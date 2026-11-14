@@ -887,7 +887,7 @@
       "other": "{n} dives logged on this device without an account"
     },
     "title": "Account",
-    "verified": "Subsurface account verified",
+    "cloudLine": "Subsurface cloud",
     "syncGroup": "Synchronisation",
     "autoSync": "Sync automatically",
     "autoSyncText": "When the app opens, when you come back to it and a few seconds after a change",
@@ -1706,6 +1706,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: under the address, “Subsurface cloud” instead of “Subsurface account verified”.",
       "Tools: the gas tools are rows of one card, like the planner.",
       "iPhone: a tab bar at the bottom (Logbook, Sites, Statistics, Tools) and the account initial at the top right, which opens the account sheet; no more side menu.",
       "Android: the account avatar shows a badge when changes wait or a map update is ready; in manual sync, the account sheet shows the waiting changes, “Sync” and its other options. Tablet: the rail, now in portrait too, looks like the phone’s bar and has the account avatar at the bottom. “Import a file” lists the formats it reads.",
