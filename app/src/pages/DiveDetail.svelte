@@ -17,6 +17,7 @@
   import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
+  import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
@@ -218,6 +219,32 @@
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
   onMount(loadDive);
+
+  /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
+  let computersOpen = $state(false);
+  let changingMain = $state(false);
+
+  /** Another computer becomes the main one: one undoable edit through the core. @param {number} index */
+  async function makeMain(index) {
+    if (!dive || changingMain) return;
+    const name = dive.diveComputers?.[index]?.nickname || dive.diveComputers?.[index]?.model || '';
+    changingMain = true;
+    try {
+      await saveDiveChanges(dive.id, { mainComputer: index });
+      offerUndo(t('detail.mainChanged', { name }));
+    } catch (e) {
+      console.error('Main computer', e);
+      showSnackbar(t('edit.failed'));
+    } finally {
+      changingMain = false;
+    }
+  }
+
+  /** The computer's nickname, in « Ordinateurs du carnet ». @param {{ model: string, serial: string }} c */
+  function renameComputer(c) {
+    computersOpen = false;
+    f7router.navigate(`/settings/computers/edit?model=${encodeURIComponent(c.model)}&serial=${encodeURIComponent(c.serial)}`);
+  }
 
   /** "Renuméroter la plongée" open. */
   let renumbering = $state(false);
@@ -690,8 +717,21 @@
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
           {feedback}
           onfeedback={setFeedback}
+          oncomputers={() => (computersOpen = true)}
         />
       </section>
+      {#if computers.length > 1}
+        <ComputersSheet
+          opened={computersOpen}
+          title={dive.site || t('dive.siteNotSet')}
+          date={dive.date}
+          computers={dive.diveComputers ?? []}
+          busy={changingMain}
+          onclose={() => (computersOpen = false)}
+          onmain={makeMain}
+          onrename={renameComputer}
+        />
+      {/if}
     {/if}
 
 

@@ -125,11 +125,11 @@ test('the Equipment card opens when it has a weight (the weights and "Ce lest é
   assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', open: false }, words), 'dry, 7 lb. Show');
 });
 
-test('the Equipment card also opens with several dive computers, and its name adds the computer', async () => {
+test('the Equipment card opens for weights only (several computers have their own block since task 2026-11-14-144), and its name adds the computer', async () => {
   const { equipmentOpens, equipmentLabel } = await import('../../app/src/lib/gas-summary.js');
   assert.equal(equipmentOpens([], 1), false);
   assert.equal(equipmentOpens([{ description: 'unknown' }], 1), true);
-  assert.equal(equipmentOpens([], 2), true);
+  assert.equal(equipmentOpens([], 2), false);
   assert.equal(equipmentOpens([{ description: 'unknown' }], 2), true);
   const words = { both: 'Equipment: {suit}, weights {weight}', weightOnly: 'Equipment: weights {weight}', suitOnly: 'Equipment: {suit}', show: 'Show', hide: 'Hide', computer: ', computer {name}', computerOnly: 'Equipment: computer {name}' };
   assert.equal(equipmentLabel({ suit: 'dry', weight: '7 lb', computer: 'Perdix', open: false, opens: false }, words), 'Equipment: dry, weights 7 lb, computer Perdix');
@@ -159,7 +159,9 @@ test('two dive computers after a merge: both listed, the first main, the card op
     { name: 'Shearwater Perdix AI', main: true },
     { name: 'Petrel de Christian', main: false },
   ]);
-  assert.equal(equipmentOpens([], list.length), true, 'no weight, two computers: the card still opens');
+  // Since task 2026-11-14-144 several computers have their own block, always shown: the card
+  // does not need to open for them.
+  assert.equal(equipmentOpens([], list.length), false, 'no weight, two computers: the computers show without opening');
   assert.equal(equipmentOpens([], computerList([{ model: 'Shearwater Petrel 3' }]).length), false);
   assert.deepEqual(computerList([{ model: '' }, { model: 'Shearwater Petrel 3' }]), [{ name: 'Shearwater Petrel 3', main: true }], 'a computer without a model is not listed');
   assert.deepEqual(computerList(undefined), []);

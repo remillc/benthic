@@ -402,7 +402,18 @@
     "delete": "Supprimer la plongée",
     "deleteTitle": "Supprimer la plongée",
     "deleted": "Plongée supprimée",
-    "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée."
+    "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée.",
+    "computersRow": "Ordinateurs",
+    "computersLabel": "Ordinateurs : {list}. Afficher les ordinateurs de cette plongée",
+    "computerMain": "{name}, principal",
+    "computersTitle": "Ordinateurs de cette plongée",
+    "computerSerial": "n° {serial}",
+    "makeMain": "Définir comme principal",
+    "makeMainLabel": "Faire de {name} l’ordinateur principal",
+    "renameComputer": "Renommer {name}",
+    "computersNote": "Le profil de la fiche est celui de l’ordinateur principal. Les données des deux ordinateurs sont gardées.",
+    "computersNoteIos": "Touchez un ordinateur pour en faire le principal. Le profil de la fiche est le sien. Les données des deux ordinateurs sont gardées.",
+    "mainChanged": "{name} est l’ordinateur principal"
   },
   "profile": {
     "hint": "Touchez le profil pour lire les valeurs",
@@ -1712,6 +1723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Plongée à plusieurs ordinateurs : la fiche les montre tous, « Définir comme principal » choisit celui du profil, et la fin du téléchargement dit quand des plongées ont été réunies avec des plongées déjà au carnet.",
       "Dialogues : quand les boutons ne tiennent pas sur une ligne, ils s’empilent, l’action principale en haut ; aucun libellé n’est coupé.",
       "iPhone : « + › Importer depuis Apple Santé » ajoute au carnet les plongées d’une Apple Watch Ultra (profondeur et température).",
       "Carnet : le bouton « + » est de nouveau à 24 dp du bord droit, au-dessus de la barre du bas.",
@@ -2353,7 +2365,8 @@
     "gasShort": {
       "o2": "O₂",
       "he": "He"
-    }
+    },
+    "mergedChip": "Plongées réunies au téléchargement"
   },
   "addUnavailable": {
     "heading": "Pas encore disponible",
@@ -2444,7 +2457,12 @@
       "one": "Une plongée est arrivée avant l'annulation. Elle n'est pas encore dans le carnet.",
       "other": "{n} plongées sont arrivées avant l'annulation. Elles ne sont pas encore dans le carnet."
     },
-    "retryingClassic": "Le Bluetooth basse consommation ne répond pas. Nouvel essai en Bluetooth classique…"
+    "retryingClassic": "Le Bluetooth basse consommation ne répond pas. Nouvel essai en Bluetooth classique…",
+    "merged": {
+      "one": "{n} réunie avec une plongée déjà au carnet.",
+      "other": "{n} réunies avec des plongées déjà au carnet."
+    },
+    "see": "Voir"
   },
   "downloadFailed": {
     "title": "Téléchargement",

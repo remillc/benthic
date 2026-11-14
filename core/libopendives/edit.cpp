@@ -3532,6 +3532,16 @@ static int import_log(struct divelog &log, int flags, const std::string &source,
 		divelog.process_imported_dives(log, flags);
 	if (flags & import_flags::is_downloaded)
 		number_new_last_dives(dives_to_add, new_dive_has_number);
+	// The dives merged into dives already in the log (task 2026-11-14-144): each one the core
+	// removes is replaced by its merge with an imported dive, found as the core matched them
+	// (dive::likely_same, as divelog.cpp's merge does).
+	std::vector<int> merged_ids;
+	for (const dive *old: dives_to_remove)
+		for (const auto &dp: dives_to_add)
+			if (old->likely_same(*dp) || dp->likely_same(*old)) {
+				merged_ids.push_back(dp->id);
+				break;
+			}
 	step.devices = std::move(devices_to_add);
 	for (auto &trip: trips_to_add)
 		step.list.trips.push_back(std::move(trip));
@@ -3568,6 +3578,11 @@ static int import_log(struct divelog &log, int flags, const std::string &source,
 	}
 	apply_dive_list(step);
 	result_json = dive_list_json(step);
+	// "merged": how many of the imported dives joined a dive already in the log, "mergedIds" those dives.
+	std::string ids;
+	for (size_t i = 0; i < merged_ids.size(); i++)
+		ids += (i ? "," : "") + std::to_string(merged_ids[i]);
+	result_json.insert(result_json.size() - 1, ",\"merged\":" + std::to_string(merged_ids.size()) + ",\"mergedIds\":[" + ids + "]");
 	push_step(std::move(step));
 	return 0;
 }

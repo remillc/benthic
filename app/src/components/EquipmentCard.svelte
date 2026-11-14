@@ -23,6 +23,7 @@
    *   ontoggle: () => void,
    *   feedback?: string,
    *   onfeedback?: (value: string) => void,
+   *   oncomputers?: () => void,
    * }}
    * label: the accessible name, "Equipment: dry suit, weights 35 lb. Show details";
    * weightTotal: empty when no weight is set; weights: one entry per location.
@@ -32,8 +33,16 @@
    * Open, the order is: suit, weight total, weights by location, "Ce lest était"
    * (feedback: 'too-light', 'ok', 'too-heavy' or '', when a weight is set and
    * onfeedback is given), then the computer. Closed, the computer row is the third row.
+   * With several computers (task 2026-11-14-144), a block « Ordinateurs » under the card's rows,
+   * open or closed: one row per computer, « Principal » on the first; a tap calls oncomputers.
    */
-  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle, feedback = '', onfeedback } = $props();
+  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle, feedback = '', onfeedback, oncomputers } = $props();
+
+  /** Several computers: their own block, always shown, instead of the « Ordinateur » row. */
+  const several = $derived(computers.length > 1);
+  const computersLabel = $derived(
+    t('detail.computersLabel', { list: computers.map((c) => (c.main ? t('detail.computerMain', { name: c.name }) : c.name)).join(', ') }),
+  );
 
   const spread = $derived(opens && open);
   /** The computer row stays in the summary when closed, or when it is the only row. */
@@ -59,7 +68,7 @@
       {#if weightTotal}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
       {/if}
-      {#if computer && computerInSummary}
+      {#if computer && computerInSummary && !several}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
       {/if}
     </span>
@@ -78,22 +87,91 @@
       <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable marked />
     </div>
   {/if}
-  {#if spread && computer && !computerInSummary}
+  {#if spread && computer && !computerInSummary && !several}
     <div class="od-equipment-card--computer">
       <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
     </div>
   {/if}
-  {#if spread && computers.length > 1}
-    <ul class="od-equipment-card--weights" aria-label={t('detail.computers')}>
+  {#if several}
+    <!-- One touch target: it opens « Ordinateurs de cette plongée » (detail-ordinateurs-android.dc.html). -->
+    <button type="button" class="od-equipment-card--computers" aria-label={computersLabel} aria-haspopup="dialog" onclick={oncomputers}>
+      <span class="od-equipment-card--computers-head">
+        <span>{t('detail.computersRow')}</span>
+        <Icon name="chevron" size={24} weight={2} />
+      </span>
       {#each computers as c, i (i)}
-        <li><span>{c.name}</span>{#if c.main}<span>{t('detail.mainBadge')}</span>{/if}</li>
+        <span class="od-equipment-card--computer-row">
+          <Icon name="wristComputer" size={24} weight={1.8} />
+          <span class="od-equipment-card--computer-name">{c.name}</span>
+          {#if c.main}<span class="od-equipment-card--main">{t('detail.mainBadge')}</span>{/if}
+        </span>
       {/each}
-    </ul>
+    </button>
   {/if}
 </div>
 
 <style>
   @layer od.components {
+    .od-equipment-card--computers {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 8px 4px 16px;
+      border: none;
+      border-top: 1px solid var(--od-row-divider);
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+    }
+
+    .od-equipment-card--computers-head {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 16px;
+
+      :global(.od-icon) {
+        color: var(--od-text-2);
+      }
+    }
+
+    .od-equipment-card--computer-row {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-right: 8px;
+      border-top: 1px solid var(--od-row-divider);
+
+      :global(.od-icon) {
+        flex: none;
+        color: var(--od-text-2);
+      }
+    }
+
+    .od-equipment-card--computer-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 16px;
+      color: var(--od-text-2);
+    }
+
+    /* « Principal »: #114477 on #D4E2F2, as the blue theme's selection. */
+    .od-equipment-card--main {
+      flex: none;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 12px;
+      background: var(--od-secondary-container);
+      color: var(--od-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+
     .od-equipment-card {
       border-radius: 16px;
       background: var(--od-surface);

@@ -13,9 +13,42 @@
 
 import { f7 } from 'framework7-svelte';
 import { OpenDivesCore } from 'opendives-core';
-import { afterDownload } from './logbook.svelte.js';
+import { afterDownload, logbook } from './logbook.svelte.js';
 import { offerUndo } from './undo.js';
+import { showSnackbar } from './snackbar.js';
+import { showSection } from './navigation.svelte.js';
+import { showDives } from './filter.svelte.js';
 import { t } from './i18n.js';
+
+/**
+ * The message at the end of a download that added dives (task 2026-11-14-144). When the core merged
+ * some of them into dives already in the logbook (another computer's recording of the same dive), it
+ * says so, with « Voir »: that dive, or the Logbook showing only the merged dives. Otherwise
+ * « N plongées téléchargées » with « Annuler », as before.
+ * @param {{ downloaded?: number, list?: { merged?: number, mergedIds?: number[] } }} result
+ */
+export function announceDownload(result) {
+  const n = result.downloaded ?? 0;
+  if (!n) return;
+  const ids = result.list?.mergedIds ?? [];
+  if (!ids.length) {
+    offerUndo(t('download.done', { n }));
+    return;
+  }
+  showSnackbar(`${t('download.done', { n })}. ${t('download.merged', { n: ids.length })}`, {
+    action: t('download.see'),
+    timeout: 8000,
+    onAction: async () => {
+      if (ids.length === 1) {
+        const { openDiveById } = await import('./open-link.js');
+        await openDiveById(ids[0]);
+      } else {
+        showSection('logbook');
+        await showDives(ids, logbook.prefs);
+      }
+    },
+  });
+}
 
 /**
  * Keeps the dives received before a download failed or was cancelled, as a
@@ -27,7 +60,7 @@ export async function keepReceived() {
   try {
     const result = await OpenDivesCore.downloadPartial({ action: 'keep' });
     await afterDownload(result);
-    if (result.downloaded) offerUndo(t('download.done', { n: result.downloaded }));
+    announceDownload(result);
     return true;
   } catch (e) {
     console.error('Keeping the dives received', e);
