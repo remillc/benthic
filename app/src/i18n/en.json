@@ -25,6 +25,7 @@
     "addImportFormats": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
     "addManual": "Log a dive manually",
     "addScan": "Scan a QR code",
+    "addHealth": "Import from Apple Health",
     "loading": "Loading the logbook",
     "errorTitle": "The logbook could not be read",
     "errorNothingChanged": "No dive was changed.",
@@ -1711,6 +1712,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "iPhone: “+ › Import from Apple Health” adds the dives of an Apple Watch Ultra to the logbook (depth and temperature).",
       "Logbook: the “+” button is back 24 dp from the right edge, above the bottom bar.",
       "About: “Free, and so is your logbook”, with “See on GitHub” and “Export my logbook”.",
       "French: « courriel » in Canada, « e-mail » in France.",
@@ -3165,5 +3167,18 @@
       "other": "{n} map updates"
     },
     "mapUpdateWaiting": "Map update available"
+  },
+  "health": {
+    "title": "Apple Health",
+    "import": {
+      "one": "Import",
+      "other": "Import {n}"
+    },
+    "reading": "Reading Apple Health…",
+    "unavailable": "Apple Health has no dive data on this device. It needs an iPhone with iOS 16 or later and an Apple Watch Ultra.",
+    "failed": "Apple Health could not be read.",
+    "none": "No dives in Apple Health in the last year. If access was refused, allow OpenDives in Health › Sharing › Apps.",
+    "known": "already in the logbook",
+    "what": "Apple Health only keeps the time, depth and temperature: the site, gas and buddies are completed in the dive."
   }
 }

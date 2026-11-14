@@ -25,6 +25,7 @@
     "addImportFormats": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
     "addManual": "Noter une plongée à la main",
     "addScan": "Scanner un code QR",
+    "addHealth": "Importer depuis Apple Santé",
     "loading": "Chargement du carnet",
     "errorTitle": "Le carnet n'a pas pu être lu",
     "errorNothingChanged": "Aucune plongée n'a été modifiée.",
@@ -1711,6 +1712,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "iPhone : « + › Importer depuis Apple Santé » ajoute au carnet les plongées d’une Apple Watch Ultra (profondeur et température).",
       "Carnet : le bouton « + » est de nouveau à 24 dp du bord droit, au-dessus de la barre du bas.",
       "À propos : « Libre, et votre carnet aussi », avec « Voir sur GitHub » et « Exporter mon carnet ».",
       "Français : « courriel » au Canada, « e-mail » en France.",
@@ -3165,5 +3167,18 @@
       "other": "{n} mises à jour de carte"
     },
     "mapUpdateWaiting": "Mise à jour de carte disponible"
+  },
+  "health": {
+    "title": "Apple Santé",
+    "import": {
+      "one": "Importer",
+      "other": "Importer {n}"
+    },
+    "reading": "Lecture d’Apple Santé…",
+    "unavailable": "Apple Santé n’a pas de données de plongée sur cet appareil. Il faut un iPhone avec iOS 16 ou plus et une Apple Watch Ultra.",
+    "failed": "Apple Santé n’a pas pu être lu.",
+    "none": "Aucune plongée dans Apple Santé depuis un an. Si l’accès a été refusé, autorisez OpenDives dans Santé › Partage › Apps.",
+    "known": "déjà dans le carnet",
+    "what": "Apple Santé ne garde que l’heure, la profondeur et la température : le site, le gaz et les compagnons se complètent dans la plongée."
   }
 }

@@ -51,6 +51,7 @@
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
   import Download from './pages/Download.svelte';
+  import HealthImport from './pages/HealthImport.svelte';
   import NavMenu from './components/NavMenu.svelte';
   import NavigationBar from './components/NavigationBar.svelte';
   import AccountSheet from './components/AccountSheet.svelte';
@@ -96,6 +97,8 @@
     { path: '/filter/:key', component: FilterCriterion },
     { path: '/add/:what', component: AddUnavailable },
     { path: '/download', component: Download },
+    // iPhone: the dives of an Apple Watch Ultra from Apple Health (to-do #67).
+    { path: '/health', component: HealthImport },
     { path: '/download/failed', component: DownloadFailed },
     { path: '/settings/', component: Settings },
     { path: '/about', component: About },

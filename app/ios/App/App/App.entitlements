@@ -5,6 +5,12 @@
 	<!-- Universal Links: https://opendives.app/... opens the app. Needs the
 	     Associated Domains capability on the App ID, and the Team ID in
 	     site/.well-known/apple-app-site-association. -->
+	<!-- Apple Health, read only: the dives of an Apple Watch Ultra (to-do #67). Needs the
+	     HealthKit capability on the App ID. -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array/>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:opendives.app</string>
