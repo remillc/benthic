@@ -809,7 +809,7 @@
       "volumeNoteLitres": "The water volume of the cylinder, in litres. In imperial units, you enter the volume of gas at working pressure, in cubic feet. The working pressure is optional for a volume in litres."
     },
     "paperSize": {
-      "label": "Paper size",
+      "label": "Paper size (printing)",
       "text": "{name}, from the region",
       "letter": "Letter",
       "a4": "A4",
@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings: “Paper size (printing)”, to say it is only for printing.",
       "Offline maps: no space limit of their own any more; only the device’s free space counts (always at least 1 GB free). The top card shows the maps, the other data and the free space.",
       "Offline maps: the ⋮ of each region is clearly visible; every ⋮ keeps full dots.",
       "Account without an account: a third choice, “Use my own git repository”, and an icon on each choice.",
