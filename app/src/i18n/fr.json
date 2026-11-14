@@ -1711,6 +1711,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Cartes hors ligne : le ⋮ de chaque région est bien visible ; tous les ⋮ gardent des points pleins.",
       "Compte sans compte : un troisième choix, « Utiliser mon propre dépôt git », et une icône sur chaque choix.",
       "Compte : « Se déconnecter » vient d’abord, à part du groupe du compte ; la « Zone dangereuse » ne contient plus que « Supprimer le compte » ; la ligne du serveur est en petit.",
       "Connexion : l’indicateur de progression ondulé est bleu sur une piste bleu pâle, à 16 dp des bords, sous la barre ; avec « Supprimer les animations », une barre plate glisse. La barre de synchronisation prend les mêmes couleurs.",
