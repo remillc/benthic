@@ -2706,7 +2706,7 @@ Check the app with the device in French (Canada) and in French (France).
 
 Done in fix/courriel-fr-ca: fr.json says « e-mail » again in the five strings of task 140 (E-mail, Adresse e-mail twice, « envoyé par e-mail », « Cette adresse e-mail n’est pas valide »), and in three older ones that said « courriel » (« Un lien est envoyé à votre adresse e-mail », « Par e-mail, avec les informations techniques », « s’ouvre dans l’application de messagerie »; account.createText keeps « par e-mail »). fr-CA.json holds the « courriel » versions of all of them. The release notes are left as written. Also fixed: fr-CA.json still overrode account.deleteText with the sentence of before task 139; it now has task 139's text with « nuage ». The site's French pages come from fr.json and have no Canadian version, so they say « e-mail ». docs/ui-writing.md: the rule is fr-CA « courriel », fr « e-mail ». Checked by resolving each key in both catalogs (fr-CA, then fr), not on the device's language.
 
-## [ ] 2026-11-14-142 About: « Libre, et votre carnet aussi »
+## [x] 2026-11-14-142 About: « Libre, et votre carnet aussi »
 
 Christian's to-do #57, decided on 14 November 2026. Mock-up: `docs/mockups/apropos-android.dc.html`.
 
@@ -2718,3 +2718,5 @@ In About, right under the logo, version, tagline and author, before the « Proje
 - two buttons: « Voir sur GitHub » (tonal, opens the repository's page, where the source and the compiled versions are) and « Exporter mon carnet » (outlined, the same export as elsewhere in the app, a Subsurface `.ssrf` file).
 
 The licence is not named in the card: it stays in the « Licences » group below. Same card on the iPhone About screen (grouped style) and on the tablet. Update `docs/ui-specification.md` (About). English: « Free, and so is your logbook », « The app and its code are always freely available on GitHub. Anyone can read the code, change it and share it. », « Your logbook is yours: in the Subsurface format, it can be copied and opened in Subsurface on a computer too. », « See on GitHub », « Export my logbook ».
+
+Done in feature/about-free-card: a card under the header of About (20 dp corners, 16 dp padding, 10 pt on iPhone) with the heading « Libre, et votre carnet aussi » (an h2), the two texts, « Voir sur GitHub » (tonal link to the repository) and « Exporter mon carnet » (outlined; every dive of the logbook through exportDives as .ssrf, the same export as the Logbook selection; disabled with an empty logbook). The licence stays in « Licences ». One page for phone, tablet and iPhone. Checked on the phone emulator, light and dark. ui-specification updated.

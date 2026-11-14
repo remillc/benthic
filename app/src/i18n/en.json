@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "About: “Free, and so is your logbook”, with “See on GitHub” and “Export my logbook”.",
       "French: « courriel » in Canada, « e-mail » in France.",
       "French texts: « courriel » everywhere, never « e-mail ».",
       "Account: under “Delete account”, it says your dives can stay on this device.",
@@ -1996,7 +1997,14 @@
     "opensElsewhere": "opens in the browser",
     "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors.",
     "librariesIntro": "Tapping a library opens its website in the browser.",
-    "libraryLink": "{name}, {licence} (opens in the browser)"
+    "libraryLink": "{name}, {licence} (opens in the browser)",
+    "free": {
+      "title": "Free, and so is your logbook",
+      "code": "The app and its code are always freely available on GitHub. Anyone can read the code, change it and share it.",
+      "logbook": "Your logbook is yours: in the Subsurface format, it can be copied and opened in Subsurface on a computer too.",
+      "github": "See on GitHub",
+      "export": "Export my logbook"
+    }
   },
   "bringLogbook": {
     "device": {

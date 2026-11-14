@@ -16,6 +16,8 @@
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
+  import { exportDives } from '../lib/share.js';
+  import { showSnackbar } from '../lib/snackbar.js';
 
   /** The author's name: a proper name, not translated. */
   const AUTHOR = 'Christian Rémillard';
@@ -31,6 +33,23 @@
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
   };
+
+  /** « Exporter mon carnet »: the whole logbook as a Subsurface file, the same export as elsewhere. */
+  async function exportLogbook() {
+    try {
+      await exportDives(
+        logbook.dives.map((d) => d.id),
+        'ssrf',
+        false,
+        logbook.prefs,
+      );
+    } catch (e) {
+      // Closing the system's share sheet without choosing is not an error.
+      if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
+      console.error('Export the logbook', e);
+      showSnackbar(t('export.failed'));
+    }
+  }
 
   /**
    * "Version 0.1.0": the installed package's version (its build number stays
@@ -144,6 +163,18 @@
     <p class="od-about--author">{t('about.author', { name: AUTHOR })}</p>
   </header>
 
+  <!-- « Libre, et votre carnet aussi » (task 2026-11-14-142, to-do #57): the app's code is open and
+       the logbook stays the diver's. The licence itself is named below, in « Licences ». -->
+  <section class="od-about--free" aria-labelledby="od-about-free-title">
+    <h2 id="od-about-free-title" class="od-about--free-title">{t('about.free.title')}</h2>
+    <p>{t('about.free.code')}</p>
+    <p>{t('about.free.logbook')}</p>
+    <div class="od-about--free-actions">
+      <a href={LINKS.source} class="external od-tonal-button" target="_blank" rel="noopener">{t('about.free.github')}</a>
+      <button type="button" class="od-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}>{t('about.free.export')}</button>
+    </div>
+  </section>
+
   {#each groups as group (group.title)}
     <h2 class="block-title od-section-title">{group.title}</h2>
     <nav class="list list-strong inset list-dividers" aria-label={group.title}>
@@ -207,6 +238,47 @@
 
     :global(html.dark) .od-about--logo.dark {
       display: block;
+    }
+
+    .od-about--free {
+      margin: 16px 16px 0;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--od-surface);
+      color: var(--od-text);
+
+      :global(.ios) & {
+        border-radius: 10px;
+      }
+
+      p {
+        margin: 8px 0 0;
+        font-size: 15px;
+        line-height: 21px;
+        color: var(--od-text-2);
+      }
+    }
+
+    .od-about--free-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    .od-about--free-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      /* A link drawn as a button: its label centred like the button's. */
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+      }
     }
 
     .od-about--author {
