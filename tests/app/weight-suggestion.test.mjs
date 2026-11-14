@@ -158,3 +158,23 @@ test('cylinders are compared by capacity rounded to 0.1 L, not by name', () => {
   assert.equal(suggestWeight({ ...current, cylinders: named('AL80', 11100) }, [dive({ cylinders: named('AL80', 12000) })], 'lbs'), null);
   assert.equal(suggestWeight({ ...current, cylinders: named('AL80', 11100) }, [dive({ cylinders: named('AL80', 11300) })], 'lbs'), null);
 });
+
+// Task 2026-11-14-145: the suggestion is offered on the most recent dive of the logbook only.
+test('only the most recent dive gets the suggestion', async () => {
+  const { isMostRecent } = await import('../../app/src/lib/weight-suggestion.js');
+  const dives = [
+    { id: 1, date: '2026-08-30T11:36:02', number: 1370 },
+    { id: 2, date: '2026-11-08T09:35:00', number: 1386 },
+    { id: 3, date: '2026-11-04T11:35:00', number: 1385 },
+  ];
+  assert.equal(isMostRecent(2, dives), true);
+  assert.equal(isMostRecent(1, dives), false);
+  assert.equal(isMostRecent(3, dives), false);
+  // One download bringing two dives the same day: the later one.
+  const download = [...dives, { id: 4, date: '2026-11-14T09:00:00', number: 1387 }, { id: 5, date: '2026-11-14T13:00:00', number: 1388 }];
+  assert.equal(isMostRecent(5, download), true);
+  assert.equal(isMostRecent(4, download), false);
+  // Same start: the higher number.
+  assert.equal(isMostRecent(7, [{ id: 6, date: '2026-11-14T13:00:00', number: 10 }, { id: 7, date: '2026-11-14T13:00:00', number: 11 }]), true);
+  assert.equal(isMostRecent(1, []), false);
+});

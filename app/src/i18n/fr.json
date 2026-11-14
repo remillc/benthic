@@ -1723,6 +1723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Modifier la plongée : la suggestion de lest n’apparaît que sur la plongée la plus récente du carnet.",
       "Plongée à plusieurs ordinateurs : la fiche les montre tous, « Définir comme principal » choisit celui du profil, et la fin du téléchargement dit quand des plongées ont été réunies avec des plongées déjà au carnet.",
       "Dialogues : quand les boutons ne tiennent pas sur une ligne, ils s’empilent, l’action principale en haut ; aucun libellé n’est coupé.",
       "iPhone : « + › Importer depuis Apple Santé » ajoute au carnet les plongées d’une Apple Watch Ultra (profondeur et température).",

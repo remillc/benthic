@@ -50,7 +50,7 @@
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import { FEEDBACK_CHOICES, feedbackOf, isFeedbackTag, toggleFeedback, visibleTags, withFeedback } from '../lib/weight-feedback.js';
-  import { cylinderKey, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
+  import { cylinderKey, isMostRecent, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -310,10 +310,13 @@
     if (key === ruleKey) sources = read;
   }
 
+  /** Only the most recent dive of the logbook gets a suggestion (task 2026-11-14-145). */
+  const suggestionAllowed = $derived(!!dive && isMostRecent(dive.id, logbook.dives));
+
   // One scan after each pause in the suit, water type or cylinder sizes.
   $effect(() => {
     const key = ruleKey;
-    if (!dive) return;
+    if (!dive || !suggestionAllowed) return;
     const timer = setTimeout(() => scanSources(key), 300);
     return () => clearTimeout(timer);
   });
@@ -321,7 +324,7 @@
   const suggestion = $derived(suggestWeight(ruleDive, sources, prefs.weight));
   /** The dive's total weight now, in grams. */
   const weightsNow = $derived(weights.reduce((sum, w) => sum + (Number.isFinite(gramsOf(w)) ? gramsOf(w) : 0), 0));
-  const suggestionShown = $derived(showSuggestion(suggestion, weightsNow, prefs.weight));
+  const suggestionShown = $derived(suggestionAllowed && showSuggestion(suggestion, weightsNow, prefs.weight));
   const suggestionTexts = $derived(
     suggestion ? { weight: formatWeight(suggestion.grams, prefs), date: formatLongDate(suggestion.from.date) } : { weight: '', date: '' },
   );

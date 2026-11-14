@@ -65,6 +65,19 @@ export const matches = (dive, current) =>
 export const mostRecentFirst = (a, b) => (a.date === b.date ? (b.number ?? 0) - (a.number ?? 0) : a.date < b.date ? 1 : -1);
 
 /**
+ * Whether a dive is the most recent of the logbook (task 2026-11-14-145): the suggestion is only
+ * offered on it, the dive just downloaded or added; when a download brings several dives, the last
+ * of them. Most recent as mostRecentFirst orders them: by start, then by number.
+ * @param {number} id the dive being edited
+ * @param {{ id: number, date: string, number?: number }[]} dives the logbook's dives
+ */
+export function isMostRecent(id, dives) {
+  let latest = null;
+  for (const d of dives) if (!latest || mostRecentFirst(d, latest) < 0) latest = d;
+  return !!latest && latest.id === id;
+}
+
+/**
  * The suggestion for a dive, or null.
  * @param {{ id: number, suit: string, waterType: string, cylinders: { sizeMl: number }[] }} current
  * @param {WeightSource[]} dives candidates, any order

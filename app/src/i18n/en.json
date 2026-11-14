@@ -1723,6 +1723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Edit dive: the suggested weight only shows on the most recent dive of the logbook.",
       "Dive with several computers: the dive shows them all, “Make main” chooses the profile’s one, and the end of a download says when dives were joined to dives already in the logbook.",
       "Dialogs: when the buttons do not fit on one line, they stack, the main action on top; no label is cut.",
       "iPhone: “+ › Import from Apple Health” adds the dives of an Apple Watch Ultra to the logbook (depth and temperature).",
