@@ -2584,3 +2584,9 @@ Christian's decision of 14 November 2026: the iPhone follows the same model as A
 3. **Account screens.** The ☰ becomes the standard back button.
 
 The iOS build runs on GitHub (no Mac): keep the change to the web/Capacitor layer where possible, and test VoiceOver labels on the tab bar and the initial. Update `docs/ui-specification.md` and `docs/system-design.md` §7 for iPhone.
+
+## [ ] 2026-11-14-128 Outils: the gas tools each on its own row
+
+Christian's correction of 14 November 2026, completing task 122. Mock-ups: `docs/mockups/android-outils.dc.html`, `docs/mockups/android-tablette-outils-paysage.dc.html`, `docs/mockups/android-tablette-outils-portrait.dc.html`.
+
+Under « Gaz », replace the grid of three tiles with one card (28 dp corners, white) holding three rows separated by a 1 dp divider indented to the text: « EAD et MOD » (Profondeurs d’un mélange), « Meilleur mélange » (Pour une profondeur), « Mélangeur de gaz » (Nitrox ou trimix). Each row is laid out like the Planificateur card: 40 dp icon container in `#D4E2F2` (keep each tool's shape), title 16 sp semibold, supporting text 14 sp `#4B4A47`, chevron at the end, at least 72 dp tall, the whole row tappable. Same on the tablet, landscape and portrait. Update the Tools page paragraph of `docs/ui-specification.md`. Check on the phone and tablet emulators, light and dark, with TalkBack.
