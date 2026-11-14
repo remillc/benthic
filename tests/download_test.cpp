@@ -652,6 +652,7 @@ static void test_merged_computers()
 	fingerprint_table before;
 	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:44:55:66", before, json, error);
 	check("merged computers: imported", rc == 0, error);
+	check("merged computers: the result says one dive was merged", json.find("\"merged\":1") != std::string::npos, json);
 	check("merged computers: merged, no new dive", divelog.dives.size() == dives_before,
 	      std::to_string(divelog.dives.size()) + " dives, were " + std::to_string(dives_before));
 	const dive *merged = nullptr;
@@ -664,6 +665,8 @@ static void test_merged_computers()
 		check("merged computers: one computer more", merged->dcs.size() == dcs_before + 1,
 		      std::to_string(merged->dcs.size()) + " computers");
 		check("merged computers: the downloaded one first", merged->dcs[0].model == "Shearwater Perdix AI", merged->dcs[0].model);
+		check("merged computers: the result names the merged dive",
+		      json.find("\"mergedIds\":[" + std::to_string(merged->id) + "]") != std::string::npos, json);
 		bool kept = false;
 		for (size_t i = 1; i < merged->dcs.size(); i++)
 			kept |= merged->dcs[i].model == old_model;
@@ -673,6 +676,25 @@ static void test_merged_computers()
 		opendives::get_dive(merged->id, detail, error);
 		size_t list = detail.find("\"diveComputers\":[");
 		size_t first = detail.find("Shearwater Perdix AI", list), second = detail.find(old_model, list);
+		// « Définir comme principal » (task 2026-11-14-144): edit_dive {"mainComputer": n}, Subsurface's
+		// MoveDiveComputerToFront. The computers change places; the dive keeps its id and its start
+		// time (the dive's own, not the computer's), and undo puts them back.
+		{
+			int merged_id = merged->id;
+			timestamp_t when = merged->when;
+			std::string result;
+			int mrc = opendives::edit_dive(merged_id, "{\"mainComputer\":1}", result, error);
+			const dive *m = divelog.dives.get_by_uniq_id(merged_id);
+			check("make main: done", mrc == 0 && m, error);
+			if (m) {
+				check("make main: the computer already logged is first", m->dcs[0].model == old_model, m->dcs[0].model);
+				check("make main: the downloaded one is kept second", m->dcs.size() == 2 && m->dcs[1].model == "Shearwater Perdix AI");
+				check("make main: the start time does not change", m->when == when);
+			}
+			opendives::undo(result, error);
+			m = divelog.dives.get_by_uniq_id(merged_id);
+			check("make main: undo puts the downloaded one first again", m && m->dcs[0].model == "Shearwater Perdix AI");
+		}
 		check("merged computers: get_dive lists both, the downloaded one first",
 		      list != std::string::npos && first != std::string::npos && second != std::string::npos && first < second,
 		      detail.substr(list == std::string::npos ? 0 : list, 200));

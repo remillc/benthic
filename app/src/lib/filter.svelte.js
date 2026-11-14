@@ -31,11 +31,14 @@ import { logbook } from './logbook.svelte.js';
  *   rating: number, visibility: number, current: number, wavesize: number, surge: number, chill: number,
  *   notes: string, fulltext: string,
  *   unsent: boolean,
+ *   onlyIds: number[],
  *   preset: SavedFilter|null,
  * }} Criteria
  * `unsent`: only the dives whose edits are not sent yet (the ones the Logbook
  * marks), as the sync menu's "See changes not sent yet" asks; matched here,
  * not by the core, and not on the Filter screen.
+ * `onlyIds`: only these dives (the dives a download merged into dives already in the logbook, task
+ * 2026-11-14-144); matched here, not on the Filter screen.
  * `preset`: a saved filter applied as the core keeps it (its rules are added
  * to the other criteria).
  */
@@ -58,6 +61,7 @@ export function emptyCriteria() {
     rating: 0, visibility: 0, current: 0, wavesize: 0, surge: 0, chill: 0,
     notes: '', fulltext: '',
     unsent: false,
+    onlyIds: [],
     preset: null,
   };
 }
@@ -388,10 +392,12 @@ export function isEmpty(c) {
  */
 async function match(c, prefs) {
   const unsent = c.unsent ? unsentIds(logbook.dives, logbook.pendingByDive) : null;
-  if (unsent && isEmpty({ ...c, unsent: false })) return unsent;
+  const only = c.onlyIds?.length ? new Set(c.onlyIds) : null;
+  const rest = { ...c, unsent: false, onlyIds: [] };
+  if ((unsent || only) && isEmpty(rest)) return new Set([...(unsent ?? only ?? [])].filter((id) => (!unsent || unsent.has(id)) && (!only || only.has(id))));
   /** @type {number[]} */
   const ids = await OpenDivesCore.filterQuery({ kind: 'dives', ...fulltextOf(c), rules: rulesFor(c, prefs) });
-  return new Set(unsent ? ids.filter((id) => unsent.has(id)) : ids);
+  return new Set(ids.filter((id) => (!unsent || unsent.has(id)) && (!only || only.has(id))));
 }
 
 /**
@@ -723,6 +729,15 @@ export function valueText(key, c, prefs, tripName = (id) => id) {
 }
 
 /**
+ * The dives a download merged into dives already in the logbook: the sections show only those.
+ * @param {number[]} ids
+ * @param {Prefs} prefs
+ */
+export function showDives(ids, prefs) {
+  return applyFilter({ ...emptyCriteria(), onlyIds: [...ids] }, prefs);
+}
+
+/**
  * The criteria set in the applied filter, for the active filter row.
  * @param {Criteria} c
  */
@@ -732,6 +747,7 @@ export function activeKeys(c) {
   if (hasRemainder(c.preset)) keys.push('preset');
   if (c.mode !== 'all') keys.push('mode');
   if (c.unsent) keys.push('unsent');
+  if (c.onlyIds?.length) keys.push('onlyIds');
   for (const g of groups) for (const k of g.keys) if (isSet(k.key, c)) keys.push(k.key);
   return keys;
 }

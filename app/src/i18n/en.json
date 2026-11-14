@@ -402,7 +402,18 @@
     "delete": "Delete the dive",
     "deleteTitle": "Delete the dive",
     "deleted": "Dive deleted",
-    "deleteFailed": "The dive could not be deleted. No dive was changed."
+    "deleteFailed": "The dive could not be deleted. No dive was changed.",
+    "computersRow": "Computers",
+    "computersLabel": "Computers: {list}. Show the computers of this dive",
+    "computerMain": "{name}, main",
+    "computersTitle": "Computers of this dive",
+    "computerSerial": "no. {serial}",
+    "makeMain": "Make main",
+    "makeMainLabel": "Make {name} the main computer",
+    "renameComputer": "Rename {name}",
+    "computersNote": "The profile of the dive is the main computer’s. The data of both computers is kept.",
+    "computersNoteIos": "Tap a computer to make it the main one. The profile of the dive is its own. The data of both computers is kept.",
+    "mainChanged": "{name} is the main computer"
   },
   "profile": {
     "hint": "Touch the profile to read the values",
@@ -1712,6 +1723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dive with several computers: the dive shows them all, “Make main” chooses the profile’s one, and the end of a download says when dives were joined to dives already in the logbook.",
       "Dialogs: when the buttons do not fit on one line, they stack, the main action on top; no label is cut.",
       "iPhone: “+ › Import from Apple Health” adds the dives of an Apple Watch Ultra to the logbook (depth and temperature).",
       "Logbook: the “+” button is back 24 dp from the right edge, above the bottom bar.",
@@ -2353,7 +2365,8 @@
     "gasShort": {
       "o2": "O₂",
       "he": "He"
-    }
+    },
+    "mergedChip": "Dives joined by the download"
   },
   "addUnavailable": {
     "heading": "Not available yet",
@@ -2444,7 +2457,12 @@
       "one": "One dive arrived before the download was cancelled. It is not in the logbook yet.",
       "other": "{n} dives arrived before the download was cancelled. They are not in the logbook yet."
     },
-    "retryingClassic": "Bluetooth Low Energy does not answer. Trying again over Bluetooth Classic…"
+    "retryingClassic": "Bluetooth Low Energy does not answer. Trying again over Bluetooth Classic…",
+    "merged": {
+      "one": "{n} joined to a dive already in the logbook.",
+      "other": "{n} joined to dives already in the logbook."
+    },
+    "see": "View"
   },
   "downloadFailed": {
     "title": "Download",

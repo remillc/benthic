@@ -175,7 +175,7 @@ export { waterTypeOf };
  * @property {boolean} invalid marked invalid
  * @property {boolean} manual entered by hand: duration and depth can be edited
  * @property {number} pictures number of pictures and videos referenced
- * @property {{model: string, nickname: string, divemode: string}[]} diveComputers the first is the main one
+ * @property {{model: string, nickname: string, divemode: string, serial: string}[]} diveComputers the first is the main one; `serial` as « Ordinateurs du carnet » names it
  * @property {string} divemode OC, CCR, PSCR, Freedive
  * @property {string} computer model of the first dive computer
  * @property {number} computers number of dive computers

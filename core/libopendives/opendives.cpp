@@ -461,6 +461,10 @@ int get_dive(int id, std::string &json, std::string &error)
 		append_json_string(json, get_dc_nickname(&d->dcs[i]));
 		json += ",\"divemode\":";
 		append_json_string(json, divemode_text[d->dcs[i].divemode]);
+		// The serial number names the computer in « Ordinateurs du carnet » (its nickname is kept
+		// per model and serial number): the dive's computers sheet opens it (task 2026-11-14-144).
+		json += ",\"serial\":";
+		append_json_string(json, d->dcs[i].serial);
 		json += '}';
 	}
 	json += ']';

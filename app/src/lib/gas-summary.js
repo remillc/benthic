@@ -145,11 +145,12 @@ export function unusedShown(cylinder) {
 /**
  * Whether opening the Equipment card shows something more than the rows
  * (task 2026-11-13-99): a weight (the weights by location and "Ce lest
- * était") or several dive computers (task 2026-11-12-60: all of them listed).
+ * était"). Several dive computers no longer need it: they have their own block,
+ * shown open or closed (task 2026-11-14-144).
  * @param {{ description?: string }[]} weights the weights that are set
- * @param {number} [computers] how many dive computers the dive has
+ * @param {number} [_computers] how many dive computers the dive has (no longer counts)
  */
-export const equipmentOpens = (weights, computers = 0) => weights.length > 0 || computers > 1;
+export const equipmentOpens = (weights, _computers = 0) => weights.length > 0;
 
 /**
  * The dive computers of a dive as the Equipment card lists them (task 2026-11-12-60): every one
