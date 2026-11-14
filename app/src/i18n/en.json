@@ -918,8 +918,8 @@
     "changePasswordText": "A link is sent to your email",
     "dangerZone": "Danger zone",
     "signOut": "Sign out",
-    "signOutText": "Your dives stay in the cloud and on this device.",
-    "delete": "Delete account",
+    "signOutText": "Your dives stay in the cloud and on this device. To erase them from the cloud, delete the cloud account.",
+    "delete": "Delete the cloud account",
     "deleteText": "Erases the account and its dives from the Subsurface cloud. Cannot be undone. You can keep your dives on this device.",
     "server": "Connected through the {region} server ({host}).",
     "serverHost": "Connected through the {host} server.",
@@ -1784,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: “Delete account” becomes “Delete the cloud account”, and the text under “Sign out” says how to erase your dives from the cloud.",
       "Heat map: the colours go from blue (few dives) to red (the most dives), and the legend follows.",
       "Relative times (“2 min ago”, “in 3 h”, “yesterday at 2:30 pm”) are no longer split at the end of a line.",
       "Account: the account sheet has rounder corners and the account card is a little narrower.",
