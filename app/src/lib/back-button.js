@@ -66,6 +66,12 @@ export function enableBackButton() {
       gasPage.dispatchEvent(new CustomEvent('od-cancel'));
       return;
     }
+    // 3b'. The account deletion wizard goes back one step (pages/DeleteAccount.svelte).
+    const wizardStep = document.querySelector('.page-current .od-delete-wizard--body:not([data-step="1"])');
+    if (wizardStep && !modal) {
+      wizardStep.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     // 3c. A form with unsaved changes (the full screen, or its popup on a tablet) asks
     // before it is left (lib/leave-guard.js); a sheet or dialog above it closed first.
     if ((!modal || modal.classList.contains('popup')) && backThroughGuard(modal)) return;

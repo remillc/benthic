@@ -1016,15 +1016,35 @@
   },
   "deleteAccount": {
     "back": "Retour au compte",
+    "backStep": "Retour à l'étape précédente",
+    "step": "Étape {n} sur 3",
+    "stepTitle": "Étape {n} sur 3 · {title}",
+    "stepErase": "Ce qui sera effacé",
+    "stepDives": "Vos plongées",
+    "stepConfirm": "Confirmer",
+    "continue": "Continuer",
     "definitive": "C'est définitif !",
-    "consequence": {
-      "one": "Le compte {email} et sa plongée seront effacés du cloud, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler.",
-      "other": "Le compte {email} et ses {n} plongées seront effacés du cloud, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler."
-    },
     "keep": "Garder mes plongées sur cet appareil",
     "keepText": "Elles passent dans un carnet sans compte, seulement sur ce téléphone",
+    "keepTextTablet": "Elles passent dans un carnet sans compte, seulement sur cette tablette",
     "export": "Exporter une copie du carnet",
     "exportText": "Un fichier Subsurface (.ssrf), à garder ailleurs",
+    "nothingKeptLead": "Si vous décochez sans exporter",
+    "nothingKeptRest": ", vos plongées ne seront plus nulle part.",
+    "summary": "En résumé",
+    "erased": "Effacé du cloud",
+    "erasedText": {
+      "one": "Le compte {email} et sa plongée",
+      "other": "Le compte {email} et ses {n} plongées"
+    },
+    "keptPhone": "Gardé sur ce téléphone",
+    "keptTablet": "Gardé sur cette tablette",
+    "keptText": {
+      "one": "{n} plongée, dans un carnet sans compte",
+      "other": "{n} plongées, dans un carnet sans compte"
+    },
+    "keptNothingPhone": "Rien n'est gardé sur ce téléphone",
+    "keptNothingTablet": "Rien n'est gardé sur cette tablette",
     "password": "Mot de passe du compte",
     "passwordText": "Pour confirmer que c'est bien vous",
     "note": "Les modifications en attente sont envoyées d'abord. Le compte n'est supprimé qu'après la confirmation du serveur.",
@@ -1032,7 +1052,24 @@
     "connectionNeeded": "Connexion nécessaire",
     "deleted": "Le compte a été supprimé.",
     "notDeleted": "Le compte n'a pas été supprimé. Rien n'a changé.",
-    "wrongPassword": "Ce n'est pas le mot de passe du compte. Rien n'a été supprimé."
+    "wrongPassword": "Ce n'est pas le mot de passe du compte. Rien n'a été supprimé.",
+    "noUndo": "Il n'y a aucun moyen d'annuler.",
+    "eraseAccount": "Le compte {email}",
+    "eraseAccountText": "Effacé du cloud Subsurface",
+    "eraseDives": {
+      "one": "Sa plongée dans le cloud",
+      "other": "Ses {n} plongées dans le cloud"
+    },
+    "eraseDivesText": {
+      "one": "Effacée pour de bon",
+      "other": "Effacées pour de bon"
+    },
+    "eraseElsewhere": "Subsurface sur l'ordinateur et vos autres appareils",
+    "eraseElsewhereText": "Ne trouveront plus ce carnet",
+    "nextPhone": "À l'étape suivante, vous choisissez ce que deviennent vos plongées sur ce téléphone.",
+    "nextTablet": "À l'étape suivante, vous choisissez ce que deviennent vos plongées sur cette tablette.",
+    "questionPhone": "Que deviennent vos plongées sur ce téléphone ?",
+    "questionTablet": "Que deviennent vos plongées sur cette tablette ?"
   },
   "gauge": {
     "readStart": "Lire la pression de début sur une photo",
@@ -1795,6 +1832,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Suppression du compte cloud : un assistant en trois étapes (ce qui sera effacé, vos plongées, confirmer), le bouton final désactivé tant que le mot de passe n’est pas saisi.",
       "Suppression du compte cloud : l’avertissement se lit « C’est définitif ! ».",
       "Déconnexion : le dialogue montre l’icône et le titre centrés, les modifications non envoyées dans un encadré, et une vraie case à cocher pour effacer la copie de l’appareil.",
       "Compte : une section « Quitter le cloud » met côte à côte « Se déconnecter de cet appareil » et « Supprimer le compte cloud », chacun avec ce qu’il fait des plongées.",

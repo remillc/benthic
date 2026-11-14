@@ -53,10 +53,12 @@
     "textNone": "Le carnet reste dans le nuage. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez."
   },
   "deleteAccount": {
-    "consequence": {
-      "one": "Le compte {email} et sa plongée seront effacés du nuage, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler.",
-      "other": "Le compte {email} et ses {n} plongées seront effacés du nuage, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler."
-    }
+    "eraseAccountText": "Effacé du nuage Subsurface",
+    "eraseDives": {
+      "one": "Sa plongée dans le nuage",
+      "other": "Ses {n} plongées dans le nuage"
+    },
+    "erased": "Effacé du nuage"
   },
   "accountStep": {
     "emailRow": "Courriel"
