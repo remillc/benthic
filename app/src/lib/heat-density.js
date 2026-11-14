@@ -40,6 +40,22 @@ export function densityGrid(points, width, height, radius, cell) {
   return { values, cols, rows, max };
 }
 
+/** Halos follow the screen, not the ground (task 2026-11-14-155): radius at low zoom, and at zoom 13 and closer. */
+export const HALO_FAR_DP = 20;
+export const HALO_NEAR_DP = 40;
+const FAR_ZOOM = 5;
+const NEAR_ZOOM = 13;
+
+/**
+ * The kernel radius in dp at a zoom: 20 dp up to zoom 5, 40 dp from zoom 13, in between
+ * interpolated. Zooming in, nearby sites separate; zooming out, they merge.
+ * @param {number} zoom
+ */
+export function haloRadius(zoom) {
+  const f = Math.max(0, Math.min(1, (zoom - FAR_ZOOM) / (NEAR_ZOOM - FAR_ZOOM)));
+  return HALO_FAR_DP + (HALO_NEAR_DP - HALO_FAR_DP) * f;
+}
+
 /** @param {string} hex #RRGGBB @returns {[number, number, number]} */
 export function rgb(hex) {
   const n = parseInt(hex.trim().replace('#', ''), 16);

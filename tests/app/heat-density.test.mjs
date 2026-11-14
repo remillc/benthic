@@ -1,7 +1,7 @@
 // The heat as a density (task 2026-11-14-154): weighted kernels on a grid, then the ramp.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { densityGrid, rampColour, rgb } from '../../app/src/lib/heat-density.js';
+import { densityGrid, haloRadius, rampColour, rgb } from '../../app/src/lib/heat-density.js';
 
 test('a single site: densest at its centre, nothing beyond its radius', () => {
   const g = densityGrid([{ x: 50, y: 50, weight: 10 }], 100, 100, 20, 2);
@@ -27,4 +27,12 @@ test('the ramp: transparent below 2 %, the edge colour fading in, the centre col
   assert.deepEqual(rampColour(0.5, ramp).slice(0, 3), [0xf0, 0xa6, 0x6b]);
   assert.ok(rampColour(0.1, ramp)[3] < rampColour(0.9, ramp)[3]);
   assert.ok(rampColour(1, ramp)[3] < 255, 'never fully covers the map');
+});
+
+test('halo radius in dp: 20 far away, 40 from zoom 13, interpolated (task 2026-11-14-155)', () => {
+  assert.equal(haloRadius(2), 20);
+  assert.equal(haloRadius(5), 20);
+  assert.equal(haloRadius(9), 30);
+  assert.equal(haloRadius(13), 40);
+  assert.equal(haloRadius(17), 40);
 });
