@@ -2653,11 +2653,13 @@ Each of the three cards gets a 24 dp icon on the left, aligned with the title, 1
 
 Done in feature/account-git-choice: the no-account Account screen has a third card « Utiliser mon propre dépôt git » with « Au lieu d’un compte, un dépôt à vous (GitHub, Gitea…). Vos N plongées y sont envoyées » (real count), outlined on no background; the three cards (20 dp corners now) carry decorative icons (new personAdd and login icons from the mock-up, the existing git branch). It opens the git setup at /account/git/new; once connected, back to Account, the repository's logbook is loaded and the dives of this device are added and sent (importDeviceDives, as « Ajouter les plongées de cet appareil »). Checked on the phone emulator, light and dark (no account simulated in memory); icons aria-hidden. The connection itself was not run (no test repository at hand). ui-specification updated.
 
-## [ ] 2026-11-14-136 The ⋮ icons are too pale in the app
+## [x] 2026-11-14-136 The ⋮ icons are too pale in the app
 
 Christian's correction of 14 November 2026, seen in the app on « Cartes hors ligne ». Mock-up: `docs/mockups/android-cartes-hors-ligne.dc.html`.
 
 The ⋮ (more options) icon of each region row is drawn in a pale grey in the app, while the mock-up uses `--od-on-surface` (`#1F2124` in light, `#E3E3E0` in dark). Fix it there, and check every ⋮ in the app (row menus, top bars, the Detail floating toolbar, Planner, Carnet selection): an action icon uses `--od-on-surface` (or the on-colour of its container, white on the coloured headers), never a disabled or « variant » tone, so it keeps a contrast of at least 3:1 (WCAG non-text contrast). Check light and dark on the phone emulator.
+
+Done in fix/more-icons-contrast: the ⋮ of the region rows was already in --od-text, but MapsRow sets stroke-width: 2 on its icons, which overrode the 4 px the ⋮ needs: its three dots, drawn by round caps, shrank to faint specks. Icon.svelte now gives the « more » icon a stroke of at least 4 px as an inline style, which no component stylesheet overrides, so every ⋮ keeps full dots. Checked every ⋮: row menus (plans, trip, settings computers, maps), top bars (white on the bands), the dive detail floating toolbar (its on-container colour), the planner and the account sheet: all use --od-text or the on-colour of their container, none a variant or disabled tone. Measured on the phone emulator: the band ⋮ in white with a 4 px stroke; the emulator has no downloaded region, so the maps row itself was not seen.
 
 ## [ ] 2026-11-14-137 Offline maps: remove « Espace maximum pour les cartes »
 

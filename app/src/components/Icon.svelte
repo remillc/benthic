@@ -112,6 +112,8 @@
   };
 </script>
 
+<!-- The dots of ⋮ are drawn by round caps: below a 4 px stroke they shrink to faint specks, so a
+     component's own stroke width never applies to them (task 2026-11-14-136). -->
 <svg
   class="od-icon"
   width={size}
@@ -120,6 +122,7 @@
   fill="none"
   stroke="currentColor"
   stroke-width={weight}
+  style:stroke-width={name === 'more' ? `${Math.max(weight, 4)}px` : undefined}
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"

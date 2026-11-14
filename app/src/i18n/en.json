@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Offline maps: the ⋮ of each region is clearly visible; every ⋮ keeps full dots.",
       "Account without an account: a third choice, “Use my own git repository”, and an icon on each choice.",
       "Account: “Sign out” comes first, apart from the account group; the “Danger zone” only holds “Delete account”; the server line is in small type.",
       "Signing in: the wavy progress indicator is blue on a pale blue track, 16 dp from the edges, under the bar; with “Remove animations”, a flat bar slides. The sync bar takes the same colours.",
