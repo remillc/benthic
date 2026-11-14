@@ -261,7 +261,6 @@
         {#if row.kind === 'number' && row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
       </span>
       <span class="od-planner-settings--value od-value">{row.kind === 'number' ? shown(row) : row.value}</span>
-      <svg class="od-planner-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
     </button>
   {/if}
 {/snippet}
@@ -393,17 +392,6 @@
       font-size: 14px;
       color: var(--od-text-2);
       text-align: end;
-    }
-
-    .od-planner-settings--chevron {
-      flex: none;
-      width: 18px;
-      height: 18px;
-      fill: none;
-      stroke: var(--od-text-2);
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
     }
 
     /* Framework7's switch, as in Settings. */

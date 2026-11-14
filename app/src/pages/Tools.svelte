@@ -102,7 +102,7 @@
             <span class="od-tools--card-title">{t('tools.planner')}</span>
             <span class="od-tools--card-line">{plansText}</span>
           </span>
-          <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+          <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
         </span>
       </a>
 
@@ -126,7 +126,7 @@
               {/if}
             </span>
           </span>
-          <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+          <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
         </span>
         {#if desat?.kind === 'waiting'}
           <span class="od-tools--track" aria-hidden="true"><span class="od-tools--fill" style="width: {(desat.share * 100).toFixed(1)}%"></span></span>
@@ -145,7 +145,7 @@
               <span class="od-tools--card-title">{tool.name}</span>
               <span class="od-tools--card-line">{tool.text}</span>
             </span>
-            <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+            <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
           </a>
         </div>
       {/each}

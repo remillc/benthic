@@ -3017,7 +3017,7 @@ Check on the phone, the tablet and the iPhone sheet.
 
 Done in fix/account-sheet-layout. 1: the header is a grid 48 dp / 1fr / 48 dp (an empty slot balances ✕); the logo and the title are centred on the sheet's width, the title truncated with an ellipsis. 2: in automatic sync, the status (cloud icon, text in --od-text-2, taking the width, wrapping when long) and SyncControl's « Synchroniser » sit on one row, centred, 16 dp gap, inside the 12/16 dp padding of the sync block; manual sync already had one row. Checked on the phone emulator. The tablet (the Android floating panel) uses the same markup. The iPhone sheet is a grouped list (task 127) with « Synchroniser » as its own row by design, unchanged.
 
-## [ ] 2026-11-14-157 Account sheet: chevrons on « Réglages » and « À propos »
+## [x] 2026-11-14-157 Account sheet: chevrons on « Réglages » and « À propos »
 
 Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-android.dc.html` and `nav-compte-maj-android.dc.html` (the account sheet opened from the initial).
 
@@ -3025,3 +3025,5 @@ Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-a
 2. The rule is now written in `docs/system-design.md` (section 5, « Trailing chevron »): a chevron on every row that opens another page, none on a row that runs an action, toggles a setting or opens a menu. Check the app's other lists against it and fix any row that breaks it; list what you changed.
 
 Same on the tablet; iOS keeps its own disclosure indicator.
+
+Done in fix/trailing-chevrons. 1: the account sheet's « Réglages » and « À propos » already ended with the 20 dp chevron (after the map-update badge): unchanged. 2: the app's lists checked against the rule (an audit of pages/ and components/). Changed: Settings — choice and number rows (units, formats, theme, decompression…) and « Renuméroter » (a dialog) lose their chevron, the rows that open a page keep it, now 20 dp everywhere (was 18); Réglages du planificateur — choice and number rows lose their chevron; Types de bouteilles — each row (opens the type) gains a 20 dp chevron; site sheet — « Plongées ici » rows (open the dive) gain one; Outils — the planner, desaturation and gas tool chevrons from 24 to 20 dp; Compte — « Ajouter les plongées de l'appareil » and « Changer le mot de passe » (actions) lose Framework7's chevron; Voyage — « Lieu » and « Notes » (edit dialogs) lose it; Planner — the rows of « choose the starting dive » (pick and back) lose it. Left as they are, to decide: the « Ordinateurs » block of the Equipment card (opens a sheet, chevron decided in task 144); the content rows without a chevron by their mock-ups (Logbook dives and trips, Sites list, saved plans with their ⋮); the account-less choice cards of Compte and Bienvenue (cards, not rows); sync status rows and pills. iOS unchanged. tests/e2e/run.sh green; tests/app 561 passed.

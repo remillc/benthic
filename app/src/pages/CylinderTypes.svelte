@@ -54,6 +54,7 @@
             {#if usage}<span class="od-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
           </span>
           <span class="od-cylinder-types--value">{size(type)}</span>
+          <span class="od-cylinder-types--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       </div>
     {/each}
@@ -170,6 +171,13 @@
       font-size: 14px;
       color: var(--od-text-2);
       font-variant-numeric: tabular-nums;
+    }
+
+    /* The row opens the type's page (system-design, « Trailing chevron »). */
+    .od-cylinder-types--chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     .od-cylinder-types--note {

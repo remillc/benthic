@@ -1784,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Lists: a “›” chevron ends every row that opens another page (cylinder types, a site’s dives) and no row that opens a menu, a choice or an action (choice settings, renumbering, a trip’s place and notes).",
       "Account: in the account sheet, the title is centred and “Synced … ago” stays on the same row as the “Sync” button.",
       "Heat map: the halos keep their size on screen and separate when zooming in, the colours keep one scale everywhere, and up close (zoom 14) the sites’ pins replace the halos; tapping a pin shows the site.",
       "Contrast: the header band is darker behind titles and buttons, and a few texts gain contrast (rust values, errors in fields, the “Signing in…” button, secondary text on iPhone, the account pill).",

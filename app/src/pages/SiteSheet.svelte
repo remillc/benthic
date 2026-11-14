@@ -212,6 +212,7 @@
                 <span class="od-site-sheet--date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatLongDateTime(dive.date) }) : formatLongDateTime(dive.date)}</span>
                 <span class="od-site-sheet--supporting od-value">{lines[dive.id] ?? ''}</span>
               </span>
+              <span class="od-site-sheet--chevron"><Icon name="chevron" size={20} /></span>
             </a>
           </li>
         {/each}
@@ -332,6 +333,13 @@
     }
 
     /* A dive: the profile thumbnail, the long date, then minutes, buddies, mode. */
+    .od-site-sheet--chevron {
+      flex: none;
+      margin-left: auto;
+      display: flex;
+      color: var(--od-text-2);
+    }
+
     .od-site-sheet--dive {
       min-height: 64px;
       flex-direction: row;
