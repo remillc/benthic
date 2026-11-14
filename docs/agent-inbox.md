@@ -2669,11 +2669,13 @@ Remove the map cap entirely: the « Espace maximum pour les cartes » row and it
 
 Done in fix/maps-no-cap: removed the « Espace maximum pour les cartes » row and its dialog, the « Limite des cartes atteinte » dialog, the stored setting (capBytes, now ignored when read) and the cap in the start, retry and update checks (maps-logic.js checkStart and checkUpdate keep only the free-space floor: 1 Go, or 10 % of the storage if more; the pause « Reprendra quand … sera libre » is unchanged). The summary card shows « 1 région · 302 Mo », a bar of the device's storage (maps, other data) with its legend, and « 18,4 Go libres sur 64 Go ». Strings removed from fr.json and en.json (maps.limit, maps.dialogs.cap, summary.usage/usageLabel/free/freeShort). tests/app/maps-logic.test.mjs: the cap tests became floor tests (the behaviour they checked was removed by this decision). Checked on the phone emulator (empty and with a region simulated in memory). Not on iPhone (same page, iOS look).
 
-## [ ] 2026-11-14-138 Settings: « Format du papier (impression) »
+## [x] 2026-11-14-138 Settings: « Format du papier (impression) »
 
 Christian's correction of 14 November 2026. Mock-ups in `docs/mockups/`: `reglages-langue-android`, `ios-reglages-langue`, `android-tablette-reglages-paysage`, `android-tablette-reglages-portrait` (all `.dc.html`).
 
 In Settings › Langue et formats, the row « Format du papier » becomes « Format du papier (impression) », so the diver knows it is only for printing. Same label everywhere the setting appears (Android phone and tablet, iPhone). English: « Paper size (printing) ». Update `fr.json`, `en.json` and `docs/ui-specification.md`.
+
+Done in fix/paper-size-label: the row reads « Format du papier (impression) » / « Paper size (printing) » (settings.paperSize.label, the one key used on Android phone and tablet and on iPhone, also as the choice dialog's title); ui-specification updated.
 
 ## [ ] 2026-11-14-139 Account: say that the dives can be kept on the device when the account is deleted
 

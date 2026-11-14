@@ -809,7 +809,7 @@
       "volumeNoteLitres": "Le volume d’eau de la bouteille, en litres. En unités impériales, on saisit le volume de gaz à la pression de service, en pieds cubes. La pression de service est facultative pour un volume en litres."
     },
     "paperSize": {
-      "label": "Format du papier",
+      "label": "Format du papier (impression)",
       "text": "{name}, selon la région",
       "letter": "Lettre",
       "a4": "A4",
@@ -1711,6 +1711,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : « Format du papier (impression) », pour dire qu’il ne sert qu’à imprimer.",
       "Cartes hors ligne : plus de limite propre aux cartes ; seul l’espace libre de l’appareil compte (toujours au moins 1 Go libre). La carte du haut montre les cartes, les autres données et l’espace libre.",
       "Cartes hors ligne : le ⋮ de chaque région est bien visible ; tous les ⋮ gardent des points pleins.",
       "Compte sans compte : un troisième choix, « Utiliser mon propre dépôt git », et une icône sur chaque choix.",
