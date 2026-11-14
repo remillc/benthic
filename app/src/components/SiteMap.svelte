@@ -11,7 +11,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
-  import { densityGrid, haloRadius, rampColour, rgb } from '../lib/heat-density.js';
+  import { densityGrid, haloRadius, heatShare, rampColour, rgb } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
@@ -176,7 +176,8 @@
     const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
     const image = sctx.createImageData(grid.cols, grid.rows);
     for (let i = 0; i < grid.values.length; i++) {
-      const [r, g, b, a] = rampColour(grid.values[i] / heatScale, ramp, fade);
+      // A logarithmic scale, as the mock-ups: one dive blue, the busiest site red.
+      const [r, g, b, a] = rampColour(heatShare(grid.values[i], heatScale), ramp, fade);
       image.data.set([r, g, b, a], i * 4);
     }
     sctx.putImageData(image, 0, 0);

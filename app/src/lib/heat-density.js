@@ -5,8 +5,8 @@
 // reaching the darkest colour. Overlapping sites no longer stack into dark brown.
 
 /**
- * The density on a grid of cells: each point adds weight × (1 − (d/r)²)², an
- * Epanechnikov-like kernel, within its radius.
+ * The density on a grid of cells: each point adds weight × (1 − (d/r)²)³, a soft
+ * kernel close to a Gaussian, within its radius.
  * @param {{ x: number, y: number, weight: number }[]} points positions in CSS px
  * @param {number} width @param {number} height CSS px of the view
  * @param {number} radius CSS px
@@ -31,7 +31,8 @@ export function densityGrid(points, width, height, radius, cell) {
         const d2 = dx * dx + dy * dy;
         if (d2 >= r2) continue;
         const k = 1 - d2 / r2;
-        values[row * cols + col] += p.weight * k * k;
+        // A soft kernel, near a Gaussian: the halo fades out smoothly to its edge.
+        values[row * cols + col] += p.weight * k * k * k;
       }
     }
   }
@@ -54,6 +55,15 @@ const NEAR_ZOOM = 13;
 export function haloRadius(zoom) {
   const f = Math.max(0, Math.min(1, (zoom - FAR_ZOOM) / (NEAR_ZOOM - FAR_ZOOM)));
   return HALO_FAR_DP + (HALO_NEAR_DP - HALO_FAR_DP) * f;
+}
+
+/**
+ * A density's place on the ramp, on a logarithmic scale against the reference (the busiest
+ * place): a site with one dive is blue, red is left to the busiest site, as on the mock-ups.
+ * @param {number} value @param {number} reference
+ */
+export function heatShare(value, reference) {
+  return value > 0 && reference > 0 ? Math.log1p(value) / Math.log1p(reference) : 0;
 }
 
 /** @param {string} hex #RRGGBB @returns {[number, number, number]} */
@@ -86,7 +96,9 @@ export function rampColour(t, stops, fade = stops[0]) {
     rgbValue = mix(stops[i], stops[i + 1], at - i);
   }
   const [r, g, b] = rgbValue;
-  // Fades in at the edge, opaque enough at the core to be read, never fully covering the map.
-  const alpha = Math.round(255 * Math.min(0.85, 0.15 + v * 0.9));
+  // As the mock-ups draw it: opaque enough (0.8) as soon as a site is there, the fade-out
+  // coming from the kernel's edge; never fully covering the map.
+  const rise = Math.min(1, (v - 0.02) / 0.12);
+  const alpha = Math.round(255 * 0.8 * rise * rise * (3 - 2 * rise));
   return [r, g, b, alpha];
 }
