@@ -2751,7 +2751,7 @@ In « Modifier la plongée », the weight suggestion row (« Suggestion : 6 lb �
 
 Done in fix/weight-suggestion-latest: weight-suggestion.js isMostRecent(id, dives) (by start, then number, as mostRecentFirst orders them; tested, including two dives of one download); EditDive shows the suggestion row, and reads past dives for it, only when the dive being edited is the most recent of the logbook; nothing in its place otherwise. One form for phone, tablet and iPhone. ui-specification (Dive editor, Équipement) updated.
 
-## [ ] 2026-11-14-146 Planner from a dive: « Modifier le profil » under the profile
+## [x] 2026-11-14-146 Planner from a dive: « Modifier le profil » under the profile
 
 Christian's to-do #43, decided on 14 November 2026. The goal is to plan from this dive while changing its depths and durations; simplifying the curve is only the means. Mock-ups in `docs/mockups/`: `android-planificateur`, `android-planificateur-menu`, `android-planificateur-quitter`, `android-planificateur-simplifie` (all `.dc.html`).
 
@@ -2760,6 +2760,8 @@ Christian's to-do #43, decided on 14 November 2026. The goal is to plan from thi
 3. On the simplified profile, the caption at the top reads « Le profil est ramené à quelques niveaux pour que vous puissiez en changer la profondeur et la durée. » The button does not appear there.
 
 English: « Edit profile », « Times and depths taken from the dive. », « The profile is reduced to a few levels so you can change their depth and duration. » Same on the tablet and on iPhone. Update `docs/ui-specification.md` (Planner).
+
+Done in feature/planner-edit-profile. 1: under the profile of « Planificateur, depuis une plongée », the caption « Temps et profondeurs repris de la plongée. » with, at the end of the same line, the tonal button « Modifier le profil » (pencil icon, --od-secondary-container / --od-secondary, 40 dp; 44 pt with 10 pt corners on iOS); it does what « Simplifier le profil » did, with the same « Profil simplifié » snackbar and « Annuler ». 2: « Simplifier le profil » removed from the ⋮ menu. 3: on the simplified profile, the caption reads « Le profil est ramené à quelques niveaux pour que vous puissiez en changer la profondeur et la durée. », no button; the Niveaux helper is the plain « La descente et la remontée sont ajoutées au calcul ». Texts fr/en (plan.editProfile, plan.simplifiedHelper, plan.fromDiveHelper shortened), release note updated, ui-specification (Planner) updated. Checked on the phone emulator (both states, English). tests/e2e/run.sh: green; tests/app: 538 passed. Not checked: iPhone and tablet on a device.
 
 ## [ ] 2026-11-14-147 Maps: a full-screen button on every map, dive counts on the Sites pins
 
