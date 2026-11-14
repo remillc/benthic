@@ -6,7 +6,7 @@
   // the most dived first: its dive count in an ink badge, its name, « {n} plongées »,
   // its maximum depth and a chevron. A row opens the site's sheet; ✕, the scrim and Back
   // close (lib/back-button.js closes an open sheet). On iPhone, the same in iOS form.
-  import { Sheet } from 'framework7-svelte';
+  import { Sheet, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { formatDepth, formatNumber } from '../lib/format.js';
@@ -15,30 +15,44 @@
 
   /**
    * @type {{
-   *   opened: boolean,
    *   sites: { uuid: number, name: string, dives: number, maxDepthMm: number }[],
    *   place: string,
    *   onclose: () => void,
    *   onopen: (uuid: number) => void,
    * }}
    */
-  let { opened, sites, place, onclose, onopen } = $props();
+  let { sites, place, onclose, onopen } = $props();
+
+  // Mounted open, once per tap (Sites.svelte), and gone only once it has closed
+  // (onclose, from sheetClosed): Framework7's Sheet does not reopen reliably through
+  // its « opened » prop after a swipe closed it. Every way out closes it the same way,
+  // with its animation; a chosen site opens after.
+  /** @type {HTMLElement|undefined} */
+  let content = $state();
+  let chosen = 0;
+  const close = () => f7.sheet.close(/** @type {HTMLElement} */ (content?.closest('.sheet-modal')));
+  // A chosen site first (its opening also forgets the sheet), else only forgotten:
+  // once onclose has run, this sheet is being removed.
+  const closed = () => {
+    if (chosen) onopen(chosen);
+    else onclose();
+  };
 
   const rows = $derived([...sites].sort((a, b) => b.dives - a.dives));
   const title = $derived(t('sites.stackTitle', { n: sites.length }));
 </script>
 
-<Sheet class="od-map-stack-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={title}>
-  <div class="od-map-stack-sheet--content">
+<Sheet class="od-map-stack-sheet" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
+  <div class="od-map-stack-sheet--content" bind:this={content}>
     <div class="od-map-stack-sheet--handle" aria-hidden="true"></div>
     <div class="od-map-stack-sheet--head">
       <h2 class="od-map-stack-sheet--title">{title}</h2>
-      <button type="button" class="od-map-stack-sheet--close" aria-label={t('sites.close')} onclick={onclose}><Icon name="close" size={20} /></button>
+      <button type="button" class="od-map-stack-sheet--close" aria-label={t('sites.close')} onclick={close}><Icon name="close" size={20} /></button>
     </div>
     <p class="od-map-stack-sheet--note">{place ? `${place}. ` : ''}{t('sites.stackNote')}</p>
     <nav class="od-map-stack-sheet--list">
       {#each rows as site (site.uuid)}
-        <button type="button" class="od-map-stack-sheet--row" onclick={() => onopen(site.uuid)}>
+        <button type="button" class="od-map-stack-sheet--row" onclick={() => ((chosen = site.uuid), close())}>
           <span class="od-map-stack-sheet--badge" aria-hidden="true">{formatNumber(site.dives)}</span>
           <span class="od-map-stack-sheet--texts">
             <span class="od-map-stack-sheet--name">{site.name || t('sites.noName')}</span>

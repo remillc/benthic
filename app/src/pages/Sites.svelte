@@ -110,14 +110,16 @@ import { language } from '../lib/i18n.js';
   const stackSites = $derived(stack ? located.filter((s) => stack?.uuids.includes(s.uuid)) : []);
 
   /** @param {number[]} uuids @param {{ latUdeg: number, lonUdeg: number }} at */
+  let stackAsk = 0;
   function showStack(uuids, at) {
+    const ask = ++stackAsk;
     selectedUuid = null;
     stack = { uuids, at };
     stackPlace = '';
     // The place under the title (« Morrisburg, Ontario »), when it can be found.
     placeAt(at.latUdeg, at.lonUdeg, language).then(
       (p) => {
-        if (stack?.at !== at || !p) return;
+        if (ask !== stackAsk || !stack || !p) return;
         stackPlace = [p.city, p.region].filter(Boolean).join(', ') || p.country;
       },
       () => {},
@@ -572,7 +574,12 @@ import { language } from '../lib/i18n.js';
     </List>
   </Popover>
 
-  <MapStackSheet opened={!!stack} sites={stackSites} place={stackPlace} onclose={() => (stack = null)} onopen={openFromMap} />
+  <!-- A new sheet for each tap (MapStackSheet.svelte says why), removed once closed. -->
+  {#if stack}
+    {#key stack}
+      <MapStackSheet sites={stackSites} place={stackPlace} onclose={() => (stack = null)} onopen={openFromMap} />
+    {/key}
+  {/if}
 
   {#if choosingKeeper && selection.length >= 2}
     <ChoiceDialog
