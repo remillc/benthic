@@ -260,6 +260,8 @@ Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-port
 - **Accessibility:** `role="progressbar"`, `aria-label`, `aria-valuenow` (percent) unless indeterminate.
 - **Motion:** the wave travels at 40 dp/s. With "Remove animations" (`prefers-reduced-motion`) there is no wave: the determinate one stands still and the indeterminate one is a plain flat bar that slides (task 130).
 
+**A busy button changes state, never size or place (decided on 14 November 2026, task 131).** While its request runs, a primary button (« Se connecter », « Créer le compte », « Envoyer le code », « Synchroniser », « Importer ») keeps its exact size and position (on the account screens: full width between the 24 dp margins, 56 dp, 28 dp corners) and only turns disabled (on-surface at 12 % behind, text at 60 %), with the loading indicator before its busy label (« Connexion… »), centred, 16 sp, and `aria-busy` for TalkBack. Mock-up: `compte-connexion-encours-android.dc.html`.
+
 **`<LoadingIndicator>` (`od-loading-indicator`):** the Material 3 Expressive loading indicator, uncontained, instead of circular spinners on Android: "À proximité" while scanning (20 dp), the running import step (24 dp), the "Connexion…" button (18 dp, hidden from TalkBack because the button text says it).
 - **Props:** `size` (dp), `label` (required; "" hides it from TalkBack).
 - **Shape:** it holds, then morphs between the Expressive polygons (soft burst, 9-sided cookie, pentagon, pill, sunny, 4-sided cookie, oval) while turning; the morph interpolates the shapes' radii.

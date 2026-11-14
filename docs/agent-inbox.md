@@ -2611,11 +2611,13 @@ While signing in, the indeterminate progress indicator is the Material 3 Express
 
 Done in fix/wavy-progress: LinearWavyProgress already used --od-progress-active (#114477, dark #8FB6E6) on --od-progress-track (#D4E2F2, dark #1E3552); on the sign-in screen it now sits 16 dp from each side under the top bar, and the heading starts 16 dp below it (was 8) so the indicator never touches the overline. With reduced motion the indeterminate indicator is a flat bar that slides (was a still half wave). The only linear bar drawn in black, the sync bar of SyncStatus (--od-action), takes the progress colours. Download, maps and import already used the same component. Checked on the phone emulator, light and dark, the sign-in shown busy with a temporary flag (removed), reduced motion emulated through the DevTools protocol (the WebView ignores Android's « Remove animations »). system-design §8 updated.
 
-## [ ] 2026-11-14-131 Signing in: the busy button keeps the size and place of « Se connecter »
+## [x] 2026-11-14-131 Signing in: the busy button keeps the size and place of « Se connecter »
 
 Christian's correction of 14 November 2026, completing task 130. Mock-up: `docs/mockups/compte-connexion-encours-android.dc.html`.
 
 While signing in, the button does not shrink or move to the right: it keeps exactly the size and place of « Se connecter » (full width between the 24 dp margins, 56 dp tall, 28 dp corners) and only switches to its disabled state (`rgba(31,33,36,0.12)` container, 60 % text), with the loading indicator before « Connexion… », centred, 16 sp. Same rule for every primary button that becomes busy (create account, send code, sync, import): the button changes state, never size or position. Check on the phone emulator, light and dark, and that TalkBack announces it as busy.
+
+Done in fix/busy-button-size, nothing to change in the code: measured on the phone emulator (current build, the sign-in shown busy with a temporary flag, removed), « Se connecter » is at x = 24 dp, 379 × 56 dp both at rest and busy, disabled colours (on-surface 12 % / 60 %), the loading indicator before « Signing in… », centred, aria-busy=true. The other busy primary buttons of the flow (create account, send code, git repository, bring the logbook, import) are the same EditorialPage button (flex: 1, full width; « Précédent » keeps its place beside it), and « Synchroniser » keeps its label and size while it fills. If the shrinking was seen on the phone, it was an earlier build. The rule is written in system-design §8.
 
 ## [ ] 2026-11-14-132 Account screen: « Zone dangereuse » right above « Supprimer le compte »
 
