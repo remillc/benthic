@@ -2939,7 +2939,7 @@ Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mo
 
 1. **A full-width card** (`od-stats-heatmap`) after the « Graphiques » charts, before « Mes statistiques ».
    - White, 12 dp corners, 16 dp padding.
-   - Title « Où je plonge le plus » (16 sp, 500). Under it, « {site} en tête, {n} plongées · touchez pour ouvrir la carte » (12 sp, `--od-text-2`).
+   - Title « Où je plonge le plus » (16 sp, 500). Under it, « {site} en tête, {n} plongées » (12 sp, `--od-text-2`). The card itself is not a link (changed on 14 November 2026).
 2. **The map**, 170 dp high, 8 dp corners.
    - The base map is the offline map, desaturated (about 25 % saturation) so the heat stands out.
    - It is framed on the area that holds most of the dives: the region of the most dived sites. It is not the whole world when one trip went far away.
@@ -2950,8 +2950,8 @@ Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mo
    - Sites without coordinates are not shown.
 4. **Legend:** « Moins », a 96 dp × 8 dp bar with the same ramp, « Plus ».
 5. **No OpenStreetMap credit on this card** (Christian's decision). The credit stays in About, as for the map behind the dive detail header.
-6. **Tapping the card** opens the Sites map in full screen (task 147) on the same area.
-7. **Accessibility:** the card is one link named « Où je plonge le plus : carte de chaleur. {site} en tête, {n} plongées. Ouvrir la carte des sites ». The map itself is hidden from screen readers.
+6. **Full-screen button** at the top right of the map, 8 dp from the edges: the button of task 147, named « Afficher la carte de chaleur en plein écran ». It opens the heat map in full screen (`od-map-fullscreen`, same layout as task 147: « Quitter le plein écran » at the top right, Back leaves), on the same area, with the heat and the legend, and no site names. Pins are not shown in this view.
+7. **Accessibility:** the card is a section named « Où je plonge le plus ». The map image is hidden from screen readers, the subtitle gives the leading site, and the full-screen button is reachable.
 8. **Without enough data** (fewer than 2 sites with coordinates in the filter), the card is not shown.
 
-English: « Where I dive most », « {site} leads, {n} dives · tap to open the map », « Less », « More ». Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
+English: « Where I dive most », « {site} leads, {n} dives », « Less », « More », « Show the heat map full screen ». Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
