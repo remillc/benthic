@@ -2595,11 +2595,13 @@ Under « Gaz », replace the grid of three tiles with one card (28 dp corners, w
 
 Done in fix/tools-gas-rows: under « Gaz », one card (28 dp corners) with three rows laid out like the Planificateur card: 40 dp icon container in the secondary container, each tool keeping its shape (rounded square, circle, leaf), title 16 sp semibold, supporting text 14 sp, chevron, 72 dp, a divider indented to the text; the whole row is the link (its name is the title and the supporting text). Same on tablets, under the two cards. Checked on the phone emulator and on the tablet (landscape, light and dark). ui-specification updated.
 
-## [ ] 2026-11-14-129 Account screen: « Cloud Subsurface » instead of « Compte Subsurface vérifié »
+## [x] 2026-11-14-129 Account screen: « Cloud Subsurface » instead of « Compte Subsurface vérifié »
 
 Christian's decision of 14 November 2026 (to-do #10). Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte` (all `.dc.html`).
 
 On the signed-in Account screen, the line under the e-mail reads « Cloud Subsurface » (with the cloud icon), not « Compte Subsurface vérifié ». Reason, checked in the Subsurface core: a cloud account is « verified » (`CS_VERIFIED`) once the PIN sent by e-mail is accepted, and one cannot be signed in and syncing without it, so the label was always true and told the diver nothing. The other states stay where they already are: « to verify » (`CS_NEED_TO_VERIFY`) on the PIN screens of account creation (`compte-code-*`), wrong password as an error on the sign-in screen. Update `docs/ui-specification.md` (and the description in task 2026-11-07 of the signed-in state, if it is quoted elsewhere). Check on Android phone and tablet, and on iPhone.
+
+Done in fix/account-cloud-line: the line under the e-mail of the signed-in Account screen reads « Cloud Subsurface » / « Subsurface cloud » with the cloud icon (key account.cloudLine, replacing account.verified); one screen for Android phone, tablet and iPhone. The PIN screens and the sign-in error are unchanged. ui-specification: a paragraph on the signed-in Account screen with the reason. Checked on the phone emulator (en).
 
 ## [ ] 2026-11-14-130 Signing in: the wavy progress indicator in the right colours and place
 

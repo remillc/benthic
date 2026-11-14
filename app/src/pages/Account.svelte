@@ -161,7 +161,7 @@
         <span class="od-account--avatar"><Icon name="account" size={28} /></span>
         <span class="od-account--text">
           <span class="od-account--name">{logbook.email}</span>
-          <span class="od-account--status"><Icon name="cloud" size={16} />{t('account.verified')}</span>
+          <span class="od-account--status"><Icon name="cloud" size={16} />{t('account.cloudLine')}</span>
         </span>
       {/if}
     </div>
