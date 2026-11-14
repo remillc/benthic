@@ -840,6 +840,19 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("wifi", wifi))
     }
 
+    /**
+     * The system contrast level (Settings › Accessibility › Contrast), Android 14 and
+     * later: 0 by default, up to 1; the app turns to high contrast above 0.5
+     * (task 2026-11-14-149). Older systems answer 0.
+     */
+    @PluginMethod
+    fun contrastLevel(call: PluginCall) {
+        val level = if (Build.VERSION.SDK_INT >= 34) {
+            (context.getSystemService(Context.UI_MODE_SERVICE) as android.app.UiModeManager).contrast
+        } else 0f
+        call.resolve(JSObject().put("level", level.toDouble()))
+    }
+
     // --- Offline maps (MapsManager, MapsDownloadWorker) ---
 
     private val mapsIo: ExecutorService = Executors.newSingleThreadExecutor()

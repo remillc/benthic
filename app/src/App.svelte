@@ -65,6 +65,9 @@
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
+  import { followContrast } from './lib/contrast.js';
+  import { OpenDivesCore } from 'opendives-core';
+  import { App as CapacitorApp } from '@capacitor/app';
   import { enableDialogFit } from './lib/dialog-fit.js';
   import { enableTopBarScroll } from './lib/top-bar.js';
   import { enableDeepLinks } from './lib/open-link.js';
@@ -273,6 +276,11 @@
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
     enableBackButton();
+    // High contrast when the system asks for more contrast (task 2026-11-14-149).
+    followContrast({
+      readLevel: () => OpenDivesCore.contrastLevel().then((r) => r.level),
+      onResume: (listener) => void CapacitorApp.addListener('resume', listener),
+    });
     enableTopBarScroll();
     enableDeepLinks();
     startFlightReminder();

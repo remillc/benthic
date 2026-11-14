@@ -449,7 +449,7 @@
     .od-date-picker--input-box {
       position: relative;
       display: block;
-      border: 1px solid var(--od-outline);
+      border: var(--od-outline-width) solid var(--od-outline);
       border-radius: 4px;
       padding: 8px 16px 6px;
     }

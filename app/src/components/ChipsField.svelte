@@ -206,7 +206,7 @@
       height: 32px;
       padding: 0 4px 0 12px;
       box-sizing: border-box;
-      border: 1px solid var(--od-text-2);
+      border: var(--od-outline-width) solid var(--od-text-2);
       border-radius: 8px;
       background: var(--od-surface);
       display: inline-flex;

@@ -92,6 +92,9 @@
     --od-text-2: #4B4A47;
     --od-separator: #DADAD6;
     --od-outline: #74777C;
+    /* Outlines of fields, chips and outlined buttons, and the planned profile's line: thicker in high contrast. */
+    --od-outline-width: 1px;
+    --od-profile-line-width: 1.5;
     /* Pins of the sites around, on the map of the dives without a site (task 2026-11-14-148). */
     --od-map-pin-muted: #75787C;
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
@@ -295,6 +298,55 @@
     --od-inverse-surface: #E8E8E5;
     --od-inverse-on-surface: #1F2124;
     --od-inverse-primary: #2B66AD;
+  }
+
+  /*
+   * High contrast (task 2026-11-14-149; contraste-eleve-echantillons.dc.html): the class
+   * od-high-contrast, set by lib/contrast.js when the system asks for more contrast.
+   * Text 7:1 at least, strokes 3:1 at least; meaning colours keep their families,
+   * darker in light, lighter in dark. Containers are unchanged.
+   */
+  html.od-high-contrast:not(.dark) {
+    --od-text: #000000;
+    --od-text-2: #26282B;
+    --od-separator: #74777C;
+    --od-row-divider: #74777C;
+    --od-outline: #3E4145;
+    --od-chip-outline: #3E4145;
+    --od-secondary: #0A2D52;
+    --od-tertiary: #7A3200;
+    --od-on-tertiary-container: #2E1900;
+    --od-alarm: #8E1010;
+    --od-oxygen: #1B5E20;
+    --od-pending: #5C3100;
+    --od-band-pending: #5C3100;
+    --od-background: #FFFFFF;
+    --od-surface: #FFFFFF;
+    --od-nav-active: #0A2D52;
+    --od-band-control: #FFFFFF;
+    --od-outline-width: 1.5px;
+    --od-profile-line-width: 2;
+  }
+
+  html.dark.od-high-contrast {
+    --od-text: #FFFFFF;
+    --od-text-2: #E2E4E7;
+    --od-separator: #8E9196;
+    --od-row-divider: #8E9196;
+    --od-outline: #C2C5C9;
+    --od-chip-outline: #C2C5C9;
+    --od-secondary: #C2DAF7;
+    --od-tertiary: #FFC79A;
+    --od-on-tertiary-container: #FFFFFF;
+    --od-alarm: #FFC0B8;
+    --od-oxygen: #B2EBB4;
+    --od-pending: #FFD98A;
+    --od-background: #000000;
+    --od-surface: #121314;
+    --od-nav-active: #FFFFFF;
+    --od-band-control: #FFFFFF;
+    --od-outline-width: 1.5px;
+    --od-profile-line-width: 2;
   }
 }
 
@@ -898,7 +950,7 @@ html.ios {
     width: auto;
     height: 40px;
     padding: 0 24px;
-    border: 1px solid var(--od-text-2);
+    border: var(--od-outline-width) solid var(--od-text-2);
     border-radius: 20px;
     background: none;
     color: var(--od-text);

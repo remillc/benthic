@@ -1753,6 +1753,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Contraste élevé : quand le système demande plus de contraste (Android 14 et plus, « Augmenter le contraste » sur iPhone et iPad), l’app passe à des couleurs plus contrastées, sans transparence et avec des contours plus épais.",
       "Sites : « Plongées sans site » montre sur une carte les plongées qui ont une position et propose le site le plus proche à moins de 500 m ; « Nettoyer les sites » montre chaque doublon possible sur une bande de carte ; le raccourci compte aussi les sites sans plongée, et l’iPhone et l’iPad ont les raccourcis « À faire ».",
       "Cartes : chaque épingle de la carte des sites porte le nombre de plongées du site, avec son nom à côté ; un bouton met toute carte en plein écran (sites, fiche d’un site, nouveau site, modifier le site), et le geste Retour en sort.",
       "Fiche d’une plongée : en glissant vers la plongée suivante ou précédente, les deux fiches défilent côte à côte (téléphone).",

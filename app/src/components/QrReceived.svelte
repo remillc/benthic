@@ -237,7 +237,7 @@
     }
 
     :global(.od-qr-received--cancel) {
-      border: 1px solid var(--od-outline);
+      border: var(--od-outline-width) solid var(--od-outline);
       color: var(--od-text);
     }
 

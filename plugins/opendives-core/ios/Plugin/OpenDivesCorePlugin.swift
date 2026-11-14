@@ -64,6 +64,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "createDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "placesSearch", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "networkStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "contrastLevel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cancelConflictResolution", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "diveComputers", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "diveComputerAction", returnType: CAPPluginReturnPromise),
@@ -1085,6 +1086,14 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             call.resolve(["wifi": wifi])
         }
         monitor.start(queue: DispatchQueue(label: "org.opendives.core.path"))
+    }
+
+    /// The system contrast, as Android's level (task 2026-11-14-149): 1 with « Augmenter
+    /// le contraste » on, else 0. The WebView also reports it as prefers-contrast: more.
+    @objc func contrastLevel(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            call.resolve(["level": UIAccessibility.isDarkerSystemColorsEnabled ? 1.0 : 0.0])
+        }
     }
 
     // MARK: - Offline maps (MapsManager)
