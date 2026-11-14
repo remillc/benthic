@@ -3112,3 +3112,15 @@ Christian decided this on 14 November 2026. Use case: a diver wants to leave the
 Phone, tablet and iPhone. Update the tests that read these texts.
 
 Done in fix/delete-cloud-account. 1: account.signOutText is now « Vos plongées restent dans le cloud et sur cet appareil. Pour les effacer du cloud, supprimez le compte cloud. » (en « Your dives stay in the cloud and on this device. To erase them from the cloud, delete the cloud account. »). 2: account.delete, the danger-zone button and the deletion page's title (DeleteAccount.svelte uses the same key), is « Supprimer le compte cloud » (en « Delete the cloud account »); the final button « Supprimer définitivement le compte » is unchanged. Same keys on the phone, the tablet and the iPhone; fr-CA has no override of these keys. No test reads these texts (tests/app, tests/e2e). Spec (Leaving the account) and release notes updated. Checked on the phone emulator (Account).
+
+## [ ] 2026-11-14-164 Account: a « Quitter le cloud » section with both choices side by side
+
+Christian decided this on 14 November 2026. It replaces item 1 of task 163 (the pointer sentence under « Se déconnecter »): if 163 is already done, remove that sentence. Item 2 of 163 (« Supprimer le compte cloud ») stays. Mock-ups (updated in `docs/mockups/`): `compte-android-connecte.dc.html`, `compte-android-connecte-manuel.dc.html`, `compte-android-deconnexion.dc.html`, `compte-ios-connecte.dc.html`, `android-tablette-compte-paysage.dc.html`, `android-tablette-compte-portrait.dc.html`.
+
+1. The lone « Se déconnecter » outlined button with its text, the « Zone dangereuse » heading and the lone « Supprimer le compte » button are replaced by **one section, « Quitter le cloud »** (section header like « Compte Subsurface »), with one card (`od-account-leave`) of two list rows, so both choices are compared at a glance:
+   - `od-account-leave--sign-out`: 24 dp sign-out icon (ink), « Se déconnecter de cet appareil », supporting text « Le compte et les plongées restent dans le cloud. Ce téléphone garde sa copie. » (tablet: « Cette tablette garde sa copie. »). It opens the existing sign-out dialog: no chevron (it is not a page).
+   - `od-account-leave--delete`, separated by a divider: 24 dp trash icon in the alarm colour, « Supprimer le compte cloud » in the alarm colour, medium weight, supporting text « Efface définitivement le compte et ses plongées du cloud. Ce téléphone peut garder sa copie. » (tablet: « Cette tablette… »), trailing chevron: it opens the deletion page.
+2. English: « Leave the cloud », « Sign out of this device », « The account and the dives stay in the cloud. This phone keeps its copy. » (« This tablet… »), « Delete the cloud account », « Permanently erases the account and its dives from the cloud. This phone can keep its copy. ».
+3. Danger is carried by the alarm colour, the icon and « définitivement », not by a heading. The sign-out dialog and the deletion page are unchanged.
+
+Phone, tablet and iPhone (iOS keeps its own list styling). Update the tests that read these texts and `docs/ui-specification.md` (Account).
