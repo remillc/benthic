@@ -7,6 +7,7 @@
 // dives left out as Subsurface does. Nothing is summed here. The free filter
 // applies too (spec: "Statistics apply to the filtered results"): its dives
 // are passed as an "id" criterion.
+import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
 import { formatGasLong, formatTotalTime, formatLongDate, locale } from './format.js';
@@ -201,7 +202,7 @@ const STORE_KEY = 'od.statistics';
 /** @returns {SavedStatistic[]} */
 function readSaved() {
   try {
-    const list = JSON.parse(localStorage.getItem(STORE_KEY) ?? '[]');
+    const list = JSON.parse(deviceStore.getItem(STORE_KEY) ?? '[]');
     return Array.isArray(list) ? list : [];
   } catch {
     return [];
@@ -213,7 +214,7 @@ export const myStatistics = $state({ list: readSaved() });
 
 function writeSaved() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(myStatistics.list));
+    deviceStore.setItem(STORE_KEY, JSON.stringify(myStatistics.list));
   } catch {
     // Not fatal: the statistic lasts until the app closes.
   }

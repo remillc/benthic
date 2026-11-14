@@ -134,6 +134,7 @@ There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub ma
 - Author of every commit: Christian Rémillard. No `Co-Authored-By` or `Claude-Session` line in commit messages.
 - Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. OpenDives is GPLv2 because it reuses Subsurface's core.
 - Never commit Subsurface cloud credentials or a personal dive log.
+- The settings of the device and its remembered choices (sort orders, last export format, and so on) are stored in one place and one way: through `app/src/lib/device-store.js` (`@capacitor/preferences`: SharedPreferences on Android, UserDefaults on iOS), keys `od.<name>`, values as text (JSON for objects). Never `localStorage` directly; the only exception is the logbook snapshot, a cache (decided on 15 November 2026). Account credentials stay in the secure storage of the plugin.
 - Existing French comments and documentation are translated to English when the file is next touched.
 
 ## Agent inbox

@@ -1,6 +1,7 @@
 // Totals of time under water: hours and minutes under 24 h, days and hours from 24 h.
 // The interface language is fixed when the i18n module loads, so each language
-// runs in its own node process with the language chosen in localStorage.
+// runs in its own node process with the language chosen in the settings of the device
+// (lib/device-store.js, read from memory: nothing is written in a test).
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { test } from 'node:test';
@@ -10,7 +11,8 @@ const seconds = [23 * H + 59 * 60, 24 * H, 24 * H + 59 * 60, 80 * 24 * H + 16 * 
 
 function run(lang) {
   const script = `
-    globalThis.localStorage = { getItem: () => JSON.stringify({ language: '${lang}' }) };
+    const { deviceStore } = await import('../../app/src/lib/device-store.js');
+    deviceStore.setItem('od.appSettings', JSON.stringify({ language: '${lang}' }));
     const { formatTotalTime } = await import('../../app/src/lib/format.js');
     console.log(JSON.stringify(${JSON.stringify(seconds)}.map((s) => formatTotalTime(s).replace(/\\u00a0/g, ' '))));`;
   const out = execFileSync(process.execPath, ['--import', './register.mjs', '--input-type=module', '-e', script], {

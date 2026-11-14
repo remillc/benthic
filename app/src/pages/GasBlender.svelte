@@ -16,6 +16,7 @@
 
 <script>
   // @ts-check
+  import { deviceStore } from '../lib/device-store.js';
   // Gas blender (docs/ui-specification.md, section 1, "Tools page and gas
   // tools"; docs/mockups/outils-melangeur-android.dc.html, outils-melangeur-
   // nitrox-android.dc.html): partial pressure blending of nitrox and trimix.
@@ -46,7 +47,7 @@
   /** @returns {'nitrox'|'trimix'} */
   function readMode() {
     try {
-      return localStorage.getItem(MODE_KEY) === 'trimix' ? 'trimix' : 'nitrox';
+      return deviceStore.getItem(MODE_KEY) === 'trimix' ? 'trimix' : 'nitrox';
     } catch {
       return 'nitrox';
     }
@@ -56,7 +57,7 @@
   function setMode(next) {
     mode = next;
     try {
-      localStorage.setItem(MODE_KEY, next);
+      deviceStore.setItem(MODE_KEY, next);
     } catch {
       // The mode is only a convenience.
     }
@@ -67,7 +68,7 @@
   /** @returns {'helium'|'oxygen'} */
   function readOrder() {
     try {
-      return localStorage.getItem(ORDER_KEY) === 'oxygen' ? 'oxygen' : 'helium';
+      return deviceStore.getItem(ORDER_KEY) === 'oxygen' ? 'oxygen' : 'helium';
     } catch {
       return 'helium';
     }
@@ -77,7 +78,7 @@
   function setOrder(next) {
     order = next;
     try {
-      localStorage.setItem(ORDER_KEY, next);
+      deviceStore.setItem(ORDER_KEY, next);
     } catch {
       // The order is only a convenience.
     }

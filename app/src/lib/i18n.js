@@ -4,6 +4,7 @@
 // translations live in src/i18n/<language>.json. French is the reference
 // language; an untranslated language falls back to English.
 // Diver data (site names, notes, tags) never goes through this module.
+import { deviceStore } from './device-store.js';
 import { keepUnits } from './nbsp.js';
 import fr from '../i18n/fr.json';
 import frCA from '../i18n/fr-CA.json';
@@ -47,7 +48,7 @@ export const deviceLanguage = pickLanguage(typeof navigator !== 'undefined' ? na
  */
 export const language = (() => {
   try {
-    const chosen = JSON.parse(localStorage.getItem('od.appSettings') ?? '{}').language;
+    const chosen = JSON.parse(deviceStore.getItem('od.appSettings') ?? '{}').language;
     if (chosen in catalogs) return chosen;
   } catch {
     // The device's language.

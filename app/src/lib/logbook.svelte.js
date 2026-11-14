@@ -1,5 +1,6 @@
 // @ts-check
 // Shared logbook state: dives, the log's units, sync status.
+import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
@@ -583,7 +584,7 @@ async function syncEdits() {
  */
 function readWelcomeState() {
   try {
-    return localStorage.getItem('od.welcome');
+    return deviceStore.getItem('od.welcome');
   } catch {
     return 'done';
   }
@@ -596,7 +597,7 @@ function readWelcome() {
 /** @param {'show'|'done'} value */
 function writeWelcomeState(value) {
   try {
-    localStorage.setItem('od.welcome', value);
+    deviceStore.setItem('od.welcome', value);
   } catch {
     // Not fatal: first launch may be shown again at the next start.
   }
@@ -617,8 +618,8 @@ const ACCOUNT_HINT = 'od.cloudAccount';
 /** @param {boolean} has */
 function rememberAccount(has) {
   try {
-    if (has) localStorage.setItem(ACCOUNT_HINT, '1');
-    else localStorage.removeItem(ACCOUNT_HINT);
+    if (has) deviceStore.setItem(ACCOUNT_HINT, '1');
+    else deviceStore.removeItem(ACCOUNT_HINT);
   } catch {
     // Not fatal: the probe is then sent after the account is read.
   }
@@ -639,7 +640,7 @@ export function boot() {
     try {
       // The probe runs on the plugin's network thread, not in the core's
       // order: it is sent once the account is set, or it finds none.
-      if (logbook.autoSync && localStorage.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
+      if (logbook.autoSync && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }
@@ -712,7 +713,7 @@ function forgetAccount(showWelcome) {
   logbook.lastSync = null;
   logbook.welcome = showWelcome;
   try {
-    localStorage.removeItem('od.lastSync');
+    deviceStore.removeItem('od.lastSync');
   } catch {
     // Not fatal.
   }
@@ -751,7 +752,7 @@ export function repositoryChanged() {
   clearFailure();
   logbook.lastSync = null;
   try {
-    localStorage.removeItem('od.lastSync');
+    deviceStore.removeItem('od.lastSync');
   } catch {
     // Not fatal.
   }
@@ -760,7 +761,7 @@ export function repositoryChanged() {
 
 function readAutoSync() {
   try {
-    return localStorage.getItem('od.autoSync') !== 'false';
+    return deviceStore.getItem('od.autoSync') !== 'false';
   } catch {
     return true;
   }
@@ -774,7 +775,7 @@ function readAutoSync() {
 export function setAutoSync(value) {
   logbook.autoSync = value;
   try {
-    localStorage.setItem('od.autoSync', String(value));
+    deviceStore.setItem('od.autoSync', String(value));
   } catch {
     // Not fatal: the setting only lasts until the app closes.
   }
@@ -848,7 +849,7 @@ if (typeof window !== 'undefined') {
 
 function readLastSync() {
   try {
-    return localStorage.getItem('od.lastSync');
+    return deviceStore.getItem('od.lastSync');
   } catch {
     return null;
   }
@@ -885,7 +886,7 @@ function markSynced() {
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
   logbook.lastSync = local;
   try {
-    localStorage.setItem('od.lastSync', local);
+    deviceStore.setItem('od.lastSync', local);
   } catch {
     // Not fatal: only the Account screen shows it.
   }

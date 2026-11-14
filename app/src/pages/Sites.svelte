@@ -1,5 +1,6 @@
 <script>
   // @ts-check
+  import { deviceStore } from '../lib/device-store.js';
   // Sites section (docs/mockups/android-sites.dc.html; spec, section 4,
   // "Sites"): the section header (☰, title, search), the map of the sites
   // with a position and "centre on my position", then the list panel: the
@@ -55,12 +56,12 @@ import { language } from '../lib/i18n.js';
 
   const SORT_KEY = 'od.sitesSort';
   /** The order of the list, a setting of this device. */
-  let sortBy = $state(/** @type {'name'|'recent'} */ (localStorage.getItem(SORT_KEY) === 'recent' ? 'recent' : 'name'));
+  let sortBy = $state(/** @type {'name'|'recent'} */ (deviceStore.getItem(SORT_KEY) === 'recent' ? 'recent' : 'name'));
 
   /** @param {'name'|'recent'} order */
   function setSort(order) {
     sortBy = order;
-    localStorage.setItem(SORT_KEY, order);
+    deviceStore.setItem(SORT_KEY, order);
   }
 
   /** Sites used by dives, in the chosen order. */

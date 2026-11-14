@@ -1,5 +1,6 @@
 <script>
   // @ts-check
+  import { deviceStore } from '../lib/device-store.js';
   // "Exporter au format…" of the logbook's selection
   // (docs/mockups/carnet-export-android.dc.html; spec, section 4, "Logbook
   // selection and export"): an MD3 modal bottom sheet with the formats as a
@@ -24,13 +25,13 @@
   const KEY = 'od.exportFormat';
   /** @type {ExportFormat[]} */
   const FORMATS = ['ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf'];
-  const stored = /** @type {ExportFormat} */ (localStorage.getItem(KEY) ?? 'ssrf');
+  const stored = /** @type {ExportFormat} */ (deviceStore.getItem(KEY) ?? 'ssrf');
   let format = $state(FORMATS.includes(stored) ? stored : 'ssrf');
   let anonymize = $state(false);
   let opened = $state(true);
 
   function submit() {
-    localStorage.setItem(KEY, format);
+    deviceStore.setItem(KEY, format);
     opened = false;
     onexport(format, anonymize);
   }

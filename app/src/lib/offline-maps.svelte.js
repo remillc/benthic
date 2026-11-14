@@ -4,6 +4,7 @@
 // updates and the dialogs. Kept on the device, not in the logbook. The native
 // side (downloads, files, free space) is the plugin's maps* methods; the rules
 // are in maps-logic.js.
+import { deviceStore } from './device-store.js';
 import { f7 } from 'framework7-svelte';
 import { showSnackbar } from './snackbar.js';
 import { OpenDivesCore } from 'opendives-core';
@@ -62,7 +63,7 @@ const SETTINGS_KEY = 'od.offlineMapsSettings';
 /** @param {string} key */
 function readJson(key) {
   try {
-    return JSON.parse(localStorage.getItem(key) ?? 'null');
+    return JSON.parse(deviceStore.getItem(key) ?? 'null');
   } catch {
     return null;
   }
@@ -71,7 +72,7 @@ function readJson(key) {
 /** @param {string} key @param {unknown} value */
 function writeJson(key, value) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    deviceStore.setItem(key, JSON.stringify(value));
   } catch {
     // Not fatal: the state lasts until the app closes.
   }

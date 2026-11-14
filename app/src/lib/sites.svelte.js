@@ -1,6 +1,7 @@
 // @ts-check
 // Dive sites (spec, section 4, "Sites"): changes through the core, saved and
 // synced like a dive edit; coordinates as Subsurface writes them.
+import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, refreshAfterChange } from './logbook.svelte.js';
 import { language, tIfExists } from './i18n.js';
@@ -72,13 +73,13 @@ const MARKS_KEY = 'od.notDuplicates';
 
 /** "These are not duplicates": kept on this device (see site-dismissed.js). */
 function storedMarks() {
-  return parseMarks(localStorage.getItem(MARKS_KEY));
+  return parseMarks(deviceStore.getItem(MARKS_KEY));
 }
 
 /** @param {Record<string, string>} marks */
 function storeMarks(marks) {
   try {
-    localStorage.setItem(MARKS_KEY, JSON.stringify(marks));
+    deviceStore.setItem(MARKS_KEY, JSON.stringify(marks));
   } catch {
     // Not fatal.
   }
