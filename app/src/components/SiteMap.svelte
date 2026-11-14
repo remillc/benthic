@@ -166,7 +166,9 @@
     // The scale is set once, on the whole filter at the opening framing; the legend keeps its meaning.
     if (!heatScale) heatScale = grid.max || 1;
     const styles = getComputedStyle(heatCanvas);
-    const ramp = /** @type {any} */ (['--od-heat-3', '--od-heat-2', '--od-heat-1'].map((v) => rgb(styles.getPropertyValue(v) || '#000000')));
+    const colour = (/** @type {string} */ v) => rgb(styles.getPropertyValue(v) || '#000000');
+    const ramp = /** @type {[number, number, number][]} */ ([1, 2, 3, 4, 5, 6].map((i) => colour(`--od-heat-${i}`)));
+    const fade = colour('--od-heat-fade');
     // The grid coloured on a small canvas, then drawn smoothed at the map's size.
     const small = document.createElement('canvas');
     small.width = grid.cols;
@@ -174,7 +176,7 @@
     const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
     const image = sctx.createImageData(grid.cols, grid.rows);
     for (let i = 0; i < grid.values.length; i++) {
-      const [r, g, b, a] = rampColour(grid.values[i] / heatScale, ramp);
+      const [r, g, b, a] = rampColour(grid.values[i] / heatScale, ramp, fade);
       image.data.set([r, g, b, a], i * 4);
     }
     sctx.putImageData(image, 0, 0);

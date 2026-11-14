@@ -104,10 +104,15 @@
     --od-alarm-on-field: #B71C1C;
     /* The account initial's pill on the band: opaque, the initial 9.9:1 on any band. */
     --od-band-avatar: #FFFFFF;
-    /* The heat of « Où je plonge le plus »: the tertiary ramp, centre to edge (task 2026-11-14-152). */
-    --od-heat-1: #B4530F;
-    --od-heat-2: #F0A66B;
-    --od-heat-3: #FBE3B2;
+    /* The heat of « Où je plonge le plus »: blue (least) to red (most), 1 to 6, the lowest density
+       fading out through light blue (task 2026-11-14-161). Same in dark mode for now. */
+    --od-heat-fade: #6FC3F0;
+    --od-heat-1: #1E5BD8;
+    --od-heat-2: #3FB5D9;
+    --od-heat-3: #5CC06A;
+    --od-heat-4: #F2D43A;
+    --od-heat-5: #F07C1E;
+    --od-heat-6: #D7191C;
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --od-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
@@ -256,9 +261,13 @@
     --od-tertiary-text: #F0A66B;
     --od-alarm-on-field: #FF8A80;
     --od-band-avatar: #FFFFFF;
-    --od-heat-1: #F0A66B;
-    --od-heat-2: #9C6B3F;
-    --od-heat-3: #4A3216;
+    --od-heat-fade: #6FC3F0;
+    --od-heat-1: #1E5BD8;
+    --od-heat-2: #3FB5D9;
+    --od-heat-3: #5CC06A;
+    --od-heat-4: #F2D43A;
+    --od-heat-5: #F07C1E;
+    --od-heat-6: #D7191C;
     --od-star-summary: #75787C;
     --od-row-divider: #3A3C40;
     --od-map-sea: #1E2A36;

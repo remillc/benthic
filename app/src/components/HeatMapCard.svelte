@@ -136,7 +136,8 @@
       width: 96px;
       height: 8px;
       border-radius: 4px;
-      background: linear-gradient(to right, var(--od-heat-3), var(--od-heat-2), var(--od-heat-1));
+      /* The six stops, least (blue) to most (red), as on the map (task 2026-11-14-161). */
+      background: linear-gradient(to right, var(--od-heat-1), var(--od-heat-2), var(--od-heat-3), var(--od-heat-4), var(--od-heat-5), var(--od-heat-6));
     }
 
     /* Full screen: the legend in a white card at the bottom left. */

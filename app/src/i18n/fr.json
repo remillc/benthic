@@ -1784,6 +1784,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carte de chaleur : les couleurs vont du bleu (peu de plongées) au rouge (le plus de plongées), et la légende suit.",
       "Les temps relatifs (« il y a 2 min », « dans 3 h », « hier à 14 h 30 ») ne sont plus coupés en fin de ligne.",
       "Compte : la feuille du compte a des coins plus arrondis et la carte du compte est un peu plus étroite.",
       "Listes : une flèche « › » termine chaque ligne qui ouvre une autre page (types de bouteilles, plongées d’un site) et aucune ligne qui ouvre un menu, un choix ou une action (réglages à choix, renumérotation, lieu et notes d’un voyage).",

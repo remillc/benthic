@@ -3056,7 +3056,7 @@ The account sheet's header shows the OpenDives logo (the one of « À propos »,
 
 Already in place, no change: the account sheet's header shows the logo of « À propos » (logo-light.svg / logo-dark.svg, 24 dp, alt="" so hidden from screen readers) before « OpenDives », 8 dp apart, both centred together on the sheet's width with task 156's balancing 48 dp slot (od-account-sheet--brand). Checked on the phone emulator; the tablet's floating panel uses the same markup.
 
-## [ ] 2026-11-14-161 Heat map: the blue-to-red ramp (item 4 of task 154, missed)
+## [x] 2026-11-14-161 Heat map: the blue-to-red ramp (item 4 of task 154, missed)
 
 Item 4 was added to task 154 after you had started it, so it was not done: `app/src/theme.css` still has the sand-to-rust ramp (`--od-heat-1..3` #B4530F, #F0A66B, #FBE3B2). Christian approved this ramp on 14 November 2026. Mock-ups: `android-stats.dc.html` and `stats-carte-chaleur-plein-ecran-android.dc.html`.
 
@@ -3065,3 +3065,5 @@ Item 4 was added to task 154 after you had started it, so it was not done: `app/
 3. **Legend:** the same six stops, « Moins » on the left, « Plus » on the right, on the card and in full screen.
 
 Check on the phone emulator with the test account: Lock 21 red, the sites around it yellow to green, a lone site with one dive blue.
+
+Done in fix/heat-ramp. 1: theme.css --od-heat-1..6 (least to most) #1E5BD8, #3FB5D9, #5CC06A, #F2D43A, #F07C1E, #D7191C, light and dark alike, plus --od-heat-fade #6FC3F0; lib/heat-density.js rampColour takes any number of stops and a fade colour: the fade colour at 0, the first stop at 12 %, the others evenly up to red at 1, the 2 % threshold and the 0.15–0.85 alpha of task 154 kept; SiteMap reads the six stops and the fade. 2: the lowest density fades through light blue. 3: the legend bar shows the six stops, Moins left, Plus right, on the card and in full screen. Test values of tests/app/heat-density.test.mjs changed with the ramp (the new stops). Checked on the phone emulator with the test account: Lock 21 orange to red at its centre, the sites around yellow to green, lone sites blue.
