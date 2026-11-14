@@ -2664,3 +2664,15 @@ The ⋮ (more options) icon of each region row is drawn in a pale grey in the ap
 Christian's confirmation of 14 November 2026 of a decision already in the mock-ups (note of the « Cartes hors ligne » section: « Garde-fou : toujours au moins 1 Go libre sur l’appareil, sans limite propre aux cartes ») that the specification and the app did not follow. Mock-ups: `docs/mockups/android-cartes-hors-ligne.dc.html`, `docs/mockups/ios-cartes-hors-ligne.dc.html`.
 
 Remove the map cap entirely: the « Espace maximum pour les cartes » row and its dialog (500 Mo, 1, 2 or 5 Go), the « Limite des cartes atteinte » dialog (« Voir mes régions », « Changer la limite »), the stored setting and the cap check before and during a download. The summary card shows the regions, the space they use and the free space on the device (« 18,4 Go libres sur 64 Go »), with no « sur 1 Go ». Keep only the free-space floor: a download starts only if it leaves at least 1 Go free, or 10 % of the device storage if that is more; « Espace insuffisant » before, pause « Reprendra quand 1 Go sera libre » during. Remove the strings from `fr.json` and `en.json`, update `docs/ui-specification.md` (Offline maps: list and storage guards) and the tests. Check on the phone emulator and on iPhone.
+
+## [ ] 2026-11-14-138 Settings: « Format du papier (impression) »
+
+Christian's correction of 14 November 2026. Mock-ups in `docs/mockups/`: `reglages-langue-android`, `ios-reglages-langue`, `android-tablette-reglages-paysage`, `android-tablette-reglages-portrait` (all `.dc.html`).
+
+In Settings › Langue et formats, the row « Format du papier » becomes « Format du papier (impression) », so the diver knows it is only for printing. Same label everywhere the setting appears (Android phone and tablet, iPhone). English: « Paper size (printing) ». Update `fr.json`, `en.json` and `docs/ui-specification.md`.
+
+## [ ] 2026-11-14-139 Account: say that the dives can be kept on the device when the account is deleted
+
+Christian's request of 14 November 2026: one must be able to leave the Subsurface server, delete the data there and keep only local data. This already exists (« Supprimer le compte » with « Garder mes plongées sur cet appareil », checked by default), but the Account screen did not say so. Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte`, `compte-android-suppression` (all `.dc.html`).
+
+Under « Supprimer le compte », the consequence reads: « Efface le compte et ses plongées du cloud Subsurface. Irréversible. Vous pouvez garder vos plongées sur cet appareil. » On the delete screen, check that « Garder mes plongées sur cet appareil » is checked by default and that, once the server confirms the deletion, the logbook becomes a no-account logbook with every dive still there. Numbers with a thousands separator never break across lines (« 1 353 » with a non-breaking space, as the formatter should already do). Update `docs/ui-specification.md`. Check on Android phone and tablet and on iPhone.
