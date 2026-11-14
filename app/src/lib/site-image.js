@@ -34,8 +34,9 @@ let drawers = 0;
  * An off-screen map that draws one site after the other. The tiles come from a
  * downloaded package, else the network (see map-style.js).
  * @param {() => void} [onTile] called for each tile asked of the network
+ * @param {{ width: number, height: number }} [size] CSS pixels of the picture
  */
-async function createDrawer(onTile) {
+async function createDrawer(onTile, size = { width: DRAW_WIDTH, height: HALF_HEIGHT * 2 }) {
   const module = await import('maplibre-gl');
   /** @type {typeof import('maplibre-gl')} */
   const maplibregl = /** @type {any} */ (module).default ?? module;
@@ -48,7 +49,7 @@ async function createDrawer(onTile) {
     else if (origin === 'missing') missing++;
   });
   const container = document.createElement('div');
-  container.style.cssText = `position:fixed;left:-${DRAW_WIDTH + 100}px;top:0;width:${DRAW_WIDTH}px;height:${HALF_HEIGHT * 2}px`;
+  container.style.cssText = `position:fixed;left:-${size.width + 100}px;top:0;width:${size.width}px;height:${size.height}px`;
   document.body.append(container);
   const map = new maplibregl.Map({
     container,
@@ -119,7 +120,88 @@ async function createDrawer(onTile) {
     });
   }
 
-  return { draw, close };
+  /**
+   * A picture framing several points (the map strips of « Nettoyer les sites »),
+   * and where each point falls on it, CSS pixels.
+   * @param {[number, number][]} points [lon, lat]
+   * @param {{ top: number, right: number, bottom: number, left: number }} padding
+   * @returns {Promise<{ blob: Blob, xy: [number, number][] }>}
+   */
+  function drawFraming(points, padding) {
+    return new Promise((resolve, reject) => {
+      /** @param {{ error?: Error }} e */
+      const failed = (e) => done(() => reject(e.error ?? new Error('Map strip')));
+      /** @param {() => void} then */
+      const done = (then) => {
+        clearTimeout(timer);
+        map.off('error', failed);
+        then();
+      };
+      const timer = setTimeout(() => done(() => reject(new Error('Map strip: timeout'))), TIMEOUT_MS);
+      map.on('error', failed);
+      map.once('idle', () =>
+        done(() => {
+          const xy = points.map((p) => {
+            const at = map.project(p);
+            return /** @type {[number, number]} */ ([at.x, at.y]);
+          });
+          map.getCanvas().toBlob((blob) => (blob ? resolve({ blob, xy }) : reject(new Error('Map strip: no picture'))), 'image/webp', 0.8);
+        }),
+      );
+      const bounds = points.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(points[0], points[0]));
+      map.fitBounds(bounds, { padding, maxZoom: 18, animate: false });
+      map.triggerRepaint();
+    });
+  }
+
+  return { draw, drawFraming, close };
+}
+
+// --- Map strips (task 2026-11-14-148) ---
+//
+// Pictures framing a few points, drawn one after the other by one off-screen
+// map per size: a page of duplicates never holds a live map per group.
+
+/** @type {Map<string, Promise<Awaited<ReturnType<typeof createDrawer>>>>} */
+const stripDrawers = new Map();
+let stripQueue = Promise.resolve();
+/** @type {ReturnType<typeof setTimeout>|undefined} */
+let stripIdle;
+
+/**
+ * A map picture framing the points, with where each falls on it. Not kept: the
+ * caller frees the address (URL.revokeObjectURL).
+ * @param {[number, number][]} points [lon, lat]
+ * @param {{ width: number, height: number }} size CSS pixels
+ * @param {{ top: number, right: number, bottom: number, left: number }} padding
+ * @returns {Promise<{ url: string, xy: [number, number][] }>}
+ */
+export function mapStrip(points, size, padding) {
+  const key = `${Math.round(size.width)}x${Math.round(size.height)}`;
+  const run = stripQueue.then(async () => {
+    clearTimeout(stripIdle);
+    let drawer = stripDrawers.get(key);
+    if (!drawer) {
+      drawer = createDrawer(undefined, size);
+      stripDrawers.set(key, drawer);
+    }
+    const { blob, xy } = await (await drawer).drawFraming(points, padding);
+    return { url: URL.createObjectURL(blob), xy };
+  });
+  // The next one waits for this one, failed or not; the maps go after a pause.
+  stripQueue = run.then(
+    () => {},
+    () => {},
+  ).then(() => {
+    clearTimeout(stripIdle);
+    stripIdle = setTimeout(closeStripDrawers, 5000);
+  });
+  return run;
+}
+
+function closeStripDrawers() {
+  for (const drawer of stripDrawers.values()) drawer.then((d) => d.close(), () => {});
+  stripDrawers.clear();
 }
 
 /** @param {Cache|null} cache @param {string} key @param {Blob} blob */

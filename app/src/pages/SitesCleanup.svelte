@@ -15,6 +15,7 @@
   import { pairsGone } from '../lib/site-cleanup.js';
   import Icon from '../components/Icon.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
+  import DuplicateStrip from '../components/DuplicateStrip.svelte';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -173,6 +174,12 @@
         <span class="od-sites-cleanup--name">{both[0].name || t('sites.noName')}</span>
         <span class="od-sites-cleanup--sub">{reason(pair)}</span>
       </legend>
+      <!-- Both sites on a map strip, when both have a position (task 2026-11-14-148). -->
+      {#if both[0].hasLocation && both[1].hasLocation}
+        <div class="od-sites-cleanup--strip">
+          <DuplicateStrip a={both[0]} b={both[1]} kept={kept[key] ?? both[0].uuid} distanceM={pair.distanceM} />
+        </div>
+      {/if}
       {#each both as s (s.uuid)}
         <div class="od-sites-cleanup--keep-row">
           <ChoiceRow class="od-sites-cleanup--keep-pick" name="keep-{key}" selected={(kept[key] ?? both[0].uuid) === s.uuid} onselect={() => (kept[key] = s.uuid)}>
@@ -229,6 +236,11 @@
       background: var(--od-surface);
       overflow: hidden;
       min-width: 0;
+    }
+
+    /* The map strip spans the card, under the floating header. */
+    .od-sites-cleanup--strip {
+      clear: both;
     }
 
     /* Header of a duplicate group: the site's name, then the reason. */

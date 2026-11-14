@@ -23,10 +23,13 @@
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
 
-  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string } }, f7router: any }} */
+  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, lat?: string, lon?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const editing = f7route.params.uuid ? Number(f7route.params.uuid) : 0;
   const forDive = f7route.query?.dive ? Number(f7route.query.dive) : 0;
+  /** ?lat=&lon= (micro-degrees): the position recorded with the dive, where « Nouveau site » creates the site (task 2026-11-14-148). */
+  const givenPosition =
+    f7route.query?.lat && f7route.query?.lon ? { latUdeg: Number(f7route.query.lat), lonUdeg: Number(f7route.query.lon) } : null;
 
   let original = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
   let name = $state('');
@@ -54,23 +57,31 @@
 
   onMount(async () => {
     if (!editing) {
+      /** @param {{latUdeg: number, lonUdeg: number}} p */
+      const start = (p) =>
+        setPosition(p).then(() => {
+          // The found position, country and region are the opening values; what was typed meanwhile stays a change.
+          if (!opened) return;
+          const now = values();
+          const auto = (/** @type {string} */ typed, /** @type {string} */ found) => (found && typed === found ? typed : null);
+          opened = {
+            ...opened,
+            place: now.place,
+            country: auto(country, autoCountry) ?? opened.country,
+            region: auto(region, autoRegion) ?? opened.region,
+          };
+        });
+      // At the dive's recorded position, when there is one.
+      if (givenPosition) {
+        start(givenPosition);
+        return;
+      }
       // A new site starts where the diver is (often on the boat or the
       // shore); without a position, the map stays as it is, silently.
       navigator.geolocation?.getCurrentPosition(
         (pos) => {
           if (position) return;
-          setPosition({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) }).then(() => {
-            // The found position, country and region are the opening values; what was typed meanwhile stays a change.
-            if (!opened) return;
-            const now = values();
-            const auto = (/** @type {string} */ typed, /** @type {string} */ found) => (found && typed === found ? typed : null);
-            opened = {
-              ...opened,
-              place: now.place,
-              country: auto(country, autoCountry) ?? opened.country,
-              region: auto(region, autoRegion) ?? opened.region,
-            };
-          });
+          start({ latUdeg: Math.round(pos.coords.latitude * 1e6), lonUdeg: Math.round(pos.coords.longitude * 1e6) });
         },
         () => {},
         { enableHighAccuracy: true, timeout: 15000 },

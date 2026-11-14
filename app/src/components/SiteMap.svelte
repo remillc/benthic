@@ -32,11 +32,18 @@
    *   matching?: Set<number>|null,
    *   onlocate?: () => void,
    *   overlay?: import('svelte').Snippet<[boolean]>,
+   *   points?: { n: number, latUdeg: number, lonUdeg: number }[],
+   *   muted?: boolean,
+   *   label?: string,
    * }}
+   * points: numbered round markers (the dives without a site, task 2026-11-14-148); when
+   *   given, the map is framed on them, and the sites are only the places around.
+   * muted: the sites as grey pins with their name, not buttons (the places around).
+   * label: the map's accessible name, in place of the list of the sites.
    * onlocate: « Centrer sur ma position » in full screen (the screen has its own outside it).
    * overlay: drawn over the map, in and out of full screen (gets whether it is full screen).
    */
-  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null, onlocate, overlay } = $props();
+  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null, onlocate, overlay, points = [], muted = false, label: givenLabel } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
   let full = $state(false);
@@ -52,6 +59,7 @@
   const PLACE = { centre: 'Centre', north: 'North', northEast: 'NorthEast', east: 'East', southEast: 'SouthEast', south: 'South', southWest: 'SouthWest', west: 'West', northWest: 'NorthWest' };
   const mapName = $derived(t(full ? 'sites.mapFullscreen' : 'sites.map'));
   const label = $derived(
+    givenLabel ??
     mapLabel(
       sites.map((s) => ({ name: s.name || t('sites.noName'), lonDeg: s.lonUdeg / 1e6, latDeg: s.latUdeg / 1e6, dives: s.dives ?? 0 })),
       bounds,
@@ -102,6 +110,8 @@
   let markers = [];
   /** @type {import('maplibre-gl').Marker|undefined} */
   let pinMarker;
+  /** @type {import('maplibre-gl').Marker[]} */
+  let pointMarkers = [];
 
   const numbers = new Intl.NumberFormat(typeof document === 'undefined' ? undefined : document.documentElement.lang || undefined);
 
@@ -114,10 +124,15 @@
     markers = sites.map((site) => {
       // The pin with the number of dives in its head, and the site's name beside it.
       const name = site.name || t('sites.noName');
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'od-site-map--site-marker';
-      el.setAttribute('aria-label', site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
+      // Muted: a grey pin with a white dot and the name on its left, for the eye only
+      // (the page says the places in words).
+      const el = document.createElement(muted ? 'div' : 'button');
+      if (muted) el.setAttribute('aria-hidden', 'true');
+      else {
+        /** @type {HTMLButtonElement} */ (el).type = 'button';
+        el.setAttribute('aria-label', site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
+      }
+      el.className = muted ? 'od-site-map--site-marker od-site-map--muted' : 'od-site-map--site-marker';
       const svg = 'http://www.w3.org/2000/svg';
       const drawing = document.createElementNS(svg, 'svg');
       drawing.setAttribute('class', 'od-site-map--pin');
@@ -128,7 +143,12 @@
       const head = document.createElementNS(svg, 'path');
       head.setAttribute('d', 'M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z');
       drawing.append(head);
-      if (site.dives) {
+      if (muted) {
+        const dot = document.createElementNS(svg, 'circle');
+        dot.setAttribute('cy', '-24');
+        dot.setAttribute('r', '5');
+        drawing.append(dot);
+      } else if (site.dives) {
         const count = document.createElementNS(svg, 'text');
         count.setAttribute('x', '0');
         count.setAttribute('y', '-19.5');
@@ -140,7 +160,7 @@
       text.setAttribute('aria-hidden', 'true');
       text.textContent = name;
       el.append(drawing, text);
-      el.addEventListener('click', () => onselect?.(site.uuid));
+      if (!muted) el.addEventListener('click', () => onselect?.(site.uuid));
       // The drawing's tip (x 16, 2 px above its bottom) on the site.
       const marker = new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 2] })
         .setLngLat(lngLat(site))
@@ -148,6 +168,19 @@
       return { uuid: site.uuid, marker };
     });
     dim();
+  }
+
+  /** The numbered markers: a 22 dp ink circle, white number, 2 dp white ring. */
+  function drawPoints() {
+    if (!map) return;
+    for (const m of pointMarkers) m.remove();
+    pointMarkers = points.map((p) => {
+      const el = document.createElement('div');
+      el.className = 'od-site-map--point';
+      el.setAttribute('aria-hidden', 'true');
+      el.textContent = numbers.format(p.n);
+      return new maplibregl.Marker({ element: el }).setLngLat(lngLat(p)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
+    });
   }
 
   /** During a search, the markers that do not match fade to 30 %. */
@@ -172,12 +205,13 @@
 
   function fit() {
     if (!map) return;
-    const points = [...sites.map(lngLat), ...(pin ? [lngLat(pin)] : [])];
-    if (points.length === 1) {
-      map.jumpTo({ center: points[0], zoom: 13 }, { programmatic: true });
-    } else if (points.length > 1) {
-      const bounds = points.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(points[0], points[0]));
-      map.fitBounds(bounds, { padding: 40, maxZoom: 12, animate: false }, { programmatic: true });
+    // Numbered points frame the map; the sites are then only what lies around.
+    const framed = points.length ? points.map(lngLat) : [...sites.map(lngLat), ...(pin ? [lngLat(pin)] : [])];
+    if (framed.length === 1) {
+      map.jumpTo({ center: framed[0], zoom: 13 }, { programmatic: true });
+    } else if (framed.length > 1) {
+      const bounds = framed.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(framed[0], framed[0]));
+      map.fitBounds(bounds, { padding: 40, maxZoom: points.length ? 14 : 12, animate: false }, { programmatic: true });
     }
   }
 
@@ -206,6 +240,7 @@
     m.on('load', () => {
       showLabelsInLanguage(m);
       drawSites();
+      drawPoints();
       fit();
       readBounds();
     });
@@ -287,6 +322,14 @@
     sites;
     if (map?.loaded()) {
       drawSites();
+    }
+  });
+
+  $effect(() => {
+    points;
+    if (map?.loaded()) {
+      drawPoints();
+      fit();
     }
   });
 
@@ -422,6 +465,22 @@
       }
     }
 
+    :global(.od-site-map--point) {
+      box-sizing: border-box;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--od-surface);
+      border-radius: 50%;
+      background: var(--od-text);
+      color: var(--od-surface);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 18px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+    }
+
     .od-site-map--center-pin {
       position: absolute;
       left: 50%;
@@ -492,6 +551,39 @@
       /* !important: MapLibre sets an inline opacity on every marker. */
       &.od-site-map--dim {
         opacity: 0.3 !important;
+      }
+
+      /* The places around: a smaller grey pin, white dot, name on its left in
+         the secondary text colour, 13 sp. */
+      &:global(.od-site-map--muted) {
+        width: 28px;
+        height: 36px;
+        cursor: default;
+
+        :global(.od-site-map--pin) {
+          width: 28px;
+          height: 36px;
+        }
+
+        :global(.od-site-map--pin path) {
+          fill: var(--od-map-pin-muted);
+        }
+
+        :global(.od-site-map--pin circle) {
+          fill: var(--od-surface);
+        }
+
+        :global(.od-site-map--pin-name) {
+          left: auto;
+          right: 32px;
+          top: 2px;
+          font-size: 13px;
+          color: var(--od-text-2);
+        }
+
+        &::after {
+          content: none;
+        }
       }
 
       /* A 48 dp touch target around the pin: MapLibre places the marker with
