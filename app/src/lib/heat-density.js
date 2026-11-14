@@ -1,45 +1,6 @@
 // @ts-check
-// The heat of « Où je plonge le plus » drawn as a density (task 2026-11-14-154): each
-// site adds a smooth kernel weighted by its dive count, on a coarse grid of the visible
-// map; each value is then mapped to the tertiary ramp, the densest point of the view
-// reaching the darkest colour. Overlapping sites no longer stack into dark brown.
-
-/**
- * The density on a grid of cells: each point adds weight × (1 − (d/r)²)³, a soft
- * kernel close to a Gaussian, within its radius.
- * @param {{ x: number, y: number, weight: number }[]} points positions in CSS px
- * @param {number} width @param {number} height CSS px of the view
- * @param {number} radius CSS px
- * @param {number} cell CSS px per grid cell
- * @returns {{ values: Float32Array, cols: number, rows: number, max: number }}
- */
-export function densityGrid(points, width, height, radius, cell) {
-  const cols = Math.max(1, Math.ceil(width / cell));
-  const rows = Math.max(1, Math.ceil(height / cell));
-  const values = new Float32Array(cols * rows);
-  const r2 = radius * radius;
-  for (const p of points) {
-    if (p.x < -radius || p.y < -radius || p.x > width + radius || p.y > height + radius) continue;
-    const c0 = Math.max(0, Math.floor((p.x - radius) / cell));
-    const c1 = Math.min(cols - 1, Math.floor((p.x + radius) / cell));
-    const r0 = Math.max(0, Math.floor((p.y - radius) / cell));
-    const r1 = Math.min(rows - 1, Math.floor((p.y + radius) / cell));
-    for (let row = r0; row <= r1; row++) {
-      const dy = (row + 0.5) * cell - p.y;
-      for (let col = c0; col <= c1; col++) {
-        const dx = (col + 0.5) * cell - p.x;
-        const d2 = dx * dx + dy * dy;
-        if (d2 >= r2) continue;
-        const k = 1 - d2 / r2;
-        // A soft kernel, near a Gaussian: the halo fades out smoothly to its edge.
-        values[row * cols + col] += p.weight * k * k * k;
-      }
-    }
-  }
-  let max = 0;
-  for (const v of values) if (v > max) max = v;
-  return { values, cols, rows, max };
-}
+// The heat of « Où je plonge le plus »: the halos' scale with the zoom (task 155), the colour
+// scale fixed per filter (tasks 155, 162), and one spot per site as the mock-up draws them.
 
 /** Halos follow the screen, not the ground (task 2026-11-14-155): radius at low zoom, and at zoom 13 and closer. */
 export const HALO_FAR_DP = 20;
@@ -57,16 +18,6 @@ export function haloRadius(zoom) {
   return HALO_FAR_DP + (HALO_NEAR_DP - HALO_FAR_DP) * f;
 }
 
-/**
- * A density's place on the ramp (task 2026-11-14-162): t = √(d / D), clamped to 1, where D is
- * the scale (the densest value of the filter at the opening framing). The square root
- * spreads the values: a quarter of the top density sits halfway (yellow-green).
- * @param {number} value d
- * @param {number} reference D
- */
-export function heatShare(value, reference) {
-  return value > 0 && reference > 0 ? Math.min(1, Math.sqrt(value / reference)) : 0;
-}
 
 /**
  * The colour scale of a heat map (tasks 155 and 162): measured once, at the opening framing,
@@ -94,29 +45,61 @@ export function rgb(hex) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-/** Where the colours sit on t (task 2026-11-14-162): the fade-in, then the six stops of task 161. */
-export const FADE_AT = 0.05;
-export const STOPS_AT = [0.12, 0.3, 0.48, 0.66, 0.83, 1];
+
+// --- The heat as the mock-up draws it (15 November 2026, after Christian compared the app
+// with android-stats.dc.html at the same zoom; the mock-up's card uses his real sites, so its
+// numbers can be read back): one radial spot per site, not a summed density; spots cover one
+// another (the busiest painted last) rather than adding up. Three gradients, by the site's
+// dives n against the busiest site's D: one dive blue; up to about 5 % of D a yellow centre;
+// from there a red centre. The radius grows with √((n − 1)/(D − 1)): 8 px for one dive, 27.5 px
+// for the busiest site at the card's zoom (Lock 21, 144 dives; Lock 23, 103 dives: 24.5 px).
+
+/** A gradient stop of a spot: offset from the centre (0) to the edge (1), a colour variable, an opacity. */
+/** @typedef {{ offset: number, colour: string, alpha: number }} SpotStop */
+
+/** The three gradients of the mock-up (#od-heat-1, 2 and 3 in android-stats.dc.html). */
+export const SPOT_GRADIENTS = /** @type {const} */ ({
+  one: [
+    { offset: 0, colour: '--od-heat-1', alpha: 0.8 },
+    { offset: 0.5, colour: '--od-heat-spot-mid', alpha: 0.5 },
+    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+  ],
+  few: [
+    { offset: 0, colour: '--od-heat-4', alpha: 0.85 },
+    { offset: 0.35, colour: '--od-heat-3', alpha: 0.75 },
+    { offset: 0.7, colour: '--od-heat-spot-edge', alpha: 0.5 },
+    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+  ],
+  many: [
+    { offset: 0, colour: '--od-heat-6', alpha: 0.9 },
+    { offset: 0.25, colour: '--od-heat-5', alpha: 0.85 },
+    { offset: 0.5, colour: '--od-heat-4', alpha: 0.75 },
+    { offset: 0.72, colour: '--od-heat-3', alpha: 0.55 },
+    { offset: 0.88, colour: '--od-heat-spot-edge', alpha: 0.35 },
+    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+  ],
+});
+/** Every spot is drawn at this opacity over its own gradient, as the mock-up does. */
+export const SPOT_OPACITY = 0.9;
+/** From this share of the busiest site's dives, a red centre (8 of 144 in the mock-up). */
+export const MANY_SHARE = 0.05;
 
 /**
- * The colour at t on the ramp: transparent under 0.05; from 0.05 the fade colour (light blue,
- * alpha 0) into the first stop at 0.12, then the stops at STOPS_AT, interpolated. Alpha 0 at
- * 0.05, 0.6 at 0.30, 0.85 from 0.48 up: the low end stays see-through.
- * @param {number} t
- * @param {[number, number, number][]} stops the six colours, least to most
- * @param {[number, number, number]} [fade] the colour the low end fades in through
- * @returns {[number, number, number, number]} r, g, b, alpha 0–255
+ * Which gradient a site takes.
+ * @param {number} dives n @param {number} busiest D
+ * @returns {'one'|'few'|'many'}
  */
-export function rampColour(t, stops, fade = stops[0]) {
-  const v = Math.max(0, Math.min(1, t));
-  if (v < FADE_AT) return [0, 0, 0, 0];
-  const mix = (/** @type {number[]} */ a, /** @type {number[]} */ b, /** @type {number} */ f) => a.map((x, i) => Math.round(x + (b[i] - x) * f));
-  const points = [FADE_AT, ...STOPS_AT];
-  const colours = [fade, ...stops];
-  let i = 0;
-  while (i < points.length - 2 && v > points[i + 1]) i++;
-  const f = Math.min(1, (v - points[i]) / (points[i + 1] - points[i]));
-  const [r, g, b] = mix(colours[i], colours[i + 1], f);
-  const alpha = v <= 0.3 ? (0.6 * (v - FADE_AT)) / (0.3 - FADE_AT) : v >= 0.48 ? 0.85 : 0.6 + (0.25 * (v - 0.3)) / (0.48 - 0.3);
-  return [r, g, b, Math.round(255 * alpha)];
+export function spotKind(dives, busiest) {
+  if (dives <= 1) return 'one';
+  return dives >= MANY_SHARE * busiest ? 'many' : 'few';
+}
+
+/**
+ * A spot's radius, CSS px: 8 + 19.5 × √((n − 1)/(D − 1)) at the card's zoom, scaled with the
+ * zoom as the halos of task 155 (× 1 far away, × 2 from zoom 13).
+ * @param {number} dives n @param {number} busiest D @param {number} zoom
+ */
+export function spotRadius(dives, busiest, zoom) {
+  const share = busiest > 1 ? Math.max(0, dives - 1) / (busiest - 1) : 0;
+  return (8 + 19.5 * Math.sqrt(share)) * (haloRadius(zoom) / HALO_FAR_DP);
 }
