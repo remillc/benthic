@@ -12,7 +12,7 @@
         "title": "Le nuage refuse votre mot de passe"
       },
       "server": {
-        "row": "Le nuage ne répond pas : nouvel essai dans {n} min",
+        "row": "Le nuage ne répond pas : nouvel essai dans {n} min",
         "rowManual": "Le nuage ne répond pas",
         "title": "Le nuage ne répond pas",
         "intro": "Le réseau fonctionne, mais le serveur du nuage est peut-être en maintenance."

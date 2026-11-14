@@ -3039,12 +3039,14 @@ Same on the tablet. iOS keeps its own sheet.
 
 Done in fix/account-sheet-card. 1: the identity card (avatar, address, « Gérer le compte », the sync row) gets 12 dp more margin on each side (od-account-sheet--identity), the « Réglages » / « À propos » card keeps the full inner width. 2: the sheet's corners 36 dp (was 28), on the phone and the tablet's floating panel; both white cards 28 dp (were 20). iOS unchanged. Checked on the phone emulator.
 
-## [ ] 2026-11-14-159 Relative times never break inside
+## [x] 2026-11-14-159 Relative times never break inside
 
 Christian decided this on 14 November 2026, from the account sheet (`nav-option-barre-compte-android.dc.html`): when « Synchronisé il y a 2 min » wraps beside the « Synchroniser » button, the line must break before « il », never inside « il y a 2 min ».
 
 1. Wherever the app builds a relative time (« il y a 2 min », « il y a 3 j », « dans 3 h », « hier à 14 h 30 »; en « 2 min ago », « in 3 h », « yesterday at 2:30 pm »), join its words with non-breaking spaces (U+00A0), in the helper that formats it, so every caller gets it. The space between the status word (« Synchronisé ») and the relative time stays a normal space.
 2. The rule is in `docs/ui-writing.md` (Rules). Check the sync status in the account sheet, the Account page, the offline maps (« Mis à jour il y a … ») and any other relative time.
+
+Done in fix/relative-time-nbsp. 1: lib/format.js gains oneLine() (spaces to U+00A0) and uses it in every helper that builds a relative time: formatTimeAgo, formatShortAgo (the sync status), formatRelativeDateTime (« Hier, 13:40 ») and formatDayAt (« hier à 14 h 30 »); the texts built around a relative value join it too: fr « il y a {time} » (desaturation, surfaced, last dive), « dans {time} » (flying), « nouvel essai dans {n} min » (fr, fr-CA), en « {time} ago », « in {time} », « in {n} min ». The space before the relative time (« Synchronisé il y a… ») stays a normal one, since the status text is « Synchronisé » + the helper's output. 2: the rule was already in docs/ui-writing.md. Callers checked: the account sheet and the Account page (SyncStatus), the offline maps (formatTimeAgo), the desaturation and flight texts. Test: tests/app/relative-time.test.mjs.
 
 ## [x] 2026-11-14-160 Account sheet: the logo before the title
 
