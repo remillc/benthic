@@ -2932,3 +2932,26 @@ Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/`: `ios-sa
    - On iPhone: the same screen in iOS form, a navigation bar with a search field.
 
 English: « Complete the dive », « Later », « {distance} away · last dive on {date} », « {distance} away · no dives », « · Nearest », « From nearest to farthest from your position. Without a position, from most recently dived to oldest. », « Choose a site », « Search for a site », « Create a site at my current position », « {n} sites, from nearest to farthest from your position ». Update `docs/ui-specification.md` (quick entry, site choice).
+
+## [ ] 2026-11-14-152 Statistics: a heat map « Où je plonge le plus »
+
+Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mockups/android-stats.dc.html`, the card under « Graphiques ». The card's map and counts are Christian's real St. Lawrence sites, while the rest of the board still shows the sample logbook.
+
+1. **A full-width card** (`od-stats-heatmap`) after the « Graphiques » charts, before « Mes statistiques ».
+   - White, 12 dp corners, 16 dp padding.
+   - Title « Où je plonge le plus » (16 sp, 500). Under it, « {site} en tête, {n} plongées · touchez pour ouvrir la carte » (12 sp, `--od-text-2`).
+2. **The map**, 170 dp high, 8 dp corners.
+   - The base map is the offline map, desaturated (about 25 % saturation) so the heat stands out.
+   - It is framed on the area that holds most of the dives: the region of the most dived sites. It is not the whole world when one trip went far away.
+   - It follows the current filter of Statistics, like the other charts.
+3. **The heat.**
+   - One radial spot per site, centred on the site. Its radius grows with the square root of the dive count, and its opacity with the logarithm of the count, so a site with 140 dives dominates without hiding the small ones.
+   - The colours are the tertiary ramp: #B4530F at the centre, #F0A66B in the middle, #FBE3B2 fading to transparent at the edge. Same in dark mode with the dark tertiary (#F0A66B, #4A3216).
+   - Sites without coordinates are not shown.
+4. **Legend:** « Moins », a 96 dp × 8 dp bar with the same ramp, « Plus ».
+5. **No OpenStreetMap credit on this card** (Christian's decision). The credit stays in About, as for the map behind the dive detail header.
+6. **Tapping the card** opens the Sites map in full screen (task 147) on the same area.
+7. **Accessibility:** the card is one link named « Où je plonge le plus : carte de chaleur. {site} en tête, {n} plongées. Ouvrir la carte des sites ». The map itself is hidden from screen readers.
+8. **Without enough data** (fewer than 2 sites with coordinates in the filter), the card is not shown.
+
+English: « Where I dive most », « {site} leads, {n} dives · tap to open the map », « Less », « More ». Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
