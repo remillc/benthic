@@ -24,6 +24,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "OpenDivesCore"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "importSample", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "healthDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "listDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "plannerSetup", returnType: CAPPluginReturnPromise),

@@ -1001,6 +1001,8 @@
     { key: 'import', icon: 'file', text: t('logbook.addImport'), sub: t('logbook.addImportFormats') },
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
     { key: 'scan', icon: 'qr', text: t('logbook.addScan') },
+    // iPhone only: the dives of an Apple Watch Ultra, from Apple Health (to-do #67).
+    ...(theme.ios && layout.phone ? [{ key: 'health', icon: /** @type {'download'} */ ('download'), text: t('logbook.addHealth') }] : []),
   ];
 
   /**
@@ -1024,6 +1026,7 @@
     download: downloadRoute,
     manual: '/dives/new',
     divelogs: '/welcome/import',
+    health: '/health',
   });
 
   /** @param {string} key download, import, manual, divelogs */

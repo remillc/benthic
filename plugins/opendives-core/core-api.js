@@ -725,6 +725,11 @@ export { waterTypeOf };
  *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
  * @property {(options: {on: boolean}) => Promise<void>} keepScreenAwake
  *   While on: the screen stays on and at full brightness (the QR sending screen); off restores both.
+ * @property {(options: {from: number, to: number}) => Promise<{available: boolean, depth: {id: string, at: number, value: number}[], temperature: {id: string, at: number, value: number}[]}>} healthDives
+ *   iPhone only (to-do #67): the depth (m) and water temperature (°C) samples an Apple Watch Ultra
+ *   wrote into Apple Health between `from` and `to` (ms since 1970), read only. `available` is
+ *   false where Health has no such data. A refused reading looks like no data (HealthKit does not
+ *   tell). Not on Android, where the call is rejected.
  * @property {() => Promise<{store: boolean, installer: string}>} installSource
  *   Whether the app was installed from Google Play (installer "com.android.vending") or the
  *   App Store (not a TestFlight or development build); `installer` is the package name, "" on iOS.
@@ -933,6 +938,7 @@ export const OpenDivesCore = {
   gaugeCamera: (options) => native.gaugeCamera(options),
   qrScan: (options) => native.qrScan(options),
   keepScreenAwake: (options) => native.keepScreenAwake(options),
+  healthDives: (options) => native.healthDives(options),
   installSource: () => native.installSource(),
   requestReview: () => native.requestReview(),
   openStorePage: () => native.openStorePage(),
