@@ -66,6 +66,10 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 - Never break a line between a number and its unit, in every language: join them with a non-breaking space (U+00A0) — « 27,6 m », « 1,6 bar », « 302 Mo », « 90 % », « 14 h 30 », « 9 plongées », en « 27.6 m », « 302 MB » (decided on 13 November 2026).
 - Sentence case, no title case.
 
+### 9. Vocabulary (French)
+
+- **« courriel », never « e-mail », « email » or « mail »** (decided on 14 November 2026, to-do #18, task 140): « Adresse courriel », « Courriel » as a short row label, « envoyé par courriel », « Cette adresse courriel n’est pas valide ». English keeps « email ». Code comments and identifiers are not concerned.
+
 ## Before publishing a text
 
 1. Read it out loud once. Cut every word that does not change the meaning.

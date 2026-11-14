@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "French texts: « courriel » everywhere, never « e-mail ».",
       "Account: under “Delete account”, it says your dives can stay on this device.",
       "Settings: “Paper size (printing)”, to say it is only for printing.",
       "Offline maps: no space limit of their own any more; only the device’s free space counts (always at least 1 GB free). The top card shows the maps, the other data and the free space.",
