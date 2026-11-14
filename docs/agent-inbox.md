@@ -3025,3 +3025,12 @@ Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-a
 2. The rule is now written in `docs/system-design.md` (section 5, « Trailing chevron »): a chevron on every row that opens another page, none on a row that runs an action, toggles a setting or opens a menu. Check the app's other lists against it and fix any row that breaks it; list what you changed.
 
 Same on the tablet; iOS keeps its own disclosure indicator.
+
+## [ ] 2026-11-14-158 Account sheet: narrower identity card, rounder corners
+
+Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-android.dc.html` and `nav-compte-maj-android.dc.html` (the account sheet opened from the initial). The sheet keeps its width (360 dp on a phone).
+
+1. **Identity card narrower.** The first white card (avatar, address, « Cloud · N plongées », « Gérer le compte », the sync row) gets 12 dp of extra side margin inside the sheet: 320 dp wide instead of 344. The « Réglages » / « À propos » card keeps the full inner width.
+2. **Rounder corners.** The sheet: 36 dp (was 28). Both white cards: 28 dp (were 20).
+
+Same on the tablet. iOS keeps its own sheet.
