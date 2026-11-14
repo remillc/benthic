@@ -2957,3 +2957,24 @@ Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mo
 English: « Where I dive most », « {site} leads, {n} dives », « Less », « More », « Show the heat map full screen ». Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
 
 Done in feature/stats-heatmap. 1-3: HeatMapCard.svelte (od-stats-heatmap) after « Graphiques », before « Mes statistiques », on the Statistics filter's dives: title, « {site} en tête, {n} plongées », a 170 dp picture of the base map (lib/site-image.js mapStrip, one off-screen map; place names hidden) desaturated with saturate(0.25), framed on the busiest area (lib/heatmap.js: the sites within 150 km of the place with the most dives around it), one radial spot per site, radius by the square root of the count, opacity by its logarithm (0.35 to 1), tertiary ramp as --od-heat-1..3 (dark #F0A66B, #9C6B3F, #4A3216). 4: legend Moins / 96×8 ramp / Plus. 5: no credit on the card. 6-7: full-screen button « Afficher la carte de chaleur en plein écran »; full screen redraws the same area at the screen size, with the heat and the legend, no names nor pins; « Quitter le plein écran » and Back (the overlay takes od-map-fullscreen only while open) leave it; section named, picture hidden from screen readers. 8: hidden under 2 sites with coordinates. Tests: tests/app/heatmap.test.mjs. Checked on the phone emulator with the test account (St. Lawrence area, Lock 21 leading with 144 dives; full screen; Back). Limit: the dive list names its site only, so a name shared by several sites counts for the one with coordinates and the most dives. Not checked: tablet, iPhone, dark mode, a filter.
+
+## [ ] 2026-11-14-153 Contrast: raise the header band's light, and five small fixes
+
+From the contrast audit of 14 November 2026 (`docs/audit/2026-11-14-contrast.md`). Christian decided the fixes the same day. The mock-ups in `docs/mockups/` that carry the header band are updated.
+
+1. **Header band.**
+   - The light centre of the radial gradient sat behind the page title, the summary line and the right-hand buttons (search, « Filtre libre »), on the lightest blue: white text measured 3.3 to 4.2:1, the summary 2.6 to 4.1:1.
+   - The gradient keeps its colours and its horizontal position, `radial-gradient(140% 115% at 38% Y, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`. Only the centre moves up, above the top edge:
+     - Y = **−20 %** on phones;
+     - Y = **−30 %** from the tablet width (600 dp), where the band is wider.
+   - Measured after the change:
+     - phone: title 5.3 to 5.8:1, « Filtre libre » 6.4:1, summary 5.5 to 6.4:1;
+     - landscape tablet: title 8:1, summary 5.5:1.
+   - Same change for the side menu band and any other place that uses this gradient. Update `docs/system-design.md` (« Blue theme »).
+2. **Rust value on the sand banner** (wait before flying, suggested weight, the key value in rust semibold on the tertiary container): use #9A4400 (5.2:1 on #FBE3B2) for this text instead of #B4530F (4.0:1). Rust stays #B4530F for graphics, icons and large text. Dark mode is unchanged.
+3. **Error text on a grey surface** (divelogs import, `compte-import-identifiants-android`): #B71C1C (5.0:1 on #E3E1DC) instead of #C62828 (4.3:1). Error text on white keeps #C62828.
+4. **Busy button** (« Connexion… », `compte-connexion-encours-android`): the label is #4B4A47 (6.4:1), not ink at 60 %. Busy is not disabled.
+5. **iPhone field labels and secondary text** (`compte-connexion-encours-ios`): #6C6C70 (5.2:1 on white), the iOS secondary label colour, instead of #8E8E93 (3.3:1). Apply it wherever #8E8E93 is used for text on iOS. Icons and separators can keep it.
+6. **Account avatar on the band:** the white pill becomes opaque (#FFFFFF), so the initial keeps 9.9:1 on any band.
+
+Check with the same measure on the device, light and dark: every text at least 4.5:1, or 3:1 for large text.
