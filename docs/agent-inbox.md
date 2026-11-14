@@ -3046,8 +3046,10 @@ Christian decided this on 14 November 2026, from the account sheet (`nav-option-
 1. Wherever the app builds a relative time (« il y a 2 min », « il y a 3 j », « dans 3 h », « hier à 14 h 30 »; en « 2 min ago », « in 3 h », « yesterday at 2:30 pm »), join its words with non-breaking spaces (U+00A0), in the helper that formats it, so every caller gets it. The space between the status word (« Synchronisé ») and the relative time stays a normal space.
 2. The rule is in `docs/ui-writing.md` (Rules). Check the sync status in the account sheet, the Account page, the offline maps (« Mis à jour il y a … ») and any other relative time.
 
-## [ ] 2026-11-14-160 Account sheet: the logo before the title
+## [x] 2026-11-14-160 Account sheet: the logo before the title
 
 Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-android.dc.html` and `nav-compte-maj-android.dc.html` (updated in `docs/mockups/` with tasks 157, 158 and 159 too).
 
 The account sheet's header shows the OpenDives logo (the one of « À propos », 24 dp) before the « OpenDives » title, 8 dp apart. Logo and title are centred together on the sheet's width (task 156's balancing 48 dp slot on the right stays). The logo is decorative (hidden from screen readers): the title already says « OpenDives ». Same on the tablet.
+
+Already in place, no change: the account sheet's header shows the logo of « À propos » (logo-light.svg / logo-dark.svg, 24 dp, alt="" so hidden from screen readers) before « OpenDives », 8 dp apart, both centred together on the sheet's width with task 156's balancing 48 dp slot (od-account-sheet--brand). Checked on the phone emulator; the tablet's floating panel uses the same markup.
