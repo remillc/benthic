@@ -42,7 +42,10 @@
   const ready = $derived(readyList());
   const empty = $derived(!downloads.length && !ready.length);
   const readyBytes = $derived(ready.reduce((sum, r) => sum + r.sizeBytes, 0));
-  const usedPercent = $derived(Math.min(100, Math.round((readyBytes / offlineMaps.capBytes) * 100)));
+  // The device's storage (android-cartes-hors-ligne.dc.html): the maps, the other data, the free space.
+  const share = (/** @type {number} */ bytes) => (offlineMaps.totalBytes ? Math.min(100, (bytes / offlineMaps.totalBytes) * 100) : 0);
+  const mapsPercent = $derived(share(readyBytes));
+  const otherPercent = $derived(share(Math.max(0, offlineMaps.totalBytes - offlineMaps.freeBytes - readyBytes)));
   const updates = $derived(updatesCount());
   const split = $derived(!layout.phone && layout.split);
 
@@ -76,19 +79,21 @@
 
 {#snippet summary()}
   <div class="od-settings-maps--summary">
+    <!-- No limit of their own (task 2026-11-14-137): the regions, their space, and the device's. -->
     <span class="od-settings-maps--line">
-      <span class="od-settings-maps--count">{t('maps.summary.regions', { n: ready.length })}</span>
-      <span class="od-settings-maps--usage">{t('maps.summary.usage', { used: formatMapSize(readyBytes), cap: formatMapSize(offlineMaps.capBytes) })}</span>
+      <span class="od-settings-maps--count">{t('maps.summary.regions', { n: ready.length })} · {formatMapSize(readyBytes)}</span>
     </span>
-    <span
-      class="od-settings-maps--bar"
-      role="progressbar"
-      aria-label={t('maps.summary.usageLabel', { used: formatMapSize(readyBytes), cap: formatMapSize(offlineMaps.capBytes) })}
-      aria-valuenow={usedPercent}
-      aria-valuemin="0"
-      aria-valuemax="100"><span style:width="{usedPercent}%"></span></span
-    >
-    {#if offlineMaps.totalBytes}<span class="od-settings-maps--free">{t(ios ? 'maps.summary.freeShort' : 'maps.summary.free', { free: formatMapSize(offlineMaps.freeBytes) })}</span>{/if}
+    {#if offlineMaps.totalBytes}
+      <span class="od-settings-maps--bar" role="img" aria-label={t('maps.summary.storageLabel', { maps: formatMapSize(readyBytes), free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}>
+        <span class="od-settings-maps--maps" style:width="{mapsPercent}%"></span>
+        <span class="od-settings-maps--other" style:width="{otherPercent}%"></span>
+      </span>
+      <span class="od-settings-maps--legend" aria-hidden="true">
+        <span class="od-settings-maps--key od-settings-maps--key-maps"></span>{t('maps.summary.maps')}
+        <span class="od-settings-maps--key od-settings-maps--key-other"></span>{t('maps.summary.other')}
+      </span>
+      <span class="od-settings-maps--free">{t('maps.summary.freeOf', { free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}</span>
+    {/if}
   </div>
 {/snippet}
 
@@ -209,16 +214,6 @@
           <span class="toggle-icon"></span>
         </span>
       </label>
-    </div>
-    <div role="listitem">
-      <button type="button" class="od-settings-maps--set-row" aria-haspopup="dialog" onclick={() => (offlineMaps.dialog = { kind: 'limit' })}>
-        <span class="od-settings-maps--texts">
-          <span class="od-settings-maps--label">{t(ios ? 'maps.limit.labelShort' : 'maps.limit.label')}</span>
-          {#if !ios}<span class="od-maps-row--supporting">{formatMapSize(offlineMaps.capBytes)}</span>{/if}
-        </span>
-        {#if ios}<span class="od-settings-maps--value">{formatMapSize(offlineMaps.capBytes)}</span>{/if}
-        <Icon name="chevron" size={20} />
-      </button>
     </div>
   </div>
 {/snippet}
@@ -381,22 +376,49 @@
         line-height: 24px;
       }
 
-      .od-settings-maps--usage {
-        font-size: 14px;
-        color: var(--od-text-2);
-      }
-
+      /* The device's storage: the maps in ink, the other data in the outline tone, the rest free. */
       .od-settings-maps--bar {
         height: 8px;
         border-radius: 4px;
-        background: var(--od-primary-container);
+        background: var(--od-surface-container);
         overflow: hidden;
+        display: flex;
+        gap: 2px;
 
         > span {
-          display: block;
+          flex: none;
           height: 100%;
           border-radius: 4px;
-          background: var(--od-text);
+        }
+      }
+
+      .od-settings-maps--maps,
+      .od-settings-maps--key-maps {
+        background: var(--od-text);
+      }
+
+      .od-settings-maps--other,
+      .od-settings-maps--key-other {
+        background: var(--od-separator);
+      }
+
+      .od-settings-maps--legend {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--od-text-2);
+      }
+
+      .od-settings-maps--key {
+        flex: none;
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+
+        &.od-settings-maps--key-other {
+          margin-left: 6px;
         }
       }
 
