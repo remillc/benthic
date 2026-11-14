@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Runs OpenDives' tests, compiled for iOS, in an iOS simulator:
 #   - the round trip over Subsurface's sample logs (run-roundtrip.sh, unchanged),
-#     expected: 97 passed, 1 known failure (TestDiveSeabearNewFormat.xml);
+#     expected: 98 passed, 0 failed;
 #   - the planner tests (plan_test, plan_oracle).
 # usage: tests/ios/run-simulator.sh     (after native/build-ios.sh)
 # Exit status: 0 when every result is the expected one.
@@ -33,8 +33,7 @@ chmod +x "$WRAP"
 bash "$ROOT/tests/run-roundtrip.sh" "$WRAP" "$OUT/rt" "$SS"/dives/*.xml "$SS"/dives/*.ssrf > "$L/roundtrip.log" 2>&1
 summary=$(tail -1 "$L/roundtrip.log")
 echo "roundtrip in the simulator: $summary"
-if [ "$summary" != "passed: 97  failed: 1" ] || [ "$(grep -c '^FAIL' "$L/roundtrip.log")" != 1 ] ||
-   ! grep -q '^FAIL TestDiveSeabearNewFormat.xml ' "$L/roundtrip.log"; then
+if [ "$summary" != "passed: 98  failed: 0" ]; then
   status=1
   grep '^FAIL' "$L/roundtrip.log" | head -20
 fi

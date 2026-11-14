@@ -18,8 +18,8 @@ GitHub macOS runner (`.github/workflows/ios.yml`). It uses the same web layer
   is `plugins/opendives-core/OpendivesCore.podspec`.
 - `app/ios/` is the Capacitor iOS project (icon, launch screen, Info.plist).
 - `tests/ios/` runs the round-trip and planner tests in a simulator
-  (`run-simulator.sh`; expected round-trip result: 97 passed, 1 known failure,
-  `TestDiveSeabearNewFormat.xml`), starts the app (`run-app.sh`), checks the
+  (`run-simulator.sh`; expected round-trip result: 98 passed,
+  0 failed), starts the app (`run-app.sh`), checks the
   offline maps on iPhone and iPad (`run-maps.sh`) and starts the app many times
   (`run-launches.sh`).
 

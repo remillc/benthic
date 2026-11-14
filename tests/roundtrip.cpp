@@ -25,6 +25,8 @@ int main(int argc, char **argv)
 	// As the app does after every load: keep the log's own settings (units...).
 	opendives::apply_log_prefs();
 	fprintf(stderr, "loaded %zu dives, %zu sites, %zu trips\n", divelog.dives.size(), divelog.sites.size(), divelog.trips.size());
+	// As the app saves (core/libopendives: import_file, save_to).
+	opendives::uncache_shared_start_times();
 	ret = save_dives(argv[2], true);
 	if (ret) {
 		fprintf(stderr, "save failed (%d): %s\n", ret, argv[2]);

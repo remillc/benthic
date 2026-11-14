@@ -78,6 +78,11 @@ int cylinder_type_action(const std::string &action, const std::string &name, int
 // Required before saving: save-git rewrites these settings from prefs.
 void apply_log_prefs();
 
+// Before every save to git: the dives that share their start time with another
+// dive are written afresh, not from their cache, so that their folder names
+// ("…=00" and "…=00~<hash>") stay the same from one save to the next.
+void uncache_shared_start_times();
+
 // Reads `source` (.xml, .ssrf…) and saves it into the local git repository `repo`,
 // created if needed. Returns the number of dives, or -1 with `error` set.
 int import_file(const std::string &source, const std::string &repo, std::string &error);

@@ -34,7 +34,7 @@ The differences in step 2 come from Subsurface's code, not from the POC:
 
 These two differences were found by reading Subsurface's code. They were not compared with the official Subsurface application, which was not built here.
 
-**Only failure:** `TestDiveSeabearNewFormat.xml`. This file contains pairs of dives with the same number and the same start time. On every save, their order is reversed, so the git tree changes. No data is lost. This edge case comes from Subsurface's sorting; it should be watched, but it blocks nothing.
+**`TestDiveSeabearNewFormat.xml`** (the one failure until 14 November 2026): this file has pairs of dives with the same start time (a Seabear H3 and a Seabear T1). save-git names a dive's folder after its start time, and the second dive of a pair gets a `~<hash>` suffix; but which one is second depends on the path. A dive written from its cache goes in at once, in the dive order; a dive written afresh goes through `new_directory()`, which puts it at the front, so the order is reversed. Saving a log into its own repository (step 4) therefore swapped the two names on every save. No data was lost. The façade now writes such dives afresh before every git save (`uncache_shared_start_times()`, called by `import_file`, `save_to` and this test), which gives the names of a fresh save every time; Subsurface is unchanged. Result: **98 passed, 0 failed.**
 
 ## Edit round trip (6 November 2026)
 
@@ -42,7 +42,7 @@ Test 1 of `docs/editing-and-sync-plan.md`, without network: `tests/run-edit-roun
 
 - **Baseline:** each sample is imported, then loaded as the app loads a log (`list_dives`, hence `process_loaded_dives()`) and saved into a fresh repository. Subsurface desktop and mobile also call `process_loaded_dives()` after a load: with automatic grouping on, the first save writes the automatic trips as real trips (`00-Trip` files, dives moved into the trip folders). The baseline is taken after that, and must be stable on a second save.
 - **Checks, for notes, suit, rating, visibility, buddies, dive guide and tags:** the first dive is edited, saved and reloaded with the new value; exactly one file changed, that dive's `Dive` (or `Dive-<number>`) file; one commit, whose message is "Changes made:" and the command text ("Edit notes [#2]"). Then edit, save, undo, save: the tree is the original one, and the message is "(undo) Edit notes [#2]". Finally, saving into an unrelated repository is refused with `SAVE_REPLACEMENT` and writes nothing.
-- **Result:** 95 passed, 2 skipped (`Dive_2013-02-02-1614.xml` and `test24.xml` have no dive), 1 failure: `TestDiveSeabearNewFormat.xml`, the same pairs of identical dives whose order Subsurface reverses on every save (see above).
+- **Result:** 96 passed, 2 skipped (`Dive_2013-02-02-1614.xml` and `test24.xml` have no dive). `TestDiveSeabearNewFormat.xml` failed until 14 November 2026, for the reason given above.
 
 ```sh
 tests/run-edit-roundtrip.sh build/poc/edit-roundtrip build/poc/roundtrip ~/ert   third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf

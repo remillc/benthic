@@ -559,6 +559,7 @@ int save_to(const std::string &log, std::string &error)
 		return -1;
 	bool was_local_only = git_local_only;
 	git_local_only = true;
+	uncache_shared_start_times();
 	int ret = save_dives(log.c_str());
 	git_local_only = was_local_only;
 	if (ret) {

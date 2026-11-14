@@ -88,7 +88,7 @@ tests/run-roundtrip.sh build/poc/roundtrip build/rt \
   third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
 ```
 
-The expected result is **97 passed, 1 known failure** (`TestDiveSeabearNewFormat.xml`), explained in `poc/README.md`. Any new regression must be fixed before delivering.
+The expected result is **98 passed, 0 failed** (see `poc/README.md`). Any regression must be fixed before delivering.
 
 ### Android app
 
