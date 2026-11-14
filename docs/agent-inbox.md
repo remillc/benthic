@@ -3055,3 +3055,13 @@ Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-a
 The account sheet's header shows the OpenDives logo (the one of « À propos », 24 dp) before the « OpenDives » title, 8 dp apart. Logo and title are centred together on the sheet's width (task 156's balancing 48 dp slot on the right stays). The logo is decorative (hidden from screen readers): the title already says « OpenDives ». Same on the tablet.
 
 Already in place, no change: the account sheet's header shows the logo of « À propos » (logo-light.svg / logo-dark.svg, 24 dp, alt="" so hidden from screen readers) before « OpenDives », 8 dp apart, both centred together on the sheet's width with task 156's balancing 48 dp slot (od-account-sheet--brand). Checked on the phone emulator; the tablet's floating panel uses the same markup.
+
+## [ ] 2026-11-14-161 Heat map: the blue-to-red ramp (item 4 of task 154, missed)
+
+Item 4 was added to task 154 after you had started it, so it was not done: `app/src/theme.css` still has the sand-to-rust ramp (`--od-heat-1..3` #B4530F, #F0A66B, #FBE3B2). Christian approved this ramp on 14 November 2026. Mock-ups: `android-stats.dc.html` and `stats-carte-chaleur-plein-ecran-android.dc.html`.
+
+1. **Six stops instead of three**, least to most: #1E5BD8, #3FB5D9, #5CC06A, #F2D43A, #F07C1E, #D7191C. Replace `--od-heat-1..3` with `--od-heat-1..6` (1 = least), light and dark alike for now, and use them in `lib/heat-density.js` / `SiteMap.svelte` (the density colouring) and in the `HeatMapCard` legend.
+2. **Fade-out:** the lowest density fades to transparent through light blue #6FC3F0 (keep the 2 % threshold and the alpha range of task 154), so the map stays readable and only the densest area reaches red.
+3. **Legend:** the same six stops, « Moins » on the left, « Plus » on the right, on the card and in full screen.
+
+Check on the phone emulator with the test account: Lock 21 red, the sites around it yellow to green, a lone site with one dive blue.
