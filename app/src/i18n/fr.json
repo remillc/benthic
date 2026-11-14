@@ -1784,6 +1784,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte : la feuille du compte a des coins plus arrondis et la carte du compte est un peu plus étroite.",
       "Listes : une flèche « › » termine chaque ligne qui ouvre une autre page (types de bouteilles, plongées d’un site) et aucune ligne qui ouvre un menu, un choix ou une action (réglages à choix, renumérotation, lieu et notes d’un voyage).",
       "Compte : dans la feuille du compte, le titre est centré et « Synchronisé il y a… » reste sur la même ligne que le bouton « Synchroniser ».",
       "Carte de chaleur : les halos gardent leur taille à l’écran et se séparent quand on zoome, les couleurs gardent la même échelle partout, et de près (zoom 14) les épingles des sites remplacent les halos ; toucher une épingle montre le site.",

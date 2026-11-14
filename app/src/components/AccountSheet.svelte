@@ -175,7 +175,7 @@
       <span aria-hidden="true"></span>
     </div>
 
-    <div class="od-account-sheet--card">
+    <div class="od-account-sheet--card od-account-sheet--identity">
       <div class="od-account-sheet--account">
         <span class="od-account-sheet--initial" aria-hidden="true">
           {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
@@ -246,14 +246,15 @@
     :global(.sheet-modal.od-account-sheet) {
       --f7-sheet-bg-color: var(--od-drawer);
       height: auto;
-      border-radius: 28px 28px 0 0;
+      /* 36 dp corners (task 2026-11-14-158). */
+      border-radius: 36px 36px 0 0;
     }
 
     :global(.sheet-modal.od-account-sheet.od-account-sheet--floating) {
       left: calc(var(--od-nav-width) + env(safe-area-inset-left) + 8px);
       bottom: calc(16px + env(safe-area-inset-bottom));
       width: 360px;
-      border-radius: 28px;
+      border-radius: 36px;
       box-shadow: 0 2px 6px rgb(0 0 0 / 0.15), 0 8px 24px rgb(0 0 0 / 0.12);
 
       .od-account-sheet--content {
@@ -408,11 +409,17 @@
       }
     }
 
+    /* The white cards: 28 dp corners; the identity card (the first) 12 dp narrower on each side (task 2026-11-14-158). */
     .od-account-sheet--card {
       margin-top: 8px;
-      border-radius: 20px;
+      border-radius: 28px;
       background: var(--od-surface);
       overflow: hidden;
+    }
+
+    .od-account-sheet--identity {
+      margin-left: 12px;
+      margin-right: 12px;
     }
 
     .od-account-sheet--account {
