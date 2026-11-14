@@ -27,14 +27,14 @@ import {
   bboxesOverlap,
 } from '../../app/src/lib/maps-logic.js';
 
-const base = { totalBytes: 64 * GB, freeBytes: 18 * GB, usedBytes: 0, capBytes: 1 * GB };
+const base = { totalBytes: 64 * GB, freeBytes: 18 * GB };
 
 test('the floor is 1 Go, or 10 % of the storage when that is more', () => {
   assert.equal(floorBytes(8 * GB), 1 * GB);
   assert.equal(floorBytes(64 * GB), 6.4 * GB);
 });
 
-test('a download starts when it leaves the floor and stays under the cap', () => {
+test('a download starts when it leaves the floor', () => {
   assert.deepEqual(checkStart({ ...base, sizeBytes: 80 * MB }), { ok: true });
 });
 
@@ -49,26 +49,25 @@ test('exactly the floor is allowed', () => {
   assert.equal(checkStart({ ...base, totalBytes: 8 * GB, freeBytes: 1 * GB + 80 * MB, sizeBytes: 80 * MB }).ok, true);
 });
 
-test('the cap refuses what would exceed it (970 Mo used of 1 Go, 80 Mo more)', () => {
-  const r = checkStart({ ...base, usedBytes: 970 * MB, sizeBytes: 80 * MB });
-  assert.equal(r.ok, false);
-  assert.equal(r.reason, 'cap');
-  assert.equal(checkStart({ ...base, usedBytes: 920 * MB, sizeBytes: 80 * MB }).ok, true);
+// Task 2026-11-14-137: the maps have no space limit of their own, only the device's floor.
+test('no limit of their own: what the maps already take does not count', () => {
+  assert.deepEqual(checkStart({ ...base, usedBytes: 5 * GB, sizeBytes: 80 * MB }), { ok: true });
 });
 
 test('an update keeps both versions when they fit', () => {
-  assert.deepEqual(checkUpdate({ ...base, newBytes: 101 * MB, oldBytes: 96 * MB, usedBytes: 302 * MB }), { mode: 'both' });
+  assert.deepEqual(checkUpdate({ ...base, newBytes: 101 * MB, oldBytes: 96 * MB }), { mode: 'both' });
 });
 
 test('an update that fits only alone replaces the old package first', () => {
-  const r = checkUpdate({ ...base, newBytes: 101 * MB, oldBytes: 96 * MB, usedBytes: 950 * MB });
+  // 8 Go device, floor 1 Go: 1,05 Go free does not leave the floor with 101 Mo more, but does once 96 Mo are freed.
+  const r = checkUpdate({ totalBytes: 8 * GB, freeBytes: 1.05 * GB, newBytes: 101 * MB, oldBytes: 96 * MB });
   assert.deepEqual(r, { mode: 'replace' });
 });
 
 test('an update that fits even alone nowhere is blocked', () => {
-  const r = checkUpdate({ ...base, capBytes: 500 * MB, newBytes: 600 * MB, oldBytes: 96 * MB, usedBytes: 300 * MB });
+  const r = checkUpdate({ totalBytes: 8 * GB, freeBytes: 1.2 * GB, newBytes: 600 * MB, oldBytes: 96 * MB });
   assert.equal(r.mode, 'blocked');
-  assert.equal(r.reason, 'cap');
+  assert.equal(r.reason, 'space');
 });
 
 test('a running download pauses below the floor and resumes with a margin', () => {

@@ -1711,6 +1711,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Cartes hors ligne : plus de limite propre aux cartes ; seul l’espace libre de l’appareil compte (toujours au moins 1 Go libre). La carte du haut montre les cartes, les autres données et l’espace libre.",
       "Cartes hors ligne : le ⋮ de chaque région est bien visible ; tous les ⋮ gardent des points pleins.",
       "Compte sans compte : un troisième choix, « Utiliser mon propre dépôt git », et une icône sur chaque choix.",
       "Compte : « Se déconnecter » vient d’abord, à part du groupe du compte ; la « Zone dangereuse » ne contient plus que « Supprimer le compte » ; la ligne du serveur est en petit.",
@@ -2864,10 +2865,10 @@
         "one": "{n} région",
         "other": "{n} régions"
       },
-      "usage": "{used} sur {cap}",
-      "usageLabel": "Espace des cartes : {used} sur {cap} permis",
-      "free": "{free} libres sur l’appareil",
-      "freeShort": "{free} libres"
+      "maps": "Cartes",
+      "other": "Autres données",
+      "freeOf": "{free} libres sur {total}",
+      "storageLabel": "Stockage de l’appareil : cartes {maps}, {free} libres sur {total}"
     },
     "sections": {
       "downloads": "Téléchargements",
@@ -2885,11 +2886,6 @@
       "label": "Télécharger sur données mobiles",
       "labelShort": "Données mobiles",
       "text": "Sinon, les téléchargements attendent le Wi-Fi"
-    },
-    "limit": {
-      "label": "Espace maximum pour les cartes",
-      "labelShort": "Espace maximum",
-      "text": "Vos cartes occupent {used}. OpenDives garde aussi toujours au moins {floor} libre sur l’appareil."
     },
     "region": {
       "sizeDate": "{size} · {date}",
@@ -2946,12 +2942,6 @@
       "manage": {
         "title": "Espace sur l’appareil",
         "text": "Il reste {free} libres sur l’appareil. OpenDives garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner. Supprimez des régions ou libérez de l’espace sur l’appareil : le téléchargement reprendra de lui-même."
-      },
-      "cap": {
-        "title": "Limite des cartes atteinte",
-        "text": "{name} peut demander jusqu’à {size}. Vos cartes occupent déjà {used} sur {cap} permis. Supprimez une région, ou augmentez la limite.",
-        "view": "Voir mes régions",
-        "change": "Changer la limite"
       },
       "replace": {
         "title": "Remplacer la carte ?",

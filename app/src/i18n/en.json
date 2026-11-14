@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Offline maps: no space limit of their own any more; only the device’s free space counts (always at least 1 GB free). The top card shows the maps, the other data and the free space.",
       "Offline maps: the ⋮ of each region is clearly visible; every ⋮ keeps full dots.",
       "Account without an account: a third choice, “Use my own git repository”, and an icon on each choice.",
       "Account: “Sign out” comes first, apart from the account group; the “Danger zone” only holds “Delete account”; the server line is in small type.",
@@ -2864,10 +2865,10 @@
         "one": "{n} region",
         "other": "{n} regions"
       },
-      "usage": "{used} of {cap}",
-      "usageLabel": "Map storage: {used} of {cap} allowed",
-      "free": "{free} free on the device",
-      "freeShort": "{free} free"
+      "maps": "Maps",
+      "other": "Other data",
+      "freeOf": "{free} free of {total}",
+      "storageLabel": "Device storage: maps {maps}, {free} free of {total}"
     },
     "sections": {
       "downloads": "Downloads",
@@ -2885,11 +2886,6 @@
       "label": "Download on mobile data",
       "labelShort": "Mobile data",
       "text": "Otherwise, downloads wait for Wi-Fi"
-    },
-    "limit": {
-      "label": "Maximum space for maps",
-      "labelShort": "Maximum space",
-      "text": "Your maps take {used}. OpenDives also always keeps at least {floor} free on the device."
     },
     "region": {
       "sizeDate": "{size} · {date}",
@@ -2946,12 +2942,6 @@
       "manage": {
         "title": "Space on the device",
         "text": "{free} is free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well. Delete regions or free space on the device: the download will resume by itself."
-      },
-      "cap": {
-        "title": "Map limit reached",
-        "text": "{name} can take up to {size}. Your maps already take {used} of {cap} allowed. Delete a region, or raise the limit.",
-        "view": "See my regions",
-        "change": "Change the limit"
       },
       "replace": {
         "title": "Replace the map?",

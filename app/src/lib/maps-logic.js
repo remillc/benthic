@@ -8,10 +8,11 @@ export const MB = 1_000_000;
 export const GB = 1_000_000_000;
 const DAY_MS = 24 * 3600 * 1000;
 
-/** "Espace maximum pour les cartes": 500 Mo, 1, 2 or 5 Go, no "unlimited". */
-export const CAP_CHOICES = [500 * MB, 1 * GB, 2 * GB, 5 * GB];
-export const DEFAULT_CAP = 1 * GB;
-/** Free space OpenDives always leaves on the device: 1 Go, or 10 % of the storage if more. */
+/**
+ * Free space OpenDives always leaves on the device: 1 Go, or 10 % of the storage if more. It is the
+ * only guard: the maps have no space limit of their own (task 2026-11-14-137, removing « Espace
+ * maximum pour les cartes »).
+ */
 export const FLOOR_MIN = 1 * GB;
 /** A paused download resumes this far above the floor, so that it does not pause again at once. */
 export const RESUME_MARGIN = 64 * MB;
@@ -32,31 +33,26 @@ export function floorBytes(totalBytes) {
 }
 
 /**
- * Whether a download of `sizeBytes` may start.
- * @param {{ sizeBytes: number, freeBytes: number, totalBytes: number, usedBytes: number, capBytes: number }} o
- *   usedBytes: what the maps already take (and what the running downloads will take)
- * @returns {{ ok: true } | { ok: false, reason: 'space', remainingBytes: number, floorBytes: number }
- *   | { ok: false, reason: 'cap', usedBytes: number, capBytes: number }}
+ * Whether a download of `sizeBytes` may start: only if it leaves at least the floor free.
+ * @param {{ sizeBytes: number, freeBytes: number, totalBytes: number }} o
+ * @returns {{ ok: true } | { ok: false, reason: 'space', remainingBytes: number, floorBytes: number }}
  */
-export function checkStart({ sizeBytes, freeBytes, totalBytes, usedBytes, capBytes }) {
+export function checkStart({ sizeBytes, freeBytes, totalBytes }) {
   const floor = floorBytes(totalBytes);
   const remaining = freeBytes - sizeBytes;
   if (remaining < floor) return { ok: false, reason: 'space', remainingBytes: Math.max(0, remaining), floorBytes: floor };
-  if (usedBytes + sizeBytes > capBytes) return { ok: false, reason: 'cap', usedBytes, capBytes };
   return { ok: true };
 }
 
 /**
- * An update needs room for both versions. If that does not fit (floor or
- * cap), the old package can be deleted first ("Remplacer"); if even that does
- * not fit, the update is blocked.
- * @param {{ newBytes: number, oldBytes: number, freeBytes: number, totalBytes: number, usedBytes: number, capBytes: number }} o
- * @returns {{ mode: 'both' } | { mode: 'replace' } | (ReturnType<typeof checkStart> & { ok: false, mode: 'blocked' })}
+ * An update needs room for both versions. If that does not fit the floor, the old package can be
+ * deleted first ("Remplacer"); if even that does not fit, the update is blocked.
+ * @param {{ newBytes: number, oldBytes: number, freeBytes: number, totalBytes: number }} o
+ * @returns {{ mode: 'both' } | { mode: 'replace' } | (Exclude<ReturnType<typeof checkStart>, { ok: true }> & { mode: 'blocked' })}
  */
-export function checkUpdate({ newBytes, oldBytes, freeBytes, totalBytes, usedBytes, capBytes }) {
-  const both = checkStart({ sizeBytes: newBytes, freeBytes, totalBytes, usedBytes, capBytes });
-  if (both.ok) return { mode: 'both' };
-  const alone = checkStart({ sizeBytes: newBytes, freeBytes: freeBytes + oldBytes, totalBytes, usedBytes: Math.max(0, usedBytes - oldBytes), capBytes });
+export function checkUpdate({ newBytes, oldBytes, freeBytes, totalBytes }) {
+  if (checkStart({ sizeBytes: newBytes, freeBytes, totalBytes }).ok) return { mode: 'both' };
+  const alone = checkStart({ sizeBytes: newBytes, freeBytes: freeBytes + oldBytes, totalBytes });
   if (alone.ok) return { mode: 'replace' };
   return { ...alone, mode: 'blocked' };
 }

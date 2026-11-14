@@ -11,8 +11,6 @@ import { t, language } from './i18n.js';
 import { showSection } from './navigation.svelte.js';
 import { readTileSource } from './tilejson.js';
 import {
-  CAP_CHOICES,
-  DEFAULT_CAP,
   MAX_REGION_BYTES,
   MAX_TILES,
   checkStart,
@@ -53,10 +51,8 @@ import {
 /**
  * @typedef {{ kind: 'cellular', id: string }
  *   | { kind: 'space', name: string, sizeBytes: number, remainingBytes: number }
- *   | { kind: 'cap', name: string, sizeBytes: number, usedBytes: number, capBytes: number }
  *   | { kind: 'replace', id: string }
  *   | { kind: 'delete', id: string }
- *   | { kind: 'limit' }
  *   | { kind: 'manage' }} MapsDialog
  */
 
@@ -92,8 +88,6 @@ export const offlineMaps = $state({
   regions: (readJson(REGIONS_KEY) ?? []).filter((/** @type {Region} */ r) => r.maxZoom === 12 || r.maxZoom === 14),
   /** "Télécharger sur données mobiles": off by default. */
   cellular: stored.cellular === true,
-  /** "Espace maximum pour les cartes", bytes. */
-  capBytes: CAP_CHOICES.includes(stored.capBytes) ? /** @type {number} */ (stored.capBytes) : DEFAULT_CAP,
   freeBytes: 0,
   totalBytes: 0,
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
@@ -114,7 +108,7 @@ function save() {
 }
 
 function saveSettings() {
-  writeJson(SETTINGS_KEY, { cellular: offlineMaps.cellular, capBytes: offlineMaps.capBytes, lastCheck: offlineMaps.lastCheck });
+  writeJson(SETTINGS_KEY, { cellular: offlineMaps.cellular, lastCheck: offlineMaps.lastCheck });
 }
 
 // --- Reading ---------------------------------------------------------------------
@@ -217,13 +211,6 @@ export function setCellular(on) {
   saveSettings();
 }
 
-/** @param {number} bytes */
-export function setCap(bytes) {
-  if (!CAP_CHOICES.includes(bytes)) return;
-  offlineMaps.capBytes = bytes;
-  saveSettings();
-}
-
 // --- Downloads ---------------------------------------------------------------------
 
 /**
@@ -277,10 +264,7 @@ function fail(r, error) {
  * @param {Exclude<ReturnType<typeof checkStart>, { ok: true }>} verdict
  */
 function refuse(name, sizeBytes, verdict) {
-  offlineMaps.dialog =
-    verdict.reason === 'space'
-      ? { kind: 'space', name, sizeBytes, remainingBytes: verdict.remainingBytes }
-      : { kind: 'cap', name, sizeBytes, usedBytes: verdict.usedBytes, capBytes: verdict.capBytes };
+  offlineMaps.dialog = { kind: 'space', name, sizeBytes, remainingBytes: verdict.remainingBytes };
 }
 
 /** Free space as the guards read it: without the native part (web) they pass. */
@@ -292,8 +276,8 @@ const spaceFigures = () => ({
 /**
  * Starts the download of a rectangle drawn on the map. Refused with a toast
  * above 3,000 tiles (the area screen blocks it before), and with a dialog
- * when it could leave less than the floor free or go over the cap (a region
- * takes 50 MB at most). Returns whether it started.
+ * when it could leave less than the floor free (a region takes 50 MB at
+ * most). Returns whether it started.
  * @param {string} name the diver's name for the region
  * @param {[number, number, number, number]} bbox
  * @param {12|14} maxZoom
@@ -305,7 +289,7 @@ export async function addRegion(name, bbox, maxZoom) {
     return false;
   }
   await refreshSpace();
-  const verdict = checkStart({ sizeBytes: MAX_REGION_BYTES, ...spaceFigures(), usedBytes: usedBytes(), capBytes: offlineMaps.capBytes });
+  const verdict = checkStart({ sizeBytes: MAX_REGION_BYTES, ...spaceFigures() });
   if (!verdict.ok) {
     refuse(name, MAX_REGION_BYTES, verdict);
     return false;
@@ -346,8 +330,6 @@ export async function retryRegion(id) {
   const verdict = checkStart({
     sizeBytes: Math.max(0, MAX_REGION_BYTES - r.bytesReceived),
     ...spaceFigures(),
-    usedBytes: sumUsed(visibleRegions().filter((x) => x.id !== id)),
-    capBytes: offlineMaps.capBytes,
   });
   if (!verdict.ok) return refuse(regionName(r), MAX_REGION_BYTES, verdict);
   let source;
@@ -418,8 +400,6 @@ export async function updateRegion(id, { replace = false } = {}) {
     newBytes: MAX_REGION_BYTES,
     oldBytes: r.sizeBytes,
     ...spaceFigures(),
-    usedBytes: usedBytes(),
-    capBytes: offlineMaps.capBytes,
   });
   if (verdict.mode === 'blocked') {
     refuse(regionName(r), MAX_REGION_BYTES, verdict);
