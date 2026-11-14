@@ -64,6 +64,7 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 - fr-CA formats: « 10 h 44 » with non-breaking spaces, « pi », « pi³ ».
 - Non-breaking space before « : », « ? », « ! » and inside « ».
 - Never break a line between a number and its unit, in every language: join them with a non-breaking space (U+00A0) — « 27,6 m », « 1,6 bar », « 302 Mo », « 90 % », « 14 h 30 », « 9 plongées », en « 27.6 m », « 302 MB » (decided on 13 November 2026).
+- Never break a line inside a relative time: « il y a 2 min », « dans 3 h », « hier à 14 h 30 », en « 2 min ago », « in 3 h » stay on one line, joined with non-breaking spaces, so a long status breaks before them (« Synchronisé / il y a 2 min ») (decided on 14 November 2026).
 - Sentence case, no title case.
 
 ### 9. Vocabulary (French)

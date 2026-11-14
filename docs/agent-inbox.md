@@ -3034,3 +3034,10 @@ Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-a
 2. **Rounder corners.** The sheet: 36 dp (was 28). Both white cards: 28 dp (were 20).
 
 Same on the tablet. iOS keeps its own sheet.
+
+## [ ] 2026-11-14-159 Relative times never break inside
+
+Christian decided this on 14 November 2026, from the account sheet (`nav-option-barre-compte-android.dc.html`): when « Synchronisé il y a 2 min » wraps beside the « Synchroniser » button, the line must break before « il », never inside « il y a 2 min ».
+
+1. Wherever the app builds a relative time (« il y a 2 min », « il y a 3 j », « dans 3 h », « hier à 14 h 30 »; en « 2 min ago », « in 3 h », « yesterday at 2:30 pm »), join its words with non-breaking spaces (U+00A0), in the helper that formats it, so every caller gets it. The space between the status word (« Synchronisé ») and the relative time stays a normal space.
+2. The rule is in `docs/ui-writing.md` (Rules). Check the sync status in the account sheet, the Account page, the offline maps (« Mis à jour il y a … ») and any other relative time.
