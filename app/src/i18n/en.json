@@ -1784,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Heat map: the halos keep their size on screen and separate when zooming in, the colours keep one scale everywhere, and up close (zoom 14) the sites’ pins replace the halos; tapping a pin shows the site.",
       "Contrast: the header band is darker behind titles and buttons, and a few texts gain contrast (rust values, errors in fields, the “Signing in…” button, secondary text on iPhone, the account pill).",
       "Statistics: a heat map, “Where I dive most”, shows where the dives of the filter are concentrated, with the leading site, on a map you can pan and zoom; it opens full screen.",
       "“Choose a site”: a screen that lists every site, from nearest to farthest from your position (else from the most recently dived), with the distance and a search field; it is used in “Dives without a site” and for the site of “Edit dive”, and can create a site at your position.",

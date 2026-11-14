@@ -29,6 +29,7 @@ import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
 import { inBbox } from '../lib/maps-logic.js';
 import { matchesSite, highlightParts } from '../lib/site-search.js';
 import MapStackSheet from '../components/MapStackSheet.svelte';
+import MapSiteCard from '../components/MapSiteCard.svelte';
 import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
 
@@ -109,8 +110,8 @@ import { language } from '../lib/i18n.js';
   let stackPlace = $state('');
   const stackSites = $derived(stack ? located.filter((s) => stack?.uuids.includes(s.uuid)) : []);
 
-  /** @param {number[]} uuids @param {{ latUdeg: number, lonUdeg: number }} at */
   let stackAsk = 0;
+  /** @param {number[]} uuids @param {{ latUdeg: number, lonUdeg: number }} at */
   function showStack(uuids, at) {
     const ask = ++stackAsk;
     selectedUuid = null;
@@ -134,16 +135,6 @@ import { language } from '../lib/i18n.js';
     open(uuid);
   }
 
-  /** The card's accessible name: « Northern Arch, Nouvelle-Zélande, 1 plongée. Ouvrir la fiche du site ». */
-  const cardLabel = (/** @type {import('opendives-core').SiteSummary} */ site) =>
-    `${[site.name || t('sites.noName'), site.country, t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`;
-
-  /** Back closes the card (lib/back-button.js). @param {HTMLElement} node */
-  function cancelable(node) {
-    const close = () => (selectedUuid = null);
-    node.addEventListener('od-cancel', close);
-    return { destroy: () => node.removeEventListener('od-cancel', close) };
-  }
   const matching = $derived(typed ? new Set(results.map((s) => s.uuid)) : null);
   const searchCount = $derived(
     !typed ? '' : results.length ? t('sites.searchCount', { n: results.length, text: query.trim() }) : t('sites.noMatch'),
@@ -401,16 +392,7 @@ import { language } from '../lib/i18n.js';
       >
         {#snippet overlay()}
           {#if selectedSite}
-            <button type="button" class="od-map-site-card" aria-label={cardLabel(selectedSite)} onclick={() => openFromMap(selectedSite.uuid)} use:cancelable>
-              <span class="od-map-site-card--texts">
-                <span class="od-map-site-card--name">{selectedSite.name || t('sites.noName')}</span>
-                <span class="od-map-site-card--line"
-                  >{[selectedSite.country, t('sites.rowDives', { n: selectedSite.dives, date: formatLongDate(selectedSite.lastDate) })].filter(Boolean).join(' · ')}</span
-                >
-              </span>
-              {#if selectedSite.maxDepthMm}<span class="od-map-site-card--depth od-value">{formatDepth(selectedSite.maxDepthMm, logbook.prefs)}</span>{/if}
-              <Icon name="chevron" size={20} />
-            </button>
+            <MapSiteCard site={selectedSite} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
           {/if}
         {/snippet}
       </SiteMap>
@@ -864,65 +846,6 @@ import { language } from '../lib/i18n.js';
       height: 100%;
     }
 
-    /* The card of the selected pin (od-map-site-card): over the bottom of the map, 16 dp
-       from the edges, white, 16 dp corners, a light shadow. */
-    .od-map-site-card {
-      position: absolute;
-      z-index: 3;
-      left: 16px;
-      right: 16px;
-      /* Above the map credit, which stays readable. */
-      bottom: 28px;
-      box-sizing: border-box;
-      width: auto;
-      min-height: 72px;
-      padding: 10px 12px 10px 16px;
-      border: none;
-      border-radius: 16px;
-      background: var(--od-surface);
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
-      color: var(--od-text);
-      font: inherit;
-      text-align: start;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      :global(.od-icon) {
-        flex: none;
-        color: var(--od-text-2);
-      }
-
-      :global(.od-map-fullscreen) & {
-        bottom: calc(env(safe-area-inset-bottom) + 112px);
-      }
-    }
-
-    .od-map-site-card--texts {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .od-map-site-card--name {
-      font-size: 16px;
-      line-height: 22px;
-      font-weight: 600;
-    }
-
-    .od-map-site-card--line {
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--od-text-2);
-    }
-
-    .od-map-site-card--depth {
-      flex: none;
-      font-size: 16px;
-      font-weight: 500;
-    }
 
     /* « Centrer sur ma position » moves up above the card while it is open. */
     .od-sites--card-open .od-sites--locate {

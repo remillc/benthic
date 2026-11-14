@@ -11,7 +11,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
-  import { densityGrid, rampColour, rgb } from '../lib/heat-density.js';
+  import { densityGrid, haloRadius, rampColour, rgb } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
@@ -36,7 +36,7 @@
    *   points?: { n: number, latUdeg: number, lonUdeg: number }[],
    *   muted?: boolean,
    *   label?: string,
-   *   names?: 'always'|'fewInFullScreen',
+   *   names?: 'always'|'fewInFullScreen'|'never',
    *   selected?: number|null,
    *   onstack?: (uuids: number[], at: { latUdeg: number, lonUdeg: number }) => void,
    *   onmapclick?: () => void,
@@ -47,7 +47,10 @@
    *   desaturated?: boolean,
    *   fullscreenLabel?: string,
    *   closerInFullScreen?: boolean,
+   *   pinsFromZoom?: number,
    * }}
+   * pinsFromZoom: the pins show only from this zoom, and the heat fades out over the zoom
+   *   level before it (the heat map up close, task 2026-11-14-155); 0: always.
    * heat: the dives per site drawn as a density over the map (« Où je plonge le plus »,
    *   task 2026-11-14-154; lib/heat-density.js), on its own layer: the base map can be
    *   desaturated without the heat.
@@ -94,6 +97,7 @@
     desaturated = false,
     fullscreenLabel = '',
     closerInFullScreen = false,
+    pinsFromZoom = 0,
   } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
@@ -144,9 +148,9 @@
 
   /** @type {HTMLCanvasElement|undefined} */
   let heatCanvas = $state();
-  /** The zoom the heat's spread is measured at (the opening framing): 25 dp there. */
-  let heatZoom = 0;
   let heatFrame = 0;
+  /** The densest value at the opening framing: the colour scale, fixed while panning and zooming (task 155). */
+  let heatScale = 0;
 
   /** The density of the dives over the visible map, on the heat's own layer. */
   function drawHeat() {
@@ -154,10 +158,13 @@
     const w = container?.clientWidth ?? 0;
     const h = container?.clientHeight ?? 0;
     if (!w || !h) return;
-    const radius = Math.max(6, Math.min(240, 25 * 2 ** (map.getZoom() - heatZoom)));
+    // Halos follow the screen, not the ground: 20 dp far away, 40 dp from zoom 13 (task 155).
+    const radius = haloRadius(map.getZoom());
     const cell = 3;
     const m = map;
     const grid = densityGrid(heat.map((p) => ({ ...m.project([p.lon, p.lat]), weight: p.count })), w, h, radius, cell);
+    // The scale is set once, on the whole filter at the opening framing; the legend keeps its meaning.
+    if (!heatScale) heatScale = grid.max || 1;
     const styles = getComputedStyle(heatCanvas);
     const ramp = /** @type {any} */ (['--od-heat-3', '--od-heat-2', '--od-heat-1'].map((v) => rgb(styles.getPropertyValue(v) || '#000000')));
     // The grid coloured on a small canvas, then drawn smoothed at the map's size.
@@ -167,7 +174,7 @@
     const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
     const image = sctx.createImageData(grid.cols, grid.rows);
     for (let i = 0; i < grid.values.length; i++) {
-      const [r, g, b, a] = rampColour(grid.max ? grid.values[i] / grid.max : 0, ramp);
+      const [r, g, b, a] = rampColour(grid.values[i] / heatScale, ramp);
       image.data.set([r, g, b, a], i * 4);
     }
     sctx.putImageData(image, 0, 0);
@@ -274,7 +281,7 @@
       text.textContent = name;
       el.append(drawing, text);
       el.dataset.uuid = String(site.uuid);
-      if (!muted) el.addEventListener('click', (e) => pick(site.uuid, e));
+      if (!muted) el.addEventListener('click', (e) => pick(site.uuid, /** @type {MouseEvent} */ (e)));
       // The drawing's tip (x 16, 2 px above its bottom) on the site.
       const marker = new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 2] })
         .setLngLat(lngLat(site))
@@ -347,7 +354,7 @@
   function updateNames() {
     if (names === 'always' || !map) return;
     let on = false;
-    if (full) {
+    if (full && names !== 'never') {
       const b = map.getBounds();
       const inView = markers.filter((m) => b.contains(m.marker.getLngLat()));
       if (inView.length <= 8) {
@@ -357,8 +364,9 @@
         on = !boxes.some((a, i) => boxes.some((c, j) => j > i && a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom));
       }
     }
-    namesOn = on;
+    // The state draws the class (Svelte rewrites the class attribute); the class set by hand above was for the measure.
     root?.classList.toggle('od-site-map--names-on', on);
+    namesOn = on;
   }
 
   $effect(() => {
@@ -409,7 +417,19 @@
       const bounds = framed.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(framed[0], framed[0]));
       map.fitBounds(bounds, { padding: 40, maxZoom: points.length || frame?.length ? 14 : 12, animate: false }, { programmatic: true });
     }
-    heatZoom = map.getZoom();
+    heatScale = 0;
+    zoomLayers();
+  }
+
+  let pinsHidden = $state(false);
+
+  /** Up close (pinsFromZoom): the heat fades out over the zoom level before, the pins show from it. */
+  function zoomLayers() {
+    if (!pinsFromZoom || !map) return;
+    const z = map.getZoom();
+    if (heatCanvas) heatCanvas.style.opacity = String(Math.max(0, Math.min(1, pinsFromZoom - z)));
+    // A state, not a class set by hand: Svelte rewrites the root's class attribute.
+    pinsHidden = z < pinsFromZoom;
   }
 
   onMount(async () => {
@@ -444,6 +464,7 @@
     });
     // The heat follows the map as it moves.
     m.on('move', scheduleHeat);
+    m.on('zoom', zoomLayers);
     m.on('resize', scheduleHeat);
     // Where the map looks, for the offline hint (Sites).
     m.on('moveend', () => {
@@ -563,6 +584,8 @@
   class:od-map-fullscreen={full}
   class:od-site-map--quiet={names !== 'always'}
   class:od-site-map--desaturated={desaturated}
+  class:od-site-map--pins-hidden={pinsHidden}
+  class:od-site-map--names-on={namesOn}
   style:height={full ? '100%' : height}
   role="region"
   aria-label={label}
@@ -706,6 +729,11 @@
 
     /* Sites: no names on the map, but in full screen with few pins (updateNames). */
     .od-site-map--quiet:not(:global(.od-site-map--names-on)) :global(.od-site-map--pin-name) {
+      display: none;
+    }
+
+    /* The heat map from afar: no pins (pinsFromZoom). */
+    .od-site-map--pins-hidden :global(.od-site-map--site-marker) {
       display: none;
     }
 

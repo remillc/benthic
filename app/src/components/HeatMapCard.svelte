@@ -8,7 +8,11 @@
   // (lib/heatmap.js). No site names, no pins, no credit (it is in About). Full screen is the
   // same live map, slightly closer, with « Centrer sur ma position » and the legend in a
   // white card. Not shown with fewer than 2 sites with coordinates.
+  // Up close (task 2026-11-14-155): from zoom 14 the heat fades out and the sites' pins show,
+  // with their dives in the filter and no names; a pin opens the card of a selected site.
+  import { f7 } from 'framework7-svelte';
   import SiteMap from './SiteMap.svelte';
+  import MapSiteCard from './MapSiteCard.svelte';
   import { busiestArea, siteHeat } from '../lib/heatmap.js';
   import { currentPosition } from '../lib/site-choice.js';
   import { t } from '../lib/i18n.js';
@@ -16,7 +20,7 @@
   /**
    * @type {{
    *   dives: { site: string }[],
-   *   sites: { name: string, hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number }[],
+   *   sites: import('opendives-core').SiteSummary[],
    * }}
    */
   let { dives, sites } = $props();
@@ -25,6 +29,18 @@
   const frame = $derived(/** @type {[number, number][]} */ (busiestArea(spots).map((s) => [s.lon, s.lat])));
   const shown = $derived(spots.length >= 2);
   const lead = $derived(spots[0]);
+
+  /** The sites as pins up close: their dives in the filter. */
+  const pins = $derived(spots.map((s) => ({ uuid: s.site.uuid, name: s.name, latUdeg: s.site.latUdeg, lonUdeg: s.site.lonUdeg, dives: s.count })));
+  let selectedUuid = $state(/** @type {number|null} */ (null));
+  const selectedSite = $derived(selectedUuid === null ? null : (spots.find((s) => s.site.uuid === selectedUuid)?.site ?? null));
+
+  /** The site's sheet, full screen left first. @param {number} uuid */
+  function openSite(uuid) {
+    selectedUuid = null;
+    map?.exitFullScreen();
+    f7.views.current?.router.navigate(`/sites/${uuid}`);
+  }
 
   /** @type {SiteMap|undefined} */
   let map = $state();
@@ -50,6 +66,12 @@
         bind:this={map}
         heat={spots}
         {frame}
+        sites={pins}
+        names="never"
+        pinsFromZoom={14}
+        selected={selectedUuid}
+        onselect={(uuid) => (selectedUuid = uuid)}
+        onmapclick={() => (selectedUuid = null)}
         credits={false}
         desaturated
         closerInFullScreen
@@ -60,6 +82,9 @@
       >
         {#snippet overlay(/** @type {boolean} */ full)}
           {#if full}<div class="od-stats-heatmap--full-legend">{@render legend()}</div>{/if}
+          {#if selectedSite}
+            <MapSiteCard site={selectedSite} onopen={() => openSite(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
+          {/if}
         {/snippet}
       </SiteMap>
     </div>

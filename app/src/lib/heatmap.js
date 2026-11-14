@@ -12,11 +12,12 @@ export const AREA_KM = 150;
  * its site only: a name shared by several sites goes to the one of them with
  * coordinates and the most dives.
  * @param {{ site: string }[]} dives
- * @param {{ name: string, hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number }[]} sites
- * @returns {{ name: string, lon: number, lat: number, count: number }[]} the busiest first
+ * @param {S[]} sites
+ * @template {{ name: string, hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number }} S
+ * @returns {{ name: string, lon: number, lat: number, count: number, site: S }[]} the busiest first
  */
 export function siteHeat(dives, sites) {
-  /** @type {Map<string, { name: string, hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number }>} */
+  /** @type {Map<string, S>} */
   const byName = new Map();
   for (const s of sites) {
     if (!s.hasLocation || !s.name) continue;
@@ -29,7 +30,7 @@ export function siteHeat(dives, sites) {
   return [...counts]
     .map(([name, count]) => {
       const s = /** @type {NonNullable<ReturnType<typeof byName.get>>} */ (byName.get(name));
-      return { name, lon: s.lonUdeg / 1e6, lat: s.latUdeg / 1e6, count };
+      return { name, lon: s.lonUdeg / 1e6, lat: s.latUdeg / 1e6, count, site: s };
     })
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
