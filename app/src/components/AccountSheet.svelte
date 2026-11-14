@@ -165,10 +165,14 @@
       <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
         <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
       </button>
-      <!-- The retained logo of the light surfaces, and its dark variant (task 2026-11-14-123). -->
-      <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
-      <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
-      <span class="od-account-sheet--title">{t('menu.title')}</span>
+      <!-- Centred on the sheet's width: an empty 48 dp slot on the right balances ✕ (task 2026-11-14-156).
+           The retained logo of the light surfaces, and its dark variant (task 2026-11-14-123). -->
+      <span class="od-account-sheet--brand">
+        <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
+        <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
+        <span class="od-account-sheet--title">{t('menu.title')}</span>
+      </span>
+      <span aria-hidden="true"></span>
     </div>
 
     <div class="od-account-sheet--card">
@@ -205,9 +209,13 @@
               </button>
             </div>
           {:else}
-            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+            <!-- One row: the cloud and the status take the width, « Synchroniser » on the right; a long
+                 status wraps beside the button, never above it (task 2026-11-14-156). -->
+            <div class="od-account-sheet--auto">
+              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+              {#if logbook.email}<SyncControl />{/if}
+            </div>
           {/if}
-          {#if logbook.email && !manual}<SyncControl />{/if}
         </div>
       {/if}
     </div>
@@ -337,8 +345,16 @@
 
     .od-account-sheet--head {
       height: 48px;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) 48px;
+      align-items: center;
+    }
+
+    .od-account-sheet--brand {
+      min-width: 0;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
     }
 
@@ -364,9 +380,32 @@
     }
 
     .od-account-sheet--title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       font-size: 16px;
       font-weight: 500;
       color: var(--od-text);
+    }
+
+    .od-account-sheet--auto {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      :global(.od-sync-status) {
+        flex: 1;
+        min-width: 0;
+        justify-content: flex-start;
+        text-align: start;
+        color: var(--od-text-2);
+      }
+
+      > :global(*:last-child) {
+        flex: none;
+      }
     }
 
     .od-account-sheet--card {

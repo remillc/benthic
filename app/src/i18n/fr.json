@@ -1784,6 +1784,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte : dans la feuille du compte, le titre est centré et « Synchronisé il y a… » reste sur la même ligne que le bouton « Synchroniser ».",
       "Carte de chaleur : les halos gardent leur taille à l’écran et se séparent quand on zoome, les couleurs gardent la même échelle partout, et de près (zoom 14) les épingles des sites remplacent les halos ; toucher une épingle montre le site.",
       "Contraste : le bandeau d’en-tête est plus sombre derrière les titres et les boutons, et quelques textes gagnent en contraste (valeurs en rouille, erreurs dans les champs, bouton « Connexion… », textes secondaires sur iPhone, pastille du compte).",
       "Statistiques : une carte de chaleur « Où je plonge le plus » montre où se concentrent les plongées du filtre, avec le site en tête, sur une carte qu’on déplace et qu’on zoome ; elle s’ouvre en plein écran.",

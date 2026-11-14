@@ -3006,7 +3006,7 @@ Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
 
 Done in feature/heatmap-zoom. 1: haloRadius(zoom) in lib/heat-density.js: 20 dp up to zoom 5, 40 dp from zoom 13, interpolated (tested). 2: SiteMap keeps a heatScale set once per filter (the densest value at the opening framing) and colours every value against it, so the scale no longer follows the visible area. 3: SiteMap's pinsFromZoom: below 14 the pins are hidden (a reactive class), the heat's opacity is 14 − zoom between 13 and 14, from 14 the pins (the Sites map's, names « never », dives in the filter) show; a pin selects the site and opens MapSiteCard (the od-map-site-card of task 150, now a shared component used by Sites too), which leaves full screen and opens the site's sheet; Back closes the card. Also fixed: SiteMap's names-on class is now driven by state (Svelte rewrote the hand-set class). Checked on the phone emulator by wheel zoom in full screen: pins hidden and heat shown far away, pins shown and heat at 0 from zoom 14. Not seen: a pin up close on screen (the zoomed spot had no site in view), tablet, iPhone. The task speaks of « red » and « blue »: the ramp stays the tertiary ramp of task 152 (sand to rust).
 
-## [ ] 2026-11-14-156 Account sheet: centre the title, keep « Synchronisé » beside its button
+## [x] 2026-11-14-156 Account sheet: centre the title, keep « Synchronisé » beside its button
 
 Reported by Christian on 14 November 2026 in the app. Mock-up: `nav-option-barre-compte-android.dc.html` (the account sheet opened from the initial). The mock-up is unchanged: the app differs from it.
 
@@ -3014,3 +3014,5 @@ Reported by Christian on 14 November 2026 in the app. Mock-up: `nav-option-barre
 2. **« Synchronisé il y a 2 min » sits above the « Synchroniser » button.** It is one row: the cloud icon (24 dp), the status text (14 sp, #4B4A47, takes the remaining width), then the tonal « Synchroniser » button (40 dp high) on the right; all vertically centred, 16 dp gaps, 12 dp vertical and 16 dp horizontal padding. If the text is too long it wraps on two lines beside the button, never above it.
 
 Check on the phone, the tablet and the iPhone sheet.
+
+Done in fix/account-sheet-layout. 1: the header is a grid 48 dp / 1fr / 48 dp (an empty slot balances ✕); the logo and the title are centred on the sheet's width, the title truncated with an ellipsis. 2: in automatic sync, the status (cloud icon, text in --od-text-2, taking the width, wrapping when long) and SyncControl's « Synchroniser » sit on one row, centred, 16 dp gap, inside the 12/16 dp padding of the sync block; manual sync already had one row. Checked on the phone emulator. The tablet (the Android floating panel) uses the same markup. The iPhone sheet is a grouped list (task 127) with « Synchroniser » as its own row by design, unchanged.
