@@ -1016,7 +1016,7 @@
   },
   "deleteAccount": {
     "back": "Back to the account",
-    "definitive": "This is permanent",
+    "definitive": "This is permanent!",
     "consequence": {
       "one": "The account {email} and its dive will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it.",
       "other": "The account {email} and its {n} dives will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it."
@@ -1795,6 +1795,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Deleting the cloud account: the warning reads « This is permanent! ».",
       "Sign out: the dialog shows the icon and the title centred, the unsent changes in a box, and a real checkbox to erase the device’s copy.",
       "Account: a “Leave the cloud” section puts “Sign out of this device” and “Delete the cloud account” side by side, each saying what happens to the dives.",
       "Heat map: the colours go from blue (few dives) to red (the most dives), and the legend follows.",

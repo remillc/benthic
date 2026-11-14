@@ -3140,6 +3140,8 @@ English: « 3 unsent changes », « They will go out the next time you sign in t
 
 Done in feature/sign-out-dialog. Android (cloud mode): 1. the dialog's title is the 24 dp sign-out icon (the logout drawing of task 164, in --od-secondary) centred over « Se déconnecter ? », centred (Material 3 dialog with icon; class od-sign-out-dialog). 2. with unsent changes, the sentence is replaced by od-sign-out-dialog--pending: a 16 dp-corner box in --od-tertiary-container, text in --od-pending (#8A4B00, the pending family), a 20 dp cloud with an upward arrow, « {n} modifications non envoyées » semibold (signOut.pendingCount, plural) and « Elles partiront à votre prochaine connexion à ce compte depuis cet appareil. » (signOut.pendingWhen, plural). 3. « Effacer aussi la copie de cet appareil » stays a real Framework7 checkbox (18 dp), its row now 48 dp high, disabled with « Possible une fois les modifications envoyées » while changes wait, enabled without that line otherwise. 4. actions unchanged. The task named the text colour --od-on-tertiary-container but gave #8A4B00, which is --od-pending: --od-pending is used. iOS keeps its alert; git mode keeps its sentence. Checked on the phone emulator with the pending count set to 3 in memory only.
 
-## [ ] 2026-11-14-166 Delete the cloud account: « C'est définitif ! »
+## [x] 2026-11-14-166 Delete the cloud account: « C'est définitif ! »
 
 Christian decided this on 14 November 2026. Mock-up: `compte-android-suppression.dc.html`. The warning heading of the deletion page becomes « C'est définitif ! » (French: a narrow no-break space U+202F before « ! »), English « This is permanent! » (no space). Phone, tablet, iPhone.
+
+Done in fix/definitive-heading. deleteAccount.definitive: fr « C'est définitif ! » with a narrow no-break space (U+202F) before « ! », en « This is permanent! ». fr-CA has no override and takes the French text. The same key serves phone, tablet and iPhone (DeleteAccount.svelte).
