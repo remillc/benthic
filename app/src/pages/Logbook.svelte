@@ -1061,6 +1061,20 @@
     }
   }
 
+  /**
+   * The scrolled bar's search button: back to the top of the list, the cursor in the search field.
+   * @param {MouseEvent} e
+   */
+  function openSearch(e) {
+    const page = /** @type {HTMLElement} */ (e.currentTarget).closest('.page');
+    const content = /** @type {HTMLElement|null} */ (page?.querySelector('.page-content') ?? null);
+    const field = /** @type {HTMLInputElement|null} */ (page?.querySelector('.od-band-search input') ?? null);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    content?.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    // The field is focused once it is back on screen (no scroll jump from focus()).
+    setTimeout(() => field?.focus({ preventScroll: true }), reduced ? 0 : 350);
+  }
+
   /** iOS "+": the choices in an action sheet. */
   function add() {
     f7.actions
@@ -1082,6 +1096,15 @@
   <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
+      <!-- Scrolled, with the month headers in the band (Android, task 2026-11-14-125): the search
+           field has left the screen, a search button takes its place. Then the avatar, and the
+           page ⋮ always last. -->
+      {#if !theme.ios && stickyGroup}
+        <Link iconOnly class="od-logbook--search-button" onClick={openSearch}>
+          <Icon name="search" />
+          <span class="od-sr-only">{t('logbook.search')}</span>
+        </Link>
+      {/if}
       <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120). -->
       <AccountAvatar />
       {#if logbook.dives.length || logbook.preview}
