@@ -7,6 +7,7 @@ import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
+import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -303,11 +304,16 @@ export async function savePlan(request, replaceId = 0, title = '') {
 /**
  * Imports a file chosen by the diver (one undoable step), saved and synced
  * like an edit. Errors keep the core's code (IMPORT_FAILED, NO_DIVES,
- * NO_NEW_DIVES) for the message.
+ * NO_NEW_DIVES) for the message. A .zip holding .fit files (Garmin Connect's « Export
+ * Original ») gives each .fit to the core, which cannot read them inside the archive.
  * @param {File} file
  * @returns {Promise<number>} the number of dives added to the logbook
  */
 export async function importFile(file) {
+  if (isZipName(file.name)) {
+    const fits = await fitFilesInZip(new Uint8Array(await file.arrayBuffer()));
+    if (fits.length) return importFits(fits);
+  }
   const data = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
@@ -315,6 +321,27 @@ export async function importFile(file) {
     reader.readAsDataURL(file);
   });
   return importData(file.name, String(data));
+}
+
+/**
+ * The .fit files taken out of a .zip, one import each. The dives added are counted together; an
+ * error is reported only when none was added (« Annuler » then undoes the last file's dives).
+ * @param {{ name: string, data: Uint8Array }[]} fits
+ * @returns {Promise<number>}
+ */
+async function importFits(fits) {
+  let added = 0;
+  /** @type {unknown} */
+  let failure = null;
+  for (const fit of fits) {
+    try {
+      added += await importData(fit.name, toBase64(fit.data));
+    } catch (e) {
+      failure = e;
+    }
+  }
+  if (!added && failure) throw failure;
+  return added;
 }
 
 /**

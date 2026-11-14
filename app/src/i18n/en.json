@@ -108,7 +108,7 @@
     "emptyCloud": "Connected to the Subsurface cloud, no dives",
     "emptyPair": "Pair a dive computer",
     "emptyDivelogs": "Download from divelogs.de",
-    "emptyNote": "Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are imported here.",
+    "emptyNote": "Files from Subsurface (.ssrf, .xml), divelogs.de, Garmin watches (.fit) and other logbooks are imported here.",
     "noFilterResults": "No dive matches the filter.",
     "imported": {
       "one": "{n} dive imported",
@@ -117,7 +117,7 @@
     "importTitle": "Import a file",
     "importNothingNew": "Every dive of this file is already in the logbook. No dive was changed.",
     "importNoDives": "This file holds no dive. No dive was changed.",
-    "importFailed": "This file could not be read. Files from Subsurface (.ssrf, .xml), divelogs.de and other logbooks are accepted. No dive was changed.",
+    "importFailed": "This file could not be read. Files from Subsurface (.ssrf, .xml), divelogs.de, Garmin watches (.fit) and other logbooks are accepted. No dive was changed.",
     "importing": "Importing the file",
     "menuExport": "Export as…",
     "menuDeleteTrip": {
@@ -1705,6 +1705,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Import a file: dives from Garmin watches (.fit) are imported, also from Garmin Connect’s “Export Original” .zip.",
       "First launch: “Start without an account” is now a real button, with what it means written under it; the account sheet uses the light-background logo too.",
       "Tools: the planner shows the number of planned dives and desaturation the wait before flying; the gas tools become tiles. On tablets the page takes the full width.",
       "Settings: the profile and pO₂ graph options move to Display; “Profile and decompression” becomes “Decompression”.",
@@ -1994,7 +1995,7 @@
     "password": "divelogs.de password",
     "credentialsNote": "These credentials are only used for this download. OpenDives does not keep them.",
     "file": "From a file",
-    "fileText": "Subsurface logbook (.ssrf, .xml), divelogs.de export (.dld) or from another program",
+    "fileText": "Subsurface logbook (.ssrf, .xml), divelogs.de export (.dld), Garmin watch (.fit) or from another program",
     "empty": "Start with an empty logbook",
     "creating": "Creating the logbook…",
     "continue": "Continue",

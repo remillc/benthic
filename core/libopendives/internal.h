@@ -18,6 +18,14 @@ using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
 namespace opendives::internal {
 
+// Reads a file to import into `log`, as Subsurface's desktop import does
+// (MainWindow::importFiles(): it keeps whatever dives parse_file() found):
+// true when the file could not be read. parse_file()'s return value is not a
+// plain error code: the FIT reader (core/fit_file.cpp, fit_file_import())
+// returns 1 after reading a dive, so a non-zero value only means a failure
+// when no dive came out (task 2026-11-14-124).
+bool read_import_file(const std::string &path, struct divelog &log);
+
 // Download from a dive computer (edit.cpp): NO_LOG or FORMAT_NEWER when the
 // log in memory cannot take changes.
 int check_writable(std::string &error);
