@@ -137,7 +137,8 @@
       height: 8px;
       border-radius: 4px;
       /* The six stops, least (blue) to most (red), as on the map (task 2026-11-14-161). */
-      background: linear-gradient(to right, var(--od-heat-1), var(--od-heat-2), var(--od-heat-3), var(--od-heat-4), var(--od-heat-5), var(--od-heat-6));
+      /* The ramp from t = 0.12 (« Moins ») to 1 (« Plus »), each stop where it sits (task 162). */
+      background: linear-gradient(to right, var(--od-heat-1) 0%, var(--od-heat-2) 20.5%, var(--od-heat-3) 40.9%, var(--od-heat-4) 61.4%, var(--od-heat-5) 80.7%, var(--od-heat-6) 100%);
     }
 
     /* Full screen: the legend in a white card at the bottom left. */

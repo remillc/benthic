@@ -11,7 +11,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
-  import { densityGrid, haloRadius, heatShare, rampColour, rgb } from '../lib/heat-density.js';
+  import { createHeatScale, densityGrid, haloRadius, heatShare, rampColour, rgb } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
@@ -149,8 +149,8 @@
   /** @type {HTMLCanvasElement|undefined} */
   let heatCanvas = $state();
   let heatFrame = 0;
-  /** The densest value at the opening framing: the colour scale, fixed while panning and zooming (task 155). */
-  let heatScale = 0;
+  /** The colour scale: the densest value of the filter at the opening framing, fixed while exploring (tasks 155, 162). */
+  const heatScale = createHeatScale();
 
   /** The density of the dives over the visible map, on the heat's own layer. */
   function drawHeat() {
@@ -164,7 +164,7 @@
     const m = map;
     const grid = densityGrid(heat.map((p) => ({ ...m.project([p.lon, p.lat]), weight: p.count })), w, h, radius, cell);
     // The scale is set once, on the whole filter at the opening framing; the legend keeps its meaning.
-    if (!heatScale) heatScale = grid.max || 1;
+    const scale = heatScale.measure(grid.max);
     const styles = getComputedStyle(heatCanvas);
     const colour = (/** @type {string} */ v) => rgb(styles.getPropertyValue(v) || '#000000');
     const ramp = /** @type {[number, number, number][]} */ ([1, 2, 3, 4, 5, 6].map((i) => colour(`--od-heat-${i}`)));
@@ -176,8 +176,8 @@
     const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
     const image = sctx.createImageData(grid.cols, grid.rows);
     for (let i = 0; i < grid.values.length; i++) {
-      // A logarithmic scale, as the mock-ups: one dive blue, the busiest site red.
-      const [r, g, b, a] = rampColour(heatShare(grid.values[i], heatScale), ramp, fade);
+      // t = √(d / D) on the ramp (task 162).
+      const [r, g, b, a] = rampColour(heatShare(grid.values[i], scale), ramp, fade);
       image.data.set([r, g, b, a], i * 4);
     }
     sctx.putImageData(image, 0, 0);
@@ -420,7 +420,7 @@
       const bounds = framed.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(framed[0], framed[0]));
       map.fitBounds(bounds, { padding: 40, maxZoom: points.length || frame?.length ? 14 : 12, animate: false }, { programmatic: true });
     }
-    heatScale = 0;
+    heatScale.reset();
     zoomLayers();
   }
 
