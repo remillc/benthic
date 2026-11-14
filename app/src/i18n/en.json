@@ -902,7 +902,7 @@
     "subsurfaceGroup": "Subsurface account",
     "changePassword": "Change password",
     "changePasswordText": "A link is sent to your email",
-    "leaveGroup": "Leave",
+    "dangerZone": "Danger zone",
     "signOut": "Sign out",
     "signOutText": "Your dives stay in the cloud and on this device.",
     "delete": "Delete account",
@@ -1706,6 +1706,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: “Sign out” comes first, apart from the account group; the “Danger zone” only holds “Delete account”; the server line is in small type.",
       "Signing in: the wavy progress indicator is blue on a pale blue track, 16 dp from the edges, under the bar; with “Remove animations”, a flat bar slides. The sync bar takes the same colours.",
       "Account: under the address, “Subsurface cloud” instead of “Subsurface account verified”.",
       "Tools: the gas tools are rows of one card, like the planner.",

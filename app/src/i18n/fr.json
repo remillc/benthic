@@ -902,7 +902,7 @@
     "subsurfaceGroup": "Compte Subsurface",
     "changePassword": "Changer le mot de passe",
     "changePasswordText": "Un lien est envoyé à votre courriel",
-    "leaveGroup": "Quitter",
+    "dangerZone": "Zone dangereuse",
     "signOut": "Se déconnecter",
     "signOutText": "Vos plongées restent dans le cloud et sur cet appareil.",
     "delete": "Supprimer le compte",
@@ -1706,6 +1706,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte : « Se déconnecter » vient d’abord, à part du groupe du compte ; la « Zone dangereuse » ne contient plus que « Supprimer le compte » ; la ligne du serveur est en petit.",
       "Connexion : l’indicateur de progression ondulé est bleu sur une piste bleu pâle, à 16 dp des bords, sous la barre ; avec « Supprimer les animations », une barre plate glisse. La barre de synchronisation prend les mêmes couleurs.",
       "Compte : sous l’adresse, « Cloud Subsurface » au lieu de « Compte Subsurface vérifié ».",
       "Outils : les outils de gaz sont des rangées d’une même carte, comme le planificateur.",
