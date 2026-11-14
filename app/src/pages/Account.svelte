@@ -10,7 +10,7 @@
   import Icon from '../components/Icon.svelte';
   import SyncControl from '../components/SyncControl.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { bottomNav, layout } from '../lib/layout.svelte.js';
+  import { bottomNav, layout, ios } from '../lib/layout.svelte.js';
   import SectionBand from '../components/SectionBand.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
@@ -72,6 +72,9 @@
   });
 
   /** @param {string} s */
+  /** The sign-out icon (Icon.svelte « logout ») and a cloud with an upward arrow, for the dialog's HTML. */
+  const LOGOUT = 'M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 16l4-4-4-4M20 12H9';
+  const CLOUD_UPLOAD = 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18zM12 15.5v-5M9.75 12.5 12 10.25l2.25 2.25';
   const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
 
   /**
@@ -84,8 +87,17 @@
     e?.preventDefault();
     const pending = logbook.pending;
     const text = pending ? t(git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(git ? 'signOut.textNoneGit' : 'signOut.textNone');
+    // Android, cloud (task 2026-11-14-165; compte-android-deconnexion.dc.html): the waiting changes
+    // in a box of the pending family (od-sign-out-dialog--pending), in place of the sentence.
+    const box = pending && !git && !ios;
+    const lead = box
+      ? `<div class="od-sign-out-dialog--pending">
+          <svg class="od-sign-out-dialog--pending-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${CLOUD_UPLOAD}"/></svg>
+          <span><strong>${escape(t('signOut.pendingCount', { n: pending }))}</strong><br>${escape(t('signOut.pendingWhen', { n: pending }))}</span>
+        </div>`
+      : `<p class="od-account--signout-text">${escape(text)}</p>`;
     const content = `
-      <p class="od-account--signout-text">${escape(text)}</p>
+      ${lead}
       <label class="od-account--signout-copy${pending ? ' disabled' : ''}">
         <span class="checkbox"><input type="checkbox"${pending ? ' disabled' : ''}><i class="icon-checkbox"></i></span>
         <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="od-account--signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
@@ -102,7 +114,10 @@
           { text: t('signOut.cancel') },
           { text: t('signOut.confirm'), bold: true, onClick: (/** @type {any} */ dialog) => runSignOut(deleteCopy(dialog)) },
         ];
-    f7.dialog.create({ title: t(git ? 'signOut.titleGit' : 'signOut.title'), content, buttons, verticalButtons: pending > 0, cssClass: 'od-account--signout' }).open();
+    const title = escape(t(git ? 'signOut.titleGit' : 'signOut.title'));
+    // Android: the Material 3 dialog with icon, the sign-out icon centred over a centred title; iOS keeps its alert.
+    const heroTitle = ios ? title : `<svg class="od-sign-out-dialog--icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${LOGOUT}"/></svg><span>${title}</span>`;
+    f7.dialog.create({ title: heroTitle, content, buttons, verticalButtons: pending > 0, cssClass: `od-account--signout${ios ? '' : ' od-sign-out-dialog'}` }).open();
   }
 
   /** @param {boolean} deleteCopy */
@@ -418,6 +433,58 @@
 
     :global(.od-account--signout .od-account--signout-copy.disabled) {
       opacity: 0.55;
+    }
+
+    /* Android (task 2026-11-14-165): the icon and the title centred, Material 3 « dialog with icon ». */
+    :global(.od-sign-out-dialog .dialog-title) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    :global(.od-sign-out-dialog .od-sign-out-dialog--icon) {
+      fill: none;
+      stroke: var(--od-secondary);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* The waiting changes: a 16 dp box of the pending family (tertiary container, pending text). */
+    :global(.od-sign-out-dialog .od-sign-out-dialog--pending) {
+      margin: 0 0 12px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: var(--od-tertiary-container);
+      color: var(--od-pending);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: start;
+      font-size: 14px;
+      line-height: 20px;
+
+      strong {
+        font-weight: 600;
+      }
+    }
+
+    :global(.od-sign-out-dialog .od-sign-out-dialog--pending-icon) {
+      flex: none;
+      margin-top: 1px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* The checkbox: 18 dp in a 48 dp target (MD3). */
+    :global(.od-sign-out-dialog .od-account--signout-copy) {
+      align-items: center;
+      min-height: 48px;
     }
 
     :global(.od-account--signout .od-account--signout-hint) {

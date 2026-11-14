@@ -991,6 +991,14 @@
       "one": "{n} change is not sent yet. It will be sent the next time you sign in to this account from this device.",
       "other": "{n} changes are not sent yet. They will be sent the next time you sign in to this account from this device."
     },
+    "pendingCount": {
+      "one": "{n} unsent change",
+      "other": "{n} unsent changes"
+    },
+    "pendingWhen": {
+      "one": "It will go out the next time you sign in to this account on this device.",
+      "other": "They will go out the next time you sign in to this account on this device."
+    },
     "deleteCopy": "Also delete the copy on this device",
     "deleteCopyHint": "Possible once the changes are sent",
     "confirm": "Sign out",
@@ -1787,6 +1795,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sign out: the dialog shows the icon and the title centred, the unsent changes in a box, and a real checkbox to erase the device’s copy.",
       "Account: a “Leave the cloud” section puts “Sign out of this device” and “Delete the cloud account” side by side, each saying what happens to the dives.",
       "Heat map: the colours go from blue (few dives) to red (the most dives), and the legend follows.",
       "Relative times (“2 min ago”, “in 3 h”, “yesterday at 2:30 pm”) are no longer split at the end of a line.",
