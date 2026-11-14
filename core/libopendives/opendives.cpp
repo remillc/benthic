@@ -145,9 +145,9 @@ int count_dives(const std::string &log, std::string &error)
 {
 	struct divelog other;
 	std::string loaded = loaded_git_commit;
-	int ret = parse_file(log.c_str(), &other);
+	bool failed = internal::read_import_file(log, other);
 	loaded_git_commit = loaded;
-	if (ret) {
+	if (failed) {
 		error = "IMPORT_FAILED";
 		return -1;
 	}
@@ -928,7 +928,7 @@ int cloud_create_log(const std::string &import_path, std::string &json, std::str
 	}
 	// The file is read before anything is written.
 	struct divelog imported;
-	if (!import_path.empty() && parse_file(import_path.c_str(), &imported)) {
+	if (!import_path.empty() && internal::read_import_file(import_path, imported)) {
 		error = "IMPORT_FAILED";
 		return -1;
 	}

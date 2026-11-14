@@ -367,7 +367,7 @@ out:
 int import_count(const std::string &path, std::string &json, std::string &error)
 {
 	struct divelog log;
-	if (parse_file(path.c_str(), &log)) {
+	if (internal::read_import_file(path, log)) {
 		error = "IMPORT_FAILED";
 		return -1;
 	}

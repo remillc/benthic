@@ -3581,9 +3581,9 @@ int import_dives(const std::string &file, const std::string &source, std::string
 	// the next save of the log in memory checks against its destination:
 	// it is put back, or that save would be refused (SAVE_REPLACEMENT).
 	std::string loaded = loaded_git_commit;
-	int parsed = parse_file(file.c_str(), &log);
+	bool failed = internal::read_import_file(file, log);
 	loaded_git_commit = loaded;
-	if (parsed) {
+	if (failed) {
 		error = "IMPORT_FAILED";
 		return -1;
 	}
@@ -3597,6 +3597,12 @@ int import_dives(const std::string &file, const std::string &source, std::string
 }
 
 namespace internal {
+
+bool read_import_file(const std::string &path, struct divelog &log)
+{
+	int ret = parse_file(path.c_str(), &log);
+	return ret != 0 && log.dives.empty();
+}
 
 int check_writable(std::string &error)
 {
