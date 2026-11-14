@@ -150,3 +150,14 @@ export function unusedShown(cylinder) {
  * @param {number} [computers] how many dive computers the dive has
  */
 export const equipmentOpens = (weights, computers = 0) => weights.length > 0 || computers > 1;
+
+/**
+ * The dive computers of a dive as the Equipment card lists them (task 2026-11-12-60): every one
+ * with a model, in the core's order, the first being the main one. A dive downloaded over a dive
+ * already logged by another computer holds both (Subsurface merges them, the downloaded one first):
+ * none may be left out (14 November 2026, a Perdix AI over a Petrel 3).
+ * @param {{ model?: string, nickname?: string }[] | undefined} diveComputers get_dive's list
+ * @returns {{ name: string, main: boolean }[]}
+ */
+export const computerList = (diveComputers) =>
+  (diveComputers ?? []).filter((dc) => dc.model).map((dc, i) => ({ name: /** @type {string} */ (dc.nickname || dc.model), main: i === 0 }));

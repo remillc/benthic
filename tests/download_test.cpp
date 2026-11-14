@@ -6,7 +6,7 @@
 // of downloaded dives as one undoable step.
 // usage: download <a log the core reads> <other dives to import>
 //   e.g. build/poc/download third_party/subsurface/dives/SampleDivesV2.ssrf \
-//        third_party/subsurface/dives/TestDiveDivelogsDE.xml
+//        third_party/subsurface/dives/TestDiveDM5.xml (at least 3 dives: the default water type)
 #include "../core/libopendives/opendives.h"
 #include "../core/libopendives/internal.h"
 #include "core/compat/bt_transport.h"
@@ -614,6 +614,82 @@ static void test_numbering()
 	divelog.dives.back()->number = saved_number;
 }
 
+// A downloaded dive that overlaps a dive already in the log, from another dive
+// computer (14 November 2026: a Perdix AI downloaded over a dive logged by a
+// Petrel 3, which Christian then believed lost). Subsurface merges them into one
+// dive (prefer_imported): the downloaded computer first, the other one kept,
+// since the models differ (dive.cpp, remove_redundant_dc). The app reads the
+// list from get_dive's "diveComputers": both must be there, in that order.
+static void test_merged_computers()
+{
+	std::string json, error;
+	dive *old = nullptr;
+	for (auto &d: divelog.dives)
+		if (!d->dcs[0].model.empty() && d->duration.seconds > 600 && d->maxdepth.mm > 3000)
+			old = d.get();
+	if (!old) {
+		check("merged computers: a dive with a computer in the log", false);
+		return;
+	}
+	const std::string old_model = old->dcs[0].model;
+	const size_t dives_before = divelog.dives.size(), dcs_before = old->dcs.size();
+	struct divelog log;
+	auto d = std::make_unique<dive>();
+	// The other computer's clock is 30 s off; same depth and length.
+	d->when = old->when + 30;
+	d->duration = old->duration;
+	d->maxdepth = old->maxdepth;
+	d->meandepth = old->meandepth;
+	divecomputer &dc = d->dcs[0];
+	dc.when = d->when;
+	dc.model = "Shearwater Perdix AI";
+	dc.deviceid = 0x5678;
+	dc.diveid = 0x777;
+	dc.duration = old->duration;
+	dc.maxdepth = old->maxdepth;
+	dc.meandepth = old->meandepth;
+	log.dives.put(std::move(d));
+	fingerprint_table before;
+	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:44:55:66", before, json, error);
+	check("merged computers: imported", rc == 0, error);
+	check("merged computers: merged, no new dive", divelog.dives.size() == dives_before,
+	      std::to_string(divelog.dives.size()) + " dives, were " + std::to_string(dives_before));
+	const dive *merged = nullptr;
+	for (auto &x: divelog.dives)
+		for (auto &c: x->dcs)
+			if (c.model == "Shearwater Perdix AI" && c.diveid == 0x777)
+				merged = x.get();
+	check("merged computers: the downloaded computer is in a dive", merged != nullptr);
+	if (merged) {
+		check("merged computers: one computer more", merged->dcs.size() == dcs_before + 1,
+		      std::to_string(merged->dcs.size()) + " computers");
+		check("merged computers: the downloaded one first", merged->dcs[0].model == "Shearwater Perdix AI", merged->dcs[0].model);
+		bool kept = false;
+		for (size_t i = 1; i < merged->dcs.size(); i++)
+			kept |= merged->dcs[i].model == old_model;
+		check("merged computers: the computer already logged is kept", kept, old_model);
+		// What the dive detail reads.
+		std::string detail;
+		opendives::get_dive(merged->id, detail, error);
+		size_t list = detail.find("\"diveComputers\":[");
+		size_t first = detail.find("Shearwater Perdix AI", list), second = detail.find(old_model, list);
+		check("merged computers: get_dive lists both, the downloaded one first",
+		      list != std::string::npos && first != std::string::npos && second != std::string::npos && first < second,
+		      detail.substr(list == std::string::npos ? 0 : list, 200));
+	}
+	const timestamp_t old_when = old->when;
+	opendives::undo(json, error);
+	bool perdix_left = false, restored = false;
+	for (auto &x: divelog.dives) {
+		for (auto &c: x->dcs)
+			perdix_left |= c.diveid == 0x777;
+		if (x->when == old_when && x->dcs.size() == dcs_before && x->dcs[0].model == old_model)
+			restored = true;
+	}
+	check("merged computers: undo gives the dive back with its own computers",
+	      divelog.dives.size() == dives_before && !perdix_left && restored);
+}
+
 // A download cut after some dives (a stream lost, or cancelled): the dives
 // received are offered, as Subsurface-mobile does (download_partial).
 static void test_partial(const char *file)
@@ -705,6 +781,7 @@ int main(int argc, char **argv)
 	test_import_step(argv[2]);
 	test_default_salinity(argv[2]);
 	test_numbering();
+	test_merged_computers();
 	test_partial(argv[2]);
 	printf("%s\n", failed ? "FAILED" : "all passed");
 	return failed ? 1 : 0;
