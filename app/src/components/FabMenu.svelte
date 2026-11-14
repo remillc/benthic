@@ -152,8 +152,10 @@
 <style>
   @layer od.components {
     .od-fab-menu {
-      /* 16 dp above the bottom navigation bar when it shows (task 2026-11-14-120). */
-      --od-fab-edge: calc(24px + var(--od-bottom-nav-room, 0px));
+      /* 24 dp from the screen's edges; from the bottom, 16 dp above the bottom navigation bar when
+         it shows (task 2026-11-14-120). The bar only moves it up, never away from the right edge. */
+      --od-fab-edge: 24px;
+      --od-fab-bottom: calc(24px + var(--od-bottom-nav-room, 0px));
       --od-fab-size: 56px;
     }
 
@@ -182,7 +184,7 @@
       z-index: 6501;
       right: calc(var(--od-fab-edge) + var(--f7-safe-area-right, 0px));
       /* 24 dp above the button, itself 24 dp above the bottom edge. */
-      bottom: calc(var(--od-fab-edge) + var(--od-fab-size) + 24px + var(--f7-safe-area-bottom, 0px));
+      bottom: calc(var(--od-fab-bottom) + var(--od-fab-size) + 24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       flex-direction: column-reverse;
       align-items: flex-end;
@@ -280,7 +282,7 @@
       position: fixed;
       z-index: 6502;
       right: calc(var(--od-fab-edge) + var(--f7-safe-area-right, 0px));
-      bottom: calc(var(--od-fab-edge) + var(--f7-safe-area-bottom, 0px));
+      bottom: calc(var(--od-fab-bottom) + var(--f7-safe-area-bottom, 0px));
       width: var(--od-fab-size);
       height: var(--od-fab-size);
       padding: 0;

@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: the “+” button is back 24 dp from the right edge, above the bottom bar.",
       "About: “Free, and so is your logbook”, with “See on GitHub” and “Export my logbook”.",
       "French: « courriel » in Canada, « e-mail » in France.",
       "French texts: « courriel » everywhere, never « e-mail ».",
