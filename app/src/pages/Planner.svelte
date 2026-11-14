@@ -1000,7 +1000,8 @@
           </Link>
         {/snippet}
       </Navbar>
-      <List strongIos insetIos dividersIos>
+      <!-- Choosing the starting dive goes back to the planner: no chevron. -->
+      <List strongIos insetIos dividersIos noChevron>
         <ListItem link="#" title={t('plan.newDive')} onClick={() => choose(null)} />
         {#each choices as dive (dive.id)}
           <ListItem

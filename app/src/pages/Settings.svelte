@@ -1021,7 +1021,8 @@
       </span>
       {#if row.kind === 'link' && row.badge}<span class="badge">{row.badge}</span>{/if}
       {#if row.kind !== 'link' || row.value}<span class="od-settings--value">{row.value}</span>{/if}
-      <svg class="od-settings--chevron" class:od-settings--large={row.kind === 'link'} viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+      <!-- A chevron only when the row opens a page; a menu, a dialog or an action has none (system-design, « Trailing chevron »). -->
+      {#if row.kind === 'link' && row.href}<svg class="od-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
     </button>
   {/if}
 {/snippet}
@@ -1418,18 +1419,14 @@
 
     .od-settings--chevron {
       flex: none;
-      width: 18px;
-      height: 18px;
+      /* 20 dp, on every row that opens a page (system-design, « Trailing chevron »). */
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: var(--od-text-2);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
-
-      &.od-settings--large {
-        width: 20px;
-        height: 20px;
-      }
     }
 
     .toggle {

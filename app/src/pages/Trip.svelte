@@ -209,7 +209,7 @@
     <div class="list list-strong inset list-dividers">
       <ul>
         <li>
-          <a href="#place" class="item-link item-content external" role="button" onclick={(e) => { e.preventDefault(); editField('location'); }}>
+          <a href="#place" class="item-link item-content external no-chevron" role="button" onclick={(e) => { e.preventDefault(); editField('location'); }}>
             <div class="item-inner">
               <div class="item-title">
                 {t('tripScreen.place')}
@@ -219,7 +219,7 @@
           </a>
         </li>
         <li>
-          <a href="#notes" class="item-link item-content external" role="button" onclick={(e) => { e.preventDefault(); editField('notes'); }}>
+          <a href="#notes" class="item-link item-content external no-chevron" role="button" onclick={(e) => { e.preventDefault(); editField('notes'); }}>
             <div class="item-inner">
               <div class="item-title">
                 {t('tripScreen.notes')}

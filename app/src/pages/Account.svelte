@@ -213,7 +213,7 @@
         </li>
         {#if deviceCount}
           <li>
-            <a href="#device-dives" class="item-link item-content external" role="button" onclick={(e) => { e.preventDefault(); addDeviceDives(); }}>
+            <a href="#device-dives" class="item-link item-content external no-chevron" role="button" onclick={(e) => { e.preventDefault(); addDeviceDives(); }}>
               <div class="item-inner">
                 <div class="item-title">
                   {t('account.addDeviceDives')}
@@ -250,7 +250,7 @@
       <div class="list list-strong inset list-dividers">
         <ul>
           <li>
-            <a href="#password" class="item-link item-content external" role="button" onclick={notAvailable}>
+            <a href="#password" class="item-link item-content external no-chevron" role="button" onclick={notAvailable}>
               <div class="item-inner">
                 <div class="item-title">
                   {t('account.changePassword')}
