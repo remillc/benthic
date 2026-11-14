@@ -152,6 +152,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `android-tablette-accueil-portrait.dc.html` | Tablette Android, Carnet, accueil, portrait |
 | `android-tablette-accueil-portrait-menu.dc.html` | Tablette Android, Carnet, accueil, menu ouvert, portrait |
 | `sites-carte-plein-ecran-android.dc.html` | Sites, carte en plein écran · Android |
+| `stats-carte-chaleur-plein-ecran-android.dc.html` | Statistiques, carte de chaleur en plein écran · Android |
 | `contraste-eleve-echantillons.dc.html` | Contraste élevé · échantillons (to-do #75) |
 | `sites-superposes-android.dc.html` | Sites, épingles superposées · Android |
 | `saisie-bateau-android.dc.html` | Saisie sur le bateau · Android |
