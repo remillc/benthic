@@ -686,9 +686,6 @@
 
   <Popover id={menuId} class="od-menu" backdrop={false}>
     <List noChevron>
-      {#if canSimplify()}
-        <MenuItem icon="simplifyProfile" text={t('plan.simplify')} onclick={simplify} />
-      {/if}
       <MenuItem
         icon="share"
         text={t('plan.share')}
@@ -762,7 +759,18 @@
       {:else if !failed}
         <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
-      {#if planner.source && !planner.simplified}<p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>{/if}
+      {#if planner.source && !planner.simplified}
+        <!-- Task 2026-11-14-146: the profile is changed from here; « Modifier le profil » turns it
+             into a few levels (what « Simplifier le profil » in the ⋮ menu did). -->
+        <div class="od-planner--edit-row">
+          <p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>
+          {#if canSimplify()}
+            <button type="button" class="od-planner--edit-profile" onclick={simplify}><Icon name="edit" size={18} />{t('plan.editProfile')}</button>
+          {/if}
+        </div>
+      {:else if planner.simplified}
+        <p class="od-planner--helper">{t('plan.simplifiedHelper')}</p>
+      {/if}
     </div>
 
     <div class="od-planner--data">
@@ -798,7 +806,7 @@
           {#if levelFields.length < 20}
             <button type="button" class="od-planner--add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
           {/if}
-          <p class="od-planner--helper od-planner--inner">{t(planner.simplified ? 'plan.levelsFromDive' : 'plan.levelsHelper')}</p>
+          <p class="od-planner--helper od-planner--inner">{t('plan.levelsHelper')}</p>
         </div>
       {/if}
 
@@ -1288,6 +1296,42 @@
       line-height: 16px;
       font-weight: 500;
       color: var(--od-text-2);
+    }
+
+    .od-planner--edit-row {
+      margin: 8px 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .od-planner--helper {
+        flex: 1;
+        margin: 0;
+      }
+    }
+
+    /* Tonal button (secondary container), as drawn in android-planificateur. */
+    .od-planner--edit-profile {
+      flex: none;
+      width: auto;
+      height: 40px;
+      padding: 0 16px 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-secondary-container);
+      color: var(--od-secondary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      :global(.ios) & {
+        height: 44px;
+        border-radius: 10px;
+        font-size: 15px;
+      }
     }
 
     .od-planner--helper {
