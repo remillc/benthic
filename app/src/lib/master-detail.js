@@ -1,6 +1,6 @@
 // @ts-check
 // Helpers for the master pages of the tablet list-and-detail layouts
-// (Statistics, Tools; the Logbook has its own copy in Logbook.svelte).
+// (Statistics; the Logbook has its own copy in Logbook.svelte).
 
 /**
  * A master route of a master-detail view is not rendered as the view's first

@@ -1,63 +1,89 @@
 <script>
   // @ts-check
-  // Tools section (docs/ui-specification.md, section 1, "Tools page and gas
-  // tools"; docs/mockups/android-outils.dc.html): only a list of links, in two
-  // groups, on white surfaces like Settings. Each tool has its own screen.
+  // Tools section (task 2026-11-14-122; docs/ui-specification.md, section 1, "Tools page and
+  // gas tools"; docs/mockups/android-outils.dc.html, android-tablette-outils-*.dc.html). The two
+  // dive tools are cards that say their state: the planned dives of the logbook, and the wait
+  // before flying with the time since the last dive. The three gas tools are tiles in one row.
+  // On a tablet the page takes the width (no list pane): the two cards side by side, and a
+  // tool opens over the page, as on a phone.
   import { Page, Navbar, NavRight, theme } from 'framework7-svelte';
+  import { OpenDivesCore } from 'opendives-core';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { keepInSvelteRange } from '../lib/master-detail.js';
+  import { desaturationState } from '../lib/tools-page.js';
+  import { formatHoursMinutes } from '../lib/tools.js';
+  import { formatDuration, localNowIso } from '../lib/format.js';
 
-  /** @type {{ f7router: { navigate: (url: string, options?: object) => void } }} */
-  let { f7router } = $props();
-
-  /** Tablet: the address of the tool shown beside the list. */
-  let selected = $state('');
-  let opened = false;
-
-  // Tablet: the planner is shown beside the list as soon as the section is
-  // opened (spec, section 3), instead of an empty pane.
+  // The time moves: read the clock again every 30 seconds, and when the app comes back.
+  let now = $state(localNowIso());
   $effect(() => {
-    if (!layout.split || navigation.section !== 'tools' || opened) return;
-    opened = true;
-    selected = '/plans/';
-    f7router.navigate('/plans/', { reloadDetail: true });
+    const tick = () => (now = localNowIso());
+    const timer = setInterval(tick, 30000);
+    const back = () => document.visibilityState === 'visible' && tick();
+    document.addEventListener('visibilitychange', back);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', back);
+    };
   });
 
-  /** @param {MouseEvent} e */
-  function select(e) {
-    if (!layout.split) return;
-    const link = /** @type {HTMLElement} */ (e.target).closest('a[data-reload-detail]');
-    if (link) selected = link.getAttribute('href') ?? '';
+  const desat = $derived(logbook.loading ? null : desaturationState(logbook.dives, settings.flightWait, now));
+  /** "55 min", "6 h 10": as the wait before flying is written. @param {number} seconds */
+  const spell = (seconds) => (seconds < 3600 ? formatDuration(seconds, 'minutes') : formatHoursMinutes(seconds));
+  const wait = $derived(desat?.kind === 'waiting' ? spell(desat.remainingSeconds) : '');
+  // The time since surfacing counts whole minutes behind (the wait, rounded up, counts ahead).
+  const ago = $derived(desat && desat.sinceSeconds >= 0 ? spell(desat.sinceSeconds - (desat.sinceSeconds % 60)) : '');
+  const desatLabel = $derived(desat ? t(`tools.desaturationLabel.${desat.kind}`, { time: wait, ago }) : t('tools.desaturation'));
+
+  /** The planned dives of the logbook; null until read. */
+  let plans = $state(/** @type {number|null} */ (null));
+  let reading = false;
+  /** Asked again while a read was running: read once more after it. */
+  let again = false;
+
+  async function readPlans() {
+    if (reading) {
+      again = true;
+      return;
+    }
+    reading = true;
+    do {
+      again = false;
+      try {
+        plans = (await OpenDivesCore.listPlans()).length;
+      } catch {
+        plans = null;
+      }
+    } while (again);
+    reading = false;
   }
 
-  /** @type {{ title: string, rows: { href: string, icon: 'plan'|'desaturation'|'depthGauge'|'bestMix'|'blender', name: string, text: string }[] }[]} */
-  const groups = $derived([
-    {
-      title: t('tools.groupDive'),
-      rows: [
-        { href: '/plans/', icon: 'plan', name: t('tools.planner'), text: t('tools.plannerText') },
-        { href: '/tools/desaturation', icon: 'desaturation', name: t('tools.desaturation'), text: t('tools.desaturationText') },
-      ],
-    },
-    {
-      title: t('tools.groupGas'),
-      rows: [
-        { href: '/tools/ead-mod', icon: 'depthGauge', name: t('tools.eadMod'), text: t('tools.eadModText') },
-        { href: '/tools/best-mix', icon: 'bestMix', name: t('tools.bestMixTool'), text: t('tools.bestMixText') },
-        { href: '/tools/blender', icon: 'blender', name: t('tools.blender'), text: t('tools.blenderText') },
-      ],
-    },
+  // Read again each time the page is shown at the root of its section, and when the logbook
+  // changes (a download, a sync, a saved plan).
+  $effect(() => {
+    void logbook.dives;
+    if (logbook.loading || navigation.section !== 'tools' || !navigation.atRoot) return;
+    readPlans();
+  });
+
+  const plansText = $derived(plans === null ? '' : plans === 0 ? t('tools.plansNone') : t('tools.plansCount', { n: plans }));
+
+  /** @type {{ href: string, icon: 'depthGauge'|'bestMix'|'blender', shape: string, name: string, text: string }[]} */
+  const gases = $derived([
+    { href: '/tools/ead-mod', icon: 'depthGauge', shape: 'square', name: t('tools.eadMod'), text: t('tools.eadModText') },
+    { href: '/tools/best-mix', icon: 'bestMix', shape: 'circle', name: t('tools.bestMixTool'), text: t('tools.bestMixText') },
+    { href: '/tools/blender', icon: 'blender', shape: 'leaf', name: t('tools.blender'), text: t('tools.blenderText') },
   ]);
 </script>
 
-<Page class="od-tools" onPageInit={keepInSvelteRange}>
+<Page class="od-tools" onPageBeforeIn={readPlans}>
   <Navbar class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight><AccountAvatar /></NavRight>
@@ -66,74 +92,125 @@
   {#if !theme.ios}<BandBackdrop short />{/if}
   <SectionBand bare={!theme.ios} summary={t('band.tools')} />
 
-  {#each groups as group (group.title)}
-    <h2 class="od-tools--title">{group.title}</h2>
-    <div class="od-tools--surface" role="list">
-      {#each group.rows as row (row.href)}
-        <div role="listitem">
-          <!-- Only while the list and the tool are side by side: a large phone turned back
-               to portrait kept the planner's tint (Christian, 13 November 2026). -->
-          <a class="od-tools--row" class:od-tools--selected={layout.split && selected === row.href} href={row.href} data-reload-detail="true" onclick={select}>
-            <span class="od-tools--icon"><Icon name={row.icon} /></span>
-            <span class="od-tools--texts">
-              <span class="od-tools--label">{row.name}</span>
-              <span class="od-tools--supporting">{row.text}</span>
+  <div class="od-tools--content">
+    <div class="od-tools--dive">
+      <a class="od-tools--card" href="/plans/">
+        <span class="od-tools--card-row">
+          <span class="od-tools--card-icon od-tools--plan-icon"><Icon name="plan" /></span>
+          <span class="od-tools--texts">
+            <span class="od-tools--card-title">{t('tools.planner')}</span>
+            <span class="od-tools--card-line">{plansText}</span>
+          </span>
+          <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+        </span>
+      </a>
+
+      <a class="od-tools--card" href="/tools/desaturation" aria-label={desatLabel}>
+        <span class="od-tools--card-row">
+          <span class="od-tools--card-icon od-tools--desat-icon" class:od-tools--idle={desat?.kind === 'rest' || desat?.kind === 'empty'}>
+            <Icon name="desaturation" />
+          </span>
+          <span class="od-tools--texts">
+            <span class="od-tools--card-title">{t('tools.desaturation')}</span>
+            <span class="od-tools--card-line">
+              {#if desat?.kind === 'waiting'}
+                <span class="od-tools--flight od-value">{t('tools.flightIn', { time: wait })}</span>
+                · {t('tools.diveAgo', { time: ago })}
+              {:else if desat?.kind === 'allowed'}
+                {t('tools.flightAllowed')} · {t('tools.diveAgo', { time: ago })}
+              {:else if desat?.kind === 'rest'}
+                {t('tools.atRest')}
+              {:else if desat?.kind === 'empty'}
+                {t('tools.noDives')}
+              {/if}
             </span>
-            <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+          </span>
+          <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
+        </span>
+        {#if desat?.kind === 'waiting'}
+          <span class="od-tools--track" aria-hidden="true"><span class="od-tools--fill" style="width: {(desat.share * 100).toFixed(1)}%"></span></span>
+        {/if}
+      </a>
+    </div>
+
+    <h2 class="od-tools--title">{t('tools.groupGas')}</h2>
+    <div class="od-tools--tiles" role="list">
+      {#each gases as tool (tool.href)}
+        <div role="listitem">
+          <a class="od-tools--tile" href={tool.href}>
+            <span class="od-tools--tile-icon od-tools--{tool.shape}"><Icon name={tool.icon} /></span>
+            <span class="od-tools--tile-name">{tool.name}</span>
+            <span class="od-tools--tile-text">{tool.text}</span>
           </a>
         </div>
       {/each}
     </div>
-  {/each}
+  </div>
   <div class="od-tools--bottom"></div>
 </Page>
 
 <style>
   @layer od.components {
-    /* As Settings: titles on the page background, groups as rounded white surfaces. */
-    .od-tools--title {
-      margin: 0;
-      padding: 22px 20px 8px;
-      font-size: 18px;
-      line-height: 24px;
-      font-weight: 700;
-      color: var(--od-text);
+    .od-tools--content {
+      container-type: inline-size;
     }
 
-    .od-tools--surface {
-      margin: 0 16px;
-      border-radius: 20px;
+    /* The two dive tools: one under the other on a phone, side by side when there is room. */
+    .od-tools--dive {
+      margin: 12px 16px 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @container (min-width: 600px) {
+      .od-tools--dive {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .od-tools--tile {
+        min-height: 140px;
+      }
+    }
+
+    .od-tools--card {
+      display: block;
+      padding: 16px;
+      border-radius: 28px;
       background: var(--od-surface);
-      overflow: hidden;
-    }
-
-    .od-tools--row {
-      box-sizing: border-box;
-      width: 100%;
-      min-height: 72px;
-      padding: 8px 24px 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
       color: var(--od-text);
       text-decoration: none;
     }
 
-    /* Tablet: the tool shown beside the list. */
-    .od-tools--row.od-tools--selected {
-      background: var(--od-tint);
-      color: var(--od-on-tint);
-
-      .od-tools--supporting,
-      .od-tools--chevron {
-        color: inherit;
-      }
+    .od-tools--card-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .od-tools--icon {
+    .od-tools--card-icon {
       flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
       display: flex;
-      color: var(--od-text);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .od-tools--plan-icon {
+      background: var(--od-secondary-container);
+      color: var(--od-secondary);
+    }
+
+    .od-tools--desat-icon {
+      background: var(--od-tertiary-container);
+      color: var(--od-tertiary);
+
+      &.od-tools--idle {
+        background: var(--od-idle-container);
+        color: var(--od-text-2);
+      }
     }
 
     .od-tools--texts {
@@ -141,23 +218,111 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 2px;
     }
 
-    .od-tools--label {
+    .od-tools--card-title {
       font-size: 16px;
-      line-height: 22px;
+      line-height: 24px;
+      font-weight: 600;
     }
 
-    .od-tools--supporting {
+    .od-tools--card-line {
+      min-height: 20px;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
+    .od-tools--flight {
+      color: var(--od-tertiary);
+      font-weight: 600;
+    }
+
     .od-tools--chevron {
       flex: none;
       display: flex;
+      color: var(--od-text-2);
+    }
+
+    /* The wait before flying: the share of it already behind, under the text (52 dp in). */
+    .od-tools--track {
+      display: block;
+      margin: 12px 0 0 52px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--od-flight-track);
+      overflow: hidden;
+    }
+
+    .od-tools--fill {
+      display: block;
+      height: 100%;
+      border-radius: 2px;
+      background: var(--od-tertiary);
+    }
+
+    .od-tools--title {
+      margin: 20px 16px 8px 20px;
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+      color: var(--od-text);
+    }
+
+    .od-tools--tiles {
+      margin: 0 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .od-tools--tile {
+      box-sizing: border-box;
+      height: 100%;
+      min-height: 132px;
+      padding: 14px 12px;
+      border-radius: 24px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Three shapes, in the Material 3 Expressive spirit: rounded square, circle, leaf. */
+    .od-tools--tile-icon {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      background: var(--od-secondary-container);
+      color: var(--od-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.od-tools--square {
+        border-radius: 16px;
+      }
+
+      &.od-tools--circle {
+        border-radius: 22px;
+      }
+
+      &.od-tools--leaf {
+        border-radius: 12px 24px 12px 24px;
+      }
+    }
+
+    .od-tools--tile-name {
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    .od-tools--tile-text {
+      font-size: 13px;
+      line-height: 18px;
       color: var(--od-text-2);
     }
 

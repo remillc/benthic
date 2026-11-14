@@ -102,7 +102,7 @@ Files: [`docs/brand/`](brand/).
 - **Task screens** (Modifier la plongée, new site, git configuration, every screen with ✕ and Enregistrer): small top app bar, title 22/28 (Title Large), no band.
 - **Sheets** (dive, site, trip): the top bar carries only ←; the title is editorial and sits in the page (32 sp as drawn in the mock-ups; the current screens use 34 for the dive, 32 for the site and 28 for the trip).
 - **No 36 sp** (large flexible app bar) on phones.
-- **Tablets:** the list pane of the Carnet and the Statistiques and Outils pages use the same band and the same two sizes.
+- **Tablets:** the list pane of the Carnet, the Statistiques page and the Outils page (full width since 14 November 2026) use the same band and the same two sizes.
 - **iPhone and iPad** keep the iOS large title (Human Interface Guidelines), unchanged.
 
 ## 5. Android: Material 3 Expressive
@@ -160,7 +160,7 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 | Sections | Logbook, Sites, Statistics, Tools, then Account and Settings after a separator, in the side menu; the synchronisation state at the bottom of the menu. Account is a section (☰ in its top bar): the cloud account, its synchronisation and the server in use, or, without an account, the choices to create one or sign in | The same, plus Account and Settings at the bottom of the bar |
 | Logbook | List, then full-screen detail | List (340 px) and detail side by side |
 | Sites | Map at the top, list in a fixed panel below it (not a draggable bottom sheet: no handle, the panel scrolls on its own) | List on the left, map on the right |
-| Tools | List of tools, then full-screen planner | Parameters on the left, computed plan on the right |
+| Tools | Tools page (two state cards, three gas tiles), then full-screen planner | Parameters on the left, computed plan on the right |
 | Edit a dive | Full screen | iOS: 780 px sheet in two columns; Android: content pane in two columns |
 | Settings | Scrolling list | 600 px centred column; two columns on Android |
 
@@ -183,7 +183,7 @@ The four sections use the same band as their header, MD3 Small top app bar (☰,
 
 **Android tablet in portrait: no rail (decided on 10 November 2026).** The navigation rail shows only when the window is at least about 1000 dp wide (Android tablet in landscape). Below that width, in portrait on a tablet as on a phone, there is no rail: the first pane's top bar has the ☰ button that opens the modal side menu of the phone (300 dp, scrim, same content: account card, Carnet, Sites, Statistiques, Outils, Réglages, À propos, sync card), and the Carnet's "+" is the floating button at the bottom right of the screen (24 dp from the edges, over the detail pane, under any scrim), not of the list pane. The list and detail panes keep their widths (340 dp list in the Carnet, the detail takes the rest: 459 dp on an 800 dp tablet instead of 363). Landscape is unchanged. Mock-ups: `android-tablette-accueil-portrait.dc.html`, `android-tablette-accueil-portrait-menu.dc.html` (menu open), and every `android-tablette-*-portrait.dc.html`.
 
-**Back arrow in the detail pane, tablets (decided on 11 November 2026).** In the two-pane layouts (list on the left, detail on the right: Carnet, Statistiques, Outils, and Sites when it shows two panes), the detail pane has its own history.
+**Back arrow in the detail pane, tablets (decided on 11 November 2026).** In the two-pane layouts (list on the left, detail on the right: Carnet, Statistiques, and Sites when it shows two panes), the detail pane has its own history.
 - **First screen of the pane** (what a row of the list opened: a dive, a trip, a statistic, a tool): no ←. The list is on screen, so there is nothing to go back to: the diver picks another row. The top bar keeps its actions (✎, ⋮), aligned right, with the ← space left empty.
 - **Deeper screens** (opened from inside the pane: dive → site, dive → buddy's dives, trip → dive, statistic → dive): ← at the top left, 48 dp target. It goes back one screen **in the detail pane only**. The list, its scroll position and its selected row do not change.
 - **Android system back** (gesture or button) does the same as ← while the pane has history. When the pane is at its first screen, system back does what it does on the list alone (in Carnet, leaves the app; in another section, goes back to Carnet), and never only clears the selection.

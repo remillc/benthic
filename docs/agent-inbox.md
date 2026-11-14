@@ -2504,7 +2504,7 @@ Tablet: same pages in the right pane. Settings search still finds each moved row
 
 Done in feature/settings-display-decompression: Affichage holds the theme, « Profil de plongée » and « Graphique de pO₂ en recycleur »; « Décompression » at /settings/decompression opens on the warning; the Recycleur block keeps its four rows; texts changed in fr and en; ui-specification Settings listing updated. Checked on the phone emulator in fr and en (each moved switch changes its core setting; search finds them) and on the tablet. Also fixed: two switches flipped quickly no longer overwrite each other (core changes are queued).
 
-## [ ] 2026-11-14-122 Outils: a livelier page, with the state of the planner and of the desaturation
+## [x] 2026-11-14-122 Outils: a livelier page, with the state of the planner and of the desaturation
 
 Christian's decision of 14 November 2026. The Tools page stops being a plain list of links: its two dive tools show their state, and the gas tools become tiles. Mock-ups in `docs/mockups/`: `android-outils.dc.html` (phone), `android-tablette-outils-paysage.dc.html`, `android-tablette-outils-portrait.dc.html`. The header band and the bottom navigation bar (task 120) are unchanged. The tools' own screens are unchanged.
 
@@ -2523,3 +2523,5 @@ The cards update when the page is shown again (after a download, a sync, a saved
 **Tablet** (landscape and portrait): the same content in the page's pane; the Planificateur and Désaturation cards side by side (two equal columns, 12 dp apart), the three gas tiles in one row under them. Links open the tablet screens of each tool, as today.
 
 Update `docs/ui-specification.md` (the « Tools page and gas tools » paragraph) to match: it no longer describes a list of rows. Check on the phone and tablet emulators, fr and en, with a logbook whose last dive is recent, one whose last dive is older than 48 h, and an empty logbook, and with 0, 1 and several planned dives.
+
+Done in feature/tools-page-state: Planificateur and Désaturation cards with their state (lib/tools-page.js, tested: waiting, allowed, at rest, empty), Gaz tiles in three shapes; on tablets the page is full width with no list pane (Christian's choice in the chat, following the mock-ups), the cards side by side. ui-specification and system-design updated. Checked on the phone emulator in fr and en, light and dark, with a recent dive, a dive older than the wait, an empty logbook and 0, 1 and several planned dives (in memory, nothing written), and on the tablet in landscape and portrait.

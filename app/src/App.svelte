@@ -215,28 +215,9 @@
     ...appRoutes,
   ];
 
-  /** The Tools view's routes (tablet): the list of tools is the master, the tool opens beside it. */
-  const toolsRoutes = [
-    {
-      path: '/tools/',
-      component: Tools,
-      master: true,
-      detailRoutes: [
-        { path: '/plans/', component: Plans },
-        { path: '/plans/:id', component: Planner, options: { props: { reopen: true } } },
-        { path: '/plan/:id', component: Planner },
-        { path: '/tools/desaturation', component: Desaturation },
-        { path: '/tools/ead-mod', component: GasEadMod },
-        { path: '/tools/best-mix', component: GasBestMix },
-        { path: '/tools/blender', component: GasBlender },
-      ],
-    },
-    ...appRoutes,
-  ];
-
-  /** Widths of the lists beside a result (Statistics) and beside a tool (Tools), from the tablet mock-ups. */
+  /** Width of the list beside a result (Statistics), from the tablet mock-ups. Tools has no
+      list pane since task 2026-11-14-122: its page takes the width, a tool opens over it. */
   const statisticsListWidth = ios ? 420 : 400;
-  const toolsListWidth = 360;
 
   const f7params = {
     name: 'OpenDives',
@@ -323,14 +304,7 @@
       masterDetailBreakpoint={splitBreakpoint}
       style="--f7-page-master-width: {statisticsListWidth}px; --od-no-dive: '{t('tablet.noStatistic')}'"
     />
-    <View
-      id="view-tools"
-      tab
-      url="/tools/"
-      routes={toolsRoutes}
-      masterDetailBreakpoint={splitBreakpoint}
-      style="--f7-page-master-width: {toolsListWidth}px; --od-no-dive: '{t('tablet.noTool')}'"
-    />
+    <View id="view-tools" tab url="/tools/" />
     <View id="view-account" tab url="/account" routes={accountRoutes} masterDetailBreakpoint={splitBreakpoint} />
   </Views>
 </App>

@@ -858,8 +858,7 @@
   },
   "tablet": {
     "noDive": "Choisissez une plongée pour la voir ici",
-    "noStatistic": "Choisissez une statistique pour la voir ici",
-    "noTool": "Choisissez un outil pour l’utiliser ici"
+    "noStatistic": "Choisissez une statistique pour la voir ici"
   },
   "menu": {
     "open": "Menu",
@@ -1479,18 +1478,15 @@
   },
   "tools": {
     "title": "Outils",
-    "groupDive": "Plongée",
     "groupGas": "Gaz",
     "planner": "Planificateur de plongée",
-    "plannerText": "Plongées planifiées et nouveaux plans",
     "desaturation": "Désaturation",
-    "desaturationText": "D’après vos dernières plongées",
     "eadMod": "EAD et MOD",
     "eadModText": "Profondeurs d’un mélange",
     "bestMixTool": "Meilleur mélange",
-    "bestMixText": "Pour une profondeur donnée",
+    "bestMixText": "Pour une profondeur",
     "blender": "Mélangeur de gaz",
-    "blenderText": "Gonfler un nitrox ou un trimix",
+    "blenderText": "Nitrox ou trimix",
     "oxygen": "Oxygène",
     "helium": "Hélium",
     "gasInvalid": "Oxygène de 1 à 100 %, oxygène et hélium ensemble 100 % au plus",
@@ -1555,7 +1551,23 @@
     "blendCooled": "Pressions à lire bouteille refroidie.",
     "blendOxygenClean": "Au-delà de 40 % d’oxygène, la bouteille et le robinet doivent être nettoyés pour l’oxygène.",
     "blendAnalyse": "Analysez le mélange avant de plonger.",
-    "hoursMinutes": "{h} h {m}"
+    "hoursMinutes": "{h} h {m}",
+    "plansNone": "Aucune plongée planifiée",
+    "plansCount": {
+      "one": "{n} plongée planifiée",
+      "other": "{n} plongées planifiées"
+    },
+    "flightIn": "Avion dans {time}",
+    "flightAllowed": "Avion permis",
+    "diveAgo": "plongée il y a {time}",
+    "atRest": "Au repos",
+    "noDives": "Aucune plongée au carnet",
+    "desaturationLabel": {
+      "waiting": "Désaturation : avion dans {time}, dernière plongée il y a {ago}",
+      "allowed": "Désaturation : avion permis, dernière plongée il y a {ago}",
+      "rest": "Désaturation : au repos",
+      "empty": "Désaturation : aucune plongée au carnet"
+    }
   },
   "desaturation": {
     "title": "Désaturation",
@@ -1692,6 +1704,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Outils : le planificateur montre le nombre de plongées planifiées et la désaturation l’attente avant l’avion ; les outils de gaz deviennent des tuiles. Sur tablette, la page prend toute la largeur.",
       "Réglages : les options du profil et du graphique de pO₂ passent dans Affichage ; « Profil et décompression » devient « Décompression ».",
       "Glisser entre les sections, entre les plongées ou vers Réglages et À propos : l’écran suit le doigt dès le début et finit son mouvement à la vitesse du doigt.",
       "Téléphone Android : barre de navigation en bas (Carnet, Sites, Statistiques, Outils) ; le compte, la synchronisation, Réglages et À propos s’ouvrent depuis l’avatar en haut à droite.",

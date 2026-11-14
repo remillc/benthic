@@ -40,6 +40,9 @@
     --od-tertiary: #B4530F;
     --od-on-tertiary: #FFFFFF;
     --od-tertiary-container: #FBE3B2;
+    /* The Tools page (task 2026-11-14-122): the wait before flying's track; a tool with nothing to report. */
+    --od-flight-track: #F3E3C8;
+    --od-idle-container: #E8E8E5;
     /* Charts that do not measure depth: smallest value, largest value. */
     /* The stripes of a reserve, on the tertiary container. */
     --od-tertiary-hatch: #EDC691;
@@ -203,6 +206,8 @@
     --od-tertiary: #F0A66B;
     --od-on-tertiary: #3D2200;
     --od-tertiary-container: #4A3216;
+    --od-flight-track: #5C4124;
+    --od-idle-container: #2E3033;
     --od-tertiary-hatch: #6A4A22;
     --od-gauge-used: #4C8BD4;
     --od-gauge-track: #2A4466;

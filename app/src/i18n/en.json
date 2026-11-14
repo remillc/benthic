@@ -858,8 +858,7 @@
   },
   "tablet": {
     "noDive": "Choose a dive to see it here",
-    "noStatistic": "Choose a statistic to see it here",
-    "noTool": "Choose a tool to use it here"
+    "noStatistic": "Choose a statistic to see it here"
   },
   "menu": {
     "open": "Menu",
@@ -1479,18 +1478,15 @@
   },
   "tools": {
     "title": "Tools",
-    "groupDive": "Diving",
     "groupGas": "Gas",
     "planner": "Dive planner",
-    "plannerText": "Planned dives and new plans",
     "desaturation": "Desaturation",
-    "desaturationText": "From your latest dives",
     "eadMod": "EAD and MOD",
     "eadModText": "Depths of a mix",
     "bestMixTool": "Best mix",
-    "bestMixText": "For a given depth",
+    "bestMixText": "For a depth",
     "blender": "Gas blender",
-    "blenderText": "Fill a nitrox or a trimix",
+    "blenderText": "Nitrox or trimix",
     "oxygen": "Oxygen",
     "helium": "Helium",
     "gasInvalid": "Oxygen from 1 to 100 %, oxygen and helium together 100 % at most",
@@ -1555,7 +1551,23 @@
     "blendCooled": "Read the pressures on a cooled cylinder.",
     "blendOxygenClean": "Above 40 % oxygen, the cylinder and the valve must be oxygen clean.",
     "blendAnalyse": "Analyse the mix before diving.",
-    "hoursMinutes": "{h} h {m} min"
+    "hoursMinutes": "{h} h {m} min",
+    "plansNone": "No planned dives",
+    "plansCount": {
+      "one": "{n} planned dive",
+      "other": "{n} planned dives"
+    },
+    "flightIn": "Flying in {time}",
+    "flightAllowed": "Flying allowed",
+    "diveAgo": "dive {time} ago",
+    "atRest": "At rest",
+    "noDives": "No dives in the logbook",
+    "desaturationLabel": {
+      "waiting": "Desaturation: flying in {time}, last dive {ago} ago",
+      "allowed": "Desaturation: flying allowed, last dive {ago} ago",
+      "rest": "Desaturation: at rest",
+      "empty": "Desaturation: no dives in the logbook"
+    }
   },
   "desaturation": {
     "title": "Desaturation",
@@ -1692,6 +1704,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tools: the planner shows the number of planned dives and desaturation the wait before flying; the gas tools become tiles. On tablets the page takes the full width.",
       "Settings: the profile and pO₂ graph options move to Display; “Profile and decompression” becomes “Decompression”.",
       "Swiping between sections, between dives or to Settings and About: the screen follows the finger from the start and finishes at the finger’s speed.",
       "Android phone: navigation bar at the bottom (Logbook, Sites, Statistics, Tools); the account, sync, Settings and About open from the avatar at the top right.",
