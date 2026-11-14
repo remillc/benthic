@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Compte, Android, supprimer le compte</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/98bdd40d9c9776c0342c6095fa88b728) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/76fec74eed7ca9cbf97f9dc41adaf95a) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/9b710693576c78c27e4c783038abf91e) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/839602f67bc365daeaccdf214af3f9bc) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fd76e9f7a6ebec405432b97fb664c642) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fda13f7bdf9af1e9052b5e364691135) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div class="od-delete-wizard" style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F4F0; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124; position: relative; overflow: hidden">
+  <div style="padding: 32px 4px 0 4px; height: 64px; box-sizing: content-box; display: flex; align-items: center">
+    <a href="#retour" aria-label="Retour à l'étape précédente" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 12H5 M11 6l-6 6 6 6"></path></svg></a>
+    <h1 style="margin: 0 0 0 4px; font-size: 22px; font-weight: 500">Supprimer le compte cloud</h1>
+  </div>
+  <div class="od-delete-wizard--steps" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="3" aria-label="Étape 3 sur 3" style="margin: 4px 16px 0 16px; display: flex; flex-direction: column; gap: 8px"><span style="display: flex; gap: 4px"><span style="flex: 1; height: 4px; border-radius: 2px; background: #114477"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #114477"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #114477"></span></span><span style="font-size: 12px; line-height: 16px; color: #4B4A47">Étape 3 sur 3 · Confirmer</span></div>
+  <div style="margin: 24px 16px 0 16px; padding: 16px; border-radius: 16px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 14px; font-weight: 600; color: #4B4A47">En résumé</span>
+    <div style="display: flex; gap: 16px; align-items: flex-start; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #C62828; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v5 M14 11v5"></path></svg><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">Effacé du cloud</span><span style="font-size: 14px; line-height: 20px; color: #4B4A47">Le compte vous@exemple.com et ses 1&nbsp;353 plongées</span></span></div>
+    <div style="display: flex; gap: 16px; align-items: flex-start; padding: 0"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z M11 18h2"></path></svg><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px">Gardé sur ce téléphone</span><span style="font-size: 14px; line-height: 20px; color: #4B4A47">1&nbsp;353 plongées, dans un carnet sans compte</span></span></div>
+  </div>
+  <div style="margin: 24px 16px 0 16px; position: relative">
+    <span style="position: absolute; left: 16px; top: 8px; font-size: 12px; line-height: 16px; color: #1F2124">Mot de passe du compte</span>
+    <div style="height: 56px; padding: 18px 16px 0 16px; box-sizing: border-box; background: #EBEAE5; border: none; border-bottom: 2px solid #1F2124; border-radius: 4px 4px 0 0; display: flex; align-items: center; font-size: 16px"><span aria-hidden="true" style="display: inline-block; width: 2px; height: 20px; background: #1F2124"></span></div>
+    <span style="display: block; margin-top: 4px; padding-left: 16px; font-size: 12px; color: #4B4A47">Pour confirmer que c'est bien vous</span>
+  </div>
+  <p style="margin: 16px 20px 0 20px; font-size: 14px; line-height: 20px; color: #4B4A47">Les modifications en attente sont envoyées d'abord. Le compte n'est supprimé qu'après la confirmation du serveur.</p>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 32px; display: flex; flex-direction: column; gap: 8px">
+    <button disabled aria-disabled="true" style="height: 48px; border: none; border-radius: 24px; background: rgba(31, 33, 36, 0.12); color: rgba(31, 33, 36, 0.38); font-family: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v5 M14 11v5"></path></svg>Supprimer définitivement le compte</button>
+    <button style="height: 40px; border: none; border-radius: 20px; background: none; color: #1F2124; font-family: inherit; font-size: 15px; font-weight: 500">Annuler</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>
