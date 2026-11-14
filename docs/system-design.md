@@ -354,6 +354,7 @@ Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoye
 - Text: 14 sp, line height 20 sp, `--od-inverse-on-surface` #F4F4F2 (dark mode #1F2124).
 - Action: a text button, 40 dp high, 12 dp side padding, 14 sp semibold, in `--od-inverse-primary` #8AB4F8 (dark mode #2F6DB5). At most one action, usually "Annuler".
 - Duration: at least 4 s, 6 s when there is an action. One snackbar at a time; a new one replaces the old.
+- Swipe to the right to send it away (Christian, 14 November 2026): it follows the finger; past a quarter of its width, or with a quick flick, it leaves to the right and closes without running its action; otherwise it springs back. Not from the action button.
 - `role="status"` so screen readers announce it; the action stays reachable with the keyboard and TalkBack until the snackbar closes.
 
 ## 9. States and messages

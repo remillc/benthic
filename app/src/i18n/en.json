@@ -1723,6 +1723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Messages at the bottom of the screen: a swipe to the right sends them away.",
       "Edit dive: the suggested weight only shows on the most recent dive of the logbook.",
       "Dive with several computers: the dive shows them all, “Make main” chooses the profile’s one, and the end of a download says when dives were joined to dives already in the logbook.",
       "Dialogs: when the buttons do not fit on one line, they stack, the main action on top; no label is cut.",
