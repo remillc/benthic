@@ -1706,6 +1706,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Signing in: the wavy progress indicator is blue on a pale blue track, 16 dp from the edges, under the bar; with “Remove animations”, a flat bar slides. The sync bar takes the same colours.",
       "Account: under the address, “Subsurface cloud” instead of “Subsurface account verified”.",
       "Tools: the gas tools are rows of one card, like the planner.",
       "iPhone: a tab bar at the bottom (Logbook, Sites, Statistics, Tools) and the account initial at the top right, which opens the account sheet; no more side menu.",

@@ -196,8 +196,9 @@
       flex-direction: column;
     }
 
+    /* 16 dp at the top: the 10 dp band of the busy indicator stays clear of the overline. */
     .od-editorial-page--heading {
-      padding: 8px 24px 0;
+      padding: 16px 24px 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -295,12 +296,13 @@
       flex: none;
     }
 
-    /* MD3 Expressive wavy linear progress indicator, indeterminate, under the top bar. */
+    /* MD3 Expressive wavy linear progress indicator, indeterminate, under the top bar, 16 dp
+       from each side (compte-connexion-encours-android.dc.html, task 2026-11-14-130). */
     .od-editorial-page--linear {
       position: absolute;
       z-index: 600;
-      left: 0;
-      right: 0;
+      left: 16px;
+      right: 16px;
       top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
       height: 10px;
     }

@@ -1706,6 +1706,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Connexion : l’indicateur de progression ondulé est bleu sur une piste bleu pâle, à 16 dp des bords, sous la barre ; avec « Supprimer les animations », une barre plate glisse. La barre de synchronisation prend les mêmes couleurs.",
       "Compte : sous l’adresse, « Cloud Subsurface » au lieu de « Compte Subsurface vérifié ».",
       "Outils : les outils de gaz sont des rangées d’une même carte, comme le planificateur.",
       "iPhone : barre d’onglets en bas (Carnet, Sites, Statistiques, Outils) et initiale du compte en haut à droite, qui ouvre la feuille du compte ; plus de menu latéral.",
