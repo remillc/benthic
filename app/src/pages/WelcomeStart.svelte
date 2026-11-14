@@ -3,13 +3,15 @@
   // First launch (spec, section 4, "First launch, redesigned"; Android:
   // docs/mockups/android-accueil-c.dc.html, iPhone: ios-accueil.dc.html): three
   // ways to start, each with its consequence. Android: the logo, a large title,
-  // a dive profile, then three pill buttons of decreasing weight at the bottom.
+  // a dive profile, then three pill buttons of decreasing weight at the bottom: filled,
+  // outlined, tonal (task 2026-11-14-123), and under a thin divider the git link.
   // iOS: an inset grouped list with chevrons.
   import { Page, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { layout } from '../lib/layout.svelte.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -63,10 +65,11 @@
           <p class="od-welcome-start--note">{t('welcome.createNote')}</p>
         </div>
         <div class="od-welcome-start--option">
-          <a href="#no-account" class="od-welcome-start--pill od-welcome-start--pill-text external" onclick={withoutAccount}>{t('welcome.noAccount')}</a>
-          <p class="od-welcome-start--note">{t('welcome.noAccountNote')}</p>
+          <a href="#no-account" class="od-welcome-start--pill od-welcome-start--pill-tonal external" onclick={withoutAccount}>{t('welcome.noAccount')}</a>
+          <p class="od-welcome-start--note">{t(layout.phone ? 'welcome.noAccountNotePhone' : 'welcome.noAccountNoteTablet')}</p>
         </div>
       </nav>
+      <div class="od-welcome-start--divider" role="presentation"></div>
       <a href="/welcome/git" class="od-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
       </div>
     </div>
@@ -230,6 +233,24 @@
 
     .od-welcome-start--pill-outlined {
       border: 1px solid var(--od-chip-outline);
+    }
+
+    .od-welcome-start--pill-tonal {
+      background: var(--od-idle-container);
+    }
+
+    /* Between the three choices and the git link: 260 dp on phones, 200 dp on tablets. */
+    .od-welcome-start--divider {
+      flex: none;
+      width: 260px;
+      max-width: calc(100% - 48px);
+      height: 1px;
+      margin: 0 auto 4px;
+      background: var(--od-surface-container-highest);
+
+      @media (min-width: 768px) {
+        width: 200px;
+      }
     }
 
     .od-welcome-start--note {

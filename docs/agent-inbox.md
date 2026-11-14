@@ -2526,7 +2526,7 @@ Update `docs/ui-specification.md` (the « Tools page and gas tools » paragraph)
 
 Done in feature/tools-page-state: Planificateur and Désaturation cards with their state (lib/tools-page.js, tested: waiting, allowed, at rest, empty), Gaz tiles in three shapes; on tablets the page is full width with no list pane (Christian's choice in the chat, following the mock-ups), the cards side by side. ui-specification and system-design updated. Checked on the phone emulator in fr and en, light and dark, with a recent dive, a dive older than the wait, an empty logbook and 0, 1 and several planned dives (in memory, nothing written), and on the tablet in landscape and portrait.
 
-## [ ] 2026-11-14-123 First launch and About: the retained logo, and « Commencer sans compte » as a button
+## [x] 2026-11-14-123 First launch and About: the retained logo, and « Commencer sans compte » as a button
 
 Christian's decisions of 14 November 2026. Mock-ups in `docs/mockups/`: `android-accueil-c.dc.html`, `android-tablette-premier-lancement-paysage.dc.html`, `android-tablette-premier-lancement-portrait.dc.html`, `apropos-android.dc.html`, `android-tablette-apropos-paysage.dc.html`, `android-tablette-apropos-portrait.dc.html`.
 
@@ -2538,3 +2538,5 @@ Christian's decisions of 14 November 2026. Mock-ups in `docs/mockups/`: `android
 - A thin divider (1 dp, #E3E1DC, inset, about 260 dp wide on phones, 200 dp on tablets) separates the three choices from the « Utiliser mon propre dépôt git » link.
 
 Check on the phone and tablet emulators, light and dark (in dark, keep the logo's dark variant of the same board), fr and en.
+
+Done in feature/logo-first-launch: the light logo assets already were the retained « A océan-nuit » version (grey arc, #114477 bubbles, from fix/logo-ring-bubbles); the account sheet now uses that pair (light, and the dark variant in dark mode) instead of logo-small-light.svg, removed; the app icon is untouched. « Commencer sans compte » is a tonal 56 dp pill, its text says the logbook stays on this phone (this device on tablets), and a 1 dp divider precedes the git link. Checked on the phone (light, dark, en) and tablet (landscape, portrait, fr) emulators.

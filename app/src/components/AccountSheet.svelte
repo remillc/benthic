@@ -46,7 +46,9 @@
       <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
         <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
       </button>
-      <img class="od-account-sheet--logo" src="/logo-small-light.svg" alt="" width="24" height="24" />
+      <!-- The retained logo of the light surfaces, and its dark variant (task 2026-11-14-123). -->
+      <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
+      <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
       <span class="od-account-sheet--title">{t('menu.title')}</span>
     </div>
 
@@ -124,6 +126,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .od-account-sheet--dark,
+    :global(html.dark) .od-account-sheet--light {
+      display: none;
+    }
+
+    :global(html.dark) .od-account-sheet--dark {
+      display: block;
     }
 
     .od-account-sheet--title {

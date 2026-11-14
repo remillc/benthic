@@ -958,7 +958,8 @@
     "existingNote": "Sauvegardé dans le cloud, consultable hors ligne",
     "createShort": "Créer un compte",
     "createNote": "Gratuit. Partagé entre vos appareils",
-    "noAccountNote": "Sur cet appareil seulement"
+    "noAccountNotePhone": "Le carnet reste sur ce téléphone. Vous pourrez le sauvegarder plus tard",
+    "noAccountNoteTablet": "Le carnet reste sur cet appareil. Vous pourrez le sauvegarder plus tard"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -1704,6 +1705,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement : « Commencer sans compte » devient un vrai bouton, avec ce qu’il implique écrit dessous ; le logo des fonds clairs est aussi celui de la feuille du compte.",
       "Outils : le planificateur montre le nombre de plongées planifiées et la désaturation l’attente avant l’avion ; les outils de gaz deviennent des tuiles. Sur tablette, la page prend toute la largeur.",
       "Réglages : les options du profil et du graphique de pO₂ passent dans Affichage ; « Profil et décompression » devient « Décompression ».",
       "Glisser entre les sections, entre les plongées ou vers Réglages et À propos : l’écran suit le doigt dès le début et finit son mouvement à la vitesse du doigt.",
