@@ -1723,6 +1723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dive: swiping to the next or previous dive moves both dives side by side (phone).",
       "Messages at the bottom of the screen: a swipe to the right sends them away.",
       "Edit dive: the suggested weight only shows on the most recent dive of the logbook.",
       "Dive with several computers: the dive shows them all, “Make main” chooses the profile’s one, and the end of a download says when dives were joined to dives already in the logbook.",

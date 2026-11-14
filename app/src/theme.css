@@ -1212,6 +1212,11 @@ html.md {
     animation: none;
   }
 
+  /* A swipe to the previous dive: the new page comes from the left (DiveDetail.svelte). */
+  .view.od-pushing.od-pushing-back > .page:not(.od-push-from) {
+    transform: translate3d(calc(-100% + var(--od-push-dx)), 0, 0);
+  }
+
   .view.od-pushing > .page.od-push-from {
     transform: translate3d(var(--od-push-dx), 0, 0);
   }

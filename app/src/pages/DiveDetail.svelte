@@ -88,16 +88,92 @@
     f7router.navigate(`${base}${id}`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
   }
 
+  /** The neighbour dive's id on the side of a swipe of `dx`, or undefined. @param {number} dx */
+  function neighbourId(dx) {
+    const ids = listOrder();
+    const at = ids.indexOf(Number(diveId));
+    return at < 0 ? undefined : ids[at + (dx < 0 ? 1 : -1)];
+  }
+
+  /**
+   * Phone (Christian's request of 14 November 2026): the two dives side by side. As soon as the
+   * finger moves, the neighbour dive's page opens without animation beside this one (its detail is
+   * preloaded), and both follow the finger (the --od-push-dx of theme.css, as Réglages → À propos).
+   * Through: this page leaves the history, so that back still goes to the list. Not through: back
+   * to this one, without animation.
+   * @param {HTMLElement} pageEl
+   */
+  function sideBySide(pageEl) {
+    /** @type {null|{ view: HTMLElement, dir: -1|1, width: number }} */
+    let push = null;
+    let busy = false;
+    const clamp = (/** @type {number} */ dx) => (push ? (push.dir < 0 ? Math.min(dx, 0) : Math.max(dx, 0)) : dx);
+    return {
+      /** @param {number} dx */
+      move(dx) {
+        if (busy) return;
+        if (!push) {
+          const id = neighbourId(dx);
+          const view = /** @type {HTMLElement|null} */ (pageEl.parentElement);
+          if (id === undefined || !view) return false;
+          push = { view, dir: dx < 0 ? -1 : 1, width: view.clientWidth };
+          pageEl.classList.add('od-push-from');
+          view.style.setProperty('--od-push-dx', '0px');
+          view.classList.add('od-pushing');
+          if (push.dir > 0) view.classList.add('od-pushing-back');
+          const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
+          f7router.navigate(`${base}${id}`, { animate: false });
+        }
+        push.view.style.setProperty('--od-push-dx', `${clamp(dx)}px`);
+        return true;
+      },
+      /** @param {number} dx @param {number} velocity */
+      end(dx, velocity) {
+        if (!push) return false;
+        const { view, dir, width } = push;
+        const x = clamp(dx);
+        const through = x !== 0 && swipeGoesThrough(x, velocity, width);
+        const target = through ? dir * width : 0;
+        const { easing, ms } = settle(x, target, x !== 0 ? velocity : 0);
+        busy = true;
+        view.style.setProperty('--od-push-ease', easing);
+        view.style.setProperty('--od-push-ms', `${ms}ms`);
+        view.classList.add('od-push-settle');
+        view.style.setProperty('--od-push-dx', `${target}px`);
+        setTimeout(() => {
+          if (through) {
+            // This dive's page leaves the history: the new one takes its place.
+            const history = f7router.history;
+            history.splice(history.length - 2, 1);
+            f7router.view.history = [...history];
+            f7router.saveHistory?.();
+            f7router.pageCallback?.('beforeRemove', f7.$(pageEl), 'previous', undefined, {});
+            f7router.removePage(pageEl);
+          } else {
+            f7router.back({ animate: false });
+          }
+          view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
+          for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
+          pageEl.classList.remove('od-push-from');
+          push = null;
+          busy = false;
+        }, ms);
+        return true;
+      },
+    };
+  }
+
   /**
    * The page follows the finger; lifted past a quarter of the width (or
    * flicked), it goes out on that side and the next dive comes in from the
    * other; otherwise it comes back. At the first or last dive it only gives
-   * a little.
+   * a little. On a phone the next dive is beside it all the way (sideBySide).
    * @param {any} page Framework7's page
    */
   function watchSwipes(page) {
     const content = /** @type {HTMLElement|null} */ (page.el.querySelector('.page-content'));
     if (!content) return;
+    const pair = sideBySide(page.el);
     /** @param {number} dx */
     const hasNeighbour = (dx) => {
       const ids = listOrder();
@@ -107,12 +183,14 @@
     horizontalSwipe(content, {
       accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.od-dive-profile--profile')) && !document.querySelector('.modal-in'),
       move(dx) {
+        if (!layout.split && pair.move(dx)) return;
         const shown = hasNeighbour(dx) ? dx : dx / 3;
         content.style.transition = '';
         content.style.transform = `translateX(${shown}px)`;
         content.style.opacity = String(1 - Math.min(Math.abs(shown) / content.clientWidth, 1) / 2);
       },
       end(dx, velocity) {
+        if (!layout.split && pair.end(dx, velocity)) return;
         const width = content.clientWidth;
         const neighbour = hasNeighbour(dx);
         const through = neighbour && swipeGoesThrough(dx, velocity, width);
