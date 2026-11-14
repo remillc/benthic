@@ -3067,3 +3067,35 @@ Item 4 was added to task 154 after you had started it, so it was not done: `app/
 Check on the phone emulator with the test account: Lock 21 red, the sites around it yellow to green, a lone site with one dive blue.
 
 Done in fix/heat-ramp. 1: theme.css --od-heat-1..6 (least to most) #1E5BD8, #3FB5D9, #5CC06A, #F2D43A, #F07C1E, #D7191C, light and dark alike, plus --od-heat-fade #6FC3F0; lib/heat-density.js rampColour takes any number of stops and a fade colour: the fade colour at 0, the first stop at 12 %, the others evenly up to red at 1, the 2 % threshold and the 0.15–0.85 alpha of task 154 kept; SiteMap reads the six stops and the fade. 2: the lowest density fades through light blue. 3: the legend bar shows the six stops, Moins left, Plus right, on the card and in full screen. Test values of tests/app/heat-density.test.mjs changed with the ramp (the new stops). Checked on the phone emulator with the test account: Lock 21 orange to red at its centre, the sites around yellow to green, lone sites blue.
+
+## [ ] 2026-11-14-162 Heat map: how the colour scale works, and how density spreads over the ramp
+
+Christian asked on 14 November 2026 that this be written out for you and in the spec. It completes tasks 155 and 161; where `SiteMap` already does it, keep it and say so.
+
+**1. The scale is relative to the filter, and fixed while exploring.**
+- The top of the ramp (red) is the densest value **of the current Statistics filter**, measured once at the opening framing (`heatScale`, task 155). It is not an absolute number of dives: with the whole logbook it is Lock 21 (144 dives); with « 2025 » or « dry suit » it is the busiest place of that subset, which is red too.
+- Once the map is open, the scale does not change when panning or zooming: Lock 21 stays red up close, a site with one dive stays blue even alone on screen.
+- It is computed again only when the filter changes (and when the dives change: a sync, an import).
+- Why not absolute (« red from 100 dives »): a small filter or a new diver would see almost only blue. The legend « Moins / Plus » carries no numbers on purpose.
+
+**2. How a density value becomes a colour.**
+- Let d be the density at a pixel and D the scale above. The position on the ramp is **t = √(d / D)**, clamped to 1. The square root spreads the values: with one dominant site, a linear t would leave every other site in the first blue; with √, a site with a quarter of the top density sits halfway (yellow-green).
+- Under t = 0.05 nothing is drawn (transparent).
+- Ramp stops on t (task 161's colours):
+
+| t | colour |
+|---|---|
+| 0.05 | #6FC3F0, alpha 0 (fade-in) |
+| 0.12 | #1E5BD8 |
+| 0.30 | #3FB5D9 |
+| 0.48 | #5CC06A |
+| 0.66 | #F2D43A |
+| 0.83 | #F07C1E |
+| 1.00 | #D7191C |
+
+- Colours are interpolated between stops. Alpha grows with t: 0 at 0.05, 0.6 at 0.30, 0.85 from 0.48 up, so the low end stays see-through and the map under it readable.
+- The legend draws the same ramp from t = 0.12 to 1 (« Moins » on the left at #1E5BD8, « Plus » on the right at #D7191C).
+
+**3. Spec.** Write both points in `docs/ui-specification.md` (Statistics, heat map), with the table, so the rule is kept when the map changes.
+
+Test (tests/app/heat-density.test.mjs): t = √(d/D); d = D gives #D7191C; d = D/4 gives the colour at t = 0.5 (between #5CC06A and #F2D43A); d under 0.0025·D gives nothing; the scale is unchanged after a zoom and recomputed after a filter change.
