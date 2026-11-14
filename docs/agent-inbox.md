@@ -2705,3 +2705,16 @@ Christian's correction of 14 November 2026 to task 140 (already done in `f70735a
 Check the app with the device in French (Canada) and in French (France).
 
 Done in fix/courriel-fr-ca: fr.json says « e-mail » again in the five strings of task 140 (E-mail, Adresse e-mail twice, « envoyé par e-mail », « Cette adresse e-mail n’est pas valide »), and in three older ones that said « courriel » (« Un lien est envoyé à votre adresse e-mail », « Par e-mail, avec les informations techniques », « s’ouvre dans l’application de messagerie »; account.createText keeps « par e-mail »). fr-CA.json holds the « courriel » versions of all of them. The release notes are left as written. Also fixed: fr-CA.json still overrode account.deleteText with the sentence of before task 139; it now has task 139's text with « nuage ». The site's French pages come from fr.json and have no Canadian version, so they say « e-mail ». docs/ui-writing.md: the rule is fr-CA « courriel », fr « e-mail ». Checked by resolving each key in both catalogs (fr-CA, then fr), not on the device's language.
+
+## [ ] 2026-11-14-142 About: « Libre, et votre carnet aussi »
+
+Christian's to-do #57, decided on 14 November 2026. Mock-up: `docs/mockups/apropos-android.dc.html`.
+
+In About, right under the logo, version, tagline and author, before the « Projet » group, add a white card (20 dp corners, 16 dp padding):
+
+- title « Libre, et votre carnet aussi » (18 sp bold, a heading for TalkBack and VoiceOver);
+- « L’app et son code sont toujours disponibles gratuitement sur GitHub. Chacun peut lire le code, le modifier et le partager. »;
+- « Votre carnet vous appartient : au format Subsurface, il se copie et s’ouvre aussi dans Subsurface sur ordinateur. »;
+- two buttons: « Voir sur GitHub » (tonal, opens the repository's page, where the source and the compiled versions are) and « Exporter mon carnet » (outlined, the same export as elsewhere in the app, a Subsurface `.ssrf` file).
+
+The licence is not named in the card: it stays in the « Licences » group below. Same card on the iPhone About screen (grouped style) and on the tablet. Update `docs/ui-specification.md` (About). English: « Free, and so is your logbook », « The app and its code are always freely available on GitHub. Anyone can read the code, change it and share it. », « Your logbook is yours: in the Subsurface format, it can be copied and opened in Subsurface on a computer too. », « See on GitHub », « Export my logbook ».
