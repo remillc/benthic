@@ -1723,6 +1723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Fiche d’une plongée : en glissant vers la plongée suivante ou précédente, les deux fiches défilent côte à côte (téléphone).",
       "Messages en bas de l’écran : un glissement vers la droite les fait disparaître.",
       "Modifier la plongée : la suggestion de lest n’apparaît que sur la plongée la plus récente du carnet.",
       "Plongée à plusieurs ordinateurs : la fiche les montre tous, « Définir comme principal » choisit celui du profil, et la fin du téléchargement dit quand des plongées ont été réunies avec des plongées déjà au carnet.",
