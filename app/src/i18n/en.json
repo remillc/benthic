@@ -1359,6 +1359,17 @@
     "mapWithSites": "{map}: {list}",
     "mapSite": "{name} {place}, {dives}",
     "mapPin": "{name}, {dives}",
+    "openSiteSheet": "Open the site sheet",
+    "stackTitle": {
+      "one": "{n} site here",
+      "other": "{n} sites here"
+    },
+    "stackNote": "Pins overlap at this scale.",
+    "areaCount": {
+      "one": "{n} site in this area",
+      "other": "{n} sites in this area"
+    },
+    "mapSelected": "{name} is selected.",
     "mapPlaceCentre": "in the centre",
     "mapPlaceNorth": "in the north",
     "mapPlaceNorthEast": "in the north-east",
@@ -1753,9 +1764,10 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sites: the map no longer shows site names, only the pins, the most dived on top; tapping a pin shows the site in a card, several overlapping pins open a list of those sites, and the list under the map keeps only the sites of the visible area.",
       "High contrast: when the system asks for more contrast (Android 14 and later, “Increase Contrast” on iPhone and iPad), the app switches to stronger colours, with nothing translucent and thicker outlines.",
       "Sites: “Dives without a site” shows the dives that have a position on a map and suggests the nearest site within 500 m; “Clean up the sites” shows each possible duplicate on a map strip; the shortcut also counts the sites without a dive, and iPhone and iPad get the “To do” shortcuts.",
-      "Maps: each pin of the Sites map shows the site’s number of dives, with its name beside it; a button shows any map full screen (Sites, a site’s sheet, new site, edit site), and the Back gesture leaves it.",
+      "Maps: each pin of the Sites map shows the site’s number of dives; a button shows any map full screen (Sites, a site’s sheet, new site, edit site), and the Back gesture leaves it.",
       "Dive: swiping to the next or previous dive moves both dives side by side (phone).",
       "Messages at the bottom of the screen: a swipe to the right sends them away.",
       "Edit dive: the suggested weight only shows on the most recent dive of the logbook.",

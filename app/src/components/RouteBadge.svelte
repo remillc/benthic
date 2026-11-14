@@ -2,8 +2,8 @@
   // @ts-check
   // Development aid: the address of the page on screen (path, query string
   // and hash of the current view's route), in a small badge at the bottom.
-  // Shown only when VITE_SHOW_ROUTE=1 (app/.env.local, not in git), so a
-  // published build never has it. Not interactive: taps go through.
+  // Shown only on the development server with VITE_SHOW_ROUTE=1 (app/.env.local,
+  // not in git): a built app never has it (App.svelte). Not interactive: taps go through.
   import { onDestroy, onMount } from 'svelte';
   import { f7 } from 'framework7-svelte';
 

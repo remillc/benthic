@@ -27,6 +27,9 @@ import { connection } from '../lib/online.svelte.js';
 import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
 import { inBbox } from '../lib/maps-logic.js';
 import { matchesSite, highlightParts } from '../lib/site-search.js';
+import MapStackSheet from '../components/MapStackSheet.svelte';
+import { placeAt } from '../lib/place-lookup.js';
+import { language } from '../lib/i18n.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -90,6 +93,54 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
   const typed = $derived(searching && query.trim() !== '');
   const results = $derived(typed ? used.filter((s) => matchesSite(s, query)) : used);
+
+  // The list follows the map (task 2026-11-14-150): the sites inside the visible
+  // area, once the map has stopped; a search looks through the whole logbook.
+  const inArea = $derived(
+    typed || !view || !located.length ? null : results.filter((s) => s.hasLocation && inBbox(s.lonUdeg / 1e6, s.latUdeg / 1e6, view.bounds)),
+  );
+  const listed = $derived(inArea ?? results);
+
+  // A pin tapped (od-map-site-card), or several pins under the finger (od-map-stack-sheet).
+  let selectedUuid = $state(/** @type {number|null} */ (null));
+  const selectedSite = $derived(selectedUuid === null ? null : (located.find((s) => s.uuid === selectedUuid) ?? null));
+  let stack = $state(/** @type {{ uuids: number[], at: { latUdeg: number, lonUdeg: number } }|null} */ (null));
+  let stackPlace = $state('');
+  const stackSites = $derived(stack ? located.filter((s) => stack?.uuids.includes(s.uuid)) : []);
+
+  /** @param {number[]} uuids @param {{ latUdeg: number, lonUdeg: number }} at */
+  function showStack(uuids, at) {
+    selectedUuid = null;
+    stack = { uuids, at };
+    stackPlace = '';
+    // The place under the title (« Morrisburg, Ontario »), when it can be found.
+    placeAt(at.latUdeg, at.lonUdeg, language).then(
+      (p) => {
+        if (stack?.at !== at || !p) return;
+        stackPlace = [p.city, p.region].filter(Boolean).join(', ') || p.country;
+      },
+      () => {},
+    );
+  }
+
+  /** @param {number} uuid */
+  function openFromMap(uuid) {
+    selectedUuid = null;
+    stack = null;
+    siteMap?.exitFullScreen();
+    open(uuid);
+  }
+
+  /** The card's accessible name: « Northern Arch, Nouvelle-Zélande, 1 plongée. Ouvrir la fiche du site ». */
+  const cardLabel = (/** @type {import('opendives-core').SiteSummary} */ site) =>
+    `${[site.name || t('sites.noName'), site.country, t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`;
+
+  /** Back closes the card (lib/back-button.js). @param {HTMLElement} node */
+  function cancelable(node) {
+    const close = () => (selectedUuid = null);
+    node.addEventListener('od-cancel', close);
+    return { destroy: () => node.removeEventListener('od-cancel', close) };
+  }
   const matching = $derived(typed ? new Set(results.map((s) => s.uuid)) : null);
   const searchCount = $derived(
     !typed ? '' : results.length ? t('sites.searchCount', { n: results.length, text: query.trim() }) : t('sites.noMatch'),
@@ -327,10 +378,39 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length}
-    <div class="od-sites--map" class:od-sites--map-offline={!connection.online}>
+    <div class="od-sites--map" class:od-sites--map-offline={!connection.online} class:od-sites--card-open={!!selectedSite}>
       <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
-           and its own « Centrer sur ma position » (task 2026-11-14-147). -->
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} onlocate={centreOnDevice} />
+           and its own « Centrer sur ma position » (task 2026-11-14-147). No names on the
+           map; a tapped pin shows its card, several under the finger a sheet (task 2026-11-14-150). -->
+      <SiteMap
+        bind:this={siteMap}
+        sites={located}
+        names="fewInFullScreen"
+        selected={selectedUuid}
+        onselect={(uuid) => ((stack = null), (selectedUuid = uuid))}
+        onstack={showStack}
+        onmapclick={() => (selectedUuid = null)}
+        stackAt={stack?.at ?? null}
+        {onview}
+        {height}
+        {matching}
+        onlocate={centreOnDevice}
+      >
+        {#snippet overlay()}
+          {#if selectedSite}
+            <button type="button" class="od-map-site-card" aria-label={cardLabel(selectedSite)} onclick={() => openFromMap(selectedSite.uuid)} use:cancelable>
+              <span class="od-map-site-card--texts">
+                <span class="od-map-site-card--name">{selectedSite.name || t('sites.noName')}</span>
+                <span class="od-map-site-card--line"
+                  >{[selectedSite.country, t('sites.rowDives', { n: selectedSite.dives, date: formatLongDate(selectedSite.lastDate) })].filter(Boolean).join(' · ')}</span
+                >
+              </span>
+              {#if selectedSite.maxDepthMm}<span class="od-map-site-card--depth od-value">{formatDepth(selectedSite.maxDepthMm, logbook.prefs)}</span>{/if}
+              <Icon name="chevron" size={20} />
+            </button>
+          {/if}
+        {/snippet}
+      </SiteMap>
       <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -375,11 +455,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
      </div>
     {/if}
 
-    {#if results.length}
+    {#if inArea}
+      <p class="od-sites--area-count" role="status">{t('sites.areaCount', { n: inArea.length })}</p>
+    {/if}
+    {#if listed.length}
       <!-- No chevron on the site rows (android-sites.dc.html). -->
       <div class="list no-chevron od-sites--surface od-sites--list" use:selectable>
         <ul>
-          {#each results as site (site.uuid)}
+          {#each listed as site (site.uuid)}
             <li class="od-sites--site-row" data-uuid={site.uuid}>
               {#if selection.length}
                 <label class="checkbox od-sites--site-check">
@@ -487,6 +570,8 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       <MenuItem icon="merge" text={t('sites.mergeSites')} onclick={() => (choosingKeeper = true)} />
     </List>
   </Popover>
+
+  <MapStackSheet opened={!!stack} sites={stackSites} place={stackPlace} onclose={() => (stack = null)} onopen={openFromMap} />
 
   {#if choosingKeeper && selection.length >= 2}
     <ChoiceDialog
@@ -769,6 +854,78 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     .od-sites--map-pane .od-sites--map {
       height: 100%;
+    }
+
+    /* The card of the selected pin (od-map-site-card): over the bottom of the map, 16 dp
+       from the edges, white, 16 dp corners, a light shadow. */
+    .od-map-site-card {
+      position: absolute;
+      z-index: 3;
+      left: 16px;
+      right: 16px;
+      /* Above the map credit, which stays readable. */
+      bottom: 28px;
+      box-sizing: border-box;
+      width: auto;
+      min-height: 72px;
+      padding: 10px 12px 10px 16px;
+      border: none;
+      border-radius: 16px;
+      background: var(--od-surface);
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      :global(.od-icon) {
+        flex: none;
+        color: var(--od-text-2);
+      }
+
+      :global(.od-map-fullscreen) & {
+        bottom: calc(env(safe-area-inset-bottom) + 112px);
+      }
+    }
+
+    .od-map-site-card--texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-map-site-card--name {
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 600;
+    }
+
+    .od-map-site-card--line {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-map-site-card--depth {
+      flex: none;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* « Centrer sur ma position » moves up above the card while it is open. */
+    .od-sites--card-open .od-sites--locate {
+      bottom: 116px;
+    }
+
+    .od-sites--area-count {
+      margin: 8px 24px 4px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
     }
 
     /* The full-screen button (task 2026-11-14-147): phone, top right of the visible
