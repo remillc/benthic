@@ -2622,3 +2622,9 @@ While signing in, the button does not shrink or move to the right: it keeps exac
 Christian's correction of 14 November 2026, completing task 129. Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte` (all `.dc.html`).
 
 On the signed-in Account screen, « Se déconnecter » (with « Vos plongées restent dans le cloud et sur cet appareil. ») comes first, under the Subsurface account group, outside any danger heading: signing out can be undone. The « Zone dangereuse » heading, with its warning icon, sits right above « Supprimer le compte » and its consequence, which are the only content of that zone. Same order on Android phone and tablet and on iPhone. Update `docs/ui-specification.md`. Check with TalkBack and VoiceOver that the heading is read before the delete button.
+
+## [ ] 2026-11-14-133 Account screen: more space above « Se déconnecter »
+
+Christian's correction of 14 November 2026, completing task 132. Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte` (all `.dc.html`).
+
+The « Se déconnecter » button and its consequence stand apart from the Subsurface account group above them: 32 dp between the « Changer le mot de passe » card and the button (instead of 14 dp). Same on Android phone and tablet and on iPhone. Note: these mock-ups also show the server line (« Connecté via le serveur… ») in a smaller size; that change is not approved yet, leave the server line as it is until a later task.
