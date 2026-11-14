@@ -1706,6 +1706,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Outils : les outils de gaz sont des rangées d’une même carte, comme le planificateur.",
       "iPhone : barre d’onglets en bas (Carnet, Sites, Statistiques, Outils) et initiale du compte en haut à droite, qui ouvre la feuille du compte ; plus de menu latéral.",
       "Android : l’avatar du compte porte une pastille quand des modifications attendent ou qu’une mise à jour de carte est prête ; en synchronisation manuelle, la feuille du compte montre les modifications en attente, « Synchroniser » et ses autres options. Tablette : le rail, aussi en portrait, ressemble à la barre du téléphone et porte l’avatar du compte en bas. « Importer un fichier » liste les formats lus.",
       "Carnet défilé : un bouton de recherche apparaît dans la barre du haut, avant l’avatar ; le menu ⋮ reste tout à droite.",
