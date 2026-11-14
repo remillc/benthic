@@ -991,6 +991,14 @@
       "one": "{n} modification n'est pas encore envoyée. Elle partira à votre prochaine connexion à ce compte depuis cet appareil.",
       "other": "{n} modifications ne sont pas encore envoyées. Elles partiront à votre prochaine connexion à ce compte depuis cet appareil."
     },
+    "pendingCount": {
+      "one": "{n} modification non envoyée",
+      "other": "{n} modifications non envoyées"
+    },
+    "pendingWhen": {
+      "one": "Elle partira à votre prochaine connexion à ce compte depuis cet appareil.",
+      "other": "Elles partiront à votre prochaine connexion à ce compte depuis cet appareil."
+    },
     "deleteCopy": "Effacer aussi la copie de cet appareil",
     "deleteCopyHint": "Possible une fois les modifications envoyées",
     "confirm": "Se déconnecter",
@@ -1787,6 +1795,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Déconnexion : le dialogue montre l’icône et le titre centrés, les modifications non envoyées dans un encadré, et une vraie case à cocher pour effacer la copie de l’appareil.",
       "Compte : une section « Quitter le cloud » met côte à côte « Se déconnecter de cet appareil » et « Supprimer le compte cloud », chacun avec ce qu’il fait des plongées.",
       "Carte de chaleur : les couleurs vont du bleu (peu de plongées) au rouge (le plus de plongées), et la légende suit.",
       "Les temps relatifs (« il y a 2 min », « dans 3 h », « hier à 14 h 30 ») ne sont plus coupés en fin de ligne.",
