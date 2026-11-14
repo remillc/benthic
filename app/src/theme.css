@@ -97,6 +97,10 @@
     --od-profile-line-width: 1.5;
     /* Pins of the sites around, on the map of the dives without a site (task 2026-11-14-148). */
     --od-map-pin-muted: #75787C;
+    /* The heat of « Où je plonge le plus »: the tertiary ramp, centre to edge (task 2026-11-14-152). */
+    --od-heat-1: #B4530F;
+    --od-heat-2: #F0A66B;
+    --od-heat-3: #FBE3B2;
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --od-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
@@ -240,6 +244,9 @@
     --od-separator: #3A3C40;
     --od-outline: #8E9196;
     --od-map-pin-muted: #8E9196;
+    --od-heat-1: #F0A66B;
+    --od-heat-2: #9C6B3F;
+    --od-heat-3: #4A3216;
     --od-star-summary: #75787C;
     --od-row-divider: #3A3C40;
     --od-map-sea: #1E2A36;

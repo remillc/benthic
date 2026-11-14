@@ -1466,6 +1466,11 @@
       "other": "Maximum depth of {n} dives"
     },
     "chartYears": "Dives per year",
+    "heatTitle": "Where I dive most",
+    "heatLead": "{site} leads, {dives}",
+    "heatLess": "Less",
+    "heatMore": "More",
+    "heatFullscreen": "Show the heat map full screen",
     "chartYearsText": {
       "one": "{dives} over {n} year",
       "other": "{dives} over {n} years"
@@ -1779,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Statistics: a heat map, “Where I dive most”, shows where the dives of the filter are concentrated, with the leading site; it opens full screen.",
       "“Choose a site”: a screen that lists every site, from nearest to farthest from your position (else from the most recently dived), with the distance and a search field; it is used in “Dives without a site” and for the site of “Edit dive”, and can create a site at your position.",
       "Settings: they are now kept in the system’s preferences (Android and iOS) and written at once; a setting changed just before the app closes or updates is no longer lost.",
       "Sites: the map no longer shows site names, only the pins, the most dived on top; tapping a pin shows the site in a card, several overlapping pins open a list of those sites, and the list under the map keeps only the sites of the visible area.",

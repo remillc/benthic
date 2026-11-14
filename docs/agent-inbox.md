@@ -2933,7 +2933,7 @@ Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/`: `ios-sa
 
 English: « Complete the dive », « Later », « {distance} away · last dive on {date} », « {distance} away · no dives », « · Nearest », « From nearest to farthest from your position. Without a position, from most recently dived to oldest. », « Choose a site », « Search for a site », « Create a site at my current position », « {n} sites, from nearest to farthest from your position ». Update `docs/ui-specification.md` (quick entry, site choice).
 
-## [ ] 2026-11-14-152 Statistics: a heat map « Où je plonge le plus »
+## [x] 2026-11-14-152 Statistics: a heat map « Où je plonge le plus »
 
 Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mockups/android-stats.dc.html`, the card under « Graphiques ». The card's map and counts are Christian's real St. Lawrence sites, while the rest of the board still shows the sample logbook.
 
@@ -2955,3 +2955,5 @@ Decided with Christian on 14 November 2026 (idea #62, item 7). Mock-up: `docs/mo
 8. **Without enough data** (fewer than 2 sites with coordinates in the filter), the card is not shown.
 
 English: « Where I dive most », « {site} leads, {n} dives », « Less », « More », « Show the heat map full screen ». Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
+
+Done in feature/stats-heatmap. 1-3: HeatMapCard.svelte (od-stats-heatmap) after « Graphiques », before « Mes statistiques », on the Statistics filter's dives: title, « {site} en tête, {n} plongées », a 170 dp picture of the base map (lib/site-image.js mapStrip, one off-screen map; place names hidden) desaturated with saturate(0.25), framed on the busiest area (lib/heatmap.js: the sites within 150 km of the place with the most dives around it), one radial spot per site, radius by the square root of the count, opacity by its logarithm (0.35 to 1), tertiary ramp as --od-heat-1..3 (dark #F0A66B, #9C6B3F, #4A3216). 4: legend Moins / 96×8 ramp / Plus. 5: no credit on the card. 6-7: full-screen button « Afficher la carte de chaleur en plein écran »; full screen redraws the same area at the screen size, with the heat and the legend, no names nor pins; « Quitter le plein écran » and Back (the overlay takes od-map-fullscreen only while open) leave it; section named, picture hidden from screen readers. 8: hidden under 2 sites with coordinates. Tests: tests/app/heatmap.test.mjs. Checked on the phone emulator with the test account (St. Lawrence area, Lock 21 leading with 144 dives; full screen; Back). Limit: the dive list names its site only, so a name shared by several sites counts for the one with coordinates and the most dives. Not checked: tablet, iPhone, dark mode, a filter.
