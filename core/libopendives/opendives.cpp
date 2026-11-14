@@ -123,6 +123,26 @@ void apply_log_prefs()
 	prefs.pp_graphs.po2 = git_prefs.pp_graphs.po2;
 }
 
+// save-git names a dive's folder after its start time only (create_dive_name).
+// When two dives share it, the second one written gets a "~<hash>" suffix, and
+// which one is "second" depends on the path: a dive saved from its cache is
+// inserted at once, in the dive order; a dive written afresh goes through
+// new_directory(), which puts it at the front of the list, so the order is
+// reversed. Resaving a log into its own repository (cache valid) therefore
+// swapped the two names on every save. Writing every dive of such a group
+// afresh gives the names a fresh save gives, every time. The divelog is sorted
+// by start time first (comp_dives), so such dives are neighbours.
+void uncache_shared_start_times()
+{
+	auto &dives = divelog.dives;
+	for (size_t i = 1; i < dives.size(); ++i) {
+		if (dives[i]->when != dives[i - 1]->when)
+			continue;
+		dives[i - 1]->invalidate_cache();
+		dives[i]->invalidate_cache();
+	}
+}
+
 int init()
 {
 	int ret = git_libgit2_init();
@@ -162,6 +182,7 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 		error = "Cannot create repository " + repo;
 		return -1;
 	}
+	uncache_shared_start_times();
 	int ret = save_dives(repo.c_str(), true);
 	if (ret) {
 		error = "Cannot save to " + repo + " (" + std::to_string(ret) + ")";
