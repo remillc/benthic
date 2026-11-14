@@ -2993,3 +2993,13 @@ Follows task 152. Christian decided this on 14 November 2026. Mock-ups: `android
 Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
 
 Done in feature/heatmap-live. 1: HeatMapCard now uses SiteMap (live MapLibre map: pan, pinch zoom) with new props heat, frame (the busiest area), credits={false}, desaturated (a saturate(0.25) filter on the map's canvas only), fullscreenLabel and closerInFullScreen; the page scrolls when a gesture starts outside the map. 2: full screen is SiteMap's (od-map-fullscreen): the same view zoomed in by 0.6, « Quitter le plein écran », « Centrer sur ma position » (the phone's position), Back; the legend in a white card at the bottom left (overlay snippet). 3: lib/heat-density.js (tests/app/heat-density.test.mjs): each site adds count × (1 − (d/r)²)² on a 3 px grid of the view, coloured on the --od-heat ramp by its share of the view's densest value (transparent under 2 %, alpha 0.15 to 0.85), drawn smoothed on a canvas layer over the map and redrawn on every move; radius 25 px at the opening zoom × 2^(zoom − opening zoom). The stacked-spot heatSpot is removed. Checked on the phone emulator: the card, a pan (the heat follows), full screen, Back. Not checked: tablet, iPhone, dark mode, pinch on a device.
+
+## [ ] 2026-11-14-155 Heat map: how the halos behave when zooming, pins up close
+
+Follows task 154. Christian decided this on 14 November 2026. Applies to the live heat map on the Statistics card and in full screen.
+
+1. **Halo size follows the screen, not the ground.** The kernel radius is in dp: about 20 dp at low zoom, growing to about 40 dp at zoom 13 (interpolated). Zooming in, nearby sites separate and a hot area splits into distinct halos; zooming out, they merge again.
+2. **Fixed colour scale.** Each site weighs its dive count. The ramp is normalised once on the whole filter (the busiest site, or the densest value at the opening zoom), not on the visible area, so the legend keeps its meaning while panning and zooming: Lock 21 stays red up close, a site with one dive stays blue.
+3. **Pins up close (a trial).** From zoom 14, the halos fade out over about one zoom level and the site pins with their dive count appear (the pins of task 147, same look as the Sites map, no names). Tapping a pin opens the selected-pin card of task 150 (`od-map-site-card`). Zooming back out below 14 brings the halos back. This replaces, from zoom 14 only, the « no pins » rule of task 152 for the full screen.
+
+Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
