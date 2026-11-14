@@ -2503,3 +2503,23 @@ Do not copy from the mock-up: the value « 1 h 10 » shown for « Rapport de dil
 Tablet: same pages in the right pane. Settings search still finds each moved row and opens Affichage. Update `docs/ui-specification.md` (Settings paragraph) where it lists the groups in detail. Check on the phone and tablet emulators, fr and en, that every moved switch still acts on the profile and on the pO₂ graph.
 
 Done in feature/settings-display-decompression: Affichage holds the theme, « Profil de plongée » and « Graphique de pO₂ en recycleur »; « Décompression » at /settings/decompression opens on the warning; the Recycleur block keeps its four rows; texts changed in fr and en; ui-specification Settings listing updated. Checked on the phone emulator in fr and en (each moved switch changes its core setting; search finds them) and on the tablet. Also fixed: two switches flipped quickly no longer overwrite each other (core changes are queued).
+
+## [ ] 2026-11-14-122 Outils: a livelier page, with the state of the planner and of the desaturation
+
+Christian's decision of 14 November 2026. The Tools page stops being a plain list of links: its two dive tools show their state, and the gas tools become tiles. Mock-ups in `docs/mockups/`: `android-outils.dc.html` (phone), `android-tablette-outils-paysage.dc.html`, `android-tablette-outils-portrait.dc.html`. The header band and the bottom navigation bar (task 120) are unchanged. The tools' own screens are unchanged.
+
+**Phone, from top to bottom** (16 dp side margins, 12 dp between cards, cards on white with 28 dp corners and 16 dp padding, no group title above the two dive cards):
+
+1. **Planificateur de plongée** card. One row: a 40 dp icon container (14 dp corners, primary container #D4E2F2, icon in primary #114477), the title « Planificateur de plongée » (16 sp, semibold), under it the count of planned dives of the logbook (« 1 plongée planifiée », « 2 plongées planifiées », « Aucune plongée planifiée »), a chevron. The whole card opens the planned dives list, as the row did. No buttons on the card.
+2. **Désaturation** card, same size and structure. Icon container in tertiary container (#FBE3B2), icon in rust (#B4530F). Second line, while the wait before flying runs: « Avion dans {durée} » in rust and semibold, then « · plongée il y a {durée} » in on-surface-variant (time since surfacing of the last dive). Under the text, aligned with it (52 dp from the card's start), a 4 dp bar, 2 dp corners: track #F3E3C8, filled part rust, filled share = time since surfacing ÷ (time since surfacing + remaining wait). States:
+   - wait over and last dive within 48 h: second line « Avion permis · plongée il y a {durée} », no rust, no bar;
+   - no dive in the last 48 h: « Au repos », no bar, icon container in surface container (#E8E8E5) and icon in on-surface-variant;
+   - no dive in the logbook: « Aucune plongée au carnet », same neutral look.
+   The values come from what the Désaturation screen already computes (task 98 and the « Last dive » section); nothing new in the core. Durations follow `docs/ui-writing.md` (non-breaking space between number and unit). Accessible name of the card: « Désaturation : avion dans 18 h, dernière plongée il y a 6 h » (and the matching text for the other states).
+3. **« Gaz »** title (18 sp, bold, on the page background), then **three tiles in one row**, equal width, 8 dp apart, white, 24 dp corners, at least 132 dp high (140 on tablets), padding 14 × 12 dp. Each tile: a 44 dp icon container in primary container with the icon in primary, then the name (15 sp semibold, may wrap to two lines) and a short hint (13 sp, on-surface-variant). The containers use three different shapes, in the Material 3 Expressive spirit: rounded square (16 dp) for EAD et MOD, circle for Meilleur mélange, asymmetric (12 / 24 dp alternating corners) for Mélangeur de gaz. Texts: « EAD et MOD » / « Profondeurs d’un mélange », « Meilleur mélange » / « Pour une profondeur », « Mélangeur de gaz » / « Nitrox ou trimix ». Each tile opens its tool.
+
+The cards update when the page is shown again (after a download, a sync, a saved plan).
+
+**Tablet** (landscape and portrait): the same content in the page's pane; the Planificateur and Désaturation cards side by side (two equal columns, 12 dp apart), the three gas tiles in one row under them. Links open the tablet screens of each tool, as today.
+
+Update `docs/ui-specification.md` (the « Tools page and gas tools » paragraph) to match: it no longer describes a list of rows. Check on the phone and tablet emulators, fr and en, with a logbook whose last dive is recent, one whose last dive is older than 48 h, and an empty logbook, and with 0, 1 and several planned dives.
