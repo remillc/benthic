@@ -33,8 +33,13 @@
   "account": {
     "cloudDives": "Plongées dans le nuage",
     "signOutText": "Vos plongées restent dans le nuage et sur cet appareil.",
-    "deleteText": "Supprime le compte et toutes ses plongées du nuage Subsurface. Irréversible.",
-    "bandSignedIn": "Votre carnet dans le nuage"
+    "deleteText": "Efface le compte et ses plongées du nuage Subsurface. Irréversible. Vous pouvez garder vos plongées sur cet appareil.",
+    "bandSignedIn": "Votre carnet dans le nuage",
+    "changePasswordText": "Un lien est envoyé à votre courriel",
+    "createText": {
+      "one": "Votre plongée y est envoyée. Un code de confirmation arrive par courriel",
+      "other": "Vos {n} plongées y sont envoyées. Un code de confirmation arrive par courriel"
+    }
   },
   "welcome": {
     "existingText": "Vos plongées sont sauvegardées dans le nuage Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient.",
@@ -82,5 +87,9 @@
   },
   "gitRepo": {
     "intro": "Votre carnet dans un dépôt git à vous (GitHub, GitLab, Codeberg ou votre serveur), à la place du nuage. Une copie reste sur cet appareil."
+  },
+  "about": {
+    "issuesText": "Par courriel, avec les informations techniques",
+    "opensMail": "s'ouvre dans l'application de courriel"
   }
 }
