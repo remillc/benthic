@@ -906,7 +906,7 @@
     "signOut": "Sign out",
     "signOutText": "Your dives stay in the cloud and on this device.",
     "delete": "Delete account",
-    "deleteText": "Deletes the account and all its dives from the Subsurface cloud. Cannot be undone.",
+    "deleteText": "Erases the account and its dives from the Subsurface cloud. Cannot be undone. You can keep your dives on this device.",
     "server": "Connected through the {region} server ({host}).",
     "serverHost": "Connected through the {host} server.",
     "regions": {
@@ -1711,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: under “Delete account”, it says your dives can stay on this device.",
       "Settings: “Paper size (printing)”, to say it is only for printing.",
       "Offline maps: no space limit of their own any more; only the device’s free space counts (always at least 1 GB free). The top card shows the maps, the other data and the free space.",
       "Offline maps: the ⋮ of each region is clearly visible; every ⋮ keeps full dots.",
