@@ -2760,3 +2760,41 @@ Christian's to-do #43, decided on 14 November 2026. The goal is to plan from thi
 3. On the simplified profile, the caption at the top reads « Le profil est ramené à quelques niveaux pour que vous puissiez en changer la profondeur et la durée. » The button does not appear there.
 
 English: « Edit profile », « Times and depths taken from the dive. », « The profile is reduced to a few levels so you can change their depth and duration. » Same on the tablet and on iPhone. Update `docs/ui-specification.md` (Planner).
+
+## [ ] 2026-11-14-147 Maps: a full-screen button on every map, dive counts on the Sites pins
+
+Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/` (all `.dc.html`):
+- Sites: `android-sites`, `android-sites-recherche`, `android-sites-hors-ligne`, `android-tablette-sites-portrait`, `android-tablette-sites-paysage`, `ios-sites`, `tablette-sites`.
+- Site maps: `sites-fiche-android`, `sites-edition-android`, `sites-modifier-android`, `android-tablette-site-*`, `android-tablette-carnet-site-*`, `android-tablette-site-nouveau-*`, `android-tablette-site-modifier-*`.
+- New: `sites-carte-plein-ecran-android`.
+
+The maps in these boards are now real OpenStreetMap images. That only changes the mock-ups: the app already uses the real base map.
+
+1. **Pins on the Sites map.**
+   - Each pin shows the number of dives at the site, in place of the white dot: white, 13 sp, bold, centred in the head of the ink pin (#1F2124).
+   - The site name next to the pin is in ink, with a 4 dp white halo.
+   - No clustering of pins for display (Christian's decision): every site keeps its own pin at its own position, even when pins overlap.
+   - The map's accessible label gives each site with its count, for example « Northern Arch au nord, 1 plongée ».
+2. **Full-screen button** (`od-map-fullscreen-button`) on every interactive map.
+   - Look: a white square, 40 dp on Android and 44 pt on iOS, 12 dp corners, a light shadow, the four-corners icon, 22 dp, in ink.
+   - Accessible label: « Afficher la carte en plein écran ».
+   - Sites, phone and Android tablet: top right of the visible map, 16 dp from the edge, just under the header band. « Centrer sur ma position » stays at the bottom right.
+   - Sites offline: under the « © contributeurs OpenStreetMap » credit, which is at the top there.
+   - iPhone Sites: top right, under the search bar.
+   - iPad Sites: top right, with « Centrer sur ma position » right under it.
+   - Site sheet, « Nouveau site » and « Modifier le site » (phone and tablets): top right of the map, 8 dp from the edges.
+   - Not on the map behind the header of the dive detail: it is decorative, not interactive and hidden from screen readers.
+3. **Full-screen map** (`od-map-fullscreen`, new board `sites-carte-plein-ecran-android`).
+   - The map fills the whole screen, edge to edge under the status bar, with the same pins and labels.
+   - No top bar, list, FAB or bottom navigation.
+   - Top right, where the entry button was: « Quitter le plein écran », the same button with the inverse icon (corners pointing in).
+   - Bottom right: « Centrer sur ma position », right above the credit.
+   - « © contributeurs OpenStreetMap » sits at the bottom right.
+   - The system Back gesture and Back button also leave full screen.
+   - The map keeps its position and zoom when entering and leaving.
+   - From « Nouveau site » and « Modifier le site », the pin can still be moved in full screen, and the new position is kept on return.
+   - From the site sheet, the map shows that site's pin.
+   - Offline, the same map sources as the screen it came from apply (downloaded region, else the network, else the simplified map).
+4. **Site maps in cards** (site sheet, new and edit site): the map now stays inside its rounded card, so the credit is fully visible.
+
+English: « Show map full screen », « Exit full screen », « 1 dive » / « {n} dives » in the map label. Same on iPhone and the tablets, with iOS sizes on iOS. Update `docs/ui-specification.md` (Sites, site sheet, site form) and `docs/system-design.md` (shared components).

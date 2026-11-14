@@ -30,19 +30,18 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 
 
   <div style="position: absolute; left: 0; top: 0; width: 390px; height: 488px; background: #EBEAE5">
-    <svg width="390" height="480" viewBox="0 0 390 480" role="img" aria-label="Carte des sites : Northern Arch au nord, Lake Coleridge au sud" style="display: block">
-      <g style="stroke: #DADAD6; stroke-width: 1"><path d="M0 80H390 M0 160H390 M0 240H390 M0 320H390 M0 400H390 M65 0V480 M130 0V480 M195 0V480 M260 0V480 M325 0V480"></path></g>
+    <svg width="390" height="480" viewBox="0 0 390 480" role="img" aria-label="Carte des sites : Northern Arch au nord, 1 plongée. Lake Coleridge au sud, 1 plongée" style="display: block">
+      <image href="/_blob/0f8d6b43869c79d6442c1f53afc3c9a0" x="0" y="0" width="390" height="480" preserveAspectRatio="none"></image>
       <sc-for list="{{pins}}" as="p" hint-placeholder-count="2">
         <g transform="translate({{p.x}} {{p.y}})">
           <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" style="fill: #1F2124; stroke: #FFFFFF; stroke-width: 2"></path>
-          <circle cx="0" cy="-24" r="5" style="fill: #FFFFFF"></circle>
+          <text x="0" y="-19.5" style="font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; font-size: 13px; font-weight: 700; fill: #FFFFFF; text-anchor: middle">{{p.n}}</text>
         </g>
-        <text x="{{p.lx}}" y="{{p.ly}}" style="font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; font-size: 14px; font-weight: 500; fill: #1F2124; paint-order: stroke; stroke: #EBEAE5; stroke-width: 4px">{{p.name}}</text>
+        <text x="{{p.lx}}" y="{{p.ly}}" style="font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; font-size: 14px; font-weight: 500; fill: #1F2124; paint-order: stroke; stroke: #FFFFFF; stroke-width: 4px">{{p.name}}</text>
       </sc-for>
-      <text x="195" y="260" style="font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; font-size: 14px; fill: #4B4A47; text-anchor: middle">[Fond de carte OpenStreetMap, PMTiles hors ligne]</text>
     </svg>
     <p style="position: absolute; right: 8px; bottom: 84px; margin: 0; font-size: 11px; color: #4B4A47; background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 4px">© contributeurs OpenStreetMap</p>
-    <button aria-label="Centrer sur ma position" style="position: absolute; right: 16px; top: 336px; width: 40px; height: 40px; border: none; border-radius: 12px; background: #FFFFFF; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2.5v3 M12 18.5v3 M2.5 12h3 M18.5 12h3"></path><circle cx="12" cy="12" r="7"></circle></svg></button>
+    <button aria-label="Afficher la carte en plein écran" style="position: absolute; right: 16px; top: 176px; width: 40px; height: 40px; border: none; border-radius: 12px; background: #FFFFFF; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5"></path></svg></button><button aria-label="Centrer sur ma position" style="position: absolute; right: 16px; top: 336px; width: 40px; height: 40px; border: none; border-radius: 12px; background: #FFFFFF; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2.5v3 M12 18.5v3 M2.5 12h3 M18.5 12h3"></path><circle cx="12" cy="12" r="7"></circle></svg></button>
   </div>
   <section aria-label="Liste des sites" style="position: absolute; left: 0; right: 0; top: 408px; bottom: 0; overflow-y: auto; background: #F5F4F0; border-top: 1px solid #DADAD6; padding-bottom: 88px; box-sizing: border-box">
     <div style="padding: 16px 24px 4px 16px; display: flex; justify-content: space-between; align-items: baseline">
@@ -73,14 +72,16 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 // Positions réelles (fichiers d'exemple de Subsurface), projetées sur la zone visible.
 var SITES = [
-  { name: 'Northern Arch', lat: -35.4485, lon: 174.732 },
-  { name: 'Lake Coleridge', lat: -43.342295, lon: 171.545936 }
+  { name: 'Northern Arch', lat: -35.4485, lon: 174.732, n: 1 },
+  { name: 'Lake Coleridge', lat: -43.342295, lon: 171.545936, n: 1 }
 ];
-function px(lon) { return Math.round((lon - 168) / 10 * 390); }
-function py(lat) { return Math.round(205 + (-34 - lat) / 11 * 200); }
+function wp(lat, lon) { var n = 64 * 256, s = Math.sin(lat * Math.PI / 180); return [(lon + 180) / 360 * n, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n]; }
+// Carte réelle : tuiles OpenStreetMap au zoom 6, coin haut gauche (15557, 9444), réduites à 0,4 pixel CSS par pixel de tuile.
+function px(lon) { return Math.round((wp(0, lon)[0] - 15557) * 0.4); }
+function py(lat) { return Math.round((wp(lat, 0)[1] - 9444) * 0.4); }
 class Component extends DCLogic {
   renderVals() {
-    return { pins: SITES.map(function (s) { var x = px(s.lon), y = py(s.lat); return { name: s.name, x: x, y: y, lx: x + 18, ly: y - 20 }; }) };
+    return { pins: SITES.map(function (s) { var x = px(s.lon), y = py(s.lat); return { name: s.name, x: x, y: y, lx: x + 18, ly: y - 20, n: s.n }; }) };
   }
 }
 </script>
