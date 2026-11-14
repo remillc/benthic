@@ -11,7 +11,8 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { chooseDiveSite, setDiveSite } from '../lib/dive-site.js';
+  import { setDiveSite } from '../lib/dive-site.js';
+  import { chooseSite } from '../lib/site-choice.js';
   import { formatDateTime, formatNumber, depthUnit } from '../lib/format.js';
   import { SITE_SUGGESTION_LIMIT_M, distanceInDepthUnit, suggestByDistance } from '../lib/site-suggestion.js';
   import { diveLines } from '../lib/sites.svelte.js';
@@ -128,7 +129,7 @@
                 {siteName(suggested)}
               </button>
             {/if}
-            <button type="button" class="od-dives-without-site--small" onclick={() => chooseDiveSite(dive.id, sites)}>{t('sites.chooseSite')}</button>
+            <button type="button" class="od-dives-without-site--small" onclick={() => chooseSite(f7router, (site) => setDiveSite(dive.id, site.uuid))}>{t('sites.chooseSite')}</button>
             <!-- With a position, the new site is created there. -->
             <button
               type="button"

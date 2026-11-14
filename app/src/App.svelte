@@ -29,6 +29,7 @@
   import DivesWithoutSite from './pages/DivesWithoutSite.svelte';
   import DiveNoSiteProfile from './pages/DiveNoSiteProfile.svelte';
   import SitesCleanup from './pages/SitesCleanup.svelte';
+  import SiteChoose from './pages/SiteChoose.svelte';
   import SitesUnplaced from './pages/SitesUnplaced.svelte';
   import Statistics from './pages/Statistics.svelte';
   import StatisticsResult from './pages/StatisticsResult.svelte';
@@ -167,6 +168,8 @@
     { path: '/sites/without/', component: DivesWithoutSite },
     { path: '/sites/without-site/:diveId', component: DiveNoSiteProfile },
     { path: '/sites/cleanup', component: SitesCleanup },
+    // « Choisir un site » (task 2026-11-14-151): lib/site-choice.js.
+    { path: '/sites/choose', component: SiteChoose },
     { path: '/sites/unplaced/', component: SitesUnplaced },
     { path: '/sites/new', component: SiteEdit },
     { path: '/sites/:uuid', component: SiteSheet },

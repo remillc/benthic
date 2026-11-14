@@ -10,7 +10,8 @@
   import DiveFigures from '../components/DiveFigures.svelte';
   import DiveProfile from '../components/DiveProfile.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { chooseDiveSite } from '../lib/dive-site.js';
+  import { setDiveSite } from '../lib/dive-site.js';
+  import { chooseSite } from '../lib/site-choice.js';
   import { formatDateTime } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -68,7 +69,10 @@
   {#snippet fixedContent()}
     {#if dive}
       <div class="od-dive-no-site-profile--bar">
-        <button type="button" class="od-dive-no-site-profile--action od-dive-no-site-profile--filled" onclick={() => chooseDiveSite(diveId, sites, () => f7router.back())}>{t('sites.chooseSite')}</button>
+        <button type="button" class="od-dive-no-site-profile--action od-dive-no-site-profile--filled" onclick={() => chooseSite(f7router, async (site) => {
+          // Back to the list once the dive has its site (« Choisir un site » has gone back first).
+          if (await setDiveSite(diveId, site.uuid)) setTimeout(() => f7router.back(), 400);
+        })}>{t('sites.chooseSite')}</button>
         <!-- Replaces this screen, so that saving the new site ends on the list. -->
         <button type="button" class="od-dive-no-site-profile--action" onclick={() => f7router.navigate(`/sites/new?dive=${diveId}`, { reloadCurrent: true })}>{t('sites.newSite')}</button>
       </div>
