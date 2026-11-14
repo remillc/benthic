@@ -2903,3 +2903,32 @@ Decided with Christian on 14 November 2026, after a screenshot of the app with h
 English: « {n} sites here », « Pins overlap at this scale. », « {n} sites in this area », « Open the site sheet ». Same on the Android tablet, iPhone (the card and the sheet in iOS form) and iPad. Update `docs/ui-specification.md` (Sites screen).
 
 Done in feature/sites-map-select. 1: SiteMap names « fewInFullScreen » on Sites: no names on the map; in full screen they show with 8 pins or fewer in view and no two overlapping (measured); pins drawn by dive count, the most dived on top; no grouping. 2: a tapped pin is selected (1.3×, halo --od-secondary at 18 %, z-index front); od-map-site-card over the bottom of the map, above the credit (name, « {pays} · {n} plongées, la dernière le {date} » from sites.rowDives, max depth, chevron), label « {site}, {pays}, {n} plongées. Ouvrir la fiche du site »; it opens the site sheet (leaving full screen); a tap on the map or Back (lib/back-button.js, only when visible) closes it; « Centrer sur ma position » moves up; the map's label adds « {site} est sélectionné. ». 3: a tap whose 48 dp target touches several pin heads opens MapStackSheet.svelte (od-map-stack-sheet): blue disc on the map, « {n} sites à cet endroit », the place from place-lookup when found, « Les épingles se superposent à cette échelle. », rows by dive count with ink badge, name, dives, max depth, chevron; ✕, scrim and Back close. 4: the list shows the sites inside the visible area (lib/maps-logic inBbox, at moveend) under « {n} sites dans cette zone »; a search looks through the whole logbook; the to-do shortcuts count the whole logbook. 5: the route badge shows on the development server only (import.meta.env.DEV and VITE_SHOW_ROUTE), never in a built app. Spec updated (Sites map: no names …), release notes updated (the 147 line no longer mentions names). Checked on the phone emulator with the test account's 239 sites: no names, a tapped pin and its card, Back, 96 stacked pins in the sheet, Back, 212 sites in the area. Not checked: names in full screen with few pins, the place line (no answer during the test), iPhone, iPad and tablet layouts on a device.
+
+## [ ] 2026-11-14-151 Quick entry on the boat: sites by distance, an Android version, a « Choisir un site » screen
+
+Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/`: `ios-saisie` (updated), `saisie-bateau-android` (new), `choisir-site-android` (new).
+
+1. **Sites sorted by distance in the quick entry** (« Compléter la plongée », after a download).
+   - When the phone knows its position, the « Site » block lists the 3 nearest sites. Each row shows « À {distance} · dernière plongée le {date} » or « À {distance} · aucune plongée ».
+   - The distance is in feet then miles in imperial (« 394 pi », « 1,1 mi »), and in metres then kilometres in metric.
+   - The nearest site is preselected when it is within 500 m (the constant of task 148, `docs/advanced-settings.md`), and « · Le plus proche » follows its name.
+   - Without a position, the 3 most recently dived sites, as before.
+   - The block keeps « Créer un site à ma position actuelle » first and « Chercher un autre site » last.
+   - Under the block: « Du plus proche au plus loin de votre position. Sans position, du plus récemment plongé au plus ancien. »
+   - The list never scrolls on its own: the page scrolls.
+2. **No radio buttons.** Choosing a site is a single-choice list (`role="listbox"`, rows `role="option"`, `aria-selected`).
+   - Android: the selected row is filled with the secondary container (#D4E2F2), its text in #0B2440, its name in 600, and a blue check (#114477) on the right. The other rows stay white.
+   - iPhone: a blue check on the right of the selected row, no fill, as in iOS settings lists.
+3. **The quick entry on Android** (`saisie-bateau-android`), which did not exist.
+   - The same content in Material 3: a top bar with ✕ « Plus tard », the title « Compléter la plongée » and a filled « Enregistrer » button.
+   - Then the dive card (profile thumbnail, date, depth and duration), « Site », « Compagnons » (« Ajouter un compagnon » and its note) and « Note » (five stars).
+   - Section titles are 14 sp in the secondary colour. Blocks are white, with 16 dp corners.
+4. **« Choisir un site »** (`choisir-site-android`): one screen, opened by « Chercher un autre site » here, by « Choisir un site » on « Plongées sans site » and by the Site field of « Modifier la plongée ».
+   - At the top, a Material 3 search bar: ← « Retour », the field « Rechercher un site ».
+   - Then « Créer un site à ma position actuelle ».
+   - Then the line « {n} sites, du plus proche au plus loin de votre position », and every site of the logbook in one scrolling list. Each row has a pin icon, the name and « {pays} · à {distance} · {n} plongées ».
+   - Typing filters on name, region and country. Without a position, the list is sorted from the most recently dived site.
+   - Tapping a site chooses it and goes back.
+   - On iPhone: the same screen in iOS form, a navigation bar with a search field.
+
+English: « Complete the dive », « Later », « {distance} away · last dive on {date} », « {distance} away · no dives », « · Nearest », « From nearest to farthest from your position. Without a position, from most recently dived to oldest. », « Choose a site », « Search for a site », « Create a site at my current position », « {n} sites, from nearest to farthest from your position ». Update `docs/ui-specification.md` (quick entry, site choice).
