@@ -1244,10 +1244,18 @@
       "one": "{n} dive without a site: assign it",
       "other": "{n} dives without a site: assign them"
     },
-    "duplicatesLink": {
-      "one": "{n} possible duplicate: clean up the sites",
-      "other": "{n} possible duplicates: clean up the sites"
+    "cleanupLink": "{what}: clean up the sites",
+    "stripLabel": "Map: {a} and {b}, {distance} apart",
+    "stripLabelSame": "Map: {a} and {b}, at the same position",
+    "duplicatesCount": {
+      "one": "{n} possible duplicate",
+      "other": "{n} possible duplicates"
     },
+    "unusedCount": {
+      "one": "{n} site without a dive",
+      "other": "{n} sites without a dive"
+    },
+    "todoLabel": "To do",
     "rowDives": {
       "one": "{n} dive, on {date}",
       "other": "{n} dives, the latest on {date}"
@@ -1277,9 +1285,18 @@
     "region": "Region",
     "withoutTitle": "Dives without a site",
     "withoutIntro": {
-      "one": "{n} dive has no site. OpenDives suggests the site of the other dives of the same trip.",
-      "other": "{n} dives have no site. OpenDives suggests the site of the other dives of the same trip."
+      "one": "{n} dive has no site. OpenDives suggests the nearest site when the dive has a position, or the site of the other dives of the same trip.",
+      "other": "{n} dives have no site. OpenDives suggests the nearest site when the dive has a position, or the site of the other dives of the same trip."
     },
+    "withoutMapNote": "Position recorded by the dive computer or the phone. Dives without a position are not on the map.",
+    "withoutMapLabel": {
+      "one": "Map: GPS position of dive {list}.",
+      "other": "Map: GPS positions of dives {list}."
+    },
+    "withoutMapOthers": "The other dives have no position.",
+    "mapPoint": "Point {n} on the map",
+    "distanceSuggestion": "Suggestion: {site}, {distance} from the dive’s position",
+    "noSiteNear": "No site within {limit} of its position. “New site” creates one there.",
     "suggestionLine": {
       "one": "Suggestion: same trip as one dive at {site}",
       "other": "Suggestion: same trip as {n} dives at {site}"
@@ -1736,6 +1753,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sites: “Dives without a site” shows the dives that have a position on a map and suggests the nearest site within 500 m; “Clean up the sites” shows each possible duplicate on a map strip; the shortcut also counts the sites without a dive, and iPhone and iPad get the “To do” shortcuts.",
       "Maps: each pin of the Sites map shows the site’s number of dives, with its name beside it; a button shows any map full screen (Sites, a site’s sheet, new site, edit site), and the Back gesture leaves it.",
       "Dive: swiping to the next or previous dive moves both dives side by side (phone).",
       "Messages at the bottom of the screen: a swipe to the right sends them away.",

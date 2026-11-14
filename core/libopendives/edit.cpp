@@ -1892,6 +1892,12 @@ int dives_without_site(std::string &json)
 		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
 		append_json_string(json, iso_time(d->when));
 		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
+		// The position recorded with the dive (GPS1/GPS2 of a dive computer,
+		// dive::get_gps_location()), for the map and the suggestion by distance
+		// (task 2026-11-14-148). Without a site, only a recorded one is found.
+		location_t gps = d->get_gps_location();
+		if (has_location(&gps))
+			json += ",\"latUdeg\":" + std::to_string(gps.lat.udeg) + ",\"lonUdeg\":" + std::to_string(gps.lon.udeg);
 		// Suggestion: the site of another dive of the same trip.
 		uint32_t suggestion = 0;
 		if (d->divetrip)

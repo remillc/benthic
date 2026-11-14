@@ -32,6 +32,14 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
   let sites = $state([]);
   let withoutSite = $state(0);
   let duplicates = $state(0);
+  /** Sites without a dive, which « Nettoyer les sites » also deletes (task 2026-11-14-148). */
+  const unused = $derived(sites.filter((s) => s.dives === 0).length);
+  /** The clean-up row: « 2 doublons possibles, 3 sites sans plongée : nettoyer les sites ». */
+  const cleanupText = $derived(
+    t('sites.cleanupLink', {
+      what: [duplicates ? t('sites.duplicatesCount', { n: duplicates }) : '', unused ? t('sites.unusedCount', { n: unused }) : ''].filter(Boolean).join(', '),
+    }),
+  );
   /** @type {SiteMap|undefined} */
   let siteMap = $state();
 
@@ -346,10 +354,11 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
 {#snippet panel()}
   <section class="od-sites--panel" aria-label={t('sites.listLabel')}>
-    {#if withoutSite || unplaced || duplicates}
+    {#if withoutSite || unplaced || duplicates || unused}
      <div class="od-sites--todo" class:od-sites--hidden={searching} bind:this={todoEl}>
       <div class="od-sites--todo-inner">
-      <div class="list od-sites--links od-sites--surface">
+      <!-- « À faire » (od-sites-todo), on every device: iPhone and iPad too since task 2026-11-14-148. -->
+      <nav class="list od-sites--links od-sites--surface od-sites-todo" aria-label={t('sites.todoLabel')}>
         <ul>
           {#if withoutSite}
             <li><a href="/sites/without/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.withoutLink', { n: withoutSite })}</div></div></a></li>
@@ -357,11 +366,11 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
           {#if unplaced}
             <li><a href="/sites/unplaced/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.unplacedLink', { n: unplaced })}</div></div></a></li>
           {/if}
-          {#if duplicates}
-            <li><a href="/sites/cleanup" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.duplicatesLink', { n: duplicates })}</div></div></a></li>
+          {#if duplicates || unused}
+            <li><a href="/sites/cleanup" class="item-link item-content"><div class="item-inner"><div class="item-title">{cleanupText}</div></div></a></li>
           {/if}
         </ul>
-      </div>
+      </nav>
       </div>
      </div>
     {/if}
@@ -893,9 +902,10 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
         min-height: 48px;
       }
 
+      /* A long row (« 2 doublons possibles, 3 sites sans plongée : … ») wraps, never cut. */
       .item-inner {
-        padding-top: 0;
-        padding-bottom: 0;
+        padding-top: 12px;
+        padding-bottom: 12px;
       }
 
       .item-title {
@@ -903,6 +913,26 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
         line-height: 20px;
         letter-spacing: 0.25px;
         color: var(--od-text);
+        white-space: normal;
+      }
+
+      /* iPhone and iPad (ios-sites): 17 pt rows, 44 pt high at least. */
+      :global(.ios) & {
+        .item-content,
+        .item-inner {
+          min-height: 44px;
+        }
+
+        .item-inner {
+          padding-top: 10px;
+          padding-bottom: 10px;
+        }
+
+        .item-title {
+          font-size: 17px;
+          line-height: 22px;
+          letter-spacing: normal;
+        }
       }
     }
 
