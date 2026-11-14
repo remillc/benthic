@@ -35,7 +35,18 @@
    *   points?: { n: number, latUdeg: number, lonUdeg: number }[],
    *   muted?: boolean,
    *   label?: string,
+   *   names?: 'always'|'fewInFullScreen',
+   *   selected?: number|null,
+   *   onstack?: (uuids: number[], at: { latUdeg: number, lonUdeg: number }) => void,
+   *   onmapclick?: () => void,
+   *   stackAt?: { latUdeg: number, lonUdeg: number }|null,
    * }}
+   * names: « fewInFullScreen » (Sites, task 2026-11-14-150): the names show only in full
+   *   screen, with 8 pins or fewer in view and no two names overlapping.
+   * selected: the site whose pin is selected (1.3×, a halo in the secondary colour, in front).
+   * onstack: a tap that touches several pins (within the 48 dp target) gives them all.
+   * onmapclick: a tap on the map, not on a pin.
+   * stackAt: where the touched pins are, marked by a blue disc.
    * points: numbered round markers (the dives without a site, task 2026-11-14-148); when
    *   given, the map is framed on them, and the sites are only the places around.
    * muted: the sites as grey pins with their name, not buttons (the places around).
@@ -43,7 +54,26 @@
    * onlocate: « Centrer sur ma position » in full screen (the screen has its own outside it).
    * overlay: drawn over the map, in and out of full screen (gets whether it is full screen).
    */
-  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null, onlocate, overlay, points = [], muted = false, label: givenLabel } = $props();
+  let {
+    sites = [],
+    pin = null,
+    editable = false,
+    onmove,
+    onselect,
+    onview,
+    height = '240px',
+    matching = null,
+    onlocate,
+    overlay,
+    points = [],
+    muted = false,
+    label: givenLabel,
+    names = 'always',
+    selected = null,
+    onstack,
+    onmapclick,
+    stackAt = null,
+  } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
   let full = $state(false);
@@ -58,8 +88,8 @@
   const divesText = (n) => t('sites.diveCount', { n });
   const PLACE = { centre: 'Centre', north: 'North', northEast: 'NorthEast', east: 'East', southEast: 'SouthEast', south: 'South', southWest: 'SouthWest', west: 'West', northWest: 'NorthWest' };
   const mapName = $derived(t(full ? 'sites.mapFullscreen' : 'sites.map'));
-  const label = $derived(
-    givenLabel ??
+  const selectedName = $derived(selected === null ? '' : (sites.find((x) => x.uuid === selected)?.name ?? ''));
+  const sitesLabel = $derived(
     mapLabel(
       sites.map((s) => ({ name: s.name || t('sites.noName'), lonDeg: s.lonUdeg / 1e6, latDeg: s.latUdeg / 1e6, dives: s.dives ?? 0 })),
       bounds,
@@ -71,6 +101,8 @@
       },
     ),
   );
+  /** The map's accessible name, with the selected pin (task 2026-11-14-150). */
+  const label = $derived(givenLabel ?? (selectedName ? `${sitesLabel}. ${t('sites.mapSelected', { name: selectedName })}` : sitesLabel));
 
   /** @param {boolean} on */
   function setFull(on) {
@@ -85,6 +117,11 @@
       map?.resize();
       fullButton?.focus(/** @type {any} */ ({ focusVisible: false }));
     });
+  }
+
+  /** Leaves full screen (a site opened from the card of a selected pin). */
+  export function exitFullScreen() {
+    setFull(false);
   }
 
   /** Moves the map to <body> in full screen and back to its place after. @param {HTMLElement} node @param {boolean} on */
@@ -112,6 +149,10 @@
   let pinMarker;
   /** @type {import('maplibre-gl').Marker[]} */
   let pointMarkers = [];
+  /** @type {import('maplibre-gl').Marker|undefined} */
+  let stackMarker;
+  /** Whether the names show (names « fewInFullScreen »). */
+  let namesOn = $state(false);
 
   const numbers = new Intl.NumberFormat(typeof document === 'undefined' ? undefined : document.documentElement.lang || undefined);
 
@@ -121,7 +162,9 @@
   function drawSites() {
     if (!map) return;
     for (const m of markers) m.marker.remove();
-    markers = sites.map((site) => {
+    // The most dived on top (drawn last), so that the busy sites stay visible.
+    const ordered = [...sites].sort((a, b) => (a.dives ?? 0) - (b.dives ?? 0));
+    markers = ordered.map((site) => {
       // The pin with the number of dives in its head, and the site's name beside it.
       const name = site.name || t('sites.noName');
       // Muted: a grey pin with a white dot and the name on its left, for the eye only
@@ -160,7 +203,8 @@
       text.setAttribute('aria-hidden', 'true');
       text.textContent = name;
       el.append(drawing, text);
-      if (!muted) el.addEventListener('click', () => onselect?.(site.uuid));
+      el.dataset.uuid = String(site.uuid);
+      if (!muted) el.addEventListener('click', (e) => pick(site.uuid, e));
       // The drawing's tip (x 16, 2 px above its bottom) on the site.
       const marker = new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 2] })
         .setLngLat(lngLat(site))
@@ -168,7 +212,89 @@
       return { uuid: site.uuid, marker };
     });
     dim();
+    mark();
+    if (names !== 'always') queueMicrotask(updateNames);
   }
+
+  /**
+   * A tap on a pin: the pins whose head is within the 48 dp target around the tap.
+   * One: it is selected; several: they are given together (od-map-stack-sheet).
+   * @param {number} uuid the pin that took the tap
+   * @param {MouseEvent} e
+   */
+  function pick(uuid, e) {
+    e.stopPropagation();
+    const near = [];
+    for (const m of markers) {
+      const box = m.marker.getElement().getBoundingClientRect();
+      if (!box.width) continue;
+      // The head's centre: 16 px from the left and the top of the 32 × 42 drawing.
+      const dx = box.left + box.width / 2 - e.clientX;
+      const dy = box.top + (16 * box.height) / 42 - e.clientY;
+      if (Math.hypot(dx, dy) <= 24) near.push(m.uuid);
+    }
+    if (near.length > 1 && onstack && map) {
+      const at = map.unproject([e.clientX - map.getContainer().getBoundingClientRect().left, e.clientY - map.getContainer().getBoundingClientRect().top]);
+      onstack(near, { latUdeg: Math.round(at.lat * 1e6), lonUdeg: Math.round(at.lng * 1e6) });
+    } else onselect?.(uuid);
+  }
+
+  /** The selected pin: larger, with a halo, in front. */
+  function mark() {
+    for (const { uuid, marker } of markers) {
+      const on = uuid === selected;
+      const el = marker.getElement();
+      el.classList.toggle('od-site-map--selected', on);
+      el.style.zIndex = on ? '2' : '';
+    }
+  }
+
+  $effect(() => {
+    selected;
+    mark();
+  });
+
+  // The blue disc where several pins were touched.
+  $effect(() => {
+    if (!map) return;
+    if (!stackAt) {
+      stackMarker?.remove();
+      stackMarker = undefined;
+      return;
+    }
+    if (!stackMarker) {
+      const el = document.createElement('div');
+      el.className = 'od-site-map--stack-disc';
+      el.setAttribute('aria-hidden', 'true');
+      stackMarker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(stackAt)).addTo(map);
+    } else stackMarker.setLngLat(lngLat(stackAt));
+  });
+
+  /**
+   * Names in full screen only, with 8 pins or fewer in view and none overlapping
+   * another (names « fewInFullScreen »).
+   */
+  function updateNames() {
+    if (names === 'always' || !map) return;
+    let on = false;
+    if (full) {
+      const b = map.getBounds();
+      const inView = markers.filter((m) => b.contains(m.marker.getLngLat()));
+      if (inView.length <= 8) {
+        // Measured with the names shown.
+        root?.classList.add('od-site-map--names-on');
+        const boxes = inView.map((m) => /** @type {HTMLElement} */ (m.marker.getElement().querySelector('.od-site-map--pin-name')).getBoundingClientRect());
+        on = !boxes.some((a, i) => boxes.some((c, j) => j > i && a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom));
+      }
+    }
+    namesOn = on;
+    root?.classList.toggle('od-site-map--names-on', on);
+  }
+
+  $effect(() => {
+    full;
+    if (map?.loaded()) tick().then(updateNames);
+  });
 
   /** The numbered markers: a 22 dp ink circle, white number, 2 dp white ring. */
   function drawPoints() {
@@ -249,9 +375,15 @@
       // Offline over a region of less detail (zoom 12), the map does not zoom further.
       applyZoomCap(m);
       readBounds();
+      updateNames();
       const b = m.getBounds();
       const c = m.getCenter();
       onview?.({ center: [c.lng, c.lat], bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: m.getZoom() });
+    });
+    // A tap on the map, not on a pin (a pin's tap stops at the pin).
+    m.on('click', (e) => {
+      if (/** @type {HTMLElement|null} */ (e.originalEvent?.target)?.closest?.('.od-site-map--site-marker')) return;
+      onmapclick?.();
     });
     if (editable) {
       // The position under the pin, once the map stops; moves made by the
@@ -343,6 +475,7 @@
 <div
   class="od-site-map no-swipeback"
   class:od-map-fullscreen={full}
+  class:od-site-map--quiet={names !== 'always'}
   style:height={full ? '100%' : height}
   role="region"
   aria-label={label}
@@ -469,6 +602,22 @@
       }
     }
 
+    /* Sites: no names on the map, but in full screen with few pins (updateNames). */
+    .od-site-map--quiet:not(:global(.od-site-map--names-on)) :global(.od-site-map--pin-name) {
+      display: none;
+    }
+
+    /* Where several pins were touched: a blue disc, 2 dp outline (od-map-stack-sheet). */
+    :global(.od-site-map--stack-disc) {
+      width: 48px;
+      height: 48px;
+      box-sizing: border-box;
+      border: 2px solid var(--od-secondary);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--od-secondary) 16%, transparent);
+      pointer-events: none;
+    }
+
     :global(.od-site-map--point) {
       box-sizing: border-box;
       width: 22px;
@@ -535,6 +684,26 @@
         font-weight: 700;
         text-anchor: middle;
         font-variant-numeric: tabular-nums;
+      }
+
+      /* Selected (task 2026-11-14-150): 1.3×, a halo in the secondary colour at 18 %. */
+      &:global(.od-site-map--selected) :global(.od-site-map--pin) {
+        transform: scale(1.3);
+        transform-origin: 50% 95%;
+        filter: drop-shadow(0 0 0 transparent) drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
+      }
+
+      &:global(.od-site-map--selected)::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 16px;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--od-secondary) 18%, transparent);
+        transform: translate(-50%, -50%) translateY(-6px);
+        pointer-events: none;
       }
 
       /* Baseline 20 px above the tip, 18 px right of it, as drawn. */

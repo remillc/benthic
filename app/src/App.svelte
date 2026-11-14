@@ -49,7 +49,9 @@
   import NavRail from './components/NavRail.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
-  const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
+  // The route badge: on the development server only (task 2026-11-14-150), never in a built app,
+  // even one built on a machine whose .env.local asks for it.
+  const showRoute = /** @type {any} */ (import.meta).env?.DEV === true && /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
   import Download from './pages/Download.svelte';
   import HealthImport from './pages/HealthImport.svelte';
   import NavMenu from './components/NavMenu.svelte';

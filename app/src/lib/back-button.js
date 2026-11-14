@@ -9,7 +9,13 @@ import { backThroughGuard } from './leave-guard.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
-    // 0. A map shown full screen (components/SiteMap.svelte) goes back to its place.
+    // 0. The card of a selected pin on the Sites map closes (pages/Sites.svelte), then
+    // a map shown full screen (components/SiteMap.svelte) goes back to its place.
+    const siteCard = document.querySelector('.od-map-site-card');
+    if (siteCard && siteCard.getClientRects().length && !document.querySelector('.modal-in')) {
+      siteCard.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
     const fullMap = document.querySelector('.od-map-fullscreen');
     if (fullMap) {
       fullMap.dispatchEvent(new CustomEvent('od-cancel'));
