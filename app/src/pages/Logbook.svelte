@@ -1105,8 +1105,8 @@
           <span class="od-sr-only">{t('logbook.search')}</span>
         </Link>
       {/if}
-      <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120). -->
-      <AccountAvatar />
+      <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120); iPhone: last. -->
+      {#if !theme.ios}<AccountAvatar />{/if}
       {#if logbook.dives.length || logbook.preview}
         <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
@@ -1115,6 +1115,8 @@
       {/if}
       {#if theme.ios}
         <Link iconOnly onClick={add}><Icon name="plus" /><span class="od-sr-only">{t('logbook.add')}</span></Link>
+        <!-- iPhone: the account initial after the other buttons (task 2026-11-14-127). -->
+        <AccountAvatar />
       {/if}
     </NavRight>
   </Navbar>

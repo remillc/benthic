@@ -284,10 +284,11 @@
 
 <App {...f7params}>
   <!-- Tablet, both orientations: the rail (Android) or the sidebar (iPad). Android phone: the
-       bottom bar. Android, phone and tablet: the account sheet (tasks 2026-11-14-120 and 126).
-       iPhone: the ☰ side menu. -->
+       bottom bar; iPhone: the tab bar (task 2026-11-14-127). The account sheet: phones and
+       Android tablets (tasks 2026-11-14-120, 126, 127). The ☰ side menu only remains for a
+       window between the phone and tablet layouts that has no rail. -->
   {#if layout.rail}<NavRail />{:else if !bottomNav()}<NavMenu />{/if}
-  {#if !ios && (layout.rail || bottomNav())}<AccountSheet />{/if}
+  {#if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <SyncFailureSheet />
   <ConflictHost />

@@ -32,7 +32,7 @@
 </script>
 
 {#if shown}
-  <button type="button" class="od-account-avatar" class:od-account-avatar--rail={rail} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
+  <button type="button" class="od-account-avatar" class:od-account-avatar--rail={rail} class:od-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
     <span class="od-account-avatar--circle">
       {#if initial}{initial}{:else}<Icon name="account" size={20} weight={2} />{/if}
     </span>
@@ -88,6 +88,24 @@
       .od-account-avatar--badge {
         top: 6px;
         right: 6px;
+        box-shadow: 0 0 0 2px var(--od-background);
+      }
+    }
+
+    /* iPhone (task 2026-11-14-127): a 32 pt circle in the secondary colour, white initial. */
+    .od-account-avatar--ios {
+      width: 44px;
+      height: 44px;
+
+      .od-account-avatar--circle {
+        background: var(--od-secondary);
+        color: var(--od-on-secondary);
+        font-size: 15px;
+      }
+
+      .od-account-avatar--badge {
+        top: 4px;
+        right: 4px;
         box-shadow: 0 0 0 2px var(--od-background);
       }
     }
