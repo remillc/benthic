@@ -2550,3 +2550,9 @@ Christian's request of 14 November 2026 (to-do #68). Subsurface's core reads FIT
 3. **Test**: add a small sample FIT file with no personal data to the tests (the core's own test files or a synthetic one) and a test that imports it through the façade and checks the dive count, the duration, the maximum depth and the dive computer. Keep it in the release check if it fits there.
 4. **Texts** (fr and en, `docs/ui-writing.md`): where the app lists the accepted files (`logbook.emptyNote`, `logbook.importFailed`, and the « Bringing the logbook » screens if they list them), add Garmin: for example « Les fichiers de Subsurface (.ssrf, .xml), de divelogs.de, des montres Garmin (.fit) et d’autres carnets… ». Add a release-notes line.
 5. Report what works and what does not in this task's « Done » paragraph, and update to-do #68 in `docs/TODOS.md` with the result.
+
+## [ ] 2026-11-14-125 Carnet scrolled with sticky month headers: the ⋮ at the far right
+
+Christian's correction of 14 November 2026, completing task 120. Mock-ups: `docs/mockups/android-carnet-entetes.dc.html`, `docs/mockups/android-carnet-entetes-petit.dc.html`.
+
+When the Carnet is scrolled and its top bar shows the search icon (sticky month headers state), the actions on the right are, in this order: search, the account avatar, then the page ⋮ **always last, at the far right**. Same rule everywhere a top bar of a section page has both the avatar and a ⋮. The title « Carnet » starts 16 dp from the screen edge, as in the other states. Check on the phone emulator while scrolling the Carnet, with a large and a small logbook.
