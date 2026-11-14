@@ -1712,6 +1712,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Dialogues : quand les boutons ne tiennent pas sur une ligne, ils s’empilent, l’action principale en haut ; aucun libellé n’est coupé.",
       "iPhone : « + › Importer depuis Apple Santé » ajoute au carnet les plongées d’une Apple Watch Ultra (profondeur et température).",
       "Carnet : le bouton « + » est de nouveau à 24 dp du bord droit, au-dessus de la barre du bas.",
       "À propos : « Libre, et votre carnet aussi », avec « Voir sur GitHub » et « Exporter mon carnet ».",

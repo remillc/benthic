@@ -17,9 +17,25 @@
    *   role?: 'dialog'|'alertdialog',
    * }}
    */
+  import { fitButtons } from '../lib/dialog-fit.js';
+
   let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog' } = $props();
 
   const id = `od-dialog-${Math.random().toString(36).slice(2, 9)}`;
+
+  /**
+   * The buttons stack when they do not fit on one line (task 2026-11-14-143): measured once
+   * drawn, and again when the dialog changes width (rotation, font size).
+   * @param {HTMLElement} surface
+   */
+  function fit(surface) {
+    const row = /** @type {HTMLElement|null} */ (surface.querySelector('.od-md3-dialog--actions'));
+    const measure = () => fitButtons(surface, row);
+    requestAnimationFrame(measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(surface);
+    return { destroy: () => observer.disconnect() };
+  }
 
   /** @param {HTMLElement} node */
   function portal(node) {
@@ -56,7 +72,7 @@
 <div class="od-md3-dialog modal-in {extraClass}" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="od-md3-dialog--scrim" onclick={oncancel}></div>
-  <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1">
+  <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1" use:fit>
     <h2 {id}>{title}</h2>
     {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
     <div class="od-md3-dialog--content">{@render children()}</div>
@@ -168,6 +184,26 @@
 
     .od-md3-dialog--actions :global(.od-md3-dialog--start) {
       margin-right: auto;
+    }
+
+    /* Not on one line: one per line, aligned to the end, the main action (the last) on top. */
+    :global(.od-dialog-stacked) .od-md3-dialog--actions {
+      flex-direction: column-reverse;
+      align-items: flex-end;
+
+      :global(button) {
+        max-width: 100%;
+        height: auto;
+        min-height: 40px;
+        padding: 10px 12px;
+        line-height: 20px;
+        white-space: normal;
+        text-align: end;
+      }
+
+      :global(.od-md3-dialog--start) {
+        margin-right: 0;
+      }
     }
 
     :global(.ios) .od-md3-dialog--surface {
