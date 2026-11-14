@@ -2800,3 +2800,39 @@ The maps in these boards are now real OpenStreetMap images. That only changes th
 4. **Site maps in cards** (site sheet, new and edit site): the map now stays inside its rounded card, so the credit is fully visible.
 
 English: « Show map full screen », « Exit full screen », « 1 dive » / « {n} dives » in the map label. Same on iPhone and the tablets, with iOS sizes on iOS. Update `docs/ui-specification.md` (Sites, site sheet, site form) and `docs/system-design.md` (shared components).
+
+## [ ] 2026-11-14-148 Sites: maps for dives without a site and for duplicates, a « to do » shortcut that includes unused sites
+
+Decided with Christian on 14 November 2026 (to-do #62, ideas 3 and 4). Mock-ups in `docs/mockups/` (all `.dc.html`): `sites-sans-site-android`, `sites-nettoyer-android`, `sites-nettoyer-pas-doublons-android`, `android-sites`, `android-sites-hors-ligne`, `android-tablette-sites-portrait`, `android-tablette-sites-paysage`, `ios-sites`, `tablette-sites`. The maps there are real OpenStreetMap images.
+
+1. **« Plongées sans site »: a map of the dive positions** (`od-dives-without-site-map`).
+   - Under the intro text, a card (16 dp corners) holds a 170 dp map. It shows every dive of the list that has a GPS position, recorded by the dive computer or the phone.
+   - Each dive is a numbered round marker: a 22 dp ink circle with a white number and a 2 dp white ring.
+   - The existing sites nearby are grey pins (#75787C) with their name.
+   - The map has the full-screen button at the top right (task 147).
+   - Under the map, the line « Position enregistrée par l’ordinateur ou le téléphone. Les plongées sans position ne sont pas sur la carte. », after a small ink dot.
+   - Each listed dive with a position shows the same numbered badge before its date. Its accessible label is « Point {n} sur la carte ».
+   - Without any dive with a position, the map card is not shown.
+2. **Suggestion by distance.**
+   - When the nearest site is within the limit, it becomes a tonal button with the site's name, before « Choisir un site » and « Nouveau site ».
+   - Under the buttons, the line « Suggestion : {site}, à {distance} de la position de la plongée », with the distance in the depth unit (« 689 pi », « 210 m »).
+   - Beyond the limit, there is no suggestion and the line reads « Aucun site à moins de {limite} de sa position. « Nouveau site » le crée à cet endroit. » « Nouveau site » then opens the new site form at the dive's position.
+   - The limit is 500 m (1 640 ft). It is an app constant listed in `docs/advanced-settings.md`, not a visible setting.
+   - The trip suggestion (« même voyage que … ») is unchanged for dives without a position.
+3. **« Nettoyer les sites »: a map strip per duplicate group.**
+   - Between the group's title and its sites, a map strip 110 dp high spans the card's width and shows both sites.
+   - The kept site (the checked row) is a filled ink pin. The other is a white pin with an ink outline.
+   - A dashed ink line joins the two pins. Each pin carries its name, in ink with a white halo.
+   - Sites at the same position share one pin with the count (« 2 ») and the names under it (« Lake Coleridge, Coleridge, NZ »).
+   - The strip is zoomed to fit both sites. It is not interactive: no full-screen button, because the « Modifier le site » pencils already open the map to move a site.
+   - The accessible label says the names and the distance (« Carte : Northern Arch et Northern arch, à 131 pi l’un de l’autre »).
+4. **The Sites « to do » shortcut counts unused sites too.** « Nettoyer les sites » also deletes sites without a dive, but the shortcut only showed when there were duplicates.
+   - It now reads « 2 doublons possibles, 3 sites sans plongée : nettoyer les sites ».
+   - With only one kind, it reads « 2 doublons possibles : nettoyer les sites » or « 3 sites sans plongée : nettoyer les sites ».
+   - With neither, it is hidden.
+   - Same on the Android tablet and in Sites offline.
+5. **iPhone and iPad get the « to do » shortcuts** (`od-sites-todo`).
+   - Like Android: an inset grouped list « À faire » above the list of sites, with the same three rows and iOS chevrons, 17 pt. Each row is shown only when it applies.
+   - « 6 plongées sans site : les associer » no longer sits at the bottom of the list.
+
+English: « Point {n} on the map », « Position recorded by the dive computer or the phone. Dives without a position are not on the map. », « Suggestion: {site}, {distance} from the dive's position », « No site within {limit} of its position. “New site” creates one there. », « {n} possible duplicates, {m} sites without a dive: clean up the sites ». Update `docs/ui-specification.md` (Dives without a site, Clean up the sites, Sites screen).
