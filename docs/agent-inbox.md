@@ -2692,3 +2692,14 @@ Christian's to-do #18, done on 14 November 2026. Mock-ups updated in `docs/mocku
 In every French text of the app, write « courriel », never « e-mail » or « mail »: « Adresse courriel » (field label), « Courriel » (short iPhone row label), « Un code vous est envoyé par courriel pour confirmer l'adresse. », « Cette adresse courriel n'est pas valide ». Today `app/src/i18n/fr.json` still has five « e-mail » (`emailRow`, two `email`, `intro`, `invalidEmail`): fix them, then search the whole French text (strings, accessibility labels, error messages, the French pages of `site/`) for « e-mail », « email » and « mail » shown to the user. English keeps « email ». Add the rule to `docs/ui-writing.md` (French vocabulary). Code comments and identifiers are not concerned.
 
 Done in fix/courriel: the five « e-mail » of fr.json became « Courriel » (accountStep.emailRow), « Adresse courriel » (twice), « envoyé par courriel » and « Cette adresse courriel n’est pas valide ». A search of every French string (fr.json, which also feeds the site's French pages) finds no other « e-mail », « email » or « mail » shown to the user ({email} placeholders apart); the components hold no French text. Rule added to docs/ui-writing.md (9. Vocabulary, French).
+
+## [ ] 2026-11-14-141 « Courriel » for fr-CA only: France keeps « e-mail »
+
+Christian's correction of 14 November 2026 to task 140 (already done in `f70735a`): the « courriel » rule is for **Canadian French (fr-CA) only**, not for `fr`.
+
+1. In `app/src/i18n/fr.json`, put back « e-mail » in every string task 140 changed (« Adresse e-mail », « E-mail », « …envoyé par e-mail… », « Cette adresse e-mail n'est pas valide », and any other one changed then).
+2. In `app/src/i18n/fr-CA.json` (which holds only what differs from `fr`), add the « courriel » versions of those same keys: « Adresse courriel », « Courriel », « Un code vous est envoyé par courriel pour confirmer l'adresse. », « Cette adresse courriel n'est pas valide ».
+3. Same split for the French pages of `site/` if task 140 changed them: they are read in both countries, so use the fr-CA wording only where the site has a Canadian version, else keep « e-mail ».
+4. In `docs/ui-writing.md`, the rule becomes: fr-CA « courriel », fr « e-mail ». The mock-ups are in Canadian French.
+
+Check the app with the device in French (Canada) and in French (France).
