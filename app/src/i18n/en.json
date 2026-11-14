@@ -472,6 +472,7 @@
       "logbook": "Logbook",
       "equipment": "Equipment",
       "profile": "Dive profile",
+      "po2Graph": "Rebreather pO₂ graph",
       "deco": "Decompression",
       "partialPressures": "Partial pressures",
       "rebreather": "Rebreather",
@@ -490,7 +491,7 @@
       "units": "Units",
       "logbook": "Logbook",
       "equipment": "Equipment",
-      "profile": "Profile and decompression",
+      "decompression": "Decompression",
       "gases": "Gases and rebreather",
       "tools": "Tools",
       "download": "Computers and download",
@@ -612,7 +613,7 @@
     "redCeiling": "Ceiling in red",
     "calcCeiling": {
       "label": "Calculated ceiling",
-      "text": "Shows the ceiling calculated with the decompression model below"
+      "text": "With the model chosen in Settings › Decompression"
     },
     "tankbar": {
       "label": "Tank bar",
@@ -656,9 +657,9 @@
       "setpointText": "Used by the planner",
       "setpointDialog": "In {unit}.",
       "sensors": "Show each O₂ sensor",
-      "sensorsText": "On the pO₂ graph, one line per cell",
+      "sensorsText": "One line per cell",
       "setpoints": "Show the setpoint",
-      "setpointsText": "On the pO₂ graph, the target value",
+      "setpointsText": "The target value",
       "ocDiluent": "Open-circuit gas as diluent",
       "o2consumption": "Metabolic O₂ consumption (pSCR)",
       "o2consumptionDialog": "In litres per minute.",
@@ -1691,6 +1692,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings: the profile and pO₂ graph options move to Display; “Profile and decompression” becomes “Decompression”.",
       "Swiping between sections, between dives or to Settings and About: the screen follows the finger from the start and finishes at the finger’s speed.",
       "Android phone: navigation bar at the bottom (Logbook, Sites, Statistics, Tools); the account, sync, Settings and About open from the avatar at the top right.",
       "Desaturation updates when you come back to the app.",

@@ -2481,7 +2481,7 @@ Check on the phone emulator: each tab selected, light and dark, TalkBack on the 
 
 Done in feature/bottom-nav-phone: NavigationBar, AccountAvatar and AccountSheet components on Android phones (bottomNav()); the side menu stays on iPhone and Android tablets in portrait, the rail in landscape. Compte, Réglages and À propos open over the section with a back arrow. Checked on emulator-5554: the four tabs, light and dark, TalkBack names, the sheet with and without an account, Compte and Réglages from the sheet.
 
-## [ ] 2026-11-14-121 Réglages: the profile's display options move to Affichage, « Profil et décompression » becomes « Décompression »
+## [x] 2026-11-14-121 Réglages: the profile's display options move to Affichage, « Profil et décompression » becomes « Décompression »
 
 Christian's decision of 14 November 2026. Affichage now holds the theme and everything that only changes what the dive profile shows. No key, default or behaviour changes: rows move, one page is renamed, three supporting texts change. Mock-ups in `docs/mockups/`: `reglages-affichage-android`, `reglages-profil-deco-android` (now the Décompression page), `reglages-gaz-android`, `reglages-apercu-android`, and their iPhone versions `ios-reglages-affichage`, `ios-reglages-profil-deco`, `ios-reglages-gaz`, `ios-reglages-apercu` (all `.dc.html`).
 
@@ -2501,3 +2501,5 @@ Christian's decision of 14 November 2026. Affichage now holds the theme and ever
 Do not copy from the mock-up: the value « 1 h 10 » shown for « Rapport de dilution (pSCR) » is a mock-up error; the app keeps its ratio format.
 
 Tablet: same pages in the right pane. Settings search still finds each moved row and opens Affichage. Update `docs/ui-specification.md` (Settings paragraph) where it lists the groups in detail. Check on the phone and tablet emulators, fr and en, that every moved switch still acts on the profile and on the pO₂ graph.
+
+Done in feature/settings-display-decompression: Affichage holds the theme, « Profil de plongée » and « Graphique de pO₂ en recycleur »; « Décompression » at /settings/decompression opens on the warning; the Recycleur block keeps its four rows; texts changed in fr and en; ui-specification Settings listing updated. Checked on the phone emulator in fr and en (each moved switch changes its core setting; search finds them) and on the tablet. Also fixed: two switches flipped quickly no longer overwrite each other (core changes are queued).

@@ -472,6 +472,7 @@
       "logbook": "Carnet",
       "equipment": "Équipement",
       "profile": "Profil de plongée",
+      "po2Graph": "Graphique de pO₂ en recycleur",
       "deco": "Décompression",
       "partialPressures": "Pressions partielles",
       "rebreather": "Recycleur",
@@ -490,7 +491,7 @@
       "units": "Unités",
       "logbook": "Carnet",
       "equipment": "Équipement",
-      "profile": "Profil et décompression",
+      "decompression": "Décompression",
       "gases": "Gaz et recycleur",
       "tools": "Outils",
       "download": "Ordinateurs et téléchargement",
@@ -612,7 +613,7 @@
     "redCeiling": "Plafond en rouge",
     "calcCeiling": {
       "label": "Plafond calculé",
-      "text": "Affiche le plafond calculé selon le modèle de décompression ci-dessous"
+      "text": "Selon le modèle choisi dans Réglages › Décompression"
     },
     "tankbar": {
       "label": "Bande des bouteilles",
@@ -656,9 +657,9 @@
       "setpointText": "Utilisée par le planificateur",
       "setpointDialog": "En {unit}.",
       "sensors": "Afficher chaque capteur d’O₂",
-      "sensorsText": "Sur le graphique de pO₂, une courbe par cellule",
+      "sensorsText": "Une courbe par cellule",
       "setpoints": "Afficher la consigne",
-      "setpointsText": "Sur le graphique de pO₂, la valeur visée",
+      "setpointsText": "La valeur visée",
       "ocDiluent": "Gaz en circuit ouvert comme diluant",
       "o2consumption": "Consommation métabolique d’O₂ (pSCR)",
       "o2consumptionDialog": "En litres par minute.",
@@ -1691,6 +1692,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : les options du profil et du graphique de pO₂ passent dans Affichage ; « Profil et décompression » devient « Décompression ».",
       "Glisser entre les sections, entre les plongées ou vers Réglages et À propos : l’écran suit le doigt dès le début et finit son mouvement à la vitesse du doigt.",
       "Téléphone Android : barre de navigation en bas (Carnet, Sites, Statistiques, Outils) ; le compte, la synchronisation, Réglages et À propos s’ouvrent depuis l’avatar en haut à droite.",
       "Désaturation se met à jour quand on revient dans l’app.",

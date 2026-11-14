@@ -97,12 +97,20 @@
 
   /** @param {Partial<CorePrefValues>} changes */
   async function setCore(changes) {
-    try {
-      logbook.prefs = await setCorePrefs(changes);
-    } catch (e) {
-      failed(e);
-    }
+    // One change at a time: two switches flipped quickly otherwise came back out of order,
+    // the older settings overwriting the newer.
+    const run = coreQueue.then(async () => {
+      try {
+        logbook.prefs = await setCorePrefs(changes);
+      } catch (e) {
+        failed(e);
+      }
+    });
+    coreQueue = run;
+    return run;
   }
+  /** The last change sent to the core. */
+  let coreQueue = Promise.resolve();
 
   // --- Values and examples ---------------------------------------------------
 
@@ -495,7 +503,8 @@
       ],
     },
     {
-      id: 'profile',
+      // What the dive profile shows: on the Affichage page (task 2026-11-14-121).
+      id: 'profileDisplay',
       title: t('settings.groups.profile'),
       rows: [
         { kind: 'switch', id: 'showAverageDepth', label: t('settings.averageDepth'), checked: p.showAverageDepth, set: (v) => setCore({ showAverageDepth: v }) },
@@ -503,6 +512,16 @@
         { kind: 'switch', id: 'redCeiling', label: t('settings.redCeiling'), text: t('settings.redCeilingText'), checked: p.redCeiling, dimmed: !p.dcCeiling, set: (v) => setCore({ redCeiling: v }) },
         { kind: 'switch', id: 'calcCeiling', label: t('settings.calcCeiling.label'), text: t('settings.calcCeiling.text'), checked: p.calcCeiling, set: (v) => setCore({ calcCeiling: v }) },
         { kind: 'switch', id: 'tankbar', label: t('settings.tankbar.label'), text: t('settings.tankbar.text'), checked: p.tankbar, set: (v) => setCore({ tankbar: v }) },
+      ],
+    },
+    {
+      // The rebreather's pO₂ graph, also on Affichage (task 2026-11-14-121).
+      id: 'po2Graph',
+      title: t('settings.groups.po2Graph'),
+      rows: [
+        { kind: 'switch', id: 'showCcrSensors', label: t('settings.rebreather.sensors'), text: t('settings.rebreather.sensorsText'), checked: p.showCcrSensors, set: (v) => setCore({ showCcrSensors: v }) },
+        { kind: 'switch', id: 'showCcrSetpoint', label: t('settings.rebreather.setpoints'), text: t('settings.rebreather.setpointsText'), checked: p.showCcrSetpoint, set: (v) => setCore({ showCcrSetpoint: v }) },
+        { kind: 'switch', id: 'showScrOcPo2', label: t('settings.rebreather.ocPo2'), checked: p.showScrOcPo2, set: (v) => setCore({ showScrOcPo2: v }) },
       ],
     },
     {
@@ -621,8 +640,6 @@
           wheels: () => [wheel(t('settings.rebreather.setpoint'), range(0, 10000, 100), p.setpointMbar, defaults.setpointMbar, (v) => formatNumber(v / 1000, 1))],
           set: ([i]) => setCore({ setpointMbar: i * 100 }),
         },
-        { kind: 'switch', id: 'showCcrSensors', label: t('settings.rebreather.sensors'), text: t('settings.rebreather.sensorsText'), checked: p.showCcrSensors, set: (v) => setCore({ showCcrSensors: v }) },
-        { kind: 'switch', id: 'showCcrSetpoint', label: t('settings.rebreather.setpoints'), text: t('settings.rebreather.setpointsText'), checked: p.showCcrSetpoint, set: (v) => setCore({ showCcrSetpoint: v }) },
         { kind: 'switch', id: 'allowOcGasAsDiluent', label: t('settings.rebreather.ocDiluent'), checked: p.allowOcGasAsDiluent, set: (v) => setCore({ allowOcGasAsDiluent: v }) },
         {
           kind: 'number',
@@ -643,7 +660,6 @@
           wheels: () => [wheel(t('settings.rebreather.dilution'), range(1, 100, 1), Math.round(1000 / p.pscrRatio), Math.round(1000 / defaults.pscrRatio), (n) => `1:${formatNumber(n)}`)],
           set: ([i]) => setCore({ pscrRatio: Math.round(1000 / (1 + i)) }),
         },
-        { kind: 'switch', id: 'showScrOcPo2', label: t('settings.rebreather.ocPo2'), checked: p.showScrOcPo2, set: (v) => setCore({ showScrOcPo2: v }) },
       ],
     },
     {
@@ -803,9 +819,9 @@
           summary: [t('settings.overview.cylinderTypes'), p.defaultCylinder].filter(Boolean).join(' · '),
         },
         {
-          id: 'profile',
+          id: 'decompression',
           icon: 'M3 5l3 7 4 3 5 1 3-4 3-7',
-          href: '/settings/profile',
+          href: '/settings/decompression',
           summary: [rowOf('decoModel')?.value, rowOf('gf')?.dimmed || !rowOf('gf')?.value ? '' : `GF ${rowOf('gf').value.replace(/\s/g, '')}`].filter(Boolean).join(', '),
         },
         {
@@ -1069,7 +1085,12 @@
 
   <!-- Affichage first (task 2026-11-13-110), then Langue et formats and Unités. On a subpage
        of one group, the app bar names it: no second title. -->
-  {#if inPage('display')}{@render groupView('display', !section)}{/if}
+  <!-- Affichage: the theme, then what the dive profile and the rebreather's pO₂ graph show (task 2026-11-14-121). -->
+  {#if inPage('display')}
+    {@render groupView('display', !section)}
+    {@render groupView('profileDisplay')}
+    {@render groupView('po2Graph')}
+  {/if}
   {#if inPage('language')}{@render groupView('language', !section)}{/if}
 
   <!-- Units: the system, the five units, then speeds, duration and coordinates. -->
@@ -1095,10 +1116,9 @@
 
   {#if inPage('logbook')}{@render groupView('logbook', !section)}{/if}
   {#if inPage('equipment')}{@render groupView('equipment', !section)}{/if}
-  {#if inPage('profile')}{@render groupView('profile')}{/if}
-
-  {#if inPage('profile') && decoWarningShown}
-    <h2 class="od-settings--title">{t('settings.groups.deco')}</h2>
+  <!-- Décompression: opens on the warning; the app bar names the page, so no heading there. -->
+  {#if inPage('decompression') && decoWarningShown}
+    {#if !section}<h2 class="od-settings--title">{t('settings.groups.deco')}</h2>{/if}
     <div class="od-settings--warning" role="note">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
       <span>{t('settings.deco.warning')}</span>
