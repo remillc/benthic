@@ -1016,7 +1016,7 @@
   },
   "deleteAccount": {
     "back": "Retour au compte",
-    "definitive": "C'est définitif",
+    "definitive": "C'est définitif !",
     "consequence": {
       "one": "Le compte {email} et sa plongée seront effacés du cloud, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler.",
       "other": "Le compte {email} et ses {n} plongées seront effacés du cloud, sur tous vos appareils et dans toutes les apps qui utilisent ce compte. Il n'y a aucun moyen d'annuler."
@@ -1795,6 +1795,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Suppression du compte cloud : l’avertissement se lit « C’est définitif ! ».",
       "Déconnexion : le dialogue montre l’icône et le titre centrés, les modifications non envoyées dans un encadré, et une vraie case à cocher pour effacer la copie de l’appareil.",
       "Compte : une section « Quitter le cloud » met côte à côte « Se déconnecter de cet appareil » et « Supprimer le compte cloud », chacun avec ce qu’il fait des plongées.",
       "Carte de chaleur : les couleurs vont du bleu (peu de plongées) au rouge (le plus de plongées), et la légende suit.",
