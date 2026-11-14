@@ -165,11 +165,11 @@
         "action": "Fix the password"
       },
       "server": {
-        "row": "The cloud isn’t answering: trying again in {n} min",
+        "row": "The cloud isn’t answering: trying again in {n} min",
         "rowManual": "The cloud isn’t answering",
         "title": "The cloud isn’t answering",
         "intro": "The network works, but the cloud server may be under maintenance.",
-        "retry": "Next automatic try in {n} minutes.",
+        "retry": "Next automatic try in {n} minutes.",
         "action": "Try again now"
       },
       "repository": {
@@ -1637,14 +1637,14 @@
       "one": "{n} planned dive",
       "other": "{n} planned dives"
     },
-    "flightIn": "Flying in {time}",
+    "flightIn": "Flying in {time}",
     "flightAllowed": "Flying allowed",
-    "diveAgo": "dive {time} ago",
+    "diveAgo": "dive {time} ago",
     "atRest": "At rest",
     "noDives": "No dives in the logbook",
     "desaturationLabel": {
-      "waiting": "Desaturation: flying in {time}, last dive {ago} ago",
-      "allowed": "Desaturation: flying allowed, last dive {ago} ago",
+      "waiting": "Desaturation: flying in {time}, last dive {ago} ago",
+      "allowed": "Desaturation: flying allowed, last dive {ago} ago",
       "rest": "Desaturation: at rest",
       "empty": "Desaturation: no dives in the logbook"
     }
@@ -1657,11 +1657,11 @@
     "noWait": "No wait",
     "canFly": "You can fly",
     "waitOverAt": "Wait over {when}",
-    "surfacedAgo": "Out of the water {time} ago",
+    "surfacedAgo": "Out of the water {time} ago",
     "surfacedLong": "Out of the water {ago}",
     "lastDive": "Last dive",
     "noRecentDive": "Over 48 h ago",
-    "ago": "{time} ago",
+    "ago": "{time} ago",
     "ruleSingle": "Recommendation: {hours} hours after a single dive in the day.",
     "ruleSeveral": "Recommendation: {hours} hours after several dives in the day.",
     "ruleFixed": "Setting: {hours} hours after the last dive.",
@@ -1691,7 +1691,7 @@
   "flight": {
     "at": "{day} at {time}",
     "banner": {
-      "title": "Flying in {time}",
+      "title": "Flying in {time}",
       "allowed": "Allowed {when}"
     },
     "notice": {
@@ -1784,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Relative times (“2 min ago”, “in 3 h”, “yesterday at 2:30 pm”) are no longer split at the end of a line.",
       "Account: the account sheet has rounder corners and the account card is a little narrower.",
       "Lists: a “›” chevron ends every row that opens another page (cylinder types, a site’s dives) and no row that opens a menu, a choice or an action (choice settings, renumbering, a trip’s place and notes).",
       "Account: in the account sheet, the title is centred and “Synced … ago” stays on the same row as the “Sync” button.",

@@ -387,6 +387,13 @@ export function localNowIso() {
 }
 
 /**
+ * A relative time on one line: its words joined with non-breaking spaces, so that a
+ * long status breaks before it, never inside it (docs/ui-writing.md, task 2026-11-14-159).
+ * @param {string} text
+ */
+export const oneLine = (text) => text.replace(/ /g, '\u00a0');
+
+/**
  * Time since a local date, in days, weeks, months or years: "il y a 9 mois".
  * Days are days of the calendar: last night's dive is "hier", even under 24 h ago.
  * @param {string} iso
@@ -395,10 +402,10 @@ export function formatTimeAgo(iso) {
   const DAY = 86400000;
   const days = Math.floor(toDate(localNowIso()).getTime() / DAY) - Math.floor(toDate(iso).getTime() / DAY);
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-  if (days < 7) return rtf.format(-days, 'day');
-  if (days < 60) return rtf.format(-Math.floor(days / 7), 'week');
-  if (days < 365) return rtf.format(-Math.floor(days / 30.44), 'month');
-  return rtf.format(-Math.floor(days / 365.25), 'year');
+  if (days < 7) return oneLine(rtf.format(-days, 'day'));
+  if (days < 60) return oneLine(rtf.format(-Math.floor(days / 7), 'week'));
+  if (days < 365) return oneLine(rtf.format(-Math.floor(days / 30.44), 'month'));
+  return oneLine(rtf.format(-Math.floor(days / 365.25), 'year'));
 }
 
 /**
@@ -410,9 +417,9 @@ export function formatTimeAgo(iso) {
 export function formatShortAgo(iso, now = localNowIso()) {
   const minutes = Math.floor((toDate(now).getTime() - toDate(iso).getTime()) / 60000);
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
-  if (minutes < 1) return rtf.format(0, 'second');
-  if (minutes < 60) return rtf.format(-minutes, 'minute');
-  if (minutes < 24 * 60) return rtf.format(-Math.floor(minutes / 60), 'hour');
+  if (minutes < 1) return oneLine(rtf.format(0, 'second'));
+  if (minutes < 60) return oneLine(rtf.format(-minutes, 'minute'));
+  if (minutes < 24 * 60) return oneLine(rtf.format(-Math.floor(minutes / 60), 'hour'));
   return formatTimeAgo(iso);
 }
 
@@ -429,7 +436,7 @@ export function formatRelativeDateTime(iso, now = localNowIso(), capital = true)
   if (days !== 0 && days !== 1) return formatDateTime(iso);
   const day = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-days, 'day');
   const text = capital ? day.charAt(0).toLocaleUpperCase(locale) + day.slice(1) : day;
-  return `${text}, ${formatTimeChoice(toDate(iso), settings.timeFormat)}`;
+  return oneLine(`${text}, ${formatTimeChoice(toDate(iso), settings.timeFormat)}`);
 }
 
 /**
@@ -443,7 +450,7 @@ export function formatDayAt(iso, now = localNowIso()) {
   const days = Math.floor(toDate(now).getTime() / DAY) - Math.floor(toDate(iso).getTime() / DAY);
   if (days < -1 || days > 1) return formatDateTime(iso);
   const day = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-days, 'day');
-  return t('flight.at', { day, time: formatTimeChoice(toDate(iso), settings.timeFormat) });
+  return oneLine(t('flight.at', { day, time: formatTimeChoice(toDate(iso), settings.timeFormat) }));
 }
 
 /**

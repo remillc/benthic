@@ -165,11 +165,11 @@
         "action": "Corriger le mot de passe"
       },
       "server": {
-        "row": "Le cloud ne répond pas : nouvel essai dans {n} min",
+        "row": "Le cloud ne répond pas : nouvel essai dans {n} min",
         "rowManual": "Le cloud ne répond pas",
         "title": "Le cloud ne répond pas",
         "intro": "Le réseau fonctionne, mais le serveur du cloud est peut-être en maintenance.",
-        "retry": "Nouvel essai automatique dans {n} minutes.",
+        "retry": "Nouvel essai automatique dans {n} minutes.",
         "action": "Réessayer maintenant"
       },
       "repository": {
@@ -1637,14 +1637,14 @@
       "one": "{n} plongée planifiée",
       "other": "{n} plongées planifiées"
     },
-    "flightIn": "Avion dans {time}",
+    "flightIn": "Avion dans {time}",
     "flightAllowed": "Avion permis",
-    "diveAgo": "plongée il y a {time}",
+    "diveAgo": "plongée il y a {time}",
     "atRest": "Au repos",
     "noDives": "Aucune plongée au carnet",
     "desaturationLabel": {
-      "waiting": "Désaturation : avion dans {time}, dernière plongée il y a {ago}",
-      "allowed": "Désaturation : avion permis, dernière plongée il y a {ago}",
+      "waiting": "Désaturation : avion dans {time}, dernière plongée il y a {ago}",
+      "allowed": "Désaturation : avion permis, dernière plongée il y a {ago}",
       "rest": "Désaturation : au repos",
       "empty": "Désaturation : aucune plongée au carnet"
     }
@@ -1657,11 +1657,11 @@
     "noWait": "Aucune attente",
     "canFly": "Vous pouvez prendre l’avion",
     "waitOverAt": "Attente terminée {when}",
-    "surfacedAgo": "Sortie de l’eau il y a {time}",
+    "surfacedAgo": "Sortie de l’eau il y a {time}",
     "surfacedLong": "Sortie de l’eau {ago}",
     "lastDive": "Dernière plongée",
     "noRecentDive": "Plus de 48 h",
-    "ago": "Il y a {time}",
+    "ago": "Il y a {time}",
     "ruleSingle": "Recommandation : {hours} heures après une seule plongée dans la journée.",
     "ruleSeveral": "Recommandation : {hours} heures après plusieurs plongées dans la journée.",
     "ruleFixed": "Réglage : {hours} heures après la dernière plongée.",
@@ -1691,7 +1691,7 @@
   "flight": {
     "at": "{day} à {time}",
     "banner": {
-      "title": "Avion dans {time}",
+      "title": "Avion dans {time}",
       "allowed": "Permis {when}"
     },
     "notice": {
@@ -1784,6 +1784,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Les temps relatifs (« il y a 2 min », « dans 3 h », « hier à 14 h 30 ») ne sont plus coupés en fin de ligne.",
       "Compte : la feuille du compte a des coins plus arrondis et la carte du compte est un peu plus étroite.",
       "Listes : une flèche « › » termine chaque ligne qui ouvre une autre page (types de bouteilles, plongées d’un site) et aucune ligne qui ouvre un menu, un choix ou une action (réglages à choix, renumérotation, lieu et notes d’un voyage).",
       "Compte : dans la feuille du compte, le titre est centré et « Synchronisé il y a… » reste sur la même ligne que le bouton « Synchroniser ».",
