@@ -3137,3 +3137,7 @@ Christian decided this on 14 November 2026. Mock-up: `compte-android-deconnexion
 4. **Actions unchanged:** text buttons stacked at the end, main action first (task 143's rule): « Synchroniser puis se déconnecter », « Se déconnecter quand même », « Annuler ».
 
 English: « 3 unsent changes », « They will go out the next time you sign in to this account on this device. ». Phone, tablet; iOS keeps its alert.
+
+## [ ] 2026-11-14-166 Delete the cloud account: « C'est définitif ! »
+
+Christian decided this on 14 November 2026. Mock-up: `compte-android-suppression.dc.html`. The warning heading of the deletion page becomes « C'est définitif ! » (French: a narrow no-break space U+202F before « ! »), English « This is permanent! » (no space). Phone, tablet, iPhone.
