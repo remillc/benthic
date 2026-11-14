@@ -2838,3 +2838,37 @@ Decided with Christian on 14 November 2026 (to-do #62, ideas 3 and 4). Mock-ups 
    - « 6 plongées sans site : les associer » no longer sits at the bottom of the list.
 
 English: « Point {n} on the map », « Position recorded by the dive computer or the phone. Dives without a position are not on the map. », « Suggestion: {site}, {distance} from the dive's position », « No site within {limit} of its position. “New site” creates one there. », « {n} possible duplicates, {m} sites without a dive: clean up the sites ». Update `docs/ui-specification.md` (Dives without a site, Clean up the sites, Sites screen).
+
+## [ ] 2026-11-14-149 High contrast: a variant of the colour variables when the system asks for more contrast
+
+Christian's to-do #75, decided on 14 November 2026. Reference: `docs/mockups/contraste-eleve-echantillons.dc.html`, one board with the variables, their ratios and the same components in the four modes. There is no duplicate set of mock-ups: the variant only changes `--od-*` variables.
+
+1. **When it applies.**
+   - iPhone and iPad: the system setting « Augmenter le contraste », which the WebView exposes as `@media (prefers-contrast: more)`. Check on a device that WKWebView reports it.
+   - Android: check whether the WebView reports `prefers-contrast: more`. If it does not, the plugin reads the system contrast level (`UiModeManager.getContrast()`, Android 14 and later) and sets the class `od-high-contrast` on the root element. Treat a level above 0.5 as « more ».
+   - The CSS matches either the media query or the class. It follows the setting live, while the app is open.
+   - No setting in the app.
+2. **Variables** (light normal → light high, dark normal → dark high):
+
+   | Variable | Light | Dark |
+   |---|---|---|
+   | `--od-text` | #1F2124 → #000000 | #F4F4F2 → #FFFFFF |
+   | `--od-text-2` | #4A4D52 → #26282B | #B5B8BC → #E2E4E7 |
+   | `--od-separator` | #DADAD6 → #74777C | #3A3C40 → #8E9196 |
+   | `--od-outline` | #74777C → #3E4145 | #8E9196 → #C2C5C9 |
+   | secondary | #114477 → #0A2D52 | #8FB6E6 → #C2DAF7 |
+   | tertiary | #B4530F → #7A3200 | #F0A66B → #FFC79A |
+   | `--od-alarm` | #C62828 → #8E1010 | #FF8A80 → #FFC0B8 |
+   | `--od-oxygen` | #2E7D32 → #1B5E20 | #7FD283 → #B2EBB4 |
+   | `--od-pending` | #8A4B00 → #5C3100 | #F2B84B → #FFD98A |
+
+   - Page background: #FFFFFF in light and #000000 in dark. Surfaces stay #FFFFFF in light and become #121314 in dark.
+   - Containers (secondary #D4E2F2, tertiary #FBE3B2) are unchanged. In high contrast, the text on the tertiary container becomes #2E1900 in light and #FFFFFF in dark. The active item of the bottom bar and the rail stays secondary, with #0A2D52 in light and #FFFFFF in dark.
+   - The target is 7:1 for text and at least 3:1 for strokes. The ratios are on the board.
+3. **Other rules in high contrast.**
+   - Nothing is translucent: the iPhone tab bar, the map credit, the « Hors ligne » pill and the veil of the map behind the dive detail header become opaque. The bar's top line becomes 1.5 dp in ink.
+   - The outlines of fields, chips and outlined buttons are 1.5 dp.
+   - The profile keeps its blue water, and its line becomes 2 dp.
+   - Meaning colours keep their families, darker in light and lighter in dark. Meaning is still never carried by colour alone.
+
+Add a « High contrast » column to the colour tables of `docs/system-design.md` (section 3) and describe the detection there. Test both modes on the Carnet, the dive detail, Sites and the planner.
