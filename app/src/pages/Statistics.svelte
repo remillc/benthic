@@ -32,6 +32,8 @@
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
   import { keepInSvelteRange } from '../lib/master-detail.js';
+  import HeatMapCard from '../components/HeatMapCard.svelte';
+  import { OpenDivesCore } from 'opendives-core';
 
   /** @type {{ f7router?: any }} */
   let { f7router = undefined } = $props();
@@ -49,6 +51,17 @@
     void ids;
     computeStatistics([]).then((r) => (result = r));
     for (const s of list) computeStatistics(s.criteria).then((r) => (saved[s.id] = r?.total ?? null));
+  });
+
+  /** The sites, for « Où je plonge le plus » (their coordinates). */
+  let sites = $state(/** @type {import('opendives-core').SiteSummary[]} */ ([]));
+  $effect(() => {
+    logbook.sitesVersion;
+    if (logbook.loading) return;
+    OpenDivesCore.siteQuery({ kind: 'list' }).then(
+      (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
+      (/** @type {unknown} */ e) => console.error('Sites', e),
+    );
   });
 
   /** The dives counted by the core (invalid dives and the free filter left out), the oldest first. */
@@ -172,6 +185,9 @@
         <BarChart bars={durationBars} tinted scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
       </section>
     </div>
+
+    <!-- « Où je plonge le plus » (task 2026-11-14-152): after the charts, on the same filter. -->
+    <div class="od-statistics--heatmap"><HeatMapCard {dives} {sites} /></div>
 
     <div class="block-title">{t('stats.mine')}</div>
     {#if myStatistics.list.length || theme.ios}
@@ -381,6 +397,10 @@
       font-size: 14px;
       font-weight: 500;
       letter-spacing: 0.1px;
+    }
+
+    .od-statistics--heatmap {
+      margin-top: 16px;
     }
 
     /* Ready-made charts: cards scrolled sideways, snapping to each card. */

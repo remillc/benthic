@@ -125,9 +125,10 @@ async function createDrawer(onTile, size = { width: DRAW_WIDTH, height: HALF_HEI
    * and where each point falls on it, CSS pixels.
    * @param {[number, number][]} points [lon, lat]
    * @param {{ top: number, right: number, bottom: number, left: number }} padding
+   * @param {number} [maxZoom]
    * @returns {Promise<{ blob: Blob, xy: [number, number][] }>}
    */
-  function drawFraming(points, padding) {
+  function drawFraming(points, padding, maxZoom = 18) {
     return new Promise((resolve, reject) => {
       /** @param {{ error?: Error }} e */
       const failed = (e) => done(() => reject(e.error ?? new Error('Map strip')));
@@ -149,7 +150,7 @@ async function createDrawer(onTile, size = { width: DRAW_WIDTH, height: HALF_HEI
         }),
       );
       const bounds = points.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(points[0], points[0]));
-      map.fitBounds(bounds, { padding, maxZoom: 18, animate: false });
+      map.fitBounds(bounds, { padding, maxZoom, animate: false });
       map.triggerRepaint();
     });
   }
@@ -174,9 +175,10 @@ let stripIdle;
  * @param {[number, number][]} points [lon, lat]
  * @param {{ width: number, height: number }} size CSS pixels
  * @param {{ top: number, right: number, bottom: number, left: number }} padding
+ * @param {number} [maxZoom] the closest the picture may be (18 by default)
  * @returns {Promise<{ url: string, xy: [number, number][] }>}
  */
-export function mapStrip(points, size, padding) {
+export function mapStrip(points, size, padding, maxZoom = 18) {
   const key = `${Math.round(size.width)}x${Math.round(size.height)}`;
   const run = stripQueue.then(async () => {
     clearTimeout(stripIdle);
@@ -185,7 +187,7 @@ export function mapStrip(points, size, padding) {
       drawer = createDrawer(undefined, size);
       stripDrawers.set(key, drawer);
     }
-    const { blob, xy } = await (await drawer).drawFraming(points, padding);
+    const { blob, xy } = await (await drawer).drawFraming(points, padding, maxZoom);
     return { url: URL.createObjectURL(blob), xy };
   });
   // The next one waits for this one, failed or not; the maps go after a pause.
