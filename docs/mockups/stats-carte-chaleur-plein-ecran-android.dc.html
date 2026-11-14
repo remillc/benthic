@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Statistiques, carte de chaleur en plein écran, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/98bdd40d9c9776c0342c6095fa88b728) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/76fec74eed7ca9cbf97f9dc41adaf95a) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/9b710693576c78c27e4c783038abf91e) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/839602f67bc365daeaccdf214af3f9bc) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fd76e9f7a6ebec405432b97fb664c642) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fda13f7bdf9af1e9052b5e364691135) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div class="od-map-fullscreen od-stats-heatmap--fullscreen" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #AAD3DF; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124">
+  <svg width="390" height="844" viewBox="140 0 225.6 488" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Carte de chaleur en plein écran : la zone de Lock 21 compte le plus de plongées" style="display: block; position: absolute; inset: 0">
+    <defs><radialGradient id="od-heat"><stop offset="0" style="stop-color: #B4530F; stop-opacity: 0.85"></stop><stop offset="0.45" style="stop-color: #F0A66B; stop-opacity: 0.75"></stop><stop offset="1" style="stop-color: #FBE3B2; stop-opacity: 0"></stop></radialGradient></defs>
+    <image href="/_blob/3d6d9de439fa4f52b0d94112f1a86d66" x="0" y="0" width="390" height="488" preserveAspectRatio="none" style="filter: saturate(0.25) brightness(1.05)"></image>
+    <circle cx="340.5" cy="210.4" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="317.5" cy="198.1" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="319.0" cy="203.0" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="250.7" cy="220.9" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="22.1" cy="361.2" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="202.0" cy="246.0" r="8.0" style="fill: url(#od-heat); opacity: 0.30"></circle><circle cx="287.4" cy="218.3" r="8.8" style="fill: url(#od-heat); opacity: 0.35"></circle><circle cx="248.5" cy="239.0" r="8.8" style="fill: url(#od-heat); opacity: 0.35"></circle><circle cx="79.0" cy="331.7" r="8.8" style="fill: url(#od-heat); opacity: 0.35"></circle><circle cx="67.6" cy="339.3" r="9.3" style="fill: url(#od-heat); opacity: 0.38"></circle><circle cx="62.5" cy="339.9" r="9.3" style="fill: url(#od-heat); opacity: 0.38"></circle><circle cx="337.4" cy="210.1" r="9.3" style="fill: url(#od-heat); opacity: 0.38"></circle><circle cx="318.4" cy="205.3" r="10.2" style="fill: url(#od-heat); opacity: 0.43"></circle><circle cx="307.1" cy="198.1" r="11.0" style="fill: url(#od-heat); opacity: 0.46"></circle><circle cx="200.3" cy="245.3" r="11.0" style="fill: url(#od-heat); opacity: 0.46"></circle><circle cx="69.0" cy="339.4" r="11.3" style="fill: url(#od-heat); opacity: 0.47"></circle><circle cx="128.3" cy="292.3" r="11.9" style="fill: url(#od-heat); opacity: 0.50"></circle><circle cx="62.5" cy="339.9" r="12.5" style="fill: url(#od-heat); opacity: 0.52"></circle><circle cx="61.0" cy="339.9" r="12.7" style="fill: url(#od-heat); opacity: 0.53"></circle><circle cx="195.2" cy="255.2" r="12.7" style="fill: url(#od-heat); opacity: 0.53"></circle><circle cx="260.7" cy="235.0" r="13.9" style="fill: url(#od-heat); opacity: 0.56"></circle><circle cx="63.6" cy="338.3" r="24.5" style="fill: url(#od-heat); opacity: 0.61"></circle><circle cx="268.5" cy="231.6" r="27.5" style="fill: url(#od-heat); opacity: 0.61"></circle>
+  </svg>
+  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 40px; background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0)); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; box-sizing: border-box"><span>10 h 30</span><span>100 %</span></div>
+  <a href="android-stats.dc.html" aria-label="Quitter le plein écran" class="od-map-fullscreen--exit" style="text-decoration: none; position: absolute; right: 16px; width: 40px; height: 40px; border: none; border-radius: 12px; background: #FFFFFF; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); top: 48px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 4v5H4 M15 4v5h5 M9 20v-5H4 M15 20v-5h5"></path></svg></a>
+  <button aria-label="Centrer sur ma position" style="position: absolute; right: 16px; width: 40px; height: 40px; border: none; border-radius: 12px; background: #FFFFFF; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); bottom: 56px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3 M12 19v3 M2 12h3 M19 12h3"></path><circle cx="12" cy="12" r="7.5"></circle></svg></button>
+  <div style="position: absolute; left: 16px; bottom: 56px; z-index: 2; padding: 8px 12px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4B4A47">Moins<span style="flex: 0 0 72px; width: 72px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #FBE3B2, #F0A66B, #B4530F)"></span>Plus</div>
+  <div aria-hidden="true" style="position: absolute; left: 50%; bottom: 8px; width: 108px; height: 4px; margin-left: -54px; border-radius: 2px; background: #1F2124; opacity: 0.6"></div>
+</div>
+</x-dc>
+</body>
+</html>
