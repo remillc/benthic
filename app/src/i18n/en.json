@@ -1016,15 +1016,52 @@
   },
   "deleteAccount": {
     "back": "Back to the account",
+    "backStep": "Back to the previous step",
+    "step": "Step {n} of 3",
+    "stepTitle": "Step {n} of 3 · {title}",
+    "stepErase": "What will be erased",
+    "stepDives": "Your dives",
+    "stepConfirm": "Confirm",
+    "continue": "Continue",
     "definitive": "This is permanent!",
-    "consequence": {
-      "one": "The account {email} and its dive will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it.",
-      "other": "The account {email} and its {n} dives will be deleted from the cloud, on all your devices and in every app that uses this account. There is no way to undo it."
+    "noUndo": "There is no way to undo it.",
+    "eraseAccount": "The account {email}",
+    "eraseAccountText": "Erased from the Subsurface cloud",
+    "eraseDives": {
+      "one": "Its dive in the cloud",
+      "other": "Its {n} dives in the cloud"
     },
+    "eraseDivesText": {
+      "one": "Erased for good",
+      "other": "Erased for good"
+    },
+    "eraseElsewhere": "Subsurface on the computer and your other devices",
+    "eraseElsewhereText": "Will no longer find this logbook",
+    "nextPhone": "Next, you choose what happens to your dives on this phone.",
+    "nextTablet": "Next, you choose what happens to your dives on this tablet.",
+    "questionPhone": "What happens to your dives on this phone?",
+    "questionTablet": "What happens to your dives on this tablet?",
     "keep": "Keep my dives on this device",
     "keepText": "They move to a logbook without account, on this phone only",
+    "keepTextTablet": "They move to a logbook without account, on this tablet only",
     "export": "Export a copy of the logbook",
     "exportText": "A Subsurface file (.ssrf), to keep elsewhere",
+    "nothingKeptLead": "If you uncheck without exporting",
+    "nothingKeptRest": ", your dives will be nowhere.",
+    "summary": "In short",
+    "erased": "Erased from the cloud",
+    "erasedText": {
+      "one": "The account {email} and its dive",
+      "other": "The account {email} and its {n} dives"
+    },
+    "keptPhone": "Kept on this phone",
+    "keptTablet": "Kept on this tablet",
+    "keptText": {
+      "one": "{n} dive, in a logbook without an account",
+      "other": "{n} dives, in a logbook without an account"
+    },
+    "keptNothingPhone": "Nothing is kept on this phone",
+    "keptNothingTablet": "Nothing is kept on this tablet",
     "password": "Account password",
     "passwordText": "To confirm that it is you",
     "note": "Pending changes are sent first. The account is only deleted after the server confirms.",
@@ -1795,6 +1832,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Deleting the cloud account: a three-step wizard (what will be erased, your dives, confirm), the final button disabled until the password is typed.",
       "Deleting the cloud account: the warning reads « This is permanent! ».",
       "Sign out: the dialog shows the icon and the title centred, the unsent changes in a box, and a real checkbox to erase the device’s copy.",
       "Account: a “Leave the cloud” section puts “Sign out of this device” and “Delete the cloud account” side by side, each saying what happens to the dives.",
