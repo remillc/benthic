@@ -169,8 +169,9 @@
         color: var(--od-primary-action);
       }
 
+      /* Inside the grey field: the darker red, 5.0:1 (task 2026-11-14-153). */
       .od-text-field--invalid & {
-        color: var(--od-alarm);
+        color: var(--od-alarm-on-field);
       }
     }
 

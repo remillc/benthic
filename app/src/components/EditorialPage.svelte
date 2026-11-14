@@ -288,6 +288,11 @@
       &:disabled {
         background: color-mix(in srgb, var(--od-text) 12%, transparent);
         color: color-mix(in srgb, var(--od-text) 60%, transparent);
+
+        /* Busy (« Connexion… ») is not disabled: its label in --od-text-2, 6.4:1 (task 2026-11-14-153). */
+        &[aria-busy='true'] {
+          color: var(--od-text-2);
+        }
         cursor: default;
       }
     }

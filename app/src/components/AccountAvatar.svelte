@@ -61,7 +61,7 @@
       width: 32px;
       height: 32px;
       border-radius: 16px;
-      background: var(--od-band-control);
+      background: var(--od-band-avatar);
       color: var(--od-nav-avatar-ink);
       display: flex;
       align-items: center;
