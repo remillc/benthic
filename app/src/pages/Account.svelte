@@ -263,13 +263,16 @@
       </div>
     {/if}
 
-    <div class="block-title">{t('account.leaveGroup')}</div>
-    <!-- Leaving the account: buttons, each with its consequence (spec, section 4). -->
-    <div class="od-account--leave">
+    <!-- Signing out can be undone: under the account group, apart from it, no danger heading
+         (tasks 2026-11-14-132 and 133). Each button with its consequence (spec, section 4). -->
+    <div class="od-account--leave od-account--sign-out">
       <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(git ? 'account.gitSignOut' : 'account.signOut')}</button>
       <span class="od-account--consequence">{t(git ? 'account.gitSignOutText' : 'account.signOutText')}</span>
     </div>
     {#if !git}
+      <!-- « Zone dangereuse » right above « Supprimer le compte », its only content; a heading,
+           so that screen readers read it before the button. -->
+      <h2 class="block-title od-account--danger-title"><Icon name="warning" size={18} />{t('account.dangerZone')}</h2>
       <div class="od-account--leave">
         <button type="button" class="od-outlined-button od-danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
           {t('account.delete')}
@@ -410,10 +413,27 @@
       }
     }
 
+    /* 32 dp between the account group and « Se déconnecter » (task 2026-11-14-133). */
+    .od-account--sign-out {
+      margin-top: 32px;
+    }
+
+    .od-account--danger-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      :global(.od-icon) {
+        flex: none;
+        color: var(--od-alarm);
+      }
+    }
+
+    /* The server in use, set apart in small type (task 2026-11-14-134). */
     .od-account--caption {
-      margin: 14px 20px 24px;
-      font-size: 13px;
-      line-height: 18px;
+      margin: 24px 20px;
+      font-size: 11px;
+      line-height: 16px;
       color: var(--od-text-2);
     }
 
