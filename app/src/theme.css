@@ -1395,11 +1395,21 @@ html.od-bottom-nav-on .view.tab-active > .page-current .fab-right-bottom {
   bottom: calc(var(--od-bottom-nav-room) + 24px + var(--f7-safe-area-bottom, 0px));
 }
 
-/* Android phone (bottom bar): a section's top bar has no ☰; its title starts 16 dp from the edge. */
-html.od-bottom-nav .navbar .left:not(:has(a, button)) {
+/* iPhone: the tab bar is 49 pt high, and there is no floating « + » to lift. */
+html.ios.od-bottom-nav-on {
+  --od-bottom-nav-height: 49px;
+}
+
+/* iPhone (tab bar): no ☰, and no empty glass button where it was. */
+html.ios.od-bottom-nav .navbar .left:not(:has(a, button)) {
   display: none;
 }
 
-html.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
+/* Android phone (bottom bar): a section's top bar has no ☰; its title starts 16 dp from the edge. */
+html.md.od-bottom-nav .navbar .left:not(:has(a, button)) {
+  display: none;
+}
+
+html.md.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
   margin-left: 16px;
 }

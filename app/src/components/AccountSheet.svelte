@@ -16,7 +16,7 @@
   import { navigation, openOver, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, ios } from '../lib/layout.svelte.js';
 
   const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(logbook.email || t('menu.noAccount'));
@@ -58,6 +58,29 @@
     popover.open();
   }
 
+  /** iPhone: the sync options as an action sheet (appbar-tiroir-ios-ouvert.dc.html). */
+  function syncOptionsIos() {
+    f7.actions
+      .create({
+        buttons: [
+          [
+            { text: t('account.syncOptions'), label: true },
+            { text: t('account.syncGoAuto'), onClick: () => setAutoSync(true) },
+            {
+              text: t('account.syncShowPending'),
+              onClick: () => {
+                navigation.accountOpen = false;
+                showSection('logbook');
+                showUnsent(logbook.prefs);
+              },
+            },
+          ],
+          [{ text: t('dialog.cancel'), bold: true }],
+        ],
+      })
+      .open();
+  }
+
   /**
    * Closes the sheet, then opens a page over the current section.
    * @param {() => void} open
@@ -78,6 +101,65 @@
   push={false}
   aria-label={t('nav.accountSheet')}
 >
+  {#if ios}
+  <!-- iPhone (task 2026-11-14-127, appbar-tiroir-ios-ouvert.dc.html): a page sheet « Compte » with
+       OK, in grouped lists: the account, the sync, then Réglages and À propos. -->
+  <div class="od-account-sheet--ios">
+    <div class="od-account-sheet--ios-bar">
+      <span class="od-account-sheet--ios-title">{t('account.title')}</span>
+      <button type="button" class="od-account-sheet--ios-ok" onclick={() => (navigation.accountOpen = false)}>{t('dialog.ok')}</button>
+    </div>
+    <div class="od-account-sheet--ios-group">
+      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/account'))}>
+        <span class="od-account-sheet--initial" aria-hidden="true">
+          {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
+        </span>
+        <span class="od-account-sheet--texts">
+          <span class="od-account-sheet--name">{accountName}</span>
+          <span class="od-account-sheet--line">{accountLine} · {t('nav.manageAccount')}</span>
+        </span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+    {#if !logbook.loading && !logbook.error}
+      <div class="od-account-sheet--ios-group">
+        {#if logbook.syncFailure}
+          <div class="od-account-sheet--ios-row"><SyncFailureRow /></div>
+        {:else if logbook.conflict && logbook.conflictLater}
+          <div class="od-account-sheet--ios-row"><SyncFailureRow conflict /></div>
+        {:else if manual && logbook.pending > 0}
+          <div class="od-account-sheet--ios-row"><span class="od-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span></div>
+        {:else}
+          <div class="od-account-sheet--ios-row">
+            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
+          </div>
+        {/if}
+        {#if logbook.email}
+          <div class="od-account-sheet--ios-row od-account-sheet--ios-sync"><SyncButton /></div>
+          {#if manual}
+            <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
+          {/if}
+        {/if}
+      </div>
+    {/if}
+    <div class="od-account-sheet--ios-group">
+      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openSettings)}>
+        <Icon name="settings" />
+        <span class="od-account-sheet--row-label">
+          {t('settings.title')}
+          {#if mapUpdates > 0}<span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>{/if}
+        </span>
+        {#if mapUpdates > 0}<span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>{/if}
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openAbout)}>
+        <Icon name="info" />
+        <span class="od-account-sheet--row-label">{t('about.title')}</span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+  </div>
+  {:else}
   <div class="od-account-sheet--content">
     <div class="od-account-sheet--head">
       <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
@@ -148,6 +230,7 @@
       </a>
     </div>
   </div>
+  {/if}
 </Sheet>
 
 <style>
@@ -168,6 +251,84 @@
       .od-account-sheet--content {
         padding-bottom: 12px;
       }
+    }
+
+    /* iPhone: grouped lists on the grouped background, 10 pt corners at the top. */
+    :global(.ios .sheet-modal.od-account-sheet) {
+      --f7-sheet-bg-color: var(--od-background);
+      border-radius: 10px 10px 0 0;
+    }
+
+    .od-account-sheet--ios {
+      padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    /* Title centred, « OK » at the end: three columns. */
+    .od-account-sheet--ios-bar {
+      height: 56px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+
+    .od-account-sheet--ios-title {
+      grid-column: 2;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--od-text);
+    }
+
+    .od-account-sheet--ios-ok {
+      grid-column: 3;
+      justify-self: end;
+      min-width: 44px;
+      height: 44px;
+      border: none;
+      background: none;
+      color: var(--od-secondary);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .od-account-sheet--ios-group {
+      margin-top: 16px;
+      border-radius: 10px;
+      background: var(--od-surface);
+      overflow: hidden;
+    }
+
+    .od-account-sheet--ios-row {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 17px;
+      text-align: start;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      & + .od-account-sheet--ios-row {
+        box-shadow: inset 0 0.5px 0 var(--od-separator);
+      }
+
+      :global(.od-sync-status) {
+        padding: 0;
+        font-size: 15px;
+      }
+    }
+
+    .od-account-sheet--ios-sync {
+      justify-content: center;
+    }
+
+    .od-account-sheet--ios-link {
+      color: var(--od-secondary);
     }
 
     .od-account-sheet--content {

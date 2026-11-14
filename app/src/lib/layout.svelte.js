@@ -53,12 +53,12 @@ query?.addEventListener('change', (e) => {
 });
 
 /**
- * Android phone: the four sections are reached from the bottom navigation bar, and the top
- * bars of the sections have no ☰ (task 2026-11-14-120). iPhone and tablets keep their menu,
- * sidebar or rail.
+ * Phones: the four sections are reached from the bottom navigation (Android: the Material bar,
+ * task 2026-11-14-120; iPhone: the tab bar, task 2026-11-14-127), and the top bars of the
+ * sections have no ☰. Tablets keep their sidebar (iPad) or rail (Android).
  * @returns {boolean}
  */
-export const bottomNav = () => !ios && layout.phone;
+export const bottomNav = () => layout.phone;
 railQuery?.addEventListener('change', (e) => {
   layout.rail = e.matches;
 });

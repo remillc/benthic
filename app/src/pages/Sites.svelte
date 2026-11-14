@@ -493,11 +493,13 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
-      <AccountAvatar />
+      {#if !theme.ios}<AccountAvatar />{/if}
       <Link iconOnly popoverOpen=".od-sites-sort-menu">
         {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
         <span class="od-sr-only">{t('detail.moreOptions')}</span>
       </Link>
+      <!-- iPhone: the account initial after the other buttons (task 2026-11-14-127). -->
+      {#if theme.ios}<AccountAvatar />{/if}
     </NavRight>
   </Navbar>
 

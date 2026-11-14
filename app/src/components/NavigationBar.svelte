@@ -8,6 +8,7 @@
   import { t } from '../lib/i18n.js';
   import { navigation, goToSection, sections } from '../lib/navigation.svelte.js';
   import NavIcon from './NavIcon.svelte';
+  import { ios } from '../lib/layout.svelte.js';
 
   /**
    * A tap: another section opens; the current one scrolls back to its top.
@@ -25,7 +26,8 @@
   }
 </script>
 
-<nav class="od-navigation-bar" aria-label={t('menu.sections')}>
+<!-- iPhone (task 2026-11-14-127): the same four destinations as a tab bar, in iOS form. -->
+<nav class="od-navigation-bar" class:ios aria-label={t('menu.sections')}>
   {#each sections as section (section)}
     {@const active = navigation.section === section}
     <a href="#{section}" class="od-navigation-bar--item" class:od-navigation-bar--active={active} aria-current={active ? 'page' : undefined} onclick={(e) => choose(e, section)}>
@@ -91,6 +93,39 @@
 
       .od-navigation-bar--label {
         font-weight: 600;
+      }
+    }
+
+    /* iPhone: a translucent 49 pt tab bar, no pill; the active tab in the secondary colour. */
+    .od-navigation-bar.ios {
+      height: 49px;
+      background: color-mix(in srgb, var(--od-background) 94%, transparent);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 -0.5px 0 rgb(0 0 0 / 0.2);
+      /* The inner lines of a filled icon take the bar's colour. */
+      --od-nav-active-container: var(--od-background);
+
+      .od-navigation-bar--item {
+        justify-content: flex-start;
+        padding-top: 7px;
+        gap: 2px;
+      }
+
+      .od-navigation-bar--pill {
+        width: auto;
+        height: auto;
+        background: none;
+      }
+
+      .od-navigation-bar--label {
+        font-size: 11px;
+        line-height: 13px;
+        font-weight: 500;
+      }
+
+      .od-navigation-bar--active {
+        color: var(--od-secondary);
       }
     }
 
