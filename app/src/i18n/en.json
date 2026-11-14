@@ -1706,6 +1706,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tools: the gas tools are rows of one card, like the planner.",
       "iPhone: a tab bar at the bottom (Logbook, Sites, Statistics, Tools) and the account initial at the top right, which opens the account sheet; no more side menu.",
       "Android: the account avatar shows a badge when changes wait or a map update is ready; in manual sync, the account sheet shows the waiting changes, “Sync” and its other options. Tablet: the rail, now in portrait too, looks like the phone’s bar and has the account avatar at the bottom. “Import a file” lists the formats it reads.",
       "Scrolled logbook: a search button shows in the top bar, before the avatar; the ⋮ menu stays at the far right.",

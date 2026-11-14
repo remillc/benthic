@@ -2587,11 +2587,13 @@ The iOS build runs on GitHub (no Mac): keep the change to the web/Capacitor laye
 
 Done in feature/iphone-tab-bar, in the web layer only (no native change): the bottom navigation now covers both phones (bottomNav()); on iPhone NavigationBar.svelte is a translucent 49 pt tab bar with the same icons, active tab #114477; no ☰ and no side menu on iPhone (the empty ☰ slot is hidden). The account initial (32 pt, #114477, same badge and name as Android) sits after the other buttons of each tab's bar. AccountSheet.svelte has an iOS page sheet « Compte » with OK: account row (« … · Gérer le compte ») opening Compte, sync group (manual: pending changes, « Synchroniser », « Autres options de synchronisation » as an action sheet), Réglages (map update line and count) and À propos. Compte, Réglages and À propos have the standard back button. Checked with the forced iOS look (?theme=ios) on the Android emulator: tab names, the order of the bar's buttons and the initial's name (« Account, sync, settings and about: … »); not on a real iPhone (no Mac; the iOS workflow builds it). Not part of this task but seen: the iOS large title « Carnet » is white on the light strip under the bar.
 
-## [ ] 2026-11-14-128 Outils: the gas tools each on its own row
+## [x] 2026-11-14-128 Outils: the gas tools each on its own row
 
 Christian's correction of 14 November 2026, completing task 122. Mock-ups: `docs/mockups/android-outils.dc.html`, `docs/mockups/android-tablette-outils-paysage.dc.html`, `docs/mockups/android-tablette-outils-portrait.dc.html`.
 
 Under « Gaz », replace the grid of three tiles with one card (28 dp corners, white) holding three rows separated by a 1 dp divider indented to the text: « EAD et MOD » (Profondeurs d’un mélange), « Meilleur mélange » (Pour une profondeur), « Mélangeur de gaz » (Nitrox ou trimix). Each row is laid out like the Planificateur card: 40 dp icon container in `#D4E2F2` (keep each tool's shape), title 16 sp semibold, supporting text 14 sp `#4B4A47`, chevron at the end, at least 72 dp tall, the whole row tappable. Same on the tablet, landscape and portrait. Update the Tools page paragraph of `docs/ui-specification.md`. Check on the phone and tablet emulators, light and dark, with TalkBack.
+
+Done in fix/tools-gas-rows: under « Gaz », one card (28 dp corners) with three rows laid out like the Planificateur card: 40 dp icon container in the secondary container, each tool keeping its shape (rounded square, circle, leaf), title 16 sp semibold, supporting text 14 sp, chevron, 72 dp, a divider indented to the text; the whole row is the link (its name is the title and the supporting text). Same on tablets, under the two cards. Checked on the phone emulator and on the tablet (landscape, light and dark). ui-specification updated.
 
 ## [ ] 2026-11-14-129 Account screen: « Cloud Subsurface » instead of « Compte Subsurface vérifié »
 

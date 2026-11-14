@@ -3,7 +3,8 @@
   // Tools section (task 2026-11-14-122; docs/ui-specification.md, section 1, "Tools page and
   // gas tools"; docs/mockups/android-outils.dc.html, android-tablette-outils-*.dc.html). The two
   // dive tools are cards that say their state: the planned dives of the logbook, and the wait
-  // before flying with the time since the last dive. The three gas tools are tiles in one row.
+  // before flying with the time since the last dive. The three gas tools are rows of one card
+  // (task 2026-11-14-128).
   // On a tablet the page takes the width (no list pane): the two cards side by side, and a
   // tool opens over the page, as on a phone.
   import { Page, Navbar, NavRight, theme } from 'framework7-svelte';
@@ -134,13 +135,17 @@
     </div>
 
     <h2 class="od-tools--title">{t('tools.groupGas')}</h2>
-    <div class="od-tools--tiles" role="list">
+    <!-- One card, a row per tool, laid out like the Planificateur card (task 2026-11-14-128). -->
+    <div class="od-tools--gases" role="list">
       {#each gases as tool (tool.href)}
         <div role="listitem">
-          <a class="od-tools--tile" href={tool.href}>
-            <span class="od-tools--tile-icon od-tools--{tool.shape}"><Icon name={tool.icon} /></span>
-            <span class="od-tools--tile-name">{tool.name}</span>
-            <span class="od-tools--tile-text">{tool.text}</span>
+          <a class="od-tools--gas" href={tool.href}>
+            <span class="od-tools--gas-icon od-tools--{tool.shape}"><Icon name={tool.icon} /></span>
+            <span class="od-tools--texts">
+              <span class="od-tools--card-title">{tool.name}</span>
+              <span class="od-tools--card-line">{tool.text}</span>
+            </span>
+            <span class="od-tools--chevron"><Icon name="chevron" size={24} weight={2} /></span>
           </a>
         </div>
       {/each}
@@ -166,10 +171,6 @@
     @container (min-width: 600px) {
       .od-tools--dive {
         grid-template-columns: 1fr 1fr;
-      }
-
-      .od-tools--tile {
-        min-height: 140px;
       }
     }
 
@@ -269,32 +270,40 @@
       color: var(--od-text);
     }
 
-    .od-tools--tiles {
+    .od-tools--gases {
       margin: 0 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      border-radius: 28px;
+      background: var(--od-surface);
+      overflow: hidden;
+
+      [role='listitem'] + [role='listitem'] .od-tools--gas::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 68px;
+        right: 0;
+        height: 1px;
+        background: var(--od-row-divider);
+      }
     }
 
-    .od-tools--tile {
+    .od-tools--gas {
+      position: relative;
       box-sizing: border-box;
-      height: 100%;
-      min-height: 132px;
-      padding: 14px 12px;
-      border-radius: 24px;
-      background: var(--od-surface);
+      min-height: 72px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       color: var(--od-text);
       text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
     }
 
-    /* Three shapes, in the Material 3 Expressive spirit: rounded square, circle, leaf. */
-    .od-tools--tile-icon {
+    /* Each tool keeps its shape, in the Material 3 Expressive spirit: rounded square, circle, leaf. */
+    .od-tools--gas-icon {
       flex: none;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       background: var(--od-secondary-container);
       color: var(--od-secondary);
       display: flex;
@@ -302,28 +311,16 @@
       justify-content: center;
 
       &.od-tools--square {
-        border-radius: 16px;
+        border-radius: 14px;
       }
 
       &.od-tools--circle {
-        border-radius: 22px;
+        border-radius: 20px;
       }
 
       &.od-tools--leaf {
-        border-radius: 12px 24px 12px 24px;
+        border-radius: 10px 20px 10px 20px;
       }
-    }
-
-    .od-tools--tile-name {
-      font-size: 15px;
-      line-height: 20px;
-      font-weight: 600;
-    }
-
-    .od-tools--tile-text {
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
     }
 
     .od-tools--bottom {
