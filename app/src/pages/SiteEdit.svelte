@@ -17,16 +17,19 @@
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { placeAt } from '../lib/place-lookup.js';
+  import { deliverSite } from '../lib/site-choice.js';
   import { language, t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
 
-  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, lat?: string, lon?: string } }, f7router: any }} */
+  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, lat?: string, lon?: string, choose?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const editing = f7route.params.uuid ? Number(f7route.params.uuid) : 0;
   const forDive = f7route.query?.dive ? Number(f7route.query.dive) : 0;
+  /** Opened from « Choisir un site » (?choose=1): the site saved, or the one nearby used, is given back. */
+  const forChoice = f7route.query?.choose === '1';
   /** ?lat=&lon= (micro-degrees): the position recorded with the dive, where « Nouveau site » creates the site (task 2026-11-14-148). */
   const givenPosition =
     f7route.query?.lat && f7route.query?.lon ? { latUdeg: Number(f7route.query.lat), lonUdeg: Number(f7route.query.lon) } : null;
@@ -178,6 +181,7 @@
         // The site lists change once the dive has its site.
         logbook.sitesVersion++;
       }
+      if (forChoice) deliverSite({ uuid, name: name.trim() });
       f7router.back();
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
@@ -216,7 +220,11 @@
   async function useNearby(/** @type {MouseEvent} */ e) {
     e.preventDefault();
     if (!nearby) return;
-    if (forDive) {
+    if (forChoice) {
+      // The site nearby is the one chosen.
+      deliverSite({ uuid: nearby.uuid, name: nearby.name });
+      f7router.back();
+    } else if (forDive) {
       await saveDiveChanges(forDive, { site: nearby.uuid });
       logbook.sitesVersion++;
       f7router.back();

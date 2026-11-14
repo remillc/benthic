@@ -445,6 +445,8 @@
   "units": {
     "meters": "m",
     "feet": "pi",
+    "miles": "mi",
+    "kilometers": "km",
     "minutes": "min",
     "liters": "L",
     "litersPerMinute": "L/min",
@@ -1169,6 +1171,7 @@
       "bailout": "Secours (bailout)"
     },
     "siteHint": "Un site du carnet ou un nouveau nom",
+    "noSite": "Aucun site",
     "siteSearch": "Rechercher un site",
     "siteNew": "Nouveau site…",
     "siteNone": "Aucun site trouvé",
@@ -1302,6 +1305,18 @@
       "other": "Suggestion : même voyage que {n} plongées à {site}"
     },
     "chooseSite": "Choisir un site",
+    "chooseAway": "à {distance}",
+    "createHere": "Créer un site à ma position actuelle",
+    "searchSitePlaceholder": "Rechercher un site",
+    "chooseCountNear": {
+      "one": "{n} site, du plus proche au plus loin de votre position",
+      "other": "{n} sites, du plus proche au plus loin de votre position"
+    },
+    "chooseCountRecent": {
+      "one": "{n} site, du plus récemment plongé au plus ancien",
+      "other": "{n} sites, du plus récemment plongé au plus ancien"
+    },
+    "chooseNote": "Taper un nom ou un pays filtre la liste. Sans position, les sites sont triés du plus récemment plongé au plus ancien.",
     "diveNumberDate": "N° {number} · {date}",
     "seeProfile": "Voir le profil de la plongée",
     "noSiteSubtitle": "Plongée sans site · {mode}",
@@ -1764,6 +1779,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "« Choisir un site » : un écran qui liste tous les sites, du plus proche au plus loin de votre position (sinon du plus récemment plongé), avec la distance et un champ de recherche ; il sert dans « Plongées sans site » et pour le site de « Modifier la plongée », et peut créer un site à votre position.",
       "Réglages : ils sont maintenant gardés dans les préférences du système (Android et iOS), enregistrés tout de suite ; un réglage changé juste avant la fermeture de l’app ou une mise à jour n’est plus perdu.",
       "Sites : la carte ne montre plus les noms des sites, seulement les épingles, les plus plongées par-dessus ; toucher une épingle montre le site dans une carte, plusieurs épingles superposées ouvrent la liste de ces sites, et la liste sous la carte ne garde que les sites de la zone visible.",
       "Contraste élevé : quand le système demande plus de contraste (Android 14 et plus, « Augmenter le contraste » sur iPhone et iPad), l’app passe à des couleurs plus contrastées, sans transparence et avec des contours plus épais.",
