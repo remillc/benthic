@@ -111,14 +111,15 @@
       bottom: 2px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-surface-2);
+      /* The progress colours of every linear indicator, never black (task 2026-11-14-130). */
+      background: var(--od-progress-track);
       overflow: hidden;
     }
 
     .od-sync-status--fill {
       height: 100%;
       border-radius: 2px;
-      background: var(--od-action);
+      background: var(--od-progress-active);
       transition: width 200ms linear;
     }
   }

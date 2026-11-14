@@ -5,7 +5,8 @@
   // (download, import, sign-in). Determinate: a wave for the done part, a
   // 4 dp gap, the flat track and a stop dot; indeterminate: moving wave
   // segments. Geometry: lib/progress-geometry.js. With "Remove animations"
-  // the wave stands still and the indeterminate one is a static half wave.
+  // there is no wave: the determinate one stands still, the indeterminate one is
+  // a plain bar that slides (task 2026-11-14-130).
   import { onMount } from 'svelte';
   import { WAVY, determinatePieces, indeterminatePieces, piecePath } from '../lib/progress-geometry.js';
   import { watchReducedMotion } from '../lib/reduced-motion.js';
@@ -27,7 +28,14 @@
   let reduced = $state(false);
 
   const wavelength = $derived(indeterminate ? WAVY.wavelengthIndeterminate : WAVY.wavelengthDeterminate);
-  const pieces = $derived(width > 0 ? (indeterminate ? indeterminatePieces(width, cycle) : determinatePieces(width, value)) : []);
+  const pieces = $derived(
+    width > 0
+      ? indeterminate
+        ? // Reduced motion: flat segments, no wave.
+          indeterminatePieces(width, cycle).map((p) => (reduced && p.kind === 'wave' ? { ...p, amplitude: 0 } : p))
+        : determinatePieces(width, value)
+      : [],
+  );
   const centerY = WAVY.height / 2;
   const percent = $derived(Math.round(Math.min(1, Math.max(0, value)) * 100));
 
@@ -36,16 +44,15 @@
     const stopWatching = watchReducedMotion((r) => {
       reduced = r;
       cancelAnimationFrame(frame);
-      if (r) {
-        phase = 0;
-        cycle = 0.5;
-        return;
-      }
+      phase = 0;
+      cycle = 0.5;
+      // Reduced motion: nothing moves but the indeterminate bar, flat, sliding.
+      if (r && !indeterminate) return;
       const start = performance.now();
       const tick = (/** @type {number} */ now) => {
         const ms = now - start;
         // The wave travels at 40 dp per second (Compose's default wave speed).
-        phase = (ms / 1000) * 40;
+        phase = r ? 0 : (ms / 1000) * 40;
         cycle = (Math.max(0, ms) % 1800) / 1800;
         frame = requestAnimationFrame(tick);
       };

@@ -2603,8 +2603,10 @@ On the signed-in Account screen, the line under the e-mail reads « Cloud Subsur
 
 Done in fix/account-cloud-line: the line under the e-mail of the signed-in Account screen reads « Cloud Subsurface » / « Subsurface cloud » with the cloud icon (key account.cloudLine, replacing account.verified); one screen for Android phone, tablet and iPhone. The PIN screens and the sign-in error are unchanged. ui-specification: a paragraph on the signed-in Account screen with the reason. Checked on the phone emulator (en).
 
-## [ ] 2026-11-14-130 Signing in: the wavy progress indicator in the right colours and place
+## [x] 2026-11-14-130 Signing in: the wavy progress indicator in the right colours and place
 
 Christian's correction of 14 November 2026. Mock-up: `docs/mockups/compte-connexion-encours-android.dc.html`.
 
 While signing in, the indeterminate progress indicator is the Material 3 Expressive wavy linear indicator (`LinearWavyProgressIndicator`, or its web equivalent): the active wave in the primary colour `#114477`, 4 dp thick, over a flat track in `#D4E2F2` (secondary container), with 16 dp side margins. It sits just under the top bar and never overlaps the « Se connecter » overline or the title. Dark theme: active `#8FB6E6`, track `#1E3552`. Use the same indicator, with the same tokens, wherever the app shows an indeterminate linear progress (sync, download, import), and check that none is drawn in black. Respect « reduce motion »: no wave animation, a plain sliding bar instead. Check on the phone emulator, light and dark.
+
+Done in fix/wavy-progress: LinearWavyProgress already used --od-progress-active (#114477, dark #8FB6E6) on --od-progress-track (#D4E2F2, dark #1E3552); on the sign-in screen it now sits 16 dp from each side under the top bar, and the heading starts 16 dp below it (was 8) so the indicator never touches the overline. With reduced motion the indeterminate indicator is a flat bar that slides (was a still half wave). The only linear bar drawn in black, the sync bar of SyncStatus (--od-action), takes the progress colours. Download, maps and import already used the same component. Checked on the phone emulator, light and dark, the sign-in shown busy with a temporary flag (removed), reduced motion emulated through the DevTools protocol (the WebView ignores Android's « Remove animations »). system-design §8 updated.

@@ -253,12 +253,12 @@ Mock-ups: `android-tablette-ajout-paysage.dc.html`, `android-tablette-ajout-port
 
 ### Wavy progress and loading indicator (Android, decided on 11 November 2026)
 
-**`<LinearWavyProgress>` (`od-linear-wavy-progress`):** the Material 3 Expressive wavy linear progress indicator, for operations on Android (dive-computer download, offline maps download and update, account import, indeterminate bar under the top bar while signing in). iOS keeps its flat bar. The drawer's "Encore 1 plongée avant la 10e" gauge and the sync bar stay plain bars.
+**`<LinearWavyProgress>` (`od-linear-wavy-progress`):** the Material 3 Expressive wavy linear progress indicator, for operations on Android (dive-computer download, offline maps download and update, account import, indeterminate bar under the top bar while signing in, 16 dp from each side, clear of the overline). iOS keeps its flat bar. The drawer's "Encore 1 plongée avant la 10e" gauge and the sync bar stay plain bars, in the same progress colours (task 130).
 - **Props:** `value` (0 to 1) or `indeterminate`; `label` (required).
 - **Geometry** (Compose `LinearWavyProgressIndicator` defaults): 4 dp stroke with round caps, wave amplitude 3 dp (10 dp high in all), wavelength 40 dp determinate and 20 dp indeterminate. Determinate: the wave for the done part, a 4 dp gap, the flat track, a 4 dp stop dot at its end; the amplitude flattens smoothly over the first 10 % and the last 5 %. Indeterminate: two wave segments run across, the track fills the gaps between them. The functions are in `app/src/lib/progress-geometry.js`.
-- **Colours:** wave and dot `--od-action` (ink), track `--od-separator`; a screen may override `--od-linear-wavy-progress-active` and `--od-linear-wavy-progress-track`.
+- **Colours (task 130):** wave and dot `--od-progress-active` (#114477, dark #8FB6E6), track `--od-progress-track` (#D4E2F2, dark #1E3552), never black; a screen may override `--od-linear-wavy-progress-active` and `--od-linear-wavy-progress-track`.
 - **Accessibility:** `role="progressbar"`, `aria-label`, `aria-valuenow` (percent) unless indeterminate.
-- **Motion:** the wave travels at 40 dp/s. With "Remove animations" (`prefers-reduced-motion`) the wave stands still and the indeterminate one is a static pair of segments.
+- **Motion:** the wave travels at 40 dp/s. With "Remove animations" (`prefers-reduced-motion`) there is no wave: the determinate one stands still and the indeterminate one is a plain flat bar that slides (task 130).
 
 **`<LoadingIndicator>` (`od-loading-indicator`):** the Material 3 Expressive loading indicator, uncontained, instead of circular spinners on Android: "À proximité" while scanning (20 dp), the running import step (24 dp), the "Connexion…" button (18 dp, hidden from TalkBack because the button text says it).
 - **Props:** `size` (dp), `label` (required; "" hides it from TalkBack).
