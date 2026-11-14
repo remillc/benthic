@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -52,6 +52,9 @@
     renumber: 'M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 11h2.5l-2.5 3h2.5M3.5 16h2.5v4.5h-2.5M4 18.2h2',
     menu: 'M4 7h16M4 12h16M4 17h16',
     account: 'M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5',
+    // Account without an account (task 2026-11-14-135): create an account, sign in.
+    personAdd: 'M10 4a4 4 0 1 0 0 8 4 4 0 1 0 0-8M3 20c.7-3.5 3.5-5.5 7-5.5 1.6 0 3 .4 4.2 1.1M18 13v6M15 16h6',
+    login: 'M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4',
     warning: 'M12 4l9 16H3zM12 10v4M12 17h.01',
     lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5zM12 15v2',
     blank: '',

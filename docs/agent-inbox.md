@@ -2643,13 +2643,15 @@ The caption « Connecté via le serveur Europe (ssrf-cloud-eu). » at the bottom
 
 Done in fix/account-bottom (one commit for tasks 132, 133 and 134, which change the same lines): « Se déconnecter » and its consequence come first, under the Subsurface account group (or the git group), 32 dp below its card (measured), with no heading; then an h2 « Zone dangereuse » with the warning icon in --od-alarm, right above « Supprimer le compte » and its consequence (none in git mode); then the server caption at 11 / 16 sp in --od-text-2, 24 dp below. One screen for Android phone, tablet and iPhone (the iPhone caption is in px like the rest of the app, not Dynamic Type). Checked on the phone emulator: reading order sign out, Danger zone (heading), Delete account, caption. ui-specification updated (the paragraph already named the zone; the app still said « Quitter »).
 
-## [ ] 2026-11-14-135 Account without an account: a third choice, « Utiliser mon propre dépôt git », and an icon on each choice
+## [x] 2026-11-14-135 Account without an account: a third choice, « Utiliser mon propre dépôt git », and an icon on each choice
 
 Christian's decision of 14 November 2026. Mock-up: `docs/mockups/compte-android-sans-compte.dc.html`.
 
 On the Account screen when no account is connected (« Aucun compte connecté »), under « Créer un compte » and « Se connecter à un compte existant », add a third card button « Utiliser mon propre dépôt git » with « Au lieu d’un compte, un dépôt à vous (GitHub, Gitea…). Vos 9 plongées y sont envoyées » (the number is the real count). Same layout as « Se connecter à un compte existant » (20 dp corners, 1 dp `#DADAD6` outline, 14 dp × 16 dp padding, title 17 sp bold, supporting text 14 sp `#4B4A47`), but on a transparent background so it stays the third choice. It opens the existing git setup (`git-config-android`), and the local dives are pushed to the repository as in the first-launch git path.
 
 Each of the three cards gets a 24 dp icon on the left, aligned with the title, 14 dp before the text: « Créer un compte », a person with a + (light stroke on the dark card); « Se connecter à un compte existant », an arrow entering a door (login); « Utiliser mon propre dépôt git », a git branch. Icons are decorative (hidden from TalkBack). Update `docs/ui-specification.md`. Check on the phone emulator, light and dark, and the same screen on the tablet.
+
+Done in feature/account-git-choice: the no-account Account screen has a third card « Utiliser mon propre dépôt git » with « Au lieu d’un compte, un dépôt à vous (GitHub, Gitea…). Vos N plongées y sont envoyées » (real count), outlined on no background; the three cards (20 dp corners now) carry decorative icons (new personAdd and login icons from the mock-up, the existing git branch). It opens the git setup at /account/git/new; once connected, back to Account, the repository's logbook is loaded and the dives of this device are added and sent (importDeviceDives, as « Ajouter les plongées de cet appareil »). Checked on the phone emulator, light and dark (no account simulated in memory); icons aria-hidden. The connection itself was not run (no test repository at hand). ui-specification updated.
 
 ## [ ] 2026-11-14-136 The ⋮ icons are too pale in the app
 

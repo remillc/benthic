@@ -123,6 +123,8 @@
     // The logbook in the user's own git repository (Modifier le dépôt).
     { path: '/account/git', component: GitRepository, options: { props: { edit: true } } },
     { path: '/account/git/token', component: TokenHelp },
+    // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
+    { path: '/account/git/new', component: GitRepository },
     // First launch, in the view of its popup (components/Welcome.svelte).
     { path: '/welcome', component: WelcomeStart },
     { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
