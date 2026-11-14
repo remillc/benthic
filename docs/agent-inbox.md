@@ -3145,3 +3145,26 @@ Done in feature/sign-out-dialog. Android (cloud mode): 1. the dialog's title is 
 Christian decided this on 14 November 2026. Mock-up: `compte-android-suppression.dc.html`. The warning heading of the deletion page becomes « C'est définitif ! » (French: a narrow no-break space U+202F before « ! »), English « This is permanent! » (no space). Phone, tablet, iPhone.
 
 Done in fix/definitive-heading. deleteAccount.definitive: fr « C'est définitif ! » with a narrow no-break space (U+202F) before « ! », en « This is permanent! ». fr-CA has no override and takes the French text. The same key serves phone, tablet and iPhone (DeleteAccount.svelte).
+
+## [ ] 2026-11-14-167 Delete the cloud account: a three-step wizard
+
+Christian decided this on 14 November 2026. It replaces the single deletion page (`compte-android-suppression.dc.html`, kept in `docs/mockups/` for comparison). Mock-ups: `compte-suppression-etape1-android.dc.html`, `compte-suppression-etape2-android.dc.html`, `compte-suppression-etape3-android.dc.html`. Opened by « Supprimer le compte cloud » (task 164). A rare, irreversible action: some friction is wanted, and each step is one real decision.
+
+**Every step** (`od-delete-wizard`): the top app bar with a back arrow and « Supprimer le compte cloud »; under it the progress (`od-delete-wizard--steps`, `role="progressbar"`, three 4 dp segments, done ones in the band blue #114477) and « Étape n sur 3 · {step title} »; the actions at the bottom: the main button, then « Annuler » (text button).
+
+1. **« Ce qui sera effacé ».** The alarm box « C'est définitif ! » / « Il n'y a aucun moyen d'annuler. » (task 166), then a card of three rows: trash icon (alarm colour) « Le compte {email} » / « Effacé du cloud Subsurface »; cloud icon (alarm colour) « Ses {n} plongées dans le cloud » / « Effacées pour de bon »; computer icon « Subsurface sur l'ordinateur et vos autres appareils » / « Ne trouveront plus ce carnet ». Then « À l'étape suivante, vous choisissez ce que deviennent vos plongées sur ce téléphone. » Button « Continuer ».
+2. **« Vos plongées ».** Heading « Que deviennent vos plongées sur ce téléphone ? » (narrow no-break space before « ? »). A card: the checkbox « Garder mes plongées sur cet appareil » (checked by default) / « Elles passent dans un carnet sans compte, seulement sur ce téléphone », a divider, then the outlined « Exporter une copie du carnet » button / « Un fichier Subsurface (.ssrf), à garder ailleurs ». **Only when the box is unchecked and nothing was exported**, a warning (`od-delete-wizard--nothing-kept`, dashed alarm border, #B71C1C text): « Si vous décochez sans exporter, vos plongées ne seront plus nulle part. » Button « Continuer ».
+3. **« Confirmer ».** A summary card « En résumé »: « Effacé du cloud » / « Le compte {email} et ses {n} plongées » (trash, alarm colour), and « Gardé sur ce téléphone » / « {n} plongées, dans un carnet sans compte » (or, if not kept: « Rien n'est gardé sur ce téléphone », plus the export if one was made). The password field « Mot de passe du compte » / « Pour confirmer que c'est bien vous », then « Les modifications en attente sont envoyées d'abord. Le compte n'est supprimé qu'après la confirmation du serveur. »
+
+**Buttons (so the last one cannot be reached by momentum):**
+- Steps 1 and 2: filled ink « Continuer » with a trailing arrow, 40 dp.
+- Step 3: the password field arrives **empty and focused**, keyboard open. « Supprimer définitivement le compte » has a trash icon, is 48 dp high, and stays **disabled** (MD3 disabled: on-surface 12 % container, 38 % label) until a password is typed; then it takes the alarm colour.
+
+**Navigation:**
+- « Annuler », at any step, returns to the Account page the wizard started from. Nothing is erased and nothing is remembered: the next time starts again at step 1.
+- The back arrow (and the system Back) goes back one step; at step 1 it returns to the Account page.
+- A copy exported at step 2 stays where it was saved.
+
+English: « What will be erased », « Your dives », « Confirm », « Step n of 3 », « Continue », « This is permanent! », « There is no way to undo it. », « Erased from the Subsurface cloud », « Its {n} dives in the cloud », « Erased for good », « Subsurface on the computer and your other devices », « Will no longer find this logbook », « Next, you choose what happens to your dives on this phone. », « What happens to your dives on this phone? », « If you uncheck without exporting, your dives will be nowhere. », « In short », « Erased from the cloud », « Kept on this phone », « {n} dives, in a logbook without an account ».
+
+Phone and tablet (on the tablet, the wizard is the detail pane); iOS: the same three steps in iOS form. Update `docs/ui-specification.md` (Account) and the tests that read the deletion page.

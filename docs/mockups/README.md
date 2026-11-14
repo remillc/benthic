@@ -77,6 +77,9 @@ When a mock-up disagrees with `docs/system-design.md` or `docs/ui-specification.
 | `compte-android-connecte-manuel.dc.html` | Compte, Android, synchronisation manuelle |
 | `compte-android-deconnexion.dc.html` | Compte, Android, confirmation de déconnexion |
 | `compte-android-suppression.dc.html` | Compte, Android, supprimer le compte |
+| `compte-suppression-etape1-android.dc.html` | Supprimer le compte cloud, assistant, étape 1 sur 3 · Android |
+| `compte-suppression-etape2-android.dc.html` | Supprimer le compte cloud, assistant, étape 2 sur 3 · Android |
+| `compte-suppression-etape3-android.dc.html` | Supprimer le compte cloud, assistant, étape 3 sur 3 · Android |
 | `compte-connexion-android.dc.html` | Se connecter · Android |
 | `compte-connexion-encours-android.dc.html` | Se connecter, connexion en cours · Android |
 | `compte-connexion-erreur-android.dc.html` | Se connecter, adresse ou mot de passe incorrect · Android |
