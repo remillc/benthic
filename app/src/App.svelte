@@ -283,9 +283,11 @@
 </script>
 
 <App {...f7params}>
-  <!-- Tablet: the rail or sidebar. Android phone: the bottom bar and the account sheet (task
-       2026-11-14-120). iPhone and Android tablets in portrait: the ☰ side menu. -->
-  {#if layout.rail}<NavRail />{:else if bottomNav()}<AccountSheet />{:else}<NavMenu />{/if}
+  <!-- Tablet, both orientations: the rail (Android) or the sidebar (iPad). Android phone: the
+       bottom bar. Android, phone and tablet: the account sheet (tasks 2026-11-14-120 and 126).
+       iPhone: the ☰ side menu. -->
+  {#if layout.rail}<NavRail />{:else if !bottomNav()}<NavMenu />{/if}
+  {#if !ios && (layout.rail || bottomNav())}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <SyncFailureSheet />
   <ConflictHost />

@@ -12,7 +12,7 @@
 
   /**
    * @type {{
-   *   choices: { key: string, icon: 'download'|'file'|'edit'|'qr', text: string }[],
+   *   choices: { key: string, icon: 'download'|'file'|'edit'|'qr', text: string, sub?: string }[],
    *   onchoose: (key: string) => void,
    * }}
    */
@@ -123,7 +123,15 @@
         onclick={() => pick(choice.key)}
       >
         <Icon name={choice.icon} size={24} />
-        <span class="od-fab-menu--label">{choice.text}</span>
+        {#if choice.sub}
+          <!-- A second line (task 2026-11-14-126): the formats « Importer un fichier » reads. -->
+          <span class="od-fab-menu--texts">
+            <span class="od-fab-menu--label">{choice.text}</span>
+            <span class="od-fab-menu--sub">{choice.sub}</span>
+          </span>
+        {:else}
+          <span class="od-fab-menu--label">{choice.text}</span>
+        {/if}
       </button>
     {/each}
   </div>
@@ -205,7 +213,7 @@
 
     .od-fab-menu--item {
       width: max-content;
-      height: 56px;
+      min-height: 56px;
       padding: 0 24px;
       box-sizing: border-box;
       border: 0;
@@ -228,6 +236,21 @@
       transition:
         transform var(--od-fab-spatial-ms) var(--od-fab-spatial) var(--od-fab-close-delay),
         opacity var(--od-fab-effects-ms) var(--od-fab-effects) var(--od-fab-close-delay);
+    }
+
+    .od-fab-menu--texts {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 6px 0;
+    }
+
+    .od-fab-menu--sub {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+      color: var(--od-text-2);
     }
 
     .od-fab-menu--primary {

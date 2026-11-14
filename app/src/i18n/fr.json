@@ -22,6 +22,7 @@
     "add": "Ajouter des plongées",
     "addDownload": "Télécharger depuis l'ordinateur de plongée",
     "addImport": "Importer un fichier",
+    "addImportFormats": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
     "addManual": "Noter une plongée à la main",
     "addScan": "Scanner un code QR",
     "loading": "Chargement du carnet",
@@ -1705,6 +1706,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Android : l’avatar du compte porte une pastille quand des modifications attendent ou qu’une mise à jour de carte est prête ; en synchronisation manuelle, la feuille du compte montre les modifications en attente, « Synchroniser » et ses autres options. Tablette : le rail, aussi en portrait, ressemble à la barre du téléphone et porte l’avatar du compte en bas. « Importer un fichier » liste les formats lus.",
       "Carnet défilé : un bouton de recherche apparaît dans la barre du haut, avant l’avatar ; le menu ⋮ reste tout à droite.",
       "Importer un fichier : les plongées des montres Garmin (.fit) s’importent, aussi depuis le .zip « Export Original » de Garmin Connect.",
       "Premier lancement : « Commencer sans compte » devient un vrai bouton, avec ce qu’il implique écrit dessous ; le logo des fonds clairs est aussi celui de la feuille du compte.",
@@ -3138,6 +3140,15 @@
     "accountLabel": "Compte, synchronisation, réglages et à propos : {name}",
     "accountSheet": "Compte et options",
     "manageAccount": "Gérer le compte",
-    "close": "Fermer"
+    "close": "Fermer",
+    "pendingChanges": {
+      "one": "{n} modification non envoyée",
+      "other": "{n} modifications non envoyées"
+    },
+    "mapUpdates": {
+      "one": "{n} mise à jour de carte",
+      "other": "{n} mises à jour de carte"
+    },
+    "mapUpdateWaiting": "Mise à jour de carte disponible"
   }
 }

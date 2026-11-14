@@ -2,9 +2,13 @@
   // @ts-check
   // Main navigation of the tablet layout (spec, section 3): the 220 px sidebar
   // on iPad, the 96 px navigation rail on Android (no "+": it is the floating button of the
-  // Logbook, spec section 7). Sections, then Account and Settings at the bottom. The phone layout
-  // has the side menu instead (NavMenu.svelte).
+  // Logbook, spec section 7). iPad: the sections, then Account, Settings and About. Android (task
+  // 2026-11-14-126): the sections drawn as in the phone's bottom bar, and at the bottom only the
+  // account avatar, which opens the account sheet. The phones have their own navigation
+  // (NavigationBar.svelte on Android, NavMenu.svelte on iPhone).
   import Icon from './Icon.svelte';
+  import NavIcon from './NavIcon.svelte';
+  import AccountAvatar from './AccountAvatar.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
@@ -33,11 +37,14 @@
       aria-current={navigation.section === section ? 'page' : undefined}
       onclick={(e) => choose(e, () => goToSection(section))}
     >
-      <span class="od-nav-rail--icon"><Icon name={section} size={ios ? 22 : 24} /></span>
+      <span class="od-nav-rail--icon">
+        {#if ios}<Icon name={section} size={22} />{:else}<NavIcon {section} active={navigation.section === section} />{/if}
+      </span>
       <span class="od-nav-rail--label">{t(`tabs.${section}`)}</span>
     </a>
   {/each}
   <div class="od-nav-rail--spacer"></div>
+  {#if !ios}<AccountAvatar rail />{:else}
   <a
     href="#account"
     class="od-nav-rail--item od-nav-rail--bottom"
@@ -55,6 +62,7 @@
     <span class="od-nav-rail--icon"><Icon name="info" size={ios ? 22 : 24} /></span>
     <span class="od-nav-rail--label" class:od-sr-only={!ios}>{t('about.title')}</span>
   </a>
+  {/if}
   {#if ios && !logbook.loading && !logbook.error}
     <div class="od-nav-rail--status"><SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} /></div>
   {/if}
@@ -86,9 +94,9 @@
       gap: 4px;
       min-width: 56px;
       color: var(--od-text-2);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 400;
       text-decoration: none;
 
       .od-nav-rail--icon {
@@ -100,13 +108,14 @@
         justify-content: center;
       }
 
+      /* As the phone's bottom bar: the active section in the secondary colour on its pill. */
       &[aria-current='page'] {
-        color: var(--od-text);
+        color: var(--od-nav-active);
         font-weight: 600;
 
         .od-nav-rail--icon {
-          background: var(--od-tint);
-          color: var(--od-on-tint);
+          background: var(--od-nav-active-container);
+          color: var(--od-nav-active);
         }
       }
 
