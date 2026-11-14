@@ -1785,7 +1785,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Contraste : le bandeau d’en-tête est plus sombre derrière les titres et les boutons, et quelques textes gagnent en contraste (valeurs en rouille, erreurs dans les champs, bouton « Connexion… », textes secondaires sur iPhone, pastille du compte).",
-      "Statistiques : une carte de chaleur « Où je plonge le plus » montre où se concentrent les plongées du filtre, avec le site en tête ; elle s’ouvre en plein écran.",
+      "Statistiques : une carte de chaleur « Où je plonge le plus » montre où se concentrent les plongées du filtre, avec le site en tête, sur une carte qu’on déplace et qu’on zoome ; elle s’ouvre en plein écran.",
       "« Choisir un site » : un écran qui liste tous les sites, du plus proche au plus loin de votre position (sinon du plus récemment plongé), avec la distance et un champ de recherche ; il sert dans « Plongées sans site » et pour le site de « Modifier la plongée », et peut créer un site à votre position.",
       "Réglages : ils sont maintenant gardés dans les préférences du système (Android et iOS), enregistrés tout de suite ; un réglage changé juste avant la fermeture de l’app ou une mise à jour n’est plus perdu.",
       "Sites : la carte ne montre plus les noms des sites, seulement les épingles, les plus plongées par-dessus ; toucher une épingle montre le site dans une carte, plusieurs épingles superposées ouvrent la liste de ces sites, et la liste sous la carte ne garde que les sites de la zone visible.",

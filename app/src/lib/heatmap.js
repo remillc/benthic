@@ -1,8 +1,7 @@
 // @ts-check
 // « Où je plonge le plus » (task 2026-11-14-152): the dives of the Statistics filter
-// counted per site, the area that holds most of them, and the heat drawn for each
-// site: a radius that grows with the square root of its count and an opacity with
-// its logarithm, so that a site with 140 dives leads without hiding the small ones.
+// counted per site and the area that holds most of them; the heat itself is a density
+// (lib/heat-density.js, task 2026-11-14-154).
 import { distanceKm } from './maps-logic.js';
 
 /** Sites within this distance of the busiest place make up the area shown. */
@@ -56,18 +55,4 @@ export function busiestArea(spots, areaKm = AREA_KM) {
     }
   }
   return area;
-}
-
-/**
- * The heat of one site: its radius, as a share of the largest (square root of the
- * count), and its opacity (logarithm of the count), from 0.35 to 1.
- * @param {number} count
- * @param {number} max the largest count shown
- */
-export function heatSpot(count, max) {
-  const top = Math.max(1, max);
-  return {
-    radius: Math.max(0.18, Math.sqrt(count / top)),
-    opacity: 0.35 + (0.65 * Math.log(1 + count)) / Math.log(1 + top),
-  };
 }

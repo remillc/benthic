@@ -1,7 +1,7 @@
-// « Où je plonge le plus »: dives per site, the busiest area, the heat (task 2026-11-14-152).
+// « Où je plonge le plus »: dives per site, the busiest area (task 2026-11-14-152).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { busiestArea, heatSpot, siteHeat } from '../../app/src/lib/heatmap.js';
+import { busiestArea, siteHeat } from '../../app/src/lib/heatmap.js';
 
 const sites = [
   { name: 'Lock 21', hasLocation: true, latUdeg: 44_990_000, lonUdeg: -74_950_000, dives: 144 },
@@ -27,12 +27,4 @@ test('dives counted per site with coordinates, the busiest first; a shared name 
 test('the busiest area: the St. Lawrence (8 dives), not the trip to Cozumel (4)', () => {
   const area = busiestArea(siteHeat(dives, sites));
   assert.deepEqual(area.map((s) => s.name).sort(), ['Lock 21', 'Lock 23']);
-});
-
-test('the heat: radius by the square root, opacity by the logarithm', () => {
-  assert.deepEqual(heatSpot(140, 140), { radius: 1, opacity: 1 });
-  const small = heatSpot(1, 140);
-  assert.ok(Math.abs(small.radius - Math.sqrt(1 / 140)) < 1e-9 || small.radius === 0.18);
-  assert.ok(small.opacity > 0.35 && small.opacity < 0.5, String(small.opacity));
-  assert.ok(heatSpot(35, 140).radius === 0.5);
 });

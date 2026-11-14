@@ -11,6 +11,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
+  import { densityGrid, rampColour, rgb } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
@@ -40,7 +41,21 @@
    *   onstack?: (uuids: number[], at: { latUdeg: number, lonUdeg: number }) => void,
    *   onmapclick?: () => void,
    *   stackAt?: { latUdeg: number, lonUdeg: number }|null,
+   *   heat?: { lon: number, lat: number, count: number }[]|null,
+   *   frame?: [number, number][]|null,
+   *   credits?: boolean,
+   *   desaturated?: boolean,
+   *   fullscreenLabel?: string,
+   *   closerInFullScreen?: boolean,
    * }}
+   * heat: the dives per site drawn as a density over the map (« Où je plonge le plus »,
+   *   task 2026-11-14-154; lib/heat-density.js), on its own layer: the base map can be
+   *   desaturated without the heat.
+   * frame: the points the map opens on (lon, lat), in place of the sites.
+   * credits: the OpenStreetMap line (not on the heat map: it is in About).
+   * desaturated: the base map at about 25 % saturation.
+   * fullscreenLabel: the full-screen button's name, when not « Afficher la carte en plein écran ».
+   * closerInFullScreen: full screen opens on the same area, slightly closer.
    * names: « fewInFullScreen » (Sites, task 2026-11-14-150): the names show only in full
    *   screen, with 8 pins or fewer in view and no two names overlapping.
    * selected: the site whose pin is selected (1.3×, a halo in the secondary colour, in front).
@@ -73,6 +88,12 @@
     onstack,
     onmapclick,
     stackAt = null,
+    heat = null,
+    frame = null,
+    credits = true,
+    desaturated = false,
+    fullscreenLabel = '',
+    closerInFullScreen = false,
   } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
@@ -115,7 +136,56 @@
     // changes into its opposite.
     tick().then(() => {
       map?.resize();
+      if (closerInFullScreen && map) map.zoomTo(map.getZoom() + (on ? 0.6 : -0.6), { duration: 0 }, { programmatic: true });
+      drawHeat();
       fullButton?.focus(/** @type {any} */ ({ focusVisible: false }));
+    });
+  }
+
+  /** @type {HTMLCanvasElement|undefined} */
+  let heatCanvas = $state();
+  /** The zoom the heat's spread is measured at (the opening framing): 25 dp there. */
+  let heatZoom = 0;
+  let heatFrame = 0;
+
+  /** The density of the dives over the visible map, on the heat's own layer. */
+  function drawHeat() {
+    if (!map || !heatCanvas || !heat?.length) return;
+    const w = container?.clientWidth ?? 0;
+    const h = container?.clientHeight ?? 0;
+    if (!w || !h) return;
+    const radius = Math.max(6, Math.min(240, 25 * 2 ** (map.getZoom() - heatZoom)));
+    const cell = 3;
+    const m = map;
+    const grid = densityGrid(heat.map((p) => ({ ...m.project([p.lon, p.lat]), weight: p.count })), w, h, radius, cell);
+    const styles = getComputedStyle(heatCanvas);
+    const ramp = /** @type {any} */ (['--od-heat-3', '--od-heat-2', '--od-heat-1'].map((v) => rgb(styles.getPropertyValue(v) || '#000000')));
+    // The grid coloured on a small canvas, then drawn smoothed at the map's size.
+    const small = document.createElement('canvas');
+    small.width = grid.cols;
+    small.height = grid.rows;
+    const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
+    const image = sctx.createImageData(grid.cols, grid.rows);
+    for (let i = 0; i < grid.values.length; i++) {
+      const [r, g, b, a] = rampColour(grid.max ? grid.values[i] / grid.max : 0, ramp);
+      image.data.set([r, g, b, a], i * 4);
+    }
+    sctx.putImageData(image, 0, 0);
+    const dpr = window.devicePixelRatio || 1;
+    heatCanvas.width = Math.round(w * dpr);
+    heatCanvas.height = Math.round(h * dpr);
+    const ctx = /** @type {CanvasRenderingContext2D} */ (heatCanvas.getContext('2d'));
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.clearRect(0, 0, heatCanvas.width, heatCanvas.height);
+    ctx.drawImage(small, 0, 0, grid.cols * cell * dpr, grid.rows * cell * dpr);
+  }
+
+  function scheduleHeat() {
+    if (!heat?.length || heatFrame) return;
+    heatFrame = requestAnimationFrame(() => {
+      heatFrame = 0;
+      drawHeat();
     });
   }
 
@@ -331,14 +401,15 @@
 
   function fit() {
     if (!map) return;
-    // Numbered points frame the map; the sites are then only what lies around.
-    const framed = points.length ? points.map(lngLat) : [...sites.map(lngLat), ...(pin ? [lngLat(pin)] : [])];
+    // A given frame first; numbered points frame the map; the sites are then only what lies around.
+    const framed = frame?.length ? frame : points.length ? points.map(lngLat) : [...sites.map(lngLat), ...(pin ? [lngLat(pin)] : [])];
     if (framed.length === 1) {
       map.jumpTo({ center: framed[0], zoom: 13 }, { programmatic: true });
     } else if (framed.length > 1) {
       const bounds = framed.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(framed[0], framed[0]));
-      map.fitBounds(bounds, { padding: 40, maxZoom: points.length ? 14 : 12, animate: false }, { programmatic: true });
+      map.fitBounds(bounds, { padding: 40, maxZoom: points.length || frame?.length ? 14 : 12, animate: false }, { programmatic: true });
     }
+    heatZoom = map.getZoom();
   }
 
   onMount(async () => {
@@ -369,7 +440,11 @@
       drawPoints();
       fit();
       readBounds();
+      drawHeat();
     });
+    // The heat follows the map as it moves.
+    m.on('move', scheduleHeat);
+    m.on('resize', scheduleHeat);
     // Where the map looks, for the offline hint (Sites).
     m.on('moveend', () => {
       // Offline over a region of less detail (zoom 12), the map does not zoom further.
@@ -465,7 +540,18 @@
     }
   });
 
+  // Another filter: the heat and its framing follow.
+  $effect(() => {
+    heat;
+    frame;
+    if (heat && map?.loaded()) {
+      fit();
+      drawHeat();
+    }
+  });
+
   onDestroy(() => {
+    if (heatFrame) cancelAnimationFrame(heatFrame);
     if (full) setFull(false);
     map?.remove();
   });
@@ -476,6 +562,7 @@
   class="od-site-map no-swipeback"
   class:od-map-fullscreen={full}
   class:od-site-map--quiet={names !== 'always'}
+  class:od-site-map--desaturated={desaturated}
   style:height={full ? '100%' : height}
   role="region"
   aria-label={label}
@@ -487,6 +574,7 @@
   }}
 >
   <div class="od-site-map--canvas" bind:this={container}></div>
+  {#if heat?.length}<canvas class="od-site-map--heat" bind:this={heatCanvas} aria-hidden="true"></canvas>{/if}
   {#if editable}
     <!-- The tip of the pin is the centre of the map. -->
     <svg class="od-site-map--center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
@@ -496,10 +584,10 @@
   {/if}
   {@render overlay?.(full)}
   <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
-  <p class="od-site-map--credits">{t('sites.mapCredits')}</p>
+  {#if credits}<p class="od-site-map--credits">{t('sites.mapCredits')}</p>{/if}
   <button type="button" class="od-map-fullscreen-button" bind:this={fullButton} onclick={() => setFull(!full)}>
     <Icon name={full ? 'exitFullscreen' : 'fullscreen'} size={22} weight={2} />
-    <span class="od-sr-only">{t(full ? 'sites.exitFullscreen' : 'sites.fullscreen')}</span>
+    <span class="od-sr-only">{full ? t('sites.exitFullscreen') : fullscreenLabel || t('sites.fullscreen')}</span>
   </button>
   {#if full && onlocate}
     <button type="button" class="od-map-fullscreen-button od-map-fullscreen--locate" onclick={onlocate}>
@@ -573,6 +661,20 @@
     .od-map-fullscreen .od-map-fullscreen-button.od-map-fullscreen--locate {
       top: auto;
       bottom: calc(env(safe-area-inset-bottom) + 56px);
+    }
+
+    /* The heat: its own layer over the map, taps go through to the map. */
+    .od-site-map--heat {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* The base map at about 25 % saturation, so the heat stands out (the heat is not affected). */
+    .od-site-map--desaturated .od-site-map--canvas :global(canvas) {
+      filter: saturate(0.25);
     }
 
     .od-site-map--credits {
