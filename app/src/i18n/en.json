@@ -958,7 +958,8 @@
     "existingNote": "Backed up in the cloud, readable offline",
     "createShort": "Create an account",
     "createNote": "Free. Shared across your devices",
-    "noAccountNote": "On this device only"
+    "noAccountNotePhone": "Your logbook stays on this phone. You can back it up later",
+    "noAccountNoteTablet": "Your logbook stays on this device. You can back it up later"
   },
   "signOut": {
     "title": "Sign out?",
@@ -1704,6 +1705,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: “Start without an account” is now a real button, with what it means written under it; the account sheet uses the light-background logo too.",
       "Tools: the planner shows the number of planned dives and desaturation the wait before flying; the gas tools become tiles. On tablets the page takes the full width.",
       "Settings: the profile and pO₂ graph options move to Display; “Profile and decompression” becomes “Decompression”.",
       "Swiping between sections, between dives or to Settings and About: the screen follows the finger from the start and finishes at the finger’s speed.",
