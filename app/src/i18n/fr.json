@@ -1705,6 +1705,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet défilé : un bouton de recherche apparaît dans la barre du haut, avant l’avatar ; le menu ⋮ reste tout à droite.",
       "Importer un fichier : les plongées des montres Garmin (.fit) s’importent, aussi depuis le .zip « Export Original » de Garmin Connect.",
       "Premier lancement : « Commencer sans compte » devient un vrai bouton, avec ce qu’il implique écrit dessous ; le logo des fonds clairs est aussi celui de la feuille du compte.",
       "Outils : le planificateur montre le nombre de plongées planifiées et la désaturation l’attente avant l’avion ; les outils de gaz deviennent des tuiles. Sur tablette, la page prend toute la largeur.",

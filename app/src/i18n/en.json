@@ -1705,6 +1705,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Scrolled logbook: a search button shows in the top bar, before the avatar; the ⋮ menu stays at the far right.",
       "Import a file: dives from Garmin watches (.fit) are imported, also from Garmin Connect’s “Export Original” .zip.",
       "First launch: “Start without an account” is now a real button, with what it means written under it; the account sheet uses the light-background logo too.",
       "Tools: the planner shows the number of planned dives and desaturation the wait before flying; the gas tools become tiles. On tablets the page takes the full width.",
