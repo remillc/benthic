@@ -2740,3 +2740,9 @@ Christian's decisions of 14 November 2026, after the Perdix AI download merged i
 5. **Duplicate cylinders after a merge** (Air, Air, EAN26): leave them as the core makes them, no message. The diver can delete a cylinder in « Modifier la plongée ».
 
 Same on the tablet (sheet as a dialog) and in dark (same tokens as the rest of the Detail). Update `docs/ui-specification.md` (Detail, Equipment; download end) and `fr.json`, `en.json`. Test with a dive that has two computers (merge a download into an existing dive), TalkBack and VoiceOver on the block and the sheet, and check in Subsurface on a computer that the main computer and the nickname are kept.
+
+## [ ] 2026-11-14-145 Suggested weight: only on the most recent dive
+
+Christian's correction of 14 November 2026, completing task 2026-11-13-99. Mock-up unchanged: `docs/mockups/android-edition.dc.html` (it shows the allowed case).
+
+In « Modifier la plongée », the weight suggestion row (« Suggestion : 6 lb · Comme le … », « Utiliser ») appears only when the dive being edited is the most recent dive of the logbook (the one just downloaded or added). When one download brings several dives, only the last of them gets it. For any older dive, the row is not shown at all (no placeholder). The rest of the weight group (weight, « Ce lest était ») is unchanged. Same on the tablet and on iPhone. Update `docs/ui-specification.md` (Edit, weight).
