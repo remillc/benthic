@@ -2,6 +2,7 @@
 // When to ask for the store's in-app review (task 2026-11-13-104). The system dialog
 // is the only one: OpenDives never asks "do you like the app?" first, and never
 // chooses who is asked. Pure decision here; the dates live in the device's storage.
+import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 
 /** The logbook holds at least this many dives. */
@@ -47,7 +48,7 @@ export function shouldAskReview(s) {
  */
 function readDate(key) {
   try {
-    const n = Number(localStorage.getItem(key));
+    const n = Number(deviceStore.getItem(key));
     return Number.isFinite(n) && n > 0 ? n : null;
   } catch {
     return null;
@@ -57,7 +58,7 @@ function readDate(key) {
 /** Stores the first-open date, once: called at every launch. */
 export function noteFirstOpen() {
   try {
-    if (readDate(FIRST_OPEN_KEY) == null) localStorage.setItem(FIRST_OPEN_KEY, String(Date.now()));
+    if (readDate(FIRST_OPEN_KEY) == null) deviceStore.setItem(FIRST_OPEN_KEY, String(Date.now()));
   } catch {
     // Storage unavailable: the review is simply never asked.
   }
@@ -83,7 +84,7 @@ export async function askReviewAfterDownload(context) {
       conflict: context.conflict,
     });
     if (!ask) return false;
-    localStorage.setItem(LAST_REVIEW_KEY, String(Date.now()));
+    deviceStore.setItem(LAST_REVIEW_KEY, String(Date.now()));
     await OpenDivesCore.requestReview();
     return true;
   } catch (e) {

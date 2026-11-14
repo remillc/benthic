@@ -1764,6 +1764,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings: they are now kept in the system’s preferences (Android and iOS) and written at once; a setting changed just before the app closes or updates is no longer lost.",
       "Sites: the map no longer shows site names, only the pins, the most dived on top; tapping a pin shows the site in a card, several overlapping pins open a list of those sites, and the list under the map keeps only the sites of the visible area.",
       "High contrast: when the system asks for more contrast (Android 14 and later, “Increase Contrast” on iPhone and iPad), the app switches to stronger colours, with nothing translucent and thicker outlines.",
       "Sites: “Dives without a site” shows the dives that have a position on a map and suggests the nearest site within 500 m; “Clean up the sites” shows each possible duplicate on a map strip; the shortcut also counts the sites without a dive, and iPhone and iPad get the “To do” shortcuts.",

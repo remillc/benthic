@@ -1764,6 +1764,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : ils sont maintenant gardés dans les préférences du système (Android et iOS), enregistrés tout de suite ; un réglage changé juste avant la fermeture de l’app ou une mise à jour n’est plus perdu.",
       "Sites : la carte ne montre plus les noms des sites, seulement les épingles, les plus plongées par-dessus ; toucher une épingle montre le site dans une carte, plusieurs épingles superposées ouvrent la liste de ces sites, et la liste sous la carte ne garde que les sites de la zone visible.",
       "Contraste élevé : quand le système demande plus de contraste (Android 14 et plus, « Augmenter le contraste » sur iPhone et iPad), l’app passe à des couleurs plus contrastées, sans transparence et avec des contours plus épais.",
       "Sites : « Plongées sans site » montre sur une carte les plongées qui ont une position et propose le site le plus proche à moins de 500 m ; « Nettoyer les sites » montre chaque doublon possible sur une bande de carte ; le raccourci compte aussi les sites sans plongée, et l’iPhone et l’iPad ont les raccourcis « À faire ».",

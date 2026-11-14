@@ -8,6 +8,7 @@
 //
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
+import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
 import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor, reserveSettings } from './reserve-factor.js';
@@ -101,7 +102,7 @@ export const TIME_PATTERNS = { 24: 'HH:mm', 12: 'h:mm AP' };
 /** @param {string} key */
 function readJson(key) {
   try {
-    const text = localStorage.getItem(key);
+    const text = deviceStore.getItem(key);
     return text ? JSON.parse(text) : null;
   } catch {
     return null;
@@ -111,8 +112,8 @@ function readJson(key) {
 /** @param {string} key @param {unknown} value */
 function writeJson(key, value) {
   try {
-    if (value == null) localStorage.removeItem(key);
-    else localStorage.setItem(key, JSON.stringify(value));
+    if (value == null) deviceStore.removeItem(key);
+    else deviceStore.setItem(key, JSON.stringify(value));
   } catch {
     // Not fatal: the setting lasts until the app closes.
   }
@@ -124,7 +125,7 @@ const storedCore = readJson(CORE_KEY) ?? {};
 if (storedCore.duration === 'hours') delete storedCore.duration;
 // Before Settings followed Subsurface, the conditions switch had its own key.
 try {
-  if (!('extraEnvironmental' in storedCore) && localStorage.getItem('od.extraConditions') === 'true')
+  if (!('extraEnvironmental' in storedCore) && deviceStore.getItem('od.extraConditions') === 'true')
     storedCore.extraEnvironmental = true;
 } catch {
   // Not fatal.
@@ -324,7 +325,7 @@ export async function resetAllSettings(defaults) {
   Object.assign(storedCore, kept, OD_CORE_DEFAULTS);
   writeJson(CORE_KEY, Object.keys(storedCore).length ? storedCore : null);
   try {
-    localStorage.removeItem('od.extraConditions');
+    deviceStore.removeItem('od.extraConditions');
   } catch {
     // Not fatal.
   }

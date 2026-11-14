@@ -2,6 +2,7 @@
 // Sign in and new account (spec, section 4, "Sign in and new account"): the
 // same screens open from first launch (routes /welcome/…) and from Account
 // without an account (routes /account/…).
+import { deviceStore } from './device-store.js';
 import { f7 } from 'framework7-svelte';
 import { showSnackbar } from './snackbar.js';
 import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './logbook.svelte.js';
@@ -66,14 +67,14 @@ export function finishAccount(router, welcome, { offerDeviceDives = false } = {}
 async function offerDeviceDivesOnce(email) {
   const key = `od.deviceDivesOffered:${email}`;
   try {
-    if (!email || localStorage.getItem(key)) return;
+    if (!email || deviceStore.getItem(key)) return;
   } catch {
     return;
   }
   const n = await deviceDiveCount();
   if (!n) return;
   try {
-    localStorage.setItem(key, '1');
+    deviceStore.setItem(key, '1');
   } catch {
     // Offered again next time: not harmful.
   }

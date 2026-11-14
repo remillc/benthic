@@ -287,7 +287,8 @@ async function openNew() {
 
 // --- state to restore ----------------------------------------------------------------
 const startPlans = (await core('listPlans')).map((x) => x.id);
-const startLocal = await p.eval(`localStorage.getItem('od.corePrefs')`);
+// The record the app keeps of the settings changed, in the system's preferences (lib/device-store.js).
+const startLocal = await p.eval(`window.Capacitor.Plugins.Preferences.get({ key: 'od.corePrefs' }).then((r) => r.value)`);
 const startPrefs = await core('getPrefs');
 const startSetup = await core('plannerSetup');
 console.log(`start: ${startPlans.length} plans, units ${startPrefs.length}/${startPrefs.pressure}/${startPrefs.volume}`);
@@ -599,7 +600,7 @@ try {
     // screen writes both; it has no way to choose back a personalised set in one tap).
     const units = Object.fromEntries(['length', 'pressure', 'volume', 'weight', 'temperature', 'unitSystem'].map((k) => [k, startPrefs[k]]));
     await core('setPrefs', { changes: units });
-    if (startLocal !== null) await p.eval(`localStorage.setItem('od.corePrefs', ${q(startLocal)})`);
+    if (startLocal !== null) await p.eval(`window.Capacitor.Plugins.Preferences.set({ key: 'od.corePrefs', value: ${q(startLocal)} }).then(() => 1)`);
     const end = await core('getPrefs');
     record('cleanup: the units are back', ['length', 'pressure', 'volume', 'weight', 'temperature'].every((k) => end[k] === startPrefs[k]), JSON.stringify(end));
     await go('/');
