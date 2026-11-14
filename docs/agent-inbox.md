@@ -2525,3 +2525,16 @@ The cards update when the page is shown again (after a download, a sync, a saved
 Update `docs/ui-specification.md` (the « Tools page and gas tools » paragraph) to match: it no longer describes a list of rows. Check on the phone and tablet emulators, fr and en, with a logbook whose last dive is recent, one whose last dive is older than 48 h, and an empty logbook, and with 0, 1 and several planned dives.
 
 Done in feature/tools-page-state: Planificateur and Désaturation cards with their state (lib/tools-page.js, tested: waiting, allowed, at rest, empty), Gaz tiles in three shapes; on tablets the page is full width with no list pane (Christian's choice in the chat, following the mock-ups), the cards side by side. ui-specification and system-design updated. Checked on the phone emulator in fr and en, light and dark, with a recent dive, a dive older than the wait, an empty logbook and 0, 1 and several planned dives (in memory, nothing written), and on the tablet in landscape and portrait.
+
+## [ ] 2026-11-14-123 First launch and About: the retained logo, and « Commencer sans compte » as a button
+
+Christian's decisions of 14 November 2026. Mock-ups in `docs/mockups/`: `android-accueil-c.dc.html`, `android-tablette-premier-lancement-paysage.dc.html`, `android-tablette-premier-lancement-portrait.dc.html`, `apropos-android.dc.html`, `android-tablette-apropos-paysage.dc.html`, `android-tablette-apropos-portrait.dc.html`.
+
+**Logo on light backgrounds.** Wherever the logo is drawn on a light surface (first launch, About, on phone and tablet, and anywhere else the app draws it on a light background), use the retained version « A océan-nuit » of the canvas board « Logo bleu »: the three waves unchanged (#D4E2F2→#BCD2EB, #8FB0D6→#7199C2, #3F6F9F→#2D5E90 on a white disc), the arc in light grey #C9C7C1 instead of black, the two bubbles in primary #114477 instead of black. The white logo on the blue header bands does not change. If the logo is an asset (SVG or vector drawable), update the asset; check the app icon is not affected.
+
+**First launch, the third choice:**
+- « Commencer sans compte » becomes a real button, the same size and shape as the two others (56 dp, fully rounded), tonal: background surface container #E8E8E5, text on-surface. The three choices then read by importance: filled black, outlined, tonal.
+- Its supporting text becomes « Le carnet reste sur ce téléphone. Vous pourrez le sauvegarder plus tard » on phones, « … sur cet appareil … » on tablets (en: « Your logbook stays on this phone. You can back it up later » / « this device »). It replaces « Sur cet appareil seulement », which read as a note about the link below.
+- A thin divider (1 dp, #E3E1DC, inset, about 260 dp wide on phones, 200 dp on tablets) separates the three choices from the « Utiliser mon propre dépôt git » link.
+
+Check on the phone and tablet emulators, light and dark (in dark, keep the logo's dark variant of the same board), fr and en.
