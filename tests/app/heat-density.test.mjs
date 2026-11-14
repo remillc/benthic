@@ -20,13 +20,16 @@ test('the busier site is the denser one; two close sites add up without one hidi
   assert.ok(pair.values[25 * pair.cols + 25] > densityGrid([{ x: 45, y: 50, weight: 1 }], 100, 100, 20, 2).values[25 * pair.cols + 25]);
 });
 
-test('the ramp: transparent below 2 %, the edge colour fading in, the centre colour at the densest', () => {
-  const ramp = /** @type {any} */ ([rgb('#FBE3B2'), rgb('#F0A66B'), rgb('#B4530F')]);
-  assert.deepEqual(rampColour(0, ramp), [0, 0, 0, 0]);
-  assert.deepEqual(rampColour(1, ramp).slice(0, 3), [0xb4, 0x53, 0x0f]);
-  assert.deepEqual(rampColour(0.5, ramp).slice(0, 3), [0xf0, 0xa6, 0x6b]);
-  assert.ok(rampColour(0.1, ramp)[3] < rampColour(0.9, ramp)[3]);
-  assert.ok(rampColour(1, ramp)[3] < 255, 'never fully covers the map');
+test('the ramp (task 2026-11-14-161): transparent below 2 %, light blue fading in, blue to red, red at the densest', () => {
+  const ramp = /** @type {any} */ (['#1E5BD8', '#3FB5D9', '#5CC06A', '#F2D43A', '#F07C1E', '#D7191C'].map(rgb));
+  const fade = /** @type {any} */ (rgb('#6FC3F0'));
+  assert.deepEqual(rampColour(0, ramp, fade), [0, 0, 0, 0]);
+  assert.deepEqual(rampColour(0.02, ramp, fade).slice(0, 3), rgb('#6FC3F0').map((x, i) => Math.round(x + (rgb('#1E5BD8')[i] - x) * (0.02 / 0.12))), 'the lowest density is light blue');
+  assert.deepEqual(rampColour(0.12, ramp, fade).slice(0, 3), rgb('#1E5BD8'), 'then the least colour, blue');
+  assert.deepEqual(rampColour(1, ramp, fade).slice(0, 3), rgb('#D7191C'), 'red only at the densest');
+  assert.deepEqual(rampColour(0.12 + 0.88 * 3 / 5, ramp, fade).slice(0, 3), rgb('#F2D43A'), 'yellow in between');
+  assert.ok(rampColour(0.1, ramp, fade)[3] < rampColour(0.9, ramp, fade)[3]);
+  assert.ok(rampColour(1, ramp, fade)[3] < 255, 'never fully covers the map');
 });
 
 test('halo radius in dp: 20 far away, 40 from zoom 13, interpolated (task 2026-11-14-155)', () => {

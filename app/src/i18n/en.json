@@ -1784,6 +1784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Heat map: the colours go from blue (few dives) to red (the most dives), and the legend follows.",
       "Relative times (“2 min ago”, “in 3 h”, “yesterday at 2:30 pm”) are no longer split at the end of a line.",
       "Account: the account sheet has rounder corners and the account card is a little narrower.",
       "Lists: a “›” chevron ends every row that opens another page (cylinder types, a site’s dives) and no row that opens a menu, a choice or an action (choice settings, renumbering, a trip’s place and notes).",
