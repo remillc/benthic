@@ -2746,3 +2746,13 @@ Same on the tablet (sheet as a dialog) and in dark (same tokens as the rest of t
 Christian's correction of 14 November 2026, completing task 2026-11-13-99. Mock-up unchanged: `docs/mockups/android-edition.dc.html` (it shows the allowed case).
 
 In « Modifier la plongée », the weight suggestion row (« Suggestion : 6 lb · Comme le … », « Utiliser ») appears only when the dive being edited is the most recent dive of the logbook (the one just downloaded or added). When one download brings several dives, only the last of them gets it. For any older dive, the row is not shown at all (no placeholder). The rest of the weight group (weight, « Ce lest était ») is unchanged. Same on the tablet and on iPhone. Update `docs/ui-specification.md` (Edit, weight).
+
+## [ ] 2026-11-14-146 Planner from a dive: « Modifier le profil » under the profile
+
+Christian's to-do #43, decided on 14 November 2026. The goal is to plan from this dive while changing its depths and durations; simplifying the curve is only the means. Mock-ups in `docs/mockups/`: `android-planificateur`, `android-planificateur-menu`, `android-planificateur-quitter`, `android-planificateur-simplifie` (all `.dc.html`).
+
+1. On « Planificateur, depuis une plongée », under the profile, the caption reads « Temps et profondeurs repris de la plongée. » and, on the same line at the end, a tonal button with a pencil icon « Modifier le profil » (secondary container `#D4E2F2`, `#114477`). It does what « Simplifier le profil » did: the profile is turned into a few levels the diver can change.
+2. Remove « Simplifier le profil » from the ⋮ menu (« Partager le plan » and « Réglages du planificateur » stay).
+3. On the simplified profile, the caption at the top reads « Le profil est ramené à quelques niveaux pour que vous puissiez en changer la profondeur et la durée. » The button does not appear there.
+
+English: « Edit profile », « Times and depths taken from the dive. », « The profile is reduced to a few levels so you can change their depth and duration. » Same on the tablet and on iPhone. Update `docs/ui-specification.md` (Planner).
