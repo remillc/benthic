@@ -1,7 +1,7 @@
 // The heat as a density (task 2026-11-14-154): weighted kernels on a grid, then the ramp.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { densityGrid, haloRadius, rampColour, rgb } from '../../app/src/lib/heat-density.js';
+import { densityGrid, haloRadius, heatShare, rampColour, rgb } from '../../app/src/lib/heat-density.js';
 
 test('a single site: densest at its centre, nothing beyond its radius', () => {
   const g = densityGrid([{ x: 50, y: 50, weight: 10 }], 100, 100, 20, 2);
@@ -38,4 +38,15 @@ test('halo radius in dp: 20 far away, 40 from zoom 13, interpolated (task 2026-1
   assert.equal(haloRadius(9), 30);
   assert.equal(haloRadius(13), 40);
   assert.equal(haloRadius(17), 40);
+});
+
+test('a logarithmic scale, as the mock-ups: one dive blue, the busiest red, the middle green to yellow', () => {
+  const ramp = /** @type {any} */ (['#1E5BD8', '#3FB5D9', '#5CC06A', '#F2D43A', '#F07C1E', '#D7191C'].map(rgb));
+  const one = heatShare(1, 144);
+  assert.ok(one >= 0.12 && one < 0.2, `one dive at ${one}: blue`);
+  assert.equal(heatShare(144, 144), 1);
+  const twenty = heatShare(20, 144);
+  assert.ok(twenty > 0.55 && twenty < 0.7, `20 dives at ${twenty}: green to yellow`);
+  assert.equal(heatShare(0, 144), 0);
+  assert.ok(rampColour(one, ramp)[3] > 0.7 * 255, 'a lone site with one dive reads clearly');
 });
