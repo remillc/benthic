@@ -2874,3 +2874,28 @@ Christian's to-do #75, decided on 14 November 2026. Reference: `docs/mockups/con
    - Meaning colours keep their families, darker in light and lighter in dark. Meaning is still never carried by colour alone.
 
 Add a « High contrast » column to the colour tables of `docs/system-design.md` (section 3) and describe the detection there. Test both modes on the Carnet, the dive detail, Sites and the planner.
+
+## [ ] 2026-11-14-150 Sites map: no site names, tap a pin to see the site, a sheet for stacked pins, a list that follows the map
+
+Decided with Christian on 14 November 2026, after a screenshot of the app with his 239 sites: the names covered one another and could not be read (Cozumel, the cenotes). Mock-ups in `docs/mockups/`: `android-sites` (a pin selected) and `sites-superposes-android` (new: 23 real sites of the St. Lawrence between Morrisburg and Cornwall). This builds on task 147.
+
+1. **No site names on the map.**
+   - The Sites map, and the tablet and iPhone versions, show only the pins with their dive count, still without clustering.
+   - Pins are drawn in order of dive count, the most dived on top, so the busy sites stay visible.
+   - Names show only in full screen, when 8 pins or fewer are in view and no two names overlap.
+2. **Tap a pin to select it.**
+   - The pin grows to 1.3×, gets a halo in the secondary colour (#114477 at 18 %) and comes to the front.
+   - A card (`od-map-site-card`) opens over the bottom of the map, 16 dp from the edges, white, 16 dp corners, a light shadow. It shows the site name (16 sp, 600), « {pays ou région} · {n} plongées, la dernière le {date} », the maximum depth on the right and a chevron.
+   - Tapping the card opens the site sheet. Tapping the map elsewhere, or Back, closes the card.
+   - « Centrer sur ma position » moves up above the card while it is open.
+   - Screen readers: the card's label is « {site}, {pays}, {n} plongées. Ouvrir la fiche du site ».
+3. **Several pins under the finger.**
+   - When the tap touches several pins (within the 48 dp target), the touched area shows a blue disc (#114477 at 16 %, 2 dp outline), and a bottom sheet (`od-map-stack-sheet`) opens: « {n} sites à cet endroit », the place under it (« Morrisburg, Ontario. Les épingles se superposent à cette échelle. »), then one 56 dp row per site with the dive count in an ink badge, the name, « {n} plongées », the maximum depth and a chevron. Rows are sorted by dive count.
+   - A row opens the site sheet. ✕ « Fermer », the scrim and Back close the sheet.
+4. **The list under the map follows the map.**
+   - It shows only the sites inside the visible area, sorted as before.
+   - Its count line reads « {n} sites dans cette zone » (« 1 site dans cette zone »). It updates when the map stops moving.
+   - The « to do » shortcuts above the list still count the whole logbook.
+5. **Remove the route label** « /sites/ » shown at the bottom left of the screen in the current build. Debug overlays must not appear in a build given to users. Keep it only behind a developer option if it is useful.
+
+English: « {n} sites here », « Pins overlap at this scale. », « {n} sites in this area », « Open the site sheet ». Same on the Android tablet, iPhone (the card and the sheet in iOS form) and iPad. Update `docs/ui-specification.md` (Sites screen).
