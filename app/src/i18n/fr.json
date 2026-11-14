@@ -1711,6 +1711,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "À propos : « Libre, et votre carnet aussi », avec « Voir sur GitHub » et « Exporter mon carnet ».",
       "Français : « courriel » au Canada, « e-mail » en France.",
       "Textes français : « courriel » partout, plus jamais « e-mail ».",
       "Compte : sous « Supprimer le compte », il est dit que vos plongées peuvent rester sur cet appareil.",
@@ -1996,7 +1997,14 @@
     "opensElsewhere": "s'ouvre dans le navigateur",
     "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.",
     "librariesIntro": "Toucher une bibliothèque ouvre son site dans le navigateur.",
-    "libraryLink": "{name}, {licence} (s’ouvre dans le navigateur)"
+    "libraryLink": "{name}, {licence} (s’ouvre dans le navigateur)",
+    "free": {
+      "title": "Libre, et votre carnet aussi",
+      "code": "L’app et son code sont toujours disponibles gratuitement sur GitHub. Chacun peut lire le code, le modifier et le partager.",
+      "logbook": "Votre carnet vous appartient : au format Subsurface, il se copie et s’ouvre aussi dans Subsurface sur ordinateur.",
+      "github": "Voir sur GitHub",
+      "export": "Exporter mon carnet"
+    }
   },
   "bringLogbook": {
     "device": {
