@@ -3005,3 +3005,12 @@ Follows task 154. Christian decided this on 14 November 2026. Applies to the liv
 Same on the tablet and iPhone. Update `docs/ui-specification.md` (Statistics).
 
 Done in feature/heatmap-zoom. 1: haloRadius(zoom) in lib/heat-density.js: 20 dp up to zoom 5, 40 dp from zoom 13, interpolated (tested). 2: SiteMap keeps a heatScale set once per filter (the densest value at the opening framing) and colours every value against it, so the scale no longer follows the visible area. 3: SiteMap's pinsFromZoom: below 14 the pins are hidden (a reactive class), the heat's opacity is 14 − zoom between 13 and 14, from 14 the pins (the Sites map's, names « never », dives in the filter) show; a pin selects the site and opens MapSiteCard (the od-map-site-card of task 150, now a shared component used by Sites too), which leaves full screen and opens the site's sheet; Back closes the card. Also fixed: SiteMap's names-on class is now driven by state (Svelte rewrote the hand-set class). Checked on the phone emulator by wheel zoom in full screen: pins hidden and heat shown far away, pins shown and heat at 0 from zoom 14. Not seen: a pin up close on screen (the zoomed spot had no site in view), tablet, iPhone. The task speaks of « red » and « blue »: the ramp stays the tertiary ramp of task 152 (sand to rust).
+
+## [ ] 2026-11-14-156 Account sheet: centre the title, keep « Synchronisé » beside its button
+
+Reported by Christian on 14 November 2026 in the app. Mock-up: `nav-option-barre-compte-android.dc.html` (the account sheet opened from the initial). The mock-up is unchanged: the app differs from it.
+
+1. **Title « OpenDives » not centred.** The header row is 48 dp high: the « Fermer » (✕) button, 48 dp, on the left, then the title, 16 sp medium. Centre the title on the sheet's width, not on the space left after the button: balance the button with an empty 48 dp slot on the right (or centre the title absolutely). A long translated title is truncated with an ellipsis before it reaches the button.
+2. **« Synchronisé il y a 2 min » sits above the « Synchroniser » button.** It is one row: the cloud icon (24 dp), the status text (14 sp, #4B4A47, takes the remaining width), then the tonal « Synchroniser » button (40 dp high) on the right; all vertically centred, 16 dp gaps, 12 dp vertical and 16 dp horizontal padding. If the text is too long it wraps on two lines beside the button, never above it.
+
+Check on the phone, the tablet and the iPhone sheet.
