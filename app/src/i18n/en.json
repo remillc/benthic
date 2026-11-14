@@ -1712,6 +1712,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dialogs: when the buttons do not fit on one line, they stack, the main action on top; no label is cut.",
       "iPhone: “+ › Import from Apple Health” adds the dives of an Apple Watch Ultra to the logbook (depth and temperature).",
       "Logbook: the “+” button is back 24 dp from the right edge, above the bottom bar.",
       "About: “Free, and so is your logbook”, with “See on GitHub” and “Export my logbook”.",
