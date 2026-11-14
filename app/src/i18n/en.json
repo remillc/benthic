@@ -22,6 +22,7 @@
     "add": "Add dives",
     "addDownload": "Download from dive computer",
     "addImport": "Import a file",
+    "addImportFormats": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
     "addManual": "Log a dive manually",
     "addScan": "Scan a QR code",
     "loading": "Loading the logbook",
@@ -1705,6 +1706,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Android: the account avatar shows a badge when changes wait or a map update is ready; in manual sync, the account sheet shows the waiting changes, “Sync” and its other options. Tablet: the rail, now in portrait too, looks like the phone’s bar and has the account avatar at the bottom. “Import a file” lists the formats it reads.",
       "Scrolled logbook: a search button shows in the top bar, before the avatar; the ⋮ menu stays at the far right.",
       "Import a file: dives from Garmin watches (.fit) are imported, also from Garmin Connect’s “Export Original” .zip.",
       "First launch: “Start without an account” is now a real button, with what it means written under it; the account sheet uses the light-background logo too.",
@@ -3138,6 +3140,15 @@
     "accountLabel": "Account, sync, settings and about: {name}",
     "accountSheet": "Account and options",
     "manageAccount": "Manage the account",
-    "close": "Close"
+    "close": "Close",
+    "pendingChanges": {
+      "one": "{n} change not sent",
+      "other": "{n} changes not sent"
+    },
+    "mapUpdates": {
+      "one": "{n} map update",
+      "other": "{n} map updates"
+    },
+    "mapUpdateWaiting": "Map update available"
   }
 }

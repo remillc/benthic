@@ -30,11 +30,11 @@ export const listWidth = 340;
 export const splitBreakpoint = 768;
 
 /**
- * The navigation rail (Android) shows from 1000 dp only (spec, section 7,
- * "Android tablet in portrait: no rail"): below it, a tablet in portrait uses
- * the phone's side menu and floating "+". The iPad sidebar stays from 768.
+ * The navigation rail (Android) and the sidebar (iPad) show with the tablet layout, from 768 dp,
+ * in portrait too (task 2026-11-14-126, replacing the « no rail in portrait » rule of 10
+ * November 2026).
  */
-export const railBreakpoint = ios ? splitBreakpoint : 1000;
+export const railBreakpoint = splitBreakpoint;
 
 const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 767.98px)') : null;
 const railQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${railBreakpoint}px)`) : null;

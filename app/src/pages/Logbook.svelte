@@ -998,7 +998,7 @@
    */
   const addChoices = [
     { key: 'download', icon: 'download', text: t('logbook.addDownload') },
-    { key: 'import', icon: 'file', text: t('logbook.addImport') },
+    { key: 'import', icon: 'file', text: t('logbook.addImport'), sub: t('logbook.addImportFormats') },
     { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
     { key: 'scan', icon: 'qr', text: t('logbook.addScan') },
   ];

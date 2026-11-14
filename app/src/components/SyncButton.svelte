@@ -11,6 +11,9 @@
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
+  /** filled: changes wait to be sent (the account sheet in manual sync, task 2026-11-14-126). */
+  let { filled = false } = $props();
+
   /** From the tap to the snackbar: this button's own sync. */
   let busy = $state(false);
   /** The last moment, filled to 100 %. */
@@ -42,6 +45,7 @@
 <button
   type="button"
   class="od-tonal-button od-sync-button"
+  class:od-sync-button--filled={filled}
   disabled={logbook.loading || running}
   aria-busy={running}
   onclick={sync}
@@ -62,6 +66,13 @@
     .od-sync-button {
       position: relative;
       overflow: hidden;
+
+      /* Changes wait to be sent: filled in the tertiary colour (what waits for the diver). */
+      &.od-sync-button--filled {
+        background: var(--od-tertiary);
+        color: var(--od-on-tertiary);
+        font-weight: 600;
+      }
 
       /* Running: shown as busy, not as unavailable. */
       &:disabled[aria-busy='true'] {

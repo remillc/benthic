@@ -7,7 +7,11 @@
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { bottomNav } from '../lib/layout.svelte.js';
+  import { bottomNav, layout, ios } from '../lib/layout.svelte.js';
+
+  /** rail: at the bottom of the Android tablet rail (task 2026-11-14-126), a 40 dp circle. */
+  let { rail = false } = $props();
+  const shown = $derived(rail ? layout.rail && !ios : bottomNav());
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -16,11 +20,19 @@
   const badge = $derived(
     logbook.syncFailure || (logbook.conflict && logbook.conflictLater) ? 'alarm' : logbook.pending > 0 || updatesCount() > 0 ? 'waiting' : '',
   );
-  const label = $derived(t('nav.accountLabel', { name: logbook.email || t('menu.noAccount') }));
+  /** What waits, in words, after the account (task 2026-11-14-126): « 3 modifications non envoyées, 1 mise à jour de carte ». */
+  const waiting = $derived(
+    [logbook.pending > 0 ? t('nav.pendingChanges', { n: logbook.pending }) : '', updatesCount() > 0 ? t('nav.mapUpdates', { n: updatesCount() }) : '']
+      .filter(Boolean)
+      .join(', '),
+  );
+  const label = $derived(
+    t('nav.accountLabel', { name: logbook.email || t('menu.noAccount') }) + (waiting ? `. ${waiting}` : ''),
+  );
 </script>
 
-{#if bottomNav()}
-  <button type="button" class="od-account-avatar" aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
+{#if shown}
+  <button type="button" class="od-account-avatar" class:od-account-avatar--rail={rail} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
     <span class="od-account-avatar--circle">
       {#if initial}{initial}{:else}<Icon name="account" size={20} weight={2} />{/if}
     </span>
@@ -57,6 +69,27 @@
       font-size: 14px;
       line-height: 1;
       font-weight: 600;
+    }
+
+    /* The rail: a 40 dp circle in the secondary colour, on the rail's light surface. */
+    .od-account-avatar--rail {
+      width: 56px;
+      height: 56px;
+
+      .od-account-avatar--circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        background: var(--od-nav-avatar-ink);
+        color: #FFFFFF;
+        font-size: 17px;
+      }
+
+      .od-account-avatar--badge {
+        top: 6px;
+        right: 6px;
+        box-shadow: 0 0 0 2px var(--od-background);
+      }
     }
 
     /* A small dot at the top right of the circle; its meaning is also in the sheet, in words. */

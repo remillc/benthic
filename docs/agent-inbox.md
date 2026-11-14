@@ -2561,7 +2561,7 @@ When the Carnet is scrolled and its top bar shows the search icon (sticky month 
 
 Done in fix/logbook-actions-order: the scrolled Carnet (Android, month headers in the band) shows a search button first, then the avatar, then the ⋮ at the far right; the button scrolls back to the top and puts the cursor in the search field. Sites already had search, avatar, ⋮; Statistics has no ⋮. The title stays 16 dp from the edge. Checked on the phone emulator with the large test logbook; a small logbook does not scroll far enough for the month headers, so its bar is unchanged.
 
-## [ ] 2026-11-14-126 Android: account badge, account sheet in manual sync, tablet rail like the bottom bar, dilution ratio, import formats
+## [x] 2026-11-14-126 Android: account badge, account sheet in manual sync, tablet rail like the bottom bar, dilution ratio, import formats
 
 Christian's decisions of 14 November 2026, completing tasks 120 and 125. Mock-ups in `docs/mockups/`: `nav-pastille-android`, `nav-compte-maj-android`, `nav-compte-options-android`, `android-tablette-accueil-paysage`, `android-tablette-accueil-portrait`, `android-tablette-accueil-portrait-menu`, `android-tablette-stats-portrait`, `android-tablette-outils-portrait`, `android-tablette-reglages-portrait`, `reglages-gaz-android`, `ios-reglages-gaz`, `android-ajout`, `android-tablette-ajout-paysage`, `android-tablette-ajout-portrait` (all `.dc.html`).
 
@@ -2572,6 +2572,8 @@ Christian's decisions of 14 November 2026, completing tasks 120 and 125. Mock-up
 5. **Import formats.** Under « Importer un fichier » in the add sheet (phone and tablet), a second line lists the supported formats: « Subsurface, UDDF, Garmin .fit, CSV… ». Keep the list in sync with what the core really imports (see task 124).
 
 Update `docs/ui-specification.md` and `docs/system-design.md` §7 (tablet: rail in both orientations, avatar at the bottom, no drawer). Check on the phone and tablet emulators, portrait and landscape, light and dark, with TalkBack on the avatar and the rail.
+
+Done in feature/android-account-rail. 1: the avatar's badge (alarm on a sync error, tertiary when changes wait or a map update is ready) and its name adds what waits (« 3 modifications non envoyées, 1 mise à jour de carte »). 2: in manual sync the account sheet shows the pending changes in the pending colour, a filled tertiary « Synchroniser » and a ⋮ « Autres options de synchronisation » with the two choices (a popover of the app); with nothing pending, the last sync; Réglages shows « Mise à jour de carte disponible » and a count badge. 3: Android tablets have the rail from 768 dp in both orientations, drawn like the bottom bar (shared NavIcon.svelte), with only the account avatar (40 dp) at the bottom, opening the account sheet as a 360 dp panel next to the rail over the scrim; no ☰ and no side menu on Android tablets; iPad unchanged. 4: the dilution ratio already reads « 1:10 » in fr and fr-CA (checked on the emulator); « 1 h 10 » was only in the mock-up; the iPhone uses the same code (no Mac to check). 5: « Importer un fichier » has a second line « Subsurface, UDDF, divelogs.de, Garmin .fit… »; CSV is left out because the core's file import refuses it. Checked on the phone (fr, manual sync and pending changes simulated in memory) and tablet emulators (landscape, portrait, light, dark; rail and avatar names). system-design §7 updated (the « no rail in portrait » paragraph marked superseded).
 
 ## [ ] 2026-11-14-127 iPhone: tab bar at the bottom, account initial at the top right
 
