@@ -2628,3 +2628,9 @@ On the signed-in Account screen, « Se déconnecter » (with « Vos plongées re
 Christian's correction of 14 November 2026, completing task 132. Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte` (all `.dc.html`).
 
 The « Se déconnecter » button and its consequence stand apart from the Subsurface account group above them: 32 dp between the « Changer le mot de passe » card and the button (instead of 14 dp). Same on Android phone and tablet and on iPhone. Note: these mock-ups also show the server line (« Connecté via le serveur… ») in a smaller size; that change is not approved yet, leave the server line as it is until a later task.
+
+## [ ] 2026-11-14-134 Account screen: the server line in small type
+
+Christian's correction of 14 November 2026, completing task 133 (same mock-ups, already in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte`).
+
+The caption « Connecté via le serveur Europe (ssrf-cloud-eu). » at the bottom of the signed-in Account screen is set small: 11 sp, 16 sp line height, `#4B4A47`, with 24 dp above it to set it apart from « Supprimer le compte ». This lifts the hold noted in task 133. Same on Android phone and tablet and on iPhone (where the size follows Dynamic Type from the caption 2 style). Check that it stays readable at the largest font size.
