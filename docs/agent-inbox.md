@@ -2616,3 +2616,9 @@ Done in fix/wavy-progress: LinearWavyProgress already used --od-progress-active 
 Christian's correction of 14 November 2026, completing task 130. Mock-up: `docs/mockups/compte-connexion-encours-android.dc.html`.
 
 While signing in, the button does not shrink or move to the right: it keeps exactly the size and place of « Se connecter » (full width between the 24 dp margins, 56 dp tall, 28 dp corners) and only switches to its disabled state (`rgba(31,33,36,0.12)` container, 60 % text), with the loading indicator before « Connexion… », centred, 16 sp. Same rule for every primary button that becomes busy (create account, send code, sync, import): the button changes state, never size or position. Check on the phone emulator, light and dark, and that TalkBack announces it as busy.
+
+## [ ] 2026-11-14-132 Account screen: « Zone dangereuse » right above « Supprimer le compte »
+
+Christian's correction of 14 November 2026, completing task 129. Mock-ups in `docs/mockups/`: `compte-android-connecte`, `compte-android-connecte-manuel`, `compte-android-deconnexion`, `android-tablette-compte-paysage`, `android-tablette-compte-portrait`, `compte-ios-connecte` (all `.dc.html`).
+
+On the signed-in Account screen, « Se déconnecter » (with « Vos plongées restent dans le cloud et sur cet appareil. ») comes first, under the Subsurface account group, outside any danger heading: signing out can be undone. The « Zone dangereuse » heading, with its warning icon, sits right above « Supprimer le compte » and its consequence, which are the only content of that zone. Same order on Android phone and tablet and on iPhone. Update `docs/ui-specification.md`. Check with TalkBack and VoiceOver that the heading is read before the delete button.
