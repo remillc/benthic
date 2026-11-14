@@ -3016,3 +3016,12 @@ Reported by Christian on 14 November 2026 in the app. Mock-up: `nav-option-barre
 Check on the phone, the tablet and the iPhone sheet.
 
 Done in fix/account-sheet-layout. 1: the header is a grid 48 dp / 1fr / 48 dp (an empty slot balances ✕); the logo and the title are centred on the sheet's width, the title truncated with an ellipsis. 2: in automatic sync, the status (cloud icon, text in --od-text-2, taking the width, wrapping when long) and SyncControl's « Synchroniser » sit on one row, centred, 16 dp gap, inside the 12/16 dp padding of the sync block; manual sync already had one row. Checked on the phone emulator. The tablet (the Android floating panel) uses the same markup. The iPhone sheet is a grouped list (task 127) with « Synchroniser » as its own row by design, unchanged.
+
+## [ ] 2026-11-14-157 Account sheet: chevrons on « Réglages » and « À propos »
+
+Christian decided this on 14 November 2026. Mock-ups: `nav-option-barre-compte-android.dc.html` and `nav-compte-maj-android.dc.html` (the account sheet opened from the initial).
+
+1. The « Réglages » and « À propos » rows of the account sheet end with the trailing chevron (20 dp, `--od-text-2`), like every other row that opens a page. In the variant with a map update, the chevron comes after the « 1 » badge.
+2. The rule is now written in `docs/system-design.md` (section 5, « Trailing chevron »): a chevron on every row that opens another page, none on a row that runs an action, toggles a setting or opens a menu. Check the app's other lists against it and fix any row that breaks it; list what you changed.
+
+Same on the tablet; iOS keeps its own disclosure indicator.
