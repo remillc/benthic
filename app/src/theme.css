@@ -113,6 +113,9 @@
     --od-heat-4: #F2D43A;
     --od-heat-5: #F07C1E;
     --od-heat-6: #D7191C;
+    /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
+    --od-heat-spot-mid: #3FA0E0;
+    --od-heat-spot-edge: #2F86DE;
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --od-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
@@ -268,6 +271,9 @@
     --od-heat-4: #F2D43A;
     --od-heat-5: #F07C1E;
     --od-heat-6: #D7191C;
+    /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
+    --od-heat-spot-mid: #3FA0E0;
+    --od-heat-spot-edge: #2F86DE;
     --od-star-summary: #75787C;
     --od-row-divider: #3A3C40;
     --od-map-sea: #1E2A36;

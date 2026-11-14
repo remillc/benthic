@@ -11,7 +11,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
-  import { createHeatScale, densityGrid, haloRadius, heatShare, rampColour, rgb } from '../lib/heat-density.js';
+  import { createHeatScale, rgb, SPOT_GRADIENTS, SPOT_OPACITY, spotKind, spotRadius } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
@@ -158,37 +158,37 @@
     const w = container?.clientWidth ?? 0;
     const h = container?.clientHeight ?? 0;
     if (!w || !h) return;
-    // Halos follow the screen, not the ground: 20 dp far away, 40 dp from zoom 13 (task 155).
-    const radius = haloRadius(map.getZoom());
-    const cell = 3;
+    const zoom = map.getZoom();
     const m = map;
-    const grid = densityGrid(heat.map((p) => ({ ...m.project([p.lon, p.lat]), weight: p.count })), w, h, radius, cell);
-    // The scale is set once, on the whole filter at the opening framing; the legend keeps its meaning.
-    const scale = heatScale.measure(grid.max);
+    // D: the busiest site's dives in the filter, set once per filter (tasks 155, 162).
+    const scale = heatScale.measure(Math.max(...heat.map((p) => p.count)));
     const styles = getComputedStyle(heatCanvas);
-    const colour = (/** @type {string} */ v) => rgb(styles.getPropertyValue(v) || '#000000');
-    const ramp = /** @type {[number, number, number][]} */ ([1, 2, 3, 4, 5, 6].map((i) => colour(`--od-heat-${i}`)));
-    const fade = colour('--od-heat-fade');
-    // The grid coloured on a small canvas, then drawn smoothed at the map's size.
-    const small = document.createElement('canvas');
-    small.width = grid.cols;
-    small.height = grid.rows;
-    const sctx = /** @type {CanvasRenderingContext2D} */ (small.getContext('2d'));
-    const image = sctx.createImageData(grid.cols, grid.rows);
-    for (let i = 0; i < grid.values.length; i++) {
-      // t = √(d / D) on the ramp (task 162).
-      const [r, g, b, a] = rampColour(heatShare(grid.values[i], scale), ramp, fade);
-      image.data.set([r, g, b, a], i * 4);
-    }
-    sctx.putImageData(image, 0, 0);
+    /** @type {Record<string, [number, number, number]>} */
+    const colours = {};
+    const colour = (/** @type {string} */ v) => (colours[v] ??= rgb(styles.getPropertyValue(v) || '#000000'));
     const dpr = window.devicePixelRatio || 1;
     heatCanvas.width = Math.round(w * dpr);
     heatCanvas.height = Math.round(h * dpr);
     const ctx = /** @type {CanvasRenderingContext2D} */ (heatCanvas.getContext('2d'));
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0, 0, heatCanvas.width, heatCanvas.height);
-    ctx.drawImage(small, 0, 0, grid.cols * cell * dpr, grid.rows * cell * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalAlpha = SPOT_OPACITY;
+    // One spot per site, as the mock-up draws them: the busiest painted last, on top; spots
+    // cover one another rather than adding up (heat-density.js, SPOT_GRADIENTS).
+    for (const p of [...heat].sort((a, b) => a.count - b.count)) {
+      const r = spotRadius(p.count, scale, zoom);
+      const { x, y } = m.project([p.lon, p.lat]);
+      if (x < -r || y < -r || x > w + r || y > h + r) continue;
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+      for (const stop of SPOT_GRADIENTS[spotKind(p.count, scale)]) {
+        const [cr, cg, cb] = colour(stop.colour);
+        gradient.addColorStop(stop.offset, `rgba(${cr}, ${cg}, ${cb}, ${stop.alpha})`);
+      }
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   function scheduleHeat() {
