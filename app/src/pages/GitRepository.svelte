@@ -26,7 +26,7 @@
   import { errorCode } from '../lib/account.js';
   import { normaliseGitUrl, validGitToken, validGitUsername } from '../lib/account-validation.js';
   import { liveError } from '../lib/live-validation.svelte.js';
-  import { accountReady, logbook, repositoryChanged, syncNow } from '../lib/logbook.svelte.js';
+  import { accountReady, deviceDiveCount, importDeviceDives, logbook, repositoryChanged, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, edit?: boolean }} */
@@ -162,8 +162,14 @@
       if (edit) {
         f7router.back(f7router.history[0], { force: true });
         repositoryChanged();
-      } else {
+      } else if (welcome) {
         accountReady();
+      } else {
+        // From Account without an account (task 2026-11-14-135): back to Account, the
+        // repository's logbook loaded, then the dives of this device added and sent there.
+        f7router.back(f7router.history[0], { force: true });
+        await accountReady();
+        if ((await deviceDiveCount()) > 0) await importDeviceDives();
       }
     } catch (e) {
       const code = errorCode(e);

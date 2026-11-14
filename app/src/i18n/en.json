@@ -929,6 +929,11 @@
       "one": "Your dive is added to the account's dives, without overwriting anything",
       "other": "Your {n} dives are added to the account's dives, without overwriting anything"
     },
+    "ownGit": "Use my own git repository",
+    "ownGitText": {
+      "one": "Instead of an account, a repository of yours (GitHub, Gitea…). Your dive is sent there",
+      "other": "Instead of an account, a repository of yours (GitHub, Gitea…). Your {n} dives are sent there"
+    },
     "notAvailable": "Not available yet",
     "autoSyncOff": "Off: nothing is sent or received until you sync.",
     "pending": "Changes not sent",
@@ -1706,6 +1711,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account without an account: a third choice, “Use my own git repository”, and an icon on each choice.",
       "Account: “Sign out” comes first, apart from the account group; the “Danger zone” only holds “Delete account”; the server line is in small type.",
       "Signing in: the wavy progress indicator is blue on a pale blue track, 16 dp from the edges, under the bar; with “Remove animations”, a flat bar slides. The sync bar takes the same colours.",
       "Account: under the address, “Subsurface cloud” instead of “Subsurface account verified”.",

@@ -291,14 +291,29 @@
       </span>
     </div>
     <p class="od-account--pitch">{t('account.pitch')}</p>
+    <!-- Three choices, each with its consequence and a decorative icon (task 2026-11-14-135,
+         compte-android-sans-compte.dc.html); the git repository is the third, on no background. -->
     <div class="od-account--choices">
       <a href="/account/create" class="od-account--choice od-account--primary">
-        <span class="od-account--label">{t('account.create')}</span>
-        <span class="od-account--consequence">{t('account.createText', { n: count })}</span>
+        <Icon name="personAdd" />
+        <span class="od-account--choice-texts">
+          <span class="od-account--label">{t('account.create')}</span>
+          <span class="od-account--consequence">{t('account.createText', { n: count })}</span>
+        </span>
       </a>
       <a href="/account/sign-in" class="od-account--choice">
-        <span class="od-account--label">{t('account.signIn')}</span>
-        <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
+        <Icon name="login" />
+        <span class="od-account--choice-texts">
+          <span class="od-account--label">{t('account.signIn')}</span>
+          <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
+        </span>
+      </a>
+      <a href="/account/git/new" class="od-account--choice od-account--third">
+        <Icon name="git" />
+        <span class="od-account--choice-texts">
+          <span class="od-account--label">{t('account.ownGit')}</span>
+          <span class="od-account--consequence">{t('account.ownGitText', { n: count })}</span>
+        </span>
       </a>
     </div>
   {/if}
@@ -444,6 +459,14 @@
       color: var(--od-text-2);
     }
 
+    .od-account--choice-texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
     .od-account--choices {
       margin: 16px 16px 24px;
       display: flex;
@@ -453,14 +476,25 @@
 
     .od-account--choice {
       padding: 14px 16px;
-      border-radius: 16px;
+      border-radius: 20px;
       border: 1px solid var(--od-separator);
       background: var(--od-surface);
       color: var(--od-text);
       text-decoration: none;
       display: flex;
-      flex-direction: column;
-      gap: 3px;
+      align-items: flex-start;
+      gap: 14px;
+
+      /* The 24 dp icon on the left, aligned with the title. */
+      :global(.od-icon) {
+        flex: none;
+        margin-top: 0;
+      }
+
+      /* The git repository: the third choice, on no background. */
+      &.od-account--third {
+        background: transparent;
+      }
 
       :global(.ios) & {
         border-radius: 10px;
