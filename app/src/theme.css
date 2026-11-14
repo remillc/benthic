@@ -97,6 +97,13 @@
     --od-profile-line-width: 1.5;
     /* Pins of the sites around, on the map of the dives without a site (task 2026-11-14-148). */
     --od-map-pin-muted: #75787C;
+    /* Rust as text on the tertiary container (#FBE3B2): 5.2:1; #B4530F stays for graphics,
+       icons and large text (task 2026-11-14-153). */
+    --od-tertiary-text: #9A4400;
+    /* Error text on a grey field surface (#E3E1DC): 5.0:1; on white, --od-alarm. */
+    --od-alarm-on-field: #B71C1C;
+    /* The account initial's pill on the band: opaque, the initial 9.9:1 on any band. */
+    --od-band-avatar: #FFFFFF;
     /* The heat of « Où je plonge le plus »: the tertiary ramp, centre to edge (task 2026-11-14-152). */
     --od-heat-1: #B4530F;
     --od-heat-2: #F0A66B;
@@ -118,7 +125,9 @@
     --od-nav-avatar-ink: #114477;
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
-    --od-band-gradient: radial-gradient(140% 115% at 38% -4%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    /* The light centre above the top edge (contrast audit, task 2026-11-14-153): -20 % on phones,
+       -30 % from 600 dp (below). White text on the band 5.3:1 and more. */
+    --od-band-gradient: radial-gradient(140% 115% at 38% -20%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
     /* Paper grain over the band (tasks 2026-11-13-108 and 109, system design « Paper grain on the header
        band »): a 256 px tile drawn once by the browser and repeated, no live filter while scrolling. */
     --od-band-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='7' stitchTiles='stitch' result='n'/><feDiffuseLighting in='n' lighting-color='%23FFFFFF' surfaceScale='1'><feDistantLight azimuth='45' elevation='55'/></feDiffuseLighting><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.18 0 0 0 0.155'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
@@ -244,6 +253,9 @@
     --od-separator: #3A3C40;
     --od-outline: #8E9196;
     --od-map-pin-muted: #8E9196;
+    --od-tertiary-text: #F0A66B;
+    --od-alarm-on-field: #FF8A80;
+    --od-band-avatar: #FFFFFF;
     --od-heat-1: #F0A66B;
     --od-heat-2: #9C6B3F;
     --od-heat-3: #4A3216;
@@ -305,6 +317,13 @@
     --od-inverse-surface: #E8E8E5;
     --od-inverse-on-surface: #1F2124;
     --od-inverse-primary: #2B66AD;
+  }
+
+  /* Tablet width: the band is wider, its light centre higher still. */
+  @media (min-width: 600px) {
+    :root {
+      --od-band-gradient: radial-gradient(140% 115% at 38% -30%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    }
   }
 
   /*
@@ -425,6 +444,14 @@ html.ios {
     --f7-bars-bg-color: var(--od-surface);
     --f7-list-item-border-color: var(--od-separator);
     --f7-list-outline-border-color: var(--od-separator);
+    /* Secondary text and field labels: #6C6C70 (5.2:1 on white), iOS's secondary label
+       colour, instead of 45 % black (about 3.5:1); task 2026-11-14-153. */
+    --f7-block-header-text-color: #6C6C70;
+    --f7-block-footer-text-color: #6C6C70;
+    --f7-list-item-after-text-color: #6C6C70;
+    --f7-list-item-footer-text-color: #6C6C70;
+    --f7-list-item-text-text-color: #6C6C70;
+    --f7-list-item-header-text-color: #6C6C70;
   }
 
   &.dark {
