@@ -10,7 +10,7 @@
   import Icon from '../components/Icon.svelte';
   import SyncControl from '../components/SyncControl.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { bottomNav } from '../lib/layout.svelte.js';
+  import { bottomNav, layout } from '../lib/layout.svelte.js';
   import SectionBand from '../components/SectionBand.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
@@ -263,21 +263,35 @@
       </div>
     {/if}
 
-    <!-- Signing out can be undone: under the account group, apart from it, no danger heading
-         (tasks 2026-11-14-132 and 133). Each button with its consequence (spec, section 4). -->
-    <div class="od-account--leave od-account--sign-out">
-      <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(git ? 'account.gitSignOut' : 'account.signOut')}</button>
-      <span class="od-account--consequence">{t(git ? 'account.gitSignOutText' : 'account.signOutText')}</span>
-    </div>
-    {#if !git}
-      <!-- « Zone dangereuse » right above « Supprimer le compte », its only content; a heading,
-           so that screen readers read it before the button. -->
-      <h2 class="block-title od-account--danger-title"><Icon name="warning" size={18} />{t('account.dangerZone')}</h2>
-      <div class="od-account--leave">
-        <button type="button" class="od-outlined-button od-danger" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
-          {t('account.delete')}
+    {#if git}
+      <!-- The git repository: signing out only (there is no account to delete); under the group,
+           apart from it (tasks 2026-11-14-132 and 133). -->
+      <div class="od-account--leave od-account--sign-out">
+        <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t('account.gitSignOut')}</button>
+        <span class="od-account--consequence">{t('account.gitSignOutText')}</span>
+      </div>
+    {:else}
+      <!-- « Quitter le cloud » (task 2026-11-14-164): both ways out side by side, so that they are
+           compared at a glance. The danger is carried by the alarm colour, the icon and
+           « définitivement », not by a heading. Signing out opens a dialog (no chevron); deleting
+           opens a page (a chevron). -->
+      <h2 class="block-title">{t('account.leaveGroup')}</h2>
+      <div class="od-account-leave">
+        <button type="button" class="od-account-leave--row od-account-leave--sign-out" aria-haspopup="dialog" onclick={confirmSignOut}>
+          <Icon name="logout" size={24} />
+          <span class="od-account-leave--texts">
+            <span class="od-account-leave--label">{t('account.signOutDevice')}</span>
+            <span class="od-account-leave--supporting">{t(layout.phone ? 'account.signOutKeepsPhone' : 'account.signOutKeepsTablet')}</span>
+          </span>
         </button>
-        <span class="od-account--consequence">{t('account.deleteText')}</span>
+        <button type="button" class="od-account-leave--row od-account-leave--delete" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
+          <Icon name="delete" size={24} />
+          <span class="od-account-leave--texts">
+            <span class="od-account-leave--label">{t('account.delete')}</span>
+            <span class="od-account-leave--supporting">{t(layout.phone ? 'account.deleteKeepsPhone' : 'account.deleteKeepsTablet')}</span>
+          </span>
+          <span class="od-account-leave--chevron"><Icon name="chevron" size={20} /></span>
+        </button>
       </div>
     {/if}
 
@@ -433,15 +447,86 @@
       margin-top: 32px;
     }
 
-    .od-account--danger-title {
+    /* « Quitter le cloud »: one card of two list rows (task 2026-11-14-164). */
+    .od-account-leave {
+      margin: 0 16px;
+      border-radius: 20px;
+      background: var(--od-surface);
+      overflow: hidden;
+
+      :global(.ios) & {
+        border-radius: 10px;
+      }
+    }
+
+    .od-account-leave--row {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 16px;
 
       :global(.od-icon) {
         flex: none;
+      }
+
+      & + .od-account-leave--row {
+        border-top: 1px solid var(--od-row-divider);
+      }
+
+      :global(.ios) & {
+        min-height: 60px;
+        padding: 10px 16px;
+      }
+    }
+
+    .od-account-leave--texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-account-leave--label {
+      font-size: 16px;
+      line-height: 24px;
+
+      :global(.ios) & {
+        font-size: 17px;
+        line-height: 22px;
+      }
+    }
+
+    .od-account-leave--supporting {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    /* Deleting: the alarm colour on the icon and the label, medium weight. */
+    .od-account-leave--delete {
+      > :global(.od-icon),
+      .od-account-leave--label {
         color: var(--od-alarm);
       }
+
+      .od-account-leave--label {
+        font-weight: 500;
+      }
+    }
+
+    .od-account-leave--chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     /* The server in use, set apart in small type (task 2026-11-14-134). */

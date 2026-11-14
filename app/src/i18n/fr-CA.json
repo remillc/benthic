@@ -32,8 +32,12 @@
   },
   "account": {
     "cloudDives": "Plongées dans le nuage",
-    "signOutText": "Vos plongées restent dans le nuage et sur cet appareil.",
-    "deleteText": "Efface le compte et ses plongées du nuage Subsurface. Irréversible. Vous pouvez garder vos plongées sur cet appareil.",
+    "leaveGroup": "Quitter le nuage",
+    "signOutKeepsPhone": "Le compte et les plongées restent dans le nuage. Ce téléphone garde sa copie.",
+    "signOutKeepsTablet": "Le compte et les plongées restent dans le nuage. Cette tablette garde sa copie.",
+    "delete": "Supprimer le compte du nuage",
+    "deleteKeepsPhone": "Efface définitivement le compte et ses plongées du nuage. Ce téléphone peut garder sa copie.",
+    "deleteKeepsTablet": "Efface définitivement le compte et ses plongées du nuage. Cette tablette peut garder sa copie.",
     "bandSignedIn": "Votre carnet dans le nuage",
     "changePasswordText": "Un lien est envoyé à votre courriel",
     "createText": {
