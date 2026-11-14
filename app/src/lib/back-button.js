@@ -9,7 +9,13 @@ import { backThroughGuard } from './leave-guard.js';
 
 export function enableBackButton() {
   CapacitorApp.addListener('backButton', () => {
-    // 0. An open Settings row menu (components/RowMenu.svelte) closes first.
+    // 0. A map shown full screen (components/SiteMap.svelte) goes back to its place.
+    const fullMap = document.querySelector('.od-map-fullscreen');
+    if (fullMap) {
+      fullMap.dispatchEvent(new CustomEvent('od-cancel'));
+      return;
+    }
+    // 0a. An open Settings row menu (components/RowMenu.svelte) closes first.
     const rowMenu = document.querySelector('.od-row-menu');
     if (rowMenu) {
       rowMenu.dispatchEvent(new CustomEvent('od-cancel'));

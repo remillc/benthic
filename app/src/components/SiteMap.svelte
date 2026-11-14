@@ -5,8 +5,13 @@
   // online, else the simplified world map (see map-style.js). Markers for the sites;
   // with `editable`, a pin fixed at the centre: the diver moves the map under
   // it, and onmove gets the centre (micro-degrees) when the map stops.
-  import { onMount, onDestroy } from 'svelte';
+  // Every map has the full-screen button (task 2026-11-14-147): the same map,
+  // moved over the whole screen, keeps its position, zoom, pins and sources;
+  // the system Back, Escape or the button leave it.
+  import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
+  import { mapLabel } from '../lib/map-label.js';
+  import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
   import { offlineMaps } from '../lib/offline-maps.svelte.js';
@@ -17,7 +22,7 @@
 
   /**
    * @type {{
-   *   sites?: { uuid: number, name: string, latUdeg: number, lonUdeg: number }[],
+   *   sites?: { uuid: number, name: string, latUdeg: number, lonUdeg: number, dives?: number }[],
    *   pin?: { latUdeg: number, lonUdeg: number } | null,
    *   editable?: boolean,
    *   onmove?: (pos: { latUdeg: number, lonUdeg: number }) => void,
@@ -25,9 +30,69 @@
    *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   height?: string,
    *   matching?: Set<number>|null,
+   *   onlocate?: () => void,
+   *   overlay?: import('svelte').Snippet<[boolean]>,
    * }}
+   * onlocate: « Centrer sur ma position » in full screen (the screen has its own outside it).
+   * overlay: drawn over the map, in and out of full screen (gets whether it is full screen).
    */
-  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null } = $props();
+  let { sites = [], pin = null, editable = false, onmove, onselect, onview, height = '240px', matching = null, onlocate, overlay } = $props();
+
+  /** Full screen: the map is moved to the end of <body>, over everything. */
+  let full = $state(false);
+  /** @type {HTMLElement|undefined} */
+  let root = $state();
+  /** @type {HTMLButtonElement|undefined} */
+  let fullButton = $state();
+  /** The visible map, for the accessible name. @type {[number, number, number, number]|null} */
+  let bounds = $state(null);
+
+  /** @param {number} n */
+  const divesText = (n) => t('sites.diveCount', { n });
+  const PLACE = { centre: 'Centre', north: 'North', northEast: 'NorthEast', east: 'East', southEast: 'SouthEast', south: 'South', southWest: 'SouthWest', west: 'West', northWest: 'NorthWest' };
+  const mapName = $derived(t(full ? 'sites.mapFullscreen' : 'sites.map'));
+  const label = $derived(
+    mapLabel(
+      sites.map((s) => ({ name: s.name || t('sites.noName'), lonDeg: s.lonUdeg / 1e6, latDeg: s.latUdeg / 1e6, dives: s.dives ?? 0 })),
+      bounds,
+      {
+        map: mapName,
+        withSites: (list) => t('sites.mapWithSites', { map: mapName, list }),
+        item: (name, place, dives) => t('sites.mapSite', { name, place: t('sites.mapPlace' + PLACE[place]), dives: divesText(dives) }),
+        join: '. ',
+      },
+    ),
+  );
+
+  /** @param {boolean} on */
+  function setFull(on) {
+    if (full === on) return;
+    full = on;
+    // The rest of the app is out of reach while the map covers it.
+    const app = document.getElementById('app');
+    if (app) app.inert = on;
+    // The canvas takes its new size at once, and focus follows the button, which
+    // changes into its opposite.
+    tick().then(() => {
+      map?.resize();
+      fullButton?.focus(/** @type {any} */ ({ focusVisible: false }));
+    });
+  }
+
+  /** Moves the map to <body> in full screen and back to its place after. @param {HTMLElement} node @param {boolean} on */
+  function lift(node, on) {
+    const home = document.createComment('map');
+    node.before(home);
+    const place = (/** @type {boolean} */ up) => (up ? document.body.append(node) : home.after(node));
+    place(on);
+    return {
+      update: place,
+      destroy() {
+        home.remove();
+        node.remove();
+      },
+    };
+  }
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
@@ -38,6 +103,8 @@
   /** @type {import('maplibre-gl').Marker|undefined} */
   let pinMarker;
 
+  const numbers = new Intl.NumberFormat(typeof document === 'undefined' ? undefined : document.documentElement.lang || undefined);
+
   /** @param {{latUdeg: number, lonUdeg: number}} p */
   const lngLat = (p) => /** @type {[number, number]} */ ([p.lonUdeg / 1e6, p.latUdeg / 1e6]);
 
@@ -45,12 +112,39 @@
     if (!map) return;
     for (const m of markers) m.marker.remove();
     markers = sites.map((site) => {
+      // The pin with the number of dives in its head, and the site's name beside it.
+      const name = site.name || t('sites.noName');
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'od-site-map--site-marker';
-      el.setAttribute('aria-label', site.name || t('sites.noName'));
+      el.setAttribute('aria-label', site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
+      const svg = 'http://www.w3.org/2000/svg';
+      const drawing = document.createElementNS(svg, 'svg');
+      drawing.setAttribute('class', 'od-site-map--pin');
+      drawing.setAttribute('width', '32');
+      drawing.setAttribute('height', '42');
+      drawing.setAttribute('viewBox', '-16 -40 32 42');
+      drawing.setAttribute('aria-hidden', 'true');
+      const head = document.createElementNS(svg, 'path');
+      head.setAttribute('d', 'M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z');
+      drawing.append(head);
+      if (site.dives) {
+        const count = document.createElementNS(svg, 'text');
+        count.setAttribute('x', '0');
+        count.setAttribute('y', '-19.5');
+        count.textContent = numbers.format(site.dives);
+        drawing.append(count);
+      }
+      const text = document.createElement('span');
+      text.className = 'od-site-map--pin-name';
+      text.setAttribute('aria-hidden', 'true');
+      text.textContent = name;
+      el.append(drawing, text);
       el.addEventListener('click', () => onselect?.(site.uuid));
-      const marker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
+      // The drawing's tip (x 16, 2 px above its bottom) on the site.
+      const marker = new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 2] })
+        .setLngLat(lngLat(site))
+        .addTo(/** @type {import('maplibre-gl').Map} */ (map));
       return { uuid: site.uuid, marker };
     });
     dim();
@@ -113,11 +207,13 @@
       showLabelsInLanguage(m);
       drawSites();
       fit();
+      readBounds();
     });
     // Where the map looks, for the offline hint (Sites).
     m.on('moveend', () => {
       // Offline over a region of less detail (zoom 12), the map does not zoom further.
       applyZoomCap(m);
+      readBounds();
       const b = m.getBounds();
       const c = m.getCenter();
       onview?.({ center: [c.lng, c.lat], bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: m.getZoom() });
@@ -134,6 +230,12 @@
       m.on('click', (e) => m.easeTo({ center: e.lngLat }));
     }
   });
+
+  function readBounds() {
+    if (!map) return;
+    const b = map.getBounds();
+    bounds = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+  }
 
   // The connection or the regions change: the zoom cap follows.
   $effect(() => {
@@ -188,10 +290,26 @@
     }
   });
 
-  onDestroy(() => map?.remove());
+  onDestroy(() => {
+    if (full) setFull(false);
+    map?.remove();
+  });
 </script>
 
-<div class="od-site-map no-swipeback" style:height role="region" aria-label={t('sites.map')}>
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<div
+  class="od-site-map no-swipeback"
+  class:od-map-fullscreen={full}
+  style:height={full ? '100%' : height}
+  role="region"
+  aria-label={label}
+  bind:this={root}
+  use:lift={full}
+  onod-cancel={() => setFull(false)}
+  onkeydown={(e) => {
+    if (full && e.key === 'Escape') setFull(false);
+  }}
+>
   <div class="od-site-map--canvas" bind:this={container}></div>
   {#if editable}
     <!-- The tip of the pin is the centre of the map. -->
@@ -200,8 +318,19 @@
       <circle cx="0" cy="-24" r="5" />
     </svg>
   {/if}
+  {@render overlay?.(full)}
   <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
   <p class="od-site-map--credits">{t('sites.mapCredits')}</p>
+  <button type="button" class="od-map-fullscreen-button" bind:this={fullButton} onclick={() => setFull(!full)}>
+    <Icon name={full ? 'exitFullscreen' : 'fullscreen'} size={22} weight={2} />
+    <span class="od-sr-only">{t(full ? 'sites.exitFullscreen' : 'sites.fullscreen')}</span>
+  </button>
+  {#if full && onlocate}
+    <button type="button" class="od-map-fullscreen-button od-map-fullscreen--locate" onclick={onlocate}>
+      <Icon name="locate" size={22} />
+      <span class="od-sr-only">{t('sites.centreOnMe')}</span>
+    </button>
+  {/if}
 </div>
 
 <style>
@@ -217,10 +346,65 @@
       inset: 0;
     }
 
+    /* Full screen (od-map-fullscreen, sites-carte-plein-ecran-android): edge to edge,
+       under the status bar, over every bar of the app. */
+    .od-site-map.od-map-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+    }
+
+    /* The full-screen button (od-map-fullscreen-button): a white square, 40 dp (44 pt on
+       iOS), 12 dp corners, light shadow, 22 dp icon in ink. Where it sits is the
+       screen's choice (--od-map-button-top, --od-map-button-right): by default 8 dp
+       from the top right of the map. */
+    .od-map-fullscreen-button {
+      position: absolute;
+      z-index: 2;
+      top: var(--od-map-button-top, 8px);
+      right: var(--od-map-button-right, 8px);
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+
+      :global(.ios) & {
+        width: 44px;
+        height: 44px;
+      }
+
+      /* A 48 dp target around the 40 dp square. */
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+      }
+
+      .od-map-fullscreen & {
+        top: calc(var(--f7-safe-area-top, env(safe-area-inset-top)) + 8px);
+        right: 16px;
+      }
+    }
+
+    /* Full screen: « Centrer sur ma position » at the bottom right, above the credits. */
+    .od-map-fullscreen .od-map-fullscreen-button.od-map-fullscreen--locate {
+      top: auto;
+      bottom: calc(env(safe-area-inset-bottom) + 56px);
+    }
+
     .od-site-map--credits {
       position: absolute;
-      right: 8px;
-      bottom: 4px;
+      z-index: 1;
+      top: var(--od-map-credits-top, auto);
+      right: var(--od-map-credits-right, 8px);
+      bottom: var(--od-map-credits-bottom, 4px);
       max-width: calc(100% - 16px);
       margin: 0;
       padding: 2px 6px;
@@ -230,6 +414,12 @@
       font-size: 11px;
       line-height: 14px;
       pointer-events: none;
+
+      .od-map-fullscreen & {
+        top: auto;
+        right: 8px;
+        bottom: calc(env(safe-area-inset-bottom) + 24px);
+      }
     }
 
     .od-site-map--center-pin {
@@ -252,29 +442,65 @@
       }
     }
 
+    /* A pin per site (no grouping, even when pins overlap): ink, with the number of
+       dives, white, 13 sp, bold, in its head; the name beside it, ink with a 4 dp
+       white halo. */
     :global(.od-site-map--site-marker) {
-      width: 16px;
-      height: 16px;
+      width: 32px;
+      height: 42px;
       padding: 0;
-      border-radius: 50%;
-      border: 2px solid var(--od-surface);
-      background: var(--od-text);
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+      border: none;
+      background: none;
       cursor: pointer;
       transition: opacity 150ms linear;
+
+      :global(.od-site-map--pin) {
+        display: block;
+        overflow: visible;
+        filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
+      }
+
+      :global(.od-site-map--pin path) {
+        fill: var(--od-text);
+        stroke: var(--od-surface);
+        stroke-width: 2;
+      }
+
+      :global(.od-site-map--pin text) {
+        fill: var(--od-surface);
+        font-size: 13px;
+        font-weight: 700;
+        text-anchor: middle;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Baseline 20 px above the tip, 18 px right of it, as drawn. */
+      :global(.od-site-map--pin-name) {
+        position: absolute;
+        left: 34px;
+        top: 6px;
+        white-space: nowrap;
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 500;
+        color: var(--od-text);
+        -webkit-text-stroke: 4px var(--od-surface);
+        paint-order: stroke fill;
+        pointer-events: none;
+      }
 
       /* !important: MapLibre sets an inline opacity on every marker. */
       &.od-site-map--dim {
         opacity: 0.3 !important;
       }
 
-      /* 16 dp dot, 48 dp touch target, around the dot: MapLibre places the
-         marker with position: absolute, which also holds the target (no
-         position here, which would win over MapLibre's layer). */
+      /* A 48 dp touch target around the pin: MapLibre places the marker with
+         position: absolute, which also holds the target (no position here,
+         which would win over MapLibre's layer). */
       &::after {
         content: '';
         position: absolute;
-        inset: -16px;
+        inset: -3px -8px;
       }
     }
   }
