@@ -146,3 +146,21 @@ test('unused cylinders: listed with the setting on, drawn full with "not used" o
   assert.equal(unusedShown({ used: true, startMbar: 0, endMbar: 0 }), null);
   assert.equal(unusedShown({ used: false, startMbar: 200000, endMbar: 150000 }), null);
 });
+
+// A dive downloaded over a dive already logged by another computer (14 November 2026: a Perdix AI
+// over a Petrel 3). The core keeps both, the downloaded one first; the card must list both and open.
+test('two dive computers after a merge: both listed, the first main, the card opens', async () => {
+  const { computerList, equipmentOpens } = await import('../../app/src/lib/gas-summary.js');
+  const list = computerList([
+    { model: 'Shearwater Perdix AI', nickname: 'Shearwater Perdix AI' },
+    { model: 'Shearwater Petrel 3', nickname: 'Petrel de Christian' },
+  ]);
+  assert.deepEqual(list, [
+    { name: 'Shearwater Perdix AI', main: true },
+    { name: 'Petrel de Christian', main: false },
+  ]);
+  assert.equal(equipmentOpens([], list.length), true, 'no weight, two computers: the card still opens');
+  assert.equal(equipmentOpens([], computerList([{ model: 'Shearwater Petrel 3' }]).length), false);
+  assert.deepEqual(computerList([{ model: '' }, { model: 'Shearwater Petrel 3' }]), [{ name: 'Shearwater Petrel 3', main: true }], 'a computer without a model is not listed');
+  assert.deepEqual(computerList(undefined), []);
+});

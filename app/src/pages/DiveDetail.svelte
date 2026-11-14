@@ -17,7 +17,7 @@
   import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
-  import { cylinderListed, equipmentLabel, equipmentOpens, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
+  import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
@@ -467,11 +467,7 @@
   const weightTotal = $derived(formatWeight(weightEntries.reduce((sum, w) => sum + w.grams, 0), prefs));
 
   /** Dive computers (task 2026-11-12-60): the first is the main one. */
-  const computers = $derived(
-    (dive?.diveComputers ?? [])
-      .filter((dc) => dc.model)
-      .map((dc, i) => ({ name: dc.nickname || dc.model, main: i === 0 })),
-  );
+  const computers = $derived(computerList(dive?.diveComputers));
 
   // A freediving dive has no Gas section (Christian, 13 November 2026).
   const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
