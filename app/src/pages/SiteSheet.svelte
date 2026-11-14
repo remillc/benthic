@@ -266,6 +266,9 @@
       margin: 14px 16px 0;
       border-radius: 16px;
       overflow: hidden;
+      /* The credits stay inside the rounded corners (task 2026-11-14-147). */
+      --od-map-credits-right: 12px;
+      --od-map-credits-bottom: 8px;
     }
 
     .od-site-sheet--coords {

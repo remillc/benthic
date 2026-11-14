@@ -345,6 +345,10 @@ Every search field, on every platform, shows a clear button at its end as soon a
 
 Pages that do not use the blue band (Réglages and its subpages, Compte, Dépôt git, Cartes hors ligne, À propos, Bibliothèques libres, Plongées planifiées, the editors) have an MD3 Small top app bar in the colour of the page (`--od-background`, light #F5F4F0, dark #121314), never the white default of Framework7. When the content scrolls under it, the bar takes `--od-surface-container` (MD3 "on scroll" state), with no divider line and no shadow.
 
+### Map full-screen button (decided on 14 November 2026)
+
+`od-map-fullscreen-button`, on every interactive map (`components/SiteMap.svelte`): a white square (`--od-surface`), 40 dp on Android and 44 pt on iOS, 12 dp corners, a light shadow (0 1px 3px, 20 % black), the four-corners icon, 22 dp, in ink (`--od-text`), with a 48 dp touch target. Its place is set by the screen with `--od-map-button-top` and `--od-map-button-right` (8 dp by default). It opens `od-map-fullscreen`: the same map over the whole screen, where the button, at the top right under the status bar, turns into "Quitter le plein écran" with the inverse icon. "Centrer sur ma position" in full screen is the same square. The map's credit can move to the top with `--od-map-credits-top` (Sites offline).
+
 ### Snackbar
 
 Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoyer-pas-doublons-android.dc.html`:

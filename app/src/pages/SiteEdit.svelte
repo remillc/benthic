@@ -42,7 +42,6 @@
   let coordsError = $state(false);
   let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
   let saving = $state(false);
-  let fullscreen = $state(false);
   let lookups = 0;
 
   // Leaving with changes asks first (components/LeaveGuard.svelte): the fields
@@ -214,26 +213,6 @@
       f7router.navigate(`/sites/${nearby.uuid}`, { reloadCurrent: true });
     }
   }
-
-  /**
-   * Full screen: the map card moves to the end of <body>, above the pages,
-   * and comes back to its place after.
-   * @param {HTMLElement} node
-   * @param {boolean} on
-   */
-  function lift(node, on) {
-    const home = document.createComment('map');
-    node.before(home);
-    const place = (/** @type {boolean} */ up) => (up ? document.body.append(node) : home.after(node));
-    place(on);
-    return {
-      update: place,
-      destroy() {
-        home.remove();
-        node.remove();
-      },
-    };
-  }
 </script>
 
 <Page class="od-site-edit">
@@ -249,14 +228,14 @@
 
   <TextField label={t('sites.name')} bind:value={name} />
 
-  <div class="od-site-edit--map-card" class:od-site-edit--fullscreen={fullscreen} use:lift={fullscreen}>
-    <SiteMap pin={position} editable onmove={setPosition} height={fullscreen ? '100%' : '190px'} />
-    <span class="chip od-site-edit--chip">{t('sites.movePin')}</span>
-    <button type="button" class="od-site-edit--map-button" onclick={() => (fullscreen = !fullscreen)}>
-      <Icon name={fullscreen ? 'exitFullscreen' : 'fullscreen'} size={20} weight={2} />
-      <span class="od-sr-only">{fullscreen ? t('sites.exitFullscreen') : t('sites.fullscreen')}</span>
-    </button>
-    {#if fullscreen && coordsText}<span class="od-site-edit--coords od-value">{coordsText}</span>{/if}
+  <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
+  <div class="od-site-edit--map-card">
+    <SiteMap pin={position} editable onmove={setPosition} height="190px">
+      {#snippet overlay(/** @type {boolean} */ full)}
+        <span class="chip od-site-edit--chip" class:od-site-edit--full={full}>{t('sites.movePin')}</span>
+        {#if full && coordsText}<span class="od-site-edit--coords od-value">{coordsText}</span>{/if}
+      {/snippet}
+    </SiteMap>
   </div>
 
   {#if !editing && nearby}
@@ -309,13 +288,9 @@
       border-radius: 16px;
       overflow: hidden;
 
-      &.od-site-edit--fullscreen {
-        position: fixed;
-        inset: 0;
-        z-index: 12000;
-        margin: 0;
-        border-radius: 0;
-      }
+      /* The credits stay inside the rounded corners. */
+      --od-map-credits-right: 12px;
+      --od-map-credits-bottom: 8px;
     }
 
     .od-site-edit--chip {
@@ -329,40 +304,8 @@
       color: var(--od-text-2);
       pointer-events: none;
 
-      .od-site-edit--fullscreen & {
+      &.od-site-edit--full {
         top: calc(12px + env(safe-area-inset-top));
-      }
-    }
-
-    .od-site-edit--map-button {
-      position: absolute;
-      right: 4px;
-      top: 4px;
-      width: 48px;
-      height: 48px;
-      border: none;
-      background: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--od-text);
-
-      /* The visible disc, 40 dp, in a 48 dp target. */
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 4px;
-        border-radius: 50%;
-        background: var(--od-surface);
-        box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-      }
-
-      :global(.od-site-edit--icon) {
-        position: relative;
-      }
-
-      .od-site-edit--fullscreen & {
-        top: calc(4px + env(safe-area-inset-top));
       }
     }
 

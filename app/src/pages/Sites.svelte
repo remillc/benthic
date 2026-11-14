@@ -319,9 +319,10 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length}
-    <div class="od-sites--map">
-      <!-- 5:4 landscape, full width (task 2026-11-07-24). -->
-      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} />
+    <div class="od-sites--map" class:od-sites--map-offline={!connection.online}>
+      <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
+           and its own « Centrer sur ma position » (task 2026-11-14-147). -->
+      <SiteMap bind:this={siteMap} sites={located} onselect={open} {onview} {height} {matching} onlocate={centreOnDevice} />
       <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -557,7 +558,7 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
 
     /* iPad: 44 pt button at the top right of the map. */
     .od-sites--split.ios .od-sites--locate {
-      top: 24px;
+      top: 76px;
       bottom: auto;
       width: 44px;
       height: 44px;
@@ -761,8 +762,32 @@ import { matchesSite, highlightParts } from '../lib/site-search.js';
       height: 100%;
     }
 
+    /* The full-screen button (task 2026-11-14-147): phone, top right of the visible
+       map, 16 dp from the edge, under the band (whose wave runs 18 px over the map). */
     .od-sites--map {
       position: relative;
+      --od-map-button-top: 34px;
+      --od-map-button-right: 16px;
+
+      /* Offline (android-sites-hors-ligne): the credits at the top, the button under them. */
+      &.od-sites--map-offline {
+        --od-map-credits-top: 34px;
+        --od-map-credits-bottom: auto;
+        --od-map-button-top: 62px;
+      }
+    }
+
+    /* Tablets: the map is its own pane, the button 16 dp from its top right; the
+       credits stay at the bottom. */
+    .od-sites--map-pane .od-sites--map {
+      --od-map-button-top: 16px;
+      --od-map-credits-top: auto;
+      --od-map-credits-bottom: 4px;
+    }
+
+    /* iPad: 24 pt from the top, « Centrer sur ma position » right under it. */
+    .od-sites--split.ios .od-sites--map {
+      --od-map-button-top: 24px;
     }
 
     /* 40 dp, white surface, 12 dp corners, elevation 1, 16 dp from the right
