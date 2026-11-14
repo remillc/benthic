@@ -232,7 +232,7 @@
     }
 
     .od-welcome-start--pill-outlined {
-      border: 1px solid var(--od-chip-outline);
+      border: var(--od-outline-width) solid var(--od-chip-outline);
     }
 
     .od-welcome-start--pill-tonal {

@@ -44,32 +44,34 @@ Every component carries a class that names it, prefixed `od-`, in kebab case: `o
 
 The theme is **black and white**: a neutral light background, actions without a bright colour (#1F2124), strong contrast and sans-serif titles. In dive data, the water column of the profile and of the thumbnails goes from sand to rust with depth. Colour may also appear elsewhere in the interface, and we can play with it, but sparingly and always within the accessibility rules (WCAG 2.2 AA): text at least 4.5:1 against its background (3:1 for large text, 18 sp, or 14 sp bold), and 3:1 for icons, borders, selection marks and other meaningful graphics. Colour never carries meaning alone: a selection, a state or an alert also has a shape, an icon or a word. The code declares each colour once, as a CSS variable `--od-*`, and never hard-codes a value in a component.
 
-| Token | Light | Dark | Use, and only this one |
-| --- | --- | --- | --- |
-| `--od-text` | #1F2124 (14.7:1 on the background) | #F4F4F2 | Main text, links, buttons, active tab, profile cursor; a filled button carries #FFFFFF text (16.1:1), #1F2124 in dark mode |
-| `--od-text-2` | #4A4D52 (7.7:1) | #B5B8BC (9.3:1) | Secondary text, labels |
-| `--od-background` | #F4F4F2 | #121314 | Screen background |
-| `--od-surface` | #FFFFFF | #1C1D1F | Cell, block, profile |
-| `--od-tint` | #E8E8E5 | #2E3033 | Pills (gases, buddies, tags), secondary button, selected item |
-| `--od-separator` | #DADAD6 | #3A3C40 | Separators and outlines |
-| `--od-outline` | #74777C | #8E9196 | Dashed outline of an empty profile thumbnail |
-| `--od-water-top` | #D4E2F2 | #BFD6F0 | Top of the water column |
-| `--od-water-bottom` | #5584B5 (3:1 or more with the #1F2124 line) | #4C8BD4 | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
-| `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | Profile line |
-| `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
-| `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | ppO2 curve, nitrox and oxygen mixes |
-| `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | "Offline, waiting to be sent" state; text only, always with an icon |
+| Token | Light | Dark | High contrast, light / dark | Use, and only this one |
+| --- | --- | --- | --- | --- |
+| `--od-text` | #1F2124 (14.7:1 on the background) | #F4F4F2 | #000000 / #FFFFFF | Main text, links, buttons, active tab, profile cursor; a filled button carries #FFFFFF text (16.1:1), #1F2124 in dark mode |
+| `--od-text-2` | #4A4D52 (7.7:1) | #B5B8BC (9.3:1) | #26282B / #E2E4E7 | Secondary text, labels |
+| `--od-background` | #F4F4F2 | #121314 | #FFFFFF / #000000 | Screen background |
+| `--od-surface` | #FFFFFF | #1C1D1F | #FFFFFF / #121314 | Cell, block, profile |
+| `--od-tint` | #E8E8E5 | #2E3033 | unchanged | Pills (gases, buddies, tags), secondary button, selected item |
+| `--od-separator` | #DADAD6 | #3A3C40 | #74777C / #8E9196 | Separators and outlines |
+| `--od-outline` | #74777C | #8E9196 | #3E4145 / #C2C5C9 | Dashed outline of an empty profile thumbnail |
+| `--od-water-top` | #D4E2F2 | #BFD6F0 | unchanged | Top of the water column |
+| `--od-water-bottom` | #5584B5 (3:1 or more with the #1F2124 line) | #4C8BD4 | unchanged | Water column at 60 m and deeper; in between, the colour is mixed according to the maximum depth |
+| `--od-trace` | #1F2124 (3.2:1 on the bottom of the water) | #F4F4F2, 2 px, over a 4.5 px #121314 outline | unchanged colour; the planned profile's line 2 dp | Profile line |
+| `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | #8E1010 / #FFC0B8 | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
+| `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | #1B5E20 / #B2EBB4 | ppO2 curve, nitrox and oxygen mixes |
+| `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | #5C3100 / #FFD98A | "Offline, waiting to be sent" state; text only, always with an icon |
 
 **Colour roles (decided on 9 November 2026).** Besides the water of the dive data, the interface has four MD3 colour roles, each with a colour, an on-colour, a container and an on-container. Each becomes a `--od-*` token and the matching Framework7/MD3 variable.
 
-| Role | Light: colour / on / container / on-container | Dark: colour / on / container / on-container | Use, and only this one |
-| --- | --- | --- | --- |
-| Primary (ink) | #1F2124 / #FFFFFF / #E8E8E5 / #1F2124 | #F4F4F2 / #1F2124 / #2E3033 / #F4F4F2 | Main actions, links, text (unchanged) |
-| Secondary (ocean-night blue) | #114477 / #FFFFFF / #D4E2F2 / #0B2440 | #8FB6E6 / #0B2440 / #1E3552 / #D4E2F2 | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert |
-| Tertiary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly. Rust text on the light background is 4.6:1: short bold labels only |
-| Error (red) | #C62828 / #FFFFFF / #FDE2E0 / #5F1010 | #FF8A80 / #3A0A08 / #5C1A16 / #FDE2E0 | Alarms and errors only (unchanged, `--od-alarm`) |
+| Role | Light: colour / on / container / on-container | Dark: colour / on / container / on-container | High contrast: colour, light / dark | Use, and only this one |
+| --- | --- | --- | --- | --- |
+| Primary (ink) | #1F2124 / #FFFFFF / #E8E8E5 / #1F2124 | #F4F4F2 / #1F2124 / #2E3033 / #F4F4F2 | #000000 / #FFFFFF; containers unchanged | Main actions, links, text (unchanged) |
+| Secondary (ocean-night blue) | #114477 / #FFFFFF / #D4E2F2 / #0B2440 | #8FB6E6 / #0B2440 / #1E3552 / #D4E2F2 | #0A2D52 / #C2DAF7; containers unchanged; the active item of the bottom bar and rail #0A2D52 / #FFFFFF | Selection and active state (check badge, selected card, active row of the side menu), tonal buttons, small accents; never an alert |
+| Tertiary (rust and sand) | #B4530F / #FFFFFF / #FBE3B2 / #3D2200 | #F0A66B / #3D2200 / #4A3216 / #FBE3B2 | #7A3200 / #FFC79A; container unchanged, text on it #2E1900 / #FFFFFF | Data series other than the water: temperature, charts of the logbook and of the statistics; sparingly. Rust text on the light background is 4.6:1: short bold labels only |
+| Error (red) | #C62828 / #FFFFFF / #FDE2E0 / #5F1010 | #FF8A80 / #3A0A08 / #5C1A16 / #FDE2E0 | #8E1010 / #FFC0B8 | Alarms and errors only (unchanged, `--od-alarm`) |
 
 All text pairs reach 4.5:1 and all graphic marks 3:1 (ratios in the reference). Reference: `docs/mockups/palette-roles.dc.html`.
+
+**High contrast (decided on 14 November 2026, to-do #75).** When the system asks for more contrast, the `--od-*` variables take their high-contrast values (column above; reference `docs/mockups/contraste-eleve-echantillons.dc.html`, with the ratios): text 7:1 at least, strokes 3:1 at least, page background #FFFFFF in light and #000000 in dark, surfaces #FFFFFF and #121314, containers unchanged. Detection (`app/src/lib/contrast.js`): the media query `prefers-contrast: more` (iOS « Augmenter le contraste »; Android's WebView does not report it, checked on the API 37 emulator), or the system contrast level read by the plugin (`contrastLevel`: Android 14 and later `UiModeManager.getContrast()`, iOS `UIAccessibility.isDarkerSystemColorsEnabled`), « more » above 0.5. Either sets the class `od-high-contrast` on the root element, which `theme.css` matches; it follows the setting while the app is open (the media query live, the level at start and when the app comes back; Android restarts the screen when the contrast changes). No setting in the app. Other rules in high contrast: nothing is translucent (the iPhone tab bar, the map credit, the « Hors ligne » pill, the veil of the map behind the dive detail header become opaque; the tab bar's top line is 1.5 dp in ink); the outlines of fields, chips and outlined buttons are 1.5 dp (`--od-outline-width`); the profile keeps its blue water and the planned profile's line becomes 2 dp (`--od-profile-line-width`; the dive detail's is 2 dp already); meaning colours keep their families, darker in light and lighter in dark, and meaning is still never carried by colour alone.
 
 **Blue theme (decided on 12 November 2026, TODO #45).** The interface moves from sand and copper to an "ocean-night" blue. The primary colour stays the ink (#1F2124): main buttons stay black. Header bands and the side-menu band use the gradient #D4E2F2 0 %, #7199C2 55 %, #2D5E90 100 % (165°), with the same faint profile and wave; the summary text in the band stays warm grey (#3D3A33), and the warm neutrals (paper #F4F4F2, menu tint #E3E1DC) are kept. The secondary role becomes blue (table above) and the old rust and sand become the tertiary role, used for data series such as temperature, so that they stand out on blue water. The water is blue: #D4E2F2 at the surface to #5584B5 at 60 m and deeper, a mid blue chosen so that the black profile line keeps at least 3:1; in dark mode #BFD6F0 to #4C8BD4 with the light line outlined in #121314. Gas cylinder drawings use the water colours (#A9C4E2 to #5584B5, light fill #CFDEF0), and their dashed start and end marks are red (#C62828, dark #FF8A80). The logo becomes blue too (proposal A "ocean-night", chosen on 12 November 2026): light mode #D4E2F2 to #BCD2EB, #8FB0D6 to #7199C2, #3F6F9F to #2D5E90; dark mode #D6E4F4 to #BED3EC, #93B6E0 to #77A0D2, #4F84C2 to #3A6FAE. Same drawing and same rule: the top of a layer is always darker than the bottom of the layer above. Light mode, decided on 13 November 2026: the lower half-circle under the waves (and the full ring of the app icon) is a pale warm grey #C9C7C1 instead of the ink, and the two bubbles are the deep blue #114477; dark mode keeps the off-white #F4F4F2 for the half-circle and the bubbles. Reference: `docs/mockups/logo-bleu.dc.html`; the brand files in `docs/brand/` are updated. The alarm red, the oxygen green and the pending brown are unchanged. The sand-and-copper screens are kept for reference on the canvas page "Du sable au cuivre". References: the screens of the canvas and `docs/mockups/palette-roles.dc.html`.
 

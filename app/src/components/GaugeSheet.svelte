@@ -255,7 +255,7 @@
     }
 
     .od-gauge-sheet--again {
-      border: 1px solid var(--od-text-2);
+      border: var(--od-outline-width) solid var(--od-text-2);
       background: none;
       color: var(--od-text);
     }

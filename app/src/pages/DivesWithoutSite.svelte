@@ -270,7 +270,7 @@
       width: auto;
       height: 32px;
       padding: 0 12px;
-      border: 1px solid var(--od-text-2);
+      border: var(--od-outline-width) solid var(--od-text-2);
       border-radius: 8px;
       background: none;
       color: var(--od-text);

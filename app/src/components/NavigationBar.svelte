@@ -103,6 +103,14 @@
       -webkit-backdrop-filter: blur(20px);
       backdrop-filter: blur(20px);
       box-shadow: 0 -0.5px 0 rgb(0 0 0 / 0.2);
+
+      /* High contrast (task 2026-11-14-149): nothing translucent. */
+      :global(html.od-high-contrast) & {
+        background: var(--od-background);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        box-shadow: 0 -1.5px 0 var(--od-text);
+      }
       /* The inner lines of a filled icon take the bar's colour. */
       --od-nav-active-container: var(--od-background);
 

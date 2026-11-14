@@ -679,6 +679,9 @@ export { waterTypeOf };
  * @property {(options: {action: 'rename'|'remove'|'merge', model: string, serial: string, value?: string, intoModel?: string, intoSerial?: string}) => Promise<EditResult>} diveComputerAction
  *   One undoable step (opendives.h).
  * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
+ * @property {() => Promise<{level: number}>} contrastLevel
+ *   The system contrast level: Android 14+ UiModeManager.getContrast() (0 by default, up to 1),
+ *   iOS 1 with « Augmenter le contraste », else 0.
  * @property {() => Promise<{freeBytes: number, totalBytes: number}>} mapsFreeSpace
  *   Free and total space of the storage that holds the offline maps.
  * @property {(options: {id: string, bbox: number[], maxZoom: 12|14, urlTemplate: string, version: string, allowCellular: boolean, title: string}) => Promise<void>} mapsTilesStart
@@ -919,6 +922,7 @@ export const OpenDivesCore = {
     return JSON.parse((await native.savePlan(options)).json);
   },
   networkStatus: () => native.networkStatus(),
+  contrastLevel: () => native.contrastLevel(),
   mapsFreeSpace: () => native.mapsFreeSpace(),
   placesSearch: (options) => native.placesSearch(options),
   mapsTilesStart: (options) => native.mapsTilesStart(options),

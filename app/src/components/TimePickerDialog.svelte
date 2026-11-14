@@ -392,7 +392,7 @@
       width: 52px;
       height: 80px;
       margin-left: 12px;
-      border: 1px solid var(--od-outline);
+      border: var(--od-outline-width) solid var(--od-outline);
       border-radius: 8px;
       overflow: hidden;
     }

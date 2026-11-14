@@ -158,7 +158,7 @@
     .od-cylinder-types--unused {
       margin-inline-start: 8px;
       padding: 0 6px;
-      border: 1px solid var(--od-text-2);
+      border: var(--od-outline-width) solid var(--od-text-2);
       border-radius: 8px;
       font-size: 11px;
       line-height: 16px;

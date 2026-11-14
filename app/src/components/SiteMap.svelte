@@ -453,6 +453,10 @@
       padding: 2px 6px;
       border-radius: 4px;
       background: color-mix(in srgb, var(--od-surface) 85%, transparent);
+
+      :global(html.od-high-contrast) & {
+        background: var(--od-surface);
+      }
       color: var(--od-text-2);
       font-size: 11px;
       line-height: 14px;

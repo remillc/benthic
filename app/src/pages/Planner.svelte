@@ -1242,7 +1242,7 @@
       .od-planner--line {
         fill: none;
         stroke: var(--od-trace);
-        stroke-width: 1.5;
+        stroke-width: var(--od-profile-line-width);
         stroke-linejoin: round;
       }
 

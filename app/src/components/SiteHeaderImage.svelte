@@ -107,6 +107,11 @@
         color-mix(in srgb, var(--od-background) 70%, transparent) 60%,
         var(--od-background) 100%
       );
+
+      /* High contrast: an opaque veil; the header reads on the plain background. */
+      :global(html.od-high-contrast) & {
+        background: var(--od-background);
+      }
     }
   }
 </style>

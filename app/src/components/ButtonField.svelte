@@ -64,7 +64,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        height: 1px;
+        height: var(--od-outline-width);
         background: var(--od-text-2);
       }
 

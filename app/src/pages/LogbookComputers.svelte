@@ -118,7 +118,7 @@
       height: 20px;
       padding: 0 8px;
       box-sizing: border-box;
-      border: 1px solid var(--od-chip-outline);
+      border: var(--od-outline-width) solid var(--od-chip-outline);
       border-radius: 6px;
       font-size: 12px;
       line-height: 18px;
