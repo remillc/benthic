@@ -3124,3 +3124,14 @@ Christian decided this on 14 November 2026. It replaces item 1 of task 163 (the 
 3. Danger is carried by the alarm colour, the icon and « définitivement », not by a heading. The sign-out dialog and the deletion page are unchanged.
 
 Phone, tablet and iPhone (iOS keeps its own list styling). Update the tests that read these texts and `docs/ui-specification.md` (Account).
+
+## [ ] 2026-11-14-165 Sign-out dialog: icon, pending-changes box, a real disabled checkbox
+
+Christian decided this on 14 November 2026. Mock-up: `compte-android-deconnexion.dc.html` (the dialog opened by « Se déconnecter de cet appareil » when changes are waiting).
+
+1. **Hero icon and centred title.** The MD3 « dialog with icon » layout: the 24 dp sign-out icon (the one of task 164's row) centred at the top, then « Se déconnecter ? » centred under it.
+2. **Pending changes in a box** (`od-sign-out-dialog--pending`): a 16 dp-corner box in the tertiary container (#FBE3B2, dark per the theme tokens), text in `--od-on-tertiary-container` (#8A4B00): a 20 dp cloud-upload icon, « 3 modifications non envoyées » (semibold, with the real count and plural), then « Elles partiront à votre prochaine connexion à ce compte depuis cet appareil. » Same pending family as the badge and the account sheet. Shown only when there are unsent changes.
+3. **« Effacer aussi la copie de cet appareil »** is a real checkbox (MD3, 18 dp in a 48 dp target), disabled while changes are waiting, with « Possible une fois les modifications envoyées » under its label; enabled, without that line, when nothing is waiting.
+4. **Actions unchanged:** text buttons stacked at the end, main action first (task 143's rule): « Synchroniser puis se déconnecter », « Se déconnecter quand même », « Annuler ».
+
+English: « 3 unsent changes », « They will go out the next time you sign in to this account on this device. ». Phone, tablet; iOS keeps its alert.
