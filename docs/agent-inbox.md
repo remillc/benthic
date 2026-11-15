@@ -3846,13 +3846,15 @@ Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingTe
 
 Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
 
-## [ ] 2026-11-15-207 New logbook dialog: a close button at every step
+## [x] 2026-11-15-207 New logbook dialog: a close button at every step
 
 Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».
 
 Test: at each step, the ✕ closes the dialog, no logbook is created, the window is back to where it was; Échap does the same.
 
-## [ ] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
+Done: the ✕ (40 dp, round, transparent, 24 dp, label « Annuler la création du carnet », tooltip « Annuler (Échap) ») sits top right of the dialog at every step and closes it like Échap (Échap now works wherever the focus is, a sign-in waiting in the browser is cancelled, nothing is created). Checked in a stub of the bridge (each step, ✕ and Échap) and in the Electron window.
+
+## [x] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
 
 Christian approved this on 15 November 2026. It changes the « Nouveau carnet » dialog of task 175 (`app/src/components/DesktopNewLogbook.svelte`); the ✕ of task 207 stays. The full description is in `docs/system-design.md`, « New logbook »; mock-ups in `docs/mockups/`, in this order: `bureau-nouveau-carnet-choix.dc.html` (step 1), `bureau-nouveau-carnet-nuage-fournisseur.dc.html` (step 2), `bureau-nouveau-carnet-nuage-connexion.dc.html` (step 3, not connected), `bureau-nouveau-carnet-nuage.dc.html` (step 3, connected), `bureau-nouveau-carnet-nuage-webdav.dc.html` (step 3, WebDAV), `bureau-nouveau-carnet-git.dc.html` (git, step 2 of 2).
 
@@ -3866,3 +3868,5 @@ Christian approved this on 15 November 2026. It changes the « Nouveau carnet »
 English: « Step 1 of 3 », « In your cloud », « Choose the service to keep the logbook in. », « Sign in to {service} », « Not signed in yet », « Sign in to {service} in your browser, then come back here to create the logbook. », « The logbook “My logbook.ssrf” will be created in an OpenDives folder of this account. », « Switch account », « Sign in to your server », « Server address », « Username », « Password », « In Nextcloud, create an app password in Settings › Security. It stays on this computer. ».
 
 Tests: the dialog keeps the same size and place through every step and back; step 3 shows « Se connecter à {service} » until the sign-in comes back, then the connected state and « Créer le carnet »; a service already authorised opens step 3 connected; « Changer de compte » signs in with another account; WebDAV creates the logbook only with a valid server and credentials.
+
+Done: the cloud path is three steps in one 560 × 526 frame (checked at every step and back: same size and place, 150 ms cross-fade, none with reduced motion): the services (Google Drive, OneDrive, Dropbox, iCloud Drive on macOS as a disabled « Pas encore disponible » row, WebDAV ou Nextcloud), then the connection step with the band, « Se connecter à {service} » (becomes « Annuler la connexion » with « Rouvrir la page » while the browser waits, cancelled on ✕, Échap, « Retour »), the connected state with « Changer de compte » (sign-in again choosing an account; the stored account is replaced only on success) and « Créer le carnet ». No « Dossier » field: the file goes into an OpenDives folder. WebDAV ou Nextcloud is built in `desktop/cloud.cjs` (see architecture, section 10) with errors under the field concerned; verified end to end in Electron against a fake WebDAV server. Official service logos are still neutral squares.

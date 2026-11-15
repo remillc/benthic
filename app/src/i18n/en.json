@@ -194,7 +194,9 @@
       "git": "Git repository",
       "googleDrive": "Google Drive",
       "oneDrive": "Microsoft OneDrive",
-      "dropbox": "Dropbox"
+      "dropbox": "Dropbox",
+      "iCloudDrive": "iCloud Drive",
+      "webdav": "WebDAV or Nextcloud"
     },
     "when": {
       "openNow": "open now",
@@ -204,8 +206,8 @@
       "openedOn": "opened {date}"
     },
     "new": {
-      "step": "Step {n} of 2",
-      "stepNamed": "Step 2 of 2 · {name}",
+      "step": "Step {n} of {total}",
+      "stepNamed": "Step {n} of {total} · {name}",
       "title": "New logbook",
       "nameLabel": "Logbook name",
       "nameHelp": "It shows in the top bar and in the recent logbooks.",
@@ -215,18 +217,22 @@
       "computerHelp": "A logbook file (.ssrf), in the folder you choose",
       "cloud": "In your cloud",
       "cloudHelp": "{services} · synced between your devices",
-      "cloudServices": "Google Drive, OneDrive or Dropbox",
+      "cloudServices": "Google Drive, OneDrive, Dropbox or WebDAV",
+      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
       "git": "In a git repository",
       "gitHelp": "Your own repository · full history of changes",
       "continue": "Continue",
       "cancel": "Cancel",
       "back": "Back",
+      "closeLabel": "Cancel creating the logbook",
+      "closeTip": "Cancel (Esc)",
+      "providerIntro": "Choose the service to keep the logbook in.",
+      "connectTitle": "Sign in to {service}",
+      "connectTitleServer": "Sign in to your server",
       "create": "Create the logbook",
       "creating": "Creating…",
-      "cloudIntro": "Signing in happens in your browser. The logbook is a file on the service, copied to this computer.",
       "notAvailable": "Not available yet",
       "folderLabel": "Folder",
-      "folderHelp": "The file “{file}” will be created there. OpenDives only reaches the files it creates or that you open.",
       "gitUrl": "Repository address",
       "gitUrlPlaceholder": "https://github.com/you/logbook.git",
       "gitBranch": "Branch",
@@ -283,17 +289,29 @@
       "modified": "modified {date}",
       "warning": "The copy you do not keep is replaced."
     },
-    "row": {
-      "notConnected": "Not signed in",
-      "signingIn": "Signing in, in your browser…",
-      "connected": "Connected · {account}",
-      "connectedNoAccount": "Connected"
+    "connect": {
+      "notYet": "Not signed in yet",
+      "notYetText": "Sign in to {service} in your browser, then come back here to create the logbook.",
+      "waiting": "Signing in, in your browser…",
+      "waitingText": "The sign-in page of {service} is open in your browser.",
+      "ready": "The logbook “{file}” will be created in an OpenDives folder of this account.",
+      "noAccount": "Account signed in",
+      "switchAccount": "Switch account",
+      "signIn": "Sign in to {service}",
+      "cancel": "Cancel sign-in",
+      "reopen": "Open the page again",
+      "privacy": "OpenDives only reaches the files it creates or that you open.",
+      "linkSign": "Link between OpenDives and {service}"
     },
-    "folderPlaceholder": "OpenDives",
-    "folderHelp": "The file “{file}” is created in this folder of {service}. OpenDives only reaches its own files.",
-    "folderError": "The folder name has a character that is not allowed.",
-    "signIn": "Sign in to {service}",
-    "signOut": "Sign out of {service}",
+    "webdav": {
+      "intro": "OpenDives will create the file “{file}” in an OpenDives folder of your server.",
+      "server": "Server address",
+      "serverPlaceholder": "https://cloud.example.com",
+      "username": "Username",
+      "password": "Password",
+      "passwordHelp": "In Nextcloud, create an app password in Settings › Security. It stays on this computer.",
+      "errorAddress": "This address is not valid."
+    },
     "errors": {
       "NOT_SIGNED_IN": "Sign in to this service first.",
       "NOT_AVAILABLE": "This service is not available yet.",
@@ -307,17 +325,19 @@
       "NETWORK": "The service does not answer. Check the connection.",
       "EXISTS": "A file with this name already exists in this folder.",
       "other": "The logbook could not be created.",
-      "SIGN_IN_CANCELLED": "The sign-in was cancelled."
+      "SIGN_IN_CANCELLED": "The sign-in was cancelled.",
+      "BAD_ADDRESS": "This address is not a WebDAV or Nextcloud server.",
+      "INSECURE_ADDRESS": "The address must start with https://. http:// is only accepted for this computer.",
+      "BAD_CREDENTIALS": "The username or the password is refused.",
+      "SERVER": "The server answered with an error. Try again later.",
+      "NETWORK_SERVER": "No answer at this address. Check the address and the connection."
     },
     "startup": {
       "label": "Open at start",
       "text": "The last logbook reopens each logbook that was open at quit, in its own window",
       "last": "The last logbook",
       "ask": "Choose each time"
-    },
-    "cancelSignIn": "Cancel the sign-in",
-    "waiting": "The sign-in page of {service} is open in your browser.",
-    "reopen": "Open the page again"
+    }
   },
   "sync": {
     "failure": {

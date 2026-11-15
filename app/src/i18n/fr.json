@@ -194,7 +194,9 @@
       "git": "Dépôt git",
       "googleDrive": "Google Drive",
       "oneDrive": "Microsoft OneDrive",
-      "dropbox": "Dropbox"
+      "dropbox": "Dropbox",
+      "iCloudDrive": "iCloud Drive",
+      "webdav": "WebDAV ou Nextcloud"
     },
     "when": {
       "openNow": "ouvert maintenant",
@@ -204,8 +206,8 @@
       "openedOn": "ouvert le {date}"
     },
     "new": {
-      "step": "Étape {n} sur 2",
-      "stepNamed": "Étape 2 sur 2 · {name}",
+      "step": "Étape {n} sur {total}",
+      "stepNamed": "Étape {n} sur {total} · {name}",
       "title": "Nouveau carnet",
       "nameLabel": "Nom du carnet",
       "nameHelp": "Il s'affiche dans la barre du haut et dans les carnets récents.",
@@ -215,18 +217,22 @@
       "computerHelp": "Un fichier carnet (.ssrf), dans le dossier de votre choix",
       "cloud": "Dans votre nuage",
       "cloudHelp": "{services} · synchronisé entre vos appareils",
-      "cloudServices": "Google Drive, OneDrive ou Dropbox",
+      "cloudServices": "Google Drive, OneDrive, Dropbox ou WebDAV",
+      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive ou WebDAV",
       "git": "Dans un dépôt git",
       "gitHelp": "Votre propre dépôt · historique complet des changements",
       "continue": "Continuer",
       "cancel": "Annuler",
       "back": "Retour",
+      "closeLabel": "Annuler la création du carnet",
+      "closeTip": "Annuler (Échap)",
+      "providerIntro": "Choisissez le service où garder le carnet.",
+      "connectTitle": "Connexion à {service}",
+      "connectTitleServer": "Connexion à votre serveur",
       "create": "Créer le carnet",
       "creating": "Création…",
-      "cloudIntro": "La connexion se fait dans votre navigateur. Le carnet est un fichier du service, copié sur cet ordinateur.",
       "notAvailable": "Pas encore disponible",
       "folderLabel": "Dossier",
-      "folderHelp": "Le fichier «  {file}  » y sera créé. OpenDives n'a accès qu'aux fichiers qu'il crée ou que vous ouvrez.",
       "gitUrl": "Adresse du dépôt",
       "gitUrlPlaceholder": "https://github.com/vous/carnet.git",
       "gitBranch": "Branche",
@@ -283,17 +289,29 @@
       "modified": "modifiée le {date}",
       "warning": "La copie que vous ne gardez pas est remplacée."
     },
-    "row": {
-      "notConnected": "Non connecté",
-      "signingIn": "Connexion dans le navigateur…",
-      "connected": "Connecté · {account}",
-      "connectedNoAccount": "Connecté"
+    "connect": {
+      "notYet": "Pas encore connecté",
+      "notYetText": "Connectez-vous à {service} dans votre navigateur, puis revenez ici pour créer le carnet.",
+      "waiting": "Connexion dans le navigateur…",
+      "waitingText": "La page de connexion de {service} est ouverte dans votre navigateur.",
+      "ready": "Le carnet « {file} » sera créé dans un dossier OpenDives de ce compte.",
+      "noAccount": "Compte connecté",
+      "switchAccount": "Changer de compte",
+      "signIn": "Se connecter à {service}",
+      "cancel": "Annuler la connexion",
+      "reopen": "Rouvrir la page",
+      "privacy": "OpenDives n’a accès qu’aux fichiers qu’il crée ou que vous ouvrez.",
+      "linkSign": "Lien entre OpenDives et {service}"
     },
-    "folderPlaceholder": "OpenDives",
-    "folderHelp": "Le fichier « {file} » sera créé dans ce dossier de {service}. OpenDives n’accède qu’à ses propres fichiers.",
-    "folderError": "Le nom du dossier contient un caractère interdit.",
-    "signIn": "Se connecter à {service}",
-    "signOut": "Se déconnecter de {service}",
+    "webdav": {
+      "intro": "OpenDives créera le fichier « {file} » dans un dossier OpenDives de votre serveur.",
+      "server": "Adresse du serveur",
+      "serverPlaceholder": "https://cloud.exemple.com",
+      "username": "Nom d’utilisateur",
+      "password": "Mot de passe",
+      "passwordHelp": "Dans Nextcloud, créez un mot de passe d’application dans Réglages › Sécurité. Il reste sur cet ordinateur.",
+      "errorAddress": "Cette adresse n’est pas valable."
+    },
     "errors": {
       "NOT_SIGNED_IN": "Connectez-vous d’abord à ce service.",
       "NOT_AVAILABLE": "Ce service n’est pas encore disponible.",
@@ -307,17 +325,19 @@
       "NETWORK": "Le service ne répond pas. Vérifiez la connexion.",
       "EXISTS": "Un fichier de ce nom existe déjà dans ce dossier.",
       "other": "Le carnet n’a pas pu être créé.",
-      "SIGN_IN_CANCELLED": "La connexion a été annulée."
+      "SIGN_IN_CANCELLED": "La connexion a été annulée.",
+      "BAD_ADDRESS": "Cette adresse n’est pas celle d’un serveur WebDAV ou Nextcloud.",
+      "INSECURE_ADDRESS": "L’adresse doit commencer par https://. http:// n’est accepté que pour cet ordinateur.",
+      "BAD_CREDENTIALS": "Le nom d’utilisateur ou le mot de passe est refusé.",
+      "SERVER": "Le serveur a répondu par une erreur. Réessayez plus tard.",
+      "NETWORK_SERVER": "Aucune réponse à cette adresse. Vérifiez l’adresse et la connexion."
     },
     "startup": {
       "label": "Ouvrir au démarrage",
       "text": "Le dernier carnet rouvre chaque carnet ouvert à la fermeture, dans sa fenêtre",
       "last": "Le dernier carnet",
       "ask": "Choisir à chaque fois"
-    },
-    "cancelSignIn": "Annuler la connexion",
-    "waiting": "La page de connexion de {service} est ouverte dans votre navigateur.",
-    "reopen": "Rouvrir la page"
+    }
   },
   "sync": {
     "failure": {

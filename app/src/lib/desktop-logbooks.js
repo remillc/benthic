@@ -9,8 +9,19 @@
  * @typedef {{ id: string, kind: 'main'|'file'|'cloud'|'git', name: string, location: string, provider?: string, branch?: string, openedAt?: number, open?: boolean }} LogbookEntry
  */
 
-/** The cloud services, in the order the dialog lists them (iCloud Drive and WebDAV have no API path for now). */
-export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive', 'dropbox']);
+/** The cloud services with a row in the dialog, in order (iCloud Drive: macOS only, see cloudRows; WebDAV has no browser sign-in). */
+export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
+
+/**
+ * The service rows of step 2 of the cloud path: Google Drive, OneDrive, Dropbox, then « iCloud Drive » on macOS only
+ * (Apple gives other apps no access to it elsewhere; there is no API path for it yet, so its row stays disabled),
+ * then « WebDAV ou Nextcloud ».
+ * @param {boolean} mac
+ * @returns {string[]}
+ */
+export function cloudRows(mac) {
+  return mac ? ['googleDrive', 'oneDrive', 'dropbox', 'iCloudDrive', 'webdav'] : [...CLOUD_PROVIDERS];
+}
 
 /**
  * What the main process says about a service: nothing secret, only whether it can be used, whether the diver
@@ -19,53 +30,92 @@ export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive',
  */
 
 /**
- * What the end of a service's row says: « Pas encore disponible » (no client id in this build, the row is
- * disabled), « Se connecter », « Connexion dans le navigateur… » while the browser is open, or
- * « Connecté · diver@example.org ».
+ * Whether a service's row can be chosen: its keys are in this build (no client id: « Pas encore disponible »,
+ * the row is disabled), and for iCloud Drive never, for now.
  * @param {CloudStatus|undefined} status
- * @param {boolean} signingIn
- * @param {(key: string, params?: Record<string, any>) => string} t
- * @returns {{ state: 'unavailable'|'signedOut'|'signingIn'|'connected', text: string }}
  */
-export function providerRow(status, signingIn, t) {
-  if (!status || !status.available) return { state: 'unavailable', text: t('desktopLogbooks.new.notAvailable') };
-  if (signingIn) return { state: 'signingIn', text: t('desktopCloud.row.signingIn') };
-  if (!status.connected) return { state: 'signedOut', text: t('desktopCloud.row.notConnected') };
-  return { state: 'connected', text: status.account ? t('desktopCloud.row.connected', { account: status.account }) : t('desktopCloud.row.connectedNoAccount') };
+export function providerAvailable(status) {
+  return !!status && status.available;
+}
+
+/** @typedef {'choice'|'provider'|'connect'|'git'} NewLogbookStep */
+
+/**
+ * « Étape 2 sur 3 »: the cloud path has three steps (name and place, service, connection), the others two.
+ * @param {NewLogbookStep} step
+ * @param {Where} where the choice of step 1
+ * @returns {{ n: number, total: number }}
+ */
+export function stepCount(step, where) {
+  const total = where === 'cloud' ? 3 : 2;
+  const n = { choice: 1, provider: 2, connect: 3, git: 2 }[step];
+  return { n, total };
 }
 
 /**
- * The folder a service starts with: Google Drive gets a folder OpenDives creates; the others use the app's
- * own folder, where a subfolder is optional.
- * @param {string} provider
+ * The state of step 3 for a service with a browser sign-in: not signed in yet, the browser is open and we wait, or
+ * signed in (also when OpenDives already had access to the service). A switch of account waits like a first sign-in.
+ * @param {{ connected: boolean, signingIn: boolean }} state
+ * @returns {'notConnected'|'waiting'|'connected'}
  */
-export function defaultCloudFolder(provider) {
-  return provider === 'googleDrive' ? 'OpenDives' : '';
+export function connectionState({ connected, signingIn }) {
+  if (signingIn) return 'waiting';
+  return connected ? 'connected' : 'notConnected';
 }
 
 /**
- * Whether a folder path can be used on the services: segments separated by « / », none empty or « . » or « .. »,
- * no control character or one of < > : " | ? * (the main process checks the same). Empty is fine (the service's root).
- * @param {string} folder
- * @returns {'' | 'folder'}
- */
-export function cloudFolderError(folder) {
-  const segments = String(folder ?? '')
-    .split(/[\\/]+/)
-    .map((x) => x.trim())
-    .filter(Boolean);
-  const bad = (/** @type {string} */ x) => x === '.' || x === '..' || x.length > 100 || [...x].some((c) => c.charCodeAt(0) < 32 || '<>:"|?*'.includes(c));
-  return segments.length > 6 || segments.some(bad) ? 'folder' : '';
-}
-
-/**
- * The text key of the error of a failed sign-in or a failed cloud creation.
+ * The text key of the error of a failed sign-in or a failed cloud creation. For WebDAV the unreachable server
+ * is not « le service ».
  * @param {{ code?: string, message?: string }} error
+ * @param {string} [provider]
  */
-export function cloudErrorKey(error) {
-  const known = ['SIGN_IN_CANCELLED', 'NOT_SIGNED_IN', 'NOT_AVAILABLE', 'SIGN_IN_DENIED', 'SIGN_IN_TIMEOUT', 'SIGN_IN_EXPIRED', 'STATE_MISMATCH', 'PORT_BUSY', 'CREDENTIALS_NOT_SAVED', 'DENIED', 'NETWORK', 'EXISTS'];
+export function cloudErrorKey(error, provider = '') {
+  const known = ['SIGN_IN_CANCELLED', 'NOT_SIGNED_IN', 'NOT_AVAILABLE', 'SIGN_IN_DENIED', 'SIGN_IN_TIMEOUT', 'SIGN_IN_EXPIRED', 'STATE_MISMATCH', 'PORT_BUSY', 'CREDENTIALS_NOT_SAVED', 'DENIED', 'NETWORK', 'EXISTS', 'BAD_ADDRESS', 'INSECURE_ADDRESS', 'BAD_CREDENTIALS', 'SERVER'];
   const code = error?.code && known.includes(error.code) ? error.code : String(error?.message ?? '').split(/[:\s]/)[0];
+  if (code === 'NETWORK' && provider === 'webdav') return 'desktopCloud.errors.NETWORK_SERVER';
   return `desktopCloud.errors.${known.includes(code) ? code : 'other'}`;
+}
+
+/**
+ * The field of the WebDAV step an error belongs to, so that it shows under that field: a bad, insecure or
+ * unreachable address under « Adresse du serveur », a refused account under « Mot de passe », the rest at the bottom.
+ * @param {{ code?: string, message?: string }} error
+ * @returns {'server'|'password'|''}
+ */
+export function webdavErrorField(error) {
+  const code = String(error?.code || String(error?.message ?? '').split(/[:\s]/)[0]);
+  if (code === 'BAD_ADDRESS' || code === 'INSECURE_ADDRESS' || code === 'NETWORK') return 'server';
+  if (code === 'BAD_CREDENTIALS') return 'password';
+  return '';
+}
+
+/**
+ * The live check of « Adresse du serveur »: https, or http for this computer only. Empty is not an error (the button
+ * says it). A bare host (cloud.example.org) is fine: https is assumed, as the main process does.
+ * @param {string} server
+ * @returns {'' | 'address' | 'insecure'}
+ */
+export function webdavServerError(server) {
+  const text = String(server ?? '').trim();
+  if (!text) return '';
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : `https://${text}`;
+  let url;
+  try {
+    url = new URL(withScheme);
+  } catch {
+    return 'address';
+  }
+  if (url.username || url.password || !url.hostname || /\s/.test(text)) return 'address';
+  if (url.protocol === 'https:') return '';
+  return url.protocol === 'http:' ? (['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) ? '' : 'insecure') : 'address';
+}
+
+/**
+ * The server, user name and password of the WebDAV step are all filled in (the connection itself is checked on « Créer le carnet »).
+ * @param {{ server: string, username: string, password: string }} form
+ */
+export function webdavFormReady(form) {
+  return !!form.server.trim() && webdavServerError(form.server) === '' && !!form.username.trim() && form.password !== '';
 }
 
 /** « Ouvrir au démarrage »: the logbooks open at the last quit, or the start screen. */
@@ -166,12 +216,12 @@ export function fileNameFor(name) {
 
 /**
  * The step after step 1: « Sur cet ordinateur » goes straight to the system's save dialog (no second step),
- * the two others have one.
+ * the cloud has the service list, the git repository its form.
  * @param {Where} where
- * @returns {'cloud'|'git'|null}
+ * @returns {'provider'|'git'|null}
  */
 export function secondStep(where) {
-  return where === 'cloud' ? 'cloud' : where === 'git' ? 'git' : null;
+  return where === 'cloud' ? 'provider' : where === 'git' ? 'git' : null;
 }
 
 /**
@@ -219,11 +269,13 @@ export function gitFormReady(form) {
 }
 
 /**
- * The cloud step is ready when a service is chosen, available and signed in, and its folder is valid.
- * @param {{ provider: string, connected: boolean, folder: string }} state
+ * The last cloud step is ready when a service with a browser sign-in is chosen and signed in, or when the WebDAV
+ * server, user name and password are filled in.
+ * @param {{ provider: string, connected: boolean, webdav?: { server: string, username: string, password: string } }} state
  */
 export function cloudFormReady(state) {
-  return /** @type {readonly string[]} */ (CLOUD_PROVIDERS).includes(state.provider) && state.connected && cloudFolderError(state.folder) === '';
+  if (state.provider === 'webdav') return !!state.webdav && webdavFormReady(state.webdav);
+  return ['googleDrive', 'oneDrive', 'dropbox'].includes(state.provider) && state.connected;
 }
 
 /**
@@ -295,6 +347,6 @@ export function isLogbookFileName(name) {
 export function keptIn(entry, t) {
   if (entry.kind === 'git') return { key: 'whereGit', where: entry.location.replace(/^[a-z]+:\/\//i, '').replace(/\.git$/i, '') };
   const folder = folderOf(entry.location);
-  if (entry.provider) return { key: 'whereCloud', where: `${t(`desktopLogbooks.source.${entry.provider}`)}, ${t('desktopLogbooks.new.folderLabel').toLowerCase()} ${folder}` };
+  if (entry.provider) return { key: 'whereCloud', where: `${t(`desktopLogbooks.source.${entry.provider}`)}, ${t('desktopLogbooks.new.folderLabel').toLowerCase()} ${folder || 'OpenDives'}` };
   return { key: 'whereComputer', where: folder };
 }

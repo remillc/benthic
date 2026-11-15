@@ -4,10 +4,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   CLOUD_PROVIDERS,
-  providerRow,
-  defaultCloudFolder,
-  cloudFolderError,
+  cloudRows,
+  providerAvailable,
+  stepCount,
+  connectionState,
   cloudErrorKey,
+  webdavErrorField,
+  webdavServerError,
+  webdavFormReady,
   STARTUP_MODES,
   sourceKind,
   sourceText,
@@ -42,39 +46,36 @@ const texts = {
 };
 const t = (key, params = {}) => (texts[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => params[k]);
 
-test('the cloud services are the three with an API; iCloud Drive and WebDAV are gone', () => {
-  assert.deepEqual([...CLOUD_PROVIDERS], ['googleDrive', 'oneDrive', 'dropbox']);
+test('the cloud services: the three with a browser sign-in, then WebDAV or Nextcloud', () => {
+  assert.deepEqual([...CLOUD_PROVIDERS], ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
 });
 
-test('the end of a service row: not available, sign in, signing in, connected as', () => {
-  const rows = {
-    'desktopLogbooks.new.notAvailable': 'Pas encore disponible',
-    'desktopCloud.row.notConnected': 'Non connecté',
-    'desktopCloud.row.signingIn': 'Connexion dans le navigateur…',
-    'desktopCloud.row.connected': 'Connecté · {account}',
-    'desktopCloud.row.connectedNoAccount': 'Connecté',
-  };
-  const tt = (key, params = {}) => (rows[key] ?? key).replace('{account}', params.account ?? '');
+test('the rows of step 2: iCloud Drive on macOS only, before WebDAV ou Nextcloud', () => {
+  assert.deepEqual(cloudRows(false), ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
+  assert.deepEqual(cloudRows(true), ['googleDrive', 'oneDrive', 'dropbox', 'iCloudDrive', 'webdav']);
+});
+
+test('a row can be chosen when the main process says the service is available; iCloud Drive has no status, so never', () => {
   const status = (over) => ({ provider: 'dropbox', available: true, connected: false, account: '', ...over });
-  assert.deepEqual(providerRow(status({ available: false }), false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
-  assert.deepEqual(providerRow(undefined, false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
-  assert.deepEqual(providerRow(status({}), false, tt), { state: 'signedOut', text: 'Non connecté' });
-  assert.deepEqual(providerRow(status({}), true, tt), { state: 'signingIn', text: 'Connexion dans le navigateur…' });
-  assert.deepEqual(providerRow(status({ connected: true, account: 'moi@example.org' }), false, tt), { state: 'connected', text: 'Connecté · moi@example.org' });
-  assert.deepEqual(providerRow(status({ connected: true }), false, tt), { state: 'connected', text: 'Connecté' });
-  // Not available wins over a stale connection.
-  assert.equal(providerRow(status({ available: false, connected: true }), false, tt).state, 'unavailable');
+  assert.equal(providerAvailable(status({})), true);
+  assert.equal(providerAvailable(status({ available: false })), false);
+  assert.equal(providerAvailable(undefined), false);
 });
 
-test('the folder: Google Drive starts with a folder OpenDives creates, the others with their own', () => {
-  assert.equal(defaultCloudFolder('googleDrive'), 'OpenDives');
-  assert.equal(defaultCloudFolder('dropbox'), '');
-  assert.equal(defaultCloudFolder('oneDrive'), '');
+test('the step line: three steps on the cloud path (name, service, connection), two on the others', () => {
+  assert.deepEqual(stepCount('choice', 'cloud'), { n: 1, total: 3 });
+  assert.deepEqual(stepCount('provider', 'cloud'), { n: 2, total: 3 });
+  assert.deepEqual(stepCount('connect', 'cloud'), { n: 3, total: 3 });
+  assert.deepEqual(stepCount('choice', 'computer'), { n: 1, total: 2 });
+  assert.deepEqual(stepCount('choice', 'git'), { n: 1, total: 2 });
+  assert.deepEqual(stepCount('git', 'git'), { n: 2, total: 2 });
 });
 
-test('a cloud folder path: segments with no dot-dot, no forbidden character; empty is the root', () => {
-  for (const ok of ['', 'OpenDives', 'OpenDives/plongées', ' a / b ', 'a/b/c/d/e/f']) assert.equal(cloudFolderError(ok), '', ok);
-  for (const bad of ['..', 'a/../b', 'a/./b', 'a:b', 'a?b', 'a|b', 'a/b/c/d/e/f/g', 'x'.repeat(101)]) assert.equal(cloudFolderError(bad), 'folder', bad);
+test('step 3: not signed in, waiting for the browser (also for a switch of account), signed in', () => {
+  assert.equal(connectionState({ connected: false, signingIn: false }), 'notConnected');
+  assert.equal(connectionState({ connected: false, signingIn: true }), 'waiting');
+  assert.equal(connectionState({ connected: true, signingIn: false }), 'connected');
+  assert.equal(connectionState({ connected: true, signingIn: true }), 'waiting');
 });
 
 test('the error of a sign-in or a cloud creation has its own text', () => {
@@ -84,6 +85,35 @@ test('the error of a sign-in or a cloud creation has its own text', () => {
   assert.equal(cloudErrorKey({ message: 'NETWORK: no answer' }), 'desktopCloud.errors.NETWORK');
   assert.equal(cloudErrorKey({ message: 'weird failure' }), 'desktopCloud.errors.other');
   assert.equal(cloudErrorKey({}), 'desktopCloud.errors.other');
+  // WebDAV: the server does not answer, not « le service ».
+  assert.equal(cloudErrorKey({ code: 'NETWORK' }, 'webdav'), 'desktopCloud.errors.NETWORK_SERVER');
+  assert.equal(cloudErrorKey({ code: 'NETWORK' }, 'dropbox'), 'desktopCloud.errors.NETWORK');
+  for (const code of ['BAD_ADDRESS', 'INSECURE_ADDRESS', 'BAD_CREDENTIALS', 'SERVER']) assert.equal(cloudErrorKey({ code }, 'webdav'), `desktopCloud.errors.${code}`);
+});
+
+test('a WebDAV error shows under its field: the address, the password, or at the bottom', () => {
+  for (const code of ['BAD_ADDRESS', 'INSECURE_ADDRESS', 'NETWORK']) assert.equal(webdavErrorField({ code }), 'server', code);
+  assert.equal(webdavErrorField({ code: 'BAD_CREDENTIALS' }), 'password');
+  assert.equal(webdavErrorField({ message: 'BAD_CREDENTIALS' }), 'password');
+  for (const code of ['DENIED', 'SERVER', 'EXISTS', 'CREDENTIALS_NOT_SAVED']) assert.equal(webdavErrorField({ code }), '', code);
+  assert.equal(webdavErrorField({}), '');
+});
+
+test('the WebDAV address: https, or http for this computer only; a bare host is fine', () => {
+  for (const ok of ['', 'https://cloud.exemple.com', 'cloud.exemple.com', 'https://cloud.exemple.com/remote.php/dav/files/vous/', 'http://localhost:8080/dav', 'http://127.0.0.1/', ' https://cloud.exemple.com ']) assert.equal(webdavServerError(ok), '', ok);
+  for (const insecure of ['http://cloud.exemple.com', 'http://192.168.1.20/dav']) assert.equal(webdavServerError(insecure), 'insecure', insecure);
+  for (const bad of ['ftp://cloud.exemple.com', 'https://user:pw@cloud.exemple.com', 'https://', 'cloud exemple com']) assert.equal(webdavServerError(bad), 'address', bad);
+});
+
+test('the WebDAV button is enabled once the server, user name and password are filled and the address is usable', () => {
+  const form = { server: 'https://cloud.exemple.com', username: 'vous', password: 'x' };
+  assert.ok(webdavFormReady(form));
+  assert.ok(!webdavFormReady({ ...form, server: '' }));
+  assert.ok(!webdavFormReady({ ...form, username: '  ' }));
+  assert.ok(!webdavFormReady({ ...form, password: '' }));
+  assert.ok(!webdavFormReady({ ...form, server: 'http://cloud.exemple.com' }));
+  // A password made of spaces is a password.
+  assert.ok(webdavFormReady({ ...form, password: '  ' }));
 });
 
 test('the start-up choices', () => {
@@ -128,7 +158,7 @@ test('the name of a logbook and its file name', () => {
 
 test('step 1 goes straight to the save dialog for this computer, to a second step for the others', () => {
   assert.equal(secondStep('computer'), null);
-  assert.equal(secondStep('cloud'), 'cloud');
+  assert.equal(secondStep('cloud'), 'provider');
   assert.equal(secondStep('git'), 'git');
 });
 
@@ -160,13 +190,15 @@ test('the git form: an https address, a branch and a token', () => {
   assert.equal(gitUserFromUrl(''), '');
 });
 
-test('the cloud form needs a service the diver is signed in to, and a valid folder', () => {
-  assert.ok(cloudFormReady({ provider: 'dropbox', connected: true, folder: 'Carnets' }));
-  assert.ok(cloudFormReady({ provider: 'dropbox', connected: true, folder: '' }));
-  assert.ok(!cloudFormReady({ provider: 'dropbox', connected: false, folder: 'Carnets' }));
-  assert.ok(!cloudFormReady({ provider: '', connected: true, folder: 'd' }));
-  assert.ok(!cloudFormReady({ provider: 'webdav', connected: true, folder: 'd' }));
-  assert.ok(!cloudFormReady({ provider: 'googleDrive', connected: true, folder: '../x' }));
+test('the last cloud step needs a service the diver is signed in to, or the three WebDAV fields', () => {
+  assert.ok(cloudFormReady({ provider: 'dropbox', connected: true }));
+  assert.ok(!cloudFormReady({ provider: 'dropbox', connected: false }));
+  assert.ok(!cloudFormReady({ provider: '', connected: true }));
+  assert.ok(!cloudFormReady({ provider: 'iCloudDrive', connected: true }));
+  const webdav = { server: 'https://cloud.exemple.com', username: 'vous', password: 'x' };
+  assert.ok(cloudFormReady({ provider: 'webdav', connected: false, webdav }));
+  assert.ok(!cloudFormReady({ provider: 'webdav', connected: true }));
+  assert.ok(!cloudFormReady({ provider: 'webdav', connected: false, webdav: { ...webdav, password: '' } }));
 });
 
 test('where to create a token, by host', () => {
@@ -203,5 +235,6 @@ test('where a new logbook is kept, for its ready screen', () => {
   assert.deepEqual(keptIn({ id: 'f', kind: 'file', name: 'a', location: '/home/me/Documents/a.ssrf' }, t), { key: 'whereComputer', where: 'Documents' });
   assert.deepEqual(keptIn({ id: 'f', kind: 'file', name: 'a', location: '/d/OpenDives/a.ssrf', provider: 'googleDrive' }, t), { key: 'whereCloud', where: 'Google Drive, dossier OpenDives' });
   assert.deepEqual(keptIn({ id: 'c', kind: 'cloud', name: 'a', location: 'OpenDives/a.ssrf', provider: 'googleDrive' }, t), { key: 'whereCloud', where: 'Google Drive, dossier OpenDives' });
+  assert.deepEqual(keptIn({ id: 'c', kind: 'cloud', name: 'a', location: 'a.ssrf', provider: 'googleDrive' }, t), { key: 'whereCloud', where: 'Google Drive, dossier OpenDives' });
   assert.deepEqual(keptIn({ id: 'g', kind: 'git', name: 'a', location: 'https://h.org/o/r.git' }, t), { key: 'whereGit', where: 'h.org/o/r' });
 });
