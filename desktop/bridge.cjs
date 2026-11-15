@@ -104,6 +104,8 @@ const PATH_ARGS = {
 
 /** Files of userData the renderer never reaches by path. */
 const SECRET_FILES = new Set(['cloud-account.bin', 'git-remote.bin', 'cloud-account.bin.tmp', 'git-remote.bin.tmp']);
+/** The refresh token of a personal cloud (cloud.cjs): cloud-<service>.bin, with the file of the clients' keys. */
+const SECRET_CLOUD = /^(cloud-(googleDrive|oneDrive|dropbox)\.bin(\.tmp)?|oauth-clients\.local\.json)$/;
 /** The token of a git logbook other than the main one: git-remote-<id>.bin (task 2026-11-15-173). */
 const SECRET_PATTERN = /^git-remote-[fg]-[0-9a-f]{12}\.bin(\.tmp)?$/;
 const DEV_FILES = new Set(['cloud-dev.env', 'cloud-test.env']);
@@ -257,9 +259,10 @@ class HostProcess {
  * @param {(channel: string, ...args: any[]) => void} [options.broadcast] sends to every window; default: all
  *   BrowserWindows
  * @param {() => any} [options.electron] the electron module, for BrowserWindow (tests replace it)
+ * @param {ReturnType<import('./cloud.cjs').createCloudService>} [options.cloud] the personal clouds (cloud logbooks)
  * @returns {{ call: (method: string, args?: object) => Promise<any>, stop: () => Promise<void>, paths: object }}
  */
-function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resourcesDir, broadcast, electron }) {
+function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resourcesDir, broadcast, electron, cloud }) {
   const userData = app.getPath('userData');
   const tempDir = path.join(app.getPath('temp'), 'opendives');
   const resources = resourcesDir
@@ -327,7 +330,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       onExit: () => emit(ctx, 'od:core-event', 'coreRestarted', {}),
       async onStart(sendRaw) {
         await coreSetup(sendRaw);
-        if (ctx.descriptor?.kind === 'file') await prepareFileLogbook(ctx, sendRaw);
+        if (isFileLike(ctx)) await prepareFileLogbook(ctx, sendRaw);
       },
     });
     contexts.set(key, ctx);
@@ -377,33 +380,32 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // --- A file logbook: the core works on a git copy, the .ssrf file is kept up to date ---
 
+  /** A logbook whose git copy is built from a .ssrf file: a file, or the working copy of a cloud logbook. */
+  const isFileLike = (ctx) => !!ctx.descriptor && (ctx.descriptor.kind === 'file' || ctx.descriptor.kind === 'cloud');
   const repoDirOf = (ctx) => path.join(logbooks.cacheDir(userData, ctx.descriptor.id), 'repo');
-  const metaFileOf = (ctx) => path.join(logbooks.cacheDir(userData, ctx.descriptor.id), 'meta.json');
+  const localFileOf = (ctx) => logbooks.localFileOf(userData, ctx.descriptor);
 
+  /** What the file is after this app wrote it: the hash tells whether another program changed it. */
   function writeMeta(ctx, file) {
-    fs.mkdirSync(path.dirname(metaFileOf(ctx)), { recursive: true });
-    fs.writeFileSync(metaFileOf(ctx), JSON.stringify({ hash: logbooks.fileHash(file) }));
+    logbooks.writeMeta(userData, ctx.descriptor.id, { hash: logbooks.fileHash(file) });
   }
 
   /**
    * At the start of the helper: the git copy is made again from the file when the file is not the one
-   * this app last wrote (Subsurface or another program changed it, or this is the first time).
+   * this app last wrote (Subsurface or another program changed it, a newer cloud version was downloaded,
+   * or this is the first time). A cloud logbook first meets its remote file.
    */
   async function prepareFileLogbook(ctx, sendRaw) {
-    const file = ctx.descriptor.location;
+    if (ctx.descriptor.kind === 'cloud') await cloudReconcile(ctx, { opening: true });
+    const file = localFileOf(ctx);
     const repo = repoDirOf(ctx);
     if (!fs.existsSync(file)) {
-      ctx.failure = 'FILE_MISSING';
+      ctx.failure = ctx.failure || 'FILE_MISSING';
       log(`The logbook file is missing: ${file}`);
       return;
     }
     ctx.failure = '';
-    let meta = {};
-    try {
-      meta = JSON.parse(fs.readFileSync(metaFileOf(ctx), 'utf8'));
-    } catch {
-      // No bookkeeping yet.
-    }
+    const meta = logbooks.readMeta(userData, ctx.descriptor.id);
     if (fs.existsSync(repo) && meta.hash === logbooks.fileHash(file)) return;
     fs.rmSync(repo, { recursive: true, force: true });
     fs.mkdirSync(path.dirname(repo), { recursive: true });
@@ -415,6 +417,118 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       throw e;
     }
     writeMeta(ctx, file);
+  }
+
+  // --- A cloud logbook: the working copy and the remote file (cloud.cjs) ---
+
+  const cloudEvent = (ctx, state) => emit(ctx, 'od:core-event', 'cloudSync', { state });
+
+  /** Sends the working copy up; the revision, and no pending change, are kept. */
+  async function cloudUpload(ctx, expectedRev) {
+    const id = ctx.descriptor.id;
+    const meta = logbooks.readMeta(userData, id);
+    const sent = await cloud.upload(ctx.descriptor, meta.remote, localFileOf(ctx), { expectedRev });
+    logbooks.writeMeta(userData, id, { rev: sent.rev, modified: sent.modified, remote: sent.ref, pending: false });
+    cloudEvent(ctx, 'synced');
+  }
+
+  /** Takes the remote file as the working copy; the git copy is made again at the next start of the helper. */
+  async function cloudDownload(ctx, remote) {
+    const id = ctx.descriptor.id;
+    const meta = logbooks.readMeta(userData, id);
+    const local = localFileOf(ctx);
+    const tmp = `${local}.od-download`;
+    const got = await cloud.download(ctx.descriptor, remote?.ref ?? meta.remote, tmp);
+    fs.mkdirSync(path.dirname(local), { recursive: true });
+    fs.renameSync(tmp, local);
+    logbooks.writeMeta(userData, id, { rev: got.rev, modified: got.modified, remote: got.ref, pending: false, hash: '' });
+    cloudEvent(ctx, 'synced');
+  }
+
+  /**
+   * The working copy meets the remote file. Same revision: nothing. Changed elsewhere and nothing unsent
+   * here: download. Both changed: the diver chooses (never overwritten without asking). Without a
+   * connection, the working copy is the logbook and the change waits.
+   * @returns {Promise<{ state: string, changed: boolean }>} changed: the working copy is another file now
+   */
+  async function cloudReconcile(ctx, { opening = false } = {}) {
+    const id = ctx.descriptor.id;
+    const local = localFileOf(ctx);
+    const meta = logbooks.readMeta(userData, id);
+    const hasLocal = fs.existsSync(local);
+    let remote;
+    try {
+      remote = await cloud.stat(ctx.descriptor, meta.remote);
+    } catch (e) {
+      if (!hasLocal) {
+        ctx.failure = e.code === 'NOT_SIGNED_IN' || e.code === 'SIGN_IN_EXPIRED' ? 'CLOUD_SIGN_IN' : 'CLOUD_UNREACHABLE';
+        throw new Error(ctx.failure);
+      }
+      log(`Cloud logbook ${id}: the remote file was not reached (${e.code || 'error'})`);
+      cloudEvent(ctx, 'offline');
+      return { state: 'offline', changed: false };
+    }
+    if (!hasLocal) {
+      if (!remote) {
+        ctx.failure = 'FILE_MISSING';
+        return { state: 'missing', changed: false };
+      }
+      await cloudDownload(ctx, remote);
+      return { state: 'downloaded', changed: true };
+    }
+    const decision = cloud.decide({ knownRev: meta.rev, remote, pending: !!meta.pending });
+    try {
+      if (decision === 'same') return { state: 'same', changed: false };
+      if (decision === 'download') {
+        await cloudDownload(ctx, remote);
+        return { state: 'downloaded', changed: true };
+      }
+      if (decision === 'upload') {
+        await cloudUpload(ctx, remote ? remote.rev : undefined);
+        return { state: 'uploaded', changed: false };
+      }
+      if (ctx.conflictLater && !opening) return { state: 'conflict', changed: false };
+      const keep = await cloud.askConflict(ctx.webContents, { provider: ctx.descriptor.provider, name: ctx.descriptor.name, localModified: fs.statSync(local).mtimeMs, remoteModified: remote?.modified ?? '' });
+      if (keep === 'remote') {
+        await cloudDownload(ctx, remote);
+        ctx.conflictLater = false;
+        return { state: 'downloaded', changed: true };
+      }
+      if (keep === 'local') {
+        await cloudUpload(ctx, remote?.rev);
+        ctx.conflictLater = false;
+        return { state: 'uploaded', changed: false };
+      }
+      ctx.conflictLater = true;
+      cloudEvent(ctx, 'conflict');
+      return { state: 'conflict', changed: false };
+    } catch (e) {
+      // Changed again while it was being sent: the next check meets it afresh.
+      if (e.code === 'REMOTE_CHANGED') return { state: 'changed-again', changed: false };
+      if (decision === 'upload' || decision === 'conflict') {
+        log(`Cloud logbook ${id}: the upload failed (${e.code || 'error'})`);
+        cloudEvent(ctx, 'pending');
+        return { state: 'pending', changed: false };
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * « Is the logbook the same elsewhere? »: asked when a window of a cloud logbook gets the focus and
+   * every few minutes. Resolves { state, reload }: reload when the working copy changed and the window
+   * must read it again (its helper starts afresh; the caller reloads the page).
+   * @param {number} key
+   */
+  async function cloudCheck(key) {
+    const ctx = contexts.get(key);
+    if (!ctx || !cloud || !ctx.descriptor || ctx.descriptor.kind !== 'cloud') return { state: 'none', reload: false };
+    const work = ctx.mirror.catch(() => {}).then(() => cloudReconcile(ctx));
+    ctx.mirror = work.then(() => {});
+    const result = await work;
+    if (!result.changed) return { state: result.state, reload: false };
+    await setDescriptor(key, ctx.descriptor);
+    return { state: result.state, reload: true };
   }
 
   /** The logbook in memory, saved as Subsurface's Save As does, as a .ssrf file at `target` (never the logbook's own file while it is open elsewhere). */
@@ -443,9 +557,14 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   /** The file follows the git copy after a save; one write at a time per window. */
   function mirrorToFile(ctx) {
     const work = ctx.mirror.catch(() => {}).then(async () => {
-      const file = ctx.descriptor.location;
+      const file = localFileOf(ctx);
       await exportAll(ctx, file);
       writeMeta(ctx, file);
+      if (ctx.descriptor.kind === 'cloud' && cloud) {
+        // The change is pending until the service has it; a failed upload waits for the next write or check.
+        logbooks.writeMeta(userData, ctx.descriptor.id, { pending: true });
+        await cloudReconcile(ctx);
+      }
     });
     ctx.mirror = work;
     return work;
@@ -493,7 +612,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function allowed(value, kind) {
     if (typeof value !== 'string' || value === '' || value.includes('\0')) return false;
     const plain = path.resolve(value.replace(/\[[^\]/\\]*\]$/, ''));
-    if (SECRET_FILES.has(path.basename(plain)) || SECRET_PATTERN.test(path.basename(plain)) || DEV_FILES.has(path.basename(plain))) return false;
+    if (SECRET_FILES.has(path.basename(plain)) || SECRET_PATTERN.test(path.basename(plain)) || SECRET_CLOUD.test(path.basename(plain)) || DEV_FILES.has(path.basename(plain))) return false;
     if (kind === 'temp') return inside(plain, tempDir);
     if (kind === 'data') return inside(plain, userData) || plain === userData;
     if (kind === 'write') return inside(plain, userData) || inside(plain, tempDir);
@@ -534,14 +653,14 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   async function coreCall(method, args, ctx = contextFor()) {
     if (typeof method !== 'string' || !CORE_METHODS.has(method)) throw new Error(`Unknown method ${method}`);
     const checked = checkedArgs(method, args);
-    if (ctx.descriptor && ctx.descriptor.kind === 'file') {
+    if (isFileLike(ctx)) {
       // Before the first call: a file the app cannot read is told, not shown as an empty logbook.
       await ctx.host.start();
       if (ctx.failure) throw new Error(ctx.failure);
     }
     const result = await ctx.host.call(method, checked);
     // The file logbook's file follows every save of its git copy.
-    if (ctx.descriptor && ctx.descriptor.kind === 'file' && (method === 'saveLocal' || method === 'sync')) await mirrorToFile(ctx);
+    if (isFileLike(ctx) && (method === 'saveLocal' || method === 'sync')) await mirrorToFile(ctx);
     return result;
   }
 
@@ -835,6 +954,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     callFor: (key, method, args) => coreCall(method, args ?? {}, contexts.get(key) || contextFor()),
     saveCopy: (key, target) => saveCopy(contexts.get(key) || contextFor(), target),
     probeGit,
+    cloudCheck,
     /** The access of a git logbook, from the dialog (the token never goes back to a renderer). */
     storeGitAccess: (descriptor, access) => writeCredentials('git', access, { descriptor }),
     forgetGitAccess: (descriptor) => clearCredentials('git', { descriptor }),

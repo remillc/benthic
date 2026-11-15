@@ -84,8 +84,13 @@ contextBridge.exposeInMainWorld('odDesktop', {
     close: () => invoke('od:logbooks', 'close'),
     clearRecent: () => invoke('od:logbooks', 'clearRecent'),
     forget: (options) => invoke('od:logbooks', 'forget', options),
-    cloud: () => invoke('od:logbooks', 'cloud'),
-    pickFolder: () => invoke('od:logbooks', 'pickFolder'),
+    /** The personal clouds: { provider, available, connected, account } for each, never a token. */
+    cloudStatus: () => invoke('od:logbooks', 'cloudStatus'),
+    cloudSignIn: (options) => invoke('od:logbooks', 'cloudSignIn', options),
+    cloudSignOut: (options) => invoke('od:logbooks', 'cloudSignOut', options),
+    /** « Ouvrir au démarrage »: { mode: 'last' | 'ask' }, kept in the main process. */
+    startup: () => invoke('od:logbooks', 'startup'),
+    setStartup: (options) => invoke('od:logbooks', 'setStartup', options),
     create: (options) => invoke('od:logbooks', 'create', options),
     saveCopy: () => invoke('od:logbooks', 'saveCopy'),
     openCopy: (options) => invoke('od:logbooks', 'openCopy', options),

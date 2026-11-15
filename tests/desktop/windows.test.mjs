@@ -224,7 +224,7 @@ test('windows: a recent logbook whose file is gone is told and forgotten', async
   assert.ok(!new logbooks.LogbookStore(userData).find(gone.id));
 });
 
-test('windows: a new logbook is an empty .ssrf opened in a new window, on this computer or in a cloud folder', async () => {
+test('windows: a new logbook is an empty .ssrf opened in a new window on this computer', async () => {
   const fake = fakeElectron();
   const wm = manager(fake);
   const main = wm.openMain();
@@ -233,12 +233,6 @@ test('windows: a new logbook is an empty .ssrf opened in a new window, on this c
   const result = await wm.handle({ sender: main.webContents }, 'create', { where: 'computer', name: 'Neuf' });
   assert.equal(result.opened, true);
   assert.ok(readFileSync(`${target}.ssrf`, 'utf8').includes('<dives>'));
-  const folder = path.join(root, 'sync');
-  mkdirSync(folder);
-  const cloud = await wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder });
-  assert.equal(cloud.descriptor.provider, 'dropbox');
-  assert.ok(existsSync(path.join(folder, 'Nuage.ssrf')));
-  await assert.rejects(wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder }), /EXISTS/);
   fake.dialogs.save.push({ canceled: true });
   assert.equal((await wm.handle({ sender: main.webContents }, 'create', { where: 'computer', name: 'X' })).canceled, true);
 });
@@ -262,15 +256,4 @@ test('windows: a saved copy leaves the original window on the original logbook; 
   assert.equal(bridge.descriptorOf(fake.created[2].webContents.id).location, path.resolve(copy));
   fake.dialogs.save.push({ canceled: false, filePath: file });
   await assert.rejects(wm.handle({ sender: original.webContents }, 'saveCopy'), /SAME_FILE/);
-});
-
-test('the iCloud Drive row exists on macOS only; cloud folders are found where the clients put them', () => {
-  assert.ok(logbooks.cloudProviders('darwin').includes('iCloud'));
-  assert.ok(!logbooks.cloudProviders('win32').includes('iCloud'));
-  assert.ok(!logbooks.cloudProviders('linux').includes('iCloud'));
-  const there = new Set([path.join('/home/me', 'Dropbox'), path.join('/home/me', 'Library', 'Mobile Documents', 'com~apple~CloudDocs')]);
-  const found = logbooks.cloudFolders({ platform: 'linux', home: '/home/me', env: {}, exists: (p) => there.has(p) });
-  assert.deepEqual(found.map((f) => f.provider), ['dropbox']);
-  const mac = logbooks.cloudFolders({ platform: 'darwin', home: '/home/me', env: {}, exists: (p) => there.has(p) });
-  assert.deepEqual(mac.map((f) => f.provider), ['dropbox', 'iCloud']);
 });

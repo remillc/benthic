@@ -25,9 +25,10 @@ const logbooks = require('./logbooks.cjs');
  * @param {{ load: Function, track: Function }} [options.windowState]
  * @param {() => void} [options.onChange] the recent list or the open logbooks changed (the Mac menu is rebuilt)
  * @param {string} [options.home]
- * @param {Record<string, string|undefined>} [options.env]
+ * @param {ReturnType<import('./cloud.cjs').createCloudService>} [options.cloud] the personal clouds (sign-in, cloud logbooks)
+ * @param {number} [options.cloudCheckMs] how often a cloud logbook looks for a change made elsewhere
  */
-function createWindowManager({ electron, bridge, store, ipcMain, texts, userData, platform, preload, icon, entryUrl, isAppUrl, windowState, onChange = () => {}, home = '', env = {} }) {
+function createWindowManager({ electron, bridge, store, ipcMain, texts, userData, platform, preload, icon, entryUrl, isAppUrl, windowState, onChange = () => {}, home = '', cloud, cloudCheckMs = 5 * 60 * 1000 }) {
   const { BrowserWindow, dialog, shell } = electron;
   /** @type {Map<number, any>} webContents id -> window */
   const windows = new Map();
@@ -35,7 +36,33 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
 
   const t = () => texts().desktopLogbooks.main;
   const mainName = () => texts().desktopLogbooks.mainName;
-  const notify = () => onChange();
+  /** True from the moment the app quits: the logbooks open then are what the next start reopens. */
+  let quitting = false;
+
+  /** The logbooks the windows hold now, in window order. */
+  function openDescriptors() {
+    const out = [];
+    for (const [key, win] of windows) {
+      const d = bridge.descriptorOf(key);
+      if (d && !win.isDestroyed()) out.push(d);
+    }
+    return out;
+  }
+
+  /** « Ouvrir au démarrage » > « Le dernier carnet »: what is open is kept, unless the app is quitting (its windows close one by one). */
+  function rememberOpen() {
+    if (quitting) return;
+    try {
+      store.setLastOpen(openDescriptors());
+    } catch (e) {
+      console.error('[desktop] Keeping the open logbooks', e.message);
+    }
+  }
+
+  const notify = () => {
+    rememberOpen();
+    onChange();
+  };
 
   function titleOf(/** @type {any} */ descriptor) {
     return logbooks.windowTitle(descriptor, mainName());
@@ -55,6 +82,44 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
       if (d) ids.add(d.id);
     }
     return ids;
+  }
+
+  /** @type {Map<number, number>} webContents id -> time of its last check */
+  const checkedAt = new Map();
+  const checking = new Set();
+
+  /**
+   * A cloud logbook looks at its remote file (cloud.cjs): changed elsewhere and nothing unsent here, the
+   * window reads the new version; both changed, the diver is asked which to keep.
+   * @param {any} win @param {number} [minGapMs] skips the check when the last one is more recent
+   */
+  async function checkCloud(win, minGapMs = 0) {
+    if (!cloud || !win || win.isDestroyed()) return null;
+    const key = win.webContents.id;
+    if (bridge.descriptorOf(key)?.kind !== 'cloud' || checking.has(key)) return null;
+    if (Date.now() - (checkedAt.get(key) ?? 0) < minGapMs) return null;
+    checking.add(key);
+    try {
+      const result = await bridge.cloudCheck(key);
+      checkedAt.set(key, Date.now());
+      if (result.reload && !win.isDestroyed()) win.webContents.reload();
+      return result;
+    } catch (e) {
+      console.error('[desktop] Looking at the cloud logbook', e.message);
+      return null;
+    } finally {
+      checking.delete(key);
+    }
+  }
+
+  /** @type {ReturnType<typeof setInterval>|null} */
+  let timer = null;
+  function startCloudTimer() {
+    if (timer || !cloud || !(cloudCheckMs > 0)) return;
+    timer = setInterval(() => {
+      for (const win of windows.values()) checkCloud(win);
+    }, cloudCheckMs);
+    timer.unref?.();
   }
 
   function focus(/** @type {any} */ win) {
@@ -110,12 +175,21 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
         if (/^https?:/.test(url)) shell.openExternal(url);
       }
     });
+    // Closing the last window quits the app on Windows and Linux: what is open now is what the next start reopens.
+    win.on('close', () => {
+      if (platform !== 'darwin' && windows.size <= 1) beforeQuit();
+    });
     win.on('closed', () => {
       windows.delete(key);
+      checkedAt.delete(key);
       bridge.detach(key);
       notify();
     });
-    win.on('focus', notify);
+    win.on('focus', () => {
+      notify();
+      checkCloud(win, 30 * 1000);
+    });
+    startCloudTimer();
     win.loadURL(entryUrl);
     notify();
     return win;
@@ -162,6 +236,31 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     return create(logbooks.MAIN);
   }
 
+  /**
+   * The windows of the start: « Le dernier carnet » reopens the logbooks that were open at the last quit,
+   * each in its window (a file that is gone is skipped, quietly; none open, or the first start: the logbook
+   * of this computer); « Choisir à chaque fois » shows the start screen with the recent logbooks.
+   * @returns {Promise<any[]>} the windows
+   */
+  async function openStartup() {
+    if (store.startup() === 'ask') return [create(null)];
+    const wanted = store.lastOpen().filter((d) => d.kind !== 'file' || fs.existsSync(d.location));
+    if (!wanted.length) return [store.lastOpen().length ? create(null) : openMain()];
+    const opened = [];
+    for (const d of wanted) {
+      const result = await open(d, opened[opened.length - 1]);
+      if (result.window) opened.push(result.window);
+    }
+    return opened.length ? opened : [create(null)];
+  }
+
+  /** The app is quitting: what is open now is what the next start reopens. */
+  function beforeQuit() {
+    if (quitting) return;
+    rememberOpen();
+    quitting = true;
+  }
+
   /** The window shows the start screen: its logbook is closed (nothing is asked; changes are already saved). */
   async function closeLogbook(/** @type {any} */ win) {
     const key = win.webContents.id;
@@ -202,12 +301,6 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     return store.list().map((e) => ({ ...e, open: ids.has(e.id) }));
   }
 
-  /** The provider's synchronised folder when its desktop client is installed. */
-  function cloudInfo() {
-    const folders = logbooks.cloudFolders({ platform, home, env, exists: (p) => fs.existsSync(p) });
-    return { providers: logbooks.cloudProviders(platform), folders };
-  }
-
   /** A git username when the diver gave none: the owner in the address, else a fixed word (a token needs any). */
   function gitUserName(/** @type {string} */ url) {
     const parts = url.replace(/^[a-z]+:\/\//i, '').split('/');
@@ -233,30 +326,47 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
       const opened = await open(descriptor, win);
       return { canceled: false, created: result.created, descriptor, opened: !!opened.window };
     }
-    // A file: on this computer (the system's save dialog), or in the folder a personal cloud's client keeps in sync.
-    let target;
-    let provider;
-    if (spec.where === 'cloud') {
-      const folder = String(spec.folder || '');
-      if (!path.isAbsolute(folder) || !fs.existsSync(folder)) throw new Error('BAD_ARGUMENT: no folder');
-      target = path.join(folder, logbooks.logbookFileName(name));
-      provider = logbooks.PROVIDERS.includes(spec.provider) ? spec.provider : undefined;
-      if (fs.existsSync(target)) {
-        const error = new Error('EXISTS');
-        error.code = 'EXISTS';
-        throw error;
-      }
-    } else {
-      const answer = await dialog.showSaveDialog(win ?? undefined, {
-        title: t().newFileTitle,
-        defaultPath: path.join(startFolder() ?? '', logbooks.logbookFileName(name)),
-        filters: [{ name: t().fileFilter, extensions: ['ssrf'] }],
-      });
-      if (answer.canceled || !answer.filePath) return { canceled: true };
-      target = /\.ssrf$/i.test(answer.filePath) ? answer.filePath : `${answer.filePath}.ssrf`;
-    }
+    if (spec.where === 'cloud') return createCloudLogbook(spec, name, win);
+    // A file on this computer: the system's save dialog.
+    const answer = await dialog.showSaveDialog(win ?? undefined, {
+      title: t().newFileTitle,
+      defaultPath: path.join(startFolder() ?? '', logbooks.logbookFileName(name)),
+      filters: [{ name: t().fileFilter, extensions: ['ssrf'] }],
+    });
+    if (answer.canceled || !answer.filePath) return { canceled: true };
+    const target = /\.ssrf$/i.test(answer.filePath) ? answer.filePath : `${answer.filePath}.ssrf`;
     fs.writeFileSync(target, logbooks.EMPTY_LOGBOOK);
-    const descriptor = logbooks.fileDescriptor(target, { name, provider, platform });
+    const descriptor = logbooks.fileDescriptor(target, { name, platform });
+    const opened = await open(descriptor, win);
+    return { canceled: false, created: true, descriptor, opened: !!opened.window };
+  }
+
+  /**
+   * A new logbook in a personal cloud: an empty .ssrf in the service's folder (a subfolder of the app's
+   * folder; for Google Drive a folder OpenDives creates), and a working copy here. EXISTS when the
+   * service already has a file by that name.
+   */
+  async function createCloudLogbook(/** @type {any} */ spec, /** @type {string} */ name, /** @type {any} */ win) {
+    if (!cloud) throw new Error('NOT_AVAILABLE');
+    const provider = String(spec.provider || '');
+    const state = cloud.status().find((p) => p.provider === provider);
+    if (!state || !state.available) throw Object.assign(new Error('NOT_AVAILABLE'), { code: 'NOT_AVAILABLE' });
+    if (!state.connected) throw Object.assign(new Error('NOT_SIGNED_IN'), { code: 'NOT_SIGNED_IN' });
+    const descriptor = logbooks.cloudDescriptor({ provider, folder: spec.folder, name });
+    const local = /** @type {string} */ (logbooks.localFileOf(userData, descriptor));
+    // The working copy exists only once the service has the file: a refused name leaves nothing behind.
+    const staged = path.join(path.dirname(local), 'new.ssrf');
+    fs.mkdirSync(path.dirname(local), { recursive: true });
+    fs.writeFileSync(staged, logbooks.EMPTY_LOGBOOK);
+    try {
+      const remote = await cloud.createRemote(descriptor, staged);
+      fs.renameSync(staged, local);
+      fs.rmSync(path.join(path.dirname(local), 'repo'), { recursive: true, force: true });
+      logbooks.writeMeta(userData, descriptor.id, { rev: remote.rev, modified: remote.modified, remote: remote.ref, pending: false, hash: '' });
+    } catch (e) {
+      fs.rmSync(staged, { force: true });
+      throw e;
+    }
     const opened = await open(descriptor, win);
     return { canceled: false, created: true, descriptor, opened: !!opened.window };
   }
@@ -277,11 +387,6 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     if (descriptor.kind === 'file' && path.resolve(target).toLowerCase() === path.resolve(descriptor.location).toLowerCase()) throw new Error('SAME_FILE');
     await bridge.saveCopy(win.webContents.id, target);
     return { canceled: false, path: target };
-  }
-
-  async function pickFolder(/** @type {any} */ win) {
-    const answer = await dialog.showOpenDialog(win ?? undefined, { title: t().folderTitle, defaultPath: startFolder(), properties: ['openDirectory', 'createDirectory'] });
-    return answer.canceled || !answer.filePaths.length ? { folder: null } : { folder: answer.filePaths[0] };
   }
 
   const answer = (work) => async (event, ...args) => {
@@ -319,10 +424,18 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
         store.forget(String(options.id));
         notify();
         return recent();
-      case 'cloud':
-        return cloudInfo();
-      case 'pickFolder':
-        return pickFolder(win);
+      case 'cloudStatus':
+        return cloud ? cloud.status() : [];
+      case 'cloudSignIn':
+        if (!cloud) throw new Error('NOT_AVAILABLE');
+        return cloud.signIn(String(options.provider));
+      case 'cloudSignOut':
+        if (!cloud) throw new Error('NOT_AVAILABLE');
+        return cloud.signOut(String(options.provider));
+      case 'startup':
+        return { mode: store.startup() };
+      case 'setStartup':
+        return { mode: store.setStartup(String(options.mode)) };
       case 'create':
         return createLogbook(options, win);
       case 'saveCopy':
@@ -342,6 +455,9 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
 
   return {
     openMain,
+    openStartup,
+    beforeQuit,
+    checkCloud,
     open,
     openPath,
     pickAndOpen,

@@ -28,6 +28,7 @@
       "menu.cjs",
       "window-state.cjs",
       "bridge.cjs",
+      "cloud.cjs",
       "logbooks.cjs",
       "windows.cjs",
       "preload.cjs",

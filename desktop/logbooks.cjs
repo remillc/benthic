@@ -10,8 +10,12 @@
 //   kind 'file'  a .ssrf file; the core works on a git copy in <userData>/logbooks/<id>/repo that the
 //                bridge writes back to the file after every save (bridge.cjs)
 //   kind 'git'   a git repository the diver owns (token in the keychain, scoped to this id)
-// `location` is the file path, or the repository address (without any token). `provider` is the
-// personal cloud whose synchronised folder holds the file, when the diver chose one.
+//   kind 'cloud' a .ssrf file in a personal cloud (Google Drive, OneDrive, Dropbox) reached through the
+//                service's API (desktop/cloud.cjs); the core works on a git copy built from a local
+//                working copy, <userData>/logbooks/<id>/logbook.ssrf, kept in step with the remote file
+// `location` is the file path, the repository address (without any token), or for a cloud logbook the
+// remote path shown to the diver ("OpenDives/plongees.ssrf"). `provider` is the personal cloud of a
+// cloud logbook (or, in older recent lists, of a file in a synchronised folder).
 'use strict';
 
 const crypto = require('node:crypto');
@@ -21,7 +25,9 @@ const path = require('node:path');
 const MAIN_ID = 'main';
 const MAX_RECENT = 12;
 const STORE_FILE = 'logbooks.json';
-const PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox', 'iCloud', 'webdav'];
+const PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox'];
+/** What the start-up opens: the logbooks open at the last quit, or the start screen. */
+const STARTUP_MODES = ['last', 'ask'];
 
 /** The logbook of this computer, as before there were several. */
 const MAIN = Object.freeze({ id: MAIN_ID, kind: 'main', name: '', location: '' });
@@ -61,17 +67,59 @@ function gitDescriptor({ url, branch, name }) {
 
 /** @param {unknown} value @returns {boolean} */
 function validId(value) {
-  return typeof value === 'string' && (value === MAIN_ID || /^[fg]-[0-9a-f]{12}$/.test(value));
+  return typeof value === 'string' && (value === MAIN_ID || /^[fgc]-[0-9a-f]{12}$/.test(value));
+}
+
+/**
+ * A cloud logbook: a remote file in `folder` (a path inside the app's folder, or the folder OpenDives
+ * created on Google Drive), `fileName` its name there.
+ * @param {{ provider: string, folder?: string, name: string, fileName?: string }} options
+ */
+function cloudDescriptor({ provider, folder = '', name, fileName }) {
+  if (!PROVIDERS.includes(provider)) throw new Error('BAD_ARGUMENT: unknown service');
+  const dir = cleanRemoteFolder(folder);
+  const file = fileName || logbookFileName(name);
+  return {
+    id: `c-${digest(`${provider}:${dir.toLowerCase()}/${file.toLowerCase()}`)}`,
+    kind: 'cloud',
+    name: name || file,
+    location: dir ? `${dir}/${file}` : file,
+    provider,
+    folder: dir,
+    fileName: file,
+  };
+}
+
+/**
+ * A folder path typed by the diver, as the services take it: segments joined by "/", no empty one, no
+ * "." or "..", nothing a service refuses. '' is the root of the app's folder. Throws BAD_ARGUMENT.
+ * @param {string} folder
+ */
+function cleanRemoteFolder(folder) {
+  const segments = String(folder ?? '').replaceAll(String.fromCharCode(92), '/').split('/').map((s) => s.trim()).filter(Boolean);
+  const bad = (s) => s === '.' || s === '..' || s.length > 100 || [...s].some((c) => c.charCodeAt(0) < 32 || '<>:"|?*'.includes(c));
+  if (segments.length > 6 || segments.some(bad)) throw new Error('BAD_ARGUMENT: folder');
+  return segments.join('/');
 }
 
 /** A descriptor read from the file or built by the interface: only known fields, or null. @param {any} value */
 function cleanDescriptor(value) {
   if (!value || typeof value !== 'object' || !validId(value.id)) return null;
-  const kind = value.id === MAIN_ID ? 'main' : value.id.startsWith('f-') ? 'file' : 'git';
+  const kind = value.id === MAIN_ID ? 'main' : value.id.startsWith('f-') ? 'file' : value.id.startsWith('c-') ? 'cloud' : 'git';
   if (kind !== value.kind) return null;
   const out = { id: value.id, kind, name: String(value.name ?? '').slice(0, 200), location: String(value.location ?? '').slice(0, 2000) };
   if (kind === 'git' && typeof value.branch === 'string') out.branch = value.branch.slice(0, 200);
   if (kind === 'file' && PROVIDERS.includes(value.provider)) out.provider = value.provider;
+  if (kind === 'cloud') {
+    if (!PROVIDERS.includes(value.provider) || typeof value.fileName !== 'string' || !value.fileName) return null;
+    try {
+      out.folder = cleanRemoteFolder(value.folder);
+    } catch {
+      return null;
+    }
+    out.provider = value.provider;
+    out.fileName = value.fileName.slice(0, 200);
+  }
   if (kind !== 'main' && !out.location) return null;
   return out;
 }
@@ -80,6 +128,32 @@ function cleanDescriptor(value) {
 function cacheDir(/** @type {string} */ userData, /** @type {string} */ id) {
   if (!validId(id) || id === MAIN_ID) throw new Error('BAD_ARGUMENT: not a logbook id');
   return path.join(userData, 'logbooks', id);
+}
+
+/** The file the core's git copy is built from: the logbook's own file, or a cloud logbook's working copy. */
+function localFileOf(/** @type {string} */ userData, /** @type {any} */ descriptor) {
+  if (!descriptor) return null;
+  if (descriptor.kind === 'file') return descriptor.location;
+  if (descriptor.kind === 'cloud') return path.join(cacheDir(userData, descriptor.id), 'logbook.ssrf');
+  return null;
+}
+
+/** The bookkeeping of a file or cloud logbook: <cache>/meta.json. @returns {Record<string, any>} */
+function readMeta(/** @type {string} */ userData, /** @type {string} */ id) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(cacheDir(userData, id), 'meta.json'), 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+/** Merges `patch` into the bookkeeping. @returns {Record<string, any>} */
+function writeMeta(/** @type {string} */ userData, /** @type {string} */ id, /** @type {Record<string, any>} */ patch) {
+  const file = path.join(cacheDir(userData, id), 'meta.json');
+  const next = { ...readMeta(userData, id), ...patch };
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(next));
+  return next;
 }
 
 /** A file name for a logbook called `name`: nothing a file system refuses, .ssrf added once. */
@@ -103,34 +177,6 @@ function fileHash(file) {
   return crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex');
 }
 
-/**
- * The folders the personal clouds' own desktop clients keep in sync, where they exist. A folder
- * synchronised by the provider's client is a plain folder for OpenDives: the file in it is a file
- * logbook, and the client does the rest. @param {{ platform: string, home: string, env: Record<string, string|undefined>, exists: (p: string) => boolean }} where
- * @returns {{ provider: string, folder: string }[]}
- */
-function cloudFolders({ platform, home, env, exists }) {
-  /** @type {{ provider: string, folders: (string|undefined)[] }[]} */
-  const candidates = [
-    { provider: 'googleDrive', folders: [path.join(home, 'Google Drive'), path.join(home, 'My Drive'), 'G:\\My Drive', path.join(home, 'Library', 'CloudStorage', 'GoogleDrive')] },
-    { provider: 'oneDrive', folders: [env.OneDrive, env.OneDriveConsumer, path.join(home, 'OneDrive'), path.join(home, 'Library', 'CloudStorage', 'OneDrive-Personal')] },
-    { provider: 'dropbox', folders: [path.join(home, 'Dropbox')] },
-  ];
-  if (platform === 'darwin') candidates.push({ provider: 'iCloud', folders: [path.join(home, 'Library', 'Mobile Documents', 'com~apple~CloudDocs')] });
-  /** @type {{ provider: string, folder: string }[]} */
-  const found = [];
-  for (const { provider, folders } of candidates) {
-    const folder = folders.find((f) => f && exists(f));
-    if (folder) found.push({ provider, folder });
-  }
-  return found;
-}
-
-/** The providers a computer offers: iCloud Drive on macOS only. @param {string} platform */
-function cloudProviders(platform) {
-  return PROVIDERS.filter((p) => p !== 'iCloud' || platform === 'darwin');
-}
-
 /** The window's title bar text. @param {{ name?: string }|null} descriptor @param {string} [mainName] */
 function windowTitle(descriptor, mainName = '') {
   if (!descriptor) return 'OpenDives';
@@ -138,7 +184,12 @@ function windowTitle(descriptor, mainName = '') {
   return name ? `OpenDives \u00b7 ${name}` : 'OpenDives';
 }
 
-/** The recent logbooks of this computer: <userData>/logbooks.json, newest first. */
+/**
+ * What this computer remembers about its logbooks: <userData>/logbooks.json.
+ *   recent    the recent logbooks, newest first
+ *   startup   'last' (reopen the logbooks open at the last quit, the default) or 'ask' (the start screen)
+ *   lastOpen  the descriptors open at the last quit, in window order
+ */
 class LogbookStore {
   /** @param {string} userData @param {() => number} [now] */
   constructor(userData, now = Date.now) {
@@ -146,17 +197,31 @@ class LogbookStore {
     this.now = now;
   }
 
+  /** @returns {Record<string, any>} */
+  read() {
+    try {
+      const data = JSON.parse(fs.readFileSync(this.file, 'utf8'));
+      return data && typeof data === 'object' ? data : {};
+    } catch {
+      return {};
+    }
+  }
+
+  /** @param {Record<string, any>} patch */
+  save(patch) {
+    const data = { ...this.read(), version: 1, ...patch };
+    fs.mkdirSync(path.dirname(this.file), { recursive: true });
+    const tmp = `${this.file}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, this.file);
+  }
+
   /** @returns {(ReturnType<typeof cleanDescriptor> & { openedAt: number })[]} */
   list() {
-    let data;
-    try {
-      data = JSON.parse(fs.readFileSync(this.file, 'utf8'));
-    } catch {
-      return [];
-    }
+    const data = this.read();
     const seen = new Set();
     const out = [];
-    for (const entry of Array.isArray(data?.recent) ? data.recent : []) {
+    for (const entry of Array.isArray(data.recent) ? data.recent : []) {
       const d = cleanDescriptor(entry);
       if (!d || seen.has(d.id)) continue;
       seen.add(d.id);
@@ -167,10 +232,7 @@ class LogbookStore {
 
   /** @param {any[]} recent */
   write(recent) {
-    fs.mkdirSync(path.dirname(this.file), { recursive: true });
-    const tmp = `${this.file}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify({ version: 1, recent }, null, 2));
-    fs.renameSync(tmp, this.file);
+    this.save({ recent });
   }
 
   /** A logbook was opened: first in the list. @param {any} descriptor */
@@ -198,6 +260,44 @@ class LogbookStore {
   find(id) {
     return this.list().find((e) => e.id === id) ?? null;
   }
+
+  /** « Ouvrir au démarrage » (Réglages › Carnet): 'last' unless the diver chose 'ask'. @returns {'last'|'ask'} */
+  startup() {
+    const mode = this.read().startup;
+    return STARTUP_MODES.includes(mode) ? mode : 'last';
+  }
+
+  /** @param {string} mode */
+  setStartup(mode) {
+    if (!STARTUP_MODES.includes(mode)) throw new Error('BAD_ARGUMENT: start-up mode');
+    this.save({ startup: mode });
+    return mode;
+  }
+
+  /** The logbooks that were open at the last quit. @returns {NonNullable<ReturnType<typeof cleanDescriptor>>[]} */
+  lastOpen() {
+    const data = this.read();
+    const seen = new Set();
+    const out = [];
+    for (const entry of Array.isArray(data.lastOpen) ? data.lastOpen : []) {
+      const d = cleanDescriptor(entry);
+      if (!d || seen.has(d.id)) continue;
+      seen.add(d.id);
+      out.push(d);
+    }
+    return out;
+  }
+
+  /** @param {any[]} descriptors */
+  setLastOpen(descriptors) {
+    const out = [];
+    for (const entry of descriptors) {
+      const d = cleanDescriptor(entry);
+      if (d && !out.some((e) => e.id === d.id)) out.push(d);
+    }
+    this.save({ lastOpen: out });
+    return out;
+  }
 }
 
 module.exports = {
@@ -205,6 +305,12 @@ module.exports = {
   MAIN_ID,
   MAX_RECENT,
   PROVIDERS,
+  STARTUP_MODES,
+  cloudDescriptor,
+  cleanRemoteFolder,
+  localFileOf,
+  readMeta,
+  writeMeta,
   EMPTY_LOGBOOK,
   LogbookStore,
   fileDescriptor,
@@ -216,7 +322,5 @@ module.exports = {
   logbookFileName,
   isLogbookFile,
   fileHash,
-  cloudFolders,
-  cloudProviders,
   windowTitle,
 };

@@ -17,6 +17,7 @@ const { buildMenu } = require('./menu.cjs');
 const windowState = require('./window-state.cjs');
 const { LogbookStore, isLogbookFile } = require('./logbooks.cjs');
 const { createWindowManager } = require('./windows.cjs');
+const { createCloudService, loadClients } = require('./cloud.cjs');
 
 const devUrl = process.env.OD_DEV_URL || '';
 const resources = app.isPackaged
@@ -139,7 +140,21 @@ app.whenReady().then(() => {
     if (!file.startsWith(webRoot)) return new Response('', { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
-  const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources });
+  // The personal clouds (task 173): the client keys are read when asked, so a file put there while the app
+  // runs is found at the next sign-in. Never logged.
+  const clientsFiles = [path.join(__dirname, 'oauth-clients.local.json'), path.join(resources, 'oauth-clients.local.json'), path.join(app.getPath('userData'), 'oauth-clients.local.json')];
+  const cloud = createCloudService({
+    userData: app.getPath('userData'),
+    safeStorage,
+    openExternal: (url) => shell.openExternal(url),
+    clients: () => loadClients(clientsFiles.find((file) => fs.existsSync(file)) || clientsFiles[0]),
+    texts: menuTexts,
+    dialog,
+    parentOf: (webContents) => BrowserWindow.fromWebContents(webContents),
+    locale: app.getLocale(),
+    log: (text) => console.error('[desktop]', text),
+  });
+  const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources, cloud });
   ipcMain.handle('od:settingsWindow', () => {
     openSettingsWindow();
     return { ok: true, value: true };
@@ -159,8 +174,10 @@ app.whenReady().then(() => {
     windowState,
     onChange: rebuildMenu,
     home: app.getPath('home'),
-    env: process.env,
+    cloud,
   });
+  // The logbooks open now are what « Le dernier carnet » reopens at the next start.
+  app.on('before-quit', () => windows?.beforeQuit());
   // macOS has a menu bar; Windows and Linux none (task 2026-11-15-169, section 6).
   if (process.platform === 'darwin') rebuildMenu();
   else Menu.setApplicationMenu(null);
@@ -169,11 +186,18 @@ app.whenReady().then(() => {
     const items = (menu) => menu?.items.map((i) => ({ label: i.label, accelerator: i.accelerator ?? '', role: i.role ?? '', type: i.type, submenu: items(i.submenu) }));
     fs.writeFileSync(process.env.OD_DUMP_MENU, JSON.stringify(items(Menu.getApplicationMenu()) ?? null, null, 2));
   }
-  // The first window holds the logbook of this computer, as the app always did; a file given on the
-  // command line (or by the system) opens in a window of its own.
-  windows.openMain();
+  // « Ouvrir au démarrage » (Réglages): the logbooks open at the last quit, or the start screen; a file given
+  // on the command line (or by the system) opens in a window of its own.
   for (const arg of process.argv.slice(1)) if (isLogbookFile(arg)) pendingFiles.push(path.resolve(arg));
-  for (const file of pendingFiles.splice(0)) openRequestedFile(file);
+  windows.openStartup().then(
+    () => {
+      for (const file of pendingFiles.splice(0)) openRequestedFile(file);
+    },
+    (e) => {
+      console.error('[desktop] Opening the logbooks', e.message);
+      windows.openMain();
+    },
+  );
   app.on('activate', () => {
     if (!BrowserWindow.getAllWindows().length) windows.openMain();
   });
