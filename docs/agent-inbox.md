@@ -3767,3 +3767,16 @@ Tests: an empty logbook shows the profile, the title, the large button and the t
 Christian approved this on 15 November 2026. The mock-up `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone ») had the water under the profile going from #D4E2F2 to black (#1F2124); it now goes to #5584B5, as on Android and everywhere else. `app/src/pages/WelcomeStart.svelte` already uses `--od-water-top` and `--od-water-bottom`, so this is a check, not a change: on iOS (light and dark), the water must end in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the profile line stay `--od-trace`. If an iOS-specific style or an older build still darkens it, fix it there.
 
 Test: the iPhone first launch in light mode shows a blue water column, never black, under a #1F2124 line.
+
+## [ ] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
+
+Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »). Mock-up: `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone »). The iOS layout does not change (large title, the profile, a grouped list with chevrons); only the texts become those of the Android first launch, already in `app/src/i18n/fr.json` (`welcome`):
+- under « OpenDives »: « Votre carnet de plongée. » (instead of `welcome.intro`);
+- « J’ai un compte Subsurface » (`existingShort`), helper « Sauvegardé dans le cloud, consultable hors ligne » (`existingNote`);
+- « Créer un compte » (`createShort`), helper « Gratuit. Partagé entre vos appareils » (`createNote`);
+- « Commencer sans compte » (`noAccount`), helper « Le carnet reste sur ce téléphone. Vous pourrez le sauvegarder plus tard » (`noAccountNotePhone`; on iPad `noAccountNoteTablet`).
+- « Utiliser mon propre dépôt git », if shown on iOS, keeps its place and wording.
+
+Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` from every language file. English follows the existing English keys of the same names.
+
+Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
