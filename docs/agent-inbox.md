@@ -3413,3 +3413,17 @@ English: « Buddies ».
 
 Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
 
+## [ ] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
+
+Christian decided this on 15 November 2026. Desktop only; phone and tablet already have these curves. Read `docs/ui-specification.md`, « Dive profile, cursor and curve buttons », for the curves themselves, their colours and scales: desktop uses the same ones. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first (also `bureau-carnet-groupe`, `-macos`, `-edition-sur-place`, `-colonnes`, `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`).
+
+- Under the profile, inside its white card, a row of Material 3 filter chips (32 dp, 8 dp corners, 8 dp apart): Température, Gaz, ppO₂, Plafond, Tissus. Several can be on at once.
+- An active chip shows a check and takes its curve's colours: Température is sand (#FBE3B2 fill, #B4530F outline, #3D2200 text) with the rust curve #B4530F and its °C scale on the right of the profile. An inactive chip is outlined #8F8D86 on transparent.
+- The cursor's readout under the pointer adds the values of the active curves (as on the phone).
+- The choice is kept between dives and between sessions, in the app's settings on this computer (not in the logbook).
+- Keyboard: Tab reaches the chips; Espace toggles.
+
+English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues ».
+
+Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
+
