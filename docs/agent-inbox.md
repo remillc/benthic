@@ -3824,3 +3824,13 @@ Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/android-tab
 Test: on a tablet, landscape and portrait, the logo is 96 dp and « OpenDives » 48 sp; on a phone nothing changes.
 
 Done: in the tablet layout (landscape and portrait) the brand row has a 96 dp logo (the logo in use), « OpenDives » at 48 sp (500, line height 56, letter spacing −0.5) and a 20 dp gap; the phone layout and the rest of the screen are unchanged. Test in `tests/app/welcome-start.test.mjs`.
+
+## [ ] 2026-11-15-211 First launch on tablet: the dive profile stays off the screen edges
+
+Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`. On the tablet first launch (`app/src/pages/WelcomeStart.svelte`, `.od-welcome-start--wide-profile`), the decorative profile must touch neither the side edges of the screen nor the bottom one, in landscape or in portrait.
+- **Landscape**: the profile starts at the same 56 dp inset as the brand row and « Votre carnet de plongée. ». It ends 56 dp before the choices column (the existing column gap). Below it there is a 56 dp margin, so it never reaches the bottom edge.
+- **Portrait**: the profile has the same width as the heading column (520 dp, centred), so its left edge lines up with the logo and the heading. Its distance below the heading stays the same.
+
+Only the profile's width and margins change: its shape, height and colours stay the same. Nothing changes on a phone. Tasks 209 and 210 stay as they are.
+
+Test: on a tablet, in both orientations, there is screen background between the profile and every edge of the screen; in landscape, the profile's left edge lines up with the heading.
