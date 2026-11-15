@@ -39,6 +39,10 @@ function mutate(url, source) {
 
 export async function resolve(specifier, context, nextResolve) {
   if (specifier === 'opendives-core') return { url: stub, shortCircuit: true };
+  // The plugin's own files (plugins/opendives-core/desktop.js) import Capacitor, installed with the app.
+  if (specifier.startsWith('@capacitor/') && context.parentURL?.includes('/plugins/')) {
+    return nextResolve(specifier, { ...context, parentURL: pathToFileURL(path.join(appDir, 'package.json')).href });
+  }
   if (specifier === 'svelte' || specifier.startsWith('svelte/')) {
     return nextResolve(specifier, { ...context, parentURL: pathToFileURL(path.join(appDir, 'package.json')).href });
   }
