@@ -3656,3 +3656,14 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-outil
 English: « Desired final pressure », « Working pressure: 3,365 psi », « Above the working pressure of 3,365 psi ».
 
 Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
+
+## [ ] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
+
+Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html`.
+
+- The cylinder drawing shows only the gases of the fill: helium (blue), oxygen (green) and the top-up gas (sand #C9B98F), bottom to top in fill order (oxygen before helium when « Oxygène d'abord » is chosen).
+- What was already in the cylinder is not a separate layer: each layer's height is that gas's partial pressure in the final mix, residual included. Example of the mock-up (50 bar of 21/35 left, 21/35 wanted at 220 bar, air top-up): helium 77 bar, oxygen 26 bar, air 117 bar.
+- In Nitrox mode: oxygen and the top-up gas only.
+- The aria-label: « Bouteille à 220 bar : hélium, oxygène et air, dans l'ordre du gonflage ».
+
+Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
