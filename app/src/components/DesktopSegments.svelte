@@ -74,5 +74,13 @@
       outline: 2px solid var(--od-text);
       outline-offset: -3px;
     }
+
+
+    /* Mouse: the selected segment takes the 8 % layer of its text colour too. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-segments--selected:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
   }
 </style>
