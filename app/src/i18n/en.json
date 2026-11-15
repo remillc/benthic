@@ -34,7 +34,7 @@
     "errorStorage": "The free space on the device.",
     "retry": "Try again",
     "emptyTitle": "No dives yet",
-    "emptyText": "Pair your dive computer to download your dives. You can also import an existing logbook or log a dive by hand.",
+    "emptyText": "Start with your dive computer, or pick another way below.",
     "noResults": "No dive matches “{query}”.",
     "count": {
       "one": "{n} dive",
@@ -110,7 +110,12 @@
     "emptyCloud": "Connected to the Subsurface cloud, no dives",
     "emptyPair": "Pair a dive computer",
     "emptyDivelogs": "Download from divelogs.de",
-    "emptyNote": "Files from Subsurface (.ssrf, .xml), divelogs.de, Garmin watches (.fit) and other logbooks are imported here.",
+    "emptyOthers": "Other ways to add dives",
+    "emptyImport": "Import a file",
+    "emptyImportNote": ".ssrf, .xml and other logbooks",
+    "emptyDivelogsNote": "With your divelogs.de username",
+    "emptyManual": "Log a dive by hand",
+    "emptyManualNote": "Date, depth and time are enough",
     "noFilterResults": "No dive matches the filter.",
     "imported": {
       "one": "{n} dive imported",
@@ -1860,6 +1865,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Empty logbook: a dive profile, a large « Pair a dive computer » button and, in a card, the other ways to add dives (import a file, download from divelogs.de, log a dive by hand).",
       "Logbook: « Merge into one dive » and « Edit together… » in the ⋮ menu of the checked dives. Merging is offered only for dives that follow one another, less than an hour apart; « Edit together… » changes the site, guide, buddies, tags, suit, water type and notes of several dives at once, and « Undo » reverts it in one go.",
       "Dive profiles: « Ceiling » shows the ceiling given by the dive computer, as Subsurface does. The ceiling computed with your gradient factors is added as a dashed line when « Computed ceiling » is on in Settings, Display.",
       "Dive profiles: thinner curves (1.25 dp), a 1 dp average-depth line; high contrast keeps 2 dp lines.",
