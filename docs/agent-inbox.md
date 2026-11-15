@@ -3400,3 +3400,16 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
+## [ ] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
+
+Christian decided this on 15 November 2026. Mock-ups: every `docs/mockups/bureau-carnet-*.dc.html` and `bureau-carnets-*.dc.html` table.
+
+- Default columns of the Carnet table: N°, Date, Site, Prof. max, Durée, **Compagnons** (the dive's buddies, comma-separated, #4B4A47, left-aligned, ellipsis when too long). **Temp. leaves the defaults**; it stays available in the columns button's menu, and the water temperature stays in the detail pane's figures.
+- Widths: Prof. max and Durée get narrower (about 96 and 88 dp with padding), Compagnons about 124 dp, so that Site keeps its room.
+- A diver who has already chosen or moved columns (task 181) keeps their own set: the change applies to the defaults only.
+- Sorting on Compagnons sorts by the first buddy's name; a double click on a Compagnons cell edits it in place (task 172).
+
+English: « Buddies ».
+
+Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
+
