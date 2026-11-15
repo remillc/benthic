@@ -6,7 +6,7 @@ Instructions for coding agents (Claude Code and others) working in this reposito
 
 ## The project
 
-OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, but it is not a mere companion to the desktop app. It runs on iPhone, Android phones and tablets (iPad and Android) from the first version.
+OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, but it is not a mere companion to the desktop app. It runs on iPhone, Android phones and tablets (iPad and Android) from the first version; a desktop version (Windows, macOS, Linux) follows.
 
 - **Data:** the Subsurface cloud (git repositories on `ssrf-cloud-*.subsurface-divelog.org`) is **the only synchronised data source**. We connect to it; we do not replace it. No other providers.
 - **GeoNames and divelogs.de** work as in Subsurface: one-off import or upload, no synchronisation.
@@ -22,6 +22,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
 - **JavaScript first (decided on 14 November 2026):** OpenDives' own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
 - **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
+- **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the C++ façade is exposed through a Node-API addon that follows the JSDoc contract of `plugins/opendives-core`, so the app's code does not depend on the platform. Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
 
 ## Golden rule: Subsurface is never modified
 
