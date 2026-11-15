@@ -774,7 +774,12 @@ export { waterTypeOf };
  */
 
 /** @type {any} */
-const native = registerPlugin('OpenDivesCore');
+// On Android and iOS the native plugin answers. In the desktop app (Electron, which runs as a "web"
+// platform) desktop.js does, through window.odDesktop; in a plain browser its methods reject with
+// UNAVAILABLE.
+const native = registerPlugin('OpenDivesCore', {
+  web: () => import('./desktop.js').then((m) => new m.OpenDivesCoreDesktop()),
+});
 
 
 /**
