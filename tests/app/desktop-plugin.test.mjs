@@ -272,7 +272,10 @@ test('stageImport, importCount and discardImport work on files of the import fol
 test('importDives stages the file under its name, imports it, then deletes it', async () => {
   install({ importDives: '{"dive":{}}' });
   assert.deepEqual(await plugin.importDives({ name: 'dir/trip.ssrf', data: 'QQ==' }), { json: '{"dive":{}}' });
-  assert.deepEqual(lastCall().args, { file: '/tmp/opendives/import/trip.ssrf', source: 'trip.ssrf' });
+  // The staged file has a name of its own (a prefix) and keeps the extension; the source is the diver's name.
+  const { file, source } = lastCall().args;
+  assert.ok(file.startsWith('/tmp/opendives/import/') && file.endsWith('-trip.ssrf') && file.length > '/tmp/opendives/import/-trip.ssrf'.length);
+  assert.equal(source, 'trip.ssrf');
   assert.equal(bridge.files.size, 0);
 });
 

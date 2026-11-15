@@ -1840,6 +1840,22 @@
     "editFailed": "Les plongées n'ont pas pu être modifiées. Aucune plongée n'a été modifiée.",
     "loadFailed": "Les plongées n'ont pas pu être lues."
   },
+  "desktopMultiDive": {
+    "apply": {
+      "one": "Appliquer à la plongée",
+      "other": "Appliquer aux {n} plongées"
+    },
+    "paste": "Coller",
+    "copied": {
+      "one": "{n} plongée copiée",
+      "other": "{n} plongées copiées"
+    },
+    "copyFailed": "La copie a échoué.",
+    "pasted": {
+      "one": "{n} plongée collée",
+      "other": "{n} plongées collées"
+    }
+  },
   "dialog": {
     "close": "Fermer",
     "ok": "OK",

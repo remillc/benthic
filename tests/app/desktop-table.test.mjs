@@ -16,6 +16,7 @@ import {
   stepSelect,
   keepSelection,
   contextMenuEntries,
+  emptyAreaMenuEntries,
   selectionSummary,
   clampTableWidth,
   EMPTY_SELECTION,
@@ -158,16 +159,37 @@ test('right-click menu for one dive and for several', () => {
   assert.deepEqual(keys(two), ['merge', 'addToTrip', 'editTogether', 'separator', 'copy', 'export', 'share', 'separator', 'delete']);
   assert.deepEqual(
     two.filter((e) => 'shortcut' in e && e.shortcut).map((e) => e.shortcut),
-    ['Ctrl+E', 'Ctrl+C', 'Ctrl+Maj+E', 'Suppr'],
+    ['Ctrl+M', 'Ctrl+E', 'Ctrl+C', 'Ctrl+Maj+E', 'Suppr'],
   );
   assert.deepEqual(
     contextMenuEntries(2, { mac: true, available }).filter((e) => 'shortcut' in e && e.shortcut).map((e) => e.shortcut),
-    ['⌘E', '⌘C', '⇧⌘E', '⌫'],
+    ['⌘M', '⌘E', '⌘C', '⇧⌘E', '⌫'],
   );
   assert.equal(two.at(-1).danger, true);
   // Only what the app can do: no empty group, no separator at either end.
   assert.deepEqual(keys(contextMenuEntries(2, { mac: false, available: new Set(['export', 'delete']) })), ['export', 'separator', 'delete']);
   assert.deepEqual(contextMenuEntries(0, { mac: false, available }), []);
+});
+
+test('merge stays in the menu, disabled with its reason, when the dives cannot be merged (task 178)', () => {
+  const available = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'copy', 'export', 'share', 'delete']);
+  const merge = (opts) => contextMenuEntries(2, { mac: false, available, ...opts }).find((e) => e.key === 'merge');
+  assert.equal(merge({ mergeable: true }).disabled, undefined);
+  assert.equal(merge({ mergeable: true }).hint, undefined);
+  assert.equal(merge({ mergeable: false }).disabled, true);
+  assert.equal(merge({ mergeable: false }).hint, 'multiDive.mergeBlocked');
+  // One dive: no merge item at all; the other entries stay, in the task's order, Partager… included.
+  assert.equal(contextMenuEntries(1, { mac: false, available, mergeable: false }).some((e) => e.key === 'merge'), false);
+  assert.deepEqual(
+    contextMenuEntries(3, { mac: false, available, mergeable: false }).map((e) => e.key),
+    ['merge', 'addToTrip', 'editTogether', 'separator', 'copy', 'export', 'share', 'separator', 'delete'],
+  );
+});
+
+test('the menu of the empty area offers Coller, disabled without dives on the clipboard', () => {
+  assert.deepEqual(emptyAreaMenuEntries({ mac: false, canPaste: true }).map((e) => [e.key, e.disabled, e.shortcut]), [['paste', false, 'Ctrl+V']]);
+  assert.equal(emptyAreaMenuEntries({ mac: true, canPaste: false })[0].disabled, true);
+  assert.equal(emptyAreaMenuEntries({ mac: true, canPaste: false })[0].shortcut, '⌘V');
 });
 
 test('the summary of several dives', () => {

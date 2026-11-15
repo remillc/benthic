@@ -556,11 +556,14 @@ export class OpenDivesCoreDesktop extends WebPlugin {
   async importDives(options) {
     const name = baseName(options?.name ?? '') || 'import.xml';
     if (options?.data == null) throw reject('Missing data', 'BAD_ARGUMENT');
-    const { path } = await this.bridge.fs.writeFile({ area: 'import', name, base64: options.data });
+    // A name of its own: on Windows the helper may still hold the previous file of that name open
+    // (EBUSY), and removing the staged file must never hide what the import answered.
+    const unique = `${Date.now().toString(36)}-${name}`;
+    const { path } = await this.bridge.fs.writeFile({ area: 'import', name: unique, base64: options.data });
     try {
       return { json: await this.core('importDives', { file: path, source: name }) };
     } finally {
-      await this.bridge.fs.remove({ path });
+      await this.bridge.fs.remove({ path }).catch(() => {});
     }
   }
 
@@ -674,6 +677,18 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     const ids = options?.ids ?? (options?.id != null ? [options.id] : null);
     if (!ids || ids.length === 0) throw reject('Missing id', 'BAD_ARGUMENT');
     return { json: await this.core('deleteDive', { ids }) };
+  }
+
+  /** Merges dives into one (task 2026-11-15-178). @param {{ids?: number[]}} options */
+  async mergeDives(options) {
+    if (!options?.ids || options.ids.length < 2) throw reject('Missing ids', 'BAD_ARGUMENT');
+    return { json: await this.core('mergeDives', { ids: options.ids }) };
+  }
+
+  /** The same changes on several dives (task 2026-11-15-178). @param {{ids?: number[], changes?: object}} options */
+  async editDives(options) {
+    if (!options?.ids?.length || options.changes == null) throw reject('Missing ids or changes', 'BAD_ARGUMENT');
+    return { json: await this.core('editDives', { ids: options.ids, changes: JSON.stringify(options.changes) }) };
   }
 
   /** @param {{start?: number, ids?: number[], numbers?: number[]}} options */

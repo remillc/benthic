@@ -12,6 +12,7 @@
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
+  import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
   import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
   import DesktopLogbookReady from '../components/DesktopLogbookReady.svelte';
   import { ownLogbookWindow } from '../lib/window-logbook.js';
@@ -22,7 +23,9 @@
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
+  import { canMerge } from '../lib/multi-dive.js';
+  import { selectionText, copyDives, clipboardDives, textToBase64 } from '../lib/desktop-clipboard.js';
   import { filter } from '../lib/filter.svelte.js';
   import { navigation, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
@@ -41,6 +44,7 @@
     stepSelect,
     keepSelection,
     contextMenuEntries,
+    emptyAreaMenuEntries,
     clampTableWidth,
     adjacentTrips,
     moveColumn,
@@ -56,7 +60,7 @@
   loadDesktopChoices();
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
-  const AVAILABLE = new Set(['addToTrip', 'edit', 'export', 'share', 'delete']);
+  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'copy', 'export', 'share', 'delete']);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- Search: the core's fulltext index, as on the phone (Logbook.svelte). ---------------
@@ -204,7 +208,22 @@
     menuAt = { x: e.clientX, y: e.clientY };
   }
 
-  const menuEntries = $derived(contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available: AVAILABLE }));
+  const mergeable = $derived(canMerge(logbook.dives, desk.selection.ids).ok);
+  const menuEntries = $derived(contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available: AVAILABLE, mergeable }));
+
+  // The right-click menu of the table's empty area: « Coller » (task 2026-11-15-178).
+  /** @type {{x: number, y: number, canPaste: boolean}|null} */
+  let emptyMenuAt = $state(null);
+  const emptyMenuEntries = $derived(emptyMenuAt ? emptyAreaMenuEntries({ mac: desktopMac, canPaste: emptyMenuAt.canPaste }) : []);
+
+  /** @param {MouseEvent} e */
+  async function areaMenu(e) {
+    // A row, a header or a control has its own menu or none.
+    if (e.defaultPrevented || /** @type {HTMLElement} */ (e.target).closest('tr, thead, button, input, a, header, .od-desktop-logbook--handle')) return;
+    e.preventDefault();
+    const { clientX: x, clientY: y } = e;
+    emptyMenuAt = { x, y, canPaste: !!(await clipboardDives()) };
+  }
   const menuHeading = $derived.by(() => {
     const ids = desk.selection.ids;
     if (ids.length !== 1) return t('desktop.selected', { n: ids.length });
@@ -228,9 +247,69 @@
     showSnackbar(t('desktop.changeFailed'));
   }
 
-  /** Task 172: the detail pane is the editor; its first editable field gets the cursor. */
+  /** Task 172: the detail pane is the editor; its first editable field gets the cursor. Several dives: the dialog. */
   function editSelected() {
     if (desk.selection.ids.length === 1) window.dispatchEvent(new Event('od-detail-focus-first'));
+    else if (desk.selection.ids.length > 1) editingTogether = true;
+  }
+
+  // --- Several dives (task 2026-11-15-178): merge, edit together, copy, paste. ----------------------
+  let editingTogether = $state(false);
+
+  async function mergeSelected() {
+    const ids = [...desk.selection.ids];
+    const n = ids.length;
+    if (!canMerge(logbook.dives, ids).ok) return;
+    try {
+      const id = await mergeDives(ids);
+      // The list was read again: the merged dive becomes the selection.
+      if (id) desk.selection = { ids: [id], anchor: id, focus: id };
+      offerUndo(t('multiDive.merged', { n }));
+    } catch (e) {
+      console.error('Merge dives', e);
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+    }
+  }
+
+  /** The selected rows as the table shows them, in its order: a header line, then a line per dive. */
+  function copiedText() {
+    const chosen = order.filter((id) => selected.has(id));
+    const byId = new Map(logbook.dives.map((d) => [d.id, d]));
+    return selectionText(
+      columns.map((c) => t(c.label)),
+      chosen.flatMap((id) => {
+        const dive = byId.get(id);
+        return dive ? [columns.map((c) => cell(c.key, dive))] : [];
+      }),
+    );
+  }
+
+  async function copySelected() {
+    const ids = order.filter((id) => selected.has(id));
+    if (!ids.length) return;
+    try {
+      await copyDives(ids, copiedText());
+      showSnackbar(t('desktopMultiDive.copied', { n: ids.length }));
+    } catch (e) {
+      console.error('Copy dives', e);
+      showSnackbar(t('desktopMultiDive.copyFailed'));
+    }
+  }
+
+  /** Adds the dives of the clipboard with the import's duplicate check; nothing when it holds none. */
+  async function pasteDives() {
+    const xml = await clipboardDives();
+    if (!xml) return false;
+    try {
+      const n = await importData('clipboard.ssrf', textToBase64(xml));
+      offerUndo(t('desktopMultiDive.pasted', { n }));
+    } catch (e) {
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      console.error('Paste dives', code);
+      showSnackbar(t(importErrorKey(code)));
+    }
+    return true;
   }
 
   function deleteSelected() {
@@ -293,6 +372,9 @@
   function act(key) {
     if (key === 'edit') editSelected();
     else if (key === 'delete') deleteSelected();
+    else if (key === 'editTogether') editingTogether = true;
+    else if (key === 'merge') mergeSelected();
+    else if (key === 'copy') copySelected();
     else if (key === 'export' || key === 'share') exporting = true;
     else if (key === 'addToTrip') choosingTrip = true;
   }
@@ -520,10 +602,12 @@
       navigation.section === 'logbook' &&
       !menuAt &&
       !moreAt &&
+      !emptyMenuAt &&
+      !editingTogether &&
       !exporting &&
       !choosingTrip &&
       !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in') &&
-      !!tableEl?.closest('.page-current, .page-master')
+      !!pageEl?.closest('.page-current, .page-master')
     );
   }
 
@@ -548,6 +632,18 @@
         return true;
       case 'delete':
         deleteSelected();
+        return true;
+      case 'merge':
+        if (desk.selection.ids.length > 1 && mergeable) mergeSelected();
+        return true;
+      case 'copy':
+        // Text selected in a field copies as text; otherwise the selected dives.
+        if (document.activeElement?.closest('input, textarea, select, [contenteditable="true"]') || window.getSelection()?.toString()) {
+          document.execCommand('copy');
+        } else copySelected();
+        return true;
+      case 'paste':
+        pasteDives();
         return true;
       case 'export':
         // The dialog offers the selection, the filtered dives or the whole logbook (task 189).
@@ -594,6 +690,9 @@
       else if (modKey && key === 'f') cmd = 'find';
       else if (modKey && key === ',') cmd = 'settings';
       else if (!typing && modKey && key === 'n') cmd = 'new';
+      else if (!typing && modKey && key === 'm') cmd = 'merge';
+      else if (!typing && modKey && key === 'c' && !e.shiftKey && !window.getSelection()?.toString()) cmd = 'copy';
+      else if (!typing && modKey && key === 'v' && !e.shiftKey) cmd = 'paste';
       else if (!typing && modKey && key === 'e' && e.shiftKey) cmd = 'export';
       else if (!typing && modKey && key === 'e') cmd = 'edit';
       else if (!typing && modKey && key === 'z') cmd = e.shiftKey ? 'redo' : 'undo';
@@ -613,6 +712,15 @@
       if (cmd && command(cmd)) e.preventDefault();
     };
     window.addEventListener('keydown', keydown);
+    // The Mac's Edit menu pastes through the system (a paste event, no key): the dives of the clipboard,
+    // unless the focus is in a text field.
+    /** @param {ClipboardEvent} e */
+    const paste = (e) => {
+      if (!inUse() || (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]'))) return;
+      e.preventDefault();
+      pasteDives();
+    };
+    window.addEventListener('paste', paste);
     // The detail pane's ⋮ (DiveDetail.svelte) acts through the same commands, on the dive it shows.
     /** @param {Event} e */
     const fromDetail = (e) => command(/** @type {CustomEvent<string>} */ (e).detail);
@@ -620,6 +728,7 @@
     const off = /** @type {any} */ (window).odDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
     return () => {
       window.removeEventListener('keydown', keydown);
+      window.removeEventListener('paste', paste);
       window.removeEventListener('od-desktop-command', fromDetail);
       off?.();
     };
@@ -665,7 +774,8 @@
 </script>
 
 <Page class="od-desktop-logbook" pageContent={false}>
-  <div class="od-desktop-logbook--frame" bind:this={pageEl}>
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="od-desktop-logbook--frame" bind:this={pageEl} oncontextmenu={areaMenu}>
     <header class="od-desktop-logbook--bar">
       <!-- The list column's own header (task 2026-11-15-192): the title, the count on one line under it. -->
       <div class="od-desktop-logbook--titles">
@@ -826,6 +936,12 @@
   {/if}
   {#if menuAt}
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />
+  {/if}
+  {#if emptyMenuAt}
+    <DesktopContextMenu x={emptyMenuAt.x} y={emptyMenuAt.y} heading="" entries={emptyMenuEntries} onchoose={(key) => key === 'paste' && pasteDives()} onclose={() => (emptyMenuAt = null)} />
+  {/if}
+  {#if editingTogether}
+    <DesktopEditTogetherDialog ids={[...desk.selection.ids]} openId={null} onclose={() => (editingTogether = false)} />
   {/if}
   {#if exporting}
     <DesktopExportDialog
