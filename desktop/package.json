@@ -19,17 +19,63 @@
   "build": {
     "appId": "org.opendives.app",
     "productName": "OpenDives",
-    "directories": { "output": "../build/desktop/dist", "buildResources": "resources" },
-    "files": ["main.cjs", "menu.cjs", "window-state.cjs", "bridge.cjs", "preload.cjs", "package.json"],
-    "extraResources": [
-      { "from": "../build/desktop/stage/web", "to": "web" },
-      { "from": "../build/desktop/stage/bin", "to": "bin" },
-      { "from": "../build/desktop/stage/xslt", "to": "xslt" },
-      { "from": "../build/desktop/stage/i18n", "to": "i18n" }
+    "directories": {
+      "output": "../build/desktop/dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "main.cjs",
+      "menu.cjs",
+      "window-state.cjs",
+      "bridge.cjs",
+      "preload.cjs",
+      "package.json"
     ],
-    "win": { "target": ["nsis", "appx"] },
-    "appx": { "identityName": "OpenDives", "publisherDisplayName": "Christian Rémillard" },
-    "mac": { "target": ["dmg", "mas"], "category": "public.app-category.sports" },
-    "linux": { "target": ["AppImage", "flatpak"], "category": "Utility" }
+    "extraResources": [
+      {
+        "from": "../build/desktop/stage/web",
+        "to": "web"
+      },
+      {
+        "from": "../build/desktop/stage/bin",
+        "to": "bin"
+      },
+      {
+        "from": "../build/desktop/stage/xslt",
+        "to": "xslt"
+      },
+      {
+        "from": "../build/desktop/stage/i18n",
+        "to": "i18n"
+      },
+      {
+        "from": "../build/desktop/stage/SampleDivesV2.ssrf",
+        "to": "SampleDivesV2.ssrf"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "appx"
+      ]
+    },
+    "appx": {
+      "identityName": "OpenDives",
+      "publisherDisplayName": "Christian Rémillard"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "mas"
+      ],
+      "category": "public.app-category.sports"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "flatpak"
+      ],
+      "category": "Utility"
+    }
   }
 }

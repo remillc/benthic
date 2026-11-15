@@ -605,6 +605,11 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     return { json: await this.core('listLoadedDives') };
   }
 
+  /** Desktop only: the logbook table's extra columns (dive_columns, opendives.h). */
+  async diveColumns() {
+    return { json: await this.core('diveColumns') };
+  }
+
   /** Local save only, without network (manual synchronisation). */
   async saveLocal() {
     await this.core('saveLocal');

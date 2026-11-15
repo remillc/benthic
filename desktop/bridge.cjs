@@ -67,7 +67,7 @@ const CORE_METHODS = new Set([
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
   'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',
-  'undo', 'sync', 'listLoadedDives', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
+  'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
   'dcBluetoothModels', 'downloadPartial', 'downloadCancel', 'setSyncListener', 'ping',
 ]);

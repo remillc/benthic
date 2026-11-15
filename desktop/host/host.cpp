@@ -566,6 +566,12 @@ void register_methods()
 		opendives::list_loaded_dives(json);
 		return S(json);
 	});
+	// Desktop only: the logbook table's extra columns (task 2026-11-15-169).
+	add("diveColumns", core, [](const Args &) {
+		std::string json;
+		opendives::dive_columns(json);
+		return S(json);
+	});
 	add("saveLocal", core, [](const Args &) {
 		std::string error;
 		if (opendives::save_local(error))

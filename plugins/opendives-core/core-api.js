@@ -892,6 +892,10 @@ export const OpenDivesCore = {
   htmlToPdf: (options) => native.htmlToPdf(options),
   grantShareFile: (options) => native.grantShareFile(options),
   exportDives: (options) => native.exportDives(options),
+  /** Desktop only: the extra columns of the logbook's table, for every listed dive. */
+  async diveColumns() {
+    return JSON.parse((await native.diveColumns()).json);
+  },
   async listLoadedDives() {
     return JSON.parse((await native.listLoadedDives()).json);
   },
