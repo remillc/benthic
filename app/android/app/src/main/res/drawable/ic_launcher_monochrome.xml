@@ -1,38 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Themed icon layer of the "Trois vagues" logo in one colour: the ring under the water, the three waterlines and the bubbles; above the water, the circle at half strength. -->
+<!-- Themed icon layer of the simple logo in one colour (docs/brand/opendives-logo.svg). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <group>
-        <clip-path android:pathData="M25,54a29,29 0,1 0,58 0a29,29 0,1 0,-58 0Z" />
-        <path
-            android:pathData="M-2,52 Q9,61 20,52 T42,52 T64,52 T86,52 T108,52 T130,52"
-            android:strokeColor="#FF000000"
-            android:strokeWidth="2.5"
-            android:strokeLineCap="round" />
-            <path
-            android:pathData="M-5,60.5 Q6,69.5 17,60.5 T39,60.5 T61,60.5 T83,60.5 T105,60.5 T127,60.5"
-            android:strokeColor="#FF000000"
-            android:strokeWidth="2.5"
-            android:strokeLineCap="round" />
-            <path
-            android:pathData="M-8,69 Q3,78 14,69 T36,69 T58,69 T80,69 T102,69 T124,69"
-            android:strokeColor="#FF000000"
-            android:strokeWidth="2.5"
-            android:strokeLineCap="round" />
-        </group>
+    <!-- Themed icon layer: the disc with the wave cut out (the wave is the outline of its stroke, rounded ends). -->
     <path
-        android:pathData="M24,54 A30,30 0 1,1 84,54"
-        android:strokeColor="#80000000"
-        android:strokeWidth="3"
-        android:strokeLineCap="round" />
-    <path
-        android:pathData="M24,54 A30,30 0 0,0 84,54"
-        android:strokeColor="#FF000000"
-        android:strokeWidth="3"
-        android:strokeLineCap="round" />
-    <path android:fillColor="#FF000000" android:pathData="M58.4,39a3.6,3.6 0,1 0,7.2 0a3.6,3.6 0,1 0,-7.2 0Z" />
-    <path android:fillColor="#FF000000" android:pathData="M53.9,30.8a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z M36.684,58.798 Q44.455,52.137 52.225,58.798 Q63.545,68.501 74.866,58.798 A2.727,2.727 0,0,0 71.316,54.657 Q63.545,61.317 55.775,54.657 Q44.455,44.953 33.134,54.657 A2.727,2.727 0,0,0 36.684,58.798 Z" />
 </vector>
