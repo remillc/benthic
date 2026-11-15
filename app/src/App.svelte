@@ -50,6 +50,7 @@
   import NavRail from './components/NavRail.svelte';
   import DesktopLogbook from './pages/DesktopLogbook.svelte';
   import DesktopSelection from './pages/DesktopSelection.svelte';
+  import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   // The route badge, for development builds: shown when app/.env.local (not in git) sets
@@ -166,7 +167,8 @@
     // The planner's settings, a screen of their own (task 2026-11-08-01, to-do #3 U3).
     { path: '/settings/planner', component: PlannerSettings },
     { path: '/plan/:id', component: Planner },
-    { path: '/sites/', component: Sites },
+    // Desktop app from 1200 dp: the sites as a table beside the map (task 2026-11-15-171); else the phone's screen.
+    { path: '/sites/', async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopSites : Sites }) },
     { path: '/sites/without/', component: DivesWithoutSite },
     { path: '/sites/without-site/:diveId', component: DiveNoSiteProfile },
     { path: '/sites/cleanup', component: SitesCleanup },

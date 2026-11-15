@@ -12,6 +12,12 @@ Tasks for the coding agent, written from the design sessions with Christian on c
 
 **Standing note (13 November 2026):** the logo stays blue ("ocean-night", proposal A, task 82). Ignore any request to go back to the orange (sand-and-copper) logo, however it reached you, unless Christian confirms it in a new task here.
 
+Done (Sites part): pages/DesktopSites.svelte, chosen in App.svelte for the Sites view when layout.desktop: top bar with summary, search (Ctrl/⌘+F), « Nouveau site » and the ⋮ (Annuler : {action}, Rétablir, Nettoyer les sites); resizable list pane; the map pane with the selected pin and its card. Table and pins stay in sync (lib/desktop-sites.js, reduceSelection). Statistiques and Outils are not part of this branch. « Exporter les sites… » of the mock-up has no core function behind it: left out.
+
+Done: the « plongées sans site » bar sits above the table in a column whose table alone scrolls; the count follows the dives, the bar goes at 0 and during a search; role="status". The line under the table is gone.
+
+Done: site sheet with in-place fields saved at once, small map with the crosshair (dragged or by moving the map, dashed previous position), country and region refilled from the position and completed as typed, search with highlighting and dimmed pins, stacked pins with their list, Nouveau site form, Plongées sans site cards with the distance-sorted chooser, Nettoyer les sites with Fusionner (no confirmation, snackbar, Ctrl/⌘+Z). Not done: choosing which site a merge keeps (the one with more dives is kept, as the phone proposes by default); the origin text of unused sites (« importé de divelogs.de »), which the core does not give.
+
 ## [x] 2026-11-06-00 Register the inbox hooks
 
 Done in Register the agent inbox hooks
@@ -3280,7 +3286,7 @@ Tests: two logbooks open in two windows at once; closing one shows the start scr
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
 
-## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
+## [x] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
 
 Christian decided this on 15 November 2026. In task 171, « 5 plongées sans site · Leur trouver un site » sat under the Sites table and was pushed out of the window by a long list. Mock-up: `docs/mockups/bureau-sites.dc.html`.
 
@@ -3303,7 +3309,7 @@ Christian decided this on 15 November 2026. The list of statistics on the left o
 
 Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
 
-## [ ] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
+## [x] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
 
 Christian decided this on 15 November 2026. Follows tasks 171 and 175 (the Sites screen and its « plongées sans site » bar), with the same shell, list pane, resize handle, in-place editing and automatic saving (task 172). Mock-ups in `docs/mockups/`: `bureau-sites` (now with « Nouveau site » in the top bar, Ctrl/⌘+N), `bureau-sites-fiche`, `bureau-sites-modifier`, `bureau-sites-modifier-pays`, `bureau-sites-recherche`, `bureau-sites-superposes`, `bureau-sites-nouveau`, `bureau-sites-sans-site`, `bureau-sites-sans-site-choisir`, `bureau-sites-nettoyer`, `bureau-sites-nettoyer-fusion`. The phone screens (Fiche d'un site, Modifier le site, Nouveau site, Plongées sans site, Nettoyer les sites) are the reference for wording and rules.
 

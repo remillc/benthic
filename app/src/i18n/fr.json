@@ -1479,6 +1479,71 @@
     "editSite": "Modifier le site {name}",
     "editedNoDuplicate": "{name} modifié, ce n’est plus un doublon possible"
   },
+  "desktopSites": {
+    "column": {
+      "name": "Site",
+      "country": "Pays",
+      "dives": "Plongées",
+      "last": "Dernière"
+    },
+    "withoutBar": {
+      "one": "{n} plongée sans site",
+      "other": "{n} plongées sans site"
+    },
+    "findThem": "Leur trouver un site",
+    "cleanUp": "Nettoyer les sites",
+    "searchNote": "Résultats : noms des sites, régions et pays. Échap pour tout revoir.",
+    "seeDives": "Voir les plongées",
+    "modify": "Modifier",
+    "deepestAt": "{depth} au plus profond",
+    "deepest": "Plus profonde",
+    "moreSites": "Plus d’options des sites",
+    "resize": "Largeur de la liste des sites",
+    "emptyTitle": "Aucun site",
+    "emptyText": "Un site apparaît quand une plongée en a un. « Nouveau site » en ajoute un.",
+    "keepHint": "Entrée pour garder · Échap pour annuler",
+    "orMoveMap": "ou déplacez la carte",
+    "moveHint": "Déplacez la carte ou la croix pour corriger",
+    "clickToPlace": "Cliquez sur la carte pour placer la croix",
+    "placeExplain": "Pays et région se mettent à jour quand la position change, sauf si vous les avez corrigés.",
+    "coordinatesExample": "Par exemple -35.4485, 174.732, ou cliquez sur la carte",
+    "updatedFromPosition": "Mis à jour d’après la nouvelle position",
+    "savedAtOnce": "Chaque changement est enregistré tout de suite.",
+    "sitesInLogbook": {
+      "one": "{n} site au carnet",
+      "other": "{n} sites au carnet"
+    },
+    "addName": "Ajouter un nom",
+    "addCoordinates": "Ajouter des coordonnées",
+    "addCountry": "Ajouter un pays",
+    "addRegion": "Ajouter une région",
+    "addDescription": "Ajouter une description",
+    "addNotes": "Ajouter des notes",
+    "addSite": "Ajouter le site",
+    "cancel": "Annuler",
+    "zoomHere": "Zoomer ici",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "deleted": "Site supprimé",
+    "merged": "Sites fusionnés",
+    "mergedOne": "Fusionnés : un seul site",
+    "cleanupIntro": "Fusionner garde un seul site, avec toutes ses plongées. C’est annulable ({shortcut}).",
+    "possibleDuplicates": "Doublons possibles",
+    "noDuplicates": "Aucun doublon possible",
+    "noUnused": "Aucun site sans plongée",
+    "chooseSite": "Choisir un site…",
+    "nearestToDive": "Les plus proches de la plongée",
+    "mostRecent": "Les plus récemment plongés",
+    "newSiteNamedHere": "Nouveau site « {text} » à la position de la plongée",
+    "newSiteNamed": "Nouveau site « {text} »",
+    "noPosition": "Aucune position enregistrée : choisissez le site, ou créez-le et placez-le sur la carte.",
+    "otherTripDives": {
+      "one": "et {n} autre plongée de ce voyage",
+      "other": "et {n} autres plongées de ce voyage"
+    },
+    "assignAll": "Les associer toutes au même site",
+    "noneWithout": "Toutes les plongées ont un site."
+  },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
     "dialogTextChecked": {
