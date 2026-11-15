@@ -3762,13 +3762,15 @@ Dark mode: the same layout with the dark tokens (card `--od-surface`, icon conta
 
 Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
 
-## [ ] 2026-11-15-205 iPhone first launch: check the water colour under the profile
+## [x] 2026-11-15-205 iPhone first launch: check the water colour under the profile
 
 Christian approved this on 15 November 2026. The mock-up `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone ») had the water under the profile going from #D4E2F2 to black (#1F2124); it now goes to #5584B5, as on Android and everywhere else. `app/src/pages/WelcomeStart.svelte` already uses `--od-water-top` and `--od-water-bottom`, so this is a check, not a change: on iOS (light and dark), the water must end in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the profile line stay `--od-trace`. If an iOS-specific style or an older build still darkens it, fix it there.
 
 Test: the iPhone first launch in light mode shows a blue water column, never black, under a #1F2124 line.
 
-## [ ] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
+
+Done: checked, nothing to change. In a browser with `?theme=ios` (iPhone 393 x 852 and iPad 820 x 1180, light and dark), the computed water gradient ends in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the line is `--od-trace` (#1F2124 light, #F4F4F2 dark); no iOS-specific style darkens it. Guarded by `tests/app/welcome-start.test.mjs`.
+## [x] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
 
 Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »). Mock-up: `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone »). The iOS layout does not change (large title, the profile, a grouped list with chevrons); only the texts become those of the Android first launch, already in `app/src/i18n/fr.json` (`welcome`):
 - under « OpenDives »: « Votre carnet de plongée. » (instead of `welcome.intro`);
@@ -3781,6 +3783,8 @@ Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingTe
 
 Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
 
+
+Done: the iOS branch of `WelcomeStart.svelte` now uses `welcome.headline` under the title, `existingShort`/`existingNote`, `createShort`/`createNote`, `noAccount` with `noAccountNotePhone` (phone) or `noAccountNoteTablet` (iPad); the git link is unchanged. `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` are removed from en, fr and fr-CA (nothing else referenced them). One release-note line added (fr, en). Layout unchanged; checked in a browser at iPhone and iPad sizes, light and dark.
 ## [ ] 2026-11-15-207 New logbook dialog: a close button at every step
 
 Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».

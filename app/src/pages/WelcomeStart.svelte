@@ -88,28 +88,28 @@
 
   <div class="od-welcome-start--heading">
     <h1>{t('welcome.title')}</h1>
-    <p>{t('welcome.intro')}</p>
+    <p>{t('welcome.headline')}</p>
   </div>
 
   <nav class="od-welcome-start--choices" aria-label={t('welcome.choicesLabel')}>
     <a href="/welcome/sign-in" class="od-welcome-start--choice od-welcome-start--filled" onclick={(e) => go(e, '/welcome/sign-in')}>
       <span class="od-welcome-start--text">
-        <span class="od-welcome-start--label">{t('welcome.existing')}</span>
-        <span class="od-welcome-start--consequence">{t('welcome.existingText')}</span>
+        <span class="od-welcome-start--label">{t('welcome.existingShort')}</span>
+        <span class="od-welcome-start--consequence">{t('welcome.existingNote')}</span>
       </span>
       <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
     <a href="/welcome/create" class="od-welcome-start--choice" onclick={(e) => go(e, '/welcome/create')}>
       <span class="od-welcome-start--text">
-        <span class="od-welcome-start--label">{t('welcome.create')}</span>
-        <span class="od-welcome-start--consequence">{t('welcome.createText')}</span>
+        <span class="od-welcome-start--label">{t('welcome.createShort')}</span>
+        <span class="od-welcome-start--consequence">{t('welcome.createNote')}</span>
       </span>
       <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
     <a href="#no-account" class="od-welcome-start--choice external" onclick={withoutAccount}>
       <span class="od-welcome-start--text">
         <span class="od-welcome-start--label">{t('welcome.noAccount')}</span>
-        <span class="od-welcome-start--consequence">{t('welcome.noAccountText')}</span>
+        <span class="od-welcome-start--consequence">{t(layout.phone ? 'welcome.noAccountNotePhone' : 'welcome.noAccountNoteTablet')}</span>
       </span>
       <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
