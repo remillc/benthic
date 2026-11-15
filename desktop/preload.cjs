@@ -3,7 +3,7 @@
 // Preload of the desktop app: window.odDesktop, the only door between the
 // renderer and the main process (the contract is documented at the top of
 // desktop/bridge.cjs). Sandbox-compatible: it uses only electron's modules.
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 /** Calls a handler of the bridge; its { ok, value } answer becomes a resolved value or an Error. */
 async function invoke(channel, ...args) {
@@ -25,11 +25,13 @@ ipcRenderer.on('od:core-event', (_event, name, data) => {
   }
 });
 
-const { platform, ...paths } = ipcRenderer.sendSync('od:paths');
+// `logbook`: what this window holds (bridge.cjs, logbooks.cjs); null: the start screen.
+const { platform, logbook, ...paths } = ipcRenderer.sendSync('od:paths');
 
 contextBridge.exposeInMainWorld('odDesktop', {
   platform,
   paths,
+  logbook,
   core: (method, args) => invoke('od:core', method, args),
   onCoreEvent(name, callback) {
     if (typeof callback !== 'function') return () => {};
@@ -62,4 +64,28 @@ contextBridge.exposeInMainWorld('odDesktop', {
     return () => ipcRenderer.removeListener('od:menu', listener);
   },
   placesSearch: (options) => invoke('od:placesSearch', options),
+  /** Several logbooks (task 2026-11-15-173): one window per logbook; windows.cjs answers. */
+  logbooks: {
+    recent: () => invoke('od:logbooks', 'recent'),
+    open: (options) => invoke('od:logbooks', 'open', options),
+    pickAndOpen: () => invoke('od:logbooks', 'pickAndOpen'),
+    openPath: (options) => invoke('od:logbooks', 'openPath', options),
+    close: () => invoke('od:logbooks', 'close'),
+    clearRecent: () => invoke('od:logbooks', 'clearRecent'),
+    forget: (options) => invoke('od:logbooks', 'forget', options),
+    cloud: () => invoke('od:logbooks', 'cloud'),
+    pickFolder: () => invoke('od:logbooks', 'pickFolder'),
+    create: (options) => invoke('od:logbooks', 'create', options),
+    saveCopy: () => invoke('od:logbooks', 'saveCopy'),
+    openCopy: (options) => invoke('od:logbooks', 'openCopy', options),
+    revealCopy: (options) => invoke('od:logbooks', 'revealCopy', options),
+    /** The path of a file dropped on the window (the renderer cannot read it). */
+    pathForFile: (file) => {
+      try {
+        return webUtils.getPathForFile(file);
+      } catch {
+        return '';
+      }
+    },
+  },
 });

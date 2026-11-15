@@ -10,10 +10,27 @@ const { Menu } = require('electron');
 /**
  * @param {any} texts the app's translations (app/src/i18n/<lang>.json)
  * @param {(command: string) => void} send
+ * @param {{ recent?: { id: string, name: string, open: boolean }[], actions?: { pickAndOpen?: () => void, openRecent?: (id: string) => void, clearRecent?: () => void, closeLogbook?: () => void } }} [logbooks]
+ *   the recent logbooks and what the logbook items do in the main process (task 2026-11-15-173)
  * @returns {Menu}
  */
-function buildMenu(texts, send) {
+function buildMenu(texts, send, logbooks = {}) {
   const m = texts.desktop.macMenu;
+  const l = texts.desktopLogbooks.menu;
+  const actions = logbooks.actions ?? {};
+  const recent = logbooks.recent ?? [];
+  const recentItems = recent.length
+    ? [
+        ...recent.map((entry) => ({
+          label: entry.name || texts.desktopLogbooks.mainName,
+          type: /** @type {const} */ ('checkbox'),
+          checked: entry.open,
+          click: () => actions.openRecent?.(entry.id),
+        })),
+        { type: /** @type {const} */ ('separator') },
+        { label: l.clearRecent, click: () => actions.clearRecent?.() },
+      ]
+    : [{ label: l.noRecent, enabled: false }];
   const item = (/** @type {string} */ label, /** @type {string} */ command, /** @type {string} */ accelerator = '') => ({
     label,
     ...(accelerator ? { accelerator } : {}),
@@ -40,8 +57,15 @@ function buildMenu(texts, send) {
     {
       label: m.file,
       submenu: [
+        item(l.newLogbook, 'newLogbook', 'Shift+Cmd+N'),
+        { label: l.openLogbook, accelerator: 'Cmd+O', click: () => actions.pickAndOpen?.() },
+        { label: l.recentLogbooks, submenu: recentItems },
+        { type: 'separator' },
+        { label: l.closeLogbook, accelerator: 'Cmd+W', click: () => actions.closeLogbook?.() },
+        item(l.saveCopy, 'saveCopy', 'Shift+Cmd+S'),
+        { type: 'separator' },
         item(m.newDive, 'new', 'Cmd+N'),
-        item(m.import, 'import', 'Cmd+O'),
+        item(m.import, 'import', 'Cmd+I'),
         item(m.download, 'download'),
         { type: 'separator' },
         item(m.export, 'export', 'Shift+Cmd+E'),

@@ -145,6 +145,135 @@
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     }
   },
+  "desktopLogbooks": {
+    "mainName": "This computer's logbook",
+    "selector": {
+      "label": "Logbook",
+      "change": "Switch logbook",
+      "recentTitle": "Recent logbooks · each opens in its own window",
+      "newLogbook": "New logbook…",
+      "openLogbook": "Open a logbook…",
+      "saveCopy": "Save a copy…",
+      "closeLogbook": "Close the logbook",
+      "noRecent": "No recent logbook"
+    },
+    "menu": {
+      "newLogbook": "New Logbook…",
+      "openLogbook": "Open a Logbook…",
+      "recentLogbooks": "Recent Logbooks",
+      "clearRecent": "Clear List",
+      "closeLogbook": "Close Logbook",
+      "saveCopy": "Save a Copy…",
+      "noRecent": "No Recent Logbook"
+    },
+    "main": {
+      "missingTitle": "“{name}” cannot be found",
+      "missingText": "The file was moved or deleted. It is removed from the recent logbooks.",
+      "ok": "OK",
+      "openTitle": "Open a logbook",
+      "fileFilter": "Logbook",
+      "newFileTitle": "New logbook",
+      "copyTitle": "Save a copy",
+      "copySuffix": "copy",
+      "folderTitle": "Choose the folder"
+    },
+    "start": {
+      "empty": "No logbook open in this window",
+      "open": "Open a logbook…",
+      "newLogbook": "New logbook…",
+      "recent": "Recent logbooks",
+      "drop": "You can also drop a logbook file on this window.",
+      "notALogbook": "This file is not a logbook (.ssrf or .xml).",
+      "openFailed": "This logbook could not be opened.",
+      "dropHere": "Drop the file to open it",
+      "forget": "Remove from the list"
+    },
+    "source": {
+      "device": "This computer",
+      "file": "File",
+      "git": "Git repository",
+      "googleDrive": "Google Drive",
+      "oneDrive": "Microsoft OneDrive",
+      "dropbox": "Dropbox",
+      "iCloud": "iCloud Drive",
+      "webdav": "WebDAV or Nextcloud"
+    },
+    "when": {
+      "openNow": "open now",
+      "closedNow": "closed just now",
+      "closedMinutes": "closed {n} min ago",
+      "closedHours": "closed {n} h ago",
+      "openedOn": "opened {date}"
+    },
+    "new": {
+      "step": "Step {n} of 2",
+      "stepNamed": "Step 2 of 2 · {name}",
+      "title": "New logbook",
+      "nameLabel": "Logbook name",
+      "nameHelp": "It shows in the top bar and in the recent logbooks.",
+      "defaultName": "My logbook",
+      "whereLabel": "Where to keep it?",
+      "computer": "On this computer",
+      "computerHelp": "A logbook file (.ssrf), in the folder you choose",
+      "cloud": "In your cloud",
+      "cloudHelp": "{services} · synced between your devices",
+      "cloudServices": "Google Drive, OneDrive, Dropbox or WebDAV",
+      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
+      "git": "In a git repository",
+      "gitHelp": "Your own repository · full history of changes",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "back": "Back",
+      "create": "Create the logbook",
+      "creating": "Creating…",
+      "cloudIntro": "Choose the service whose app is installed on this computer. The logbook will be a file in its synced folder.",
+      "folderFound": "Folder found",
+      "folderMissing": "Choose a folder",
+      "notAvailable": "Not available yet",
+      "folderLabel": "Folder",
+      "folderBrowse": "Choose…",
+      "folderHelp": "The file “{file}” will be created there. OpenDives only reaches the files it creates or that you open.",
+      "gitUrl": "Repository address",
+      "gitUrlPlaceholder": "https://github.com/you/logbook.git",
+      "gitBranch": "Branch",
+      "gitToken": "Access token",
+      "gitTokenHelp": "The token stays on this computer.",
+      "gitTokenLink": "Create an access token",
+      "gitNote": "The repository must be empty or already hold a logbook. If it holds one, it opens as it is.",
+      "errorUrl": "The address must start with https://",
+      "errors": {
+        "BAD_ADDRESS": "No repository found at this address.",
+        "BAD_CREDENTIALS": "The token is refused.",
+        "DENIED": "The token is refused or has no right to write to this repository.",
+        "BAD_BRANCH": "This branch does not exist or its name is not valid.",
+        "NO_LOG": "This repository holds no logbook.",
+        "CREATE_FAILED": "The logbook could not be created in this repository.",
+        "NOT_EMPTY": "This repository already holds something other than a logbook.",
+        "NETWORK": "The server does not answer. Check the connection.",
+        "EXISTS": "A file with this name already exists in this folder.",
+        "other": "The logbook could not be created."
+      }
+    },
+    "ready": {
+      "title": "Your logbook is ready",
+      "whereComputer": "“{name}” is kept on this computer, in {where}. Add your first dives:",
+      "whereCloud": "“{name}” is kept in {where}. Add your first dives:",
+      "whereGit": "“{name}” is kept in the repository {where}. Add your first dives:",
+      "download": "Download from a dive computer",
+      "downloadHelp": "Bluetooth or USB cable",
+      "import": "Import a file",
+      "importHelp": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
+      "manual": "Log a dive by hand",
+      "manualHelp": "For a dive without a computer",
+      "drop": "You can also drop a file on this window."
+    },
+    "copy": {
+      "saved": "Copy saved",
+      "open": "Open",
+      "failed": "The copy could not be saved.",
+      "sameFile": "Choose a different file than the open logbook's."
+    }
+  },
   "sync": {
     "failure": {
       "later": "Later",

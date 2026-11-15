@@ -5,6 +5,7 @@ import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
+import { ownLogbookWindow, noLogbookWindow } from './window-logbook.js';
 import { nextProgress } from './sync-progress.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
@@ -583,6 +584,9 @@ async function syncEdits() {
  * @returns {string|null}
  */
 function readWelcomeState() {
+  // A window that holds a logbook of its own (a file or a git repository) or none has no first launch:
+  // that belongs to the logbook of this computer (task 2026-11-15-173).
+  if (ownLogbookWindow()) return 'done';
   try {
     return deviceStore.getItem('od.welcome');
   } catch {
@@ -596,6 +600,7 @@ function readWelcome() {
 
 /** @param {'show'|'done'} value */
 function writeWelcomeState(value) {
+  if (ownLogbookWindow()) return;
   try {
     deviceStore.setItem('od.welcome', value);
   } catch {
@@ -659,6 +664,11 @@ export function boot() {
 export async function startApp() {
   mark('startApp');
   if (logbook.welcome) return;
+  // The desktop's start screen: no logbook is open in this window (task 2026-11-15-173).
+  if (noLogbookWindow()) {
+    logbook.loading = false;
+    return;
+  }
   if (readWelcomeState() === null) {
     let configured = false;
     try {

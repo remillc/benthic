@@ -131,10 +131,21 @@ export class OpenDivesCoreDesktop extends WebPlugin {
 
   /** @returns {string} the repository of the logbook: <userData>/carnet[main] */
   get repo() {
-    return `${joinPath(this.bridge.paths.userData, 'carnet')}[main]`;
+    return `${this.repoDir}[main]`;
   }
+  /**
+   * Where the core keeps this window's logbook (task 2026-11-15-173): <userData>/carnet for the logbook
+   * of this computer (the only one before there were several), <userData>/logbooks/<id>/repo for a file
+   * logbook (a git copy the bridge writes back to the .ssrf file).
+   */
   get repoDir() {
+    const logbook = this.bridge.logbook;
+    if (logbook && logbook.kind !== 'main') return joinPath(this.bridge.paths.userData, 'logbooks', logbook.id, 'repo');
     return joinPath(this.bridge.paths.userData, 'carnet');
+  }
+  /** The logbook this window holds; null on the start screen (no logbook open), undefined outside the desktop app. */
+  get windowLogbook() {
+    return /** @type {any} */ (globalThis).odDesktop?.logbook;
   }
   get importDir() {
     return joinPath(this.bridge.paths.temp, 'import');
@@ -184,6 +195,8 @@ export class OpenDivesCoreDesktop extends WebPlugin {
 
   /** The JSON of the core is passed on as a string (`json`) and parsed once, in core-api.js. */
   async listDives() {
+    // The start screen: no logbook is open in this window.
+    if (this.windowLogbook === null) return { exists: false, json: '[]' };
     const exists = await this.core('logExists', { repo: this.repo });
     const json = exists ? await this.core('listDives', { repo: this.repo }) : '[]';
     return { exists, json };
@@ -234,6 +247,8 @@ export class OpenDivesCoreDesktop extends WebPlugin {
    * user name for a repository.
    */
   async configureCloud() {
+    // The start screen has no logbook, so no account.
+    if (this.windowLogbook === null) return { available: false, email: '' };
     const remote = await this.bridge.credentials.get('git');
     if (remote) {
       try {
@@ -261,6 +276,7 @@ export class OpenDivesCoreDesktop extends WebPlugin {
 
   /** @param {{cached?: boolean}} [options] */
   async listCloudDives(options) {
+    if (this.windowLogbook === null) return { available: false };
     const cached = options?.cached === true;
     let json;
     if (cached) {

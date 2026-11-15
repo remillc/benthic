@@ -40,6 +40,11 @@
 //   saveAs({path, name})     the system's save dialog for a file of <temp>/share: resolves { saved, path }
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
+// One window, one logbook, one helper (task 2026-11-15-173): `od:paths` also returns `logbook`, the
+// descriptor of the sender's window (desktop/logbooks.cjs; null on the start screen), and od:core,
+// od:credentials and od:fs run in the sender's context. The git token of a logbook other than the main
+// one is its own file; a .ssrf file logbook is written back after saveLocal and sync.
+//
 // The renderer is untrusted: methods are checked against the host's list, and
 // every path argument of a core call or an fs call must be inside userData or
 // temp (the bundled resources, for reading only), never one of the credential
@@ -59,6 +64,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
+const logbooks = require('./logbooks.cjs');
 
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
 const CORE_METHODS = new Set([
@@ -93,12 +99,15 @@ const PATH_ARGS = {
 
 /** Files of userData the renderer never reaches by path. */
 const SECRET_FILES = new Set(['cloud-account.bin', 'git-remote.bin', 'cloud-account.bin.tmp', 'git-remote.bin.tmp']);
+/** The token of a git logbook other than the main one: git-remote-<id>.bin (task 2026-11-15-173). */
+const SECRET_PATTERN = /^git-remote-[fg]-[0-9a-f]{12}\.bin(\.tmp)?$/;
 const DEV_FILES = new Set(['cloud-dev.env', 'cloud-test.env']);
 const CREDENTIAL_FIELDS = {
   cloud: ['email', 'password'],
   git: ['url', 'username', 'branch', 'token'],
 };
 const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin' };
+const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH', 'DENIED', 'NO_LOG', 'CREATE_FAILED', 'LOG_EXISTS', 'NOT_EMPTY']);
 const MAX_READ = 100 * 1024 * 1024;
 const NOMINATIM = 'https://nominatim.openstreetmap.org/';
 const REPO_URL = 'https://github.com/remillc/opendives';
@@ -261,11 +270,218 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   // Where imports are staged and shares are written: the core writes there too (divelogs.de, exports).
   for (const area of ['import', 'share']) fs.mkdirSync(path.join(tempDir, area), { recursive: true, mode: 0o700 });
 
-  const send = broadcast || ((channel, ...args) => {
+  const electron_ = () => (electron ? electron() : require('electron'));
+  const sendAll = broadcast || ((channel, ...args) => {
     for (const window of electron_().BrowserWindow.getAllWindows()) window.webContents.send(channel, ...args);
   });
-  const electron_ = () => (electron ? electron() : require('electron'));
   const log = (text) => console.error(`[desktop] ${text}`);
+
+  // --- Windows: one context, and one core helper, per logbook window (task 2026-11-15-173) ---
+  // The core holds one logbook at a time, so each window has its own helper, started when the window
+  // first calls the core. The window is known by its webContents id; calls that come without a
+  // sender (tests, the single-window case before main.cjs attaches the window) use the default one.
+
+  /** @typedef {{ key: number, descriptor: any, webContents: any, host: HostProcess, mirror: Promise<void>, failure: string }} WindowContext */
+  /** @type {Map<number, WindowContext>} */
+  const contexts = new Map();
+  const DEFAULT_KEY = 0;
+
+  /** To the window of the context; to every window when it has none. */
+  function emit(/** @type {WindowContext} */ ctx, /** @type {string} */ channel, /** @type {any[]} */ ...args) {
+    const target = ctx.webContents;
+    if (!target) sendAll(channel, ...args);
+    else if (!(typeof target.isDestroyed === 'function' && target.isDestroyed())) target.send(channel, ...args);
+  }
+
+  /** The calls every helper gets first: HOME and libgit2, then the certificates and the stylesheets
+   *  (calls that reach the network must not run before them). */
+  async function coreSetup(sendRaw) {
+    await sendRaw('init', { home: userData });
+    try {
+      writeCaFile();
+      await sendRaw('setCaFile', { path: paths.caFile });
+    } catch (e) {
+      log(`Cannot set the certificate authorities: ${e.message}`);
+    }
+    try {
+      await sendRaw('setXsltDir', { dir: paths.xsltDir });
+    } catch (e) {
+      log(`Cannot set the XSLT stylesheets: ${e.message}`);
+    }
+  }
+
+  /** @param {number} key @param {any} descriptor @param {any} webContents @returns {WindowContext} */
+  function newContext(key, descriptor, webContents) {
+    /** @type {WindowContext} */
+    const ctx = { key, descriptor: descriptor === undefined ? logbooks.MAIN : descriptor, webContents: webContents || null, host: /** @type {any} */ (null), mirror: Promise.resolve(), failure: '' };
+    ctx.host = new HostProcess({
+      hostPath,
+      hostArgs,
+      log,
+      onEvent: (name, data) => emit(ctx, 'od:core-event', name, data),
+      onExit: () => emit(ctx, 'od:core-event', 'coreRestarted', {}),
+      async onStart(sendRaw) {
+        await coreSetup(sendRaw);
+        if (ctx.descriptor?.kind === 'file') await prepareFileLogbook(ctx, sendRaw);
+      },
+    });
+    contexts.set(key, ctx);
+    return ctx;
+  }
+
+  /** The context of the window an ipc message comes from. @param {any} [event] */
+  function contextFor(event) {
+    const key = event && event.sender && Number.isInteger(event.sender.id) ? event.sender.id : DEFAULT_KEY;
+    return contexts.get(key) || contexts.get(DEFAULT_KEY) || newContext(DEFAULT_KEY, logbooks.MAIN, null);
+  }
+
+  /**
+   * A window opens (main.cjs): it holds `descriptor`, or no logbook (null: the start screen). Its helper
+   * starts when it first calls the core.
+   * @param {any} webContents @param {any} descriptor
+   */
+  function attach(webContents, descriptor) {
+    if (contexts.has(webContents.id)) return setDescriptor(webContents.id, descriptor);
+    return newContext(webContents.id, descriptor, webContents);
+  }
+
+  /** The window holds another logbook, or none: its helper stops (it finishes its saves first) and a new one serves the next. */
+  async function setDescriptor(/** @type {number} */ key, /** @type {any} */ descriptor) {
+    const ctx = contexts.get(key);
+    if (!ctx) return null;
+    await ctx.mirror.catch(() => {});
+    contexts.delete(key);
+    await ctx.host.stop();
+    return newContext(key, descriptor, ctx.webContents);
+  }
+
+  /** The window closed: its helper finishes what it was given, then exits. */
+  async function detach(/** @type {number} */ key) {
+    const ctx = contexts.get(key);
+    if (!ctx) return;
+    contexts.delete(key);
+    await ctx.mirror.catch(() => {});
+    await ctx.host.stop();
+  }
+
+  /** The logbook of a window (null: none open). */
+  function descriptorOf(/** @type {number} */ key) {
+    const ctx = contexts.get(key);
+    return ctx ? ctx.descriptor : null;
+  }
+
+  // --- A file logbook: the core works on a git copy, the .ssrf file is kept up to date ---
+
+  const repoDirOf = (ctx) => path.join(logbooks.cacheDir(userData, ctx.descriptor.id), 'repo');
+  const metaFileOf = (ctx) => path.join(logbooks.cacheDir(userData, ctx.descriptor.id), 'meta.json');
+
+  function writeMeta(ctx, file) {
+    fs.mkdirSync(path.dirname(metaFileOf(ctx)), { recursive: true });
+    fs.writeFileSync(metaFileOf(ctx), JSON.stringify({ hash: logbooks.fileHash(file) }));
+  }
+
+  /**
+   * At the start of the helper: the git copy is made again from the file when the file is not the one
+   * this app last wrote (Subsurface or another program changed it, or this is the first time).
+   */
+  async function prepareFileLogbook(ctx, sendRaw) {
+    const file = ctx.descriptor.location;
+    const repo = repoDirOf(ctx);
+    if (!fs.existsSync(file)) {
+      ctx.failure = 'FILE_MISSING';
+      log(`The logbook file is missing: ${file}`);
+      return;
+    }
+    ctx.failure = '';
+    let meta = {};
+    try {
+      meta = JSON.parse(fs.readFileSync(metaFileOf(ctx), 'utf8'));
+    } catch {
+      // No bookkeeping yet.
+    }
+    if (fs.existsSync(repo) && meta.hash === logbooks.fileHash(file)) return;
+    fs.rmSync(repo, { recursive: true, force: true });
+    fs.mkdirSync(path.dirname(repo), { recursive: true });
+    try {
+      await sendRaw('importFile', { source: file, repo: `${repo}[main]` });
+    } catch (e) {
+      ctx.failure = 'FILE_UNREADABLE';
+      fs.rmSync(repo, { recursive: true, force: true });
+      throw e;
+    }
+    writeMeta(ctx, file);
+  }
+
+  /** Every dive of the logbook in memory, as a .ssrf file at `target` (never the logbook's own file while it is open elsewhere). */
+  async function exportAll(ctx, target) {
+    const staged = path.join(tempDir, 'share', `copy-${ctx.key}-${Date.now()}.ssrf`);
+    fs.mkdirSync(path.dirname(staged), { recursive: true, mode: 0o700 });
+    try {
+      const ids = JSON.parse(await ctx.host.call('listLoadedDives', {})).map((d) => d.id);
+      if (ids.length) await ctx.host.call('exportDives', { ids, format: 'ssrf', anonymize: false, path: staged });
+      else fs.writeFileSync(staged, logbooks.EMPTY_LOGBOOK);
+      const tmp = `${target}.od-tmp`;
+      fs.copyFileSync(staged, tmp);
+      try {
+        fs.renameSync(tmp, target);
+      } catch (e) {
+        // Windows refuses to rename over a file another program holds open (an antivirus, a sync client):
+        // write into the file itself, then.
+        if (!['EPERM', 'EBUSY', 'EACCES'].includes(e.code)) throw e;
+        fs.copyFileSync(tmp, target);
+        fs.rmSync(tmp, { force: true });
+      }
+    } finally {
+      fs.rmSync(staged, { force: true });
+    }
+  }
+
+  /** The file follows the git copy after a save; one write at a time per window. */
+  function mirrorToFile(ctx) {
+    const work = ctx.mirror.catch(() => {}).then(async () => {
+      const file = ctx.descriptor.location;
+      await exportAll(ctx, file);
+      writeMeta(ctx, file);
+    });
+    ctx.mirror = work;
+    return work;
+  }
+
+  /** Saves the logbook in memory as a copy at `target`: a .ssrf file. @param {WindowContext} ctx @param {string} target */
+  async function saveCopy(ctx, target) {
+    if (typeof target !== 'string' || !path.isAbsolute(target)) throw new Error('BAD_ARGUMENT: not a path');
+    await ctx.host.start();
+    await ctx.mirror.catch(() => {});
+    await exportAll(ctx, target);
+    return { path: target };
+  }
+
+  /**
+   * Checks a git repository, with a helper of its own (the windows' helpers keep their logbooks), and
+   * creates the logbook branch of an empty repository when `create`. Same answers as the plugin's gitConnect.
+   * @param {{url: string, branch: string, username: string, token: string, create?: boolean}} options
+   */
+  async function probeGit({ url, branch, username, token, create }) {
+    const probe = new HostProcess({ hostPath, hostArgs, log, onStart: (sendRaw) => coreSetup(sendRaw) });
+    try {
+      await probe.call('gitConfigure', { url, username, token, branch });
+      const exists = JSON.parse(await probe.call('cloudProbe')).exists === true;
+      if (!exists) {
+        if (!create) throw new Error('NO_LOG');
+        await probe.call('gitCreateLog');
+        return { created: true };
+      }
+      return { created: false };
+    } catch (e) {
+      const message = String((e && e.message) || '');
+      const code = message.includes('Credentials rejected') ? 'DENIED' : message.split(':')[0] || 'CORE_ERROR';
+      const error = new Error(KNOWN_GIT_CODES.has(code) ? code : 'NETWORK');
+      error.code = error.message;
+      throw error;
+    } finally {
+      await probe.stop(3000);
+    }
+  }
 
   // --- The path policy ---
 
@@ -273,7 +489,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function allowed(value, kind) {
     if (typeof value !== 'string' || value === '' || value.includes('\0')) return false;
     const plain = path.resolve(value.replace(/\[[^\]/\\]*\]$/, ''));
-    if (SECRET_FILES.has(path.basename(plain)) || DEV_FILES.has(path.basename(plain))) return false;
+    if (SECRET_FILES.has(path.basename(plain)) || SECRET_PATTERN.test(path.basename(plain)) || DEV_FILES.has(path.basename(plain))) return false;
     if (kind === 'temp') return inside(plain, tempDir);
     if (kind === 'data') return inside(plain, userData) || plain === userData;
     if (kind === 'write') return inside(plain, userData) || inside(plain, tempDir);
@@ -310,41 +526,36 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   }
 
-  const host = new HostProcess({
-    hostPath,
-    hostArgs,
-    log,
-    onEvent: (name, data) => send('od:core-event', name, data),
-    onExit: () => send('od:core-event', 'coreRestarted', {}),
-    // The setup, before any other call: HOME and libgit2, then the certificates and the stylesheets
-    // (calls that reach the network must not run before them).
-    async onStart(sendRaw) {
-      await sendRaw('init', { home: userData });
-      try {
-        writeCaFile();
-        await sendRaw('setCaFile', { path: paths.caFile });
-      } catch (e) {
-        log(`Cannot set the certificate authorities: ${e.message}`);
-      }
-      try {
-        await sendRaw('setXsltDir', { dir: paths.xsltDir });
-      } catch (e) {
-        log(`Cannot set the XSLT stylesheets: ${e.message}`);
-      }
-    },
-  });
-
   /** A call from the renderer. */
-  function coreCall(method, args) {
+  async function coreCall(method, args, ctx = contextFor()) {
     if (typeof method !== 'string' || !CORE_METHODS.has(method)) throw new Error(`Unknown method ${method}`);
-    return host.call(method, checkedArgs(method, args));
+    const checked = checkedArgs(method, args);
+    if (ctx.descriptor && ctx.descriptor.kind === 'file') {
+      // Before the first call: a file the app cannot read is told, not shown as an empty logbook.
+      await ctx.host.start();
+      if (ctx.failure) throw new Error(ctx.failure);
+    }
+    const result = await ctx.host.call(method, checked);
+    // The file logbook's file follows every save of its git copy.
+    if (ctx.descriptor && ctx.descriptor.kind === 'file' && (method === 'saveLocal' || method === 'sync')) await mirrorToFile(ctx);
+    return result;
   }
 
   // --- Credentials: safeStorage, one encrypted file per kind (CredentialStore.kt, GitRemoteStore.kt) ---
 
-  function credentialFile(kind) {
+  /**
+   * The file of a kind of credentials. The main logbook has the two files it always had; another
+   * logbook has its own git token (git-remote-<id>.bin) and no Subsurface cloud account.
+   * @param {string} kind @param {WindowContext} ctx
+   */
+  function credentialFile(kind, ctx) {
     if (!CREDENTIAL_FILES[kind]) throw new Error('BAD_ARGUMENT: unknown credentials kind');
-    return path.join(userData, CREDENTIAL_FILES[kind]);
+    // A window with no logbook (the start screen) has no credentials.
+    if (!ctx.descriptor) return null;
+    const own = ctx.descriptor.kind !== 'main' ? ctx.descriptor : null;
+    if (!own) return path.join(userData, CREDENTIAL_FILES[kind]);
+    if (kind !== 'git' || own.kind !== 'git') return null;
+    return path.join(userData, `git-remote-${own.id}.bin`);
   }
 
   function encryptionAvailable() {
@@ -353,9 +564,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     return !(typeof safeStorage.getSelectedStorageBackend === 'function' && safeStorage.getSelectedStorageBackend() === 'basic_text');
   }
 
-  function readCredentials(kind) {
-    const file = credentialFile(kind);
-    if (!fs.existsSync(file) || !encryptionAvailable()) return null;
+  function readCredentials(kind, ctx) {
+    const file = credentialFile(kind, ctx);
+    if (!file || !fs.existsSync(file) || !encryptionAvailable()) return null;
     try {
       const value = JSON.parse(safeStorage.decryptString(fs.readFileSync(file)));
       return CREDENTIAL_FIELDS[kind].every((field) => typeof value[field] === 'string' && value[field] !== '') ? value : null;
@@ -364,8 +575,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   }
 
-  function writeCredentials(kind, value) {
-    const file = credentialFile(kind);
+  function writeCredentials(kind, value, ctx) {
+    const file = credentialFile(kind, ctx);
+    if (!file) throw new Error('BAD_ARGUMENT: this logbook has no such credentials');
     const fields = CREDENTIAL_FIELDS[kind];
     if (!value || typeof value !== 'object' || fields.some((field) => typeof value[field] !== 'string' || value[field] === '')) {
       throw new Error('BAD_ARGUMENT: incomplete credentials');
@@ -382,9 +594,10 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   }
 
-  function clearCredentials(kind) {
+  function clearCredentials(kind, ctx) {
     for (const k of kind ? [kind] : Object.keys(CREDENTIAL_FILES)) {
-      const file = credentialFile(k);
+      const file = credentialFile(k, ctx);
+      if (!file) continue;
       fs.rmSync(file, { force: true });
       fs.rmSync(`${file}.tmp`, { force: true });
     }
@@ -392,7 +605,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // --- Files ---
 
-  function fsCall(op, options = {}) {
+  /** @param {string} op @param {any} [options] @param {WindowContext} [ctx] */
+  function fsCall(op, options = {}, ctx = contextFor()) {
+    const isMain = !!ctx.descriptor && ctx.descriptor.kind === 'main';
     switch (op) {
       case 'writeFile': {
         if (options.area !== 'import' && options.area !== 'share') throw new Error('BAD_ARGUMENT: unknown area');
@@ -419,16 +634,20 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
         return fs.existsSync(options.path);
       }
       case 'removeTree': {
+        if (!isMain) throw new Error('BAD_ARGUMENT: not a logbook folder');
         const target = logbookFolder(options.path);
         fs.rmSync(target, { recursive: true, force: true });
         return true;
       }
       case 'rename': {
+        if (!isMain) throw new Error('BAD_ARGUMENT: not a logbook folder');
         fs.renameSync(logbookFolder(options.from), logbookFolder(options.to));
         return true;
       }
       case 'readDevEnv': {
         if (!DEV_FILES.has(options.name)) throw new Error('BAD_ARGUMENT: unknown file');
+        // The development accounts belong to the main logbook.
+        if (!isMain) return '';
         const file = path.join(userData, options.name);
         return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
       }
@@ -505,28 +724,29 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // --- ipc ---
 
-  /** Answers { ok, value } or { ok, error }: an Error thrown through ipcMain.handle loses its message's form. */
-  const answer = (work) => async (_event, ...args) => {
+  /** Answers { ok, value } or { ok, error }: an Error thrown through ipcMain.handle loses its message's form. The first argument of `work` is the ipc event. */
+  const answer = (work) => async (event, ...args) => {
     try {
-      return { ok: true, value: await work(...args) };
+      return { ok: true, value: await work(event, ...args) };
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e), code: e && e.code };
     }
   };
 
   ipcMain.on('od:paths', (event) => {
-    event.returnValue = { ...paths, platform: process.platform };
+    event.returnValue = { ...paths, platform: process.platform, logbook: contextFor(event).descriptor };
   });
-  ipcMain.handle('od:core', answer((method, args) => coreCall(method, args)));
-  ipcMain.handle('od:credentials', answer((op, kind, value) => {
-    if (op === 'get') return readCredentials(kind);
-    if (op === 'set') return writeCredentials(kind, value) ?? null;
-    if (op === 'clear') return clearCredentials(kind) ?? null;
+  ipcMain.handle('od:core', answer((event, method, args) => coreCall(method, args, contextFor(event))));
+  ipcMain.handle('od:credentials', answer((event, op, kind, value) => {
+    const ctx = contextFor(event);
+    if (op === 'get') return readCredentials(kind, ctx);
+    if (op === 'set') return writeCredentials(kind, value, ctx) ?? null;
+    if (op === 'clear') return clearCredentials(kind, ctx) ?? null;
     throw new Error(`Unknown credentials operation ${op}`);
   }));
-  ipcMain.handle('od:fs', answer((op, options) => fsCall(op, options)));
-  ipcMain.handle('od:htmlToPdf', answer((options) => htmlToPdf(options)));
-  ipcMain.handle('od:placesSearch', answer((options) => placesSearch(options)));
+  ipcMain.handle('od:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
+  ipcMain.handle('od:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
+  ipcMain.handle('od:placesSearch', answer((_event, options) => placesSearch(options)));
   // « Exporter… » on desktop (task 2026-11-15-189): the system's save dialog, then the file staged
   // in <temp>/share copied where the diver chose. Resolves { saved, path }.
   ipcMain.handle('od:saveAs', async (event, options) => {
@@ -545,16 +765,37 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   });
 
-  // Quit: the host finishes what it was given (a save in progress), then exits.
+  /** Every helper finishes what it was given (a save in progress), then exits. */
+  async function stopAll() {
+    await Promise.all([...contexts.values()].map((ctx) => ctx.mirror.catch(() => {}).then(() => ctx.host.stop())));
+  }
+
+  // Quit: the helpers finish what they were given, then the app goes.
   let quitting = false;
   app.on('will-quit', (event) => {
     if (quitting) return;
     quitting = true;
     event.preventDefault();
-    host.stop().finally(() => app.quit());
+    stopAll().finally(() => app.quit());
   });
 
-  return { call: coreCall, stop: () => host.stop(), paths };
+  return {
+    call: (method, args) => coreCall(method, args),
+    stop: stopAll,
+    paths,
+    // Windows and logbooks (windows.cjs)
+    attach,
+    detach,
+    setDescriptor,
+    descriptorOf,
+    /** The core call of a window, as the renderer's, without the path checks (the main process asks). */
+    callFor: (key, method, args) => coreCall(method, args ?? {}, contexts.get(key) || contextFor()),
+    saveCopy: (key, target) => saveCopy(contexts.get(key) || contextFor(), target),
+    probeGit,
+    /** The access of a git logbook, from the dialog (the token never goes back to a renderer). */
+    storeGitAccess: (descriptor, access) => writeCredentials('git', access, { descriptor }),
+    forgetGitAccess: (descriptor) => clearCredentials('git', { descriptor }),
+  };
 }
 
 module.exports = { setupBridge, HostProcess, CORE_METHODS, PATH_ARGS };
