@@ -1942,6 +1942,11 @@
     },
     "nothingNew": "These dives are already in the logbook of the account"
   },
+  "welcomeHelp": {
+    "question": "Any questions?",
+    "link": "About and contact",
+    "label": "Any questions? About and contact"
+  },
   "about": {
     "title": "About",
     "version": "Version {version}",
@@ -1960,6 +1965,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: the « Any questions? About and contact » link at the bottom of the screen opens About, with the support address.",
       "The decorative dive profile (first launch, empty logbook, account pages) is a smooth curve, without corners.",
       "First launch on a tablet: the dive profile no longer touches the screen edges.",
       "First launch on a tablet: a larger logo and OpenDives name.",

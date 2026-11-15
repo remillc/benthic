@@ -57,6 +57,7 @@
 </script>
 
 <EditorialPage class="od-sign-in"
+  helpLink={welcome}
   title={t('signIn.title')}
   heading={t('signIn.heading')}
   intro={t('signIn.intro')}

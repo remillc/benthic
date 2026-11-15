@@ -77,6 +77,7 @@
 </script>
 
 <EditorialPage class="od-create-account"
+  helpLink={welcome}
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={confirmed ? t('createAccount.createdHeading') : t('createAccount.heading')}

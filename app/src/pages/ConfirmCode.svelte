@@ -60,6 +60,7 @@
 </script>
 
 <EditorialPage class="od-confirm-code"
+  helpLink={welcome}
   title={t('createAccount.title')}
   step={t('createAccount.step1')}
   heading={t('confirmCode.heading')}

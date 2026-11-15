@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 81
+Next number: 82
 
 ## List
 
@@ -36,3 +36,4 @@ Next number: 81
 - #79 [site] afficher la liste des ordinateurs de plongée compatibles avec OpenDives (pour un téléchargement).
 - #80 [site] trouver les principaux arguments que nous allons utiliser pour vendre le produit sur le site. L'écran d'accueil d'OpenDives dit : « Téléchargez vos plongées depuis votre ordinateur de plongée, en Bluetooth ou en USB. » Je ne trouve pas ça très vendeur.
 - #69 [design] Première installation : offrir d’importer un carnet d’exemple, pour essayer l’app (Carnet, Détail, Sites, Statistiques) sans ordinateur de plongée ni compte. À décider : où l’offrir (écran de premier lancement, carnet vide), le contenu (quelques plongées variées : eau douce et eau de mer, un voyage, une plongée en recycleur, des sites avec position), comment le marquer comme exemple (bandeau, étiquette) et comment le retirer en un geste avant d’ajouter ses vraies plongées. Il ne doit jamais être synchronisé vers un compte ni mêlé au carnet du plongeur. Décidé par Christian le 15 novembre 2026 : offert sur le premier écran par le lien « Essayer avec un carnet d’exemple » ; l’app reste en mode démo jusqu’à ce que le plongeur le quitte (moyen à déterminer : proposé, un bandeau « Carnet d’exemple » avec « Commencer mon carnet »).
+- #81 [design] un outil de feedback de la part des beta testers

@@ -4048,3 +4048,35 @@ Christian approved this on 15 November 2026.
 - On each of these screens, the link is visible without scrolling on a tablet and opens About.
 - « Retour » from About comes back to the same step.
 - The beta screens are otherwise pixel-identical.
+
+Done (part 2, beta): `app/src/components/WelcomeHelpLink.svelte` (class `od-welcome-help-link`, colour `--od-text-2`, #4B4A47 light / #B5B8BC dark, ⓘ 18 dp, 14 sp, only « À propos et contact » underlined, pointer and hover state), keys `welcomeHelp.question|link|label` in `fr.json` and `en.json`, a release note line. On `WelcomeStart` (Android and iOS branches) and, through a `helpLink` prop of `EditorialPage` set from `welcome`, on the first-launch sign-in, account creation, code and git repository screens. Tablet: centred, pinned 28 dp above the bottom; phone: centred at the end of the content (below the fold when the page does not scroll). It opens `/about` in the first-launch view; « Retour » returns to the same step. Tests: `tests/app/welcome-help-link.test.mjs`. Before/after headless screenshots: only the link's area changes on tablets; on Android phones the geometry is unchanged, only text anti-aliasing differs (the page now scrolls). Not ticked: the coordinator ticks it when both parts are in.
+
+## [ ] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
+
+Christian approved this on 15 November 2026.
+
+**1. Beta, on `main`, on every platform** (Android phone and tablet, iPhone and iPad, desktop). On the empty logbook:
+- The main action « Associer un ordinateur de plongée » becomes **« Télécharger mes plongées »**. The diver does not pair the computer beforehand: pairing happens inside the download, the first time.
+- Its Bluetooth icon becomes a **dive computer icon**: a wrist computer with a dive profile on its screen. These are the exact paths, 24 × 24, as a stroke icon in the button's ink:
+  ```
+  <path d="M9 5.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M9 18.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.5"/>
+  <rect x="5" y="5.5" width="14" height="13" rx="4"/>
+  <path d="M7.5 9.5h1l1.8 4.5h2.4l1.3-2h1.2l1.3-2.5"/>
+  <path d="M19 10.5h1.5"/>
+  ```
+  The Bluetooth icon stays on the next screen, where the app looks for computers nearby.
+- **iPhone:** the help text becomes « Téléchargez vos plongées depuis votre ordinateur de plongée. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main. ».
+- Mock-ups: `android-etat-vide.dc.html`, `ios-etat-vide.dc.html`, `bureau-carnet-vide-actuel.dc.html`.
+- The macOS File menu keeps its longer « Télécharger depuis un ordinateur de plongée ».
+
+**2. Release edition, on `feature/release-new-logbook`** (task 218, not merged into `main`). The tablet empty logbook gets its own layout (`android-tablette-carnet-vide-paysage.dc.html`):
+- The navigation rail.
+- The list pane with the blue « Carnet » band, which shows the logbook name and where it is kept (« Mon carnet · Google Drive », then « Aucune plongée »), with no search field.
+- On the right, a centred 520 dp column:
+  - the smooth decorative profile, without bubbles ;
+  - « Aucune plongée pour l'instant » and its line ;
+  - « Télécharger mes plongées » ;
+  - the paper with « Importer un fichier », « Télécharger depuis divelogs.de » and « Noter une plongée à la main ».
+- Every « Créer le carnet » of task 218 lands here.
+
+**Test:** on each platform, the empty logbook shows « Télécharger mes plongées » with the dive computer icon, and it opens the download.
