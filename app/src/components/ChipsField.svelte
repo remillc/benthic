@@ -14,9 +14,11 @@
    *   values: string[],
    *   suggestions?: string[],
    *   supporting?: string,
+   *   notes?: Record<string, string>,
    * }}
+   * notes: a small text after a chip's name (« sur 2 plongées », when several dives are edited).
    */
-  let { label, values = $bindable(), suggestions = [], supporting = '' } = $props();
+  let { label, values = $bindable(), suggestions = [], supporting = '', notes = {} } = $props();
 
   let typed = $state('');
   let focused = $state(false);
@@ -87,7 +89,7 @@
     <div class="od-chips-field--chips">
       {#each values as value, i (value)}
         <span class="chip od-chips-field--chip">
-          {value}
+          {value}{#if notes[value]}<span class="od-chips-field--note">{notes[value]}</span>{/if}
           <button type="button" class="od-chips-field--remove" onclick={(e) => { e.stopPropagation(); remove(i); }}>
             <Icon name="close" size={18} weight={2} />
             <span class="od-sr-only">{t('chips.remove', { value })}</span>
@@ -163,6 +165,13 @@
         height: 2px;
         background: var(--od-primary-action);
       }
+    }
+
+    /* « sur 2 plongées » after the name of a chip of only some of the dives. */
+    .od-chips-field--note {
+      margin-left: 6px;
+      font-size: 12px;
+      color: var(--od-text-2);
     }
 
     .od-chips-field--label {

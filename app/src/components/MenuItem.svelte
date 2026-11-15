@@ -10,15 +10,19 @@
   /**
    * `link`: a route to open; otherwise `onclick` runs.
    * `destructive`: in the alarm colour on iOS (Human Interface Guidelines).
+   * `disabled`: shown at 38 % and does nothing; `supporting` is the line under its label that
+   * says why (« Seulement des plongées qui se suivent… »).
    * @type {{
    *   icon: import('svelte').ComponentProps<typeof Icon>['name'],
    *   text: string,
    *   link?: string,
    *   onclick?: () => void,
    *   destructive?: boolean,
+   *   disabled?: boolean,
+   *   supporting?: string,
    * }}
    */
-  let { icon, text, link = '#', onclick = undefined, destructive = false } = $props();
+  let { icon, text, link = '#', onclick = undefined, destructive = false, disabled = false, supporting = '' } = $props();
 </script>
 
 {#snippet leading()}<Icon name={icon} weight={2} />{/snippet}
@@ -26,10 +30,12 @@
 
 <!-- Only the slot of this platform: an empty one would still take room. -->
 <ListItem
-  {link}
-  popoverClose
+  link={disabled ? undefined : link}
+  popoverClose={!disabled}
   title={text}
-  class="od-menu-item {destructive ? 'od-menu-item--destructive' : ''}"
-  onClick={onclick}
+  text={supporting || undefined}
+  class="od-menu-item {destructive ? 'od-menu-item--destructive' : ''} {disabled ? 'od-menu-item--disabled' : ''}"
+  onClick={disabled ? undefined : onclick}
+  aria-disabled={disabled ? 'true' : undefined}
   {...theme.ios ? { after: trailing } : { media: leading }}
 />

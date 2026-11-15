@@ -536,6 +536,20 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
++ (NSString *)mergeDives:(NSArray<NSNumber *> *)ids error:(NSError **)error
+{
+	std::string json, message;
+	int ret = opendives::merge_dives(ints(ids), json, message);
+	return edit_or_fail(ret, json, message, error);
+}
+
++ (NSString *)editDives:(NSArray<NSNumber *> *)ids changes:(NSString *)changes error:(NSError **)error
+{
+	std::string json, message;
+	int ret = opendives::edit_dives(ints(ids), str(changes), json, message);
+	return edit_or_fail(ret, json, message, error);
+}
+
 + (NSString *)renumberDives:(NSArray<NSNumber *> *)ids
 		      start:(NSInteger)start
 		    numbers:(NSArray<NSNumber *> *)numbers
