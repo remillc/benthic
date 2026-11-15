@@ -3603,3 +3603,13 @@ The empty-selection hint in the detail pane becomes « Clic droit pour agir sur 
 English: « Plan from this dive », « Share… », « Export the dive… », « Delete the dive », « Enlarge the profile », « Filter… », « Renumber the dives… », « Logbook dive computers », « Merge with the previous trip », « Merge with the next trip », « Right-click to act on the selection ».
 
 Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
+
+## [ ] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html`.
+
+- While a column header is dragged, **no tooltip** is shown: remove « Déposez pour placer « {colonne} » entre … et … ». The floating header, the pale slot at its original place and the 3 dp #114477 insertion bar with its marker are enough.
+- Screen readers still get the announcement through a live region (« « Site » sera placé entre Durée et Compagnons »), not shown on screen.
+- Everything else of task 181 is unchanged (Échap cancels, the order is kept per logbook).
+
+Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
