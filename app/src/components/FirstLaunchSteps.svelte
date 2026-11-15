@@ -11,6 +11,7 @@
   import Icon from './Icon.svelte';
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
   import ReleaseField from './ReleaseField.svelte';
+  import WelcomeHelpLink from './WelcomeHelpLink.svelte';
   import FirstLaunchGit from './FirstLaunchGit.svelte';
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
   import { flow, go, goBack, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
@@ -194,12 +195,6 @@
   /** @param {number} ms */
   const changed = (ms) => dateFormat.format(new Date(ms));
 
-  /** @param {MouseEvent} e */
-  function openAbout(e) {
-    e.preventDefault();
-    f7router.navigate('/about');
-  }
-
   /** The steps whose page title is the step's own title (no logbook name above it). */
   const titles = /** @type {Record<string, string>} */ ({
     start: 'welcomeSteps.startTitle',
@@ -381,10 +376,7 @@
   </div>
 
   <!-- Task 2026-11-15-219: pinned 28 dp above the bottom of the column on every step, so that it does not move. -->
-  <a class="od-first-launch--help" href="/about" aria-label={t('welcomeHelp.label')} onclick={openAbout}>
-    <Icon name="info" size={18} />
-    <span>{t('welcomeHelp.question')} <span class="od-first-launch--help-link">{t('welcomeHelp.link')}</span></span>
-  </a>
+  <WelcomeHelpLink />
 </div>
 
 <style>
@@ -876,49 +868,11 @@
       color: var(--od-text-2);
     }
 
-    /* Task 219: « Une question ? À propos et contact », centred, 28 dp above the bottom of the column. */
-    .od-first-launch--help {
-      position: absolute;
-      left: 64px;
-      right: 64px;
-      bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--od-text-2);
-      text-decoration: none;
-      cursor: pointer;
-
-      &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
-        outline-offset: 4px;
-        border-radius: 4px;
-      }
-
-      @media (hover: hover) {
-        &:hover .od-first-launch--help-link {
-          color: var(--od-text);
-        }
-      }
-    }
-
-    .od-first-launch--help-link {
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
     @media (orientation: portrait) {
       .od-first-launch {
         padding: 0 120px 76px;
       }
 
-      .od-first-launch--help {
-        left: 120px;
-        right: 120px;
-      }
     }
   }
 </style>

@@ -22,6 +22,9 @@
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
+  import ReleaseEmptyLogbook from '../components/ReleaseEmptyLogbook.svelte';
+  import { isRelease } from '../lib/edition.js';
+  import { deviceStore } from '../lib/device-store.js';
   import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -872,8 +875,27 @@
     return list;
   });
 
+  /**
+   * The release edition's empty logbook on a tablet (task 2026-11-15-220): the list pane only shows the band, the
+   * detail pane holds the empty column (components/ReleaseEmptyLogbook.svelte).
+   */
+  const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
+
+  /** « Mon carnet · Dépôt git » then « Aucune plongée »: the logbook's name and where it is kept. */
+  const emptyBand = $derived.by(() => {
+    let name = t('welcomeSteps.defaultName');
+    try {
+      name = deviceStore.getItem('od.logbookName') || name;
+    } catch {
+      // Not fatal: the default name.
+    }
+    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t('welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
+    return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
+  });
+
   /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
   const bandSummary = $derived.by(() => {
+    if (releaseEmpty) return emptyBand;
     if (!logbook.dives.length) return '';
     const sites = new Set(logbook.dives.map((d) => d.site).filter(Boolean)).size;
     // A dive dated in the future (a dive computer's clock) is not the last one done.
@@ -1266,6 +1288,9 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
+    {#if releaseEmpty}
+      <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
+    {:else}
     {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
     <div class="od-logbook--empty">
       <div class="od-logbook--empty-illustration" aria-hidden="true">
@@ -1292,6 +1317,7 @@
         {/each}
       </nav>
     </div>
+    {/if}
   {:else if results && results.length === 0}
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
   {:else if filtered && sorted.length === 0}

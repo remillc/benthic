@@ -1083,6 +1083,10 @@
     "openLogbook": "Open the logbook",
     "gitEmptyOpen": "This repository is empty: it holds no logbook to open.",
     "gitBranchMissing": "This branch does not exist in the repository.",
+    "keptGit": "Git repository",
+    "keptCloud": "Cloud",
+    "keptDevice": "This tablet",
+    "bandNoDives": "No dives",
     "cloudSoon": "The cloud is coming in a later version."
   },
   "signOut": {
@@ -3477,10 +3481,5 @@
     "none": "No dives in Apple Health in the last year. If access was refused, allow OpenDives in Health › Sharing › Apps.",
     "known": "already in the logbook",
     "what": "Apple Health only keeps the time, depth and temperature: the site, gas and buddies are completed in the dive."
-  },
-  "welcomeHelp": {
-    "question": "Any questions?",
-    "link": "About and contact",
-    "label": "Any questions? About and contact"
   }
 }

@@ -1083,6 +1083,10 @@
     "openLogbook": "Ouvrir le carnet",
     "gitEmptyOpen": "Ce dépôt est vide : il ne contient aucun carnet à ouvrir.",
     "gitBranchMissing": "Cette branche n’existe pas dans le dépôt.",
+    "keptGit": "Dépôt git",
+    "keptCloud": "Nuage",
+    "keptDevice": "Cette tablette",
+    "bandNoDives": "Aucune plongée",
     "cloudSoon": "Le nuage arrive dans une prochaine version."
   },
   "signOut": {
@@ -3477,10 +3481,5 @@
     "none": "Aucune plongée dans Apple Santé depuis un an. Si l’accès a été refusé, autorisez OpenDives dans Santé › Partage › Apps.",
     "known": "déjà dans le carnet",
     "what": "Apple Santé ne garde que l’heure, la profondeur et la température : le site, le gaz et les compagnons se complètent dans la plongée."
-  },
-  "welcomeHelp": {
-    "question": "Une question ?",
-    "link": "À propos et contact",
-    "label": "Une question ? À propos et contact"
   }
 }
