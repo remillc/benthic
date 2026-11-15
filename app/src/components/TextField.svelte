@@ -28,8 +28,10 @@
    *   oninput?: (e: Event) => void,
    *   trailing?: import('svelte').Snippet,
    *   keepTrailing?: boolean,
+   *   warning?: boolean,
    * }}
    * keepTrailing: the trailing content stays beside the error icon.
+   * warning: the helper text is a warning (alarm colour and a triangle) and the field is not in error.
    */
   let {
     label,
@@ -45,6 +47,7 @@
     oninput,
     trailing,
     keepTrailing = false,
+    warning = false,
   } = $props();
 
   let focused = $state(false);
@@ -86,7 +89,12 @@
       <div class="od-text-field--trailing">{@render trailing()}</div>
     {/if}
   </div>
-  {#if supporting}<p class="od-text-field--supporting">{supporting}</p>{/if}
+  {#if supporting}
+    <p class="od-text-field--supporting" class:od-text-field--warning={warning}>
+      {#if warning}<Icon name="warning" size={16} />{/if}
+      <span>{supporting}</span>
+    </p>
+  {/if}
 </div>
 
 <style>
@@ -222,8 +230,20 @@
       line-height: 16px;
       color: var(--od-text-2);
 
-      .od-text-field--invalid & {
+      .od-text-field--invalid &,
+      &.od-text-field--warning {
         color: var(--od-alarm);
+      }
+
+      &.od-text-field--warning {
+        display: flex;
+        gap: 4px;
+        align-items: flex-start;
+        padding-left: 12px;
+
+        :global(svg) {
+          flex: none;
+        }
       }
     }
   }
