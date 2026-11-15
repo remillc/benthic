@@ -303,6 +303,12 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour, over the elevation shadow. */
     @media (hover: hover) and (pointer: fine) {
+      .od-fab-menu--item:hover {
+        box-shadow:
+          inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
+          0 1px 3px rgb(0 0 0 / 0.3),
+          0 4px 8px 3px rgb(0 0 0 / 0.15);
+      }
       .od-fab-menu--button:hover {
         box-shadow:
           inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
