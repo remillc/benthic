@@ -31,7 +31,7 @@
   } from '../lib/desktop-sites.js';
   import { clampTableWidth } from '../lib/desktop-table.js';
   import { undoNameKey } from '../lib/undo-name.js';
-  import { navigation } from '../lib/navigation.svelte.js';
+  import { navigation, openAbout } from '../lib/navigation.svelte.js';
   import { connection } from '../lib/online.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { formatDepth, formatShortDate, locale } from '../lib/format.js';
@@ -207,12 +207,15 @@
       { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
       { key: 'separator' },
       { key: 'cleanup', label: '', text: t('sites.cleanupTitle'), icon: 'delete' },
+      // Task 2026-11-15-202: « À propos d'OpenDives » ends the ⋮ menus on Windows and Linux.
+      ...(desktopMac ? [] : [{ key: 'separator' }, { key: 'about', label: '', text: t('desktopSettings.about'), icon: 'info' }]),
     ]),
   );
   /** @param {string} key */
   function moreChoose(key) {
     if (key === 'undo' || key === 'redo') command(key);
     else if (key === 'cleanup') pane = 'cleanup';
+    else if (key === 'about') openAbout();
   }
 
   // --- Keyboard and the Mac's menu bar. ------------------------------------------------------

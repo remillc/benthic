@@ -47,7 +47,7 @@
   {#if !ios}
   <!-- Desktop, Windows and Linux: Réglages above the avatar (task 2026-11-15-169); the Mac has it in its menu bar. -->
   {#if desktopApp && !desktopMac}
-    <a href="#settings" class="od-nav-rail--item od-nav-rail--settings" title="{t('settings.title')} (Ctrl+,)" onclick={(e) => choose(e, openSettings)}>
+    <a href="#settings" class="od-nav-rail--item od-nav-rail--settings" aria-current={navigation.page === 'settings' ? 'page' : undefined} title="{t('settings.title')} (Ctrl+,)" onclick={(e) => choose(e, openSettings)}>
       <span class="od-nav-rail--icon"><Icon name="settings" size={24} /></span>
       <span class="od-nav-rail--label">{t('settings.title')}</span>
     </a>

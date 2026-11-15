@@ -97,9 +97,10 @@ function buildMenu(texts, send, logbooks = {}) {
         { type: 'separator' },
         item(m.columns, 'columns'),
         { type: 'separator' },
-        { role: 'zoomIn', label: m.textBigger },
-        { role: 'zoomOut', label: m.textSmaller },
-        { role: 'resetZoom', label: m.textActual },
+        // « Taille du texte » (task 2026-11-15-202): the app's three sizes, not Chromium's free zoom.
+        item(m.textBigger, 'text:bigger', 'Cmd+Plus'),
+        item(m.textSmaller, 'text:smaller', 'Cmd+-'),
+        item(m.textActual, 'text:actual', 'Cmd+0'),
         { type: 'separator' },
         { role: 'togglefullscreen', label: m.fullScreen },
       ],

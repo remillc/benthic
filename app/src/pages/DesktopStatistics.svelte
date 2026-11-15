@@ -18,7 +18,7 @@
   import HeatMapCard from '../components/HeatMapCard.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { filter } from '../lib/filter.svelte.js';
-  import { navigation, goToSection } from '../lib/navigation.svelte.js';
+  import { navigation, goToSection, openAbout } from '../lib/navigation.svelte.js';
   import { desk, loadExtras } from '../lib/desktop-logbook.svelte.js';
   import { computeStatistics, myStatistics, summaryLine } from '../lib/statistics.svelte.js';
   import {
@@ -355,6 +355,10 @@
       { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
       { key: 'separator' },
       { key: 'new', label: '', text: t('stats.new'), icon: 'plus' },
+      // « Filtre libre… » leaves the top bar for the ⋮; « À propos » ends it (task 2026-11-15-202).
+      { key: 'filter', label: '', text: t('desktopSettings.filterFree'), icon: 'filter', shortcut: desktopMac ? '⇧⌘F' : 'Ctrl+Maj+F' },
+      { key: 'separator' },
+      { key: 'about', label: '', text: t('desktopSettings.about'), icon: 'info' },
     ]),
   );
 
@@ -370,6 +374,8 @@
   function moreChoose(key) {
     if (key === 'undo' || key === 'redo') step(key);
     else if (key === 'new') f7router?.navigate('/statistics/new');
+    else if (key === 'filter') f7router?.navigate('/filter');
+    else if (key === 'about') openAbout();
   }
 
   // Ctrl/⌘+Z and Ctrl/⌘+Shift+Z while this section is the one shown.
@@ -381,7 +387,8 @@
       if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       const modKey = desktopMac ? e.metaKey : e.ctrlKey;
       const k = e.key.toLowerCase();
-      if (modKey && k === 'z') step(e.shiftKey ? 'redo' : 'undo');
+      if (modKey && k === 'f' && e.shiftKey) f7router?.navigate('/filter');
+      else if (modKey && k === 'z') step(e.shiftKey ? 'redo' : 'undo');
       else if (modKey && k === 'y' && !desktopMac) step('redo');
       else return;
       e.preventDefault();
@@ -415,15 +422,6 @@
       <h1 class="od-desktop-statistics--title">{t('stats.title')}</h1>
       {#if summary}<p class="od-desktop-statistics--summary od-value" title={summary}>{summary}</p>{/if}
       <span class="od-desktop-statistics--spacer"></span>
-      <button
-        type="button"
-        class="od-desktop-statistics--outlined"
-        class:od-desktop-statistics--outlined-on={!!filter.ids}
-        aria-label={filter.ids ? t('desktopStats.filterActive') : undefined}
-        onclick={() => f7router?.navigate('/filter')}
-      >
-        <Icon name="filter" size={18} weight={2} />{t('desktopStats.filter')}
-      </button>
       <button type="button" class="od-desktop-statistics--icon-button" aria-label={t('desktopStats.undo')} title="{t('desktopStats.undo')} ({mod}Z)" disabled={!logbook.undoText} onclick={() => step('undo')}>
         <Icon name="undo" size={22} />
       </button>
@@ -593,13 +591,6 @@
     .od-desktop-statistics--outlined:disabled {
       opacity: 0.38;
       cursor: default;
-    }
-
-    /* A filter is on: the button takes the selection's colours. */
-    .od-desktop-statistics--outlined-on {
-      border-color: transparent;
-      background: var(--od-table-selected);
-      color: var(--od-on-table-selected);
     }
 
     .od-desktop-statistics--icon-button {

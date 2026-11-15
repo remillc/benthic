@@ -747,6 +747,15 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   ipcMain.handle('od:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
   ipcMain.handle('od:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
   ipcMain.handle('od:placesSearch', answer((_event, options) => placesSearch(options)));
+  // « Afficher dans le dossier » (task 2026-11-15-202): only a folder of the app's data (the logbooks).
+  ipcMain.handle('od:showInFolder', answer((_event, options) => {
+    const target = path.resolve(String(options?.path ?? ''));
+    if (target !== userData && !(path.dirname(target) === userData && /^carnet(\.[A-Za-z0-9._-]+)?$/.test(path.basename(target)))) throw new Error('BAD_ARGUMENT: not a logbook folder');
+    const { shell } = electron_();
+    if (fs.existsSync(target)) shell.openPath(target);
+    else shell.showItemInFolder(target);
+    return true;
+  }));
   // « Exporter… » on desktop (task 2026-11-15-189): the system's save dialog, then the file staged
   // in <temp>/share copied where the diver chose. Resolves { saved, path }.
   ipcMain.handle('od:saveAs', async (event, options) => {

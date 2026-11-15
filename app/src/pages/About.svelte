@@ -6,7 +6,7 @@
   // and the privacy policy; the credit to Subsurface at the bottom, which its
   // licence requires. Links that leave the app say so and show the
   // external-link icon.
-  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { Page, Navbar, Link, Popup, View } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { layout, bottomNav } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -18,6 +18,12 @@
   import { OpenDivesCore } from 'opendives-core';
   import { exportDives } from '../lib/share.js';
   import { showSnackbar } from '../lib/snackbar.js';
+
+  /**
+   * Desktop app (task 2026-11-15-202): « À propos d'OpenDives » opens as a dialog over the section
+   * (a popup, App.svelte), from the ⋮ menus; its subpages open inside the dialog.
+   */
+  const dialog = layout.desktop;
 
   /** The author's name: a proper name, not translated. */
   const AUTHOR = 'Christian Rémillard';
@@ -139,10 +145,16 @@
   ]);
 </script>
 
+{#snippet aboutPage()}
 <Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
-      {#if !layout.rail && !bottomNav()}
+      {#if dialog}
+        <Link popupClose iconOnly>
+          <Icon name="close" />
+          <span class="od-sr-only">{t('nav.close')}</span>
+        </Link>
+      {:else if !layout.rail && !bottomNav()}
         <MenuButton />
       {:else}
         <Link back iconOnly>
@@ -213,6 +225,15 @@
 
   <p class="od-about--credit">{t('about.copyright', { year: '2026', name: AUTHOR })} {t('about.credit')}</p>
 </Page>
+{/snippet}
+
+{#if dialog}
+  <Popup class="od-about-dialog" push={false}>
+    <View>{@render aboutPage()}</View>
+  </Popup>
+{:else}
+  {@render aboutPage()}
+{/if}
 
 <style>
   @layer od.components {

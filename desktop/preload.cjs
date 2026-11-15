@@ -3,7 +3,7 @@
 // Preload of the desktop app: window.odDesktop, the only door between the
 // renderer and the main process (the contract is documented at the top of
 // desktop/bridge.cjs). Sandbox-compatible: it uses only electron's modules.
-const { contextBridge, ipcRenderer, webUtils } = require('electron');
+const { contextBridge, ipcRenderer, webUtils, webFrame } = require('electron');
 
 /** Calls a handler of the bridge; its { ok, value } answer becomes a resolved value or an Error. */
 async function invoke(channel, ...args) {
@@ -55,6 +55,12 @@ contextBridge.exposeInMainWorld('odDesktop', {
     deleteDevEnv: (options) => invoke('od:fs', 'deleteDevEnv', options),
   },
   htmlToPdf: (options) => invoke('od:htmlToPdf', options),
+  /** « Taille du texte » (task 2026-11-15-202): the window's zoom factor, 1 = normal. */
+  setZoom: (factor) => webFrame.setZoomFactor(Number(factor) || 1),
+  /** « Afficher dans le dossier »: the logbook's folder in the system's file manager. */
+  showInFolder: (options) => invoke('od:showInFolder', options),
+  /** The Mac's Réglages window (desktop/main.cjs): opens it, or brings it forward. */
+  openSettingsWindow: () => invoke('od:settingsWindow'),
   saveAs: (options) => invoke('od:saveAs', options),
   /** The Mac's menu bar (menu.cjs): each item's command, e.g. 'undo', 'find'. Returns an unsubscribe. */
   onMenu(callback) {

@@ -1070,6 +1070,57 @@
       "text": "Dans le détail et la modification d’une plongée"
     }
   },
+  "desktopSettings": {
+    "saved": "Enregistrés tout de suite, sur cet ordinateur",
+    "search": "Rechercher un réglage",
+    "searchShort": "Rechercher",
+    "results": {
+      "one": "{n} réglage pour « {text} »",
+      "other": "{n} réglages pour « {text} »"
+    },
+    "resultsIn": "Dans {categories}",
+    "system": "Système",
+    "unitValues": "Affichage des valeurs",
+    "categories": {
+      "language": "Langue et formats",
+      "units": "Unités",
+      "display": "Affichage",
+      "logbook": "Carnet",
+      "equipment": "Équipement",
+      "decompression": "Profil et décompression",
+      "gases": "Gaz et pressions partielles",
+      "rebreather": "Recycleur",
+      "devices": "Ordinateurs et téléchargement",
+      "maps": "Cartes hors ligne",
+      "advanced": "Avancé"
+    },
+    "notes": {
+      "units": "Elles s’appliquent au carnet, aux outils et aux exports."
+    },
+    "textSize": {
+      "label": "Taille du texte",
+      "text": "Aussi avec {keys}",
+      "small": "Petite",
+      "normal": "Normale",
+      "large": "Grande"
+    },
+    "file": {
+      "title": "Fichier du carnet",
+      "location": "Emplacement",
+      "show": "Afficher dans le dossier"
+    },
+    "account": {
+      "sheet": "Compte",
+      "syncNow": "Synchroniser maintenant",
+      "auto": "Synchroniser automatiquement",
+      "autoText": "À l’ouverture et après chaque modification",
+      "unmetered": "Seulement sur Wi-Fi ou câble",
+      "unmeteredText": "Jamais sur un partage de connexion",
+      "manage": "Gérer le compte"
+    },
+    "about": "À propos d’OpenDives",
+    "filterFree": "Filtre libre…"
+  },
   "gas": {
     "air": "Air",
     "oxygen": "O2",
