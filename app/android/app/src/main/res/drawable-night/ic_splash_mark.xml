@@ -1,63 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Splash screen mark in dark mode, shown large, so without the grey arc: the dark "Trois vagues" logo (docs/brand/opendives-logo-dark.svg). -->
+<!-- Splash screen mark in dark mode: the simple logo (docs/brand/opendives-logo.svg), the same drawing as in light mode. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- The porthole: a disc (circle r 30). -->
-    <path android:fillColor="#FF1E2023" android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
-    <!-- The water in three layers, clipped to the porthole (circle r 29). -->
-    <group>
-        <clip-path android:pathData="M25,54a29,29 0,1 0,58 0a29,29 0,1 0,-58 0Z" />
-        <path android:pathData="M-2,52 Q9,61 20,52 T42,52 T64,52 T86,52 T108,52 T130,52 V100 H-2 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="54"
-                    android:startY="47.5"
-                    android:endX="54"
-                    android:endY="100">
-                    <item android:offset="0" android:color="#FFD6E4F4" />
-                    <item android:offset="1" android:color="#FFBED3EC" />
-                </gradient>
-            </aapt:attr>
-        </path>
-        <path android:pathData="M-5,60.5 Q6,69.5 17,60.5 T39,60.5 T61,60.5 T83,60.5 T105,60.5 T127,60.5 V100 H-5 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="54"
-                    android:startY="56"
-                    android:endX="54"
-                    android:endY="100">
-                    <item android:offset="0" android:color="#FF93B6E0" />
-                    <item android:offset="1" android:color="#FF77A0D2" />
-                </gradient>
-            </aapt:attr>
-        </path>
-        <path android:pathData="M-8,69 Q3,78 14,69 T36,69 T58,69 T80,69 T102,69 T124,69 V100 H-8 Z">
-            <aapt:attr name="android:fillColor">
-                <gradient
-                    android:type="linear"
-                    android:startX="54"
-                    android:startY="64.5"
-                    android:endX="54"
-                    android:endY="100">
-                    <item android:offset="0" android:color="#FF4F84C2" />
-                    <item android:offset="1" android:color="#FF3A6FAE" />
-                </gradient>
-            </aapt:attr>
-        </path>
-    </group>
-    <!-- The ring, only under the water. -->
+    <!-- The disc: radius 30 of the 108 grid, centred (docs/brand/opendives-logo.svg scaled by 30/11). -->
+    <path android:fillColor="#FF114477" android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z" />
+    <!-- The wave: one white stroke, rounded ends, width 2 x 30/11. -->
     <path
-        android:pathData="M24,54 A30,30 0 0,0 84,54"
-        android:strokeColor="#FFF4F4F2"
-        android:strokeWidth="3"
+        android:pathData="M34.909,56.727 Q44.455,48.545 54,56.727 T73.091,56.727"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="5.455"
         android:strokeLineCap="round" />
-    <!-- Bubbles. -->
-    <path android:fillColor="#FFF4F4F2" android:pathData="M58.4,39a3.6,3.6 0,1 0,7.2 0a3.6,3.6 0,1 0,-7.2 0Z" />
-    <path android:fillColor="#FFF4F4F2" android:pathData="M53.9,30.8a2.6,2.6 0,1 0,5.2 0a2.6,2.6 0,1 0,-5.2 0Z" />
 </vector>

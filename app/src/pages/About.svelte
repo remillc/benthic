@@ -166,7 +166,7 @@
   </Navbar>
 
   <header class="od-about--head">
-    <!-- The large standalone logo, without the grey arc of the small sizes (spec, "Logo"). -->
+    <!-- The simple logo, the same drawing in light and dark mode. -->
     <img class="od-about--logo od-about--light" src="logo-light.svg" alt="" width="112" height="112" />
     <img class="od-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>OpenDives</h1>

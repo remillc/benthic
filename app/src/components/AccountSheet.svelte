@@ -166,7 +166,7 @@
         <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
       </button>
       <!-- Centred on the sheet's width: an empty 48 dp slot on the right balances ✕ (task 2026-11-14-156).
-           The retained logo of the light surfaces, and its dark variant (task 2026-11-14-123). -->
+           The simple logo (the same drawing in both files) (task 2026-11-14-123). -->
       <span class="od-account-sheet--brand">
         <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
         <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
