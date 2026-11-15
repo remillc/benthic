@@ -285,5 +285,21 @@
         font-weight: 400;
       }
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-row-menu--option {
+        transition: box-shadow 120ms linear;
+      }
+      .od-row-menu--option:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-row-menu--option {
+        transition: none;
+      }
+    }
   }
 </style>
