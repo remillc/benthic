@@ -67,3 +67,13 @@ OPENDIVES_HOST=build/desktop/opendives-host node --test tests/desktop/host.test.
 node --test tests/desktop/bridge.test.mjs      # the bridge, with a fake host: no native build needed
 node --import ./tests/app/register.mjs --test tests/app/desktop-plugin.test.mjs
 ```
+
+### Personal clouds
+
+`cloud.cjs` signs in to Google Drive, OneDrive and Dropbox (OAuth 2 with PKCE, system browser, loopback redirect) and syncs a cloud logbook's .ssrf file; `bridge.cjs` runs the sync around the working copy (see docs/architecture.md, section 10). The client ids are read from `desktop/oauth-clients.local.json` (git-ignored, never logged):
+
+```json
+{ "google": { "clientId": "...", "clientSecret": "..." }, "microsoft": { "clientId": "..." }, "dropbox": { "appKey": "..." } }
+```
+
+A service missing from the file shows "Pas encore disponible" and cannot be chosen. Tests: `node --test tests/desktop/cloud.test.mjs` (a fake OAuth server and fake providers; no real account), `tests/desktop/startup.test.mjs` (« Ouvrir au démarrage »).
