@@ -5,8 +5,11 @@
   // gradient, stretched across the width it is given. Decoration only: hidden
   // from screen readers.
 
-  /** @type {{ class?: string }} */
-  let { class: extraClass = '' } = $props();
+  /**
+   * `trace`: the line in the profile ink (`--od-trace`, 1.25 dp) instead of the text colour (1.5 dp).
+   * @type {{ class?: string, trace?: boolean }}
+   */
+  let { class: extraClass = '', trace = false } = $props();
 
   // The profile of a dive (time in s, depth in m), as in the mock-ups.
   const POINTS = [
@@ -30,7 +33,7 @@
     </linearGradient>
   </defs>
   <path class="od-decorative-profile--water" d="{line} Z" fill="url(#{gradient})"></path>
-  <path class="od-decorative-profile--line" d={line}></path>
+  <path class="od-decorative-profile--line" class:od-decorative-profile--trace={trace} d={line}></path>
 </svg>
 
 <style>
@@ -58,6 +61,11 @@
       stroke-width: 1.5;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
+    }
+
+    .od-decorative-profile--trace {
+      stroke: var(--od-trace);
+      stroke-width: 1.25;
     }
   }
 </style>

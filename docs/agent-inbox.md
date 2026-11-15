@@ -3809,7 +3809,7 @@ Tests: the launcher icon, the splash screen (light and dark), the About screen, 
 
 Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
 
-## [ ] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
+## [x] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
 
 Christian approved this on 15 November 2026. Mock-up: `docs/mockups/android-etat-vide.dc.html` (« Carnet vide · Android »). The empty state of the Logbook (`app/src/pages/Logbook.svelte`, `emptyTitle`), on phone and tablet (on tablet, the same column, max 440 dp wide, centred as on the tablet first launch).
 
@@ -3827,13 +3827,18 @@ Dark mode: the same layout with the dark tokens (card `--od-surface`, icon conta
 
 Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
 
-## [ ] 2026-11-15-205 iPhone first launch: check the water colour under the profile
+Done: the empty logbook (`Logbook.svelte`) shows the shared `DecorativeProfile` (new `trace` option: `--od-trace`, 1.25 dp) at 104 dp with three bubble outlines (`--od-bubble`, aria-hidden), the new title and text, a 56 dp « Associer un ordinateur de plongée » button, and one card of three option rows (icon container `--od-secondary-container` / `--od-secondary`, so dark mode follows the tokens). The old note and the QR-scan row are gone from this screen (scan stays in the « + » menu). Column of at most 440 dp, centred. iOS builds the same structure with 50 dp / 14 dp button and 12 dp card corners. Test: `tests/app/empty-logbook.test.mjs`.
+
+## [x] 2026-11-15-205 iPhone first launch: check the water colour under the profile
 
 Christian approved this on 15 November 2026. The mock-up `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone ») had the water under the profile going from #D4E2F2 to black (#1F2124); it now goes to #5584B5, as on Android and everywhere else. `app/src/pages/WelcomeStart.svelte` already uses `--od-water-top` and `--od-water-bottom`, so this is a check, not a change: on iOS (light and dark), the water must end in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the profile line stay `--od-trace`. If an iOS-specific style or an older build still darkens it, fix it there.
 
 Test: the iPhone first launch in light mode shows a blue water column, never black, under a #1F2124 line.
 
-## [ ] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
+
+Done: checked, nothing to change. In a browser with `?theme=ios` (iPhone 393 x 852 and iPad 820 x 1180, light and dark), the computed water gradient ends in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the line is `--od-trace` (#1F2124 light, #F4F4F2 dark); no iOS-specific style darkens it. Guarded by `tests/app/welcome-start.test.mjs`.
+
+## [x] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
 
 Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »). Mock-up: `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone »). The iOS layout does not change (large title, the profile, a grouped list with chevrons); only the texts become those of the Android first launch, already in `app/src/i18n/fr.json` (`welcome`):
 - under « OpenDives »: « Votre carnet de plongée. » (instead of `welcome.intro`);
@@ -3845,6 +3850,9 @@ Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »
 Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` from every language file. English follows the existing English keys of the same names.
 
 Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
+
+
+Done: the iOS branch of `WelcomeStart.svelte` now uses `welcome.headline` under the title, `existingShort`/`existingNote`, `createShort`/`createNote`, `noAccount` with `noAccountNotePhone` (phone) or `noAccountNoteTablet` (iPad); the git link is unchanged. `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` are removed from en, fr and fr-CA (nothing else referenced them). One release-note line added (fr, en). Layout unchanged; checked in a browser at iPhone and iPad sizes, light and dark.
 
 ## [x] 2026-11-15-207 New logbook dialog: a close button at every step
 
@@ -3870,3 +3878,12 @@ English: « Step 1 of 3 », « In your cloud », « Choose the service to keep t
 Tests: the dialog keeps the same size and place through every step and back; step 3 shows « Se connecter à {service} » until the sign-in comes back, then the connected state and « Créer le carnet »; a service already authorised opens step 3 connected; « Changer de compte » signs in with another account; WebDAV creates the logbook only with a valid server and credentials.
 
 Done: the cloud path is three steps in one 560 × 526 frame (checked at every step and back: same size and place, 150 ms cross-fade, none with reduced motion): the services (Google Drive, OneDrive, Dropbox, iCloud Drive on macOS as a disabled « Pas encore disponible » row, WebDAV ou Nextcloud), then the connection step with the band, « Se connecter à {service} » (becomes « Annuler la connexion » with « Rouvrir la page » while the browser waits, cancelled on ✕, Échap, « Retour »), the connected state with « Changer de compte » (sign-in again choosing an account; the stored account is replaced only on success) and « Créer le carnet ». No « Dossier » field: the file goes into an OpenDives folder. WebDAV ou Nextcloud is built in `desktop/cloud.cjs` (see architecture, section 10) with errors under the field concerned; verified end to end in Electron against a fake WebDAV server. Official service logos are still neutral squares.
+
+## [x] 2026-11-15-209 App: the simple logo with relief replaces the flat simple logo
+
+Christian approved this on 15 November 2026. After task 203 (the simple logo everywhere), the logo in use is « Simple en relief »: `docs/brand/opendives-logo-relief.svg` (board `docs/mockups/logo-simple-relief.dc.html`; `docs/system-design.md`, « Logo in use »). Same drawing as the simple logo, with relief: the disc filled with a vertical gradient #1F5C99 → #0C3866, a 0.6 rim at radius 10.7 stroked with a white gradient (20 % at the top to 0 % halfway), the wave at stroke 2.2, and under it the same wave shifted 1.1 down in #072A4D at 35 % opacity.
+
+Replace the flat simple logo by this one everywhere task 203 put it: `docs/brand/` (it becomes `opendives-logo.svg`; regenerate the icon and logo files and their PNGs; move the flat ones to `docs/brand/previous/`), Android (`ic_launcher_foreground.xml`, every `mipmap-*/ic_launcher*.png`, `ic_splash_mark.xml` light and night; the monochrome icon stays flat: the disc with the wave cut out), iOS (`AppIcon-1024.png`, `AppIcon-1024-dark.png`, `Splash.imageset`), web (`app/public/favicon.svg`, `apple-touch-icon.png`, `logo-light.svg`, `logo-dark.svg`, `logo-menu.svg`), the components that draw the logo inline (About, first launch, account sheet, side menu, desktop title bar, desktop splash and start screen), and the desktop window and taskbar icons (`desktop/resources/icon.png`, `icon-round.png`). Give the gradients unique ids in inline SVGs, so two logos on one screen do not share them. Rebuild `app/dist` so the desktop app shows it.
+
+Tests: every place that showed the flat simple logo shows the relief version; the Android monochrome icon stays flat; the favicon at 16 px stays readable.
+Done: the relief logo replaces the flat simple logo on this branch in `docs/brand/` (`opendives-logo.svg`, icon and logo files, `opendives-icon-1024.png`, `opendives-logo-1024.png`; the flat files are in `docs/brand/previous/` with the suffix `-simple`), Android (foreground and splash marks with gradients in `aapt:attr`, minSdk 24; launcher PNGs; the monochrome icon stays flat), iOS (AppIcon light and dark, now full-bleed and opaque; Splash.imageset) and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files as images, so no gradient id is shared). The favicon is the relief simplified (disc gradient and a 2.6 wave, no rim, no shadow wave) because the shadow made the wave grey at 16 px. `tools/build-logo-assets.mjs` rebuilds every file (PNGs drawn by Edge headless). `tests/app/logo.test.mjs` checks them. Left to the desktop branch: the title bar, desktop splash and start screen, `desktop/resources/icon*.png`, and the rebuild of `app/dist`.

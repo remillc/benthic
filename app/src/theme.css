@@ -151,6 +151,8 @@
     --od-on-primary-action: var(--od-on-action);
     --od-cursor: var(--od-action);
     --od-water-top: #D4E2F2;
+    /* The bubble outlines of the empty logbook illustration, white on the water in both modes. */
+    --od-bubble: #FFFFFF;
     /* The active item of the bottom navigation bar (task 2026-11-14-120): primary container and primary. */
     --od-nav-active-container: #D4E2F2;
     --od-nav-active: #114477;
@@ -358,6 +360,7 @@
     --od-action: #F4F4F2;
     --od-on-action: #1F2124;
     --od-cursor: #F4F4F2;
+    --od-bubble: #FFFFFF;
     --od-water-top: #BFD6F0;
     --od-nav-active-container: #1E3552;
     --od-nav-active: #8FB6E6;
