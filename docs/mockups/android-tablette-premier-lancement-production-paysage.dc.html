@@ -32,9 +32,9 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </style>
 </helmet>
 <div style="position: relative; width: 1280px; height: 800px; box-sizing: border-box; background: #F5F4F0; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124; overflow: hidden; display: flex"><style>
-@keyframes odpl-draw{from{stroke-dashoffset:0.66}to{stroke-dashoffset:0}}
+@keyframes odpl-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes odpl-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.odpl-line{stroke-dasharray:0.66 1;animation:odpl-draw 1.6s cubic-bezier(.2,0,0,1) both}
+.odpl-line{stroke-dasharray:1;animation:odpl-draw 1.6s cubic-bezier(.2,0,0,1) both}
 .odpl-chip{animation:odpl-in .5s 1.2s cubic-bezier(.2,0,0,1) both}
 .odpl-row{transition:transform .15s, box-shadow .15s}.odpl-row:hover{transform:translateY(-1px)}
 @media (prefers-reduced-motion: reduce){.odpl-line,.odpl-chip{animation:none}}
