@@ -305,6 +305,19 @@
         margin-right: 0;
       }
 
+      /* A larger brand row (task 2026-11-15-210): logo 96 dp, « OpenDives » 48 sp; the rest does not move. */
+      .od-welcome-start--brand {
+        gap: 20px;
+        font-size: 48px;
+        line-height: 56px;
+        letter-spacing: -0.5px;
+      }
+
+      .od-welcome-start--logo {
+        width: 96px;
+        height: 96px;
+      }
+
       .od-welcome-start--actions {
         display: flex;
         flex-direction: column;

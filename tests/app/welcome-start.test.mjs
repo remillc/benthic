@@ -28,3 +28,12 @@ test('the water gradient ends in --od-water-bottom and the line is --od-trace', 
   assert.match(source, /\.od-welcome-start--trace \{[^}]*stroke: var\(--od-trace\);/);
   assert.doesNotMatch(source, /--od-water-bottom:|#1F2124/i);
 });
+
+test('tablet first launch: a larger brand row (logo 96 dp, « OpenDives » 48 sp), the phone unchanged', () => {
+  const tablet = source.slice(source.indexOf('@media (min-width: 768px)'));
+  assert.match(tablet, /\.od-welcome-start--brand \{\s*gap: 20px;\s*font-size: 48px;\s*line-height: 56px;\s*letter-spacing: -0\.5px;/);
+  assert.match(tablet, /\.od-welcome-start--logo \{\s*width: 96px;\s*height: 96px;/);
+  const phone = source.slice(0, source.indexOf('@media (min-width: 768px)'));
+  assert.match(phone, /\.od-welcome-start--brand \{[^}]*gap: 10px;[^}]*font-size: 20px;/);
+  assert.match(source, /src="logo-light\.svg" alt="" width="40" height="40"/);
+});
