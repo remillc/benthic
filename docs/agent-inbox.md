@@ -3171,7 +3171,7 @@ Phone and tablet (on the tablet, the wizard is the detail pane); iOS: the same t
 
 Done in feature/delete-wizard. DeleteAccount.svelte is now the wizard od-delete-wizard: one page, the step in its state (nothing remembered, the next opening starts at step 1). Progress od-delete-wizard--steps (progressbar, three 4 dp segments in --od-secondary / --od-separator, « Étape n sur 3 · title »). Step 1: alarm box « C'est définitif ! » / « Il n'y a aucun moyen d'annuler. », the card of three rows (trash and cloud in --od-alarm, a new 'desktop' icon in ink), the next-step sentence. Step 2: the question (U+202F before « ? »), the card with the checkbox (checked by default) and the outlined export button, od-delete-wizard--nothing-kept (dashed, --od-alarm-on-field = #B71C1C) only when unchecked and nothing exported. Step 3: « En résumé » (erased; kept or « Rien n'est gardé… »), the password field empty and focused on arrival (keyboard open, checked on the emulator with real taps), the note, « Supprimer définitivement le compte » 48 dp with a trash icon, MD3 disabled until a password is typed, then --od-alarm. « Continuer » 40 dp ink with a trailing arrow. Back arrow and system Back (lib/back-button.js, od-cancel on the wizard from step 2) go back one step; at step 1 the Account page; iOS swipe back off from step 2. « Annuler » returns to the Account page. The texts naming the device have a tablet variant (« cette tablette »), as in task 164; fr-CA says « nuage ». The export still does not exist (it says so), so the summary has no « exported » line yet: exported stays false. The old deleteAccount.consequence text goes. No test read the deletion page (deep-link only checks the route).
 
-## [ ] 2026-11-15-168 Logbook header: « dernière plongée il y a … » never breaks inside
+## [x] 2026-11-15-168 Logbook header: « dernière plongée il y a … » never breaks inside
 
 Christian decided this on 15 November 2026. Mock-ups: `android-carnet.dc.html` and `android-carnet-groupe.dc.html`.
 
@@ -3180,3 +3180,5 @@ The summary line under the « Carnet » title reads « {n} plongées · {n} site
 This follows the rule for relative times in `docs/ui-writing.md` (task 159). Extend it there: a counter line that ends with « dernière … il y a … » keeps that whole clause together. English: « last dive {duration} ago », same rule.
 
 Phone and tablet, Android and iOS.
+
+Done: in the band summary the last-dive clause is joined with no-break spaces and « · » is glued to the item before it; rule added to docs/ui-writing.md, section 8.

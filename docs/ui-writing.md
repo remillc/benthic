@@ -65,6 +65,7 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 - Non-breaking space before « : », « ? », « ! » and inside « ».
 - Never break a line between a number and its unit, in every language: join them with a non-breaking space (U+00A0) — « 27,6 m », « 1,6 bar », « 302 Mo », « 90 % », « 14 h 30 », « 9 plongées », en « 27.6 m », « 302 MB » (decided on 13 November 2026).
 - Never break a line inside a relative time: « il y a 2 min », « dans 3 h », « hier à 14 h 30 », en « 2 min ago », « in 3 h » stay on one line, joined with non-breaking spaces, so a long status breaks before them (« Synchronisé / il y a 2 min ») (decided on 14 November 2026).
+- A counter line that ends with « dernière … il y a … » keeps that whole clause on one line: « 9 plongées · 4 sites · / dernière plongée il y a 9 mois », en « 9 dives · 4 sites · / last dive 9 months ago ». A « · » separator never starts a line (decided on 15 November 2026).
 - Sentence case, no title case.
 
 ### 9. Vocabulary (French)

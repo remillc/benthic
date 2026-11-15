@@ -853,9 +853,12 @@
     // A dive dated in the future (a dive computer's clock) is not the last one done.
     const now = localNowIso();
     const latest = logbook.dives.reduce((a, d) => (d.date <= now && d.date > a ? d.date : a), '');
-    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), latest ? t('band.lastDive', { ago: formatTimeAgo(latest) }) : '']
+    // "dernière plongée il y a 9 mois" is one unbreakable block, and a "·" never starts a
+    // line: a long summary moves the whole block to the second row (docs/ui-writing.md, 8).
+    const last = latest ? t('band.lastDive', { ago: formatTimeAgo(latest) }).replace(/ /g, ' ') : '';
+    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), last]
       .filter(Boolean)
-      .join(' · ');
+      .join(' · ');
   });
 
   /** Number of dives shown: follows the search (the filter row counts the filter). */
