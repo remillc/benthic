@@ -3427,3 +3427,17 @@ English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues �
 
 Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
 
+## [ ] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
+
+Christian decided this on 15 November 2026: in the detail pane, a diver could not tell that the fields were editable in place. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet screens.
+
+- **Every editable field of the Informations tab is shown as a field at rest, on every screen:** #ECEAE4 fill, 8 dp corners, 40 dp high, 8 dp between rows. No pencil at rest (the pencil appears on hover only, task 172).
+- **An empty editable field shows its invitation** in #4B4A47: « Ajouter des compagnons », « Ajouter la visibilité », « Site à préciser » for the site.
+- **Read-only values** (Ordinateur, what the dive computer recorded) stay plain text with no fill.
+- **One hint line above the fields**, 13 px #4B4A47: « Les champs gris se modifient d'un clic et s'enregistrent tout de suite. »
+- **No floating toolbar on desktop.** The detail pane's actions stay in its ⋮ menu, the right-click menu and the keyboard shortcuts.
+
+English: « Grey fields can be edited with a click and are saved at once. », « Add buddies », « Add the visibility ».
+
+Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
+
