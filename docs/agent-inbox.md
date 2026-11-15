@@ -3496,3 +3496,19 @@ English: « Copy saved · Open ».
 
 Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
 
+## [ ] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-exporter.dc.html` (the dialog), `docs/mockups/bureau-carnets-selecteur.dc.html` (« Exporter le carnet… » in the logbook selector). The formats and the anonymise option are those of the phone (`docs/ui-specification.md`, « Logbook selection and export »).
+
+- **Where:** « Exporter… » in the right-click menu and in the dive's ⋮ menu (Ctrl/⌘+Maj+E); « Exporter le carnet… » (Ctrl+Maj+E) in the logbook selector on Windows and Linux, under « Enregistrer une copie… »; Fichier › Exporter… (⇧⌘E) on macOS.
+- **The dialog**, titled with the count (« Exporter 2 plongées »):
+  - « Quelles plongées », as choice rows (no radio buttons): « Les 2 plongées sélectionnées » (with their numbers) when dives are selected, « Les 12 plongées filtrées » when a filter is active, « Tout le carnet » (with its count). The default is the selection, else the filter, else the whole logbook. « Exporter le carnet… » opens it on « Tout le carnet ».
+  - « Format », as choice rows with a line each: Fichier carnet (.ssrf) « Lisible par OpenDives et d'autres carnets », UDDF (.uddf), CSV liste des plongées, CSV profils, Fiches PDF. The last format chosen is remembered.
+  - The « Anonymiser » switch (off by default): removes people's names, notes and GPS positions.
+  - « Annuler » and « Exporter… », which opens the system's save dialog with a proposed name (« plongees-6-7.ssrf », « carnet-2026-11-15.uddf »).
+- The title and the count update when the « Quelles plongées » choice changes.
+
+English: « Export 2 dives », « Which dives », « The 2 selected dives », « The 12 filtered dives », « The whole logbook », « Format », « Anonymise », « Export… », « Export the logbook… ».
+
+Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
+
