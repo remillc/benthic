@@ -72,7 +72,7 @@ await run(`(() => {
   for (const el of document.querySelectorAll('body *')) {
     if (!el.getClientRects().length) continue;
     const r = el.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1 || r.bottom < 0 || r.right < 0 || r.top > innerHeight || r.left > innerWidth) continue;
+    if (r.width < 1 || r.height < 1) continue;
     const cs = getComputedStyle(el);
     if (cs.visibility !== 'visible' || cs.pointerEvents === 'none' || cs.cursor !== 'pointer') continue;
     // Children inherit the hand: only the outermost element of a clickable area is audited.
