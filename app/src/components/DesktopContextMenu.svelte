@@ -72,9 +72,9 @@
       {#if entry.key === 'separator'}
         <div class="od-context-menu--separator" role="separator"></div>
       {:else if 'label' in entry}
-        <button type="button" role="menuitem" class="od-context-menu--item" class:od-context-menu--danger={entry.danger} disabled={entry.disabled} aria-disabled={entry.disabled} onclick={() => choose(entry.key)}>
+        <button type="button" role="menuitem" class="od-context-menu--item" class:od-context-menu--danger={entry.danger} disabled={entry.disabled} aria-disabled={entry.disabled} title={entry.hint ? t(entry.hint) : undefined} onclick={() => choose(entry.key)}>
           <Icon name={/** @type {any} */ (entry.icon)} size={20} />
-          <span class="od-context-menu--label">{entry.text ?? t(entry.label)}</span>
+          <span class="od-context-menu--label">{entry.text ?? t(entry.label)}{#if entry.hint}<span class="od-context-menu--hint">{t(entry.hint)}</span>{/if}</span>
           {#if entry.shortcut}<kbd class="od-context-menu--shortcut">{entry.shortcut}</kbd>{/if}
         </button>
       {/if}
@@ -112,7 +112,7 @@
       align-items: center;
       gap: 12px;
       width: 100%;
-      height: 44px;
+      min-height: 44px;
       padding: 0 16px;
       border: 0;
       background: none;
@@ -133,6 +133,14 @@
     }
     .od-context-menu--label {
       flex: 1;
+    }
+    /* The supporting line of a disabled item: why it cannot be chosen. */
+    .od-context-menu--hint {
+      display: block;
+      padding-block: 2px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
     }
     .od-context-menu--shortcut {
       font: inherit;

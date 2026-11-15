@@ -451,6 +451,18 @@ void register_methods()
 			fail(error);
 		return edit_result(json);
 	});
+	add("mergeDives", core, [](const Args &a) {
+		std::string json, error;
+		if (opendives::merge_dives(a.ints("ids"), json, error))
+			fail(error);
+		return edit_result(json);
+	});
+	add("editDives", core, [](const Args &a) {
+		std::string json, error;
+		if (opendives::edit_dives(a.ints("ids"), a.str("changes"), json, error))
+			fail(error);
+		return edit_result(json);
+	});
 	add("renumberDives", core, [](const Args &a) {
 		std::string json, error;
 		if (opendives::renumber_dives(a.ints("ids"), a.i32("start"), json, error, a.ints("numbers")))

@@ -676,6 +676,18 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     return { json: await this.core('deleteDive', { ids }) };
   }
 
+  /** Merges dives into one (task 2026-11-15-178). @param {{ids?: number[]}} options */
+  async mergeDives(options) {
+    if (!options?.ids || options.ids.length < 2) throw reject('Missing ids', 'BAD_ARGUMENT');
+    return { json: await this.core('mergeDives', { ids: options.ids }) };
+  }
+
+  /** The same changes on several dives (task 2026-11-15-178). @param {{ids?: number[], changes?: object}} options */
+  async editDives(options) {
+    if (!options?.ids?.length || options.changes == null) throw reject('Missing ids or changes', 'BAD_ARGUMENT');
+    return { json: await this.core('editDives', { ids: options.ids, changes: JSON.stringify(options.changes) }) };
+  }
+
   /** @param {{start?: number, ids?: number[], numbers?: number[]}} options */
   async renumberDives(options) {
     if (options?.start == null) throw reject('Missing start', 'BAD_ARGUMENT');

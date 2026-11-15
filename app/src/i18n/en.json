@@ -1840,6 +1840,22 @@
     "editFailed": "The dives could not be edited. No dive was changed.",
     "loadFailed": "The dives could not be read."
   },
+  "desktopMultiDive": {
+    "apply": {
+      "one": "Apply to the dive",
+      "other": "Apply to the {n} dives"
+    },
+    "paste": "Paste",
+    "copied": {
+      "one": "{n} dive copied",
+      "other": "{n} dives copied"
+    },
+    "copyFailed": "The copy failed.",
+    "pasted": {
+      "one": "{n} dive pasted",
+      "other": "{n} dives pasted"
+    }
+  },
   "dialog": {
     "close": "Close",
     "ok": "OK",

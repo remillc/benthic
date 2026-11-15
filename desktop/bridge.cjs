@@ -38,6 +38,10 @@
 //   fs.deleteDevEnv({name})  deletes cloud-dev.env
 //   htmlToPdf({html, name, letter})   renders a page to a PDF in <temp>/share: resolves { path }
 //   saveAs({path, name})     the system's save dialog for a file of <temp>/share: resolves { saved, path }
+//   clipboard.write({text, dives})   the system clipboard gets the plain text; the dives' Subsurface XML is
+//                            kept by the main process with it (task 2026-11-15-178)
+//   clipboard.read()         resolves { text, dives }: the plain text, and the dives' XML while the clipboard
+//                            still holds the text copied with them ('' otherwise)
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
 // One window, one logbook, one helper (task 2026-11-15-173): `od:paths` also returns `logbook`, the
@@ -72,7 +76,7 @@ const CORE_METHODS = new Set([
   'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
   'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'cloudProbe', 'gitCheck',
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
-  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'renumberDives', 'importDives', 'filterPresets',
+  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',
   'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
@@ -769,6 +773,36 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       if (chosen.canceled || !chosen.filePath) return { ok: true, value: { saved: false } };
       await fs.promises.copyFile(from, chosen.filePath);
       return { ok: true, value: { saved: true, path: chosen.filePath } };
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
+
+  // Copy and paste of dives (task 2026-11-15-178). Electron cannot put the plain text and a custom
+  // type on the clipboard together: every write (writeText, writeBuffer) replaces the others, so
+  // writing the private type application/x-opendives-dives would lose the text a spreadsheet pastes.
+  // The plain text is written, and the dives' XML (the private type's content) is kept here, in the
+  // main process, tied to that text: read() gives it back while the clipboard still holds exactly that
+  // text, from any window of this app. Another application's copy replaces the text, so the dives
+  // are then not offered (a pasted `<divelog>` text still is, by the renderer).
+  const CLIPBOARD_LIMIT = 50 * 1024 * 1024;
+  let copied = { text: '', dives: '' };
+  ipcMain.handle('od:clipboard', async (_event, action, options) => {
+    try {
+      const { clipboard } = electron_();
+      if (action === 'write') {
+        const text = String(options?.text ?? '');
+        const dives = String(options?.dives ?? '');
+        if (text.length + dives.length > CLIPBOARD_LIMIT) throw new Error('BAD_ARGUMENT: too much to copy');
+        clipboard.writeText(text);
+        copied = { text: clipboard.readText(), dives };
+        return { ok: true, value: true };
+      }
+      if (action === 'read') {
+        const text = clipboard.readText();
+        return { ok: true, value: { text, dives: copied.dives && text === copied.text ? copied.dives : '' } };
+      }
+      throw new Error(`BAD_ARGUMENT: unknown clipboard action ${action}`);
     } catch (e) {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }

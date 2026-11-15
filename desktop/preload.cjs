@@ -62,6 +62,11 @@ contextBridge.exposeInMainWorld('odDesktop', {
   /** The Mac's Réglages window (desktop/main.cjs): opens it, or brings it forward. */
   openSettingsWindow: () => invoke('od:settingsWindow'),
   saveAs: (options) => invoke('od:saveAs', options),
+  /** Copy and paste of dives (task 2026-11-15-178): text plus the private type application/x-opendives-dives. */
+  clipboard: {
+    write: (options) => invoke('od:clipboard', 'write', options),
+    read: () => invoke('od:clipboard', 'read'),
+  },
   /** The Mac's menu bar (menu.cjs): each item's command, e.g. 'undo', 'find'. Returns an unsubscribe. */
   onMenu(callback) {
     if (typeof callback !== 'function') return () => {};

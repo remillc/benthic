@@ -261,7 +261,7 @@ export function keepSelection(selection, order) {
 }
 
 /**
- * @typedef {{key: string, label: string, icon: string, shortcut?: string, danger?: boolean, disabled?: boolean, text?: string}
+ * @typedef {{key: string, label: string, icon: string, shortcut?: string, danger?: boolean, disabled?: boolean, text?: string, hint?: string}
  *   | {key: 'separator'}} MenuEntry
  */
 
@@ -269,19 +269,24 @@ export function keepSelection(selection, order) {
  * The right-click menu for the selected dives, in order (task 2026-11-15-169): only what
  * applies to them. `shortcut` names the keys in the platform's words (« Ctrl+E », « ⌘E »).
  * Merging needs two dives or more; « Modifier ensemble… » is « Modifier » for one dive.
- * `available` lists the actions the app can do; the others are left out.
+ * `available` lists the actions the app can do; the others are left out. `mergeable` tells
+ * whether the selected dives can be merged (task 2026-11-15-178, `canMerge` of lib/multi-dive.js):
+ * when not, « Fusionner » stays in the menu, disabled, with its reason as a supporting line (`hint`,
+ * a translation key).
  * @param {number} count number of dives selected (1 or more)
- * @param {{mac: boolean, available: Set<string>}} options
+ * @param {{mac: boolean, available: Set<string>, mergeable?: boolean}} options
  * @returns {MenuEntry[]}
  */
-export function contextMenuEntries(count, { mac, available }) {
+export function contextMenuEntries(count, { mac, available, mergeable = true }) {
   if (count < 1) return [];
   const key = (/** @type {string} */ k, /** @type {boolean} */ shift = false) =>
     mac ? `${shift ? '⇧' : ''}⌘${k}` : `Ctrl+${shift ? 'Maj+' : ''}${k}`;
   /** @type {MenuEntry[][]} */
   const groups = [
     [
-      count > 1 ? { key: 'merge', label: 'desktop.menu.merge', icon: 'merge' } : null,
+      count > 1
+        ? { key: 'merge', label: 'desktop.menu.merge', icon: 'merge', shortcut: key('M'), ...(mergeable ? {} : { disabled: true, hint: 'multiDive.mergeBlocked' }) }
+        : null,
       { key: 'addToTrip', label: 'desktop.menu.addToTrip', icon: 'trip' },
       count > 1
         ? { key: 'editTogether', label: 'desktop.menu.editTogether', icon: 'edit', shortcut: key('E') }
@@ -303,6 +308,16 @@ export function contextMenuEntries(count, { mac, available }) {
     entries.push(...group);
   }
   return entries;
+}
+
+/**
+ * The right-click menu of the table's empty area (task 2026-11-15-178): « Coller », disabled when
+ * the clipboard holds no dives.
+ * @param {{mac: boolean, canPaste: boolean}} options
+ * @returns {MenuEntry[]}
+ */
+export function emptyAreaMenuEntries({ mac, canPaste }) {
+  return [{ key: 'paste', label: 'desktopMultiDive.paste', icon: 'file', shortcut: mac ? '⌘V' : 'Ctrl+V', disabled: !canPaste }];
 }
 
 /**
