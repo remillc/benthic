@@ -54,5 +54,10 @@ case $TARGET in
   *) echo "unknown TARGET: $TARGET"; exit 1 ;;
 esac
 export CC CXX
+# macOS: Homebrew installs GNU libtoolize as glibtoolize; autoreconf needs the GNU names.
+if [ "$(uname -s)" = Darwin ] && command -v brew >/dev/null; then
+  GNUBIN=$(brew --prefix libtool)/libexec/gnubin
+  if [ -d "$GNUBIN" ]; then export PATH="$GNUBIN:$PATH"; fi
+fi
 
 [ -f "$SS/core/dive.cpp" ] || { echo "missing submodule: git submodule update --init third_party/subsurface && git -C third_party/subsurface submodule update --init libdivecomputer"; exit 1; }

@@ -43,7 +43,7 @@ cm() { # name [cmake options...] — rebuilt if the options change
   cmake -S "$SRC/$name" -B "$W/$name" -G Ninja -Wno-dev "${CMAKE_TARGET_ARGS[@]}" \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$P" -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_FIND_ROOT_PATH="$P" -DCMAKE_PREFIX_PATH="$P" -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_POSITION_INDEPENDENT_CODE=ON "$@" >"$W/$name.log" 2>&1 || { tail -30 "$W/$name.log"; exit 1; }
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "$@" >"$W/$name.log" 2>&1 || { tail -30 "$W/$name.log"; exit 1; }
   cmake --build "$W/$name" --target install -j"$JOBS" >>"$W/$name.log" 2>&1 || { tail -30 "$W/$name.log"; exit 1; }
   echo "$*" > "$W/$name.done"
 }
