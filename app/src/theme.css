@@ -1127,6 +1127,29 @@ html.ios {
     }
   }
 
+  /* Mouse: the Material 3 hover layer, 8 % of the button's content colour over its background
+     (docs/system-design.md, « Pointer »). */
+  @media (hover: hover) and (pointer: fine) {
+    .od-tonal-button,
+    .od-text-button,
+    .od-icon-button,
+    .od-outlined-button {
+      transition: box-shadow 120ms linear;
+
+      &:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .od-tonal-button,
+    .od-text-button,
+    .od-icon-button,
+    .od-outlined-button {
+      transition: none;
+    }
+  }
+
   /* Text for screen readers only. */
   .od-sr-only {
     position: absolute;

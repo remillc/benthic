@@ -2267,5 +2267,20 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
-    }  }
+    }
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour, on the fields and the selected category. */
+    @media (hover: hover) and (pointer: fine) {
+      label.od-desktop-settings--row:not(:has(:disabled)):hover {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+      }
+      .od-desktop-settings--field {
+        transition: box-shadow 120ms linear;
+      }
+      .od-desktop-settings--field:not(:disabled):hover,
+      .od-desktop-settings--category.od-desktop-settings--selected:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+  }
 </style>
