@@ -40,7 +40,7 @@ cm() { # name [cmake options...] — rebuilt if the options change
   [ -f "$W/$name.done" ] && [ "$(cat "$W/$name.done")" = "$*" ] && return 0
   rm -rf "$W/$name"
   echo "== $TARGET : $name"
-  cmake -S "$SRC/$name" -B "$W/$name" -G Ninja -Wno-dev "${CMAKE_TARGET_ARGS[@]}" \
+  cmake -S "$SRC/$name" -B "$W/$name" -G Ninja -Wno-dev ${CMAKE_TARGET_ARGS[@]+"${CMAKE_TARGET_ARGS[@]}"} \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$P" -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_FIND_ROOT_PATH="$P" -DCMAKE_PREFIX_PATH="$P" -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "$@" >"$W/$name.log" 2>&1 || { tail -30 "$W/$name.log"; exit 1; }
@@ -76,7 +76,7 @@ if [ ! -f "$P/lib/libdivecomputer.a" ]; then
   echo "== $TARGET : libdivecomputer"
   rm -rf "$W/libdc"; cp -r "$SS/libdivecomputer" "$W/libdc"
   (cd "$W/libdc" && autoreconf --install --force >/dev/null 2>&1 &&
-   ./configure "${CONFIGURE_HOST_ARGS[@]}" --prefix="$P" --disable-shared --enable-static --with-pic \
+   ./configure ${CONFIGURE_HOST_ARGS[@]+"${CONFIGURE_HOST_ARGS[@]}"} --prefix="$P" --disable-shared --enable-static --with-pic \
      --without-libusb --without-hidapi --without-bluez --disable-examples \
      CC="$CC" AR="$AR" RANLIB="$RANLIB" >"$W/libdc.log" 2>&1 &&
    make -j"$JOBS" >>"$W/libdc.log" 2>&1 && make install >>"$W/libdc.log" 2>&1) ||
