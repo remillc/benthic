@@ -217,6 +217,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-nouveau-carnet-nuage.dc.html` | (étape 3, compte connecté) Nouveau carnet, étape 2 : dans votre nuage · bureau |
 | `bureau-nouveau-carnet-nuage-fournisseur.dc.html` | Nouveau carnet, étape 2 : choisir le service · bureau |
 | `bureau-nouveau-carnet-nuage-connexion.dc.html` | Nouveau carnet, étape 3 : se connecter · bureau |
+| `bureau-nouveau-carnet-nuage-webdav.dc.html` | Nouveau carnet, étape 3 : serveur WebDAV ou Nextcloud · bureau |
 | `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
 | `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
 | `logo-profil-claude.dc.html` | Logo · simple (icône de Claude VC) |
