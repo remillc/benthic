@@ -1,0 +1,81 @@
+name: Desktop core
+
+# Manual only: a failed run emails the owner.
+on:
+  workflow_dispatch:
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build autoconf automake libtool pkg-config
+      - name: Build
+        run: native/desktop/build.sh linux-x64
+      - name: Round trip on the sample logs
+        run: |
+          tests/run-roundtrip.sh build/desktop/linux-x64/bin/roundtrip build/rt \
+            third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-linux-x64
+          path: build/desktop/linux-x64/bin
+
+  win-x64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build autoconf automake libtool pkg-config
+      - name: llvm-mingw
+        run: TARGET=win-x64 native/desktop/install-llvm-mingw.sh
+      - name: Build
+        run: native/desktop/build.sh win-x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-win-x64
+          path: build/desktop/win-x64/bin
+
+  mac-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Tools
+        run: brew install ninja autoconf automake libtool pkg-config
+      - name: Build
+        run: native/desktop/build.sh mac-arm64
+      - name: Round trip on the sample logs
+        run: |
+          tests/run-roundtrip.sh build/desktop/mac-arm64/bin/roundtrip build/rt \
+            third_party/subsurface/dives/*.xml third_party/subsurface/dives/*.ssrf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-mac-arm64
+          path: build/desktop/mac-arm64/bin
+      # The app itself on the Mac, where nobody can look at it: the interface, the helper, then
+      # screenshots of the Carnet and the menu bar's items (desktop/scripts/screenshots.mjs).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: App dependencies
+        run: |
+          npm ci --prefix app
+          npm ci --prefix desktop
+      - name: Stage the app
+        run: node desktop/scripts/prepare.cjs mac-arm64
+      - name: Screenshots
+        run: node desktop/scripts/screenshots.mjs build/desktop/screenshots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-mac-arm64-screenshots
+          path: |
+            build/desktop/screenshots/*.png
+            build/desktop/screenshots/menu.json
