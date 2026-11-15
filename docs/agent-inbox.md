@@ -3512,7 +3512,7 @@ English: « Export 2 dives », « Which dives », « The 2 selected dives », «
 
 Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
 
-## [ ] 2026-11-15-190 Profiles: thinner curve lines on every platform
+## [x] 2026-11-15-190 Profiles: thinner curve lines on every platform
 
 Christian decided this on 15 November 2026: the profile curves were too thick. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet and Statistiques screens, `docs/mockups/android-detail.dc.html`, `docs/mockups/detail3-android.dc.html`, `docs/mockups/detail3-ios.dc.html`, the tablet detail and planner screens.
 
@@ -3524,6 +3524,8 @@ Christian decided this on 15 November 2026: the profile curves were too thick. M
 - Unchanged: the cursor line, the grid, the planner's ceiling line.
 
 Test: the depth curve of the dive detail measures 1.25 dp at 1× and 2 dp with high contrast; the average line measures 1 dp.
+
+Done: --od-profile-line-width is 1.25 (2 in high contrast) and every profile curve uses it (depth, temperature, ppO₂, ceiling; the planner's planned line already did), the dark halo is --od-profile-halo-width (2.5, 4.5 in high contrast), the average-depth line 1 dp, the PDF sheet and the shared image 1.25; tests/app/profile-lines.test.mjs checks them. Cursor, grid and the planner's ceiling line unchanged.
 
 ## [ ] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
 
