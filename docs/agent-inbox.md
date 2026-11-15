@@ -3231,7 +3231,7 @@ English: « Search for a site », « 5 dives without a site · Find them a site 
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
 
-## [ ] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
+## [x] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
 
 Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 171); phone and tablet are unchanged. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Automatic saving » and « Editing a dive in place ». Mock-up: `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3254,6 +3254,8 @@ Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to
 English: « Add the visibility », « Recorded by the dive computer, can't be edited », « Enter to keep · Esc to cancel », « Add “Ju” as a new buddy », « Dive merged · Undo ».
 
 Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
+
+Done (detail pane, branch feature/desktop-detail): the detail pane is the editor. components/DesktopField.svelte (grey field, hover pencil, input in place, hint, Entrée/Échap/Tab, chips and suggestions) and components/DesktopDiveFields.svelte write through saveDiveChanges (the phone editor's core edit, one undoable step), logic in lib/desktop-edit.js; recorded values are read-only unless the dive is manual. Tests: tests/app/desktop-edit.test.mjs. The Carnet table cells and Ctrl/⌘+E (needs DesktopLogbook to dispatch `od-detail-focus-first`) are left to the Carnet.
 
 ## [ ] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
 
@@ -3415,7 +3417,7 @@ Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. 
 
 Done: Compagnons is a default column instead of Temp. (secondary text, about 124 dp, sorted by the first buddy); a diver's own column set is kept; Temp. stays in the columns menu.
 
-## [ ] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
+## [x] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
 
 Christian decided this on 15 November 2026. Desktop only; phone and tablet already have these curves. Read `docs/ui-specification.md`, « Dive profile, cursor and curve buttons », for the curves themselves, their colours and scales: desktop uses the same ones. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first (also `bureau-carnet-groupe`, `-macos`, `-edition-sur-place`, `-colonnes`, `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`).
 
@@ -3429,7 +3431,9 @@ English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues �
 
 Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
 
-## [ ] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
+Done: the chips choice is kept in device-store (`od.profileLayers`, lib/profile-layers.js), the tooltip adds the active curves.
+
+## [x] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
 
 Christian decided this on 15 November 2026: in the detail pane, a diver could not tell that the fields were editable in place. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet screens.
 
@@ -3443,7 +3447,9 @@ English: « Grey fields can be edited with a click and are saved at once. », «
 
 Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
 
-## [ ] 2026-11-15-185 Desktop profile: dashed line at the average depth
+Done: fields at rest, invitations, hint line, read-only values as plain text, no floating toolbar.
+
+## [x] 2026-11-15-185 Desktop profile: dashed line at the average depth
 
 Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first.
 
@@ -3455,6 +3461,8 @@ Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: ever
 English: « avg. 17.9 m ».
 
 Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
+
+Done: dashed #114477 line (`--od-profile-mean`) with « moy. 17,9 m » label, desktop only.
 
 ## [ ] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
 
@@ -3529,7 +3537,7 @@ Test: the depth curve of the dive detail measures 1.25 dp at 1× and 2 dp with h
 
 Done: --od-profile-line-width is 1.25 (2 in high contrast) and every profile curve uses it (depth, temperature, ppO₂, ceiling; the planner's planned line already did), the dark halo is --od-profile-halo-width (2.5, 4.5 in high contrast), the average-depth line 1 dp, the PDF sheet and the shared image 1.25; tests/app/profile-lines.test.mjs checks them. Cursor, grid and the planner's ceiling line unchanged.
 
-## [ ] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
+## [x] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
 
 Christian noticed on 15 November 2026 that the desktop detail pane has no tabs and its fields cannot be edited in place. This is a reminder of tasks 169, 172 and 184, not a new decision: the build must match the mock-ups `docs/mockups/bureau-carnet-profil-droite.dc.html` (with the group copy `bureau-carnet-groupe.dc.html`) and `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3538,6 +3546,8 @@ Christian noticed on 15 November 2026 that the desktop detail pane has no tabs a
 - Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the detail pane to the commit description.
 
 Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
+
+Done: tabs styled as the mock-ups, last tab kept (`od.detailTab`, lib/detail-tab.js), editing in place in Informations, Équipement, Gaz and Notes.
 
 ## [ ] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
 
@@ -3557,7 +3567,7 @@ English: « More logbook options », « Undo: {last action} », « Redo », « C
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
 
-## [ ] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
+## [x] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and its group copy `bureau-carnet-groupe.dc.html` (dive N° 5, Lake Coleridge, selected). They are the reference for the whole desktop Carnet; the other desktop Carnet mock-ups still show the older table.
 
@@ -3579,7 +3589,9 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 
 Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
 
-## [ ] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
+Done (detail pane part): site map behind the header (SiteHeaderImage `desk`), 36 dp top padding. The table part is the Carnet's.
+
+## [x] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
 
 Christian decided this on 15 November 2026: two ⋮ menus on the same screen were confusing. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html`, the group copy `bureau-carnet-groupe.dc.html` (the logbook ⋮ menu open, dive N° 5 selected), `bureau-carnet-edition-sur-place.dc.html` (the menu open, dive N° 9 selected), `bureau-carnet-menu-contextuel.dc.html` (right-click on two dives), and the other desktop Carnet screens.
 
@@ -3605,6 +3617,8 @@ The empty-selection hint in the detail pane becomes « Clic droit pour agir sur 
 English: « Plan from this dive », « Share… », « Export the dive… », « Delete the dive », « Enlarge the profile », « Filter… », « Renumber the dives… », « Logbook dive computers », « Merge with the previous trip », « Merge with the next trip », « Right-click to act on the selection ».
 
 Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
+
+Done (detail pane part): ⋮ removed; plan, share, export and delete icons; ⤢ at the end of the chips row and on double-click. « share » is sent as `od-desktop-command`, to be handled by DesktopLogbook.
 
 ## [ ] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
 

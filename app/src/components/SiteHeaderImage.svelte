@@ -6,8 +6,10 @@
   // (offline and never seen), nothing is shown. The map's credits are in About.
   import { DRAW_WIDTH, HALF_HEIGHT, readySiteMap, sharedSiteMap } from '../lib/site-image.js';
 
-  /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void }} */
-  let { latUdeg, lonUdeg, onshown } = $props();
+  // `desk` (desktop detail pane, task 2026-11-15-193): the picture covers the top 170 dp of the pane,
+  // with no top bar above it.
+  /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void, desk?: boolean }} */
+  let { latUdeg, lonUdeg, onshown, desk = false } = $props();
 
   // Prepared ahead (the dives beside this one, dive-preload.js): there from the first frame.
   // svelte-ignore state_referenced_locally
@@ -38,7 +40,7 @@
   });
 </script>
 
-<div class="od-site-header-image od-site-header-image--image" aria-hidden="true">
+<div class="od-site-header-image od-site-header-image--image" class:od-site-header-image--desk={desk} aria-hidden="true">
   {#if src}
     <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
     <svg class="od-site-header-image--pin" width="40" height="40" viewBox="-20 -20 40 40">
@@ -81,6 +83,23 @@
 
     .od-site-header-image--pin {
       transform: translate(-50%, -50%);
+    }
+
+    /* Desktop pane: from the top of the pane, 170 dp; the pin in the header's right half. */
+    .od-site-header-image--image.od-site-header-image--desk {
+      top: 0;
+      bottom: auto;
+      height: 170px;
+    }
+
+    .od-site-header-image--desk img,
+    .od-site-header-image--desk .od-site-header-image--pin {
+      top: 62px;
+    }
+
+    .od-site-header-image--desk img,
+    .od-site-header-image--desk .od-site-header-image--pin {
+      left: 75%;
     }
 
     .od-site-header-image--halo {

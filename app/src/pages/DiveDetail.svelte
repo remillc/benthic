@@ -59,7 +59,10 @@
     formatTimeOfDay,
   } from '../lib/format.js';
   import SiteMap from '../components/SiteMap.svelte';
-  import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
+  import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
+  import { deviceStore } from '../lib/device-store.js';
+  import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
+  import { hasRecordedValues } from '../lib/desktop-edit.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -586,9 +589,14 @@
   // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
   // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
   const desk = $derived(layout.desktop);
-  /** @type {'info'|'equipment'|'gas'|'notes'|'map'} */
-  let tab = $state('info');
-  const deskTabs = /** @type {const} */ (['info', 'equipment', 'gas', 'notes', 'map']);
+  /** The last tab chosen is kept for the next dive and the next session (task 2026-11-15-191). */
+  let tab = $state(readTab(deviceStore));
+  const deskTabs = DETAIL_TABS;
+  /** @param {import('../lib/detail-tab.js').DetailTab} key */
+  function chooseTab(key) {
+    tab = key;
+    saveTab(deviceStore, key);
+  }
   /** The key figures: Prof. max, Durée, Prof. moy., Temp., Gaz, Consommation (those known). */
   const deskFigures = $derived.by(() => {
     if (!dive) return [];
@@ -603,34 +611,15 @@
       { label: t('desktop.figure.sac'), value: sac },
     ].filter((x) => x.value);
   });
-  // The dive's ⋮ on desktop (task 2026-11-15-186): the desktop menu, not the phone's popover.
-  /** @type {{x: number, y: number}|null} */
-  let deskMenuAt = $state(null);
-  /** @param {MouseEvent} e */
-  function openDeskMenu(e) {
-    const r = /** @type {HTMLElement} */ (e.currentTarget).getBoundingClientRect();
-    deskMenuAt = { x: r.right - 300, y: r.bottom + 4 };
-  }
-  const deskMenu = $derived(
-    /** @type {import('../lib/desktop-table.js').MenuEntry[]} */ ([
-      { key: 'enlarge', label: 'desktop.menu.enlarge', icon: 'fullscreen', shortcut: desktopMac ? '⌘P' : 'Ctrl+P' },
-      { key: 'addToTrip', label: 'desktop.menu.addToTrip', icon: 'trip' },
-      ...(removableFromTrip ? [{ key: 'removeFromTrip', label: 'desktop.menu.removeFromTrip', icon: 'tripRemove' }] : []),
-      { key: 'renumber', label: 'desktop.menu.renumber', icon: 'renumber' },
-      { key: 'export', label: 'desktop.menu.export', icon: 'export', shortcut: desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E' },
-      { key: 'separator' },
-      { key: 'delete', label: 'desktop.menu.deleteDive', icon: 'delete', shortcut: desktopMac ? '⌫' : 'Suppr', danger: true },
-    ]),
-  );
   /** « Agrandir le profil »: the profile fills the pane; Échap returns. */
   let profileBig = $state(false);
-  /** @param {string} key */
-  function deskChoose(key) {
-    if (key === 'enlarge') profileBig = true;
-    else if (key === 'removeFromTrip') removeFromTrip();
-    else if (key === 'renumber') renumbering = true;
-    // The logbook's table acts on its selection, which is this dive.
-    else window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: key }));
+  /**
+   * The icons right of the title (task 2026-11-15-194). Export, share and delete act through the
+   * Carnet's selection, which is this dive: the table handles them (DesktopLogbook.svelte).
+   * @param {'export'|'share'|'delete'} command
+   */
+  function deskCommand(command) {
+    window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: command }));
   }
   $effect(() => {
     if (!desk) return;
@@ -649,8 +638,7 @@
   function tabKey(e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    const at = deskTabs.indexOf(tab);
-    tab = deskTabs[(at + (e.key === 'ArrowRight' ? 1 : deskTabs.length - 1)) % deskTabs.length];
+    chooseTab(stepTab(tab, e.key));
     /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.currentTarget).querySelector(`[data-tab="${tab}"]`))?.focus();
   }
 
@@ -768,14 +756,22 @@
     </div>
   {:else}
     {#if desk}
-    <header class="od-dive-detail--desk-head">
-      <div class="od-dive-detail--desk-titles">
-        <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
-        <p class="od-dive-detail--desk-sub od-value">{[formatShortDate(dive.date) + ', ' + formatTimeOfDay(dive.date), dive.computer].filter(Boolean).join(' · ')}</p>
-      </div>
-      <button type="button" class="od-dive-detail--desk-action" aria-label={t('detail.edit')} title="{t('detail.edit')} ({desktopMac ? '⌘E' : 'Ctrl+E'})" onclick={() => f7router.navigate(`/dives/${diveId}/edit`)}><Icon name="edit" size={22} /></button>
-      <button type="button" class="od-dive-detail--desk-action" aria-label={t('detail.moreOptionsList')} title={t('detail.moreOptions')} aria-haspopup="menu" onclick={openDeskMenu}><Icon name="more" size={22} /></button>
-    </header>
+    <!-- The site's map behind the header, 170 dp from the top of the pane (task 2026-11-15-193). -->
+    <div class="od-dive-detail--desk-hero">
+      {#if dive.siteCoordinates}
+        <SiteHeaderImage desk latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={() => {}} />
+      {/if}
+      <header class="od-dive-detail--desk-head">
+        <div class="od-dive-detail--desk-titles">
+          <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
+          <p class="od-dive-detail--desk-sub od-value">{[formatShortDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
+        </div>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.export')} title="{t('desktopDetail.export')} ({desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E'})" onclick={() => deskCommand('export')}><Icon name="export" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.delete')} title="{t('desktopDetail.delete')} ({desktopMac ? '⌫' : 'Suppr'})" onclick={() => deskCommand('delete')}><Icon name="delete" size={22} /></button>
+      </header>
+    </div>
     {:else}
     <div class="od-dive-detail--hero" use:watchScroll>
       {#if dive.siteCoordinates}
@@ -805,6 +801,7 @@
     <div class:od-dive-detail--desk-card={desk} class:od-dive-detail--desk-big={desk && profileBig}>
     <DiveProfile
       hover={desk}
+      onenlarge={desk ? () => (profileBig = !profileBig) : undefined}
       samples={dive.samples}
       cylinders={dive.cylinders}
       divemode={dive.divemode}
@@ -824,15 +821,18 @@
           {/each}
         </dl>
       {/if}
+      {#if hasRecordedValues(dive)}
+        <p class="od-dive-detail--desk-recorded"><Icon name="computer" size={16} />{t('desktopDetail.recorded')}</p>
+      {/if}
       <!-- svelte-ignore a11y_interactive_supports_focus -->
       <div class="od-dive-detail--desk-tabs" role="tablist" tabindex="-1" onkeydown={tabKey}>
         {#each deskTabs as key (key)}
-          <button type="button" role="tab" data-tab={key} aria-selected={tab === key} tabindex={tab === key ? 0 : -1} onclick={() => (tab = key)}>{t(`desktop.tab.${key}`)}</button>
+          <button type="button" role="tab" data-tab={key} aria-selected={tab === key} tabindex={tab === key ? 0 : -1} onclick={() => chooseTab(key)}>{t(`desktop.tab.${key}`)}</button>
         {/each}
       </div>
     {/if}
 
-    {#if (!desk || tab === 'info') && facts.length}
+    {#if !desk && facts.length}
       <dl class="od-dive-detail--facts">
         {#each facts as fact (fact.label)}
           <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
@@ -840,7 +840,7 @@
       </dl>
     {/if}
 
-    {#if (!desk || tab === 'info') && (dive.guides.length || dive.buddies.length)}
+    {#if !desk && (dive.guides.length || dive.buddies.length)}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
         <div class="od-dive-detail--group">
@@ -855,10 +855,7 @@
     {/if}
 
     <!-- Notes right under Personnes (task 2026-11-12-64). -->
-    {#if desk && tab === 'notes' && !dive.notes.trim()}
-      <p class="od-dive-detail--desk-empty">{t('desktop.noNotes')}</p>
-    {/if}
-    {#if (!desk || tab === 'notes') && dive.notes.trim()}
+    {#if !desk && dive.notes.trim()}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
         <!-- Shown in full, line breaks kept: no "Read more". -->
@@ -867,7 +864,7 @@
     {/if}
 
     <!-- Tags right under Notes (task 2026-11-12-66). -->
-    {#if (!desk || tab === 'info') && visibleTags(dive.tags).length}
+    {#if !desk && visibleTags(dive.tags).length}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
         <ul class="od-dive-detail--tags">
@@ -876,10 +873,7 @@
       </section>
     {/if}
 
-    {#if desk && tab === 'gas' && !hasGas}
-      <p class="od-dive-detail--desk-empty">{t('desktop.noGas')}</p>
-    {/if}
-    {#if (!desk || tab === 'gas') && hasGas}
+    {#if !desk && hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
         <GasCard
@@ -892,10 +886,7 @@
       </section>
     {/if}
 
-    {#if desk && tab === 'equipment' && !hasEquipment}
-      <p class="od-dive-detail--desk-empty">{t('desktop.noEquipment')}</p>
-    {/if}
-    {#if (!desk || tab === 'equipment') && hasEquipment}
+    {#if !desk && hasEquipment}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
         <EquipmentCard
@@ -928,7 +919,7 @@
     {/if}
 
 
-    {#if (!desk || tab === 'info') && conditions.length}
+    {#if !desk && conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="od-dive-detail--section">
         <div class="od-dive-detail--group">
@@ -959,6 +950,9 @@
     {/if}
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
+    {#if desk && tab !== 'map'}
+      <DesktopDiveFields {dive} {prefs} tab={tab === 'equipment' || tab === 'gas' || tab === 'notes' ? tab : 'info'} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
+    {/if}
     {#if desk && tab === 'map'}
       {#if dive.siteCoordinates}
         <div class="od-dive-detail--desk-map"><SiteMap pin={dive.siteCoordinates} height="320px" /></div>
@@ -967,7 +961,7 @@
       {/if}
     {/if}
 
-    {#if (!desk || tab === 'info') && dive.pictures > 0 && settings.showPhotos}
+    {#if !desk && dive.pictures > 0 && settings.showPhotos}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
         <div class="od-dive-detail--group">
@@ -998,10 +992,6 @@
     {/if}
   {/snippet}
 </Page>
-
-{#if deskMenuAt}
-  <DesktopContextMenu x={deskMenuAt.x} y={deskMenuAt.y} heading="" entries={deskMenu} onchoose={deskChoose} onclose={() => (deskMenuAt = null)} />
-{/if}
 
 {#if sharing}
   <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onlink={dive && diveLink(dive.date) ? () => share('link') : undefined} onqr={() => ((sharing = false), (qrSharing = true))} onclose={() => (sharing = false)} />
@@ -1037,11 +1027,16 @@
     :global(.od-dive-detail--desk > .page-content) {
       padding-top: 0;
     }
+    /* 36 dp above the title, room for the site map behind the header (task 2026-11-15-193). */
+    .od-dive-detail--desk-hero {
+      position: relative;
+    }
     .od-dive-detail--desk-head {
+      position: relative;
       display: flex;
       align-items: flex-start;
       gap: 4px;
-      padding: 16px 16px 8px 24px;
+      padding: 36px 16px 8px 24px;
     }
     .od-dive-detail--desk-titles {
       flex: 1;
@@ -1055,10 +1050,14 @@
       line-height: 28px;
       color: var(--od-text);
     }
+    /* The date line stays on one line, cut with an ellipsis (task 2026-11-15-194). */
     .od-dive-detail--desk-sub {
       margin: 2px 0 0;
       font-size: 14px;
       color: var(--od-text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .od-dive-detail--desk-action {
       display: grid;
@@ -1113,6 +1112,15 @@
       margin: 20px 24px 8px;
       border-bottom: 1px solid var(--od-separator);
     }
+    /* Under the key figures: the dive computer's values cannot be edited (task 2026-11-15-172). */
+    .od-dive-detail--desk-recorded {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 12px 24px 0;
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
     .od-dive-detail--desk-tabs button {
       position: relative;
       height: 48px;
@@ -1121,7 +1129,7 @@
       background: none;
       font: inherit;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 400;
       color: var(--od-text-2);
       cursor: pointer;
     }
@@ -1130,6 +1138,7 @@
       background: color-mix(in srgb, var(--od-text) 4%, transparent);
     }
     .od-dive-detail--desk-tabs button[aria-selected='true'] {
+      font-weight: 600;
       color: var(--od-on-table-selected);
     }
     .od-dive-detail--desk-tabs button[aria-selected='true']::after {
