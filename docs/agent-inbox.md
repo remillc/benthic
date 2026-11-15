@@ -3681,3 +3681,14 @@ Christian noticed on 15 November 2026 that the app's « Dans la bouteille » sec
 English: « Leave empty if the cylinder is empty », « Analyse the mix before diving. ».
 
 Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alone then Oxygène and Hélium; no text of the screen is red when the mix can be reached; the analyse banner is amber.
+
+## [ ] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html` (completes task 196).
+
+- **« Dans la bouteille »** in two columns, like « Mélange voulu »: Pression alone on the first line, with the helper « Laissez vide si la bouteille est vide »; Oxygène and Hélium on the next line (Trimix; in Nitrox, Oxygène alone); then « Compléter avec » on its own line.
+- An empty Pression means an empty cylinder: the fill starts from 0 bar.
+
+English: « Leave empty if the cylinder is empty ».
+
+Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
