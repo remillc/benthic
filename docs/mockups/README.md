@@ -167,3 +167,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-sites.dc.html` | Sites · bureau (Windows, Linux) |
 | `bureau-stats.dc.html` | Statistiques · bureau (Windows, Linux) |
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
+| `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
