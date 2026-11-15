@@ -3576,3 +3576,30 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 - A trip row is a #ECEAE4 band with 12 dp corners, 36 dp high, with ⌄, a suitcase icon, the trip's name (medium) and « · 4 plongées, de 21 à 29 m ».
 
 Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
+
+## [ ] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
+
+Christian decided this on 15 November 2026: two ⋮ menus on the same screen were confusing. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html`, the group copy `bureau-carnet-groupe.dc.html` (the logbook ⋮ menu open, dive N° 5 selected), `bureau-carnet-edition-sur-place.dc.html` (the menu open, dive N° 9 selected), `bureau-carnet-menu-contextuel.dc.html` (right-click on two dives), and the other desktop Carnet screens.
+
+Correction of the record: the removal of « Partager… » in task 178 was Claude's answer to Claude VC's questions, not Christian's decision. Christian now wants it back.
+
+**The detail pane has no ⋮ any more** (task 186 is replaced):
+
+- Right of the dive's title, four 44 dp icon buttons with tooltips: « Planifier depuis cette plongée » (the phone's planner icon), « Partager… », « Exporter la plongée… » (Ctrl+Maj+E), « Supprimer la plongée » (Suppr).
+- « Agrandir le profil » (⤢, tooltip with Ctrl+P) is a 36 dp icon button at the right end of the profile's chips row (Température, Gaz, ppO₂, Plafond, Tissus). A double-click on the profile does the same.
+- Ajouter à un voyage…, Renuméroter la plongée…, Retirer du voyage, Copier and Planifier depuis cette plongée are in the dive's right-click menu.
+- The date line under the title stays on one line, cut with an ellipsis if needed.
+
+**« Partager… » on desktop** (task 178 is corrected): it opens the system's native share sheet with the exported file (macOS `NSSharingServicePicker`, Windows 11 share window). Linux has no share sheet: there it opens the export dialog of task 189. It is in the detail pane's icons and in the right-click menu, under « Exporter… », for one dive or several.
+
+**The logbook ⋮ menu** (task 192's menu, extended), in this order:
+
+1. « Annuler : {dernière action} » (Ctrl+Z), « Rétablir » (Ctrl+Maj+Z, greyed out when there is nothing to redo);
+2. a divider, then the phone's Carnet menu items: « Filtrer… » (Ctrl+Maj+F), « Renuméroter les plongées… », « Ordinateurs du carnet »;
+3. a divider and « Fusionner avec le voyage précédent » and/or « Fusionner avec le voyage suivant », **shown only** when the selected dive, or the selected run of consecutive dives, touches a trip directly on that side (no other dive between them and the trip). Otherwise the item is absent, not greyed out, and so is its divider. « Précédent » is the trip just above in the list (more recent), « suivant » the trip just below. Merging puts the dives into that trip, with « Annuler » in a snackbar.
+
+The empty-selection hint in the detail pane becomes « Clic droit pour agir sur la sélection » (no « ou ⋮ »).
+
+English: « Plan from this dive », « Share… », « Export the dive… », « Delete the dive », « Enlarge the profile », « Filter… », « Renumber the dives… », « Logbook dive computers », « Merge with the previous trip », « Merge with the next trip », « Right-click to act on the selection ».
+
+Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
