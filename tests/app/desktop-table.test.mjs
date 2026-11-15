@@ -194,3 +194,18 @@ test('the trips a run of dives can join, above and below (task 194)', async () =
   const below = [...dives, { ...dives[0], id: 10, number: 0, date: '2012-01-01T10:00:00', trip: null }];
   assert.equal(adjacentTrips(below, [10]).previous?.id, 100);
 });
+
+test("columns keep the diver's order, N° first (task 181)", async () => {
+  const { shownColumns, moveColumn, dropTarget } = await import('../../app/src/lib/desktop-table.js');
+  assert.deepEqual(shownColumns(['site', 'date', 'number', 'duration']).map((c) => c.key), ['number', 'site', 'date', 'duration']);
+  assert.deepEqual(shownColumns(['site']).map((c) => c.key), ['number', 'date', 'site']);
+  const keys = ['number', 'date', 'site', 'maxDepth', 'duration', 'buddies'];
+  // « Site » dropped between Durée and Compagnons.
+  assert.deepEqual(moveColumn(keys, 'site', 4), ['number', 'date', 'maxDepth', 'duration', 'site', 'buddies']);
+  assert.deepEqual(moveColumn(keys, 'buddies', 0), ['number', 'buddies', 'date', 'site', 'maxDepth', 'duration']);
+  assert.deepEqual(moveColumn(keys, 'number', 3), keys);
+  const heads = keys.map((key, i) => ({ key, left: i * 100, right: i * 100 + 100 }));
+  assert.deepEqual(dropTarget(heads, 'site', 470), { index: 4, before: 'duration', after: 'buddies' });
+  assert.deepEqual(dropTarget(heads, 'site', 10), { index: 1, before: 'number', after: 'date' });
+  assert.deepEqual(dropTarget(heads, 'site', 900), { index: 5, before: 'buddies', after: null });
+});

@@ -3483,6 +3483,9 @@
     "filterOn": "Filtrer… (filtre appliqué)",
     "renumberDives": "Renuméroter les plongées…",
     "mergePreviousTrip": "Fusionner avec le voyage précédent",
-    "mergeNextTrip": "Fusionner avec le voyage suivant"
+    "mergeNextTrip": "Fusionner avec le voyage suivant",
+    "resetColumns": "Rétablir l'ordre des colonnes",
+    "columnWillMove": "« {column} » sera placé entre {before} et {after}",
+    "columnWillMoveLast": "« {column} » sera placé en dernier"
   }
 }

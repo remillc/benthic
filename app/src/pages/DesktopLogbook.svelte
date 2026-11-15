@@ -41,6 +41,9 @@
     contextMenuEntries,
     clampTableWidth,
     adjacentTrips,
+    moveColumn,
+    dropTarget,
+    DEFAULT_COLUMNS,
   } from '../lib/desktop-table.js';
   import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatShortDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -350,6 +353,97 @@
     }
   }
 
+  // --- Moving a column by its header (tasks 2026-11-15-181 and 195). ----------------------------
+  /** @type {{key: string, label: string, x: number, y: number, dx: number, width: number, barX: number, top: number, height: number}|null} */
+  let dragging = $state(null);
+  let dropAt = 0;
+  let movedByDrag = false;
+  /** Said to screen readers only (no tooltip on screen, task 195). */
+  let announce = $state('');
+
+  /** @param {string|null} key */
+  const columnName = (key) => (key ? t(COLUMNS.find((c) => c.key === key)?.label ?? '') : '');
+
+  /** @param {PointerEvent} e @param {string} key */
+  function headDown(e, key) {
+    if (key === 'number' || e.button !== 0) return;
+    const th = /** @type {HTMLElement} */ (e.currentTarget);
+    const startX = e.clientX;
+    const rect = th.getBoundingClientRect();
+    const table = /** @type {HTMLElement} */ (th.closest('table'));
+    const scroller = /** @type {HTMLElement} */ (th.closest('.od-desktop-logbook--scroll'));
+    /** @param {PointerEvent} m */
+    const move = (m) => {
+      if (!dragging && Math.abs(m.clientX - startX) < 5) return;
+      const heads = [...table.querySelectorAll('th')].map((h) => {
+        const r = h.getBoundingClientRect();
+        return { key: /** @type {string} */ (h.dataset.col), left: r.left, right: r.right };
+      });
+      const target = dropTarget(heads, key, m.clientX);
+      dropAt = target.index;
+      const rest = heads.filter((h) => h.key !== key);
+      const barX = target.after ? (rest[target.index]?.left ?? 0) : (rest[rest.length - 1]?.right ?? 0);
+      const box = scroller.getBoundingClientRect();
+      announce = target.after
+        ? t('desktop.columnWillMove', { column: columnName(key), before: columnName(target.before), after: columnName(target.after) })
+        : t('desktop.columnWillMoveLast', { column: columnName(key) });
+      dragging = { key, label: columnName(key), x: m.clientX, y: m.clientY, dx: startX - rect.left, width: rect.width, barX, top: box.top, height: box.height };
+    };
+    /** @param {boolean} keep */
+    const end = (keep) => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('keydown', esc, true);
+      if (dragging && keep) {
+        movedByDrag = true;
+        setColumns(moveColumn(columns.map((c) => c.key), key, dropAt));
+      }
+      dragging = null;
+      announce = '';
+    };
+    const up = () => end(true);
+    /** @param {KeyboardEvent} k */
+    const esc = (k) => {
+      if (k.key !== 'Escape' || !dragging) return;
+      k.preventDefault();
+      k.stopPropagation();
+      end(false);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('keydown', esc, true);
+  }
+
+  /** A click that was not a drag sorts, as before. @param {string} key */
+  function headClick(key) {
+    if (movedByDrag) {
+      movedByDrag = false;
+      return;
+    }
+    setSort(nextSort(desk.sort, key));
+  }
+
+  /** Alt+Maj+← → move the focused column one place. @param {KeyboardEvent} e @param {string} key */
+  function headKey(e, key) {
+    if (!e.altKey || !e.shiftKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || key === 'number') return;
+    e.preventDefault();
+    const keys = columns.map((c) => c.key);
+    const at = keys.indexOf(key);
+    // moveColumn counts in the list without the column: right is at + 1 there, left at - 1.
+    setColumns(moveColumn(keys, key, e.key === 'ArrowRight' ? at + 1 : at - 1));
+    tick().then(() => /** @type {HTMLElement|null} */ (tableEl?.querySelector(`th[data-col="${key}"] button`))?.focus());
+  }
+
+  /** « Rétablir l'ordre des colonnes »: the default order, then the other shown columns in the table's order. */
+  function resetColumnOrder() {
+    const shown = new Set(columns.map((c) => c.key));
+    setColumns([
+      ...DEFAULT_COLUMNS.filter((k) => shown.has(k)),
+      ...COLUMNS.map((c) => c.key).filter((k) => shown.has(k) && !DEFAULT_COLUMNS.includes(k)),
+    ]);
+    columnsOpen = false;
+  }
+
   // --- The columns button. ----------------------------------------------------------------
   let columnsOpen = $state(false);
 
@@ -596,6 +690,8 @@
                 {t(column.label)}
               </label>
             {/each}
+            <div class="od-desktop-logbook--columns-divider" role="separator"></div>
+            <button type="button" role="menuitem" class="od-desktop-logbook--column-choice od-desktop-logbook--columns-reset" onclick={resetColumnOrder}>{t('desktop.resetColumns')}</button>
           </div>
         {/if}
       </div>
@@ -630,9 +726,11 @@
                   class="od-desktop-logbook--head"
                   class:od-desktop-logbook--numeric={column.numeric}
                   data-col={column.key}
+                  class:od-desktop-logbook--slot={dragging?.key === column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
+                  onpointerdown={(e) => headDown(e, column.key)}
                 >
-                  <button type="button" onclick={() => setSort(nextSort(desk.sort, column.key))}>
+                  <button type="button" onclick={() => headClick(column.key)} onkeydown={(e) => headKey(e, column.key)}>
                     {t(column.label)}{#if sortedHere}<span class="od-desktop-logbook--arrow" aria-hidden="true">{desk.sort.descending ? '▾' : '▴'}</span>{/if}
                   </button>
                 </th>
@@ -705,6 +803,13 @@
     </div>
 
     {#if dropping}<div class="od-desktop-logbook--drop" aria-hidden="true"><p>{t('desktop.dropHere')}</p></div>{/if}
+    {#if dragging}
+      <div class="od-desktop-logbook--ghost" aria-hidden="true" style:left="{dragging.x - dragging.dx}px" style:top="{dragging.y - 18}px" style:width="{dragging.width}px">
+        <span class="od-desktop-logbook--grip-dots">⠿</span>{dragging.label}
+      </div>
+      <div class="od-desktop-logbook--insert" aria-hidden="true" style:left="{dragging.barX - 1.5}px" style:top="{dragging.top}px" style:height="{dragging.height}px"></div>
+    {/if}
+    <p class="od-sr-only" aria-live="polite">{announce}</p>
   </div>
 
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
@@ -1059,6 +1164,63 @@
     .od-desktop-logbook--handle:focus-visible .od-desktop-logbook--grip,
     .od-desktop-logbook--handle:hover .od-desktop-logbook--grip {
       background: var(--od-text);
+    }
+    /* Moving a column (task 181): the slot it leaves, the floating header, the insertion bar. */
+    .od-desktop-logbook--head {
+      user-select: none;
+    }
+    .od-desktop-logbook--slot {
+      background: var(--od-trip-band);
+      color: transparent;
+    }
+    .od-desktop-logbook--ghost {
+      position: fixed;
+      z-index: 14000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: var(--od-surface);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+      transform: rotate(-2deg);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--od-text);
+      pointer-events: none;
+    }
+    .od-desktop-logbook--grip-dots {
+      color: var(--od-text-2);
+    }
+    .od-desktop-logbook--insert {
+      position: fixed;
+      z-index: 13999;
+      width: 3px;
+      background: var(--od-on-table-selected);
+      pointer-events: none;
+    }
+    .od-desktop-logbook--insert::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -3.5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--od-on-table-selected);
+    }
+    .od-desktop-logbook--columns-divider {
+      height: 1px;
+      margin: 8px 0;
+      background: var(--od-separator);
+    }
+    .od-desktop-logbook--columns-reset {
+      width: 100%;
+      border: 0;
+      background: none;
+      font: inherit;
+      text-align: start;
     }
     .od-desktop-logbook--drop {
       position: fixed;

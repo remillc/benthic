@@ -3483,6 +3483,9 @@
     "filterOn": "Filter… (filter on)",
     "renumberDives": "Renumber the dives…",
     "mergePreviousTrip": "Merge with the previous trip",
-    "mergeNextTrip": "Merge with the next trip"
+    "mergeNextTrip": "Merge with the next trip",
+    "resetColumns": "Reset the column order",
+    "columnWillMove": "“{column}” will be placed between {before} and {after}",
+    "columnWillMoveLast": "“{column}” will be placed last"
   }
 }

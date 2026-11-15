@@ -48,16 +48,52 @@ export const COLUMNS = [
 export const DEFAULT_COLUMNS = COLUMNS.filter((c) => c.defaultShown).map((c) => c.key);
 
 /**
- * The shown columns, in the table's order, from a remembered list (unknown keys dropped;
- * N° and Date always kept, so that a row can always be found).
+ * The shown columns, in the diver's order (task 2026-11-15-181), from a remembered list:
+ * unknown keys dropped, N° always first, Date always shown (so that a row can be found).
  * @param {string[]|null|undefined} keys
  * @returns {Column[]}
  */
 export function shownColumns(keys) {
-  const wanted = new Set(keys?.length ? keys : DEFAULT_COLUMNS);
-  wanted.add('number');
-  wanted.add('date');
-  return COLUMNS.filter((c) => wanted.has(c.key));
+  const list = (keys?.length ? keys : DEFAULT_COLUMNS).filter((k, i, all) => all.indexOf(k) === i && k !== 'number');
+  if (!list.includes('date')) list.unshift('date');
+  return ['number', ...list].map((k) => COLUMNS.find((c) => c.key === k)).filter((c) => !!c);
+}
+
+/**
+ * The column order after moving `key` so that it lands at `index` among the shown columns
+ * (0 is N°, which never moves: an index of 0 means just after it).
+ * @param {string[]} keys the shown columns, in order (N° first)
+ * @param {string} key
+ * @param {number} index where it lands, counted in the list without it
+ * @returns {string[]}
+ */
+export function moveColumn(keys, key, index) {
+  if (key === 'number' || !keys.includes(key)) return keys;
+  const rest = keys.filter((k) => k !== key);
+  const at = Math.max(1, Math.min(rest.length, index));
+  return [...rest.slice(0, at), key, ...rest.slice(at)];
+}
+
+/**
+ * Where a dragged header lands, from the pointer's x and the headers' edges: the gap between
+ * two columns nearest to the pointer, never before N°. Returns the index in the list without
+ * the dragged column, and the neighbours' keys for the announcement.
+ * @param {{key: string, left: number, right: number}[]} heads the shown headers, in order
+ * @param {string} key the dragged column
+ * @param {number} x
+ * @returns {{index: number, before: string|null, after: string|null}}
+ */
+export function dropTarget(heads, key, x) {
+  const rest = heads.filter((h) => h.key !== key);
+  let index = rest.length;
+  for (let i = 0; i < rest.length; i++) {
+    if (x < (rest[i].left + rest[i].right) / 2) {
+      index = i;
+      break;
+    }
+  }
+  index = Math.max(1, index);
+  return { index, before: rest[index - 1]?.key ?? null, after: rest[index]?.key ?? null };
 }
 
 /**
@@ -68,10 +104,8 @@ export function shownColumns(keys) {
  */
 export function toggleColumn(keys, key) {
   if (key === 'number' || key === 'date') return keys;
-  const set = new Set(keys);
-  if (set.has(key)) set.delete(key);
-  else set.add(key);
-  return COLUMNS.filter((c) => set.has(c.key)).map((c) => c.key);
+  // The diver's order is kept: a removed column leaves its place, an added one goes last.
+  return keys.includes(key) ? keys.filter((k) => k !== key) : [...keys, key];
 }
 
 /** @typedef {{key: string, descending: boolean}} Sort */
