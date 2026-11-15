@@ -3329,3 +3329,32 @@ English: « New site », « Delete the site », « Every change is saved at once
 
 Tests: editing a site field saves it without a button; moving the crosshair refills country and region but not a corrected one; Pays autocompletes with logbook countries first; search dims the other pins; stacked pins open the list; a new site within 100 m of another shows the notice; assigning a suggested site removes the dive from the list and lowers the count; a merge is undone by Ctrl/⌘+Z.
 
+## [ ] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
+
+Christian decided this on 15 November 2026, answering the four open questions of the desktop right-click menu. Read `docs/system-design.md`, section 7, « Actions on several dives », and `docs/ui-specification.md`, « Logbook selection and export ».
+
+**Desktop right-click menu on two dives or more**, in this order: Fusionner en une plongée (Ctrl/⌘+M), Ajouter à un voyage…, Modifier ensemble… (Ctrl/⌘+E), Copier (Ctrl/⌘+C), Exporter…, a divider, Supprimer. **« Partager… » is removed from desktop**, on all three systems: « Exporter… » already saves the file and Linux has no share window.
+
+**1. Fusionner en une plongée** (desktop, phone and tablet; on phone and tablet in the ⋮ menu of the selection bar, after Modifier ensemble…).
+- Offered when the selected dives follow one another in the logbook (no other dive between them) and each starts at most 60 min after the previous one ends; overlapping dives (two computers) qualify. Otherwise the item is shown disabled with the tooltip or supporting line « Seulement des plongées qui se suivent, à moins d'une heure d'intervalle ».
+- Calls the Subsurface core's merge through the facade (a new core function that writes the logbook): profiles, cylinders, events and the other data are joined; the surface interval stays in the profile. The result must stay a dive Subsurface for desktop reads and edits as its own merge would produce it.
+- No confirmation. The merged dive keeps the first dive's number and becomes the selection. Snackbar « 2 plongées fusionnées · Annuler » (« N plongées fusionnées »); « Annuler » and Ctrl/⌘+Z restore the original dives exactly (keep them until the snackbar is gone and the undo history is cleared).
+
+**2. Modifier ensemble…** (desktop, phone and tablet).
+- Desktop: a dialog titled « Modifier 3 plongées »; phone and tablet: a full-screen sheet with the same title.
+- Fields: Site, Guide, Compagnons, Étiquettes, Combinaison, Type d'eau, Note. A field whose values differ shows « Plusieurs valeurs » in #4B4A47 and is left as it is unless the diver changes it.
+- Compagnons and Étiquettes: chips common to all dives, then those of only some, marked « sur 2 plongées »; the diver adds or removes chips; nothing else is replaced.
+- Buttons « Annuler » and « Appliquer aux 3 plongées » (desktop) or « Enregistrer » (phone and tablet). Applied at once to all the dives, as a single change: Ctrl/⌘+Z or the snackbar « 3 plongées modifiées · Annuler » undoes it.
+- Not offered: date, duration, depth, profile, gases, numbers, trip.
+
+**3. Copier and Coller** (desktop only).
+- Ctrl/⌘+C writes two forms: plain text (the selected rows as shown in the table, a header line, columns separated by tabs, one dive per line) and the dives in Subsurface XML from the core's export, under the private type `application/x-opendives-dives`.
+- Ctrl/⌘+V in the Logbook, and « Coller » in the right-click menu of the table's empty area, add the dives from that private type, or from plain text that is a Subsurface `<divelog>`, with the import's duplicate check. Snackbar « 2 plongées collées · Annuler ». Disabled when the clipboard holds no dives.
+- Where a system keeps no private type, write the plain text only; pasting a `<divelog>` text still works.
+
+**4. Task 172 is unchanged** for a single dive: in-place editing and automatic saving. The multi-dive dialog is an exception, like the creation forms, because it changes many dives at once.
+
+English: « Merge into one dive », « Only dives that follow one another, less than an hour apart », « 2 dives merged · Undo », « Edit together… », « Edit 3 dives », « Several values », « on 2 dives », « Apply to the 3 dives », « 3 dives edited · Undo », « Copy », « Paste », « 2 dives pasted · Undo ».
+
+Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface for desktop opens with both profile parts; two dives with another dive between them, or 2 h apart, leave the item disabled; undo restores both dives byte for byte in the logbook; « Modifier ensemble » on three dives with two different sites shows « Plusieurs valeurs » and changes only the edited fields; removing a buddy chip removes it from every dive that had it; copied text pastes into a spreadsheet as columns; copied dives pasted into another logbook arrive once, and a second paste finds them as duplicates.
+
