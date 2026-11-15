@@ -881,5 +881,21 @@
   /* Framework7's variable, outside the layers. */
   .od-dive-profile--layers {
     --f7-chip-outline-border-color: var(--od-chip-outline);
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-dive-profile--chip {
+        transition: box-shadow 120ms linear;
+      }
+      .od-dive-profile--filter:hover .od-dive-profile--chip {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-dive-profile--chip {
+        transition: none;
+      }
+    }
   }
 </style>

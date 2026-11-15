@@ -1175,6 +1175,11 @@
       background: var(--od-table-selected);
       color: var(--od-on-table-selected);
     }
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-logbook--selected:hover td {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
     .od-desktop-logbook--selected td[data-col='number'] {
       color: inherit;
     }
@@ -1363,6 +1368,22 @@
     }
     .od-desktop-logbook--drop-note {
       font-size: 14px;
+    }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-logbook--trip button {
+        transition: box-shadow 120ms linear;
+      }
+      .od-desktop-logbook--trip button:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-desktop-logbook--trip button {
+        transition: none;
+      }
     }
   }
 </style>

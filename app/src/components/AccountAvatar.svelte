@@ -110,6 +110,30 @@
       }
     }
 
+    /* Mouse: the Material 3 hover layer, 8 % of the circle's content colour, over the circle. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-account-avatar--circle {
+        position: relative;
+      }
+      .od-account-avatar--circle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: currentColor;
+        opacity: 0;
+        transition: opacity 120ms linear;
+      }
+      .od-account-avatar:hover .od-account-avatar--circle::after {
+        opacity: 0.08;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-account-avatar--circle::after {
+        transition: none;
+      }
+    }
+
     /* A small dot at the top right of the circle; its meaning is also in the sheet, in words. */
     .od-account-avatar--badge {
       position: absolute;
