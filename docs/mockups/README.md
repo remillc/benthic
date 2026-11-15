@@ -138,6 +138,9 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `detail3-android-curseur.dc.html` | Téléphone Android, détail avec le profil touché : curseur et lecture du temps et de la profondeur |
 | `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
 | `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
+| `carnet-fusion-menu-android.dc.html` | Carnet, deux plongées qui se suivent, menu ouvert · Android |
+| `carnet-fusion-android.dc.html` | Carnet, deux plongées fusionnées · Android |
+| `carnet-modifier-ensemble-android.dc.html` | Modifier ensemble, trois plongées · Android |
 | `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
 | `compte-git-android.dc.html` | Téléphone Android, Compte en mode dépôt git (#11) |
 | `git-config-android.dc.html` | Téléphone Android, Dépôt git : configuration, dépôt trouvé, branches lues |
