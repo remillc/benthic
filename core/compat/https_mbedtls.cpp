@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — opendives_https_get() with Mbed TLS (Android).
+// OpenDives — opendives_https_get() with Mbed TLS (Android and desktop, Winsock on Windows).
 // Full validation: trusted authorities, chain and host name.
 // Mbed TLS is used under its GPL-2.0-or-later option, compatible with the
 // GPL v2 of Subsurface's core; OpenSSL's Apache 2.0 licence is not.
@@ -14,10 +14,31 @@
 #include <cerrno>
 #include <cstring>
 
+#ifdef _WIN32
+// Windows: Winsock stands in for the POSIX socket calls. Sockets are SOCKET
+// handles, closed with closesocket(); the time limits are DWORD milliseconds.
+#include <winsock2.h>
+#include <ws2tcpip.h>
+typedef SOCKET socket_t;
+#define OD_INVALID_SOCKET INVALID_SOCKET
+#define OD_CLOSE closesocket
+#define OD_INTERRUPTED (WSAGetLastError() == WSAEINTR)
+#define OD_SEND_FLAGS 0
+#else
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
+typedef int socket_t;
+#define OD_INVALID_SOCKET (-1)
+#define OD_CLOSE close
+#define OD_INTERRUPTED (errno == EINTR)
+#ifdef MSG_NOSIGNAL
+#define OD_SEND_FLAGS MSG_NOSIGNAL
+#else
+#define OD_SEND_FLAGS 0 // macOS: SO_NOSIGPIPE is set on the socket instead
+#endif
+#endif
 
 static std::string ca_file;
 
@@ -26,25 +47,43 @@ void opendives_https_set_ca_file(const std::string &path)
 	ca_file = path;
 }
 
-static int connect_tcp(const std::string &host, int timeout_seconds)
+static socket_t connect_tcp(const std::string &host, int timeout_seconds)
 {
+#ifdef _WIN32
+	static bool winsock_started = [] {
+		WSADATA data;
+		return WSAStartup(MAKEWORD(2, 2), &data) == 0;
+	}();
+	if (!winsock_started)
+		return OD_INVALID_SOCKET;
+#endif
 	struct addrinfo hints = {}, *res = nullptr;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	if (getaddrinfo(host.c_str(), "443", &hints, &res) != 0)
-		return -1;
-	int fd = -1;
+		return OD_INVALID_SOCKET;
+	socket_t fd = OD_INVALID_SOCKET;
 	for (struct addrinfo *ai = res; ai; ai = ai->ai_next) {
 		fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-		if (fd < 0)
+		if (fd == OD_INVALID_SOCKET)
 			continue;
+#ifdef _WIN32
+		DWORD tv = static_cast<DWORD>(timeout_seconds) * 1000;
+		setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char *>(&tv), sizeof(tv));
+		setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<const char *>(&tv), sizeof(tv));
+#else
 		struct timeval tv = { timeout_seconds, 0 };
 		setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 		setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
-		if (connect(fd, ai->ai_addr, ai->ai_addrlen) == 0)
+#ifdef SO_NOSIGPIPE
+		int one = 1;
+		setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
+#endif
+#endif
+		if (connect(fd, ai->ai_addr, static_cast<int>(ai->ai_addrlen)) == 0)
 			break;
-		close(fd);
-		fd = -1;
+		OD_CLOSE(fd);
+		fd = OD_INVALID_SOCKET;
 	}
 	freeaddrinfo(res);
 	return fd;
@@ -70,18 +109,18 @@ static std::string decode_chunked(const std::string &in)
 // The socket under the TLS session. The time limits are the socket's.
 static int socket_send(void *context, const unsigned char *data, size_t length)
 {
-	ssize_t n = send(*static_cast<int *>(context), data, length, MSG_NOSIGNAL);
+	auto n = send(*static_cast<socket_t *>(context), reinterpret_cast<const char *>(data), static_cast<int>(length), OD_SEND_FLAGS);
 	if (n >= 0)
 		return static_cast<int>(n);
-	return errno == EINTR ? MBEDTLS_ERR_SSL_WANT_WRITE : MBEDTLS_ERR_SSL_TIMEOUT;
+	return OD_INTERRUPTED ? MBEDTLS_ERR_SSL_WANT_WRITE : MBEDTLS_ERR_SSL_TIMEOUT;
 }
 
 static int socket_recv(void *context, unsigned char *data, size_t length)
 {
-	ssize_t n = recv(*static_cast<int *>(context), data, length, 0);
+	auto n = recv(*static_cast<socket_t *>(context), reinterpret_cast<char *>(data), static_cast<int>(length), 0);
 	if (n >= 0)
 		return static_cast<int>(n);
-	return errno == EINTR ? MBEDTLS_ERR_SSL_WANT_READ : MBEDTLS_ERR_SSL_TIMEOUT;
+	return OD_INTERRUPTED ? MBEDTLS_ERR_SSL_WANT_READ : MBEDTLS_ERR_SSL_TIMEOUT;
 }
 
 namespace {
@@ -93,7 +132,7 @@ struct Session {
 	mbedtls_x509_crt authorities;
 	mbedtls_ssl_config config;
 	mbedtls_ssl_context ssl;
-	int fd = -1;
+	socket_t fd = OD_INVALID_SOCKET;
 
 	Session()
 	{
@@ -105,9 +144,9 @@ struct Session {
 	}
 	~Session()
 	{
-		if (fd >= 0) {
+		if (fd != OD_INVALID_SOCKET) {
 			mbedtls_ssl_close_notify(&ssl);
-			close(fd);
+			OD_CLOSE(fd);
 		}
 		mbedtls_ssl_free(&ssl);
 		mbedtls_ssl_config_free(&config);
@@ -173,7 +212,7 @@ static int https_request(const std::string &method, const std::string &url, cons
 		return -2;
 
 	s.fd = connect_tcp(host, timeout_seconds);
-	if (s.fd < 0)
+	if (s.fd == OD_INVALID_SOCKET)
 		return -4;
 	mbedtls_ssl_set_bio(&s.ssl, &s.fd, socket_send, socket_recv, nullptr);
 
