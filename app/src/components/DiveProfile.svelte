@@ -11,7 +11,9 @@
   import { entryExitTimes, meanLabelY } from '../lib/profile-times.js';
   import { tissueColor } from '../lib/tissues.js';
   import { t } from '../lib/i18n.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopMac } from '../lib/layout.svelte.js';
+  import { deviceStore } from '../lib/device-store.js';
+  import { readLayers, saveLayers, setLayer } from '../lib/profile-layers.js';
 
   /**
    * @type {{
@@ -27,7 +29,22 @@
    */
   // `hover` (desktop, task 2026-11-15-169): the mouse pointer reads the values without a press:
   // a dashed line, a dot on the curve and a dark tooltip next to it.
-  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs, hover = false } = $props();
+  // `onenlarge` (desktop, task 2026-11-15-194): « Agrandir le profil », a button at the end of the chips
+  // row and a double click on the profile. On desktop the curves that are on are kept between dives
+  // and sessions (task 2026-11-15-183, lib/profile-layers.js).
+  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs, hover = false, onenlarge = undefined } = $props();
+
+  // svelte-ignore state_referenced_locally
+  const remembered = hover ? readLayers(deviceStore) : null;
+  /** The chips turned on, in the order they were turned on (desktop). @type {import('../lib/profile-layers.js').Layer[]} */
+  // svelte-ignore state_referenced_locally
+  let layersOn = remembered ?? [];
+  /** @param {import('../lib/profile-layers.js').Layer} layer @param {boolean} on */
+  function remember(layer, on) {
+    if (!hover) return;
+    layersOn = setLayer(layersOn, layer, on);
+    saveLayers(deviceStore, layersOn);
+  }
 
   const uid = $props.id();
   let width = $state(320);
@@ -91,19 +108,19 @@
     return { mk, unit, lo, hi, symbol: fahrenheit ? '°F' : '°C' };
   });
   const temperatureAvailable = $derived(temperature !== null);
-  let temperatureLayer = $state(true);
+  let temperatureLayer = $state(remembered ? remembered.includes('temperature') : true);
   const showTemperature = $derived(temperatureAvailable && temperatureLayer);
 
   // ppO2: the samples in bar, on their own 0 to 1.6 bar scale on the right,
   // with the 1.4 and 1.6 bar limits as light dashed lines.
   const PPO2_MAX = 1.6;
   const ppo2Available = $derived(samples.ppo2Mbar.some((v) => v > 0));
-  let ppo2Layer = $state(false);
+  let ppo2Layer = $state(!!remembered?.includes('ppo2'));
   const showPpo2 = $derived(ppo2Available && ppo2Layer);
 
   // Only one right-hand scale is drawn: the last one turned on.
   /** @type {('temperature'|'ppo2')[]} */
-  let scaleOrder = $state(['temperature']);
+  let scaleOrder = $state(remembered ? remembered.filter((l) => l === 'temperature' || l === 'ppo2') : ['temperature']);
   /** @param {'temperature'|'ppo2'} layer @param {boolean} on */
   function trackScale(layer, on) {
     scaleOrder = on ? [...scaleOrder.filter((l) => l !== layer), layer] : scaleOrder.filter((l) => l !== layer);
@@ -180,7 +197,7 @@
     return edge;
   });
   const ceilingAvailable = $derived((!!ceilingMm && ceilingMm.some((v) => v > 0)) || !!calcCeilingEdge);
-  let ceilingLayer = $state(false);
+  let ceilingLayer = $state(!!remembered?.includes('ceiling'));
   const ceilingShape = $derived.by(() => {
     if (!ceilingAvailable || !ceilingMm || !times.length) return null;
     let edge = '';
@@ -193,7 +210,7 @@
   // the end of the dive.
   const tissueData = $derived(samples.tissues);
   const tissuesAvailable = $derived(!!tissueData && tissueData.length >= 16 && tissueData.length === times.length * 16);
-  let tissuesLayer = $state(false);
+  let tissuesLayer = $state(!!remembered?.includes('tissues'));
   const T_HEIGHT = 56;
   const T_TOP = 4;
   const T_BOTTOM = 40;
@@ -236,7 +253,7 @@
     return list.filter((s) => s.name);
   });
   const gasAvailable = $derived(gasSegments.length > 0);
-  let gasLayer = $state(false);
+  let gasLayer = $state(!!remembered?.includes('gas'));
 
   // Cursor: a finger on the profile places a vertical line and shows time and depth.
   /** @type {number|null} */
@@ -283,6 +300,8 @@
         water,
         showPpo2 ? `${t('profile.ppo2')} ${formatPartialPressure(samples.ppo2Mbar[cursor] / 1000, 2)}` : '',
         ceilingLayer && ceilingMm ? `${t('profile.ceiling')} ${formatDepth(ceilingMm[cursor], prefs)}` : '',
+        ceilingLayer && calcCeilingMm ? `${t('profile.ceilingCalc')} ${formatDepth(calcCeilingMm[cursor], prefs)}` : '',
+        gasLayer ? (gasSegments.find((g) => times[cursor] >= g.start && times[cursor] <= g.end)?.name ?? '') : '',
       ]
         .filter(Boolean)
         .join(' · '),
@@ -347,6 +366,7 @@
       onpointerdown={placeCursor}
       onpointermove={move}
       onpointerleave={leave}
+      ondblclick={onenlarge}
     >
       <defs>
         <linearGradient id="water-{uid}" x1="0" y1={y(0)} x2="0" y2={y(dMax)} gradientUnits="userSpaceOnUse">
@@ -375,6 +395,11 @@
         {#if ceilingLayer && calcCeilingEdge}
           <path d={calcCeilingEdge} class="od-dive-profile--ceiling-line od-dive-profile--ceiling-calc" />
         {/if}
+        {#if showMean && hover}
+          <!-- Desktop (task 2026-11-15-185): above the water, under the curves and the cursor; the label just above its left end. -->
+          <line class="od-dive-profile--mean-desk" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
+          <text class="od-dive-profile--mean-desk-label od-value" x={MARGIN_LEFT + 4} y={meanY - 4}>{t('desktopDetail.mean', { depth: formatDepth(meanDepthMm, prefs) })}</text>
+        {/if}
         <path d={paths.line} class="od-dive-profile--trace-outline" />
         <path d={paths.line} class="od-dive-profile--trace" />
       {/if}
@@ -390,7 +415,7 @@
         {/if}
       {/each}
 
-      {#if showMean}
+      {#if showMean && !hover}
         <line class="od-dive-profile--mean" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
         <text class="od-dive-profile--mean-label od-value" x={MARGIN_LEFT - 4} y={meanLabel + 3} text-anchor="end"
           >{t('profile.mean', { depth: depthValue(meanDepthMm, prefs) })}</text
@@ -473,8 +498,8 @@
     </svg>
   {/if}
 
-  {#if temperatureAvailable || gasAvailable || ppo2Available || ceilingAvailable || tissuesAvailable}
-    <div class="od-dive-profile--layers" role="group" aria-label={t('profile.layers')}>
+  {#if temperatureAvailable || gasAvailable || ppo2Available || ceilingAvailable || tissuesAvailable || onenlarge}
+    <div class="od-dive-profile--layers" class:od-dive-profile--layers-desk={hover} role="group" aria-label={t('profile.layers')}>
       <!-- MD3 filter chips, 48 px targets around 32 px chips (spec, section 3); the row scrolls sideways. -->
       {#if temperatureAvailable}
         <button
@@ -484,6 +509,7 @@
           onclick={() => {
             temperatureLayer = !temperatureLayer;
             trackScale('temperature', temperatureLayer);
+            remember('temperature', temperatureLayer);
           }}
         >
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer} class:od-dive-profile--chip-temperature={temperatureLayer}>
@@ -492,7 +518,7 @@
         </button>
       {/if}
       {#if gasAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={gasLayer} onclick={() => (gasLayer = !gasLayer)}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={gasLayer} onclick={() => ((gasLayer = !gasLayer), remember('gas', gasLayer))}>
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!gasLayer} class:od-dive-profile--chip-ink={gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
           </span>
@@ -506,6 +532,7 @@
           onclick={() => {
             ppo2Layer = !ppo2Layer;
             trackScale('ppo2', ppo2Layer);
+            remember('ppo2', ppo2Layer);
           }}
         >
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ppo2Layer} class:od-dive-profile--chip-ppo2={ppo2Layer}>
@@ -514,18 +541,22 @@
         </button>
       {/if}
       {#if ceilingAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => (ceilingLayer = !ceilingLayer)}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => ((ceilingLayer = !ceilingLayer), remember('ceiling', ceilingLayer))}>
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ceilingLayer} class:od-dive-profile--chip-ceiling={ceilingLayer}>
             {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
           </span>
         </button>
       {/if}
       {#if tissuesAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => (tissuesLayer = !tissuesLayer)}>
+        <button type="button" class="od-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => ((tissuesLayer = !tissuesLayer), remember('tissues', tissuesLayer))}>
           <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!tissuesLayer} class:od-dive-profile--chip-ink={tissuesLayer}>
             {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
         </button>
+      {/if}
+      {#if onenlarge}
+        <!-- « Agrandir le profil » (Ctrl+P): at the end of the row. -->
+        <button type="button" class="od-dive-profile--enlarge" aria-label={t('desktopDetail.enlarge')} title={t('desktopDetail.enlargeTip', { shortcut: desktopMac ? '⌘P' : 'Ctrl+P' })} onclick={onenlarge}><Icon name="fullscreen" size={20} /></button>
       {/if}
     </div>
   {/if}
@@ -674,6 +705,45 @@
     .od-dive-profile--mean-label {
       font-size: 9px;
       fill: var(--od-text-2);
+    }
+
+    /* Desktop (task 2026-11-15-185): the average depth, 1.2 dp dashes of 5 and gaps of 4 in blue. */
+    .od-dive-profile--mean-desk {
+      stroke: var(--od-profile-mean);
+      stroke-width: 1.2;
+      stroke-dasharray: 5 4;
+    }
+
+    .od-dive-profile--mean-desk-label {
+      font-size: 11px;
+      fill: var(--od-profile-mean);
+    }
+
+    .od-dive-profile--layers-desk {
+      align-items: center;
+      padding: 4px 12px 0;
+    }
+
+    .od-dive-profile--layers-desk .od-dive-profile--filter {
+      min-height: 40px;
+    }
+
+    .od-dive-profile--enlarge {
+      flex: none;
+      margin-inline-start: auto;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--od-text);
+      cursor: pointer;
+    }
+
+    .od-dive-profile--enlarge:hover {
+      background: color-mix(in srgb, var(--od-text) 8%, transparent);
     }
 
     .od-dive-profile--tick {

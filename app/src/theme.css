@@ -77,6 +77,11 @@
     /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
     --od-buddy-badge: #E3E1DC;
     --od-trip-band: #ECEAE4;
+    /* Desktop detail pane (tasks 2026-11-15-172, 184, 185): an editable field at rest, its hover outline,
+       the average-depth line of the profile, a chip of a person in a field. */
+    --od-field-rest: #ECEAE4;
+    --od-field-hover: #8F8D86;
+    --od-profile-mean: #114477;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     /* A safe outcome (the planner: no deco stop), in the oxygen green. */
@@ -290,6 +295,10 @@
     --od-menu-danger: #FF8A80;
     --od-buddy-badge: #3A3C40;
     --od-trip-band: #26282B;
+    /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
+    --od-field-rest: #2A2D31;
+    --od-field-hover: #8A8D91;
+    --od-profile-mean: #9DC1EA;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;
     --od-on-error-container: #FDE2E0;
