@@ -587,7 +587,7 @@
                       aria-expanded={row.expanded}
                       onclick={() => (desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded })}
                     >
-                      <span class="od-desktop-logbook--chevron" class:od-desktop-logbook--open={row.expanded} aria-hidden="true">⌄</span>
+                      <span class="od-desktop-logbook--chevron" class:od-desktop-logbook--open={row.expanded} aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                       <span class="od-desktop-logbook--trip-title">{text.title}</span>
                       <span class="od-desktop-logbook--trip-range"> · {text.range}</span>
                     </button>
@@ -858,7 +858,8 @@
       cursor: pointer;
     }
     .od-desktop-logbook--chevron {
-      display: inline-block;
+      display: inline-flex;
+      color: var(--od-text-2);
       transform: rotate(-90deg);
       transition: transform 150ms;
     }
