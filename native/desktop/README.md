@@ -37,3 +37,5 @@ Expected: `passed: 98  failed: 0`. On Windows the same script runs the `.exe` th
 - `core/compat/https_mbedtls.cpp` has a Winsock branch. Mbed TLS has no system certificate
   store: the application passes a PEM file with `opendives_https_set_ca_file()` on every target.
 - CI: `.github/workflows/desktop.yml`, manual only.
+- Windows executables embed `utf8.manifest` (UTF-8 active code page): `argv` and narrow paths are UTF-8, as the core expects.
+- macOS is not tested here; `build-deps.sh` and the CMake file use only portable options (`sed -i.bak`, `-arch`).
