@@ -4023,3 +4023,135 @@ Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 **Inbox.** In the « Done » note of each release-edition task, give its branch name.
 
 Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.
+
+## [ ] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
+
+Christian approved this on 15 November 2026. **Release edition: build it on the branch `feature/release-new-logbook`, started from `feature/release-first-launch` (tasks 213, 216 and 217). Do not merge it into `main`.** Tablets only; the phone comes later.
+
+**What stays from 213:** the left blue panel (brand, heading, line, profile, chips) is unchanged on every step. Its line-drawing animation plays only when the first screen opens.
+
+**What goes from 213:**
+- the right-hand column « Commencer un carnet » ;
+- the « Ouvrir ou importer un carnet » dialog ;
+- the line « Aucune plongée n’est envoyée à OpenDives. ». It must not appear anywhere (new rule 8 in `docs/ui-writing.md`).
+
+**Mock-ups:** `docs/mockups/android-tablette-premier-lancement-production-*.dc.html`, landscape for all screens, plus portrait for the first two (`…-production-portrait`, `…-production-ou-portrait`). In portrait, every other step uses the same centred column under the blue panel.
+
+**Motion between steps:** the shared-axis X transition in `docs/system-design.md` (« Steps of the first launch »), on the right-hand column only. « Retour » plays it backwards. Reference: `docs/mockups/transitions/nouveau-carnet-git.gif`.
+
+**The steps** (texts exactly as in the mock-ups; all in `fr.json` and `en.json`):
+
+1. **Pour commencer** (`…-production-paysage`):
+   - Three choice rows: « Créer un carnet » (main row, filled), « Importer un carnet » and « Ouvrir mon carnet OpenDives ».
+   - Under them, the link « Essayer avec un carnet d’exemple ». It is to-do #69, not designed yet, so hide the link until #69 is built.
+2. **Nouveau carnet** (`…-ou-paysage`), after « Créer un carnet »:
+   - The field « Nom du carnet », prefilled « Mon carnet », with the help line « Il s’affiche en haut du carnet et nomme son fichier. ».
+   - Then « Où le garder ? » with three rows: « Dans mon nuage », « Dans un dépôt git » and « Seulement sur cette tablette ».
+   - **The name becomes the file name** (`Mon carnet.ssrf`):
+     - Strip the characters a file name cannot hold.
+     - If a file of that name already exists in the OpenDives folder, add « (2) ».
+     - For git, the name is a label kept on the device.
+3. **The following steps show the logbook name as the page title** (« Mon carnet », 28 sp, with a pencil icon that goes back to step 2 to rename it). The step's own title sits under it, smaller.
+   - **Cloud:**
+     - « Choisissez votre service » (`…-nuage-service`): Google Drive, OneDrive, Dropbox, « WebDAV ou Nextcloud », with generic icons and **no brand logos**.
+     - « Connexion à {service} », not connected (`…-nuage-connexion`): « Se connecter à {service} » opens the browser.
+     - Connected (`…-nuage-connecte`): the account, « « Mon carnet.ssrf » sera créé dans le dossier OpenDives de ce compte. », « Changer de compte » and « Créer le carnet ».
+   - **Git** (`…-git`):
+     - The fields « Adresse du dépôt », « Branche » (main) and « Jeton d’accès », with « Le jeton reste sur cette tablette. » and the link « Créer un jeton d’accès ».
+     - The note « Le dépôt doit être vide. S’il contient déjà un carnet, passez par Ouvrir mon carnet OpenDives. », where « Ouvrir mon carnet OpenDives » is a link to step 5.
+     - The button « Créer le carnet ».
+   - **Seulement sur cette tablette:** there is no extra screen. The logbook is created on the device, and the app opens it.
+4. **Importer un carnet** (`…-importer`): « D’où viennent vos plongées ? », with two rows.
+   - « Un fichier » opens the system file picker, using the formats the core reads.
+   - « divelogs.de » opens a form (`…-importer-divelogs`): the user name, the password, « OpenDives ne garde pas ces identifiants. » and « Importer ». The credentials are never stored.
+   - Then the progress screen (`…-importer-divelogs-progres`), on a white paper card with three steps (done, current, to come):
+     - « Connexion à divelogs.de » ;
+     - « Téléchargement des plongées » with « n sur N » and the Material 3 Expressive wavy determinate indicator, inside the paper ;
+     - « Lecture des sites et de l’équipement ».
+     - Under the paper, the help line and « Annuler », which keeps nothing.
+   - After the file or divelogs.de has been read, « Nouveau carnet » (`…-importer-nouveau-carnet`) shows a summary card (file name, dives and sites, years). The name is prefilled from the file name, or « Mon carnet » for divelogs.de. The same « Où le garder ? » and the following steps then apply. The imported dives go into the new logbook.
+5. **Ouvrir mon carnet OpenDives:**
+   - « Où est-il ? » (`…-ouvrir`): « Dans mon nuage » or « Dans un dépôt git ».
+   - **Cloud:**
+     - « Dans quel service ? » (`…-ouvrir-nuage`).
+     - The connection (`…-ouvrir-connexion`), then connected (`…-ouvrir-connecte`), with « OpenDives cherchera vos carnets dans le dossier OpenDives de ce compte. », « Changer de compte » and « Voir mes carnets ».
+     - « Choisissez votre carnet » (`…-ouvrir-choix`) lists the logbooks found, each with its number of dives and the date it was last changed. With exactly one logbook, the app opens it without showing the list.
+   - **Git** (`…-ouvrir-git`): the same three fields, then « Ouvrir le carnet ».
+
+**Until idea #74 (the personal cloud) is built:**
+- The cloud rows and screens exist, but « Se connecter à {service} » opens a short message saying the cloud is coming in a later version.
+- Git, « Seulement sur cette tablette », the file import and divelogs.de work with what the app already has.
+
+**Not drawn yet, coming later:**
+- the empty logbook on a tablet ;
+- the « no logbook found » and « empty repository » errors ;
+- the demo banner (#69).
+
+In the meantime, use the existing empty-logbook screen and the existing error messages.
+
+**Test:**
+- In the release build, on a tablet, in both orientations: every step matches its mock-up, « Retour » goes back one step with the reverse animation, and the name ends up as the file name.
+- Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
+- The beta on `main` is untouched.
+
+## [ ] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
+
+Christian approved this on 15 November 2026.
+
+**What the link looks like:**
+- A discreet link, centred, pinned 28 dp above the bottom of the column of choices, so that it does not move from one step to the next.
+- A ⓘ help icon (18 dp, #4B4A47), then « Une question ? » and « À propos et contact ». Only « À propos et contact » is underlined. The text is 14 sp, #4B4A47.
+- It opens the About page, which already gives support@opendives.app.
+- In `fr.json` and `en.json` (« Any questions? About and contact »).
+
+**1. Release edition**, on the branch of task 218 (`feature/release-new-logbook`, not merged into `main`):
+- The link is at the bottom of the right-hand column on **every step** of the first launch: Pour commencer, Nouveau carnet, the cloud, git, import and open steps.
+- Both orientations. Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-*.dc.html`.
+
+**2. Beta**, on `main`:
+- The same link at the bottom of the **first-launch screens of the beta**: `WelcomeStart` (phone and tablet, both orientations), and the screens reached from it before a logbook is open:
+  - the Subsurface account sign-in ;
+  - the account creation and its code ;
+  - the git repository setup.
+- Same look and same place: centred at the bottom of the content, pinned on a tablet, at the end of the content on a phone when the page scrolls.
+- Nothing else changes on these screens: tasks 210, 211 and 214 stay as they are.
+- The beta mock-ups do not show it yet: follow the release mock-ups for its look.
+
+**Test:**
+- On each of these screens, the link is visible without scrolling on a tablet and opens About.
+- « Retour » from About comes back to the same step.
+- The beta screens are otherwise pixel-identical.
+
+Done (part 2, beta): `app/src/components/WelcomeHelpLink.svelte` (class `od-welcome-help-link`, colour `--od-text-2`, #4B4A47 light / #B5B8BC dark, ⓘ 18 dp, 14 sp, only « À propos et contact » underlined, pointer and hover state), keys `welcomeHelp.question|link|label` in `fr.json` and `en.json`, a release note line. On `WelcomeStart` (Android and iOS branches) and, through a `helpLink` prop of `EditorialPage` set from `welcome`, on the first-launch sign-in, account creation, code and git repository screens. Tablet: centred, pinned 28 dp above the bottom; phone: centred at the end of the content (below the fold when the page does not scroll). It opens `/about` in the first-launch view; « Retour » returns to the same step. Tests: `tests/app/welcome-help-link.test.mjs`. Before/after headless screenshots: only the link's area changes on tablets; on Android phones the geometry is unchanged, only text anti-aliasing differs (the page now scrolls). Not ticked: the coordinator ticks it when both parts are in.
+
+## [ ] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
+
+Christian approved this on 15 November 2026.
+
+**1. Beta, on `main`, on every platform** (Android phone and tablet, iPhone and iPad, desktop). On the empty logbook:
+- The main action « Associer un ordinateur de plongée » becomes **« Télécharger mes plongées »**. The diver does not pair the computer beforehand: pairing happens inside the download, the first time.
+- Its Bluetooth icon becomes a **dive computer icon**: a wrist computer with a dive profile on its screen. These are the exact paths, 24 × 24, as a stroke icon in the button's ink:
+  ```
+  <path d="M9 5.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M9 18.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.5"/>
+  <rect x="5" y="5.5" width="14" height="13" rx="4"/>
+  <path d="M7.5 9.5h1l1.8 4.5h2.4l1.3-2h1.2l1.3-2.5"/>
+  <path d="M19 10.5h1.5"/>
+  ```
+  The Bluetooth icon stays on the next screen, where the app looks for computers nearby.
+- **iPhone:** the help text becomes « Téléchargez vos plongées depuis votre ordinateur de plongée. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main. ».
+- Mock-ups: `android-etat-vide.dc.html`, `ios-etat-vide.dc.html`, `bureau-carnet-vide-actuel.dc.html`.
+- The macOS File menu keeps its longer « Télécharger depuis un ordinateur de plongée ».
+
+**2. Release edition, on `feature/release-new-logbook`** (task 218, not merged into `main`). The tablet empty logbook gets its own layout (`android-tablette-carnet-vide-paysage.dc.html`):
+- The navigation rail.
+- The list pane with the blue « Carnet » band, which shows the logbook name and where it is kept (« Mon carnet · Google Drive », then « Aucune plongée »), with no search field.
+- On the right, a centred 520 dp column:
+  - the smooth decorative profile, without bubbles ;
+  - « Aucune plongée pour l'instant » and its line ;
+  - « Télécharger mes plongées » ;
+  - the paper with « Importer un fichier », « Télécharger depuis divelogs.de » and « Noter une plongée à la main ».
+- Every « Créer le carnet » of task 218 lands here.
+
+**Test:** on each platform, the empty logbook shows « Télécharger mes plongées » with the dive computer icon, and it opens the download.
+
+Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.

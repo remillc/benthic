@@ -35,6 +35,7 @@
     "retry": "Réessayer",
     "emptyTitle": "Aucune plongée pour l'instant",
     "emptyText": "Commencez par votre ordinateur de plongée, ou choisissez une autre façon ci-dessous.",
+    "emptyTextIos": "Téléchargez vos plongées depuis votre ordinateur de plongée. Vous pouvez aussi importer un carnet existant ou noter une plongée à la main.",
     "noResults": "Aucune plongée ne correspond à « {query} ».",
     "count": {
       "one": "{n} plongée",
@@ -108,7 +109,7 @@
     "filterOn": "Filtrer les plongées, un filtre est appliqué",
     "filterFailed": "Le filtre n'a pas pu être appliqué. Toutes les plongées sont affichées.",
     "emptyCloud": "Connecté au cloud Subsurface, aucune plongée",
-    "emptyPair": "Associer un ordinateur de plongée",
+    "emptyDownload": "Télécharger mes plongées",
     "emptyDivelogs": "Télécharger depuis divelogs.de",
     "emptyOthers": "Autres façons d'ajouter des plongées",
     "emptyImport": "Importer un fichier",
@@ -2361,6 +2362,11 @@
     },
     "nothingNew": "Ces plongées sont déjà dans le carnet du compte"
   },
+  "welcomeHelp": {
+    "question": "Une question ?",
+    "link": "À propos et contact",
+    "label": "Une question ? À propos et contact"
+  },
   "about": {
     "title": "À propos",
     "version": "Version {version}",
@@ -2379,6 +2385,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet vide : le bouton principal devient « Télécharger mes plongées », avec une icône d’ordinateur de plongée ; l’association de l’ordinateur se fait pendant le téléchargement.",
+      "Premier lancement : le lien « Une question ? À propos et contact » en bas de l’écran ouvre À propos, avec l’adresse du support.",
       "Le profil de plongée décoratif (premier lancement, carnet vide, pages du compte) est une courbe lisse, sans angles.",
       "Premier lancement sur tablette : le profil de plongée ne touche plus les bords de l’écran.",
       "Premier lancement sur tablette : le logo et le nom OpenDives sont plus grands.",

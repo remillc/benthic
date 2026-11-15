@@ -25,6 +25,7 @@
   import LoadingIndicator from './LoadingIndicator.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
   import DecorativeProfile from './DecorativeProfile.svelte';
+  import WelcomeHelpLink from './WelcomeHelpLink.svelte';
   import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -44,6 +45,7 @@
    *   previous?: boolean,
    *   closable?: boolean,
    *   back?: boolean,
+   *   helpLink?: boolean,
    *   children: import('svelte').Snippet,
    *   class?: string,
    * }}
@@ -52,7 +54,7 @@
    * main button (iOS: under it). closable false: no close button (an import
    * that runs). back: ← (iOS: "‹ Retour") instead of ✕ (iOS: "Annuler").
    * previous: the text button is "Précédent" (iOS: a grey capsule beside the
-   * main one).
+   * main one). helpLink: « Une question ? À propos et contact » under the content (first launch).
    */
   let {
     title,
@@ -69,6 +71,7 @@
     previous = false,
     closable = true,
     back = false,
+    helpLink = false,
     children,
     class: extraClass = '',
   } = $props();
@@ -149,6 +152,7 @@
 
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
   </form>
+  {#if helpLink}<WelcomeHelpLink />{/if}
 </Page>
 
 <style>
