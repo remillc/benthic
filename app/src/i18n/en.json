@@ -3827,7 +3827,8 @@
         "other": "{n} dives exported"
       },
       "fileDives": "dives",
-      "fileLogbook": "logbook"
+      "fileLogbook": "logbook",
+      "logbook": "Export the logbook…"
     }
   }
 }

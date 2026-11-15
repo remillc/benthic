@@ -12,6 +12,9 @@
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
+  import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
+  import DesktopLogbookReady from '../components/DesktopLogbookReady.svelte';
+  import { ownLogbookWindow } from '../lib/window-logbook.js';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -53,7 +56,7 @@
   loadDesktopChoices();
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
-  const AVAILABLE = new Set(['addToTrip', 'edit', 'export', 'delete']);
+  const AVAILABLE = new Set(['addToTrip', 'edit', 'export', 'share', 'delete']);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- Search: the core's fulltext index, as on the phone (Logbook.svelte). ---------------
@@ -225,9 +228,9 @@
     showSnackbar(t('desktop.changeFailed'));
   }
 
+  /** Task 172: the detail pane is the editor; its first editable field gets the cursor. */
   function editSelected() {
-    const id = desk.selection.ids[0];
-    if (desk.selection.ids.length === 1 && id !== undefined) f7router.navigate(`/dives/${id}/edit`);
+    if (desk.selection.ids.length === 1) window.dispatchEvent(new Event('od-detail-focus-first'));
   }
 
   function deleteSelected() {
@@ -250,6 +253,7 @@
   }
 
   let exporting = $state(false);
+  let exportWhole = $state(false);
 
   // « Ajouter à un voyage… »: the logbook's trips, newest first, or a new trip.
   let choosingTrip = $state(false);
@@ -289,7 +293,7 @@
   function act(key) {
     if (key === 'edit') editSelected();
     else if (key === 'delete') deleteSelected();
-    else if (key === 'export') exporting = true;
+    else if (key === 'export' || key === 'share') exporting = true;
     else if (key === 'addToTrip') choosingTrip = true;
   }
 
@@ -548,6 +552,11 @@
       case 'addToTrip':
         if (desk.selection.ids.length) choosingTrip = true;
         return true;
+      case 'share':
+        // Task 194: the system's share sheet on Windows and macOS once the bridge has one; until
+        // then, and on Linux, the export dialog.
+        exporting = true;
+        return true;
       case 'undo':
       case 'redo':
         undoLastChange(command === 'redo').catch(changeFailed);
@@ -587,7 +596,6 @@
       else if (!typing && modKey && key === 'y' && !desktopMac) cmd = 'redo';
       else if (!typing && modKey && key === 'a') cmd = 'selectAll';
       else if (!typing && (e.key === 'Delete' || (desktopMac && e.key === 'Backspace' && e.metaKey))) cmd = 'delete';
-      else if (!typing && e.key === 'Enter' && desk.selection.ids.length === 1) cmd = 'edit';
       else if (!typing && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
         e.preventDefault();
         desk.selection = stepSelect(desk.selection, e.key === 'ArrowDown' ? 1 : -1, order, e.shiftKey);
@@ -657,7 +665,7 @@
     <header class="od-desktop-logbook--bar">
       <!-- The list column's own header (task 2026-11-15-192): the title, the count on one line under it. -->
       <div class="od-desktop-logbook--titles">
-        <h1 class="od-desktop-logbook--title">{t('logbook.title')}</h1>
+        {#if desktopMac}<h1 class="od-desktop-logbook--title">{t('logbook.title')}</h1>{:else}<DesktopLogbookSelector onexport={() => ((exportWhole = true), (exporting = true))} />{/if}
         {#if summary}<p class="od-desktop-logbook--summary od-value" title={summary}>{summary}</p>{/if}
       </div>
       <label class="od-desktop-logbook--search">
@@ -698,6 +706,8 @@
         <p>{t('logbook.errorNothingChanged')}</p>
         <button type="button" class="od-desktop-logbook--filled" onclick={() => loadLogbook({ force: true })}>{t('logbook.retry')}</button>
       </div>
+    {:else if !logbook.dives.length && ownLogbookWindow()}
+      <DesktopLogbookReady ondownload={() => choose('download')} onimport={() => choose('import')} onmanual={() => choose('manual')} />
     {:else if !logbook.dives.length}
       <div class="od-desktop-logbook--state">
         <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
@@ -819,7 +829,8 @@
       filtered={filter.ids ? [...filter.ids] : null}
       all={logbook.dives.map((d) => d.id)}
       prefs={logbook.prefs}
-      onclose={() => (exporting = false)}
+      whole={exportWhole}
+      onclose={() => ((exporting = false), (exportWhole = false))}
     />
   {/if}
   {#if choosingTrip}

@@ -3518,7 +3518,7 @@ Test: saving a copy leaves the original window on the original logbook; « Ouvri
 
 Done: `saveCopy()` in `app/src/lib/desktop-logbooks.svelte.js` (system save dialog, the copy written by the bridge, snackbar « Copie enregistrée · Ouvrir » opening it in a new window); ⇧⌘S on the Mac (menu), Ctrl+Maj+S and the selector entry on Windows and Linux. Tested in `tests/desktop/windows.test.mjs`.
 
-## [ ] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
+## [x] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-exporter.dc.html` (the dialog), `docs/mockups/bureau-carnets-selecteur.dc.html` (« Exporter le carnet… » in the logbook selector). The formats and the anonymise option are those of the phone (`docs/ui-specification.md`, « Logbook selection and export »).
 
@@ -3533,6 +3533,8 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 English: « Export 2 dives », « Which dives », « The 2 selected dives », « The 12 filtered dives », « The whole logbook », « Format », « Anonymise », « Export… », « Export the logbook… ».
 
 Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
+
+Done: components/DesktopExportDialog.svelte (title with the count, « Quelles plongées » and « Format » as choice rows, « Anonymiser », the last format remembered in device-store) opened by « Exporter… » in the right-click menu and the dive's icons, Ctrl/⌘+Maj+E, the macOS Fichier › Exporter…, and « Exporter le carnet… » in the Windows/Linux logbook selector (whole logbook); « Exporter… » opens the system's save dialog through the bridge (od:saveAs) with the proposed name (lib/desktop-export.js, tested: « plongees-6-7.ssrf », « carnet-2026-11-15.uddf »). Not checked by hand: the file actually written through the save dialog (a native dialog the test window cannot drive).
 
 ## [x] 2026-11-15-190 Profiles: thinner curve lines on every platform
 

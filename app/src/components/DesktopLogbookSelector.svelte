@@ -18,6 +18,9 @@
   } from '../lib/desktop-logbooks.svelte.js';
   import { displayName, sourceText, whenText, selectorShortcuts } from '../lib/desktop-logbooks.js';
 
+  /** « Exporter le carnet… » (task 2026-11-15-189): the Carnet opens its export dialog on the whole logbook. */
+  let { onexport = undefined } = $props();
+
   const current = windowLogbook();
   const shortcuts = selectorShortcuts(false);
   let open = $state(false);
@@ -112,6 +115,11 @@
         <button type="button" role="menuitem" class="od-logbook-selector--item" onclick={() => run(saveCopy)}>
           <span class="od-logbook-selector--label">{t('desktopLogbooks.selector.saveCopy')}</span><kbd>{shortcuts.saveCopy}</kbd>
         </button>
+        {#if onexport}
+          <button type="button" role="menuitem" class="od-logbook-selector--item" onclick={() => run(onexport)}>
+            <span class="od-logbook-selector--label">{t('desktop.export.logbook')}</span><kbd>Ctrl+Maj+E</kbd>
+          </button>
+        {/if}
         <hr class="od-logbook-selector--rule" />
         <button type="button" role="menuitem" class="od-logbook-selector--item" onclick={() => run(closeLogbook)}>
           <span class="od-logbook-selector--label">{t('desktopLogbooks.selector.closeLogbook')}</span><kbd>{shortcuts.closeLogbook}</kbd>

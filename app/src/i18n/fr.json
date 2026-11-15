@@ -3827,7 +3827,8 @@
         "other": "{n} plongées exportées"
       },
       "fileDives": "plongees",
-      "fileLogbook": "carnet"
+      "fileLogbook": "carnet",
+      "logbook": "Exporter le carnet…"
     }
   }
 }
