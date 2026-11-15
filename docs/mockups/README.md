@@ -215,3 +215,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-nouveau-carnet-nuage.dc.html` | Nouveau carnet, étape 2 : dans votre nuage · bureau |
 | `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
 | `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
+| `logo-profil-claude.dc.html` | Logo · profil de plongée (proposition de Claude) |
