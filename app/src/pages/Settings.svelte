@@ -2103,7 +2103,7 @@
       }
     }
     label.od-desktop-settings--row {
-      cursor: default;
+      cursor: pointer;
     }
     .od-desktop-settings--dimmed .od-desktop-settings--texts,
     .od-desktop-settings--dimmed .od-desktop-settings--control {

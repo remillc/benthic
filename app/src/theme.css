@@ -598,6 +598,18 @@ html.ios {
 }
 
 @layer od.base {
+  /* Pointer (docs/system-design.md, « Pointer »): with a mouse, everything that acts shows the hand;
+     what is disabled, or only shows something, keeps the arrow. */
+  @media (hover: hover) and (pointer: fine) {
+    :where(button, a[href], summary, select, [role='button'], [role='menuitem'], [role='menuitemradio'], [role='menuitemcheckbox'], [role='tab'], [role='option'], [role='radio'], [role='switch'], [role='checkbox'], [role='link'], input[type='checkbox'], input[type='radio'], input[type='range'], label:has(> input:not([type='text'], [type='number'], [type='search'], [type='password'], [type='url'], [type='email'])):not(:has(:disabled))) {
+      cursor: pointer;
+    }
+    :where(button:disabled, [aria-disabled='true'], input:disabled, select:disabled) {
+      cursor: default;
+    }
+  }
+
+@layer od.base {
   body {
     font-family: var(--f7-font-family);
   }

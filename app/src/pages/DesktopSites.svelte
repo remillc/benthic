@@ -716,7 +716,7 @@
     .od-desktop-sites--row {
       height: 44px;
       border-bottom: 1px solid var(--od-row-divider);
-      cursor: default;
+      cursor: pointer;
     }
     .od-desktop-sites--row td {
       padding: 0 12px;

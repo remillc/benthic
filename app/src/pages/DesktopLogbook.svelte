@@ -1149,7 +1149,7 @@
     }
     .od-desktop-logbook--row {
       height: 48px;
-      cursor: default;
+      cursor: pointer;
     }
     .od-desktop-logbook--row td {
       padding: 0 10px;

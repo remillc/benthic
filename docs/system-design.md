@@ -387,6 +387,10 @@ Every snackbar in the app uses one style, the one of `docs/mockups/sites-nettoye
 - Swipe to the right to send it away (Christian, 14 November 2026): it follows the finger; past a quarter of its width, or with a quick flick, it leaves to the right and closes without running its action; otherwise it springs back. Not from the action button.
 - `role="status"` so screen readers announce it; the action stays reachable with the keyboard and TalkBack until the snackbar closes.
 
+### Pointer (decided on 15 November 2026)
+
+With a mouse (the desktop app, a tablet with a mouse), **everything that acts shows the hand pointer** (`cursor: pointer`): buttons, links, menu items, navigation rail items, tabs, chips, choice rows, switches and their row, table rows that select or open something, map pins that open something. **What is disabled, or only shows something, keeps the arrow**: disabled controls, plain text, headings, empty space, a pane's background; a text field keeps the text cursor. Hover feedback goes with the hand: an element that shows the hand also has its hover state. `app/src/theme.css` (`od.base`) gives the hand to buttons, links and the usual roles; a component sets `cursor: pointer` itself on any other element it makes clickable, and never `cursor: default` on an action.
+
 ## 9. States and messages
 
 Each screen has five states to build, besides the normal one: loading, empty, error, offline and conflict. They are drawn for phones in the mock-ups.

@@ -140,10 +140,11 @@
     }
 
     /* Mouse (the desktop app, task 2026-11-15-180): the Material 3 hover layer on the pill, ink
-       for the icon and label; the active pill keeps its colours under the layer. No hand pointer. */
+       for the icon and label; the active pill keeps its colours under the layer. An action: the hand pointer
+       (docs/system-design.md, « Pointer »). */
     @media (hover: hover) and (pointer: fine) {
       .od-nav-rail--item {
-        cursor: default;
+        cursor: pointer;
 
         .od-nav-rail--icon {
           position: relative;
