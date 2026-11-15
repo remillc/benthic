@@ -3960,3 +3960,66 @@ Christian approved this on 15 November 2026. Mock-ups:
 **Test:**
 - The beta build is unchanged.
 - In the release build, on a tablet, in both orientations: the screens match the mock-ups, the profile touches no edge, and « Sur cette tablette » and « Choisir un fichier » each lead to a working logbook.
+
+On hold (tasks 215 and 216): built once, then taken off `main`; the work is kept on `feature/release-first-launch` (edition switch `VITE_EDITION`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, `OpenImportDialog.svelte`, tests). A new task replaces this one.
+
+## [x] 2026-11-15-214 The decorative dive profile becomes a smooth curve
+
+Christian approved this on 15 November 2026. The decorative profile (first launch, editorial pages, empty logbook) has no corners any more. It is a smooth curve that passes through **every** original point, so no detail is lost. Mock-ups (all show the curve): `docs/mockups/android-tablette-premier-lancement-{paysage,portrait}.dc.html`, `android-etat-vide.dc.html`, `ios-accueil.dc.html`, `android-accueil-c.dc.html` (its script computes the curve from PTS), `bureau-carnet-vide-actuel.dc.html`.
+
+**How:** a Catmull-Rom spline through the points, converted to cubic Béziers (tension 1/6). For each segment from Pᵢ to Pᵢ₊₁:
+- C1 = Pᵢ + (Pᵢ₊₁ − Pᵢ₋₁) / 6
+- C2 = Pᵢ₊₁ − (Pᵢ₊₂ − Pᵢ) / 6
+
+At the two ends, the missing neighbour is the end point itself. The path is `M P₀` then one `C C1 C2 Pᵢ₊₁` per segment.
+- Put this in one function in `app/src/lib` (for example `smooth-path.js`, with a test in `tests/app`), and use it wherever the decorative profile is drawn: `DecorativeProfile.svelte`, the profile in `WelcomeStart.svelte`, and any other copy of the same POINTS.
+- The water fill uses the same curve.
+- The line's thickness, colours, height and margins do not change (tasks 210, 211 and 213 stay as they are).
+
+**Not concerned:** the real profile of a dive (Detail, planner, statistics). It keeps drawing the recorded samples as they are.
+
+**Test:** the decorative profile shows no corner at any size, on phone, tablet and desktop. The curve passes through each original point (unit test). The real dive profile is unchanged.
+
+Done: `app/src/lib/smooth-path.js` (`smoothPath`, Catmull-Rom as cubic Béziers, tension 1/6, end points as their own neighbours; `decorativeProfilePath` for the shared dive points) draws the line and the water of `DecorativeProfile.svelte` (empty logbook, editorial pages) and of `WelcomeStart.svelte`; sizes, colours and margins unchanged. The release-edition profile (task 213) already uses the mock-up's curve. The real dive profile is untouched. Tests in `tests/app/smooth-path.test.mjs` (every point on the curve, the control points, no corner).
+
+## [x] 2026-11-15-215 Release-edition screens stay on a branch; task 213 is on hold
+
+Christian decided this on 15 November 2026.
+
+**Release-edition screens stay on their own branch.** These are the screens of the future public edition: task 213 and the tasks that will replace or follow it. They must not replace the beta screens. You may build them, but on the branch `feature/release-first-launch` (created from `main`, kept up to date with it), never merged into `main` until Christian asks. The beta on `main` stays exactly as it is.
+
+**Task 213 is on hold.** Its screens are being redesigned: the first launch becomes two steps, « Pour commencer » then « Nouveau carnet ». A new task will replace 213.
+- Do not start 213.
+- If you already started it, stop and keep what you have on `feature/release-first-launch`.
+
+Mark this task done once the branch exists (or once you have noted the rule, if nothing was started).
+
+Done: task 213 had already been merged into `main`; it is reverted there, so the beta on `main` is as before (no edition switch, no release screens), and the branch `feature/release-first-launch` keeps the work, kept up to date with `main` and never merged until Christian asks.
+
+## [x] 2026-11-15-216 Correction to 215: move task 213's work off main
+
+Christian decided this on 15 November 2026. Task 215 assumed 213 was not started, but it is already done and merged into `main`. Christian chose to take it **off `main`**.
+
+1. Create `feature/release-first-launch` from the current `main`. It keeps everything 213 added: `edition.js` and `VITE_EDITION`, `WelcomeEntry.svelte`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, the dialog, the texts, the README section, the tests.
+2. On `main`, remove what 213 added, with one revert commit (or a commit that removes those files and the changes in `App.svelte`, the i18n files and `app/README.md`). `main` goes back to the beta only, with nothing from the release edition in it.
+   - Keep everything that does not come from 213, in particular 214 (the smooth decorative profile) and 210 and 211.
+   - The beta screens must stay pixel-identical: check it as you did for 213.
+3. From now on, every task about the release edition (marked « release edition » or « version publique ») is built on `feature/release-first-launch`, never merged into `main` until Christian asks. Keep the branch up to date with `main`.
+4. 213 itself stays on hold on the branch: its screens are being redesigned, and a new task will replace it.
+
+This replaces the « Task 213 is on hold » part of task 215.
+
+Done: one revert commit on `main` takes off everything 213 added (edition switch, release screens, dialog, texts, README section, tests); 210, 211 and 214 stay. `feature/release-first-launch` was created from `main` before the revert and keeps the work (the revert is undone there after merging `main`). Beta first launch checked in headless Edge at 800 × 1280: identical to the screenshot taken before 213.
+
+## [x] 2026-11-15-217 Branch names for the release edition
+
+Christian decided this on 15 November 2026; this specifies point 3 of task 216.
+
+**Branches.** Each release-edition task gets its own branch, named `feature/release-<short task name>`: for example `feature/release-first-launch` for 213 and 216, and `feature/release-new-logbook` for the coming two-step first launch.
+- A task that builds on an earlier release task starts from that task's branch. Otherwise it starts from `main`.
+- None of these branches is merged into `main` until Christian asks.
+- Keep each one up to date with `main`.
+
+**Inbox.** In the « Done » note of each release-edition task, give its branch name.
+
+Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.

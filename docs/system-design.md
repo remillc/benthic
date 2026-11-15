@@ -328,6 +328,8 @@ Android uses the Material 3 Expressive motion scheme: springs, not fixed curves.
 
 Spatial springs (position, size, scale) may overshoot a little; effects springs (opacity, colour) never do. The `anchored` tokens are an OpenDives addition: the spatial stiffness with a damping ratio of 1, for surfaces fixed to a screen edge, which must not leave it.
 
+**Steps of the first launch (decided on 15 November 2026).** Moving from one step to the next (« Pour commencer », « Nouveau carnet », the service, the sign-in, the git repository) uses Material's forward shared-axis X transition on the column of choices only; the blue panel with the brand and the profile stays still. The touched row first shows its pressed state and ripple. Then the outgoing content slides 30 dp to the left and fades out in the first 30 % of the move, and the incoming content slides in from 30 dp to the right and fades in over the rest. Use `spatial-default` for the slide and `effects-default` for the fades. « Retour » plays it backwards. Reference animation: `docs/mockups/transitions/nouveau-carnet-git.gif`.
+
 Where they apply (rules in `theme.css`, layer `od.base`, and in the components):
 
 - **Page transitions** (opening a dive, Settings, any pushed page, phone): the new page and the one below use `spatial-default`; going back uses `spatial-fast` and `effects-fast` for the fade. Framework7's keyframes are kept; only their duration and easing change.

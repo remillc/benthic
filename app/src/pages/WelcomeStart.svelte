@@ -12,20 +12,15 @@
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
+  import { decorativeProfilePath } from '../lib/smooth-path.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
-  // Illustration: the profile of a dive (time in s, depth in m), as in the mock-ups.
-  const POINTS = [
-    [0, 0], [170, 24], [390, 46.4], [610, 57.3], [830, 59.6], [1050, 55.5], [1160, 52.9], [1380, 32.4],
-    [1553, 20.7], [1632, 20.6], [1676, 21.1], [1750, 22.4], [1970, 20.7], [2190, 22.3], [2410, 24], [2630, 22.6],
-    [2850, 18.2], [3070, 16.5], [3290, 16.5], [3510, 14.3], [3730, 16.2], [3950, 13.3], [4170, 10], [4390, 10.9],
-    [4610, 10.5], [4830, 9.9], [5050, 7.5], [5270, 6.1], [5490, 7.6], [5710, 6.3], [5930, 4.5], [6150, 5], [6240, 0],
-  ];
   const WIDTH = 390;
   const HEIGHT = 220;
-  const line = 'M' + POINTS.map(([s, d]) => `${((s / 6240) * WIDTH).toFixed(1)} ${(40 + (d / 60.2) * 160).toFixed(1)}`).join(' L');
+  // Illustration: the dive of the mock-ups as a smooth curve through every point (task 2026-11-15-214).
+  const line = decorativeProfilePath(WIDTH, 40, 160);
   // The water column lies between the surface and the profile line.
   const area = `${line} L${WIDTH} 0 L0 0 Z`;
 
