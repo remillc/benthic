@@ -120,7 +120,8 @@ struct DiveListChange {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES } kind = DIVE;
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES,
+		    MERGE, DIVES_EDIT } kind = DIVE;
 	// DIVE_LIST: as Subsurface's AddDive and ImportDives: what the next undo
 	// or redo puts in and takes out; for an import, the dive computers and
 	// filter presets it brings, and whether they are in the log now.
@@ -2012,6 +2013,31 @@ static void apply_dive_list(Step &step)
 	}
 }
 
+// MergeDives::redoit() and undoit() (commands/command_divelist.cpp): redo
+// renumbers the following dives, adds the merged dive, removes the originals
+// and sets the location of the merged dive's site; undo does it in reverse
+// order. The renumbering and the location swap with their previous values.
+static void apply_merge(Step &step)
+{
+	bool redo = !step.list_applied;
+	auto renumber = [&step]() {
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	};
+	if (redo)
+		renumber();
+	apply_dive_list(step);
+	if (!redo)
+		renumber();
+	if (step.site) {
+		std::swap(step.location, step.site->location);
+		for (dive *d: step.site->dives)
+			d->invalidate_cache();
+	}
+}
+
 // CreateFilterPreset, RemoveFilterPreset, EditFilterPreset: redo and undo.
 static void apply_filter_preset(Step &step)
 {
@@ -2176,6 +2202,19 @@ static int swap_step(Step &step, std::string &result_json, std::string &error)
 	if (step.kind == Step::DIVE_LIST) {
 		apply_dive_list(step);
 		result_json = dive_list_json(step);
+		return 0;
+	}
+	if (step.kind == Step::MERGE) {
+		apply_merge(step);
+		result_json = dive_list_json(step);
+		return 0;
+	}
+	if (step.kind == Step::DIVES_EDIT) {
+		// EditDivesBase: every dive swaps its contents with the saved ones.
+		for (auto &[id, other]: step.dive_swaps)
+			if (dive *d = divelog.dives.get_by_uniq_id(id))
+				exchange(d, *other);
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
 		return 0;
 	}
 	if (step.kind == Step::FILTER_PRESET) {
@@ -3161,6 +3200,282 @@ static int check_writable_log(std::string &error)
 		error = "FORMAT_NEWER";
 		return -1;
 	}
+	return 0;
+}
+
+// Dives of the log from ids, in the order of the table (Subsurface passes its
+// selection in that order); NOT_FOUND for an unknown id.
+static int dives_in_table_order(const std::vector<int> &ids, std::vector<dive *> &out, std::string &error)
+{
+	std::set<dive *> wanted;
+	for (int id: ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		wanted.insert(d);
+	}
+	for (auto &d: divelog.dives)
+		if (wanted.count(d.get()))
+			out.push_back(d.get());
+	return 0;
+}
+
+int merge_dives(const std::vector<int> &ids, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<dive *> dives;
+	if (dives_in_table_order(ids, dives, error))
+		return -1;
+	if (dives.size() < 2) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// MergeDives::MergeDives() (commands/command_divelist.cpp).
+	Step step;
+	step.kind = Step::MERGE;
+	step.text = "merge dive";
+	auto [d, set_location] = divelog.dives.merge_dives(dives);
+	if (!d) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// The merged dive gets the number of the first dive with a non-zero number.
+	for (const dive *item: dives) {
+		if (item->number) {
+			d->number = item->number;
+			break;
+		}
+	}
+	// The following dives are renumbered only if the merged ones are
+	// consecutive in the table and numbered in increasing order; missing
+	// numbers stay missing (see the comment in MergeDives).
+	size_t idx = divelog.dives.get_idx(dives[0]);
+	size_t num = dives.size();
+	if (idx == std::string::npos) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	bool consecutive = idx + num <= divelog.dives.size();
+	for (size_t i = 0; consecutive && i < num; i++)
+		consecutive = divelog.dives[idx + i].get() == dives[i];
+	if (consecutive && dives[0]->number && dives.back()->number && dives[0]->number < dives.back()->number) {
+		int diff = dives.back()->number - dives[0]->number;
+		int previousnr = dives[0]->number;
+		for (size_t i = idx + num; i < divelog.dives.size(); ++i) {
+			int newnr = divelog.dives[i]->number - diff;
+			if (newnr <= previousnr) // stop renumbering if stuff isn't in order
+				break;
+			step.renumbered.push_back({ divelog.dives[i].get(), newnr });
+			previousnr = newnr;
+		}
+	}
+	DiveToAdd merged;
+	merged.trip = d->divetrip;
+	merged.site = d->dive_site;
+	if (set_location.has_value() && d->dive_site) {
+		step.location = *set_location;
+		step.site = d->dive_site;
+	}
+	// The preferred trip and site are kept in `merged`; the new dive carries no reference.
+	d->divetrip = nullptr;
+	d->dive_site = nullptr;
+	merged.d = std::move(d);
+	step.list.dives.push_back(std::move(merged));
+	step.list.remove_dives = dives;
+	apply_merge(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+// The fields of edit_dives() as they come in the request.
+namespace {
+struct MultiEdit {
+	bool has_site = false, has_notes = false, has_suit = false, has_salinity = false;
+	uint32_t site = 0;
+	std::string notes, suit;
+	int salinity = 0;
+	// Names to add and to remove (the Add and Remove suffixes) from the lists.
+	std::vector<std::string> buddies_add, buddies_remove, guide_add, guide_remove, tags_add, tags_remove;
+	// "diveguide" given as a list: the whole new list.
+	bool has_guide_list = false;
+	std::vector<std::string> guide_list;
+};
+
+bool names_of(const JsonValue &value, std::vector<std::string> &out)
+{
+	if (value.kind != JsonValue::LIST)
+		return false;
+	for (const std::string &s: value.list) {
+		std::string t = trim(s);
+		if (!t.empty())
+			out.push_back(t);
+	}
+	return true;
+}
+
+// EditTagsBase for one dive: the removed names leave, the added ones go at
+// the end; false when nothing changes.
+bool add_remove(std::vector<std::string> &list, const std::vector<std::string> &add, const std::vector<std::string> &remove)
+{
+	bool changed = false;
+	for (const std::string &s: remove) {
+		auto it = std::remove(list.begin(), list.end(), s);
+		if (it != list.end()) {
+			list.erase(it, list.end());
+			changed = true;
+		}
+	}
+	for (const std::string &s: add) {
+		if (!contains(list, s)) {
+			list.push_back(s);
+			changed = true;
+		}
+	}
+	return changed;
+}
+} // namespace
+
+int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<dive *> dives;
+	if (dives_in_table_order(ids, dives, error))
+		return -1;
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	std::vector<std::pair<std::string, JsonValue>> changes;
+	if (!JsonReader(changes_json).object(changes)) {
+		error = "BAD_REQUEST: invalid JSON";
+		return -1;
+	}
+	MultiEdit e;
+	for (const auto &[key, value]: changes) {
+		if (key == "notes" || key == "suit") {
+			if (value.kind != JsonValue::STRING) {
+				error = "BAD_REQUEST: " + key + " must be a string";
+				return -1;
+			}
+			(key == "notes" ? e.has_notes : e.has_suit) = true;
+			(key == "notes" ? e.notes : e.suit) = value.text;
+		} else if (key == "site") {
+			if (value.kind != JsonValue::NUMBER || value.number < 0) {
+				error = "BAD_REQUEST: site must be a site uuid";
+				return -1;
+			}
+			e.has_site = true;
+			e.site = static_cast<uint32_t>(value.number);
+			if (e.site && !divelog.sites.get_by_uuid(e.site)) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+		} else if (key == "userSalinity") {
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 1000000) {
+				error = "BAD_REQUEST: userSalinity";
+				return -1;
+			}
+			e.has_salinity = true;
+			e.salinity = static_cast<int>(value.number);
+		} else if (key == "buddiesAdd" || key == "buddiesRemove" || key == "diveguideAdd" || key == "diveguideRemove" ||
+			   key == "tagsAdd" || key == "tagsRemove" || key == "diveguide") {
+			std::vector<std::string> &target =
+				key == "buddiesAdd" ? e.buddies_add : key == "buddiesRemove" ? e.buddies_remove
+				: key == "diveguideAdd" ? e.guide_add : key == "diveguideRemove" ? e.guide_remove
+				: key == "tagsAdd" ? e.tags_add : key == "tagsRemove" ? e.tags_remove : e.guide_list;
+			if (!names_of(value, target)) {
+				error = "BAD_REQUEST: " + key + " must be a list of strings";
+				return -1;
+			}
+			if (key == "diveguide")
+				e.has_guide_list = true;
+		} else {
+			error = "BAD_REQUEST: unknown field " + key;
+			return -1;
+		}
+	}
+
+	Step step;
+	step.kind = Step::DIVES_EDIT;
+	std::vector<dive *> changed;
+	std::vector<std::string> fields; // names as in Subsurface's Edit* commands
+	auto note_field = [&fields](const std::string &name) {
+		if (std::find(fields.begin(), fields.end(), name) == fields.end())
+			fields.push_back(name);
+	};
+	for (dive *d: dives) {
+		auto copy = std::make_unique<dive>(*d);
+		bool any = false;
+		if (e.has_notes && copy->notes != e.notes) {
+			copy->notes = e.notes;
+			note_field("notes");
+			any = true;
+		}
+		if (e.has_suit && copy->suit != e.suit) {
+			copy->suit = e.suit;
+			note_field("suit");
+			any = true;
+		}
+		if (e.has_salinity && copy->user_salinity != e.salinity) {
+			copy->user_salinity = e.salinity;
+			note_field("salinity");
+			any = true;
+		}
+		if (e.has_site) {
+			dive_site *ds = e.site ? divelog.sites.get_by_uuid(e.site) : nullptr;
+			if (copy->dive_site != ds) {
+				copy->dive_site = ds;
+				note_field("dive site");
+				any = true;
+			}
+		}
+		std::vector<std::string> list = string_to_list(copy->buddy);
+		if (add_remove(list, e.buddies_add, e.buddies_remove)) {
+			copy->buddy = join(list); // EditBuddies::set()
+			note_field("buddies");
+			any = true;
+		}
+		list = string_to_list(copy->diveguide);
+		bool guide_changed = e.has_guide_list ? apply_tag_edit(list, e.guide_list) : false;
+		guide_changed = add_remove(list, e.guide_add, e.guide_remove) || guide_changed;
+		if (guide_changed) {
+			copy->diveguide = join(list);
+			note_field("dive guide");
+			any = true;
+		}
+		list = tag_names(*copy);
+		if (add_remove(list, e.tags_add, e.tags_remove)) {
+			copy->tags.clear(); // EditTags::set()
+			for (const std::string &tag: list)
+				taglist_add_tag(copy->tags, tag);
+			taglist_cleanup(copy->tags);
+			note_field("tags");
+			any = true;
+		}
+		if (!any)
+			continue;
+		changed.push_back(d);
+		step.dive_swaps.emplace_back(d->id, std::move(copy));
+	}
+	if (changed.empty()) {
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+		return 0;
+	}
+	// EditDivesBase: "Edit notes (3 dive(s)) [#1, #2, #3]", or "Edit dive" when
+	// several fields change.
+	std::string what = fields.size() == 1 ? "Edit " + fields[0] : "Edit dive";
+	if (changed.size() == 1)
+		step.text = what + " [" + dive_number_or_date(*changed[0]) + "]";
+	else
+		step.text = what + " (" + std::to_string(changed.size()) + " dive(s)) [" + list_of_dives(changed) + "]";
+	std::string unused;
+	swap_step(step, result_json, unused);
+	push_step(std::move(step));
 	return 0;
 }
 

@@ -1040,6 +1040,29 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.deleteDive(ids)))
     }
 
+    /** Merges dives into one (merge_dives): one undoable step. */
+    @PluginMethod
+    fun mergeDives(call: PluginCall) = onCoreThread(call) {
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray()
+        if (ids == null || ids.size < 2) {
+            call.reject("Missing ids", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.mergeDives(ids)))
+    }
+
+    /** Applies the same changes to several dives (edit_dives): one undoable step. */
+    @PluginMethod
+    fun editDives(call: PluginCall) = onCoreThread(call) {
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray()
+        val changes = call.getObject("changes")
+        if (ids == null || ids.isEmpty() || changes == null) {
+            call.reject("Missing ids or changes", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.editDives(ids, changes.toString())))
+    }
+
     /** Renumbers dives in date order (renumber_dives): all of them if no ids, one undoable step. */
     @PluginMethod
     fun renumberDives(call: PluginCall) = onCoreThread(call) {

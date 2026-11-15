@@ -530,6 +530,30 @@ int delete_dive(int id, std::string &result_json, std::string &error);
 // The same for several dives, one undoable step ("delete N dive(s) [...]").
 int delete_dives(const std::vector<int> &ids, std::string &result_json, std::string &error);
 
+// Merges two or more dives of the log into one (MergeDives, commands/
+// command_divelist.cpp, through dive_table::merge_dives): profiles, cylinders,
+// events and the other data are joined as Subsurface joins them. The merged
+// dive takes the number of the first numbered dive, the following dives are
+// renumbered as Subsurface does, and it sits in the preferred trip and site.
+// One undoable step ("merge dive"); undo puts the original dives back as they
+// were. The result is {"listChange":true,"dives":<count>,"id":<merged dive>}.
+// The rule "consecutive and at most 60 minutes apart" is the caller's
+// (app/src/lib/multi-dive.js): the core merges any dives it is given.
+// NOTHING_TO_DO with fewer than two dives.
+int merge_dives(const std::vector<int> &ids, std::string &result_json, std::string &error);
+
+// Applies the same changes to several dives as one undoable step (the multi-
+// dive edits of commands/command_edit.cpp, EditDivesBase). `changes_json` is
+// an object with any of: "site" (uuid, 0 for none), "notes", "suit" (strings),
+// "userSalinity" (water type, 0 clears), "buddiesAdd", "buddiesRemove",
+// "diveguideAdd", "diveguideRemove", "tagsAdd", "tagsRemove" (lists of names:
+// added at the end of each dive's list, removed from each dive that has them,
+// nothing else touched) and "diveguide" (a list that replaces the guides of
+// every dive, as EditDiveGuide). Dives that already have the values are left
+// alone; no step is added when nothing changes. Result:
+// {"listChange":true,"dives":<count>,"id":0}.
+int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std::string &result_json, std::string &error);
+
 // Renumbers dives as Subsurface's Renumber dialog (RenumberDialog, then
 // RenumberDives in commands/command_divelist.cpp): the listed dives (all of
 // them if `ids` is empty), in date order, get consecutive numbers from

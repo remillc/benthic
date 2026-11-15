@@ -34,6 +34,8 @@ internal object NativeCore {
     external fun createDive(fields: String): String
     external fun deleteDive(ids: IntArray): String
     external fun renumberDives(ids: IntArray, start: Int, numbers: IntArray): String
+    external fun mergeDives(ids: IntArray): String
+    external fun editDives(ids: IntArray, changes: String): String
     external fun importDives(file: String, source: String): String
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String

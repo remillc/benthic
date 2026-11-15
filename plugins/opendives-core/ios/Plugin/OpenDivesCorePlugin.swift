@@ -72,6 +72,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "savePlan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "renumberDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
@@ -510,6 +512,27 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
         onCoreThread(call) { [self] in
             call.resolve(["json": try OpenDivesNative.deleteDives(numbers(list))])
+        }
+    }
+
+    @objc func mergeDives(_ call: CAPPluginCall) {
+        guard let ids = intList(call, "ids"), ids.count >= 2 else {
+            call.reject("Missing ids", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            call.resolve(["json": try OpenDivesNative.mergeDives(numbers(ids))])
+        }
+    }
+
+    @objc func editDives(_ call: CAPPluginCall) {
+        guard let ids = intList(call, "ids"), !ids.isEmpty, let changes = call.getObject("changes"),
+              let text = jsonText(changes) else {
+            call.reject("Missing ids or changes", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            call.resolve(["json": try OpenDivesNative.editDives(numbers(ids), changes: text)])
         }
     }
 

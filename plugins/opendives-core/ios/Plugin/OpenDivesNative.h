@@ -120,6 +120,10 @@ NS_ASSUME_NONNULL_BEGIN
 			     error:(NSError **)error NS_SWIFT_NAME(filterQuery(kind:fulltext:mode:rules:));
 + (nullable NSString *)createDive:(NSString *)fields error:(NSError **)error NS_SWIFT_NAME(createDive(_:));
 + (nullable NSString *)deleteDives:(NSArray<NSNumber *> *)ids error:(NSError **)error NS_SWIFT_NAME(deleteDives(_:));
++ (nullable NSString *)mergeDives:(NSArray<NSNumber *> *)ids error:(NSError **)error NS_SWIFT_NAME(mergeDives(_:));
++ (nullable NSString *)editDives:(NSArray<NSNumber *> *)ids
+			 changes:(NSString *)changes
+			   error:(NSError **)error NS_SWIFT_NAME(editDives(_:changes:));
 + (nullable NSString *)renumberDives:(NSArray<NSNumber *> *)ids
 			       start:(NSInteger)start
 			     numbers:(NSArray<NSNumber *> *)numbers
