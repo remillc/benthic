@@ -4020,3 +4020,31 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 - In the release build, on a tablet, in both orientations: every step matches its mock-up, « Retour » goes back one step with the reverse animation, and the name ends up as the file name.
 - Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
 - The beta on `main` is untouched.
+
+## [ ] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
+
+Christian approved this on 15 November 2026.
+
+**What the link looks like:**
+- A discreet link, centred, pinned 28 dp above the bottom of the column of choices, so that it does not move from one step to the next.
+- A ⓘ help icon (18 dp, #4B4A47), then « Une question ? » and « À propos et contact ». Only « À propos et contact » is underlined. The text is 14 sp, #4B4A47.
+- It opens the About page, which already gives support@opendives.app.
+- In `fr.json` and `en.json` (« Any questions? About and contact »).
+
+**1. Release edition**, on the branch of task 218 (`feature/release-new-logbook`, not merged into `main`):
+- The link is at the bottom of the right-hand column on **every step** of the first launch: Pour commencer, Nouveau carnet, the cloud, git, import and open steps.
+- Both orientations. Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-*.dc.html`.
+
+**2. Beta**, on `main`:
+- The same link at the bottom of the **first-launch screens of the beta**: `WelcomeStart` (phone and tablet, both orientations), and the screens reached from it before a logbook is open:
+  - the Subsurface account sign-in ;
+  - the account creation and its code ;
+  - the git repository setup.
+- Same look and same place: centred at the bottom of the content, pinned on a tablet, at the end of the content on a phone when the page scrolls.
+- Nothing else changes on these screens: tasks 210, 211 and 214 stay as they are.
+- The beta mock-ups do not show it yet: follow the release mock-ups for its look.
+
+**Test:**
+- On each of these screens, the link is visible without scrolling on a tablet and opens About.
+- « Retour » from About comes back to the same step.
+- The beta screens are otherwise pixel-identical.
