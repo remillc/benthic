@@ -171,3 +171,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-carnets-selecteur.dc.html` | Carnet · bureau (Windows, Linux), choisir un carnet |
 | `bureau-carnets-menu-fichier-macos.dc.html` | Carnet · bureau macOS, menu Fichier et carnets récents |
 | `bureau-carnets-accueil.dc.html` | Bureau · aucun carnet ouvert |
+| `bureau-nouveau-carnet-choix.dc.html` | Nouveau carnet, étape 1 : nom et où le garder · bureau |
+| `bureau-nouveau-carnet-nuage.dc.html` | Nouveau carnet, étape 2 : dans votre nuage · bureau |
+| `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
+| `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
