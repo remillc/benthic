@@ -331,9 +331,9 @@ Where they apply (rules in `theme.css`, layer `od.base`, and in the components):
 
 Springs are kept short (all under 0.4 s except `spatial-slow`). "Remove animations" (`prefers-reduced-motion`) cuts every transition and animation to 0.01 ms through the rule at the end of `od.base`; the `--od-motion-*` tokens need no special case.
 
-### Choice rows (Android, decided on 12 November 2026)
+### Choice rows (Android and desktop; Android decided on 12 November 2026, desktop on 15 November 2026)
 
-No radio buttons on Android. A choice of one item among several uses `ChoiceRow` (`app/src/components/ChoiceRow.svelte`):
+No radio buttons on Android, and none on desktop (Windows, macOS, Linux). A choice of one item among several uses `ChoiceRow` (`app/src/components/ChoiceRow.svelte`):
 
 - The chosen row sits on `--od-surface-container-highest` with 12 dp corners and a 24 dp ink check at the start; the other rows are plain with an empty 24 dp slot, so the texts line up. A tap selects.
 - Accessibility is unchanged: the rows are `role="radio"` with `aria-checked` inside a `role="radiogroup"`; the arrow keys move and select, only the chosen row is in the tab order.
