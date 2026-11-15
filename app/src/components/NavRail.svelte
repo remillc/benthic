@@ -139,6 +139,47 @@
       }
     }
 
+    /* Mouse (the desktop app, task 2026-11-15-180): the Material 3 hover layer on the pill, ink
+       for the icon and label; the active pill keeps its colours under the layer. No hand pointer. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-nav-rail--item {
+        cursor: default;
+
+        .od-nav-rail--icon {
+          position: relative;
+        }
+        .od-nav-rail--icon::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: var(--od-text);
+          opacity: 0;
+          transition: opacity 120ms linear;
+        }
+        &:hover .od-nav-rail--icon::after {
+          opacity: 0.08;
+        }
+        &:hover:not([aria-current='page']) {
+          color: var(--od-text);
+        }
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-nav-rail--item .od-nav-rail--icon::after {
+        transition: none;
+      }
+    }
+    /* Keyboard focus: the Material 3 focus ring, 2 dp outside the pill. */
+    .od-nav-rail--item:focus-visible {
+      outline: none;
+
+      .od-nav-rail--icon {
+        outline: 2px solid var(--od-on-table-selected);
+        outline-offset: 2px;
+      }
+    }
+
     .od-nav-rail--spacer {
       flex: 1;
     }

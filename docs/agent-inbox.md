@@ -3373,7 +3373,7 @@ English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
 
 Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
 
-## [ ] 2026-11-15-180 Desktop: hover state of the navigation rail items
+## [x] 2026-11-15-180 Desktop: hover state of the navigation rail items
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-profil-droite.dc.html` (Statistiques under the pointer).
 
@@ -3384,6 +3384,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 - Same rule on macOS, Windows and Linux; transitions follow the motion rules (short fade, none with reduced motion).
 
 Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
+
+Done: with a mouse (hover: hover, pointer: fine), a rail item's 56 × 32 dp pill gets an 8 % ink layer and its icon and label turn ink; the active section keeps its pill and colours under the layer; keyboard focus shows a 2 dp ring 2 dp outside the pill; normal arrow pointer, no tooltip; the fade is skipped with reduced motion (NavRail.svelte). Checked in a desktop window on Statistiques.
 
 ## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
