@@ -3554,3 +3554,25 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 English: « More logbook options », « Undo: {last action} », « Redo », « Columns shown ».
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
+
+## [ ] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and its group copy `bureau-carnet-groupe.dc.html` (dive N° 5, Lake Coleridge, selected). They are the reference for the whole desktop Carnet; the other desktop Carnet mock-ups still show the older table.
+
+**Site map behind the detail header** (the phone's rule, `docs/ui-specification.md`, « Dive detail, site map behind the header »):
+
+- When the selected dive's site has GPS coordinates, the top of the detail pane shows the site's prepared map (the same image as on the phone, OpenFreeMap without place names) behind the number, title and date line, about 170 dp high and the pane's full width, from the top of the window.
+- The same veil of the page background: 45 % at the top, 70 % at 60 % of the height, opaque at the bottom, so it fades out before the profile card. The pin sits under the veil, in the header's right half. Decorative: not interactive, hidden from screen readers; dark mode darkens it as on the phone.
+- Without coordinates (« Site à préciser ») or with no prepared image, the header stays on the plain background.
+- The detail pane's top padding is 36 dp so the map has room above the title.
+
+**The dive table:**
+
+- No lines between rows: rows are 48 dp high with 2 dp between them; the selected row is a pill (#D4E2F2, 12 dp corners at both ends, text #114477). The header row has no bottom line.
+- Columns (cells padded 10 dp): N° (28 dp, 13 px #4B4A47), Date (150 dp, 14 px), Site (the rest), Prof. max (64 dp), Durée (56 dp), Compagnons (96 dp). No profile thumbnails.
+- A named site starts with a 14 dp pin icon; « Site à préciser » is in italics, #4B4A47.
+- Each buddy shows a 22 dp round badge (#E3E1DC) with the initial, then the name.
+- Depths of 40 m or more are semibold.
+- A trip row is a #ECEAE4 band with 12 dp corners, 36 dp high, with ⌄, a suitcase icon, the trip's name (medium) and « · 4 plongées, de 21 à 29 m ».
+
+Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
