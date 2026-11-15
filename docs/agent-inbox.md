@@ -4021,7 +4021,7 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 - Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
 - The beta on `main` is untouched.
 
-## [ ] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
+## [x] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
 
 Christian approved this on 15 November 2026.
 
@@ -4051,7 +4051,9 @@ Christian approved this on 15 November 2026.
 
 Done (part 2, beta): `app/src/components/WelcomeHelpLink.svelte` (class `od-welcome-help-link`, colour `--od-text-2`, #4B4A47 light / #B5B8BC dark, ⓘ 18 dp, 14 sp, only « À propos et contact » underlined, pointer and hover state), keys `welcomeHelp.question|link|label` in `fr.json` and `en.json`, a release note line. On `WelcomeStart` (Android and iOS branches) and, through a `helpLink` prop of `EditorialPage` set from `welcome`, on the first-launch sign-in, account creation, code and git repository screens. Tablet: centred, pinned 28 dp above the bottom; phone: centred at the end of the content (below the fold when the page does not scroll). It opens `/about` in the first-launch view; « Retour » returns to the same step. Tests: `tests/app/welcome-help-link.test.mjs`. Before/after headless screenshots: only the link's area changes on tablets; on Android phones the geometry is unchanged, only text anti-aliasing differs (the page now scrolls). Not ticked: the coordinator ticks it when both parts are in.
 
-## [ ] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
+Done (part 1, release edition): on `feature/release-new-logbook` (task 218), the same `WelcomeHelpLink` pinned 28 dp above the bottom of the right-hand column on every step, both orientations; About and back keep the step. Both parts done.
+
+## [x] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
 
 Christian approved this on 15 November 2026.
 
@@ -4082,3 +4084,5 @@ Christian approved this on 15 November 2026.
 **Test:** on each platform, the empty logbook shows « Télécharger mes plongées » with the dive computer icon, and it opens the download.
 
 Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
+
+Done (part 2, release edition): on `feature/release-new-logbook`, `ReleaseEmptyLogbook.svelte`, the tablet empty logbook (band with the logbook name and where it is kept, then « Aucune plongée »; on the right the 520 dp column with the smooth profile, « Télécharger mes plongées » and the paper). Desktop (beta): the ready screen of a new logbook uses the same label and icon, on `feature/desktop-logbook`. Both parts done.
