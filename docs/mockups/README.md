@@ -195,6 +195,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
 | `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
+| `bureau-carnet-carte.dc.html` | Carnet · bureau, plongée avec site, carte derrière l’en-tête |
 | `bureau-carnet-exporter.dc.html` | Carnet · bureau, exporter des plongées |
 | `bureau-carnets-selecteur.dc.html` | Carnet · bureau (Windows, Linux), choisir un carnet |
 | `bureau-carnets-menu-fichier-macos.dc.html` | Carnet · bureau macOS, menu Fichier et carnets récents |
