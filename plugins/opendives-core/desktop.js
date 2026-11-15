@@ -556,11 +556,14 @@ export class OpenDivesCoreDesktop extends WebPlugin {
   async importDives(options) {
     const name = baseName(options?.name ?? '') || 'import.xml';
     if (options?.data == null) throw reject('Missing data', 'BAD_ARGUMENT');
-    const { path } = await this.bridge.fs.writeFile({ area: 'import', name, base64: options.data });
+    // A name of its own: on Windows the helper may still hold the previous file of that name open
+    // (EBUSY), and removing the staged file must never hide what the import answered.
+    const unique = `${Date.now().toString(36)}-${name}`;
+    const { path } = await this.bridge.fs.writeFile({ area: 'import', name: unique, base64: options.data });
     try {
       return { json: await this.core('importDives', { file: path, source: name }) };
     } finally {
-      await this.bridge.fs.remove({ path });
+      await this.bridge.fs.remove({ path }).catch(() => {});
     }
   }
 
