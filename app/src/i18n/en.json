@@ -3977,5 +3977,12 @@
       "fileLogbook": "logbook",
       "logbook": "Export the logbook…"
     }
+  },
+  "desktopFollowups": {
+    "newLogbook": {
+      "gitUsername": "User name",
+      "gitUsernameHelp": "Optional. Used with the token to sign in to the repository.",
+      "errorUsername": "The name cannot contain spaces or special characters."
+    }
   }
 }

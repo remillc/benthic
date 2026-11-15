@@ -18,6 +18,8 @@
     fileNameFor,
     gitUrlError,
     gitFormReady,
+    gitUserError,
+    gitUserFromUrl,
     cloudFormReady,
     tokenPageUrl,
     creationErrorKey,
@@ -34,6 +36,9 @@
   let folder = $state('');
   let url = $state('');
   let branch = $state('main');
+  let username = $state('');
+  /** True once the diver typed a user name: the address no longer fills it in. */
+  let userTyped = $state(false);
   let token = $state('');
   let busy = $state(false);
   let error = $state('');
@@ -45,8 +50,16 @@
     () => url,
     (text) => (gitUrlError(text) ? t('desktopLogbooks.new.errorUrl') : ''),
   );
+  const userCheck = liveError(
+    () => username,
+    (text) => (gitUserError(text) ? t('desktopFollowups.newLogbook.errorUsername') : ''),
+  );
+  $effect(() => {
+    const owner = gitUserFromUrl(url);
+    if (!userTyped) username = owner;
+  });
   const nameValid = $derived(validLogbookName(name));
-  const gitReady = $derived(gitFormReady({ url, branch, token }));
+  const gitReady = $derived(gitFormReady({ url, branch, token, username }));
   const cloudReady = $derived(cloudFormReady({ provider, folder }));
   const services = $derived(t(desktopMac ? 'desktopLogbooks.new.cloudServicesMac' : 'desktopLogbooks.new.cloudServices'));
 
@@ -99,7 +112,7 @@
     try {
       const spec =
         where === 'git'
-          ? { where, name: name.trim(), url: url.trim(), branch: branch.trim(), token: token.trim() }
+          ? { where, name: name.trim(), url: url.trim(), username: username.trim(), branch: branch.trim(), token: token.trim() }
           : where === 'cloud'
             ? { where, name: name.trim(), provider, folder }
             : { where, name: name.trim() };
@@ -210,6 +223,9 @@
       <label class="od-new-logbook--label" for="od-new-logbook-url">{t('desktopLogbooks.new.gitUrl')}</label>
       <input id="od-new-logbook-url" class="od-new-logbook--input" class:od-new-logbook--invalid={!!urlCheck.error} type="url" bind:value={url} placeholder={t('desktopLogbooks.new.gitUrlPlaceholder')} autocomplete="off" spellcheck="false" aria-invalid={!!urlCheck.error} />
       {#if urlCheck.error}<p class="od-new-logbook--error od-new-logbook--error-small" role="alert">{urlCheck.error}</p>{/if}
+      <label class="od-new-logbook--label" for="od-new-logbook-username">{t('desktopFollowups.newLogbook.gitUsername')}</label>
+      <input id="od-new-logbook-username" class="od-new-logbook--input" class:od-new-logbook--invalid={!!userCheck.error} type="text" bind:value={username} oninput={() => (userTyped = username.trim() !== '')} autocomplete="off" spellcheck="false" aria-invalid={!!userCheck.error} />
+      {#if userCheck.error}<p class="od-new-logbook--error od-new-logbook--error-small" role="alert">{userCheck.error}</p>{:else}<p class="od-new-logbook--help">{t('desktopFollowups.newLogbook.gitUsernameHelp')}</p>{/if}
       <label class="od-new-logbook--label" for="od-new-logbook-branch">{t('desktopLogbooks.new.gitBranch')}</label>
       <input id="od-new-logbook-branch" class="od-new-logbook--input" type="text" bind:value={branch} autocomplete="off" spellcheck="false" />
       <label class="od-new-logbook--label" for="od-new-logbook-token">{t('desktopLogbooks.new.gitToken')}</label>
