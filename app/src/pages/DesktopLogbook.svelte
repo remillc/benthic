@@ -14,6 +14,7 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
+  import RenumberDialog from '../components/RenumberDialog.svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -39,6 +40,7 @@
     keepSelection,
     contextMenuEntries,
     clampTableWidth,
+    adjacentTrips,
   } from '../lib/desktop-table.js';
   import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatShortDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -317,13 +319,35 @@
       { key: 'undo', label: '', text: undoEntryText('undo'), icon: 'undo', shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z', disabled: !logbook.undoText },
       { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
       { key: 'separator' },
-      { key: 'filter', label: filter.ids ? 'logbook.menuFilterOn' : 'logbook.menuFilter', icon: 'filter' },
+      { key: 'filter', label: '', text: t(filter.ids ? 'desktop.filterOn' : 'desktop.filter'), icon: 'filter', shortcut: desktopMac ? '⇧⌘F' : 'Ctrl+Maj+F' },
+      { key: 'renumber', label: 'desktop.renumberDives', icon: 'renumber' },
+      { key: 'computers', label: 'settings.logbookComputers.title', icon: 'computer' },
+      // Only when the selection touches a trip on that side (task 2026-11-15-194).
+      ...(nearTrips.previous || nearTrips.next ? [{ key: 'separator' }] : []),
+      ...(nearTrips.previous ? [{ key: 'mergePrevious', label: 'desktop.mergePreviousTrip', icon: 'merge' }] : []),
+      ...(nearTrips.next ? [{ key: 'mergeNext', label: 'desktop.mergeNextTrip', icon: 'merge' }] : []),
     ]),
   );
+  const nearTrips = $derived(adjacentTrips(logbook.dives, desk.selection.ids));
+  let renumbering = $state(false);
   /** @param {string} key */
-  function moreChoose(key) {
+  async function moreChoose(key) {
     if (key === 'undo' || key === 'redo') command(key);
-    else if (key === 'filter') f7router.navigate('/filter');
+    else if (key === 'filter') command('filter');
+    else if (key === 'renumber') renumbering = true;
+    else if (key === 'computers') f7router.navigate('/settings/computers/');
+    else if (key === 'mergePrevious' || key === 'mergeNext') {
+      const trip = key === 'mergePrevious' ? nearTrips.previous : nearTrips.next;
+      if (!trip) return;
+      const ids = [...desk.selection.ids];
+      try {
+        await tripChange({ action: 'add', tripId: trip.id, diveIds: ids });
+        desk.collapsed = { ...desk.collapsed, [trip.id]: false };
+        offerUndo(t('logbook.addedToTrip', { n: ids.length }));
+      } catch (e) {
+        changeFailed(e);
+      }
+    }
   }
 
   // --- The columns button. ----------------------------------------------------------------
@@ -453,6 +477,9 @@
       case 'columns':
         columnsOpen = true;
         return true;
+      case 'filter':
+        f7router.navigate('/filter');
+        return true;
     }
     return false;
   }
@@ -466,7 +493,8 @@
       const key = e.key.toLowerCase();
       /** @type {string|null} */
       let cmd = null;
-      if (modKey && key === 'f') cmd = 'find';
+      if (modKey && key === 'f' && e.shiftKey) cmd = 'filter';
+      else if (modKey && key === 'f') cmd = 'find';
       else if (modKey && key === ',') cmd = 'settings';
       else if (!typing && modKey && key === 'n') cmd = 'new';
       else if (!typing && modKey && key === 'e' && e.shiftKey) cmd = 'export';
@@ -601,6 +629,7 @@
                   scope="col"
                   class="od-desktop-logbook--head"
                   class:od-desktop-logbook--numeric={column.numeric}
+                  data-col={column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
                 >
                   <button type="button" onclick={() => setSort(nextSort(desk.sort, column.key))}>
@@ -622,6 +651,7 @@
                       onclick={() => (desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded })}
                     >
                       <span class="od-desktop-logbook--chevron" class:od-desktop-logbook--open={row.expanded} aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                      <span class="od-desktop-logbook--trip-icon" aria-hidden="true"><Icon name="trip" size={16} /></span>
                       <span class="od-desktop-logbook--trip-title">{text.title}</span>
                       <span class="od-desktop-logbook--trip-range"> · {text.range}</span>
                     </button>
@@ -641,11 +671,16 @@
                 >
                   {#each columns as column (column.key)}
                     <td
+                      data-col={column.key}
                       class:od-desktop-logbook--numeric={column.numeric}
-                      class:od-desktop-logbook--muted={(column.key === 'site' && !dive.site) || column.key === 'buddies'}
-                      class:od-desktop-logbook--buddies={column.key === 'buddies'}
-                      class:od-desktop-logbook--first={column.key === 'number' && row.inTrip}
-                    >{cell(column.key, dive)}</td>
+                      class:od-desktop-logbook--deep={column.key === 'maxDepth' && dive.maxDepthMm >= 40000}
+                    >
+                      {#if column.key === 'site'}
+                        {#if dive.site}<span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="place" size={14} /></span>{dive.site}{:else}<span class="od-desktop-logbook--no-site">{t('desktop.noSite')}</span>{/if}
+                      {:else if column.key === 'buddies'}
+                        {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="od-desktop-logbook--buddy"><span class="od-desktop-logbook--initial" aria-hidden="true">{name.charAt(0).toLocaleUpperCase()}</span>{name}</span>{/each}
+                      {:else}{cell(column.key, dive)}{/if}
+                    </td>
                   {/each}
                 </tr>
               {/if}
@@ -676,6 +711,9 @@
   {#if logbook.dives.length}<FabMenu choices={addChoices} onchoose={choose} />{/if}
   {#if moreAt}
     <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
+  {/if}
+  {#if renumbering}
+    <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
   {/if}
   {#if menuAt}
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />
@@ -813,20 +851,22 @@
       overflow: auto;
       padding-right: 9px;
     }
+    /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
     .od-desktop-logbook--table {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
+      border-collapse: separate;
+      border-spacing: 0 2px;
+      table-layout: fixed;
+      font-size: 14px;
       color: var(--od-text);
     }
     .od-desktop-logbook--head {
       position: sticky;
       top: 0;
       z-index: 1;
-      height: 40px;
+      height: 36px;
       padding: 0;
       background: var(--od-background);
-      border-bottom: 1px solid var(--od-separator);
       font-size: 13px;
       font-weight: 500;
       text-align: start;
@@ -835,7 +875,7 @@
     .od-desktop-logbook--head button {
       width: 100%;
       height: 100%;
-      padding: 0 12px;
+      padding: 0 10px;
       border: 0;
       background: none;
       font: inherit;
@@ -850,60 +890,115 @@
     .od-desktop-logbook--arrow {
       margin-inline-start: 4px;
     }
+    [data-col='number'] {
+      width: 48px;
+    }
+    [data-col='date'] {
+      width: 170px;
+    }
+    [data-col='maxDepth'] {
+      width: 84px;
+    }
+    [data-col='duration'] {
+      width: 76px;
+    }
+    [data-col='buddies'] {
+      width: 116px;
+    }
+    [data-col='waterTemp'],
+    [data-col='airTemp'],
+    [data-col='meanDepth'],
+    [data-col='rating'] {
+      width: 84px;
+    }
     .od-desktop-logbook--numeric {
       text-align: end;
       font-variant-numeric: tabular-nums;
     }
     .od-desktop-logbook--row {
-      height: 44px;
-      border-bottom: 1px solid var(--od-row-divider);
+      height: 48px;
       cursor: default;
     }
     .od-desktop-logbook--row td {
-      padding: 0 12px;
+      padding: 0 10px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 280px;
     }
-    .od-desktop-logbook--row:hover {
+    .od-desktop-logbook--row td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+    .od-desktop-logbook--row td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+    .od-desktop-logbook--row td[data-col='number'] {
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-logbook--row:hover td {
       background: color-mix(in srgb, var(--od-text) 4%, transparent);
     }
-    .od-desktop-logbook--selected,
-    .od-desktop-logbook--selected:hover {
+    .od-desktop-logbook--selected td,
+    .od-desktop-logbook--selected:hover td {
       background: var(--od-table-selected);
       color: var(--od-on-table-selected);
     }
-    .od-desktop-logbook--muted {
-      color: var(--od-text-2);
-    }
-    /* Compagnons: about 124 dp, the rest ellipsised (task 2026-11-15-182). */
-    .od-desktop-logbook--row .od-desktop-logbook--buddies {
-      max-width: 124px;
-    }
-    .od-desktop-logbook--selected .od-desktop-logbook--muted {
+    .od-desktop-logbook--selected td[data-col='number'] {
       color: inherit;
     }
-    .od-desktop-logbook--trip {
-      height: 44px;
-      border-bottom: 1px solid var(--od-row-divider);
+    .od-desktop-logbook--pin {
+      display: inline-flex;
+      vertical-align: -2px;
+      margin-inline-end: 6px;
+    }
+    .od-desktop-logbook--no-site {
+      font-style: italic;
+      color: var(--od-text-2);
+    }
+    .od-desktop-logbook--selected .od-desktop-logbook--no-site {
+      color: inherit;
+    }
+    .od-desktop-logbook--deep {
+      font-weight: 600;
+    }
+    .od-desktop-logbook--buddy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-inline-end: 8px;
+    }
+    .od-desktop-logbook--initial {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--od-buddy-badge);
+      color: var(--od-text);
+      font-size: 11px;
+      font-weight: 600;
     }
     .od-desktop-logbook--trip td {
-      padding: 0;
+      padding: 4px 0;
     }
     .od-desktop-logbook--trip button {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       width: 100%;
-      height: 44px;
+      height: 36px;
       padding: 0 12px;
       border: 0;
-      background: none;
+      border-radius: 12px;
+      background: var(--od-trip-band);
       font: inherit;
       color: var(--od-text);
       text-align: start;
       cursor: pointer;
+    }
+    .od-desktop-logbook--trip-icon {
+      display: inline-flex;
+      color: var(--od-text-2);
     }
     .od-desktop-logbook--chevron {
       display: inline-flex;

@@ -179,3 +179,18 @@ test('pane widths stay within the window', () => {
   assert.equal(clampTableWidth(1200, 1344), 944);
   assert.equal(clampTableWidth(100, 1344), 420);
 });
+
+test('the trips a run of dives can join, above and below (task 194)', async () => {
+  const { adjacentTrips } = await import('../../app/src/lib/desktop-table.js');
+  // Newest first: 9 8 7 6 5 | trip 100: 4 3 2 1.
+  assert.deepEqual(adjacentTrips(dives, [15]), { previous: null, next: { id: 100, location: '' } });
+  assert.deepEqual(adjacentTrips(dives, [16, 15]).next?.id, 100);
+  assert.deepEqual(adjacentTrips(dives, [19]), { previous: null, next: null });
+  // Not consecutive: nothing.
+  assert.deepEqual(adjacentTrips(dives, [17, 15]), { previous: null, next: null });
+  // A dive of the trip itself does not join its own trip.
+  assert.deepEqual(adjacentTrips(dives, [14]), { previous: null, next: null });
+  // A dive just below a trip: the trip is « previous ».
+  const below = [...dives, { ...dives[0], id: 10, number: 0, date: '2012-01-01T10:00:00', trip: null }];
+  assert.equal(adjacentTrips(below, [10]).previous?.id, 100);
+});

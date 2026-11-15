@@ -3356,7 +3356,7 @@
     "numbers": "No. {numbers}",
     "underWater": "{n} min under water",
     "deepest": "{depth} at the deepest",
-    "selectionHint": "Right-click or ⋮ to act on the selection",
+    "selectionHint": "Right-click to act on the selection",
     "column": {
       "number": "No.",
       "date": "Date",
@@ -3478,6 +3478,11 @@
     "undoNamed": "Undo: {action}",
     "redoNamed": "Redo: {action}",
     "undoPlain": "Undo",
-    "redoPlain": "Redo"
+    "redoPlain": "Redo",
+    "filter": "Filter…",
+    "filterOn": "Filter… (filter on)",
+    "renumberDives": "Renumber the dives…",
+    "mergePreviousTrip": "Merge with the previous trip",
+    "mergeNextTrip": "Merge with the next trip"
   }
 }

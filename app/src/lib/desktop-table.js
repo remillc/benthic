@@ -297,3 +297,28 @@ export function selectionSummary(dives) {
 export function clampTableWidth(wanted, available, { minTable = 420, minDetail = 400 } = {}) {
   return Math.round(Math.max(minTable, Math.min(wanted, available - minDetail)));
 }
+
+/**
+ * The trips the selected dives can join (task 2026-11-15-194, « Fusionner avec le voyage
+ * précédent / suivant »): in the logbook's order, newest first, the selection must be one run
+ * of consecutive dives; « previous » is the trip of the dive just above it (more recent), « next »
+ * that of the dive just below, each only when the run is not already in that trip.
+ * @param {import('opendives-core').Dive[]} dives every dive of the logbook
+ * @param {number[]} ids the selected dives
+ * @returns {{previous: {id: number, location: string}|null, next: {id: number, location: string}|null}}
+ */
+export function adjacentTrips(dives, ids) {
+  const none = { previous: null, next: null };
+  if (!ids.length) return none;
+  const order = [...dives].sort((a, b) => b.date.localeCompare(a.date) || b.number - a.number);
+  const chosen = new Set(ids);
+  const at = order.map((d, i) => (chosen.has(d.id) ? i : -1)).filter((i) => i >= 0);
+  if (at.length !== ids.length) return none;
+  const first = at[0];
+  const last = at[at.length - 1];
+  if (last - first + 1 !== at.length) return none;
+  const inside = new Set(order.slice(first, last + 1).map((d) => d.trip?.id ?? null));
+  /** @param {import('opendives-core').Dive|undefined} d */
+  const tripOf = (d) => (d?.trip && !(inside.size === 1 && inside.has(d.trip.id)) ? { id: d.trip.id, location: d.trip.location } : null);
+  return { previous: tripOf(order[first - 1]), next: tripOf(order[last + 1]) };
+}

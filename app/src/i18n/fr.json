@@ -3356,7 +3356,7 @@
     "numbers": "N° {numbers}",
     "underWater": "{n} min sous l'eau",
     "deepest": "{depth} au plus profond",
-    "selectionHint": "Clic droit ou ⋮ pour agir sur la sélection",
+    "selectionHint": "Clic droit pour agir sur la sélection",
     "column": {
       "number": "N°",
       "date": "Date",
@@ -3478,6 +3478,11 @@
     "undoNamed": "Annuler : {action}",
     "redoNamed": "Rétablir : {action}",
     "undoPlain": "Annuler",
-    "redoPlain": "Rétablir"
+    "redoPlain": "Rétablir",
+    "filter": "Filtrer…",
+    "filterOn": "Filtrer… (filtre appliqué)",
+    "renumberDives": "Renuméroter les plongées…",
+    "mergePreviousTrip": "Fusionner avec le voyage précédent",
+    "mergeNextTrip": "Fusionner avec le voyage suivant"
   }
 }

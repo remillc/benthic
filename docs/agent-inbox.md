@@ -3539,7 +3539,7 @@ Christian noticed on 15 November 2026 that the desktop detail pane has no tabs a
 
 Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
 
-## [ ] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
+## [x] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and every desktop Carnet screen (with the group copy `bureau-carnet-groupe.dc.html`); the ⋮ menu open in `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3556,6 +3556,8 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 English: « More logbook options », « Undo: {last action} », « Redo », « Columns shown ».
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
+
+Done: the list column has its own header (« Carnet » with the count line on one line, the search 220 to 300 dp, the columns button « Colonnes affichées », a ⋮ « Plus d'options du carnet »), no bar across the window; the ⋮ starts with « Annuler : {action} » and « Rétablir » named from the core's undo step (lib/undo-name.js), greyed out when there is nothing, then (task 194) Filtrer… (Ctrl/⌘+Maj+F), Renuméroter les plongées…, Ordinateurs du carnet and, only when the selection touches a trip, Fusionner avec le voyage précédent/suivant (lib/desktop-table.js adjacentTrips, tested).
 
 ## [ ] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
 

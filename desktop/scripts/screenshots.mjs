@@ -111,6 +111,8 @@ try {
     }
   }
 } finally {
-  app.kill();
+  // On Windows the app runs under a shell: end the whole tree, or the window stays open.
+  if (process.platform === 'win32') execFileSync('taskkill', ['/pid', String(app.pid), '/T', '/F'], { stdio: 'ignore' });
+  else app.kill();
 }
 process.exit(0);
