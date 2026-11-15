@@ -3613,3 +3613,21 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 - Everything else of task 181 is unchanged (Échap cancels, the order is kept per logbook).
 
 Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
+
+## [ ] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
+
+Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils » of the canvas): `docs/mockups/bureau-outils.dc.html` (planner), its group copy `bureau-outils-groupe.dc.html` (planner ⋮ menu open), `bureau-outils-desaturation.dc.html`, `bureau-outils-ead-mod.dc.html`, `bureau-outils-meilleur-melange.dc.html`, `bureau-outils-melangeur.dc.html`. The calculations are the phone's (same core functions, `docs/ui-specification.md`); only the layout is new.
+
+- **Top bar:** « Outils » and « Planifier, vérifier la désaturation, préparer les gaz ». No ⋮ in the top bar.
+- **Tools list** (320 dp, left): two headings, « Plongée » (Planificateur de plongée, Désaturation) and « Gaz » (EAD et MOD, Meilleur mélange, Mélangeur de gaz). Each row 64 dp: a 40 dp icon tile, the name, and a live line (« 2 plongées planifiées », « Avion dans 17 h 05 », …). The selected row is #D4E2F2 with 12 dp corners and a white icon tile.
+- **Fields:** grey filled fields (#ECEAE4, 8 dp corners, 44 dp) with the unit at the end; choices that are lists are dropdown fields. Nitrox / Trimix and « Hélium d'abord / Oxygène d'abord » are connected button groups (selected segment #D4E2F2 with a check), not radio buttons.
+- **Planner:** parameters on the left (Profondeur, Temps au fond, Gaz de fond, Gaz de déco, Facteurs de gradient, Consommation, and the line « Bühlmann ZH-L16C · eau douce · 0 m d'altitude »). On the right: totals (durée, paliers, volume of each gas), the planned profile with a band showing each gas, the stops table. Header actions: « Plans enregistrés », « Imprimer l'ardoise », « Enregistrer le plan » (filled) and a ⋮ « Plus d'options du plan » holding « Partager le plan… » (native share sheet, export on Linux) and « Réglages du planificateur » (gear icon), as on the phone.
+- **Désaturation:** a card with « Désaturation restante » and « Avant de prendre l'avion » side by side, top-aligned, each with its « soit demain vers … » line; « Me prévenir » on the right (a system notification when flying is allowed). Below: « Saturation des tissus » (16 compartment bars, red from 90 %, the dashed 100 % limit, legend and note) and « Calculé à partir de » (the dives used, each on two lines, « Voir dans le carnet »). The phone's warning line at the bottom.
+- **EAD et MOD:** fields on the left, three result cards on the right (MOD, EAD, END) with their explanations.
+- **Meilleur mélange:** the advised mix in a large card (« 25/28 », « Trimix », « 25 % d'oxygène, 28 % d'hélium ») with « Préparer ce mélange », which opens the gas blender with that target; then MOD, END and ppO₂ at the planned depth.
+- **Mélangeur de gaz:** target, cylinder content and « Compléter avec » on the left; on the right the fill order with a cylinder drawing in layers (rest, helium, oxygen, air) and the numbered steps (added pressure and volume, « jusqu'à … bar »), the cooled-cylinder note and the amber « Analysez le mélange avant de plonger. » banner.
+- Units follow the logbook's settings (the mock-ups are metric).
+
+English: « Plan », « More plan options », « Share the plan… », « Planner settings », « Saved plans », « Print the slate », « Save the plan », « Notify me », « Prepare this mix ».
+
+Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
