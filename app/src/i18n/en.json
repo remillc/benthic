@@ -3982,6 +3982,10 @@
       "gitUsername": "User name",
       "gitUsernameHelp": "Optional. Used with the token to sign in to the repository.",
       "errorUsername": "The name cannot contain spaces or special characters."
+    },
+    "siteMerge": {
+      "title": "Merge the sites?",
+      "which": "Site to keep"
     }
   }
 }

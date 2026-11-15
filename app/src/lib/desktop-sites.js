@@ -5,6 +5,7 @@
 // functions, no framework: tested in tests/app/desktop-sites.test.mjs. The reads and writes
 // themselves go through the core (lib/sites.svelte.js).
 import { normalise, highlightParts } from './site-search.js';
+import { defaultKeeper } from './site-merge.js';
 
 export { highlightParts };
 
@@ -311,4 +312,17 @@ export function checkedUnused(unused, checked) {
 export function toggleAllUnused(unused, checked) {
   const all = unused.length > 0 && unused.every((s) => checked[s.uuid]);
   return Object.fromEntries(unused.map((s) => [s.uuid, !all]));
+}
+
+/**
+ * The two sites of a duplicate pair for the merge dialog, as the phone's clean-up lists them: the one
+ * kept by default first (more dives, then a position), and the site kept and the one that goes for the
+ * choice made (`keptUuid`; the first when none or unknown).
+ * @param {Site} a @param {Site} b @param {number|null|undefined} keptUuid
+ * @returns {{ first: Site, second: Site, keep: Site, other: Site }}
+ */
+export function mergeSides(a, b, keptUuid) {
+  const first = defaultKeeper([a, b]);
+  const second = first === a ? b : a;
+  return keptUuid === second.uuid ? { first, second, keep: second, other: first } : { first, second, keep: first, other: second };
 }

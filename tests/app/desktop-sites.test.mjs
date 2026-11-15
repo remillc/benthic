@@ -22,6 +22,7 @@ import {
   filterChoice,
   checkedUnused,
   toggleAllUnused,
+  mergeSides,
   highlightParts,
 } from '../../app/src/lib/desktop-sites.js';
 
@@ -224,4 +225,24 @@ test('the sites without a dive: the checked ones, and « Tout sélectionner » t
   assert.deepEqual(checkedUnused(unused, toggleAllUnused(unused, all)), [], 'a second click unchecks');
   // A site checked that is no longer in the list is not deleted.
   assert.deepEqual(checkedUnused(unused, { 99: true }), []);
+});
+
+test('merging two sites: the site with more dives is offered first, and the choice decides which one is kept', () => {
+  const few = site(1, 'Goat Island', 'NZ', 2);
+  const many = site(2, 'Goat Is.', 'NZ', 9);
+  const sides = mergeSides(few, many, undefined);
+  assert.equal(sides.first, many);
+  assert.equal(sides.keep, many);
+  assert.equal(sides.other, few);
+  // The other site chosen: it is kept and the first one goes.
+  const swapped = mergeSides(few, many, 1);
+  assert.equal(swapped.keep, few);
+  assert.equal(swapped.other, many);
+  assert.equal(swapped.first, many, 'the order of the rows does not change');
+  // An unknown choice falls back to the default.
+  assert.equal(mergeSides(few, many, 77).keep, many);
+  // Same dives: the one with a position comes first.
+  const placed = { ...site(3, 'A', 'NZ', 4), hasLocation: true };
+  const bare = { ...site(4, 'A', 'NZ', 4), hasLocation: false };
+  assert.equal(mergeSides(bare, placed, null).keep, placed);
 });

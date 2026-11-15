@@ -3982,6 +3982,10 @@
       "gitUsername": "Nom d’utilisateur",
       "gitUsernameHelp": "Facultatif. Il sert avec le jeton à se connecter au dépôt.",
       "errorUsername": "Le nom ne peut contenir ni espace ni caractère spécial."
+    },
+    "siteMerge": {
+      "title": "Fusionner les sites ?",
+      "which": "Site à garder"
     }
   }
 }

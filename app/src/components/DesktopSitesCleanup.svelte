@@ -3,13 +3,14 @@
   // « Nettoyer les sites » on the desktop (task 2026-11-15-177, mock-ups bureau-sites-nettoyer and
   // -fusion): on the left the possible duplicates (each pair with its reason, both sites,
   // « Pas des doublons » and « Fusionner »), on the right the sites without a dive with check boxes,
-  // « Tout sélectionner » and « Supprimer la sélection (n) ». A merge asks nothing: the pair
-  // collapses into « Fusionnés : un seul site, … », a snackbar offers « Annuler », and Ctrl/⌘+Z
+  // « Tout sélectionner » and « Supprimer la sélection (n) ». « Fusionner » opens a dialog that asks
+  // which of the two sites to keep (as the phone does); the pair then collapses into « Fusionnés : un seul site, … », a snackbar offers « Annuler », and Ctrl/⌘+Z
   // undoes it. The rules are the phone's (pages/SitesCleanup.svelte).
   import Icon from './Icon.svelte';
   import { dismissPair, pairKey, restorePair, siteChange } from '../lib/sites.svelte.js';
   import { checkedUnused, toggleAllUnused } from '../lib/desktop-sites.js';
-  import { defaultKeeper } from '../lib/site-merge.js';
+  import { mergeSides } from '../lib/desktop-sites.js';
+  import DesktopSitesMerge from './DesktopSitesMerge.svelte';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -28,6 +29,8 @@
 
   /** @type {Record<number, boolean>} */
   let checked = $state({});
+  /** The pair whose merge dialog is open. @type {{a: Site, b: Site, distanceM: number}|null} */
+  let merging = $state(null);
   /** The pairs merged here: they stay as a line, « Fusionnés », until the diver leaves. @type {{ key: string, name: string, text: string }[]} */
   let merged = $state([]);
 
@@ -51,15 +54,15 @@
         : t('sites.sameName')
       : t('sites.samePlace');
 
-  /** The site kept first: more dives, then a position. @param {{a: Site, b: Site}} pair @returns {[Site, Site]} */
+  /** The site kept by default first: more dives, then a position. @param {{a: Site, b: Site}} pair @returns {[Site, Site]} */
   function ordered(pair) {
-    const keep = defaultKeeper([pair.a, pair.b]);
-    return keep === pair.a ? [pair.a, pair.b] : [pair.b, pair.a];
+    const { first, second } = mergeSides(pair.a, pair.b, null);
+    return [first, second];
   }
 
-  /** @param {{a: Site, b: Site, distanceM: number}} pair */
-  async function merge(pair) {
-    const [keep, other] = ordered(pair);
+  /** The dialog's choice: `keep` stays, `other` goes into it. @param {{a: Site, b: Site, distanceM: number}} pair @param {Site} keep @param {Site} other */
+  async function merge(pair, keep, other) {
+    merging = null;
     const total = keep.dives + other.dives;
     try {
       await siteChange({ action: 'merge', uuid: keep.uuid, other: other.uuid });
@@ -142,7 +145,7 @@
           {/each}
           <div class="od-cleanup--actions">
             <button type="button" class="od-cleanup--text" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
-            <button type="button" class="od-cleanup--tonal" onclick={() => merge(pair)}>{t('sites.merge')}</button>
+            <button type="button" class="od-cleanup--tonal" onclick={() => (merging = pair)}>{t('sites.merge')}</button>
           </div>
         </div>
       {/each}
@@ -175,6 +178,10 @@
     </div>
   </div>
 </section>
+
+{#if merging}
+  <DesktopSitesMerge a={merging.a} b={merging.b} {describe} onmerge={(keep, other) => merge(/** @type {any} */ (merging), keep, other)} onclose={() => (merging = null)} />
+{/if}
 
 <style>
   @layer od.components {
