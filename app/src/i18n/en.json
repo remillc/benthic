@@ -862,6 +862,57 @@
       "text": "In the detail and the editing of a dive"
     }
   },
+  "desktopSettings": {
+    "saved": "Saved at once, on this computer",
+    "search": "Search settings",
+    "searchShort": "Search",
+    "results": {
+      "one": "{n} setting for “{text}”",
+      "other": "{n} settings for “{text}”"
+    },
+    "resultsIn": "In {categories}",
+    "system": "System",
+    "unitValues": "How values are shown",
+    "categories": {
+      "language": "Language and formats",
+      "units": "Units",
+      "display": "Display",
+      "logbook": "Logbook",
+      "equipment": "Equipment",
+      "decompression": "Profile and decompression",
+      "gases": "Gases and partial pressures",
+      "rebreather": "Rebreather",
+      "devices": "Computers and download",
+      "maps": "Offline maps",
+      "advanced": "Advanced"
+    },
+    "notes": {
+      "units": "They apply to the logbook, the tools and the exports."
+    },
+    "textSize": {
+      "label": "Text size",
+      "text": "Also with {keys}",
+      "small": "Small",
+      "normal": "Normal",
+      "large": "Large"
+    },
+    "file": {
+      "title": "Logbook file",
+      "location": "Location",
+      "show": "Show in folder"
+    },
+    "account": {
+      "sheet": "Account",
+      "syncNow": "Sync now",
+      "auto": "Sync automatically",
+      "autoText": "At startup and after each change",
+      "unmetered": "Only on Wi-Fi or cable",
+      "unmeteredText": "Never on a tethered connection",
+      "manage": "Manage account"
+    },
+    "about": "About OpenDives",
+    "filterFree": "Free filter…"
+  },
   "gas": {
     "air": "Air",
     "oxygen": "O2",

@@ -3713,7 +3713,7 @@ Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pres
 
 Done (branch feature/desktop-tools): « Dans la bouteille » in two columns, Pression alone with « Laissez vide si la bouteille est vide », Oxygène and Hélium under it (Oxygène alone in Nitrox), « Compléter avec » on its own line; an empty Pression gives the steps of an empty cylinder (tested).
 
-## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
+## [x] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
 
@@ -3739,3 +3739,5 @@ Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglage
 English: « Settings », « Saved at once, on this computer », « Search settings », « Logbook file », « Location », « Show in folder », « Open at startup », « Text size », « Account », « Sync now », « Sync automatically », « Only on Wi-Fi or cable », « Sign out », « About OpenDives », « Free filter… », « Clean up sites… ».
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
+
+Done: Réglages is a section (rail gear, Ctrl+,) with the eleven categories, search across them (highlight, « N réglages pour « … » »), « Taille du texte » (Petite, Normale, Grande; Ctrl++, Ctrl+-, Ctrl+0; Electron zoom through the preload's setZoom, kept as `od.textSize`) and « Fichier du carnet » › Emplacement with « Afficher dans le dossier ». Rows are the phone's (`pages/Settings.svelte`, desktop branch `desk`; logic in `lib/desktop-settings.js`, tests in `tests/app/desktop-settings.test.mjs`). The account sheet is `components/DesktopAccountSheet.svelte`. « À propos d'OpenDives » is a dialog (popup of `pages/About.svelte`) at the end of the Carnet and Statistiques ⋮ menus (Sites: still to add by the Sites branch), and « Filtre libre… » (Ctrl+Maj+F) replaced « Filtrer » in Statistiques. macOS: a separate 980 × 680 window (`desktop/main.cjs`, `?settings-window=1`), untested on a Mac. Not done: « Ouvrir au démarrage » (one logbook only, nothing to choose), enforcement of « Seulement sur Wi-Fi ou câble » (the switch is stored; the desktop has no metered-connection signal).

@@ -67,7 +67,9 @@
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
-  import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint, bottomNav, settingsWindow } from './lib/layout.svelte.js';
+  import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
+  import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
@@ -112,8 +114,10 @@
     // iPhone: the dives of an Apple Watch Ultra from Apple Health (to-do #67).
     { path: '/health', component: HealthImport },
     { path: '/download/failed', component: DownloadFailed },
-    { path: '/settings/', component: Settings },
-    { path: '/about', component: About },
+    // Desktop app from 1200 dp: Réglages as categories with a search, and À propos as a dialog
+    // (task 2026-11-15-202); else the phone's pages.
+    { path: '/settings/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop || settingsWindow, windowed: settingsWindow } }) },
+    { path: '/about', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.desktop ? { popup: { component: About } } : { component: About }) },
     { path: '/about/notes', component: AboutText, options: { props: { which: 'notes' } } },
     { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
     { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
@@ -239,7 +243,13 @@
    * openOver), its overview the master, a subpage beside it (task 2026-11-13-111).
    */
   const accountRoutes = [
-    { path: '/settings/', component: Settings, master: true, detailRoutes: [{ path: '/settings/:section', component: Settings }] },
+    {
+      path: '/settings/',
+      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop } }),
+      // Desktop app: Réglages is one page with its categories (task 2026-11-15-202), not a master with a detail.
+      master: () => !layout.desktop,
+      detailRoutes: [{ path: '/settings/:section', component: Settings }],
+    },
     ...appRoutes,
   ];
 
@@ -311,6 +321,12 @@
 
   onMount(() => {
     applyMotionTokens();
+    // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
+    startDesktopShell();
+    if (settingsWindow) {
+      enableDialogFit(f7);
+      return;
+    }
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
     enableBackButton();
@@ -336,13 +352,20 @@
   });
 </script>
 
+{#if settingsWindow}
+<App {...f7params}>
+  <Views class="safe-areas">
+    <View id="view-settings-window" main url="/settings/" />
+  </Views>
+</App>
+{:else}
 <App {...f7params}>
   <!-- Tablet, both orientations: the rail (Android) or the sidebar (iPad). Android phone: the
        bottom bar; iPhone: the tab bar (task 2026-11-14-127). The account sheet: phones and
        Android tablets (tasks 2026-11-14-120, 126, 127). The ☰ side menu only remains for a
        window between the phone and tablet layouts that has no rail. -->
   {#if layout.rail}<NavRail />{:else if !bottomNav()}<NavMenu />{/if}
-  {#if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
+  {#if layout.desktop}<DesktopAccountSheet />{:else if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <SyncFailureSheet />
   <ConflictHost />
@@ -365,6 +388,7 @@
     <View id="view-account" tab url="/account" routes={accountRoutes} masterDetailBreakpoint={splitBreakpoint} />
   </Views>
 </App>
+{/if}
 
 <style>
   @layer od.components {

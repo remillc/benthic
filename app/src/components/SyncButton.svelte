@@ -11,8 +11,9 @@
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** filled: changes wait to be sent (the account sheet in manual sync, task 2026-11-14-126). */
-  let { filled = false } = $props();
+  /** filled: changes wait to be sent (the account sheet in manual sync, task 2026-11-14-126).
+      label: another text than « Synchroniser » (the desktop account sheet, task 2026-11-15-202). */
+  let { filled = false, label = '' } = $props();
 
   /** From the tap to the snackbar: this button's own sync. */
   let busy = $state(false);
@@ -57,7 +58,7 @@
       <span class="od-sync-button--sweep" aria-hidden="true"></span>
     {/if}
   {/if}
-  <span class="od-sync-button--label">{t('account.syncNow')}</span>
+  <span class="od-sync-button--label">{label || t('account.syncNow')}</span>
   {#if running}<span class="od-sr-only">, {known ? `${percent}\u00A0%` : t('sync.syncing')}</span>{/if}
 </button>
 

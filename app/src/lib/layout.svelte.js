@@ -21,6 +21,12 @@ export const desktopApp = typeof window !== 'undefined' && !!(/** @type {any} */
 /** The Mac's desktop app: its menu bar, ⌘ in shortcuts, no Réglages in the rail. */
 export const desktopMac = desktopApp && /** @type {any} */ (window).odDesktop.platform === 'darwin';
 
+/**
+ * The Mac's separate Réglages window (task 2026-11-15-202, desktop/main.cjs): the same app, loaded at
+ * `?settings-window=1`, which shows Réglages only and does not load the logbook.
+ */
+export const settingsWindow = desktopApp && new URLSearchParams(location.search).has('settings-window');
+
 /** From this width the desktop app shows the logbook as a table beside the detail; below, the tablet layout. */
 export const desktopBreakpoint = 1200;
 

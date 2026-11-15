@@ -21,7 +21,7 @@
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, undoLastChange, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { filter } from '../lib/filter.svelte.js';
-  import { navigation, openSettings } from '../lib/navigation.svelte.js';
+  import { navigation, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { undoNameKey } from '../lib/undo-name.js';
@@ -318,6 +318,9 @@
       ...(nearTrips.previous || nearTrips.next ? [{ key: 'separator' }] : []),
       ...(nearTrips.previous ? [{ key: 'mergePrevious', label: 'desktop.mergePreviousTrip', icon: 'merge' }] : []),
       ...(nearTrips.next ? [{ key: 'mergeNext', label: 'desktop.mergeNextTrip', icon: 'merge' }] : []),
+      // The last item, after a divider (task 2026-11-15-202).
+      { key: 'separator' },
+      { key: 'about', label: '', text: t('desktopSettings.about'), icon: 'info' },
     ]),
   );
   const nearTrips = $derived(adjacentTrips(logbook.dives, desk.selection.ids));
@@ -328,6 +331,7 @@
     else if (key === 'filter') command('filter');
     else if (key === 'renumber') renumbering = true;
     else if (key === 'computers') f7router.navigate('/settings/computers/');
+    else if (key === 'about') openAbout();
     else if (key === 'mergePrevious' || key === 'mergeNext') {
       const trip = key === 'mergePrevious' ? nearTrips.previous : nearTrips.next;
       if (!trip) return;

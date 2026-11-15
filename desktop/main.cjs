@@ -40,6 +40,8 @@ if (!app.requestSingleInstanceLock()) app.quit();
 
 /** @type {BrowserWindow|null} */
 let win = null;
+/** @type {BrowserWindow|null} */
+let settingsWin = null;
 
 function createWindow() {
   const state = windowState.load(app.getPath('userData'));
@@ -84,6 +86,42 @@ function createWindow() {
   win.loadURL(devUrl || 'app://opendives/index.html');
   win.on('closed', () => {
     win = null;
+    settingsWin?.close();
+  });
+}
+
+/**
+ * The Mac's Réglages window (task 2026-11-15-202, bureau-reglages-macos): the same app loaded at
+ * `?settings-window=1` (the interface shows Réglages only and does not load the logbook), 980 x 680,
+ * one at a time. ⌘W closes it (the Window menu's Close). Changes made there reach the main window
+ * through the shared storage (see lib/desktop-shell.js). Not tested on a Mac.
+ */
+function openSettingsWindow() {
+  if (settingsWin && !settingsWin.isDestroyed()) {
+    if (settingsWin.isMinimized()) settingsWin.restore();
+    settingsWin.focus();
+    return;
+  }
+  settingsWin = new BrowserWindow({
+    width: 980,
+    height: 680,
+    minWidth: 760,
+    minHeight: 520,
+    show: false,
+    title: 'OpenDives',
+    backgroundColor: '#F5F4F0',
+    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false },
+  });
+  settingsWin.once('ready-to-show', () => settingsWin?.show());
+  settingsWin.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:/.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  const url = new URL(devUrl || 'app://opendives/index.html');
+  url.searchParams.set('settings-window', '1');
+  settingsWin.loadURL(url.toString());
+  settingsWin.on('closed', () => {
+    settingsWin = null;
   });
 }
 
@@ -113,6 +151,10 @@ app.whenReady().then(() => {
     return net.fetch(pathToFileURL(file).toString());
   });
   setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources });
+  ipcMain.handle('od:settingsWindow', () => {
+    openSettingsWindow();
+    return { ok: true, value: true };
+  });
   // macOS has a menu bar; Windows and Linux none (task 2026-11-15-169, section 6).
   Menu.setApplicationMenu(process.platform === 'darwin' ? buildMenu(menuTexts(), sendMenu) : null);
   // Checks without a screen (desktop/scripts/screenshots.mjs): the menu bar's items, as a file.
