@@ -3780,3 +3780,9 @@ Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »
 Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` from every language file. English follows the existing English keys of the same names.
 
 Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
+
+## [ ] 2026-11-15-207 New logbook dialog: a close button at every step
+
+Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».
+
+Test: at each step, the ✕ closes the dialog, no logbook is created, the window is back to where it was; Échap does the same.
