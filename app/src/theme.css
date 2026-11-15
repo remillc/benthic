@@ -137,9 +137,16 @@
     --od-release-row-main-hover: #246AAE;
     --od-release-tile: #E6EEF7;
     --od-release-tile-icon: #1F5C99;
-    --od-release-label: #6B6A66;
     --od-release-divider: #ECEAE5;
-    --od-release-scrim: rgb(7 20 36 / 0.45);
+    --od-release-note: #E6EEF7;
+    --od-release-hero: #EEF3F9;
+    --od-release-field-border: #75787C;
+    --od-release-ok: #1E6B3A;
+    --od-release-pending: #C9CCD0;
+    --od-release-track: #D5DEE8;
+    --od-release-line: #A5A8AC;
+    --od-release-line-soft: #E3E1DC;
+    --od-release-hover: rgb(31 33 36 / 0.06);
     --od-release-on-panel: #FFFFFF;
     --od-release-on-panel-soft: rgb(255 255 255 / 0.78);
     --od-release-on-main-soft: rgb(255 255 255 / 0.82);
@@ -149,7 +156,6 @@
     --od-release-dot-ring: rgb(255 255 255 / 0.22);
     --od-release-row-shadow: rgb(31 33 36 / 0.06);
     --od-release-row-shadow-hover: rgb(31 33 36 / 0.12);
-    --od-release-dialog-shadow: rgb(7 20 36 / 0.35);
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --od-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
@@ -256,12 +262,18 @@
     /* First launch of the release edition: the panel keeps its blues; tiles, label, dividers and scrim follow dark mode. */
     --od-release-tile: #1E3552;
     --od-release-tile-icon: #8FB6E6;
-    --od-release-label: #B5B8BC;
     --od-release-divider: #2E3033;
-    --od-release-scrim: rgb(0 0 0 / 0.6);
+    --od-release-note: #1E3552;
+    --od-release-hero: #1A2A3F;
+    --od-release-field-border: #8F9296;
+    --od-release-ok: #4C9F70;
+    --od-release-pending: #5A5D61;
+    --od-release-track: #1E3552;
+    --od-release-line: #6B6E72;
+    --od-release-line-soft: #3A3C40;
+    --od-release-hover: rgb(255 255 255 / 0.08);
     --od-release-row-shadow: rgb(0 0 0 / 0.3);
     --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);
-    --od-release-dialog-shadow: rgb(0 0 0 / 0.6);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
