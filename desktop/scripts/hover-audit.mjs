@@ -48,6 +48,7 @@ await run(`(() => {
     props: ['backgroundColor', 'backgroundImage', 'color', 'boxShadow', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'opacity', 'textDecorationLine', 'outlineStyle', 'outlineColor', 'filter', 'transform', 'fill', 'stroke'],
     snapshot(el) {
       const out = [];
+      if (!el) return out;
       const nodes = [el, ...[...el.querySelectorAll('*')].slice(0, 80)];
       for (const n of nodes) {
         for (const pseudo of [null, '::before', '::after']) {
