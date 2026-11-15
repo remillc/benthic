@@ -525,3 +525,19 @@ test('the tokens and the client keys never reach the interface', async () => {
   assert.ok(!/refreshToken|accessToken|clientSecret/.test(preload));
   await d.bridge.stop();
 });
+
+test('« Annuler la connexion » ends a sign-in waiting for the browser at once', async () => {
+  /** @type {any} */
+  let cloud;
+  cloud = service({
+    signInTimeoutMs: 60_000,
+    // The page was opened, then closed by the diver: OpenDives cancels the wait.
+    openExternal: async () => {
+      setTimeout(() => cloud.cancelSignIn('oneDrive'), 20);
+    },
+  });
+  const started = Date.now();
+  await assert.rejects(cloud.signIn('oneDrive'), { code: 'SIGN_IN_CANCELLED' });
+  assert.ok(Date.now() - started < 5000, 'not after the timeout');
+  assert.equal(cloud.status().find((p) => p.provider === 'oneDrive').connected, false);
+});

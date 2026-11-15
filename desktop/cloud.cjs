@@ -276,7 +276,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   /**
    * Listens on the loopback address for the provider's redirect. `redirectUri` is known as soon as it listens.
    * @param {{ port: number, state: string, timeoutMs: number, slash: boolean }} options
-   * @returns {Promise<{ redirectUri: string, result: Promise<string>, close: () => void }>}
+   * @returns {Promise<{ redirectUri: string, result: Promise<string>, close: () => void, cancel: () => void }>}
    */
   function listenForRedirect({ port, state, timeoutMs, slash }) {
     return new Promise((resolveListening, rejectListening) => {
@@ -315,7 +315,12 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
       server.once('error', (e) => rejectListening(/** @type {any} */ (e).code === 'EADDRINUSE' ? coded('PORT_BUSY') : e));
       server.listen(port, '127.0.0.1', () => {
         const actual = /** @type {import('node:net').AddressInfo} */ (server.address()).port;
-        resolveListening({ redirectUri: `http://127.0.0.1:${actual}${slash ? '/' : ''}`, result: /** @type {Promise<string>} */ (result), close });
+        // « Annuler la connexion », or another service chosen: the wait ends at once (SIGN_IN_CANCELLED).
+        const cancel = () => {
+          close();
+          rejectCode(coded('SIGN_IN_CANCELLED'));
+        };
+        resolveListening({ redirectUri: `http://127.0.0.1:${actual}${slash ? '/' : ''}`, result: /** @type {Promise<string>} */ (result), close, cancel });
       });
     });
   }
@@ -351,7 +356,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     const state = base64url(crypto.randomBytes(24));
     const port = provider === 'dropbox' ? (ports.dropbox ?? DROPBOX_PORT) : (ports[provider] ?? 0);
     const listener = await listenForRedirect({ port, state, timeoutMs: signInTimeoutMs, slash: provider === 'dropbox' });
-    signingIn.set(provider, { cancel: () => { listener.close(); } });
+    signingIn.set(provider, { cancel: listener.cancel });
     let wrote = false;
     try {
       await openExternal(authorizeUrl(provider, { redirectUri: listener.redirectUri, state, challenge }));
@@ -582,7 +587,13 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     return answer.response === 0 ? 'local' : answer.response === 1 ? 'remote' : 'later';
   }
 
-  return { status, statusOf, signIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync };
+  /** Ends a sign-in still waiting for the browser (the diver closed the page, or chose another service). @param {string} provider */
+  function cancelSignIn(provider) {
+    signingIn.get(provider)?.cancel();
+    signingIn.delete(provider);
+  }
+
+  return { status, statusOf, signIn, cancelSignIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync };
 }
 
 module.exports = {

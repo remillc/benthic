@@ -306,14 +306,16 @@
       "DENIED": "The service refuses access to this folder.",
       "NETWORK": "The service does not answer. Check the connection.",
       "EXISTS": "A file with this name already exists in this folder.",
-      "other": "The logbook could not be created."
+      "other": "The logbook could not be created.",
+      "SIGN_IN_CANCELLED": "The sign-in was cancelled."
     },
     "startup": {
       "label": "Open at start",
       "text": "The last logbook reopens each logbook that was open at quit, in its own window",
       "last": "The last logbook",
       "ask": "Choose each time"
-    }
+    },
+    "cancelSignIn": "Cancel the sign-in"
   },
   "sync": {
     "failure": {

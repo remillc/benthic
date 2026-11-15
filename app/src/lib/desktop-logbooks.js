@@ -63,7 +63,7 @@ export function cloudFolderError(folder) {
  * @param {{ code?: string, message?: string }} error
  */
 export function cloudErrorKey(error) {
-  const known = ['NOT_SIGNED_IN', 'NOT_AVAILABLE', 'SIGN_IN_DENIED', 'SIGN_IN_TIMEOUT', 'SIGN_IN_EXPIRED', 'STATE_MISMATCH', 'PORT_BUSY', 'CREDENTIALS_NOT_SAVED', 'DENIED', 'NETWORK', 'EXISTS'];
+  const known = ['SIGN_IN_CANCELLED', 'NOT_SIGNED_IN', 'NOT_AVAILABLE', 'SIGN_IN_DENIED', 'SIGN_IN_TIMEOUT', 'SIGN_IN_EXPIRED', 'STATE_MISMATCH', 'PORT_BUSY', 'CREDENTIALS_NOT_SAVED', 'DENIED', 'NETWORK', 'EXISTS'];
   const code = error?.code && known.includes(error.code) ? error.code : String(error?.message ?? '').split(/[:\s]/)[0];
   return `desktopCloud.errors.${known.includes(code) ? code : 'other'}`;
 }

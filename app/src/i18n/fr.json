@@ -306,14 +306,16 @@
       "DENIED": "Le service refuse l’accès à ce dossier.",
       "NETWORK": "Le service ne répond pas. Vérifiez la connexion.",
       "EXISTS": "Un fichier de ce nom existe déjà dans ce dossier.",
-      "other": "Le carnet n’a pas pu être créé."
+      "other": "Le carnet n’a pas pu être créé.",
+      "SIGN_IN_CANCELLED": "La connexion a été annulée."
     },
     "startup": {
       "label": "Ouvrir au démarrage",
       "text": "Le dernier carnet rouvre chaque carnet ouvert à la fermeture, dans sa fenêtre",
       "last": "Le dernier carnet",
       "ask": "Choisir à chaque fois"
-    }
+    },
+    "cancelSignIn": "Annuler la connexion"
   },
   "sync": {
     "failure": {

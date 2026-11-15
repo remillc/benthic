@@ -106,11 +106,23 @@
     try {
       status = [await bridge().logbooks.cloudSignIn({ provider: id }), ...status.filter((p) => p.provider !== id)];
     } catch (e) {
-      error = t(cloudErrorKey(/** @type {any} */ (e)));
+      // Cancelled on purpose: nothing to say.
+      if (cloudErrorKey(/** @type {any} */ (e)) !== 'desktopCloud.errors.SIGN_IN_CANCELLED') error = t(cloudErrorKey(/** @type {any} */ (e)));
     } finally {
       signingIn = '';
     }
   }
+
+  /** « Annuler la connexion »: the page was closed, or the diver changed their mind. */
+  function cancelSignIn() {
+    if (signingIn) bridge().logbooks.cloudCancelSignIn({ provider: signingIn });
+  }
+
+  // Another service chosen, or the dialog left: a sign-in still waiting is cancelled.
+  $effect(() => {
+    provider;
+    return () => cancelSignIn();
+  });
 
   async function signOut() {
     try {
@@ -225,7 +237,7 @@
         {/each}
       </div>
       {#if provider && !isConnected(provider)}
-        <button type="button" class="od-new-logbook--secondary od-new-logbook--sign-in" disabled={!!signingIn} onclick={() => signIn(provider)}>{signingIn ? t('desktopCloud.row.signingIn') : t('desktopCloud.signIn', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
+        <button type="button" class="od-new-logbook--secondary od-new-logbook--sign-in" onclick={() => (signingIn ? cancelSignIn() : signIn(provider))}>{signingIn ? t('desktopCloud.cancelSignIn') : t('desktopCloud.signIn', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
       {:else if isConnected(provider)}
         <button type="button" class="od-new-logbook--text-button od-new-logbook--sign-out" onclick={signOut}>{t('desktopCloud.signOut', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
       {/if}
