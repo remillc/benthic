@@ -93,10 +93,16 @@ await run(`(() => { const s = document.createElement('style'); s.id = '__odHover
 await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: (await run('innerWidth')) - 1, y: (await run('innerHeight')) - 1 });
 await send('DOM.enable');
 await send('CSS.enable');
-const root = (await send('DOM.getDocument', { depth: 0 })).root.nodeId;
 const missing = [];
 for (const item of found) {
-  const { nodeId } = await send('DOM.querySelector', { nodeId: root, selector: `[data-od-audit="${item.n}"]` });
+  // The page may re-render while it is checked: a node that is gone is skipped.
+  let nodeId = 0;
+  try {
+    const doc = (await send('DOM.getDocument', { depth: 0 })).root.nodeId;
+    nodeId = (await send('DOM.querySelector', { nodeId: doc, selector: `[data-od-audit="${item.n}"]` })).nodeId;
+  } catch {
+    continue;
+  }
   if (!nodeId) continue;
   const before = await run(`window.__odHover.snapshot(document.querySelector('[data-od-audit="${item.n}"]'))`);
   await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] });
