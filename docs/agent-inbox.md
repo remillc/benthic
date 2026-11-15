@@ -3920,3 +3920,16 @@ Christian decided this on 15 November 2026.
 - If you already started it, stop and keep what you have on `feature/release-first-launch`.
 
 Mark this task done once the branch exists (or once you have noted the rule, if nothing was started).
+
+## [ ] 2026-11-15-216 Correction to 215: move task 213's work off main
+
+Christian decided this on 15 November 2026. Task 215 assumed 213 was not started, but it is already done and merged into `main`. Christian chose to take it **off `main`**.
+
+1. Create `feature/release-first-launch` from the current `main`. It keeps everything 213 added: `edition.js` and `VITE_EDITION`, `WelcomeEntry.svelte`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, the dialog, the texts, the README section, the tests.
+2. On `main`, remove what 213 added, with one revert commit (or a commit that removes those files and the changes in `App.svelte`, the i18n files and `app/README.md`). `main` goes back to the beta only, with nothing from the release edition in it.
+   - Keep everything that does not come from 213, in particular 214 (the smooth decorative profile) and 210 and 211.
+   - The beta screens must stay pixel-identical: check it as you did for 213.
+3. From now on, every task about the release edition (marked « release edition » or « version publique ») is built on `feature/release-first-launch`, never merged into `main` until Christian asks. Keep the branch up to date with `main`.
+4. 213 itself stays on hold on the branch: its screens are being redesigned, and a new task will replace it.
+
+This replaces the « Task 213 is on hold » part of task 215.
