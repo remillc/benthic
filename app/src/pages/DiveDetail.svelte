@@ -59,6 +59,7 @@
     formatTimeOfDay,
   } from '../lib/format.js';
   import SiteMap from '../components/SiteMap.svelte';
+  import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -602,10 +603,48 @@
       { label: t('desktop.figure.sac'), value: sac },
     ].filter((x) => x.value);
   });
+  // The dive's ⋮ on desktop (task 2026-11-15-186): the desktop menu, not the phone's popover.
+  /** @type {{x: number, y: number}|null} */
+  let deskMenuAt = $state(null);
   /** @param {MouseEvent} e */
   function openDeskMenu(e) {
-    f7.popover.open(`#${menuId}`, /** @type {HTMLElement} */ (e.currentTarget));
+    const r = /** @type {HTMLElement} */ (e.currentTarget).getBoundingClientRect();
+    deskMenuAt = { x: r.right - 300, y: r.bottom + 4 };
   }
+  const deskMenu = $derived(
+    /** @type {import('../lib/desktop-table.js').MenuEntry[]} */ ([
+      { key: 'enlarge', label: 'desktop.menu.enlarge', icon: 'fullscreen', shortcut: desktopMac ? '⌘P' : 'Ctrl+P' },
+      { key: 'addToTrip', label: 'desktop.menu.addToTrip', icon: 'trip' },
+      ...(removableFromTrip ? [{ key: 'removeFromTrip', label: 'desktop.menu.removeFromTrip', icon: 'tripRemove' }] : []),
+      { key: 'renumber', label: 'desktop.menu.renumber', icon: 'renumber' },
+      { key: 'export', label: 'desktop.menu.export', icon: 'export', shortcut: desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E' },
+      { key: 'separator' },
+      { key: 'delete', label: 'desktop.menu.deleteDive', icon: 'delete', shortcut: desktopMac ? '⌫' : 'Suppr', danger: true },
+    ]),
+  );
+  /** « Agrandir le profil »: the profile fills the pane; Échap returns. */
+  let profileBig = $state(false);
+  /** @param {string} key */
+  function deskChoose(key) {
+    if (key === 'enlarge') profileBig = true;
+    else if (key === 'removeFromTrip') removeFromTrip();
+    else if (key === 'renumber') renumbering = true;
+    // The logbook's table acts on its selection, which is this dive.
+    else window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: key }));
+  }
+  $effect(() => {
+    if (!desk) return;
+    /** @param {KeyboardEvent} e */
+    const key = (e) => {
+      if (profileBig && e.key === 'Escape') profileBig = false;
+      else if ((desktopMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'p' && navigation.section === 'logbook') {
+        e.preventDefault();
+        profileBig = !profileBig;
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  });
   /** ← → between the tabs (WAI-ARIA tabs). @param {KeyboardEvent} e */
   function tabKey(e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
@@ -763,7 +802,7 @@
 
     {#if !desk}<DiveFigures {dive} {prefs} />{/if}
 
-    <div class:od-dive-detail--desk-card={desk}>
+    <div class:od-dive-detail--desk-card={desk} class:od-dive-detail--desk-big={desk && profileBig}>
     <DiveProfile
       hover={desk}
       samples={dive.samples}
@@ -960,6 +999,10 @@
   {/snippet}
 </Page>
 
+{#if deskMenuAt}
+  <DesktopContextMenu x={deskMenuAt.x} y={deskMenuAt.y} heading="" entries={deskMenu} onchoose={deskChoose} onclose={() => (deskMenuAt = null)} />
+{/if}
+
 {#if sharing}
   <ShareSheet onpdf={() => share('pdf')} onsummary={() => share('summary')} onlink={dive && diveLink(dive.date) ? () => share('link') : undefined} onqr={() => ((sharing = false), (qrSharing = true))} onclose={() => (sharing = false)} />
 {/if}
@@ -1036,6 +1079,17 @@
       padding: 8px 0 12px;
       border-radius: 16px;
       background: var(--od-surface);
+    }
+    /* « Agrandir le profil »: the card covers the pane. */
+    .od-dive-detail--desk-big {
+      position: fixed;
+      inset: 16px 16px 16px calc(var(--f7-page-master-width, 50%) + var(--od-nav-width) + 16px);
+      z-index: 50;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
     }
     .od-dive-detail--desk-figures {
       display: flex;

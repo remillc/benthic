@@ -227,7 +227,7 @@ export function keepSelection(selection, order) {
 }
 
 /**
- * @typedef {{key: string, label: string, icon: string, shortcut?: string, danger?: boolean}
+ * @typedef {{key: string, label: string, icon: string, shortcut?: string, danger?: boolean, disabled?: boolean, text?: string}
  *   | {key: 'separator'}} MenuEntry
  */
 

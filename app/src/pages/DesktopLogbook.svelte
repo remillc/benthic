@@ -24,6 +24,7 @@
   import { navigation, openSettings } from '../lib/navigation.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
+  import { undoNameKey } from '../lib/undo-name.js';
   import { desk, setSort, setColumns, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
   import {
     COLUMNS,
@@ -102,7 +103,6 @@
     });
   });
 
-  let shownInDetail = '';
   $effect(() => {
     if (!layout.desktop || navigation.section !== 'logbook' || logbook.loading) return;
     const ids = desk.selection.ids;
@@ -117,8 +117,9 @@
 
   /** @param {string} url */
   function showDetail(url) {
-    if (url === shownInDetail && url !== '/pane/selection') return;
-    shownInDetail = url;
+    // What the pane really shows: another screen opened there (Filtrer) is replaced too.
+    const current = untrack(() => f7router.currentRoute?.url);
+    if (url === current && url !== '/pane/selection') return;
     untrack(() => f7router.navigate(url, { reloadDetail: true, animate: false }));
   }
 
@@ -298,6 +299,33 @@
     else if (key === 'addToTrip') choosingTrip = true;
   }
 
+  // --- The ⋮ of the list header: Annuler and Rétablir naming the change, then Filtrer (task 192). --
+  /** @type {{x: number, y: number}|null} */
+  let moreAt = $state(null);
+  /** @param {MouseEvent} e */
+  function openMore(e) {
+    const r = /** @type {HTMLElement} */ (e.currentTarget).getBoundingClientRect();
+    moreAt = { x: r.right - 280, y: r.bottom + 4 };
+  }
+  /** « Annuler : Ajouter au voyage », or plain « Annuler » when the step has no known name. */
+  function undoEntryText(/** @type {'undo'|'redo'} */ which) {
+    const key = undoNameKey(which === 'undo' ? logbook.undoText : logbook.redoText);
+    return key ? t(`desktop.${which}Named`, { action: t(key) }) : t(`desktop.${which}Plain`);
+  }
+  const moreEntries = $derived(
+    /** @type {import('../lib/desktop-table.js').MenuEntry[]} */ ([
+      { key: 'undo', label: '', text: undoEntryText('undo'), icon: 'undo', shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z', disabled: !logbook.undoText },
+      { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
+      { key: 'separator' },
+      { key: 'filter', label: filter.ids ? 'logbook.menuFilterOn' : 'logbook.menuFilter', icon: 'filter' },
+    ]),
+  );
+  /** @param {string} key */
+  function moreChoose(key) {
+    if (key === 'undo' || key === 'redo') command(key);
+    else if (key === 'filter') f7router.navigate('/filter');
+  }
+
   // --- The columns button. ----------------------------------------------------------------
   let columnsOpen = $state(false);
 
@@ -376,6 +404,7 @@
       layout.desktop &&
       navigation.section === 'logbook' &&
       !menuAt &&
+      !moreAt &&
       !exporting &&
       !choosingTrip &&
       !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in') &&
@@ -413,9 +442,7 @@
         return true;
       case 'undo':
       case 'redo':
-        undoLastChange(command === 'redo')
-          .then(() => logbook.undoText && showSnackbar(logbook.undoText))
-          .catch(changeFailed);
+        undoLastChange(command === 'redo').catch(changeFailed);
         return true;
       case 'selectAll':
         desk.selection = { ids: [...order], anchor: order[0] ?? null, focus: order.at(-1) ?? null };
@@ -462,9 +489,14 @@
       if (cmd && command(cmd)) e.preventDefault();
     };
     window.addEventListener('keydown', keydown);
+    // The detail pane's ⋮ (DiveDetail.svelte) acts through the same commands, on the dive it shows.
+    /** @param {Event} e */
+    const fromDetail = (e) => command(/** @type {CustomEvent<string>} */ (e).detail);
+    window.addEventListener('od-desktop-command', fromDetail);
     const off = /** @type {any} */ (window).odDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
     return () => {
       window.removeEventListener('keydown', keydown);
+      window.removeEventListener('od-desktop-command', fromDetail);
       off?.();
     };
   });
@@ -511,16 +543,18 @@
 <Page class="od-desktop-logbook" pageContent={false}>
   <div class="od-desktop-logbook--frame" bind:this={pageEl}>
     <header class="od-desktop-logbook--bar">
-      <h1 class="od-desktop-logbook--title">{t('logbook.title')}</h1>
-      {#if summary}<p class="od-desktop-logbook--summary od-value">{summary}</p>{/if}
-      <div class="od-desktop-logbook--spacer"></div>
+      <!-- The list column's own header (task 2026-11-15-192): the title, the count on one line under it. -->
+      <div class="od-desktop-logbook--titles">
+        <h1 class="od-desktop-logbook--title">{t('logbook.title')}</h1>
+        {#if summary}<p class="od-desktop-logbook--summary od-value" title={summary}>{summary}</p>{/if}
+      </div>
       <label class="od-desktop-logbook--search">
         <Icon name="search" size={20} />
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('logbook.search')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} />
         {#if !query}<kbd class="od-desktop-logbook--hint">{mod}F</kbd>{/if}
       </label>
       <div class="od-desktop-logbook--columns-anchor">
-        <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('desktop.columns')} title={t('desktop.columns')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>
+        <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('desktop.columnsShown')} title={t('desktop.columnsShown')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>
           <Icon name="columns" size={22} />
         </button>
         {#if columnsOpen}
@@ -537,7 +571,7 @@
           </div>
         {/if}
       </div>
-      <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('detail.moreOptions')} title={t('detail.moreOptions')} onclick={() => f7router.navigate('/filter')}>
+      <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('desktop.moreLogbook')} title={t('desktop.moreLogbook')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
     </header>
@@ -640,6 +674,9 @@
 
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   {#if logbook.dives.length}<FabMenu choices={addChoices} onchoose={choose} />{/if}
+  {#if moreAt}
+    <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
+  {/if}
   {#if menuAt}
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />
   {/if}
@@ -667,6 +704,10 @@
       min-height: 64px;
       padding: 8px 8px 8px 12px;
     }
+    .od-desktop-logbook--titles {
+      flex: 1;
+      min-width: 0;
+    }
     .od-desktop-logbook--title {
       margin: 0;
       font-family: var(--od-title-font);
@@ -675,10 +716,12 @@
       color: var(--od-text);
     }
     .od-desktop-logbook--summary {
-      margin: 0 0 0 8px;
-      font-size: 14px;
+      margin: 2px 0 0;
+      font-size: 13px;
       color: var(--od-text-2);
-      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .od-desktop-logbook--spacer {
       flex: 1;
@@ -687,8 +730,8 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      width: 320px;
-      max-width: 40%;
+      flex: 0 1 300px;
+      min-width: 220px;
       height: 44px;
       padding: 0 12px 0 16px;
       border-radius: 22px;

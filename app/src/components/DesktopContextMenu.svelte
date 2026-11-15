@@ -30,13 +30,13 @@
       const { width, height } = menu.getBoundingClientRect();
       left = Math.max(8, Math.min(x, innerWidth - width - 8));
       top = Math.max(8, Math.min(y, innerHeight - height - 8));
-      /** @type {HTMLElement|null} */ (menu.querySelector('.od-context-menu--item'))?.focus();
+      /** @type {HTMLElement|null} */ (menu.querySelector('.od-context-menu--item:not(:disabled)'))?.focus();
     });
   });
 
   /** @param {KeyboardEvent} e */
   function keydown(e) {
-    const items = /** @type {HTMLElement[]} */ ([...(menu?.querySelectorAll('.od-context-menu--item') ?? [])]);
+    const items = /** @type {HTMLElement[]} */ ([...(menu?.querySelectorAll('.od-context-menu--item:not(:disabled)') ?? [])]);
     const at = items.indexOf(/** @type {HTMLElement} */ (document.activeElement));
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -67,14 +67,14 @@
   }}
 >
   <div class="od-context-menu" role="menu" aria-label={heading} bind:this={menu} style:left="{left}px" style:top="{top}px" tabindex="-1" onkeydown={keydown}>
-    <p class="od-context-menu--heading">{heading}</p>
+    {#if heading}<p class="od-context-menu--heading">{heading}</p>{/if}
     {#each entries as entry, i (entry.key === 'separator' ? `separator${i}` : entry.key)}
       {#if entry.key === 'separator'}
         <div class="od-context-menu--separator" role="separator"></div>
       {:else if 'label' in entry}
-        <button type="button" role="menuitem" class="od-context-menu--item" class:od-context-menu--danger={entry.danger} onclick={() => choose(entry.key)}>
+        <button type="button" role="menuitem" class="od-context-menu--item" class:od-context-menu--danger={entry.danger} disabled={entry.disabled} aria-disabled={entry.disabled} onclick={() => choose(entry.key)}>
           <Icon name={/** @type {any} */ (entry.icon)} size={20} />
-          <span class="od-context-menu--label">{t(entry.label)}</span>
+          <span class="od-context-menu--label">{entry.text ?? t(entry.label)}</span>
           {#if entry.shortcut}<kbd class="od-context-menu--shortcut">{entry.shortcut}</kbd>{/if}
         </button>
       {/if}
@@ -122,7 +122,11 @@
       text-align: start;
       cursor: pointer;
     }
-    .od-context-menu--item:hover,
+    .od-context-menu--item:disabled {
+      opacity: 0.38;
+      cursor: default;
+    }
+    .od-context-menu--item:not(:disabled):hover,
     .od-context-menu--item:focus-visible {
       background: color-mix(in srgb, var(--od-text) 8%, transparent);
       outline: none;

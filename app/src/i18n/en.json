@@ -3382,7 +3382,11 @@
       "copy": "Copy",
       "export": "Export…",
       "share": "Share…",
-      "delete": "Delete"
+      "delete": "Delete",
+      "enlarge": "Enlarge the profile",
+      "removeFromTrip": "Remove from the trip",
+      "renumber": "Renumber the dive…",
+      "deleteDive": "Delete the dive"
     },
     "macMenu": {
       "about": "About OpenDives",
@@ -3444,6 +3448,34 @@
     "noNotes": "No notes for this dive.",
     "noGas": "No gas recorded for this dive.",
     "noEquipment": "No equipment recorded for this dive.",
-    "noMap": "This dive’s site has no coordinates."
+    "noMap": "This dive’s site has no coordinates.",
+    "columnsShown": "Columns shown",
+    "moreLogbook": "More logbook options",
+    "undo": {
+      "editDive": "Edit the dive",
+      "editTrip": "Edit the trip",
+      "editSite": "Edit the site",
+      "filters": "Edit the filters",
+      "addSite": "Add the site",
+      "addDive": "Add the dive",
+      "addToTrip": "Add to the trip",
+      "removeFromTrip": "Remove from the trip",
+      "createTrip": "Create the trip",
+      "mergeTrips": "Merge the trips",
+      "autogroup": "Group into trips",
+      "ungroup": "Undo automatic trips",
+      "mergeSites": "Merge the sites",
+      "deleteSites": "Delete the sites",
+      "deleteDives": "Delete the dives",
+      "import": "Import",
+      "renumber": "Renumber",
+      "cylinderType": "Rename the cylinder type",
+      "computers": "Edit the dive computers",
+      "replan": "Plan the dive"
+    },
+    "undoNamed": "Undo: {action}",
+    "redoNamed": "Redo: {action}",
+    "undoPlain": "Undo",
+    "redoPlain": "Redo"
   }
 }

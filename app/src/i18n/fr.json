@@ -3382,7 +3382,11 @@
       "copy": "Copier",
       "export": "Exporter…",
       "share": "Partager…",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "enlarge": "Agrandir le profil",
+      "removeFromTrip": "Retirer du voyage",
+      "renumber": "Renuméroter la plongée…",
+      "deleteDive": "Supprimer la plongée"
     },
     "macMenu": {
       "about": "À propos d'OpenDives",
@@ -3444,6 +3448,34 @@
     "noNotes": "Aucune note pour cette plongée.",
     "noGas": "Aucun gaz noté pour cette plongée.",
     "noEquipment": "Aucun équipement noté pour cette plongée.",
-    "noMap": "Le site de cette plongée n’a pas de coordonnées."
+    "noMap": "Le site de cette plongée n’a pas de coordonnées.",
+    "columnsShown": "Colonnes affichées",
+    "moreLogbook": "Plus d'options du carnet",
+    "undo": {
+      "editDive": "Modifier la plongée",
+      "editTrip": "Modifier le voyage",
+      "editSite": "Modifier le site",
+      "filters": "Modifier les filtres",
+      "addSite": "Ajouter le site",
+      "addDive": "Ajouter la plongée",
+      "addToTrip": "Ajouter au voyage",
+      "removeFromTrip": "Retirer du voyage",
+      "createTrip": "Créer le voyage",
+      "mergeTrips": "Fusionner les voyages",
+      "autogroup": "Regrouper en voyages",
+      "ungroup": "Défaire les voyages automatiques",
+      "mergeSites": "Fusionner les sites",
+      "deleteSites": "Supprimer les sites",
+      "deleteDives": "Supprimer les plongées",
+      "import": "Importer",
+      "renumber": "Renuméroter",
+      "cylinderType": "Renommer le type de bouteille",
+      "computers": "Modifier les ordinateurs",
+      "replan": "Planifier la plongée"
+    },
+    "undoNamed": "Annuler : {action}",
+    "redoNamed": "Rétablir : {action}",
+    "undoPlain": "Annuler",
+    "redoPlain": "Rétablir"
   }
 }
