@@ -14,6 +14,8 @@
   import Account from './pages/Account.svelte';
   import DeleteAccount from './pages/DeleteAccount.svelte';
   import WelcomeStart from './pages/WelcomeStart.svelte';
+  import WelcomeEntry from './pages/WelcomeEntry.svelte';
+  import { isRelease } from './lib/edition.js';
   import SettingsBailout from './pages/SettingsBailout.svelte';
   import Plans from './pages/Plans.svelte';
   import SignIn from './pages/SignIn.svelte';
@@ -138,7 +140,8 @@
     // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
     { path: '/account/git/new', component: GitRepository },
     // First launch, in the view of its popup (components/Welcome.svelte).
-    { path: '/welcome', component: WelcomeStart },
+    // The release edition has its own first launch (pages/WelcomeEntry.svelte); the beta keeps WelcomeStart.
+    { path: '/welcome', component: isRelease ? WelcomeEntry : WelcomeStart },
     { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
     { path: '/welcome/create', component: CreateAccount, options: { props: { welcome: true } } },
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },

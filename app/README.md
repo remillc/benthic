@@ -274,6 +274,20 @@ The emulator is shared and its speed drifted between sessions (the WebView navig
 - **Launch screen:** kept until the WebView paints its first content (4 s at most), WebView background in the app's colour.
 - **Left as is:** the core reads the 1,353 dives in 380 to 500 ms; the cloud probe (1 to 2.6 s, network).
 
+## Editions (15 November 2026)
+
+One source, two editions, chosen at build time by `VITE_EDITION`, read in one place (`src/lib/edition.js`, which exports `edition` and `isRelease`):
+
+- unset, or any value other than `release`: the **beta** edition (the default). Its first launch is `pages/WelcomeStart.svelte`, with tasks 210 and 211.
+- `VITE_EDITION=release`: the **release** edition. On tablets (from 768 px) its first launch is `pages/WelcomeStartRelease.svelte`, with the « Ouvrir ou importer un carnet » dialog (task 213). On a phone it still shows the beta screen: the release edition's phone layout comes in a later task. `App.svelte` picks the page; the other screens are the same in both editions.
+
+```sh
+VITE_EDITION=release npx vite          # development server, release edition
+VITE_EDITION=release npm run build     # build for the release edition (then npm run android:sync)
+```
+
+On Windows PowerShell: `$env:VITE_EDITION = "release"` first. A line `VITE_EDITION=release` in `.env.local` does the same. In the release edition, « Dans mon nuage » and the four cloud rows of the dialog only say that the cloud comes in a later version (idea #74).
+
 ## Reproduce
 
 The commands are in [AGENTS.md](../AGENTS.md#commands).
