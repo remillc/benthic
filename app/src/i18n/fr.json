@@ -434,7 +434,8 @@
     "ceiling": "Plafond",
     "tissues": "Tissus",
     "tissuesLabel": "Saturation des tissus, des compartiments rapides aux lents",
-    "layers": "Courbes affichées"
+    "layers": "Courbes affichées",
+    "ceilingCalc": "Plafond calculé"
   },
   "weightFeedback": {
     "title": "Ce lest était",
@@ -1834,6 +1835,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil des plongées : « Plafond » montre le plafond donné par l'ordinateur de plongée, comme Subsurface. Le plafond calculé avec vos facteurs de gradient s'ajoute en pointillé si « Plafond calculé » est activé dans Réglages, Affichage.",
       "Profil des plongées : courbes plus fines (1,25 dp) et ligne de profondeur moyenne de 1 dp. Le contraste élevé garde des traits de 2 dp.",
       "Détail d'une plongée : le menu ⋮ de la barre d'actions se ferme d'un appui ailleurs ou d'un second appui sur ⋮.",
       "Carnet : « dernière plongée il y a … » ne se coupe plus en fin de ligne.",

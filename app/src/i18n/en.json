@@ -434,7 +434,8 @@
     "ceiling": "Ceiling",
     "tissues": "Tissues",
     "tissuesLabel": "Tissue loading, from fast to slow compartments",
-    "layers": "Curves shown"
+    "layers": "Curves shown",
+    "ceilingCalc": "Computed ceiling"
   },
   "weightFeedback": {
     "title": "This weight was",
@@ -1834,6 +1835,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dive profiles: « Ceiling » shows the ceiling given by the dive computer, as Subsurface does. The ceiling computed with your gradient factors is added as a dashed line when « Computed ceiling » is on in Settings, Display.",
       "Dive profiles: thinner curves (1.25 dp), a 1 dp average-depth line; high contrast keeps 2 dp lines.",
       "Dive detail: the ⋮ menu of the action bar closes with a tap elsewhere or a second tap on ⋮.",
       "Logbook: « last dive … ago » no longer breaks across lines.",

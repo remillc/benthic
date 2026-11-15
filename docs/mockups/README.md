@@ -193,6 +193,11 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-stats-filtre-actif.dc.html` | Statistiques · bureau, filtre actif |
 | `bureau-stats-nouvelle.dc.html` | Statistiques · bureau, nouvelle statistique |
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
+| `bureau-outils-groupe.dc.html` | Outils · bureau · copie du groupe |
+| `bureau-outils-desaturation.dc.html` | Outils · bureau, désaturation |
+| `bureau-outils-ead-mod.dc.html` | Outils · bureau, EAD et MOD |
+| `bureau-outils-meilleur-melange.dc.html` | Outils · bureau, meilleur mélange |
+| `bureau-outils-melangeur.dc.html` | Outils · bureau, mélangeur de gaz |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
 | `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
 | `bureau-carnet-exporter.dc.html` | Carnet · bureau, exporter des plongées |

@@ -170,7 +170,16 @@
   // Ceiling: the core's calculated ceiling (gradient factors of the settings),
   // an area from the surface down to it, as on the planner.
   const ceilingMm = $derived(samples.ceilingMm);
-  const ceilingAvailable = $derived(!!ceilingMm && ceilingMm.some((v) => v > 0));
+  // The computer's ceiling (or the computed one for a dive without deco data); with « Plafond
+  // calculé » in Settings, the computed one is drawn beside it as a dashed line.
+  const calcCeilingMm = $derived(samples.calcCeilingMm ?? null);
+  const calcCeilingEdge = $derived.by(() => {
+    if (!calcCeilingMm || !calcCeilingMm.some((v) => v > 0) || !times.length) return null;
+    let edge = '';
+    for (let i = 0; i < times.length; i++) edge += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(calcCeilingMm[i]).toFixed(1)}`;
+    return edge;
+  });
+  const ceilingAvailable = $derived((!!ceilingMm && ceilingMm.some((v) => v > 0)) || !!calcCeilingEdge);
   let ceilingLayer = $state(false);
   const ceilingShape = $derived.by(() => {
     if (!ceilingAvailable || !ceilingMm || !times.length) return null;
@@ -320,6 +329,9 @@
       {#if ceilingLayer && ceilingMm}
         <span>{t('profile.ceiling')} <strong>{formatDepth(ceilingMm[cursor], prefs)}</strong></span>
       {/if}
+      {#if ceilingLayer && calcCeilingMm}
+        <span>{t('profile.ceilingCalc')} <strong>{formatDepth(calcCeilingMm[cursor], prefs)}</strong></span>
+      {/if}
     {:else}
       <span class="od-dive-profile--hint">{t('profile.hint')}</span>
     {/if}
@@ -359,6 +371,9 @@
         {#if ceilingLayer && ceilingShape}
           <path d={ceilingShape.area} class="od-dive-profile--ceiling-area" />
           <path d={ceilingShape.edge} class="od-dive-profile--ceiling-line" />
+        {/if}
+        {#if ceilingLayer && calcCeilingEdge}
+          <path d={calcCeilingEdge} class="od-dive-profile--ceiling-line od-dive-profile--ceiling-calc" />
         {/if}
         <path d={paths.line} class="od-dive-profile--trace-outline" />
         <path d={paths.line} class="od-dive-profile--trace" />
@@ -617,6 +632,10 @@
 
     /* The ceiling (as on the planner): an exception to the rule that keeps
        --od-alarm for violations (spec, section 4). */
+    .od-dive-profile--ceiling-calc {
+      stroke-dasharray: 4 3;
+    }
+
     .od-dive-profile--ceiling-area {
       fill: var(--od-alarm);
       fill-opacity: 0.35;

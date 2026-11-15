@@ -584,8 +584,14 @@ int get_dive(int id, std::string &json, std::string &error)
 	json += ']';
 
 	// Profile computed by the core (profile.cpp), as Subsurface draws it.
-	std::vector<int> t, depth, ceiling, ppo2, cylinder, temperature;
+	std::vector<int> t, depth, ceiling, dc_ceiling, ppo2, cylinder, temperature;
 	bool has_ceiling = false, has_temperature = false;
+	// The ceiling the dive computer reported (its deco stop while in deco), as Subsurface for
+	// desktop draws it with « dcceiling » (DiveReportedCeiling): what the diver followed. The
+	// ceiling the core computes with the app's gradient factors stands in for it only when the
+	// computer recorded no deco data at all (no-deco limit, deco flag or stop depth), and is
+	// given on its own as well with « calcceiling » (Christian's choice, 15 November 2026).
+	bool dc_deco_data = false, has_dc_ceiling = false;
 	// Tissue loading, 16 compartments per entry, flattened (see "tissues" below).
 	std::vector<int> tissues;
 	if (dc) {
@@ -596,6 +602,10 @@ int get_dive(int id, std::string &json, std::string &error)
 			t.push_back(e.sec);
 			depth.push_back(e.depth.mm);
 			ceiling.push_back(e.ceiling.mm);
+			int reported = e.in_deco && e.stopdepth.mm ? std::min(e.stopdepth.mm, e.depth.mm) : 0;
+			dc_ceiling.push_back(reported);
+			has_dc_ceiling = has_dc_ceiling || reported > 0;
+			dc_deco_data = dc_deco_data || e.ndl > 0 || e.in_deco || e.stopdepth.mm > 0;
 			ppo2.push_back(static_cast<int>(e.pressures.o2 * 1000.0 + 0.5));
 			cylinder.push_back(e.ruler_cylinder);
 			// Water temperature as the profile carries it (populate_plot_entries
@@ -614,7 +624,16 @@ int get_dive(int id, std::string &json, std::string &error)
 	json += ",\"cylinder\":";
 	append_json_array(json, cylinder);
 	json += ",\"ceilingMm\":";
-	if (has_ceiling)
+	if (dc_deco_data && prefs.dcceiling && has_dc_ceiling)
+		append_json_array(json, dc_ceiling);
+	else if (!dc_deco_data && has_ceiling)
+		append_json_array(json, ceiling);
+	else
+		json += "null";
+	json += ",\"ceilingSource\":";
+	append_json_string(json, dc_deco_data ? "computer" : "calculated");
+	json += ",\"calcCeilingMm\":";
+	if (dc_deco_data && prefs.calcceiling && has_ceiling)
 		append_json_array(json, ceiling);
 	else
 		json += "null";

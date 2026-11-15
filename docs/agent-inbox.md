@@ -3556,3 +3556,80 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 English: « More logbook options », « Undo: {last action} », « Redo », « Columns shown ».
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
+
+## [ ] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and its group copy `bureau-carnet-groupe.dc.html` (dive N° 5, Lake Coleridge, selected). They are the reference for the whole desktop Carnet; the other desktop Carnet mock-ups still show the older table.
+
+**Site map behind the detail header** (the phone's rule, `docs/ui-specification.md`, « Dive detail, site map behind the header »):
+
+- When the selected dive's site has GPS coordinates, the top of the detail pane shows the site's prepared map (the same image as on the phone, OpenFreeMap without place names) behind the number, title and date line, about 170 dp high and the pane's full width, from the top of the window.
+- The same veil of the page background: 45 % at the top, 70 % at 60 % of the height, opaque at the bottom, so it fades out before the profile card. The pin sits under the veil, in the header's right half. Decorative: not interactive, hidden from screen readers; dark mode darkens it as on the phone.
+- Without coordinates (« Site à préciser ») or with no prepared image, the header stays on the plain background.
+- The detail pane's top padding is 36 dp so the map has room above the title.
+
+**The dive table:**
+
+- No lines between rows: rows are 48 dp high with 2 dp between them; the selected row is a pill (#D4E2F2, 12 dp corners at both ends, text #114477). The header row has no bottom line.
+- Columns (cells padded 10 dp): N° (28 dp, 13 px #4B4A47), Date (150 dp, 14 px), Site (the rest), Prof. max (64 dp), Durée (56 dp), Compagnons (96 dp). No profile thumbnails.
+- A named site starts with a 14 dp pin icon; « Site à préciser » is in italics, #4B4A47.
+- Each buddy shows a 22 dp round badge (#E3E1DC) with the initial, then the name.
+- Depths of 40 m or more are semibold.
+- A trip row is a #ECEAE4 band with 12 dp corners, 36 dp high, with ⌄, a suitcase icon, the trip's name (medium) and « · 4 plongées, de 21 à 29 m ».
+
+Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
+
+## [ ] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
+
+Christian decided this on 15 November 2026: two ⋮ menus on the same screen were confusing. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html`, the group copy `bureau-carnet-groupe.dc.html` (the logbook ⋮ menu open, dive N° 5 selected), `bureau-carnet-edition-sur-place.dc.html` (the menu open, dive N° 9 selected), `bureau-carnet-menu-contextuel.dc.html` (right-click on two dives), and the other desktop Carnet screens.
+
+Correction of the record: the removal of « Partager… » in task 178 was Claude's answer to Claude VC's questions, not Christian's decision. Christian now wants it back.
+
+**The detail pane has no ⋮ any more** (task 186 is replaced):
+
+- Right of the dive's title, four 44 dp icon buttons with tooltips: « Planifier depuis cette plongée » (the phone's planner icon), « Partager… », « Exporter la plongée… » (Ctrl+Maj+E), « Supprimer la plongée » (Suppr).
+- « Agrandir le profil » (⤢, tooltip with Ctrl+P) is a 36 dp icon button at the right end of the profile's chips row (Température, Gaz, ppO₂, Plafond, Tissus). A double-click on the profile does the same.
+- Ajouter à un voyage…, Renuméroter la plongée…, Retirer du voyage, Copier and Planifier depuis cette plongée are in the dive's right-click menu.
+- The date line under the title stays on one line, cut with an ellipsis if needed.
+
+**« Partager… » on desktop** (task 178 is corrected): it opens the system's native share sheet with the exported file (macOS `NSSharingServicePicker`, Windows 11 share window). Linux has no share sheet: there it opens the export dialog of task 189. It is in the detail pane's icons and in the right-click menu, under « Exporter… », for one dive or several.
+
+**The logbook ⋮ menu** (task 192's menu, extended), in this order:
+
+1. « Annuler : {dernière action} » (Ctrl+Z), « Rétablir » (Ctrl+Maj+Z, greyed out when there is nothing to redo);
+2. a divider, then the phone's Carnet menu items: « Filtrer… » (Ctrl+Maj+F), « Renuméroter les plongées… », « Ordinateurs du carnet »;
+3. a divider and « Fusionner avec le voyage précédent » and/or « Fusionner avec le voyage suivant », **shown only** when the selected dive, or the selected run of consecutive dives, touches a trip directly on that side (no other dive between them and the trip). Otherwise the item is absent, not greyed out, and so is its divider. « Précédent » is the trip just above in the list (more recent), « suivant » the trip just below. Merging puts the dives into that trip, with « Annuler » in a snackbar.
+
+The empty-selection hint in the detail pane becomes « Clic droit pour agir sur la sélection » (no « ou ⋮ »).
+
+English: « Plan from this dive », « Share… », « Export the dive… », « Delete the dive », « Enlarge the profile », « Filter… », « Renumber the dives… », « Logbook dive computers », « Merge with the previous trip », « Merge with the next trip », « Right-click to act on the selection ».
+
+Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
+
+## [ ] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html`.
+
+- While a column header is dragged, **no tooltip** is shown: remove « Déposez pour placer « {colonne} » entre … et … ». The floating header, the pale slot at its original place and the 3 dp #114477 insertion bar with its marker are enough.
+- Screen readers still get the announcement through a live region (« « Site » sera placé entre Durée et Compagnons »), not shown on screen.
+- Everything else of task 181 is unchanged (Échap cancels, the order is kept per logbook).
+
+Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
+
+## [ ] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
+
+Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils » of the canvas): `docs/mockups/bureau-outils.dc.html` (planner), its group copy `bureau-outils-groupe.dc.html` (planner ⋮ menu open), `bureau-outils-desaturation.dc.html`, `bureau-outils-ead-mod.dc.html`, `bureau-outils-meilleur-melange.dc.html`, `bureau-outils-melangeur.dc.html`. The calculations are the phone's (same core functions, `docs/ui-specification.md`); only the layout is new.
+
+- **Top bar:** « Outils » and « Planifier, vérifier la désaturation, préparer les gaz ». No ⋮ in the top bar.
+- **Tools list** (320 dp, left): two headings, « Plongée » (Planificateur de plongée, Désaturation) and « Gaz » (EAD et MOD, Meilleur mélange, Mélangeur de gaz). Each row 64 dp: a 40 dp icon tile, the name, and a live line (« 2 plongées planifiées », « Avion dans 17 h 05 », …). The selected row is #D4E2F2 with 12 dp corners and a white icon tile.
+- **Fields:** grey filled fields (#ECEAE4, 8 dp corners, 44 dp) with the unit at the end; choices that are lists are dropdown fields. Nitrox / Trimix and « Hélium d'abord / Oxygène d'abord » are connected button groups (selected segment #D4E2F2 with a check), not radio buttons.
+- **Planner:** parameters on the left (Profondeur, Temps au fond, Gaz de fond, Gaz de déco, Facteurs de gradient, Consommation, and the line « Bühlmann ZH-L16C · eau douce · 0 m d'altitude »). On the right: totals (durée, paliers, volume of each gas), the planned profile with a band showing each gas, the stops table. Header actions: « Plans enregistrés », « Imprimer l'ardoise », « Enregistrer le plan » (filled) and a ⋮ « Plus d'options du plan » holding « Partager le plan… » (native share sheet, export on Linux) and « Réglages du planificateur » (gear icon), as on the phone.
+- **Désaturation:** a card with « Désaturation restante » and « Avant de prendre l'avion » side by side, top-aligned, each with its « soit demain vers … » line; « Me prévenir » on the right (a system notification when flying is allowed). Below: « Saturation des tissus » (16 compartment bars, red from 90 %, the dashed 100 % limit, legend and note) and « Calculé à partir de » (the dives used, each on two lines, « Voir dans le carnet »). The phone's warning line at the bottom.
+- **EAD et MOD:** fields on the left, three result cards on the right (MOD, EAD, END) with their explanations.
+- **Meilleur mélange:** the advised mix in a large card (« 25/28 », « Trimix », « 25 % d'oxygène, 28 % d'hélium ») with « Préparer ce mélange », which opens the gas blender with that target; then MOD, END and ppO₂ at the planned depth.
+- **Mélangeur de gaz:** target, cylinder content and « Compléter avec » on the left; on the right the fill order with a cylinder drawing in layers (rest, helium, oxygen, air) and the numbered steps (added pressure and volume, « jusqu'à … bar »), the cooled-cylinder note and the amber « Analysez le mélange avant de plonger. » banner.
+- Units follow the logbook's settings (the mock-ups are metric).
+
+English: « Plan », « More plan options », « Share the plan… », « Planner settings », « Saved plans », « Print the slate », « Save the plan », « Notify me », « Prepare this mix ».
+
+Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
