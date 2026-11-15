@@ -11,7 +11,8 @@ const path = require('node:path');
 const { execSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..', '..');
-const stage = path.join(root, 'build', 'desktop', 'stage');
+// OD_STAGE: another folder, e.g. while a development window runs from the usual one.
+const stage = process.env.OD_STAGE ? path.resolve(process.env.OD_STAGE) : path.join(root, 'build', 'desktop', 'stage');
 const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
 const system = { win32: 'win', darwin: 'mac', linux: 'linux' }[process.platform];
 const target = process.argv[2] || `${system}-${arch}`;
@@ -20,9 +21,13 @@ const exe = target.startsWith('win') ? '.exe' : '';
 fs.rmSync(stage, { recursive: true, force: true });
 for (const dir of ['web', 'bin', 'xslt', 'i18n']) fs.mkdirSync(path.join(stage, dir), { recursive: true });
 
-// A release is built without the development switches (AGENTS.md): the build mode
-// "production" does not read app/.env.local.
-execSync('npx vite build --mode production', { cwd: path.join(root, 'app'), stdio: 'inherit' });
+// A release is built without the development switches of app/.env.local (AGENTS.md).
+// Vite reads app/.env.local in every mode; values already in the environment win over it.
+execSync('npx vite build --mode production', {
+  cwd: path.join(root, 'app'),
+  stdio: 'inherit',
+  env: { ...process.env, VITE_SHOW_ROUTE: '0', VITE_SHOW_PERF: '0' },
+});
 fs.cpSync(path.join(root, 'app', 'dist'), path.join(stage, 'web'), { recursive: true });
 
 const host = path.join(root, 'build', 'desktop', target, 'bin', `opendives-host${exe}`);

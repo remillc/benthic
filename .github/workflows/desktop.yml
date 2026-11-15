@@ -59,3 +59,23 @@ jobs:
         with:
           name: desktop-mac-arm64
           path: build/desktop/mac-arm64/bin
+      # The app itself on the Mac, where nobody can look at it: the interface, the helper, then
+      # screenshots of the Carnet and the menu bar's items (desktop/scripts/screenshots.mjs).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: App dependencies
+        run: |
+          npm ci --prefix app
+          npm ci --prefix desktop
+      - name: Stage the app
+        run: node desktop/scripts/prepare.cjs mac-arm64
+      - name: Screenshots
+        run: node desktop/scripts/screenshots.mjs build/desktop/screenshots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-mac-arm64-screenshots
+          path: |
+            build/desktop/screenshots/*.png
+            build/desktop/screenshots/menu.json

@@ -16,7 +16,9 @@ const { buildMenu } = require('./menu.cjs');
 const windowState = require('./window-state.cjs');
 
 const devUrl = process.env.OD_DEV_URL || '';
-const resources = app.isPackaged ? process.resourcesPath : path.join(__dirname, '..', 'build', 'desktop', 'stage');
+const resources = app.isPackaged
+  ? process.resourcesPath
+  : process.env.OD_STAGE || path.join(__dirname, '..', 'build', 'desktop', 'stage');
 const webRoot = path.join(resources, 'web');
 
 /** The helper: OD_HOST in development, else the one shipped with the app. */
@@ -30,6 +32,9 @@ function hostPath() {
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } },
 ]);
+
+// Checks and tests: a data folder of their own, beside the diver's (OD_USER_DATA).
+if (process.env.OD_USER_DATA) app.setPath('userData', process.env.OD_USER_DATA);
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
@@ -110,6 +115,11 @@ app.whenReady().then(() => {
   setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources });
   // macOS has a menu bar; Windows and Linux none (task 2026-11-15-169, section 6).
   Menu.setApplicationMenu(process.platform === 'darwin' ? buildMenu(menuTexts(), sendMenu) : null);
+  // Checks without a screen (desktop/scripts/screenshots.mjs): the menu bar's items, as a file.
+  if (process.env.OD_DUMP_MENU) {
+    const items = (menu) => menu?.items.map((i) => ({ label: i.label, accelerator: i.accelerator ?? '', role: i.role ?? '', type: i.type, submenu: items(i.submenu) }));
+    fs.writeFileSync(process.env.OD_DUMP_MENU, JSON.stringify(items(Menu.getApplicationMenu()) ?? null, null, 2));
+  }
   createWindow();
   app.on('activate', () => {
     if (!BrowserWindow.getAllWindows().length) createWindow();
