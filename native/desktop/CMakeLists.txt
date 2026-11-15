@@ -74,7 +74,7 @@ set(OD_LIBS "${DEPS}/lib/libdivecomputer.a" "${DEPS}/lib/libgit2.a"
   "${DEPS}/lib/libzip.a" "${DEPS}/lib/libxslt.a" "${DEPS}/lib/libxml2.a"
   "${DEPS}/lib/libsqlite3.a" "${DEPS}/lib/libz.a")
 if(WIN32)
-  list(APPEND OD_LIBS ws2_32 rpcrt4 crypt32 secur32 bcrypt advapi32 shell32 ole32 user32 shlwapi)
+  list(APPEND OD_LIBS pthread ws2_32 rpcrt4 crypt32 secur32 bcrypt advapi32 shell32 ole32 user32 shlwapi)
   target_link_options(opendives_core PUBLIC -static)
 elseif(APPLE)
   list(APPEND OD_LIBS m "-framework CoreFoundation" "-framework Security")
@@ -84,9 +84,16 @@ endif()
 target_link_libraries(opendives_core PUBLIC ${OD_LIBS})
 
 # Test executables: the same programs as poc/build.sh, against opendives_core.
+# On Windows each executable carries a manifest that makes its narrow strings UTF-8.
+set(OD_EXE_EXTRA "")
+if(WIN32)
+  enable_language(RC)
+  set(OD_EXE_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/utf8.rc")
+endif()
+
 set(TESTS roundtrip facade)
 foreach(t ${TESTS})
-  add_executable(${t} "${ROOT}/tests/${t}.cpp")
+  add_executable(${t} "${ROOT}/tests/${t}.cpp" ${OD_EXE_EXTRA})
   target_compile_options(${t} PRIVATE ${OD_COMPILE_OPTIONS})
   target_link_libraries(${t} PRIVATE opendives_core)
 endforeach()
@@ -94,7 +101,7 @@ endforeach()
 # opendives-host: the desktop application's native host, written in desktop/host/.
 file(GLOB HOST_SOURCES "${ROOT}/desktop/host/*.cpp")
 if(HOST_SOURCES)
-  add_executable(opendives-host ${HOST_SOURCES})
+  add_executable(opendives-host ${HOST_SOURCES} ${OD_EXE_EXTRA})
   target_compile_options(opendives-host PRIVATE ${OD_COMPILE_OPTIONS})
   target_link_libraries(opendives-host PRIVATE opendives_core)
 endif()
