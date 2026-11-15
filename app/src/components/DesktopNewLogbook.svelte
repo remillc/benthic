@@ -132,6 +132,26 @@
     }
   }
 
+  /**
+   * « Retour »: back to step 1 with step 2 as new — a sign-in still waiting is cancelled, the
+   * service, folder, repository fields and any message cleared — so coming back starts afresh.
+   */
+  function back() {
+    cancelSignIn();
+    signingIn = '';
+    error = '';
+    busy = false;
+    provider = '';
+    folder = '';
+    url = '';
+    branch = 'main';
+    username = '';
+    userTyped = false;
+    token = '';
+    step = 'choice';
+    refreshStatus();
+  }
+
   /** Step 1 « Continuer ». */
   async function next() {
     if (!nameValid || busy) return;
@@ -250,7 +270,7 @@
       {/if}
       {#if error}<p class="od-new-logbook--error" role="alert">{error}</p>{/if}
       <div class="od-new-logbook--actions">
-        <button type="button" class="od-new-logbook--text-button" onclick={() => (step = 'choice')}>{t('desktopLogbooks.new.back')}</button>
+        <button type="button" class="od-new-logbook--text-button" onclick={back}>{t('desktopLogbooks.new.back')}</button>
         <button type="button" class="od-new-logbook--button" disabled={!cloudReady || busy} onclick={create}>{busy ? t('desktopLogbooks.new.creating') : t('desktopLogbooks.new.create')}</button>
       </div>
     {:else}
@@ -273,7 +293,7 @@
       <p class="od-new-logbook--note"><Icon name="info" size={18} /><span>{t('desktopLogbooks.new.gitNote')}</span></p>
       {#if error}<p class="od-new-logbook--error" role="alert">{error}</p>{/if}
       <div class="od-new-logbook--actions">
-        <button type="button" class="od-new-logbook--text-button" onclick={() => (step = 'choice')}>{t('desktopLogbooks.new.back')}</button>
+        <button type="button" class="od-new-logbook--text-button" onclick={back}>{t('desktopLogbooks.new.back')}</button>
         <button type="button" class="od-new-logbook--button" disabled={!gitReady || busy} onclick={create}>{busy ? t('desktopLogbooks.new.creating') : t('desktopLogbooks.new.create')}</button>
       </div>
     {/if}
