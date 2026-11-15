@@ -12,6 +12,8 @@ import {
   secondStep,
   gitUrlError,
   gitFormReady,
+  gitUserFromUrl,
+  gitUserError,
   cloudFormReady,
   tokenPageUrl,
   creationErrorKey,
@@ -91,6 +93,23 @@ test('the git form: an https address, a branch and a token', () => {
   assert.ok(!gitFormReady({ url: 'https://h/o/r.git', branch: '', token: 't' }));
   assert.ok(!gitFormReady({ url: 'https://h/o/r.git', branch: 'a b', token: 't' }));
   assert.ok(!gitFormReady({ url: 'https://h/o/r.git', branch: 'main', token: ' ' }));
+  // The git user name: optional, prefilled with the owner of the address, valid while typed.
+  assert.ok(gitFormReady({ url: 'https://h/o/r.git', branch: 'main', token: 't', username: '' }));
+  assert.ok(gitFormReady({ url: 'https://h/o/r.git', branch: 'main', token: 't', username: 'marie.d' }));
+  assert.ok(!gitFormReady({ url: 'https://h/o/r.git', branch: 'main', token: 't', username: 'a b' }));
+  assert.equal(gitUserError(''), '');
+  assert.equal(gitUserError('  '), '');
+  assert.equal(gitUserError('marie-d_1.x'), '');
+  assert.equal(gitUserError('marie@club.org'), '');
+  assert.equal(gitUserError('marie d'), 'username');
+  assert.equal(gitUserError('-marie'), 'username');
+  assert.equal(gitUserError('a'.repeat(101)), 'username');
+  assert.equal(gitUserFromUrl('https://github.com/vous/carnet.git'), 'vous');
+  assert.equal(gitUserFromUrl('  https://gitlab.com/club-x/sub/carnet '), 'club-x');
+  assert.equal(gitUserFromUrl('https://codeberg.org/vous'), '');
+  assert.equal(gitUserFromUrl('https://github.com/'), '');
+  assert.equal(gitUserFromUrl('github.com/vous/carnet'), '');
+  assert.equal(gitUserFromUrl(''), '');
 });
 
 test('the cloud form needs a service with a folder; WebDAV is not available yet', () => {

@@ -223,7 +223,10 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
       const branch = String(spec.branch || '').trim();
       const token = String(spec.token || '').trim();
       if (!url || !branch || !token) throw new Error('BAD_ARGUMENT: incomplete repository');
-      const username = gitUserName(url);
+      // The user name typed in the dialog, else the owner in the address.
+      const typed = String(spec.username || '').trim();
+      if (typed && !/^[A-Za-z0-9][A-Za-z0-9._@+-]{0,99}$/.test(typed)) throw new Error('BAD_ARGUMENT: user name');
+      const username = typed || gitUserName(url);
       const result = await bridge.probeGit({ url, branch, username, token, create: true });
       const descriptor = logbooks.gitDescriptor({ url, branch, name });
       bridge.storeGitAccess(descriptor, { url: `${url}[${branch}]`, username, branch, token });

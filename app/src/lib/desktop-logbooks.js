@@ -134,10 +134,37 @@ export function gitUrlError(url) {
 }
 
 /**
- * @param {{ url: string, branch: string, token: string }} form
+ * The owner in a repository address of the GitHub or GitLab kind (https://host/owner/repo.git), '' when
+ * the address has none.
+ * @param {string} url
+ */
+export function gitUserFromUrl(url) {
+  const match = /^https:\/\/[^\s/]+\/([^\s/]+)\/[^\s/]+/i.exec(String(url ?? '').trim());
+  return match && gitUserError(match[1]) === '' ? match[1] : '';
+}
+
+/**
+ * @param {string} name the git user name; empty is not an error (the field is optional)
+ * @returns {'' | 'username'}
+ */
+export function gitUserError(name) {
+  const text = String(name ?? '').trim();
+  if (!text) return '';
+  return text.length <= 100 && /^[A-Za-z0-9][A-Za-z0-9._@+-]*$/.test(text) ? '' : 'username';
+}
+
+/**
+ * @param {{ url: string, branch: string, token: string, username?: string }} form
  */
 export function gitFormReady(form) {
-  return !!form.url.trim() && gitUrlError(form.url) === '' && !!form.branch.trim() && !/\s/.test(form.branch.trim()) && !!form.token.trim();
+  return (
+    !!form.url.trim() &&
+    gitUrlError(form.url) === '' &&
+    gitUserError(form.username ?? '') === '' &&
+    !!form.branch.trim() &&
+    !/\s/.test(form.branch.trim()) &&
+    !!form.token.trim()
+  );
 }
 
 /**

@@ -561,6 +561,13 @@ void register_methods()
 			fail(error);
 		return NOTHING;
 	});
+	// The whole loaded log as a plain .ssrf file (Subsurface's Save As).
+	add("saveLogbookFile", core, [](const Args &a) {
+		std::string error;
+		if (opendives::save_logbook_file(a.str("path"), error))
+			fail(error);
+		return NOTHING;
+	});
 	add("undo", core, [](const Args &a) {
 		std::string json, error;
 		if (a.flag("redo") ? opendives::redo(json, error) : opendives::undo(json, error))

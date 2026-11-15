@@ -2172,7 +2172,6 @@
     "workingPressure": "Cylinder working pressure: {pressure}",
     "aboveWorking": "Above the working pressure of {pressure}",
     "cylinderLabel": "Cylinder at {pressure}: {gases}, in filling order",
-    "remaining": "Desaturation left",
     "soit": "that is {when}",
     "around": "{day} around {time}",
     "notify": "Notify me",
@@ -3992,6 +3991,17 @@
       "fileDives": "dives",
       "fileLogbook": "logbook",
       "logbook": "Export the logbook…"
+    }
+  },
+  "desktopFollowups": {
+    "newLogbook": {
+      "gitUsername": "User name",
+      "gitUsernameHelp": "Optional. Used with the token to sign in to the repository.",
+      "errorUsername": "The name cannot contain spaces or special characters."
+    },
+    "siteMerge": {
+      "title": "Merge the sites?",
+      "which": "Site to keep"
     }
   }
 }

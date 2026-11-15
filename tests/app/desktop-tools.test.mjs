@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // The desktop Outils section's own logic (app/src/lib/desktop-tools.js): the live lines of the
-// tools list, the remaining desaturation, « Préparer ce mélange », the final pressure that follows
+// tools list, the desaturation page's figures, « Préparer ce mélange », the final pressure that follows
 // the cylinder and the layers of the cylinder drawing. The calculations themselves are the
 // phone's and keep their tests (gas-tools.test.mjs, planner tests).
 import test from 'node:test';
@@ -9,7 +9,8 @@ import {
   DESKTOP_TOOLS,
   plansLine,
   desaturationLine,
-  desaturationSeconds,
+  flightRule,
+  lastDiveFigure,
   blenderTarget,
   suggestedFinalPressure,
   followCylinder,
@@ -40,21 +41,17 @@ test('live lines: planned dives and flight wait', () => {
   assert.equal(desaturationLine({ kind: 'empty' }, '').key, 'tools.noDives');
 });
 
-test('remaining desaturation: half-time times log2 of the load over 1 %', () => {
-  assert.equal(desaturationSeconds([]), 0);
-  assert.equal(desaturationSeconds([{ surfaceGf: 0, halfTimeMin: 635 }]), 0);
-  assert.equal(desaturationSeconds([{ surfaceGf: 1, halfTimeMin: 635 }]), 0);
-  // 8 % is three halvings over 1 %: 3 half-times.
-  assert.equal(desaturationSeconds([{ surfaceGf: 8, halfTimeMin: 100 }]), 300 * 60);
-  // The slowest compartment still loaded decides.
-  assert.equal(
-    desaturationSeconds([
-      { surfaceGf: 80, halfTimeMin: 5 },
-      { surfaceGf: 2, halfTimeMin: 240 },
-      { surfaceGf: 0, halfTimeMin: 635 },
-    ]),
-    240 * 60,
-  );
+test('the last-dive figure is the time since the dive, or « Plus de 48 h » when none counts', () => {
+  assert.deepEqual(lastDiveFigure(-1), { key: 'desaturation.noRecentDive', seconds: null });
+  assert.deepEqual(lastDiveFigure(0), { key: 'desaturation.ago', seconds: 0 });
+  assert.deepEqual(lastDiveFigure(3300), { key: 'desaturation.ago', seconds: 3300 });
+});
+
+test('the rule line names the rule that gave the wait before flying', () => {
+  assert.deepEqual(flightRule(null, 'auto'), { key: 'desaturation.atRest', params: {} });
+  assert.deepEqual(flightRule({ hours: 12, several: false }, 'auto'), { key: 'desaturation.ruleSingle', params: { hours: 12 } });
+  assert.deepEqual(flightRule({ hours: 18, several: true }, 'auto'), { key: 'desaturation.ruleSeveral', params: { hours: 18 } });
+  assert.deepEqual(flightRule({ hours: 24, several: true }, '24'), { key: 'desaturation.ruleFixed', params: { hours: 24 } });
 });
 
 test('« Préparer ce mélange » gives the blender 25/28 as trimix at 148 ft', () => {

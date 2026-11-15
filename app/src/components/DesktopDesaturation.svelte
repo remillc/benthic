@@ -1,20 +1,21 @@
 <script>
   // @ts-check
-  // Désaturation on the desktop (task 2026-11-15-196, mock-up bureau-outils-desaturation): the
-  // remaining desaturation and the wait before flying side by side, the 16 tissues, the dives
-  // the calculation used. The data is the phone's (Desaturation.svelte): the core's tissues and
-  // lib/tools.js for the wait; the remaining desaturation is lib/desktop-tools.js.
+  // Désaturation on the desktop (task 2026-11-15-196, mock-up bureau-outils-desaturation): the wait
+  // before flying and the time since the last dive side by side, the 16 tissues, the dives the
+  // calculation used. The data and the figures are the phone's (Desaturation.svelte): the core's
+  // tissues, lib/tools.js for the wait, lib/desaturation.js for the surface interval. No figure
+  // of OpenDives' own is added (the mock-up's « Désaturation restante » is left out).
   import { OpenDivesCore } from 'opendives-core';
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
-  import { formatDateTime, formatDepth, formatDuration, formatFullDate, formatRelativeDateTime, formatTimeOfDay, locale } from '../lib/format.js';
+  import { formatDateTime, formatDepth, formatDuration, formatFullDate, formatLongDuration, formatRelativeDateTime, formatTimeAgo, formatTimeOfDay, locale } from '../lib/format.js';
   import { flightWait, formatHoursMinutes } from '../lib/tools.js';
-  import { desaturationSeconds } from '../lib/desktop-tools.js';
+  import { flightRule, lastDiveFigure } from '../lib/desktop-tools.js';
   import { ALARM_PERCENT } from '../lib/tissues.js';
-  import { overlapStart } from '../lib/desaturation.js';
+  import { overlapStart, surfaceSeconds } from '../lib/desaturation.js';
   import { t } from '../lib/i18n.js';
 
   let desat = $state(/** @type {import('opendives-core').Desaturation|null} */ (null));
@@ -42,7 +43,25 @@
   });
 
   const wait = $derived(desat ? flightWait(desat.dives, desat.now, settings.flightWait) : null);
-  const remaining = $derived(desat ? desaturationSeconds(desat.tissues) : 0);
+  const sinceLastDive = $derived(desat ? surfaceSeconds(desat.dives, desat.now) : -1);
+  const lastFigure = $derived(lastDiveFigure(sinceLastDive));
+  const rule = $derived(flightRule(wait, settings.flightWait));
+  /** The last dive of the logbook before now, used or not by the calculation, as the phone's. */
+  const lastDive = $derived.by(() => {
+    const now = desat?.now;
+    if (!now) return null;
+    let last = null;
+    for (const d of logbook.dives) if (d.date <= now && (!last || d.date > last.date)) last = d;
+    return last;
+  });
+  /** « Sortie de l'eau il y a 55 min »; in days, months or years after 48 hours. */
+  const surfaced = $derived.by(() => {
+    if (!desat || !lastDive) return '';
+    const end = Date.parse(`${lastDive.date}Z`) + lastDive.durationSeconds * 1000;
+    const seconds = Math.max(0, Math.round((Date.parse(`${desat.now}Z`) - end) / 1000));
+    if (seconds <= 48 * 3600) return t('desaturation.surfacedAgo', { time: formatLongDuration(seconds) });
+    return t('desaturation.surfacedLong', { ago: formatTimeAgo(new Date(end).toISOString().slice(0, 19)) });
+  });
   const overlapAt = $derived(desat ? overlapStart(desat.dives) : null);
   const waiting = $derived(!!wait && wait.remainingSeconds > 0);
 
@@ -57,9 +76,6 @@
     const day = days >= -1 && days <= 1 ? new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day') : formatDateTime(iso).split(',')[0];
     return t('desktopTools.around', { day, time: formatTimeOfDay(iso) });
   }
-  /** @param {number} seconds */
-  const endOfWait = (seconds) => (desat ? new Date(Date.parse(`${desat.now}Z`) + seconds * 1000).toISOString().slice(0, 19) : '');
-
   /** @param {number} load */
   const barClass = (load) => (load >= ALARM_PERCENT ? 'od-desktop-desaturation--bar-high' : load >= 50 ? 'od-desktop-desaturation--bar-mid' : 'od-desktop-desaturation--bar-low');
 
@@ -93,9 +109,9 @@
 
     <section class="od-desktop-desaturation--figures">
       <div class="od-desktop-desaturation--figure">
-        <span class="od-desktop-desaturation--label">{t('desktopTools.remaining')}</span>
-        <span class="od-desktop-desaturation--value od-value">{remaining > 0 ? formatHoursMinutes(remaining) : t('desaturation.noWait')}</span>
-        {#if remaining > 0}<span class="od-desktop-desaturation--sub od-value">{t('desktopTools.soit', { when: around(endOfWait(remaining)) })}</span>{/if}
+        <span class="od-desktop-desaturation--label">{t('desaturation.lastDive')}</span>
+        <span class="od-desktop-desaturation--value od-value">{lastFigure.seconds === null ? t(lastFigure.key) : t(lastFigure.key, { time: formatHoursMinutes(lastFigure.seconds) })}</span>
+        {#if lastDive}<span class="od-desktop-desaturation--sub od-value">{surfaced}</span>{/if}
       </div>
       <div class="od-desktop-desaturation--figure">
         <span class="od-desktop-desaturation--label">{t('desaturation.beforeFlying')}</span>
@@ -117,6 +133,7 @@
         </button>
       {/if}
     </section>
+    <p class="od-desktop-desaturation--caption">{t(rule.key, rule.params)}</p>
 
     <div class="od-desktop-desaturation--columns">
       <section class="od-desktop-desaturation--card">

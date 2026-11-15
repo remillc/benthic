@@ -2172,7 +2172,6 @@
     "workingPressure": "Service de la bouteille : {pressure}",
     "aboveWorking": "Au-dessus de la pression de service de {pressure}",
     "cylinderLabel": "Bouteille à {pressure} : {gases}, dans l’ordre du gonflage",
-    "remaining": "Désaturation restante",
     "soit": "soit {when}",
     "around": "{day} vers {time}",
     "notify": "Me prévenir",
@@ -3992,6 +3991,17 @@
       "fileDives": "plongees",
       "fileLogbook": "carnet",
       "logbook": "Exporter le carnet…"
+    }
+  },
+  "desktopFollowups": {
+    "newLogbook": {
+      "gitUsername": "Nom d’utilisateur",
+      "gitUsernameHelp": "Facultatif. Il sert avec le jeton à se connecter au dépôt.",
+      "errorUsername": "Le nom ne peut contenir ni espace ni caractère spécial."
+    },
+    "siteMerge": {
+      "title": "Fusionner les sites ?",
+      "which": "Site à garder"
     }
   }
 }

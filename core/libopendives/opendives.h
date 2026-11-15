@@ -384,6 +384,11 @@ void set_xslt_dir(const std::string &dir);
 // not changed. Errors: NOT_FOUND, BAD_REQUEST, EXPORT_FAILED: <message>.
 int export_dives(const std::vector<int> &ids, const std::string &format, bool anonymize, const std::string &path,
 		 std::string &error);
+// The whole loaded log written to `path` as a plain .ssrf file, with the function
+// File > Save As uses in Subsurface (save_dives): every dive, the dive sites, the
+// trips, the log's settings (computer nicknames, autogroup) and the filter
+// presets. Nothing of the log is changed. Errors: BAD_REQUEST, SAVE_FAILED.
+int save_logbook_file(const std::string &path, std::string &error);
 // Possible duplicates: same name ignoring case within same_name_m, or
 // different names within same_place_m: [{"a":…, "b":…, "distanceM":…}].
 int sites_duplicates(int same_name_m, int same_place_m, std::string &json);
