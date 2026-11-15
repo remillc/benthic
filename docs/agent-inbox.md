@@ -3291,3 +3291,15 @@ Christian decided this on 15 November 2026. In task 171, « 5 plongées sans sit
 
 Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
 
+## [ ] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
+
+Christian decided this on 15 November 2026. The list of statistics on the left of the desktop Statistiques screen gets an icon and a preview on each row. Mock-up: `docs/mockups/bureau-stats.dc.html`.
+
+- **Row:** 72 dp high, 12 dp corners, 8 dp side margins, 4 dp between rows; the chosen row stays #D4E2F2 with #114477 text (title in 600).
+- **At the start, an icon tile:** 40 dp, 12 dp corners, #ECEAE4 (#FFFFFF on the chosen row), with a 22 dp stroke icon in ink (#114477 on the chosen row): bars for Plongées par année, an arrow down to the bottom for Profondeur maximale, a stopwatch for Temps sous l'eau, a cylinder for Consommation (SAC), a pin for Plongées par site, a grid for Carte de chaleur. A statistic the diver created takes the icon of its chart type.
+- **Then** the title (16 px) and the summary line (14 px, #4B4A47).
+- **At the end, a preview of the statistic's own data**, 56 × 24 dp, decorative (`aria-hidden`): small bars for counts (per year, per site; the last 7 values), a 2 dp line for a measure over time (depth drawn downward, time, SAC), a 4 × 2 grid of the heat-map colours for the heat map. #8FB0D6, #114477 on the chosen row. It follows the active filter and is redrawn when the logbook changes.
+- « + Nouvelle statistique » is unchanged.
+
+Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
+
