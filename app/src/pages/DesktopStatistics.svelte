@@ -780,5 +780,13 @@
       font-weight: 500;
       color: var(--od-text);
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-statistics--item-selected:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
   }
 </style>

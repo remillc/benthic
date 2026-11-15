@@ -398,5 +398,16 @@
     .od-desktop-site-map--zoom-here:hover {
       background: color-mix(in srgb, var(--od-secondary) 8%, transparent);
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      :global(.od-desktop-site-map--dot:hover .od-desktop-site-map--disc) {
+        box-shadow: 0 0 0 6px color-mix(in srgb, var(--od-text) 12%, transparent);
+      }
+      :global(.od-desktop-site-map--stack:hover) {
+        box-shadow: 0 0 0 9px color-mix(in srgb, var(--od-secondary) 30%, transparent);
+      }
+    }
   }
 </style>

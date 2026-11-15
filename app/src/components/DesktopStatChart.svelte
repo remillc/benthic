@@ -201,5 +201,13 @@
     .od-desktop-stat-chart--tip-hint {
       color: var(--od-desk-stats-tip-hint);
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-stat-chart--hit:hover {
+        fill: color-mix(in srgb, var(--od-text) 6%, transparent);
+      }
+    }
   }
 </style>

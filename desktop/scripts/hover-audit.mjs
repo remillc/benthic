@@ -45,7 +45,7 @@ const run = async (expression) => {
 // In the page: marks the candidates and gives the snapshot function.
 await run(`(() => {
   window.__odHover = {
-    props: ['backgroundColor', 'backgroundImage', 'color', 'boxShadow', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'opacity', 'textDecorationLine', 'outlineStyle', 'outlineColor', 'filter', 'transform'],
+    props: ['backgroundColor', 'backgroundImage', 'color', 'boxShadow', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'opacity', 'textDecorationLine', 'outlineStyle', 'outlineColor', 'filter', 'transform', 'fill', 'stroke'],
     snapshot(el) {
       const out = [];
       const nodes = [el, ...[...el.querySelectorAll('*')].slice(0, 80)];

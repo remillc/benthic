@@ -934,5 +934,19 @@
       font-size: 14px;
       color: var(--od-text);
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-desktop-planner--filled {
+        transition: box-shadow 120ms linear;
+      }
+      .od-desktop-planner--filled:hover:not(:disabled) {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+      .od-desktop-planner--add:hover {
+        text-decoration: underline;
+      }
+    }
   }
 </style>
