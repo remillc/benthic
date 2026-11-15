@@ -143,7 +143,12 @@ export { waterTypeOf };
  * @property {number[]} timeSeconds
  * @property {number[]} depthMm
  * @property {number[]} cylinder open-circuit cylinder being breathed; -1 when unknown or rebreather
- * @property {number[]|null} ceilingMm computed ceiling; null when zero for the whole dive
+ * @property {number[]|null} ceilingMm the ceiling the dive computer reported (its deco stop while in deco, never below the diver),
+ *   as Subsurface for desktop draws it; computed with the app's gradient factors only when the computer recorded no deco
+ *   data (see ceilingSource); null when zero for the whole dive
+ * @property {'computer'|'calculated'} ceilingSource where ceilingMm comes from; with the computer's, it follows the dcCeiling setting
+ * @property {number[]|null} calcCeilingMm the ceiling the core computes with the app's gradient factors, beside the computer's,
+ *   when the calcCeiling setting is on; null otherwise
  * @property {number[]} ppo2Mbar
  * @property {number[]|null} temperatureMk water temperature in mK (0 where unknown); null when the dive has none
  * @property {number[]|null} tissues loading of the 16 compartments in percent (100 = M-value limit with the gradient factors), flat: compartment c at sample i is tissues[16 * i + c]; null without profile
