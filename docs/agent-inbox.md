@@ -3286,6 +3286,8 @@ English: « New logbook », « Logbook name », « Where to keep it? », « On t
 
 Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
 
+**Christian's decision (15 November 2026): no sign-in to Google, Microsoft or Dropbox, no OAuth keys.** « Dans votre nuage » offers the folders that the providers' own desktop applications synchronise on the computer (Google Drive, OneDrive, Dropbox, iCloud Drive on macOS, Nextcloud's desktop client for WebDAV); OpenDives writes the .ssrf file there like any file and the provider's application syncs it. Each row shows « Dossier trouvé » or « Dossier à choisir » instead of « Connecté · {compte} »; no browser step. This is what the desktop builds today (desktop/logbooks.cjs). The cloud-step mock-up still shows the sign-in and needs this correction; the providers' official logo files are still missing from the repository (`docs/brand/providers/`).
+
 ## [x] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
