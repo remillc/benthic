@@ -300,6 +300,18 @@
     .od-cleanup--danger:not(:disabled):hover {
       background: color-mix(in srgb, currentColor 8%, transparent);
     }
+    /* Mouse: the tonal button takes the 8 % layer of its text colour; a checkbox row gets a halo round its box. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-cleanup--tonal {
+        transition: box-shadow 120ms linear;
+      }
+      .od-cleanup--tonal:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+      .od-cleanup--check:hover .od-cleanup--box {
+        box-shadow: 0 0 0 8px color-mix(in srgb, var(--od-text) 8%, transparent);
+      }
+    }
     .od-cleanup--check {
       display: flex;
       align-items: flex-start;
