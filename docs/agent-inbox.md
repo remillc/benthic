@@ -3647,3 +3647,91 @@ English: « Plan », « More plan options », « Share the plan… », « Planne
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
 
 Done: `pages/DesktopTools.svelte` (list and right pane, chosen in App.svelte when `layout.desktop`), `components/DesktopPlanner|Desaturation|EadMod|BestMix|Blender.svelte`, grey fields and connected segments (`DesktopField`, `DesktopSegments`), logic in `lib/desktop-tools.js` (tested in `tests/app/desktop-tools.test.mjs`) and state in `lib/desktop-tools.svelte.js`. The blender follows the rules of tasks 198 (desktop part), 199 and 201. Differences from the mock-ups are listed in the report.
+
+## [ ] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
+
+Christian decided this on 15 November 2026, to match the desktop (task 196). Mock-ups: `docs/mockups/outils-meilleur-melange-android.dc.html`, `outils-meilleur-melange-trimix-android.dc.html`, `android-tablette-meilleur-melange-paysage.dc.html`, `android-tablette-meilleur-melange-portrait.dc.html`.
+
+- Under the advised mix and its note, an outlined button (MD3, 40 dp, gas cylinder icon) « Préparer ce mélange ». On the tablet, where both the nitrox and the trimix are listed, it names the advised one: « Préparer le trimix 25/28 » (or « Préparer l'EAN25 »).
+- It opens the Mélangeur de gaz with the mode (Nitrox or Trimix) and the « Mélange voulu » (oxygen, helium) set to that mix; the final pressure, the cylinder and what it still holds keep their last values. Back returns to Meilleur mélange.
+- iOS: the same button at the same place, when the iOS gas tools are built.
+
+English: « Prepare this mix », « Prepare the 25/28 trimix ».
+
+Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » opens the blender in Trimix with 25 % oxygen and 28 % helium.
+
+## [ ] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-outils-melangeur.dc.html` (desktop), `outils-melangeur-android.dc.html`, `outils-melangeur-nitrox-android.dc.html`, `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`. Applies on every platform; the desktop screen is otherwise task 196.
+
+- **Order:** « Bouteille » comes before the final pressure (Trimix on the phone: Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox: Oxygène and Bouteille, then « Pression finale désirée » on its own line).
+- **« Pression finale désirée »** (was « Pression finale »): prefilled with the chosen cylinder's working pressure, still editable (the calculation targets exactly the value typed). Choosing another cylinder replaces the value only if the diver has not changed it.
+- **Its helper** shows the working pressure: « Service : 3 365 psi » (desktop: « Service de la bouteille : 232 bar »; the desktop cylinder field reads « 12 L · 232 bar »). Above the working pressure, the helper becomes a warning in `--od-alarm` with an icon, « Au-dessus de la pression de service de 3 365 psi », and the calculation still runs.
+- **Desktop cylinder drawing:** a plain scuba cylinder (no valve): narrow body, rounded shoulder, slightly flattened bottom, a short neck. It is drawn full, from bottom to top, in layers in fill order: what was already in it (grey), helium (blue), oxygen (green), the top-up gas (sand #C9B98F, with its step badge #9A8657). The working pressure label at the shoulder.
+
+English: « Desired final pressure », « Working pressure: 3,365 psi », « Above the working pressure of 3,365 psi ».
+
+Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
+
+## [ ] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
+
+Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html`.
+
+- The cylinder drawing shows only the gases of the fill: helium (blue), oxygen (green) and the top-up gas (sand #C9B98F), bottom to top in fill order (oxygen before helium when « Oxygène d'abord » is chosen).
+- What was already in the cylinder is not a separate layer: each layer's height is that gas's partial pressure in the final mix, residual included. Example of the mock-up (50 bar of 21/35 left, 21/35 wanted at 220 bar, air top-up): helium 77 bar, oxygen 26 bar, air 117 bar.
+- In Nitrox mode: oxygen and the top-up gas only.
+- The aria-label: « Bouteille à 220 bar : hélium, oxygène et air, dans l'ordre du gonflage ».
+
+Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
+
+## [ ] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
+
+Christian noticed on 15 November 2026 that the app's « Dans la bouteille » section does not match the mock-ups, and that the red text at the bottom must be corrected. Mock-ups (the reference): `docs/mockups/outils-melangeur-nitrox-android.dc.html`, `outils-melangeur-android.dc.html` (Trimix), `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`.
+
+- **« Dans la bouteille », Nitrox:** Pression (with its unit) and Mélange (dropdown, « EAN32 ») side by side, then « Compléter avec » (dropdown, « Air ») on its own line. **Trimix:** Pression on its own line, then Oxygène and Hélium (two dropdowns) side by side, then « Compléter avec ». MD3 filled fields, 56 dp, as in the rest of the screen.
+- **Under Pression**, the helper « Laissez vide si la bouteille est vide » (as the app already does; now in the mock-ups).
+- **The note at the bottom is no longer red:** « Pressions à lire bouteille refroidie. Au-delà de 40 % d'oxygène, la bouteille et le robinet doivent être nettoyés pour l'oxygène. » in 13 sp `--od-text-2`. Red stays for errors (a mix that cannot be reached).
+- **« Analysez le mélange avant de plonger. »** becomes an amber banner: #FBE3B2, 12 dp corners, 16 dp margins, a 20 dp warning triangle, 14 sp text.
+- Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the screen to the commit description.
+
+English: « Leave empty if the cylinder is empty », « Analyse the mix before diving. ».
+
+Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alone then Oxygène and Hélium; no text of the screen is red when the mix can be reached; the analyse banner is amber.
+
+## [ ] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html` (completes task 196).
+
+- **« Dans la bouteille »** in two columns, like « Mélange voulu »: Pression alone on the first line, with the helper « Laissez vide si la bouteille est vide »; Oxygène and Hélium on the next line (Trimix; in Nitrox, Oxygène alone); then « Compléter avec » on its own line.
+- An empty Pression means an empty cylinder: the fill starts from 0 bar.
+
+English: « Leave empty if the cylinder is empty ».
+
+Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
+
+## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
+
+Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
+
+**Réglages, Windows and Linux:** a section of the main window, reached by the gear of the rail or Ctrl+,. Top bar « Réglages » with « Enregistrés tout de suite, sur cet ordinateur » and a search field « Rechercher un réglage » (Ctrl+F). On the left, the categories (300 dp, icon + name, selected row #D4E2F2 with 12 dp corners): Langue et formats, Unités, Affichage, Carnet, Équipement, Profil et décompression, Gaz et pressions partielles, Recycleur, Ordinateurs et téléchargement, Cartes hors ligne, Avancé. On the right, the category's settings in white cards (16 dp corners) grouped under small headings, max 720 dp wide: each row has the label, an optional helper line and its control at the end (switch, dropdown field #ECEAE4 with chevron, or a connected button group with a check for 2 to 3 choices, never radio buttons). No Save button: every change applies at once.
+
+**Search:** typing filters across every category, the section becomes « 4 réglages pour « plafond » », each result shows its category under its label, the matched word highlighted (#FBE3B2).
+
+**Réglages › Carnet** also holds « Fichier du carnet »: « Emplacement » (the path, with « Afficher dans le dossier », which opens the system file manager) and « Ouvrir au démarrage » (Le dernier carnet / Choisir à chaque fois).
+
+**Desktop additions to Affichage:** « Taille du texte » (Petite, Normale, Grande; Ctrl++ and Ctrl+- change it too). Do not add « Arrondir le plafond aux paliers de 3 m » seen in the search mock-up: it is only an example.
+
+**macOS:** the settings open in a separate window (OpenDives › Réglages… ⌘, or the rail's gear), 980 × 680, the categories in a sidebar with a search field, the window titled with the chosen category, ⌘W closes it. Same content.
+
+**No « Compte et synchronisation » category.** The account initial at the bottom of the rail opens the **account sheet** (anchored above it, 380 dp, 16 dp corners): initial, address, « Synchronisé il y a 2 min · plongees.ssrf », « Synchroniser maintenant » (filled), the switches « Synchroniser automatiquement » and « Seulement sur Wi-Fi ou câble » (« Jamais sur un partage de connexion »), a divider, « Se déconnecter ». Escape or a click outside closes it.
+
+**« À propos d'OpenDives »** is no longer in Réglages:
+- Windows and Linux: the last item of the ⋮ menus, after a divider: the Carnet's list ⋮ (task 194's menu), the Sites ⋮ (« Nettoyer les sites… », divider, « À propos d'OpenDives »), the Statistiques ⋮.
+- macOS: also OpenDives › À propos d'OpenDives in the app menu, as every Mac app.
+- It opens the About page of the phone (version, licences, libraries) in a dialog.
+
+**Statistiques:** the « Filtrer » button leaves the top bar. The ⋮ holds « Filtre libre… » (Ctrl+Maj+F, opens the filter side sheet), a divider and « À propos d'OpenDives ». An active filter is still shown by the bar above the chart (« Mode : circuit ouvert · 6 plongées sur 9 » with ✕).
+
+English: « Settings », « Saved at once, on this computer », « Search settings », « Logbook file », « Location », « Show in folder », « Open at startup », « Text size », « Account », « Sync now », « Sync automatically », « Only on Wi-Fi or cable », « Sign out », « About OpenDives », « Free filter… », « Clean up sites… ».
+
+Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.

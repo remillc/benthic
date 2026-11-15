@@ -168,6 +168,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `sites-superposes-android.dc.html` | Sites, épingles superposées · Android |
 | `saisie-bateau-android.dc.html` | Saisie sur le bateau · Android |
 | `choisir-site-android.dc.html` | Choisir un site · Android |
+| `bureau-demarrage.dc.html` | Écran de démarrage · bureau |
 | `bureau-carnet-profil-droite.dc.html` | Carnet · bureau (Windows, Linux) |
 | `bureau-carnet-macos.dc.html` | Carnet · bureau macOS, barre de menus |
 | `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
@@ -198,6 +199,13 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-outils-ead-mod.dc.html` | Outils · bureau, EAD et MOD |
 | `bureau-outils-meilleur-melange.dc.html` | Outils · bureau, meilleur mélange |
 | `bureau-outils-melangeur.dc.html` | Outils · bureau, mélangeur de gaz |
+| `bureau-reglages.dc.html` | Réglages · bureau (Windows, Linux), unités |
+| `bureau-reglages-groupe.dc.html` | Réglages · bureau · copie du groupe |
+| `bureau-reglages-affichage.dc.html` | Réglages · bureau, affichage |
+| `bureau-reglages-carnet.dc.html` | Réglages · bureau, carnet |
+| `bureau-compte.dc.html` | Compte · bureau, feuille du compte |
+| `bureau-reglages-recherche.dc.html` | Réglages · bureau, recherche |
+| `bureau-reglages-macos.dc.html` | Réglages · bureau macOS, fenêtre séparée |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
 | `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
 | `bureau-carnet-exporter.dc.html` | Carnet · bureau, exporter des plongées |
@@ -208,3 +216,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-nouveau-carnet-nuage.dc.html` | Nouveau carnet, étape 2 : dans votre nuage · bureau |
 | `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
 | `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
+| `logo-profil-claude.dc.html` | Logo · profil de plongée (proposition de Claude) |
