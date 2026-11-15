@@ -77,3 +77,7 @@ node --import ./tests/app/register.mjs --test tests/app/desktop-plugin.test.mjs
 ```
 
 A service missing from the file shows "Pas encore disponible" and cannot be chosen. Tests: `node --test tests/desktop/cloud.test.mjs` (a fake OAuth server and fake providers; no real account), `tests/desktop/startup.test.mjs` (« Ouvrir au démarrage »).
+
+### Hover audit
+
+`node desktop/scripts/hover-audit.mjs <DevTools port>` checks the current page of a running desktop app: every visible element that shows the hand pointer must change its look under `:hover` (docs/system-design.md, section 8, « Pointer »). It forces `:hover` through the DevTools protocol and compares the computed styles of the element, its descendants and their pseudo-elements; the elements with no change are listed (exit code 1). Open the screen or the state to check first, then run it; `--verbose` also lists the elements that pass.
