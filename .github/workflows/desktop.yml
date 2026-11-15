@@ -3,9 +3,16 @@ name: Desktop core
 # Manual only: a failed run emails the owner.
 on:
   workflow_dispatch:
+    inputs:
+      system:
+        description: Which system to build
+        type: choice
+        options: [all, linux, windows, mac]
+        default: all
 
 jobs:
   linux-x64:
+    if: inputs.system == 'all' || inputs.system == 'linux'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +32,7 @@ jobs:
           path: build/desktop/linux-x64/bin
 
   win-x64:
+    if: inputs.system == 'all' || inputs.system == 'windows'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +50,7 @@ jobs:
           path: build/desktop/win-x64/bin
 
   mac-arm64:
+    if: inputs.system == 'all' || inputs.system == 'mac'
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
