@@ -3441,3 +3441,16 @@ English: « Grey fields can be edited with a click and are saved at once. », «
 
 Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
 
+## [ ] 2026-11-15-185 Desktop profile: dashed line at the average depth
+
+Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first.
+
+- On the dive profile, a horizontal dashed line at the dive's average depth (the same value as « Prof. moy. » in the figures under the profile): #114477, 1.2 dp, dashes of 5 and gaps of 4, from the depth axis to the right edge of the plot, drawn above the water fill and under the curves and the cursor.
+- A label just above its left end, 11 px #114477: « moy. 17,9 m » (the dive's value, in the depth unit chosen in the settings).
+- The line is always shown; it is not one of the curve chips (task 183).
+- Not drawn when the dive has no profile (a dive logged by hand without samples).
+
+English: « avg. 17.9 m ».
+
+Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
+
