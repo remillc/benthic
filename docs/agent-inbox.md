@@ -3889,3 +3889,74 @@ Tests: every place that showed the flat simple logo shows the relief version; th
 Done: the relief logo replaces the flat simple logo on this branch in `docs/brand/` (`opendives-logo.svg`, icon and logo files, `opendives-icon-1024.png`, `opendives-logo-1024.png`; the flat files are in `docs/brand/previous/` with the suffix `-simple`), Android (foreground and splash marks with gradients in `aapt:attr`, minSdk 24; launcher PNGs; the monochrome icon stays flat), iOS (AppIcon light and dark, now full-bleed and opaque; Splash.imageset) and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files as images, so no gradient id is shared). The favicon is the relief simplified (disc gradient and a 2.6 wave, no rim, no shadow wave) because the shadow made the wave grey at 16 px. `tools/build-logo-assets.mjs` rebuilds every file (PNGs drawn by Edge headless). `tests/app/logo.test.mjs` checks them. Left to the desktop branch: the title bar, desktop splash and start screen, `desktop/resources/icon*.png`, and the rebuild of `app/dist`.
 
 Done (desktop branch): `desktop/resources/icon.png` and `icon-round.png` copied from the relief brand PNGs; the OpenDives tile of the « Nouveau carnet » dialog uses `logo-light.svg` instead of a flat inline mark; the start screen and the account sheet already load the logo files.
+
+## [x] 2026-11-15-210 First launch on tablet: a larger logo and name
+
+Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`. On the first launch (`app/src/pages/WelcomeStart.svelte`), in the tablet layout (landscape and portrait), the brand row grows: the logo goes from 40 to **96 dp**, « OpenDives » from 20 to **48 sp** (weight 500, line height 56, letter spacing −0.5), and the gap between them from 10 to 20 dp. The rest of the screen does not move: « Votre carnet de plongée. », the three choices and the profile keep their size and place. The phone layout is unchanged. Use the logo in use (task 209).
+
+Test: on a tablet, landscape and portrait, the logo is 96 dp and « OpenDives » 48 sp; on a phone nothing changes.
+
+Done: in the tablet layout (landscape and portrait) the brand row has a 96 dp logo (the logo in use), « OpenDives » at 48 sp (500, line height 56, letter spacing −0.5) and a 20 dp gap; the phone layout and the rest of the screen are unchanged. Test in `tests/app/welcome-start.test.mjs`.
+
+## [x] 2026-11-15-211 First launch on tablet: the dive profile stays off the screen edges
+
+Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`. On the tablet first launch (`app/src/pages/WelcomeStart.svelte`, `.od-welcome-start--wide-profile`), the decorative profile must touch neither the side edges of the screen nor the bottom one, in landscape or in portrait.
+- **Landscape**: the profile starts at the same 56 dp inset as the brand row and « Votre carnet de plongée. ». It ends 56 dp before the choices column (the existing column gap). Below it there is a 56 dp margin, so it never reaches the bottom edge.
+- **Portrait**: the profile has the same width as the heading column (520 dp, centred), so its left edge lines up with the logo and the heading. Its distance below the heading stays the same.
+
+Only the profile's width and margins change: its shape, height and colours stay the same. Nothing changes on a phone. Tasks 209 and 210 stay as they are.
+
+Test: on a tablet, in both orientations, there is screen background between the profile and every edge of the screen; in landscape, the profile's left edge lines up with the heading.
+
+Done: landscape, the profile starts at the heading's 56 dp inset, ends at the 56 dp column gap before the choices and keeps 56 dp above the bottom edge; portrait, it is 520 dp wide and centred, its left edge on the logo, 32 dp under the heading as before. Shape, height and colours unchanged; the phone unchanged. Checked in Edge at 1280 × 800 and 800 × 1280; test in `tests/app/welcome-start.test.mjs`.
+
+## [x] 2026-11-15-212 A new to-do tag: [site]
+
+Christian decided this on 15 November 2026. To-dos and ideas get a third tag, `[site]`, for the product's website, opendives.app (folder `site/`): its pages, texts, look and publishing. The rule is written in `docs/TODOS.md` and `docs/IDEAS.md`. The design agent sorts the items; #34 (where to announce the free APKs) is now `[site]`. A `[site]` item follows the usual split: its pages and texts are designed on the canvas and sent to you as tasks, and building and publishing `site/` are yours. Nothing to code: read the rule, mark this task done.
+
+Done: rule read in docs/TODOS.md and docs/IDEAS.md; [site] items (pages, texts, look and publishing of opendives.app, folder site/) are built and published from tasks, as usual. Nothing to code.
+
+## [ ] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+
+Christian approved this on 15 November 2026. Mock-ups:
+- `docs/mockups/android-tablette-premier-lancement-production-paysage.dc.html`
+- `docs/mockups/android-tablette-premier-lancement-production-portrait.dc.html`
+- `docs/mockups/android-tablette-ouvrir-importer-paysage.dc.html`
+
+**The two editions.** These screens are the first launch of the **release edition**. Today's beta keeps its current first launch (`WelcomeStart.svelte`, with tasks 210 and 211). Add a build-time switch so one build shows the beta screen and the other the release screen, defaulting to the beta. A name such as `VITE_EDITION=release`, read in one place, is enough. The beta build must look exactly as it does today. Tablets only in this task; the phone layout of the release screen will come in a later task.
+
+**Release first launch, landscape.**
+- **Left:** a panel 700 dp wide, full height, under the status bar (the time is white there). Its background is a vertical gradient: #2A6FB0, then #1F5C99 at 22 %, #0C3866 at 70 %, #072A4D at the bottom. On top of it, a soft white radial light at the top left, and faint diagonal light bands that fade out by mid-height.
+- **The panel's text:** at a 56 dp inset, the brand row (the logo in use, 96 dp, then « OpenDives » in white, 48 sp, as in task 210). Under it, the heading « Votre carnet de plongée, sur tous vos appareils. » (40 sp, white, on two lines). Then, at 78 % white, the line « Vos plongées passent de votre ordinateur de plongée à votre carnet en un geste. Profils, statistiques et carte de vos sites, même sans réseau. ».
+- **The profile:** the decorative dive profile in white, 2.5 dp, with a soft blue glow under it (#8CC4FF, blurred). The water column is filled with white going from 20 % to 4 % opacity, and the surface is a white dashed line at 35 %. It stays 56 dp from the panel's sides and above the bottom edge (task 211's rule).
+- **On the profile:** a white dot at the deepest point, with two frosted chips: « 32,4 m · Profondeur max. » under the dot, and « 54 min · Durée · Nitrox 32 % » near the end. The values are decorative, as in the mock-up.
+- **Motion:** on opening, the line draws itself from left to right in 1.6 s, the **full line** to the end, with an emphasised-decelerate curve. The two chips then fade in. Without motion when the system asks for reduced motion.
+- **Right:** the choices, vertically centred, with 64 dp side margins:
+  - « Commencer un carnet » (28 sp), then « Vous pourrez changer d’endroit plus tard. ».
+  - Three choice rows, each with a 48 dp tonal icon tile, a title, a help line and a chevron:
+    1. « Dans mon nuage » (main row, filled #1F5C99, white text): « Google Drive, OneDrive, Dropbox ou WebDAV. Synchronisé avec vos autres appareils. »
+    2. « Sur cette tablette »: « Aucun compte requis. Vous ne pourrez l’ouvrir que sur cette tablette. »
+    3. « Dans un dépôt git »: « GitHub, GitLab ou votre serveur. Synchronisé avec vos autres appareils. »
+  - A small uppercase section label, « Vous avez déjà un carnet », with a rule.
+  - The row « Ouvrir ou importer un carnet »: « Depuis votre nuage, ou un fichier .ssrf ou .xml. ».
+  - At the bottom, with a padlock: « Aucune plongée n’est envoyée à OpenDives. ».
+  - No radio buttons.
+
+**Portrait.** The same blue panel across the top, 640 dp high: the brand row, the heading, the line, and the profile with its 56 dp side insets. Below it, the same right-hand column, centred, with 120 dp side margins.
+
+**Where the rows go.**
+- « Sur cette tablette »: today's « Commencer sans compte ».
+- « Dans un dépôt git »: today's git setup.
+- « Dans mon nuage »: idea #74 is not built yet. Until it is, the row opens a short message saying the cloud is coming in a later version. Do not hide the row.
+
+**« Ouvrir ou importer un carnet ».** A dialog over the first launch: 600 dp wide, 28 dp corners, the page colour, a scrim at 45 %, and a ✕ that closes it.
+- **« Ouvrir depuis votre nuage »** (uppercase section label), help line « Le carnet reste dans votre nuage et se synchronise avec vos autres appareils. ». One card with the rows Google Drive, OneDrive, Dropbox and « WebDAV ou Nextcloud ». Each row has a generic icon (a cloud, and a server for WebDAV), **never a brand logo**, and a chevron. Until #74 exists, each opens the same « coming » message.
+- **« Importer un fichier »**, help line « Les plongées sont copiées dans un nouveau carnet sur cette tablette. ». One row, « Choisir un fichier », with the help line « Formats .ssrf et .xml ». It opens the system file picker and creates the logbook on the device from the file, through the import the app already has.
+
+**Texts and checks.**
+- All texts go in `fr.json` and `en.json`.
+- Mark the release screen in the release notes only when the release edition is first built.
+
+**Test:**
+- The beta build is unchanged.
+- In the release build, on a tablet, in both orientations: the screens match the mock-ups, the profile touches no edge, and « Sur cette tablette » and « Choisir un fichier » each lead to a working logbook.

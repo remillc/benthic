@@ -305,6 +305,19 @@
         margin-right: 0;
       }
 
+      /* A larger brand row (task 2026-11-15-210): logo 96 dp, « OpenDives » 48 sp; the rest does not move. */
+      .od-welcome-start--brand {
+        gap: 20px;
+        font-size: 48px;
+        line-height: 56px;
+        letter-spacing: -0.5px;
+      }
+
+      .od-welcome-start--logo {
+        width: 96px;
+        height: 96px;
+      }
+
       .od-welcome-start--actions {
         display: flex;
         flex-direction: column;
@@ -338,12 +351,16 @@
           margin: 34px 0 0 56px;
         }
 
-        :global(.od-welcome-start--wide-profile) {
+        .od-welcome-start--page :global(.od-welcome-start--wide-profile) {
           grid-column: 1;
           grid-row: 2;
           align-self: end;
-          height: min(230px, 100%);
-          margin-top: 0;
+          /* Off the screen edges (task 2026-11-15-211): the heading's 56 dp inset on the left, the column gap
+             before the choices, 56 dp above the bottom edge. */
+          box-sizing: border-box;
+          width: calc(100% - 56px);
+          height: min(230px, calc(100% - 56px));
+          margin: 0 0 56px 56px;
         }
 
         .od-welcome-start--actions {
@@ -366,10 +383,13 @@
           margin-top: 48px;
         }
 
-        :global(.od-welcome-start--wide-profile) {
+        .od-welcome-start--page :global(.od-welcome-start--wide-profile) {
           flex: none;
+          /* The heading column's width, centred: its left edge lines up with the logo (task 2026-11-15-211). */
+          width: 100%;
+          max-width: 520px;
           height: 260px;
-          margin-top: 32px;
+          margin: 32px auto 0;
         }
 
         .od-welcome-start--actions {

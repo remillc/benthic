@@ -2379,6 +2379,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on a tablet: the dive profile no longer touches the screen edges.",
+      "First launch on a tablet: a larger logo and OpenDives name.",
       "First launch on iPhone and iPad: one line under the title and a one-line helper under each choice, as on Android.",
       "Empty logbook: a dive profile, a large « Pair a dive computer » button and, in a card, the other ways to add dives (import a file, download from divelogs.de, log a dive by hand).",
       "Logbook: « Merge into one dive » and « Edit together… » in the ⋮ menu of the checked dives. Merging is offered only for dives that follow one another, less than an hour apart; « Edit together… » changes the site, guide, buddies, tags, suit, water type and notes of several dives at once, and « Undo » reverts it in one go.",

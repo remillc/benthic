@@ -6,7 +6,7 @@ Rules:
 - Ideas and to-dos share one numbering, kept in "Next number" in `docs/TODOS.md`. A new idea takes that number, and the agent increases it there. A number is never reused or changed.
 - **Adding:** when Christian writes "idée : …" to an agent, that agent adds the item at the end, in his words, and commits. Neither agent adds ideas on its own initiative.
 - **Deciding:** when Christian decides to do an idea, the agent moves the item, with its number, to the end of the list in `docs/TODOS.md`. When he drops one, the agent deletes it after asking him.
-- **Tag:** the same tags as the to-dos (`[design]` or `[code]`, then `[hors compat. SS]` when it applies).
+- **Tag:** the same tags as the to-dos (`[design]`, `[code]` or `[site]`, then `[hors compat. SS]` when it applies).
 - No other content in this file: no history, no notes from agents.
 
 ## List
