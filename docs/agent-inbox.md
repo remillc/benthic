@@ -3331,7 +3331,7 @@ Tests: editing a site field saves it without a button; moving the crosshair refi
 
 ## [ ] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
 
-Christian decided this on 15 November 2026, answering the four open questions of the desktop right-click menu. Read `docs/system-design.md`, section 7, « Actions on several dives », and `docs/ui-specification.md`, « Logbook selection and export ». Phone mock-ups (added after the task was written, same decisions): `docs/mockups/carnet-selection-menu-android.dc.html` (both items in the ⋮ menu, merge disabled), `carnet-fusion-menu-android.dc.html` (two dives a few minutes apart, merge enabled), `carnet-fusion-android.dc.html` (after the merge, snackbar), `carnet-modifier-ensemble-android.dc.html` (the full-screen sheet).
+Christian decided this on 15 November 2026, answering the four open questions of the desktop right-click menu. Read `docs/system-design.md`, section 7, « Actions on several dives », and `docs/ui-specification.md`, « Logbook selection and export ».
 
 **Desktop right-click menu on two dives or more**, in this order: Fusionner en une plongée (Ctrl/⌘+M), Ajouter à un voyage…, Modifier ensemble… (Ctrl/⌘+E), Copier (Ctrl/⌘+C), Exporter…, a divider, Supprimer. **« Partager… » is removed from desktop**, on all three systems: « Exporter… » already saves the file and Linux has no share window.
 
