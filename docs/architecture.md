@@ -190,3 +190,22 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 | iOS build | Impossible from Windows | Spare Mac or macOS continuous integration |
 
 **Proposed next step.** With A, B and C settled, interface design could start in parallel with a first **technical proof of concept**: build the core without Qt for Android, open a real cloud logbook, show it in a list, and achieve the Git round trip without differences. Both have since been done (see [the proof of concept](../poc/README.md)).
+
+## 10. The desktop app (decided on 15 November 2026)
+
+OpenDives also runs on **Windows, macOS and Linux**, as an **Electron** app (task 2026-11-15-170). The interface is the same web layer as on the phones and tablets; only the shell and the way to reach the core change.
+
+| Piece | Where | Role |
+| --- | --- | --- |
+| Electron's main process | `desktop/main.cjs`, `menu.cjs`, `window-state.cjs` | The window (size and place remembered), the interface served from `app://opendives/` (from `app/dist`, or the Vite server in development), the macOS menu bar (none on Windows and Linux) |
+| The bridge | `desktop/bridge.cjs`, `desktop/preload.cjs` | Starts the core's helper, passes the calls of the interface to it, keeps the account credentials (Electron `safeStorage`), and gives the interface a few checked file operations. The interface sees `window.odDesktop` only (contract at the top of `bridge.cjs`) |
+| The core's helper | `desktop/host/host.cpp` → `opendives-host` | Subsurface's core, `core/compat` and the façade, compiled natively for the system (`native/desktop/`), in a **separate process** that speaks JSON lines on its standard input and output: one handler per function of the Android bridge (`opendives_jni.cpp`), with the same names and results |
+| The plugin | `plugins/opendives-core/desktop.js` | The desktop implementation of `OpenDivesCore`, method by method as `OpenDivesCorePlugin.kt`, built on `window.odDesktop`; `core-api.js` registers it as the plugin's web implementation, so the app's code does not know it runs on a computer |
+
+**Why a helper process and not a Node module.** A Node module must be built with the compiler Electron was built with (Visual Studio on Windows) against each Electron version. A separate program builds with any compiler (gcc on Linux, clang on macOS, llvm-mingw from Linux for Windows), does not change when Electron does, and a crash of the core does not take the window down: the bridge starts it again. The core works on one logbook at a time from one thread, so one long-lived process fits; its replies are already JSON.
+
+**Build.** `native/desktop/build.sh <target>` builds the core's dependencies and `opendives-host` in `build/desktop/<target>/` (`linux-x64`, `win-x64`, `mac-arm64`, `mac-x64`); `npm run dist` in `desktop/` gathers the interface (built without the development switches), the helper, Subsurface's XSLT stylesheets and the sample logbook (`desktop/scripts/prepare.cjs`), then electron-builder makes the packages: NSIS and APPX (Microsoft Store) on Windows, DMG and MAS (Mac App Store) on macOS, AppImage and Flatpak on Linux. The `desktop` GitHub workflow builds the three systems; it is started by hand.
+
+**What the desktop does not have yet.** Offline maps, the gauge camera, QR codes, Apple Health and the Bluetooth download (planned through Chromium's Web Bluetooth, in JavaScript) answer as on a device without them (`desktop.js` lists each one).
+
+**Interface.** From 1200 dp wide the desktop app shows the logbook as a table beside the detail (`pages/DesktopLogbook.svelte`, `lib/desktop-table.js`); below, the tablet layout. `lib/layout.svelte.js` tells the desktop app (`desktopApp`, `desktopMac`) and its width (`layout.desktop`). See docs/system-design.md, section 7, and docs/ui-specification.md, « Desktop logbook ».

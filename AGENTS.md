@@ -22,7 +22,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
 - **JavaScript first (decided on 14 November 2026):** OpenDives' own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
 - **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
-- **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the C++ façade is exposed through a Node-API addon that follows the JSDoc contract of `plugins/opendives-core`, so the app's code does not depend on the platform. Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
+- **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the core runs in a helper process (`desktop/host`, JSON lines over stdio) reached from Electron's main process, and `plugins/opendives-core/desktop.js` implements the plugin's JSDoc contract on it, so the app's code does not depend on the platform (docs/architecture.md, section 10). Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
 
 ## Golden rule: Subsurface is never modified
 
@@ -65,7 +65,8 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 ```
 AGENTS.md                 this file
 app/                      Capacitor app (Svelte 5, Framework7) + report (README.md)
-plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/)
+plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/); desktop.js (desktop)
+desktop/                  Electron app (Windows, macOS, Linux): main process, bridge, the core's helper (host/)
 core/compat/              OpenDives additions to build Subsurface's core without Qt
 core/libopendives/        C++ facade over the core
 native/                   Android build of the core and its dependencies; ios/: the iOS build
