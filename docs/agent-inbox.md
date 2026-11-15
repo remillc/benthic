@@ -3908,3 +3908,15 @@ At the two ends, the missing neighbour is the end point itself. The path is `M P
 **Test:** the decorative profile shows no corner at any size, on phone, tablet and desktop. The curve passes through each original point (unit test). The real dive profile is unchanged.
 
 Done: `app/src/lib/smooth-path.js` (`smoothPath`, Catmull-Rom as cubic Béziers, tension 1/6, end points as their own neighbours; `decorativeProfilePath` for the shared dive points) draws the line and the water of `DecorativeProfile.svelte` (empty logbook, editorial pages) and of `WelcomeStart.svelte`; sizes, colours and margins unchanged. The release-edition profile (task 213) already uses the mock-up's curve. The real dive profile is untouched. Tests in `tests/app/smooth-path.test.mjs` (every point on the curve, the control points, no corner).
+
+## [ ] 2026-11-15-215 Release-edition screens stay on a branch; task 213 is on hold
+
+Christian decided this on 15 November 2026.
+
+**Release-edition screens stay on their own branch.** These are the screens of the future public edition: task 213 and the tasks that will replace or follow it. They must not replace the beta screens. You may build them, but on the branch `feature/release-first-launch` (created from `main`, kept up to date with it), never merged into `main` until Christian asks. The beta on `main` stays exactly as it is.
+
+**Task 213 is on hold.** Its screens are being redesigned: the first launch becomes two steps, « Pour commencer » then « Nouveau carnet ». A new task will replace 213.
+- Do not start 213.
+- If you already started it, stop and keep what you have on `feature/release-first-launch`.
+
+Mark this task done once the branch exists (or once you have noted the rule, if nothing was started).
