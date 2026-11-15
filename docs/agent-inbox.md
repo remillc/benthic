@@ -3673,7 +3673,7 @@ English: « Desired final pressure », « Working pressure: 3,365 psi », « Abo
 
 Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
 
-## [ ] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
+## [x] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
 
 Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html`.
 
@@ -3683,6 +3683,8 @@ Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up
 - The aria-label: « Bouteille à 220 bar : hélium, oxygène et air, dans l'ordre du gonflage ».
 
 Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
+
+Done (branch feature/desktop-tools, desktop blender): no grey layer; helium, oxygen and the top-up gas in fill order, each the height of its partial pressure in the final mix, residual included (example 77, 26, 117 bar, tested in tests/app/desktop-tools.test.mjs); Nitrox: oxygen and top-up only; aria-label as specified.
 
 ## [ ] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
 
@@ -3698,7 +3700,7 @@ English: « Leave empty if the cylinder is empty », « Analyse the mix before d
 
 Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alone then Oxygène and Hélium; no text of the screen is red when the mix can be reached; the analyse banner is amber.
 
-## [ ] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
+## [x] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html` (completes task 196).
 
@@ -3708,6 +3710,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils
 English: « Leave empty if the cylinder is empty ».
 
 Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
+
+Done (branch feature/desktop-tools): « Dans la bouteille » in two columns, Pression alone with « Laissez vide si la bouteille est vide », Oxygène and Hélium under it (Oxygène alone in Nitrox), « Compléter avec » on its own line; an empty Pression gives the steps of an empty cylinder (tested).
 
 ## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
