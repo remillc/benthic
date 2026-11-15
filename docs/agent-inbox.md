@@ -3183,7 +3183,7 @@ Phone and tablet, Android and iOS.
 
 Done: in the band summary the last-dive clause is joined with no-break spaces and « · » is glued to the item before it; rule added to docs/ui-writing.md, section 8.
 
-## [ ] 2026-11-15-169 Desktop app (Windows, macOS, Linux): the shell and the Carnet
+## [x] 2026-11-15-169 Desktop app (Windows, macOS, Linux): the shell and the Carnet
 
 Christian decided this on 15 November 2026. Read first `docs/system-design.md`, section 7, « Desktop app ». Mock-ups (in `docs/mockups/`): `bureau-carnet-profil-droite.dc.html` (Windows and Linux), `bureau-carnet-macos.dc.html` (macOS), `bureau-carnet-menu-contextuel.dc.html` (multiple selection and right-click menu). This task covers the Carnet only; Sites, Statistiques and Outils come in later tasks.
 
@@ -3213,9 +3213,13 @@ English: « Logbook », « Search the logbook », « 2 dives selected », « Rig
 
 Write in `docs/architecture.md` how the desktop build is organised, and add the desktop to `docs/ui-specification.md`. Tests: the table sorting, the selection and the right-click menu's items for one and several dives.
 
-## [ ] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
+Done (with task 170: Electron): the desktop shell (desktop/), the core compiled natively in a helper process (native/desktop, desktop/host; linux-x64 and win-x64 built here, mac-arm64 built and screenshotted on GitHub, round trip 98/0 on all three), the Carnet table (sorting, trips, selection, right-click menu, shortcuts, file drop), the detail pane (hover reading, figures, tabs, then in-place editing from task 172), the macOS menu bar, Réglages in the rail on Windows/Linux; docs/architecture.md section 10 and docs/ui-specification.md « Desktop logbook ». Later tasks (172 to 195) changed several of these and are ticked on their own.
+
+## [x] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
 
 Christian decided this on 15 November 2026, with you. Task 169 asks for Tauri 2 by default: **use Electron instead**, as you agreed with Christian. The rest of task 169 is unchanged. The Subsurface core is compiled natively and reached from Electron's main process (a Node native module or a helper process, your choice; write it in `docs/architecture.md`). Builds for Windows, macOS and Linux in the GitHub workflow. `docs/system-design.md` (section 7, « Desktop app ») now says Electron.
+
+Done: Electron; the core runs in a helper process (desktop/host) reached from the main process (desktop/bridge.cjs), see docs/architecture.md section 10; the desktop workflow builds linux-x64, win-x64 and mac-arm64 (started by hand).
 
 ## [x] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
 
@@ -3368,7 +3372,7 @@ English: « Merge into one dive », « Only dives that follow one another, less 
 
 Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface for desktop opens with both profile parts; two dives with another dive between them, or 2 h apart, leave the item disabled; undo restores both dives byte for byte in the logbook; « Modifier ensemble » on three dives with two different sites shows « Plusieurs valeurs » and changes only the edited fields; removing a buddy chip removes it from every dive that had it; copied text pastes into a spreadsheet as columns; copied dives pasted into another logbook arrive once, and a second paste finds them as duplicates.
 
-## [ ] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
+## [x] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
 
 Christian decided this on 15 November 2026. On macOS, Annuler and Rétablir are in the Édition menu of the menu bar (task 169). On Windows and Linux they were only keyboard shortcuts and the snackbar's « Annuler », which goes away. Mock-up: `docs/mockups/bureau-sites-nettoyer-fusion.dc.html` (menu open after a merge).
 
@@ -3382,6 +3386,8 @@ Christian decided this on 15 November 2026. On macOS, Annuler and Rétablir are 
 English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
 
 Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
+
+Superseded by tasks 187, then 192 and 194: Annuler and Rétablir, named after the last change, start each section's ⋮ menu (Carnet, Sites, Statistiques); Outils has no ⋮ in its top bar (task 196).
 
 ## [x] 2026-11-15-180 Desktop: hover state of the navigation rail items
 
@@ -3476,7 +3482,7 @@ Test: the line sits at the « Prof. moy. » value and follows the depth unit (m 
 
 Done: dashed #114477 line (`--od-profile-mean`) with « moy. 17,9 m » label, desktop only.
 
-## [ ] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+## [x] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-groupe.dc.html` (the menu shown open).
 
@@ -3494,7 +3500,9 @@ English: « Enlarge the profile », « Add to a trip… », « Remove from the t
 
 Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
 
-## [ ] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
+Superseded by task 194: the detail pane has no ⋮; its actions are icons (plan, share, export, delete), ⤢ on the chips row, the others in the row's right-click menu.
+
+## [x] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
 
 Christian decided this on 15 November 2026, after task 179: two ⋮ menus one above the other (top bar and detail pane) were confusing. Mock-ups: `docs/mockups/bureau-carnet-groupe.dc.html` and the other desktop Carnet screens.
 
@@ -3506,6 +3514,8 @@ Christian decided this on 15 November 2026, after task 179: two ⋮ menus one ab
 English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
 
 Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
+
+Superseded by task 192: Annuler and Rétablir went back into a ⋮ of the list header; one ⋮ in the Carnet (task 194).
 
 ## [x] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
 
@@ -3684,7 +3694,7 @@ Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » op
 
 Done: in Meilleur mélange (phone and tablet), an outlined 40 dp button with the cylinder icon under the advised mix and its note, « Préparer ce mélange » on the phone, « Préparer le trimix 25/28 » or « Préparer l’EAN25 » on a tablet (the app keeps its Nitrox / Trimix tabs on tablets, so it names the mix of the tab shown). It opens the Mélangeur de gaz through `lib/gas-handoff.js` with the mode and the mix as displayed (whole percent) as « Mélange voulu »; the final pressure, the cylinder and what it holds keep their values, and back returns to Meilleur mélange. Test: `tests/app/gas-blender-form.test.mjs` (25/28 at 148 ft). Not done: iOS (no iOS gas tools yet). Checked in a browser at 412 and 820 px wide, not on a device.
 
-## [ ] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
+## [x] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-outils-melangeur.dc.html` (desktop), `outils-melangeur-android.dc.html`, `outils-melangeur-nitrox-android.dc.html`, `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`. Applies on every platform; the desktop screen is otherwise task 196.
 
@@ -3698,6 +3708,8 @@ English: « Desired final pressure », « Working pressure: 3,365 psi », « Abo
 Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
 
 Done (phone and tablet parts), not ticked: the desktop part is on another branch. Order: Trimix Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox Oxygène and Bouteille, then the final pressure on its own line. The final pressure follows the cylinder's working pressure (`lib/gas-blender-form.js`) until the diver types a value, which a change of cylinder keeps. Helper « Service : 3 365 psi »; above it, a warning in `--od-alarm` with a triangle (`TextField` `warning`), the steps still computed. « Pression finale » renamed. Tests in `tests/app/gas-blender-form.test.mjs`. No calculation file changed (`gas-blend.js`, `gas-calculator.js`).
+
+Done: desktop part (branch feature/desktop-tools: order, prefill and kept value, helper and warning, the cylinder drawing, then task 199) and phone/tablet part (branch feature/phone-gas-tools, merged into main: order, prefill from lib/gas-blender-form.js, « Service : … » helper and warning, rename), both tested.
 
 ## [x] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
 
