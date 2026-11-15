@@ -163,3 +163,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-carnet-profil-droite.dc.html` | Carnet · bureau (Windows, Linux) |
 | `bureau-carnet-macos.dc.html` | Carnet · bureau macOS, barre de menus |
 | `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
+| `bureau-carnet-groupe.dc.html` | Carnet · bureau · copie du groupe |
+| `bureau-sites.dc.html` | Sites · bureau (Windows, Linux) |
+| `bureau-stats.dc.html` | Statistiques · bureau (Windows, Linux) |
+| `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
