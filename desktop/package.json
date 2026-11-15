@@ -30,7 +30,7 @@
       "bridge.cjs",
       "preload.cjs",
       "package.json",
-      "resources/icon.png"
+      "resources/icon-round.png"
     ],
     "extraResources": [
       {
@@ -58,7 +58,8 @@
       "target": [
         "nsis",
         "appx"
-      ]
+      ],
+      "icon": "resources/icon-round.png"
     },
     "appx": {
       "identityName": "OpenDives",
@@ -69,14 +70,16 @@
         "dmg",
         "mas"
       ],
-      "category": "public.app-category.sports"
+      "category": "public.app-category.sports",
+      "icon": "resources/icon.png"
     },
     "linux": {
       "target": [
         "AppImage",
         "flatpak"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "resources/icon-round.png"
     }
   }
 }
