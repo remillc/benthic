@@ -201,6 +201,14 @@ The four sections use the same band as their header, MD3 Small top app bar (☰,
 - **iPad:** the same rule, in iOS form. The secondary column of the split view shows the system back button, a "‹" chevron followed by the previous screen's title (for example "‹ Lake Coleridge"), only when it has history. At its first screen it shows no back button. The edge swipe goes back in that column too.
 Mock-ups: `android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, no ←), `android-tablette-carnet-site-{paysage,portrait}.dc.html` (dive → site, with ←).
 
+**Desktop app (decided on 15 November 2026, nothing drawn yet).** OpenDives will also run as a desktop app on **Windows, macOS and Linux**: the same Svelte interface in a desktop shell (Tauri or Electron, to choose), with the Subsurface core compiled natively.
+- **Material 3 Expressive on every platform**, Windows, macOS and Linux alike, as on Android. No Fluent on Windows and no Apple look on the Mac: one interface, one code.
+- **Layout: Material 3's large windows.** From 1200 dp wide (Large) and 1600 dp (Extra-large), the navigation rail of the tablet and the list-detail canonical layout; two panes, three at most in Extra-large. Panes can be resized and their widths are remembered.
+- **Menu bar on macOS only.** The Mac always has a menu bar, so the app provides a native one: OpenDives (À propos, Réglages ⌘,, Quitter), Fichier (Nouvelle plongée, Importer, Télécharger depuis un ordinateur de plongée, Exporter, Imprimer), Édition (Annuler, Rétablir, Copier, Supprimer, Rechercher), Affichage (Carnet, Sites, Statistiques, Outils, columns, text size), Plongée (Modifier, Fusionner, Séparer, Ajouter à un voyage), Aide. **On Windows and Linux, no menu bar:** the actions stay where they are on Android, in the top bar and its ⋮ menu.
+- **Everywhere:** context menus on right click (a dive, a site, a point of the profile; they replace the long press), keyboard shortcuts shown in menus and tooltips (arrows to move between dives, Ctrl/⌘+F, Ctrl/⌘+N, Delete, Ctrl/⌘+Z), multiple selection with Shift and Ctrl/⌘, hover on the profile shows the values under the pointer, a file dropped on the window is imported, printing.
+- **What Material 3 does not cover** (no data table, no menu bar, no keyboard conventions) is decided by OpenDives and written here.
+- **Still to decide:** the logbook as a table with sortable columns (Subsurface desktop style) or as the list of the phone; the dive profile in the detail pane or large above the table.
+
 ## 8. Shared components
 
 Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
