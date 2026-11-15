@@ -194,9 +194,7 @@
       "git": "Git repository",
       "googleDrive": "Google Drive",
       "oneDrive": "Microsoft OneDrive",
-      "dropbox": "Dropbox",
-      "iCloud": "iCloud Drive",
-      "webdav": "WebDAV or Nextcloud"
+      "dropbox": "Dropbox"
     },
     "when": {
       "openNow": "open now",
@@ -217,8 +215,7 @@
       "computerHelp": "A logbook file (.ssrf), in the folder you choose",
       "cloud": "In your cloud",
       "cloudHelp": "{services} · synced between your devices",
-      "cloudServices": "Google Drive, OneDrive, Dropbox or WebDAV",
-      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
+      "cloudServices": "Google Drive, OneDrive or Dropbox",
       "git": "In a git repository",
       "gitHelp": "Your own repository · full history of changes",
       "continue": "Continue",
@@ -226,12 +223,9 @@
       "back": "Back",
       "create": "Create the logbook",
       "creating": "Creating…",
-      "cloudIntro": "Choose the service whose app is installed on this computer. The logbook will be a file in its synced folder.",
-      "folderFound": "Folder found",
-      "folderMissing": "Choose a folder",
+      "cloudIntro": "Signing in happens in your browser. The logbook is a file on the service, copied to this computer.",
       "notAvailable": "Not available yet",
       "folderLabel": "Folder",
-      "folderBrowse": "Choose…",
       "folderHelp": "The file “{file}” will be created there. OpenDives only reaches the files it creates or that you open.",
       "gitUrl": "Repository address",
       "gitUrlPlaceholder": "https://github.com/you/logbook.git",
@@ -272,6 +266,53 @@
       "open": "Open",
       "failed": "The copy could not be saved.",
       "sameFile": "Choose a different file than the open logbook's."
+    }
+  },
+  "desktopCloud": {
+    "browserPage": {
+      "done": "Connected",
+      "doneText": "You can close this tab and go back to OpenDives.",
+      "failed": "Sign-in failed",
+      "failedText": "Go back to OpenDives and try again."
+    },
+    "conflict": {
+      "title": "“{name}” changed in two places",
+      "local": "This computer’s copy",
+      "remote": "The copy on {service}",
+      "later": "Decide later",
+      "modified": "modified {date}",
+      "warning": "The copy you do not keep is replaced."
+    },
+    "row": {
+      "signIn": "Sign in",
+      "signingIn": "Signing in, in your browser…",
+      "connected": "Connected · {account}",
+      "connectedNoAccount": "Connected"
+    },
+    "folderPlaceholder": "OpenDives",
+    "folderHelp": "The file “{file}” is created in this folder of {service}. OpenDives only reaches its own files.",
+    "folderError": "The folder name has a character that is not allowed.",
+    "signIn": "Sign in to {service}",
+    "signOut": "Sign out of {service}",
+    "errors": {
+      "NOT_SIGNED_IN": "Sign in to this service first.",
+      "NOT_AVAILABLE": "This service is not available yet.",
+      "SIGN_IN_DENIED": "The sign-in was refused.",
+      "SIGN_IN_TIMEOUT": "The sign-in did not finish. Try again.",
+      "SIGN_IN_EXPIRED": "The sign-in has expired. Sign in again.",
+      "STATE_MISMATCH": "The browser’s answer does not belong to this sign-in. Try again.",
+      "PORT_BUSY": "Another program uses the sign-in address. Close it and try again.",
+      "CREDENTIALS_NOT_SAVED": "This computer cannot keep the sign-in safely.",
+      "DENIED": "The service refuses access to this folder.",
+      "NETWORK": "The service does not answer. Check the connection.",
+      "EXISTS": "A file with this name already exists in this folder.",
+      "other": "The logbook could not be created."
+    },
+    "startup": {
+      "label": "Open at start",
+      "text": "The last logbook reopens each logbook that was open at quit, in its own window",
+      "last": "The last logbook",
+      "ask": "Choose each time"
     }
   },
   "sync": {

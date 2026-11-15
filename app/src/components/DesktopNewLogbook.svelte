@@ -8,11 +8,14 @@
   import Icon from './Icon.svelte';
   import ChoiceRow from './ChoiceRow.svelte';
   import { t } from '../lib/i18n.js';
-  import { desktopMac } from '../lib/layout.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { logbooks } from '../lib/desktop-logbooks.svelte.js';
   import {
-    cloudProvidersFor,
+    CLOUD_PROVIDERS,
+    providerRow,
+    defaultCloudFolder,
+    cloudFolderError,
+    cloudErrorKey,
     secondStep,
     validLogbookName,
     fileNameFor,
@@ -42,10 +45,21 @@
   let token = $state('');
   let busy = $state(false);
   let error = $state('');
-  /** The sync folders found for the services (the main process looks). @type {{ provider: string, folder: string }[]} */
-  let found = $state([]);
+  /** What the main process says of each service: available, connected, as whom (never a token). @type {import('../lib/desktop-logbooks.js').CloudStatus[]} */
+  let status = $state([]);
+  /** The service whose sign-in is open in the browser. */
+  let signingIn = $state('');
 
-  const providers = cloudProvidersFor(desktopMac);
+  /** @param {string} id */
+  const statusOf = (id) => status.find((p) => p.provider === id);
+  /** @param {string} id */
+  const isConnected = (id) => !!statusOf(id)?.connected;
+
+  const providers = CLOUD_PROVIDERS;
+  const folderCheck = liveError(
+    () => folder,
+    (text) => (cloudFolderError(text) ? t('desktopCloud.folderError') : ''),
+  );
   const urlCheck = liveError(
     () => url,
     (text) => (gitUrlError(text) ? t('desktopLogbooks.new.errorUrl') : ''),
@@ -60,37 +74,49 @@
   });
   const nameValid = $derived(validLogbookName(name));
   const gitReady = $derived(gitFormReady({ url, branch, token, username }));
-  const cloudReady = $derived(cloudFormReady({ provider, folder }));
-  const services = $derived(t(desktopMac ? 'desktopLogbooks.new.cloudServicesMac' : 'desktopLogbooks.new.cloudServices'));
+  const cloudReady = $derived(cloudFormReady({ provider, connected: isConnected(provider), folder }));
+  const services = t('desktopLogbooks.new.cloudServices');
 
   /** @returns {any} */
   const bridge = () => /** @type {any} */ (globalThis).odDesktop;
 
-  onMount(async () => {
+  async function refreshStatus() {
     try {
-      found = (await bridge().logbooks.cloud()).folders;
+      status = await bridge().logbooks.cloudStatus();
     } catch (e) {
-      console.error('Looking for the synchronised folders', e);
+      console.error('Reading the cloud services', e);
     }
-  });
+  }
 
-  /** @param {string} id */
-  const foundFolder = (id) => found.find((f) => f.provider === id)?.folder ?? '';
+  onMount(refreshStatus);
 
-  /** @param {string} id */
+  /** A row is chosen: its folder starts at the service's default. @param {string} id */
   function chooseProvider(id) {
-    if (id === 'webdav') return;
+    if (!statusOf(id)?.available || signingIn) return;
     provider = id;
-    folder = foundFolder(id);
+    folder = defaultCloudFolder(id);
     error = '';
   }
 
-  async function browse() {
+  /** « Se connecter à {service} »: the browser opens on the service's sign-in page. @param {string} id */
+  async function signIn(id) {
+    if (signingIn) return;
+    error = '';
+    signingIn = id;
     try {
-      const answer = await bridge().logbooks.pickFolder();
-      if (answer.folder) folder = answer.folder;
+      status = [await bridge().logbooks.cloudSignIn({ provider: id }), ...status.filter((p) => p.provider !== id)];
     } catch (e) {
-      console.error('Choosing a folder', e);
+      error = t(cloudErrorKey(/** @type {any} */ (e)));
+    } finally {
+      signingIn = '';
+    }
+  }
+
+  async function signOut() {
+    try {
+      status = [await bridge().logbooks.cloudSignOut({ provider }), ...status.filter((p) => p.provider !== provider)];
+    } catch (e) {
+      console.error('Signing out of the service', e);
     }
   }
 
@@ -114,13 +140,13 @@
         where === 'git'
           ? { where, name: name.trim(), url: url.trim(), username: username.trim(), branch: branch.trim(), token: token.trim() }
           : where === 'cloud'
-            ? { where, name: name.trim(), provider, folder }
+            ? { where, name: name.trim(), provider, folder: folder.trim() }
             : { where, name: name.trim() };
       const result = await bridge().logbooks.create(spec);
       if (result.canceled) return;
       onclose();
     } catch (e) {
-      error = t(creationErrorKey(/** @type {any} */ (e)));
+      error = t(where === 'cloud' ? cloudErrorKey(/** @type {any} */ (e)) : creationErrorKey(/** @type {any} */ (e)));
     } finally {
       busy = false;
     }
@@ -189,29 +215,27 @@
       <p class="od-new-logbook--intro">{t('desktopLogbooks.new.cloudIntro')}</p>
       <div role="radiogroup" aria-label={t('desktopLogbooks.new.cloud')} class="od-new-logbook--rows">
         {#each providers as id (id)}
-          {@const unavailable = id === 'webdav'}
-          <ChoiceRow name="od-new-logbook-provider" selected={provider === id} disabled={unavailable} onselect={() => chooseProvider(id)}>
+          {@const row = providerRow(statusOf(id), signingIn === id, t)}
+          <ChoiceRow name="od-new-logbook-provider" selected={provider === id} disabled={row.state === 'unavailable' || (!!signingIn && signingIn !== id)} onselect={() => chooseProvider(id)}>
             <!-- A neutral square: the services' official logos are added from their brand files (task 173 report). -->
-            <span class="od-new-logbook--logo" data-provider={id}>
-              {#if id === 'webdav'}
-                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" class="od-new-logbook--server"><rect x="4" y="4" width="16" height="6" rx="1.5" /><rect x="4" y="14" width="16" height="6" rx="1.5" /><path d="M8 7h.01M8 17h.01" /></svg>
-              {:else}
-                <Icon name="cloud" size={20} />
-              {/if}
-            </span>
+            <span class="od-new-logbook--logo" data-provider={id}><Icon name="cloud" size={20} /></span>
             <span class="od-new-logbook--row-title od-new-logbook--grow">{t(`desktopLogbooks.source.${id}`)}</span>
-            <span class="od-new-logbook--status">
-              {#if unavailable}{t('desktopLogbooks.new.notAvailable')}{:else if foundFolder(id)}{t('desktopLogbooks.new.folderFound')}{:else}{t('desktopLogbooks.new.folderMissing')}{/if}
-            </span>
+            <span class="od-new-logbook--status" class:od-new-logbook--status-connected={row.state === 'connected'}>{row.text}</span>
           </ChoiceRow>
         {/each}
       </div>
+      {#if provider && !isConnected(provider)}
+        <button type="button" class="od-new-logbook--secondary od-new-logbook--sign-in" disabled={!!signingIn} onclick={() => signIn(provider)}>{signingIn ? t('desktopCloud.row.signingIn') : t('desktopCloud.signIn', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
+      {:else if isConnected(provider)}
+        <button type="button" class="od-new-logbook--text-button od-new-logbook--sign-out" onclick={signOut}>{t('desktopCloud.signOut', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
+      {/if}
       <label class="od-new-logbook--label" for="od-new-logbook-folder">{t('desktopLogbooks.new.folderLabel')}</label>
-      <div class="od-new-logbook--folder">
-        <input id="od-new-logbook-folder" class="od-new-logbook--input" type="text" readonly value={folder} disabled={!provider} />
-        <button type="button" class="od-new-logbook--secondary" disabled={!provider} onclick={browse}>{t('desktopLogbooks.new.folderBrowse')}</button>
-      </div>
-      <p class="od-new-logbook--help">{t('desktopLogbooks.new.folderHelp', { file: fileNameFor(name) })}</p>
+      <input id="od-new-logbook-folder" class="od-new-logbook--input" class:od-new-logbook--invalid={!!folderCheck.error} type="text" bind:value={folder} placeholder={t('desktopCloud.folderPlaceholder')} disabled={!isConnected(provider)} autocomplete="off" spellcheck="false" aria-invalid={!!folderCheck.error} />
+      {#if folderCheck.error}
+        <p class="od-new-logbook--error od-new-logbook--error-small" role="alert">{folderCheck.error}</p>
+      {:else if provider}
+        <p class="od-new-logbook--help">{t('desktopCloud.folderHelp', { file: fileNameFor(name), service: t(`desktopLogbooks.source.${provider}`) })}</p>
+      {/if}
       {#if error}<p class="od-new-logbook--error" role="alert">{error}</p>{/if}
       <div class="od-new-logbook--actions">
         <button type="button" class="od-new-logbook--text-button" onclick={() => (step = 'choice')}>{t('desktopLogbooks.new.back')}</button>
@@ -364,12 +388,6 @@
       background: var(--od-logo-square);
       box-shadow: inset 0 0 0 1px var(--od-separator);
     }
-    .od-new-logbook--server {
-      fill: none;
-      stroke: var(--od-logo-square-ink);
-      stroke-width: 1.8;
-      stroke-linecap: round;
-    }
     .od-new-logbook--text {
       display: flex;
       flex-direction: column;
@@ -393,14 +411,17 @@
       font-size: 13px;
       color: var(--od-text-2);
     }
-    .od-new-logbook--folder {
-      display: flex;
-      gap: 8px;
+    .od-new-logbook--status-connected {
+      color: var(--od-text);
     }
-    .od-new-logbook--folder .od-new-logbook--input {
-      flex: 1;
-      width: auto;
-      min-width: 0;
+    .od-new-logbook--sign-in {
+      margin-top: 12px;
+      height: 40px;
+    }
+    .od-new-logbook--sign-out {
+      margin-top: 8px;
+      padding: 0;
+      height: auto;
     }
     .od-new-logbook--note {
       display: flex;

@@ -6,19 +6,70 @@
 
 /**
  * A logbook as the main process describes it.
- * @typedef {{ id: string, kind: 'main'|'file'|'git', name: string, location: string, provider?: string, branch?: string, openedAt?: number, open?: boolean }} LogbookEntry
+ * @typedef {{ id: string, kind: 'main'|'file'|'cloud'|'git', name: string, location: string, provider?: string, branch?: string, openedAt?: number, open?: boolean }} LogbookEntry
  */
 
-/** The cloud services, in the order the dialog lists them; iCloud Drive exists on macOS only. */
-export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive', 'dropbox', 'iCloud', 'webdav']);
+/** The cloud services, in the order the dialog lists them (iCloud Drive and WebDAV have no API path for now). */
+export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive', 'dropbox']);
 
 /**
- * The services a system offers.
- * @param {boolean} mac
+ * What the main process says about a service: nothing secret, only whether it can be used, whether the diver
+ * is signed in, and as whom.
+ * @typedef {{ provider: string, available: boolean, connected: boolean, account: string }} CloudStatus
  */
-export function cloudProvidersFor(mac) {
-  return CLOUD_PROVIDERS.filter((p) => p !== 'iCloud' || mac);
+
+/**
+ * What the end of a service's row says: « Pas encore disponible » (no client id in this build, the row is
+ * disabled), « Se connecter », « Connexion dans le navigateur… » while the browser is open, or
+ * « Connecté · diver@example.org ».
+ * @param {CloudStatus|undefined} status
+ * @param {boolean} signingIn
+ * @param {(key: string, params?: Record<string, any>) => string} t
+ * @returns {{ state: 'unavailable'|'signedOut'|'signingIn'|'connected', text: string }}
+ */
+export function providerRow(status, signingIn, t) {
+  if (!status || !status.available) return { state: 'unavailable', text: t('desktopLogbooks.new.notAvailable') };
+  if (signingIn) return { state: 'signingIn', text: t('desktopCloud.row.signingIn') };
+  if (!status.connected) return { state: 'signedOut', text: t('desktopCloud.row.signIn') };
+  return { state: 'connected', text: status.account ? t('desktopCloud.row.connected', { account: status.account }) : t('desktopCloud.row.connectedNoAccount') };
 }
+
+/**
+ * The folder a service starts with: Google Drive gets a folder OpenDives creates; the others use the app's
+ * own folder, where a subfolder is optional.
+ * @param {string} provider
+ */
+export function defaultCloudFolder(provider) {
+  return provider === 'googleDrive' ? 'OpenDives' : '';
+}
+
+/**
+ * Whether a folder path can be used on the services: segments separated by « / », none empty or « . » or « .. »,
+ * no control character or one of < > : " | ? * (the main process checks the same). Empty is fine (the service's root).
+ * @param {string} folder
+ * @returns {'' | 'folder'}
+ */
+export function cloudFolderError(folder) {
+  const segments = String(folder ?? '')
+    .split(/[\\/]+/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const bad = (/** @type {string} */ x) => x === '.' || x === '..' || x.length > 100 || [...x].some((c) => c.charCodeAt(0) < 32 || '<>:"|?*'.includes(c));
+  return segments.length > 6 || segments.some(bad) ? 'folder' : '';
+}
+
+/**
+ * The text key of the error of a failed sign-in or a failed cloud creation.
+ * @param {{ code?: string, message?: string }} error
+ */
+export function cloudErrorKey(error) {
+  const known = ['NOT_SIGNED_IN', 'NOT_AVAILABLE', 'SIGN_IN_DENIED', 'SIGN_IN_TIMEOUT', 'SIGN_IN_EXPIRED', 'STATE_MISMATCH', 'PORT_BUSY', 'CREDENTIALS_NOT_SAVED', 'DENIED', 'NETWORK', 'EXISTS'];
+  const code = error?.code && known.includes(error.code) ? error.code : String(error?.message ?? '').split(/[:\s]/)[0];
+  return `desktopCloud.errors.${known.includes(code) ? code : 'other'}`;
+}
+
+/** « Ouvrir au démarrage »: the logbooks open at the last quit, or the start screen. */
+export const STARTUP_MODES = /** @type {const} */ (['last', 'ask']);
 
 /**
  * What the icon of a logbook says: this computer, a file, a personal cloud, a git repository.
@@ -168,10 +219,11 @@ export function gitFormReady(form) {
 }
 
 /**
- * @param {{ provider: string, folder: string }} state
+ * The cloud step is ready when a service is chosen, available and signed in, and its folder is valid.
+ * @param {{ provider: string, connected: boolean, folder: string }} state
  */
 export function cloudFormReady(state) {
-  return !!state.provider && state.provider !== 'webdav' && !!state.folder;
+  return /** @type {readonly string[]} */ (CLOUD_PROVIDERS).includes(state.provider) && state.connected && cloudFolderError(state.folder) === '';
 }
 
 /**

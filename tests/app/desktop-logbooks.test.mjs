@@ -3,7 +3,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  cloudProvidersFor,
+  CLOUD_PROVIDERS,
+  providerRow,
+  defaultCloudFolder,
+  cloudFolderError,
+  cloudErrorKey,
+  STARTUP_MODES,
   sourceKind,
   sourceText,
   whenText,
@@ -37,16 +42,59 @@ const texts = {
 };
 const t = (key, params = {}) => (texts[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => params[k]);
 
-test('iCloud Drive is offered on macOS only', () => {
-  assert.ok(cloudProvidersFor(true).includes('iCloud'));
-  assert.ok(!cloudProvidersFor(false).includes('iCloud'));
-  assert.deepEqual(cloudProvidersFor(false), ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
+test('the cloud services are the three with an API; iCloud Drive and WebDAV are gone', () => {
+  assert.deepEqual([...CLOUD_PROVIDERS], ['googleDrive', 'oneDrive', 'dropbox']);
+});
+
+test('the end of a service row: not available, sign in, signing in, connected as', () => {
+  const rows = {
+    'desktopLogbooks.new.notAvailable': 'Pas encore disponible',
+    'desktopCloud.row.signIn': 'Se connecter',
+    'desktopCloud.row.signingIn': 'Connexion dans le navigateur…',
+    'desktopCloud.row.connected': 'Connecté · {account}',
+    'desktopCloud.row.connectedNoAccount': 'Connecté',
+  };
+  const tt = (key, params = {}) => (rows[key] ?? key).replace('{account}', params.account ?? '');
+  const status = (over) => ({ provider: 'dropbox', available: true, connected: false, account: '', ...over });
+  assert.deepEqual(providerRow(status({ available: false }), false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
+  assert.deepEqual(providerRow(undefined, false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
+  assert.deepEqual(providerRow(status({}), false, tt), { state: 'signedOut', text: 'Se connecter' });
+  assert.deepEqual(providerRow(status({}), true, tt), { state: 'signingIn', text: 'Connexion dans le navigateur…' });
+  assert.deepEqual(providerRow(status({ connected: true, account: 'moi@example.org' }), false, tt), { state: 'connected', text: 'Connecté · moi@example.org' });
+  assert.deepEqual(providerRow(status({ connected: true }), false, tt), { state: 'connected', text: 'Connecté' });
+  // Not available wins over a stale connection.
+  assert.equal(providerRow(status({ available: false, connected: true }), false, tt).state, 'unavailable');
+});
+
+test('the folder: Google Drive starts with a folder OpenDives creates, the others with their own', () => {
+  assert.equal(defaultCloudFolder('googleDrive'), 'OpenDives');
+  assert.equal(defaultCloudFolder('dropbox'), '');
+  assert.equal(defaultCloudFolder('oneDrive'), '');
+});
+
+test('a cloud folder path: segments with no dot-dot, no forbidden character; empty is the root', () => {
+  for (const ok of ['', 'OpenDives', 'OpenDives/plongées', ' a / b ', 'a/b/c/d/e/f']) assert.equal(cloudFolderError(ok), '', ok);
+  for (const bad of ['..', 'a/../b', 'a/./b', 'a:b', 'a?b', 'a|b', 'a/b/c/d/e/f/g', 'x'.repeat(101)]) assert.equal(cloudFolderError(bad), 'folder', bad);
+});
+
+test('the error of a sign-in or a cloud creation has its own text', () => {
+  assert.equal(cloudErrorKey({ code: 'SIGN_IN_DENIED' }), 'desktopCloud.errors.SIGN_IN_DENIED');
+  assert.equal(cloudErrorKey({ message: 'NOT_SIGNED_IN' }), 'desktopCloud.errors.NOT_SIGNED_IN');
+  assert.equal(cloudErrorKey({ code: 'EXISTS', message: 'EXISTS' }), 'desktopCloud.errors.EXISTS');
+  assert.equal(cloudErrorKey({ message: 'NETWORK: no answer' }), 'desktopCloud.errors.NETWORK');
+  assert.equal(cloudErrorKey({ message: 'weird failure' }), 'desktopCloud.errors.other');
+  assert.equal(cloudErrorKey({}), 'desktopCloud.errors.other');
+});
+
+test('the start-up choices', () => {
+  assert.deepEqual([...STARTUP_MODES], ['last', 'ask']);
 });
 
 test('the icon of a logbook says its source', () => {
   assert.equal(sourceKind({ id: 'main', kind: 'main', name: '', location: '' }), 'device');
   assert.equal(sourceKind({ id: 'f-1', kind: 'file', name: 'a', location: '/x/a.ssrf' }), 'file');
   assert.equal(sourceKind({ id: 'f-1', kind: 'file', name: 'a', location: '/x/a.ssrf', provider: 'dropbox' }), 'cloud');
+  assert.equal(sourceKind({ id: 'c-1', kind: 'cloud', name: 'a', location: 'OpenDives/a.ssrf', provider: 'oneDrive' }), 'cloud');
   assert.equal(sourceKind({ id: 'g-1', kind: 'git', name: 'a', location: 'https://h/x' }), 'git');
 });
 
@@ -112,11 +160,13 @@ test('the git form: an https address, a branch and a token', () => {
   assert.equal(gitUserFromUrl(''), '');
 });
 
-test('the cloud form needs a service with a folder; WebDAV is not available yet', () => {
-  assert.ok(cloudFormReady({ provider: 'dropbox', folder: '/d' }));
-  assert.ok(!cloudFormReady({ provider: 'dropbox', folder: '' }));
-  assert.ok(!cloudFormReady({ provider: '', folder: '/d' }));
-  assert.ok(!cloudFormReady({ provider: 'webdav', folder: '/d' }));
+test('the cloud form needs a service the diver is signed in to, and a valid folder', () => {
+  assert.ok(cloudFormReady({ provider: 'dropbox', connected: true, folder: 'Carnets' }));
+  assert.ok(cloudFormReady({ provider: 'dropbox', connected: true, folder: '' }));
+  assert.ok(!cloudFormReady({ provider: 'dropbox', connected: false, folder: 'Carnets' }));
+  assert.ok(!cloudFormReady({ provider: '', connected: true, folder: 'd' }));
+  assert.ok(!cloudFormReady({ provider: 'webdav', connected: true, folder: 'd' }));
+  assert.ok(!cloudFormReady({ provider: 'googleDrive', connected: true, folder: '../x' }));
 });
 
 test('where to create a token, by host', () => {
@@ -152,5 +202,6 @@ test('a dropped file is a logbook when it is .ssrf or .xml', () => {
 test('where a new logbook is kept, for its ready screen', () => {
   assert.deepEqual(keptIn({ id: 'f', kind: 'file', name: 'a', location: '/home/me/Documents/a.ssrf' }, t), { key: 'whereComputer', where: 'Documents' });
   assert.deepEqual(keptIn({ id: 'f', kind: 'file', name: 'a', location: '/d/OpenDives/a.ssrf', provider: 'googleDrive' }, t), { key: 'whereCloud', where: 'Google Drive, dossier OpenDives' });
+  assert.deepEqual(keptIn({ id: 'c', kind: 'cloud', name: 'a', location: 'OpenDives/a.ssrf', provider: 'googleDrive' }, t), { key: 'whereCloud', where: 'Google Drive, dossier OpenDives' });
   assert.deepEqual(keptIn({ id: 'g', kind: 'git', name: 'a', location: 'https://h.org/o/r.git' }, t), { key: 'whereGit', where: 'h.org/o/r' });
 });

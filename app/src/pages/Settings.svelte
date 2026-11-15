@@ -31,6 +31,7 @@
   import { t, tIfExists, deviceLanguage } from '../lib/i18n.js';
   import { CATEGORIES, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
+  import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
   import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
   import {
     settings,
@@ -65,6 +66,13 @@
    */
 
   onMount(async () => {
+    if (desktopApp) {
+      try {
+        startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.startup()).mode;
+      } catch (e) {
+        console.error('Reading the start-up choice', e);
+      }
+    }
     // Tablet: the overview opens with its first subpage beside it; a subpage marks its row.
     if (section) selected.id = section;
     try {
@@ -88,6 +96,8 @@
 
   let search = $state('');
   let renumbering = $state(false);
+  /** « Ouvrir au démarrage » (desktop): kept by the main process, read here when the page opens. @type {'last'|'ask'} */
+  let startupMode = $state('last');
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
 
   /** @type {{ kind: 'choice', row: Extract<Row, {kind: 'choice'}>, options: Option[], anchor: HTMLElement } | { kind: 'number', row: Extract<Row, {kind: 'number'}> } | null} */
@@ -1025,6 +1035,30 @@
       case 'textSize':
         return desktopApp
           ? { title: '', rows: [{ kind: 'textSize', id: 'textSize', label: t('desktopSettings.textSize.label'), text: t('desktopSettings.textSize.text', { keys: textKeys }), value: t(`desktopSettings.textSize.${textSize.id}`) }] }
+          : null;
+      case 'startup':
+        return desktopApp
+          ? {
+              title: '',
+              rows: [
+                {
+                  kind: 'choice',
+                  id: 'startup',
+                  label: t('desktopCloud.startup.label'),
+                  text: t('desktopCloud.startup.text'),
+                  value: t(`desktopCloud.startup.${startupMode}`),
+                  current: startupMode,
+                  options: () => STARTUP_MODES.map((mode) => ({ value: mode, label: t(`desktopCloud.startup.${mode}`) })),
+                  set: async (/** @type {string} */ v) => {
+                    try {
+                      startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.setStartup({ mode: v })).mode;
+                    } catch (e) {
+                      failed(e);
+                    }
+                  },
+                },
+              ],
+            }
           : null;
       case 'logbookFile':
         return desktopApp && logbookPath

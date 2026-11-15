@@ -194,9 +194,7 @@
       "git": "Dépôt git",
       "googleDrive": "Google Drive",
       "oneDrive": "Microsoft OneDrive",
-      "dropbox": "Dropbox",
-      "iCloud": "iCloud Drive",
-      "webdav": "WebDAV ou Nextcloud"
+      "dropbox": "Dropbox"
     },
     "when": {
       "openNow": "ouvert maintenant",
@@ -217,8 +215,7 @@
       "computerHelp": "Un fichier carnet (.ssrf), dans le dossier de votre choix",
       "cloud": "Dans votre nuage",
       "cloudHelp": "{services} · synchronisé entre vos appareils",
-      "cloudServices": "Google Drive, OneDrive, Dropbox ou WebDAV",
-      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive ou WebDAV",
+      "cloudServices": "Google Drive, OneDrive ou Dropbox",
       "git": "Dans un dépôt git",
       "gitHelp": "Votre propre dépôt · historique complet des changements",
       "continue": "Continuer",
@@ -226,12 +223,9 @@
       "back": "Retour",
       "create": "Créer le carnet",
       "creating": "Création…",
-      "cloudIntro": "Choisissez le service dont l'application est installée sur cet ordinateur. Le carnet sera un fichier de son dossier synchronisé.",
-      "folderFound": "Dossier trouvé",
-      "folderMissing": "Dossier à choisir",
+      "cloudIntro": "La connexion se fait dans votre navigateur. Le carnet est un fichier du service, copié sur cet ordinateur.",
       "notAvailable": "Pas encore disponible",
       "folderLabel": "Dossier",
-      "folderBrowse": "Choisir…",
       "folderHelp": "Le fichier «  {file}  » y sera créé. OpenDives n'a accès qu'aux fichiers qu'il crée ou que vous ouvrez.",
       "gitUrl": "Adresse du dépôt",
       "gitUrlPlaceholder": "https://github.com/vous/carnet.git",
@@ -272,6 +266,53 @@
       "open": "Ouvrir",
       "failed": "La copie n'a pas pu être enregistrée.",
       "sameFile": "Choisissez un autre fichier que celui du carnet ouvert."
+    }
+  },
+  "desktopCloud": {
+    "browserPage": {
+      "done": "Connexion réussie",
+      "doneText": "Vous pouvez fermer cet onglet et revenir à OpenDives.",
+      "failed": "Connexion impossible",
+      "failedText": "Revenez à OpenDives et réessayez."
+    },
+    "conflict": {
+      "title": "« {name} » a changé à deux endroits",
+      "local": "La copie de cet ordinateur",
+      "remote": "La copie de {service}",
+      "later": "Décider plus tard",
+      "modified": "modifiée le {date}",
+      "warning": "La copie que vous ne gardez pas est remplacée."
+    },
+    "row": {
+      "signIn": "Se connecter",
+      "signingIn": "Connexion dans le navigateur…",
+      "connected": "Connecté · {account}",
+      "connectedNoAccount": "Connecté"
+    },
+    "folderPlaceholder": "OpenDives",
+    "folderHelp": "Le fichier « {file} » sera créé dans ce dossier de {service}. OpenDives n’accède qu’à ses propres fichiers.",
+    "folderError": "Le nom du dossier contient un caractère interdit.",
+    "signIn": "Se connecter à {service}",
+    "signOut": "Se déconnecter de {service}",
+    "errors": {
+      "NOT_SIGNED_IN": "Connectez-vous d’abord à ce service.",
+      "NOT_AVAILABLE": "Ce service n’est pas encore disponible.",
+      "SIGN_IN_DENIED": "La connexion a été refusée.",
+      "SIGN_IN_TIMEOUT": "La connexion n’a pas abouti. Réessayez.",
+      "SIGN_IN_EXPIRED": "La connexion a expiré. Connectez-vous de nouveau.",
+      "STATE_MISMATCH": "La réponse du navigateur ne correspond pas à cette connexion. Réessayez.",
+      "PORT_BUSY": "Un autre programme utilise l’adresse de connexion. Fermez-le et réessayez.",
+      "CREDENTIALS_NOT_SAVED": "Cet ordinateur ne peut pas garder la connexion de façon sûre.",
+      "DENIED": "Le service refuse l’accès à ce dossier.",
+      "NETWORK": "Le service ne répond pas. Vérifiez la connexion.",
+      "EXISTS": "Un fichier de ce nom existe déjà dans ce dossier.",
+      "other": "Le carnet n’a pas pu être créé."
+    },
+    "startup": {
+      "label": "Ouvrir au démarrage",
+      "text": "Le dernier carnet rouvre chaque carnet ouvert à la fermeture, dans sa fenêtre",
+      "last": "Le dernier carnet",
+      "ask": "Choisir à chaque fois"
     }
   },
   "sync": {

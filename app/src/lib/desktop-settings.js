@@ -7,7 +7,7 @@
 /**
  * The categories, in the order of the left column. `groups` are the ids of the phone's groups of
  * rows (pages/Settings.svelte) and of the few blocks that are not rows (`unitSystem`,
- * `textSize`, `logbookFile`, `computersKnown`, `reset`) shown in this category.
+ * `textSize`, `startup`, `logbookFile`, `computersKnown`, `reset`) shown in this category.
  * `icon`: the path of a 24 dp outline icon (the phone's overview uses the same).
  * @type {readonly { id: string, icon: string, groups: readonly string[] }[]}
  */
@@ -15,7 +15,7 @@ export const CATEGORIES = [
   { id: 'language', icon: 'M4 5h9 M8.5 3v2 M6 5c1 4 4 7 7 8 M11 5c-1 4-4 7-7 8 M13 20l4-9 4 9 M14.5 17h5', groups: ['language'] },
   { id: 'units', icon: 'M3 17h18v-6H3z M7 11v3 M11 11v2 M15 11v3 M19 11v2', groups: ['unitSystem', 'units', 'units2'] },
   { id: 'display', icon: 'M12 3a9 9 0 1 0 0 18V3z M12 3a9 9 0 0 1 0 18', groups: ['display', 'textSize', 'profileDisplay', 'po2Graph'] },
-  { id: 'logbook', icon: 'M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z M9 8h6 M9 12h6', groups: ['logbook', 'logbookFile'] },
+  { id: 'logbook', icon: 'M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z M9 8h6 M9 12h6', groups: ['logbook', 'startup', 'logbookFile'] },
   { id: 'equipment', icon: 'M10.6 3v2c-2.5.5-4.5 2.7-4.5 5.7V19c0 1.7 1.3 2.5 3 2.5h5.8c1.7 0 3-.8 3-2.5v-8.3c0-3-2-5.2-4.5-5.7V3z', groups: ['equipment'] },
   { id: 'decompression', icon: 'M3 5l3 7 4 3 5 1 3-4 3-7', groups: ['deco', 'conditions', 'flight'] },
   { id: 'gases', icon: 'M8 21V9a4 4 0 0 1 8 0v12z M12 5V3 M8 14h8', groups: ['partialPressures'] },
