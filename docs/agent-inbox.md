@@ -3836,3 +3836,7 @@ Only the profile's width and margins change: its shape, height and colours stay 
 Test: on a tablet, in both orientations, there is screen background between the profile and every edge of the screen; in landscape, the profile's left edge lines up with the heading.
 
 Done: landscape, the profile starts at the heading's 56 dp inset, ends at the 56 dp column gap before the choices and keeps 56 dp above the bottom edge; portrait, it is 520 dp wide and centred, its left edge on the logo, 32 dp under the heading as before. Shape, height and colours unchanged; the phone unchanged. Checked in Edge at 1280 × 800 and 800 × 1280; test in `tests/app/welcome-start.test.mjs`.
+
+## [ ] 2026-11-15-212 A new to-do tag: [site]
+
+Christian decided this on 15 November 2026. To-dos and ideas get a third tag, `[site]`, for the product's website, opendives.app (folder `site/`): its pages, texts, look and publishing. The rule is written in `docs/TODOS.md` and `docs/IDEAS.md`. The design agent sorts the items; #34 (where to announce the free APKs) is now `[site]`. A `[site]` item follows the usual split: its pages and texts are designed on the canvas and sent to you as tasks, and building and publishing `site/` are yours. Nothing to code: read the rule, mark this task done.
