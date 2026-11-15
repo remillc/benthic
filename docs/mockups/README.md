@@ -198,6 +198,12 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-outils-ead-mod.dc.html` | Outils · bureau, EAD et MOD |
 | `bureau-outils-meilleur-melange.dc.html` | Outils · bureau, meilleur mélange |
 | `bureau-outils-melangeur.dc.html` | Outils · bureau, mélangeur de gaz |
+| `bureau-reglages.dc.html` | Réglages · bureau (Windows, Linux), unités |
+| `bureau-reglages-groupe.dc.html` | Réglages · bureau · copie du groupe |
+| `bureau-reglages-affichage.dc.html` | Réglages · bureau, affichage |
+| `bureau-reglages-compte.dc.html` | Réglages · bureau, compte et synchronisation |
+| `bureau-reglages-recherche.dc.html` | Réglages · bureau, recherche |
+| `bureau-reglages-macos.dc.html` | Réglages · bureau macOS, fenêtre séparée |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
 | `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
 | `bureau-carnet-exporter.dc.html` | Carnet · bureau, exporter des plongées |
