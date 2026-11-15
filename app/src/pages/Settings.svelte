@@ -22,7 +22,7 @@
   import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { layout, ios, bottomNav } from '../lib/layout.svelte.js';
+  import { layout, ios, bottomNav, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
@@ -854,6 +854,11 @@
           href: '/settings/advanced',
           summary: t('settings.overview.advanced'),
         },
+        // Desktop, Windows and Linux: À propos is the last row of Réglages (task 2026-11-15-169);
+        // the Mac has it in its menu bar.
+        ...(desktopApp && !desktopMac
+          ? [{ id: 'about', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v6 M12 7.5v.5', href: '/about', summary: t('settings.overview.version', { version: __APP_VERSION__ }) }]
+          : []),
       ],
     },
   ]);

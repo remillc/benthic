@@ -16,7 +16,7 @@
   import { navigation, openOver, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
-  import { layout, ios } from '../lib/layout.svelte.js';
+  import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
 
   const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(logbook.email || t('menu.noAccount'));
@@ -220,6 +220,8 @@
       {/if}
     </div>
 
+    <!-- Desktop: Réglages and À propos leave the sheet (rail, or the Mac's menu bar; task 2026-11-15-169). -->
+    {#if !desktopApp}
     <div class="od-account-sheet--card">
       <a href="#settings" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openSettings))}>
         <Icon name="settings" />
@@ -237,6 +239,7 @@
         <Icon name="chevron" size={20} />
       </a>
     </div>
+    {/if}
   </div>
   {/if}
 </Sheet>

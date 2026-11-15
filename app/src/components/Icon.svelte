@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'trip'|'export'|'columns',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -49,6 +49,11 @@
     redo: 'M15 14l5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13',
     // A desktop computer: a screen on a stand (task 2026-11-14-167).
     desktop: 'M4 5h16v10H4zM2 19h20',
+    // Desktop logbook (task 2026-11-15-169): a suitcase (add to a trip), an upload arrow (export),
+    // three columns (the columns button).
+    trip: 'M9 7V5h6v2M4 7h16v12H4zM4 12h16',
+    export: 'M12 15V4M7 9l5-5 5 5M5 15v5h14v-5',
+    columns: 'M4 5h16v14H4zM9.5 5v14M14.5 5v14',
     computer: 'M9 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM10 7h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM10 17h4',
     tripRemove: 'M4 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM5.5 7V4.5h5V7M6 11v8M10 11v8M17 13h5',
     renumber: 'M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 11h2.5l-2.5 3h2.5M3.5 16h2.5v4.5h-2.5M4 18.2h2',

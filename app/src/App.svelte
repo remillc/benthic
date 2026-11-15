@@ -48,6 +48,8 @@
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
   import NavRail from './components/NavRail.svelte';
+  import DesktopLogbook from './pages/DesktopLogbook.svelte';
+  import DesktopSelection from './pages/DesktopSelection.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   // The route badge, for development builds: shown when app/.env.local (not in git) sets
@@ -199,7 +201,13 @@
 
   const logbookRoutes = [
     appRoutes[0],
-    { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, PANE_EMPTY] },
+    {
+      path: '/',
+      // Desktop app from 1200 dp: the logbook as a table (task 2026-11-15-169); else the list.
+      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopLogbook : Logbook }),
+      master: true,
+      detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, { path: '/pane/selection', component: DesktopSelection }, PANE_EMPTY],
+    },
     ...appRoutes,
   ];
 
@@ -265,6 +273,15 @@
     },
     routes: appRoutes,
   };
+
+  // Desktop app: crossing 1200 dp swaps the logbook's table and the tablet's list.
+  let desktopShown = layout.desktop;
+  $effect(() => {
+    const wide = layout.desktop;
+    if (wide === desktopShown) return;
+    desktopShown = wide;
+    f7.views.get('#view-logbook')?.router.navigate('/', { reloadAll: true, animate: false });
+  });
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.
   $effect(() => {

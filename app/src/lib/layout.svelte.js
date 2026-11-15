@@ -12,6 +12,18 @@ export const ios =
     typeof navigator !== 'undefined' &&
     (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)));
 
+/**
+ * The desktop app (Electron, task 2026-11-15-169): its preload script gives the interface
+ * `window.odDesktop`. Material 3 Expressive on every system (docs/system-design.md, section 7).
+ */
+export const desktopApp = typeof window !== 'undefined' && !!(/** @type {any} */ (window).odDesktop);
+
+/** The Mac's desktop app: its menu bar, ⌘ in shortcuts, no Réglages in the rail. */
+export const desktopMac = desktopApp && /** @type {any} */ (window).odDesktop.platform === 'darwin';
+
+/** From this width the desktop app shows the logbook as a table beside the detail; below, the tablet layout. */
+export const desktopBreakpoint = 1200;
+
 /** Width of the tablet navigation, in px: the iPad sidebar, the Android rail (spec, section 3). */
 export const navWidth = ios ? 220 : 96;
 
@@ -39,6 +51,7 @@ export const railBreakpoint = splitBreakpoint;
 const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 767.98px)') : null;
 const railQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${railBreakpoint}px)`) : null;
 const splitQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${splitBreakpoint}px)`) : null;
+const desktopQuery = desktopApp && typeof matchMedia === 'function' ? matchMedia(`(min-width: ${desktopBreakpoint}px)`) : null;
 
 export const layout = $state({
   phone: query ? query.matches : true,
@@ -46,6 +59,8 @@ export const layout = $state({
   rail: railQuery ? railQuery.matches : false,
   /** Tablet layout with room for the list and the detail side by side. */
   split: splitQuery ? splitQuery.matches : false,
+  /** Desktop app, wide enough for the logbook's table and the detail pane. */
+  desktop: desktopQuery ? desktopQuery.matches : false,
 });
 
 query?.addEventListener('change', (e) => {
@@ -64,4 +79,7 @@ railQuery?.addEventListener('change', (e) => {
 });
 splitQuery?.addEventListener('change', (e) => {
   layout.split = e.matches;
+});
+desktopQuery?.addEventListener('change', (e) => {
+  layout.desktop = e.matches;
 });

@@ -91,6 +91,13 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 // into `json`. Returns 0, or -1 with `error` set.
 int list_dives(const std::string &log, std::string &json, std::string &error);
 
+// The desktop logbook's table columns beyond those of list_dives, for every dive
+// list_dives lists, in the same order: a JSON array of
+// {id, waterTempMk, airTempMk, meanDepthMm, sacMlMin, rating, buddies: [], guides: [],
+//  computer, suit, gases: [] (the used cylinders' mixes, without repeats), tags: [],
+//  divemode, country}. Read only.
+int dive_columns(std::string &json);
+
 // Sets the Subsurface cloud account and writes the log address into `url`,
 // in Subsurface's format: "https://<server>/git/<email>[<email>]".
 // Needs no network.

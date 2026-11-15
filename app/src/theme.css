@@ -60,6 +60,10 @@
     --od-selected: var(--od-secondary);
     /* The selected fill (a selected card or row): lighter than the container. */
     --od-selected-container: #E6EEF8;
+    /* Desktop (task 2026-11-15-169): the selected row of a table, and a destructive menu item. */
+    --od-table-selected: #D4E2F2;
+    --od-on-table-selected: #114477;
+    --od-menu-danger: #B71C1C;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     /* A safe outcome (the planner: no deco stop), in the oxygen green. */
@@ -241,6 +245,9 @@
     --od-chart-high: #C97A35;
     --od-on-tertiary-container: #FBE3B2;
     --od-selected-container: #1A2D47;
+    --od-table-selected: #1A2D47;
+    --od-on-table-selected: #BFD6F0;
+    --od-menu-danger: #FF8A80;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;
     --od-on-error-container: #FDE2E0;
