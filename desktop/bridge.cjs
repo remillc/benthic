@@ -74,7 +74,7 @@ const CORE_METHODS = new Set([
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
   'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',
-  'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
+  'saveLogbookFile', 'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
   'dcBluetoothModels', 'downloadPartial', 'downloadCancel', 'setSyncListener', 'ping',
 ]);
@@ -95,6 +95,7 @@ const PATH_ARGS = {
   cloudDeleteAccount: { keepDivesIn: 'data' },
   divelogsDownload: { outPath: 'write' },
   exportDives: { path: 'write' },
+  saveLogbookFile: { path: 'write' },
 };
 
 /** Files of userData the renderer never reaches by path. */
@@ -412,14 +413,13 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     writeMeta(ctx, file);
   }
 
-  /** Every dive of the logbook in memory, as a .ssrf file at `target` (never the logbook's own file while it is open elsewhere). */
+  /** The logbook in memory, saved as Subsurface's Save As does, as a .ssrf file at `target` (never the logbook's own file while it is open elsewhere). */
   async function exportAll(ctx, target) {
     const staged = path.join(tempDir, 'share', `copy-${ctx.key}-${Date.now()}.ssrf`);
     fs.mkdirSync(path.dirname(staged), { recursive: true, mode: 0o700 });
     try {
-      const ids = JSON.parse(await ctx.host.call('listLoadedDives', {})).map((d) => d.id);
-      if (ids.length) await ctx.host.call('exportDives', { ids, format: 'ssrf', anonymize: false, path: staged });
-      else fs.writeFileSync(staged, logbooks.EMPTY_LOGBOOK);
+      // Subsurface's own File > Save As: the whole log, with its settings, sites and filter presets.
+      await ctx.host.call('saveLogbookFile', { path: staged });
       const tmp = `${target}.od-tmp`;
       fs.copyFileSync(staged, tmp);
       try {

@@ -1461,6 +1461,22 @@ int export_dives(const std::vector<int> &ids, const std::string &format, bool an
 	return ret;
 }
 
+int save_logbook_file(const std::string &path, std::string &error)
+{
+	if (path.empty()) {
+		error = "BAD_REQUEST";
+		return -1;
+	}
+	// File > Save As in Subsurface's main window: save_dives() writes the whole
+	// log (every dive, site, trip reached by a dive, the settings, the filter
+	// presets), not the selected dives only.
+	if (save_dives(path.c_str())) {
+		error = "SAVE_FAILED";
+		return -1;
+	}
+	return 0;
+}
+
 namespace internal {
 
 int load(const std::string &path, std::string &error)
