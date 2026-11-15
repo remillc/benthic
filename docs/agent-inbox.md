@@ -3358,3 +3358,18 @@ English: « Merge into one dive », « Only dives that follow one another, less 
 
 Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface for desktop opens with both profile parts; two dives with another dive between them, or 2 h apart, leave the item disabled; undo restores both dives byte for byte in the logbook; « Modifier ensemble » on three dives with two different sites shows « Plusieurs valeurs » and changes only the edited fields; removing a buddy chip removes it from every dive that had it; copied text pastes into a spreadsheet as columns; copied dives pasted into another logbook arrive once, and a second paste finds them as duplicates.
 
+## [ ] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
+
+Christian decided this on 15 November 2026. On macOS, Annuler and Rétablir are in the Édition menu of the menu bar (task 169). On Windows and Linux they were only keyboard shortcuts and the snackbar's « Annuler », which goes away. Mock-up: `docs/mockups/bureau-sites-nettoyer-fusion.dc.html` (menu open after a merge).
+
+- In every section (Carnet, Sites, Statistiques, Outils), the ⋮ menu of the top bar starts with:
+  - « Annuler : {dernière action} » with « Ctrl+Z » at the right, naming the last change as the macOS Édition menu does (« Annuler : Fusionner les sites », « Annuler : Modifier le site », « Annuler : Fusionner les plongées »);
+  - « Rétablir » (« Rétablir : {action} » when there is one) with « Ctrl+Maj+Z »;
+  - then a divider and the section's own items.
+- Each is greyed out (38 %) when there is nothing to undo or redo. Icons: an arrow turning back for Annuler, forward for Rétablir.
+- The undo history is the same one as Ctrl+Z, task 172: one history per window and logbook.
+
+English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
+
+Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
+
