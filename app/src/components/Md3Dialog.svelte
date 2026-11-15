@@ -223,7 +223,6 @@
       letter-spacing: 0;
     }
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       .od-md3-dialog--actions :global(button) {

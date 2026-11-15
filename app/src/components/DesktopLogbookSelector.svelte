@@ -258,7 +258,6 @@
       color: var(--od-text-2);
     }
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       .od-logbook-selector--pill {

@@ -115,7 +115,6 @@
       color: var(--od-on-secondary);
     }
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       .od-button-group--button {

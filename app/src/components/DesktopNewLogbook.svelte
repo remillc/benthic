@@ -842,5 +842,31 @@
       outline: 2px solid var(--od-action);
       outline-offset: 2px;
     }
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-new-logbook--button,
+      .od-new-logbook--text-button {
+        transition: box-shadow 120ms linear;
+      }
+      .od-new-logbook--button:not(:disabled):hover,
+      .od-new-logbook--text-button:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-new-logbook--button,
+      .od-new-logbook--text-button {
+        transition: none;
+      }
+    }
+
+    /* Mouse: a text action underlines. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-new-logbook--link-button:hover,
+      .od-new-logbook--help a:hover {
+        text-decoration: underline;
+      }
+    }
   }
 </style>

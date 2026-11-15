@@ -882,7 +882,6 @@
   .od-dive-profile--layers {
     --f7-chip-outline-border-color: var(--od-chip-outline);
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       .od-dive-profile--chip {
