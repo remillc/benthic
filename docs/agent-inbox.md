@@ -3692,3 +3692,30 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils
 English: « Leave empty if the cylinder is empty ».
 
 Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
+
+## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
+
+Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
+
+**Réglages, Windows and Linux:** a section of the main window, reached by the gear of the rail or Ctrl+,. Top bar « Réglages » with « Enregistrés tout de suite, sur cet ordinateur » and a search field « Rechercher un réglage » (Ctrl+F). On the left, the categories (300 dp, icon + name, selected row #D4E2F2 with 12 dp corners): Langue et formats, Unités, Affichage, Carnet, Équipement, Profil et décompression, Gaz et pressions partielles, Recycleur, Ordinateurs et téléchargement, Cartes hors ligne, Avancé. On the right, the category's settings in white cards (16 dp corners) grouped under small headings, max 720 dp wide: each row has the label, an optional helper line and its control at the end (switch, dropdown field #ECEAE4 with chevron, or a connected button group with a check for 2 to 3 choices, never radio buttons). No Save button: every change applies at once.
+
+**Search:** typing filters across every category, the section becomes « 4 réglages pour « plafond » », each result shows its category under its label, the matched word highlighted (#FBE3B2).
+
+**Réglages › Carnet** also holds « Fichier du carnet »: « Emplacement » (the path, with « Afficher dans le dossier », which opens the system file manager) and « Ouvrir au démarrage » (Le dernier carnet / Choisir à chaque fois).
+
+**Desktop additions to Affichage:** « Taille du texte » (Petite, Normale, Grande; Ctrl++ and Ctrl+- change it too). Do not add « Arrondir le plafond aux paliers de 3 m » seen in the search mock-up: it is only an example.
+
+**macOS:** the settings open in a separate window (OpenDives › Réglages… ⌘, or the rail's gear), 980 × 680, the categories in a sidebar with a search field, the window titled with the chosen category, ⌘W closes it. Same content.
+
+**No « Compte et synchronisation » category.** The account initial at the bottom of the rail opens the **account sheet** (anchored above it, 380 dp, 16 dp corners): initial, address, « Synchronisé il y a 2 min · plongees.ssrf », « Synchroniser maintenant » (filled), the switches « Synchroniser automatiquement » and « Seulement sur Wi-Fi ou câble » (« Jamais sur un partage de connexion »), a divider, « Se déconnecter ». Escape or a click outside closes it.
+
+**« À propos d'OpenDives »** is no longer in Réglages:
+- Windows and Linux: the last item of the ⋮ menus, after a divider: the Carnet's list ⋮ (task 194's menu), the Sites ⋮ (« Nettoyer les sites… », divider, « À propos d'OpenDives »), the Statistiques ⋮.
+- macOS: also OpenDives › À propos d'OpenDives in the app menu, as every Mac app.
+- It opens the About page of the phone (version, licences, libraries) in a dialog.
+
+**Statistiques:** the « Filtrer » button leaves the top bar. The ⋮ holds « Filtre libre… » (Ctrl+Maj+F, opens the filter side sheet), a divider and « À propos d'OpenDives ». An active filter is still shown by the bar above the chart (« Mode : circuit ouvert · 6 plongées sur 9 » with ✕).
+
+English: « Settings », « Saved at once, on this computer », « Search settings », « Logbook file », « Location », « Show in folder », « Open at startup », « Text size », « Account », « Sync now », « Sync automatically », « Only on Wi-Fi or cable », « Sign out », « About OpenDives », « Free filter… », « Clean up sites… ».
+
+Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
