@@ -1832,6 +1832,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Détail d'une plongée : le menu ⋮ de la barre d'actions se ferme d'un appui ailleurs ou d'un second appui sur ⋮.",
       "Carnet : « dernière plongée il y a … » ne se coupe plus en fin de ligne.",
       "Compte : la bande d’en-tête garde sa vague quand la page défile.",
       "Suppression du compte cloud : un assistant en trois étapes (ce qui sera effacé, vos plongées, confirmer), le bouton final désactivé tant que le mot de passe n’est pas saisi.",
