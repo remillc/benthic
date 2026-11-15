@@ -3761,3 +3761,9 @@ From top to bottom, under the unchanged header band:
 Dark mode: the same layout with the dark tokens (card `--od-surface`, icon container `--od-tint`, button in the dark ink). English: « No dives yet », « Start with your dive computer, or pick another way below. », « Pair a dive computer », « Other ways to add dives », « Import a file » — « .ssrf, .xml and other logbooks », « Download from divelogs.de » — « With your divelogs.de username », « Log a dive by hand » — « Date, depth and time are enough ».
 
 Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
+
+## [ ] 2026-11-15-205 iPhone first launch: check the water colour under the profile
+
+Christian approved this on 15 November 2026. The mock-up `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone ») had the water under the profile going from #D4E2F2 to black (#1F2124); it now goes to #5584B5, as on Android and everywhere else. `app/src/pages/WelcomeStart.svelte` already uses `--od-water-top` and `--od-water-bottom`, so this is a check, not a change: on iOS (light and dark), the water must end in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the profile line stay `--od-trace`. If an iOS-specific style or an older build still darkens it, fix it there.
+
+Test: the iPhone first launch in light mode shows a blue water column, never black, under a #1F2124 line.
