@@ -1859,6 +1859,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on a tablet: the dive profile no longer touches the screen edges.",
       "First launch on a tablet: a larger logo and OpenDives name.",
       "First launch on iPhone and iPad: one line under the title and a one-line helper under each choice, as on Android.",
       "Empty logbook: a dive profile, a large « Pair a dive computer » button and, in a card, the other ways to add dives (import a file, download from divelogs.de, log a dive by hand).",
