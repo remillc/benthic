@@ -168,6 +168,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-sites-groupe.dc.html` | Sites · bureau · copie du groupe |
 | `bureau-sites-fiche.dc.html` | Sites · bureau, fiche d’un site |
 | `bureau-sites-modifier.dc.html` | Sites · bureau, modifier un site sur place |
+| `bureau-sites-modifier-pays.dc.html` | Sites · bureau, pays proposé pendant la saisie |
 | `bureau-sites-recherche.dc.html` | Sites · bureau, recherche ouverte |
 | `bureau-sites-superposes.dc.html` | Sites · bureau, épingles superposées |
 | `bureau-sites-nouveau.dc.html` | Sites · bureau, nouveau site |
