@@ -14,7 +14,8 @@ test('the empty logbook shows the profile, the title, the pair button and the op
   assert.match(empty, /<DecorativeProfile trace/);
   assert.match(empty, /logbook\.emptyTitle/);
   assert.match(empty, /od-logbook--empty-pair/);
-  assert.match(empty, /logbook\.emptyPair/);
+  assert.match(empty, /<Icon name="diveComputer"[^>]*\/>\{t\('logbook\.emptyDownload'\)\}/);
+  assert.doesNotMatch(empty, /logbook\.emptyPair|name="bluetooth"/);
   assert.match(empty, /<nav class="od-logbook--empty-options" aria-label=\{t\('logbook\.emptyOthers'\)\}/);
 });
 
@@ -40,4 +41,15 @@ test('every text of the screen exists in French and English', () => {
   }
   assert.equal(langs.fr.logbook.emptyTitle, "Aucune plongée pour l'instant");
   assert.equal(langs.en.logbook.emptyOthers, 'Other ways to add dives');
+});
+
+test('task 220: « Télécharger mes plongées », the dive computer icon, the iPhone help text', () => {
+  const fr = JSON.parse(readFileSync(new URL('../../app/src/i18n/fr.json', import.meta.url), 'utf8'));
+  const en = JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8'));
+  assert.equal(fr.logbook.emptyDownload, 'Télécharger mes plongées');
+  assert.equal(en.logbook.emptyDownload, 'Download my dives');
+  assert.equal(fr.logbook.emptyPair, undefined);
+  assert.match(fr.logbook.emptyTextIos, /^Téléchargez vos plongées depuis votre ordinateur de plongée\./);
+  const icon = readFileSync(new URL('../../app/src/components/Icon.svelte', import.meta.url), 'utf8');
+  assert.match(icon, /diveComputer: 'M9 5\.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\.5M9 18\.5V21[^']*M7\.5 9\.5h1l1\.8 4\.5h2\.4l1\.3-2h1\.2l1\.3-2\.5M19 10\.5h1\.5'/);
 });

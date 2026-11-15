@@ -34,6 +34,8 @@
     keyboard: 'M3.5 6.5h17v11h-17zM7 10h.01M10 10h.01M14 10h.01M17 10h.01M7 14h.01M17 14h.01M9.5 14h5',
     clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7.5V12l3 2',
     bluetooth: 'M7 7l10 10-5 4V3l5 4L7 17',
+    // A wrist dive computer with a dive profile on its screen (task 2026-11-15-220): straps, case, profile, button.
+    diveComputer: 'M9 5.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M9 18.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.5M9 5.5h6a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5a4 4 0 0 1 4-4zM7.5 9.5h1l1.8 4.5h2.4l1.3-2h1.2l1.3-2.5M19 10.5h1.5',
     // The same, crossed out: no Bluetooth connection (download failed).
     bluetoothOff: 'M4 4l16 16M7 7l3.5 3.5M12 10V3l5 4-3 3M12 14v7l5-4-3.5-3.5M7 17l3-3',
     merge: 'M6 3v4c0 3 6 5 6 8v6M18 3v4c0 3-6 5-6 8',

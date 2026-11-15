@@ -35,6 +35,7 @@
     "retry": "Try again",
     "emptyTitle": "No dives yet",
     "emptyText": "Start with your dive computer, or pick another way below.",
+    "emptyTextIos": "Download your dives from your dive computer. You can also import an existing logbook or log a dive by hand.",
     "noResults": "No dive matches “{query}”.",
     "count": {
       "one": "{n} dive",
@@ -108,7 +109,7 @@
     "filterOn": "Filter the dives, a filter is applied",
     "filterFailed": "The filter could not be applied. All dives are shown.",
     "emptyCloud": "Connected to the Subsurface cloud, no dives",
-    "emptyPair": "Pair a dive computer",
+    "emptyDownload": "Download my dives",
     "emptyDivelogs": "Download from divelogs.de",
     "emptyOthers": "Other ways to add dives",
     "emptyImport": "Import a file",
@@ -1864,6 +1865,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Empty logbook: the main button becomes « Download my dives », with a dive computer icon; the computer is paired during the download.",
       "First launch: the « Any questions? About and contact » link at the bottom of the screen opens About, with the support address.",
       "The decorative dive profile (first launch, empty logbook, account pages) is a smooth curve, without corners.",
       "First launch on a tablet: the dive profile no longer touches the screen edges.",

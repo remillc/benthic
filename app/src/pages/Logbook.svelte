@@ -1275,9 +1275,9 @@
         <span class="od-logbook--empty-bubble od-logbook--empty-bubble-3"></span>
       </div>
       <h2 class="od-state-title od-logbook--empty-title">{t('logbook.emptyTitle')}</h2>
-      <p class="od-logbook--empty-text">{t('logbook.emptyText')}</p>
+      <p class="od-logbook--empty-text">{t(theme.ios ? 'logbook.emptyTextIos' : 'logbook.emptyText')}</p>
       <a href={downloadRoute} class="od-logbook--empty-pair">
-        <Icon name="bluetooth" size={20} weight={2} />{t('logbook.emptyPair')}
+        <Icon name="diveComputer" size={20} weight={2} />{t('logbook.emptyDownload')}
       </a>
       <nav class="od-logbook--empty-options" aria-label={t('logbook.emptyOthers')}>
         {#each emptyChoices as c (c.key)}

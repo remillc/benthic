@@ -4080,3 +4080,5 @@ Christian approved this on 15 November 2026.
 - Every « Créer le carnet » of task 218 lands here.
 
 **Test:** on each platform, the empty logbook shows « Télécharger mes plongées » with the dive computer icon, and it opens the download.
+
+Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
