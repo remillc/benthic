@@ -3743,3 +3743,21 @@ Tests: the launcher icon, the splash screen (light and dark), the About screen, 
 
 Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
 
+
+## [ ] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
+
+Christian approved this on 15 November 2026. Mock-up: `docs/mockups/android-etat-vide.dc.html` (« Carnet vide · Android »). The empty state of the Logbook (`app/src/pages/Logbook.svelte`, `emptyTitle`), on phone and tablet (on tablet, the same column, max 440 dp wide, centred as on the tablet first launch).
+
+From top to bottom, under the unchanged header band:
+- **Illustration:** the dive profile of the first launch (`android-tablette-premier-lancement-portrait.dc.html`, the same path), 104 dp high, 24 dp margins left and right, 16 dp under the band, directly on the page background (no card, no label). Water between the surface and the profile in the gradient `--od-water-top` to `--od-water-bottom` (0.9 opacity), profile line `--od-trace` 1.25 dp. Three white bubble outlines (1.5 dp stroke) rising in the water of the descent, the smallest lowest (radius 2.5, 3.5, 4.5 dp). Decorative: `aria-hidden`.
+- **Title** « Aucune plongée pour l'instant », 24 sp, weight 500, 20 dp under the illustration; then « Commencez par votre ordinateur de plongée, ou choisissez une autre façon ci-dessous. » (16 sp, `--od-text-2`).
+- **« Associer un ordinateur de plongée »:** a full-width filled button (24 dp margins), 56 dp high, fully rounded, ink #1F2124 with white text and the Bluetooth icon.
+- **The other ways**, grouped in one white card (24 dp corners, 16 dp margins, `nav` « Autres façons d'ajouter des plongées »), rows of 60 dp min separated by 1 dp #ECEAE4, each with a 44 dp tonal icon container (#D4E2F2, 14 dp corners, icon #114477), a title (16 sp, 500), a helper line (13 sp, `--od-text-2`) and a chevron:
+  - « Importer un fichier » — « .ssrf, .xml et autres carnets » (download icon; opens the file picker as today);
+  - « Télécharger depuis divelogs.de » — « Avec votre identifiant divelogs.de » (cloud icon; opens the divelogs.de step as today);
+  - « Noter une plongée à la main » — « Date, profondeur et durée suffisent » (pencil icon; opens the dive editor).
+- The small note at the bottom (« Les fichiers de Subsurface… s'importent ici. ») is removed: its content is now the helper of « Importer un fichier ».
+
+Dark mode: the same layout with the dark tokens (card `--od-surface`, icon container `--od-tint`, button in the dark ink). English: « No dives yet », « Start with your dive computer, or pick another way below. », « Pair a dive computer », « Other ways to add dives », « Import a file » — « .ssrf, .xml and other logbooks », « Download from divelogs.de » — « With your divelogs.de username », « Log a dive by hand » — « Date, depth and time are enough ».
+
+Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
