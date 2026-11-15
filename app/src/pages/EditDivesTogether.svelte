@@ -10,6 +10,7 @@
   // applied to each dive, nothing else is replaced. « Enregistrer » applies everything at once
   // as one undoable step (lib/multi-dive.js, lib/logbook.svelte.js).
   import { onMount } from 'svelte';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
@@ -123,7 +124,7 @@
       return;
     }
     try {
-      await editDivesTogether(ids, changes);
+      await editDivesTogether(ids, changes, navigation.dive === null ? null : Number(navigation.dive));
       leave();
       offerUndo(t('multiDive.edited', { n }));
     } catch (e) {

@@ -6,7 +6,6 @@ import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
-import { navigation } from './navigation.svelte.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
@@ -216,17 +215,16 @@ export async function mergeDives(ids) {
  * synced like an edit. `changes` is built by `multiEditChanges` of lib/multi-dive.js.
  * @param {number[]} ids
  * @param {Record<string, string|number|string[]>} changes
+ * @param {number|null} [openId] the dive open in the detail pane (tablet), refreshed when it is one of them
  */
-export async function editDivesTogether(ids, changes) {
+export async function editDivesTogether(ids, changes, openId = null) {
   const result = await OpenDivesCore.editDives({ ids, changes });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   // The dive open in the detail pane (tablet), if it was one of them, shows its new values.
-  const open = navigation.dive;
-  const openId = Number(open);
-  if (open !== null && ids.includes(openId)) logbook.edited = { id: openId, dive: await OpenDivesCore.getDive({ id: openId }) };
+  if (openId !== null && ids.includes(openId)) logbook.edited = { id: openId, dive: await OpenDivesCore.getDive({ id: openId }) };
   await persistChanges();
 }
 
