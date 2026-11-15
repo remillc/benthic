@@ -3667,3 +3667,17 @@ Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up
 - The aria-label: « Bouteille à 220 bar : hélium, oxygène et air, dans l'ordre du gonflage ».
 
 Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
+
+## [ ] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
+
+Christian noticed on 15 November 2026 that the app's « Dans la bouteille » section does not match the mock-ups, and that the red text at the bottom must be corrected. Mock-ups (the reference): `docs/mockups/outils-melangeur-nitrox-android.dc.html`, `outils-melangeur-android.dc.html` (Trimix), `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`.
+
+- **« Dans la bouteille », Nitrox:** Pression (with its unit) and Mélange (dropdown, « EAN32 ») side by side, then « Compléter avec » (dropdown, « Air ») on its own line. **Trimix:** Pression on its own line, then Oxygène and Hélium (two dropdowns) side by side, then « Compléter avec ». MD3 filled fields, 56 dp, as in the rest of the screen.
+- **Under Pression**, the helper « Laissez vide si la bouteille est vide » (as the app already does; now in the mock-ups).
+- **The note at the bottom is no longer red:** « Pressions à lire bouteille refroidie. Au-delà de 40 % d'oxygène, la bouteille et le robinet doivent être nettoyés pour l'oxygène. » in 13 sp `--od-text-2`. Red stays for errors (a mix that cannot be reached).
+- **« Analysez le mélange avant de plonger. »** becomes an amber banner: #FBE3B2, 12 dp corners, 16 dp margins, a 20 dp warning triangle, 14 sp text.
+- Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the screen to the commit description.
+
+English: « Leave empty if the cylinder is empty », « Analyse the mix before diving. ».
+
+Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alone then Oxygène and Hélium; no text of the screen is red when the mix can be reached; the analyse banner is amber.
