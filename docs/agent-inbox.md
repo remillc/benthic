@@ -3454,3 +3454,21 @@ English: « avg. 17.9 m ».
 
 Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
 
+## [ ] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-groupe.dc.html` (the menu shown open).
+
+The ⋮ button at the top right of the detail pane opens a Material 3 menu (300 dp wide, 16 dp corners, #EFEFEC, items 44 dp with a 20 dp icon and the shortcut at the right in 13 px #4B4A47), in this order:
+- Agrandir le profil (Ctrl/⌘+P): the profile fills the detail pane; Échap returns.
+- Ajouter à un voyage…; when the dive is in a trip, « Retirer du voyage » follows it.
+- Renuméroter la plongée…
+- Copier (Ctrl/⌘+C), as in task 178.
+- Exporter… (Ctrl/⌘+Maj+E).
+- a divider, then Supprimer la plongée (Suppr) in #B3261E, with the usual confirmation.
+
+The same actions stay in the right-click menu of the table row. No « Modifier » item: the fields are edited in place (tasks 172 and 184).
+
+English: « Enlarge the profile », « Add to a trip… », « Remove from the trip », « Renumber the dive… », « Copy », « Export… », « Delete the dive ».
+
+Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
+
