@@ -1607,6 +1607,77 @@
     "nameHintShort": "Facultatif. Proposé d’après les critères",
     "rules": "Plusieurs valeurs cochées : les plongées qui ont l’une ou l’autre. Plusieurs critères : les plongées qui les remplissent tous."
   },
+  "desktopStats": {
+    "list": "Statistiques",
+    "filter": "Filtrer",
+    "filterActive": "Filtrer, un filtre est actif",
+    "exportChart": "Exporter le graphique",
+    "exportFailed": "Le graphique n'a pas pu être exporté.",
+    "filePrefix": "OpenDives-statistique",
+    "newStatistic": "+ Nouvelle statistique",
+    "more": "Plus d'options pour les statistiques",
+    "hoursUnit": "h",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "kinds": {
+      "byYear": {
+        "title": "Plongées par année"
+      },
+      "maxDepth": {
+        "title": "Profondeur maximale"
+      },
+      "time": {
+        "title": "Temps sous l'eau"
+      },
+      "sac": {
+        "title": "Consommation (SAC)"
+      },
+      "bySite": {
+        "title": "Plongées par site"
+      },
+      "heat": {
+        "title": "Carte de chaleur"
+      }
+    },
+    "subtitle": {
+      "byYear": "{dives}, {from} à {to}",
+      "byYearSingle": "{dives}, {year}",
+      "maxDepth": "Par plongée",
+      "time": "{time} au total",
+      "sac": "Moyenne {sac}",
+      "sacNone": "Aucune consommation enregistrée",
+      "bySite": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "heat": "Où vous plongez le plus"
+    },
+    "tip": "{what} · {value}",
+    "open": {
+      "one": "Clic pour la voir",
+      "other": "Clic pour les voir"
+    },
+    "noSite": "Sans site",
+    "noData": "Rien à afficher pour ces plongées.",
+    "noSac": "Aucune consommation enregistrée pour ces plongées.",
+    "figure": {
+      "total": "Total",
+      "bestYear": "Meilleure année",
+      "mean": "Moyenne",
+      "perYear": "{n} par année",
+      "yearValue": "{year}, {value}",
+      "deepest": "Plus profonde",
+      "shallowest": "Moins profonde",
+      "longestYear": "Année la plus longue",
+      "meanPerDive": "Moyenne par plongée",
+      "lowest": "Plus basse",
+      "highest": "Plus haute",
+      "sites": "Sites",
+      "busiest": "Site le plus visité",
+      "withoutSite": "Sans site",
+      "siteValue": "{site}, {dives}"
+    }
+  },
   "tools": {
     "title": "Outils",
     "groupGas": "Gaz",

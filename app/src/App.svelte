@@ -49,6 +49,7 @@
   import DownloadFailed from './pages/DownloadFailed.svelte';
   import NavRail from './components/NavRail.svelte';
   import DesktopLogbook from './pages/DesktopLogbook.svelte';
+  import DesktopStatistics from './pages/DesktopStatistics.svelte';
   import DesktopSelection from './pages/DesktopSelection.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
@@ -218,8 +219,10 @@
   const statisticsRoutes = [
     {
       path: '/statistics/',
-      component: Statistics,
-      master: true,
+      // Desktop app from 1200 dp: the list and the chart of the chosen statistic on one page
+      // (task 2026-11-15-171), not a master with a detail beside it; else the tablet's list.
+      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopStatistics : Statistics }),
+      master: () => !layout.desktop,
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
         { path: '/statistics/dives/', component: StatisticsDives },
@@ -281,6 +284,7 @@
     if (wide === desktopShown) return;
     desktopShown = wide;
     f7.views.get('#view-logbook')?.router.navigate('/', { reloadAll: true, animate: false });
+    f7.views.get('#view-statistics')?.router.navigate('/statistics/', { reloadAll: true, animate: false });
   });
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.
