@@ -3485,3 +3485,14 @@ English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
 
 Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
 
+## [ ] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
+
+Christian decided this on 15 November 2026 (follows task 173). « Enregistrer une copie… » stays the only way to save a logbook elsewhere: there is no « Enregistrer sous », since saving is automatic and each logbook has its own window.
+
+- After the copy is written, a snackbar: « Copie enregistrée · Ouvrir ». « Ouvrir » opens the copy in a new window; the window of the original stays open and unchanged. Without « Ouvrir », nothing else happens.
+- Same on macOS (Fichier › Enregistrer une copie…, ⇧⌘S), Windows and Linux (logbook selector, Ctrl+Maj+S).
+
+English: « Copy saved · Open ».
+
+Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
+
