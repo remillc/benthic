@@ -17,7 +17,8 @@
   const kept = entry ? keptIn(entry, t) : null;
   const mod = desktopMac ? '⌘' : 'Ctrl+';
   const ways = [
-    { key: 'download', icon: 'download', shortcut: `${mod}D`, run: ondownload },
+    // « Télécharger mes plongées » with the dive computer icon, as the empty logbook (task 2026-11-15-220).
+    { key: 'download', icon: 'diveComputer', shortcut: `${mod}D`, run: ondownload },
     { key: 'import', icon: 'document', shortcut: `${mod}I`, run: onimport },
     { key: 'manual', icon: 'edit', shortcut: `${mod}N`, run: onmanual },
   ];

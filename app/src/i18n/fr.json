@@ -265,7 +265,7 @@
       "whereComputer": "«  {name}  » est gardé sur cet ordinateur, dans {where}. Ajoutez vos premières plongées :",
       "whereCloud": "«  {name}  » est gardé dans {where}. Ajoutez vos premières plongées :",
       "whereGit": "«  {name}  » est gardé dans le dépôt {where}. Ajoutez vos premières plongées :",
-      "download": "Télécharger depuis un ordinateur de plongée",
+      "download": "Télécharger mes plongées",
       "downloadHelp": "Bluetooth ou câble USB",
       "import": "Importer un fichier",
       "importHelp": "Subsurface, UDDF, divelogs.de, Garmin .fit…",

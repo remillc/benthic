@@ -265,7 +265,7 @@
       "whereComputer": "“{name}” is kept on this computer, in {where}. Add your first dives:",
       "whereCloud": "“{name}” is kept in {where}. Add your first dives:",
       "whereGit": "“{name}” is kept in the repository {where}. Add your first dives:",
-      "download": "Download from a dive computer",
+      "download": "Download my dives",
       "downloadHelp": "Bluetooth or USB cable",
       "import": "Import a file",
       "importHelp": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
