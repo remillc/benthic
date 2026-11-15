@@ -165,6 +165,16 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
 | `bureau-carnet-groupe.dc.html` | Carnet · bureau · copie du groupe |
 | `bureau-sites.dc.html` | Sites · bureau (Windows, Linux) |
+| `bureau-sites-groupe.dc.html` | Sites · bureau · copie du groupe |
+| `bureau-sites-fiche.dc.html` | Sites · bureau, fiche d’un site |
+| `bureau-sites-modifier.dc.html` | Sites · bureau, modifier un site sur place |
+| `bureau-sites-recherche.dc.html` | Sites · bureau, recherche ouverte |
+| `bureau-sites-superposes.dc.html` | Sites · bureau, épingles superposées |
+| `bureau-sites-nouveau.dc.html` | Sites · bureau, nouveau site |
+| `bureau-sites-sans-site.dc.html` | Sites · bureau, plongées sans site |
+| `bureau-sites-sans-site-choisir.dc.html` | Sites · bureau, choisir un site pour une plongée |
+| `bureau-sites-nettoyer.dc.html` | Sites · bureau, nettoyer les sites |
+| `bureau-sites-nettoyer-fusion.dc.html` | Sites · bureau, sites fusionnés |
 | `bureau-stats.dc.html` | Statistiques · bureau (Windows, Linux) |
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
