@@ -63,6 +63,16 @@
     /* Desktop (task 2026-11-15-169): the selected row of a table, and a destructive menu item. */
     --od-table-selected: #D4E2F2;
     --od-on-table-selected: #114477;
+    /* Desktop Statistiques (tasks 2026-11-15-171 and 176): the chart bars, the previews of the list, the heat map's grid, the tooltip's second line. */
+    --od-desk-stats-bar: #7FA3C8;
+    --od-desk-stats-bar-strong: #114477;
+    --od-desk-stats-preview: #8FB0D6;
+    --od-desk-stats-heat-0: #ECEAE4;
+    --od-desk-stats-heat-1: #D4E2F2;
+    --od-desk-stats-heat-2: #8FB0D6;
+    --od-desk-stats-heat-3: #3F6F9F;
+    --od-desk-stats-heat-4: #114477;
+    --od-desk-stats-tip-hint: #D4E2F2;
     --od-menu-danger: #B71C1C;
     /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
     --od-buddy-badge: #E3E1DC;
@@ -253,6 +263,15 @@
     --od-selected-container: #1A2D47;
     --od-table-selected: #1A2D47;
     --od-on-table-selected: #BFD6F0;
+    --od-desk-stats-bar: #4C7FB8;
+    --od-desk-stats-bar-strong: #BFD6F0;
+    --od-desk-stats-preview: #4C7FB8;
+    --od-desk-stats-heat-0: #2E3033;
+    --od-desk-stats-heat-1: #1E3552;
+    --od-desk-stats-heat-2: #2D5E90;
+    --od-desk-stats-heat-3: #4C8BD4;
+    --od-desk-stats-heat-4: #BFD6F0;
+    --od-desk-stats-tip-hint: #2B66AD;
     --od-menu-danger: #FF8A80;
     --od-buddy-badge: #3A3C40;
     --od-trip-band: #26282B;

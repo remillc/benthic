@@ -3231,6 +3231,8 @@ English: « Search for a site », « 5 dives without a site · Find them a site 
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
 
+Done (Statistiques part, branch feature/desktop-stats): `pages/DesktopStatistics.svelte` (chosen in `App.svelte` on `layout.desktop`), `components/DesktopStatChart.svelte` (hover tooltip, a click selects the bar's dives in the Carnet), top bar with Filtrer, Annuler, Rétablir and a ⋮ naming the undo step, « Exporter le graphique » as a PNG through the share path (download fallback). Sites and Outils are not done in this branch.
+
 ## [ ] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
 
 Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 171); phone and tablet are unchanged. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Automatic saving » and « Editing a dive in place ». Mock-up: `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
@@ -3291,7 +3293,7 @@ Christian decided this on 15 November 2026. In task 171, « 5 plongées sans sit
 
 Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
 
-## [ ] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
+## [x] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
 
 Christian decided this on 15 November 2026. The list of statistics on the left of the desktop Statistiques screen gets an icon and a preview on each row. Mock-up: `docs/mockups/bureau-stats.dc.html`.
 
@@ -3302,6 +3304,8 @@ Christian decided this on 15 November 2026. The list of statistics on the left o
 - « + Nouvelle statistique » is unchanged.
 
 Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
+
+Done: the rows of the list carry the icon tile, the summary line and the preview (`components/DesktopStatIcon.svelte`, `DesktopStatPreview.svelte`, data in `lib/desktop-stats.js`); statistics the diver created take the bars icon and a preview of their per-dive depths. Tests: `tests/app/desktop-stats.test.mjs`.
 
 ## [ ] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
 

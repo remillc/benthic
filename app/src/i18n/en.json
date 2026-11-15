@@ -1607,6 +1607,77 @@
     "nameHintShort": "Optional. Proposed from the criteria",
     "rules": "Several checked values: the dives that have any of them. Several criteria: the dives that meet all of them."
   },
+  "desktopStats": {
+    "list": "Statistics",
+    "filter": "Filter",
+    "filterActive": "Filter, a filter is on",
+    "exportChart": "Export the chart",
+    "exportFailed": "The chart could not be exported.",
+    "filePrefix": "OpenDives-statistic",
+    "newStatistic": "+ New statistic",
+    "more": "More statistics options",
+    "hoursUnit": "h",
+    "undo": "Undo",
+    "redo": "Redo",
+    "kinds": {
+      "byYear": {
+        "title": "Dives per year"
+      },
+      "maxDepth": {
+        "title": "Maximum depth"
+      },
+      "time": {
+        "title": "Time under water"
+      },
+      "sac": {
+        "title": "Consumption (SAC)"
+      },
+      "bySite": {
+        "title": "Dives per site"
+      },
+      "heat": {
+        "title": "Heat map"
+      }
+    },
+    "subtitle": {
+      "byYear": "{dives}, {from} to {to}",
+      "byYearSingle": "{dives}, {year}",
+      "maxDepth": "Per dive",
+      "time": "{time} in total",
+      "sac": "Mean {sac}",
+      "sacNone": "No consumption recorded",
+      "bySite": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "heat": "Where you dive most"
+    },
+    "tip": "{what} · {value}",
+    "open": {
+      "one": "Click to see it",
+      "other": "Click to see them"
+    },
+    "noSite": "No site",
+    "noData": "Nothing to show for these dives.",
+    "noSac": "No consumption recorded for these dives.",
+    "figure": {
+      "total": "Total",
+      "bestYear": "Best year",
+      "mean": "Mean",
+      "perYear": "{n} per year",
+      "yearValue": "{year}, {value}",
+      "deepest": "Deepest",
+      "shallowest": "Shallowest",
+      "longestYear": "Longest year",
+      "meanPerDive": "Mean per dive",
+      "lowest": "Lowest",
+      "highest": "Highest",
+      "sites": "Sites",
+      "busiest": "Most visited",
+      "withoutSite": "Without a site",
+      "siteValue": "{site}, {dives}"
+    }
+  },
   "tools": {
     "title": "Tools",
     "groupGas": "Gas",
