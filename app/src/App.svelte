@@ -22,6 +22,7 @@
   import ConfirmCode from './pages/ConfirmCode.svelte';
   import ImportProgress from './pages/ImportProgress.svelte';
   import EditDive from './pages/EditDive.svelte';
+  import EditDivesTogether from './pages/EditDivesTogether.svelte';
   import Trip from './pages/Trip.svelte';
   import Sites from './pages/Sites.svelte';
   import SiteSheet from './pages/SiteSheet.svelte';
@@ -150,6 +151,12 @@
     {
       path: '/dives/:id/edit',
       async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(!layout.rail ? { component: EditDive } : { popup: { component: EditDive } }),
+    },
+    // « Modifier ensemble… » on the checked dives (?ids=1,2,3): the same kind of screen.
+    {
+      path: '/dives/edit-together',
+      async: (/** @type {{ resolve: Function }} */ { resolve }) =>
+        resolve(!layout.rail ? { component: EditDivesTogether } : { popup: { component: EditDivesTogether } }),
     },
     // A dive opened from another section (site, tools) or from a trip: the
     // same screen, without the master-detail routing of the Logbook, which

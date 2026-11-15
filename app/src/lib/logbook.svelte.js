@@ -212,7 +212,7 @@ export async function mergeDives(ids) {
 }
 
 /**
- * The same changes on several dives, one undoable step (« Modifier ensemble »), saved and
+ * The same changes on several dives, one undoable step (Â« Modifier ensemble Â»), saved and
  * synced like an edit. `changes` is built by `multiEditChanges` of lib/multi-dive.js.
  * @param {number[]} ids
  * @param {Record<string, string|number|string[]>} changes

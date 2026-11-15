@@ -1155,6 +1155,20 @@ html.ios {
     .ios .od-menu .item-after {
       color: var(--od-text);
     }
+
+    /* A menu item that cannot be used now (« Fusionner en une plongée »): 38 %, with the
+       reason on a second line; it takes no touch. */
+    .od-menu .od-menu-item--disabled {
+      pointer-events: none;
+      opacity: 0.38;
+    }
+
+    .od-menu .od-menu-item--disabled .item-text {
+      white-space: normal;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+    }
 }
 
 /*
