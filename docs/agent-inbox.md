@@ -3230,3 +3230,27 @@ Christian decided this on 15 November 2026. Follows tasks 169 and 170 (the Elect
 English: « Search for a site », « 5 dives without a site · Find them a site », « See the dives », « Export the chart », « New statistic », « Print the slate », « Save the plan », « Total duration », « Stops ».
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
+
+## [ ] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
+
+Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 171); phone and tablet are unchanged. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Automatic saving » and « Editing a dive in place ». Mock-up: `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+**1. Automatic saving.**
+- Every change is saved to the device as soon as it is made: a field of a dive, a site or a setting, a merge, a reorder. No « Enregistrer » button; closing the window or switching dives never asks to save.
+- Ctrl/⌘+Z undoes, Ctrl/⌘+Maj+Z redoes, across fields and dives. When the change is not visible on screen, a snackbar names it with « Annuler » (« Plongée fusionnée · Annuler »).
+- Saving is separate from synchronisation, which keeps its own mode (automatic or manual) and its pending count.
+- **Exceptions that keep a button:** creating from a form that is not valid until complete (Nouveau site, a dive logged by hand: « Ajouter » and « Annuler »); « Enregistrer le plan » in the planner (it adds a planned dive); every confirmation of an irreversible action (delete, sign out, delete the account).
+
+**2. Editing a dive in place.** The detail pane is the editor; there is no separate edit screen on desktop, and the ✎ button leaves the detail pane.
+- **At rest:** an editable value sits in a #ECEAE4 field, 8 dp corners, 40 dp high; an empty one shows its invitation in #4B4A47 (« Ajouter la visibilité »). A read-only value is plain text with no field. Under the key figures, a line with a computer icon: « Enregistré par l'ordinateur de plongée, non modifiable ».
+- **Hover:** a 1 dp #8F8D86 outline and a pencil at the right.
+- **Editing:** a click, or Tab from the previous field, turns the field into an input in place: white, 2 dp #114477 border, « Entrée pour garder · Échap pour annuler » under it. Entrée or leaving the field keeps the value (and saves it); Échap restores it. Tab moves to the next editable field.
+- **Buddies and site:** chips for the chosen buddies (#D4E2F2, #114477, ✕ to remove), and a list under the field with what is already in the logbook (« Juha · 1 plongée ») and « Ajouter « Ju » comme nouveau compagnon ».
+- **Équipement and Gaz tabs:** their rows are edited in place the same way (add, remove, reorder a cylinder).
+- **The Carnet table:** a double click on an editable cell (Site, Compagnons and the columns the diver added) edits it in place.
+- **Read-only:** what the dive computer recorded (profile, maximum depth, duration, temperatures, pressures). Editable only for a dive logged by hand.
+- **Shortcuts:** Ctrl/⌘+E puts the focus on the first editable field. With several dives selected, « Modifier ensemble… » stays a dialog.
+
+English: « Add the visibility », « Recorded by the dive computer, can't be edited », « Enter to keep · Esc to cancel », « Add “Ju” as a new buddy », « Dive merged · Undo ».
+
+Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
