@@ -3286,7 +3286,7 @@ The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They
 
 Done: the start screen uses `logo-light.svg` / `logo-dark.svg` of `app/public` (the same drawing as `docs/brand/opendives-logo-*.svg`, not redrawn) at 64 dp. Windows and Linux keep the system title bar with the window icon `icon-round.png` (task 170); task 169 put no other logo in the desktop screens.
 
-## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
+## [x] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
 
 Christian decided this on 15 November 2026. In task 171, « 5 plongées sans site · Leur trouver un site » sat under the Sites table and was pushed out of the window by a long list. Mock-up: `docs/mockups/bureau-sites.dc.html`.
 
@@ -3311,7 +3311,7 @@ Tests: each built-in statistic shows its icon and a preview drawn from the logbo
 
 Done: the rows of the list carry the icon tile, the summary line and the preview (`components/DesktopStatIcon.svelte`, `DesktopStatPreview.svelte`, data in `lib/desktop-stats.js`); statistics the diver created take the bars icon and a preview of their per-dive depths. Tests: `tests/app/desktop-stats.test.mjs`.
 
-## [ ] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
+## [x] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
 
 Christian decided this on 15 November 2026. Follows tasks 171 and 175 (the Sites screen and its « plongées sans site » bar), with the same shell, list pane, resize handle, in-place editing and automatic saving (task 172). Mock-ups in `docs/mockups/`: `bureau-sites` (now with « Nouveau site » in the top bar, Ctrl/⌘+N), `bureau-sites-fiche`, `bureau-sites-modifier`, `bureau-sites-modifier-pays`, `bureau-sites-recherche`, `bureau-sites-superposes`, `bureau-sites-nouveau`, `bureau-sites-sans-site`, `bureau-sites-sans-site-choisir`, `bureau-sites-nettoyer`, `bureau-sites-nettoyer-fusion`. The phone screens (Fiche d'un site, Modifier le site, Nouveau site, Plongées sans site, Nettoyer les sites) are the reference for wording and rules.
 

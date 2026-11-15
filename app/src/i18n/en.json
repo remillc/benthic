@@ -1687,6 +1687,71 @@
     "editSite": "Edit the site {name}",
     "editedNoDuplicate": "{name} edited, no longer a possible duplicate"
   },
+  "desktopSites": {
+    "column": {
+      "name": "Site",
+      "country": "Country",
+      "dives": "Dives",
+      "last": "Latest"
+    },
+    "withoutBar": {
+      "one": "{n} dive without a site",
+      "other": "{n} dives without a site"
+    },
+    "findThem": "Find them a site",
+    "cleanUp": "Clean up the sites",
+    "searchNote": "Results: site names, regions and countries. Esc to see everything again.",
+    "seeDives": "See the dives",
+    "modify": "Edit",
+    "deepestAt": "{depth} at the deepest",
+    "deepest": "Deepest",
+    "moreSites": "More site options",
+    "resize": "Width of the site list",
+    "emptyTitle": "No sites",
+    "emptyText": "A site appears when a dive has one. “New site” adds one.",
+    "keepHint": "Enter to keep · Esc to cancel",
+    "orMoveMap": "or move the map",
+    "moveHint": "Move the map or the crosshair to correct",
+    "clickToPlace": "Click the map to place the crosshair",
+    "placeExplain": "Country and region update when the position changes, unless you corrected them.",
+    "coordinatesExample": "For example -35.4485, 174.732, or click the map",
+    "updatedFromPosition": "Updated from the new position",
+    "savedAtOnce": "Every change is saved at once.",
+    "sitesInLogbook": {
+      "one": "{n} site in the logbook",
+      "other": "{n} sites in the logbook"
+    },
+    "addName": "Add a name",
+    "addCoordinates": "Add coordinates",
+    "addCountry": "Add a country",
+    "addRegion": "Add a region",
+    "addDescription": "Add a description",
+    "addNotes": "Add notes",
+    "addSite": "Add the site",
+    "cancel": "Cancel",
+    "zoomHere": "Zoom in here",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "deleted": "Site deleted",
+    "merged": "Sites merged",
+    "mergedOne": "Merged: a single site",
+    "cleanupIntro": "Merging keeps a single site, with all its dives. It can be undone ({shortcut}).",
+    "possibleDuplicates": "Possible duplicates",
+    "noDuplicates": "No possible duplicates",
+    "noUnused": "No site without a dive",
+    "chooseSite": "Choose a site…",
+    "nearestToDive": "Nearest to the dive",
+    "mostRecent": "Most recently dived",
+    "newSiteNamedHere": "New site “{text}” at the dive’s position",
+    "newSiteNamed": "New site “{text}”",
+    "noPosition": "No position recorded: choose the site, or create it and place it on the map.",
+    "otherTripDives": {
+      "one": "and {n} other dive of this trip",
+      "other": "and {n} other dives of this trip"
+    },
+    "assignAll": "Assign them all to the same site",
+    "noneWithout": "Every dive has a site."
+  },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
     "dialogTextChecked": {
