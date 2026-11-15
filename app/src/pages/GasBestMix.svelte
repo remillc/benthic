@@ -19,6 +19,9 @@
   import Po2Field from '../components/Po2Field.svelte';
   import GasResults from '../components/GasResults.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
+  import Icon from '../components/Icon.svelte';
+  import { layout } from '../lib/layout.svelte.js';
+  import { requestBlend } from '../lib/gas-handoff.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { depthUnit, formatNumber } from '../lib/format.js';
@@ -60,6 +63,19 @@
       result = null;
     }
   });
+
+  /** The label of "Prepare this mix": it names the mix on a tablet, where there is room. */
+  const prepareLabel = $derived.by(() => {
+    if (!result || layout.phone) return t('tools.bestMixPrepare');
+    const o2 = formatNumber(result.bestO2 / 10, 0);
+    return trimix ? t('tools.bestMixPrepareTrimix', { o2, he: formatNumber(result.bestHe / 10, 0) }) : t('tools.bestMixPrepareNitrox', { o2 });
+  });
+
+  /** Leaves the advised mix to the blender, which opens with the link. */
+  function prepare() {
+    // The mix as shown (whole percent), not the unrounded figures of the calculation.
+    if (result) requestBlend(mode, Math.round(result.bestO2 / 10) * 10, trimix ? Math.round(result.bestHe / 10) * 10 : 0);
+  }
 
   /** One result row: the tab's mix. */
   const rows = $derived.by(() => {
@@ -115,6 +131,12 @@
   <p class="od-gas-best-mix--caption">
     {t(trimix ? (logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic') : 'tools.bestMixNoteNitrox')}
   </p>
+  {#if result}
+    <a class="od-outlined-button od-gas-best-mix--prepare" href="/tools/blender" onclick={prepare}>
+      <Icon name="blender" size={18} />
+      <span>{prepareLabel}</span>
+    </a>
+  {/if}
 </Page>
 
 <style>
@@ -160,8 +182,18 @@
       }
     }
 
+    .od-gas-best-mix--prepare {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 20px 32px;
+      padding: 0 16px;
+      box-sizing: border-box;
+      text-decoration: none;
+    }
+
     .od-gas-best-mix--caption {
-      margin: 8px 20px 32px;
+      margin: 8px 20px 16px;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;

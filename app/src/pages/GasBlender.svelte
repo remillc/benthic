@@ -5,6 +5,8 @@
     o2: '32',
     he: '35',
     finalPressure: '',
+    // The value the cylinder put in the final pressure (kept to tell it from a typed one).
+    autoFinal: '',
     cylinder: '',
     insidePressure: '',
     insideO2: '21',
@@ -16,7 +18,9 @@
 
 <script>
   // @ts-check
+  import { untrack } from 'svelte';
   import { deviceStore } from '../lib/device-store.js';
+  import { takeBlend } from '../lib/gas-handoff.js';
   // Gas blender (docs/ui-specification.md, section 1, "Tools page and gas
   // tools"; docs/mockups/outils-melangeur-android.dc.html, outils-melangeur-
   // nitrox-android.dc.html): partial pressure blending of nitrox and trimix.
@@ -30,10 +34,12 @@
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
+  import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatCylinderSize, formatGasVolume, formatNumber } from '../lib/format.js';
   import { parseDecimal } from '../lib/tools.js';
   import { gasBlend } from '../lib/gas-blend.js';
+  import { followCylinder, aboveWorkingPressure } from '../lib/gas-blender-form.js';
   import { t } from '../lib/i18n.js';
 
   const prefs = logbook.prefs;
@@ -52,7 +58,9 @@
       return 'nitrox';
     }
   }
-  let mode = $state(readMode());
+  // "Prepare this mix" of Best mix: the mode and the wanted mix, once.
+  const handoff = takeBlend();
+  let mode = $state(handoff?.mode ?? readMode());
   /** @param {'nitrox'|'trimix'} next */
   function setMode(next) {
     mode = next;
@@ -85,9 +93,10 @@
   }
   const oxygenFirst = $derived(trimix && order === 'oxygen');
 
-  let o2 = $state(saved.o2);
-  let he = $state(saved.he);
-  let finalPressure = $state(saved.finalPressure || (psi ? '3000' : '200'));
+  let o2 = $state(handoff ? String(handoff.o2 / 10) : saved.o2);
+  let he = $state(handoff && handoff.mode === 'trimix' ? String(handoff.he / 10) : saved.he);
+  // Starts at the working pressure of the cylinder (see the effect below).
+  let finalPressure = $state(saved.finalPressure);
   let cylinder = $state(saved.cylinder);
   let insidePressure = $state(saved.insidePressure);
   let insideO2 = $state(saved.insideO2);
@@ -129,6 +138,22 @@
   const topUpInvalid = $derived(!(topUpO2Value >= 1 && topUpO2Value <= 99));
   const cylinderMl = $derived(cylinders.find((c) => c.name === cylinder)?.ml ?? 0);
   const invalid = $derived(wantedInvalid || finalInvalid || insideInvalid || insideMixInvalid || topUpInvalid || cylinderMl <= 0);
+
+  /** Working pressure of the chosen cylinder, in mbar (0 when unknown). */
+  const workingMbar = $derived(cylinders.find((c) => c.name === cylinder)?.workingPressureMbar ?? 0);
+  const workingText = $derived(workingMbar > 0 ? pressureText(workingMbar) : '');
+  const aboveWorking = $derived(!finalInvalid && aboveWorkingPressure(Math.round(finalValue * MBAR_PER_UNIT), workingMbar));
+
+  // The final pressure follows the cylinder's working pressure until the diver types a value;
+  // a typed value stays when the cylinder changes.
+  $effect(() => {
+    const wm = workingMbar;
+    untrack(() => {
+      const next = followCylinder({ current: finalPressure, lastAuto: saved.autoFinal, workingMbar: wm, mbarPerUnit: MBAR_PER_UNIT, fallback: psi ? '3000' : '200' });
+      finalPressure = next.value;
+      saved.autoFinal = next.auto;
+    });
+  });
 
   $effect(() => {
     Object.assign(saved, { o2, he, finalPressure, cylinder, insidePressure, insideO2, insideHe, topUp, topUpO2 });
@@ -194,7 +219,8 @@
   ]);
   /** 0 to 100 %, for the oxygen and helium left in the cylinder (any combination). */
   const percentOptions = Array.from({ length: 101 }, (_, i) => ({ value: String(i), label: `${i} ${t('units.percent')}` }));
-  const oxygenRich = $derived(o2Value > 40);
+  /** Oxygen left in a nitrox cylinder, one mix: "EAN32". */
+  const nitroxOptions = Array.from({ length: 101 }, (_, i) => ({ value: String(i), label: i === 0 ? `0 ${t('units.percent')}` : `EAN${i}` }));
 </script>
 
 <Page class="od-gas-blender">
@@ -221,21 +247,24 @@
         {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
       </TextField>
     {:else}
-      <TextField label={t('tools.blendFinalPressure')} bind:value={finalPressure} inputmode="decimal" invalid={finalInvalid}>
-        {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
-      </TextField>
+      <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
     {/if}
   </div>
-  {#if trimix}
-    <div class="od-gas-blender--pair">
-      <TextField label={t('tools.blendFinalPressure')} bind:value={finalPressure} inputmode="decimal" invalid={finalInvalid}>
-        {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
-      </TextField>
+  <div class="od-gas-blender--pair">
+    {#if trimix}
       <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
-    </div>
-  {:else}
-    <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
-  {/if}
+    {/if}
+    <TextField
+      label={t('tools.blendFinalPressure')}
+      bind:value={finalPressure}
+      inputmode="decimal"
+      invalid={finalInvalid}
+      warning={aboveWorking}
+      supporting={aboveWorking ? t('tools.blendAboveWorking', { pressure: workingText }) : workingText ? t('tools.blendWorking', { pressure: workingText }) : ''}
+    >
+      {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
+    </TextField>
+  </div>
 
   <h2 class="od-gas-blender--label">{t('tools.blendInside')}</h2>
   <div class="od-gas-blender--pair">
@@ -248,14 +277,16 @@
     >
       {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
     </TextField>
-  </div>
-  <!-- Always shown: oxygen, and helium in trimix mode (task 2026-11-07-23). -->
-  <div class="od-gas-blender--pair">
-    <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
-    {#if trimix}
-      <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
+    {#if !trimix}
+      <SelectField label={t('tools.blendInsideMix')} bind:value={insideO2} options={nitroxOptions} />
     {/if}
   </div>
+  {#if trimix}
+    <div class="od-gas-blender--pair">
+      <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
+      <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
+    </div>
+  {/if}
   <SelectField label={t('tools.blendTopUp')} bind:value={topUp} options={topUpOptions} />
   {#if topUp === 'nitrox'}
     <TextField label={t('tools.blendTopUpOxygen')} bind:value={topUpO2} inputmode="decimal" invalid={topUpInvalid}>
@@ -296,9 +327,11 @@
     <p class="od-gas-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
   {/if}
 
-  <p class="od-gas-blender--caption">{t('tools.blendCooled')}</p>
-  <p class="od-gas-blender--caption" class:od-gas-blender--alarm={oxygenRich}>{t('tools.blendOxygenClean')}</p>
-  <p class="od-gas-blender--caption">{t('tools.blendAnalyse')}</p>
+  <p class="od-gas-blender--caption">{t('tools.blendCooled')} {t('tools.blendOxygenClean')}</p>
+  <p class="od-gas-blender--analyse">
+    <Icon name="warning" size={20} />
+    <span>{t('tools.blendAnalyse')}</span>
+  </p>
   <div class="od-gas-blender--bottom"></div>
 </Page>
 
@@ -336,7 +369,8 @@
       margin: 0 16px;
       align-items: flex-start;
 
-      :global(.od-text-field--field) {
+      :global(.od-text-field--field),
+      :global(.od-select-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -429,9 +463,23 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
 
-      &.od-gas-blender--alarm {
-        color: var(--od-alarm);
+    /* Amber banner: what waits for the diver (tertiary container, docs/system-design.md). */
+    .od-gas-blender--analyse {
+      margin: 16px 16px 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--od-tertiary-container);
+      color: var(--od-on-tertiary-container);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 20px;
+
+      :global(svg) {
+        flex: none;
       }
     }
 

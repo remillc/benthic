@@ -3632,7 +3632,7 @@ English: « Plan », « More plan options », « Share the plan… », « Planne
 
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
 
-## [ ] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
+## [x] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
 
 Christian decided this on 15 November 2026, to match the desktop (task 196). Mock-ups: `docs/mockups/outils-meilleur-melange-android.dc.html`, `outils-meilleur-melange-trimix-android.dc.html`, `android-tablette-meilleur-melange-paysage.dc.html`, `android-tablette-meilleur-melange-portrait.dc.html`.
 
@@ -3643,6 +3643,8 @@ Christian decided this on 15 November 2026, to match the desktop (task 196). Moc
 English: « Prepare this mix », « Prepare the 25/28 trimix ».
 
 Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » opens the blender in Trimix with 25 % oxygen and 28 % helium.
+
+Done: in Meilleur mélange (phone and tablet), an outlined 40 dp button with the cylinder icon under the advised mix and its note, « Préparer ce mélange » on the phone, « Préparer le trimix 25/28 » or « Préparer l’EAN25 » on a tablet (the app keeps its Nitrox / Trimix tabs on tablets, so it names the mix of the tab shown). It opens the Mélangeur de gaz through `lib/gas-handoff.js` with the mode and the mix as displayed (whole percent) as « Mélange voulu »; the final pressure, the cylinder and what it holds keep their values, and back returns to Meilleur mélange. Test: `tests/app/gas-blender-form.test.mjs` (25/28 at 148 ft). Not done: iOS (no iOS gas tools yet). Checked in a browser at 412 and 820 px wide, not on a device.
 
 ## [ ] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
 
@@ -3657,6 +3659,8 @@ English: « Desired final pressure », « Working pressure: 3,365 psi », « Abo
 
 Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
 
+Done (phone and tablet parts), not ticked: the desktop part is on another branch. Order: Trimix Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox Oxygène and Bouteille, then the final pressure on its own line. The final pressure follows the cylinder's working pressure (`lib/gas-blender-form.js`) until the diver types a value, which a change of cylinder keeps. Helper « Service : 3 365 psi »; above it, a warning in `--od-alarm` with a triangle (`TextField` `warning`), the steps still computed. « Pression finale » renamed. Tests in `tests/app/gas-blender-form.test.mjs`. No calculation file changed (`gas-blend.js`, `gas-calculator.js`).
+
 ## [ ] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
 
 Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html`.
@@ -3668,7 +3672,7 @@ Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up
 
 Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
 
-## [ ] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
+## [x] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
 
 Christian noticed on 15 November 2026 that the app's « Dans la bouteille » section does not match the mock-ups, and that the red text at the bottom must be corrected. Mock-ups (the reference): `docs/mockups/outils-melangeur-nitrox-android.dc.html`, `outils-melangeur-android.dc.html` (Trimix), `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`.
 
@@ -3681,6 +3685,8 @@ Christian noticed on 15 November 2026 that the app's « Dans la bouteille » sec
 English: « Leave empty if the cylinder is empty », « Analyse the mix before diving. ».
 
 Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alone then Oxygène and Hélium; no text of the screen is red when the mix can be reached; the analyse banner is amber.
+
+Done: « Dans la bouteille » follows the mock-ups: Nitrox, Pression and Mélange (dropdown « EAN32 ») side by side then « Compléter avec »; Trimix, Pression alone, then Oxygène and Hélium dropdowns side by side, then « Compléter avec », with the helper under Pression. The note (cooled cylinder and oxygen clean, one paragraph) is 13 sp `--od-text-2`, no longer red; « Analysez le mélange avant de plonger. » is an amber banner (`--od-tertiary-container`, 12 dp corners, 16 dp margins, 20 dp triangle, 14 sp). Compared with the mock-ups side by side in a browser at 412 px.
 
 ## [ ] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
 
