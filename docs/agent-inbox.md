@@ -3888,7 +3888,7 @@ Christian approved this on 15 November 2026. Mock-ups:
 - The beta build is unchanged.
 - In the release build, on a tablet, in both orientations: the screens match the mock-ups, the profile touches no edge, and « Sur cette tablette » and « Choisir un fichier » each lead to a working logbook.
 
-On hold (task 215): built once, then taken off `main`; the work is kept on `feature/release-first-launch` (edition switch `VITE_EDITION`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, `OpenImportDialog.svelte`, tests). A new task replaces this one.
+On hold (tasks 215 and 216): built once, then taken off `main`; the work is kept on `feature/release-first-launch` (edition switch `VITE_EDITION`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, `OpenImportDialog.svelte`, tests). A new task replaces this one.
 
 ## [x] 2026-11-15-214 The decorative dive profile becomes a smooth curve
 
@@ -3922,3 +3922,18 @@ Christian decided this on 15 November 2026.
 Mark this task done once the branch exists (or once you have noted the rule, if nothing was started).
 
 Done: task 213 had already been merged into `main`; it is reverted there, so the beta on `main` is as before (no edition switch, no release screens), and the branch `feature/release-first-launch` keeps the work, kept up to date with `main` and never merged until Christian asks.
+
+## [x] 2026-11-15-216 Correction to 215: move task 213's work off main
+
+Christian decided this on 15 November 2026. Task 215 assumed 213 was not started, but it is already done and merged into `main`. Christian chose to take it **off `main`**.
+
+1. Create `feature/release-first-launch` from the current `main`. It keeps everything 213 added: `edition.js` and `VITE_EDITION`, `WelcomeEntry.svelte`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, the dialog, the texts, the README section, the tests.
+2. On `main`, remove what 213 added, with one revert commit (or a commit that removes those files and the changes in `App.svelte`, the i18n files and `app/README.md`). `main` goes back to the beta only, with nothing from the release edition in it.
+   - Keep everything that does not come from 213, in particular 214 (the smooth decorative profile) and 210 and 211.
+   - The beta screens must stay pixel-identical: check it as you did for 213.
+3. From now on, every task about the release edition (marked « release edition » or « version publique ») is built on `feature/release-first-launch`, never merged into `main` until Christian asks. Keep the branch up to date with `main`.
+4. 213 itself stays on hold on the branch: its screens are being redesigned, and a new task will replace it.
+
+This replaces the « Task 213 is on hold » part of task 215.
+
+Done: one revert commit on `main` takes off everything 213 added (edition switch, release screens, dialog, texts, README section, tests); 210, 211 and 214 stay. `feature/release-first-launch` was created from `main` before the revert and keeps the work (the revert is undone there after merging `main`). Beta first launch checked in headless Edge at 800 × 1280: identical to the screenshot taken before 213.
