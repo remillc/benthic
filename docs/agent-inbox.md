@@ -3254,3 +3254,29 @@ Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to
 English: « Add the visibility », « Recorded by the dive computer, can't be edited », « Enter to keep · Esc to cancel », « Add “Ju” as a new buddy », « Dive merged · Undo ».
 
 Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
+
+## [ ] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
+
+Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 172); the phone keeps a single logbook. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Several logbooks » and « New logbook ». Mock-ups in `docs/mockups/`: `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`, `bureau-carnets-accueil`, `bureau-nouveau-carnet-choix`, `bureau-nouveau-carnet-nuage`, `bureau-nouveau-carnet-git`, `bureau-nouveau-carnet-vide`.
+
+**1. One window per logbook.** A logbook is a source: a local .ssrf file, a file in a personal cloud, or a git repository. Opening a logbook always opens a new window. Window title « OpenDives · {logbook} ».
+- **macOS:** at the top of the Fichier menu, Nouveau carnet… (⇧⌘N), Ouvrir un carnet… (⌘O), Carnets récents › (with « Effacer la liste »), Fermer le carnet (⌘W), Enregistrer une copie… (⇧⌘S). No « Enregistrer sous »: saving is automatic (task 172).
+- **Windows and Linux:** the Carnet title becomes a selector, « Carnet · plongees.ssrf ▾ » on a #ECEAE4 pill. Its menu lists the recent logbooks (name, source and when, ✓ on the open one), then Nouveau carnet… (Ctrl+Maj+N), Ouvrir un carnet… (Ctrl+O), Enregistrer une copie…, Fermer le carnet (Ctrl+W).
+- **Closing a logbook** asks nothing and leaves the window on a start screen: the logo, « Aucun carnet ouvert dans cette fenêtre », « Ouvrir un carnet… » and « Nouveau carnet… », the recent logbooks with their source icon, « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ». The rail's sections are disabled (38 % opacity); Réglages and the account stay active. Dropping a .ssrf or .xml file on the window opens it.
+
+**2. New logbook, two steps.**
+- **Step 1:** « Nom du carnet », then « Où le garder ? » as choice rows, never radio buttons: the chosen row on #E3E1DC with 12 dp corners and a 24 dp ink check at the start, the others plain with an empty 24 dp slot. « Sur cet ordinateur » goes straight to the system's save dialog; the two others go to step 2.
+- **Step 2, cloud:** the services as choice rows. Each shows its provider's **official logo** in a 32 dp white square with 8 dp corners: take the files from each provider's brand resources and follow their usage rules. Google Drive, Microsoft OneDrive, Dropbox, iCloud Drive **on macOS only** (on Windows and Linux the row is absent, and the step-1 subtitle does not name it), then « WebDAV ou Nextcloud » with a generic server icon (two stacked blocks, ink stroke). Sign-in happens in the browser; a connected service shows « Connecté · {account} ». Then the « Dossier » field.
+- **Step 2, git:** « Adresse du dépôt », « Branche », « Jeton d'accès » stored on this computer only (the system keychain), link « Créer un jeton d'accès ». An empty repository gets a new logbook; one that already holds a logbook opens it as it is.
+- **After creating:** a new window on the empty logbook, « Votre carnet est prêt », where it is kept, and the three ways to add dives with their shortcuts (Ctrl/⌘+D, Ctrl/⌘+I, Ctrl/⌘+N).
+
+Personal cloud and git hold only what Subsurface can store (the .ssrf logbook).
+
+English: « New logbook », « Logbook name », « Where to keep it? », « On this computer », « In your cloud », « In a git repository », « Your logbook is ready », « No logbook open in this window », « You can also drop a logbook file on this window. ».
+
+Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
+
+## [ ] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
+
+The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
+
