@@ -1859,6 +1859,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur tablette : le logo et le nom OpenDives sont plus grands.",
       "Premier lancement sur iPhone et iPad : une phrase sous le titre et une ligne d’aide sous chaque choix, comme sur Android.",
       "Carnet vide : le profil d'une plongée, un grand bouton « Associer un ordinateur de plongée » et, dans une carte, les autres façons d'ajouter des plongées (importer un fichier, télécharger depuis divelogs.de, noter une plongée à la main).",
       "Carnet : « Fusionner en une plongée » et « Modifier ensemble… » dans le menu ⋮ des plongées cochées. La fusion n'est offerte que pour des plongées qui se suivent, à moins d'une heure d'intervalle ; « Modifier ensemble… » change le site, le guide, les compagnons, les étiquettes, la combinaison, le type d'eau et les notes de plusieurs plongées à la fois, et « Annuler » défait tout d'un coup.",
