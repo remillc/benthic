@@ -3950,3 +3950,73 @@ Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 **Inbox.** In the « Done » note of each release-edition task, give its branch name.
 
 Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.
+
+## [ ] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
+
+Christian approved this on 15 November 2026. **Release edition: build it on the branch `feature/release-new-logbook`, started from `feature/release-first-launch` (tasks 213, 216 and 217). Do not merge it into `main`.** Tablets only; the phone comes later.
+
+**What stays from 213:** the left blue panel (brand, heading, line, profile, chips) is unchanged on every step. Its line-drawing animation plays only when the first screen opens.
+
+**What goes from 213:**
+- the right-hand column « Commencer un carnet » ;
+- the « Ouvrir ou importer un carnet » dialog ;
+- the line « Aucune plongée n’est envoyée à OpenDives. ». It must not appear anywhere (new rule 8 in `docs/ui-writing.md`).
+
+**Mock-ups:** `docs/mockups/android-tablette-premier-lancement-production-*.dc.html`, landscape for all screens, plus portrait for the first two (`…-production-portrait`, `…-production-ou-portrait`). In portrait, every other step uses the same centred column under the blue panel.
+
+**Motion between steps:** the shared-axis X transition in `docs/system-design.md` (« Steps of the first launch »), on the right-hand column only. « Retour » plays it backwards. Reference: `docs/mockups/transitions/nouveau-carnet-git.gif`.
+
+**The steps** (texts exactly as in the mock-ups; all in `fr.json` and `en.json`):
+
+1. **Pour commencer** (`…-production-paysage`):
+   - Three choice rows: « Créer un carnet » (main row, filled), « Importer un carnet » and « Ouvrir mon carnet OpenDives ».
+   - Under them, the link « Essayer avec un carnet d’exemple ». It is to-do #69, not designed yet, so hide the link until #69 is built.
+2. **Nouveau carnet** (`…-ou-paysage`), after « Créer un carnet »:
+   - The field « Nom du carnet », prefilled « Mon carnet », with the help line « Il s’affiche en haut du carnet et nomme son fichier. ».
+   - Then « Où le garder ? » with three rows: « Dans mon nuage », « Dans un dépôt git » and « Seulement sur cette tablette ».
+   - **The name becomes the file name** (`Mon carnet.ssrf`):
+     - Strip the characters a file name cannot hold.
+     - If a file of that name already exists in the OpenDives folder, add « (2) ».
+     - For git, the name is a label kept on the device.
+3. **The following steps show the logbook name as the page title** (« Mon carnet », 28 sp, with a pencil icon that goes back to step 2 to rename it). The step's own title sits under it, smaller.
+   - **Cloud:**
+     - « Choisissez votre service » (`…-nuage-service`): Google Drive, OneDrive, Dropbox, « WebDAV ou Nextcloud », with generic icons and **no brand logos**.
+     - « Connexion à {service} », not connected (`…-nuage-connexion`): « Se connecter à {service} » opens the browser.
+     - Connected (`…-nuage-connecte`): the account, « « Mon carnet.ssrf » sera créé dans le dossier OpenDives de ce compte. », « Changer de compte » and « Créer le carnet ».
+   - **Git** (`…-git`):
+     - The fields « Adresse du dépôt », « Branche » (main) and « Jeton d’accès », with « Le jeton reste sur cette tablette. » and the link « Créer un jeton d’accès ».
+     - The note « Le dépôt doit être vide. S’il contient déjà un carnet, passez par Ouvrir mon carnet OpenDives. », where « Ouvrir mon carnet OpenDives » is a link to step 5.
+     - The button « Créer le carnet ».
+   - **Seulement sur cette tablette:** there is no extra screen. The logbook is created on the device, and the app opens it.
+4. **Importer un carnet** (`…-importer`): « D’où viennent vos plongées ? », with two rows.
+   - « Un fichier » opens the system file picker, using the formats the core reads.
+   - « divelogs.de » opens a form (`…-importer-divelogs`): the user name, the password, « OpenDives ne garde pas ces identifiants. » and « Importer ». The credentials are never stored.
+   - Then the progress screen (`…-importer-divelogs-progres`), on a white paper card with three steps (done, current, to come):
+     - « Connexion à divelogs.de » ;
+     - « Téléchargement des plongées » with « n sur N » and the Material 3 Expressive wavy determinate indicator, inside the paper ;
+     - « Lecture des sites et de l’équipement ».
+     - Under the paper, the help line and « Annuler », which keeps nothing.
+   - After the file or divelogs.de has been read, « Nouveau carnet » (`…-importer-nouveau-carnet`) shows a summary card (file name, dives and sites, years). The name is prefilled from the file name, or « Mon carnet » for divelogs.de. The same « Où le garder ? » and the following steps then apply. The imported dives go into the new logbook.
+5. **Ouvrir mon carnet OpenDives:**
+   - « Où est-il ? » (`…-ouvrir`): « Dans mon nuage » or « Dans un dépôt git ».
+   - **Cloud:**
+     - « Dans quel service ? » (`…-ouvrir-nuage`).
+     - The connection (`…-ouvrir-connexion`), then connected (`…-ouvrir-connecte`), with « OpenDives cherchera vos carnets dans le dossier OpenDives de ce compte. », « Changer de compte » and « Voir mes carnets ».
+     - « Choisissez votre carnet » (`…-ouvrir-choix`) lists the logbooks found, each with its number of dives and the date it was last changed. With exactly one logbook, the app opens it without showing the list.
+   - **Git** (`…-ouvrir-git`): the same three fields, then « Ouvrir le carnet ».
+
+**Until idea #74 (the personal cloud) is built:**
+- The cloud rows and screens exist, but « Se connecter à {service} » opens a short message saying the cloud is coming in a later version.
+- Git, « Seulement sur cette tablette », the file import and divelogs.de work with what the app already has.
+
+**Not drawn yet, coming later:**
+- the empty logbook on a tablet ;
+- the « no logbook found » and « empty repository » errors ;
+- the demo banner (#69).
+
+In the meantime, use the existing empty-logbook screen and the existing error messages.
+
+**Test:**
+- In the release build, on a tablet, in both orientations: every step matches its mock-up, « Retour » goes back one step with the reverse animation, and the name ends up as the file name.
+- Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
+- The beta on `main` is untouched.
