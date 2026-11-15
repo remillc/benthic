@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 77
+Next number: 80
 
 ## List
 
@@ -33,3 +33,4 @@ Next number: 77
 - #72 [design] Réglages > Carnet : renuméroter les plongées n’est pas un réglage, mais un outil. Sortir cette fonction des réglages.
 - #73 [design] Il manque un endroit dans l’app pour lister les personnes (compagnons et guides de palanquée), fusionner les doublons, renommer et supprimer. On ne pourra sans doute pas en ajouter, puisqu’une personne n’est pas un objet à part entière : elle n’existe que dans une plongée.
 - [x] #78 [design] Logo (tranché le 15 novembre 2026 : le logo simple est retenu pour l’instant, toutes les maquettes l’utilisent) : une variante simple à départager avec le logo retenu (« Logo bleu · A océan-nuit »). Un disque #114477 et une seule vague blanche, sans dégradé ni bulles : `docs/brand/opendives-logo.svg`. Née par erreur le 15 novembre 2026 dans les maquettes de bureau (corrigées depuis avec le vrai logo) ; Christian aime sa simplicité. À comparer aux petites tailles (barre de titre, icône de l’app, favicon) et à côté du logo retenu avant de trancher.
+- #79 [site] afficher la liste des ordinateurs de plongée compatibles avec OpenDives (pour un téléchargement).
