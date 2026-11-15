@@ -1,0 +1,26 @@
+// Profile curves, thin on every platform (task 2026-11-15-190): 1.25 dp, 2 dp in high contrast,
+// the average-depth line 1 dp, the dark halo twice the line.
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
+
+const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');
+const profile = readFileSync(new URL('../../app/src/components/DiveProfile.svelte', import.meta.url), 'utf8');
+
+/** @param {string} selector */
+const rule = (selector) => profile.match(new RegExp(selector.replaceAll('.', '\\.') + String.raw` \{([^}]*)\}`))?.[1] ?? '';
+
+test('the line widths of the theme', () => {
+  const widths = [...theme.matchAll(/--od-profile-line-width: ([\d.]+);/g)].map((m) => m[1]);
+  assert.deepEqual(widths, ['1.25', '2', '2'], 'base, then the two high-contrast themes');
+  const halos = [...theme.matchAll(/--od-profile-halo-width: ([\d.]+);/g)].map((m) => m[1]);
+  assert.deepEqual(halos, ['2.5', '4.5', '4.5']);
+});
+
+test('every curve of the profile uses the line width', () => {
+  for (const cls of ['.od-dive-profile--trace', '.od-dive-profile--temperature', '.od-dive-profile--ppo2', '.od-dive-profile--ceiling-line']) {
+    assert.match(rule(cls), /stroke-width: var\(--od-profile-line-width\);/, cls);
+  }
+  assert.match(rule('.od-dive-profile--trace-outline'), /stroke-width: var\(--od-profile-halo-width\);/);
+  assert.match(rule('.od-dive-profile--mean'), /stroke-width: 1;/);
+});

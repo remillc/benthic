@@ -98,7 +98,10 @@
     --od-outline: #74777C;
     /* Outlines of fields, chips and outlined buttons, and the planned profile's line: thicker in high contrast. */
     --od-outline-width: 1px;
-    --od-profile-line-width: 1.5;
+    /* The profile curves (depth, temperature, ppO₂, ceiling) and the dark halo under the depth
+       curve: thin lines, thicker in high contrast (task 2026-11-15-190). */
+    --od-profile-line-width: 1.25;
+    --od-profile-halo-width: 2.5;
     /* Pins of the sites around, on the map of the dives without a site (task 2026-11-14-148). */
     --od-map-pin-muted: #75787C;
     /* Rust as text on the tertiary container (#FBE3B2): 5.2:1; #B4530F stays for graphics,
@@ -374,6 +377,7 @@
     --od-band-control: #FFFFFF;
     --od-outline-width: 1.5px;
     --od-profile-line-width: 2;
+    --od-profile-halo-width: 4.5;
   }
 
   html.dark.od-high-contrast {
@@ -395,6 +399,7 @@
     --od-band-control: #FFFFFF;
     --od-outline-width: 1.5px;
     --od-profile-line-width: 2;
+    --od-profile-halo-width: 4.5;
   }
 }
 

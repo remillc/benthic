@@ -185,9 +185,17 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-sites-nettoyer.dc.html` | Sites · bureau, nettoyer les sites |
 | `bureau-sites-nettoyer-fusion.dc.html` | Sites · bureau, sites fusionnés |
 | `bureau-stats.dc.html` | Statistiques · bureau (Windows, Linux) |
+| `bureau-stats-groupe.dc.html` | Statistiques · bureau · copie du groupe |
+| `bureau-stats-profondeur.dc.html` | Statistiques · bureau, profondeur maximale |
+| `bureau-stats-plongees.dc.html` | Statistiques · bureau, plongées d’une barre |
+| `bureau-stats-carte-chaleur.dc.html` | Statistiques · bureau, carte de chaleur |
+| `bureau-stats-filtre.dc.html` | Statistiques · bureau, filtrer |
+| `bureau-stats-filtre-actif.dc.html` | Statistiques · bureau, filtre actif |
+| `bureau-stats-nouvelle.dc.html` | Statistiques · bureau, nouvelle statistique |
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
 | `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
+| `bureau-carnet-exporter.dc.html` | Carnet · bureau, exporter des plongées |
 | `bureau-carnets-selecteur.dc.html` | Carnet · bureau (Windows, Linux), choisir un carnet |
 | `bureau-carnets-menu-fichier-macos.dc.html` | Carnet · bureau macOS, menu Fichier et carnets récents |
 | `bureau-carnets-accueil.dc.html` | Bureau · aucun carnet ouvert |

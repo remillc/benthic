@@ -3429,3 +3429,130 @@ English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues �
 
 Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
 
+## [ ] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
+
+Christian decided this on 15 November 2026: in the detail pane, a diver could not tell that the fields were editable in place. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet screens.
+
+- **Every editable field of the Informations tab is shown as a field at rest, on every screen:** #ECEAE4 fill, 8 dp corners, 40 dp high, 8 dp between rows. No pencil at rest (the pencil appears on hover only, task 172).
+- **An empty editable field shows its invitation** in #4B4A47: « Ajouter des compagnons », « Ajouter la visibilité », « Site à préciser » for the site.
+- **Read-only values** (Ordinateur, what the dive computer recorded) stay plain text with no fill.
+- **One hint line above the fields**, 13 px #4B4A47: « Les champs gris se modifient d'un clic et s'enregistrent tout de suite. »
+- **No floating toolbar on desktop.** The detail pane's actions stay in its ⋮ menu, the right-click menu and the keyboard shortcuts.
+
+English: « Grey fields can be edited with a click and are saved at once. », « Add buddies », « Add the visibility ».
+
+Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
+
+## [ ] 2026-11-15-185 Desktop profile: dashed line at the average depth
+
+Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first.
+
+- On the dive profile, a horizontal dashed line at the dive's average depth (the same value as « Prof. moy. » in the figures under the profile): #114477, 1.2 dp, dashes of 5 and gaps of 4, from the depth axis to the right edge of the plot, drawn above the water fill and under the curves and the cursor.
+- A label just above its left end, 11 px #114477: « moy. 17,9 m » (the dive's value, in the depth unit chosen in the settings).
+- The line is always shown; it is not one of the curve chips (task 183).
+- Not drawn when the dive has no profile (a dive logged by hand without samples).
+
+English: « avg. 17.9 m ».
+
+Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
+
+## [ ] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-groupe.dc.html` (the menu shown open).
+
+The ⋮ button at the top right of the detail pane opens a Material 3 menu (300 dp wide, 16 dp corners, #EFEFEC, items 44 dp with a 20 dp icon and the shortcut at the right in 13 px #4B4A47), in this order:
+- Agrandir le profil (Ctrl/⌘+P): the profile fills the detail pane; Échap returns.
+- Ajouter à un voyage…; when the dive is in a trip, « Retirer du voyage » follows it.
+- Renuméroter la plongée…
+- Copier (Ctrl/⌘+C), as in task 178.
+- Exporter… (Ctrl/⌘+Maj+E).
+- a divider, then Supprimer la plongée (Suppr) in #B3261E, with the usual confirmation.
+
+The same actions stay in the right-click menu of the table row. No « Modifier » item: the fields are edited in place (tasks 172 and 184).
+
+English: « Enlarge the profile », « Add to a trip… », « Remove from the trip », « Renumber the dive… », « Copy », « Export… », « Delete the dive ».
+
+Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
+
+## [ ] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
+
+Christian decided this on 15 November 2026, after task 179: two ⋮ menus one above the other (top bar and detail pane) were confusing. Mock-ups: `docs/mockups/bureau-carnet-groupe.dc.html` and the other desktop Carnet screens.
+
+- **Instead of the items at the top of the ⋮ menu (task 179):** two icon buttons in the top bar of every section, right after the search field: ↶ Annuler and ↷ Rétablir, 44 dp, ink icons. Tooltips: « Annuler : {dernière action} (Ctrl+Z) » and « Rétablir : {action} (Ctrl+Maj+Z) ». Each is disabled (38 %) when there is nothing to undo or redo. Remove « Annuler » and « Rétablir » from the ⋮ menus.
+- **Carnet:** the top bar loses its ⋮ entirely. Its columns button moves to the right end of the table's header row: 32 dp, an 18 dp #4B4A47 icon, same menu as before (with « Rétablir l'ordre des colonnes », task 181). The only ⋮ on the Carnet screen is the dive's, in the detail pane (task 186).
+- **Sites, Statistiques, Outils:** keep their ⋮ for their own items (for Sites: Nettoyer les sites, Exporter les sites…), without Annuler and Rétablir.
+- macOS keeps Annuler and Rétablir in its Édition menu as well.
+
+English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
+
+Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
+
+## [ ] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
+
+Christian decided this on 15 November 2026 (follows task 173). « Enregistrer une copie… » stays the only way to save a logbook elsewhere: there is no « Enregistrer sous », since saving is automatic and each logbook has its own window.
+
+- After the copy is written, a snackbar: « Copie enregistrée · Ouvrir ». « Ouvrir » opens the copy in a new window; the window of the original stays open and unchanged. Without « Ouvrir », nothing else happens.
+- Same on macOS (Fichier › Enregistrer une copie…, ⇧⌘S), Windows and Linux (logbook selector, Ctrl+Maj+S).
+
+English: « Copy saved · Open ».
+
+Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
+
+## [ ] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-exporter.dc.html` (the dialog), `docs/mockups/bureau-carnets-selecteur.dc.html` (« Exporter le carnet… » in the logbook selector). The formats and the anonymise option are those of the phone (`docs/ui-specification.md`, « Logbook selection and export »).
+
+- **Where:** « Exporter… » in the right-click menu and in the dive's ⋮ menu (Ctrl/⌘+Maj+E); « Exporter le carnet… » (Ctrl+Maj+E) in the logbook selector on Windows and Linux, under « Enregistrer une copie… »; Fichier › Exporter… (⇧⌘E) on macOS.
+- **The dialog**, titled with the count (« Exporter 2 plongées »):
+  - « Quelles plongées », as choice rows (no radio buttons): « Les 2 plongées sélectionnées » (with their numbers) when dives are selected, « Les 12 plongées filtrées » when a filter is active, « Tout le carnet » (with its count). The default is the selection, else the filter, else the whole logbook. « Exporter le carnet… » opens it on « Tout le carnet ».
+  - « Format », as choice rows with a line each: Fichier carnet (.ssrf) « Lisible par OpenDives et d'autres carnets », UDDF (.uddf), CSV liste des plongées, CSV profils, Fiches PDF. The last format chosen is remembered.
+  - The « Anonymiser » switch (off by default): removes people's names, notes and GPS positions.
+  - « Annuler » and « Exporter… », which opens the system's save dialog with a proposed name (« plongees-6-7.ssrf », « carnet-2026-11-15.uddf »).
+- The title and the count update when the « Quelles plongées » choice changes.
+
+English: « Export 2 dives », « Which dives », « The 2 selected dives », « The 12 filtered dives », « The whole logbook », « Format », « Anonymise », « Export… », « Export the logbook… ».
+
+Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
+
+## [x] 2026-11-15-190 Profiles: thinner curve lines on every platform
+
+Christian decided this on 15 November 2026: the profile curves were too thick. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet and Statistiques screens, `docs/mockups/android-detail.dc.html`, `docs/mockups/detail3-android.dc.html`, `docs/mockups/detail3-ios.dc.html`, the tablet detail and planner screens.
+
+- **Depth curve:** 1.25 dp (was 2 dp on the phone and tablet, 1.5 dp on desktop), dive detail, planner, list previews and PDF sheet alike. `--od-profile-line-width` is 1.25 dp.
+- **Temperature curve and the other curves of the profile chips** (Gaz, ppO₂, Plafond, Tissus, task 183): 1.25 dp.
+- **Average-depth dashed line** (task 185): 1 dp, dashes unchanged.
+- **Dark themes:** the dark halo drawn under the depth curve shrinks with it (2.5 dp under a 1.25 dp line).
+- **High contrast** (#75): the profile lines stay at 2 dp.
+- Unchanged: the cursor line, the grid, the planner's ceiling line.
+
+Test: the depth curve of the dive detail measures 1.25 dp at 1× and 2 dp with high contrast; the average line measures 1 dp.
+
+Done: --od-profile-line-width is 1.25 (2 in high contrast) and every profile curve uses it (depth, temperature, ppO₂, ceiling; the planner's planned line already did), the dark halo is --od-profile-halo-width (2.5, 4.5 in high contrast), the average-depth line 1 dp, the PDF sheet and the shared image 1.25; tests/app/profile-lines.test.mjs checks them. Cursor, grid and the planner's ceiling line unchanged.
+
+## [ ] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
+
+Christian noticed on 15 November 2026 that the desktop detail pane has no tabs and its fields cannot be edited in place. This is a reminder of tasks 169, 172 and 184, not a new decision: the build must match the mock-ups `docs/mockups/bureau-carnet-profil-droite.dc.html` (with the group copy `bureau-carnet-groupe.dc.html`) and `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+- **Tabs under the profile and its summary** (`role="tablist"`): Informations, Équipement, Gaz, Notes, Carte. The selected tab is 14 px semibold #114477 with a 3 dp #114477 underline, the others 14 px regular #4B4A47, a 1 dp #DCDAD3 line under the row. Arrow keys move between tabs. The last tab chosen is kept when another dive is selected.
+- **Editing in place in every tab** (task 172): a click on a grey field turns it into an input where it is, Enter or leaving the field saves at once, Escape cancels; no edit mode and no dialog. The fields at rest are those of task 184: #ECEAE4 fill, 8 dp corners, invitations when empty, the hint line, read-only values as plain text.
+- Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the detail pane to the commit description.
+
+Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
+
+## [ ] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and every desktop Carnet screen (with the group copy `bureau-carnet-groupe.dc.html`); the ⋮ menu open in `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+- **No top bar across the window.** The detail pane rises to the top of the window (20 dp padding above the dive's title), which gives room to the site map behind its header.
+- **The list column has its own 64 dp header,** aligned with the table's cells (12 dp start padding), from left to right:
+  - « Carnet » (22 px medium) with the count line under it, 13 px #4B4A47, on one line (« 9 plongées · 4 sites · dernière plongée il y a 9 mois »);
+  - the search field (Ctrl+F), up to 300 dp wide and at least 220 dp, its placeholder on one line, cut with an ellipsis if needed;
+  - the columns button (44 dp, 22 dp icon, tooltip « Colonnes affichées »), which leaves the table's header row;
+  - a ⋮ button « Plus d'options du carnet » (44 dp).
+- **The ⋮ menu** (16 dp corners, as the other desktop menus) holds « Annuler : {dernière action} » with Ctrl+Z and « Rétablir » with Ctrl+Maj+Z, each with its ↶ ↷ icon; an item is greyed out when there is nothing to undo or redo. The ↶ ↷ icon buttons of task 187 are removed. The shortcuts are unchanged.
+- On macOS the same header; Annuler and Rétablir are also in the Édition menu, as before.
+- Sites and Statistiques are not changed by this task.
+
+English: « More logbook options », « Undo: {last action} », « Redo », « Columns shown ».
+
+Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
