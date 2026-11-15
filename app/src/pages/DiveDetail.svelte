@@ -35,7 +35,7 @@
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
@@ -54,7 +54,11 @@
     formatSac,
     formatTemperature,
     formatWeight,
+    formatMinutes,
+    formatShortDate,
+    formatTimeOfDay,
   } from '../lib/format.js';
+  import SiteMap from '../components/SiteMap.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -578,6 +582,39 @@
   const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
   const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
 
+  // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
+  // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
+  const desk = $derived(layout.desktop);
+  /** @type {'info'|'equipment'|'gas'|'notes'|'map'} */
+  let tab = $state('info');
+  const deskTabs = /** @type {const} */ (['info', 'equipment', 'gas', 'notes', 'map']);
+  /** The key figures: Prof. max, Durée, Prof. moy., Temp., Gaz, Consommation (those known). */
+  const deskFigures = $derived.by(() => {
+    if (!dive) return [];
+    const first = gasCylinders[0];
+    const gas = first ? [first.gas, first.start && first.end ? `${first.start} → ${first.end}` : ''].filter(Boolean).join(' · ') : '';
+    return [
+      { label: t('desktop.figure.maxDepth'), value: dive.maxDepthMm ? formatDepth(dive.maxDepthMm, prefs) : '' },
+      { label: t('desktop.figure.duration'), value: dive.durationSeconds ? formatMinutes(dive.durationSeconds) : '' },
+      { label: t('desktop.figure.meanDepth'), value: dive.meanDepthMm ? formatDepth(dive.meanDepthMm, prefs) : '' },
+      { label: t('desktop.figure.temperature'), value: dive.waterTempMk ? formatTemperature(dive.waterTempMk, prefs) : '' },
+      { label: t('desktop.figure.gas'), value: gas },
+      { label: t('desktop.figure.sac'), value: sac },
+    ].filter((x) => x.value);
+  });
+  /** @param {MouseEvent} e */
+  function openDeskMenu(e) {
+    f7.popover.open(`#${menuId}`, /** @type {HTMLElement} */ (e.currentTarget));
+  }
+  /** ← → between the tabs (WAI-ARIA tabs). @param {KeyboardEvent} e */
+  function tabKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const at = deskTabs.indexOf(tab);
+    tab = deskTabs[(at + (e.key === 'ArrowRight' ? 1 : deskTabs.length - 1)) % deskTabs.length];
+    /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.currentTarget).querySelector(`[data-tab="${tab}"]`))?.focus();
+  }
+
   // Collapsed by default; a tap opens the weights by location and "Ce lest était".
   let equipmentOpen = $state(false);
   const feedback = $derived(feedbackOf(dive?.tags ?? []));
@@ -616,7 +653,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}
@@ -691,6 +728,16 @@
       <div class="skeleton-block od-dive-detail--skeleton-profile"></div>
     </div>
   {:else}
+    {#if desk}
+    <header class="od-dive-detail--desk-head">
+      <div class="od-dive-detail--desk-titles">
+        <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
+        <p class="od-dive-detail--desk-sub od-value">{[formatShortDate(dive.date) + ', ' + formatTimeOfDay(dive.date), dive.computer].filter(Boolean).join(' · ')}</p>
+      </div>
+      <button type="button" class="od-dive-detail--desk-action" aria-label={t('detail.edit')} title="{t('detail.edit')} ({desktopMac ? '⌘E' : 'Ctrl+E'})" onclick={() => f7router.navigate(`/dives/${diveId}/edit`)}><Icon name="edit" size={22} /></button>
+      <button type="button" class="od-dive-detail--desk-action" aria-label={t('detail.moreOptionsList')} title={t('detail.moreOptions')} aria-haspopup="menu" onclick={openDeskMenu}><Icon name="more" size={22} /></button>
+    </header>
+    {:else}
     <div class="od-dive-detail--hero" use:watchScroll>
       {#if dive.siteCoordinates}
         <SiteHeaderImage latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={(shown) => (imageShown = shown)} />
@@ -712,10 +759,13 @@
       {/if}
     </header>
     </div>
+    {/if}
 
-    <DiveFigures {dive} {prefs} />
+    {#if !desk}<DiveFigures {dive} {prefs} />{/if}
 
+    <div class:od-dive-detail--desk-card={desk}>
     <DiveProfile
+      hover={desk}
       samples={dive.samples}
       cylinders={dive.cylinders}
       divemode={dive.divemode}
@@ -725,8 +775,25 @@
       meanDepthMm={dive.meanDepthMm}
       {prefs}
     />
+    </div>
 
-    {#if facts.length}
+    {#if desk}
+      {#if deskFigures.length}
+        <dl class="od-dive-detail--desk-figures">
+          {#each deskFigures as figure (figure.label)}
+            <div><dt>{figure.label}</dt><dd class="od-value">{figure.value}</dd></div>
+          {/each}
+        </dl>
+      {/if}
+      <!-- svelte-ignore a11y_interactive_supports_focus -->
+      <div class="od-dive-detail--desk-tabs" role="tablist" tabindex="-1" onkeydown={tabKey}>
+        {#each deskTabs as key (key)}
+          <button type="button" role="tab" data-tab={key} aria-selected={tab === key} tabindex={tab === key ? 0 : -1} onclick={() => (tab = key)}>{t(`desktop.tab.${key}`)}</button>
+        {/each}
+      </div>
+    {/if}
+
+    {#if (!desk || tab === 'info') && facts.length}
       <dl class="od-dive-detail--facts">
         {#each facts as fact (fact.label)}
           <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
@@ -734,7 +801,7 @@
       </dl>
     {/if}
 
-    {#if dive.guides.length || dive.buddies.length}
+    {#if (!desk || tab === 'info') && (dive.guides.length || dive.buddies.length)}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
         <div class="od-dive-detail--group">
@@ -749,7 +816,10 @@
     {/if}
 
     <!-- Notes right under Personnes (task 2026-11-12-64). -->
-    {#if dive.notes.trim()}
+    {#if desk && tab === 'notes' && !dive.notes.trim()}
+      <p class="od-dive-detail--desk-empty">{t('desktop.noNotes')}</p>
+    {/if}
+    {#if (!desk || tab === 'notes') && dive.notes.trim()}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
         <!-- Shown in full, line breaks kept: no "Read more". -->
@@ -758,7 +828,7 @@
     {/if}
 
     <!-- Tags right under Notes (task 2026-11-12-66). -->
-    {#if visibleTags(dive.tags).length}
+    {#if (!desk || tab === 'info') && visibleTags(dive.tags).length}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
         <ul class="od-dive-detail--tags">
@@ -767,7 +837,10 @@
       </section>
     {/if}
 
-    {#if hasGas}
+    {#if desk && tab === 'gas' && !hasGas}
+      <p class="od-dive-detail--desk-empty">{t('desktop.noGas')}</p>
+    {/if}
+    {#if (!desk || tab === 'gas') && hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
         <GasCard
@@ -780,7 +853,10 @@
       </section>
     {/if}
 
-    {#if hasEquipment}
+    {#if desk && tab === 'equipment' && !hasEquipment}
+      <p class="od-dive-detail--desk-empty">{t('desktop.noEquipment')}</p>
+    {/if}
+    {#if (!desk || tab === 'equipment') && hasEquipment}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
         <EquipmentCard
@@ -813,7 +889,7 @@
     {/if}
 
 
-    {#if conditions.length}
+    {#if (!desk || tab === 'info') && conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="od-dive-detail--section">
         <div class="od-dive-detail--group">
@@ -844,7 +920,15 @@
     {/if}
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
-    {#if dive.pictures > 0 && settings.showPhotos}
+    {#if desk && tab === 'map'}
+      {#if dive.siteCoordinates}
+        <div class="od-dive-detail--desk-map"><SiteMap pin={dive.siteCoordinates} height="320px" /></div>
+      {:else}
+        <p class="od-dive-detail--desk-empty">{t('desktop.noMap')}</p>
+      {/if}
+    {/if}
+
+    {#if (!desk || tab === 'info') && dive.pictures > 0 && settings.showPhotos}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
         <div class="od-dive-detail--group">
@@ -860,7 +944,7 @@
 
   {#snippet fixedContent()}
     <!-- Android: the actions in a floating toolbar (Material 3 Expressive); iOS keeps the top bar. -->
-    {#if !theme.ios && dive && !failed}
+    {#if !theme.ios && dive && !failed && !desk}
       <FloatingToolbar
         label={t('detail.actions')}
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
@@ -898,6 +982,121 @@
 
 <style>
   @layer od.components {
+    /* Desktop detail pane (task 2026-11-15-169). */
+    /* No top bar on desktop: the pane's own header carries the actions. */
+    :global(.od-dive-detail--desk.page) {
+      --f7-page-bg-color: var(--od-background);
+      background: var(--od-background);
+    }
+    :global(.od-dive-detail--desk > .navbar) {
+      display: none;
+    }
+    :global(.od-dive-detail--desk > .page-content) {
+      padding-top: 0;
+    }
+    .od-dive-detail--desk-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 16px 16px 8px 24px;
+    }
+    .od-dive-detail--desk-titles {
+      flex: 1;
+      min-width: 0;
+    }
+    .od-dive-detail--desk-title {
+      margin: 0;
+      font-family: var(--od-title-font);
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 28px;
+      color: var(--od-text);
+    }
+    .od-dive-detail--desk-sub {
+      margin: 2px 0 0;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-action {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--od-text);
+      cursor: pointer;
+    }
+    .od-dive-detail--desk-action:hover {
+      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    }
+    .od-dive-detail--desk-card {
+      margin: 8px 24px 0;
+      padding: 8px 0 12px;
+      border-radius: 16px;
+      background: var(--od-surface);
+    }
+    .od-dive-detail--desk-figures {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 28px;
+      margin: 16px 24px 0;
+    }
+    .od-dive-detail--desk-figures dt {
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-figures dd {
+      margin: 2px 0 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--od-text);
+    }
+    .od-dive-detail--desk-tabs {
+      display: flex;
+      gap: 4px;
+      margin: 20px 24px 8px;
+      border-bottom: 1px solid var(--od-separator);
+    }
+    .od-dive-detail--desk-tabs button {
+      position: relative;
+      height: 48px;
+      padding: 0 16px;
+      border: 0;
+      background: none;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--od-text-2);
+      cursor: pointer;
+    }
+    .od-dive-detail--desk-tabs button:hover {
+      color: var(--od-text);
+      background: color-mix(in srgb, var(--od-text) 4%, transparent);
+    }
+    .od-dive-detail--desk-tabs button[aria-selected='true'] {
+      color: var(--od-on-table-selected);
+    }
+    .od-dive-detail--desk-tabs button[aria-selected='true']::after {
+      content: '';
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: -1px;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: var(--od-on-table-selected);
+    }
+    .od-dive-detail--desk-empty {
+      margin: 16px 24px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-map {
+      margin: 8px 24px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
     .od-dive-detail--hero {
       position: relative;
     }

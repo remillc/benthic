@@ -25,7 +25,9 @@
    *   prefs: import('opendives-core').Prefs,
    * }}
    */
-  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs } = $props();
+  // `hover` (desktop, task 2026-11-15-169): the mouse pointer reads the values without a press:
+  // a dashed line, a dot on the curve and a dark tooltip next to it.
+  let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs, hover = false } = $props();
 
   const uid = $props.id();
   let width = $state(320);
@@ -249,8 +251,34 @@
 
   /** @param {PointerEvent} e */
   function move(e) {
-    if (e.buttons || e.pointerType === 'touch') placeCursor(e);
+    if (e.buttons || e.pointerType === 'touch' || (hover && e.pointerType === 'mouse')) placeCursor(e);
   }
+
+  /** Desktop: the mouse leaving the profile hides the reading. */
+  function leave(/** @type {PointerEvent} */ e) {
+    if (hover && e.pointerType === 'mouse') cursor = null;
+  }
+
+  /** The tooltip under the mouse (desktop): its place in the frame and its two lines. */
+  const tip = $derived.by(() => {
+    if (!hover || cursor === null) return null;
+    const px = x(times[cursor]);
+    const water = showTemperature && temperature && temperature.mk[cursor] > 0 ? formatTemperature(temperature.mk[cursor], prefs) : '';
+    return {
+      left: px,
+      top: y(depths[cursor]),
+      flip: px > width * 0.62,
+      first: `${formatMinSec(times[cursor])} · ${formatDepth(depths[cursor], prefs)}`,
+      // The values of the curves turned on, as the phone's readout.
+      second: [
+        water,
+        showPpo2 ? `${t('profile.ppo2')} ${formatPartialPressure(samples.ppo2Mbar[cursor] / 1000, 2)}` : '',
+        ceilingLayer && ceilingMm ? `${t('profile.ceiling')} ${formatDepth(ceilingMm[cursor], prefs)}` : '',
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    };
+  });
 
   // Entry and exit times (the exit is the last sample) and the average depth.
   const ends = $derived(entryExitTimes(startIso, tMax, formatTimeOfDay));
@@ -277,6 +305,8 @@
 </script>
 
 <div class="od-dive-profile od-dive-profile--profile od-block no-swipeback">
+  <!-- Desktop: the tooltip under the mouse carries the values. -->
+  {#if !hover}
   <div class="od-dive-profile--readout od-value" aria-hidden="true">
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
@@ -294,6 +324,7 @@
       <span class="od-dive-profile--hint">{t('profile.hint')}</span>
     {/if}
   </div>
+  {/if}
 
   <div class="od-dive-profile--frame" bind:clientWidth={width}>
     <svg
@@ -303,6 +334,7 @@
       aria-label={description}
       onpointerdown={placeCursor}
       onpointermove={move}
+      onpointerleave={leave}
     >
       <defs>
         <linearGradient id="water-{uid}" x1="0" y1={y(0)} x2="0" y2={y(dMax)} gradientUnits="userSpaceOnUse">
@@ -392,12 +424,19 @@
       {/if}
 
       {#if cursor !== null}
-        <line class="od-dive-profile--cursor" x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        <line class="od-dive-profile--cursor" class:od-dive-profile--cursor-hover={hover} x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        {#if hover}<circle class="od-dive-profile--depth-dot" cx={x(times[cursor])} cy={y(depths[cursor])} r="4" />{/if}
         {#if showTemperature && temperature && temperature.mk[cursor] > 0}
           <circle class="od-dive-profile--temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
         {/if}
       {/if}
     </svg>
+    {#if tip}
+      <div class="od-dive-profile--tip od-value" class:od-dive-profile--tip-left={tip.flip} style:left="{tip.left}px" style:top="{tip.top}px" aria-hidden="true">
+        <span>{tip.first}</span>
+        {#if tip.second}<span>{tip.second}</span>{/if}
+      </div>
+    {/if}
   </div>
 
   {#if tissuesLayer && tissuesAvailable}
@@ -530,6 +569,7 @@
     /* The chart is as wide as the screen minus the room its axis labels need:
        about 14 dp for the depths on the left, 26 dp for the temperatures on the right. */
     .od-dive-profile--frame {
+      position: relative;
       margin: 0 26px 0 14px;
       touch-action: pan-y;
       user-select: none;
@@ -641,6 +681,35 @@
       stroke: var(--od-cursor);
       stroke-width: 2;
       stroke-linecap: round;
+    }
+
+    /* Desktop hover (task 2026-11-15-169): a thin dashed line, a dot on the curve, a dark tooltip. */
+    .od-dive-profile--cursor-hover {
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+    .od-dive-profile--depth-dot {
+      fill: var(--od-cursor);
+      stroke: var(--od-surface);
+      stroke-width: 2;
+    }
+    .od-dive-profile--tip {
+      position: absolute;
+      transform: translate(12px, -50%);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: var(--od-inverse-surface);
+      color: var(--od-inverse-on-surface);
+      font-size: 12px;
+      line-height: 1.3;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .od-dive-profile--tip-left {
+      transform: translate(calc(-100% - 12px), -50%);
     }
 
     .od-dive-profile--temperature-dot {

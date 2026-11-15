@@ -3424,6 +3424,25 @@
       "window": "Fenêtre",
       "help": "Aide",
       "helpAbout": "À propos d'OpenDives"
-    }
+    },
+    "figure": {
+      "maxDepth": "Prof. max",
+      "duration": "Durée",
+      "meanDepth": "Prof. moy.",
+      "temperature": "Temp.",
+      "gas": "Gaz",
+      "sac": "Consommation"
+    },
+    "tab": {
+      "info": "Informations",
+      "equipment": "Équipement",
+      "gas": "Gaz",
+      "notes": "Notes",
+      "map": "Carte"
+    },
+    "noNotes": "Aucune note pour cette plongée.",
+    "noGas": "Aucun gaz noté pour cette plongée.",
+    "noEquipment": "Aucun équipement noté pour cette plongée.",
+    "noMap": "Le site de cette plongée n’a pas de coordonnées."
   }
 }

@@ -3424,6 +3424,25 @@
       "window": "Window",
       "help": "Help",
       "helpAbout": "About OpenDives"
-    }
+    },
+    "figure": {
+      "maxDepth": "Max depth",
+      "duration": "Duration",
+      "meanDepth": "Avg depth",
+      "temperature": "Temp.",
+      "gas": "Gas",
+      "sac": "Consumption"
+    },
+    "tab": {
+      "info": "Information",
+      "equipment": "Equipment",
+      "gas": "Gas",
+      "notes": "Notes",
+      "map": "Map"
+    },
+    "noNotes": "No notes for this dive.",
+    "noGas": "No gas recorded for this dive.",
+    "noEquipment": "No equipment recorded for this dive.",
+    "noMap": "This dive’s site has no coordinates."
   }
 }
