@@ -381,7 +381,7 @@
             <div class="od-new-logbook--band">
               <div class="od-new-logbook--end">
                 <span class="od-new-logbook--big-tile">
-                  <svg class="od-new-logbook--mark" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" /><path d="M5 13q3.5-3 7 0t7 0" /></svg>
+                  <img class="od-new-logbook--mark" src="logo-light.svg" alt="" width="44" height="44" />
                 </span>
                 <span class="od-new-logbook--end-name">OpenDives</span>
               </div>
@@ -692,15 +692,6 @@
       background: var(--od-logo-square);
       color: var(--od-logo-square-ink);
       box-shadow: var(--od-tile-shadow);
-    }
-    .od-new-logbook--mark circle {
-      fill: var(--od-brand-blue);
-    }
-    .od-new-logbook--mark path {
-      fill: none;
-      stroke: var(--od-logo-square);
-      stroke-width: 2;
-      stroke-linecap: round;
     }
     .od-new-logbook--end-name {
       font-size: 14px;

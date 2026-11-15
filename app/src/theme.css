@@ -249,7 +249,6 @@
     --od-link-off-badge: #E3E1DC;
     --od-link-ok: #1E6B3A;
     --od-link-ok-badge: #DCEFE2;
-    --od-brand-blue: #114477;
     --od-tile-shadow: 0 1px 3px rgb(17 68 119 / 0.12), 0 4px 12px rgb(17 68 119 / 0.08);
     /* Vibrant floating toolbar (spec, section 8): ink container, light icons. */
     --od-toolbar-container: #1F2124;
@@ -327,7 +326,6 @@
     --od-link-off-badge: #3A3C40;
     --od-link-ok: #7FD39B;
     --od-link-ok-badge: #1F3A2B;
-    --od-brand-blue: #114477;
     --od-tile-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
     --od-toolbar-container: #E3E1DC;
     --od-toolbar-on-container: #1F2124;
