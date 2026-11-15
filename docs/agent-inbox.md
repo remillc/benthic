@@ -3217,7 +3217,7 @@ Write in `docs/architecture.md` how the desktop build is organised, and add the 
 
 Christian decided this on 15 November 2026, with you. Task 169 asks for Tauri 2 by default: **use Electron instead**, as you agreed with Christian. The rest of task 169 is unchanged. The Subsurface core is compiled natively and reached from Electron's main process (a Node native module or a helper process, your choice; write it in `docs/architecture.md`). Builds for Windows, macOS and Linux in the GitHub workflow. `docs/system-design.md` (section 7, « Desktop app ») now says Electron.
 
-## [ ] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
+## [x] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
 
 Christian decided this on 15 November 2026. Follows tasks 169 and 170 (the Electron shell and the Carnet): do it after them, with the same shell, rail, top bar, resize handle and keyboard rules. Mock-ups (in `docs/mockups/`): `bureau-sites.dc.html`, `bureau-stats.dc.html`, `bureau-outils.dc.html` (Windows and Linux; on macOS the same without the Réglages item in the rail, as in task 169).
 
@@ -3232,6 +3232,8 @@ English: « Search for a site », « 5 dives without a site · Find them a site 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
 
 Done (Statistiques part, branch feature/desktop-stats): `pages/DesktopStatistics.svelte` (chosen in `App.svelte` on `layout.desktop`), `components/DesktopStatChart.svelte` (hover tooltip, a click selects the bar's dives in the Carnet), top bar with Filtrer, Annuler, Rétablir and a ⋮ naming the undo step, « Exporter le graphique » as a PNG through the share path (download fallback). Sites and Outils are not done in this branch.
+
+Done: the three parts, each from its own branch (see the « Done » notes above): Statistiques (pages/DesktopStatistics.svelte), Outils (pages/DesktopTools.svelte, task 196), Sites (pages/DesktopSites.svelte, tasks 175 and 177), all chosen in App.svelte from 1200 dp in the desktop app.
 
 ## [x] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
 
