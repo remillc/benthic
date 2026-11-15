@@ -3280,3 +3280,14 @@ Tests: two logbooks open in two windows at once; closing one shows the start scr
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
 
+## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
+
+Christian decided this on 15 November 2026. In task 171, « 5 plongées sans site · Leur trouver un site » sat under the Sites table and was pushed out of the window by a long list. Mock-up: `docs/mockups/bureau-sites.dc.html`.
+
+- The line moves **above** the table, at the top of the list pane, and never scrolls: the list pane is a column whose table area alone scrolls.
+- It is discreet: a bar 40 dp high, 12 dp corners, #ECEAE4 background, 8 dp below it; a pin-with-a-cross icon (18 dp, #4B4A47), « 5 plongées sans site » in 14 px #4B4A47, and « Leur trouver un site » as a text button (#114477, 600, no fill) at the right, which opens Plongées sans site as before.
+- `role="status"`; the count updates when dives get a site. With no dive without a site, the bar is absent and the table starts at the top.
+- The line under the table is removed.
+
+Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
+
