@@ -53,6 +53,8 @@ const listen = () => (ws.onmessage = (m) => { const d = JSON.parse(m.data); pend
 listen();
 const send = (method, params = {}) => new Promise((r) => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
 const run = async (expression) => (await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })).result?.result?.value;
+/** A runner's screen is small and the window is cut to it: the page is laid out at 1440 x 900, as on a desktop. */
+const desktopSize = () => send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 const shot = async (name) => {
   const r = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync(path.join(out, `${name}.png`), Buffer.from(r.result.data, 'base64'));
@@ -63,6 +65,7 @@ const centre = (selector, index = 0) =>
   run(`(() => { const e = [...document.querySelectorAll(${JSON.stringify(selector)})].filter((e) => e.getClientRects().length)[${index}]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
 
 try {
+  await desktopSize();
   await wait(4000);
   await shot('01-first-launch');
   // « Commencer sans compte », then the sample logbook (the empty logbook's own start).
@@ -74,6 +77,7 @@ try {
   await wait(4000);
   ws = await connect();
   listen();
+  await desktopSize();
   for (let i = 0; i < 30 && !(await run(`document.querySelectorAll('.od-desktop-logbook--row').length`)); i++) await wait(1000);
   await wait(2000);
   await shot('02-logbook');
