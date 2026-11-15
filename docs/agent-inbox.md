@@ -3391,7 +3391,7 @@ Test: hovering each rail item shows the 8 % layer and the ink colours; leaving i
 
 Done: with a mouse (hover: hover, pointer: fine), a rail item's 56 × 32 dp pill gets an 8 % ink layer and its icon and label turn ink; the active section keeps its pill and colours under the layer; keyboard focus shows a 2 dp ring 2 dp outside the pill; normal arrow pointer, no tooltip; the fade is skipped with reduced motion (NavRail.svelte). Checked in a desktop window on Statistiques.
 
-## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+## [x] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
 
@@ -3405,6 +3405,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 English: « Drop to place “Site” between Durée and Temp. », « Reset the column order ».
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
+
+Done: a header is dragged to move its column (floating header with ⠿, pale slot, 3 dp insertion bar with its marker; Échap cancels; a click without moving still sorts); N° stays first; Alt+Maj+← → move the focused column; « Rétablir l'ordre des colonnes » ends the columns menu; the order is kept on this computer through device-store (od.desktopColumns), never in the logbook. Logic in lib/desktop-table.js (moveColumn, dropTarget, shownColumns in the diver's order), tested. Not done: column widths (there is no column resizing yet), and the key per logbook waits for several logbooks (task 173): today one logbook, one key.
 
 ## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
@@ -3614,7 +3616,7 @@ English: « Plan from this dive », « Share… », « Export the dive… », «
 
 Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
 
-## [ ] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
+## [x] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html`.
 
@@ -3623,6 +3625,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 - Everything else of task 181 is unchanged (Échap cancels, the order is kept per logbook).
 
 Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
+
+Done: no tooltip while dragging a column; an aria-live region announces « « Site » sera placé entre Durée et Compagnons » (or « en dernier »). Checked in a desktop window.
 
 ## [ ] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
 
