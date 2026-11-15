@@ -1832,6 +1832,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil des plongées : courbes plus fines (1,25 dp) et ligne de profondeur moyenne de 1 dp. Le contraste élevé garde des traits de 2 dp.",
       "Détail d'une plongée : le menu ⋮ de la barre d'actions se ferme d'un appui ailleurs ou d'un second appui sur ⋮.",
       "Carnet : « dernière plongée il y a … » ne se coupe plus en fin de ligne.",
       "Compte : la bande d’en-tête garde sa vague quand la page défile.",

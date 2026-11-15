@@ -552,14 +552,14 @@
     .od-dive-profile--temperature {
       fill: none;
       stroke: var(--od-temperature);
-      stroke-width: 2;
+      stroke-width: var(--od-profile-line-width);
       stroke-linejoin: round;
     }
 
     .od-dive-profile--ppo2 {
       fill: none;
       stroke: var(--od-oxygen);
-      stroke-width: 2;
+      stroke-width: var(--od-profile-line-width);
       stroke-linejoin: round;
     }
 
@@ -585,7 +585,7 @@
     .od-dive-profile--ceiling-line {
       fill: none;
       stroke: var(--od-alarm);
-      stroke-width: 1.5;
+      stroke-width: var(--od-profile-line-width);
     }
 
     .od-dive-profile--tissue-limit {
@@ -605,10 +605,10 @@
       fill: var(--od-temperature);
     }
 
-    /* Average depth: a thin dashed line across the whole profile, in the axis grey. */
+    /* Average depth: a thin dashed line across the whole profile, in the axis grey; 1 dp (task 2026-11-15-190). */
     .od-dive-profile--mean {
       stroke: var(--od-text-2);
-      stroke-width: 0.6;
+      stroke-width: 1;
       stroke-dasharray: 4 3;
     }
 
@@ -622,18 +622,18 @@
       fill: var(--od-text-2);
     }
 
-    /* Dark mode: a 4.5 px outline under the 2 px line keeps it readable on the bright water. */
+    /* Dark mode: an outline twice the line's width under it keeps it readable on the bright water. */
     .od-dive-profile--trace-outline {
       fill: none;
       stroke: var(--od-trace-outline);
-      stroke-width: 4.5;
+      stroke-width: var(--od-profile-halo-width);
       stroke-linejoin: round;
     }
 
     .od-dive-profile--trace {
       fill: none;
       stroke: var(--od-trace);
-      stroke-width: 2;
+      stroke-width: var(--od-profile-line-width);
       stroke-linejoin: round;
     }
 
