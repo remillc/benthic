@@ -119,6 +119,37 @@
     /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
     --od-heat-spot-mid: #3FA0E0;
     --od-heat-spot-edge: #2F86DE;
+    /* First launch of the release edition (task 2026-11-15-213): the blue panel's vertical gradient, the soft
+       light at its top left, its faint bands, the glow under the profile and the frosted chips. The panel is
+       the same blue in dark mode (white text on it: 7.7:1 at the lightest stop). */
+    --od-release-panel-1: #2A6FB0;
+    --od-release-panel-2: #1F5C99;
+    --od-release-panel-3: #0C3866;
+    --od-release-panel-4: #072A4D;
+    --od-release-panel-light: rgb(255 255 255 / 0.22);
+    --od-release-panel-band: rgb(255 255 255 / 0.035);
+    --od-release-glow: #8CC4FF;
+    --od-release-chip: rgb(255 255 255 / 0.12);
+    --od-release-chip-border: rgb(255 255 255 / 0.22);
+    /* The main choice's fill and shadow, the icon tiles, the section label, the dialog's row dividers and scrim. */
+    --od-release-row-main: #1F5C99;
+    --od-release-row-main-shadow: rgb(12 56 102 / 0.28);
+    --od-release-row-main-hover: #246AAE;
+    --od-release-tile: #E6EEF7;
+    --od-release-tile-icon: #1F5C99;
+    --od-release-label: #6B6A66;
+    --od-release-divider: #ECEAE5;
+    --od-release-scrim: rgb(7 20 36 / 0.45);
+    --od-release-on-panel: #FFFFFF;
+    --od-release-on-panel-soft: rgb(255 255 255 / 0.78);
+    --od-release-on-main-soft: rgb(255 255 255 / 0.82);
+    --od-release-main-tile: rgb(255 255 255 / 0.16);
+    --od-release-chip-caption: rgb(255 255 255 / 0.75);
+    --od-release-surface-line: rgb(255 255 255 / 0.35);
+    --od-release-dot-ring: rgb(255 255 255 / 0.22);
+    --od-release-row-shadow: rgb(31 33 36 / 0.06);
+    --od-release-row-shadow-hover: rgb(31 33 36 / 0.12);
+    --od-release-dialog-shadow: rgb(7 20 36 / 0.35);
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --od-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
@@ -222,6 +253,15 @@
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
   html.dark {
+    /* First launch of the release edition: the panel keeps its blues; tiles, label, dividers and scrim follow dark mode. */
+    --od-release-tile: #1E3552;
+    --od-release-tile-icon: #8FB6E6;
+    --od-release-label: #B5B8BC;
+    --od-release-divider: #2E3033;
+    --od-release-scrim: rgb(0 0 0 / 0.6);
+    --od-release-row-shadow: rgb(0 0 0 / 0.3);
+    --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);
+    --od-release-dialog-shadow: rgb(0 0 0 / 0.6);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
