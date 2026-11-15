@@ -1832,6 +1832,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte : la bande d’en-tête garde sa vague quand la page défile.",
       "Suppression du compte cloud : un assistant en trois étapes (ce qui sera effacé, vos plongées, confirmer), le bouton final désactivé tant que le mot de passe n’est pas saisi.",
       "Suppression du compte cloud : l’avertissement se lit « C’est définitif ! ».",
       "Déconnexion : le dialogue montre l’icône et le titre centrés, les modifications non envoyées dans un encadré, et une vraie case à cocher pour effacer la copie de l’appareil.",

@@ -1832,6 +1832,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: the header band keeps its wave while the page scrolls.",
       "Deleting the cloud account: a three-step wizard (what will be erased, your dives, confirm), the final button disabled until the password is typed.",
       "Deleting the cloud account: the warning reads « This is permanent! ».",
       "Sign out: the dialog shows the icon and the title centred, the unsent changes in a box, and a real checkbox to erase the device’s copy.",
