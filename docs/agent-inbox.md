@@ -3373,3 +3373,15 @@ English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
 
 Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
 
+## [ ] 2026-11-15-180 Desktop: hover state of the navigation rail items
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-profil-droite.dc.html` (Statistiques under the pointer).
+
+- When the pointer is over a rail item that is not the active section (Carnet, Sites, Statistiques, Outils, Réglages), its 56 × 32 dp pill (16 dp corners) gets the Material 3 hover state layer: ink #1F2124 at 8 % opacity; the icon and the label turn from #4B4A47 to ink #1F2124.
+- The active section keeps its #D4E2F2 pill and #114477 icon and label; on hover it adds the same 8 % layer over its pill.
+- Keyboard focus shows the M3 focus ring (2 dp #114477, 2 dp outside the pill), not the hover layer.
+- The pointer is the normal arrow (no hand), as in native desktop apps. No tooltip: the label is already shown.
+- Same rule on macOS, Windows and Linux; transitions follow the motion rules (short fade, none with reduced motion).
+
+Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
+
