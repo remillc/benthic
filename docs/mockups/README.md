@@ -138,6 +138,14 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `detail3-android-curseur.dc.html` | Téléphone Android, détail avec le profil touché : curseur et lecture du temps et de la profondeur |
 | `carnet-selection-android.dc.html` | Téléphone Android, carnet en sélection multiple (dessiné d’après l’app) |
 | `carnet-selection-menu-android.dc.html` | Téléphone Android, carnet en sélection multiple, menu ⋮ ouvert |
+| `carnet-fusion-menu-android.dc.html` | Carnet, deux plongées qui se suivent, menu ouvert · Android |
+| `carnet-fusion-android.dc.html` | Carnet, deux plongées fusionnées · Android |
+| `carnet-modifier-ensemble-android.dc.html` | Modifier ensemble, trois plongées · Android |
+| `android-tablette-carnet-selection-menu-paysage.dc.html` | 03 · Carnet, sélection, menu ⋮ · tablette Android, paysage |
+| `android-tablette-modifier-ensemble-paysage.dc.html` | 03 · Modifier ensemble, trois plongées · tablette Android, paysage |
+| `ios-carnet-selection-menu.dc.html` | Carnet, sélection, menu « … » · iPhone |
+| `ios-carnet-fusion.dc.html` | Carnet, deux plongées fusionnées · iPhone |
+| `ios-modifier-ensemble.dc.html` | Modifier ensemble, trois plongées · iPhone |
 | `carnet-export-android.dc.html` | Téléphone Android, exporter les plongées cochées : choix du format |
 | `compte-git-android.dc.html` | Téléphone Android, Compte en mode dépôt git (#11) |
 | `git-config-android.dc.html` | Téléphone Android, Dépôt git : configuration, dépôt trouvé, branches lues |
@@ -165,6 +173,25 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
 | `bureau-carnet-groupe.dc.html` | Carnet · bureau · copie du groupe |
 | `bureau-sites.dc.html` | Sites · bureau (Windows, Linux) |
+| `bureau-sites-groupe.dc.html` | Sites · bureau · copie du groupe |
+| `bureau-sites-fiche.dc.html` | Sites · bureau, fiche d’un site |
+| `bureau-sites-modifier.dc.html` | Sites · bureau, modifier un site sur place |
+| `bureau-sites-modifier-pays.dc.html` | Sites · bureau, pays proposé pendant la saisie |
+| `bureau-sites-recherche.dc.html` | Sites · bureau, recherche ouverte |
+| `bureau-sites-superposes.dc.html` | Sites · bureau, épingles superposées |
+| `bureau-sites-nouveau.dc.html` | Sites · bureau, nouveau site |
+| `bureau-sites-sans-site.dc.html` | Sites · bureau, plongées sans site |
+| `bureau-sites-sans-site-choisir.dc.html` | Sites · bureau, choisir un site pour une plongée |
+| `bureau-sites-nettoyer.dc.html` | Sites · bureau, nettoyer les sites |
+| `bureau-sites-nettoyer-fusion.dc.html` | Sites · bureau, sites fusionnés |
 | `bureau-stats.dc.html` | Statistiques · bureau (Windows, Linux) |
 | `bureau-outils.dc.html` | Outils, planificateur · bureau (Windows, Linux) |
 | `bureau-carnet-edition-sur-place.dc.html` | Carnet · bureau, modification sur place |
+| `bureau-carnet-colonnes.dc.html` | Carnet · bureau, déplacer une colonne |
+| `bureau-carnets-selecteur.dc.html` | Carnet · bureau (Windows, Linux), choisir un carnet |
+| `bureau-carnets-menu-fichier-macos.dc.html` | Carnet · bureau macOS, menu Fichier et carnets récents |
+| `bureau-carnets-accueil.dc.html` | Bureau · aucun carnet ouvert |
+| `bureau-nouveau-carnet-choix.dc.html` | Nouveau carnet, étape 1 : nom et où le garder · bureau |
+| `bureau-nouveau-carnet-nuage.dc.html` | Nouveau carnet, étape 2 : dans votre nuage · bureau |
+| `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
+| `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |

@@ -3230,3 +3230,200 @@ Christian decided this on 15 November 2026. Follows tasks 169 and 170 (the Elect
 English: « Search for a site », « 5 dives without a site · Find them a site », « See the dives », « Export the chart », « New statistic », « Print the slate », « Save the plan », « Total duration », « Stops ».
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
+
+## [ ] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
+
+Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 171); phone and tablet are unchanged. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Automatic saving » and « Editing a dive in place ». Mock-up: `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+**1. Automatic saving.**
+- Every change is saved to the device as soon as it is made: a field of a dive, a site or a setting, a merge, a reorder. No « Enregistrer » button; closing the window or switching dives never asks to save.
+- Ctrl/⌘+Z undoes, Ctrl/⌘+Maj+Z redoes, across fields and dives. When the change is not visible on screen, a snackbar names it with « Annuler » (« Plongée fusionnée · Annuler »).
+- Saving is separate from synchronisation, which keeps its own mode (automatic or manual) and its pending count.
+- **Exceptions that keep a button:** creating from a form that is not valid until complete (Nouveau site, a dive logged by hand: « Ajouter » and « Annuler »); « Enregistrer le plan » in the planner (it adds a planned dive); every confirmation of an irreversible action (delete, sign out, delete the account).
+
+**2. Editing a dive in place.** The detail pane is the editor; there is no separate edit screen on desktop, and the ✎ button leaves the detail pane.
+- **At rest:** an editable value sits in a #ECEAE4 field, 8 dp corners, 40 dp high; an empty one shows its invitation in #4B4A47 (« Ajouter la visibilité »). A read-only value is plain text with no field. Under the key figures, a line with a computer icon: « Enregistré par l'ordinateur de plongée, non modifiable ».
+- **Hover:** a 1 dp #8F8D86 outline and a pencil at the right.
+- **Editing:** a click, or Tab from the previous field, turns the field into an input in place: white, 2 dp #114477 border, « Entrée pour garder · Échap pour annuler » under it. Entrée or leaving the field keeps the value (and saves it); Échap restores it. Tab moves to the next editable field.
+- **Buddies and site:** chips for the chosen buddies (#D4E2F2, #114477, ✕ to remove), and a list under the field with what is already in the logbook (« Juha · 1 plongée ») and « Ajouter « Ju » comme nouveau compagnon ».
+- **Équipement and Gaz tabs:** their rows are edited in place the same way (add, remove, reorder a cylinder).
+- **The Carnet table:** a double click on an editable cell (Site, Compagnons and the columns the diver added) edits it in place.
+- **Read-only:** what the dive computer recorded (profile, maximum depth, duration, temperatures, pressures). Editable only for a dive logged by hand.
+- **Shortcuts:** Ctrl/⌘+E puts the focus on the first editable field. With several dives selected, « Modifier ensemble… » stays a dialog.
+
+English: « Add the visibility », « Recorded by the dive computer, can't be edited », « Enter to keep · Esc to cancel », « Add “Ju” as a new buddy », « Dive merged · Undo ».
+
+Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
+
+## [ ] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
+
+Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 172); the phone keeps a single logbook. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Several logbooks » and « New logbook ». Mock-ups in `docs/mockups/`: `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`, `bureau-carnets-accueil`, `bureau-nouveau-carnet-choix`, `bureau-nouveau-carnet-nuage`, `bureau-nouveau-carnet-git`, `bureau-nouveau-carnet-vide`.
+
+**1. One window per logbook.** A logbook is a source: a local .ssrf file, a file in a personal cloud, or a git repository. Opening a logbook always opens a new window. Window title « OpenDives · {logbook} ».
+- **macOS:** at the top of the Fichier menu, Nouveau carnet… (⇧⌘N), Ouvrir un carnet… (⌘O), Carnets récents › (with « Effacer la liste »), Fermer le carnet (⌘W), Enregistrer une copie… (⇧⌘S). No « Enregistrer sous »: saving is automatic (task 172).
+- **Windows and Linux:** the Carnet title becomes a selector, « Carnet · plongees.ssrf ▾ » on a #ECEAE4 pill. Its menu lists the recent logbooks (name, source and when, ✓ on the open one), then Nouveau carnet… (Ctrl+Maj+N), Ouvrir un carnet… (Ctrl+O), Enregistrer une copie…, Fermer le carnet (Ctrl+W).
+- **Closing a logbook** asks nothing and leaves the window on a start screen: the logo, « Aucun carnet ouvert dans cette fenêtre », « Ouvrir un carnet… » and « Nouveau carnet… », the recent logbooks with their source icon, « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ». The rail's sections are disabled (38 % opacity); Réglages and the account stay active. Dropping a .ssrf or .xml file on the window opens it.
+
+**2. New logbook, two steps.**
+- **Step 1:** « Nom du carnet », then « Où le garder ? » as choice rows, never radio buttons: the chosen row on #E3E1DC with 12 dp corners and a 24 dp ink check at the start, the others plain with an empty 24 dp slot. « Sur cet ordinateur » goes straight to the system's save dialog; the two others go to step 2.
+- **Step 2, cloud:** the services as choice rows. Each shows its provider's **official logo** in a 32 dp white square with 8 dp corners: take the files from each provider's brand resources and follow their usage rules. Google Drive, Microsoft OneDrive, Dropbox, iCloud Drive **on macOS only** (on Windows and Linux the row is absent, and the step-1 subtitle does not name it), then « WebDAV ou Nextcloud » with a generic server icon (two stacked blocks, ink stroke). Sign-in happens in the browser; a connected service shows « Connecté · {account} ». Then the « Dossier » field.
+- **Step 2, git:** « Adresse du dépôt », « Branche », « Jeton d'accès » stored on this computer only (the system keychain), link « Créer un jeton d'accès ». An empty repository gets a new logbook; one that already holds a logbook opens it as it is.
+- **After creating:** a new window on the empty logbook, « Votre carnet est prêt », where it is kept, and the three ways to add dives with their shortcuts (Ctrl/⌘+D, Ctrl/⌘+I, Ctrl/⌘+N).
+
+Personal cloud and git hold only what Subsurface can store (the .ssrf logbook).
+
+English: « New logbook », « Logbook name », « Where to keep it? », « On this computer », « In your cloud », « In a git repository », « Your logbook is ready », « No logbook open in this window », « You can also drop a logbook file on this window. ».
+
+Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
+
+## [ ] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
+
+The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
+
+## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
+
+Christian decided this on 15 November 2026. In task 171, « 5 plongées sans site · Leur trouver un site » sat under the Sites table and was pushed out of the window by a long list. Mock-up: `docs/mockups/bureau-sites.dc.html`.
+
+- The line moves **above** the table, at the top of the list pane, and never scrolls: the list pane is a column whose table area alone scrolls.
+- It is discreet: a bar 40 dp high, 12 dp corners, #ECEAE4 background, 8 dp below it; a pin-with-a-cross icon (18 dp, #4B4A47), « 5 plongées sans site » in 14 px #4B4A47, and « Leur trouver un site » as a text button (#114477, 600, no fill) at the right, which opens Plongées sans site as before.
+- `role="status"`; the count updates when dives get a site. With no dive without a site, the bar is absent and the table starts at the top.
+- The line under the table is removed.
+
+Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
+
+## [ ] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
+
+Christian decided this on 15 November 2026. The list of statistics on the left of the desktop Statistiques screen gets an icon and a preview on each row. Mock-up: `docs/mockups/bureau-stats.dc.html`.
+
+- **Row:** 72 dp high, 12 dp corners, 8 dp side margins, 4 dp between rows; the chosen row stays #D4E2F2 with #114477 text (title in 600).
+- **At the start, an icon tile:** 40 dp, 12 dp corners, #ECEAE4 (#FFFFFF on the chosen row), with a 22 dp stroke icon in ink (#114477 on the chosen row): bars for Plongées par année, an arrow down to the bottom for Profondeur maximale, a stopwatch for Temps sous l'eau, a cylinder for Consommation (SAC), a pin for Plongées par site, a grid for Carte de chaleur. A statistic the diver created takes the icon of its chart type.
+- **Then** the title (16 px) and the summary line (14 px, #4B4A47).
+- **At the end, a preview of the statistic's own data**, 56 × 24 dp, decorative (`aria-hidden`): small bars for counts (per year, per site; the last 7 values), a 2 dp line for a measure over time (depth drawn downward, time, SAC), a 4 × 2 grid of the heat-map colours for the heat map. #8FB0D6, #114477 on the chosen row. It follows the active filter and is redrawn when the logbook changes.
+- « + Nouvelle statistique » is unchanged.
+
+Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
+
+## [ ] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
+
+Christian decided this on 15 November 2026. Follows tasks 171 and 175 (the Sites screen and its « plongées sans site » bar), with the same shell, list pane, resize handle, in-place editing and automatic saving (task 172). Mock-ups in `docs/mockups/`: `bureau-sites` (now with « Nouveau site » in the top bar, Ctrl/⌘+N), `bureau-sites-fiche`, `bureau-sites-modifier`, `bureau-sites-modifier-pays`, `bureau-sites-recherche`, `bureau-sites-superposes`, `bureau-sites-nouveau`, `bureau-sites-sans-site`, `bureau-sites-sans-site-choisir`, `bureau-sites-nettoyer`, `bureau-sites-nettoyer-fusion`. The phone screens (Fiche d'un site, Modifier le site, Nouveau site, Plongées sans site, Nettoyer les sites) are the reference for wording and rules.
+
+**1. Site sheet.** Selecting a site in the list replaces the map pane with its sheet: name (24 px) and « pays · région », « Voir les plongées » and a ⋮ menu (Supprimer le site, with the phone's confirmation). On the left, a small map (220 dp, 16 dp corners, zoom buttons), the figures (Plongées, Plus profonde, Dernière) and « Plongées à ce site » (rows that open the dive in Carnet). On the right, the fields edited in place, as for a dive (task 172): Nom, Coordonnées, Pays, Région, Description, Notes; « Chaque changement est enregistré tout de suite. » Échap or a click on the map's empty list area returns to the map.
+
+**2. The small map.** The site's position is a **crosshair**, not a dot: 28 dp, 2.5 dp #114477 stroke with a white halo. **Nearby sites** show as 6 dp #4B4A47 dots with their names. To correct the position, drag the crosshair or the map under it; the previous position stays as a dashed grey crosshair until the change is kept. Hint chip: « Déplacez la carte ou la croix pour corriger ».
+
+**3. Country and region.**
+- **Filled from the position:** whenever the position changes (dragging, moving the map, coordinates typed by hand), Pays and Région are filled by reverse geocoding; for a moment both fields turn #D4E2F2 with a refresh icon, and their note reads « Mis à jour d'après la nouvelle position ». A value the diver corrected is never overwritten. Offline, they are filled when the network is back.
+- **Autocompletion while typing:** in Pays, the most likely completion shows in grey inside the field (« Nouv|elle-Zélande »), with a list under it; countries already used in the logbook come first, with their count (« 2 sites au carnet »). Tab or Entrée accepts, Échap cancels. Région completes the same way, proposing only the regions of the chosen country.
+
+**4. Search.** Ctrl/⌘+F focuses « Rechercher un site »; matches cover names, regions and countries. The summary becomes « 1 site correspond à « cole » », the matching text is highlighted (#FBE3B2), other pins are dimmed to 35 %, the bars above the table hide, and a line says « Résultats : noms des sites, régions et pays. Échap pour tout revoir. ».
+
+**5. Stacked pins.** When pins overlap at the current zoom, they merge into one #114477 pin with the count. Clicking it opens a list: « 6 sites à cet endroit », the place and « Les épingles se superposent à cette échelle. », each site with its dive count (#D4E2F2 pill) and depth, and « Zoomer ici ».
+
+**6. New site.** « Nouveau site » shows a creation form in the right pane (an exception to automatic saving): Nom (focused), Coordonnées (« Par exemple -35.4485, 174.732, ou cliquez sur la carte »), Pays and Région (filled from the position, autocompleted as above), Description, Notes; a click on the map places the crosshair. When a site already exists within 100 m: a #FBE3B2 notice « Un site existe déjà à moins de 100 m : {nom}. » with « Utiliser ce site ». « Annuler » and « Ajouter le site ».
+
+**7. Dives without a site.** « Leur trouver un site » turns the bar #D4E2F2 and shows the list in the right pane, with the phone's explanation. Each dive is a card: number, date, duration and depth, then the suggestion as a tonal button (« Northern Arch ») when there is one, « Choisir un site… » and « Nouveau site » (created at the dive's position), and a line explaining the suggestion or its absence. Dives of a trip are grouped under the trip, with « Les associer toutes au même site ». « Choisir un site… » opens a searchable list sorted by distance from the dive (« à 3,2 km »), ending with « Nouveau site « {texte} » à la position de la plongée ».
+
+**8. Clean up the sites.** When there are possible duplicates or sites without a dive, a second bar appears under the first: « 2 doublons possibles · 3 sites sans plongée » with « Nettoyer les sites ». The pane shows, on the left, « Doublons possibles » (each pair with the reason, both sites, « Pas des doublons » and « Fusionner »), on the right « Sites sans plongée » with checkboxes, « Tout sélectionner » and « Supprimer la sélection (2) » (#B3261E). A merge collapses the pair into « Fusionnés : un seul site, … » and shows the snackbar « Sites fusionnés · Annuler »; Ctrl/⌘+Z undoes.
+
+English: « New site », « Delete the site », « Every change is saved at once », « Move the map or the crosshair to correct », « Updated from the new position », « 2 sites in the logbook », « 1 site matches “cole” », « 6 sites here », « Zoom in here », « A site already exists within 100 m: {name}. », « Use this site », « Add the site », « Dives without a site », « Choose a site… », « Assign them all to the same site », « New site “{text}” at the dive's position », « Clean up the sites », « Not duplicates », « Merge », « Sites without a dive », « Delete the selection (2) », « Sites merged · Undo ».
+
+Tests: editing a site field saves it without a button; moving the crosshair refills country and region but not a corrected one; Pays autocompletes with logbook countries first; search dims the other pins; stacked pins open the list; a new site within 100 m of another shows the notice; assigning a suggested site removes the dive from the list and lowers the count; a merge is undone by Ctrl/⌘+Z.
+
+## [ ] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
+
+Christian decided this on 15 November 2026, answering the four open questions of the desktop right-click menu. Read `docs/system-design.md`, section 7, « Actions on several dives », and `docs/ui-specification.md`, « Logbook selection and export ».
+
+**Desktop right-click menu on two dives or more**, in this order: Fusionner en une plongée (Ctrl/⌘+M), Ajouter à un voyage…, Modifier ensemble… (Ctrl/⌘+E), Copier (Ctrl/⌘+C), Exporter…, a divider, Supprimer. **« Partager… » is removed from desktop**, on all three systems: « Exporter… » already saves the file and Linux has no share window.
+
+**1. Fusionner en une plongée** (desktop, phone and tablet; on phone and tablet in the ⋮ menu of the selection bar, after Modifier ensemble…).
+- Offered when the selected dives follow one another in the logbook (no other dive between them) and each starts at most 60 min after the previous one ends; overlapping dives (two computers) qualify. Otherwise the item is shown disabled with the tooltip or supporting line « Seulement des plongées qui se suivent, à moins d'une heure d'intervalle ».
+- Calls the Subsurface core's merge through the facade (a new core function that writes the logbook): profiles, cylinders, events and the other data are joined; the surface interval stays in the profile. The result must stay a dive Subsurface for desktop reads and edits as its own merge would produce it.
+- No confirmation. The merged dive keeps the first dive's number and becomes the selection. Snackbar « 2 plongées fusionnées · Annuler » (« N plongées fusionnées »); « Annuler » and Ctrl/⌘+Z restore the original dives exactly (keep them until the snackbar is gone and the undo history is cleared).
+
+**2. Modifier ensemble…** (desktop, phone and tablet).
+- Desktop: a dialog titled « Modifier 3 plongées »; phone and tablet: a full-screen sheet with the same title.
+- Fields: Site, Guide, Compagnons, Étiquettes, Combinaison, Type d'eau, Note. A field whose values differ shows « Plusieurs valeurs » in #4B4A47 and is left as it is unless the diver changes it.
+- Compagnons and Étiquettes: chips common to all dives, then those of only some, marked « sur 2 plongées »; the diver adds or removes chips; nothing else is replaced.
+- Buttons « Annuler » and « Appliquer aux 3 plongées » (desktop) or « Enregistrer » (phone and tablet). Applied at once to all the dives, as a single change: Ctrl/⌘+Z or the snackbar « 3 plongées modifiées · Annuler » undoes it.
+- Not offered: date, duration, depth, profile, gases, numbers, trip.
+
+**3. Copier and Coller** (desktop only).
+- Ctrl/⌘+C writes two forms: plain text (the selected rows as shown in the table, a header line, columns separated by tabs, one dive per line) and the dives in Subsurface XML from the core's export, under the private type `application/x-opendives-dives`.
+- Ctrl/⌘+V in the Logbook, and « Coller » in the right-click menu of the table's empty area, add the dives from that private type, or from plain text that is a Subsurface `<divelog>`, with the import's duplicate check. Snackbar « 2 plongées collées · Annuler ». Disabled when the clipboard holds no dives.
+- Where a system keeps no private type, write the plain text only; pasting a `<divelog>` text still works.
+
+**4. Task 172 is unchanged** for a single dive: in-place editing and automatic saving. The multi-dive dialog is an exception, like the creation forms, because it changes many dives at once.
+
+English: « Merge into one dive », « Only dives that follow one another, less than an hour apart », « 2 dives merged · Undo », « Edit together… », « Edit 3 dives », « Several values », « on 2 dives », « Apply to the 3 dives », « 3 dives edited · Undo », « Copy », « Paste », « 2 dives pasted · Undo ».
+
+Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface for desktop opens with both profile parts; two dives with another dive between them, or 2 h apart, leave the item disabled; undo restores both dives byte for byte in the logbook; « Modifier ensemble » on three dives with two different sites shows « Plusieurs valeurs » and changes only the edited fields; removing a buddy chip removes it from every dive that had it; copied text pastes into a spreadsheet as columns; copied dives pasted into another logbook arrive once, and a second paste finds them as duplicates.
+
+## [ ] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
+
+Christian decided this on 15 November 2026. On macOS, Annuler and Rétablir are in the Édition menu of the menu bar (task 169). On Windows and Linux they were only keyboard shortcuts and the snackbar's « Annuler », which goes away. Mock-up: `docs/mockups/bureau-sites-nettoyer-fusion.dc.html` (menu open after a merge).
+
+- In every section (Carnet, Sites, Statistiques, Outils), the ⋮ menu of the top bar starts with:
+  - « Annuler : {dernière action} » with « Ctrl+Z » at the right, naming the last change as the macOS Édition menu does (« Annuler : Fusionner les sites », « Annuler : Modifier le site », « Annuler : Fusionner les plongées »);
+  - « Rétablir » (« Rétablir : {action} » when there is one) with « Ctrl+Maj+Z »;
+  - then a divider and the section's own items.
+- Each is greyed out (38 %) when there is nothing to undo or redo. Icons: an arrow turning back for Annuler, forward for Rétablir.
+- The undo history is the same one as Ctrl+Z, task 172: one history per window and logbook.
+
+English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
+
+Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
+
+## [ ] 2026-11-15-180 Desktop: hover state of the navigation rail items
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-profil-droite.dc.html` (Statistiques under the pointer).
+
+- When the pointer is over a rail item that is not the active section (Carnet, Sites, Statistiques, Outils, Réglages), its 56 × 32 dp pill (16 dp corners) gets the Material 3 hover state layer: ink #1F2124 at 8 % opacity; the icon and the label turn from #4B4A47 to ink #1F2124.
+- The active section keeps its #D4E2F2 pill and #114477 icon and label; on hover it adds the same 8 % layer over its pill.
+- Keyboard focus shows the M3 focus ring (2 dp #114477, 2 dp outside the pill), not the hover layer.
+- The pointer is the normal arrow (no hand), as in native desktop apps. No tooltip: the label is already shown.
+- Same rule on macOS, Windows and Linux; transitions follow the motion rules (short fade, none with reduced motion).
+
+Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
+
+## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
+
+- **Drag a column header** to move the column. While dragging: the header floats above the table (white, 8 dp corners, shadow, a ⠿ grip, tilted slightly), its original place stays as a pale #ECEAE4 slot, and a 3 dp #114477 bar with a small marker at the top shows where it will land; a plain tooltip says « Déposez pour placer « Site » entre Durée et Temp. ». Échap cancels the drag.
+- **Every column moves except N°**, which stays first. A click on a header without moving still sorts, as before.
+- **Keyboard:** with focus on a header, Alt+Maj+← and Alt+Maj+→ move the column one place.
+- **Kept between sessions, per logbook:** the order, the widths and the visible columns are stored in the app's settings on this computer, keyed by the logbook. Never in the logbook file: Subsurface for desktop must read it unchanged.
+- **Reset:** the menu of the columns button ends with a divider and « Rétablir l'ordre des colonnes ».
+- A move is not an undo step of the logbook (it changes no data).
+
+English: « Drop to place “Site” between Durée and Temp. », « Reset the column order ».
+
+Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
+
+## [ ] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
+
+Christian decided this on 15 November 2026. Mock-ups: every `docs/mockups/bureau-carnet-*.dc.html` and `bureau-carnets-*.dc.html` table.
+
+- Default columns of the Carnet table: N°, Date, Site, Prof. max, Durée, **Compagnons** (the dive's buddies, comma-separated, #4B4A47, left-aligned, ellipsis when too long). **Temp. leaves the defaults**; it stays available in the columns button's menu, and the water temperature stays in the detail pane's figures.
+- Widths: Prof. max and Durée get narrower (about 96 and 88 dp with padding), Compagnons about 124 dp, so that Site keeps its room.
+- A diver who has already chosen or moved columns (task 181) keeps their own set: the change applies to the defaults only.
+- Sorting on Compagnons sorts by the first buddy's name; a double click on a Compagnons cell edits it in place (task 172).
+
+English: « Buddies ».
+
+Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
+
+## [ ] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
+
+Christian decided this on 15 November 2026. Desktop only; phone and tablet already have these curves. Read `docs/ui-specification.md`, « Dive profile, cursor and curve buttons », for the curves themselves, their colours and scales: desktop uses the same ones. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first (also `bureau-carnet-groupe`, `-macos`, `-edition-sur-place`, `-colonnes`, `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`).
+
+- Under the profile, inside its white card, a row of Material 3 filter chips (32 dp, 8 dp corners, 8 dp apart): Température, Gaz, ppO₂, Plafond, Tissus. Several can be on at once.
+- An active chip shows a check and takes its curve's colours: Température is sand (#FBE3B2 fill, #B4530F outline, #3D2200 text) with the rust curve #B4530F and its °C scale on the right of the profile. An inactive chip is outlined #8F8D86 on transparent.
+- The cursor's readout under the pointer adds the values of the active curves (as on the phone).
+- The choice is kept between dives and between sessions, in the app's settings on this computer (not in the logbook).
+- Keyboard: Tab reaches the chips; Espace toggles.
+
+English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues ».
+
+Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
+

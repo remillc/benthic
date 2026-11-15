@@ -1834,6 +1834,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dive detail: the ⋮ menu of the action bar closes with a tap elsewhere or a second tap on ⋮.",
       "Logbook: « last dive … ago » no longer breaks across lines.",
       "Account: the header band keeps its wave while the page scrolls.",
       "Deleting the cloud account: a three-step wizard (what will be erased, your dives, confirm), the final button disabled until the password is typed.",

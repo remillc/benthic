@@ -65,9 +65,18 @@
     return () => scroller.removeEventListener('scroll', onScroll);
   });
 
+  /** Stops watching for a press outside the open menu. */
+  let stopOutside = () => {};
+
+  /** The menu that closed last, and when: a press on its button that closed it does not reopen it. */
+  let justClosed = { key: '', at: 0 };
+
   // The menu closed: the button is no longer pressed.
   $effect(() => {
-    const closed = () => (openKey = '');
+    const closed = () => {
+      openKey = '';
+      stopOutside();
+    };
     f7.on('popoverClosed', closed);
     return () => f7.off('popoverClosed', closed);
   });
@@ -106,8 +115,40 @@
     hideTip();
     if (!action.menu) return action.onclick?.();
     const button = /** @type {HTMLElement} */ (e.currentTarget);
+    // A second press on ⋮ closes its menu (read from the menu itself: Framework7's
+    // "popoverClosed" does not always reach this toolbar).
+    // On a touch screen Framework7 closes the menu on this same press, just before this
+    // runs: a menu closed a moment ago by a press on its own button stays closed.
+    if (document.querySelector(action.menu)?.classList.contains('modal-in')) {
+      f7.popover.close(action.menu);
+      return;
+    }
+    if (justClosed.key === action.key && performance.now() - justClosed.at < 400) return;
     openKey = action.key;
-    f7.popover.open(action.menu, button);
+    const popover = f7.popover.open(action.menu, button);
+    const key = action.key;
+    // "close" as soon as it starts closing: on a touch screen that is the touchend, before the click.
+    popover?.once?.('close', () => (justClosed = { key, at: performance.now() }));
+    popover?.once?.('closed', () => {
+      openKey = '';
+      stopOutside();
+    });
+    // A press anywhere else closes it. Framework7's own outside click is not enough: the
+    // popover is moved to the app's root, and in the tablet and desktop detail pane its
+    // handler was lost once the pane showed another dive.
+    stopOutside();
+    const selector = action.menu;
+    /** @param {PointerEvent} p */
+    const outside = (p) => {
+      const target = /** @type {Node} */ (p.target);
+      if (document.querySelector(selector)?.contains(target) || button.contains(target)) return;
+      f7.popover.close(selector);
+    };
+    document.addEventListener('pointerdown', outside, true);
+    stopOutside = () => {
+      document.removeEventListener('pointerdown', outside, true);
+      stopOutside = () => {};
+    };
     // Above the toolbar, its right edge on the button's.
     requestAnimationFrame(() => {
       const menu = /** @type {HTMLElement|null} */ (document.querySelector(action.menu ?? ''));
