@@ -968,13 +968,7 @@
   },
   "welcome": {
     "title": "OpenDives",
-    "intro": "Votre carnet de plongée, sur le téléphone et la tablette. Comment voulez-vous commencer ?",
-    "existing": "J'ai déjà un compte Subsurface",
-    "existingText": "Vos plongées sont sauvegardées dans le cloud Subsurface. Une copie reste sur cet appareil : vous la consultez même sans réseau, et elle se met à jour quand le réseau revient.",
-    "create": "Créer un compte Subsurface",
-    "createText": "Gratuit. Vos plongées sont sauvegardées et partagées entre votre téléphone, votre tablette et votre ordinateur. Vous pourrez y reprendre votre carnet divelogs.de.",
     "noAccount": "Commencer sans compte",
-    "noAccountText": "Vos plongées restent seulement sur cet appareil : pas de sauvegarde, et pas de partage avec vos autres appareils. Vous pourrez créer un compte plus tard et y envoyer votre carnet.",
     "choicesLabel": "Façons de commencer",
     "ownGit": "Utiliser mon propre dépôt git",
     "headline": "Votre carnet\nde plongée.",
@@ -1860,6 +1854,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur iPhone et iPad : une phrase sous le titre et une ligne d’aide sous chaque choix, comme sur Android.",
       "Carnet : « Fusionner en une plongée » et « Modifier ensemble… » dans le menu ⋮ des plongées cochées. La fusion n'est offerte que pour des plongées qui se suivent, à moins d'une heure d'intervalle ; « Modifier ensemble… » change le site, le guide, les compagnons, les étiquettes, la combinaison, le type d'eau et les notes de plusieurs plongées à la fois, et « Annuler » défait tout d'un coup.",
       "Profil des plongées : « Plafond » montre le plafond donné par l'ordinateur de plongée, comme Subsurface. Le plafond calculé avec vos facteurs de gradient s'ajoute en pointillé si « Plafond calculé » est activé dans Réglages, Affichage.",
       "Profil des plongées : courbes plus fines (1,25 dp) et ligne de profondeur moyenne de 1 dp. Le contraste élevé garde des traits de 2 dp.",

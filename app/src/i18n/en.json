@@ -968,13 +968,7 @@
   },
   "welcome": {
     "title": "OpenDives",
-    "intro": "Your dive logbook, on your phone and tablet. How do you want to start?",
-    "existing": "I already have a Subsurface account",
-    "existingText": "Your dives are backed up in the Subsurface cloud. A copy stays on this device: you can read it without a network, and it is updated when the network is back.",
-    "create": "Create a Subsurface account",
-    "createText": "Free. Your dives are backed up and shared between your phone, your tablet and your computer. You can bring your divelogs.de logbook into it.",
     "noAccount": "Start without an account",
-    "noAccountText": "Your dives stay on this device only: no backup, and no sharing with your other devices. You can create an account later and send your logbook to it.",
     "choicesLabel": "Ways to start",
     "ownGit": "Use my own git repository",
     "headline": "Your dive log.",
@@ -1860,6 +1854,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on iPhone and iPad: one line under the title and a one-line helper under each choice, as on Android.",
       "Logbook: « Merge into one dive » and « Edit together… » in the ⋮ menu of the checked dives. Merging is offered only for dives that follow one another, less than an hour apart; « Edit together… » changes the site, guide, buddies, tags, suit, water type and notes of several dives at once, and « Undo » reverts it in one go.",
       "Dive profiles: « Ceiling » shows the ceiling given by the dive computer, as Subsurface does. The ceiling computed with your gradient factors is added as a dashed line when « Computed ceiling » is on in Settings, Display.",
       "Dive profiles: thinner curves (1.25 dp), a 1 dp average-depth line; high contrast keeps 2 dp lines.",
