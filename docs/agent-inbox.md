@@ -3534,3 +3534,21 @@ Christian noticed on 15 November 2026 that the desktop detail pane has no tabs a
 - Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the detail pane to the commit description.
 
 Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
+
+## [ ] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and every desktop Carnet screen (with the group copy `bureau-carnet-groupe.dc.html`); the ⋮ menu open in `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+- **No top bar across the window.** The detail pane rises to the top of the window (20 dp padding above the dive's title), which gives room to the site map behind its header.
+- **The list column has its own 64 dp header,** aligned with the table's cells (12 dp start padding), from left to right:
+  - « Carnet » (22 px medium) with the count line under it, 13 px #4B4A47, on one line (« 9 plongées · 4 sites · dernière plongée il y a 9 mois »);
+  - the search field (Ctrl+F), up to 300 dp wide and at least 220 dp, its placeholder on one line, cut with an ellipsis if needed;
+  - the columns button (44 dp, 22 dp icon, tooltip « Colonnes affichées »), which leaves the table's header row;
+  - a ⋮ button « Plus d'options du carnet » (44 dp).
+- **The ⋮ menu** (16 dp corners, as the other desktop menus) holds « Annuler : {dernière action} » with Ctrl+Z and « Rétablir » with Ctrl+Maj+Z, each with its ↶ ↷ icon; an item is greyed out when there is nothing to undo or redo. The ↶ ↷ icon buttons of task 187 are removed. The shortcuts are unchanged.
+- On macOS the same header; Annuler and Rétablir are also in the Édition menu, as before.
+- Sites and Statistiques are not changed by this task.
+
+English: « More logbook options », « Undo: {last action} », « Redo », « Columns shown ».
+
+Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
