@@ -3728,7 +3728,7 @@ English: « Settings », « Saved at once, on this computer », « Search settin
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
 
-## [ ] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
+## [x] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
 
 Christian approved this on 15 November 2026: the simple logo is the one in use for now (`docs/system-design.md`, « Logo in use »; to-do #78). The drawing: `docs/brand/candidates/opendives-logo-simple.svg`, a disc of radius 11 on a 24 grid, centred, filled #114477, and one white wave across it (`M5 13q3.5-3 7 0t7 0`, stroke 2, rounded ends). Two flat colours, no gradient, no bubbles, no ring, no grey arc: the same drawing in light and dark mode and at every size. On the 108 icon grid it is the same disc at radius 30, centred (scale 30/11 around the centre). Every mock-up already shows it, for instance `docs/mockups/bureau-demarrage.dc.html`, `apropos-android.dc.html`, `android-tablette-premier-lancement-portrait.dc.html`, `nav-compte-maj-android.dc.html`, the desktop title bars and `docs/mockups/logo-profil-claude.dc.html` (« Logo · simple », the reference board).
 
@@ -3740,3 +3740,6 @@ Replace « Trois vagues » in:
 - Desktop: the window and taskbar icon and the splash screen (`docs/mockups/bureau-demarrage.dc.html`: the logo centred at 240 dp on #F4F4F2, #121314 in dark mode, nothing else).
 
 Tests: the launcher icon, the splash screen (light and dark), the About screen, the first launch and the side menu show the disc with one white wave and nothing else; no file of the app still contains the wave colours #D4E2F2/#BCD2EB inside a logo; the favicon is the simple logo.
+
+Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
+
