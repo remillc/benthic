@@ -169,6 +169,7 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `saisie-bateau-android.dc.html` | Saisie sur le bateau · Android |
 | `choisir-site-android.dc.html` | Choisir un site · Android |
 | `bureau-demarrage.dc.html` | Écran de démarrage · bureau |
+| `bureau-demarrage-actuel.dc.html` | Démarrage sans carnet · bureau (app actuelle, capture du 15 novembre 2026) |
 | `bureau-carnet-profil-droite.dc.html` | Carnet · bureau (Windows, Linux) |
 | `bureau-carnet-macos.dc.html` | Carnet · bureau macOS, barre de menus |
 | `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
@@ -213,10 +214,14 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-carnets-menu-fichier-macos.dc.html` | Carnet · bureau macOS, menu Fichier et carnets récents |
 | `bureau-carnets-accueil.dc.html` | Bureau · aucun carnet ouvert |
 | `bureau-nouveau-carnet-choix.dc.html` | Nouveau carnet, étape 1 : nom et où le garder · bureau |
-| `bureau-nouveau-carnet-nuage.dc.html` | Nouveau carnet, étape 2 : dans votre nuage · bureau |
+| `bureau-nouveau-carnet-nuage.dc.html` | (étape 3, compte connecté) Nouveau carnet, étape 2 : dans votre nuage · bureau |
+| `bureau-nouveau-carnet-nuage-fournisseur.dc.html` | Nouveau carnet, étape 2 : choisir le service · bureau |
+| `bureau-nouveau-carnet-nuage-connexion.dc.html` | Nouveau carnet, étape 3 : se connecter · bureau |
+| `bureau-nouveau-carnet-nuage-webdav.dc.html` | Nouveau carnet, étape 3 : serveur WebDAV ou Nextcloud · bureau |
 | `bureau-nouveau-carnet-git.dc.html` | Nouveau carnet, étape 2 : dans un dépôt git · bureau |
 | `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
 | `logo-profil-claude.dc.html` | Logo · simple (icône de Claude VC) |
 | `logo-fusion.dc.html` | Logo · fusion (proposition de Claude) |
 | `logo-vagues-bulles.dc.html` | Logo · vagues et bulles (proposition de Claude, retirée du canevas) |
-| `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude) |
+| `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude, retirée du canevas) |
+| `logo-simple-relief.dc.html` | Logo · simple en relief (proposition de Claude) |

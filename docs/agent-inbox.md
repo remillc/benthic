@@ -3808,3 +3808,61 @@ Replace « Trois vagues » in:
 Tests: the launcher icon, the splash screen (light and dark), the About screen, the first launch and the side menu show the disc with one white wave and nothing else; no file of the app still contains the wave colours #D4E2F2/#BCD2EB inside a logo; the favicon is the simple logo.
 
 Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
+
+## [ ] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
+
+Christian approved this on 15 November 2026. Mock-up: `docs/mockups/android-etat-vide.dc.html` (« Carnet vide · Android »). The empty state of the Logbook (`app/src/pages/Logbook.svelte`, `emptyTitle`), on phone and tablet (on tablet, the same column, max 440 dp wide, centred as on the tablet first launch).
+
+From top to bottom, under the unchanged header band:
+- **Illustration:** the dive profile of the first launch (`android-tablette-premier-lancement-portrait.dc.html`, the same path), 104 dp high, 24 dp margins left and right, 16 dp under the band, directly on the page background (no card, no label). Water between the surface and the profile in the gradient `--od-water-top` to `--od-water-bottom` (0.9 opacity), profile line `--od-trace` 1.25 dp. Three white bubble outlines (1.5 dp stroke) rising in the water of the descent, the smallest lowest (radius 2.5, 3.5, 4.5 dp). Decorative: `aria-hidden`.
+- **Title** « Aucune plongée pour l'instant », 24 sp, weight 500, 20 dp under the illustration; then « Commencez par votre ordinateur de plongée, ou choisissez une autre façon ci-dessous. » (16 sp, `--od-text-2`).
+- **« Associer un ordinateur de plongée »:** a full-width filled button (24 dp margins), 56 dp high, fully rounded, ink #1F2124 with white text and the Bluetooth icon.
+- **The other ways**, grouped in one white card (24 dp corners, 16 dp margins, `nav` « Autres façons d'ajouter des plongées »), rows of 60 dp min separated by 1 dp #ECEAE4, each with a 44 dp tonal icon container (#D4E2F2, 14 dp corners, icon #114477), a title (16 sp, 500), a helper line (13 sp, `--od-text-2`) and a chevron:
+  - « Importer un fichier » — « .ssrf, .xml et autres carnets » (download icon; opens the file picker as today);
+  - « Télécharger depuis divelogs.de » — « Avec votre identifiant divelogs.de » (cloud icon; opens the divelogs.de step as today);
+  - « Noter une plongée à la main » — « Date, profondeur et durée suffisent » (pencil icon; opens the dive editor).
+- The small note at the bottom (« Les fichiers de Subsurface… s'importent ici. ») is removed: its content is now the helper of « Importer un fichier ».
+
+Dark mode: the same layout with the dark tokens (card `--od-surface`, icon container `--od-tint`, button in the dark ink). English: « No dives yet », « Start with your dive computer, or pick another way below. », « Pair a dive computer », « Other ways to add dives », « Import a file » — « .ssrf, .xml and other logbooks », « Download from divelogs.de » — « With your divelogs.de username », « Log a dive by hand » — « Date, depth and time are enough ».
+
+Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
+
+## [ ] 2026-11-15-205 iPhone first launch: check the water colour under the profile
+
+Christian approved this on 15 November 2026. The mock-up `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone ») had the water under the profile going from #D4E2F2 to black (#1F2124); it now goes to #5584B5, as on Android and everywhere else. `app/src/pages/WelcomeStart.svelte` already uses `--od-water-top` and `--od-water-bottom`, so this is a check, not a change: on iOS (light and dark), the water must end in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the profile line stay `--od-trace`. If an iOS-specific style or an older build still darkens it, fix it there.
+
+Test: the iPhone first launch in light mode shows a blue water column, never black, under a #1F2124 line.
+
+## [ ] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
+
+Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »). Mock-up: `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone »). The iOS layout does not change (large title, the profile, a grouped list with chevrons); only the texts become those of the Android first launch, already in `app/src/i18n/fr.json` (`welcome`):
+- under « OpenDives »: « Votre carnet de plongée. » (instead of `welcome.intro`);
+- « J’ai un compte Subsurface » (`existingShort`), helper « Sauvegardé dans le cloud, consultable hors ligne » (`existingNote`);
+- « Créer un compte » (`createShort`), helper « Gratuit. Partagé entre vos appareils » (`createNote`);
+- « Commencer sans compte » (`noAccount`), helper « Le carnet reste sur ce téléphone. Vous pourrez le sauvegarder plus tard » (`noAccountNotePhone`; on iPad `noAccountNoteTablet`).
+- « Utiliser mon propre dépôt git », if shown on iOS, keeps its place and wording.
+
+Once nothing uses them any more, remove `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` from every language file. English follows the existing English keys of the same names.
+
+Test: the iPhone first launch shows one short line under the title and a one-line helper under each choice; the iPad shows « sur cet appareil ».
+
+## [ ] 2026-11-15-207 New logbook dialog: a close button at every step
+
+Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».
+
+Test: at each step, the ✕ closes the dialog, no logbook is created, the window is back to where it was; Échap does the same.
+
+## [ ] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
+
+Christian approved this on 15 November 2026. It changes the « Nouveau carnet » dialog of task 175 (`app/src/components/DesktopNewLogbook.svelte`); the ✕ of task 207 stays. The full description is in `docs/system-design.md`, « New logbook »; mock-ups in `docs/mockups/`, in this order: `bureau-nouveau-carnet-choix.dc.html` (step 1), `bureau-nouveau-carnet-nuage-fournisseur.dc.html` (step 2), `bureau-nouveau-carnet-nuage-connexion.dc.html` (step 3, not connected), `bureau-nouveau-carnet-nuage.dc.html` (step 3, connected), `bureau-nouveau-carnet-nuage-webdav.dc.html` (step 3, WebDAV), `bureau-nouveau-carnet-git.dc.html` (git, step 2 of 2).
+
+- **Step count:** « Étape 1 sur 3 » when « Dans votre nuage » is chosen, « sur 2 » otherwise; step 1's button stays « Continuer ».
+- **Step 2 · Dans votre nuage:** « Choisissez le service où garder le carnet. », the four service rows (choice rows with the check), nothing beside « WebDAV ou Nextcloud », « Retour » and « Continuer ». No account, no button, no « Dossier » field.
+- **Step 3 · Connexion à {service}:** the band with the OpenDives tile and the service's tile joined by a line and a badge (dashed grey with a link icon when not connected; solid #1E6B3A with a check when connected). Not connected: « Pas encore connecté », « Connectez-vous à {service} dans votre navigateur, puis revenez ici pour créer le carnet. », main button « Se connecter à {service} » (external-link icon) which opens the sign-in in the browser; when the diver comes back signed in, the same step switches to the connected state. Connected (also when OpenDives already had access to the service): the account, « Le carnet « Mon carnet.ssrf » sera créé dans un dossier OpenDives de ce compte. », the link « Changer de compte » (signs in again in the browser), main button « Créer le carnet ». The privacy line with a padlock sits just above the buttons.
+- **Step 3 for WebDAV ou Nextcloud · Connexion à votre serveur:** « Adresse du serveur », « Nom d'utilisateur », « Mot de passe » (helper « Dans Nextcloud, créez un mot de passe d’application dans Réglages › Sécurité. Il reste sur cet ordinateur. »); « Créer le carnet » enabled once the three are filled; the connection is checked on « Créer le carnet » and an error stays on this step under the field concerned.
+- **Same frame at every step:** the dialog is 560 × 526 dp and does not move or resize from step to step (step 1, 2, 3 and the git step); the ✕ stays top right, the buttons are pinned bottom right, and only the content changes, with a 150 ms cross-fade (none with « réduire les animations »).
+- The « Dossier » field is gone everywhere: the file always goes into an OpenDives folder of the service.
+
+English: « Step 1 of 3 », « In your cloud », « Choose the service to keep the logbook in. », « Sign in to {service} », « Not signed in yet », « Sign in to {service} in your browser, then come back here to create the logbook. », « The logbook “My logbook.ssrf” will be created in an OpenDives folder of this account. », « Switch account », « Sign in to your server », « Server address », « Username », « Password », « In Nextcloud, create an app password in Settings › Security. It stays on this computer. ».
+
+Tests: the dialog keeps the same size and place through every step and back; step 3 shows « Se connecter à {service} » until the sign-in comes back, then the connected state and « Créer le carnet »; a service already authorised opens step 3 connected; « Changer de compte » signs in with another account; WebDAV creates the logbook only with a valid server and credentials.
