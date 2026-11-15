@@ -3276,9 +3276,11 @@ English: « New logbook », « Logbook name », « Where to keep it? », « On t
 
 Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
 
-## [ ] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
+## [x] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
+
+Done: the start screen uses `logo-light.svg` / `logo-dark.svg` of `app/public` (the same drawing as `docs/brand/opendives-logo-*.svg`, not redrawn) at 64 dp. Windows and Linux keep the system title bar with the window icon `icon-round.png` (task 170); task 169 put no other logo in the desktop screens.
 
 ## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
 
@@ -3487,7 +3489,7 @@ English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
 
 Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
 
-## [ ] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
+## [x] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
 
 Christian decided this on 15 November 2026 (follows task 173). « Enregistrer une copie… » stays the only way to save a logbook elsewhere: there is no « Enregistrer sous », since saving is automatic and each logbook has its own window.
 
@@ -3497,6 +3499,8 @@ Christian decided this on 15 November 2026 (follows task 173). « Enregistrer un
 English: « Copy saved · Open ».
 
 Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
+
+Done: `saveCopy()` in `app/src/lib/desktop-logbooks.svelte.js` (system save dialog, the copy written by the bridge, snackbar « Copie enregistrée · Ouvrir » opening it in a new window); ⇧⌘S on the Mac (menu), Ctrl+Maj+S and the selector entry on Windows and Linux. Tested in `tests/desktop/windows.test.mjs`.
 
 ## [ ] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
 

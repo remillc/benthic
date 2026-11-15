@@ -12,7 +12,10 @@
  * @typedef {{ v: 1, total: number, prefs: Prefs, entries: SnapshotEntry[] }} Snapshot
  */
 
-const KEY = 'od.logbookSnapshot';
+import { logbookKey } from './window-logbook.js';
+
+/** One snapshot per logbook: the desktop's windows share the storage (task 2026-11-15-173). */
+const KEY = logbookKey('od.logbookSnapshot');
 const VERSION = 1;
 /** Dives and collapsed trips kept: a little more than a screen. */
 const ENTRIES = 16;

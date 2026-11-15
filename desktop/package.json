@@ -28,6 +28,8 @@
       "menu.cjs",
       "window-state.cjs",
       "bridge.cjs",
+      "logbooks.cjs",
+      "windows.cjs",
       "preload.cjs",
       "package.json",
       "resources/icon-round.png"

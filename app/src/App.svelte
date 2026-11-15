@@ -50,6 +50,8 @@
   import NavRail from './components/NavRail.svelte';
   import DesktopLogbook from './pages/DesktopLogbook.svelte';
   import DesktopSelection from './pages/DesktopSelection.svelte';
+  import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
+  import DesktopNewLogbook from './components/DesktopNewLogbook.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   // The route badge, for development builds: shown when app/.env.local (not in git) sets
@@ -65,7 +67,8 @@
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
-  import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp } from './lib/layout.svelte.js';
+  import { logbooks, noLogbook, enableLogbookCommands } from './lib/desktop-logbooks.svelte.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
@@ -318,6 +321,8 @@
     mark('onMount');
     // Offline maps: follows the downloads and checks for updates (at most once a day).
     startOfflineMaps();
+    // Several logbooks (task 2026-11-15-173): new, open, close and save a copy, from the keyboard and the Mac's menu bar.
+    return enableLogbookCommands();
   });
 </script>
 
@@ -335,6 +340,9 @@
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
+  <!-- Desktop: a window with no logbook shows its start screen; the new-logbook dialog opens from there, the selector and the Mac's menu (task 2026-11-15-173). -->
+  {#if desktopApp && noLogbook}<DesktopLogbookStart />{/if}
+  {#if desktopApp && logbooks.dialog}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/if}
   <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
