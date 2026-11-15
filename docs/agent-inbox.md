@@ -3385,3 +3385,18 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 
 Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
 
+## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+
+Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
+
+- **Drag a column header** to move the column. While dragging: the header floats above the table (white, 8 dp corners, shadow, a ⠿ grip, tilted slightly), its original place stays as a pale #ECEAE4 slot, and a 3 dp #114477 bar with a small marker at the top shows where it will land; a plain tooltip says « Déposez pour placer « Site » entre Durée et Temp. ». Échap cancels the drag.
+- **Every column moves except N°**, which stays first. A click on a header without moving still sorts, as before.
+- **Keyboard:** with focus on a header, Alt+Maj+← and Alt+Maj+→ move the column one place.
+- **Kept between sessions, per logbook:** the order, the widths and the visible columns are stored in the app's settings on this computer, keyed by the logbook. Never in the logbook file: Subsurface for desktop must read it unchanged.
+- **Reset:** the menu of the columns button ends with a divider and « Rétablir l'ordre des colonnes ».
+- A move is not an undo step of the logbook (it changes no data).
+
+English: « Drop to place “Site” between Durée and Temp. », « Reset the column order ».
+
+Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
+
