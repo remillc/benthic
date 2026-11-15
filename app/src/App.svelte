@@ -50,6 +50,7 @@
   import NavRail from './components/NavRail.svelte';
   import DesktopLogbook from './pages/DesktopLogbook.svelte';
   import DesktopStatistics from './pages/DesktopStatistics.svelte';
+  import DesktopTools from './pages/DesktopTools.svelte';
   import DesktopSelection from './pages/DesktopSelection.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
@@ -182,7 +183,8 @@
     { path: '/statistics/dives/', component: StatisticsDives },
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
-    { path: '/tools/', component: Tools },
+    // Desktop app from 1200 dp: the tools list and the chosen tool side by side (task 2026-11-15-196).
+    { path: '/tools/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: layout.desktop ? DesktopTools : Tools }) },
     { path: '/tools/desaturation', component: Desaturation },
     { path: '/tools/ead-mod', component: GasEadMod },
     { path: '/tools/best-mix', component: GasBestMix },
@@ -285,6 +287,15 @@
     desktopShown = wide;
     f7.views.get('#view-logbook')?.router.navigate('/', { reloadAll: true, animate: false });
     f7.views.get('#view-statistics')?.router.navigate('/statistics/', { reloadAll: true, animate: false });
+  });
+
+  // Crossing 1200 dp swaps the Outils section's desktop layout and the tablet's.
+  let desktopToolsShown = layout.desktop;
+  $effect(() => {
+    const wide = layout.desktop;
+    if (wide === desktopToolsShown) return;
+    desktopToolsShown = wide;
+    f7.views.get('#view-tools')?.router.navigate('/tools/', { reloadAll: true, animate: false });
   });
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.

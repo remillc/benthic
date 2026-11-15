@@ -151,6 +151,18 @@
     --od-nav-active: #114477;
     /* The account avatar's initial, on the white 90 % circle of the band (the band stays blue in dark mode). */
     --od-nav-avatar-ink: #114477;
+    /* Desktop Outils (task 2026-11-15-196): grey filled fields, the selected row and segment, the amber banner, the cylinder's gas layers. */
+    --od-desktop-field: #ECEAE4;
+    --od-desktop-selected: #D4E2F2;
+    --od-desktop-selected-ink: #114477;
+    --od-desktop-banner: #FBE3B2;
+    --od-desktop-banner-ink: #3D3A33;
+    --od-gas-helium: #7FA3C8;
+    --od-gas-oxygen: #4E9A6A;
+    --od-gas-topup: #C9B98F;
+    --od-gas-topup-badge: #9A8657;
+    --od-desktop-bar-mid: #114477;
+    --od-desktop-bar-low: #7FA3C8;
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
     /* The light centre above the top edge (contrast audit, task 2026-11-14-153): -20 % on phones,
@@ -325,6 +337,18 @@
     --od-loading-indicator-bottom: #4C8BD4;
     --od-cylinder-water-top: #BFD6F0;
     --od-cylinder-water-bottom: #4C8BD4;
+    /* Desktop Outils (task 2026-11-15-196), dark. */
+    --od-desktop-field: #2E3033;
+    --od-desktop-selected: #1E3552;
+    --od-desktop-selected-ink: #8FB6E6;
+    --od-desktop-banner: #4A3A1A;
+    --od-desktop-banner-ink: #F4E4C0;
+    --od-gas-helium: #6E93BC;
+    --od-gas-oxygen: #5FB07F;
+    --od-gas-topup: #A8996F;
+    --od-gas-topup-badge: #7C6D45;
+    --od-desktop-bar-mid: #4C8BD4;
+    --od-desktop-bar-low: #3A6FAE;
     --od-cylinder-breathed: #2A4466;
     --od-cylinder-level: #FF8A80;
     --od-cylinder-no-pressure: #1C1D1F;

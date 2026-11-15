@@ -3628,7 +3628,7 @@ Test: during a column drag, no tooltip appears on screen; the live region announ
 
 Done: no tooltip while dragging a column; an aria-live region announces « « Site » sera placé entre Durée et Compagnons » (or « en dernier »). Checked in a desktop window.
 
-## [ ] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
+## [x] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils » of the canvas): `docs/mockups/bureau-outils.dc.html` (planner), its group copy `bureau-outils-groupe.dc.html` (planner ⋮ menu open), `bureau-outils-desaturation.dc.html`, `bureau-outils-ead-mod.dc.html`, `bureau-outils-meilleur-melange.dc.html`, `bureau-outils-melangeur.dc.html`. The calculations are the phone's (same core functions, `docs/ui-specification.md`); only the layout is new.
 
@@ -3645,3 +3645,5 @@ Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils �
 English: « Plan », « More plan options », « Share the plan… », « Planner settings », « Saved plans », « Print the slate », « Save the plan », « Notify me », « Prepare this mix ».
 
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
+
+Done: `pages/DesktopTools.svelte` (list and right pane, chosen in App.svelte when `layout.desktop`), `components/DesktopPlanner|Desaturation|EadMod|BestMix|Blender.svelte`, grey fields and connected segments (`DesktopField`, `DesktopSegments`), logic in `lib/desktop-tools.js` (tested in `tests/app/desktop-tools.test.mjs`) and state in `lib/desktop-tools.svelte.js`. The blender follows the rules of tasks 198 (desktop part), 199 and 201. Differences from the mock-ups are listed in the report.
