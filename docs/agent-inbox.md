@@ -3212,3 +3212,7 @@ Christian decided this on 15 November 2026. Read first `docs/system-design.md`, 
 English: « Logbook », « Search the logbook », « 2 dives selected », « Right-click or ⋮ to act on the selection », « Merge into one dive », « Add to a trip… », « Edit together… », « Copy », « Export… », « Share… », « Delete », « Settings », « About OpenDives ».
 
 Write in `docs/architecture.md` how the desktop build is organised, and add the desktop to `docs/ui-specification.md`. Tests: the table sorting, the selection and the right-click menu's items for one and several dives.
+
+## [ ] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
+
+Christian decided this on 15 November 2026, with you. Task 169 asks for Tauri 2 by default: **use Electron instead**, as you agreed with Christian. The rest of task 169 is unchanged. The Subsurface core is compiled natively and reached from Electron's main process (a Node native module or a helper process, your choice; write it in `docs/architecture.md`). Builds for Windows, macOS and Linux in the GitHub workflow. `docs/system-design.md` (section 7, « Desktop app ») now says Electron.
