@@ -37,3 +37,13 @@ test('tablet first launch: a larger brand row (logo 96 dp, « OpenDives » 48 sp
   assert.match(phone, /\.od-welcome-start--brand \{[^}]*gap: 10px;[^}]*font-size: 20px;/);
   assert.match(source, /src="logo-light\.svg" alt="" width="40" height="40"/);
 });
+
+test('tablet first launch: the profile stays off the screen edges in both orientations (task 211)', () => {
+  const tablet = source.slice(source.indexOf('@media (min-width: 768px)'));
+  const landscape = tablet.slice(tablet.indexOf('@media (orientation: landscape)'), tablet.indexOf('@media (orientation: portrait)'));
+  const portrait = tablet.slice(tablet.indexOf('@media (orientation: portrait)'));
+  assert.match(landscape, /wide-profile\) \{[^}]*width: calc\(100% - 56px\);[^}]*margin: 0 0 56px 56px;/);
+  assert.match(landscape, /\.od-welcome-start--head \{[^}]*margin: 34px 0 0 56px;/);
+  assert.match(portrait, /wide-profile\) \{[^}]*max-width: 520px;[^}]*margin: 32px auto 0;/);
+  assert.match(portrait, /\.od-welcome-start--head \{[^}]*max-width: 520px;/);
+});
