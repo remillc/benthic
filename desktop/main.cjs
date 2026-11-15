@@ -47,6 +47,9 @@ function createWindow() {
     minHeight: 560,
     show: false,
     title: 'OpenDives',
+    // The OpenDives icon (« Trois vagues », docs/brand) in the title bar and the taskbar; the
+    // packages get theirs from the same file (electron-builder, resources/icon.png).
+    icon: path.join(__dirname, 'resources', 'icon.png'),
     backgroundColor: '#F5F4F0',
     autoHideMenuBar: process.platform !== 'darwin',
     webPreferences: {

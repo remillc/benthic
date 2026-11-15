@@ -29,7 +29,8 @@
       "window-state.cjs",
       "bridge.cjs",
       "preload.cjs",
-      "package.json"
+      "package.json",
+      "resources/icon.png"
     ],
     "extraResources": [
       {

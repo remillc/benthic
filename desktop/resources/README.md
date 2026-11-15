@@ -1,0 +1,1 @@
+`icon.png` (1024 × 1024) is `docs/brand/opendives-icon-light-squircle.svg` rendered as an image: the window's icon, and electron-builder makes the packages' icons from it (.ico, .icns, Linux sizes). Render it again when the brand icon changes.
