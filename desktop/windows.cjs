@@ -432,6 +432,8 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
       case 'cloudCancelSignIn':
         cloud?.cancelSignIn(String(options.provider));
         return true;
+      case 'cloudReopenSignIn':
+        return cloud ? cloud.reopenSignIn(String(options.provider)) : false;
       case 'cloudSignOut':
         if (!cloud) throw new Error('NOT_AVAILABLE');
         return cloud.signOut(String(options.provider));

@@ -284,7 +284,7 @@
       "warning": "The copy you do not keep is replaced."
     },
     "row": {
-      "signIn": "Sign in",
+      "notConnected": "Not signed in",
       "signingIn": "Signing in, in your browser…",
       "connected": "Connected · {account}",
       "connectedNoAccount": "Connected"
@@ -315,7 +315,9 @@
       "last": "The last logbook",
       "ask": "Choose each time"
     },
-    "cancelSignIn": "Cancel the sign-in"
+    "cancelSignIn": "Cancel the sign-in",
+    "waiting": "The sign-in page of {service} is open in your browser.",
+    "reopen": "Open the page again"
   },
   "sync": {
     "failure": {

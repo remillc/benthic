@@ -30,7 +30,7 @@ export const CLOUD_PROVIDERS = /** @type {const} */ (['googleDrive', 'oneDrive',
 export function providerRow(status, signingIn, t) {
   if (!status || !status.available) return { state: 'unavailable', text: t('desktopLogbooks.new.notAvailable') };
   if (signingIn) return { state: 'signingIn', text: t('desktopCloud.row.signingIn') };
-  if (!status.connected) return { state: 'signedOut', text: t('desktopCloud.row.signIn') };
+  if (!status.connected) return { state: 'signedOut', text: t('desktopCloud.row.notConnected') };
   return { state: 'connected', text: status.account ? t('desktopCloud.row.connected', { account: status.account }) : t('desktopCloud.row.connectedNoAccount') };
 }
 

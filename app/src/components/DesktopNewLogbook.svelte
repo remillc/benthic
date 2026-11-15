@@ -118,6 +118,11 @@
     if (signingIn) bridge().logbooks.cloudCancelSignIn({ provider: signingIn });
   }
 
+  /** « Rouvrir la page »: the sign-in page again (a tab closed, or opened behind another window). */
+  function reopenSignIn() {
+    if (signingIn) bridge().logbooks.cloudReopenSignIn({ provider: signingIn });
+  }
+
   // Another service chosen, or the dialog left: a sign-in still waiting is cancelled.
   $effect(() => {
     provider;
@@ -258,6 +263,12 @@
       </div>
       {#if provider && !isConnected(provider)}
         <button type="button" class="od-new-logbook--secondary od-new-logbook--sign-in" onclick={() => (signingIn ? cancelSignIn() : signIn(provider))}>{signingIn ? t('desktopCloud.cancelSignIn') : t('desktopCloud.signIn', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
+        {#if signingIn}
+          <p class="od-new-logbook--help od-new-logbook--waiting" role="status">
+            {t('desktopCloud.waiting', { service: t(`desktopLogbooks.source.${signingIn}`) })}
+            <button type="button" class="od-new-logbook--link" onclick={reopenSignIn}>{t('desktopCloud.reopen')}</button>
+          </p>
+        {/if}
       {:else if isConnected(provider)}
         <button type="button" class="od-new-logbook--text-button od-new-logbook--sign-out" onclick={signOut}>{t('desktopCloud.signOut', { service: t(`desktopLogbooks.source.${provider}`) })}</button>
       {/if}
@@ -449,6 +460,18 @@
     .od-new-logbook--sign-in {
       margin-top: 12px;
       height: 40px;
+    }
+    .od-new-logbook--waiting {
+      margin-top: 8px;
+    }
+    .od-new-logbook--link {
+      padding: 0;
+      border: 0;
+      background: none;
+      font: inherit;
+      color: var(--od-text);
+      text-decoration: underline;
+      cursor: pointer;
     }
     .od-new-logbook--sign-out {
       margin-top: 8px;

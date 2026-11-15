@@ -284,7 +284,7 @@
       "warning": "La copie que vous ne gardez pas est remplacée."
     },
     "row": {
-      "signIn": "Se connecter",
+      "notConnected": "Non connecté",
       "signingIn": "Connexion dans le navigateur…",
       "connected": "Connecté · {account}",
       "connectedNoAccount": "Connecté"
@@ -315,7 +315,9 @@
       "last": "Le dernier carnet",
       "ask": "Choisir à chaque fois"
     },
-    "cancelSignIn": "Annuler la connexion"
+    "cancelSignIn": "Annuler la connexion",
+    "waiting": "La page de connexion de {service} est ouverte dans votre navigateur.",
+    "reopen": "Rouvrir la page"
   },
   "sync": {
     "failure": {

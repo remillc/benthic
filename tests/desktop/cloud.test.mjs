@@ -541,3 +541,26 @@ test('« Annuler la connexion » ends a sign-in waiting for the browser at once'
   assert.ok(Date.now() - started < 5000, 'not after the timeout');
   assert.equal(cloud.status().find((p) => p.provider === 'oneDrive').connected, false);
 });
+
+test('« Rouvrir la page » opens the same sign-in page again while the sign-in waits', async () => {
+  /** @type {any} */
+  let cloud;
+  /** @type {string[]} */
+  const opened = [];
+  cloud = service({
+    signInTimeoutMs: 60_000,
+    openExternal: async (url) => {
+      opened.push(url);
+      if (opened.length === 1)
+        setTimeout(() => {
+          assert.equal(cloud.reopenSignIn('oneDrive'), true);
+          setTimeout(() => cloud.cancelSignIn('oneDrive'), 20);
+        }, 20);
+    },
+  });
+  await assert.rejects(cloud.signIn('oneDrive'), { code: 'SIGN_IN_CANCELLED' });
+  assert.equal(opened.length, 2);
+  assert.equal(opened[1], opened[0]);
+  // No sign-in waiting: nothing to reopen.
+  assert.equal(cloud.reopenSignIn('oneDrive'), false);
+});

@@ -146,7 +146,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   const clientOf = (/** @type {string} */ provider) => clientsNow()[provider] || null;
   /** @type {Map<string, { token: string, expires: number }>} */
   const accessTokens = new Map();
-  /** @type {Map<string, { cancel: () => void }>} */
+  /** @type {Map<string, { cancel: () => void, page?: string }>} */
   const signingIn = new Map();
 
   const tokenFile = (/** @type {string} */ provider) => {
@@ -356,10 +356,12 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     const state = base64url(crypto.randomBytes(24));
     const port = provider === 'dropbox' ? (ports.dropbox ?? DROPBOX_PORT) : (ports[provider] ?? 0);
     const listener = await listenForRedirect({ port, state, timeoutMs: signInTimeoutMs, slash: provider === 'dropbox' });
-    signingIn.set(provider, { cancel: listener.cancel });
+    const page = authorizeUrl(provider, { redirectUri: listener.redirectUri, state, challenge });
+    signingIn.set(provider, { cancel: listener.cancel, page });
     let wrote = false;
     try {
-      await openExternal(authorizeUrl(provider, { redirectUri: listener.redirectUri, state, challenge }));
+      log(`Opening the sign-in page of ${provider}`);
+      await openExternal(page);
       const code = await listener.result;
       const json = /** @type {any} */ (await tokenRequest(provider, { grant_type: 'authorization_code', code, redirect_uri: listener.redirectUri, code_verifier: verifier }));
       if (typeof json.access_token !== 'string' || typeof json.refresh_token !== 'string' || !json.refresh_token) throw coded('SERVER', 'SERVER: no refresh token');
@@ -588,12 +590,20 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   }
 
   /** Ends a sign-in still waiting for the browser (the diver closed the page, or chose another service). @param {string} provider */
+  /** « Rouvrir la page »: the sign-in page again, for a tab closed or left behind another window. @param {string} provider */
+  function reopenSignIn(provider) {
+    const page = signingIn.get(provider)?.page;
+    if (!page) return false;
+    Promise.resolve(openExternal(page)).catch((e) => log(`The sign-in page of ${provider} did not open: ${e.message}`));
+    return true;
+  }
+
   function cancelSignIn(provider) {
     signingIn.get(provider)?.cancel();
     signingIn.delete(provider);
   }
 
-  return { status, statusOf, signIn, cancelSignIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync };
+  return { status, statusOf, signIn, reopenSignIn, cancelSignIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync };
 }
 
 module.exports = {

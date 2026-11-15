@@ -89,6 +89,7 @@ contextBridge.exposeInMainWorld('odDesktop', {
     cloudSignIn: (options) => invoke('od:logbooks', 'cloudSignIn', options),
     cloudSignOut: (options) => invoke('od:logbooks', 'cloudSignOut', options),
     cloudCancelSignIn: (options) => invoke('od:logbooks', 'cloudCancelSignIn', options),
+    cloudReopenSignIn: (options) => invoke('od:logbooks', 'cloudReopenSignIn', options),
     /** « Ouvrir au démarrage »: { mode: 'last' | 'ask' }, kept in the main process. */
     startup: () => invoke('od:logbooks', 'startup'),
     setStartup: (options) => invoke('od:logbooks', 'setStartup', options),

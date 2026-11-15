@@ -49,7 +49,7 @@ test('the cloud services are the three with an API; iCloud Drive and WebDAV are 
 test('the end of a service row: not available, sign in, signing in, connected as', () => {
   const rows = {
     'desktopLogbooks.new.notAvailable': 'Pas encore disponible',
-    'desktopCloud.row.signIn': 'Se connecter',
+    'desktopCloud.row.notConnected': 'Non connecté',
     'desktopCloud.row.signingIn': 'Connexion dans le navigateur…',
     'desktopCloud.row.connected': 'Connecté · {account}',
     'desktopCloud.row.connectedNoAccount': 'Connecté',
@@ -58,7 +58,7 @@ test('the end of a service row: not available, sign in, signing in, connected as
   const status = (over) => ({ provider: 'dropbox', available: true, connected: false, account: '', ...over });
   assert.deepEqual(providerRow(status({ available: false }), false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
   assert.deepEqual(providerRow(undefined, false, tt), { state: 'unavailable', text: 'Pas encore disponible' });
-  assert.deepEqual(providerRow(status({}), false, tt), { state: 'signedOut', text: 'Se connecter' });
+  assert.deepEqual(providerRow(status({}), false, tt), { state: 'signedOut', text: 'Non connecté' });
   assert.deepEqual(providerRow(status({}), true, tt), { state: 'signingIn', text: 'Connexion dans le navigateur…' });
   assert.deepEqual(providerRow(status({ connected: true, account: 'moi@example.org' }), false, tt), { state: 'connected', text: 'Connecté · moi@example.org' });
   assert.deepEqual(providerRow(status({ connected: true }), false, tt), { state: 'connected', text: 'Connecté' });
