@@ -225,3 +225,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `logo-vagues-bulles.dc.html` | Logo · vagues et bulles (proposition de Claude, retirée du canevas) |
 | `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude, retirée du canevas) |
 | `logo-simple-relief.dc.html` | Logo · simple en relief (proposition de Claude) |
+| `bureau-carnet-vide-actuel.dc.html` | Carnet vide · bureau (app actuelle, capture du 15 novembre 2026) |
