@@ -223,4 +223,5 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `logo-profil-claude.dc.html` | Logo · simple (icône de Claude VC) |
 | `logo-fusion.dc.html` | Logo · fusion (proposition de Claude) |
 | `logo-vagues-bulles.dc.html` | Logo · vagues et bulles (proposition de Claude, retirée du canevas) |
-| `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude) |
+| `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude, retirée du canevas) |
+| `logo-simple-relief.dc.html` | Logo · simple en relief (proposition de Claude) |
