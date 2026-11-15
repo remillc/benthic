@@ -3938,7 +3938,7 @@ This replaces the « Task 213 is on hold » part of task 215.
 
 Done: one revert commit on `main` takes off everything 213 added (edition switch, release screens, dialog, texts, README section, tests); 210, 211 and 214 stay. `feature/release-first-launch` was created from `main` before the revert and keeps the work (the revert is undone there after merging `main`). Beta first launch checked in headless Edge at 800 × 1280: identical to the screenshot taken before 213.
 
-## [ ] 2026-11-15-217 Branch names for the release edition
+## [x] 2026-11-15-217 Branch names for the release edition
 
 Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 
@@ -3948,3 +3948,5 @@ Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 - Keep each one up to date with `main`.
 
 **Inbox.** In the « Done » note of each release-edition task, give its branch name.
+
+Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.
