@@ -3643,3 +3643,16 @@ Christian decided this on 15 November 2026, to match the desktop (task 196). Moc
 English: « Prepare this mix », « Prepare the 25/28 trimix ».
 
 Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » opens the blender in Trimix with 25 % oxygen and 28 % helium.
+
+## [ ] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
+
+Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-outils-melangeur.dc.html` (desktop), `outils-melangeur-android.dc.html`, `outils-melangeur-nitrox-android.dc.html`, `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`. Applies on every platform; the desktop screen is otherwise task 196.
+
+- **Order:** « Bouteille » comes before the final pressure (Trimix on the phone: Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox: Oxygène and Bouteille, then « Pression finale désirée » on its own line).
+- **« Pression finale désirée »** (was « Pression finale »): prefilled with the chosen cylinder's working pressure, still editable (the calculation targets exactly the value typed). Choosing another cylinder replaces the value only if the diver has not changed it.
+- **Its helper** shows the working pressure: « Service : 3 365 psi » (desktop: « Service de la bouteille : 232 bar »; the desktop cylinder field reads « 12 L · 232 bar »). Above the working pressure, the helper becomes a warning in `--od-alarm` with an icon, « Au-dessus de la pression de service de 3 365 psi », and the calculation still runs.
+- **Desktop cylinder drawing:** a plain scuba cylinder (no valve): narrow body, rounded shoulder, slightly flattened bottom, a short neck. It is drawn full, from bottom to top, in layers in fill order: what was already in it (grey), helium (blue), oxygen (green), the top-up gas (sand #C9B98F, with its step badge #9A8657). The working pressure label at the shoulder.
+
+English: « Desired final pressure », « Working pressure: 3,365 psi », « Above the working pressure of 3,365 psi ».
+
+Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 365 psi); typing 250 bar shows the warning and still gives the steps; changing the cylinder after typing a pressure keeps the typed value.
