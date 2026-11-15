@@ -22,7 +22,7 @@ clone zlib https://github.com/madler/zlib.git "$ZLIB_TAG"
 # Done once (the sources are shared by the targets, which may build in parallel).
 MBEDTLS_CONFIG=$SRC/mbedtls/include/mbedtls/mbedtls_config.h
 if grep -q '^//#define MBEDTLS_THREADING_PTHREAD' "$MBEDTLS_CONFIG"; then
-  sed -i.bak -E 's|^//(#define MBEDTLS_THREADING_(C\|PTHREAD))\b|\1|; s|^(#define MBEDTLS_SSL_(PROTO_TLS1_3\|TLS1_3_[A-Z0-9_]+))\b|//\1|' "$MBEDTLS_CONFIG"
+  sed -i.bak -E 's|^//(#define MBEDTLS_THREADING_(C\|PTHREAD))|\1|; s|^(#define MBEDTLS_SSL_(PROTO_TLS1_3\|TLS1_3_[A-Z0-9_]+))|//\1|' "$MBEDTLS_CONFIG"
   rm -f "$MBEDTLS_CONFIG.bak"
 fi
 clone libgit2 https://github.com/libgit2/libgit2.git "$LIBGIT2_TAG"
