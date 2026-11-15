@@ -3512,3 +3512,25 @@ English: « Export 2 dives », « Which dives », « The 2 selected dives », «
 
 Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
 
+## [ ] 2026-11-15-190 Profiles: thinner curve lines on every platform
+
+Christian decided this on 15 November 2026: the profile curves were too thick. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet and Statistiques screens, `docs/mockups/android-detail.dc.html`, `docs/mockups/detail3-android.dc.html`, `docs/mockups/detail3-ios.dc.html`, the tablet detail and planner screens.
+
+- **Depth curve:** 1.25 dp (was 2 dp on the phone and tablet, 1.5 dp on desktop), dive detail, planner, list previews and PDF sheet alike. `--od-profile-line-width` is 1.25 dp.
+- **Temperature curve and the other curves of the profile chips** (Gaz, ppO₂, Plafond, Tissus, task 183): 1.25 dp.
+- **Average-depth dashed line** (task 185): 1 dp, dashes unchanged.
+- **Dark themes:** the dark halo drawn under the depth curve shrinks with it (2.5 dp under a 1.25 dp line).
+- **High contrast** (#75): the profile lines stay at 2 dp.
+- Unchanged: the cursor line, the grid, the planner's ceiling line.
+
+Test: the depth curve of the dive detail measures 1.25 dp at 1× and 2 dp with high contrast; the average line measures 1 dp.
+
+## [ ] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
+
+Christian noticed on 15 November 2026 that the desktop detail pane has no tabs and its fields cannot be edited in place. This is a reminder of tasks 169, 172 and 184, not a new decision: the build must match the mock-ups `docs/mockups/bureau-carnet-profil-droite.dc.html` (with the group copy `bureau-carnet-groupe.dc.html`) and `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
+
+- **Tabs under the profile and its summary** (`role="tablist"`): Informations, Équipement, Gaz, Notes, Carte. The selected tab is 14 px semibold #114477 with a 3 dp #114477 underline, the others 14 px regular #4B4A47, a 1 dp #DCDAD3 line under the row. Arrow keys move between tabs. The last tab chosen is kept when another dive is selected.
+- **Editing in place in every tab** (task 172): a click on a grey field turns it into an input where it is, Enter or leaving the field saves at once, Escape cancels; no edit mode and no dialog. The fields at rest are those of task 184: #ECEAE4 fill, 8 dp corners, invitations when empty, the hint line, read-only values as plain text.
+- Compare the running app with the mock-ups side by side before closing the task, and attach a screenshot of the detail pane to the commit description.
+
+Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
