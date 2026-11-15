@@ -23,6 +23,11 @@ readline.createInterface({ input: process.stdin }).on('line', (line) => {
       fs.writeFileSync(args.path, `exported ${args.ids.join(',')} after ${imported.trim()}`);
       reply({ id, result: null });
       break;
+    case 'saveLogbookFile':
+      // Subsurface's Save As of the whole log (save_logbook_file), which replaced exportDives.
+      fs.writeFileSync(args.path, `saved after ${imported.trim()}`);
+      reply({ id, result: null });
+      break;
     case 'received':
       reply({ id, result: received });
       break;

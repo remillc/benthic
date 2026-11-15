@@ -35,3 +35,6 @@ plugins/opendives-core/ios/Resources/
 
 # Cloudflare wrangler local state (site deployment)
 .wrangler/
+
+# Desktop: OAuth client ids of the cloud services, kept out of git until they ship (task 173)
+desktop/oauth-clients.local.json

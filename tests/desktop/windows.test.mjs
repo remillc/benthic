@@ -75,7 +75,7 @@ test('a file logbook is imported from its file at start and written back after a
   bridge.attach(fakeContents(31), d);
   await invoke({ id: 31 }, 'od:core', 'logExists', { repo: path.join(userData, 'logbooks', d.id, 'repo[main]') });
   await invoke({ id: 31 }, 'od:core', 'saveLocal');
-  assert.equal(readFileSync(file, 'utf8'), 'exported 4,9 after <divelog>one</divelog>');
+  assert.equal(readFileSync(file, 'utf8'), 'saved after <divelog>one</divelog>');
   assert.ok(!existsSync(`${file}.od-tmp`));
   const meta = JSON.parse(readFileSync(path.join(userData, 'logbooks', d.id, 'meta.json'), 'utf8'));
   assert.equal(meta.hash, logbooks.fileHash(file));
@@ -95,7 +95,7 @@ test('a copy is written without touching the logbook file itself', async () => {
   bridge.attach(fakeContents(51), logbooks.fileDescriptor(file));
   const copy = path.join(root, 'copy.ssrf');
   await bridge.saveCopy(51, copy);
-  assert.match(readFileSync(copy, 'utf8'), /^exported 4,9/);
+  assert.match(readFileSync(copy, 'utf8'), /^saved after/);
   assert.equal(readFileSync(file, 'utf8'), '<divelog>orig</divelog>');
   await bridge.detach(51);
 });
