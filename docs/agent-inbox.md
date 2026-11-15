@@ -3400,7 +3400,7 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
-## [ ] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
+## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
 Christian decided this on 15 November 2026. Mock-ups: every `docs/mockups/bureau-carnet-*.dc.html` and `bureau-carnets-*.dc.html` table.
 
@@ -3412,6 +3412,8 @@ Christian decided this on 15 November 2026. Mock-ups: every `docs/mockups/bureau
 English: « Buddies ».
 
 Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
+
+Done: Compagnons is a default column instead of Temp. (secondary text, about 124 dp, sorted by the first buddy); a diver's own column set is kept; Temp. stays in the columns menu.
 
 ## [ ] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
 

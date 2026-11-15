@@ -608,7 +608,8 @@
                   {#each columns as column (column.key)}
                     <td
                       class:od-desktop-logbook--numeric={column.numeric}
-                      class:od-desktop-logbook--muted={column.key === 'site' && !dive.site}
+                      class:od-desktop-logbook--muted={(column.key === 'site' && !dive.site) || column.key === 'buddies'}
+                      class:od-desktop-logbook--buddies={column.key === 'buddies'}
                       class:od-desktop-logbook--first={column.key === 'number' && row.inTrip}
                     >{cell(column.key, dive)}</td>
                   {/each}
@@ -832,6 +833,10 @@
     }
     .od-desktop-logbook--muted {
       color: var(--od-text-2);
+    }
+    /* Compagnons: about 124 dp, the rest ellipsised (task 2026-11-15-182). */
+    .od-desktop-logbook--row .od-desktop-logbook--buddies {
+      max-width: 124px;
     }
     .od-desktop-logbook--selected .od-desktop-logbook--muted {
       color: inherit;

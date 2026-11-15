@@ -53,13 +53,14 @@ const extras = new Map([
 const numbers = (list) => list.map((d) => d.number);
 
 test('default columns are those of the mock-up, N° and Date always shown', () => {
-  assert.deepEqual(DEFAULT_COLUMNS, ['number', 'date', 'site', 'maxDepth', 'duration', 'waterTemp']);
+  // Compagnons replaced Temp. in the defaults (task 2026-11-15-182).
+  assert.deepEqual(DEFAULT_COLUMNS, ['number', 'date', 'site', 'maxDepth', 'duration', 'buddies']);
   assert.deepEqual(
     shownColumns(['site', 'unknown']).map((c) => c.key),
     ['number', 'date', 'site'],
   );
-  assert.deepEqual(toggleColumn(DEFAULT_COLUMNS, 'buddies'), [...DEFAULT_COLUMNS, 'buddies']);
-  assert.deepEqual(toggleColumn(DEFAULT_COLUMNS, 'site'), ['number', 'date', 'maxDepth', 'duration', 'waterTemp']);
+  assert.deepEqual(toggleColumn(DEFAULT_COLUMNS, 'waterTemp'), [...DEFAULT_COLUMNS, 'waterTemp']);
+  assert.deepEqual(toggleColumn(DEFAULT_COLUMNS, 'site'), ['number', 'date', 'maxDepth', 'duration', 'buddies']);
   assert.deepEqual(toggleColumn(DEFAULT_COLUMNS, 'date'), DEFAULT_COLUMNS);
   assert.ok(COLUMNS.every((c) => c.label.startsWith('desktop.column.')));
 });
