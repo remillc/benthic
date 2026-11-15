@@ -1,6 +1,6 @@
 // @ts-check
 // Pure logic of the desktop Outils section (task 2026-11-15-196, 198, 199, 201): the tools
-// list and its live lines, the remaining desaturation, the blender's target taken from the best
+// list and its live lines, the desaturation page's figures, the blender's target taken from the best
 // mix, the final pressure that follows the cylinder, and the layers of the cylinder drawing.
 // No calculation of the planner or of the gas tools lives here: those stay in the phone's
 // libraries (planner.svelte.js, gas-calculator.js, gas-blend.js).
@@ -41,25 +41,26 @@ export function desaturationLine(state, wait) {
   return { key: state.kind === 'rest' ? 'tools.atRest' : 'tools.noDives', params: {} };
 }
 
-/** A compartment is called desaturated when its load is back under this share of its limit range (%). */
-export const DESATURATED_PERCENT = 1;
+/**
+ * The « Dernière plongée » figure of the desaturation page, as the phone's tile: the time since the
+ * last dive the calculation used, or « Plus de 48 h » when none counts.
+ * @param {number} sinceLastDive seconds, -1 when no dive counts (lib/desaturation.js surfaceSeconds)
+ * @returns {{ key: string, seconds: number|null }}
+ */
+export function lastDiveFigure(sinceLastDive) {
+  return sinceLastDive < 0 ? { key: 'desaturation.noRecentDive', seconds: null } : { key: 'desaturation.ago', seconds: sinceLastDive };
+}
 
 /**
- * Seconds until the last compartment is desaturated: OpenDives' own estimate from the tissues
- * the core returned. A compartment's surface gradient factor falls exponentially with its
- * half-time (the gas above ambient pressure is what is lost), so it takes
- * half-time × log2(load ÷ 1 %) to come back under 1 %. The nitrogen half-time is used for all
- * the gas, which is the slow, cautious choice with helium. 0 when every compartment is already there.
- * @param {{ surfaceGf: number, halfTimeMin: number }[]} tissues
- * @returns {number}
+ * The line that says which rule gave the wait before flying, as the phone's caption.
+ * @param {{ hours: number, several: boolean }|null} wait lib/tools.js flightWait; null at rest
+ * @param {string} mode the setting: 'auto' or a fixed number of hours
+ * @returns {{ key: string, params: Record<string, number> }}
  */
-export function desaturationSeconds(tissues) {
-  let minutes = 0;
-  for (const tissue of tissues) {
-    if (!(tissue.surfaceGf > DESATURATED_PERCENT) || !(tissue.halfTimeMin > 0)) continue;
-    minutes = Math.max(minutes, tissue.halfTimeMin * Math.log2(tissue.surfaceGf / DESATURATED_PERCENT));
-  }
-  return Math.round(minutes * 60);
+export function flightRule(wait, mode) {
+  if (!wait) return { key: 'desaturation.atRest', params: {} };
+  if (mode !== 'auto') return { key: 'desaturation.ruleFixed', params: { hours: wait.hours } };
+  return { key: wait.several ? 'desaturation.ruleSeveral' : 'desaturation.ruleSingle', params: { hours: wait.hours } };
 }
 
 /**

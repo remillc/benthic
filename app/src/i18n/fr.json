@@ -2156,7 +2156,6 @@
     "workingPressure": "Service de la bouteille : {pressure}",
     "aboveWorking": "Au-dessus de la pression de service de {pressure}",
     "cylinderLabel": "Bouteille à {pressure} : {gases}, dans l’ordre du gonflage",
-    "remaining": "Désaturation restante",
     "soit": "soit {when}",
     "around": "{day} vers {time}",
     "notify": "Me prévenir",
