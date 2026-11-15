@@ -3889,3 +3889,20 @@ Christian approved this on 15 November 2026. Mock-ups:
 - In the release build, on a tablet, in both orientations: the screens match the mock-ups, the profile touches no edge, and « Sur cette tablette » and « Choisir un fichier » each lead to a working logbook.
 
 Done: `VITE_EDITION` (read only in `app/src/lib/edition.js`; `release`, else beta, the default; documented in `app/README.md`, « Editions ») picks the first launch in `App.svelte`: beta keeps `WelcomeStart.svelte` untouched (screenshots pixel-identical at 1280 × 800 and 800 × 1280); release uses `pages/WelcomeEntry.svelte`, which shows the new `WelcomeStartRelease.svelte` from 768 px and, for now, the beta screen on a phone. The 700 dp blue panel (gradient, light, bands, brand row, heading, line), the profile (`ReleaseProfile.svelte`: white line, glow, dashed surface, water fade, dot, two chips, drawn in 1.6 s with the emphasised-decelerate curve, none with reduced motion), the choices column and the portrait layout (640 dp panel, 120 dp margins) follow the mock-ups; the panel's colours are `--od-release-*` tokens. « Sur cette tablette » is « Commencer sans compte », « Dans un dépôt git » the git setup; « Dans mon nuage » and the four cloud rows of the dialog (generic cloud and server icons, no logo) show « Le nuage arrive dans une prochaine version. ». « Choisir un fichier » opens the file picker; the file is read first (staged, counted, discarded), so a file with no dive or that cannot be read leaves first launch as it was, then the device logbook is started, the sample dives removed when the device had none, and the file imported with the app's own `importFile`. Texts in `welcomeRelease` (fr, en). No release note yet (only when the release edition is first built). Tests in `tests/app/release-welcome.test.mjs`. Checked in headless Edge at both sizes, light and dark, dialog open.
+
+## [ ] 2026-11-15-214 The decorative dive profile becomes a smooth curve
+
+Christian approved this on 15 November 2026. The decorative profile (first launch, editorial pages, empty logbook) has no corners any more. It is a smooth curve that passes through **every** original point, so no detail is lost. Mock-ups (all show the curve): `docs/mockups/android-tablette-premier-lancement-{paysage,portrait}.dc.html`, `android-etat-vide.dc.html`, `ios-accueil.dc.html`, `android-accueil-c.dc.html` (its script computes the curve from PTS), `bureau-carnet-vide-actuel.dc.html`.
+
+**How:** a Catmull-Rom spline through the points, converted to cubic Béziers (tension 1/6). For each segment from Pᵢ to Pᵢ₊₁:
+- C1 = Pᵢ + (Pᵢ₊₁ − Pᵢ₋₁) / 6
+- C2 = Pᵢ₊₁ − (Pᵢ₊₂ − Pᵢ) / 6
+
+At the two ends, the missing neighbour is the end point itself. The path is `M P₀` then one `C C1 C2 Pᵢ₊₁` per segment.
+- Put this in one function in `app/src/lib` (for example `smooth-path.js`, with a test in `tests/app`), and use it wherever the decorative profile is drawn: `DecorativeProfile.svelte`, the profile in `WelcomeStart.svelte`, and any other copy of the same POINTS.
+- The water fill uses the same curve.
+- The line's thickness, colours, height and margins do not change (tasks 210, 211 and 213 stay as they are).
+
+**Not concerned:** the real profile of a dive (Detail, planner, statistics). It keeps drawing the recorded samples as they are.
+
+**Test:** the decorative profile shows no corner at any size, on phone, tablet and desktop. The curve passes through each original point (unit test). The real dive profile is unchanged.
