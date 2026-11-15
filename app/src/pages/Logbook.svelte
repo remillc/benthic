@@ -1672,7 +1672,9 @@
 
     .od-logbook--empty-pair {
       margin-top: 18px;
-      height: 56px;
+      min-height: 56px;
+      padding: 8px 16px;
+      text-align: center;
       border-radius: 28px;
       box-sizing: border-box;
       display: flex;
@@ -1686,7 +1688,7 @@
       text-decoration: none;
 
       :global(.ios) & {
-        height: 50px;
+        min-height: 50px;
         border-radius: 14px;
         font-weight: 600;
       }
