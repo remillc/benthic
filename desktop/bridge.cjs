@@ -105,7 +105,7 @@ const PATH_ARGS = {
 /** Files of userData the renderer never reaches by path. */
 const SECRET_FILES = new Set(['cloud-account.bin', 'git-remote.bin', 'cloud-account.bin.tmp', 'git-remote.bin.tmp']);
 /** The refresh token of a personal cloud (cloud.cjs): cloud-<service>.bin, with the file of the clients' keys. */
-const SECRET_CLOUD = /^(cloud-(googleDrive|oneDrive|dropbox)\.bin(\.tmp)?|oauth-clients\.local\.json)$/;
+const SECRET_CLOUD = /^(cloud-(googleDrive|oneDrive|dropbox|webdav)\.bin(\.tmp)?|oauth-clients\.local\.json)$/;
 /** The token of a git logbook other than the main one: git-remote-<id>.bin (task 2026-11-15-173). */
 const SECRET_PATTERN = /^git-remote-[fg]-[0-9a-f]{12}\.bin(\.tmp)?$/;
 const DEV_FILES = new Set(['cloud-dev.env', 'cloud-test.env']);

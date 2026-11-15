@@ -20,8 +20,14 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 
-/** The services, by the names the interface and the logbook descriptors use. */
-const PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox'];
+/** The services with an OAuth sign-in in the browser (their client ids come from oauth-clients.local.json). */
+const OAUTH_PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox'];
+
+/** The services, by the names the interface and the logbook descriptors use; WebDAV (Nextcloud included) has no browser sign-in. */
+const PROVIDERS = [...OAUTH_PROVIDERS, 'webdav'];
+
+/** The folder every new cloud logbook goes into: the app's folder root (OneDrive, Dropbox), an « OpenDives » folder (Google Drive, WebDAV). */
+const DEFAULT_FOLDER = { googleDrive: 'OpenDives', oneDrive: '', dropbox: '', webdav: 'OpenDives' };
 
 /** The key of each service in oauth-clients.local.json. */
 const CLIENT_KEY = { googleDrive: 'google', oneDrive: 'microsoft', dropbox: 'dropbox' };
@@ -97,7 +103,7 @@ function loadClients(file) {
   }
   /** @type {Record<string, { clientId: string, clientSecret?: string }>} */
   const out = {};
-  for (const provider of PROVIDERS) {
+  for (const provider of OAUTH_PROVIDERS) {
     const entry = data?.[CLIENT_KEY[provider]];
     const id = provider === 'dropbox' ? entry?.appKey || entry?.clientId : entry?.clientId;
     if (typeof id === 'string' && id.trim()) {
@@ -326,7 +332,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   }
 
   /** The address of the provider's sign-in page. @param {string} provider @param {{ redirectUri: string, state: string, challenge: string }} p */
-  function authorizeUrl(provider, { redirectUri, state, challenge }) {
+  function authorizeUrl(provider, { redirectUri, state, challenge, switchAccount = false }) {
     const client = /** @type {{ clientId: string }} */ (clientOf(provider));
     const query = new URLSearchParams({
       client_id: client.clientId,
@@ -339,16 +345,26 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     });
     if (provider === 'googleDrive') {
       query.set('access_type', 'offline');
-      query.set('prompt', 'consent');
+      // « Changer de compte »: the service asks which account again, instead of reusing the browser's session.
+      query.set('prompt', switchAccount ? 'select_account consent' : 'consent');
     } else if (provider === 'dropbox') {
       query.set('token_access_type', 'offline');
+      if (switchAccount) query.set('force_reauthentication', 'true');
+    } else if (switchAccount) {
+      query.set('prompt', 'select_account');
     }
     return `${endpoint(provider).auth}?${query}`;
   }
 
-  /** « Se connecter »: the browser, the code, the tokens, the account. Resolves the service's status. @param {string} provider */
-  async function signIn(provider) {
+  /**
+   * « Se connecter »: the browser, the code, the tokens, the account. Resolves the service's status.
+   * With `switchAccount` (« Changer de compte ») the service asks which account to use; the stored tokens of the
+   * current account are replaced only once the new sign-in has succeeded, and come back if it fails.
+   * @param {string} provider @param {{ switchAccount?: boolean }} [options]
+   */
+  async function signIn(provider, { switchAccount = false } = {}) {
     tokenFile(provider);
+    if (!OAUTH_PROVIDERS.includes(provider)) throw coded('BAD_ARGUMENT', 'BAD_ARGUMENT: no browser sign-in for this service');
     if (!clientOf(provider)) throw coded('NOT_AVAILABLE');
     if (!encryptionAvailable()) throw coded('CREDENTIALS_NOT_SAVED');
     signingIn.get(provider)?.cancel();
@@ -356,8 +372,10 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     const state = base64url(crypto.randomBytes(24));
     const port = provider === 'dropbox' ? (ports.dropbox ?? DROPBOX_PORT) : (ports[provider] ?? 0);
     const listener = await listenForRedirect({ port, state, timeoutMs: signInTimeoutMs, slash: provider === 'dropbox' });
-    const page = authorizeUrl(provider, { redirectUri: listener.redirectUri, state, challenge });
+    const page = authorizeUrl(provider, { redirectUri: listener.redirectUri, state, challenge, switchAccount });
     signingIn.set(provider, { cancel: listener.cancel, page });
+    const previous = fs.existsSync(tokenFile(provider)) ? fs.readFileSync(tokenFile(provider)) : null;
+    const previousAccess = accessTokens.get(provider);
     let wrote = false;
     try {
       log(`Opening the sign-in page of ${provider}`);
@@ -377,8 +395,14 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
       writeTokens(provider, { refreshToken: json.refresh_token, account });
       return statusOf(provider);
     } catch (e) {
-      // A sign-in that failed after its tokens were kept leaves no half-signed account; an earlier one stays.
-      if (wrote) forgetTokens(provider);
+      // A sign-in that failed after its tokens were kept leaves no half-signed account; an earlier one comes back.
+      if (wrote) {
+        forgetTokens(provider);
+        if (previous) {
+          fs.writeFileSync(tokenFile(provider), previous, { mode: 0o600 });
+          if (previousAccess) accessTokens.set(provider, previousAccess);
+        }
+      }
       throw e;
     } finally {
       listener.close();
@@ -412,12 +436,189 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
 
   /** @param {string} provider @returns {{ provider: string, available: boolean, connected: boolean, account: string }} */
   function statusOf(provider) {
+    if (provider === 'webdav') {
+      const saved = readWebdav();
+      return { provider, available: encryptionAvailable(), connected: !!saved, account: saved ? `${saved.username}@${new URL(saved.baseUrl).host}` : '' };
+    }
     const stored = readTokens(provider);
     return { provider, available: !!clientOf(provider), connected: !!stored, account: stored?.account ?? '' };
   }
 
   /** What the interface may know: no token, no key. */
   const status = () => PROVIDERS.map(statusOf);
+
+  // --- WebDAV and Nextcloud: a server address, a user name and a password (no browser sign-in) ---
+
+  /** @returns {{ baseUrl: string, username: string, password: string } | null} */
+  function readWebdav() {
+    const file = tokenFile('webdav');
+    if (!fs.existsSync(file) || !encryptionAvailable()) return null;
+    try {
+      const v = JSON.parse(safeStorage.decryptString(fs.readFileSync(file)));
+      return typeof v.baseUrl === 'string' && typeof v.username === 'string' && typeof v.password === 'string' && v.baseUrl && v.username ? { baseUrl: v.baseUrl, username: v.username, password: v.password } : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeWebdav(/** @type {{ baseUrl: string, username: string, password: string }} */ value) {
+    if (!encryptionAvailable()) throw coded('CREDENTIALS_NOT_SAVED');
+    const file = tokenFile('webdav');
+    const tmp = `${file}.tmp`;
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(tmp, safeStorage.encryptString(JSON.stringify({ baseUrl: value.baseUrl, username: value.username, password: value.password })), { mode: 0o600 });
+    fs.renameSync(tmp, file);
+  }
+
+  const webdavHeaders = (/** @type {{ username: string, password: string }} */ c, /** @type {Record<string, string>} */ extra = {}) => ({ Authorization: `Basic ${Buffer.from(`${c.username}:${c.password}`, 'utf8').toString('base64')}`, ...extra });
+
+  /** The server address as typed: https, or http for this computer only; a trailing slash; nothing after the path. */
+  function parseServerAddress(/** @type {string} */ input) {
+    let text = String(input ?? '').trim();
+    if (!text) throw coded('BAD_ADDRESS');
+    if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(text)) text = `https://${text}`;
+    let url;
+    try {
+      url = new URL(text);
+    } catch {
+      throw coded('BAD_ADDRESS');
+    }
+    if (url.username || url.password || !url.hostname) throw coded('BAD_ADDRESS');
+    const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    if (url.protocol === 'http:' ? !local : url.protocol !== 'https:') throw coded(url.protocol === 'http:' ? 'INSECURE_ADDRESS' : 'BAD_ADDRESS');
+    url.search = '';
+    url.hash = '';
+    if (!url.pathname.endsWith('/')) url.pathname += '/';
+    return url;
+  }
+
+  /**
+   * Checks the connection and finds the WebDAV root. A Nextcloud address (…/remote.php/dav/…) is used as it is;
+   * for a bare server address the Nextcloud path https://host/remote.php/dav/files/<user>/ is tried first, then the
+   * address itself (any other WebDAV server). 401 is BAD_CREDENTIALS, a server that does not answer NETWORK,
+   * nothing WebDAV at the address BAD_ADDRESS. Nothing is stored. @returns {Promise<string>} the root, with a trailing slash
+   */
+  async function checkWebdav(/** @type {{ server: string, username: string, password: string }} */ { server, username, password }) {
+    const user = String(username ?? '').trim();
+    const url = parseServerAddress(server);
+    if (!user || user.includes(':') || !password) throw coded('BAD_CREDENTIALS');
+    const nextcloud = /\/remote\.php\/(dav|webdav)(\/|$)/.test(url.pathname);
+    const candidates = nextcloud ? [url.href] : [new URL(`remote.php/dav/files/${encodeURIComponent(user)}/`, url).href, url.href];
+    for (const candidate of candidates) {
+      const response = await send(candidate, { method: 'PROPFIND', headers: webdavHeaders({ username: user, password }, { Depth: '0', 'Content-Type': 'application/xml' }), body: '<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:resourcetype/></d:prop></d:propfind>' });
+      await response.arrayBuffer().catch(() => {});
+      if (response.status === 207) return candidate;
+      if (response.status === 401) throw coded('BAD_CREDENTIALS');
+      if (response.status === 403) throw coded('DENIED', 'DENIED: the server refuses this account');
+      if (response.status >= 500) throw coded('SERVER', `SERVER: ${response.status}`);
+      // 404, 405, 200 (a web page): not WebDAV here; the next candidate, if any.
+    }
+    throw coded('BAD_ADDRESS');
+  }
+
+  /** The address of a file or folder under the root. */
+  const webdavUrl = (/** @type {string} */ base, /** @type {string} */ remote, /** @type {boolean} */ folder = false) => `${base}${encodePath(remote)}${folder && remote ? '/' : ''}`;
+
+  /** @param {string} method @param {string} url @param {Record<string, string>} [headers] @param {any} [body] */
+  async function webdavSend(method, url, headers = {}, body, timeoutMs = REQUEST_TIMEOUT_MS) {
+    const saved = readWebdav();
+    if (!saved) throw coded('NOT_SIGNED_IN');
+    const response = await send(url, { method, headers: webdavHeaders(saved, headers), body }, timeoutMs);
+    if (response.status === 401) throw coded('BAD_CREDENTIALS');
+    return response;
+  }
+
+  /** « "abc" » and « W/"abc" » are the same revision here. */
+  const normalEtag = (/** @type {string} */ tag) => String(tag ?? '').trim().replace(/^W\//, '').replace(/^"|"$/g, '');
+
+  const xmlText = (/** @type {string} */ xml, /** @type {string} */ name) => {
+    const m = new RegExp(`<(?:[\\w-]+:)?${name}(?:\\s[^>]*)?>([\\s\\S]*?)</(?:[\\w-]+:)?${name}>`, 'i').exec(xml);
+    return m ? m[1].replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim() : '';
+  };
+
+  /** @returns {Promise<Remote | null>} */
+  async function webdavStat(/** @type {any} */ d) {
+    const saved = readWebdav();
+    if (!saved) throw coded('NOT_SIGNED_IN');
+    const response = await webdavSend('PROPFIND', webdavUrl(saved.baseUrl, remotePath(d)), { Depth: '0', 'Content-Type': 'application/xml' }, '<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:getetag/><d:getlastmodified/><d:getcontentlength/></d:prop></d:propfind>');
+    if (response.status === 404) return null;
+    if (response.status !== 207) {
+      await expectOk(response, 'file');
+      throw coded('SERVER', `SERVER: file ${response.status}`);
+    }
+    const xml = await response.text();
+    const modified = xmlText(xml, 'getlastmodified');
+    const etag = normalEtag(xmlText(xml, 'getetag'));
+    const parsed = Date.parse(modified);
+    return { rev: etag || `${modified}|${xmlText(xml, 'getcontentlength')}`, modified: Number.isFinite(parsed) ? new Date(parsed).toISOString() : modified, ref: {} };
+  }
+
+  /** Creates the folders of `folder` one by one (MKCOL); one that exists answers 405 and is fine. */
+  async function webdavEnsureFolder(/** @type {string} */ folder) {
+    const saved = readWebdav();
+    if (!saved) throw coded('NOT_SIGNED_IN');
+    const parts = folder.split('/').filter(Boolean);
+    for (let i = 1; i <= parts.length; i++) {
+      const response = await webdavSend('MKCOL', webdavUrl(saved.baseUrl, parts.slice(0, i).join('/'), true));
+      await response.arrayBuffer().catch(() => {});
+      if (response.ok || response.status === 405) continue;
+      if (response.status === 403) throw coded('DENIED', 'DENIED: the server refuses to create the folder');
+      throw coded('SERVER', `SERVER: folder ${response.status}`);
+    }
+  }
+
+  async function webdavDownload(/** @type {any} */ d, /** @type {string} */ target) {
+    const saved = readWebdav();
+    if (!saved) throw coded('NOT_SIGNED_IN');
+    const remote = await webdavStat(d);
+    if (!remote) throw coded('REMOTE_MISSING');
+    const response = await expectOk(await webdavSend('GET', webdavUrl(saved.baseUrl, remotePath(d)), {}, undefined, TRANSFER_TIMEOUT_MS), 'download');
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, Buffer.from(await response.arrayBuffer()));
+    return remote;
+  }
+
+  /** PUT; with `expectedRev` it carries If-Match, and a file changed meanwhile is REMOTE_CHANGED (412). */
+  async function webdavUpload(/** @type {any} */ d, /** @type {string} */ source, /** @type {{ expectedRev?: string }} */ { expectedRev } = {}) {
+    const saved = readWebdav();
+    if (!saved) throw coded('NOT_SIGNED_IN');
+    const bytes = fs.readFileSync(source);
+    const url = webdavUrl(saved.baseUrl, remotePath(d));
+    const put = () => webdavSend('PUT', url, { 'Content-Type': 'application/octet-stream', ...(expectedRev ? { 'If-Match': `"${expectedRev}"` } : {}) }, bytes, TRANSFER_TIMEOUT_MS);
+    let response = await put();
+    if (response.status === 409 && !expectedRev) {
+      // The folder is gone (deleted elsewhere): made again, then once more.
+      await response.arrayBuffer().catch(() => {});
+      await webdavEnsureFolder(d.folder || '');
+      response = await put();
+    }
+    if (response.status === 412) throw coded('REMOTE_CHANGED');
+    await response.arrayBuffer().catch(() => {});
+    await expectOk(response, 'upload');
+    // The revision is read back with the same request every later check uses, so both always agree on its form.
+    const remote = await webdavStat(d);
+    if (!remote) throw coded('SERVER', 'SERVER: file not found after upload');
+    return remote;
+  }
+
+  /**
+   * A new WebDAV logbook: checks the connection, keeps the credentials, makes the OpenDives folder and uploads the
+   * file. The credentials are kept for the creation and put back (or removed) when it fails.
+   * @param {{ server: string, username: string, password: string }} fields @param {any} d the descriptor @param {string} source
+   */
+  async function createWebdavRemote(fields, d, source) {
+    const baseUrl = await checkWebdav(fields);
+    const file = tokenFile('webdav');
+    const previous = fs.existsSync(file) ? fs.readFileSync(file) : null;
+    writeWebdav({ baseUrl, username: String(fields.username).trim(), password: fields.password });
+    try {
+      return await createRemote(d, source);
+    } catch (e) {
+      if (previous) fs.writeFileSync(file, previous, { mode: 0o600 });
+      else forgetTokens('webdav');
+      throw e;
+    }
+  }
 
   // --- The files ---
 
@@ -451,6 +652,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   /** @returns {Promise<Remote | null>} */
   async function statRemote(/** @type {any} */ d, /** @type {Record<string, string> | undefined} */ ref) {
     const provider = d.provider;
+    if (provider === 'webdav') return webdavStat(d);
     const e = endpoint(provider);
     if (provider === 'googleDrive') {
       if (ref?.fileId) {
@@ -481,6 +683,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   /** Downloads the remote file to `target` (a temporary file of the caller's). @returns {Promise<Remote>} */
   async function downloadRemote(/** @type {any} */ d, /** @type {Record<string, string> | undefined} */ ref, /** @type {string} */ target) {
     const provider = d.provider;
+    if (provider === 'webdav') return webdavDownload(d, target);
     const e = endpoint(provider);
     // The revision is read first: a file changed between the two calls is noticed by the next check.
     const remote = await statRemote(d, ref);
@@ -501,6 +704,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
    */
   async function uploadRemote(/** @type {any} */ d, /** @type {Record<string, string> | undefined} */ ref, /** @type {string} */ source, /** @type {{ expectedRev?: string }} */ { expectedRev } = {}) {
     const provider = d.provider;
+    if (provider === 'webdav') return webdavUpload(d, source, { expectedRev });
     const e = endpoint(provider);
     const bytes = fs.readFileSync(source);
     if (provider !== 'dropbox' && expectedRev) {
@@ -551,6 +755,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
 
   /** A new cloud logbook's remote file: EXISTS when the service already has one by that name. */
   async function createRemote(/** @type {any} */ d, /** @type {string} */ source) {
+    if (d.provider === 'webdav') await webdavEnsureFolder(d.folder || '');
     if (await statRemote(d, undefined)) throw coded('EXISTS');
     return uploadRemote(d, undefined, source);
   }
@@ -603,11 +808,13 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
     signingIn.delete(provider);
   }
 
-  return { status, statusOf, signIn, reopenSignIn, cancelSignIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync };
+  return { status, statusOf, signIn, reopenSignIn, cancelSignIn, signOut, available: (/** @type {string} */ p) => !!clientOf(p), stat: statRemote, download: downloadRemote, upload: uploadRemote, createRemote, askConflict, decide: decideSync, createWebdavRemote, checkWebdav, defaultFolder: (/** @type {string} */ p) => DEFAULT_FOLDER[p] ?? '' };
 }
 
 module.exports = {
   PROVIDERS,
+  OAUTH_PROVIDERS,
+  DEFAULT_FOLDER,
   CLIENT_KEY,
   ACCESS,
   ENDPOINTS,

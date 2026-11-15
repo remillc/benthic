@@ -25,7 +25,7 @@ const path = require('node:path');
 const MAIN_ID = 'main';
 const MAX_RECENT = 12;
 const STORE_FILE = 'logbooks.json';
-const PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox'];
+const PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox', 'webdav'];
 /** What the start-up opens: the logbooks open at the last quit, or the start screen. */
 const STARTUP_MODES = ['last', 'ask'];
 

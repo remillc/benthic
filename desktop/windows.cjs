@@ -342,8 +342,8 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
   }
 
   /**
-   * A new logbook in a personal cloud: an empty .ssrf in the service's folder (a subfolder of the app's
-   * folder; for Google Drive a folder OpenDives creates), and a working copy here. EXISTS when the
+   * A new logbook in a personal cloud: an empty .ssrf in the service's OpenDives folder (the app's folder
+   * root for OneDrive and Dropbox, a folder OpenDives creates for Google Drive and WebDAV), and a working copy here. EXISTS when the
    * service already has a file by that name.
    */
   async function createCloudLogbook(/** @type {any} */ spec, /** @type {string} */ name, /** @type {any} */ win) {
@@ -351,15 +351,20 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     const provider = String(spec.provider || '');
     const state = cloud.status().find((p) => p.provider === provider);
     if (!state || !state.available) throw Object.assign(new Error('NOT_AVAILABLE'), { code: 'NOT_AVAILABLE' });
-    if (!state.connected) throw Object.assign(new Error('NOT_SIGNED_IN'), { code: 'NOT_SIGNED_IN' });
-    const descriptor = logbooks.cloudDescriptor({ provider, folder: spec.folder, name });
+    // WebDAV has no sign-in step: the server, user name and password come with the creation and are checked then.
+    const webdav = provider === 'webdav';
+    if (!webdav && !state.connected) throw Object.assign(new Error('NOT_SIGNED_IN'), { code: 'NOT_SIGNED_IN' });
+    // The file always goes into the OpenDives folder of the service (the app's folder root for OneDrive and Dropbox).
+    const descriptor = logbooks.cloudDescriptor({ provider, folder: cloud.defaultFolder(provider), name });
     const local = /** @type {string} */ (logbooks.localFileOf(userData, descriptor));
     // The working copy exists only once the service has the file: a refused name leaves nothing behind.
     const staged = path.join(path.dirname(local), 'new.ssrf');
     fs.mkdirSync(path.dirname(local), { recursive: true });
     fs.writeFileSync(staged, logbooks.EMPTY_LOGBOOK);
     try {
-      const remote = await cloud.createRemote(descriptor, staged);
+      const remote = webdav
+        ? await cloud.createWebdavRemote({ server: String(spec.server ?? ''), username: String(spec.username ?? ''), password: String(spec.password ?? '') }, descriptor, staged)
+        : await cloud.createRemote(descriptor, staged);
       fs.renameSync(staged, local);
       fs.rmSync(path.join(path.dirname(local), 'repo'), { recursive: true, force: true });
       logbooks.writeMeta(userData, descriptor.id, { rev: remote.rev, modified: remote.modified, remote: remote.ref, pending: false, hash: '' });
@@ -428,7 +433,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
         return cloud ? cloud.status() : [];
       case 'cloudSignIn':
         if (!cloud) throw new Error('NOT_AVAILABLE');
-        return cloud.signIn(String(options.provider));
+        return cloud.signIn(String(options.provider), { switchAccount: options.switchAccount === true });
       case 'cloudCancelSignIn':
         cloud?.cancelSignIn(String(options.provider));
         return true;

@@ -380,24 +380,24 @@ const remoteText = (provider, file) => fake.state.files[provider].get(file)?.byt
 test('a cloud logbook: created in the service, the working copy kept, every save sent up', async () => {
   const d = desktop();
   const main = d.wm.openMain();
-  await assert.rejects(d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'OpenDives' }), { code: 'NOT_SIGNED_IN' });
+  await assert.rejects(d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'ignored' }), { code: 'NOT_SIGNED_IN' });
   await d.wm.handle({ sender: main.webContents }, 'cloudSignIn', { provider: 'dropbox' });
-  const result = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'OpenDives' });
+  const result = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'ignored' });
   assert.equal(result.opened, true);
   assert.equal(result.descriptor.kind, 'cloud');
   assert.equal(result.descriptor.provider, 'dropbox');
-  assert.equal(result.descriptor.location, 'OpenDives/Nuage.ssrf');
-  assert.ok(remoteText('dropbox', 'OpenDives/Nuage.ssrf').includes('<dives>'));
+  assert.equal(result.descriptor.location, 'Nuage.ssrf');
+  assert.ok(remoteText('dropbox', 'Nuage.ssrf').includes('<dives>'));
   // The working copy is in the cache; the same name again is refused.
   assert.ok(existsSync(logbooks.localFileOf(d.data, result.descriptor)));
-  await assert.rejects(d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'OpenDives' }), { code: 'EXISTS' });
+  await assert.rejects(d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Nuage', provider: 'dropbox', folder: 'ignored' }), { code: 'EXISTS' });
   // A save in the window goes up.
   const win = d.fakeE.created[d.fakeE.created.length - 1];
   const key = win.webContents.id;
-  const before = fake.state.files.dropbox.get('OpenDives/Nuage.ssrf').rev;
+  const before = fake.state.files.dropbox.get('Nuage.ssrf').rev;
   await d.bridge.callFor(key, 'saveLocal');
-  assert.notEqual(fake.state.files.dropbox.get('OpenDives/Nuage.ssrf').rev, before);
-  assert.match(remoteText('dropbox', 'OpenDives/Nuage.ssrf'), /^saved after /);
+  assert.notEqual(fake.state.files.dropbox.get('Nuage.ssrf').rev, before);
+  assert.match(remoteText('dropbox', 'Nuage.ssrf'), /^saved after /);
   assert.equal(logbooks.readMeta(d.data, result.descriptor.id).pending, false);
   await d.bridge.stop();
 });
@@ -479,7 +479,7 @@ test('without a connection a save waits, and goes up at the next check', async (
   const d = desktop();
   const main = d.wm.openMain();
   await d.wm.handle({ sender: main.webContents }, 'cloudSignIn', { provider: 'dropbox' });
-  const { descriptor } = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Hors ligne', provider: 'dropbox', folder: 'OpenDives' });
+  const { descriptor } = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Hors ligne', provider: 'dropbox', folder: 'ignored' });
   const win = d.fakeE.created[d.fakeE.created.length - 1];
   const key = win.webContents.id;
   await d.bridge.callFor(key, 'ping');
@@ -489,15 +489,15 @@ test('without a connection a save waits, and goes up at the next check', async (
   const realUpload = d.cloud.upload;
   d.cloud.stat = down.stat;
   d.cloud.upload = down.upload;
-  const before = fake.state.files.dropbox.get('OpenDives/Hors ligne.ssrf').rev;
+  const before = fake.state.files.dropbox.get('Hors ligne.ssrf').rev;
   await d.bridge.callFor(key, 'saveLocal');
   assert.equal(logbooks.readMeta(d.data, descriptor.id).pending, true);
-  assert.equal(fake.state.files.dropbox.get('OpenDives/Hors ligne.ssrf').rev, before);
+  assert.equal(fake.state.files.dropbox.get('Hors ligne.ssrf').rev, before);
   d.cloud.stat = realStat;
   d.cloud.upload = realUpload;
   const result = await d.bridge.cloudCheck(key);
   assert.equal(result.state, 'uploaded');
-  assert.notEqual(fake.state.files.dropbox.get('OpenDives/Hors ligne.ssrf').rev, before);
+  assert.notEqual(fake.state.files.dropbox.get('Hors ligne.ssrf').rev, before);
   assert.equal(logbooks.readMeta(d.data, descriptor.id).pending, false);
   await d.bridge.stop();
 });
@@ -563,4 +563,78 @@ test('« Rouvrir la page » opens the same sign-in page again while the sign-in 
   assert.equal(opened[1], opened[0]);
   // No sign-in waiting: nothing to reopen.
   assert.equal(cloud.reopenSignIn('oneDrive'), false);
+});
+
+test('« Changer de compte »: the service asks which account again, and the stored account is replaced only once the new sign-in succeeded', async () => {
+  const extra = { googleDrive: ['prompt', 'select_account consent'], oneDrive: ['prompt', 'select_account'], dropbox: ['force_reauthentication', 'true'] };
+  for (const provider of ['googleDrive', 'oneDrive', 'dropbox']) {
+    const cloud = service();
+    await cloud.signIn(provider);
+    // An ordinary sign-in does not ask for the account (Google asks for the consent only).
+    const plain = new URL(opened[0]).searchParams;
+    assert.equal(plain.get('force_reauthentication'), null);
+    assert.notEqual(plain.get('prompt'), extra[provider][1]);
+    const file = path.join(userData, `cloud-${provider}.bin`);
+    const first = readFileSync(file);
+    // A switch the diver refuses at the service: the first account is still there.
+    const refusing = service({
+      openExternal: async (url) => {
+        const redirect = new URL(new URL(url).searchParams.get('redirect_uri'));
+        redirect.searchParams.set('error', 'access_denied');
+        redirect.searchParams.set('state', new URL(url).searchParams.get('state'));
+        await fetch(redirect);
+      },
+    });
+    await assert.rejects(refusing.signIn(provider, { switchAccount: true }), { code: 'SIGN_IN_DENIED' });
+    assert.deepEqual(readFileSync(file), first);
+    assert.equal(refusing.statusOf(provider).connected, true);
+    // A switch that succeeds: the page asks for the account, and the tokens are new.
+    opened = [];
+    const status = await service().signIn(provider, { switchAccount: true });
+    assert.equal(status.connected, true);
+    const q = new URL(opened[0]).searchParams;
+    assert.equal(q.get(extra[provider][0]), extra[provider][1]);
+    assert.notDeepEqual(readFileSync(file), first);
+    // Without the switch the page has no such parameter, whatever the service.
+    opened = [];
+    await service().signIn(provider);
+    assert.equal(new URL(opened[0]).searchParams.get('force_reauthentication'), null);
+    assert.notEqual(new URL(opened[0]).searchParams.get('prompt'), 'select_account');
+  }
+});
+
+test('the folder is never the diver\'s: OpenDives on Google Drive, the app folder root on OneDrive and Dropbox', async () => {
+  const d = desktop();
+  const main = d.wm.openMain();
+  for (const [provider, location] of [['googleDrive', 'OpenDives/Dossier.ssrf'], ['oneDrive', 'Dossier.ssrf'], ['dropbox', 'Dossier.ssrf']]) {
+    await d.wm.handle({ sender: main.webContents }, 'cloudSignIn', { provider });
+    const result = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Dossier', provider, folder: '../elsewhere' });
+    assert.equal(result.descriptor.location, location, provider);
+  }
+  await d.bridge.stop();
+});
+
+test('WebDAV from the dialog: the server, user name and password create the logbook, which then saves like any cloud logbook', async () => {
+  const { startFakeWebdav } = require('./fake-webdav-server.cjs');
+  const dav = await startFakeWebdav();
+  const d = desktop();
+  const main = d.wm.openMain();
+  const spec = { where: 'cloud', name: 'Serveur', provider: 'webdav', server: dav.address, username: dav.user, password: dav.password };
+  await assert.rejects(d.wm.handle({ sender: main.webContents }, 'create', { ...spec, password: 'nope' }), { code: 'BAD_CREDENTIALS' });
+  assert.equal(dav.files.size, 0);
+  const result = await d.wm.handle({ sender: main.webContents }, 'create', spec);
+  assert.equal(result.descriptor.provider, 'webdav');
+  assert.equal(result.descriptor.location, 'OpenDives/Serveur.ssrf');
+  assert.ok(dav.files.get('OpenDives/Serveur.ssrf').bytes.toString().includes('<dives>'));
+  const status = (await d.wm.handle({ sender: main.webContents }, 'cloudStatus')).find((p) => p.provider === 'webdav');
+  assert.equal(status.connected, true);
+  assert.ok(!JSON.stringify(status).includes(dav.password));
+  // A save goes up with If-Match on the revision this computer knows.
+  const win = d.fakeE.created[d.fakeE.created.length - 1];
+  const before = dav.files.get('OpenDives/Serveur.ssrf').etag;
+  await d.bridge.callFor(win.webContents.id, 'saveLocal');
+  assert.notEqual(dav.files.get('OpenDives/Serveur.ssrf').etag, before);
+  assert.equal(dav.requests.filter((r) => r.method === 'PUT').pop().headers['if-match'], before);
+  await d.bridge.stop();
+  await dav.close();
 });
