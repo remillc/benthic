@@ -3182,3 +3182,33 @@ This follows the rule for relative times in `docs/ui-writing.md` (task 159). Ext
 Phone and tablet, Android and iOS.
 
 Done: in the band summary the last-dive clause is joined with no-break spaces and « · » is glued to the item before it; rule added to docs/ui-writing.md, section 8.
+
+## [ ] 2026-11-15-169 Desktop app (Windows, macOS, Linux): the shell and the Carnet
+
+Christian decided this on 15 November 2026. Read first `docs/system-design.md`, section 7, « Desktop app ». Mock-ups (in `docs/mockups/`): `bureau-carnet-profil-droite.dc.html` (Windows and Linux), `bureau-carnet-macos.dc.html` (macOS), `bureau-carnet-menu-contextuel.dc.html` (multiple selection and right-click menu). This task covers the Carnet only; Sites, Statistiques and Outils come in later tasks.
+
+**1. The shell.** A desktop target for Windows, macOS and Linux that runs the existing Svelte interface with the Subsurface core compiled natively (no WebAssembly). Use **Tauri 2** unless you find a blocker; if you do, stop and report why and what Electron would cost instead, before writing more. Builds in the GitHub workflow for the three systems. The phone and tablet apps must not change.
+
+**2. Window and layout.** Material 3 Expressive on every system, the app's own tokens. Navigation rail of the tablet (96 dp) on the left. From 1200 dp wide: the Carnet as a **table** on the left, the **detail pane** on the right, separated by a resize handle (9 dp, 1 dp line, 4 × 32 dp grip); both widths are remembered. Below 1200 dp, the tablet layout.
+
+**3. The Carnet table.**
+- Columns: N°, Date (with the time, « 7 févr. 2026 · 9 h 09 »), Site, Prof. max, Durée, Temp.; a columns button in the top bar adds or removes columns (Compagnons, Ordinateur, Gaz…). Click a header to sort, again to reverse; the sorted column shows ▾ or ▴.
+- Rows 44 dp, 1 dp separators, numbers right-aligned with tabular figures, « Site à préciser » in #4B4A47. Selected row: #D4E2F2 background, #114477 text.
+- Trips are expandable rows (« ⌄ Voyage du 2 février 2013 · 4 plongées, de 21 à 29 m »).
+- Above the table, the top bar: « Carnet », the summary line (task 168 rule), the search bar (« Rechercher dans le carnet » with a « Ctrl+F » hint, ⌘F on macOS), the columns button and ⋮. The « + » stays a floating button at the bottom right.
+
+**4. The detail pane.** Title « N° 9 · Site à préciser », the date and computer, ✎ and ⋮; then the profile in a white 16 dp card; **hover** shows a dashed vertical line, a dot on the curve and a dark tooltip (time · depth, temperature · pressure); then the key figures (Prof. max, Durée, Prof. moy., Temp., Gaz, Consommation); then the tabs Informations, Équipement, Gaz, Notes, Carte.
+
+**5. Keyboard and mouse.**
+- ↑ ↓ move between dives; Entrée opens the edit; Ctrl/⌘+F search; Ctrl/⌘+N « + »; Ctrl/⌘+E edit; Suppr delete (with the usual confirmation); Ctrl/⌘+Z undo; Ctrl/⌘+, Réglages.
+- Shift+click and Ctrl/⌘+click select several dives. With several selected, the detail pane sums them up (« 2 plongées sélectionnées », « N° 6 et 7 · 204 min sous l'eau · 79,6 m au plus profond », « Clic droit ou ⋮ pour agir sur la sélection »).
+- **Right-click menu** (12 dp corners, 44 dp items, icon, label, shortcut on the right in #4B4A47), first line « 2 plongées sélectionnées » (or the dive's title for one): Fusionner en une plongée, Ajouter à un voyage…, Modifier ensemble… (Ctrl+E), separator, Copier (Ctrl+C), Exporter… (Ctrl+Maj+E), Partager…, separator, Supprimer (Suppr) in #B71C1C. Only what applies to the selection is shown.
+- A file dropped on the window is imported, as « Importer un fichier ».
+
+**6. Per system.**
+- **Windows and Linux:** no menu bar. A **Réglages** item (gear icon and label) at the bottom of the rail, above the account avatar; À propos is the last row of Réglages. The account sheet keeps only the account and the synchronisation.
+- **macOS:** a native menu bar: OpenDives (À propos d'OpenDives, Réglages… ⌘,, Quitter), Fichier (Nouvelle plongée, Importer, Télécharger depuis un ordinateur de plongée, Exporter, Imprimer), Édition (Annuler, Rétablir, Copier, Supprimer, Rechercher), Affichage (Carnet, Sites, Statistiques, Outils, Colonnes, Taille du texte), Plongée (Modifier, Fusionner, Séparer, Ajouter à un voyage), Fenêtre, Aide. No Réglages item in the rail. The window keeps the system's title bar and buttons.
+
+English: « Logbook », « Search the logbook », « 2 dives selected », « Right-click or ⋮ to act on the selection », « Merge into one dive », « Add to a trip… », « Edit together… », « Copy », « Export… », « Share… », « Delete », « Settings », « About OpenDives ».
+
+Write in `docs/architecture.md` how the desktop build is organised, and add the desktop to `docs/ui-specification.md`. Tests: the table sorting, the selection and the right-click menu's items for one and several dives.

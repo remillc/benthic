@@ -160,3 +160,6 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `sites-superposes-android.dc.html` | Sites, épingles superposées · Android |
 | `saisie-bateau-android.dc.html` | Saisie sur le bateau · Android |
 | `choisir-site-android.dc.html` | Choisir un site · Android |
+| `bureau-carnet-profil-droite.dc.html` | Carnet · bureau (Windows, Linux) |
+| `bureau-carnet-macos.dc.html` | Carnet · bureau macOS, barre de menus |
+| `bureau-carnet-menu-contextuel.dc.html` | Carnet · bureau, deux plongées sélectionnées, menu au clic droit |
