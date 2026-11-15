@@ -3472,3 +3472,16 @@ English: « Enlarge the profile », « Add to a trip… », « Remove from the t
 
 Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
 
+## [ ] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
+
+Christian decided this on 15 November 2026, after task 179: two ⋮ menus one above the other (top bar and detail pane) were confusing. Mock-ups: `docs/mockups/bureau-carnet-groupe.dc.html` and the other desktop Carnet screens.
+
+- **Instead of the items at the top of the ⋮ menu (task 179):** two icon buttons in the top bar of every section, right after the search field: ↶ Annuler and ↷ Rétablir, 44 dp, ink icons. Tooltips: « Annuler : {dernière action} (Ctrl+Z) » and « Rétablir : {action} (Ctrl+Maj+Z) ». Each is disabled (38 %) when there is nothing to undo or redo. Remove « Annuler » and « Rétablir » from the ⋮ menus.
+- **Carnet:** the top bar loses its ⋮ entirely. Its columns button moves to the right end of the table's header row: 32 dp, an 18 dp #4B4A47 icon, same menu as before (with « Rétablir l'ordre des colonnes », task 181). The only ⋮ on the Carnet screen is the dive's, in the detail pane (task 186).
+- **Sites, Statistiques, Outils:** keep their ⋮ for their own items (for Sites: Nettoyer les sites, Exporter les sites…), without Annuler and Rétablir.
+- macOS keeps Annuler and Rétablir in its Édition menu as well.
+
+English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
+
+Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
+
