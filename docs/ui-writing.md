@@ -72,6 +72,13 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 
 - **Canadian French (fr-CA): « courriel »; French (fr): « e-mail »** (to-do #18, tasks 140 and 141 of 14 November 2026). fr-CA: « Adresse courriel », « Courriel » as a short row label, « envoyé par courriel », « Cette adresse courriel n’est pas valide »; fr: « Adresse e-mail », « E-mail », « envoyé par e-mail », « Cette adresse e-mail n’est pas valide ». The fr-CA words go in `fr-CA.json`, which holds only what differs from `fr.json`. The mock-ups are in Canadian French. English keeps « email ». Code comments and identifiers are not concerned.
 
+
+### 8. No promise about where the data never goes
+
+Do not write that dives or data are never sent to OpenDives, or similar promises about the future. Paid hosting on an OpenDives server may come later, and such a line would then be false. Say where the logbook is kept, not where it will never go.
+
+- Removed on 15 November 2026: « Aucune plongée n’est envoyée à OpenDives. »
+
 ## Before publishing a text
 
 1. Read it out loud once. Cut every word that does not change the meaning.
