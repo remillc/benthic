@@ -218,3 +218,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `bureau-nouveau-carnet-vide.dc.html` | Nouveau carnet créé, carnet vide · bureau |
 | `logo-profil-claude.dc.html` | Logo · simple (icône de Claude VC) |
 | `logo-fusion.dc.html` | Logo · fusion (proposition de Claude) |
+| `logo-vagues-bulles.dc.html` | Logo · vagues et bulles (proposition de Claude) |
