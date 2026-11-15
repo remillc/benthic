@@ -1153,6 +1153,7 @@ html.ios {
   /* Mouse: Framework7's list links and icon links (navbar buttons) get the same layer. */
   @media (hover: hover) and (pointer: fine) {
     a.item-link:hover,
+    label.item-content:not(:has(:disabled)):hover,
     a.link.icon-only:hover {
       box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
     }
