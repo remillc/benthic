@@ -1,0 +1,69 @@
+# OpenDives desktop
+
+The desktop app is Electron (Windows, macOS, Linux). The Svelte app is the same as on phones; the
+core (Subsurface's C++ code through the facade) runs in a helper process.
+
+## Bridge
+
+```
+renderer (app/)                      main process                        helper process
+core-api.js                          desktop/bridge.cjs                  desktop/host/host.cpp
+  -> plugins/opendives-core/           ipc 'od:*' handlers   <-- stdio -->  opendives-host
+     desktop.js  -> window.odDesktop   + HostProcess (restarts it)          (the facade)
+                    (desktop/preload.cjs)
+```
+
+- **`plugins/opendives-core/desktop.js`** is the desktop twin of `OpenDivesCorePlugin.kt`: the same
+  methods, option names, resolved shapes and rejection codes. `core-api.js` registers it as the
+  plugin's `web` implementation; without `window.odDesktop` (a plain browser) its methods reject with
+  `UNAVAILABLE`.
+- **`desktop/preload.cjs`** exposes `window.odDesktop`; **`desktop/bridge.cjs`** (`setupBridge`) answers
+  it. The full list of the preload API, the checks on paths and the ipc channels is at the top of
+  `bridge.cjs`.
+- **`desktop/host/host.cpp`** is the desktop twin of `opendives_jni.cpp`: one handler per `NativeCore`
+  function, the same names, arguments, results and errors.
+
+Wiring in `desktop/main.cjs`:
+
+```js
+const { setupBridge } = require('./bridge.cjs');
+setupBridge({ ipcMain, app, safeStorage, hostPath, resourcesDir });
+// webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true }
+```
+
+`resourcesDir` holds `xslt/` (Subsurface's stylesheets, as `native/build-android.sh` copies them to the
+Android assets) and `SampleDivesV2.ssrf`. By default: `<process.resourcesPath>/resources` when
+packaged, else `desktop/resources`.
+
+### Host protocol
+
+One JSON object per line over stdio, UTF-8, nothing else on stdout (logs go to stderr).
+
+```
+-> {"id":7,"method":"editDive","args":{"id":12,"changes":"{...}"}}
+<- {"id":7,"result":<value>}        a string stays a string, even when it holds JSON
+<- {"id":7,"error":"message"}       where the JNI function would throw
+<- {"event":"syncProgress","data":{"message":"..."}}
+```
+
+`args` is a flat object (strings, integers, booleans, arrays of strings or integers; `null` reads as
+absent). A function that returns nothing gives `"result":null`. Requests run in order on one core
+thread; `cloudProbe` and `gitCheck` run on a second thread (they run beside a load), and
+`downloadCancel`, `setCaFile`, `setXsltDir`, `dcFromBluetoothName`, `dcBluetoothModels` and `ping` run at
+once. When stdin closes, the requests already received finish and the process exits.
+
+The bridge calls `init`, `setCaFile` (a PEM file written from Node's root certificates) and
+`setXsltDir` before any other call, and again after a restart of the host; the renderer cannot call
+them. After a restart the plugin emits `coreRestarted`: what was loaded in the core is gone.
+
+Left out of the host: `downloadDives` (Bluetooth will come from the web layer, Web Bluetooth).
+
+### Tests
+
+```sh
+poc/build.sh                                   # Linux or WSL: the core objects
+desktop/host/build-linux-test.sh               # build/desktop/opendives-host
+OPENDIVES_HOST=build/desktop/opendives-host node --test tests/desktop/host.test.mjs
+node --test tests/desktop/bridge.test.mjs      # the bridge, with a fake host: no native build needed
+node --import ./tests/app/register.mjs --test tests/app/desktop-plugin.test.mjs
+```
