@@ -20,7 +20,8 @@ const RESERVED = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
 export function sanitiseLogbookName(name) {
   let clean = String(name)
     // eslint-disable-next-line no-control-regex
-    .replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, '')
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/[<>:"/\\|?*]/g, '')
     .replace(/\s+/g, ' ')
     .replace(/^[\s.]+|[\s.]+$/g, '');
   if (clean.length > MAX_NAME_LENGTH) clean = clean.slice(0, MAX_NAME_LENGTH).replace(/[\s.]+$/g, '');

@@ -26,7 +26,7 @@
     <h2 class="od-release-empty--title">{t('logbook.emptyTitle')}</h2>
     <p class="od-release-empty--text">{t('logbook.emptyText')}</p>
     <a href={downloadRoute} class="od-release-empty--download">
-      <Icon name="bluetooth" size={20} weight={2} />{t('logbook.emptyPair')}
+      <Icon name="diveComputer" size={20} weight={2} />{t('logbook.emptyDownload')}
     </a>
     <nav class="od-release-empty--paper" aria-label={t('logbook.emptyOthers')}>
       {#each choices as c (c.key)}

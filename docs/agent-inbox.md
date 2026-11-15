@@ -3951,7 +3951,7 @@ Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 
 Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.
 
-## [ ] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
+## [x] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
 
 Christian approved this on 15 November 2026. **Release edition: build it on the branch `feature/release-new-logbook`, started from `feature/release-first-launch` (tasks 213, 216 and 217). Do not merge it into `main`.** Tablets only; the phone comes later.
 
@@ -4021,6 +4021,8 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 - Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
 - The beta on `main` is untouched.
 
+Done: on the branch `feature/release-new-logbook` (task 217), not merged into `main`. The right-hand column of the release first launch is now the steps of the mock-ups (`components/FirstLaunchSteps.svelte`, order in `lib/first-launch-steps.js`, state in `lib/first-launch.svelte.js`): « Pour commencer », « Nouveau carnet », the cloud (service, connection, connected), git, « Importer un carnet » (file, divelogs.de form and progress, « Nouveau carnet » with the summary) and « Ouvrir mon carnet OpenDives » (cloud, list, git), with the shared-axis X transition on the column only (« Retour » plays it backwards, reduced motion cuts it). The blue panel is unchanged and its line draws only when the page opens. The dialog, its tokens and the line « Aucune plongée n’est envoyée à OpenDives. » are removed (texts in `welcomeSteps`, `fr.json` and `en.json`). Working paths, checked in headless Edge with a fake plugin: Seulement sur cette tablette, git create, git open, file import, divelogs.de. Not done: « Essayer avec un carnet d’exemple » (hidden until #69); every cloud action says « Le nuage arrive dans une prochaine version. » (#74). The name is kept as a label (`od.logbookName`): the device logbook is a local git repository in the app’s folder, not a `.ssrf` file, so renaming it needs a native change; the sanitising and « (2) » rule is `lib/logbook-name.js` with tests. The git step has no user name field: the first segment of the address is sent with the token. divelogs.de gives no progress inside the download (the bar goes from 0 to N). Tests: `tests/app/release-welcome.test.mjs`.
+
 ## [ ] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
 
 Christian approved this on 15 November 2026.
@@ -4050,6 +4052,8 @@ Christian approved this on 15 November 2026.
 - The beta screens are otherwise pixel-identical.
 
 Done (part 2, beta): `app/src/components/WelcomeHelpLink.svelte` (class `od-welcome-help-link`, colour `--od-text-2`, #4B4A47 light / #B5B8BC dark, ⓘ 18 dp, 14 sp, only « À propos et contact » underlined, pointer and hover state), keys `welcomeHelp.question|link|label` in `fr.json` and `en.json`, a release note line. On `WelcomeStart` (Android and iOS branches) and, through a `helpLink` prop of `EditorialPage` set from `welcome`, on the first-launch sign-in, account creation, code and git repository screens. Tablet: centred, pinned 28 dp above the bottom; phone: centred at the end of the content (below the fold when the page does not scroll). It opens `/about` in the first-launch view; « Retour » returns to the same step. Tests: `tests/app/welcome-help-link.test.mjs`. Before/after headless screenshots: only the link's area changes on tablets; on Android phones the geometry is unchanged, only text anti-aliasing differs (the page now scrolls). Not ticked: the coordinator ticks it when both parts are in.
+
+Part 1 done (release edition), on `feature/release-new-logbook`: the link `WelcomeHelpLink` is pinned 28 dp above the bottom of the right-hand column on every step, both orientations; it opens About and « Retour » comes back to the same step. Left unticked: the coordinator ticks it when both parts are in.
 
 ## [ ] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
 
@@ -4082,3 +4086,5 @@ Christian approved this on 15 November 2026.
 **Test:** on each platform, the empty logbook shows « Télécharger mes plongées » with the dive computer icon, and it opens the download.
 
 Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
+
+Part 2 done (release edition), on `feature/release-new-logbook`: the tablet empty logbook (`components/ReleaseEmptyLogbook.svelte`, drawn by `pages/Logbook.svelte` over the empty detail pane when `isRelease`), with the band « Mon carnet · Cette tablette / Aucune plongée », the 520 dp column, « Télécharger mes plongées » with the `diveComputer` icon and the paper of three ways. Every « Créer le carnet » of 218 lands there. Left unticked: the coordinator ticks it when both parts are in.
