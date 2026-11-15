@@ -53,6 +53,7 @@ contextBridge.exposeInMainWorld('odDesktop', {
     deleteDevEnv: (options) => invoke('od:fs', 'deleteDevEnv', options),
   },
   htmlToPdf: (options) => invoke('od:htmlToPdf', options),
+  saveAs: (options) => invoke('od:saveAs', options),
   /** The Mac's menu bar (menu.cjs): each item's command, e.g. 'undo', 'find'. Returns an unsubscribe. */
   onMenu(callback) {
     if (typeof callback !== 'function') return () => {};

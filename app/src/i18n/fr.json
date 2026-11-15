@@ -3557,6 +3557,26 @@
     "mergeNextTrip": "Fusionner avec le voyage suivant",
     "resetColumns": "Rétablir l'ordre des colonnes",
     "columnWillMove": "« {column} » sera placé entre {before} et {after}",
-    "columnWillMoveLast": "« {column} » sera placé en dernier"
+    "columnWillMoveLast": "« {column} » sera placé en dernier",
+    "export": {
+      "which": "Quelles plongées",
+      "selection": {
+        "one": "La plongée sélectionnée",
+        "other": "Les {n} plongées sélectionnées"
+      },
+      "filtered": {
+        "one": "La plongée filtrée",
+        "other": "Les {n} plongées filtrées"
+      },
+      "all": "Tout le carnet",
+      "format": "Format",
+      "action": "Exporter…",
+      "saved": {
+        "one": "Plongée exportée",
+        "other": "{n} plongées exportées"
+      },
+      "fileDives": "plongees",
+      "fileLogbook": "carnet"
+    }
   }
 }

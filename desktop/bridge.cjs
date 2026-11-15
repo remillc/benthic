@@ -37,6 +37,7 @@
 //   fs.readDevEnv({name})    the text of <userData>/cloud-dev.env or cloud-test.env, '' when absent
 //   fs.deleteDevEnv({name})  deletes cloud-dev.env
 //   htmlToPdf({html, name, letter})   renders a page to a PDF in <temp>/share: resolves { path }
+//   saveAs({path, name})     the system's save dialog for a file of <temp>/share: resolves { saved, path }
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
 // The renderer is untrusted: methods are checked against the host's list, and
@@ -526,6 +527,23 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   ipcMain.handle('od:fs', answer((op, options) => fsCall(op, options)));
   ipcMain.handle('od:htmlToPdf', answer((options) => htmlToPdf(options)));
   ipcMain.handle('od:placesSearch', answer((options) => placesSearch(options)));
+  // « Exporter… » on desktop (task 2026-11-15-189): the system's save dialog, then the file staged
+  // in <temp>/share copied where the diver chose. Resolves { saved, path }.
+  ipcMain.handle('od:saveAs', async (event, options) => {
+    try {
+      const from = String(options?.path ?? '').startsWith('file:') ? require('node:url').fileURLToPath(options.path) : String(options?.path ?? '');
+      if (!allowed(from, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
+      const { dialog, BrowserWindow } = electron_();
+      const win = BrowserWindow.fromWebContents(event.sender);
+      const name = path.basename(String(options?.name ?? path.basename(from)));
+      const chosen = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('documents'), name) });
+      if (chosen.canceled || !chosen.filePath) return { ok: true, value: { saved: false } };
+      await fs.promises.copyFile(from, chosen.filePath);
+      return { ok: true, value: { saved: true, path: chosen.filePath } };
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
+    }
+  });
 
   // Quit: the host finishes what it was given (a save in progress), then exits.
   let quitting = false;

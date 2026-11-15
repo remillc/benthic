@@ -3557,6 +3557,26 @@
     "mergeNextTrip": "Merge with the next trip",
     "resetColumns": "Reset the column order",
     "columnWillMove": "“{column}” will be placed between {before} and {after}",
-    "columnWillMoveLast": "“{column}” will be placed last"
+    "columnWillMoveLast": "“{column}” will be placed last",
+    "export": {
+      "which": "Which dives",
+      "selection": {
+        "one": "The selected dive",
+        "other": "The {n} selected dives"
+      },
+      "filtered": {
+        "one": "The filtered dive",
+        "other": "The {n} filtered dives"
+      },
+      "all": "The whole logbook",
+      "format": "Format",
+      "action": "Export…",
+      "saved": {
+        "one": "Dive exported",
+        "other": "{n} dives exported"
+      },
+      "fileDives": "dives",
+      "fileLogbook": "logbook"
+    }
   }
 }

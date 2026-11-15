@@ -11,14 +11,13 @@
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
-  import ExportSheet from '../components/ExportSheet.svelte';
+  import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { exportDives } from '../lib/share.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, undoLastChange, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { filter } from '../lib/filter.svelte.js';
@@ -251,16 +250,6 @@
   }
 
   let exporting = $state(false);
-  /** @param {string} format @param {boolean} anonymize */
-  async function exportSelected(format, anonymize) {
-    try {
-      await exportDives(desk.selection.ids, /** @type {any} */ (format), anonymize, logbook.prefs);
-    } catch (e) {
-      if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
-      console.error('Export dives', e);
-      showSnackbar(t('export.failed'));
-    }
-  }
 
   // « Ajouter à un voyage… »: the logbook's trips, newest first, or a new trip.
   let choosingTrip = $state(false);
@@ -553,7 +542,8 @@
         deleteSelected();
         return true;
       case 'export':
-        if (desk.selection.ids.length) exporting = true;
+        // The dialog offers the selection, the filtered dives or the whole logbook (task 189).
+        exporting = true;
         return true;
       case 'addToTrip':
         if (desk.selection.ids.length) choosingTrip = true;
@@ -824,7 +814,13 @@
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />
   {/if}
   {#if exporting}
-    <ExportSheet count={desk.selection.ids.length} onexport={exportSelected} onclose={() => (exporting = false)} />
+    <DesktopExportDialog
+      selected={logbook.dives.filter((d) => selected.has(d.id))}
+      filtered={filter.ids ? [...filter.ids] : null}
+      all={logbook.dives.map((d) => d.id)}
+      prefs={logbook.prefs}
+      onclose={() => (exporting = false)}
+    />
   {/if}
   {#if choosingTrip}
     <ChoiceDialog title={t('desktop.menu.addToTrip')} options={tripOptions} value="new" onselect={addToTrip} oncancel={() => (choosingTrip = false)} />
