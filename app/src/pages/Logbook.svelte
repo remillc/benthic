@@ -14,6 +14,7 @@
   import TripRow from '../components/TripRow.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import Icon from '../components/Icon.svelte';
+  import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import { scanQr } from '../lib/qr-receive.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
@@ -1034,16 +1035,14 @@
   ];
 
   /**
-   * The empty logbook (spec, section 6, "Empty"): pair a dive computer,
-   * import a file, download from divelogs.de, log by hand.
-   * @type {{ key: string, icon: 'download'|'file'|'edit'|'qr', text: string }[]}
+   * The empty logbook (task 2026-11-15-204): the dive computer has its own
+   * large button; these are the other ways to add dives.
+   * @type {{ key: string, icon: 'download'|'cloud'|'edit', text: string, note: string }[]}
    */
   const emptyChoices = [
-    { key: 'download', icon: 'download', text: t('logbook.emptyPair') },
-    { key: 'import', icon: 'file', text: t('logbook.addImport') },
-    { key: 'divelogs', icon: 'download', text: t('logbook.emptyDivelogs') },
-    { key: 'manual', icon: 'edit', text: t('logbook.addManual') },
-    { key: 'scan', icon: 'qr', text: t('logbook.addScan') },
+    { key: 'import', icon: 'download', text: t('logbook.emptyImport'), note: t('logbook.emptyImportNote') },
+    { key: 'divelogs', icon: 'cloud', text: t('logbook.emptyDivelogs'), note: t('logbook.emptyDivelogsNote') },
+    { key: 'manual', icon: 'edit', text: t('logbook.emptyManual'), note: t('logbook.emptyManualNote') },
   ];
 
   /**
@@ -1269,29 +1268,30 @@
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
     {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
     <div class="od-logbook--empty">
-      <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
-      <p class="od-logbook--empty-text">{t('logbook.emptyText')}</p>
-    </div>
-    {#if theme.ios}
-      <List inset strong dividers class="od-logbook--empty-choices">
-        {#each emptyChoices as c, i (c.key)}
-          <ListItem link="#" title={c.text} class={i === 0 ? 'od-logbook--first' : ''} noChevron onClick={() => choose(c.key)}>
-            {#snippet media()}<Icon name={c.icon} size={22} />{/snippet}
-          </ListItem>
-        {/each}
-      </List>
-    {:else}
-      <div class="od-logbook--empty-buttons">
-        <a href={downloadRoute} class="od-logbook--filled">
-          <Icon name="download" size={18} weight={2} />{t('logbook.emptyPair')}
-        </a>
-        <button type="button" class="od-outlined-button" onclick={() => choose('import')}>{t('logbook.addImport')}</button>
-        <a href="/welcome/import" class="od-outlined-button">{t('logbook.emptyDivelogs')}</a>
-        <a href="/dives/new" class="od-text-button">{t('logbook.addManual')}</a>
-        <button type="button" class="od-text-button" onclick={() => choose('scan')}>{t('logbook.addScan')}</button>
+      <div class="od-logbook--empty-illustration" aria-hidden="true">
+        <DecorativeProfile trace class="od-logbook--empty-profile" />
+        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-1"></span>
+        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-2"></span>
+        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-3"></span>
       </div>
-    {/if}
-    <p class="od-logbook--empty-note">{t('logbook.emptyNote')}</p>
+      <h2 class="od-state-title od-logbook--empty-title">{t('logbook.emptyTitle')}</h2>
+      <p class="od-logbook--empty-text">{t('logbook.emptyText')}</p>
+      <a href={downloadRoute} class="od-logbook--empty-pair">
+        <Icon name="bluetooth" size={20} weight={2} />{t('logbook.emptyPair')}
+      </a>
+      <nav class="od-logbook--empty-options" aria-label={t('logbook.emptyOthers')}>
+        {#each emptyChoices as c (c.key)}
+          <a href={routes[c.key] ?? '#'} class="od-logbook--empty-option" onclick={(e) => { e.preventDefault(); choose(c.key); }}>
+            <span class="od-logbook--empty-option-icon"><Icon name={c.icon} size={22} weight={2} /></span>
+            <span class="od-logbook--empty-option-texts">
+              <span class="od-logbook--empty-option-title">{c.text}</span>
+              <span class="od-logbook--empty-option-note">{c.note}</span>
+            </span>
+            <span class="od-logbook--empty-option-chevron"><Icon name="chevron" size={20} weight={2} /></span>
+          </a>
+        {/each}
+      </nav>
+    </div>
   {:else if results && results.length === 0}
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
   {:else if filtered && sorted.length === 0}
@@ -1605,16 +1605,62 @@
       border-radius: 50%;
     }
 
+    /* Empty logbook (task 2026-11-15-204): a column of at most 440 dp, centred. */
     .od-logbook--empty {
-      margin: 48px 24px 0;
+      max-width: 440px;
+      margin: 16px auto 0;
+      padding: 0 24px 24px;
+      box-sizing: border-box;
+    }
 
-      :global(.ios) & {
-        margin-inline: 32px;
-      }
+    .od-logbook--empty-illustration {
+      position: relative;
+      height: 104px;
+    }
+
+    :global(.od-logbook--empty-profile) {
+      height: 104px;
+    }
+
+    /* Three white outlines rising in the water of the descent, the smallest lowest. */
+    .od-logbook--empty-bubble {
+      position: absolute;
+      box-sizing: border-box;
+      border: 1.5px solid var(--od-bubble);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .od-logbook--empty-bubble-1 {
+      left: 18.1%;
+      top: 67.3%;
+      width: 5px;
+      height: 5px;
+    }
+
+    .od-logbook--empty-bubble-2 {
+      left: 19.9%;
+      top: 53.8%;
+      width: 7px;
+      height: 7px;
+    }
+
+    .od-logbook--empty-bubble-3 {
+      left: 18.4%;
+      top: 38.5%;
+      width: 9px;
+      height: 9px;
+    }
+
+    .od-logbook--empty-title {
+      margin: 20px 0 0;
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 500;
     }
 
     .od-logbook--empty-text {
-      margin: 0;
+      margin: 4px 0 0;
       font-size: 16px;
       line-height: 24px;
       color: var(--od-text-2);
@@ -1624,51 +1670,92 @@
       }
     }
 
-    .od-logbook--empty-buttons {
-      margin: 24px 24px 0;
+    .od-logbook--empty-pair {
+      margin-top: 18px;
+      min-height: 56px;
+      padding: 8px 16px;
+      text-align: center;
+      border-radius: 28px;
+      box-sizing: border-box;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-
-      a {
-        display: inline-flex;
-        align-items: center;
-        box-sizing: border-box;
-        text-decoration: none;
-      }
-    }
-
-    /* MD3 filled button with a leading icon: 16 dp before it, 24 dp after the label. */
-    .od-logbook--filled {
-      height: 40px;
-      padding: 0 24px 0 16px;
-      gap: 8px;
-      border-radius: 20px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       background: var(--od-primary-action);
       color: var(--od-on-primary-action);
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
-      letter-spacing: 0.1px;
-    }
-
-    :global(.od-logbook--empty-choices .od-logbook--first .item-title) {
-      font-weight: 600;
-    }
-
-    .od-logbook--empty-note {
-      margin: 16px 24px 0;
-      font-size: 12px;
-      line-height: 16px;
-      letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      text-decoration: none;
 
       :global(.ios) & {
-        margin: 8px 32px 0;
-        font-size: 13px;
-        line-height: 18px;
-        letter-spacing: 0;
+        min-height: 50px;
+        border-radius: 14px;
+        font-weight: 600;
       }
+    }
+
+    .od-logbook--empty-options {
+      margin: 16px -8px 0;
+      border-radius: 24px;
+      background: var(--od-surface);
+      overflow: hidden;
+
+      :global(.ios) & {
+        border-radius: 12px;
+      }
+    }
+
+    .od-logbook--empty-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      min-height: 60px;
+      box-sizing: border-box;
+      color: var(--od-text);
+      text-decoration: none;
+
+      & + & {
+        border-top: 1px solid var(--od-separator);
+      }
+    }
+
+    .od-logbook--empty-option-icon {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--od-secondary-container);
+      color: var(--od-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .od-logbook--empty-option-texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-logbook--empty-option-title {
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+
+    .od-logbook--empty-option-note {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .od-logbook--empty-option-chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
     }
 
     .od-logbook--skeleton-thumbnail {

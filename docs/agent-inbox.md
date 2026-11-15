@@ -3744,7 +3744,7 @@ Tests: the launcher icon, the splash screen (light and dark), the About screen, 
 Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
 
 
-## [ ] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
+## [x] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
 
 Christian approved this on 15 November 2026. Mock-up: `docs/mockups/android-etat-vide.dc.html` (« Carnet vide · Android »). The empty state of the Logbook (`app/src/pages/Logbook.svelte`, `emptyTitle`), on phone and tablet (on tablet, the same column, max 440 dp wide, centred as on the tablet first launch).
 
@@ -3761,6 +3761,8 @@ From top to bottom, under the unchanged header band:
 Dark mode: the same layout with the dark tokens (card `--od-surface`, icon container `--od-tint`, button in the dark ink). English: « No dives yet », « Start with your dive computer, or pick another way below. », « Pair a dive computer », « Other ways to add dives », « Import a file » — « .ssrf, .xml and other logbooks », « Download from divelogs.de » — « With your divelogs.de username », « Log a dive by hand » — « Date, depth and time are enough ».
 
 Tests: an empty logbook shows the profile, the title, the large button and the three cards; each card opens the same flow as the old button; the old note is gone; the illustration is ignored by TalkBack.
+
+Done: the empty logbook (`Logbook.svelte`) shows the shared `DecorativeProfile` (new `trace` option: `--od-trace`, 1.25 dp) at 104 dp with three bubble outlines (`--od-bubble`, aria-hidden), the new title and text, a 56 dp « Associer un ordinateur de plongée » button, and one card of three option rows (icon container `--od-secondary-container` / `--od-secondary`, so dark mode follows the tokens). The old note and the QR-scan row are gone from this screen (scan stays in the « + » menu). Column of at most 440 dp, centred. iOS builds the same structure with 50 dp / 14 dp button and 12 dp card corners. Test: `tests/app/empty-logbook.test.mjs`.
 
 ## [x] 2026-11-15-205 iPhone first launch: check the water colour under the profile
 
