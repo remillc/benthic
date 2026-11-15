@@ -3631,3 +3631,15 @@ Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils �
 English: « Plan », « More plan options », « Share the plan… », « Planner settings », « Saved plans », « Print the slate », « Save the plan », « Notify me », « Prepare this mix ».
 
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
+
+## [ ] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
+
+Christian decided this on 15 November 2026, to match the desktop (task 196). Mock-ups: `docs/mockups/outils-meilleur-melange-android.dc.html`, `outils-meilleur-melange-trimix-android.dc.html`, `android-tablette-meilleur-melange-paysage.dc.html`, `android-tablette-meilleur-melange-portrait.dc.html`.
+
+- Under the advised mix and its note, an outlined button (MD3, 40 dp, gas cylinder icon) « Préparer ce mélange ». On the tablet, where both the nitrox and the trimix are listed, it names the advised one: « Préparer le trimix 25/28 » (or « Préparer l'EAN25 »).
+- It opens the Mélangeur de gaz with the mode (Nitrox or Trimix) and the « Mélange voulu » (oxygen, helium) set to that mix; the final pressure, the cylinder and what it still holds keep their last values. Back returns to Meilleur mélange.
+- iOS: the same button at the same place, when the iOS gas tools are built.
+
+English: « Prepare this mix », « Prepare the 25/28 trimix ».
+
+Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » opens the blender in Trimix with 25 % oxygen and 28 % helium.
