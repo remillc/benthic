@@ -2118,7 +2118,7 @@
       "Edit a dive: choose the main computer when the dive has several.",
       "Settings: Logbook dive computers, to rename, remove or merge duplicates, found by serial number, then by comparing the profiles.",
       "Logbook: “Logbook dive computers” in the ⋮ menu.",
-      "New logo, a deep-blue disc with a white wave: app icon, launch screen, menu and About.",
+      "New logo, a deep-blue disc with a white wave and a soft relief (light rim, shadow under the wave): app icon, launch screen, menu and About. The favicon is simplified so that it stays readable at 16 px.",
       "Sync conflict: new dialog, readable differences, “Later”, and “Undo” before anything is sent.",
       "Filter (Android): new page, cylinder and gas criteria grouped, a saved filter fills the page, and deleting one offers “Undo”.",
       "Filter: the explanatory sentences under the criteria are gone.",
