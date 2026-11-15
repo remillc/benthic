@@ -3843,7 +3843,7 @@ Christian decided this on 15 November 2026. To-dos and ideas get a third tag, `[
 
 Done: rule read in docs/TODOS.md and docs/IDEAS.md; [site] items (pages, texts, look and publishing of opendives.app, folder site/) are built and published from tasks, as usual. Nothing to code.
 
-## [x] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+## [ ] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
 
 Christian approved this on 15 November 2026. Mock-ups:
 - `docs/mockups/android-tablette-premier-lancement-production-paysage.dc.html`
@@ -3888,7 +3888,7 @@ Christian approved this on 15 November 2026. Mock-ups:
 - The beta build is unchanged.
 - In the release build, on a tablet, in both orientations: the screens match the mock-ups, the profile touches no edge, and « Sur cette tablette » and « Choisir un fichier » each lead to a working logbook.
 
-Done: `VITE_EDITION` (read only in `app/src/lib/edition.js`; `release`, else beta, the default; documented in `app/README.md`, « Editions ») picks the first launch in `App.svelte`: beta keeps `WelcomeStart.svelte` untouched (screenshots pixel-identical at 1280 × 800 and 800 × 1280); release uses `pages/WelcomeEntry.svelte`, which shows the new `WelcomeStartRelease.svelte` from 768 px and, for now, the beta screen on a phone. The 700 dp blue panel (gradient, light, bands, brand row, heading, line), the profile (`ReleaseProfile.svelte`: white line, glow, dashed surface, water fade, dot, two chips, drawn in 1.6 s with the emphasised-decelerate curve, none with reduced motion), the choices column and the portrait layout (640 dp panel, 120 dp margins) follow the mock-ups; the panel's colours are `--od-release-*` tokens. « Sur cette tablette » is « Commencer sans compte », « Dans un dépôt git » the git setup; « Dans mon nuage » and the four cloud rows of the dialog (generic cloud and server icons, no logo) show « Le nuage arrive dans une prochaine version. ». « Choisir un fichier » opens the file picker; the file is read first (staged, counted, discarded), so a file with no dive or that cannot be read leaves first launch as it was, then the device logbook is started, the sample dives removed when the device had none, and the file imported with the app's own `importFile`. Texts in `welcomeRelease` (fr, en). No release note yet (only when the release edition is first built). Tests in `tests/app/release-welcome.test.mjs`. Checked in headless Edge at both sizes, light and dark, dialog open.
+On hold (task 215): built once, then taken off `main`; the work is kept on `feature/release-first-launch` (edition switch `VITE_EDITION`, `WelcomeStartRelease.svelte`, `ReleaseProfile.svelte`, `OpenImportDialog.svelte`, tests). A new task replaces this one.
 
 ## [x] 2026-11-15-214 The decorative dive profile becomes a smooth curve
 
@@ -3909,7 +3909,7 @@ At the two ends, the missing neighbour is the end point itself. The path is `M P
 
 Done: `app/src/lib/smooth-path.js` (`smoothPath`, Catmull-Rom as cubic Béziers, tension 1/6, end points as their own neighbours; `decorativeProfilePath` for the shared dive points) draws the line and the water of `DecorativeProfile.svelte` (empty logbook, editorial pages) and of `WelcomeStart.svelte`; sizes, colours and margins unchanged. The release-edition profile (task 213) already uses the mock-up's curve. The real dive profile is untouched. Tests in `tests/app/smooth-path.test.mjs` (every point on the curve, the control points, no corner).
 
-## [ ] 2026-11-15-215 Release-edition screens stay on a branch; task 213 is on hold
+## [x] 2026-11-15-215 Release-edition screens stay on a branch; task 213 is on hold
 
 Christian decided this on 15 November 2026.
 
@@ -3920,3 +3920,5 @@ Christian decided this on 15 November 2026.
 - If you already started it, stop and keep what you have on `feature/release-first-launch`.
 
 Mark this task done once the branch exists (or once you have noted the rule, if nothing was started).
+
+Done: task 213 had already been merged into `main`; it is reverted there, so the beta on `main` is as before (no edition switch, no release screens), and the branch `feature/release-first-launch` keeps the work, kept up to date with `main` and never merged until Christian asks.
