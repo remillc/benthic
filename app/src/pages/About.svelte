@@ -154,7 +154,7 @@
   </Navbar>
 
   <header class="od-about--head">
-    <!-- The simple logo, the same drawing in light and dark mode. -->
+    <!-- The simple logo with relief, the same drawing in light and dark mode. -->
     <img class="od-about--logo od-about--light" src="logo-light.svg" alt="" width="112" height="112" />
     <img class="od-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>OpenDives</h1>
