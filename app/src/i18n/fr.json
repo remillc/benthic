@@ -1819,6 +1819,27 @@
     "done": "Plongées renumérotées",
     "failed": "Les plongées n'ont pas pu être renumérotées. Aucune plongée n'a été modifiée."
   },
+  "multiDive": {
+    "menuMerge": "Fusionner en une plongée",
+    "mergeBlocked": "Seulement des plongées qui se suivent, à moins d'une heure d'intervalle",
+    "merged": {
+      "one": "{n} plongée fusionnée",
+      "other": "{n} plongées fusionnées"
+    },
+    "mergeFailed": "Les plongées n'ont pas pu être fusionnées. Aucune plongée n'a été modifiée.",
+    "menuEdit": "Modifier ensemble…",
+    "editTitle": "Modifier {n} plongées",
+    "manyValues": "Plusieurs valeurs",
+    "onSome": "sur {n} plongées",
+    "onSomeGroup": "Seulement sur certaines plongées",
+    "save": "Enregistrer",
+    "edited": {
+      "one": "{n} plongée modifiée",
+      "other": "{n} plongées modifiées"
+    },
+    "editFailed": "Les plongées n'ont pas pu être modifiées. Aucune plongée n'a été modifiée.",
+    "loadFailed": "Les plongées n'ont pas pu être lues."
+  },
   "dialog": {
     "close": "Fermer",
     "ok": "OK",
@@ -2279,6 +2300,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet : « Fusionner en une plongée » et « Modifier ensemble… » dans le menu ⋮ des plongées cochées. La fusion n'est offerte que pour des plongées qui se suivent, à moins d'une heure d'intervalle ; « Modifier ensemble… » change le site, le guide, les compagnons, les étiquettes, la combinaison, le type d'eau et les notes de plusieurs plongées à la fois, et « Annuler » défait tout d'un coup.",
       "Profil des plongées : « Plafond » montre le plafond donné par l'ordinateur de plongée, comme Subsurface. Le plafond calculé avec vos facteurs de gradient s'ajoute en pointillé si « Plafond calculé » est activé dans Réglages, Affichage.",
       "Profil des plongées : courbes plus fines (1,25 dp) et ligne de profondeur moyenne de 1 dp. Le contraste élevé garde des traits de 2 dp.",
       "Détail d'une plongée : le menu ⋮ de la barre d'actions se ferme d'un appui ailleurs ou d'un second appui sur ⋮.",

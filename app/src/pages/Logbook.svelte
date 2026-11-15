@@ -27,7 +27,8 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { importErrorKey } from '../lib/deep-link.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
+  import { canMerge } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -316,6 +317,30 @@
     } catch (e) {
       changeFailed(e);
     }
+  }
+
+  /** "Fusionner en une plongée": whether the checked dives follow one another, less than an hour apart. */
+  const mergeable = $derived(canMerge(logbook.dives, checkedIds).ok);
+
+  /** The checked dives become one dive, which stays checked; no confirmation, « Annuler » undoes it. */
+  async function mergeChecked() {
+    const n = checkedIds.length;
+    if (!mergeable) return;
+    try {
+      const id = await mergeDives(checkedIds);
+      // The list was read again, which left the selection: the merged dive becomes the selection.
+      if (id) startSelection(id);
+      offerUndo(t('multiDive.merged', { n }));
+    } catch (e) {
+      console.error('Merge dives', e);
+      const code = String(/** @type {any} */ (e)?.message ?? '');
+      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+    }
+  }
+
+  /** "Modifier ensemble…": a full-screen sheet for the checked dives (pages/EditDivesTogether.svelte). */
+  function editChecked() {
+    f7router.navigate(`/dives/edit-together?ids=${checkedIds.join(',')}`);
   }
 
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
@@ -1276,6 +1301,16 @@
         <MenuItem icon="redo" text={t('logbook.menuRedo')} onclick={() => undoRedo(true)} />
       {/if}
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
+      {#if selecting && checkedCount >= 2}
+        <MenuItem icon="edit" text={t('multiDive.menuEdit')} onclick={editChecked} />
+        <MenuItem
+          icon="merge"
+          text={t('multiDive.menuMerge')}
+          disabled={!mergeable}
+          supporting={mergeable ? '' : t('multiDive.mergeBlocked')}
+          onclick={mergeChecked}
+        />
+      {/if}
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
         <MenuItem icon="computer" text={t('settings.logbookComputers.title')} link="/settings/computers/" />

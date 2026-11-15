@@ -195,6 +195,41 @@ export async function deleteDives(ids) {
 }
 
 /**
+ * Merges dives into one with the core's merge (one undoable step), saved and synced like an
+ * edit. Whether the dives may be merged is `canMerge` of lib/multi-dive.js: the core merges
+ * whatever it is given. The merged dive keeps the first dive's number.
+ * @param {number[]} ids
+ * @returns {Promise<number>} the merged dive's id (the selection after the merge)
+ */
+export async function mergeDives(ids) {
+  const result = await OpenDivesCore.mergeDives({ ids });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return result.list?.id ?? 0;
+}
+
+/**
+ * The same changes on several dives, one undoable step (« Modifier ensemble »), saved and
+ * synced like an edit. `changes` is built by `multiEditChanges` of lib/multi-dive.js.
+ * @param {number[]} ids
+ * @param {Record<string, string|number|string[]>} changes
+ * @param {number|null} [openId] the dive open in the detail pane (tablet), refreshed when it is one of them
+ */
+export async function editDivesTogether(ids, changes, openId = null) {
+  const result = await OpenDivesCore.editDives({ ids, changes });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  // The dive open in the detail pane (tablet), if it was one of them, shows its new values.
+  if (openId !== null && ids.includes(openId)) logbook.edited = { id: openId, dive: await OpenDivesCore.getDive({ id: openId }) };
+  await persistChanges();
+}
+
+/**
  * Renumbers dives in date order from `start` (one undoable step), saved and
  * synced like an edit. No ids: all the dives, as Subsurface's Renumber dialog.
  * @param {number[]} ids

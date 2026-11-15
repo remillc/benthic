@@ -625,6 +625,13 @@ export { waterTypeOf };
  * @property {(options: {id?: number, ids?: number[]}) => Promise<EditResult>} deleteDive
  *   One dive (id) or several (ids), one undoable step.
  *   Deletes a dive, one undoable step (delete_dive).
+ * @property {(options: {ids: number[]}) => Promise<EditResult>} mergeDives
+ *   Merges two or more dives into one, one undoable step (merge_dives in opendives.h): Subsurface's own merge;
+ *   the merged dive keeps the first numbered dive's number. The result's `id` is the merged dive.
+ * @property {(options: {ids: number[], changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDives
+ *   The same changes on several dives, one undoable step (edit_dives in opendives.h): site (uuid), notes, suit,
+ *   userSalinity, diveguide, and the chip lists buddiesAdd/buddiesRemove, diveguideAdd/diveguideRemove,
+ *   tagsAdd/tagsRemove (only those names are added or removed, per dive).
  * @property {(options: {ids: number[], start: number, numbers?: number[]}) => Promise<EditResult>} renumberDives
  *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives);
  *   with numbers (one per id), each dive gets its own number instead.
@@ -856,6 +863,12 @@ export const OpenDivesCore = {
   },
   async deleteDive(options) {
     return JSON.parse((await native.deleteDive(options)).json);
+  },
+  async mergeDives(options) {
+    return JSON.parse((await native.mergeDives(options)).json);
+  },
+  async editDives(options) {
+    return JSON.parse((await native.editDives(options)).json);
   },
   async renumberDives(options) {
     return JSON.parse((await native.renumberDives(options)).json);

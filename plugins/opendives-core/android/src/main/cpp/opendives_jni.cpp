@@ -645,6 +645,44 @@ Java_org_opendives_core_NativeCore_deleteDive(JNIEnv *env, jobject, jintArray di
 	return edit_result(env, json);
 }
 
+// Merges dives into one: one undoable step (merge_dives).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_mergeDives(JNIEnv *env, jobject, jintArray diveIds)
+{
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	std::string json, error;
+	if (opendives::merge_dives(ids, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+// The same changes on several dives: one undoable step (edit_dives).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_editDives(JNIEnv *env, jobject, jintArray diveIds, jstring changes)
+{
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	std::string json, error;
+	if (opendives::edit_dives(ids, to_string(env, changes), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // Renumbers dives (all of them if ids is empty): one undoable step (renumber_dives).
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_renumberDives(JNIEnv *env, jobject, jintArray diveIds, jint start, jintArray diveNumbers)

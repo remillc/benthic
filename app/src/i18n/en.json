@@ -1819,6 +1819,27 @@
     "done": "Dives renumbered",
     "failed": "The dives could not be renumbered. No dive was changed."
   },
+  "multiDive": {
+    "menuMerge": "Merge into one dive",
+    "mergeBlocked": "Only dives that follow one another, less than an hour apart",
+    "merged": {
+      "one": "{n} dive merged",
+      "other": "{n} dives merged"
+    },
+    "mergeFailed": "The dives could not be merged. No dive was changed.",
+    "menuEdit": "Edit together…",
+    "editTitle": "Edit {n} dives",
+    "manyValues": "Several values",
+    "onSome": "on {n} dives",
+    "onSomeGroup": "Only on some of the dives",
+    "save": "Save",
+    "edited": {
+      "one": "{n} dive edited",
+      "other": "{n} dives edited"
+    },
+    "editFailed": "The dives could not be edited. No dive was changed.",
+    "loadFailed": "The dives could not be read."
+  },
   "dialog": {
     "close": "Close",
     "ok": "OK",
@@ -2279,6 +2300,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: « Merge into one dive » and « Edit together… » in the ⋮ menu of the checked dives. Merging is offered only for dives that follow one another, less than an hour apart; « Edit together… » changes the site, guide, buddies, tags, suit, water type and notes of several dives at once, and « Undo » reverts it in one go.",
       "Dive profiles: « Ceiling » shows the ceiling given by the dive computer, as Subsurface does. The ceiling computed with your gradient factors is added as a dashed line when « Computed ceiling » is on in Settings, Display.",
       "Dive profiles: thinner curves (1.25 dp), a 1 dp average-depth line; high contrast keeps 2 dp lines.",
       "Dive detail: the ⋮ menu of the action bar closes with a tap elsewhere or a second tap on ⋮.",
