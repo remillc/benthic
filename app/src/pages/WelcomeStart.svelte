@@ -8,6 +8,7 @@
   // iOS: an inset grouped list with chevrons.
   import { Page, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import WelcomeHelpLink from '../components/WelcomeHelpLink.svelte';
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -68,6 +69,7 @@
       <a href="/welcome/git" class="od-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
       </div>
     </div>
+    <WelcomeHelpLink />
   {:else}
   <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
     <defs>
@@ -114,6 +116,7 @@
     <Icon name="git" size={20} />
     <span>{t('welcome.ownGit')}</span>
   </a>
+  <WelcomeHelpLink />
   {/if}
 </Page>
 

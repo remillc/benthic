@@ -1841,6 +1841,11 @@
     },
     "nothingNew": "Ces plongées sont déjà dans le carnet du compte"
   },
+  "welcomeHelp": {
+    "question": "Une question ?",
+    "link": "À propos et contact",
+    "label": "Une question ? À propos et contact"
+  },
   "about": {
     "title": "À propos",
     "version": "Version {version}",
@@ -1859,6 +1864,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement : le lien « Une question ? À propos et contact » en bas de l’écran ouvre À propos, avec l’adresse du support.",
       "Le profil de plongée décoratif (premier lancement, carnet vide, pages du compte) est une courbe lisse, sans angles.",
       "Premier lancement sur tablette : le profil de plongée ne touche plus les bords de l’écran.",
       "Premier lancement sur tablette : le logo et le nom OpenDives sont plus grands.",

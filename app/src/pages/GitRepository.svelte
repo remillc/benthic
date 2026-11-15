@@ -214,6 +214,7 @@
 </script>
 
 <EditorialPage class="od-git-repository"
+  helpLink={welcome}
   title={t('gitRepo.title')}
   heading={t('gitRepo.heading')}
   intro={t('gitRepo.intro')}
