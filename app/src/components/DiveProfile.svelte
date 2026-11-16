@@ -719,6 +719,12 @@
       fill: var(--od-profile-mean);
     }
 
+    /* The desktop app, in the tablet layout too: no sideways scrolling a mouse cannot do. */
+    :global(html.od-desktop-app) .od-dive-profile--layers {
+      flex-wrap: wrap;
+      overflow-x: visible;
+    }
+
     .od-dive-profile--layers.od-dive-profile--layers-desk {
       align-items: center;
       padding: 4px 12px 0;

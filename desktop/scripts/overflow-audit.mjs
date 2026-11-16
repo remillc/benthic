@@ -147,6 +147,9 @@ function inspect(allow, rootSel) {
         out.clipped.push({ el: label(el), scrollWidth: el.scrollWidth, clientWidth: el.clientWidth, text: (el.textContent || '').trim().slice(0, 30) });
       }
     }
+    if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1 && (oy === 'hidden' || oy === 'clip') && !el.querySelector(':scope > img, :scope > canvas, :scope > video') && !['IFRAME'].includes(el.tagName) && cs.display !== '-webkit-box') {
+      out.clipped.push({ el: label(el), axis: 'y', scrollWidth: el.scrollHeight, clientWidth: el.clientHeight, text: (el.textContent || '').trim().slice(0, 30) });
+    }
     if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1 && (oy === 'auto' || oy === 'scroll')) {
       out.paneScroll.push({ el: label(el), scrollHeight: el.scrollHeight, clientHeight: el.clientHeight, allowed: isAllowed(el) });
     }
@@ -180,7 +183,7 @@ const problems = [];
 if (report.document.horizontal) problems.push(`document: horizontal overflow (${report.document.scrollWidth} > ${report.viewport.width})`);
 if (report.document.vertical) problems.push(`document: page-level vertical overflow (${report.document.scrollHeight} > ${report.viewport.height})`);
 for (const h of report.horizontal) problems.push(`${h.el}: horizontal scroll (${h.scrollWidth} > ${h.clientWidth})`);
-for (const c of report.clipped) problems.push(`${c.el}: content cut off (${c.scrollWidth} > ${c.clientWidth}) "${c.text}"`);
+for (const c of report.clipped) problems.push(`${c.el}: content cut off${c.axis === 'y' ? ' at the bottom' : ''} (${c.scrollWidth} > ${c.clientWidth}) "${c.text}"`);
 for (const o of report.outside) problems.push(`${o.el}: sticks out of its box or the window (${o.left}..${o.right}, box ${o.clip[0]}..${o.clip[1]}) "${o.text}"`);
 for (const p of report.paneScroll) if (!p.allowed) problems.push(`${p.el}: pane scrolls vertically and is not a list (${p.scrollHeight} > ${p.clientHeight})`);
 for (const s of report.scrollbars) {

@@ -178,6 +178,38 @@
       margin-top: 42px;
     }
 
+    /* A short window (fluid layout, docs/system-design.md, section 7): the brand row, the title and the margins give
+       way so that the profile keeps its room. */
+    @media (max-height: 700px) {
+      :global(html.od-desktop-app) .od-first-launch-panel {
+        padding: 32px 32px 72px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--brand {
+        gap: 12px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--logo {
+        width: 64px;
+        height: 64px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--name {
+        font-size: 34px;
+        line-height: 40px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--title {
+        margin-top: 20px;
+        font-size: 28px;
+        line-height: 34px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--intro {
+        margin-top: 6px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--profile {
+        margin-top: 16px;
+      }
+    }
+
     /* A narrow window: a smaller brand row, title and margins. */
     @media (max-width: 1100px) {
       :global(html.od-desktop-app) .od-first-launch-panel {
