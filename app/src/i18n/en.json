@@ -1865,6 +1865,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "App icon on iPhone, iPad and Mac: blue to its edge, with the wave, no white background.",
       "App icon on Android: the blue disc fills the whole icon, with no white ring around it.",
       "Empty logbook: the main button becomes « Download my dives », with a dive computer icon; the computer is paired during the download.",
       "First launch: the « Any questions? About and contact » link at the bottom of the screen opens About, with the support address.",

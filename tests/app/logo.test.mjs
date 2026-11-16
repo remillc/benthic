@@ -88,8 +88,14 @@ test('the favicon keeps the disc gradient and one thick white wave, simplified f
 });
 
 test('the brand files are the relief drawing; the flat ones are in previous/', () => {
-  for (const f of ['opendives-logo.svg', 'opendives-logo-light.svg', 'opendives-logo-dark.svg', 'opendives-icon-light-round.svg', 'opendives-icon-dark-squircle.svg', 'opendives-icon-light-fullbleed.svg']) {
+  for (const f of ['opendives-logo.svg', 'opendives-logo-light.svg', 'opendives-logo-dark.svg']) {
     assert.match(read(join(root, 'docs/brand', f)), RELIEF, f);
+  }
+  // App icons are blue to their edge (no white ring once masked): the gradient over the whole icon, the wave on top.
+  for (const f of ['opendives-icon-light-round.svg', 'opendives-icon-dark-squircle.svg', 'opendives-icon-light-fullbleed.svg']) {
+    const icon = read(join(root, 'docs/brand', f));
+    assert.ok(icon.includes('<rect width="108" height="108" fill="url(#od-icon)"/>'), f);
+    assert.doesNotMatch(icon, /#F4F4F2|#121314/i, f);
   }
   assert.ok(!existsSync(join(root, 'docs/brand/opendives-logo-relief.svg')));
   assert.match(read(join(root, 'docs/brand/previous/opendives-logo-simple.svg')), /#114477/);
