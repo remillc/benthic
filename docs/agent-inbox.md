@@ -4410,3 +4410,71 @@ Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approve
 - Use the same field wherever the app asks for such a code. Texts in `fr.json` and `en.json`.
 
 **Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
+
+## [ ] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
+
+Christian decided this on 16 November 2026. The app on `main` (with the Subsurface account) is the **alpha**. The word « bêta » now names the next edition, the one without Subsurface.
+
+- Do on `main` what task 225 asked, with one change: the badge text is « Alpha » (« Alpha » in `en.json` too), and the accessible name of the brand row is « OpenDives, alpha ».
+- If task 225 is already done, change the text only. The look, the size and the place of the badge stay the same.
+- Mock-ups: `docs/mockups/android-tablette-premier-lancement-{paysage,portrait}.dc.html` and `docs/mockups/android-accueil-c.dc.html` now show « ALPHA ».
+- Do not touch the release-edition branches.
+
+**Test:** the first-launch screen shows « ALPHA » next to the name on phones, tablets and the desktop; TalkBack reads « OpenDives, alpha » once.
+
+## [ ] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`, with the Subsurface account)**: do it on `main`. Phones first. On tablets, the first-launch screen keeps its current layout, with the badge of task 229.
+
+Mock-ups, in `docs/mockups/`. Some file names still say « beta »: they are the alpha. All of them show the badge « ALPHA ».
+
+**1. The welcome screen** (`android-accueil-c.dc.html`):
+- **At the top**, the blue band (330 dp) with:
+  - the logo, « OpenDives » and the badge « ALPHA » (white text, 12 sp, a white outline over the blue);
+  - « Votre carnet de plongée, sur tous vos appareils. » and the line under it;
+  - the decorative dive profile, 24 dp from both edges.
+- **At the bottom, unchanged:** the three buttons (« J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte ») with their help lines, then « Utiliser mon propre dépôt git ».
+
+**2. The steps that follow** share one layout:
+- At the top, a 108 dp band with the logo, « OpenDives » and a smaller badge « ALPHA » (10 sp). The band uses the app's section band: the `--od-band-gradient` gradient, the faint dive profile and the wave of `SectionBand.svelte`. Reuse it.
+- Then « Retour », the page title, and buttons that take the full width.
+- At the bottom, « Une question ? À propos et contact ».
+
+**3. « J’ai un compte Subsurface »:**
+- **Sign-in** (`android-premier-lancement-beta-compte-subsurface.dc.html`):
+  - « Votre compte Subsurface », with the existing texts, « ce téléphone » instead of « cet appareil » ;
+  - « Adresse courriel », and « Mot de passe » with « Gardé seulement dans le stockage sécurisé de ce téléphone. » ;
+  - « Se connecter ».
+- **Download** (`…-compte-subsurface-telechargement`):
+  - a white card with three steps: « Connexion à Subsurface » with the address, « Téléchargement des plongées » with « n sur N » and the wavy indicator, and « Copie du carnet sur ce téléphone » ;
+  - the line « Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau. » ;
+  - « Annuler ».
+- **Then the logbook opens** (`…-compte-subsurface-carnet`), with the snackbar « Carnet téléchargé. Il reste sur ce téléphone, même sans réseau. » above the « + ».
+
+**4. « Créer un compte »** (`android-premier-lancement-beta-creer-compte*.dc.html`):
+- **Step 1 of 2**, « Créer votre compte Subsurface » :
+  - « Adresse courriel » ;
+  - « Mot de passe », with « Lettres sans accent, chiffres et @ . + _ - seulement. » ;
+  - « Créer le compte ».
+  - Error: « Cette adresse courriel n’est pas valide. ».
+- **Step 2 of 2**, « Confirmer votre adresse » : the six-box code of task 232, « Renvoyer le code » and « Confirmer ». The old screen said « étape 1 sur 2 » here: it is « étape 2 sur 2 ».
+- **Then the empty logbook**, with the snackbar « Compte créé. Votre carnet est prêt. ».
+
+**5. « Commencer sans compte »** (`android-premier-lancement-alpha-sans-compte*.dc.html`):
+- « Commencer sans compte », « Votre carnet est créé tout de suite, sans inscription. » ;
+- a white card with three rows:
+  - « Sur ce téléphone seulement » ;
+  - « Sans sauvegarde » (warning icon, amber tile) ;
+  - « Vous pourrez le relier plus tard » (to a Subsurface account or a git repository, from Compte) ;
+- the button « Commencer ».
+- Then the empty logbook. Its line reads « Sur ce téléphone seulement, aucune plongée », with the snackbar « Carnet créé sur ce téléphone. ».
+
+« Utiliser mon propre dépôt git » keeps its current screens for now.
+
+All texts in `fr.json` and `en.json`.
+
+**Test:**
+- On a phone, each path (sign in, create an account, start without an account) matches its mock-ups and ends in the logbook with its snackbar.
+- White text on the bands is at least 4.5:1.
+- « Retour » goes back one step.
+- On a tablet, nothing changes but the badge.
