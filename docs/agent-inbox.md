@@ -4736,7 +4736,7 @@ Christian approved this on 16 November 2026. **Alpha, on `main`.**
 
 Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelte` the link now ends the Android page. On a phone it sits 12 dp under the git link's text (6 dp of touch padding + 6 dp of margin) and 20 dp above the bottom edge (`--od-help-link-bottom`; the page content has no bottom padding there, so the screen no longer scrolls at 390 × 844); on a tablet it was already pinned 28 dp from the edge and did not move; iOS is unchanged. It opens « À propos » and Back returns. Checked headless at 390×844, 412×915, 1280×800, 800×1280: only the link and the git link's touch area moved. Tests in `tests/app/welcome-help-link.test.mjs`; one release-note line (fr, en). Part 2 is on `fix/desktop-download-wording`, for the desktop branch (`feature/desktop-logbook`): the ready screen of a new logbook already said « Télécharger mes plongées » (task 242), so only the macOS File menu changed (`desktop.macMenu.download`, « Télécharger mes plongées… » / « Download my dives… »); test `tests/app/desktop-download-wording.test.mjs`. No release note for the desktop.
 
-## [ ] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
+## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
 
@@ -4747,6 +4747,8 @@ The phone first-launch screens of the public version take the same bands as the 
 This replaces the light section-band gradient and the 18 dp wave of task 227 on these screens. The content below the band moves down by 32 dp and must still fit on a 390 × 844 dp screen.
 
 **Test:** on a phone, the welcome hero and every step band are hatched dark blue with a straight bottom edge, and white text on them stays at least 4.5:1.
+
+Done on `feature/release-phone-first-launch` (not merged): the phone welcome hero (330 dp) and the steps band (140 dp) take the alpha's hatched dark blue (`--od-first-band`, sheen, hatching), no wave, no faint profile, straight edge; white text 6.1:1 or more; tablets unchanged (byte-identical screenshots). At 390 × 844 every step fits except « Nouveau carnet » and « Seulement sur ce téléphone », where the help link under the content makes the page scroll by about 39 dp (measured with the fallback font of headless Edge).
 
 ## [x] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
 
