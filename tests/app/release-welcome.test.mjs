@@ -476,3 +476,9 @@ test('two steps: the pencil keeps the name, the name is the title of « Où le g
   assert.equal(fr.deviceTitlePhone, 'Seulement sur ce téléphone');
   assert.equal(fr.deviceTitleDesktop, 'Seulement sur cet ordinateur');
 });
+
+test('task 249: « Suivant » has a trailing 18 dp chevron, 24 dp of padding at the start and 16 dp at the end', () => {
+  const steps = read('components/FirstLaunchSteps.svelte');
+  assert.match(steps, /od-first-launch--action-next[^>]*>\{t\('welcomeSteps\.next'\)\}<Icon name="chevron" size=\{18\} \/><\/button>/);
+  assert.match(steps, /\.od-first-launch--action\.od-first-launch--action-next \{\s*padding: 0 16px 0 24px;/);
+});

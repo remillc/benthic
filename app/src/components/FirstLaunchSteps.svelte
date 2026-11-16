@@ -597,7 +597,7 @@
     </div>
   {/if}
   <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} onenter={nameDone} />
-  <button type="button" class="od-first-launch--action" disabled={nameInvalid} onclick={nameDone}>{t('welcomeSteps.next')}</button>
+  <button type="button" class="od-first-launch--action od-first-launch--action-next" disabled={nameInvalid} onclick={nameDone}>{t('welcomeSteps.next')}<Icon name="chevron" size={18} /></button>
 {/snippet}
 
 <!-- Task 2026-11-16-231: « Où le garder ? », the second step of « Nouveau carnet »; the name is the page title above. -->
@@ -1436,6 +1436,12 @@
       outline: 2px dashed var(--od-release-link);
       outline-offset: 8px;
       border-radius: 4px;
+    }
+
+    /* « Suivant » (task 2026-11-16-249): the MD3 button with a trailing icon, an 18 dp chevron 8 dp after the
+       label, 24 dp of padding at the start and 16 dp at the end. */
+    .od-first-launch--action.od-first-launch--action-next {
+      padding: 0 16px 0 24px;
     }
 
     .od-first-launch--action {
