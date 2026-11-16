@@ -4691,3 +4691,51 @@ The step content sits on the paper side, in the column of the release tablet ste
 - **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
 
 **Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
+
+## [x] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/bureau-demarrage-actuel.dc.html` (no logbook open in the window) and `docs/mockups/bureau-carnet-vide-actuel.dc.html` (empty logbook).
+
+In the desktop app, the navigation rail always ends with « Réglages » (gear, shortcut Ctrl+, / ⌘,) and the account avatar at the bottom, as on the other desktop screens such as `bureau-carnets-accueil.dc.html`.
+
+- **No logbook open in the window:** only the four sections (Carnet, Sites, Statistiques, Outils) are dimmed and unavailable. « Réglages » and the avatar keep full colour and work, since they do not depend on a logbook.
+- **Empty logbook:** the rail is the full one, with « Réglages » and the avatar.
+
+**Test:** open a window with no logbook. The four sections are dimmed, and « Réglages » and the avatar are at the bottom of the rail and open their screens. Open an empty logbook: the rail shows the same two items.
+
+Done: already the behaviour of the desktop app (`feature/desktop-logbook`), checked in the desktop app at 1440 × 900: with no logbook open, the four sections are at 38 % and unavailable while « Réglages » (Ctrl+, / ⌘,) and the account avatar keep full colour and open Réglages and the account sheet; with a logbook open the rail is the full one with both items. No code change; only the mock-ups lacked the two items.
+
+## [x] 2026-11-16-241 Desktop release: recent logbooks window, missing logbook, computer icon
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 228, `feature/release-desktop-first-launch`, and never merge it into `main`.
+
+**Mock-ups**, all under `docs/mockups/`:
+- `bureau-premier-lancement-production-recents.dc.html`;
+- `bureau-premier-lancement-production-recents-introuvable.dc.html`;
+- `bureau-premier-lancement-production-ou.dc.html`.
+
+**1. A window with no logbook, after first use.** This window appears in a new window, or after « Fermer le carnet », when at least one logbook has been opened before. On the very first launch the first-launch screen of task 228 stays as it is.
+- **Left:** the same blue panel, with the profile and its labels shown without the opening animation.
+- **Right, from top to bottom:**
+  - « Carnets récents » at 24 sp, then a white card listing the logbooks opened most recently, newest first. Show at most about five; drop the oldest.
+  - Each row shows an icon for where the logbook is kept (cloud, git or file), the logbook name, and the place with when it was last closed or opened, e.g. « Google Drive · fermé il y a 2 min », « Dépôt git · github.com/club/carnet », « Documents · ouvert le 2 nov. ». A chevron ends the row, and a click opens that logbook in this window.
+  - « Ou bien » at 15 sp semibold, then the three choices of the first-launch screen (« Créer un carnet », « Importer un carnet », « Ouvrir mon carnet OpenDives »). They are compact (40 dp icon, 10 dp vertical padding) and all neutral white: no filled primary choice here.
+  - « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. »
+  - « Une question ? À propos et contact » at the bottom.
+- « Essayer avec un carnet d’exemple » is not shown on this screen.
+
+**2. A recent logbook that cannot be found.** When the window opens, check that each recent file or folder still exists.
+- A missing one keeps its place in the list. Its name is greyed, and its second line is « Introuvable dans Documents » (the place it had) in error red with a small warning icon.
+- Clicking it opens a basic dialog with no ✕:
+  - title « Carnet introuvable »;
+  - text « « essai.ssrf » n’est plus dans Documents. Il a peut-être été déplacé, renommé ou supprimé. »;
+  - actions « Retirer de la liste » (text button) and « Chercher le fichier… » (filled; it opens the system file picker, and the chosen file replaces the entry).
+
+**3. Icon.** In « Où le garder ? » on the desktop, « Seulement sur cet ordinateur » uses a computer-screen icon instead of the tablet icon.
+
+**Test:**
+- First launch shows the screen of task 228.
+- Open a logbook, close it, then open a new window: the recent list appears above « Ou bien ».
+- Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.
+
+Done: branch `feature/release-desktop-first-launch` (not merged). After first use (the recent list is not empty) the window without a logbook shows « Carnets récents » (`components/RecentLogbooks.svelte`: at most five rows, newest first, icon by source, name, « place · when », chevron, a click opens the logbook in this window), then « Ou bien » and the three choices compact (40 dp tile, 10 dp padding) and neutral (`ReleaseChoiceRow` `compact`), the drop line and the help link, no demo link; the blue panel shows its profile without the opening animation (`ReleaseProfile` `still`). First launch (empty list) keeps task 228's screen; the right column waits for the list before choosing (`lib/desktop-recents.js` `startMode`). Missing logbooks: the new main-process op `exists` (`desktop/windows.cjs`, `od:logbooks`) takes no path from the page and looks only at the files of the recent list; a `file` logbook is checked with `fs.existsSync`, and the logbook of this computer, git and cloud entries are not checked (a git repository or a cloud file is only reached when opened and would need the network and credentials), so they count as there. A missing row keeps its place, its name greyed, « Introuvable dans {place} » in error red with a warning icon; clicking opens a basic dialog without ✕ (`Md3Dialog`): « Retirer de la liste » calls the existing `forget`, « Chercher le fichier… » (filled) calls the new op `relocate`: the main process shows the system file picker, forgets the old entry and opens the picked file in this window (so it comes first in the list); a name the diver chose is kept, a name that was the old file's name becomes the new file's; cancelling the picker leaves the dialog open. The icon of « Seulement sur cet ordinateur » is `desktop` (computer screen) in the desktop app. Differences from the mock-ups: « fermé à l'instant » for a logbook just closed (existing text); the window's list also shows the logbook of this computer when it was opened. Tests: `tests/app/desktop-recents.test.mjs` (screen choice, order and cap, rows, missing state, dialog actions, icon), `tests/desktop/windows.test.mjs` (`exists` ignores page paths and checks only the recent list, `relocate` replaces, cancels, refuses non-recent entries and non-logbook files, `forget`); app 919/0, desktop 81/0. Checked in the Electron app at 1440 x 900 and 760 x 560 (list, rename outside the app, « Introuvable », the dialog, « Retirer de la liste »; the system picker of « Chercher le fichier… » was not driven, its main-process side is tested with a fake dialog).

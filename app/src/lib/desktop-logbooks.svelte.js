@@ -25,6 +25,10 @@ export const logbooks = $state({
   dialog: false,
   /** @type {LogbookEntry[]} */
   recent: [],
+  /** The recent logbooks were read at least once (the window without a logbook waits for it to choose its screen). */
+  recentLoaded: false,
+  /** @type {Record<string, boolean>} logbook id -> the logbook can be found (a file that was moved or deleted is false) */
+  exists: {},
 });
 
 /** Reads the recent logbooks again (the main process keeps them). */
@@ -33,6 +37,43 @@ export async function refreshRecent() {
     logbooks.recent = await bridge().logbooks.recent();
   } catch (e) {
     console.error('Reading the recent logbooks', e);
+  }
+  logbooks.recentLoaded = true;
+}
+
+/** Asks which recent logbooks are still there (task 2026-11-16-241): a missing one is shown as such. */
+export async function checkRecent() {
+  try {
+    logbooks.exists = await bridge().logbooks.exists();
+  } catch (e) {
+    console.error('Looking for the recent logbooks', e);
+  }
+}
+
+/** « Retirer de la liste »: the entry leaves the recent list. @param {string} id */
+export async function forgetRecent(id) {
+  try {
+    logbooks.recent = await bridge().logbooks.forget({ id });
+  } catch (e) {
+    console.error('Forgetting a recent logbook', e);
+  }
+}
+
+/**
+ * « Chercher le fichier… »: the system's file picker; the picked file replaces the entry and opens in this window.
+ * @param {string} id
+ * @returns {Promise<boolean>} the picked file was opened
+ */
+export async function relocateRecent(id) {
+  try {
+    const result = await bridge().logbooks.relocate({ id });
+    return !!result.opened;
+  } catch (e) {
+    fail('Looking for a logbook file', e);
+    return false;
+  } finally {
+    refreshRecent();
+    checkRecent();
   }
 }
 

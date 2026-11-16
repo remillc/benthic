@@ -8,16 +8,23 @@
   // It covers the whole window; it steps aside while a page is open under it (the token help) or Réglages is shown,
   // and keeps its state meanwhile. About is a popup and opens above it. The logbook the steps make is created by the main process, which reloads
   // this window on it (lib/desktop-first-launch.js).
+  // After first use (a logbook was opened before: the recent list is not empty) the same window shows the recent
+  // logbooks above the choices and the profile without its opening animation (task 2026-11-16-241); the first launch
+  // keeps the screen of task 228. The right column waits for the list (read, with which files are still there) to choose.
   import { onMount } from 'svelte';
   import { f7, f7ready } from 'framework7-svelte';
   import ReleaseProfile from './ReleaseProfile.svelte';
   import FirstLaunchSteps from './FirstLaunchSteps.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
+  import { logbooks, refreshRecent, checkRecent } from '../lib/desktop-logbooks.svelte.js';
+  import { startMode } from '../lib/desktop-recents.js';
   import { t } from '../lib/i18n.js';
 
   /** A page is open over the start screen: the token help of the git step (About is a popup, above this screen). */
   let pushed = $state(false);
   const visible = $derived(navigation.section !== 'account' && !pushed);
+  /** The screen: the first launch, or the recent logbooks; null until the list is read. */
+  const mode = $derived(startMode(logbooks.recentLoaded ? logbooks.recent : null));
 
   /** The same router the pages use, read when it is needed (the views are built after this component). */
   const router = {
@@ -26,6 +33,7 @@
 
   onMount(() => {
     document.documentElement.classList.add('od-no-logbook');
+    void refreshRecent().then(checkRecent);
     const update = () => {
       const path = f7.views.get('#view-logbook')?.router?.currentRoute?.path ?? '/';
       pushed = path.startsWith('/welcome/');
@@ -59,11 +67,11 @@
     </div>
     <h1 class="od-desktop-first-launch--headline">{t('welcomeRelease.headline')}</h1>
     <p class="od-desktop-first-launch--intro">{t('welcomeRelease.intro')}</p>
-    <div class="od-desktop-first-launch--profile"><ReleaseProfile /></div>
+    <div class="od-desktop-first-launch--profile"><ReleaseProfile still={mode === 'recents'} /></div>
   </section>
 
   <div class="od-desktop-first-launch--steps">
-    <FirstLaunchSteps f7router={router} />
+    {#if mode}<FirstLaunchSteps f7router={router} recents={mode === 'recents'} />{/if}
   </div>
 </main>
 

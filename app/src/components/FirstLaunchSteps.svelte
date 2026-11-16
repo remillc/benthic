@@ -13,6 +13,7 @@
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
   import ReleaseField from './ReleaseField.svelte';
   import WelcomeHelpLink from './WelcomeHelpLink.svelte';
+  import RecentLogbooks from './RecentLogbooks.svelte';
   import ImportFormats from './ImportFormats.svelte';
   import CsvImportDialog from './CsvImportDialog.svelte';
   import { pickCsvFiles } from '../lib/csv-import.js';
@@ -39,8 +40,12 @@
   import { DROP_STEPS, droppedFiles, nameFromGitUrl, parkPending, pendingFromSource, signInFailure, signInTo, PENDING_IMPORT_KEY } from '../lib/desktop-first-launch.js';
   import { t, locale } from '../lib/i18n.js';
 
-  /** @type {{ f7router: any }} */
-  let { f7router } = $props();
+  /**
+   * `recents`: the desktop window without a logbook, after first use (task 2026-11-16-241): the first step shows the
+   * recent logbooks above the three choices, which are compact and neutral, and no demo link.
+   * @type {{ f7router: any, recents?: boolean }}
+   */
+  let { f7router, recents = false } = $props();
 
   const step = $derived(currentStep());
   /** The services of the lists; iCloud Drive only in the desktop app on macOS (task 2026-11-16-228). */
@@ -602,7 +607,7 @@
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
     <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
     <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone, desktopApp))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone, desktopApp))} disabled={nameInvalid || busy} onclick={() => where('device')} />
+    <ReleaseChoiceRow icon={desktopApp ? 'desktop' : 'tablet'} title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone, desktopApp))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone, desktopApp))} disabled={nameInvalid || busy} onclick={() => where('device')} />
   </nav>
 {/snippet}
 
@@ -614,11 +619,21 @@
 
         {#if hasLogbookTitle(step)}
           {@render logbookTitle()}
+        {:else if step === 'start' && recents}
+          <RecentLogbooks />
         {:else}
           <h2 class="od-first-launch--title">{t(titles[step])}</h2>
         {/if}
 
-        {#if step === 'start'}
+        {#if step === 'start' && recents}
+          <h3 class="od-first-launch--or">{t('desktopLogbooks.recents.orElse')}</h3>
+          <nav class="od-first-launch--rows od-first-launch--rows-compact" aria-label={t('desktopLogbooks.recents.otherChoices')}>
+            <ReleaseChoiceRow compact icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
+            <ReleaseChoiceRow compact icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
+            <ReleaseChoiceRow compact icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
+          </nav>
+          {@render dropLine()}
+        {:else if step === 'start'}
           <nav class="od-first-launch--rows od-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
             <ReleaseChoiceRow main icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
             <ReleaseChoiceRow icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
@@ -934,6 +949,19 @@
 
     .od-first-launch--rows-start {
       margin-top: 14px;
+    }
+
+    /* The recent logbooks screen (task 2026-11-16-241): « Ou bien » and the three compact choices under the list. */
+    .od-first-launch--or {
+      margin: 28px 0 10px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--od-text-2);
+    }
+
+    .od-first-launch--rows-compact {
+      gap: 8px;
     }
 
     :global(.od-first-launch--name-field) {

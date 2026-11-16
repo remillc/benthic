@@ -10,6 +10,9 @@
   import { scaledProfile } from '../lib/release-welcome.js';
   import { t } from '../lib/i18n.js';
 
+  /** @type {{ still?: boolean }} still: no opening animation (the screens that come back to it, task 2026-11-16-241) */
+  let { still = false } = $props();
+
   let width = $state(588);
   let height = $state(300);
   const shape = $derived(scaledProfile(width, height));
@@ -17,7 +20,7 @@
   const glow = `${gradient}-glow`;
 </script>
 
-<div class="od-release-profile" bind:clientWidth={width} bind:clientHeight={height}>
+<div class="od-release-profile" class:od-release-profile--still={still} bind:clientWidth={width} bind:clientHeight={height}>
   <svg class="od-release-profile--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('welcomeRelease.profileLabel')}>
     <defs>
       <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
@@ -180,6 +183,14 @@
       to {
         opacity: 1;
         transform: none;
+      }
+    }
+
+    .od-release-profile--still {
+      .od-release-profile--line,
+      .od-release-profile--dot,
+      .od-release-profile--chip {
+        animation: none;
       }
     }
 
