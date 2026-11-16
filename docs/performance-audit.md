@@ -256,7 +256,23 @@ Nodes / event listeners after 1, 5 and 20 cycles (two forced GCs before each cou
 | s3000 tools | 11,681 / 437 ; 14,954 / 537 ; 27,196 / 766 | 11,351 / 425 ; 11,693 / 456 ; 11,686 / 431 | 45.7 / 50.3 / 56.3 -> 40 / 44.9 / 44.6 |
 | s3000 settings | 13,644 / 437 ; 14,253 / 478 ; 16,505 / 538 | 31,865 / 1694 ; 31,874 / 1731 ; 31,867 / 1694 | 46.5 / 50.5 / 54.1 -> 49.7 / 54.7 / 54.4 |
 
-After the first (warm-up) cycle the growth is 0 nodes (at most +9) and 0 listeners at 20 cycles in every section, at 500 and 3,000 dives, with no console error; the selection, the open tool and the section survive the swaps and the page count stays the same. Before the fix a section grew by about 120 nodes per cycle (Outils: about 800) and 1 to 10 listeners. The level reached after the first cycle is higher on the merged code than on the code this fix was first measured on (about 24,300 nodes and 1,400 listeners at 500 dives, 31,000 and 1,700 at 3,000, against 13,500 and 400 before the merge): a one-off cost of the first narrow layout with the lazy routes, flat afterwards, so not a leak; not chased here (Outils is unaffected).
+After the first (warm-up) cycle the growth is 0 nodes (at most +9) and 0 listeners at 20 cycles in every section, at 500 and 3,000 dives, with no console error; the selection, the open tool and the section survive the swaps and the page count stays the same. Before the fix a section grew by about 120 nodes per cycle (Outils: about 800) and 1 to 10 listeners. The level reached after the first cycle is higher on the merged code than on the code this fix was first measured on (about 24,300 nodes and 1,400 listeners at 500 dives, 31,000 and 1,700 at 3,000, against 13,500 and 400 before the merge): flat afterwards; the cause is found and fixed below ("After (first swap level)").
+
+**After (first swap level) (branch `perf/first-swap-level`, 16 November 2026).** The higher level after the first narrow layout was not a one-off cost of lazy loading: the narrow layout's nodes (about 11,000 nodes, 1,000 listeners and two template documents) stayed reachable after the return to wide. Found by bisecting the files changed since the leak fix (restoring the old version of half of them at a time and measuring the level after one cycle): the cause is `DesktopTools.svelte`. Its three `{#await import(...) then ...}` blocks (planner, desaturation, blender; added by the code splitting) are mounted in the wide layout and removed by the swap. A heap snapshot shows the retaining path: a Svelte `Batch` (its `current` map) kept alive through the `teardown` of the removed await block, and the batch holds the sources and effects of the swap, so the DOM of the other sections' narrow pages (Carnet, Sites, Statistiques, Réglages; Outils is not affected because its own page is what the swap replaces). Fix: the tools are loaded with `import()` in a script function and kept in a `$state.raw` map shown with `{#if}`; no await block in a layout that the swap removes.
+
+Level after the first cycle, same method (Vite dev server, Electron CDP, 700 px / 1500 px, one launch per section), nodes / listeners (JS heap MB):
+
+| logbook, section | before the fix, 1 cycle | after the fix, 1 cycle | 5 cycles | 20 cycles |
+|---|---|---|---|---|
+| s500 logbook | 24,324 / 1421 | 13,372 / 398 (37.9) | 13,381 / 423 | 13,374 / 398 |
+| s500 sites | 24,883 / 1945 | 13,289 / 922 (38.6) | 13,298 / 957 | 13,291 / 922 |
+| s500 statistics | 24,465 / 1429 | 12,871 / 406 (38.3) | 12,880 / 433 | 12,873 / 406 |
+| s500 tools | 11,355 / 401 | 11,355 / 401 (37.9) | 11,697 / 434 | 11,690 / 407 |
+| s500 settings | 25,252 / 1434 | 13,314 / 403 (38.7) | 13,323 / 437 | 13,316 / 403 |
+| s3000 logbook | 30,953 / 1681 | 13,412 / 422 (40.5) | 13,421 / 455 | 13,414 / 422 |
+| s3000 sites | 31,464 / 2169 | 13,253 / 910 (41) | 13,262 / 937 | 13,255 / 910 |
+
+The level is back to (slightly under) the one before the code splitting (13,500 / 400) and no longer depends on the number of dives; growth after the first cycle is still 0 (at most +9 nodes), with no console error. Not changed: the other `{#await import}` in `App.svelte` (the new-logbook dialog), which is in the root, not in a swapped layout.
 
 ### F6. Profile draws every sample (impact: medium, effort: S-M)
 

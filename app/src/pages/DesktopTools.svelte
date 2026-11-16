@@ -19,6 +19,21 @@
   import { DESKTOP_TOOLS, desaturationLine, plansLine } from '../lib/desktop-tools.js';
   import { desktopTools, openTool } from '../lib/desktop-tools.svelte.js';
 
+  // The tools that are their own chunks, read when first shown. Not `{#await import(...)}`: an await block left
+  // in a layout that the adaptive swap removes kept that layout (and the other sections' DOM) alive in Svelte's batch.
+  const chunks = {
+    planner: () => import('../components/DesktopPlanner.svelte'),
+    desaturation: () => import('../components/DesktopDesaturation.svelte'),
+    blender: () => import('../components/DesktopBlender.svelte'),
+  };
+  /** @type {Record<string, any>} */
+  let loaded = $state.raw({});
+  /** @param {string} id */
+  function load(id) {
+    const read = /** @type {Record<string, (() => Promise<{ default: any }>) | undefined>} */ (chunks)[id];
+    if (read && !loaded[id]) read().then((m) => (loaded = { ...loaded, [id]: m.default }));
+  }
+
   // The time moves: read the clock again every 30 seconds, and when the window comes back.
   let now = $state(localNowIso());
   $effect(() => {
@@ -86,6 +101,7 @@
     queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-desktop-tools--row[data-tool="${next.id}"]`))?.focus());
   }
   const current = $derived(DESKTOP_TOOLS.find((tool) => tool.id === desktopTools.tool) ?? DESKTOP_TOOLS[0]);
+  $effect(() => load(current.id));
 </script>
 
 <Page class="od-desktop-tools" pageContent={false}>
@@ -125,17 +141,17 @@
       <main class="od-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
           <!-- The tools are their own chunks, read when first shown. -->
-          {#await import('../components/DesktopPlanner.svelte') then { default: DesktopPlanner }}<DesktopPlanner />{/await}
+          {#if loaded.planner}{@const Planner = loaded.planner}<Planner />{/if}
         {:else}
           <h2 class="od-desktop-tools--pane-title">{t(current.name)}</h2>
           {#if current.id === 'desaturation'}
-            {#await import('../components/DesktopDesaturation.svelte') then { default: DesktopDesaturation }}<DesktopDesaturation />{/await}
+            {#if loaded.desaturation}{@const Desaturation = loaded.desaturation}<Desaturation />{/if}
           {:else if current.id === 'eadMod'}
             <DesktopEadMod />
           {:else if current.id === 'bestMix'}
             <DesktopBestMix />
           {:else}
-            {#await import('../components/DesktopBlender.svelte') then { default: DesktopBlender }}<DesktopBlender />{/await}
+            {#if loaded.blender}{@const Blender = loaded.blender}<Blender />{/if}
           {/if}
         {/if}
       </main>
