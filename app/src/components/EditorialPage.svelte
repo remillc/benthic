@@ -91,7 +91,7 @@
   /** The title ends with a full stop, unless it is a question. */
   const shownHeading = $derived(/[.?!…]$/.test(heading) ? heading : `${heading}.`);
   /** Tablet (Android): the actions are the last element of the card. */
-  /** A phone layout; never the desktop app's, which is at least 760 dp wide and takes the tablet's screens (task 2026-11-16-242). */
+  /** A phone layout; never the desktop app's, which is at least 768 dp wide and takes the tablet's screens (task 2026-11-16-242). */
   const phone = $derived(layout.phone && !desktopApp);
   const actionsInCard = $derived(!ios && !phone);
   /** The alpha first launch on an Android phone (task 2026-11-16-233). */

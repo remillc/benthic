@@ -159,7 +159,7 @@
 
     /* The desktop app (task 2026-11-16-242; mock-ups docs/mockups/bureau-premier-lancement-alpha-*.dc.html): always a
        row, the panel on the left in a window of any shape. 700 dp in a 1440 dp window, sharing the width in a
-       narrower one so that the step keeps its room (the window is 760 dp wide at least). */
+       narrower one so that the step keeps its room (the window is 768 dp wide at least). */
     :global(html.od-desktop-app) .od-first-launch-panel {
       width: min(700px, 48.6%);
       min-width: 300px;
