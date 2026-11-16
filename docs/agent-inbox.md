@@ -4173,3 +4173,90 @@ Mock-ups:
 - The beta on `main` is untouched.
 
 **Done:** on `feature/release-new-logbook` (release edition only, `main` and the beta untouched). The list of formats is one data file, `app/src/lib/import-formats.js` (18 entries, each a « works » line of `docs/import-formats.md`: 4 in « Formats ouverts », 10 in « Montres et ordinateurs de plongée », 4 in « Autres carnets »); the help line (« 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. ») and the dialog text take their number from its length, CSV is not named. `ImportFormats.svelte` holds the link « Voir les formats acceptés » (14 sp, `--od-release-link` = #1F5C99, underlined, hand, hover) and the basic dialog on `Md3Dialog` (no ✕, « Fermer » bottom right, scrim, Escape and Back). The « Ce fichier n’a pas pu être lu » block now exists on the source screen (it was a system dialog before). Test: `tests/app/import-formats.test.mjs` (parses the report). Differences from the mock-ups: only the working formats are listed (the mock-up lists more), the third column title wraps, « Fermer » is the release blue as in the mock-up.
+
+## [ ] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
+
+Christian approved these mock-ups on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-first-launch-complete`, started from `feature/release-new-logbook` (tasks 218 and 223). Do not merge it into `main`. The beta on `main` stays unchanged. Tablets only; the phone comes later (to-do #84).
+
+In the canvas, all these screens are now in the chapter « Version publique (étape 2) · Tablette Android », right after the beta tablet sections. Texts exactly as in the mock-ups, all in `fr.json` and `en.json`. Mock-up names below drop the prefix `docs/mockups/android-tablette-premier-lancement-production-`.
+
+### 1. Portrait for every step
+
+Every step of task 218 now has a portrait mock-up (`…-portrait.dc.html`). From the second step on, the blue panel is a compact 540 dp hero above the column. The first step keeps its 640 dp hero. The « Une question ? À propos et contact » link (task 219) stays at the bottom and never overlaps the buttons.
+
+### 2. Connecting a cloud account
+
+- **« Se connecter à {service} »** (`nuage-connexion`, `ouvrir-connexion`): the line « Connectez-vous dans votre navigateur, puis revenez ici. » is now a hint **under the button**, 13 sp, aligned right with it. It is no longer a paragraph above it.
+- **New: connection in progress** (`ouvrir-attente-paysage`). The app shows it while the browser tab is open and when the person comes back before the provider has answered:
+  - the link band with a spinner on the line;
+  - « Connexion en cours… » and « Terminez la connexion dans la page qui s’est ouverte. Vous reviendrez ici ensuite. » ;
+  - « Annuler » (outlined) and « Rouvrir la page » (text button with the external-link icon), which opens the browser tab again.
+  - Use the same screen in the « Créer un carnet » path; the title is then the logbook name.
+- **Refused or cancelled** (`nuage-refus`): « Connexion non établie », « La connexion a été annulée ou refusée dans le navigateur. » and « Réessayer ».
+- The provider's own sign-in and consent pages are not drawn: they belong to the provider.
+
+### 3. WebDAV or Nextcloud
+
+- `webdav` (create) and `ouvrir-webdav` (open): « Adresse du serveur », « Nom d’utilisateur », « Mot de passe », with the help line « Dans Nextcloud, créez un mot de passe d’application dans Réglages › Sécurité. Il reste sur cette tablette. », then « Créer le carnet » or « Voir mes carnets ».
+- `webdav-erreur`: the field error « Impossible de joindre ce serveur. Vérifiez l’adresse. » under the address.
+
+### 4. Errors
+
+- `git-erreur` (create): « Ce dépôt contient déjà un carnet. » under the address, and « Pour l’utiliser, passez par Ouvrir mon carnet OpenDives. », with the link.
+- `ouvrir-git-erreur`: « Ce dépôt ne contient pas de carnet OpenDives. » and « Pour commencer un carnet dans ce dépôt, passez par Créer un carnet. », with the link.
+- `ouvrir-aucun-carnet`: « Aucun carnet dans ce compte », « Le dossier OpenDives de ce compte est vide, ou il n’existe pas encore. », « Changer de compte » and « Créer un carnet ici ».
+- `importer-fichier-erreur`: « Ce fichier n’a pas pu être lu » with the file name, above the two choice rows.
+- `importer-divelogs-erreur`: « Nom d’utilisateur ou mot de passe incorrect. » under the fields.
+- `importer-divelogs-interrompu`: the progress card stops on « Téléchargement interrompu », « 184 sur 312 · la connexion à Internet a été perdue. », then « Les 184 plongées déjà téléchargées sont gardées. « Reprendre » télécharge seulement les autres. », with « Annuler » and « Reprendre ». « Reprendre » must download only the dives still missing.
+
+### 5. The « Formats acceptés » dialog (changes task 223)
+
+Mock-up: `importer-formats-paysage`.
+- The text under the title becomes « Importez vos plongées depuis n’importe lequel de ces formats. » The number of formats is no longer in the dialog.
+- The three groups become three white cards side by side. Each card has a 36 dp icon tile (a file for « Formats ouverts », the dive computer icon for « Montres et ordinateurs », a book for « Autres carnets »), a 16 sp title, and no count.
+- On each line, the name is on the left and each extension is a small chip on the right (monospace 12 sp, background #EEF3F9, text #114477).
+- The dialog is 1 040 dp wide. It stays a basic dialog with « Fermer ».
+- The list still comes from `app/src/lib/import-formats.js`. The help line of « Un fichier » keeps the real number.
+
+### 6. The empty logbook (tablet)
+
+Mock-ups: `docs/mockups/android-tablette-carnet-vide-{paysage,portrait}.dc.html` and `…-carnet-vide-menu-paysage.dc.html`.
+- The decorative profile is wider (724 dp in landscape, 624 dp in portrait) and still never touches the screen edges.
+- The logbook menu (⋮ next to « Mon carnet · Google Drive ») has: « Renommer le carnet », « Changer d’endroit » (« Nuage, dépôt git ou cette tablette »), « Ouvrir un autre carnet », « Nouveau carnet » and « Exporter le carnet » (disabled, « Aucune plongée à exporter »). « Réglages du carnet » is gone from this menu.
+
+### 7. The demo logbook (to-do #69)
+
+Mock-ups: `docs/mockups/android-tablette-demo{,-quitter,-ajout}-{paysage,portrait}.dc.html`.
+- On the first screen, the link « Essayer avec un carnet d’exemple » (hidden since task 218) now opens the demo logbook. Use the sample logbook that ships with the app.
+- While the demo is open, a banner sits at the top of the content: « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » with the button « Commencer mon carnet ».
+- « Commencer mon carnet » opens a basic dialog (`demo-quitter`): « Commencer mon carnet ? », « Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet. », « Annuler » and « Commencer mon carnet ». Confirming deletes the demo logbook and goes back to the first step.
+- Adding, downloading or importing a dive while in the demo opens `demo-ajout`: « Vous êtes dans le carnet d’exemple », « Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé. », with the same two buttons.
+- Nothing from the demo logbook is ever synced or kept in a real logbook.
+
+### 8. Importing a CSV file
+
+Mock-ups: `docs/mockups/android-tablette-import-csv-{type,colonnes,apercu}-paysage.dc.html`. It is a dialog in three steps, with the step shown in its header (« Importer un fichier CSV · étape n sur 3 »). It opens when the chosen file is a `.csv`, both from the first launch and from « Importer un fichier » in the logbook.
+1. **Type de fichier:**
+   - The file name, with its columns, lines and separator.
+   - « Que contient chaque ligne ? » with « Un point du profil » or « Une plongée entière ».
+   - « Format connu » (Seabear, Poseidon MkVI, Sensus fill the columns in advance).
+   - « Annuler » and « Suivant ».
+2. **Colonnes:**
+   - The first rows of the file, with a menu above each column (« Temps (min:s) », « Profondeur (m) », « Température (°C) », « Pression (bar) », « Ignorer »…).
+   - « Unités du fichier », « Séparateur » and « Date de la plongée ».
+   - « Retour » and « Suivant ».
+3. **Aperçu:**
+   - What was read: dives, duration and maximum depth.
+   - « Nouvelle plongée » with its date, « Site à préciser », and « Le site, l’équipement et les gaz se complètent ensuite dans Modifier. »
+   - « Retour » and « Ajouter au carnet ».
+
+Use the core's CSV import (the one task 221 checked) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
+
+### Test
+
+- In the release build, on a tablet, in both orientations: every screen above matches its mock-up.
+- Cloud: the connection-in-progress screen appears while the browser is open, « Rouvrir la page » reopens it, and a refusal lands on `nuage-refus`.
+- Errors: a non-empty repository, a repository without a logbook, an unreachable WebDAV server, wrong divelogs.de credentials, an unreadable file and a lost connection during a divelogs.de download each show their screen. « Reprendre » downloads only the missing dives.
+- Demo: the banner stays visible. Adding a dive opens `demo-ajout`. « Commencer mon carnet » erases the demo and goes back to the first step.
+- CSV: a Seabear file and a hand-mapped file each import one correct dive.
+- The beta on `main` is untouched.
