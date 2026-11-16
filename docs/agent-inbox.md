@@ -4375,3 +4375,133 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 - `main` is untouched.
 
 Done (phone and tablet), branch `feature/release-phone-first-launch`: point 1, the hint « La page de connexion du service s’ouvre. / Vous revenez ici ensuite. » (`welcomeSteps.connectHint`, fr and en) on two lines, centred under the button, and « Se connecter à {service} » centred on the tablet (full width on the phone); point 2, the phone band is `SectionBand` (its gradient, faint profile and 18 dp wave) with `--od-release-band-gradient` (the same gradient, light centre at 38% -40%, in `theme.css`), 108 dp on the later steps; measured on the rendered band: white « OpenDives » 4.76:1 on the lightest pixel, headline 6.8:1, line 9.1:1; point 3, the progress bar is limited to the width of its card. Still to do: the desktop part of point 1 (task 228).
+
+## [ ] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-new-logbook-two-steps`, started from the latest release branch (task 230). Do not merge it into `main`. Phone, tablet (both orientations) and desktop.
+
+Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, and the same names for `android-premier-lancement-production-` and `bureau-premier-lancement-production-`):
+- `…-nom` (new);
+- `…-ou` (changed);
+- `…-importer-nouveau-carnet` (changed).
+
+**Create a logbook** (after « Créer un carnet »):
+1. **« Nouveau carnet »** (`…-nom`): the field « Nom du carnet », prefilled « Mon carnet », its help line « Il s’affiche en haut du carnet et nomme son fichier. », and the button « Suivant ». Nothing else on the screen.
+2. **« Où le garder ? »** (`…-ou`):
+   - The logbook name is the page title (« Mon carnet », 28 sp), with the pencil that goes back to step 1.
+   - Under it, the subtitle « Où le garder ? », then « Vous pourrez changer d’endroit plus tard. » and the three rows: « Dans mon nuage », « Dans un dépôt git », and « Seulement sur cette tablette / ce téléphone / cet ordinateur ».
+   - The following steps are unchanged.
+
+**Import a logbook** (`…-importer-nouveau-carnet`): « Nouveau carnet » keeps the summary card of the file and the name field (prefilled from the file name), then « Suivant ». It no longer shows the three rows: « Suivant » opens the same « Où le garder ? » screen.
+
+« Retour » goes back one step, with the shared-axis X transition backwards.
+
+**Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
+
+## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`)**: do it on `main`.
+
+Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approved yet; for this task only, use `docs/mockups/android-premier-lancement-beta-creer-compte-code.dc.html` and `…-code-erreur.dc.html` (the file names keep « beta », the screens say « Alpha »).
+
+- On « Confirmer votre adresse » (account creation, the code sent by email), the code field becomes **six boxes**, one per digit: 48 × 56 dp each, 8 dp apart, the digit in a monospace font at 24 sp.
+- The label « Code de confirmation » sits above the boxes.
+- **States:**
+  - the box being typed has a 2 dp border in #1F5C99 and shows the caret;
+  - the other boxes have a 1 dp border in #75787C;
+  - on error, all six boxes have a 2 dp border in #B3261E, and the message « Code incorrect. Vérifiez le dernier courriel reçu. » shows under them.
+- **One field, not six:** it is a single input drawn as six boxes, so that it works as people expect:
+  - `inputmode="numeric"` and `autocomplete="one-time-code"`, so the system can offer the code;
+  - pasting the whole code fills all six boxes;
+  - Backspace goes back one box;
+  - TalkBack reads one field, « Code de confirmation, 6 chiffres ».
+- « Confirmer » sends the code. Sending it automatically when the sixth digit is typed is fine too.
+- Use the same field wherever the app asks for such a code. Texts in `fr.json` and `en.json`.
+
+**Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
+
+Done: `app/src/components/CodeField.svelte` (class `od-code-field`) is one `<input>` (`inputmode="numeric"`, `autocomplete="one-time-code"`, `maxlength="6"`, accessible name « Code de confirmation, 6 chiffres » from `confirmCode.codeLabel`) drawn as six 48 × 56 dp boxes 8 dp apart, Roboto Mono / monospace 24 sp, active box 2 dp #1F5C99 with a blinking caret, others 1 dp #75787C, error state all six 2 dp #B3261E with « Code incorrect. Vérifiez le dernier courriel reçu. » under them (`confirmCode.wrong`, fr and en; fr-CA falls back to fr). The rules are pure functions in `app/src/lib/code-input.js` (digits only, paste of « 482 913 » fills six, Backspace removes the last digit). It is used on « Confirmer votre adresse » (`pages/ConfirmCode.svelte`, routes `/welcome/code` and `/account/code`), the only place the app asks for such a code. « Confirmer » sends, enabled with six digits (Enter sends too); **no auto-send on the sixth digit**, so a wrong paste or typo is not sent before the diver looks at it. The error clears when the code is edited. New tokens `--od-code-active`, `--od-code-border`, `--od-code-error` (no existing token had these values), with dark values. On a 360 dp phone the card leaves 296 dp, so the boxes shrink in proportion to about 43 dp (gap stays 8 dp); no horizontal scroll at 360 or 412. The field sits in the editorial card like the other account screens (the mock-up has no card), the « Renvoyer le code » button is kept. iOS: same structure, 10 pt corners. Checked in headless Edge at 412 × 915 and 360 × 800 (normal, typing, error; light, dark, iOS). Tests: `tests/app/code-input.test.mjs`. Branch `feature/code-boxes`.
+
+## [x] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
+
+Christian decided this on 16 November 2026. The app on `main` (with the Subsurface account) is the **alpha**. The word « bêta » now names the next edition, the one without Subsurface.
+
+- Do on `main` what task 225 asked, with one change: the badge text is « Alpha » (« Alpha » in `en.json` too), and the accessible name of the brand row is « OpenDives, alpha ».
+- If task 225 is already done, change the text only. The look, the size and the place of the badge stay the same.
+- Mock-ups: `docs/mockups/android-tablette-premier-lancement-{paysage,portrait}.dc.html` and `docs/mockups/android-accueil-c.dc.html` now show « ALPHA ».
+- Do not touch the release-edition branches.
+
+**Test:** the first-launch screen shows « ALPHA » next to the name on phones, tablets and the desktop; TalkBack reads « OpenDives, alpha » once.
+
+Done on main: the badge of task 225 now says « Alpha » (fr and en) and the brand row is named « OpenDives, alpha »; look, size and place unchanged; the release note of 225 updated. The desktop shows the same first-launch screen in a narrow window; its window without a logbook (task 222) has no badge.
+
+## [ ] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`, with the Subsurface account)**: do it on `main`. Phones first. On tablets, the first-launch screen keeps its current layout, with the badge of task 229.
+
+Mock-ups, in `docs/mockups/`. Some file names still say « beta »: they are the alpha. All of them show the badge « ALPHA ».
+
+**1. The welcome screen** (`android-accueil-c.dc.html`):
+- **At the top**, the blue band (330 dp) with:
+  - the logo, « OpenDives » and the badge « ALPHA » (white text, 12 sp, a white outline over the blue);
+  - « Votre carnet de plongée, sur tous vos appareils. » and the line under it;
+  - the decorative dive profile, 24 dp from both edges.
+- **At the bottom, unchanged:** the three buttons (« J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte ») with their help lines, then « Utiliser mon propre dépôt git ».
+
+**2. The steps that follow** share one layout:
+- At the top, a 108 dp band with the logo, « OpenDives » and a smaller badge « ALPHA » (10 sp). The band uses the app's section band: the `--od-band-gradient` gradient, the faint dive profile and the wave of `SectionBand.svelte`. Reuse it.
+- Then « Retour », the page title, and buttons that take the full width.
+- At the bottom, « Une question ? À propos et contact ».
+
+**3. « J’ai un compte Subsurface »:**
+- **Sign-in** (`android-premier-lancement-beta-compte-subsurface.dc.html`):
+  - « Votre compte Subsurface », with the existing texts, « ce téléphone » instead of « cet appareil » ;
+  - « Adresse courriel », and « Mot de passe » with « Gardé seulement dans le stockage sécurisé de ce téléphone. » ;
+  - « Se connecter ».
+- **Download** (`…-compte-subsurface-telechargement`):
+  - a white card with three steps: « Connexion à Subsurface » with the address, « Téléchargement des plongées » with « n sur N » and the wavy indicator, and « Copie du carnet sur ce téléphone » ;
+  - the line « Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau. » ;
+  - « Annuler ».
+- **Then the logbook opens** (`…-compte-subsurface-carnet`), with the snackbar « Carnet téléchargé. Il reste sur ce téléphone, même sans réseau. » above the « + ».
+
+**4. « Créer un compte »** (`android-premier-lancement-beta-creer-compte*.dc.html`):
+- **Step 1 of 2**, « Créer votre compte Subsurface » :
+  - « Adresse courriel » ;
+  - « Mot de passe », with « Lettres sans accent, chiffres et @ . + _ - seulement. » ;
+  - « Créer le compte ».
+  - Error: « Cette adresse courriel n’est pas valide. ».
+- **Step 2 of 2**, « Confirmer votre adresse » : the six-box code of task 232, « Renvoyer le code » and « Confirmer ». The old screen said « étape 1 sur 2 » here: it is « étape 2 sur 2 ».
+- **Then the empty logbook**, with the snackbar « Compte créé. Votre carnet est prêt. ».
+
+**5. « Commencer sans compte »** (`android-premier-lancement-alpha-sans-compte*.dc.html`):
+- « Commencer sans compte », « Votre carnet est créé tout de suite, sans inscription. » ;
+- a white card with three rows:
+  - « Sur ce téléphone seulement » ;
+  - « Sans sauvegarde » (warning icon, amber tile) ;
+  - « Vous pourrez le relier plus tard » (to a Subsurface account or a git repository, from Compte) ;
+- the button « Commencer ».
+- Then the empty logbook. Its line reads « Sur ce téléphone seulement, aucune plongée », with the snackbar « Carnet créé sur ce téléphone. ».
+
+« Utiliser mon propre dépôt git » keeps its current screens for now.
+
+All texts in `fr.json` and `en.json`.
+
+**Test:**
+- On a phone, each path (sign in, create an account, start without an account) matches its mock-ups and ends in the logbook with its snackbar.
+- White text on the bands is at least 4.5:1.
+- « Retour » goes back one step.
+- On a tablet, nothing changes but the badge.
+
+## [ ] 2026-11-16-234 Correction to 233: welcome band blue and a smaller Alpha badge
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/android-accueil-c.dc.html`.
+
+1. **Band background.** On the phone welcome screen, the 330 dp blue band uses **the same background as the blue panel of the tablet first launch** (mock-ups `android-tablette-premier-lancement-production-*`). From bottom to top:
+   - the linear gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`, from top to bottom;
+   - a light radial sheen: `ellipse 70% 45% at 22% 0%`, white at 22 % opacity fading to 0 at 70 %;
+   - the faint diagonal hatching: `repeating-linear-gradient(105deg, white 3.5 % 0–60 px, transparent 60–150 px)`, masked from opaque at the top to transparent at 55 % of the height.
+
+   It is not the light section-band gradient. The small 108 dp band of the following steps keeps the section band, as task 233 says.
+2. **Alpha badge.** It is smaller: text 10 sp, line height 14, letter spacing 0.6, padding 1 × 6 dp, total height 18 dp. Same colours: white text, white fill at 18 % and white 1 dp outline at 55 %.
+
+**Test:** on a phone, the welcome band matches the tablet's blue panel (gradient, sheen, hatching), white text on it stays at least 4.5:1, and the Alpha badge is 18 dp tall.

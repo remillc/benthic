@@ -974,8 +974,8 @@
   },
   "welcome": {
     "title": "OpenDives",
-    "beta": "Bêta",
-    "brandBeta": "OpenDives, bêta",
+    "alpha": "Alpha",
+    "brandAlpha": "OpenDives, alpha",
     "noAccount": "Commencer sans compte",
     "choicesLabel": "Façons de commencer",
     "ownGit": "Utiliser mon propre dépôt git",
@@ -2022,6 +2022,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement : un badge « Alpha » suit le nom OpenDives.",
+      "Création de compte : le code de confirmation s’écrit dans six boîtes, une par chiffre. Le code reçu par courriel se colle d’un coup.",
       "Premier lancement : un badge « Bêta » suit le nom OpenDives.",
       "Importer un fichier : vous pouvez en choisir plusieurs à la fois. Un .json de l’app Suunto et le .fit du même nom sont lus comme une seule plongée, avec le mélange gazeux et les facteurs de gradient du .fit.",
       "Icône de l’app sur iPhone, iPad et Mac : bleue jusqu’au bord, avec la vague, sans fond blanc.",
@@ -2943,12 +2945,12 @@
     "heading": "Confirmer votre adresse",
     "intro": "Entrez le code envoyé à {email}. Il peut prendre quelques minutes à arriver.",
     "code": "Code de confirmation",
-    "codeRow": "Code",
     "submit": "Confirmer",
     "busy": "Confirmation…",
     "resend": "Renvoyer le code",
     "resent": "Code renvoyé à {email}",
-    "wrong": "Code incorrect"
+    "wrong": "Code incorrect. Vérifiez le dernier courriel reçu.",
+    "codeLabel": "Code de confirmation, 6 chiffres"
   },
   "importProgress": {
     "title": "Import de votre carnet",

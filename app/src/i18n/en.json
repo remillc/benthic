@@ -974,8 +974,8 @@
   },
   "welcome": {
     "title": "OpenDives",
-    "beta": "Beta",
-    "brandBeta": "OpenDives, beta",
+    "alpha": "Alpha",
+    "brandAlpha": "OpenDives, alpha",
     "noAccount": "Start without an account",
     "choicesLabel": "Ways to start",
     "ownGit": "Use my own git repository",
@@ -2022,6 +2022,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: an « Alpha » badge follows the OpenDives name.",
+      "Account creation: the confirmation code goes in six boxes, one per digit. The code from the email can be pasted in one go.",
       "First launch: a « Beta » badge follows the OpenDives name.",
       "Import a file: you can choose several files at once. A Suunto app .json and the .fit with the same name are read as one dive, with the gas mix and the gradient factors from the .fit.",
       "App icon on iPhone, iPad and Mac: blue to its edge, with the wave, no white background.",
@@ -2943,12 +2945,12 @@
     "heading": "Confirm your address",
     "intro": "Enter the code sent to {email}. It may take a few minutes to arrive.",
     "code": "Confirmation code",
-    "codeRow": "Code",
     "submit": "Confirm",
     "busy": "Confirming…",
     "resend": "Send the code again",
     "resent": "Code sent again to {email}",
-    "wrong": "Wrong code"
+    "wrong": "Incorrect code. Check the last email you received.",
+    "codeLabel": "Confirmation code, 6 digits"
   },
   "importProgress": {
     "title": "Importing your logbook",
