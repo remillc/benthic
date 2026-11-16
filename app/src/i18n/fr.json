@@ -1868,6 +1868,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur tablette Android : un panneau bleu à gauche (en haut en portrait) avec le profil d’une plongée qui se dessine à l’ouverture, et les trois façons de commencer à côté.",
       "Premier lancement sur téléphone Android : un bandeau bleu avec le profil de plongée, puis le même bandeau réduit sur chaque étape (compte Subsurface, création de compte, sans compte), avec un lien « Retour ».",
       "Premier lancement : après la connexion, l’écran de téléchargement montre trois étapes avec la progression des plongées, puis le carnet s’ouvre avec un message.",
       "Création de compte : l’écran du code dit « étape 2 sur 2 », et le carnet vide s’ouvre avec le message « Compte créé. Votre carnet est prêt. ».",
@@ -3429,6 +3430,12 @@
       "downloaded": "Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.",
       "created": "Compte créé. Votre carnet est prêt.",
       "local": "Carnet créé sur ce téléphone."
-    }
+    },
+    "tabletStart": "Pour commencer",
+    "profileLabel": "Profil d’une plongée",
+    "profileDepthValue": "32,4 m",
+    "profileDepthCaption": "Profondeur max.",
+    "profileDurationValue": "54 min",
+    "profileDurationCaption": "Durée · Nitrox 32 %"
   }
 }

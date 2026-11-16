@@ -57,7 +57,7 @@
       /* Tablet: pinned to the bottom of the page. */
       @media (min-width: 768px) {
         position: absolute;
-        left: 50%;
+        left: var(--od-help-link-left, 50%);
         bottom: calc(var(--f7-safe-area-bottom) + 28px);
         margin: 0;
         transform: translateX(-50%);

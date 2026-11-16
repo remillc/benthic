@@ -1868,6 +1868,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android tablets: a blue panel on the left (at the top in portrait) with a dive profile that draws itself when the screen opens, and the three ways to start beside it.",
       "First launch on Android phones: a blue banner with the dive profile, then the same banner, smaller, on every step (Subsurface account, account creation, no account), with a « Back » link.",
       "First launch: after signing in, the download screen shows three steps with the progress of the dives, then the logbook opens with a message.",
       "Account creation: the code screen says « step 2 of 2 », and the empty logbook opens with the message « Account created. Your logbook is ready. ».",
@@ -3429,6 +3430,12 @@
       "downloaded": "Logbook downloaded. It stays on this phone, even offline.",
       "created": "Account created. Your logbook is ready.",
       "local": "Logbook created on this phone."
-    }
+    },
+    "tabletStart": "Get started",
+    "profileLabel": "Dive profile",
+    "profileDepthValue": "32.4 m",
+    "profileDepthCaption": "Max. depth",
+    "profileDurationValue": "54 min",
+    "profileDurationCaption": "Duration · Nitrox 32 %"
   }
 }
