@@ -107,3 +107,42 @@ struct GitRemoteStore {
         item.delete()
     }
 }
+
+/// The OpenDives server's session (release edition): "email
+sessionToken
+repositoryUrl
+branch
+gitUsername
+gitToken".
+struct ServerSession {
+    let email: String
+    let sessionToken: String
+    let repositoryUrl: String
+    let branch: String
+    let gitUsername: String
+    let gitToken: String
+}
+
+struct ServerSessionStore {
+    private let item = KeychainText(account: "server-session")
+
+    func read() -> ServerSession? {
+        guard let text = item.read() else { return nil }
+        let parts = text.components(separatedBy: "
+")
+        if parts.count != 6 || parts.contains(where: { $0.isEmpty }) { return nil }
+        return ServerSession(email: parts[0], sessionToken: parts[1], repositoryUrl: parts[2], branch: parts[3], gitUsername: parts[4], gitToken: parts[5])
+    }
+
+    func write(_ session: ServerSession) throws {
+        let fields = [session.email, session.sessionToken, session.repositoryUrl, session.branch, session.gitUsername, session.gitToken]
+        if fields.contains(where: { $0.isEmpty || $0.contains("
+") }) { throw Failure("BAD_ARGUMENT", "BAD_ARGUMENT") }
+        try item.write(fields.joined(separator: "
+"))
+    }
+
+    func delete() {
+        item.delete()
+    }
+}

@@ -416,6 +416,36 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     }
   }
 
+  /** Release edition: the OpenDives server's session, in safeStorage (bridge.cjs, kind 'server'). */
+  async serverSessionSave(options) {
+    await this.bridge.credentials.set('server', {
+      email: options?.email ?? '',
+      sessionToken: options?.sessionToken ?? '',
+      repositoryUrl: options?.repositoryUrl ?? '',
+      branch: options?.branch ?? '',
+      gitUsername: options?.gitUsername ?? '',
+      gitToken: options?.gitToken ?? '',
+    });
+  }
+
+  /** Who is signed in to the OpenDives server, without any token. */
+  async serverSessionInfo() {
+    const stored = await this.bridge.credentials.get('server');
+    return { signedIn: stored != null, email: stored?.email ?? '', repositoryUrl: stored?.repositoryUrl ?? '', branch: stored?.branch ?? '' };
+  }
+
+  /** The access to the repository, for the download only. */
+  async serverSessionAccess() {
+    const stored = await this.bridge.credentials.get('server');
+    if (!stored) throw Object.assign(new Error('NOT_SIGNED_IN'), { code: 'NOT_SIGNED_IN' });
+    return { repositoryUrl: stored.repositoryUrl, branch: stored.branch, username: stored.gitUsername, token: stored.gitToken };
+  }
+
+  /** Signs out of the OpenDives server. */
+  async serverSessionClear() {
+    await this.bridge.credentials.clear('server');
+  }
+
   /** The stored repository without its token, for the form that edits it. */
   async gitConfig() {
     const stored = await this.bridge.credentials.get('git');

@@ -42,6 +42,10 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "createAccount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitCheck", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConfig", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionSave", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConnect", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resendCode", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "verifyPin", returnType: CAPPluginReturnPromise),
@@ -142,6 +146,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     private let credentials = CredentialStore()
     private let gitStore = GitRemoteStore()
+    /// The OpenDives server's session (release edition).
+    private let serverStore = ServerSessionStore()
 
     /// An account being created or signed in to whose logbook does not exist yet:
     /// in memory only, stored once its logbook is created. Core queue only.
@@ -948,6 +954,56 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(message, message.components(separatedBy: ":")[0])
             }
         }
+    }
+
+    /// Keeps the OpenDives server's session (release edition) in the Keychain.
+    @objc func serverSessionSave(_ call: CAPPluginCall) {
+        let session = ServerSession(
+            email: call.getString("email") ?? "",
+            sessionToken: call.getString("sessionToken") ?? "",
+            repositoryUrl: call.getString("repositoryUrl") ?? "",
+            branch: call.getString("branch") ?? "",
+            gitUsername: call.getString("gitUsername") ?? "",
+            gitToken: call.getString("gitToken") ?? ""
+        )
+        do {
+            try serverStore.write(session)
+            call.resolve()
+        } catch {
+            let message = error.localizedDescription
+            call.reject(message, message.components(separatedBy: ":")[0])
+        }
+    }
+
+    /// Who is signed in to the OpenDives server, without any token.
+    @objc func serverSessionInfo(_ call: CAPPluginCall) {
+        let stored = serverStore.read()
+        call.resolve([
+            "signedIn": stored != nil,
+            "email": stored?.email ?? "",
+            "repositoryUrl": stored?.repositoryUrl ?? "",
+            "branch": stored?.branch ?? "",
+        ])
+    }
+
+    /// The access to the repository, for the download only.
+    @objc func serverSessionAccess(_ call: CAPPluginCall) {
+        guard let stored = serverStore.read() else {
+            call.reject("NOT_SIGNED_IN", "NOT_SIGNED_IN")
+            return
+        }
+        call.resolve([
+            "repositoryUrl": stored.repositoryUrl,
+            "branch": stored.branch,
+            "username": stored.gitUsername,
+            "token": stored.gitToken,
+        ])
+    }
+
+    /// Signs out of the OpenDives server: the tokens are erased from this device.
+    @objc func serverSessionClear(_ call: CAPPluginCall) {
+        serverStore.delete()
+        call.resolve()
     }
 
     /// The stored repository without its token, for the form that edits it.

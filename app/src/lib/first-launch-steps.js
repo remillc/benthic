@@ -9,6 +9,8 @@
 //   (iCloud Drive, iPhone and macOS only: cloudService → cloudConnected, no sign-in; tasks 2026-11-16-228 and 261)
 //   start → import → (file | importDivelogs → importProgress) → importNew → where as above
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
+//   where | open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
+//     e-mail step is `server`; « Le serveur ne répond pas » is `serverOffline`, over the step that failed)
 //
 // The connection to a cloud service (« Se connecter », in progress, refused) is not a step: it is the
 // state of the connect step (lib/cloud-connection.js), so that « Retour » leaves it in one move.
@@ -16,7 +18,8 @@
 /**
  * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
  *   |'where'|'import'|'importDivelogs'|'importProgress'|'importNew'
- *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'} Step
+ *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
+ *   |'server'|'serverCode'|'serverOffline'|'serverDownload'} Step
  */
 
 /** The steps that hold the name field: the pencil of the later steps goes back to the last of them. */
@@ -34,6 +37,7 @@ const FORWARD = {
   'importNew:next': 'where',
   'where:cloud': 'cloudService',
   'where:git': 'git',
+  'where:server': 'server',
   'cloudService:service': 'cloudConnect',
   'cloudService:webdav': 'webdav',
   'cloudService:icloud': 'cloudConnected',
@@ -43,6 +47,12 @@ const FORWARD = {
   'import:file': 'importNew',
   'open:cloud': 'openCloudService',
   'open:git': 'openGit',
+  'open:server': 'server',
+  'server:code': 'serverCode',
+  'server:offline': 'serverOffline',
+  'serverCode:offline': 'serverOffline',
+  'serverDownload:offline': 'serverOffline',
+  'serverCode:session': 'serverDownload',
   'openCloudService:service': 'openCloudConnect',
   'openCloudService:webdav': 'openWebdav',
   'openCloudService:icloud': 'openCloudConnected',
@@ -131,7 +141,7 @@ export function hasLogbookTitle(step) {
  */
 export function hasBack(step, leavable = false) {
   if (step === 'start') return leavable;
-  return step !== 'importProgress';
+  return step !== 'importProgress' && step !== 'serverDownload';
 }
 
 /**

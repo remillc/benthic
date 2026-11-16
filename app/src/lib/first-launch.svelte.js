@@ -39,6 +39,19 @@ export const flow = $state({
   gitProblem: /** @type {''|'notEmpty'|'noLogbook'} */ (''),
   /** The WebDAV or Nextcloud form; `error` is `'unreachable'`, `'denied'` or empty. Nothing is kept: the password is cleared when used. */
   webdav: { url: '', user: '', password: '', error: '' },
+  /**
+   * The OpenDives server sign-in (release edition, tasks 2026-11-16-259 and 260). Only the address and the code live
+   * here, and only while the screens are open; the session itself goes to the platform's secure storage.
+   * `error` is what the code screen tells; `resendAt` and `lockedUntil` are times (ms) of the countdown and the lock.
+   */
+  server: {
+    email: '',
+    emailError: false,
+    code: '',
+    error: /** @type {''|'WRONG_CODE'|'CODE_EXPIRED'|'TOO_MANY_ATTEMPTS'} */ (''),
+    resendAt: 0,
+    lockedUntil: 0,
+  },
   /** The cloud account connected (idea #74: always empty until the cloud is built). */
   account: '',
   /** @type {FoundLogbook[]} */
@@ -126,6 +139,7 @@ export function resetFlow() {
   flow.connection = 'idle';
   flow.gitProblem = '';
   Object.assign(flow.webdav, { url: '', user: '', password: '', error: '' });
+  Object.assign(flow.server, { email: '', emailError: false, code: '', error: '', resendAt: 0, lockedUntil: 0 });
   flow.found = [];
   flow.source = null;
   Object.assign(flow.divelogs, { user: '', password: '', total: 0, done: 0, phase: 'download', error: '', interrupted: false, progress: newDownloadProgress() });

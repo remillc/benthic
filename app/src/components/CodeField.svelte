@@ -14,13 +14,17 @@
    *   value: string,
    *   error?: string,
    *   disabled?: boolean,
+   *   gap?: number,
+   *   spread?: boolean,
    *   onsubmit?: () => void,
    *   oninput?: () => void,
    * }}
    * label: the visible label above the boxes; accessibleLabel: the name read
-   * for the field; error: the message under the boxes (all six turn red).
+   * for the field; error: the message under the boxes (all six turn red); gap: the space between the boxes in dp
+   * (8 by default, 12 on the wide server screens); spread: the boxes share the width of the column (the phone's
+   * server screens) instead of staying together at the start of the line.
    */
-  let { label, accessibleLabel, value = $bindable(''), error = '', disabled = false, onsubmit, oninput } = $props();
+  let { label, accessibleLabel, value = $bindable(''), error = '', disabled = false, gap = 8, spread = false, onsubmit, oninput } = $props();
 
   const uid = Math.random().toString(36).slice(2, 9);
   const id = `od-code-${uid}`;
@@ -70,7 +74,7 @@
 
 <div class="od-code-field" class:od-code-field--error={!!error} class:od-code-field--disabled={disabled}>
   <label class="od-code-field--label" for={id}>{label}</label>
-  <div class="od-code-field--boxes">
+  <div class="od-code-field--boxes" class:od-code-field--spread={spread} style:gap="{gap}px">
     {#each digits as digit, i (i)}
       <span
         class="od-code-field--box"
@@ -131,6 +135,10 @@
       display: flex;
       gap: 8px;
       justify-content: flex-start;
+
+      &.od-code-field--spread {
+        justify-content: space-between;
+      }
     }
 
     /* 48 x 56 dp; under 328 dp of room the boxes shrink in proportion (the gap stays 8 dp). */

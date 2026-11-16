@@ -58,6 +58,9 @@ class OpenDivesCorePlugin : Plugin() {
     /** The user's own git repository, instead of the cloud account (see GitRemoteStore). */
     private val gitStore: GitRemoteStore by lazy { GitRemoteStore(context) }
 
+    /** The OpenDives server's session (release edition), see ServerSessionStore. */
+    private val serverStore: ServerSessionStore by lazy { ServerSessionStore(context) }
+
     /**
      * An account being created or signed in to whose logbook does not exist
      * yet: kept in memory only, and stored once its logbook is created.
@@ -441,6 +444,66 @@ class OpenDivesCorePlugin : Plugin() {
                 call.reject("CORE_ERROR", "CORE_ERROR")
             }
         }
+    }
+
+    /** Keeps the OpenDives server's session (the e-mail sign-in's answer) in the Keystore; nothing is returned. */
+    @PluginMethod
+    fun serverSessionSave(call: PluginCall) {
+        try {
+            serverStore.write(
+                ServerSession(
+                    email = call.getString("email").orEmpty(),
+                    sessionToken = call.getString("sessionToken").orEmpty(),
+                    repositoryUrl = call.getString("repositoryUrl").orEmpty(),
+                    branch = call.getString("branch").orEmpty(),
+                    gitUsername = call.getString("gitUsername").orEmpty(),
+                    gitToken = call.getString("gitToken").orEmpty(),
+                ),
+            )
+            call.resolve()
+        } catch (e: IllegalArgumentException) {
+            call.reject("BAD_ARGUMENT", "BAD_ARGUMENT")
+        } catch (e: Exception) {
+            Log.e(TAG, "serverSessionSave failed", e)
+            call.reject("CREDENTIALS_NOT_SAVED", "CREDENTIALS_NOT_SAVED")
+        }
+    }
+
+    /** Who is signed in to the OpenDives server, without any token. */
+    @PluginMethod
+    fun serverSessionInfo(call: PluginCall) {
+        val stored = serverStore.read()
+        call.resolve(
+            JSObject()
+                .put("signedIn", stored != null)
+                .put("email", stored?.email.orEmpty())
+                .put("repositoryUrl", stored?.repositoryUrl.orEmpty())
+                .put("branch", stored?.branch.orEmpty()),
+        )
+    }
+
+    /** The access to the repository (the git user name and token), for the download only. */
+    @PluginMethod
+    fun serverSessionAccess(call: PluginCall) {
+        val stored = serverStore.read()
+        if (stored == null) {
+            call.reject("NOT_SIGNED_IN", "NOT_SIGNED_IN")
+            return
+        }
+        call.resolve(
+            JSObject()
+                .put("repositoryUrl", stored.repositoryUrl)
+                .put("branch", stored.branch)
+                .put("username", stored.gitUsername)
+                .put("token", stored.gitToken),
+        )
+    }
+
+    /** Signs out of the OpenDives server: the tokens are erased from this device. */
+    @PluginMethod
+    fun serverSessionClear(call: PluginCall) {
+        serverStore.delete()
+        call.resolve()
     }
 
     /** The stored repository without its token ({url, username, branch}), or empty: for the form that edits it. */

@@ -23,8 +23,9 @@
 //   onCoreEvent(name, cb)    cb(data) for an event; returns a function that unsubscribes (sync).
 //                            Events: 'syncProgress' {message}, 'coreRestarted' {} (the host died and
 //                            started again: the log must be loaded again).
-//   credentials.get(kind)    the stored secret or null: kind 'cloud' {email, password} or
-//                            'git' {url, username, branch, token}
+//   credentials.get(kind)    the stored secret or null: kind 'cloud' {email, password},
+//                            'git' {url, username, branch, token} or 'server' (release edition: the OpenDives
+//                            server's session {email, sessionToken, repositoryUrl, branch, gitUsername, gitToken})
 //   credentials.set(kind, value)   stores it (Electron safeStorage, encrypted in <userData>)
 //   credentials.clear(kind?) forgets one kind, or both without an argument
 //   fs.writeFile({area, name, base64})  stages a file in <temp>/<area> ('import' or 'share'):
@@ -42,6 +43,8 @@
 //                            kept by the main process with it (task 2026-11-15-178)
 //   clipboard.read()         resolves { text, dives }: the plain text, and the dives' XML while the clipboard
 //                            still holds the text copied with them ('' otherwise)
+//   server.request({method, url, headers, body})   release edition: one call to the OpenDives server, https or
+//                            the development server's loopback; resolves { status, text }
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
 // One window, one logbook, one helper (task 2026-11-15-173): `od:paths` also returns `logbook`, the
@@ -112,8 +115,10 @@ const DEV_FILES = new Set(['cloud-dev.env', 'cloud-test.env']);
 const CREDENTIAL_FIELDS = {
   cloud: ['email', 'password'],
   git: ['url', 'username', 'branch', 'token'],
+  // Release edition: the OpenDives server's session (the e-mail sign-in's answer), kept for the whole app.
+  server: ['email', 'sessionToken', 'repositoryUrl', 'branch', 'gitUsername', 'gitToken'],
 };
-const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin' };
+const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin', server: 'server-session.bin' };
 const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH', 'DENIED', 'NO_LOG', 'CREATE_FAILED', 'LOG_EXISTS', 'NOT_EMPTY']);
 const MAX_READ = 100 * 1024 * 1024;
 const NOMINATIM = 'https://nominatim.openstreetmap.org/';
@@ -673,6 +678,8 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
    */
   function credentialFile(kind, ctx) {
     if (!CREDENTIAL_FILES[kind]) throw new Error('BAD_ARGUMENT: unknown credentials kind');
+    // The server session belongs to the app, not to a logbook: the start screen (no logbook yet) signs in too.
+    if (kind === 'server') return path.join(userData, CREDENTIAL_FILES.server);
     // A window with no logbook (the start screen) has no credentials.
     if (!ctx.descriptor) return null;
     const own = ctx.descriptor.kind !== 'main' ? ctx.descriptor : null;
@@ -718,12 +725,36 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   }
 
   function clearCredentials(kind, ctx) {
-    for (const k of kind ? [kind] : Object.keys(CREDENTIAL_FILES)) {
+    // Without a kind: the logbook's credentials; the server session is cleared by its own kind.
+    for (const k of kind ? [kind] : Object.keys(CREDENTIAL_FILES).filter((name) => name !== 'server')) {
       const file = credentialFile(k, ctx);
       if (!file) continue;
       fs.rmSync(file, { force: true });
       fs.rmSync(`${file}.tmp`, { force: true });
     }
+  }
+
+  // --- The OpenDives server (release edition) ---
+
+  /**
+   * One HTTP call for the page: https, or http for this machine's development server only. Answers `{ status, text }`;
+   * a network failure rejects (the page shows « Le serveur ne répond pas »).
+   * @param {{ method?: string, url?: string, headers?: Record<string, string>, body?: unknown }} request
+   */
+  async function serverRequest(request) {
+    let url;
+    try {
+      url = new URL(String(request?.url ?? ''));
+    } catch {
+      throw new Error('BAD_ARGUMENT: not an address');
+    }
+    const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
+    if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
+    const method = request?.method === 'POST' ? 'POST' : 'GET';
+    const headers = { Accept: 'application/json', 'User-Agent': 'OpenDives', ...(request?.headers ?? {}) };
+    if (request?.body !== undefined) headers['Content-Type'] = 'application/json';
+    const response = await fetch(url, { method, headers, body: request?.body !== undefined ? JSON.stringify(request.body) : undefined, signal: AbortSignal.timeout(20000) });
+    return { status: response.status, text: await response.text() };
   }
 
   // --- Files ---
@@ -867,6 +898,8 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     if (op === 'clear') return clearCredentials(kind, ctx) ?? null;
     throw new Error(`Unknown credentials operation ${op}`);
   }));
+  // Release edition: the OpenDives server's JSON calls and the repository downloads (no CORS in the main process).
+  ipcMain.handle('od:server', answer((_event, request) => serverRequest(request)));
   ipcMain.handle('od:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
   ipcMain.handle('od:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
   ipcMain.handle('od:placesSearch', answer((_event, options) => placesSearch(options)));

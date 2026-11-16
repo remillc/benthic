@@ -559,6 +559,15 @@ export { waterTypeOf };
  *   with no token typed): as for a push, which checks the token and its right
  *   to write ('ok', 'denied', 'none'). Network only; nothing is stored.
  *   Rejects with BAD_ADDRESS (not HTTPS, or holding credentials) or BAD_CREDENTIALS.
+ * @property {(options: {email: string, sessionToken: string, repositoryUrl: string, branch: string, gitUsername: string, gitToken: string}) => Promise<void>} serverSessionSave
+ *   Release edition: keeps the OpenDives server's session (session token and git token) in the platform's secure
+ *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
+ * @property {() => Promise<{signedIn: boolean, email: string, repositoryUrl: string, branch: string}>} serverSessionInfo
+ *   Who is signed in to the OpenDives server, without any token.
+ * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string}>} serverSessionAccess
+ *   The access to the repository, for the download. Rejects with NOT_SIGNED_IN.
+ * @property {() => Promise<void>} serverSessionClear
+ *   Signs out of the OpenDives server: the tokens are erased.
  * @property {() => Promise<{url: string, username: string, branch: string}>} gitConfig
  *   The connected repository without its token, empty strings when none (for editing it).
  * @property {(options: {url: string, username: string, token: string, branch: string, empty?: boolean}) => Promise<{created: boolean}>} gitConnect
@@ -830,6 +839,10 @@ export const OpenDivesCore = {
     return JSON.parse((await native.gitCheck(options)).json);
   },
   gitConfig: () => native.gitConfig(),
+  serverSessionSave: (options) => native.serverSessionSave(options),
+  serverSessionInfo: () => native.serverSessionInfo(),
+  serverSessionAccess: () => native.serverSessionAccess(),
+  serverSessionClear: () => native.serverSessionClear(),
   gitConnect: (options) => native.gitConnect(options),
   async probeCloud() {
     const { json } = await native.probeCloud();

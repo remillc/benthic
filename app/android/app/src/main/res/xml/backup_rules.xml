@@ -5,4 +5,6 @@
 <full-backup-content>
     <exclude domain="file" path="git-remote.bin" />
     <exclude domain="file" path="git-remote.bin.tmp" />
+    <exclude domain="file" path="server-session.bin" />
+    <exclude domain="file" path="server-session.bin.tmp" />
 </full-backup-content>

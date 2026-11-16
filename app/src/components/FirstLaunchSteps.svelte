@@ -21,9 +21,11 @@
   import FirstLaunchGit from './FirstLaunchGit.svelte';
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
   import FirstLaunchWebdav from './FirstLaunchWebdav.svelte';
+  import FirstLaunchServer from './FirstLaunchServer.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
+  import { entryRows } from '../lib/server-signin.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
@@ -224,7 +226,7 @@
   }
 
   /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of « Où le garder ? ». */
-  function where(/** @type {'cloud'|'git'|'device'} */ kind) {
+  function where(/** @type {'server'|'cloud'|'git'|'device'} */ kind) {
     if (nameInvalid) return;
     if (kind === 'device') void createOnDevice();
     else go(kind);
@@ -533,7 +535,16 @@
     openChoose: 'welcomeSteps.chooseTitle',
     openWebdav: 'welcomeSteps.openTitle',
     openGit: 'welcomeSteps.openTitle',
+    server: 'serverSteps.title',
+    serverCode: 'serverSteps.title',
+    serverDownload: 'serverSteps.title',
   });
+
+  /** The server was downloaded and opened: the snackbar says where the logbook is now (mock-ups …-serveur-carnet). */
+  function serverOpened() {
+    showSnackbar(t(deviceKey('serverSteps.downloaded', kind)));
+    resetFlow();
+  }
 </script>
 
 {#snippet backButton()}
@@ -649,9 +660,17 @@
   <h3 class="od-first-launch--subtitle">{t('welcomeSteps.whereTitle')}</h3>
   <p class="od-first-launch--lead">{t('welcomeSteps.whereHelp')}</p>
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
-    <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.cloudHelp', iphone))} disabled={nameInvalid} onclick={() => where('cloud')} />
-    <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon={desktopApp ? 'desktop' : 'tablet'} title={t(deviceKey('welcomeSteps.deviceTitle', kind))} help={t(deviceKey('welcomeSteps.deviceHelp', kind))} disabled={nameInvalid || busy} onclick={() => where('device')} />
+    {#each entryRows('where') as row (row.key)}
+      {#if row.key === 'server'}
+        <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.whereHelp')} disabled={nameInvalid} onclick={() => where('server')} />
+      {:else if row.key === 'cloud'}
+        <ReleaseChoiceRow icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.cloudHelp', iphone))} disabled={nameInvalid} onclick={() => where('cloud')} />
+      {:else if row.key === 'git'}
+        <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
+      {:else}
+        <ReleaseChoiceRow icon={desktopApp ? 'desktop' : 'tablet'} title={t(deviceKey('welcomeSteps.deviceTitle', kind))} help={t(deviceKey('welcomeSteps.deviceHelp', kind))} disabled={nameInvalid || busy} onclick={() => where('device')} />
+      {/if}
+    {/each}
   </nav>
 {/snippet}
 
@@ -665,7 +684,7 @@
           {@render logbookTitle()}
         {:else if step === 'start' && recents}
           <RecentLogbooks />
-        {:else}
+        {:else if step !== 'serverOffline'}
           <h2 class="od-first-launch--title">{t(titles[step])}</h2>
         {/if}
 
@@ -741,8 +760,15 @@
         {:else if step === 'open'}
           <p class="od-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
-            <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.openCloudHelp', iphone))} onclick={() => go('cloud')} />
-            <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.openGitHelp')} onclick={() => go('git')} />
+            {#each entryRows('open') as row (row.key)}
+              {#if row.key === 'server'}
+                <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.openHelp')} onclick={() => go('server')} />
+              {:else if row.key === 'cloud'}
+                <ReleaseChoiceRow icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.openCloudHelp', iphone))} onclick={() => go('cloud')} />
+              {:else}
+                <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.openGitHelp')} onclick={() => go('git')} />
+              {/if}
+            {/each}
           </nav>
         {:else if step === 'openCloudService'}
           <p class="od-first-launch--lead">{t('welcomeSteps.openService')}</p>
@@ -792,6 +818,8 @@
         {:else if step === 'openGit'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
           <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} onconnect={windowTakes ? createGit : undefined} />
+        {:else if step === 'server' || step === 'serverCode' || step === 'serverOffline' || step === 'serverDownload'}
+          <FirstLaunchServer {step} onopened={serverOpened} />
         {/if}
       </section>
     {/key}

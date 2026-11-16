@@ -44,6 +44,8 @@ contextBridge.exposeInMainWorld('odDesktop', {
     set: (kind, value) => invoke('od:credentials', 'set', kind, value),
     clear: (kind) => invoke('od:credentials', 'clear', kind),
   },
+  /** Release edition: a call to the OpenDives server (main process, no CORS): resolves { status, text }. */
+  server: { request: (options) => invoke('od:server', options) },
   fs: {
     writeFile: (options) => invoke('od:fs', 'writeFile', options),
     readFile: (options) => invoke('od:fs', 'readFile', options),
