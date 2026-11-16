@@ -4320,7 +4320,7 @@ Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.ht
 
 Done on `feature/release-phone-first-launch` (not merged): every step on phones under 768 dp (330 dp band on the first step, 108 dp on the others as task 230 corrected, the column from the top, full-width buttons, the formats dialog stacked at 358 dp, « ce téléphone » texts), WelcomeEntry shows the release screen on phones too; tablets unchanged (screenshots identical apart from the 230 sign-in changes). Task 230 (phone and tablet parts) done there too.
 
-## [ ] 2026-11-16-228 Release edition: the first launch on the desktop
+## [x] 2026-11-16-228 Release edition: the first launch on the desktop
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-desktop-first-launch`, started from `feature/release-phone-first-launch` (task 227). Do not merge it into `main`. On `main`, the beta keeps its current window without a logbook (task 222).
 
@@ -4349,7 +4349,9 @@ Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.htm
 - Dropping a `.ssrf` or `.xml` file on the window imports it.
 - The beta on `main` is untouched.
 
-## [ ] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
+Done on `feature/release-desktop-first-launch` (not merged; it also carries the desktop branch): in the release edition the desktop window without a logbook is « Pour commencer » (700 dp blue panel, the tablet steps on the right, « cet ordinateur » texts, the drop line and dropping a file starts the import, iCloud Drive on macOS only and stubbed, the help link opens About). Creating a logbook in Google Drive, OneDrive, Dropbox or WebDAV is real through the desktop cloud service; opening a logbook from a cloud account still says « coming » (the main process cannot list an account's logbooks). Recent logbooks (#83) not shown. The beta keeps the window of task 222.
+
+## [x] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
 
 Christian approved these on 16 November 2026. **Release edition:** do them on the branches of tasks 227 (`feature/release-phone-first-launch`) and 228 (`feature/release-desktop-first-launch`), or on a new branch `feature/release-first-launch-fixes` started from the latest of them. Do not merge into `main`.
 
@@ -4368,6 +4370,8 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 - On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
 - The progress bars stay inside their card at 360 dp wide.
 - `main` is untouched.
+
+Done (desktop): the two-line centred hint and the centred button come from the shared component; checked in a narrow window too. All parts done, on `feature/release-phone-first-launch` and `feature/release-desktop-first-launch`.
 
 ## [ ] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
 
