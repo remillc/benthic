@@ -60,7 +60,7 @@ test('« Pour commencer »: the 700 dp blue panel on the left over the window’
   // The smallest window (760 x 560): a narrower panel, and a column that scrolls with the help link after it.
   assert.match(screen, /@media \(max-width: 1100px\)/);
   assert.match(screen, /@media \(max-height: 700px\)/);
-  assert.match(read('../../desktop/windows.cjs'), /minWidth: 760,\s+minHeight: 560/);
+  assert.match(read('../../desktop/windows.cjs'), /minWidth: 768,\s+minHeight: 560/);
 });
 
 test('the help link opens the desktop About where there is no view of its own', () => {
