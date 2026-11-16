@@ -1873,6 +1873,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Aides « Créer un dépôt » et « Créer un jeton d’accès » : les libellés du site sont dans des cases et les valeurs à saisir en police à chasse fixe ; les onglets GitLab et Codeberg donnent les libellés du site dans la langue de l’app, et GitLab et Codeberg ont leurs propres étapes pour le jeton.",
       "Synchronisation avec un dépôt git : un serveur qui ne répond pas n’est plus présenté comme un jeton refusé ; l’app réessaie seule.",
       "Premier lancement et Compte sur téléphone Android : « Utiliser mon propre dépôt git » est un seul formulaire (adresse vérifiée à la sortie du champ, jeton, liste des branches lues dans le dépôt), avec l’écran de téléchargement du carnet puis un message à l’ouverture. L’aide « Comment créer un dépôt » donne les étapes pour GitHub, GitLab et Codeberg.",
       "Premier lancement sur téléphone Android : les étapes ont des marges de 16 dp de chaque côté.",
@@ -3069,12 +3070,12 @@
       "open": "Ouvrir la page des jetons de GitLab",
       "note": "Sur GitLab, un jeton personnel donne accès à tous vos dépôts et doit avoir une date d’expiration.",
       "s1": "Connectez-vous à GitLab, touchez votre avatar, puis [kbd]Modifier le profil[/kbd].",
-      "s2": "Dans la colonne de gauche, ouvrez [kbd]Jetons d’accès[/kbd].",
-      "s3": "Touchez [kbd]Ajouter un nouveau jeton[/kbd].",
+      "s2": "Dans la colonne de gauche, ouvrez [kbd]Accès[/kbd], puis [kbd]Jetons d’accès personnel[/kbd].",
+      "s3": "Dans la liste [kbd]Générer un jeton[/kbd], choisissez [kbd]Ancien jeton[/kbd].",
       "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
       "s5": "[kbd]Date d’expiration[/kbd] : choisissez la date la plus lointaine permise. GitLab exige une date ; à cette date, créez un nouveau jeton et collez-le dans OpenDives.",
-      "s6": "[kbd]Portées[/kbd] : cochez seulement [kbd]write_repository[/kbd], qui permet de lire et d’écrire dans vos dépôts.",
-      "s7": "Touchez [kbd]Créer un jeton[/kbd], puis copiez le jeton."
+      "s6": "[kbd]Sélectionner les portées[/kbd] : cochez seulement [kbd]write_repository[/kbd], qui permet de lire et d’écrire dans vos dépôts.",
+      "s7": "Touchez [kbd]Générer un jeton[/kbd], puis copiez le jeton."
     },
     "codeberg": {
       "name": "Codeberg",
@@ -3083,10 +3084,11 @@
       "note": "Sur Codeberg, un jeton n’expire pas. Vous pouvez le supprimer à tout moment.",
       "s1": "Connectez-vous à Codeberg, touchez votre avatar, puis [kbd]Configuration[/kbd].",
       "s2": "Ouvrez l’onglet [kbd]Applications[/kbd].",
-      "s3": "Sous [kbd]Gérer les jetons d’accès[/kbd], [kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
-      "s4": "Choisissez [kbd]Tout (public, privé et limité)[/kbd] pour que le jeton atteigne votre dépôt privé.",
-      "s5": "Dans la liste des autorisations, réglez [kbd]Dépôt[/kbd] sur [kbd]Lecture et écriture[/kbd]. Laissez les autres sur [kbd]Aucun accès[/kbd].",
-      "s6": "Touchez [kbd]Générer un jeton[/kbd], puis copiez le jeton."
+      "s3": "Sous [kbd]Jetons d’accès[/kbd], touchez [kbd]Nouveau jeton d’accès[/kbd].",
+      "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
+      "s5": "Choisissez [kbd]Tout (public, privé et limité)[/kbd] pour que le jeton atteigne votre dépôt privé.",
+      "s6": "Sous [kbd]Sélectionner les autorisations[/kbd], réglez [kbd]repository[/kbd] sur [kbd]Lecture et écriture[/kbd]. Laissez les autres sur [kbd]Aucun accès[/kbd].",
+      "s7": "Touchez [kbd]Générer un jeton[/kbd], puis copiez le jeton."
     },
     "hosts": "Sites"
   },

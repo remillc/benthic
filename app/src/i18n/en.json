@@ -1873,6 +1873,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "« Create a repository » and « Create an access token » help: the site's labels are in boxes and the values to type in a monospace font; the GitLab and Codeberg tabs give the site's labels in the app's language, and GitLab and Codeberg have their own token steps.",
       "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",
       "First launch and Compte on an Android phone: « Use my own git repository » is one form (address checked when you leave the field, token, the branches read from the repository), with the logbook download screen and then a message when it opens. The help « How to create a repository » gives the steps for GitHub, GitLab and Codeberg.",
       "First launch on an Android phone: the steps have 16 dp side margins.",
@@ -3069,11 +3070,11 @@
       "open": "Open GitLab’s token page",
       "note": "On GitLab, a personal token gives access to all your repositories and must have an expiry date.",
       "s1": "Sign in to GitLab, tap your avatar, then [kbd]Edit profile[/kbd].",
-      "s2": "In the left sidebar, open [kbd]Access tokens[/kbd].",
-      "s3": "Tap [kbd]Add new token[/kbd].",
+      "s2": "In the left sidebar, open [kbd]Access[/kbd], then [kbd]Personal access tokens[/kbd].",
+      "s3": "In the [kbd]Generate token[/kbd] list, choose [kbd]Legacy token[/kbd].",
       "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
       "s5": "[kbd]Expiration date[/kbd]: choose the latest date allowed. GitLab requires a date; on that date, create a new token and paste it into OpenDives.",
-      "s6": "[kbd]Scopes[/kbd]: tick only [kbd]write_repository[/kbd], which allows reading and writing in your repositories.",
+      "s6": "[kbd]Select scopes[/kbd]: tick only [kbd]write_repository[/kbd], which allows reading and writing in your repositories.",
       "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
     },
     "codeberg": {
@@ -3083,10 +3084,11 @@
       "note": "On Codeberg, a token does not expire. You can delete it at any time.",
       "s1": "Sign in to Codeberg, tap your avatar, then [kbd]Settings[/kbd].",
       "s2": "Open the [kbd]Applications[/kbd] tab.",
-      "s3": "Under [kbd]Manage Access Tokens[/kbd], [kbd]Token Name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
-      "s4": "Choose [kbd]All (public, private, and limited)[/kbd] so that the token reaches your private repository.",
-      "s5": "In the permissions list, set [kbd]repository[/kbd] to [kbd]Read and Write[/kbd]. Leave the others on [kbd]No access[/kbd].",
-      "s6": "Tap [kbd]Generate Token[/kbd], then copy the token."
+      "s3": "Under [kbd]Access tokens[/kbd], tap [kbd]New access token[/kbd].",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
+      "s5": "Choose [kbd]All (public, private, and limited)[/kbd] so that the token reaches your private repository.",
+      "s6": "Under [kbd]Select permissions[/kbd], set [kbd]repository[/kbd] to [kbd]Read and write[/kbd]. Leave the others on [kbd]No access[/kbd].",
+      "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
     },
     "hosts": "Hosts"
   },

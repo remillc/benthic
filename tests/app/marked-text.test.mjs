@@ -43,7 +43,7 @@ function steps(lang) {
 for (const lang of ['fr', 'en']) {
   test(`steps (${lang}): marks balanced, each step has a label or a value, no bold`, () => {
     const list = steps(lang);
-    assert.equal(list.length, 6 + 7 + 6 + 9 + 7 + 6, 'all the steps of the two pages');
+    assert.equal(list.length, 6 + 7 + 6 + 9 + 7 + 7, 'all the steps of the two pages');
     for (const [key, text] of list) {
       for (const tag of ['kbd', 'code']) {
         assert.equal((text.match(new RegExp(String.raw`\[${tag}\]`, 'g')) ?? []).length, (text.match(new RegExp(String.raw`\[/${tag}\]`, 'g')) ?? []).length, key);

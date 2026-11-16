@@ -23,7 +23,7 @@
   const PROVIDERS = [
     { id: 'github', page: 'https://github.com/settings/personal-access-tokens/new', steps: steps('github', 9) },
     { id: 'gitlab', page: 'https://gitlab.com/-/user_settings/personal_access_tokens', steps: steps('gitlab', 7) },
-    { id: 'codeberg', page: 'https://codeberg.org/user/settings/applications', steps: steps('codeberg', 6) },
+    { id: 'codeberg', page: 'https://codeberg.org/user/settings/applications', steps: steps('codeberg', 7) },
   ];
 
   let selected = $state(0);

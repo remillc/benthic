@@ -4917,7 +4917,7 @@ The site labels are in English for now; Christian may ask for the French labels 
 
 Done: the GitLab (7 steps, link `https://gitlab.com/projects/new#blank_project`) and Codeberg (6 steps, link `https://codeberg.org/repo/create`) tabs of `pages/RepositoryHelp.svelte` use the texts of the task word for word (`repoHelp.gitlab.*`, `repoHelp.codeberg.*`, fr; the English versions keep the site labels), the same layout as GitHub: active tab semi-bold in the text colour with the 3 dp underline, the others grey. Checked headless at 390 x 844; the tests are in `tests/app/git-form.test.mjs`. The French labels of GitLab and Codeberg are left to a later request.
 
-## [ ] 2026-11-16-253 Git help pages: interface labels as `<kbd>`, values as `<code>`
+## [x] 2026-11-16-253 Git help pages: interface labels as `<kbd>`, values as `<code>`
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html` and `git-jeton-aide-android.dc.html`.
 
@@ -4929,7 +4929,9 @@ Put a no-break space before a colon that follows a label (« Repository name : �
 
 **Test:** in the four help pages, every site label is a chip and every example value is monospace, with no bold, in light and dark themes.
 
-## [ ] 2026-11-16-254 Token help (GitHub): choose « No expiration »
+Done: in the steps of the repository help and the token help, an interface label is set apart as `<kbd>` and a value as `<code>`, without bold. The step texts stay plain JSON with the marks `[kbd]…[/kbd]` and `[code]…[/code]`; `app/src/lib/marked-text.js` parses them into segments and `app/src/components/MarkedText.svelte` renders `<kbd>`, `<code>` and text (never `{@html}`). Colours come from `--od-kbd-*` and `--od-code-*` in `app/src/theme.css`, light as in the task, dark `#F4F4F2` on `#2A2C30` (kbd) and `#BFD6F0` on `#1F2B3B` (code), both above 4.5:1 (tests/app/marked-text.test.mjs). A no-break space precedes a colon after a label in French. Tests: parser, balanced marks in every step in fr and en, no bold, tokens in light and dark. Rendered at 390×844 headless, light and dark, in French and English.
+
+## [x] 2026-11-16-254 Token help (GitHub): choose « No expiration »
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/git-jeton-aide-android.dc.html`, GitHub tab of « Créer un jeton d’accès ».
 
@@ -4941,7 +4943,9 @@ Background: since October 2024 GitHub lets a fine-grained token have no expirati
 
 **Test:** the GitHub tab of the token help shows the new intro and the « No expiration » step.
 
-## [ ] 2026-11-16-255 Token help: the GitLab and Codeberg tabs
+Done: the GitHub intro of the token help no longer mentions an expiry date, and the Expiration step reads « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » with Expiration and No expiration as `<kbd>`. The intro follows the mock-up (« GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. »). Test in tests/app/marked-text.test.mjs.
+
+## [x] 2026-11-16-255 Token help: the GitLab and Codeberg tabs
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-jeton-aide-gitlab-android.dc.html` and `git-jeton-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-jeton-aide-android.dc.html`).
 
@@ -4957,7 +4961,9 @@ The help page must scroll when its content is taller than the screen (the GitHub
 
 **Test:** each tab of the token help shows its own steps and link, the active tab is underlined, and each link opens the right page.
 
-## [ ] 2026-11-16-256 Help « Créer un dépôt »: French site labels for GitLab and Codeberg (correction to 252)
+Done: each host of the token help has its own intro, first line, steps and link text (`tokenHelp.<id>.intro`, `.note`, `.open`, `.s1…`), the GitLab and Codeberg texts are those of the mock-ups, the links are https://gitlab.com/-/user_settings/personal_access_tokens and https://codeberg.org/user/settings/applications, and the page scrolls when taller than the screen (1019 dp on GitHub at 390 dp). Where the sites' current translation files differ from the mock-ups, the sites win: see the list of differences in the report of this task (GitLab personal tokens: Access › Personal access tokens, Generate token › Legacy token, Generate token; Codeberg: Access tokens › New access token, Select permissions with the row `repository`, then Generate token).
+
+## [x] 2026-11-16-256 Help « Créer un dépôt »: French site labels for GitLab and Codeberg (correction to 252)
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html`.
 
@@ -4968,3 +4974,5 @@ GitLab and Codeberg exist in French, so their tabs name the labels of the French
 - **Codeberg steps:** + › Nouveau dépôt; Nom du dépôt; Rendre le dépôt privé; leave Initialiser le dépôt unchecked; Créer un dépôt; HTTPS. Link: « Ouvrir la page « Nouveau dépôt » de Codeberg ».
 
 **Test:** the GitLab and Codeberg tabs show the French labels, the GitHub tab the English ones with the new intro.
+
+Done: the repository help has one intro per host (GitHub: « GitHub n’existe qu’en anglais… »; GitLab and Codeberg: « Les libellés ci-dessous sont ceux de l’interface française du site. », and in English « The labels below are those of the site’s English interface. »), the French labels of GitLab and Codeberg from the mock-ups, and the links « Ouvrir la page « Nouveau projet » de GitLab » and « Ouvrir la page « Nouveau dépôt » de Codeberg ». The labels were checked against GitLab's `locale/fr/gitlab.po` and Forgejo's `locale_fr-FR.ini` and `locale_en-US.ini`. The GitLab and Codeberg tabs take the language of the app (fr and fr-CA: French labels, en: English labels); GitHub stays English.
