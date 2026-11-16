@@ -4258,3 +4258,18 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - Demo: the banner stays visible. Adding a dive opens `demo-ajout`. « Commencer mon carnet » erases the demo and goes back to the first step.
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
+
+## [ ] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
+
+Christian approved this on 16 November 2026. **Beta only:** do it on `main`. Do not touch the release-edition branches.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
+
+- On the first-launch screen (`/welcome`), a badge follows the name « OpenDives » in the brand row:
+  - the text « Bêta » (« Beta » in `en.json`), in capitals, 14 sp, bold, letter spacing 0.8;
+  - text #114477 on #DCE7F3, a full pill (3 dp × 10 dp padding);
+  - 8 dp after the name.
+- The badge is decorative: put the text in the accessible name of the brand row (« OpenDives, bêta »), not a separate stop for screen readers.
+- Use the same screen on phones, tablets and desktop; the badge follows the name wherever the brand row appears on this screen.
+
+**Test:** on a tablet in both orientations and on a phone, the badge sits on the name's line, 8 dp away, without wrapping; TalkBack reads « OpenDives, bêta » once.
