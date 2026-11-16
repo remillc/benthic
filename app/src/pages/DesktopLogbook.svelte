@@ -118,6 +118,13 @@
     untrack(() => loadExtras());
   });
 
+  // Adaptive page: arriving from the tablet layout, the dive its detail pane shows is the selection.
+  {
+    const shown = /^\/dives\/(\d+)$/.exec(untrack(() => f7router.currentRoute?.url) ?? '');
+    const id = shown ? Number(shown[1]) : 0;
+    if (id && !desk.selection.ids.includes(id)) desk.selection = { ids: [id], anchor: id, focus: id };
+  }
+
   // The selection keeps the dives still listed; the detail pane follows it.
   $effect(() => {
     const kept = keepSelection(

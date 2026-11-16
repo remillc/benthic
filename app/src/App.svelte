@@ -57,6 +57,7 @@
   import DesktopSelection from './pages/DesktopSelection.svelte';
   import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
   import DesktopNewLogbook from './components/DesktopNewLogbook.svelte';
+  import AdaptivePage from './components/AdaptivePage.svelte';
   import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
@@ -124,7 +125,7 @@
     { path: '/download/failed', component: DownloadFailed },
     // Desktop app from 1200 dp: Réglages as categories with a search, and À propos as a dialog
     // (task 2026-11-15-202); else the phone's pages.
-    { path: '/settings/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop || settingsWindow, windowed: settingsWindow } }) },
+    { path: '/settings/', ...(settingsWindow ? { component: Settings, options: { props: { desk: true, windowed: true } } } : { component: AdaptivePage, options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false } } } }) },
     { path: '/about', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.desktop ? { popup: { component: About } } : { component: About }) },
     { path: '/about/notes', component: AboutText, options: { props: { which: 'notes' } } },
     { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
@@ -193,7 +194,7 @@
     { path: '/settings/planner', component: PlannerSettings },
     { path: '/plan/:id', component: Planner },
     // Desktop app from 1200 dp: the sites as a table beside the map (task 2026-11-15-171); else the phone's screen.
-    { path: '/sites/', async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopSites : Sites }) },
+    { path: '/sites/', component: AdaptivePage, options: { props: { wide: DesktopSites, narrow: Sites } } },
     { path: '/sites/without/', component: DivesWithoutSite },
     { path: '/sites/without-site/:diveId', component: DiveNoSiteProfile },
     { path: '/sites/cleanup', component: SitesCleanup },
@@ -209,7 +210,7 @@
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
     // Desktop app from 1200 dp: the tools list and the chosen tool side by side (task 2026-11-15-196).
-    { path: '/tools/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: layout.desktop ? DesktopTools : Tools }) },
+    { path: '/tools/', component: AdaptivePage, options: { props: { wide: DesktopTools, narrow: Tools } } },
     { path: '/tools/desaturation', component: Desaturation },
     { path: '/tools/ead-mod', component: GasEadMod },
     { path: '/tools/best-mix', component: GasBestMix },
@@ -232,7 +233,8 @@
     {
       path: '/',
       // Desktop app from 1200 dp: the logbook as a table (task 2026-11-15-169); else the list.
-      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopLogbook : Logbook }),
+      component: AdaptivePage,
+      options: { props: { wide: DesktopLogbook, narrow: Logbook } },
       master: true,
       detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, { path: '/pane/selection', component: DesktopSelection }, PANE_EMPTY],
     },
@@ -248,8 +250,9 @@
       path: '/statistics/',
       // Desktop app from 1200 dp: the list and the chart of the chosen statistic on one page
       // (task 2026-11-15-171), not a master with a detail beside it; else the tablet's list.
-      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopStatistics : Statistics }),
-      master: () => !layout.desktop,
+      component: AdaptivePage,
+      options: { props: { wide: DesktopStatistics, narrow: Statistics } },
+      master: true,
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
         { path: '/statistics/dives/', component: StatisticsDives },
@@ -266,9 +269,10 @@
   const accountRoutes = [
     {
       path: '/settings/',
-      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop } }),
-      // Desktop app: Réglages is one page with its categories (task 2026-11-15-202), not a master with a detail.
-      master: () => !layout.desktop,
+      // Desktop app: Réglages is one page with its categories (task 2026-11-15-202); below, a master with a detail.
+      component: AdaptivePage,
+      options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false } } },
+      master: true,
       detailRoutes: [{ path: '/settings/:section', component: Settings }],
     },
     ...appRoutes,
@@ -309,43 +313,6 @@
     },
     routes: appRoutes,
   };
-
-  /**
-   * Loads a view's first page again, to swap its desktop layout and its tablet layout. A single
-   * `reloadAll` to the address the view already shows is ignored by Framework7 (the tablet's list
-   * on screen, no dive open): the view first goes to its empty detail, then to its first page.
-   * @param {string} id
-   * @param {string} path
-   * @param {string} [emptyPath] the view's empty detail (master-detail views only)
-   */
-  async function reloadView(id, path, emptyPath) {
-    const router = f7.views.get(id)?.router;
-    if (!router) return;
-    if (emptyPath && router.currentRoute?.url === path) {
-      await router.navigate(emptyPath, { reloadAll: true, animate: false });
-      await new Promise((resolve) => setTimeout(resolve, 300));
-    }
-    await router.navigate(path, { reloadAll: true, animate: false });
-  }
-
-  // Desktop app: crossing 1200 dp swaps the logbook's table and the tablet's list.
-  let desktopShown = layout.desktop;
-  $effect(() => {
-    const wide = layout.desktop;
-    if (wide === desktopShown) return;
-    desktopShown = wide;
-    reloadView('#view-logbook', '/', PANE_EMPTY.path);
-    reloadView('#view-statistics', '/statistics/', PANE_EMPTY.path);
-  });
-
-  // Crossing 1200 dp swaps the Outils section's desktop layout and the tablet's.
-  let desktopToolsShown = layout.desktop;
-  $effect(() => {
-    const wide = layout.desktop;
-    if (wide === desktopToolsShown) return;
-    desktopToolsShown = wide;
-    reloadView('#view-tools', '/tools/');
-  });
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.
   $effect(() => {
@@ -446,6 +413,16 @@
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */
+    /* Adaptive pages: the desktop layout of a master route fills the view, with no list column's width or border. */
+    :global(.view-master-detail .page-master:is(.od-desktop-statistics, .od-desktop-settings)) {
+      width: 100%;
+      border-right: 0;
+    }
+    /* ... and no detail pane or empty-pane notice beside it (a detail opened in the tablet layout comes back when the window narrows). */
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail),
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings))::after) {
+      display: none;
+    }
     :global(.view-master-detail .page-master-detail) {
       background: var(--od-surface);
     }

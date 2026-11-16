@@ -29,7 +29,7 @@
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import { t, tIfExists, deviceLanguage } from '../lib/i18n.js';
-  import { CATEGORIES, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
+  import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
   import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
   import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
@@ -88,6 +88,8 @@
 
   /** @type {{ f7route?: { params?: { section?: string } }, f7router?: any, desk?: boolean, windowed?: boolean }} */
   let { f7route = undefined, f7router = undefined, desk = false, windowed = false } = $props();
+  // Adaptive page: arriving from the tablet layout, the desktop opens the category of the subpage shown there.
+  if (desk && !windowed && selected.id) deskState.category = categoryOf(selected.id) || deskState.category;
   /**
    * The subpage shown (task 2026-11-13-111): '' for the overview (/settings/), else one
    * group of rows (/settings/<section>).
@@ -881,7 +883,9 @@
   function openFirstSubpage() {
     if (section || !layout.split || !f7router) return;
     const detail = f7router.currentRoute?.path ?? '';
-    if (!detail.startsWith('/settings/') || detail === '/settings/') f7router.navigate('/settings/display', { reloadDetail: true });
+    // Adaptive page: arriving from the desktop layout, the subpage of the category chosen there.
+    const chosen = CATEGORIES.find((c) => c.id === deskState.category)?.groups.find((g) => cards.some((card) => card.rows.some((row) => row.id === g)));
+    if (!detail.startsWith('/settings/') || detail === '/settings/') f7router.navigate(`/settings/${chosen ?? 'display'}`, { reloadDetail: true });
   }
 
   /** The overview: no subpage and no search. */
@@ -1105,6 +1109,9 @@
   function chooseCategory(id) {
     search = '';
     deskState.category = id;
+    // Kept for the tablet layout: its overview marks the row of this category.
+    const group = CATEGORIES.find((c) => c.id === id)?.groups.find((g) => cards.some((card) => card.rows.some((row) => row.id === g)));
+    if (group) selected.id = group;
   }
 
   /** « Affichage et Profil et décompression »: the categories of the results. @param {{ category: string }[]} blocks */
