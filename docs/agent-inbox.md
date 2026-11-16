@@ -4611,3 +4611,14 @@ The step content sits on the paper side, in the column of the release tablet ste
 - **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
 
 **Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
+
+## [ ] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/bureau-demarrage-actuel.dc.html` (no logbook open in the window) and `docs/mockups/bureau-carnet-vide-actuel.dc.html` (empty logbook).
+
+In the desktop app, the navigation rail always ends with « Réglages » (gear, shortcut Ctrl+, / ⌘,) and the account avatar at the bottom, as on the other desktop screens such as `bureau-carnets-accueil.dc.html`.
+
+- **No logbook open in the window:** only the four sections (Carnet, Sites, Statistiques, Outils) are dimmed and unavailable. « Réglages » and the avatar keep full colour and work, since they do not depend on a logbook.
+- **Empty logbook:** the rail is the full one, with « Réglages » and the avatar.
+
+**Test:** open a window with no logbook. The four sections are dimmed, and « Réglages » and the avatar are at the bottom of the rail and open their screens. Open an empty logbook: the rail shows the same two items.
