@@ -1518,6 +1518,16 @@ html.md {
       transform: scale(1);
     }
 
+    /* The first launch's snackbar on a tablet (task 2026-11-16-239): bottom left, 24 dp from the rail's edge. */
+    @media (min-width: 768px) {
+      &.od-snackbar-start {
+        left: calc(var(--od-nav-width, 96px) + 24px);
+        right: auto;
+        bottom: calc(24px + var(--f7-safe-area-bottom));
+        width: max-content;
+      }
+    }
+
     /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */
     &.od-snackbar-above-fab {
       --od-snackbar-bottom: calc(88px + var(--od-bottom-nav-room, 0px));

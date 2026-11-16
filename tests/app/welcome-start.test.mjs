@@ -5,7 +5,7 @@ import { test } from 'node:test';
 
 const i18nDir = new URL('../../app/src/i18n/', import.meta.url);
 const source = readFileSync(new URL('../../app/src/pages/WelcomeStart.svelte', import.meta.url), 'utf8');
-const ios = source.slice(source.indexOf('{:else}'), source.indexOf('</Page>'));
+const ios = source.slice(source.lastIndexOf('{:else}', source.indexOf('</Page>')), source.indexOf('</Page>'));
 const OBSOLETE = ['intro', 'existing', 'existingText', 'create', 'createText', 'noAccountText'];
 
 test('iOS first launch uses the short keys and the tablet note on iPad', () => {
@@ -29,33 +29,25 @@ test('the water gradient ends in --od-water-bottom and the line is --od-trace', 
   assert.doesNotMatch(source, /--od-water-bottom:|#1F2124/i);
 });
 
-test('tablet first launch: a larger brand row (logo 96 dp, « OpenDives » 48 sp), the phone unchanged', () => {
-  const tablet = source.slice(source.indexOf('@media (min-width: 768px)'));
-  assert.match(tablet, /\.od-welcome-start--brand \{\s*gap: 20px;\s*font-size: 48px;\s*line-height: 56px;\s*letter-spacing: -0\.5px;/);
-  assert.match(tablet, /\.od-welcome-start--logo \{\s*width: 96px;\s*height: 96px;/);
-  const phone = source.slice(0, source.indexOf('@media (min-width: 768px)'));
-  assert.match(phone, /\.od-welcome-start--brand \{[^}]*gap: 10px;[^}]*font-size: 20px;/);
-  assert.match(source, /src="logo-light\.svg" alt="" width="40" height="40"/);
+// Tasks 210 and 211 (the larger brand row and the profile off the screen edges) and the tablet half of tasks
+// 225 and 229 (the pill badge after the name) described the old tablet head. Task 237 replaces that head with the
+// blue panel (components/FirstLaunchPanel.svelte): the logo is 96 dp and « OpenDives » 48 sp as in task 210, the
+// badge is the panel's own (12 sp, task 237); the profile is the animated one. The assertions moved to
+// tests/app/tablet-first-launch.test.mjs; what stays here is the phone and iOS side.
+test('the tablet head of tasks 210 and 211 is gone, the phone and iOS keep what they had', () => {
+  assert.doesNotMatch(source, /od-welcome-start--head["\s]|od-welcome-start--wide-profile|od-welcome-start--brand/);
+  assert.doesNotMatch(source, /DecorativeProfile/);
+  // The phone's low-window rule keeps its tighter gap.
+  assert.match(source, /@media \(max-width: 767\.98px\) and \(max-height: 820px\) \{\s*\.od-welcome-start--buttons \{\s*gap: 8px;/);
 });
 
-test('tablet first launch: the profile stays off the screen edges in both orientations (task 211)', () => {
-  const tablet = source.slice(source.indexOf('@media (min-width: 768px)'));
-  const landscape = tablet.slice(tablet.indexOf('@media (orientation: landscape)'), tablet.indexOf('@media (orientation: portrait)'));
-  const portrait = tablet.slice(tablet.indexOf('@media (orientation: portrait)'));
-  assert.match(landscape, /wide-profile\) \{[^}]*width: calc\(100% - 56px\);[^}]*margin: 0 0 56px 56px;/);
-  assert.match(landscape, /\.od-welcome-start--head \{[^}]*margin: 34px 0 0 56px;/);
-  assert.match(portrait, /wide-profile\) \{[^}]*max-width: 520px;[^}]*margin: 32px auto 0;/);
-  assert.match(portrait, /\.od-welcome-start--head \{[^}]*max-width: 520px;/);
-});
-
-test('tasks 225 and 229: an « Alpha » badge follows the name, read once as « OpenDives, alpha »', () => {
+test('tasks 225 and 229: iOS keeps the pill badge after the name, read once as « OpenDives, alpha »', () => {
   const fr = JSON.parse(readFileSync(new URL('../../app/src/i18n/fr.json', import.meta.url), 'utf8'));
   const en = JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8'));
   assert.equal(fr.welcome.alpha, 'Alpha');
   assert.equal(en.welcome.alpha, 'Alpha');
   assert.equal(fr.welcome.brandAlpha, 'OpenDives, alpha');
-  assert.match(source, /class="od-welcome-start--brand" role="img" aria-label=\{t\('welcome\.brandAlpha'\)\}/);
-  assert.match(source, /<span class="od-welcome-start--name" aria-hidden="true">OpenDives<span class="od-welcome-start--alpha">/);
+  assert.match(ios, /<h1 aria-label=\{t\('welcome\.brandAlpha'\)\}>[\s\S]*od-welcome-start--alpha/);
   assert.match(source, /\.od-welcome-start--alpha \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
   const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');
   assert.match(theme, /--od-alpha-badge: #DCE7F3;\s*--od-on-alpha-badge: #114477;/);

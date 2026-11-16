@@ -9,16 +9,18 @@
   import Icon from '../components/Icon.svelte';
   import { announceFirstLaunch } from '../lib/account.js';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
+  import { deviceKey } from '../lib/first-launch.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   let busy = $state(false);
 
-  /** @type {{ key: string, icon: 'device'|'warning'|'link', warn?: boolean }[]} */
-  const rows = [
-    { key: 'phoneOnly', icon: 'device' },
-    { key: 'noBackup', icon: 'warning', warn: true },
-    { key: 'later', icon: 'link' },
-  ];
+  /** @type {{ key: string, text: string, icon: 'device'|'tablet'|'warning'|'link', warn?: boolean }[]} */
+  const rows = $derived([
+    { key: 'phoneOnly', text: 'phoneOnlyText', icon: layout.phone ? 'device' : 'tablet' },
+    { key: 'noBackup', text: layout.phone ? 'noBackupText' : 'noBackupTextTablet', icon: 'warning', warn: true },
+    { key: 'later', text: 'laterText', icon: 'link' },
+  ]);
 
   async function start() {
     busy = true;
@@ -46,8 +48,8 @@
       <li>
         <span class="od-without-account--tile" class:od-without-account--warn={row.warn} aria-hidden="true"><Icon name={row.icon} size={22} /></span>
         <span class="od-without-account--text">
-          <span class="od-without-account--label">{t(`firstLaunch.local.${row.key}`)}</span>
-          <span class="od-without-account--detail">{t(`firstLaunch.local.${row.key}Text`)}</span>
+          <span class="od-without-account--label">{t(row.key === 'phoneOnly' ? deviceKey('firstLaunch.local.phoneOnly', layout.phone) : `firstLaunch.local.${row.key}`)}</span>
+          <span class="od-without-account--detail">{t(`firstLaunch.local.${row.text}`)}</span>
         </span>
       </li>
     {/each}

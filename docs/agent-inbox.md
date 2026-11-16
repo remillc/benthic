@@ -4533,7 +4533,7 @@ Content below the band (« Retour », title, fields, buttons, the About link) is
 
 Done: the header of the steps is `FirstLaunchBand` in its `step` variant: 140 dp plus the status bar (`max(safe-area-top, 24px) + 140px`, so 164 dp in the 390 × 844 test), the same hatched blue as the welcome band, a straight bottom edge, no wave and no profile (`SectionBand` is not used). The content shifts down 32 dp and fits in 390 × 844 on every step, error states included (the About link is at 844 − 28 dp). White text on the step band: « OpenDives » 7.4:1, badge 5.06:1.
 
-## [ ] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
+## [x] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
 
@@ -4569,6 +4569,8 @@ The tablet first-launch screen (the one with « J’ai un compte Subsurface », 
 
 **Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
 
+Done: the tablet first-launch screen has the blue panel (`components/FirstLaunchPanel.svelte`: 700 dp on the left in landscape, 640 dp at the top in portrait, the hatched blue of the phone's band, the 96 dp logo, « OpenDives » at 48 sp, the Alpha badge, the title at 40 sp, the paragraph at 16 sp / 78 %) and, on the paper side, « Pour commencer » at 28 sp, the three buttons with their hints unchanged, a thin divider and the git link; « Une question ? » stays, centred on the content side. The profile is `components/ProfileHero.svelte` (curves and timing in `lib/profile-hero.js`, one curve per orientation scaled to its box): the line and its glow draw in 2.2 s with `cubic-bezier(0.4, 0, 0.2, 1)` by stroke trimming, the water column is still, the dot appears at 0.7 s (40 % to 100 %, fade over 0.3 s), the two labels rise 8 dp at 2.1 s over 0.5 s; the page re-creates the profile in `onPageBeforeIn`, so it plays each time the screen is shown; `prefers-reduced-motion` shows the final state at once. The badge fill is 12 %, not the 18 % of the brief, as on the phone's welcome band: with 18 % the white 12 sp text measured 4.2:1 on the panel, with 12 % 4.7:1 or more. The assertions of tasks 210, 211, 225 and 229 about the old tablet head (larger brand row, profile off the edges, pill badge on the tablet) were replaced on purpose by `tests/app/tablet-first-launch.test.mjs`; the old head and its CSS are removed (the phone and iOS branches are unchanged). Phones 412 x 915 and 390 x 844 are pixel-identical before and after.
+
 ## [x] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Reference mock-up: `docs/mockups/android-tablette-detail-menu-paysage.dc.html`; the same chart appears in every tablet screen that shows the dive detail.
@@ -4583,7 +4585,7 @@ Nothing else changes: the grid lines, ticks and other curves, the water fill, th
 
 Done on main: from 768 dp, a token `--od-profile-main-width: 1` gives the depth line and the temperature curve of `DiveProfile.svelte` 1 dp; every other curve keeps `--od-profile-line-width` (1.25 dp), the phone is unchanged, and high contrast keeps its 2 dp. Test in `tests/app/profile-lines.test.mjs`.
 
-## [ ] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
+## [x] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** This follows task 237, which covers the tablet first-launch screen itself, and the phone steps of tasks 224–236.
 
@@ -4605,3 +4607,5 @@ The step content sits on the paper side, in the column of the release tablet ste
 - **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
 
 **Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
+
+Done: the three tablet paths (Subsurface account with its download, account creation with the code, « Commencer sans compte ») use the new style: the blue panel of task 237 shown still (no animation), the step in a 452 dp column vertically centred (landscape: beside the panel; portrait: under it, 120 dp side margins), « Retour », the title at 28 sp, the content of the phone steps (same components: `AccountField`, `CodeField`, the download card, the rows of `WithoutAccount`), buttons right-aligned and not full width, and the help link at the bottom of the content side. « ce téléphone » becomes « cette tablette » through `deviceKey` (`lib/first-launch.js`; keys with a `Tablet` suffix in fr.json and en.json) and the phone icon a tablet icon. The six code boxes are one 328 dp group centred in the column, the label, the error and « Renvoyer le code » at the left edge of the first box. « Commencer sans compte » on a tablet now goes through its own screen too (iOS still starts the logbook straight away). The logbook opens with the tablet snackbars (« Carnet téléchargé. Il reste sur cette tablette, même sans réseau. », « Compte créé. Votre carnet est prêt. », « Carnet créé sur cette tablette. ») at the bottom left, 24 dp from the rail's edge (`placement: 'start'`), and the empty local logbook says « Sur cette tablette seulement, aucune plongée ». Difference from the mock-ups: the account logbook keeps the existing subtitle « Connecté au cloud Subsurface, aucune plongée » instead of the two-line header « Cloud Subsurface / Aucune plongée ». Tests that said a tablet keeps its old screens (`tests/app/first-launch.test.mjs`) now say it takes the new style, on purpose. Phones are pixel-identical before and after.

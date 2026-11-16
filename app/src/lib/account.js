@@ -9,7 +9,7 @@ import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './log
 import { confirmAction } from './dialogs.js';
 import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
-import { FIRST_LAUNCH_SNACKBARS, newFirstLaunch } from './first-launch.js';
+import { FIRST_LAUNCH_SNACKBARS, FIRST_LAUNCH_SNACKBARS_TABLET, newFirstLaunch } from './first-launch.js';
 import { layout, ios } from './layout.svelte.js';
 
 /**
@@ -113,10 +113,12 @@ function toastText(text) {
  * @param {keyof typeof FIRST_LAUNCH_SNACKBARS} kind
  */
 export function announceFirstLaunch(kind) {
-  setTimeout(() => showSnackbar(t(FIRST_LAUNCH_SNACKBARS[kind])), 400);
+  const keys = layout.phone ? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET;
+  // On a tablet it sits at the bottom left, 24 dp from the content's edge (task 2026-11-16-239).
+  setTimeout(() => showSnackbar(t(keys[kind]), { placement: 'start' }), 400);
 }
 
-/** Alpha first launch on a phone: the new screens and snackbars. */
+/** Alpha first launch on Android, phone or tablet: the new screens and snackbars. */
 export function phoneFirstLaunch() {
   return newFirstLaunch({ phone: layout.phone, ios });
 }

@@ -1,14 +1,25 @@
 // @ts-check
-// The alpha first launch on Android phones (tasks 2026-11-16-233 to 236): which screens use the new style,
-// the three steps of the download after signing in, and the snackbar that follows each path.
-// Tablets and iOS keep the screens they had.
+// The alpha first launch on Android (phones: tasks 2026-11-16-233 to 236; tablets: tasks 237 and 239): which
+// screens use the new style, the three steps of the download after signing in, and the snackbar that follows
+// each path. iOS keeps the screens it had.
 
 /**
- * The new first-launch style: Android look on a phone (below 768 dp).
+ * The new first-launch style: the Android look, on a phone (below 768 dp: a blue band) and on a tablet (a
+ * blue panel beside or above the step). The wording is the device's (see `deviceKey`).
  * @param {{ phone: boolean, ios: boolean }} where
  */
-export function newFirstLaunch({ phone, ios }) {
-  return !!phone && !ios;
+export function newFirstLaunch({ ios }) {
+  return !ios;
+}
+
+/**
+ * The key of a text that names the device: « ce téléphone » on a phone, the `Tablet` variant (« cette
+ * tablette ») on a tablet.
+ * @param {string} key the phone's key
+ * @param {boolean} phone
+ */
+export function deviceKey(key, phone) {
+  return phone ? key : `${key}Tablet`;
 }
 
 /** The snackbar of each path, shown over the logbook that opens at the end. */
@@ -19,6 +30,13 @@ export const FIRST_LAUNCH_SNACKBARS = /** @type {const} */ ({
   created: 'firstLaunch.snackbar.created',
   /** Without an account: the logbook of this phone. */
   local: 'firstLaunch.snackbar.local',
+});
+
+/** The same snackbars on a tablet (« cette tablette »). */
+export const FIRST_LAUNCH_SNACKBARS_TABLET = /** @type {const} */ ({
+  downloaded: 'firstLaunch.snackbar.downloadedTablet',
+  created: 'firstLaunch.snackbar.created',
+  local: 'firstLaunch.snackbar.localTablet',
 });
 
 /**

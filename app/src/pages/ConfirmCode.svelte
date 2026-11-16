@@ -112,6 +112,15 @@
         margin: 8px 0 0;
       }
 
+      /* Beside the tablet's panel (task 2026-11-16-239): the group of boxes is centred in the column, and the
+         label, the error and « Renvoyer le code » start at the left edge of the first box. */
+      :global(.od-editorial-page--panelled) & {
+        /* Six boxes of 48 dp and five gaps of 8 dp. */
+        width: 328px;
+        max-width: 100%;
+        margin: 8px auto 0;
+      }
+
       :global(.ios) & {
         margin: 0;
       }

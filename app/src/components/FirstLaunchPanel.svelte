@@ -8,8 +8,12 @@
   import ProfileHero from './ProfileHero.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** Changes each time the screen is shown: the profile is created again and plays its animation again. */
-  let { playKey = 0 } = $props();
+  /**
+   * playKey: changes each time the screen is shown, the profile is created again and plays its animation again.
+   * still: the steps (task 2026-11-16-239) show the profile without the animation.
+   * @type {{ playKey?: number, still?: boolean }}
+   */
+  let { playKey = 0, still = false } = $props();
 </script>
 
 <header class="od-first-launch-panel">
@@ -24,7 +28,7 @@
   <p class="od-first-launch-panel--intro">{t('firstLaunch.bandIntro')}</p>
   <div class="od-first-launch-panel--profile">
     {#key playKey}
-      <ProfileHero />
+      <ProfileHero {still} />
     {/key}
   </div>
 </header>
@@ -91,13 +95,15 @@
       white-space: nowrap;
     }
 
-    /* « Alpha »: 12 sp, line 16, letter spacing 0.6, padding 2 × 8 dp, white fill at 18 %, outline at 55 %. */
+    /* « Alpha »: 12 sp, line 16, letter spacing 0.6, padding 2 × 8 dp, outline at 55 %. The white fill is 12 % and
+       not the 18 % of the brief, as on the phone's welcome band (task 233): with 18 % the white 12 sp text measured
+       4.2:1 on the panel, with 12 % it is above 4.5:1 (WCAG AA). */
     .od-first-launch-panel--alpha {
       margin-left: -6px;
       padding: 2px 8px;
       border: 1px solid var(--od-first-band-badge-line);
       border-radius: 999px;
-      background: var(--od-first-band-badge);
+      background: var(--od-first-band-badge-welcome);
       color: var(--od-on-first-band);
       font-size: 12px;
       line-height: 16px;

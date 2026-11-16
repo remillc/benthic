@@ -12,6 +12,9 @@
   import { scaledProfile } from '../lib/profile-hero.js';
   import { t } from '../lib/i18n.js';
 
+  /** @type {{ still?: boolean }} still: the final state, without the animation (the steps after the first screen) */
+  let { still = false } = $props();
+
   let width = $state(588);
   let height = $state(300);
   const query = typeof matchMedia === 'function' ? matchMedia('(orientation: portrait)') : null;
@@ -29,7 +32,7 @@
   const glow = `od-profile-hero-glow-${id}`;
 </script>
 
-<div class="od-profile-hero" class:od-profile-hero--portrait={portrait} bind:clientWidth={width} bind:clientHeight={height}>
+<div class="od-profile-hero" class:od-profile-hero--portrait={portrait} class:od-profile-hero--still={still} bind:clientWidth={width} bind:clientHeight={height}>
   <svg class="od-profile-hero--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('firstLaunch.profileLabel')}>
     <defs>
       <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
@@ -195,6 +198,15 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
+      .od-profile-hero--glow,
+      .od-profile-hero--line,
+      .od-profile-hero--dot,
+      .od-profile-hero--label {
+        animation: none;
+      }
+    }
+
+    .od-profile-hero--still {
       .od-profile-hero--glow,
       .od-profile-hero--line,
       .od-profile-hero--dot,

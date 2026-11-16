@@ -39,12 +39,12 @@
   function withoutAccount(/** @type {MouseEvent} */ e) {
     e.preventDefault();
     // Android phone (task 2026-11-16-233): a screen says where the logbook stays before it is created.
-    if (!theme.ios && layout.phone) f7router.navigate('/welcome/local');
+    if (!theme.ios) f7router.navigate('/welcome/local');
     else startWithoutAccount();
   }
 </script>
 
-<Page class="od-welcome-start{panel ? ' od-welcome-start--panelled' : ''}" onPageBeforeIn={() => playKey++}>
+<Page class="od-welcome-start{panel ? ' od-first-panelled' : ''}" onPageBeforeIn={() => playKey++}>
   {#if !theme.ios}
     <div class="od-welcome-start--page" class:od-welcome-start--with-band={layout.phone} class:od-welcome-start--with-panel={panel}>
       {#if layout.phone}
@@ -333,15 +333,6 @@
 
       .od-welcome-start--pill {
         cursor: pointer;
-      }
-    }
-
-    /* The « Une question ? » link sits in the middle of the choices' side, not of the screen. */
-    :global(.od-welcome-start--panelled) {
-      --od-help-link-left: calc(min(700px, 55%) + (100% - min(700px, 55%)) / 2);
-
-      @media (orientation: portrait) {
-        --od-help-link-left: 50%;
       }
     }
 
