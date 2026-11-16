@@ -5192,9 +5192,11 @@ Cloud sign-in pages open in the system authentication sheet (`ASWebAuthenticatio
 
 Done on `feature/release-phone-first-launch` (not merged): on iPhone, the bands clear the island and the home indicator, « cet iPhone » texts, iCloud Drive first with no sign-in step, iOS grouped inset rows on every first-launch form, « Un fichier » opens the Files picker, an unreadable file shows an iOS alert with « Autre fichier ». Native parts written without a Mac and untested: `createIcloudLogbook` in Swift (creates the logbook folder in the app's iCloud Drive container; needs the iCloud capability on the App ID) and the iCloud entitlements; the core does not yet read or write a logbook there, so the screen then says the cloud is coming. Cloud sign-in through `ASWebAuthenticationSession` is not built.
 
-## [ ] 2026-11-16-262 Desktop (alpha): the five tabs of the dive detail
+## [x] 2026-11-16-262 Desktop (alpha): the five tabs of the dive detail
 
-Christian approved this on 16 November 2026. Alpha: work on `main`. Build what the mock-ups show and ignore any earlier desktop detail tab you built: these mock-ups replace it.
+Christian approved this on 16 November 2026. Alpha: work on `main`.
+
+Done on `feature/desktop-logbook` (the desktop app lives there): the five tabs, edited in place. « Autre équipement » and « Sous-vêtement » are built but not stored: they wait for the OpenDives server. Build what the mock-ups show and ignore any earlier desktop detail tab you built: these mock-ups replace it.
 
 The detail pane of the desktop logbook has five tabs: Informations, Équipement, Gaz, Notes and Carte. Every grey field is edited in place with one click and saved at once, as in `bureau-carnet-edition-sur-place`.
 
