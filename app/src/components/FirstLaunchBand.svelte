@@ -4,7 +4,7 @@
   // docs/mockups/android-accueil-c.dc.html and android-premier-lancement-*.dc.html): the same panel as the
   // tablet's (gradient, sheen, hatching), with the logo, « OpenDives » and the « Alpha » badge.
   // `welcome`: 330 dp, with the headline, the line under it and the decorative dive profile.
-  // `step`: 140 dp, only the brand, a straight bottom edge (no wave, no profile).
+  // `step`: 140 dp under the status bar, only the brand, a straight bottom edge (no wave, no profile).
   // The status bar is part of the band: its height (at least 24 dp) comes first.
   import { t } from '../lib/i18n.js';
   import { decorativeProfilePath } from '../lib/smooth-path.js';
@@ -58,7 +58,7 @@
       position: relative;
       flex: none;
       width: 100%;
-      height: calc(var(--od-first-band-top) + 116px);
+      height: calc(var(--od-first-band-top) + 140px);
       padding: calc(var(--od-first-band-top) + 16px) 20px 0;
       overflow: hidden;
       background: var(--od-first-band);

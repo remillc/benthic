@@ -548,7 +548,7 @@
 
     /* The busy indicator runs under the band. */
     .od-editorial-page--linear.od-editorial-page--linear-band {
-      top: calc(max(var(--f7-safe-area-top), 24px) + 116px);
+      top: calc(max(var(--f7-safe-area-top), 24px) + 140px);
     }
 
     /* iPhone: the same layout with iOS sizes (compte-*-ios.dc.html). */

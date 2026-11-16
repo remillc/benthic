@@ -115,10 +115,10 @@ test('the download: three steps from the sync progress, the count of what the co
   assert.equal(langs.fr.firstLaunch.download.count.replace('{n}', '184').replace('{total}', '312'), '184 sur 312');
 });
 
-test('the band: 330 dp on the welcome screen, 140 dp on a step, a straight edge, the badge 16 dp tall', () => {
-  assert.match(band, /height: calc\(var\(--od-first-band-top\) \+ 116px\);/);
+test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, a straight edge, the badge 16 dp tall', () => {
+  assert.match(band, /height: calc\(var\(--od-first-band-top\) \+ 140px\);/);
   assert.match(band, /\.od-first-launch-band--welcome \{\s*height: calc\(var\(--od-first-band-top\) \+ 306px\);/);
-  // 24 dp of status bar + 116 = 140; 24 + 306 = 330.
+  // The step band is 140 dp under the status bar (task 236); the welcome band is 330 dp with it (24 + 306).
   assert.match(band, /--od-first-band-top: max\(var\(--f7-safe-area-top\), 24px\)/);
   // A step has no wave and no profile: the profile is drawn on the welcome band only, and no SectionBand is used.
   assert.match(band, /\{#if welcome\}\s*<h1[\s\S]*<svg class="od-first-launch-band--profile"/);
