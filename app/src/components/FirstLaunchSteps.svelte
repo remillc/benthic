@@ -1575,6 +1575,12 @@
        link between OpenDives and the service is compact and centred (80 dp tiles under 104 dp names, a 120 dp
        line), and the words under it are a little larger. */
     .od-first-launch--desktop {
+      /* A step taller than the window scrolls from its top: auto margins centre it only when there is room. */
+      .od-first-launch--step {
+        align-self: start;
+        margin-block: auto;
+      }
+
       .od-first-launch--hero {
         padding: 24px 16px 18px;
         justify-content: center;
@@ -1585,6 +1591,12 @@
         gap: 8px;
       }
 
+      .od-first-launch--hero-tile {
+        width: 80px;
+        height: 80px;
+        border-radius: 24px;
+      }
+
       .od-first-launch--hero-name {
         font-size: 14px;
         line-height: 19px;
@@ -1593,7 +1605,16 @@
       .od-first-launch--hero-link {
         flex: none;
         width: 120px;
+        height: 80px;
         padding: 0;
+      }
+
+      .od-first-launch--action {
+        align-self: flex-end;
+      }
+
+      .od-first-launch--action.od-first-launch--action-centre {
+        align-self: center;
       }
 
       .od-first-launch--status {

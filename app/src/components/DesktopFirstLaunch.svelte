@@ -5,17 +5,17 @@
   // logbook shows in the release edition, in place of components/DesktopLogbookStart.svelte (which the beta keeps,
   // task 2026-11-15-173). The blue panel (700 dp, the window's full height) is on the left, as on a tablet in
   // landscape (pages/WelcomeStartRelease.svelte), and the steps are on the right (components/FirstLaunchSteps.svelte).
-  // It covers the whole window; it steps aside while a page is open over it (About, the token help) or Réglages is
-  // shown, and keeps its state meanwhile. The logbook the steps make is created by the main process, which reloads
+  // It covers the whole window; it steps aside while a page is open under it (the token help) or Réglages is shown,
+  // and keeps its state meanwhile. About is a popup and opens above it. The logbook the steps make is created by the main process, which reloads
   // this window on it (lib/desktop-first-launch.js).
   import { onMount } from 'svelte';
-  import { f7 } from 'framework7-svelte';
+  import { f7, f7ready } from 'framework7-svelte';
   import ReleaseProfile from './ReleaseProfile.svelte';
   import FirstLaunchSteps from './FirstLaunchSteps.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** A page is open over the start screen: About, or the token help of the git step. */
+  /** A page is open over the start screen: the token help of the git step (About is a popup, above this screen). */
   let pushed = $state(false);
   const visible = $derived(navigation.section !== 'account' && !pushed);
 
@@ -27,14 +27,21 @@
   onMount(() => {
     document.documentElement.classList.add('od-no-logbook');
     const update = () => {
-      const path = f7.views.current?.router?.currentRoute?.path ?? '/';
-      pushed = path === '/about' || path.startsWith('/welcome/');
+      const path = f7.views.get('#view-logbook')?.router?.currentRoute?.path ?? '/';
+      pushed = path.startsWith('/welcome/');
     };
-    f7.on('routeChanged', update);
-    f7.on('pageAfterIn', update);
-    f7.on('pageAfterOut', update);
+    let ready = false;
+    // The views are built after this component: Framework7 is waited for.
+    f7ready(() => {
+      ready = true;
+      f7.on('routeChanged', update);
+      f7.on('pageAfterIn', update);
+      f7.on('pageAfterOut', update);
+      update();
+    });
     return () => {
       document.documentElement.classList.remove('od-no-logbook');
+      if (!ready) return;
       f7.off('routeChanged', update);
       f7.off('pageAfterIn', update);
       f7.off('pageAfterOut', update);
@@ -82,7 +89,9 @@
       position: relative;
       box-sizing: border-box;
       flex: none;
-      width: clamp(300px, 48.6%, 700px);
+      width: 48.6%;
+      min-width: 300px;
+      max-width: 700px;
       overflow: hidden;
       padding: 80px 56px 0;
       display: flex;
@@ -154,8 +163,9 @@
       margin: 42px 0 96px;
     }
 
-    /* The steps: the tablet's column, in landscape whatever the window's shape (the portrait and phone rules of the
-       column's CSS answer to the screen, not to the window). */
+    /* The steps: the tablet's column, in landscape whatever the window's shape. The portrait and phone rules of the
+       column's CSS answer to the screen, not to the window: a desktop window is never a phone, but from 760 to
+       767 dp wide it matches the phone query, so what those rules change is set again here. */
     .od-desktop-first-launch--steps {
       flex: 1;
       min-width: 0;
@@ -164,6 +174,27 @@
 
       :global(.od-first-launch) {
         padding: 54px 64px 76px;
+        overflow: hidden;
+      }
+
+      :global(.od-first-launch--stage) {
+        overflow-y: auto;
+      }
+
+      :global(.od-first-launch-git--action),
+      :global(.od-first-launch-webdav--action) {
+        align-self: flex-end;
+      }
+
+      /* Pinned 28 dp above the bottom, as on a tablet. */
+      :global(.od-welcome-help-link) {
+        position: absolute;
+        left: 50%;
+        bottom: 28px;
+        margin: 0;
+        padding: 6px 12px;
+        transform: translateX(-50%);
+        white-space: nowrap;
       }
     }
 
@@ -203,6 +234,57 @@
 
       .od-desktop-first-launch--steps :global(.od-first-launch) {
         padding: 24px 32px 76px;
+      }
+    }
+
+    /* A narrow window: the panel gives the steps room, down to 300 dp at the smallest window (760 dp). */
+    @media (max-width: 1100px) {
+      .od-desktop-first-launch--panel {
+        width: 40%;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .od-desktop-first-launch--panel {
+        padding: 32px 24px 0;
+      }
+
+      .od-desktop-first-launch--brand {
+        gap: 10px;
+        font-size: 26px;
+        line-height: 32px;
+      }
+
+      .od-desktop-first-launch--logo {
+        width: 48px;
+        height: 48px;
+      }
+
+      .od-desktop-first-launch--headline {
+        margin-top: 20px;
+        font-size: 22px;
+        line-height: 28px;
+        letter-spacing: 0;
+      }
+
+      .od-desktop-first-launch--intro {
+        font-size: 13px;
+        line-height: 18px;
+      }
+    }
+
+    /* A short window (down to 560 dp tall): the column scrolls, and the help link follows it instead of floating
+       over the choices. */
+    @media (max-height: 700px) {
+      .od-desktop-first-launch--steps :global(.od-first-launch) {
+        padding: 16px 32px 4px;
+      }
+
+      .od-desktop-first-launch--steps :global(.od-welcome-help-link) {
+        position: static;
+        flex: none;
+        margin: 4px auto 10px;
+        transform: none;
       }
     }
   }
