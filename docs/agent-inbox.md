@@ -5166,7 +5166,7 @@ They use the release first-launch frame (the blue panel with the animated profil
 
 On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
 
-## [ ] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
+## [x] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`.
 
@@ -5189,3 +5189,5 @@ Cloud sign-in pages open in the system authentication sheet (`ASWebAuthenticatio
 - The WebDAV form shows iOS rows.
 - « Un fichier » opens the Files picker.
 - An unreadable file shows the alert, and « Autre fichier » reopens the picker.
+
+Done on `feature/release-phone-first-launch` (not merged): on iPhone, the bands clear the island and the home indicator, « cet iPhone » texts, iCloud Drive first with no sign-in step, iOS grouped inset rows on every first-launch form, « Un fichier » opens the Files picker, an unreadable file shows an iOS alert with « Autre fichier ». Native parts written without a Mac and untested: `createIcloudLogbook` in Swift (creates the logbook folder in the app's iCloud Drive container; needs the iCloud capability on the App ID) and the iCloud entitlements; the core does not yet read or write a logbook there, so the screen then says the cloud is coming. Cloud sign-in through `ASWebAuthenticationSession` is not built.
