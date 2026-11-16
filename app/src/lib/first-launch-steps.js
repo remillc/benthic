@@ -4,7 +4,8 @@
 // can check the order of every path.
 //
 // Paths:
-//   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
+//   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device;
+//   iCloud Drive, iPhone only: cloudService → cloudConnected, no sign-in)
 //   start → import → (file | importDivelogs → importProgress) → importNew → where as above
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
 //
@@ -33,6 +34,7 @@ const FORWARD = {
   'importNew:cloud': 'cloudService',
   'importNew:git': 'git',
   'cloudService:service': 'cloudConnect',
+  'cloudService:icloud': 'cloudConnected',
   'cloudService:webdav': 'webdav',
   'cloudConnect:connected': 'cloudConnected',
   'import:divelogs': 'importDivelogs',
@@ -41,6 +43,7 @@ const FORWARD = {
   'open:cloud': 'openCloudService',
   'open:git': 'openGit',
   'openCloudService:service': 'openCloudConnect',
+  'openCloudService:icloud': 'openCloudConnected',
   'openCloudService:webdav': 'openWebdav',
   'openCloudConnect:connected': 'openCloudConnected',
   'openCloudConnected:list': 'openChoose',

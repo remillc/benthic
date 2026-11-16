@@ -48,6 +48,22 @@ export const CLOUD_SERVICES = [
 ];
 
 /**
+ * iCloud Drive, first in the list on an iPhone only (task 2026-11-16-261): the Apple account of the device, so there
+ * is no sign-in; `help` is the line under its name.
+ * @type {{ key: string, text: string, help: string, icon: 'cloud'|'server' }}
+ */
+export const ICLOUD_SERVICE = { key: 'icloud', text: 'welcomeSteps.icloud', help: 'welcomeSteps.icloudHelp', icon: 'cloud' };
+
+/**
+ * The services to offer: iCloud Drive first on an iPhone, the others as on every device.
+ * @param {boolean} iphone
+ * @returns {{ key: string, text: string, help?: string, icon: 'cloud'|'server' }[]}
+ */
+export function cloudServices(iphone) {
+  return iphone ? [ICLOUD_SERVICE, ...CLOUD_SERVICES] : CLOUD_SERVICES;
+}
+
+/**
  * « Se connecter à {service} » and the other cloud actions: idea #74 is not built yet, they say so.
  * @param {(text: string) => void} show the snackbar
  * @param {(key: string) => string} t
