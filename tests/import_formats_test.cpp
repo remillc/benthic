@@ -256,38 +256,85 @@ int main(int argc, char **argv)
 		if (*s.ref)
 			check(diffs == s.diffs, what + ": " + std::to_string(s.diffs) + " lines differ from the reference");
 	}
-	// The Suunto app exports a .json and a .fit for the same dive. Subsurface reads the two files
-	// as one dive when both are selected (suunto_json_fit_pair_import(), called by its import of
-	// several files); the façade's import_dives() reads one file at a time, so the app does not.
-	// Here the core's function is called as it is, to know what the pair gives.
-	{
-		std::string what = "suunto_ocean_nitrox.json + .fit (suunto-json, as a pair)";
-		std::string log = folder + "/log-pair[main]";
+	// The Suunto app exports a .json and a .fit for the same dive. Several files chosen together go
+	// through import_dives_files(), which reads a pair as one dive first (Subsurface's
+	// suunto_json_fit_pair_import(), as its desktop import does), then every other file on its own.
+	// The pair gives the reference; a .json alone, and files that are not a pair, still import.
+	struct Case {
+		const char *label;
+		std::vector<std::string> files;
+		int dives;          // dives added
+		const char *ref;    // reference to compare the added dives with ("" for none)
+		const char *error;  // expected refusal ("" for none)
+	};
+	const std::string nitrox = "suunto_ocean_nitrox";
+	const std::vector<Case> cases = {
+		{ "suunto_ocean_nitrox.json + .fit (the pair)", { "suunto_ocean_nitrox.json", "suunto_ocean_nitrox.fit" }, 1,
+		  "suunto_ocean_nitrox.xml", "" },
+		{ "suunto_ocean_nitrox.fit + .json (the other order)", { "suunto_ocean_nitrox.fit", "suunto_ocean_nitrox.json" }, 1,
+		  "suunto_ocean_nitrox.xml", "" },
+		{ "suunto_ocean_nitrox.json + .fit + suunto_ocean_air.json (the pair and a file of its own)",
+		  { "suunto_ocean_nitrox.json", "suunto_ocean_nitrox.fit", "suunto_ocean_air.json" }, 2, "", "" },
+		{ "suunto_ocean_nitrox.json + garmin .fit (no pair: each on its own)",
+		  { "suunto_ocean_nitrox.json", "garmin_2023-08-17-08-51-59.fit" }, 2, "", "" },
+		{ "suunto_ocean_air.json + suunto_eon_core_nitrox.json (two .json files)",
+		  { "suunto_ocean_air.json", "suunto_eon_core_nitrox.json" }, 2, "", "" },
+		{ "suunto_ocean_nitrox.json alone (one file)", { "suunto_ocean_nitrox.json" }, 1, "", "" },
+		{ "suunto_ocean_air.json + a file that is not a log", { "suunto_ocean_air.json", "DL7.zxu" }, 1, "", "" },
+	};
+	for (const Case &c: cases) {
+		std::string what = std::string(c.label) + " through import_dives_files()";
+		std::string log = folder + "/log-pair" + std::to_string(index++) + "[main]";
 		error.clear();
 		if (import_file(dives + "/test1.xml", log, error) <= 0) {
 			check(false, what + ": the logbook to import into (" + error + ")");
 			return 1;
 		}
-		size_t before = divelog.dives.size();
-		for (const auto &x: divelog.dives)
+		std::vector<const dive *> known;
+		for (const auto &x: divelog.dives) {
+			known.push_back(x.get());
 			x->selected = false;
-		std::vector<std::string> names = { dives + "/suunto_ocean_nitrox.json", dives + "/suunto_ocean_nitrox.fit" };
-		std::vector<bool> consumed(names.size(), false);
-		suunto_json_fit_pair_import(names, consumed, &divelog);
-		check(consumed[0] && consumed[1], what + ": both files read as one dive");
-		check(divelog.dives.size() == before + 1, what + ": one dive added");
-		for (size_t i = before; i < divelog.dives.size(); i++)
-			divelog.dives[i]->selected = true;
-		std::string out = folder + "/pair.out.ssrf";
+		}
+		std::vector<std::string> names;
+		for (const std::string &f: c.files)
+			names.push_back(dives + "/" + f);
+		if (import_dives_files(names, "multiple files", result, error)) {
+			check(false, what + ": refused (" + error + ")");
+			continue;
+		}
+		size_t added = 0;
+		for (const auto &x: divelog.dives) {
+			if (std::find(known.begin(), known.end(), x.get()) != known.end())
+				continue;
+			x->selected = true;
+			added++;
+		}
+		check((int)added == c.dives, what + ": " + std::to_string(c.dives) + " dives added (got " + std::to_string(added) + ")");
+		if (!*c.ref) {
+			printf("result: %s: %zu dives\n", what.c_str(), added);
+			continue;
+		}
+		std::string out = folder + "/pair" + std::to_string(index) + ".out.ssrf";
 		std::ostringstream detail;
 		if (save_dives_logic(out.c_str(), true, false)) {
 			check(false, what + ": the dives could not be written");
-		} else {
-			int d = differing_lines(trimmed_lines(out, true), trimmed_lines(dives + "/suunto_ocean_nitrox.xml", true), detail);
-			printf("result: %s: reference %s\n%s", what.c_str(), (d ? std::to_string(d) + " lines differ" : std::string("identical")).c_str(),
-			       detail.str().c_str());
-			check(d == 0, what + ": identical to the reference");
+			continue;
 		}
+		int d = differing_lines(trimmed_lines(out, true), trimmed_lines(dives + "/" + c.ref, true), detail);
+		printf("result: %s: reference %s\n%s", what.c_str(), (d ? std::to_string(d) + " lines differ" : std::string("identical")).c_str(),
+		       detail.str().c_str());
+		check(d == 0, what + ": identical to the reference");
+	}
+	// Nothing readable in any file: a refusal, as for one file.
+	{
+		std::string log = folder + "/log-pair-none[main]";
+		error.clear();
+		if (import_file(dives + "/test1.xml", log, error) <= 0) {
+			check(false, "the logbook to import into (" + error + ")");
+			return 1;
+		}
+		int ret = import_dives_files({ dives + "/DL7.zxu", dives + "/DL7.zxu" }, "multiple files", result, error);
+		check(ret != 0, "two files that are not logs: refused (" + error + ")");
 	}
 
 	return failures ? 1 : 0;

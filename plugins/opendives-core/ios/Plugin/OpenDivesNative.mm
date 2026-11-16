@@ -567,6 +567,16 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
++ (NSString *)importDivesFiles:(NSArray<NSString *> *)files source:(NSString *)source error:(NSError **)error
+{
+	std::vector<std::string> paths;
+	for (NSString *f in files)
+		paths.push_back(str(f));
+	std::string json, message;
+	int ret = opendives::import_dives_files(paths, str(source), json, message);
+	return edit_or_fail(ret, json, message, error);
+}
+
 // action: list (read-only, the plain object), save or delete (undoable steps).
 + (NSString *)filterPresets:(NSString *)actionIn
 		       name:(NSString *)name
