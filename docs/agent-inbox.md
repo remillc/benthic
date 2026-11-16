@@ -4373,7 +4373,7 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 
 Done (desktop): the two-line centred hint and the centred button come from the shared component; checked in a narrow window too. All parts done, on `feature/release-phone-first-launch` and `feature/release-desktop-first-launch`.
 
-## [ ] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
+## [x] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-new-logbook-two-steps`, started from the latest release branch (task 230). Do not merge it into `main`. Phone, tablet (both orientations) and desktop.
 
@@ -4394,6 +4394,8 @@ Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, a
 « Retour » goes back one step, with the shared-axis X transition backwards.
 
 **Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
+
+Done on `feature/release-new-logbook-two-steps` (not merged): « Nouveau carnet » (name, « Suivant ») then « Où le garder ? » (the name as title with the pencil back to the name, the three rows by device), for creating and importing, on phone, tablet and desktop; « Retour » one step back with the backward transition.
 
 ## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
 
