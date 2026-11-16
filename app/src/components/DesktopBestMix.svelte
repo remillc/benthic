@@ -53,8 +53,10 @@
       const endMm = trimix ? Math.round(endValue * mmPerUnit) : -1;
       const depthMm = Math.round(depthValue * mmPerUnit);
       // The gas only matters for the MOD, which is not shown from this call: air.
-      result = gasCalculator(210, 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
-      mix = gasCalculator(result.bestO2, trimix ? result.bestHe : 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
+      // A local: reading `result` back here would make this effect depend on the state it writes.
+      const advised = gasCalculator(210, 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
+      result = advised;
+      mix = gasCalculator(advised.bestO2, trimix ? advised.bestHe : 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
     } catch (e) {
       console.error('Best mix', e);
       result = mix = null;
