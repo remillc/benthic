@@ -1,0 +1,13 @@
+{
+ "dives": 3000,
+ "sortDateLocaleCompare_proxy_ms": 2.6,
+ "sortDateLocaleCompare_raw_ms": 0.1,
+ "sortDatePlainCompare_raw_ms": 0.1,
+ "filterMap_proxy_ms": 1.8,
+ "filterMap_raw_ms": 0,
+ "jsonParse_listBytes": 1877924,
+ "jsonParse_ms": 5.4,
+ "rowsInDom": 3000,
+ "toggleClassOnOneRow_styleAndLayout_ms": 0.2,
+ "forceFullLayout_ms": 6.3
+}

@@ -1,0 +1,43 @@
+{
+ "label": "long",
+ "cpu": 1,
+ "getDive": [
+  {
+   "method": "getDive",
+   "resultBytes": 825550,
+   "ms": 38
+  },
+  {
+   "method": "getDive",
+   "resultBytes": 827181,
+   "ms": 24
+  }
+ ],
+ "longTasksOnSelect": [
+  193,
+  109,
+  255,
+  93,
+  108,
+  72
+ ],
+ "profileDom": {
+  "found": true,
+  "svgNodes": 66,
+  "pathDLengths": [
+   120814,
+   120794,
+   120794,
+   117778,
+   38,
+   22
+  ],
+  "pathCount": 6
+ },
+ "hover": {
+  "syncAvgMs": 0.5,
+  "frameAvgMs": 16.3,
+  "frameMaxMs": 24
+ },
+ "toggleLayer": 32
+}

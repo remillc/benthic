@@ -1,0 +1,342 @@
+{
+ "label": "s3000",
+ "ssrf": "build/perf/logbook-3000.ssrf",
+ "cpu": 1,
+ "coldFromSpawnMs": 68221,
+ "idle": {
+  "nodes": 47348,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 44442,
+   "od-dive-detail*": 259,
+   "od-desktop-sites*": 1667,
+   "od-desktop-statistics*": 127,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 3627,
+  "jsHeapMB": 132.6,
+  "layoutCount": 5,
+  "recalcStyle": 9,
+  "layoutMs": 0,
+  "scriptMs": 35,
+  "taskMs": 7353,
+  "listeners": 488
+ },
+ "afterSelect": {
+  "nodes": 47340,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 44442,
+   "od-dive-detail*": 243,
+   "od-desktop-sites*": 1667,
+   "od-desktop-statistics*": 127,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 3614,
+  "jsHeapMB": 134.2,
+  "layoutCount": 11,
+  "recalcStyle": 16,
+  "layoutMs": 3,
+  "scriptMs": 153,
+  "taskMs": 13514,
+  "listeners": 563
+ },
+ "navs": [
+  "#logbook",
+  "#sites",
+  "#statistics",
+  "#tools",
+  "#settings"
+ ],
+ "after_sites": {
+  "nodes": 14625,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 11434,
+   "od-dive-detail*": 241,
+   "od-desktop-sites*": 1962,
+   "od-desktop-statistics*": 127,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 609,
+  "jsHeapMB": 86.5,
+  "layoutCount": 43,
+  "recalcStyle": 59,
+  "layoutMs": 527,
+  "scriptMs": 1045,
+  "taskMs": 39577,
+  "listeners": 973
+ },
+ "after_statistics": {
+  "nodes": 14669,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 11434,
+   "od-dive-detail*": 247,
+   "od-desktop-sites*": 1962,
+   "od-desktop-statistics*": 174,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 657,
+  "jsHeapMB": 85.6,
+  "layoutCount": 46,
+  "recalcStyle": 65,
+  "layoutMs": 529,
+  "scriptMs": 1129,
+  "taskMs": 39813,
+  "listeners": 967
+ },
+ "after_tools": {
+  "nodes": 14614,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 11434,
+   "od-dive-detail*": 247,
+   "od-desktop-sites*": 1962,
+   "od-desktop-statistics*": 127,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 611,
+  "jsHeapMB": 84.7,
+  "layoutCount": 49,
+  "recalcStyle": 69,
+  "layoutMs": 538,
+  "scriptMs": 1204,
+  "taskMs": 40000,
+  "listeners": 894
+ },
+ "after_logbook": {
+  "nodes": 47615,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 44442,
+   "od-dive-detail*": 247,
+   "od-desktop-sites*": 1962,
+   "od-desktop-statistics*": 127,
+   "od-desktop-tools*": 468,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 3000,
+  "svgNodes": 3612,
+  "jsHeapMB": 132.1,
+  "layoutCount": 57,
+  "recalcStyle": 77,
+  "layoutMs": 920,
+  "scriptMs": 1504,
+  "taskMs": 45862,
+  "listeners": 868
+ },
+ "timings": {
+  "selectDive": {
+   "sync": 54,
+   "total": 2371
+  },
+  "selectOther": {
+   "sync": 50,
+   "total": 4694
+  },
+  "sortByDepth": {
+   "sync": 178,
+   "total": 1680
+  },
+  "sortByDate": {
+   "sync": 165,
+   "total": 1732
+  },
+  "search": {
+   "keystrokes_sync_total_ms": [
+    [
+     5,
+     3590
+    ],
+    [
+     4,
+     1243
+    ],
+    [
+     3,
+     1205
+    ],
+    [
+     3,
+     34
+    ],
+    [
+     9,
+     48
+    ],
+    [
+     4,
+     30
+    ]
+   ],
+   "rowsAfter": 3000
+  },
+  "scrollList": {
+   "sync": 161,
+   "total": 192
+  },
+  "nav_sites": {
+   "sync": 46,
+   "total": 271
+  },
+  "nav_statistics": {
+   "sync": 20,
+   "total": 66
+  },
+  "nav_tools": {
+   "sync": 19,
+   "total": 39
+  },
+  "nav_logbook": {
+   "sync": 19,
+   "total": 4196
+  }
+ },
+ "longTasksInteractions": [
+  216,
+  68,
+  1599,
+  1099,
+  89,
+  1308,
+  1169,
+  88,
+  1115,
+  1160,
+  1152,
+  1125,
+  2372,
+  2303,
+  2312,
+  80,
+  1149,
+  1136,
+  1135,
+  72,
+  2288,
+  2310,
+  1128,
+  2298,
+  178,
+  1496,
+  1218,
+  164,
+  1553,
+  2427,
+  82,
+  2490,
+  1191,
+  2386,
+  1202,
+  1174,
+  1228,
+  222,
+  4176,
+  60,
+  1177
+ ],
+ "navLoop_heapMB_nodes_listeners": [
+  [
+   132.4,
+   130364,
+   867
+  ],
+  [
+   132.8,
+   130335,
+   867
+  ],
+  [
+   134,
+   130373,
+   896
+  ],
+  [
+   132.9,
+   130319,
+   867
+  ],
+  [
+   133.8,
+   130367,
+   867
+  ],
+  [
+   133.2,
+   130372,
+   867
+  ],
+  [
+   133.1,
+   130335,
+   867
+  ],
+  [
+   133.4,
+   130372,
+   867
+  ],
+  [
+   133.4,
+   130319,
+   867
+  ],
+  [
+   134.7,
+   130367,
+   867
+  ]
+ ],
+ "afterResizesElements": "{\"el\":47194,\"pages\":[\"od-welcome-start:61\",\"od-desktop-logbook:44442\",\"od-dive-detail:249\",\"od-desktop-sites:1539\",\"od-desktop-statistics:127\",\"od-desktop-tools:468\",\"od-account:41\"]}",
+ "afterResizes": {
+  "heapMB": 145.4,
+  "nodes": 259336,
+  "listeners": 225
+ },
+ "reloadToRowsMs": 4491,
+ "reload": {
+  "paint": [
+   [
+    "first-paint",
+    428
+   ],
+   [
+    "first-contentful-paint",
+    428
+   ]
+  ],
+  "longTasks": [
+   162,
+   74,
+   1594,
+   1061,
+   95,
+   1228,
+   1106,
+   93,
+   90,
+   1069
+  ],
+  "nav": {
+   "dcl": 46,
+   "load": 49
+  }
+ }
+}

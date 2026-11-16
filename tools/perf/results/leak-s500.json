@@ -1,0 +1,42 @@
+[
+ {
+  "step": "start",
+  "elements": 10342,
+  "documents": 3,
+  "nodes": 31359,
+  "jsEventListeners": 403,
+  "jsHeapMB": null
+ },
+ {
+  "step": "after 1 narrow/wide cycles",
+  "elements": 10342,
+  "documents": 9,
+  "nodes": 60223,
+  "jsEventListeners": 416,
+  "jsHeapMB": null
+ },
+ {
+  "step": "after 2 narrow/wide cycles",
+  "elements": 10350,
+  "documents": 9,
+  "nodes": 60382,
+  "jsEventListeners": 448,
+  "jsHeapMB": null
+ },
+ {
+  "step": "after 4 narrow/wide cycles",
+  "elements": 10350,
+  "documents": 9,
+  "nodes": 60682,
+  "jsEventListeners": 463,
+  "jsHeapMB": null
+ },
+ {
+  "step": "after 8 narrow/wide cycles",
+  "elements": 10350,
+  "documents": 9,
+  "nodes": 61284,
+  "jsEventListeners": 470,
+  "jsHeapMB": null
+ }
+]

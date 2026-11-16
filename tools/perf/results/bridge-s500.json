@@ -1,0 +1,197 @@
+{
+ "label": "s500",
+ "patched": true,
+ "loadLogbookForce": {
+  "calls": 5,
+  "totalMs": 163,
+  "totalKB": 308,
+  "byMethod": {
+   "setCloudTestEmail": {
+    "n": 1,
+    "ms": 0,
+    "maxMs": 0,
+    "bytes": 4,
+    "argBytes": 12
+   },
+   "logExists": {
+    "n": 1,
+    "ms": 1,
+    "maxMs": 1,
+    "bytes": 4,
+    "argBytes": 91
+   },
+   "listDives": {
+    "n": 1,
+    "ms": 158,
+    "maxMs": 158,
+    "bytes": 312657,
+    "argBytes": 91
+   },
+   "setPrefs": {
+    "n": 1,
+    "ms": 4,
+    "maxMs": 4,
+    "bytes": 4,
+    "argBytes": 117
+   },
+   "getPrefs": {
+    "n": 1,
+    "ms": 0,
+    "maxMs": 0,
+    "bytes": 2672,
+    "argBytes": 2
+   }
+  }
+ },
+ "selectDive": {
+  "calls": 18,
+  "totalMs": 478,
+  "totalKB": 183,
+  "byMethod": {
+   "siteQuery": {
+    "n": 4,
+    "ms": 228,
+    "maxMs": 170,
+    "bytes": 104678,
+    "argBytes": 260
+   },
+   "getDive": {
+    "n": 4,
+    "ms": 99,
+    "maxMs": 66,
+    "bytes": 79694,
+    "argBytes": 48
+   },
+   "plannerSetup": {
+    "n": 2,
+    "ms": 30,
+    "maxMs": 27,
+    "bytes": 892,
+    "argBytes": 4
+   },
+   "statsQuery": {
+    "n": 6,
+    "ms": 90,
+    "maxMs": 27,
+    "bytes": 1732,
+    "argBytes": 188
+   },
+   "toolQuery": {
+    "n": 2,
+    "ms": 31,
+    "maxMs": 27,
+    "bytes": 642,
+    "argBytes": 40
+   }
+  }
+ },
+ "section_sites": {
+  "calls": 0,
+  "totalMs": 0,
+  "totalKB": 0,
+  "byMethod": {}
+ },
+ "section_statistics": {
+  "calls": 0,
+  "totalMs": 0,
+  "totalKB": 0,
+  "byMethod": {}
+ },
+ "section_tools": {
+  "calls": 2,
+  "totalMs": 20,
+  "totalKB": 51,
+  "byMethod": {
+   "listPlans": {
+    "n": 1,
+    "ms": 19,
+    "maxMs": 19,
+    "bytes": 2,
+    "argBytes": 2
+   },
+   "siteQuery": {
+    "n": 1,
+    "ms": 1,
+    "maxMs": 1,
+    "bytes": 52337,
+    "argBytes": 62
+   }
+  }
+ },
+ "section_logbook": {
+  "calls": 0,
+  "totalMs": 0,
+  "totalKB": 0,
+  "byMethod": {}
+ },
+ "editDiveId": 86751,
+ "editTimings": {
+  "error": "Error: Unknown method saveLogbookFile"
+ },
+ "editNotes": {
+  "calls": 2,
+  "totalMs": 5,
+  "totalKB": 20,
+  "byMethod": {
+   "editDive": {
+    "n": 1,
+    "ms": 2,
+    "maxMs": 2,
+    "bytes": 20932,
+    "argBytes": 56
+   },
+   "saveLocal": {
+    "n": 1,
+    "ms": 3,
+    "maxMs": 3,
+    "bytes": 0,
+    "argBytes": 2
+   }
+  }
+ },
+ "refreshTimings": {
+  "error": "Error: Unknown method saveLogbookFile"
+ },
+ "refreshAfterChange": {
+  "calls": 6,
+  "totalMs": 148,
+  "totalKB": 554,
+  "byMethod": {
+   "listLoadedDives": {
+    "n": 1,
+    "ms": 4,
+    "maxMs": 4,
+    "bytes": 312657,
+    "argBytes": 2
+   },
+   "saveLocal": {
+    "n": 1,
+    "ms": 3,
+    "maxMs": 3,
+    "bytes": 0,
+    "argBytes": 2
+   },
+   "diveColumns": {
+    "n": 1,
+    "ms": 5,
+    "maxMs": 5,
+    "bytes": 125716,
+    "argBytes": 2
+   },
+   "siteQuery": {
+    "n": 2,
+    "ms": 83,
+    "maxMs": 57,
+    "bytes": 104674,
+    "argBytes": 124
+   },
+   "statsQuery": {
+    "n": 1,
+    "ms": 53,
+    "maxMs": 53,
+    "bytes": 24209,
+    "argBytes": 28
+   }
+  }
+ }
+}
