@@ -4569,7 +4569,7 @@ The tablet first-launch screen (the one with « J’ai un compte Subsurface », 
 
 **Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
 
-## [ ] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
+## [x] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Reference mock-up: `docs/mockups/android-tablette-detail-menu-paysage.dc.html`; the same chart appears in every tablet screen that shows the dive detail.
 
@@ -4580,3 +4580,5 @@ On tablets, in the profile chart of the dive detail, two strokes change from 1.2
 Nothing else changes: the grid lines, ticks and other curves, the water fill, the colours and the phone chart stay as they are.
 
 **Test:** on a tablet, open a dive. The profile line and the temperature curve are 1 dp wide, in landscape and in portrait.
+
+Done on main: from 768 dp, a token `--od-profile-main-width: 1` gives the depth line and the temperature curve of `DiveProfile.svelte` 1 dp; every other curve keeps `--od-profile-line-width` (1.25 dp), the phone is unchanged, and high contrast keeps its 2 dp. Test in `tests/app/profile-lines.test.mjs`.
