@@ -78,6 +78,7 @@
   import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, settingsWindow } from './lib/layout.svelte.js';
   import { logbooks, noLogbook, enableLogbookCommands } from './lib/desktop-logbooks.svelte.js';
   import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
+  import { releaseModalListeners } from './lib/f7-modal-cleanup.js';
   import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
@@ -313,6 +314,8 @@
       mdSwipeBackAnimateShadow: false,
     },
     routes: appRoutes,
+    // Framework7 leaves a swipeable sheet's or popup's app listeners behind when it is destroyed.
+    on: { modalBeforeDestroy: releaseModalListeners },
   };
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.

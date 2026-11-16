@@ -5,6 +5,7 @@
   // The route keeps one page element for Framework7: the new page takes over the old one's place
   // in the router (position, role, page object), so going forward and back still work.
   import { onMount, tick, untrack } from 'svelte';
+  import { app as f7Shared } from 'framework7-svelte/shared/f7.js';
   import { layout } from '../lib/layout.svelte.js';
 
   /**
@@ -83,6 +84,9 @@
     const f7Page = old.f7Page;
     f7Page.el = el;
     f7Page.$el = dom(el);
+    // The page object has the element under two more names; left alone they keep the old layout alive.
+    f7Page.pageEl = el;
+    f7Page.$pageEl = f7Page.$el;
     /** @type {any} */ (el).f7Page = f7Page;
     if (router.currentPageEl === old.el) router.currentPageEl = el;
     if (router.currentPage?.[0] === old.el) router.currentPage = dom(el);
@@ -95,7 +99,9 @@
     // The new page is in: its own « after in » work (a tablet's overview shows its first subpage).
     if (position === 'current') app.emit('pageAfterIn', f7Page);
     // The view's component list keeps the element it removes the page by.
-    const views = /** @type {any} */ (app).f7routers?.views;
+    // The component list is the Framework7-Svelte app object's (not the Framework7 instance's): the entry has to follow
+    // the element, or the router cannot find the page's component when it removes the page, and it is never unmounted.
+    const views = /** @type {any} */ (f7Shared).f7routers?.views;
     views?.forEach((/** @type {any} */ data) => {
       if (data.el === router.el) data.pages?.forEach((/** @type {any} */ p) => p.el === old.el && (p.el = el));
     });
