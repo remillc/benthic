@@ -15,6 +15,8 @@
   });
 
   const ICONS = /** @type {const} */ ({ auth: 'lock', server: 'cloud', repository: 'git' });
+  /** An own repository whose server does not answer: the texts say « dépôt git », the icon is git's. */
+  const gitServer = $derived(cause === 'server' && logbook.mode === 'git');
 
   const stays = $derived.by(() => {
     if (!logbook.pending) return t('sync.failure.staysNone');
@@ -40,10 +42,10 @@
 <Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-sync-failure-sheet od-sync-failure-sheet--failure-sheet" style="height: auto" onSheetClosed={close}>
   <div class="od-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
     <div class="od-sync-failure-sheet--handle" aria-hidden="true"></div>
-    <span class="badge" aria-hidden="true"><Icon name={ICONS[cause]} weight={2} /></span>
-    <h2 id="od-failure-title" class="od-sync-failure-sheet--title">{t(`sync.failure.${cause}.title`)}</h2>
+    <span class="badge" aria-hidden="true"><Icon name={gitServer ? 'git' : ICONS[cause]} weight={2} /></span>
+    <h2 id="od-failure-title" class="od-sync-failure-sheet--title">{t(`sync.failure.${cause}.title${gitServer ? 'Git' : ''}`)}</h2>
     <p class="od-sync-failure-sheet--text">
-      {t(`sync.failure.${cause}.intro`)}
+      {t(`sync.failure.${cause}.intro${gitServer ? 'Git' : ''}`)}
       {#if cause === 'server' && logbook.retryMinutes}{t('sync.failure.server.retry', { n: logbook.retryMinutes })}{/if}
       {stays}
     </p>
