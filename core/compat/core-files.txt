@@ -33,6 +33,7 @@ import-logtrak
 import-seac
 import-shearwater
 import-suunto
+import-suunto-json
 libdivecomputer
 liquivision
 load-git
