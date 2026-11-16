@@ -2392,6 +2392,10 @@
     "link": "À propos et contact",
     "label": "Une question ? À propos et contact"
   },
+  "desktopLanguage": {
+    "system": "Comme le système",
+    "button": "Langue de l’app : {language}"
+  },
   "about": {
     "title": "À propos",
     "version": "Version {version}",

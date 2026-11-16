@@ -10,6 +10,7 @@
   import { Page, theme, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import WelcomeHelpLink from '../components/WelcomeHelpLink.svelte';
+  import DesktopLanguageMenu from '../components/DesktopLanguageMenu.svelte';
   import FirstLaunchBand from '../components/FirstLaunchBand.svelte';
   import FirstLaunchPanel from '../components/FirstLaunchPanel.svelte';
   import { logbook, startWithoutAccount, importFile } from '../lib/logbook.svelte.js';
@@ -134,7 +135,12 @@
       {/if}
       </div>
       <!-- Phone (android-accueil-c.dc.html): 12 dp under the git link, 20 dp above the bottom edge. Tablet: pinned 28 dp from the edge. -->
-      <WelcomeHelpLink />
+      {#if desktopApp}
+        <!-- Desktop (task 2026-11-16-246): the help link, a divider and the language menu on one centred line. -->
+        <div class="od-welcome-start--footer"><WelcomeHelpLink inline /><DesktopLanguageMenu /></div>
+      {:else}
+        <WelcomeHelpLink />
+      {/if}
     </div>
   {:else}
   <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
@@ -232,6 +238,26 @@
     /* The wrapper only matters on tablets. */
     .od-welcome-start--actions {
       display: contents;
+    }
+
+    /* The desktop app: the help link and the language menu share one line, 24 dp from the bottom, centred under the
+       choices (the same centre as the help link alone had). */
+    :global(html.od-desktop-app) .od-welcome-start--footer {
+      position: absolute;
+      left: var(--od-help-link-left, 50%);
+      bottom: 24px;
+      z-index: 2;
+      transform: translateX(-50%);
+      width: max-content;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+
+      /* A low window: a step may scroll under the line, which then keeps its own ground. */
+      @media (max-height: 700px) {
+        background: var(--od-background);
+      }
     }
 
     /* « Alpha » after the name (tasks 2026-11-16-225 and 229): capitals, 14 sp, bold, a full pill 8 dp after the name. */

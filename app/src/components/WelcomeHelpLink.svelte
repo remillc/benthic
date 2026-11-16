@@ -8,9 +8,10 @@
 
   /**
    * onopen: where the link is outside a view (the desktop's window without a logbook, task 2026-11-16-242).
-   * @type {{ onopen?: () => void }}
+   * inline: in a line of its own (the desktop first launch beside the language menu, task 2026-11-16-246).
+   * @type {{ onopen?: () => void, inline?: boolean }}
    */
-  let { onopen } = $props();
+  let { onopen, inline = false } = $props();
 
   /** @param {MouseEvent} e */
   function open(e) {
@@ -22,7 +23,7 @@
   }
 </script>
 
-<a href="/about" class="od-welcome-help-link" aria-label={t('welcomeHelp.label')} onclick={open}>
+<a href="/about" class="od-welcome-help-link" class:od-welcome-help-link--inline={inline} aria-label={t('welcomeHelp.label')} onclick={open}>
   <svg class="od-welcome-help-link--icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="12" cy="12" r="9"></circle>
     <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"></path>
@@ -97,6 +98,14 @@
     }
     :global(html.od-desktop-app .od-first-panelled) {
       --od-help-link-left: calc(min(700px, 48.6%) + (100% - min(700px, 48.6%)) / 2);
+    }
+
+    /* In a line of its own: no pinning. */
+    :global(html.od-desktop-app .od-welcome-help-link.od-welcome-help-link--inline) {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
     }
 
     .od-welcome-help-link--icon {

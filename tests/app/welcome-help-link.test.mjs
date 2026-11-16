@@ -46,7 +46,7 @@ test('Android phone: the link ends the page, 12 dp under the git link and 20 dp 
   const welcome = src('pages/WelcomeStart.svelte');
   const link = src('components/WelcomeHelpLink.svelte');
   // The link is inside the Android page, after the actions (the git link), so it follows it.
-  assert.match(welcome, /<\/div>\s*<!--[^>]*-->\s*<WelcomeHelpLink \/>\s*<\/div>\s*\{:else\}/);
+  assert.match(welcome, /<\/div>\s*<!--[^>]*-->\s*\{#if desktopApp\}[\s\S]*?\{:else\}\s*<WelcomeHelpLink \/>\s*\{\/if\}\s*<\/div>\s*\{:else\}/);
   // 20 dp above the edge on the phone; the page content has no bottom padding of its own there.
   assert.match(welcome, /:global\(\.od-welcome-start--phone\) \{\s*--od-help-link-bottom: 20px;[\s\S]*?padding-bottom: 0;/);
   assert.match(link, /margin: 0 auto calc\(var\(--f7-safe-area-bottom\) \+ var\(--od-help-link-bottom, 28px\)\)/);

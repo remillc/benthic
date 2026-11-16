@@ -4844,7 +4844,7 @@ As task 238 does for the alpha, the depth profile line and the temperature curve
 
 Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
 
-## [ ] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
+## [x] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/bureau-premier-lancement-alpha-accueil.dc.html`, shown with the menu open.
 
@@ -4867,3 +4867,5 @@ It is not shown on the steps, on the « no logbook » window, nor on phone or ta
 **Test:**
 - On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
 - The « no logbook » window shows no rail.
+
+Done (on `feature/desktop-language-menu`, to be merged into `feature/desktop-logbook`): the desktop first-launch screen (`pages/WelcomeStart.svelte`, `desktopApp` only) ends with one centred line 24 dp from the bottom: the help link (`WelcomeHelpLink` with a new `inline` prop), a 1 × 20 dp divider (`--od-language-divider`, #C8C6BF light, #4A4C50 dark) and the new `components/DesktopLanguageMenu.svelte` (globe, current language, chevron; 32 dp, 14 sp, the help link's grey; the selected tint `--od-surface-container-highest` (#E3E1DC) while open). The menu is the Settings choice menu itself, `RowMenu`, which gained two optional props, `width` (260) and `above` (opens above the anchor, right-aligned; `placeRowMenu` takes them); it has no title and no Annuler/OK, and carries `role="listbox"`/`role="option"`/`aria-selected`, arrows, Enter and Escape. The button has `aria-haspopup="listbox"` and `aria-expanded`. A choice calls `setAppSetting('language', …)`, the same setter and value as Settings › « Langue de l’app », and the app reloads in that language. The options come from `lib/language-menu.js`. Settings also offers « Français (Canada) »: the menu keeps the mock-up's three options and lists it only while it is the chosen language, so the current choice is never missing. Part 2 already held, no change: `html.od-start-screen` hides the rail on the « no logbook » window (task 242), Ctrl+, / ⌘, is a window shortcut of the desktop shell, and the empty-logbook window keeps its rail with Réglages and the avatar. Tests: `tests/app/desktop-language-menu.test.mjs`; `tests/app/welcome-help-link.test.mjs` reads the new markup. Checked in Electron at 1440 × 900 and 768 × 560 (menu open, English chosen, `od.appSettings.language` = `en`).

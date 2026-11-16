@@ -21,13 +21,16 @@
    *   value: string,
    *   onselect: (value: string) => void,
    *   onclose: () => void,
+   *   width?: number,
+   *   above?: boolean,
    * }}
-   * anchor: the row that opened the menu. label: its accessible name (the row's label).
+   * anchor: the row that opened the menu. label: its accessible name (the row's label). width and above: see
+   * placeRowMenu (the desktop first-launch language menu).
    */
-  let { anchor, label, options, value, onselect, onclose } = $props();
+  let { anchor, label, options, value, onselect, onclose, width, above } = $props();
 
   // svelte-ignore state_referenced_locally
-  let place = $state(placeRowMenu(anchor.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight }, menuHeight(options)));
+  let place = $state(placeRowMenu(anchor.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight }, menuHeight(options), { width, above }));
   // svelte-ignore state_referenced_locally
   let active = $state(Math.max(0, options.findIndex((o) => o.value === value)));
   /** @type {HTMLDivElement|undefined} */
@@ -37,7 +40,7 @@
 
   function position() {
     const height = menu?.scrollHeight ?? menuHeight(options);
-    place = placeRowMenu(anchor.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight }, height);
+    place = placeRowMenu(anchor.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight }, height, { width, above });
   }
 
   /** The menu lives in the page's root. @param {HTMLElement} node */
