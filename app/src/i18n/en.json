@@ -178,7 +178,11 @@
         "title": "The cloud isn’t answering",
         "intro": "The network works, but the cloud server may be under maintenance.",
         "retry": "Next automatic try in {n} minutes.",
-        "action": "Try again now"
+        "action": "Try again now",
+        "rowGit": "The git repository is not answering: trying again in {n} min",
+        "rowManualGit": "The git repository is not answering",
+        "titleGit": "The git repository is not answering",
+        "introGit": "The network works, but the repository server is not answering. It may be under maintenance."
       },
       "repository": {
         "row": "Can’t sync: git repository refused",
@@ -1869,6 +1873,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",
       "First launch and Compte on an Android phone: « Use my own git repository » is one form (address checked when you leave the field, token, the branches read from the repository), with the logbook download screen and then a message when it opens. The help « How to create a repository » gives the steps for GitHub, GitLab and Codeberg.",
       "First launch on an Android phone: the steps have 16 dp side margins.",
       "First launch on an Android phone: the band on the steps takes the look of the app's section bands (light gradient, faint profile, wave at the edge) instead of the dark band with a straight edge.",

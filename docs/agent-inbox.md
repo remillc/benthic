@@ -4956,3 +4956,15 @@ The intro of both tabs: « OpenDives se connecte à votre dépôt avec un jeton 
 The help page must scroll when its content is taller than the screen (the GitHub tab is about 1100 dp tall).
 
 **Test:** each tab of the token help shows its own steps and link, the active tab is underlined, and each link opens the right page.
+
+## [ ] 2026-11-16-256 Help « Créer un dépôt »: French site labels for GitLab and Codeberg (correction to 252)
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html`.
+
+GitLab and Codeberg exist in French, so their tabs name the labels of the French interface (taken from the GitLab and Gitea/Forgejo translation files). GitHub exists only in English and keeps the English labels. Use the texts of the mock-ups word for word:
+- **Intro of the GitHub tab:** « … GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. » (same sentence in the GitHub tab of the token help).
+- **Intro of the GitLab and Codeberg tabs:** « … Les libellés ci-dessous sont ceux de l’interface française du site. »
+- **GitLab steps:** + (Créer un nouveau) › Nouveau projet/dépôt; Créer un projet vide; Nom du projet; Niveau de visibilité › Privé; uncheck Initialiser le dépôt avec un README; Créer le projet; Code › Cloner avec HTTPS. Link: « Ouvrir la page « Nouveau projet » de GitLab ».
+- **Codeberg steps:** + › Nouveau dépôt; Nom du dépôt; Rendre le dépôt privé; leave Initialiser le dépôt unchecked; Créer un dépôt; HTTPS. Link: « Ouvrir la page « Nouveau dépôt » de Codeberg ».
+
+**Test:** the GitLab and Codeberg tabs show the French labels, the GitHub tab the English ones with the new intro.
