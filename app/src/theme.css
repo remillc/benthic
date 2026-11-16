@@ -132,6 +132,12 @@
     --od-surface-container-highest: #E3E1DC;
     --od-text: #1F2124;
     --od-text-2: #4B4A47;
+    /* Steps of the git help pages (task 2026-11-16-253): an interface label (kbd) and a value to type (code). */
+    --od-kbd-text: #1F2124;
+    --od-kbd-background: #F1EFEA;
+    --od-kbd-outline: #D3D0C8;
+    --od-code-text: #1F3F66;
+    --od-code-background: #EAF0F7;
     --od-separator: #DADAD6;
     --od-outline: #74777C;
     /* Outlines of fields, chips and outlined buttons, and the planned profile's line: thicker in high contrast. */
@@ -345,6 +351,11 @@
     --od-toolbar-on-primary: #F4F4F2;
     --od-text: #F4F4F2;
     --od-text-2: #B5B8BC;
+    --od-kbd-text: #F4F4F2;
+    --od-kbd-background: #2A2C30;
+    --od-kbd-outline: #4A4D52;
+    --od-code-text: #BFD6F0;
+    --od-code-background: #1F2B3B;
     --od-separator: #3A3C40;
     --od-outline: #8E9196;
     --od-map-pin-muted: #8E9196;
