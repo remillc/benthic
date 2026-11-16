@@ -46,6 +46,8 @@
     contextMenuEntries,
     emptyAreaMenuEntries,
     clampTableWidth,
+    tableWidthFor,
+    fittingColumns,
     adjacentTrips,
     moveColumn,
     dropTarget,
@@ -90,6 +92,19 @@
     logbook.dives.filter((d) => (!filter.ids || filter.ids.has(d.id)) && (!searchIds || searchIds.has(d.id))),
   );
   const columns = $derived(shownColumns(desk.columns));
+  /** The room the table has, in px (read from its scroll area). */
+  let tableRoom = $state(0);
+  /** The shown columns that fit in that room; the others stay chosen and come back in a wider pane. */
+  const columnsNow = $derived(fittingColumns(columns, tableRoom));
+  $effect(() => {
+    if (!tableEl) return;
+    const element = tableEl;
+    const measure = () => (tableRoom = element.clientWidth - 9);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  });
   const sorted = $derived(sortDives(listed, desk.extras, desk.sort));
   const rows = $derived(tableRows(sorted, desk.sort, desk.collapsed));
   const order = $derived(rowDiveIds(rows));
@@ -749,7 +764,7 @@
     const up = () => {
       handle.removeEventListener('pointermove', move);
       handle.removeEventListener('pointerup', up);
-      setTableWidth(desk.tableWidth);
+      if (desk.tableWidth !== null) setTableWidth(desk.tableWidth);
     };
     handle.addEventListener('pointermove', move);
     handle.addEventListener('pointerup', up);
@@ -760,16 +775,28 @@
     e.preventDefault();
     const view = /** @type {HTMLElement} */ (e.currentTarget).closest('.view');
     const available = view?.getBoundingClientRect().width ?? innerWidth;
-    setTableWidth(clampTableWidth(desk.tableWidth + (e.key === 'ArrowRight' ? 16 : -16), available));
+    setTableWidth(clampTableWidth(tableNow + (e.key === 'ArrowRight' ? 16 : -16), available));
   }
 
-  // The view gives the table its width (Framework7's master-detail).
+  /** The width the table has now, in px (the pane follows the window while the diver has not moved the handle). */
+  let tableNow = $state(760);
+  // The view gives the table its width (Framework7's master-detail), again each time the window changes size.
   $effect(() => {
     const view = /** @type {HTMLElement|null} */ (pageEl?.closest('.view') ?? null);
     if (!view) return;
-    const available = view.getBoundingClientRect().width;
-    view.style.setProperty('--f7-page-master-width', `${clampTableWidth(desk.tableWidth, available)}px`);
-    return () => view.style.removeProperty('--f7-page-master-width');
+    const stored = desk.tableWidth;
+    const place = () => {
+      const available = view.getBoundingClientRect().width;
+      tableNow = clampTableWidth(tableWidthFor(stored, available), available);
+      view.style.setProperty('--f7-page-master-width', `${tableNow}px`);
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(view);
+    return () => {
+      observer.disconnect();
+      view.style.removeProperty('--f7-page-master-width');
+    };
   });
 </script>
 
@@ -833,7 +860,7 @@
         <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={order.length}>
           <thead>
             <tr>
-              {#each columns as column (column.key)}
+              {#each columnsNow as column (column.key)}
                 {@const sortedHere = desk.sort.key === column.key}
                 <th
                   scope="col"
@@ -856,7 +883,7 @@
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
                 <tr class="od-desktop-logbook--trip">
-                  <td colspan={columns.length}>
+                  <td colspan={columnsNow.length}>
                     <button
                       type="button"
                       aria-expanded={row.expanded}
@@ -881,7 +908,7 @@
                   ondblclick={() => editSelected()}
                   oncontextmenu={(e) => rowMenu(e, dive.id)}
                 >
-                  {#each columns as column (column.key)}
+                  {#each columnsNow as column (column.key)}
                     <td
                       data-col={column.key}
                       class:od-desktop-logbook--numeric={column.numeric}
@@ -908,7 +935,7 @@
       role="separator"
       aria-orientation="vertical"
       aria-label={t('desktop.resize')}
-      aria-valuenow={desk.tableWidth}
+      aria-valuenow={tableNow}
       tabindex="0"
       onpointerdown={startResize}
       onkeydown={resizeKey}
@@ -975,7 +1002,8 @@
       padding: 8px 8px 8px 12px;
     }
     .od-desktop-logbook--titles {
-      flex: 1;
+      /* Fluid layout: in a narrow pane the search field gives way first, then the title. */
+      flex: 1 0.2 auto;
       min-width: 0;
     }
     .od-desktop-logbook--title {
@@ -1001,7 +1029,7 @@
       align-items: center;
       gap: 12px;
       flex: 0 1 300px;
-      min-width: 220px;
+      min-width: 150px;
       height: 44px;
       padding: 0 12px 0 16px;
       border-radius: 22px;

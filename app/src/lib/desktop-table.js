@@ -44,6 +44,32 @@ export const COLUMNS = [
   { key: 'tags', label: 'desktop.column.tags', numeric: false, defaultShown: false, value: (_, x) => joined(x?.tags) },
 ];
 
+/** The narrowest a column reads well, in px (fluid layout: the columns that do not fit are left out). */
+export const COLUMN_MIN_WIDTH = { number: 48, date: 170, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+
+/**
+ * The columns that fit in a table `width` px wide: N° and Date always, then the others in the diver's order while
+ * they fit. The ones left out stay chosen; they come back when the pane is wider (docs/system-design.md,
+ * section 7, « Fluid desktop layout »).
+ * @param {Column[]} columns the shown columns, in order
+ * @param {number} width the room the table has, in px; 0 when not measured yet
+ * @returns {Column[]}
+ */
+export function fittingColumns(columns, width) {
+  if (!width) return columns;
+  let used = 0;
+  /** @type {Column[]} */
+  const kept = [];
+  for (const column of columns) {
+    const need = /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[column.key] ?? 120;
+    const required = column.key === 'number' || column.key === 'date';
+    if (!required && used + need > width) continue;
+    kept.push(column);
+    used += need;
+  }
+  return kept;
+}
+
 /** The columns shown when the diver has chosen none. */
 export const DEFAULT_COLUMNS = COLUMNS.filter((c) => c.defaultShown).map((c) => c.key);
 
@@ -345,6 +371,17 @@ export function selectionSummary(dives) {
  */
 export function clampTableWidth(wanted, available, { minTable = 420, minDetail = 400 } = {}) {
   return Math.round(Math.max(minTable, Math.min(wanted, available - minDetail)));
+}
+
+/**
+ * The width of the table's pane: what the diver dragged it to, or, until then, 760 dp in a wide window and
+ * 57 % of the view in a narrower one (fluid layout: the detail keeps its room in a 1200 dp window).
+ * @param {number|null|undefined} stored the remembered width, null when the diver never moved the handle
+ * @param {number} available the width of the view
+ * @returns {number}
+ */
+export function tableWidthFor(stored, available) {
+  return typeof stored === 'number' ? stored : Math.min(760, Math.round(available * 0.57));
 }
 
 /**

@@ -719,9 +719,13 @@
       fill: var(--od-profile-mean);
     }
 
-    .od-dive-profile--layers-desk {
+    .od-dive-profile--layers.od-dive-profile--layers-desk {
       align-items: center;
       padding: 4px 12px 0;
+      /* Fluid layout: in a narrow detail pane the curve buttons wrap on a second line instead of scrolling sideways. */
+      flex-wrap: wrap;
+      overflow-x: visible;
+      row-gap: 0;
     }
 
     .od-dive-profile--layers-desk .od-dive-profile--filter {

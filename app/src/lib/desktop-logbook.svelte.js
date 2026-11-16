@@ -30,8 +30,8 @@ export const desk = $state({
   columns: DEFAULT_COLUMNS,
   /** @type {Record<number, boolean>} */
   collapsed: {},
-  /** Width of the table's pane, in px (the detail takes the rest). */
-  tableWidth: 760,
+  /** Width of the table's pane, in px (the detail takes the rest); null until the diver moves the handle (desktop-table.js, tableWidthFor). */
+  tableWidth: /** @type {number|null} */ (null),
   /** The extra values of the columns, by dive id (the core's dive_columns). */
   extras: /** @type {Map<number, import('./desktop-table.js').DiveColumns>} */ (new Map()),
 });
@@ -40,7 +40,7 @@ export const desk = $state({
 export function loadDesktopChoices() {
   desk.sort = remembered(SORT_KEY, DEFAULT_SORT);
   desk.columns = remembered(COLUMNS_KEY, DEFAULT_COLUMNS);
-  desk.tableWidth = remembered(WIDTH_KEY, 760);
+  desk.tableWidth = remembered(WIDTH_KEY, null);
 }
 
 /** @param {import('./desktop-table.js').Sort} sort */
