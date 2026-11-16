@@ -44,7 +44,7 @@ test('the blue band is 330 dp on the first step and 140 dp on the others, the st
 test('the column has 20 dp of padding, starts at the top, has 24 sp titles and full-width buttons', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   const phone = steps.slice(steps.lastIndexOf('@media (max-width: 767.98px)'));
-  assert.match(phone, /padding: 16px 20px 0/);
+  assert.match(phone, /padding: 16px 16px 0/);
   assert.match(phone, /od-first-launch--first \{\s+padding-top: 20px/);
   assert.match(phone, /od-first-launch--step \{\s+align-self: start/);
   assert.match(phone, /od-first-launch--title \{\s+font-size: 24px/);
