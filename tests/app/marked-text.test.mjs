@@ -33,7 +33,7 @@ function steps(lang) {
     for (const [host, node] of Object.entries(catalogs[lang][group])) {
       if (typeof node !== 'object' || node === null) continue;
       for (const [k, v] of Object.entries(node)) {
-        if (/^[spq]\d+$/.test(k)) out.push([`${group}.${host}.${k}`, v]);
+        if (/^s\d+$/.test(k)) out.push([`${group}.${host}.${k}`, v]);
       }
     }
   }
@@ -43,13 +43,13 @@ function steps(lang) {
 for (const lang of ['fr', 'en']) {
   test(`steps (${lang}): marks balanced, each step has a label or a value, no bold`, () => {
     const list = steps(lang);
-    assert.equal(list.length, 6 + 7 + 6 + 9 + 7 + 6 + 7, 'all the steps of the two pages');
+    assert.equal(list.length, 6 + 7 + 6 + 9 + 7 + 6, 'all the steps of the two pages');
     for (const [key, text] of list) {
       for (const tag of ['kbd', 'code']) {
         assert.equal((text.match(new RegExp(String.raw`\[${tag}\]`, 'g')) ?? []).length, (text.match(new RegExp(String.raw`\[/${tag}\]`, 'g')) ?? []).length, key);
       }
       assert.equal(/\[(kbd|code)\]/.test(stripMarked(text)), false, `${key}: nothing left once marks are read`);
-      if (key !== 'tokenHelp.codeberg.s6') assert.ok(parseMarked(text).some((s) => s.type === 'kbd'), `${key}: an interface label`);
+      assert.ok(parseMarked(text).some((s) => s.type === 'kbd'), `${key}: an interface label`);
       assert.doesNotMatch(text, /<|\*\*|\[b\]|\[strong\]/, `${key}: no bold, no HTML`);
     }
   });
@@ -61,7 +61,7 @@ test('steps: the example values are code (name, address, token name)', () => {
       const code = parseMarked(text).filter((s) => s.type === 'code').map((s) => s.text);
       if (/\.git\b/.test(text)) assert.ok(code.some((c) => /^https:\/\/.+\.git$/.test(c)), key);
       if (/carnet-plongee/.test(text.replace(/https:\/\/\S+/, ''))) assert.ok(code.includes('carnet-plongee'), key);
-      if (/OpenDives/.test(text)) assert.ok(code.includes('OpenDives'), key);
+      if (/(par exemple|for example) \[code\]OpenDives/.test(text)) assert.ok(code.includes('OpenDives'), key);
     }
   }
 });
@@ -114,4 +114,19 @@ test('light values are those of the mock-ups', () => {
   assert.equal(token('--od-kbd-outline', false), '#D3D0C8');
   assert.equal(token('--od-code-background', false), '#EAF0F7');
   assert.equal(token('--od-code-text', false), '#1F3F66');
+});
+
+test('token help (tasks 254, 255): each host has its own intro, note, link text and steps, in both languages', () => {
+  for (const lang of ['fr', 'en']) {
+    for (const id of ['github', 'gitlab', 'codeberg']) {
+      const h = catalogs[lang].tokenHelp[id];
+      for (const k of ['name', 'intro', 'open', 'note']) assert.equal(typeof h[k], 'string', `${lang} ${id} ${k}`);
+    }
+    const s5 = catalogs[lang].tokenHelp.github.s5;
+    assert.deepEqual(parseMarked(s5).filter((x) => x.type === 'kbd').map((x) => x.text), ['Expiration', 'No expiration']);
+    assert.doesNotMatch(catalogs[lang].tokenHelp.github.intro, /expir|date/i);
+  }
+  const page = read('src/pages/TokenHelp.svelte');
+  assert.match(page, /https:\/\/gitlab\.com\/-\/user_settings\/personal_access_tokens/);
+  assert.match(page, /https:\/\/codeberg\.org\/user\/settings\/applications/);
 });

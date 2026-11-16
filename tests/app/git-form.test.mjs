@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { stripMarked } from '../../app/src/lib/marked-text.js';
 
 const src = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 const lookup = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
@@ -51,9 +52,9 @@ test('the help page: the three hosts, their links, the steps of task 252', () =>
   assert.match(help, /https:\/\/codeberg\.org\/repo\/create/);
   assert.match(help, /steps\('github', 6\)[\s\S]*steps\('gitlab', 7\)[\s\S]*steps\('codeberg', 6\)/);
   assert.match(help, /target="_blank" rel="noopener"/);
-  assert.equal(fr.repoHelp.gitlab.s7, 'Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.');
-  assert.equal(fr.repoHelp.codeberg.s4, 'Laissez Initialize repository décoché. Le dépôt doit rester vide.');
-  assert.equal(fr.repoHelp.codeberg.s6, 'Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.');
+  assert.equal(stripMarked(fr.repoHelp.gitlab.s7), 'Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.');
+  assert.equal(stripMarked(fr.repoHelp.codeberg.s4), 'Laissez Initialize repository décoché. Le dépôt doit rester vide.');
+  assert.equal(stripMarked(fr.repoHelp.codeberg.s6), 'Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.');
   assert.equal(fr.repoHelp.open.replace('{page}', fr.repoHelp.gitlab.page).replace('{name}', 'GitLab'), 'Ouvrir la page « New project » de GitLab');
   // The active tab: semi-bold, text colour, a 3 dp underline.
   assert.match(help, /aria-selected='true'\] \{\s*color: var\(--od-text\);\s*font-weight: 600;[\s\S]*border-bottom: 3px solid var\(--od-text\)/);
