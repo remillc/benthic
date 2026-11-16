@@ -33,9 +33,9 @@ test('the texts of the mock-ups, in French', () => {
 
 test('every new key exists in both languages', () => {
   const keys = ['gitRepo.titlePhone', 'gitRepo.introPhone', 'gitRepo.repositoryHow', 'gitRepo.branchWaitingAccess', 'firstLaunch.snackbar.gitDownloaded', 'firstLaunch.download.gitConnect',
-    'repoHelp.title', 'repoHelp.tabs', 'repoHelp.intro', 'repoHelp.afterwards', 'repoHelp.open'];
+    'repoHelp.title', 'repoHelp.tabs', 'repoHelp.afterwards', 'repoHelp.open'];
   for (const [id, count] of [['github', 6], ['gitlab', 7], ['codeberg', 6]]) {
-    keys.push(`repoHelp.${id}.name`, `repoHelp.${id}.page`, `repoHelp.${id}.note`);
+    keys.push(`repoHelp.${id}.name`, `repoHelp.${id}.intro`, `repoHelp.${id}.page`, `repoHelp.${id}.note`);
     for (let i = 1; i <= count; i++) keys.push(`repoHelp.${id}.s${i}`);
   }
   for (const [lang, json] of [['fr', fr], ['en', en]]) for (const key of keys) assert.ok(lookup(json, key), `${lang}: ${key}`);
@@ -52,10 +52,10 @@ test('the help page: the three hosts, their links, the steps of task 252', () =>
   assert.match(help, /https:\/\/codeberg\.org\/repo\/create/);
   assert.match(help, /steps\('github', 6\)[\s\S]*steps\('gitlab', 7\)[\s\S]*steps\('codeberg', 6\)/);
   assert.match(help, /target="_blank" rel="noopener"/);
-  assert.equal(stripMarked(fr.repoHelp.gitlab.s7), 'Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.');
-  assert.equal(stripMarked(fr.repoHelp.codeberg.s4), 'Laissez Initialize repository décoché. Le dépôt doit rester vide.');
+  assert.equal(stripMarked(fr.repoHelp.gitlab.s7), 'Touchez Code, puis copiez l’adresse sous Cloner avec HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.');
+  assert.equal(stripMarked(fr.repoHelp.codeberg.s4), 'Laissez Initialiser le dépôt décoché. Le dépôt doit rester vide.');
   assert.equal(stripMarked(fr.repoHelp.codeberg.s6), 'Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.');
-  assert.equal(fr.repoHelp.open.replace('{page}', fr.repoHelp.gitlab.page).replace('{name}', 'GitLab'), 'Ouvrir la page « New project » de GitLab');
+  assert.equal(fr.repoHelp.open.replace('{page}', fr.repoHelp.gitlab.page).replace('{name}', 'GitLab'), 'Ouvrir la page « Nouveau projet » de GitLab');
   // The active tab: semi-bold, text colour, a 3 dp underline.
   assert.match(help, /aria-selected='true'\] \{\s*color: var\(--od-text\);\s*font-weight: 600;[\s\S]*border-bottom: 3px solid var\(--od-text\)/);
 });

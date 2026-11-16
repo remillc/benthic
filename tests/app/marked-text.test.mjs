@@ -130,3 +130,18 @@ test('token help (tasks 254, 255): each host has its own intro, note, link text 
   assert.match(page, /https:\/\/gitlab\.com\/-\/user_settings\/personal_access_tokens/);
   assert.match(page, /https:\/\/codeberg\.org\/user\/settings\/applications/);
 });
+
+test('repository help (task 256): French labels for GitLab and Codeberg, English ones for GitHub and in en.json', () => {
+  const kbd = (lang, id) => Object.entries(catalogs[lang].repoHelp[id]).filter(([k]) => /^s\d+$/.test(k)).flatMap(([, v]) => parseMarked(v).filter((x) => x.type === 'kbd').map((x) => x.text));
+  assert.ok(kbd('fr', 'gitlab').includes('Nouveau projet/dépôt'));
+  assert.ok(kbd('fr', 'gitlab').includes('Cloner avec HTTPS'));
+  assert.ok(kbd('fr', 'codeberg').includes('Rendre le dépôt privé'));
+  assert.ok(kbd('fr', 'github').includes('New repository'));
+  assert.ok(kbd('en', 'gitlab').includes('New project/repository'));
+  assert.ok(kbd('en', 'codeberg').includes('Make repository private'));
+  assert.equal(catalogs.fr.repoHelp.gitlab.page, 'Nouveau projet');
+  assert.equal(catalogs.fr.repoHelp.codeberg.page, 'Nouveau dépôt');
+  assert.match(catalogs.fr.repoHelp.github.intro, /GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface\.$/);
+  assert.match(catalogs.fr.tokenHelp.github.intro, /GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface\.$/);
+  for (const id of ['gitlab', 'codeberg']) assert.match(catalogs.fr.repoHelp[id].intro, /Les libellés ci-dessous sont ceux de l’interface française du site\.$/);
+});

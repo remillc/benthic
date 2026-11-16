@@ -3459,11 +3459,11 @@
   "repoHelp": {
     "title": "Créer un dépôt",
     "tabs": "Sites",
-    "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface anglaise de chaque site.",
     "afterwards": "Revenez ensuite dans OpenDives, collez l’adresse, puis créez un jeton d’accès pour ce dépôt.",
     "open": "Ouvrir la page « {page} » de {name}",
     "github": {
       "name": "GitHub",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface.",
       "page": "New repository",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
       "s1": "Connectez-vous à GitHub, puis touchez [kbd]+[/kbd] en haut de la page et [kbd]New repository[/kbd].",
@@ -3475,25 +3475,27 @@
     },
     "gitlab": {
       "name": "GitLab",
-      "page": "New project",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "page": "Nouveau projet",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
-      "s1": "Connectez-vous à GitLab, puis touchez [kbd]+ (Create new)[/kbd] en haut du menu et [kbd]New project/repository[/kbd].",
-      "s2": "Touchez [kbd]Create blank project[/kbd].",
-      "s3": "[kbd]Project name[/kbd] : un nom reconnaissable, par exemple [code]carnet-plongee[/code].",
-      "s4": "Sous [kbd]Visibility Level[/kbd], choisissez [kbd]Private[/kbd].",
-      "s5": "Décochez [kbd]Initialize repository with a README[/kbd]. Le dépôt doit rester vide.",
-      "s6": "Touchez [kbd]Create project[/kbd].",
-      "s7": "Touchez [kbd]Code[/kbd], puis copiez l’adresse sous [kbd]Clone with HTTPS[/kbd], par exemple [code]https://gitlab.com/vous/carnet-plongee.git[/code]."
+      "s1": "Connectez-vous à GitLab, puis touchez [kbd]+ (Créer un nouveau)[/kbd] en haut du menu et [kbd]Nouveau projet/dépôt[/kbd].",
+      "s2": "Touchez [kbd]Créer un projet vide[/kbd].",
+      "s3": "[kbd]Nom du projet[/kbd] : un nom reconnaissable, par exemple [code]carnet-plongee[/code].",
+      "s4": "Sous [kbd]Niveau de visibilité[/kbd], choisissez [kbd]Privé[/kbd].",
+      "s5": "Décochez [kbd]Initialiser le dépôt avec un README[/kbd]. Le dépôt doit rester vide.",
+      "s6": "Touchez [kbd]Créer le projet[/kbd].",
+      "s7": "Touchez [kbd]Code[/kbd], puis copiez l’adresse sous [kbd]Cloner avec HTTPS[/kbd], par exemple [code]https://gitlab.com/vous/carnet-plongee.git[/code]."
     },
     "codeberg": {
       "name": "Codeberg",
-      "page": "New repository",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "page": "Nouveau dépôt",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
-      "s1": "Connectez-vous à Codeberg, puis touchez [kbd]+[/kbd] en haut de la page et [kbd]New repository[/kbd].",
-      "s2": "[kbd]Repository name[/kbd] : un nom reconnaissable, par exemple [code]carnet-plongee[/code].",
-      "s3": "Cochez [kbd]Make repository private[/kbd].",
-      "s4": "Laissez [kbd]Initialize repository[/kbd] décoché. Le dépôt doit rester vide.",
-      "s5": "Touchez [kbd]Create repository[/kbd].",
+      "s1": "Connectez-vous à Codeberg, puis touchez [kbd]+[/kbd] en haut de la page et [kbd]Nouveau dépôt[/kbd].",
+      "s2": "[kbd]Nom du dépôt[/kbd] : un nom reconnaissable, par exemple [code]carnet-plongee[/code].",
+      "s3": "Cochez [kbd]Rendre le dépôt privé[/kbd].",
+      "s4": "Laissez [kbd]Initialiser le dépôt[/kbd] décoché. Le dépôt doit rester vide.",
+      "s5": "Touchez [kbd]Créer un dépôt[/kbd].",
       "s6": "Choisissez [kbd]HTTPS[/kbd] au-dessus de l’adresse du dépôt, puis copiez-la, par exemple [code]https://codeberg.org/vous/carnet-plongee.git[/code]."
     }
   }

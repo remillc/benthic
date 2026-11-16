@@ -1,8 +1,7 @@
 <script>
   // @ts-check
   // "Créer un dépôt" (task 2026-11-16-247; docs/mockups/git-depot-aide-android.dc.html): the steps to create, on
-  // each host, a private and empty repository, and to copy its HTTPS address. Labels are those of each
-  // site's English interface, in both languages. Same layout as the token help (TokenHelp.svelte): one
+  // each host, a private and empty repository, and to copy its HTTPS address. GitHub's labels are those of its English interface; GitLab's and Codeberg's follow the app's language (task 256). Same layout as the token help (TokenHelp.svelte): one
   // host at a time, chosen with Material 3 primary tabs under the top bar; swiping sideways changes tab.
   // The button to the host's page opens in the browser, with the external-link icon.
   // To add a host: one entry in PROVIDERS and its texts `repoHelp.<id>.*` (name, page, note, then the steps).
@@ -90,7 +89,7 @@
     {/each}
   </div>
 
-  <p class="od-repository-help--intro">{t('repoHelp.intro')}</p>
+  <p class="od-repository-help--intro">{t(`repoHelp.${provider.id}.intro`)}</p>
 
   <div
     class="od-repository-help--surface"

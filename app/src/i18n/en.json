@@ -3459,11 +3459,11 @@
   "repoHelp": {
     "title": "Create a repository",
     "tabs": "Sites",
-    "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of each site’s English interface.",
     "afterwards": "Then come back to OpenDives, paste the address, and create an access token for this repository.",
     "open": "Open {name}’s “{page}” page",
     "github": {
       "name": "GitHub",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. GitHub exists only in English: the labels below are those of its interface.",
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitHub, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
@@ -3475,6 +3475,7 @@
     },
     "gitlab": {
       "name": "GitLab",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
       "page": "New project",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitLab, then tap [kbd]+ (Create new)[/kbd] at the top of the menu and [kbd]New project/repository[/kbd].",
@@ -3487,6 +3488,7 @@
     },
     "codeberg": {
       "name": "Codeberg",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to Codeberg, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
