@@ -1317,7 +1317,7 @@
         </header>
       {/if}
       <div class="od-desktop-settings--columns">
-        <nav class="od-desktop-settings--categories" aria-label={t('settings.title')}>
+        <nav class="od-desktop-settings--categories" data-od-scroll aria-label={t('settings.title')}>
           {#if windowed}{@render deskSearchField()}{/if}
           <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
           <ul role="list" onkeydown={categoryKey}>
@@ -1340,7 +1340,7 @@
             {/each}
           </ul>
         </nav>
-        <main class="od-desktop-settings--pane" aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
+        <main class="od-desktop-settings--pane" data-od-scroll aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
           <div class="od-desktop-settings--content">
             {#if searching}
               <h2 class="od-desktop-settings--pane-title">{t('desktopSettings.results', { n: found.count, text: search.trim() })}</h2>

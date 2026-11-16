@@ -502,6 +502,17 @@
       flex-direction: column;
       padding: 24px;
     }
+    /* A short window (fluid layout, docs/system-design.md, section 7): the frame follows the window's height, so its
+       margins give way before the step's content has to scroll. */
+    @media (max-height: 640px) {
+      .od-new-logbook--page {
+        padding-block: 16px;
+      }
+      .od-new-logbook--footer {
+        gap: 8px;
+        padding-top: 8px;
+      }
+    }
     .od-new-logbook--header {
       flex: none;
       padding-inline-end: 32px;

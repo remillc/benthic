@@ -44,7 +44,7 @@
   }
 </script>
 
-<Page class="od-about-text">
+<Page data-od-scroll class="od-about-text">
   <Navbar title={which === 'notes' ? t('about.notes') : which === 'privacy' ? t('about.privacyPolicy') : t('about.licence')}>
     {#snippet left()}
       <Link back iconOnly>

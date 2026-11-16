@@ -712,6 +712,12 @@ html.ios {
   html.od-desktop-app * {
     scrollbar-width: thin;
   }
+
+  /* The page itself never shows a bar (Framework7 hides the body's). */
+  html.od-desktop-app,
+  html.od-desktop-app body {
+    scrollbar-width: none;
+  }
 }
 
 @layer od.base {

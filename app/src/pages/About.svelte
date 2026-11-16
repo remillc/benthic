@@ -146,7 +146,7 @@
 </script>
 
 {#snippet aboutPage()}
-<Page class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-od-scroll class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
       {#if dialog}

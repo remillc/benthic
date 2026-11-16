@@ -116,7 +116,7 @@ function inspect(allow, rootSel) {
   const clipRect = (el) => {
     let left = 0;
     let top = 0;
-    let right = vw;
+    let right = window.innerWidth;
     let bottom = vh;
     for (let p = el.parentElement; p && p !== document.body && p !== doc; p = p.parentElement) {
       const cs = getComputedStyle(p);

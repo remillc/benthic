@@ -37,7 +37,7 @@
   ];
 </script>
 
-<Page class="od-about-libraries">
+<Page data-od-scroll class="od-about-libraries">
   <Navbar title={t('about.libraries')}>
     {#snippet left()}
       <Link back iconOnly>

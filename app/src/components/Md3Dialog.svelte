@@ -75,7 +75,7 @@
   <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1" use:fit>
     <h2 {id}>{title}</h2>
     {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
-    <div class="od-md3-dialog--content">{@render children()}</div>
+    <div class="od-md3-dialog--content" data-od-scroll>{@render children()}</div>
     <div class="od-md3-dialog--actions">{@render actions()}</div>
   </div>
 </div>
