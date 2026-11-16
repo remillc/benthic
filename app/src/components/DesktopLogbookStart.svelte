@@ -48,8 +48,8 @@
   <main class="od-logbook-start" class:od-logbook-start--dragging={dragging} aria-label={t('desktopLogbooks.start.empty')}>
     <div class="od-logbook-start--column">
       <div class="od-logbook-start--head">
-        <img class="od-logbook-start--logo od-logbook-start--light" src="logo-light.svg" alt="" width="64" height="64" />
-        <img class="od-logbook-start--logo od-logbook-start--dark" src="logo-dark.svg" alt="" width="64" height="64" />
+        <img class="od-logbook-start--logo od-logbook-start--light" src="logo-light.svg" alt="" width="96" height="96" />
+        <img class="od-logbook-start--logo od-logbook-start--dark" src="logo-dark.svg" alt="" width="96" height="96" />
         <div>
           <h1 class="od-logbook-start--title">OpenDives</h1>
           <p class="od-logbook-start--subtitle">{t('desktopLogbooks.start.empty')}</p>
@@ -97,7 +97,7 @@
     }
 
     .od-logbook-start--column {
-      width: 560px;
+      width: 600px;
       max-width: calc(100% - 48px);
       display: flex;
       flex-direction: column;
@@ -105,10 +105,13 @@
       padding: 24px 0;
     }
 
+    /* A larger brand row with more space (task 2026-11-16-222): logo 96 px, 24 px gap, 48 px above the buttons
+       (the column's 20 px gap plus 28 px). */
     .od-logbook-start--head {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 24px;
+      margin-bottom: 28px;
     }
 
     .od-logbook-start--logo {
@@ -127,15 +130,16 @@
     .od-logbook-start--title {
       margin: 0;
       font-family: var(--od-title-font);
-      font-size: 28px;
-      line-height: 32px;
+      font-size: 44px;
+      line-height: 52px;
       font-weight: 500;
+      letter-spacing: -0.5px;
     }
 
     .od-logbook-start--subtitle {
-      margin: 0;
-      font-size: 16px;
-      line-height: 22px;
+      margin: 4px 0 0;
+      font-size: 18px;
+      line-height: 24px;
       color: var(--od-text-2);
     }
 
