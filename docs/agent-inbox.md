@@ -4313,3 +4313,32 @@ Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.ht
 - « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
 - On a tablet, nothing changes.
 - The beta on `main` is untouched.
+
+## [ ] 2026-11-16-228 Release edition: the first launch on the desktop
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-desktop-first-launch`, started from `feature/release-phone-first-launch` (task 227). Do not merge it into `main`. On `main`, the beta keeps its current window without a logbook (task 222).
+
+Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.html` (a 1440 × 900 window). They are the desktop versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors.
+
+**Layout:**
+- The window without a logbook becomes « Pour commencer ».
+- The blue panel (700 dp) is on the left and the steps are in the right-hand column, as on a tablet in landscape.
+- The panel is decorative and keeps the window's full height.
+- The motion between steps is the same shared-axis X transition.
+
+**Desktop-only details:**
+- « cette tablette » becomes « cet ordinateur »: « Seulement sur cet ordinateur », « Le jeton reste sur cet ordinateur. », « Il reste sur cet ordinateur. ».
+- Under the choices of « Pour commencer » and of « Importer un carnet », add the line « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ». Dropping a file on the window starts the import with that file, as « Un fichier » does.
+- **iCloud Drive (note from Christian):**
+  - On macOS only, iCloud Drive also appears in the list of services: « Choisissez votre service » (create) and « Dans quel service ? » (open).
+  - Windows and Linux do not show it.
+  - iCloud Drive uses the Mac's own account, so there is no sign-in screen: after the choice, go straight to the connected screen, with the OpenDives folder of iCloud Drive.
+- « Voir les formats acceptés » sits under « Un fichier », as a 48 dp target (task 226).
+- The « Une question ? À propos et contact » link opens the desktop About page.
+- **Not drawn yet (to-do #83):** the list of recent logbooks above the choices, in a new window or after « Fermer le carnet ». Until it is drawn, keep what the desktop app does today for recent logbooks, if anything.
+
+**Test:**
+- On Windows, macOS and Linux, every screen matches its mock-up at 1440 × 900 and still fits at the smallest window size the app allows.
+- iCloud Drive shows only on macOS.
+- Dropping a `.ssrf` or `.xml` file on the window imports it.
+- The beta on `main` is untouched.
