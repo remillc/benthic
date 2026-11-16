@@ -4389,7 +4389,7 @@ Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, a
 
 **Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
 
-## [ ] 2026-11-16-232 Alpha: the confirmation code in six boxes
+## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
 
 Christian approved this on 16 November 2026. **Alpha (the app on `main`)**: do it on `main`.
 
@@ -4410,6 +4410,8 @@ Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approve
 - Use the same field wherever the app asks for such a code. Texts in `fr.json` and `en.json`.
 
 **Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
+
+Done: `app/src/components/CodeField.svelte` (class `od-code-field`) is one `<input>` (`inputmode="numeric"`, `autocomplete="one-time-code"`, `maxlength="6"`, accessible name « Code de confirmation, 6 chiffres » from `confirmCode.codeLabel`) drawn as six 48 × 56 dp boxes 8 dp apart, Roboto Mono / monospace 24 sp, active box 2 dp #1F5C99 with a blinking caret, others 1 dp #75787C, error state all six 2 dp #B3261E with « Code incorrect. Vérifiez le dernier courriel reçu. » under them (`confirmCode.wrong`, fr and en; fr-CA falls back to fr). The rules are pure functions in `app/src/lib/code-input.js` (digits only, paste of « 482 913 » fills six, Backspace removes the last digit). It is used on « Confirmer votre adresse » (`pages/ConfirmCode.svelte`, routes `/welcome/code` and `/account/code`), the only place the app asks for such a code. « Confirmer » sends, enabled with six digits (Enter sends too); **no auto-send on the sixth digit**, so a wrong paste or typo is not sent before the diver looks at it. The error clears when the code is edited. New tokens `--od-code-active`, `--od-code-border`, `--od-code-error` (no existing token had these values), with dark values. On a 360 dp phone the card leaves 296 dp, so the boxes shrink in proportion to about 43 dp (gap stays 8 dp); no horizontal scroll at 360 or 412. The field sits in the editorial card like the other account screens (the mock-up has no card), the « Renvoyer le code » button is kept. iOS: same structure, 10 pt corners. Checked in headless Edge at 412 × 915 and 360 × 800 (normal, typing, error; light, dark, iOS). Tests: `tests/app/code-input.test.mjs`. Branch `feature/code-boxes`.
 
 ## [x] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
 

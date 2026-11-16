@@ -1,16 +1,17 @@
 <script>
   // @ts-check
-  // New account: the confirmation code mailed by the server (docs/mockups/
-  // compte-code-*.dc.html; spec, section 4, "Sign in and new account"), as
+  // New account: the confirmation code mailed by the server, in six boxes (CodeField,
+  // task 2026-11-16-232; docs/mockups/*creer-compte-code*.dc.html; spec, section 4, "Sign in and new account"), as
   // the PIN screen of Subsurface-mobile: cloud_verify_pin. "Renvoyer le
   // code" sits right under the field (outlined on Android, tinted grey on
   // iOS). From first launch, then "Reprendre votre carnet ?"; from Account,
   // the logbook of this device becomes the account's first logbook.
   import { OpenDivesCore } from 'opendives-core';
-  import AccountField from '../components/AccountField.svelte';
+  import CodeField from '../components/CodeField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
   import { accountFlow, errorCode, finishAccount, showFailure, toast } from '../lib/account.js';
+  import { codeComplete } from '../lib/code-input.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, email?: string }} */
@@ -24,7 +25,7 @@
     busy = true;
     codeError = '';
     try {
-      const result = await OpenDivesCore.verifyPin({ pin: code.trim() });
+      const result = await OpenDivesCore.verifyPin({ pin: code });
       if (result.status !== 'verified') {
         codeError = t('confirmCode.wrong');
         return;
@@ -68,18 +69,18 @@
   action={t('confirmCode.submit')}
   busyLabel={t('confirmCode.busy')}
   {busy}
-  actionDisabled={!code.trim()}
+  actionDisabled={!codeComplete(code)}
   onaction={confirm}
 >
   <div class="od-confirm-code--fields">
-    <AccountField
+    <CodeField
       label={t('confirmCode.code')}
-      rowLabel={t('confirmCode.codeRow')}
-      autocomplete="one-time-code"
+      accessibleLabel={t('confirmCode.codeLabel')}
       bind:value={code}
       error={codeError}
       disabled={busy}
-      required
+      oninput={() => (codeError = '')}
+      onsubmit={confirm}
     />
     <div class="od-confirm-code--resend">
       <button type="button" disabled={busy} onclick={resend}><Icon name="refresh" size={18} weight={2} />{t('confirmCode.resend')}</button>
@@ -99,7 +100,7 @@
 
     /* MD3 outlined button with a leading icon (18 dp); iOS: a grey tinted button. */
     .od-confirm-code--resend {
-      margin: 8px 16px 0;
+      margin: 8px var(--od-field-margin, 0) 0;
 
       button {
         width: auto;
