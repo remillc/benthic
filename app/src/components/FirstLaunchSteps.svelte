@@ -12,6 +12,7 @@
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
   import ReleaseField from './ReleaseField.svelte';
   import WelcomeHelpLink from './WelcomeHelpLink.svelte';
+  import ImportFormats from './ImportFormats.svelte';
   import FirstLaunchGit from './FirstLaunchGit.svelte';
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
   import { flow, go, goBack, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
@@ -24,6 +25,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
+  import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
   import { t, locale } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -36,6 +38,11 @@
   const nameInvalid = $derived(!fileName);
   const nameError = $derived(flow.name.trim() && nameInvalid ? t('welcomeSteps.nameInvalid') : '');
   let busy = $state(false);
+  /** The name of the file the core could not read: the error block of « Importer un carnet » (task 223). */
+  let unreadable = $state('');
+  $effect(() => {
+    if (step !== 'import') unreadable = '';
+  });
   /** @type {HTMLInputElement|undefined} */
   let fileInput = $state();
 
@@ -136,11 +143,19 @@
     }
   }
 
-  /** @param {unknown} e */
-  function failed(e) {
+  /**
+   * @param {unknown} e
+   * @param {File} [file] the file being read, when there is one
+   */
+  function failed(e, file) {
     const code = String(/** @type {any} */ (e)?.message ?? '');
     console.error('First launch', code);
-    f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
+    const key = importErrorKey(code);
+    if (step === 'import' && file && (key === 'logbook.importFailed' || key === 'logbook.importNoDives')) {
+      unreadable = file.name;
+      return;
+    }
+    f7.dialog.create({ title: t('logbook.importTitle'), text: t(key), buttons: [{ text: t('dialog.ok') }] }).open();
   }
 
   /** @param {File} file */
@@ -160,6 +175,7 @@
     const file = fileInput?.files?.[0];
     if (!fileInput || !file || busy) return;
     fileInput.value = '';
+    unreadable = '';
     busy = true;
     try {
       const dives = await readImportFile(file, {
@@ -174,7 +190,7 @@
       flow.name = flow.source.name;
       go('file');
     } catch (e) {
-      failed(e);
+      failed(e, file);
     } finally {
       busy = false;
     }
@@ -322,10 +338,20 @@
           <FirstLaunchGit create router={f7router} afterConnect={afterGit} onopen={() => go('openLink')} />
         {:else if step === 'import'}
           <p class="od-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
+          {#if unreadable}
+            <div class="od-first-launch--error" role="alert">
+              <span class="od-first-launch--error-icon"><Icon name="error" size={22} /></span>
+              <span class="od-first-launch--error-text">
+                <span class="od-first-launch--error-title">{t('welcomeSteps.fileUnreadable')}</span>
+                <span class="od-first-launch--error-detail">{t('welcomeSteps.fileUnreadableHelp', { name: unreadable })}</span>
+              </span>
+            </div>
+          {/if}
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
-            <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp')} disabled={busy} onclick={() => fileInput?.click()} />
+            <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp', { n: IMPORT_FORMAT_COUNT })} disabled={busy} onclick={() => fileInput?.click()} />
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
+          <ImportFormats />
           <input type="file" class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
         {:else if step === 'importDivelogs' || step === 'importProgress'}
           <FirstLaunchDivelogs {step} onread={divelogsRead} />
@@ -589,6 +615,42 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--od-text-2);
+    }
+
+    /* The file that could not be read (mock-up …-importer-fichier-erreur-paysage). */
+    .od-first-launch--error {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin: 0 0 22px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--od-error-container);
+      color: var(--od-on-error-container);
+    }
+
+    .od-first-launch--error-icon {
+      flex: none;
+      color: var(--od-error);
+      display: flex;
+    }
+
+    .od-first-launch--error-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .od-first-launch--error-title {
+      font-size: 16px;
+      line-height: 21px;
+      font-weight: 600;
+    }
+
+    .od-first-launch--error-detail {
+      font-size: 14px;
+      line-height: 19px;
     }
 
     .od-first-launch--file {

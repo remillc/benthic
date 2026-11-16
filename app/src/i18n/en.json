@@ -994,6 +994,16 @@
     "durationValue": "54 min",
     "durationLabel": "Duration · Nitrox 32 %"
   },
+  "importFormats": {
+    "link": "See the accepted formats",
+    "title": "Accepted formats",
+    "text": "OpenDives reads {n} logbook formats. Choose the file exported by your software or your device.",
+    "column": {
+      "open": "Open formats",
+      "devices": "Dive watches and computers",
+      "logbooks": "Other logbooks"
+    }
+  },
   "welcomeSteps": {
     "startTitle": "Get started",
     "createTitle": "Create a logbook",
@@ -1043,7 +1053,9 @@
     "gitNotEmpty": "This repository already holds files. If it holds a logbook, use “Open my OpenDives logbook”.",
     "importQuestion": "Where do your dives come from?",
     "fileTitle": "A file",
-    "fileHelp": "Formats .ssrf, .xml, UDDF, FIT and those of other logbooks.",
+    "fileHelp": "{n} formats: .ssrf, .xml, UDDF, FIT, Suunto, Shearwater and other logbooks.",
+    "fileUnreadable": "This file could not be read",
+    "fileUnreadableHelp": "“{name}” is not a recognised logbook. Choose a .ssrf, .xml, UDDF or FIT file, or a file from another logbook.",
     "divelogsTitle": "divelogs.de",
     "divelogsHelp": "With your divelogs.de login.",
     "divelogsFormTitle": "Import from divelogs.de",

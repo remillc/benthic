@@ -994,6 +994,16 @@
     "durationValue": "54 min",
     "durationLabel": "Durée · Nitrox 32 %"
   },
+  "importFormats": {
+    "link": "Voir les formats acceptés",
+    "title": "Formats acceptés",
+    "text": "OpenDives lit {n} formats de carnet. Choisissez le fichier exporté par votre logiciel ou votre appareil.",
+    "column": {
+      "open": "Formats ouverts",
+      "devices": "Montres et ordinateurs de plongée",
+      "logbooks": "Autres carnets"
+    }
+  },
   "welcomeSteps": {
     "startTitle": "Pour commencer",
     "createTitle": "Créer un carnet",
@@ -1043,7 +1053,9 @@
     "gitNotEmpty": "Ce dépôt contient déjà des fichiers. S’il contient un carnet, passez par « Ouvrir mon carnet OpenDives ».",
     "importQuestion": "D’où viennent vos plongées ?",
     "fileTitle": "Un fichier",
-    "fileHelp": "Formats .ssrf, .xml, UDDF, FIT et ceux d’autres carnets.",
+    "fileHelp": "{n} formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets.",
+    "fileUnreadable": "Ce fichier n’a pas pu être lu",
+    "fileUnreadableHelp": "« {name} » n’est pas un carnet reconnu. Choisissez un fichier .ssrf, .xml, UDDF, FIT ou d’un autre carnet.",
     "divelogsTitle": "divelogs.de",
     "divelogsHelp": "Avec votre identifiant divelogs.de.",
     "divelogsFormTitle": "Importer depuis divelogs.de",
