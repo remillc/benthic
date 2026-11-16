@@ -4848,3 +4848,26 @@ Every « Suivant » button gets a right chevron after the label, following the M
 The chevron is decorative (`aria-hidden`); the button's name stays « Suivant ». In right-to-left layouts it would point left, but we have none yet.
 
 **Test:** on the « Nouveau carnet » step, when creating and when importing, on phone, tablet and desktop, « Suivant » shows the chevron to the right of the label.
+
+## [ ] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: every phone step page of the alpha and beta first launch, `docs/mockups/android-premier-lancement-alpha-*.dc.html` and `android-premier-lancement-beta-*.dc.html` (for example `-beta-compte-subsurface`, `-alpha-git`, `-alpha-sans-compte`, `-beta-creer-compte*`, the download screens).
+
+The band of the steps (`FirstLaunchBand`, variant `step`, 140 dp under the status bar) changes back to the look of the app's section band (`SectionBand` / `BandBackdrop`), with the light rays kept:
+- **Background:** the section band's radial gradient (`radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`), instead of the dark hatched linear gradient. The top-left sheen goes away.
+- **Light rays:** keep the diagonal rays layer (`repeating-linear-gradient(105deg, …)`, fading out at 55 % of the height).
+- **Faint profile:** the band's decorative dive profile at the bottom, as in the section band (area 10 % white, line 30 % white, 1.5 dp).
+- **Wave:** the app's 18 dp wave at the bottom edge, the same curve as `SectionBand` (`M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z`), in the page background colour.
+- The logo, « OpenDives » and the « Alpha » badge do not change. Check that the badge's white text still reaches 4.5:1 on the lighter top of the gradient; if not, raise the badge fill as on the welcome band.
+
+This replaces, for the step pages only, the band of tasks 234 and 236 (hatched dark blue, straight edge). The welcome screen keeps its 330 dp hatched hero with the headline and the animated profile. Tablets do not change.
+
+**Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
+
+## [ ] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+Same change as task 250, for the release step pages: the 140 dp step band takes the section band's radial gradient, keeps the light rays, gets the faint profile and the 18 dp wave at the bottom, and loses the top-left sheen and the straight edge. This replaces the step band of task 244. The welcome hero (330 dp) and the tablets do not change.
+
+**Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
