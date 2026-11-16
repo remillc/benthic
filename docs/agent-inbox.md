@@ -4275,3 +4275,15 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and 
 **Test:** on a tablet in both orientations and on a phone, the badge sits on the name's line, 8 dp away, without wrapping; TalkBack reads « OpenDives, bêta » once.
 
 Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.
+
+## [ ] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-formats-link`, started from `feature/release-first-launch-complete` (task 224). Do not merge it into `main`.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{paysage,portrait}.dc.html` and `…-importer-fichier-erreur-{paysage,portrait}.dc.html`.
+
+- On « Importer un carnet » and on the « fichier illisible » error screen, the link « Voir les formats acceptés » moves from under both choice rows to **right under the « Un fichier » row**, before « divelogs.de ».
+- The link is a 48 dp tall touch target (the text stays 14 sp, #1F5C99, underlined, 4 dp padding on each side). The space between the target and each row is 4 dp, so the text sits about 18 dp from both rows. Everything stays on the 4 dp grid.
+- The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
+
+**Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
