@@ -58,7 +58,6 @@
     formatShortDate,
     formatTimeOfDay,
   } from '../lib/format.js';
-  import SiteMap from '../components/SiteMap.svelte';
   import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
   import { deviceStore } from '../lib/device-store.js';
   import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
@@ -950,15 +949,8 @@
     {/if}
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
-    {#if desk && tab !== 'map'}
-      <DesktopDiveFields {dive} {prefs} tab={tab === 'equipment' || tab === 'gas' || tab === 'notes' ? tab : 'info'} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
-    {/if}
-    {#if desk && tab === 'map'}
-      {#if dive.siteCoordinates}
-        <div class="od-dive-detail--desk-map"><SiteMap pin={dive.siteCoordinates} height="320px" /></div>
-      {:else}
-        <p class="od-dive-detail--desk-empty">{t('desktop.noMap')}</p>
-      {/if}
+    {#if desk}
+      <DesktopDiveFields {dive} {prefs} {tab} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
     {#if !desk && dive.pictures > 0 && settings.showPhotos}
@@ -1150,15 +1142,6 @@
       height: 3px;
       border-radius: 3px 3px 0 0;
       background: var(--od-on-table-selected);
-    }
-    .od-dive-detail--desk-empty {
-      margin: 16px 24px;
-      color: var(--od-text-2);
-    }
-    .od-dive-detail--desk-map {
-      margin: 8px 24px;
-      border-radius: 16px;
-      overflow: hidden;
     }
     .od-dive-detail--hero {
       position: relative;

@@ -125,6 +125,12 @@
        the average-depth line of the profile, a chip of a person in a field. */
     --od-field-rest: #ECEAE4;
     --od-field-hover: #8F8D86;
+    /* Gaz tab of the desktop detail (task 2026-11-16-262): the selected cylinder card, the dashed add card, the reserve mark and the empty consumption bar. */
+    --od-gas-card-selected: #F5F4F0;
+    --od-gas-card-selected-outline: #1F2124;
+    --od-gas-card-add-outline: #B9B6AE;
+    --od-gas-reserve: #B3261E;
+    --od-gas-track: #F1EFEA;
     --od-profile-mean: #114477;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
@@ -406,6 +412,11 @@
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
     --od-field-rest: #2A2D31;
     --od-field-hover: #8A8D91;
+    --od-gas-card-selected: #26282B;
+    --od-gas-card-selected-outline: #F4F4F2;
+    --od-gas-card-add-outline: #5A5D62;
+    --od-gas-reserve: #FF8A80;
+    --od-gas-track: #2A2D31;
     --od-profile-mean: #9DC1EA;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;

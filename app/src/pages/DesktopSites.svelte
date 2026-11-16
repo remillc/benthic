@@ -18,6 +18,7 @@
   import DesktopSitesCleanup from '../components/DesktopSitesCleanup.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
+  import { siteFocus } from '../lib/site-focus.svelte.js';
   import { deskSites, loadSitesChoices, setSitesSort, setSitesWidth, loadRegions, retryWaiting, showSiteDives } from '../lib/desktop-sites.svelte.js';
   import {
     SITE_COLUMNS,
@@ -123,6 +124,15 @@
     const uuids = rows.map((s) => s.uuid);
     const next = reduceSelection(untrack(() => sel), { type: 'visible', uuids });
     if (next !== untrack(() => sel)) sel = next;
+  });
+
+  // A dive's « Voir le site dans Sites »: its site opens in the sheet.
+  $effect(() => {
+    const uuid = siteFocus.uuid;
+    if (uuid && sites.some((s) => s.uuid === uuid)) {
+      untrack(() => select({ type: 'row' }, uuid));
+      siteFocus.uuid = 0;
+    }
   });
 
   const selectedSite = $derived(sites.find((s) => s.uuid === sel.selected) ?? null);

@@ -3,8 +3,8 @@
   // A connected button group of the desktop tools (task 2026-11-15-196): the selected segment is
   // pale blue with a check, not a radio button. Arrow keys move the choice.
   import Icon from './Icon.svelte';
-  /** @type {{ options: { value: string, label: string }[], value: string, onchange: (value: string) => void, ariaLabel: string }} */
-  let { options, value, onchange, ariaLabel } = $props();
+  /** `block`: the group takes the width of its column (40 dp high), as in the dive detail's Informations tab. @type {{ options: { value: string, label: string }[], value: string, onchange: (value: string) => void, ariaLabel: string, block?: boolean }} */
+  let { options, value, onchange, ariaLabel, block = false } = $props();
   /** @type {HTMLDivElement|undefined} */
   let group = $state();
 
@@ -19,7 +19,7 @@
   }
 </script>
 
-<div bind:this={group} class="od-desktop-segments" role="radiogroup" aria-label={ariaLabel}>
+<div bind:this={group} class="od-desktop-segments" class:od-desktop-segments--block={block} role="radiogroup" aria-label={ariaLabel}>
   {#each options as option, i (option.value)}
     <button
       type="button"
@@ -45,6 +45,16 @@
       border: 1px solid var(--od-text-2);
       border-radius: 21px;
       overflow: hidden;
+    }
+    .od-desktop-segments--block {
+      display: flex;
+      height: 40px;
+      border-radius: 20px;
+    }
+    .od-desktop-segments--block .od-desktop-segments--segment {
+      flex: 1;
+      justify-content: center;
+      padding: 0 12px;
     }
     .od-desktop-segments--segment {
       display: flex;
