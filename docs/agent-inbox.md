@@ -4746,7 +4746,7 @@ This replaces the light section-band gradient and the 18 dp wave of task 227 on 
 
 **Test:** on a phone, the welcome hero and every step band are hatched dark blue with a straight bottom edge, and white text on them stays at least 4.5:1.
 
-## [ ] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
+## [x] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
 
 Christian approved this on 16 November 2026. **Release edition:** do it on its own branch, `feature/release-tablet-profile-lines`, and never merge it into `main`.
 
@@ -4758,3 +4758,5 @@ Mock-ups: the tablet screens of the public version that show the profile chart, 
 As task 238 does for the alpha, the depth profile line and the temperature curve change from 1.25 to **1 dp**. Nothing else changes.
 
 **Test:** on a tablet in the public version, the profile line and the temperature curve are 1 dp wide.
+
+Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
