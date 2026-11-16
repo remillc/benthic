@@ -283,3 +283,58 @@ What changed:
 - Sites, Statistics (wide and phone), the site chooser, the blender, the multi-edit dialog and the map preparation use the cached sites list or cylinder types.
 - `loadRegions` reads 16 sites at a time (`readRegions` in `desktop-sites.js`) instead of one round trip per site.
 - Phone and tablet keep their behaviour: they still preload the two neighbours for the swipe; their pages read through the same cache.
+
+## 9. After: F2 and F8 (start-up weight), branch `perf/code-splitting`
+
+Production build (`vite build`), served by Electron from `app://`; four A/B runs per size, before and after interleaved (`tools/perf/make-stage.sh`, `measure-startup.mjs`,
+`STAGE=stage-before|stage-after`, `PHONE=1` for the 390x844 touch layout at 4x CPU, `verify-lazy.mjs` for the walk through the screens). Medians; the machine is shared with other
+agents, so single runs vary by 10-20 % (raw values in `build/perf/startup-ab*.json`, not kept in git).
+
+What the first screen loads (static import graph of `start.js`, `vite build`):
+
+| | before | after |
+|---|---|---|
+| JS files / size / gzip | 7 files, 2,535 KB, 727 KB | 3 files, 1,375 KB, 407 KB (+ the catalogs of the language: fr 204 KB, fr-CA 4 KB, en 177 KB; a French session loads fr and en, an English one en only) |
+| Main chunk `start-*.js` | 2,009 KB | 879 KB (+ `shared-*.js` 528 KB) |
+| i18n | one 446 KB chunk with fr, fr-CA and en | one chunk per language, loaded for the session's language (and English as the fallback) |
+| CSS before the first paint | 596 + 431 = 1,027 KB (Framework7 bundle 570 KB + MapLibre 68 KB + theme + all components) | 726 KB (Framework7 core + 21 components 301 KB; MapLibre's 68 KB with the map code; the CSS of lazy pages with their chunks) |
+| Lazy chunks (JS) | 2 (MapLibre, world land) | 120 (65 pages and dialogs, the three desktop tools, the new-logbook dialog, MapLibre + its CSS, the catalogs) |
+
+Start-up, medians of 4 interleaved runs, before / after (desktop wide layout; phone layout 390x844, touch, CPU 4x):
+
+| | s50 | s500 | s3000 |
+|---|---|---|---|
+| Desktop, first contentful paint (ms) | 428 / 412 | 456 / 408 | 432 / 396 |
+| Desktop, spawn to first row (ms) | 1,394 / 1,423 | 1,652 / 1,411 | 4,534 / 4,210 |
+| Desktop, long tasks in the first 3 s (ms) | 574 / 613 | 1,112 / 754 | 8,139 / 3,415 |
+| Desktop, JS heap after start (MB) | 41.5 / 37.4 | 56.4 / 50.7 | 120.3 / 129.2 |
+| Phone, first contentful paint (ms) | 896 / 732 | 936 / 848 | 1,056 / 920 |
+| Phone, reload to first dive row (ms) | 1,247 / 975 | 1,467 / 1,260 | 1,067 / 929 |
+| Phone, long tasks total (ms) | 1,532 / 1,097 | 2,523 / 1,572 | 7,449 / 1,774 |
+| Phone, JS heap (MB) | 38.2 / 36.0 | 63.4 / 42.4 | 81.5 / 88.6 |
+
+Reading: the first paint is 4-15 % earlier and the main thread is busier for less time (the long tasks drop most at 500 and 3,000 dives, where the first-screen script no longer
+competes with the list render); the time to the first row stays bound by the logbook list itself (F1), so it moves by the noise of the machine (the 3 s outliers in the phone
+rows, 3,847 and 3,200 ms, are single slow reloads on both builds). The split gives less to download, parse and keep, which counts more on a phone's WebView and on a first install
+than on this desktop. One finding changed the design: a first attempt that only added lazy routes made the first paint 60-80 ms **later** (the first screen then needed 76 small
+files, each a request to the `app://` handler, as it would be to the Capacitor asset loader); grouping the modules shared by several screens in one `shared-*.js`
+(`codeSplitting.groups` in `vite.config.js`, 3 files for the first screen) and listing the first screen's files as `modulepreload` links in `index.html` (`preloadFirstScreen`)
+brought it below the before value.
+
+What changed:
+- `App.svelte`: every page that is not a section root, a master-detail pane, the welcome start or Settings is a lazy route (`lazy(() => import(...))`, F7's `async` route with the
+  page resolved on first open): 49 pages. The About, editor and new-statistic popups resolve their component the same way. The sections' own pages stay static (Framework7 creates
+  the four tab views at start, so they are needed at once). The three desktop tools and the new-logbook dialog load when first shown.
+- `lib/language.js` (new) + `lib/i18n.js`: the catalogs are dynamic imports read before the first `t()` (top-level await), and `main.js` starts them beside `start.js`.
+- `framework7.js` (new): Framework7's core and the 23 components the app uses instead of `framework7/lite-bundle` (which also carried the calendar, pickers, photo browser, swiper,
+  messages, data table, colour picker...); `theme.css` imports `framework7/css` and the CSS of those components instead of the 570 KB bundle (642 classes of the bundle are not in the
+  subset; none is named by the app's sources, the other ones only appear in Framework7-Svelte components the app does not use).
+- `maplibre.css` + `lib/maplibre.js`: MapLibre's CSS loads with the map code, in its layer.
+- `vite.config.js`: `shared` chunk group and `preloadFirstScreen` (see above).
+
+Checked by hand in the production build with `verify-lazy.mjs` (desktop, French and English, 50-dive logbook): the logbook, a dive and its five tabs, Sites, Statistics, Tools with its
+five tools, the lazy Planner page from a dive, Settings, and the phone layout: no console error and no exception, except `effect_update_depth_exceeded` when a trip row is opened in
+the phone layout, which the pre-change build throws too (not from this work).
+
+Not done: lazy section roots (Sites, Statistics, Tools, Account are created at start by the four tab views: making them lazy means creating those views on first tab visit, which
+changes the navigation code); lazy Settings (it is the root of two master-detail routes that need a static component); `material-color-utils` (134 KB of Framework7's core).

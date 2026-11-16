@@ -38,8 +38,8 @@ test('the new style is for an Android phone only: a tablet and iOS keep their sc
 
 test('the welcome screen sends Android (phone and, since task 239, tablet) to the « sans compte » screen; iOS starts the logbook', () => {
   assert.match(welcome, /if \(!theme\.ios\) f7router\.navigate\('\/welcome\/local'\);\s*else startWithoutAccount\(\);/);
-  assert.match(app, /path: '\/welcome\/local', component: WithoutAccount/);
-  assert.match(app, /path: '\/welcome\/downloading', component: FirstDownload/);
+  assert.ok(app.includes("'/welcome/local', ...lazy(() => import('./pages/WithoutAccount.svelte'))"));
+  assert.ok(app.includes("'/welcome/downloading', ...lazy(() => import('./pages/FirstDownload.svelte'))"));
 });
 
 test('sign in: the download screen comes between the sign-in and the logbook', () => {

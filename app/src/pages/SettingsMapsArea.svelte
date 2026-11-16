@@ -8,6 +8,7 @@
   // keep the area between about 20 km across and the largest the limit allows
   // (lib/area-frame.js). The search floats on the map. Needs the network (the
   // map of the place is drawn from the online tiles).
+  import { loadMapLibre } from '../lib/maplibre.js';
   import SearchClear from '../components/SearchClear.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
@@ -214,7 +215,7 @@
     const centre = given ? { lng: qLng, lat: qLat } : located[0] ?? { lng: 0, lat: 20 };
     if (!offlineMaps.online || !container) return;
 
-    const module = await import('maplibre-gl');
+    const module = await loadMapLibre();
     maplibregl = /** @type {any} */ (module).default ?? module;
     if (!container?.isConnected) return;
     layout(); // measures the stage, the search field and the sheet

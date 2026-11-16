@@ -4,57 +4,11 @@
 // translations live in src/i18n/<language>.json. French is the reference
 // language; an untranslated language falls back to English.
 // Diver data (site names, notes, tags) never goes through this module.
-import { deviceStore } from './device-store.js';
 import { keepUnits } from './nbsp.js';
-import fr from '../i18n/fr.json';
-import frCA from '../i18n/fr-CA.json';
-import en from '../i18n/en.json';
 
-/** @type {Record<string, Record<string, any>>} */
-const catalogs = { fr, 'fr-CA': frCA, en };
-const FALLBACK = 'en';
+import { catalogs, catalogChain, deviceLanguage, language, pickLanguage, FALLBACK } from './language.js';
 
-/**
- * Catalogs searched for a key, in order. fr-CA holds only what differs from
- * fr (a plural object counts as one leaf), then fr, then English.
- * @param {string} lang
- */
-export function catalogChain(lang) {
-  return lang === 'fr-CA' ? ['fr-CA', 'fr', FALLBACK] : lang === FALLBACK ? [FALLBACK] : [lang, FALLBACK];
-}
-
-/**
- * Interface language for a list of device language tags: fr-CA for a tag
- * fr-CA (any case), fr for any other fr-*, else the first tag that has a
- * translation, else English.
- * @param {readonly string[]} tags
- */
-export function pickLanguage(tags) {
-  for (const tag of tags) {
-    const lower = tag.toLowerCase();
-    if (lower === 'fr-ca') return 'fr-CA';
-    const code = lower.split('-')[0];
-    if (code in catalogs) return code;
-  }
-  return FALLBACK;
-}
-
-/** Device language that has a translation, or English. */
-export const deviceLanguage = pickLanguage(typeof navigator !== 'undefined' ? navigator.languages ?? [navigator.language] : []);
-
-/**
- * Interface language: the one chosen in Settings ("App language", kept by
- * settings.svelte.js), else the device's. Changing it restarts the app.
- */
-export const language = (() => {
-  try {
-    const chosen = JSON.parse(deviceStore.getItem('od.appSettings') ?? '{}').language;
-    if (chosen in catalogs) return chosen;
-  } catch {
-    // The device's language.
-  }
-  return deviceLanguage;
-})();
+export { catalogChain, deviceLanguage, language, pickLanguage };
 
 /**
  * Locale of the numbers, dates and times: the device's own ("10:44" in fr-FR,

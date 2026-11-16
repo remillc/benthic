@@ -5,6 +5,7 @@
 // shows at once, offline too.
 import { OpenDivesCore } from 'opendives-core';
 import { cachedSites } from './core-cache.js';
+import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle } from './map-style.js';
 import { onTileOrigin } from './offline-tiles.js';
 
@@ -38,7 +39,7 @@ let drawers = 0;
  * @param {{ width: number, height: number }} [size] CSS pixels of the picture
  */
 async function createDrawer(onTile, size = { width: DRAW_WIDTH, height: HALF_HEIGHT * 2 }) {
-  const module = await import('maplibre-gl');
+  const module = await loadMapLibre();
   /** @type {typeof import('maplibre-gl')} */
   const maplibregl = /** @type {any} */ (module).default ?? module;
   const channel = `draw${++drawers}`;
