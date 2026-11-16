@@ -7,8 +7,8 @@
 /** The media query the components' phone CSS uses: the same width as `layout.phone`. */
 export const PHONE_QUERY = '(max-width: 767.98px)';
 
-/** Heights of the blue band, in dp, its wave included: tall on the first step, a brand row on the others (task 2026-11-16-230). */
-export const BAND_HEIGHT = Object.freeze({ start: 330, compact: 108 });
+/** Heights of the blue band, in dp, its wave included: tall on the first step, a brand row on the others (task 2026-11-16-244: 140, 108 before). */
+export const BAND_HEIGHT = Object.freeze({ start: 330, compact: 140 });
 
 /**
  * The key of a text that names the device: « cette tablette » on a tablet, « ce téléphone » on a phone. The
