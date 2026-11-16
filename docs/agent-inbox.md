@@ -4916,3 +4916,15 @@ The site labels are in English for now; Christian may ask for the French labels 
 **Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
 
 Done: the GitLab (7 steps, link `https://gitlab.com/projects/new#blank_project`) and Codeberg (6 steps, link `https://codeberg.org/repo/create`) tabs of `pages/RepositoryHelp.svelte` use the texts of the task word for word (`repoHelp.gitlab.*`, `repoHelp.codeberg.*`, fr; the English versions keep the site labels), the same layout as GitHub: active tab semi-bold in the text colour with the 3 dp underline, the others grey. Checked headless at 390 x 844; the tests are in `tests/app/git-form.test.mjs`. The French labels of GitLab and Codeberg are left to a later request.
+
+## [ ] 2026-11-16-253 Git help pages: interface labels as `<kbd>`, values as `<code>`
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html` and `git-jeton-aide-android.dc.html`.
+
+In the numbered steps of the « Créer un dépôt » help (three tabs, tasks 247 and 252) and of the « Créer un jeton d’accès » help, the words the person must find on the site or type are set apart, without bold:
+- **Interface labels** (buttons, menus, fields, options, e.g. +, New repository, Private, Repository name, Fine-grained tokens, Read and write): a `<kbd>` element, shown as a small chip: same font, size 14 sp, normal weight, padding 0 × 5 dp, 1 dp outline `#D3D0C8`, radius 4 dp, background `#F1EFEA`, no line break inside.
+- **Values to type or copy** (the logbook name `carnet-plongee`, the example addresses `https://github.com/vous/carnet-plongee.git` and the GitLab and Codeberg ones, the token name `OpenDives`): a `<code>` element in Roboto Mono 13.5 sp, padding 0 × 4 dp, radius 4 dp, background `#EAF0F7`, text `#1F3F66`; a long address may break anywhere.
+
+Put a no-break space before a colon that follows a label (« Repository name : »). Take the two colours from tokens (add `--od-kbd-*` and `--od-code-*` if they do not exist) and check the dark theme: both must keep 4.5:1. Only the styling changes here; the step texts stay those of tasks 247 and 252.
+
+**Test:** in the four help pages, every site label is a chip and every example value is monospace, with no bold, in light and dark themes.
