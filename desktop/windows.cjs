@@ -143,7 +143,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     const win = new BrowserWindow({
       width: state.width,
       height: state.height,
-      minWidth: 760,
+      minWidth: 768,
       minHeight: 560,
       show: false,
       title: titleOf(descriptor),
