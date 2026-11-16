@@ -4140,3 +4140,30 @@ Christian approved this on 16 November 2026.
 **Test:** the window without a logbook matches the mock-up at 1440 × 900, and the block stays centred when the window is resized.
 
 Done on `feature/desktop-logbook` (the desktop app lives there until it is merged): `DesktopLogbookStart.svelte`, logo 96 px, « OpenDives » 44 px (500, −0.5), the line 18 px in `--od-text-2` 4 px under it, 24 px between logo and text, 48 px above the buttons, a 600 px centred column; buttons, drop line and rail unchanged. Checked in the desktop app at 1440 × 900 against the mock-up.
+
+## [ ] 2026-11-16-223 Release edition: « Plus de 30 formats » and the list of accepted formats on « Importer un carnet »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on the branch of task 218 (`feature/release-new-logbook`). Do not merge it into `main`. It follows task 221: do it once `docs/import-formats.md` exists.
+
+Mock-ups:
+- `docs/mockups/android-tablette-premier-lancement-production-importer-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-fichier-erreur-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-formats-paysage.dc.html`.
+
+**Changes:**
+1. **The help line of « Un fichier »** becomes « Plus de 30 formats : .ssrf, .xml, UDDF, FIT, CSV, Suunto, Shearwater et d’autres carnets. ». **Use the real total** from `docs/import-formats.md`:
+   - if fewer than 30 formats work, write the true number (« Plus de 20 formats », or the exact count) ;
+   - name only brands that work.
+2. **A link under the two choice rows:** « Voir les formats acceptés » (14 sp, #1F5C99, underlined), on the source screen and on the « fichier illisible » error screen, in both orientations.
+3. **The link opens the « Formats acceptés » dialog.** It is a **basic dialog**: no ✕, a text button « Fermer » at the bottom right, and it also closes with a tap on the scrim and with Back (the new rule in `docs/system-design.md`).
+   - The text « OpenDives lit plus de 30 formats de carnet. Choisissez le fichier exporté par votre logiciel ou votre appareil. », with the same real number.
+   - Three columns: « Formats ouverts », « Montres et ordinateurs de plongée », « Autres carnets ».
+   - One line per format with its extensions, as in the mock-up.
+   - **The list comes from `docs/import-formats.md`:** only the formats marked as working, in one place in the code (a data file the dialog reads), so that the report and the dialog stay the same.
+   - CSV appears only once the CSV import exists. Until then, leave it out.
+4. All texts go in `fr.json` and `en.json`.
+
+**Test:**
+- The link opens the dialog, and « Fermer », the scrim and Back close it.
+- The number in the help line and in the dialog equals the number of lines in the dialog.
+- The beta on `main` is untouched.
