@@ -5,6 +5,7 @@
   // first launch »). The order of the steps is in lib/first-launch-steps.js, their state in
   // lib/first-launch.svelte.js. Moving between steps plays the forward shared-axis X transition on this column
   // only (« Retour » plays it backwards); the blue panel next to it does not move.
+  import { onMount } from 'svelte';
   import { f7 } from 'framework7-svelte';
   import { Capacitor } from '@capacitor/core';
   import { OpenDivesCore } from 'opendives-core';
@@ -13,6 +14,9 @@
   import ReleaseField from './ReleaseField.svelte';
   import WelcomeHelpLink from './WelcomeHelpLink.svelte';
   import ImportFormats from './ImportFormats.svelte';
+  import CsvImportDialog from './CsvImportDialog.svelte';
+  import { pickCsvFiles } from '../lib/csv-import.js';
+  import { canTryDemo, tryDemo } from '../lib/demo.svelte.js';
   import FirstLaunchGit from './FirstLaunchGit.svelte';
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
   import { flow, go, goBack, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
@@ -20,7 +24,7 @@
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
   import { CLOUD_SERVICES, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
-  import { logbook, startWithoutAccount, deleteDives, importFile } from '../lib/logbook.svelte.js';
+  import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
@@ -94,7 +98,7 @@
   function importer() {
     const source = flow.source;
     if (!source) return null;
-    if (source.kind === 'file') return () => importFile(source.file);
+    if (source.kind === 'file') return source.csv ? () => importCsvFile(source.file, source.csv.params, source.csv.companion) : () => importFile(source.file);
     return async () => {
       const file = await downloadedFile(source.path, (p) => Capacitor.convertFileSrc(p), (u) => fetch(u));
       const added = await importFile(file);
@@ -170,12 +174,40 @@
     );
   }
 
+  /** The CSV file being mapped (task 2026-11-16-224): its column mapping waits for the new logbook. */
+  let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
+
+  /** @param {{ params: import('opendives-core').CsvParams, companion: File|null, dives: number }} result */
+  function csvConfirmed(result) {
+    const chosen = csv;
+    if (!chosen) return;
+    flow.source = {
+      kind: 'file',
+      file: chosen.file,
+      name: nameFromFile(chosen.file.name, t('welcomeSteps.defaultName')),
+      summary: summariseImport(result.dives),
+      csv: { params: result.params, companion: result.companion },
+    };
+    flow.name = flow.source.name;
+    csv = null;
+    go('file');
+  }
+
+  /** « Essayer avec un carnet d’exemple »: only on a device without a logbook (lib/demo.svelte.js). */
+  let demoOffered = $state(false);
+  onMount(() => void canTryDemo().then((yes) => (demoOffered = yes)));
+
   /** A file picked for the import: read without touching anything, then « Nouveau carnet » with its summary. */
   async function fileChosen() {
-    const file = fileInput?.files?.[0];
+    const picked = fileInput?.files ? pickCsvFiles(fileInput.files) : null;
+    const file = picked?.csv ?? fileInput?.files?.[0];
     if (!fileInput || !file || busy) return;
     fileInput.value = '';
     unreadable = '';
+    if (picked) {
+      csv = picked;
+      return;
+    }
     busy = true;
     try {
       const dives = await readImportFile(file, {
@@ -311,7 +343,9 @@
             <ReleaseChoiceRow icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
             <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
           </nav>
-          <!-- « Essayer avec un carnet d’exemple »: hidden until to-do #69 (the demo logbook) is built. -->
+          {#if demoOffered}
+            <button type="button" class="od-first-launch--demo" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
+          {/if}
         {:else if step === 'new' || step === 'importNew'}
           {@render nameAndWhere()}
         {:else if step === 'cloudService'}
@@ -352,7 +386,10 @@
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
           <ImportFormats />
-          <input type="file" class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+          <input type="file" multiple class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+          {#if csv}
+            <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
+          {/if}
         {:else if step === 'importDivelogs' || step === 'importProgress'}
           <FirstLaunchDivelogs {step} onread={divelogsRead} />
         {:else if step === 'open'}
@@ -855,6 +892,41 @@
         &:hover {
           color: var(--od-release-row-main-hover);
         }
+      }
+    }
+
+    /* « Essayer avec un carnet d’exemple » under the three choices of the first step (task 2026-11-16-224). */
+    .od-first-launch--demo {
+      width: auto;
+      align-self: center;
+      margin: 24px 0 0;
+      padding: 2px 4px;
+      border: none;
+      background: transparent;
+      color: var(--od-release-link);
+      font: inherit;
+      font-size: 14px;
+      line-height: 19px;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      @media (hover: hover) {
+        &:hover:not(:disabled) {
+          color: var(--od-release-row-main-hover);
+          text-decoration-thickness: 2px;
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-link);
+        outline-offset: 3px;
+        border-radius: 4px;
       }
     }
 

@@ -3497,5 +3497,148 @@
     "none": "No dives in Apple Health in the last year. If access was refused, allow OpenDives in Health › Sharing › Apps.",
     "known": "already in the logbook",
     "what": "Apple Health only keeps the time, depth and temperature: the site, gas and buddies are completed in the dive."
+  },
+  "demoLogbook": {
+    "link": "Try a sample logbook",
+    "failed": "The sample logbook could not be opened.",
+    "banner": {
+      "lead": "Sample logbook.",
+      "text": "These dives are not yours.",
+      "start": "Start my logbook"
+    },
+    "exit": {
+      "title": "Start my logbook?",
+      "text": "The sample logbook will be erased from this tablet. You then choose to create, import or open your logbook.",
+      "cancel": "Cancel",
+      "confirm": "Start my logbook"
+    },
+    "add": {
+      "title": "You are in the sample logbook",
+      "text": "To add your dives, start your logbook. The sample logbook will be erased."
+    }
+  },
+  "csvImport": {
+    "eyebrow": "Import a CSV file · step {n} of 3",
+    "close": "Close",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "add": "Add to logbook",
+    "type": {
+      "title": "File type",
+      "columns": {
+        "one": "{n} column",
+        "other": "{n} columns"
+      },
+      "lines": {
+        "one": "{n} line",
+        "other": "{n} lines"
+      },
+      "detail": "{columns}, {lines} · separator: {separator}",
+      "question": "What does each line hold?",
+      "samples": "A point of the profile",
+      "samplesHelp": "One dive per file: each line gives the time, the depth and other readings at that moment.",
+      "dives": "A whole dive",
+      "divesHelp": "An exported logbook: each line is a dive, with its date, its duration, its maximum depth.",
+      "known": "Known format",
+      "knownField": "Device or software",
+      "none": "None · I choose the columns",
+      "knownHelp": "Seabear, Poseidon MkVI and Sensus are recognised: their columns are filled in beforehand.",
+      "poseidonNeeds": "Poseidon MkVI: also choose the .txt file of the same name, together with the .csv file."
+    },
+    "separator": {
+      "label": "Separator",
+      "tab": "Tab",
+      "comma": "Comma",
+      "semicolon": "Semicolon",
+      "pipe": "Vertical bar"
+    },
+    "columns": {
+      "title": "Columns",
+      "help": "Choose what each column holds. Columns that are not recognised are ignored.",
+      "ignore": "Ignore",
+      "menu": "Content of column {name}",
+      "units": "File units",
+      "metric": "Metric (m, °C, bar)",
+      "imperial": "Imperial (ft, °F, psi)",
+      "diveDate": "Dive date",
+      "dateFormat": "Date format",
+      "durationFormat": "Duration format",
+      "dateFormats": {
+        "dmy": "dd.mm.yyyy",
+        "mdy": "mm/dd/yyyy",
+        "ymd": "yyyy-mm-dd"
+      },
+      "durationFormats": {
+        "seconds": "Seconds",
+        "minutes": "Minutes",
+        "minSec": "Minutes:seconds"
+      },
+      "none": "This file has no line to read.",
+      "needs": "Choose at least the depth and the time."
+    },
+    "field": {
+      "time": "Time (min:s)",
+      "depth": "Depth ({unit})",
+      "temp": "Temperature ({unit})",
+      "pressure": "Pressure ({unit})",
+      "ndl": "No-stop time",
+      "tts": "Time to surface",
+      "stopdepth": "Stop ({unit})",
+      "cns": "CNS",
+      "setpoint": "Setpoint",
+      "po2": "ppO₂",
+      "sensor1": "ppO₂ sensor 1",
+      "sensor2": "ppO₂ sensor 2",
+      "sensor3": "ppO₂ sensor 3",
+      "heartrate": "Heart rate",
+      "number": "Dive number",
+      "date": "Date",
+      "start": "Start time",
+      "duration": "Duration",
+      "maxDepth": "Max. depth ({unit})",
+      "avgDepth": "Average depth ({unit})",
+      "mode": "Mode",
+      "location": "Place",
+      "gps": "GPS coordinates",
+      "buddy": "Buddy",
+      "divemaster": "Dive guide",
+      "suit": "Suit",
+      "notes": "Notes",
+      "tags": "Tags",
+      "weight": "Weight",
+      "cylSize": "Cylinder size",
+      "startPressure": "Start pressure ({unit})",
+      "endPressure": "End pressure ({unit})",
+      "o2": "O₂ (%)",
+      "he": "He (%)",
+      "airTemp": "Air temperature ({unit})",
+      "waterTemp": "Water temperature ({unit})",
+      "visibility": "Visibility",
+      "rating": "Rating"
+    },
+    "preview": {
+      "title": "Preview",
+      "reading": "Reading the file…",
+      "summary": "{dives} · {minutes} min · {depth} deepest",
+      "dives": {
+        "one": "{n} dive",
+        "other": "{n} dives"
+      },
+      "lead": {
+        "one": "Check the dive that was read before adding it to the logbook.",
+        "other": "Check the dives that were read before adding them to the logbook."
+      },
+      "newDive": "New dive",
+      "site": "Site to be set",
+      "more": {
+        "one": "and {n} more dive",
+        "other": "and {n} more dives"
+      },
+      "note": "The site, the equipment and the gases are completed afterwards in Edit.",
+      "noDives": "No dive could be read with these columns.",
+      "failed": "This file could not be read with these columns.",
+      "addFailed": "The dives could not be added to the logbook."
+    }
   }
 }
