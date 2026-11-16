@@ -5149,3 +5149,17 @@ What the screens show, for when the work starts:
 - **Download, then logbook** (`-telechargement`, `-carnet`), as for the other places, with « Connexion au serveur » and the snackbar « Carnet téléchargé depuis le serveur OpenDives. … ».
 
 The tablet and desktop versions will follow in later tasks.
+
+## [ ] 2026-11-16-260 Tablet and desktop (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: do not build anything yet**, as for task 259: there is no OpenDives server yet. Ask Christian how to proceed before any code. You can ask both questions together, for 259 and 260.
+
+Christian approved the design on 16 November 2026. **Release edition only**, never on `main` and not in the beta.
+
+Mock-ups (canvas « OpenDives — Serveur »), the same 11 screens as task 259:
+- **Tablet:** `docs/mockups/android-tablette-serveur-*-{paysage,portrait}.dc.html`.
+- **Desktop:** `bureau-serveur-*.dc.html`.
+
+They use the release first-launch frame (the blue panel with the animated profile, the step in the right-hand or lower column), with « Sur le serveur OpenDives » as the first choice. The texts are those of task 259, with « cette tablette » or « cet ordinateur ».
+
+On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
