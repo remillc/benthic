@@ -4119,7 +4119,7 @@ Christian asked for this on 16 November 2026. It is for the website's selling po
 
 The texts will be updated in the design session from this report.
 
-## [ ] 2026-11-16-222 Desktop: the window without a logbook, a larger brand row with more space
+## [x] 2026-11-16-222 Desktop: the window without a logbook, a larger brand row with more space
 
 Christian approved this on 16 November 2026.
 
@@ -4138,3 +4138,5 @@ Christian approved this on 16 November 2026.
 **Where:** the desktop app (`desktop/`), on `main`. This is the current beta desktop, not the release edition. The desktop source is not in this repository's history I can see; if the screen lives elsewhere, apply it there.
 
 **Test:** the window without a logbook matches the mock-up at 1440 × 900, and the block stays centred when the window is resized.
+
+Done on `feature/desktop-logbook` (the desktop app lives there until it is merged): `DesktopLogbookStart.svelte`, logo 96 px, « OpenDives » 44 px (500, −0.5), the line 18 px in `--od-text-2` 4 px under it, 24 px between logo and text, 48 px above the buttons, a 600 px centred column; buttons, drop line and rail unchanged. Checked in the desktop app at 1440 × 900 against the mock-up.
