@@ -301,6 +301,47 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     return store.list().map((e) => ({ ...e, open: ids.has(e.id) }));
   }
 
+  /**
+   * Which recent logbooks are still there (task 2026-11-16-241): the file of a `file` logbook is looked at, and
+   * only the files of the recent list, never a path the page gives. The other kinds are not checked: the logbook of
+   * this computer lives in the app's own folder, and a git repository or a cloud file is only reached when it is
+   * opened (a check would need the network and the diver's credentials), so they count as there.
+   * @returns {Record<string, boolean>} logbook id -> the logbook can be found
+   */
+  function existence() {
+    /** @type {Record<string, boolean>} */
+    const out = {};
+    for (const entry of store.list()) out[entry.id] = entry.kind !== 'file' || fs.existsSync(entry.location);
+    return out;
+  }
+
+  /**
+   * « Chercher le fichier… » of a recent file logbook that cannot be found: the system's file picker, then the
+   * picked file replaces the entry (the old entry is forgotten, the picked file is opened in this window and so
+   * comes first in the list). A name the diver chose is kept; a name that was the old file's name becomes the new one's.
+   * @param {string} id a `file` logbook of the recent list
+   * @param {any} win
+   */
+  async function relocate(id, win) {
+    const old = store.find(id);
+    if (!old || old.kind !== 'file') throw new Error('NOT_FOUND');
+    const answer = await dialog.showOpenDialog(win ?? undefined, {
+      title: t().openTitle,
+      defaultPath: fs.existsSync(path.dirname(old.location)) ? path.dirname(old.location) : startFolder(),
+      properties: ['openFile'],
+      filters: [{ name: t().fileFilter, extensions: ['ssrf', 'xml'] }],
+    });
+    if (answer.canceled || !answer.filePaths.length) return { canceled: true };
+    const picked = answer.filePaths[0];
+    if (!path.isAbsolute(picked) || !logbooks.isLogbookFile(picked)) throw new Error('BAD_ARGUMENT: not a logbook file');
+    const label = old.name !== path.basename(old.location) ? old.name : '';
+    const descriptor = logbooks.fileDescriptor(picked, { platform, name: label, provider: old.provider });
+    if (descriptor.id !== old.id) store.forget(old.id);
+    const result = await open(descriptor, win);
+    notify();
+    return { canceled: false, opened: !!result.window };
+  }
+
   /** A git username when the diver gave none: the owner in the address, else a fixed word (a token needs any). */
   function gitUserName(/** @type {string} */ url) {
     const parts = url.replace(/^[a-z]+:\/\//i, '').split('/');
@@ -414,6 +455,10 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
         const result = await open(entry, win);
         return { opened: !!result.window };
       }
+      case 'exists':
+        return existence();
+      case 'relocate':
+        return relocate(String(options.id), win);
       case 'pickAndOpen':
         return pickAndOpen(win);
       case 'openPath':
@@ -474,6 +519,8 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     closeLogbook,
     saveCopy,
     recent,
+    existence,
+    relocate,
     handle,
     /** The focused logbook window, for the menu bar's commands. */
     focused: () => BrowserWindow.getFocusedWindow(),

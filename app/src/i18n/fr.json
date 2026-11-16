@@ -3743,6 +3743,16 @@
       "dropHere": "Déposez le fichier pour l'ouvrir",
       "forget": "Retirer de la liste"
     },
+    "recents": {
+      "title": "Carnets récents",
+      "orElse": "Ou bien",
+      "missingIn": "Introuvable dans {place}",
+      "missingTitle": "Carnet introuvable",
+      "missingText": "« {file} » n’est plus dans {place}. Il a peut-être été déplacé, renommé ou supprimé.",
+      "remove": "Retirer de la liste",
+      "search": "Chercher le fichier…",
+      "otherChoices": "Autres choix"
+    },
     "source": {
       "device": "Cet ordinateur",
       "file": "Fichier",

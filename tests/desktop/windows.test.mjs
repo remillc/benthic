@@ -224,6 +224,94 @@ test('windows: a recent logbook whose file is gone is told and forgotten', async
   assert.ok(!new logbooks.LogbookStore(userData).find(gone.id));
 });
 
+test('windows (task 241): exists looks only at the files of the recent list and takes no path from the page', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const store = new logbooks.LogbookStore(userData);
+  store.clear();
+  const there = path.join(root, 'there.ssrf');
+  writeFileSync(there, 'x');
+  const gone = logbooks.fileDescriptor(path.join(root, 'gone-241.ssrf'));
+  const git = logbooks.gitDescriptor({ url: 'https://github.com/club/carnet', branch: 'main' });
+  const sync = logbooks.fileDescriptor(path.join(root, 'no-sync-folder', 'sync.ssrf'), { provider: 'dropbox' });
+  for (const d of [gone, git, sync, logbooks.fileDescriptor(there)]) store.remember(d);
+  const main = wm.openMain();
+  const answer = await wm.handle({ sender: main.webContents }, 'exists', { ids: ['x'], path: path.join(root, 'there.ssrf'), paths: [there] });
+  // The answer names recent entries only, by id; the options are ignored.
+  assert.deepEqual(Object.keys(answer).sort(), [gone.id, git.id, sync.id, logbooks.fileDescriptor(there).id, 'main'].filter((id) => id in answer).sort());
+  assert.equal(answer[gone.id], false);
+  assert.equal(answer[sync.id], false);
+  assert.equal(answer[logbooks.fileDescriptor(there).id], true);
+  // A git repository (and the logbook of this computer) is not checked: it counts as there.
+  assert.equal(answer[git.id], true);
+  assert.ok(!Object.keys(answer).includes(path.resolve(there)));
+  // A file that is not in the list is not looked at at all.
+  const stranger = path.join(root, 'stranger.ssrf');
+  writeFileSync(stranger, 'x');
+  assert.ok(!(logbooks.fileDescriptor(stranger).id in answer));
+});
+
+test('windows (task 241): relocate replaces a missing entry with the picked file and opens it in this window', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const store = new logbooks.LogbookStore(userData);
+  store.clear();
+  const gone = logbooks.fileDescriptor(path.join(root, 'essai-241.ssrf'));
+  store.remember(gone);
+  const main = wm.openMain();
+  await wm.closeLogbook(main);
+  const moved = path.join(root, 'sub-241', 'essai-renamed.ssrf');
+  mkdirSync(path.dirname(moved), { recursive: true });
+  writeFileSync(moved, 'x');
+  // Cancelled: nothing changes.
+  const cancelled = await wm.handle({ sender: main.webContents }, 'relocate', { id: gone.id });
+  assert.equal(cancelled.canceled, true);
+  assert.ok(store.find(gone.id));
+  // Picked: the old entry goes, the picked file is the logbook of this window and the first of the list.
+  fake.dialogs.open.push({ canceled: false, filePaths: [moved] });
+  const result = await wm.handle({ sender: main.webContents }, 'relocate', { id: gone.id });
+  assert.equal(result.opened, true);
+  assert.equal(fake.created.length, 1);
+  assert.equal(bridge.descriptorOf(main.webContents.id).location, path.resolve(moved));
+  const recent = new logbooks.LogbookStore(userData).list();
+  assert.ok(!recent.some((e) => e.id === gone.id));
+  assert.equal(recent[0].location, path.resolve(moved));
+});
+
+test('windows (task 241): relocate refuses an entry that is not a file of the recent list, and a picked file that is not a logbook', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const store = new logbooks.LogbookStore(userData);
+  store.clear();
+  const git = logbooks.gitDescriptor({ url: 'https://github.com/club/carnet', branch: 'main' });
+  store.remember(git);
+  const gone = logbooks.fileDescriptor(path.join(root, 'gone2-241.ssrf'));
+  store.remember(gone);
+  const main = wm.openMain();
+  const ask = (id) => wm.handle({ sender: main.webContents }, 'relocate', { id });
+  await assert.rejects(ask(git.id), /NOT_FOUND/);
+  await assert.rejects(ask('f-000000000000'), /NOT_FOUND/);
+  await assert.rejects(ask('../../etc'), /NOT_FOUND/);
+  fake.dialogs.open.push({ canceled: false, filePaths: [path.join(root, 'notes.txt')] });
+  await assert.rejects(ask(gone.id), /BAD_ARGUMENT/);
+  assert.ok(store.find(gone.id), 'the entry stays when the picked file is refused');
+});
+
+test('windows (task 241): forget removes one entry from the recent list', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const store = new logbooks.LogbookStore(userData);
+  store.clear();
+  const a = logbooks.fileDescriptor(path.join(root, 'fa-241.ssrf'));
+  const b = logbooks.fileDescriptor(path.join(root, 'fb-241.ssrf'));
+  store.remember(a);
+  store.remember(b);
+  const main = wm.openMain();
+  const left = await wm.handle({ sender: main.webContents }, 'forget', { id: a.id });
+  assert.ok(!left.some((e) => e.id === a.id));
+  assert.ok(left.some((e) => e.id === b.id));
+});
+
 test('windows: a new logbook is an empty .ssrf opened in a new window on this computer', async () => {
   const fake = fakeElectron();
   const wm = manager(fake);

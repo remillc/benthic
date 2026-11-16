@@ -3743,6 +3743,16 @@
       "dropHere": "Drop the file to open it",
       "forget": "Remove from the list"
     },
+    "recents": {
+      "title": "Recent logbooks",
+      "orElse": "Or",
+      "missingIn": "Not found in {place}",
+      "missingTitle": "Logbook not found",
+      "missingText": "“{file}” is no longer in {place}. It may have been moved, renamed or deleted.",
+      "remove": "Remove from the list",
+      "search": "Look for the file…",
+      "otherChoices": "Other choices"
+    },
     "source": {
       "device": "This computer",
       "file": "File",

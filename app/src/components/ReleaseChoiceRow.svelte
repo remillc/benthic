@@ -11,15 +11,16 @@
    *   title: string,
    *   help?: string,
    *   main?: boolean,
+   *   compact?: boolean,
    *   disabled?: boolean,
    *   class?: string,
    *   onclick: () => void,
    * }}
    */
-  let { icon, title, help = '', main = false, disabled = false, class: extra = '', onclick } = $props();
+  let { icon, title, help = '', main = false, compact = false, disabled = false, class: extra = '', onclick } = $props();
 </script>
 
-<button type="button" class="od-release-row {extra}" class:od-release-row--main={main} {disabled} {onclick}>
+<button type="button" class="od-release-row {extra}" class:od-release-row--main={main} class:od-release-row--compact={compact} {disabled} {onclick}>
   <span class="od-release-row--tile"><Icon name={/** @type {any} */ (icon)} size={24} /></span>
   <span class="od-release-row--text">
     <span class="od-release-row--title">{title}</span>
@@ -91,6 +92,17 @@
       .od-release-row--help,
       .od-release-row--chevron {
         color: var(--od-release-on-main-soft);
+      }
+    }
+
+    /* Compact (the recent logbooks screen, task 2026-11-16-241): a 40 dp tile and 10 dp above and below. */
+    .od-release-row--compact {
+      padding-block: 10px;
+
+      .od-release-row--tile {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
       }
     }
 
