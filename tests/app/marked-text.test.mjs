@@ -74,7 +74,9 @@ test('steps (fr): a no-break space before the colon that follows a label', () =>
 });
 
 test('the two pages render the steps through MarkedText, and the component sets no bold', () => {
-  for (const page of ['RepositoryHelp', 'TokenHelp']) assert.match(read(`src/pages/${page}.svelte`), /<MarkedText text=\{t\(key\)\} \/>/);
+  // One body draws both helps (components/GitHelp.svelte); the two pages and the tablet's column use it.
+  assert.match(read('src/components/GitHelp.svelte'), /<MarkedText text=\{t\(key\)\} \/>/);
+  for (const [page, kind] of [['RepositoryHelp', 'repository'], ['TokenHelp', 'token']]) assert.match(read(`src/pages/${page}.svelte`), new RegExp(`<GitHelp kind="${kind}" />`));
   const component = read('src/components/MarkedText.svelte');
   assert.doesNotMatch(component, /\{@html/);
   assert.equal((component.match(/font-weight: 400/g) ?? []).length, 2);
@@ -126,7 +128,7 @@ test('token help (tasks 254, 255): each host has its own intro, note, link text 
     assert.deepEqual(parseMarked(s5).filter((x) => x.type === 'kbd').map((x) => x.text), ['Expiration', 'No expiration']);
     assert.doesNotMatch(catalogs[lang].tokenHelp.github.intro, /expir|date/i);
   }
-  const page = read('src/pages/TokenHelp.svelte');
+  const page = read('src/lib/git-help.js');
   assert.match(page, /https:\/\/gitlab\.com\/-\/user_settings\/personal_access_tokens/);
   assert.match(page, /https:\/\/codeberg\.org\/user\/settings\/applications/);
 });

@@ -37,6 +37,7 @@ export const FIRST_LAUNCH_SNACKBARS = /** @type {const} */ ({
 /** The same snackbars on a tablet (« cette tablette »). */
 export const FIRST_LAUNCH_SNACKBARS_TABLET = /** @type {const} */ ({
   downloaded: 'firstLaunch.snackbar.downloadedTablet',
+  gitDownloaded: 'firstLaunch.snackbar.gitDownloadedTablet',
   created: 'firstLaunch.snackbar.created',
   local: 'firstLaunch.snackbar.localTablet',
 });

@@ -11,7 +11,10 @@ const fr = JSON.parse(src('i18n/fr.json'));
 const en = JSON.parse(src('i18n/en.json'));
 const form = src('components/GitForm.svelte');
 const page = src('pages/GitRepository.svelte');
-const help = src('pages/RepositoryHelp.svelte');
+// The help: the hosts and their steps (lib/git-help.js), drawn by one component (components/GitHelp.svelte) that the
+// phone's two pages and the tablet's first-launch column share.
+const helpData = src('lib/git-help.js');
+const help = src('components/GitHelp.svelte');
 const app = src('App.svelte');
 
 test('the texts of the mock-ups, in French', () => {
@@ -47,10 +50,10 @@ test('every new key exists in both languages', () => {
 });
 
 test('the help page: the three hosts, their links, the steps of task 252', () => {
-  assert.match(help, /github\.com\/new/);
-  assert.match(help, /https:\/\/gitlab\.com\/projects\/new#blank_project/);
-  assert.match(help, /https:\/\/codeberg\.org\/repo\/create/);
-  assert.match(help, /steps\('github', 6\)[\s\S]*steps\('gitlab', 7\)[\s\S]*steps\('codeberg', 6\)/);
+  assert.match(helpData, /github\.com\/new/);
+  assert.match(helpData, /https:\/\/gitlab\.com\/projects\/new#blank_project/);
+  assert.match(helpData, /https:\/\/codeberg\.org\/repo\/create/);
+  assert.match(helpData, /steps: 6[\s\S]*steps: 7[\s\S]*steps: 6/);
   assert.match(help, /target="_blank" rel="noopener"/);
   assert.equal(stripMarked(fr.repoHelp.gitlab.s7), 'Touchez Code, puis copiez l’adresse sous Cloner avec HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.');
   assert.equal(stripMarked(fr.repoHelp.codeberg.s4), 'Laissez Initialiser le dépôt décoché. Le dépôt doit rester vide.');

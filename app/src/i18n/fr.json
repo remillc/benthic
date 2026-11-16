@@ -1873,6 +1873,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
       "Aides « Créer un dépôt » et « Créer un jeton d’accès » : les libellés du site sont dans des cases et les valeurs à saisir en police à chasse fixe ; les onglets GitLab et Codeberg donnent les libellés du site dans la langue de l’app, et GitLab et Codeberg ont leurs propres étapes pour le jeton.",
       "Synchronisation avec un dépôt git : un serveur qui ne répond pas n’est plus présenté comme un jeton refusé ; l’app réessaie seule.",
       "Premier lancement et Compte sur téléphone Android : « Utiliser mon propre dépôt git » est un seul formulaire (adresse vérifiée à la sortie du champ, jeton, liste des branches lues dans le dépôt), avec l’écran de téléchargement du carnet puis un message à l’ouverture. L’aide « Comment créer un dépôt » donne les étapes pour GitHub, GitLab et Codeberg.",
@@ -3043,6 +3044,7 @@
     "connected": "Connecté au dépôt {repository}",
     "titlePhone": "Votre propre dépôt git",
     "introPhone": "Gardez votre carnet dans votre dépôt git, avec une copie sur ce téléphone.",
+    "introPhoneTablet": "Gardez votre carnet dans votre dépôt git, avec une copie sur cette tablette.",
     "repositoryHow": "Comment créer un dépôt",
     "branchWaitingAccess": "La liste des branches s’affiche quand l’accès est accepté."
   },
@@ -3449,7 +3451,8 @@
       "local": "Carnet créé sur ce téléphone.",
       "downloadedTablet": "Carnet téléchargé. Il reste sur cette tablette, même sans réseau.",
       "localTablet": "Carnet créé sur cette tablette.",
-      "gitDownloaded": "Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau."
+      "gitDownloaded": "Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau.",
+      "gitDownloadedTablet": "Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette, même sans réseau."
     },
     "tabletStart": "Pour commencer",
     "profileLabel": "Profil d’une plongée",

@@ -98,7 +98,8 @@ test('task 239: the tablet texts say « cette tablette », picked by deviceKey',
 });
 
 test('task 239: the tablet logbook opens with the snackbar at the bottom left and the subtitle of the path', () => {
-  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS_TABLET).sort(), ['created', 'downloaded', 'local']);
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS_TABLET).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
+  assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.gitDownloaded), 'Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette, même sans réseau.');
   assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.downloaded), 'Carnet téléchargé. Il reste sur cette tablette, même sans réseau.');
   assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.created), 'Compte créé. Votre carnet est prêt.');
   assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.local), 'Carnet créé sur cette tablette.');
@@ -200,7 +201,7 @@ test('white text on the band: at least 4.5:1 on every colour of the gradient, an
 
 test('« Retour » goes back one step, and the steps are laid out as the mock-ups say', () => {
   assert.match(editorial, /<Link back class="od-editorial-page--retour">[\s\S]*t\('accountStep\.back'\)/);
-  assert.match(editorial, /\{#if !noRetour\}/);
+  assert.match(editorial, /\{#if !noRetour && onback\}[\s\S]*\{:else if !noRetour\}/);
   // The download is a step you leave with « Annuler », not « Retour ».
   assert.match(download, /\bnoRetour\b/);
   assert.match(editorial, /\.od-editorial-page--retour\) \{[^}]*min-height: 48px;/);
