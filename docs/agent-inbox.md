@@ -4292,7 +4292,7 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{
 
 Done on `feature/release-formats-link` (not merged; it also carries main, so the CSV import and the import of several files live together): the link is the row right under « Un fichier », before divelogs.de, on the import and unreadable-file screens (the same step), a 48 dp target with 4 dp of padding, 4 dp from each row, read as a link. Checked in headless Edge at 1280 × 800; test in `tests/app/import-formats.test.mjs`.
 
-## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
+## [x] 2026-11-16-227 Release edition: the first launch on Android phones
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-phone-first-launch`, started from `feature/release-formats-link` (task 226). Do not merge it into `main`. The beta on `main` stays unchanged.
 
@@ -4317,6 +4317,8 @@ Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.ht
 - « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
 - On a tablet, nothing changes.
 - The beta on `main` is untouched.
+
+Done on `feature/release-phone-first-launch` (not merged): every step on phones under 768 dp (330 dp band on the first step, 108 dp on the others as task 230 corrected, the column from the top, full-width buttons, the formats dialog stacked at 358 dp, « ce téléphone » texts), WelcomeEntry shows the release screen on phones too; tablets unchanged (screenshots identical apart from the 230 sign-in changes). Task 230 (phone and tablet parts) done there too.
 
 ## [ ] 2026-11-16-228 Release edition: the first launch on the desktop
 
