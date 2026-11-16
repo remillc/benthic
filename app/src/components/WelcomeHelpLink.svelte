@@ -6,9 +6,16 @@
   // Tablet: centred, pinned 28 dp above the bottom of the page. Phone: centred at the end of the content.
   import { t } from '../lib/i18n.js';
 
+  /**
+   * onopen: where the link is outside a view (the desktop's window without a logbook, task 2026-11-16-242).
+   * @type {{ onopen?: () => void }}
+   */
+  let { onopen } = $props();
+
   /** @param {MouseEvent} e */
   function open(e) {
     e.preventDefault();
+    if (onopen) return onopen();
     // The router of the view the link is in (first launch has a view of its own, in a popup).
     const view = /** @type {HTMLElement} */ (e.currentTarget).closest('.view');
     /** @type {any} */ (view)?.f7View?.router.navigate('/about');
@@ -72,6 +79,11 @@
       @media (orientation: portrait) {
         --od-help-link-left: 50%;
       }
+    }
+
+    /* The desktop app: the panel is 48.6 % of the window at most 700 dp (components/FirstLaunchPanel.svelte), in any shape. */
+    :global(html.od-desktop-app .od-first-panelled) {
+      --od-help-link-left: calc(min(700px, 48.6%) + (100% - min(700px, 48.6%)) / 2);
     }
 
     .od-welcome-help-link--icon {

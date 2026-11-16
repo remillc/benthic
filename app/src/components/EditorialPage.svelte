@@ -607,6 +607,20 @@
       }
     }
 
+    /* The desktop app (task 2026-11-16-242): the step is always beside the panel (48.6 % of the window, 700 dp at
+       most), its column keeps its room in a narrow window. */
+    :global(html.od-desktop-app .od-editorial-page--panelled .page-content) {
+      flex-direction: row;
+    }
+    :global(html.od-desktop-app.md) .od-editorial-page--panel-body {
+      padding: 24px clamp(24px, 4.4vw, 64px) 56px;
+    }
+    :global(html.od-desktop-app) .od-editorial-page--linear.od-editorial-page--linear-panel {
+      left: calc(min(700px, 48.6%) + clamp(24px, 4.4vw, 64px));
+      right: clamp(24px, 4.4vw, 64px);
+      top: 24px;
+    }
+
     /* The busy indicator runs at the top of the step's column. */
     .od-editorial-page--linear.od-editorial-page--linear-panel {
       left: calc(min(700px, 55%) + 64px);

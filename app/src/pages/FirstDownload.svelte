@@ -11,7 +11,7 @@
   import LinearWavyProgress from '../components/LinearWavyProgress.svelte';
   import { announceFirstLaunch, showFailure } from '../lib/account.js';
   import { deviceKey, downloadSteps } from '../lib/first-launch.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { deviceKind } from '../lib/layout.svelte.js';
   import { downloadAccountLogbook, logbook, signOut } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -79,7 +79,7 @@
           {/if}
         </span>
         <span class="od-first-download--text">
-          <span class="od-first-download--label">{t(row.key === 'copy' ? deviceKey('firstLaunch.download.copy', layout.phone) : `firstLaunch.download.${row.key}`)}</span>
+          <span class="od-first-download--label">{t(row.key === 'copy' ? deviceKey('firstLaunch.download.copy', deviceKind()) : `firstLaunch.download.${row.key}`)}</span>
           {#if row.detail}<span class="od-first-download--detail">{row.detail}</span>{/if}
           {#if row.key === 'dives' && state === 'running'}
             <span class="od-first-download--bar">

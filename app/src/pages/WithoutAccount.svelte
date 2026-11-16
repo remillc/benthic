@@ -10,15 +10,15 @@
   import { announceFirstLaunch } from '../lib/account.js';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { deviceKind } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   let busy = $state(false);
 
   /** @type {{ key: string, text: string, icon: 'device'|'tablet'|'warning'|'link', warn?: boolean }[]} */
   const rows = $derived([
-    { key: 'phoneOnly', text: 'phoneOnlyText', icon: layout.phone ? 'device' : 'tablet' },
-    { key: 'noBackup', text: layout.phone ? 'noBackupText' : 'noBackupTextTablet', icon: 'warning', warn: true },
+    { key: 'phoneOnly', text: 'phoneOnlyText', icon: { phone: 'device', tablet: 'tablet', desktop: 'desktop' }[deviceKind()] },
+    { key: 'noBackup', text: deviceKey('noBackupText', deviceKind()), icon: 'warning', warn: true },
     { key: 'later', text: 'laterText', icon: 'link' },
   ]);
 
@@ -48,7 +48,7 @@
       <li>
         <span class="od-without-account--tile" class:od-without-account--warn={row.warn} aria-hidden="true"><Icon name={row.icon} size={22} /></span>
         <span class="od-without-account--text">
-          <span class="od-without-account--label">{t(row.key === 'phoneOnly' ? deviceKey('firstLaunch.local.phoneOnly', layout.phone) : `firstLaunch.local.${row.key}`)}</span>
+          <span class="od-without-account--label">{t(row.key === 'phoneOnly' ? deviceKey('firstLaunch.local.phoneOnly', deviceKind()) : `firstLaunch.local.${row.key}`)}</span>
           <span class="od-without-account--detail">{t(`firstLaunch.local.${row.text}`)}</span>
         </span>
       </li>

@@ -174,6 +174,10 @@
     --od-code-active: #1F5C99;
     --od-code-border: #75787C;
     --od-code-error: #B3261E;
+    /* The window without a logbook (task 2026-11-16-242): the filled action of its dialog, the blue of the panel. */
+    --od-start-fill: #1F5C99;
+    --od-on-start-fill: #FFFFFF;
+    --od-start-hover: rgb(31 33 36 / 0.06);
     /* The heat of « Où je plonge le plus »: blue (least) to red (most), 1 to 6, the lowest density
        fading out through light blue (task 2026-11-14-161). Same in dark mode for now. */
     --od-heat-fade: #6FC3F0;
@@ -318,6 +322,10 @@
     --od-code-active: #7FB0E6;
     --od-code-border: #8E9196;
     --od-code-error: #FF8A80;
+    /* The window without a logbook (task 2026-11-16-242). */
+    --od-start-fill: #7FB0E6;
+    --od-on-start-fill: #0C2A4A;
+    --od-start-hover: rgb(255 255 255 / 0.08);
     --od-primary: #F4F4F2;
     --od-on-primary: #1F2124;
     --od-primary-container: #2E3033;

@@ -14,12 +14,13 @@ export function newFirstLaunch({ ios }) {
 
 /**
  * The key of a text that names the device: « ce téléphone » on a phone, the `Tablet` variant (« cette
- * tablette ») on a tablet.
+ * tablette ») on a tablet, the `Desktop` variant (« cet ordinateur ») in the desktop app (task 2026-11-16-242).
  * @param {string} key the phone's key
- * @param {boolean} phone
+ * @param {boolean|'phone'|'tablet'|'desktop'} device `layout.phone` (true: a phone, false: a tablet), or `deviceKind()`
  */
-export function deviceKey(key, phone) {
-  return phone ? key : `${key}Tablet`;
+export function deviceKey(key, device) {
+  if (device === true || device === 'phone') return key;
+  return device === 'desktop' ? `${key}Desktop` : `${key}Tablet`;
 }
 
 /** The snackbar of each path, shown over the logbook that opens at the end. */
@@ -37,6 +38,21 @@ export const FIRST_LAUNCH_SNACKBARS_TABLET = /** @type {const} */ ({
   downloaded: 'firstLaunch.snackbar.downloadedTablet',
   created: 'firstLaunch.snackbar.created',
   local: 'firstLaunch.snackbar.localTablet',
+});
+
+/**
+ * The suffix of the keys that come in three variants (`...Phone`, `...Tablet`, `...Desktop`).
+ * @param {'phone'|'tablet'|'desktop'} device
+ */
+export function deviceSuffix(device) {
+  return device === 'phone' ? 'Phone' : device === 'desktop' ? 'Desktop' : 'Tablet';
+}
+
+/** The same snackbars in the desktop app (« cet ordinateur »). */
+export const FIRST_LAUNCH_SNACKBARS_DESKTOP = /** @type {const} */ ({
+  downloaded: 'firstLaunch.snackbar.downloadedDesktop',
+  created: 'firstLaunch.snackbar.created',
+  local: 'firstLaunch.snackbar.localDesktop',
 });
 
 /**

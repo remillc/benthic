@@ -34,7 +34,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, deviceKind } from '../lib/layout.svelte.js';
+  import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -1257,7 +1258,7 @@
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
     {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>
     {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
-      <p class="od-logbook--count">{t(layout.phone ? 'logbook.emptyLocal' : 'logbook.emptyLocalTablet')}</p>{/if}
+      <p class="od-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
     <div class="od-logbook--empty">
       <div class="od-logbook--empty-illustration" aria-hidden="true">
         <DecorativeProfile trace class="od-logbook--empty-profile" />

@@ -65,8 +65,8 @@ test('create an account: step 1 of 2, then the code as step 2 of 2, then the emp
 });
 
 test('« Commencer sans compte »: three rows, then « Commencer » creates the logbook and says so', () => {
-  assert.match(local, /\{ key: 'phoneOnly', text: 'phoneOnlyText', icon: layout\.phone \? 'device' : 'tablet' \}/);
-  assert.match(local, /\{ key: 'noBackup', text: layout\.phone \? 'noBackupText' : 'noBackupTextTablet', icon: 'warning', warn: true \}/);
+  assert.match(local, /\{ key: 'phoneOnly', text: 'phoneOnlyText', icon: \{ phone: 'device', tablet: 'tablet', desktop: 'desktop' \}\[deviceKind\(\)\] \}/);
+  assert.match(local, /\{ key: 'noBackup', text: deviceKey\('noBackupText', deviceKind\(\)\), icon: 'warning', warn: true \}/);
   assert.match(local, /\{ key: 'later', text: 'laterText', icon: 'link' \}/);
   assert.match(local, /await startWithoutAccount\(\);\s*announceFirstLaunch\('local'\);/);
   const fr = langs.fr.firstLaunch.local;
@@ -84,6 +84,10 @@ test('« Commencer sans compte »: three rows, then « Commencer » creates the 
 test('task 239: the tablet texts say « cette tablette », picked by deviceKey', () => {
   assert.equal(deviceKey('a.b', true), 'a.b');
   assert.equal(deviceKey('a.b', false), 'a.bTablet');
+  // Task 242: the desktop app has its own variant, picked by deviceKind().
+  assert.equal(deviceKey('a.b', 'phone'), 'a.b');
+  assert.equal(deviceKey('a.b', 'tablet'), 'a.bTablet');
+  assert.equal(deviceKey('a.b', 'desktop'), 'a.bDesktop');
   const fr = langs.fr.firstLaunch;
   assert.equal(fr.signIn.introTablet, 'Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cette tablette.');
   assert.equal(fr.signIn.passwordTextTablet, 'Gardé seulement dans le stockage sécurisé de cette tablette.');
@@ -93,8 +97,8 @@ test('task 239: the tablet texts say « cette tablette », picked by deviceKey',
     assert.doesNotMatch(get(langs.fr, `firstLaunch.${k}`), /téléphone/);
     assert.doesNotMatch(get(langs.en, `firstLaunch.${k}`), /phone/);
   }
-  assert.match(read('pages/SignIn.svelte'), /deviceKey\('firstLaunch\.signIn\.intro', layout\.phone\)/);
-  assert.match(download, /deviceKey\('firstLaunch\.download\.copy', layout\.phone\)/);
+  assert.match(read('pages/SignIn.svelte'), /deviceKey\('firstLaunch\.signIn\.intro', deviceKind\(\)\)/);
+  assert.match(download, /deviceKey\('firstLaunch\.download\.copy', deviceKind\(\)\)/);
 });
 
 test('task 239: the tablet logbook opens with the snackbar at the bottom left and the subtitle of the path', () => {
@@ -103,12 +107,13 @@ test('task 239: the tablet logbook opens with the snackbar at the bottom left an
   assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.created), 'Compte créé. Votre carnet est prêt.');
   assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.local), 'Carnet créé sur cette tablette.');
   for (const key of Object.values(FIRST_LAUNCH_SNACKBARS_TABLET)) assert.ok(get(langs.en, key), key);
-  assert.match(read('lib/account.js'), /layout\.phone \? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET/);
+  assert.match(read('lib/account.js'), /desktopApp \? FIRST_LAUNCH_SNACKBARS_DESKTOP : layout\.phone \? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET/);
   assert.match(read('lib/account.js'), /\{ placement: 'start' \}/);
   assert.match(read('lib/snackbar-logic.js'), /placement === 'start' \? 'od-snackbar-start'/);
   assert.match(read('theme.css'), /&\.od-snackbar-start \{\s*left: calc\(var\(--od-nav-width, 96px\) \+ 24px\);\s*right: auto;\s*bottom: calc\(24px \+ var\(--f7-safe-area-bottom\)\);/);
   assert.equal(langs.fr.logbook.emptyLocalTablet, 'Sur cette tablette seulement, aucune plongée');
   assert.ok(langs.en.logbook.emptyLocalTablet);
+  assert.equal(langs.fr.logbook.emptyLocalDesktop, 'Sur cet ordinateur seulement, aucune plongée');
 });
 
 test('the snackbars of the three paths and the empty logbook line, in French and English', () => {
@@ -119,7 +124,7 @@ test('the snackbars of the three paths and the empty logbook line, in French and
     assert.ok(get(langs.en, key), `${key} in English`);
   }
   assert.equal(langs.fr.logbook.emptyLocal, 'Sur ce téléphone seulement, aucune plongée');
-  assert.match(read('pages/Logbook.svelte'), /else if !theme\.ios\}[\s\S]*layout\.phone \? 'logbook\.emptyLocal' : 'logbook\.emptyLocalTablet'/);
+  assert.match(read('pages/Logbook.svelte'), /else if !theme\.ios\}[\s\S]*deviceKey\('logbook\.emptyLocal', deviceKind\(\)\)/);
   assert.match(read('lib/account.js'), /showSnackbar\(t\(keys\[kind\]\), \{ placement: 'start' \}\)/);
 });
 

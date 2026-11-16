@@ -166,6 +166,14 @@
       top: 34.5%;
     }
 
+    /* The desktop app in a narrow window (task 2026-11-16-242): the duration label stays inside the panel. */
+    @media (max-width: 1100px) {
+      :global(html.od-desktop-app) .od-profile-hero--label-duration {
+        left: auto;
+        right: 0;
+      }
+    }
+
     @keyframes od-profile-hero-draw {
       from {
         stroke-dashoffset: 1;

@@ -151,7 +151,8 @@
       "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le dépôt. Vous pourrez les annuler pendant quelques secondes."
     },
     "emptyLocal": "Sur ce téléphone seulement, aucune plongée",
-    "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée"
+    "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée",
+    "emptyLocalDesktop": "Sur cet ordinateur seulement, aucune plongée"
   },
   "desktopLogbooks": {
     "mainName": "Carnet de cet ordinateur",
@@ -189,12 +190,24 @@
       "empty": "Aucun carnet ouvert dans cette fenêtre",
       "open": "Ouvrir un carnet…",
       "newLogbook": "Nouveau carnet…",
+      "openHint": "Un fichier .ssrf ou .xml, ou un dossier de dépôt git.",
+      "newHint": "Vous choisirez ensuite où le garder.",
       "recent": "Carnets récents",
       "drop": "Vous pouvez aussi déposer un fichier carnet sur cette fenêtre.",
       "notALogbook": "Ce fichier n'est pas un carnet (.ssrf ou .xml).",
       "openFailed": "Ce carnet n'a pas pu s'ouvrir.",
       "dropHere": "Déposez le fichier pour l'ouvrir",
       "forget": "Retirer de la liste"
+    },
+    "recents": {
+      "title": "Carnets récents",
+      "orElse": "Ou bien",
+      "missingIn": "Introuvable dans {place}",
+      "missingTitle": "Carnet introuvable",
+      "missingText": "« {file} » n’est plus dans {place}. Il a peut-être été déplacé, renommé ou supprimé.",
+      "remove": "Retirer de la liste",
+      "search": "Chercher le fichier…",
+      "otherChoices": "Autres choix"
     },
     "source": {
       "device": "Cet ordinateur",
@@ -1256,8 +1269,10 @@
     "signOutDevice": "Se déconnecter de cet appareil",
     "signOutKeepsPhone": "Le compte et les plongées restent dans le cloud. Ce téléphone garde sa copie.",
     "signOutKeepsTablet": "Le compte et les plongées restent dans le cloud. Cette tablette garde sa copie.",
+    "signOutKeepsDesktop": "Le compte et les plongées restent dans le cloud. Cet ordinateur garde sa copie.",
     "deleteKeepsPhone": "Efface définitivement le compte et ses plongées du cloud. Ce téléphone peut garder sa copie.",
     "deleteKeepsTablet": "Efface définitivement le compte et ses plongées du cloud. Cette tablette peut garder sa copie.",
+    "deleteKeepsDesktop": "Efface définitivement le compte et ses plongées du cloud. Cet ordinateur peut garder sa copie.",
     "delete": "Supprimer le compte cloud",
     "server": "Connecté via le serveur {region} ({host}).",
     "serverHost": "Connecté via le serveur {host}.",
@@ -1313,7 +1328,8 @@
     "createShort": "Créer un compte",
     "createNote": "Gratuit. Partagé entre vos appareils",
     "noAccountNotePhone": "Le carnet reste sur ce téléphone. Vous pourrez le sauvegarder plus tard",
-    "noAccountNoteTablet": "Le carnet reste sur cet appareil. Vous pourrez le sauvegarder plus tard"
+    "noAccountNoteTablet": "Le carnet reste sur cet appareil. Vous pourrez le sauvegarder plus tard",
+    "noAccountNoteDesktop": "Le carnet reste sur cet ordinateur. Vous pourrez le sauvegarder plus tard"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -1358,6 +1374,7 @@
     "keep": "Garder mes plongées sur cet appareil",
     "keepText": "Elles passent dans un carnet sans compte, seulement sur ce téléphone",
     "keepTextTablet": "Elles passent dans un carnet sans compte, seulement sur cette tablette",
+    "keepTextDesktop": "Elles passent dans un carnet sans compte, seulement sur cet ordinateur",
     "export": "Exporter une copie du carnet",
     "exportText": "Un fichier Subsurface (.ssrf), à garder ailleurs",
     "nothingKeptLead": "Si vous décochez sans exporter",
@@ -1370,12 +1387,14 @@
     },
     "keptPhone": "Gardé sur ce téléphone",
     "keptTablet": "Gardé sur cette tablette",
+    "keptDesktop": "Gardé sur cet ordinateur",
     "keptText": {
       "one": "{n} plongée, dans un carnet sans compte",
       "other": "{n} plongées, dans un carnet sans compte"
     },
     "keptNothingPhone": "Rien n'est gardé sur ce téléphone",
     "keptNothingTablet": "Rien n'est gardé sur cette tablette",
+    "keptNothingDesktop": "Rien n'est gardé sur cet ordinateur",
     "password": "Mot de passe du compte",
     "passwordText": "Pour confirmer que c'est bien vous",
     "note": "Les modifications en attente sont envoyées d'abord. Le compte n'est supprimé qu'après la confirmation du serveur.",
@@ -1399,8 +1418,10 @@
     "eraseElsewhereText": "Ne trouveront plus ce carnet",
     "nextPhone": "À l'étape suivante, vous choisissez ce que deviennent vos plongées sur ce téléphone.",
     "nextTablet": "À l'étape suivante, vous choisissez ce que deviennent vos plongées sur cette tablette.",
+    "nextDesktop": "À l'étape suivante, vous choisissez ce que deviennent vos plongées sur cet ordinateur.",
     "questionPhone": "Que deviennent vos plongées sur ce téléphone ?",
-    "questionTablet": "Que deviennent vos plongées sur cette tablette ?"
+    "questionTablet": "Que deviennent vos plongées sur cette tablette ?",
+    "questionDesktop": "Que deviennent vos plongées sur cet ordinateur ?"
   },
   "gauge": {
     "readStart": "Lire la pression de début sur une photo",
@@ -4108,7 +4129,9 @@
       "passwordText": "Gardé seulement dans le stockage sécurisé de ce téléphone.",
       "invalidEmail": "Cette adresse courriel n’est pas valide.",
       "introTablet": "Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cette tablette.",
-      "passwordTextTablet": "Gardé seulement dans le stockage sécurisé de cette tablette."
+      "passwordTextTablet": "Gardé seulement dans le stockage sécurisé de cette tablette.",
+      "introDesktop": "Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cet ordinateur.",
+      "passwordTextDesktop": "Gardé seulement dans le stockage sécurisé de cet ordinateur."
     },
     "create": {
       "intro": "Gratuit. Un code vous est envoyé par courriel pour confirmer l’adresse.",
@@ -4122,7 +4145,8 @@
       "copy": "Copie du carnet sur ce téléphone",
       "note": "Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau.",
       "progressLabel": "Téléchargement des plongées",
-      "copyTablet": "Copie du carnet sur cette tablette"
+      "copyTablet": "Copie du carnet sur cette tablette",
+      "copyDesktop": "Copie du carnet sur cet ordinateur"
     },
     "local": {
       "intro": "Votre carnet est créé tout de suite, sans inscription.",
@@ -4134,14 +4158,18 @@
       "laterText": "À un compte Subsurface ou à votre dépôt git, depuis Compte. Vos plongées suivent.",
       "start": "Commencer",
       "phoneOnlyTablet": "Sur cette tablette seulement",
-      "noBackupTextTablet": "Si vous perdez ou changez de tablette, le carnet est perdu."
+      "phoneOnlyDesktop": "Sur cet ordinateur seulement",
+      "noBackupTextTablet": "Si vous perdez ou changez de tablette, le carnet est perdu.",
+      "noBackupTextDesktop": "Si vous perdez ou changez d’ordinateur, le carnet est perdu."
     },
     "snackbar": {
       "downloaded": "Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.",
       "created": "Compte créé. Votre carnet est prêt.",
       "local": "Carnet créé sur ce téléphone.",
       "downloadedTablet": "Carnet téléchargé. Il reste sur cette tablette, même sans réseau.",
-      "localTablet": "Carnet créé sur cette tablette."
+      "downloadedDesktop": "Carnet téléchargé. Il reste sur cet ordinateur, même sans réseau.",
+      "localTablet": "Carnet créé sur cette tablette.",
+      "localDesktop": "Carnet créé sur cet ordinateur."
     },
     "tabletStart": "Pour commencer",
     "profileLabel": "Profil d’une plongée",

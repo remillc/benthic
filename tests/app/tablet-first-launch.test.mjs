@@ -61,7 +61,7 @@ test('reduced motion shows the final state at once; the steps show it still', ()
 });
 
 test('the screen plays the animation each time it is shown', () => {
-  assert.match(welcome, /onPageBeforeIn=\{\(\) => playKey\+\+\}/);
+  assert.match(welcome, /onPageBeforeIn=\{\(\) => \{\s*playKey\+\+;\s*shown = true;\s*\}\}/);
   assert.match(welcome, /<FirstLaunchPanel \{playKey\} \/>/);
   assert.match(panel, /\{#key playKey\}\s*<ProfileHero \{still\} \/>\s*\{\/key\}/);
 });

@@ -156,5 +156,56 @@
         margin-top: 36px;
       }
     }
+
+    /* The desktop app (task 2026-11-16-242; mock-ups docs/mockups/bureau-premier-lancement-alpha-*.dc.html): always a
+       row, the panel on the left in a window of any shape. 700 dp in a 1440 dp window, sharing the width in a
+       narrower one so that the step keeps its room (the window is 760 dp wide at least). */
+    :global(html.od-desktop-app) .od-first-launch-panel {
+      width: min(700px, 48.6%);
+      min-width: 300px;
+      height: 100%;
+      padding: 80px 56px 48px;
+    }
+    :global(html.od-desktop-app) .od-first-launch-panel--title {
+      margin-top: 36px;
+    }
+    :global(html.od-desktop-app) .od-first-launch-panel--intro {
+      max-width: 520px;
+      margin-top: 10px;
+    }
+    :global(html.od-desktop-app) .od-first-launch-panel--profile {
+      max-height: 300px;
+      margin-top: 42px;
+    }
+
+    /* A narrow window: a smaller brand row, title and margins. */
+    @media (max-width: 1100px) {
+      :global(html.od-desktop-app) .od-first-launch-panel {
+        padding: 40px 32px 88px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--brand {
+        gap: 12px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--logo {
+        width: 64px;
+        height: 64px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--name {
+        font-size: 34px;
+        line-height: 40px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--title {
+        margin-top: 24px;
+        font-size: 28px;
+        line-height: 34px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--intro {
+        font-size: 14px;
+        line-height: 20px;
+      }
+      :global(html.od-desktop-app) .od-first-launch-panel--profile {
+        margin-top: 24px;
+      }
+    }
   }
 </style>
