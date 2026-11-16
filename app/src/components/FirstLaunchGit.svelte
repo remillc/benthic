@@ -16,6 +16,8 @@
   import { accountReady } from '../lib/logbook.svelte.js';
   import { flow } from '../lib/first-launch.svelte.js';
   import { gitProblem, gitProblemFromCode, gitUserName } from '../lib/first-launch-git.js';
+  import { deviceKey } from '../lib/first-launch-phone.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -127,7 +129,7 @@
     <p class="od-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="od-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
   {:else}
     <div class="od-first-launch-git--token-help">
-      <span>{t('welcomeSteps.gitTokenHelp')}</span>
+      <span>{t(deviceKey('welcomeSteps.gitTokenHelp', layout.phone))}</span>
       <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
     </div>
 
@@ -251,6 +253,13 @@
         &:hover:not(:disabled) {
           opacity: 0.88;
         }
+      }
+    }
+
+/* Phone (task 2026-11-16-227): the button takes the width of the column. */
+    @media (max-width: 767.98px) {
+      .od-first-launch-git--action {
+        align-self: stretch;
       }
     }
 

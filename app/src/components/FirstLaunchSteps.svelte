@@ -32,6 +32,8 @@
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
+  import { deviceKey } from '../lib/first-launch-phone.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { t, locale } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -388,11 +390,11 @@
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
     <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
     <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon="tablet" title={t('welcomeSteps.deviceTitle')} help={t('welcomeSteps.deviceHelp')} disabled={nameInvalid || busy} onclick={() => where('device')} />
+    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone))} disabled={nameInvalid || busy} onclick={() => where('device')} />
   </nav>
 {/snippet}
 
-<div class="od-first-launch">
+<div class="od-first-launch" class:od-first-launch--first={step === 'start'}>
   <div class="od-first-launch--stage">
     {#key step}
       <section class="od-first-launch--step" in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
@@ -488,7 +490,7 @@
               <p class="od-first-launch--empty-title">{t('welcomeSteps.noLogbookTitle')}</p>
               <p class="od-first-launch--empty-text">{t('welcomeSteps.noLogbookText')}</p>
             </div>
-            <div class="od-first-launch--buttons">
+            <div class="od-first-launch--buttons od-first-launch--buttons-even">
               <button type="button" class="od-first-launch--outlined" onclick={otherAccount}>{t('welcomeSteps.changeAccount')}</button>
               <button type="button" class="od-first-launch--action od-first-launch--action-inline" onclick={() => go('createHere')}>{t('welcomeSteps.createHere')}</button>
             </div>
@@ -1251,6 +1253,86 @@
         padding: 0 120px 76px;
       }
 
+    }
+
+    /* Phone (task 2026-11-16-227; mock-ups docs/mockups/android-premier-lancement-production*.dc.html): the column
+       has 20 dp of padding and its content starts at the top (16 dp under the 96 dp band, 20 dp under the
+       330 dp one); the page scrolls when a step is taller than the screen, and the help link follows the
+       content, at the bottom of the screen when there is room. */
+    @media (max-width: 767.98px) {
+      .od-first-launch {
+        padding: 16px 20px 0;
+        overflow: visible;
+      }
+
+      .od-first-launch--first {
+        padding-top: 20px;
+      }
+
+      .od-first-launch--stage {
+        overflow: visible;
+      }
+
+      .od-first-launch--step {
+        align-self: start;
+      }
+
+      .od-first-launch :global(.od-welcome-help-link) {
+        margin: auto auto calc(var(--f7-safe-area-bottom) + 28px);
+        padding-top: 24px;
+      }
+
+      .od-first-launch--title {
+        font-size: 24px;
+        line-height: 30px;
+      }
+
+      .od-first-launch--hero {
+        padding: 22px 0 18px;
+        justify-content: center;
+      }
+
+      .od-first-launch--hero-end {
+        width: 84px;
+      }
+
+      .od-first-launch--hero-tile {
+        width: 64px;
+        height: 64px;
+        border-radius: 20px;
+      }
+
+      .od-first-launch--hero-link {
+        flex: none;
+        width: 56px;
+        height: 64px;
+        padding: 0;
+      }
+
+      .od-first-launch--action {
+        align-self: stretch;
+        justify-content: center;
+      }
+
+      .od-first-launch--hint {
+        align-self: center;
+        text-align: center;
+      }
+
+      /* « Changer de compte » and « Créer un carnet ici »: two buttons of the same width, their text on two lines. */
+      .od-first-launch--buttons-even {
+        gap: 12px;
+
+        > button {
+          flex: 1 1 0;
+          min-width: 0;
+          height: auto;
+          min-height: 48px;
+          padding: 8px 16px;
+          justify-content: center;
+          text-align: center;
+        }
+      }
     }
   }
 </style>

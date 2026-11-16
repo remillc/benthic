@@ -163,5 +163,94 @@
       }
 
     }
+
+    /* Phone (task 2026-11-16-227; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844): the
+       band across the top, 330 dp on the first step (the status bar's 24 dp included) and 96 dp on the others,
+       and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
+       texts need more room, so that nothing is cut off. */
+    @media (max-width: 767.98px) {
+      .od-welcome-release--page {
+        height: auto;
+        flex-direction: column;
+      }
+
+      .od-welcome-release--panel {
+        width: auto;
+        height: auto;
+        min-height: calc(330px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
+        padding: calc(max(var(--f7-safe-area-top, 0px), 24px) + 16px) 20px 0;
+      }
+
+      .od-welcome-release--compact {
+        height: auto;
+        min-height: calc(96px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
+        padding-bottom: 24px;
+      }
+
+      .od-welcome-release--panel-light {
+        background: radial-gradient(ellipse 80% 55% at 20% 0%, var(--od-release-panel-light), transparent 70%);
+      }
+
+      .od-welcome-release--panel-bands {
+        display: none;
+      }
+
+      .od-welcome-release--brand {
+        gap: 10px;
+        font-size: 24px;
+        line-height: 30px;
+        letter-spacing: 0;
+      }
+
+      .od-welcome-release--logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .od-welcome-release--compact .od-welcome-release--brand {
+        font-size: 20px;
+        line-height: 26px;
+      }
+
+      .od-welcome-release--compact .od-welcome-release--logo {
+        width: 32px;
+        height: 32px;
+      }
+
+      .od-welcome-release--compact .od-welcome-release--headline,
+      .od-welcome-release--compact .od-welcome-release--intro,
+      .od-welcome-release--compact .od-welcome-release--profile {
+        display: none;
+      }
+
+      .od-welcome-release--headline {
+        max-width: none;
+        margin: 18px 0 0;
+        font-size: 26px;
+        line-height: 32px;
+        letter-spacing: -0.3px;
+      }
+
+      .od-welcome-release--intro {
+        max-width: none;
+        margin: 8px 0 0;
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      /* 24 dp from both edges (the panel's 20 dp padding and 4 dp), 20 dp above the bottom. */
+      .od-welcome-release--profile {
+        min-height: 56px;
+        margin: 16px 4px 20px;
+      }
+
+      /* Its height is the flex item's, which a percentage cannot reach: the profile fills it by position. */
+      .od-welcome-release--profile :global(.od-release-profile) {
+        position: absolute;
+        inset: 0;
+        width: auto;
+        height: auto;
+      }
+    }
   }
 </style>

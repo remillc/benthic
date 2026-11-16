@@ -56,8 +56,9 @@ test('the beta path is unchanged: WelcomeStart knows nothing of the edition, the
   assert.match(beta, /od-welcome-start--wide-profile/);
   assert.match(beta, /welcome\.noAccountNoteTablet/);
   assert.match(read('App.svelte'), /component: isRelease \? WelcomeEntry : WelcomeStart/);
-  assert.match(sources.entry, /layout\.phone/);
-  assert.match(sources.entry, /<WelcomeStart \{f7router\} \/>/);
+  // The release edition shows its own screen on phones too (task 2026-11-16-227): never the beta one.
+  assert.doesNotMatch(sources.entry, /<WelcomeStart /);
+  assert.match(sources.entry, /<WelcomeStartRelease \{f7router\} \/>/);
   // The empty-logbook layout of the release edition is behind the edition switch too.
   assert.match(sources.logbook, /isRelease && layout\.split/);
 });
@@ -186,6 +187,8 @@ test('every text of the release screens is in fr and en, none is unused', () => 
   const keys = new Set();
   for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
+    // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
+    for (const m of src.matchAll(/deviceKey\('(welcomeSteps\.\w+)'/g)) keys.add(`${m[1]}Phone`);
   }
   assert.ok(keys.size >= 80, `only ${keys.size} keys found`);
   for (const lang of ['fr', 'en']) {

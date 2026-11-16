@@ -169,8 +169,14 @@
       line-height: 18px;
     }
 
-    /* Narrow screens: the columns stack. */
+    /* Narrow screens: the columns stack. Phone (task 2026-11-16-227): a 358 dp dialog, at most 780 dp tall; the cards
+       scroll inside it (the content area of Md3Dialog) and « Fermer » stays at the bottom. */
     @media (max-width: 767px) {
+      :global(.od-import-formats) :global(.od-md3-dialog--surface) {
+        width: min(358px, calc(100% - 32px));
+        max-height: min(780px, calc(100% - 64px));
+      }
+
       .od-import-formats--columns {
         flex-direction: column;
         align-items: stretch;

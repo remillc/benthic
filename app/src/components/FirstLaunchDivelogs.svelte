@@ -340,6 +340,21 @@
       }
     }
 
+    /* Phone (task 2026-11-16-227): the buttons alone take the width of the column; side by side they keep their size. */
+    @media (max-width: 767.98px) {
+      .od-first-launch-divelogs--action,
+      .od-first-launch-divelogs--cancel {
+        align-self: stretch;
+      }
+
+      .od-first-launch-divelogs--buttons {
+        .od-first-launch-divelogs--action,
+        .od-first-launch-divelogs--cancel {
+          align-self: auto;
+        }
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .od-first-launch-divelogs--action,
       .od-first-launch-divelogs--cancel {

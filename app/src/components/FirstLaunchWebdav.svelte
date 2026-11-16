@@ -10,6 +10,8 @@
   import { connectWebdav, webdavProblem } from '../lib/cloud-connection.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { errorCode } from '../lib/account.js';
+  import { deviceKey } from '../lib/first-launch-phone.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -54,7 +56,7 @@
 <div class="od-first-launch-webdav">
   <ReleaseField label={t('welcomeSteps.webdavAddress')} bind:value={w.url} mono error={addressError} disabled={busy} autocomplete="url" oninput={edited} />
   <ReleaseField label={t('welcomeSteps.webdavUser')} bind:value={w.user} disabled={busy} autocomplete="username" oninput={edited} />
-  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t('welcomeSteps.webdavHelp')} oninput={edited} />
+  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', layout.phone))} oninput={edited} />
   <button type="button" class="od-first-launch-webdav--action" disabled={!ready} aria-busy={busy} onclick={run}>
     {t(create ? 'welcomeSteps.createLogbook' : 'welcomeSteps.seeLogbooks')}
   </button>
@@ -97,6 +99,13 @@
       &:focus-visible {
         outline: 2px solid var(--od-release-row-main);
         outline-offset: 2px;
+      }
+    }
+
+/* Phone (task 2026-11-16-227): the button takes the width of the column. */
+    @media (max-width: 767.98px) {
+      .od-first-launch-webdav--action {
+        align-self: stretch;
       }
     }
 
