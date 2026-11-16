@@ -4764,3 +4764,27 @@ As task 238 does for the alpha, the depth profile line and the temperature curve
 **Test:** on a tablet in the public version, the profile line and the temperature curve are 1 dp wide.
 
 Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
+
+## [ ] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/bureau-premier-lancement-alpha-accueil.dc.html`, shown with the menu open.
+
+**1. Language menu on the desktop first-launch screen (« Pour commencer ») only.**
+- **Placement:** at the bottom of the content column, on one centred line, 24 dp from the bottom edge, from left to right:
+  - « Une question ? À propos et contact »;
+  - a thin vertical divider (1 × 20 dp, `#C8C6BF`);
+  - a small text button showing a globe icon, the current language and a down chevron, e.g. « Français ». It is 32 dp high, 14 sp, in the same grey as the About link.
+- **The menu:**
+  - It opens above the button, right-aligned with it. Like the Settings menus it has no title and no Annuler/OK, and is 260 dp wide.
+  - Options: « Comme le système » (with the system language as a help line), « Français », « English ». The current one is tinted with a check.
+  - Picking an option applies it at once to the whole app and closes the menu. It is the same value as « Langue de l’app » in Settings.
+  - While the menu is open, the button takes the selected tint (`#E3E1DC`).
+- **Accessibility:** `aria-haspopup="listbox"` and `aria-expanded` on the button, and `role="listbox"` / `role="option"` with `aria-selected` in the menu.
+
+It is not shown on the steps, on the « no logbook » window, nor on phone or tablet.
+
+**2. Correction to task 240.** The « no logbook » window after first use (task 242, `bureau-demarrage-actuel.dc.html`) has **no navigation rail**. Settings stay reachable through Ctrl+, (⌘, on macOS) and, on macOS, the app menu. Task 240 still applies to the empty-logbook window (`bureau-carnet-vide-actuel.dc.html`), whose rail keeps « Réglages » and the avatar.
+
+**Test:**
+- On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
+- The « no logbook » window shows no rail.
