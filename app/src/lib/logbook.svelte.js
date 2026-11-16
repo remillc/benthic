@@ -2,6 +2,8 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
+import { runCsvImport } from './csv-import.js';
+import { storedDemo } from './demo.js';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
@@ -398,6 +400,43 @@ export async function importData(name, data) {
 }
 
 /**
+ * A CSV file with the column mapping the diver chose (components/CsvImportDialog.svelte, task 2026-11-16-224):
+ * the core's CSV import, one undoable step, saved and synced like any import. The files are staged in the app's
+ * cache for the call and discarded after it.
+ * @param {File} file
+ * @param {import('opendives-core').CsvParams} params the mapping (lib/csv-import.js, buildParams)
+ * @param {File|null} [companion] Poseidon MkVI: the .txt of the same dive
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importCsvFile(file, params, companion = null) {
+  const before = logbook.dives.length;
+  const result = await runCsvImport(
+    {
+      stage: async (f) => (await OpenDivesCore.stageImport({ name: f.name, data: await fileBase64(f) })).path,
+      discard: (path) => OpenDivesCore.discardImport({ path }),
+      importCsv: (o) => OpenDivesCore.importCsv(o),
+    },
+    { file, companion, params, dryRun: false },
+  );
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
+/** @param {File} file @returns {Promise<string>} the contents, base64 */
+function fileBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
  * A dive or a plan received by QR code (lib/qr-receive.svelte.js): its .ssrf text goes through the
  * core's import, as a normal dive of the logbook (new number), one undoable step, saved and synced
  * like any import.
@@ -420,6 +459,8 @@ export async function importReceived(xml) {
 
 /** Dives logged on this device without an account (0 when none, or unreadable). */
 export async function deviceDiveCount() {
+  // The demo logbook is never offered to an account (task 2026-11-16-224).
+  if (storedDemo(deviceStore)) return 0;
   try {
     return (await OpenDivesCore.deviceLog({ action: 'count' })).count;
   } catch (e) {
@@ -434,6 +475,7 @@ export async function deviceDiveCount() {
  * @returns {Promise<number>} the number of dives added
  */
 export async function importDeviceDives() {
+  if (storedDemo(deviceStore)) throw new Error('NO_DIVES');
   const before = logbook.dives.length;
   const result = await OpenDivesCore.deviceLog({ action: 'import' });
   logbook.undoText = result.undo;
@@ -731,6 +773,27 @@ export async function signOut({ deleteCopy = false } = {}) {
 export async function accountDeleted({ keepDives }) {
   forgetAccount(!keepDives);
   if (keepDives) await loadLogbook();
+}
+
+/**
+ * The demo logbook is erased from this device (« Commencer mon carnet »): its dives and the sites they leave unused,
+ * saved, then first launch is shown again as after signing out. The demo has no account, so nothing is sent anywhere.
+ * @returns {Promise<void>}
+ */
+export async function eraseDemoLogbook() {
+  // Only this device's own logbook: an account's logbook is never touched, whatever the stored flag says.
+  if (logbook.email) throw new Error('NOT_DEMO');
+  const ids = logbook.dives.map((d) => d.id);
+  if (ids.length) await OpenDivesCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+  await OpenDivesCore.saveLocal();
+  undoCleared();
+}
+
+/** First launch is shown again: the logbook on screen is gone (the demo was erased). */
+export function showFirstLaunchAgain() {
+  forgetAccount(true);
 }
 
 /** @param {boolean} showWelcome */

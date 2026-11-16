@@ -15,11 +15,15 @@
    *   actions: import('svelte').Snippet,
    *   class?: string,
    *   role?: 'dialog'|'alertdialog',
+   *   eyebrow?: string,
+   *   onclose?: () => void,
+   *   closeLabel?: string,
    * }}
    */
   import { fitButtons } from '../lib/dialog-fit.js';
+  import Icon from './Icon.svelte';
 
-  let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog' } = $props();
+  let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog', eyebrow = '', onclose, closeLabel = '' } = $props();
 
   const id = `od-dialog-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -73,6 +77,11 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="od-md3-dialog--scrim" onclick={oncancel}></div>
   <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1" use:fit>
+    <!-- The wizard dialogs (the CSV import): a small line above the title and a close button at the top right. -->
+    {#if eyebrow}<p class="od-md3-dialog--eyebrow">{eyebrow}</p>{/if}
+    {#if onclose}
+      <button type="button" class="od-md3-dialog--close" aria-label={closeLabel} onclick={onclose}><Icon name="close" size={22} /></button>
+    {/if}
     <h2 {id}>{title}</h2>
     {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
     <div class="od-md3-dialog--content">{@render children()}</div>
@@ -133,6 +142,39 @@
     @keyframes od-dialog-fade {
       from {
         opacity: 0;
+      }
+    }
+
+    .od-md3-dialog--eyebrow {
+      margin: -4px 64px 2px 24px;
+      color: var(--od-release-link);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .od-md3-dialog--close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--od-text);
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-release-hover);
+        }
       }
     }
 

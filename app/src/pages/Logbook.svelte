@@ -32,7 +32,10 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { importErrorKey } from '../lib/deep-link.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
+  import CsvImportDialog from '../components/CsvImportDialog.svelte';
+  import { pickCsvFiles } from '../lib/csv-import.js';
+  import { guardedAdd } from '../lib/demo.svelte.js';
+  import { logbook, loadLogbook, importFile, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
   import { canMerge } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -1094,11 +1097,16 @@
     health: '/health',
   });
 
-  /** @param {string} key download, import, manual, divelogs */
+  /**
+   * @param {string} key download, import, manual, divelogs
+   * In the demo logbook every one of them opens « Vous êtes dans le carnet d’exemple » instead (task 2026-11-16-224).
+   */
   function choose(key) {
-    if (key === 'import') fileInput?.click();
-    else if (key === 'scan') scanQr();
-    else f7router.navigate(routes[key]);
+    guardedAdd(() => {
+      if (key === 'import') fileInput?.click();
+      else if (key === 'scan') scanQr();
+      else f7router.navigate(routes[key]);
+    });
   }
 
   // Import a file: the WebView's own file picker, no native code; the core
@@ -1112,10 +1120,36 @@
     showSnackbar(text);
   }
 
+  /** The CSV file being mapped (the dialog of task 2026-11-16-224), with its companion .txt (Poseidon MkVI). */
+  let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
+
+  /** « Importer un fichier » is a .csv: its column mapping first, then the core's CSV import. */
+  async function csvConfirmed(/** @type {{ params: import('opendives-core').CsvParams, companion: File|null }} */ result) {
+    const chosen = csv;
+    if (!chosen) return;
+    const n = await importCsvFile(chosen.file, result.params, result.companion);
+    csv = null;
+    offerUndo(t('logbook.imported', { n }));
+  }
+
+  /** @param {unknown} e */
+  function csvFailed(e) {
+    const code = String(/** @type {any} */ (e)?.message ?? '');
+    console.error('Import a CSV file', code);
+    csv = null;
+    f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
+  }
+
   async function fileChosen() {
-    const file = fileInput?.files?.[0];
+    const files = fileInput?.files;
+    const picked = files ? pickCsvFiles(files) : null;
+    const file = picked?.csv ?? files?.[0];
     if (!file || !fileInput) return;
     fileInput.value = '';
+    if (picked) {
+      csv = { file: picked.csv, companion: picked.companion };
+      return;
+    }
     importing = true;
     try {
       const n = await importFile(file);
@@ -1480,7 +1514,10 @@
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
-  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" multiple class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  {#if csv}
+    <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={csvFailed} />
+  {/if}
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}

@@ -66,6 +66,8 @@
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
+  import DemoHost from './components/DemoHost.svelte';
+  import { accountGuard } from './lib/demo.svelte.js';
   import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
@@ -129,13 +131,13 @@
     { path: '/account', component: Account },
     { path: '/account/delete', component: DeleteAccount },
     // Signing in and creating an account, from the Account screen without an account.
-    { path: '/account/sign-in', component: SignIn },
-    { path: '/account/create', component: CreateAccount },
+    { path: '/account/sign-in', component: SignIn, beforeEnter: accountGuard },
+    { path: '/account/create', component: CreateAccount, beforeEnter: accountGuard },
     { path: '/account/code', component: ConfirmCode },
-    { path: '/account/import', component: BringLogbook },
+    { path: '/account/import', component: BringLogbook, beforeEnter: accountGuard },
     { path: '/account/importing', component: ImportProgress },
     // The logbook in the user's own git repository (Modifier le dépôt).
-    { path: '/account/git', component: GitRepository, options: { props: { edit: true } } },
+    { path: '/account/git', component: GitRepository, options: { props: { edit: true } }, beforeEnter: accountGuard },
     { path: '/account/git/token', component: TokenHelp },
     // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
     { path: '/account/git/new', component: GitRepository },
@@ -328,6 +330,7 @@
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
+  <DemoHost />
   <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />

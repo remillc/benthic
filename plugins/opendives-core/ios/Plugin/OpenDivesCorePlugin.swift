@@ -75,6 +75,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "syncConflicts", returnType: CAPPluginReturnPromise),
@@ -570,6 +571,28 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
             try bytes.write(to: file)
             call.resolve(["json": try OpenDivesNative.importDives(file: file.path, source: importName)])
+        }
+    }
+
+    /// A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+    /// `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is the
+    /// mapping as JSON text. With `dryRun` nothing is added and the answer is the preview; otherwise the dives
+    /// are imported, one undoable step.
+    @objc func importCsv(_ call: CAPPluginCall) {
+        let path = call.getString("path") ?? ""
+        let companionPath = call.getString("companionPath") ?? ""
+        let params = call.getString("params") ?? ""
+        let dryRun = call.getBool("dryRun") ?? true
+        var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
+        if name.isEmpty { name = "import.csv" }
+        let importName = name
+        onCoreThread(call) { [self] in
+            guard let file = stagedImport(path), companionPath.isEmpty || stagedImport(companionPath) != nil else {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return
+            }
+            let companion = companionPath.isEmpty ? "" : (stagedImport(companionPath)?.path ?? "")
+            call.resolve(["json": try OpenDivesNative.importCsv(file: file.path, companion: companion, params: params, source: importName, dryRun: dryRun)])
         }
     }
 

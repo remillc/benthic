@@ -3,8 +3,9 @@
 // The dialog « Formats acceptés », the help line under « Un fichier » and the error message all read this
 // list, and the number they show is its length. Every entry is a « works » line of docs/import-formats.md
 // (task 2026-11-16-221: checked with real files through the façade); `tests/app/import-formats.test.mjs`
-// parses that report and compares. A format the core cannot read as the app opens it (CSV, DL7, SmartTrak)
-// is not here; add it when its import exists. Names are product names and are never translated.
+// parses that report and compares. A format the core cannot read as the app opens it (DL7, SmartTrak) is not
+// here; add it when its import exists. CSV is: the core reads it through the column mapping of the CSV dialog
+// (task 2026-11-16-224). Names are product names and are never translated.
 
 /** The three columns of the dialog, in order; their titles are `importFormats.column.<key>`. */
 export const FORMAT_COLUMNS = /** @type {const} */ (['open', 'devices', 'logbooks']);
@@ -25,6 +26,7 @@ export const IMPORT_FORMATS = [
   { report: 'UDDF 3.0 to 3.2', column: 'open', name: 'UDDF', extensions: ['.uddf'] },
   { report: 'UDDF of the APD Inspiration', column: 'open', name: 'UDDF APD Inspiration', extensions: ['.uddf'] },
   { report: 'UDCF', column: 'open', name: 'UDCF', extensions: ['.udcf'] },
+  { report: 'CSV with a column mapping', column: 'open', name: 'CSV', extensions: ['.csv', '.tsv'] },
 
   { report: 'FIT (Garmin Descent, Suunto)', column: 'devices', name: 'Garmin et Suunto (FIT)', extensions: ['.fit'] },
   { report: 'Suunto app JSON', column: 'devices', name: 'Suunto, appli', extensions: ['.json'] },

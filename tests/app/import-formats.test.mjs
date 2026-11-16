@@ -43,8 +43,9 @@ test('the count is the report\'s total, and the lines the dialog draws', () => {
   assert.equal(IMPORT_FORMAT_COUNT, Number(/\*\*(\d+) formats work\*\*/.exec(report)[1]));
   assert.equal(FORMAT_COLUMNS.map((c) => formatsOf(c).length).reduce((a, b) => a + b, 0), IMPORT_FORMAT_COUNT);
   assert.deepEqual([...FORMAT_COLUMNS], ['open', 'devices', 'logbooks']);
-  // No format that is not reachable (CSV, DL7, SmartTrak) is named.
-  for (const f of IMPORT_FORMATS) assert.ok(!/csv|dl7|smarttrak/i.test(f.name + f.extensions.join()), f.name);
+  // No format that is not reachable (DL7, SmartTrak) is named; CSV is, through its column mapping (task 224).
+  for (const f of IMPORT_FORMATS) assert.ok(!/dl7|smarttrak/i.test(f.name + f.extensions.join()), f.name);
+  assert.deepEqual(IMPORT_FORMATS.find((f) => f.name === 'CSV')?.extensions, ['.csv', '.tsv']);
 });
 
 test('the help line reads the count from the list; the dialog shows no number (task 224)', () => {

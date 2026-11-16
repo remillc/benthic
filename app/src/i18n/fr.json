@@ -3531,5 +3531,148 @@
     "none": "Aucune plongée dans Apple Santé depuis un an. Si l’accès a été refusé, autorisez OpenDives dans Santé › Partage › Apps.",
     "known": "déjà dans le carnet",
     "what": "Apple Santé ne garde que l’heure, la profondeur et la température : le site, le gaz et les compagnons se complètent dans la plongée."
+  },
+  "demoLogbook": {
+    "link": "Essayer avec un carnet d’exemple",
+    "failed": "Le carnet d’exemple n’a pas pu être ouvert.",
+    "banner": {
+      "lead": "Carnet d’exemple.",
+      "text": "Ces plongées ne sont pas les vôtres.",
+      "start": "Commencer mon carnet"
+    },
+    "exit": {
+      "title": "Commencer mon carnet ?",
+      "text": "Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.",
+      "cancel": "Annuler",
+      "confirm": "Commencer mon carnet"
+    },
+    "add": {
+      "title": "Vous êtes dans le carnet d’exemple",
+      "text": "Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé."
+    }
+  },
+  "csvImport": {
+    "eyebrow": "Importer un fichier CSV · étape {n} sur 3",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "add": "Ajouter au carnet",
+    "type": {
+      "title": "Type de fichier",
+      "columns": {
+        "one": "{n} colonne",
+        "other": "{n} colonnes"
+      },
+      "lines": {
+        "one": "{n} ligne",
+        "other": "{n} lignes"
+      },
+      "detail": "{columns}, {lines} · séparateur : {separator}",
+      "question": "Que contient chaque ligne ?",
+      "samples": "Un point du profil",
+      "samplesHelp": "Une plongée par fichier : chaque ligne donne le temps, la profondeur et d’autres mesures à cet instant.",
+      "dives": "Une plongée entière",
+      "divesHelp": "Un carnet exporté : chaque ligne est une plongée, avec sa date, sa durée, sa profondeur maximale.",
+      "known": "Format connu",
+      "knownField": "Appareil ou logiciel",
+      "none": "Aucun · je choisis les colonnes",
+      "knownHelp": "Seabear, Poseidon MkVI et Sensus sont reconnus : leurs colonnes sont remplies d’avance.",
+      "poseidonNeeds": "Poseidon MkVI : choisissez aussi le fichier .txt du même nom, avec le fichier .csv."
+    },
+    "separator": {
+      "label": "Séparateur",
+      "tab": "Tabulation",
+      "comma": "Virgule",
+      "semicolon": "Point-virgule",
+      "pipe": "Barre verticale"
+    },
+    "columns": {
+      "title": "Colonnes",
+      "help": "Choisissez ce que contient chaque colonne. Les colonnes non reconnues sont ignorées.",
+      "ignore": "Ignorer",
+      "menu": "Contenu de la colonne {name}",
+      "units": "Unités du fichier",
+      "metric": "Métriques (m, °C, bar)",
+      "imperial": "Impériales (ft, °F, psi)",
+      "diveDate": "Date de la plongée",
+      "dateFormat": "Format de la date",
+      "durationFormat": "Format de la durée",
+      "dateFormats": {
+        "dmy": "jj.mm.aaaa",
+        "mdy": "mm/jj/aaaa",
+        "ymd": "aaaa-mm-jj"
+      },
+      "durationFormats": {
+        "seconds": "Secondes",
+        "minutes": "Minutes",
+        "minSec": "Minutes:secondes"
+      },
+      "none": "Il n’y a pas de ligne à lire dans ce fichier.",
+      "needs": "Choisissez au moins la profondeur et le temps."
+    },
+    "field": {
+      "time": "Temps (min:s)",
+      "depth": "Profondeur ({unit})",
+      "temp": "Température ({unit})",
+      "pressure": "Pression ({unit})",
+      "ndl": "Temps sans palier",
+      "tts": "Temps avant la surface",
+      "stopdepth": "Palier ({unit})",
+      "cns": "CNS",
+      "setpoint": "Consigne",
+      "po2": "ppO₂",
+      "sensor1": "ppO₂ capteur 1",
+      "sensor2": "ppO₂ capteur 2",
+      "sensor3": "ppO₂ capteur 3",
+      "heartrate": "Fréquence cardiaque",
+      "number": "N° de plongée",
+      "date": "Date",
+      "start": "Heure de début",
+      "duration": "Durée",
+      "maxDepth": "Profondeur max. ({unit})",
+      "avgDepth": "Profondeur moyenne ({unit})",
+      "mode": "Mode",
+      "location": "Lieu",
+      "gps": "Coordonnées GPS",
+      "buddy": "Compagnon",
+      "divemaster": "Guide de palanquée",
+      "suit": "Combinaison",
+      "notes": "Notes",
+      "tags": "Étiquettes",
+      "weight": "Lestage",
+      "cylSize": "Volume du bloc",
+      "startPressure": "Pression initiale ({unit})",
+      "endPressure": "Pression finale ({unit})",
+      "o2": "O₂ (%)",
+      "he": "He (%)",
+      "airTemp": "Température de l’air ({unit})",
+      "waterTemp": "Température de l’eau ({unit})",
+      "visibility": "Visibilité",
+      "rating": "Note"
+    },
+    "preview": {
+      "title": "Aperçu",
+      "reading": "Lecture du fichier…",
+      "summary": "{dives} · {minutes} min · {depth} au plus profond",
+      "dives": {
+        "one": "{n} plongée",
+        "other": "{n} plongées"
+      },
+      "lead": {
+        "one": "Vérifiez la plongée lue avant de l’ajouter au carnet.",
+        "other": "Vérifiez les plongées lues avant de les ajouter au carnet."
+      },
+      "newDive": "Nouvelle plongée",
+      "site": "Site à préciser",
+      "more": {
+        "one": "et {n} autre plongée",
+        "other": "et {n} autres plongées"
+      },
+      "note": "Le site, l’équipement et les gaz se complètent ensuite dans Modifier.",
+      "noDives": "Aucune plongée n’a pu être lue avec ces colonnes.",
+      "failed": "Ce fichier n’a pas pu être lu avec ces colonnes.",
+      "addFailed": "Les plongées n’ont pas pu être ajoutées au carnet."
+    }
   }
 }

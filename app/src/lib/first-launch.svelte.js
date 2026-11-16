@@ -12,7 +12,7 @@ import { t } from './i18n.js';
 
 /**
  * What the diver brings: a picked file, or the divelogs.de logbook downloaded into the app's cache.
- * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary }
+ * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('opendives-core').CsvParams, companion: File|null } }
  *   | { kind: 'divelogs', path: string, paths?: string[], name: string, summary: ImportSummary }} ImportSource
  * A resumable divelogs.de download is several files (`paths`); `path` is the first one.
  */
