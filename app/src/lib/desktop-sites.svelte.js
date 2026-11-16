@@ -5,7 +5,7 @@
 // network. The reads and writes of the sites themselves stay in lib/sites.svelte.js.
 import { OpenDivesCore } from 'opendives-core';
 import { deviceStore } from './device-store.js';
-import { DEFAULT_SORT } from './desktop-sites.js';
+import { DEFAULT_SORT, readRegions } from './desktop-sites.js';
 import { geocodeSite } from './sites.svelte.js';
 import { logbook } from './logbook.svelte.js';
 import { filter, applyFilter, clearFilter, emptyCriteria } from './filter.svelte.js';
@@ -59,23 +59,14 @@ let loading = false;
 
 /**
  * Reads the region of every site (a SiteDetail each), for the search and the Region field's
- * completions; once per version of the sites.
+ * completions; once per version of the sites. The reads run side by side (readRegions).
  * @param {import('opendives-core').SiteSummary[]} sites @param {number} version logbook.sitesVersion
  */
 export async function loadRegions(sites, version) {
   if (regionsFor === version || loading) return;
   loading = true;
   try {
-    const found = new Map();
-    for (const s of sites) {
-      try {
-        const detail = await OpenDivesCore.siteQuery({ kind: 'site', uuid: s.uuid });
-        found.set(s.uuid, detail?.region?.value ?? '');
-      } catch {
-        found.set(s.uuid, '');
-      }
-    }
-    deskSites.regions = found;
+    deskSites.regions = await readRegions(sites, async (uuid) => (await OpenDivesCore.siteQuery({ kind: 'site', uuid }))?.region?.value ?? '');
     regionsFor = version;
   } finally {
     loading = false;

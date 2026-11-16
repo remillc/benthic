@@ -9,6 +9,7 @@
   import { tick, untrack } from 'svelte';
   import { Page } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import DesktopSiteMap from '../components/DesktopSiteMap.svelte';
@@ -55,7 +56,7 @@
 
   async function load() {
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await cachedSites();
       without = await OpenDivesCore.siteQuery({ kind: 'without' });
       pairs = await possibleDuplicates();
       loaded = true;

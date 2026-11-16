@@ -10,6 +10,7 @@
   import { onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
   import { t } from '../lib/i18n.js';
@@ -31,7 +32,7 @@
   /** A site was chosen or is being created: the screen that asked keeps waiting. */
   let handedOver = false;
 
-  OpenDivesCore.siteQuery({ kind: 'list' }).then(
+  cachedSites().then(
     (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list.filter((s) => s.name || s.dives)),
     (/** @type {unknown} */ e) => console.error('Sites', e),
   );

@@ -39,6 +39,7 @@
   import { depthUnit, depthValue, formatDepth, formatNumber, formatSac, formatShortDate, formatTotalTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
 
   /** @type {{ f7router?: any }} */
   let { f7router = undefined } = $props();
@@ -70,7 +71,7 @@
   $effect(() => {
     logbook.sitesVersion;
     if (logbook.loading) return;
-    OpenDivesCore.siteQuery({ kind: 'list' }).then(
+    cachedSites().then(
       (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
     );

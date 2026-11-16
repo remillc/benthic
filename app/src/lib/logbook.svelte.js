@@ -1,6 +1,8 @@
 // @ts-check
 // Shared logbook state: dives, the log's units, sync status.
+import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
+import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
@@ -103,6 +105,10 @@ export const logbook = $state({
   sitesVersion: 0,
 });
 
+// What the kept answers of the core (lib/core-cache.js, lib/dive-preload.js) are tied to: they are read
+// again once the list was read again or the sites changed.
+setCacheVersions(() => untrack(() => [logbook.dives, logbook.sitesVersion]));
+
 /**
  * One trip change (spec, section 4, "Trip"), saved and synced like a dive
  * edit; the logbook list is read again, as trips changed.
@@ -140,6 +146,7 @@ export async function setAutogroup(on) {
  */
 export async function renameCylinderType(name, newName) {
   const result = await OpenDivesCore.cylinderTypes({ action: 'rename', name, value: newName });
+  invalidateCoreCache();
   keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
@@ -160,6 +167,7 @@ let syncTimer;
  */
 export async function saveDiveChanges(id, changes) {
   const result = await OpenDivesCore.editDive({ id, changes });
+  invalidateCoreCache(); // the buddies, tags and site counts may have moved
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
@@ -559,6 +567,7 @@ export async function cancelConflictChoice() {
  */
 export async function undoLastChange(redo = false) {
   const result = await OpenDivesCore.undo({ redo });
+  invalidateCoreCache();
   if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
   if (result.list) {
     logbook.dives = await OpenDivesCore.listLoadedDives();

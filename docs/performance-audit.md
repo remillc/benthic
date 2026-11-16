@@ -255,3 +255,31 @@ Larger work:
 - Bridge durations include time the renderer's main thread was busy (a request sent during a long task waits); sizes are exact.
 - The synthetic logbook has uniform profiles; real logs with long CCR dives (F6) and many photos or notes would shift sizes.
 - Run-to-run noise: start-up runs agree within about 10 % (two runs each); interaction numbers are single runs.
+
+## 8. After: F3 (chatty detail pane), branch `perf/dive-click-calls`
+
+Measured with `tools/perf/measure-mount.mjs` (new: counts every core call from a page reload to the first dive shown, then for three
+clicks on a dive; the plugin's `desktop.js` is rewritten on its way to the page through CDP `Fetch`) and `measure-bridge.mjs`, on the
+synthetic logbooks, own Vite 5247 and Electron CDP 9397, dev server. Same machine and method as section 2.
+
+| Core calls | before | after |
+|---|---|---|
+| One click on a dive (s500 and s3000; every click mounts the detail pane again) | 8-9 (`getDive` 2-3, `statsQuery` 3, `siteQuery` 1-2, `plannerSetup` 1, `toolQuery` 1) | **1** (`getDive`) |
+| First click of the session, the two mounts of the pane counted (bridge, s500) | 18 calls, 183 KB (`getDive` 4, `siteQuery` 4 x 52 KB, `statsQuery` 6, `plannerSetup` 2, `toolQuery` 2) | 4 calls on a cold cache (`getDive`, `siteQuery list`, `statsQuery` buddy and guide: what the Informations tab shows); 1 once warm |
+| Reload to first rows (s500 / s3000) | 25 calls (`siteQuery` 5, `statsQuery` 4, `plannerSetup` 2, `getDive` 2, `toolQuery` 1...) | 19 (`siteQuery` 3, `statsQuery` 3, `plannerSetup` 1, `getDive` 1) |
+| Payload of one click, s500 | 183 KB | about 20 KB (the dive) |
+| `loadRegions` for 300 sites (Sites search, bridge, s500 / s50) | 59-90 ms sequential, 83-94 ms through the app | 12-18 ms (16 reads at a time) |
+
+The s50 run of `measure-mount.mjs` counted nothing (the page was too quick for the hook after the reload): its figures are those of the bridge script
+(one `getDive` per click once the lists are cached). Row-click time is DOM-bound (section 4.1) and did not change.
+
+What changed:
+- `app/src/lib/core-cache.js` (new): the sites list, the buddy / guide / tag values, the planner's setup and the cylinder types are read once and shared by every pane that asks
+  at the same time. They are tied to the dive list and `logbook.sitesVersion` (the logbook store registers them), and dropped on a dive edit, an undo, a setting written and a
+  cylinder library change.
+- `app/src/lib/dive-preload.js`: `loadDive` reads a dive once per logbook version (shared when two screens ask together, stamped at the time of the request so an answer that
+  arrives after a change is not taken as current); `DiveDetail` uses it, and does not preload the neighbours on desktop (no swipe there).
+- `DesktopDiveFields.svelte`: each tab reads its own data when first shown (Informations: sites, buddies, guides; Notes: tags; Équipement and Gaz: cylinder types; Gaz: the reserve).
+- Sites, Statistics (wide and phone), the site chooser, the blender, the multi-edit dialog and the map preparation use the cached sites list or cylinder types.
+- `loadRegions` reads 16 sites at a time (`readRegions` in `desktop-sites.js`) instead of one round trip per site.
+- Phone and tablet keep their behaviour: they still preload the two neighbours for the swipe; their pages read through the same cache.

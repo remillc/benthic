@@ -326,3 +326,32 @@ export function mergeSides(a, b, keptUuid) {
   const second = first === a ? b : a;
   return keptUuid === second.uuid ? { first, second, keep: second, other: first } : { first, second, keep: first, other: second };
 }
+
+/** Region reads in flight together: the core answers each in about a millisecond, so a few at a time hide the round trips. */
+export const REGION_READS_AT_ONCE = 16;
+
+/**
+ * The region of each site, read with `read(uuid)` a few sites at a time instead of one after the other
+ * (300 sites made 300 round trips in a row). A site whose read fails has no region.
+ * @param {{ uuid: number }[]} sites
+ * @param {(uuid: number) => Promise<string>} read
+ * @param {number} [atOnce]
+ * @returns {Promise<Map<number, string>>}
+ */
+export async function readRegions(sites, read, atOnce = REGION_READS_AT_ONCE) {
+  /** @type {Map<number, string>} */
+  const found = new Map();
+  let next = 0;
+  const worker = async () => {
+    while (next < sites.length) {
+      const { uuid } = sites[next++];
+      try {
+        found.set(uuid, await read(uuid));
+      } catch {
+        found.set(uuid, '');
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(atOnce, sites.length) }, worker));
+  return found;
+}

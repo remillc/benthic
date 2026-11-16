@@ -42,7 +42,7 @@
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
-  import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
+  import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
     formatDepth,
@@ -291,14 +291,14 @@
   async function loadDive() {
     const id = Number(diveId);
     try {
-      dive = await OpenDivesCore.getDive({ id });
-      keepDive(id, dive);
+      dive = await readDive(id);
     } catch (e) {
       console.error('Dive detail', e);
       failed = true;
       return;
     }
-    // The dives a swipe can lead to, the next (older) one first.
+    // The dives a swipe can lead to, the next (older) one first. Beside the list (desktop) there is no swipe.
+    if (layout.desktop) return;
     const ids = listOrder();
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
