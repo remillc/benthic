@@ -13,7 +13,9 @@ export const isRefused = (message) => String(message ?? '').startsWith('AUTH');
  */
 export function failureCause({ online, gitMode, refused }) {
   if (!online) return null;
-  if (gitMode) return 'repository';
+  // An own repository: refused credentials go to its form; a server that does not answer is retried, as the
+  // cloud's (Christian, 16 November 2026: an outage must not read as an expired token).
+  if (gitMode) return refused ? 'repository' : 'server';
   return refused ? 'auth' : 'server';
 }
 

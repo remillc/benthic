@@ -106,6 +106,7 @@
   import AboutLibraries from './pages/AboutLibraries.svelte';
   import GitRepository from './pages/GitRepository.svelte';
   import TokenHelp from './pages/TokenHelp.svelte';
+  import RepositoryHelp from './pages/RepositoryHelp.svelte';
   import SettingsMaps from './pages/SettingsMaps.svelte';
   import SettingsMapsArea from './pages/SettingsMapsArea.svelte';
   import MapsDialogs from './components/MapsDialogs.svelte';
@@ -149,6 +150,7 @@
     // The logbook in the user's own git repository (Modifier le dépôt).
     { path: '/account/git', component: GitRepository, options: { props: { edit: true } } },
     { path: '/account/git/token', component: TokenHelp },
+    { path: '/account/git/repository', component: RepositoryHelp },
     // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
     { path: '/account/git/new', component: GitRepository },
     // First launch, in the view of its popup (components/Welcome.svelte).
@@ -162,6 +164,9 @@
     { path: '/welcome/importing', component: ImportProgress },
     { path: '/welcome/git', component: GitRepository, options: { props: { welcome: true } } },
     { path: '/welcome/git/token', component: TokenHelp },
+    { path: '/welcome/git/repository', component: RepositoryHelp },
+    // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
+    { path: '/welcome/git/downloading', component: FirstDownload },
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {

@@ -27,6 +27,8 @@ export function deviceKey(key, device) {
 export const FIRST_LAUNCH_SNACKBARS = /** @type {const} */ ({
   /** Signed in: the logbook was downloaded. */
   downloaded: 'firstLaunch.snackbar.downloaded',
+  /** Connected to the diver's own git repository: the logbook was downloaded from it (task 2026-11-16-247). */
+  gitDownloaded: 'firstLaunch.snackbar.gitDownloaded',
   /** A new account: its empty logbook is ready. */
   created: 'firstLaunch.snackbar.created',
   /** Without an account: the logbook of this phone. */
@@ -36,6 +38,7 @@ export const FIRST_LAUNCH_SNACKBARS = /** @type {const} */ ({
 /** The same snackbars on a tablet (« cette tablette »). */
 export const FIRST_LAUNCH_SNACKBARS_TABLET = /** @type {const} */ ({
   downloaded: 'firstLaunch.snackbar.downloadedTablet',
+  gitDownloaded: 'firstLaunch.snackbar.gitDownloadedTablet',
   created: 'firstLaunch.snackbar.created',
   local: 'firstLaunch.snackbar.localTablet',
 });
@@ -51,6 +54,7 @@ export function deviceSuffix(device) {
 /** The same snackbars in the desktop app (« cet ordinateur »). */
 export const FIRST_LAUNCH_SNACKBARS_DESKTOP = /** @type {const} */ ({
   downloaded: 'firstLaunch.snackbar.downloadedDesktop',
+  gitDownloaded: 'firstLaunch.snackbar.gitDownloadedDesktop',
   created: 'firstLaunch.snackbar.created',
   local: 'firstLaunch.snackbar.localDesktop',
 });

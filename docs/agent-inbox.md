@@ -4599,6 +4599,9 @@ Done: on the welcome band and on every step, the badge is 9 sp, line height 12, 
 
 ## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
 
+**Superseded:** the step band of this task is replaced by task 250 (the app's wavy band).
+
+
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
 
 On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
@@ -4817,6 +4820,9 @@ Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelt
 
 ## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
 
+**Superseded:** the step band of this task is replaced by task 251 (the app's wavy band); the welcome hero stays.
+
+
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
 
 The phone first-launch screens of the public version take the same bands as the alpha (tasks 234 and 236):
@@ -4869,3 +4875,210 @@ It is not shown on the steps, on the « no logbook » window, nor on phone or ta
 - The « no logbook » window shows no rail.
 
 Done (on `feature/desktop-language-menu`, to be merged into `feature/desktop-logbook`): the desktop first-launch screen (`pages/WelcomeStart.svelte`, `desktopApp` only) ends with one centred line 24 dp from the bottom: the help link (`WelcomeHelpLink` with a new `inline` prop), a 1 × 20 dp divider (`--od-language-divider`, #C8C6BF light, #4A4C50 dark) and the new `components/DesktopLanguageMenu.svelte` (globe, current language, chevron; 32 dp, 14 sp, the help link's grey; the selected tint `--od-surface-container-highest` (#E3E1DC) while open). The menu is the Settings choice menu itself, `RowMenu`, which gained two optional props, `width` (260) and `above` (opens above the anchor, right-aligned; `placeRowMenu` takes them); it has no title and no Annuler/OK, and carries `role="listbox"`/`role="option"`/`aria-selected`, arrows, Enter and Escape. The button has `aria-haspopup="listbox"` and `aria-expanded`. A choice calls `setAppSetting('language', …)`, the same setter and value as Settings › « Langue de l’app », and the app reloads in that language. The options come from `lib/language-menu.js`. Settings also offers « Français (Canada) »: the menu keeps the mock-up's three options and lists it only while it is the chosen language, so the current choice is never missing. Part 2 already held, no change: `html.od-start-screen` hides the rail on the « no logbook » window (task 242), Ctrl+, / ⌘, is a window shortcut of the desktop shell, and the empty-logbook window keeps its rail with Réglages and the avatar. Tests: `tests/app/desktop-language-menu.test.mjs`; `tests/app/welcome-help-link.test.mjs` reads the new markup. Checked in Electron at 1440 × 900 and 768 × 560 (menu open, English chosen, `od.appSettings.language` = `en`).
+
+## [x] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+Mock-ups, all in `docs/mockups/`:
+- first launch: `android-premier-lancement-alpha-git.dc.html`, `-alpha-git-erreur-adresse`, `-alpha-git-erreur-acces`, `-alpha-git-telechargement`, `-alpha-git-carnet`;
+- help pages: `git-depot-aide-android.dc.html` (new), `git-jeton-aide-android.dc.html` (existing);
+- Compte: `git-config-android.dc.html`, `git-config-adresse-android.dc.html`, `git-config-erreur-android.dc.html`.
+
+**1. First launch, « Utiliser mon propre dépôt git ».** The link on the welcome screen opens a step page with the alpha hatched band (140 dp, as in task 236), « Retour », and the git form:
+- title « Votre propre dépôt git »; intro « Gardez votre carnet dans votre dépôt git, avec une copie sur ce téléphone. »;
+- link « Comment créer un dépôt » → the new help page;
+- outlined fields: « Adresse du dépôt (HTTPS) » (monospace), « Nom d’utilisateur », « Jeton d’accès » (hidden, with the eye icon, help line « Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe. »), then the link « Comment créer un jeton d’accès » → `git-jeton-aide-android`, then the « Branche » dropdown;
+- the address is checked when the field loses focus: « Dépôt trouvé, avec un carnet existant. » (green, with a check), or the errors shown in the two error mock-ups (« Aucun dépôt git à cette adresse… » under the address; « Accès refusé par le serveur… » under the token, with the address line « Dépôt privé ou introuvable : il sera vérifié avec le jeton. »);
+- « Branche » lists the branches read from the repository (« 3 branches lues dans le dépôt : … »); before that it is empty with « La liste des branches s’affiche quand le dépôt est trouvé. »;
+- « Connecter », full width, then the About link at the bottom.
+« Connecter » goes to the download screen (`-git-telechargement`: connection, then « Téléchargement du carnet » with a count, « Annuler »), then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau. » (`-git-carnet`).
+
+**2. Help page « Créer un dépôt »** (`git-depot-aide-android`). Same app bar as the token help page, back to the form. Tabs GitHub, GitLab, Codeberg; only GitHub is drawn: 6 steps (private, empty repository; copy the HTTPS address), the button « Ouvrir la page « New repository » de GitHub » (opens the browser), and the closing line about the token. For GitLab and Codeberg, write the equivalent steps with each site's English labels; Christian will review them.
+
+**3. One form for Compte.** The git screens in Compte (`git-config-*`) now use exactly the same form as the first launch. Only the top differs: an app bar « ← Votre propre dépôt git » (back to Compte) instead of the hatched band. The old ✕, white card and decorative profile are gone. Build it as one shared component.
+
+**4. Spacing (MD3, 4 dp grid)** in this form: 8 dp title → intro; 16 dp intro → « Comment créer un dépôt » → first field; 16 dp between fields; 4 dp field → help line; the token link 4 dp under the token help line; 24 dp before « Connecter ». Every link keeps a 48 dp touch target; only the visible gaps are as listed.
+
+**5. Side margins 16 dp** (was 20) on every phone first-launch step page of the alpha and beta: `android-premier-lancement-alpha-*` and `android-premier-lancement-beta-*`. The header band is unchanged.
+
+**Test:**
+- From the welcome screen, « Utiliser mon propre dépôt git » opens the form; a valid repository and token lead to the download, then to the open logbook with the snackbar.
+- A wrong address and a refused token show the messages of the mock-ups under the right field.
+- Compte › dépôt git shows the same form with the app bar.
+- Both help links open their pages and Back returns to the form.
+- At 390 dp wide, the content starts 16 dp from each edge.
+
+Done: branch `feature/alpha-git-form`. One shared form: `components/GitForm.svelte` (fields, links, branch, « Connecter ») on one controller, `lib/git-form.svelte.js` (the address check on blur, the authenticated check, the branches, `gitConnect`), used by `pages/GitRepository.svelte`: on an Android phone, first launch = `EditorialPage firstLaunch` (the 140 dp band of task 250, « Retour », the form, the About link), Compte (`/account/git`, `/account/git/new`) = app bar « ← Votre propre dépôt git » with the same form, no ✕, card or profile. Tablets and iPhone keep their previous layout (same controller). Outlined fields: `AccountField` (`mono` for the address) and `SelectField` got an `outlined` look; spacing per point 4, measured at 390 dp: title to sentence 8, sentence to link text 16.5, link text to field 16.5, field to help line 4, token link 4.5 under the help line, between fields 16, 24 before « Connecter » (full width), 48 dp links. « Connecter » from the first launch goes to `/welcome/git/downloading` (`FirstDownload` with `git`: « Connexion au dépôt », repository and branch, « Annuler » forgets the access and returns to the form), then the logbook opens with « Carnet téléchargé depuis votre dépôt… ». An empty repository skips the download. New help page `pages/RepositoryHelp.svelte` (`/welcome/git/repository`, `/account/git/repository`) with the GitHub, GitLab and Codeberg tabs (texts of tasks 247 and 252). Side margins of the phone step pages are 16 dp (`EditorialPage`, header band unchanged). **Native: none.** `gitCheck` already returns `branches` and `empty`, so no C++, JNI or Swift change and no round trip. **Known gap:** « Dépôt trouvé, avec un carnet existant. » means the repository holds references (not empty); whether the branch really holds a Subsurface logbook is only known at `gitConnect` (error `NO_LOG`, shown under the form). Telling it earlier needs a native check of the branch's tree (a new façade function plus JNI and Swift). The branch list is a real dropdown: no free-text fallback was needed. Texts: periods added to the sentences of the form as in the mock-ups. Tests: `tests/app/git-form.test.mjs` (new), `first-launch.test.mjs` and `tablet-first-launch.test.mjs` (what they read; the margin expectation 20 to 16 is the task's), 668 pass. Two release-note lines (fr, en).
+
+## [x] 2026-11-16-248 Phone first launch (release): 16 dp side margins
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+On every step page of the phone first launch, the side margins change from 20 to **16 dp** (MD3 margin for compact screens). Nothing else changes; the header bands keep their own layout.
+
+**Test:** at 390 dp wide, the content of every first-launch step starts 16 dp from each edge.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the phone step column has 16 dp side margins; the header bands are unchanged.
+
+## [x] 2026-11-16-249 First launch (release): right chevron on « Suivant »
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 230, `feature/release-new-logbook-two-steps`, which has the « Nouveau carnet » step, and never merge it into `main`.
+
+Mock-ups, phone, tablet (both orientations) and desktop:
+- `android-premier-lancement-production-nom.dc.html` and `-importer-nouveau-carnet`;
+- `android-tablette-premier-lancement-production-nom-{paysage,portrait}` and `-importer-nouveau-carnet-{paysage,portrait}`;
+- `bureau-premier-lancement-production-nom` and `-importer-nouveau-carnet`.
+
+Every « Suivant » button gets a right chevron after the label, following the MD3 button with a trailing icon:
+- 18 dp chevron in the label colour, 8 dp from the text;
+- padding 24 dp at the start and 16 dp at the end.
+
+The chevron is decorative (`aria-hidden`); the button's name stays « Suivant ». In right-to-left layouts it would point left, but we have none yet.
+
+**Test:** on the « Nouveau carnet » step, when creating and when importing, on phone, tablet and desktop, « Suivant » shows the chevron to the right of the label.
+
+Done on `feature/release-new-logbook-two-steps`: « Suivant » of the « Nouveau carnet » step (creating and importing, every device) has an 18 dp chevron 8 dp after the label, with 24 dp of padding at the start and 16 dp at the end; the chevron is hidden from screen readers.
+
+## [x] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: every phone step page of the alpha and beta first launch, `docs/mockups/android-premier-lancement-alpha-*.dc.html` and `android-premier-lancement-beta-*.dc.html` (for example `-beta-compte-subsurface`, `-alpha-git`, `-alpha-sans-compte`, `-beta-creer-compte*`, the download screens).
+
+The band of the steps (`FirstLaunchBand`, variant `step`, 140 dp under the status bar) changes back to the look of the app's section band (`SectionBand` / `BandBackdrop`), with the light rays kept:
+- **Background:** the section band's radial gradient (`radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`), instead of the dark hatched linear gradient. The top-left sheen goes away.
+- **Light rays:** keep the diagonal rays layer (`repeating-linear-gradient(105deg, …)`, fading out at 55 % of the height).
+- **Faint profile:** the band's decorative dive profile at the bottom, as in the section band (area 10 % white, line 30 % white, 1.5 dp).
+- **Wave:** the app's 18 dp wave at the bottom edge, the same curve as `SectionBand` (`M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z`), in the page background colour.
+- The logo, « OpenDives » and the « Alpha » badge do not change. Check that the badge's white text still reaches 4.5:1 on the lighter top of the gradient; if not, raise the badge fill as on the welcome band.
+
+This replaces, for the step pages only, the band of tasks 234 and 236 (hatched dark blue, straight edge). The welcome screen keeps its 330 dp hatched hero with the headline and the animated profile. Tablets do not change.
+
+**Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
+
+Done: in `FirstLaunchBand.svelte` the `step` variant now draws the section band: the radial gradient (token `--od-first-band-step`, `#A9C4E2` to `#114477`, centre 38 % / -40 %), the 105deg rays kept, the SectionBand profile (area 10 % white, line 30 % white, 1.5 dp, same path) and its 18 dp wave in the page colour (`--f7-page-bg-color`); the top-left sheen is drawn on the welcome band only and the step has no straight edge. Height stays 140 dp under the status bar. The welcome hero and tablets (the panel) did not change. Badge contrast: computed with the gradient at the badge position (about 68 % of the radius), white 9 sp text on the 18 % fill is 4.9:1 (AA 4.5:1), so the fill was not raised. Test updated in `tests/app/first-launch.test.mjs`; one release-note line (fr, en).
+
+## [x] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+Same change as task 250, for the release step pages: the 140 dp step band takes the section band's radial gradient, keeps the light rays, gets the faint profile and the 18 dp wave at the bottom, and loses the top-left sheen and the straight edge. This replaces the step band of task 244. The welcome hero (330 dp) and the tablets do not change.
+
+**Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
+
+## [x] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It completes part 2 of task 247. Mock-ups: `docs/mockups/git-depot-aide-gitlab-android.dc.html` and `git-depot-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-depot-aide-android.dc.html`).
+
+The help page keeps one layout for the three tabs: the intro, the white card « Un dépôt privé : vous seul pouvez le voir. » with numbered steps, a link that opens the site in the browser, and the closing line about the token. The active tab is semi-bold, in the text colour, with the 3 dp underline; the others are grey. Use the texts of the mock-ups word for word.
+
+**GitLab**, 7 steps; the link « Ouvrir la page « New project » de GitLab » opens `https://gitlab.com/projects/new#blank_project`:
+1. Connectez-vous à GitLab, puis touchez + (Create new) en haut du menu et New project/repository.
+2. Touchez Create blank project.
+3. Project name : un nom reconnaissable, par exemple carnet-plongee.
+4. Sous Visibility Level, choisissez Private.
+5. Décochez Initialize repository with a README. Le dépôt doit rester vide.
+6. Touchez Create project.
+7. Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.
+
+**Codeberg**, 6 steps; the link « Ouvrir la page « New repository » de Codeberg » opens `https://codeberg.org/repo/create`:
+1. Connectez-vous à Codeberg, puis touchez + en haut de la page et New repository.
+2. Repository name : un nom reconnaissable, par exemple carnet-plongee.
+3. Cochez Make repository private.
+4. Laissez Initialize repository décoché. Le dépôt doit rester vide.
+5. Touchez Create repository.
+6. Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.
+
+The site labels are in English for now; Christian may ask for the French labels of GitLab and Codeberg later (GitHub exists only in English).
+
+**Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
+
+Done: the GitLab (7 steps, link `https://gitlab.com/projects/new#blank_project`) and Codeberg (6 steps, link `https://codeberg.org/repo/create`) tabs of `pages/RepositoryHelp.svelte` use the texts of the task word for word (`repoHelp.gitlab.*`, `repoHelp.codeberg.*`, fr; the English versions keep the site labels), the same layout as GitHub: active tab semi-bold in the text colour with the 3 dp underline, the others grey. Checked headless at 390 x 844; the tests are in `tests/app/git-form.test.mjs`. The French labels of GitLab and Codeberg are left to a later request.
+
+## [x] 2026-11-16-253 Git help pages: interface labels as `<kbd>`, values as `<code>`
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html` and `git-jeton-aide-android.dc.html`.
+
+In the numbered steps of the « Créer un dépôt » help (three tabs, tasks 247 and 252) and of the « Créer un jeton d’accès » help, the words the person must find on the site or type are set apart, without bold:
+- **Interface labels** (buttons, menus, fields, options, e.g. +, New repository, Private, Repository name, Fine-grained tokens, Read and write): a `<kbd>` element, shown as a small chip: same font, size 14 sp, normal weight, padding 0 × 5 dp, 1 dp outline `#D3D0C8`, radius 4 dp, background `#F1EFEA`, no line break inside.
+- **Values to type or copy** (the logbook name `carnet-plongee`, the example addresses `https://github.com/vous/carnet-plongee.git` and the GitLab and Codeberg ones, the token name `OpenDives`): a `<code>` element in Roboto Mono 13.5 sp, padding 0 × 4 dp, radius 4 dp, background `#EAF0F7`, text `#1F3F66`; a long address may break anywhere.
+
+Put a no-break space before a colon that follows a label (« Repository name : »). Take the two colours from tokens (add `--od-kbd-*` and `--od-code-*` if they do not exist) and check the dark theme: both must keep 4.5:1. Only the styling changes here; the step texts stay those of tasks 247 and 252.
+
+**Test:** in the four help pages, every site label is a chip and every example value is monospace, with no bold, in light and dark themes.
+
+Done: in the steps of the repository help and the token help, an interface label is set apart as `<kbd>` and a value as `<code>`, without bold. The step texts stay plain JSON with the marks `[kbd]…[/kbd]` and `[code]…[/code]`; `app/src/lib/marked-text.js` parses them into segments and `app/src/components/MarkedText.svelte` renders `<kbd>`, `<code>` and text (never `{@html}`). Colours come from `--od-kbd-*` and `--od-code-*` in `app/src/theme.css`, light as in the task, dark `#F4F4F2` on `#2A2C30` (kbd) and `#BFD6F0` on `#1F2B3B` (code), both above 4.5:1 (tests/app/marked-text.test.mjs). A no-break space precedes a colon after a label in French. Tests: parser, balanced marks in every step in fr and en, no bold, tokens in light and dark. Rendered at 390×844 headless, light and dark, in French and English.
+
+## [x] 2026-11-16-254 Token help (GitHub): choose « No expiration »
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/git-jeton-aide-android.dc.html`, GitHub tab of « Créer un jeton d’accès ».
+
+Two text changes:
+- In the intro, remove « , et une date d’expiration » so that it reads « … avec le droit de lire et d’écrire son contenu et rien d’autre. »
+- The Expiration step becomes: « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » (Expiration and No expiration are interface labels, styled as in task 253.)
+
+Background: since October 2024 GitHub lets a fine-grained token have no expiration for personal repositories; organisations limit it to 366 days by default.
+
+**Test:** the GitHub tab of the token help shows the new intro and the « No expiration » step.
+
+Done: the GitHub intro of the token help no longer mentions an expiry date, and the Expiration step reads « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » with Expiration and No expiration as `<kbd>`. The intro follows the mock-up (« GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. »). Test in tests/app/marked-text.test.mjs.
+
+## [x] 2026-11-16-255 Token help: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-jeton-aide-gitlab-android.dc.html` and `git-jeton-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-jeton-aide-android.dc.html`).
+
+The « Créer un jeton d’accès » help gets the same layout as the GitHub tab for GitLab and Codeberg: intro, white card with a first line and numbered steps, a link that opens the site's token page in the browser, then the closing line. Labels of the sites are `<kbd>`, values are `<code>` (task 253). Use the texts of the mock-ups word for word; the site labels are those of the French interface of each site (taken from the GitLab and Gitea/Forgejo translation files).
+
+**GitLab** (link « Ouvrir la page des jetons de GitLab » → `https://gitlab.com/-/user_settings/personal_access_tokens`). Card line: « Sur GitLab, un jeton personnel donne accès à tous vos dépôts et doit avoir une date d’expiration. » Steps: avatar › Modifier le profil; Jetons d’accès; Ajouter un nouveau jeton; Nom du jeton (`OpenDives`); Date d’expiration: the latest date allowed, with a new token to create at that date; Portées: only `write_repository`; Créer un jeton, then copy it.
+
+**Codeberg** (link « Ouvrir la page des applications de Codeberg » → `https://codeberg.org/user/settings/applications`). Card line: « Sur Codeberg, un jeton n’expire pas. Vous pouvez le supprimer à tout moment. » Steps: avatar › Configuration; Applications; under Gérer les jetons d’accès, Nom du jeton (`OpenDives`); Tout (public, privé et limité); Dépôt on Lecture et écriture, the others on Aucun accès; Générer un jeton, then copy it.
+
+The intro of both tabs: « OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site. »
+
+The help page must scroll when its content is taller than the screen (the GitHub tab is about 1100 dp tall).
+
+**Test:** each tab of the token help shows its own steps and link, the active tab is underlined, and each link opens the right page.
+
+Done: each host of the token help has its own intro, first line, steps and link text (`tokenHelp.<id>.intro`, `.note`, `.open`, `.s1…`), the GitLab and Codeberg texts are those of the mock-ups, the links are https://gitlab.com/-/user_settings/personal_access_tokens and https://codeberg.org/user/settings/applications, and the page scrolls when taller than the screen (1019 dp on GitHub at 390 dp). Where the sites' current translation files differ from the mock-ups, the sites win: see the list of differences in the report of this task (GitLab personal tokens: Access › Personal access tokens, Generate token › Legacy token, Generate token; Codeberg: Access tokens › New access token, Select permissions with the row `repository`, then Generate token).
+
+## [x] 2026-11-16-256 Help « Créer un dépôt »: French site labels for GitLab and Codeberg (correction to 252)
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html`.
+
+GitLab and Codeberg exist in French, so their tabs name the labels of the French interface (taken from the GitLab and Gitea/Forgejo translation files). GitHub exists only in English and keeps the English labels. Use the texts of the mock-ups word for word:
+- **Intro of the GitHub tab:** « … GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. » (same sentence in the GitHub tab of the token help).
+- **Intro of the GitLab and Codeberg tabs:** « … Les libellés ci-dessous sont ceux de l’interface française du site. »
+- **GitLab steps:** + (Créer un nouveau) › Nouveau projet/dépôt; Créer un projet vide; Nom du projet; Niveau de visibilité › Privé; uncheck Initialiser le dépôt avec un README; Créer le projet; Code › Cloner avec HTTPS. Link: « Ouvrir la page « Nouveau projet » de GitLab ».
+- **Codeberg steps:** + › Nouveau dépôt; Nom du dépôt; Rendre le dépôt privé; leave Initialiser le dépôt unchecked; Créer un dépôt; HTTPS. Link: « Ouvrir la page « Nouveau dépôt » de Codeberg ».
+
+**Test:** the GitLab and Codeberg tabs show the French labels, the GitHub tab the English ones with the new intro.
+
+Done: the repository help has one intro per host (GitHub: « GitHub n’existe qu’en anglais… »; GitLab and Codeberg: « Les libellés ci-dessous sont ceux de l’interface française du site. », and in English « The labels below are those of the site’s English interface. »), the French labels of GitLab and Codeberg from the mock-ups, and the links « Ouvrir la page « Nouveau projet » de GitLab » and « Ouvrir la page « Nouveau dépôt » de Codeberg ». The labels were checked against GitLab's `locale/fr/gitlab.po` and Forgejo's `locale_fr-FR.ini` and `locale_en-US.ini`. The GitLab and Codeberg tabs take the language of the app (fr and fr-CA: French labels, en: English labels); GitHub stays English.
+
+## [ ] 2026-11-16-257 Tablet and desktop (alpha): « Utiliser mon propre dépôt git », with the help pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings task 247 (phone) and the help pages of tasks 252 to 256 to the tablet and the desktop.
+
+Mock-ups, all in `docs/mockups/`:
+- **Tablet, landscape and portrait:**
+  - `android-tablette-premier-lancement-alpha-git-{paysage,portrait}`;
+  - `-git-erreur-adresse-*`, `-git-erreur-acces-*`;
+  - `-git-telechargement-*`, `-git-carnet-*`.
+- **Desktop:**
+  - `bureau-premier-lancement-alpha-git`;
+  - `-git-erreur-adresse`, `-git-erreur-acces`;
+  - `-git-telechargement`, `-git-carnet`.
+- **Help pages:** `git-depot-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}` and `git-jeton-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}`.
+
+**1. The form.** The same shared git form as on the phone (task 247: texts, fields, messages, links, MD3 spacing), placed in the first-launch frame of the tablet and the desktop: the blue panel with the animated profile stays, the form takes the place of the « J’ai un compte Subsurface » form (same « Retour », same column). « ce téléphone » becomes « cette tablette » or « cet ordinateur ».
+
+**2. Download and logbook.** As for the Subsurface account (tasks 239 and 242), with the git texts: « Votre dépôt git », « Connexion au dépôt » with `github.com/vous/carnet-plongee · main`, « Téléchargement du carnet », « Copie du carnet sur cette tablette / cet ordinateur »; then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette / cet ordinateur, même sans réseau. »
+
+**3. Help pages.** « Comment créer un dépôt » and « Comment créer un jeton d’accès » do not open a new screen: the help replaces the form in the same column, with « Retour » back to the form, the page title, the three tabs and the same content as on the phone (labels as `<kbd>`, values as `<code>`, links that open the browser). The column scrolls when the help is taller than the screen; the blue panel does not move. On the desktop the steps say « Cliquez » instead of « Touchez ».
+
+**Test:**
+- On a tablet in both orientations and on the desktop, « Utiliser mon propre dépôt git » opens the form in the first-launch frame.
+- The two errors show under the right field.
+- The help links swap the form for the help, and « Retour » brings the form back with its fields still filled.
+- A valid repository leads to the download, then to the logbook with the snackbar.

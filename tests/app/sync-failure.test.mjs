@@ -16,9 +16,9 @@ test('the cloud not answering while the network works', () => {
   assert.equal(failureCause({ online: true, gitMode: false, refused: false }), 'server');
 });
 
-test('any failure of an own repository goes to its form', () => {
+test('an own repository: a refusal goes to its form, an unreachable server is retried', () => {
   assert.equal(failureCause({ online: true, gitMode: true, refused: true }), 'repository');
-  assert.equal(failureCause({ online: true, gitMode: true, refused: false }), 'repository');
+  assert.equal(failureCause({ online: true, gitMode: true, refused: false }), 'server');
 });
 
 test('only the core\'s AUTH prefix counts as refused', () => {

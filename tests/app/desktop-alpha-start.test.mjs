@@ -173,7 +173,7 @@ test('the desktop says « cet ordinateur »: a Desktop twin of every Tablet text
   assert.equal(fr.welcome.noAccountNoteDesktop, 'Le carnet reste sur cet ordinateur. Vous pourrez le sauvegarder plus tard');
   assert.equal(fr.firstLaunch.snackbar.downloadedDesktop, 'Carnet téléchargé. Il reste sur cet ordinateur, même sans réseau.');
   assert.equal(fr.firstLaunch.snackbar.localDesktop, 'Carnet créé sur cet ordinateur.');
-  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS_DESKTOP).sort(), ['created', 'downloaded', 'local']);
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS_DESKTOP).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
   for (const key of Object.values(FIRST_LAUNCH_SNACKBARS_DESKTOP)) assert.ok(get(fr, key) && get(langs.en, key), key);
   assert.equal(get(fr, FIRST_LAUNCH_SNACKBARS_DESKTOP.created), 'Compte créé. Votre carnet est prêt.');
   // The snackbar sits bottom-left after the rail, as on a tablet; the icon of « Sur cet ordinateur seulement » is a computer screen.
