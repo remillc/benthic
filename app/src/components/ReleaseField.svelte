@@ -21,6 +21,7 @@
    *   class?: string,
    *   oninput?: () => void,
    *   onchange?: () => void,
+   *   onenter?: () => void,
    * }}
    */
   let {
@@ -36,6 +37,7 @@
     class: extra = '',
     oninput,
     onchange,
+    onenter,
   } = $props();
 
   const id = `od-release-field-${Math.random().toString(36).slice(2, 8)}-${uid++}`;
@@ -58,6 +60,9 @@
       bind:value
       oninput={() => oninput?.()}
       onchange={() => onchange?.()}
+      onkeydown={(e) => {
+        if (e.key === 'Enter' && onenter) onenter();
+      }}
     />
     <label class="od-release-field--label" for={id}>{label}</label>
     {#if error}<span class="od-release-field--error-icon" aria-hidden="true"><Icon name="error" size={20} /></span>{/if}

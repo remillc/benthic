@@ -1023,6 +1023,7 @@
     "nameHelp": "Il s’affiche en haut du carnet et nomme son fichier.",
     "nameInvalid": "Le nom doit contenir au moins une lettre ou un chiffre.",
     "defaultName": "Mon carnet",
+    "next": "Suivant",
     "whereTitle": "Où le garder ?",
     "whereHelp": "Vous pourrez changer d’endroit plus tard.",
     "cloudTitle": "Dans mon nuage",

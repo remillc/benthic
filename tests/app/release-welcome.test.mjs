@@ -79,22 +79,24 @@ function play(choices) {
 
 test('step machine: forward order of every path', () => {
   const last = (choices) => play(choices).at(-1);
-  assert.deepEqual(last(['create', 'cloud', 'service', 'connected']), ['start', 'new', 'cloudService', 'cloudConnect', 'cloudConnected']);
-  assert.deepEqual(last(['create', 'git']), ['start', 'new', 'git']);
+  assert.deepEqual(last(['create', 'next', 'cloud', 'service', 'connected']), ['start', 'new', 'where', 'cloudService', 'cloudConnect', 'cloudConnected']);
+  assert.deepEqual(last(['create', 'next', 'git']), ['start', 'new', 'where', 'git']);
   assert.deepEqual(last(['import', 'divelogs', 'submit']), ['start', 'import', 'importDivelogs', 'importProgress']);
   assert.deepEqual(last(['import', 'file']), ['start', 'import', 'importNew']);
-  assert.deepEqual(last(['import', 'file', 'git']), ['start', 'import', 'importNew', 'git']);
+  assert.deepEqual(last(['import', 'file', 'next']), ['start', 'import', 'importNew', 'where']);
+  assert.deepEqual(last(['import', 'file', 'next', 'git']), ['start', 'import', 'importNew', 'where', 'git']);
   assert.deepEqual(last(['open', 'cloud', 'service', 'connected', 'list']), ['start', 'open', 'openCloudService', 'openCloudConnect', 'openCloudConnected', 'openChoose']);
   assert.deepEqual(last(['open', 'git']), ['start', 'open', 'openGit']);
   // « Ouvrir mon carnet OpenDives » in the git note goes to step 5 and « Retour » comes back to the git step.
-  assert.deepEqual(last(['create', 'git', 'openLink']), ['start', 'new', 'git', 'open']);
-  assert.deepEqual(last(['create', 'git', 'openLink', 'back']), ['start', 'new', 'git']);
+  assert.deepEqual(last(['create', 'next', 'git', 'openLink']), ['start', 'new', 'where', 'git', 'open']);
+  assert.deepEqual(last(['create', 'next', 'git', 'openLink', 'back']), ['start', 'new', 'where', 'git']);
 });
 
 test('step machine: « Retour » goes back one step along every path, never below the first screen', () => {
   for (const path of [
-    ['create', 'cloud', 'service', 'connected'],
-    ['create', 'git'],
+    ['create', 'next', 'cloud', 'service', 'connected'],
+    ['create', 'next', 'git'],
+    ['import', 'file', 'next', 'git'],
     ['import', 'divelogs'],
     ['open', 'cloud', 'service', 'connected', 'list'],
     ['open', 'git'],
@@ -108,14 +110,18 @@ test('step machine: « Retour » goes back one step along every path, never belo
 });
 
 test('step machine: a choice that leads nowhere changes nothing; the device path has no extra screen', () => {
-  assert.deepEqual(forward(['start', 'new'], 'device'), ['start', 'new']);
-  assert.equal(nextStep('new', 'device'), undefined);
+  assert.deepEqual(forward(['start', 'new', 'where'], 'device'), ['start', 'new', 'where']);
+  assert.equal(nextStep('where', 'device'), undefined);
+  // The name step has only « Suivant »: the three places are on the next step.
+  for (const c of ['cloud', 'git', 'device']) assert.equal(nextStep('new', c), undefined, c);
+  for (const c of ['cloud', 'git', 'device']) assert.equal(nextStep('importNew', c), undefined, c);
   assert.equal(nextStep('start', 'nonsense'), undefined);
 });
 
 test('step machine: the pencil returns to the name; the read divelogs.de import skips the form', () => {
-  assert.deepEqual(backToName(['start', 'new', 'cloudService', 'cloudConnect']), ['start', 'new']);
-  assert.deepEqual(backToName(['start', 'import', 'importNew', 'git']), ['start', 'import', 'importNew']);
+  assert.deepEqual(backToName(['start', 'new', 'where', 'cloudService', 'cloudConnect']), ['start', 'new']);
+  assert.deepEqual(backToName(['start', 'new', 'where']), ['start', 'new'], 'the pencil of « Où le garder ? »');
+  assert.deepEqual(backToName(['start', 'import', 'importNew', 'where', 'git']), ['start', 'import', 'importNew']);
   assert.deepEqual(importRead(['start', 'import', 'importDivelogs', 'importProgress']), ['start', 'import', 'importNew']);
   assert.deepEqual(importRead(['start', 'import']), ['start', 'import', 'importNew']);
   // « Retour » from « Nouveau carnet » of a divelogs.de import lands on « Importer un carnet ».
@@ -123,7 +129,7 @@ test('step machine: the pencil returns to the name; the read divelogs.de import 
 });
 
 test('the page title is the logbook name on the steps after the name, and « Retour » is missing where it must be', () => {
-  for (const s of ['cloudService', 'cloudConnect', 'cloudConnected', 'git']) assert.ok(hasLogbookTitle(s), s);
+  for (const s of ['where', 'cloudService', 'cloudConnect', 'cloudConnected', 'git']) assert.ok(hasLogbookTitle(s), s);
   for (const s of ['start', 'new', 'import', 'open', 'openGit']) assert.ok(!hasLogbookTitle(s), s);
   assert.ok(!hasBack('start'));
   assert.ok(!hasBack('importProgress'));
@@ -437,4 +443,36 @@ test('the tablet empty logbook: the dive computer button and the three ways, ove
   assert.match(sources.empty, /width: min\(520px, 100%\)/);
   assert.match(sources.logbook, /<ReleaseEmptyLogbook/);
   for (const lang of ['fr', 'en']) assert.ok(langs[lang].logbook.emptyDownload);
+});
+
+// Task 2026-11-16-231: « Nouveau carnet » in two steps, the name then « Où le garder ? ».
+test('two steps: create and import both reach « Où le garder ? » after « Suivant », « Retour » goes back one step', () => {
+  assert.deepEqual(play(['create', 'next']).at(-1), ['start', 'new', 'where']);
+  assert.deepEqual(play(['import', 'file', 'next']).at(-1), ['start', 'import', 'importNew', 'where']);
+  assert.deepEqual(play(['create', 'next', 'back']).at(-1), ['start', 'new']);
+  assert.deepEqual(play(['import', 'file', 'next', 'back']).at(-1), ['start', 'import', 'importNew']);
+  assert.deepEqual(play(['import', 'divelogs', 'submit', 'read', 'next']).at(-1), ['start', 'import', 'importNew', 'where']);
+});
+
+test('two steps: the pencil keeps the name, the name is the title of « Où le garder ? » and the device texts are by device', () => {
+  const read = (p) => readFileSync(new URL(`../../app/src/${p}`, import.meta.url), 'utf8');
+  const steps = read('components/FirstLaunchSteps.svelte');
+  assert.match(steps, /\{:else if step === 'where'\}\s*\{@render whereStep\(\)\}/);
+  // editName only pops the stack: flow.name is not touched, so the name typed in step 1 stays.
+  const state = read('lib/first-launch.svelte.js');
+  const editName = state.slice(state.indexOf('export function editName'), state.indexOf('export function importIsRead'));
+  assert.doesNotMatch(editName, /flow\.name/);
+  assert.match(steps, /<span class="od-first-launch--title">\{flow\.name\.trim\(\)/);
+  const nameStep = steps.slice(steps.indexOf('{#snippet nameStep()}'), steps.indexOf('{#snippet whereStep()}'));
+  assert.doesNotMatch(nameStep, /ReleaseChoiceRow/, 'the name step has no place rows');
+  assert.match(nameStep, /welcomeSteps\.next/);
+  for (const l of ['fr', 'en']) {
+    const w = JSON.parse(read(`i18n/${l}.json`)).welcomeSteps;
+    for (const k of ['next', 'deviceTitle', 'deviceTitlePhone', 'deviceTitleDesktop', 'whereTitle', 'whereHelp']) assert.ok(w[k], `${l} ${k}`);
+  }
+  const fr = JSON.parse(read('i18n/fr.json')).welcomeSteps;
+  assert.equal(fr.next, 'Suivant');
+  assert.equal(fr.deviceTitle, 'Seulement sur cette tablette');
+  assert.equal(fr.deviceTitlePhone, 'Seulement sur ce téléphone');
+  assert.equal(fr.deviceTitleDesktop, 'Seulement sur cet ordinateur');
 });

@@ -1023,6 +1023,7 @@
     "nameHelp": "It shows at the top of the logbook and names its file.",
     "nameInvalid": "The name needs at least one letter or digit.",
     "defaultName": "My logbook",
+    "next": "Next",
     "whereTitle": "Where to keep it?",
     "whereHelp": "You can change this later.",
     "cloudTitle": "In my cloud",

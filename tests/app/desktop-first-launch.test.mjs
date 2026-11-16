@@ -161,9 +161,9 @@ test('iCloud Drive is offered on macOS only, before WebDAV; Windows and Linux do
 test('iCloud Drive has no sign-in screen: the choice goes straight to the connected screen, in both lists', () => {
   assert.equal(nextStep('cloudService', 'icloud'), 'cloudConnected');
   assert.equal(nextStep('openCloudService', 'icloud'), 'openCloudConnected');
-  const stack = forward(['start', 'new', 'cloudService'], 'icloud');
-  assert.deepEqual(stack, ['start', 'new', 'cloudService', 'cloudConnected']);
-  assert.deepEqual(back(stack), ['start', 'new', 'cloudService'], '« Retour » goes to the list, not to a sign-in screen');
+  const stack = forward(['start', 'new', 'where', 'cloudService'], 'icloud');
+  assert.deepEqual(stack, ['start', 'new', 'where', 'cloudService', 'cloudConnected']);
+  assert.deepEqual(back(stack), ['start', 'new', 'where', 'cloudService'], '« Retour » goes to the list, not to a sign-in screen');
   assert.deepEqual(forward(['start', 'open', 'openCloudService'], 'icloud').slice(-1), ['openCloudConnected']);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /go\(key === 'webdav' \? 'webdav' : key === 'icloud' \? 'icloud' : 'service'\)/);

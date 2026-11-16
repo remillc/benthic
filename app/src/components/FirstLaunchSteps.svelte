@@ -188,7 +188,13 @@
     goBackTo('openCloudService');
   }
 
-  /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of the name step. */
+  /** « Suivant » of the name step: « Où le garder ? ». */
+  function nameDone() {
+    if (nameInvalid) return;
+    go('next');
+  }
+
+  /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of « Où le garder ? ». */
   function where(/** @type {'cloud'|'git'|'device'} */ kind) {
     if (nameInvalid) return;
     if (kind === 'device') void createOnDevice();
@@ -575,7 +581,7 @@
   {/if}
 {/snippet}
 
-{#snippet nameAndWhere()}
+{#snippet nameStep()}
   {#if flow.source}
     <div class="od-first-launch--summary">
       <span class="od-first-launch--summary-icon"><Icon name="file" size={20} /></span>
@@ -585,9 +591,14 @@
       </span>
     </div>
   {/if}
-  <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} />
-  <h3 class="od-first-launch--section">{t('welcomeSteps.whereTitle')}</h3>
-  <p class="od-first-launch--section-help">{t('welcomeSteps.whereHelp')}</p>
+  <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} onenter={nameDone} />
+  <button type="button" class="od-first-launch--action" disabled={nameInvalid} onclick={nameDone}>{t('welcomeSteps.next')}</button>
+{/snippet}
+
+<!-- Task 2026-11-16-231: « Où le garder ? », the second step of « Nouveau carnet »; the name is the page title above. -->
+{#snippet whereStep()}
+  <h3 class="od-first-launch--subtitle">{t('welcomeSteps.whereTitle')}</h3>
+  <p class="od-first-launch--lead">{t('welcomeSteps.whereHelp')}</p>
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
     <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
     <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
@@ -618,7 +629,9 @@
           {/if}
           {@render dropLine()}
         {:else if step === 'new' || step === 'importNew'}
-          {@render nameAndWhere()}
+          {@render nameStep()}
+        {:else if step === 'where'}
+          {@render whereStep()}
         {:else if step === 'cloudService'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.serviceTitle')}</h3>
           <p class="od-first-launch--lead">{t('welcomeSteps.serviceHelp')}</p>
@@ -925,20 +938,6 @@
 
     :global(.od-first-launch--name-field) {
       margin: 8px 0 4px;
-    }
-
-    .od-first-launch--section {
-      margin: 24px 0 0;
-      font-size: 17px;
-      line-height: 22px;
-      font-weight: 600;
-    }
-
-    .od-first-launch--section-help {
-      margin: 0 0 14px;
-      font-size: 15px;
-      line-height: 21px;
-      color: var(--od-text-2);
     }
 
     /* The file that could not be read (mock-up …-importer-fichier-erreur-paysage). */

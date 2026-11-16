@@ -4,7 +4,8 @@
 // can check the order of every path.
 //
 // Paths:
-//   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
+//   start → new (the name) → where (« Où le garder ? »; task 2026-11-16-231) →
+//     (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
 //   (iCloud Drive, macOS only: cloudService → cloudConnected, no sign-in; task 2026-11-16-228)
 //   start → import → (file | importDivelogs → importProgress) → importNew → where as above
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
@@ -14,7 +15,7 @@
 
 /**
  * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
- *   |'import'|'importDivelogs'|'importProgress'|'importNew'
+ *   |'where'|'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'} Step
  */
 
@@ -22,17 +23,17 @@
 const NAME_STEPS = /** @type {Step[]} */ (['new', 'importNew']);
 
 /** The steps after the name, where the logbook's name is the page title. */
-const TITLED_STEPS = /** @type {Step[]} */ (['cloudService', 'cloudConnect', 'cloudConnected', 'webdav', 'git']);
+const TITLED_STEPS = /** @type {Step[]} */ (['where', 'cloudService', 'cloudConnect', 'cloudConnected', 'webdav', 'git']);
 
 /** @type {Record<string, Step>} */
 const FORWARD = {
   'start:create': 'new',
   'start:import': 'import',
   'start:open': 'open',
-  'new:cloud': 'cloudService',
-  'new:git': 'git',
-  'importNew:cloud': 'cloudService',
-  'importNew:git': 'git',
+  'new:next': 'where',
+  'importNew:next': 'where',
+  'where:cloud': 'cloudService',
+  'where:git': 'git',
   'cloudService:service': 'cloudConnect',
   'cloudService:webdav': 'webdav',
   'cloudService:icloud': 'cloudConnected',

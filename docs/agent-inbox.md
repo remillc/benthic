@@ -4453,7 +4453,7 @@ Done (phone and tablet), branch `feature/release-phone-first-launch`: point 1, t
 
 Done (desktop), branch `feature/release-desktop-first-launch`: the desktop gets the hint on two lines, centred under a centred « Se connecter à {service} » from the shared component; kept centred in a window narrow enough to match the phone rules (test in `tests/app/desktop-first-launch.test.mjs`).
 
-## [ ] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
+## [x] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-new-logbook-two-steps`, started from the latest release branch (task 230). Do not merge it into `main`. Phone, tablet (both orientations) and desktop.
 
@@ -4474,6 +4474,8 @@ Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, a
 « Retour » goes back one step, with the shared-axis X transition backwards.
 
 **Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
+
+Done: « Nouveau carnet » is two steps on phone, tablet (both orientations) and desktop. New step `where` in `lib/first-launch-steps.js` (« Suivant » is the choice `next` from `new` and `importNew`; `cloud` and `git` now leave `where`; the pencil still pops to the last name step, so the name is kept). `FirstLaunchSteps.svelte`: `nameStep` (summary card for an import, name field, « Suivant », Enter also goes on; `ReleaseField` got an `onenter` prop) and `whereStep` (the name as the page title with the pencil, subtitle, help line, the three rows with the device texts by device). « Retour » pops one step with the existing backward shared-axis transition. New key `welcomeSteps.next` (fr, en). No release note. Tests: `tests/app/release-welcome.test.mjs`, `first-launch-complete.test.mjs` and `desktop-first-launch.test.mjs` updated for the extra `where` step. Branch `feature/release-new-logbook-two-steps`.
 
 ## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
 
