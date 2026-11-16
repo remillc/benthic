@@ -4065,6 +4065,9 @@ int import_csv(const std::string &file, const std::string &companion, const std:
 	if (dry_run) {
 		result_json = csv_preview_json(log);
 		return 0;
+	}
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
 
 int import_dives_files(const std::vector<std::string> &files, const std::string &source, std::string &result_json,
 		       std::string &error)
