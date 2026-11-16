@@ -63,7 +63,7 @@ function openSettingsWindow() {
   settingsWin = new BrowserWindow({
     width: 980,
     height: 680,
-    minWidth: 760,
+    minWidth: 768,
     minHeight: 520,
     show: false,
     title: 'OpenDives',

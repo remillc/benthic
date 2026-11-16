@@ -21,7 +21,7 @@ function load(dir) {
       typeof saved.x === 'number' &&
       screen.getAllDisplays().some(({ workArea: a }) => saved.x >= a.x - 50 && saved.y >= a.y - 50 && saved.x < a.x + a.width && saved.y < a.y + a.height);
     return {
-      width: Math.max(760, saved.width || DEFAULT.width),
+      width: Math.max(768, saved.width || DEFAULT.width),
       height: Math.max(560, saved.height || DEFAULT.height),
       ...(visible ? { x: saved.x, y: saved.y } : {}),
       maximized: !!saved.maximized,
