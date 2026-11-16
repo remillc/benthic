@@ -4928,3 +4928,15 @@ In the numbered steps of the « Créer un dépôt » help (three tabs, tasks 247
 Put a no-break space before a colon that follows a label (« Repository name : »). Take the two colours from tokens (add `--od-kbd-*` and `--od-code-*` if they do not exist) and check the dark theme: both must keep 4.5:1. Only the styling changes here; the step texts stay those of tasks 247 and 252.
 
 **Test:** in the four help pages, every site label is a chip and every example value is monospace, with no bold, in light and dark themes.
+
+## [ ] 2026-11-16-254 Token help (GitHub): choose « No expiration »
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/git-jeton-aide-android.dc.html`, GitHub tab of « Créer un jeton d’accès ».
+
+Two text changes:
+- In the intro, remove « , et une date d’expiration » so that it reads « … avec le droit de lire et d’écrire son contenu et rien d’autre. »
+- The Expiration step becomes: « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » (Expiration and No expiration are interface labels, styled as in task 253.)
+
+Background: since October 2024 GitHub lets a fine-grained token have no expiration for personal repositories; organisations limit it to 366 days by default.
+
+**Test:** the GitHub tab of the token help shows the new intro and the « No expiration » step.
