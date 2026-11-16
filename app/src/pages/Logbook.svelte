@@ -1131,7 +1131,7 @@
     if (!file || !fileInput) return;
     fileInput.value = '';
     if (picked) {
-      csv = picked;
+      csv = { file: picked.csv, companion: picked.companion };
       return;
     }
     importing = true;

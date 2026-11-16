@@ -4260,3 +4260,6 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - Demo: the banner stays visible. Adding a dive opens `demo-ajout`. « Commencer mon carnet » erases the demo and goes back to the first step.
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
+
+Done (parts 7–8): branch `feature/release-csv-demo` (from `feature/release-first-launch-complete`). Demo logbook: `lib/demo.js`, `lib/demo.svelte.js`, `components/DemoHost.svelte` (banner, `demo-quitter`, `demo-ajout`); no account means no sync, device dives are never offered to an account while it is open, and the account routes open the exit dialog. CSV: façade `import_csv()` (`opendives.h`), plugin `importCsv` (Kotlin, JNI, Swift, `core-api.js`), `components/CsvImportDialog.svelte`, `lib/csv-import.js`, `lib/csv-dialog.js`; `parse_seabear_header()` ported in `core/compat/qthelper_compat.cpp`; CSV added to `docs/import-formats.md` and `lib/import-formats.js`. Tests: `tests/import_csv_test.cpp` (`build/poc/import-csv`), `tests/app/csv-import.test.mjs`, `tests/app/demo-logbook.test.mjs`.
+

@@ -205,7 +205,7 @@
     fileInput.value = '';
     unreadable = '';
     if (picked) {
-      csv = picked;
+      csv = { file: picked.csv, companion: picked.companion };
       return;
     }
     busy = true;

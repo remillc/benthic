@@ -360,6 +360,7 @@ test('the dialog texts exist in French and English, and the CSS follows the rule
   // Every field of a menu has its label.
   for (const kind of Object.values(FIELDS)) for (const f of kind) assert.ok(fr.csvImport.field[f.key], f.key);
   const dialog = src('components/CsvImportDialog.svelte');
+  assert.doesNotMatch(dialog, /n: formatNumber/, 'a plural takes the number, not its text');
   assert.match(dialog, /\.od-csv-import--kind \{[^}]*cursor: pointer/s, 'the type cards have the hand pointer');
   assert.match(dialog, /\.od-csv-import--select select \{[^}]*cursor: pointer/s);
   assert.match(dialog, /\.od-csv-import--filled \{[\s\S]*?:hover:not\(:disabled\)/, 'a hover state on the main button');

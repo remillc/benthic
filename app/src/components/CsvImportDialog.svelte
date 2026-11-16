@@ -158,8 +158,8 @@
             <span class="od-csv-import--file-name">{file.name}</span>
             <span class="od-csv-import--file-detail">
               {t('csvImport.type.detail', {
-                columns: t('csvImport.type.columns', { n: formatNumber(s.inspection.columnCount, 0) }),
-                lines: t('csvImport.type.lines', { n: formatNumber(s.inspection.lineCount, 0) }),
+                columns: t('csvImport.type.columns', { n: s.inspection.columnCount }),
+                lines: t('csvImport.type.lines', { n: s.inspection.lineCount }),
                 separator: t(`csvImport.separator.${SEPARATOR_KEYS[s.inspection.separator]}`).toLowerCase(),
               })}
             </span>
@@ -300,7 +300,7 @@
               <span class="od-csv-import--file-name">{file.name}</span>
               <span class="od-csv-import--file-detail">
                 {t('csvImport.preview.summary', {
-                  dives: t('csvImport.preview.dives', { n: formatNumber(totals.dives, 0) }),
+                  dives: t('csvImport.preview.dives', { n: totals.dives }),
                   minutes: formatNumber(totals.minutes, 0),
                   depth: formatDepth(totals.maxDepthMm, logbook.prefs),
                 })}
