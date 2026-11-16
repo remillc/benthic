@@ -1112,7 +1112,7 @@
   }
 </script>
 
-<Page class="od-logbook" onPageInit={keepInSvelteRange}>
+<Page data-od-scroll class="od-logbook" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>

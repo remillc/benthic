@@ -145,7 +145,7 @@
   });
 </script>
 
-<Page class="od-statistics" onPageInit={keepInSvelteRange}>
+<Page data-od-scroll class="od-statistics" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -412,6 +412,20 @@
       scroll-snap-type: x mandatory;
       scroll-padding: 0 16px;
       scrollbar-width: none;
+    }
+
+    /* The desktop app (a mouse has no swipe, fluid layout): the cards wrap in the pane's width instead of scrolling sideways. */
+    :global(html.od-desktop-app) .od-statistics--charts {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      scroll-snap-type: none;
+
+      .od-statistics--chart-card {
+        flex: 1 1 272px;
+        width: auto;
+        min-width: 0;
+        max-width: 100%;
+      }
     }
 
     .od-statistics--chart-card {

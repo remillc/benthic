@@ -1381,7 +1381,7 @@
 {#if desk}
   {@render deskView()}
 {:else}
-<Page class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-od-scroll class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
       {#if section && layout.split}

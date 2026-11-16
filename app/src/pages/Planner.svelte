@@ -667,7 +667,7 @@
   }
 </script>
 
-<Page class="od-planner" onPageReinit={refresh}>
+<Page data-od-scroll class="od-planner" onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
       <Link iconOnly={!theme.ios} onClick={() => guard?.attempt()}>

@@ -43,6 +43,9 @@
   /** @type {{ f7router?: any }} */
   let { f7router = undefined } = $props();
 
+  /** Fluid layout: the chart keeps 380 dp in a tall window and shrinks in a short one, so the page does not scroll. */
+  let windowHeight = $state(900);
+  const chartHeight = $derived(Math.max(200, Math.min(380, windowHeight - 330)));
   const SELECTED_KEY = 'od.desktopStatistic';
   /** @type {string} */
   let selected = $state(deviceStore.getItem(SELECTED_KEY) ?? 'byYear');
@@ -416,6 +419,8 @@
   }
 </script>
 
+<svelte:window bind:innerHeight={windowHeight} />
+
 <Page class="od-desktop-statistics" pageContent={false}>
   <div class="od-desktop-statistics--frame">
     <header class="od-desktop-statistics--bar">
@@ -443,7 +448,7 @@
     {:else}
       <div class="od-desktop-statistics--body">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <section class="od-desktop-statistics--list" aria-label={t('desktopStats.list')} onkeydown={listKey}>
+        <section class="od-desktop-statistics--list" data-od-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
           <ul role="list">
             {#each rows as row (row.key)}
               <li>
@@ -478,13 +483,14 @@
             {/if}
           </div>
           {#if isHeat}
-            <HeatMapCard dives={chartDives} {sites} height="420px" />
+            <HeatMapCard dives={chartDives} {sites} height="clamp(200px, calc(100vh - 330px), 420px)" />
           {:else}
             <div class="od-desktop-statistics--card">
               {#if bars.length}
                 <DesktopStatChart
                   bind:svg={chartSvg}
                   {bars}
+                  height={chartHeight}
                   label={current.title}
                   {tip}
                   valueText={valueShort}
