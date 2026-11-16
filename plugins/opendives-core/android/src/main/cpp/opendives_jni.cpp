@@ -718,7 +718,6 @@ Java_org_opendives_core_NativeCore_importDives(JNIEnv *env, jobject, jstring fil
 	return edit_result(env, json);
 }
 
-<<<<<<< HEAD
 // A CSV file with its column mapping (import_csv): a dry run returns the preview as it is, a real
 // import is one undoable step (edit_result).
 JNIEXPORT jstring JNICALL
@@ -732,7 +731,8 @@ Java_org_opendives_core_NativeCore_importCsv(JNIEnv *env, jobject, jstring file,
 		return nullptr;
 	}
 	return dryRun == JNI_TRUE ? env->NewStringUTF(json.c_str()) : edit_result(env, json);
-=======
+}
+
 // Imports several files at once (import_dives_files): a Suunto .json and its .fit are read as one dive.
 JNIEXPORT jstring JNICALL
 Java_org_opendives_core_NativeCore_importDivesFiles(JNIEnv *env, jobject, jobjectArray filesIn, jstring source)
@@ -751,7 +751,6 @@ Java_org_opendives_core_NativeCore_importDivesFiles(JNIEnv *env, jobject, jobjec
 		return nullptr;
 	}
 	return edit_result(env, json);
->>>>>>> origin/main
 }
 
 // Filter presets: action "list" (read-only), "save" (rules: five strings per
