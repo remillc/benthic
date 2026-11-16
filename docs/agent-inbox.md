@@ -4118,3 +4118,23 @@ Christian asked for this on 16 November 2026. It is for the website's selling po
 - the release notes.
 
 The texts will be updated in the design session from this report.
+
+## [ ] 2026-11-16-222 Desktop: the window without a logbook, a larger brand row with more space
+
+Christian approved this on 16 November 2026.
+
+**Mock-up:** `docs/mockups/bureau-demarrage-actuel.dc.html`. It is now a drawn mock-up of the screen the desktop app shows today: the faded rail, then « OpenDives », « Aucun carnet ouvert dans cette fenêtre », « Ouvrir un carnet… », « Nouveau carnet… » and « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ».
+
+**What changes:**
+- The logo in use goes from about 60 px to **96 px**.
+- « OpenDives » goes to **44 px** (weight 500, letter spacing −0.5).
+- « Aucun carnet ouvert dans cette fenêtre » goes to **18 px**, #4B4A47, 4 px under the name.
+- The gap between the logo and the text is **24 px**.
+- The brand row stands **48 px** above the two buttons (about 20 px today).
+- The block stays centred in the window, 600 px wide.
+
+**What does not change:** the buttons, their order, their texts, the drop line and the rail.
+
+**Where:** the desktop app (`desktop/`), on `main`. This is the current beta desktop, not the release edition. The desktop source is not in this repository's history I can see; if the screen lives elsewhere, apply it there.
+
+**Test:** the window without a logbook matches the mock-up at 1440 × 900, and the block stays centred when the window is resized.
