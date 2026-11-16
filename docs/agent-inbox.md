@@ -4824,7 +4824,7 @@ Mock-ups, all in `docs/mockups/`:
 - Both help links open their pages and Back returns to the form.
 - At 390 dp wide, the content starts 16 dp from each edge.
 
-## [ ] 2026-11-16-248 Phone first launch (release): 16 dp side margins
+## [x] 2026-11-16-248 Phone first launch (release): 16 dp side margins
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
 
@@ -4832,7 +4832,9 @@ On every step page of the phone first launch, the side margins change from 20 to
 
 **Test:** at 390 dp wide, the content of every first-launch step starts 16 dp from each edge.
 
-## [ ] 2026-11-16-249 First launch (release): right chevron on « Suivant »
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the phone step column has 16 dp side margins; the header bands are unchanged.
+
+## [x] 2026-11-16-249 First launch (release): right chevron on « Suivant »
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 230, `feature/release-new-logbook-two-steps`, which has the « Nouveau carnet » step, and never merge it into `main`.
 
@@ -4848,6 +4850,8 @@ Every « Suivant » button gets a right chevron after the label, following the M
 The chevron is decorative (`aria-hidden`); the button's name stays « Suivant ». In right-to-left layouts it would point left, but we have none yet.
 
 **Test:** on the « Nouveau carnet » step, when creating and when importing, on phone, tablet and desktop, « Suivant » shows the chevron to the right of the label.
+
+Done on `feature/release-new-logbook-two-steps`: « Suivant » of the « Nouveau carnet » step (creating and importing, every device) has an 18 dp chevron 8 dp after the label, with 24 dp of padding at the start and 16 dp at the end; the chevron is hidden from screen readers.
 
 ## [ ] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
 
