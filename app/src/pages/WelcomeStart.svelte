@@ -94,7 +94,7 @@
 </script>
 
 <Page
-  class="od-welcome-start{panel ? ' od-first-panelled' : ''}"
+  class="od-welcome-start{panel ? ' od-first-panelled' : ''}{!theme.ios && band ? ' od-welcome-start--phone' : ''}"
   onPageBeforeIn={() => {
     playKey++;
     shown = true;
@@ -133,8 +133,9 @@
         <p class="od-welcome-start--drop" class:od-welcome-start--dragging={dragging}>{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
       {/if}
       </div>
+      <!-- Phone (android-accueil-c.dc.html): 12 dp under the git link, 20 dp above the bottom edge. Tablet: pinned 28 dp from the edge. -->
+      <WelcomeHelpLink />
     </div>
-    <WelcomeHelpLink />
   {:else}
   <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
     <defs>
@@ -211,6 +212,20 @@
       /* Phone: the band starts at the top edge, under the status bar. */
       &.od-welcome-start--with-band {
         padding-top: 0;
+      }
+    }
+
+    /* Android phone: the help link ends the page, 20 dp above the bottom edge (set by the link), so the page takes
+       the whole height and the content has no bottom padding of its own. */
+    :global(.od-welcome-start--phone) {
+      --od-help-link-bottom: 20px;
+
+      :global(.page-content) {
+        padding-bottom: 0;
+      }
+
+      .od-welcome-start--page {
+        min-height: 100%;
       }
     }
 
@@ -316,6 +331,13 @@
       line-height: 18px;
       color: var(--od-text-2);
       text-decoration: underline;
+    }
+
+    /* Phone: the link is 18 dp of text with 6 dp of touch padding, 12 dp (6 + 6) above the help link. */
+    :global(.od-welcome-start--phone) .od-welcome-start--git-link {
+      min-height: 0;
+      padding: 6px 12px;
+      margin-bottom: 6px;
     }
 
     /* A low phone window: every choice stays in view (to-do #31). */

@@ -4796,3 +4796,74 @@ Done on the desktop branch line, `feature/desktop-alpha-first-launch` (started f
 - **Reused from the release edition** (task 241, `feature/release-desktop-first-launch`, copied, not merged): the main-process operations `exists` and `relocate` (`desktop/windows.cjs`, `desktop/preload.cjs`) with their tests, `RecentLogbooks.svelte` (release colours replaced by `--od-start-*` and the first-launch tokens) and `lib/desktop-recents.js`.
 - **Differences from the mock-ups:** the system picker takes a file, not a git folder, as the line « Un fichier .ssrf ou .xml, ou un dossier de dépôt git. » of the mock-up says (a git repository is opened from « Nouveau carnet… »); the « Retour » arrow and the icons are the app's; at 760 × 560 the right column scrolls and the profile is smaller (a compact brand row and title below 1100 dp).
 - **Tests:** `tests/app/desktop-alpha-start.test.mjs` (new), `tests/desktop/windows.test.mjs` (exists, relocate, forget, the window without a logbook). Tests that read the sources of the tablet's first launch (`first-launch`, `tablet-first-launch`, `welcome-start`) now read `deviceKind()`, `band` / `phone` and the page's `onPageBeforeIn` block: how they read the code changed, not what they expect. Desktop work adds no release note.
+
+## [x] 2026-11-16-243 Alpha: About link on the welcome screens, « Télécharger mes plongées » on the desktop
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+1. **« Une question ? À propos et contact » on the alpha welcome screens.**
+   - Phone (`docs/mockups/android-accueil-c.dc.html`): the link goes under « Utiliser mon propre dépôt git », centred, 12 dp below it and 20 dp above the bottom edge.
+   - Tablet (`android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`): the link sits at the bottom of the content column, 28 dp from the edge, as in the tablet steps.
+   - It opens « À propos ». The desktop welcome already has it (task 242).
+2. **« Télécharger mes plongées » on the desktop.** It replaces « Télécharger depuis un ordinateur de plongée » in two places:
+   - the main action of a new empty logbook (`bureau-nouveau-carnet-vide.dc.html`);
+   - the macOS File menu, where it reads « Télécharger mes plongées… » (`bureau-carnets-menu-fichier-macos.dc.html`).
+
+   This matches every other screen.
+
+**Test:** the welcome screens show the About link and it opens « À propos ». On the desktop, the empty logbook and the macOS File menu say « Télécharger mes plongées ».
+
+Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelte` the link now ends the Android page. On a phone it sits 12 dp under the git link's text (6 dp of touch padding + 6 dp of margin) and 20 dp above the bottom edge (`--od-help-link-bottom`; the page content has no bottom padding there, so the screen no longer scrolls at 390 × 844); on a tablet it was already pinned 28 dp from the edge and did not move; iOS is unchanged. It opens « À propos » and Back returns. Checked headless at 390×844, 412×915, 1280×800, 800×1280: only the link and the git link's touch area moved. Tests in `tests/app/welcome-help-link.test.mjs`; one release-note line (fr, en). Part 2 is on `fix/desktop-download-wording`, for the desktop branch (`feature/desktop-logbook`): the ready screen of a new logbook already said « Télécharger mes plongées » (task 242), so only the macOS File menu changed (`desktop.macMenu.download`, « Télécharger mes plongées… » / « Download my dives… »); test `tests/app/desktop-download-wording.test.mjs`. No release note for the desktop.
+
+## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
+
+The phone first-launch screens of the public version take the same bands as the alpha (tasks 234 and 236):
+- **The welcome hero (330 dp)** uses the hatched dark blue: the linear gradient `#2A6FB0 → #1F5C99 → #0C3866 → #072A4D`, the light sheen at the top left and the diagonal hatching. It keeps its title, text and dive profile, with no wave and no faint decorative profile at the bottom edge.
+- **The band of the steps** grows from 108 to 140 dp, with the same hatched dark blue, no wave and no profile, and a straight bottom edge.
+
+This replaces the light section-band gradient and the 18 dp wave of task 227 on these screens. The content below the band moves down by 32 dp and must still fit on a 390 × 844 dp screen.
+
+**Test:** on a phone, the welcome hero and every step band are hatched dark blue with a straight bottom edge, and white text on them stays at least 4.5:1.
+
+Done on `feature/release-phone-first-launch` (not merged): the phone welcome hero (330 dp) and the steps band (140 dp) take the alpha's hatched dark blue (`--od-first-band`, sheen, hatching), no wave, no faint profile, straight edge; white text 6.1:1 or more; tablets unchanged (byte-identical screenshots). At 390 × 844 every step fits except « Nouveau carnet » and « Seulement sur ce téléphone », where the help link under the content makes the page scroll by about 39 dp (measured with the fallback font of headless Edge).
+
+## [x] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
+
+Christian approved this on 16 November 2026. **Release edition:** do it on its own branch, `feature/release-tablet-profile-lines`, and never merge it into `main`.
+
+Mock-ups: the tablet screens of the public version that show the profile chart, all under `docs/mockups/android-tablette-`:
+- `demo-paysage`, `demo-portrait`, `demo-ajout-*`, `demo-quitter-*`;
+- `carnet-vide-paysage`, `carnet-vide-portrait`, `carnet-vide-menu-paysage`;
+- `import-csv-apercu-paysage`, `import-csv-colonnes-paysage`, `import-csv-type-paysage`.
+
+As task 238 does for the alpha, the depth profile line and the temperature curve change from 1.25 to **1 dp**. Nothing else changes.
+
+**Test:** on a tablet in the public version, the profile line and the temperature curve are 1 dp wide.
+
+Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
+
+## [ ] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/bureau-premier-lancement-alpha-accueil.dc.html`, shown with the menu open.
+
+**1. Language menu on the desktop first-launch screen (« Pour commencer ») only.**
+- **Placement:** at the bottom of the content column, on one centred line, 24 dp from the bottom edge, from left to right:
+  - « Une question ? À propos et contact »;
+  - a thin vertical divider (1 × 20 dp, `#C8C6BF`);
+  - a small text button showing a globe icon, the current language and a down chevron, e.g. « Français ». It is 32 dp high, 14 sp, in the same grey as the About link.
+- **The menu:**
+  - It opens above the button, right-aligned with it. Like the Settings menus it has no title and no Annuler/OK, and is 260 dp wide.
+  - Options: « Comme le système » (with the system language as a help line), « Français », « English ». The current one is tinted with a check.
+  - Picking an option applies it at once to the whole app and closes the menu. It is the same value as « Langue de l’app » in Settings.
+  - While the menu is open, the button takes the selected tint (`#E3E1DC`).
+- **Accessibility:** `aria-haspopup="listbox"` and `aria-expanded` on the button, and `role="listbox"` / `role="option"` with `aria-selected` in the menu.
+
+It is not shown on the steps, on the « no logbook » window, nor on phone or tablet.
+
+**2. Correction to task 240.** The « no logbook » window after first use (task 242, `bureau-demarrage-actuel.dc.html`) has **no navigation rail**. Settings stay reachable through Ctrl+, (⌘, on macOS) and, on macOS, the app menu. Task 240 still applies to the empty-logbook window (`bureau-carnet-vide-actuel.dc.html`), whose rail keeps « Réglages » and the avatar.
+
+**Test:**
+- On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
+- The « no logbook » window shows no rail.

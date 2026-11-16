@@ -2410,6 +2410,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android phones and tablets: the « Any questions? About and contact » link sits under « Use my own git repository » on a phone, and at the bottom of the column on a tablet.",
       "First launch on Android tablets: the steps (Subsurface account, account creation, no account) keep the blue panel, with « this tablet » in the texts, and the logbook opens with a message at the bottom left.",
       "First launch on Android tablets: a blue panel on the left (at the top in portrait) with a dive profile that draws itself when the screen opens, and the three ways to start beside it.",
       "Tablet: in a dive profile, the depth line and the temperature curve are thinner (1 dp).",
