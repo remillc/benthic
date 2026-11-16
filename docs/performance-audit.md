@@ -232,7 +232,31 @@ The phone layout (F7 virtual list) is not touched by this fix and was not re-mea
 | s500 before / after | 12,564 / 12,564 | 22,626 / 13,762 | 22,785 / 13,921 | 23,085 / 14,221 | 23,687 / 14,823 |
 | s3000 before / after | 12,625 / 12,625 | 22,662 / 13,786 | 22,821 / 13,945 | 23,121 / 14,245 | 23,723 / 14,847 |
 
-(With the table not virtualised the first cycle cost +29k nodes at 500 dives and +130k at 3,000; fix 1 brought it to +10k, this fix to +1.2k.) About +75 nodes and +3 listeners per later cycle remain (a heap snapshot after four cycles shows 908 detached nodes: Svelte template fragments and comments, a few SVG nodes); not chased. Not done: keeping the Sites and Statistics pages unmounted until first shown.
+(With the table not virtualised the first cycle cost +29k nodes at 500 dives and +130k at 3,000; fix 1 brought it to +10k, this fix to +1.2k.) About +75 nodes and +3 listeners per later cycle remained; fixed below ("After (leak)"). Not done: keeping the Sites and Statistics pages unmounted until first shown.
+
+**After (leak) (branch `perf/adaptive-leak`, 16 November 2026).** Two root causes, found with heap snapshots over CDP (`measure-leak-sections.mjs`; `SNAP=file` writes a snapshot, `PROBE=<expression>` evaluates one at the end; the shortest retaining path from the GC roots to each detached node names the holder):
+
+1. **Framework7 never releases a swipeable sheet's or popup's app listeners.** `Sheet` and `Popup` register `touchmove` and `touchend:passive` on the app and remove them on `sheetDestroy` / `popupDestroy`, but destroying a modal only emits `<type>BeforeDestroy`. Each layout swap remounts the account sheet (`swipeToClose`), so one more closure per cycle stayed on `f7.eventsListeners`, retaining the sheet's element and its Svelte fragments (the 75 nodes and 3 listeners per cycle). `app/src/lib/f7-modal-cleanup.js` hands the matching event over from `modalBeforeDestroy` (app parameter `on` in App.svelte).
+2. **`AdaptivePage.adopt` never updated Framework7-Svelte's page list.** It looked for the list on the Framework7 instance (`router.app.f7routers`, which does not exist; the optional chaining hid it). The list is on the Framework7-Svelte app object (`framework7-svelte/shared/f7.js`). The entry kept the old element, so when the router later removed the page (`reloadAll`, back to the root) it did not find the page's component, removed the DOM only and never unmounted the component: its Page kept every `page*` listener on the app and its whole layout alive. Visible with an open tool (Outils: about 800 nodes and one set of Page listeners per cycle). `adopt` now updates the right list, and the page object's `pageEl` and `$pageEl` too.
+
+What a snapshot still shows after many cycles is constant: the module-level template fragments of Svelte (`root_N` closures, created once per component) and its dev-mode error-stack tracking. The heap rise in the first cycles is compiled code (JIT), not DOM.
+
+Nodes / event listeners after 1, 5 and 20 cycles (two forced GCs before each count). Before: the code before this fix. After: this fix merged with perf fixes 2 and 3. Vite dev server, Electron CDP 9401, window 700 px / 1500 px, one launch per section (Carnet with a dive selected, Outils with a tool open):
+
+| logbook, section | before: 1 ; 5 ; 20 cycles | after: 1 ; 5 ; 20 cycles | JS heap MB, before -> after |
+|---|---|---|---|
+| s500 logbook | 13,706 / 408 ; 14,315 / 460 ; 16,558 / 484 | 24,324 / 1421 ; 24,333 / 1446 ; 24,326 / 1421 | 43.5 / 49.4 / 48.3 -> 44.6 / 49.6 / 49.2 |
+| s500 sites | 13,623 / 932 ; 14,232 / 978 ; 16,475 / 1008 | 24,883 / 1945 ; 24,892 / 1971 ; 24,885 / 1945 | 43.6 / 48.4 / 48.2 -> 45.2 / 49.4 / 49.4 |
+| s500 statistics | 13,205 / 416 ; 13,814 / 463 ; 16,057 / 492 | 24,465 / 1429 ; 24,474 / 1454 ; 24,467 / 1429 | 43.3 / 47.8 / 48 -> 45.2 / 49.7 / 49.3 |
+| s500 tools | 11,689 / 413 ; 14,962 / 502 ; 27,195 / 717 | 11,355 / 401 ; 11,697 / 434 ; 11,690 / 407 | 42.4 / 48 / 51.4 -> 37.7 / 42.7 / 42.2 |
+| s500 settings | 13,648 / 413 ; 14,257 / 462 ; 16,500 / 489 | 25,252 / 1434 ; 25,261 / 1459 ; 25,254 / 1434 | 43.7 / 48 / 48.6 -> 45.7 / 50 / 50.1 |
+| s3000 logbook | 13,728 / 432 ; 14,337 / 473 ; 16,593 / 533 | 30,953 / 1681 ; 30,962 / 1711 ; 30,955 / 1681 | 45.8 / 49.9 / 53.1 -> 49 / 54.5 / 53.6 |
+| s3000 sites | 13,587 / 920 ; 14,196 / 961 ; 21,408 / 372 | 31,464 / 2169 ; 31,473 / 2194 ; 31,466 / 2169 | 46.1 / 49.7 / 64.1 -> 49.7 / 53.6 / 53.8 |
+| s3000 statistics | 13,267 / 468 ; 13,876 / 511 ; 16,128 / 569 | 31,148 / 1717 ; 31,157 / 1742 ; 31,150 / 1717 | 45.9 / 50.5 / 52.4 -> 49.5 / 53.5 / 53.5 |
+| s3000 tools | 11,681 / 437 ; 14,954 / 537 ; 27,196 / 766 | 11,351 / 425 ; 11,693 / 456 ; 11,686 / 431 | 45.7 / 50.3 / 56.3 -> 40 / 44.9 / 44.6 |
+| s3000 settings | 13,644 / 437 ; 14,253 / 478 ; 16,505 / 538 | 31,865 / 1694 ; 31,874 / 1731 ; 31,867 / 1694 | 46.5 / 50.5 / 54.1 -> 49.7 / 54.7 / 54.4 |
+
+After the first (warm-up) cycle the growth is 0 nodes (at most +9) and 0 listeners at 20 cycles in every section, at 500 and 3,000 dives, with no console error; the selection, the open tool and the section survive the swaps and the page count stays the same. Before the fix a section grew by about 120 nodes per cycle (Outils: about 800) and 1 to 10 listeners. The level reached after the first cycle is higher on the merged code than on the code this fix was first measured on (about 24,300 nodes and 1,400 listeners at 500 dives, 31,000 and 1,700 at 3,000, against 13,500 and 400 before the merge): a one-off cost of the first narrow layout with the lazy routes, flat afterwards, so not a leak; not chased here (Outils is unaffected).
 
 ### F6. Profile draws every sample (impact: medium, effort: S-M)
 
