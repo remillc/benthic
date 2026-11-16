@@ -4259,7 +4259,7 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
 
-## [ ] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
+## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
 
 Christian approved this on 16 November 2026. **Beta only:** do it on `main`. Do not touch the release-edition branches.
 
@@ -4273,3 +4273,5 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and 
 - Use the same screen on phones, tablets and desktop; the badge follows the name wherever the brand row appears on this screen.
 
 **Test:** on a tablet in both orientations and on a phone, the badge sits on the name's line, 8 dp away, without wrapping; TalkBack reads « OpenDives, bêta » once.
+
+Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.

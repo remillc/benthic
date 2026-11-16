@@ -41,10 +41,11 @@
   {#if !theme.ios}
     <div class="od-welcome-start--page">
       <div class="od-welcome-start--head">
-      <div class="od-welcome-start--brand">
+      <div class="od-welcome-start--brand" role="img" aria-label={t('welcome.brandBeta')}>
         <img class="od-welcome-start--logo od-welcome-start--light" src="logo-light.svg" alt="" width="40" height="40" />
         <img class="od-welcome-start--logo od-welcome-start--dark" src="logo-dark.svg" alt="" width="40" height="40" />
-        <span>OpenDives</span>
+        <!-- The beta (task 2026-11-16-225): a decorative badge 8 dp after the name, on its line; the row's name says it once. -->
+        <span class="od-welcome-start--name" aria-hidden="true">OpenDives<span class="od-welcome-start--beta">{t('welcome.beta')}</span></span>
       </div>
       <h1 class="od-welcome-start--headline">{t('welcome.headline')}</h1>
       </div>
@@ -84,7 +85,7 @@
   </svg>
 
   <div class="od-welcome-start--heading">
-    <h1>{t('welcome.title')}</h1>
+    <h1 aria-label={t('welcome.brandBeta')}><span aria-hidden="true">{t('welcome.title')}</span><span class="od-welcome-start--beta" aria-hidden="true">{t('welcome.beta')}</span></h1>
     <p>{t('welcome.headline')}</p>
   </div>
 
@@ -163,6 +164,27 @@
 
     .od-welcome-start--logo {
       display: block;
+    }
+
+    /* « Bêta » after the name (task 2026-11-16-225): capitals, 14 sp, bold, a full pill 8 dp after the name. */
+    .od-welcome-start--name {
+      white-space: nowrap;
+    }
+
+    .od-welcome-start--beta {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--od-beta-badge);
+      color: var(--od-on-beta-badge);
+      font-size: 14px;
+      line-height: 18px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      vertical-align: middle;
     }
 
     .od-welcome-start--dark,
