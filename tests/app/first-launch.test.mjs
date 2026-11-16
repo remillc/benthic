@@ -32,8 +32,8 @@ test('the new style is for an Android phone only: a tablet and iOS keep their sc
   // The steps: the band and « Retour » only when the page says firstLaunch, on an Android phone.
   assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && layout\.phone\)/);
   for (const page of [signIn, create, confirm, download, local]) assert.match(page, /firstLaunch/);
-  // « Utiliser mon propre dépôt git » keeps its screens: it does not ask for the band.
-  assert.doesNotMatch(read('pages/GitRepository.svelte'), /firstLaunch/);
+  // « Utiliser mon propre dépôt git » asks for the band on a phone since task 247 (tablets and iPhone keep their layout).
+  assert.match(read('pages/GitRepository.svelte'), /\{#if phone && welcome\}\s*<EditorialPage[^>]*\s+firstLaunch/);
 });
 
 test('the welcome screen sends Android (phone and, since task 239, tablet) to the « sans compte » screen; iOS starts the logbook', () => {
@@ -48,8 +48,8 @@ test('sign in: the download screen comes between the sign-in and the logbook', (
   // An account without a logbook still goes to « Reprendre votre carnet ? ».
   assert.match(signIn, /\/import`, \{ props: \{ signedIn: true \} \}/);
   assert.match(create, /if \(signedIn\.exists && look\) f7router\.navigate\('\/welcome\/downloading'/);
-  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\('downloaded'\)/);
-  assert.match(download, /f7router\.back\('\/welcome\/sign-in', \{ force: true \}\)/);
+  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\(git \? 'gitDownloaded' : 'downloaded'\)/);
+  assert.match(download, /f7router\.back\(git \? '\/welcome\/git' : '\/welcome\/sign-in', \{ force: true \}\)/);
 });
 
 test('create an account: step 1 of 2, then the code as step 2 of 2, then the empty logbook with its snackbar', () => {
@@ -112,8 +112,8 @@ test('task 239: the tablet logbook opens with the snackbar at the bottom left an
 });
 
 test('the snackbars of the three paths and the empty logbook line, in French and English', () => {
-  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'local']);
-  const fr = { downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
+  const fr = { gitDownloaded: 'Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau.', downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
   for (const [kind, key] of Object.entries(FIRST_LAUNCH_SNACKBARS)) {
     assert.equal(get(langs.fr, key), fr[kind]);
     assert.ok(get(langs.en, key), `${key} in English`);
@@ -150,14 +150,19 @@ test('the download: three steps from the sync progress, the count of what the co
   assert.equal(langs.fr.firstLaunch.download.count.replace('{n}', '184').replace('{total}', '312'), '184 sur 312');
 });
 
-test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, a straight edge, the badge 16 dp tall', () => {
+test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, the section-band wave, the badge 16 dp tall', () => {
   assert.match(band, /height: calc\(var\(--od-first-band-top\) \+ 140px\);/);
   assert.match(band, /\.od-first-launch-band--welcome \{\s*height: calc\(var\(--od-first-band-top\) \+ 306px\);/);
   // The step band is 140 dp under the status bar (task 236); the welcome band is 330 dp with it (24 + 306).
   assert.match(band, /--od-first-band-top: max\(var\(--f7-safe-area-top\), 24px\)/);
-  // A step has no wave and no profile: the profile is drawn on the welcome band only, and no SectionBand is used.
+  // The welcome band draws the headline and the animated profile; a step has the section band's look
+  // (task 250): its radial gradient, the rays, the faint profile and the 18 dp wave, no sheen, no straight edge.
   assert.match(band, /\{#if welcome\}\s*<h1[\s\S]*<svg class="od-first-launch-band--profile"/);
-  assert.doesNotMatch(band, /SectionBand|--wave/);
+  assert.match(band, /\{#if welcome\}<div class="od-first-launch-band--sheen"/);
+  assert.match(band, /d="M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z"/);
+  assert.match(band, /od-first-launch-band--step-area[\s\S]*var\(--od-band-profile-area\)/);
+  assert.match(band, /background: var\(--od-first-band-step\)/);
+  assert.match(theme, /--od-first-band-step: radial-gradient\(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%\)/);
   assert.match(band, /\.od-first-launch-band--alpha \{[^}]*height: 16px;[^}]*padding: 1px 5px;[^}]*font-size: 9px;[^}]*line-height: 12px;[^}]*letter-spacing: 0\.5px;/);
   assert.match(band, /border: 1px solid var\(--od-first-band-badge-line\)/);
   assert.match(theme, /--od-first-band-badge: rgb\(255 255 255 \/ 0\.18\)/);
@@ -199,7 +204,7 @@ test('« Retour » goes back one step, and the steps are laid out as the mock-up
   // The download is a step you leave with « Annuler », not « Retour ».
   assert.match(download, /\bnoRetour\b/);
   assert.match(editorial, /\.od-editorial-page--retour\) \{[^}]*min-height: 48px;/);
-  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 20px 0;/);
+  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
   // Pointer and hover on the link.
   assert.match(editorial, /cursor: pointer;[\s\S]*@media \(hover: hover\)/);
 });

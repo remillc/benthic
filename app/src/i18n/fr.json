@@ -1869,6 +1869,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement et Compte sur téléphone Android : « Utiliser mon propre dépôt git » est un seul formulaire (adresse vérifiée à la sortie du champ, jeton, liste des branches lues dans le dépôt), avec l’écran de téléchargement du carnet puis un message à l’ouverture. L’aide « Comment créer un dépôt » donne les étapes pour GitHub, GitLab et Codeberg.",
+      "Premier lancement sur téléphone Android : les étapes ont des marges de 16 dp de chaque côté.",
+      "Premier lancement sur téléphone Android : le bandeau des étapes reprend celui des sections de l’app (dégradé clair, profil discret, vague au bord) à la place du bandeau sombre à bord droit.",
       "Premier lancement sur téléphone et tablette Android : le lien « Une question ? À propos et contact » se place sous « Utiliser mon propre dépôt git » sur téléphone, en bas de la colonne sur tablette.",
       "Premier lancement sur tablette Android : les étapes (compte Subsurface, création de compte, sans compte) gardent le panneau bleu, avec « cette tablette » dans les textes, et le carnet s’ouvre avec un message en bas à gauche.",
       "Premier lancement sur tablette Android : un panneau bleu à gauche (en haut en portrait) avec le profil d’une plongée qui se dessine à l’ouverture, et les trois façons de commencer à côté.",
@@ -3004,34 +3007,38 @@
     "intro": "Votre carnet dans un dépôt git à vous (GitHub, GitLab, Codeberg ou votre serveur), à la place du cloud. Une copie reste sur cet appareil.",
     "address": "Adresse du dépôt (HTTPS)",
     "addressChecking": "Vérification de l’adresse…",
-    "addressPublic": "Dépôt trouvé, avec un carnet existant",
-    "addressPublicEmpty": "Dépôt trouvé, vide",
-    "addressPrivate": "Dépôt privé ou introuvable : il sera vérifié avec le jeton",
+    "addressPublic": "Dépôt trouvé, avec un carnet existant.",
+    "addressPublicEmpty": "Dépôt trouvé, vide.",
+    "addressPrivate": "Dépôt privé ou introuvable : il sera vérifié avec le jeton.",
     "addressNone": "Aucun dépôt git à cette adresse. Vérifiez l’adresse, elle se termine souvent par .git",
     "addressNotHttps": "L’adresse doit commencer par https://",
     "addressInvalid": "Adresse non valide : elle ne doit contenir ni identifiant, ni espace, ni crochet.",
     "username": "Nom d’utilisateur",
     "usernameInvalid": "Lettres, chiffres, point, tiret et tiret bas seulement",
     "token": "Jeton d’accès",
-    "tokenHelper": "Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe",
+    "tokenHelper": "Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe.",
     "tokenKeep": "Laissez vide pour garder le jeton enregistré",
     "tokenChecking": "Vérification du jeton…",
     "tokenDenied": "Accès refusé par le serveur. Vérifiez le jeton et son droit d’écriture sur ce dépôt.",
     "tokenInvalid": "Un jeton ne contient ni espace ni lettre accentuée",
     "tokenHow": "Comment créer un jeton d’accès",
     "branch": "Branche",
-    "branchWaiting": "Disponible une fois l’accès accepté",
+    "branchWaiting": "La liste des branches s’affiche quand le dépôt est trouvé.",
     "branchesRead": {
-      "one": "{n} branche lue dans le dépôt : {list}",
-      "other": "{n} branches lues dans le dépôt : {list}"
+      "one": "{n} branche lue dans le dépôt : {list}.",
+      "other": "{n} branches lues dans le dépôt : {list}."
     },
-    "branchEmpty": "Dépôt vide : la branche {name} y sera créée",
+    "branchEmpty": "Dépôt vide : la branche {name} y sera créée.",
     "note": "Le jeton reste chiffré sur cet appareil.",
     "errorNetwork": "Le serveur ne répond pas. Vérifiez la connexion, puis réessayez.",
     "errorNoLog": "La branche n’existe plus dans le dépôt. Rouvrez la liste des branches et choisissez-en une.",
     "errorFailed": "La connexion n’a pas abouti. Rien n’a été enregistré.",
     "pending": "Des modifications ne sont pas encore envoyées au dépôt. Synchronisez avant de changer de dépôt.",
-    "connected": "Connecté au dépôt {repository}"
+    "connected": "Connecté au dépôt {repository}",
+    "titlePhone": "Votre propre dépôt git",
+    "introPhone": "Gardez votre carnet dans votre dépôt git, avec une copie sur ce téléphone.",
+    "repositoryHow": "Comment créer un dépôt",
+    "branchWaitingAccess": "La liste des branches s’affiche quand l’accès est accepté."
   },
   "tokenHelp": {
     "title": "Créer un jeton d’accès",
@@ -3421,7 +3428,8 @@
       "copy": "Copie du carnet sur ce téléphone",
       "note": "Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau.",
       "progressLabel": "Téléchargement des plongées",
-      "copyTablet": "Copie du carnet sur cette tablette"
+      "copyTablet": "Copie du carnet sur cette tablette",
+      "gitConnect": "Connexion au dépôt"
     },
     "local": {
       "intro": "Votre carnet est créé tout de suite, sans inscription.",
@@ -3440,7 +3448,8 @@
       "created": "Compte créé. Votre carnet est prêt.",
       "local": "Carnet créé sur ce téléphone.",
       "downloadedTablet": "Carnet téléchargé. Il reste sur cette tablette, même sans réseau.",
-      "localTablet": "Carnet créé sur cette tablette."
+      "localTablet": "Carnet créé sur cette tablette.",
+      "gitDownloaded": "Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau."
     },
     "tabletStart": "Pour commencer",
     "profileLabel": "Profil d’une plongée",
@@ -3448,5 +3457,46 @@
     "profileDepthCaption": "Profondeur max.",
     "profileDurationValue": "54 min",
     "profileDurationCaption": "Durée · Nitrox 32 %"
+  },
+  "repoHelp": {
+    "title": "Créer un dépôt",
+    "tabs": "Sites",
+    "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface anglaise de chaque site.",
+    "afterwards": "Revenez ensuite dans OpenDives, collez l’adresse, puis créez un jeton d’accès pour ce dépôt.",
+    "open": "Ouvrir la page « {page} » de {name}",
+    "github": {
+      "name": "GitHub",
+      "page": "New repository",
+      "note": "Un dépôt privé : vous seul pouvez le voir.",
+      "s1": "Connectez-vous à GitHub, puis touchez + en haut de la page et New repository.",
+      "s2": "Repository name : un nom reconnaissable, par exemple carnet-plongee.",
+      "s3": "Choisissez Private.",
+      "s4": "Ne cochez rien sous Initialize this repository : ni README, ni .gitignore, ni licence. Le dépôt doit rester vide.",
+      "s5": "Touchez Create repository.",
+      "s6": "Sous Quick setup, choisissez HTTPS, puis copiez l’adresse, par exemple https://github.com/vous/carnet-plongee.git."
+    },
+    "gitlab": {
+      "name": "GitLab",
+      "page": "New project",
+      "note": "Un dépôt privé : vous seul pouvez le voir.",
+      "s1": "Connectez-vous à GitLab, puis touchez + (Create new) en haut du menu et New project/repository.",
+      "s2": "Touchez Create blank project.",
+      "s3": "Project name : un nom reconnaissable, par exemple carnet-plongee.",
+      "s4": "Sous Visibility Level, choisissez Private.",
+      "s5": "Décochez Initialize repository with a README. Le dépôt doit rester vide.",
+      "s6": "Touchez Create project.",
+      "s7": "Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git."
+    },
+    "codeberg": {
+      "name": "Codeberg",
+      "page": "New repository",
+      "note": "Un dépôt privé : vous seul pouvez le voir.",
+      "s1": "Connectez-vous à Codeberg, puis touchez + en haut de la page et New repository.",
+      "s2": "Repository name : un nom reconnaissable, par exemple carnet-plongee.",
+      "s3": "Cochez Make repository private.",
+      "s4": "Laissez Initialize repository décoché. Le dépôt doit rester vide.",
+      "s5": "Touchez Create repository.",
+      "s6": "Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git."
+    }
   }
 }

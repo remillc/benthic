@@ -4797,7 +4797,7 @@ It is not shown on the steps, on the « no logbook » window, nor on phone or ta
 
 Done on `feature/desktop-logbook`: on the desktop first launch only, the help link, a 1 × 20 dp divider and a language button (globe, current language, chevron) on one centred line 24 dp from the bottom; the menu is the Settings RowMenu, above the button, right-aligned, 260 dp, with « Comme le système », « Français », « English » (« Français (Canada) » only while it is the chosen language) and sets the same value as Settings › Langue de l’app. Part 2 already held: the « no logbook » window has no rail and Ctrl+, opens Settings.
 
-## [ ] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
+## [x] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.**
 
@@ -4830,6 +4830,8 @@ Mock-ups, all in `docs/mockups/`:
 - Both help links open their pages and Back returns to the form.
 - At 390 dp wide, the content starts 16 dp from each edge.
 
+Done: branch `feature/alpha-git-form`. One shared form: `components/GitForm.svelte` (fields, links, branch, « Connecter ») on one controller, `lib/git-form.svelte.js` (the address check on blur, the authenticated check, the branches, `gitConnect`), used by `pages/GitRepository.svelte`: on an Android phone, first launch = `EditorialPage firstLaunch` (the 140 dp band of task 250, « Retour », the form, the About link), Compte (`/account/git`, `/account/git/new`) = app bar « ← Votre propre dépôt git » with the same form, no ✕, card or profile. Tablets and iPhone keep their previous layout (same controller). Outlined fields: `AccountField` (`mono` for the address) and `SelectField` got an `outlined` look; spacing per point 4, measured at 390 dp: title to sentence 8, sentence to link text 16.5, link text to field 16.5, field to help line 4, token link 4.5 under the help line, between fields 16, 24 before « Connecter » (full width), 48 dp links. « Connecter » from the first launch goes to `/welcome/git/downloading` (`FirstDownload` with `git`: « Connexion au dépôt », repository and branch, « Annuler » forgets the access and returns to the form), then the logbook opens with « Carnet téléchargé depuis votre dépôt… ». An empty repository skips the download. New help page `pages/RepositoryHelp.svelte` (`/welcome/git/repository`, `/account/git/repository`) with the GitHub, GitLab and Codeberg tabs (texts of tasks 247 and 252). Side margins of the phone step pages are 16 dp (`EditorialPage`, header band unchanged). **Native: none.** `gitCheck` already returns `branches` and `empty`, so no C++, JNI or Swift change and no round trip. **Known gap:** « Dépôt trouvé, avec un carnet existant. » means the repository holds references (not empty); whether the branch really holds a Subsurface logbook is only known at `gitConnect` (error `NO_LOG`, shown under the form). Telling it earlier needs a native check of the branch's tree (a new façade function plus JNI and Swift). The branch list is a real dropdown: no free-text fallback was needed. Texts: periods added to the sentences of the form as in the mock-ups. Tests: `tests/app/git-form.test.mjs` (new), `first-launch.test.mjs` and `tablet-first-launch.test.mjs` (what they read; the margin expectation 20 to 16 is the task's), 668 pass. Two release-note lines (fr, en).
+
 ## [x] 2026-11-16-248 Phone first launch (release): 16 dp side margins
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
@@ -4859,7 +4861,7 @@ The chevron is decorative (`aria-hidden`); the button's name stays « Suivant »
 
 Done on `feature/release-new-logbook-two-steps`: « Suivant » of the « Nouveau carnet » step (creating and importing, every device) has an 18 dp chevron 8 dp after the label, with 24 dp of padding at the start and 16 dp at the end; the chevron is hidden from screen readers.
 
-## [ ] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
+## [x] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: every phone step page of the alpha and beta first launch, `docs/mockups/android-premier-lancement-alpha-*.dc.html` and `android-premier-lancement-beta-*.dc.html` (for example `-beta-compte-subsurface`, `-alpha-git`, `-alpha-sans-compte`, `-beta-creer-compte*`, the download screens).
 
@@ -4874,6 +4876,8 @@ This replaces, for the step pages only, the band of tasks 234 and 236 (hatched d
 
 **Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
 
+Done: in `FirstLaunchBand.svelte` the `step` variant now draws the section band: the radial gradient (token `--od-first-band-step`, `#A9C4E2` to `#114477`, centre 38 % / -40 %), the 105deg rays kept, the SectionBand profile (area 10 % white, line 30 % white, 1.5 dp, same path) and its 18 dp wave in the page colour (`--f7-page-bg-color`); the top-left sheen is drawn on the welcome band only and the step has no straight edge. Height stays 140 dp under the status bar. The welcome hero and tablets (the panel) did not change. Badge contrast: computed with the gradient at the badge position (about 68 % of the radius), white 9 sp text on the 18 % fill is 4.9:1 (AA 4.5:1), so the fill was not raised. Test updated in `tests/app/first-launch.test.mjs`; one release-note line (fr, en).
+
 ## [x] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
@@ -4884,7 +4888,7 @@ Same change as task 250, for the release step pages: the 140 dp step band takes 
 
 Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
 
-## [ ] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
+## [x] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** It completes part 2 of task 247. Mock-ups: `docs/mockups/git-depot-aide-gitlab-android.dc.html` and `git-depot-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-depot-aide-android.dc.html`).
 
@@ -4910,3 +4914,5 @@ The help page keeps one layout for the three tabs: the intro, the white card « 
 The site labels are in English for now; Christian may ask for the French labels of GitLab and Codeberg later (GitHub exists only in English).
 
 **Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
+
+Done: the GitLab (7 steps, link `https://gitlab.com/projects/new#blank_project`) and Codeberg (6 steps, link `https://codeberg.org/repo/create`) tabs of `pages/RepositoryHelp.svelte` use the texts of the task word for word (`repoHelp.gitlab.*`, `repoHelp.codeberg.*`, fr; the English versions keep the site labels), the same layout as GitHub: active tab semi-bold in the text colour with the 3 dp underline, the others grey. Checked headless at 390 x 844; the tests are in `tests/app/git-form.test.mjs`. The French labels of GitLab and Codeberg are left to a later request.

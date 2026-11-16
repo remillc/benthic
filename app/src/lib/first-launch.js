@@ -26,6 +26,8 @@ export function deviceKey(key, phone) {
 export const FIRST_LAUNCH_SNACKBARS = /** @type {const} */ ({
   /** Signed in: the logbook was downloaded. */
   downloaded: 'firstLaunch.snackbar.downloaded',
+  /** Connected to the diver's own git repository: the logbook was downloaded from it (task 2026-11-16-247). */
+  gitDownloaded: 'firstLaunch.snackbar.gitDownloaded',
   /** A new account: its empty logbook is ready. */
   created: 'firstLaunch.snackbar.created',
   /** Without an account: the logbook of this phone. */

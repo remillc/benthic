@@ -160,7 +160,7 @@ test('task 239: the steps keep the panel, still, with the step in a 452 dp colum
   assert.match(style, /flex-direction: row;\s*justify-content: flex-end;/);
   assert.match(style, /\.od-editorial-page--title \{\s*margin-bottom: 8px;\s*font-size: 28px;\s*line-height: 36px;/);
   // The phone's rule is the one of tasks 233 to 236, unchanged.
-  assert.match(style, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 20px 0;/);
+  assert.match(style, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
 });
 
 test('task 239: the six code boxes are one centred group of 328 dp, the label, error and resend at its left edge', () => {

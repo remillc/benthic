@@ -1869,6 +1869,9 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch and Compte on an Android phone: « Use my own git repository » is one form (address checked when you leave the field, token, the branches read from the repository), with the logbook download screen and then a message when it opens. The help « How to create a repository » gives the steps for GitHub, GitLab and Codeberg.",
+      "First launch on an Android phone: the steps have 16 dp side margins.",
+      "First launch on an Android phone: the band on the steps takes the look of the app's section bands (light gradient, faint profile, wave at the edge) instead of the dark band with a straight edge.",
       "First launch on Android phones and tablets: the « Any questions? About and contact » link sits under « Use my own git repository » on a phone, and at the bottom of the column on a tablet.",
       "First launch on Android tablets: the steps (Subsurface account, account creation, no account) keep the blue panel, with « this tablet » in the texts, and the logbook opens with a message at the bottom left.",
       "First launch on Android tablets: a blue panel on the left (at the top in portrait) with a dive profile that draws itself when the screen opens, and the three ways to start beside it.",
@@ -3004,34 +3007,38 @@
     "intro": "Your logbook in a git repository of your own (GitHub, GitLab, Codeberg or your server), instead of the cloud. A copy stays on this device.",
     "address": "Repository address (HTTPS)",
     "addressChecking": "Checking the address…",
-    "addressPublic": "Repository found, with an existing logbook",
-    "addressPublicEmpty": "Repository found, empty",
-    "addressPrivate": "Private or missing repository: it will be checked with the token",
+    "addressPublic": "Repository found, with an existing logbook.",
+    "addressPublicEmpty": "Repository found, empty.",
+    "addressPrivate": "Private or missing repository: it will be checked with the token.",
     "addressNone": "No git repository at this address. Check the address, it often ends with .git",
     "addressNotHttps": "The address must start with https://",
     "addressInvalid": "Invalid address: it must not contain a user name, spaces or brackets.",
     "username": "User name",
     "usernameInvalid": "Letters, digits, dot, hyphen and underscore only",
     "token": "Access token",
-    "tokenHelper": "A personal access token with write access, not your password",
+    "tokenHelper": "A personal access token with write access, not your password.",
     "tokenKeep": "Leave empty to keep the saved token",
     "tokenChecking": "Checking the token…",
     "tokenDenied": "Access refused by the server. Check the token and its write access to this repository.",
     "tokenInvalid": "A token has no space or accented letter",
     "tokenHow": "How to create an access token",
     "branch": "Branch",
-    "branchWaiting": "Available once access is accepted",
+    "branchWaiting": "The branch list appears once the repository is found.",
     "branchesRead": {
-      "one": "{n} branch read from the repository: {list}",
-      "other": "{n} branches read from the repository: {list}"
+      "one": "{n} branch read from the repository: {list}.",
+      "other": "{n} branches read from the repository: {list}."
     },
-    "branchEmpty": "Empty repository: the {name} branch will be created in it",
+    "branchEmpty": "Empty repository: the {name} branch will be created in it.",
     "note": "The token stays encrypted on this device.",
     "errorNetwork": "The server does not answer. Check the connection, then try again.",
     "errorNoLog": "The branch is no longer in the repository. Open the list of branches and pick one.",
     "errorFailed": "The connection did not succeed. Nothing was saved.",
     "pending": "Some changes are not sent to the repository yet. Sync before changing repository.",
-    "connected": "Connected to the repository {repository}"
+    "connected": "Connected to the repository {repository}",
+    "titlePhone": "Your own git repository",
+    "introPhone": "Keep your logbook in your git repository, with a copy on this phone.",
+    "repositoryHow": "How to create a repository",
+    "branchWaitingAccess": "The branch list appears once access is accepted."
   },
   "tokenHelp": {
     "title": "Create an access token",
@@ -3421,7 +3428,8 @@
       "copy": "Copying the logbook to this phone",
       "note": "Keep the app open until it is done. Then your logbook opens, and you can read it offline.",
       "progressLabel": "Downloading the dives",
-      "copyTablet": "Copying the logbook to this tablet"
+      "copyTablet": "Copying the logbook to this tablet",
+      "gitConnect": "Connecting to the repository"
     },
     "local": {
       "intro": "Your logbook is created right away, with no sign-up.",
@@ -3440,7 +3448,8 @@
       "created": "Account created. Your logbook is ready.",
       "local": "Logbook created on this phone.",
       "downloadedTablet": "Logbook downloaded. It stays on this tablet, even offline.",
-      "localTablet": "Logbook created on this tablet."
+      "localTablet": "Logbook created on this tablet.",
+      "gitDownloaded": "Logbook downloaded from your repository. It stays on this phone, even without a network."
     },
     "tabletStart": "Get started",
     "profileLabel": "Dive profile",
@@ -3448,5 +3457,46 @@
     "profileDepthCaption": "Max. depth",
     "profileDurationValue": "54 min",
     "profileDurationCaption": "Duration · Nitrox 32 %"
+  },
+  "repoHelp": {
+    "title": "Create a repository",
+    "tabs": "Sites",
+    "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of each site’s English interface.",
+    "afterwards": "Then come back to OpenDives, paste the address, and create an access token for this repository.",
+    "open": "Open {name}’s “{page}” page",
+    "github": {
+      "name": "GitHub",
+      "page": "New repository",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to GitHub, then tap + at the top of the page and New repository.",
+      "s2": "Repository name: a name you will recognise, for example carnet-plongee.",
+      "s3": "Choose Private.",
+      "s4": "Tick nothing under Initialize this repository: no README, no .gitignore, no licence. The repository must stay empty.",
+      "s5": "Tap Create repository.",
+      "s6": "Under Quick setup, choose HTTPS, then copy the address, for example https://github.com/you/carnet-plongee.git."
+    },
+    "gitlab": {
+      "name": "GitLab",
+      "page": "New project",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to GitLab, then tap + (Create new) at the top of the menu and New project/repository.",
+      "s2": "Tap Create blank project.",
+      "s3": "Project name: a name you will recognise, for example carnet-plongee.",
+      "s4": "Under Visibility Level, choose Private.",
+      "s5": "Untick Initialize repository with a README. The repository must stay empty.",
+      "s6": "Tap Create project.",
+      "s7": "Tap Code, then copy the address under Clone with HTTPS, for example https://gitlab.com/you/carnet-plongee.git."
+    },
+    "codeberg": {
+      "name": "Codeberg",
+      "page": "New repository",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to Codeberg, then tap + at the top of the page and New repository.",
+      "s2": "Repository name: a name you will recognise, for example carnet-plongee.",
+      "s3": "Tick Make repository private.",
+      "s4": "Leave Initialize repository unticked. The repository must stay empty.",
+      "s5": "Tap Create repository.",
+      "s6": "Choose HTTPS above the repository address, then copy it, for example https://codeberg.org/you/carnet-plongee.git."
+    }
   }
 }
