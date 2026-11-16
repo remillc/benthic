@@ -4498,3 +4498,16 @@ Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `doc
 2. **Alpha badge.** It is smaller: text 10 sp, line height 14, letter spacing 0.6, padding 1 × 6 dp, total height 18 dp. Same colours: white text, white fill at 18 % and white 1 dp outline at 55 %.
 
 **Test:** on a phone, the welcome band matches the tablet's blue panel (gradient, sheen, hatching), white text on it stays at least 4.5:1, and the Alpha badge is 18 dp tall.
+
+## [ ] 2026-11-16-235 Correction to 234: the Alpha badge is even smaller on phone
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-accueil-c.dc.html` and `docs/mockups/android-premier-lancement-*.dc.html` (alpha screens).
+
+On every phone screen that shows the Alpha badge next to « OpenDives » (welcome screen and first-launch steps), the badge is smaller than in task 234:
+- text 9 sp, line height 12, letter spacing 0.5;
+- padding 1 × 5 dp, so the badge is 16 dp tall;
+- colours unchanged: white text, white fill at 18 %, white 1 dp outline at 55 %.
+
+This replaces the 18 dp badge in task 234 point 2. Point 1 of task 234 (band background) stays as written.
+
+**Test:** on a phone, the Alpha badge is 16 dp tall on the welcome screen and on every first-launch step.
