@@ -3187,7 +3187,7 @@ Phone and tablet, Android and iOS.
 
 Done: in the band summary the last-dive clause is joined with no-break spaces and « · » is glued to the item before it; rule added to docs/ui-writing.md, section 8.
 
-## [ ] 2026-11-15-169 Desktop app (Windows, macOS, Linux): the shell and the Carnet
+## [x] 2026-11-15-169 Desktop app (Windows, macOS, Linux): the shell and the Carnet
 
 Christian decided this on 15 November 2026. Read first `docs/system-design.md`, section 7, « Desktop app ». Mock-ups (in `docs/mockups/`): `bureau-carnet-profil-droite.dc.html` (Windows and Linux), `bureau-carnet-macos.dc.html` (macOS), `bureau-carnet-menu-contextuel.dc.html` (multiple selection and right-click menu). This task covers the Carnet only; Sites, Statistiques and Outils come in later tasks.
 
@@ -3217,11 +3217,15 @@ English: « Logbook », « Search the logbook », « 2 dives selected », « Rig
 
 Write in `docs/architecture.md` how the desktop build is organised, and add the desktop to `docs/ui-specification.md`. Tests: the table sorting, the selection and the right-click menu's items for one and several dives.
 
-## [ ] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
 
 Christian decided this on 15 November 2026, with you. Task 169 asks for Tauri 2 by default: **use Electron instead**, as you agreed with Christian. The rest of task 169 is unchanged. The Subsurface core is compiled natively and reached from Electron's main process (a Node native module or a helper process, your choice; write it in `docs/architecture.md`). Builds for Windows, macOS and Linux in the GitHub workflow. `docs/system-design.md` (section 7, « Desktop app ») now says Electron.
 
-## [ ] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
 
 Christian decided this on 15 November 2026. Follows tasks 169 and 170 (the Electron shell and the Carnet): do it after them, with the same shell, rail, top bar, resize handle and keyboard rules. Mock-ups (in `docs/mockups/`): `bureau-sites.dc.html`, `bureau-stats.dc.html`, `bureau-outils.dc.html` (Windows and Linux; on macOS the same without the Réglages item in the rail, as in task 169).
 
@@ -3235,7 +3239,9 @@ English: « Search for a site », « 5 dives without a site · Find them a site 
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
 
-## [ ] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
+Done on `feature/desktop-logbook` (Sites and Outils completed there by tasks 177 and 196).
+
+## [x] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
 
 Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 171); phone and tablet are unchanged. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Automatic saving » and « Editing a dive in place ». Mock-up: `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3259,7 +3265,9 @@ English: « Add the visibility », « Recorded by the dive computer, can't be ed
 
 Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
 
-## [ ] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
 
 Christian decided this on 15 November 2026. Desktop only (Electron, tasks 169 to 172); the phone keeps a single logbook. Read `docs/system-design.md`, section 7, « Desktop app », the paragraphs « Several logbooks » and « New logbook ». Mock-ups in `docs/mockups/`: `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`, `bureau-carnets-accueil`, `bureau-nouveau-carnet-choix`, `bureau-nouveau-carnet-nuage`, `bureau-nouveau-carnet-git`, `bureau-nouveau-carnet-vide`.
 
@@ -3280,11 +3288,15 @@ English: « New logbook », « Logbook name », « Where to keep it? », « On t
 
 Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
 
-## [ ] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
 
-## [ ] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
 
 Christian decided this on 15 November 2026. In task 171, « 5 plongées sans site · Leur trouver un site » sat under the Sites table and was pushed out of the window by a long list. Mock-up: `docs/mockups/bureau-sites.dc.html`.
 
@@ -3295,7 +3307,9 @@ Christian decided this on 15 November 2026. In task 171, « 5 plongées sans sit
 
 Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
 
-## [ ] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
 
 Christian decided this on 15 November 2026. The list of statistics on the left of the desktop Statistiques screen gets an icon and a preview on each row. Mock-up: `docs/mockups/bureau-stats.dc.html`.
 
@@ -3307,7 +3321,9 @@ Christian decided this on 15 November 2026. The list of statistics on the left o
 
 Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
 
-## [ ] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
 
 Christian decided this on 15 November 2026. Follows tasks 171 and 175 (the Sites screen and its « plongées sans site » bar), with the same shell, list pane, resize handle, in-place editing and automatic saving (task 172). Mock-ups in `docs/mockups/`: `bureau-sites` (now with « Nouveau site » in the top bar, Ctrl/⌘+N), `bureau-sites-fiche`, `bureau-sites-modifier`, `bureau-sites-modifier-pays`, `bureau-sites-recherche`, `bureau-sites-superposes`, `bureau-sites-nouveau`, `bureau-sites-sans-site`, `bureau-sites-sans-site-choisir`, `bureau-sites-nettoyer`, `bureau-sites-nettoyer-fusion`. The phone screens (Fiche d'un site, Modifier le site, Nouveau site, Plongées sans site, Nettoyer les sites) are the reference for wording and rules.
 
@@ -3333,7 +3349,9 @@ English: « New site », « Delete the site », « Every change is saved at once
 
 Tests: editing a site field saves it without a button; moving the crosshair refills country and region but not a corrected one; Pays autocompletes with logbook countries first; search dims the other pins; stacked pins open the list; a new site within 100 m of another shows the notice; assigning a suggested site removes the dive from the list and lowers the count; a merge is undone by Ctrl/⌘+Z.
 
-## [ ] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
 
 Christian decided this on 15 November 2026, answering the four open questions of the desktop right-click menu. Read `docs/system-design.md`, section 7, « Actions on several dives », and `docs/ui-specification.md`, « Logbook selection and export ».
 
@@ -3364,7 +3382,9 @@ Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface
 
 **Done (parts 1 and 2), 15 November 2026, branch `feature/multi-dive-actions`:** the façade has `merge_dives(ids)` (Subsurface's `MergeDives` through `dive_table::merge_dives`, one undoable step; the merged dive keeps the first numbered dive's number and the following dives are renumbered as Subsurface does) and `edit_dives(ids, changes)` (the multi-dive edits of `command_edit.cpp`, one undoable step; chips go through `buddiesAdd/Remove`, `diveguideAdd/Remove`, `tagsAdd/Remove`, never a replacement). Plugin methods `mergeDives` and `editDives` on Android (JNI, Kotlin) and iOS (Swift), wrappers in `core-api.js`. Pure rules in `app/src/lib/multi-dive.js` (`canMerge`, `multiEditState`, `multiEditChanges`), actions `mergeDives` and `editDivesTogether` in `lib/logbook.svelte.js`. Phone and tablet: « Fusionner en une plongée » (disabled with its supporting line) and « Modifier ensemble… » in the ⋮ menu of the selection, the sheet `pages/EditDivesTogether.svelte`, the snackbars « N plongées fusionnées » and « N plongées modifiées ». Tests: `tests/multi_dive_test.cpp` (`build/poc/multi-dive`), `tests/app/multi-dive.test.mjs`. Part 3 and the desktop UI remain.
 
-## [ ] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
 
 Christian decided this on 15 November 2026. On macOS, Annuler and Rétablir are in the Édition menu of the menu bar (task 169). On Windows and Linux they were only keyboard shortcuts and the snackbar's « Annuler », which goes away. Mock-up: `docs/mockups/bureau-sites-nettoyer-fusion.dc.html` (menu open after a merge).
 
@@ -3379,7 +3399,9 @@ English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
 
 Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
 
-## [ ] 2026-11-15-180 Desktop: hover state of the navigation rail items
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-180 Desktop: hover state of the navigation rail items
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-profil-droite.dc.html` (Statistiques under the pointer).
 
@@ -3390,6 +3412,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 - Same rule on macOS, Windows and Linux; transitions follow the motion rules (short fade, none with reduced motion).
 
 Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
+
+Done on `feature/desktop-logbook`.
 
 ## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
@@ -3406,7 +3430,9 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
-## [ ] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
+Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
+
+## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
 Christian decided this on 15 November 2026. Mock-ups: every `docs/mockups/bureau-carnet-*.dc.html` and `bureau-carnets-*.dc.html` table.
 
@@ -3419,7 +3445,9 @@ English: « Buddies ».
 
 Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
 
-## [ ] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
 
 Christian decided this on 15 November 2026. Desktop only; phone and tablet already have these curves. Read `docs/ui-specification.md`, « Dive profile, cursor and curve buttons », for the curves themselves, their colours and scales: desktop uses the same ones. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first (also `bureau-carnet-groupe`, `-macos`, `-edition-sur-place`, `-colonnes`, `bureau-carnets-selecteur`, `bureau-carnets-menu-fichier-macos`).
 
@@ -3433,7 +3461,9 @@ English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues �
 
 Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
 
-## [ ] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
 
 Christian decided this on 15 November 2026: in the detail pane, a diver could not tell that the fields were editable in place. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and the other desktop Carnet screens.
 
@@ -3447,7 +3477,9 @@ English: « Grey fields can be edited with a click and are saved at once. », «
 
 Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
 
-## [ ] 2026-11-15-185 Desktop profile: dashed line at the average depth
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-185 Desktop profile: dashed line at the average depth
 
 Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: every desktop screen with a profile, `docs/mockups/bureau-carnet-profil-droite.dc.html` first.
 
@@ -3459,6 +3491,8 @@ Christian decided this on 15 November 2026. Desktop only for now. Mock-ups: ever
 English: « avg. 17.9 m ».
 
 Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
 
@@ -3480,7 +3514,7 @@ English: « Enlarge the profile », « Add to a trip… », « Remove from the t
 
 Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
 
-## [ ] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
+## [x] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
 
 Christian decided this on 15 November 2026, after task 179: two ⋮ menus one above the other (top bar and detail pane) were confusing. Mock-ups: `docs/mockups/bureau-carnet-groupe.dc.html` and the other desktop Carnet screens.
 
@@ -3493,7 +3527,9 @@ English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
 
 Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
 
-## [ ] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
 
 Christian decided this on 15 November 2026 (follows task 173). « Enregistrer une copie… » stays the only way to save a logbook elsewhere: there is no « Enregistrer sous », since saving is automatic and each logbook has its own window.
 
@@ -3504,7 +3540,9 @@ English: « Copy saved · Open ».
 
 Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
 
-## [ ] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-exporter.dc.html` (the dialog), `docs/mockups/bureau-carnets-selecteur.dc.html` (« Exporter le carnet… » in the logbook selector). The formats and the anonymise option are those of the phone (`docs/ui-specification.md`, « Logbook selection and export »).
 
@@ -3519,6 +3557,8 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 English: « Export 2 dives », « Which dives », « The 2 selected dives », « The 12 filtered dives », « The whole logbook », « Format », « Anonymise », « Export… », « Export the logbook… ».
 
 Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-190 Profiles: thinner curve lines on every platform
 
@@ -3535,7 +3575,7 @@ Test: the depth curve of the dive detail measures 1.25 dp at 1× and 2 dp with h
 
 Done: --od-profile-line-width is 1.25 (2 in high contrast) and every profile curve uses it (depth, temperature, ppO₂, ceiling; the planner's planned line already did), the dark halo is --od-profile-halo-width (2.5, 4.5 in high contrast), the average-depth line 1 dp, the PDF sheet and the shared image 1.25; tests/app/profile-lines.test.mjs checks them. Cursor, grid and the planner's ceiling line unchanged.
 
-## [ ] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
+## [x] 2026-11-15-191 Desktop Carnet: follow the mock-ups for the detail pane (tabs and editing in place)
 
 Christian noticed on 15 November 2026 that the desktop detail pane has no tabs and its fields cannot be edited in place. This is a reminder of tasks 169, 172 and 184, not a new decision: the build must match the mock-ups `docs/mockups/bureau-carnet-profil-droite.dc.html` (with the group copy `bureau-carnet-groupe.dc.html`) and `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3545,7 +3585,9 @@ Christian noticed on 15 November 2026 that the desktop detail pane has no tabs a
 
 Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
 
-## [ ] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and every desktop Carnet screen (with the group copy `bureau-carnet-groupe.dc.html`); the ⋮ menu open in `docs/mockups/bureau-carnet-edition-sur-place.dc.html`.
 
@@ -3563,7 +3605,9 @@ English: « More logbook options », « Undo: {last action} », « Redo », « C
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
 
-## [ ] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html` and its group copy `bureau-carnet-groupe.dc.html` (dive N° 5, Lake Coleridge, selected). They are the reference for the whole desktop Carnet; the other desktop Carnet mock-ups still show the older table.
 
@@ -3585,7 +3629,9 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 
 Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
 
-## [ ] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
 
 Christian decided this on 15 November 2026: two ⋮ menus on the same screen were confusing. Mock-ups: `docs/mockups/bureau-carnet-profil-droite.dc.html`, the group copy `bureau-carnet-groupe.dc.html` (the logbook ⋮ menu open, dive N° 5 selected), `bureau-carnet-edition-sur-place.dc.html` (the menu open, dive N° 9 selected), `bureau-carnet-menu-contextuel.dc.html` (right-click on two dives), and the other desktop Carnet screens.
 
@@ -3612,7 +3658,9 @@ English: « Plan from this dive », « Share… », « Export the dive… », «
 
 Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
 
-## [ ] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html`.
 
@@ -3622,7 +3670,9 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 
 Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
 
-## [ ] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Outils » of the canvas): `docs/mockups/bureau-outils.dc.html` (planner), its group copy `bureau-outils-groupe.dc.html` (planner ⋮ menu open), `bureau-outils-desaturation.dc.html`, `bureau-outils-ead-mod.dc.html`, `bureau-outils-meilleur-melange.dc.html`, `bureau-outils-melangeur.dc.html`. The calculations are the phone's (same core functions, `docs/ui-specification.md`); only the layout is new.
 
@@ -3640,6 +3690,8 @@ English: « Plan », « More plan options », « Share the plan… », « Planne
 
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
 
+Done on `feature/desktop-logbook`.
+
 ## [x] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
 
 Christian decided this on 15 November 2026, to match the desktop (task 196). Mock-ups: `docs/mockups/outils-meilleur-melange-android.dc.html`, `outils-meilleur-melange-trimix-android.dc.html`, `android-tablette-meilleur-melange-paysage.dc.html`, `android-tablette-meilleur-melange-portrait.dc.html`.
@@ -3654,7 +3706,7 @@ Test: on the phone, Trimix at 148 ft gives 25/28; « Préparer ce mélange » op
 
 Done: in Meilleur mélange (phone and tablet), an outlined 40 dp button with the cylinder icon under the advised mix and its note, « Préparer ce mélange » on the phone, « Préparer le trimix 25/28 » or « Préparer l’EAN25 » on a tablet (the app keeps its Nitrox / Trimix tabs on tablets, so it names the mix of the tab shown). It opens the Mélangeur de gaz through `lib/gas-handoff.js` with the mode and the mix as displayed (whole percent) as « Mélange voulu »; the final pressure, the cylinder and what it holds keep their values, and back returns to Meilleur mélange. Test: `tests/app/gas-blender-form.test.mjs` (25/28 at 148 ft). Not done: iOS (no iOS gas tools yet). Checked in a browser at 412 and 820 px wide, not on a device.
 
-## [ ] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
+## [x] 2026-11-15-198 Gas blender: « Pression finale désirée » from the cylinder, field order, desktop cylinder drawing
 
 Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-outils-melangeur.dc.html` (desktop), `outils-melangeur-android.dc.html`, `outils-melangeur-nitrox-android.dc.html`, `android-tablette-melangeur-paysage.dc.html`, `android-tablette-melangeur-portrait.dc.html`. Applies on every platform; the desktop screen is otherwise task 196.
 
@@ -3669,7 +3721,9 @@ Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 
 
 Done (phone and tablet parts), not ticked: the desktop part is on another branch. Order: Trimix Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox Oxygène and Bouteille, then the final pressure on its own line. The final pressure follows the cylinder's working pressure (`lib/gas-blender-form.js`) until the diver types a value, which a change of cylinder keeps. Helper « Service : 3 365 psi »; above it, a warning in `--od-alarm` with a triangle (`TextField` `warning`), the steps still computed. « Pression finale » renamed. Tests in `tests/app/gas-blender-form.test.mjs`. No calculation file changed (`gas-blend.js`, `gas-calculator.js`).
 
-## [ ] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
 
 Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html`.
 
@@ -3679,6 +3733,8 @@ Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up
 - The aria-label: « Bouteille à 220 bar : hélium, oxygène et air, dans l'ordre du gonflage ».
 
 Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
 
@@ -3696,7 +3752,7 @@ Test: Nitrox shows Pression and Mélange on one line; Trimix shows Pression alon
 
 Done: « Dans la bouteille » follows the mock-ups: Nitrox, Pression and Mélange (dropdown « EAN32 ») side by side then « Compléter avec »; Trimix, Pression alone, then Oxygène and Hélium dropdowns side by side, then « Compléter avec », with the helper under Pression. The note (cooled cylinder and oxygen clean, one paragraph) is 13 sp `--od-text-2`, no longer red; « Analysez le mélange avant de plonger. » is an amber banner (`--od-tertiary-container`, 12 dp corners, 16 dp margins, 20 dp triangle, 14 sp). Compared with the mock-ups side by side in a browser at 412 px.
 
-## [ ] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
+## [x] 2026-11-15-201 Desktop gas blender: « Dans la bouteille » layout and empty-cylinder hint
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils-melangeur.dc.html` (completes task 196).
 
@@ -3706,6 +3762,8 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-outils
 English: « Leave empty if the cylinder is empty ».
 
 Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
+
+Done on `feature/desktop-logbook`.
 
 ## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
@@ -3733,6 +3791,8 @@ Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglage
 English: « Settings », « Saved at once, on this computer », « Search settings », « Logbook file », « Location », « Show in folder », « Open at startup », « Text size », « Account », « Sync now », « Sync automatically », « Only on Wi-Fi or cable », « Sign out », « About OpenDives », « Free filter… », « Clean up sites… ».
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
+
+Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
 
 ## [x] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
 
@@ -3793,13 +3853,15 @@ Test: the iPhone first launch shows one short line under the title and a one-lin
 
 
 Done: the iOS branch of `WelcomeStart.svelte` now uses `welcome.headline` under the title, `existingShort`/`existingNote`, `createShort`/`createNote`, `noAccount` with `noAccountNotePhone` (phone) or `noAccountNoteTablet` (iPad); the git link is unchanged. `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` are removed from en, fr and fr-CA (nothing else referenced them). One release-note line added (fr, en). Layout unchanged; checked in a browser at iPhone and iPad sizes, light and dark.
-## [ ] 2026-11-15-207 New logbook dialog: a close button at every step
+## [x] 2026-11-15-207 New logbook dialog: a close button at every step
 
 Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».
 
 Test: at each step, the ✕ closes the dialog, no logbook is created, the window is back to where it was; Échap does the same.
 
-## [ ] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
+Done on `feature/desktop-logbook`.
+
+## [x] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
 
 Christian approved this on 15 November 2026. It changes the « Nouveau carnet » dialog of task 175 (`app/src/components/DesktopNewLogbook.svelte`); the ✕ of task 207 stays. The full description is in `docs/system-design.md`, « New logbook »; mock-ups in `docs/mockups/`, in this order: `bureau-nouveau-carnet-choix.dc.html` (step 1), `bureau-nouveau-carnet-nuage-fournisseur.dc.html` (step 2), `bureau-nouveau-carnet-nuage-connexion.dc.html` (step 3, not connected), `bureau-nouveau-carnet-nuage.dc.html` (step 3, connected), `bureau-nouveau-carnet-nuage-webdav.dc.html` (step 3, WebDAV), `bureau-nouveau-carnet-git.dc.html` (git, step 2 of 2).
 
@@ -3813,6 +3875,8 @@ Christian approved this on 15 November 2026. It changes the « Nouveau carnet »
 English: « Step 1 of 3 », « In your cloud », « Choose the service to keep the logbook in. », « Sign in to {service} », « Not signed in yet », « Sign in to {service} in your browser, then come back here to create the logbook. », « The logbook “My logbook.ssrf” will be created in an OpenDives folder of this account. », « Switch account », « Sign in to your server », « Server address », « Username », « Password », « In Nextcloud, create an app password in Settings › Security. It stays on this computer. ».
 
 Tests: the dialog keeps the same size and place through every step and back; step 3 shows « Se connecter à {service} » until the sign-in comes back, then the connected state and « Créer le carnet »; a service already authorised opens step 3 connected; « Changer de compte » signs in with another account; WebDAV creates the logbook only with a valid server and credentials.
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-209 App: the simple logo with relief replaces the flat simple logo
 
@@ -3959,7 +4023,7 @@ Christian decided this on 15 November 2026; this specifies point 3 of task 216.
 
 Done: rule noted. Release-edition tasks: one branch each, `feature/release-<short task name>`, from the earlier release branch they build on or else from `main`, kept up to date with `main`, never merged until Christian asks; each « Done » note names its branch. Task 213's work is on `feature/release-first-launch`.
 
-## [ ] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
+## [x] 2026-11-15-218 Release edition: the new first launch in steps (replaces 213's right-hand column and its dialog)
 
 Christian approved this on 15 November 2026. **Release edition: build it on the branch `feature/release-new-logbook`, started from `feature/release-first-launch` (tasks 213, 216 and 217). Do not merge it into `main`.** Tablets only; the phone comes later.
 
@@ -4028,6 +4092,8 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 - In the release build, on a tablet, in both orientations: every step matches its mock-up, « Retour » goes back one step with the reverse animation, and the name ends up as the file name.
 - Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
 - The beta on `main` is untouched.
+
+Done on `feature/release-new-logbook` (carried into `feature/release-new-logbook-two-steps`).
 
 ## [x] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
 
@@ -5012,7 +5078,7 @@ Mock-ups, all in `docs/mockups/`:
 - The help links swap the form for the help, and « Retour » brings the form back with its fields still filled.
 - A valid repository leads to the download, then to the logbook with the snackbar.
 
-## [ ] 2026-11-16-258 Inbox clean-up: tick the desktop and release tasks that are done
+## [x] 2026-11-16-258 Inbox clean-up: tick the desktop and release tasks that are done
 
 Christian asked for this on 16 November 2026. Several tasks are still unticked although their work seems to be on branches that are not on `origin` (the desktop branch, the release branches). I cannot check those branches from here.
 
@@ -5029,3 +5095,39 @@ For each task:
 Change no code for this task. Report the result in a short list at the end of this task.
 
 Already closed during the same clean-up: 77, 151 (merged into `main`), 186 (superseded by 194), 213 (superseded by 218).
+
+Done (checked against each branch's code and its own inbox, where every one of these tasks had been ticked with a Done note):
+- 15: left open (standing task).
+- 169: Done on `feature/desktop-logbook`.
+- 170: Done on `feature/desktop-logbook`.
+- 171: Done on `feature/desktop-logbook` (Sites and Outils completed there by tasks 177 and 196).
+- 172: Done on `feature/desktop-logbook`.
+- 173: Done on `feature/desktop-logbook`.
+- 174: Done on `feature/desktop-logbook`.
+- 175: Done on `feature/desktop-logbook`.
+- 176: Done on `feature/desktop-logbook`.
+- 177: Done on `feature/desktop-logbook`.
+- 178: Done on `feature/desktop-logbook`.
+- 179: Done on `feature/desktop-logbook`.
+- 180: Done on `feature/desktop-logbook`.
+- 181: left open — Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
+- 182: Done on `feature/desktop-logbook`.
+- 183: Done on `feature/desktop-logbook`.
+- 184: Done on `feature/desktop-logbook`.
+- 185: Done on `feature/desktop-logbook`.
+- 187: Done on `feature/desktop-logbook`.
+- 188: Done on `feature/desktop-logbook`.
+- 189: Done on `feature/desktop-logbook`.
+- 191: Done on `feature/desktop-logbook`.
+- 192: Done on `feature/desktop-logbook`.
+- 193: Done on `feature/desktop-logbook`.
+- 194: Done on `feature/desktop-logbook`.
+- 195: Done on `feature/desktop-logbook`.
+- 196: Done on `feature/desktop-logbook`.
+- 198: Done on `feature/desktop-logbook`.
+- 199: Done on `feature/desktop-logbook`.
+- 201: Done on `feature/desktop-logbook`.
+- 202: left open — Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
+- 207: Done on `feature/desktop-logbook`.
+- 208: Done on `feature/desktop-logbook`.
+- 218: Done on `feature/release-new-logbook` (carried into `feature/release-new-logbook-two-steps`).
