@@ -46,7 +46,7 @@ export async function connectWebdav(_server) {
  * @returns {'unreachable'|'denied'|''} '' for a code the form does not tell (COMING…)
  */
 export function webdavProblem(code) {
-  if (code === 'UNREACHABLE' || code === 'BAD_ADDRESS' || code === 'NETWORK') return 'unreachable';
-  if (code === 'LOGIN_FAILED' || code === 'DENIED') return 'denied';
+  if (code === 'UNREACHABLE' || code === 'BAD_ADDRESS' || code === 'INSECURE_ADDRESS' || code === 'NETWORK') return 'unreachable';
+  if (code === 'LOGIN_FAILED' || code === 'DENIED' || code === 'BAD_CREDENTIALS') return 'denied';
   return '';
 }

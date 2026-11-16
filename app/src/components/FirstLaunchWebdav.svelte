@@ -11,15 +11,17 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { errorCode } from '../lib/account.js';
   import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
-   * @type {{ create: boolean, onconnected?: () => void, oncoming?: () => void }}
+   * @type {{ create: boolean, onconnected?: () => void, oncoming?: () => void, onsubmit?: () => Promise<unknown>, onfail?: (e: unknown) => void }}
    * `create`: a new logbook (« Créer le carnet »); otherwise « Voir mes carnets ». `onconnected` runs once the
-   * server answered; `oncoming` when the cloud is not built yet.
+   * server answered; `oncoming` when the cloud is not built yet. `onsubmit` replaces the connection (the desktop
+   * app's window without a logbook creates the logbook on the server, which checks the account then: task
+   * 2026-11-16-228); `onfail` tells an error the form's two fields do not (a name already taken…).
    */
-  let { create, onconnected, oncoming } = $props();
+  let { create, onconnected, oncoming, onsubmit, onfail } = $props();
 
   const w = flow.webdav;
   let busy = $state(false);
@@ -40,13 +42,16 @@
     busy = true;
     w.error = '';
     try {
-      await connectWebdav({ url: w.url.trim(), user: w.user.trim(), password: w.password });
+      if (onsubmit) await onsubmit();
+      else await connectWebdav({ url: w.url.trim(), user: w.user.trim(), password: w.password });
       w.password = '';
       onconnected?.();
     } catch (e) {
       const code = errorCode(e);
       if (code === 'COMING') oncoming?.();
-      else w.error = webdavProblem(code) || 'unreachable';
+      else if (webdavProblem(code)) w.error = webdavProblem(code);
+      else if (onfail) onfail(e);
+      else w.error = 'unreachable';
     } finally {
       busy = false;
     }
@@ -56,7 +61,7 @@
 <div class="od-first-launch-webdav">
   <ReleaseField label={t('welcomeSteps.webdavAddress')} bind:value={w.url} mono error={addressError} disabled={busy} autocomplete="url" oninput={edited} />
   <ReleaseField label={t('welcomeSteps.webdavUser')} bind:value={w.user} disabled={busy} autocomplete="username" oninput={edited} />
-  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', layout.phone))} oninput={edited} />
+  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', layout.phone, desktopApp))} oninput={edited} />
   <button type="button" class="od-first-launch-webdav--action" disabled={!ready} aria-busy={busy} onclick={run}>
     {t(create ? 'welcomeSteps.createLogbook' : 'welcomeSteps.seeLogbooks')}
   </button>

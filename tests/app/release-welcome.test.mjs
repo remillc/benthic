@@ -188,7 +188,11 @@ test('every text of the release screens is in fr and en, none is unused', () => 
   for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
     // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
-    for (const m of src.matchAll(/deviceKey\('(welcomeSteps\.\w+)'/g)) keys.add(`${m[1]}Phone`);
+    // The desktop app's variant too (« cet ordinateur », task 2026-11-16-228).
+    for (const m of src.matchAll(/deviceKey\('(welcomeSteps\.\w+)'/g)) {
+      keys.add(`${m[1]}Phone`);
+      keys.add(`${m[1]}Desktop`);
+    }
   }
   assert.ok(keys.size >= 80, `only ${keys.size} keys found`);
   for (const lang of ['fr', 'en']) {
@@ -250,7 +254,7 @@ test('four cloud services with generic icons, never a brand logo; « coming » u
   assert.deepEqual(shown, ['<welcomeSteps.cloudSoon>']);
   // « Se connecter à {service} », « Changer de compte » and « Créer le carnet » (connected) say so
   // (task 224: « Se connecter » starts the connection once the cloud exists, see first-launch-complete.test.mjs).
-  assert.match(sources.steps, /function signIn\(\) \{\s*if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
+  assert.match(sources.steps, /function signIn\(\) \{\s*(?:if \(realCloud\) return void desktopSignIn\(step === 'cloudConnected'\);\s*)?if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
   assert.match(sources.steps, /function cloud\(\) \{\s*cloudComing\(showSnackbar, t\);/);
 });
 

@@ -56,6 +56,7 @@
   import DesktopTools from './pages/DesktopTools.svelte';
   import DesktopSelection from './pages/DesktopSelection.svelte';
   import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
+  import DesktopFirstLaunch from './components/DesktopFirstLaunch.svelte';
   import DesktopNewLogbook from './components/DesktopNewLogbook.svelte';
   import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
@@ -96,6 +97,7 @@
   import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook } from './lib/logbook.svelte.js';
+  import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
@@ -330,6 +332,11 @@
     if (logbook.dives.length) schedulePreparingSiteMaps();
   });
 
+  // Desktop app: the dives the first launch brought are imported once the new logbook it made is open (task 2026-11-16-228).
+  $effect(() => {
+    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
+  });
+
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
     document.documentElement.classList.toggle('od-bottom-nav-on', bottomNav() && navigation.atRoot);
@@ -393,8 +400,8 @@
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <DemoHost />
-  <!-- Desktop: a window with no logbook shows its start screen; the new-logbook dialog opens from there, the selector and the Mac's menu (task 2026-11-15-173). -->
-  {#if desktopApp && noLogbook}<DesktopLogbookStart />{/if}
+  <!-- Desktop: a window with no logbook shows its start screen; the new-logbook dialog opens from there, the selector and the Mac's menu (task 2026-11-15-173). The release edition shows « Pour commencer » instead (task 2026-11-16-228); the new-logbook dialog is then reached only from the menu bar and Ctrl+Maj+N. -->
+  {#if desktopApp && noLogbook}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
   {#if desktopApp && logbooks.dialog}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/if}
   <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />

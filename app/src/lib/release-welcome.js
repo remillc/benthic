@@ -48,6 +48,24 @@ export const CLOUD_SERVICES = [
 ];
 
 /**
+ * iCloud Drive, on macOS only (task 2026-11-16-228): the Mac's own account, so no sign-in screen follows its row.
+ * @type {{ key: string, text: string, icon: 'cloud'|'server' }}
+ */
+export const ICLOUD_SERVICE = { key: 'icloud', text: 'welcomeSteps.icloud', icon: 'cloud' };
+
+/**
+ * The services of the lists: the four above, and iCloud Drive before WebDAV on macOS, where the desktop app
+ * offers it (Windows and Linux do not show it).
+ * @param {boolean} [mac] the desktop app on macOS
+ * @returns {{ key: string, text: string, icon: 'cloud'|'server' }[]}
+ */
+export function cloudServices(mac = false) {
+  if (!mac) return CLOUD_SERVICES;
+  const at = CLOUD_SERVICES.findIndex((s) => s.key === 'webdav');
+  return [...CLOUD_SERVICES.slice(0, at), ICLOUD_SERVICE, ...CLOUD_SERVICES.slice(at)];
+}
+
+/**
  * « Se connecter à {service} » and the other cloud actions: idea #74 is not built yet, they say so.
  * @param {(text: string) => void} show the snackbar
  * @param {(key: string) => string} t

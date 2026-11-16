@@ -66,8 +66,8 @@ test('the connection to a service: start, wait, cancel, refuse, retry, connect',
 test('until idea #74 nothing opens the browser: the buttons say « coming », the state is cleared when the step changes', async () => {
   assert.equal(CLOUD_CONNECTION_AVAILABLE, false);
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /function signIn\(\) \{\s*if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
-  assert.match(steps, /function reopenPage\(\) \{\s*if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
+  assert.match(steps, /function signIn\(\) \{\s*(?:if \(realCloud\) return void desktopSignIn\(step === 'cloudConnected'\);\s*)?if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
+  assert.match(steps, /function reopenPage\(\) \{\s*(?:if \(realCloud\) return void [^\n]*;\s*)?if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
   await assert.rejects(connectWebdav({ url: '', user: '', password: '' }), /COMING/);
   const state = read('lib/first-launch.svelte.js');
   for (const fn of ['go', 'goBack', 'goBackTo', 'editName']) {
@@ -115,9 +115,9 @@ test('WebDAV: the codes tell the address or the password; the texts are the mock
   assert.match(form, /welcomeSteps\.createLogbook/);
   assert.match(form, /welcomeSteps\.seeLogbooks/);
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /<FirstLaunchWebdav create oncoming=\{cloud\} \/>/);
+  assert.match(steps, /<FirstLaunchWebdav create oncoming=\{cloud\} onsubmit=\{windowTakes \? createWebdav : undefined\} .*\/>/);
   assert.match(steps, /<FirstLaunchWebdav create=\{false\} oncoming=\{cloud\} \/>/);
-  assert.match(steps, /go\(key === 'webdav' \? 'webdav' : 'service'\)/);
+  assert.match(steps, /go\(key === 'webdav' \? 'webdav' : key === 'icloud' \? 'icloud' : 'service'\)/);
 });
 
 test('git: a repository that does not fit the path is told under the address, with the link to the other path', () => {

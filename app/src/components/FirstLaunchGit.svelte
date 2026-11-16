@@ -17,7 +17,7 @@
   import { flow } from '../lib/first-launch.svelte.js';
   import { gitProblem, gitProblemFromCode, gitUserName } from '../lib/first-launch-git.js';
   import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -26,12 +26,15 @@
    *   router: any,
    *   afterConnect?: () => Promise<unknown>,
    *   onswitch?: () => void,
+   *   onconnect?: (access: { url: string, username: string, branch: string, token: string }) => Promise<unknown>,
    * }}
    * `create`: the repository must be empty (a new logbook); otherwise it must hold a logbook. `afterConnect`
    * runs once the logbook is open (the imported dives, the label). `onswitch`: the link to the other path
-   * (« Ouvrir mon carnet OpenDives » when creating, « Créer un carnet » when opening).
+   * (« Ouvrir mon carnet OpenDives » when creating, « Créer un carnet » when opening). `onconnect` replaces the
+   * connection and what follows it (the desktop app's window without a logbook, whose main process creates the
+   * logbook from the address, the branch and the token: task 2026-11-16-228); what it throws is told as below.
    */
-  let { create, router, afterConnect, onswitch } = $props();
+  let { create, router, afterConnect, onswitch, onconnect } = $props();
 
   let url = $state('');
   let branch = $state('main');
@@ -87,6 +90,11 @@
         formError = t('welcomeSteps.gitBranchMissing');
         return;
       }
+      if (onconnect) {
+        await onconnect({ url: address, username, branch: branch.trim(), token: token.trim() });
+        token = '';
+        return;
+      }
       await OpenDivesCore.gitConnect({ url: address, username, token: token.trim(), branch: branch.trim(), empty: !!found.empty });
       token = '';
       await accountReady();
@@ -129,7 +137,7 @@
     <p class="od-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="od-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
   {:else}
     <div class="od-first-launch-git--token-help">
-      <span>{t(deviceKey('welcomeSteps.gitTokenHelp', layout.phone))}</span>
+      <span>{t(deviceKey('welcomeSteps.gitTokenHelp', layout.phone, desktopApp))}</span>
       <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
     </div>
 

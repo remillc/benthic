@@ -25,7 +25,7 @@
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
-  import { CLOUD_SERVICES, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
+  import { cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -33,14 +33,24 @@
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
   import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopApp, desktopMac } from '../lib/layout.svelte.js';
+  import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
+  import { cloudErrorKey, creationErrorKey } from '../lib/desktop-logbooks.js';
+  import { DROP_STEPS, droppedFiles, nameFromGitUrl, parkPending, pendingFromSource, signInFailure, signInTo, PENDING_IMPORT_KEY } from '../lib/desktop-first-launch.js';
   import { t, locale } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
   const step = $derived(currentStep());
-  const service = $derived(CLOUD_SERVICES.find((s) => s.key === flow.service) ?? CLOUD_SERVICES[0]);
+  /** The services of the lists; iCloud Drive only in the desktop app on macOS (task 2026-11-16-228). */
+  const services = cloudServices(desktopMac);
+  const service = $derived(services.find((s) => s.key === flow.service) ?? services[0]);
+  /**
+   * The desktop app's window without a logbook: it takes the logbook this first launch makes (the main process
+   * creates it and the window reloads on it), and the cloud connection is the desktop app's own (desktop/cloud.cjs).
+   */
+  const windowTakes = desktopApp && noLogbook;
   const serviceName = $derived(t(service.text));
   const fileName = $derived(logbookFileName(flow.name, []));
   const nameInvalid = $derived(!fileName);
@@ -83,26 +93,88 @@
   /** @param {string} key */
   function pickService(key) {
     flow.service = key;
-    go(key === 'webdav' ? 'webdav' : 'service');
+    // iCloud Drive is the Mac's own account: no sign-in screen, straight to the connected one.
+    if (key === 'icloud') flow.account = t('welcomeSteps.icloudAccount');
+    go(key === 'webdav' ? 'webdav' : key === 'icloud' ? 'icloud' : 'service');
   }
+
+  /** @returns {any} the desktop app's bridge (window.odDesktop) */
+  const bridge = () => /** @type {any} */ (globalThis).odDesktop;
+
+  /**
+   * The cloud connection is real in the desktop app's window without a logbook, on the path that creates a logbook:
+   * the main process signs in (desktop/cloud.cjs) and creates the file in the service. Opening a logbook of the
+   * account is not built yet (the main process cannot list an account's logbooks), so that path keeps its message.
+   */
+  const realCloud = $derived(windowTakes && (step === 'cloudConnect' || step === 'cloudConnected'));
+  /** Another account is being chosen from the connected screen. */
+  let switching = $state(false);
+  /** Each sign-in has a number: the answer of one that was cancelled, or left with « Retour », is dropped. */
+  let signInRun = 0;
 
   /**
    * « Se connecter à {service} » and « Réessayer »: the provider's page opens in the browser and the screen
-   * waits for the answer. Idea #74 is not built yet: until then nothing opens and the message says so.
+   * waits for the answer. In the desktop app's window without a logbook the sign-in is real; elsewhere idea #74 is
+   * not built yet: nothing opens and the message says so.
    */
   function signIn() {
+    if (realCloud) return void desktopSignIn(step === 'cloudConnected');
     if (!CLOUD_CONNECTION_AVAILABLE) return cloud();
     flow.connection = connectionNext(flow.connection, 'start');
   }
 
+  /** @param {boolean} another « Changer de compte »: the connected screen stays, the account changes */
+  async function desktopSignIn(another) {
+    const run = ++signInRun;
+    const provider = flow.service;
+    if (another) switching = true;
+    else flow.connection = connectionNext(flow.connection, 'start');
+    try {
+      const status = await signInTo(bridge().logbooks, provider, another);
+      if (run !== signInRun) return;
+      flow.account = status.account || serviceName;
+      if (!another) go('connected');
+    } catch (e) {
+      if (run !== signInRun) return;
+      const failure = signInFailure(e);
+      if (failure === 'unavailable') {
+        flow.connection = 'idle';
+        cloud();
+      } else if (failure === 'cancelled') {
+        flow.connection = 'idle';
+      } else if (another) {
+        showSnackbar(t(cloudErrorKey(/** @type {any} */ (e), provider)));
+      } else {
+        flow.connection = connectionNext(flow.connection, 'refused');
+      }
+    } finally {
+      if (run === signInRun) switching = false;
+    }
+  }
+
   /** « Rouvrir la page »: the provider's page again, in the browser. */
   function reopenPage() {
+    if (realCloud) return void bridge().logbooks.cloudReopenSignIn({ provider: flow.service });
     if (!CLOUD_CONNECTION_AVAILABLE) return cloud();
+  }
+
+  /** The sign-in waiting in the browser is given up (« Annuler », « Retour »). */
+  function abandonSignIn() {
+    signInRun++;
+    switching = false;
+    if (realCloud && flow.connection === 'waiting') bridge().logbooks.cloudCancelSignIn({ provider: flow.service });
   }
 
   /** « Annuler » of the connection in progress: back to « Se connecter ». */
   function cancelConnection() {
+    abandonSignIn();
     flow.connection = connectionNext(flow.connection, 'cancel');
+  }
+
+  /** « Retour »: one step back; a sign-in still waiting in the browser is given up. */
+  function back() {
+    abandonSignIn();
+    goBack();
   }
 
   /** « Retour » on the first screen of a first launch entered from the logbook's menu: the logbook stays as it was. */
@@ -157,10 +229,85 @@
     resetFlow();
   }
 
+  /**
+   * The desktop app's window without a logbook: the main process creates the logbook (the system's save dialog, a
+   * git repository or a cloud service) and this window reloads on it. What the diver brought is parked first and
+   * imported once the logbook is open (lib/desktop-pending-import.js).
+   * @param {Record<string, unknown>} where `where` and what it needs (provider, address…)
+   * @param {string} [name] the logbook's name; the one typed by default
+   * @returns {Promise<boolean>} false when the diver cancelled (the save dialog)
+   * @throws the main process's error: the callers show it
+   */
+  async function createInWindow(where, name = sanitiseLogbookName(flow.name)) {
+    let parked = false;
+    try {
+      if (flow.source) {
+        const pending = await pendingFromSource(flow.source, async (file) => (await OpenDivesCore.stageImport({ name: file.name, data: await readBase64(file) })).path);
+        parkPending(sessionStorage, pending);
+        parked = true;
+      }
+      const result = await bridge().logbooks.create({ ...where, name });
+      if (result.canceled || !result.opened) throw Object.assign(new Error(result.canceled ? 'CANCELLED' : 'NOT_OPENED'), { cancelled: !!result.canceled });
+      return true;
+    } catch (e) {
+      if (parked) {
+        // Nothing was created: what was parked is not needed (the staged files go with the temp folder).
+        try {
+          sessionStorage.removeItem(PENDING_IMPORT_KEY);
+        } catch {
+          // Not fatal.
+        }
+      }
+      if (/** @type {any} */ (e)?.cancelled) return false;
+      throw e;
+    }
+  }
+
+  /** The error of a creation in this window, as a message. @param {unknown} e @param {string} [provider] */
+  function creationFailed(e, provider = '') {
+    console.error('Creating the logbook', /** @type {any} */ (e)?.message);
+    showSnackbar(t(provider ? cloudErrorKey(/** @type {any} */ (e), provider) : creationErrorKey(/** @type {any} */ (e))));
+  }
+
+  /** « Créer le carnet » of the connected screen: in the desktop app's window the file is created in the service. */
+  async function createCloud() {
+    // iCloud Drive: the Mac's own account cannot be reached from here yet (no Mac to try it on): the message says so.
+    if (!windowTakes || service.key === 'icloud') return cloud();
+    if (busy || nameInvalid) return;
+    busy = true;
+    try {
+      await createInWindow({ where: 'cloud', provider: flow.service });
+    } catch (e) {
+      creationFailed(e, flow.service);
+    } finally {
+      busy = false;
+    }
+  }
+
+  /** The WebDAV form, in the window without a logbook: the logbook is created on the server, which checks the account. */
+  async function createWebdav() {
+    await createInWindow({ where: 'cloud', provider: 'webdav', server: flow.webdav.url.trim(), username: flow.webdav.user.trim(), password: flow.webdav.password });
+  }
+
+  /** The git form, in the window without a logbook (an empty repository gets the logbook; one that holds it is opened). */
+  async function createGit(/** @type {{ url: string, username: string, branch: string, token: string }} */ access) {
+    await createInWindow({ where: 'git', ...access }, step === 'git' ? sanitiseLogbookName(flow.name) : nameFromGitUrl(access.url, t('welcomeSteps.defaultName')));
+  }
+
   /** « Seulement sur cette tablette »: the logbook is created on the device and opened, no extra screen. */
   async function createOnDevice() {
     if (busy) return;
     busy = true;
+    if (windowTakes) {
+      try {
+        await createInWindow({ where: 'computer' });
+      } catch (e) {
+        creationFailed(e);
+      } finally {
+        busy = false;
+      }
+      return;
+    }
     try {
       rememberName();
       await createDeviceLogbook(
@@ -230,12 +377,59 @@
   let demoOffered = $state(false);
   onMount(() => void canTryDemo().then((yes) => (demoOffered = yes)));
 
-  /** A file picked for the import: read without touching anything, then « Nouveau carnet » with its summary. */
+  /** A file is being dragged over the window, on a step that takes it (the drop line lights up). */
+  let dragging = $state(false);
+
+  // Desktop app: a file dropped on the first screen or on « Importer un carnet » starts the import with it. A drop
+  // anywhere is kept from opening the file in the window.
+  onMount(() => {
+    if (!desktopApp) return;
+    const takes = () => DROP_STEPS.includes(currentStep()) && !busy;
+    /** @param {DragEvent} e */
+    const over = (e) => {
+      if (!e.dataTransfer?.types?.includes('Files')) return;
+      e.preventDefault();
+      dragging = takes();
+    };
+    /** @param {DragEvent} e */
+    const drop = (e) => {
+      dragging = false;
+      if (!e.dataTransfer?.types?.includes('Files')) return;
+      e.preventDefault();
+      const files = droppedFiles(e.dataTransfer);
+      if (!files.length || !takes()) return;
+      if (currentStep() === 'start') go('import');
+      void bring(files);
+    };
+    const leave = (/** @type {DragEvent} */ e) => {
+      if (!e.relatedTarget) dragging = false;
+    };
+    window.addEventListener('dragover', over);
+    window.addEventListener('drop', drop);
+    window.addEventListener('dragleave', leave);
+    return () => {
+      window.removeEventListener('dragover', over);
+      window.removeEventListener('drop', drop);
+      window.removeEventListener('dragleave', leave);
+    };
+  });
+
+  /** A file picked for the import (« Un fichier »). */
   async function fileChosen() {
-    const picked = fileInput?.files ? pickCsvFiles(fileInput.files) : null;
-    const file = picked?.csv ?? fileInput?.files?.[0];
-    if (!fileInput || !file || busy) return;
-    fileInput.value = '';
+    const files = fileInput?.files ? Array.from(fileInput.files) : [];
+    if (fileInput) fileInput.value = '';
+    await bring(files);
+  }
+
+  /**
+   * Files brought for the import, picked or (desktop app) dropped on the window: read without touching anything,
+   * then « Nouveau carnet » with its summary.
+   * @param {File[]} files
+   */
+  async function bring(files) {
+    const picked = files.length ? pickCsvFiles(files) : null;
+    const file = picked?.csv ?? files[0];
+    if (!file || busy) return;
     unreadable = '';
     if (picked) {
       csv = { file: picked.csv, companion: picked.companion };
@@ -296,9 +490,16 @@
 
 {#snippet backButton()}
   {#if hasBack(step, flow.origin === 'menu')}
-    <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : goBack}>
+    <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : back}>
       <span class="od-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
+  {/if}
+{/snippet}
+
+<!-- Desktop app, task 2026-11-16-228: a logbook file dropped on the window starts the import with that file. -->
+{#snippet dropLine()}
+  {#if desktopApp}
+    <p class="od-first-launch--drop">{t('welcomeSteps.dropLine')}</p>
   {/if}
 {/snippet}
 
@@ -311,7 +512,7 @@
 
 {#snippet serviceList()}
   <div class="od-first-launch--list">
-    {#each CLOUD_SERVICES as s (s.key)}
+    {#each services as s (s.key)}
       <button type="button" class="od-first-launch--list-row" onclick={() => pickService(s.key)}>
         <span class="od-first-launch--list-tile"><Icon name={s.icon === 'server' ? 'server' : 'cloudUpload'} size={22} /></span>
         <span class="od-first-launch--list-title">{t(s.text)}</span>
@@ -390,11 +591,11 @@
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
     <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
     <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone))} disabled={nameInvalid || busy} onclick={() => where('device')} />
+    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone, desktopApp))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone, desktopApp))} disabled={nameInvalid || busy} onclick={() => where('device')} />
   </nav>
 {/snippet}
 
-<div class="od-first-launch" class:od-first-launch--first={step === 'start'}>
+<div class="od-first-launch" class:od-first-launch--first={step === 'start'} class:od-first-launch--dragging={dragging} class:od-first-launch--desktop={desktopApp}>
   <div class="od-first-launch--stage">
     {#key step}
       <section class="od-first-launch--step" in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
@@ -415,6 +616,7 @@
           {#if demoOffered}
             <button type="button" class="od-first-launch--demo" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
           {/if}
+          {@render dropLine()}
         {:else if step === 'new' || step === 'importNew'}
           {@render nameAndWhere()}
         {:else if step === 'cloudService'}
@@ -429,15 +631,17 @@
             {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.connectedCreate', { file: fileName })}</p>
-            <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
-            <button type="button" class="od-first-launch--action" onclick={cloud}>{t('welcomeSteps.createLogbook')}</button>
+            {#if service.key !== 'icloud'}
+              <button type="button" class="od-first-launch--text-link" disabled={switching} onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {/if}
+            <button type="button" class="od-first-launch--action" disabled={busy} onclick={createCloud}>{t('welcomeSteps.createLogbook')}</button>
           {/if}
         {:else if step === 'webdav'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
-          <FirstLaunchWebdav create oncoming={cloud} />
+          <FirstLaunchWebdav create oncoming={cloud} onsubmit={windowTakes ? createWebdav : undefined} onfail={windowTakes ? (e) => creationFailed(e, 'webdav') : undefined} />
         {:else if step === 'git'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
-          <FirstLaunchGit create router={f7router} afterConnect={afterGit} onswitch={() => go('openLink')} />
+          <FirstLaunchGit create router={f7router} afterConnect={afterGit} onswitch={() => go('openLink')} onconnect={windowTakes ? createGit : undefined} />
         {:else if step === 'import'}
           <p class="od-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
           {#if unreadable}
@@ -455,6 +659,7 @@
             <ImportFormats />
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
+          {@render dropLine()}
           <input type="file" multiple class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
           {#if csv}
             <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
@@ -478,7 +683,9 @@
             {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.openConnectedHelp')}</p>
-            <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {#if service.key !== 'icloud'}
+              <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {/if}
             <button type="button" class="od-first-launch--action" onclick={seeLogbooks}>{t('welcomeSteps.seeLogbooks')}</button>
           {/if}
         {:else if step === 'openChoose'}
@@ -512,7 +719,7 @@
           <FirstLaunchWebdav create={false} oncoming={cloud} />
         {:else if step === 'openGit'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
-          <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} />
+          <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} onconnect={windowTakes ? createGit : undefined} />
         {/if}
       </section>
     {/key}
@@ -1140,8 +1347,13 @@
       text-decoration: underline;
       cursor: pointer;
 
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
       @media (hover: hover) {
-        &:hover {
+        &:hover:not(:disabled) {
           color: var(--od-release-row-main-hover);
         }
       }
@@ -1180,6 +1392,23 @@
         outline-offset: 3px;
         border-radius: 4px;
       }
+    }
+
+    /* Desktop app (task 2026-11-16-228): the line under the choices of « Pour commencer » and « Importer un carnet »;
+       it lights up while a file is dragged over the window. */
+    .od-first-launch--drop {
+      margin: 12px 0 0;
+      font-size: 14px;
+      line-height: 19px;
+      color: var(--od-text-2);
+    }
+
+    .od-first-launch--dragging .od-first-launch--drop {
+      color: var(--od-release-link);
+      font-weight: 600;
+      outline: 2px dashed var(--od-release-link);
+      outline-offset: 8px;
+      border-radius: 4px;
     }
 
     .od-first-launch--action {
@@ -1339,6 +1568,42 @@
           justify-content: center;
           text-align: center;
         }
+      }
+    }
+
+    /* Desktop app (task 2026-11-16-228; mock-ups docs/mockups/bureau-premier-lancement-production-*.dc.html): the
+       link between OpenDives and the service is compact and centred (80 dp tiles under 104 dp names, a 120 dp
+       line), and the words under it are a little larger. */
+    .od-first-launch--desktop {
+      .od-first-launch--hero {
+        padding: 24px 16px 18px;
+        justify-content: center;
+      }
+
+      .od-first-launch--hero-end {
+        width: 104px;
+        gap: 8px;
+      }
+
+      .od-first-launch--hero-name {
+        font-size: 14px;
+        line-height: 19px;
+      }
+
+      .od-first-launch--hero-link {
+        flex: none;
+        width: 120px;
+        padding: 0;
+      }
+
+      .od-first-launch--status {
+        font-size: 17px;
+        line-height: 22px;
+      }
+
+      .od-first-launch--status-help {
+        font-size: 15px;
+        line-height: 21px;
       }
     }
   }

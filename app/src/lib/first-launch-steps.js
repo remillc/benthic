@@ -5,6 +5,7 @@
 //
 // Paths:
 //   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
+//   (iCloud Drive, macOS only: cloudService → cloudConnected, no sign-in; task 2026-11-16-228)
 //   start → import → (file | importDivelogs → importProgress) → importNew → where as above
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
 //
@@ -34,6 +35,7 @@ const FORWARD = {
   'importNew:git': 'git',
   'cloudService:service': 'cloudConnect',
   'cloudService:webdav': 'webdav',
+  'cloudService:icloud': 'cloudConnected',
   'cloudConnect:connected': 'cloudConnected',
   'import:divelogs': 'importDivelogs',
   'importDivelogs:submit': 'importProgress',
@@ -42,6 +44,7 @@ const FORWARD = {
   'open:git': 'openGit',
   'openCloudService:service': 'openCloudConnect',
   'openCloudService:webdav': 'openWebdav',
+  'openCloudService:icloud': 'openCloudConnected',
   'openCloudConnect:connected': 'openCloudConnected',
   'openCloudConnected:list': 'openChoose',
   'openChoose:createHere': 'cloudConnected',

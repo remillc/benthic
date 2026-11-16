@@ -118,10 +118,10 @@ test('texts that name the device: « ce téléphone » on a phone, « cette tabl
   assert.ok(langs.fr.welcomeSteps.webdavHelpPhone.endsWith('Il reste sur ce téléphone.'));
   // The components choose the key by layout.phone.
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone\)/);
-  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', layout\.phone\)/);
-  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', layout\.phone\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone, desktopApp\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone, desktopApp\)/);
+  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', layout\.phone, desktopApp\)/);
+  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', layout\.phone, desktopApp\)/);
 });
 
 test('the release edition shows its own screen on a phone, not the beta screen', () => {

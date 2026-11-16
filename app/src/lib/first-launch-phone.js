@@ -11,12 +11,15 @@ export const PHONE_QUERY = '(max-width: 767.98px)';
 export const BAND_HEIGHT = Object.freeze({ start: 330, compact: 108 });
 
 /**
- * The key of a text that names the device: « cette tablette » on a tablet, « ce téléphone » on a phone. The
- * phone variant of `welcomeSteps.deviceTitle` is `welcomeSteps.deviceTitlePhone`.
+ * The key of a text that names the device: « cette tablette » on a tablet, « ce téléphone » on a phone, « cet
+ * ordinateur » in the desktop app (task 2026-11-16-228). The phone variant of `welcomeSteps.deviceTitle` is
+ * `welcomeSteps.deviceTitlePhone`, the desktop one `welcomeSteps.deviceTitleDesktop`. The desktop app wins when
+ * a narrow window also matches the phone query.
  * @param {string} key
  * @param {boolean} phone
+ * @param {boolean} [desktop] the desktop app
  * @returns {string}
  */
-export function deviceKey(key, phone) {
-  return phone ? `${key}Phone` : key;
+export function deviceKey(key, phone, desktop = false) {
+  return desktop ? `${key}Desktop` : phone ? `${key}Phone` : key;
 }
