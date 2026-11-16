@@ -11,6 +11,7 @@
   // (docs/mockups/git-jeton-aide-android.dc.html); swiping sideways changes tab.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import MarkedText from '../components/MarkedText.svelte';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -128,7 +129,7 @@
       {#each provider.sections as section}
         {#if section.title}<h3>{t(section.title)}</h3>{/if}
         <ol>
-          {#each section.steps as key (key)}<li>{t(key)}</li>{/each}
+          {#each section.steps as key (key)}<li><MarkedText text={t(key)} /></li>{/each}
         </ol>
       {/each}
       {#if provider.after}<p class="od-token-help--note">{t(provider.after)}</p>{/if}

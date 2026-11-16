@@ -8,6 +8,7 @@
   // To add a host: one entry in PROVIDERS and its texts `repoHelp.<id>.*` (name, page, note, then the steps).
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import MarkedText from '../components/MarkedText.svelte';
   import { t } from '../lib/i18n.js';
 
   /** @typedef {{ id: string, page: string, steps: string[] }} Provider */
@@ -102,7 +103,7 @@
   >
     <p class="od-repository-help--note">{t(`repoHelp.${provider.id}.note`)}</p>
     <ol>
-      {#each provider.steps as key (key)}<li>{t(key)}</li>{/each}
+      {#each provider.steps as key (key)}<li><MarkedText text={t(key)} /></li>{/each}
     </ol>
     <a href={provider.page} class="od-repository-help--open external" target="_blank" rel="noopener">
       <span>{t('repoHelp.open', { name, page: t(`repoHelp.${provider.id}.page`) })}</span>
