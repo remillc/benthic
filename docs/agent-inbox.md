@@ -5191,3 +5191,37 @@ Cloud sign-in pages open in the system authentication sheet (`ASWebAuthenticatio
 - An unreadable file shows the alert, and « Autre fichier » reopens the picker.
 
 Done on `feature/release-phone-first-launch` (not merged): on iPhone, the bands clear the island and the home indicator, « cet iPhone » texts, iCloud Drive first with no sign-in step, iOS grouped inset rows on every first-launch form, « Un fichier » opens the Files picker, an unreadable file shows an iOS alert with « Autre fichier ». Native parts written without a Mac and untested: `createIcloudLogbook` in Swift (creates the logbook folder in the app's iCloud Drive container; needs the iCloud capability on the App ID) and the iCloud entitlements; the core does not yet read or write a logbook there, so the screen then says the cloud is coming. Cloud sign-in through `ASWebAuthenticationSession` is not built.
+
+## [ ] 2026-11-16-262 Desktop (alpha): the five tabs of the dive detail
+
+Christian approved this on 16 November 2026. Alpha: work on `main`. Build what the mock-ups show and ignore any earlier desktop detail tab you built: these mock-ups replace it.
+
+The detail pane of the desktop logbook has five tabs: Informations, Équipement, Gaz, Notes and Carte. Every grey field is edited in place with one click and saved at once, as in `bureau-carnet-edition-sur-place`.
+
+Mock-ups, in `docs/mockups/`, canvas « OpenDives — Version Alpha »:
+
+1. **Informations: `bureau-carnet-colonnes`.** This is the reference for this tab. The other desktop mock-ups that show it (`bureau-carnet-edition-sur-place`, `-macos`, `-profil-droite`, `bureau-carnets-menu-fichier-macos`, `bureau-compte`, `bureau-premier-lancement-alpha-*-carnet`, `bureau-reglages-macos`) still have the old list: follow `bureau-carnet-colonnes`, not them.
+   - The site is a card at the top: a pin in a blue circle, the site name, its country and number of dives, and a chevron that opens the site's sheet.
+   - Then two columns with a label above each field: « Compagnons » and « Moniteur », then « Type d'eau » and « Visibilité ».
+   - « Type d'eau » is a segmented button, « Eau douce » / « Eau salée », with a check on the selected segment. Never radio buttons.
+   - « Visibilité » is five stars, from 1 to 5, with « Non notée » when empty.
+   - « Combinaison » and « Ordinateur » are no longer in this tab. They are in Équipement.
+2. **Équipement: `bureau-carnet-onglet-equipement`.**
+   - « Ordinateurs de plongée »: the main computer with its serial number, and an empty field to add another.
+   - « Protection et lest »: Combinaison, Sous-vêtement and Lest. **A dive can have several weights**: each is a chip with its place and its weight (« Ceinture 5 kg », « Intégré 3 kg »), then « Ajouter », then the total at the right (« total 8 kg »). Chips wrap to a second line when there are many.
+   - « Autre équipement »: two columns of tiles. Each tile has an icon in a blue circle, the name and a ✕ that removes the item from this dive. A dashed tile « + Ajouter de l'équipement » ends the grid. **Subsurface does not store this list.** Build the interface, but ask Christian where the data is kept before wiring it.
+3. **Gaz: `bureau-carnet-onglet-gaz`.**
+   - One card per cylinder, using the current cylinder drawing (rounded shoulders and neck, as in `android-edition-bouteille`), followed by a dashed « Ajouter une bouteille » card.
+   - The colours are the mobile ones: gas at the start #CFDEF0, gas left at the end a gradient from #A9C4E2 to #5584B5, dashed level lines #C62828. The legend uses the same colours.
+   - The selected card has a neutral background (#F5F4F0) and a dark 2 dp outline, not blue.
+   - Under the cards: the fields of the selected cylinder (Bouteille, Mélange, Pression).
+   - Then a « Consommation » card: SAC, litres breathed, bar used, and a bar with the reserve mark.
+4. **Notes: `bureau-carnet-onglet-notes`.** The notes, as drawn.
+5. **Carte: `bureau-carnet-onglet-carte`.** The map, as drawn. It keeps its height (`flex: none`) and does not shrink.
+
+**Test:**
+- Each tab shows the content of its mock-up for the selected dive.
+- A grey field opens in place and saves on Enter or when the focus leaves it.
+- In Informations, the segmented button changes the water type, and a star sets the visibility.
+- With three weights, the chips wrap and the total is right.
+- The Gaz tab shows one card per cylinder, and selecting a card shows its fields.
