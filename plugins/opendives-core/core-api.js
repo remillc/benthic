@@ -609,6 +609,12 @@ export { waterTypeOf };
  *   imported (EditResult), one undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
  * @property {(options: {path: string}) => Promise<void>} discardImport
  *   Deletes a downloaded file (cancelled or failed import).
+ * @property {(options: {name: string}) => Promise<{path: string, created: boolean}>} createIcloudLogbook
+ *   iOS only (task 2026-11-16-261): the logbook `name` (a file name) is created in the OpenDives folder of the
+ *   app's iCloud Drive container, which uses the device's Apple account, so there is no sign-in. `path` is the
+ *   folder's path; `created` is false when it already existed. Rejects with NOT_AVAILABLE (Android, or iCloud Drive
+ *   turned off or signed out on the iPhone) or BAD_REQUEST (empty name). Only the iOS side has an implementation;
+ *   the JavaScript calls it on an iPhone only.
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
  * @property {(options: {action: 'count'|'import'}) => Promise<any>} deviceLog
  *   The dives logged on this device without an account: "count" ({count}),
@@ -848,6 +854,7 @@ export const OpenDivesCore = {
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),
+  createIcloudLogbook: (options) => native.createIcloudLogbook(options),
   async importCsv(options) {
     const result = await native.importCsv({ ...options, params: JSON.stringify(options.params) });
     return JSON.parse(result.json);

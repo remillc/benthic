@@ -111,5 +111,18 @@
 	<array>
 		<string>org.opendives.app.maps-download</string>
 	</array>
+	<!-- The app's iCloud Drive folder shows in the Files app as « OpenDives » (task 2026-11-16-261). -->
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.org.opendives.app</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>OpenDives</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
 </dict>
 </plist>
