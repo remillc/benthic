@@ -57,11 +57,20 @@
       /* Tablet: pinned to the bottom of the page. */
       @media (min-width: 768px) {
         position: absolute;
-        left: 50%;
+        left: var(--od-help-link-left, 50%);
         bottom: calc(var(--f7-safe-area-bottom) + 28px);
         margin: 0;
         transform: translateX(-50%);
         white-space: nowrap;
+      }
+    }
+
+    /* Beside the blue panel of the tablet's first launch (task 2026-11-16-237): in the middle of the choices' side. */
+    :global(.od-first-panelled) {
+      --od-help-link-left: calc(min(700px, 55%) + (100% - min(700px, 55%)) / 2);
+
+      @media (orientation: portrait) {
+        --od-help-link-left: 50%;
       }
     }
 

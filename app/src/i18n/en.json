@@ -150,7 +150,8 @@
       "one": "The dive is removed from the logbook, on this device and in the repository. You can undo for a few seconds.",
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     },
-    "emptyLocal": "On this phone only, no dives"
+    "emptyLocal": "On this phone only, no dives",
+    "emptyLocalTablet": "On this tablet only, no dives"
   },
   "sync": {
     "failure": {
@@ -1868,6 +1869,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android tablets: the steps (Subsurface account, account creation, no account) keep the blue panel, with « this tablet » in the texts, and the logbook opens with a message at the bottom left.",
+      "First launch on Android tablets: a blue panel on the left (at the top in portrait) with a dive profile that draws itself when the screen opens, and the three ways to start beside it.",
       "Tablet: in a dive profile, the depth line and the temperature curve are thinner (1 dp).",
       "First launch on Android phones: a blue banner with the dive profile, then the same banner, smaller, on every step (Subsurface account, account creation, no account), with a « Back » link.",
       "First launch: after signing in, the download screen shows three steps with the progress of the dives, then the logbook opens with a message.",
@@ -3401,7 +3404,9 @@
       "intro": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this phone.",
       "email": "Email address",
       "passwordText": "Kept only in the secure storage of this phone.",
-      "invalidEmail": "This email address is not valid."
+      "invalidEmail": "This email address is not valid.",
+      "introTablet": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this tablet.",
+      "passwordTextTablet": "Kept only in the secure storage of this tablet."
     },
     "create": {
       "intro": "Free. A code is sent to you by email to confirm the address.",
@@ -3414,7 +3419,8 @@
       "count": "{n} of {total}",
       "copy": "Copying the logbook to this phone",
       "note": "Keep the app open until it is done. Then your logbook opens, and you can read it offline.",
-      "progressLabel": "Downloading the dives"
+      "progressLabel": "Downloading the dives",
+      "copyTablet": "Copying the logbook to this tablet"
     },
     "local": {
       "intro": "Your logbook is created right away, with no sign-up.",
@@ -3424,12 +3430,22 @@
       "noBackupText": "If you lose or change your phone, the logbook is lost.",
       "later": "You can link it later",
       "laterText": "To a Subsurface account or to your git repository, from Account. Your dives follow.",
-      "start": "Start"
+      "start": "Start",
+      "phoneOnlyTablet": "On this tablet only",
+      "noBackupTextTablet": "If you lose or change your tablet, the logbook is lost."
     },
     "snackbar": {
       "downloaded": "Logbook downloaded. It stays on this phone, even offline.",
       "created": "Account created. Your logbook is ready.",
-      "local": "Logbook created on this phone."
-    }
+      "local": "Logbook created on this phone.",
+      "downloadedTablet": "Logbook downloaded. It stays on this tablet, even offline.",
+      "localTablet": "Logbook created on this tablet."
+    },
+    "tabletStart": "Get started",
+    "profileLabel": "Dive profile",
+    "profileDepthValue": "32.4 m",
+    "profileDepthCaption": "Max. depth",
+    "profileDurationValue": "54 min",
+    "profileDurationCaption": "Duration · Nitrox 32 %"
   }
 }
