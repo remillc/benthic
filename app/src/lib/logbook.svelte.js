@@ -11,6 +11,7 @@ import { nextProgress } from './sync-progress.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
+import { importPayload } from './import-files.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -359,6 +360,25 @@ export async function importFile(file) {
     reader.readAsDataURL(file);
   });
   return importData(file.name, String(data));
+}
+
+/**
+ * Several files chosen together, imported as one undoable step: a Suunto app .json and the .fit
+ * with the same base name give one dive, the other files are read on their own. One file goes
+ * through importFile, unchanged.
+ * @param {File[]} files
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importFiles(files) {
+  if (files.length === 1) return importFile(files[0]);
+  const before = logbook.dives.length;
+  const result = await OpenDivesCore.importDivesFiles({ files: await importPayload(files) });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
 }
 
 /**

@@ -75,7 +75,11 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
+<<<<<<< HEAD
         CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
+=======
+        CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
+>>>>>>> origin/main
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "syncConflicts", returnType: CAPPluginReturnPromise),
@@ -574,6 +578,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+<<<<<<< HEAD
     /// A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
     /// `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is the
     /// mapping as JSON text. With `dryRun` nothing is added and the answer is the preview; otherwise the dives
@@ -593,6 +598,34 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
             let companion = companionPath.isEmpty ? "" : (stagedImport(companionPath)?.path ?? "")
             call.resolve(["json": try OpenDivesNative.importCsv(file: file.path, companion: companion, params: params, source: importName, dryRun: dryRun)])
+=======
+    /// Several files chosen together: "files" is a list of {name, data} (base64, original name).
+    /// They go to one temporary folder, so that a Suunto app .json and the .fit with the same
+    /// base name are read as one dive; the other files are read on their own.
+    @objc func importDivesFiles(_ call: CAPPluginCall) {
+        guard let items = call.getArray("files") as? [[String: Any]], !items.isEmpty else {
+            call.reject("Missing files", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            let dir = cacheDir.appendingPathComponent("import").appendingPathComponent(UUID().uuidString)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: dir) }
+            var paths: [String] = []
+            for (i, item) in items.enumerated() {
+                var name = ((item["name"] as? String ?? "") as NSString).lastPathComponent
+                if name.isEmpty { name = "import-\(i).xml" }
+                guard let data = item["data"] as? String,
+                      let bytes = Data(base64Encoded: data, options: .ignoreUnknownCharacters) else {
+                    throw Failure("CORE_ERROR", "Invalid base64 data")
+                }
+                let file = dir.appendingPathComponent(name)
+                try bytes.write(to: file)
+                paths.append(file.path)
+            }
+            let source = paths.count == 1 ? (paths[0] as NSString).lastPathComponent : "multiple files"
+            call.resolve(["json": try OpenDivesNative.importDivesFiles(files: paths, source: source)])
+>>>>>>> origin/main
         }
     }
 

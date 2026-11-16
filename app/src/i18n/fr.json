@@ -974,6 +974,8 @@
   },
   "welcome": {
     "title": "OpenDives",
+    "beta": "Bêta",
+    "brandBeta": "OpenDives, bêta",
     "noAccount": "Commencer sans compte",
     "choicesLabel": "Façons de commencer",
     "ownGit": "Utiliser mon propre dépôt git",
@@ -2016,6 +2018,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement : un badge « Bêta » suit le nom OpenDives.",
+      "Importer un fichier : vous pouvez en choisir plusieurs à la fois. Un .json de l’app Suunto et le .fit du même nom sont lus comme une seule plongée, avec le mélange gazeux et les facteurs de gradient du .fit.",
       "Icône de l’app sur iPhone, iPad et Mac : bleue jusqu’au bord, avec la vague, sans fond blanc.",
       "Icône de l’app sur Android : le disque bleu remplit toute l’icône, sans anneau blanc autour.",
       "Carnet vide : le bouton principal devient « Télécharger mes plongées », avec une icône d’ordinateur de plongée ; l’association de l’ordinateur se fait pendant le téléchargement.",

@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 85
+Next number: 86
 
 ## List
 
@@ -19,7 +19,7 @@ Next number: 85
 - #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download ; et (ex-#7) Mettre /plan sous /tools
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
 - #32 [code] tablette : sur une petite tablette en paysage, le dialogue de /welcome défile. On ne veut pas de défilement dans ce dialogue. Même bogue que l'ex-#31, que Claude VC a traité avec la tâche 2026-11-10-18 : à vérifier sur une petite tablette, puis supprimer.
-- #34 [site] décider où annoncer les APK gratuits (page « Télécharger » du site `site/`, README et versions GitHub, F-Droid plus tard ; la fiche du store seulement après avoir relu ses règles). Pas dans l'app.
+- #34 [site] un endroit qui explique que les apps OpenDives et leurs sources sont toujours disponibles gratuitement à partir du dépôt GitHub du projet (précisé par Christian le 16 novembre 2026). Décider où : page « Télécharger » ou « À propos » du site `site/`, README et versions GitHub, F-Droid plus tard ; la fiche du store seulement après avoir relu ses règles. Pas dans l'app.
 - #35 [design] indiquer quelque part (À propos, aide ou écran d'erreur ?) que pour les problèmes du cœur du carnet (lecture des ordinateurs de plongée, format des fichiers, calculs) on peut s'adresser au forum de Subsurface. Trouver une formulation pour l'utilisateur, sans parler de « fonctions core ».
 - #40 [design] Améliorer les vues pour le workflow de download des données d'un ordinateur de plongée. Doit être plus jazzé. Ce n'est pas clair qu'il faille sélectionner l'ordinateur de plongée pour que le téléchargement démarre.
 - #44 [code] Devrait-on générer les fichiers multilingues pour couvrir toutes les langues de SS? Notes : Subsurface a 36 fichiers de traduction (translations/subsurface_*.ts), soit 34 langues ou variantes : bg_BG, ca, cs, da_DK, de_CH, de_DE, el_GR, en_GB, en_US, es_ES, et_EE, fi_FI, fr_FR, he, hr_HR, hu, id, it_IT, ja_JP, ko_KR, lv_LV, nb_NO, nl_NL, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, sv_SE, tr, vi, zh_TW. OpenDives n'a que en, fr et fr-CA. Ces fichiers ne serviraient qu'aux mots communs aux deux apps (noms de champs, termes de plongée) : la plupart des textes d'OpenDives sont nouveaux et absents de Subsurface. Une seule langue de Subsurface se lit de droite à gauche : l'hébreu (he). L'ajouter demande d'afficher toute l'interface en miroir (flèche ← à droite, menus, listes et chevrons inversés), en gardant chiffres, unités et profils de gauche à droite. Framework7 et Android le gèrent, mais il faudrait vérifier chaque écran.

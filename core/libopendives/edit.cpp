@@ -4065,6 +4065,37 @@ int import_csv(const std::string &file, const std::string &companion, const std:
 	if (dry_run) {
 		result_json = csv_preview_json(log);
 		return 0;
+
+int import_dives_files(const std::vector<std::string> &files, const std::string &source, std::string &result_json,
+		       std::string &error)
+{
+	if (files.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	if (files.size() == 1)
+		return import_dives(files[0], source, result_json, error);
+	if (check_writable_log(error))
+		return -1;
+	struct divelog log;
+	std::string loaded = loaded_git_commit;
+	// MainWindow::importFiles(): the Suunto .json and .fit with the same base name are read as one
+	// dive first, then every file not used by a pair is read on its own.
+	std::vector<bool> consumed(files.size(), false);
+	suunto_json_fit_pair_import(files, consumed, &log);
+	size_t failed = 0, read = 0;
+	for (size_t i = 0; i < files.size(); i++) {
+		if (consumed[i])
+			continue;
+		read++;
+		// Subsurface keeps whatever dives parse_file() found, and ignores a file that fails.
+		if (internal::read_import_file(files[i], log))
+			failed++;
+	}
+	loaded_git_commit = loaded;
+	if (log.dives.empty()) {
+		error = read && failed == read ? "IMPORT_FAILED" : "NO_DIVES";
+		return -1;
 	}
 	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
 }

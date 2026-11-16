@@ -36,6 +36,9 @@
     --od-on-secondary: #FFFFFF;
     --od-secondary-container: #D4E2F2;
     --od-on-secondary-container: #0B2440;
+    /* The « Bêta » badge of the first launch (task 2026-11-16-225). */
+    --od-beta-badge: #DCE7F3;
+    --od-on-beta-badge: #114477;
     /* Tertiary: rust and sand, for data series other than the water (temperature, statistics charts). */
     --od-tertiary: #B4530F;
     --od-on-tertiary: #FFFFFF;
@@ -291,6 +294,8 @@
     --od-on-secondary: #0B2440;
     --od-secondary-container: #1E3552;
     --od-on-secondary-container: #D4E2F2;
+    --od-beta-badge: #1E3552;
+    --od-on-beta-badge: #D4E2F2;
     --od-tertiary: #F0A66B;
     --od-on-tertiary: #3D2200;
     --od-tertiary-container: #4A3216;

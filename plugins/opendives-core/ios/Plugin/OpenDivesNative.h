@@ -131,12 +131,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)importDives:(NSString *)file
 			    source:(NSString *)source
 			     error:(NSError **)error NS_SWIFT_NAME(importDives(file:source:));
+<<<<<<< HEAD
 + (nullable NSString *)importCsv:(NSString *)file
 		       companion:(NSString *)companion
 			  params:(NSString *)params
 			  source:(NSString *)source
 			  dryRun:(BOOL)dryRun
 			   error:(NSError **)error NS_SWIFT_NAME(importCsv(file:companion:params:source:dryRun:));
+=======
++ (nullable NSString *)importDivesFiles:(NSArray<NSString *> *)files
+				  source:(NSString *)source
+				   error:(NSError **)error NS_SWIFT_NAME(importDivesFiles(files:source:));
+>>>>>>> origin/main
 + (nullable NSString *)filterPresets:(NSString *)action
 				name:(NSString *)name
 			    fulltext:(NSString *)fulltext

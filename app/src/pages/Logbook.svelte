@@ -35,7 +35,7 @@
   import CsvImportDialog from '../components/CsvImportDialog.svelte';
   import { pickCsvFiles } from '../lib/csv-import.js';
   import { guardedAdd } from '../lib/demo.svelte.js';
-  import { logbook, loadLogbook, importFile, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFiles, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
   import { canMerge } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -1141,10 +1141,10 @@
   }
 
   async function fileChosen() {
-    const files = fileInput?.files;
-    const picked = files ? pickCsvFiles(files) : null;
-    const file = picked?.csv ?? files?.[0];
-    if (!file || !fileInput) return;
+    // Several files at once (a Suunto .json and its .fit are read as one dive); a .csv opens the CSV dialog.
+    const files = Array.from(fileInput?.files ?? []);
+    if (!files.length || !fileInput) return;
+    const picked = pickCsvFiles(files);
     fileInput.value = '';
     if (picked) {
       csv = { file: picked.csv, companion: picked.companion };
@@ -1152,7 +1152,7 @@
     }
     importing = true;
     try {
-      const n = await importFile(file);
+      const n = await importFiles(files);
       offerUndo(t('logbook.imported', { n }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');

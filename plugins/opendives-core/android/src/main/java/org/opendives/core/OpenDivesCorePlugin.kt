@@ -1132,6 +1132,36 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /**
+     * Several files chosen together (import_dives_files): "files" is a list of
+     * {name, data} (base64 contents, original name). They are written to one
+     * temporary folder, so that a Suunto app .json and the .fit with the same
+     * base name are read as one dive; the other files are read on their own.
+     */
+    @PluginMethod
+    fun importDivesFiles(call: PluginCall) = onCoreThread(call) {
+        val list = call.getArray("files")
+        if (list == null || list.length() == 0) {
+            call.reject("Missing files", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        val dir = File(context.cacheDir, "import/" + System.nanoTime()).apply { mkdirs() }
+        try {
+            val paths = mutableListOf<String>()
+            for (i in 0 until list.length()) {
+                val item = list.getJSONObject(i)
+                val name = File(item.optString("name")).name.ifEmpty { "import-$i.xml" }
+                val file = File(dir, name)
+                file.writeBytes(Base64.decode(item.optString("data"), Base64.DEFAULT))
+                paths.add(file.absolutePath)
+            }
+            val source = if (paths.size == 1) File(paths[0]).name else "multiple files"
+            call.resolve(JSObject().put("json", NativeCore.importDivesFiles(paths.toTypedArray(), source)))
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
+
+    /**
      * The dives logged on this device without an account (its own log), once
      * an account is used: "count" reads them apart; "import" adds them to the
      * account's log in memory as one undoable step (import_dives, Subsurface's

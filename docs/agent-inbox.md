@@ -4174,7 +4174,7 @@ Mock-ups:
 
 **Done:** on `feature/release-new-logbook` (release edition only, `main` and the beta untouched). The list of formats is one data file, `app/src/lib/import-formats.js` (18 entries, each a « works » line of `docs/import-formats.md`: 4 in « Formats ouverts », 10 in « Montres et ordinateurs de plongée », 4 in « Autres carnets »); the help line (« 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. ») and the dialog text take their number from its length, CSV is not named. `ImportFormats.svelte` holds the link « Voir les formats acceptés » (14 sp, `--od-release-link` = #1F5C99, underlined, hand, hover) and the basic dialog on `Md3Dialog` (no ✕, « Fermer » bottom right, scrim, Escape and Back). The « Ce fichier n’a pas pu être lu » block now exists on the source screen (it was a system dialog before). Test: `tests/app/import-formats.test.mjs` (parses the report). Differences from the mock-ups: only the working formats are listed (the mock-up lists more), the third column title wraps, « Fermer » is the release blue as in the mock-up.
 
-## [ ] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
+## [x] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
 
 Christian approved these mock-ups on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-first-launch-complete`, started from `feature/release-new-logbook` (tasks 218 and 223). Do not merge it into `main`. The beta on `main` stays unchanged. Tablets only; the phone comes later (to-do #84).
 
@@ -4263,5 +4263,93 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
 
+<<<<<<< HEAD
 Done (parts 7–8): branch `feature/release-csv-demo` (from `feature/release-first-launch-complete`). Demo logbook: `lib/demo.js`, `lib/demo.svelte.js`, `components/DemoHost.svelte` (banner, `demo-quitter`, `demo-ajout`); no account means no sync, device dives are never offered to an account while it is open, and the account routes open the exit dialog. CSV: façade `import_csv()` (`opendives.h`), plugin `importCsv` (Kotlin, JNI, Swift, `core-api.js`), `components/CsvImportDialog.svelte`, `lib/csv-import.js`, `lib/csv-dialog.js`; `parse_seabear_header()` ported in `core/compat/qthelper_compat.cpp`; CSV added to `docs/import-formats.md` and `lib/import-formats.js`. Tests: `tests/import_csv_test.cpp` (`build/poc/import-csv`), `tests/app/csv-import.test.mjs`, `tests/app/demo-logbook.test.mjs`.
 
+=======
+Done on `feature/release-first-launch-complete` (not merged): parts 1–6 (portrait for every step, cloud connection states, WebDAV, the errors, the formats dialog, the tablet empty logbook and its menu) and parts 7–8 (the demo logbook; the three-step CSV import through a new façade call `import_csv`, Seabear, Sensus, Poseidon MkVI and hand-mapped files; CSV added to `docs/import-formats.md` and the formats list, 19 formats). Waiting for native work: « Reprendre » for divelogs.de (a list call and a download of chosen ids), the personal cloud (#74), WebDAV, « Renommer le carnet » and « Changer d’endroit ».
+
+## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
+
+Christian approved this on 16 November 2026. **Beta only:** do it on `main`. Do not touch the release-edition branches.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
+
+- On the first-launch screen (`/welcome`), a badge follows the name « OpenDives » in the brand row:
+  - the text « Bêta » (« Beta » in `en.json`), in capitals, 14 sp, bold, letter spacing 0.8;
+  - text #114477 on #DCE7F3, a full pill (3 dp × 10 dp padding);
+  - 8 dp after the name.
+- The badge is decorative: put the text in the accessible name of the brand row (« OpenDives, bêta »), not a separate stop for screen readers.
+- Use the same screen on phones, tablets and desktop; the badge follows the name wherever the brand row appears on this screen.
+
+**Test:** on a tablet in both orientations and on a phone, the badge sits on the name's line, 8 dp away, without wrapping; TalkBack reads « OpenDives, bêta » once.
+
+Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.
+
+## [ ] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-formats-link`, started from `feature/release-first-launch-complete` (task 224). Do not merge it into `main`.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{paysage,portrait}.dc.html` and `…-importer-fichier-erreur-{paysage,portrait}.dc.html`.
+
+- On « Importer un carnet » and on the « fichier illisible » error screen, the link « Voir les formats acceptés » moves from under both choice rows to **right under the « Un fichier » row**, before « divelogs.de ».
+- The link is a 48 dp tall touch target (the text stays 14 sp, #1F5C99, underlined, 4 dp padding on each side). The space between the target and each row is 4 dp, so the text sits about 18 dp from both rows. Everything stays on the 4 dp grid.
+- The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
+
+**Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
+
+## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-phone-first-launch`, started from `feature/release-formats-link` (task 226). Do not merge it into `main`. The beta on `main` stays unchanged.
+
+Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.html` (390 × 844). They are the phone versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors. Only the layout changes.
+
+**Layout on a phone (width under 600 dp):**
+- **First step** (`android-premier-lancement-production.dc.html`):
+  - a blue band 330 dp tall at the top, with the logo (40 dp), « OpenDives » (24 sp), « Votre carnet de plongée, sur tous vos appareils. » (26 sp), the line under it (14 sp) and the decorative profile, scaled down and 24 dp from both edges;
+  - below it, « Pour commencer », the three choice rows and « Essayer avec un carnet d’exemple ».
+- **Every other step:** a blue band 96 dp tall with the logo (32 dp) and « OpenDives » (20 sp), then the step's column.
+- **The column:** 20 dp side padding, content from the top (not centred). Page titles are 24 sp.
+- **Buttons** take the full width of the column.
+- **The link band** (OpenDives ↔ service): 64 dp tiles and a 56 dp line.
+- **« Une question ? À propos et contact »** comes after the content, at the bottom of the screen when there is room. When the content is taller than the screen (« Importer › nouveau carnet »), the page scrolls and the link follows the content.
+- **Texts:** « cette tablette » becomes « ce téléphone » (« Seulement sur ce téléphone », « Le jeton reste sur ce téléphone. », « Il reste sur ce téléphone. »).
+- **« Formats acceptés »:** the same basic dialog, 358 dp wide, with the three cards stacked. The list scrolls inside the dialog, and « Fermer » stays visible.
+- **« Voir les formats acceptés »** sits under « Un fichier », as a 48 dp target (task 226).
+- **Motion between steps:** the same shared-axis X transition as on the tablet.
+
+**Test:**
+- On a phone, in portrait, every screen matches its mock-up. Nothing touches the screen edges, and nothing is cut off; long screens scroll.
+- « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
+- On a tablet, nothing changes.
+- The beta on `main` is untouched.
+
+## [ ] 2026-11-16-228 Release edition: the first launch on the desktop
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-desktop-first-launch`, started from `feature/release-phone-first-launch` (task 227). Do not merge it into `main`. On `main`, the beta keeps its current window without a logbook (task 222).
+
+Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.html` (a 1440 × 900 window). They are the desktop versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors.
+
+**Layout:**
+- The window without a logbook becomes « Pour commencer ».
+- The blue panel (700 dp) is on the left and the steps are in the right-hand column, as on a tablet in landscape.
+- The panel is decorative and keeps the window's full height.
+- The motion between steps is the same shared-axis X transition.
+
+**Desktop-only details:**
+- « cette tablette » becomes « cet ordinateur »: « Seulement sur cet ordinateur », « Le jeton reste sur cet ordinateur. », « Il reste sur cet ordinateur. ».
+- Under the choices of « Pour commencer » and of « Importer un carnet », add the line « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ». Dropping a file on the window starts the import with that file, as « Un fichier » does.
+- **iCloud Drive (note from Christian):**
+  - On macOS only, iCloud Drive also appears in the list of services: « Choisissez votre service » (create) and « Dans quel service ? » (open).
+  - Windows and Linux do not show it.
+  - iCloud Drive uses the Mac's own account, so there is no sign-in screen: after the choice, go straight to the connected screen, with the OpenDives folder of iCloud Drive.
+- « Voir les formats acceptés » sits under « Un fichier », as a 48 dp target (task 226).
+- The « Une question ? À propos et contact » link opens the desktop About page.
+- **Not drawn yet (to-do #83):** the list of recent logbooks above the choices, in a new window or after « Fermer le carnet ». Until it is drawn, keep what the desktop app does today for recent logbooks, if anything.
+
+**Test:**
+- On Windows, macOS and Linux, every screen matches its mock-up at 1440 × 900 and still fits at the smallest window size the app allows.
+- iCloud Drive shows only on macOS.
+- Dropping a `.ssrf` or `.xml` file on the window imports it.
+- The beta on `main` is untouched.
+>>>>>>> origin/main
