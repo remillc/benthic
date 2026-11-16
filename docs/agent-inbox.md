@@ -4411,7 +4411,7 @@ Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approve
 
 **Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
 
-## [ ] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
+## [x] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
 
 Christian decided this on 16 November 2026. The app on `main` (with the Subsurface account) is the **alpha**. The word « bêta » now names the next edition, the one without Subsurface.
 
@@ -4421,6 +4421,8 @@ Christian decided this on 16 November 2026. The app on `main` (with the Subsurfa
 - Do not touch the release-edition branches.
 
 **Test:** the first-launch screen shows « ALPHA » next to the name on phones, tablets and the desktop; TalkBack reads « OpenDives, alpha » once.
+
+Done on main: the badge of task 225 now says « Alpha » (fr and en) and the brand row is named « OpenDives, alpha »; look, size and place unchanged; the release note of 225 updated. The desktop shows the same first-launch screen in a narrow window; its window without a logbook (task 222) has no badge.
 
 ## [ ] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
 

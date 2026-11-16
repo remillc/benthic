@@ -48,15 +48,15 @@ test('tablet first launch: the profile stays off the screen edges in both orient
   assert.match(portrait, /\.od-welcome-start--head \{[^}]*max-width: 520px;/);
 });
 
-test('task 225: a « Bêta » badge follows the name, read once as « OpenDives, bêta »', () => {
+test('tasks 225 and 229: an « Alpha » badge follows the name, read once as « OpenDives, alpha »', () => {
   const fr = JSON.parse(readFileSync(new URL('../../app/src/i18n/fr.json', import.meta.url), 'utf8'));
   const en = JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8'));
-  assert.equal(fr.welcome.beta, 'Bêta');
-  assert.equal(en.welcome.beta, 'Beta');
-  assert.equal(fr.welcome.brandBeta, 'OpenDives, bêta');
-  assert.match(source, /class="od-welcome-start--brand" role="img" aria-label=\{t\('welcome\.brandBeta'\)\}/);
-  assert.match(source, /<span class="od-welcome-start--name" aria-hidden="true">OpenDives<span class="od-welcome-start--beta">/);
-  assert.match(source, /\.od-welcome-start--beta \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
+  assert.equal(fr.welcome.alpha, 'Alpha');
+  assert.equal(en.welcome.alpha, 'Alpha');
+  assert.equal(fr.welcome.brandAlpha, 'OpenDives, alpha');
+  assert.match(source, /class="od-welcome-start--brand" role="img" aria-label=\{t\('welcome\.brandAlpha'\)\}/);
+  assert.match(source, /<span class="od-welcome-start--name" aria-hidden="true">OpenDives<span class="od-welcome-start--alpha">/);
+  assert.match(source, /\.od-welcome-start--alpha \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
   const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');
-  assert.match(theme, /--od-beta-badge: #DCE7F3;\s*--od-on-beta-badge: #114477;/);
+  assert.match(theme, /--od-alpha-badge: #DCE7F3;\s*--od-on-alpha-badge: #114477;/);
 });
