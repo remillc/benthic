@@ -41,11 +41,11 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 .odpl-line,.odpl-glow{stroke-dasharray:1;animation:odpl-draw 2.2s cubic-bezier(.4,0,.2,1) both}
 .odpl-dot{animation:odpl-pop .3s .7s cubic-bezier(.2,0,0,1) both}
 .odpl-chip{animation:odpl-in .5s 2.1s cubic-bezier(.2,0,0,1) both}
-/* Mock-up only: the « Rejouer » control restarts the sequence by switching to identical keyframes. */
+/* Mock-up only, not part of the design: the « Rejouer » control appears when the pointer is over the blue panel and restarts the sequence by switching to identical keyframes. */
 #odpl-replay:checked ~ div .odpl-line,#odpl-replay:checked ~ div .odpl-glow{animation-name:odpl-draw2}
 #odpl-replay:checked ~ div .odpl-dot{animation-name:odpl-pop2}
 #odpl-replay:checked ~ div .odpl-chip{animation-name:odpl-in2}
-.odpl-replay{cursor:pointer}.odpl-replay:hover{background:rgba(255,255,255,0.22)}
+.odpl-replay{cursor:pointer;opacity:0;transition:opacity .2s}div:hover > .odpl-replay{opacity:1}.odpl-replay:hover{background:rgba(255,255,255,0.22)}
 .odpl-row{transition:transform .15s, box-shadow .15s}.odpl-row:hover{transform:translateY(-1px)}
 @media (prefers-reduced-motion: reduce){.odpl-line,.odpl-glow,.odpl-dot,.odpl-chip{animation:none}}
 </style><div aria-hidden="true" style="position: absolute; left: 0; top: 0; right: 0; height: 24px; padding: 0 16px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; z-index: 2"><span style="flex: 1; color: #FFFFFF">10 h 30</span><svg width="15" height="12" viewBox="0 0 15 12"><path d="M7.5 11.5L0 3a11 11 0 0 1 15 0z" style="fill: #FFFFFF"></path></svg><svg width="9" height="14" viewBox="0 0 9 14"><rect x="0" y="1.5" width="9" height="12.5" rx="1.5" style="fill: #FFFFFF"></rect><rect x="3" y="0" width="3" height="2" style="fill: #FFFFFF"></rect></svg></div><div style="position: relative; width: 800px; height: 640px; flex: none; overflow: hidden; background: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)">
