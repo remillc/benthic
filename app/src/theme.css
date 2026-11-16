@@ -181,6 +181,13 @@
     /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
     --od-heat-spot-mid: #3FA0E0;
     --od-heat-spot-edge: #2F86DE;
+    /* The hatched dark blue of the first launch's phone bands (tasks 2026-11-16-233, 234, 236 and 244; the same names
+       and values as the alpha): the welcome hero and the header of the steps. Fixed blue, light and dark. */
+    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --od-on-first-band: #FFFFFF;
+    --od-on-first-band-2: rgb(255 255 255 / 0.78);
     /* First launch of the release edition (task 2026-11-15-213): the blue panel's vertical gradient, the soft
        light at its top left, its faint bands, the glow under the profile and the frosted chips. The panel is
        the same blue in dark mode (white text on it: 7.7:1 at the lightest stop). */
@@ -255,9 +262,6 @@
     /* The light centre above the top edge (contrast audit, task 2026-11-14-153): -20 % on phones,
        -30 % from 600 dp (below). White text on the band 5.3:1 and more. */
     --od-band-gradient: radial-gradient(140% 115% at 38% -20%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
-    /* The release edition's first launch on phones (task 2026-11-16-230): the same band, its light centre raised to -40 %
-       so that white text keeps 4.5:1 everywhere on it. */
-    --od-release-band-gradient: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
     /* Paper grain over the band (tasks 2026-11-13-108 and 109, system design « Paper grain on the header
        band »): a 256 px tile drawn once by the browser and repeated, no live filter while scrolling. */
     --od-band-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='7' stitchTiles='stitch' result='n'/><feDiffuseLighting in='n' lighting-color='%23FFFFFF' surfaceScale='1'><feDistantLight azimuth='45' elevation='55'/></feDiffuseLighting><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.18 0 0 0 0.155'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");

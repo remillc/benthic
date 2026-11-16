@@ -8,8 +8,6 @@
   // chosen for the edition is pages/WelcomeEntry.svelte.
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
-  import SectionBand from '../components/SectionBand.svelte';
-  import { layout } from '../lib/layout.svelte.js';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
   import { flow } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -31,14 +29,9 @@
 <Page class="od-welcome-release" noToolbar>
   <div class="od-welcome-release--page">
     <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
-      {#if layout.phone}
-        <!-- Phone (task 2026-11-16-230): the app's own section band, with its faint profile and its wave. -->
-        <SectionBand>{@render panelContent()}</SectionBand>
-      {:else}
-        <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
-        <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
-        {@render panelContent()}
-      {/if}
+      <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
+      <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
+      {@render panelContent()}
     </section>
 
     <FirstLaunchSteps {f7router} />
@@ -175,11 +168,11 @@
 
     }
 
-    /* Phone (tasks 2026-11-16-227 and 230; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):
-       the app's section band across the top (SectionBand: its gradient with the light centre raised to -40 %, the
-       faint profile, the wave), 330 dp on the first step (the status bar's 24 dp included) and 108 dp on the others,
-       and the page scrolls as one when a step is taller than the screen. The first-step band grows when its texts
-       need more room, so that nothing is cut off. */
+    /* Phone (tasks 2026-11-16-227, 230 and 244; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):
+       the hatched dark blue of the alpha across the top (--od-first-band, its sheen and its hatching; no wave, no faint
+       profile, a straight bottom edge), 330 dp on the first step (the status bar's 24 dp included) and 140 dp on the
+       others, and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
+       texts need more room, so that nothing is cut off. */
     @media (max-width: 767.98px) {
       .od-welcome-release--page {
         height: auto;
@@ -187,33 +180,30 @@
       }
 
       .od-welcome-release--panel {
-        display: block;
+        --od-welcome-band-top: max(var(--f7-safe-area-top, 0px), 24px);
+        display: flex;
+        flex-direction: column;
         flex: none;
         width: auto;
         height: auto;
-        padding: 0;
-        overflow: visible;
-        background: none;
+        min-height: calc(330px - 24px + var(--od-welcome-band-top));
+        padding: calc(var(--od-welcome-band-top) + 16px) 20px 0;
+        overflow: hidden;
+        background: var(--od-first-band);
+        color: var(--od-on-first-band);
+      }
+
+      .od-welcome-release--panel-light {
+        background: var(--od-first-band-sheen);
+      }
+
+      .od-welcome-release--panel-bands {
+        background: var(--od-first-band-hatch);
       }
 
       .od-welcome-release--compact {
         height: auto;
-      }
-
-      .od-welcome-release--panel :global(.od-section-band--band) {
-        --od-band-gradient: var(--od-release-band-gradient);
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        min-height: calc(330px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
-        padding: calc(max(var(--f7-safe-area-top, 0px), 24px) + 16px) 20px 0;
-        background-size: 256px 256px, 100% 100%;
-        background-position: 0 0, 0 0;
-      }
-
-      .od-welcome-release--compact :global(.od-section-band--band) {
-        min-height: calc(108px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
-        padding-bottom: 36px;
+        min-height: calc(140px - 24px + var(--od-welcome-band-top));
       }
 
       .od-welcome-release--brand {
@@ -255,11 +245,12 @@
       .od-welcome-release--intro {
         max-width: none;
         margin: 8px 0 0;
+        color: var(--od-on-first-band-2);
         font-size: 14px;
         line-height: 20px;
       }
 
-      /* 24 dp from both edges (the band's 20 dp padding and 4 dp); above the faint profile and the wave. */
+      /* 24 dp from both edges (the band's 20 dp padding and 4 dp). */
       .od-welcome-release--profile {
         flex: 1;
         min-height: 56px;

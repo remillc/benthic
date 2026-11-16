@@ -29,11 +29,12 @@ test('the phone layout is chosen by the width, the same one as layout.phone', ()
   }
 });
 
-test('the blue band is 330 dp on the first step and 108 dp on the others, the status bar included', () => {
-  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 108 });
+test('the blue band is 330 dp on the first step and 140 dp on the others, the status bar included (task 244: 108 before)', () => {
+  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 140 });
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /min-height: calc\(330px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
-  assert.match(page, /min-height: calc\(108px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
+  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--od-welcome-band-top\)\)/);
+  assert.match(page, /--od-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
   // First step: logo 40 dp, name 24 sp, headline 26 sp, line 14 sp; other steps: logo 32 dp, name 20 sp.
   for (const piece of [/width: 40px;\s+height: 40px/, /width: 32px;\s+height: 32px/, /font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
     assert.match(page, piece);
@@ -65,16 +66,23 @@ test('the profile of the band has no dot and no chips on a phone', () => {
   );
 });
 
-test("the phone band is the app's section band: its gradient with the light centre at 38% -40%, its profile and its wave", () => {
+test("the phone bands are the alpha's hatched dark blue: its tokens, no SectionBand, no wave, a straight bottom edge (task 244)", () => {
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /import SectionBand from '\.\.\/components\/SectionBand\.svelte'/);
-  assert.match(page, /\{#if layout\.phone\}[^]*<SectionBand>\{@render panelContent\(\)\}<\/SectionBand>[^]*\{:else\}/);
-  assert.match(page, /--od-band-gradient: var\(--od-release-band-gradient\)/);
+  assert.doesNotMatch(page, /SectionBand|od-section-band|layout\.phone/);
+  assert.doesNotMatch(page, /od-section-band--wave|release-band-gradient|<svg[^>]*wave/i);
   const theme = read('theme.css');
-  const band = theme.match(/--od-band-gradient: radial-gradient\(([^)]*)\)/)[1];
-  const release = theme.match(/--od-release-band-gradient: radial-gradient\(([^)]*)\)/)[1];
-  // The same gradient, only the light centre is raised.
-  assert.equal(release, band.replace('at 38% -20%', 'at 38% -40%'));
+  assert.doesNotMatch(theme, /--od-release-band-gradient/);
+  const token = (name) => theme.match(new RegExp(`${name}: ([^;]*);`))[1];
+  assert.equal(token('--od-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
+  assert.equal(token('--od-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
+  assert.equal(token('--od-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
+  const phone = page.slice(page.lastIndexOf('@media (max-width: 767.98px)'));
+  assert.match(phone, /background: var\(--od-first-band\)/);
+  assert.match(phone, /od-welcome-release--panel-light \{\s+background: var\(--od-first-band-sheen\)/);
+  assert.match(phone, /od-welcome-release--panel-bands \{\s+background: var\(--od-first-band-hatch\)/);
+  assert.doesNotMatch(phone, /border-radius|clip-path/);
+  // The hatching fades out at 55 % of the height (the tablet panel's rule, shared).
+  assert.match(page, /mask-image: linear-gradient\(180deg, black 0%, transparent 55%\)/);
 });
 
 test('the sign-in hint reads on two lines, centred; the sign-in button is centred on a tablet', () => {
