@@ -4624,3 +4624,36 @@ In the desktop app, the navigation rail always ends with « Réglages » (gear, 
 **Test:** open a window with no logbook. The four sections are dimmed, and « Réglages » and the avatar are at the bottom of the rail and open their screens. Open an empty logbook: the rail shows the same two items.
 
 Done: already the behaviour of the desktop app (`feature/desktop-logbook`), checked in the desktop app at 1440 × 900: with no logbook open, the four sections are at 38 % and unavailable while « Réglages » (Ctrl+, / ⌘,) and the account avatar keep full colour and open Réglages and the account sheet; with a logbook open the rail is the full one with both items. No code change; only the mock-ups lacked the two items.
+
+## [ ] 2026-11-16-241 Desktop release: recent logbooks window, missing logbook, computer icon
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 228, `feature/release-desktop-first-launch`, and never merge it into `main`.
+
+**Mock-ups**, all under `docs/mockups/`:
+- `bureau-premier-lancement-production-recents.dc.html`;
+- `bureau-premier-lancement-production-recents-introuvable.dc.html`;
+- `bureau-premier-lancement-production-ou.dc.html`.
+
+**1. A window with no logbook, after first use.** This window appears in a new window, or after « Fermer le carnet », when at least one logbook has been opened before. On the very first launch the first-launch screen of task 228 stays as it is.
+- **Left:** the same blue panel, with the profile and its labels shown without the opening animation.
+- **Right, from top to bottom:**
+  - « Carnets récents » at 24 sp, then a white card listing the logbooks opened most recently, newest first. Show at most about five; drop the oldest.
+  - Each row shows an icon for where the logbook is kept (cloud, git or file), the logbook name, and the place with when it was last closed or opened, e.g. « Google Drive · fermé il y a 2 min », « Dépôt git · github.com/club/carnet », « Documents · ouvert le 2 nov. ». A chevron ends the row, and a click opens that logbook in this window.
+  - « Ou bien » at 15 sp semibold, then the three choices of the first-launch screen (« Créer un carnet », « Importer un carnet », « Ouvrir mon carnet OpenDives »). They are compact (40 dp icon, 10 dp vertical padding) and all neutral white: no filled primary choice here.
+  - « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. »
+  - « Une question ? À propos et contact » at the bottom.
+- « Essayer avec un carnet d’exemple » is not shown on this screen.
+
+**2. A recent logbook that cannot be found.** When the window opens, check that each recent file or folder still exists.
+- A missing one keeps its place in the list. Its name is greyed, and its second line is « Introuvable dans Documents » (the place it had) in error red with a small warning icon.
+- Clicking it opens a basic dialog with no ✕:
+  - title « Carnet introuvable »;
+  - text « « essai.ssrf » n’est plus dans Documents. Il a peut-être été déplacé, renommé ou supprimé. »;
+  - actions « Retirer de la liste » (text button) and « Chercher le fichier… » (filled; it opens the system file picker, and the chosen file replaces the entry).
+
+**3. Icon.** In « Où le garder ? » on the desktop, « Seulement sur cet ordinateur » uses a computer-screen icon instead of the tablet icon.
+
+**Test:**
+- First launch shows the screen of task 228.
+- Open a logbook, close it, then open a new window: the recent list appears above « Ou bien ».
+- Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.
