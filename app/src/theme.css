@@ -701,6 +701,19 @@ html.ios {
   }
 }
 
+/* Desktop app, scrollbars (docs/system-design.md, section 7, « Fluid desktop layout »): a pane that scrolls
+   (a list, a long detail) shows a thin bar whose thumb is faint and whose track is transparent. A bar that takes
+   15 dp from a pane is never left to the system. */
+@layer od.base {
+  html.od-desktop-app {
+    scrollbar-color: color-mix(in srgb, var(--od-text) 30%, transparent) transparent;
+  }
+
+  html.od-desktop-app * {
+    scrollbar-width: thin;
+  }
+}
+
 @layer od.base {
   body {
     font-family: var(--f7-font-family);

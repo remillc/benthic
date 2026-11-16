@@ -680,7 +680,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page data-od-scroll onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}

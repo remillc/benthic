@@ -249,10 +249,24 @@
       z-index: 2;
       transform: translateX(-50%);
       width: max-content;
+      /* Never wider than the choices' column (the window minus the blue panel): in a narrow window the link and the
+         language menu stack. */
+      max-width: calc(100% - min(700px, 48.6%) - 8px);
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       align-items: center;
-      gap: 8px;
-      white-space: nowrap;
+      gap: 0 8px;
+
+      /* A narrow window: the link and the menu keep one line. */
+      @media (max-width: 900px) {
+        gap: 0 2px;
+
+        :global(.od-welcome-help-link),
+        :global(.od-desktop-language) {
+          padding-inline: 8px;
+        }
+      }
 
       /* A low window: a step may scroll under the line, which then keeps its own ground. */
       @media (max-height: 700px) {

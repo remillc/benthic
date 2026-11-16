@@ -305,14 +305,32 @@
     routes: appRoutes,
   };
 
+  /**
+   * Loads a view's first page again, to swap its desktop layout and its tablet layout. A single
+   * `reloadAll` to the address the view already shows is ignored by Framework7 (the tablet's list
+   * on screen, no dive open): the view first goes to its empty detail, then to its first page.
+   * @param {string} id
+   * @param {string} path
+   * @param {string} [emptyPath] the view's empty detail (master-detail views only)
+   */
+  async function reloadView(id, path, emptyPath) {
+    const router = f7.views.get(id)?.router;
+    if (!router) return;
+    if (emptyPath && router.currentRoute?.url === path) {
+      await router.navigate(emptyPath, { reloadAll: true, animate: false });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+    await router.navigate(path, { reloadAll: true, animate: false });
+  }
+
   // Desktop app: crossing 1200 dp swaps the logbook's table and the tablet's list.
   let desktopShown = layout.desktop;
   $effect(() => {
     const wide = layout.desktop;
     if (wide === desktopShown) return;
     desktopShown = wide;
-    f7.views.get('#view-logbook')?.router.navigate('/', { reloadAll: true, animate: false });
-    f7.views.get('#view-statistics')?.router.navigate('/statistics/', { reloadAll: true, animate: false });
+    reloadView('#view-logbook', '/', PANE_EMPTY.path);
+    reloadView('#view-statistics', '/statistics/', PANE_EMPTY.path);
   });
 
   // Crossing 1200 dp swaps the Outils section's desktop layout and the tablet's.
@@ -321,7 +339,7 @@
     const wide = layout.desktop;
     if (wide === desktopToolsShown) return;
     desktopToolsShown = wide;
-    f7.views.get('#view-tools')?.router.navigate('/tools/', { reloadAll: true, animate: false });
+    reloadView('#view-tools', '/tools/');
   });
 
   // Each time the logbook is loaded, the maps of its new sites are prepared.

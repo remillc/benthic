@@ -624,6 +624,36 @@
         padding-top: 16px;
         padding-bottom: 80px;
       }
+
+      /* A short window (fluid layout, docs/system-design.md, section 7): the step's own spacing gives way so that it
+         fits without a scrollbar. */
+      @media (max-height: 640px) {
+        padding-top: 8px;
+
+        .od-editorial-page--retour {
+          min-height: 36px;
+        }
+
+        .od-editorial-page--eyebrow {
+          margin-bottom: 2px;
+        }
+
+        .od-editorial-page--title {
+          margin-bottom: 4px;
+          font-size: 24px;
+          line-height: 30px;
+        }
+
+        .od-editorial-page--intro {
+          margin-bottom: 12px;
+          font-size: 15px;
+          line-height: 20px;
+        }
+
+        .od-editorial-page--actions {
+          padding-top: 12px;
+        }
+      }
     }
     :global(html.od-desktop-app) .od-editorial-page--linear.od-editorial-page--linear-panel {
       left: calc(min(700px, 48.6%) + clamp(24px, 4.4vw, 64px));

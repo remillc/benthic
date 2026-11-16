@@ -829,7 +829,7 @@
         <p class="od-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="od-desktop-logbook--scroll" bind:this={tableEl}>
+      <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl}>
         <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={order.length}>
           <thead>
             <tr>
