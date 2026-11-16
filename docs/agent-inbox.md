@@ -4248,7 +4248,7 @@ Mock-ups: `docs/mockups/android-tablette-import-csv-{type,colonnes,apercu}-paysa
    - « Nouvelle plongée » with its date, « Site à préciser », and « Le site, l’équipement et les gaz se complètent ensuite dans Modifier. »
    - « Retour » and « Ajouter au carnet ».
 
-Use the core's CSV import (`core/import-csv.c`) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
+Use the core's CSV import (the one task 221 checked) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
 
 ### Test
 
