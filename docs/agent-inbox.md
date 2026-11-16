@@ -5131,3 +5131,21 @@ Done (checked against each branch's code and its own inbox, where every one of t
 - 207: Done on `feature/desktop-logbook`.
 - 208: Done on `feature/desktop-logbook`.
 - 218: Done on `feature/release-new-logbook` (carried into `feature/release-new-logbook-two-steps`).
+
+## [ ] 2026-11-16-259 Phone (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: do not build anything yet.** These screens need an OpenDives server, which does not exist yet. Read this task, then ask Christian in the session how he wants to proceed: what can be built now (for example the screens behind a switch, with a stubbed server), what waits for the server, and which branch to use. Build nothing before his answer.
+
+Christian approved the design on 16 November 2026. **Release edition only**, never on `main` and not in the beta. Mock-ups: `docs/mockups/android-serveur-*.dc.html` (11 files; canvas « OpenDives — Serveur »).
+
+What the screens show, for when the work starts:
+- **Header.** Every setup screen uses the « en-tête hachuré » (Christian's name for the light section-band gradient with the light rays, the faint profile and the wave, as on « Nom du carnet »). The open logbook keeps the app's header.
+- **Entry points** (`-ou`, `-ouvrir`). « Sur le serveur OpenDives » becomes the first and highlighted choice of « Où le garder ? » and of « Ouvrir mon carnet », before the cloud and git; « Dans mon nuage » becomes an ordinary white row.
+- **Sign-in by e-mail code, no password** (`-courriel`, `-courriel-erreur`, `-code`, `-code-erreur`, `-code-expire`, `-trop-essais`).
+  - The address is entered first, with « Recevoir un code »; the account is created with the code if it does not exist yet.
+  - Then a 6-digit code: « Renvoyer le code » shows a countdown, and « Se connecter » stays disabled until the code is complete.
+  - Errors: invalid address, wrong code, expired code (« Recevoir un nouveau code »), too many attempts (wait 10 minutes).
+- **Server unreachable** (`-hors-ligne`): « Réessayer » and « Choisir un autre endroit ».
+- **Download, then logbook** (`-telechargement`, `-carnet`), as for the other places, with « Connexion au serveur » and the snackbar « Carnet téléchargé depuis le serveur OpenDives. … ».
+
+The tablet and desktop versions will follow in later tasks.
