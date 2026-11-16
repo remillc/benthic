@@ -4940,3 +4940,19 @@ Two text changes:
 Background: since October 2024 GitHub lets a fine-grained token have no expiration for personal repositories; organisations limit it to 366 days by default.
 
 **Test:** the GitHub tab of the token help shows the new intro and the « No expiration » step.
+
+## [ ] 2026-11-16-255 Token help: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-jeton-aide-gitlab-android.dc.html` and `git-jeton-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-jeton-aide-android.dc.html`).
+
+The « Créer un jeton d’accès » help gets the same layout as the GitHub tab for GitLab and Codeberg: intro, white card with a first line and numbered steps, a link that opens the site's token page in the browser, then the closing line. Labels of the sites are `<kbd>`, values are `<code>` (task 253). Use the texts of the mock-ups word for word; the site labels are those of the French interface of each site (taken from the GitLab and Gitea/Forgejo translation files).
+
+**GitLab** (link « Ouvrir la page des jetons de GitLab » → `https://gitlab.com/-/user_settings/personal_access_tokens`). Card line: « Sur GitLab, un jeton personnel donne accès à tous vos dépôts et doit avoir une date d’expiration. » Steps: avatar › Modifier le profil; Jetons d’accès; Ajouter un nouveau jeton; Nom du jeton (`OpenDives`); Date d’expiration: the latest date allowed, with a new token to create at that date; Portées: only `write_repository`; Créer un jeton, then copy it.
+
+**Codeberg** (link « Ouvrir la page des applications de Codeberg » → `https://codeberg.org/user/settings/applications`). Card line: « Sur Codeberg, un jeton n’expire pas. Vous pouvez le supprimer à tout moment. » Steps: avatar › Configuration; Applications; under Gérer les jetons d’accès, Nom du jeton (`OpenDives`); Tout (public, privé et limité); Dépôt on Lecture et écriture, the others on Aucun accès; Générer un jeton, then copy it.
+
+The intro of both tabs: « OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site. »
+
+The help page must scroll when its content is taller than the screen (the GitHub tab is about 1100 dp tall).
+
+**Test:** each tab of the token help shows its own steps and link, the active tab is underlined, and each link opens the right page.
