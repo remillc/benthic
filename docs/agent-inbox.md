@@ -4629,7 +4629,7 @@ In the desktop app, the navigation rail always ends with « Réglages » (gear, 
 
 Done: already the behaviour of the desktop app (`feature/desktop-logbook`), checked in the desktop app at 1440 × 900: with no logbook open, the four sections are at 38 % and unavailable while « Réglages » (Ctrl+, / ⌘,) and the account avatar keep full colour and open Réglages and the account sheet; with a logbook open the rail is the full one with both items. No code change; only the mock-ups lacked the two items.
 
-## [ ] 2026-11-16-241 Desktop release: recent logbooks window, missing logbook, computer icon
+## [x] 2026-11-16-241 Desktop release: recent logbooks window, missing logbook, computer icon
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 228, `feature/release-desktop-first-launch`, and never merge it into `main`.
 
@@ -4661,3 +4661,5 @@ Christian approved this on 16 November 2026. **Release edition:** do it on the b
 - First launch shows the screen of task 228.
 - Open a logbook, close it, then open a new window: the recent list appears above « Ou bien ».
 - Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.
+
+Done on `feature/release-desktop-first-launch` (not merged): after first use the window without a logbook lists « Carnets récents » (five at most, newest first) above « Ou bien » and the three compact neutral choices; a missing file is greyed with « Introuvable dans {place} » and its dialog offers « Retirer de la liste » and « Chercher le fichier… » (main-process ops `exists` and `relocate`, which accept only entries of the recent list; git and cloud entries are not checked); « Seulement sur cet ordinateur » has the computer-screen icon. « Chercher le fichier… » was not clicked in the real app (it opens the system picker); its main-process side is tested.
