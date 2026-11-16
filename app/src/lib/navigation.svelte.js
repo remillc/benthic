@@ -117,7 +117,9 @@ export function openOver(path) {
     view = f7.views.get('#view-account');
   }
   const router = view?.router;
-  if (router && router.currentRoute?.path !== path) router.navigate(path);
+  // The desktop layout shows Réglages' list with its detail pane emptied: that is Réglages already open.
+  const open = router?.currentRoute?.path;
+  if (router && open !== path && !(path === '/settings/' && open === '/pane/empty')) router.navigate(path);
 }
 
 /** Settings open over the current section, from the side menu or the tablet navigation. */

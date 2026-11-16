@@ -41,3 +41,46 @@ test('the wide logbook takes the dive shown in the narrow layout, Réglages the 
 test('the rule is written in the design system', () => {
   assert.match(read('docs/system-design.md'), /Adaptive pages \(decided on 16 November 2026\)/);
 });
+
+test('every adaptive route hands its selection over when the layout changes', () => {
+  const page = read('app/src/components/AdaptivePage.svelte');
+  assert.match(page, /handOver\?\.\(rest\.f7router\)/);
+  assert.match(app, /detailRoutes: \[\{ path: '\/settings\/:section', component: Settings \}, PANE_EMPTY\]/);
+  for (const hook of ['logbookToNarrow', 'statisticsToWide', 'statisticsToNarrow', 'settingsToWide', 'settingsToNarrow', 'toolsToWide', 'toolsToNarrow']) {
+    assert.ok(app.includes(hook), hook);
+  }
+});
+
+test('Statistiques has one selection for both layouts', () => {
+  const selection = read('app/src/lib/statistics-selection.svelte.js');
+  assert.match(selection, /export const statSelection = \$state/);
+  const wide = read('app/src/pages/DesktopStatistics.svelte');
+  assert.match(wide, /statSelection\.key/);
+  assert.ok(!/let selected = \$state/.test(wide), 'the wide layout keeps no selection of its own');
+  const narrow = read('app/src/pages/Statistics.svelte');
+  assert.match(narrow, /chooseStatistic\(`saved:\$\{s\.id\}`\)/);
+  assert.match(narrow, /savedHref\(statSelection\.key\)/);
+});
+
+test('the hand-over functions move the open item and leave no hidden page', () => {
+  const handoff = read('app/src/lib/adaptive-handoff.js');
+  // Narrow to wide: the pane is emptied (one page of the right layout), the tool page is removed.
+  assert.match(handoff, /export function statisticsToWide[\s\S]*emptyPane\(router\)/);
+  assert.match(handoff, /export function settingsToWide[\s\S]*emptyPane\(router\)/);
+  assert.match(handoff, /export function toolsToWide[\s\S]*openTool\(id\);[\s\S]*router\.navigate\(root, \{ reloadAll: true/);
+  // Wide to narrow: the chosen item opens, the first-dive start-up is not blocked by the emptied pane.
+  assert.match(handoff, /export function toolsToNarrow[\s\S]*desktopTools\.chosen/);
+  assert.match(handoff, /export function logbookToNarrow[\s\S]*\/pane\/selection/);
+  assert.match(read('app/src/pages/Logbook.svelte'), /od-pane-empty/);
+});
+
+test('each tool has a page in the narrow layout, and back', async () => {
+  const { TOOL_PAGES, toolOfPath, pathOfTool, DESKTOP_TOOLS } = await import('../../app/src/lib/desktop-tools.js');
+  assert.deepEqual(TOOL_PAGES.map((p) => p.id), DESKTOP_TOOLS.map((tool) => tool.id));
+  for (const { id, path } of TOOL_PAGES) {
+    assert.equal(toolOfPath(path), id);
+    assert.equal(pathOfTool(id), path);
+  }
+  assert.equal(toolOfPath('/tools/'), null);
+  assert.equal(pathOfTool('nothing'), null);
+});

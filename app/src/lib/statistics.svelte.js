@@ -242,6 +242,16 @@ export function encodeCriteria(criteria) {
   return encodeURIComponent(JSON.stringify(criteria));
 }
 
+/**
+ * Address of the list of a row's dives (Statistics). The criteria are encoded twice: the
+ * router decodes the query once, and decodeCriteria once more.
+ * @param {string} section key of its section's title
+ * @param {string} title
+ * @param {Criterion[]} criteria
+ */
+export const rowHref = (section, title, criteria) =>
+  `/statistics/dives/?section=${section}&title=${encodeURIComponent(title)}&c=${encodeURIComponent(encodeCriteria(criteria))}`;
+
 /** @param {string|undefined} text @returns {Criterion[]} */
 export function decodeCriteria(text) {
   try {

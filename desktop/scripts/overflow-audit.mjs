@@ -106,6 +106,7 @@ function inspect(allow, rootSel) {
     paneScroll: [],
     scrollbars: [],
     outside: [],
+    bottomCut: [],
   };
   // The layer on top: with a popup, a sheet or a dialog open, only that layer is looked at (what lies under
   // it is covered and cannot be seen); `--root` names another one.
@@ -134,6 +135,14 @@ function inspect(allow, rootSel) {
     }
     return { left, top, right, bottom };
   };
+  // The window's foot: what is fixed to the window (the rail with the account button, a bar) must lie inside it
+  // entirely; a window moved or sized so that its bottom is cut, or a rail taller than the window, shows here.
+  // The whole page is looked at, whichever layer is on top, as the rail sits under every layer.
+  for (const el of document.querySelectorAll('.od-nav-rail--rail, .od-nav-rail--rail *, [class*="od-"][style*="fixed"]')) {
+    if (!shown(el) || el.closest('svg, .od-sr-only')) continue;
+    const r = el.getBoundingClientRect();
+    if (r.bottom > vh + 1 && r.top < vh) out.bottomCut.push({ el: label(el), bottom: Math.round(r.bottom), height: vh });
+  }
   for (const el of root.querySelectorAll('*')) {
     // Covered pages (the previous page of a stack) and text for screen readers only are not on screen.
     if (!shown(el) || el.closest('svg, .page-previous, .od-sr-only, .sr-only, .maplibregl-marker, .maplibregl-popup, .maplibregl-ctrl') || ['IMG', 'VIDEO', 'CANVAS'].includes(el.tagName)) continue;
@@ -184,6 +193,7 @@ if (report.document.horizontal) problems.push(`document: horizontal overflow (${
 if (report.document.vertical) problems.push(`document: page-level vertical overflow (${report.document.scrollHeight} > ${report.viewport.height})`);
 for (const h of report.horizontal) problems.push(`${h.el}: horizontal scroll (${h.scrollWidth} > ${h.clientWidth})`);
 for (const c of report.clipped) problems.push(`${c.el}: content cut off${c.axis === 'y' ? ' at the bottom' : ''} (${c.scrollWidth} > ${c.clientWidth}) "${c.text}"`);
+for (const b of report.bottomCut) problems.push(`${b.el}: cut off at the bottom of the window (bottom ${b.bottom}, window ${b.height})`);
 for (const o of report.outside) problems.push(`${o.el}: sticks out of its box or the window (${o.left}..${o.right}, box ${o.clip[0]}..${o.clip[1]}) "${o.text}"`);
 for (const p of report.paneScroll) if (!p.allowed) problems.push(`${p.el}: pane scrolls vertically and is not a list (${p.scrollHeight} > ${p.clientHeight})`);
 for (const s of report.scrollbars) {

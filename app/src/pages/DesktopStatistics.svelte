@@ -31,7 +31,7 @@
     previewOf,
     selectionOfBar,
   } from '../lib/desktop-stats.js';
-  import { deviceStore } from '../lib/device-store.js';
+  import { chooseStatistic, statSelection } from '../lib/statistics-selection.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { undoNameKey } from '../lib/undo-name.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -46,19 +46,9 @@
   /** Fluid layout: the chart keeps 380 dp in a tall window and shrinks in a short one, so the page does not scroll. */
   let windowHeight = $state(900);
   const chartHeight = $derived(Math.max(200, Math.min(380, windowHeight - 330)));
-  const SELECTED_KEY = 'od.desktopStatistic';
-  /** @type {string} */
-  let selected = $state(deviceStore.getItem(SELECTED_KEY) ?? 'byYear');
-
-  /** @param {string} key */
-  function choose(key) {
-    selected = key;
-    try {
-      deviceStore.setItem(SELECTED_KEY, key);
-    } catch {
-      // Not fatal: the choice lasts until the app closes.
-    }
-  }
+  // One selection for both layouts (lib/statistics-selection.svelte.js).
+  const selected = $derived(statSelection.key);
+  const choose = chooseStatistic;
 
   // --- The data: the dives the core counted, on the free filter. ------------------------------
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));

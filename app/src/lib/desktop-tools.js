@@ -18,6 +18,29 @@ export const DESKTOP_TOOLS = [
 ];
 
 /**
+ * The page each tool has in the narrow layout (adaptive page: the same tool in both layouts).
+ * The planner's page is the list of planned dives.
+ * @type {readonly { id: 'planner'|'desaturation'|'eadMod'|'bestMix'|'blender', path: string }[]}
+ */
+export const TOOL_PAGES = [
+  { id: 'planner', path: '/plans/' },
+  { id: 'desaturation', path: '/tools/desaturation' },
+  { id: 'eadMod', path: '/tools/ead-mod' },
+  { id: 'bestMix', path: '/tools/best-mix' },
+  { id: 'blender', path: '/tools/blender' },
+];
+
+/** The tool whose narrow page is at this path, or null. @param {string|undefined} path */
+export function toolOfPath(path) {
+  return TOOL_PAGES.find((page) => page.path === path)?.id ?? null;
+}
+
+/** The narrow page of a tool. @param {string} id */
+export function pathOfTool(id) {
+  return TOOL_PAGES.find((page) => page.id === id)?.path ?? null;
+}
+
+/**
  * The live line of the planner row: how many planned dives the logbook holds.
  * @param {number|null} plans null until read
  * @returns {{ key: string, params: Record<string, string|number> }|null}

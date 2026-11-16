@@ -797,7 +797,9 @@
     if (!layout.split || navigation.section !== 'logbook' || logbook.loading || logbook.error || selecting || !listEl) return;
     const first = entries[0];
     const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
-    if (!dive || autoOpening || listEl.closest('.view')?.querySelector('.page-master-detail')) return;
+    // The emptied pane (PaneEmpty) is not a screen to keep: the desktop layout leaves it when the window narrows.
+    const pane = listEl.closest('.view')?.querySelector('.page-master-detail');
+    if (!dive || autoOpening || (pane && !pane.classList.contains('od-pane-empty'))) return;
     autoOpening = true;
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });

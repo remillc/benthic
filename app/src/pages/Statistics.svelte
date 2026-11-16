@@ -23,14 +23,15 @@
   import {
     chronological,
     computeStatistics,
-    encodeCriteria,
     myStatistics,
+    rowHref,
     notSetLabel,
     summaryLine,
   } from '../lib/statistics.svelte.js';
   import { formatTotalTime, formatLongDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
+  import { chooseStatistic, statSelection } from '../lib/statistics-selection.svelte.js';
   import { keepInSvelteRange } from '../lib/master-detail.js';
   import HeatMapCard from '../components/HeatMapCard.svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -81,8 +82,17 @@
         })
       : '',
   );
+  /**
+   * The address of a saved statistic's row, for the statistic the desktop layout had chosen
+   * (adaptive page: the same selection in both layouts); '' for any other.
+   * @param {string} key
+   */
+  function savedHref(key) {
+    const mine = key.startsWith('saved:') ? myStatistics.list.find((s) => s.id === key.slice(6)) : null;
+    return layout.split && mine ? rowHref('mine', mine.name, mine.criteria) : '';
+  }
   /** Tablet: the address of the row whose result is shown beside the list. */
-  let selected = $state('');
+  let selected = $state(savedHref(statSelection.key));
   /** The "By …" sections opened, by title: all closed at first. */
   let openSections = $state(/** @type {Record<string, boolean>} */ ({}));
   /**
@@ -108,16 +118,6 @@
   const yearBars = $derived(
     [...(result?.yearly ?? [])].sort((a, b) => a.year - b.year).map((y) => ({ value: y.dives, label: String(y.year) })),
   );
-
-  /**
-   * Address of the list of a row's dives. The criteria are encoded twice: the
-   * router decodes the query once, and decodeCriteria once more.
-   * @param {string} section key of its section's title
-   * @param {string} title
-   * @param {import('../lib/statistics.svelte.js').Criterion[]} criteria
-   */
-  const rowHref = (section, title, criteria) =>
-    `/statistics/dives/?section=${section}&title=${encodeURIComponent(title)}&c=${encodeURIComponent(encodeCriteria(criteria))}`;
 
   /** @typedef {{key: string, title: string, numeric?: boolean, support: string, after?: string, criteria: import('../lib/statistics.svelte.js').Criterion[]}} StatRow */
 
@@ -196,7 +196,7 @@
           {#each myStatistics.list as s (s.id)}
             {@const href = rowHref('mine', s.name, s.criteria)}
             <li class:od-statistics--selected={layout.split && selected === href}>
-              <a {href} data-reload-detail="true" class="item-link item-content" onclick={select}>
+              <a {href} data-reload-detail="true" class="item-link item-content" onclick={(e) => { chooseStatistic(`saved:${s.id}`); select(e); }}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
                   <div class="item-text od-value">{summaryLine(saved[s.id])}</div>

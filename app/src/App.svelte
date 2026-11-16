@@ -58,6 +58,7 @@
   import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
   import DesktopNewLogbook from './components/DesktopNewLogbook.svelte';
   import AdaptivePage from './components/AdaptivePage.svelte';
+  import { logbookToNarrow, settingsToNarrow, settingsToWide, statisticsToNarrow, statisticsToWide, toolsToNarrow, toolsToWide } from './lib/adaptive-handoff.js';
   import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
@@ -210,7 +211,7 @@
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
     // Desktop app from 1200 dp: the tools list and the chosen tool side by side (task 2026-11-15-196).
-    { path: '/tools/', component: AdaptivePage, options: { props: { wide: DesktopTools, narrow: Tools } } },
+    { path: '/tools/', component: AdaptivePage, options: { props: { wide: DesktopTools, narrow: Tools, toWide: (/** @type {any} */ r) => toolsToWide(r, '/tools/'), toNarrow: (/** @type {any} */ r) => toolsToNarrow(r, '/tools/') } } },
     { path: '/tools/desaturation', component: Desaturation },
     { path: '/tools/ead-mod', component: GasEadMod },
     { path: '/tools/best-mix', component: GasBestMix },
@@ -234,7 +235,7 @@
       path: '/',
       // Desktop app from 1200 dp: the logbook as a table (task 2026-11-15-169); else the list.
       component: AdaptivePage,
-      options: { props: { wide: DesktopLogbook, narrow: Logbook } },
+      options: { props: { wide: DesktopLogbook, narrow: Logbook, toNarrow: logbookToNarrow } },
       master: true,
       detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, { path: '/pane/selection', component: DesktopSelection }, PANE_EMPTY],
     },
@@ -251,7 +252,7 @@
       // Desktop app from 1200 dp: the list and the chart of the chosen statistic on one page
       // (task 2026-11-15-171), not a master with a detail beside it; else the tablet's list.
       component: AdaptivePage,
-      options: { props: { wide: DesktopStatistics, narrow: Statistics } },
+      options: { props: { wide: DesktopStatistics, narrow: Statistics, toWide: statisticsToWide, toNarrow: statisticsToNarrow } },
       master: true,
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
@@ -271,9 +272,9 @@
       path: '/settings/',
       // Desktop app: Réglages is one page with its categories (task 2026-11-15-202); below, a master with a detail.
       component: AdaptivePage,
-      options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false } } },
+      options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false }, toWide: settingsToWide, toNarrow: settingsToNarrow } },
       master: true,
-      detailRoutes: [{ path: '/settings/:section', component: Settings }],
+      detailRoutes: [{ path: '/settings/:section', component: Settings }, PANE_EMPTY],
     },
     ...appRoutes,
   ];
