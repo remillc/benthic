@@ -4287,3 +4287,29 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{
 - The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
 
 **Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
+
+## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-phone-first-launch`, started from `feature/release-formats-link` (task 226). Do not merge it into `main`. The beta on `main` stays unchanged.
+
+Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.html` (390 × 844). They are the phone versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors. Only the layout changes.
+
+**Layout on a phone (width under 600 dp):**
+- **First step** (`android-premier-lancement-production.dc.html`):
+  - a blue band 330 dp tall at the top, with the logo (40 dp), « OpenDives » (24 sp), « Votre carnet de plongée, sur tous vos appareils. » (26 sp), the line under it (14 sp) and the decorative profile, scaled down and 24 dp from both edges;
+  - below it, « Pour commencer », the three choice rows and « Essayer avec un carnet d’exemple ».
+- **Every other step:** a blue band 96 dp tall with the logo (32 dp) and « OpenDives » (20 sp), then the step's column.
+- **The column:** 20 dp side padding, content from the top (not centred). Page titles are 24 sp.
+- **Buttons** take the full width of the column.
+- **The link band** (OpenDives ↔ service): 64 dp tiles and a 56 dp line.
+- **« Une question ? À propos et contact »** comes after the content, at the bottom of the screen when there is room. When the content is taller than the screen (« Importer › nouveau carnet »), the page scrolls and the link follows the content.
+- **Texts:** « cette tablette » becomes « ce téléphone » (« Seulement sur ce téléphone », « Le jeton reste sur ce téléphone. », « Il reste sur ce téléphone. »).
+- **« Formats acceptés »:** the same basic dialog, 358 dp wide, with the three cards stacked. The list scrolls inside the dialog, and « Fermer » stays visible.
+- **« Voir les formats acceptés »** sits under « Un fichier », as a 48 dp target (task 226).
+- **Motion between steps:** the same shared-axis X transition as on the tablet.
+
+**Test:**
+- On a phone, in portrait, every screen matches its mock-up. Nothing touches the screen edges, and nothing is cut off; long screens scroll.
+- « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
+- On a tablet, nothing changes.
+- The beta on `main` is untouched.
