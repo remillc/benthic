@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { FIRST_LAUNCH_SNACKBARS, downloadSteps, newFirstLaunch, transferCount } from '../../app/src/lib/first-launch.js';
+import { FIRST_LAUNCH_SNACKBARS, FIRST_LAUNCH_SNACKBARS_TABLET, deviceKey, downloadSteps, newFirstLaunch, transferCount } from '../../app/src/lib/first-launch.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (f) => readFileSync(new URL(f, root), 'utf8');
@@ -23,20 +23,21 @@ const theme = read('theme.css');
 
 test('the new style is for an Android phone only: a tablet and iOS keep their screens', () => {
   assert.equal(newFirstLaunch({ phone: true, ios: false }), true);
-  assert.equal(newFirstLaunch({ phone: false, ios: false }), false);
+  // Task 239: a tablet takes the new style too (the blue panel); only iOS keeps its screens.
+  assert.equal(newFirstLaunch({ phone: false, ios: false }), true);
   assert.equal(newFirstLaunch({ phone: true, ios: true }), false);
   assert.equal(newFirstLaunch({ phone: false, ios: true }), false);
-  // The welcome screen: the band on a phone, the old head and profile otherwise; iOS has its own branch.
-  assert.match(welcome, /\{#if layout\.phone\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}\s*<div class="od-welcome-start--head">/);
+  // The welcome screen: the band on a phone, the panel of task 237 on a tablet; iOS has its own branch.
+  assert.match(welcome, /\{#if layout\.phone\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}\s*<!--[^>]*-->\s*<FirstLaunchPanel \{playKey\} \/>/);
   // The steps: the band and « Retour » only when the page says firstLaunch, on an Android phone.
   assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && layout\.phone\)/);
   for (const page of [signIn, create, confirm, download, local]) assert.match(page, /firstLaunch/);
-  // « Utiliser mon propre dépôt git » keeps its screens: it does not ask for the band.
-  assert.doesNotMatch(read('pages/GitRepository.svelte'), /firstLaunch/);
+  // « Utiliser mon propre dépôt git » asks for the band on a phone since task 247 (tablets and iPhone keep their layout).
+  assert.match(read('pages/GitRepository.svelte'), /\{#if phone && welcome\}\s*<EditorialPage[^>]*\s+firstLaunch/);
 });
 
-test('the welcome screen sends a phone to the « sans compte » screen, and a tablet straight to its logbook', () => {
-  assert.match(welcome, /if \(!theme\.ios && layout\.phone\) f7router\.navigate\('\/welcome\/local'\);\s*else startWithoutAccount\(\);/);
+test('the welcome screen sends Android (phone and, since task 239, tablet) to the « sans compte » screen; iOS starts the logbook', () => {
+  assert.match(welcome, /if \(!theme\.ios\) f7router\.navigate\('\/welcome\/local'\);\s*else startWithoutAccount\(\);/);
   assert.match(app, /path: '\/welcome\/local', component: WithoutAccount/);
   assert.match(app, /path: '\/welcome\/downloading', component: FirstDownload/);
 });
@@ -47,8 +48,8 @@ test('sign in: the download screen comes between the sign-in and the logbook', (
   // An account without a logbook still goes to « Reprendre votre carnet ? ».
   assert.match(signIn, /\/import`, \{ props: \{ signedIn: true \} \}/);
   assert.match(create, /if \(signedIn\.exists && look\) f7router\.navigate\('\/welcome\/downloading'/);
-  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\('downloaded'\)/);
-  assert.match(download, /f7router\.back\('\/welcome\/sign-in', \{ force: true \}\)/);
+  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\(git \? 'gitDownloaded' : 'downloaded'\)/);
+  assert.match(download, /f7router\.back\(git \? '\/welcome\/git' : '\/welcome\/sign-in', \{ force: true \}\)/);
 });
 
 test('create an account: step 1 of 2, then the code as step 2 of 2, then the empty logbook with its snackbar', () => {
@@ -64,9 +65,9 @@ test('create an account: step 1 of 2, then the code as step 2 of 2, then the emp
 });
 
 test('« Commencer sans compte »: three rows, then « Commencer » creates the logbook and says so', () => {
-  assert.match(local, /\{ key: 'phoneOnly', icon: 'device' \}/);
-  assert.match(local, /\{ key: 'noBackup', icon: 'warning', warn: true \}/);
-  assert.match(local, /\{ key: 'later', icon: 'link' \}/);
+  assert.match(local, /\{ key: 'phoneOnly', text: 'phoneOnlyText', icon: layout\.phone \? 'device' : 'tablet' \}/);
+  assert.match(local, /\{ key: 'noBackup', text: layout\.phone \? 'noBackupText' : 'noBackupTextTablet', icon: 'warning', warn: true \}/);
+  assert.match(local, /\{ key: 'later', text: 'laterText', icon: 'link' \}/);
   assert.match(local, /await startWithoutAccount\(\);\s*announceFirstLaunch\('local'\);/);
   const fr = langs.fr.firstLaunch.local;
   assert.equal(fr.phoneOnly, 'Sur ce téléphone seulement');
@@ -74,18 +75,53 @@ test('« Commencer sans compte »: three rows, then « Commencer » creates the 
   assert.equal(fr.later, 'Vous pourrez le relier plus tard');
   assert.equal(fr.start, 'Commencer');
   assert.equal(langs.en.firstLaunch.local.phoneOnly, 'On this phone only');
+  // Tablet (task 239): « cette tablette » in the rows, a tablet icon.
+  assert.equal(fr.phoneOnlyTablet, 'Sur cette tablette seulement');
+  assert.equal(fr.noBackupTextTablet, 'Si vous perdez ou changez de tablette, le carnet est perdu.');
+  assert.match(read('components/Icon.svelte'), /\btablet: 'M5 4h14/);
+});
+
+test('task 239: the tablet texts say « cette tablette », picked by deviceKey', () => {
+  assert.equal(deviceKey('a.b', true), 'a.b');
+  assert.equal(deviceKey('a.b', false), 'a.bTablet');
+  const fr = langs.fr.firstLaunch;
+  assert.equal(fr.signIn.introTablet, 'Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cette tablette.');
+  assert.equal(fr.signIn.passwordTextTablet, 'Gardé seulement dans le stockage sécurisé de cette tablette.');
+  assert.equal(fr.download.copyTablet, 'Copie du carnet sur cette tablette');
+  for (const k of ['signIn.introTablet', 'signIn.passwordTextTablet', 'download.copyTablet', 'local.phoneOnlyTablet', 'local.noBackupTextTablet']) {
+    assert.ok(get(langs.en, `firstLaunch.${k}`), k);
+    assert.doesNotMatch(get(langs.fr, `firstLaunch.${k}`), /téléphone/);
+    assert.doesNotMatch(get(langs.en, `firstLaunch.${k}`), /phone/);
+  }
+  assert.match(read('pages/SignIn.svelte'), /deviceKey\('firstLaunch\.signIn\.intro', layout\.phone\)/);
+  assert.match(download, /deviceKey\('firstLaunch\.download\.copy', layout\.phone\)/);
+});
+
+test('task 239: the tablet logbook opens with the snackbar at the bottom left and the subtitle of the path', () => {
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS_TABLET).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
+  assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.gitDownloaded), 'Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette, même sans réseau.');
+  assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.downloaded), 'Carnet téléchargé. Il reste sur cette tablette, même sans réseau.');
+  assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.created), 'Compte créé. Votre carnet est prêt.');
+  assert.equal(get(langs.fr, FIRST_LAUNCH_SNACKBARS_TABLET.local), 'Carnet créé sur cette tablette.');
+  for (const key of Object.values(FIRST_LAUNCH_SNACKBARS_TABLET)) assert.ok(get(langs.en, key), key);
+  assert.match(read('lib/account.js'), /layout\.phone \? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET/);
+  assert.match(read('lib/account.js'), /\{ placement: 'start' \}/);
+  assert.match(read('lib/snackbar-logic.js'), /placement === 'start' \? 'od-snackbar-start'/);
+  assert.match(read('theme.css'), /&\.od-snackbar-start \{\s*left: calc\(var\(--od-nav-width, 96px\) \+ 24px\);\s*right: auto;\s*bottom: calc\(24px \+ var\(--f7-safe-area-bottom\)\);/);
+  assert.equal(langs.fr.logbook.emptyLocalTablet, 'Sur cette tablette seulement, aucune plongée');
+  assert.ok(langs.en.logbook.emptyLocalTablet);
 });
 
 test('the snackbars of the three paths and the empty logbook line, in French and English', () => {
-  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'local']);
-  const fr = { downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
+  const fr = { gitDownloaded: 'Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau.', downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
   for (const [kind, key] of Object.entries(FIRST_LAUNCH_SNACKBARS)) {
     assert.equal(get(langs.fr, key), fr[kind]);
     assert.ok(get(langs.en, key), `${key} in English`);
   }
   assert.equal(langs.fr.logbook.emptyLocal, 'Sur ce téléphone seulement, aucune plongée');
-  assert.match(read('pages/Logbook.svelte'), /else if layout\.phone && !theme\.ios\}[\s\S]*logbook\.emptyLocal/);
-  assert.match(read('lib/account.js'), /showSnackbar\(t\(FIRST_LAUNCH_SNACKBARS\[kind\]\)\)/);
+  assert.match(read('pages/Logbook.svelte'), /else if !theme\.ios\}[\s\S]*layout\.phone \? 'logbook\.emptyLocal' : 'logbook\.emptyLocalTablet'/);
+  assert.match(read('lib/account.js'), /showSnackbar\(t\(keys\[kind\]\), \{ placement: 'start' \}\)/);
 });
 
 test('every new text exists in French and English', () => {
@@ -115,14 +151,19 @@ test('the download: three steps from the sync progress, the count of what the co
   assert.equal(langs.fr.firstLaunch.download.count.replace('{n}', '184').replace('{total}', '312'), '184 sur 312');
 });
 
-test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, a straight edge, the badge 16 dp tall', () => {
+test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, the section-band wave, the badge 16 dp tall', () => {
   assert.match(band, /height: calc\(var\(--od-first-band-top\) \+ 140px\);/);
   assert.match(band, /\.od-first-launch-band--welcome \{\s*height: calc\(var\(--od-first-band-top\) \+ 306px\);/);
   // The step band is 140 dp under the status bar (task 236); the welcome band is 330 dp with it (24 + 306).
   assert.match(band, /--od-first-band-top: max\(var\(--f7-safe-area-top\), 24px\)/);
-  // A step has no wave and no profile: the profile is drawn on the welcome band only, and no SectionBand is used.
+  // The welcome band draws the headline and the animated profile; a step has the section band's look
+  // (task 250): its radial gradient, the rays, the faint profile and the 18 dp wave, no sheen, no straight edge.
   assert.match(band, /\{#if welcome\}\s*<h1[\s\S]*<svg class="od-first-launch-band--profile"/);
-  assert.doesNotMatch(band, /SectionBand|--wave/);
+  assert.match(band, /\{#if welcome\}<div class="od-first-launch-band--sheen"/);
+  assert.match(band, /d="M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z"/);
+  assert.match(band, /od-first-launch-band--step-area[\s\S]*var\(--od-band-profile-area\)/);
+  assert.match(band, /background: var\(--od-first-band-step\)/);
+  assert.match(theme, /--od-first-band-step: radial-gradient\(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%\)/);
   assert.match(band, /\.od-first-launch-band--alpha \{[^}]*height: 16px;[^}]*padding: 1px 5px;[^}]*font-size: 9px;[^}]*line-height: 12px;[^}]*letter-spacing: 0\.5px;/);
   assert.match(band, /border: 1px solid var\(--od-first-band-badge-line\)/);
   assert.match(theme, /--od-first-band-badge: rgb\(255 255 255 \/ 0\.18\)/);
@@ -160,11 +201,11 @@ test('white text on the band: at least 4.5:1 on every colour of the gradient, an
 
 test('« Retour » goes back one step, and the steps are laid out as the mock-ups say', () => {
   assert.match(editorial, /<Link back class="od-editorial-page--retour">[\s\S]*t\('accountStep\.back'\)/);
-  assert.match(editorial, /\{#if !noRetour\}/);
+  assert.match(editorial, /\{#if !noRetour && onback\}[\s\S]*\{:else if !noRetour\}/);
   // The download is a step you leave with « Annuler », not « Retour ».
   assert.match(download, /\bnoRetour\b/);
   assert.match(editorial, /\.od-editorial-page--retour\) \{[^}]*min-height: 48px;/);
-  assert.match(editorial, /\.od-editorial-page--band-body \{\s*padding: 16px 20px 0;/);
+  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
   // Pointer and hover on the link.
   assert.match(editorial, /cursor: pointer;[\s\S]*@media \(hover: hover\)/);
 });

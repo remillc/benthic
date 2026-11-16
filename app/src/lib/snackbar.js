@@ -51,6 +51,7 @@ function swipeToDismiss(toast) {
  * @property {() => void} [onClosed] the snackbar is gone, whatever the cause
  * @property {number} [timeout] ms; raised to the floor (4 s, 6 s with an action)
  * @property {boolean} [undoable] closed at once when the undo history is cleared
+ * @property {'start'} [placement] on a tablet, at the bottom left (the first launch)
  * @property {boolean} [hasFab] force whether the snackbar floats above a FAB (default: the page has one);
  *   false when the page moves its FAB up itself while the snackbar shows
  */
@@ -59,7 +60,7 @@ function swipeToDismiss(toast) {
  * @param {string} text
  * @param {SnackbarOptions} [options]
  */
-export function showSnackbar(text, { action, onAction, onClosed, timeout, undoable, hasFab: forcedFab } = {}) {
+export function showSnackbar(text, { action, onAction, onClosed, timeout, undoable, placement, hasFab: forcedFab } = {}) {
   const hasFab = forcedFab ?? (typeof document !== 'undefined' && !!document.querySelector('.view.tab-active .page-current .fab'));
   /** @type {Record<string, () => void>} */
   const on = {};
@@ -67,7 +68,7 @@ export function showSnackbar(text, { action, onAction, onClosed, timeout, undoab
   if (onClosed) on.closed = onClosed;
   const toast = f7.toast.create({
     text,
-    cssClass: snackbarClasses({ hasFab, undoable }),
+    cssClass: snackbarClasses({ hasFab, undoable, placement }),
     closeButton: !!action,
     closeButtonText: action,
     closeTimeout: snackbarTimeout(timeout, !!action),

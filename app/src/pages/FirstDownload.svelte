@@ -5,17 +5,22 @@
   // download in a white card (connection, the dives with « n sur N » and the wavy indicator, the copy on the
   // phone), the line that says to keep the app open, « Annuler ». When the logbook is there, first launch
   // closes and a snackbar says it stays on the phone. « Annuler » signs the account out again.
+  // `git` (task 2026-11-16-247; docs/mockups/android-premier-lancement-alpha-git-telechargement.dc.html): the
+  // same screen for a logbook in the diver's own git repository: « Connexion au dépôt » with the repository and
+  // the branch, a snackbar that says where it comes from; « Annuler » forgets the access and returns to the form.
   import { onMount } from 'svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
   import LinearWavyProgress from '../components/LinearWavyProgress.svelte';
   import { announceFirstLaunch, showFailure } from '../lib/account.js';
-  import { downloadSteps } from '../lib/first-launch.js';
+  import { deviceKey, downloadSteps } from '../lib/first-launch.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { downloadAccountLogbook, logbook, signOut } from '../lib/logbook.svelte.js';
+  import { repositoryLabel } from '../lib/git-address.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ f7router: any, email?: string }} */
-  let { f7router, email = '' } = $props();
+  /** @type {{ f7router: any, email?: string, git?: boolean, repository?: string, branch?: string }} */
+  let { f7router, email = '', git = false, repository = '', branch = '' } = $props();
 
   let cancelled = false;
   let cancelling = $state(false);
@@ -23,14 +28,14 @@
   const count = $derived(logbook.firstDownload && logbook.firstDownload.total ? t('firstLaunch.download.count', { n: logbook.firstDownload.n, total: logbook.firstDownload.total }) : '');
   /** @type {{ key: 'connect'|'dives'|'copy', detail: string }[]} */
   const rows = $derived([
-    { key: 'connect', detail: email },
+    { key: 'connect', detail: git ? `${repositoryLabel(repository)} · ${branch}` : email },
     { key: 'dives', detail: steps.dives === 'running' ? count : '' },
     { key: 'copy', detail: '' },
   ]);
 
   onMount(() => {
     downloadAccountLogbook(() => cancelled).then((ok) => {
-      if (ok) announceFirstLaunch('downloaded');
+      if (ok) announceFirstLaunch(git ? 'gitDownloaded' : 'downloaded');
       else if (!cancelled) {
         // The account is signed in, the logbook did not come: back to the sign-in, nothing is lost.
         logbook.error = null;
@@ -50,7 +55,7 @@
     }
     logbook.error = null;
     cancelling = false;
-    f7router.back('/welcome/sign-in', { force: true });
+    f7router.back(git ? '/welcome/git' : '/welcome/sign-in', { force: true });
   }
 </script>
 
@@ -58,8 +63,8 @@
   firstLaunch
   noRetour
   helpLink
-  title={t('signIn.title')}
-  heading={t('signIn.heading')}
+  title={git ? t('gitRepo.titlePhone') : t('signIn.title')}
+  heading={git ? t('gitRepo.titlePhone') : t('signIn.heading')}
   intro=""
   secondary={{ label: t('accountStep.cancel'), onclick: cancel, disabled: cancelling }}
   closable={false}
@@ -78,7 +83,7 @@
           {/if}
         </span>
         <span class="od-first-download--text">
-          <span class="od-first-download--label">{t(`firstLaunch.download.${row.key}`)}</span>
+          <span class="od-first-download--label">{t(row.key === 'copy' ? deviceKey('firstLaunch.download.copy', layout.phone) : row.key === 'connect' && git ? 'firstLaunch.download.gitConnect' : `firstLaunch.download.${row.key}`)}</span>
           {#if row.detail}<span class="od-first-download--detail">{row.detail}</span>{/if}
           {#if row.key === 'dives' && state === 'running'}
             <span class="od-first-download--bar">

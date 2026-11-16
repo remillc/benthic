@@ -150,7 +150,8 @@
       "one": "The dive is removed from the logbook, on this device and in the repository. You can undo for a few seconds.",
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     },
-    "emptyLocal": "On this phone only, no dives"
+    "emptyLocal": "On this phone only, no dives",
+    "emptyLocalTablet": "On this tablet only, no dives"
   },
   "sync": {
     "failure": {
@@ -177,7 +178,11 @@
         "title": "The cloud isn’t answering",
         "intro": "The network works, but the cloud server may be under maintenance.",
         "retry": "Next automatic try in {n} minutes.",
-        "action": "Try again now"
+        "action": "Try again now",
+        "rowGit": "The git repository is not answering: trying again in {n} min",
+        "rowManualGit": "The git repository is not answering",
+        "titleGit": "The git repository is not answering",
+        "introGit": "The network works, but the repository server is not answering. It may be under maintenance."
       },
       "repository": {
         "row": "Can’t sync: git repository refused",
@@ -2043,6 +2048,15 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",
+      "« Create a repository » and « Create an access token » help: the site's labels are in boxes and the values to type in a monospace font; the GitLab and Codeberg tabs give the site's labels in the app's language, and GitLab and Codeberg have their own token steps.",
+      "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",
+      "First launch and Compte on an Android phone: « Use my own git repository » is one form (address checked when you leave the field, token, the branches read from the repository), with the logbook download screen and then a message when it opens. The help « How to create a repository » gives the steps for GitHub, GitLab and Codeberg.",
+      "First launch on an Android phone: the steps have 16 dp side margins.",
+      "First launch on an Android phone: the band on the steps takes the look of the app's section bands (light gradient, faint profile, wave at the edge) instead of the dark band with a straight edge.",
+      "First launch on Android phones and tablets: the « Any questions? About and contact » link sits under « Use my own git repository » on a phone, and at the bottom of the column on a tablet.",
+      "First launch on Android tablets: the steps (Subsurface account, account creation, no account) keep the blue panel, with « this tablet » in the texts, and the logbook opens with a message at the bottom left.",
+      "First launch on Android tablets: a blue panel on the left (at the top in portrait) with a dive profile that draws itself when the screen opens, and the three ways to start beside it.",
       "Tablet: in a dive profile, the depth line and the temperature curve are thinner (1 dp).",
       "First launch on Android phones: a blue banner with the dive profile, then the same banner, smaller, on every step (Subsurface account, account creation, no account), with a « Back » link.",
       "First launch: after signing in, the download screen shows three steps with the progress of the dives, then the logbook opens with a message.",
@@ -3175,84 +3189,83 @@
     "intro": "Your logbook in a git repository of your own (GitHub, GitLab, Codeberg or your server), instead of the cloud. A copy stays on this device.",
     "address": "Repository address (HTTPS)",
     "addressChecking": "Checking the address…",
-    "addressPublic": "Repository found, with an existing logbook",
-    "addressPublicEmpty": "Repository found, empty",
-    "addressPrivate": "Private or missing repository: it will be checked with the token",
+    "addressPublic": "Repository found, with an existing logbook.",
+    "addressPublicEmpty": "Repository found, empty.",
+    "addressPrivate": "Private or missing repository: it will be checked with the token.",
     "addressNone": "No git repository at this address. Check the address, it often ends with .git",
     "addressNotHttps": "The address must start with https://",
     "addressInvalid": "Invalid address: it must not contain a user name, spaces or brackets.",
     "username": "User name",
     "usernameInvalid": "Letters, digits, dot, hyphen and underscore only",
     "token": "Access token",
-    "tokenHelper": "A personal access token with write access, not your password",
+    "tokenHelper": "A personal access token with write access, not your password.",
     "tokenKeep": "Leave empty to keep the saved token",
     "tokenChecking": "Checking the token…",
     "tokenDenied": "Access refused by the server. Check the token and its write access to this repository.",
     "tokenInvalid": "A token has no space or accented letter",
     "tokenHow": "How to create an access token",
     "branch": "Branch",
-    "branchWaiting": "Available once access is accepted",
+    "branchWaiting": "The branch list appears once the repository is found.",
     "branchesRead": {
-      "one": "{n} branch read from the repository: {list}",
-      "other": "{n} branches read from the repository: {list}"
+      "one": "{n} branch read from the repository: {list}.",
+      "other": "{n} branches read from the repository: {list}."
     },
-    "branchEmpty": "Empty repository: the {name} branch will be created in it",
+    "branchEmpty": "Empty repository: the {name} branch will be created in it.",
     "note": "The token stays encrypted on this device.",
     "errorNetwork": "The server does not answer. Check the connection, then try again.",
     "errorNoLog": "The branch is no longer in the repository. Open the list of branches and pick one.",
     "errorFailed": "The connection did not succeed. Nothing was saved.",
     "pending": "Some changes are not sent to the repository yet. Sync before changing repository.",
-    "connected": "Connected to the repository {repository}"
+    "connected": "Connected to the repository {repository}",
+    "titlePhone": "Your own git repository",
+    "introPhone": "Keep your logbook in your git repository, with a copy on this phone.",
+    "introPhoneTablet": "Keep your logbook in your git repository, with a copy on this tablet.",
+    "repositoryHow": "How to create a repository",
+    "branchWaitingAccess": "The branch list appears once access is accepted."
   },
   "tokenHelp": {
     "title": "Create an access token",
-    "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token limited to this one repository, allowed to read and write its contents and nothing else, with an expiry date. The labels below are those of each site’s English interface.",
     "afterwards": "Then paste the token into OpenDives, with your user name. The site shows the token only once: copy it before leaving the page.",
-    "open": "Open {name}’s token page",
-    "openDocs": "{name} documentation",
     "github": {
       "name": "GitHub",
+      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token limited to this one repository, allowed to read and write its contents and nothing else. GitHub exists only in English: the labels below are those of its interface.",
+      "open": "Open GitHub’s token page",
       "note": "A fine-grained token can be limited to a single repository.",
-      "s1": "Sign in to GitHub, then open Settings (menu of your profile picture).",
-      "s2": "At the bottom of the left column, open Developer settings.",
-      "s3": "Open Personal access tokens, then Fine-grained tokens, then tap Generate new token.",
-      "s4": "Token name: a name you will recognise, for example OpenDives.",
-      "s5": "Expiration: choose a near date, for example in 90 days. On that date the token stops working and you create a new one.",
-      "s6": "Resource owner: your account, or the organisation that owns the repository.",
-      "s7": "Repository access: choose Only select repositories, then the repository of your logbook.",
-      "s8": "Permissions: under Repository permissions, set Contents to Read and write. Add no other permission.",
-      "s9": "Tap Generate token, then copy the token."
+      "s1": "Sign in to GitHub, then open [kbd]Settings[/kbd] (menu of your profile picture).",
+      "s2": "At the bottom of the left column, open [kbd]Developer settings[/kbd].",
+      "s3": "Open [kbd]Personal access tokens[/kbd], then [kbd]Fine-grained tokens[/kbd], then tap [kbd]Generate new token[/kbd].",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
+      "s5": "[kbd]Expiration[/kbd]: choose [kbd]No expiration[/kbd], otherwise OpenDives can no longer sync on the chosen date. If the repository belongs to an organisation, it may impose an end date.",
+      "s6": "[kbd]Resource owner[/kbd]: your account, or the organisation that owns the repository.",
+      "s7": "[kbd]Repository access[/kbd]: choose [kbd]Only select repositories[/kbd], then the repository of your logbook.",
+      "s8": "[kbd]Permissions[/kbd]: under [kbd]Repository permissions[/kbd], set [kbd]Contents[/kbd] to [kbd]Read and write[/kbd]. Add no other permission.",
+      "s9": "Tap [kbd]Generate token[/kbd], then copy the token."
     },
     "gitlab": {
       "name": "GitLab",
-      "note": "A project access token is limited to one project. On GitLab.com it needs the Premium or Ultimate plan (any licence on a self-managed GitLab server) and the Maintainer or Owner role on the project. Without that, use a personal access token, which reaches all your projects: GitLab cannot limit it to one.",
-      "projectTitle": "Project access token",
-      "p1": "Open your project, then in the left sidebar Settings, Access tokens.",
-      "p2": "Tap Add new token.",
-      "p3": "Token name: a name you will recognise, for example OpenDives.",
-      "p4": "Expiration date: a near date (365 days at most).",
-      "p5": "Role: the lowest one allowed to push to your branch, Developer, or Maintainer if the branch is protected.",
-      "p6": "Scopes: tick write_repository only.",
-      "p7": "Tap Create project access token, then copy the token.",
-      "personalTitle": "Otherwise, personal access token",
-      "q1": "At the top right, tap your avatar, then Edit profile.",
-      "q2": "In the left sidebar, open Access, then Personal access tokens.",
-      "q3": "In the Generate token list, choose Legacy token.",
-      "q4": "Token name: a name you will recognise. Expiration date: a near date.",
-      "q5": "Scopes: tick write_repository only.",
-      "q6": "Tap Generate token, then copy the token.",
-      "user": "In OpenDives, the user name is your GitLab user name. For Git over HTTPS, GitLab accepts any non-empty name with the token."
+      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
+      "open": "Open GitLab’s token page",
+      "note": "On GitLab, a personal token gives access to all your repositories and must have an expiry date.",
+      "s1": "Sign in to GitLab, tap your avatar, then [kbd]Edit profile[/kbd].",
+      "s2": "In the left sidebar, open [kbd]Access[/kbd], then [kbd]Personal access tokens[/kbd].",
+      "s3": "In the [kbd]Generate token[/kbd] list, choose [kbd]Legacy token[/kbd].",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
+      "s5": "[kbd]Expiration date[/kbd]: choose the latest date allowed. GitLab requires a date; on that date, create a new token and paste it into OpenDives.",
+      "s6": "[kbd]Select scopes[/kbd]: tick only [kbd]write_repository[/kbd], which allows reading and writing in your repositories.",
+      "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
     },
     "codeberg": {
       "name": "Codeberg",
-      "note": "Codeberg’s guide says a token gives full access to your account by default: limit it as below.",
-      "s1": "Sign in to Codeberg, open the menu of your profile picture (Profiles and Settings), then Settings.",
-      "s2": "Open the Applications tab.",
-      "s3": "Under Manage Access Tokens, in Generate New Token, type a Token Name you will recognise, for example OpenDives.",
-      "s4": "If the form offers it, limit the token to your repository: choose Specific repositories, then the repository of your logbook.",
-      "s5": "Permissions: for repository, choose Read and Write. Leave the others on No access.",
-      "s6": "If the form offers an expiry date, choose a near one. Codeberg’s guide does not mention one: without a date, delete the token from this page when you stop using it.",
-      "s7": "Tap Generate Token, then copy the token."
+      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
+      "open": "Open Codeberg’s applications page",
+      "note": "On Codeberg, a token does not expire. You can delete it at any time.",
+      "s1": "Sign in to Codeberg, tap your avatar, then [kbd]Settings[/kbd].",
+      "s2": "Open the [kbd]Applications[/kbd] tab.",
+      "s3": "Under [kbd]Access tokens[/kbd], tap [kbd]New access token[/kbd].",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
+      "s5": "Choose [kbd]All (public, private, and limited)[/kbd] so that the token reaches your private repository.",
+      "s6": "Under [kbd]Select permissions[/kbd], set [kbd]repository[/kbd] to [kbd]Read and write[/kbd]. Leave the others on [kbd]No access[/kbd].",
+      "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
     },
     "hosts": "Hosts"
   },
@@ -4429,7 +4442,9 @@
       "intro": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this phone.",
       "email": "Email address",
       "passwordText": "Kept only in the secure storage of this phone.",
-      "invalidEmail": "This email address is not valid."
+      "invalidEmail": "This email address is not valid.",
+      "introTablet": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this tablet.",
+      "passwordTextTablet": "Kept only in the secure storage of this tablet."
     },
     "create": {
       "intro": "Free. A code is sent to you by email to confirm the address.",
@@ -4442,7 +4457,9 @@
       "count": "{n} of {total}",
       "copy": "Copying the logbook to this phone",
       "note": "Keep the app open until it is done. Then your logbook opens, and you can read it offline.",
-      "progressLabel": "Downloading the dives"
+      "progressLabel": "Downloading the dives",
+      "copyTablet": "Copying the logbook to this tablet",
+      "gitConnect": "Connecting to the repository"
     },
     "local": {
       "intro": "Your logbook is created right away, with no sign-up.",
@@ -4452,12 +4469,67 @@
       "noBackupText": "If you lose or change your phone, the logbook is lost.",
       "later": "You can link it later",
       "laterText": "To a Subsurface account or to your git repository, from Account. Your dives follow.",
-      "start": "Start"
+      "start": "Start",
+      "phoneOnlyTablet": "On this tablet only",
+      "noBackupTextTablet": "If you lose or change your tablet, the logbook is lost."
     },
     "snackbar": {
       "downloaded": "Logbook downloaded. It stays on this phone, even offline.",
       "created": "Account created. Your logbook is ready.",
-      "local": "Logbook created on this phone."
+      "local": "Logbook created on this phone.",
+      "downloadedTablet": "Logbook downloaded. It stays on this tablet, even offline.",
+      "localTablet": "Logbook created on this tablet.",
+      "gitDownloaded": "Logbook downloaded from your repository. It stays on this phone, even without a network.",
+      "gitDownloadedTablet": "Logbook downloaded from your repository. It stays on this tablet, even without a network."
+    },
+    "tabletStart": "Get started",
+    "profileLabel": "Dive profile",
+    "profileDepthValue": "32.4 m",
+    "profileDepthCaption": "Max. depth",
+    "profileDurationValue": "54 min",
+    "profileDurationCaption": "Duration · Nitrox 32 %"
+  },
+  "repoHelp": {
+    "title": "Create a repository",
+    "tabs": "Sites",
+    "afterwards": "Then come back to OpenDives, paste the address, and create an access token for this repository.",
+    "open": "Open {name}’s “{page}” page",
+    "github": {
+      "name": "GitHub",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. GitHub exists only in English: the labels below are those of its interface.",
+      "page": "New repository",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to GitHub, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
+      "s2": "[kbd]Repository name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
+      "s3": "Choose [kbd]Private[/kbd].",
+      "s4": "Tick nothing under [kbd]Initialize this repository[/kbd]: no README, no .gitignore, no licence. The repository must stay empty.",
+      "s5": "Tap [kbd]Create repository[/kbd].",
+      "s6": "Under [kbd]Quick setup[/kbd], choose [kbd]HTTPS[/kbd], then copy the address, for example [code]https://github.com/you/carnet-plongee.git[/code]."
+    },
+    "gitlab": {
+      "name": "GitLab",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
+      "page": "New project",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to GitLab, then tap [kbd]+ (Create new)[/kbd] at the top of the menu and [kbd]New project/repository[/kbd].",
+      "s2": "Tap [kbd]Create blank project[/kbd].",
+      "s3": "[kbd]Project name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
+      "s4": "Under [kbd]Visibility Level[/kbd], choose [kbd]Private[/kbd].",
+      "s5": "Untick [kbd]Initialize repository with a README[/kbd]. The repository must stay empty.",
+      "s6": "Tap [kbd]Create project[/kbd].",
+      "s7": "Tap [kbd]Code[/kbd], then copy the address under [kbd]Clone with HTTPS[/kbd], for example [code]https://gitlab.com/you/carnet-plongee.git[/code]."
+    },
+    "codeberg": {
+      "name": "Codeberg",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
+      "page": "New repository",
+      "note": "A private repository: only you can see it.",
+      "s1": "Sign in to Codeberg, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
+      "s2": "[kbd]Repository name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
+      "s3": "Tick [kbd]Make repository private[/kbd].",
+      "s4": "Leave [kbd]Initialize repository[/kbd] unticked. The repository must stay empty.",
+      "s5": "Tap [kbd]Create repository[/kbd].",
+      "s6": "Choose [kbd]HTTPS[/kbd] above the repository address, then copy it, for example [code]https://codeberg.org/you/carnet-plongee.git[/code]."
     }
   }
 }
