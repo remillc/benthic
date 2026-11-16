@@ -4346,3 +4346,23 @@ Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.htm
 - iCloud Drive shows only on macOS.
 - Dropping a `.ssrf` or `.xml` file on the window imports it.
 - The beta on `main` is untouched.
+
+## [ ] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
+
+Christian approved these on 16 November 2026. **Release edition:** do them on the branches of tasks 227 (`feature/release-phone-first-launch`) and 228 (`feature/release-desktop-first-launch`), or on a new branch `feature/release-first-launch-fixes` started from the latest of them. Do not merge into `main`.
+
+1. **The cloud sign-in hint, everywhere** (`…nuage-connexion…` and `…ouvrir-connexion…`, phone, tablet in both orientations, desktop):
+   - The text becomes « La page de connexion du service s’ouvre. » then, on a second line, « Vous revenez ici ensuite. ». The app opens the page itself: no wording may suggest that the person opens a browser.
+   - The hint is centred under the button. On the tablet and the desktop, the button « Se connecter à {service} » is also centred (it was aligned right).
+2. **The blue band on phones** (`docs/mockups/android-premier-lancement-production*.dc.html`): it now uses the app's own section band.
+   - It uses the same gradient as `--od-band-gradient`, but with the light centre raised to `at 38% -40%`, so that white text keeps at least 4.5:1 everywhere on it. The worst pixel measured on the mock-ups: « OpenDives » 4.96:1 on the first step.
+   - The faint dive profile of `SectionBand.svelte` sits at the bottom of the band, with its wave (18 dp, the same path). On the first step, the faint profile and the wave come under the large decorative profile.
+   - The small band of the later steps is 108 dp tall.
+   - Reuse `SectionBand`, or its pieces, rather than drawing a new band.
+3. **Progress bars on phones** (`…importer-divelogs-progres`, `…importer-divelogs-interrompu`): the wavy indicator and its track stay inside the white card. They never overflow it.
+
+**Test:**
+- On a phone, a tablet and the desktop, the sign-in hint reads on two lines, centred.
+- On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
+- The progress bars stay inside their card at 360 dp wide.
+- `main` is untouched.
