@@ -4159,3 +4159,578 @@ Christian approved this on 15 November 2026.
 Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
 
 Done (part 2, release edition): on `feature/release-new-logbook`, `ReleaseEmptyLogbook.svelte`, the tablet empty logbook (band with the logbook name and where it is kept, then « Aucune plongée »; on the right the 520 dp column with the smooth profile, « Télécharger mes plongées » and the paper). Desktop (beta): the ready screen of a new logbook uses the same label and icon, on `feature/desktop-logbook`. Both parts done.
+
+## [x] 2026-11-16-221 Check every import format the core reads, with real files
+
+Christian asked for this on 16 November 2026. It is for the website's selling points (to-do #80): we want to be able to say how many dive log formats OpenDives imports, and be right. No interface change.
+
+**What we know:**
+- OpenDives compiles the core's full import path: no `SUBSURFACE_MOBILE`, with sqlite, libzip and libxslt, and the XSLT stylesheets copied into the app.
+- The file picker accepts any file, and the core picks the format from the extension.
+- Only FIT has a test (`tests/fit_import_test.cpp`).
+
+**Do:**
+1. **A test over sample files.** Add `tests/import_formats_test.cpp`, built by `poc/build.sh`, which imports through the façade's `import_dives` each sample file of Subsurface's `third_party/subsurface/dives/`. The samples include:
+   - .ssrf, .xml, UDDF, UDCF ;
+   - Suunto DM3 .SDE, DM4 and DM5 .db ;
+   - divelogs.de .DLD, JDiveLog .jlb ;
+   - Shearwater Cloud and Seac .db, Diving Log .sql ;
+   - DL7 .zxu, OSTCtools .dive, Divesoft .dlf ;
+   - DataTrak .log, SmartTrak .slg ;
+   - Garmin and Suunto .fit, Suunto .json ;
+   - APD .uddf.
+
+   Where Subsurface keeps a reference (the `…xml` next to a sample, e.g. `TestDiveDM4.xml`, `test-apd-inspiration-reference.xml`), compare what was read with it as Subsurface's own tests do (`third_party/subsurface/tests/testparse.cpp`, testparsetoxml…). Otherwise, check the number of dives and that each has a profile.
+2. **Android.** Run the same test with the NDK on the emulator, as `tests/release-check.sh` does for the other programs, to confirm that sqlite, libzip and the XSLT stylesheets work in the app's own build.
+3. **Suunto app JSON.** `import-suunto-json` is not in `core/compat/core-files.txt`: it is replaced by a stub in `qthelper_compat.cpp`. If adding the source file builds without changing Subsurface, add it and test the `suunto_*.json` samples. If it cannot, say why.
+4. **CSV.** It is out of scope: the core refuses a .csv opened directly, and asks for its column-mapping dialog. Just list which samples need it (Seabear, Poseidon, Sensus, generic CSV).
+5. **The report.** Write `docs/import-formats.md`: one line per format, with its extension(s), the sample used, the result (works, works with differences, fails, not reachable) and a short note. Give the total that work. Mark the task done with that total.
+
+**Do not change:**
+- the import screen and its texts (`addImportFormats`, `importFailed`) ;
+- the release notes.
+
+The texts will be updated in the design session from this report.
+
+Done in test/import-formats: **18 formats work, 7 are not reachable, none fails** (report: `docs/import-formats.md`). Of the 18, 17 are clean and one works with differences (the Suunto app's JSON); counting only formats other than Subsurface's own log, 17. `tests/import_formats_test.cpp` (built by `poc/build.sh` as `build/poc/import-formats`) imports 48 sample files through `import_dives()` (and the Suunto `.json` + `.fit` pair through the core): against Subsurface's reference where one exists (20 samples; one identical as it comes, 18 differing only by what the import itself adds, the cylinder depth and the dive number, which Subsurface's own import adds too, and one that differs in content), else the dive count and a profile on every dive. Works: Subsurface XML and `.ssrf`, UDDF, APD UDDF, UDCF, Suunto DM3 `.SDE`, DM4 and DM5 `.db`, divelogs.de `.DLD` and `.divelogs`, JDiveLog `.jlb`, Shearwater Cloud `.db`, Seac `.db`, Diving Log `.sql`, OSTCtools `.dive`, Divesoft `.dlf`, DataTrak `.log`, FIT (Garmin and Suunto), Suunto app JSON. Not reachable: SmartTrak `.slg` (a separate program in Subsurface, not in the core), DL7 `.zxu`, and the CSV samples (Seabear, Poseidon, Sensus, generic CSV and TSV), which need the column mapping. **Suunto JSON:** added, without changing Subsurface: `core/compat/qtshim/qtjson.h` stands in for the Qt JSON classes, `QFile` and `QFileInfo` that `import-suunto-json.cpp` uses, `import-suunto-json` is in `core-files.txt` and the stub in `qthelper_compat.cpp` is gone. Four of the five `suunto_*.json` samples are identical to the references; `suunto_ocean_nitrox.json` alone has no gas mix and no gradient factors (they are in its `.fit`), and the core pairs the two files only through `suunto_json_fit_pair_import()`, which the façade does not call (the pair gives the reference, checked in the test): to decide whether the app pairs a `.json` and a `.fit` selected together. **Android:** the same program built with the NDK (`tests/android/build.sh`, `tests/android/run-import-formats.sh`) on `emulator-5554`: 108 checks passed, 0 failed, the same results as on the host line for line; the stylesheet folder must be an absolute path (the app's is). Not added to `tests/release-check.sh`, which locks the planner and tool calculations, and which would need the 29 MB of samples pushed to the emulator for a check that is not about the planner. Round trip: 98 passed, 0 failed. Not changed: the import screen, its texts, the release notes.
+
+## [x] 2026-11-16-222 Desktop: the window without a logbook, a larger brand row with more space
+
+Christian approved this on 16 November 2026.
+
+**Mock-up:** `docs/mockups/bureau-demarrage-actuel.dc.html`. It is now a drawn mock-up of the screen the desktop app shows today: the faded rail, then « OpenDives », « Aucun carnet ouvert dans cette fenêtre », « Ouvrir un carnet… », « Nouveau carnet… » and « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ».
+
+**What changes:**
+- The logo in use goes from about 60 px to **96 px**.
+- « OpenDives » goes to **44 px** (weight 500, letter spacing −0.5).
+- « Aucun carnet ouvert dans cette fenêtre » goes to **18 px**, #4B4A47, 4 px under the name.
+- The gap between the logo and the text is **24 px**.
+- The brand row stands **48 px** above the two buttons (about 20 px today).
+- The block stays centred in the window, 600 px wide.
+
+**What does not change:** the buttons, their order, their texts, the drop line and the rail.
+
+**Where:** the desktop app (`desktop/`), on `main`. This is the current beta desktop, not the release edition. The desktop source is not in this repository's history I can see; if the screen lives elsewhere, apply it there.
+
+**Test:** the window without a logbook matches the mock-up at 1440 × 900, and the block stays centred when the window is resized.
+
+Done on `feature/desktop-logbook` (the desktop app lives there until it is merged): `DesktopLogbookStart.svelte`, logo 96 px, « OpenDives » 44 px (500, −0.5), the line 18 px in `--od-text-2` 4 px under it, 24 px between logo and text, 48 px above the buttons, a 600 px centred column; buttons, drop line and rail unchanged. Checked in the desktop app at 1440 × 900 against the mock-up.
+
+## [x] 2026-11-16-223 Release edition: « Plus de 30 formats » and the list of accepted formats on « Importer un carnet »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on the branch of task 218 (`feature/release-new-logbook`). Do not merge it into `main`. It follows task 221: do it once `docs/import-formats.md` exists.
+
+Mock-ups:
+- `docs/mockups/android-tablette-premier-lancement-production-importer-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-fichier-erreur-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-formats-paysage.dc.html`.
+
+**Changes:**
+1. **The help line of « Un fichier »** becomes « Plus de 30 formats : .ssrf, .xml, UDDF, FIT, CSV, Suunto, Shearwater et d’autres carnets. ». **Use the real total** from `docs/import-formats.md`:
+   - if fewer than 30 formats work, write the true number (« Plus de 20 formats », or the exact count) ;
+   - name only brands that work.
+2. **A link under the two choice rows:** « Voir les formats acceptés » (14 sp, #1F5C99, underlined), on the source screen and on the « fichier illisible » error screen, in both orientations.
+3. **The link opens the « Formats acceptés » dialog.** It is a **basic dialog**: no ✕, a text button « Fermer » at the bottom right, and it also closes with a tap on the scrim and with Back (the new rule in `docs/system-design.md`).
+   - The text « OpenDives lit plus de 30 formats de carnet. Choisissez le fichier exporté par votre logiciel ou votre appareil. », with the same real number.
+   - Three columns: « Formats ouverts », « Montres et ordinateurs de plongée », « Autres carnets ».
+   - One line per format with its extensions, as in the mock-up.
+   - **The list comes from `docs/import-formats.md`:** only the formats marked as working, in one place in the code (a data file the dialog reads), so that the report and the dialog stay the same.
+   - CSV appears only once the CSV import exists. Until then, leave it out.
+4. All texts go in `fr.json` and `en.json`.
+
+**Test:**
+- The link opens the dialog, and « Fermer », the scrim and Back close it.
+- The number in the help line and in the dialog equals the number of lines in the dialog.
+- The beta on `main` is untouched.
+
+Done on `feature/release-new-logbook` (not merged): the real total from `docs/import-formats.md`, « 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. » (no CSV); the link « Voir les formats acceptés » on the source and « fichier illisible » screens; the basic dialog « Formats acceptés » (Fermer, scrim, Back) in three columns read from one list, `app/src/lib/import-formats.js`, checked against the report by `tests/app/import-formats.test.mjs`.
+
+## [x] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
+
+Christian approved these mock-ups on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-first-launch-complete`, started from `feature/release-new-logbook` (tasks 218 and 223). Do not merge it into `main`. The beta on `main` stays unchanged. Tablets only; the phone comes later (to-do #84).
+
+In the canvas, all these screens are now in the chapter « Version publique (étape 2) · Tablette Android », right after the beta tablet sections. Texts exactly as in the mock-ups, all in `fr.json` and `en.json`. Mock-up names below drop the prefix `docs/mockups/android-tablette-premier-lancement-production-`.
+
+### 1. Portrait for every step
+
+Every step of task 218 now has a portrait mock-up (`…-portrait.dc.html`). From the second step on, the blue panel is a compact 540 dp hero above the column. The first step keeps its 640 dp hero. The « Une question ? À propos et contact » link (task 219) stays at the bottom and never overlaps the buttons.
+
+### 2. Connecting a cloud account
+
+- **« Se connecter à {service} »** (`nuage-connexion`, `ouvrir-connexion`): the line « Connectez-vous dans votre navigateur, puis revenez ici. » is now a hint **under the button**, 13 sp, aligned right with it. It is no longer a paragraph above it.
+- **New: connection in progress** (`ouvrir-attente-paysage`). The app shows it while the browser tab is open and when the person comes back before the provider has answered:
+  - the link band with a spinner on the line;
+  - « Connexion en cours… » and « Terminez la connexion dans la page qui s’est ouverte. Vous reviendrez ici ensuite. » ;
+  - « Annuler » (outlined) and « Rouvrir la page » (text button with the external-link icon), which opens the browser tab again.
+  - Use the same screen in the « Créer un carnet » path; the title is then the logbook name.
+- **Refused or cancelled** (`nuage-refus`): « Connexion non établie », « La connexion a été annulée ou refusée dans le navigateur. » and « Réessayer ».
+- The provider's own sign-in and consent pages are not drawn: they belong to the provider.
+
+### 3. WebDAV or Nextcloud
+
+- `webdav` (create) and `ouvrir-webdav` (open): « Adresse du serveur », « Nom d’utilisateur », « Mot de passe », with the help line « Dans Nextcloud, créez un mot de passe d’application dans Réglages › Sécurité. Il reste sur cette tablette. », then « Créer le carnet » or « Voir mes carnets ».
+- `webdav-erreur`: the field error « Impossible de joindre ce serveur. Vérifiez l’adresse. » under the address.
+
+### 4. Errors
+
+- `git-erreur` (create): « Ce dépôt contient déjà un carnet. » under the address, and « Pour l’utiliser, passez par Ouvrir mon carnet OpenDives. », with the link.
+- `ouvrir-git-erreur`: « Ce dépôt ne contient pas de carnet OpenDives. » and « Pour commencer un carnet dans ce dépôt, passez par Créer un carnet. », with the link.
+- `ouvrir-aucun-carnet`: « Aucun carnet dans ce compte », « Le dossier OpenDives de ce compte est vide, ou il n’existe pas encore. », « Changer de compte » and « Créer un carnet ici ».
+- `importer-fichier-erreur`: « Ce fichier n’a pas pu être lu » with the file name, above the two choice rows.
+- `importer-divelogs-erreur`: « Nom d’utilisateur ou mot de passe incorrect. » under the fields.
+- `importer-divelogs-interrompu`: the progress card stops on « Téléchargement interrompu », « 184 sur 312 · la connexion à Internet a été perdue. », then « Les 184 plongées déjà téléchargées sont gardées. « Reprendre » télécharge seulement les autres. », with « Annuler » and « Reprendre ». « Reprendre » must download only the dives still missing.
+
+### 5. The « Formats acceptés » dialog (changes task 223)
+
+Mock-up: `importer-formats-paysage`.
+- The text under the title becomes « Importez vos plongées depuis n’importe lequel de ces formats. » The number of formats is no longer in the dialog.
+- The three groups become three white cards side by side. Each card has a 36 dp icon tile (a file for « Formats ouverts », the dive computer icon for « Montres et ordinateurs », a book for « Autres carnets »), a 16 sp title, and no count.
+- On each line, the name is on the left and each extension is a small chip on the right (monospace 12 sp, background #EEF3F9, text #114477).
+- The dialog is 1 040 dp wide. It stays a basic dialog with « Fermer ».
+- The list still comes from `app/src/lib/import-formats.js`. The help line of « Un fichier » keeps the real number.
+
+### 6. The empty logbook (tablet)
+
+Mock-ups: `docs/mockups/android-tablette-carnet-vide-{paysage,portrait}.dc.html` and `…-carnet-vide-menu-paysage.dc.html`.
+- The decorative profile is wider (724 dp in landscape, 624 dp in portrait) and still never touches the screen edges.
+- The logbook menu (⋮ next to « Mon carnet · Google Drive ») has: « Renommer le carnet », « Changer d’endroit » (« Nuage, dépôt git ou cette tablette »), « Ouvrir un autre carnet », « Nouveau carnet » and « Exporter le carnet » (disabled, « Aucune plongée à exporter »). « Réglages du carnet » is gone from this menu.
+
+### 7. The demo logbook (to-do #69)
+
+Mock-ups: `docs/mockups/android-tablette-demo{,-quitter,-ajout}-{paysage,portrait}.dc.html`.
+- On the first screen, the link « Essayer avec un carnet d’exemple » (hidden since task 218) now opens the demo logbook. Use the sample logbook that ships with the app.
+- While the demo is open, a banner sits at the top of the content: « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » with the button « Commencer mon carnet ».
+- « Commencer mon carnet » opens a basic dialog (`demo-quitter`): « Commencer mon carnet ? », « Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet. », « Annuler » and « Commencer mon carnet ». Confirming deletes the demo logbook and goes back to the first step.
+- Adding, downloading or importing a dive while in the demo opens `demo-ajout`: « Vous êtes dans le carnet d’exemple », « Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé. », with the same two buttons.
+- Nothing from the demo logbook is ever synced or kept in a real logbook.
+
+### 8. Importing a CSV file
+
+Mock-ups: `docs/mockups/android-tablette-import-csv-{type,colonnes,apercu}-paysage.dc.html`. It is a dialog in three steps, with the step shown in its header (« Importer un fichier CSV · étape n sur 3 »). It opens when the chosen file is a `.csv`, both from the first launch and from « Importer un fichier » in the logbook.
+1. **Type de fichier:**
+   - The file name, with its columns, lines and separator.
+   - « Que contient chaque ligne ? » with « Un point du profil » or « Une plongée entière ».
+   - « Format connu » (Seabear, Poseidon MkVI, Sensus fill the columns in advance).
+   - « Annuler » and « Suivant ».
+2. **Colonnes:**
+   - The first rows of the file, with a menu above each column (« Temps (min:s) », « Profondeur (m) », « Température (°C) », « Pression (bar) », « Ignorer »…).
+   - « Unités du fichier », « Séparateur » and « Date de la plongée ».
+   - « Retour » and « Suivant ».
+3. **Aperçu:**
+   - What was read: dives, duration and maximum depth.
+   - « Nouvelle plongée » with its date, « Site à préciser », and « Le site, l’équipement et les gaz se complètent ensuite dans Modifier. »
+   - « Retour » and « Ajouter au carnet ».
+
+Use the core's CSV import (the one task 221 checked) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
+
+### Test
+
+- In the release build, on a tablet, in both orientations: every screen above matches its mock-up.
+- Cloud: the connection-in-progress screen appears while the browser is open, « Rouvrir la page » reopens it, and a refusal lands on `nuage-refus`.
+- Errors: a non-empty repository, a repository without a logbook, an unreachable WebDAV server, wrong divelogs.de credentials, an unreadable file and a lost connection during a divelogs.de download each show their screen. « Reprendre » downloads only the missing dives.
+- Demo: the banner stays visible. Adding a dive opens `demo-ajout`. « Commencer mon carnet » erases the demo and goes back to the first step.
+- CSV: a Seabear file and a hand-mapped file each import one correct dive.
+- The beta on `main` is untouched.
+
+Done on `feature/release-first-launch-complete` (not merged): parts 1–6 (portrait for every step, cloud connection states, WebDAV, the errors, the formats dialog, the tablet empty logbook and its menu) and parts 7–8 (the demo logbook; the three-step CSV import through a new façade call `import_csv`, Seabear, Sensus, Poseidon MkVI and hand-mapped files; CSV added to `docs/import-formats.md` and the formats list, 19 formats). Waiting for native work: « Reprendre » for divelogs.de (a list call and a download of chosen ids), the personal cloud (#74), WebDAV, « Renommer le carnet » and « Changer d’endroit ».
+
+## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
+
+Christian approved this on 16 November 2026. **Beta only:** do it on `main`. Do not touch the release-edition branches.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
+
+- On the first-launch screen (`/welcome`), a badge follows the name « OpenDives » in the brand row:
+  - the text « Bêta » (« Beta » in `en.json`), in capitals, 14 sp, bold, letter spacing 0.8;
+  - text #114477 on #DCE7F3, a full pill (3 dp × 10 dp padding);
+  - 8 dp after the name.
+- The badge is decorative: put the text in the accessible name of the brand row (« OpenDives, bêta »), not a separate stop for screen readers.
+- Use the same screen on phones, tablets and desktop; the badge follows the name wherever the brand row appears on this screen.
+
+**Test:** on a tablet in both orientations and on a phone, the badge sits on the name's line, 8 dp away, without wrapping; TalkBack reads « OpenDives, bêta » once.
+
+Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.
+
+## [x] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-formats-link`, started from `feature/release-first-launch-complete` (task 224). Do not merge it into `main`.
+
+Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{paysage,portrait}.dc.html` and `…-importer-fichier-erreur-{paysage,portrait}.dc.html`.
+
+- On « Importer un carnet » and on the « fichier illisible » error screen, the link « Voir les formats acceptés » moves from under both choice rows to **right under the « Un fichier » row**, before « divelogs.de ».
+- The link is a 48 dp tall touch target (the text stays 14 sp, #1F5C99, underlined, 4 dp padding on each side). The space between the target and each row is 4 dp, so the text sits about 18 dp from both rows. Everything stays on the 4 dp grid.
+- The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
+
+**Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
+
+Done on `feature/release-formats-link` (not merged; it also carries main, so the CSV import and the import of several files live together): the link is the row right under « Un fichier », before divelogs.de, on the import and unreadable-file screens (the same step), a 48 dp target with 4 dp of padding, 4 dp from each row, read as a link. Checked in headless Edge at 1280 × 800; test in `tests/app/import-formats.test.mjs`.
+
+## [x] 2026-11-16-227 Release edition: the first launch on Android phones
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-phone-first-launch`, started from `feature/release-formats-link` (task 226). Do not merge it into `main`. The beta on `main` stays unchanged.
+
+Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.html` (390 × 844). They are the phone versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors. Only the layout changes.
+
+**Layout on a phone (width under 600 dp):**
+- **First step** (`android-premier-lancement-production.dc.html`):
+  - a blue band 330 dp tall at the top, with the logo (40 dp), « OpenDives » (24 sp), « Votre carnet de plongée, sur tous vos appareils. » (26 sp), the line under it (14 sp) and the decorative profile, scaled down and 24 dp from both edges;
+  - below it, « Pour commencer », the three choice rows and « Essayer avec un carnet d’exemple ».
+- **Every other step:** a blue band 96 dp tall with the logo (32 dp) and « OpenDives » (20 sp), then the step's column.
+- **The column:** 20 dp side padding, content from the top (not centred). Page titles are 24 sp.
+- **Buttons** take the full width of the column.
+- **The link band** (OpenDives ↔ service): 64 dp tiles and a 56 dp line.
+- **« Une question ? À propos et contact »** comes after the content, at the bottom of the screen when there is room. When the content is taller than the screen (« Importer › nouveau carnet »), the page scrolls and the link follows the content.
+- **Texts:** « cette tablette » becomes « ce téléphone » (« Seulement sur ce téléphone », « Le jeton reste sur ce téléphone. », « Il reste sur ce téléphone. »).
+- **« Formats acceptés »:** the same basic dialog, 358 dp wide, with the three cards stacked. The list scrolls inside the dialog, and « Fermer » stays visible.
+- **« Voir les formats acceptés »** sits under « Un fichier », as a 48 dp target (task 226).
+- **Motion between steps:** the same shared-axis X transition as on the tablet.
+
+**Test:**
+- On a phone, in portrait, every screen matches its mock-up. Nothing touches the screen edges, and nothing is cut off; long screens scroll.
+- « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
+- On a tablet, nothing changes.
+- The beta on `main` is untouched.
+
+Done on `feature/release-phone-first-launch` (not merged): every step on phones under 768 dp (330 dp band on the first step, 108 dp on the others as task 230 corrected, the column from the top, full-width buttons, the formats dialog stacked at 358 dp, « ce téléphone » texts), WelcomeEntry shows the release screen on phones too; tablets unchanged (screenshots identical apart from the 230 sign-in changes). Task 230 (phone and tablet parts) done there too.
+
+## [x] 2026-11-16-228 Release edition: the first launch on the desktop
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-desktop-first-launch`, started from `feature/release-phone-first-launch` (task 227). Do not merge it into `main`. On `main`, the beta keeps its current window without a logbook (task 222).
+
+Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.html` (a 1440 × 900 window). They are the desktop versions of the tablet screens of tasks 218, 223, 224 and 226: the same steps, texts, logic and errors.
+
+**Layout:**
+- The window without a logbook becomes « Pour commencer ».
+- The blue panel (700 dp) is on the left and the steps are in the right-hand column, as on a tablet in landscape.
+- The panel is decorative and keeps the window's full height.
+- The motion between steps is the same shared-axis X transition.
+
+**Desktop-only details:**
+- « cette tablette » becomes « cet ordinateur »: « Seulement sur cet ordinateur », « Le jeton reste sur cet ordinateur. », « Il reste sur cet ordinateur. ».
+- Under the choices of « Pour commencer » and of « Importer un carnet », add the line « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ». Dropping a file on the window starts the import with that file, as « Un fichier » does.
+- **iCloud Drive (note from Christian):**
+  - On macOS only, iCloud Drive also appears in the list of services: « Choisissez votre service » (create) and « Dans quel service ? » (open).
+  - Windows and Linux do not show it.
+  - iCloud Drive uses the Mac's own account, so there is no sign-in screen: after the choice, go straight to the connected screen, with the OpenDives folder of iCloud Drive.
+- « Voir les formats acceptés » sits under « Un fichier », as a 48 dp target (task 226).
+- The « Une question ? À propos et contact » link opens the desktop About page.
+- **Not drawn yet (to-do #83):** the list of recent logbooks above the choices, in a new window or after « Fermer le carnet ». Until it is drawn, keep what the desktop app does today for recent logbooks, if anything.
+
+**Test:**
+- On Windows, macOS and Linux, every screen matches its mock-up at 1440 × 900 and still fits at the smallest window size the app allows.
+- iCloud Drive shows only on macOS.
+- Dropping a `.ssrf` or `.xml` file on the window imports it.
+- The beta on `main` is untouched.
+
+Done on `feature/release-desktop-first-launch` (not merged; it also carries the desktop branch): in the release edition the desktop window without a logbook is « Pour commencer » (700 dp blue panel, the tablet steps on the right, « cet ordinateur » texts, the drop line and dropping a file starts the import, iCloud Drive on macOS only and stubbed, the help link opens About). Creating a logbook in Google Drive, OneDrive, Dropbox or WebDAV is real through the desktop cloud service; opening a logbook from a cloud account still says « coming » (the main process cannot list an account's logbooks). Recent logbooks (#83) not shown. The beta keeps the window of task 222.
+
+## [x] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
+
+Christian approved these on 16 November 2026. **Release edition:** do them on the branches of tasks 227 (`feature/release-phone-first-launch`) and 228 (`feature/release-desktop-first-launch`), or on a new branch `feature/release-first-launch-fixes` started from the latest of them. Do not merge into `main`.
+
+1. **The cloud sign-in hint, everywhere** (`…nuage-connexion…` and `…ouvrir-connexion…`, phone, tablet in both orientations, desktop):
+   - The text becomes « La page de connexion du service s’ouvre. » then, on a second line, « Vous revenez ici ensuite. ». The app opens the page itself: no wording may suggest that the person opens a browser.
+   - The hint is centred under the button. On the tablet and the desktop, the button « Se connecter à {service} » is also centred (it was aligned right).
+2. **The blue band on phones** (`docs/mockups/android-premier-lancement-production*.dc.html`): it now uses the app's own section band.
+   - It uses the same gradient as `--od-band-gradient`, but with the light centre raised to `at 38% -40%`, so that white text keeps at least 4.5:1 everywhere on it. The worst pixel measured on the mock-ups: « OpenDives » 4.96:1 on the first step.
+   - The faint dive profile of `SectionBand.svelte` sits at the bottom of the band, with its wave (18 dp, the same path). On the first step, the faint profile and the wave come under the large decorative profile.
+   - The small band of the later steps is 108 dp tall.
+   - Reuse `SectionBand`, or its pieces, rather than drawing a new band.
+3. **Progress bars on phones** (`…importer-divelogs-progres`, `…importer-divelogs-interrompu`): the wavy indicator and its track stay inside the white card. They never overflow it.
+
+**Test:**
+- On a phone, a tablet and the desktop, the sign-in hint reads on two lines, centred.
+- On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
+- The progress bars stay inside their card at 360 dp wide.
+- `main` is untouched.
+
+Done (desktop): the two-line centred hint and the centred button come from the shared component; checked in a narrow window too. All parts done, on `feature/release-phone-first-launch` and `feature/release-desktop-first-launch`.
+
+## [x] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-new-logbook-two-steps`, started from the latest release branch (task 230). Do not merge it into `main`. Phone, tablet (both orientations) and desktop.
+
+Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, and the same names for `android-premier-lancement-production-` and `bureau-premier-lancement-production-`):
+- `…-nom` (new);
+- `…-ou` (changed);
+- `…-importer-nouveau-carnet` (changed).
+
+**Create a logbook** (after « Créer un carnet »):
+1. **« Nouveau carnet »** (`…-nom`): the field « Nom du carnet », prefilled « Mon carnet », its help line « Il s’affiche en haut du carnet et nomme son fichier. », and the button « Suivant ». Nothing else on the screen.
+2. **« Où le garder ? »** (`…-ou`):
+   - The logbook name is the page title (« Mon carnet », 28 sp), with the pencil that goes back to step 1.
+   - Under it, the subtitle « Où le garder ? », then « Vous pourrez changer d’endroit plus tard. » and the three rows: « Dans mon nuage », « Dans un dépôt git », and « Seulement sur cette tablette / ce téléphone / cet ordinateur ».
+   - The following steps are unchanged.
+
+**Import a logbook** (`…-importer-nouveau-carnet`): « Nouveau carnet » keeps the summary card of the file and the name field (prefilled from the file name), then « Suivant ». It no longer shows the three rows: « Suivant » opens the same « Où le garder ? » screen.
+
+« Retour » goes back one step, with the shared-axis X transition backwards.
+
+**Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
+
+Done on `feature/release-new-logbook-two-steps` (not merged): « Nouveau carnet » (name, « Suivant ») then « Où le garder ? » (the name as title with the pencil back to the name, the three rows by device), for creating and importing, on phone, tablet and desktop; « Retour » one step back with the backward transition.
+
+## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`)**: do it on `main`.
+
+Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approved yet; for this task only, use `docs/mockups/android-premier-lancement-beta-creer-compte-code.dc.html` and `…-code-erreur.dc.html` (the file names keep « beta », the screens say « Alpha »).
+
+- On « Confirmer votre adresse » (account creation, the code sent by email), the code field becomes **six boxes**, one per digit: 48 × 56 dp each, 8 dp apart, the digit in a monospace font at 24 sp.
+- The label « Code de confirmation » sits above the boxes.
+- **States:**
+  - the box being typed has a 2 dp border in #1F5C99 and shows the caret;
+  - the other boxes have a 1 dp border in #75787C;
+  - on error, all six boxes have a 2 dp border in #B3261E, and the message « Code incorrect. Vérifiez le dernier courriel reçu. » shows under them.
+- **One field, not six:** it is a single input drawn as six boxes, so that it works as people expect:
+  - `inputmode="numeric"` and `autocomplete="one-time-code"`, so the system can offer the code;
+  - pasting the whole code fills all six boxes;
+  - Backspace goes back one box;
+  - TalkBack reads one field, « Code de confirmation, 6 chiffres ».
+- « Confirmer » sends the code. Sending it automatically when the sixth digit is typed is fine too.
+- Use the same field wherever the app asks for such a code. Texts in `fr.json` and `en.json`.
+
+**Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
+
+Done: `app/src/components/CodeField.svelte` (class `od-code-field`) is one `<input>` (`inputmode="numeric"`, `autocomplete="one-time-code"`, `maxlength="6"`, accessible name « Code de confirmation, 6 chiffres » from `confirmCode.codeLabel`) drawn as six 48 × 56 dp boxes 8 dp apart, Roboto Mono / monospace 24 sp, active box 2 dp #1F5C99 with a blinking caret, others 1 dp #75787C, error state all six 2 dp #B3261E with « Code incorrect. Vérifiez le dernier courriel reçu. » under them (`confirmCode.wrong`, fr and en; fr-CA falls back to fr). The rules are pure functions in `app/src/lib/code-input.js` (digits only, paste of « 482 913 » fills six, Backspace removes the last digit). It is used on « Confirmer votre adresse » (`pages/ConfirmCode.svelte`, routes `/welcome/code` and `/account/code`), the only place the app asks for such a code. « Confirmer » sends, enabled with six digits (Enter sends too); **no auto-send on the sixth digit**, so a wrong paste or typo is not sent before the diver looks at it. The error clears when the code is edited. New tokens `--od-code-active`, `--od-code-border`, `--od-code-error` (no existing token had these values), with dark values. On a 360 dp phone the card leaves 296 dp, so the boxes shrink in proportion to about 43 dp (gap stays 8 dp); no horizontal scroll at 360 or 412. The field sits in the editorial card like the other account screens (the mock-up has no card), the « Renvoyer le code » button is kept. iOS: same structure, 10 pt corners. Checked in headless Edge at 412 × 915 and 360 × 800 (normal, typing, error; light, dark, iOS). Tests: `tests/app/code-input.test.mjs`. Branch `feature/code-boxes`.
+
+## [x] 2026-11-16-229 Correction to 225: the badge says « Alpha », not « Bêta »
+
+Christian decided this on 16 November 2026. The app on `main` (with the Subsurface account) is the **alpha**. The word « bêta » now names the next edition, the one without Subsurface.
+
+- Do on `main` what task 225 asked, with one change: the badge text is « Alpha » (« Alpha » in `en.json` too), and the accessible name of the brand row is « OpenDives, alpha ».
+- If task 225 is already done, change the text only. The look, the size and the place of the badge stay the same.
+- Mock-ups: `docs/mockups/android-tablette-premier-lancement-{paysage,portrait}.dc.html` and `docs/mockups/android-accueil-c.dc.html` now show « ALPHA ».
+- Do not touch the release-edition branches.
+
+**Test:** the first-launch screen shows « ALPHA » next to the name on phones, tablets and the desktop; TalkBack reads « OpenDives, alpha » once.
+
+Done on main: the badge of task 225 now says « Alpha » (fr and en) and the brand row is named « OpenDives, alpha »; look, size and place unchanged; the release note of 225 updated. The desktop shows the same first-launch screen in a narrow window; its window without a logbook (task 222) has no badge.
+
+## [x] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`, with the Subsurface account)**: do it on `main`. Phones first. On tablets, the first-launch screen keeps its current layout, with the badge of task 229.
+
+Mock-ups, in `docs/mockups/`. Some file names still say « beta »: they are the alpha. All of them show the badge « ALPHA ».
+
+**1. The welcome screen** (`android-accueil-c.dc.html`):
+- **At the top**, the blue band (330 dp) with:
+  - the logo, « OpenDives » and the badge « ALPHA » (white text, 12 sp, a white outline over the blue);
+  - « Votre carnet de plongée, sur tous vos appareils. » and the line under it;
+  - the decorative dive profile, 24 dp from both edges.
+- **At the bottom, unchanged:** the three buttons (« J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte ») with their help lines, then « Utiliser mon propre dépôt git ».
+
+**2. The steps that follow** share one layout:
+- At the top, a 108 dp band with the logo, « OpenDives » and a smaller badge « ALPHA » (10 sp). The band uses the app's section band: the `--od-band-gradient` gradient, the faint dive profile and the wave of `SectionBand.svelte`. Reuse it.
+- Then « Retour », the page title, and buttons that take the full width.
+- At the bottom, « Une question ? À propos et contact ».
+
+**3. « J’ai un compte Subsurface »:**
+- **Sign-in** (`android-premier-lancement-beta-compte-subsurface.dc.html`):
+  - « Votre compte Subsurface », with the existing texts, « ce téléphone » instead of « cet appareil » ;
+  - « Adresse courriel », and « Mot de passe » with « Gardé seulement dans le stockage sécurisé de ce téléphone. » ;
+  - « Se connecter ».
+- **Download** (`…-compte-subsurface-telechargement`):
+  - a white card with three steps: « Connexion à Subsurface » with the address, « Téléchargement des plongées » with « n sur N » and the wavy indicator, and « Copie du carnet sur ce téléphone » ;
+  - the line « Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau. » ;
+  - « Annuler ».
+- **Then the logbook opens** (`…-compte-subsurface-carnet`), with the snackbar « Carnet téléchargé. Il reste sur ce téléphone, même sans réseau. » above the « + ».
+
+**4. « Créer un compte »** (`android-premier-lancement-beta-creer-compte*.dc.html`):
+- **Step 1 of 2**, « Créer votre compte Subsurface » :
+  - « Adresse courriel » ;
+  - « Mot de passe », with « Lettres sans accent, chiffres et @ . + _ - seulement. » ;
+  - « Créer le compte ».
+  - Error: « Cette adresse courriel n’est pas valide. ».
+- **Step 2 of 2**, « Confirmer votre adresse » : the six-box code of task 232, « Renvoyer le code » and « Confirmer ». The old screen said « étape 1 sur 2 » here: it is « étape 2 sur 2 ».
+- **Then the empty logbook**, with the snackbar « Compte créé. Votre carnet est prêt. ».
+
+**5. « Commencer sans compte »** (`android-premier-lancement-alpha-sans-compte*.dc.html`):
+- « Commencer sans compte », « Votre carnet est créé tout de suite, sans inscription. » ;
+- a white card with three rows:
+  - « Sur ce téléphone seulement » ;
+  - « Sans sauvegarde » (warning icon, amber tile) ;
+  - « Vous pourrez le relier plus tard » (to a Subsurface account or a git repository, from Compte) ;
+- the button « Commencer ».
+- Then the empty logbook. Its line reads « Sur ce téléphone seulement, aucune plongée », with the snackbar « Carnet créé sur ce téléphone. ».
+
+« Utiliser mon propre dépôt git » keeps its current screens for now.
+
+All texts in `fr.json` and `en.json`.
+
+**Test:**
+- On a phone, each path (sign in, create an account, start without an account) matches its mock-ups and ends in the logbook with its snackbar.
+- White text on the bands is at least 4.5:1.
+- « Retour » goes back one step.
+- On a tablet, nothing changes but the badge.
+
+Done: on `feature/alpha-phone-first-launch` (from `main`). **Phones only** (`newFirstLaunch`, `app/src/lib/first-launch.js`: Android look below 768 dp); tablets and iOS are unchanged (headless 1280 × 800 and 800 × 1280 welcome screenshots before and after are byte-identical; a tablet sign-in still has the navbar and the card). New: `components/FirstLaunchBand.svelte` (welcome band and step header), `pages/FirstDownload.svelte` (`/welcome/downloading`), `pages/WithoutAccount.svelte` (`/welcome/local`), the `firstLaunch` mode of `EditorialPage` (« Retour » link, title, content on the page, full-width 48 dp buttons, the About link at the bottom), the `outlined` field of `AccountField` (52 dp, label on the border), tokens `--od-first-*` and `--od-outlined-field-*` in `theme.css` (light and dark), keys `firstLaunch.*` and `logbook.emptyLocal` (fr and en; fr-CA falls back to fr, it already says « courriel »), four release-note lines. **Sign in:** sign-in, then the download screen (three steps, `n sur N` and the wavy indicator from the core's sync messages, « Annuler » signs out again), then the logbook opens with « Carnet téléchargé… ». An account without a logbook still goes to « Reprendre votre carnet ? ». **Create:** step 1 of 2, the code as « étape 2 sur 2 » (fixed on every platform), then the new account's empty logbook (the dives of this device, if any, are its first dives) with « Compte créé… »; the choice of source is skipped on a phone (import and divelogs.de stay in the empty logbook). **Sans compte:** the new screen, then « Commencer » creates the logbook with « Carnet créé sur ce téléphone. »; the empty logbook reads « Sur ce téléphone seulement, aucune plongée ». « Utiliser mon propre dépôt git » is untouched. Differences from the mock-ups: the count `n sur N` is the core's transfer count (objects of the git transfer, not dives: the core does not know the number of dives before it reads the log); step titles are drawn at 24 sp (the mock-ups' own stylesheet shrinks the 28 sp titles to 24 sp); the welcome badge fill is 12 % instead of 18 % (see 234). Tests: `tests/app/first-launch.test.mjs`; all of `tests/app` green. No e2e flow reads these screens (`tests/e2e` only covers the planner).
+
+## [x] 2026-11-16-234 Correction to 233: welcome band blue and a smaller Alpha badge
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/android-accueil-c.dc.html`.
+
+1. **Band background.** On the phone welcome screen, the 330 dp blue band uses **the same background as the blue panel of the tablet first launch** (mock-ups `android-tablette-premier-lancement-production-*`). From bottom to top:
+   - the linear gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`, from top to bottom;
+   - a light radial sheen: `ellipse 70% 45% at 22% 0%`, white at 22 % opacity fading to 0 at 70 %;
+   - the faint diagonal hatching: `repeating-linear-gradient(105deg, white 3.5 % 0–60 px, transparent 60–150 px)`, masked from opaque at the top to transparent at 55 % of the height.
+
+   It is not the light section-band gradient. The small 108 dp band of the following steps keeps the section band, as task 233 says.
+2. **Alpha badge.** It is smaller: text 10 sp, line height 14, letter spacing 0.6, padding 1 × 6 dp, total height 18 dp. Same colours: white text, white fill at 18 % and white 1 dp outline at 55 %.
+
+**Test:** on a phone, the welcome band matches the tablet's blue panel (gradient, sheen, hatching), white text on it stays at least 4.5:1, and the Alpha badge is 18 dp tall.
+
+Done: the welcome band (`FirstLaunchBand`, 330 dp) uses the tablet's blue panel through tokens `--od-first-band` (gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`), `--od-first-band-sheen` and `--od-first-band-hatch` (hatching masked to transparent at 55 %). Contrast, measured in headless Edge on the rendered band (lightest pixel under each text, text hidden; light and dark are identical): « OpenDives » 4.76:1, headline 7.55:1, the line under it (white 78 %) 6.72:1, the badge on the welcome band **4.04:1 with the specified 18 % fill, so its fill is 12 % there (4.57:1)**; the point 2 size of this task is replaced by 235.
+
+## [x] 2026-11-16-235 Correction to 234: the Alpha badge is even smaller on phone
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-accueil-c.dc.html` and `docs/mockups/android-premier-lancement-*.dc.html` (alpha screens).
+
+On every phone screen that shows the Alpha badge next to « OpenDives » (welcome screen and first-launch steps), the badge is smaller than in task 234:
+- text 9 sp, line height 12, letter spacing 0.5;
+- padding 1 × 5 dp, so the badge is 16 dp tall;
+- colours unchanged: white text, white fill at 18 %, white 1 dp outline at 55 %.
+
+This replaces the 18 dp badge in task 234 point 2. Point 1 of task 234 (band background) stays as written.
+
+**Test:** on a phone, the Alpha badge is 16 dp tall on the welcome screen and on every first-launch step.
+
+Done: on the welcome band and on every step, the badge is 9 sp, line height 12, letter spacing 0.5, padding 1 × 5 dp, 16 dp tall (`box-sizing: border-box`, 1 dp outline at 55 %); fill 18 % (12 % on the welcome band, see 234), white text. Tested in `tests/app/first-launch.test.mjs`.
+
+## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
+
+On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
+- **Height:** 140 dp (status bar not included). The logo, « OpenDives » and the Alpha badge stay in the same place at the top of the band.
+- **Background:** the same hatched dark blue as the welcome band (task 234 point 1): linear gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`, the light radial sheen at the top left and the faint diagonal hatching that fades out at 55 % of the height.
+- **No wave and no decorative profile.** The band ends with a straight edge on the paper background.
+
+Content below the band (« Retour », title, fields, buttons, the About link) is unchanged and shifts down by 32 dp. Everything must still fit on a 390 × 844 dp screen, including the error states.
+
+**Test:** on a phone, each first-launch step shows a 140 dp hatched dark-blue band with a straight bottom edge, no wave and no profile. The content fits without scrolling on a common phone, and white text on the band stays at least 4.5:1.
+
+Done: the header of the steps is `FirstLaunchBand` in its `step` variant: 140 dp plus the status bar (`max(safe-area-top, 24px) + 140px`, so 164 dp in the 390 × 844 test), the same hatched blue as the welcome band, a straight bottom edge, no wave and no profile (`SectionBand` is not used). The content shifts down 32 dp and fits in 390 × 844 on every step, error states included (the About link is at 844 − 28 dp). White text on the step band: « OpenDives » 7.4:1, badge 5.06:1.
+
+## [x] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
+
+The tablet first-launch screen (the one with « J’ai un compte Subsurface », « Créer un compte » and « Commencer sans compte ») gets a new layout:
+- **Landscape:** a 700 dp blue panel on the left, with the content on the paper background on the right.
+- **Portrait:** a 640 dp blue panel at the top, with the content below.
+
+**Blue panel**
+- Background: the same hatched dark blue as the phone welcome band (task 234 point 1).
+- Top: the round logo, « OpenDives » at 48 sp in white, then the Alpha badge.
+  - The badge is white text at 12 sp, line height 16, letter spacing 0.6, uppercase.
+  - Padding is 2 × 8 dp, with a white fill at 18 % and a white 1 dp outline at 55 %.
+- Title « Votre carnet de plongée, sur tous vos appareils. » at 40 sp in white.
+- The paragraph under the title, at 16 sp in white at 78 %.
+- Below the text, the dive profile:
+  - a white 2.5 dp line with a soft light-blue glow behind it;
+  - the water column, a pale white fill between the surface and the line;
+  - a dashed line at the surface;
+  - a white dot at the deepest point;
+  - two translucent labels, « 32,4 m » (max depth) and « 54 min » (duration · gas).
+
+**Content side**
+- « Pour commencer » at 28 sp.
+- The three existing buttons, unchanged, each with its hint below.
+- A thin divider, then the « Utiliser mon propre dépôt git » link.
+
+**Animation when the screen opens.** It plays once, each time the screen is shown.
+- The white line and its glow draw from left to right in 2.2 s, with standard easing (`cubic-bezier(0.4, 0, 0.2, 1)`). Animate the stroke length, i.e. path trimming.
+- The water column does **not** animate: it is visible from the start, and the line draws over it.
+- The deepest-point dot appears at 0.7 s: it scales from 40 % to 100 % with a fade-in over 0.3 s.
+- The two labels fade in and rise 8 dp at 2.1 s, over 0.5 s.
+- When the system setting to remove animations is on, show the final state at once.
+
+**Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
+
+Done: the tablet first-launch screen has the blue panel (`components/FirstLaunchPanel.svelte`: 700 dp on the left in landscape, 640 dp at the top in portrait, the hatched blue of the phone's band, the 96 dp logo, « OpenDives » at 48 sp, the Alpha badge, the title at 40 sp, the paragraph at 16 sp / 78 %) and, on the paper side, « Pour commencer » at 28 sp, the three buttons with their hints unchanged, a thin divider and the git link; « Une question ? » stays, centred on the content side. The profile is `components/ProfileHero.svelte` (curves and timing in `lib/profile-hero.js`, one curve per orientation scaled to its box): the line and its glow draw in 2.2 s with `cubic-bezier(0.4, 0, 0.2, 1)` by stroke trimming, the water column is still, the dot appears at 0.7 s (40 % to 100 %, fade over 0.3 s), the two labels rise 8 dp at 2.1 s over 0.5 s; the page re-creates the profile in `onPageBeforeIn`, so it plays each time the screen is shown; `prefers-reduced-motion` shows the final state at once. The badge fill is 12 %, not the 18 % of the brief, as on the phone's welcome band: with 18 % the white 12 sp text measured 4.2:1 on the panel, with 12 % 4.7:1 or more. The assertions of tasks 210, 211, 225 and 229 about the old tablet head (larger brand row, profile off the edges, pill badge on the tablet) were replaced on purpose by `tests/app/tablet-first-launch.test.mjs`; the old head and its CSS are removed (the phone and iOS branches are unchanged). Phones 412 x 915 and 390 x 844 are pixel-identical before and after.
+
+## [x] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Reference mock-up: `docs/mockups/android-tablette-detail-menu-paysage.dc.html`; the same chart appears in every tablet screen that shows the dive detail.
+
+On tablets, in the profile chart of the dive detail, two strokes change from 1.25 dp to **1 dp**:
+- the depth profile line;
+- the temperature curve.
+
+Nothing else changes: the grid lines, ticks and other curves, the water fill, the colours and the phone chart stay as they are.
+
+**Test:** on a tablet, open a dive. The profile line and the temperature curve are 1 dp wide, in landscape and in portrait.
+
+Done on main: from 768 dp, a token `--od-profile-main-width: 1` gives the depth line and the temperature curve of `DiveProfile.svelte` 1 dp; every other curve keeps `--od-profile-line-width` (1.25 dp), the phone is unchanged, and high contrast keeps its 2 dp. Test in `tests/app/profile-lines.test.mjs`.
+
+## [x] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** This follows task 237, which covers the tablet first-launch screen itself, and the phone steps of tasks 224–236.
+
+**Mock-ups**, each in `-paysage` and `-portrait`, all under `docs/mockups/android-tablette-premier-lancement-alpha-`:
+- `compte-subsurface`, `compte-subsurface-telechargement`, `compte-subsurface-carnet`;
+- `creer-compte`, `creer-compte-erreur`, `creer-compte-code`, `creer-compte-code-erreur`, `creer-compte-carnet`;
+- `sans-compte`, `sans-compte-carnet`.
+
+**Layout.** The steps keep the blue panel of task 237 (700 dp on the left in landscape, 640 dp at the top in portrait), with the same Alpha badge and dive profile. In these steps the profile is shown static, without the opening animation.
+
+The step content sits on the paper side, in the column of the release tablet steps: 452 dp wide, vertically centred, with « Une question ? À propos et contact » at the bottom. The content is the same as on the phone (tasks 224–236). Only these changes apply:
+- « ce téléphone » becomes « cette tablette » everywhere, e.g. « Sur cette tablette seulement », « Si vous perdez ou changez de tablette » and « Copie du carnet sur cette tablette ». The phone icon becomes a tablet icon.
+- Buttons are right-aligned, as in the other tablet steps; they are not full width.
+- **Confirmation code:** the six boxes are grouped with 8 dp between them and the group is centred in the column. The « Code de confirmation » label, the error message and the « Renvoyer le code » link start at the left edge of the first box.
+
+**When the logbook is ready.** These screens open the existing tablet logbook with a snackbar placed bottom-left, 24 dp from the content edge:
+- **Compte Subsurface:** the logbook with the dives, snackbar « Carnet téléchargé. Il reste sur cette tablette, même sans réseau. »
+- **Créer un compte:** the empty logbook with the subtitle « Cloud Subsurface », snackbar « Compte créé. Votre carnet est prêt. »
+- **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
+
+**Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
+
+Done: the three tablet paths (Subsurface account with its download, account creation with the code, « Commencer sans compte ») use the new style: the blue panel of task 237 shown still (no animation), the step in a 452 dp column vertically centred (landscape: beside the panel; portrait: under it, 120 dp side margins), « Retour », the title at 28 sp, the content of the phone steps (same components: `AccountField`, `CodeField`, the download card, the rows of `WithoutAccount`), buttons right-aligned and not full width, and the help link at the bottom of the content side. « ce téléphone » becomes « cette tablette » through `deviceKey` (`lib/first-launch.js`; keys with a `Tablet` suffix in fr.json and en.json) and the phone icon a tablet icon. The six code boxes are one 328 dp group centred in the column, the label, the error and « Renvoyer le code » at the left edge of the first box. « Commencer sans compte » on a tablet now goes through its own screen too (iOS still starts the logbook straight away). The logbook opens with the tablet snackbars (« Carnet téléchargé. Il reste sur cette tablette, même sans réseau. », « Compte créé. Votre carnet est prêt. », « Carnet créé sur cette tablette. ») at the bottom left, 24 dp from the rail's edge (`placement: 'start'`), and the empty local logbook says « Sur cette tablette seulement, aucune plongée ». Difference from the mock-ups: the account logbook keeps the existing subtitle « Connecté au cloud Subsurface, aucune plongée » instead of the two-line header « Cloud Subsurface / Aucune plongée ». Tests that said a tablet keeps its old screens (`tests/app/first-launch.test.mjs`) now say it takes the new style, on purpose. Phones are pixel-identical before and after.
+
+## [x] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/bureau-demarrage-actuel.dc.html` (no logbook open in the window) and `docs/mockups/bureau-carnet-vide-actuel.dc.html` (empty logbook).
+
+In the desktop app, the navigation rail always ends with « Réglages » (gear, shortcut Ctrl+, / ⌘,) and the account avatar at the bottom, as on the other desktop screens such as `bureau-carnets-accueil.dc.html`.
+
+- **No logbook open in the window:** only the four sections (Carnet, Sites, Statistiques, Outils) are dimmed and unavailable. « Réglages » and the avatar keep full colour and work, since they do not depend on a logbook.
+- **Empty logbook:** the rail is the full one, with « Réglages » and the avatar.
+
+**Test:** open a window with no logbook. The four sections are dimmed, and « Réglages » and the avatar are at the bottom of the rail and open their screens. Open an empty logbook: the rail shows the same two items.
+
+Done: already the behaviour of the desktop app (`feature/desktop-logbook`), checked in the desktop app at 1440 × 900: with no logbook open, the four sections are at 38 % and unavailable while « Réglages » (Ctrl+, / ⌘,) and the account avatar keep full colour and open Réglages and the account sheet; with a logbook open the rail is the full one with both items. No code change; only the mock-ups lacked the two items.
+
+## [ ] 2026-11-16-241 Desktop release: recent logbooks window, missing logbook, computer icon
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 228, `feature/release-desktop-first-launch`, and never merge it into `main`.
+
+**Mock-ups**, all under `docs/mockups/`:
+- `bureau-premier-lancement-production-recents.dc.html`;
+- `bureau-premier-lancement-production-recents-introuvable.dc.html`;
+- `bureau-premier-lancement-production-ou.dc.html`.
+
+**1. A window with no logbook, after first use.** This window appears in a new window, or after « Fermer le carnet », when at least one logbook has been opened before. On the very first launch the first-launch screen of task 228 stays as it is.
+- **Left:** the same blue panel, with the profile and its labels shown without the opening animation.
+- **Right, from top to bottom:**
+  - « Carnets récents » at 24 sp, then a white card listing the logbooks opened most recently, newest first. Show at most about five; drop the oldest.
+  - Each row shows an icon for where the logbook is kept (cloud, git or file), the logbook name, and the place with when it was last closed or opened, e.g. « Google Drive · fermé il y a 2 min », « Dépôt git · github.com/club/carnet », « Documents · ouvert le 2 nov. ». A chevron ends the row, and a click opens that logbook in this window.
+  - « Ou bien » at 15 sp semibold, then the three choices of the first-launch screen (« Créer un carnet », « Importer un carnet », « Ouvrir mon carnet OpenDives »). They are compact (40 dp icon, 10 dp vertical padding) and all neutral white: no filled primary choice here.
+  - « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. »
+  - « Une question ? À propos et contact » at the bottom.
+- « Essayer avec un carnet d’exemple » is not shown on this screen.
+
+**2. A recent logbook that cannot be found.** When the window opens, check that each recent file or folder still exists.
+- A missing one keeps its place in the list. Its name is greyed, and its second line is « Introuvable dans Documents » (the place it had) in error red with a small warning icon.
+- Clicking it opens a basic dialog with no ✕:
+  - title « Carnet introuvable »;
+  - text « « essai.ssrf » n’est plus dans Documents. Il a peut-être été déplacé, renommé ou supprimé. »;
+  - actions « Retirer de la liste » (text button) and « Chercher le fichier… » (filled; it opens the system file picker, and the chosen file replaces the entry).
+
+**3. Icon.** In « Où le garder ? » on the desktop, « Seulement sur cet ordinateur » uses a computer-screen icon instead of the tablet icon.
+
+**Test:**
+- First launch shows the screen of task 228.
+- Open a logbook, close it, then open a new window: the recent list appears above « Ou bien ».
+- Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.

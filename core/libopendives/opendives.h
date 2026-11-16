@@ -582,6 +582,15 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 // command text. IMPORT_FAILED, NO_DIVES, NO_NEW_DIVES (all already there).
 int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error);
 
+// Several files at once, as the desktop import does (MainWindow::importFiles()): a Suunto app
+// .json and the .fit with the same base name are read as one dive (suunto_json_fit_pair_import(),
+// which brings the gas mix and the gradient factors of the .fit), every other file is read on its
+// own; one undoable step. A file that cannot be read is ignored when another one gives dives;
+// IMPORT_FAILED when none could be read, NO_DIVES, NO_NEW_DIVES as import_dives. A single file
+// goes through import_dives.
+int import_dives_files(const std::vector<std::string> &files, const std::string &source, std::string &result_json,
+		       std::string &error);
+
 // Filter presets of the log (Subsurface's filter_presets):
 // {"presetList":[{"index", "name", "filter":{"fulltext", "mode", "rules"}}]}.
 int filter_presets_json(std::string &json);

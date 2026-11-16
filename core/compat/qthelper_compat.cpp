@@ -231,11 +231,7 @@ enum mediatype_t get_metadata(const char *, struct metadata *data)
 
 // --- bluetoothaddress.cpp: ported in bluetooth_compat.cpp ----------------
 
-// --- import-suunto-json.cpp (Qt JSON): not part of the POC ---------------
-int suunto_json_import(const std::string &, const std::string &, struct divelog *)
-{
-	return report_error("Suunto JSON import is not available in this build");
-}
+// --- import-suunto-json.cpp: compiled as it is (Qt JSON in qtshim/qtjson.h) ---
 
 // --- commands/command.cpp: undo stack lives in the app layer -------------
 namespace opendives_compat {

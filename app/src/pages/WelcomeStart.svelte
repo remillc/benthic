@@ -9,11 +9,16 @@
   import { Page, theme } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import WelcomeHelpLink from '../components/WelcomeHelpLink.svelte';
-  import DecorativeProfile from '../components/DecorativeProfile.svelte';
+  import FirstLaunchBand from '../components/FirstLaunchBand.svelte';
+  import FirstLaunchPanel from '../components/FirstLaunchPanel.svelte';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
   import { decorativeProfilePath } from '../lib/smooth-path.js';
+
+  // The tablet's panel plays its profile animation each time the screen is shown (task 2026-11-16-237).
+  let playKey = $state(0);
+  const panel = $derived(!theme.ios && !layout.phone);
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -33,24 +38,25 @@
 
   function withoutAccount(/** @type {MouseEvent} */ e) {
     e.preventDefault();
-    startWithoutAccount();
+    // Android phone (task 2026-11-16-233): a screen says where the logbook stays before it is created.
+    if (!theme.ios) f7router.navigate('/welcome/local');
+    else startWithoutAccount();
   }
 </script>
 
-<Page class="od-welcome-start">
+<Page class="od-welcome-start{panel ? ' od-first-panelled' : ''}" onPageBeforeIn={() => playKey++}>
   {#if !theme.ios}
-    <div class="od-welcome-start--page">
-      <div class="od-welcome-start--head">
-      <div class="od-welcome-start--brand">
-        <img class="od-welcome-start--logo od-welcome-start--light" src="logo-light.svg" alt="" width="40" height="40" />
-        <img class="od-welcome-start--logo od-welcome-start--dark" src="logo-dark.svg" alt="" width="40" height="40" />
-        <span>OpenDives</span>
-      </div>
-      <h1 class="od-welcome-start--headline">{t('welcome.headline')}</h1>
-      </div>
-      <DecorativeProfile class="od-welcome-start--wide-profile" />
+    <div class="od-welcome-start--page" class:od-welcome-start--with-band={layout.phone} class:od-welcome-start--with-panel={panel}>
+      {#if layout.phone}
+        <!-- Android phone (tasks 2026-11-16-233 to 236): the blue band replaces the brand row, the headline and the profile. -->
+        <FirstLaunchBand variant="welcome" />
+      {:else}
+        <!-- Android tablet (task 2026-11-16-237): a blue panel with the profile animation, the choices beside it or below. -->
+        <FirstLaunchPanel {playKey} />
+      {/if}
       <div class="od-welcome-start--space"></div>
       <div class="od-welcome-start--actions">
+      {#if panel}<h2 class="od-welcome-start--start">{t('firstLaunch.tabletStart')}</h2>{/if}
       <nav class="od-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
         <div class="od-welcome-start--option">
           <a href="/welcome/sign-in" class="od-welcome-start--pill od-welcome-start--pill-filled" onclick={(e) => go(e, '/welcome/sign-in')}>{t('welcome.existingShort')}</a>
@@ -84,7 +90,7 @@
   </svg>
 
   <div class="od-welcome-start--heading">
-    <h1>{t('welcome.title')}</h1>
+    <h1 aria-label={t('welcome.brandAlpha')}><span aria-hidden="true">{t('welcome.title')}</span><span class="od-welcome-start--alpha" aria-hidden="true">{t('welcome.alpha')}</span></h1>
     <p>{t('welcome.headline')}</p>
   </div>
 
@@ -142,50 +148,33 @@
       padding-top: calc(var(--f7-safe-area-top) + 24px);
       display: flex;
       flex-direction: column;
+
+      /* Phone: the band starts at the top edge, under the status bar. */
+      &.od-welcome-start--with-band {
+        padding-top: 0;
+      }
     }
 
-    /* The wrappers only matter on tablets. */
-    .od-welcome-start--head,
+    /* The wrapper only matters on tablets. */
     .od-welcome-start--actions {
       display: contents;
     }
 
-    .od-welcome-start--brand {
-      margin: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      line-height: 28px;
-      font-weight: 500;
-      letter-spacing: 0.2px;
-    }
-
-    .od-welcome-start--logo {
-      display: block;
-    }
-
-    .od-welcome-start--dark,
-    :global(html.dark) .od-welcome-start--light {
-      display: none;
-    }
-
-    :global(html.dark) .od-welcome-start--dark {
-      display: block;
-    }
-
-    .od-welcome-start--headline {
-      margin: 72px 24px 0;
-      font-size: 40px;
-      line-height: 48px;
-      font-weight: 400;
-      letter-spacing: -0.5px;
-      white-space: pre-line;
-    }
-
-    :global(.od-welcome-start--wide-profile) {
-      height: 190px;
-      margin-top: 28px;
+    /* « Alpha » after the name (tasks 2026-11-16-225 and 229): capitals, 14 sp, bold, a full pill 8 dp after the name. */
+    .od-welcome-start--alpha {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--od-alpha-badge);
+      color: var(--od-on-alpha-badge);
+      font-size: 14px;
+      line-height: 18px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      vertical-align: middle;
     }
 
     .od-welcome-start--space {
@@ -272,130 +261,78 @@
 
     /* A low phone window: every choice stays in view (to-do #31). */
     @media (max-width: 767.98px) and (max-height: 820px) {
-      .od-welcome-start--headline {
-        margin-top: 16px;
-      }
-
-      :global(.od-welcome-start--wide-profile) {
-        height: 56px;
-        margin-top: 12px;
-      }
-
       .od-welcome-start--buttons {
         gap: 8px;
       }
     }
 
-    /* Tablet (width from 768 px; mock-ups android-tablette-premier-lancement-*.dc.html): no scrolling. */
-    @media (min-width: 768px) {
-      .od-welcome-start--page {
-        height: calc(100% - var(--f7-safe-area-bottom) - 24px);
-        min-height: 0;
-      }
+    /* Tablet (width from 768 px; task 2026-11-16-237, mock-ups android-tablette-premier-lancement-*.dc.html):
+       the blue panel (components/FirstLaunchPanel.svelte) and the choices, no scrolling. The panel reaches
+       the screen edges: the page's bottom padding is taken back. */
+    .od-welcome-start--with-panel {
+      --od-first-panel-bottom: calc(var(--f7-safe-area-bottom) + 24px);
+      height: calc(100% + var(--od-first-panel-bottom));
+      min-height: 0;
+      padding-top: 0;
+      margin-bottom: calc(-1 * var(--od-first-panel-bottom));
+      flex-direction: row;
 
-      .od-welcome-start--head {
-        display: block;
-      }
-
-      .od-welcome-start--brand,
-      .od-welcome-start--headline {
-        margin-left: 0;
-        margin-right: 0;
-      }
-
-      /* A larger brand row (task 2026-11-15-210): logo 96 dp, « OpenDives » 48 sp; the rest does not move. */
-      .od-welcome-start--brand {
-        gap: 20px;
-        font-size: 48px;
-        line-height: 56px;
-        letter-spacing: -0.5px;
-      }
-
-      .od-welcome-start--logo {
-        width: 96px;
-        height: 96px;
-      }
-
-      .od-welcome-start--actions {
-        display: flex;
+      @media (orientation: portrait) {
         flex-direction: column;
-        box-sizing: border-box;
-        width: 440px;
-        justify-content: center;
-      }
-
-      .od-welcome-start--buttons {
-        max-width: none;
-        padding: 0 0 12px;
       }
 
       .od-welcome-start--space {
         display: none;
       }
 
-      /* Landscape: heading and profile on the left, choices on the right. */
-      @media (orientation: landscape) {
-        .od-welcome-start--page {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) 440px;
-          grid-template-rows: auto minmax(0, 1fr);
-          column-gap: 56px;
-          padding-right: 56px;
-        }
+      .od-welcome-start--actions {
+        box-sizing: border-box;
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 24px 64px 56px;
+      }
 
-        .od-welcome-start--head {
-          grid-column: 1;
-          grid-row: 1;
-          margin: 34px 0 0 56px;
-        }
-
-        .od-welcome-start--page :global(.od-welcome-start--wide-profile) {
-          grid-column: 1;
-          grid-row: 2;
-          align-self: end;
-          /* Off the screen edges (task 2026-11-15-211): the heading's 56 dp inset on the left, the column gap
-             before the choices, 56 dp above the bottom edge. */
-          box-sizing: border-box;
-          width: calc(100% - 56px);
-          height: min(230px, calc(100% - 56px));
-          margin: 0 0 56px 56px;
-        }
-
+      @media (orientation: portrait) {
         .od-welcome-start--actions {
-          grid-column: 2;
-          grid-row: 1 / span 2;
-          align-self: center;
+          padding: 0 120px 64px;
         }
       }
 
-      /* Portrait: a centred heading, the profile across the width, the choices centred in what is left. */
-      @media (orientation: portrait) {
-        .od-welcome-start--head {
-          box-sizing: border-box;
-          width: 100%;
-          max-width: 520px;
-          margin: 48px auto 0;
-        }
+      .od-welcome-start--start {
+        margin: 0 0 20px;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 500;
+        letter-spacing: -0.2px;
+      }
 
-        .od-welcome-start--headline {
-          margin-top: 48px;
-        }
+      .od-welcome-start--buttons {
+        max-width: none;
+        padding: 0;
+      }
 
-        .od-welcome-start--page :global(.od-welcome-start--wide-profile) {
-          flex: none;
-          /* The heading column's width, centred: its left edge lines up with the logo (task 2026-11-15-211). */
-          width: 100%;
-          max-width: 520px;
-          height: 260px;
-          margin: 32px auto 0;
-        }
+      .od-welcome-start--divider {
+        width: auto;
+        max-width: none;
+        margin: 20px 48px 16px;
+      }
 
-        .od-welcome-start--actions {
-          flex: 1;
-          min-height: 0;
-          align-self: center;
-          max-width: 100%;
+      .od-welcome-start--git-link {
+        cursor: pointer;
+
+        @media (hover: hover) {
+          &:hover {
+            color: var(--od-text);
+          }
         }
+      }
+
+      .od-welcome-start--pill {
+        cursor: pointer;
       }
     }
 

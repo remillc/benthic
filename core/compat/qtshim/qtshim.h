@@ -125,6 +125,8 @@ public:
 	const char *data() const { return d_.c_str(); }
 	char *data() { return d_.data(); }
 	std::string toStdString() const { return d_; }
+	// The data is copied; nothing in the core relies on the sharing.
+	static QByteArray fromRawData(const char *data, int size) { return QByteArray(data, size); }
 	static QByteArray fromHex(const char *hex)
 	{
 		QByteArray r;

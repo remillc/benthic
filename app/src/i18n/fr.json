@@ -149,7 +149,9 @@
     "deleteTextGit": {
       "one": "La plongée est retirée du carnet, sur cet appareil et dans le dépôt. Vous pourrez l’annuler pendant quelques secondes.",
       "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le dépôt. Vous pourrez les annuler pendant quelques secondes."
-    }
+    },
+    "emptyLocal": "Sur ce téléphone seulement, aucune plongée",
+    "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée"
   },
   "desktopLogbooks": {
     "mainName": "Carnet de cet ordinateur",
@@ -1300,6 +1302,8 @@
   },
   "welcome": {
     "title": "OpenDives",
+    "alpha": "Alpha",
+    "brandAlpha": "OpenDives, alpha",
     "noAccount": "Commencer sans compte",
     "choicesLabel": "Façons de commencer",
     "ownGit": "Utiliser mon propre dépôt git",
@@ -2385,6 +2389,17 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur tablette Android : les étapes (compte Subsurface, création de compte, sans compte) gardent le panneau bleu, avec « cette tablette » dans les textes, et le carnet s’ouvre avec un message en bas à gauche.",
+      "Premier lancement sur tablette Android : un panneau bleu à gauche (en haut en portrait) avec le profil d’une plongée qui se dessine à l’ouverture, et les trois façons de commencer à côté.",
+      "Tablette : dans le profil d’une plongée, la ligne de profondeur et la courbe de température sont plus fines (1 dp).",
+      "Premier lancement sur téléphone Android : un bandeau bleu avec le profil de plongée, puis le même bandeau réduit sur chaque étape (compte Subsurface, création de compte, sans compte), avec un lien « Retour ».",
+      "Premier lancement : après la connexion, l’écran de téléchargement montre trois étapes avec la progression des plongées, puis le carnet s’ouvre avec un message.",
+      "Création de compte : l’écran du code dit « étape 2 sur 2 », et le carnet vide s’ouvre avec le message « Compte créé. Votre carnet est prêt. ».",
+      "« Commencer sans compte » : un écran dit où reste le carnet (ce téléphone seulement, sans sauvegarde, à relier plus tard) avant de le créer. Le carnet vide indique « Sur ce téléphone seulement, aucune plongée ».",
+      "Premier lancement : un badge « Alpha » suit le nom OpenDives.",
+      "Création de compte : le code de confirmation s’écrit dans six boîtes, une par chiffre. Le code reçu par courriel se colle d’un coup.",
+      "Premier lancement : un badge « Bêta » suit le nom OpenDives.",
+      "Importer un fichier : vous pouvez en choisir plusieurs à la fois. Un .json de l’app Suunto et le .fit du même nom sont lus comme une seule plongée, avec le mélange gazeux et les facteurs de gradient du .fit.",
       "Icône de l’app sur iPhone, iPad et Mac : bleue jusqu’au bord, avec la vague, sans fond blanc.",
       "Icône de l’app sur Android : le disque bleu remplit toute l’icône, sans anneau blanc autour.",
       "Carnet vide : le bouton principal devient « Télécharger mes plongées », avec une icône d’ordinateur de plongée ; l’association de l’ordinateur se fait pendant le téléchargement.",
@@ -3304,12 +3319,12 @@
     "heading": "Confirmer votre adresse",
     "intro": "Entrez le code envoyé à {email}. Il peut prendre quelques minutes à arriver.",
     "code": "Code de confirmation",
-    "codeRow": "Code",
     "submit": "Confirmer",
     "busy": "Confirmation…",
     "resend": "Renvoyer le code",
     "resent": "Code renvoyé à {email}",
-    "wrong": "Code incorrect"
+    "wrong": "Code incorrect. Vérifiez le dernier courriel reçu.",
+    "codeLabel": "Code de confirmation, 6 chiffres"
   },
   "importProgress": {
     "title": "Import de votre carnet",
@@ -4082,5 +4097,57 @@
       "title": "Fusionner les sites ?",
       "which": "Site à garder"
     }
+  },
+  "firstLaunch": {
+    "bandHeadline": "Votre carnet de plongée,\nsur tous vos appareils.",
+    "bandIntro": "Vos plongées passent de votre ordinateur de plongée à votre carnet en un geste. Profils, statistiques et carte de vos sites, même sans réseau.",
+    "profile": "Profil d’une plongée",
+    "signIn": {
+      "intro": "Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur ce téléphone.",
+      "email": "Adresse courriel",
+      "passwordText": "Gardé seulement dans le stockage sécurisé de ce téléphone.",
+      "invalidEmail": "Cette adresse courriel n’est pas valide.",
+      "introTablet": "Le même compte que dans Subsurface sur ordinateur. Vos plongées sont téléchargées, puis une copie reste sur cette tablette.",
+      "passwordTextTablet": "Gardé seulement dans le stockage sécurisé de cette tablette."
+    },
+    "create": {
+      "intro": "Gratuit. Un code vous est envoyé par courriel pour confirmer l’adresse.",
+      "passwordText": "Lettres sans accent, chiffres et @ . + _ - seulement."
+    },
+    "download": {
+      "stepsLabel": "Étapes du téléchargement",
+      "connect": "Connexion à Subsurface",
+      "dives": "Téléchargement des plongées",
+      "count": "{n} sur {total}",
+      "copy": "Copie du carnet sur ce téléphone",
+      "note": "Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau.",
+      "progressLabel": "Téléchargement des plongées",
+      "copyTablet": "Copie du carnet sur cette tablette"
+    },
+    "local": {
+      "intro": "Votre carnet est créé tout de suite, sans inscription.",
+      "phoneOnly": "Sur ce téléphone seulement",
+      "phoneOnlyText": "Vos plongées restent ici. Elles ne sont envoyées nulle part.",
+      "noBackup": "Sans sauvegarde",
+      "noBackupText": "Si vous perdez ou changez de téléphone, le carnet est perdu.",
+      "later": "Vous pourrez le relier plus tard",
+      "laterText": "À un compte Subsurface ou à votre dépôt git, depuis Compte. Vos plongées suivent.",
+      "start": "Commencer",
+      "phoneOnlyTablet": "Sur cette tablette seulement",
+      "noBackupTextTablet": "Si vous perdez ou changez de tablette, le carnet est perdu."
+    },
+    "snackbar": {
+      "downloaded": "Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.",
+      "created": "Compte créé. Votre carnet est prêt.",
+      "local": "Carnet créé sur ce téléphone.",
+      "downloadedTablet": "Carnet téléchargé. Il reste sur cette tablette, même sans réseau.",
+      "localTablet": "Carnet créé sur cette tablette."
+    },
+    "tabletStart": "Pour commencer",
+    "profileLabel": "Profil d’une plongée",
+    "profileDepthValue": "32,4 m",
+    "profileDepthCaption": "Profondeur max.",
+    "profileDurationValue": "54 min",
+    "profileDurationCaption": "Durée · Nitrox 32 %"
   }
 }

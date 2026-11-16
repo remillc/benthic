@@ -20,6 +20,13 @@
 @import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
 
 @layer od.tokens {
+  /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
+     the other curves keep --od-profile-line-width, and high contrast keeps its 2 dp. */
+  @media (min-width: 768px) {
+    :root:not(.od-high-contrast) {
+      --od-profile-main-width: 1;
+    }
+  }
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
@@ -36,6 +43,40 @@
     --od-on-secondary: #FFFFFF;
     --od-secondary-container: #D4E2F2;
     --od-on-secondary-container: #0B2440;
+    /* The « Alpha » badge of the first launch (tasks 2026-11-16-225 and 229). */
+    --od-alpha-badge: #DCE7F3;
+    --od-on-alpha-badge: #114477;
+    /* The blue panel of the first launch (tasks 2026-11-16-233, 234 and 236; the same as the tablet's):
+       the welcome band of the phone and the header of its steps. Fixed blue, light and dark. */
+    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --od-on-first-band: #FFFFFF;
+    --od-on-first-band-2: rgb(255 255 255 / 0.78);
+    --od-first-band-badge: rgb(255 255 255 / 0.18);
+    --od-first-band-badge-line: rgb(255 255 255 / 0.55);
+    --od-first-band-badge-welcome: rgb(255 255 255 / 0.12);
+    --od-first-band-water-top: rgb(255 255 255 / 0.2);
+    --od-first-band-water-bottom: rgb(255 255 255 / 0.04);
+    --od-first-band-trace: #FFFFFF;
+    --od-first-band-glow: #8CC4FF;
+    --od-first-band-surface: rgb(255 255 255 / 0.35);
+    /* The labels and the dot of the profile on the tablet's panel (task 2026-11-16-237). */
+    --od-first-band-label: rgb(255 255 255 / 0.12);
+    --od-first-band-label-line: rgb(255 255 255 / 0.22);
+    --od-first-band-label-caption: rgb(255 255 255 / 0.75);
+    --od-first-band-dot-ring: rgb(255 255 255 / 0.22);
+    /* Outlined text field of the first-launch steps. */
+    --od-outlined-field-border: var(--od-code-border);
+    --od-outlined-field-active: var(--od-code-active);
+    --od-outlined-field-error: var(--od-code-error);
+    /* Cards and steps of the first-launch screens (tasks 2026-11-16-233 and 236). */
+    --od-first-row-line: #F0EEE9;
+    --od-first-tile: #E6EEF7;
+    --od-first-tile-warn: #FBEFD9;
+    --od-first-done: #1E6B3A;
+    --od-on-first-done: #FFFFFF;
+    --od-first-pending-ring: #C9CCD0;
     /* Tertiary: rust and sand, for data series other than the water (temperature, statistics charts). */
     --od-tertiary: #B4530F;
     --od-on-tertiary: #FFFFFF;
@@ -129,6 +170,10 @@
     --od-alarm-on-field: #B71C1C;
     /* The account initial's pill on the band: opaque, the initial 9.9:1 on any band. */
     --od-band-avatar: #FFFFFF;
+    /* Confirmation code boxes (task 2026-11-16-232): the active box, the others, the error. */
+    --od-code-active: #1F5C99;
+    --od-code-border: #75787C;
+    --od-code-error: #B3261E;
     /* The heat of « Où je plonge le plus »: blue (least) to red (most), 1 to 6, the lowest density
        fading out through light blue (task 2026-11-14-161). Same in dark mode for now. */
     --od-heat-fade: #6FC3F0;
@@ -270,6 +315,9 @@
     --od-alarm: #FF8A80;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
     --od-alarm-tint: #3F2423;
+    --od-code-active: #7FB0E6;
+    --od-code-border: #8E9196;
+    --od-code-error: #FF8A80;
     --od-primary: #F4F4F2;
     --od-on-primary: #1F2124;
     --od-primary-container: #2E3033;
@@ -278,6 +326,38 @@
     --od-on-secondary: #0B2440;
     --od-secondary-container: #1E3552;
     --od-on-secondary-container: #D4E2F2;
+    --od-alpha-badge: #1E3552;
+    --od-on-alpha-badge: #D4E2F2;
+    /* The blue panel of the first launch (tasks 2026-11-16-233, 234 and 236; the same as the tablet's):
+       the welcome band of the phone and the header of its steps. The same blue in dark mode. */
+    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --od-on-first-band: #FFFFFF;
+    --od-on-first-band-2: rgb(255 255 255 / 0.78);
+    --od-first-band-badge: rgb(255 255 255 / 0.18);
+    --od-first-band-badge-line: rgb(255 255 255 / 0.55);
+    --od-first-band-badge-welcome: rgb(255 255 255 / 0.12);
+    --od-first-band-water-top: rgb(255 255 255 / 0.2);
+    --od-first-band-water-bottom: rgb(255 255 255 / 0.04);
+    --od-first-band-trace: #FFFFFF;
+    --od-first-band-glow: #8CC4FF;
+    --od-first-band-surface: rgb(255 255 255 / 0.35);
+    /* The labels and the dot of the profile on the tablet's panel (task 2026-11-16-237). */
+    --od-first-band-label: rgb(255 255 255 / 0.12);
+    --od-first-band-label-line: rgb(255 255 255 / 0.22);
+    --od-first-band-label-caption: rgb(255 255 255 / 0.75);
+    --od-first-band-dot-ring: rgb(255 255 255 / 0.22);
+    --od-outlined-field-border: var(--od-code-border);
+    --od-outlined-field-active: var(--od-code-active);
+    --od-outlined-field-error: var(--od-code-error);
+    /* Cards and steps of the first-launch screens (tasks 2026-11-16-233 and 236). */
+    --od-first-row-line: #2A2C2F;
+    --od-first-tile: #1E3552;
+    --od-first-tile-warn: #4A3216;
+    --od-first-done: #4FA874;
+    --od-on-first-done: #0B2418;
+    --od-first-pending-ring: #4A4D52;
     --od-tertiary: #F0A66B;
     --od-on-tertiary: #3D2200;
     --od-tertiary-container: #4A3216;
@@ -1566,6 +1646,16 @@ html.md {
     &.modal-in,
     &.modal-out {
       transform: scale(1);
+    }
+
+    /* The first launch's snackbar on a tablet (task 2026-11-16-239): bottom left, 24 dp from the rail's edge. */
+    @media (min-width: 768px) {
+      &.od-snackbar-start {
+        left: calc(var(--od-nav-width, 96px) + 24px);
+        right: auto;
+        bottom: calc(24px + var(--f7-safe-area-bottom));
+        width: max-content;
+      }
     }
 
     /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */

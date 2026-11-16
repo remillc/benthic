@@ -637,6 +637,10 @@ export { waterTypeOf };
  *   with numbers (one per id), each dive gets its own number instead.
  * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
  *   Imports a file (base64 contents, original name), one undoable step (import_dives).
+ * @property {(options: {files: {name: string, data: string}[]}) => Promise<EditResult>} importDivesFiles
+ *   Imports several files chosen together (base64 contents, original names), one undoable step
+ *   (import_dives_files): a Suunto app .json and the .fit with the same base name are read as one
+ *   dive (the .fit brings the gas mix and the gradient factors), the other files on their own.
  * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
  *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
  * @property {() => Promise<SyncConflicts>} syncConflicts
@@ -875,6 +879,9 @@ export const OpenDivesCore = {
   },
   async importDives(options) {
     return JSON.parse((await native.importDives(options)).json);
+  },
+  async importDivesFiles(options) {
+    return JSON.parse((await native.importDivesFiles(options)).json);
   },
   async filterPresets(options) {
     return JSON.parse((await native.filterPresets(options)).json);

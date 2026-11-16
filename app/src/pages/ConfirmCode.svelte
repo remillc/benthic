@@ -1,16 +1,18 @@
 <script>
   // @ts-check
-  // New account: the confirmation code mailed by the server (docs/mockups/
-  // compte-code-*.dc.html; spec, section 4, "Sign in and new account"), as
+  // New account: the confirmation code mailed by the server, in six boxes (CodeField,
+  // task 2026-11-16-232; docs/mockups/*creer-compte-code*.dc.html; spec, section 4, "Sign in and new account"), as
   // the PIN screen of Subsurface-mobile: cloud_verify_pin. "Renvoyer le
   // code" sits right under the field (outlined on Android, tinted grey on
   // iOS). From first launch, then "Reprendre votre carnet ?"; from Account,
   // the logbook of this device becomes the account's first logbook.
   import { OpenDivesCore } from 'opendives-core';
-  import AccountField from '../components/AccountField.svelte';
+  import CodeField from '../components/CodeField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
-  import { accountFlow, errorCode, finishAccount, showFailure, toast } from '../lib/account.js';
+  import { accountFlow, announceFirstLaunch, errorCode, finishAccount, phoneFirstLaunch, showFailure, toast } from '../lib/account.js';
+  import { accountReady, deviceDiveCount } from '../lib/logbook.svelte.js';
+  import { codeComplete } from '../lib/code-input.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, email?: string }} */
@@ -19,18 +21,31 @@
   let code = $state('');
   let busy = $state(false);
   let codeError = $state('');
+  // Alpha first launch on a phone: the new account's empty logbook opens straight after the code, with a snackbar.
+  const look = $derived(welcome && phoneFirstLaunch());
+  let verified = false;
 
   async function confirm() {
     busy = true;
     codeError = '';
     try {
-      const result = await OpenDivesCore.verifyPin({ pin: code.trim() });
-      if (result.status !== 'verified') {
-        codeError = t('confirmCode.wrong');
-        return;
+      if (!verified) {
+        const result = await OpenDivesCore.verifyPin({ pin: code });
+        if (result.status !== 'verified') {
+          codeError = t('confirmCode.wrong');
+          return;
+        }
+        verified = true;
       }
       accountFlow.confirmedEmail = email;
-      if (welcome) {
+      if (look) {
+        // The dives logged on this device without an account, if any, are the first of the new logbook.
+        const onDevice = await deviceDiveCount();
+        await OpenDivesCore.createLog({ source: onDevice ? 'device' : 'empty' });
+        accountFlow.confirmedEmail = '';
+        await accountReady();
+        announceFirstLaunch('created');
+      } else if (welcome) {
         f7router.navigate('/welcome/import');
       } else {
         // From Account: the dives of this device are sent to the new account.
@@ -61,25 +76,26 @@
 
 <EditorialPage class="od-confirm-code"
   helpLink={welcome}
+  firstLaunch={welcome}
   title={t('createAccount.title')}
-  step={t('createAccount.step1')}
+  step={t('createAccount.step2')}
   heading={t('confirmCode.heading')}
   intro={t('confirmCode.intro', { email })}
   action={t('confirmCode.submit')}
   busyLabel={t('confirmCode.busy')}
   {busy}
-  actionDisabled={!code.trim()}
+  actionDisabled={!codeComplete(code)}
   onaction={confirm}
 >
   <div class="od-confirm-code--fields">
-    <AccountField
+    <CodeField
       label={t('confirmCode.code')}
-      rowLabel={t('confirmCode.codeRow')}
-      autocomplete="one-time-code"
+      accessibleLabel={t('confirmCode.codeLabel')}
       bind:value={code}
       error={codeError}
       disabled={busy}
-      required
+      oninput={() => (codeError = '')}
+      onsubmit={confirm}
     />
     <div class="od-confirm-code--resend">
       <button type="button" disabled={busy} onclick={resend}><Icon name="refresh" size={18} weight={2} />{t('confirmCode.resend')}</button>
@@ -92,6 +108,19 @@
     .od-confirm-code--fields {
       margin: 6px 0 0;
 
+      :global(.od-editorial-page--first-launch) & {
+        margin: 8px 0 0;
+      }
+
+      /* Beside the tablet's panel (task 2026-11-16-239): the group of boxes is centred in the column, and the
+         label, the error and « Renvoyer le code » start at the left edge of the first box. */
+      :global(.od-editorial-page--panelled) & {
+        /* Six boxes of 48 dp and five gaps of 8 dp. */
+        width: 328px;
+        max-width: 100%;
+        margin: 8px auto 0;
+      }
+
       :global(.ios) & {
         margin: 0;
       }
@@ -99,7 +128,7 @@
 
     /* MD3 outlined button with a leading icon (18 dp); iOS: a grey tinted button. */
     .od-confirm-code--resend {
-      margin: 8px 16px 0;
+      margin: 8px var(--od-field-margin, 0) 0;
 
       button {
         width: auto;
@@ -120,6 +149,29 @@
 
         &:disabled {
           opacity: 0.38;
+        }
+      }
+
+      /* Alpha first launch on a phone (the mock-ups): a link under the boxes, a 48 dp target. */
+      :global(.od-editorial-page--first-launch) & {
+        margin: 4px 0 -12px;
+
+        button {
+          height: auto;
+          min-height: 48px;
+          padding: 0 4px;
+          border: none;
+          border-radius: 8px;
+          color: var(--od-code-active);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          font-weight: 400;
+          letter-spacing: 0;
+          line-height: 19px;
+
+          :global(svg) {
+            display: none;
+          }
         }
       }
 
