@@ -4765,7 +4765,7 @@ As task 238 does for the alpha, the depth profile line and the temperature curve
 
 Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
 
-## [ ] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
+## [x] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/bureau-premier-lancement-alpha-accueil.dc.html`, shown with the menu open.
 
@@ -4788,6 +4788,8 @@ It is not shown on the steps, on the « no logbook » window, nor on phone or ta
 **Test:**
 - On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
 - The « no logbook » window shows no rail.
+
+Done on `feature/desktop-logbook`: on the desktop first launch only, the help link, a 1 × 20 dp divider and a language button (globe, current language, chevron) on one centred line 24 dp from the bottom; the menu is the Settings RowMenu, above the button, right-aligned, 260 dp, with « Comme le système », « Français », « English » (« Français (Canada) » only while it is the chosen language) and sets the same value as Settings › Langue de l’app. Part 2 already held: the « no logbook » window has no rail and Ctrl+, opens Settings.
 
 ## [ ] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
 
