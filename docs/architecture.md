@@ -190,3 +190,196 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 | iOS build | Impossible from Windows | Spare Mac or macOS continuous integration |
 
 **Proposed next step.** With A, B and C settled, interface design could start in parallel with a first **technical proof of concept**: build the core without Qt for Android, open a real cloud logbook, show it in a list, and achieve the Git round trip without differences. Both have since been done (see [the proof of concept](../poc/README.md)).
+
+## 11. OpenDives server (release edition)
+
+Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and the app keeps working without any server (Subsurface cloud, own git repository, local mode). The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on.
+
+### 11.1 Components and what lives where
+
+```
+                      app (phone, tablet, desktop)
+            ┌──────────────┬──────────────────┬─────────────────┐
+            │ HTTPS JSON   │ git over HTTPS   │ HTTPS (signed   │
+            │ /v1/...      │ (scoped token)   │ object URLs)    │
+            ▼              ▼                  ▼                 │
+     ┌─────────────┐  ┌───────────┐    ┌────────────────┐      │
+     │ OpenDives   │  │ Git       │    │ Object storage │      │
+     │ API         │─▶│ hosting   │    │ (S3-compatible)│◀─────┘
+     │ (sign-in,   │  │ 1 repo /  │    │ photos, videos,│
+     │  sharing)   │  │ user      │    │ encrypted docs │
+     └──────┬──────┘  └───────────┘    └────────────────┘
+            │ SQL
+            ▼
+     ┌─────────────┐
+     │ PostgreSQL  │  accounts, sessions, opt-in shared data
+     │ + PostGIS   │  (friends, public site base)
+     └─────────────┘
+```
+
+| What | Where | Notes |
+| --- | --- | --- |
+| Logbook (dives, sites, gear, settings) | Git repository, branch `main` | **Subsurface's format, unchanged.** Desktop Subsurface can read and write it. |
+| Data OpenDives adds (inventory, maintenance, certifications, gas analyses, diver profile, site water type) | Same repository, **second branch `opendives`** | Section 11.3. Subsurface never touches that branch. |
+| Accounts, sessions, friends, public site base | PostgreSQL + PostGIS | Sharing is **opt-in** (section 11.6). |
+| Photos, videos, encrypted documents | S3-compatible object storage | Referenced by content hash (section 11.5). |
+| Sign-in | OpenDives API | E-mail code, no password (section 11.2). |
+
+The API never holds the logbook itself: the app talks to the git hosting directly with a scoped token that the API hands out at sign-in.
+
+### 11.2 Sign-in contract (API v1)
+
+All bodies are JSON (`Content-Type: application/json`), UTF-8. Addresses are lower-cased by the server. The account is created at the first successful verification: the app has no separate "create account" call.
+
+**`POST /v1/auth/code`** sends a 6-digit code to the address.
+
+Request: `{ "email": "diver@example.org" }`
+
+Response `200`: `{ "ok": true, "expiresInSeconds": 600, "resendAfterSeconds": 30 }`. The response is the same whether the account exists or not.
+
+**`POST /v1/auth/verify`** checks the code and signs in (and creates the account if it is new).
+
+Request: `{ "email": "diver@example.org", "code": "123456" }`
+
+Response `200`:
+
+```json
+{
+  "sessionToken": "opaque, 64 hex characters",
+  "sessionExpiresInSeconds": 7776000,
+  "user": { "id": "17", "email": "diver@example.org", "isNew": true },
+  "repository": {
+    "url": "https://git.example.org/<user>/logbook.git",
+    "branch": "main",
+    "dataBranch": "opendives"
+  },
+  "git": {
+    "username": "<user>",
+    "token": "scoped git token",
+    "scopes": ["read:repository", "write:repository"]
+  }
+}
+```
+
+The git token only reaches the repositories of that user. The app keeps `sessionToken` and `git.token` in the platform's secure storage (Keychain, Keystore), never in the device store or in logs. Each successful verification issues a new git token.
+
+**`GET /v1/health`** returns `{ "status": "ok" | "degraded", "db": true, "forgejo": true }`, without authentication. The app can use it for the "server unreachable" state.
+
+**Errors.** Every error is `{ "error": { "code": "...", "message": "...", "retryAfterSeconds": 600 } }` (`retryAfterSeconds` only when relevant; also sent as the `Retry-After` header). The `message` is for logs only: the app shows its own translated text for each `code`.
+
+| HTTP | `code` | When | App behaviour |
+| --- | --- | --- | --- |
+| 400 | `INVALID_ADDRESS` | The address is not a valid e-mail address | Error under the address field |
+| 400 / 401 | `WRONG_CODE` | The code is malformed (400) or does not match (401) | Error under the code field; the person can retry |
+| 410 | `CODE_EXPIRED` | The code is older than 10 minutes, or already used | "Get a new code" |
+| 429 | `TOO_MANY_ATTEMPTS` | 5 wrong codes, or 5 codes requested in 10 minutes: the address is locked for 10 minutes | Message with the wait (`retryAfterSeconds`); both buttons disabled until then |
+| 429 | `RESEND_TOO_SOON` | A second code was asked within 30 seconds | Countdown on "Send the code again" (`retryAfterSeconds`) |
+| 502 | `UNREACHABLE` | The server could not send the e-mail or finish provisioning | Same screen as a network failure |
+| 404 / 500 | `NOT_FOUND`, `SERVER_ERROR` | Unknown route, unexpected error | Same screen as a network failure |
+| (no response) | `UNREACHABLE` | Client side: no network, timeout, TLS failure, a 5xx without a JSON body | "Server unreachable": **Try again** and **Choose another place** |
+
+The 6-digit code, the 10-minute expiry, the 5-attempt limit and the 10-minute wait are the values of the design tasks 259 and 260. They are server constants: the app reads the actual delays from `expiresInSeconds`, `resendAfterSeconds` and `retryAfterSeconds`, never from its own copy.
+
+### 11.3 The second branch: `opendives`
+
+The branch `opendives` of the user's repository is an **orphan branch** (no common history with `main`). It holds the data OpenDives adds to a Subsurface logbook, so that the logbook itself stays exactly what Subsurface writes.
+
+```
+opendives branch
+├── manifest.json              { "format": 1, "kind": "opendives-data" }
+├── keys/wrapped.json          the data key, wrapped (section 11.4)
+├── equipment/<id>.json        inventory item (#42)
+├── maintenance/<id>.json      reminder or service record (#47)
+├── certifications/<id>.json   certification or document (#48), sensitive
+├── gas-analyses/<id>.json     analysis of a cylinder's gas (#49)
+├── profile/diver.json         diver profile (#63), sensitive fields
+├── site-info/<site-uuid>.json extra data about a site, e.g. water type (#64)
+└── media/<dive-key-hash>.json photos and videos of a dive (section 11.5)
+```
+
+Rules:
+
+- **One JSON file per item.** `<id>` is a UUID version 7, created on the device, never reused. Deleting an item deletes its file (git keeps the history). Two devices editing two items never conflict.
+- Every file carries `"format": <integer>`. A file with a newer `format` than the app knows is kept as is and shown read only; unknown fields are preserved on rewrite.
+- Common fields: `format`, `id`, `createdAt`, `updatedAt` (UTC, ISO 8601). Merge: if both sides changed the same file, the one with the later `updatedAt` wins for the whole file; the other stays in the commit history.
+- JSON is written with sorted keys, two-space indent and a final newline, so that equal data gives equal files and diffs stay readable.
+- Commits are made by the app, signed "OpenDives", one per validated action, like the logbook commits.
+- Pressures and temperatures are stored in bar and degrees Celsius whatever the display units.
+
+**Stable keys** link an item to the logbook without touching it.
+
+| Key | Form | Notes |
+| --- | --- | --- |
+| Dive key | `{ "deviceId": "<hex>", "diveId": "<hex>" }` for a dive from a dive computer (the `deviceid` and `diveid` Subsurface stores for the dive computer), else `{ "start": "2026-11-01T09:30:00Z" }` (start time of the dive, UTC, when the link is created) | The key is **stored in the item and never recomputed**. If Subsurface later changes the start time of a manual dive, the app looks the dive up again and rewrites the link. Open question: dives with several dive computers. |
+| Site key | `{ "siteUuid": "<hex>" }`, Subsurface's dive site `uuid` | Stable across Subsurface edits. |
+| Equipment key | `"equipmentId": "<uuid>"` | Used by maintenance items and gas analyses (the cylinder). |
+
+Shapes by kind (fields not listed are preserved if present):
+
+```json
+// equipment/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "type": "regulator", "name": "...", "brand": "...", "model": "...", "serial": "...",
+  "purchasedOn": "2024-05-01", "tags": ["travel"], "retired": false }
+
+// maintenance/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "equipmentId": "<uuid>", "task": "service", "intervalMonths": 12,
+  "intervalDives": 100, "lastDoneOn": "2026-03-10", "lastDoneDive": { "start": "..." },
+  "notes": "" }
+
+// certifications/<id>.json   (sensitive: the whole payload is encrypted)
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "<base64>", "ct": "<base64>" } }
+// plaintext after decryption: agency, level, number, issuedOn, expiresOn,
+// and "documents": [ { "hash": "<sha256>", "mime": "application/pdf", "size": 123456 } ]
+
+// gas-analyses/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "dive": { "deviceId": "...", "diveId": "..." }, "equipmentId": "<cylinder uuid>",
+  "o2Percent": 32.0, "hePercent": 0.0, "pressureBar": 200, "analysedAt": "..." }
+
+// profile/diver.json   (plain fields + one encrypted block for the sensitive ones)
+{ "format": 1, "updatedAt": "...",
+  "displayName": "...", "homeAirport": "...",
+  "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "...", "ct": "..." } }
+// plaintext of enc: bloodGroup, allergies, medicalNotes, emergencyContact { name, phone }
+
+// site-info/<site-uuid>.json
+{ "format": 1, "siteUuid": "...", "updatedAt": "...", "waterType": "salt" }
+```
+
+### 11.4 Sensitive data: encrypted on the device
+
+The server and its operator must not be able to read the **sensitive items**: documents and certifications (#48), blood group, allergies, medical notes and emergency contact (#63). The rest of the `opendives` branch and the logbook are readable by the server: the logbook has to stay readable by Subsurface, so it cannot be encrypted. The app and the privacy policy say this plainly.
+
+High-level design:
+
+1. **Data key.** At first use, the device creates a random 256-bit key. It lives in the platform's secure storage (Keychain, Keystore; the system credential store on desktop) and never leaves the device in clear.
+2. **Encryption.** Sensitive payloads are encrypted on the device with AES-256-GCM (a fresh random nonce each time, the item id and `format` as authenticated data) before the commit or the upload. The file keeps `enc: { v, alg, kid, nonce, ct }`; `kid` names the key so that it can be rotated.
+3. **Documents** (scans, PDFs) are encrypted the same way and stored in object storage under the hash of the **ciphertext**; the certification item holds the hash list.
+4. **More than one device.** The data key is also stored **wrapped** in `keys/wrapped.json`: encrypted with a key derived (Argon2id, parameters stored in the file) from a recovery secret chosen by the person. A new device asks for the recovery secret, unwraps the data key and keeps it in its own secure storage. A device-to-device route by QR code can be added later.
+5. **Loss.** If every device is lost **and** the recovery secret is forgotten, the sensitive items cannot be read again, by anyone. The app tells the person so when the secret is created.
+
+**To decide (flagged for Christian):** what the recovery secret is. A generated recovery phrase is strong but must be written down; a recovery question is easier but weaker, because guessable answers cut the effective strength of the wrapped key. Until this is decided, the wrapped key and the multi-device flow are not built; the single-device case works without it.
+
+### 11.5 Photos and videos: by hash
+
+- Photos stay on the device by default (unchanged). Uploading the photos or videos of a dive is **opt-in**, per dive or album.
+- An uploaded file is stored once, under the **SHA-256 of its content** (`media/<hash>`), so the same photo uploaded twice, or from two devices, is one object.
+- The reference lives in the `opendives` branch, in `media/<dive-key-hash>.json`: `{ "format": 1, "dive": <dive key>, "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Subsurface's own picture entries in the logbook are left as they are.
+- The app holds no storage credentials: it asks the API for short-lived signed URLs to upload or download an object. The API only signs for objects the person owns or that were shared with them (section 11.6).
+- Originals are never altered or recompressed on upload.
+
+### 11.6 Shared data: opt-in
+
+Everything social lives in PostgreSQL + PostGIS, never in the logbook.
+
+- **Off by default.** The account works fully with nothing shared. Each kind of sharing is a separate switch, each with a sentence that says exactly what leaves the device: for example "Follow friends" (name and the dives a friend chooses to show) and "Contribute my sites to the public site base" (site name, position, water type; no dive, no date, no name).
+- Sharing a site to the public base copies only the listed fields; the person's own logbook entry is not modified. Withdrawing deletes the copy.
+- A follow needs the other person's acceptance.
+- Nothing from the sensitive items (section 11.4) is ever shared.
+
+### 11.7 Where the rest lives
+
+The server code, the local development stack (containers, seed data, smoke test) and the hosting plan (hosting, backups, restore, monitoring, privacy-law notes, go-live checklist) are in the **private repository `opendives-server`**. They are deliberately not described here: this repository only holds what the app depends on.
