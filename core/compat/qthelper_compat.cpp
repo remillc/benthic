@@ -18,6 +18,8 @@
 #include "core/qthelper.h"
 #include "core/string-format.h"
 #include "core/units.h"
+#include "core/xmlparams.h"
+#include <fstream>
 #include "core/file.h"
 #include "commands/command.h"
 #include "commands/command.h"
@@ -245,7 +247,178 @@ std::string changesMade()
 }
 }
 
-// --- qthelper.cpp: Seabear CSV header parsing (not part of the POC) ------
-void parse_seabear_header(const char *, struct xml_params *)
+// --- qthelper.cpp: Seabear CSV header parsing (task 2026-11-16-224) -------
+// parse_seabear_header() of third_party/subsurface/core/qthelper.cpp, line for line without Qt: QFile's
+// readLine() and seek() become std::ifstream, QString::trimmed() trim(), contains() and replace() their
+// std::string counterparts. The quirks stay: every scan starts again at the top of the file and stops at
+// the first empty line (or the end of the file), the first scan skips the first line, and a column
+// number only advances for the columns the function knows (its "index++").
+namespace {
+
+std::string seabear_trim(const std::string &s)
 {
+	const char *space = " \t\n\r\v\f";
+	size_t b = s.find_first_not_of(space);
+	if (b == std::string::npos)
+		return std::string();
+	return s.substr(b, s.find_last_not_of(space) - b + 1);
+}
+
+bool seabear_contains(const std::string &s, const char *needle)
+{
+	return s.find(needle) != std::string::npos;
+}
+
+// QString::replace(needle, with), every occurrence.
+std::string seabear_replace(std::string s, const std::string &needle, const std::string &with)
+{
+	for (size_t at = s.find(needle); at != std::string::npos; at = s.find(needle, at + with.size()))
+		s.replace(at, needle.size(), with);
+	return s;
+}
+
+class SeabearFile {
+public:
+	explicit SeabearFile(const char *filename) : in(filename, std::ios::binary) {}
+	bool open() const { return in.is_open(); }
+	// QFile::readLine().trimmed()
+	std::string line()
+	{
+		std::string text;
+		std::getline(in, text);
+		return seabear_trim(text);
+	}
+	// QFile::atEnd()
+	bool at_end() { return in.peek() == std::ifstream::traits_type::eof(); }
+	void seek_start()
+	{
+		in.clear();
+		in.seekg(0);
+	}
+	// `while ((line = f.readLine().trimmed()).length() > 0 && !f.atEnd())`
+	bool next(std::string &out)
+	{
+		out = line();
+		return !out.empty() && !at_end();
+	}
+
+private:
+	std::ifstream in;
+};
+
+} // namespace
+
+void parse_seabear_header(const char *filename, struct xml_params *params)
+{
+	SeabearFile f(filename);
+	if (!f.open())
+		return;
+
+	std::string parse_line = f.line(); // the first line is skipped
+
+	// The dive number
+	while (f.next(parse_line)) {
+		if (seabear_contains(parse_line, "//DIVE NR: ")) {
+			xml_params_add(params, "diveNro", seabear_replace(parse_line, "//DIVE NR: ", ""));
+			break;
+		}
+	}
+	f.seek_start();
+
+	// The hardware version
+	while (f.next(parse_line)) {
+		if (seabear_contains(parse_line, "//Hardware Version: ")) {
+			xml_params_add(params, "hw", seabear_trim(seabear_replace(parse_line, "//Hardware Version: ", "\"Seabear ")) + "\"");
+			break;
+		}
+	}
+	f.seek_start();
+
+	// The sample interval
+	while (f.next(parse_line)) {
+		if (seabear_contains(parse_line, "//Log interval: ")) {
+			xml_params_add(params, "delta", seabear_replace(seabear_trim(seabear_replace(parse_line, "//Log interval: ", "")), " s", ""));
+			break;
+		}
+	}
+	f.seek_start();
+
+	// The dive mode: OC, APNEA, BOTTOM TIMER, CCR, CCR SENSORBOARD. This scan goes on to the end of the
+	// header on purpose.
+	while (f.next(parse_line)) {
+		const std::string needle = "//Mode: ";
+		if (seabear_contains(parse_line, needle.c_str())) {
+			std::string mode = seabear_replace(parse_line, needle, "");
+			if (mode == "CCR" || mode == "CCR SENSORBOARD")
+				// A CCR dive gets a default setpoint, which makes the diluent cylinder
+				xml_params_add_int(params, "setpointField", 1300);
+			xml_params_add(params, "diveMode", "\"" + mode + "\"");
+		}
+	}
+	f.seek_start();
+
+	// Some fields for the extra data
+	while (f.next(parse_line)) {
+		const std::string needle = "//Firmware Version: ";
+		if (seabear_contains(parse_line, needle.c_str()))
+			xml_params_add(params, "Firmware", "\"" + seabear_replace(parse_line, needle, "") + "\"");
+	}
+	f.seek_start();
+
+	while (f.next(parse_line)) {
+		const std::string needle = "//Serial number: ";
+		if (seabear_contains(parse_line, needle.c_str()))
+			xml_params_add(params, "Serial", "\"" + seabear_replace(parse_line, needle, "") + "\"");
+	}
+	f.seek_start();
+
+	while (f.next(parse_line)) {
+		const std::string needle = "//GF: ";
+		if (seabear_contains(parse_line, needle.c_str()))
+			xml_params_add(params, "GF", "\"" + seabear_replace(parse_line, needle, "") + "\"");
+	}
+	f.seek_start();
+
+	// The header up to its empty line, then the line of the column names
+	while (f.next(parse_line)) {
+	}
+	parse_line = f.line();
+
+	unsigned short index = 0;
+	size_t start = 0;
+	for (;;) {
+		size_t end = parse_line.find(';', start);
+		const std::string column = parse_line.substr(start, end == std::string::npos ? std::string::npos : end - start);
+		if (column == "Time") {
+			xml_params_add_int(params, "timeField", index++);
+		} else if (column == "Depth") {
+			xml_params_add_int(params, "depthField", index++);
+		} else if (column == "Temperature") {
+			xml_params_add_int(params, "tempField", index++);
+		} else if (column == "NDT") {
+			xml_params_add_int(params, "ndlField", index++);
+		} else if (column == "TTS") {
+			xml_params_add_int(params, "ttsField", index++);
+		} else if (column == "pO2_1") {
+			xml_params_add_int(params, "o2sensor1Field", index++);
+		} else if (column == "pO2_2") {
+			xml_params_add_int(params, "o2sensor2Field", index++);
+		} else if (column == "pO2_3") {
+			xml_params_add_int(params, "o2sensor3Field", index++);
+		} else if (column == "Ceiling") {
+			// The dive computer's ceiling is not read (a TODO in Subsurface too)
+			xml_params_add_int(params, "ceilingField", index++);
+		} else if (column == "Tank pressure") {
+			xml_params_add_int(params, "pressureField", index++);
+		} else {
+			report_info("Seabear import found an un-handled field: %s", column.c_str());
+		}
+		if (end == std::string::npos)
+			break;
+		start = end + 1;
+	}
+
+	// The separator is ';' (index 2 in the desktop dialog) and the units are metric
+	xml_params_add_int(params, "separatorIndex", 2);
+	xml_params_add_int(params, "units", 0);
 }

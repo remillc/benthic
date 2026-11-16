@@ -610,6 +610,37 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject(NativeCore.importCount(file.absolutePath)))
     }
 
+    /**
+     * A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+     * `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is
+     * the mapping as JSON text. With `dryRun` nothing is added and the answer is the preview
+     * ({dives:[{when, durationSeconds, maxDepthMm, profile}]}); otherwise the dives are imported, one
+     * undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
+     */
+    @PluginMethod
+    fun importCsv(call: PluginCall) = onCoreThread(call) {
+        val file = importFile(call.getString("path").orEmpty())
+        val companionPath = call.getString("companionPath").orEmpty()
+        val companion = if (companionPath.isEmpty()) null else importFile(companionPath)
+        if (file == null || (companionPath.isNotEmpty() && companion == null)) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val name = File(call.getString("name").orEmpty()).name.ifEmpty { "import.csv" }
+        call.resolve(
+            JSObject().put(
+                "json",
+                NativeCore.importCsv(
+                    file.absolutePath,
+                    companion?.absolutePath.orEmpty(),
+                    call.getString("params").orEmpty(),
+                    name,
+                    call.getBoolean("dryRun", true) == true,
+                ),
+            ),
+        )
+    }
+
     /** Cancelled or failed import: the downloaded file is deleted. */
     @PluginMethod
     fun discardImport(call: PluginCall) = onCoreThread(call) {

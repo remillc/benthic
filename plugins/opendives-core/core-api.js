@@ -9,6 +9,15 @@ import { sortCylinderTypes } from './cylinder-sort.js';
 export { waterTypeOf };
 
 /**
+ * The column mapping of a CSV import (import_csv in core/libopendives/opendives.h): `format` is `samples` (a
+ * profile per file), `dives` (a dive per line), `seabear` or `poseidon`; `template` the stylesheet of `samples`
+ * (`csv`, `SensusCSV`); the other keys are the stylesheets' own: a column index (`timeField`, `depthField`, ...,
+ * -1 for none), an option index (`separatorIndex`, `units`, `datefmt`, `durationfmt`) or a text (`date`, `time`, `hw`).
+ * Key order counts: `date` comes first when given.
+ * @typedef {{ format: 'samples'|'dives'|'seabear'|'poseidon', template?: string, [key: string]: string|number|undefined }} CsvParams
+ */
+
+/**
  * Trip identifiers change on every load: never store them.
  * @typedef {Object} DiveTrip
  * @property {number} id
@@ -593,6 +602,11 @@ export { waterTypeOf };
  *   A picked file (base64 data) written to the app's cache for the import steps.
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
+ * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
+ *   A CSV file (staged with stageImport) with its column mapping, as import_csv in opendives.h. `companionPath`: for
+ *   Poseidon MkVI, the staged .txt of the same dive. With `dryRun` nothing is added and the answer is the preview
+ *   {dives:[{when, number, durationSeconds, maxDepthMm, profile:[[seconds, mm]]}]}; otherwise the dives are
+ *   imported (EditResult), one undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
  * @property {(options: {path: string}) => Promise<void>} discardImport
  *   Deletes a downloaded file (cancelled or failed import).
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
@@ -830,6 +844,10 @@ export const OpenDivesCore = {
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),
+  async importCsv(options) {
+    const result = await native.importCsv({ ...options, params: JSON.stringify(options.params) });
+    return JSON.parse(result.json);
+  },
   async createLog(options) {
     return JSON.parse((await native.createLog(options)).json);
   },

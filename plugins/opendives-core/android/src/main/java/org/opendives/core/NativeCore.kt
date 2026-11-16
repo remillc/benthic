@@ -37,6 +37,7 @@ internal object NativeCore {
     external fun mergeDives(ids: IntArray): String
     external fun editDives(ids: IntArray, changes: String): String
     external fun importDives(file: String, source: String): String
+    external fun importCsv(file: String, companion: String, params: String, source: String, dryRun: Boolean): String
     external fun filterPresets(action: String, name: String, fulltext: String, mode: String, rules: Array<String>, index: Int): String
     external fun syncConflicts(): String
     external fun cancelConflictResolution()

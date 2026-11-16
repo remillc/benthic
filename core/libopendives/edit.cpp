@@ -32,6 +32,8 @@
 #include "core/filterpresettable.h"
 #include "core/subsurface-time.h"
 #include "core/file.h"
+#include "core/import-csv.h"
+#include "core/xmlparams.h"
 #include "core/fulltext.h"
 #include "core/git-access.h"
 #include "core/pref.h"
@@ -49,6 +51,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <ctime>
 #include <initializer_list>
 #include <map>
@@ -3930,6 +3933,139 @@ int import_dives(const std::string &file, const std::string &source, std::string
 	}
 	// ImportDives::ImportDives(log, import_flags::merge_all_trips, source), as
 	// QMLManager::importDivesFromFile() and the desktop import do.
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
+
+// --- CSV import with a column mapping (task 2026-11-16-224, part 8) --------------------------------
+//
+// The core reads a .csv only through its column-mapping import, which Subsurface's desktop runs from
+// DiveLogImportDialog::on_buttonBox_accepted() (desktop-widgets/divelogimportdialog.cpp): the mapping
+// goes to the stylesheets as parameters (xml_params), then parse_csv_file() (a profile per file),
+// parse_manual_file() (a dive per line), parse_seabear_log() or parse_txt_file() (Poseidon MkVI) read the
+// file. The app's dialog decides the mapping (JavaScript, app/src/lib/csv-import.js); this only runs
+// the core's own functions with it.
+namespace {
+
+// A text value for a stylesheet parameter: the stylesheets take XPath expressions, so a text is quoted
+// (the desktop dialog quotes the hardware name the same way).
+std::string xslt_text(const std::string &value)
+{
+	std::string clean;
+	for (char c: value)
+		if (c != '"')
+			clean += c;
+	return "\"" + clean + "\"";
+}
+
+// The dives a CSV read gave, for the preview: when (the log's own time, as the list shows it), duration,
+// maximum depth and about 200 points of the profile (seconds, millimetres).
+std::string csv_preview_json(const struct divelog &log)
+{
+	std::string json = "{\"dives\":[";
+	bool first = true;
+	for (const auto &dp: log.dives) {
+		const struct dive &d = *dp;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"when\":" + std::to_string(static_cast<long long>(d.when)) + ",\"number\":" + std::to_string(d.number) +
+			",\"durationSeconds\":" + std::to_string(d.duration.seconds) +
+			",\"maxDepthMm\":" + std::to_string(d.maxdepth.mm) + ",\"profile\":[";
+		if (!d.dcs.empty()) {
+			const auto &samples = d.dcs[0].samples;
+			size_t step = samples.size() / 200 + 1;
+			bool firstPoint = true;
+			for (size_t i = 0; i < samples.size(); i += step) {
+				json += (firstPoint ? "[" : ",[") + std::to_string(samples[i].time.seconds) + "," +
+					std::to_string(samples[i].depth.mm) + "]";
+				firstPoint = false;
+			}
+		}
+		json += "]}";
+	}
+	json += "]}";
+	return json;
+}
+
+} // namespace
+
+int import_csv(const std::string &file, const std::string &companion, const std::string &params_json,
+	       const std::string &source, bool dry_run, std::string &result_json, std::string &error)
+{
+	if (!dry_run && check_writable_log(error))
+		return -1;
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(params_json).object(fields)) {
+		error = "BAD_REQUEST: params";
+		return -1;
+	}
+	std::string format = "samples";
+	std::string templ = "csv";
+	xml_params params;
+	for (auto &[key, value]: fields) {
+		if (key == "format") {
+			format = value.text;
+		} else if (key == "template") {
+			templ = value.text;
+		} else if (value.kind == JsonValue::NUMBER) {
+			xml_params_add_int(&params, key.c_str(), static_cast<int>(value.number));
+		} else if (value.kind == JsonValue::STRING) {
+			xml_params_add(&params, key, key == "hw" ? xslt_text(value.text) : value.text);
+		}
+	}
+	if (format != "samples" && format != "dives" && format != "seabear" && format != "poseidon") {
+		error = "BAD_REQUEST: format";
+		return -1;
+	}
+	// The stylesheets are chosen by name: no path may be given.
+	if (templ.find('/') != std::string::npos || templ.find('\\') != std::string::npos || templ.find("..") != std::string::npos) {
+		error = "BAD_REQUEST: template";
+		return -1;
+	}
+
+	struct divelog log;
+	std::string loaded = loaded_git_commit;
+	int ret;
+	if (format == "seabear") {
+		// The newer Seabear files (H3, T1: a header with the dive mode and the log interval) are read by
+		// their own parser, as the desktop dialog does for "Seabear CSV". The older HUDC files have no
+		// such header and a different layout: the parser would misread their columns, so they go through
+		// the mapping the dialog filled in for Seabear (what Subsurface's own test of such a file does).
+		std::string head;
+		{
+			std::ifstream in(file, std::ios::binary);
+			head.resize(4096);
+			head.resize(static_cast<size_t>(in.read(&head[0], 4096).gcount()));
+		}
+		if (head.find("//Log interval: ") != std::string::npos)
+			ret = parse_seabear_log(file.c_str(), &log);
+		else
+			ret = parse_csv_file(file.c_str(), &params, templ.c_str(), &log);
+	} else if (format == "poseidon") {
+		if (companion.empty()) {
+			error = "IMPORT_FAILED";
+			return -1;
+		}
+		// MkVI: the dive's data are in the .txt, the profile in the .csv.
+		ret = parse_txt_file(companion.c_str(), file.c_str(), &log);
+	} else if (format == "dives") {
+		ret = parse_manual_file(file.c_str(), &params, &log);
+	} else {
+		ret = parse_csv_file(file.c_str(), &params, templ.c_str(), &log);
+	}
+	loaded_git_commit = loaded;
+	if (ret != 0 && log.dives.empty()) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	if (log.dives.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	if (dry_run) {
+		result_json = csv_preview_json(log);
+		return 0;
+	}
 	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
 }
 
