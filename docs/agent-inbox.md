@@ -4482,3 +4482,17 @@ All texts in `fr.json` and `en.json`.
 - White text on the bands is at least 4.5:1.
 - « Retour » goes back one step.
 - On a tablet, nothing changes but the badge.
+
+## [ ] 2026-11-16-234 Correction to 233: welcome band blue and a smaller Alpha badge
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/android-accueil-c.dc.html`.
+
+1. **Band background.** On the phone welcome screen, the 330 dp blue band uses **the same background as the blue panel of the tablet first launch** (mock-ups `android-tablette-premier-lancement-production-*`). From bottom to top:
+   - the linear gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`, from top to bottom;
+   - a light radial sheen: `ellipse 70% 45% at 22% 0%`, white at 22 % opacity fading to 0 at 70 %;
+   - the faint diagonal hatching: `repeating-linear-gradient(105deg, white 3.5 % 0–60 px, transparent 60–150 px)`, masked from opaque at the top to transparent at 55 % of the height.
+
+   It is not the light section-band gradient. The small 108 dp band of the following steps keeps the section band, as task 233 says.
+2. **Alpha badge.** It is smaller: text 10 sp, line height 14, letter spacing 0.6, padding 1 × 6 dp, total height 18 dp. Same colours: white text, white fill at 18 % and white 1 dp outline at 55 %.
+
+**Test:** on a phone, the welcome band matches the tablet's blue panel (gradient, sheen, hatching), white text on it stays at least 4.5:1, and the Alpha badge is 18 dp tall.
