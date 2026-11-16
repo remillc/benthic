@@ -4366,3 +4366,25 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 - On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
 - The progress bars stay inside their card at 360 dp wide.
 - `main` is untouched.
+
+## [ ] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-new-logbook-two-steps`, started from the latest release branch (task 230). Do not merge it into `main`. Phone, tablet (both orientations) and desktop.
+
+Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, and the same names for `android-premier-lancement-production-` and `bureau-premier-lancement-production-`):
+- `…-nom` (new);
+- `…-ou` (changed);
+- `…-importer-nouveau-carnet` (changed).
+
+**Create a logbook** (after « Créer un carnet »):
+1. **« Nouveau carnet »** (`…-nom`): the field « Nom du carnet », prefilled « Mon carnet », its help line « Il s’affiche en haut du carnet et nomme son fichier. », and the button « Suivant ». Nothing else on the screen.
+2. **« Où le garder ? »** (`…-ou`):
+   - The logbook name is the page title (« Mon carnet », 28 sp), with the pencil that goes back to step 1.
+   - Under it, the subtitle « Où le garder ? », then « Vous pourrez changer d’endroit plus tard. » and the three rows: « Dans mon nuage », « Dans un dépôt git », and « Seulement sur cette tablette / ce téléphone / cet ordinateur ».
+   - The following steps are unchanged.
+
+**Import a logbook** (`…-importer-nouveau-carnet`): « Nouveau carnet » keeps the summary card of the file and the name field (prefilled from the file name), then « Suivant ». It no longer shows the three rows: « Suivant » opens the same « Où le garder ? » screen.
+
+« Retour » goes back one step, with the shared-axis X transition backwards.
+
+**Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
