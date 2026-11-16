@@ -4568,3 +4568,40 @@ The tablet first-launch screen (the one with « J’ai un compte Subsurface », 
 - When the system setting to remove animations is on, show the final state at once.
 
 **Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
+
+## [x] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Reference mock-up: `docs/mockups/android-tablette-detail-menu-paysage.dc.html`; the same chart appears in every tablet screen that shows the dive detail.
+
+On tablets, in the profile chart of the dive detail, two strokes change from 1.25 dp to **1 dp**:
+- the depth profile line;
+- the temperature curve.
+
+Nothing else changes: the grid lines, ticks and other curves, the water fill, the colours and the phone chart stay as they are.
+
+**Test:** on a tablet, open a dive. The profile line and the temperature curve are 1 dp wide, in landscape and in portrait.
+
+Done on main: from 768 dp, a token `--od-profile-main-width: 1` gives the depth line and the temperature curve of `DiveProfile.svelte` 1 dp; every other curve keeps `--od-profile-line-width` (1.25 dp), the phone is unchanged, and high contrast keeps its 2 dp. Test in `tests/app/profile-lines.test.mjs`.
+
+## [ ] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** This follows task 237, which covers the tablet first-launch screen itself, and the phone steps of tasks 224–236.
+
+**Mock-ups**, each in `-paysage` and `-portrait`, all under `docs/mockups/android-tablette-premier-lancement-alpha-`:
+- `compte-subsurface`, `compte-subsurface-telechargement`, `compte-subsurface-carnet`;
+- `creer-compte`, `creer-compte-erreur`, `creer-compte-code`, `creer-compte-code-erreur`, `creer-compte-carnet`;
+- `sans-compte`, `sans-compte-carnet`.
+
+**Layout.** The steps keep the blue panel of task 237 (700 dp on the left in landscape, 640 dp at the top in portrait), with the same Alpha badge and dive profile. In these steps the profile is shown static, without the opening animation.
+
+The step content sits on the paper side, in the column of the release tablet steps: 452 dp wide, vertically centred, with « Une question ? À propos et contact » at the bottom. The content is the same as on the phone (tasks 224–236). Only these changes apply:
+- « ce téléphone » becomes « cette tablette » everywhere, e.g. « Sur cette tablette seulement », « Si vous perdez ou changez de tablette » and « Copie du carnet sur cette tablette ». The phone icon becomes a tablet icon.
+- Buttons are right-aligned, as in the other tablet steps; they are not full width.
+- **Confirmation code:** the six boxes are grouped with 8 dp between them and the group is centred in the column. The « Code de confirmation » label, the error message and the « Renvoyer le code » link start at the left edge of the first box.
+
+**When the logbook is ready.** These screens open the existing tablet logbook with a snackbar placed bottom-left, 24 dp from the content edge:
+- **Compte Subsurface:** the logbook with the dives, snackbar « Carnet téléchargé. Il reste sur cette tablette, même sans réseau. »
+- **Créer un compte:** the empty logbook with the subtitle « Cloud Subsurface », snackbar « Compte créé. Votre carnet est prêt. »
+- **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
+
+**Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
