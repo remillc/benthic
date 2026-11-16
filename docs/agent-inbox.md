@@ -1932,7 +1932,9 @@ Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, 
 
 Done in `feature/share-plan` (25d95a4, then on main): "Partager le plan" opens the five rows (ShareSheet gains optional rows and heading). The slate (PlanSlate.svelte) offers the base plan, "+5 min" (deepest level + 300 s), "+10 ft / +3 m" (every level deeper, times kept) and "Sans <gas>" per deco gas; each extra plan is one more planDive call to the core on a copy of the request, nothing computed in JavaScript. Rows are matched by order for levels and by depth for ascents and stops; a plan the core cannot compute shows "–". Sizes: 4 × 6 in, 3 × 5 in or full Letter; A6, A7 or full A4 elsewhere; the PDF is one page with the card at real size and cut marks. The PNG is drawn word by word on a canvas from the laid-out card (the SVG foreign object route tainted the canvas in the WebView) and cropped to its content. The .ssrf row needs a saved plan and uses the core export. Last choices remembered (slateSize, slateFile, slatePlus5, slatePlusDepth). Checked on the phone emulator: share sheet, slate preview with core-computed +5 min and +10 ft columns, PDF (A4 page, A6 card, cut marks) and table PNG. Not checked on device: a deco plan with "Sans <gas>" (covered by node tests).
 
-## [ ] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
+## [x] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
+
+Closed on 16 November 2026 during the inbox clean-up: built and merged into `main` (`feature/gauge-camera`, ML Kit, task 77).
 
 **Christian asks you not to start the work.** First write here, under this task, a summary of how you plan to build this part of the app, then stop and wait for his go-ahead.
 
@@ -2904,7 +2906,9 @@ English: « {n} sites here », « Pins overlap at this scale. », « {n} sites i
 
 Done in feature/sites-map-select. 1: SiteMap names « fewInFullScreen » on Sites: no names on the map; in full screen they show with 8 pins or fewer in view and no two overlapping (measured); pins drawn by dive count, the most dived on top; no grouping. 2: a tapped pin is selected (1.3×, halo --od-secondary at 18 %, z-index front); od-map-site-card over the bottom of the map, above the credit (name, « {pays} · {n} plongées, la dernière le {date} » from sites.rowDives, max depth, chevron), label « {site}, {pays}, {n} plongées. Ouvrir la fiche du site »; it opens the site sheet (leaving full screen); a tap on the map or Back (lib/back-button.js, only when visible) closes it; « Centrer sur ma position » moves up; the map's label adds « {site} est sélectionné. ». 3: a tap whose 48 dp target touches several pin heads opens MapStackSheet.svelte (od-map-stack-sheet): blue disc on the map, « {n} sites à cet endroit », the place from place-lookup when found, « Les épingles se superposent à cette échelle. », rows by dive count with ink badge, name, dives, max depth, chevron; ✕, scrim and Back close. 4: the list shows the sites inside the visible area (lib/maps-logic inBbox, at moveend) under « {n} sites dans cette zone »; a search looks through the whole logbook; the to-do shortcuts count the whole logbook. 5: the route badge shows on the development server only (import.meta.env.DEV and VITE_SHOW_ROUTE), never in a built app. Spec updated (Sites map: no names …), release notes updated (the 147 line no longer mentions names). Checked on the phone emulator with the test account's 239 sites: no names, a tapped pin and its card, Back, 96 stacked pins in the sheet, Back, 212 sites in the area. Not checked: names in full screen with few pins, the place line (no answer during the test), iPhone, iPad and tablet layouts on a device.
 
-## [ ] 2026-11-14-151 Quick entry on the boat: sites by distance, an Android version, a « Choisir un site » screen
+## [x] 2026-11-14-151 Quick entry on the boat: sites by distance, an Android version, a « Choisir un site » screen
+
+Closed on 16 November 2026 during the inbox clean-up: built and merged into `main` (`feature/quick-entry-sites`).
 
 Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/`: `ios-saisie` (updated), `saisie-bateau-android` (new), `choisir-site-android` (new).
 
@@ -3456,7 +3460,9 @@ English: « avg. 17.9 m ».
 
 Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
 
-## [ ] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+## [x] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+
+**Superseded** by task 194 (the detail pane has no ⋮ any more). Closed during the inbox clean-up of 16 November 2026.
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-groupe.dc.html` (the menu shown open).
 
@@ -3843,7 +3849,9 @@ Christian decided this on 15 November 2026. To-dos and ideas get a third tag, `[
 
 Done: rule read in docs/TODOS.md and docs/IDEAS.md; [site] items (pages, texts, look and publishing of opendives.app, folder site/) are built and published from tasks, as usual. Nothing to code.
 
-## [ ] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+## [x] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+
+**Superseded** by task 218 (the first launch in steps); the work was taken off `main` and kept on `feature/release-first-launch` (task 216). Closed during the inbox clean-up of 16 November 2026.
 
 Christian approved this on 15 November 2026. Mock-ups:
 - `docs/mockups/android-tablette-premier-lancement-production-paysage.dc.html`
@@ -5003,3 +5011,21 @@ Mock-ups, all in `docs/mockups/`:
 - The two errors show under the right field.
 - The help links swap the form for the help, and « Retour » brings the form back with its fields still filled.
 - A valid repository leads to the download, then to the logbook with the snackbar.
+
+## [ ] 2026-11-16-258 Inbox clean-up: tick the desktop and release tasks that are done
+
+Christian asked for this on 16 November 2026. Several tasks are still unticked although their work seems to be on branches that are not on `origin` (the desktop branch, the release branches). I cannot check those branches from here.
+
+Go through these tasks and, for each one, compare the request with the code on its branch:
+- **Desktop app:** 15 (every screen of the mock-ups, a standing task: leave it open), 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 187, 188, 189, 191, 192, 193, 194, 195, 196, 198 (desktop part), 199, 201, 202;
+- **New logbook:** 207, 208;
+- **Release edition:** 218.
+
+For each task:
+- If it is done, tick it and add one line « Done on `<branch>` ».
+- If it is only partly done, leave it unticked and add one line saying what is missing.
+- If a later task replaced it, tick it and add « Superseded by task N ».
+
+Change no code for this task. Report the result in a short list at the end of this task.
+
+Already closed during the same clean-up: 77, 151 (merged into `main`), 186 (superseded by 194), 213 (superseded by 218).
