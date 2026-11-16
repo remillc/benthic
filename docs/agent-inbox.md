@@ -4526,6 +4526,9 @@ Done: on the welcome band and on every step, the badge is 9 sp, line height 12, 
 
 ## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
 
+**Superseded:** the step band of this task is replaced by task 250 (the app's wavy band).
+
+
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
 
 On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
@@ -4738,6 +4741,9 @@ Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelt
 
 ## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
 
+**Superseded:** the step band of this task is replaced by task 251 (the app's wavy band); the welcome hero stays.
+
+
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
 
 The phone first-launch screens of the public version take the same bands as the alpha (tasks 234 and 236):
@@ -4870,10 +4876,39 @@ This replaces, for the step pages only, the band of tasks 234 and 236 (hatched d
 
 Done: in `FirstLaunchBand.svelte` the `step` variant now draws the section band: the radial gradient (token `--od-first-band-step`, `#A9C4E2` to `#114477`, centre 38 % / -40 %), the 105deg rays kept, the SectionBand profile (area 10 % white, line 30 % white, 1.5 dp, same path) and its 18 dp wave in the page colour (`--f7-page-bg-color`); the top-left sheen is drawn on the welcome band only and the step has no straight edge. Height stays 140 dp under the status bar. The welcome hero and tablets (the panel) did not change. Badge contrast: computed with the gradient at the badge position (about 68 % of the radius), white 9 sp text on the 18 % fill is 4.9:1 (AA 4.5:1), so the fill was not raised. Test updated in `tests/app/first-launch.test.mjs`; one release-note line (fr, en).
 
-## [ ] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
+## [x] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
 
 Same change as task 250, for the release step pages: the 140 dp step band takes the section band's radial gradient, keeps the light rays, gets the faint profile and the 18 dp wave at the bottom, and loses the top-left sheen and the straight edge. This replaces the step band of task 244. The welcome hero (330 dp) and the tablets do not change.
 
 **Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
+
+## [ ] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It completes part 2 of task 247. Mock-ups: `docs/mockups/git-depot-aide-gitlab-android.dc.html` and `git-depot-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-depot-aide-android.dc.html`).
+
+The help page keeps one layout for the three tabs: the intro, the white card « Un dépôt privé : vous seul pouvez le voir. » with numbered steps, a link that opens the site in the browser, and the closing line about the token. The active tab is semi-bold, in the text colour, with the 3 dp underline; the others are grey. Use the texts of the mock-ups word for word.
+
+**GitLab**, 7 steps; the link « Ouvrir la page « New project » de GitLab » opens `https://gitlab.com/projects/new#blank_project`:
+1. Connectez-vous à GitLab, puis touchez + (Create new) en haut du menu et New project/repository.
+2. Touchez Create blank project.
+3. Project name : un nom reconnaissable, par exemple carnet-plongee.
+4. Sous Visibility Level, choisissez Private.
+5. Décochez Initialize repository with a README. Le dépôt doit rester vide.
+6. Touchez Create project.
+7. Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.
+
+**Codeberg**, 6 steps; the link « Ouvrir la page « New repository » de Codeberg » opens `https://codeberg.org/repo/create`:
+1. Connectez-vous à Codeberg, puis touchez + en haut de la page et New repository.
+2. Repository name : un nom reconnaissable, par exemple carnet-plongee.
+3. Cochez Make repository private.
+4. Laissez Initialize repository décoché. Le dépôt doit rester vide.
+5. Touchez Create repository.
+6. Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.
+
+The site labels are in English for now; Christian may ask for the French labels of GitLab and Codeberg later (GitHub exists only in English).
+
+**Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
