@@ -41,3 +41,23 @@ test('its colour is the secondary text colour, #4B4A47 in light', () => {
   assert.match(src('theme.css'), /--od-text-2: #4B4A47;/);
   assert.match(src('components/WelcomeHelpLink.svelte'), /color: var\(--od-text-2\)/);
 });
+
+test('Android phone: the link ends the page, 12 dp under the git link and 20 dp above the bottom edge (task 2026-11-16-243)', () => {
+  const welcome = src('pages/WelcomeStart.svelte');
+  const link = src('components/WelcomeHelpLink.svelte');
+  // The link is inside the Android page, after the actions (the git link), so it follows it.
+  assert.match(welcome, /<\/div>\s*<!--[^>]*-->\s*<WelcomeHelpLink \/>\s*<\/div>\s*\{:else\}/);
+  // 20 dp above the edge on the phone; the page content has no bottom padding of its own there.
+  assert.match(welcome, /:global\(\.od-welcome-start--phone\) \{\s*--od-help-link-bottom: 20px;[\s\S]*?padding-bottom: 0;/);
+  assert.match(link, /margin: 0 auto calc\(var\(--f7-safe-area-bottom\) \+ var\(--od-help-link-bottom, 28px\)\)/);
+  // 12 dp between the git link's text and the help link: 6 dp of padding + 6 dp of margin under an 18 dp line.
+  assert.match(welcome, /:global\(\.od-welcome-start--phone\) \.od-welcome-start--git-link \{\s*min-height: 0;\s*padding: 6px 12px;\s*margin-bottom: 6px;/);
+});
+
+test('tablet: the link stays pinned 28 dp above the bottom edge, iOS keeps its placement', () => {
+  const link = src('components/WelcomeHelpLink.svelte');
+  assert.match(link, /@media \(min-width: 768px\) \{\s*position: absolute;[\s\S]*?bottom: calc\(var\(--f7-safe-area-bottom\) \+ 28px\);/);
+  const welcome = src('pages/WelcomeStart.svelte');
+  const ios = welcome.slice(welcome.indexOf('{:else}'));
+  assert.match(ios, /<\/a>\s*<WelcomeHelpLink \/>\s*\{\/if\}/);
+});

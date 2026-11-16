@@ -3,7 +3,7 @@
   // « Une question ? À propos et contact » at the bottom of the first-launch screens (task 2026-11-15-219;
   // look: docs/mockups/android-tablette-premier-lancement-production-*.dc.html). It opens About and
   // « Retour » comes back to the screen it was opened from.
-  // Tablet: centred, pinned 28 dp above the bottom of the page. Phone: centred at the end of the content.
+  // Tablet: centred, pinned 28 dp above the bottom of the page. Phone: centred at the end of the content, 20 dp above the edge on the welcome screen (--od-help-link-bottom).
   import { t } from '../lib/i18n.js';
 
   /** @param {MouseEvent} e */
@@ -31,7 +31,7 @@
       z-index: 2;
       width: fit-content;
       max-width: calc(100% - 32px);
-      margin: 0 auto calc(var(--f7-safe-area-bottom) + 28px);
+      margin: 0 auto calc(var(--f7-safe-area-bottom) + var(--od-help-link-bottom, 28px));
       padding: 6px 12px;
       border-radius: 16px;
       display: flex;
