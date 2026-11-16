@@ -1869,6 +1869,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur téléphone Android : le bandeau des étapes reprend celui des sections de l’app (dégradé clair, profil discret, vague au bord) à la place du bandeau sombre à bord droit.",
       "Premier lancement sur téléphone et tablette Android : le lien « Une question ? À propos et contact » se place sous « Utiliser mon propre dépôt git » sur téléphone, en bas de la colonne sur tablette.",
       "Premier lancement sur tablette Android : les étapes (compte Subsurface, création de compte, sans compte) gardent le panneau bleu, avec « cette tablette » dans les textes, et le carnet s’ouvre avec un message en bas à gauche.",
       "Premier lancement sur tablette Android : un panneau bleu à gauche (en haut en portrait) avec le profil d’une plongée qui se dessine à l’ouverture, et les trois façons de commencer à côté.",

@@ -4853,7 +4853,7 @@ The chevron is decorative (`aria-hidden`); the button's name stays « Suivant »
 
 Done on `feature/release-new-logbook-two-steps`: « Suivant » of the « Nouveau carnet » step (creating and importing, every device) has an 18 dp chevron 8 dp after the label, with 24 dp of padding at the start and 16 dp at the end; the chevron is hidden from screen readers.
 
-## [ ] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
+## [x] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: every phone step page of the alpha and beta first launch, `docs/mockups/android-premier-lancement-alpha-*.dc.html` and `android-premier-lancement-beta-*.dc.html` (for example `-beta-compte-subsurface`, `-alpha-git`, `-alpha-sans-compte`, `-beta-creer-compte*`, the download screens).
 
@@ -4867,6 +4867,8 @@ The band of the steps (`FirstLaunchBand`, variant `step`, 140 dp under the statu
 This replaces, for the step pages only, the band of tasks 234 and 236 (hatched dark blue, straight edge). The welcome screen keeps its 330 dp hatched hero with the headline and the animated profile. Tablets do not change.
 
 **Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
+
+Done: in `FirstLaunchBand.svelte` the `step` variant now draws the section band: the radial gradient (token `--od-first-band-step`, `#A9C4E2` to `#114477`, centre 38 % / -40 %), the 105deg rays kept, the SectionBand profile (area 10 % white, line 30 % white, 1.5 dp, same path) and its 18 dp wave in the page colour (`--f7-page-bg-color`); the top-left sheen is drawn on the welcome band only and the step has no straight edge. Height stays 140 dp under the status bar. The welcome hero and tablets (the panel) did not change. Badge contrast: computed with the gradient at the badge position (about 68 % of the radius), white 9 sp text on the 18 % fill is 4.9:1 (AA 4.5:1), so the fill was not raised. Test updated in `tests/app/first-launch.test.mjs`; one release-note line (fr, en).
 
 ## [ ] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
 
