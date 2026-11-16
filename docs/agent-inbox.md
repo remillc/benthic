@@ -4511,3 +4511,16 @@ On every phone screen that shows the Alpha badge next to « OpenDives » (welcom
 This replaces the 18 dp badge in task 234 point 2. Point 1 of task 234 (band background) stays as written.
 
 **Test:** on a phone, the Alpha badge is 16 dp tall on the welcome screen and on every first-launch step.
+
+## [ ] 2026-11-16-236 Correction to 233: the header of the first-launch steps
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
+
+On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
+- **Height:** 140 dp (status bar not included). The logo, « OpenDives » and the Alpha badge stay in the same place at the top of the band.
+- **Background:** the same hatched dark blue as the welcome band (task 234 point 1): linear gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`, the light radial sheen at the top left and the faint diagonal hatching that fades out at 55 % of the height.
+- **No wave and no decorative profile.** The band ends with a straight edge on the paper background.
+
+Content below the band (« Retour », title, fields, buttons, the About link) is unchanged and shifts down by 32 dp. Everything must still fit on a 390 × 844 dp screen, including the error states.
+
+**Test:** on a phone, each first-launch step shows a 140 dp hatched dark-blue band with a straight bottom edge, no wave and no profile. The content fits without scrolling on a common phone, and white text on the band stays at least 4.5:1.
