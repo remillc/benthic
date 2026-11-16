@@ -4532,3 +4532,39 @@ Content below the band (« Retour », title, fields, buttons, the About link) is
 **Test:** on a phone, each first-launch step shows a 140 dp hatched dark-blue band with a straight bottom edge, no wave and no profile. The content fits without scrolling on a common phone, and white text on the band stays at least 4.5:1.
 
 Done: the header of the steps is `FirstLaunchBand` in its `step` variant: 140 dp plus the status bar (`max(safe-area-top, 24px) + 140px`, so 164 dp in the 390 × 844 test), the same hatched blue as the welcome band, a straight bottom edge, no wave and no profile (`SectionBand` is not used). The content shifts down 32 dp and fits in 390 × 844 on every step, error states included (the About link is at 844 − 28 dp). White text on the step band: « OpenDives » 7.4:1, badge 5.06:1.
+
+## [ ] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
+
+The tablet first-launch screen (the one with « J’ai un compte Subsurface », « Créer un compte » and « Commencer sans compte ») gets a new layout:
+- **Landscape:** a 700 dp blue panel on the left, with the content on the paper background on the right.
+- **Portrait:** a 640 dp blue panel at the top, with the content below.
+
+**Blue panel**
+- Background: the same hatched dark blue as the phone welcome band (task 234 point 1).
+- Top: the round logo, « OpenDives » at 48 sp in white, then the Alpha badge.
+  - The badge is white text at 12 sp, line height 16, letter spacing 0.6, uppercase.
+  - Padding is 2 × 8 dp, with a white fill at 18 % and a white 1 dp outline at 55 %.
+- Title « Votre carnet de plongée, sur tous vos appareils. » at 40 sp in white.
+- The paragraph under the title, at 16 sp in white at 78 %.
+- Below the text, the dive profile:
+  - a white 2.5 dp line with a soft light-blue glow behind it;
+  - the water column, a pale white fill between the surface and the line;
+  - a dashed line at the surface;
+  - a white dot at the deepest point;
+  - two translucent labels, « 32,4 m » (max depth) and « 54 min » (duration · gas).
+
+**Content side**
+- « Pour commencer » at 28 sp.
+- The three existing buttons, unchanged, each with its hint below.
+- A thin divider, then the « Utiliser mon propre dépôt git » link.
+
+**Animation when the screen opens.** It plays once, each time the screen is shown.
+- The white line and its glow draw from left to right in 2.2 s, with standard easing (`cubic-bezier(0.4, 0, 0.2, 1)`). Animate the stroke length, i.e. path trimming.
+- The water column does **not** animate: it is visible from the start, and the line draws over it.
+- The deepest-point dot appears at 0.7 s: it scales from 40 % to 100 % with a fade-in over 0.3 s.
+- The two labels fade in and rise 8 dp at 2.1 s, over 0.5 s.
+- When the system setting to remove animations is on, show the final state at once.
+
+**Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
