@@ -4883,3 +4883,30 @@ Same change as task 250, for the release step pages: the 140 dp step band takes 
 **Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
 
 Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
+
+## [ ] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It completes part 2 of task 247. Mock-ups: `docs/mockups/git-depot-aide-gitlab-android.dc.html` and `git-depot-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-depot-aide-android.dc.html`).
+
+The help page keeps one layout for the three tabs: the intro, the white card « Un dépôt privé : vous seul pouvez le voir. » with numbered steps, a link that opens the site in the browser, and the closing line about the token. The active tab is semi-bold, in the text colour, with the 3 dp underline; the others are grey. Use the texts of the mock-ups word for word.
+
+**GitLab**, 7 steps; the link « Ouvrir la page « New project » de GitLab » opens `https://gitlab.com/projects/new#blank_project`:
+1. Connectez-vous à GitLab, puis touchez + (Create new) en haut du menu et New project/repository.
+2. Touchez Create blank project.
+3. Project name : un nom reconnaissable, par exemple carnet-plongee.
+4. Sous Visibility Level, choisissez Private.
+5. Décochez Initialize repository with a README. Le dépôt doit rester vide.
+6. Touchez Create project.
+7. Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.
+
+**Codeberg**, 6 steps; the link « Ouvrir la page « New repository » de Codeberg » opens `https://codeberg.org/repo/create`:
+1. Connectez-vous à Codeberg, puis touchez + en haut de la page et New repository.
+2. Repository name : un nom reconnaissable, par exemple carnet-plongee.
+3. Cochez Make repository private.
+4. Laissez Initialize repository décoché. Le dépôt doit rester vide.
+5. Touchez Create repository.
+6. Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.
+
+The site labels are in English for now; Christian may ask for the French labels of GitLab and Codeberg later (GitHub exists only in English).
+
+**Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
