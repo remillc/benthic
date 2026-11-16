@@ -5152,6 +5152,8 @@ What the screens show, for when the work starts:
 
 The tablet and desktop versions will follow in later tasks.
 
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
+
 ## [ ] 2026-11-16-260 Tablet and desktop (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
 
 **Stop: do not build anything yet**, as for task 259: there is no OpenDives server yet. Ask Christian how to proceed before any code. You can ask both questions together, for 259 and 260.
@@ -5165,6 +5167,8 @@ Mock-ups (canvas « OpenDives — Serveur »), the same 11 screens as task 259:
 They use the release first-launch frame (the blue panel with the animated profile, the step in the right-hand or lower column), with « Sur le serveur OpenDives » as the first choice. The texts are those of task 259, with « cette tablette » or « cet ordinateur ».
 
 On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
+
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
 
 ## [x] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
 
