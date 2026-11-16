@@ -718,6 +718,26 @@ Java_org_opendives_core_NativeCore_importDives(JNIEnv *env, jobject, jstring fil
 	return edit_result(env, json);
 }
 
+// Imports several files at once (import_dives_files): a Suunto .json and its .fit are read as one dive.
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_importDivesFiles(JNIEnv *env, jobject, jobjectArray filesIn, jstring source)
+{
+	std::vector<std::string> files;
+	jsize n = filesIn ? env->GetArrayLength(filesIn) : 0;
+	for (jsize i = 0; i < n; i++) {
+		auto s = static_cast<jstring>(env->GetObjectArrayElement(filesIn, i));
+		files.push_back(s ? to_string(env, s) : std::string());
+		if (s)
+			env->DeleteLocalRef(s);
+	}
+	std::string json, error;
+	if (opendives::import_dives_files(files, to_string(env, source), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // Filter presets: action "list" (read-only), "save" (rules: five strings per
 // rule, as filterQuery) or "delete" (index); save and delete are undoable steps.
 JNIEXPORT jstring JNICALL

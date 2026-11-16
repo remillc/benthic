@@ -1865,6 +1865,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Import a file: you can choose several files at once. A Suunto app .json and the .fit with the same name are read as one dive, with the gas mix and the gradient factors from the .fit.",
       "App icon on iPhone, iPad and Mac: blue to its edge, with the wave, no white background.",
       "App icon on Android: the blue disc fills the whole icon, with no white ring around it.",
       "Empty logbook: the main button becomes « Download my dives », with a dive computer icon; the computer is paired during the download.",

@@ -28,7 +28,7 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { importErrorKey } from '../lib/deep-link.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, loadLogbook, importFiles, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
   import { canMerge } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -1075,12 +1075,12 @@
   }
 
   async function fileChosen() {
-    const file = fileInput?.files?.[0];
-    if (!file || !fileInput) return;
+    const files = Array.from(fileInput?.files ?? []);
+    if (!files.length || !fileInput) return;
     fileInput.value = '';
     importing = true;
     try {
-      const n = await importFile(file);
+      const n = await importFiles(files);
       offerUndo(t('logbook.imported', { n }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
@@ -1412,7 +1412,7 @@
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
-  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" multiple class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}

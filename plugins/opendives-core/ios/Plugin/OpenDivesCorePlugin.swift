@@ -75,6 +75,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "syncConflicts", returnType: CAPPluginReturnPromise),
@@ -570,6 +571,35 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
             try bytes.write(to: file)
             call.resolve(["json": try OpenDivesNative.importDives(file: file.path, source: importName)])
+        }
+    }
+
+    /// Several files chosen together: "files" is a list of {name, data} (base64, original name).
+    /// They go to one temporary folder, so that a Suunto app .json and the .fit with the same
+    /// base name are read as one dive; the other files are read on their own.
+    @objc func importDivesFiles(_ call: CAPPluginCall) {
+        guard let items = call.getArray("files") as? [[String: Any]], !items.isEmpty else {
+            call.reject("Missing files", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            let dir = cacheDir.appendingPathComponent("import").appendingPathComponent(UUID().uuidString)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: dir) }
+            var paths: [String] = []
+            for (i, item) in items.enumerated() {
+                var name = ((item["name"] as? String ?? "") as NSString).lastPathComponent
+                if name.isEmpty { name = "import-\(i).xml" }
+                guard let data = item["data"] as? String,
+                      let bytes = Data(base64Encoded: data, options: .ignoreUnknownCharacters) else {
+                    throw Failure("CORE_ERROR", "Invalid base64 data")
+                }
+                let file = dir.appendingPathComponent(name)
+                try bytes.write(to: file)
+                paths.append(file.path)
+            }
+            let source = paths.count == 1 ? (paths[0] as NSString).lastPathComponent : "multiple files"
+            call.resolve(["json": try OpenDivesNative.importDivesFiles(files: paths, source: source)])
         }
     }
 

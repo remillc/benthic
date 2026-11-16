@@ -131,6 +131,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)importDives:(NSString *)file
 			    source:(NSString *)source
 			     error:(NSError **)error NS_SWIFT_NAME(importDives(file:source:));
++ (nullable NSString *)importDivesFiles:(NSArray<NSString *> *)files
+				  source:(NSString *)source
+				   error:(NSError **)error NS_SWIFT_NAME(importDivesFiles(files:source:));
 + (nullable NSString *)filterPresets:(NSString *)action
 				name:(NSString *)name
 			    fulltext:(NSString *)fulltext
