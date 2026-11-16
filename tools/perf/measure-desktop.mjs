@@ -20,10 +20,10 @@ await sleep(1500);
 rmSync(ud, { recursive: true, force: true });
 mkdirSync(ud, { recursive: true });
 
-const env = { ...process.env, OD_DEV_URL: 'http://localhost:5241', OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const t0 = Date.now();
-const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), '--remote-debugging-port=9391', path.resolve(ssrf)], { env, stdio: 'ignore' });
+const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 
 const R = { label, ssrf, cpu };
 const p = await attachLogbook();

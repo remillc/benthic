@@ -48,6 +48,19 @@
 
   const uid = $props.id();
   let width = $state(320);
+  /**
+   * Keeps the width state at the element's width. A ResizeObserver reports it after the browser has laid the page out, so
+   * the width is not read (forced layout) in the middle of a change of the page, as bind:clientWidth does.
+   * @param {HTMLElement} node
+   */
+  function widthOf(node) {
+    const observer = new ResizeObserver((entries) => {
+      const w = Math.round(entries[entries.length - 1].contentRect.width);
+      if (w && w !== width) width = w;
+    });
+    observer.observe(node);
+    return { destroy: () => observer.disconnect() };
+  }
   const HEIGHT = 184;
   const MARGIN_LEFT = 30;
   const MARGIN_TOP = 6;
@@ -357,7 +370,7 @@
   </div>
   {/if}
 
-  <div class="od-dive-profile--frame" bind:clientWidth={width}>
+  <div class="od-dive-profile--frame" use:widthOf>
     <svg
       {width}
       height={HEIGHT + (gasLayer ? BAND + 4 : 0)}

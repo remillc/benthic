@@ -408,3 +408,78 @@ export function adjacentTrips(dives, ids) {
   const tripOf = (d) => (d?.trip && !(inside.size === 1 && inside.has(d.trip.id)) ? { id: d.trip.id, location: d.trip.location } : null);
   return { previous: tripOf(order[first - 1]), next: tripOf(order[last + 1]) };
 }
+
+// --- Windowing: the table draws only the rows in view. ----------------------------------------
+
+/** A dive row is 48 px plus the 2 px between rows; a trip row 44 px plus 2 (the table's styles set the 48 and the 44). */
+export const ROW_HEIGHT = 50;
+export const TRIP_HEIGHT = 46;
+/** From the top of the table to the first row: spacing, header (36), spacing. */
+export const BODY_TOP = 40;
+/** Rows kept drawn above and below the view, so a fast scroll or a held key finds rows in place. */
+export const OVERSCAN = 10;
+
+/**
+ * Where each row starts, in px from the first row's top; one more entry holds the total height.
+ * @param {{type: string}[]} rows
+ * @returns {Float64Array}
+ */
+export function rowOffsets(rows) {
+  const out = new Float64Array(rows.length + 1);
+  for (let i = 0; i < rows.length; i++) out[i + 1] = out[i] + (rows[i].type === 'trip' ? TRIP_HEIGHT : ROW_HEIGHT);
+  return out;
+}
+
+/**
+ * The first row whose bottom is below `y` (px from the first row's top); the row count when none.
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} y
+ */
+export function rowAt(offsets, y) {
+  let lo = 0;
+  let hi = offsets.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (offsets[mid + 1] > y) hi = mid;
+    else lo = mid + 1;
+  }
+  return lo;
+}
+
+/**
+ * The rows to draw for a scroll position: those in view plus the overscan, and the height of the
+ * two spacer rows that stand for the others (less the 2 px a row of their own would add around them).
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} scrollTop
+ * @param {number} viewHeight the scroll area's height; unknown (0) counts as a tall screen
+ * @returns {{start: number, end: number, padTop: number, padBottom: number}}
+ */
+export function windowRange(offsets, scrollTop, viewHeight) {
+  const n = offsets.length - 1;
+  const top = scrollTop - BODY_TOP;
+  const start = Math.max(0, rowAt(offsets, top) - OVERSCAN);
+  const end = Math.min(n, rowAt(offsets, top + (viewHeight || 900)) + 1 + OVERSCAN);
+  return {
+    start,
+    end,
+    padTop: start > 0 ? offsets[start] - 2 : 0,
+    padBottom: end < n ? offsets[n] - offsets[end] - 2 : 0,
+  };
+}
+
+/**
+ * The scroll position that brings row `index` fully into view (under the sticky header), the current one when it already is.
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} index
+ * @param {number} scrollTop
+ * @param {number} viewHeight
+ */
+export function scrollForRow(offsets, index, scrollTop, viewHeight) {
+  if (index < 0 || index >= offsets.length - 1) return scrollTop;
+  const top = BODY_TOP + offsets[index];
+  const bottom = top + (offsets[index + 1] - offsets[index]) - 2;
+  const head = BODY_TOP - 2;
+  if (top - head < scrollTop) return Math.max(0, top - head);
+  if (bottom > scrollTop + viewHeight) return bottom - viewHeight;
+  return scrollTop;
+}

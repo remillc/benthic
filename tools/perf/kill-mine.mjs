@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 
 const script = [
   "Get-CimInstance Win32_Process -Filter \"Name='electron.exe'\" |",
-  "Where-Object { $_.CommandLine -match 'remote-debugging-port=9391' -and $_.CommandLine -notmatch '--type=' } |",
+  `Where-Object { $_.CommandLine -match 'remote-debugging-port=${process.env.CDP_PORT || 9391}( |$)' -and $_.CommandLine -notmatch '--type=' } |`,
   'ForEach-Object { taskkill /F /T /PID $_.ProcessId | Out-Null }',
 ].join(' ');
 

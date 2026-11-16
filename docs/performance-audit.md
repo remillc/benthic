@@ -180,6 +180,28 @@ Effort: S under half a day, M one to three days, L more.
 - Fix: window the rows (render about 40 visible rows plus spacer rows or `padding` blocks; fixed row height of 70 px makes it easy), keep trip rows in the same windowed list, keep keyboard selection by id not by DOM. Also keep the table mounted while another section shows (`display:none`) or, better, virtualise so remounting is cheap. Replace the `bind:clientWidth` in the profile by a ResizeObserver that stores `contentRect.width` (no forced layout).
 - Quick partial win (S): unmount the table when the logbook is not the current page (already half done: 44k -> 11k when hidden) and collapse trips by default so only trip rows render until opened.
 
+**After (branch `perf/logbook-table`, 16 November 2026).** Same scripts, same machine, dev server, no throttling (`measure-desktop.mjs`, one run each; the "before" column is a re-run of the audit's numbers on the unchanged branch).
+
+| Measure | s50 before / after | s500 before / after | s3000 before / after |
+|---|---|---|---|
+| Elements in the page | 3,400 / 3,027 | 10,342 / 3,292 | 47,348 / 3,322 |
+| Logbook page elements | n/a | n/a | 44,442 / 426 |
+| Rows in the DOM | 50 / 24 | 500 / 23 | 3,000 / 24 |
+| JS heap after GC (MB) | 42.4 / 41.5 | 56.5 / 42.4 | 132.6 / 44.5 |
+| Click a row, total (sync) (ms) | 40 (6) / 28 (7) | 160 (13) / 27 (6) | 2,399 (59) / 44 (12) |
+| Click another row (ms) | 38 / 24 | 165 / 82 | 2,373 / 46 |
+| Sort by depth (ms) | 26 / 33 | 156 / 33 | 1,761 / 62 |
+| Search, first keystroke total (ms) | n/a | 82 / 29 | 1,215 / 8 |
+| Round trip to Sites / back to logbook (ms) | 122 / 52 -> 120 / 43 | 140 / 341 -> 124 / 46 | 300 / 4,154 -> 148 / 96 |
+| Longest long task in the script (ms) | 200 / 347 | 332 / 438 | 4,132 / 251 |
+| Long tasks (count) | 4 / 6 | 37 / 5 | 39 / 9 |
+| Warm reload to first row (ms) | 741 / 847 | 1,005 / 880 | 4,420 / 2,016 |
+| CDP nodes after 12 narrow/wide resizes | 22,412 / 20,855 | 60,970 / 24,255 | 259,022 / 24,249 |
+| Heap after those resizes, s3000 (MB) | | | 144.9 / 54.8 |
+
+What changed: the table draws the rows in view plus 10 above and below, between two spacer rows (`lib/desktop-table.js`: `rowOffsets`, `windowRange`, `scrollForRow`; row heights are fixed, 48 + 2 px and 44 + 2 px for a trip row); selection, keyboard, sorting, trips, column move and resize work on the full row list, not on the DOM; `aria-rowcount` is the full count and each drawn row has `aria-rowindex`; the arrow keys scroll by computation, so a focused row that is not drawn is reached; `overflow-anchor: none` keeps the browser from shifting the scroll when the spacers change; `logbook.dives` is a `$state.raw` array (replaced on change, 3,000 proxies gone); `diveColumns` is fetched only when a shown column or the sort reads it; `DiveProfile` reads its width with a ResizeObserver instead of `bind:clientWidth`. A hand check on the 3,000-dive logbook: 60 and 20 arrow presses (plain and Shift) keep the focused row in view and the right rows selected; scrolling to the bottom and clicking a row in the middle select it; narrowing under 1200 and widening again brings the selected dive back into view; sorting by depth works; measured row positions equal the computed ones to the pixel. The audit's measure scripts now take `VITE_PORT` and `CDP_PORT` and start Electron with window occlusion off (a covered window stops `requestAnimationFrame`, which hung the timing).
+The phone layout (F7 virtual list) is not touched by this fix and was not re-measured. The 12-resize node count dropping is a side effect of the smaller page; the retained second layout is the subject of fix 4.
+
 ### F2. Start-up cost: one 2.1 MB chunk, then the full list rendered (impact: high, effort: M)
 
 - Evidence: production, 50 dives: FCP 440 ms, two long tasks 160 ms (evaluate) and 414 ms (boot), rows at 1.3-1.4 s. 3,000 dives: rows at 4.3 s, 6.6 s total long-task time, 1.5 s then 1.1 s x 4 (the table render, the `listDives` parse of 1.88 MB, `diveColumns`, `sortDives` 165 ms sync, the derived summary).

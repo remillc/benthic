@@ -32,9 +32,21 @@ import { importPayload } from './import-files.js';
  * @typedef {Extract<import('opendives-core').SyncConflicts, {conflict: true}>} Conflict
  */
 
+/**
+ * The dive list: always replaced whole on a change, never edited in place, so it is not a deep reactive
+ * proxy (3,000 dives would be 3,000 proxies read by every derived value); only the swap of the array is tracked.
+ * @type {Dive[]}
+ */
+let diveList = $state.raw([]);
+
 export const logbook = $state({
   /** @type {Dive[]} */
-  dives: [],
+  get dives() {
+    return diveList;
+  },
+  set dives(value) {
+    diveList = value;
+  },
   /** The core's preferences (units, Settings); only the units until the first read. */
   prefs: /** @type {Prefs} */ ({ ...defaultPrefs }),
   /** @type {SyncState} */
