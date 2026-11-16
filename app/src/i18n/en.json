@@ -1873,6 +1873,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",
       "« Create a repository » and « Create an access token » help: the site's labels are in boxes and the values to type in a monospace font; the GitLab and Codeberg tabs give the site's labels in the app's language, and GitLab and Codeberg have their own token steps.",
       "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",
       "First launch and Compte on an Android phone: « Use my own git repository » is one form (address checked when you leave the field, token, the branches read from the repository), with the logbook download screen and then a message when it opens. The help « How to create a repository » gives the steps for GitHub, GitLab and Codeberg.",
@@ -3043,6 +3044,7 @@
     "connected": "Connected to the repository {repository}",
     "titlePhone": "Your own git repository",
     "introPhone": "Keep your logbook in your git repository, with a copy on this phone.",
+    "introPhoneTablet": "Keep your logbook in your git repository, with a copy on this tablet.",
     "repositoryHow": "How to create a repository",
     "branchWaitingAccess": "The branch list appears once access is accepted."
   },
@@ -3449,7 +3451,8 @@
       "local": "Logbook created on this phone.",
       "downloadedTablet": "Logbook downloaded. It stays on this tablet, even offline.",
       "localTablet": "Logbook created on this tablet.",
-      "gitDownloaded": "Logbook downloaded from your repository. It stays on this phone, even without a network."
+      "gitDownloaded": "Logbook downloaded from your repository. It stays on this phone, even without a network.",
+      "gitDownloadedTablet": "Logbook downloaded from your repository. It stays on this tablet, even without a network."
     },
     "tabletStart": "Get started",
     "profileLabel": "Dive profile",

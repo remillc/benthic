@@ -7,15 +7,21 @@
   //   first launch (« Retour », the title, the About link) or under the app bar « ← Votre propre dépôt git »
   //   of Compte. Connecting from the first launch goes through the download screen (FirstDownload), then the
   //   logbook opens with a snackbar.
-  // - Tablets and iPhone: the editorial layout of the account flow (EditorialPage): the fields in its card,
-  //   « Connecter » its main action.
+  // - Android tablet, first launch (task 2026-11-16-257; docs/mockups/android-tablette-premier-lancement-alpha-git-*.dc.html):
+  //   the same form in the step column of the first launch, beside or under the blue panel (EditorialPage
+  //   firstLaunch), « Connecter » the page's own button. « Comment créer un dépôt » and « Comment créer un jeton
+  //   d'accès » replace the form in that column (components/GitHelp.svelte), « Retour » brings the form back with its
+  //   fields as they were (the state is the controller's); the panel does not move.
+  // - Tablets (account flow) and iPhone: the editorial layout of the account flow (EditorialPage): the fields in
+  //   its card, « Connecter » its main action.
   // The questions to the server and the state are the same in both (lib/git-form.svelte.js).
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import AccountField from '../components/AccountField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import GitForm from '../components/GitForm.svelte';
+  import GitHelp from '../components/GitHelp.svelte';
   import SelectField from '../components/SelectField.svelte';
   import Icon from '../components/Icon.svelte';
   import { createGitForm } from '../lib/git-form.svelte.js';
@@ -29,6 +35,10 @@
 
   /** The Android phone's form (task 2026-11-16-247). */
   const phone = $derived(!ios && layout.phone);
+  /** The Android tablet's first launch: the form in the step column beside the blue panel (task 2026-11-16-257). */
+  const panelled = $derived(welcome && !ios && !layout.phone);
+  /** The help shown in the column in place of the form, on a tablet. @type {'repository'|'token'|null} */
+  let help = $state(null);
 
   // The route decides `edit` once: the page is not reused for another mode.
   // svelte-ignore state_referenced_locally
@@ -41,7 +51,7 @@
         }
       : undefined,
     onconnected: async ({ repository, empty }) => {
-      if (welcome && phone && !empty) {
+      if (welcome && !ios && !empty) {
         // The logbook of the repository comes down on the download screen, then the snackbar says where it stays.
         f7router.navigate('/welcome/git/downloading', { props: { git: true, repository, branch: form.branch } });
         return;
@@ -68,7 +78,20 @@
    */
   function openHelp(which, e) {
     e.preventDefault();
+    if (panelled) {
+      help = which;
+      // The keyboard goes with the diver to « Retour ».
+      tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector('.od-git-repository .od-editorial-page--retour'))?.focus());
+      return;
+    }
     f7router.navigate(`${welcome ? '/welcome' : '/account'}/git/${which === 'token' ? 'token' : 'repository'}`);
+  }
+
+  /** « Retour » in the help: the form comes back, the focus on the link that opened the help. */
+  function closeHelp() {
+    const which = help;
+    help = null;
+    tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-git-repository .od-git-form--link-${which}`))?.focus());
   }
 
   onMount(form.load);
@@ -88,6 +111,26 @@
     onaction={form.connect}
   >
     <GitForm {form} onhelp={openHelp} />
+  </EditorialPage>
+{:else if panelled}
+  <EditorialPage class="od-git-repository"
+    firstLaunch
+    helpLink={!help}
+    title={heading}
+    heading={help ? t(help === 'token' ? 'tokenHelp.title' : 'repoHelp.title') : heading}
+    intro=""
+    action={help ? '' : t('gitRepo.connect')}
+    busy={form.busy}
+    busyLabel={t('gitRepo.connecting')}
+    actionDisabled={!form.canConnect}
+    onaction={form.connect}
+    onback={help ? closeHelp : undefined}
+  >
+    {#if help}
+      <GitHelp kind={help} embedded />
+    {:else}
+      <GitForm {form} onhelp={openHelp} action={false} />
+    {/if}
   </EditorialPage>
 {:else if phone}
   <Page class="od-git-repository od-git-repository--compte">

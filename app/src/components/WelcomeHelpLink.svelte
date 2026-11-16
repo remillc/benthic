@@ -6,6 +6,9 @@
   // Tablet: centred, pinned 28 dp above the bottom of the page. Phone: centred at the end of the content, 20 dp above the edge on the welcome screen (--od-help-link-bottom).
   import { t } from '../lib/i18n.js';
 
+  /** @type {{ inColumn?: boolean }} inColumn: the last item of a scrolling column (the first launch of a tablet and of the desktop, task 2026-11-16-257), not pinned to the page. */
+  let { inColumn = false } = $props();
+
   /** @param {MouseEvent} e */
   function open(e) {
     e.preventDefault();
@@ -15,7 +18,7 @@
   }
 </script>
 
-<a href="/about" class="od-welcome-help-link" aria-label={t('welcomeHelp.label')} onclick={open}>
+<a href="/about" class="od-welcome-help-link" class:od-welcome-help-link--column={inColumn} aria-label={t('welcomeHelp.label')} onclick={open}>
   <svg class="od-welcome-help-link--icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="12" cy="12" r="9"></circle>
     <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"></path>
@@ -63,6 +66,14 @@
         transform: translateX(-50%);
         white-space: nowrap;
       }
+    }
+
+    /* The last item of the step's column: in the flow, 24 dp under the content, 28 dp above the foot. */
+    .od-welcome-help-link.od-welcome-help-link--column {
+      position: static;
+      flex: none;
+      margin: 24px auto 0;
+      transform: none;
     }
 
     /* Beside the blue panel of the tablet's first launch (task 2026-11-16-237): in the middle of the choices' side. */

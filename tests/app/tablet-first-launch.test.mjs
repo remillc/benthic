@@ -155,7 +155,7 @@ test('task 239: the steps keep the panel, still, with the step in a 452 dp colum
   assert.match(editorial, /\{:else if panel\}\s*<FirstLaunchPanel still \/>/);
   const style = css(editorial);
   // 580 dp of content side at 1280 dp, 64 dp on each side: 452 dp.
-  assert.match(style, /\.od-editorial-page--panel-body \{[\s\S]*?padding: 24px 64px 56px;\s*justify-content: center;/);
+  assert.match(style, /\.od-editorial-page--panel-body \{[\s\S]*?padding: 24px 64px 28px;\s*\/\* Centred while it fits[^*]*\*\/\s*overflow-y: auto;\s*&::before,\s*\.od-editorial-page--spacer \{\s*content: '';\s*flex: 1 1 0;/);
   assert.match(style, /@media \(orientation: portrait\) \{\s*padding: 0 120px 64px;/);
   assert.match(style, /flex-direction: row;\s*justify-content: flex-end;/);
   assert.match(style, /\.od-editorial-page--title \{\s*margin-bottom: 8px;\s*font-size: 28px;\s*line-height: 36px;/);
