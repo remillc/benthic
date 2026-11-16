@@ -64,9 +64,9 @@ test('the help page: the three hosts, their links, the steps of task 252', () =>
 });
 
 test('the routes: the help pages and the download of the repository', () => {
-  assert.match(app, /'\/welcome\/git\/repository', component: RepositoryHelp/);
-  assert.match(app, /'\/account\/git\/repository', component: RepositoryHelp/);
-  assert.match(app, /'\/welcome\/git\/downloading', component: FirstDownload/);
+  assert.ok(app.includes("'/welcome/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte'))"));
+  assert.ok(app.includes("'/account/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte'))"));
+  assert.ok(app.includes("'/welcome/git/downloading', ...lazy(() => import('./pages/FirstDownload.svelte'))"));
   assert.match(page, /navigate\('\/welcome\/git\/downloading', \{ props: \{ git: true, repository, branch: form\.branch \} \}\)/);
   const download = src('pages/FirstDownload.svelte');
   assert.match(download, /announceFirstLaunch\(git \? 'gitDownloaded' : 'downloaded'\)/);

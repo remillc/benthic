@@ -7,11 +7,8 @@
   import { Page } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
-  import DesktopPlanner from '../components/DesktopPlanner.svelte';
-  import DesktopDesaturation from '../components/DesktopDesaturation.svelte';
   import DesktopEadMod from '../components/DesktopEadMod.svelte';
   import DesktopBestMix from '../components/DesktopBestMix.svelte';
-  import DesktopBlender from '../components/DesktopBlender.svelte';
   import { t } from '../lib/i18n.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -127,17 +124,18 @@
 
       <main class="od-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
-          <DesktopPlanner />
+          <!-- The tools are their own chunks, read when first shown. -->
+          {#await import('../components/DesktopPlanner.svelte') then { default: DesktopPlanner }}<DesktopPlanner />{/await}
         {:else}
           <h2 class="od-desktop-tools--pane-title">{t(current.name)}</h2>
           {#if current.id === 'desaturation'}
-            <DesktopDesaturation />
+            {#await import('../components/DesktopDesaturation.svelte') then { default: DesktopDesaturation }}<DesktopDesaturation />{/await}
           {:else if current.id === 'eadMod'}
             <DesktopEadMod />
           {:else if current.id === 'bestMix'}
             <DesktopBestMix />
           {:else}
-            <DesktopBlender />
+            {#await import('../components/DesktopBlender.svelte') then { default: DesktopBlender }}<DesktopBlender />{/await}
           {/if}
         {/if}
       </main>

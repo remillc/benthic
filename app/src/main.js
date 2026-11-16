@@ -7,4 +7,8 @@
 import './theme.css';
 import { loadDeviceStore } from './lib/device-store.js';
 
-loadDeviceStore().then(() => import('./start.js'));
+// The catalogs of the language start loading at once, beside the app's code (lib/language.js).
+loadDeviceStore().then(() => {
+  import('./lib/language.js');
+  return import('./start.js');
+});

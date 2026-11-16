@@ -2467,6 +2467,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Lighter start-up and faster dive selection: the app loads half as much code and style at start, each screen and each language when it is first needed, and selecting a dive in the desktop logbook asks the core for that dive only instead of eighteen answers.",
       "In the desktop app, a long dive's profile is drawn with a few points per pixel instead of every sample, and the window no longer keeps the other layout in memory after you resize it across the narrow and wide layouts.",
       "In the desktop app, a large logbook is fast: the Logbook table draws only the rows in view, so selecting a dive, searching, sorting and coming back to the Logbook stay quick with thousands of dives.",
       "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",

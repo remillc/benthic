@@ -4,6 +4,8 @@
 // kept on the device. The pictures are prepared ahead, on Wi-Fi, so that a site
 // shows at once, offline too.
 import { OpenDivesCore } from 'opendives-core';
+import { cachedSites } from './core-cache.js';
+import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle } from './map-style.js';
 import { onTileOrigin } from './offline-tiles.js';
 
@@ -37,7 +39,7 @@ let drawers = 0;
  * @param {{ width: number, height: number }} [size] CSS pixels of the picture
  */
 async function createDrawer(onTile, size = { width: DRAW_WIDTH, height: HALF_HEIGHT * 2 }) {
-  const module = await import('maplibre-gl');
+  const module = await loadMapLibre();
   /** @type {typeof import('maplibre-gl')} */
   const maplibregl = /** @type {any} */ (module).default ?? module;
   const channel = `draw${++drawers}`;
@@ -312,7 +314,7 @@ async function prepareSiteMaps() {
     const cache = await openCache();
     if (!cache || !(await canPrepare())) return;
     /** @type {{ hasLocation: boolean, latUdeg: number, lonUdeg: number, dives: number, lastDate: string }[]} */
-    const sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+    const sites = await cachedSites();
     const wanted = sites.filter((s) => s.hasLocation && s.dives > 0).sort((a, b) => (b.lastDate ?? '').localeCompare(a.lastDate ?? ''));
     for (const site of wanted) {
       const key = keyOf(site.latUdeg, site.lonUdeg);

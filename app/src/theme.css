@@ -16,8 +16,31 @@
  */
 @layer framework7, maplibre, od.tokens, od.base, od.components;
 
-@import 'framework7/css/bundle' layer(framework7);
-@import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
+/* Framework7's core, then the components the app uses (src/framework7.js): the bundle also holds the
+   calendar, the pickers, the photo browser, the swiper, the messages, the data tables... that no screen opens.
+   MapLibre's CSS comes with the map code (src/maplibre.css, lib/maplibre.js). */
+@import 'framework7/css' layer(framework7);
+@import 'framework7/components/actions/css' layer(framework7);
+@import 'framework7/components/card/css' layer(framework7);
+@import 'framework7/components/checkbox/css' layer(framework7);
+@import 'framework7/components/chip/css' layer(framework7);
+@import 'framework7/components/dialog/css' layer(framework7);
+@import 'framework7/components/fab/css' layer(framework7);
+@import 'framework7/components/input/css' layer(framework7);
+@import 'framework7/components/panel/css' layer(framework7);
+@import 'framework7/components/popover/css' layer(framework7);
+@import 'framework7/components/popup/css' layer(framework7);
+@import 'framework7/components/preloader/css' layer(framework7);
+@import 'framework7/components/progressbar/css' layer(framework7);
+@import 'framework7/components/radio/css' layer(framework7);
+@import 'framework7/components/searchbar/css' layer(framework7);
+@import 'framework7/components/sheet/css' layer(framework7);
+@import 'framework7/components/skeleton/css' layer(framework7);
+@import 'framework7/components/swipeout/css' layer(framework7);
+@import 'framework7/components/tabs/css' layer(framework7);
+@import 'framework7/components/toast/css' layer(framework7);
+@import 'framework7/components/toggle/css' layer(framework7);
+@import 'framework7/components/typography/css' layer(framework7);
 
 @layer od.tokens {
   /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);

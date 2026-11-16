@@ -2467,6 +2467,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Démarrage plus léger et sélection d’une plongée plus rapide : l’application charge deux fois moins de code et de styles au démarrage, chaque écran et chaque langue au moment où on en a besoin, et choisir une plongée dans le carnet du bureau ne demande plus au cœur que cette plongée au lieu de dix-huit réponses.",
       "Dans l'application de bureau, le profil d'une longue plongée est tracé avec quelques points par pixel au lieu de chaque mesure, et la fenêtre ne garde plus l'autre disposition en mémoire quand vous la redimensionnez entre la disposition étroite et la disposition large.",
       "Dans l'application de bureau, un grand carnet reste fluide : le tableau du Carnet ne dessine que les lignes visibles, donc choisir une plongée, chercher, trier et revenir au Carnet restent rapides avec des milliers de plongées.",
       "Détail d’une plongée sur ordinateur : cinq onglets. Informations : la fiche du site, les compagnons, le moniteur, le type d’eau en boutons segmentés et la visibilité en cinq étoiles ; Équipement : les ordinateurs, la combinaison et plusieurs lests en pastilles avec leur total ; Gaz : une carte par bouteille avec ses champs et une carte Consommation ; Notes : la note, les notes et les étiquettes ; Carte garde sa hauteur. Les champs gris s’enregistrent avec Entrée ou en les quittant.",

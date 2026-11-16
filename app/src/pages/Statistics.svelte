@@ -35,6 +35,7 @@
   import { keepInSvelteRange } from '../lib/master-detail.js';
   import HeatMapCard from '../components/HeatMapCard.svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
 
   /** @type {{ f7router?: any }} */
   let { f7router = undefined } = $props();
@@ -59,7 +60,7 @@
   $effect(() => {
     logbook.sitesVersion;
     if (logbook.loading) return;
-    OpenDivesCore.siteQuery({ kind: 'list' }).then(
+    cachedSites().then(
       (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
     );

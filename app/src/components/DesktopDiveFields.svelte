@@ -5,8 +5,9 @@
   // at once through the same core edit function as the phone's editor (saveDiveChanges →
   // OpenDivesCore.editDive), one undoable step, so Ctrl/⌘+Z undoes it. What the dive computer
   // recorded is plain text, editable only on a dive logged by hand (lib/desktop-edit.js).
-  import { onMount } from 'svelte';
+  import { untrack } from 'svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedCylinderTypes, cachedPlannerSetup, cachedSites, cachedValues } from '../lib/core-cache.js';
   import DesktopEditField from './DesktopEditField.svelte';
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopSegments from './DesktopSegments.svelte';
@@ -51,11 +52,13 @@
   let known = $state({ buddy: /** @type {{ key: string, dives: number }[]} */ ([]), guide: /** @type {{ key: string, dives: number }[]} */ ([]), tag: /** @type {{ key: string, dives: number }[]} */ ([]) });
   let cylinderTypes = $state(/** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */ ([]));
 
+  // Answers that do not depend on the dive come from lib/core-cache.js (one call for all the panes and
+  // dives, read again after a change) and are read when a tab needs them, not for each dive shown.
   /** @param {'buddy'|'guide'|'tag'} field */
   async function loadValues(field) {
     try {
       /** @type {{ key: string, dives: number }[]} */
-      const values = await OpenDivesCore.statsQuery({ kind: 'values', field });
+      const values = await cachedValues(field);
       known[field] = withoutFeedbackTags(values.filter((v) => v.key));
     } catch (e) {
       console.error('Logbook values', field, e);
@@ -63,22 +66,49 @@
   }
   async function loadSites() {
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await cachedSites();
     } catch (e) {
       console.error('Sites', e);
     }
   }
   /** The planner's reserve, for the Consommation card's mark; 0 until read. */
   let reserveMbar = $state(0);
-  onMount(() => {
-    OpenDivesCore.plannerSetup()
+  function loadReserve() {
+    cachedPlannerSetup()
       .then((/** @type {{ reserveMbar?: number }} */ setup) => (reserveMbar = Number(setup?.reserveMbar) || 0))
       .catch((/** @type {unknown} */ e) => console.error('Planner setup', e));
-    for (const field of /** @type {const} */ (['buddy', 'guide', 'tag'])) loadValues(field);
-    loadSites();
-    OpenDivesCore.toolQuery({ kind: 'cylinders' })
+  }
+  function loadCylinderTypes() {
+    cachedCylinderTypes()
       .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types))
       .catch((/** @type {unknown} */ e) => console.error('Cylinder types', e));
+  }
+  // Each tab reads what it shows when it is first shown; the cache makes a second tab or dive free.
+  /** @type {Set<string>} */
+  const needed = new Set();
+  let neededFor = -1;
+  $effect(() => {
+    const shown = tab;
+    const version = logbook.sitesVersion; // sites merged, renamed or deleted: read again
+    untrack(() => {
+      if (version !== neededFor) needed.clear();
+      neededFor = version;
+      /** @param {string} key @param {() => void} load */
+      const once = (key, load) => {
+        if (!needed.has(key)) {
+          needed.add(key);
+          load();
+        }
+      };
+      if (shown === 'info' || shown === 'map') once('sites', loadSites);
+      if (shown === 'info') {
+        once('buddy', () => loadValues('buddy'));
+        once('guide', () => loadValues('guide'));
+      }
+      if (shown === 'notes') once('tag', () => loadValues('tag'));
+      if (shown === 'equipment' || shown === 'gas') once('cylinders', loadCylinderTypes);
+      if (shown === 'gas') once('reserve', loadReserve);
+    });
   });
 
   /** @param {unknown} e */

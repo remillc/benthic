@@ -10,6 +10,7 @@
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
@@ -341,7 +342,7 @@ import { language } from '../lib/i18n.js';
 
   async function load() {
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await cachedSites();
       withoutSite = (await OpenDivesCore.siteQuery({ kind: 'without' })).length;
       duplicates = (await possibleDuplicates()).length;
     } catch (e) {
