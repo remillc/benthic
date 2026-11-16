@@ -4143,7 +4143,7 @@ Christian approved this on 16 November 2026.
 
 Done on `feature/desktop-logbook` (the desktop app lives there until it is merged): `DesktopLogbookStart.svelte`, logo 96 px, « OpenDives » 44 px (500, −0.5), the line 18 px in `--od-text-2` 4 px under it, 24 px between logo and text, 48 px above the buttons, a 600 px centred column; buttons, drop line and rail unchanged. Checked in the desktop app at 1440 × 900 against the mock-up.
 
-## [ ] 2026-11-16-223 Release edition: « Plus de 30 formats » and the list of accepted formats on « Importer un carnet »
+## [x] 2026-11-16-223 Release edition: « Plus de 30 formats » and the list of accepted formats on « Importer un carnet »
 
 Christian approved this on 16 November 2026. **Release edition:** build it on the branch of task 218 (`feature/release-new-logbook`). Do not merge it into `main`. It follows task 221: do it once `docs/import-formats.md` exists.
 
@@ -4169,3 +4169,5 @@ Mock-ups:
 - The link opens the dialog, and « Fermer », the scrim and Back close it.
 - The number in the help line and in the dialog equals the number of lines in the dialog.
 - The beta on `main` is untouched.
+
+Done on `feature/release-new-logbook` (not merged): the real total from `docs/import-formats.md`, « 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. » (no CSV); the link « Voir les formats acceptés » on the source and « fichier illisible » screens; the basic dialog « Formats acceptés » (Fermer, scrim, Back) in three columns read from one list, `app/src/lib/import-formats.js`, checked against the report by `tests/app/import-formats.test.mjs`.
