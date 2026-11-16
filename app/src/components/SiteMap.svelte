@@ -547,6 +547,8 @@
       pinMarker = new maplibregl.Marker({ color: getComputedStyle(container).getPropertyValue('--od-text').trim() || '#1F2124' })
         .setLngLat(lngLat(pin))
         .addTo(map);
+    // It shows a position and does nothing: the arrow, not the hand that maplibre's button role gives it.
+    pinMarker.getElement().style.cursor = 'default';
   });
 
   $effect(() => {
@@ -683,6 +685,22 @@
       }
     }
 
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-map-fullscreen-button {
+        transition: box-shadow 120ms linear;
+      }
+      .od-map-fullscreen-button:not(:disabled):hover {
+        box-shadow:
+          inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
+          0 1px 3px rgb(0 0 0 / 0.2);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-map-fullscreen-button {
+        transition: none;
+      }
+    }
     /* Full screen: « Centrer sur ma position » at the bottom right, above the credits. */
     .od-map-fullscreen .od-map-fullscreen-button.od-map-fullscreen--locate {
       top: auto;

@@ -327,6 +327,22 @@ export async function exportDives(ids, format, anonymize, prefs) {
   const day = new Date().toISOString().slice(0, 10);
   const ext = format === 'csvProfiles' ? 'csv' : format;
   const name = `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
+  const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name);
+  await OpenDivesCore.grantShareFile({ uri, mime });
+  await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
+}
+
+/**
+ * The export file of the dives, in the app's share folder: its URI and type. The phone shares
+ * it (exportDives); the desktop saves it where the diver chooses (task 2026-11-15-189).
+ * @param {number[]} ids
+ * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format
+ * @param {boolean} anonymize
+ * @param {any} prefs
+ * @param {string} name the file's name
+ * @returns {Promise<{uri: string, mime: string}>}
+ */
+export async function exportFile(ids, format, anonymize, prefs, name) {
   let uri;
   if (format === 'pdf') {
     const pages = [];
@@ -343,8 +359,7 @@ export async function exportDives(ids, format, anonymize, prefs) {
     ({ uri } = await OpenDivesCore.exportDives({ ids, format, anonymize, name }));
   }
   const mime = { ssrf: 'application/xml', uddf: 'application/xml', csv: 'text/csv', csvProfiles: 'text/csv', pdf: 'application/pdf' }[format];
-  await OpenDivesCore.grantShareFile({ uri, mime });
-  await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
+  return { uri, mime };
 }
 
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */

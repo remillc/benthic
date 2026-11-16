@@ -35,6 +35,16 @@ int main(int argc, char **argv)
 		printf("%s\n", json.c_str());
 		return 0;
 	}
+	if (argc == 3 && !strcmp(argv[1], "columns")) {
+		// columns <log>: the desktop table's extra columns (dive_columns).
+		if (opendives::list_dives(argv[2], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		opendives::dive_columns(json);
+		printf("%s\n", json.c_str());
+		return 0;
+	}
 	if (argc == 4 && !strcmp(argv[1], "dive")) {
 		// dive <log> <number>: detail of the dive with this number.
 		if (opendives::list_dives(argv[2], json, error)) {

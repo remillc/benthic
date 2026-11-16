@@ -51,6 +51,13 @@
   import AddUnavailable from './pages/AddUnavailable.svelte';
   import DownloadFailed from './pages/DownloadFailed.svelte';
   import NavRail from './components/NavRail.svelte';
+  import DesktopLogbook from './pages/DesktopLogbook.svelte';
+  import DesktopStatistics from './pages/DesktopStatistics.svelte';
+  import DesktopTools from './pages/DesktopTools.svelte';
+  import DesktopSelection from './pages/DesktopSelection.svelte';
+  import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
+  import DesktopNewLogbook from './components/DesktopNewLogbook.svelte';
+  import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   // The route badge, for development builds: shown when app/.env.local (not in git) sets
@@ -68,7 +75,10 @@
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
-  import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, settingsWindow } from './lib/layout.svelte.js';
+  import { logbooks, noLogbook, enableLogbookCommands } from './lib/desktop-logbooks.svelte.js';
+  import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
+  import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
@@ -113,8 +123,10 @@
     // iPhone: the dives of an Apple Watch Ultra from Apple Health (to-do #67).
     { path: '/health', component: HealthImport },
     { path: '/download/failed', component: DownloadFailed },
-    { path: '/settings/', component: Settings },
-    { path: '/about', component: About },
+    // Desktop app from 1200 dp: Réglages as categories with a search, and À propos as a dialog
+    // (task 2026-11-15-202); else the phone's pages.
+    { path: '/settings/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop || settingsWindow, windowed: settingsWindow } }) },
+    { path: '/about', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve(layout.desktop ? { popup: { component: About } } : { component: About }) },
     { path: '/about/notes', component: AboutText, options: { props: { which: 'notes' } } },
     { path: '/about/licence', component: AboutText, options: { props: { which: 'licence' } } },
     { path: '/about/privacy', component: AboutText, options: { props: { which: 'privacy' } } },
@@ -176,7 +188,8 @@
     // The planner's settings, a screen of their own (task 2026-11-08-01, to-do #3 U3).
     { path: '/settings/planner', component: PlannerSettings },
     { path: '/plan/:id', component: Planner },
-    { path: '/sites/', component: Sites },
+    // Desktop app from 1200 dp: the sites as a table beside the map (task 2026-11-15-171); else the phone's screen.
+    { path: '/sites/', async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopSites : Sites }) },
     { path: '/sites/without/', component: DivesWithoutSite },
     { path: '/sites/without-site/:diveId', component: DiveNoSiteProfile },
     { path: '/sites/cleanup', component: SitesCleanup },
@@ -191,7 +204,8 @@
     { path: '/statistics/dives/', component: StatisticsDives },
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     { path: '/statistics/new', popup: { component: StatisticNew } },
-    { path: '/tools/', component: Tools },
+    // Desktop app from 1200 dp: the tools list and the chosen tool side by side (task 2026-11-15-196).
+    { path: '/tools/', async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: layout.desktop ? DesktopTools : Tools }) },
     { path: '/tools/desaturation', component: Desaturation },
     { path: '/tools/ead-mod', component: GasEadMod },
     { path: '/tools/best-mix', component: GasBestMix },
@@ -211,7 +225,13 @@
 
   const logbookRoutes = [
     appRoutes[0],
-    { path: '/', component: Logbook, master: true, detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, PANE_EMPTY] },
+    {
+      path: '/',
+      // Desktop app from 1200 dp: the logbook as a table (task 2026-11-15-169); else the list.
+      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopLogbook : Logbook }),
+      master: true,
+      detailRoutes: [{ path: '/dives/:id', component: DiveDetail }, { path: '/pane/selection', component: DesktopSelection }, PANE_EMPTY],
+    },
     ...appRoutes,
   ];
 
@@ -222,8 +242,10 @@
   const statisticsRoutes = [
     {
       path: '/statistics/',
-      component: Statistics,
-      master: true,
+      // Desktop app from 1200 dp: the list and the chart of the chosen statistic on one page
+      // (task 2026-11-15-171), not a master with a detail beside it; else the tablet's list.
+      async: ({ resolve }) => resolve({ component: layout.desktop ? DesktopStatistics : Statistics }),
+      master: () => !layout.desktop,
       detailRoutes: [
         { path: '/statistics/result', component: StatisticsResult },
         { path: '/statistics/dives/', component: StatisticsDives },
@@ -238,7 +260,13 @@
    * openOver), its overview the master, a subpage beside it (task 2026-11-13-111).
    */
   const accountRoutes = [
-    { path: '/settings/', component: Settings, master: true, detailRoutes: [{ path: '/settings/:section', component: Settings }] },
+    {
+      path: '/settings/',
+      async: (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: Settings }, { props: { desk: layout.desktop } }),
+      // Desktop app: Réglages is one page with its categories (task 2026-11-15-202), not a master with a detail.
+      master: () => !layout.desktop,
+      detailRoutes: [{ path: '/settings/:section', component: Settings }],
+    },
     ...appRoutes,
   ];
 
@@ -278,6 +306,25 @@
     routes: appRoutes,
   };
 
+  // Desktop app: crossing 1200 dp swaps the logbook's table and the tablet's list.
+  let desktopShown = layout.desktop;
+  $effect(() => {
+    const wide = layout.desktop;
+    if (wide === desktopShown) return;
+    desktopShown = wide;
+    f7.views.get('#view-logbook')?.router.navigate('/', { reloadAll: true, animate: false });
+    f7.views.get('#view-statistics')?.router.navigate('/statistics/', { reloadAll: true, animate: false });
+  });
+
+  // Crossing 1200 dp swaps the Outils section's desktop layout and the tablet's.
+  let desktopToolsShown = layout.desktop;
+  $effect(() => {
+    const wide = layout.desktop;
+    if (wide === desktopToolsShown) return;
+    desktopToolsShown = wide;
+    f7.views.get('#view-tools')?.router.navigate('/tools/', { reloadAll: true, animate: false });
+  });
+
   // Each time the logbook is loaded, the maps of its new sites are prepared.
   $effect(() => {
     if (logbook.dives.length) schedulePreparingSiteMaps();
@@ -291,6 +338,12 @@
 
   onMount(() => {
     applyMotionTokens();
+    // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
+    startDesktopShell();
+    if (settingsWindow) {
+      enableDialogFit(f7);
+      return;
+    }
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
     enableBackButton();
@@ -313,16 +366,25 @@
     mark('onMount');
     // Offline maps: follows the downloads and checks for updates (at most once a day).
     startOfflineMaps();
+    // Several logbooks (task 2026-11-15-173): new, open, close and save a copy, from the keyboard and the Mac's menu bar.
+    return enableLogbookCommands();
   });
 </script>
 
+{#if settingsWindow}
+<App {...f7params}>
+  <Views class="safe-areas">
+    <View id="view-settings-window" main url="/settings/" />
+  </Views>
+</App>
+{:else}
 <App {...f7params}>
   <!-- Tablet, both orientations: the rail (Android) or the sidebar (iPad). Android phone: the
        bottom bar; iPhone: the tab bar (task 2026-11-14-127). The account sheet: phones and
        Android tablets (tasks 2026-11-14-120, 126, 127). The ☰ side menu only remains for a
        window between the phone and tablet layouts that has no rail. -->
   {#if layout.rail}<NavRail />{:else if !bottomNav()}<NavMenu />{/if}
-  {#if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
+  {#if layout.desktop}<DesktopAccountSheet />{:else if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <SyncFailureSheet />
   <ConflictHost />
@@ -331,6 +393,9 @@
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
   <DemoHost />
+  <!-- Desktop: a window with no logbook shows its start screen; the new-logbook dialog opens from there, the selector and the Mac's menu (task 2026-11-15-173). -->
+  {#if desktopApp && noLogbook}<DesktopLogbookStart />{/if}
+  {#if desktopApp && logbooks.dialog}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/if}
   <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
@@ -346,6 +411,7 @@
     <View id="view-account" tab url="/account" routes={accountRoutes} masterDetailBreakpoint={splitBreakpoint} />
   </Views>
 </App>
+{/if}
 
 <style>
   @layer od.components {

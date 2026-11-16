@@ -24,6 +24,20 @@
 #include <utility>
 #include <vector>
 
+#ifdef _WIN32
+// Windows (UCRT) has no POSIX time functions: the same calls, by their Windows names.
+#include <time.h>
+#ifndef gmtime_r
+#define gmtime_r(t, tm) (gmtime_s((tm), (t)) == 0 ? (tm) : nullptr)
+#endif
+#ifndef localtime_r
+#define localtime_r(t, tm) (localtime_s((tm), (t)) == 0 ? (tm) : nullptr)
+#endif
+#ifndef timegm
+#define timegm _mkgmtime
+#endif
+#endif
+
 #define QT_VERSION 0x060a00
 #define QT_VERSION_CHECK(a, b, c) (((a) << 16) | ((b) << 8) | (c))
 #define Q_DECLARE_METATYPE(T)

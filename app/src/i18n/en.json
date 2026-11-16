@@ -518,7 +518,8 @@
       "tools": "Tools",
       "download": "Computers and download",
       "maps": "Offline maps",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "about": "About"
     },
     "overview": {
       "theme": "Theme: {value}",
@@ -531,7 +532,8 @@
       "altitude": "altitude {value}",
       "remembered": "{name} remembered",
       "noComputer": "No computer remembered",
-      "advanced": "Reset all settings"
+      "advanced": "Reset all settings",
+      "version": "Version {version}"
     },
     "flight": {
       "label": "Length of the wait",
@@ -3683,6 +3685,706 @@
       "noDives": "No dive could be read with these columns.",
       "failed": "This file could not be read with these columns.",
       "addFailed": "The dives could not be added to the logbook."
+    }
+  },
+  "desktopLogbooks": {
+    "mainName": "This computer's logbook",
+    "selector": {
+      "label": "Logbook",
+      "change": "Switch logbook",
+      "recentTitle": "Recent logbooks · each opens in its own window",
+      "newLogbook": "New logbook…",
+      "openLogbook": "Open a logbook…",
+      "saveCopy": "Save a copy…",
+      "closeLogbook": "Close the logbook",
+      "noRecent": "No recent logbook"
+    },
+    "menu": {
+      "newLogbook": "New Logbook…",
+      "openLogbook": "Open a Logbook…",
+      "recentLogbooks": "Recent Logbooks",
+      "clearRecent": "Clear List",
+      "closeLogbook": "Close Logbook",
+      "saveCopy": "Save a Copy…",
+      "noRecent": "No Recent Logbook"
+    },
+    "main": {
+      "missingTitle": "“{name}” cannot be found",
+      "missingText": "The file was moved or deleted. It is removed from the recent logbooks.",
+      "ok": "OK",
+      "openTitle": "Open a logbook",
+      "fileFilter": "Logbook",
+      "newFileTitle": "New logbook",
+      "copyTitle": "Save a copy",
+      "copySuffix": "copy",
+      "folderTitle": "Choose the folder"
+    },
+    "start": {
+      "empty": "No logbook open in this window",
+      "open": "Open a logbook…",
+      "newLogbook": "New logbook…",
+      "recent": "Recent logbooks",
+      "drop": "You can also drop a logbook file on this window.",
+      "notALogbook": "This file is not a logbook (.ssrf or .xml).",
+      "openFailed": "This logbook could not be opened.",
+      "dropHere": "Drop the file to open it",
+      "forget": "Remove from the list"
+    },
+    "source": {
+      "device": "This computer",
+      "file": "File",
+      "git": "Git repository",
+      "googleDrive": "Google Drive",
+      "oneDrive": "Microsoft OneDrive",
+      "dropbox": "Dropbox",
+      "iCloudDrive": "iCloud Drive",
+      "webdav": "WebDAV or Nextcloud"
+    },
+    "when": {
+      "openNow": "open now",
+      "closedNow": "closed just now",
+      "closedMinutes": "closed {n} min ago",
+      "closedHours": "closed {n} h ago",
+      "openedOn": "opened {date}"
+    },
+    "new": {
+      "step": "Step {n} of {total}",
+      "stepNamed": "Step {n} of {total} · {name}",
+      "title": "New logbook",
+      "nameLabel": "Logbook name",
+      "nameHelp": "It shows in the top bar and in the recent logbooks.",
+      "defaultName": "My logbook",
+      "whereLabel": "Where to keep it?",
+      "computer": "On this computer",
+      "computerHelp": "A logbook file (.ssrf), in the folder you choose",
+      "cloud": "In your cloud",
+      "cloudHelp": "{services} · synced between your devices",
+      "cloudServices": "Google Drive, OneDrive, Dropbox or WebDAV",
+      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
+      "git": "In a git repository",
+      "gitHelp": "Your own repository · full history of changes",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "back": "Back",
+      "closeLabel": "Cancel creating the logbook",
+      "closeTip": "Cancel (Esc)",
+      "providerIntro": "Choose the service to keep the logbook in.",
+      "connectTitle": "Sign in to {service}",
+      "connectTitleServer": "Sign in to your server",
+      "create": "Create the logbook",
+      "creating": "Creating…",
+      "notAvailable": "Not available yet",
+      "folderLabel": "Folder",
+      "gitUrl": "Repository address",
+      "gitUrlPlaceholder": "https://github.com/you/logbook.git",
+      "gitBranch": "Branch",
+      "gitToken": "Access token",
+      "gitTokenHelp": "The token stays on this computer.",
+      "gitTokenLink": "Create an access token",
+      "gitNote": "The repository must be empty or already hold a logbook. If it holds one, it opens as it is.",
+      "errorUrl": "The address must start with https://",
+      "errors": {
+        "BAD_ADDRESS": "No repository found at this address.",
+        "BAD_CREDENTIALS": "The token is refused.",
+        "DENIED": "The token is refused or has no right to write to this repository.",
+        "BAD_BRANCH": "This branch does not exist or its name is not valid.",
+        "NO_LOG": "This repository holds no logbook.",
+        "CREATE_FAILED": "The logbook could not be created in this repository.",
+        "NOT_EMPTY": "This repository already holds something other than a logbook.",
+        "NETWORK": "The server does not answer. Check the connection.",
+        "EXISTS": "A file with this name already exists in this folder.",
+        "other": "The logbook could not be created."
+      }
+    },
+    "ready": {
+      "title": "Your logbook is ready",
+      "whereComputer": "“{name}” is kept on this computer, in {where}. Add your first dives:",
+      "whereCloud": "“{name}” is kept in {where}. Add your first dives:",
+      "whereGit": "“{name}” is kept in the repository {where}. Add your first dives:",
+      "download": "Download my dives",
+      "downloadHelp": "Bluetooth or USB cable",
+      "import": "Import a file",
+      "importHelp": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
+      "manual": "Log a dive by hand",
+      "manualHelp": "For a dive without a computer",
+      "drop": "You can also drop a file on this window."
+    },
+    "copy": {
+      "saved": "Copy saved",
+      "open": "Open",
+      "failed": "The copy could not be saved.",
+      "sameFile": "Choose a different file than the open logbook's."
+    }
+  },
+  "desktopCloud": {
+    "browserPage": {
+      "done": "Connected",
+      "doneText": "You can close this tab and go back to OpenDives.",
+      "failed": "Sign-in failed",
+      "failedText": "Go back to OpenDives and try again."
+    },
+    "conflict": {
+      "title": "“{name}” changed in two places",
+      "local": "This computer’s copy",
+      "remote": "The copy on {service}",
+      "later": "Decide later",
+      "modified": "modified {date}",
+      "warning": "The copy you do not keep is replaced."
+    },
+    "connect": {
+      "notYet": "Not signed in yet",
+      "notYetText": "Sign in to {service} in your browser, then come back here to create the logbook.",
+      "waiting": "Signing in, in your browser…",
+      "waitingText": "The sign-in page of {service} is open in your browser.",
+      "ready": "The logbook “{file}” will be created in an OpenDives folder of this account.",
+      "noAccount": "Account signed in",
+      "switchAccount": "Switch account",
+      "signIn": "Sign in to {service}",
+      "cancel": "Cancel sign-in",
+      "reopen": "Open the page again",
+      "privacy": "OpenDives only reaches the files it creates or that you open.",
+      "linkSign": "Link between OpenDives and {service}"
+    },
+    "webdav": {
+      "intro": "OpenDives will create the file “{file}” in an OpenDives folder of your server.",
+      "server": "Server address",
+      "serverPlaceholder": "https://cloud.example.com",
+      "username": "Username",
+      "password": "Password",
+      "passwordHelp": "In Nextcloud, create an app password in Settings › Security. It stays on this computer.",
+      "errorAddress": "This address is not valid."
+    },
+    "errors": {
+      "NOT_SIGNED_IN": "Sign in to this service first.",
+      "NOT_AVAILABLE": "This service is not available yet.",
+      "SIGN_IN_DENIED": "The sign-in was refused.",
+      "SIGN_IN_TIMEOUT": "The sign-in did not finish. Try again.",
+      "SIGN_IN_EXPIRED": "The sign-in has expired. Sign in again.",
+      "STATE_MISMATCH": "The browser’s answer does not belong to this sign-in. Try again.",
+      "PORT_BUSY": "Another program uses the sign-in address. Close it and try again.",
+      "CREDENTIALS_NOT_SAVED": "This computer cannot keep the sign-in safely.",
+      "DENIED": "The service refuses access to this folder.",
+      "NETWORK": "The service does not answer. Check the connection.",
+      "EXISTS": "A file with this name already exists in this folder.",
+      "other": "The logbook could not be created.",
+      "SIGN_IN_CANCELLED": "The sign-in was cancelled.",
+      "BAD_ADDRESS": "This address is not a WebDAV or Nextcloud server.",
+      "INSECURE_ADDRESS": "The address must start with https://. http:// is only accepted for this computer.",
+      "BAD_CREDENTIALS": "The username or the password is refused.",
+      "SERVER": "The server answered with an error. Try again later.",
+      "NETWORK_SERVER": "No answer at this address. Check the address and the connection."
+    },
+    "startup": {
+      "label": "Open at start",
+      "text": "The last logbook reopens each logbook that was open at quit, in its own window",
+      "last": "The last logbook",
+      "ask": "Choose each time"
+    }
+  },
+  "desktopDetail": {
+    "mean": "avg. {depth}",
+    "enlarge": "Enlarge the profile",
+    "enlargeTip": "Enlarge the profile ({shortcut})",
+    "plan": "Plan from this dive",
+    "share": "Share…",
+    "export": "Export the dive…",
+    "delete": "Delete the dive",
+    "recorded": "Recorded by the dive computer, can’t be edited",
+    "fieldsHint": "Grey fields can be edited with a click and are saved at once.",
+    "hint": "Enter to keep · Esc to cancel",
+    "hintNotes": "Leave the field to keep · Esc to cancel",
+    "invalid": "Not a valid value",
+    "readOnly": "This value comes from the dive computer.",
+    "starsLabel": "{label}: {n} of 5",
+    "removeItem": "Remove {name}",
+    "diveCount": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
+    "newSite": "Add “{name}” as a new site",
+    "newBuddy": "Add “{name}” as a new buddy",
+    "newGuide": "Add “{name}” as a new guide",
+    "newTag": "Add “{name}” as a new tag",
+    "addWeight": "Add a weight",
+    "removeWeight": "Remove this weight",
+    "addCylinder": "Add a cylinder",
+    "removeCylinder": "Remove the cylinder",
+    "moveUp": "Move the cylinder up",
+    "moveDown": "Move the cylinder down",
+    "cylinder": "Cylinder {n}",
+    "label": {
+      "site": "Site",
+      "buddies": "Buddies",
+      "guides": "Guides",
+      "tags": "Tags",
+      "waterType": "Water type",
+      "visibility": "Visibility",
+      "rating": "Rating",
+      "suit": "Suit",
+      "surfacePressure": "Surface pressure",
+      "maxDepth": "Max depth",
+      "duration": "Duration",
+      "waterTemp": "Water",
+      "airTemp": "Air",
+      "computer": "Computer",
+      "mode": "Mode",
+      "cns": "CNS",
+      "otu": "OTU",
+      "trip": "Trip",
+      "notes": "Notes",
+      "cylinderType": "Type",
+      "oxygen": "Oxygen",
+      "helium": "Helium",
+      "use": "Use",
+      "startPressure": "Start pressure",
+      "endPressure": "End pressure",
+      "gasChanges": "Gas changes"
+    },
+    "invitation": {
+      "site": "Site not set",
+      "buddies": "Add buddies",
+      "guides": "Add a guide",
+      "tags": "Add tags",
+      "waterType": "Choose the water type",
+      "visibility": "Add the visibility",
+      "rating": "Add a rating",
+      "suit": "Add the suit",
+      "surfacePressure": "Add the surface pressure",
+      "maxDepth": "Add the depth",
+      "duration": "Add the duration",
+      "waterTemp": "Add the water temperature",
+      "airTemp": "Add the air temperature",
+      "notes": "Add notes",
+      "weight": "Add the weight",
+      "cylinderType": "Choose a type",
+      "pressure": "Add the pressure"
+    }
+  },
+  "desktopSettings": {
+    "saved": "Saved at once, on this computer",
+    "search": "Search settings",
+    "searchShort": "Search",
+    "results": {
+      "one": "{n} setting for “{text}”",
+      "other": "{n} settings for “{text}”"
+    },
+    "resultsIn": "In {categories}",
+    "system": "System",
+    "unitValues": "How values are shown",
+    "categories": {
+      "language": "Language and formats",
+      "units": "Units",
+      "display": "Display",
+      "logbook": "Logbook",
+      "equipment": "Equipment",
+      "decompression": "Profile and decompression",
+      "gases": "Gases and partial pressures",
+      "rebreather": "Rebreather",
+      "devices": "Computers and download",
+      "maps": "Offline maps",
+      "advanced": "Advanced"
+    },
+    "notes": {
+      "units": "They apply to the logbook, the tools and the exports."
+    },
+    "textSize": {
+      "label": "Text size",
+      "text": "Also with {keys}",
+      "small": "Small",
+      "normal": "Normal",
+      "large": "Large"
+    },
+    "file": {
+      "title": "Logbook file",
+      "location": "Location",
+      "show": "Show in folder"
+    },
+    "account": {
+      "sheet": "Account",
+      "syncNow": "Sync now",
+      "auto": "Sync automatically",
+      "autoText": "At startup and after each change",
+      "unmetered": "Only on Wi-Fi or cable",
+      "unmeteredText": "Never on a tethered connection",
+      "manage": "Manage account"
+    },
+    "about": "About OpenDives",
+    "filterFree": "Free filter…"
+  },
+  "desktopSites": {
+    "column": {
+      "name": "Site",
+      "country": "Country",
+      "dives": "Dives",
+      "last": "Latest"
+    },
+    "withoutBar": {
+      "one": "{n} dive without a site",
+      "other": "{n} dives without a site"
+    },
+    "findThem": "Find them a site",
+    "cleanUp": "Clean up the sites",
+    "searchNote": "Results: site names, regions and countries. Esc to see everything again.",
+    "seeDives": "See the dives",
+    "modify": "Edit",
+    "deepestAt": "{depth} at the deepest",
+    "deepest": "Deepest",
+    "moreSites": "More site options",
+    "resize": "Width of the site list",
+    "emptyTitle": "No sites",
+    "emptyText": "A site appears when a dive has one. “New site” adds one.",
+    "keepHint": "Enter to keep · Esc to cancel",
+    "orMoveMap": "or move the map",
+    "moveHint": "Move the map or the crosshair to correct",
+    "clickToPlace": "Click the map to place the crosshair",
+    "placeExplain": "Country and region update when the position changes, unless you corrected them.",
+    "coordinatesExample": "For example -35.4485, 174.732, or click the map",
+    "updatedFromPosition": "Updated from the new position",
+    "savedAtOnce": "Every change is saved at once.",
+    "sitesInLogbook": {
+      "one": "{n} site in the logbook",
+      "other": "{n} sites in the logbook"
+    },
+    "addName": "Add a name",
+    "addCoordinates": "Add coordinates",
+    "addCountry": "Add a country",
+    "addRegion": "Add a region",
+    "addDescription": "Add a description",
+    "addNotes": "Add notes",
+    "addSite": "Add the site",
+    "cancel": "Cancel",
+    "zoomHere": "Zoom in here",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "deleted": "Site deleted",
+    "merged": "Sites merged",
+    "mergedOne": "Merged: a single site",
+    "cleanupIntro": "Merging keeps a single site, with all its dives. It can be undone ({shortcut}).",
+    "possibleDuplicates": "Possible duplicates",
+    "noDuplicates": "No possible duplicates",
+    "noUnused": "No site without a dive",
+    "chooseSite": "Choose a site…",
+    "nearestToDive": "Nearest to the dive",
+    "mostRecent": "Most recently dived",
+    "newSiteNamedHere": "New site “{text}” at the dive’s position",
+    "newSiteNamed": "New site “{text}”",
+    "noPosition": "No position recorded: choose the site, or create it and place it on the map.",
+    "otherTripDives": {
+      "one": "and {n} other dive of this trip",
+      "other": "and {n} other dives of this trip"
+    },
+    "assignAll": "Assign them all to the same site",
+    "noneWithout": "Every dive has a site."
+  },
+  "desktopMultiDive": {
+    "apply": {
+      "one": "Apply to the dive",
+      "other": "Apply to the {n} dives"
+    },
+    "paste": "Paste",
+    "copied": {
+      "one": "{n} dive copied",
+      "other": "{n} dives copied"
+    },
+    "copyFailed": "The copy failed.",
+    "pasted": {
+      "one": "{n} dive pasted",
+      "other": "{n} dives pasted"
+    }
+  },
+  "desktopStats": {
+    "list": "Statistics",
+    "filter": "Filter",
+    "filterActive": "Filter, a filter is on",
+    "exportChart": "Export the chart",
+    "exportFailed": "The chart could not be exported.",
+    "filePrefix": "OpenDives-statistic",
+    "newStatistic": "+ New statistic",
+    "more": "More statistics options",
+    "hoursUnit": "h",
+    "undo": "Undo",
+    "redo": "Redo",
+    "kinds": {
+      "byYear": {
+        "title": "Dives per year"
+      },
+      "maxDepth": {
+        "title": "Maximum depth"
+      },
+      "time": {
+        "title": "Time under water"
+      },
+      "sac": {
+        "title": "Consumption (SAC)"
+      },
+      "bySite": {
+        "title": "Dives per site"
+      },
+      "heat": {
+        "title": "Heat map"
+      }
+    },
+    "subtitle": {
+      "byYear": "{dives}, {from} to {to}",
+      "byYearSingle": "{dives}, {year}",
+      "maxDepth": "Per dive",
+      "time": "{time} in total",
+      "sac": "Mean {sac}",
+      "sacNone": "No consumption recorded",
+      "bySite": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "heat": "Where you dive most"
+    },
+    "tip": "{what} · {value}",
+    "open": {
+      "one": "Click to see it",
+      "other": "Click to see them"
+    },
+    "noSite": "No site",
+    "noData": "Nothing to show for these dives.",
+    "noSac": "No consumption recorded for these dives.",
+    "figure": {
+      "total": "Total",
+      "bestYear": "Best year",
+      "mean": "Mean",
+      "perYear": "{n} per year",
+      "yearValue": "{year}, {value}",
+      "deepest": "Deepest",
+      "shallowest": "Shallowest",
+      "longestYear": "Longest year",
+      "meanPerDive": "Mean per dive",
+      "lowest": "Lowest",
+      "highest": "Highest",
+      "sites": "Sites",
+      "busiest": "Most visited",
+      "withoutSite": "Without a site",
+      "siteValue": "{site}, {dives}"
+    }
+  },
+  "desktopTools": {
+    "groupDive": "Dive",
+    "newPlan": "New plan",
+    "savedPlans": "Saved plans",
+    "printSlate": "Print the slate",
+    "savePlan": "Save the plan",
+    "moreOptions": "More plan options",
+    "sharePlan": "Share the plan…",
+    "startFrom": "Start from",
+    "bottomTime": "Bottom time",
+    "bottomGas": "Bottom gas",
+    "decoGas": "Deco gas",
+    "otherGas": "Other mix…",
+    "gradientFactors": "Gradient factors",
+    "gradientInvalid": "Two values, 10 to 150 then 40 to 150, for example 30 / 75",
+    "sac": "Consumption (SAC)",
+    "conditions": "{model} · {water} · {altitude} altitude",
+    "modelBuehlmann": "Bühlmann ZH-L16C",
+    "stops": "Stops",
+    "cns": "CNS",
+    "resultsFor": "Results for {gas}",
+    "modSub": "at {po2} ppO₂",
+    "atPo2": "at {po2}",
+    "endAt": "END at {depth}",
+    "po2At": "ppO₂ at {depth}",
+    "o2Narcotic": "O₂ counted as narcotic",
+    "o2NotNarcotic": "O₂ not counted as narcotic",
+    "underLimit": "under the limit",
+    "overLimit": "over the limit",
+    "prepareMix": "Prepare this mix",
+    "finalPressure": "Desired final pressure",
+    "workingPressure": "Cylinder working pressure: {pressure}",
+    "aboveWorking": "Above the working pressure of {pressure}",
+    "cylinderLabel": "Cylinder at {pressure}: {gases}, in filling order",
+    "soit": "that is {when}",
+    "around": "{day} around {time}",
+    "notify": "Notify me",
+    "notifyOn": "Reminder on",
+    "legendMid": "50 to 89 %",
+    "legendLow": "under 50 %",
+    "seeInLogbook": "See in the logbook"
+  },
+  "desktop": {
+    "dateTime": "{date} · {time}",
+    "noSite": "Site not set",
+    "selected": {
+      "one": "{n} dive selected",
+      "other": "{n} dives selected"
+    },
+    "diveTitle": "No. {number} · {site}",
+    "changeFailed": "The change could not be made. The logbook has not changed.",
+    "newTrip": "New trip",
+    "columns": "Columns",
+    "dropNote": "Drag a logbook file (.ssrf, .xml, .fit…) onto the window to import it.",
+    "noMatch": "No dive matches the search.",
+    "resize": "Logbook width",
+    "dropHere": "Drop the file to import it",
+    "numbers": "No. {numbers}",
+    "underWater": "{n} min under water",
+    "deepest": "{depth} at the deepest",
+    "selectionHint": "Right-click to act on the selection",
+    "column": {
+      "number": "No.",
+      "date": "Date",
+      "site": "Site",
+      "maxDepth": "Max depth",
+      "duration": "Duration",
+      "waterTemp": "Temp.",
+      "buddies": "Buddies",
+      "guides": "Guides",
+      "computer": "Computer",
+      "gases": "Gas",
+      "suit": "Suit",
+      "meanDepth": "Avg depth",
+      "sac": "Consumption",
+      "airTemp": "Air temp.",
+      "rating": "Rating",
+      "country": "Country",
+      "tags": "Tags"
+    },
+    "menu": {
+      "merge": "Merge into one dive",
+      "addToTrip": "Add to a trip…",
+      "editTogether": "Edit together…",
+      "edit": "Edit",
+      "copy": "Copy",
+      "export": "Export…",
+      "share": "Share…",
+      "delete": "Delete",
+      "enlarge": "Enlarge the profile",
+      "removeFromTrip": "Remove from the trip",
+      "renumber": "Renumber the dive…",
+      "deleteDive": "Delete the dive"
+    },
+    "macMenu": {
+      "about": "About OpenDives",
+      "settings": "Settings…",
+      "services": "Services",
+      "hide": "Hide OpenDives",
+      "hideOthers": "Hide Others",
+      "showAll": "Show All",
+      "quit": "Quit OpenDives",
+      "file": "File",
+      "newDive": "New Dive",
+      "import": "Import…",
+      "download": "Download from a Dive Computer",
+      "export": "Export…",
+      "print": "Print…",
+      "edit": "Edit",
+      "undo": "Undo",
+      "redo": "Redo",
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "selectAll": "Select All",
+      "delete": "Delete",
+      "find": "Find",
+      "view": "View",
+      "logbook": "Logbook",
+      "sites": "Sites",
+      "statistics": "Statistics",
+      "tools": "Tools",
+      "columns": "Columns…",
+      "textBigger": "Larger Text",
+      "textSmaller": "Smaller Text",
+      "textActual": "Actual Size",
+      "fullScreen": "Full Screen",
+      "dive": "Dive",
+      "editDive": "Edit",
+      "merge": "Merge",
+      "split": "Split",
+      "addToTrip": "Add to a Trip…",
+      "window": "Window",
+      "help": "Help",
+      "helpAbout": "About OpenDives"
+    },
+    "figure": {
+      "maxDepth": "Max depth",
+      "duration": "Duration",
+      "meanDepth": "Avg depth",
+      "temperature": "Temp.",
+      "gas": "Gas",
+      "sac": "Consumption"
+    },
+    "tab": {
+      "info": "Information",
+      "equipment": "Equipment",
+      "gas": "Gas",
+      "notes": "Notes",
+      "map": "Map"
+    },
+    "noNotes": "No notes for this dive.",
+    "noGas": "No gas recorded for this dive.",
+    "noEquipment": "No equipment recorded for this dive.",
+    "noMap": "This dive’s site has no coordinates.",
+    "columnsShown": "Columns shown",
+    "moreLogbook": "More logbook options",
+    "undo": {
+      "editDive": "Edit the dive",
+      "editTrip": "Edit the trip",
+      "editSite": "Edit the site",
+      "filters": "Edit the filters",
+      "addSite": "Add the site",
+      "addDive": "Add the dive",
+      "addToTrip": "Add to the trip",
+      "removeFromTrip": "Remove from the trip",
+      "createTrip": "Create the trip",
+      "mergeTrips": "Merge the trips",
+      "autogroup": "Group into trips",
+      "ungroup": "Undo automatic trips",
+      "mergeSites": "Merge the sites",
+      "deleteSites": "Delete the sites",
+      "deleteDives": "Delete the dives",
+      "import": "Import",
+      "renumber": "Renumber",
+      "cylinderType": "Rename the cylinder type",
+      "computers": "Edit the dive computers",
+      "replan": "Plan the dive"
+    },
+    "undoNamed": "Undo: {action}",
+    "redoNamed": "Redo: {action}",
+    "undoPlain": "Undo",
+    "redoPlain": "Redo",
+    "filter": "Filter…",
+    "filterOn": "Filter… (filter on)",
+    "renumberDives": "Renumber the dives…",
+    "mergePreviousTrip": "Merge with the previous trip",
+    "mergeNextTrip": "Merge with the next trip",
+    "resetColumns": "Reset the column order",
+    "columnWillMove": "“{column}” will be placed between {before} and {after}",
+    "columnWillMoveLast": "“{column}” will be placed last",
+    "export": {
+      "which": "Which dives",
+      "selection": {
+        "one": "The selected dive",
+        "other": "The {n} selected dives"
+      },
+      "filtered": {
+        "one": "The filtered dive",
+        "other": "The {n} filtered dives"
+      },
+      "all": "The whole logbook",
+      "format": "Format",
+      "action": "Export…",
+      "saved": {
+        "one": "Dive exported",
+        "other": "{n} dives exported"
+      },
+      "fileDives": "dives",
+      "fileLogbook": "logbook",
+      "logbook": "Export the logbook…"
+    }
+  },
+  "desktopFollowups": {
+    "newLogbook": {
+      "gitUsername": "User name",
+      "gitUsernameHelp": "Optional. Used with the token to sign in to the repository.",
+      "errorUsername": "The name cannot contain spaces or special characters."
+    },
+    "siteMerge": {
+      "title": "Merge the sites?",
+      "which": "Site to keep"
     }
   }
 }

@@ -63,6 +63,28 @@
     --od-selected: var(--od-secondary);
     /* The selected fill (a selected card or row): lighter than the container. */
     --od-selected-container: #E6EEF8;
+    /* Desktop (task 2026-11-15-169): the selected row of a table, and a destructive menu item. */
+    --od-table-selected: #D4E2F2;
+    --od-on-table-selected: #114477;
+    /* Desktop Statistiques (tasks 2026-11-15-171 and 176): the chart bars, the previews of the list, the heat map's grid, the tooltip's second line. */
+    --od-desk-stats-bar: #7FA3C8;
+    --od-desk-stats-bar-strong: #114477;
+    --od-desk-stats-preview: #8FB0D6;
+    --od-desk-stats-heat-0: #ECEAE4;
+    --od-desk-stats-heat-1: #D4E2F2;
+    --od-desk-stats-heat-2: #8FB0D6;
+    --od-desk-stats-heat-3: #3F6F9F;
+    --od-desk-stats-heat-4: #114477;
+    --od-desk-stats-tip-hint: #D4E2F2;
+    --od-menu-danger: #B71C1C;
+    /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
+    --od-buddy-badge: #E3E1DC;
+    --od-trip-band: #ECEAE4;
+    /* Desktop detail pane (tasks 2026-11-15-172, 184, 185): an editable field at rest, its hover outline,
+       the average-depth line of the profile, a chip of a person in a field. */
+    --od-field-rest: #ECEAE4;
+    --od-field-hover: #8F8D86;
+    --od-profile-mean: #114477;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
     /* A safe outcome (the planner: no deco stop), in the oxygen green. */
@@ -183,6 +205,18 @@
     --od-nav-active: #114477;
     /* The account avatar's initial, on the white 90 % circle of the band (the band stays blue in dark mode). */
     --od-nav-avatar-ink: #114477;
+    /* Desktop Outils (task 2026-11-15-196): grey filled fields, the selected row and segment, the amber banner, the cylinder's gas layers. */
+    --od-desktop-field: #ECEAE4;
+    --od-desktop-selected: #D4E2F2;
+    --od-desktop-selected-ink: #114477;
+    --od-desktop-banner: #FBE3B2;
+    --od-desktop-banner-ink: #3D3A33;
+    --od-gas-helium: #7FA3C8;
+    --od-gas-oxygen: #4E9A6A;
+    --od-gas-topup: #C9B98F;
+    --od-gas-topup-badge: #9A8657;
+    --od-desktop-bar-mid: #114477;
+    --od-desktop-bar-low: #7FA3C8;
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
     /* The light centre above the top edge (contrast audit, task 2026-11-14-153): -20 % on phones,
@@ -256,6 +290,16 @@
     /* Android tablet FAB menu (spec, section 8): its light scrim and its tonal choices. */
     --od-fab-scrim: rgb(0 0 0 / 0.16);
     --od-fab-tonal: #E3E1DC;
+    /* The square that holds a cloud service's own logo (task 2026-11-15-173): white in both themes, as the brand rules ask. */
+    --od-logo-square: #FFFFFF;
+    --od-logo-square-ink: #1F2124;
+    /* New logbook, step 3 (task 2026-11-15-208): the band with the two tiles, the link between them (dashed grey, solid green when signed in) and the brand tile. */
+    --od-link-band: #EEF3F9;
+    --od-link-off: #8F8D86;
+    --od-link-off-badge: #E3E1DC;
+    --od-link-ok: #1E6B3A;
+    --od-link-ok-badge: #DCEFE2;
+    --od-tile-shadow: 0 1px 3px rgb(17 68 119 / 0.12), 0 4px 12px rgb(17 68 119 / 0.08);
     /* Vibrant floating toolbar (spec, section 8): ink container, light icons. */
     --od-toolbar-container: #1F2124;
     --od-toolbar-on-container: #F5F4F0;
@@ -318,6 +362,24 @@
     --od-chart-high: #C97A35;
     --od-on-tertiary-container: #FBE3B2;
     --od-selected-container: #1A2D47;
+    --od-table-selected: #1A2D47;
+    --od-on-table-selected: #BFD6F0;
+    --od-desk-stats-bar: #4C7FB8;
+    --od-desk-stats-bar-strong: #BFD6F0;
+    --od-desk-stats-preview: #4C7FB8;
+    --od-desk-stats-heat-0: #2E3033;
+    --od-desk-stats-heat-1: #1E3552;
+    --od-desk-stats-heat-2: #2D5E90;
+    --od-desk-stats-heat-3: #4C8BD4;
+    --od-desk-stats-heat-4: #BFD6F0;
+    --od-desk-stats-tip-hint: #2B66AD;
+    --od-menu-danger: #FF8A80;
+    --od-buddy-badge: #3A3C40;
+    --od-trip-band: #26282B;
+    /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
+    --od-field-rest: #2A2D31;
+    --od-field-hover: #8A8D91;
+    --od-profile-mean: #9DC1EA;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;
     --od-on-error-container: #FDE2E0;
@@ -329,6 +391,14 @@
     --od-surface-container-high: #2E3033;
     --od-surface-container-highest: #3A3C40;
     --od-fab-tonal: #3A3C40;
+    --od-logo-square: #FFFFFF;
+    --od-logo-square-ink: #1F2124;
+    --od-link-band: #1D2A3A;
+    --od-link-off: #7A7D82;
+    --od-link-off-badge: #3A3C40;
+    --od-link-ok: #7FD39B;
+    --od-link-ok-badge: #1F3A2B;
+    --od-tile-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
     --od-toolbar-container: #E3E1DC;
     --od-toolbar-on-container: #1F2124;
     --od-toolbar-primary: #1F2124;
@@ -369,6 +439,18 @@
     --od-loading-indicator-bottom: #4C8BD4;
     --od-cylinder-water-top: #BFD6F0;
     --od-cylinder-water-bottom: #4C8BD4;
+    /* Desktop Outils (task 2026-11-15-196), dark. */
+    --od-desktop-field: #2E3033;
+    --od-desktop-selected: #1E3552;
+    --od-desktop-selected-ink: #8FB6E6;
+    --od-desktop-banner: #4A3A1A;
+    --od-desktop-banner-ink: #F4E4C0;
+    --od-gas-helium: #6E93BC;
+    --od-gas-oxygen: #5FB07F;
+    --od-gas-topup: #A8996F;
+    --od-gas-topup-badge: #7C6D45;
+    --od-desktop-bar-mid: #4C8BD4;
+    --od-desktop-bar-low: #3A6FAE;
     --od-cylinder-breathed: #2A4466;
     --od-cylinder-level: #FF8A80;
     --od-cylinder-no-pressure: #1C1D1F;
@@ -585,6 +667,19 @@ html.ios {
 .ios {
   --od-title-font: -apple-system, 'SF Pro Display', system-ui, sans-serif;
   --f7-font-family: 'Source Sans 3', -apple-system, system-ui, sans-serif;
+}
+
+@layer od.base {
+  /* Pointer (docs/system-design.md, « Pointer »): with a mouse, everything that acts shows the hand;
+     what is disabled, or only shows something, keeps the arrow. */
+  @media (hover: hover) and (pointer: fine) {
+    :where(button, a[href], summary, select, [role='button'], [role='menuitem'], [role='menuitemradio'], [role='menuitemcheckbox'], [role='tab'], [role='option'], [role='radio'], [role='switch'], [role='checkbox'], [role='link'], input[type='checkbox'], input[type='radio'], input[type='range'], label:has(> input:not([type='text'], [type='number'], [type='search'], [type='password'], [type='url'], [type='email'])):not(:has(:disabled))) {
+      cursor: pointer;
+    }
+    :where(button:disabled, [aria-disabled='true'], input:disabled, select:disabled) {
+      cursor: default;
+    }
+  }
 }
 
 @layer od.base {
@@ -1101,6 +1196,41 @@ html.ios {
       border-radius: 12px;
       font-size: 17px;
       letter-spacing: 0;
+    }
+  }
+
+  /* Mouse: the Material 3 hover layer, 8 % of the button's content colour over its background
+     (docs/system-design.md, « Pointer »). */
+  @media (hover: hover) and (pointer: fine) {
+    .od-tonal-button,
+    .od-text-button,
+    .od-icon-button,
+    .od-outlined-button {
+      transition: box-shadow 120ms linear;
+
+      &:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .od-tonal-button,
+    .od-text-button,
+    .od-icon-button,
+    .od-outlined-button {
+      transition: none;
+    }
+  }
+
+  /* Mouse: Framework7's list links and icon links (navbar buttons) get the same layer. */
+  @media (hover: hover) and (pointer: fine) {
+    a.item-link:hover,
+    label.item-content:not(:has(:disabled)):hover,
+    a.link.icon-only:hover {
+      box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+    }
+    a.link.icon-only:hover {
+      border-radius: 50%;
     }
   }
 

@@ -804,7 +804,12 @@ export { waterTypeOf };
  */
 
 /** @type {any} */
-const native = registerPlugin('OpenDivesCore');
+// On Android and iOS the native plugin answers. In the desktop app (Electron, which runs as a "web"
+// platform) desktop.js does, through window.odDesktop; in a plain browser its methods reject with
+// UNAVAILABLE.
+const native = registerPlugin('OpenDivesCore', {
+  web: () => import('./desktop.js').then((m) => new m.OpenDivesCoreDesktop()),
+});
 
 
 /**
@@ -930,6 +935,10 @@ export const OpenDivesCore = {
   htmlToPdf: (options) => native.htmlToPdf(options),
   grantShareFile: (options) => native.grantShareFile(options),
   exportDives: (options) => native.exportDives(options),
+  /** Desktop only: the extra columns of the logbook's table, for every listed dive. */
+  async diveColumns() {
+    return JSON.parse((await native.diveColumns()).json);
+  },
   async listLoadedDives() {
     return JSON.parse((await native.listLoadedDives()).json);
   },

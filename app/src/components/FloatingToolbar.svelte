@@ -367,5 +367,21 @@
         transition: none;
       }
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-floating-toolbar--button {
+        transition: box-shadow 120ms linear;
+      }
+      .od-floating-toolbar--button:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-floating-toolbar--button {
+        transition: none;
+      }
+    }
   }
 </style>

@@ -1,6 +1,8 @@
 <script module>
   // The subpage shown beside the overview on a tablet, for the overview's selected row.
   const selected = $state({ id: '' });
+  // The desktop's chosen category (task 2026-11-15-202), kept while the page is left and reopened.
+  const deskState = $state({ category: 'language' });
 </script>
 
 <script>
@@ -22,11 +24,14 @@
   import AltitudeField from '../components/AltitudeField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { layout, ios, bottomNav } from '../lib/layout.svelte.js';
+  import { layout, ios, bottomNav, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
-  import { t, deviceLanguage } from '../lib/i18n.js';
+  import { t, tIfExists, deviceLanguage } from '../lib/i18n.js';
+  import { CATEGORIES, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
+  import { textSize, setTextSize } from '../lib/text-size.svelte.js';
+  import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
   import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
   import {
     settings,
@@ -61,6 +66,13 @@
    */
 
   onMount(async () => {
+    if (desktopApp) {
+      try {
+        startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.startup()).mode;
+      } catch (e) {
+        console.error('Reading the start-up choice', e);
+      }
+    }
     // Tablet: the overview opens with its first subpage beside it; a subpage marks its row.
     if (section) selected.id = section;
     try {
@@ -74,8 +86,8 @@
   const p = $derived(/** @type {CorePrefValues} */ ({ ...(logbook.prefs.defaults ?? {}), ...logbook.prefs }));
   const defaults = $derived(/** @type {CorePrefValues} */ (logbook.prefs.defaults ?? p));
 
-  /** @type {{ f7route?: { params?: { section?: string } }, f7router?: any }} */
-  let { f7route = undefined, f7router = undefined } = $props();
+  /** @type {{ f7route?: { params?: { section?: string } }, f7router?: any, desk?: boolean, windowed?: boolean }} */
+  let { f7route = undefined, f7router = undefined, desk = false, windowed = false } = $props();
   /**
    * The subpage shown (task 2026-11-13-111): '' for the overview (/settings/), else one
    * group of rows (/settings/<section>).
@@ -84,6 +96,8 @@
 
   let search = $state('');
   let renumbering = $state(false);
+  /** « Ouvrir au démarrage » (desktop): kept by the main process, read here when the page opens. @type {'last'|'ask'} */
+  let startupMode = $state('last');
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
 
   /** @type {{ kind: 'choice', row: Extract<Row, {kind: 'choice'}>, options: Option[], anchor: HTMLElement } | { kind: 'number', row: Extract<Row, {kind: 'number'}> } | null} */
@@ -854,6 +868,11 @@
           href: '/settings/advanced',
           summary: t('settings.overview.advanced'),
         },
+        // Desktop, Windows and Linux: À propos is the last row of Réglages (task 2026-11-15-169);
+        // the Mac has it in its menu bar.
+        ...(desktopApp && !desktopMac
+          ? [{ id: 'about', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M12 11v6 M12 7.5v.5', href: '/about', summary: t('settings.overview.version', { version: __APP_VERSION__ }) }]
+          : []),
       ],
     },
   ]);
@@ -975,7 +994,168 @@
       },
     });
   }
-</script>
+
+  // --- The desktop layout (task 2026-11-15-202) -----------------------------------------------
+
+  /** @type {HTMLInputElement|undefined} */
+  let searchField = $state();
+  const searching = $derived(desk && !!search.trim());
+
+  /** « Ctrl++ et Ctrl+- » (⌘ on the Mac): the keys of « Taille du texte ». */
+  const textKeys = desktopMac ? '⌘+ · ⌘-' : 'Ctrl++ · Ctrl+-';
+
+  /** Where the logbook is kept on this computer: the folder the bridge calls userData, then carnet. */
+  const logbookPath = (() => {
+    const base = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop?.paths?.userData ?? '';
+    return base ? `${base}${base.includes('\\') ? '\\' : '/'}carnet` : '';
+  })();
+
+  /** « Afficher dans le dossier »: the system's file manager, on the logbook's folder. */
+  async function showLogbookFolder() {
+    try {
+      await /** @type {any} */ (window).odDesktop.showInFolder({ path: logbookPath });
+    } catch (e) {
+      failed(e);
+    }
+  }
+
+  /**
+   * One block of the category pages: a group of the phone's rows, or one of the few rows that
+   * exist on the desktop only. null when there is nothing to show.
+   * @param {string} id
+   * @returns {{ title: string, rows: any[], warning?: string, note?: string }|null}
+   */
+  function deskBlock(id) {
+    const group = groups.find((g) => g.id === id);
+    switch (id) {
+      case 'unitSystem':
+        return { title: t('desktopSettings.system'), rows: [{ kind: 'unitSystem', id: 'unitSystem', label: t('settings.unitSystem.label'), text: t('settings.unitSystem.note') }] };
+      case 'units2':
+        return { title: t('desktopSettings.unitValues'), rows: group?.rows ?? [] };
+      case 'textSize':
+        return desktopApp
+          ? { title: '', rows: [{ kind: 'textSize', id: 'textSize', label: t('desktopSettings.textSize.label'), text: t('desktopSettings.textSize.text', { keys: textKeys }), value: t(`desktopSettings.textSize.${textSize.id}`) }] }
+          : null;
+      case 'startup':
+        return desktopApp
+          ? {
+              title: '',
+              rows: [
+                {
+                  kind: 'choice',
+                  id: 'startup',
+                  label: t('desktopCloud.startup.label'),
+                  text: t('desktopCloud.startup.text'),
+                  value: t(`desktopCloud.startup.${startupMode}`),
+                  current: startupMode,
+                  options: () => STARTUP_MODES.map((mode) => ({ value: mode, label: t(`desktopCloud.startup.${mode}`) })),
+                  set: async (/** @type {string} */ v) => {
+                    try {
+                      startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.setStartup({ mode: v })).mode;
+                    } catch (e) {
+                      failed(e);
+                    }
+                  },
+                },
+              ],
+            }
+          : null;
+      case 'logbookFile':
+        return desktopApp && logbookPath
+          ? { title: t('desktopSettings.file.title'), rows: [{ kind: 'file', id: 'logbookLocation', label: t('desktopSettings.file.location'), value: logbookPath }] }
+          : null;
+      case 'computersKnown':
+        return computers.length
+          ? {
+              title: t('settings.computers.overline', { n: computers.length }),
+              rows: [
+                ...computers.map((c) => ({ kind: 'computer', id: `computer${c.slot}`, label: computerName(c), computer: c })),
+                { kind: 'forgetAll', id: 'forgetAll', label: t('settings.computers.forgetAll', { n: computers.length }) },
+              ],
+            }
+          : null;
+      case 'reset':
+        return { title: '', rows: [{ kind: 'reset', id: 'reset', label: t('settings.advanced.reset'), text: t('settings.advanced.resetText') }], note: t('settings.advanced.note') };
+      case 'deco':
+        return group ? { title: group.title, rows: group.rows, warning: t('settings.deco.warning'), note: t('settings.deco.note') } : null;
+      case 'conditions':
+        return group ? { title: group.title, rows: group.rows, note: t('settings.conditions.note') } : null;
+      case 'flight':
+        return group ? { title: group.title, rows: group.rows, note: t('settings.flight.note') } : null;
+      default:
+        return group ? { title: group.title, rows: group.rows } : null;
+    }
+  }
+
+  /** Every block of every category, in the order of the left column. */
+  const deskBlocks = $derived(
+    desk
+      ? CATEGORIES.flatMap((cat) =>
+          cat.groups.flatMap((id) => {
+            const block = deskBlock(id);
+            return block && block.rows.length ? [{ ...block, id, category: cat.id }] : [];
+          }),
+        )
+      : [],
+  );
+  const pageBlocks = $derived(deskBlocks.filter((b) => b.category === deskState.category));
+  const found = $derived(searchBlocks(deskBlocks, search));
+
+  /** @param {string} id */
+  function chooseCategory(id) {
+    search = '';
+    deskState.category = id;
+  }
+
+  /** « Affichage et Profil et décompression »: the categories of the results. @param {{ category: string }[]} blocks */
+  function listCategories(blocks) {
+    const names = categoriesOf(blocks).map((id) => t(`desktopSettings.categories.${id}`));
+    try {
+      return new Intl.ListFormat(document.documentElement.lang || undefined, { type: 'conjunction' }).format(names);
+    } catch {
+      return names.join(', ');
+    }
+  }
+
+  /** The choices of a row that has two or three of them, written out as a button group (else null). @param {any} row */
+  function smallChoice(row) {
+    try {
+      const options = row.options();
+      return Array.isArray(options) && options.length >= 2 && options.length <= 3 ? options.map((/** @type {Option} */ o) => ({ value: o.value, label: o.label })) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** ↑ ↓ move from one category to the next. @param {KeyboardEvent} e */
+  function categoryKey(e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const at = CATEGORIES.findIndex((c) => c.id === deskState.category);
+    const next = CATEGORIES[Math.max(0, Math.min(CATEGORIES.length - 1, at + (e.key === 'ArrowDown' ? 1 : -1)))];
+    chooseCategory(next.id);
+    queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-desktop-settings--category[data-category="${next.id}"]`))?.focus());
+  }
+
+  // Ctrl+F (⌘F) goes to the search field, on this page only.
+  $effect(() => {
+    if (!desk) return;
+    /** @param {KeyboardEvent} e */
+    const keydown = (e) => {
+      if (!(desktopMac ? e.metaKey : e.ctrlKey) || e.shiftKey || e.key.toLowerCase() !== 'f') return;
+      if (!windowed && navigation.section !== 'account') return;
+      e.preventDefault();
+      searchField?.focus();
+      searchField?.select();
+    };
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  });
+
+  // The Mac's separate window carries the chosen category's name as its title.
+  $effect(() => {
+    if (desk && windowed) document.title = searching ? t('settings.title') : t(`desktopSettings.categories.${deskState.category}`);
+  });</script>
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
@@ -1037,6 +1217,170 @@
   {/if}
 {/snippet}
 
+<!-- The desktop Réglages (task 2026-11-15-202, bureau-reglages*): the categories on the left, the
+     chosen category's cards on the right, a search across every category. Same rows as the phone. -->
+{#snippet hl(/** @type {string} */ text)}{#each highlightParts(text, search) as part, i (i)}{#if part.hit}<mark class="od-desktop-settings--hit">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
+
+{#snippet deskSearchField()}
+  <div class="od-desktop-settings--search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
+    <input
+      type="search"
+      bind:this={searchField}
+      bind:value={search}
+      placeholder={t(windowed ? 'desktopSettings.searchShort' : 'desktopSettings.search')}
+      aria-label={t('desktopSettings.search')}
+      onkeydown={(e) => e.key === 'Escape' && search && ((search = ''), e.stopPropagation())}
+    />
+    {#if !windowed && !search}<kbd class="od-desktop-settings--kbd">{desktopMac ? '⌘F' : 'Ctrl+F'}</kbd>{/if}
+  </div>
+{/snippet}
+
+{#snippet deskRow(/** @type {any} */ row, /** @type {string} */ lead)}
+  {@const whole = row.kind === 'link' || row.kind === 'reset' || row.kind === 'forgetAll'}
+  {@const small = row.kind === 'choice' ? smallChoice(row) : null}
+  <svelte:element
+    this={row.kind === 'switch' ? 'label' : 'div'}
+    class="od-desktop-settings--row"
+    class:od-desktop-settings--dimmed={row.dimmed}
+    role={row.kind === 'switch' ? undefined : 'listitem'}
+  >
+    <span class="od-desktop-settings--texts">
+      <span class="od-desktop-settings--label">{@render hl(row.label)}</span>
+      {#if lead || (row.text && row.kind !== 'file')}
+        <span class="od-desktop-settings--helper">{#if lead}{lead}{#if row.text && row.kind !== 'file'}{' · '}{/if}{/if}{#if row.kind !== 'file'}{@render hl(row.text ?? '')}{/if}</span>
+      {/if}
+      {#if row.kind === 'file'}<span class="od-desktop-settings--helper od-desktop-settings--path">{@render hl(row.value)}</span>{/if}
+    </span>
+    <span class="od-desktop-settings--control">
+      {#if row.kind === 'switch'}
+        <span class="toggle">
+          <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
+          <span class="toggle-icon"></span>
+        </span>
+      {:else if row.kind === 'unitSystem'}
+        <ButtonGroup ariaLabel={row.label} value={p.unitSystem} marked options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
+      {:else if row.kind === 'textSize'}
+        <ButtonGroup ariaLabel={row.label} value={textSize.id} marked options={TEXT_SIZES.map((s) => ({ value: s.id, label: t(`desktopSettings.textSize.${s.id}`) }))} onchange={(v) => setTextSize(textSizeOf(v))} />
+      {:else if row.kind === 'file'}
+        <button type="button" class="od-outlined-button" onclick={showLogbookFolder}>{t('desktopSettings.file.show')}</button>
+      {:else if row.kind === 'computer'}
+        <button type="button" class="od-desktop-settings--more" aria-label={t('settings.computers.more', { name: row.label })} onclick={(e) => computerMenu(e, row.computer)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
+        </button>
+      {:else if small}
+        <ButtonGroup ariaLabel={row.label} value={row.current} marked options={small} onchange={(v) => row.set(v)} />
+      {:else if row.kind === 'choice' || row.kind === 'number'}
+        <button type="button" class="od-desktop-settings--field" aria-haspopup={row.kind === 'choice' ? 'listbox' : 'dialog'} aria-label="{row.label} : {row.value}" disabled={row.dimmed} onclick={(e) => open(row, e.currentTarget)}>
+          <span class="od-desktop-settings--field-value">{row.value}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+      {:else if row.kind === 'altitude'}
+        <div class="od-desktop-settings--altitude">
+          <AltitudeField
+            label={row.label}
+            value={defaultAltitude}
+            feet={p.length === 'ft'}
+            unit={depthUnit(p)}
+            ariaLabel={`${row.label}: ${formatNumber(defaultAltitude)} ${depthUnit(p)}`}
+            openLabel={t('plan.sacOpen')}
+            onchange={(v) => setAppSetting('defaultAltitudeMm', depthToMm(v, p.length === 'ft'))}
+          />
+        </div>
+      {:else if row.kind === 'info' || (row.kind === 'link' && row.value)}
+        <span class="od-desktop-settings--value">{row.value}</span>
+      {/if}
+    </span>
+    {#if whole}
+      <!-- A row that opens a page or does one thing: the whole row is the button. -->
+      <button
+        type="button"
+        class="od-desktop-settings--row-button"
+        aria-label={row.label}
+        disabled={row.kind === 'link' && row.disabled}
+        onclick={(e) => (row.kind === 'reset' ? confirmReset() : row.kind === 'forgetAll' ? confirmForgetAll() : open(row, e.currentTarget))}
+      ></button>
+      {#if row.kind === 'link' && row.href}<svg class="od-desktop-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
+    {/if}
+  </svelte:element>
+{/snippet}
+
+{#snippet deskView()}
+  <Page class="od-desktop-settings" pageContent={false} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+    <div class="od-desktop-settings--frame" class:od-desktop-settings--windowed={windowed}>
+      {#if !windowed}
+        <header class="od-desktop-settings--bar">
+          <h1 class="od-desktop-settings--title">{t('settings.title')}</h1>
+          <p class="od-desktop-settings--summary">{t('desktopSettings.saved')}</p>
+          <span class="od-desktop-settings--spacer"></span>
+          {@render deskSearchField()}
+        </header>
+      {/if}
+      <div class="od-desktop-settings--columns">
+        <nav class="od-desktop-settings--categories" aria-label={t('settings.title')}>
+          {#if windowed}{@render deskSearchField()}{/if}
+          <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+          <ul role="list" onkeydown={categoryKey}>
+            {#each CATEGORIES as cat (cat.id)}
+              {@const current = !searching && deskState.category === cat.id}
+              <li>
+                <button
+                  type="button"
+                  class="od-desktop-settings--category"
+                  class:od-desktop-settings--selected={current}
+                  data-category={cat.id}
+                  aria-current={current ? 'page' : undefined}
+                  onclick={() => chooseCategory(cat.id)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={cat.icon}></path></svg>
+                  <span class="od-desktop-settings--category-name">{t(`desktopSettings.categories.${cat.id}`)}</span>
+                  {#if cat.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
+                </button>
+              </li>
+            {/each}
+          </ul>
+        </nav>
+        <main class="od-desktop-settings--pane" aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
+          <div class="od-desktop-settings--content">
+            {#if searching}
+              <h2 class="od-desktop-settings--pane-title">{t('desktopSettings.results', { n: found.count, text: search.trim() })}</h2>
+              {#if found.count}
+                <p class="od-desktop-settings--pane-note">{t('desktopSettings.resultsIn', { categories: listCategories(found.blocks) })}</p>
+                <div class="od-desktop-settings--card" role="list">
+                  {#each found.blocks as block (block.id)}
+                    {#each block.rows as row (row.id)}{@render deskRow(row, t(`desktopSettings.categories.${block.category}`))}{/each}
+                  {/each}
+                </div>
+              {:else}
+                <p class="od-desktop-settings--pane-note">{t('settings.noResult', { text: search.trim() })}</p>
+              {/if}
+            {:else}
+              <h2 class="od-desktop-settings--pane-title">{t(`desktopSettings.categories.${deskState.category}`)}</h2>
+              {#if tIfExists(`desktopSettings.notes.${deskState.category}`)}<p class="od-desktop-settings--pane-note">{t(`desktopSettings.notes.${deskState.category}`)}</p>{/if}
+              {#each pageBlocks as block, i (block.id)}
+                {#if block.title && !(i === 0 && block.title === t(`desktopSettings.categories.${deskState.category}`))}<h3 class="od-desktop-settings--heading">{block.title}</h3>{/if}
+                {#if block.warning}
+                  <div class="od-desktop-settings--warning" role="note">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
+                    <span>{block.warning}</span>
+                  </div>
+                {/if}
+                <div class="od-desktop-settings--card" role="list">
+                  {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
+                </div>
+                {#if block.note}<p class="od-desktop-settings--note">{block.note}</p>{/if}
+              {/each}
+            {/if}
+          </div>
+        </main>
+      </div>
+    </div>
+  </Page>
+{/snippet}
+
+{#if desk}
+  {@render deskView()}
+{:else}
 <Page class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
@@ -1191,6 +1535,7 @@
   {#if !section && nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="od-settings--bottom"></div>
 </Page>
+{/if}
 
 {#if renumbering}
   <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
@@ -1549,6 +1894,393 @@
 
     :global(.ios) .od-settings--label {
       font-size: 17px;
+    }
+    /* --- The desktop Réglages (task 2026-11-15-202, bureau-reglages*) ----------------------- */
+    .od-desktop-settings--frame {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--od-background);
+    }
+    .od-desktop-settings--bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 24px 8px;
+    }
+    .od-desktop-settings--title {
+      margin: 0;
+      font-family: var(--od-title-font);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--od-text);
+    }
+    .od-desktop-settings--summary {
+      margin: 0;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-settings--spacer {
+      flex: 1;
+    }
+    .od-desktop-settings--search {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: min(300px, 100%);
+      height: 44px;
+      box-sizing: border-box;
+      padding: 0 16px;
+      border-radius: 22px;
+      background: var(--od-desktop-field);
+      color: var(--od-text);
+
+      svg {
+        flex: none;
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--od-text);
+        outline: none;
+      }
+    }
+    .od-desktop-settings--kbd {
+      padding: 1px 6px;
+      border: 1px solid var(--od-separator);
+      border-radius: 4px;
+      font: inherit;
+      font-size: 12px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-settings--columns {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .od-desktop-settings--categories {
+      flex: none;
+      width: 300px;
+      box-sizing: border-box;
+      padding: 8px 12px 24px 12px;
+      border-right: 1px solid var(--od-separator);
+      overflow-y: auto;
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+    }
+    .od-desktop-settings--windowed .od-desktop-settings--categories {
+      width: 240px;
+      padding-top: 16px;
+
+      .od-desktop-settings--search {
+        height: 34px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+      }
+    }
+    .od-desktop-settings--category {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      height: 48px;
+      box-sizing: border-box;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: none;
+      font: inherit;
+      font-size: 15px;
+      text-align: left;
+      color: var(--od-text);
+      cursor: pointer;
+
+      svg {
+        flex: none;
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--od-text) 6%, transparent);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--od-text);
+        outline-offset: -2px;
+      }
+      &.od-desktop-settings--selected,
+      &.od-desktop-settings--selected:hover {
+        background: var(--od-desktop-selected);
+        color: var(--od-desktop-selected-ink);
+        font-weight: 500;
+      }
+    }
+    .od-desktop-settings--windowed .od-desktop-settings--category {
+      height: 36px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .od-desktop-settings--category-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .od-desktop-settings--pane {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+      padding: 8px 32px 40px;
+    }
+    .od-desktop-settings--content {
+      max-width: 720px;
+    }
+    .od-desktop-settings--pane-title {
+      margin: 0;
+      font-family: var(--od-title-font);
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--od-text);
+    }
+    .od-desktop-settings--pane-note {
+      margin: 2px 0 0;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-settings--heading {
+      margin: 24px 0 8px;
+      padding: 0 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--od-text-2);
+    }
+    .od-desktop-settings--pane-title + .od-desktop-settings--heading,
+    .od-desktop-settings--pane-note + .od-desktop-settings--heading {
+      margin-top: 16px;
+    }
+    .od-desktop-settings--pane-title + .od-desktop-settings--card,
+    .od-desktop-settings--pane-note + .od-desktop-settings--card {
+      margin-top: 16px;
+    }
+    .od-desktop-settings--card {
+      margin: 0;
+      border-radius: 16px;
+      background: var(--od-surface);
+      overflow: hidden;
+    }
+    .od-desktop-settings--row {
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 64px;
+      padding: 10px 16px;
+      color: var(--od-text);
+
+      & + .od-desktop-settings--row {
+        box-shadow: inset 0 1px 0 var(--od-separator);
+        /* The line starts at the text, as the mock-up's rows. */
+      }
+    }
+    label.od-desktop-settings--row {
+      cursor: pointer;
+    }
+    .od-desktop-settings--dimmed .od-desktop-settings--texts,
+    .od-desktop-settings--dimmed .od-desktop-settings--control {
+      opacity: 0.55;
+    }
+    .od-desktop-settings--texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .od-desktop-settings--label {
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .od-desktop-settings--helper {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-settings--path {
+      overflow-wrap: anywhere;
+      user-select: text;
+    }
+    .od-desktop-settings--control {
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      max-width: 55%;
+    }
+    .od-desktop-settings--control :global(.od-button-group--button) {
+      white-space: nowrap;
+    }
+    .od-desktop-settings--value {
+      font-size: 14px;
+      color: var(--od-text-2);
+      font-variant-numeric: tabular-nums;
+    }
+    .od-desktop-settings--hit {
+      border-radius: 3px;
+      background: var(--od-desktop-banner);
+      color: var(--od-desktop-banner-ink);
+    }
+    .od-desktop-settings--field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 200px;
+      max-width: 100%;
+      height: 40px;
+      box-sizing: border-box;
+      padding: 0 8px 0 12px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--od-desktop-field);
+      font: inherit;
+      font-size: 15px;
+      color: var(--od-text);
+      cursor: pointer;
+
+      svg {
+        flex: none;
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      &:disabled {
+        cursor: default;
+      }
+      &:focus-visible {
+        outline: 2px solid var(--od-text);
+        outline-offset: 2px;
+      }
+    }
+    .od-desktop-settings--field-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .od-desktop-settings--altitude {
+      --od-field-margin: 0px;
+      width: 220px;
+    }
+    .od-desktop-settings--row-button {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+
+      &:hover {
+        background: color-mix(in srgb, var(--od-text) 5%, transparent);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--od-text);
+        outline-offset: -2px;
+      }
+      &:disabled {
+        cursor: default;
+        opacity: 0.45;
+      }
+    }
+    .od-desktop-settings--chevron {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: var(--od-text-2);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .od-desktop-settings--more {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 20px;
+      background: none;
+      cursor: pointer;
+
+      svg {
+        width: 22px;
+        height: 22px;
+        fill: var(--od-text);
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--od-text) 8%, transparent);
+      }
+    }
+    .od-desktop-settings--warning {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin: 0 0 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--od-desktop-banner);
+      color: var(--od-desktop-banner-ink);
+      font-size: 14px;
+
+      svg {
+        flex: none;
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+    .od-desktop-settings--note {
+      margin: 8px 4px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour, on the fields and the selected category. */
+    @media (hover: hover) and (pointer: fine) {
+      label.od-desktop-settings--row:not(:has(:disabled)):hover {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+      }
+      .od-desktop-settings--field {
+        transition: box-shadow 120ms linear;
+      }
+      .od-desktop-settings--field:not(:disabled):hover,
+      .od-desktop-settings--category.od-desktop-settings--selected:hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
     }
   }
 </style>

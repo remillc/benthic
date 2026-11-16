@@ -1,7 +1,7 @@
 // @ts-check
 // Main sections and the side menu of the phone layout (spec, section 3).
 import { f7 } from 'framework7-svelte';
-import { layout, bottomNav } from './layout.svelte.js';
+import { layout, bottomNav, desktopMac } from './layout.svelte.js';
 import { horizontalSwipe, swipeGoesThrough, settle } from './swipe.js';
 
 /** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
@@ -122,12 +122,20 @@ export function openOver(path) {
 
 /** Settings open over the current section, from the side menu or the tablet navigation. */
 export function openSettings() {
+  // The Mac: a separate window (task 2026-11-15-202, desktop/main.cjs).
+  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop;
+  if (desktopMac && desk?.openSettingsWindow) {
+    desk.openSettingsWindow().catch((/** @type {unknown} */ e) => console.error('Settings window', e));
+    return;
+  }
   openOver('/settings/');
 }
 
 /** About opens over the current section, from the side menu or the tablet navigation. */
 export function openAbout() {
-  openOver('/about');
+  // Desktop app: a dialog over the section (task 2026-11-15-202), whatever the view.
+  if (layout.desktop) f7.views.current?.router.navigate('/about');
+  else openOver('/about');
 }
 
 /** Follows the visible tab, whatever showed it (menu, Back key, tablet bar). */

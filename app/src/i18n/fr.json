@@ -518,7 +518,8 @@
       "tools": "Outils",
       "download": "Ordinateurs et téléchargement",
       "maps": "Cartes hors ligne",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "about": "À propos"
     },
     "overview": {
       "theme": "Thème : {value}",
@@ -531,7 +532,8 @@
       "altitude": "altitude {value}",
       "remembered": "{name} mémorisé",
       "noComputer": "Aucun ordinateur mémorisé",
-      "advanced": "Réinitialiser tous les réglages"
+      "advanced": "Réinitialiser tous les réglages",
+      "version": "Version {version}"
     },
     "flight": {
       "label": "Durée de l’attente",
@@ -3683,6 +3685,706 @@
       "noDives": "Aucune plongée n’a pu être lue avec ces colonnes.",
       "failed": "Ce fichier n’a pas pu être lu avec ces colonnes.",
       "addFailed": "Les plongées n’ont pas pu être ajoutées au carnet."
+    }
+  },
+  "desktopLogbooks": {
+    "mainName": "Carnet de cet ordinateur",
+    "selector": {
+      "label": "Carnet",
+      "change": "Changer de carnet",
+      "recentTitle": "Carnets récents · chacun s'ouvre dans sa fenêtre",
+      "newLogbook": "Nouveau carnet…",
+      "openLogbook": "Ouvrir un carnet…",
+      "saveCopy": "Enregistrer une copie…",
+      "closeLogbook": "Fermer le carnet",
+      "noRecent": "Aucun carnet récent"
+    },
+    "menu": {
+      "newLogbook": "Nouveau carnet…",
+      "openLogbook": "Ouvrir un carnet…",
+      "recentLogbooks": "Carnets récents",
+      "clearRecent": "Effacer la liste",
+      "closeLogbook": "Fermer le carnet",
+      "saveCopy": "Enregistrer une copie…",
+      "noRecent": "Aucun carnet récent"
+    },
+    "main": {
+      "missingTitle": "«  {name}  » est introuvable",
+      "missingText": "Le fichier a été déplacé ou supprimé. Il est retiré des carnets récents.",
+      "ok": "OK",
+      "openTitle": "Ouvrir un carnet",
+      "fileFilter": "Carnet",
+      "newFileTitle": "Nouveau carnet",
+      "copyTitle": "Enregistrer une copie",
+      "copySuffix": "copie",
+      "folderTitle": "Choisir le dossier"
+    },
+    "start": {
+      "empty": "Aucun carnet ouvert dans cette fenêtre",
+      "open": "Ouvrir un carnet…",
+      "newLogbook": "Nouveau carnet…",
+      "recent": "Carnets récents",
+      "drop": "Vous pouvez aussi déposer un fichier carnet sur cette fenêtre.",
+      "notALogbook": "Ce fichier n'est pas un carnet (.ssrf ou .xml).",
+      "openFailed": "Ce carnet n'a pas pu s'ouvrir.",
+      "dropHere": "Déposez le fichier pour l'ouvrir",
+      "forget": "Retirer de la liste"
+    },
+    "source": {
+      "device": "Cet ordinateur",
+      "file": "Fichier",
+      "git": "Dépôt git",
+      "googleDrive": "Google Drive",
+      "oneDrive": "Microsoft OneDrive",
+      "dropbox": "Dropbox",
+      "iCloudDrive": "iCloud Drive",
+      "webdav": "WebDAV ou Nextcloud"
+    },
+    "when": {
+      "openNow": "ouvert maintenant",
+      "closedNow": "fermé à l'instant",
+      "closedMinutes": "fermé il y a {n} min",
+      "closedHours": "fermé il y a {n} h",
+      "openedOn": "ouvert le {date}"
+    },
+    "new": {
+      "step": "Étape {n} sur {total}",
+      "stepNamed": "Étape {n} sur {total} · {name}",
+      "title": "Nouveau carnet",
+      "nameLabel": "Nom du carnet",
+      "nameHelp": "Il s'affiche dans la barre du haut et dans les carnets récents.",
+      "defaultName": "Mon carnet",
+      "whereLabel": "Où le garder ?",
+      "computer": "Sur cet ordinateur",
+      "computerHelp": "Un fichier carnet (.ssrf), dans le dossier de votre choix",
+      "cloud": "Dans votre nuage",
+      "cloudHelp": "{services} · synchronisé entre vos appareils",
+      "cloudServices": "Google Drive, OneDrive, Dropbox ou WebDAV",
+      "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive ou WebDAV",
+      "git": "Dans un dépôt git",
+      "gitHelp": "Votre propre dépôt · historique complet des changements",
+      "continue": "Continuer",
+      "cancel": "Annuler",
+      "back": "Retour",
+      "closeLabel": "Annuler la création du carnet",
+      "closeTip": "Annuler (Échap)",
+      "providerIntro": "Choisissez le service où garder le carnet.",
+      "connectTitle": "Connexion à {service}",
+      "connectTitleServer": "Connexion à votre serveur",
+      "create": "Créer le carnet",
+      "creating": "Création…",
+      "notAvailable": "Pas encore disponible",
+      "folderLabel": "Dossier",
+      "gitUrl": "Adresse du dépôt",
+      "gitUrlPlaceholder": "https://github.com/vous/carnet.git",
+      "gitBranch": "Branche",
+      "gitToken": "Jeton d'accès",
+      "gitTokenHelp": "Le jeton reste sur cet ordinateur.",
+      "gitTokenLink": "Créer un jeton d'accès",
+      "gitNote": "Le dépôt doit être vide ou contenir déjà un carnet. S'il contient un carnet, il sera ouvert tel quel.",
+      "errorUrl": "L'adresse doit commencer par https://",
+      "errors": {
+        "BAD_ADDRESS": "Ce dépôt est introuvable à cette adresse.",
+        "BAD_CREDENTIALS": "Le jeton est refusé.",
+        "DENIED": "Le jeton est refusé ou n'a pas le droit d'écrire dans ce dépôt.",
+        "BAD_BRANCH": "Cette branche n'existe pas ou son nom n'est pas valable.",
+        "NO_LOG": "Ce dépôt ne contient pas de carnet.",
+        "CREATE_FAILED": "Le carnet n'a pas pu être créé dans ce dépôt.",
+        "NOT_EMPTY": "Ce dépôt contient déjà autre chose qu'un carnet.",
+        "NETWORK": "Le serveur ne répond pas. Vérifiez la connexion.",
+        "EXISTS": "Un fichier de ce nom existe déjà dans ce dossier.",
+        "other": "Le carnet n'a pas pu être créé."
+      }
+    },
+    "ready": {
+      "title": "Votre carnet est prêt",
+      "whereComputer": "«  {name}  » est gardé sur cet ordinateur, dans {where}. Ajoutez vos premières plongées :",
+      "whereCloud": "«  {name}  » est gardé dans {where}. Ajoutez vos premières plongées :",
+      "whereGit": "«  {name}  » est gardé dans le dépôt {where}. Ajoutez vos premières plongées :",
+      "download": "Télécharger mes plongées",
+      "downloadHelp": "Bluetooth ou câble USB",
+      "import": "Importer un fichier",
+      "importHelp": "Subsurface, UDDF, divelogs.de, Garmin .fit…",
+      "manual": "Noter une plongée à la main",
+      "manualHelp": "Pour une plongée sans ordinateur",
+      "drop": "Vous pouvez aussi déposer un fichier sur cette fenêtre."
+    },
+    "copy": {
+      "saved": "Copie enregistrée",
+      "open": "Ouvrir",
+      "failed": "La copie n'a pas pu être enregistrée.",
+      "sameFile": "Choisissez un autre fichier que celui du carnet ouvert."
+    }
+  },
+  "desktopCloud": {
+    "browserPage": {
+      "done": "Connexion réussie",
+      "doneText": "Vous pouvez fermer cet onglet et revenir à OpenDives.",
+      "failed": "Connexion impossible",
+      "failedText": "Revenez à OpenDives et réessayez."
+    },
+    "conflict": {
+      "title": "« {name} » a changé à deux endroits",
+      "local": "La copie de cet ordinateur",
+      "remote": "La copie de {service}",
+      "later": "Décider plus tard",
+      "modified": "modifiée le {date}",
+      "warning": "La copie que vous ne gardez pas est remplacée."
+    },
+    "connect": {
+      "notYet": "Pas encore connecté",
+      "notYetText": "Connectez-vous à {service} dans votre navigateur, puis revenez ici pour créer le carnet.",
+      "waiting": "Connexion dans le navigateur…",
+      "waitingText": "La page de connexion de {service} est ouverte dans votre navigateur.",
+      "ready": "Le carnet « {file} » sera créé dans un dossier OpenDives de ce compte.",
+      "noAccount": "Compte connecté",
+      "switchAccount": "Changer de compte",
+      "signIn": "Se connecter à {service}",
+      "cancel": "Annuler la connexion",
+      "reopen": "Rouvrir la page",
+      "privacy": "OpenDives n’a accès qu’aux fichiers qu’il crée ou que vous ouvrez.",
+      "linkSign": "Lien entre OpenDives et {service}"
+    },
+    "webdav": {
+      "intro": "OpenDives créera le fichier « {file} » dans un dossier OpenDives de votre serveur.",
+      "server": "Adresse du serveur",
+      "serverPlaceholder": "https://cloud.exemple.com",
+      "username": "Nom d’utilisateur",
+      "password": "Mot de passe",
+      "passwordHelp": "Dans Nextcloud, créez un mot de passe d’application dans Réglages › Sécurité. Il reste sur cet ordinateur.",
+      "errorAddress": "Cette adresse n’est pas valable."
+    },
+    "errors": {
+      "NOT_SIGNED_IN": "Connectez-vous d’abord à ce service.",
+      "NOT_AVAILABLE": "Ce service n’est pas encore disponible.",
+      "SIGN_IN_DENIED": "La connexion a été refusée.",
+      "SIGN_IN_TIMEOUT": "La connexion n’a pas abouti. Réessayez.",
+      "SIGN_IN_EXPIRED": "La connexion a expiré. Connectez-vous de nouveau.",
+      "STATE_MISMATCH": "La réponse du navigateur ne correspond pas à cette connexion. Réessayez.",
+      "PORT_BUSY": "Un autre programme utilise l’adresse de connexion. Fermez-le et réessayez.",
+      "CREDENTIALS_NOT_SAVED": "Cet ordinateur ne peut pas garder la connexion de façon sûre.",
+      "DENIED": "Le service refuse l’accès à ce dossier.",
+      "NETWORK": "Le service ne répond pas. Vérifiez la connexion.",
+      "EXISTS": "Un fichier de ce nom existe déjà dans ce dossier.",
+      "other": "Le carnet n’a pas pu être créé.",
+      "SIGN_IN_CANCELLED": "La connexion a été annulée.",
+      "BAD_ADDRESS": "Cette adresse n’est pas celle d’un serveur WebDAV ou Nextcloud.",
+      "INSECURE_ADDRESS": "L’adresse doit commencer par https://. http:// n’est accepté que pour cet ordinateur.",
+      "BAD_CREDENTIALS": "Le nom d’utilisateur ou le mot de passe est refusé.",
+      "SERVER": "Le serveur a répondu par une erreur. Réessayez plus tard.",
+      "NETWORK_SERVER": "Aucune réponse à cette adresse. Vérifiez l’adresse et la connexion."
+    },
+    "startup": {
+      "label": "Ouvrir au démarrage",
+      "text": "Le dernier carnet rouvre chaque carnet ouvert à la fermeture, dans sa fenêtre",
+      "last": "Le dernier carnet",
+      "ask": "Choisir à chaque fois"
+    }
+  },
+  "desktopDetail": {
+    "mean": "moy. {depth}",
+    "enlarge": "Agrandir le profil",
+    "enlargeTip": "Agrandir le profil ({shortcut})",
+    "plan": "Planifier depuis cette plongée",
+    "share": "Partager…",
+    "export": "Exporter la plongée…",
+    "delete": "Supprimer la plongée",
+    "recorded": "Enregistré par l’ordinateur de plongée, non modifiable",
+    "fieldsHint": "Les champs gris se modifient d’un clic et s’enregistrent tout de suite.",
+    "hint": "Entrée pour garder · Échap pour annuler",
+    "hintNotes": "Quitter le champ pour garder · Échap pour annuler",
+    "invalid": "Valeur non valide",
+    "readOnly": "Cette valeur vient de l’ordinateur de plongée.",
+    "starsLabel": "{label} : {n} sur 5",
+    "removeItem": "Retirer {name}",
+    "diveCount": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
+    "newSite": "Ajouter « {name} » comme nouveau site",
+    "newBuddy": "Ajouter « {name} » comme nouveau compagnon",
+    "newGuide": "Ajouter « {name} » comme nouveau guide",
+    "newTag": "Ajouter « {name} » comme nouvelle étiquette",
+    "addWeight": "Ajouter un lest",
+    "removeWeight": "Retirer ce lest",
+    "addCylinder": "Ajouter une bouteille",
+    "removeCylinder": "Retirer la bouteille",
+    "moveUp": "Monter la bouteille",
+    "moveDown": "Descendre la bouteille",
+    "cylinder": "Bouteille {n}",
+    "label": {
+      "site": "Site",
+      "buddies": "Compagnons",
+      "guides": "Guides",
+      "tags": "Étiquettes",
+      "waterType": "Type d’eau",
+      "visibility": "Visibilité",
+      "rating": "Évaluation",
+      "suit": "Combinaison",
+      "surfacePressure": "Pression en surface",
+      "maxDepth": "Profondeur max.",
+      "duration": "Durée",
+      "waterTemp": "Eau",
+      "airTemp": "Air",
+      "computer": "Ordinateur",
+      "mode": "Mode",
+      "cns": "CNS",
+      "otu": "OTU",
+      "trip": "Voyage",
+      "notes": "Notes",
+      "cylinderType": "Type",
+      "oxygen": "Oxygène",
+      "helium": "Hélium",
+      "use": "Utilisation",
+      "startPressure": "Pression au début",
+      "endPressure": "Pression à la fin",
+      "gasChanges": "Changements de gaz"
+    },
+    "invitation": {
+      "site": "Site à préciser",
+      "buddies": "Ajouter des compagnons",
+      "guides": "Ajouter un guide",
+      "tags": "Ajouter des étiquettes",
+      "waterType": "Choisir le type d’eau",
+      "visibility": "Ajouter la visibilité",
+      "rating": "Ajouter une évaluation",
+      "suit": "Ajouter la combinaison",
+      "surfacePressure": "Ajouter la pression en surface",
+      "maxDepth": "Ajouter la profondeur",
+      "duration": "Ajouter la durée",
+      "waterTemp": "Ajouter la température de l’eau",
+      "airTemp": "Ajouter la température de l’air",
+      "notes": "Ajouter des notes",
+      "weight": "Ajouter le poids",
+      "cylinderType": "Choisir un type",
+      "pressure": "Ajouter la pression"
+    }
+  },
+  "desktopSettings": {
+    "saved": "Enregistrés tout de suite, sur cet ordinateur",
+    "search": "Rechercher un réglage",
+    "searchShort": "Rechercher",
+    "results": {
+      "one": "{n} réglage pour « {text} »",
+      "other": "{n} réglages pour « {text} »"
+    },
+    "resultsIn": "Dans {categories}",
+    "system": "Système",
+    "unitValues": "Affichage des valeurs",
+    "categories": {
+      "language": "Langue et formats",
+      "units": "Unités",
+      "display": "Affichage",
+      "logbook": "Carnet",
+      "equipment": "Équipement",
+      "decompression": "Profil et décompression",
+      "gases": "Gaz et pressions partielles",
+      "rebreather": "Recycleur",
+      "devices": "Ordinateurs et téléchargement",
+      "maps": "Cartes hors ligne",
+      "advanced": "Avancé"
+    },
+    "notes": {
+      "units": "Elles s’appliquent au carnet, aux outils et aux exports."
+    },
+    "textSize": {
+      "label": "Taille du texte",
+      "text": "Aussi avec {keys}",
+      "small": "Petite",
+      "normal": "Normale",
+      "large": "Grande"
+    },
+    "file": {
+      "title": "Fichier du carnet",
+      "location": "Emplacement",
+      "show": "Afficher dans le dossier"
+    },
+    "account": {
+      "sheet": "Compte",
+      "syncNow": "Synchroniser maintenant",
+      "auto": "Synchroniser automatiquement",
+      "autoText": "À l’ouverture et après chaque modification",
+      "unmetered": "Seulement sur Wi-Fi ou câble",
+      "unmeteredText": "Jamais sur un partage de connexion",
+      "manage": "Gérer le compte"
+    },
+    "about": "À propos d’OpenDives",
+    "filterFree": "Filtre libre…"
+  },
+  "desktopSites": {
+    "column": {
+      "name": "Site",
+      "country": "Pays",
+      "dives": "Plongées",
+      "last": "Dernière"
+    },
+    "withoutBar": {
+      "one": "{n} plongée sans site",
+      "other": "{n} plongées sans site"
+    },
+    "findThem": "Leur trouver un site",
+    "cleanUp": "Nettoyer les sites",
+    "searchNote": "Résultats : noms des sites, régions et pays. Échap pour tout revoir.",
+    "seeDives": "Voir les plongées",
+    "modify": "Modifier",
+    "deepestAt": "{depth} au plus profond",
+    "deepest": "Plus profonde",
+    "moreSites": "Plus d’options des sites",
+    "resize": "Largeur de la liste des sites",
+    "emptyTitle": "Aucun site",
+    "emptyText": "Un site apparaît quand une plongée en a un. « Nouveau site » en ajoute un.",
+    "keepHint": "Entrée pour garder · Échap pour annuler",
+    "orMoveMap": "ou déplacez la carte",
+    "moveHint": "Déplacez la carte ou la croix pour corriger",
+    "clickToPlace": "Cliquez sur la carte pour placer la croix",
+    "placeExplain": "Pays et région se mettent à jour quand la position change, sauf si vous les avez corrigés.",
+    "coordinatesExample": "Par exemple -35.4485, 174.732, ou cliquez sur la carte",
+    "updatedFromPosition": "Mis à jour d’après la nouvelle position",
+    "savedAtOnce": "Chaque changement est enregistré tout de suite.",
+    "sitesInLogbook": {
+      "one": "{n} site au carnet",
+      "other": "{n} sites au carnet"
+    },
+    "addName": "Ajouter un nom",
+    "addCoordinates": "Ajouter des coordonnées",
+    "addCountry": "Ajouter un pays",
+    "addRegion": "Ajouter une région",
+    "addDescription": "Ajouter une description",
+    "addNotes": "Ajouter des notes",
+    "addSite": "Ajouter le site",
+    "cancel": "Annuler",
+    "zoomHere": "Zoomer ici",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "deleted": "Site supprimé",
+    "merged": "Sites fusionnés",
+    "mergedOne": "Fusionnés : un seul site",
+    "cleanupIntro": "Fusionner garde un seul site, avec toutes ses plongées. C’est annulable ({shortcut}).",
+    "possibleDuplicates": "Doublons possibles",
+    "noDuplicates": "Aucun doublon possible",
+    "noUnused": "Aucun site sans plongée",
+    "chooseSite": "Choisir un site…",
+    "nearestToDive": "Les plus proches de la plongée",
+    "mostRecent": "Les plus récemment plongés",
+    "newSiteNamedHere": "Nouveau site « {text} » à la position de la plongée",
+    "newSiteNamed": "Nouveau site « {text} »",
+    "noPosition": "Aucune position enregistrée : choisissez le site, ou créez-le et placez-le sur la carte.",
+    "otherTripDives": {
+      "one": "et {n} autre plongée de ce voyage",
+      "other": "et {n} autres plongées de ce voyage"
+    },
+    "assignAll": "Les associer toutes au même site",
+    "noneWithout": "Toutes les plongées ont un site."
+  },
+  "desktopMultiDive": {
+    "apply": {
+      "one": "Appliquer à la plongée",
+      "other": "Appliquer aux {n} plongées"
+    },
+    "paste": "Coller",
+    "copied": {
+      "one": "{n} plongée copiée",
+      "other": "{n} plongées copiées"
+    },
+    "copyFailed": "La copie a échoué.",
+    "pasted": {
+      "one": "{n} plongée collée",
+      "other": "{n} plongées collées"
+    }
+  },
+  "desktopStats": {
+    "list": "Statistiques",
+    "filter": "Filtrer",
+    "filterActive": "Filtrer, un filtre est actif",
+    "exportChart": "Exporter le graphique",
+    "exportFailed": "Le graphique n'a pas pu être exporté.",
+    "filePrefix": "OpenDives-statistique",
+    "newStatistic": "+ Nouvelle statistique",
+    "more": "Plus d'options pour les statistiques",
+    "hoursUnit": "h",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "kinds": {
+      "byYear": {
+        "title": "Plongées par année"
+      },
+      "maxDepth": {
+        "title": "Profondeur maximale"
+      },
+      "time": {
+        "title": "Temps sous l'eau"
+      },
+      "sac": {
+        "title": "Consommation (SAC)"
+      },
+      "bySite": {
+        "title": "Plongées par site"
+      },
+      "heat": {
+        "title": "Carte de chaleur"
+      }
+    },
+    "subtitle": {
+      "byYear": "{dives}, {from} à {to}",
+      "byYearSingle": "{dives}, {year}",
+      "maxDepth": "Par plongée",
+      "time": "{time} au total",
+      "sac": "Moyenne {sac}",
+      "sacNone": "Aucune consommation enregistrée",
+      "bySite": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "heat": "Où vous plongez le plus"
+    },
+    "tip": "{what} · {value}",
+    "open": {
+      "one": "Clic pour la voir",
+      "other": "Clic pour les voir"
+    },
+    "noSite": "Sans site",
+    "noData": "Rien à afficher pour ces plongées.",
+    "noSac": "Aucune consommation enregistrée pour ces plongées.",
+    "figure": {
+      "total": "Total",
+      "bestYear": "Meilleure année",
+      "mean": "Moyenne",
+      "perYear": "{n} par année",
+      "yearValue": "{year}, {value}",
+      "deepest": "Plus profonde",
+      "shallowest": "Moins profonde",
+      "longestYear": "Année la plus longue",
+      "meanPerDive": "Moyenne par plongée",
+      "lowest": "Plus basse",
+      "highest": "Plus haute",
+      "sites": "Sites",
+      "busiest": "Site le plus visité",
+      "withoutSite": "Sans site",
+      "siteValue": "{site}, {dives}"
+    }
+  },
+  "desktopTools": {
+    "groupDive": "Plongée",
+    "newPlan": "Nouveau plan",
+    "savedPlans": "Plans enregistrés",
+    "printSlate": "Imprimer l’ardoise",
+    "savePlan": "Enregistrer le plan",
+    "moreOptions": "Plus d’options du plan",
+    "sharePlan": "Partager le plan…",
+    "startFrom": "Partir de",
+    "bottomTime": "Temps au fond",
+    "bottomGas": "Gaz de fond",
+    "decoGas": "Gaz de déco",
+    "otherGas": "Autre mélange…",
+    "gradientFactors": "Facteurs de gradient",
+    "gradientInvalid": "Deux valeurs, de 10 à 150 puis de 40 à 150, par exemple 30 / 75",
+    "sac": "Consommation (SAC)",
+    "conditions": "{model} · {water} · {altitude} d’altitude",
+    "modelBuehlmann": "Bühlmann ZH-L16C",
+    "stops": "Paliers",
+    "cns": "CNS",
+    "resultsFor": "Résultats pour {gas}",
+    "modSub": "à {po2} de ppO₂",
+    "atPo2": "à {po2}",
+    "endAt": "END à {depth}",
+    "po2At": "ppO₂ à {depth}",
+    "o2Narcotic": "O₂ compté narcotique",
+    "o2NotNarcotic": "O₂ non compté narcotique",
+    "underLimit": "sous la limite",
+    "overLimit": "au-dessus de la limite",
+    "prepareMix": "Préparer ce mélange",
+    "finalPressure": "Pression finale désirée",
+    "workingPressure": "Service de la bouteille : {pressure}",
+    "aboveWorking": "Au-dessus de la pression de service de {pressure}",
+    "cylinderLabel": "Bouteille à {pressure} : {gases}, dans l’ordre du gonflage",
+    "soit": "soit {when}",
+    "around": "{day} vers {time}",
+    "notify": "Me prévenir",
+    "notifyOn": "Rappel activé",
+    "legendMid": "50 à 89 %",
+    "legendLow": "moins de 50 %",
+    "seeInLogbook": "Voir dans le carnet"
+  },
+  "desktop": {
+    "dateTime": "{date} · {time}",
+    "noSite": "Site à préciser",
+    "selected": {
+      "one": "{n} plongée sélectionnée",
+      "other": "{n} plongées sélectionnées"
+    },
+    "diveTitle": "N° {number} · {site}",
+    "changeFailed": "La modification n'a pas pu être faite. Le carnet n'a pas changé.",
+    "newTrip": "Nouveau voyage",
+    "columns": "Colonnes",
+    "dropNote": "Glissez un fichier de carnet (.ssrf, .xml, .fit…) sur la fenêtre pour l'importer.",
+    "noMatch": "Aucune plongée ne correspond à la recherche.",
+    "resize": "Largeur du carnet",
+    "dropHere": "Déposez le fichier pour l'importer",
+    "numbers": "N° {numbers}",
+    "underWater": "{n} min sous l'eau",
+    "deepest": "{depth} au plus profond",
+    "selectionHint": "Clic droit pour agir sur la sélection",
+    "column": {
+      "number": "N°",
+      "date": "Date",
+      "site": "Site",
+      "maxDepth": "Prof. max",
+      "duration": "Durée",
+      "waterTemp": "Temp.",
+      "buddies": "Compagnons",
+      "guides": "Guides",
+      "computer": "Ordinateur",
+      "gases": "Gaz",
+      "suit": "Combinaison",
+      "meanDepth": "Prof. moy.",
+      "sac": "Consommation",
+      "airTemp": "Temp. de l'air",
+      "rating": "Note",
+      "country": "Pays",
+      "tags": "Étiquettes"
+    },
+    "menu": {
+      "merge": "Fusionner en une plongée",
+      "addToTrip": "Ajouter à un voyage…",
+      "editTogether": "Modifier ensemble…",
+      "edit": "Modifier",
+      "copy": "Copier",
+      "export": "Exporter…",
+      "share": "Partager…",
+      "delete": "Supprimer",
+      "enlarge": "Agrandir le profil",
+      "removeFromTrip": "Retirer du voyage",
+      "renumber": "Renuméroter la plongée…",
+      "deleteDive": "Supprimer la plongée"
+    },
+    "macMenu": {
+      "about": "À propos d'OpenDives",
+      "settings": "Réglages…",
+      "services": "Services",
+      "hide": "Masquer OpenDives",
+      "hideOthers": "Masquer les autres",
+      "showAll": "Tout afficher",
+      "quit": "Quitter OpenDives",
+      "file": "Fichier",
+      "newDive": "Nouvelle plongée",
+      "import": "Importer…",
+      "download": "Télécharger depuis un ordinateur de plongée",
+      "export": "Exporter…",
+      "print": "Imprimer…",
+      "edit": "Édition",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "cut": "Couper",
+      "copy": "Copier",
+      "paste": "Coller",
+      "selectAll": "Tout sélectionner",
+      "delete": "Supprimer",
+      "find": "Rechercher",
+      "view": "Affichage",
+      "logbook": "Carnet",
+      "sites": "Sites",
+      "statistics": "Statistiques",
+      "tools": "Outils",
+      "columns": "Colonnes…",
+      "textBigger": "Agrandir le texte",
+      "textSmaller": "Réduire le texte",
+      "textActual": "Taille réelle",
+      "fullScreen": "Plein écran",
+      "dive": "Plongée",
+      "editDive": "Modifier",
+      "merge": "Fusionner",
+      "split": "Séparer",
+      "addToTrip": "Ajouter à un voyage…",
+      "window": "Fenêtre",
+      "help": "Aide",
+      "helpAbout": "À propos d'OpenDives"
+    },
+    "figure": {
+      "maxDepth": "Prof. max",
+      "duration": "Durée",
+      "meanDepth": "Prof. moy.",
+      "temperature": "Temp.",
+      "gas": "Gaz",
+      "sac": "Consommation"
+    },
+    "tab": {
+      "info": "Informations",
+      "equipment": "Équipement",
+      "gas": "Gaz",
+      "notes": "Notes",
+      "map": "Carte"
+    },
+    "noNotes": "Aucune note pour cette plongée.",
+    "noGas": "Aucun gaz noté pour cette plongée.",
+    "noEquipment": "Aucun équipement noté pour cette plongée.",
+    "noMap": "Le site de cette plongée n’a pas de coordonnées.",
+    "columnsShown": "Colonnes affichées",
+    "moreLogbook": "Plus d'options du carnet",
+    "undo": {
+      "editDive": "Modifier la plongée",
+      "editTrip": "Modifier le voyage",
+      "editSite": "Modifier le site",
+      "filters": "Modifier les filtres",
+      "addSite": "Ajouter le site",
+      "addDive": "Ajouter la plongée",
+      "addToTrip": "Ajouter au voyage",
+      "removeFromTrip": "Retirer du voyage",
+      "createTrip": "Créer le voyage",
+      "mergeTrips": "Fusionner les voyages",
+      "autogroup": "Regrouper en voyages",
+      "ungroup": "Défaire les voyages automatiques",
+      "mergeSites": "Fusionner les sites",
+      "deleteSites": "Supprimer les sites",
+      "deleteDives": "Supprimer les plongées",
+      "import": "Importer",
+      "renumber": "Renuméroter",
+      "cylinderType": "Renommer le type de bouteille",
+      "computers": "Modifier les ordinateurs",
+      "replan": "Planifier la plongée"
+    },
+    "undoNamed": "Annuler : {action}",
+    "redoNamed": "Rétablir : {action}",
+    "undoPlain": "Annuler",
+    "redoPlain": "Rétablir",
+    "filter": "Filtrer…",
+    "filterOn": "Filtrer… (filtre appliqué)",
+    "renumberDives": "Renuméroter les plongées…",
+    "mergePreviousTrip": "Fusionner avec le voyage précédent",
+    "mergeNextTrip": "Fusionner avec le voyage suivant",
+    "resetColumns": "Rétablir l'ordre des colonnes",
+    "columnWillMove": "« {column} » sera placé entre {before} et {after}",
+    "columnWillMoveLast": "« {column} » sera placé en dernier",
+    "export": {
+      "which": "Quelles plongées",
+      "selection": {
+        "one": "La plongée sélectionnée",
+        "other": "Les {n} plongées sélectionnées"
+      },
+      "filtered": {
+        "one": "La plongée filtrée",
+        "other": "Les {n} plongées filtrées"
+      },
+      "all": "Tout le carnet",
+      "format": "Format",
+      "action": "Exporter…",
+      "saved": {
+        "one": "Plongée exportée",
+        "other": "{n} plongées exportées"
+      },
+      "fileDives": "plongees",
+      "fileLogbook": "carnet",
+      "logbook": "Exporter le carnet…"
+    }
+  },
+  "desktopFollowups": {
+    "newLogbook": {
+      "gitUsername": "Nom d’utilisateur",
+      "gitUsernameHelp": "Facultatif. Il sert avec le jeton à se connecter au dépôt.",
+      "errorUsername": "Le nom ne peut contenir ni espace ni caractère spécial."
+    },
+    "siteMerge": {
+      "title": "Fusionner les sites ?",
+      "which": "Site à garder"
     }
   }
 }

@@ -43,9 +43,10 @@
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { formatDateTime, formatLongDate, formatTimeAgo, localNowIso } from '../lib/format.js';
+  import { formatDateTime, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
+  import { logbookSummary } from '../lib/logbook-summary.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
@@ -913,20 +914,7 @@
   });
 
   /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
-  const bandSummary = $derived.by(() => {
-    if (releaseEmpty) return emptyBand;
-    if (!logbook.dives.length) return '';
-    const sites = new Set(logbook.dives.map((d) => d.site).filter(Boolean)).size;
-    // A dive dated in the future (a dive computer's clock) is not the last one done.
-    const now = localNowIso();
-    const latest = logbook.dives.reduce((a, d) => (d.date <= now && d.date > a ? d.date : a), '');
-    // "dernière plongée il y a 9 mois" is one unbreakable block, and a "·" never starts a
-    // line: a long summary moves the whole block to the second row (docs/ui-writing.md, 8).
-    const last = latest ? t('band.lastDive', { ago: formatTimeAgo(latest) }).replace(/ /g, ' ') : '';
-    return [t('band.dives', { n: logbook.dives.length }), t('band.sites', { n: sites }), last]
-      .filter(Boolean)
-      .join(' · ');
-  });
+  const bandSummary = $derived(releaseEmpty ? emptyBand : logbookSummary(logbook.dives));
 
   /** Number of dives shown: follows the search (the filter row counts the filter). */
   const count = $derived(

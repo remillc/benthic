@@ -536,5 +536,13 @@
       letter-spacing: 0.4px;
       color: var(--od-text-2);
     }
+
+
+    /* Mouse: the 8 % layer of the text colour over the field. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-select-field--trigger:hover {
+        background: color-mix(in srgb, var(--od-text) 8%, transparent);
+      }
+    }
   }
 </style>
