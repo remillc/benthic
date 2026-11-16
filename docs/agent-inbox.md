@@ -4278,7 +4278,7 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and 
 
 Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.
 
-## [ ] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
+## [x] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-formats-link`, started from `feature/release-first-launch-complete` (task 224). Do not merge it into `main`.
 
@@ -4289,6 +4289,8 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{
 - The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
 
 **Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
+
+Done on `feature/release-formats-link` (not merged; it also carries main, so the CSV import and the import of several files live together): the link is the row right under « Un fichier », before divelogs.de, on the import and unreadable-file screens (the same step), a 48 dp target with 4 dp of padding, 4 dp from each row, read as a link. Checked in headless Edge at 1280 × 800; test in `tests/app/import-formats.test.mjs`.
 
 ## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
 
