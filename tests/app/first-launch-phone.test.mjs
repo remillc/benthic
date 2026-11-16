@@ -66,22 +66,35 @@ test('the profile of the band has no dot and no chips on a phone', () => {
   );
 });
 
-test("the phone bands are the alpha's hatched dark blue: its tokens, no SectionBand, no wave, a straight bottom edge (task 244)", () => {
+test("the welcome hero is the alpha's hatched dark blue; the steps band takes the section band's look (tasks 244, 251)", () => {
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.doesNotMatch(page, /SectionBand|od-section-band|layout\.phone/);
-  assert.doesNotMatch(page, /od-section-band--wave|release-band-gradient|<svg[^>]*wave/i);
+  assert.doesNotMatch(page, /SectionBand|layout\.phone|release-band-gradient/);
   const theme = read('theme.css');
   assert.doesNotMatch(theme, /--od-release-band-gradient/);
   const token = (name) => theme.match(new RegExp(`${name}: ([^;]*);`))[1];
   assert.equal(token('--od-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
   assert.equal(token('--od-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
   assert.equal(token('--od-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
+  // Task 251: the section band's radial gradient, its light centre at -40 %.
+  assert.equal(token('--od-first-step-band'), 'radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)');
   const phone = page.slice(page.lastIndexOf('@media (max-width: 767.98px)'));
-  assert.match(phone, /background: var\(--od-first-band\)/);
+  // The hero (330 dp) keeps the hatched blue, its sheen and its hatching.
+  assert.match(phone, /background: var\(--od-first-band\);/);
   assert.match(phone, /od-welcome-release--panel-light \{\s+background: var\(--od-first-band-sheen\)/);
   assert.match(phone, /od-welcome-release--panel-bands \{\s+background: var\(--od-first-band-hatch\)/);
-  assert.doesNotMatch(phone, /border-radius|clip-path/);
-  // The hatching fades out at 55 % of the height (the tablet panel's rule, shared).
+  // The steps band: gradient, no sheen, the faint profile (10 % area, 30 % line, 1.5 dp) and the 18 dp wave in the page colour.
+  assert.match(phone, /od-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--od-first-step-band\)/);
+  assert.match(phone, /od-welcome-release--compact \.od-welcome-release--panel-light \{\s+display: none/);
+  assert.match(phone, /fill: var\(--od-band-profile-area\)/);
+  assert.match(phone, /stroke: var\(--od-band-profile-line\);\s+stroke-width: 1\.5/);
+  assert.match(phone, /od-welcome-release--panel-wave \{\s+display: block;[^}]*height: 18px/);
+  assert.match(phone, /od-welcome-release--panel-wave path \{\s+fill: var\(--od-background\)/);
+  assert.match(page, /M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z/);
+  assert.equal(token('--od-band-profile-area'), 'rgb(255 255 255 / 0.1)');
+  assert.equal(token('--od-band-profile-line'), 'rgb(255 255 255 / 0.3)');
+  // Neither the profile nor the wave shows outside a phone step band.
+  assert.match(page, /\.od-welcome-release--panel-profile,\s+\.od-welcome-release--panel-wave \{\s+display: none/);
+  // The rays fade out at 55 % of the height (the tablet panel's rule, shared).
   assert.match(page, /mask-image: linear-gradient\(180deg, black 0%, transparent 55%\)/);
 });
 
