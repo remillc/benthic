@@ -6,6 +6,7 @@ import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
+import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
@@ -39,6 +40,12 @@ export const logbook = $state({
   sync: 'local',
   /** Where the running sync is (lib/sync-progress.js); shown while sync is "syncing". */
   syncProgress: /** @type {import('./sync-progress.js').SyncProgress|null} */ (null),
+  /**
+   * The download after signing in, on the alpha first launch (task 2026-11-16-233): where it is, and the count of
+   * what the core received; null when none runs.
+   * @type {{ progress: import('./sync-progress.js').SyncProgress|null, n: number, total: number }|null}
+   */
+  firstDownload: null,
   loading: true,
   /**
    * The top of the list as it was at the last load (lib/snapshot.js): drawn
@@ -783,6 +790,31 @@ export function startWithoutAccount() {
 }
 
 /**
+ * Alpha first launch on a phone, after signing in: the account's logbook is downloaded while first launch
+ * stays open on its download screen (`logbook.firstDownload` says where it is); it closes when the logbook is
+ * there. The result is false when the download failed or was cancelled: first launch stays open.
+ * @param {() => boolean} [cancelled] true once the diver cancelled (the account was signed out)
+ * @returns {Promise<boolean>}
+ */
+export async function downloadAccountLogbook(cancelled = () => false) {
+  logbook.firstDownload = { progress: null, n: 0, total: 0 };
+  logbook.lastSync = null;
+  try {
+    await loadLogbook({ force: true });
+    if (cancelled()) {
+      logbook.error = null;
+      return false;
+    }
+    if (logbook.error) return false;
+    logbook.welcome = false;
+    writeWelcomeState('done');
+    return true;
+  } finally {
+    logbook.firstDownload = null;
+  }
+}
+
+/**
  * Signed in, or a new account with its first logbook: first launch closes
  * and the logbook of the account is loaded (its credentials are stored).
  */
@@ -899,6 +931,15 @@ if (typeof window !== 'undefined') {
   // Where the sync is: only while one is shown as running.
   OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
     if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);
+    const first = logbook.firstDownload;
+    if (first) {
+      first.progress = nextProgress(message, first.progress);
+      const count = transferCount(message);
+      if (count) {
+        first.n = count.n;
+        first.total = count.total;
+      }
+    }
   }).catch((/** @type {unknown} */ e) => console.error('Sync progress', e));
 }
 
