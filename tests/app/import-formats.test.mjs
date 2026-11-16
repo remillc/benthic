@@ -113,3 +113,17 @@ test('the link is on the source screen, which also shows the error; the beta doe
     assert.doesNotMatch(src(beta), /ImportFormats|import-formats/, beta);
   }
 });
+
+test('task 226: the link sits right under « Un fichier », before divelogs.de, as a 48 dp target read as a link', () => {
+  const steps = src('components/FirstLaunchSteps.svelte');
+  const imp = steps.slice(steps.indexOf("{:else if step === 'import'}"), steps.indexOf("{:else if step === 'importDivelogs'"));
+  const file = imp.indexOf("title={t('welcomeSteps.fileTitle')}");
+  const link = imp.indexOf('<ImportFormats />');
+  const divelogs = imp.indexOf("title={t('welcomeSteps.divelogsTitle')}");
+  assert.ok(file > 0 && file < link && link < divelogs);
+  const c = src('components/ImportFormats.svelte');
+  assert.match(c, /role="link" class="od-import-formats--link"/);
+  const rule = /\.od-import-formats--link \{([^]*?)\n    \}\n/.exec(c)[1];
+  assert.match(rule, /min-height: 48px;/);
+  assert.match(rule, /padding: 0 4px;/);
+});

@@ -14,7 +14,7 @@
   const state = $state({ formatsOpen: false });
 </script>
 
-<button type="button" class="od-import-formats--link" onclick={() => openFormats(state)}>{t('importFormats.link')}</button>
+<button type="button" role="link" class="od-import-formats--link" onclick={() => openFormats(state)}>{t('importFormats.link')}</button>
 
 {#if state.formatsOpen}
   <Md3Dialog class="od-import-formats" title={t('importFormats.title')} text={t('importFormats.text')} oncancel={() => closeFormats(state)}>
@@ -46,12 +46,15 @@
 
 <style>
   @layer od.components {
+    /* Under « Un fichier » (task 2026-11-16-226): a 48 dp touch target, 4 dp of padding on each side,
+       4 dp from each row (the rows' 12 px gap less 8). */
     .od-import-formats--link {
       align-self: flex-start;
       width: auto;
+      min-height: 48px;
       text-align: start;
-      margin: 16px 0 0;
-      padding: 0;
+      margin: -8px 0;
+      padding: 0 4px;
       border: none;
       background: transparent;
       color: var(--od-release-link);

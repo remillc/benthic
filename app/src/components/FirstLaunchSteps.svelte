@@ -449,9 +449,10 @@
           {/if}
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
             <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp', { n: IMPORT_FORMAT_COUNT })} disabled={busy} onclick={() => fileInput?.click()} />
+            <!-- Task 2026-11-16-226: the link sits right under « Un fichier », a 48 dp target 4 dp from each row. -->
+            <ImportFormats />
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
-          <ImportFormats />
           <input type="file" multiple class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
           {#if csv}
             <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
