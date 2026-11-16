@@ -47,14 +47,15 @@ test('the count is the report\'s total, and the lines the dialog draws', () => {
   for (const f of IMPORT_FORMATS) assert.ok(!/csv|dl7|smarttrak/i.test(f.name + f.extensions.join()), f.name);
 });
 
-test('the help line, the dialog text and the error read the count from the list, not a number written in the texts', () => {
+test('the help line reads the count from the list; the dialog shows no number (task 224)', () => {
   const steps = src('components/FirstLaunchSteps.svelte');
   assert.match(steps, /welcomeSteps\.fileHelp', \{ n: IMPORT_FORMAT_COUNT \}/);
-  assert.match(src('components/ImportFormats.svelte'), /importFormats\.text', \{ n: IMPORT_FORMAT_COUNT \}/);
+  // The dialog says no number of formats: the text is fixed and the component does not read the count.
+  assert.doesNotMatch(src('components/ImportFormats.svelte'), /IMPORT_FORMAT_COUNT|\{ n:/);
   for (const lang of ['fr', 'en']) {
     const j = json(lang);
     assert.match(j.welcomeSteps.fileHelp, /^\{n\} formats/, lang);
-    assert.match(j.importFormats.text, /\{n\}/, lang);
+    assert.doesNotMatch(j.importFormats.text, /\{n\}|\d/, lang);
     assert.doesNotMatch(JSON.stringify(j.importFormats) + j.welcomeSteps.fileHelp + j.welcomeSteps.fileUnreadableHelp, /\b30\b|CSV/, lang);
   }
 });
@@ -68,7 +69,8 @@ test('the texts exist in French and English', () => {
   }
   const fr = json('fr').importFormats;
   assert.equal(fr.link, 'Voir les formats acceptés');
-  assert.deepEqual(Object.values(fr.column), ['Formats ouverts', 'Montres et ordinateurs de plongée', 'Autres carnets']);
+  assert.equal(fr.text, 'Importez vos plongées depuis n’importe lequel de ces formats.');
+  assert.deepEqual(Object.values(fr.column), ['Formats ouverts', 'Montres et ordinateurs', 'Autres carnets']);
 });
 
 test('the link opens the dialog; « Fermer », the scrim and Back all end in the same close', () => {

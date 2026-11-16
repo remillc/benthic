@@ -1137,6 +1137,15 @@ html.ios {
       }
     }
 
+    /* The line above the items of a menu that names what it acts on (the logbook's name and where it is kept). */
+    .od-menu .od-menu-label {
+      list-style: none;
+      padding: 12px 16px 4px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+    }
+
     /* A 1 dp divider between groups of items, 8 dp above and below. */
     .od-menu .od-menu-divider {
       height: 1px;

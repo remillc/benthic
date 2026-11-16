@@ -388,6 +388,13 @@
       margin-left: 16px;
     }
 
+    /* The release edition's empty logbook in portrait: the list pane is the whole width, under the band (task 224). */
+    @media (orientation: portrait) {
+      :global(.view-master-detail:not(:has(.page-master-detail)):has(.od-release-empty)) {
+        --f7-page-master-width: 100%;
+      }
+    }
+
     /* Nothing chosen yet. */
     :global(.view-master-detail:not(:has(.page-master-detail))::after) {
       content: var(--od-no-dive);

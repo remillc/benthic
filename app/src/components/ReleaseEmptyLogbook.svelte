@@ -73,10 +73,13 @@
       flex-direction: column;
     }
 
-    :global(.od-release-empty--profile) {
-      height: 160px;
-      width: 100%;
-      margin-bottom: 36px;
+    /* Wider than the column (task 224): 724 dp in landscape, 624 dp in portrait, never closer than 48 dp to the
+       edges of the pane (it is 844 dp wide in landscape on a 1 280 dp screen: 60 dp on each side). */
+    .od-release-empty--column :global(.od-release-empty--profile) {
+      align-self: center;
+      height: 172px;
+      width: min(724px, calc(100vw - var(--od-nav-width, 96px) - var(--f7-page-master-width, 340px) - 96px));
+      margin-bottom: 32px;
     }
 
     .od-release-empty--title {
@@ -189,6 +192,19 @@
       flex: none;
       display: flex;
       color: var(--od-text-2);
+    }
+
+    /* Portrait: the list pane takes the whole width (App.svelte), the column sits under the band in the page. */
+    @media (orientation: portrait) {
+      .od-release-empty {
+        position: static;
+        padding: 24px 0 32px;
+        overflow: visible;
+      }
+
+      .od-release-empty--column :global(.od-release-empty--profile) {
+        width: min(624px, calc(100vw - var(--od-nav-width, 96px) - 80px));
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -15,7 +15,9 @@
   import ImportFormats from './ImportFormats.svelte';
   import FirstLaunchGit from './FirstLaunchGit.svelte';
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
-  import { flow, go, goBack, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
+  import FirstLaunchWebdav from './FirstLaunchWebdav.svelte';
+  import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
+  import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
@@ -75,12 +77,37 @@
   /** @param {string} key */
   function pickService(key) {
     flow.service = key;
-    go('service');
+    go(key === 'webdav' ? 'webdav' : 'service');
   }
 
-  /** « Se connecter à {service} »: idea #74 is not built yet, the message says so. */
+  /**
+   * « Se connecter à {service} » and « Réessayer »: the provider's page opens in the browser and the screen
+   * waits for the answer. Idea #74 is not built yet: until then nothing opens and the message says so.
+   */
   function signIn() {
-    cloud();
+    if (!CLOUD_CONNECTION_AVAILABLE) return cloud();
+    flow.connection = connectionNext(flow.connection, 'start');
+  }
+
+  /** « Rouvrir la page »: the provider's page again, in the browser. */
+  function reopenPage() {
+    if (!CLOUD_CONNECTION_AVAILABLE) return cloud();
+  }
+
+  /** « Annuler » of the connection in progress: back to « Se connecter ». */
+  function cancelConnection() {
+    flow.connection = connectionNext(flow.connection, 'cancel');
+  }
+
+  /** « Retour » on the first screen of a first launch entered from the logbook's menu: the logbook stays as it was. */
+  function leave() {
+    logbook.welcome = false;
+    resetFlow();
+  }
+
+  /** « Changer de compte » of « Aucun carnet dans ce compte »: the list of services. */
+  function otherAccount() {
+    goBackTo('openCloudService');
   }
 
   /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of the name step. */
@@ -96,9 +123,13 @@
     if (!source) return null;
     if (source.kind === 'file') return () => importFile(source.file);
     return async () => {
-      const file = await downloadedFile(source.path, (p) => Capacitor.convertFileSrc(p), (u) => fetch(u));
-      const added = await importFile(file);
-      await OpenDivesCore.discardImport({ path: source.path }).catch(() => {});
+      // A resumable download is several files (one per batch), each imported then discarded.
+      let added = 0;
+      for (const path of source.paths ?? [source.path]) {
+        const file = await downloadedFile(path, (p) => Capacitor.convertFileSrc(p), (u) => fetch(u));
+        added += await importFile(file);
+        await OpenDivesCore.discardImport({ path }).catch(() => {});
+      }
       return added;
     };
   }
@@ -196,9 +227,9 @@
     }
   }
 
-  /** @param {{ path: string, dives: number }} read the divelogs.de download, read */
+  /** @param {{ path: string, paths?: string[], dives: number }} read the divelogs.de download, read */
   function divelogsRead(read) {
-    importIsRead({ kind: 'divelogs', path: read.path, name: t('welcomeSteps.defaultName'), summary: summariseImport(read.dives) });
+    importIsRead({ kind: 'divelogs', path: read.path, paths: read.paths, name: t('welcomeSteps.defaultName'), summary: summariseImport(read.dives) });
   }
 
   /** « Voir mes carnets »: the logbooks of the account, the only one opened at once (idea #74). */
@@ -224,13 +255,14 @@
     openCloudConnect: 'welcomeSteps.openTitle',
     openCloudConnected: 'welcomeSteps.openTitle',
     openChoose: 'welcomeSteps.chooseTitle',
+    openWebdav: 'welcomeSteps.openTitle',
     openGit: 'welcomeSteps.openTitle',
   });
 </script>
 
 {#snippet backButton()}
-  {#if hasBack(step)}
-    <button type="button" class="od-first-launch--back" onclick={goBack}>
+  {#if hasBack(step, flow.origin === 'menu')}
+    <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : goBack}>
       <span class="od-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
   {/if}
@@ -255,15 +287,24 @@
   </div>
 {/snippet}
 
-{#snippet hero(connected)}
+{#snippet hero(/** @type {'idle'|'waiting'|'refused'|'connected'} */ state)}
+  {@const connected = state === 'connected'}
   <div class="od-first-launch--hero">
     <div class="od-first-launch--hero-end">
       <span class="od-first-launch--hero-tile"><img src="logo-light.svg" alt="" width="48" height="48" /></span>
       <span class="od-first-launch--hero-name">{t('welcomeSteps.appName')}</span>
     </div>
-    <div class="od-first-launch--hero-link" class:od-first-launch--hero-linked={connected}>
+    <div class="od-first-launch--hero-link" class:od-first-launch--hero-linked={connected} class:od-first-launch--hero-waiting={state === 'waiting'} class:od-first-launch--hero-refused={state === 'refused'}>
       <span class="od-first-launch--hero-line"></span>
-      <span class="od-first-launch--hero-badge"><Icon name={connected ? 'check' : 'link'} size={connected ? 16 : 14} weight={connected ? 2.6 : 1.8} /></span>
+      <span class="od-first-launch--hero-badge">
+        {#if state === 'waiting'}
+          <span class="od-first-launch--spinner" aria-hidden="true"></span>
+        {:else if state === 'refused'}
+          <span class="od-first-launch--hero-question" aria-hidden="true">?</span>
+        {:else}
+          <Icon name={connected ? 'check' : 'link'} size={connected ? 16 : 14} weight={connected ? 2.6 : 1.8} />
+        {/if}
+      </span>
       <span class="od-first-launch--hero-line"></span>
     </div>
     <div class="od-first-launch--hero-end">
@@ -271,6 +312,32 @@
       <span class="od-first-launch--hero-name">{serviceName}</span>
     </div>
   </div>
+{/snippet}
+
+{#snippet connecting()}
+  {@render hero(flow.connection)}
+  {#if flow.connection === 'waiting'}
+    <p class="od-first-launch--status" role="status">{t('welcomeSteps.connecting')}</p>
+    <p class="od-first-launch--status-help">{t('welcomeSteps.connectingHelp')}</p>
+    <div class="od-first-launch--buttons">
+      <button type="button" class="od-first-launch--outlined" onclick={cancelConnection}>{t('welcomeSteps.cancel')}</button>
+      <button type="button" class="od-first-launch--quiet" onclick={reopenPage}>
+        <Icon name="openInNew" size={18} />{t('welcomeSteps.reopenPage')}
+      </button>
+    </div>
+  {:else if flow.connection === 'refused'}
+    <p class="od-first-launch--status od-first-launch--status-error" role="alert">{t('welcomeSteps.refusedTitle')}</p>
+    <p class="od-first-launch--status-help">{t('welcomeSteps.refusedHelp')}</p>
+    <button type="button" class="od-first-launch--action" onclick={signIn}>
+      <Icon name="openInNew" size={18} />{t('welcomeSteps.retry')}
+    </button>
+  {:else}
+    <p class="od-first-launch--status">{t('welcomeSteps.notConnected')}</p>
+    <button type="button" class="od-first-launch--action" onclick={signIn}>
+      <Icon name="openInNew" size={18} />{t('welcomeSteps.connect', { service: serviceName })}
+    </button>
+    <p class="od-first-launch--hint">{t('welcomeSteps.connectHint')}</p>
+  {/if}
 {/snippet}
 
 {#snippet nameAndWhere()}
@@ -320,22 +387,21 @@
           {@render serviceList()}
         {:else if step === 'cloudConnect' || step === 'cloudConnected'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.connectTitle', { service: serviceName })}</h3>
-          {@render hero(step === 'cloudConnected')}
           {#if step === 'cloudConnect'}
-            <p class="od-first-launch--status">{t('welcomeSteps.notConnected')}</p>
-            <p class="od-first-launch--status-help">{t('welcomeSteps.notConnectedHelp')}</p>
-            <button type="button" class="od-first-launch--action" onclick={signIn}>
-              <Icon name="openInNew" size={18} />{t('welcomeSteps.connect', { service: serviceName })}
-            </button>
+            {@render connecting()}
           {:else}
+            {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.connectedCreate', { file: fileName })}</p>
             <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
             <button type="button" class="od-first-launch--action" onclick={cloud}>{t('welcomeSteps.createLogbook')}</button>
           {/if}
+        {:else if step === 'webdav'}
+          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
+          <FirstLaunchWebdav create oncoming={cloud} />
         {:else if step === 'git'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
-          <FirstLaunchGit create router={f7router} afterConnect={afterGit} onopen={() => go('openLink')} />
+          <FirstLaunchGit create router={f7router} afterConnect={afterGit} onswitch={() => go('openLink')} />
         {:else if step === 'import'}
           <p class="od-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
           {#if unreadable}
@@ -366,14 +432,10 @@
           {@render serviceList()}
         {:else if step === 'openCloudConnect' || step === 'openCloudConnected'}
           <p class="od-first-launch--lead od-first-launch--lead-tight">{t('welcomeSteps.connectTitle', { service: serviceName })}</p>
-          {@render hero(step === 'openCloudConnected')}
           {#if step === 'openCloudConnect'}
-            <p class="od-first-launch--status">{t('welcomeSteps.notConnected')}</p>
-            <p class="od-first-launch--status-help">{t('welcomeSteps.notConnectedHelp')}</p>
-            <button type="button" class="od-first-launch--action" onclick={signIn}>
-              <Icon name="openInNew" size={18} />{t('welcomeSteps.connect', { service: serviceName })}
-            </button>
+            {@render connecting()}
           {:else}
+            {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.openConnectedHelp')}</p>
             <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
@@ -381,7 +443,19 @@
           {/if}
         {:else if step === 'openChoose'}
           <p class="od-first-launch--lead">{t('welcomeSteps.chooseHelp', { account: flow.account, service: serviceName })}</p>
-          <div class="od-first-launch--list">
+          {#if chooseOutcome(flow.found) === 'none'}
+            <!-- Nothing in the OpenDives folder (mock-up …-ouvrir-aucun-carnet-paysage). -->
+            <div class="od-first-launch--empty">
+              <span class="od-first-launch--empty-tile"><Icon name="logbook" size={24} /></span>
+              <p class="od-first-launch--empty-title">{t('welcomeSteps.noLogbookTitle')}</p>
+              <p class="od-first-launch--empty-text">{t('welcomeSteps.noLogbookText')}</p>
+            </div>
+            <div class="od-first-launch--buttons">
+              <button type="button" class="od-first-launch--outlined" onclick={otherAccount}>{t('welcomeSteps.changeAccount')}</button>
+              <button type="button" class="od-first-launch--action od-first-launch--action-inline" onclick={() => go('createHere')}>{t('welcomeSteps.createHere')}</button>
+            </div>
+          {/if}
+          <div class="od-first-launch--list" hidden={chooseOutcome(flow.found) === 'none'}>
             {#each flow.found as found (found.id)}
               <button type="button" class="od-first-launch--list-row" onclick={cloud}>
                 <span class="od-first-launch--list-tile"><Icon name="logbook" size={22} /></span>
@@ -393,9 +467,12 @@
               </button>
             {/each}
           </div>
+        {:else if step === 'openWebdav'}
+          <p class="od-first-launch--lead od-first-launch--lead-tight">{t('welcomeSteps.webdavTitle')}</p>
+          <FirstLaunchWebdav create={false} oncoming={cloud} />
         {:else if step === 'openGit'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
-          <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} />
+          <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} />
         {/if}
       </section>
     {/key}
@@ -748,7 +825,7 @@
     /* The link between OpenDives and the service. */
     .od-first-launch--hero {
       margin-top: 14px;
-      padding: 22px 24px 18px;
+      padding: 22px 64px 18px;
       border-radius: 24px;
       background: linear-gradient(180deg, var(--od-release-hero) 0%, var(--od-background) 100%);
       display: flex;
@@ -821,6 +898,59 @@
       }
     }
 
+    .od-first-launch--hero-waiting {
+      .od-first-launch--hero-line {
+        border-top-color: var(--od-release-row-main);
+      }
+
+      .od-first-launch--hero-badge {
+        background: var(--od-surface);
+        box-shadow: 0 1px 4px var(--od-release-row-shadow-hover);
+      }
+    }
+
+    .od-first-launch--hero-refused {
+      .od-first-launch--hero-line {
+        border-top-color: var(--od-alarm);
+      }
+
+      .od-first-launch--hero-badge {
+        background: var(--od-error-container);
+        color: var(--od-alarm);
+      }
+    }
+
+    .od-first-launch--hero-question {
+      font-size: 14px;
+      line-height: 14px;
+      font-weight: 700;
+    }
+
+    /* The wait for the provider's page: a ring turning on the link. */
+    @keyframes od-first-launch-spin {
+      to { rotate: 360deg; }
+    }
+
+    .od-first-launch--spinner {
+      box-sizing: border-box;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--od-release-track);
+      border-top-color: var(--od-release-row-main);
+      border-radius: 50%;
+      animation: od-first-launch-spin 0.9s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .od-first-launch--spinner {
+        animation: none;
+      }
+    }
+
+    .od-first-launch--status-error {
+      color: var(--od-alarm);
+    }
+
     .od-first-launch--status {
       margin: 28px 0 0;
       text-align: center;
@@ -832,6 +962,119 @@
     .od-first-launch--status-help {
       margin: 2px 0 0;
       text-align: center;
+      font-size: 14px;
+      line-height: 19px;
+      color: var(--od-text-2);
+    }
+
+    /* The line under « Se connecter à… », right-aligned with the button. */
+    .od-first-launch--hint {
+      align-self: flex-end;
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .od-first-launch--buttons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 24px;
+      margin-top: 22px;
+    }
+
+    .od-first-launch--outlined {
+      width: auto;
+      height: 48px;
+      padding: 0 22px;
+      border: 1px solid var(--od-release-field-border);
+      border-radius: 24px;
+      background: transparent;
+      color: var(--od-text);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-release-hover);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-row-main);
+        outline-offset: 2px;
+      }
+    }
+
+    /* A text button: « Rouvrir la page ». */
+    .od-first-launch--quiet {
+      width: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--od-release-link);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-release-hover);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-row-main);
+      }
+    }
+
+    .od-first-launch--action.od-first-launch--action-inline {
+      margin-top: 0;
+    }
+
+    /* « Aucun carnet dans ce compte ». */
+    .od-first-launch--empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 32px 30px;
+      border: 1px solid var(--od-surface-container-highest);
+      border-radius: 24px;
+      background: var(--od-surface);
+      text-align: center;
+    }
+
+    .od-first-launch--empty-tile {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-release-tile);
+      color: var(--od-release-tile-icon);
+    }
+
+    .od-first-launch--empty-title {
+      margin: 14px 0 0;
+      font-size: 17px;
+      line-height: 22px;
+      font-weight: 600;
+    }
+
+    .od-first-launch--empty-text {
+      margin: 4px 0 0;
       font-size: 14px;
       line-height: 19px;
       color: var(--od-text-2);

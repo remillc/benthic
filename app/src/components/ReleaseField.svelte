@@ -3,6 +3,8 @@
   // An outlined text field of the release edition's first launch (task 2026-11-15-218; mock-ups
   // docs/mockups/android-tablette-premier-lancement-production-*.dc.html): 1 dp outline, 2 dp in the blue on
   // focus, the label on the outline, 12 dp corners. 52 dp high (56 dp for the logbook's name).
+  import Icon from './Icon.svelte';
+
   let uid = 0;
 
   /**
@@ -58,11 +60,13 @@
       onchange={() => onchange?.()}
     />
     <label class="od-release-field--label" for={id}>{label}</label>
+    {#if error}<span class="od-release-field--error-icon" aria-hidden="true"><Icon name="error" size={20} /></span>{/if}
   </div>
   {#if error}
     <p class="od-release-field--note od-release-field--note-error" id="{id}-help" role="alert">{error}</p>
-  {:else if help}
-    <p class="od-release-field--note" id="{id}-help">{help}</p>
+  {/if}
+  {#if help}
+    <p class="od-release-field--note" id={error ? undefined : `${id}-help`}>{help}</p>
   {/if}
 </div>
 
@@ -135,10 +139,23 @@
       color: var(--od-release-row-main);
     }
 
+    /* The error mark at the end of the field (mock-up …-webdav-erreur-paysage). */
+    .od-release-field--error-icon {
+      position: absolute;
+      top: 0;
+      right: 14px;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      color: var(--od-alarm);
+      pointer-events: none;
+    }
+
     .od-release-field--error {
       .od-release-field--input,
       .od-release-field--input:focus {
-        border-color: var(--od-alarm);
+        border: 2px solid var(--od-alarm);
+        padding: 0 15px;
       }
 
       .od-release-field--label {

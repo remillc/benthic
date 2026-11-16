@@ -4,21 +4,24 @@
 // can check the order of every path.
 //
 // Paths:
-//   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | git | device)
+//   start → new → where (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
 //   start → import → (file | importDivelogs → importProgress) → importNew → where as above
-//   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openGit)
+//   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
+//
+// The connection to a cloud service (« Se connecter », in progress, refused) is not a step: it is the
+// state of the connect step (lib/cloud-connection.js), so that « Retour » leaves it in one move.
 
 /**
- * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'git'
+ * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
- *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openGit'} Step
+ *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'} Step
  */
 
 /** The steps that hold the name field: the pencil of the later steps goes back to the last of them. */
 const NAME_STEPS = /** @type {Step[]} */ (['new', 'importNew']);
 
 /** The steps after the name, where the logbook's name is the page title. */
-const TITLED_STEPS = /** @type {Step[]} */ (['cloudService', 'cloudConnect', 'cloudConnected', 'git']);
+const TITLED_STEPS = /** @type {Step[]} */ (['cloudService', 'cloudConnect', 'cloudConnected', 'webdav', 'git']);
 
 /** @type {Record<string, Step>} */
 const FORWARD = {
@@ -30,6 +33,7 @@ const FORWARD = {
   'importNew:cloud': 'cloudService',
   'importNew:git': 'git',
   'cloudService:service': 'cloudConnect',
+  'cloudService:webdav': 'webdav',
   'cloudConnect:connected': 'cloudConnected',
   'import:divelogs': 'importDivelogs',
   'importDivelogs:submit': 'importProgress',
@@ -37,9 +41,13 @@ const FORWARD = {
   'open:cloud': 'openCloudService',
   'open:git': 'openGit',
   'openCloudService:service': 'openCloudConnect',
+  'openCloudService:webdav': 'openWebdav',
   'openCloudConnect:connected': 'openCloudConnected',
   'openCloudConnected:list': 'openChoose',
+  'openChoose:createHere': 'cloudConnected',
+  'webdav:openLink': 'open',
   'git:openLink': 'open',
+  'openGit:createLink': 'new',
 };
 
 /**
@@ -74,6 +82,17 @@ export function back(stack) {
 }
 
 /**
+ * « Changer de compte » of « Aucun carnet dans ce compte »: back to the given step, when it is in the stack.
+ * @param {Step[]} stack
+ * @param {Step} step
+ * @returns {Step[]}
+ */
+export function backToStep(stack, step) {
+  const at = stack.lastIndexOf(step);
+  return at >= 0 ? stack.slice(0, at + 1) : stack;
+}
+
+/**
  * The pencil of the page title: back to the step that holds the name field.
  * @param {Step[]} stack
  * @returns {Step[]}
@@ -100,11 +119,25 @@ export function hasLogbookTitle(step) {
 }
 
 /**
- * Whether the step shows a « Retour »: not the first screen, not the running import (it has « Annuler »).
+ * Whether the step shows a « Retour »: not the first screen, not the running import (it has « Annuler »). The
+ * first screen has one when the first launch was entered from the logbook's menu (« Ouvrir un autre carnet »,
+ * « Nouveau carnet »): it leaves the first launch and the logbook stays as it was.
  * @param {Step} step
+ * @param {boolean} [leavable] the first launch can be left
  */
-export function hasBack(step) {
-  return step !== 'start' && step !== 'importProgress';
+export function hasBack(step, leavable = false) {
+  if (step === 'start') return leavable;
+  return step !== 'importProgress';
+}
+
+/**
+ * The stack of the first launch entered from the logbook's menu: « Ouvrir un autre carnet » opens the « Ouvrir mon
+ * carnet OpenDives » step, « Nouveau carnet » the name step, both above the first screen.
+ * @param {'open'|'new'} first
+ * @returns {Step[]}
+ */
+export function menuEntry(first) {
+  return ['start', first];
 }
 
 /**

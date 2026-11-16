@@ -7,7 +7,7 @@
   // system Back (lib/back-button.js). The list is lib/import-formats.js, the same lines as the report.
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
-  import { FORMAT_COLUMNS, IMPORT_FORMAT_COUNT, formatsOf, openFormats, closeFormats } from '../lib/import-formats.js';
+  import { FORMAT_COLUMNS, formatsOf, openFormats, closeFormats } from '../lib/import-formats.js';
   import { t } from '../lib/i18n.js';
 
   const icons = /** @type {const} */ ({ open: 'file', devices: 'wristComputer', logbooks: 'logbook' });
@@ -17,7 +17,7 @@
 <button type="button" class="od-import-formats--link" onclick={() => openFormats(state)}>{t('importFormats.link')}</button>
 
 {#if state.formatsOpen}
-  <Md3Dialog class="od-import-formats" title={t('importFormats.title')} text={t('importFormats.text', { n: IMPORT_FORMAT_COUNT })} oncancel={() => closeFormats(state)}>
+  <Md3Dialog class="od-import-formats" title={t('importFormats.title')} text={t('importFormats.text')} oncancel={() => closeFormats(state)}>
     <div class="od-import-formats--columns">
       {#each FORMAT_COLUMNS as column (column)}
         <section class="od-import-formats--column" aria-labelledby="od-import-formats-{column}">

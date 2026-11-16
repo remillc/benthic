@@ -9,6 +9,7 @@
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
+  import { flow } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -17,7 +18,7 @@
 
 <Page class="od-welcome-release" noToolbar>
   <div class="od-welcome-release--page">
-    <section class="od-welcome-release--panel">
+    <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
       <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
       <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
       <div class="od-welcome-release--brand">
@@ -130,7 +131,8 @@
       margin: 42px 0 96px;
     }
 
-    /* Portrait: the panel across the top (640 dp), the steps centred below it with 120 dp side margins. */
+    /* Portrait: the panel across the top (640 dp, 540 dp from the second step on: a compact hero), the steps
+       centred below it with 120 dp side margins. */
     @media (orientation: portrait) {
       .od-welcome-release--page {
         flex-direction: column;
@@ -140,6 +142,10 @@
         width: auto;
         height: 640px;
         padding-top: calc(max(var(--f7-safe-area-top, 0px), 24px) + 40px);
+      }
+
+      .od-welcome-release--compact {
+        height: 540px;
       }
 
       .od-welcome-release--headline {

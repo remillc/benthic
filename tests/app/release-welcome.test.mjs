@@ -20,6 +20,7 @@ const sources = {
   steps: read('components/FirstLaunchSteps.svelte'),
   git: read('components/FirstLaunchGit.svelte'),
   divelogs: read('components/FirstLaunchDivelogs.svelte'),
+  webdav: read('components/FirstLaunchWebdav.svelte'),
   row: read('components/ReleaseChoiceRow.svelte'),
   field: read('components/ReleaseField.svelte'),
   empty: read('components/ReleaseEmptyLogbook.svelte'),
@@ -183,7 +184,7 @@ test('the import summary reads sites and years from Subsurface XML, only the cou
 
 test('every text of the release screens is in fr and en, none is unused', () => {
   const keys = new Set();
-  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
+  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
   }
   assert.ok(keys.size >= 80, `only ${keys.size} keys found`);
@@ -244,8 +245,9 @@ test('four cloud services with generic icons, never a brand logo; « coming » u
   const shown = [];
   cloudComing((text) => shown.push(text), (key) => `<${key}>`);
   assert.deepEqual(shown, ['<welcomeSteps.cloudSoon>']);
-  // « Se connecter à {service} », « Changer de compte » and « Créer le carnet » (connected) say so.
-  assert.match(sources.steps, /function signIn\(\) \{\s*cloud\(\);/);
+  // « Se connecter à {service} », « Changer de compte » and « Créer le carnet » (connected) say so
+  // (task 224: « Se connecter » starts the connection once the cloud exists, see first-launch-complete.test.mjs).
+  assert.match(sources.steps, /function signIn\(\) \{\s*if \(!CLOUD_CONNECTION_AVAILABLE\) return cloud\(\);/);
   assert.match(sources.steps, /function cloud\(\) \{\s*cloudComing\(showSnackbar, t\);/);
 });
 
@@ -281,7 +283,8 @@ test('a file or a divelogs.de download goes into the new device logbook with the
   await createDeviceLogbook(again.deps, async () => 1);
   assert.ok(!again.calls.some((c) => c[0] === 'remove'), 'an existing device logbook keeps its dives');
   assert.match(sources.steps, /importFile\(source\.file\)/);
-  assert.match(sources.steps, /downloadedFile\(source\.path/);
+  // A resumable divelogs.de download is several files (task 224): each is read back, imported and discarded.
+  assert.match(sources.steps, /for \(const path of source\.paths \?\? \[source\.path\]\)[\s\S]*downloadedFile\(path/);
 });
 
 test('the picked file is read first without touching anything; no dive, or unreadable, leaves first launch as it was', async () => {
@@ -376,8 +379,10 @@ test('the profile is drawn to the size it is given and keeps its shape', () => {
 test('the left panel is kept and plays its line only when the page opens, not on each step', () => {
   assert.match(sources.page, /<ReleaseProfile \/>/);
   assert.match(sources.page, /<FirstLaunchSteps \{f7router\} \/>/);
-  // The panel is outside the stepped column and takes no step state.
-  assert.doesNotMatch(sources.page, /first-launch\.svelte/);
+  // The panel is outside the stepped column: its content does not change with the step. Only its height does, in
+  // portrait (540 dp from the second step on, task 224).
+  assert.doesNotMatch(sources.page, /\{#key|\{#if[^}]*flow\./);
+  assert.match(sources.page, /flow\.stack\.length > 1/);
   assert.match(sources.profile, /1\.6s cubic-bezier\(0\.2, 0, 0, 1\)/);
 });
 

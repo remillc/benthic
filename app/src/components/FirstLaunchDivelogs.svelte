@@ -11,7 +11,7 @@
   import Icon from './Icon.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
   import { flow, go, goBack } from '../lib/first-launch.svelte.js';
-  import { checkDivelogs, downloadDivelogs } from '../lib/first-launch-import.js';
+  import { canResume, checkDivelogs, discardParts, downloadDivelogs, downloadDivelogsResumable, failureKind } from '../lib/first-launch-import.js';
   import { errorCode } from '../lib/account.js';
   import { t } from '../lib/i18n.js';
 
@@ -29,6 +29,14 @@
     download: (/** @type {any} */ o) => OpenDivesCore.divelogsDownload(o),
     count: (/** @type {any} */ o) => OpenDivesCore.importCount(o),
     discard: (/** @type {any} */ o) => OpenDivesCore.discardImport(o),
+    // The resumable download needs the plugin to list the account's dives and to download by ids; it has neither
+    // yet (plugins/opendives-core/core-api.js), so a lost connection keeps nothing and goes back to the form.
+    ...(typeof (/** @type {any} */ (OpenDivesCore).divelogsList) === 'function'
+      ? {
+          list: (/** @type {any} */ o) => /** @type {any} */ (OpenDivesCore).divelogsList(o),
+          downloadIds: (/** @type {any} */ o) => OpenDivesCore.divelogsDownload(o),
+        }
+      : {}),
   };
 
   const ready = $derived(!!d.user.trim() && !!d.password && !busy);
@@ -45,7 +53,7 @@
       go('submit');
     } catch (e) {
       const code = errorCode(e);
-      d.error = code === 'LOGIN_FAILED' ? t('bringLogbook.refused') : code === 'NETWORK' || code === 'NETWORK_LOST' ? t('importProgress.offline') : t('importProgress.downloadFailed');
+      d.error = code === 'LOGIN_FAILED' ? t('welcomeSteps.divelogsDenied') : code === 'NETWORK' || code === 'NETWORK_LOST' ? t('importProgress.offline') : t('importProgress.downloadFailed');
     } finally {
       busy = false;
     }
@@ -54,36 +62,50 @@
   /** The progress screen: the download, then the read; « Annuler » keeps nothing. */
   async function run() {
     cancelled = false;
+    d.interrupted = false;
+    const credentials = { user: d.user, password: d.password };
+    const report = (/** @type {{ phase: 'download'|'read', done: number, total: number }} */ s) => {
+      d.phase = s.phase;
+      d.done = s.done;
+      d.total = s.total;
+    };
     try {
-      const read = await downloadDivelogs(
-        calls,
-        { user: d.user, password: d.password },
-        d.total,
-        (s) => {
-          d.phase = s.phase;
-          d.done = s.done;
-          d.total = s.total;
-        },
-        () => cancelled,
-      );
+      const read = canResume(calls)
+        ? await downloadDivelogsResumable(/** @type {any} */ (calls), credentials, d.progress, report, () => cancelled)
+        : await downloadDivelogs(calls, credentials, d.total, report, () => cancelled);
       // The credentials are no longer needed.
       d.password = '';
       if (read) onread(read);
     } catch (e) {
+      const code = errorCode(e);
+      // Part of the dives came in and the connection was lost: the screen stops, the dives received are kept and
+      // the password stays in memory for « Reprendre ».
+      if (failureKind(code, d.progress.done) === 'interrupted') {
+        d.interrupted = true;
+        return;
+      }
       d.password = '';
-      d.error = errorCode(e) === 'NO_DIVES' ? t('importProgress.readFailed') : t('importProgress.downloadFailed');
+      d.error = code === 'NO_DIVES' ? t('importProgress.readFailed') : t('importProgress.downloadFailed');
+      await discardParts(calls, d.progress);
       if (!cancelled) goBack();
     }
   }
 
+  /** « Annuler »: keeps nothing, the dives already received are deleted. */
   function cancel() {
     cancelled = true;
     d.password = '';
+    void discardParts(calls, d.progress);
     goBack();
   }
 
+  /** « Reprendre »: only the dives still missing are downloaded. */
+  function resume() {
+    void run();
+  }
+
   onMount(() => {
-    if (step === 'importProgress') void run();
+    if (step === 'importProgress' && !d.interrupted) void run();
     return () => {
       // The form is left for anything but the progress screen: the password is forgotten.
       if (step === 'importDivelogs' && flow.stack[flow.stack.length - 1] !== 'importProgress') d.password = '';
@@ -91,6 +113,7 @@
       if (step === 'importProgress') {
         cancelled = cancelled || d.phase !== 'read';
         d.password = '';
+        if (d.phase !== 'read') void discardParts(calls, d.progress);
       }
     };
   });
@@ -109,18 +132,29 @@
         <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.progressAccount', { user: account })}</span>
       </span>
     </div>
-    <div class="od-first-launch-divelogs--step">
-      <span class="od-first-launch-divelogs--mark" class:od-first-launch-divelogs--done={d.phase === 'read'} class:od-first-launch-divelogs--current={d.phase === 'download'}>
-        {#if d.phase === 'read'}<Icon name="check" size={16} weight={2.6} />{:else}<span class="od-first-launch-divelogs--dot"></span>{/if}
-      </span>
-      <span class="od-first-launch-divelogs--text">
-        <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-current">{t('welcomeSteps.progressDownload')}</span>
-        <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.progressCount', { done: d.done, total: d.total })}</span>
-      </span>
-    </div>
-    <div class="od-first-launch-divelogs--bar">
-      <LinearWavyProgress value={d.total ? d.done / d.total : 0} label={t('welcomeSteps.progressDownload')} />
-    </div>
+    {#if d.interrupted}
+      <!-- A lost connection with part of the dives kept (mock-up …-importer-divelogs-interrompu-paysage). -->
+      <div class="od-first-launch-divelogs--step" role="alert">
+        <span class="od-first-launch-divelogs--mark od-first-launch-divelogs--failed"><span class="od-first-launch-divelogs--bang" aria-hidden="true">!</span></span>
+        <span class="od-first-launch-divelogs--text">
+          <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-failed">{t('welcomeSteps.interrupted')}</span>
+          <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.interruptedDetail', { done: d.done, total: d.total })}</span>
+        </span>
+      </div>
+    {:else}
+      <div class="od-first-launch-divelogs--step">
+        <span class="od-first-launch-divelogs--mark" class:od-first-launch-divelogs--done={d.phase === 'read'} class:od-first-launch-divelogs--current={d.phase === 'download'}>
+          {#if d.phase === 'read'}<Icon name="check" size={16} weight={2.6} />{:else}<span class="od-first-launch-divelogs--dot"></span>{/if}
+        </span>
+        <span class="od-first-launch-divelogs--text">
+          <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-current">{t('welcomeSteps.progressDownload')}</span>
+          <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.progressCount', { done: d.done, total: d.total })}</span>
+        </span>
+      </div>
+      <div class="od-first-launch-divelogs--bar">
+        <LinearWavyProgress value={d.total ? d.done / d.total : 0} label={t('welcomeSteps.progressDownload')} />
+      </div>
+    {/if}
     <div class="od-first-launch-divelogs--step">
       <span class="od-first-launch-divelogs--mark" class:od-first-launch-divelogs--current={d.phase === 'read'}>
         {#if d.phase === 'read'}<span class="od-first-launch-divelogs--dot"></span>{/if}
@@ -130,8 +164,16 @@
       </span>
     </div>
   </div>
-  <p class="od-first-launch-divelogs--help">{t('welcomeSteps.progressHelp')}</p>
-  <button type="button" class="od-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+  {#if d.interrupted}
+    <p class="od-first-launch-divelogs--help">{t('welcomeSteps.interruptedHelp', { n: d.done })}</p>
+    <div class="od-first-launch-divelogs--buttons">
+      <button type="button" class="od-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+      <button type="button" class="od-first-launch-divelogs--action od-first-launch-divelogs--resume" onclick={resume}>{t('welcomeSteps.resume')}</button>
+    </div>
+  {:else}
+    <p class="od-first-launch-divelogs--help">{t('welcomeSteps.progressHelp')}</p>
+    <button type="button" class="od-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+  {/if}
 {/if}
 
 <style>
@@ -194,6 +236,17 @@
       color: var(--od-release-on-panel);
     }
 
+    .od-first-launch-divelogs--failed {
+      border: none;
+      background: var(--od-alarm);
+    }
+
+    .od-first-launch-divelogs--bang {
+      font-size: 15px;
+      line-height: 16px;
+      font-weight: 700;
+    }
+
     .od-first-launch-divelogs--done {
       border: none;
       background: var(--od-release-ok);
@@ -227,6 +280,11 @@
       font-weight: 600;
     }
 
+    .od-first-launch-divelogs--name-failed {
+      font-weight: 600;
+      color: var(--od-alarm);
+    }
+
     .od-first-launch-divelogs--waiting {
       color: var(--od-text-2);
     }
@@ -248,6 +306,16 @@
       font-size: 14px;
       line-height: 19px;
       color: var(--od-text-2);
+    }
+
+    .od-first-launch-divelogs--buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .od-first-launch-divelogs--resume {
+      margin-top: 0;
     }
 
     .od-first-launch-divelogs--cancel {

@@ -19,6 +19,7 @@
   import { scanQr } from '../lib/qr-receive.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import { enterFromMenu } from '../lib/first-launch.svelte.js';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
@@ -881,6 +882,21 @@
    */
   const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
 
+  /** « Renommer le carnet » and « Changer d'endroit »: no flow yet, the message says so. */
+  function emptyMenuSoon() {
+    showSnackbar(t('welcomeSteps.menuSoon'));
+  }
+
+  /**
+   * « Ouvrir un autre carnet » and « Nouveau carnet »: the first launch opens at its step; « Retour » on its first
+   * screen leaves it.
+   * @param {'open'|'new'} first
+   */
+  function openFirstLaunch(first) {
+    enterFromMenu(first);
+    logbook.welcome = true;
+  }
+
   /** « Mon carnet · Dépôt git » then « Aucune plongée »: the logbook's name and where it is kept. */
   const emptyBand = $derived.by(() => {
     let name = t('welcomeSteps.defaultName');
@@ -1159,7 +1175,13 @@
       {/if}
       <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120); iPhone: last. -->
       {#if !theme.ios}<AccountAvatar />{/if}
-      {#if logbook.dives.length || logbook.preview}
+      {#if releaseEmpty}
+        <!-- The empty logbook of the release edition on a tablet: the logbook's own menu (task 224). -->
+        <Link iconOnly popoverOpen=".od-logbook-empty-menu">
+          <Icon name="more" weight={4} />
+          <span class="od-sr-only">{t('detail.moreOptions')}</span>
+        </Link>
+      {:else if logbook.dives.length || logbook.preview}
         <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
           <span class="od-sr-only">{t('detail.moreOptions')}</span>
@@ -1322,6 +1344,26 @@
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
   {:else if filtered && sorted.length === 0}
     <Block><p>{t('logbook.noFilterResults')}</p></Block>
+  {/if}
+
+  <!--
+    The menu of the empty logbook on a release tablet (mock-up android-tablette-carnet-vide-menu-paysage): the
+    logbook's name and where it is kept, then what can be done with the logbook itself. Rename and « Changer
+    d'endroit » have no flow yet (they say so); the two others open the first launch at its step.
+  -->
+  {#if releaseEmpty}
+    <Popover class="od-menu od-logbook-empty-menu" backdrop={false}>
+      <List noChevron mediaList>
+        <li class="od-menu-label">{emptyBand.split('\n')[0]}</li>
+        <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={emptyMenuSoon} />
+        <MenuItem icon="cloudUpload" text={t('welcomeSteps.menuMove')} supporting={t('welcomeSteps.menuMoveHint')} onclick={emptyMenuSoon} />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
+        <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={t('welcomeSteps.menuExportNone')} disabled />
+      </List>
+    </Popover>
   {/if}
 
   <!--
@@ -1520,6 +1562,16 @@
     /* The snapshot of the start: a tap is held until the real list is there. */
     .od-logbook--preview {
       user-select: none;
+    }
+
+    /* The menu of the empty logbook: 296 dp, each line on one line (mock-up …-carnet-vide-menu-paysage). */
+    :global(.od-logbook-empty-menu) {
+      width: 296px;
+    }
+
+    :global(.od-logbook-empty-menu .item-title),
+    :global(.od-logbook-empty-menu .item-text) {
+      white-space: nowrap;
     }
 
     /* Selection mode: over the top bar, the same height. */

@@ -14,7 +14,8 @@
   import { normaliseGitUrl, validGitToken, validGitUsername } from '../lib/account-validation.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { accountReady } from '../lib/logbook.svelte.js';
-  import { gitUserName } from '../lib/first-launch-git.js';
+  import { flow } from '../lib/first-launch.svelte.js';
+  import { gitProblem, gitProblemFromCode, gitUserName } from '../lib/first-launch-git.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -22,18 +23,31 @@
    *   create: boolean,
    *   router: any,
    *   afterConnect?: () => Promise<unknown>,
-   *   onopen?: () => void,
+   *   onswitch?: () => void,
    * }}
    * `create`: the repository must be empty (a new logbook); otherwise it must hold a logbook. `afterConnect`
-   * runs once the logbook is open (the imported dives, the label). `onopen`: the note's link, only when creating.
+   * runs once the logbook is open (the imported dives, the label). `onswitch`: the link to the other path
+   * (« Ouvrir mon carnet OpenDives » when creating, « Créer un carnet » when opening).
    */
-  let { create, router, afterConnect, onopen } = $props();
+  let { create, router, afterConnect, onswitch } = $props();
 
   let url = $state('');
   let branch = $state('main');
   let token = $state('');
   let busy = $state(false);
   let formError = $state('');
+  /** The repository does not fit the path: told under the address, with the link to the other path. */
+  let problem = $state(/** @type {''|'notEmpty'|'noLogbook'} */ (flow.gitProblem));
+  const problemText = $derived(problem === 'notEmpty' ? t('welcomeSteps.gitNotEmpty') : problem === 'noLogbook' ? t('welcomeSteps.gitEmptyOpen') : '');
+  const hint = $derived(
+    problem ? t(problem === 'notEmpty' ? 'welcomeSteps.gitNotEmptyHint' : 'welcomeSteps.gitEmptyOpenHint').split('{link}') : [],
+  );
+  const switchText = $derived(t(create ? 'welcomeSteps.openTitle' : 'welcomeSteps.createTitle'));
+  /** Typing again clears what was told about the repository. */
+  const edited = () => {
+    problem = '';
+    formError = '';
+  };
 
   const addressLive = liveError(
     () => url,
@@ -46,6 +60,7 @@
     if (!ready) return;
     busy = true;
     formError = '';
+    problem = '';
     try {
       const address = url.trim();
       const username = gitUserName(address, validGitUsername);
@@ -59,11 +74,11 @@
         return;
       }
       if (create && !found.empty) {
-        formError = t('welcomeSteps.gitNotEmpty');
+        problem = gitProblem(create, found);
         return;
       }
       if (!create && found.empty) {
-        formError = t('welcomeSteps.gitEmptyOpen');
+        problem = gitProblem(create, found);
         return;
       }
       if (!create && !found.branches.includes(branch.trim())) {
@@ -79,7 +94,7 @@
       if (code === 'DENIED' || code === 'BAD_CREDENTIALS') formError = t('gitRepo.tokenDenied');
       else if (code === 'NETWORK') formError = t('gitRepo.errorNetwork');
       else if (code === 'BAD_ADDRESS') formError = t('gitRepo.addressInvalid');
-      else if (code === 'NO_LOG' || code === 'LOG_EXISTS' || code === 'NOT_EMPTY') formError = t(create ? 'welcomeSteps.gitNotEmpty' : 'welcomeSteps.gitEmptyOpen');
+      else if (gitProblemFromCode(create, code)) problem = gitProblemFromCode(create, code);
       else formError = t('gitRepo.errorFailed');
     } finally {
       busy = false;
@@ -93,30 +108,35 @@
   }
 
   /** @param {MouseEvent} e */
-  function openLink(e) {
+  function switchPath(e) {
     e.preventDefault();
-    onopen?.();
+    onswitch?.();
   }
 
   const note = $derived(t('welcomeSteps.gitNote').split('{link}'));
 </script>
 
 <div class="od-first-launch-git">
-  <ReleaseField label={t('welcomeSteps.gitAddress')} bind:value={url} mono error={addressLive.error} disabled={busy} autocomplete="url" />
+  <ReleaseField label={t('welcomeSteps.gitAddress')} bind:value={url} mono error={addressLive.error || problemText} disabled={busy} autocomplete="url" oninput={edited} />
   <div class="od-first-launch-git--pair">
-    <ReleaseField class="od-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} />
+    <ReleaseField class="od-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} oninput={edited} />
     <ReleaseField class="od-first-launch-git--token" label={t('welcomeSteps.gitToken')} bind:value={token} type="password" error={tokenLive.error} disabled={busy} />
   </div>
-  <div class="od-first-launch-git--token-help">
-    <span>{t('welcomeSteps.gitTokenHelp')}</span>
-    <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
-  </div>
+  {#if problem}
+    <!-- The repository does not fit this path (mock-ups …-git-erreur-paysage, …-ouvrir-git-erreur-paysage). -->
+    <p class="od-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="od-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
+  {:else}
+    <div class="od-first-launch-git--token-help">
+      <span>{t('welcomeSteps.gitTokenHelp')}</span>
+      <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
+    </div>
 
-  {#if create}
-    <p class="od-first-launch-git--note">
-      <span class="od-first-launch-git--note-icon"><Icon name="info" size={20} /></span>
-      <span>{note[0]}<a href="/welcome/open" class="od-first-launch-git--link od-first-launch-git--inline" onclick={openLink}>{t('welcomeSteps.openTitle')}</a>{note[1]}</span>
-    </p>
+    {#if create}
+      <p class="od-first-launch-git--note">
+        <span class="od-first-launch-git--note-icon"><Icon name="info" size={20} /></span>
+        <span>{note[0]}<a href="/welcome/open" class="od-first-launch-git--link od-first-launch-git--inline" onclick={switchPath}>{t('welcomeSteps.openTitle')}</a>{note[1]}</span>
+      </p>
+    {/if}
   {/if}
   {#if formError}<p class="od-first-launch-git--error" role="alert">{formError}</p>{/if}
 
@@ -151,6 +171,13 @@
       justify-content: space-between;
       gap: 12px;
       margin: 4px 0 0 16px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .od-first-launch-git--hint {
+      margin: 6px 0 0 16px;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
