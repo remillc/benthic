@@ -4612,7 +4612,7 @@ The step content sits on the paper side, in the column of the release tablet ste
 
 **Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
 
-## [ ] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
+## [x] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/bureau-demarrage-actuel.dc.html` (no logbook open in the window) and `docs/mockups/bureau-carnet-vide-actuel.dc.html` (empty logbook).
 
@@ -4622,3 +4622,5 @@ In the desktop app, the navigation rail always ends with « Réglages » (gear, 
 - **Empty logbook:** the rail is the full one, with « Réglages » and the avatar.
 
 **Test:** open a window with no logbook. The four sections are dimmed, and « Réglages » and the avatar are at the bottom of the rail and open their screens. Open an empty logbook: the rail shows the same two items.
+
+Done: already the behaviour of the desktop app (`feature/desktop-logbook`), checked in the desktop app at 1440 × 900: with no logbook open, the four sections are at 38 % and unavailable while « Réglages » (Ctrl+, / ⌘,) and the account avatar keep full colour and open Réglages and the account sheet; with a logbook open the rail is the full one with both items. No code change; only the mock-ups lacked the two items.
