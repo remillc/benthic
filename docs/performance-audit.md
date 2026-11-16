@@ -225,10 +225,30 @@ The phone layout (F7 virtual list) is not touched by this fix and was not re-mea
 - `app/src/components/AdaptivePage.svelte` (the `adopt` hand-over, `before` / `known` references), F7 page stack keeps old pages.
 - Fix: on swap, destroy the old layout's component and drop `before`/`known`; confirm with a heap snapshot which object holds the detached tree (F7 `f7Page` data of the adopted element is the first suspect). Statistics/sites pages could render lazily when first shown.
 
+**After (branch `perf/single-layout-profile`, 16 November 2026).** Measured on top of fix 1 (`measure-leak.mjs`, `Memory.getDOMCounters` after two forced GCs). The component was already mounting one layout only (`{#if layout.desktop}`); what stayed was the *old page element*: after a swap the detached `.page` of the other layout, with its whole subtree, stayed reachable from the browser's native tables (a heap snapshot shows a retained `<input type="file">` of the old logbook page pointing to its page element and an older Framework7 page object). `AdaptivePage.adopt` now empties the old page element once the new one has taken its place (`replaceChildren()`), so a stray reference keeps a shell, not a layout.
+
+| CDP nodes | start | after 1 cycle | after 2 | after 4 | after 8 |
+|---|---|---|---|---|---|
+| s500 before / after | 12,564 / 12,564 | 22,626 / 13,762 | 22,785 / 13,921 | 23,085 / 14,221 | 23,687 / 14,823 |
+| s3000 before / after | 12,625 / 12,625 | 22,662 / 13,786 | 22,821 / 13,945 | 23,121 / 14,245 | 23,723 / 14,847 |
+
+(With the table not virtualised the first cycle cost +29k nodes at 500 dives and +130k at 3,000; fix 1 brought it to +10k, this fix to +1.2k.) About +75 nodes and +3 listeners per later cycle remain (a heap snapshot after four cycles shows 908 detached nodes: Svelte template fragments and comments, a few SVG nodes); not chased. Not done: keeping the Sites and Statistics pages unmounted until first shown.
+
 ### F6. Profile draws every sample (impact: medium, effort: S-M)
 
 - Evidence: `DiveProfile.svelte:142-148` builds `line` and `water` paths with one `L` per sample, `toFixed(1)` each; at 10,800 samples that is four 117-121 KB path strings (line, water, temperature, one more) and a 255 ms task when opening; `getDive` answers 826 KB (76 bytes per sample, tissues are 16 floats per sample). Hover stays cheap (16 ms/frame). `DiveProfile.svelte:61` spreads `Math.max(1, ...depths, ...)`: fine now, but throws a `RangeError` above about 120,000 samples (a 33 h dive at 1 s; unlikely, cheap to fix with a loop).
 - Fix: downsample to at most 2 points per pixel of plot width (min/max per pixel bucket keeps peaks), keep full arrays for the hover lookup; request tissues only when the Tissus layer is on (core option) or decimate them in the façade. Effort S in JavaScript for the path; M for the payload.
+
+**After (same branch).** `lib/profile-decimate.js`: each pixel column of the plot keeps four samples (first, lowest, highest, last); a gas switch, a change of ceiling violation and both sides of a gap in a series are kept whatever the zoom; the ends are kept; a profile with at most two samples per pixel is drawn whole; the paths are rebuilt when the plot width changes, not at a cursor move; the hover, the tooltip and the gas bands read the full arrays. The `Math.max(...depths)` spread is a loop. Measured on the `long` logbook (10,800 samples, wide window 458 px plot):
+
+| | before | after |
+|---|---|---|
+| SVG path `d` lengths (depth line, water, ceiling/other, temperature), bytes | 120,978 / 120,958 / 120,958 / 116,188 | 15,293 / 15,273 / 15,273 / 12,875 |
+| Long tasks when opening the dive, 1x CPU (ms) | 197, 57, 226, 74, 78, 64, 82, 65 | 192, 424, 71, 88, 60, 104, 88 |
+| Long tasks, 4x CPU (ms) | 199, 217, 77, 80, 67, 434, 161, 329, 67 | 199, 95, 89, 54, 543, 232, 415, 56 |
+| Hover, frame average, 4x CPU (ms) | 19.7 | 20.1 |
+
+The paths are eight times smaller, but the opening time did not move measurably: it is dominated by the 826 KB `getDive` parse and the detail pane's other content, not by the path strings. The payload (tissues for every sample) is the remaining F6 item and is not touched here.
 
 ### F7. File logbooks rewritten whole after every save (impact: potentially high, effort: M; not measured)
 

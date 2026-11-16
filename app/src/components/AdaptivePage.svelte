@@ -75,6 +75,9 @@
     const el = /** @type {HTMLElement|undefined} */ ([...router.el.children].find((child) => child.classList.contains('page') && !(/** @type {any} */ (child).f7Page)));
     // Framework7 may have moved the old page out of the range Svelte removes: it goes now.
     if (old.el.isConnected) old.el.remove();
+    // The page left behind is not used again, but Framework7's page objects and the browser's own tables may still point
+    // at one of its nodes; emptied, it keeps a shell instead of the whole layout (a page of the other layout is thousands of nodes).
+    old.el.replaceChildren();
     if (!el) return;
     const dom = app.$;
     const f7Page = old.f7Page;

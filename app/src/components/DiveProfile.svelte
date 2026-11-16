@@ -13,6 +13,7 @@
   import { t } from '../lib/i18n.js';
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
+  import { decimate, changesAt } from '../lib/profile-decimate.js';
   import { readLayers, saveLayers, setLayer } from '../lib/profile-layers.js';
 
   /**
@@ -71,7 +72,12 @@
   const times = $derived(samples.timeSeconds);
   const depths = $derived(samples.depthMm);
   const tMax = $derived(Math.max(1, times.length ? times[times.length - 1] : durationSeconds));
-  const dMax = $derived(Math.max(1, ...depths, maxDepthMm));
+  const dMax = $derived.by(() => {
+    // A loop, not Math.max(...depths): a spread of a very long dive overflows the call stack.
+    let deepest = Math.max(1, maxDepthMm);
+    for (let i = 0; i < depths.length; i++) if (depths[i] > deepest) deepest = depths[i];
+    return deepest;
+  });
 
   // Depth axis: a labelled graduation with a grid line every 40 ft (10 m),
   // the first label with the unit; a 5 px tick every 10 ft (2 m).
@@ -152,10 +158,21 @@
   /** @param {number} mm */
   const y = (mm) => MARGIN_TOP + (mm / dMax) * scaleHeight;
 
+  // The samples each curve draws: all of them for a short profile, else a few per pixel column
+  // (lib/profile-decimate.js). Worked out again when the plot's width changes, not at each cursor move.
+  /** @param {ArrayLike<number>} values @param {(i: number) => boolean} [valid] @param {(i: number) => boolean} [must] */
+  const drawn = (values, valid, must) => decimate(times, values, { width: plotWidth, tMax, valid, must }) ?? times.map((_, i) => i);
+  const switches = $derived(changesAt(samples.cylinder));
+  const depthIndices = $derived.by(() => {
+    const ceiling = samples.ceilingMm;
+    const violation = (/** @type {number} */ i) => !!ceiling && ceiling[i] > depths[i];
+    return drawn(depths, undefined, (i) => switches(i) || (i > 0 && violation(i) !== violation(i - 1)));
+  });
+
   const paths = $derived.by(() => {
     if (!times.length) return null;
     let line = '';
-    for (let i = 0; i < times.length; i++) line += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(depths[i]).toFixed(1)}`;
+    for (const i of depthIndices) line += `${line ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(depths[i]).toFixed(1)}`;
     const last = times.length - 1;
     const water = `${line}L${x(times[last]).toFixed(1)},${y(0).toFixed(1)}L${x(times[0]).toFixed(1)},${y(0).toFixed(1)}Z`;
     return { line, water };
@@ -173,7 +190,7 @@
     const { mk } = temperature;
     let d = '';
     let pen = false;
-    for (let i = 0; i < times.length; i++) {
+    for (const i of drawn(mk, (k) => mk[k] > 0, switches)) {
       if (!(mk[i] > 0)) {
         pen = false;
         continue;
@@ -188,7 +205,7 @@
   const ppo2Path = $derived.by(() => {
     if (!ppo2Available) return '';
     let d = '';
-    for (let i = 0; i < times.length; i++) d += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yPpo2(samples.ppo2Mbar[i] / 1000).toFixed(1)}`;
+    for (const i of drawn(samples.ppo2Mbar, undefined, switches)) d += `${d ? 'L' : 'M'}${x(times[i]).toFixed(1)},${yPpo2(samples.ppo2Mbar[i] / 1000).toFixed(1)}`;
     return d;
   });
   const ppo2Labels = $derived([
@@ -206,7 +223,7 @@
   const calcCeilingEdge = $derived.by(() => {
     if (!calcCeilingMm || !calcCeilingMm.some((v) => v > 0) || !times.length) return null;
     let edge = '';
-    for (let i = 0; i < times.length; i++) edge += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(calcCeilingMm[i]).toFixed(1)}`;
+    for (const i of drawn(calcCeilingMm)) edge += `${edge ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(calcCeilingMm[i]).toFixed(1)}`;
     return edge;
   });
   const ceilingAvailable = $derived((!!ceilingMm && ceilingMm.some((v) => v > 0)) || !!calcCeilingEdge);
@@ -214,7 +231,7 @@
   const ceilingShape = $derived.by(() => {
     if (!ceilingAvailable || !ceilingMm || !times.length) return null;
     let edge = '';
-    for (let i = 0; i < times.length; i++) edge += `${i ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(ceilingMm[i]).toFixed(1)}`;
+    for (const i of drawn(ceilingMm)) edge += `${edge ? 'L' : 'M'}${x(times[i]).toFixed(1)},${y(ceilingMm[i]).toFixed(1)}`;
     const last = times.length - 1;
     return { edge, area: `${edge}L${x(times[last]).toFixed(1)},${y(0).toFixed(1)}L${x(times[0]).toFixed(1)},${y(0).toFixed(1)}Z` };
   });
