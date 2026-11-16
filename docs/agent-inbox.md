@@ -4428,7 +4428,7 @@ Christian decided this on 16 November 2026. The app on `main` (with the Subsurfa
 
 Done on main: the badge of task 225 now says « Alpha » (fr and en) and the brand row is named « OpenDives, alpha »; look, size and place unchanged; the release note of 225 updated. The desktop shows the same first-launch screen in a narrow window; its window without a logbook (task 222) has no badge.
 
-## [ ] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
+## [x] 2026-11-16-233 Alpha: the first launch on Android phones, in the new style
 
 Christian approved this on 16 November 2026. **Alpha (the app on `main`, with the Subsurface account)**: do it on `main`. Phones first. On tablets, the first-launch screen keeps its current layout, with the badge of task 229.
 
@@ -4485,7 +4485,9 @@ All texts in `fr.json` and `en.json`.
 - « Retour » goes back one step.
 - On a tablet, nothing changes but the badge.
 
-## [ ] 2026-11-16-234 Correction to 233: welcome band blue and a smaller Alpha badge
+Done: on `feature/alpha-phone-first-launch` (from `main`). **Phones only** (`newFirstLaunch`, `app/src/lib/first-launch.js`: Android look below 768 dp); tablets and iOS are unchanged (headless 1280 × 800 and 800 × 1280 welcome screenshots before and after are byte-identical; a tablet sign-in still has the navbar and the card). New: `components/FirstLaunchBand.svelte` (welcome band and step header), `pages/FirstDownload.svelte` (`/welcome/downloading`), `pages/WithoutAccount.svelte` (`/welcome/local`), the `firstLaunch` mode of `EditorialPage` (« Retour » link, title, content on the page, full-width 48 dp buttons, the About link at the bottom), the `outlined` field of `AccountField` (52 dp, label on the border), tokens `--od-first-*` and `--od-outlined-field-*` in `theme.css` (light and dark), keys `firstLaunch.*` and `logbook.emptyLocal` (fr and en; fr-CA falls back to fr, it already says « courriel »), four release-note lines. **Sign in:** sign-in, then the download screen (three steps, `n sur N` and the wavy indicator from the core's sync messages, « Annuler » signs out again), then the logbook opens with « Carnet téléchargé… ». An account without a logbook still goes to « Reprendre votre carnet ? ». **Create:** step 1 of 2, the code as « étape 2 sur 2 » (fixed on every platform), then the new account's empty logbook (the dives of this device, if any, are its first dives) with « Compte créé… »; the choice of source is skipped on a phone (import and divelogs.de stay in the empty logbook). **Sans compte:** the new screen, then « Commencer » creates the logbook with « Carnet créé sur ce téléphone. »; the empty logbook reads « Sur ce téléphone seulement, aucune plongée ». « Utiliser mon propre dépôt git » is untouched. Differences from the mock-ups: the count `n sur N` is the core's transfer count (objects of the git transfer, not dives: the core does not know the number of dives before it reads the log); step titles are drawn at 24 sp (the mock-ups' own stylesheet shrinks the 28 sp titles to 24 sp); the welcome badge fill is 12 % instead of 18 % (see 234). Tests: `tests/app/first-launch.test.mjs`; all of `tests/app` green. No e2e flow reads these screens (`tests/e2e` only covers the planner).
+
+## [x] 2026-11-16-234 Correction to 233: welcome band blue and a smaller Alpha badge
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/android-accueil-c.dc.html`.
 
@@ -4499,7 +4501,9 @@ Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `doc
 
 **Test:** on a phone, the welcome band matches the tablet's blue panel (gradient, sheen, hatching), white text on it stays at least 4.5:1, and the Alpha badge is 18 dp tall.
 
-## [ ] 2026-11-16-235 Correction to 234: the Alpha badge is even smaller on phone
+Done: the welcome band (`FirstLaunchBand`, 330 dp) uses the tablet's blue panel through tokens `--od-first-band` (gradient `#2A6FB0 0% → #1F5C99 22% → #0C3866 70% → #072A4D 100%`), `--od-first-band-sheen` and `--od-first-band-hatch` (hatching masked to transparent at 55 %). Contrast, measured in headless Edge on the rendered band (lightest pixel under each text, text hidden; light and dark are identical): « OpenDives » 4.76:1, headline 7.55:1, the line under it (white 78 %) 6.72:1, the badge on the welcome band **4.04:1 with the specified 18 % fill, so its fill is 12 % there (4.57:1)**; the point 2 size of this task is replaced by 235.
+
+## [x] 2026-11-16-235 Correction to 234: the Alpha badge is even smaller on phone
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-accueil-c.dc.html` and `docs/mockups/android-premier-lancement-*.dc.html` (alpha screens).
 
@@ -4512,7 +4516,9 @@ This replaces the 18 dp badge in task 234 point 2. Point 1 of task 234 (band bac
 
 **Test:** on a phone, the Alpha badge is 16 dp tall on the welcome screen and on every first-launch step.
 
-## [ ] 2026-11-16-236 Correction to 233: the header of the first-launch steps
+Done: on the welcome band and on every step, the badge is 9 sp, line height 12, letter spacing 0.5, padding 1 × 5 dp, 16 dp tall (`box-sizing: border-box`, 1 dp outline at 55 %); fill 18 % (12 % on the welcome band, see 234), white text. Tested in `tests/app/first-launch.test.mjs`.
+
+## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
 
@@ -4524,3 +4530,5 @@ On these phone screens, the header band after the welcome screen changes. It rep
 Content below the band (« Retour », title, fields, buttons, the About link) is unchanged and shifts down by 32 dp. Everything must still fit on a 390 × 844 dp screen, including the error states.
 
 **Test:** on a phone, each first-launch step shows a 140 dp hatched dark-blue band with a straight bottom edge, no wave and no profile. The content fits without scrolling on a common phone, and white text on the band stays at least 4.5:1.
+
+Done: the header of the steps is `FirstLaunchBand` in its `step` variant: 140 dp in total (24 dp of status bar, or the system's if taller, + 116 dp, as in the mock-ups, where the 140 dp band holds the status bar), the same hatched blue as the welcome band, a straight bottom edge, no wave and no profile (`SectionBand` is not used). The content shifts down 32 dp and fits in 390 × 844 on every step, error states included (the About link is at 844 − 28 dp). White text on the step band: « OpenDives » 7.4:1, badge 5.06:1.
