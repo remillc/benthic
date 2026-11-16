@@ -2098,6 +2098,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Serveur OpenDives (édition de publication) : « Sur le serveur OpenDives » est le premier choix de « Où le garder ? » et de « Ouvrir mon carnet ». Vous vous connectez avec votre adresse courriel et un code à 6 chiffres, sans mot de passe ; les écrans disent un code incorrect, un code expiré, trop d’essais (attente de 10 minutes) et un serveur qui ne répond pas. Le carnet est ensuite téléchargé.",
       "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
       "Aides « Créer un dépôt » et « Créer un jeton d’accès » : les libellés du site sont dans des cases et les valeurs à saisir en police à chasse fixe ; les onglets GitLab et Codeberg donnent les libellés du site dans la langue de l’app, et GitLab et Codeberg ont leurs propres étapes pour le jeton.",
       "Synchronisation avec un dépôt git : un serveur qui ne répond pas n’est plus présenté comme un jeton refusé ; l’app réessaie seule.",
