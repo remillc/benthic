@@ -4086,3 +4086,35 @@ Christian approved this on 15 November 2026.
 Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
 
 Done (part 2, release edition): on `feature/release-new-logbook`, `ReleaseEmptyLogbook.svelte`, the tablet empty logbook (band with the logbook name and where it is kept, then « Aucune plongée »; on the right the 520 dp column with the smooth profile, « Télécharger mes plongées » and the paper). Desktop (beta): the ready screen of a new logbook uses the same label and icon, on `feature/desktop-logbook`. Both parts done.
+
+## [ ] 2026-11-16-221 Check every import format the core reads, with real files
+
+Christian asked for this on 16 November 2026. It is for the website's selling points (to-do #80): we want to be able to say how many dive log formats OpenDives imports, and be right. No interface change.
+
+**What we know:**
+- OpenDives compiles the core's full import path: no `SUBSURFACE_MOBILE`, with sqlite, libzip and libxslt, and the XSLT stylesheets copied into the app.
+- The file picker accepts any file, and the core picks the format from the extension.
+- Only FIT has a test (`tests/fit_import_test.cpp`).
+
+**Do:**
+1. **A test over sample files.** Add `tests/import_formats_test.cpp`, built by `poc/build.sh`, which imports through the façade's `import_dives` each sample file of Subsurface's `third_party/subsurface/dives/`. The samples include:
+   - .ssrf, .xml, UDDF, UDCF ;
+   - Suunto DM3 .SDE, DM4 and DM5 .db ;
+   - divelogs.de .DLD, JDiveLog .jlb ;
+   - Shearwater Cloud and Seac .db, Diving Log .sql ;
+   - DL7 .zxu, OSTCtools .dive, Divesoft .dlf ;
+   - DataTrak .log, SmartTrak .slg ;
+   - Garmin and Suunto .fit, Suunto .json ;
+   - APD .uddf.
+
+   Where Subsurface keeps a reference (the `…xml` next to a sample, e.g. `TestDiveDM4.xml`, `test-apd-inspiration-reference.xml`), compare what was read with it as Subsurface's own tests do (`third_party/subsurface/tests/testparse.cpp`, testparsetoxml…). Otherwise, check the number of dives and that each has a profile.
+2. **Android.** Run the same test with the NDK on the emulator, as `tests/release-check.sh` does for the other programs, to confirm that sqlite, libzip and the XSLT stylesheets work in the app's own build.
+3. **Suunto app JSON.** `import-suunto-json` is not in `core/compat/core-files.txt`: it is replaced by a stub in `qthelper_compat.cpp`. If adding the source file builds without changing Subsurface, add it and test the `suunto_*.json` samples. If it cannot, say why.
+4. **CSV.** It is out of scope: the core refuses a .csv opened directly, and asks for its column-mapping dialog. Just list which samples need it (Seabear, Poseidon, Sensus, generic CSV).
+5. **The report.** Write `docs/import-formats.md`: one line per format, with its extension(s), the sample used, the result (works, works with differences, fails, not reachable) and a short note. Give the total that work. Mark the task done with that total.
+
+**Do not change:**
+- the import screen and its texts (`addImportFormats`, `importFailed`) ;
+- the release notes.
+
+The texts will be updated in the design session from this report.
