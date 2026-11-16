@@ -461,7 +461,7 @@
 
     .od-editorial-page--band-body,
     .od-editorial-page--panel-body {
-      padding: 16px 20px 0;
+      padding: 16px 16px 0;
       min-height: 0;
       flex: 1 0 auto;
 

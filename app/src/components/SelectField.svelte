@@ -27,13 +27,15 @@
    *   newLabel?: string,
    *   noResultsLabel?: string,
    *   onnew?: (query: string) => void,
+   *   outlined?: boolean,
    * }}
    * ariaLabel: the accessible name when the label alone is not enough (the
    * full label and the unit).
    * invalid: the label and a 2 dp indicator in the alarm colour.
    * searchLabel: a search field at the top of the menu (long lists, such as
    * the sites). newLabel: a last choice, "New site…", that calls onnew with
-   * what was searched.
+   * what was searched. outlined: the outlined field of the alpha first launch (52 dp, 12 dp corners, the label
+   * on the border), as AccountField's.
    */
   let {
     label,
@@ -49,6 +51,7 @@
     newLabel = '',
     noResultsLabel = '',
     onnew,
+    outlined = false,
   } = $props();
 
   /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
@@ -213,6 +216,7 @@
   class:disabled
   class:od-select-field--invalid={invalid}
   class:od-select-field--open={open}
+  class:od-select-field--outlined={outlined}
   bind:this={root}
   onkeydown={keydown}
 >
@@ -452,6 +456,48 @@
 
       .od-select-field--open & {
         transform: translateY(-50%) rotate(180deg);
+      }
+    }
+
+    /* Outlined (docs/mockups/android-premier-lancement-alpha-git.dc.html): the box is 52 dp with a border, no
+       underline; the label sits on the border over the page colour. */
+    .od-select-field--outlined {
+      margin: var(--od-outlined-gap, 14px) 0 0;
+
+      .od-select-field--box {
+        height: 52px;
+        border: var(--od-outline-width) solid var(--od-outlined-field-border);
+        border-radius: 12px;
+        background: var(--od-surface);
+
+        &::after {
+          display: none;
+        }
+      }
+
+      &.od-select-field--open .od-select-field--box {
+        border: 2px solid var(--od-outlined-field-active);
+      }
+
+      .od-select-field--label {
+        left: 12px;
+        top: -9px;
+        padding: 0 4px;
+        background: var(--od-background);
+        font-weight: 600;
+      }
+
+      &.od-select-field--open .od-select-field--label {
+        color: var(--od-outlined-field-active);
+      }
+
+      .od-select-field--trigger {
+        padding: 0 48px 0 16px;
+        line-height: 50px;
+      }
+
+      .od-select-field--supporting {
+        margin: 4px 0 0 16px;
       }
     }
 

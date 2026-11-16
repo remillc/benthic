@@ -32,8 +32,8 @@ test('the new style is for an Android phone only: a tablet and iOS keep their sc
   // The steps: the band and « Retour » only when the page says firstLaunch, on an Android phone.
   assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && layout\.phone\)/);
   for (const page of [signIn, create, confirm, download, local]) assert.match(page, /firstLaunch/);
-  // « Utiliser mon propre dépôt git » keeps its screens: it does not ask for the band.
-  assert.doesNotMatch(read('pages/GitRepository.svelte'), /firstLaunch/);
+  // « Utiliser mon propre dépôt git » asks for the band on a phone since task 247 (tablets and iPhone keep their layout).
+  assert.match(read('pages/GitRepository.svelte'), /\{#if phone && welcome\}\s*<EditorialPage[^>]*\s+firstLaunch/);
 });
 
 test('the welcome screen sends Android (phone and, since task 239, tablet) to the « sans compte » screen; iOS starts the logbook', () => {
@@ -48,8 +48,8 @@ test('sign in: the download screen comes between the sign-in and the logbook', (
   // An account without a logbook still goes to « Reprendre votre carnet ? ».
   assert.match(signIn, /\/import`, \{ props: \{ signedIn: true \} \}/);
   assert.match(create, /if \(signedIn\.exists && look\) f7router\.navigate\('\/welcome\/downloading'/);
-  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\('downloaded'\)/);
-  assert.match(download, /f7router\.back\('\/welcome\/sign-in', \{ force: true \}\)/);
+  assert.match(download, /downloadAccountLogbook\(\(\) => cancelled\)\.then\(\(ok\) => \{\s*if \(ok\) announceFirstLaunch\(git \? 'gitDownloaded' : 'downloaded'\)/);
+  assert.match(download, /f7router\.back\(git \? '\/welcome\/git' : '\/welcome\/sign-in', \{ force: true \}\)/);
 });
 
 test('create an account: step 1 of 2, then the code as step 2 of 2, then the empty logbook with its snackbar', () => {
@@ -112,8 +112,8 @@ test('task 239: the tablet logbook opens with the snackbar at the bottom left an
 });
 
 test('the snackbars of the three paths and the empty logbook line, in French and English', () => {
-  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'local']);
-  const fr = { downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
+  assert.deepEqual(Object.keys(FIRST_LAUNCH_SNACKBARS).sort(), ['created', 'downloaded', 'gitDownloaded', 'local']);
+  const fr = { gitDownloaded: 'Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau.', downloaded: 'Carnet téléchargé. Il reste sur ce téléphone, même sans réseau.', created: 'Compte créé. Votre carnet est prêt.', local: 'Carnet créé sur ce téléphone.' };
   for (const [kind, key] of Object.entries(FIRST_LAUNCH_SNACKBARS)) {
     assert.equal(get(langs.fr, key), fr[kind]);
     assert.ok(get(langs.en, key), `${key} in English`);
@@ -204,7 +204,7 @@ test('« Retour » goes back one step, and the steps are laid out as the mock-up
   // The download is a step you leave with « Annuler », not « Retour ».
   assert.match(download, /\bnoRetour\b/);
   assert.match(editorial, /\.od-editorial-page--retour\) \{[^}]*min-height: 48px;/);
-  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 20px 0;/);
+  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
   // Pointer and hover on the link.
   assert.match(editorial, /cursor: pointer;[\s\S]*@media \(hover: hover\)/);
 });
