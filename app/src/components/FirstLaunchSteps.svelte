@@ -1262,12 +1262,12 @@
     }
 
     /* Phone (task 2026-11-16-227; mock-ups docs/mockups/android-premier-lancement-production*.dc.html): the column
-       has 20 dp of padding and its content starts at the top (16 dp under the 96 dp band, 20 dp under the
+       has 16 dp side margins (task 2026-11-16-248, MD3 compact) and its content starts at the top (16 dp under the 96 dp band, 20 dp under the
        330 dp one); the page scrolls when a step is taller than the screen, and the help link follows the
        content, at the bottom of the screen when there is room. */
     @media (max-width: 767.98px) {
       .od-first-launch {
-        padding: 16px 20px 0;
+        padding: 16px 16px 0;
         overflow: visible;
       }
 
