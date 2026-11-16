@@ -117,7 +117,7 @@ test('WebDAV: the codes tell the address or the password; the texts are the mock
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /<FirstLaunchWebdav create oncoming=\{cloud\} \/>/);
   assert.match(steps, /<FirstLaunchWebdav create=\{false\} oncoming=\{cloud\} \/>/);
-  assert.match(steps, /go\(key === 'webdav' \? 'webdav' : 'service'\)/);
+  assert.match(steps, /go\(key === 'webdav' \? 'webdav' : key === 'icloud' \? 'icloud' : 'service'\)/);
 });
 
 test('git: a repository that does not fit the path is told under the address, with the link to the other path', () => {

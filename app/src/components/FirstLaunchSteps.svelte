@@ -25,22 +25,25 @@
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
-  import { CLOUD_SERVICES, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
+  import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
+  import { errorCode } from '../lib/account.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
-  import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { deviceKey, iphoneKey, iosPhone } from '../lib/first-launch-phone.js';
+  import { layout, ios } from '../lib/layout.svelte.js';
   import { t, locale } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
   const step = $derived(currentStep());
-  const service = $derived(CLOUD_SERVICES.find((s) => s.key === flow.service) ?? CLOUD_SERVICES[0]);
+  /** The iPhone variant of the first launch (task 2026-11-16-261): « cet iPhone », iCloud Drive first, iOS rows and alert. */
+  const iphone = $derived(iosPhone(ios, layout.phone));
+  const service = $derived([ICLOUD_SERVICE, ...CLOUD_SERVICES].find((s) => s.key === flow.service) ?? CLOUD_SERVICES[0]);
   const serviceName = $derived(t(service.text));
   const fileName = $derived(logbookFileName(flow.name, []));
   const nameInvalid = $derived(!fileName);
@@ -83,7 +86,28 @@
   /** @param {string} key */
   function pickService(key) {
     flow.service = key;
-    go(key === 'webdav' ? 'webdav' : 'service');
+    // iCloud Drive uses the device's Apple account: no sign-in, straight to the connected screen.
+    if (key === 'icloud') flow.account = t('welcomeSteps.icloudAccount');
+    go(key === 'webdav' ? 'webdav' : key === 'icloud' ? 'icloud' : 'service');
+  }
+
+  /**
+   * « Créer le carnet » on the iCloud Drive screen: the logbook's folder is created in the app's iCloud Drive
+   * container (plugin, iOS only). The core does not read a logbook from that container yet, so the screen ends with
+   * the « coming » message once the folder exists; iCloud Drive turned off says so.
+   */
+  async function createInIcloud() {
+    if (busy || nameInvalid) return;
+    busy = true;
+    try {
+      await OpenDivesCore.createIcloudLogbook({ name: fileName });
+      cloud();
+    } catch (e) {
+      if (errorCode(e) === 'NOT_AVAILABLE') f7.dialog.create({ title: t('welcomeSteps.icloud'), text: t('welcomeSteps.icloudUnavailable'), buttons: [{ text: t('dialog.ok') }] }).open();
+      else failed(e);
+    } finally {
+      busy = false;
+    }
   }
 
   /**
@@ -189,10 +213,23 @@
     console.error('First launch', code);
     const key = importErrorKey(code);
     if (step === 'import' && file && (key === 'logbook.importFailed' || key === 'logbook.importNoDives')) {
-      unreadable = file.name;
+      // iPhone: a native alert (task 2026-11-16-261) instead of the inline card; « Autre fichier » reopens the picker.
+      if (iphone) unreadableAlert(file.name);
+      else unreadable = file.name;
       return;
     }
     f7.dialog.create({ title: t('logbook.importTitle'), text: t(key), buttons: [{ text: t('dialog.ok') }] }).open();
+  }
+
+  /** The iOS alert of an unreadable file: « Annuler » and « Autre fichier », which opens the Files picker again. */
+  function unreadableAlert(/** @type {string} */ name) {
+    f7.dialog
+      .create({
+        title: t('welcomeSteps.fileUnreadable'),
+        text: t('welcomeSteps.fileUnreadableHelp', { name }),
+        buttons: [{ text: t('welcomeSteps.cancel') }, { text: t('welcomeSteps.otherFile'), bold: true, onClick: () => fileInput?.click() }],
+      })
+      .open();
   }
 
   /** @param {File} file */
@@ -311,10 +348,17 @@
 
 {#snippet serviceList()}
   <div class="od-first-launch--list">
-    {#each CLOUD_SERVICES as s (s.key)}
+    {#each cloudServices(iphone) as s (s.key)}
       <button type="button" class="od-first-launch--list-row" onclick={() => pickService(s.key)}>
         <span class="od-first-launch--list-tile"><Icon name={s.icon === 'server' ? 'server' : 'cloudUpload'} size={22} /></span>
-        <span class="od-first-launch--list-title">{t(s.text)}</span>
+        {#if s.help}
+          <span class="od-first-launch--list-text">
+            <span class="od-first-launch--list-title">{t(s.text)}</span>
+            <span class="od-first-launch--list-detail">{t(s.help)}</span>
+          </span>
+        {:else}
+          <span class="od-first-launch--list-title">{t(s.text)}</span>
+        {/if}
         <span class="od-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
       </button>
     {/each}
@@ -388,9 +432,9 @@
   <h3 class="od-first-launch--section">{t('welcomeSteps.whereTitle')}</h3>
   <p class="od-first-launch--section-help">{t('welcomeSteps.whereHelp')}</p>
   <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
-    <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
+    <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.cloudHelp', iphone))} disabled={nameInvalid} onclick={() => where('cloud')} />
     <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone))} disabled={nameInvalid || busy} onclick={() => where('device')} />
+    <ReleaseChoiceRow icon="tablet" title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone, ios))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone, ios))} disabled={nameInvalid || busy} onclick={() => where('device')} />
   </nav>
 {/snippet}
 
@@ -429,8 +473,10 @@
             {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.connectedCreate', { file: fileName })}</p>
-            <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
-            <button type="button" class="od-first-launch--action" onclick={cloud}>{t('welcomeSteps.createLogbook')}</button>
+            {#if flow.service !== 'icloud'}
+              <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {/if}
+            <button type="button" class="od-first-launch--action" disabled={busy} onclick={flow.service === 'icloud' ? createInIcloud : cloud}>{t('welcomeSteps.createLogbook')}</button>
           {/if}
         {:else if step === 'webdav'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
@@ -464,7 +510,7 @@
         {:else if step === 'open'}
           <p class="od-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
-            <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.openCloudHelp')} onclick={() => go('cloud')} />
+            <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.openCloudHelp', iphone))} onclick={() => go('cloud')} />
             <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.openGitHelp')} onclick={() => go('git')} />
           </nav>
         {:else if step === 'openCloudService'}
@@ -478,7 +524,9 @@
             {@render hero('connected')}
             <p class="od-first-launch--status">{flow.account}</p>
             <p class="od-first-launch--status-help">{t('welcomeSteps.openConnectedHelp')}</p>
-            <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {#if flow.service !== 'icloud'}
+              <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+            {/if}
             <button type="button" class="od-first-launch--action" onclick={seeLogbooks}>{t('welcomeSteps.seeLogbooks')}</button>
           {/if}
         {:else if step === 'openChoose'}

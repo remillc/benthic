@@ -161,6 +161,8 @@
     --od-release-track: #D5DEE8;
     --od-release-line: #A5A8AC;
     --od-release-line-soft: #E3E1DC;
+    /* iPhone grouped rows (task 2026-11-16-261): the help line under a card, iOS's secondary label colour (4.9:1 on the page). */
+    --od-release-ios-help: #6C6C70;
     --od-release-hover: rgb(31 33 36 / 0.06);
     --od-release-on-panel: #FFFFFF;
     --od-release-on-panel-soft: rgb(255 255 255 / 0.78);
@@ -288,6 +290,7 @@
     --od-release-track: #1E3552;
     --od-release-line: #6B6E72;
     --od-release-line-soft: #3A3C40;
+    --od-release-ios-help: #98989D;
     --od-release-hover: rgb(255 255 255 / 0.08);
     --od-release-row-shadow: rgb(0 0 0 / 0.3);
     --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);
