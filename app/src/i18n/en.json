@@ -1104,7 +1104,7 @@
     "keptCloud": "Cloud",
     "keptDevice": "This tablet",
     "bandNoDives": "No dives",
-    "connectHint": "Sign in in your browser, then come back here.",
+    "connectHint": "The service’s sign-in page opens.\nYou come back here afterwards.",
     "connecting": "Connecting…",
     "connectingHelp": "Finish signing in on the page that opened. You will come back here afterwards.",
     "reopenPage": "Reopen the page",

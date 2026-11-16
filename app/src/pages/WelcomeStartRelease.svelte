@@ -8,6 +8,8 @@
   // chosen for the edition is pages/WelcomeEntry.svelte.
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
+  import SectionBand from '../components/SectionBand.svelte';
+  import { layout } from '../lib/layout.svelte.js';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
   import { flow } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -16,18 +18,27 @@
   let { f7router } = $props();
 </script>
 
+{#snippet panelContent()}
+  <div class="od-welcome-release--brand">
+    <img class="od-welcome-release--logo" src="logo-light.svg" alt="" width="96" height="96" />
+    <span>OpenDives</span>
+  </div>
+  <h1 class="od-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
+  <p class="od-welcome-release--intro">{t('welcomeRelease.intro')}</p>
+  <div class="od-welcome-release--profile"><ReleaseProfile /></div>
+{/snippet}
+
 <Page class="od-welcome-release" noToolbar>
   <div class="od-welcome-release--page">
     <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
-      <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
-      <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
-      <div class="od-welcome-release--brand">
-        <img class="od-welcome-release--logo" src="logo-light.svg" alt="" width="96" height="96" />
-        <span>OpenDives</span>
-      </div>
-      <h1 class="od-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
-      <p class="od-welcome-release--intro">{t('welcomeRelease.intro')}</p>
-      <div class="od-welcome-release--profile"><ReleaseProfile /></div>
+      {#if layout.phone}
+        <!-- Phone (task 2026-11-16-230): the app's own section band, with its faint profile and its wave. -->
+        <SectionBand>{@render panelContent()}</SectionBand>
+      {:else}
+        <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
+        <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
+        {@render panelContent()}
+      {/if}
     </section>
 
     <FirstLaunchSteps {f7router} />
@@ -164,10 +175,11 @@
 
     }
 
-    /* Phone (task 2026-11-16-227; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844): the
-       band across the top, 330 dp on the first step (the status bar's 24 dp included) and 96 dp on the others,
-       and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
-       texts need more room, so that nothing is cut off. */
+    /* Phone (tasks 2026-11-16-227 and 230; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):
+       the app's section band across the top (SectionBand: its gradient with the light centre raised to -40 %, the
+       faint profile, the wave), 330 dp on the first step (the status bar's 24 dp included) and 108 dp on the others,
+       and the page scrolls as one when a step is taller than the screen. The first-step band grows when its texts
+       need more room, so that nothing is cut off. */
     @media (max-width: 767.98px) {
       .od-welcome-release--page {
         height: auto;
@@ -175,24 +187,33 @@
       }
 
       .od-welcome-release--panel {
+        display: block;
+        flex: none;
         width: auto;
         height: auto;
-        min-height: calc(330px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
-        padding: calc(max(var(--f7-safe-area-top, 0px), 24px) + 16px) 20px 0;
+        padding: 0;
+        overflow: visible;
+        background: none;
       }
 
       .od-welcome-release--compact {
         height: auto;
-        min-height: calc(96px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
-        padding-bottom: 24px;
       }
 
-      .od-welcome-release--panel-light {
-        background: radial-gradient(ellipse 80% 55% at 20% 0%, var(--od-release-panel-light), transparent 70%);
+      .od-welcome-release--panel :global(.od-section-band--band) {
+        --od-band-gradient: var(--od-release-band-gradient);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(330px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
+        padding: calc(max(var(--f7-safe-area-top, 0px), 24px) + 16px) 20px 0;
+        background-size: 256px 256px, 100% 100%;
+        background-position: 0 0, 0 0;
       }
 
-      .od-welcome-release--panel-bands {
-        display: none;
+      .od-welcome-release--compact :global(.od-section-band--band) {
+        min-height: calc(108px - 24px + max(var(--f7-safe-area-top, 0px), 24px));
+        padding-bottom: 36px;
       }
 
       .od-welcome-release--brand {
@@ -238,10 +259,11 @@
         line-height: 20px;
       }
 
-      /* 24 dp from both edges (the panel's 20 dp padding and 4 dp), 20 dp above the bottom. */
+      /* 24 dp from both edges (the band's 20 dp padding and 4 dp); above the faint profile and the wave. */
       .od-welcome-release--profile {
+        flex: 1;
         min-height: 56px;
-        margin: 16px 4px 20px;
+        margin: 16px 4px 24px;
       }
 
       /* Its height is the flex item's, which a percentage cannot reach: the profile fills it by position. */

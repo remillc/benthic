@@ -4297,7 +4297,7 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{
 
 Done on `feature/release-formats-link` (not merged; it also carries main, so the CSV import and the import of several files live together): the link is the row right under « Un fichier », before divelogs.de, on the import and unreadable-file screens (the same step), a 48 dp target with 4 dp of padding, 4 dp from each row, read as a link. Checked in headless Edge at 1280 × 800; test in `tests/app/import-formats.test.mjs`.
 
-## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
+## [x] 2026-11-16-227 Release edition: the first launch on Android phones
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-phone-first-launch`, started from `feature/release-formats-link` (task 226). Do not merge it into `main`. The beta on `main` stays unchanged.
 
@@ -4322,6 +4322,8 @@ Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.ht
 - « Retour » and the transitions work as on the tablet, and each working path ends in an open logbook.
 - On a tablet, nothing changes.
 - The beta on `main` is untouched.
+
+Done: branch `feature/release-phone-first-launch` (from `feature/release-formats-link`, not merged). `pages/WelcomeEntry.svelte` now shows the release screen on a phone as on a tablet; the beta screen is not used there. Same steps, texts, logic and errors: only the layout changes, by CSS `@media (max-width: 767.98px)` (the width `layout.phone` uses; `lib/first-launch-phone.js` holds the query, the band heights and `deviceKey`). First step: band of 330 dp (status bar included), logo 40 dp, name 24 sp, headline 26 sp, line 14 sp, the profile scaled 24 dp from both edges without its dot and chips; other steps: band of 108 dp (see task 230), logo 32 dp, name 20 sp. Column: 20 dp side padding, content from the top (16 dp under the small band as drawn in the mock-ups, 20 dp under the large one), 24 sp titles, full-width buttons, 64 dp tiles and a 56 dp line in the link band, « Une question ? » after the content (the page scrolls as one when a step is taller). Formats dialog: 358 dp, cards stacked, the list scrolls inside, « Fermer » visible. Phone variants of the texts (`deviceTitlePhone`, `deviceHelpPhone`, `gitTokenHelpPhone`, `webdavHelpPhone`), chosen by `layout.phone`. Tests: `tests/app/first-launch-phone.test.mjs`. Tablet: 26 screenshots (13 screens, 1280 x 800 and 800 x 1280) taken before and after the change are byte-identical.
 
 ## [ ] 2026-11-16-228 Release edition: the first launch on the desktop
 
@@ -4371,3 +4373,5 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 - On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
 - The progress bars stay inside their card at 360 dp wide.
 - `main` is untouched.
+
+Done (phone and tablet), branch `feature/release-phone-first-launch`: point 1, the hint « La page de connexion du service s’ouvre. / Vous revenez ici ensuite. » (`welcomeSteps.connectHint`, fr and en) on two lines, centred under the button, and « Se connecter à {service} » centred on the tablet (full width on the phone); point 2, the phone band is `SectionBand` (its gradient, faint profile and 18 dp wave) with `--od-release-band-gradient` (the same gradient, light centre at 38% -40%, in `theme.css`), 108 dp on the later steps; measured on the rendered band: white « OpenDives » 4.76:1 on the lightest pixel, headline 6.8:1, line 9.1:1; point 3, the progress bar is limited to the width of its card. Still to do: the desktop part of point 1 (task 228).

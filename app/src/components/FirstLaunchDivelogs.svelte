@@ -295,7 +295,11 @@
       color: var(--od-text-2);
     }
 
+    /* Inside the card at any width (task 2026-11-16-230): the bar is as wide as the text beside it, never wider. */
     .od-first-launch-divelogs--bar {
+      min-width: 0;
+      max-width: calc(100% - 42px);
+      overflow: hidden;
       margin: -4px 0 2px 42px;
       --od-linear-wavy-progress-active: var(--od-release-row-main);
       --od-linear-wavy-progress-track: var(--od-release-track);

@@ -29,11 +29,11 @@ test('the phone layout is chosen by the width, the same one as layout.phone', ()
   }
 });
 
-test('the blue band is 330 dp on the first step and 96 dp on the others, the status bar included', () => {
-  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 96 });
+test('the blue band is 330 dp on the first step and 108 dp on the others, the status bar included', () => {
+  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 108 });
   const page = read('pages/WelcomeStartRelease.svelte');
   assert.match(page, /min-height: calc\(330px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
-  assert.match(page, /min-height: calc\(96px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
+  assert.match(page, /min-height: calc\(108px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
   // First step: logo 40 dp, name 24 sp, headline 26 sp, line 14 sp; other steps: logo 32 dp, name 20 sp.
   for (const piece of [/width: 40px;\s+height: 40px/, /width: 32px;\s+height: 32px/, /font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
     assert.match(page, piece);
@@ -47,7 +47,7 @@ test('the column has 20 dp of padding, starts at the top, has 24 sp titles and f
   assert.match(phone, /od-first-launch--first \{\s+padding-top: 20px/);
   assert.match(phone, /od-first-launch--step \{\s+align-self: start/);
   assert.match(phone, /od-first-launch--title \{\s+font-size: 24px/);
-  assert.match(phone, /od-first-launch--action \{\s+align-self: stretch/);
+  assert.match(phone, /od-first-launch--action,\s+\.od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: stretch/);
   // The link band: 64 dp tiles, a 56 dp line.
   assert.match(phone, /od-first-launch--hero-tile \{\s+width: 64px;\s+height: 64px/);
   assert.match(phone, /od-first-launch--hero-link \{\s+flex: none;\s+width: 56px/);
@@ -63,6 +63,38 @@ test('the profile of the band has no dot and no chips on a phone', () => {
     read('components/ReleaseProfile.svelte'),
     /@media \(max-width: 767\.98px\) \{\s+\.od-release-profile--dot,\s+\.od-release-profile--chip \{\s+display: none/,
   );
+});
+
+test("the phone band is the app's section band: its gradient with the light centre at 38% -40%, its profile and its wave", () => {
+  const page = read('pages/WelcomeStartRelease.svelte');
+  assert.match(page, /import SectionBand from '\.\.\/components\/SectionBand\.svelte'/);
+  assert.match(page, /\{#if layout\.phone\}[^]*<SectionBand>\{@render panelContent\(\)\}<\/SectionBand>[^]*\{:else\}/);
+  assert.match(page, /--od-band-gradient: var\(--od-release-band-gradient\)/);
+  const theme = read('theme.css');
+  const band = theme.match(/--od-band-gradient: radial-gradient\(([^)]*)\)/)[1];
+  const release = theme.match(/--od-release-band-gradient: radial-gradient\(([^)]*)\)/)[1];
+  // The same gradient, only the light centre is raised.
+  assert.equal(release, band.replace('at 38% -20%', 'at 38% -40%'));
+});
+
+test('the sign-in hint reads on two lines, centred; the sign-in button is centred on a tablet', () => {
+  for (const lang of ['fr', 'en']) {
+    const hint = langs[lang].welcomeSteps.connectHint;
+    assert.equal(hint.split('\n').length, 2, lang);
+    assert.doesNotMatch(hint, /navigateur|browser/i, lang);
+  }
+  assert.equal(langs.fr.welcomeSteps.connectHint, 'La page de connexion du service s’ouvre.\nVous revenez ici ensuite.');
+  const steps = read('components/FirstLaunchSteps.svelte');
+  assert.match(steps, /od-first-launch--hint \{\s+align-self: center;[^}]*text-align: center;\s+white-space: pre-line/);
+  assert.match(steps, /od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: center/);
+  // On a phone the button takes the column's width again.
+  const phone = steps.slice(steps.lastIndexOf('@media (max-width: 767.98px)'));
+  assert.match(phone, /od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: stretch/);
+});
+
+test('the progress bar stays inside its card', () => {
+  const divelogs = read('components/FirstLaunchDivelogs.svelte');
+  assert.match(divelogs, /od-first-launch-divelogs--bar \{\s+min-width: 0;\s+max-width: calc\(100% - 42px\);\s+overflow: hidden/);
 });
 
 test('texts that name the device: « ce téléphone » on a phone, « cette tablette » on a tablet', () => {

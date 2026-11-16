@@ -367,7 +367,7 @@
     </button>
   {:else}
     <p class="od-first-launch--status">{t('welcomeSteps.notConnected')}</p>
-    <button type="button" class="od-first-launch--action" onclick={signIn}>
+    <button type="button" class="od-first-launch--action od-first-launch--action-centre" onclick={signIn}>
       <Icon name="openInNew" size={18} />{t('welcomeSteps.connect', { service: serviceName })}
     </button>
     <p class="od-first-launch--hint">{t('welcomeSteps.connectHint')}</p>
@@ -1007,10 +1007,16 @@
       color: var(--od-text-2);
     }
 
-    /* The line under « Se connecter à… », right-aligned with the button. */
+    /* « Se connecter à… » is centred, and so is the two-line hint under it (task 2026-11-16-230). */
+    .od-first-launch--action.od-first-launch--action-centre {
+      align-self: center;
+    }
+
     .od-first-launch--hint {
-      align-self: flex-end;
+      align-self: center;
       margin: 8px 0 0;
+      text-align: center;
+      white-space: pre-line;
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
@@ -1309,7 +1315,8 @@
         padding: 0;
       }
 
-      .od-first-launch--action {
+      .od-first-launch--action,
+      .od-first-launch--action.od-first-launch--action-centre {
         align-self: stretch;
         justify-content: center;
       }

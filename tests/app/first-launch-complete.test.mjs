@@ -91,7 +91,8 @@ test('the connect screens: the hint under the button, in progress with « Annule
   assert.equal(fr.refusedTitle, 'Connexion non établie');
   assert.equal(fr.refusedHelp, 'La connexion a été annulée ou refusée dans le navigateur.');
   assert.equal(fr.retry, 'Réessayer');
-  assert.equal(fr.connectHint, 'Connectez-vous dans votre navigateur, puis revenez ici.');
+  // Task 2026-11-16-230: two lines, no mention of a browser.
+  assert.equal(fr.connectHint, 'La page de connexion du service s’ouvre.\nVous revenez ici ensuite.');
 });
 
 test('the spinner stops under reduced motion', () => {
