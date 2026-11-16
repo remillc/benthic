@@ -4831,3 +4831,20 @@ Christian approved this on 16 November 2026. **Release edition:** do it on the b
 On every step page of the phone first launch, the side margins change from 20 to **16 dp** (MD3 margin for compact screens). Nothing else changes; the header bands keep their own layout.
 
 **Test:** at 390 dp wide, the content of every first-launch step starts 16 dp from each edge.
+
+## [ ] 2026-11-16-249 First launch (release): right chevron on « Suivant »
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 230, `feature/release-new-logbook-two-steps`, which has the « Nouveau carnet » step, and never merge it into `main`.
+
+Mock-ups, phone, tablet (both orientations) and desktop:
+- `android-premier-lancement-production-nom.dc.html` and `-importer-nouveau-carnet`;
+- `android-tablette-premier-lancement-production-nom-{paysage,portrait}` and `-importer-nouveau-carnet-{paysage,portrait}`;
+- `bureau-premier-lancement-production-nom` and `-importer-nouveau-carnet`.
+
+Every « Suivant » button gets a right chevron after the label, following the MD3 button with a trailing icon:
+- 18 dp chevron in the label colour, 8 dp from the text;
+- padding 24 dp at the start and 16 dp at the end.
+
+The chevron is decorative (`aria-hidden`); the button's name stays « Suivant ». In right-to-left layouts it would point left, but we have none yet.
+
+**Test:** on the « Nouveau carnet » step, when creating and when importing, on phone, tablet and desktop, « Suivant » shows the chevron to the right of the label.
