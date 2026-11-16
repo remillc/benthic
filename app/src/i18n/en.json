@@ -974,6 +974,8 @@
   },
   "welcome": {
     "title": "OpenDives",
+    "beta": "Beta",
+    "brandBeta": "OpenDives, beta",
     "noAccount": "Start without an account",
     "choicesLabel": "Ways to start",
     "ownGit": "Use my own git repository",
@@ -1865,6 +1867,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: a « Beta » badge follows the OpenDives name.",
       "Import a file: you can choose several files at once. A Suunto app .json and the .fit with the same name are read as one dive, with the gas mix and the gradient factors from the .fit.",
       "App icon on iPhone, iPad and Mac: blue to its edge, with the wave, no white background.",
       "App icon on Android: the blue disc fills the whole icon, with no white ring around it.",
