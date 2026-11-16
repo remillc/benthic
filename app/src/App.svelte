@@ -16,6 +16,8 @@
   import WelcomeStart from './pages/WelcomeStart.svelte';
   import WelcomeEntry from './pages/WelcomeEntry.svelte';
   import { isRelease } from './lib/edition.js';
+  import FirstDownload from './pages/FirstDownload.svelte';
+  import WithoutAccount from './pages/WithoutAccount.svelte';
   import SettingsBailout from './pages/SettingsBailout.svelte';
   import Plans from './pages/Plans.svelte';
   import SignIn from './pages/SignIn.svelte';
@@ -161,6 +163,8 @@
     { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
     { path: '/welcome/create', component: CreateAccount, options: { props: { welcome: true } } },
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
+    { path: '/welcome/downloading', component: FirstDownload },
+    { path: '/welcome/local', component: WithoutAccount },
     { path: '/welcome/import', component: BringLogbook },
     { path: '/welcome/importing', component: ImportProgress },
     { path: '/welcome/git', component: GitRepository, options: { props: { welcome: true } } },

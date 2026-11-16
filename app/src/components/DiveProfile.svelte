@@ -638,7 +638,7 @@
     .od-dive-profile--temperature {
       fill: none;
       stroke: var(--od-temperature);
-      stroke-width: var(--od-profile-line-width);
+      stroke-width: var(--od-profile-main-width, var(--od-profile-line-width));
       stroke-linejoin: round;
     }
 
@@ -762,7 +762,7 @@
     .od-dive-profile--trace {
       fill: none;
       stroke: var(--od-trace);
-      stroke-width: var(--od-profile-line-width);
+      stroke-width: var(--od-profile-main-width, var(--od-profile-line-width));
       stroke-linejoin: round;
     }
 

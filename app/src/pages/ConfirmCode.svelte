@@ -10,7 +10,8 @@
   import CodeField from '../components/CodeField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
-  import { accountFlow, errorCode, finishAccount, showFailure, toast } from '../lib/account.js';
+  import { accountFlow, announceFirstLaunch, errorCode, finishAccount, phoneFirstLaunch, showFailure, toast } from '../lib/account.js';
+  import { accountReady, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { codeComplete } from '../lib/code-input.js';
   import { t } from '../lib/i18n.js';
 
@@ -20,18 +21,31 @@
   let code = $state('');
   let busy = $state(false);
   let codeError = $state('');
+  // Alpha first launch on a phone: the new account's empty logbook opens straight after the code, with a snackbar.
+  const look = $derived(welcome && phoneFirstLaunch());
+  let verified = false;
 
   async function confirm() {
     busy = true;
     codeError = '';
     try {
-      const result = await OpenDivesCore.verifyPin({ pin: code });
-      if (result.status !== 'verified') {
-        codeError = t('confirmCode.wrong');
-        return;
+      if (!verified) {
+        const result = await OpenDivesCore.verifyPin({ pin: code });
+        if (result.status !== 'verified') {
+          codeError = t('confirmCode.wrong');
+          return;
+        }
+        verified = true;
       }
       accountFlow.confirmedEmail = email;
-      if (welcome) {
+      if (look) {
+        // The dives logged on this device without an account, if any, are the first of the new logbook.
+        const onDevice = await deviceDiveCount();
+        await OpenDivesCore.createLog({ source: onDevice ? 'device' : 'empty' });
+        accountFlow.confirmedEmail = '';
+        await accountReady();
+        announceFirstLaunch('created');
+      } else if (welcome) {
         f7router.navigate('/welcome/import');
       } else {
         // From Account: the dives of this device are sent to the new account.
@@ -62,8 +76,9 @@
 
 <EditorialPage class="od-confirm-code"
   helpLink={welcome}
+  firstLaunch={welcome}
   title={t('createAccount.title')}
-  step={t('createAccount.step1')}
+  step={t('createAccount.step2')}
   heading={t('confirmCode.heading')}
   intro={t('confirmCode.intro', { email })}
   action={t('confirmCode.submit')}
@@ -93,6 +108,10 @@
     .od-confirm-code--fields {
       margin: 6px 0 0;
 
+      :global(.od-editorial-page--first-launch) & {
+        margin: 8px 0 0;
+      }
+
       :global(.ios) & {
         margin: 0;
       }
@@ -121,6 +140,29 @@
 
         &:disabled {
           opacity: 0.38;
+        }
+      }
+
+      /* Alpha first launch on a phone (the mock-ups): a link under the boxes, a 48 dp target. */
+      :global(.od-editorial-page--first-launch) & {
+        margin: 4px 0 -12px;
+
+        button {
+          height: auto;
+          min-height: 48px;
+          padding: 0 4px;
+          border: none;
+          border-radius: 8px;
+          color: var(--od-code-active);
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          font-weight: 400;
+          letter-spacing: 0;
+          line-height: 19px;
+
+          :global(svg) {
+            display: none;
+          }
         }
       }
 

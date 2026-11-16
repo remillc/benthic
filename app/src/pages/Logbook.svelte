@@ -1335,7 +1335,9 @@
     {#if releaseEmpty}
       <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
     {:else}
-    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
+    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>
+    {:else if layout.phone && !theme.ios}<!-- Without an account, on an Android phone (task 2026-11-16-233): where the logbook is. -->
+      <p class="od-logbook--count">{t('logbook.emptyLocal')}</p>{/if}
     <div class="od-logbook--empty">
       <div class="od-logbook--empty-illustration" aria-hidden="true">
         <DecorativeProfile trace class="od-logbook--empty-profile" />
