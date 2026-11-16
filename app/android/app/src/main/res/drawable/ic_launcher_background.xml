@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon background: the logo's disc colours over the whole icon, so the launcher's mask (a circle,
+     a squircle) is blue to its edge, with no white ring. Vertical gradient #1F5C99 to #0C3866 across the
+     visible part (18 to 90 of the 108 grid). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M0,0h108v108h-108Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="18"
+                android:endX="54"
+                android:endY="90">
+                <item android:offset="0" android:color="#FF1F5C99" />
+                <item android:offset="1" android:color="#FF0C3866" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

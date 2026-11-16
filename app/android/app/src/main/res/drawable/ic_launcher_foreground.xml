@@ -1,51 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive icon foreground: the simple logo with relief (docs/brand/opendives-logo.svg), without its background. -->
+<!-- Adaptive icon foreground: the wave of the logo with relief (docs/brand/opendives-logo.svg) and its shadow.
+     The disc is the background (ic_launcher_background.xml), so it fills the launcher's mask: no white ring.
+     The wave keeps its share of the disc: drawn for a disc of radius 30, scaled by 1.2 to the visible
+     circle of radius 36. No rim: on a squircle mask it would show as a ring. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- The disc: radius 30 of the 108 grid, centred, vertical gradient #1F5C99 to #0C3866 (docs/brand/opendives-logo.svg scaled by 30/11). -->
-    <path android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="54"
-                android:startY="24"
-                android:endX="54"
-                android:endY="84">
-                <item android:offset="0" android:color="#FF1F5C99" />
-                <item android:offset="1" android:color="#FF0C3866" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- The rim: radius 29.18, width 1.64, white at 20 % at the top to 0 % halfway down. -->
-    <path
-        android:pathData="M24.82,54a29.18,29.18 0,1 0,58.36 0a29.18,29.18 0,1 0,-58.36 0Z"
-        android:strokeWidth="1.636">
-        <aapt:attr name="android:strokeColor">
-            <gradient
-                android:type="linear"
-                android:startX="54"
-                android:startY="24"
-                android:endX="54"
-                android:endY="84">
-                <item android:offset="0" android:color="#33FFFFFF" />
-                <item android:offset="0.45" android:color="#00FFFFFF" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- The shadow: the wave shifted 3 down (1.1 x 30/11), #072A4D at 35 %. -->
-    <path
-        android:pathData="M34.909,59.727 Q44.455,51.545 54,59.727 T73.091,59.727"
-        android:strokeColor="#59072A4D"
-        android:strokeWidth="6"
-        android:strokeLineCap="round" />
-    <!-- The wave: one white stroke, rounded ends, width 2.2 x 30/11. -->
-    <path
-        android:pathData="M34.909,56.727 Q44.455,48.545 54,56.727 T73.091,56.727"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="6"
-        android:strokeLineCap="round" />
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="1.2"
+        android:scaleY="1.2">
+        <!-- The shadow: the wave shifted 3 down, #072A4D at 35 %. -->
+        <path
+            android:pathData="M34.909,59.727 Q44.455,51.545 54,59.727 T73.091,59.727"
+            android:strokeColor="#59072A4D"
+            android:strokeWidth="6"
+            android:strokeLineCap="round" />
+        <!-- The wave: one white stroke, rounded ends. -->
+        <path
+            android:pathData="M34.909,56.727 Q44.455,48.545 54,56.727 T73.091,56.727"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="6"
+            android:strokeLineCap="round" />
+    </group>
 </vector>

@@ -2385,6 +2385,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Icône de l’app sur iPhone, iPad et Mac : bleue jusqu’au bord, avec la vague, sans fond blanc.",
+      "Icône de l’app sur Android : le disque bleu remplit toute l’icône, sans anneau blanc autour.",
       "Carnet vide : le bouton principal devient « Télécharger mes plongées », avec une icône d’ordinateur de plongée ; l’association de l’ordinateur se fait pendant le téléchargement.",
       "Premier lancement : le lien « Une question ? À propos et contact » en bas de l’écran ouvre À propos, avec l’adresse du support.",
       "Le profil de plongée décoratif (premier lancement, carnet vide, pages du compte) est une courbe lisse, sans angles.",
