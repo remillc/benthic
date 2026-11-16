@@ -4718,7 +4718,7 @@ The rail of these windows is not shown in the mock-ups, so Settings and the acco
 
 Done on `feature/desktop-logbook` (the desktop app lives there until it is merged into main): the desktop first launch reuses the tablet screens of tasks 237 and 239 with « cet ordinateur » texts, the computer icon, the drop to import and the snackbars after the rail; the « no logbook » window after first use is the blue panel with « Carnets récents », « Ou bien » (« Ouvrir un carnet… », « Nouveau carnet… »), the drop hint and the help link, without the rail; a missing logbook is greyed with its dialog (« Retirer de la liste », « Chercher le fichier… »). The real system picker and real Subsurface calls were not exercised (stubs).
 
-## [ ] 2026-11-16-243 Alpha: About link on the welcome screens, « Télécharger mes plongées » on the desktop
+## [x] 2026-11-16-243 Alpha: About link on the welcome screens, « Télécharger mes plongées » on the desktop
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.**
 
@@ -4733,6 +4733,8 @@ Christian approved this on 16 November 2026. **Alpha, on `main`.**
    This matches every other screen.
 
 **Test:** the welcome screens show the About link and it opens « À propos ». On the desktop, the empty logbook and the macOS File menu say « Télécharger mes plongées ».
+
+Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelte` the link now ends the Android page. On a phone it sits 12 dp under the git link's text (6 dp of touch padding + 6 dp of margin) and 20 dp above the bottom edge (`--od-help-link-bottom`; the page content has no bottom padding there, so the screen no longer scrolls at 390 × 844); on a tablet it was already pinned 28 dp from the edge and did not move; iOS is unchanged. It opens « À propos » and Back returns. Checked headless at 390×844, 412×915, 1280×800, 800×1280: only the link and the git link's touch area moved. Tests in `tests/app/welcome-help-link.test.mjs`; one release-note line (fr, en). Part 2 is on `fix/desktop-download-wording`, for the desktop branch (`feature/desktop-logbook`): the ready screen of a new logbook already said « Télécharger mes plongées » (task 242), so only the macOS File menu changed (`desktop.macMenu.download`, « Télécharger mes plongées… » / « Download my dives… »); test `tests/app/desktop-download-wording.test.mjs`. No release note for the desktop.
 
 ## [ ] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
 
