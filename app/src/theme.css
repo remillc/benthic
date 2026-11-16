@@ -20,6 +20,13 @@
 @import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
 
 @layer od.tokens {
+  /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
+     the other curves keep --od-profile-line-width, and high contrast keeps its 2 dp. */
+  @media (min-width: 768px) {
+    :root:not(.od-high-contrast) {
+      --od-profile-main-width: 1;
+    }
+  }
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
