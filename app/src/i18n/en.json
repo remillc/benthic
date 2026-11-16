@@ -691,7 +691,12 @@
       "use": "Use",
       "startPressure": "Start pressure",
       "endPressure": "End pressure",
-      "gasChanges": "Gas changes"
+      "gasChanges": "Gas changes",
+      "undersuit": "Undersuit",
+      "weights": "Weights",
+      "mix": "Mix",
+      "pressure": "Pressure",
+      "coordinates": "Coordinates"
     },
     "invitation": {
       "site": "Site not set",
@@ -710,8 +715,52 @@
       "notes": "Add notes",
       "weight": "Add the weight",
       "cylinderType": "Choose a type",
-      "pressure": "Add the pressure"
-    }
+      "pressure": "Add the pressure",
+      "undersuit": "Add the undersuit",
+      "mix": "Type the mix, such as 32 or 18/45"
+    },
+    "notRated": "Not rated",
+    "add": "Add",
+    "weightTotal": "total",
+    "weightPlace": "Weight place",
+    "openSite": "Open the site",
+    "openSiteLink": "See the site in Sites",
+    "serial": "no. {serial}",
+    "addComputer": "Add a computer",
+    "computerRole": {
+      "0": "Main",
+      "1": "Second",
+      "2": "Third",
+      "n": "Computer {n}"
+    },
+    "section": {
+      "computers": "Dive computers",
+      "protection": "Protection and weights",
+      "otherGear": "Other gear"
+    },
+    "gasCards": "Cylinders of the dive",
+    "gasCardLabel": "Cylinder {n}, {gas}, {type}, {range}",
+    "addCylinderUses": "deco, relay, bailout",
+    "legendStart": "At the start",
+    "legendEnd": "At the exit",
+    "cylinderSpan": "from {from} to {to} min",
+    "consumption": "Consumption",
+    "sacSurface": "at the surface (SAC)",
+    "breathed": "breathed",
+    "usedOf": "used out of {start}",
+    "barLabel": "Pressure from {end} at the exit to {start} at the start",
+    "barZero": "0 bar",
+    "reserve": "reserve {value}",
+    "atExit": "{value} at the exit",
+    "marginAbove": "Exit {value} above the reserve.",
+    "marginBelow": "Exit {value} under the reserve.",
+    "otherGearList": "Other gear worn",
+    "otherGearRemove": "Remove {name} from this dive",
+    "otherGearRemoveTip": "Remove from this dive",
+    "otherGearAdd": "Add gear",
+    "otherGearSoon": "Not available yet",
+    "mixNote": "O₂ {o2} % · He {he} %",
+    "pressureNote": "start → end"
   },
   "profile": {
     "hint": "Touch the profile to read the values",
@@ -2418,6 +2467,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",
       "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
       "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
       "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",

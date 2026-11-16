@@ -691,7 +691,12 @@
       "use": "Utilisation",
       "startPressure": "Pression au début",
       "endPressure": "Pression à la fin",
-      "gasChanges": "Changements de gaz"
+      "gasChanges": "Changements de gaz",
+      "undersuit": "Sous-vêtement",
+      "weights": "Lest",
+      "mix": "Mélange",
+      "pressure": "Pression",
+      "coordinates": "Coordonnées"
     },
     "invitation": {
       "site": "Site à préciser",
@@ -710,8 +715,52 @@
       "notes": "Ajouter des notes",
       "weight": "Ajouter le poids",
       "cylinderType": "Choisir un type",
-      "pressure": "Ajouter la pression"
-    }
+      "pressure": "Ajouter la pression",
+      "undersuit": "Ajouter le sous-vêtement",
+      "mix": "Saisir le mélange, par exemple 32 ou 18/45"
+    },
+    "notRated": "Non notée",
+    "add": "Ajouter",
+    "weightTotal": "total",
+    "weightPlace": "Emplacement du lest",
+    "openSite": "Ouvrir la fiche du site",
+    "openSiteLink": "Voir le site dans Sites",
+    "serial": "n° {serial}",
+    "addComputer": "Ajouter un ordinateur",
+    "computerRole": {
+      "0": "Principal",
+      "1": "Deuxième",
+      "2": "Troisième",
+      "n": "Ordinateur {n}"
+    },
+    "section": {
+      "computers": "Ordinateurs de plongée",
+      "protection": "Protection et lest",
+      "otherGear": "Autre équipement"
+    },
+    "gasCards": "Bouteilles de la plongée",
+    "gasCardLabel": "Bouteille {n}, {gas}, {type}, {range}",
+    "addCylinderUses": "déco, relais, secours",
+    "legendStart": "Au départ",
+    "legendEnd": "À la sortie",
+    "cylinderSpan": "de {from} à {to} min",
+    "consumption": "Consommation",
+    "sacSurface": "en surface (SAC)",
+    "breathed": "respirés",
+    "usedOf": "utilisés sur {start}",
+    "barLabel": "Pression de {end} à la sortie à {start} au départ",
+    "barZero": "0 bar",
+    "reserve": "réserve {value}",
+    "atExit": "{value} à la sortie",
+    "marginAbove": "Sortie {value} au-dessus de la réserve.",
+    "marginBelow": "Sortie {value} sous la réserve.",
+    "otherGearList": "Autre équipement porté",
+    "otherGearRemove": "Retirer {name} de cette plongée",
+    "otherGearRemoveTip": "Retirer de cette plongée",
+    "otherGearAdd": "Ajouter de l’équipement",
+    "otherGearSoon": "Pas encore disponible",
+    "mixNote": "O₂ {o2} % · He {he} %",
+    "pressureNote": "début → fin"
   },
   "profile": {
     "hint": "Touchez le profil pour lire les valeurs",
@@ -2418,6 +2467,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Détail d’une plongée sur ordinateur : cinq onglets. Informations : la fiche du site, les compagnons, le moniteur, le type d’eau en boutons segmentés et la visibilité en cinq étoiles ; Équipement : les ordinateurs, la combinaison et plusieurs lests en pastilles avec leur total ; Gaz : une carte par bouteille avec ses champs et une carte Consommation ; Notes : la note, les notes et les étiquettes ; Carte garde sa hauteur. Les champs gris s’enregistrent avec Entrée ou en les quittant.",
       "Sur ordinateur, agrandir ou réduire la fenêtre au-delà de 1200 dp passe de la grande à la petite disposition sans quitter l’écran : la plongée sélectionnée dans le Carnet, la statistique enregistrée dans Statistiques, la catégorie dans Réglages et l’outil dans Outils restent en place.",
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
       "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
