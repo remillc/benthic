@@ -4263,11 +4263,8 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
 
-<<<<<<< HEAD
 Done (parts 7–8): branch `feature/release-csv-demo` (from `feature/release-first-launch-complete`). Demo logbook: `lib/demo.js`, `lib/demo.svelte.js`, `components/DemoHost.svelte` (banner, `demo-quitter`, `demo-ajout`); no account means no sync, device dives are never offered to an account while it is open, and the account routes open the exit dialog. CSV: façade `import_csv()` (`opendives.h`), plugin `importCsv` (Kotlin, JNI, Swift, `core-api.js`), `components/CsvImportDialog.svelte`, `lib/csv-import.js`, `lib/csv-dialog.js`; `parse_seabear_header()` ported in `core/compat/qthelper_compat.cpp`; CSV added to `docs/import-formats.md` and `lib/import-formats.js`. Tests: `tests/import_csv_test.cpp` (`build/poc/import-csv`), `tests/app/csv-import.test.mjs`, `tests/app/demo-logbook.test.mjs`.
 
-=======
-Done on `feature/release-first-launch-complete` (not merged): parts 1–6 (portrait for every step, cloud connection states, WebDAV, the errors, the formats dialog, the tablet empty logbook and its menu) and parts 7–8 (the demo logbook; the three-step CSV import through a new façade call `import_csv`, Seabear, Sensus, Poseidon MkVI and hand-mapped files; CSV added to `docs/import-formats.md` and the formats list, 19 formats). Waiting for native work: « Reprendre » for divelogs.de (a list call and a download of chosen ids), the personal cloud (#74), WebDAV, « Renommer le carnet » and « Changer d’endroit ».
 
 ## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
 
@@ -4286,7 +4283,7 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and 
 
 Done on main: in WelcomeStart, the badge (welcome.beta, Bêta / Beta; tokens --od-beta-badge #DCE7F3 and --od-on-beta-badge #114477, dark values in the dark block) follows the name in the brand row, kept on its line with the name, 8 dp away; the row is one image named « OpenDives, bêta » (welcome.brandBeta). The iOS large title gets the same badge and name. Checked in headless Edge on a tablet and a phone; test in tests/app/welcome-start.test.mjs.
 
-## [ ] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
+## [x] 2026-11-16-226 Release edition: « Voir les formats acceptés » moves under « Un fichier »
 
 Christian approved this on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-formats-link`, started from `feature/release-first-launch-complete` (task 224). Do not merge it into `main`.
 
@@ -4297,6 +4294,8 @@ Mock-ups: `docs/mockups/android-tablette-premier-lancement-production-importer-{
 - The phone mock-ups (`docs/mockups/android-premier-lancement-production-importer*.dc.html`) already show the same layout. They are for a later task (to-do #84): nothing to build for phones now.
 
 **Test:** in both orientations, the link sits between the two rows, a tap anywhere in its 48 dp row opens « Formats acceptés », and TalkBack reads it as a link. The beta on `main` is untouched.
+
+Done on `feature/release-formats-link` (not merged; it also carries main, so the CSV import and the import of several files live together): the link is the row right under « Un fichier », before divelogs.de, on the import and unreadable-file screens (the same step), a 48 dp target with 4 dp of padding, 4 dp from each row, read as a link. Checked in headless Edge at 1280 × 800; test in `tests/app/import-formats.test.mjs`.
 
 ## [ ] 2026-11-16-227 Release edition: the first launch on Android phones
 
@@ -4352,4 +4351,23 @@ Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.htm
 - iCloud Drive shows only on macOS.
 - Dropping a `.ssrf` or `.xml` file on the window imports it.
 - The beta on `main` is untouched.
->>>>>>> origin/main
+
+## [ ] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
+
+Christian approved these on 16 November 2026. **Release edition:** do them on the branches of tasks 227 (`feature/release-phone-first-launch`) and 228 (`feature/release-desktop-first-launch`), or on a new branch `feature/release-first-launch-fixes` started from the latest of them. Do not merge into `main`.
+
+1. **The cloud sign-in hint, everywhere** (`…nuage-connexion…` and `…ouvrir-connexion…`, phone, tablet in both orientations, desktop):
+   - The text becomes « La page de connexion du service s’ouvre. » then, on a second line, « Vous revenez ici ensuite. ». The app opens the page itself: no wording may suggest that the person opens a browser.
+   - The hint is centred under the button. On the tablet and the desktop, the button « Se connecter à {service} » is also centred (it was aligned right).
+2. **The blue band on phones** (`docs/mockups/android-premier-lancement-production*.dc.html`): it now uses the app's own section band.
+   - It uses the same gradient as `--od-band-gradient`, but with the light centre raised to `at 38% -40%`, so that white text keeps at least 4.5:1 everywhere on it. The worst pixel measured on the mock-ups: « OpenDives » 4.96:1 on the first step.
+   - The faint dive profile of `SectionBand.svelte` sits at the bottom of the band, with its wave (18 dp, the same path). On the first step, the faint profile and the wave come under the large decorative profile.
+   - The small band of the later steps is 108 dp tall.
+   - Reuse `SectionBand`, or its pieces, rather than drawing a new band.
+3. **Progress bars on phones** (`…importer-divelogs-progres`, `…importer-divelogs-interrompu`): the wavy indicator and its track stay inside the white card. They never overflow it.
+
+**Test:**
+- On a phone, a tablet and the desktop, the sign-in hint reads on two lines, centred.
+- On a phone, the band matches the app's section bands (gradient, faint profile, wave), and no white text on it is under 4.5:1.
+- The progress bars stay inside their card at 360 dp wide.
+- `main` is untouched.
