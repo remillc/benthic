@@ -4663,3 +4663,55 @@ Christian approved this on 16 November 2026. **Release edition:** do it on the b
 - Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.
 
 Done on `feature/release-desktop-first-launch` (not merged): after first use the window without a logbook lists « Carnets récents » (five at most, newest first) above « Ou bien » and the three compact neutral choices; a missing file is greyed with « Introuvable dans {place} » and its dialog offers « Retirer de la liste » and « Chercher le fichier… » (main-process ops `exists` and `relocate`, which accept only entries of the recent list; git and cloud entries are not checked); « Seulement sur cet ordinateur » has the computer-screen icon. « Chercher le fichier… » was not clicked in the real app (it opens the system picker); its main-process side is tested.
+
+## [ ] 2026-11-16-242 Desktop (alpha): first launch and the « no logbook » window
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings the first launch of tasks 224–239 (phone and tablet) to the desktop app. The mock-ups are 1440 × 900 windows, under `docs/mockups/`.
+
+**Mock-ups**
+- First launch, all named `bureau-premier-lancement-alpha-*.dc.html`:
+  - `accueil`;
+  - `compte-subsurface`, `compte-subsurface-telechargement`, `compte-subsurface-carnet`;
+  - `creer-compte`, `creer-compte-erreur`, `creer-compte-code`, `creer-compte-code-erreur`, `creer-compte-carnet`;
+  - `sans-compte`, `sans-compte-carnet`.
+- « No logbook » window: `bureau-demarrage-actuel.dc.html` (replaced) and `bureau-demarrage-introuvable.dc.html`.
+
+**1. First launch (no logbook and no account yet)**
+- **Left:** a 700 dp blue panel with the same background, Alpha badge, title, text, dive profile and opening animation as the tablet first launch (task 237).
+- **Right:** a 452 dp column, vertically centred, containing:
+  - « Pour commencer »;
+  - the three alpha buttons with their hints (« J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »), the hint under the last one reading « Le carnet reste sur cet ordinateur. Vous pourrez le sauvegarder plus tard »;
+  - a divider and « Utiliser mon propre dépôt git »;
+  - « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. »;
+  - « Une question ? À propos et contact » at the bottom.
+
+**2. Steps.** The steps keep the blue panel, with a static profile. The content is the same as on the tablet (task 239). Only these changes apply:
+- « cette tablette » becomes « cet ordinateur », e.g. « Sur cet ordinateur seulement » and « Si vous perdez ou changez d’ordinateur ».
+- The icon is a computer screen.
+- The confirmation code is laid out as on the tablet: grouped boxes centred in the column, with the label, the error and « Renvoyer le code » aligned on the first box.
+
+**3. Logbook ready.** These are the existing desktop logbook windows with a snackbar placed bottom-left, after the rail:
+- **Compte Subsurface:** the logbook with the dives, snackbar « Carnet téléchargé. Il reste sur cet ordinateur, même sans réseau. »
+- **Créer un compte:** the empty logbook, snackbar « Compte créé. Votre carnet est prêt. »
+- **Commencer sans compte:** the empty logbook, snackbar « Carnet créé sur cet ordinateur. »
+
+**4. The « no logbook » window after first use** (a new window, or after « Fermer le carnet »). It replaces the current centred screen with « Ouvrir un carnet… » and « Nouveau carnet… » buttons.
+- **Left:** the same blue panel, with a static profile.
+- **Right:**
+  - « Carnets récents »: the recently opened logbooks, newest first, at most about five. Each row has an icon for where the logbook is kept, its name, and the place with the time (« Google Drive · fermé il y a 2 min »). A click opens the logbook.
+  - « Ou bien », then two neutral rows:
+    - « Ouvrir un carnet… » (« Un fichier .ssrf ou .xml, ou un dossier de dépôt git. »), which opens the system picker;
+    - « Nouveau carnet… » (« Vous choisirez ensuite où le garder. »), which opens the existing « Nouveau carnet » flow.
+  - The drop hint, then « À propos et contact ».
+- **A missing recent logbook:** its name is greyed and its second line reads « Introuvable dans Documents » in error red with a warning icon. A click opens a basic dialog with no ✕:
+  - title « Carnet introuvable »;
+  - text « « essai.ssrf » n’est plus dans Documents. Il a peut-être été déplacé, renommé ou supprimé. »;
+  - actions « Retirer de la liste » (text button) and « Chercher le fichier… » (filled; the chosen file replaces the entry).
+
+The rail of these windows is not shown in the mock-ups, so Settings and the account are not reachable from them. Leave the rail out here; task 240 still applies to the windows that show it.
+
+**Test:** start the desktop app with no settings.
+1. The first launch matches the mock-up and the profile animates once.
+2. Each of the three paths ends in the right logbook window with its snackbar.
+3. Close the logbook: the recent list appears with « Ou bien ».
+4. Move one recent file away, then reopen the window: the entry shows « Introuvable » and the dialog works.
