@@ -4252,6 +4252,8 @@ Mock-ups: `docs/mockups/android-tablette-import-csv-{type,colonnes,apercu}-paysa
 
 Use the core's CSV import (the one task 221 checked) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
 
+**Done (parts 1–6), branch `feature/release-first-launch-complete`:** portrait for every step (540 dp compact hero from the second step); the connect screens (hint under the button, connection in progress, refused) with the state in `lib/cloud-connection.js` — « Se connecter » still shows the « coming » message until idea #74, the screens are reachable in development through `window.__firstLaunch.connection`; WebDAV create and open with their error; the git, no-logbook, unreadable-file and divelogs.de credential errors; the interrupted divelogs.de download with « Annuler » and « Reprendre » (the screen and the resume logic are in, **but the plugin cannot resume yet**: it needs `divelogsList` and a by-ids `divelogsDownload`, see `lib/first-launch-import.js`); the « Formats acceptés » dialog without a number; the tablet empty logbook with the wider profile and its ⋮ menu (« Ouvrir un autre carnet » and « Nouveau carnet » open the first launch; « Renommer le carnet » and « Changer d’endroit » show a « coming » message). Parts 7 and 8 are on `feature/release-csv-demo`. Not ticked: the coordinator ticks it when parts 7–8 are in.
+
 ### Test
 
 - In the release build, on a tablet, in both orientations: every screen above matches its mock-up.
