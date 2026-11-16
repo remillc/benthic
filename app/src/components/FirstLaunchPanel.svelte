@@ -4,7 +4,7 @@
   // docs/mockups/android-tablette-premier-lancement-paysage.dc.html and -portrait.dc.html): the same blue
   // as the phone's band (hatching, sheen), the round logo, « OpenDives » at 48 sp, the « Alpha » badge, the
   // title, the paragraph and the dive profile with its animation. Landscape: 700 dp wide, the full height,
-  // on the left. Portrait: 640 dp tall, across the top. The status bar is part of the panel.
+  // on the left. Portrait: 640 dp tall (540 on the steps), across the top. The status bar is part of the panel.
   import ProfileHero from './ProfileHero.svelte';
   import { t } from '../lib/i18n.js';
 
@@ -16,7 +16,7 @@
   let { playKey = 0, still = false } = $props();
 </script>
 
-<header class="od-first-launch-panel">
+<header class="od-first-launch-panel" class:od-first-launch-panel--step={still}>
   <div class="od-first-launch-panel--sheen" aria-hidden="true"></div>
   <div class="od-first-launch-panel--hatch" aria-hidden="true"></div>
   <div class="od-first-launch-panel--brand" role="img" aria-label={t('welcome.brandAlpha')}>
@@ -55,6 +55,13 @@
         width: 100%;
         height: 640px;
         padding: calc(var(--od-first-panel-top) + 40px) 56px 48px;
+      }
+
+      /* The steps (task 2026-11-16-257, as the mock-ups of the steps draw them): 540 dp, the column gets the room. */
+      &.od-first-launch-panel--step {
+        @media (orientation: portrait) {
+          height: 540px;
+        }
       }
     }
 

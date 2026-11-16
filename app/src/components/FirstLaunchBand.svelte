@@ -13,6 +13,8 @@
   let { variant = 'step' } = $props();
 
   const welcome = $derived(variant === 'welcome');
+  /** The faint dive profile and the wave of the section band (SectionBand), for the steps. */
+  const STEP_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 
   const WIDTH = 688;
   const HEIGHT = 130;
@@ -24,8 +26,15 @@
 </script>
 
 <header class="od-first-launch-band" class:od-first-launch-band--welcome={welcome}>
-  <div class="od-first-launch-band--sheen" aria-hidden="true"></div>
+  {#if welcome}<div class="od-first-launch-band--sheen" aria-hidden="true"></div>{/if}
   <div class="od-first-launch-band--hatch" aria-hidden="true"></div>
+  {#if !welcome}
+    <svg class="od-first-launch-band--step-profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <path d="{STEP_PROFILE} V140 H0 Z" class="od-first-launch-band--step-area" />
+      <path d={STEP_PROFILE} class="od-first-launch-band--step-line" vector-effect="non-scaling-stroke" />
+    </svg>
+    <svg class="od-first-launch-band--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+  {/if}
   <div class="od-first-launch-band--brand" role="img" aria-label={t('welcome.brandAlpha')}>
     <img class="od-first-launch-band--logo" src="logo-light.svg" alt="" width={welcome ? 40 : 32} height={welcome ? 40 : 32} />
     <span class="od-first-launch-band--name" aria-hidden="true">OpenDives</span>
@@ -61,11 +70,12 @@
       height: calc(var(--od-first-band-top) + 140px);
       padding: calc(var(--od-first-band-top) + 16px) 20px 0;
       overflow: hidden;
-      background: var(--od-first-band);
+      background: var(--od-first-band-step);
       color: var(--od-on-first-band);
 
       &.od-first-launch-band--welcome {
         height: calc(var(--od-first-band-top) + 306px);
+        background: var(--od-first-band);
       }
     }
 
@@ -84,6 +94,40 @@
     .od-first-launch-band--hatch {
       background: var(--od-first-band-hatch);
       mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
+    }
+
+    /* Steps (task 2026-11-16-250): the section band's profile and 18 dp wave in the page colour. */
+    .od-first-launch-band--step-profile {
+      position: absolute;
+      left: 0;
+      bottom: 2px;
+      width: 100%;
+      height: 34px;
+      pointer-events: none;
+    }
+
+    .od-first-launch-band--step-area {
+      fill: var(--od-band-profile-area);
+    }
+
+    .od-first-launch-band--step-line {
+      fill: none;
+      stroke: var(--od-band-profile-line);
+      stroke-width: 1.5;
+      stroke-linejoin: round;
+    }
+
+    .od-first-launch-band--wave {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 18px;
+      display: block;
+
+      path {
+        fill: var(--f7-page-bg-color);
+      }
     }
 
     .od-first-launch-band--brand {
@@ -127,7 +171,8 @@
     }
 
     /* On the welcome band the badge sits under the light sheen: with the fill at 18 % the white 9 sp text
-       measured 4.04:1; at 12 % it is 4.6:1 (WCAG AA 4.5:1). The steps keep 18 % (5.1:1). */
+       measured 4.04:1; at 12 % it is 4.6:1 (WCAG AA 4.5:1). The steps keep 18 %: on the section band's
+       gradient (task 2026-11-16-250) the badge, at about 68 % of the gradient's radius, measures 4.9:1. */
     .od-first-launch-band--welcome .od-first-launch-band--alpha {
       background: var(--od-first-band-badge-welcome);
     }

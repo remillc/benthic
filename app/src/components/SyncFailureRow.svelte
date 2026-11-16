@@ -29,7 +29,8 @@
       return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
     }
     if (logbook.syncFailure !== 'server') return t(`sync.failure.${logbook.syncFailure}.row`);
-    return logbook.retryMinutes ? t('sync.failure.server.row', { n: logbook.retryMinutes }) : t('sync.failure.server.rowManual');
+    const git = logbook.mode === 'git' ? 'Git' : '';
+    return logbook.retryMinutes ? t(`sync.failure.server.row${git}`, { n: logbook.retryMinutes }) : t(`sync.failure.server.rowManual${git}`);
   });
 </script>
 

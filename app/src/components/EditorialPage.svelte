@@ -50,6 +50,7 @@
    *   helpLink?: boolean,
    *   firstLaunch?: boolean,
    *   noRetour?: boolean,
+   *   onback?: () => void,
    *   children: import('svelte').Snippet,
    *   class?: string,
    * }}
@@ -57,7 +58,8 @@
    * action: no main button. secondaryEnd: the text button sits after the
    * main button (iOS: under it). firstLaunch: on an Android phone, the layout of the alpha first launch (tasks
    * 2026-11-16-233 and 236): the blue band, « Retour », the title and the fields on the page, full-width buttons;
-   * noRetour: without the « Retour » link (the download). closable false: no close button (an import
+   * noRetour: without the « Retour » link (the download). onback: « Retour » is a button that calls it instead of
+   * leaving the page (task 2026-11-16-257: the git help replaces the form in the same column). closable false: no close button (an import
    * that runs). back: ← (iOS: "‹ Retour") instead of ✕ (iOS: "Annuler").
    * previous: the text button is "Précédent" (iOS: a grey capsule beside the
    * main one). helpLink: « Une question ? À propos et contact » under the content (first launch).
@@ -80,6 +82,7 @@
     helpLink = false,
     firstLaunch = false,
     noRetour = false,
+    onback,
     children,
     class: extraClass = '',
   } = $props();
@@ -100,6 +103,13 @@
   const panel = $derived(firstLaunch && !ios && !phone);
   /** Both give the step the compact layout: « Retour », title, content on the page, no card. */
   const compact = $derived(band || panel);
+
+  /** The step's column on a tablet: it scrolls, and starts at the top again when the heading changes. @type {HTMLFormElement|undefined} */
+  let panelBody = $state();
+  $effect(() => {
+    heading;
+    if (panelBody) panelBody.scrollTop = 0;
+  });
 </script>
 
 {#snippet actions()}
@@ -155,6 +165,7 @@
     class="od-editorial-page--body"
     class:od-editorial-page--band-body={band}
     class:od-editorial-page--panel-body={panel}
+    bind:this={panelBody}
     novalidate
     onsubmit={(e) => {
       e.preventDefault();
@@ -163,7 +174,12 @@
   >
     {#if compact}
       <!-- Alpha first launch on a phone (task 2026-11-16-233; on a tablet, task 2026-11-16-239, beside the panel): « Retour », the title, the content on the page, full-width buttons. -->
-      {#if !noRetour}
+      {#if !noRetour && onback}
+        <button type="button" class="od-editorial-page--retour" onclick={onback}>
+          <Icon name="arrowBack" size={20} weight={2} />
+          <span>{t('accountStep.back')}</span>
+        </button>
+      {:else if !noRetour}
         <Link back class="od-editorial-page--retour">
           <Icon name="arrowBack" size={20} weight={2} />
           <span>{t('accountStep.back')}</span>
@@ -176,6 +192,11 @@
       </div>
       <div class="od-editorial-page--card">{@render children()}</div>
       {#if action || secondary}{@render actions()}{/if}
+      {#if panel}
+        <!-- The About link ends the column: at its foot when the step is short, after the content when it scrolls (task 2026-11-16-257). -->
+        <div class="od-editorial-page--spacer"></div>
+        {#if helpLink}<WelcomeHelpLink inColumn />{/if}
+      {/if}
     {:else}
     <div class="od-editorial-page--heading">
       <p class="od-editorial-page--eyebrow">{eyebrow}</p>
@@ -193,7 +214,7 @@
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
     {/if}
   </form>
-  {#if helpLink}<WelcomeHelpLink />{/if}
+  {#if helpLink && !panel}<WelcomeHelpLink />{/if}
 </Page>
 
 <style>
@@ -463,7 +484,7 @@
 
     .od-editorial-page--band-body,
     .od-editorial-page--panel-body {
-      padding: 16px 20px 0;
+      padding: 16px 16px 0;
       min-height: 0;
       flex: 1 0 auto;
 
@@ -561,8 +582,21 @@
       flex: 1;
       min-width: 0;
       min-height: 0;
-      padding: 24px 64px 56px;
-      justify-content: center;
+      padding: 24px 64px 28px;
+      /* Centred while it fits; it scrolls (the panel stays) when it is taller (the git help). */
+      overflow-y: auto;
+
+      &::before,
+      .od-editorial-page--spacer {
+        content: '';
+        flex: 1 1 0;
+      }
+
+      /* A narrow window (the desktop's smallest): the column keeps a usable width. */
+      @media (max-width: 900px) and (orientation: landscape) {
+        padding-left: 32px;
+        padding-right: 32px;
+      }
 
       .od-editorial-page--heading,
       .od-editorial-page--card {
@@ -670,12 +704,15 @@
       @media (orientation: portrait) {
         left: 120px;
         right: 120px;
-        top: 640px;
+        top: 540px;
       }
     }
 
     /* The « Retour » link: 20 dp chevron and 15 sp text, a 48 dp tall target, 8 dp out to the left. */
     :global(.od-editorial-page--retour) {
+      border: none;
+      background: none;
+      font-family: inherit;
       align-self: flex-start;
       box-sizing: border-box;
       min-height: 48px;
