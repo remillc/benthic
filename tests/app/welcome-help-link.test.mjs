@@ -31,7 +31,9 @@ test('the component links to /about and only the link text is underlined', () =>
 test('every first-launch screen includes it', () => {
   assert.match(src('pages/WelcomeStart.svelte'), /<WelcomeHelpLink \/>/);
   assert.equal(src('pages/WelcomeStart.svelte').match(/<WelcomeHelpLink \/>/g).length, 2, 'Android and iOS branches');
-  assert.match(src('components/EditorialPage.svelte'), /\{#if helpLink\}<WelcomeHelpLink \/>\{\/if\}/);
+  // Under the page (phone), or the last item of the scrolling column beside the blue panel (task 2026-11-16-257).
+  assert.match(src('components/EditorialPage.svelte'), /\{#if helpLink && !panel\}<WelcomeHelpLink \/>\{\/if\}/);
+  assert.match(src('components/EditorialPage.svelte'), /\{#if helpLink\}<WelcomeHelpLink inColumn \/>\{\/if\}/);
   for (const page of ['SignIn', 'CreateAccount', 'ConfirmCode', 'GitRepository']) {
     assert.match(src(`pages/${page}.svelte`), /helpLink=\{welcome\}/, page);
   }

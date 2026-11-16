@@ -190,6 +190,11 @@
       </div>
       <div class="od-editorial-page--card">{@render children()}</div>
       {#if action || secondary}{@render actions()}{/if}
+      {#if panel}
+        <!-- The About link ends the column: at its foot when the step is short, after the content when it scrolls (task 2026-11-16-257). -->
+        <div class="od-editorial-page--spacer"></div>
+        {#if helpLink}<WelcomeHelpLink inColumn />{/if}
+      {/if}
     {:else}
     <div class="od-editorial-page--heading">
       <p class="od-editorial-page--eyebrow">{eyebrow}</p>
@@ -207,7 +212,7 @@
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
     {/if}
   </form>
-  {#if helpLink}<WelcomeHelpLink />{/if}
+  {#if helpLink && !panel}<WelcomeHelpLink />{/if}
 </Page>
 
 <style>
@@ -575,14 +580,20 @@
       flex: 1;
       min-width: 0;
       min-height: 0;
-      padding: 24px 64px 56px;
+      padding: 24px 64px 28px;
       /* Centred while it fits; it scrolls (the panel stays) when it is taller (the git help). */
       overflow-y: auto;
 
       &::before,
-      &::after {
+      .od-editorial-page--spacer {
         content: '';
         flex: 1 1 0;
+      }
+
+      /* A narrow window (the desktop's smallest): the column keeps a usable width. */
+      @media (max-width: 900px) and (orientation: landscape) {
+        padding-left: 32px;
+        padding-right: 32px;
       }
 
       .od-editorial-page--heading,
