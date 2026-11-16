@@ -19,7 +19,7 @@ killMine();
 await sleep(1500);
 const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
-const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), '--remote-debugging-port=' + (process.env.CDP_PORT || 9391), path.resolve(ssrf)], { env, stdio: 'ignore' });
+const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
 await sleep(3000);
 await p.eval(`(async()=>{const mod=await import('/@fs/${root.replace(/\\/g, '/')}/plugins/opendives-core/desktop.js');window.__calls=[];const proto=mod.OpenDivesCoreDesktop.prototype;proto.__orig=proto.core;

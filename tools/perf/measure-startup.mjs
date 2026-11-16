@@ -21,7 +21,7 @@ for (let run = 0; run < Number(runsArg); run++) {
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.OD_DEV_URL;
   const t0 = Date.now();
-  const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), '--remote-debugging-port=' + (process.env.CDP_PORT || 9391), path.resolve(ssrf)], { env, stdio: 'ignore' });
+  const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
   const p = await attachLogbook();
   let rowsMs = Date.now() - t0;
   if (phone) {

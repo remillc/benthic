@@ -52,6 +52,9 @@
     moveColumn,
     dropTarget,
     DEFAULT_COLUMNS,
+    rowOffsets,
+    windowRange,
+    scrollForRow,
   } from '../lib/desktop-table.js';
   import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatShortDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -99,8 +102,14 @@
   $effect(() => {
     if (!tableEl) return;
     const element = tableEl;
-    const measure = () => (tableRoom = element.clientWidth - 9);
+    const measure = () => {
+      tableRoom = element.clientWidth - 9;
+      viewHeight = element.clientHeight;
+    };
     measure();
+    scrollTop = element.scrollTop;
+    // Arriving with a dive selected (a resize across the layout switch): it is put in view.
+    untrack(() => scrollToDive(desk.selection.focus));
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
@@ -111,9 +120,30 @@
   const selected = $derived(new Set(desk.selection.ids));
   const summary = $derived(logbookSummary(logbook.dives));
 
-  // The columns' extra values follow the logbook.
+  // --- Windowing: only the rows in view (plus a margin) are in the DOM; two spacer rows hold the rest's height. ---
+  let scrollTop = $state(0);
+  let viewHeight = $state(0);
+  const offsets = $derived(rowOffsets(rows));
+  const win = $derived(windowRange(offsets, scrollTop, viewHeight));
+  const windowStart = $derived(win.start);
+  const windowEnd = $derived(win.end);
+  const visibleRows = $derived(rows.slice(windowStart, windowEnd));
+  const padTop = $derived(win.padTop);
+  const padBottom = $derived(win.padBottom);
+
+  /** Scrolls the table so the row of dive `id` is fully in view; computed from the row heights, so it works for rows not drawn. */
+  function scrollToDive(/** @type {number|null} */ id) {
+    if (!tableEl || id == null) return;
+    const i = rows.findIndex((r) => r.type === 'dive' && r.dive.id === id);
+    tableEl.scrollTop = scrollForRow(offsets, i, tableEl.scrollTop, tableEl.clientHeight);
+    scrollTop = tableEl.scrollTop;
+  }
+
+  // The columns' extra values follow the logbook, when a shown column or the sort reads them.
+  const NO_EXTRAS = new Set(['number', 'date', 'site', 'maxDepth', 'duration']);
+  const needsExtras = $derived(columnsNow.some((c) => !NO_EXTRAS.has(c.key)) || !NO_EXTRAS.has(desk.sort.key));
   $effect(() => {
-    if (logbook.loading || logbook.error) return;
+    if (logbook.loading || logbook.error || !needsExtras) return;
     logbook.dives;
     untrack(() => loadExtras());
   });
@@ -258,8 +288,7 @@
 
   /** Keeps the focused row on screen after ↑ ↓. */
   async function revealFocus() {
-    await tick();
-    tableEl?.querySelector(`[data-dive="${desk.selection.focus}"]`)?.scrollIntoView({ block: 'nearest' });
+    scrollToDive(desk.selection.focus);
   }
 
   // --- Actions. ------------------------------------------------------------------------
@@ -863,10 +892,10 @@
         <p class="od-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl}>
-        <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={order.length}>
+      <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+        <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
-            <tr>
+            <tr aria-rowindex="1">
               {#each columnsNow as column (column.key)}
                 {@const sortedHere = desk.sort.key === column.key}
                 <th
@@ -886,10 +915,11 @@
             </tr>
           </thead>
           <tbody>
-            {#each rows as row (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
+            {#if padTop}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padTop}px"></td></tr>{/if}
+            {#each visibleRows as row, at (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
-                <tr class="od-desktop-logbook--trip">
+                <tr class="od-desktop-logbook--trip" aria-rowindex={windowStart + at + 2}>
                   <td colspan={columnsNow.length}>
                     <button
                       type="button"
@@ -910,6 +940,7 @@
                   class:od-desktop-logbook--selected={selected.has(dive.id)}
                   class:od-desktop-logbook--focus={desk.selection.focus === dive.id}
                   aria-selected={selected.has(dive.id)}
+                  aria-rowindex={windowStart + at + 2}
                   data-dive={dive.id}
                   onclick={(e) => rowClick(e, dive.id)}
                   ondblclick={() => editSelected()}
@@ -931,6 +962,7 @@
                 </tr>
               {/if}
             {/each}
+            {#if padBottom}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padBottom}px"></td></tr>{/if}
           </tbody>
         </table>
         {#if !rows.length}<p class="od-desktop-logbook--state" role="status">{t('desktop.noMatch')}</p>{/if}
@@ -1116,6 +1148,8 @@
     .od-desktop-logbook--scroll {
       flex: 1;
       overflow: auto;
+      /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
+      overflow-anchor: none;
       padding-right: 9px;
     }
     /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
@@ -1250,8 +1284,15 @@
       font-size: 11px;
       font-weight: 600;
     }
+    /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
+    .od-desktop-logbook--trip {
+      height: 44px;
+    }
     .od-desktop-logbook--trip td {
       padding: 4px 0;
+    }
+    .od-desktop-logbook--pad td {
+      padding: 0;
     }
     .od-desktop-logbook--trip button {
       display: flex;

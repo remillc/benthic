@@ -13,7 +13,7 @@ killMine();
 await sleep(1500);
 const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: path.join(root, 'build/perf/stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
 delete env.ELECTRON_RUN_AS_NODE; delete env.OD_DEV_URL;
-const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), '--remote-debugging-port=' + (process.env.CDP_PORT || 9391), path.resolve(ssrf)], { env, stdio: 'ignore' });
+const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
 await sleep(5000);
 const ps = `$all=Get-CimInstance Win32_Process; $root=${child.pid}; $ids=@($root); $grow=$true; while($grow){$grow=$false; foreach($x in $all){ if($ids -contains $x.ParentProcessId -and -not ($ids -contains $x.ProcessId)){$ids+=$x.ProcessId;$grow=$true}}}; $cmd=@{}; foreach($x in $all){$cmd[$x.ProcessId]=$x.CommandLine}; foreach($i in $ids){ $pr=Get-Process -Id $i -ErrorAction SilentlyContinue; if($pr){ $c=$cmd[[uint32]$i]; $ty=if($c -match "--type=([a-z-]+)"){$Matches[1]}else{"main"}; ($ty+"|"+[math]::Round($pr.WorkingSet64/1MB)+"|"+$pr.ProcessName) } }`;
