@@ -195,11 +195,12 @@ test('every text of the release screens is in fr and en, none is unused', () => 
   for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
     // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
-    // The desktop app's variant too (« cet ordinateur », task 2026-11-16-228).
+    // The desktop app's variant (« cet ordinateur », task 2026-11-16-228) and the iPhone's (task 2026-11-16-261);
+    // `iphoneKey` is a text that differs only on an iPhone.
     for (const m of src.matchAll(/deviceKey\('(welcomeSteps\.\w+)'/g)) {
-      keys.add(`${m[1]}Phone`);
-      keys.add(`${m[1]}Desktop`);
+      for (const suffix of ['Phone', 'Iphone', 'Desktop']) keys.add(`${m[1]}${suffix}`);
     }
+    for (const m of src.matchAll(/iphoneKey\('(welcomeSteps\.\w+)'/g)) keys.add(`${m[1]}Iphone`);
   }
   assert.ok(keys.size >= 80, `only ${keys.size} keys found`);
   for (const lang of ['fr', 'en']) {

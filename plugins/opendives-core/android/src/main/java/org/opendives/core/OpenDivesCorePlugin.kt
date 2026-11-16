@@ -641,6 +641,12 @@ class OpenDivesCorePlugin : Plugin() {
         )
     }
 
+    /** iCloud Drive exists on iOS only (task 2026-11-16-261): Android never offers it and rejects if it is asked. */
+    @PluginMethod
+    fun createIcloudLogbook(call: PluginCall) {
+        call.reject("NOT_AVAILABLE", "NOT_AVAILABLE")
+    }
+
     /** Cancelled or failed import: the downloaded file is deleted. */
     @PluginMethod
     fun discardImport(call: PluginCall) = onCoreThread(call) {

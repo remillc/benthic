@@ -48,18 +48,23 @@ export const CLOUD_SERVICES = [
 ];
 
 /**
- * iCloud Drive, on macOS only (task 2026-11-16-228): the Mac's own account, so no sign-in screen follows its row.
- * @type {{ key: string, text: string, icon: 'cloud'|'server' }}
+ * iCloud Drive (tasks 2026-11-16-228 and 261): the Apple account of the device, so no sign-in screen follows its
+ * row. Only on an iPhone and in the desktop app on macOS.
+ * @type {{ key: string, text: string, help?: string, icon: 'cloud'|'server' }}
  */
 export const ICLOUD_SERVICE = { key: 'icloud', text: 'welcomeSteps.icloud', icon: 'cloud' };
 
+/** iCloud Drive on an iPhone: the row has a line under its name. */
+const ICLOUD_IPHONE = { ...ICLOUD_SERVICE, help: 'welcomeSteps.icloudHelp' };
+
 /**
- * The services of the lists: the four above, and iCloud Drive before WebDAV on macOS, where the desktop app
- * offers it (Windows and Linux do not show it).
- * @param {boolean} [mac] the desktop app on macOS
- * @returns {{ key: string, text: string, icon: 'cloud'|'server' }[]}
+ * The services of the lists: the four above; iCloud Drive first on an iPhone, before WebDAV on macOS (the desktop
+ * app); Windows, Linux, Android and iPad do not show it.
+ * @param {{ iphone?: boolean, mac?: boolean }} [where]
+ * @returns {{ key: string, text: string, help?: string, icon: 'cloud'|'server' }[]}
  */
-export function cloudServices(mac = false) {
+export function cloudServices({ iphone = false, mac = false } = {}) {
+  if (iphone) return [ICLOUD_IPHONE, ...CLOUD_SERVICES];
   if (!mac) return CLOUD_SERVICES;
   const at = CLOUD_SERVICES.findIndex((s) => s.key === 'webdav');
   return [...CLOUD_SERVICES.slice(0, at), ICLOUD_SERVICE, ...CLOUD_SERVICES.slice(at)];

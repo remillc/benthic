@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PHONE_QUERY, BAND_HEIGHT, deviceKey } from '../../app/src/lib/first-launch-phone.js';
+import { PHONE_QUERY, BAND_HEIGHT, deviceKey, deviceKind } from '../../app/src/lib/first-launch-phone.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -119,8 +119,8 @@ test('the progress bar stays inside its card', () => {
 });
 
 test('texts that name the device: « ce téléphone » on a phone, « cette tablette » on a tablet', () => {
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', true), 'welcomeSteps.deviceTitlePhone');
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', false), 'welcomeSteps.deviceTitle');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: true })), 'welcomeSteps.deviceTitlePhone');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: false })), 'welcomeSteps.deviceTitle');
   const wanted = {
     fr: { deviceTitle: 'Seulement sur ce téléphone', gitTokenHelp: 'Le jeton reste sur ce téléphone.' },
     en: { deviceTitle: 'Only on this phone', gitTokenHelp: 'The token stays on this phone.' },
@@ -139,10 +139,12 @@ test('texts that name the device: « ce téléphone » on a phone, « cette tabl
   assert.ok(langs.fr.welcomeSteps.webdavHelpPhone.endsWith('Il reste sur ce téléphone.'));
   // The components choose the key by layout.phone.
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone, desktopApp\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone, desktopApp\)/);
-  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', layout\.phone, desktopApp\)/);
-  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', layout\.phone, desktopApp\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', kind\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', kind\)/);
+  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', deviceKind\(\{ phone: layout\.phone, ios, desktop: desktopApp \}\)\)/);
+  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', kind\)/);
+  // One kind for every device: the desktop app first, then the iPhone, then the phone, else the tablet.
+  assert.match(steps, /const kind = \$derived\(deviceKind\(\{ phone: layout\.phone, ios, desktop: desktopApp \}\)\)/);
 });
 
 test('the release edition shows its own screen on a phone, not the beta screen', () => {

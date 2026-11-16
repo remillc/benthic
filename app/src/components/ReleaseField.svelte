@@ -4,6 +4,8 @@
   // docs/mockups/android-tablette-premier-lancement-production-*.dc.html): 1 dp outline, 2 dp in the blue on
   // focus, the label on the outline, 12 dp corners. 52 dp high (56 dp for the logbook's name).
   import Icon from './Icon.svelte';
+  import { iosPhone } from '../lib/first-launch-phone.js';
+  import { layout, ios } from '../lib/layout.svelte.js';
 
   let uid = 0;
 
@@ -40,10 +42,13 @@
     onenter,
   } = $props();
 
+  /** On an iPhone the field is a row of a grouped inset list (task 2026-11-16-261; mock-up ios-premier-lancement-production-webdav). */
+  const iphone = $derived(iosPhone(ios, layout.phone));
+
   const id = `od-release-field-${Math.random().toString(36).slice(2, 8)}-${uid++}`;
 </script>
 
-<div class="od-release-field {extra}" class:od-release-field--error={!!error} class:od-release-field--tall={tall}>
+<div class="od-release-field {extra}" class:od-release-field--error={!!error} class:od-release-field--tall={tall} class:od-release-field--ios={iphone} class:od-release-field--noted={!!error || !!help}>
   <div class="od-release-field--box">
     <input
       {id}
@@ -177,6 +182,104 @@
 
     .od-release-field--note-error {
       color: var(--od-alarm);
+    }
+
+    /* iPhone (task 2026-11-16-261): a row of a grouped inset list. White card, 12 pt corners, the label at the left
+       (148 pt: the longest label on one line) and the value at the right, a hairline between rows, the help line under the card. Rows without a
+       note under them join into one card; a field with a note ends its card. */
+    .od-release-field--ios {
+      margin-top: 16px;
+
+      .od-release-field--box {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        border-radius: 12px;
+        background: var(--od-surface);
+      }
+
+      .od-release-field--label {
+        position: static;
+        order: -1;
+        width: 148px;
+        flex: none;
+        padding: 0;
+        background: none;
+        font-size: 17px;
+        line-height: 22px;
+        font-weight: 400;
+        color: var(--od-text);
+      }
+
+      .od-release-field--input,
+      .od-release-field--input:focus,
+      .od-release-field--error .od-release-field--input {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+        height: 48px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: none;
+        font-size: 17px;
+        caret-color: var(--od-release-row-main);
+      }
+
+      .od-release-field--mono {
+        font-size: 15px;
+      }
+
+      &.od-release-field--tall .od-release-field--input {
+        height: 48px;
+        font-size: 17px;
+      }
+
+      .od-release-field--input:focus + .od-release-field--label {
+        color: var(--od-text);
+      }
+
+      &.od-release-field--error .od-release-field--label {
+        color: var(--od-alarm);
+      }
+
+      .od-release-field--error-icon {
+        position: static;
+        flex: none;
+      }
+
+      .od-release-field--note {
+        margin: 6px 16px 0;
+        color: var(--od-release-ios-help);
+      }
+
+      .od-release-field--note-error {
+        color: var(--od-alarm);
+      }
+
+    }
+
+    /* Joined rows: no gap, square inner corners and a hairline inset 16 pt from the left. The neighbours are other
+       instances of this component, which Svelte cannot see: the sibling selectors are global. */
+    :global(.od-release-field--ios:not(.od-release-field--noted):has(+ .od-release-field--ios) .od-release-field--box) {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    :global(.od-release-field--ios:not(.od-release-field--noted) + .od-release-field--ios) {
+      margin-top: 0;
+
+      :global(.od-release-field--box) {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        background-image: linear-gradient(var(--od-release-line-soft), var(--od-release-line-soft));
+        background-size: calc(100% - 16px) 1px;
+        background-position: 16px 0;
+        background-repeat: no-repeat;
+        background-color: var(--od-surface);
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {

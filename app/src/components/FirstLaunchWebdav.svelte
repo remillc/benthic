@@ -10,8 +10,8 @@
   import { connectWebdav, webdavProblem } from '../lib/cloud-connection.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { errorCode } from '../lib/account.js';
-  import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout, desktopApp } from '../lib/layout.svelte.js';
+  import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
+  import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -23,6 +23,8 @@
    */
   let { create, onconnected, oncoming, onsubmit, onfail } = $props();
 
+  /** The device the texts name: this phone, iPhone, tablet or computer. */
+  const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
   const w = flow.webdav;
   let busy = $state(false);
 
@@ -61,7 +63,7 @@
 <div class="od-first-launch-webdav">
   <ReleaseField label={t('welcomeSteps.webdavAddress')} bind:value={w.url} mono error={addressError} disabled={busy} autocomplete="url" oninput={edited} />
   <ReleaseField label={t('welcomeSteps.webdavUser')} bind:value={w.user} disabled={busy} autocomplete="username" oninput={edited} />
-  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', layout.phone, desktopApp))} oninput={edited} />
+  <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', kind))} oninput={edited} />
   <button type="button" class="od-first-launch-webdav--action" disabled={!ready} aria-busy={busy} onclick={run}>
     {t(create ? 'welcomeSteps.createLogbook' : 'welcomeSteps.seeLogbooks')}
   </button>

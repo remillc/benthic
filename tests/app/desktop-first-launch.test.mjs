@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { deviceKey } from '../../app/src/lib/first-launch-phone.js';
+import { deviceKey, deviceKind } from '../../app/src/lib/first-launch-phone.js';
 import { cloudServices, CLOUD_SERVICES } from '../../app/src/lib/release-welcome.js';
 import { forward, back, nextStep } from '../../app/src/lib/first-launch-steps.js';
 import {
@@ -74,10 +74,10 @@ test('the help link opens the desktop About where there is no view of its own', 
 // --- Texts -----------------------------------------------------------------------------------------------
 
 test('« cet ordinateur »: the texts that name the device have a desktop variant, chosen in the desktop app', () => {
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', false, true), 'welcomeSteps.deviceTitleDesktop');
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', true, true), 'welcomeSteps.deviceTitleDesktop', 'a narrow window is still the desktop');
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', true), 'welcomeSteps.deviceTitlePhone');
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', false), 'welcomeSteps.deviceTitle');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: false, desktop: true })), 'welcomeSteps.deviceTitleDesktop');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: true, desktop: true })), 'welcomeSteps.deviceTitleDesktop', 'a narrow window is still the desktop');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: true })), 'welcomeSteps.deviceTitlePhone');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: false })), 'welcomeSteps.deviceTitle');
   const wanted = {
     fr: {
       deviceTitleDesktop: 'Seulement sur cet ordinateur',
@@ -101,8 +101,8 @@ test('« cet ordinateur »: the texts that name the device have a desktop varian
   }
   assert.ok(langs.fr.welcomeSteps.webdavHelpDesktop.endsWith('Il reste sur cet ordinateur.'));
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone, desktopApp\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone, desktopApp\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', kind\)/);
+  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', kind\)/);
 });
 
 test('the sign-in hint reads on two lines, centred, on the desktop too (task 230)', () => {
@@ -150,12 +150,12 @@ test('a drop carries files or it is not ours: text and links are left alone', ()
 // --- iCloud Drive ----------------------------------------------------------------------------------------
 
 test('iCloud Drive is offered on macOS only, before WebDAV; Windows and Linux do not show it', () => {
-  assert.deepEqual(cloudServices(false).map((s) => s.key), ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
-  assert.deepEqual(cloudServices(true).map((s) => s.key), ['googleDrive', 'oneDrive', 'dropbox', 'icloud', 'webdav']);
-  assert.equal(cloudServices(false), CLOUD_SERVICES);
+  assert.deepEqual(cloudServices().map((s) => s.key), ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
+  assert.deepEqual(cloudServices({ mac: true }).map((s) => s.key), ['googleDrive', 'oneDrive', 'dropbox', 'icloud', 'webdav']);
+  assert.equal(cloudServices(), CLOUD_SERVICES);
   assert.deepEqual(CLOUD_SERVICES.map((s) => s.key), ['googleDrive', 'oneDrive', 'dropbox', 'webdav']);
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /const services = cloudServices\(desktopMac\);/);
+  assert.match(steps, /const services = \$derived\(cloudServices\(\{ iphone, mac: desktopMac \}\)\);/);
   assert.match(steps, /\{#each services as s \(s\.key\)\}/);
 });
 
@@ -171,7 +171,7 @@ test('iCloud Drive has no sign-in screen: the choice goes straight to the connec
   // The Mac’s own account: no « Changer de compte »; creating in iCloud Drive says the cloud is coming (stubbed).
   assert.match(steps, /\{#if service\.key !== 'icloud'\}\s*<button[^>]*>\{t\('welcomeSteps\.changeAccount'\)\}/);
   assert.match(steps, /if \(!windowTakes \|\| service\.key === 'icloud'\) return cloud\(\);/);
-  assert.match(steps, /flow\.account = t\('welcomeSteps\.icloudAccount'\)/);
+  assert.match(steps, /flow\.account = t\(iphone \? 'welcomeSteps\.icloudAccountIphone' : 'welcomeSteps\.icloudAccountDesktop'\)/);
 });
 
 // --- The window takes the new logbook --------------------------------------------------------------------
