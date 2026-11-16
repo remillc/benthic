@@ -4717,3 +4717,44 @@ The rail of these windows is not shown in the mock-ups, so Settings and the acco
 4. Move one recent file away, then reopen the window: the entry shows « Introuvable » and the dialog works.
 
 Done on `feature/desktop-logbook` (the desktop app lives there until it is merged into main): the desktop first launch reuses the tablet screens of tasks 237 and 239 with « cet ordinateur » texts, the computer icon, the drop to import and the snackbars after the rail; the « no logbook » window after first use is the blue panel with « Carnets récents », « Ou bien » (« Ouvrir un carnet… », « Nouveau carnet… »), the drop hint and the help link, without the rail; a missing logbook is greyed with its dialog (« Retirer de la liste », « Chercher le fichier… »). The real system picker and real Subsurface calls were not exercised (stubs).
+
+## [ ] 2026-11-16-243 Alpha: About link on the welcome screens, « Télécharger mes plongées » on the desktop
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+1. **« Une question ? À propos et contact » on the alpha welcome screens.**
+   - Phone (`docs/mockups/android-accueil-c.dc.html`): the link goes under « Utiliser mon propre dépôt git », centred, 12 dp below it and 20 dp above the bottom edge.
+   - Tablet (`android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`): the link sits at the bottom of the content column, 28 dp from the edge, as in the tablet steps.
+   - It opens « À propos ». The desktop welcome already has it (task 242).
+2. **« Télécharger mes plongées » on the desktop.** It replaces « Télécharger depuis un ordinateur de plongée » in two places:
+   - the main action of a new empty logbook (`bureau-nouveau-carnet-vide.dc.html`);
+   - the macOS File menu, where it reads « Télécharger mes plongées… » (`bureau-carnets-menu-fichier-macos.dc.html`).
+
+   This matches every other screen.
+
+**Test:** the welcome screens show the About link and it opens « À propos ». On the desktop, the empty logbook and the macOS File menu say « Télécharger mes plongées ».
+
+## [ ] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
+
+The phone first-launch screens of the public version take the same bands as the alpha (tasks 234 and 236):
+- **The welcome hero (330 dp)** uses the hatched dark blue: the linear gradient `#2A6FB0 → #1F5C99 → #0C3866 → #072A4D`, the light sheen at the top left and the diagonal hatching. It keeps its title, text and dive profile, with no wave and no faint decorative profile at the bottom edge.
+- **The band of the steps** grows from 108 to 140 dp, with the same hatched dark blue, no wave and no profile, and a straight bottom edge.
+
+This replaces the light section-band gradient and the 18 dp wave of task 227 on these screens. The content below the band moves down by 32 dp and must still fit on a 390 × 844 dp screen.
+
+**Test:** on a phone, the welcome hero and every step band are hatched dark blue with a straight bottom edge, and white text on them stays at least 4.5:1.
+
+## [ ] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
+
+Christian approved this on 16 November 2026. **Release edition:** do it on its own branch, `feature/release-tablet-profile-lines`, and never merge it into `main`.
+
+Mock-ups: the tablet screens of the public version that show the profile chart, all under `docs/mockups/android-tablette-`:
+- `demo-paysage`, `demo-portrait`, `demo-ajout-*`, `demo-quitter-*`;
+- `carnet-vide-paysage`, `carnet-vide-portrait`, `carnet-vide-menu-paysage`;
+- `import-csv-apercu-paysage`, `import-csv-colonnes-paysage`, `import-csv-type-paysage`.
+
+As task 238 does for the alpha, the depth profile line and the temperature curve change from 1.25 to **1 dp**. Nothing else changes.
+
+**Test:** on a tablet in the public version, the profile line and the temperature curve are 1 dp wide.
