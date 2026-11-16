@@ -4968,3 +4968,30 @@ GitLab and Codeberg exist in French, so their tabs name the labels of the French
 - **Codeberg steps:** + › Nouveau dépôt; Nom du dépôt; Rendre le dépôt privé; leave Initialiser le dépôt unchecked; Créer un dépôt; HTTPS. Link: « Ouvrir la page « Nouveau dépôt » de Codeberg ».
 
 **Test:** the GitLab and Codeberg tabs show the French labels, the GitHub tab the English ones with the new intro.
+
+## [ ] 2026-11-16-257 Tablet and desktop (alpha): « Utiliser mon propre dépôt git », with the help pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings task 247 (phone) and the help pages of tasks 252 to 256 to the tablet and the desktop.
+
+Mock-ups, all in `docs/mockups/`:
+- **Tablet, landscape and portrait:**
+  - `android-tablette-premier-lancement-alpha-git-{paysage,portrait}`;
+  - `-git-erreur-adresse-*`, `-git-erreur-acces-*`;
+  - `-git-telechargement-*`, `-git-carnet-*`.
+- **Desktop:**
+  - `bureau-premier-lancement-alpha-git`;
+  - `-git-erreur-adresse`, `-git-erreur-acces`;
+  - `-git-telechargement`, `-git-carnet`.
+- **Help pages:** `git-depot-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}` and `git-jeton-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}`.
+
+**1. The form.** The same shared git form as on the phone (task 247: texts, fields, messages, links, MD3 spacing), placed in the first-launch frame of the tablet and the desktop: the blue panel with the animated profile stays, the form takes the place of the « J’ai un compte Subsurface » form (same « Retour », same column). « ce téléphone » becomes « cette tablette » or « cet ordinateur ».
+
+**2. Download and logbook.** As for the Subsurface account (tasks 239 and 242), with the git texts: « Votre dépôt git », « Connexion au dépôt » with `github.com/vous/carnet-plongee · main`, « Téléchargement du carnet », « Copie du carnet sur cette tablette / cet ordinateur »; then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette / cet ordinateur, même sans réseau. »
+
+**3. Help pages.** « Comment créer un dépôt » and « Comment créer un jeton d’accès » do not open a new screen: the help replaces the form in the same column, with « Retour » back to the form, the page title, the three tabs and the same content as on the phone (labels as `<kbd>`, values as `<code>`, links that open the browser). The column scrolls when the help is taller than the screen; the blue panel does not move. On the desktop the steps say « Cliquez » instead of « Touchez ».
+
+**Test:**
+- On a tablet in both orientations and on the desktop, « Utiliser mon propre dépôt git » opens the form in the first-launch frame.
+- The two errors show under the right field.
+- The help links swap the form for the help, and « Retour » brings the form back with its fields still filled.
+- A valid repository leads to the download, then to the logbook with the snackbar.
