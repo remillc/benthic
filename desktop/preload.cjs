@@ -84,6 +84,8 @@ contextBridge.exposeInMainWorld('odDesktop', {
     close: () => invoke('od:logbooks', 'close'),
     clearRecent: () => invoke('od:logbooks', 'clearRecent'),
     forget: (options) => invoke('od:logbooks', 'forget', options),
+    exists: () => invoke('od:logbooks', 'exists'),
+    relocate: (options) => invoke('od:logbooks', 'relocate', options),
     /** The personal clouds: { provider, available, connected, account } for each, never a token. */
     cloudStatus: () => invoke('od:logbooks', 'cloudStatus'),
     cloudSignIn: (options) => invoke('od:logbooks', 'cloudSignIn', options),
