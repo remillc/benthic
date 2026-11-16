@@ -4788,3 +4788,44 @@ It is not shown on the steps, on the « no logbook » window, nor on phone or ta
 **Test:**
 - On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
 - The « no logbook » window shows no rail.
+
+## [ ] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+Mock-ups, all in `docs/mockups/`:
+- first launch: `android-premier-lancement-alpha-git.dc.html`, `-alpha-git-erreur-adresse`, `-alpha-git-erreur-acces`, `-alpha-git-telechargement`, `-alpha-git-carnet`;
+- help pages: `git-depot-aide-android.dc.html` (new), `git-jeton-aide-android.dc.html` (existing);
+- Compte: `git-config-android.dc.html`, `git-config-adresse-android.dc.html`, `git-config-erreur-android.dc.html`.
+
+**1. First launch, « Utiliser mon propre dépôt git ».** The link on the welcome screen opens a step page with the alpha hatched band (140 dp, as in task 236), « Retour », and the git form:
+- title « Votre propre dépôt git »; intro « Gardez votre carnet dans votre dépôt git, avec une copie sur ce téléphone. »;
+- link « Comment créer un dépôt » → the new help page;
+- outlined fields: « Adresse du dépôt (HTTPS) » (monospace), « Nom d’utilisateur », « Jeton d’accès » (hidden, with the eye icon, help line « Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe. »), then the link « Comment créer un jeton d’accès » → `git-jeton-aide-android`, then the « Branche » dropdown;
+- the address is checked when the field loses focus: « Dépôt trouvé, avec un carnet existant. » (green, with a check), or the errors shown in the two error mock-ups (« Aucun dépôt git à cette adresse… » under the address; « Accès refusé par le serveur… » under the token, with the address line « Dépôt privé ou introuvable : il sera vérifié avec le jeton. »);
+- « Branche » lists the branches read from the repository (« 3 branches lues dans le dépôt : … »); before that it is empty with « La liste des branches s’affiche quand le dépôt est trouvé. »;
+- « Connecter », full width, then the About link at the bottom.
+« Connecter » goes to the download screen (`-git-telechargement`: connection, then « Téléchargement du carnet » with a count, « Annuler »), then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau. » (`-git-carnet`).
+
+**2. Help page « Créer un dépôt »** (`git-depot-aide-android`). Same app bar as the token help page, back to the form. Tabs GitHub, GitLab, Codeberg; only GitHub is drawn: 6 steps (private, empty repository; copy the HTTPS address), the button « Ouvrir la page « New repository » de GitHub » (opens the browser), and the closing line about the token. For GitLab and Codeberg, write the equivalent steps with each site's English labels; Christian will review them.
+
+**3. One form for Compte.** The git screens in Compte (`git-config-*`) now use exactly the same form as the first launch. Only the top differs: an app bar « ← Votre propre dépôt git » (back to Compte) instead of the hatched band. The old ✕, white card and decorative profile are gone. Build it as one shared component.
+
+**4. Spacing (MD3, 4 dp grid)** in this form: 8 dp title → intro; 16 dp intro → « Comment créer un dépôt » → first field; 16 dp between fields; 4 dp field → help line; the token link 4 dp under the token help line; 24 dp before « Connecter ». Every link keeps a 48 dp touch target; only the visible gaps are as listed.
+
+**5. Side margins 16 dp** (was 20) on every phone first-launch step page of the alpha and beta: `android-premier-lancement-alpha-*` and `android-premier-lancement-beta-*`. The header band is unchanged.
+
+**Test:**
+- From the welcome screen, « Utiliser mon propre dépôt git » opens the form; a valid repository and token lead to the download, then to the open logbook with the snackbar.
+- A wrong address and a refused token show the messages of the mock-ups under the right field.
+- Compte › dépôt git shows the same form with the app bar.
+- Both help links open their pages and Back returns to the form.
+- At 390 dp wide, the content starts 16 dp from each edge.
+
+## [ ] 2026-11-16-248 Phone first launch (release): 16 dp side margins
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+On every step page of the phone first launch, the side margins change from 20 to **16 dp** (MD3 margin for compact screens). Nothing else changes; the header bands keep their own layout.
+
+**Test:** at 390 dp wide, the content of every first-launch step starts 16 dp from each edge.
