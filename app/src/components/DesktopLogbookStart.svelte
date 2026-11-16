@@ -115,12 +115,13 @@
       padding: 24px 0;
     }
 
-    .od-logbook-start--column :global(.od-welcome-help-link) {
+    :global(html.od-desktop-app) .od-logbook-start--column :global(.od-welcome-help-link) {
       position: relative;
       inset: auto;
       flex: none;
       transform: none;
       margin: 0 auto 28px;
+      white-space: normal;
     }
 
     .od-logbook-start--or {

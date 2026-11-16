@@ -23,7 +23,9 @@
 
   // The tablet's panel plays its profile animation each time the screen is shown (task 2026-11-16-237).
   let playKey = $state(0);
-  const panel = $derived(!theme.ios && !layout.phone);
+  /** The phone's blue band: never in the desktop app, whose window can be a few pixels under 768 dp (task 2026-11-16-242). */
+  const band = $derived(layout.phone && !desktopApp);
+  const panel = $derived(!theme.ios && !band);
   /** This screen is the one on show (a step above it hides it), for the desktop's drop. */
   let shown = $state(false);
   /** A file is being dragged over the window (desktop). */
@@ -100,8 +102,8 @@
   onPageBeforeOut={() => (shown = false)}
 >
   {#if !theme.ios}
-    <div class="od-welcome-start--page" class:od-welcome-start--with-band={layout.phone} class:od-welcome-start--with-panel={panel}>
-      {#if layout.phone}
+    <div class="od-welcome-start--page" class:od-welcome-start--with-band={band} class:od-welcome-start--with-panel={panel}>
+      {#if band}
         <!-- Android phone (tasks 2026-11-16-233 to 236): the blue band replaces the brand row, the headline and the profile. -->
         <FirstLaunchBand variant="welcome" />
       {:else}

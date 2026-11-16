@@ -121,8 +121,8 @@ test('the Alpha badge: 12 sp, line 16, letter spacing 0.6, padding 2 x 8 dp, out
 });
 
 test('the tablet / phone split: the panel on an Android tablet only, the band on a phone, iOS untouched', () => {
-  assert.match(welcome, /const panel = \$derived\(!theme\.ios && !layout\.phone\);/);
-  assert.match(welcome, /\{#if layout\.phone\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}/);
+  assert.match(welcome, /const band = \$derived\(layout\.phone && !desktopApp\);\s*const panel = \$derived\(!theme\.ios && !band\);/);
+  assert.match(welcome, /\{#if band\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}/);
   assert.match(welcome, /\{#if panel\}<h2 class="od-welcome-start--start">\{t\('firstLaunch\.tabletStart'\)\}<\/h2>\{\/if\}/);
   // The three buttons, their hints, the divider and the git link are shared with the phone.
   for (const key of ['existingShort', 'existingNote', 'createShort', 'createNote', 'noAccount']) assert.ok(welcome.includes(`'welcome.${key}'`), key);
@@ -150,8 +150,8 @@ test('the « Une question ? » link sits in the middle of the content side besid
 });
 
 test('task 239: the steps keep the panel, still, with the step in a 452 dp column and the buttons on the right', () => {
-  assert.match(editorial, /const panel = \$derived\(firstLaunch && !ios && !layout\.phone\);/);
-  assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && layout\.phone\);/);
+  assert.match(editorial, /const panel = \$derived\(firstLaunch && !ios && !phone\);/);
+  assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && phone\);/);
   assert.match(editorial, /\{:else if panel\}\s*<FirstLaunchPanel still \/>/);
   const style = css(editorial);
   // 580 dp of content side at 1280 dp, 64 dp on each side: 452 dp.

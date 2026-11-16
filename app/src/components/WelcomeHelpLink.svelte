@@ -82,6 +82,19 @@
     }
 
     /* The desktop app: the panel is 48.6 % of the window at most 700 dp (components/FirstLaunchPanel.svelte), in any shape. */
+    :global(html.od-desktop-app .od-welcome-help-link) {
+      position: absolute;
+      left: var(--od-help-link-left, 50%);
+      bottom: 28px;
+      margin: 0;
+      transform: translateX(-50%);
+      white-space: nowrap;
+
+      /* A low window: a step may scroll under the link, which then keeps its own ground. */
+      @media (max-height: 700px) {
+        background: var(--od-background);
+      }
+    }
     :global(html.od-desktop-app .od-first-panelled) {
       --od-help-link-left: calc(min(700px, 48.6%) + (100% - min(700px, 48.6%)) / 2);
     }

@@ -28,9 +28,9 @@ test('the new style is for an Android phone only: a tablet and iOS keep their sc
   assert.equal(newFirstLaunch({ phone: true, ios: true }), false);
   assert.equal(newFirstLaunch({ phone: false, ios: true }), false);
   // The welcome screen: the band on a phone, the panel of task 237 on a tablet; iOS has its own branch.
-  assert.match(welcome, /\{#if layout\.phone\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}\s*<!--[^>]*-->\s*<FirstLaunchPanel \{playKey\} \/>/);
+  assert.match(welcome, /\{#if band\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}\s*<!--[^>]*-->\s*<FirstLaunchPanel \{playKey\} \/>/);
   // The steps: the band and « Retour » only when the page says firstLaunch, on an Android phone.
-  assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && layout\.phone\)/);
+  assert.match(editorial, /const band = \$derived\(firstLaunch && !ios && phone\)/);
   for (const page of [signIn, create, confirm, download, local]) assert.match(page, /firstLaunch/);
   // « Utiliser mon propre dépôt git » keeps its screens: it does not ask for the band.
   assert.doesNotMatch(read('pages/GitRepository.svelte'), /firstLaunch/);
