@@ -34,17 +34,14 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 <div style="position: relative; width: 800px; height: 1280px; box-sizing: border-box; background: #F5F4F0; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124; overflow: hidden; display: flex; flex-direction: column"><style>
 /* Mock-up only: the sequence loops every 6 s so it can be watched. In the app it plays once, when the screen opens. */
 @keyframes odpl-draw{0%{stroke-dashoffset:1}35%{stroke-dashoffset:0}100%{stroke-dashoffset:0}}
-@keyframes odpl-fill{0%{clip-path:inset(0 100% 0 0)}35%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 0 0 0)}}
 @keyframes odpl-dot{0%,12%{opacity:0;transform:scale(.4)}17%,88%{opacity:1;transform:none}96%,100%{opacity:0;transform:none}}
 @keyframes odpl-in{0%,36%{opacity:0;transform:translateY(8px)}44%,88%{opacity:1;transform:none}96%,100%{opacity:0;transform:none}}
 @keyframes odpl-cycle{0%,88%{opacity:1}96%,100%{opacity:0}}
-.odpl-line,.odpl-glow{stroke-dasharray:1;animation:odpl-draw 6s cubic-bezier(.4,0,.2,1) infinite}
-.odpl-area{animation:odpl-fill 6s cubic-bezier(.7,0,.3,1) infinite}
-.odpl-profile{animation:odpl-cycle 6s linear infinite}
+.odpl-line,.odpl-glow{stroke-dasharray:1;animation:odpl-draw 6s cubic-bezier(.4,0,.2,1) infinite, odpl-cycle 6s linear infinite}
 .odpl-dot{animation:odpl-dot 6s linear infinite}
 .odpl-chip{animation:odpl-in 6s linear infinite}
 .odpl-row{transition:transform .15s, box-shadow .15s}.odpl-row:hover{transform:translateY(-1px)}
-@media (prefers-reduced-motion: reduce){.odpl-line,.odpl-glow,.odpl-area,.odpl-profile,.odpl-dot,.odpl-chip{animation:none}}
+@media (prefers-reduced-motion: reduce){.odpl-line,.odpl-glow,.odpl-dot,.odpl-chip{animation:none}}
 </style><div aria-hidden="true" style="position: absolute; left: 0; top: 0; right: 0; height: 24px; padding: 0 16px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; z-index: 2"><span style="flex: 1; color: #FFFFFF">10 h 30</span><svg width="15" height="12" viewBox="0 0 15 12"><path d="M7.5 11.5L0 3a11 11 0 0 1 15 0z" style="fill: #FFFFFF"></path></svg><svg width="9" height="14" viewBox="0 0 9 14"><rect x="0" y="1.5" width="9" height="12.5" rx="1.5" style="fill: #FFFFFF"></rect><rect x="3" y="0" width="3" height="2" style="fill: #FFFFFF"></rect></svg></div><div style="position: relative; width: 800px; height: 640px; flex: none; overflow: hidden; background: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)">
 <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(ellipse 70% 45% at 22% 0%, rgba(255,255,255,0.22), rgba(255,255,255,0) 70%)"></div>
 <div aria-hidden="true" style="position: absolute; inset: 0; background: repeating-linear-gradient(105deg, rgba(255,255,255,0.035) 0 60px, rgba(255,255,255,0) 60px 150px); mask-image: linear-gradient(180deg, #000 0%, transparent 55%); -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 55%)"></div>
