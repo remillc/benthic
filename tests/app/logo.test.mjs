@@ -88,16 +88,38 @@ test('the favicon keeps the disc gradient and one thick white wave, simplified f
 });
 
 test('the brand files are the relief drawing; the flat ones are in previous/', () => {
-  for (const f of ['opendives-logo.svg', 'opendives-logo-light.svg', 'opendives-logo-dark.svg', 'opendives-icon-light-round.svg', 'opendives-icon-dark-squircle.svg', 'opendives-icon-light-fullbleed.svg']) {
+  for (const f of ['opendives-logo.svg', 'opendives-logo-light.svg', 'opendives-logo-dark.svg']) {
     assert.match(read(join(root, 'docs/brand', f)), RELIEF, f);
+  }
+  // App icons are blue to their edge (no white ring once masked): the gradient over the whole icon, the wave on top.
+  for (const f of ['opendives-icon-light-round.svg', 'opendives-icon-dark-squircle.svg', 'opendives-icon-light-fullbleed.svg']) {
+    const icon = read(join(root, 'docs/brand', f));
+    assert.ok(icon.includes('<rect width="108" height="108" fill="url(#od-icon)"/>'), f);
+    assert.doesNotMatch(icon, /#F4F4F2|#121314/i, f);
   }
   assert.ok(!existsSync(join(root, 'docs/brand/opendives-logo-relief.svg')));
   assert.match(read(join(root, 'docs/brand/previous/opendives-logo-simple.svg')), /#114477/);
 });
 
-test('the Android foreground and splash marks are the relief: gradient disc of radius 30, rim, shadow and wave', () => {
+test('the Android launcher icon is blue to its edge: gradient background, the wave and its shadow on top (no white ring)', () => {
   const res = join(root, 'app/android/app/src/main/res');
-  const files = ['drawable/ic_launcher_foreground.xml', 'drawable/ic_splash_mark.xml', 'drawable-night/ic_splash_mark.xml'];
+  const bg = read(join(res, 'drawable/ic_launcher_background.xml'));
+  assert.match(bg, /M0,0h108v108h-108Z/);
+  assert.match(bg, /#FF1F5C99/);
+  assert.match(bg, /#FF0C3866/);
+  const fg = read(join(res, 'drawable/ic_launcher_foreground.xml'));
+  assert.doesNotMatch(fg, /a30,30|<gradient|#33FFFFFF/);
+  assert.match(fg, /#59072A4D/);
+  assert.match(fg, /#FFFFFFFF/);
+  for (const f of ['ic_launcher', 'ic_launcher_round']) {
+    const a = read(join(res, `mipmap-anydpi-v26/${f}.xml`));
+    assert.ok(a.includes('<background android:drawable="@drawable/ic_launcher_background"/>'), f);
+  }
+});
+
+test('the Android splash marks are the relief: gradient disc of radius 30, rim, shadow and wave', () => {
+  const res = join(root, 'app/android/app/src/main/res');
+  const files = ['drawable/ic_splash_mark.xml', 'drawable-night/ic_splash_mark.xml'];
   for (const f of files) {
     const s = read(join(res, f));
     assert.match(s, /#FF1F5C99/, f);
@@ -108,7 +130,7 @@ test('the Android foreground and splash marks are the relief: gradient disc of r
     assert.equal((s.match(/<path/g) || []).length, 4, f);
     assert.equal((s.match(/<gradient/g) || []).length, 2, f);
   }
-  assert.equal(read(join(res, files[1])).replace(/<!--.*?-->/gs, ''), read(join(res, files[2])).replace(/<!--.*?-->/gs, ''));
+  assert.equal(read(join(res, files[0])).replace(/<!--.*?-->/gs, ''), read(join(res, files[1])).replace(/<!--.*?-->/gs, ''));
 });
 
 test('the minSdk supports gradients in vector drawables (API 24)', () => {

@@ -38,11 +38,20 @@ const FAVICON =
   '<path d="M5 13q3.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>';
 const svg = (w, h, vb, inner) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}">${inner}</svg>\n`;
 const placed = `<g transform="translate(54 54) scale(2.72727) translate(-12 -12)">${logoBody()}</g>`;
-const icon = (bg, shape) => {
-  const bgRect = `<rect width="108" height="108" fill="${bg}"/>`;
-  if (shape === 'fullbleed') return svg(108, 108, '0 0 108 108', bgRect + placed);
+// App icons are blue to their edge (no white ring once the system masks them): the disc's gradient fills the
+// whole icon and the wave sits on top, with its shadow and no rim, at the size it has in the Android launcher
+// icon (64 % of the visible width). `_bg` is kept for the callers; the icon no longer shows a background colour.
+const iconWave =
+  '<path d="M5 14.1q3.5-3 7 0t7 0" fill="none" stroke="#072A4D" stroke-opacity="0.35" stroke-width="2.2" stroke-linecap="round"/>' +
+  '<path d="M5 13q3.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>';
+const icon = (_bg, shape) => {
+  const blue =
+    '<defs><linearGradient id="od-icon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
+    '<rect width="108" height="108" fill="url(#od-icon)"/>' +
+    `<g transform="translate(54 54) scale(4.909) translate(-12 -12)">${iconWave}</g>`;
+  if (shape === 'fullbleed') return svg(108, 108, '0 0 108 108', blue);
   const clip = shape === 'round' ? '<circle cx="54" cy="54" r="54"/>' : '<rect width="108" height="108" rx="26"/>';
-  return svg(108, 108, '0 0 108 108', `<clipPath id="m">${clip}</clipPath><g clip-path="url(#m)">${bgRect}${placed}</g>`);
+  return svg(108, 108, '0 0 108 108', `<clipPath id="m">${clip}</clipPath><g clip-path="url(#m)">${blue}</g>`);
 };
 
 /** Files of the repository: [path, content]. */

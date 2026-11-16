@@ -4023,7 +4023,7 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 
 Done: on the branch `feature/release-new-logbook` (task 217), not merged into `main`. The right-hand column of the release first launch is now the steps of the mock-ups (`components/FirstLaunchSteps.svelte`, order in `lib/first-launch-steps.js`, state in `lib/first-launch.svelte.js`): « Pour commencer », « Nouveau carnet », the cloud (service, connection, connected), git, « Importer un carnet » (file, divelogs.de form and progress, « Nouveau carnet » with the summary) and « Ouvrir mon carnet OpenDives » (cloud, list, git), with the shared-axis X transition on the column only (« Retour » plays it backwards, reduced motion cuts it). The blue panel is unchanged and its line draws only when the page opens. The dialog, its tokens and the line « Aucune plongée n’est envoyée à OpenDives. » are removed (texts in `welcomeSteps`, `fr.json` and `en.json`). Working paths, checked in headless Edge with a fake plugin: Seulement sur cette tablette, git create, git open, file import, divelogs.de. Not done: « Essayer avec un carnet d’exemple » (hidden until #69); every cloud action says « Le nuage arrive dans une prochaine version. » (#74). The name is kept as a label (`od.logbookName`): the device logbook is a local git repository in the app’s folder, not a `.ssrf` file, so renaming it needs a native change; the sanitising and « (2) » rule is `lib/logbook-name.js` with tests. The git step has no user name field: the first segment of the address is sent with the token. divelogs.de gives no progress inside the download (the bar goes from 0 to N). Tests: `tests/app/release-welcome.test.mjs`.
 
-## [ ] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
+## [x] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
 
 Christian approved this on 15 November 2026.
 
@@ -4053,9 +4053,9 @@ Christian approved this on 15 November 2026.
 
 Done (part 2, beta): `app/src/components/WelcomeHelpLink.svelte` (class `od-welcome-help-link`, colour `--od-text-2`, #4B4A47 light / #B5B8BC dark, ⓘ 18 dp, 14 sp, only « À propos et contact » underlined, pointer and hover state), keys `welcomeHelp.question|link|label` in `fr.json` and `en.json`, a release note line. On `WelcomeStart` (Android and iOS branches) and, through a `helpLink` prop of `EditorialPage` set from `welcome`, on the first-launch sign-in, account creation, code and git repository screens. Tablet: centred, pinned 28 dp above the bottom; phone: centred at the end of the content (below the fold when the page does not scroll). It opens `/about` in the first-launch view; « Retour » returns to the same step. Tests: `tests/app/welcome-help-link.test.mjs`. Before/after headless screenshots: only the link's area changes on tablets; on Android phones the geometry is unchanged, only text anti-aliasing differs (the page now scrolls). Not ticked: the coordinator ticks it when both parts are in.
 
-Part 1 done (release edition), on `feature/release-new-logbook`: the link `WelcomeHelpLink` is pinned 28 dp above the bottom of the right-hand column on every step, both orientations; it opens About and « Retour » comes back to the same step. Left unticked: the coordinator ticks it when both parts are in.
+Done (part 1, release edition): on `feature/release-new-logbook` (task 218), the same `WelcomeHelpLink` pinned 28 dp above the bottom of the right-hand column on every step, both orientations; About and back keep the step. Both parts done.
 
-## [ ] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
+## [x] 2026-11-15-220 Empty logbook: « Télécharger mes plongées » with a dive computer icon; the tablet empty logbook
 
 Christian approved this on 15 November 2026.
 
@@ -4087,4 +4087,87 @@ Christian approved this on 15 November 2026.
 
 Done (part 1, beta, phone and tablet on `main`): the empty logbook's main action is « Télécharger mes plongées » (`logbook.emptyDownload`, replaces `emptyPair`) with the new `diveComputer` icon of `Icon.svelte` (the task's paths, the rect as a rounded path); on iOS the help text is `logbook.emptyTextIos`. Tests in `tests/app/empty-logbook.test.mjs`. Desktop: on its branch.
 
-Part 2 done (release edition), on `feature/release-new-logbook`: the tablet empty logbook (`components/ReleaseEmptyLogbook.svelte`, drawn by `pages/Logbook.svelte` over the empty detail pane when `isRelease`), with the band « Mon carnet · Cette tablette / Aucune plongée », the 520 dp column, « Télécharger mes plongées » with the `diveComputer` icon and the paper of three ways. Every « Créer le carnet » of 218 lands there. Left unticked: the coordinator ticks it when both parts are in.
+Done (part 2, release edition): on `feature/release-new-logbook`, `ReleaseEmptyLogbook.svelte`, the tablet empty logbook (band with the logbook name and where it is kept, then « Aucune plongée »; on the right the 520 dp column with the smooth profile, « Télécharger mes plongées » and the paper). Desktop (beta): the ready screen of a new logbook uses the same label and icon, on `feature/desktop-logbook`. Both parts done.
+
+## [x] 2026-11-16-221 Check every import format the core reads, with real files
+
+Christian asked for this on 16 November 2026. It is for the website's selling points (to-do #80): we want to be able to say how many dive log formats OpenDives imports, and be right. No interface change.
+
+**What we know:**
+- OpenDives compiles the core's full import path: no `SUBSURFACE_MOBILE`, with sqlite, libzip and libxslt, and the XSLT stylesheets copied into the app.
+- The file picker accepts any file, and the core picks the format from the extension.
+- Only FIT has a test (`tests/fit_import_test.cpp`).
+
+**Do:**
+1. **A test over sample files.** Add `tests/import_formats_test.cpp`, built by `poc/build.sh`, which imports through the façade's `import_dives` each sample file of Subsurface's `third_party/subsurface/dives/`. The samples include:
+   - .ssrf, .xml, UDDF, UDCF ;
+   - Suunto DM3 .SDE, DM4 and DM5 .db ;
+   - divelogs.de .DLD, JDiveLog .jlb ;
+   - Shearwater Cloud and Seac .db, Diving Log .sql ;
+   - DL7 .zxu, OSTCtools .dive, Divesoft .dlf ;
+   - DataTrak .log, SmartTrak .slg ;
+   - Garmin and Suunto .fit, Suunto .json ;
+   - APD .uddf.
+
+   Where Subsurface keeps a reference (the `…xml` next to a sample, e.g. `TestDiveDM4.xml`, `test-apd-inspiration-reference.xml`), compare what was read with it as Subsurface's own tests do (`third_party/subsurface/tests/testparse.cpp`, testparsetoxml…). Otherwise, check the number of dives and that each has a profile.
+2. **Android.** Run the same test with the NDK on the emulator, as `tests/release-check.sh` does for the other programs, to confirm that sqlite, libzip and the XSLT stylesheets work in the app's own build.
+3. **Suunto app JSON.** `import-suunto-json` is not in `core/compat/core-files.txt`: it is replaced by a stub in `qthelper_compat.cpp`. If adding the source file builds without changing Subsurface, add it and test the `suunto_*.json` samples. If it cannot, say why.
+4. **CSV.** It is out of scope: the core refuses a .csv opened directly, and asks for its column-mapping dialog. Just list which samples need it (Seabear, Poseidon, Sensus, generic CSV).
+5. **The report.** Write `docs/import-formats.md`: one line per format, with its extension(s), the sample used, the result (works, works with differences, fails, not reachable) and a short note. Give the total that work. Mark the task done with that total.
+
+**Do not change:**
+- the import screen and its texts (`addImportFormats`, `importFailed`) ;
+- the release notes.
+
+The texts will be updated in the design session from this report.
+
+Done in test/import-formats: **18 formats work, 7 are not reachable, none fails** (report: `docs/import-formats.md`). Of the 18, 17 are clean and one works with differences (the Suunto app's JSON); counting only formats other than Subsurface's own log, 17. `tests/import_formats_test.cpp` (built by `poc/build.sh` as `build/poc/import-formats`) imports 48 sample files through `import_dives()` (and the Suunto `.json` + `.fit` pair through the core): against Subsurface's reference where one exists (20 samples; one identical as it comes, 18 differing only by what the import itself adds, the cylinder depth and the dive number, which Subsurface's own import adds too, and one that differs in content), else the dive count and a profile on every dive. Works: Subsurface XML and `.ssrf`, UDDF, APD UDDF, UDCF, Suunto DM3 `.SDE`, DM4 and DM5 `.db`, divelogs.de `.DLD` and `.divelogs`, JDiveLog `.jlb`, Shearwater Cloud `.db`, Seac `.db`, Diving Log `.sql`, OSTCtools `.dive`, Divesoft `.dlf`, DataTrak `.log`, FIT (Garmin and Suunto), Suunto app JSON. Not reachable: SmartTrak `.slg` (a separate program in Subsurface, not in the core), DL7 `.zxu`, and the CSV samples (Seabear, Poseidon, Sensus, generic CSV and TSV), which need the column mapping. **Suunto JSON:** added, without changing Subsurface: `core/compat/qtshim/qtjson.h` stands in for the Qt JSON classes, `QFile` and `QFileInfo` that `import-suunto-json.cpp` uses, `import-suunto-json` is in `core-files.txt` and the stub in `qthelper_compat.cpp` is gone. Four of the five `suunto_*.json` samples are identical to the references; `suunto_ocean_nitrox.json` alone has no gas mix and no gradient factors (they are in its `.fit`), and the core pairs the two files only through `suunto_json_fit_pair_import()`, which the façade does not call (the pair gives the reference, checked in the test): to decide whether the app pairs a `.json` and a `.fit` selected together. **Android:** the same program built with the NDK (`tests/android/build.sh`, `tests/android/run-import-formats.sh`) on `emulator-5554`: 108 checks passed, 0 failed, the same results as on the host line for line; the stylesheet folder must be an absolute path (the app's is). Not added to `tests/release-check.sh`, which locks the planner and tool calculations, and which would need the 29 MB of samples pushed to the emulator for a check that is not about the planner. Round trip: 98 passed, 0 failed. Not changed: the import screen, its texts, the release notes.
+
+## [x] 2026-11-16-222 Desktop: the window without a logbook, a larger brand row with more space
+
+Christian approved this on 16 November 2026.
+
+**Mock-up:** `docs/mockups/bureau-demarrage-actuel.dc.html`. It is now a drawn mock-up of the screen the desktop app shows today: the faded rail, then « OpenDives », « Aucun carnet ouvert dans cette fenêtre », « Ouvrir un carnet… », « Nouveau carnet… » and « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. ».
+
+**What changes:**
+- The logo in use goes from about 60 px to **96 px**.
+- « OpenDives » goes to **44 px** (weight 500, letter spacing −0.5).
+- « Aucun carnet ouvert dans cette fenêtre » goes to **18 px**, #4B4A47, 4 px under the name.
+- The gap between the logo and the text is **24 px**.
+- The brand row stands **48 px** above the two buttons (about 20 px today).
+- The block stays centred in the window, 600 px wide.
+
+**What does not change:** the buttons, their order, their texts, the drop line and the rail.
+
+**Where:** the desktop app (`desktop/`), on `main`. This is the current beta desktop, not the release edition. The desktop source is not in this repository's history I can see; if the screen lives elsewhere, apply it there.
+
+**Test:** the window without a logbook matches the mock-up at 1440 × 900, and the block stays centred when the window is resized.
+
+Done on `feature/desktop-logbook` (the desktop app lives there until it is merged): `DesktopLogbookStart.svelte`, logo 96 px, « OpenDives » 44 px (500, −0.5), the line 18 px in `--od-text-2` 4 px under it, 24 px between logo and text, 48 px above the buttons, a 600 px centred column; buttons, drop line and rail unchanged. Checked in the desktop app at 1440 × 900 against the mock-up.
+
+## [ ] 2026-11-16-223 Release edition: « Plus de 30 formats » and the list of accepted formats on « Importer un carnet »
+
+Christian approved this on 16 November 2026. **Release edition:** build it on the branch of task 218 (`feature/release-new-logbook`). Do not merge it into `main`. It follows task 221: do it once `docs/import-formats.md` exists.
+
+Mock-ups:
+- `docs/mockups/android-tablette-premier-lancement-production-importer-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-fichier-erreur-paysage.dc.html` (with `-portrait`) ;
+- `…-importer-formats-paysage.dc.html`.
+
+**Changes:**
+1. **The help line of « Un fichier »** becomes « Plus de 30 formats : .ssrf, .xml, UDDF, FIT, CSV, Suunto, Shearwater et d’autres carnets. ». **Use the real total** from `docs/import-formats.md`:
+   - if fewer than 30 formats work, write the true number (« Plus de 20 formats », or the exact count) ;
+   - name only brands that work.
+2. **A link under the two choice rows:** « Voir les formats acceptés » (14 sp, #1F5C99, underlined), on the source screen and on the « fichier illisible » error screen, in both orientations.
+3. **The link opens the « Formats acceptés » dialog.** It is a **basic dialog**: no ✕, a text button « Fermer » at the bottom right, and it also closes with a tap on the scrim and with Back (the new rule in `docs/system-design.md`).
+   - The text « OpenDives lit plus de 30 formats de carnet. Choisissez le fichier exporté par votre logiciel ou votre appareil. », with the same real number.
+   - Three columns: « Formats ouverts », « Montres et ordinateurs de plongée », « Autres carnets ».
+   - One line per format with its extensions, as in the mock-up.
+   - **The list comes from `docs/import-formats.md`:** only the formats marked as working, in one place in the code (a data file the dialog reads), so that the report and the dialog stay the same.
+   - CSV appears only once the CSV import exists. Until then, leave it out.
+4. All texts go in `fr.json` and `en.json`.
+
+**Test:**
+- The link opens the dialog, and « Fermer », the scrim and Back close it.
+- The number in the help line and in the dialog equals the number of lines in the dialog.
+- The beta on `main` is untouched.
