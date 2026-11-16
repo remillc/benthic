@@ -388,7 +388,7 @@
           </div>
         {:else}
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-          <div class="od-desktop-sites--scroll" bind:this={scrollEl} onclick={emptyAreaClick}>
+          <div class="od-desktop-sites--scroll" data-od-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
             <table class="od-desktop-sites--table" aria-rowcount={rows.length} aria-label={t('sites.listLabel')}>
               <thead>
                 <tr>

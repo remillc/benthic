@@ -99,7 +99,7 @@
     </header>
 
     <div class="od-desktop-tools--columns">
-      <nav class="od-desktop-tools--list" aria-label={t('tools.title')}>
+      <nav class="od-desktop-tools--list" data-od-scroll aria-label={t('tools.title')}>
         {#each groups as group (group.id)}
           <h2 class="od-desktop-tools--heading">{t(group.heading)}</h2>
           <ul role="list" onkeydown={listKey}>
@@ -125,7 +125,7 @@
         {/each}
       </nav>
 
-      <main class="od-desktop-tools--pane" aria-label={t(current.name)}>
+      <main class="od-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
           <DesktopPlanner />
         {:else}
@@ -178,7 +178,8 @@
     }
     .od-desktop-tools--list {
       flex: none;
-      width: 320px;
+      /* Fluid layout: 320 dp from 1280 dp of window, narrower below. */
+      width: clamp(260px, 25vw, 320px);
       padding: 8px 8px 24px 12px;
       border-right: 1px solid var(--od-separator);
       overflow-y: auto;
@@ -264,6 +265,8 @@
       min-width: 0;
       padding: 8px 32px 32px;
       overflow-y: auto;
+      /* The tools lay out by the pane's width, not the window's (@container od-tool). */
+      container: od-tool / inline-size;
     }
     .od-desktop-tools--pane-title {
       margin: 0 0 20px;
@@ -273,6 +276,28 @@
       color: var(--od-text);
     }
 
+
+    /* A short window: the bar, the rows and the pane's margins take less room, so that more of the tool shows. */
+    @media (max-height: 700px) {
+      .od-desktop-tools--bar {
+        padding-top: 8px;
+        padding-bottom: 4px;
+      }
+      .od-desktop-tools--row {
+        height: 56px;
+      }
+      .od-desktop-tools--heading {
+        margin-top: 8px;
+      }
+      .od-desktop-tools--pane {
+        padding-top: 4px;
+        padding-bottom: 16px;
+      }
+      .od-desktop-tools--pane-title {
+        margin-bottom: 12px;
+        font-size: 20px;
+      }
+    }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {

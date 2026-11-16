@@ -117,6 +117,13 @@
       gap: 32px;
       align-items: start;
     }
+    /* Fluid layout: in a narrow pane the results go under the inputs. */
+    @container od-tool (max-width: 799px) {
+      .od-desktop-best-mix {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+    }
     .od-desktop-best-mix--inputs {
       display: flex;
       flex-direction: column;
@@ -138,8 +145,9 @@
     }
     .od-desktop-best-mix--advised {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 20px;
+      gap: 12px 20px;
       padding: 20px 24px;
       border-radius: 16px;
       background: var(--od-surface);
@@ -153,7 +161,7 @@
       white-space: nowrap;
     }
     .od-desktop-best-mix--kind {
-      flex: 1;
+      flex: 1 1 140px;
       display: flex;
       flex-direction: column;
       gap: 2px;

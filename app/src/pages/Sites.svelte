@@ -536,7 +536,7 @@ import { language } from '../lib/i18n.js';
       <div class="od-sites--split" class:ios>
         <div class="od-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
-          <div class="od-sites--scroll">{@render band(false)}{@render panel()}</div>
+          <div class="od-sites--scroll" data-od-scroll>{@render band(false)}{@render panel()}</div>
           {@render fab()}
         </div>
         <div class="od-sites--map-pane">{@render mapBlock('100%')}</div>

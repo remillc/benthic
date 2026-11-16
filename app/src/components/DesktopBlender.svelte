@@ -288,6 +288,13 @@
       gap: 32px;
       align-items: start;
     }
+    /* Fluid layout: in a narrow pane the results go under the inputs. */
+    @container od-tool (max-width: 799px) {
+      .od-desktop-blender {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+    }
     .od-desktop-blender--inputs {
       display: flex;
       flex-direction: column;
