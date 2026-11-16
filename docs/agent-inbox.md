@@ -4526,6 +4526,9 @@ Done: on the welcome band and on every step, the badge is 9 sp, line height 12, 
 
 ## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
 
+**Superseded:** the step band of this task is replaced by task 250 (the app's wavy band).
+
+
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
 
 On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
@@ -4737,6 +4740,9 @@ Christian approved this on 16 November 2026. **Alpha, on `main`.**
 Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelte` the link now ends the Android page. On a phone it sits 12 dp under the git link's text (6 dp of touch padding + 6 dp of margin) and 20 dp above the bottom edge (`--od-help-link-bottom`; the page content has no bottom padding there, so the screen no longer scrolls at 390 × 844); on a tablet it was already pinned 28 dp from the edge and did not move; iOS is unchanged. It opens « À propos » and Back returns. Checked headless at 390×844, 412×915, 1280×800, 800×1280: only the link and the git link's touch area moved. Tests in `tests/app/welcome-help-link.test.mjs`; one release-note line (fr, en). Part 2 is on `fix/desktop-download-wording`, for the desktop branch (`feature/desktop-logbook`): the ready screen of a new logbook already said « Télécharger mes plongées » (task 242), so only the macOS File menu changed (`desktop.macMenu.download`, « Télécharger mes plongées… » / « Download my dives… »); test `tests/app/desktop-download-wording.test.mjs`. No release note for the desktop.
 
 ## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
+
+**Superseded:** the step band of this task is replaced by task 251 (the app's wavy band); the welcome hero stays.
+
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
 
