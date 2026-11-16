@@ -5165,3 +5165,27 @@ Mock-ups (canvas « OpenDives — Serveur »), the same 11 screens as task 259:
 They use the release first-launch frame (the blue panel with the animated profile, the step in the right-hand or lower column), with « Sur le serveur OpenDives » as the first choice. The texts are those of task 259, with « cette tablette » or « cet ordinateur ».
 
 On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
+
+## [ ] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`.
+
+**The rule.** The iPhone gets the same « Pour commencer » flow as the Android phone (task 227 and its corrections, the 29 `android-premier-lancement-production-*` mock-ups): same steps, texts, errors and OpenDives components. Framework7's iOS theme draws the native parts (navigation, lists, fields, buttons, sheets). There is no full set of iPhone mock-ups, only the screens that really change.
+
+Mock-ups, in `docs/mockups/`, group « Téléphone iOS » of the « Version Bêta et publique » canvas:
+
+1. **`ios-premier-lancement-production`: safe area.** The status bar and the Dynamic Island sit over the blue band. The welcome hero and the step band grow by the top safe-area inset (about 30 pt more than on Android), so the brand, the headline and the profile start below the island. The home indicator stays clear of the last link.
+2. **`-ou`: iCloud Drive.** « Dans mon nuage » reads « iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV. … ». « ce téléphone » becomes « cet iPhone » everywhere.
+3. **`-nuage-service`: iCloud Drive first.** It is the first service of the list, with the line « Le compte Apple de cet iPhone, sans connexion à faire. ». Choosing it creates the logbook in the app's iCloud Drive folder with no sign-in step, as on macOS (task 228).
+4. **`-webdav`: iOS fields.** Forms use iOS grouped inset rows (label at the left, value at the right, white card, 12 pt corners) instead of the MD3 outlined fields; the help line sits under the card in the secondary label colour (#6C6C70). Apply this to every first-launch form (WebDAV, git, divelogs.de, name).
+5. **`-importer-fichiers`: Files picker.** « Un fichier » opens the system document picker (`UIDocumentPickerViewController`), not a custom screen. The mock-up only sketches it.
+6. **`-importer-fichier-erreur`: iOS alert.** An unreadable file is reported in a native alert (« Ce fichier n’a pas pu être lu », the file name and the formats; « Annuler » and « Autre fichier », which reopens the picker) instead of the inline error card. The other errors keep their inline form.
+
+Cloud sign-in pages open in the system authentication sheet (`ASWebAuthenticationSession`); the texts of the connection screens do not change.
+
+**Test:**
+- On an iPhone with a Dynamic Island, nothing of the band sits under the island.
+- iCloud Drive is offered first and creates a logbook without signing in.
+- The WebDAV form shows iOS rows.
+- « Un fichier » opens the Files picker.
+- An unreadable file shows the alert, and « Autre fichier » reopens the picker.
