@@ -147,7 +147,7 @@ function inspect(allow, rootSel) {
         out.clipped.push({ el: label(el), scrollWidth: el.scrollWidth, clientWidth: el.clientWidth, text: (el.textContent || '').trim().slice(0, 30) });
       }
     }
-    if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1 && (oy === 'hidden' || oy === 'clip') && !el.querySelector(':scope > img, :scope > canvas, :scope > video') && !['IFRAME'].includes(el.tagName) && cs.display !== '-webkit-box') {
+    if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1 && (oy === 'hidden' || oy === 'clip') && !el.querySelector(':scope > img, :scope > canvas, :scope > video') && !el.closest('.maplibregl-map') && !['IFRAME'].includes(el.tagName) && cs.display !== '-webkit-box') {
       out.clipped.push({ el: label(el), axis: 'y', scrollWidth: el.scrollHeight, clientWidth: el.clientHeight, text: (el.textContent || '').trim().slice(0, 30) });
     }
     if (el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 1 && (oy === 'auto' || oy === 'scroll')) {

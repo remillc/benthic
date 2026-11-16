@@ -284,6 +284,7 @@
 <style>
   @layer od.components {
     .od-site-sheet-desk {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
       /* Fluid layout: the sheet lays out by its own width (@container below). */

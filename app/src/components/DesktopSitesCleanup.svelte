@@ -186,6 +186,7 @@
 <style>
   @layer od.components {
     .od-cleanup {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
       /* Fluid layout: the two lists lay out by the pane's width. */

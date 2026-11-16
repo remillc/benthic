@@ -171,6 +171,7 @@
 <style>
   @layer od.components {
     .od-site-form {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
       container-type: inline-size;
