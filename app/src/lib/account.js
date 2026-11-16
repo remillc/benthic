@@ -9,6 +9,8 @@ import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './log
 import { confirmAction } from './dialogs.js';
 import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
+import { FIRST_LAUNCH_SNACKBARS, newFirstLaunch } from './first-launch.js';
+import { layout, ios } from './layout.svelte.js';
 
 /**
  * The account being created: its email once the code is confirmed. Step 1
@@ -103,4 +105,18 @@ export async function addDeviceDives() {
 /** @param {string} text */
 function toastText(text) {
   showSnackbar(text);
+}
+
+/**
+ * The snackbar that ends a path of the alpha first launch on a phone (task 2026-11-16-233), shown once the
+ * logbook is open behind first launch: it floats above the « + ».
+ * @param {keyof typeof FIRST_LAUNCH_SNACKBARS} kind
+ */
+export function announceFirstLaunch(kind) {
+  setTimeout(() => showSnackbar(t(FIRST_LAUNCH_SNACKBARS[kind])), 400);
+}
+
+/** Alpha first launch on a phone: the new screens and snackbars. */
+export function phoneFirstLaunch() {
+  return newFirstLaunch({ phone: layout.phone, ios });
 }

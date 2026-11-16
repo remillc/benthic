@@ -149,7 +149,8 @@
     "deleteTextGit": {
       "one": "The dive is removed from the logbook, on this device and in the repository. You can undo for a few seconds.",
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
-    }
+    },
+    "emptyLocal": "On this phone only, no dives"
   },
   "sync": {
     "failure": {
@@ -1867,6 +1868,10 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android phones: a blue banner with the dive profile, then the same banner, smaller, on every step (Subsurface account, account creation, no account), with a « Back » link.",
+      "First launch: after signing in, the download screen shows three steps with the progress of the dives, then the logbook opens with a message.",
+      "Account creation: the code screen says « step 2 of 2 », and the empty logbook opens with the message « Account created. Your logbook is ready. ».",
+      "« Start without an account »: a screen says where the logbook stays (this phone only, no backup, to link later) before it is created. The empty logbook reads « On this phone only, no dives ».",
       "First launch: an « Alpha » badge follows the OpenDives name.",
       "Account creation: the confirmation code goes in six boxes, one per digit. The code from the email can be pasted in one go.",
       "First launch: a « Beta » badge follows the OpenDives name.",
@@ -3386,5 +3391,44 @@
     "none": "No dives in Apple Health in the last year. If access was refused, allow OpenDives in Health › Sharing › Apps.",
     "known": "already in the logbook",
     "what": "Apple Health only keeps the time, depth and temperature: the site, gas and buddies are completed in the dive."
+  },
+  "firstLaunch": {
+    "bandHeadline": "Your dive log,\non all your devices.",
+    "bandIntro": "Your dives go from your dive computer to your logbook in one step. Profiles, statistics and a map of your sites, even offline.",
+    "profile": "Dive profile",
+    "signIn": {
+      "intro": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this phone.",
+      "email": "Email address",
+      "passwordText": "Kept only in the secure storage of this phone.",
+      "invalidEmail": "This email address is not valid."
+    },
+    "create": {
+      "intro": "Free. A code is sent to you by email to confirm the address.",
+      "passwordText": "Letters without accents, digits and @ . + _ - only."
+    },
+    "download": {
+      "stepsLabel": "Download steps",
+      "connect": "Connecting to Subsurface",
+      "dives": "Downloading the dives",
+      "count": "{n} of {total}",
+      "copy": "Copying the logbook to this phone",
+      "note": "Keep the app open until it is done. Then your logbook opens, and you can read it offline.",
+      "progressLabel": "Downloading the dives"
+    },
+    "local": {
+      "intro": "Your logbook is created right away, with no sign-up.",
+      "phoneOnly": "On this phone only",
+      "phoneOnlyText": "Your dives stay here. They are not sent anywhere.",
+      "noBackup": "No backup",
+      "noBackupText": "If you lose or change your phone, the logbook is lost.",
+      "later": "You can link it later",
+      "laterText": "To a Subsurface account or to your git repository, from Account. Your dives follow.",
+      "start": "Start"
+    },
+    "snackbar": {
+      "downloaded": "Logbook downloaded. It stays on this phone, even offline.",
+      "created": "Account created. Your logbook is ready.",
+      "local": "Logbook created on this phone."
+    }
   }
 }

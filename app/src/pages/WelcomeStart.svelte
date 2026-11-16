@@ -10,6 +10,7 @@
   import Icon from '../components/Icon.svelte';
   import WelcomeHelpLink from '../components/WelcomeHelpLink.svelte';
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
+  import FirstLaunchBand from '../components/FirstLaunchBand.svelte';
   import { startWithoutAccount } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
   import { layout } from '../lib/layout.svelte.js';
@@ -33,13 +34,19 @@
 
   function withoutAccount(/** @type {MouseEvent} */ e) {
     e.preventDefault();
-    startWithoutAccount();
+    // Android phone (task 2026-11-16-233): a screen says where the logbook stays before it is created.
+    if (!theme.ios && layout.phone) f7router.navigate('/welcome/local');
+    else startWithoutAccount();
   }
 </script>
 
 <Page class="od-welcome-start">
   {#if !theme.ios}
-    <div class="od-welcome-start--page">
+    <div class="od-welcome-start--page" class:od-welcome-start--with-band={layout.phone}>
+      {#if layout.phone}
+        <!-- Android phone (tasks 2026-11-16-233 to 236): the blue band replaces the brand row, the headline and the profile. -->
+        <FirstLaunchBand variant="welcome" />
+      {:else}
       <div class="od-welcome-start--head">
       <div class="od-welcome-start--brand" role="img" aria-label={t('welcome.brandAlpha')}>
         <img class="od-welcome-start--logo od-welcome-start--light" src="logo-light.svg" alt="" width="40" height="40" />
@@ -50,6 +57,7 @@
       <h1 class="od-welcome-start--headline">{t('welcome.headline')}</h1>
       </div>
       <DecorativeProfile class="od-welcome-start--wide-profile" />
+      {/if}
       <div class="od-welcome-start--space"></div>
       <div class="od-welcome-start--actions">
       <nav class="od-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
@@ -143,6 +151,11 @@
       padding-top: calc(var(--f7-safe-area-top) + 24px);
       display: flex;
       flex-direction: column;
+
+      /* Phone: the band starts at the top edge, under the status bar. */
+      &.od-welcome-start--with-band {
+        padding-top: 0;
+      }
     }
 
     /* The wrappers only matter on tablets. */
