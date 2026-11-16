@@ -4172,7 +4172,7 @@ Mock-ups:
 
 Done on `feature/release-new-logbook` (not merged): the real total from `docs/import-formats.md`, « 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. » (no CSV); the link « Voir les formats acceptés » on the source and « fichier illisible » screens; the basic dialog « Formats acceptés » (Fermer, scrim, Back) in three columns read from one list, `app/src/lib/import-formats.js`, checked against the report by `tests/app/import-formats.test.mjs`.
 
-## [ ] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
+## [x] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
 
 Christian approved these mock-ups on 16 November 2026. **Release edition:** build it on a new branch, `feature/release-first-launch-complete`, started from `feature/release-new-logbook` (tasks 218 and 223). Do not merge it into `main`. The beta on `main` stays unchanged. Tablets only; the phone comes later (to-do #84).
 
@@ -4258,6 +4258,8 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - Demo: the banner stays visible. Adding a dive opens `demo-ajout`. « Commencer mon carnet » erases the demo and goes back to the first step.
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
+
+Done on `feature/release-first-launch-complete` (not merged): parts 1–6 (portrait for every step, cloud connection states, WebDAV, the errors, the formats dialog, the tablet empty logbook and its menu) and parts 7–8 (the demo logbook; the three-step CSV import through a new façade call `import_csv`, Seabear, Sensus, Poseidon MkVI and hand-mapped files; CSV added to `docs/import-formats.md` and the formats list, 19 formats). Waiting for native work: « Reprendre » for divelogs.de (a list call and a download of chosen ids), the personal cloud (#74), WebDAV, « Renommer le carnet » and « Changer d’endroit ».
 
 ## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
 
