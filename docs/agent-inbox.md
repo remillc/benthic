@@ -4664,7 +4664,7 @@ Christian approved this on 16 November 2026. **Release edition:** do it on the b
 
 Done on `feature/release-desktop-first-launch` (not merged): after first use the window without a logbook lists « Carnets récents » (five at most, newest first) above « Ou bien » and the three compact neutral choices; a missing file is greyed with « Introuvable dans {place} » and its dialog offers « Retirer de la liste » and « Chercher le fichier… » (main-process ops `exists` and `relocate`, which accept only entries of the recent list; git and cloud entries are not checked); « Seulement sur cet ordinateur » has the computer-screen icon. « Chercher le fichier… » was not clicked in the real app (it opens the system picker); its main-process side is tested.
 
-## [ ] 2026-11-16-242 Desktop (alpha): first launch and the « no logbook » window
+## [x] 2026-11-16-242 Desktop (alpha): first launch and the « no logbook » window
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings the first launch of tasks 224–239 (phone and tablet) to the desktop app. The mock-ups are 1440 × 900 windows, under `docs/mockups/`.
 
@@ -4715,3 +4715,5 @@ The rail of these windows is not shown in the mock-ups, so Settings and the acco
 2. Each of the three paths ends in the right logbook window with its snackbar.
 3. Close the logbook: the recent list appears with « Ou bien ».
 4. Move one recent file away, then reopen the window: the entry shows « Introuvable » and the dialog works.
+
+Done on `feature/desktop-logbook` (the desktop app lives there until it is merged into main): the desktop first launch reuses the tablet screens of tasks 237 and 239 with « cet ordinateur » texts, the computer icon, the drop to import and the snackbars after the rail; the « no logbook » window after first use is the blue panel with « Carnets récents », « Ou bien » (« Ouvrir un carnet… », « Nouveau carnet… »), the drop hint and the help link, without the rail; a missing logbook is greyed with its dialog (« Retirer de la liste », « Chercher le fichier… »). The real system picker and real Subsurface calls were not exercised (stubs).
