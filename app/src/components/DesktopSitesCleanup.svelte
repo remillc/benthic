@@ -113,7 +113,7 @@
   }
 </script>
 
-<section class="od-cleanup" aria-label={t('sites.cleanupTitle')}>
+<section class="od-cleanup" data-od-scroll aria-label={t('sites.cleanupTitle')}>
   <h2 class="od-cleanup--title">{t('sites.cleanupTitle')}</h2>
   <p class="od-cleanup--intro">{t('desktopSites.cleanupIntro', { shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z' })}</p>
 
@@ -188,6 +188,8 @@
     .od-cleanup {
       height: 100%;
       overflow: auto;
+      /* Fluid layout: the two lists lay out by the pane's width. */
+      container-type: inline-size;
       padding: 4px 12px 24px 4px;
     }
     .od-cleanup--title {
@@ -207,6 +209,11 @@
       grid-template-columns: minmax(280px, 342px) minmax(260px, 1fr);
       gap: 16px;
       align-items: start;
+    }
+    @container (max-width: 599px) {
+      .od-cleanup--columns {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
     .od-cleanup--heading {
       margin: 0 0 8px;
