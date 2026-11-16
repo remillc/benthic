@@ -4388,3 +4388,25 @@ Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, a
 « Retour » goes back one step, with the shared-axis X transition backwards.
 
 **Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
+
+## [ ] 2026-11-16-232 Alpha: the confirmation code in six boxes
+
+Christian approved this on 16 November 2026. **Alpha (the app on `main`)**: do it on `main`.
+
+Mock-ups: `docs/mockups/android-premier-lancement-alpha-…` are not all approved yet; for this task only, use `docs/mockups/android-premier-lancement-beta-creer-compte-code.dc.html` and `…-code-erreur.dc.html` (the file names keep « beta », the screens say « Alpha »).
+
+- On « Confirmer votre adresse » (account creation, the code sent by email), the code field becomes **six boxes**, one per digit: 48 × 56 dp each, 8 dp apart, the digit in a monospace font at 24 sp.
+- The label « Code de confirmation » sits above the boxes.
+- **States:**
+  - the box being typed has a 2 dp border in #1F5C99 and shows the caret;
+  - the other boxes have a 1 dp border in #75787C;
+  - on error, all six boxes have a 2 dp border in #B3261E, and the message « Code incorrect. Vérifiez le dernier courriel reçu. » shows under them.
+- **One field, not six:** it is a single input drawn as six boxes, so that it works as people expect:
+  - `inputmode="numeric"` and `autocomplete="one-time-code"`, so the system can offer the code;
+  - pasting the whole code fills all six boxes;
+  - Backspace goes back one box;
+  - TalkBack reads one field, « Code de confirmation, 6 chiffres ».
+- « Confirmer » sends the code. Sending it automatically when the sixth digit is typed is fine too.
+- Use the same field wherever the app asks for such a code. Texts in `fr.json` and `en.json`.
+
+**Test:** type, paste and delete a code; a wrong code shows the error state; TalkBack reads one field; on a small phone, the six boxes fit without scrolling sideways.
