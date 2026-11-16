@@ -4874,10 +4874,12 @@ This replaces, for the step pages only, the band of tasks 234 and 236 (hatched d
 
 **Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
 
-## [ ] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
+## [x] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
 
 Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
 
 Same change as task 250, for the release step pages: the 140 dp step band takes the section band's radial gradient, keeps the light rays, gets the faint profile and the 18 dp wave at the bottom, and loses the top-left sheen and the straight edge. This replaces the step band of task 244. The welcome hero (330 dp) and the tablets do not change.
 
 **Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
