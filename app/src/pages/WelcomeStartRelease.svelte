@@ -14,6 +14,9 @@
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
+
+  // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
+  const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
 {#snippet panelContent()}
@@ -31,6 +34,11 @@
     <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
       <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
       <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
+      <svg class="od-welcome-release--panel-profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="{BAND_PROFILE} V140 H0 Z" class="od-welcome-release--panel-profile-area" />
+        <path d={BAND_PROFILE} class="od-welcome-release--panel-profile-line" vector-effect="non-scaling-stroke" />
+      </svg>
+      <svg class="od-welcome-release--panel-wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
       {@render panelContent()}
     </section>
 
@@ -88,6 +96,12 @@
       inset: 0;
       background: repeating-linear-gradient(105deg, var(--od-release-panel-band) 0 60px, transparent 60px 150px);
       mask-image: linear-gradient(180deg, black 0%, transparent 55%);
+    }
+
+    /* The phone steps band's faint profile and wave: only on a phone, only on the steps. */
+    .od-welcome-release--panel-profile,
+    .od-welcome-release--panel-wave {
+      display: none;
     }
 
     .od-welcome-release--brand {
@@ -170,7 +184,7 @@
 
     /* Phone (tasks 2026-11-16-227, 230 and 244; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):
        the hatched dark blue of the alpha across the top (--od-first-band, its sheen and its hatching; no wave, no faint
-       profile, a straight bottom edge), 330 dp on the first step (the status bar's 24 dp included) and 140 dp on the
+       profile, a straight bottom edge) on the first step; the steps take the section band's look (task 251, below), 330 dp on the first step (the status bar's 24 dp included) and 140 dp on the
        others, and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
        texts need more room, so that nothing is cut off. */
     @media (max-width: 767.98px) {
@@ -201,9 +215,49 @@
         background: var(--od-first-band-hatch);
       }
 
+      /* Steps band (task 2026-11-16-251): the section band's radial gradient and rays, its faint profile and its 18 dp wave
+         in the page colour; no sheen. */
       .od-welcome-release--compact {
         height: auto;
         min-height: calc(140px - 24px + var(--od-welcome-band-top));
+        background: var(--od-first-step-band);
+      }
+
+      .od-welcome-release--compact .od-welcome-release--panel-light {
+        display: none;
+      }
+
+      .od-welcome-release--compact .od-welcome-release--panel-profile {
+        display: block;
+        position: absolute;
+        left: 0;
+        bottom: 2px;
+        width: 100%;
+        height: 34px;
+      }
+
+      .od-welcome-release--panel-profile-area {
+        fill: var(--od-band-profile-area);
+      }
+
+      .od-welcome-release--panel-profile-line {
+        fill: none;
+        stroke: var(--od-band-profile-line);
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+      }
+
+      .od-welcome-release--compact .od-welcome-release--panel-wave {
+        display: block;
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 100%;
+        height: 18px;
+      }
+
+      .od-welcome-release--panel-wave path {
+        fill: var(--od-background);
       }
 
       .od-welcome-release--brand {
