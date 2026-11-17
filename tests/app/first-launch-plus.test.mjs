@@ -22,7 +22,7 @@ test('the three choices come in the order of the mock-up, « Se connecter » fir
   assert.equal(langs.fr.welcomeSteps.signInTitle, 'Se connecter');
   assert.equal(langs.fr.welcomeSteps.signInHelp, 'Ou créer un compte.');
   assert.equal(langs.fr.welcomeSteps.localHelp, 'Gardé ici, même sans réseau.');
-  assert.equal(langs.fr.welcomeSteps.importHelp, 'Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.');
+  assert.equal(langs.fr.welcomeSteps.importStartHelp, 'Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.');
   assert.equal(langs.fr.welcomeSteps.discoverPlus, 'Découvrir OpenDives+');
 });
 

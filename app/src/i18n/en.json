@@ -1016,7 +1016,7 @@
     "startTitle": "Get started",
     "createTitle": "Create a logbook",
     "importTitle": "Import a logbook",
-    "importHelp": "A file from OpenDives or another app, or divelogs.de.",
+    "importHelp": "A .ssrf, .xml, UDDF or FIT file, or your divelogs.de account.",
     "openTitle": "Open my OpenDives logbook",
     "back": "Back",
     "newTitle": "New logbook",
@@ -1165,7 +1165,10 @@
     "localTitle": "Start a logbook on this tablet",
     "localTitlePhone": "Start a logbook on this phone",
     "localTitleIphone": "Start a logbook on this iPhone",
-    "localHelp": "Kept here, even without a network."
+    "localHelp": "Kept here, even without a network.",
+    "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
+    "openHelp": "It is already in your cloud or in a git repository.",
+    "createHelp": "You will choose where to keep it next."
   },
   "signOut": {
     "title": "Sign out?",
