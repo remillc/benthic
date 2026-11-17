@@ -1016,7 +1016,7 @@
     "startTitle": "Pour commencer",
     "createTitle": "Créer un carnet",
     "importTitle": "Importer un carnet",
-    "importHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
+    "importHelp": "Un fichier .ssrf, .xml, UDDF ou FIT, ou votre compte divelogs.de.",
     "openTitle": "Ouvrir mon carnet OpenDives",
     "back": "Retour",
     "newTitle": "Nouveau carnet",
@@ -1165,7 +1165,10 @@
     "localTitle": "Commencer un carnet sur cette tablette",
     "localTitlePhone": "Commencer un carnet sur ce téléphone",
     "localTitleIphone": "Commencer un carnet sur cet iPhone",
-    "localHelp": "Gardé ici, même sans réseau."
+    "localHelp": "Gardé ici, même sans réseau.",
+    "importStartHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
+    "openHelp": "Il est déjà dans votre nuage ou dans un dépôt git.",
+    "createHelp": "Vous choisirez ensuite où le garder."
   },
   "signOut": {
     "title": "Se déconnecter ?",
