@@ -5,10 +5,14 @@
 // columns and the widths are remembered on the device (lib/device-store.js).
 import { OpenDivesCore } from 'opendives-core';
 import { deviceStore } from './device-store.js';
-import { DEFAULT_COLUMNS, DEFAULT_SORT, EMPTY_SELECTION } from './desktop-table.js';
+import { DEFAULT_COLUMNS, DEFAULT_SORT, EMPTY_SELECTION, cleanColumnWidths } from './desktop-table.js';
+import { logbookKey } from './window-logbook.js';
 
 const SORT_KEY = 'od.desktopSort';
+// The columns and their widths belong to the logbook the window holds (task 2026-11-15-181): the main logbook keeps
+// the plain keys, any other has its id after them (window-logbook.js, logbookKey). Never written in the logbook file.
 const COLUMNS_KEY = 'od.desktopColumns';
+const COLUMN_WIDTHS_KEY = 'od.desktopColumnWidths';
 const WIDTH_KEY = 'od.desktopTableWidth';
 
 /** @template T @param {string} key @param {T} fallback @returns {T} */
@@ -28,6 +32,8 @@ export const desk = $state({
   sort: DEFAULT_SORT,
   /** @type {string[]} */
   columns: DEFAULT_COLUMNS,
+  /** The widths the diver gave to columns, by column key (the others keep their default). @type {Record<string, number>} */
+  columnWidths: {},
   /** @type {Record<number, boolean>} */
   collapsed: {},
   /** Width of the table's pane, in px (the detail takes the rest); null until the diver moves the handle (desktop-table.js, tableWidthFor). */
@@ -39,7 +45,8 @@ export const desk = $state({
 /** Reads the remembered choices: called once the device store is loaded. */
 export function loadDesktopChoices() {
   desk.sort = remembered(SORT_KEY, DEFAULT_SORT);
-  desk.columns = remembered(COLUMNS_KEY, DEFAULT_COLUMNS);
+  desk.columns = remembered(logbookKey(COLUMNS_KEY), DEFAULT_COLUMNS);
+  desk.columnWidths = cleanColumnWidths(remembered(logbookKey(COLUMN_WIDTHS_KEY), {}));
   desk.tableWidth = remembered(WIDTH_KEY, null);
 }
 
@@ -52,7 +59,17 @@ export function setSort(sort) {
 /** @param {string[]} columns */
 export function setColumns(columns) {
   desk.columns = columns;
-  deviceStore.setItem(COLUMNS_KEY, JSON.stringify(columns));
+  deviceStore.setItem(logbookKey(COLUMNS_KEY), JSON.stringify(columns));
+}
+
+/**
+ * Gives a column a width. `keep` false while the handle is dragged (the table follows, nothing is written yet).
+ * @param {Record<string, number>} widths
+ * @param {boolean} [keep]
+ */
+export function setColumnWidths(widths, keep = true) {
+  desk.columnWidths = widths;
+  if (keep) deviceStore.setItem(logbookKey(COLUMN_WIDTHS_KEY), JSON.stringify(widths));
 }
 
 /** @param {number} width */

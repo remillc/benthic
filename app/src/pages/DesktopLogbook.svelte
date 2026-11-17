@@ -31,7 +31,7 @@
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { undoNameKey } from '../lib/undo-name.js';
-  import { desk, setSort, setColumns, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
+  import { desk, setSort, setColumns, setColumnWidths, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
   import {
     COLUMNS,
     shownColumns,
@@ -48,6 +48,10 @@
     clampTableWidth,
     tableWidthFor,
     fittingColumns,
+    clampColumnWidth,
+    columnWidth,
+    minColumnWidth,
+    COLUMN_MAX_WIDTH,
     adjacentTrips,
     moveColumn,
     dropTarget,
@@ -98,7 +102,13 @@
   /** The room the table has, in px (read from its scroll area). */
   let tableRoom = $state(0);
   /** The shown columns that fit in that room; the others stay chosen and come back in a wider pane. */
-  const columnsNow = $derived(fittingColumns(columns, tableRoom));
+  const columnsNow = $derived(fittingColumns(columns, tableRoom, desk.columnWidths));
+  /**
+   * Site is the column that takes the room the others leave. Once the diver gave it a width, nothing takes the room
+   * any more: every column gets its width as it is (the table is then as wide as they add up to, never stretched).
+   */
+  const exactWidths = $derived(columnsNow.some((c) => c.key === 'site') && desk.columnWidths.site != null);
+  const tableStyle = $derived(exactWidths ? `width: ${columnsNow.reduce((sum, c) => sum + columnWidth(c.key, desk.columnWidths), 0)}px` : undefined);
   $effect(() => {
     if (!tableEl) return;
     const element = tableEl;
@@ -574,6 +584,62 @@
     columnsOpen = false;
   }
 
+  // --- Resizing a column by the edge of its header (task 2026-11-15-181). ------------------------
+  /** The width a column has now: the diver's, or the one the stylesheet gives it. @param {string} key */
+  const widthOf = (key) => desk.columnWidths[key] ?? Math.round(tableEl?.querySelector(`th[data-col="${key}"]`)?.getBoundingClientRect().width ?? minColumnWidth(key));
+
+  /** @param {string} key @param {number} width @param {boolean} [keep] */
+  function giveWidth(key, width, keep = true) {
+    setColumnWidths({ ...desk.columnWidths, [key]: clampColumnWidth(key, width) }, keep);
+  }
+
+  /** The handle on a header's edge: drag to resize; the header's own drag and sort stay out of it. @param {PointerEvent} e @param {string} key */
+  function edgeDown(e, key) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startWidth = widthOf(key);
+    /** @param {PointerEvent} m */
+    const move = (m) => giveWidth(key, startWidth + (m.clientX - startX), false);
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      setColumnWidths(desk.columnWidths);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  /** Arrow keys on the focused edge: 8 px a step, 32 with Maj; Entrée fits the column to its content. @param {KeyboardEvent} e @param {string} key */
+  function edgeKey(e, key) {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      const step = (e.shiftKey ? 32 : 8) * (e.key === 'ArrowRight' ? 1 : -1);
+      giveWidth(key, widthOf(key) + step);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      fitColumn(key);
+    }
+  }
+
+  /** Double click on the edge: the width the widest value (or the header) needs. @param {string} key */
+  function fitColumn(key) {
+    const column = COLUMNS.find((c) => c.key === key);
+    if (!column || !tableEl) return;
+    const context = document.createElement('canvas').getContext('2d');
+    if (!context) return;
+    const family = getComputedStyle(tableEl).fontFamily;
+    context.font = `14px ${family}`;
+    let widest = 0;
+    const sample = logbook.dives.length > 3000 ? logbook.dives.filter((_, i) => i % Math.ceil(logbook.dives.length / 3000) === 0) : logbook.dives;
+    for (const dive of sample) widest = Math.max(widest, context.measureText(cell(key, dive)).width);
+    context.font = `500 13px ${family}`;
+    widest = Math.max(widest, context.measureText(t(column.label)).width + 16);
+    // 20 px of padding and a little room for the cell's own marks (a deep value, the sort arrow).
+    giveWidth(key, Math.ceil(widest) + 24);
+  }
+
   // --- The columns button. ----------------------------------------------------------------
   let columnsOpen = $state(false);
 
@@ -893,7 +959,7 @@
       </div>
     {:else}
       <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
-        <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={rows.length + 1}>
+        <table class="od-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
             <tr aria-rowindex="1">
               {#each columnsNow as column (column.key)}
@@ -905,11 +971,27 @@
                   data-col={column.key}
                   class:od-desktop-logbook--slot={dragging?.key === column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
+                  style:width={desk.columnWidths[column.key] || exactWidths ? `${columnWidth(column.key, desk.columnWidths)}px` : undefined}
                   onpointerdown={(e) => headDown(e, column.key)}
                 >
                   <button type="button" onclick={() => headClick(column.key)} onkeydown={(e) => headKey(e, column.key)}>
                     {t(column.label)}{#if sortedHere}<span class="od-desktop-logbook--arrow" aria-hidden="true">{desk.sort.descending ? '▾' : '▴'}</span>{/if}
                   </button>
+                  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                  <span
+                    class="od-desktop-logbook--edge"
+                    role="separator"
+                    tabindex="0"
+                    aria-orientation="vertical"
+                    aria-label={t('desktop.resizeColumn', { column: t(column.label) })}
+                    aria-valuemin={minColumnWidth(column.key)}
+                    aria-valuemax={COLUMN_MAX_WIDTH}
+                    aria-valuenow={desk.columnWidths[column.key] ?? undefined}
+                    onpointerdown={(e) => edgeDown(e, column.key)}
+                    ondblclick={() => fitColumn(column.key)}
+                    onkeydown={(e) => edgeKey(e, column.key)}
+                    onclick={(e) => e.stopPropagation()}
+                  ></span>
                 </th>
               {/each}
             </tr>
@@ -1187,6 +1269,30 @@
     }
     .od-desktop-logbook--head button:hover {
       color: var(--od-text);
+    }
+    /* The edge to drag (task 181): 8 px wide on the header's right side, a thin line on hover and focus. */
+    .od-desktop-logbook--edge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: col-resize;
+      outline: none;
+    }
+    .od-desktop-logbook--edge::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 3px;
+      width: 2px;
+      border-radius: 1px;
+      background: transparent;
+    }
+    .od-desktop-logbook--edge:hover::after,
+    .od-desktop-logbook--edge:focus-visible::after {
+      background: var(--od-outline);
     }
     .od-desktop-logbook--arrow {
       margin-inline-start: 4px;

@@ -250,3 +250,26 @@ test('tableWidthFor: 760 in a wide window, 57 % of the view in a narrow one, the
   assert.equal(tableWidthFor(null, 1824), 760);
   assert.equal(tableWidthFor(500, 1104), 500);
 });
+
+test('column widths: clamped to the minimum and maximum, unknown columns dropped (task 181)', async () => {
+  const { clampColumnWidth, cleanColumnWidths, minColumnWidth, COLUMN_MAX_WIDTH, fittingColumns } = await import('../../app/src/lib/desktop-table.js');
+  assert.equal(clampColumnWidth('date', 10), minColumnWidth('date'));
+  assert.equal(clampColumnWidth('site', 5000), COLUMN_MAX_WIDTH);
+  assert.equal(clampColumnWidth('site', 301.4), 301);
+  assert.deepEqual(cleanColumnWidths({ site: 300, bogus: 200, date: 'x', duration: 1 }), { site: 300, duration: minColumnWidth('duration') });
+  assert.deepEqual(cleanColumnWidths(null), {});
+  // A widened column needs its own width: the ones that no longer fit are left out.
+  const all = shownColumns(['date', 'site', 'maxDepth', 'duration']);
+  assert.equal(fittingColumns(all, 520).length, 5);
+  assert.equal(fittingColumns(all, 520, { site: 400 }).length, 4);
+});
+
+test('columns and widths are stored per logbook through the device store only (task 181)', async () => {
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(new URL('../../app/src/lib/desktop-logbook.svelte.js', import.meta.url), 'utf8');
+  assert.match(src, /remembered\(logbookKey\(COLUMNS_KEY\)/);
+  assert.match(src, /remembered\(logbookKey\(COLUMN_WIDTHS_KEY\)/);
+  assert.match(src, /deviceStore\.setItem\(logbookKey\(COLUMNS_KEY\)/);
+  assert.match(src, /deviceStore\.setItem\(logbookKey\(COLUMN_WIDTHS_KEY\)/);
+  assert.doesNotMatch(src, /localStorage/);
+});

@@ -53,21 +53,64 @@ export const COLUMN_MIN_WIDTH = { number: 48, date: 170, maxDepth: 84, duration:
  * section 7, « Fluid desktop layout »).
  * @param {Column[]} columns the shown columns, in order
  * @param {number} width the room the table has, in px; 0 when not measured yet
+ * @param {Record<string, number>} [widths] the widths the diver gave to some columns (a column needs its own width)
  * @returns {Column[]}
  */
-export function fittingColumns(columns, width) {
+export function fittingColumns(columns, width, widths = {}) {
   if (!width) return columns;
   let used = 0;
   /** @type {Column[]} */
   const kept = [];
   for (const column of columns) {
-    const need = /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[column.key] ?? 120;
+    const need = widths[column.key] ?? /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[column.key] ?? 120;
     const required = column.key === 'number' || column.key === 'date';
     if (!required && used + need > width) continue;
     kept.push(column);
     used += need;
   }
   return kept;
+}
+
+/** The width the stylesheet gives a column when the diver gave none, in px (the others: 140). */
+const COLUMN_DEFAULT_WIDTH = { number: 48, date: 170, site: 244, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+
+/**
+ * The width a column has when every column has its own: the diver's, else the default.
+ * @param {string} key
+ * @param {Record<string, number>} [widths]
+ * @returns {number}
+ */
+export const columnWidth = (key, widths = {}) => widths[key] ?? /** @type {Record<string, number>} */ (COLUMN_DEFAULT_WIDTH)[key] ?? 140;
+
+/** The widest a column can be dragged to, in px. */
+export const COLUMN_MAX_WIDTH = 640;
+
+/** The narrowest width a column can be given (task 2026-11-15-181): its reading minimum, at least 48 px. @param {string} key */
+export const minColumnWidth = (key) => (key === 'site' ? 96 : /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[key] ?? 72);
+
+/**
+ * A width the diver gave to a column, kept between its minimum and COLUMN_MAX_WIDTH.
+ * @param {string} key
+ * @param {number} width
+ * @returns {number}
+ */
+export function clampColumnWidth(key, width) {
+  return Math.round(Math.max(minColumnWidth(key), Math.min(COLUMN_MAX_WIDTH, width)));
+}
+
+/**
+ * The remembered widths, cleaned: only known columns, finite numbers within the limits.
+ * @param {unknown} stored
+ * @returns {Record<string, number>}
+ */
+export function cleanColumnWidths(stored) {
+  /** @type {Record<string, number>} */
+  const out = {};
+  if (!stored || typeof stored !== 'object') return out;
+  for (const [key, value] of Object.entries(stored)) {
+    if (COLUMNS.some((c) => c.key === key) && typeof value === 'number' && Number.isFinite(value)) out[key] = clampColumnWidth(key, value);
+  }
+  return out;
 }
 
 /** The columns shown when the diver has chosen none. */

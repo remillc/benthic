@@ -39,7 +39,7 @@ test('the tools, the site sheet and the clean-up lay out by their pane, not the 
 test('the logbook follows the window: its table pane, its columns, its header', () => {
   const page = read('app/src/pages/DesktopLogbook.svelte');
   assert.match(page, /new ResizeObserver\(place\)/);
-  assert.match(page, /fittingColumns\(columns, tableRoom\)/);
+  assert.match(page, /fittingColumns\(columns, tableRoom, desk\.columnWidths\)/);
   assert.match(page, /\.od-desktop-logbook--titles \{[^}]*flex: 1 0\.2 auto/);
   assert.match(read('app/src/components/DiveProfile.svelte'), /flex-wrap: wrap;\s*overflow-x: visible;/);
 });

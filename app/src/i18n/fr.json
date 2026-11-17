@@ -2465,6 +2465,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Dans l'application de bureau, vous pouvez redimensionner une colonne du Carnet en tirant le bord de son en-tête (ou ← → sur le bord, un double clic pour l'ajuster), et chaque carnet garde son propre ordre de colonnes, ses colonnes visibles et leurs largeurs sur cet ordinateur.",
       "Démarrage plus léger et sélection d’une plongée plus rapide : l’application charge deux fois moins de code et de styles au démarrage, chaque écran et chaque langue au moment où on en a besoin, et choisir une plongée dans le carnet du bureau ne demande plus au cœur que cette plongée au lieu de dix-huit réponses.",
       "Dans l'application de bureau, le profil d'une longue plongée est tracé avec quelques points par pixel au lieu de chaque mesure, et la fenêtre ne garde plus l'autre disposition en mémoire quand vous la redimensionnez entre la disposition étroite et la disposition large.",
       "Dans l'application de bureau, un grand carnet reste fluide : le tableau du Carnet ne dessine que les lignes visibles, donc choisir une plongée, chercher, trier et revenir au Carnet restent rapides avec des milliers de plongées.",
@@ -4159,6 +4160,7 @@
     "mergePreviousTrip": "Fusionner avec le voyage précédent",
     "mergeNextTrip": "Fusionner avec le voyage suivant",
     "resetColumns": "Rétablir l'ordre des colonnes",
+    "resizeColumn": "Redimensionner la colonne « {column} »",
     "columnWillMove": "« {column} » sera placé entre {before} et {after}",
     "columnWillMoveLast": "« {column} » sera placé en dernier",
     "export": {
