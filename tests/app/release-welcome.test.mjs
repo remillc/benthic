@@ -52,8 +52,9 @@ test('the edition is read in one place', () => {
 
 test('the beta path is unchanged: WelcomeStart knows nothing of the edition, the route picks the page', () => {
   const beta = read('pages/WelcomeStart.svelte');
-  assert.doesNotMatch(beta, /edition|release|FirstLaunch/i);
-  assert.match(beta, /od-welcome-start--wide-profile/);
+  // The alpha's own phone band and tablet panel (FirstLaunchBand, FirstLaunchPanel, tasks 233 and 237, on main) is not the release edition.
+  assert.doesNotMatch(beta, /edition|release|FirstLaunch(?!Band|Panel|.tabletStart)/i);
+  assert.match(beta, /od-first-panelled/);
   assert.match(beta, /welcome\.noAccountNoteTablet/);
   assert.match(read('App.svelte'), /component: isRelease \? WelcomeEntry : WelcomeStart/);
   // The release edition shows its own screen on phones too (task 2026-11-16-227): never the beta one.
