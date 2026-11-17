@@ -37,7 +37,6 @@
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
   import { deviceKind, deviceKey, iphoneKey, iosPhone } from '../lib/first-launch-phone.js';
   import { layout, ios, desktopApp, desktopMac } from '../lib/layout.svelte.js';
-  import { layout, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { cloudErrorKey, creationErrorKey } from '../lib/desktop-logbooks.js';
   import { DROP_STEPS, droppedFiles, nameFromGitUrl, parkPending, pendingFromSource, signInFailure, signInTo, PENDING_IMPORT_KEY } from '../lib/desktop-first-launch.js';
