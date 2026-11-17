@@ -5232,7 +5232,9 @@ Mock-ups, in `docs/mockups/`, canvas « OpenDives — Version Alpha »:
 - With three weights, the chips wrap and the total is right.
 - The Gaz tab shows one card per cylinder, and selecting a card shows its fields.
 
-## [ ] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+## [x] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+
+Done on `feature/release-phone-first-launch`. « Se connecter » and « Découvrir OpenDives+ » show a placeholder until task 265 is merged in.
 
 Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-phone-first-launch` (the branch of tasks 227 and 261) and never merge it into `main`.
 
@@ -5253,7 +5255,9 @@ Release mock-ups are now in their own folder, `docs/mockups-release/` (see its R
 - The choice buttons have 24 dp corners on every first-launch step.
 - The logo has the light ring and no shadow.
 
-## [ ] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+## [x] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+
+Done on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), from the phone branch of task 263.
 
 Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), and never merge them into `main`.
 
