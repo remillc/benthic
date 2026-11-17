@@ -14,6 +14,7 @@ import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
 import { importPayload } from './import-files.js';
+import { isRelease } from './edition.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -533,12 +534,19 @@ export async function afterDownload(result) {
   } catch (e) {
     console.error('Reading the remembered dive computers', e);
   }
-  if (!result?.downloaded) return;
+  // Release edition: the computer enters the equipment inventory the first time it is downloaded from
+  // (task 2026-11-17-267). Imported after the dives, so that the logbook's list of computers is up to date.
+  const noteComputer = result && isRelease ? () => import('./inventory.svelte.js').then((m) => m.noteDownloadedComputer(result)) : null;
+  if (!result?.downloaded) {
+    noteComputer?.();
+    return;
+  }
   logbook.undoText = result.undo;
   logbook.redoText = '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
+  noteComputer?.();
 }
 
 /**
