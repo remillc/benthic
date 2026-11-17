@@ -353,8 +353,6 @@
 
     <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.protection')}</h3>
     <DesktopEditField name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
-    <!-- Not stored in the logbook: shown, not editable. -->
-    <DesktopEditField name="undersuit" kind="text" disabled label={t('desktopDetail.label.undersuit')} value="" invitation={t('desktopDetail.invitation.undersuit')} />
     <div class="od-desktop-dive-fields--row" data-field="weights">
       <span class="od-desktop-dive-fields--row-label">{t('desktopDetail.label.weights')}</span>
       <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />

@@ -692,7 +692,6 @@
       "startPressure": "Pression au début",
       "endPressure": "Pression à la fin",
       "gasChanges": "Changements de gaz",
-      "undersuit": "Sous-vêtement",
       "weights": "Lest",
       "mix": "Mélange",
       "pressure": "Pression",
@@ -716,7 +715,6 @@
       "weight": "Ajouter le poids",
       "cylinderType": "Choisir un type",
       "pressure": "Ajouter la pression",
-      "undersuit": "Ajouter le sous-vêtement",
       "mix": "Saisir le mélange, par exemple 32 ou 18/45"
     },
     "notRated": "Non notée",

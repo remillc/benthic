@@ -692,7 +692,6 @@
       "startPressure": "Start pressure",
       "endPressure": "End pressure",
       "gasChanges": "Gas changes",
-      "undersuit": "Undersuit",
       "weights": "Weights",
       "mix": "Mix",
       "pressure": "Pressure",
@@ -716,7 +715,6 @@
       "weight": "Add the weight",
       "cylinderType": "Choose a type",
       "pressure": "Add the pressure",
-      "undersuit": "Add the undersuit",
       "mix": "Type the mix, such as 32 or 18/45"
     },
     "notRated": "Not rated",
