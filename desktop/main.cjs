@@ -18,6 +18,7 @@ const windowState = require('./window-state.cjs');
 const { LogbookStore, isLogbookFile } = require('./logbooks.cjs');
 const { createWindowManager } = require('./windows.cjs');
 const { createCloudService, loadClients } = require('./cloud.cjs');
+const { createNetworkMonitor } = require('./network.cjs');
 
 const devUrl = process.env.OD_DEV_URL || '';
 const resources = app.isPackaged
@@ -155,6 +156,20 @@ app.whenReady().then(() => {
     log: (text) => console.error('[desktop]', text),
   });
   const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources, cloud });
+  // « Seulement sur Wi-Fi ou câble » (task 2026-11-15-202): the connection type, asked of the system here (network.cjs).
+  const network = createNetworkMonitor({
+    onChange: (cost) => {
+      for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('od:network', cost);
+    },
+  });
+  ipcMain.handle('od:network', async (_event, op) => {
+    try {
+      if (op === 'watch') network.watch();
+      return { ok: true, value: op === 'refresh' ? await network.refresh() : await network.status() };
+    } catch (e) {
+      return { ok: true, value: 'unknown' };
+    }
+  });
   ipcMain.handle('od:settingsWindow', () => {
     openSettingsWindow();
     return { ok: true, value: true };

@@ -2465,6 +2465,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "In the desktop app, « Only on Wi-Fi or cable » now works: the automatic sync waits while the computer is on a metered connection (a phone's hotspot, mobile broadband) and runs when it is back on Wi-Fi or cable; « Sync now » still works.",
       "Lighter start-up and faster dive selection: the app loads half as much code and style at start, each screen and each language when it is first needed, and selecting a dive in the desktop logbook asks the core for that dive only instead of eighteen answers.",
       "In the desktop app, a long dive's profile is drawn with a few points per pixel instead of every sample, and the window no longer keeps the other layout in memory after you resize it across the narrow and wide layouts.",
       "In the desktop app, a large logbook is fast: the Logbook table draws only the rows in view, so selecting a dive, searching, sorting and coming back to the Logbook stay quick with thousands of dives.",

@@ -2,6 +2,7 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
+import { syncNetwork, syncAllowedOnThisNetwork, networkKnown, onSyncAllowedAgain } from './sync-network.svelte.js';
 import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
@@ -605,7 +606,7 @@ async function persistChanges() {
   await countPending();
   clearTimeout(syncTimer);
   // With a conflict waiting, the automatic sync that would run only brings the dialog back (syncEdits).
-  if (logbook.email && logbook.autoSync && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
+  if (logbook.email && autoSyncing() && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
@@ -620,6 +621,11 @@ function undoCleared() {
  * (the server did not answer); failed (it answered, the exchange stopped).
  * @typedef {'done'|'offline'|'failed'} SyncOutcome
  */
+
+/** Automatic synchronisation is on and the connection allows it (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js). */
+function autoSyncing() {
+  return logbook.autoSync && syncAllowedOnThisNetwork();
+}
 
 /**
  * Sends the saved edits (automatic synchronisation).
@@ -648,7 +654,7 @@ async function syncEdits() {
     }
     const reached = status.status !== 'offline' && status.status !== 'stopped';
     // Manual synchronisation: the state says so again once done (spec, section 4).
-    logbook.sync = !reached ? 'offline' : logbook.autoSync ? 'cloud' : 'manual';
+    logbook.sync = !reached ? 'offline' : autoSyncing() ? 'cloud' : 'manual';
     if (reached) markSynced();
     outcome = reached ? 'done' : status.status === 'offline' ? 'offline' : 'failed';
     if (!reached) noteFailure(status.cause === 'auth');
@@ -728,7 +734,7 @@ export function boot() {
     try {
       // The probe runs on the plugin's network thread, not in the core's
       // order: it is sent once the account is set, or it finds none.
-      if (logbook.autoSync && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
+      if (logbook.autoSync && !syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }
@@ -957,7 +963,11 @@ async function countPending() {
 // Offline: sending starts by itself when the network is back (spec, section 6).
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
-    if (logbook.email && logbook.autoSync && logbook.sync === 'offline' && logbook.pending) syncEdits();
+    if (logbook.email && autoSyncing() && logbook.sync === 'offline' && logbook.pending) syncEdits();
+  });
+  // The metered link went away (or the switch was turned off): what waited goes now.
+  onSyncAllowedAgain(() => {
+    if (logbook.email && logbook.autoSync && logbook.pending && logbook.sync !== 'syncing' && logbook.sync !== 'offline') syncEdits();
   });
   // Where the sync is: only while one is shown as running.
   OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
@@ -993,9 +1003,10 @@ function noteFailure(refused) {
   clearTimeout(retryTimer);
   logbook.retryMinutes = 0;
   // Only the unreachable server is tried again; the other two wait for the diver.
-  if (logbook.syncFailure === 'server' && logbook.autoSync) {
+  if (logbook.syncFailure === 'server' && autoSyncing()) {
     logbook.retryMinutes = retryDelay(retries++);
-    retryTimer = setTimeout(syncNow, logbook.retryMinutes * 60000);
+    // An automatic retry: it waits again when the link became metered meanwhile.
+    retryTimer = setTimeout(() => (autoSyncing() ? syncNow() : undefined), logbook.retryMinutes * 60000);
   }
 }
 
@@ -1045,7 +1056,8 @@ async function loadCloud(force, pre = null) {
   logbook.mode = account.mode === 'git' ? 'git' : 'cloud';
   logbook.repository = account.repository ?? '';
 
-  if (!logbook.autoSync && !force) {
+  await networkKnown();
+  if (!autoSyncing() && !force) {
     try {
       const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
       if (cached.dives) {
@@ -1143,7 +1155,7 @@ export async function loadLogbook({ force = false } = {}) {
     if (await loadCloud(force, pre)) {
       // Manual synchronisation: the state says so at all times, after a
       // "Sync" too (spec, section 4).
-      if (!logbook.autoSync) logbook.sync = 'manual';
+      if (!autoSyncing()) logbook.sync = 'manual';
       await countPending();
       await readConflicts();
     } else {
