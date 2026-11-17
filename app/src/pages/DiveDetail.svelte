@@ -17,6 +17,10 @@
   import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
+  import DiveGearBlock from '../components/DiveGearBlock.svelte';
+  import { isRelease } from '../lib/edition.js';
+  import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
+  import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
@@ -304,7 +308,10 @@
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
-  onMount(loadDive);
+  onMount(() => {
+    if (isRelease) loadInventory();
+    return loadDive();
+  });
 
   /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
   let computersOpen = $state(false);
@@ -584,7 +591,10 @@
 
   // A freediving dive has no Gas section (Christian, 13 November 2026).
   const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
-  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
+  // Release edition: what the equipment inventory says this dive used (task 2026-11-17-267).
+  const inventoryEquipment = $derived(isRelease && dive ? equipmentOf(dive) : null);
+  const undersuit = $derived(inventoryEquipment?.undersuitGearId ? (gearMap().get(inventoryEquipment.undersuitGearId)?.name ?? '') : '');
+  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0 || !!(inventoryEquipment && !equipmentIsEmpty(inventoryEquipment)));
 
   // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
   // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
@@ -892,6 +902,7 @@
         <EquipmentCard
           label={equipmentName}
           suit={dive.suit ?? ''}
+          {undersuit}
           weightTotal={weights.length ? weightTotal : ''}
           {weights}
           computer={computers[0]?.name ?? ''}
@@ -903,6 +914,7 @@
           onfeedback={setFeedback}
           oncomputers={() => (computersOpen = true)}
         />
+        {#if inventoryEquipment}<DiveGearBlock equipment={inventoryEquipment} />{/if}
       </section>
       {#if computers.length > 1}
         <ComputersSheet

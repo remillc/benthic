@@ -111,6 +111,38 @@ export async function computerDiveCounts() {
   }
 }
 
+/**
+ * The figures of a dive computer from the dives it recorded: the logbook's filter on the computer (its name in the
+ * logbook's list of computers), then the rows of those dives. Null when the core cannot answer.
+ * @param {Gear} g
+ * @returns {Promise<{ dives: number, seconds: number, deepestMm: number, last: string }|null>}
+ */
+export async function computerFigures(g) {
+  try {
+    const options = await OpenDivesCore.filterQuery({ kind: 'options' });
+    const model = (g.computerModel ?? g.name).toLowerCase();
+    const names = /** @type {string[]} */ (options.computers ?? []).filter((n) => n.toLowerCase().includes(model));
+    if (!names.length) return null;
+    // One value per line, as the filter screen sends them.
+    const data = names.map((n) => `${n}\n`).join('');
+    const ids = new Set(/** @type {number[]} */ (await OpenDivesCore.filterQuery({ kind: 'dives', rules: [{ type: 'dive_computer', stringMode: 'exact', data }] })));
+    let seconds = 0;
+    let deepestMm = 0;
+    let last = '';
+    let dives = 0;
+    for (const d of logbook.dives) {
+      if (!ids.has(d.id)) continue;
+      dives++;
+      seconds += d.durationSeconds;
+      deepestMm = Math.max(deepestMm, d.maxDepthMm);
+      if (d.date > last) last = d.date;
+    }
+    return { dives, seconds, deepestMm, last };
+  } catch {
+    return null;
+  }
+}
+
 /** Sets or lifts the read-only state: what the end of an OpenDives+ subscription will do (no billing exists yet). @param {boolean} on */
 export const setReadOnly = (on) => change((inv) => inv.setReadOnly(on));
 

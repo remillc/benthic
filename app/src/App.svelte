@@ -104,6 +104,11 @@
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
+  import ProfileDiver from './pages/ProfileDiver.svelte';
+  import ProfileGear from './pages/ProfileGear.svelte';
+  import ProfileKit from './pages/ProfileKit.svelte';
+  import ProfilePiece from './pages/ProfilePiece.svelte';
+  import ProfilePieceEdit from './pages/ProfilePieceEdit.svelte';
   import CylinderTypes from './pages/CylinderTypes.svelte';
   import LogbookComputers from './pages/LogbookComputers.svelte';
   import LogbookComputer from './pages/LogbookComputer.svelte';
@@ -146,6 +151,18 @@
     // Offline maps: the list, adding a region (a rectangle drawn on the map).
     { path: '/settings/maps/', component: SettingsMaps },
     { path: '/settings/maps/area', component: SettingsMapsArea },
+    // Release edition: « Mon profil de plongeur » and the equipment inventory (task 2026-11-17-267).
+    ...(isRelease
+      ? [
+          { path: '/profile', component: ProfileDiver },
+          { path: '/profile/gear/', component: ProfileGear },
+          { path: '/profile/gear/new', component: ProfilePieceEdit },
+          { path: '/profile/gear/:id', component: ProfilePiece },
+          { path: '/profile/gear/:id/edit', component: ProfilePieceEdit },
+          { path: '/profile/kits/new', component: ProfileKit },
+          { path: '/profile/kits/:id', component: ProfileKit },
+        ]
+      : []),
     { path: '/account', component: Account },
     { path: '/account/delete', component: DeleteAccount },
     // Signing in and creating an account, from the Account screen without an account.

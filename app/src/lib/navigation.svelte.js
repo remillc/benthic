@@ -87,7 +87,7 @@ export async function backToFirstScreen(router) {
  * Whether a route is one of the screens opened over a section.
  * @param {string} path
  */
-export const isOverPath = (path) => path.startsWith('/settings/') || path === '/about';
+export const isOverPath = (path) => path.startsWith('/settings/') || path === '/about' || path === '/profile' || path.startsWith('/profile/');
 
 /**
  * A section chosen in the side menu or the navigation rail: Settings or About

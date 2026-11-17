@@ -17,6 +17,7 @@
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
+  import { isRelease } from '../lib/edition.js';
 
   const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(logbook.email || t('menu.noAccount'));
@@ -142,6 +143,18 @@
         {/if}
       </div>
     {/if}
+    {#if isRelease && !desktopApp}
+      <div class="od-account-sheet--ios-group">
+        <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
+          <Icon name="briefcase" />
+          <span class="od-account-sheet--row-label">
+            {t('gear.profile.title')}
+            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+          </span>
+          <Icon name="chevron" size={20} />
+        </button>
+      </div>
+    {/if}
     <div class="od-account-sheet--ios-group">
       <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openSettings)}>
         <Icon name="settings" />
@@ -219,6 +232,20 @@
         </div>
       {/if}
     </div>
+
+    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages. -->
+    {#if isRelease && !desktopApp}
+      <div class="od-account-sheet--card">
+        <a href="#profile" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
+          <Icon name="briefcase" />
+          <span class="od-account-sheet--row-label">
+            {t('gear.profile.title')}
+            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+          </span>
+          <Icon name="chevron" size={20} />
+        </a>
+      </div>
+    {/if}
 
     <!-- Desktop: Réglages and À propos leave the sheet (rail, or the Mac's menu bar; task 2026-11-15-169). -->
     {#if !desktopApp}
