@@ -162,28 +162,25 @@ test('the six boxes spread on the phone and stay together, 12 dp apart, on wide 
 
 // --- Entry points and steps ---------------------------------------------------------------------------------
 
-test('the OpenDives server is the first and the only highlighted choice of both lists', () => {
-  assert.deepEqual(entryRows('where').map((r) => r.key), ['server', 'cloud', 'git', 'device']);
+test('the OpenDives server is the first and the only highlighted choice of « Ouvrir mon carnet »', () => {
   assert.deepEqual(entryRows('open').map((r) => r.key), ['server', 'cloud', 'git']);
-  for (const list of ['where', 'open']) assert.deepEqual(entryRows(list).filter((r) => r.main).map((r) => r.key), ['server']);
+  assert.deepEqual(entryRows('open').filter((r) => r.main).map((r) => r.key), ['server']);
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /entryRows\('where'\)/);
   assert.match(steps, /entryRows\('open'\)/);
   // « Dans mon nuage » is an ordinary white row: it no longer carries `main`.
   assert.doesNotMatch(steps, /<ReleaseChoiceRow main icon="cloudUpload"/);
 });
 
 test('the server steps: e-mail, code, download; « Retour » goes back one; the download has none', () => {
-  assert.equal(nextStep('where', 'server'), 'server');
   assert.equal(nextStep('open', 'server'), 'server');
   assert.equal(nextStep('server', 'code'), 'serverCode');
   assert.equal(nextStep('serverCode', 'session'), 'serverDownload');
   assert.equal(nextStep('server', 'offline'), 'serverOffline');
   assert.equal(nextStep('serverCode', 'offline'), 'serverOffline');
   assert.equal(nextStep('serverDownload', 'offline'), 'serverOffline');
-  let stack = ['start', 'new', 'where'];
+  let stack = ['start', 'open'];
   for (const choice of ['server', 'code', 'session']) stack = forward(stack, choice);
-  assert.deepEqual(stack, ['start', 'new', 'where', 'server', 'serverCode', 'serverDownload']);
+  assert.deepEqual(stack, ['start', 'open', 'server', 'serverCode', 'serverDownload']);
   assert.equal(hasBack('serverDownload'), false);
   for (const step of ['server', 'serverCode', 'serverOffline']) assert.equal(hasBack(step), true);
   assert.deepEqual(back(['start', 'open', 'server', 'serverCode']), ['start', 'open', 'server']);

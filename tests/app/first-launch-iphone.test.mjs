@@ -55,7 +55,6 @@ test('« Dans mon nuage » lists iCloud Drive first on an iPhone', () => {
   assert.doesNotMatch(langs.fr.welcomeSteps.cloudHelp, /iCloud/);
   assert.doesNotMatch(langs.fr.welcomeSteps.openCloudHelp, /iCloud/);
   const steps = src('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /iphoneKey\('welcomeSteps\.cloudHelp', iphone\)/);
   assert.match(steps, /iphoneKey\('welcomeSteps\.openCloudHelp', iphone\)/);
 });
 

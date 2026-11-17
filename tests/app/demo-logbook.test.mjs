@@ -150,7 +150,7 @@ test('the logbook\'s « + » goes through the demo guard, and the first step has
   const steps = src('components/FirstLaunchSteps.svelte');
   assert.match(steps, /\{#if demoOffered\}/);
   assert.match(steps, /t\('demoLogbook\.link'\)/);
-  const css = steps.slice(steps.indexOf('.od-first-launch--demo {'));
+  const css = steps.slice(steps.indexOf('.od-first-launch--text-button {'));
   assert.match(css, /cursor: pointer/);
   assert.match(css, /&:hover:not\(:disabled\)/);
   assert.match(css, /var\(--od-release-link\)/);

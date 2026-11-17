@@ -53,10 +53,14 @@
   let { f7router, recents = false } = $props();
 
   const step = $derived(currentStep());
+  /** The first step's rows are 12 dp high on an Android phone (mock-up android-premier-lancement-production). */
+  const denseRows = $derived(layout.phone && !ios);
   /** The iPhone variant of the first launch (task 2026-11-16-261): iCloud Drive first, iOS rows and alert. */
   const iphone = $derived(iosPhone(ios, layout.phone));
   /** The device the texts name: this tablet, phone, iPhone or computer (one `deviceKey` for all). */
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
+  /** The icon of the device choice: a computer on the desktop, a phone on a phone, a tablet on a tablet. */
+  const deviceIcon = $derived(kind === 'desktop' ? 'desktop' : layout.phone ? 'device' : 'tablet');
   /** The services of the lists; iCloud Drive first on an iPhone, before WebDAV on macOS (tasks 2026-11-16-228, 261). */
   const services = $derived(cloudServices({ iphone, mac: desktopMac }));
   const service = $derived([ICLOUD_SERVICE, ...CLOUD_SERVICES].find((s) => s.key === flow.service) ?? CLOUD_SERVICES[0]);
@@ -219,19 +223,6 @@
   /** « Changer de compte » of « Aucun carnet dans ce compte »: the list of services. */
   function otherAccount() {
     goBackTo('openCloudService');
-  }
-
-  /** « Suivant » of the name step: « Où le garder ? ». */
-  function nameDone() {
-    if (nameInvalid) return;
-    go('next');
-  }
-
-  /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of « Où le garder ? ». */
-  function where(/** @type {'server'|'cloud'|'git'|'device'} */ kind) {
-    if (nameInvalid) return;
-    if (kind === 'device') void createOnDevice();
-    else go(kind);
   }
 
   /** The dives to bring into the new logbook, once it is open (nothing for an empty logbook). */
@@ -701,27 +692,12 @@
       </span>
     </div>
   {/if}
-  <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} onenter={nameDone} />
-  <button type="button" class="od-first-launch--action od-first-launch--action-next" disabled={nameInvalid} onclick={nameDone}>{t('welcomeSteps.next')}<Icon name="chevron" size={18} /></button>
-{/snippet}
-
-<!-- Task 2026-11-16-231: « Où le garder ? », the second step of « Nouveau carnet »; the name is the page title above. -->
-{#snippet whereStep()}
-  <h3 class="od-first-launch--subtitle">{t('welcomeSteps.whereTitle')}</h3>
-  <p class="od-first-launch--lead">{t('welcomeSteps.whereHelp')}</p>
-  <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
-    {#each entryRows('where') as row (row.key)}
-      {#if row.key === 'server'}
-        <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.whereHelp')} disabled={nameInvalid} onclick={() => where('server')} />
-      {:else if row.key === 'cloud'}
-        <ReleaseChoiceRow icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.cloudHelp', iphone))} disabled={nameInvalid} onclick={() => where('cloud')} />
-      {:else if row.key === 'git'}
-        <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-      {:else}
-        <ReleaseChoiceRow icon={desktopApp ? 'desktop' : 'tablet'} title={t(deviceKey('welcomeSteps.deviceTitle', kind))} help={t(deviceKey('welcomeSteps.deviceHelp', kind))} disabled={nameInvalid || busy} onclick={() => where('device')} />
-      {/if}
-    {/each}
-  </nav>
+  <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} />
+  {#if step === 'importNew'}
+    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.importLogbook')}</button>
+  {:else}
+    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.createLogbook')}</button>
+  {/if}
 {/snippet}
 
 <div class="od-first-launch" class:od-first-launch--first={step === 'start'} class:od-first-launch--dragging={dragging} class:od-first-launch--desktop={desktopApp}>
@@ -748,18 +724,20 @@
           {@render dropLine()}
         {:else if step === 'start'}
           <nav class="od-first-launch--rows od-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
-            <ReleaseChoiceRow main icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
-            <ReleaseChoiceRow icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
-            <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
+            <!-- Task 2026-11-17-263: sign in (the OpenDives+ chip above its title), then a logbook on the device, then the import. -->
+            <ReleaseChoiceRow main prominent plus dense={denseRows} icon="login" title={t('welcomeSteps.signInTitle')} help={t('welcomeSteps.signInHelp')} onclick={() => go('signIn')} />
+            <ReleaseChoiceRow dense={denseRows} icon={deviceIcon} title={t(deviceKey('welcomeSteps.localTitle', kind))} help={t('welcomeSteps.localHelp')} onclick={() => go('create')} />
+            <ReleaseChoiceRow dense={denseRows} icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importStartHelp')} onclick={() => go('import')} />
           </nav>
-          {#if demoOffered}
-            <button type="button" class="od-first-launch--demo" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
-          {/if}
+          <div class="od-first-launch--text-buttons">
+            {#if demoOffered}
+              <button type="button" class="od-first-launch--text-button" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
+            {/if}
+            <button type="button" class="od-first-launch--text-button od-first-launch--text-button-quiet" onclick={() => go('discover')}>{t('welcomeSteps.discoverPlus')}</button>
+          </div>
           {@render dropLine()}
         {:else if step === 'new' || step === 'importNew'}
           {@render nameStep()}
-        {:else if step === 'where'}
-          {@render whereStep()}
         {:else if step === 'cloudService'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.serviceTitle')}</h3>
           <p class="od-first-launch--lead">{t('welcomeSteps.serviceHelp')}</p>
@@ -1512,21 +1490,41 @@
       }
     }
 
-    /* « Essayer avec un carnet d’exemple » under the three choices of the first step (task 2026-11-16-224). */
-    .od-first-launch--demo {
-      width: auto;
+    /* The two text buttons under the three choices of the first step (task 2026-11-17-263): « Essayer avec un carnet
+       d’exemple » and « Découvrir OpenDives+ », centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp
+       apart, 16 dp above and below the group. */
+    .od-first-launch--text-buttons {
       align-self: center;
-      margin: 24px 0 0;
-      padding: 2px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .od-first-launch--text-button {
+      width: auto;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 12px;
       border: none;
+      border-radius: 20px;
       background: transparent;
       color: var(--od-release-link);
       font: inherit;
-      font-size: 14px;
-      line-height: 19px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 500;
       cursor: pointer;
+      transition: background-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+
+      &.od-first-launch--text-button-quiet {
+        color: var(--od-text-2);
+      }
 
       &:disabled {
         opacity: 0.5;
@@ -1535,15 +1533,13 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          color: var(--od-release-row-main-hover);
-          text-decoration-thickness: 2px;
+          background: var(--od-release-hover);
         }
       }
 
       &:focus-visible {
         outline: 2px solid var(--od-release-link);
-        outline-offset: 3px;
-        border-radius: 4px;
+        outline-offset: 2px;
       }
     }
 

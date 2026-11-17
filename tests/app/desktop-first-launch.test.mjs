@@ -101,8 +101,10 @@ test('« cet ordinateur »: the texts that name the device have a desktop varian
   }
   assert.ok(langs.fr.welcomeSteps.webdavHelpDesktop.endsWith('Il reste sur cet ordinateur.'));
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', kind\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', kind\)/);
+  // The first step's choice (task 2026-11-17-264); the texts above stay for the « Où le garder ? » step of the server screens.
+  assert.match(steps, /deviceKey\('welcomeSteps\.localTitle', kind\)/);
+  assert.equal(langs.fr.welcomeSteps.localTitleDesktop, 'Commencer un carnet sur cet ordinateur');
+  assert.equal(langs.en.welcomeSteps.localTitleDesktop, 'Start a logbook on this computer');
 });
 
 test('the sign-in hint reads on two lines, centred, on the desktop too (task 230)', () => {
@@ -119,10 +121,10 @@ test('the sign-in hint reads on two lines, centred, on the desktop too (task 230
 test('the drop line sits under the choices of « Pour commencer » and « Importer un carnet », in the desktop app only', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /\{#snippet dropLine\(\)\}\s*\{#if desktopApp\}\s*<p class="od-first-launch--drop">\{t\('welcomeSteps\.dropLine'\)\}<\/p>/);
-  // Right after the demo link of the first step, after the compact choices of the recents screen (task 241) and after
+  // Right after the text buttons of the first step, after the compact choices of the recents screen (task 241) and after
   // the rows of the import step, and nowhere else.
   assert.equal((steps.match(/\{@render dropLine\(\)\}/g) ?? []).length, 3);
-  assert.match(steps, /tryDemo\(\)\}>\{t\('demoLogbook\.link'\)\}<\/button>\s*\{\/if\}\s*\{@render dropLine\(\)\}/);
+  assert.match(steps, /go\('discover'\)\}>\{t\('welcomeSteps\.discoverPlus'\)\}<\/button>\s*<\/div>\s*\{@render dropLine\(\)\}/);
   assert.match(steps, /go\('divelogs'\)\} \/>\s*<\/nav>\s*\{@render dropLine\(\)\}/);
   assert.deepEqual([...DROP_STEPS], ['start', 'import']);
 });

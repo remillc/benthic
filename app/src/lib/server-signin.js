@@ -54,17 +54,16 @@ export function resendLeft(resendAfterSeconds, sentAt, now) {
 }
 
 /**
- * The first choices of « Où le garder ? » and « Où est-il ? »: the OpenDives server first and highlighted, then the
- * cloud, git and (for « Où le garder ? ») this device. The cloud row is an ordinary white row.
- * @param {'where'|'open'} list
- * @returns {{ key: 'server'|'cloud'|'git'|'device', main: boolean }[]}
+ * The first choices of « Où est-il ? »: the OpenDives server first and highlighted, then the cloud and git. The
+ * cloud row is an ordinary white row.
+ * @param {'open'} list
+ * @returns {{ key: 'server'|'cloud'|'git', main: boolean }[]}
  */
 export function entryRows(list) {
-  const rows = /** @type {{ key: 'server'|'cloud'|'git'|'device', main: boolean }[]} */ ([
+  const rows = /** @type {{ key: 'server'|'cloud'|'git', main: boolean }[]} */ ([
     { key: 'server', main: true },
     { key: 'cloud', main: false },
     { key: 'git', main: false },
   ]);
-  if (list === 'where') rows.push({ key: 'device', main: false });
   return rows;
 }

@@ -28,9 +28,9 @@ function play(choices, from = ['start']) {
 }
 
 test('step machine: WebDAV has its own step on both paths', () => {
-  assert.deepEqual(play(['create', 'next', 'cloud', 'webdav']), ['start', 'new', 'where', 'cloudService', 'webdav']);
+  assert.deepEqual(play(['create', 'cloud', 'webdav']), ['start', 'new', 'cloudService', 'webdav']);
   assert.deepEqual(play(['open', 'cloud', 'webdav']), ['start', 'open', 'openCloudService', 'openWebdav']);
-  assert.deepEqual(play(['create', 'next', 'cloud', 'webdav', 'back']), ['start', 'new', 'where', 'cloudService']);
+  assert.deepEqual(play(['create', 'cloud', 'webdav', 'back']), ['start', 'new', 'cloudService']);
   assert.ok(hasLogbookTitle('webdav'));
   assert.ok(!hasLogbookTitle('openWebdav'));
   assert.ok(hasBack('webdav') && hasBack('openWebdav'));
@@ -39,7 +39,7 @@ test('step machine: WebDAV has its own step on both paths', () => {
 test('step machine: the links of the git error go to the other path, « Retour » comes back', () => {
   assert.deepEqual(play(['open', 'git', 'createLink']), ['start', 'open', 'openGit', 'new']);
   assert.deepEqual(play(['open', 'git', 'createLink', 'back']), ['start', 'open', 'openGit']);
-  assert.deepEqual(play(['create', 'next', 'git', 'openLink']), ['start', 'new', 'where', 'git', 'open']);
+  assert.deepEqual(play(['create', 'git', 'openLink']), ['start', 'new', 'git', 'open']);
 });
 
 test('step machine: « Aucun carnet dans ce compte » offers « Créer un carnet ici » and « Changer de compte »', () => {

@@ -139,8 +139,12 @@ test('texts that name the device: « ce téléphone » on a phone, « cette tabl
   assert.ok(langs.fr.welcomeSteps.webdavHelpPhone.endsWith('Il reste sur ce téléphone.'));
   // The components choose the key by layout.phone.
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', kind\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', kind\)/);
+  // The first step's choice (task 2026-11-17-263); the texts of « Seulement sur ce téléphone » stay for the server screens' « Où le garder ? ».
+  assert.match(steps, /deviceKey\('welcomeSteps\.localTitle', kind\)/);
+  assert.equal(langs.fr.welcomeSteps.localTitlePhone, 'Commencer un carnet sur ce téléphone');
+  assert.equal(langs.fr.welcomeSteps.localTitleIphone, 'Commencer un carnet sur cet iPhone');
+  assert.equal(langs.fr.welcomeSteps.localTitle, 'Commencer un carnet sur cette tablette');
+  assert.equal(langs.fr.welcomeSteps.localTitleDesktop, 'Commencer un carnet sur cet ordinateur');
   assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', deviceKind\(\{ phone: layout\.phone, ios, desktop: desktopApp \}\)\)/);
   assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', kind\)/);
   // One kind for every device: the desktop app first, then the iPhone, then the phone, else the tablet.

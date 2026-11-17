@@ -4,12 +4,12 @@
 // can check the order of every path.
 //
 // Paths:
-//   start → new (the name) → where (« Où le garder ? »; task 2026-11-16-231) →
-//     (cloud: cloudService → cloudConnect → cloudConnected | webdav | git | device)
+//   start → new (the name; « Créer le carnet » makes the logbook on the device; task 2026-11-17-263) |
+//     cloudService → cloudConnect → cloudConnected | webdav | git (reached from the open and git-link paths)
 //   (iCloud Drive, iPhone and macOS only: cloudService → cloudConnected, no sign-in; tasks 2026-11-16-228 and 261)
-//   start → import → (file | importDivelogs → importProgress) → importNew → where as above
+//   start → import → (file | importDivelogs → importProgress) → importNew (the name; « Importer le carnet » creates it on the device)
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
-//   where | open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
+//   open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
 //     e-mail step is `server`; « Le serveur ne répond pas » is `serverOffline`, over the step that failed)
 //   start → signIn → odplusConnect (« Se connecter ou créer un compte ») → email → server → serverCode → a subscribed
 //     account: serverDownload → odplusReady (« Votre carnet est prêt »), or createChoice when the account holds no
@@ -24,7 +24,7 @@
 
 /**
  * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
- *   |'where'|'import'|'importDivelogs'|'importProgress'|'importNew'
+ *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
  *   |'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'
@@ -35,18 +35,17 @@
 const NAME_STEPS = /** @type {Step[]} */ (['new', 'importNew']);
 
 /** The steps after the name, where the logbook's name is the page title. */
-const TITLED_STEPS = /** @type {Step[]} */ (['where', 'cloudService', 'cloudConnect', 'cloudConnected', 'webdav', 'git']);
+const TITLED_STEPS = /** @type {Step[]} */ (['cloudService', 'cloudConnect', 'cloudConnected', 'webdav', 'git']);
 
 /** @type {Record<string, Step>} */
 const FORWARD = {
   'start:create': 'new',
   'start:import': 'import',
   'start:open': 'open',
-  'new:next': 'where',
-  'importNew:next': 'where',
-  'where:cloud': 'cloudService',
-  'where:git': 'git',
-  'where:server': 'server',
+  'new:cloud': 'cloudService',
+  'new:git': 'git',
+  'importNew:cloud': 'cloudService',
+  'importNew:git': 'git',
   'cloudService:service': 'cloudConnect',
   'cloudService:webdav': 'webdav',
   'cloudService:icloud': 'cloudConnected',

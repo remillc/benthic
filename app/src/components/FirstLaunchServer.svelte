@@ -188,7 +188,7 @@
 
   /** « Choisir un autre endroit »: back to the list the diver came from. */
   function otherPlace() {
-    goBackTo(flow.stack.includes('where') ? 'where' : 'open');
+    goBackTo('open');
   }
 
   /** « Revenir à l'accueil »: the first step. */
