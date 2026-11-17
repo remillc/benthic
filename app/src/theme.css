@@ -240,6 +240,19 @@
     --od-release-on-main-soft: rgb(255 255 255 / 0.82);
     --od-release-main-tile: rgb(255 255 255 / 0.16);
     --od-release-chip-caption: rgb(255 255 255 / 0.75);
+    /* OpenDives+ (task 2026-11-17-265): the hero's gradient, the soft colour of each benefit card with its icon, the price card. */
+    --od-plus-hero: radial-gradient(140% 100% at 38% -20%, #A9C4E2 0%, #7199C2 22%, #3F70A3 42%, #1F5C99 62%, #0C3866 100%);
+    --od-plus-blue: #DCE8F5;
+    --od-plus-blue-icon: #1F5C99;
+    --od-plus-green: #DDEFE4;
+    --od-plus-green-icon: #1E6B3A;
+    --od-plus-amber: #F4E6D2;
+    --od-plus-amber-icon: #8A4B0F;
+    --od-plus-violet: #EBE3F3;
+    --od-plus-violet-icon: #5B3A8A;
+    --od-plus-price: #114477;
+    --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
+    --od-plus-chip: rgb(255 255 255 / 0.18);
     --od-release-surface-line: rgb(255 255 255 / 0.35);
     --od-release-dot-ring: rgb(255 255 255 / 0.22);
     --od-release-row-shadow: rgb(31 33 36 / 0.06);
@@ -386,6 +399,15 @@
     --od-release-line: #6B6E72;
     --od-release-line-soft: #3A3C40;
     --od-release-ios-help: #98989D;
+    /* OpenDives+: the soft cards go deep, their icons light (each pair 4.5:1 or more). */
+    --od-plus-blue: #1E3552;
+    --od-plus-blue-icon: #8FB6E6;
+    --od-plus-green: #1D3A2A;
+    --od-plus-green-icon: #7FCB9C;
+    --od-plus-amber: #43301B;
+    --od-plus-amber-icon: #E8B46E;
+    --od-plus-violet: #33284A;
+    --od-plus-violet-icon: #C2A8EA;
     --od-release-hover: rgb(255 255 255 / 0.08);
     --od-release-row-shadow: rgb(0 0 0 / 0.3);
     --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);

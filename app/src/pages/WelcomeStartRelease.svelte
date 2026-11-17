@@ -9,11 +9,14 @@
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
-  import { flow } from '../lib/first-launch.svelte.js';
+  import { flow, currentStep } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
+
+  /** The OpenDives+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
+  const plusHero = $derived(['odplusOffer', 'odplusReady', 'odplusWelcome'].includes(currentStep()));
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
@@ -30,7 +33,7 @@
 {/snippet}
 
 <Page class="od-welcome-release" noToolbar>
-  <div class="od-welcome-release--page">
+  <div class="od-welcome-release--page" class:od-welcome-release--plus={plusHero}>
     <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
       <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
       <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
@@ -188,6 +191,10 @@
        others, and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
        texts need more room, so that nothing is cut off. */
     @media (max-width: 767.98px) {
+      .od-welcome-release--plus .od-welcome-release--panel {
+        display: none;
+      }
+
       .od-welcome-release--page {
         height: auto;
         flex-direction: column;

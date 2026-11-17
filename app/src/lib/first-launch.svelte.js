@@ -3,7 +3,7 @@
 // the logbook's name, what is being imported, the cloud service. The steps and their order are in
 // first-launch-steps.js (pure); this file holds them as reactive state for the screens. The blue
 // panel does not read it: it stays as it is on every step.
-import { back, backToName, backToStep, forward, importRead, menuEntry } from './first-launch-steps.js';
+import { back, backToName, backToStep, enterCreate, enterOffer, forward, importRead, menuEntry, replaceTop } from './first-launch-steps.js';
 import { newDownloadProgress } from './first-launch-import.js';
 import { t } from './i18n.js';
 
@@ -52,6 +52,25 @@ export const flow = $state({
     resendAt: 0,
     lockedUntil: 0,
   },
+  /**
+   * Creating a logbook on the OpenDives server (task 2026-11-17-266). `source` is what is sent: the logbook already on
+   * the device, or a Subsurface file (read by the core, then sent from it); `done` of `total` dives are on the server;
+   * `left` is the time still needed. `deviceLogbook` is the logbook on the device (its name and dives), null when none.
+   * @type {{
+   *   source: ''|'device'|'file',
+   *   file: File|null,
+   *   name: string,
+   *   total: number,
+   *   done: number,
+   *   left: { unit: 'seconds'|'minutes'|'none', n: number },
+   *   deviceLogbook: { name: string, dives: number }|null,
+   *   deviceReady: boolean,
+   *   fresh: boolean,
+   * }}
+   */
+  create: { source: '', file: null, name: '', total: 0, done: 0, left: { unit: 'none', n: 0 }, deviceLogbook: null, deviceReady: false, fresh: false },
+  /** The signed-in account of the OpenDives+ screens: the address shown on « Votre carnet est prêt » and the counts. */
+  plus: { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0 } },
   /** The cloud account connected (idea #74: always empty until the cloud is built). */
   account: '',
   /** @type {FoundLogbook[]} */
@@ -83,6 +102,27 @@ export function go(choice) {
   flow.direction = 'forward';
   flow.connection = 'idle';
   flow.stack = forward(flow.stack, choice);
+}
+
+/**
+ * The top step replaced by another (the upload and its stops follow one another).
+ * @param {Step} step
+ */
+export function goReplace(step) {
+  flow.direction = 'forward';
+  flow.stack = replaceTop(flow.stack, step);
+}
+
+/** A signed-in account without a logbook: « Aucun carnet sur votre compte ». */
+export function goCreate() {
+  flow.direction = 'forward';
+  flow.stack = enterCreate(flow.stack);
+}
+
+/** A signed-in account without a subscription: the offer. */
+export function goOffer() {
+  flow.direction = 'forward';
+  flow.stack = enterOffer(flow.stack);
 }
 
 /** « Retour »: one step back, the transition played backwards. */
@@ -142,6 +182,8 @@ export function resetFlow() {
   Object.assign(flow.server, { email: '', emailError: false, code: '', error: '', resendAt: 0, lockedUntil: 0 });
   flow.found = [];
   flow.source = null;
+  Object.assign(flow.create, { source: '', file: null, name: '', total: 0, done: 0, left: { unit: 'none', n: 0 }, deviceLogbook: null, deviceReady: false, fresh: false });
+  Object.assign(flow.plus, { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0 } });
   Object.assign(flow.divelogs, { user: '', password: '', total: 0, done: 0, phase: 'download', error: '', interrupted: false, progress: newDownloadProgress() });
 }
 

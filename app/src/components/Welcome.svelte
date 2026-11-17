@@ -19,6 +19,6 @@
   }
 </script>
 
-<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
+<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome || logbook.welcomeHold} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
   <View name="welcome" url="/welcome" />
 </Popup>

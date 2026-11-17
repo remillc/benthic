@@ -1015,7 +1015,6 @@
     }
   },
   "serverSteps": {
-    "title": "OpenDives server",
     "rowTitle": "On the OpenDives server",
     "whereHelp": "Your OpenDives account, by e-mail. Synced with your other devices.",
     "openHelp": "With your OpenDives account.",
@@ -1062,7 +1061,8 @@
     "unreadableTitle": "This logbook cannot be opened yet",
     "unreadableDetail": "This version cannot read the format of the server's logbook yet. Nothing was changed.",
     "emptyTitle": "No logbook on the server",
-    "emptyDetail": "This account has no logbook yet."
+    "emptyDetail": "This account has no logbook yet.",
+    "backHome": "Back to the start"
   },
   "welcomeSteps": {
     "startTitle": "Get started",
@@ -4582,5 +4582,133 @@
       "s5": "Tap [kbd]Create repository[/kbd].",
       "s6": "Choose [kbd]HTTPS[/kbd] above the repository address, then copy it, for example [code]https://codeberg.org/you/carnet-plongee.git[/code]."
     }
+  },
+  "odplus": {
+    "chip": "OpenDives+",
+    "providerUnavailable": "Signing in with {provider} is not available yet. Use your e-mail address.",
+    "purchaseUnavailable": "Subscribing is not available in this version yet.",
+    "connect": {
+      "title": "Sign in or create an account",
+      "lead": "Already subscribed? Sign in in one tap, with no password to remember.",
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "email": "Continue with my e-mail",
+      "note": "Not subscribed yet? OpenDives+ will be presented to you. No account is created until you subscribe.",
+      "without": "Continue without an account"
+    },
+    "offer": {
+      "title": "Your logbook, everywhere and safe",
+      "lead": "All of OpenDives stays free. OpenDives+ adds what needs a server.",
+      "sync": "Synced",
+      "syncText": "On all your devices.",
+      "backup": "Backed up",
+      "backupText": "Automatic, encrypted copy.",
+      "gear": "Gear",
+      "gearText": "Cylinders, kits, computers.",
+      "certifications": "Certifications",
+      "certificationsText": "Your cards, always with you.",
+      "price": "US $14.99",
+      "per": "a year",
+      "priceDetail": "that is $1.25 a month · Cancel any time",
+      "subscribe": "Subscribe",
+      "without": "Continue without subscribing",
+      "noAccount": "No account is created."
+    },
+    "ready": {
+      "title": "Your logbook is ready",
+      "lead": "Everything is on this tablet, and stays there even without a network.",
+      "leadPhone": "Everything is on this phone, and stays there even without a network.",
+      "leadIphone": "Everything is on this iPhone, and stays there even without a network.",
+      "leadDesktop": "Everything is on this computer, and stays there even without a network.",
+      "dives": "Dives",
+      "sites": "Sites",
+      "gear": "Gear",
+      "certifications": "Certifications",
+      "articles": {
+        "one": "{n} item",
+        "other": "{n} items"
+      },
+      "account": "{email} · synced just now",
+      "open": "Open my logbook"
+    },
+    "welcome": {
+      "title": "Welcome to OpenDives+!",
+      "lead": "Your subscription is active. Thank you for supporting OpenDives.",
+      "activated": "What is turned on",
+      "sync": "Synced across your devices",
+      "backup": "Automatic backup",
+      "gearCertifications": "Gear and certifications",
+      "account": "Account: {email}",
+      "open": "Open my logbook"
+    }
+  },
+  "serverCreate": {
+    "title": "No logbook on your account",
+    "lead": "Your OpenDives+ account is ready, but it holds no logbook yet. Create one, or send a logbook you already have.",
+    "blankTitle": "Create an empty logbook",
+    "blankHelp": "You add your dives afterwards.",
+    "importTitle": "Import a Subsurface file",
+    "importHelp": "An .ssrf or .xml file, converted to OpenDives’ format.",
+    "sendTitle": "Send the logbook of this tablet",
+    "sendTitlePhone": "Send the logbook of this phone",
+    "sendTitleIphone": "Send the logbook of this iPhone",
+    "sendTitleDesktop": "Send the logbook of this computer",
+    "sendHelp": {
+      "one": "“{name}”, {n} dive, already on this device.",
+      "other": "“{name}”, {n} dives, already on this device."
+    },
+    "nameTitle": "New logbook",
+    "nameHelp": "It will be kept on the OpenDives server and on this tablet.",
+    "nameHelpPhone": "It will be kept on the OpenDives server and on this phone.",
+    "nameHelpIphone": "It will be kept on the OpenDives server and on this iPhone.",
+    "nameHelpDesktop": "It will be kept on the OpenDives server and on this computer.",
+    "create": "Create the logbook",
+    "sendingTitle": "Sending the logbook",
+    "sendingName": {
+      "one": "“{name}” · {n} dive",
+      "other": "“{name}” · {n} dives"
+    },
+    "reading": "Reading the file…",
+    "progress": {
+      "one": "{n} dive of {total}",
+      "other": "{n} dives of {total}"
+    },
+    "leftNone": "Working out the time left…",
+    "leftSeconds": "About {n} seconds",
+    "leftMinutes": {
+      "one": "About {n} minute",
+      "other": "About {n} minutes"
+    },
+    "safe": "The logbook is already saved on this tablet. You can leave the app: the upload resumes when you come back.",
+    "safePhone": "The logbook is already saved on this phone. You can leave the app: the upload resumes when you come back.",
+    "safeIphone": "The logbook is already saved on this iPhone. You can leave the app: the upload resumes when you come back.",
+    "safeDesktop": "The logbook is already saved on this computer. You can leave the app: the upload resumes when you come back.",
+    "cancel": "Cancel the upload",
+    "created": "Logbook sent to the OpenDives server. It also stays on this tablet.",
+    "createdPhone": "Logbook sent to the OpenDives server. It also stays on this phone.",
+    "createdIphone": "Logbook sent to the OpenDives server. It also stays on this iPhone.",
+    "createdDesktop": "Logbook sent to the OpenDives server. It also stays on this computer.",
+    "offlineTitle": "Server unreachable",
+    "offlineHelp": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this tablet, then try again.",
+    "offlineHelpPhone": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this phone, then try again.",
+    "offlineHelpIphone": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this iPhone, then try again.",
+    "offlineHelpDesktop": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this computer, then try again.",
+    "offlineNote": "Nothing was created.",
+    "interruptedTitle": "Upload interrupted",
+    "interruptedHelp": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this tablet, and the upload resumes where it stopped.",
+    "interruptedHelpPhone": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this phone, and the upload resumes where it stopped.",
+    "interruptedHelpIphone": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this iPhone, and the upload resumes where it stopped.",
+    "interruptedHelpDesktop": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this computer, and the upload resumes where it stopped.",
+    "interruptedSent": {
+      "one": "{n} dive of {total} sent",
+      "other": "{n} dives of {total} sent"
+    },
+    "sentCount": {
+      "one": "{n} dive",
+      "other": "{n} dives"
+    },
+    "later": "Later",
+    "resume": "Resume the upload",
+    "refused": "The server refused the upload. Sign in again, then resume it."
   }
 }

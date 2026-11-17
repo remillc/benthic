@@ -93,6 +93,11 @@ export const logbook = $state({
   conflictLater: false,
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
+  /**
+   * Release edition: the first launch stays on screen over the logbook while a logbook is being sent to the OpenDives
+   * server (task 2026-11-17-266); the logbook is already open under it.
+   */
+  welcomeHold: false,
   /** Last dive changed by an edit or an undo, for the detail screen. */
   edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
   /** Last trip changed by a trip change or an undo, for the trip screen. */

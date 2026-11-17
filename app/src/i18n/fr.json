@@ -1015,7 +1015,6 @@
     }
   },
   "serverSteps": {
-    "title": "Serveur OpenDives",
     "rowTitle": "Sur le serveur OpenDives",
     "whereHelp": "Votre compte OpenDives, par courriel. Synchronisé avec vos autres appareils.",
     "openHelp": "Avec votre compte OpenDives.",
@@ -1062,7 +1061,8 @@
     "unreadableTitle": "Ce carnet ne peut pas encore s’ouvrir",
     "unreadableDetail": "Cette version ne sait pas encore lire le format du carnet du serveur. Rien n’a été modifié.",
     "emptyTitle": "Aucun carnet sur le serveur",
-    "emptyDetail": "Ce compte ne contient pas encore de carnet."
+    "emptyDetail": "Ce compte ne contient pas encore de carnet.",
+    "backHome": "Revenir à l’accueil"
   },
   "welcomeSteps": {
     "startTitle": "Pour commencer",
@@ -4582,5 +4582,133 @@
       "s5": "Touchez [kbd]Créer un dépôt[/kbd].",
       "s6": "Choisissez [kbd]HTTPS[/kbd] au-dessus de l’adresse du dépôt, puis copiez-la, par exemple [code]https://codeberg.org/vous/carnet-plongee.git[/code]."
     }
+  },
+  "odplus": {
+    "chip": "OpenDives+",
+    "providerUnavailable": "La connexion avec {provider} n’est pas encore disponible. Utilisez votre courriel.",
+    "purchaseUnavailable": "L’abonnement n’est pas encore disponible dans cette version.",
+    "connect": {
+      "title": "Se connecter ou créer un compte",
+      "lead": "Vous êtes abonné ? Connectez-vous en un geste, sans mot de passe à retenir.",
+      "google": "Continuer avec Google",
+      "apple": "Continuer avec Apple",
+      "email": "Continuer avec mon courriel",
+      "note": "Pas encore abonné ? On vous présentera OpenDives+. Aucun compte n’est créé tant que vous ne vous abonnez pas.",
+      "without": "Continuer sans compte"
+    },
+    "offer": {
+      "title": "Votre carnet, partout et en sécurité",
+      "lead": "Tout OpenDives reste libre. OpenDives+ ajoute ce qui demande un serveur.",
+      "sync": "Synchronisé",
+      "syncText": "Sur tous vos appareils.",
+      "backup": "Sauvegardé",
+      "backupText": "Copie automatique, chiffrée.",
+      "gear": "Équipement",
+      "gearText": "Bouteilles, kits, ordinateurs.",
+      "certifications": "Brevets",
+      "certificationsText": "Vos cartes, toujours sur vous.",
+      "price": "14,99 $ US",
+      "per": "par an",
+      "priceDetail": "soit 1,25 $ par mois · Résiliable en tout temps",
+      "subscribe": "S’abonner",
+      "without": "Continuer sans abonnement",
+      "noAccount": "Aucun compte n’est créé."
+    },
+    "ready": {
+      "title": "Votre carnet est prêt",
+      "lead": "Tout est sur cette tablette, et y reste même sans réseau.",
+      "leadPhone": "Tout est sur ce téléphone, et y reste même sans réseau.",
+      "leadIphone": "Tout est sur cet iPhone, et y reste même sans réseau.",
+      "leadDesktop": "Tout est sur cet ordinateur, et y reste même sans réseau.",
+      "dives": "Plongées",
+      "sites": "Sites",
+      "gear": "Équipement",
+      "certifications": "Brevets",
+      "articles": {
+        "one": "{n} article",
+        "other": "{n} articles"
+      },
+      "account": "{email} · synchronisé à l’instant",
+      "open": "Ouvrir mon carnet"
+    },
+    "welcome": {
+      "title": "Bienvenue dans OpenDives+ !",
+      "lead": "Votre abonnement est actif. Merci de soutenir OpenDives.",
+      "activated": "Ce qui est activé",
+      "sync": "Synchronisé sur vos appareils",
+      "backup": "Sauvegarde automatique",
+      "gearCertifications": "Équipement et brevets",
+      "account": "Compte : {email}",
+      "open": "Ouvrir mon carnet"
+    }
+  },
+  "serverCreate": {
+    "title": "Aucun carnet sur votre compte",
+    "lead": "Votre compte OpenDives+ est prêt, mais il ne contient pas encore de carnet. Créez-en un, ou envoyez un carnet que vous avez déjà.",
+    "blankTitle": "Créer un carnet vide",
+    "blankHelp": "Vous y ajouterez vos plongées ensuite.",
+    "importTitle": "Importer un fichier Subsurface",
+    "importHelp": "Un fichier .ssrf ou .xml, converti au format d’OpenDives.",
+    "sendTitle": "Envoyer le carnet de cette tablette",
+    "sendTitlePhone": "Envoyer le carnet de ce téléphone",
+    "sendTitleIphone": "Envoyer le carnet de cet iPhone",
+    "sendTitleDesktop": "Envoyer le carnet de cet ordinateur",
+    "sendHelp": {
+      "one": "« {name} », {n} plongée, déjà sur cet appareil.",
+      "other": "« {name} », {n} plongées, déjà sur cet appareil."
+    },
+    "nameTitle": "Nouveau carnet",
+    "nameHelp": "Il sera gardé sur le serveur OpenDives et sur cette tablette.",
+    "nameHelpPhone": "Il sera gardé sur le serveur OpenDives et sur ce téléphone.",
+    "nameHelpIphone": "Il sera gardé sur le serveur OpenDives et sur cet iPhone.",
+    "nameHelpDesktop": "Il sera gardé sur le serveur OpenDives et sur cet ordinateur.",
+    "create": "Créer le carnet",
+    "sendingTitle": "Envoi du carnet",
+    "sendingName": {
+      "one": "« {name} » · {n} plongée",
+      "other": "« {name} » · {n} plongées"
+    },
+    "reading": "Lecture du fichier…",
+    "progress": {
+      "one": "{n} plongée sur {total}",
+      "other": "{n} plongées sur {total}"
+    },
+    "leftNone": "Calcul du temps restant…",
+    "leftSeconds": "Environ {n} secondes",
+    "leftMinutes": {
+      "one": "Environ {n} minute",
+      "other": "Environ {n} minutes"
+    },
+    "safe": "Le carnet est déjà enregistré sur cette tablette. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
+    "safePhone": "Le carnet est déjà enregistré sur ce téléphone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
+    "safeIphone": "Le carnet est déjà enregistré sur cet iPhone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
+    "safeDesktop": "Le carnet est déjà enregistré sur cet ordinateur. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
+    "cancel": "Annuler l’envoi",
+    "created": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cette tablette.",
+    "createdPhone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur ce téléphone.",
+    "createdIphone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cet iPhone.",
+    "createdDesktop": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cet ordinateur.",
+    "offlineTitle": "Serveur injoignable",
+    "offlineHelp": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cette tablette, puis réessayez.",
+    "offlineHelpPhone": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de ce téléphone, puis réessayez.",
+    "offlineHelpIphone": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cet iPhone, puis réessayez.",
+    "offlineHelpDesktop": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cet ordinateur, puis réessayez.",
+    "offlineNote": "Rien n’a été créé.",
+    "interruptedTitle": "Envoi interrompu",
+    "interruptedHelp": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cette tablette, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpPhone": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur ce téléphone, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpIphone": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cet iPhone, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpDesktop": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cet ordinateur, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedSent": {
+      "one": "{n} plongée sur {total} envoyée",
+      "other": "{n} plongées sur {total} envoyées"
+    },
+    "sentCount": {
+      "one": "{n} plongée",
+      "other": "{n} plongées"
+    },
+    "later": "Plus tard",
+    "resume": "Reprendre l’envoi",
+    "refused": "Le serveur a refusé l’envoi. Reconnectez-vous, puis reprenez-le."
   }
 }

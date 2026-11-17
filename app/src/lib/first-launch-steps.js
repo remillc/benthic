@@ -11,6 +11,13 @@
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
 //   where | open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
 //     e-mail step is `server`; « Le serveur ne répond pas » is `serverOffline`, over the step that failed)
+//   start → signIn → odplusConnect (« Se connecter ou créer un compte ») → email → server → serverCode → a subscribed
+//     account: serverDownload → odplusReady (« Votre carnet est prêt »), or createChoice when the account holds no
+//     logbook (task 2026-11-17-266: createChoice → createName | createSend → createInterrupted | createOffline);
+//     any other account: odplusOffer
+//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase)
+//   Both entries (`signIn`, `discover`) are the choices of the first step; « Continuer sans compte » and
+//   « Continuer sans abonnement » go back to it and create nothing (task 2026-11-17-265).
 //
 // The connection to a cloud service (« Se connecter », in progress, refused) is not a step: it is the
 // state of the connect step (lib/cloud-connection.js), so that « Retour » leaves it in one move.
@@ -19,7 +26,9 @@
  * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
  *   |'where'|'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
- *   |'server'|'serverCode'|'serverOffline'|'serverDownload'} Step
+ *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
+ *   |'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'
+ *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
 /** The steps that hold the name field: the pencil of the later steps goes back to the last of them. */
@@ -53,6 +62,14 @@ const FORWARD = {
   'serverCode:offline': 'serverOffline',
   'serverDownload:offline': 'serverOffline',
   'serverCode:session': 'serverDownload',
+  'start:signIn': 'odplusConnect',
+  'start:discover': 'odplusOffer',
+  'odplusConnect:email': 'server',
+  'odplusOffer:welcome': 'odplusWelcome',
+  'serverDownload:ready': 'odplusReady',
+  'createChoice:blank': 'createName',
+  'createChoice:send': 'createSend',
+  'createName:offline': 'createOffline',
   'openCloudService:service': 'openCloudConnect',
   'openCloudService:webdav': 'openWebdav',
   'openCloudService:icloud': 'openCloudConnected',
@@ -141,7 +158,49 @@ export function hasLogbookTitle(step) {
  */
 export function hasBack(step, leavable = false) {
   if (step === 'start') return leavable;
-  return step !== 'importProgress' && step !== 'serverDownload';
+  return !NO_BACK.includes(step);
+}
+
+/**
+ * The steps with no « Retour »: a running import or download (they have « Annuler »), the upload and its two stops
+ * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the OpenDives+ screens, which
+ * leave through their own buttons.
+ */
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome']);
+
+/**
+ * A signed-in account that holds no logbook: « Aucun carnet sur votre compte ». « Retour » leaves for the address
+ * step (the code is spent), not for the download.
+ * @param {Step[]} stack
+ * @returns {Step[]}
+ */
+export function enterCreate(stack) {
+  return [...cutAtServer(stack), 'createChoice'];
+}
+
+/**
+ * An account without a subscription: the offer, over the address step.
+ * @param {Step[]} stack
+ * @returns {Step[]}
+ */
+export function enterOffer(stack) {
+  return [...cutAtServer(stack), 'odplusOffer'];
+}
+
+/** The stack up to and including its last address step; the whole stack when it has none. @param {Step[]} stack */
+function cutAtServer(stack) {
+  const at = stack.lastIndexOf('server');
+  return at >= 0 ? stack.slice(0, at + 1) : stack;
+}
+
+/**
+ * The top step replaced by another one (the upload and its stops follow one another without growing the stack).
+ * @param {Step[]} stack
+ * @param {Step} step
+ * @returns {Step[]}
+ */
+export function replaceTop(stack, step) {
+  return [...stack.slice(0, -1), step];
 }
 
 /**

@@ -296,7 +296,7 @@ test('the download lists the branch, fetches the small files with the git token 
   };
   const progress = [];
   const result = await downloadServerLogbook({ transport, repositoryUrl: 'https://git.example/diver/logbook.git', branch: 'main', token: 'secret', onProgress: (d, t) => progress.push([d, t]) });
-  assert.deepEqual({ ...result }, { marker: 'ok', dives: 2, sites: 1, trips: 0, openable: false });
+  assert.deepEqual({ ...result }, { marker: 'ok', dives: 2, sites: 1, trips: 0, gear: 0, certifications: 0, openable: false });
   assert.deepEqual(progress[0], [0, 4]);
   assert.deepEqual(progress.at(-1), [4, 4]);
   assert.ok(requests.every((r) => r.headers.Authorization === 'token secret'));

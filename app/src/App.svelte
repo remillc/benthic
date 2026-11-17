@@ -100,6 +100,7 @@
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook } from './lib/logbook.svelte.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
+  import { resumeServerUpload } from './lib/server-upload-resume.js';
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
@@ -343,7 +344,8 @@
 
   // Desktop app: the dives the first launch brought are imported once the new logbook it made is open (task 2026-11-16-228).
   $effect(() => {
-    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
+    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport().then(() => isRelease && resumeServerUpload());
+    else if (isRelease && !desktopApp && !logbook.loading && !logbook.welcome && !logbook.error) void resumeServerUpload();
   });
 
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).

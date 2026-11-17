@@ -7,7 +7,7 @@
 // not built yet (the open point at the end of section 11.3).
 
 /** The files the download brings. The samples (`profile.json`) and the media wait until a dive is opened. */
-const WANTED = /^(opendives\.json|dives\/[0-9a-f]{2}\/[^/]+\/dive\.json|sites\/[^/]+\.json|trips\/[^/]+\.json)$/;
+const WANTED = /^(opendives\.json|dives\/[0-9a-f]{2}\/[^/]+\/dive\.json|sites\/[^/]+\.json|trips\/[^/]+\.json|gear\/[^/]+\.json|certifications\/[^/]+\.json)$/;
 
 /**
  * The git host's API address of a repository: `https://host/<owner>/<repo>.git` gives
@@ -27,6 +27,16 @@ export function repositoryApi(repositoryUrl) {
 }
 
 /**
+ * The git host's answer to the file list of a branch that does not exist yet (an empty repository): 404 or 409 on some
+ * versions, 400 « sha not found » on Forgejo.
+ * @param {{ status: number, text: string }} response
+ * @returns {boolean}
+ */
+export function isEmptyBranch(response) {
+  return response.status === 404 || response.status === 409 || (response.status === 400 && /not found|does not exist|empty/i.test(response.text));
+}
+
+/**
  * Whether `opendives.json` is a logbook this app can read: its kind, and a `minReader` not above the format it knows.
  * @param {any} marker the parsed file
  * @param {number} [knownFormat]
@@ -43,6 +53,8 @@ export function checkMarker(marker, knownFormat = 1) {
  * @property {number} dives
  * @property {number} sites
  * @property {number} trips
+ * @property {number} gear
+ * @property {number} certifications
  * @property {boolean} openable whether the app can load this logbook into its core: false until the open point of
  *   section 11.3 is built (the format's JSON files are not read into the core yet)
  */
@@ -71,7 +83,7 @@ export async function downloadServerLogbook({ transport, repositoryUrl, branch, 
     } catch {
       throw new Error('UNREACHABLE');
     }
-    if (response.status === 404 || response.status === 409) return null;
+    if (isEmptyBranch(response)) return null;
     if (response.status < 200 || response.status >= 300) throw new Error('UNREACHABLE');
     try {
       return JSON.parse(response.text);
@@ -89,7 +101,7 @@ export async function downloadServerLogbook({ transport, repositoryUrl, branch, 
     if (!tree.truncated && !(tree.total_count > page * 1000)) break;
   }
 
-  const result = /** @type {DownloadedLogbook} */ ({ marker: 'empty', dives: 0, sites: 0, trips: 0, openable: false });
+  const result = /** @type {DownloadedLogbook} */ ({ marker: 'empty', dives: 0, sites: 0, trips: 0, gear: 0, certifications: 0, openable: false });
   if (!paths.includes('opendives.json')) {
     onProgress?.(0, 0);
     return result;
@@ -107,6 +119,8 @@ export async function downloadServerLogbook({ transport, repositoryUrl, branch, 
       if (path === 'opendives.json') result.marker = checkMarker(file);
       else if (path.startsWith('dives/')) result.dives++;
       else if (path.startsWith('sites/')) result.sites++;
+      else if (path.startsWith('gear/')) result.gear++;
+      else if (path.startsWith('certifications/')) result.certifications++;
       else result.trips++;
       onProgress?.(++done, total);
     }

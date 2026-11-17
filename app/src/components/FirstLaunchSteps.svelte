@@ -22,6 +22,8 @@
   import FirstLaunchDivelogs from './FirstLaunchDivelogs.svelte';
   import FirstLaunchWebdav from './FirstLaunchWebdav.svelte';
   import FirstLaunchServer from './FirstLaunchServer.svelte';
+  import FirstLaunchServerCreate from './FirstLaunchServerCreate.svelte';
+  import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
@@ -535,15 +537,63 @@
     openChoose: 'welcomeSteps.chooseTitle',
     openWebdav: 'welcomeSteps.openTitle',
     openGit: 'welcomeSteps.openTitle',
-    server: 'serverSteps.title',
-    serverCode: 'serverSteps.title',
-    serverDownload: 'serverSteps.title',
+    createChoice: 'serverCreate.title',
+    createName: 'serverCreate.nameTitle',
+    createSend: 'serverCreate.sendingTitle',
   });
+
+  /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome'];
 
   /** The server was downloaded and opened: the snackbar says where the logbook is now (mock-ups …-serveur-carnet). */
   function serverOpened() {
     showSnackbar(t(deviceKey('serverSteps.downloaded', kind)));
     resetFlow();
+  }
+
+  /**
+   * « Créer le carnet » and the upload of a logbook to the OpenDives server (task 2026-11-17-266): the logbook on this
+   * device that goes with it, empty or with the dives of the file. In the desktop window without a logbook the main
+   * process creates it and the window reloads on it; the upload goes on from there (lib/server-upload-resume.js).
+   * @param {File|null} file
+   * @returns {Promise<'ready'|'reload'|'cancelled'>}
+   */
+  async function makeDeviceLogbook(file) {
+    if (windowTakes) {
+      if (file) flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary: summariseImport(flow.create.total) };
+      const made = await createInWindow({ where: 'computer' }, sanitiseLogbookName(flow.create.name));
+      return made ? 'reload' : 'cancelled';
+    }
+    await createDeviceLogbook(
+      {
+        deviceLogExists: async () => (await OpenDivesCore.listDives()).exists,
+        start: startWithoutAccount,
+        sampleIds: () => logbook.dives.map((d) => d.id),
+        remove: deleteDives,
+      },
+      file ? () => importFile(file) : null,
+    );
+    return 'ready';
+  }
+
+  /** The logbook is on the server and on this device: it opens, the snackbar says where it is. */
+  function serverCreated() {
+    logbook.welcomeHold = false;
+    logbook.welcome = false;
+    showSnackbar(t(deviceKey('serverCreate.created', kind)));
+    resetFlow();
+  }
+
+  /** « Plus tard » of « Envoi interrompu »: the logbook on this device opens; the upload waits for the next start. */
+  function serverLater() {
+    logbook.welcomeHold = false;
+    logbook.welcome = false;
+    resetFlow();
+  }
+
+  /** « Continuer sans compte » and « Continuer sans abonnement »: back to the first step, nothing was created. */
+  function withoutAccount() {
+    goBackTo('start');
   }
 </script>
 
@@ -684,7 +734,7 @@
           {@render logbookTitle()}
         {:else if step === 'start' && recents}
           <RecentLogbooks />
-        {:else if step !== 'serverOffline'}
+        {:else if !OWN_HEADING.includes(step)}
           <h2 class="od-first-launch--title">{t(titles[step])}</h2>
         {/if}
 
@@ -819,7 +869,11 @@
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
           <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} onconnect={windowTakes ? createGit : undefined} />
         {:else if step === 'server' || step === 'serverCode' || step === 'serverOffline' || step === 'serverDownload'}
-          <FirstLaunchServer {step} onopened={serverOpened} />
+          <FirstLaunchServer {step} />
+        {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
+          <FirstLaunchServerCreate {step} {makeDeviceLogbook} onfinished={serverCreated} onlater={serverLater} />
+        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome'}
+          <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>
     {/key}

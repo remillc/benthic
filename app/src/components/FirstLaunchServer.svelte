@@ -11,19 +11,22 @@
   import ReleaseField from './ReleaseField.svelte';
   import CodeField from './CodeField.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
-  import { flow, go, goBack, goBackTo } from '../lib/first-launch.svelte.js';
+  import OdPlusChip from './OdPlusChip.svelte';
+  import { flow, go, goBack, goBackTo, goCreate, goOffer, goReplace } from '../lib/first-launch.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { ServerError, createServerApi, plausibleEmail } from '../lib/server-api.js';
   import { serverTransport } from '../lib/server-transport.js';
   import { serverUrl } from '../lib/server-url.js';
   import { downloadServerLogbook } from '../lib/server-logbook.js';
   import { codeScreen, formatCountdown, lockMinutes } from '../lib/server-signin.js';
+  import { afterSignIn } from '../lib/odplus.js';
+  import { unfinishedUpload } from '../lib/server-upload-resume.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ step: 'server'|'serverCode'|'serverOffline'|'serverDownload', onopened: () => void }} */
-  let { step, onopened } = $props();
+  /** @type {{ step: 'server'|'serverCode'|'serverOffline'|'serverDownload' }} */
+  let { step } = $props();
 
   const s = flow.server;
   const api = createServerApi({ baseUrl: serverUrl(), transport: serverTransport });
@@ -118,6 +121,14 @@
     busy = true;
     try {
       const session = await api.verifyCode(s.email, s.code);
+      // An account without a subscription goes to the offer, and nothing of it is kept on this device (task 2026-11-17-265).
+      if (afterSignIn(session.user) === 'offer') {
+        s.code = '';
+        s.error = '';
+        goOffer();
+        return;
+      }
+      flow.plus.email = session.user.email;
       await OpenDivesCore.serverSessionSave({
         email: session.user.email,
         sessionToken: session.sessionToken,
@@ -180,6 +191,11 @@
     goBackTo(flow.stack.includes('where') ? 'where' : 'open');
   }
 
+  /** « Revenir à l'accueil »: the first step. */
+  function home() {
+    goBackTo('start');
+  }
+
   // --- The download ---------------------------------------------------------------------------------------
 
   const d = $state({ done: 0, total: 0, phase: /** @type {'listing'|'download'|'unreadable'|'empty'} */ ('listing'), dives: 0 });
@@ -203,10 +219,24 @@
         },
       });
       d.dives = result.dives;
+      if (result.marker === 'empty') {
+        // No logbook on the account: the choices that create one (task 2026-11-17-266). An upload left unfinished on
+        // this device is offered for resuming first.
+        const left = unfinishedUpload(access.repositoryUrl);
+        if (left) {
+          Object.assign(flow.create, { name: left.name, total: left.total, done: 0, source: 'device', deviceReady: true });
+          goCreate();
+          goReplace('createInterrupted');
+        } else goCreate();
+        return;
+      }
       // The diver's logbook is on the server, but this version cannot load it yet (docs/architecture.md, 11.3, open point).
-      d.phase = result.marker === 'empty' ? 'empty' : 'unreadable';
-      // A logbook the app can load opens here (the snackbar is told by the parent); see `openable` in server-logbook.js.
-      if (result.openable) onopened();
+      d.phase = 'unreadable';
+      // A logbook the app can load is announced by « Votre carnet est prêt »; see `openable` in server-logbook.js.
+      if (result.openable) {
+        Object.assign(flow.plus.counts, { dives: result.dives, sites: result.sites, gear: result.gear, certifications: result.certifications });
+        go('ready');
+      }
     } catch (e) {
       if (cancelled || (e instanceof Error && e.message === 'CANCELLED')) return;
       unreachable(null);
@@ -228,14 +258,14 @@
 </script>
 
 {#if step === 'server'}
-  <h3 class="od-first-launch-server--subtitle">{t('serverSteps.accountTitle')}</h3>
+  <h2 class="od-first-launch-server--heading">{t('serverSteps.accountTitle')}</h2>
   <p class="od-first-launch-server--lead">{t('serverSteps.accountHelp')}</p>
   <div class="od-first-launch-server--field">
     <ReleaseField label={t('serverSteps.emailLabel')} type="email" autocomplete="email" bind:value={s.email} error={emailError} help={t('serverSteps.emailHelp')} oninput={() => (s.emailError = false)} onenter={requestCode} />
   </div>
   <button type="button" class="od-first-launch-server--action" disabled={busy || !s.email.trim()} aria-busy={busy} onclick={requestCode}>{t('serverSteps.getCode')}</button>
 {:else if step === 'serverCode'}
-  <h3 class="od-first-launch-server--subtitle">{t('serverSteps.codeTitle')}</h3>
+  <h2 class="od-first-launch-server--heading">{t('serverSteps.codeTitle')}</h2>
   <p class="od-first-launch-server--lead">{t('serverSteps.codeHelp', { email: s.email })}</p>
   <CodeField
     label={t('serverSteps.codeLabel')}
@@ -260,14 +290,15 @@
     <button type="button" class="od-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={sendAgain}>{t('serverSteps.newCode')}</button>
   {/if}
 {:else if step === 'serverOffline'}
-  <p class="od-first-launch-server--overline">{t('serverSteps.title')}</p>
   <span class="od-first-launch-server--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
   <h2 class="od-first-launch-server--heading">{t('serverSteps.offlineTitle')}</h2>
   <p class="od-first-launch-server--lead">{t(deviceKey('serverSteps.offlineHelp', kind))}</p>
   <div class="od-first-launch-server--space"></div>
   <button type="button" class="od-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
-  <button type="button" class="od-first-launch-server--quiet" onclick={otherPlace}>{t('serverSteps.otherPlace')}</button>
+  <button type="button" class="od-first-launch-server--quiet od-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
 {:else if step === 'serverDownload'}
+  <div class="od-first-launch-server--chip"><OdPlusChip onLight /></div>
+  <h2 class="od-first-launch-server--heading">{t('serverSteps.progressDownload')}</h2>
   <div class="od-first-launch-server--paper">
     <div class="od-first-launch-server--step">
       <span class="od-first-launch-server--mark od-first-launch-server--done"><Icon name="check" size={16} weight={2.6} /></span>
@@ -314,24 +345,6 @@
 
 <style>
   @layer od.components {
-    .od-first-launch-server--subtitle {
-      margin: 2px 0 6px;
-      font-size: 17px;
-      line-height: 22px;
-      font-weight: 600;
-      color: var(--od-text-2);
-    }
-
-    .od-first-launch-server--overline {
-      margin: 0 0 4px;
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 600;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      color: var(--od-release-row-main);
-    }
-
     .od-first-launch-server--heading {
       margin: 0 0 6px;
       font-size: 28px;
@@ -347,6 +360,10 @@
       color: var(--od-text-2);
     }
 
+    .od-first-launch-server--chip {
+      margin: 2px 0 10px;
+    }
+
     .od-first-launch-server--field {
       margin-top: 14px;
     }
@@ -359,6 +376,7 @@
     .od-first-launch-server--tile {
       width: 56px;
       height: 56px;
+      align-self: center;
       margin: 4px 0 16px;
       border-radius: 16px;
       display: flex;
@@ -603,6 +621,11 @@
 
       .od-first-launch-server--quiet {
         align-self: flex-end;
+      }
+
+      /* « Revenir à l'accueil » is centred under the two buttons on a phone. */
+      .od-first-launch-server--home {
+        align-self: center;
       }
     }
 
