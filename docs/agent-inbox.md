@@ -5341,7 +5341,9 @@ Also on the tablet and the desktop: the server sign-in screens of task 260 (`and
 - An empty account shows the three choices. The third one appears only when a logbook exists on the device.
 - A cut connection during the upload shows « Envoi interrompu », and « Reprendre l’envoi » continues from where it stopped.
 
-## [ ] 2026-11-17-267 Phone (release): « Mon profil de plongeur » and the equipment inventory (to-do #42) — ASK CHRISTIAN BEFORE THE SERVER PART
+## [x] 2026-11-17-267 Phone (release): « Mon profil de plongeur » and the equipment inventory (to-do #42) — ASK CHRISTIAN BEFORE THE SERVER PART
+
+Done on `feature/release-equipment-inventory`: the screens and the local store (IndexedDB, the section 11.3 layout). Waiting for Christian: the server wiring, a file plugin for storage, the catalogue images (#65).
 
 Christian approved this on 17 November 2026. **Release edition:** work on a new branch `feature/release-equipment-inventory`, started from `feature/release-server-screens`, and never merge it into `main`.
 
