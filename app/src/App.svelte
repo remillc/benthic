@@ -16,6 +16,8 @@
   import WelcomeStart from './pages/WelcomeStart.svelte';
   import WelcomeEntry from './pages/WelcomeEntry.svelte';
   import { isRelease } from './lib/edition.js';
+  import FirstDownload from './pages/FirstDownload.svelte';
+  import WithoutAccount from './pages/WithoutAccount.svelte';
   import SettingsBailout from './pages/SettingsBailout.svelte';
   import Plans from './pages/Plans.svelte';
   import SignIn from './pages/SignIn.svelte';
@@ -66,6 +68,8 @@
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import Welcome from './components/Welcome.svelte';
+  import DemoHost from './components/DemoHost.svelte';
+  import { accountGuard } from './lib/demo.svelte.js';
   import { layout, ios, listWidth, splitBreakpoint, bottomNav } from './lib/layout.svelte.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
@@ -96,6 +100,7 @@
   import AboutLibraries from './pages/AboutLibraries.svelte';
   import GitRepository from './pages/GitRepository.svelte';
   import TokenHelp from './pages/TokenHelp.svelte';
+  import RepositoryHelp from './pages/RepositoryHelp.svelte';
   import SettingsMaps from './pages/SettingsMaps.svelte';
   import SettingsMapsArea from './pages/SettingsMapsArea.svelte';
   import MapsDialogs from './components/MapsDialogs.svelte';
@@ -129,14 +134,15 @@
     { path: '/account', component: Account },
     { path: '/account/delete', component: DeleteAccount },
     // Signing in and creating an account, from the Account screen without an account.
-    { path: '/account/sign-in', component: SignIn },
-    { path: '/account/create', component: CreateAccount },
+    { path: '/account/sign-in', component: SignIn, beforeEnter: accountGuard },
+    { path: '/account/create', component: CreateAccount, beforeEnter: accountGuard },
     { path: '/account/code', component: ConfirmCode },
-    { path: '/account/import', component: BringLogbook },
+    { path: '/account/import', component: BringLogbook, beforeEnter: accountGuard },
     { path: '/account/importing', component: ImportProgress },
     // The logbook in the user's own git repository (Modifier le dépôt).
-    { path: '/account/git', component: GitRepository, options: { props: { edit: true } } },
+    { path: '/account/git', component: GitRepository, options: { props: { edit: true } }, beforeEnter: accountGuard },
     { path: '/account/git/token', component: TokenHelp },
+    { path: '/account/git/repository', component: RepositoryHelp },
     // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
     { path: '/account/git/new', component: GitRepository },
     // First launch, in the view of its popup (components/Welcome.svelte).
@@ -145,10 +151,15 @@
     { path: '/welcome/sign-in', component: SignIn, options: { props: { welcome: true } } },
     { path: '/welcome/create', component: CreateAccount, options: { props: { welcome: true } } },
     { path: '/welcome/code', component: ConfirmCode, options: { props: { welcome: true } } },
+    { path: '/welcome/downloading', component: FirstDownload },
+    { path: '/welcome/local', component: WithoutAccount },
     { path: '/welcome/import', component: BringLogbook },
     { path: '/welcome/importing', component: ImportProgress },
     { path: '/welcome/git', component: GitRepository, options: { props: { welcome: true } } },
     { path: '/welcome/git/token', component: TokenHelp },
+    { path: '/welcome/git/repository', component: RepositoryHelp },
+    // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
+    { path: '/welcome/git/downloading', component: FirstDownload },
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {
@@ -328,6 +339,7 @@
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   <Welcome />
+  <DemoHost />
   <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
@@ -386,6 +398,13 @@
     :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
     :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left + .title) {
       margin-left: 16px;
+    }
+
+    /* The release edition's empty logbook in portrait: the list pane is the whole width, under the band (task 224). */
+    @media (orientation: portrait) {
+      :global(.view-master-detail:not(:has(.page-master-detail)):has(.od-release-empty)) {
+        --f7-page-master-width: 100%;
+      }
     }
 
     /* Nothing chosen yet. */

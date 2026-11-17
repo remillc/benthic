@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
-# The planner tests (tests/plan_test.cpp, tests/plan_oracle.cpp) as Android
+# The planner tests (tests/plan_test.cpp, tests/plan_oracle.cpp) and the import formats test
+# (tests/import_formats_test.cpp, run by tests/android/run-import-formats.sh) as Android
 # executables, built from the same sources, the same flags and the same
 # dependencies as libopendives.so (native/CMakeLists.txt), to be pushed to a
 # device with tests/android/run.sh. Nothing here ships in the app.
@@ -49,7 +50,7 @@ foreach(target core_objs)
   target_include_directories(${target} PRIVATE ${COMMON_INCLUDES})
 endforeach()
 
-foreach(test plan_test plan_oracle)
+foreach(test plan_test plan_oracle import_formats_test)
   add_executable(${test} "${ROOT}/tests/${test}.cpp" $<TARGET_OBJECTS:core_objs>)
   target_compile_features(${test} PRIVATE cxx_std_20)
   target_compile_definitions(${test} PRIVATE BT_SUPPORT BLE_SUPPORT)

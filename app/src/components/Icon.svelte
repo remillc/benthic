@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -34,6 +34,8 @@
     keyboard: 'M3.5 6.5h17v11h-17zM7 10h.01M10 10h.01M14 10h.01M17 10h.01M7 14h.01M17 14h.01M9.5 14h5',
     clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7.5V12l3 2',
     bluetooth: 'M7 7l10 10-5 4V3l5 4L7 17',
+    // A wrist dive computer with a dive profile on its screen (task 2026-11-15-220): straps, case, profile, button.
+    diveComputer: 'M9 5.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M9 18.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.5M9 5.5h6a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5a4 4 0 0 1 4-4zM7.5 9.5h1l1.8 4.5h2.4l1.3-2h1.2l1.3-2.5M19 10.5h1.5',
     // The same, crossed out: no Bluetooth connection (download failed).
     bluetoothOff: 'M4 4l16 16M7 7l3.5 3.5M12 10V3l5 4-3 3M12 14v7l5-4-3.5-3.5M7 17l3-3',
     merge: 'M6 3v4c0 3 6 5 6 8v6M18 3v4c0 3-6 5-6 8',
@@ -68,6 +70,9 @@
     tablet: 'M6.5 2.5h11a2.5 2.5 0 0 1 2.5 2.5v14a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19V5a2.5 2.5 0 0 1 2.5-2.5zM10 18.5h4',
     folderDownload: 'M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V9.5A1.5 1.5 0 0 0 19.5 8H12l-2-2.5H4.5A1.5 1.5 0 0 0 3 7zM12 11v5m-2.2-2.2L12 16l2.2-2.2',
     server: 'M6 4h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 13h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM8 7.5h.01M8 16.5h.01',
+    // An upload tray and a globe (« Importer un carnet », divelogs.de).
+    upload: 'M12 15V4m-4 4l4-4 4 4M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5',
+    globe: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9',
     blank: '',
     cloud: 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z',
     close: 'M6 6l12 12M18 6L6 18',
@@ -85,6 +90,7 @@
     lightbulb: 'M12 3a8 8 0 0 0-4.5 14.6V20h9v-2.4A8 8 0 0 0 12 3zM9.5 22h5',
     checkCircle: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M8 12.5l3 3 5-6',
     offline: 'M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6.5 9 4.5 4.5 0 0 0 7 18zM4 4l16 16',
+    tablet: 'M5 4h14a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 5 4zM11 17h2',
     device: 'M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2',
     expand: 'M6.5 9.5L12 15l5.5-5.5',
     refresh: 'M20 12a8 8 0 1 1-2.34-5.66M20 4v4.5h-4.5',

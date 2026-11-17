@@ -9,6 +9,15 @@ import { sortCylinderTypes } from './cylinder-sort.js';
 export { waterTypeOf };
 
 /**
+ * The column mapping of a CSV import (import_csv in core/libopendives/opendives.h): `format` is `samples` (a
+ * profile per file), `dives` (a dive per line), `seabear` or `poseidon`; `template` the stylesheet of `samples`
+ * (`csv`, `SensusCSV`); the other keys are the stylesheets' own: a column index (`timeField`, `depthField`, ...,
+ * -1 for none), an option index (`separatorIndex`, `units`, `datefmt`, `durationfmt`) or a text (`date`, `time`, `hw`).
+ * Key order counts: `date` comes first when given.
+ * @typedef {{ format: 'samples'|'dives'|'seabear'|'poseidon', template?: string, [key: string]: string|number|undefined }} CsvParams
+ */
+
+/**
  * Trip identifiers change on every load: never store them.
  * @typedef {Object} DiveTrip
  * @property {number} id
@@ -593,8 +602,19 @@ export { waterTypeOf };
  *   A picked file (base64 data) written to the app's cache for the import steps.
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
+ * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
+ *   A CSV file (staged with stageImport) with its column mapping, as import_csv in opendives.h. `companionPath`: for
+ *   Poseidon MkVI, the staged .txt of the same dive. With `dryRun` nothing is added and the answer is the preview
+ *   {dives:[{when, number, durationSeconds, maxDepthMm, profile:[[seconds, mm]]}]}; otherwise the dives are
+ *   imported (EditResult), one undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
  * @property {(options: {path: string}) => Promise<void>} discardImport
  *   Deletes a downloaded file (cancelled or failed import).
+ * @property {(options: {name: string}) => Promise<{path: string, created: boolean}>} createIcloudLogbook
+ *   iOS only (task 2026-11-16-261): the logbook `name` (a file name) is created in the OpenDives folder of the
+ *   app's iCloud Drive container, which uses the device's Apple account, so there is no sign-in. `path` is the
+ *   folder's path; `created` is false when it already existed. Rejects with NOT_AVAILABLE (Android, or iCloud Drive
+ *   turned off or signed out on the iPhone) or BAD_REQUEST (empty name). Only the iOS side has an implementation;
+ *   the JavaScript calls it on an iPhone only.
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
  * @property {(options: {action: 'count'|'import'}) => Promise<any>} deviceLog
  *   The dives logged on this device without an account: "count" ({count}),
@@ -637,6 +657,10 @@ export { waterTypeOf };
  *   with numbers (one per id), each dive gets its own number instead.
  * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
  *   Imports a file (base64 contents, original name), one undoable step (import_dives).
+ * @property {(options: {files: {name: string, data: string}[]}) => Promise<EditResult>} importDivesFiles
+ *   Imports several files chosen together (base64 contents, original names), one undoable step
+ *   (import_dives_files): a Suunto app .json and the .fit with the same base name are read as one
+ *   dive (the .fit brings the gas mix and the gradient factors), the other files on their own.
  * @property {(options: {action: 'list'} | {action: 'save', name: string, fulltext?: string, mode?: string, rules: FilterRule[]} | {action: 'delete', index: number}) => Promise<any>} filterPresets
  *   Filter presets: the list ({presetList}), or an undoable save or delete (EditResult).
  * @property {() => Promise<SyncConflicts>} syncConflicts
@@ -830,6 +854,11 @@ export const OpenDivesCore = {
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),
+  createIcloudLogbook: (options) => native.createIcloudLogbook(options),
+  async importCsv(options) {
+    const result = await native.importCsv({ ...options, params: JSON.stringify(options.params) });
+    return JSON.parse(result.json);
+  },
   async createLog(options) {
     return JSON.parse((await native.createLog(options)).json);
   },
@@ -870,6 +899,9 @@ export const OpenDivesCore = {
   },
   async importDives(options) {
     return JSON.parse((await native.importDives(options)).json);
+  },
+  async importDivesFiles(options) {
+    return JSON.parse((await native.importDivesFiles(options)).json);
   },
   async filterPresets(options) {
     return JSON.parse((await native.filterPresets(options)).json);

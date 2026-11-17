@@ -190,3 +190,263 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 | iOS build | Impossible from Windows | Spare Mac or macOS continuous integration |
 
 **Proposed next step.** With A, B and C settled, interface design could start in parallel with a first **technical proof of concept**: build the core without Qt for Android, open a real cloud logbook, show it in a list, and achieve the Git round trip without differences. Both have since been done (see [the proof of concept](../poc/README.md)).
+
+## 11. OpenDives server (release edition)
+
+Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and the app keeps working without any server (Subsurface cloud, own git repository, local mode). The Subsurface cloud mode of section 6 is unchanged: there the log stays in Subsurface's format and desktop Subsurface reads and writes it (see AGENTS.md, "Coexistence"). This section is only the OpenDives-server edition. The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on.
+
+### 11.1 Components and what lives where
+
+```
+                      app (phone, tablet, desktop)
+            ┌──────────────┬──────────────────┬─────────────────┐
+            │ HTTPS JSON   │ git over HTTPS   │ HTTPS (signed   │
+            │ /v1/...      │ (scoped token)   │ object URLs)    │
+            ▼              ▼                  ▼                 │
+     ┌─────────────┐  ┌───────────┐    ┌────────────────┐      │
+     │ OpenDives   │  │ Git       │    │ Object storage │      │
+     │ API         │─▶│ hosting   │    │ (S3-compatible)│◀─────┘
+     │ (sign-in,   │  │ 1 repo /  │    │ photos, videos,│
+     │  sharing)   │  │ user      │    │ encrypted docs │
+     └──────┬──────┘  └───────────┘    └────────────────┘
+            │ SQL
+            ▼
+     ┌─────────────┐
+     │ PostgreSQL  │  accounts, sessions, opt-in shared data
+     │ + PostGIS   │  (friends, public site base)
+     └─────────────┘
+```
+
+| What | Where | Notes |
+| --- | --- | --- |
+| Logbook and everything personal (dives, sites, gear, settings, inventory, maintenance, certifications, diver profile) | Git repository, branch `main`, **OpenDives' own format** (section 11.3) | Not read by Subsurface as is: Subsurface's format is only for import and export (section 11.4). |
+| Accounts, sessions, friends, public site base | PostgreSQL + PostGIS | Sharing is **opt-in** (section 11.7). |
+| Photos, videos, encrypted documents | S3-compatible object storage | Referenced by content hash (section 11.6). |
+| Sign-in | OpenDives API | E-mail code, no password (section 11.2). |
+
+The API never holds the logbook itself: the app talks to the git hosting directly with a scoped token that the API hands out at sign-in. Git gives what the format needs: history, offline work on the device and a merge when two devices changed the same logbook.
+
+### 11.2 Sign-in contract (API v1)
+
+All bodies are JSON (`Content-Type: application/json`), UTF-8. Addresses are lower-cased by the server. The account is created at the first successful verification: the app has no separate "create account" call.
+
+**`POST /v1/auth/code`** sends a 6-digit code to the address.
+
+Request: `{ "email": "diver@example.org" }`
+
+Response `200`: `{ "ok": true, "expiresInSeconds": 600, "resendAfterSeconds": 30 }`. The response is the same whether the account exists or not.
+
+**`POST /v1/auth/verify`** checks the code and signs in (and creates the account if it is new).
+
+Request: `{ "email": "diver@example.org", "code": "123456" }`
+
+Response `200`:
+
+```json
+{
+  "sessionToken": "opaque, 64 hex characters",
+  "sessionExpiresInSeconds": 7776000,
+  "user": { "id": "17", "email": "diver@example.org", "isNew": true },
+  "repository": {
+    "url": "https://git.example.org/<user>/logbook.git",
+    "branch": "main"
+  },
+  "git": {
+    "username": "<user>",
+    "token": "scoped git token",
+    "scopes": ["read:repository", "write:repository"]
+  }
+}
+```
+
+The git token only reaches the repositories of that user. The app keeps `sessionToken` and `git.token` in the platform's secure storage (Keychain, Keystore), never in the device store or in logs. Each successful verification issues a new git token.
+
+**`GET /v1/health`** returns `{ "status": "ok" | "degraded", "db": true, "forgejo": true }`, without authentication. The app can use it for the "server unreachable" state.
+
+**Errors.** Every error is `{ "error": { "code": "...", "message": "...", "retryAfterSeconds": 600 } }` (`retryAfterSeconds` only when relevant; also sent as the `Retry-After` header). The `message` is for logs only: the app shows its own translated text for each `code`.
+
+| HTTP | `code` | When | App behaviour |
+| --- | --- | --- | --- |
+| 400 | `INVALID_ADDRESS` | The address is not a valid e-mail address | Error under the address field |
+| 400 / 401 | `WRONG_CODE` | The code is malformed (400) or does not match (401) | Error under the code field; the person can retry |
+| 410 | `CODE_EXPIRED` | The code is older than 10 minutes, or already used | "Get a new code" |
+| 429 | `TOO_MANY_ATTEMPTS` | 5 wrong codes, or 5 codes requested in 10 minutes: the address is locked for 10 minutes | Message with the wait (`retryAfterSeconds`); both buttons disabled until then |
+| 429 | `RESEND_TOO_SOON` | A second code was asked within 30 seconds | None: a guard only. "Send the code again" stays disabled during the countdown (from `resendAfterSeconds`), so the app never calls early and shows no separate message |
+| 502 | `UNREACHABLE` | The server could not send the e-mail or finish provisioning | Same screen as a network failure |
+| 404 / 500 | `NOT_FOUND`, `SERVER_ERROR` | Unknown route, unexpected error | Same screen as a network failure |
+| (no response) | `UNREACHABLE` | Client side: no network, timeout, TLS failure, a 5xx without a JSON body | "Server unreachable": **Try again** and **Choose another place** |
+
+The 6-digit code, the 10-minute expiry, the 5-attempt limit and the 10-minute wait are the values of the design tasks 259 and 260. They are server constants: the app reads the actual delays from `expiresInSeconds`, `resendAfterSeconds` and `retryAfterSeconds`, never from its own copy.
+
+### 11.3 The OpenDives logbook format (proposed)
+
+**Status: proposed.** The principles (git, one branch `main`, JSON, a UUID per dive, per-file merge) are decided on 16 November 2026. The paths, field names and merge rules below are the proposal to build on; where a point is not decided it is marked **Open**. The format is versioned so that it can still change before the first release.
+
+#### Layout
+
+```
+opendives.json                     { "format": 1, "kind": "opendives-logbook", "minReader": 1, "createdAt": "..." }
+dives/<id[0:2]>/<id>/dive.json     one dive: everything the diver can edit
+dives/<id[0:2]>/<id>/profile.json  the dive computers' samples, written once at import
+dives/<id[0:2]>/<id>/media.json    photos and videos of the dive, by hash (section 11.6)
+sites/<id>.json                    dive site (name, position, taxonomy, water type, notes)
+trips/<id>.json                    trip
+gear/<id>.json                     inventory item: cylinder, regulator, suit, ... (#42)
+maintenance/<id>.json              reminder or service record (#47)
+gas-analyses/<id>.json             analysis of a cylinder's gas (#49)
+certifications/<id>.json           certification or document (#48), sensitive: encrypted
+profile/diver.json                 diver profile (#63): plain fields + one encrypted block
+settings/units.json                the units, each measure separately
+settings/planner.json              planner defaults
+settings/computers.json            dive computers list (nicknames, serials)
+keys/wrapped.json                  data key wrapped for the optional recovery phrase (section 11.5)
+```
+
+- **`<id>` is a random UUID (version 4), created once on the device that creates the item, never recomputed, never reused.** It is a field of the OpenDives data model (`"id"` in the file) and also the folder or file name, so a path never changes when the date, the site or the number of a dive changes. The first two characters shard the `dives/` folder.
+- A dive references its site and trip by id (`"siteId"`, `"tripId"`) and its inventory items by `gearId`; a maintenance item holds the `gearId` of its item.
+- `dive.json` and `profile.json` are separate because the samples are large and never edited after import: a note or a rating edit on one device touches a small file, and two devices never conflict on the profile.
+- JSON is written with sorted keys, two-space indent and a final newline, so that equal data gives equal files and text diffs stay readable.
+- Commits are made by the app, signed "OpenDives", one per validated action, like the logbook commits of section 6.
+
+#### A dive
+
+`dive.json` uses the units the app already handles (the core's: millimetres, millibars, milli-kelvins, millilitres, permille, seconds), whatever the display units. Its fields follow the `DiveDetail` that the core returns (`plugins/opendives-core/core-api.js`), without the values the core computes (`cns`, `otu`, `sacMlMin`, `gasUsedMl`, `switchDepthMm`, `waterType`): those are recomputed on load and never stored.
+
+```json
+{
+  "format": 1, "id": "5b0f3c0e-3a9d-4f6a-9d3e-2f6f3f0d7a11",
+  "createdAt": "2026-11-16T14:02:11Z", "updatedAt": "2026-11-16T14:02:11Z",
+  "number": 42,
+  "start": "2026-11-01T09:30:00", "utcOffsetSeconds": 3600,
+  "durationSeconds": 3120, "maxDepthMm": 28400, "meanDepthMm": 14200,
+  "siteId": "<uuid>", "tripId": null,
+  "divemode": "OC", "manual": false, "invalid": false,
+  "waterTempMk": 288150, "airTempMk": 0,
+  "userSalinity": 0, "surfacePressureMbar": 1013,
+  "rating": 4, "visibility": 3,
+  "conditions": { "wavesize": 0, "current": 2, "surge": 0, "chill": 1 },
+  "buddies": ["..."], "guides": [], "suit": "7 mm", "tags": ["night"],
+  "weights": [ { "grams": 6000, "description": "belt" } ],
+  "notes": "",
+  "cylinders": [ { "gearId": "<uuid>|null", "description": "AL80", "sizeMl": 11100,
+                   "workingPressureMbar": 207000, "startMbar": 200000, "endMbar": 60000,
+                   "o2Permille": 320, "hePermille": 0, "use": "OC-gas", "depthMm": 0 } ],
+  "events": [ { "type": "gaschange", "timeSeconds": 1200, "cylinder": 1 } ],
+  "computers": [ { "model": "Shearwater Perdix", "serial": "...", "firmware": "...",
+                   "deviceId": "<hex>", "diveId": "<hex>", "nickname": "" } ],
+  "origin": { "source": "subsurface", "importedAt": "...", "extra": { } }
+}
+```
+
+`profile.json` is columnar, like the `DiveSamples` of the core: `{ "format": 1, "diveId": "<id>", "computers": [ { "index": 0, "timeSeconds": [...], "depthMm": [...], "ppo2Mbar": [...], "temperatureMk": [...], "ceilingMm": [...], "cylinder": [...] } ] }`.
+
+The rows of the app's list (`Dive`: number, date, site name, depth, duration, thumbnail profile) are derived on load from these files and the site files; nothing is stored twice.
+
+#### Other items
+
+Gear, maintenance, gas analyses, certifications and the diver profile keep the shapes of the earlier design with two changes: ids are UUIDs version 4, and a link to a dive is `"diveId": "<id>"` (no composite dive key any more). A site holds the water type (`"waterType"`).
+
+```json
+// gear/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "type": "regulator", "name": "...", "brand": "...", "model": "...", "serial": "...",
+  "purchasedOn": "2024-05-01", "tags": ["travel"], "retired": false }
+
+// maintenance/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "gearId": "<uuid>", "task": "service", "intervalMonths": 12, "intervalDives": 100,
+  "lastDoneOn": "2026-03-10", "lastDoneDiveId": "<uuid>", "notes": "" }
+
+// gas-analyses/<id>.json
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "diveId": "<uuid>", "gearId": "<cylinder uuid>",
+  "o2Percent": 32.0, "hePercent": 0.0, "pressureBar": 200, "analysedAt": "..." }
+
+// certifications/<id>.json   (sensitive: the whole payload is encrypted, section 11.5)
+{ "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
+  "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "<base64>", "ct": "<base64>" } }
+// plaintext: agency, level, number, issuedOn, expiresOn,
+// "documents": [ { "hash": "<sha256>", "mime": "application/pdf", "size": 123456 } ]
+
+// profile/diver.json   (plain fields + one encrypted block)
+{ "format": 1, "updatedAt": "...", "displayName": "...", "homeAirport": "...",
+  "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "...", "ct": "..." } }
+// plaintext of enc: bloodGroup, allergies, medicalNotes, emergencyContact { name, phone }
+```
+
+#### Versions and unknown fields
+
+- Every file carries `"format": <integer>`; `opendives.json` carries `minReader`, the lowest app format that may write the logbook.
+- An app that finds `minReader` above its own format opens the logbook **read only** and says why; it never rewrites anything.
+- A file with a `format` newer than the app knows, in a logbook the app may write, is kept byte for byte and shown read only for that item.
+- **Unknown fields are preserved.** The app reads a file as a JSON object, changes only the keys it owns and writes the object back; it never rebuilds a file from its own model. Keys under `origin.extra` hold Subsurface data the model has no field for (section 11.4). The merge below follows the same rule.
+- Adding an optional field is not a format change; changing the meaning of a field or removing one is, and raises `format`.
+
+#### Merge and conflicts
+
+Granularity is **the file** first, then **the field**. The device does the merge, never the server: the server only accepts fast-forward pushes. A device whose push is refused fetches, merges, then pushes again; offline work is a list of local commits that go through the same path when the network is back.
+
+1. Two devices that changed **different files** never conflict (git merges them).
+2. Two devices that changed **the same file**: the app does a three-way merge of the JSON objects (base = common ancestor, ours, theirs), key by key, instead of git's text merge. A key changed on one side only takes that change. Arrays (`buddies`, `tags`, `weights`, `cylinders`, ...) are one value: changed on one side only, taken; changed on both, a conflict on that key. A key changed on both sides to the same value is not a conflict.
+3. A conflict on a key goes to the choice screen already built for the cloud conflicts (the "sync conflict" state, version choice). Until the person chooses, the later `updatedAt` is kept in the working copy and the other version stays in the history, so nothing is lost and a silent sync never blocks.
+4. Deleting an item deletes its file (git keeps the history). Deleted on one side and changed on the other: the change wins and the file stays; the person can delete it again.
+5. Two devices that **create** items never collide: the ids are random UUIDs, so the paths differ.
+6. **Open:** the `number` of a dive. Renumbering rewrites many files and would conflict. Either store `number` only when the diver sets it or imports it and derive the displayed number from the order of `start`, or keep it stored and make a renumbering one dedicated commit. Until decided, a conflict on `number` alone takes the side that renumbered last.
+7. For an encrypted file the app decrypts base, ours and theirs, merges the plaintext objects, and encrypts the result with a fresh nonce.
+
+**Open:** how the logbook gets from the files into the C++ core (a façade call that loads dive objects as JSON, or a conversion to the core's structures). The format code itself (reading, writing, merging, import mapping) is JavaScript in `app/src/lib`, tested in `tests/app`, as AGENTS.md asks; only loading into and saving from the core's own structures needs the façade.
+
+### 11.4 Import from and export to Subsurface
+
+Subsurface's format is **not** the format of an OpenDives-server logbook; it is the exchange format.
+
+**Import** (Subsurface XML or `.ssrf`, or a Subsurface git logbook, read by the core as today):
+
+- Each imported dive gets a **new random UUID**, a `dive.json` built from what the core returns, and a `profile.json`.
+- Subsurface's site `uuid` is kept in the site as `"origin": { "subsurfaceUuid": "..." }`; sites, trips and cylinders map to `sites/`, `trips/` and the dive's `cylinders`.
+- Whatever has no field in the model (extra data, unknown attributes) goes to `origin.extra` of the item, so a later export can write it back.
+- **Re-import without duplicates:** a dive already in the logbook is skipped when one of its computers has the same `deviceId` and `diveId`, or, for a manual dive, the same `start` and `durationSeconds`. A file exported by OpenDives carries the dive id (below) and the match is exact.
+
+**Export** (Subsurface XML, written by the core as today): the ids are dropped, the units follow Subsurface's, and `origin.extra` is written back. The dive id is written as an extra-data entry `OpenDives id` on the first dive computer (the same mechanism as `OpenDives title` for saved plans), so that re-importing an export maps to the same dives. Opening an OpenDives logbook in Subsurface is supported **only through this export**; Subsurface never reads or writes the repository of the server.
+
+Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export. **Open:** a separate JSON export of those.
+
+### 11.5 Sensitive data: encrypted on the device
+
+The server and its operator must not be able to read the **sensitive items**: documents and certifications (#48), blood group, allergies, medical notes and emergency contact (#63). The rest of the logbook is readable by the server; the app and the privacy policy say this plainly. Because the sensitive items are encrypted on the device, the physical location of the object storage does not matter for them: they are unreadable wherever they are stored.
+
+1. **Data key.** At first use, the device creates a random 256-bit key. It lives in the platform's secure storage and never reaches the server in clear.
+2. **Encryption.** Sensitive payloads are encrypted on the device with AES-256-GCM (a fresh random nonce each time, the item id and `format` as authenticated data) before the commit or the upload. The file keeps `enc: { v, alg, kid, nonce, ct }`; `kid` names the key so that it can be rotated.
+3. **Documents** (scans, PDFs) are encrypted the same way and stored in object storage under the hash of the **ciphertext**; the certification item holds the hash list.
+4. **Getting the key on a new device**, in this order:
+   - **Platform keychain.** iOS: the key is a synchronisable Keychain item (iCloud Keychain), so a new iPhone or iPad of the same Apple account receives it. Android: Google Block Store, with the system backup as a second route, restores it on a new Android device of the same Google account.
+   - **Device-to-device QR transfer.** On a device that has the key, "Add a device" shows QR codes; the new device scans them and keeps the key in its own secure storage. The transfer is local (camera and screen), with the animated-code mechanism the app already has for dives and plans (`qr-send.js`, `qr-receive.svelte.js`); nothing passes through the server. The codes appear only after the person confirms on the old device.
+   - **Recovery phrase (optional).** The person can ask for a generated phrase; the data key is then also stored **wrapped** in `keys/wrapped.json` (encrypted with a key derived by Argon2id from the phrase, parameters stored in the file). Off by default.
+5. **Limits, said plainly in the app:**
+   - The keychains do not cross platforms: there is **no transfer from an iPhone to an Android phone (or the reverse) through the keychain**. Changing platform needs the QR transfer or the recovery phrase.
+   - **Desktop** (Windows, macOS, Linux) has no synchronised keychain: it relies on the QR transfer from a phone, or on the recovery phrase if the person made one.
+   - The keychain routes depend on the platform account (Apple, Google) and on iCloud Keychain, or the Android backup, being turned on.
+   - If every device and every platform backup is lost **and** there is no recovery phrase, the sensitive items cannot be read again, by anyone. The app says so, once, when the key is created.
+
+Until the key routes are built, the single-device case works with the device's own secure storage alone.
+
+### 11.6 Photos and videos: by hash
+
+- Photos stay on the device by default (unchanged). Uploading the photos or videos of a dive is **opt-in**, per dive or album.
+- An uploaded file is stored once, under the **SHA-256 of its content** (`media/<hash>`), so the same photo uploaded twice, or from two devices, is one object.
+- The reference lives in the dive's folder, in `dives/<id[0:2]>/<id>/media.json`: `{ "format": 1, "diveId": "<id>", "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Merge: `items` are merged by `hash` (union); the caption is a field of the item.
+- The app holds no storage credentials: it asks the API for short-lived signed URLs to upload or download an object. The API only signs for objects the person owns or that were shared with them (section 11.7).
+- Originals are never altered or recompressed on upload.
+
+### 11.7 Shared data: opt-in
+
+Everything social lives in PostgreSQL + PostGIS, never in the logbook.
+
+- **Off by default.** The account works fully with nothing shared. Each kind of sharing is a separate switch, each with a sentence that says exactly what leaves the device: for example "Follow friends" (name and the dives a friend chooses to show) and "Contribute my sites to the public site base" (site name, position, water type; no dive, no date, no name).
+- Sharing a site to the public base copies only the listed fields; the person's own logbook entry is not modified. Withdrawing deletes the copy.
+- A follow needs the other person's acceptance.
+- Nothing from the sensitive items (section 11.5) is ever shared.
+
+### 11.8 Where the rest lives
+
+The server code, the local development stack (containers, seed data, smoke test) and the hosting plan (hosting, backups, restore, monitoring, privacy-law notes, go-live checklist) are in the **private repository `opendives-server`**. They are deliberately not described here: this repository only holds what the app depends on.

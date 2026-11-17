@@ -119,6 +119,7 @@
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
+      white-space: pre-line;
       color: var(--od-on-band-2);
     }
   }

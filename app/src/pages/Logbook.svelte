@@ -19,16 +19,23 @@
   import { scanQr } from '../lib/qr-receive.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
+  import { enterFromMenu } from '../lib/first-launch.svelte.js';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
+  import ReleaseEmptyLogbook from '../components/ReleaseEmptyLogbook.svelte';
+  import { isRelease } from '../lib/edition.js';
+  import { deviceStore } from '../lib/device-store.js';
   import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { importErrorKey } from '../lib/deep-link.js';
-  import { logbook, loadLogbook, importFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
+  import CsvImportDialog from '../components/CsvImportDialog.svelte';
+  import { pickCsvFiles } from '../lib/csv-import.js';
+  import { guardedAdd } from '../lib/demo.svelte.js';
+  import { logbook, loadLogbook, importFiles, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
   import { canMerge } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -872,8 +879,42 @@
     return list;
   });
 
+  /**
+   * The release edition's empty logbook on a tablet (task 2026-11-15-220): the list pane only shows the band, the
+   * detail pane holds the empty column (components/ReleaseEmptyLogbook.svelte).
+   */
+  const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
+
+  /** « Renommer le carnet » and « Changer d'endroit »: no flow yet, the message says so. */
+  function emptyMenuSoon() {
+    showSnackbar(t('welcomeSteps.menuSoon'));
+  }
+
+  /**
+   * « Ouvrir un autre carnet » and « Nouveau carnet »: the first launch opens at its step; « Retour » on its first
+   * screen leaves it.
+   * @param {'open'|'new'} first
+   */
+  function openFirstLaunch(first) {
+    enterFromMenu(first);
+    logbook.welcome = true;
+  }
+
+  /** « Mon carnet · Dépôt git » then « Aucune plongée »: the logbook's name and where it is kept. */
+  const emptyBand = $derived.by(() => {
+    let name = t('welcomeSteps.defaultName');
+    try {
+      name = deviceStore.getItem('od.logbookName') || name;
+    } catch {
+      // Not fatal: the default name.
+    }
+    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t('welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
+    return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
+  });
+
   /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
   const bandSummary = $derived.by(() => {
+    if (releaseEmpty) return emptyBand;
     if (!logbook.dives.length) return '';
     const sites = new Set(logbook.dives.map((d) => d.site).filter(Boolean)).size;
     // A dive dated in the future (a dive computer's clock) is not the last one done.
@@ -1056,11 +1097,16 @@
     health: '/health',
   });
 
-  /** @param {string} key download, import, manual, divelogs */
+  /**
+   * @param {string} key download, import, manual, divelogs
+   * In the demo logbook every one of them opens « Vous êtes dans le carnet d’exemple » instead (task 2026-11-16-224).
+   */
   function choose(key) {
-    if (key === 'import') fileInput?.click();
-    else if (key === 'scan') scanQr();
-    else f7router.navigate(routes[key]);
+    guardedAdd(() => {
+      if (key === 'import') fileInput?.click();
+      else if (key === 'scan') scanQr();
+      else f7router.navigate(routes[key]);
+    });
   }
 
   // Import a file: the WebView's own file picker, no native code; the core
@@ -1074,13 +1120,39 @@
     showSnackbar(text);
   }
 
+  /** The CSV file being mapped (the dialog of task 2026-11-16-224), with its companion .txt (Poseidon MkVI). */
+  let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
+
+  /** « Importer un fichier » is a .csv: its column mapping first, then the core's CSV import. */
+  async function csvConfirmed(/** @type {{ params: import('opendives-core').CsvParams, companion: File|null }} */ result) {
+    const chosen = csv;
+    if (!chosen) return;
+    const n = await importCsvFile(chosen.file, result.params, result.companion);
+    csv = null;
+    offerUndo(t('logbook.imported', { n }));
+  }
+
+  /** @param {unknown} e */
+  function csvFailed(e) {
+    const code = String(/** @type {any} */ (e)?.message ?? '');
+    console.error('Import a CSV file', code);
+    csv = null;
+    f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
+  }
+
   async function fileChosen() {
-    const file = fileInput?.files?.[0];
-    if (!file || !fileInput) return;
+    // Several files at once (a Suunto .json and its .fit are read as one dive); a .csv opens the CSV dialog.
+    const files = Array.from(fileInput?.files ?? []);
+    if (!files.length || !fileInput) return;
+    const picked = pickCsvFiles(files);
     fileInput.value = '';
+    if (picked) {
+      csv = { file: picked.csv, companion: picked.companion };
+      return;
+    }
     importing = true;
     try {
-      const n = await importFile(file);
+      const n = await importFiles(files);
       offerUndo(t('logbook.imported', { n }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
@@ -1137,7 +1209,13 @@
       {/if}
       <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120); iPhone: last. -->
       {#if !theme.ios}<AccountAvatar />{/if}
-      {#if logbook.dives.length || logbook.preview}
+      {#if releaseEmpty}
+        <!-- The empty logbook of the release edition on a tablet: the logbook's own menu (task 224). -->
+        <Link iconOnly popoverOpen=".od-logbook-empty-menu">
+          <Icon name="more" weight={4} />
+          <span class="od-sr-only">{t('detail.moreOptions')}</span>
+        </Link>
+      {:else if logbook.dives.length || logbook.preview}
         <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
           <span class="od-sr-only">{t('detail.moreOptions')}</span>
@@ -1266,7 +1344,12 @@
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
-    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>{/if}
+    {#if releaseEmpty}
+      <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
+    {:else}
+    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>
+    {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
+      <p class="od-logbook--count">{t(layout.phone ? 'logbook.emptyLocal' : 'logbook.emptyLocalTablet')}</p>{/if}
     <div class="od-logbook--empty">
       <div class="od-logbook--empty-illustration" aria-hidden="true">
         <DecorativeProfile trace class="od-logbook--empty-profile" />
@@ -1275,9 +1358,9 @@
         <span class="od-logbook--empty-bubble od-logbook--empty-bubble-3"></span>
       </div>
       <h2 class="od-state-title od-logbook--empty-title">{t('logbook.emptyTitle')}</h2>
-      <p class="od-logbook--empty-text">{t('logbook.emptyText')}</p>
+      <p class="od-logbook--empty-text">{t(theme.ios ? 'logbook.emptyTextIos' : 'logbook.emptyText')}</p>
       <a href={downloadRoute} class="od-logbook--empty-pair">
-        <Icon name="bluetooth" size={20} weight={2} />{t('logbook.emptyPair')}
+        <Icon name="diveComputer" size={20} weight={2} />{t('logbook.emptyDownload')}
       </a>
       <nav class="od-logbook--empty-options" aria-label={t('logbook.emptyOthers')}>
         {#each emptyChoices as c (c.key)}
@@ -1292,10 +1375,31 @@
         {/each}
       </nav>
     </div>
+    {/if}
   {:else if results && results.length === 0}
     <Block><p>{t('logbook.noResults', { query })}</p></Block>
   {:else if filtered && sorted.length === 0}
     <Block><p>{t('logbook.noFilterResults')}</p></Block>
+  {/if}
+
+  <!--
+    The menu of the empty logbook on a release tablet (mock-up android-tablette-carnet-vide-menu-paysage): the
+    logbook's name and where it is kept, then what can be done with the logbook itself. Rename and « Changer
+    d'endroit » have no flow yet (they say so); the two others open the first launch at its step.
+  -->
+  {#if releaseEmpty}
+    <Popover class="od-menu od-logbook-empty-menu" backdrop={false}>
+      <List noChevron mediaList>
+        <li class="od-menu-label">{emptyBand.split('\n')[0]}</li>
+        <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={emptyMenuSoon} />
+        <MenuItem icon="cloudUpload" text={t('welcomeSteps.menuMove')} supporting={t('welcomeSteps.menuMoveHint')} onclick={emptyMenuSoon} />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
+        <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
+        <li class="od-menu-divider" role="separator"></li>
+        <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={t('welcomeSteps.menuExportNone')} disabled />
+      </List>
+    </Popover>
   {/if}
 
   <!--
@@ -1412,7 +1516,10 @@
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
-  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" multiple class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  {#if csv}
+    <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={csvFailed} />
+  {/if}
   {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
@@ -1494,6 +1601,16 @@
     /* The snapshot of the start: a tap is held until the real list is there. */
     .od-logbook--preview {
       user-select: none;
+    }
+
+    /* The menu of the empty logbook: 296 dp, each line on one line (mock-up …-carnet-vide-menu-paysage). */
+    :global(.od-logbook-empty-menu) {
+      width: 296px;
+    }
+
+    :global(.od-logbook-empty-menu .item-title),
+    :global(.od-logbook-empty-menu .item-text) {
+      white-space: nowrap;
     }
 
     /* Selection mode: over the top bar, the same height. */

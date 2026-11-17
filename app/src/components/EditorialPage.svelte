@@ -25,6 +25,9 @@
   import LoadingIndicator from './LoadingIndicator.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
   import DecorativeProfile from './DecorativeProfile.svelte';
+  import WelcomeHelpLink from './WelcomeHelpLink.svelte';
+  import FirstLaunchBand from './FirstLaunchBand.svelte';
+  import FirstLaunchPanel from './FirstLaunchPanel.svelte';
   import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -44,15 +47,22 @@
    *   previous?: boolean,
    *   closable?: boolean,
    *   back?: boolean,
+   *   helpLink?: boolean,
+   *   firstLaunch?: boolean,
+   *   noRetour?: boolean,
+   *   onback?: () => void,
    *   children: import('svelte').Snippet,
    *   class?: string,
    * }}
    * title: the flow, shown in the eyebrow with the step. No
    * action: no main button. secondaryEnd: the text button sits after the
-   * main button (iOS: under it). closable false: no close button (an import
+   * main button (iOS: under it). firstLaunch: on an Android phone, the layout of the alpha first launch (tasks
+   * 2026-11-16-233 and 236): the blue band, « Retour », the title and the fields on the page, full-width buttons;
+   * noRetour: without the « Retour » link (the download). onback: « Retour » is a button that calls it instead of
+   * leaving the page (task 2026-11-16-257: the git help replaces the form in the same column). closable false: no close button (an import
    * that runs). back: ← (iOS: "‹ Retour") instead of ✕ (iOS: "Annuler").
    * previous: the text button is "Précédent" (iOS: a grey capsule beside the
-   * main one).
+   * main one). helpLink: « Une question ? À propos et contact » under the content (first launch).
    */
   let {
     title,
@@ -69,6 +79,10 @@
     previous = false,
     closable = true,
     back = false,
+    helpLink = false,
+    firstLaunch = false,
+    noRetour = false,
+    onback,
     children,
     class: extraClass = '',
   } = $props();
@@ -81,6 +95,19 @@
   const shownHeading = $derived(/[.?!…]$/.test(heading) ? heading : `${heading}.`);
   /** Tablet (Android): the actions are the last element of the card. */
   const actionsInCard = $derived(!ios && !layout.phone);
+  /** The alpha first launch on an Android phone (task 2026-11-16-233). */
+  const band = $derived(firstLaunch && !ios && layout.phone);
+  /** The alpha first launch on an Android tablet (task 2026-11-16-239): the blue panel of task 237, still, and the step beside it. */
+  const panel = $derived(firstLaunch && !ios && !layout.phone);
+  /** Both give the step the compact layout: « Retour », title, content on the page, no card. */
+  const compact = $derived(band || panel);
+
+  /** The step's column on a tablet: it scrolls, and starts at the top again when the heading changes. @type {HTMLFormElement|undefined} */
+  let panelBody = $state();
+  $effect(() => {
+    heading;
+    if (panelBody) panelBody.scrollTop = 0;
+  });
 </script>
 
 {#snippet actions()}
@@ -101,7 +128,12 @@
   </div>
 {/snippet}
 
-<Page class="od-editorial-page {extraClass}">
+<Page class="od-editorial-page {extraClass} {compact ? 'od-editorial-page--first-launch' : ''} {panel ? 'od-editorial-page--panelled od-first-panelled' : ''}">
+  {#if band}
+    <FirstLaunchBand />
+  {:else if panel}
+    <FirstLaunchPanel still />
+  {:else}
   <Navbar class="od-editorial-page--bar">
     {#snippet left()}
       {#if !closable}
@@ -121,19 +153,49 @@
       {/if}
     {/snippet}
   </Navbar>
+  {/if}
 
   {#if busy && !ios}
-    <div class="od-editorial-page--linear"><LinearWavyProgress indeterminate label={busyLabel || action} /></div>
+    <div class="od-editorial-page--linear" class:od-editorial-page--linear-band={band} class:od-editorial-page--linear-panel={panel}><LinearWavyProgress indeterminate label={busyLabel || action} /></div>
   {/if}
 
   <form
     class="od-editorial-page--body"
+    class:od-editorial-page--band-body={band}
+    class:od-editorial-page--panel-body={panel}
+    bind:this={panelBody}
     novalidate
     onsubmit={(e) => {
       e.preventDefault();
       if (!actionDisabled && !busy) onaction();
     }}
   >
+    {#if compact}
+      <!-- Alpha first launch on a phone (task 2026-11-16-233; on a tablet, task 2026-11-16-239, beside the panel): « Retour », the title, the content on the page, full-width buttons. -->
+      {#if !noRetour && onback}
+        <button type="button" class="od-editorial-page--retour" onclick={onback}>
+          <Icon name="arrowBack" size={20} weight={2} />
+          <span>{t('accountStep.back')}</span>
+        </button>
+      {:else if !noRetour}
+        <Link back class="od-editorial-page--retour">
+          <Icon name="arrowBack" size={20} weight={2} />
+          <span>{t('accountStep.back')}</span>
+        </Link>
+      {/if}
+      <div class="od-editorial-page--heading">
+        {#if step}<p class="od-editorial-page--eyebrow">{eyebrow}</p>{/if}
+        <h1 class="od-editorial-page--title">{heading}</h1>
+        {#if intro}<p class="od-editorial-page--intro">{intro}</p>{/if}
+      </div>
+      <div class="od-editorial-page--card">{@render children()}</div>
+      {#if action || secondary}{@render actions()}{/if}
+      {#if panel}
+        <!-- The About link ends the column: at its foot when the step is short, after the content when it scrolls (task 2026-11-16-257). -->
+        <div class="od-editorial-page--spacer"></div>
+        {#if helpLink}<WelcomeHelpLink inColumn />{/if}
+      {/if}
+    {:else}
     <div class="od-editorial-page--heading">
       <p class="od-editorial-page--eyebrow">{eyebrow}</p>
       <h1 class="od-editorial-page--title">{shownHeading}</h1>
@@ -148,7 +210,9 @@
     <DecorativeProfile class="od-editorial-page--profile" />
 
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
+    {/if}
   </form>
+  {#if helpLink && !panel}<WelcomeHelpLink />{/if}
 </Page>
 
 <style>
@@ -403,6 +467,223 @@
         max-width: none;
         margin: 0;
       }
+    }
+
+    /*
+     * Alpha first launch on an Android phone (tasks 2026-11-16-233 and 236;
+     * docs/mockups/android-premier-lancement-*.dc.html): under the 140 dp blue band, « Retour », the title,
+     * the content on the page (no card), the buttons across the width.
+     */
+    /* The page is a column: band, content, then the About link at the bottom of the screen. */
+    :global(.od-editorial-page--first-launch .page-content) {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .od-editorial-page--band-body,
+    .od-editorial-page--panel-body {
+      padding: 16px 16px 0;
+      min-height: 0;
+      flex: 1 0 auto;
+
+      .od-editorial-page--heading {
+        padding: 0;
+        gap: 0;
+      }
+
+      .od-editorial-page--eyebrow {
+        margin-bottom: 4px;
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--od-code-active);
+      }
+
+      .od-editorial-page--title {
+        margin-bottom: 6px;
+        /* 28 sp in the mock-ups, drawn at 24 sp on a 390 dp screen: two lines of title must fit. */
+        font-size: 24px;
+        line-height: 30px;
+        font-weight: 500;
+        letter-spacing: -0.2px;
+      }
+
+      .od-editorial-page--intro {
+        margin-bottom: 20px;
+        font-size: 15px;
+        line-height: 21px;
+      }
+
+      .od-editorial-page--card {
+        --od-field-margin: 0;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        background: none;
+      }
+
+      .od-editorial-page--actions {
+        padding: 22px 0 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+
+        .od-editorial-page--secondary {
+          margin: 0;
+          flex: none;
+          height: 48px;
+          padding: 0 22px;
+          border: var(--od-outline-width) solid var(--od-chip-outline);
+          border-radius: 24px;
+          justify-content: center;
+          font-size: 15px;
+          font-weight: 500;
+          color: var(--od-text);
+        }
+
+        .od-editorial-page--filled {
+          flex: none;
+          height: 48px;
+          border-radius: 24px;
+          font-size: 15px;
+        }
+      }
+    }
+
+    /*
+     * Alpha first launch on an Android tablet (task 2026-11-16-239; docs/mockups/
+     * android-tablette-premier-lancement-alpha-*.dc.html): the blue panel of task 237 (still) and the step in a
+     * 452 dp column beside it (landscape) or under it (portrait), vertically centred, the buttons on the right.
+     */
+    :global(.od-editorial-page--panelled .page-content) {
+      display: flex;
+      flex-direction: row;
+      padding: 0;
+      overflow: hidden;
+
+      @media (orientation: portrait) {
+        flex-direction: column;
+      }
+    }
+
+    :global(.md) .od-editorial-page--panel-body {
+      /* Against the tablet rules above (a grid of heading and card): a plain centred column. */
+      display: flex;
+      flex-direction: column;
+      grid-template-columns: none;
+      grid-template-rows: none;
+      column-gap: 0;
+      position: static;
+      box-sizing: border-box;
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      padding: 24px 64px 28px;
+      /* Centred while it fits; it scrolls (the panel stays) when it is taller (the git help). */
+      overflow-y: auto;
+
+      &::before,
+      .od-editorial-page--spacer {
+        content: '';
+        flex: 1 1 0;
+      }
+
+      /* A narrow window (the desktop's smallest): the column keeps a usable width. */
+      @media (max-width: 900px) and (orientation: landscape) {
+        padding-left: 32px;
+        padding-right: 32px;
+      }
+
+      .od-editorial-page--heading,
+      .od-editorial-page--card {
+        grid-column: auto;
+        grid-row: auto;
+        width: auto;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+        align-self: stretch;
+      }
+
+      @media (orientation: portrait) {
+        padding: 0 120px 64px;
+      }
+
+      .od-editorial-page--title {
+        margin-bottom: 8px;
+        font-size: 28px;
+        line-height: 36px;
+        letter-spacing: -0.2px;
+      }
+
+      .od-editorial-page--intro {
+        margin-bottom: 24px;
+        font-size: 16px;
+        line-height: 22px;
+      }
+
+      .od-editorial-page--actions {
+        padding: 24px 0 0;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+
+        .od-editorial-page--secondary,
+        .od-editorial-page--filled {
+          flex: none;
+          width: auto;
+          height: 48px;
+          padding: 0 28px;
+          font-size: 15px;
+        }
+      }
+    }
+
+    /* The busy indicator runs at the top of the step's column. */
+    .od-editorial-page--linear.od-editorial-page--linear-panel {
+      left: calc(min(700px, 55%) + 64px);
+      right: 64px;
+      top: 24px;
+
+      @media (orientation: portrait) {
+        left: 120px;
+        right: 120px;
+        top: 540px;
+      }
+    }
+
+    /* The « Retour » link: 20 dp chevron and 15 sp text, a 48 dp tall target, 8 dp out to the left. */
+    :global(.od-editorial-page--retour) {
+      border: none;
+      background: none;
+      font-family: inherit;
+      align-self: flex-start;
+      box-sizing: border-box;
+      min-height: 48px;
+      margin: 0 0 0 -8px;
+      padding: 0 12px 0 4px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--od-text);
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          background: color-mix(in srgb, var(--od-text) 8%, transparent);
+        }
+      }
+    }
+
+    /* The busy indicator runs under the band. */
+    .od-editorial-page--linear.od-editorial-page--linear-band {
+      top: calc(max(var(--f7-safe-area-top), 24px) + 140px);
     }
 
     /* iPhone: the same layout with iOS sizes (compte-*-ios.dc.html). */

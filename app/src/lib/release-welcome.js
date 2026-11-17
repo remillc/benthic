@@ -1,9 +1,8 @@
 // @ts-check
-// Logic of the release edition's first launch (task 2026-11-15-213; pages/WelcomeStartRelease.svelte,
-// components/OpenImportDialog.svelte): the decorative profile drawn to the size it is given, the
-// rows of the « Ouvrir ou importer un carnet » dialog, the « coming in a later version » message, and
-// the import of a picked file into a new logbook on the device. Kept apart from the screens so that
-// node:test can run it.
+// Logic of the release edition's first launch (tasks 2026-11-15-213 and 218; pages/WelcomeStartRelease.svelte,
+// components/FirstLaunch*.svelte): the decorative profile drawn to the size it is given, the cloud services,
+// the « coming in a later version » message, and the creation of the device logbook (empty, or from a file or
+// a divelogs.de download). Kept apart from the screens so that node:test can run it.
 
 /** The size the profile of the mock-up is drawn at (android-tablette-premier-lancement-production-paysage.dc.html). */
 const DRAWN = { width: 588, height: 300 };
@@ -35,48 +34,80 @@ export function scaledProfile(width, height) {
   };
 }
 
+
 /**
- * The rows of « Ouvrir depuis votre nuage »: generic icons, never a brand logo.
+ * The cloud services of « Choisissez votre service » and « Dans quel service ? »: generic icons, never a
+ * brand logo. `name` is what « Connexion à {service} » and « Se connecter à {service} » show.
  * @type {{ key: string, text: string, icon: 'cloud'|'server' }[]}
  */
-export const CLOUD_ROWS = [
-  { key: 'googleDrive', text: 'welcomeRelease.googleDrive', icon: 'cloud' },
-  { key: 'oneDrive', text: 'welcomeRelease.oneDrive', icon: 'cloud' },
-  { key: 'dropbox', text: 'welcomeRelease.dropbox', icon: 'cloud' },
-  { key: 'webdav', text: 'welcomeRelease.webdav', icon: 'server' },
+export const CLOUD_SERVICES = [
+  { key: 'googleDrive', text: 'welcomeSteps.googleDrive', icon: 'cloud' },
+  { key: 'oneDrive', text: 'welcomeSteps.oneDrive', icon: 'cloud' },
+  { key: 'dropbox', text: 'welcomeSteps.dropbox', icon: 'cloud' },
+  { key: 'webdav', text: 'welcomeSteps.webdav', icon: 'server' },
 ];
 
 /**
- * « Dans mon nuage » and the rows of the cloud: idea #74 is not built yet, they say so.
+ * iCloud Drive, first in the list on an iPhone only (task 2026-11-16-261): the Apple account of the device, so there
+ * is no sign-in; `help` is the line under its name.
+ * @type {{ key: string, text: string, help: string, icon: 'cloud'|'server' }}
+ */
+export const ICLOUD_SERVICE = { key: 'icloud', text: 'welcomeSteps.icloud', help: 'welcomeSteps.icloudHelp', icon: 'cloud' };
+
+/**
+ * The services to offer: iCloud Drive first on an iPhone, the others as on every device.
+ * @param {boolean} iphone
+ * @returns {{ key: string, text: string, help?: string, icon: 'cloud'|'server' }[]}
+ */
+export function cloudServices(iphone) {
+  return iphone ? [ICLOUD_SERVICE, ...CLOUD_SERVICES] : CLOUD_SERVICES;
+}
+
+/**
+ * « Se connecter à {service} » and the other cloud actions: idea #74 is not built yet, they say so.
  * @param {(text: string) => void} show the snackbar
  * @param {(key: string) => string} t
  */
 export function cloudComing(show, t) {
-  show(t('welcomeRelease.cloudSoon'));
+  show(t('welcomeSteps.cloudSoon'));
 }
 
 /**
- * A file picked on first launch becomes the device's logbook. The file is read first without
- * touching anything (staged, counted, discarded), so that a file that cannot be read leaves first
- * launch as it was; then the device's logbook is started and the file imported into it with the
- * app's own import. The sample dives that « Commencer sans compte » starts with are removed when
- * the device had no logbook yet: the logbook is made of the file.
+ * The device's logbook is started for a new logbook. When the device had none, the sample dives that
+ * starting adds are removed: the logbook is empty, or made of what the importer adds.
+ * @param {{
+ *   deviceLogExists: () => Promise<boolean>,
+ *   start: () => Promise<unknown>,
+ *   sampleIds: () => number[],
+ *   remove: (ids: number[]) => Promise<unknown>,
+ * }} deps
+ * @param {(() => Promise<number>)|null} [importer] adds the dives to the started logbook
+ * @returns {Promise<number>} the number of dives imported (0 without an importer)
+ */
+export async function createDeviceLogbook(deps, importer = null) {
+  const hadLogbook = await deps.deviceLogExists();
+  await deps.start();
+  if (!hadLogbook) {
+    const sample = deps.sampleIds();
+    if (sample.length) await deps.remove(sample);
+  }
+  return importer ? importer() : 0;
+}
+
+/**
+ * A file picked on first launch: read first without touching anything (staged, counted, discarded), so
+ * that a file that cannot be read leaves first launch as it was.
  * @param {File} file
  * @param {{
  *   readBase64: (file: File) => Promise<string>,
  *   stage: (options: { name: string, data: string }) => Promise<{ path: string }>,
  *   count: (options: { path: string }) => Promise<{ dives: number }>,
  *   discard: (options: { path: string }) => Promise<unknown>,
- *   deviceLogExists: () => Promise<boolean>,
- *   start: () => Promise<unknown>,
- *   sampleIds: () => number[],
- *   remove: (ids: number[]) => Promise<unknown>,
- *   importFile: (file: File) => Promise<number>,
  * }} deps
- * @returns {Promise<number>} the number of dives in the new logbook
- * @throws {Error} `NO_DIVES` or the core's code (IMPORT_FAILED…), as the import of the « + » menu
+ * @returns {Promise<number>} the dives the file holds
+ * @throws {Error} `NO_DIVES` or the core's code (IMPORT_FAILED…)
  */
-export async function createLogbookFromFile(file, deps) {
+export async function readImportFile(file, deps) {
   const staged = await deps.stage({ name: file.name, data: await deps.readBase64(file) });
   let dives = 0;
   try {
@@ -85,11 +116,19 @@ export async function createLogbookFromFile(file, deps) {
     await deps.discard({ path: staged.path }).catch(() => {});
   }
   if (!dives) throw new Error('NO_DIVES');
-  const hadLogbook = await deps.deviceLogExists();
-  await deps.start();
-  if (!hadLogbook) {
-    const sample = deps.sampleIds();
-    if (sample.length) await deps.remove(sample);
-  }
-  return deps.importFile(file);
+  return dives;
+}
+
+/**
+ * The divelogs.de archive downloaded into the app's cache, read back as a file the app's import takes
+ * (the WebView serves the cache through Capacitor's file URL). The core reads `.dld` archives.
+ * @param {string} path
+ * @param {(path: string) => string} toUrl Capacitor.convertFileSrc
+ * @param {(url: string) => Promise<{ blob: () => Promise<Blob>, ok: boolean }>} fetcher
+ * @returns {Promise<File>}
+ */
+export async function downloadedFile(path, toUrl, fetcher) {
+  const response = await fetcher(toUrl(path));
+  if (!response.ok) throw new Error('IMPORT_FAILED');
+  return new File([await response.blob()], 'divelogs.dld');
 }

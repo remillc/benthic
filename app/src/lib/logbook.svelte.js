@@ -2,13 +2,17 @@
 // Shared logbook state: dives, the log's units, sync status.
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
+import { runCsvImport } from './csv-import.js';
+import { storedDemo } from './demo.js';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
 import { nextProgress } from './sync-progress.js';
+import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
+import { importPayload } from './import-files.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -38,6 +42,12 @@ export const logbook = $state({
   sync: 'local',
   /** Where the running sync is (lib/sync-progress.js); shown while sync is "syncing". */
   syncProgress: /** @type {import('./sync-progress.js').SyncProgress|null} */ (null),
+  /**
+   * The download after signing in, on the alpha first launch (task 2026-11-16-233): where it is, and the count of
+   * what the core received; null when none runs.
+   * @type {{ progress: import('./sync-progress.js').SyncProgress|null, n: number, total: number }|null}
+   */
+  firstDownload: null,
   loading: true,
   /**
    * The top of the list as it was at the last load (lib/snapshot.js): drawn
@@ -360,6 +370,25 @@ export async function importFile(file) {
 }
 
 /**
+ * Several files chosen together, imported as one undoable step: a Suunto app .json and the .fit
+ * with the same base name give one dive, the other files are read on their own. One file goes
+ * through importFile, unchanged.
+ * @param {File[]} files
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importFiles(files) {
+  if (files.length === 1) return importFile(files[0]);
+  const before = logbook.dives.length;
+  const result = await OpenDivesCore.importDivesFiles({ files: await importPayload(files) });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
+/**
  * The .fit files taken out of a .zip, one import each. The dives added are counted together; an
  * error is reported only when none was added (« Annuler » then undoes the last file's dives).
  * @param {{ name: string, data: Uint8Array }[]} fits
@@ -398,6 +427,43 @@ export async function importData(name, data) {
 }
 
 /**
+ * A CSV file with the column mapping the diver chose (components/CsvImportDialog.svelte, task 2026-11-16-224):
+ * the core's CSV import, one undoable step, saved and synced like any import. The files are staged in the app's
+ * cache for the call and discarded after it.
+ * @param {File} file
+ * @param {import('opendives-core').CsvParams} params the mapping (lib/csv-import.js, buildParams)
+ * @param {File|null} [companion] Poseidon MkVI: the .txt of the same dive
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importCsvFile(file, params, companion = null) {
+  const before = logbook.dives.length;
+  const result = await runCsvImport(
+    {
+      stage: async (f) => (await OpenDivesCore.stageImport({ name: f.name, data: await fileBase64(f) })).path,
+      discard: (path) => OpenDivesCore.discardImport({ path }),
+      importCsv: (o) => OpenDivesCore.importCsv(o),
+    },
+    { file, companion, params, dryRun: false },
+  );
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
+/** @param {File} file @returns {Promise<string>} the contents, base64 */
+function fileBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
  * A dive or a plan received by QR code (lib/qr-receive.svelte.js): its .ssrf text goes through the
  * core's import, as a normal dive of the logbook (new number), one undoable step, saved and synced
  * like any import.
@@ -420,6 +486,8 @@ export async function importReceived(xml) {
 
 /** Dives logged on this device without an account (0 when none, or unreadable). */
 export async function deviceDiveCount() {
+  // The demo logbook is never offered to an account (task 2026-11-16-224).
+  if (storedDemo(deviceStore)) return 0;
   try {
     return (await OpenDivesCore.deviceLog({ action: 'count' })).count;
   } catch (e) {
@@ -434,6 +502,7 @@ export async function deviceDiveCount() {
  * @returns {Promise<number>} the number of dives added
  */
 export async function importDeviceDives() {
+  if (storedDemo(deviceStore)) throw new Error('NO_DIVES');
   const before = logbook.dives.length;
   const result = await OpenDivesCore.deviceLog({ action: 'import' });
   logbook.undoText = result.undo;
@@ -733,6 +802,27 @@ export async function accountDeleted({ keepDives }) {
   if (keepDives) await loadLogbook();
 }
 
+/**
+ * The demo logbook is erased from this device (« Commencer mon carnet »): its dives and the sites they leave unused,
+ * saved, then first launch is shown again as after signing out. The demo has no account, so nothing is sent anywhere.
+ * @returns {Promise<void>}
+ */
+export async function eraseDemoLogbook() {
+  // Only this device's own logbook: an account's logbook is never touched, whatever the stored flag says.
+  if (logbook.email) throw new Error('NOT_DEMO');
+  const ids = logbook.dives.map((d) => d.id);
+  if (ids.length) await OpenDivesCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+  await OpenDivesCore.saveLocal();
+  undoCleared();
+}
+
+/** First launch is shown again: the logbook on screen is gone (the demo was erased). */
+export function showFirstLaunchAgain() {
+  forgetAccount(true);
+}
+
 /** @param {boolean} showWelcome */
 function forgetAccount(showWelcome) {
   logbook.preview = null;
@@ -760,6 +850,31 @@ export function startWithoutAccount() {
   logbook.welcome = false;
   writeWelcomeState('done');
   return loadLogbook();
+}
+
+/**
+ * Alpha first launch on a phone, after signing in: the account's logbook is downloaded while first launch
+ * stays open on its download screen (`logbook.firstDownload` says where it is); it closes when the logbook is
+ * there. The result is false when the download failed or was cancelled: first launch stays open.
+ * @param {() => boolean} [cancelled] true once the diver cancelled (the account was signed out)
+ * @returns {Promise<boolean>}
+ */
+export async function downloadAccountLogbook(cancelled = () => false) {
+  logbook.firstDownload = { progress: null, n: 0, total: 0 };
+  logbook.lastSync = null;
+  try {
+    await loadLogbook({ force: true });
+    if (cancelled()) {
+      logbook.error = null;
+      return false;
+    }
+    if (logbook.error) return false;
+    logbook.welcome = false;
+    writeWelcomeState('done');
+    return true;
+  } finally {
+    logbook.firstDownload = null;
+  }
 }
 
 /**
@@ -879,6 +994,15 @@ if (typeof window !== 'undefined') {
   // Where the sync is: only while one is shown as running.
   OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
     if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);
+    const first = logbook.firstDownload;
+    if (first) {
+      first.progress = nextProgress(message, first.progress);
+      const count = transferCount(message);
+      if (count) {
+        first.n = count.n;
+        first.total = count.total;
+      }
+    }
   }).catch((/** @type {unknown} */ e) => console.error('Sync progress', e));
 }
 

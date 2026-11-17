@@ -155,6 +155,14 @@
       }
     }
 
+    /* Phone (task 2026-11-16-227): the band's profile is the line alone, without the dot and the chips. */
+    @media (max-width: 767.98px) {
+      .od-release-profile--dot,
+      .od-release-profile--chip {
+        display: none;
+      }
+    }
+
     @keyframes od-release-draw {
       from {
         stroke-dashoffset: 1;

@@ -50,6 +50,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stageImport", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "discardImport", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "createIcloudLogbook", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getTrip", returnType: CAPPluginReturnPromise),
@@ -75,6 +76,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "syncConflicts", returnType: CAPPluginReturnPromise),
@@ -573,6 +576,57 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+    /// `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is the
+    /// mapping as JSON text. With `dryRun` nothing is added and the answer is the preview; otherwise the dives
+    /// are imported, one undoable step.
+    @objc func importCsv(_ call: CAPPluginCall) {
+        let path = call.getString("path") ?? ""
+        let companionPath = call.getString("companionPath") ?? ""
+        let params = call.getString("params") ?? ""
+        let dryRun = call.getBool("dryRun") ?? true
+        var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
+        if name.isEmpty { name = "import.csv" }
+        let importName = name
+        onCoreThread(call) { [self] in
+            guard let file = stagedImport(path), companionPath.isEmpty || stagedImport(companionPath) != nil else {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return
+            }
+            let companion = companionPath.isEmpty ? "" : (stagedImport(companionPath)?.path ?? "")
+            call.resolve(["json": try OpenDivesNative.importCsv(file: file.path, companion: companion, params: params, source: importName, dryRun: dryRun)])
+        }
+    }
+
+    /// Several files chosen together: "files" is a list of {name, data} (base64, original name).
+    /// They go to one temporary folder, so that a Suunto app .json and the .fit with the same
+    /// base name are read as one dive; the other files are read on their own.
+    @objc func importDivesFiles(_ call: CAPPluginCall) {
+        guard let items = call.getArray("files") as? [[String: Any]], !items.isEmpty else {
+            call.reject("Missing files", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            let dir = cacheDir.appendingPathComponent("import").appendingPathComponent(UUID().uuidString)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: dir) }
+            var paths: [String] = []
+            for (i, item) in items.enumerated() {
+                var name = ((item["name"] as? String ?? "") as NSString).lastPathComponent
+                if name.isEmpty { name = "import-\(i).xml" }
+                guard let data = item["data"] as? String,
+                      let bytes = Data(base64Encoded: data, options: .ignoreUnknownCharacters) else {
+                    throw Failure("CORE_ERROR", "Invalid base64 data")
+                }
+                let file = dir.appendingPathComponent(name)
+                try bytes.write(to: file)
+                paths.append(file.path)
+            }
+            let source = paths.count == 1 ? (paths[0] as NSString).lastPathComponent : "multiple files"
+            call.resolve(["json": try OpenDivesNative.importDivesFiles(files: paths, source: source)])
+        }
+    }
+
     /// The dives logged on this device without an account, once an account is used:
     /// "count" reads them apart; "import" adds them to the account's log in memory.
     @objc func deviceLog(_ call: CAPPluginCall) {
@@ -1028,6 +1082,37 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             if let file = stagedImport(path) { try? FileManager.default.removeItem(at: file) }
             call.resolve()
+        }
+    }
+
+    /// iCloud Drive (task 2026-11-16-261; UNTESTED: written without a Mac, to be run on a device signed in to
+    /// iCloud). Creates `<name>` in the OpenDives folder of the app's ubiquity container, so that it shows in the
+    /// Files app under iCloud Drive › OpenDives. No sign-in: the container belongs to the device's Apple account.
+    /// `url(forUbiquityContainerIdentifier:)` may block, so it runs off the main thread; it returns nil when iCloud
+    /// Drive is off, the account is signed out, or the iCloud entitlement is missing (NOT_AVAILABLE).
+    @objc func createIcloudLogbook(_ call: CAPPluginCall) {
+        let name = (call.getString("name") ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        networkQueue.async { [self] in
+            do {
+                // A file name only: no path separator, no hidden file.
+                guard !name.isEmpty, !name.contains("/"), !name.contains(":"), !name.hasPrefix(".") else {
+                    throw Failure("BAD_REQUEST")
+                }
+                guard let container = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+                    throw Failure("NOT_AVAILABLE")
+                }
+                // `Documents` is the part of the container the Files app shows.
+                let folder = container.appendingPathComponent("Documents", isDirectory: true)
+                    .appendingPathComponent("OpenDives", isDirectory: true)
+                    .appendingPathComponent(name, isDirectory: true)
+                let existed = FileManager.default.fileExists(atPath: folder.path)
+                if !existed {
+                    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                }
+                call.resolve(["path": folder.path, "created": !existed])
+            } catch {
+                reject(call, error)
+            }
         }
     }
 

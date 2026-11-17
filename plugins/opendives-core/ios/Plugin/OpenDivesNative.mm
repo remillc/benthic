@@ -567,6 +567,29 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
+// A CSV file with its column mapping: a dry run answers with the preview, a real import is an undoable step.
++ (NSString *)importCsv:(NSString *)file
+	      companion:(NSString *)companion
+		 params:(NSString *)params
+		 source:(NSString *)source
+		 dryRun:(BOOL)dryRun
+		  error:(NSError **)error
+{
+	std::string json, message;
+	int ret = opendives::import_csv(str(file), str(companion), str(params), str(source), dryRun, json, message);
+	return dryRun ? json_or_fail(ret, json, message, error) : edit_or_fail(ret, json, message, error);
+}
+
++ (NSString *)importDivesFiles:(NSArray<NSString *> *)files source:(NSString *)source error:(NSError **)error
+{
+	std::vector<std::string> paths;
+	for (NSString *f in files)
+		paths.push_back(str(f));
+	std::string json, message;
+	int ret = opendives::import_dives_files(paths, str(source), json, message);
+	return edit_or_fail(ret, json, message, error);
+}
+
 // action: list (read-only, the plain object), save or delete (undoable steps).
 + (NSString *)filterPresets:(NSString *)actionIn
 		       name:(NSString *)name

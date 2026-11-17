@@ -610,6 +610,43 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject(NativeCore.importCount(file.absolutePath)))
     }
 
+    /**
+     * A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+     * `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is
+     * the mapping as JSON text. With `dryRun` nothing is added and the answer is the preview
+     * ({dives:[{when, durationSeconds, maxDepthMm, profile}]}); otherwise the dives are imported, one
+     * undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
+     */
+    @PluginMethod
+    fun importCsv(call: PluginCall) = onCoreThread(call) {
+        val file = importFile(call.getString("path").orEmpty())
+        val companionPath = call.getString("companionPath").orEmpty()
+        val companion = if (companionPath.isEmpty()) null else importFile(companionPath)
+        if (file == null || (companionPath.isNotEmpty() && companion == null)) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val name = File(call.getString("name").orEmpty()).name.ifEmpty { "import.csv" }
+        call.resolve(
+            JSObject().put(
+                "json",
+                NativeCore.importCsv(
+                    file.absolutePath,
+                    companion?.absolutePath.orEmpty(),
+                    call.getString("params").orEmpty(),
+                    name,
+                    call.getBoolean("dryRun", true) == true,
+                ),
+            ),
+        )
+    }
+
+    /** iCloud Drive exists on iOS only (task 2026-11-16-261): Android never offers it and rejects if it is asked. */
+    @PluginMethod
+    fun createIcloudLogbook(call: PluginCall) {
+        call.reject("NOT_AVAILABLE", "NOT_AVAILABLE")
+    }
+
     /** Cancelled or failed import: the downloaded file is deleted. */
     @PluginMethod
     fun discardImport(call: PluginCall) = onCoreThread(call) {
@@ -1097,6 +1134,36 @@ class OpenDivesCorePlugin : Plugin() {
             call.resolve(JSObject().put("json", NativeCore.importDives(file.absolutePath, name)))
         } finally {
             file.delete()
+        }
+    }
+
+    /**
+     * Several files chosen together (import_dives_files): "files" is a list of
+     * {name, data} (base64 contents, original name). They are written to one
+     * temporary folder, so that a Suunto app .json and the .fit with the same
+     * base name are read as one dive; the other files are read on their own.
+     */
+    @PluginMethod
+    fun importDivesFiles(call: PluginCall) = onCoreThread(call) {
+        val list = call.getArray("files")
+        if (list == null || list.length() == 0) {
+            call.reject("Missing files", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        val dir = File(context.cacheDir, "import/" + System.nanoTime()).apply { mkdirs() }
+        try {
+            val paths = mutableListOf<String>()
+            for (i in 0 until list.length()) {
+                val item = list.getJSONObject(i)
+                val name = File(item.optString("name")).name.ifEmpty { "import-$i.xml" }
+                val file = File(dir, name)
+                file.writeBytes(Base64.decode(item.optString("data"), Base64.DEFAULT))
+                paths.add(file.absolutePath)
+            }
+            val source = if (paths.size == 1) File(paths[0]).name else "multiple files"
+            call.resolve(JSObject().put("json", NativeCore.importDivesFiles(paths.toTypedArray(), source)))
+        } finally {
+            dir.deleteRecursively()
         }
     }
 
