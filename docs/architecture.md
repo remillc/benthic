@@ -409,7 +409,7 @@ Subsurface's format is **not** the format of an OpenDives-server logbook; it is 
 
 **Export** (Subsurface XML, written by the core as today): the ids are dropped, the units follow Subsurface's, and `origin.extra` is written back. The dive id is written as an extra-data entry `OpenDives id` on the first dive computer (the same mechanism as `OpenDives title` for saved plans), so that re-importing an export maps to the same dives. Opening an OpenDives logbook in Subsurface is supported **only through this export**; Subsurface never reads or writes the repository of the server.
 
-Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export. **Open:** a separate JSON export of those.
+Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export, and it does not need to be: that export is for opening the dives in Subsurface. **Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the OpenDives files of the logbook (dives, sites, gear, maintenance, certifications, gas analyses, diver profile, settings), the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, not a Subsurface file; its exact packaging is decided when its screen is designed.
 
 ### 11.5 Sensitive data: encrypted on the device
 
