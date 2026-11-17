@@ -5340,3 +5340,63 @@ Also on the tablet and the desktop: the server sign-in screens of task 260 (`and
 **Test:**
 - An empty account shows the three choices. The third one appears only when a logbook exists on the device.
 - A cut connection during the upload shows « Envoi interrompu », and « Reprendre l’envoi » continues from where it stopped.
+
+## [ ] 2026-11-17-267 Phone (release): « Mon profil de plongeur » and the equipment inventory (to-do #42) — ASK CHRISTIAN BEFORE THE SERVER PART
+
+Christian approved this on 17 November 2026. **Release edition:** work on a new branch `feature/release-equipment-inventory`, started from `feature/release-server-screens`, and never merge it into `main`.
+
+**What this is.** The equipment inventory of to-do #42, an OpenDives+ feature. Subsurface does not store it. The data lives on the OpenDives server, with a working copy on the device so that everything works offline. Build the screens and the local store. Ask Christian before wiring the server, which does not have this yet.
+
+Mock-ups in `docs/mockups-release/`, canvas « OpenDives — v. beta · Téléphone », page Android, section « Téléphone · Mon profil de plongeur et équipement (OpenDives+) »:
+
+1. **`nav-compte-profil-android`, the account sheet.** A new card « Mon profil de plongeur », « Équipement, brevets, informations », between the account card and Réglages. It opens the profile. (To-do #87 will later move Réglages and À propos out of this sheet. Not part of this task.)
+2. **`profil-plongeur-android`, « Mon profil de plongeur ».**
+   - At the top: the diver's initial, name and number of dives, and the OpenDives+ chip.
+   - Three entries: « Équipement » (« 14 pièces · 2 kits »), « Brevets », « Informations » (emergency contact, birth date, blood group).
+   - Only « Équipement » is in this task. The other two are later tasks.
+3. **`profil-equipement-android`, « Équipement ».**
+   - The kits as chips (name and number of pieces), then « Nouveau kit ».
+   - The inventory grouped by type: Ordinateurs de plongée, Détendeurs, Combinaisons et sous-vêtements, Bouteilles, Autres. Each row has a type icon, the name, a sub-line, and the number of dives.
+   - Search and ⋮ in the top bar. The ⋮ menu has « Exporter ou imprimer… » for several pieces at once, and « Afficher les pièces archivées ».
+   - The extended FAB « Ajouter une pièce ».
+4. **`profil-kit-nouveau-android`, « Nouveau kit ».**
+   - ✕ to close, and « Enregistrer ».
+   - The field « Nom du kit ».
+   - The inventory by type, with a checkbox on each piece, and the number chosen.
+5. **`profil-piece-android`, the sheet of a piece.**
+   - The model's image. For dive computers, a catalogue image (to-do #65); the diver can replace it with a photo.
+   - The type, the name, and three figures: dives, hours underwater, deepest.
+   - The details: Marque, Modèle, Numéro de série, Firmware, Date d'achat, Dans les kits. The firmware is read-only, filled at each download from the computer (« 91 · lu au téléchargement du 3 novembre 2026 »), and hidden for a computer never downloaded.
+   - The last dive.
+   - Modifier, and ⋮ (Partager la fiche, Archiver, Supprimer).
+6. **`detail-equipement-plus-android`, the dive detail.**
+   - Combinaison and Sous-vêtement show the inventory pieces.
+   - The block « Autre équipement » (with the OpenDives+ chip) lists the pieces of the dive. A piece outside the inventory says « Hors inventaire » in its sub-line.
+   - At the end, the kit used, « Kit « Eau froide » ».
+7. **`edition-equipement-plus-android`, « Modifier une plongée ».**
+   - At the top of Équipement, two tonal buttons: « Appliquer un kit » and « Comme la précédente », which copies the equipment of the previous dive.
+   - Combinaison and Sous-vêtement are menus that pick from the inventory.
+   - The computer row has a « Renommer » pencil button. Renaming changes the computer's name in the whole logbook, as in Subsurface, and the dialog says so.
+   - « Autre équipement » lists the pieces with a ✕ to remove each from this dive, then « Ajouter de l'équipement ».
+8. **`edition-kit-menu-android`, « Appliquer un kit ».**
+   - A menu listing each kit, with its number of pieces and a summary, then « Gérer les kits ».
+   - Applying a kit fills the dive's equipment, and a snackbar offers « Annuler ».
+9. **`equipement-ajout-android`, « Ajouter de l'équipement ».**
+   - A bottom sheet with search, a « Kits » row (a kit chip checks all its pieces), and the inventory by type with checkboxes.
+   - The card « Pièce hors inventaire »: a name typed there is added to this dive only, never to the inventory.
+   - « Ajouter à la plongée ».
+
+**Decisions (Christian, 17 November 2026):**
+- A piece outside the inventory (borrowed, rented) can be added to one dive without entering the inventory.
+- Weights stay outside the inventory, entered dive by dive as in Subsurface. A weight belt can be an inventory piece.
+- Not now: filtering the logbook by piece.
+- At the end of an OpenDives+ subscription, the inventory becomes read-only for 30 days, with a warning: the diver loses it unless they subscribe again or export it.
+- A dive computer that is downloaded for the first time enters the inventory with its serial number and firmware.
+
+**Also on these canvases:** the cylinders of the phone dive detail mock-ups now use the current drawing (rounded shoulders and neck) and the mobile gas colours. The app should already draw them this way. Check it.
+
+**Test:**
+- The account sheet opens « Mon profil de plongeur », then « Équipement ».
+- A new kit with five pieces, applied to a dive, fills its equipment. « Annuler » restores the previous equipment.
+- A piece added « hors inventaire » appears in the dive and not in the inventory.
+- Offline, the inventory reads and edits, and syncs when the network returns.
