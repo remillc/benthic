@@ -71,6 +71,11 @@
 
 <style>
   @layer od.components {
+    /* Fluid layout: the content keeps a readable width on a tablet. */
+    :global(.od-profile .page-content) {
+      padding-inline: max(0px, calc((100% - 720px) / 2));
+    }
+
     .od-profile--hero {
       margin: 8px 16px 0;
       padding: 16px;

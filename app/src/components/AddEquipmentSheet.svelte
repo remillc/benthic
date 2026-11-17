@@ -163,6 +163,7 @@
     }
 
     .od-add-equipment--chip {
+      width: auto;
       height: 40px;
       padding: 0 14px 0 10px;
       border: var(--od-outline-width) solid var(--od-outline);

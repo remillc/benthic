@@ -325,6 +325,7 @@ dives/<id[0:2]>/<id>/media.json    photos and videos of the dive, by hash (secti
 sites/<id>.json                    dive site (name, position, taxonomy, water type, notes)
 trips/<id>.json                    trip
 gear/<id>.json                     inventory item: cylinder, regulator, suit, ... (#42)
+kits/<id>.json                     kit: a name and the `gearId`s of its pieces (#42, added on 17 November 2026)
 maintenance/<id>.json              reminder or service record (#47)
 gas-analyses/<id>.json             analysis of a cylinder's gas (#49)
 certifications/<id>.json           certification or document (#48), sensitive: encrypted
@@ -406,6 +407,18 @@ Gear, maintenance, gas analyses, certifications and the diver profile keep the s
   "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "...", "ct": "..." } }
 // plaintext of enc: bloodGroup, allergies, medicalNotes, emergencyContact { name, phone }
 ```
+
+#### Kits and what a dive used (added on 17 November 2026, task 267)
+
+```json
+// kits/<id>.json
+{ "format": 1, "id": "<uuid>", "createdAt": "...", "updatedAt": "...", "name": "Cold water", "gearIds": ["<uuid>", "<uuid>"] }
+```
+
+- `gear/<id>.json` also takes the optional fields `note` (the line under the name), `computerModel` and `computerSerial` (tie a dive computer to the dives it recorded), `firmware` and `firmwareReadAt` (read at a download, never typed). A dive computer enters the inventory at its first download.
+- What a dive used goes in `dive.json`: `"gear": { "suitGearId", "undersuitGearId", "gearIds": [...], "adhoc": [ { "id", "name" } ], "kitId" }`. `adhoc` pieces (borrowed, rented) live only there and never enter the inventory. Weights stay in `weights`, outside the inventory.
+- **Interim on the device, until the logbook is read in this format:** the on-device logbook is still the Subsurface core's, whose numeric ids are valid for one load, so the same content is kept in `dive-equipment/<uuid>.json` with `"diveKey": { "start": "<local start time to the second>" }`. The start time is the key (Subsurface itself merges two dives that start together); editing it re-keys the file. When the dive has its own UUID, the file's content moves into its `dive.json` and the file goes away. The working copy is held in a file store with this layout (`app/src/lib/file-store.js`, IndexedDB until a file plugin is chosen), and `meta/state.json` and `meta/pending.json` (files changed here and not sent) stay on the device.
+- After an OpenDives+ subscription ends the inventory is read only for 30 days (the app writes nothing to it), then lost unless the diver subscribes again or exports it.
 
 #### Versions and unknown fields
 

@@ -62,6 +62,7 @@
     }
 
     .od-read-only-notice--button {
+      width: auto;
       margin-top: 8px;
       height: 40px;
       padding: 0 16px;

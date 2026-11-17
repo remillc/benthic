@@ -197,6 +197,11 @@
 
 <style>
   @layer od.components {
+    /* Fluid layout: the content keeps a readable width on a tablet. */
+    :global(.od-piece-page .page-content) {
+      padding-inline: max(0px, calc((100% - 720px) / 2));
+    }
+
     .od-piece-page--image {
       margin: 8px 16px 0;
       height: 160px;

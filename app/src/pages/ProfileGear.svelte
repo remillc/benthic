@@ -153,14 +153,13 @@
   <div class="od-gear-page--bottom"></div>
 
   {#snippet fixedContent()}
-    {#if !gear.readOnly}
-      <div class="fab fab-right-bottom fab-extended od-fab-add">
-        <a href="/profile/gear/new">
-          <i class="icon"><Icon name="plus" /></i>
-          <div class="fab-text">{t('gear.inventory.add')}</div>
-        </a>
-      </div>
-    {/if}
+    <!-- Read only: the button goes away (hidden, not removed: the slot is drawn once). -->
+    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly ? 'none' : null}>
+      <a href="/profile/gear/new">
+        <i class="icon"><Icon name="plus" /></i>
+        <div class="fab-text">{t('gear.inventory.add')}</div>
+      </a>
+    </div>
   {/snippet}
 </Page>
 
@@ -168,6 +167,11 @@
 
 <style>
   @layer od.components {
+    /* Fluid layout: the content keeps a readable width on a tablet. */
+    :global(.od-gear-page .page-content) {
+      padding-inline: max(0px, calc((100% - 720px) / 2));
+    }
+
     .od-gear-page--search {
       width: 100%;
       display: flex;
@@ -227,6 +231,7 @@
 
     .od-gear-page--chip {
       flex: none;
+      width: auto;
       height: 40px;
       padding: 0 14px;
       border: var(--od-outline-width) solid var(--od-outline);
