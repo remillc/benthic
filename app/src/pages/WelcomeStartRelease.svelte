@@ -21,7 +21,7 @@
 
 {#snippet panelContent()}
   <div class="od-welcome-release--brand">
-    <img class="od-welcome-release--logo" src="logo-light.svg" alt="" width="96" height="96" />
+    <span class="od-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
     <span>OpenDives</span>
   </div>
   <h1 class="od-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
@@ -115,10 +115,30 @@
       letter-spacing: -0.5px;
     }
 
+    /* The logo on the blue band (task 2026-11-17-263): no drop shadow; its disc has a thin light ring instead, 1 dp,
+       white at 30 %. The disc is 60/66 of the image, so the ring sits 4.5 % inside its edges. */
     .od-welcome-release--logo {
+      position: relative;
       display: block;
       width: 96px;
       height: 96px;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        filter: none;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 4.545%;
+        box-sizing: border-box;
+        border: 1px solid var(--od-release-logo-ring);
+        border-radius: 50%;
+        pointer-events: none;
+      }
     }
 
     .od-welcome-release--headline {

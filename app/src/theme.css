@@ -217,6 +217,9 @@
     --od-release-on-panel-soft: rgb(255 255 255 / 0.78);
     --od-release-on-main-soft: rgb(255 255 255 / 0.82);
     --od-release-main-tile: rgb(255 255 255 / 0.16);
+    /* The « OpenDives+ » chip on the main choice (task 2026-11-17-263) and the thin ring of the logo's disc on the blue band. */
+    --od-release-plus-chip: rgb(255 255 255 / 0.22);
+    --od-release-logo-ring: rgb(255 255 255 / 0.3);
     --od-release-chip-caption: rgb(255 255 255 / 0.75);
     --od-release-surface-line: rgb(255 255 255 / 0.35);
     --od-release-dot-ring: rgb(255 255 255 / 0.22);

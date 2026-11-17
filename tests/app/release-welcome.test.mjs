@@ -184,9 +184,11 @@ test('the import summary reads sites and years from Subsurface XML, only the cou
 
 // --- Texts -------------------------------------------------------------------------------------------------
 
+const KEPT_FOR_WHERE = ['whereTitle', 'whereHelp', 'cloudHelp', 'cloudHelpIphone', 'gitHelp', 'deviceTitle', 'deviceTitlePhone', 'deviceTitleIphone', 'deviceHelp', 'deviceHelpPhone', 'deviceHelpIphone'];
+
 test('every text of the release screens is in fr and en, none is unused', () => {
   const keys = new Set();
-  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
+  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state, read('components/PlusChip.svelte'), read('lib/release-plus.js')]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
     // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
     // On an iPhone, the iPhone variant (task 2026-11-16-261); `iphoneKey` is a text that differs only there.
@@ -201,7 +203,11 @@ test('every text of the release screens is in fr and en, none is unused', () => 
     }
   }
   for (const group of ['welcomeRelease', 'welcomeSteps']) {
-    for (const key of Object.keys(langs.fr[group])) assert.ok(keys.has(`${group}.${key}`), `unused: ${group}.${key}`);
+    for (const key of Object.keys(langs.fr[group])) {
+      // The texts of « Où le garder ? » (name step before task 2026-11-17-263) stay for the server screens' own step.
+      if (group === 'welcomeSteps' && KEPT_FOR_WHERE.includes(key)) continue;
+      assert.ok(keys.has(`${group}.${key}`), `unused: ${group}.${key}`);
+    }
     assert.deepEqual(Object.keys(langs.fr[group]).sort(), Object.keys(langs.en[group]).sort());
     assert.doesNotMatch(JSON.stringify(langs.fr[group]) + JSON.stringify(langs.en[group]), /Subsurface/);
   }
@@ -277,7 +283,7 @@ test('« Seulement sur cette tablette »: the device logbook is started and empt
   assert.equal(await createDeviceLogbook(deps), 0);
   assert.deepEqual(calls, [['start'], ['remove', [1, 2]]]);
   assert.match(sources.steps, /start: startWithoutAccount/);
-  assert.match(sources.steps, /if \(kind === 'device'\) void createOnDevice\(\)/);
+  assert.match(sources.steps, /disabled=\{busy \|\| nameInvalid\} onclick=\{createOnDevice\}/);
 });
 
 test('a file or a divelogs.de download goes into the new device logbook with the app’s import', async () => {

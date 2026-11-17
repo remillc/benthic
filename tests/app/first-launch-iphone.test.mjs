@@ -54,7 +54,8 @@ test('« Dans mon nuage » lists iCloud Drive first on an iPhone', () => {
   assert.doesNotMatch(langs.fr.welcomeSteps.cloudHelp, /iCloud/);
   assert.doesNotMatch(langs.fr.welcomeSteps.openCloudHelp, /iCloud/);
   const steps = src('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /iphoneKey\('welcomeSteps\.cloudHelp', iphone\)/);
+  // « Dans mon nuage » of « Où le garder ? » (cloudHelpIphone) is no longer on the name step: the first step has « Se connecter »
+  // (task 2026-11-17-263). The texts stay for the « Où le garder ? » step of the server screens.
   assert.match(steps, /iphoneKey\('welcomeSteps\.openCloudHelp', iphone\)/);
 });
 

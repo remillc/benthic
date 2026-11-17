@@ -139,8 +139,11 @@ test('texts that name the device: « ce téléphone » on a phone, « cette tabl
   assert.ok(langs.fr.welcomeSteps.webdavHelpPhone.endsWith('Il reste sur ce téléphone.'));
   // The components choose the key by layout.phone.
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone, ios\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone, ios\)/);
+  // The first step's choice (task 2026-11-17-263); the texts of « Seulement sur ce téléphone » stay for the server screens' « Où le garder ? ».
+  assert.match(steps, /deviceKey\('welcomeSteps\.localTitle', layout\.phone, ios\)/);
+  assert.equal(langs.fr.welcomeSteps.localTitlePhone, 'Commencer un carnet sur ce téléphone');
+  assert.equal(langs.fr.welcomeSteps.localTitleIphone, 'Commencer un carnet sur cet iPhone');
+  assert.equal(langs.fr.welcomeSteps.localTitle, 'Commencer un carnet sur cette tablette');
   assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', layout\.phone, ios\)/);
   assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', layout\.phone, ios\)/);
 });
