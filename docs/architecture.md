@@ -424,10 +424,10 @@ Granularity is **the file** first, then **the field**. The device does the merge
 3. A conflict on a key goes to the choice screen already built for the cloud conflicts (the "sync conflict" state, version choice). Until the person chooses, the later `updatedAt` is kept in the working copy and the other version stays in the history, so nothing is lost and a silent sync never blocks.
 4. Deleting an item deletes its file (git keeps the history). Deleted on one side and changed on the other: the change wins and the file stays; the person can delete it again.
 5. Two devices that **create** items never collide: the ids are random UUIDs, so the paths differ.
-6. **Open:** the `number` of a dive. Renumbering rewrites many files and would conflict. Either store `number` only when the diver sets it or imports it and derive the displayed number from the order of `start`, or keep it stored and make a renumbering one dedicated commit. Until decided, a conflict on `number` alone takes the side that renumbered last.
+6. **The `number` of a dive is derived (decided on 17 November 2026):** the displayed number comes from the order of `start` in the logbook and is not stored, so a renumbering never rewrites files or conflicts between devices. A `number` read from an imported file is not kept as the dive number.
 7. For an encrypted file the app decrypts base, ours and theirs, merges the plaintext objects, and encrypts the result with a fresh nonce.
 
-**Open:** how the logbook gets from the files into the C++ core (a façade call that loads dive objects as JSON, or a conversion to the core's structures). The format code itself (reading, writing, merging, import mapping) is JavaScript in `app/src/lib`, tested in `tests/app`, as AGENTS.md asks; only loading into and saving from the core's own structures needs the façade.
+**Reading the format (decided on 17 November 2026):** the app reads and writes the OpenDives format in JavaScript and shows the logbook from it; a dive goes to the C++ core only for what needs Subsurface's calculations (tissues, ceiling, planner, gas use), through a façade call that takes one dive as JSON. The format code itself (reading, writing, merging, import mapping) is JavaScript in `app/src/lib`, tested in `tests/app`, as AGENTS.md asks; only loading into and saving from the core's own structures needs the façade.
 
 ### 11.4 Import from and export to Subsurface
 
@@ -442,7 +442,7 @@ Subsurface's format is **not** the format of an OpenDives-server logbook; it is 
 
 **Export** (Subsurface XML, written by the core as today): the ids are dropped, the units follow Subsurface's, and `origin.extra` is written back. The dive id is written as an extra-data entry `OpenDives id` on the first dive computer (the same mechanism as `OpenDives title` for saved plans), so that re-importing an export maps to the same dives. Opening an OpenDives logbook in Subsurface is supported **only through this export**; Subsurface never reads or writes the repository of the server.
 
-Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export. **Open:** a separate JSON export of those.
+Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export, and it does not need to be: that export is for opening the dives in Subsurface. **Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the OpenDives files of the logbook (dives, sites, gear, maintenance, certifications, gas analyses, diver profile, settings), the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, not a Subsurface file; its exact packaging is decided when its screen is designed.
 
 ### 11.5 Sensitive data: encrypted on the device
 

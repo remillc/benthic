@@ -3415,7 +3415,7 @@ Test: hovering each rail item shows the 8 % layer and the ink colours; leaving i
 
 Done on `feature/desktop-logbook`.
 
-## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+## [x] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
 
@@ -3430,7 +3430,7 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
-Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
+Done on `feature/desktop-logbook`: columns move and resize, and each logbook keeps its own order, widths and visible columns.
 
 ## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
@@ -3765,7 +3765,7 @@ Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pres
 
 Done on `feature/desktop-logbook`.
 
-## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
+## [x] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
 
@@ -3792,7 +3792,7 @@ English: « Settings », « Saved at once, on this computer », « Search settin
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
 
-Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
+Done on `feature/desktop-logbook`: « Seulement sur Wi-Fi ou câble » now holds back automatic sync on a metered or tethered connection (Windows, macOS, Linux; unknown allows it).
 
 ## [x] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
 
@@ -5232,7 +5232,9 @@ Mock-ups, in `docs/mockups/`, canvas « OpenDives — Version Alpha »:
 - With three weights, the chips wrap and the total is right.
 - The Gaz tab shows one card per cylinder, and selecting a card shows its fields.
 
-## [ ] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+## [x] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+
+Done on `feature/release-phone-first-launch`. « Se connecter » and « Découvrir OpenDives+ » show a placeholder until task 265 is merged in.
 
 Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-phone-first-launch` (the branch of tasks 227 and 261) and never merge it into `main`.
 
@@ -5253,7 +5255,9 @@ Release mock-ups are now in their own folder, `docs/mockups-release/` (see its R
 - The choice buttons have 24 dp corners on every first-launch step.
 - The logo has the light ring and no shadow.
 
-## [ ] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+## [x] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+
+Done on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), from the phone branch of task 263.
 
 Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), and never merge them into `main`.
 
@@ -5271,7 +5275,9 @@ Mock-ups in `docs/mockups-release/`: `android-tablette-premier-lancement-product
 - « Se connecter » is the largest choice of the first step.
 - Portrait tablet: the three choices and the two text buttons fit without scrolling.
 
-## [ ] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+## [x] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+
+Done on `feature/release-server-screens`: the screens, the e-mail flow and the offer. Waiting for Christian: Google and Apple sign-in, the store purchase (« S’abonner » is inert for now).
 
 Christian approved the design on 17 November 2026. **Release edition:** work on `feature/release-server-screens` (tasks 259 and 260) and never merge it into `main`. Build the screens; ask Christian before anything that needs the store's billing (Google Play Billing, App Store) or a server feature that does not exist yet.
 
@@ -5305,7 +5311,9 @@ Mock-ups in `docs/mockups-release/`, in the order of the flow:
 - An account without a subscription sees the offer. « Continuer sans abonnement » creates no account.
 - « Découvrir OpenDives+ » opens the offer.
 
-## [ ] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+## [x] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+
+Done on `feature/release-server-screens`: create, import, send with resume, offline and interrupted states. Opening a server logbook waits for the app to read the OpenDives format.
 
 **Stop: ask Christian how to proceed before any code**, as for tasks 259 and 260. Christian approved the design on 17 November 2026. **Release edition only:** `feature/release-server-screens`, never merged into `main`.
 
@@ -5332,3 +5340,63 @@ Also on the tablet and the desktop: the server sign-in screens of task 260 (`and
 **Test:**
 - An empty account shows the three choices. The third one appears only when a logbook exists on the device.
 - A cut connection during the upload shows « Envoi interrompu », and « Reprendre l’envoi » continues from where it stopped.
+
+## [ ] 2026-11-17-267 Phone (release): « Mon profil de plongeur » and the equipment inventory (to-do #42) — ASK CHRISTIAN BEFORE THE SERVER PART
+
+Christian approved this on 17 November 2026. **Release edition:** work on a new branch `feature/release-equipment-inventory`, started from `feature/release-server-screens`, and never merge it into `main`.
+
+**What this is.** The equipment inventory of to-do #42, an OpenDives+ feature. Subsurface does not store it. The data lives on the OpenDives server, with a working copy on the device so that everything works offline. Build the screens and the local store. Ask Christian before wiring the server, which does not have this yet.
+
+Mock-ups in `docs/mockups-release/`, canvas « OpenDives — v. beta · Téléphone », page Android, section « Téléphone · Mon profil de plongeur et équipement (OpenDives+) »:
+
+1. **`nav-compte-profil-android`, the account sheet.** A new card « Mon profil de plongeur », « Équipement, brevets, informations », between the account card and Réglages. It opens the profile. (To-do #87 will later move Réglages and À propos out of this sheet. Not part of this task.)
+2. **`profil-plongeur-android`, « Mon profil de plongeur ».**
+   - At the top: the diver's initial, name and number of dives, and the OpenDives+ chip.
+   - Three entries: « Équipement » (« 14 pièces · 2 kits »), « Brevets », « Informations » (emergency contact, birth date, blood group).
+   - Only « Équipement » is in this task. The other two are later tasks.
+3. **`profil-equipement-android`, « Équipement ».**
+   - The kits as chips (name and number of pieces), then « Nouveau kit ».
+   - The inventory grouped by type: Ordinateurs de plongée, Détendeurs, Combinaisons et sous-vêtements, Bouteilles, Autres. Each row has a type icon, the name, a sub-line, and the number of dives.
+   - Search and ⋮ in the top bar. The ⋮ menu has « Exporter ou imprimer… » for several pieces at once, and « Afficher les pièces archivées ».
+   - The extended FAB « Ajouter une pièce ».
+4. **`profil-kit-nouveau-android`, « Nouveau kit ».**
+   - ✕ to close, and « Enregistrer ».
+   - The field « Nom du kit ».
+   - The inventory by type, with a checkbox on each piece, and the number chosen.
+5. **`profil-piece-android`, the sheet of a piece.**
+   - The model's image. For dive computers, a catalogue image (to-do #65); the diver can replace it with a photo.
+   - The type, the name, and three figures: dives, hours underwater, deepest.
+   - The details: Marque, Modèle, Numéro de série, Firmware, Date d'achat, Dans les kits. The firmware is read-only, filled at each download from the computer (« 91 · lu au téléchargement du 3 novembre 2026 »), and hidden for a computer never downloaded.
+   - The last dive.
+   - Modifier, and ⋮ (Partager la fiche, Archiver, Supprimer).
+6. **`detail-equipement-plus-android`, the dive detail.**
+   - Combinaison and Sous-vêtement show the inventory pieces.
+   - The block « Autre équipement » (with the OpenDives+ chip) lists the pieces of the dive. A piece outside the inventory says « Hors inventaire » in its sub-line.
+   - At the end, the kit used, « Kit « Eau froide » ».
+7. **`edition-equipement-plus-android`, « Modifier une plongée ».**
+   - At the top of Équipement, two tonal buttons: « Appliquer un kit » and « Comme la précédente », which copies the equipment of the previous dive.
+   - Combinaison and Sous-vêtement are menus that pick from the inventory.
+   - The computer row has a « Renommer » pencil button. Renaming changes the computer's name in the whole logbook, as in Subsurface, and the dialog says so.
+   - « Autre équipement » lists the pieces with a ✕ to remove each from this dive, then « Ajouter de l'équipement ».
+8. **`edition-kit-menu-android`, « Appliquer un kit ».**
+   - A menu listing each kit, with its number of pieces and a summary, then « Gérer les kits ».
+   - Applying a kit fills the dive's equipment, and a snackbar offers « Annuler ».
+9. **`equipement-ajout-android`, « Ajouter de l'équipement ».**
+   - A bottom sheet with search, a « Kits » row (a kit chip checks all its pieces), and the inventory by type with checkboxes.
+   - The card « Pièce hors inventaire »: a name typed there is added to this dive only, never to the inventory.
+   - « Ajouter à la plongée ».
+
+**Decisions (Christian, 17 November 2026):**
+- A piece outside the inventory (borrowed, rented) can be added to one dive without entering the inventory.
+- Weights stay outside the inventory, entered dive by dive as in Subsurface. A weight belt can be an inventory piece.
+- Not now: filtering the logbook by piece.
+- At the end of an OpenDives+ subscription, the inventory becomes read-only for 30 days, with a warning: the diver loses it unless they subscribe again or export it.
+- A dive computer that is downloaded for the first time enters the inventory with its serial number and firmware.
+
+**Also on these canvases:** the cylinders of the phone dive detail mock-ups now use the current drawing (rounded shoulders and neck) and the mobile gas colours. The app should already draw them this way. Check it.
+
+**Test:**
+- The account sheet opens « Mon profil de plongeur », then « Équipement ».
+- A new kit with five pieces, applied to a dive, fills its equipment. « Annuler » restores the previous equipment.
+- A piece added « hors inventaire » appears in the dive and not in the inventory.
+- Offline, the inventory reads and edits, and syncs when the network returns.
