@@ -2405,7 +2405,11 @@
       "Tablet: section headers get their wavy edge back.",
       "Best mix: « Prepare this mix » opens the Gas blender with that mix as the wanted mix (on a tablet, the button names the mix).",
       "Gas blender: « Desired final pressure » (was « Final pressure ») starts at the working pressure of the chosen cylinder, shown as « Working pressure: 3,365 psi ». A typed value stays when the cylinder changes; above the working pressure a warning shows and the calculation goes on.",
-      "Gas blender: the cylinder is chosen before the final pressure; « In the cylinder » puts Pressure and Mix (nitrox) or Oxygen and Helium (trimix); the note on pressures is no longer red; « Analyse the mix before diving. » is in an amber banner."
+      "Gas blender: the cylinder is chosen before the final pressure; « In the cylinder » puts Pressure and Mix (nitrox) or Oxygen and Helium (trimix); the note on pressures is no longer red; « Analyse the mix before diving. » is in an amber banner.",
+      "Public edition: an account with no logbook offers to create an empty logbook, import a Subsurface file (.ssrf or .xml) or send the logbook of the device. The logbook is written in OpenDives' format on the server, in small uploads; it also stays on the device.",
+      "Public edition: the upload shows « n dives of m » and the time left. If the connection drops, « Upload interrupted » says so and « Resume the upload » restarts after the last dive sent; the upload is also offered again at the next start.",
+      "Public edition: « Sign in or create an account », the OpenDives+ offer (US $14.99 a year), « Your logbook is ready » and « Welcome to OpenDives+! ». Signing in with Google or Apple and subscribing are not available yet; an account without a subscription keeps nothing on the device.",
+      "Public edition: the server screens no longer show « OpenDives server » above the title, the « The server is not responding » icon is centred and « Back to the start » replaces « Choose another place »."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

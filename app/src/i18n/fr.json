@@ -2405,7 +2405,11 @@
       "Tablette : l’en-tête des sections retrouve son bord ondulé.",
       "Meilleur mélange : « Préparer ce mélange » ouvre le Mélangeur de gaz avec ce mélange comme mélange voulu (sur tablette, le bouton nomme le mélange).",
       "Mélangeur de gaz : « Pression finale désirée » (ex « Pression finale ») reprend la pression de service de la bouteille choisie, sous le nom « Service : 3 365 psi ». Une valeur saisie reste quand on change de bouteille ; au-dessus de la pression de service, un avertissement s'affiche et le calcul continue.",
-      "Mélangeur de gaz : la bouteille se choisit avant la pression finale ; « Dans la bouteille » met Pression et Mélange (nitrox) ou Oxygène et Hélium (trimix) ; la note sur les pressions n'est plus en rouge ; « Analysez le mélange avant de plonger. » est dans un bandeau ambre."
+      "Mélangeur de gaz : la bouteille se choisit avant la pression finale ; « Dans la bouteille » met Pression et Mélange (nitrox) ou Oxygène et Hélium (trimix) ; la note sur les pressions n'est plus en rouge ; « Analysez le mélange avant de plonger. » est dans un bandeau ambre.",
+      "Édition publique : un compte sans carnet propose de créer un carnet vide, d’importer un fichier Subsurface (.ssrf ou .xml) ou d’envoyer le carnet de l’appareil. Le carnet est écrit au format d’OpenDives sur le serveur, par petits envois ; le carnet reste aussi sur l’appareil.",
+      "Édition publique : l’envoi du carnet affiche « n plongées sur m » et le temps restant. Si la connexion se coupe, « Envoi interrompu » le dit et « Reprendre l’envoi » repart de la dernière plongée envoyée ; l’envoi se propose aussi au démarrage suivant.",
+      "Édition publique : « Se connecter ou créer un compte », l’offre OpenDives+ (14,99 $ US par an), « Votre carnet est prêt » et « Bienvenue dans OpenDives+ ! ». La connexion avec Google ou Apple et l’abonnement ne sont pas encore disponibles ; un compte sans abonnement ne garde rien sur l’appareil.",
+      "Édition publique : les écrans du serveur n’affichent plus « Serveur OpenDives » au-dessus du titre, l’icône « Le serveur ne répond pas » est centrée et « Revenir à l’accueil » remplace « Choisir un autre endroit »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
