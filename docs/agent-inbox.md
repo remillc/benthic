@@ -3415,7 +3415,7 @@ Test: hovering each rail item shows the 8 % layer and the ink colours; leaving i
 
 Done on `feature/desktop-logbook`.
 
-## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+## [x] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
 
@@ -3430,7 +3430,7 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
-Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
+Done on `feature/desktop-logbook`: columns move and resize, and each logbook keeps its own order, widths and visible columns.
 
 ## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
@@ -3765,7 +3765,7 @@ Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pres
 
 Done on `feature/desktop-logbook`.
 
-## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
+## [x] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
 
@@ -3792,7 +3792,7 @@ English: « Settings », « Saved at once, on this computer », « Search settin
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
 
-Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
+Done on `feature/desktop-logbook`: « Seulement sur Wi-Fi ou câble » now holds back automatic sync on a metered or tethered connection (Windows, macOS, Linux; unknown allows it).
 
 ## [x] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
 
