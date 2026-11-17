@@ -130,6 +130,6 @@ test('a row opens its logbook; a missing one opens the dialog with « Retirer de
 });
 
 test('« Seulement sur cet ordinateur » has the computer-screen icon on the desktop, the tablet icon elsewhere', () => {
-  assert.match(read('components/FirstLaunchSteps.svelte'), /icon=\{desktopApp \? 'desktop' : 'tablet'\}/);
+  assert.match(read('components/FirstLaunchSteps.svelte'), /const deviceIcon = \$derived\(kind === 'desktop' \? 'desktop' : layout\.phone \? 'device' : 'tablet'\)/);
   assert.match(read('components/Icon.svelte'), /desktop: 'M4 5h16v10H4zM2 19h20'/);
 });

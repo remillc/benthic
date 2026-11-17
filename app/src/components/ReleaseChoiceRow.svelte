@@ -4,6 +4,7 @@
   // docs/mockups/android-tablette-premier-lancement-production-*.dc.html): a 48 dp tonal icon tile, a title,
   // a help line and a chevron. `main` is the filled row (the first choice of a list). No radio button.
   import Icon from './Icon.svelte';
+  import PlusChip from './PlusChip.svelte';
 
   /**
    * @type {{
@@ -12,17 +13,21 @@
    *   help?: string,
    *   main?: boolean,
    *   compact?: boolean,
+   *   prominent?: boolean,
+   *   dense?: boolean,
+   *   plus?: boolean,
    *   disabled?: boolean,
    *   class?: string,
    *   onclick: () => void,
    * }}
    */
-  let { icon, title, help = '', main = false, compact = false, disabled = false, class: extra = '', onclick } = $props();
+  let { icon, title, help = '', main = false, compact = false, prominent = false, dense = false, plus = false, disabled = false, class: extra = '', onclick } = $props();
 </script>
 
-<button type="button" class="od-release-row {extra}" class:od-release-row--main={main} class:od-release-row--compact={compact} {disabled} {onclick}>
+<button type="button" class="od-release-row {extra}" class:od-release-row--main={main} class:od-release-row--compact={compact} class:od-release-row--prominent={prominent} class:od-release-row--dense={dense} {disabled} {onclick}>
   <span class="od-release-row--tile"><Icon name={/** @type {any} */ (icon)} size={24} /></span>
   <span class="od-release-row--text">
+    {#if plus}<span class="od-release-row--plus"><PlusChip /></span>{/if}
     <span class="od-release-row--title">{title}</span>
     {#if help}<span class="od-release-row--help">{help}</span>{/if}
   </span>
@@ -39,7 +44,7 @@
       gap: 16px;
       padding: 16px;
       border: 1px solid var(--od-surface-container-highest);
-      border-radius: 20px;
+      border-radius: 24px;
       background: var(--od-surface);
       box-shadow: 0 1px 2px var(--od-release-row-shadow);
       color: var(--od-text);
@@ -84,7 +89,18 @@
         }
       }
 
-      .od-release-row--tile {
+      /* Android phone, first step (mock-up android-premier-lancement-production): 12 dp above and below, so that the
+       three choices, the chip and the text buttons fit. */
+    .od-release-row--dense {
+      padding-block: 12px;
+    }
+
+    .od-release-row--plus {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
+    .od-release-row--tile {
         background: var(--od-release-main-tile);
         color: var(--od-release-on-panel);
       }
@@ -106,11 +122,22 @@
       }
     }
 
+    /* Android phone, first step (mock-up android-premier-lancement-production): 12 dp above and below, so that the
+       three choices, the chip and the text buttons fit. */
+    .od-release-row--dense {
+      padding-block: 12px;
+    }
+
+    .od-release-row--plus {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
     .od-release-row--tile {
       flex: none;
       width: 48px;
       height: 48px;
-      border-radius: 14px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -142,6 +169,32 @@
       flex: none;
       display: flex;
       color: var(--od-text-2);
+    }
+
+    /* Tablet and desktop (task 2026-11-17-264): bigger choices on every step, 24 sp titles on two lines when they are
+       long. « Se connecter » stands out on the first step: 20 dp padding, 28 dp corners, a 56 dp tile with 18 dp
+       corners and a 16 sp sub-line. */
+    @media (min-width: 768px) {
+      .od-release-row--title {
+        font-size: 24px;
+        line-height: 30px;
+      }
+
+      .od-release-row--prominent {
+        padding: 20px;
+        border-radius: 28px;
+
+        .od-release-row--tile {
+          width: 56px;
+          height: 56px;
+          border-radius: 18px;
+        }
+
+        .od-release-row--help {
+          font-size: 16px;
+          line-height: 22px;
+        }
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -50,6 +50,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stageImport", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "discardImport", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "createIcloudLogbook", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getTrip", returnType: CAPPluginReturnPromise),
@@ -1081,6 +1082,37 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             if let file = stagedImport(path) { try? FileManager.default.removeItem(at: file) }
             call.resolve()
+        }
+    }
+
+    /// iCloud Drive (task 2026-11-16-261; UNTESTED: written without a Mac, to be run on a device signed in to
+    /// iCloud). Creates `<name>` in the OpenDives folder of the app's ubiquity container, so that it shows in the
+    /// Files app under iCloud Drive › OpenDives. No sign-in: the container belongs to the device's Apple account.
+    /// `url(forUbiquityContainerIdentifier:)` may block, so it runs off the main thread; it returns nil when iCloud
+    /// Drive is off, the account is signed out, or the iCloud entitlement is missing (NOT_AVAILABLE).
+    @objc func createIcloudLogbook(_ call: CAPPluginCall) {
+        let name = (call.getString("name") ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        networkQueue.async { [self] in
+            do {
+                // A file name only: no path separator, no hidden file.
+                guard !name.isEmpty, !name.contains("/"), !name.contains(":"), !name.hasPrefix(".") else {
+                    throw Failure("BAD_REQUEST")
+                }
+                guard let container = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+                    throw Failure("NOT_AVAILABLE")
+                }
+                // `Documents` is the part of the container the Files app shows.
+                let folder = container.appendingPathComponent("Documents", isDirectory: true)
+                    .appendingPathComponent("OpenDives", isDirectory: true)
+                    .appendingPathComponent(name, isDirectory: true)
+                let existed = FileManager.default.fileExists(atPath: folder.path)
+                if !existed {
+                    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                }
+                call.resolve(["path": folder.path, "created": !existed])
+            } catch {
+                reject(call, error)
+            }
         }
     }
 

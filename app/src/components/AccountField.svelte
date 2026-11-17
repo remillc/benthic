@@ -26,11 +26,12 @@
    *   required?: boolean,
    *   position?: 'single'|'first'|'last',
    *   outlined?: boolean,
+   *   mono?: boolean,
    *   onchange?: () => void,
    * }}
    * footer / footerError: the iOS footer of the group, when it is not this
    * field's own (helper text, or error). outlined: the outlined field of the alpha first launch on a phone
-   * (task 2026-11-16-233), the label sitting on the border.
+   * (task 2026-11-16-233), the label sitting on the border. mono: the text in a monospace face (an address).
    */
   let {
     label,
@@ -46,6 +47,7 @@
     required = false,
     position = 'single',
     outlined = false,
+    mono = false,
     onchange,
   } = $props();
 
@@ -77,7 +79,7 @@
     <p class="od-account-field od-account-field--ios-footer" class:od-account-field--error={footerIsError}>{footerText}</p>
   {/if}
 {:else if outlined}
-  <div class="od-account-field od-account-field--outlined" class:od-account-field--invalid={!!error} class:disabled>
+  <div class="od-account-field od-account-field--outlined" class:od-account-field--mono={mono} class:od-account-field--invalid={!!error} class:disabled>
     <div class="od-account-field--box">
       <input
         {id}
@@ -143,7 +145,7 @@
     /* Outlined field (docs/mockups/android-premier-lancement-*.dc.html): 52 dp, 12 dp corners, the label on the border. */
     .od-account-field--outlined {
       position: relative;
-      margin-top: 14px;
+      margin-top: var(--od-outlined-gap, 14px);
 
       .od-account-field--box {
         box-sizing: border-box;
@@ -173,6 +175,11 @@
         font: inherit;
         font-size: 16px;
         color: var(--od-text);
+      }
+
+      &.od-account-field--mono input {
+        font-family: 'Roboto Mono', ui-monospace, monospace;
+        font-size: 15px;
       }
 
       .od-account-field--toggle {

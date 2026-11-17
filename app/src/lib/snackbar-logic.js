@@ -23,11 +23,12 @@ export function snackbarTimeout(requested, hasAction) {
 
 /**
  * The CSS classes of the snackbar's element.
- * @param {{ hasFab?: boolean, undoable?: boolean }} [options]
+ * @param {{ hasFab?: boolean, undoable?: boolean, placement?: 'start' }} [options]
  *   hasFab: the screen has a FAB, the snackbar floats above it;
  *   undoable: the undo history can clear it (see undo.js)
+ *   placement 'start': on a tablet, at the bottom left, 24 dp from the content's edge (the first launch, task 239)
  * @returns {string}
  */
-export function snackbarClasses({ hasFab = false, undoable = false } = {}) {
-  return ['od-snackbar', hasFab ? 'od-snackbar-above-fab' : '', undoable ? 'od-undo-toast' : ''].filter(Boolean).join(' ');
+export function snackbarClasses({ hasFab = false, undoable = false, placement } = {}) {
+  return ['od-snackbar', hasFab ? 'od-snackbar-above-fab' : '', undoable ? 'od-undo-toast' : '', placement === 'start' ? 'od-snackbar-start' : ''].filter(Boolean).join(' ');
 }

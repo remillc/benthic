@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PHONE_QUERY, BAND_HEIGHT, deviceKey } from '../../app/src/lib/first-launch-phone.js';
+import { PHONE_QUERY, BAND_HEIGHT, deviceKey, deviceKind } from '../../app/src/lib/first-launch-phone.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -29,11 +29,12 @@ test('the phone layout is chosen by the width, the same one as layout.phone', ()
   }
 });
 
-test('the blue band is 330 dp on the first step and 108 dp on the others, the status bar included', () => {
-  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 108 });
+test('the blue band is 330 dp on the first step and 140 dp on the others, the status bar included (task 244: 108 before)', () => {
+  assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 140 });
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /min-height: calc\(330px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
-  assert.match(page, /min-height: calc\(108px - 24px \+ max\(var\(--f7-safe-area-top, 0px\), 24px\)\)/);
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
+  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--od-welcome-band-top\)\)/);
+  assert.match(page, /--od-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
   // First step: logo 40 dp, name 24 sp, headline 26 sp, line 14 sp; other steps: logo 32 dp, name 20 sp.
   for (const piece of [/width: 40px;\s+height: 40px/, /width: 32px;\s+height: 32px/, /font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
     assert.match(page, piece);
@@ -43,7 +44,7 @@ test('the blue band is 330 dp on the first step and 108 dp on the others, the st
 test('the column has 20 dp of padding, starts at the top, has 24 sp titles and full-width buttons', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   const phone = steps.slice(steps.lastIndexOf('@media (max-width: 767.98px)'));
-  assert.match(phone, /padding: 16px 20px 0/);
+  assert.match(phone, /padding: 16px 16px 0/);
   assert.match(phone, /od-first-launch--first \{\s+padding-top: 20px/);
   assert.match(phone, /od-first-launch--step \{\s+align-self: start/);
   assert.match(phone, /od-first-launch--title \{\s+font-size: 24px/);
@@ -65,16 +66,36 @@ test('the profile of the band has no dot and no chips on a phone', () => {
   );
 });
 
-test("the phone band is the app's section band: its gradient with the light centre at 38% -40%, its profile and its wave", () => {
+test("the welcome hero is the alpha's hatched dark blue; the steps band takes the section band's look (tasks 244, 251)", () => {
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /import SectionBand from '\.\.\/components\/SectionBand\.svelte'/);
-  assert.match(page, /\{#if layout\.phone\}[^]*<SectionBand>\{@render panelContent\(\)\}<\/SectionBand>[^]*\{:else\}/);
-  assert.match(page, /--od-band-gradient: var\(--od-release-band-gradient\)/);
+  assert.doesNotMatch(page, /SectionBand|layout\.phone|release-band-gradient/);
   const theme = read('theme.css');
-  const band = theme.match(/--od-band-gradient: radial-gradient\(([^)]*)\)/)[1];
-  const release = theme.match(/--od-release-band-gradient: radial-gradient\(([^)]*)\)/)[1];
-  // The same gradient, only the light centre is raised.
-  assert.equal(release, band.replace('at 38% -20%', 'at 38% -40%'));
+  assert.doesNotMatch(theme, /--od-release-band-gradient/);
+  const token = (name) => theme.match(new RegExp(`${name}: ([^;]*);`))[1];
+  assert.equal(token('--od-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
+  assert.equal(token('--od-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
+  assert.equal(token('--od-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
+  // Task 251: the section band's radial gradient, its light centre at -40 %.
+  assert.equal(token('--od-first-step-band'), 'radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)');
+  const phone = page.slice(page.lastIndexOf('@media (max-width: 767.98px)'));
+  // The hero (330 dp) keeps the hatched blue, its sheen and its hatching.
+  assert.match(phone, /background: var\(--od-first-band\);/);
+  assert.match(phone, /od-welcome-release--panel-light \{\s+background: var\(--od-first-band-sheen\)/);
+  assert.match(phone, /od-welcome-release--panel-bands \{\s+background: var\(--od-first-band-hatch\)/);
+  // The steps band: gradient, no sheen, the faint profile (10 % area, 30 % line, 1.5 dp) and the 18 dp wave in the page colour.
+  assert.match(phone, /od-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--od-first-step-band\)/);
+  assert.match(phone, /od-welcome-release--compact \.od-welcome-release--panel-light \{\s+display: none/);
+  assert.match(phone, /fill: var\(--od-band-profile-area\)/);
+  assert.match(phone, /stroke: var\(--od-band-profile-line\);\s+stroke-width: 1\.5/);
+  assert.match(phone, /od-welcome-release--panel-wave \{\s+display: block;[^}]*height: 18px/);
+  assert.match(phone, /od-welcome-release--panel-wave path \{\s+fill: var\(--od-background\)/);
+  assert.match(page, /M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z/);
+  assert.equal(token('--od-band-profile-area'), 'rgb(255 255 255 / 0.1)');
+  assert.equal(token('--od-band-profile-line'), 'rgb(255 255 255 / 0.3)');
+  // Neither the profile nor the wave shows outside a phone step band.
+  assert.match(page, /\.od-welcome-release--panel-profile,\s+\.od-welcome-release--panel-wave \{\s+display: none/);
+  // The rays fade out at 55 % of the height (the tablet panel's rule, shared).
+  assert.match(page, /mask-image: linear-gradient\(180deg, black 0%, transparent 55%\)/);
 });
 
 test('the sign-in hint reads on two lines, centred; the sign-in button is centred on a tablet', () => {
@@ -98,8 +119,8 @@ test('the progress bar stays inside its card', () => {
 });
 
 test('texts that name the device: « ce téléphone » on a phone, « cette tablette » on a tablet', () => {
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', true), 'welcomeSteps.deviceTitlePhone');
-  assert.equal(deviceKey('welcomeSteps.deviceTitle', false), 'welcomeSteps.deviceTitle');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: true })), 'welcomeSteps.deviceTitlePhone');
+  assert.equal(deviceKey('welcomeSteps.deviceTitle', deviceKind({ phone: false })), 'welcomeSteps.deviceTitle');
   const wanted = {
     fr: { deviceTitle: 'Seulement sur ce téléphone', gitTokenHelp: 'Le jeton reste sur ce téléphone.' },
     en: { deviceTitle: 'Only on this phone', gitTokenHelp: 'The token stays on this phone.' },
@@ -118,10 +139,16 @@ test('texts that name the device: « ce téléphone » on a phone, « cette tabl
   assert.ok(langs.fr.welcomeSteps.webdavHelpPhone.endsWith('Il reste sur ce téléphone.'));
   // The components choose the key by layout.phone.
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceTitle', layout\.phone, desktopApp\)/);
-  assert.match(steps, /deviceKey\('welcomeSteps\.deviceHelp', layout\.phone, desktopApp\)/);
-  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', layout\.phone, desktopApp\)/);
-  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', layout\.phone, desktopApp\)/);
+  // The first step's choice (task 2026-11-17-263); the texts of « Seulement sur ce téléphone » stay for the server screens' « Où le garder ? ».
+  assert.match(steps, /deviceKey\('welcomeSteps\.localTitle', kind\)/);
+  assert.equal(langs.fr.welcomeSteps.localTitlePhone, 'Commencer un carnet sur ce téléphone');
+  assert.equal(langs.fr.welcomeSteps.localTitleIphone, 'Commencer un carnet sur cet iPhone');
+  assert.equal(langs.fr.welcomeSteps.localTitle, 'Commencer un carnet sur cette tablette');
+  assert.equal(langs.fr.welcomeSteps.localTitleDesktop, 'Commencer un carnet sur cet ordinateur');
+  assert.match(read('components/FirstLaunchGit.svelte'), /deviceKey\('welcomeSteps\.gitTokenHelp', deviceKind\(\{ phone: layout\.phone, ios, desktop: desktopApp \}\)\)/);
+  assert.match(read('components/FirstLaunchWebdav.svelte'), /deviceKey\('welcomeSteps\.webdavHelp', kind\)/);
+  // One kind for every device: the desktop app first, then the iPhone, then the phone, else the tablet.
+  assert.match(steps, /const kind = \$derived\(deviceKind\(\{ phone: layout\.phone, ios, desktop: desktopApp \}\)\)/);
 });
 
 test('the release edition shows its own screen on a phone, not the beta screen', () => {

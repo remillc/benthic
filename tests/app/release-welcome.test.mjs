@@ -52,9 +52,9 @@ test('the edition is read in one place', () => {
 
 test('the beta path is unchanged: WelcomeStart knows nothing of the edition, the route picks the page', () => {
   const beta = read('pages/WelcomeStart.svelte');
-  // The alpha's own phone band (FirstLaunchBand, task 2026-11-16-233, on main) is not the release edition.
-  assert.doesNotMatch(beta, /edition|release|FirstLaunch(?!Band)/i);
-  assert.match(beta, /od-welcome-start--wide-profile/);
+  // The alpha's own phone band and tablet panel (FirstLaunchBand, FirstLaunchPanel, tasks 233 and 237, on main) is not the release edition.
+  assert.doesNotMatch(beta, /edition|release|FirstLaunch(?!Band|Panel|.tabletStart)/i);
+  assert.match(beta, /od-first-panelled/);
   assert.match(beta, /welcome\.noAccountNoteTablet/);
   assert.match(read('App.svelte'), /component: isRelease \? WelcomeEntry : WelcomeStart/);
   // The release edition shows its own screen on phones too (task 2026-11-16-227): never the beta one.
@@ -184,16 +184,19 @@ test('the import summary reads sites and years from Subsurface XML, only the cou
 
 // --- Texts -------------------------------------------------------------------------------------------------
 
+const KEPT_FOR_WHERE = ['deviceTitleDesktop', 'deviceHelpDesktop', 'whereTitle', 'whereHelp', 'cloudHelp', 'cloudHelpIphone', 'gitHelp', 'deviceTitle', 'deviceTitlePhone', 'deviceTitleIphone', 'deviceHelp', 'deviceHelpPhone', 'deviceHelpIphone'];
+
 test('every text of the release screens is in fr and en, none is unused', () => {
   const keys = new Set();
-  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state]) {
+  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state, read('components/PlusChip.svelte'), read('lib/release-plus.js')]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
     // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
-    // The desktop app's variant too (« cet ordinateur », task 2026-11-16-228).
+    // The desktop app's variant (« cet ordinateur », task 2026-11-16-228) and the iPhone's (task 2026-11-16-261);
+    // `iphoneKey` is a text that differs only on an iPhone.
     for (const m of src.matchAll(/deviceKey\('(welcomeSteps\.\w+)'/g)) {
-      keys.add(`${m[1]}Phone`);
-      keys.add(`${m[1]}Desktop`);
+      for (const suffix of ['Phone', 'Iphone', 'Desktop']) keys.add(`${m[1]}${suffix}`);
     }
+    for (const m of src.matchAll(/iphoneKey\('(welcomeSteps\.\w+)'/g)) keys.add(`${m[1]}Iphone`);
   }
   assert.ok(keys.size >= 80, `only ${keys.size} keys found`);
   for (const lang of ['fr', 'en']) {
@@ -203,7 +206,11 @@ test('every text of the release screens is in fr and en, none is unused', () => 
     }
   }
   for (const group of ['welcomeRelease', 'welcomeSteps']) {
-    for (const key of Object.keys(langs.fr[group])) assert.ok(keys.has(`${group}.${key}`), `unused: ${group}.${key}`);
+    for (const key of Object.keys(langs.fr[group])) {
+      // The texts of « Où le garder ? » (name step before task 2026-11-17-263) stay for the server screens' own step.
+      if (group === 'welcomeSteps' && KEPT_FOR_WHERE.includes(key)) continue;
+      assert.ok(keys.has(`${group}.${key}`), `unused: ${group}.${key}`);
+    }
     assert.deepEqual(Object.keys(langs.fr[group]).sort(), Object.keys(langs.en[group]).sort());
     assert.doesNotMatch(JSON.stringify(langs.fr[group]) + JSON.stringify(langs.en[group]), /Subsurface/);
   }
@@ -279,7 +286,7 @@ test('« Seulement sur cette tablette »: the device logbook is started and empt
   assert.equal(await createDeviceLogbook(deps), 0);
   assert.deepEqual(calls, [['start'], ['remove', [1, 2]]]);
   assert.match(sources.steps, /start: startWithoutAccount/);
-  assert.match(sources.steps, /if \(kind === 'device'\) void createOnDevice\(\)/);
+  assert.match(sources.steps, /disabled=\{busy \|\| nameInvalid\} onclick=\{createOnDevice\}/);
 });
 
 test('a file or a divelogs.de download goes into the new device logbook with the app’s import', async () => {

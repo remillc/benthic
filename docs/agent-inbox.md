@@ -1932,7 +1932,9 @@ Christian's request. Spec: new paragraph "Sharing a plan", the planner top bar, 
 
 Done in `feature/share-plan` (25d95a4, then on main): "Partager le plan" opens the five rows (ShareSheet gains optional rows and heading). The slate (PlanSlate.svelte) offers the base plan, "+5 min" (deepest level + 300 s), "+10 ft / +3 m" (every level deeper, times kept) and "Sans <gas>" per deco gas; each extra plan is one more planDive call to the core on a copy of the request, nothing computed in JavaScript. Rows are matched by order for levels and by depth for ascents and stops; a plan the core cannot compute shows "–". Sizes: 4 × 6 in, 3 × 5 in or full Letter; A6, A7 or full A4 elsewhere; the PDF is one page with the card at real size and cut marks. The PNG is drawn word by word on a canvas from the laid-out card (the SVG foreign object route tainted the canvas in the WebView) and cropped to its content. The .ssrf row needs a saved plan and uses the core export. Last choices remembered (slateSize, slateFile, slatePlus5, slatePlusDepth). Checked on the phone emulator: share sheet, slate preview with core-computed +5 min and +10 ft columns, PDF (A4 page, A6 card, cut marks) and table PNG. Not checked on device: a deco plan with "Sans <gas>" (covered by node tests).
 
-## [ ] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
+## [x] 2026-11-12-77 Read cylinder pressures from a photo (to-do #41): plan first, no code
+
+Closed on 16 November 2026 during the inbox clean-up: built and merged into `main` (`feature/gauge-camera`, ML Kit, task 77).
 
 **Christian asks you not to start the work.** First write here, under this task, a summary of how you plan to build this part of the app, then stop and wait for his go-ahead.
 
@@ -2904,7 +2906,9 @@ English: « {n} sites here », « Pins overlap at this scale. », « {n} sites i
 
 Done in feature/sites-map-select. 1: SiteMap names « fewInFullScreen » on Sites: no names on the map; in full screen they show with 8 pins or fewer in view and no two overlapping (measured); pins drawn by dive count, the most dived on top; no grouping. 2: a tapped pin is selected (1.3×, halo --od-secondary at 18 %, z-index front); od-map-site-card over the bottom of the map, above the credit (name, « {pays} · {n} plongées, la dernière le {date} » from sites.rowDives, max depth, chevron), label « {site}, {pays}, {n} plongées. Ouvrir la fiche du site »; it opens the site sheet (leaving full screen); a tap on the map or Back (lib/back-button.js, only when visible) closes it; « Centrer sur ma position » moves up; the map's label adds « {site} est sélectionné. ». 3: a tap whose 48 dp target touches several pin heads opens MapStackSheet.svelte (od-map-stack-sheet): blue disc on the map, « {n} sites à cet endroit », the place from place-lookup when found, « Les épingles se superposent à cette échelle. », rows by dive count with ink badge, name, dives, max depth, chevron; ✕, scrim and Back close. 4: the list shows the sites inside the visible area (lib/maps-logic inBbox, at moveend) under « {n} sites dans cette zone »; a search looks through the whole logbook; the to-do shortcuts count the whole logbook. 5: the route badge shows on the development server only (import.meta.env.DEV and VITE_SHOW_ROUTE), never in a built app. Spec updated (Sites map: no names …), release notes updated (the 147 line no longer mentions names). Checked on the phone emulator with the test account's 239 sites: no names, a tapped pin and its card, Back, 96 stacked pins in the sheet, Back, 212 sites in the area. Not checked: names in full screen with few pins, the place line (no answer during the test), iPhone, iPad and tablet layouts on a device.
 
-## [ ] 2026-11-14-151 Quick entry on the boat: sites by distance, an Android version, a « Choisir un site » screen
+## [x] 2026-11-14-151 Quick entry on the boat: sites by distance, an Android version, a « Choisir un site » screen
+
+Closed on 16 November 2026 during the inbox clean-up: built and merged into `main` (`feature/quick-entry-sites`).
 
 Decided with Christian on 14 November 2026. Mock-ups in `docs/mockups/`: `ios-saisie` (updated), `saisie-bateau-android` (new), `choisir-site-android` (new).
 
@@ -3213,13 +3217,13 @@ English: « Logbook », « Search the logbook », « 2 dives selected », « Rig
 
 Write in `docs/architecture.md` how the desktop build is organised, and add the desktop to `docs/ui-specification.md`. Tests: the table sorting, the selection and the right-click menu's items for one and several dives.
 
-Done (with task 170: Electron): the desktop shell (desktop/), the core compiled natively in a helper process (native/desktop, desktop/host; linux-x64 and win-x64 built here, mac-arm64 built and screenshotted on GitHub, round trip 98/0 on all three), the Carnet table (sorting, trips, selection, right-click menu, shortcuts, file drop), the detail pane (hover reading, figures, tabs, then in-place editing from task 172), the macOS menu bar, Réglages in the rail on Windows/Linux; docs/architecture.md section 10 and docs/ui-specification.md « Desktop logbook ». Later tasks (172 to 195) changed several of these and are ticked on their own.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-170 Desktop app: Electron, not Tauri (correction to task 169)
 
 Christian decided this on 15 November 2026, with you. Task 169 asks for Tauri 2 by default: **use Electron instead**, as you agreed with Christian. The rest of task 169 is unchanged. The Subsurface core is compiled natively and reached from Electron's main process (a Node native module or a helper process, your choice; write it in `docs/architecture.md`). Builds for Windows, macOS and Linux in the GitHub workflow. `docs/system-design.md` (section 7, « Desktop app ») now says Electron.
 
-Done: Electron; the core runs in a helper process (desktop/host) reached from the main process (desktop/bridge.cjs), see docs/architecture.md section 10; the desktop workflow builds linux-x64, win-x64 and mac-arm64 (started by hand).
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-171 Desktop app: Sites, Statistiques and Outils
 
@@ -3235,9 +3239,7 @@ English: « Search for a site », « 5 dives without a site · Find them a site 
 
 Update `docs/ui-specification.md` (desktop). Tests: the site table and map selection stay in sync; the chart's click opens the right dives.
 
-Done (Statistiques part, branch feature/desktop-stats): `pages/DesktopStatistics.svelte` (chosen in `App.svelte` on `layout.desktop`), `components/DesktopStatChart.svelte` (hover tooltip, a click selects the bar's dives in the Carnet), top bar with Filtrer, Annuler, Rétablir and a ⋮ naming the undo step, « Exporter le graphique » as a PNG through the share path (download fallback). Sites and Outils are not done in this branch.
-
-Done: the three parts, each from its own branch (see the « Done » notes above): Statistiques (pages/DesktopStatistics.svelte), Outils (pages/DesktopTools.svelte, task 196), Sites (pages/DesktopSites.svelte, tasks 175 and 177), all chosen in App.svelte from 1200 dp in the desktop app.
+Done on `feature/desktop-logbook` (Sites and Outils completed there by tasks 177 and 196).
 
 ## [x] 2026-11-15-172 Desktop app: automatic saving and editing a dive in place
 
@@ -3263,7 +3265,7 @@ English: « Add the visibility », « Recorded by the dive computer, can't be ed
 
 Tests: a field edit is saved without any button and survives a restart; Échap restores the value; undo and redo across two fields; a read-only value cannot be focused for editing; the exceptions still show their buttons.
 
-Done (detail pane, branch feature/desktop-detail): the detail pane is the editor. components/DesktopField.svelte (grey field, hover pencil, input in place, hint, Entrée/Échap/Tab, chips and suggestions) and components/DesktopDiveFields.svelte write through saveDiveChanges (the phone editor's core edit, one undoable step), logic in lib/desktop-edit.js; recorded values are read-only unless the dive is manual. Tests: tests/app/desktop-edit.test.mjs. The Carnet table cells and Ctrl/⌘+E (needs DesktopLogbook to dispatch `od-detail-focus-first`) are left to the Carnet.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-173 Desktop app: several logbooks and the new-logbook dialog
 
@@ -3286,17 +3288,13 @@ English: « New logbook », « Logbook name », « Where to keep it? », « On t
 
 Tests: two logbooks open in two windows at once; closing one shows the start screen; recent logbooks survive a restart; the iCloud Drive row exists on macOS only; creating a logbook in an empty git repository and in a cloud folder; a repository that already holds a logbook opens it unchanged.
 
-**Christian's decision (15 November 2026, replacing the synced-folders choice made earlier the same day): the personal clouds go through their APIs, with sign-in in the browser, and no detection of synced folders.** Google Drive (scope limited to the files OpenDives creates or opens), Microsoft OneDrive (Graph) and Dropbox, each as an OAuth app Christian registers (desktop/public client with PKCE, loopback redirect: http://127.0.0.1 for Google and Microsoft, http://127.0.0.1:53682/ for Dropbox); the client ids live in `desktop/oauth-clients.local.json` (not in git) until they ship with the app. OpenDives signs in, uploads and downloads the .ssrf file, notices a change made elsewhere and offers the version to keep on a conflict. A connected service shows « Connecté · {compte} » as in the mock-up. The folder detection in desktop/logbooks.cjs goes. Scope for Dropbox and OneDrive: the app folder (Christian, 15 November 2026: « on va laisser les choses telles quelles »; choosing any folder would need full access). iCloud Drive and WebDAV have no such API path for now (open).
-
-Done (APIs, without real keys): Google Drive, OneDrive and Dropbox sign-in (OAuth 2 with PKCE, system browser, loopback redirect), refresh tokens in safeStorage, cloud logbooks (working copy plus remote file, upload after each write-back, remote check on open, on focus and every 5 minutes, download when changed elsewhere, version-to-keep dialog on a conflict), the cloud step with « Se connecter » / « Connecté · {compte} » and a folder field, and the folder detection, iCloud and WebDAV rows removed. Tested against a fake provider (`tests/desktop/cloud.test.mjs`); never tried with real keys or accounts, so this task stays open until Christian's keys and a real trial.
-
-Done (15 November 2026): real trial with Christian's keys. Sign-in and creating a logbook work on OneDrive (Apps › OpenDives), Google Drive and Dropbox. The service rows say « Non connecté »; a waiting sign-in says the page is open in the browser and offers « Rouvrir la page ». Still open elsewhere: the providers' official logos (brand files to put in `docs/brand/providers/`), iCloud Drive and WebDAV, a screen for the sync state.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-174 Desktop app: the real OpenDives logo (correction to task 169)
 
 The desktop mock-ups sent with task 169 drew a logo that is not OpenDives'. They are fixed. Use the real logo, `docs/brand/opendives-logo-light.svg` (and `opendives-logo-dark.svg` in the dark theme), without redrawing it: in the title bar on Windows and Linux (20 dp), on the start screen with no logbook open (64 dp), and wherever task 169 put a logo. The app icon comes from the `opendives-icon-*` files in the same folder. Test: compare the title bar and the start screen with `docs/mockups/bureau-carnets-accueil.dc.html`.
 
-Done: the start screen uses `logo-light.svg` / `logo-dark.svg` of `app/public` (the same drawing as `docs/brand/opendives-logo-*.svg`, not redrawn) at 64 dp. Windows and Linux keep the system title bar with the window icon `icon-round.png` (task 170); task 169 put no other logo in the desktop screens.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-175 Desktop Sites: « plongées sans site » stays visible at the top of the list (correction to task 171)
 
@@ -3308,6 +3306,8 @@ Christian decided this on 15 November 2026. In task 171, « 5 plongées sans sit
 - The line under the table is removed.
 
 Tests: with 200 sites, the bar stays visible while the table scrolls; the bar disappears when the count reaches 0.
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-176 Desktop Statistiques: a richer list of statistics (correction to task 171)
 
@@ -3321,7 +3321,7 @@ Christian decided this on 15 November 2026. The list of statistics on the left o
 
 Tests: each built-in statistic shows its icon and a preview drawn from the logbook; a filter changes the previews; an empty logbook shows no preview (the slot stays empty).
 
-Done: the rows of the list carry the icon tile, the summary line and the preview (`components/DesktopStatIcon.svelte`, `DesktopStatPreview.svelte`, data in `lib/desktop-stats.js`); statistics the diver created take the bars icon and a preview of their per-dive depths. Tests: `tests/app/desktop-stats.test.mjs`.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-177 Desktop Sites: every screen (site sheet, in-place editing, search, stacked pins, new site, dives without a site, clean up)
 
@@ -3348,6 +3348,8 @@ Christian decided this on 15 November 2026. Follows tasks 171 and 175 (the Sites
 English: « New site », « Delete the site », « Every change is saved at once », « Move the map or the crosshair to correct », « Updated from the new position », « 2 sites in the logbook », « 1 site matches “cole” », « 6 sites here », « Zoom in here », « A site already exists within 100 m: {name}. », « Use this site », « Add the site », « Dives without a site », « Choose a site… », « Assign them all to the same site », « New site “{text}” at the dive's position », « Clean up the sites », « Not duplicates », « Merge », « Sites without a dive », « Delete the selection (2) », « Sites merged · Undo ».
 
 Tests: editing a site field saves it without a button; moving the crosshair refills country and region but not a corrected one; Pays autocompletes with logbook countries first; search dims the other pins; stacked pins open the list; a new site within 100 m of another shows the notice; assigning a suggested site removes the dive from the list and lowers the count; a merge is undone by Ctrl/⌘+Z.
+
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-178 Actions on several dives: merge, edit together, copy and paste; no « Partager… » on desktop (correction to tasks 169 and 172)
 
@@ -3380,7 +3382,7 @@ Tests: merging two consecutive dives 20 min apart gives one dive that Subsurface
 
 **Done (parts 1 and 2), 15 November 2026, branch `feature/multi-dive-actions`:** the façade has `merge_dives(ids)` (Subsurface's `MergeDives` through `dive_table::merge_dives`, one undoable step; the merged dive keeps the first numbered dive's number and the following dives are renumbered as Subsurface does) and `edit_dives(ids, changes)` (the multi-dive edits of `command_edit.cpp`, one undoable step; chips go through `buddiesAdd/Remove`, `diveguideAdd/Remove`, `tagsAdd/Remove`, never a replacement). Plugin methods `mergeDives` and `editDives` on Android (JNI, Kotlin) and iOS (Swift), wrappers in `core-api.js`. Pure rules in `app/src/lib/multi-dive.js` (`canMerge`, `multiEditState`, `multiEditChanges`), actions `mergeDives` and `editDivesTogether` in `lib/logbook.svelte.js`. Phone and tablet: « Fusionner en une plongée » (disabled with its supporting line) and « Modifier ensemble… » in the ⋮ menu of the selection, the sheet `pages/EditDivesTogether.svelte`, the snackbars « N plongées fusionnées » and « N plongées modifiées ». Tests: `tests/multi_dive_test.cpp` (`build/poc/multi-dive`), `tests/app/multi-dive.test.mjs`. Part 3 and the desktop UI remain.
 
-**Done (desktop), 15 November 2026, branch `feature/desktop-multi-dive`:** the right-click menu for two dives or more follows the task's order (Fusionner with Ctrl/⌘+M, disabled with its supporting line when `canMerge` fails; Ajouter à un voyage…; Modifier ensemble… with Ctrl/⌘+E; Copier; Exporter…; Partager…; Supprimer); `DesktopContextMenu` shows a supporting line (`hint`) and a tooltip on a disabled item. Merge uses `mergeDives`, selects the merged dive and offers « N plongées fusionnées · Annuler » (Ctrl/⌘+Z too). « Modifier ensemble… » is the dialog `components/DesktopEditTogetherDialog.svelte` (« Modifier N plongées », « Plusieurs valeurs », chips « sur 2 plongées », « Appliquer aux N plongées », one undoable step); with one dive Ctrl/⌘+E still focuses the detail pane. Ctrl/⌘+C writes the table's rows as tab-separated text (header line included) and the dives' Subsurface XML (core export); Ctrl/⌘+V, the Mac's Paste menu and « Coller » in the right-click menu of the table's empty area import them through `importData` (duplicate check), « N plongées collées · Annuler »; never when the focus is in a text field. The desktop host and plugin gained `mergeDives` and `editDives` (they were missing on desktop), and `importDives` stages its file under a unique name (on Windows the helper keeps the staged file open and the failed removal hid the import's answer). **Differs from the task:** Electron cannot put a custom clipboard type beside the text (every `writeText`/`writeBuffer` replaces the other formats), so the bridge writes the plain text and keeps the XML in the main process, tied to that text; the dives are offered while the clipboard still holds exactly that text (any window of the app), and a `<divelog>` text works everywhere. Tests: `tests/app/desktop-clipboard.test.mjs`, `tests/app/desktop-table.test.mjs`, `tests/desktop/clipboard.test.mjs`.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-179 Desktop (Windows, Linux): Annuler and Rétablir at the top of the ⋮ menu
 
@@ -3397,7 +3399,7 @@ English: « Undo: {last action} », « Redo », « Undo: Merge the sites ».
 
 Tests: after a merge, the menu shows « Annuler : Fusionner les sites » and choosing it undoes the merge; then « Rétablir : Fusionner les sites » redoes it; with an empty history both items are disabled.
 
-Superseded by tasks 187, then 192 and 194: Annuler and Rétablir, named after the last change, start each section's ⋮ menu (Carnet, Sites, Statistiques); Outils has no ⋮ in its top bar (task 196).
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-180 Desktop: hover state of the navigation rail items
 
@@ -3411,9 +3413,9 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 
 Test: hovering each rail item shows the 8 % layer and the ink colours; leaving it restores them; the active item keeps its blue pill.
 
-Done: with a mouse (hover: hover, pointer: fine), a rail item's 56 × 32 dp pill gets an 8 % ink layer and its icon and label turn ink; the active section keeps its pill and colours under the layer; keyboard focus shows a 2 dp ring 2 dp outside the pill; normal arrow pointer, no tooltip; the fade is skipped with reduced motion (NavRail.svelte). Checked in a desktop window on Statistiques.
+Done on `feature/desktop-logbook`.
 
-## [x] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
+## [ ] 2026-11-15-181 Desktop Carnet: movable columns, order kept between sessions
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-colonnes.dc.html` (« Site » being dragged between Durée and Temp.).
 
@@ -3428,7 +3430,7 @@ English: « Drop to place “Site” between Durée and Temp. », « Reset the c
 
 Tests: dragging « Site » after « Durée » moves it there; N° cannot be moved; the order survives closing and reopening the window and the app; two logbooks keep their own orders; « Rétablir l'ordre des colonnes » restores the default; the logbook file is byte-for-byte unchanged by a column move.
 
-Done: a header is dragged to move its column (floating header with ⠿, pale slot, 3 dp insertion bar with its marker; Échap cancels; a click without moving still sorts); N° stays first; Alt+Maj+← → move the focused column; « Rétablir l'ordre des colonnes » ends the columns menu; the order is kept on this computer through device-store (od.desktopColumns), never in the logbook. Logic in lib/desktop-table.js (moveColumn, dropTarget, shownColumns in the diver's order), tested. Not done: column widths (there is no column resizing yet), and the key per logbook waits for several logbooks (task 173): today one logbook, one key.
+Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
 
 ## [x] 2026-11-15-182 Desktop Carnet: Compagnons replaces Temp. in the default columns (correction to task 169)
 
@@ -3443,7 +3445,7 @@ English: « Buddies ».
 
 Test: a new logbook shows N°, Date, Site, Prof. max, Durée, Compagnons; Temp. can be added back from the columns menu; a saved column set is not changed.
 
-Done: Compagnons is a default column instead of Temp. (secondary text, about 124 dp, sorted by the first buddy); a diver's own column set is kept; Temp. stays in the columns menu.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-183 Desktop Carnet: curve chips under the profile (Température, Gaz, ppO₂, Plafond, Tissus)
 
@@ -3459,7 +3461,7 @@ English: « Temperature », « Gas », « ppO₂ », « Ceiling », « Tissues �
 
 Tests: turning Température on draws the curve and its scale; two chips on at once draw both; the choice survives switching dives and restarting; the readout shows the active curves' values.
 
-Done: the chips choice is kept in device-store (`od.profileLayers`, lib/profile-layers.js), the tooltip adds the active curves.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-184 Desktop Carnet: editable fields recognisable at rest, no floating toolbar (correction to task 172)
 
@@ -3475,7 +3477,7 @@ English: « Grey fields can be edited with a click and are saved at once. », «
 
 Test: with no pointer over the pane, every editable field shows its grey fill and the read-only ones do not; an empty field shows its invitation.
 
-Done: fields at rest, invitations, hint line, read-only values as plain text, no floating toolbar.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-185 Desktop profile: dashed line at the average depth
 
@@ -3490,9 +3492,11 @@ English: « avg. 17.9 m ».
 
 Test: the line sits at the « Prof. moy. » value and follows the depth unit (m or ft).
 
-Done: dashed #114477 line (`--od-profile-mean`) with « moy. 17,9 m » label, desktop only.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-186 Desktop Carnet: the ⋮ menu of a dive in the detail pane
+
+**Superseded** by task 194 (the detail pane has no ⋮ any more). Closed during the inbox clean-up of 16 November 2026.
 
 Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet-groupe.dc.html` (the menu shown open).
 
@@ -3510,8 +3514,6 @@ English: « Enlarge the profile », « Add to a trip… », « Remove from the t
 
 Test: each item does its action on the dive shown; « Retirer du voyage » appears only for a dive in a trip; the shortcuts work without opening the menu.
 
-Superseded by task 194: the detail pane has no ⋮; its actions are icons (plan, share, export, delete), ⤢ on the chips row, the others in the row's right-click menu.
-
 ## [x] 2026-11-15-187 Desktop: Annuler and Rétablir as icon buttons, one ⋮ in the Carnet (correction to task 179)
 
 Christian decided this on 15 November 2026, after task 179: two ⋮ menus one above the other (top bar and detail pane) were confusing. Mock-ups: `docs/mockups/bureau-carnet-groupe.dc.html` and the other desktop Carnet screens.
@@ -3525,7 +3527,7 @@ English: « Undo: {last action} », « Redo: {action} », « Columns shown ».
 
 Tests: the undo button names the last change in its tooltip and undoes it; redo is disabled until something is undone; the Carnet top bar has no ⋮; the columns button opens the columns menu from the table header.
 
-Superseded by task 192: Annuler and Rétablir went back into a ⋮ of the list header; one ⋮ in the Carnet (task 194).
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-188 Desktop: « Enregistrer une copie… » offers to open the copy
 
@@ -3538,7 +3540,7 @@ English: « Copy saved · Open ».
 
 Test: saving a copy leaves the original window on the original logbook; « Ouvrir » opens the copy in a second window, and edits there do not reach the original.
 
-Done: `saveCopy()` in `app/src/lib/desktop-logbooks.svelte.js` (system save dialog, the copy written by the bridge, snackbar « Copie enregistrée · Ouvrir » opening it in a new window); ⇧⌘S on the Mac (menu), Ctrl+Maj+S and the selector entry on Windows and Linux. Tested in `tests/desktop/windows.test.mjs`.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-189 Desktop: exporting dives (the export dialog, « Exporter le carnet… »)
 
@@ -3556,7 +3558,7 @@ English: « Export 2 dives », « Which dives », « The 2 selected dives », «
 
 Tests: with two dives selected, the file holds those two only; « Tout le carnet » holds them all; with a filter, the filtered choice appears and is the default; the anonymised file has no names, notes or positions; the last format is remembered.
 
-Done: components/DesktopExportDialog.svelte (title with the count, « Quelles plongées » and « Format » as choice rows, « Anonymiser », the last format remembered in device-store) opened by « Exporter… » in the right-click menu and the dive's icons, Ctrl/⌘+Maj+E, the macOS Fichier › Exporter…, and « Exporter le carnet… » in the Windows/Linux logbook selector (whole logbook); « Exporter… » opens the system's save dialog through the bridge (od:saveAs) with the proposed name (lib/desktop-export.js, tested: « plongees-6-7.ssrf », « carnet-2026-11-15.uddf »). Not checked by hand: the file actually written through the save dialog (a native dialog the test window cannot drive).
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-190 Profiles: thinner curve lines on every platform
 
@@ -3583,7 +3585,7 @@ Christian noticed on 15 November 2026 that the desktop detail pane has no tabs a
 
 Test: the five tabs are there and keyboard-navigable; a click on Site, Compagnons or Visibilité edits the value in place and the change is saved without any other action; Ordinateur cannot be edited.
 
-Done: tabs styled as the mock-ups, last tab kept (`od.detailTab`, lib/detail-tab.js), editing in place in Informations, Équipement, Gaz and Notes.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-192 Desktop Carnet: the header moves into the list column, Annuler and Rétablir in a ⋮ (correction to task 187)
 
@@ -3603,7 +3605,7 @@ English: « More logbook options », « Undo: {last action} », « Redo », « C
 
 Test: no bar spans the window above the two panes; the list header shows the title, the count, the search, the columns button and the ⋮; the ⋮ menu lists Annuler with the last action and Rétablir greyed out after a single edit; Ctrl+Z still undoes.
 
-Done: the list column has its own header (« Carnet » with the count line on one line, the search 220 to 300 dp, the columns button « Colonnes affichées », a ⋮ « Plus d'options du carnet »), no bar across the window; the ⋮ starts with « Annuler : {action} » and « Rétablir » named from the core's undo step (lib/undo-name.js), greyed out when there is nothing, then (task 194) Filtrer… (Ctrl/⌘+Maj+F), Renuméroter les plongées…, Ordinateurs du carnet and, only when the selection touches a trip, Fusionner avec le voyage précédent/suivant (lib/desktop-table.js adjacentTrips, tested).
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-193 Desktop Carnet: site map behind the detail header, a livelier table
 
@@ -3627,7 +3629,7 @@ Christian decided this on 15 November 2026. Mock-ups: `docs/mockups/bureau-carne
 
 Test: selecting a dive whose site has coordinates shows the faded map behind its header, one without a site shows none; the selected row is rounded; « Site à préciser » is italic; a buddy has its initial badge.
 
-Done (detail pane part): site map behind the header (SiteHeaderImage `desk`), 36 dp top padding. The table part is the Carnet's.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-194 Desktop Carnet: one ⋮ only, dive actions as icons, « Partager… » back (corrections to tasks 178, 186 and 192)
 
@@ -3656,7 +3658,7 @@ English: « Plan from this dive », « Share… », « Export the dive… », «
 
 Tests: only one ⋮ is on screen; with dive N° 5 selected (just above the trip of 2 February 2013) the menu shows « Fusionner avec le voyage suivant » and not « précédent »; with dive N° 9 selected it shows neither; « Partager… » opens the native share sheet on macOS and Windows and the export dialog on Linux; ⤢ and a double-click enlarge the profile.
 
-Done (detail pane part): ⋮ removed; plan, share, export and delete icons; ⤢ at the end of the chips row and on double-click. « share » is sent as `od-desktop-command`, to be handled by DesktopLogbook.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-195 Desktop Carnet: no tooltip while dragging a column (correction to task 181)
 
@@ -3668,7 +3670,7 @@ Christian decided this on 15 November 2026. Mock-up: `docs/mockups/bureau-carnet
 
 Test: during a column drag, no tooltip appears on screen; the live region announces the target position.
 
-Done: no tooltip while dragging a column; an aria-live region announces « « Site » sera placé entre Durée et Compagnons » (or « en dernier »). Checked in a desktop window.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-196 Desktop app: the Outils section (planner, desaturation, gas tools)
 
@@ -3688,7 +3690,7 @@ English: « Plan », « More plan options », « Share the plan… », « Planne
 
 Tests: each tool opens in the right pane from the list; the planner ⋮ menu has exactly the two items; « Préparer ce mélange » opens the blender with 25/28 as the target; the two desaturation figures are top-aligned.
 
-Done: `pages/DesktopTools.svelte` (list and right pane, chosen in App.svelte when `layout.desktop`), `components/DesktopPlanner|Desaturation|EadMod|BestMix|Blender.svelte`, grey fields and connected segments (`DesktopField`, `DesktopSegments`), logic in `lib/desktop-tools.js` (tested in `tests/app/desktop-tools.test.mjs`) and state in `lib/desktop-tools.svelte.js`. The blender follows the rules of tasks 198 (desktop part), 199 and 201. Differences from the mock-ups are listed in the report.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-197 Phone and tablet: « Préparer ce mélange » in Meilleur mélange
 
@@ -3719,7 +3721,7 @@ Tests: picking a 12 L 232 bar cylinder fills the final pressure with 232 bar (3 
 
 Done (phone and tablet parts), not ticked: the desktop part is on another branch. Order: Trimix Oxygène, Hélium, then Bouteille and « Pression finale désirée » on one line; Nitrox Oxygène and Bouteille, then the final pressure on its own line. The final pressure follows the cylinder's working pressure (`lib/gas-blender-form.js`) until the diver types a value, which a change of cylinder keeps. Helper « Service : 3 365 psi »; above it, a warning in `--od-alarm` with a triangle (`TextField` `warning`), the steps still computed. « Pression finale » renamed. Tests in `tests/app/gas-blender-form.test.mjs`. No calculation file changed (`gas-blend.js`, `gas-calculator.js`).
 
-Done: desktop part (branch feature/desktop-tools: order, prefill and kept value, helper and warning, the cylinder drawing, then task 199) and phone/tablet part (branch feature/phone-gas-tools, merged into main: order, prefill from lib/gas-blender-form.js, « Service : … » helper and warning, rename), both tested.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-199 Desktop gas blender: no grey layer in the cylinder drawing (correction to task 198)
 
@@ -3732,7 +3734,7 @@ Christian decided this on 15 November 2026: a grey layer matches no gas. Mock-up
 
 Test: with gas left in the cylinder, the drawing has no grey layer and its layers add up to the final pressure.
 
-Done (branch feature/desktop-tools, desktop blender): no grey layer; helium, oxygen and the top-up gas in fill order, each the height of its partial pressure in the final mix, residual included (example 77, 26, 117 bar, tested in tests/app/desktop-tools.test.mjs); Nitrox: oxygen and top-up only; aria-label as specified.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-200 Phone and tablet gas blender: follow the mock-ups for « Dans la bouteille » and the notes
 
@@ -3761,11 +3763,9 @@ English: « Leave empty if the cylinder is empty ».
 
 Test: on the desktop blender, the cylinder's Oxygène and Hélium sit under Pression; leaving Pression empty gives the steps for an empty cylinder.
 
-Done (branch feature/desktop-tools): « Dans la bouteille » in two columns, Pression alone with « Laissez vide si la bouteille est vide », Oxygène and Hélium under it (Oxygène alone in Nitrox), « Compléter avec » on its own line; an empty Pression gives the steps of an empty cylinder (tested).
+Done on `feature/desktop-logbook`.
 
-## [x] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
-
-Done later (start-up choice): « Ouvrir au démarrage » in Réglages › Carnet, « Le dernier carnet » (default) or « Choisir à chaque fois », kept in the main process (`<userData>/logbooks.json`); tested in `tests/desktop/startup.test.mjs`.
+## [ ] 2026-11-15-202 Desktop app: Réglages, the account sheet, « À propos » in the ⋮ menus
 
 Christian approved this on 15 November 2026. Mock-ups (row « Bureau · Réglages »): `docs/mockups/bureau-reglages.dc.html` (Unités), its group copy `bureau-reglages-groupe.dc.html` (a dropdown open), `bureau-reglages-affichage.dc.html`, `bureau-reglages-carnet.dc.html`, `bureau-reglages-recherche.dc.html`, `bureau-reglages-macos.dc.html`, `bureau-compte.dc.html`; the ⋮ menus open in `bureau-carnet-groupe.dc.html`, `bureau-sites-groupe.dc.html`, `bureau-stats-groupe.dc.html`. The settings themselves are the phone's (`docs/ui-specification.md`, Settings); only the layout is new.
 
@@ -3792,7 +3792,7 @@ English: « Settings », « Saved at once, on this computer », « Search settin
 
 Tests: Ctrl+, opens Réglages; a change of unit applies at once in the Carnet; search « plafond » lists the matching settings; the rail initial opens the account sheet; « À propos d'OpenDives » is in the ⋮ menus of Carnet, Sites and Statistiques and not in Réglages; on macOS ⌘, opens the separate window.
 
-Done: Réglages is a section (rail gear, Ctrl+,) with the eleven categories, search across them (highlight, « N réglages pour « … » »), « Taille du texte » (Petite, Normale, Grande; Ctrl++, Ctrl+-, Ctrl+0; Electron zoom through the preload's setZoom, kept as `od.textSize`) and « Fichier du carnet » › Emplacement with « Afficher dans le dossier ». Rows are the phone's (`pages/Settings.svelte`, desktop branch `desk`; logic in `lib/desktop-settings.js`, tests in `tests/app/desktop-settings.test.mjs`). The account sheet is `components/DesktopAccountSheet.svelte`. « À propos d'OpenDives » is a dialog (popup of `pages/About.svelte`) at the end of the Carnet and Statistiques ⋮ menus (Sites: still to add by the Sites branch), and « Filtre libre… » (Ctrl+Maj+F) replaced « Filtrer » in Statistiques. macOS: a separate 980 × 680 window (`desktop/main.cjs`, `?settings-window=1`), untested on a Mac. Not done: « Ouvrir au démarrage » (one logbook only, nothing to choose), enforcement of « Seulement sur Wi-Fi ou câble » (the switch is stored; the desktop has no metered-connection signal).
+Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
 
 ## [x] 2026-11-15-203 App: the simple logo replaces « Trois vagues » everywhere
 
@@ -3808,6 +3808,7 @@ Replace « Trois vagues » in:
 Tests: the launcher icon, the splash screen (light and dark), the About screen, the first launch and the side menu show the disc with one white wave and nothing else; no file of the app still contains the wave colours #D4E2F2/#BCD2EB inside a logo; the favicon is the simple logo.
 
 Done: the simple logo replaces « Trois vagues » in `docs/brand/` (`opendives-logo.svg`, icon and logo files regenerated, old files in `docs/brand/previous/`, plus the rendered `opendives-icon-1024.png` and `opendives-logo-1024.png` for the desktop), Android (foreground, monochrome with the wave cut out, splash marks, launcher PNGs), iOS (AppIcon light and dark, opaque, in `app/ios` and `app/resources/ios`; Splash.imageset), and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files). `tests/app/logo.test.mjs` checks the logo files. The release note about the logo was reworded. Left to the coordinator: the desktop window icon and splash (`desktop/resources/`), from the two PNGs in `docs/brand/`.
+
 
 ## [x] 2026-11-15-204 Empty logbook: dive profile illustration, large pair button, option cards
 
@@ -3837,7 +3838,6 @@ Test: the iPhone first launch in light mode shows a blue water column, never bla
 
 
 Done: checked, nothing to change. In a browser with `?theme=ios` (iPhone 393 x 852 and iPad 820 x 1180, light and dark), the computed water gradient ends in `--od-water-bottom` (#5584B5 light, #4C8BD4 dark) and the line is `--od-trace` (#1F2124 light, #F4F4F2 dark); no iOS-specific style darkens it. Guarded by `tests/app/welcome-start.test.mjs`.
-
 ## [x] 2026-11-15-206 iPhone and iPad first launch: the short texts of Android
 
 Christian approved this on 15 November 2026 (« Il y a beaucoup trop de texte »). Mock-up: `docs/mockups/ios-accueil.dc.html` (« Premier lancement · iPhone »). The iOS layout does not change (large title, the profile, a grouped list with chevrons); only the texts become those of the Android first launch, already in `app/src/i18n/fr.json` (`welcome`):
@@ -3853,14 +3853,13 @@ Test: the iPhone first launch shows one short line under the title and a one-lin
 
 
 Done: the iOS branch of `WelcomeStart.svelte` now uses `welcome.headline` under the title, `existingShort`/`existingNote`, `createShort`/`createNote`, `noAccount` with `noAccountNotePhone` (phone) or `noAccountNoteTablet` (iPad); the git link is unchanged. `welcome.intro`, `existing`, `existingText`, `create`, `createText` and `noAccountText` are removed from en, fr and fr-CA (nothing else referenced them). One release-note line added (fr, en). Layout unchanged; checked in a browser at iPhone and iPad sizes, light and dark.
-
 ## [x] 2026-11-15-207 New logbook dialog: a close button at every step
 
 Christian approved this on 15 November 2026. Mock-ups: `docs/mockups/bureau-nouveau-carnet-choix.dc.html`, `bureau-nouveau-carnet-nuage.dc.html`, `bureau-nouveau-carnet-git.dc.html`. The « Nouveau carnet » dialog (`app/src/components/DesktopNewLogbook.svelte`) gets a ✕ icon button in its top right corner, at every step (step 1 « Nouveau carnet », step 2 « Dans votre nuage » and « Dans un dépôt git »): 40 dp, fully rounded, transparent, a 24 dp ✕ in `--od-text`, aligned with the step line and the title (the header is a row: step line and title on the left, ✕ on the right, pulled 8 dp into the dialog's padding). Label « Annuler la création du carnet », tooltip « Annuler (Échap) ». It closes the dialog without creating anything, exactly like Échap (and like closing during a cloud sign-in in the browser: the sign-in is abandoned, no file is created). « Retour » at the bottom of step 2 is unchanged. English: « Cancel creating the logbook », tooltip « Cancel (Esc) ».
 
 Test: at each step, the ✕ closes the dialog, no logbook is created, the window is back to where it was; Échap does the same.
 
-Done: the ✕ (40 dp, round, transparent, 24 dp, label « Annuler la création du carnet », tooltip « Annuler (Échap) ») sits top right of the dialog at every step and closes it like Échap (Échap now works wherever the focus is, a sign-in waiting in the browser is cancelled, nothing is created). Checked in a stub of the bridge (each step, ✕ and Échap) and in the Electron window.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-208 New logbook: the cloud path in three steps, one dialog frame, sign-in as the main action
 
@@ -3877,7 +3876,7 @@ English: « Step 1 of 3 », « In your cloud », « Choose the service to keep t
 
 Tests: the dialog keeps the same size and place through every step and back; step 3 shows « Se connecter à {service} » until the sign-in comes back, then the connected state and « Créer le carnet »; a service already authorised opens step 3 connected; « Changer de compte » signs in with another account; WebDAV creates the logbook only with a valid server and credentials.
 
-Done: the cloud path is three steps in one 560 × 526 frame (checked at every step and back: same size and place, 150 ms cross-fade, none with reduced motion): the services (Google Drive, OneDrive, Dropbox, iCloud Drive on macOS as a disabled « Pas encore disponible » row, WebDAV ou Nextcloud), then the connection step with the band, « Se connecter à {service} » (becomes « Annuler la connexion » with « Rouvrir la page » while the browser waits, cancelled on ✕, Échap, « Retour »), the connected state with « Changer de compte » (sign-in again choosing an account; the stored account is replaced only on success) and « Créer le carnet ». No « Dossier » field: the file goes into an OpenDives folder. WebDAV ou Nextcloud is built in `desktop/cloud.cjs` (see architecture, section 10) with errors under the field concerned; verified end to end in Electron against a fake WebDAV server. Official service logos are still neutral squares.
+Done on `feature/desktop-logbook`.
 
 ## [x] 2026-11-15-209 App: the simple logo with relief replaces the flat simple logo
 
@@ -3887,8 +3886,6 @@ Replace the flat simple logo by this one everywhere task 203 put it: `docs/brand
 
 Tests: every place that showed the flat simple logo shows the relief version; the Android monochrome icon stays flat; the favicon at 16 px stays readable.
 Done: the relief logo replaces the flat simple logo on this branch in `docs/brand/` (`opendives-logo.svg`, icon and logo files, `opendives-icon-1024.png`, `opendives-logo-1024.png`; the flat files are in `docs/brand/previous/` with the suffix `-simple`), Android (foreground and splash marks with gradients in `aapt:attr`, minSdk 24; launcher PNGs; the monochrome icon stays flat), iOS (AppIcon light and dark, now full-bleed and opaque; Splash.imageset) and the web (favicon, apple-touch-icon, `logo-{light,dark,menu}.svg`; the components load these files as images, so no gradient id is shared). The favicon is the relief simplified (disc gradient and a 2.6 wave, no rim, no shadow wave) because the shadow made the wave grey at 16 px. `tools/build-logo-assets.mjs` rebuilds every file (PNGs drawn by Edge headless). `tests/app/logo.test.mjs` checks them. Left to the desktop branch: the title bar, desktop splash and start screen, `desktop/resources/icon*.png`, and the rebuild of `app/dist`.
-
-Done (desktop branch): `desktop/resources/icon.png` and `icon-round.png` copied from the relief brand PNGs; the OpenDives tile of the « Nouveau carnet » dialog uses `logo-light.svg` instead of a flat inline mark; the start screen and the account sheet already load the logo files.
 
 ## [x] 2026-11-15-210 First launch on tablet: a larger logo and name
 
@@ -3916,7 +3913,9 @@ Christian decided this on 15 November 2026. To-dos and ideas get a third tag, `[
 
 Done: rule read in docs/TODOS.md and docs/IDEAS.md; [site] items (pages, texts, look and publishing of opendives.app, folder site/) are built and published from tasks, as usual. Nothing to code.
 
-## [ ] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+## [x] 2026-11-15-213 Tablet first launch for the release edition, and « Ouvrir ou importer un carnet »
+
+**Superseded** by task 218 (the first launch in steps); the work was taken off `main` and kept on `feature/release-first-launch` (task 216). Closed during the inbox clean-up of 16 November 2026.
 
 Christian approved this on 15 November 2026. Mock-ups:
 - `docs/mockups/android-tablette-premier-lancement-production-paysage.dc.html`
@@ -4094,7 +4093,7 @@ In the meantime, use the existing empty-logbook screen and the existing error me
 - Each working path (tablet only, git create, git open, file import, divelogs.de) ends in an open logbook.
 - The beta on `main` is untouched.
 
-Done: on the branch `feature/release-new-logbook` (task 217), not merged into `main`. The right-hand column of the release first launch is now the steps of the mock-ups (`components/FirstLaunchSteps.svelte`, order in `lib/first-launch-steps.js`, state in `lib/first-launch.svelte.js`): « Pour commencer », « Nouveau carnet », the cloud (service, connection, connected), git, « Importer un carnet » (file, divelogs.de form and progress, « Nouveau carnet » with the summary) and « Ouvrir mon carnet OpenDives » (cloud, list, git), with the shared-axis X transition on the column only (« Retour » plays it backwards, reduced motion cuts it). The blue panel is unchanged and its line draws only when the page opens. The dialog, its tokens and the line « Aucune plongée n’est envoyée à OpenDives. » are removed (texts in `welcomeSteps`, `fr.json` and `en.json`). Working paths, checked in headless Edge with a fake plugin: Seulement sur cette tablette, git create, git open, file import, divelogs.de. Not done: « Essayer avec un carnet d’exemple » (hidden until #69); every cloud action says « Le nuage arrive dans une prochaine version. » (#74). The name is kept as a label (`od.logbookName`): the device logbook is a local git repository in the app’s folder, not a `.ssrf` file, so renaming it needs a native change; the sanitising and « (2) » rule is `lib/logbook-name.js` with tests. The git step has no user name field: the first segment of the address is sent with the token. divelogs.de gives no progress inside the download (the bar goes from 0 to N). Tests: `tests/app/release-welcome.test.mjs`.
+Done on `feature/release-new-logbook` (carried into `feature/release-new-logbook-two-steps`).
 
 ## [x] 2026-11-15-219 « Une question ? À propos et contact » at the bottom of the first-launch screens (release edition and beta)
 
@@ -4245,7 +4244,7 @@ Mock-ups:
 - The number in the help line and in the dialog equals the number of lines in the dialog.
 - The beta on `main` is untouched.
 
-**Done:** on `feature/release-new-logbook` (release edition only, `main` and the beta untouched). The list of formats is one data file, `app/src/lib/import-formats.js` (18 entries, each a « works » line of `docs/import-formats.md`: 4 in « Formats ouverts », 10 in « Montres et ordinateurs de plongée », 4 in « Autres carnets »); the help line (« 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. ») and the dialog text take their number from its length, CSV is not named. `ImportFormats.svelte` holds the link « Voir les formats acceptés » (14 sp, `--od-release-link` = #1F5C99, underlined, hand, hover) and the basic dialog on `Md3Dialog` (no ✕, « Fermer » bottom right, scrim, Escape and Back). The « Ce fichier n’a pas pu être lu » block now exists on the source screen (it was a system dialog before). Test: `tests/app/import-formats.test.mjs` (parses the report). Differences from the mock-ups: only the working formats are listed (the mock-up lists more), the third column title wraps, « Fermer » is the release blue as in the mock-up.
+Done on `feature/release-new-logbook` (not merged): the real total from `docs/import-formats.md`, « 18 formats : .ssrf, .xml, UDDF, FIT, Suunto, Shearwater et d’autres carnets. » (no CSV); the link « Voir les formats acceptés » on the source and « fichier illisible » screens; the basic dialog « Formats acceptés » (Fermer, scrim, Back) in three columns read from one list, `app/src/lib/import-formats.js`, checked against the report by `tests/app/import-formats.test.mjs`.
 
 ## [x] 2026-11-16-224 Release edition: the rest of the first launch, the empty logbook, the demo logbook and the CSV import
 
@@ -4325,8 +4324,6 @@ Mock-ups: `docs/mockups/android-tablette-import-csv-{type,colonnes,apercu}-paysa
 
 Use the core's CSV import (the one task 221 checked) with the column mapping chosen here. Once it works, add CSV to `docs/import-formats.md` and to the formats list (task 223 left it out).
 
-**Done (parts 1–6), branch `feature/release-first-launch-complete`:** portrait for every step (540 dp compact hero from the second step); the connect screens (hint under the button, connection in progress, refused) with the state in `lib/cloud-connection.js` — « Se connecter » still shows the « coming » message until idea #74, the screens are reachable in development through `window.__firstLaunch.connection`; WebDAV create and open with their error; the git, no-logbook, unreadable-file and divelogs.de credential errors; the interrupted divelogs.de download with « Annuler » and « Reprendre » (the screen and the resume logic are in, **but the plugin cannot resume yet**: it needs `divelogsList` and a by-ids `divelogsDownload`, see `lib/first-launch-import.js`); the « Formats acceptés » dialog without a number; the tablet empty logbook with the wider profile and its ⋮ menu (« Ouvrir un autre carnet » and « Nouveau carnet » open the first launch; « Renommer le carnet » and « Changer d’endroit » show a « coming » message). Parts 7 and 8 are on `feature/release-csv-demo`. Not ticked: the coordinator ticks it when parts 7–8 are in.
-
 ### Test
 
 - In the release build, on a tablet, in both orientations: every screen above matches its mock-up.
@@ -4336,8 +4333,7 @@ Use the core's CSV import (the one task 221 checked) with the column mapping cho
 - CSV: a Seabear file and a hand-mapped file each import one correct dive.
 - The beta on `main` is untouched.
 
-Done (parts 7–8): branch `feature/release-csv-demo` (from `feature/release-first-launch-complete`). Demo logbook: `lib/demo.js`, `lib/demo.svelte.js`, `components/DemoHost.svelte` (banner, `demo-quitter`, `demo-ajout`); no account means no sync, device dives are never offered to an account while it is open, and the account routes open the exit dialog. CSV: façade `import_csv()` (`opendives.h`), plugin `importCsv` (Kotlin, JNI, Swift, `core-api.js`), `components/CsvImportDialog.svelte`, `lib/csv-import.js`, `lib/csv-dialog.js`; `parse_seabear_header()` ported in `core/compat/qthelper_compat.cpp`; CSV added to `docs/import-formats.md` and `lib/import-formats.js`. Tests: `tests/import_csv_test.cpp` (`build/poc/import-csv`), `tests/app/csv-import.test.mjs`, `tests/app/demo-logbook.test.mjs`.
-
+Done on `feature/release-first-launch-complete` (not merged): parts 1–6 (portrait for every step, cloud connection states, WebDAV, the errors, the formats dialog, the tablet empty logbook and its menu) and parts 7–8 (the demo logbook; the three-step CSV import through a new façade call `import_csv`, Seabear, Sensus, Poseidon MkVI and hand-mapped files; CSV added to `docs/import-formats.md` and the formats list, 19 formats). Waiting for native work: « Reprendre » for divelogs.de (a list call and a download of chosen ids), the personal cloud (#74), WebDAV, « Renommer le carnet » and « Changer d’endroit ».
 
 ## [x] 2026-11-16-225 Beta: a « Bêta » badge next to the name on the first launch
 
@@ -4396,7 +4392,7 @@ Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production*.dc.ht
 - On a tablet, nothing changes.
 - The beta on `main` is untouched.
 
-Done: branch `feature/release-phone-first-launch` (from `feature/release-formats-link`, not merged). `pages/WelcomeEntry.svelte` now shows the release screen on a phone as on a tablet; the beta screen is not used there. Same steps, texts, logic and errors: only the layout changes, by CSS `@media (max-width: 767.98px)` (the width `layout.phone` uses; `lib/first-launch-phone.js` holds the query, the band heights and `deviceKey`). First step: band of 330 dp (status bar included), logo 40 dp, name 24 sp, headline 26 sp, line 14 sp, the profile scaled 24 dp from both edges without its dot and chips; other steps: band of 108 dp (see task 230), logo 32 dp, name 20 sp. Column: 20 dp side padding, content from the top (16 dp under the small band as drawn in the mock-ups, 20 dp under the large one), 24 sp titles, full-width buttons, 64 dp tiles and a 56 dp line in the link band, « Une question ? » after the content (the page scrolls as one when a step is taller). Formats dialog: 358 dp, cards stacked, the list scrolls inside, « Fermer » visible. Phone variants of the texts (`deviceTitlePhone`, `deviceHelpPhone`, `gitTokenHelpPhone`, `webdavHelpPhone`), chosen by `layout.phone`. Tests: `tests/app/first-launch-phone.test.mjs`. Tablet: 26 screenshots (13 screens, 1280 x 800 and 800 x 1280) taken before and after the change are byte-identical.
+Done on `feature/release-phone-first-launch` (not merged): every step on phones under 768 dp (330 dp band on the first step, 108 dp on the others as task 230 corrected, the column from the top, full-width buttons, the formats dialog stacked at 358 dp, « ce téléphone » texts), WelcomeEntry shows the release screen on phones too; tablets unchanged (screenshots identical apart from the 230 sign-in changes). Task 230 (phone and tablet parts) done there too.
 
 ## [x] 2026-11-16-228 Release edition: the first launch on the desktop
 
@@ -4427,7 +4423,7 @@ Mock-ups: the 28 files `docs/mockups/bureau-premier-lancement-production*.dc.htm
 - Dropping a `.ssrf` or `.xml` file on the window imports it.
 - The beta on `main` is untouched.
 
-Done: branch `feature/release-desktop-first-launch` (from `feature/release-phone-first-launch` with `main` and `feature/desktop-logbook` merged in; not merged). In the release edition the desktop window without a logbook shows « Pour commencer » (`components/DesktopFirstLaunch.svelte`, chosen in `App.svelte` by `isRelease`; the beta keeps `DesktopLogbookStart` untouched): the 700 dp blue panel on the left over the window's full height (above the rail, which the mock-ups do not show), the tablet's steps on the right (`FirstLaunchSteps`, same shared-axis X transition); from 1100 dp wide the panel narrows to 40 %, and below 700 dp tall the column scrolls with the help link after it, so every screen fits at 760 x 560. « cet ordinateur » texts (`*Desktop` keys, chosen by `deviceKey(key, phone, desktop)`); the desktop mock-ups' compact link band and slightly larger status texts are applied in the desktop app only. The drop line sits under the choices of « Pour commencer » and « Importer un carnet » and lights up while a file is dragged; dropping a file starts the import with it (from the first screen through « Importer un carnet »), sharing one reading of the files with « Un fichier ». iCloud Drive appears before WebDAV on macOS only (`desktopMac`) and goes straight to the connected screen (« Compte iCloud de ce Mac », no « Changer de compte »); stubbed: it cannot be connected here, so « Créer le carnet » says the cloud is coming. The help link opens About (a popup above the screen). Cloud: « Se connecter à {service} » is real in the window without a logbook on the creating path (Google Drive, OneDrive, Dropbox through `desktop/cloud.cjs`: waiting, « Annuler », « Rouvrir la page », refused, « Changer de compte »; a build without the service's keys says the cloud is coming), « Créer le carnet » creates the file in the service; WebDAV and git create the logbook through the main process too, and « Seulement sur cet ordinateur » opens the system's save dialog. The window takes the new logbook (the main process reloads it), so the dives brought are parked in the window's session storage and imported once it has loaded (`lib/desktop-first-launch.js`, `lib/desktop-pending-import.js`). Not wired: opening a logbook of a cloud account (the main process cannot list an account's logbooks), which keeps its « coming » message. Recent logbooks (to-do #83): nothing drawn, so none are shown in « Pour commencer »; the menu bar and Ctrl+O still reach them. The first start of the logbook of this computer (not a window without a logbook) shows the same screens with the desktop texts and drop, and keeps the tablet's endings. Tests: `tests/app/desktop-first-launch.test.mjs` and `tests/desktop/first-launch.test.mjs` (sign-in against the fake provider); checked end to end in the Electron app with a fake WebDAV server (drop, name from the file, logbook created, 29 dives imported after the reload).
+Done on `feature/release-desktop-first-launch` (not merged; it also carries the desktop branch): in the release edition the desktop window without a logbook is « Pour commencer » (700 dp blue panel, the tablet steps on the right, « cet ordinateur » texts, the drop line and dropping a file starts the import, iCloud Drive on macOS only and stubbed, the help link opens About). Creating a logbook in Google Drive, OneDrive, Dropbox or WebDAV is real through the desktop cloud service; opening a logbook from a cloud account still says « coming » (the main process cannot list an account's logbooks). Recent logbooks (#83) not shown. The beta keeps the window of task 222.
 
 ## [x] 2026-11-16-230 Release edition: corrections to the first-launch mock-ups (tasks 227 and 228)
 
@@ -4449,9 +4445,7 @@ Christian approved these on 16 November 2026. **Release edition:** do them on th
 - The progress bars stay inside their card at 360 dp wide.
 - `main` is untouched.
 
-Done (phone and tablet), branch `feature/release-phone-first-launch`: point 1, the hint « La page de connexion du service s’ouvre. / Vous revenez ici ensuite. » (`welcomeSteps.connectHint`, fr and en) on two lines, centred under the button, and « Se connecter à {service} » centred on the tablet (full width on the phone); point 2, the phone band is `SectionBand` (its gradient, faint profile and 18 dp wave) with `--od-release-band-gradient` (the same gradient, light centre at 38% -40%, in `theme.css`), 108 dp on the later steps; measured on the rendered band: white « OpenDives » 4.76:1 on the lightest pixel, headline 6.8:1, line 9.1:1; point 3, the progress bar is limited to the width of its card. Still to do: the desktop part of point 1 (task 228).
-
-Done (desktop), branch `feature/release-desktop-first-launch`: the desktop gets the hint on two lines, centred under a centred « Se connecter à {service} » from the shared component; kept centred in a window narrow enough to match the phone rules (test in `tests/app/desktop-first-launch.test.mjs`).
+Done (desktop): the two-line centred hint and the centred button come from the shared component; checked in a narrow window too. All parts done, on `feature/release-phone-first-launch` and `feature/release-desktop-first-launch`.
 
 ## [x] 2026-11-16-231 Release edition: « Nouveau carnet » in two steps, the name then « Où le garder ? »
 
@@ -4606,6 +4600,9 @@ Done: on the welcome band and on every step, the badge is 9 sp, line height 12, 
 
 ## [x] 2026-11-16-236 Correction to 233: the header of the first-launch steps
 
+**Superseded:** the step band of this task is replaced by task 250 (the app's wavy band).
+
+
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: the alpha first-launch steps in `docs/mockups/`, i.e. `android-premier-lancement-beta-compte-subsurface{,-telechargement}`, `android-premier-lancement-beta-creer-compte{,-erreur,-code,-code-erreur}` and `android-premier-lancement-alpha-sans-compte` (`.dc.html`). The `…-carnet` screens are the existing logbook and do not change.
 
 On these phone screens, the header band after the welcome screen changes. It replaces the 108 dp light section band of task 233:
@@ -4619,7 +4616,7 @@ Content below the band (« Retour », title, fields, buttons, the About link) is
 
 Done: the header of the steps is `FirstLaunchBand` in its `step` variant: 140 dp plus the status bar (`max(safe-area-top, 24px) + 140px`, so 164 dp in the 390 × 844 test), the same hatched blue as the welcome band, a straight bottom edge, no wave and no profile (`SectionBand` is not used). The content shifts down 32 dp and fits in 390 × 844 on every step, error states included (the About link is at 844 − 28 dp). White text on the step band: « OpenDives » 7.4:1, badge 5.06:1.
 
-## [ ] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
+## [x] 2026-11-16-237 Tablet first launch: new visual and dive-profile animation
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/android-tablette-premier-lancement-paysage.dc.html` and `…-portrait.dc.html`.
 
@@ -4655,6 +4652,8 @@ The tablet first-launch screen (the one with « J’ai un compte Subsurface », 
 
 **Test:** open the app with no logbook on a tablet in both orientations. The layout matches the mock-ups, and the profile line draws from left to right over a still water column, then the dot and the two labels appear. With animations turned off in the system settings, the screen opens already complete.
 
+Done: the tablet first-launch screen has the blue panel (`components/FirstLaunchPanel.svelte`: 700 dp on the left in landscape, 640 dp at the top in portrait, the hatched blue of the phone's band, the 96 dp logo, « OpenDives » at 48 sp, the Alpha badge, the title at 40 sp, the paragraph at 16 sp / 78 %) and, on the paper side, « Pour commencer » at 28 sp, the three buttons with their hints unchanged, a thin divider and the git link; « Une question ? » stays, centred on the content side. The profile is `components/ProfileHero.svelte` (curves and timing in `lib/profile-hero.js`, one curve per orientation scaled to its box): the line and its glow draw in 2.2 s with `cubic-bezier(0.4, 0, 0.2, 1)` by stroke trimming, the water column is still, the dot appears at 0.7 s (40 % to 100 %, fade over 0.3 s), the two labels rise 8 dp at 2.1 s over 0.5 s; the page re-creates the profile in `onPageBeforeIn`, so it plays each time the screen is shown; `prefers-reduced-motion` shows the final state at once. The badge fill is 12 %, not the 18 % of the brief, as on the phone's welcome band: with 18 % the white 12 sp text measured 4.2:1 on the panel, with 12 % 4.7:1 or more. The assertions of tasks 210, 211, 225 and 229 about the old tablet head (larger brand row, profile off the edges, pill badge on the tablet) were replaced on purpose by `tests/app/tablet-first-launch.test.mjs`; the old head and its CSS are removed (the phone and iOS branches are unchanged). Phones 412 x 915 and 390 x 844 are pixel-identical before and after.
+
 ## [x] 2026-11-16-238 Tablet: thinner lines in the dive-detail profile chart
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** Reference mock-up: `docs/mockups/android-tablette-detail-menu-paysage.dc.html`; the same chart appears in every tablet screen that shows the dive detail.
@@ -4669,7 +4668,7 @@ Nothing else changes: the grid lines, ticks and other curves, the water fill, th
 
 Done on main: from 768 dp, a token `--od-profile-main-width: 1` gives the depth line and the temperature curve of `DiveProfile.svelte` 1 dp; every other curve keeps `--od-profile-line-width` (1.25 dp), the phone is unchanged, and high contrast keeps its 2 dp. Test in `tests/app/profile-lines.test.mjs`.
 
-## [ ] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
+## [x] 2026-11-16-239 Tablet first-launch steps (alpha): « J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »
 
 Christian approved this on 16 November 2026. **Alpha, on `main`.** This follows task 237, which covers the tablet first-launch screen itself, and the phone steps of tasks 224–236.
 
@@ -4691,6 +4690,8 @@ The step content sits on the paper side, in the column of the release tablet ste
 - **Commencer sans compte:** the empty logbook with the subtitle « Sur cette tablette seulement », snackbar « Carnet créé sur cette tablette. »
 
 **Test:** on a tablet in both orientations, follow each of the three paths from the first-launch screen. Every step matches its mock-up, the tablet wording is used, and the logbook opens with the right snackbar.
+
+Done: the three tablet paths (Subsurface account with its download, account creation with the code, « Commencer sans compte ») use the new style: the blue panel of task 237 shown still (no animation), the step in a 452 dp column vertically centred (landscape: beside the panel; portrait: under it, 120 dp side margins), « Retour », the title at 28 sp, the content of the phone steps (same components: `AccountField`, `CodeField`, the download card, the rows of `WithoutAccount`), buttons right-aligned and not full width, and the help link at the bottom of the content side. « ce téléphone » becomes « cette tablette » through `deviceKey` (`lib/first-launch.js`; keys with a `Tablet` suffix in fr.json and en.json) and the phone icon a tablet icon. The six code boxes are one 328 dp group centred in the column, the label, the error and « Renvoyer le code » at the left edge of the first box. « Commencer sans compte » on a tablet now goes through its own screen too (iOS still starts the logbook straight away). The logbook opens with the tablet snackbars (« Carnet téléchargé. Il reste sur cette tablette, même sans réseau. », « Compte créé. Votre carnet est prêt. », « Carnet créé sur cette tablette. ») at the bottom left, 24 dp from the rail's edge (`placement: 'start'`), and the empty local logbook says « Sur cette tablette seulement, aucune plongée ». Difference from the mock-ups: the account logbook keeps the existing subtitle « Connecté au cloud Subsurface, aucune plongée » instead of the two-line header « Cloud Subsurface / Aucune plongée ». Tests that said a tablet keeps its old screens (`tests/app/first-launch.test.mjs`) now say it takes the new style, on purpose. Phones are pixel-identical before and after.
 
 ## [x] 2026-11-16-240 Desktop: Settings and the account avatar stay in the rail when no logbook is open
 
@@ -4738,4 +4739,596 @@ Christian approved this on 16 November 2026. **Release edition:** do it on the b
 - Open a logbook, close it, then open a new window: the recent list appears above « Ou bien ».
 - Rename that file outside the app and reopen the window: the entry shows « Introuvable », the dialog opens on click, and both actions work.
 
-Done: branch `feature/release-desktop-first-launch` (not merged). After first use (the recent list is not empty) the window without a logbook shows « Carnets récents » (`components/RecentLogbooks.svelte`: at most five rows, newest first, icon by source, name, « place · when », chevron, a click opens the logbook in this window), then « Ou bien » and the three choices compact (40 dp tile, 10 dp padding) and neutral (`ReleaseChoiceRow` `compact`), the drop line and the help link, no demo link; the blue panel shows its profile without the opening animation (`ReleaseProfile` `still`). First launch (empty list) keeps task 228's screen; the right column waits for the list before choosing (`lib/desktop-recents.js` `startMode`). Missing logbooks: the new main-process op `exists` (`desktop/windows.cjs`, `od:logbooks`) takes no path from the page and looks only at the files of the recent list; a `file` logbook is checked with `fs.existsSync`, and the logbook of this computer, git and cloud entries are not checked (a git repository or a cloud file is only reached when opened and would need the network and credentials), so they count as there. A missing row keeps its place, its name greyed, « Introuvable dans {place} » in error red with a warning icon; clicking opens a basic dialog without ✕ (`Md3Dialog`): « Retirer de la liste » calls the existing `forget`, « Chercher le fichier… » (filled) calls the new op `relocate`: the main process shows the system file picker, forgets the old entry and opens the picked file in this window (so it comes first in the list); a name the diver chose is kept, a name that was the old file's name becomes the new file's; cancelling the picker leaves the dialog open. The icon of « Seulement sur cet ordinateur » is `desktop` (computer screen) in the desktop app. Differences from the mock-ups: « fermé à l'instant » for a logbook just closed (existing text); the window's list also shows the logbook of this computer when it was opened. Tests: `tests/app/desktop-recents.test.mjs` (screen choice, order and cap, rows, missing state, dialog actions, icon), `tests/desktop/windows.test.mjs` (`exists` ignores page paths and checks only the recent list, `relocate` replaces, cancels, refuses non-recent entries and non-logbook files, `forget`); app 919/0, desktop 81/0. Checked in the Electron app at 1440 x 900 and 760 x 560 (list, rename outside the app, « Introuvable », the dialog, « Retirer de la liste »; the system picker of « Chercher le fichier… » was not driven, its main-process side is tested with a fake dialog).
+Done on `feature/release-desktop-first-launch` (not merged): after first use the window without a logbook lists « Carnets récents » (five at most, newest first) above « Ou bien » and the three compact neutral choices; a missing file is greyed with « Introuvable dans {place} » and its dialog offers « Retirer de la liste » and « Chercher le fichier… » (main-process ops `exists` and `relocate`, which accept only entries of the recent list; git and cloud entries are not checked); « Seulement sur cet ordinateur » has the computer-screen icon. « Chercher le fichier… » was not clicked in the real app (it opens the system picker); its main-process side is tested.
+
+## [x] 2026-11-16-242 Desktop (alpha): first launch and the « no logbook » window
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings the first launch of tasks 224–239 (phone and tablet) to the desktop app. The mock-ups are 1440 × 900 windows, under `docs/mockups/`.
+
+**Mock-ups**
+- First launch, all named `bureau-premier-lancement-alpha-*.dc.html`:
+  - `accueil`;
+  - `compte-subsurface`, `compte-subsurface-telechargement`, `compte-subsurface-carnet`;
+  - `creer-compte`, `creer-compte-erreur`, `creer-compte-code`, `creer-compte-code-erreur`, `creer-compte-carnet`;
+  - `sans-compte`, `sans-compte-carnet`.
+- « No logbook » window: `bureau-demarrage-actuel.dc.html` (replaced) and `bureau-demarrage-introuvable.dc.html`.
+
+**1. First launch (no logbook and no account yet)**
+- **Left:** a 700 dp blue panel with the same background, Alpha badge, title, text, dive profile and opening animation as the tablet first launch (task 237).
+- **Right:** a 452 dp column, vertically centred, containing:
+  - « Pour commencer »;
+  - the three alpha buttons with their hints (« J’ai un compte Subsurface », « Créer un compte », « Commencer sans compte »), the hint under the last one reading « Le carnet reste sur cet ordinateur. Vous pourrez le sauvegarder plus tard »;
+  - a divider and « Utiliser mon propre dépôt git »;
+  - « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. »;
+  - « Une question ? À propos et contact » at the bottom.
+
+**2. Steps.** The steps keep the blue panel, with a static profile. The content is the same as on the tablet (task 239). Only these changes apply:
+- « cette tablette » becomes « cet ordinateur », e.g. « Sur cet ordinateur seulement » and « Si vous perdez ou changez d’ordinateur ».
+- The icon is a computer screen.
+- The confirmation code is laid out as on the tablet: grouped boxes centred in the column, with the label, the error and « Renvoyer le code » aligned on the first box.
+
+**3. Logbook ready.** These are the existing desktop logbook windows with a snackbar placed bottom-left, after the rail:
+- **Compte Subsurface:** the logbook with the dives, snackbar « Carnet téléchargé. Il reste sur cet ordinateur, même sans réseau. »
+- **Créer un compte:** the empty logbook, snackbar « Compte créé. Votre carnet est prêt. »
+- **Commencer sans compte:** the empty logbook, snackbar « Carnet créé sur cet ordinateur. »
+
+**4. The « no logbook » window after first use** (a new window, or after « Fermer le carnet »). It replaces the current centred screen with « Ouvrir un carnet… » and « Nouveau carnet… » buttons.
+- **Left:** the same blue panel, with a static profile.
+- **Right:**
+  - « Carnets récents »: the recently opened logbooks, newest first, at most about five. Each row has an icon for where the logbook is kept, its name, and the place with the time (« Google Drive · fermé il y a 2 min »). A click opens the logbook.
+  - « Ou bien », then two neutral rows:
+    - « Ouvrir un carnet… » (« Un fichier .ssrf ou .xml, ou un dossier de dépôt git. »), which opens the system picker;
+    - « Nouveau carnet… » (« Vous choisirez ensuite où le garder. »), which opens the existing « Nouveau carnet » flow.
+  - The drop hint, then « À propos et contact ».
+- **A missing recent logbook:** its name is greyed and its second line reads « Introuvable dans Documents » in error red with a warning icon. A click opens a basic dialog with no ✕:
+  - title « Carnet introuvable »;
+  - text « « essai.ssrf » n’est plus dans Documents. Il a peut-être été déplacé, renommé ou supprimé. »;
+  - actions « Retirer de la liste » (text button) and « Chercher le fichier… » (filled; the chosen file replaces the entry).
+
+The rail of these windows is not shown in the mock-ups, so Settings and the account are not reachable from them. Leave the rail out here; task 240 still applies to the windows that show it.
+
+**Test:** start the desktop app with no settings.
+1. The first launch matches the mock-up and the profile animates once.
+2. Each of the three paths ends in the right logbook window with its snackbar.
+3. Close the logbook: the recent list appears with « Ou bien ».
+4. Move one recent file away, then reopen the window: the entry shows « Introuvable » and the dialog works.
+
+Done on `feature/desktop-logbook` (the desktop app lives there until it is merged into main): the desktop first launch reuses the tablet screens of tasks 237 and 239 with « cet ordinateur » texts, the computer icon, the drop to import and the snackbars after the rail; the « no logbook » window after first use is the blue panel with « Carnets récents », « Ou bien » (« Ouvrir un carnet… », « Nouveau carnet… »), the drop hint and the help link, without the rail; a missing logbook is greyed with its dialog (« Retirer de la liste », « Chercher le fichier… »). The real system picker and real Subsurface calls were not exercised (stubs).
+
+## [x] 2026-11-16-243 Alpha: About link on the welcome screens, « Télécharger mes plongées » on the desktop
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+1. **« Une question ? À propos et contact » on the alpha welcome screens.**
+   - Phone (`docs/mockups/android-accueil-c.dc.html`): the link goes under « Utiliser mon propre dépôt git », centred, 12 dp below it and 20 dp above the bottom edge.
+   - Tablet (`android-tablette-premier-lancement-paysage.dc.html` and `-portrait.dc.html`): the link sits at the bottom of the content column, 28 dp from the edge, as in the tablet steps.
+   - It opens « À propos ». The desktop welcome already has it (task 242).
+2. **« Télécharger mes plongées » on the desktop.** It replaces « Télécharger depuis un ordinateur de plongée » in two places:
+   - the main action of a new empty logbook (`bureau-nouveau-carnet-vide.dc.html`);
+   - the macOS File menu, where it reads « Télécharger mes plongées… » (`bureau-carnets-menu-fichier-macos.dc.html`).
+
+   This matches every other screen.
+
+**Test:** the welcome screens show the About link and it opens « À propos ». On the desktop, the empty logbook and the macOS File menu say « Télécharger mes plongées ».
+
+Done: part 1 on this branch (`fix/alpha-about-download`): in `WelcomeStart.svelte` the link now ends the Android page. On a phone it sits 12 dp under the git link's text (6 dp of touch padding + 6 dp of margin) and 20 dp above the bottom edge (`--od-help-link-bottom`; the page content has no bottom padding there, so the screen no longer scrolls at 390 × 844); on a tablet it was already pinned 28 dp from the edge and did not move; iOS is unchanged. It opens « À propos » and Back returns. Checked headless at 390×844, 412×915, 1280×800, 800×1280: only the link and the git link's touch area moved. Tests in `tests/app/welcome-help-link.test.mjs`; one release-note line (fr, en). Part 2 is on `fix/desktop-download-wording`, for the desktop branch (`feature/desktop-logbook`): the ready screen of a new logbook already said « Télécharger mes plongées » (task 242), so only the macOS File menu changed (`desktop.macMenu.download`, « Télécharger mes plongées… » / « Download my dives… »); test `tests/app/desktop-download-wording.test.mjs`. No release note for the desktop.
+
+## [x] 2026-11-16-244 Phone first launch (release): hatched bands without the wave
+
+**Superseded:** the step band of this task is replaced by task 251 (the app's wavy band); the welcome hero stays.
+
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 29 files `docs/mockups/android-premier-lancement-production*.dc.html`.
+
+The phone first-launch screens of the public version take the same bands as the alpha (tasks 234 and 236):
+- **The welcome hero (330 dp)** uses the hatched dark blue: the linear gradient `#2A6FB0 → #1F5C99 → #0C3866 → #072A4D`, the light sheen at the top left and the diagonal hatching. It keeps its title, text and dive profile, with no wave and no faint decorative profile at the bottom edge.
+- **The band of the steps** grows from 108 to 140 dp, with the same hatched dark blue, no wave and no profile, and a straight bottom edge.
+
+This replaces the light section-band gradient and the 18 dp wave of task 227 on these screens. The content below the band moves down by 32 dp and must still fit on a 390 × 844 dp screen.
+
+**Test:** on a phone, the welcome hero and every step band are hatched dark blue with a straight bottom edge, and white text on them stays at least 4.5:1.
+
+Done on `feature/release-phone-first-launch` (not merged): the phone welcome hero (330 dp) and the steps band (140 dp) take the alpha's hatched dark blue (`--od-first-band`, sheen, hatching), no wave, no faint profile, straight edge; white text 6.1:1 or more; tablets unchanged (byte-identical screenshots). At 390 × 844 every step fits except « Nouveau carnet » and « Seulement sur ce téléphone », where the help link under the content makes the page scroll by about 39 dp (measured with the fallback font of headless Edge).
+
+## [x] 2026-11-16-245 Tablet (release): thinner lines in the profile chart
+
+Christian approved this on 16 November 2026. **Release edition:** do it on its own branch, `feature/release-tablet-profile-lines`, and never merge it into `main`.
+
+Mock-ups: the tablet screens of the public version that show the profile chart, all under `docs/mockups/android-tablette-`:
+- `demo-paysage`, `demo-portrait`, `demo-ajout-*`, `demo-quitter-*`;
+- `carnet-vide-paysage`, `carnet-vide-portrait`, `carnet-vide-menu-paysage`;
+- `import-csv-apercu-paysage`, `import-csv-colonnes-paysage`, `import-csv-type-paysage`.
+
+As task 238 does for the alpha, the depth profile line and the temperature curve change from 1.25 to **1 dp**. Nothing else changes.
+
+**Test:** on a tablet in the public version, the profile line and the temperature curve are 1 dp wide.
+
+Done: no new code. The release branches that carry the tablet screens (`feature/release-desktop-first-launch` and `feature/release-new-logbook-two-steps`) already have task 238 from main (the token `--od-profile-main-width: 1` from 768 dp for the depth line and the temperature curve); `feature/release-tablet-profile-lines` was created at the tip of `feature/release-new-logbook-two-steps` as asked, so it has the 1 dp lines.
+
+## [x] 2026-11-16-246 Desktop (alpha): language menu on the first-launch screen; correction to 240
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/bureau-premier-lancement-alpha-accueil.dc.html`, shown with the menu open.
+
+**1. Language menu on the desktop first-launch screen (« Pour commencer ») only.**
+- **Placement:** at the bottom of the content column, on one centred line, 24 dp from the bottom edge, from left to right:
+  - « Une question ? À propos et contact »;
+  - a thin vertical divider (1 × 20 dp, `#C8C6BF`);
+  - a small text button showing a globe icon, the current language and a down chevron, e.g. « Français ». It is 32 dp high, 14 sp, in the same grey as the About link.
+- **The menu:**
+  - It opens above the button, right-aligned with it. Like the Settings menus it has no title and no Annuler/OK, and is 260 dp wide.
+  - Options: « Comme le système » (with the system language as a help line), « Français », « English ». The current one is tinted with a check.
+  - Picking an option applies it at once to the whole app and closes the menu. It is the same value as « Langue de l’app » in Settings.
+  - While the menu is open, the button takes the selected tint (`#E3E1DC`).
+- **Accessibility:** `aria-haspopup="listbox"` and `aria-expanded` on the button, and `role="listbox"` / `role="option"` with `aria-selected` in the menu.
+
+It is not shown on the steps, on the « no logbook » window, nor on phone or tablet.
+
+**2. Correction to task 240.** The « no logbook » window after first use (task 242, `bureau-demarrage-actuel.dc.html`) has **no navigation rail**. Settings stay reachable through Ctrl+, (⌘, on macOS) and, on macOS, the app menu. Task 240 still applies to the empty-logbook window (`bureau-carnet-vide-actuel.dc.html`), whose rail keeps « Réglages » and the avatar.
+
+**Test:**
+- On first launch, the language button sits to the right of « Une question ? ». Choosing « English » switches the screen at once, and Settings › Langue de l’app shows the same value.
+- The « no logbook » window shows no rail.
+
+Done on `feature/desktop-logbook`: on the desktop first launch only, the help link, a 1 × 20 dp divider and a language button (globe, current language, chevron) on one centred line 24 dp from the bottom; the menu is the Settings RowMenu, above the button, right-aligned, 260 dp, with « Comme le système », « Français », « English » (« Français (Canada) » only while it is the chosen language) and sets the same value as Settings › Langue de l’app. Part 2 already held: the « no logbook » window has no rail and Ctrl+, opens Settings.
+
+## [x] 2026-11-16-247 Phone (alpha): « Utiliser mon propre dépôt git », one git form for first launch and Compte, MD3 spacing
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.**
+
+Mock-ups, all in `docs/mockups/`:
+- first launch: `android-premier-lancement-alpha-git.dc.html`, `-alpha-git-erreur-adresse`, `-alpha-git-erreur-acces`, `-alpha-git-telechargement`, `-alpha-git-carnet`;
+- help pages: `git-depot-aide-android.dc.html` (new), `git-jeton-aide-android.dc.html` (existing);
+- Compte: `git-config-android.dc.html`, `git-config-adresse-android.dc.html`, `git-config-erreur-android.dc.html`.
+
+**1. First launch, « Utiliser mon propre dépôt git ».** The link on the welcome screen opens a step page with the alpha hatched band (140 dp, as in task 236), « Retour », and the git form:
+- title « Votre propre dépôt git »; intro « Gardez votre carnet dans votre dépôt git, avec une copie sur ce téléphone. »;
+- link « Comment créer un dépôt » → the new help page;
+- outlined fields: « Adresse du dépôt (HTTPS) » (monospace), « Nom d’utilisateur », « Jeton d’accès » (hidden, with the eye icon, help line « Un jeton d’accès personnel avec le droit d’écriture, pas votre mot de passe. »), then the link « Comment créer un jeton d’accès » → `git-jeton-aide-android`, then the « Branche » dropdown;
+- the address is checked when the field loses focus: « Dépôt trouvé, avec un carnet existant. » (green, with a check), or the errors shown in the two error mock-ups (« Aucun dépôt git à cette adresse… » under the address; « Accès refusé par le serveur… » under the token, with the address line « Dépôt privé ou introuvable : il sera vérifié avec le jeton. »);
+- « Branche » lists the branches read from the repository (« 3 branches lues dans le dépôt : … »); before that it is empty with « La liste des branches s’affiche quand le dépôt est trouvé. »;
+- « Connecter », full width, then the About link at the bottom.
+« Connecter » goes to the download screen (`-git-telechargement`: connection, then « Téléchargement du carnet » with a count, « Annuler »), then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur ce téléphone, même sans réseau. » (`-git-carnet`).
+
+**2. Help page « Créer un dépôt »** (`git-depot-aide-android`). Same app bar as the token help page, back to the form. Tabs GitHub, GitLab, Codeberg; only GitHub is drawn: 6 steps (private, empty repository; copy the HTTPS address), the button « Ouvrir la page « New repository » de GitHub » (opens the browser), and the closing line about the token. For GitLab and Codeberg, write the equivalent steps with each site's English labels; Christian will review them.
+
+**3. One form for Compte.** The git screens in Compte (`git-config-*`) now use exactly the same form as the first launch. Only the top differs: an app bar « ← Votre propre dépôt git » (back to Compte) instead of the hatched band. The old ✕, white card and decorative profile are gone. Build it as one shared component.
+
+**4. Spacing (MD3, 4 dp grid)** in this form: 8 dp title → intro; 16 dp intro → « Comment créer un dépôt » → first field; 16 dp between fields; 4 dp field → help line; the token link 4 dp under the token help line; 24 dp before « Connecter ». Every link keeps a 48 dp touch target; only the visible gaps are as listed.
+
+**5. Side margins 16 dp** (was 20) on every phone first-launch step page of the alpha and beta: `android-premier-lancement-alpha-*` and `android-premier-lancement-beta-*`. The header band is unchanged.
+
+**Test:**
+- From the welcome screen, « Utiliser mon propre dépôt git » opens the form; a valid repository and token lead to the download, then to the open logbook with the snackbar.
+- A wrong address and a refused token show the messages of the mock-ups under the right field.
+- Compte › dépôt git shows the same form with the app bar.
+- Both help links open their pages and Back returns to the form.
+- At 390 dp wide, the content starts 16 dp from each edge.
+
+Done: branch `feature/alpha-git-form`. One shared form: `components/GitForm.svelte` (fields, links, branch, « Connecter ») on one controller, `lib/git-form.svelte.js` (the address check on blur, the authenticated check, the branches, `gitConnect`), used by `pages/GitRepository.svelte`: on an Android phone, first launch = `EditorialPage firstLaunch` (the 140 dp band of task 250, « Retour », the form, the About link), Compte (`/account/git`, `/account/git/new`) = app bar « ← Votre propre dépôt git » with the same form, no ✕, card or profile. Tablets and iPhone keep their previous layout (same controller). Outlined fields: `AccountField` (`mono` for the address) and `SelectField` got an `outlined` look; spacing per point 4, measured at 390 dp: title to sentence 8, sentence to link text 16.5, link text to field 16.5, field to help line 4, token link 4.5 under the help line, between fields 16, 24 before « Connecter » (full width), 48 dp links. « Connecter » from the first launch goes to `/welcome/git/downloading` (`FirstDownload` with `git`: « Connexion au dépôt », repository and branch, « Annuler » forgets the access and returns to the form), then the logbook opens with « Carnet téléchargé depuis votre dépôt… ». An empty repository skips the download. New help page `pages/RepositoryHelp.svelte` (`/welcome/git/repository`, `/account/git/repository`) with the GitHub, GitLab and Codeberg tabs (texts of tasks 247 and 252). Side margins of the phone step pages are 16 dp (`EditorialPage`, header band unchanged). **Native: none.** `gitCheck` already returns `branches` and `empty`, so no C++, JNI or Swift change and no round trip. **Known gap:** « Dépôt trouvé, avec un carnet existant. » means the repository holds references (not empty); whether the branch really holds a Subsurface logbook is only known at `gitConnect` (error `NO_LOG`, shown under the form). Telling it earlier needs a native check of the branch's tree (a new façade function plus JNI and Swift). The branch list is a real dropdown: no free-text fallback was needed. Texts: periods added to the sentences of the form as in the mock-ups. Tests: `tests/app/git-form.test.mjs` (new), `first-launch.test.mjs` and `tablet-first-launch.test.mjs` (what they read; the margin expectation 20 to 16 is the task's), 668 pass. Two release-note lines (fr, en).
+
+## [x] 2026-11-16-248 Phone first launch (release): 16 dp side margins
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+On every step page of the phone first launch, the side margins change from 20 to **16 dp** (MD3 margin for compact screens). Nothing else changes; the header bands keep their own layout.
+
+**Test:** at 390 dp wide, the content of every first-launch step starts 16 dp from each edge.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the phone step column has 16 dp side margins; the header bands are unchanged.
+
+## [x] 2026-11-16-249 First launch (release): right chevron on « Suivant »
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 230, `feature/release-new-logbook-two-steps`, which has the « Nouveau carnet » step, and never merge it into `main`.
+
+Mock-ups, phone, tablet (both orientations) and desktop:
+- `android-premier-lancement-production-nom.dc.html` and `-importer-nouveau-carnet`;
+- `android-tablette-premier-lancement-production-nom-{paysage,portrait}` and `-importer-nouveau-carnet-{paysage,portrait}`;
+- `bureau-premier-lancement-production-nom` and `-importer-nouveau-carnet`.
+
+Every « Suivant » button gets a right chevron after the label, following the MD3 button with a trailing icon:
+- 18 dp chevron in the label colour, 8 dp from the text;
+- padding 24 dp at the start and 16 dp at the end.
+
+The chevron is decorative (`aria-hidden`); the button's name stays « Suivant ». In right-to-left layouts it would point left, but we have none yet.
+
+**Test:** on the « Nouveau carnet » step, when creating and when importing, on phone, tablet and desktop, « Suivant » shows the chevron to the right of the label.
+
+Done on `feature/release-new-logbook-two-steps`: « Suivant » of the « Nouveau carnet » step (creating and importing, every device) has an 18 dp chevron 8 dp after the label, with 24 dp of padding at the start and 16 dp at the end; the chevron is hidden from screen readers.
+
+## [x] 2026-11-16-250 Phone first launch (alpha): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: every phone step page of the alpha and beta first launch, `docs/mockups/android-premier-lancement-alpha-*.dc.html` and `android-premier-lancement-beta-*.dc.html` (for example `-beta-compte-subsurface`, `-alpha-git`, `-alpha-sans-compte`, `-beta-creer-compte*`, the download screens).
+
+The band of the steps (`FirstLaunchBand`, variant `step`, 140 dp under the status bar) changes back to the look of the app's section band (`SectionBand` / `BandBackdrop`), with the light rays kept:
+- **Background:** the section band's radial gradient (`radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)`), instead of the dark hatched linear gradient. The top-left sheen goes away.
+- **Light rays:** keep the diagonal rays layer (`repeating-linear-gradient(105deg, …)`, fading out at 55 % of the height).
+- **Faint profile:** the band's decorative dive profile at the bottom, as in the section band (area 10 % white, line 30 % white, 1.5 dp).
+- **Wave:** the app's 18 dp wave at the bottom edge, the same curve as `SectionBand` (`M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z`), in the page background colour.
+- The logo, « OpenDives » and the « Alpha » badge do not change. Check that the badge's white text still reaches 4.5:1 on the lighter top of the gradient; if not, raise the badge fill as on the welcome band.
+
+This replaces, for the step pages only, the band of tasks 234 and 236 (hatched dark blue, straight edge). The welcome screen keeps its 330 dp hatched hero with the headline and the animated profile. Tablets do not change.
+
+**Test:** on a phone, every first-launch step page (Subsurface account, own git repository, without an account, create an account, downloads) shows the light section-band gradient with the rays, the faint profile and the wave; the welcome screen is unchanged.
+
+Done: in `FirstLaunchBand.svelte` the `step` variant now draws the section band: the radial gradient (token `--od-first-band-step`, `#A9C4E2` to `#114477`, centre 38 % / -40 %), the 105deg rays kept, the SectionBand profile (area 10 % white, line 30 % white, 1.5 dp, same path) and its 18 dp wave in the page colour (`--f7-page-bg-color`); the top-left sheen is drawn on the welcome band only and the step has no straight edge. Height stays 140 dp under the status bar. The welcome hero and tablets (the panel) did not change. Badge contrast: computed with the gradient at the badge position (about 68 % of the radius), white 9 sp text on the 18 % fill is 4.9:1 (AA 4.5:1), so the fill was not raised. Test updated in `tests/app/first-launch.test.mjs`; one release-note line (fr, en).
+
+## [x] 2026-11-16-251 Phone first launch (release): the app's wavy band on the step pages
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`. Mock-ups: the 28 files `docs/mockups/android-premier-lancement-production-*.dc.html`.
+
+Same change as task 250, for the release step pages: the 140 dp step band takes the section band's radial gradient, keeps the light rays, gets the faint profile and the 18 dp wave at the bottom, and loses the top-left sheen and the straight edge. This replaces the step band of task 244. The welcome hero (330 dp) and the tablets do not change.
+
+**Test:** on a phone in the public version, every first-launch step page shows the light gradient with the rays, the faint profile and the wave.
+
+Done on `feature/release-phone-first-launch` (and carried into `feature/release-new-logbook-two-steps`): the 140 dp phone step band takes the section band's radial gradient (`--od-first-step-band`), keeps the rays, gets the faint profile and the 18 dp wave, and loses the sheen; the welcome hero and the tablets are unchanged. White text 5.65:1 at the lightest point. Only the first step was rendered at 390 × 844; the other steps share the same band.
+
+## [x] 2026-11-16-252 Help « Créer un dépôt »: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It completes part 2 of task 247. Mock-ups: `docs/mockups/git-depot-aide-gitlab-android.dc.html` and `git-depot-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-depot-aide-android.dc.html`).
+
+The help page keeps one layout for the three tabs: the intro, the white card « Un dépôt privé : vous seul pouvez le voir. » with numbered steps, a link that opens the site in the browser, and the closing line about the token. The active tab is semi-bold, in the text colour, with the 3 dp underline; the others are grey. Use the texts of the mock-ups word for word.
+
+**GitLab**, 7 steps; the link « Ouvrir la page « New project » de GitLab » opens `https://gitlab.com/projects/new#blank_project`:
+1. Connectez-vous à GitLab, puis touchez + (Create new) en haut du menu et New project/repository.
+2. Touchez Create blank project.
+3. Project name : un nom reconnaissable, par exemple carnet-plongee.
+4. Sous Visibility Level, choisissez Private.
+5. Décochez Initialize repository with a README. Le dépôt doit rester vide.
+6. Touchez Create project.
+7. Touchez Code, puis copiez l’adresse sous Clone with HTTPS, par exemple https://gitlab.com/vous/carnet-plongee.git.
+
+**Codeberg**, 6 steps; the link « Ouvrir la page « New repository » de Codeberg » opens `https://codeberg.org/repo/create`:
+1. Connectez-vous à Codeberg, puis touchez + en haut de la page et New repository.
+2. Repository name : un nom reconnaissable, par exemple carnet-plongee.
+3. Cochez Make repository private.
+4. Laissez Initialize repository décoché. Le dépôt doit rester vide.
+5. Touchez Create repository.
+6. Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.
+
+The site labels are in English for now; Christian may ask for the French labels of GitLab and Codeberg later (GitHub exists only in English).
+
+**Test:** on the help page, each tab shows its own steps and link, the active tab is underlined, and each link opens the right page in the browser.
+
+Done: the GitLab (7 steps, link `https://gitlab.com/projects/new#blank_project`) and Codeberg (6 steps, link `https://codeberg.org/repo/create`) tabs of `pages/RepositoryHelp.svelte` use the texts of the task word for word (`repoHelp.gitlab.*`, `repoHelp.codeberg.*`, fr; the English versions keep the site labels), the same layout as GitHub: active tab semi-bold in the text colour with the 3 dp underline, the others grey. Checked headless at 390 x 844; the tests are in `tests/app/git-form.test.mjs`. The French labels of GitLab and Codeberg are left to a later request.
+
+## [x] 2026-11-16-253 Git help pages: interface labels as `<kbd>`, values as `<code>`
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html` and `git-jeton-aide-android.dc.html`.
+
+In the numbered steps of the « Créer un dépôt » help (three tabs, tasks 247 and 252) and of the « Créer un jeton d’accès » help, the words the person must find on the site or type are set apart, without bold:
+- **Interface labels** (buttons, menus, fields, options, e.g. +, New repository, Private, Repository name, Fine-grained tokens, Read and write): a `<kbd>` element, shown as a small chip: same font, size 14 sp, normal weight, padding 0 × 5 dp, 1 dp outline `#D3D0C8`, radius 4 dp, background `#F1EFEA`, no line break inside.
+- **Values to type or copy** (the logbook name `carnet-plongee`, the example addresses `https://github.com/vous/carnet-plongee.git` and the GitLab and Codeberg ones, the token name `OpenDives`): a `<code>` element in Roboto Mono 13.5 sp, padding 0 × 4 dp, radius 4 dp, background `#EAF0F7`, text `#1F3F66`; a long address may break anywhere.
+
+Put a no-break space before a colon that follows a label (« Repository name : »). Take the two colours from tokens (add `--od-kbd-*` and `--od-code-*` if they do not exist) and check the dark theme: both must keep 4.5:1. Only the styling changes here; the step texts stay those of tasks 247 and 252.
+
+**Test:** in the four help pages, every site label is a chip and every example value is monospace, with no bold, in light and dark themes.
+
+Done: in the steps of the repository help and the token help, an interface label is set apart as `<kbd>` and a value as `<code>`, without bold. The step texts stay plain JSON with the marks `[kbd]…[/kbd]` and `[code]…[/code]`; `app/src/lib/marked-text.js` parses them into segments and `app/src/components/MarkedText.svelte` renders `<kbd>`, `<code>` and text (never `{@html}`). Colours come from `--od-kbd-*` and `--od-code-*` in `app/src/theme.css`, light as in the task, dark `#F4F4F2` on `#2A2C30` (kbd) and `#BFD6F0` on `#1F2B3B` (code), both above 4.5:1 (tests/app/marked-text.test.mjs). A no-break space precedes a colon after a label in French. Tests: parser, balanced marks in every step in fr and en, no bold, tokens in light and dark. Rendered at 390×844 headless, light and dark, in French and English.
+
+## [x] 2026-11-16-254 Token help (GitHub): choose « No expiration »
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-up: `docs/mockups/git-jeton-aide-android.dc.html`, GitHub tab of « Créer un jeton d’accès ».
+
+Two text changes:
+- In the intro, remove « , et une date d’expiration » so that it reads « … avec le droit de lire et d’écrire son contenu et rien d’autre. »
+- The Expiration step becomes: « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » (Expiration and No expiration are interface labels, styled as in task 253.)
+
+Background: since October 2024 GitHub lets a fine-grained token have no expiration for personal repositories; organisations limit it to 366 days by default.
+
+**Test:** the GitHub tab of the token help shows the new intro and the « No expiration » step.
+
+Done: the GitHub intro of the token help no longer mentions an expiry date, and the Expiration step reads « Expiration : choisissez No expiration, sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite. » with Expiration and No expiration as `<kbd>`. The intro follows the mock-up (« GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. »). Test in tests/app/marked-text.test.mjs.
+
+## [x] 2026-11-16-255 Token help: the GitLab and Codeberg tabs
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-jeton-aide-gitlab-android.dc.html` and `git-jeton-aide-codeberg-android.dc.html`, next to the GitHub tab (`git-jeton-aide-android.dc.html`).
+
+The « Créer un jeton d’accès » help gets the same layout as the GitHub tab for GitLab and Codeberg: intro, white card with a first line and numbered steps, a link that opens the site's token page in the browser, then the closing line. Labels of the sites are `<kbd>`, values are `<code>` (task 253). Use the texts of the mock-ups word for word; the site labels are those of the French interface of each site (taken from the GitLab and Gitea/Forgejo translation files).
+
+**GitLab** (link « Ouvrir la page des jetons de GitLab » → `https://gitlab.com/-/user_settings/personal_access_tokens`). Card line: « Sur GitLab, un jeton personnel donne accès à tous vos dépôts et doit avoir une date d’expiration. » Steps: avatar › Modifier le profil; Jetons d’accès; Ajouter un nouveau jeton; Nom du jeton (`OpenDives`); Date d’expiration: the latest date allowed, with a new token to create at that date; Portées: only `write_repository`; Créer un jeton, then copy it.
+
+**Codeberg** (link « Ouvrir la page des applications de Codeberg » → `https://codeberg.org/user/settings/applications`). Card line: « Sur Codeberg, un jeton n’expire pas. Vous pouvez le supprimer à tout moment. » Steps: avatar › Configuration; Applications; under Gérer les jetons d’accès, Nom du jeton (`OpenDives`); Tout (public, privé et limité); Dépôt on Lecture et écriture, the others on Aucun accès; Générer un jeton, then copy it.
+
+The intro of both tabs: « OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site. »
+
+The help page must scroll when its content is taller than the screen (the GitHub tab is about 1100 dp tall).
+
+**Test:** each tab of the token help shows its own steps and link, the active tab is underlined, and each link opens the right page.
+
+Done: each host of the token help has its own intro, first line, steps and link text (`tokenHelp.<id>.intro`, `.note`, `.open`, `.s1…`), the GitLab and Codeberg texts are those of the mock-ups, the links are https://gitlab.com/-/user_settings/personal_access_tokens and https://codeberg.org/user/settings/applications, and the page scrolls when taller than the screen (1019 dp on GitHub at 390 dp). Where the sites' current translation files differ from the mock-ups, the sites win: see the list of differences in the report of this task (GitLab personal tokens: Access › Personal access tokens, Generate token › Legacy token, Generate token; Codeberg: Access tokens › New access token, Select permissions with the row `repository`, then Generate token).
+
+## [x] 2026-11-16-256 Help « Créer un dépôt »: French site labels for GitLab and Codeberg (correction to 252)
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** Mock-ups: `docs/mockups/git-depot-aide-android.dc.html`, `git-depot-aide-gitlab-android.dc.html`, `git-depot-aide-codeberg-android.dc.html`.
+
+GitLab and Codeberg exist in French, so their tabs name the labels of the French interface (taken from the GitLab and Gitea/Forgejo translation files). GitHub exists only in English and keeps the English labels. Use the texts of the mock-ups word for word:
+- **Intro of the GitHub tab:** « … GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface. » (same sentence in the GitHub tab of the token help).
+- **Intro of the GitLab and Codeberg tabs:** « … Les libellés ci-dessous sont ceux de l’interface française du site. »
+- **GitLab steps:** + (Créer un nouveau) › Nouveau projet/dépôt; Créer un projet vide; Nom du projet; Niveau de visibilité › Privé; uncheck Initialiser le dépôt avec un README; Créer le projet; Code › Cloner avec HTTPS. Link: « Ouvrir la page « Nouveau projet » de GitLab ».
+- **Codeberg steps:** + › Nouveau dépôt; Nom du dépôt; Rendre le dépôt privé; leave Initialiser le dépôt unchecked; Créer un dépôt; HTTPS. Link: « Ouvrir la page « Nouveau dépôt » de Codeberg ».
+
+**Test:** the GitLab and Codeberg tabs show the French labels, the GitHub tab the English ones with the new intro.
+
+Done: the repository help has one intro per host (GitHub: « GitHub n’existe qu’en anglais… »; GitLab and Codeberg: « Les libellés ci-dessous sont ceux de l’interface française du site. », and in English « The labels below are those of the site’s English interface. »), the French labels of GitLab and Codeberg from the mock-ups, and the links « Ouvrir la page « Nouveau projet » de GitLab » and « Ouvrir la page « Nouveau dépôt » de Codeberg ». The labels were checked against GitLab's `locale/fr/gitlab.po` and Forgejo's `locale_fr-FR.ini` and `locale_en-US.ini`. The GitLab and Codeberg tabs take the language of the app (fr and fr-CA: French labels, en: English labels); GitHub stays English.
+
+## [x] 2026-11-16-257 Tablet and desktop (alpha): « Utiliser mon propre dépôt git », with the help pages
+
+Christian approved this on 16 November 2026. **Alpha, on `main`.** It brings task 247 (phone) and the help pages of tasks 252 to 256 to the tablet and the desktop.
+
+Mock-ups, all in `docs/mockups/`:
+- **Tablet, landscape and portrait:**
+  - `android-tablette-premier-lancement-alpha-git-{paysage,portrait}`;
+  - `-git-erreur-adresse-*`, `-git-erreur-acces-*`;
+  - `-git-telechargement-*`, `-git-carnet-*`.
+- **Desktop:**
+  - `bureau-premier-lancement-alpha-git`;
+  - `-git-erreur-adresse`, `-git-erreur-acces`;
+  - `-git-telechargement`, `-git-carnet`.
+- **Help pages:** `git-depot-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}` and `git-jeton-aide{,-gitlab,-codeberg}-{tablette-paysage,tablette-portrait,bureau}`.
+
+**1. The form.** The same shared git form as on the phone (task 247: texts, fields, messages, links, MD3 spacing), placed in the first-launch frame of the tablet and the desktop: the blue panel with the animated profile stays, the form takes the place of the « J’ai un compte Subsurface » form (same « Retour », same column). « ce téléphone » becomes « cette tablette » or « cet ordinateur ».
+
+**2. Download and logbook.** As for the Subsurface account (tasks 239 and 242), with the git texts: « Votre dépôt git », « Connexion au dépôt » with `github.com/vous/carnet-plongee · main`, « Téléchargement du carnet », « Copie du carnet sur cette tablette / cet ordinateur »; then the logbook opens with the snackbar « Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette / cet ordinateur, même sans réseau. »
+
+**3. Help pages.** « Comment créer un dépôt » and « Comment créer un jeton d’accès » do not open a new screen: the help replaces the form in the same column, with « Retour » back to the form, the page title, the three tabs and the same content as on the phone (labels as `<kbd>`, values as `<code>`, links that open the browser). The column scrolls when the help is taller than the screen; the blue panel does not move. On the desktop the steps say « Cliquez » instead of « Touchez ».
+
+**Test:**
+- On a tablet in both orientations and on the desktop, « Utiliser mon propre dépôt git » opens the form in the first-launch frame.
+- The two errors show under the right field.
+- The help links swap the form for the help, and « Retour » brings the form back with its fields still filled.
+- A valid repository leads to the download, then to the logbook with the snackbar.
+
+Done: tablet on `feature/tablet-git-form` (from `main`), desktop on `feature/desktop-git-form` (from `feature/desktop-logbook`, with the tablet branch merged in; to be merged into `feature/desktop-logbook`). « Utiliser mon propre dépôt git » opens the shared git form (`components/GitForm.svelte`) in the first-launch frame of an Android tablet and of the desktop app: the blue panel stays, the form takes the step column (`EditorialPage` firstLaunch, « Retour », « Connecter » the page's own button), « cette tablette » / « cet ordinateur » through `deviceKey` (`gitRepo.introPhoneTablet`, `introPhoneDesktop`). The connection goes through the download screen (`FirstDownload`, git texts) and the logbook opens with the snackbar at the bottom left (`gitDownloadedTablet`, `gitDownloadedDesktop`). The two help links swap the form for the help in the same column: the body of the phone's two help pages became `components/GitHelp.svelte` (hosts in `lib/git-help.js`), used by `RepositoryHelp`, `TokenHelp` and the column (`embedded`); « Retour » is a button (`EditorialPage` `onback`) that brings the form back, its state being the controller's, so the fields stay filled; the column scrolls (`overflow-y: auto`), the panel does not move, and the About link is now the last item of the column. Desktop: `sNDesktop` variants of the 15 steps that said « Touchez » / « Tap » (« Cliquez sur », « Click »), with the same [kbd]/[code] marks. Also: the panel of the steps is 540 dp tall in portrait (as the mock-ups of the steps draw it; the welcome screen keeps 640), and a narrow landscape window (768 dp) keeps 32 dp column sides. Phones unchanged (390 × 844 screenshots byte-identical before and after). Differences: « Cliquez sur » where the desktop mock-ups write « Cliquez » (French needs the preposition); the desktop GitLab and Codeberg token mock-ups use older labels than the app's texts of tasks 253 to 256, which are kept; the error icon in the token field is not drawn (the phone's form has none either). Tests: `tests/app/git-form-tablet.test.mjs`.
+
+## [x] 2026-11-16-258 Inbox clean-up: tick the desktop and release tasks that are done
+
+Christian asked for this on 16 November 2026. Several tasks are still unticked although their work seems to be on branches that are not on `origin` (the desktop branch, the release branches). I cannot check those branches from here.
+
+Go through these tasks and, for each one, compare the request with the code on its branch:
+- **Desktop app:** 15 (every screen of the mock-ups, a standing task: leave it open), 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 187, 188, 189, 191, 192, 193, 194, 195, 196, 198 (desktop part), 199, 201, 202;
+- **New logbook:** 207, 208;
+- **Release edition:** 218.
+
+For each task:
+- If it is done, tick it and add one line « Done on `<branch>` ».
+- If it is only partly done, leave it unticked and add one line saying what is missing.
+- If a later task replaced it, tick it and add « Superseded by task N ».
+
+Change no code for this task. Report the result in a short list at the end of this task.
+
+Already closed during the same clean-up: 77, 151 (merged into `main`), 186 (superseded by 194), 213 (superseded by 218).
+
+Done (checked against each branch's code and its own inbox, where every one of these tasks had been ticked with a Done note):
+- 15: left open (standing task).
+- 169: Done on `feature/desktop-logbook`.
+- 170: Done on `feature/desktop-logbook`.
+- 171: Done on `feature/desktop-logbook` (Sites and Outils completed there by tasks 177 and 196).
+- 172: Done on `feature/desktop-logbook`.
+- 173: Done on `feature/desktop-logbook`.
+- 174: Done on `feature/desktop-logbook`.
+- 175: Done on `feature/desktop-logbook`.
+- 176: Done on `feature/desktop-logbook`.
+- 177: Done on `feature/desktop-logbook`.
+- 178: Done on `feature/desktop-logbook`.
+- 179: Done on `feature/desktop-logbook`.
+- 180: Done on `feature/desktop-logbook`.
+- 181: left open — Partly done on `feature/desktop-logbook`: the columns move and their order is kept; missing: resizing a column's width, and one column order per logbook now that a window holds one logbook among several (today one order for all).
+- 182: Done on `feature/desktop-logbook`.
+- 183: Done on `feature/desktop-logbook`.
+- 184: Done on `feature/desktop-logbook`.
+- 185: Done on `feature/desktop-logbook`.
+- 187: Done on `feature/desktop-logbook`.
+- 188: Done on `feature/desktop-logbook`.
+- 189: Done on `feature/desktop-logbook`.
+- 191: Done on `feature/desktop-logbook`.
+- 192: Done on `feature/desktop-logbook`.
+- 193: Done on `feature/desktop-logbook`.
+- 194: Done on `feature/desktop-logbook`.
+- 195: Done on `feature/desktop-logbook`.
+- 196: Done on `feature/desktop-logbook`.
+- 198: Done on `feature/desktop-logbook`.
+- 199: Done on `feature/desktop-logbook`.
+- 201: Done on `feature/desktop-logbook`.
+- 202: left open — Partly done on `feature/desktop-logbook`: Réglages, the account sheet and « À propos » are there, and « Ouvrir au démarrage » was added with task 173; missing: « Seulement sur Wi-Fi ou câble » is stored but not applied (the desktop does not yet read the connection type).
+- 207: Done on `feature/desktop-logbook`.
+- 208: Done on `feature/desktop-logbook`.
+- 218: Done on `feature/release-new-logbook` (carried into `feature/release-new-logbook-two-steps`).
+
+## [ ] 2026-11-16-259 Phone (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: do not build anything yet.** These screens need an OpenDives server, which does not exist yet. Read this task, then ask Christian in the session how he wants to proceed: what can be built now (for example the screens behind a switch, with a stubbed server), what waits for the server, and which branch to use. Build nothing before his answer.
+
+Christian approved the design on 16 November 2026. **Release edition only**, never on `main` and not in the beta. Mock-ups: `docs/mockups/android-serveur-*.dc.html` (11 files; canvas « OpenDives — Serveur »).
+
+What the screens show, for when the work starts:
+- **Header.** Every setup screen uses the « en-tête hachuré » (Christian's name for the light section-band gradient with the light rays, the faint profile and the wave, as on « Nom du carnet »). The open logbook keeps the app's header.
+- **Entry points** (`-ou`, `-ouvrir`). « Sur le serveur OpenDives » becomes the first and highlighted choice of « Où le garder ? » and of « Ouvrir mon carnet », before the cloud and git; « Dans mon nuage » becomes an ordinary white row.
+- **Sign-in by e-mail code, no password** (`-courriel`, `-courriel-erreur`, `-code`, `-code-erreur`, `-code-expire`, `-trop-essais`).
+  - The address is entered first, with « Recevoir un code »; the account is created with the code if it does not exist yet.
+  - Then a 6-digit code: « Renvoyer le code » shows a countdown, and « Se connecter » stays disabled until the code is complete.
+  - Errors: invalid address, wrong code, expired code (« Recevoir un nouveau code »), too many attempts (wait 10 minutes).
+- **Server unreachable** (`-hors-ligne`): « Réessayer » and « Choisir un autre endroit ».
+- **Download, then logbook** (`-telechargement`, `-carnet`), as for the other places, with « Connexion au serveur » and the snackbar « Carnet téléchargé depuis le serveur OpenDives. … ».
+
+The tablet and desktop versions will follow in later tasks.
+
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
+
+## [ ] 2026-11-16-260 Tablet and desktop (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: do not build anything yet**, as for task 259: there is no OpenDives server yet. Ask Christian how to proceed before any code. You can ask both questions together, for 259 and 260.
+
+Christian approved the design on 16 November 2026. **Release edition only**, never on `main` and not in the beta.
+
+Mock-ups (canvas « OpenDives — Serveur »), the same 11 screens as task 259:
+- **Tablet:** `docs/mockups/android-tablette-serveur-*-{paysage,portrait}.dc.html`.
+- **Desktop:** `bureau-serveur-*.dc.html`.
+
+They use the release first-launch frame (the blue panel with the animated profile, the step in the right-hand or lower column), with « Sur le serveur OpenDives » as the first choice. The texts are those of task 259, with « cette tablette » or « cet ordinateur ».
+
+On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
+
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
+
+## [x] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
+
+Christian approved this on 16 November 2026. **Release edition:** do it on the branch of task 227, `feature/release-phone-first-launch`, and never merge it into `main`.
+
+**The rule.** The iPhone gets the same « Pour commencer » flow as the Android phone (task 227 and its corrections, the 29 `android-premier-lancement-production-*` mock-ups): same steps, texts, errors and OpenDives components. Framework7's iOS theme draws the native parts (navigation, lists, fields, buttons, sheets). There is no full set of iPhone mock-ups, only the screens that really change.
+
+Mock-ups, in `docs/mockups/`, group « Téléphone iOS » of the « Version Bêta et publique » canvas:
+
+1. **`ios-premier-lancement-production`: safe area.** The status bar and the Dynamic Island sit over the blue band. The welcome hero and the step band grow by the top safe-area inset (about 30 pt more than on Android), so the brand, the headline and the profile start below the island. The home indicator stays clear of the last link.
+2. **`-ou`: iCloud Drive.** « Dans mon nuage » reads « iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV. … ». « ce téléphone » becomes « cet iPhone » everywhere.
+3. **`-nuage-service`: iCloud Drive first.** It is the first service of the list, with the line « Le compte Apple de cet iPhone, sans connexion à faire. ». Choosing it creates the logbook in the app's iCloud Drive folder with no sign-in step, as on macOS (task 228).
+4. **`-webdav`: iOS fields.** Forms use iOS grouped inset rows (label at the left, value at the right, white card, 12 pt corners) instead of the MD3 outlined fields; the help line sits under the card in the secondary label colour (#6C6C70). Apply this to every first-launch form (WebDAV, git, divelogs.de, name).
+5. **`-importer-fichiers`: Files picker.** « Un fichier » opens the system document picker (`UIDocumentPickerViewController`), not a custom screen. The mock-up only sketches it.
+6. **`-importer-fichier-erreur`: iOS alert.** An unreadable file is reported in a native alert (« Ce fichier n’a pas pu être lu », the file name and the formats; « Annuler » and « Autre fichier », which reopens the picker) instead of the inline error card. The other errors keep their inline form.
+
+Cloud sign-in pages open in the system authentication sheet (`ASWebAuthenticationSession`); the texts of the connection screens do not change.
+
+**Test:**
+- On an iPhone with a Dynamic Island, nothing of the band sits under the island.
+- iCloud Drive is offered first and creates a logbook without signing in.
+- The WebDAV form shows iOS rows.
+- « Un fichier » opens the Files picker.
+- An unreadable file shows the alert, and « Autre fichier » reopens the picker.
+
+Done on `feature/release-phone-first-launch` (not merged): on iPhone, the bands clear the island and the home indicator, « cet iPhone » texts, iCloud Drive first with no sign-in step, iOS grouped inset rows on every first-launch form, « Un fichier » opens the Files picker, an unreadable file shows an iOS alert with « Autre fichier ». Native parts written without a Mac and untested: `createIcloudLogbook` in Swift (creates the logbook folder in the app's iCloud Drive container; needs the iCloud capability on the App ID) and the iCloud entitlements; the core does not yet read or write a logbook there, so the screen then says the cloud is coming. Cloud sign-in through `ASWebAuthenticationSession` is not built.
+
+## [x] 2026-11-16-262 Desktop (alpha): the five tabs of the dive detail
+
+Christian approved this on 16 November 2026. Alpha: work on `main`.
+
+Done on `feature/desktop-logbook` (the desktop app lives there): the five tabs, edited in place. « Autre équipement » and « Sous-vêtement » are built but not stored: they wait for the OpenDives server. Build what the mock-ups show and ignore any earlier desktop detail tab you built: these mock-ups replace it.
+
+The detail pane of the desktop logbook has five tabs: Informations, Équipement, Gaz, Notes and Carte. Every grey field is edited in place with one click and saved at once, as in `bureau-carnet-edition-sur-place`.
+
+Mock-ups, in `docs/mockups/`, canvas « OpenDives — Version Alpha »:
+
+1. **Informations: `bureau-carnet-colonnes`.** This is the reference for this tab. The other desktop mock-ups that show it (`bureau-carnet-edition-sur-place`, `-macos`, `-profil-droite`, `bureau-carnets-menu-fichier-macos`, `bureau-compte`, `bureau-premier-lancement-alpha-*-carnet`, `bureau-reglages-macos`) still have the old list: follow `bureau-carnet-colonnes`, not them.
+   - The site is a card at the top: a pin in a blue circle, the site name, its country and number of dives, and a chevron that opens the site's sheet.
+   - Then two columns with a label above each field: « Compagnons » and « Moniteur », then « Type d'eau » and « Visibilité ».
+   - « Type d'eau » is a segmented button, « Eau douce » / « Eau salée », with a check on the selected segment. Never radio buttons.
+   - « Visibilité » is five stars, from 1 to 5, with « Non notée » when empty.
+   - « Combinaison » and « Ordinateur » are no longer in this tab. They are in Équipement.
+2. **Équipement: `bureau-carnet-onglet-equipement`.**
+   - « Ordinateurs de plongée »: the main computer with its serial number, and an empty field to add another.
+   - « Protection et lest »: Combinaison, Sous-vêtement and Lest. **A dive can have several weights**: each is a chip with its place and its weight (« Ceinture 5 kg », « Intégré 3 kg »), then « Ajouter », then the total at the right (« total 8 kg »). Chips wrap to a second line when there are many.
+   - « Autre équipement »: two columns of tiles. Each tile has an icon in a blue circle, the name and a ✕ that removes the item from this dive. A dashed tile « + Ajouter de l'équipement » ends the grid. **Subsurface does not store this list.** Build the interface, but ask Christian where the data is kept before wiring it.
+3. **Gaz: `bureau-carnet-onglet-gaz`.**
+   - One card per cylinder, using the current cylinder drawing (rounded shoulders and neck, as in `android-edition-bouteille`), followed by a dashed « Ajouter une bouteille » card.
+   - The colours are the mobile ones: gas at the start #CFDEF0, gas left at the end a gradient from #A9C4E2 to #5584B5, dashed level lines #C62828. The legend uses the same colours.
+   - The selected card has a neutral background (#F5F4F0) and a dark 2 dp outline, not blue.
+   - Under the cards: the fields of the selected cylinder (Bouteille, Mélange, Pression).
+   - Then a « Consommation » card: SAC, litres breathed, bar used, and a bar with the reserve mark.
+4. **Notes: `bureau-carnet-onglet-notes`.** The notes, as drawn.
+5. **Carte: `bureau-carnet-onglet-carte`.** The map, as drawn. It keeps its height (`flex: none`) and does not shrink.
+
+**Test:**
+- Each tab shows the content of its mock-up for the selected dive.
+- A grey field opens in place and saves on Enter or when the focus leaves it.
+- In Informations, the segmented button changes the water type, and a star sets the visibility.
+- With three weights, the chips wrap and the total is right.
+- The Gaz tab shows one card per cylinder, and selecting a card shows its fields.
+
+## [ ] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+
+Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-phone-first-launch` (the branch of tasks 227 and 261) and never merge it into `main`.
+
+Release mock-ups are now in their own folder, `docs/mockups-release/` (see its README). Mock-ups: `android-premier-lancement-production.dc.html` and `ios-premier-lancement-production.dc.html`, plus the other `android-premier-lancement-production-*` and `ios-premier-lancement-production-*` files for the button style.
+
+1. **Three choices, in this order:**
+   - « Se connecter », sub-line « Ou créer un compte. », with the OpenDives+ chip above the title. It is the main choice: dark blue fill `#1F5C99`, white text, soft blue shadow. It opens the sign-in flow of task 265.
+   - « Commencer un carnet sur ce téléphone » (« cet iPhone » on iOS), sub-line « Gardé ici, même sans réseau. ». White card. It opens « Nouveau carnet » (name), then creates the logbook on the device.
+   - « Importer un carnet », sub-line « Un fichier d’OpenDives ou d’une autre app, ou divelogs.de. ». White card, same as the second.
+2. **Two text buttons under the choices**, centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp apart, 16 dp above and below the group: « Essayer avec un carnet d’exemple » (the demo logbook) and « Découvrir OpenDives+ », which opens the offer screen of task 265.
+3. **Choice buttons, everywhere in the first launch** (this step, « Importer un carnet », « Où le garder ? », « Ouvrir mon carnet », the import errors): 24 dp corners (was 20), and the 48 dp icon tile has 16 dp corners (was 14).
+4. **The logo on the blue band** has no drop shadow. Its disc has a thin light ring instead: 1 dp, white at 30 %.
+5. **Main buttons:** « Créer le carnet » on « Nouveau carnet », and « Importer le carnet » on the import's new-logbook step.
+
+**Test:**
+- The three choices appear in this order, and « Se connecter » is the dark blue one.
+- The two text buttons are centred and do not touch the choices.
+- The choice buttons have 24 dp corners on every first-launch step.
+- The logo has the light ring and no shadow.
+
+## [ ] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+
+Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), and never merge them into `main`.
+
+Mock-ups in `docs/mockups-release/`: `android-tablette-premier-lancement-production-{paysage,portrait}.dc.html`, `bureau-premier-lancement-production.dc.html`, and the other first-launch files of the tablet and the desktop for the button style.
+
+1. **Same three choices and two text buttons as on the phone** (task 263), with « Commencer un carnet sur cette tablette » or « … sur cet ordinateur ».
+2. **Bigger choice buttons**, on every first-launch step (this step, « Importer un carnet », « Où le garder ? », « Ouvrir mon carnet », « Carnets récents », the import errors) and on the server's « Où le garder ? » and « Ouvrir mon carnet »:
+   - title 24 sp, line height 30, semibold, on every choice, blue or white;
+   - 24 dp corners, icon tile 48 dp with 16 dp corners.
+3. **« Se connecter » stands out more** on the first step: 20 dp padding, 28 dp corners, a 56 dp icon tile with 18 dp corners, and the sub-line « Ou créer un compte. » at 16 sp.
+4. Long titles, such as « Commencer un carnet sur cet ordinateur », wrap to two lines. Nothing overflows the column.
+
+**Test:**
+- Every choice title is 24 sp, on the first step and on the other first-launch steps.
+- « Se connecter » is the largest choice of the first step.
+- Portrait tablet: the three choices and the two text buttons fit without scrolling.
+
+## [ ] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+
+Christian approved the design on 17 November 2026. **Release edition:** work on `feature/release-server-screens` (tasks 259 and 260) and never merge it into `main`. Build the screens; ask Christian before anything that needs the store's billing (Google Play Billing, App Store) or a server feature that does not exist yet.
+
+The rules behind the flow:
+- All synchronisation is part of OpenDives+. There is no free account: an account is created only when the diver subscribes.
+- The words: « Se connecter » (Sign in), « Créer un compte » (Sign up), « S’abonner » (Subscribe).
+
+Mock-ups in `docs/mockups-release/`, in the order of the flow:
+
+1. **`android-odplus-connexion`** (« Se connecter ou créer un compte »): opened by « Se connecter » on the first step.
+   - « Vous êtes abonné ? Connectez-vous en un geste, sans mot de passe à retenir. »
+   - Three buttons: « Continuer avec Google », « Continuer avec Apple », « Continuer avec mon courriel ». The Google and Apple marks are plain letter discs in the mock-up; use each provider's official sign-in button rules in the app.
+   - The note « Pas encore abonné ? On vous présentera OpenDives+. Aucun compte n’est créé tant que vous ne vous abonnez pas. », then the text button « Continuer sans compte » (back to the first step).
+2. **By e-mail** (`android-serveur-courriel`, `-courriel-erreur`, `-code`, `-code-erreur`, `-code-expire`, `-trop-essais`, `-hors-ligne`): the screens of task 259, with these changes:
+   - no « Serveur OpenDives » overline above the titles;
+   - `-hors-ligne`: the icon is centred, and the text button reads « Revenir à l’accueil ».
+3. **Subscribed account** → `android-serveur-telechargement` (the OpenDives+ chip above the title « Téléchargement du carnet ») → **`android-odplus-pret`** (« Votre carnet est prêt »: blue hero with a white check, the OpenDives+ chip, a centred summary card about 280 dp wide with dives, sites, equipment and cards, the account line, « Ouvrir mon carnet ») → the open logbook (`android-serveur-carnet`).
+4. **Account without a subscription** (and « Découvrir OpenDives+ » on the first step) → **`android-odplus-offre`** (« OpenDives+, l’offre »):
+   - blue hero with the OpenDives+ chip and the title « Votre carnet, partout et en sécurité »;
+   - four benefit cards in two columns, each with its soft colour: Synchronisé, Sauvegardé, Équipement, Brevets;
+   - the price on a dark blue card: « 14,99 $ US par an », « soit 1,25 $ par mois · Résiliable en tout temps »;
+   - « S’abonner », then the text button « Continuer sans abonnement » and the line « Aucun compte n’est créé. ».
+5. **`android-odplus-abonne`** (« Bienvenue dans OpenDives+ ! »), after a successful purchase:
+   - a tall blue hero with bubbles and a large white check;
+   - « Ce qui est activé »: three rows with a check (Synchronisé sur vos appareils, Sauvegarde automatique, Équipement et brevets);
+   - the account line, and « Ouvrir mon carnet ».
+
+**Test:**
+- « Se connecter » opens the connection screen. « Continuer sans compte » goes back without creating anything.
+- A subscribed account goes through the download and « Votre carnet est prêt », then the logbook.
+- An account without a subscription sees the offer. « Continuer sans abonnement » creates no account.
+- « Découvrir OpenDives+ » opens the offer.
+
+## [ ] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: ask Christian how to proceed before any code**, as for tasks 259 and 260. Christian approved the design on 17 November 2026. **Release edition only:** `feature/release-server-screens`, never merged into `main`.
+
+After the code sign-in, an account with no logbook on the server today ends on « Aucun carnet sur le serveur ». These screens create the logbook. The logbook is kept in OpenDives's own format, in git. The Subsurface format is only for import and export.
+
+Mock-ups in `docs/mockups-release/`, for the phone (`android-serveur-creer-*`), the tablet (`android-tablette-serveur-creer-*-{paysage,portrait}`) and the desktop (`bureau-serveur-creer-*`). Each uses « ce téléphone », « cette tablette » or « cet ordinateur ».
+
+1. **`-choix`, « Aucun carnet sur votre compte »:** three choices.
+   - « Créer un carnet vide » leads to `-nom`.
+   - « Importer un fichier Subsurface » takes a .ssrf or .xml file, converted to OpenDives's format.
+   - « Envoyer le carnet de ce téléphone » appears only when a logbook already exists on the device.
+   - The last two lead to `-envoi`.
+2. **`-nom`, « Nouveau carnet »:** the same name step as elsewhere (« en-tête hachuré »), with « Il sera gardé sur le serveur OpenDives et sur ce téléphone. » and « Créer le carnet ».
+3. **`-envoi`, « Envoi du carnet »:**
+   - a determinate progress bar and « 198 plongées sur 312 », with the time left;
+   - a note that the logbook is already saved on the device, and that the upload resumes after leaving the app;
+   - the text button « Annuler l’envoi ».
+4. **`-carnet`:** the open logbook, with the snackbar « Carnet envoyé sur le serveur OpenDives. Il reste aussi sur ce téléphone. ».
+5. **`-hors-ligne`, « Serveur injoignable »,** while creating: nothing has been created. « Réessayer » and « Revenir à l’accueil ».
+6. **`-interrompu`, « Envoi interrompu »:** the bar stops where the upload stopped, and nothing is lost. « Reprendre l’envoi » resumes from that point, and « Plus tard » opens the logbook on the device.
+
+Also on the tablet and the desktop: the server sign-in screens of task 260 (`android-tablette-serveur-*`, `bureau-serveur-*` in `docs/mockups-release/`) lose the « Serveur OpenDives » overline, and their unreachable-server icon is centred, as on the phone (task 265).
+
+**Test:**
+- An empty account shows the three choices. The third one appears only when a logbook exists on the device.
+- A cut connection during the upload shows « Envoi interrompu », and « Reprendre l’envoi » continues from where it stopped.

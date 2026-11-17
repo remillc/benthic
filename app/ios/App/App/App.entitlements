@@ -15,5 +15,19 @@
 	<array>
 		<string>applinks:opendives.app</string>
 	</array>
+	<!-- iCloud Drive, first launch on iPhone (task 2026-11-16-261): the logbook is created in the app's container.
+	     Needs the iCloud capability (iCloud Documents) and the container on the App ID. -->
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.org.opendives.app</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudDocuments</string>
+	</array>
+	<key>com.apple.developer.ubiquity-container-identifiers</key>
+	<array>
+		<string>iCloud.org.opendives.app</string>
+	</array>
 </dict>
 </plist>

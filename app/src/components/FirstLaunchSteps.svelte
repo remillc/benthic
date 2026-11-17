@@ -26,14 +26,17 @@
   import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
-  import { cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
+  import { openSignIn, openOffer } from '../lib/release-plus.js';
+  import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
+  import { errorCode } from '../lib/account.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
-  import { deviceKey } from '../lib/first-launch-phone.js';
+  import { deviceKind, deviceKey, iphoneKey, iosPhone } from '../lib/first-launch-phone.js';
+  import { layout, ios, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { layout, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { cloudErrorKey, creationErrorKey } from '../lib/desktop-logbooks.js';
@@ -48,9 +51,17 @@
   let { f7router, recents = false } = $props();
 
   const step = $derived(currentStep());
-  /** The services of the lists; iCloud Drive only in the desktop app on macOS (task 2026-11-16-228). */
-  const services = cloudServices(desktopMac);
-  const service = $derived(services.find((s) => s.key === flow.service) ?? services[0]);
+  /** The first step's rows are 12 dp high on an Android phone (mock-up android-premier-lancement-production). */
+  const denseRows = $derived(layout.phone && !ios);
+  /** The iPhone variant of the first launch (task 2026-11-16-261): iCloud Drive first, iOS rows and alert. */
+  const iphone = $derived(iosPhone(ios, layout.phone));
+  /** The device the texts name: this tablet, phone, iPhone or computer (one `deviceKey` for all). */
+  const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
+  /** The icon of the device choice: a computer on the desktop, a phone on a phone, a tablet on a tablet. */
+  const deviceIcon = $derived(kind === 'desktop' ? 'desktop' : layout.phone ? 'device' : 'tablet');
+  /** The services of the lists; iCloud Drive first on an iPhone, before WebDAV on macOS (tasks 2026-11-16-228, 261). */
+  const services = $derived(cloudServices({ iphone, mac: desktopMac }));
+  const service = $derived([ICLOUD_SERVICE, ...CLOUD_SERVICES].find((s) => s.key === flow.service) ?? CLOUD_SERVICES[0]);
   /**
    * The desktop app's window without a logbook: it takes the logbook this first launch makes (the main process
    * creates it and the window reloads on it), and the cloud connection is the desktop app's own (desktop/cloud.cjs).
@@ -98,9 +109,28 @@
   /** @param {string} key */
   function pickService(key) {
     flow.service = key;
-    // iCloud Drive is the Mac's own account: no sign-in screen, straight to the connected one.
-    if (key === 'icloud') flow.account = t('welcomeSteps.icloudAccount');
+    // iCloud Drive uses the Apple account of the device: no sign-in screen, straight to the connected one.
+    if (key === 'icloud') flow.account = t(iphone ? 'welcomeSteps.icloudAccountIphone' : 'welcomeSteps.icloudAccountDesktop');
     go(key === 'webdav' ? 'webdav' : key === 'icloud' ? 'icloud' : 'service');
+  }
+
+  /**
+   * « Créer le carnet » on the iCloud Drive screen of an iPhone: the logbook's folder is created in the app's iCloud
+   * Drive container (plugin, iOS only). The core does not read a logbook from that container yet, so the screen ends
+   * with the « coming » message once the folder exists; iCloud Drive turned off says so.
+   */
+  async function createInIcloud() {
+    if (busy || nameInvalid) return;
+    busy = true;
+    try {
+      await OpenDivesCore.createIcloudLogbook({ name: fileName });
+      cloud();
+    } catch (e) {
+      if (errorCode(e) === 'NOT_AVAILABLE') f7.dialog.create({ title: t('welcomeSteps.icloud'), text: t('welcomeSteps.icloudUnavailable'), buttons: [{ text: t('dialog.ok') }] }).open();
+      else failed(e);
+    } finally {
+      busy = false;
+    }
   }
 
   /** @returns {any} the desktop app's bridge (window.odDesktop) */
@@ -191,13 +221,6 @@
   /** « Changer de compte » of « Aucun carnet dans ce compte »: the list of services. */
   function otherAccount() {
     goBackTo('openCloudService');
-  }
-
-  /** « Seulement sur cette tablette », « Dans un dépôt git » and « Dans mon nuage » of the name step. */
-  function where(/** @type {'cloud'|'git'|'device'} */ kind) {
-    if (nameInvalid) return;
-    if (kind === 'device') void createOnDevice();
-    else go(kind);
   }
 
   /** The dives to bring into the new logbook, once it is open (nothing for an empty logbook). */
@@ -341,10 +364,23 @@
     console.error('First launch', code);
     const key = importErrorKey(code);
     if (step === 'import' && file && (key === 'logbook.importFailed' || key === 'logbook.importNoDives')) {
-      unreadable = file.name;
+      // iPhone: a native alert (task 2026-11-16-261) instead of the inline card; « Autre fichier » reopens the picker.
+      if (iphone) unreadableAlert(file.name);
+      else unreadable = file.name;
       return;
     }
     f7.dialog.create({ title: t('logbook.importTitle'), text: t(key), buttons: [{ text: t('dialog.ok') }] }).open();
+  }
+
+  /** The iOS alert of an unreadable file: « Annuler » and « Autre fichier », which opens the Files picker again. */
+  function unreadableAlert(/** @type {string} */ name) {
+    f7.dialog
+      .create({
+        title: t('welcomeSteps.fileUnreadable'),
+        text: t('welcomeSteps.fileUnreadableHelp', { name }),
+        buttons: [{ text: t('welcomeSteps.cancel') }, { text: t('welcomeSteps.otherFile'), bold: true, onClick: () => fileInput?.click() }],
+      })
+      .open();
   }
 
   /** @param {File} file */
@@ -520,7 +556,14 @@
     {#each services as s (s.key)}
       <button type="button" class="od-first-launch--list-row" onclick={() => pickService(s.key)}>
         <span class="od-first-launch--list-tile"><Icon name={s.icon === 'server' ? 'server' : 'cloudUpload'} size={22} /></span>
-        <span class="od-first-launch--list-title">{t(s.text)}</span>
+        {#if s.help}
+          <span class="od-first-launch--list-text">
+            <span class="od-first-launch--list-title">{t(s.text)}</span>
+            <span class="od-first-launch--list-detail">{t(s.help)}</span>
+          </span>
+        {:else}
+          <span class="od-first-launch--list-title">{t(s.text)}</span>
+        {/if}
         <span class="od-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
       </button>
     {/each}
@@ -580,7 +623,7 @@
   {/if}
 {/snippet}
 
-{#snippet nameAndWhere()}
+{#snippet nameStep()}
   {#if flow.source}
     <div class="od-first-launch--summary">
       <span class="od-first-launch--summary-icon"><Icon name="file" size={20} /></span>
@@ -591,13 +634,11 @@
     </div>
   {/if}
   <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} />
-  <h3 class="od-first-launch--section">{t('welcomeSteps.whereTitle')}</h3>
-  <p class="od-first-launch--section-help">{t('welcomeSteps.whereHelp')}</p>
-  <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.whereTitle')}>
-    <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.cloudHelp')} disabled={nameInvalid} onclick={() => where('cloud')} />
-    <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.gitHelp')} disabled={nameInvalid} onclick={() => where('git')} />
-    <ReleaseChoiceRow icon={desktopApp ? 'desktop' : 'tablet'} title={t(deviceKey('welcomeSteps.deviceTitle', layout.phone, desktopApp))} help={t(deviceKey('welcomeSteps.deviceHelp', layout.phone, desktopApp))} disabled={nameInvalid || busy} onclick={() => where('device')} />
-  </nav>
+  {#if step === 'importNew'}
+    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.importLogbook')}</button>
+  {:else}
+    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.createLogbook')}</button>
+  {/if}
 {/snippet}
 
 <div class="od-first-launch" class:od-first-launch--first={step === 'start'} class:od-first-launch--dragging={dragging} class:od-first-launch--desktop={desktopApp}>
@@ -624,16 +665,20 @@
           {@render dropLine()}
         {:else if step === 'start'}
           <nav class="od-first-launch--rows od-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
-            <ReleaseChoiceRow main icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
-            <ReleaseChoiceRow icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
-            <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
+            <!-- Task 2026-11-17-263: sign in (the OpenDives+ chip above its title), then a logbook on the device, then the import. -->
+            <ReleaseChoiceRow main prominent plus dense={denseRows} icon="login" title={t('welcomeSteps.signInTitle')} help={t('welcomeSteps.signInHelp')} onclick={() => openSignIn(showSnackbar, t)} />
+            <ReleaseChoiceRow dense={denseRows} icon={deviceIcon} title={t(deviceKey('welcomeSteps.localTitle', kind))} help={t('welcomeSteps.localHelp')} onclick={() => go('create')} />
+            <ReleaseChoiceRow dense={denseRows} icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
           </nav>
-          {#if demoOffered}
-            <button type="button" class="od-first-launch--demo" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
-          {/if}
+          <div class="od-first-launch--text-buttons">
+            {#if demoOffered}
+              <button type="button" class="od-first-launch--text-button" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
+            {/if}
+            <button type="button" class="od-first-launch--text-button od-first-launch--text-button-quiet" onclick={() => openOffer(showSnackbar, t)}>{t('welcomeSteps.discoverPlus')}</button>
+          </div>
           {@render dropLine()}
         {:else if step === 'new' || step === 'importNew'}
-          {@render nameAndWhere()}
+          {@render nameStep()}
         {:else if step === 'cloudService'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.serviceTitle')}</h3>
           <p class="od-first-launch--lead">{t('welcomeSteps.serviceHelp')}</p>
@@ -649,7 +694,7 @@
             {#if service.key !== 'icloud'}
               <button type="button" class="od-first-launch--text-link" disabled={switching} onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
             {/if}
-            <button type="button" class="od-first-launch--action" disabled={busy} onclick={createCloud}>{t('welcomeSteps.createLogbook')}</button>
+            <button type="button" class="od-first-launch--action" disabled={busy} onclick={iphone && service.key === 'icloud' ? createInIcloud : createCloud}>{t('welcomeSteps.createLogbook')}</button>
           {/if}
         {:else if step === 'webdav'}
           <h3 class="od-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
@@ -684,7 +729,7 @@
         {:else if step === 'open'}
           <p class="od-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
-            <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t('welcomeSteps.openCloudHelp')} onclick={() => go('cloud')} />
+            <ReleaseChoiceRow main icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.openCloudHelp', iphone))} onclick={() => go('cloud')} />
             <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.openGitHelp')} onclick={() => go('git')} />
           </nav>
         {:else if step === 'openCloudService'}
@@ -1387,21 +1432,41 @@
       }
     }
 
-    /* « Essayer avec un carnet d’exemple » under the three choices of the first step (task 2026-11-16-224). */
-    .od-first-launch--demo {
-      width: auto;
+    /* The two text buttons under the three choices of the first step (task 2026-11-17-263): « Essayer avec un carnet
+       d’exemple » and « Découvrir OpenDives+ », centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp
+       apart, 16 dp above and below the group. */
+    .od-first-launch--text-buttons {
       align-self: center;
-      margin: 24px 0 0;
-      padding: 2px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .od-first-launch--text-button {
+      width: auto;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 12px;
       border: none;
+      border-radius: 20px;
       background: transparent;
       color: var(--od-release-link);
       font: inherit;
-      font-size: 14px;
-      line-height: 19px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 500;
       cursor: pointer;
+      transition: background-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+
+      &.od-first-launch--text-button-quiet {
+        color: var(--od-text-2);
+      }
 
       &:disabled {
         opacity: 0.5;
@@ -1410,15 +1475,13 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          color: var(--od-release-row-main-hover);
-          text-decoration-thickness: 2px;
+          background: var(--od-release-hover);
         }
       }
 
       &:focus-visible {
         outline: 2px solid var(--od-release-link);
-        outline-offset: 3px;
-        border-radius: 4px;
+        outline-offset: 2px;
       }
     }
 
@@ -1519,12 +1582,12 @@
     }
 
     /* Phone (task 2026-11-16-227; mock-ups docs/mockups/android-premier-lancement-production*.dc.html): the column
-       has 20 dp of padding and its content starts at the top (16 dp under the 96 dp band, 20 dp under the
+       has 16 dp side margins (task 2026-11-16-248, MD3 compact) and its content starts at the top (16 dp under the 96 dp band, 20 dp under the
        330 dp one); the page scrolls when a step is taller than the screen, and the help link follows the
        content, at the bottom of the screen when there is room. */
     @media (max-width: 767.98px) {
       .od-first-launch {
-        padding: 16px 20px 0;
+        padding: 16px 16px 0;
         overflow: visible;
       }
 

@@ -16,8 +16,8 @@
   import { accountReady } from '../lib/logbook.svelte.js';
   import { flow } from '../lib/first-launch.svelte.js';
   import { gitProblem, gitProblemFromCode, gitUserName } from '../lib/first-launch-git.js';
-  import { deviceKey } from '../lib/first-launch-phone.js';
-  import { layout, desktopApp } from '../lib/layout.svelte.js';
+  import { deviceKind, deviceKey, iosPhone } from '../lib/first-launch-phone.js';
+  import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -126,18 +126,27 @@
   const note = $derived(t('welcomeSteps.gitNote').split('{link}'));
 </script>
 
+{#snippet branchAndToken()}
+  <ReleaseField class="od-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} oninput={edited} />
+  <ReleaseField class="od-first-launch-git--token" label={t('welcomeSteps.gitToken')} bind:value={token} type="password" error={tokenLive.error} disabled={busy} />
+{/snippet}
+
 <div class="od-first-launch-git">
   <ReleaseField label={t('welcomeSteps.gitAddress')} bind:value={url} mono error={addressLive.error || problemText} disabled={busy} autocomplete="url" oninput={edited} />
-  <div class="od-first-launch-git--pair">
-    <ReleaseField class="od-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} oninput={edited} />
-    <ReleaseField class="od-first-launch-git--token" label={t('welcomeSteps.gitToken')} bind:value={token} type="password" error={tokenLive.error} disabled={busy} />
-  </div>
+  {#if iosPhone(ios, layout.phone)}
+    <!-- iPhone: the three fields are rows of one grouped list (task 2026-11-16-261), not a pair side by side. -->
+    {@render branchAndToken()}
+  {:else}
+    <div class="od-first-launch-git--pair">
+      {@render branchAndToken()}
+    </div>
+  {/if}
   {#if problem}
     <!-- The repository does not fit this path (mock-ups …-git-erreur-paysage, …-ouvrir-git-erreur-paysage). -->
     <p class="od-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="od-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
   {:else}
-    <div class="od-first-launch-git--token-help">
-      <span>{t(deviceKey('welcomeSteps.gitTokenHelp', layout.phone, desktopApp))}</span>
+    <div class="od-first-launch-git--token-help" class:od-first-launch-git--token-help-ios={iosPhone(ios, layout.phone)}>
+      <span>{t(deviceKey('welcomeSteps.gitTokenHelp', deviceKind({ phone: layout.phone, ios, desktop: desktopApp })))}</span>
       <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
     </div>
 
@@ -174,6 +183,11 @@
       :global(.od-first-launch-git--token) {
         flex: 1;
       }
+    }
+
+    /* iPhone: the help under the card in iOS's secondary label colour. */
+    .od-first-launch-git--token-help.od-first-launch-git--token-help-ios {
+      color: var(--od-release-ios-help);
     }
 
     .od-first-launch-git--token-help {
