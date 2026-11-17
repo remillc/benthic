@@ -1180,7 +1180,9 @@
     "localTitleIphone": "Commencer un carnet sur cet iPhone",
     "localHelp": "Gardé ici, même sans réseau.",
     "importStartHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
-    "localTitleDesktop": "Commencer un carnet sur cet ordinateur"
+    "localTitleDesktop": "Commencer un carnet sur cet ordinateur",
+    "openHelp": "Il est déjà dans votre nuage ou dans un dépôt git.",
+    "createHelp": "Vous choisirez ensuite où le garder."
   },
   "signOut": {
     "title": "Se déconnecter ?",

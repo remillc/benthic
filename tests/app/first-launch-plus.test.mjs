@@ -14,7 +14,7 @@ const row = read('components/ReleaseChoiceRow.svelte');
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
 
 test('the three choices come in the order of the mock-up, « Se connecter » first and filled', () => {
-  const start = steps.slice(steps.indexOf("{#if step === 'start'}"), steps.indexOf("step === 'new' || step === 'importNew'"));
+  const start = steps.slice(steps.indexOf("{:else if step === 'start'}"), steps.indexOf("step === 'new' || step === 'importNew'"));
   const order = ['welcomeSteps.signInTitle', 'welcomeSteps.localTitle', 'welcomeSteps.importTitle'].map((k) => start.indexOf(k));
   assert.ok(order.every((i) => i > 0) && order[0] < order[1] && order[1] < order[2], String(order));
   assert.match(start, /<ReleaseChoiceRow main prominent plus /);
@@ -22,7 +22,7 @@ test('the three choices come in the order of the mock-up, « Se connecter » fir
   assert.equal(langs.fr.welcomeSteps.signInTitle, 'Se connecter');
   assert.equal(langs.fr.welcomeSteps.signInHelp, 'Ou créer un compte.');
   assert.equal(langs.fr.welcomeSteps.localHelp, 'Gardé ici, même sans réseau.');
-  assert.equal(langs.fr.welcomeSteps.importHelp, 'Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.');
+  assert.equal(langs.fr.welcomeSteps.importStartHelp, 'Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.');
   assert.equal(langs.fr.welcomeSteps.discoverPlus, 'Découvrir OpenDives+');
 });
 

@@ -1180,7 +1180,9 @@
     "localTitleIphone": "Start a logbook on this iPhone",
     "localHelp": "Kept here, even without a network.",
     "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
-    "localTitleDesktop": "Start a logbook on this computer"
+    "localTitleDesktop": "Start a logbook on this computer",
+    "openHelp": "It is already in your cloud or in a git repository.",
+    "createHelp": "You will choose where to keep it next."
   },
   "signOut": {
     "title": "Sign out?",

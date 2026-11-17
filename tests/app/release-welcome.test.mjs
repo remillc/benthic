@@ -184,7 +184,7 @@ test('the import summary reads sites and years from Subsurface XML, only the cou
 
 // --- Texts -------------------------------------------------------------------------------------------------
 
-const KEPT_FOR_WHERE = ['deviceTitleDesktop', 'deviceHelpDesktop', 'whereTitle', 'whereHelp', 'cloudHelp', 'cloudHelpIphone', 'gitHelp', 'deviceTitle', 'deviceTitlePhone', 'deviceTitleIphone', 'deviceHelp', 'deviceHelpPhone', 'deviceHelpIphone'];
+const KEPT_FOR_WHERE = ['createHelp', 'openHelp', 'importHelp', 'deviceTitleDesktop', 'deviceHelpDesktop', 'whereTitle', 'whereHelp', 'cloudHelp', 'cloudHelpIphone', 'gitHelp', 'deviceTitle', 'deviceTitlePhone', 'deviceTitleIphone', 'deviceHelp', 'deviceHelpPhone', 'deviceHelpIphone'];
 
 test('every text of the release screens is in fr and en, none is unused', () => {
   const keys = new Set();
@@ -207,7 +207,7 @@ test('every text of the release screens is in fr and en, none is unused', () => 
   }
   for (const group of ['welcomeRelease', 'welcomeSteps']) {
     for (const key of Object.keys(langs.fr[group])) {
-      // The texts of « Où le garder ? » (name step before task 2026-11-17-263) stay for the server screens' own step.
+      // The texts of « Où le garder ? » (name step before task 2026-11-17-263) stay for the server screens' own step; the old first-step texts stay for the desktop's recent-logbooks screen.
       if (group === 'welcomeSteps' && KEPT_FOR_WHERE.includes(key)) continue;
       assert.ok(keys.has(`${group}.${key}`), `unused: ${group}.${key}`);
     }
