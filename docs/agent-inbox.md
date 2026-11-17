@@ -5159,6 +5159,8 @@ What the screens show, for when the work starts:
 
 The tablet and desktop versions will follow in later tasks.
 
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
+
 ## [ ] 2026-11-16-260 Tablet and desktop (release): the OpenDives server screens — ASK CHRISTIAN BEFORE BUILDING
 
 **Stop: do not build anything yet**, as for task 259: there is no OpenDives server yet. Ask Christian how to proceed before any code. You can ask both questions together, for 259 and 260.
@@ -5172,6 +5174,8 @@ Mock-ups (canvas « OpenDives — Serveur »), the same 11 screens as task 259:
 They use the release first-launch frame (the blue panel with the animated profile, the step in the right-hand or lower column), with « Sur le serveur OpenDives » as the first choice. The texts are those of task 259, with « cette tablette » or « cet ordinateur ».
 
 On these wide screens the six code boxes stay grouped at the start of the line, 12 dp apart, instead of spreading over the column.
+
+Partly done on `feature/release-server-screens` (with task 260): the screens on phone, tablet and desktop, sign-in against the local development server; missing: opening the downloaded logbook (the app does not read the OpenDives format yet).
 
 ## [x] 2026-11-16-261 iPhone (release): the « Pour commencer » first launch
 
@@ -5234,3 +5238,104 @@ Mock-ups, in `docs/mockups/`, canvas « OpenDives — Version Alpha »:
 - In Informations, the segmented button changes the water type, and a star sets the visibility.
 - With three weights, the chips wrap and the total is right.
 - The Gaz tab shows one card per cylinder, and selecting a card shows its fields.
+
+## [ ] 2026-11-17-263 Phone and iPhone (release): the new « Pour commencer » step
+
+Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-phone-first-launch` (the branch of tasks 227 and 261) and never merge it into `main`.
+
+Release mock-ups are now in their own folder, `docs/mockups-release/` (see its README). Mock-ups: `android-premier-lancement-production.dc.html` and `ios-premier-lancement-production.dc.html`, plus the other `android-premier-lancement-production-*` and `ios-premier-lancement-production-*` files for the button style.
+
+1. **Three choices, in this order:**
+   - « Se connecter », sub-line « Ou créer un compte. », with the OpenDives+ chip above the title. It is the main choice: dark blue fill `#1F5C99`, white text, soft blue shadow. It opens the sign-in flow of task 265.
+   - « Commencer un carnet sur ce téléphone » (« cet iPhone » on iOS), sub-line « Gardé ici, même sans réseau. ». White card. It opens « Nouveau carnet » (name), then creates the logbook on the device.
+   - « Importer un carnet », sub-line « Un fichier d’OpenDives ou d’une autre app, ou divelogs.de. ». White card, same as the second.
+2. **Two text buttons under the choices**, centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp apart, 16 dp above and below the group: « Essayer avec un carnet d’exemple » (the demo logbook) and « Découvrir OpenDives+ », which opens the offer screen of task 265.
+3. **Choice buttons, everywhere in the first launch** (this step, « Importer un carnet », « Où le garder ? », « Ouvrir mon carnet », the import errors): 24 dp corners (was 20), and the 48 dp icon tile has 16 dp corners (was 14).
+4. **The logo on the blue band** has no drop shadow. Its disc has a thin light ring instead: 1 dp, white at 30 %.
+5. **Main buttons:** « Créer le carnet » on « Nouveau carnet », and « Importer le carnet » on the import's new-logbook step.
+
+**Test:**
+- The three choices appear in this order, and « Se connecter » is the dark blue one.
+- The two text buttons are centred and do not touch the choices.
+- The choice buttons have 24 dp corners on every first-launch step.
+- The logo has the light ring and no shadow.
+
+## [ ] 2026-11-17-264 Tablet and desktop (release): the new « Pour commencer » step
+
+Christian approved this on 17 November 2026. **Release edition:** work on `feature/release-first-launch` (tablet) and `feature/release-desktop-first-launch` (desktop), and never merge them into `main`.
+
+Mock-ups in `docs/mockups-release/`: `android-tablette-premier-lancement-production-{paysage,portrait}.dc.html`, `bureau-premier-lancement-production.dc.html`, and the other first-launch files of the tablet and the desktop for the button style.
+
+1. **Same three choices and two text buttons as on the phone** (task 263), with « Commencer un carnet sur cette tablette » or « … sur cet ordinateur ».
+2. **Bigger choice buttons**, on every first-launch step (this step, « Importer un carnet », « Où le garder ? », « Ouvrir mon carnet », « Carnets récents », the import errors) and on the server's « Où le garder ? » and « Ouvrir mon carnet »:
+   - title 24 sp, line height 30, semibold, on every choice, blue or white;
+   - 24 dp corners, icon tile 48 dp with 16 dp corners.
+3. **« Se connecter » stands out more** on the first step: 20 dp padding, 28 dp corners, a 56 dp icon tile with 18 dp corners, and the sub-line « Ou créer un compte. » at 16 sp.
+4. Long titles, such as « Commencer un carnet sur cet ordinateur », wrap to two lines. Nothing overflows the column.
+
+**Test:**
+- Every choice title is 24 sp, on the first step and on the other first-launch steps.
+- « Se connecter » is the largest choice of the first step.
+- Portrait tablet: the three choices and the two text buttons fit without scrolling.
+
+## [ ] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+
+Christian approved the design on 17 November 2026. **Release edition:** work on `feature/release-server-screens` (tasks 259 and 260) and never merge it into `main`. Build the screens; ask Christian before anything that needs the store's billing (Google Play Billing, App Store) or a server feature that does not exist yet.
+
+The rules behind the flow:
+- All synchronisation is part of OpenDives+. There is no free account: an account is created only when the diver subscribes.
+- The words: « Se connecter » (Sign in), « Créer un compte » (Sign up), « S’abonner » (Subscribe).
+
+Mock-ups in `docs/mockups-release/`, in the order of the flow:
+
+1. **`android-odplus-connexion`** (« Se connecter ou créer un compte »): opened by « Se connecter » on the first step.
+   - « Vous êtes abonné ? Connectez-vous en un geste, sans mot de passe à retenir. »
+   - Three buttons: « Continuer avec Google », « Continuer avec Apple », « Continuer avec mon courriel ». The Google and Apple marks are plain letter discs in the mock-up; use each provider's official sign-in button rules in the app.
+   - The note « Pas encore abonné ? On vous présentera OpenDives+. Aucun compte n’est créé tant que vous ne vous abonnez pas. », then the text button « Continuer sans compte » (back to the first step).
+2. **By e-mail** (`android-serveur-courriel`, `-courriel-erreur`, `-code`, `-code-erreur`, `-code-expire`, `-trop-essais`, `-hors-ligne`): the screens of task 259, with these changes:
+   - no « Serveur OpenDives » overline above the titles;
+   - `-hors-ligne`: the icon is centred, and the text button reads « Revenir à l’accueil ».
+3. **Subscribed account** → `android-serveur-telechargement` (the OpenDives+ chip above the title « Téléchargement du carnet ») → **`android-odplus-pret`** (« Votre carnet est prêt »: blue hero with a white check, the OpenDives+ chip, a centred summary card about 280 dp wide with dives, sites, equipment and cards, the account line, « Ouvrir mon carnet ») → the open logbook (`android-serveur-carnet`).
+4. **Account without a subscription** (and « Découvrir OpenDives+ » on the first step) → **`android-odplus-offre`** (« OpenDives+, l’offre »):
+   - blue hero with the OpenDives+ chip and the title « Votre carnet, partout et en sécurité »;
+   - four benefit cards in two columns, each with its soft colour: Synchronisé, Sauvegardé, Équipement, Brevets;
+   - the price on a dark blue card: « 14,99 $ US par an », « soit 1,25 $ par mois · Résiliable en tout temps »;
+   - « S’abonner », then the text button « Continuer sans abonnement » and the line « Aucun compte n’est créé. ».
+5. **`android-odplus-abonne`** (« Bienvenue dans OpenDives+ ! »), after a successful purchase:
+   - a tall blue hero with bubbles and a large white check;
+   - « Ce qui est activé »: three rows with a check (Synchronisé sur vos appareils, Sauvegarde automatique, Équipement et brevets);
+   - the account line, and « Ouvrir mon carnet ».
+
+**Test:**
+- « Se connecter » opens the connection screen. « Continuer sans compte » goes back without creating anything.
+- A subscribed account goes through the download and « Votre carnet est prêt », then the logbook.
+- An account without a subscription sees the offer. « Continuer sans abonnement » creates no account.
+- « Découvrir OpenDives+ » opens the offer.
+
+## [ ] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+
+**Stop: ask Christian how to proceed before any code**, as for tasks 259 and 260. Christian approved the design on 17 November 2026. **Release edition only:** `feature/release-server-screens`, never merged into `main`.
+
+After the code sign-in, an account with no logbook on the server today ends on « Aucun carnet sur le serveur ». These screens create the logbook. The logbook is kept in OpenDives's own format, in git. The Subsurface format is only for import and export.
+
+Mock-ups in `docs/mockups-release/`, for the phone (`android-serveur-creer-*`), the tablet (`android-tablette-serveur-creer-*-{paysage,portrait}`) and the desktop (`bureau-serveur-creer-*`). Each uses « ce téléphone », « cette tablette » or « cet ordinateur ».
+
+1. **`-choix`, « Aucun carnet sur votre compte »:** three choices.
+   - « Créer un carnet vide » leads to `-nom`.
+   - « Importer un fichier Subsurface » takes a .ssrf or .xml file, converted to OpenDives's format.
+   - « Envoyer le carnet de ce téléphone » appears only when a logbook already exists on the device.
+   - The last two lead to `-envoi`.
+2. **`-nom`, « Nouveau carnet »:** the same name step as elsewhere (« en-tête hachuré »), with « Il sera gardé sur le serveur OpenDives et sur ce téléphone. » and « Créer le carnet ».
+3. **`-envoi`, « Envoi du carnet »:**
+   - a determinate progress bar and « 198 plongées sur 312 », with the time left;
+   - a note that the logbook is already saved on the device, and that the upload resumes after leaving the app;
+   - the text button « Annuler l’envoi ».
+4. **`-carnet`:** the open logbook, with the snackbar « Carnet envoyé sur le serveur OpenDives. Il reste aussi sur ce téléphone. ».
+5. **`-hors-ligne`, « Serveur injoignable »,** while creating: nothing has been created. « Réessayer » and « Revenir à l’accueil ».
+6. **`-interrompu`, « Envoi interrompu »:** the bar stops where the upload stopped, and nothing is lost. « Reprendre l’envoi » resumes from that point, and « Plus tard » opens the logbook on the device.
+
+Also on the tablet and the desktop: the server sign-in screens of task 260 (`android-tablette-serveur-*`, `bureau-serveur-*` in `docs/mockups-release/`) lose the « Serveur OpenDives » overline, and their unreachable-server icon is centred, as on the phone (task 265).
+
+**Test:**
+- An empty account shows the three choices. The third one appears only when a logbook exists on the device.
+- A cut connection during the upload shows « Envoi interrompu », and « Reprendre l’envoi » continues from where it stopped.
