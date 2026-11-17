@@ -5275,7 +5275,9 @@ Mock-ups in `docs/mockups-release/`: `android-tablette-premier-lancement-product
 - « Se connecter » is the largest choice of the first step.
 - Portrait tablet: the three choices and the two text buttons fit without scrolling.
 
-## [ ] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+## [x] 2026-11-17-265 Phone (release): « Se connecter » and OpenDives+ — ASK CHRISTIAN BEFORE THE SERVER AND PAYMENT PARTS
+
+Done on `feature/release-server-screens`: the screens, the e-mail flow and the offer. Waiting for Christian: Google and Apple sign-in, the store purchase (« S’abonner » is inert for now).
 
 Christian approved the design on 17 November 2026. **Release edition:** work on `feature/release-server-screens` (tasks 259 and 260) and never merge it into `main`. Build the screens; ask Christian before anything that needs the store's billing (Google Play Billing, App Store) or a server feature that does not exist yet.
 
@@ -5309,7 +5311,9 @@ Mock-ups in `docs/mockups-release/`, in the order of the flow:
 - An account without a subscription sees the offer. « Continuer sans abonnement » creates no account.
 - « Découvrir OpenDives+ » opens the offer.
 
-## [ ] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+## [x] 2026-11-17-266 All devices (release): create a logbook on the OpenDives server — ASK CHRISTIAN BEFORE BUILDING
+
+Done on `feature/release-server-screens`: create, import, send with resume, offline and interrupted states. Opening a server logbook waits for the app to read the OpenDives format.
 
 **Stop: ask Christian how to proceed before any code**, as for tasks 259 and 260. Christian approved the design on 17 November 2026. **Release edition only:** `feature/release-server-screens`, never merged into `main`.
 
