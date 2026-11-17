@@ -18,9 +18,15 @@ test('the line widths of the theme', () => {
 });
 
 test('every curve of the profile uses the line width', () => {
-  for (const cls of ['.od-dive-profile--trace', '.od-dive-profile--temperature', '.od-dive-profile--ppo2', '.od-dive-profile--ceiling-line']) {
+  for (const cls of ['.od-dive-profile--ppo2', '.od-dive-profile--ceiling-line']) {
     assert.match(rule(cls), /stroke-width: var\(--od-profile-line-width\);/, cls);
   }
+  // Task 2026-11-16-238: the depth line and the temperature curve take a tablet width when there is one.
+  for (const cls of ['.od-dive-profile--trace', '.od-dive-profile--temperature']) {
+    assert.match(rule(cls), /stroke-width: var\(--od-profile-main-width, var\(--od-profile-line-width\)\);/, cls);
+  }
+  const css = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');
+  assert.match(css, /@media \(min-width: 768px\) \{\s*:root:not\(\.od-high-contrast\) \{\s*--od-profile-main-width: 1;/);
   assert.match(rule('.od-dive-profile--trace-outline'), /stroke-width: var\(--od-profile-halo-width\);/);
   assert.match(rule('.od-dive-profile--mean'), /stroke-width: 1;/);
 });
