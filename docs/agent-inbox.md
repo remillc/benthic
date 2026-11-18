@@ -5626,3 +5626,27 @@ The rest of the screen (header, search, navigation bar, the « + » button) does
 **Accessibility:** each row reads as one item, for example « Plongée 9, 7 février 2026, 9 h 09, site à préciser, 91 pieds, 55 minutes ».
 
 **Test:** grouping by year across years; a dive without a site; folding a trip; a large font size (the right column must not overlap the site name, which is cut with an ellipsis).
+
+## [ ] 2026-11-18-279 Tablet and desktop: clearer logbook list, and « Se connecter ou créer un compte »
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
+
+**1. Tablet: the logbook list** (`android-tablette-accueil-paysage`, `android-tablette-accueil-portrait`, `android-tablette-accueil-portrait-menu`). The list in the logbook pane takes the phone format of task 278: dives grouped by year in white cards, the date block, the site in bold (or « Site à préciser »), the dive number in bold with the time, the small profile with the maximum depth and the duration on the right. A trip is its own card with a pale blue header and a chevron (folded in landscape, open in portrait). The selected dive keeps its pale blue background (#D4E2F2). The rest of the screen does not change.
+
+**2. Desktop: the logbook list** (`bureau-carnet-profil-droite`, « Carnet · bureau (Windows, Linux) »). The table is lighter:
+- **Columns by default:** N° (bold, right-aligned), Date, Site, Prof. max, Durée, Compagnons. The « Profil » column (small dive graphs) is no longer shown by default. It stays available in the column picker (the columns button at the top of the list).
+- **Date:** the day of the week, then the date, then the time in small grey text: « lun. 14 sept. 2026 · 10 h 15 ».
+- **Site:** pin icon and name in medium weight. With no site, « Site à préciser » in grey italics with a crossed-out pin.
+- **Prof. max:** the value in bold, right-aligned under its header (« 18,4 m »). No bar under it.
+- **Compagnons:** a small disc with the initial, then the name.
+- **Years:** no year titles between the dives. A single line under the column headers shows the year and the count of the first visible dive (« 2026 · 3 plongées »). It is sticky and changes as the list scrolls (for example to « 2013 · 4 plongées » when the trip reaches the top).
+- **Sticky:** the column headers and that year line stay at the top while scrolling, on the list's background (#F5F4F0), the rows pass under them.
+- **A trip** is a white card (20 px corners would match the phone; 14 px in the mock-up) with its header: chevron, suitcase icon, « Voyage du 2 février 2013 », « · 4 plongées, de 21 à 29 m ». Its dives follow in the same row format.
+- **Selection:** the selected row is pale blue (#D4E2F2), with its number and site in blue (#114477).
+- The header above the list says « 11 plongées · 6 sites · dernière plongée il y a 2 mois ».
+
+**3. Tablet and desktop: « Se connecter ou créer un compte »** (`android-tablette-odplus-connexion-paysage`, `bureau-odplus-connexion`). The same screen as the phone (task 265, item 1), in the two-pane layout of the e-mail sign-in screens: the blue pane on the left, on the right « Retour », the title, « Vous êtes abonné ? Connectez-vous en un geste, sans mot de passe à retenir. », the three buttons (Google, Apple, e-mail), the note for non-subscribers and « Continuer sans compte ».
+- « Se connecter » on the first step (`android-tablette-premier-lancement-production-paysage`, `-portrait`, `bureau-premier-lancement-production`) opens this screen. « Continuer avec mon courriel » leads to the e-mail sign-in already built (`android-tablette-serveur-courriel-…`, `bureau-serveur-courriel`). « Continuer sans compte » goes back to the first step.
+- **Brand icons:** the mock-ups now show the real Google « G » and Apple logo in the buttons (images uploaded by Christian to the canvas, not in the repo). In the app, on every device including the phone, use the official assets and rules of each provider (Google Identity sign-in branding, Sign in with Apple guidelines). The phone mock-up still shows letter discs: treat it the same way.
+
+**Test:** desktop: scroll the list and check the sticky headers and year line; add the « Profil » column from the column picker; a dive with no site; a trip folded and open. Tablet: the list in both orientations. Sign-in: from the first step to the e-mail code on tablet and desktop.
