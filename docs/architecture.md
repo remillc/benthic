@@ -303,6 +303,8 @@ Subsurface keeps the extra data (key-value pairs) of a dive when it loads and sa
 
 Key-value is judged sufficient for OD+. The entries use the `OpenDives ` prefix (the same mechanism as `OpenDives title` for saved plans). Files on the `opendives` branch refer to a dive by this id (`"diveId"`).
 
+**Equipment already in the logbook (decided on 18 November 2026).** Subsurface gives equipment no identity of its own, except dive computers. Dive computers are matched by what Subsurface already records (model, device id, serial number): no key is written. The suit, cylinders and weights are text in each dive; when a logbook enters OD+, the app lists their distinct values with their dive counts and the diver turns them into inventory pieces (merging variants, skipping rented items). The result is a **mapping rule** on the `opendives` branch (`gear-mapping.json`: text value → piece id): past dives are linked through it and are **not rewritten**. The extra data of a dive is written only when the dive is saved in OpenDives (its id, the pieces used, pieces not in the inventory, the kit), and it always wins over the mapping rule; it also settles ambiguous cases such as two pieces with the same description.
+
 #### The `opendives` branch
 
 ```
