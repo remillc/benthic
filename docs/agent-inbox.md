@@ -5517,7 +5517,7 @@ The cards and the profile are OpenDives+ data, kept on the account with a workin
 
 **Test:** the phone number formats itself for CA, FR and US; « Inconnu » can be saved; a card photo is cropped, straightened and its glare removed; the corners can be adjusted by hand.
 
-## [ ] 2026-11-18-273 Phone: equipment, what changed since task 267
+## [x] 2026-11-18-273 Phone: equipment, what changed since task 267
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
 
@@ -5530,7 +5530,7 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** a new piece of each type can be created; a kit can be duplicated and deleted; « Remplir avec » fills the dive.
 
-## [ ] 2026-11-18-274 Phone: maintenance of the equipment (to-do #47, OpenDives+)
+## [x] 2026-11-18-274 Phone: maintenance of the equipment (to-do #47, OpenDives+)
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`. Vocabulary: fr-CA « entretien », fr « révision » (English « Service »); for cylinders, fr-CA « test hydrostatique », fr « requalification ».
 
@@ -5546,6 +5546,8 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 6. **New piece.** The « Rappel d'entretien » card of « Nouvelle pièce » (task 273) proposes a rule for the type.
 
 **Test:** the due dates by time and by dives; the first reached wins; the notifications; the badge count.
+
+**Done (18 November 2026).** Notifications use `@capacitor/local-notifications` (`app/src/lib/maintenance-notify.js`): 7, 30 or 60 days before the due date and on the day, at 9:00; rescheduled at start and after each change; the permission is asked when the first reminder is saved; a tap opens the piece's maintenance. Android builds (`assembleDebug`) and `cap sync ios` lists the plugin; iOS was not built here (no Mac). Desktop (Electron): no scheduled notification while the app is closed, so none is delivered there. A reminder by dives is dated from the pace of the last 365 days; without a pace it has no notification. The photos (piece, invoice) come from `<input type="file" accept="image/*">`, scaled to 1280 px and kept in `media/<id>.json` on the device.
 
 ## [ ] 2026-11-18-275 Tablet and desktop: « Mon profil de plongeur », and the OpenDives+ welcome
 

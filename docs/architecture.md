@@ -370,8 +370,12 @@ media/<dive id>.json               photos and videos of a dive, by hash (section
 
 // maintenance/<id>.json
 { "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",
-  "gearId": "<uuid>", "task": "service", "intervalMonths": 12, "intervalDives": 100,
-  "lastDoneOn": "2026-03-10", "lastDoneDiveId": "<uuid>", "notes": "" }
+  "gearId": "<uuid>", "task": "service", "intervalMonths": 24, "intervalDives": 100,
+  "startOn": "2026-11-18", "lastDoneOn": "2026-03-10", "notifyDays": 30, "warnInDive": true,
+  "history": [ { "id": "...", "kind": "service", "doneOn": "2026-03-10", "doneBy": "...", "cost": 185, "notes": "", "invoicePhotoId": "..." } ] }
+// task: service | inspection | hydrostatic | battery | seals | travelCheck | custom (+ "label").
+// Either interval may be null (not both for an active reminder). Dives counted: those where the piece is in the
+// dive's equipment, after lastDoneOn (from startOn before a first service). The first criterion reached wins.
 
 // gas-analyses/<id>.json
 { "format": 1, "id": "...", "createdAt": "...", "updatedAt": "...",

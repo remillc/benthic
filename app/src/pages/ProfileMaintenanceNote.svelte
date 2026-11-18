@@ -115,7 +115,7 @@
 
   <ReadOnlyNotice />
 
-  <p class="od-maintenance-note--what">{piece?.name ?? ''}{#if item} · {taskLabel(item).toLocaleLowerCase()}{/if}</p>
+  <p class="od-maintenance-note--what">{[piece?.name ?? '', item ? taskLabel(item).toLocaleLowerCase() : ''].filter(Boolean).join(' · ')}</p>
 
   <div class="od-maintenance-note--fields">
     <h2 class="od-maintenance-note--group" id="od-note-kind">{t('maintenance.note.type')}</h2>
