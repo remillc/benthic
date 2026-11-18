@@ -45,3 +45,4 @@ Next number: 97
 - #94 [code] Bogue (capture d'écran du 18 novembre 2026, Sites sur téléphone, carte des Bahamas, « 13 sites dans cette zone ») : la punaise indique 2 sites alors qu'il y en a davantage.
 - #95 [design] Sites : utiliser une icône distincte pour les sites groupés.
 - #96 [design] trouver des photos de tous les ordinateurs de plongée
+- #97 [design] planifier la transition pour un usager de la version gratuite de l'app à la version payante : comment remplacer les 2 versions ? par des apps distinctes ou dans une seule app ? Je peux imaginer un lien suivant l'abonnement qui mène vers un wizard dans l'app laquelle se transforme en version payante. Que faire du carnet de l'usager en v gratuite ? Il faut le récupérer automatiquement ou proposer de le récupérer ?
