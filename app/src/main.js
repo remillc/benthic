@@ -6,6 +6,10 @@
 // with the page, not after the settings.
 import './theme.css';
 import { loadDeviceStore } from './lib/device-store.js';
+import { installSafeArea } from './lib/safe-area.js';
+
+// Android: the window's insets, before anything is laid out (lib/safe-area.js).
+installSafeArea();
 
 // The catalogs of the language start loading at once, beside the app's code (lib/language.js).
 loadDeviceStore().then(() => {

@@ -298,8 +298,8 @@
     }
 
     :global(.sheet-modal.od-account-sheet.od-account-sheet--floating) {
-      left: calc(var(--od-nav-width) + env(safe-area-inset-left) + 8px);
-      bottom: calc(16px + env(safe-area-inset-bottom));
+      left: calc(var(--od-nav-width) + var(--od-safe-left) + 8px);
+      bottom: calc(16px + var(--od-safe-bottom));
       width: 360px;
       border-radius: 36px;
       box-shadow: 0 2px 6px rgb(0 0 0 / 0.15), 0 8px 24px rgb(0 0 0 / 0.12);
@@ -316,7 +316,7 @@
     }
 
     .od-account-sheet--ios {
-      padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+      padding: 0 16px calc(16px + var(--od-safe-bottom));
     }
 
     /* Title centred, « OK » at the end: three columns. */
@@ -388,7 +388,7 @@
     }
 
     .od-account-sheet--content {
-      padding: 8px 8px calc(16px + env(safe-area-inset-bottom));
+      padding: 8px 8px calc(16px + var(--od-safe-bottom));
     }
 
     .od-account-sheet--head {

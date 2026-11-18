@@ -231,6 +231,8 @@
   },
   "dive": {
     "siteNotSet": "Dive site not set",
+    "spokenDive": "Dive",
+    "spokenNumber": "Dive {number}",
     "screenReader": "{site}, {date}, duration {duration}, max. depth {depth}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
     "thumbnail": "Profile, {depth} max. depth",
@@ -260,6 +262,8 @@
     },
     "summarySingle": "{dives}, {depth}",
     "summaryRange": "{dives}, {min} to {max}",
+    "cardSummarySingle": "{dives} · {depth}",
+    "cardSummaryRange": "{dives} · {min} to {max}",
     "expand": "Expand the trip",
     "collapse": "Collapse the trip"
   },
@@ -471,6 +475,18 @@
     "miles": "mi",
     "kilometers": "km",
     "minutes": "min",
+    "feetSpoken": {
+      "one": "{v} foot",
+      "other": "{v} feet"
+    },
+    "metersSpoken": {
+      "one": "{v} meter",
+      "other": "{v} meters"
+    },
+    "minutesSpoken": {
+      "one": "{v} minute",
+      "other": "{v} minutes"
+    },
     "liters": "L",
     "litersPerMinute": "L/min",
     "litersPerMinuteLong": {
@@ -2151,6 +2167,8 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "A logbook that was on the Subsurface cloud is not opened here: after an update from the alpha, the app starts from its first launch and leaves that logbook's files on the phone as they were. The Account page no longer offers signing in to the Subsurface cloud. A dive that cannot be read shows a page with « Try again ».",
+      "Logbook on a phone: dives are grouped by year, each year in a white card. Each row shows the date on a pale blue block, the site (or “Dive site not set” with a crossed-out pin), the dive number in bold and the time, the small profile, then the maximum depth in bold and the duration, in the units of the settings. A trip is its own card, with a pale blue header (suitcase, number of dives, depths) and an arrow to fold it. A screen reader reads each row as one item.",
+      "Android: the screen edges are the same at every launch and in every navigation mode: sheets, messages, buttons and the bottom bar stay above the gesture bar or the navigation buttons, and the top no longer jumps.",
       "OpenDives server (release edition): your logbook downloads from the server and opens like any logbook, with « Your logbook is ready » after the download. It stays in Subsurface’s format, syncs like a git repository (automatic sync, offline, conflicts) and is named « OpenDives server » in the menu, the account and the sync messages. « Create an empty logbook », « Import a Subsurface file » and « Send the logbook of this phone » create it on the server; an interrupted sending resumes where it stopped.",
       "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",

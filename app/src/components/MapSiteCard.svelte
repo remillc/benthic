@@ -72,7 +72,7 @@
       }
 
       :global(.od-map-fullscreen) & {
-        bottom: calc(env(safe-area-inset-bottom) + 112px);
+        bottom: calc(var(--od-safe-bottom) + 112px);
       }
     }
 
