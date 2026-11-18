@@ -197,6 +197,18 @@ function cutAtServer(stack) {
 }
 
 /**
+ * Development only (simulated Google sign-in): a subscribed account goes straight to the download, over the address step so
+ * that « Retour » from « Aucun carnet sur votre compte » leaves for it, as after an e-mail code.
+ * @param {Step[]} stack
+ * @returns {Step[]}
+ */
+export function enterDownload(stack) {
+  const at = stack.lastIndexOf('odplusConnect');
+  const base = at >= 0 ? stack.slice(0, at + 1) : cutAtServer(stack);
+  return [...base, 'server', 'serverDownload'];
+}
+
+/**
  * The top step replaced by another one (the upload and its stops follow one another without growing the stack).
  * @param {Step[]} stack
  * @param {Step} step

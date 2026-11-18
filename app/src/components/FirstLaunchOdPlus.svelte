@@ -14,8 +14,10 @@
   import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
   import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
   import { claimReadyMotion } from '../lib/ready-animation.js';
-  import { flow, go } from '../lib/first-launch.svelte.js';
-  import { ACTIVATED, BENEFITS, summaryRows } from '../lib/odplus.js';
+  import { flow, go, goDownload, goOffer } from '../lib/first-launch.svelte.js';
+  import { devAccounts } from '../lib/dev-switch.js';
+  import { ServerError } from '../lib/server-api.js';
+  import { ACTIVATED, BENEFITS, afterSignIn, summaryRows } from '../lib/odplus.js';
   import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { services } from '../lib/profile.svelte.js';
@@ -52,6 +54,24 @@
     if (continuing) return;
     continuing = true;
     try {
+      // Development only: the account that just « bought » keeps its session on the device, then its logbook is looked for.
+      if (devAccounts) {
+        const dev = await import('../lib/dev-accounts.js');
+        if (dev.hasPending()) {
+          try {
+            flow.plus.email = await dev.savePending();
+          } catch (e) {
+            console.error('Keeping the simulated account on this device', e);
+            showSnackbar(t('odplus.purchaseUnavailable'));
+            continuing = false;
+            return;
+          }
+          if (keepHealth) await services().consent.give().catch((e) => console.error('Keeping the health-data consent', e));
+          continuing = false;
+          goDownload();
+          return;
+        }
+      }
       if (keepHealth) await services().consent.give();
     } catch (e) {
       console.error('Keeping the health-data consent', e);
@@ -62,13 +82,64 @@
 
   /** @param {'google'|'apple'} provider */
   async function provider(provider) {
+    // Development only: the simulated sign-in (lib/dev-accounts.js) replaces the « not available » answer.
+    if (devAccounts && provider === 'google') {
+      devError = '';
+      devOpen = true;
+      return;
+    }
     const answer = await (provider === 'google' ? signInWithGoogle() : signInWithApple());
     if (answer.status === 'unavailable') showSnackbar(t('odplus.providerUnavailable', { provider: provider === 'google' ? 'Google' : 'Apple' }));
     // To wire: a signed-in answer goes to the server's sign-in call, then to the download or the offer.
   }
 
+  // Development only: the sheet of the simulated Google sign-in, and what it does with the answer.
+  let devOpen = $state(false);
+  let devBusy = $state(false);
+  let devError = $state('');
+
+  /** @param {{ email: string, name: string }} answer */
+  async function devSignedIn({ email, name }) {
+    if (!devAccounts || devBusy) return;
+    devBusy = true;
+    devError = '';
+    try {
+      const dev = await import('../lib/dev-accounts.js');
+      const session = await dev.createDevApi().signIn(email, name);
+      devOpen = false;
+      if (afterSignIn(session.user) === 'offer') {
+        dev.rememberPending(session);
+        flow.plus.email = session.user.email;
+        goOffer();
+      } else {
+        dev.rememberPending(null);
+        flow.plus.email = session.user.email;
+        await dev.saveSession(session);
+        goDownload();
+      }
+    } catch (e) {
+      devError = e instanceof ServerError ? 'Serveur de développement injoignable ou refusé (' + e.code + ').' : String(e);
+    } finally {
+      devBusy = false;
+    }
+  }
+
   /** « S’abonner ». */
   async function subscribe() {
+    if (devAccounts) {
+      // Development only: the simulated purchase of the account signed in with the simulated Google.
+      const dev = await import('../lib/dev-accounts.js');
+      if (dev.hasPending()) {
+        try {
+          await dev.subscribePending();
+          go('welcome');
+        } catch (e) {
+          console.error('Simulated purchase', e);
+          showSnackbar(t('odplus.purchaseUnavailable'));
+        }
+        return;
+      }
+    }
     const answer = await purchaseSubscription();
     if (answer.status === 'unavailable') showSnackbar(t('odplus.purchaseUnavailable'));
     else if (answer.status === 'purchased') go('welcome');
@@ -120,6 +191,13 @@
   </header>
 {/snippet}
 
+{#if devAccounts && devOpen}
+  {#await import('./DevGoogleSheet.svelte') then sheet}
+    {@const DevGoogleSheet = sheet.default}
+    <DevGoogleSheet busy={devBusy} error={devError} onsubmit={devSignedIn} oncancel={() => (devOpen = false)} />
+  {/await}
+{/if}
+
 {#if step === 'odplusConnect'}
   <h2 class="od-plus--title">{t('odplus.connect.title')}</h2>
   <p class="od-plus--lead">{t('odplus.connect.lead')}</p>
@@ -136,7 +214,7 @@
     </button>
   </div>
   <p class="od-plus--note">{t('odplus.connect.note')}</p>
-  <button type="button" class="od-plus--text" onclick={onwithout}>{t('odplus.connect.without')}</button>
+  <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
 {:else if step === 'odplusOffer'}
   <div class="od-plus--screen">
     {@render hero('offer')}
@@ -234,7 +312,7 @@
     .od-plus--buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
     }
 
     .od-plus--provider {
@@ -373,6 +451,14 @@
       &:focus-visible {
         outline: 2px solid var(--od-release-row-main);
       }
+    }
+
+    /* « Continuer sans compte » on the connection screen: centred, in the main blue (android-odplus-connexion). */
+    .od-plus--text-link {
+      align-self: center;
+      margin-left: 0;
+      margin-top: 8px;
+      color: var(--od-release-link);
     }
 
     .od-plus--text-centre {

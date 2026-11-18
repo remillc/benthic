@@ -30,6 +30,7 @@
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
   import { isRelease } from '../lib/edition.js';
+  import { devAccounts } from '../lib/dev-switch.js';
 
   const signedIn = $derived(!!logbook.email);
   /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
@@ -309,6 +310,12 @@
         <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(server ? 'account.serverSignOut' : 'account.gitSignOut')}</button>
         <span class="od-account--consequence">{t(server ? 'account.serverSignOutText' : 'account.gitSignOutText')}</span>
       </div>
+      {#if devAccounts && server}
+        {#await import('../components/DevDeleteAccount.svelte') then dev}
+          {@const DevDeleteAccount = dev.default}
+          <DevDeleteAccount email={serverEmail || logbook.email} />
+        {/await}
+      {/if}
     {:else}
       <!-- « Quitter le cloud » (task 2026-11-14-164): both ways out side by side, so that they are
            compared at a glance. The danger is carried by the alarm colour, the icon and
