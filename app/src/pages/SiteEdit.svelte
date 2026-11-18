@@ -324,14 +324,14 @@
       pointer-events: none;
 
       &.od-site-edit--full {
-        top: calc(12px + env(safe-area-inset-top));
+        top: calc(12px + var(--od-safe-top));
       }
     }
 
     .od-site-edit--coords {
       position: absolute;
       left: 50%;
-      bottom: calc(40px + env(safe-area-inset-bottom));
+      bottom: calc(40px + var(--od-safe-bottom));
       transform: translateX(-50%);
       padding: 8px 14px;
       border-radius: 8px;

@@ -163,6 +163,7 @@
 {:else if step === 'odplusReady'}
   <div class="od-plus--screen">
     {@render hero('ready')}
+    {#if summaryRows(flow.plus.counts).length}
     <dl class="od-plus--summary">
       {#each summaryRows(flow.plus.counts) as row (row.key)}
         <div class="od-plus--summary-row">
@@ -171,6 +172,7 @@
         </div>
       {/each}
     </dl>
+    {/if}
     <p class="od-plus--account"><Icon name="check" size={16} weight={2.4} />{t('odplus.ready.account', { email: flow.plus.email })}</p>
     <button type="button" class="od-plus--primary" onclick={onopen}>{t('odplus.ready.open')}</button>
   </div>

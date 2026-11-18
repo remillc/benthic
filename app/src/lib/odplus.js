@@ -25,15 +25,18 @@ export const BENEFITS = /** @type {const} */ ([
 export const ACTIVATED = /** @type {const} */ (['sync', 'backup', 'gearCertifications']);
 
 /**
- * The counts of the summary card of « Votre carnet est prêt ».
- * @param {{ dives: number, sites: number, gear: number, certifications: number }} c
+ * The counts of the summary card of « Votre carnet est prêt ». The dives and the sites are always there; gear and
+ * certifications are OpenDives-only data (the `opendives` branch, docs/architecture.md, section 11.3): their rows show
+ * once something is stored. `known: false` (the desktop window downloads when it opens the logbook): no card.
+ * @param {{ dives: number, sites: number, gear: number, certifications: number, known?: boolean }} c
  * @returns {{ key: 'dives'|'sites'|'gear'|'certifications', n: number }[]}
  */
 export function summaryRows(c) {
+  if (c.known === false) return [];
   return [
-    { key: 'dives', n: c.dives },
-    { key: 'sites', n: c.sites },
-    { key: 'gear', n: c.gear },
-    { key: 'certifications', n: c.certifications },
-  ];
+    { key: /** @type {const} */ ('dives'), n: c.dives },
+    { key: /** @type {const} */ ('sites'), n: c.sites },
+    { key: /** @type {const} */ ('gear'), n: c.gear },
+    { key: /** @type {const} */ ('certifications'), n: c.certifications },
+  ].filter((row) => row.n > 0 || row.key === 'dives' || row.key === 'sites');
 }

@@ -68,7 +68,6 @@
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook } from './lib/logbook.svelte.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
-  import { resumeServerUpload } from './lib/server-upload-resume.js';
   import { t } from './lib/i18n.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
@@ -330,8 +329,7 @@
 
   // Desktop app: the dives the first launch brought are imported once the new logbook it made is open (task 2026-11-16-228).
   $effect(() => {
-    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport().then(() => isRelease && resumeServerUpload());
-    else if (isRelease && !desktopApp && !logbook.loading && !logbook.welcome && !logbook.error) void resumeServerUpload();
+    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
   });
 
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
@@ -432,8 +430,8 @@
       /* The rail or sidebar takes the left safe area (camera cut-out in
          landscape): the pages beside it must not add it again. */
       --f7-safe-area-left: 0px;
-      margin-left: calc(var(--od-nav-width) + env(safe-area-inset-left));
-      width: calc(100% - var(--od-nav-width) - env(safe-area-inset-left));
+      margin-left: calc(var(--od-nav-width) + var(--od-safe-left));
+      width: calc(100% - var(--od-nav-width) - var(--od-safe-left));
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */

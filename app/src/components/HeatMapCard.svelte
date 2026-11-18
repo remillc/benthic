@@ -148,7 +148,7 @@
       position: absolute;
       z-index: 2;
       left: 16px;
-      bottom: calc(env(safe-area-inset-bottom) + 24px);
+      bottom: calc(var(--od-safe-bottom) + 24px);
       padding: 4px 12px 10px;
       border-radius: 12px;
       background: var(--od-surface);

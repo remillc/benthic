@@ -7,12 +7,12 @@
   // (docs/system-design.md, section 8); iPhone: the 8 pt bar of the iOS downloads.
   import { theme } from 'framework7-svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import { logbook, syncFlavour } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   const fraction = $derived(logbook.syncProgress?.fraction ?? 0);
   const percent = $derived(Math.round(fraction * 100));
-  const label = $derived(t(logbook.mode === 'git' ? 'sync.syncingGit' : 'sync.syncing'));
+  const label = $derived(t(`sync.syncing${syncFlavour()}`));
 </script>
 
 <div class="od-pull-progress" role="status">

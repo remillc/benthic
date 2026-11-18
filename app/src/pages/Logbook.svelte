@@ -910,7 +910,7 @@
     } catch {
       // Not fatal: the default name.
     }
-    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t('welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
+    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t(logbook.odplus ? 'welcomeSteps.keptServer' : 'welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
     return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
   });
 
@@ -1358,7 +1358,7 @@
     {#if releaseEmpty}
       <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
     {:else}
-    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>
+    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? (logbook.odplus ? 'logbook.emptyServer' : 'logbook.emptyGit') : 'logbook.emptyCloud')}</p>
     {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
       <p class="od-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
     <div class="od-logbook--empty">

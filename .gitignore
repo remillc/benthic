@@ -15,6 +15,7 @@ dist/
 .gradle/
 local.properties
 *.apk
+app/android/app/src/debug/assets/dev-ca.pem
 *.aab
 
 # Environment (app/.env holds public build settings and is committed)

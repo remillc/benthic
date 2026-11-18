@@ -80,7 +80,7 @@
     }
 
     .od-map-stack-sheet--content {
-      padding: 8px 0 calc(24px + env(safe-area-inset-bottom));
+      padding: 8px 0 calc(24px + var(--od-safe-bottom));
       overflow-y: auto;
       max-height: 85vh;
     }

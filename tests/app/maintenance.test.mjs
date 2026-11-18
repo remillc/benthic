@@ -97,7 +97,8 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 });
 
 test('suggestions per type, and the rule fields are validated', () => {
-  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 24 });
+  // Decided 18 November 2026 (task 277): the suggested service of a regulator is yearly, it was every 2 years.
+  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12 });
   assert.deepEqual(suggestionsFor('regulator')[1].task, 'travelCheck');
   assert.deepEqual(suggestionsFor('cylinder').map((s) => s.task), ['inspection', 'hydrostatic']);
   assert.deepEqual(suggestionsFor('weights'), []);

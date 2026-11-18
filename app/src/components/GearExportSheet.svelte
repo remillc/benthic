@@ -61,7 +61,7 @@
       display: flex;
       flex-direction: column;
       max-height: 85vh;
-      padding: 20px 0 calc(12px + env(safe-area-inset-bottom));
+      padding: 20px 0 calc(12px + var(--od-safe-bottom));
     }
 
     .od-gear-sheet--title {

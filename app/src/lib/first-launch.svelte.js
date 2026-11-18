@@ -69,7 +69,7 @@ export const flow = $state({
    */
   create: { source: '', file: null, name: '', total: 0, done: 0, deviceLogbook: null, deviceReady: false, fresh: false },
   /** The signed-in account of the OpenDives+ screens: the address shown on « Votre carnet est prêt » and the counts. */
-  plus: { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0 } },
+  plus: { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0, known: true } },
   /** The cloud account connected (idea #74: always empty until the cloud is built). */
   account: '',
   /** @type {FoundLogbook[]} */
@@ -182,7 +182,7 @@ export function resetFlow() {
   flow.found = [];
   flow.source = null;
   Object.assign(flow.create, { source: '', file: null, name: '', total: 0, done: 0, deviceLogbook: null, deviceReady: false, fresh: false });
-  Object.assign(flow.plus, { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0 } });
+  Object.assign(flow.plus, { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0, known: true } });
   Object.assign(flow.divelogs, { user: '', password: '', total: 0, done: 0, phase: 'download', error: '', interrupted: false, progress: newDownloadProgress() });
 }
 

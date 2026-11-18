@@ -207,7 +207,7 @@ test('first step spacing: the mock-up vertical distances (title, choices, text b
   assert.match(steps, /\.od-first-launch--text-button \{[^}]*height: 40px;\s*padding: 0 12px;/);
   // The help link takes the spare height above it (auto margin) and ends 20 dp above the system bar on Android.
   assert.match(steps, /margin: auto auto calc\(var\(--f7-safe-area-bottom\) \+ 28px\);\s*padding-top: 24px;/);
-  assert.match(steps, /:global\(\.md\) \.od-first-launch :global\(\.od-welcome-help-link\) \{\s*margin-bottom: calc\(max\(var\(--f7-safe-area-bottom\), 24px\) \+ 20px\);/);
+  assert.match(steps, /:global\(\.md\) \.od-first-launch :global\(\.od-welcome-help-link\) \{\s*margin-bottom: calc\(var\(--f7-safe-area-bottom\) \+ 20px\);/);
   // The band: 330 dp including the status bar, the intro 8 dp under the headline.
   const page = read('pages/WelcomeStartRelease.svelte');
   assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);

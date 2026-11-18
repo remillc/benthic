@@ -116,7 +116,7 @@
     }
 
     .od-computers-sheet--content {
-      padding: 20px 16px calc(16px + env(safe-area-inset-bottom));
+      padding: 20px 16px calc(16px + var(--od-safe-bottom));
       overflow-y: auto;
     }
 

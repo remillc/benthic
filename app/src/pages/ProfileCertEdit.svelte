@@ -33,7 +33,8 @@
   let issuedOn = $state('');
   let instructor = $state('');
   let saving = $state(false);
-  let proposed = $state(false);
+  /** What the scan filled in, to mark it « Lu sur la carte » while the field still holds it. */
+  let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '' });
   /** The photos: `bytes` is set when changed here (null: removed), `url` is what is shown. @type {Record<'front'|'back', { bytes?: Uint8Array|null, url: string }>} */
   let photos = $state({ front: { url: '' }, back: { url: '' } });
 
@@ -62,6 +63,7 @@
     () => issuedOn,
     () => (problems.issuedOn ? t('diverProfile.cert.dateFuture') : ''),
   );
+  const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
   const canSave = $derived(!Object.keys(problems).length && !(agency === 'other' && !agencyName.trim()) && !saving && !gear.readOnly);
 
   /** @param {'front'|'back'} side */
@@ -74,10 +76,10 @@
       photos[side] = { bytes, url: photoUrl(bytes) };
       // The text read from the card proposes what the diver has not typed yet.
       const found = parseCardText(scanned.text);
-      if (found.agency && !agency) agency = found.agency;
-      if (found.level && !level.trim()) level = found.level;
-      if (found.number && !number.trim()) number = found.number;
-      proposed = !!(found.agency || found.level || found.number);
+      if (found.agency && !agency) readFrom.agency = agency = found.agency;
+      if (found.level && !level.trim()) readFrom.level = level = found.level;
+      if (found.number && !number.trim()) readFrom.number = number = found.number;
+      if (found.issuedOn && !issuedOn) readFrom.issuedOn = issuedOn = found.issuedOn;
     } catch {
       showSnackbar(t('diverProfile.cert.photoFailed'));
     }
@@ -117,16 +119,18 @@
 
 {#snippet slot(/** @type {'front'|'back'} */ side)}
   <div class="od-cert-edit--slot">
-    <button type="button" class="od-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly}>
-      {#if photos[side].url}
-        <img src={photos[side].url} alt="" />
-      {:else}
-        <Icon name="camera" size={28} weight={1.6} />
-      {/if}
-      <span class="od-cert-edit--slot-label">{side === 'front' ? t('diverProfile.cert.photoFront') : t('diverProfile.cert.photoBack')}</span>
-    </button>
     {#if photos[side].url}
+      <div class="od-cert-edit--slot-thumb"><img src={photos[side].url} alt="" /></div>
       <button type="button" class="od-cert-edit--slot-remove" onclick={() => remove(side)} aria-label={t('diverProfile.cert.photoRemove')}><Icon name="close" size={18} /></button>
+      <span class="od-cert-edit--slot-caption">
+        <span>{side === 'front' ? t('diverProfile.cert.sideFront') : t('diverProfile.cert.sideBack')}</span>
+        <button type="button" class="od-cert-edit--slot-replace" onclick={() => pick(side)} disabled={gear.readOnly}>{t('diverProfile.cert.photoReplace')}</button>
+      </span>
+    {:else}
+      <button type="button" class="od-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly}>
+        <Icon name="camera" size={28} weight={1.6} />
+        <span class="od-cert-edit--slot-label">{side === 'front' ? t('diverProfile.cert.photoFront') : t('diverProfile.cert.photoBack')}</span>
+      </button>
     {/if}
   </div>
 {/snippet}
@@ -150,16 +154,16 @@
     {@render slot('front')}
     {@render slot('back')}
   </div>
-  <p class="od-cert-edit--hint">{proposed ? t('diverProfile.cert.proposed') : t('diverProfile.cert.photoHint')}</p>
+  <p class="od-cert-edit--hint">{t('diverProfile.cert.photoHint')}</p>
 
   <div class="od-cert-edit--fields">
-    <SelectField label={t('diverProfile.cert.agency')} bind:value={agency} options={agencyOptions} />
+    <SelectField label={t('diverProfile.cert.agency')} bind:value={agency} options={agencyOptions} supporting={mark('agency', agency)} />
     {#if agency === 'other'}
       <TextField label={t('diverProfile.cert.agencyName')} bind:value={agencyName} />
     {/if}
-    <ComboField label={t('diverProfile.cert.level')} bind:value={level} options={suggestions} />
-    <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={t('diverProfile.cert.numberHint')} />
-    <DateField label={t('diverProfile.cert.date')} bind:value={issuedOn} placeholder={t('diverProfile.cert.dateHint')} maxYear={new Date().getFullYear()} supporting={dateLive.error} />
+    <ComboField label={t('diverProfile.cert.level')} bind:value={level} options={suggestions} supporting={mark('level', level)} />
+    <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
+    <DateField label={t('diverProfile.cert.date')} bind:value={issuedOn} placeholder={t('diverProfile.cert.dateHint')} maxYear={new Date().getFullYear()} supporting={dateLive.error || mark('issuedOn', issuedOn)} />
     <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={t('diverProfile.cert.instructorHint')} />
   </div>
   <div class="od-cert-edit--bottom"></div>
@@ -216,12 +220,35 @@
       font: inherit;
     }
 
-    .od-cert-edit--slot-button img {
-      position: absolute;
-      inset: 0;
+    .od-cert-edit--slot-thumb {
+      aspect-ratio: 85.6 / 54;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
+    }
+
+    .od-cert-edit--slot-thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+
+    .od-cert-edit--slot-caption {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+
+    .od-cert-edit--slot-replace {
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--od-primary);
+      font: inherit;
+      font-weight: 600;
     }
 
     .od-cert-edit--slot-label {
