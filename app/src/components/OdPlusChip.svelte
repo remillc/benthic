@@ -6,11 +6,11 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ onLight?: boolean }} */
-  let { onLight = false } = $props();
+  /** @type {{ onLight?: boolean, onSheet?: boolean }} */
+  let { onLight = false, onSheet = false } = $props();
 </script>
 
-<span class="od-plus-chip" class:od-plus-chip--on-light={onLight}>
+<span class="od-plus-chip" class:od-plus-chip--on-light={onLight} class:od-plus-chip--on-sheet={onSheet}>
   <Icon name="plusMark" size={12} weight={2.2} />{t('odplus.chip')}
 </span>
 
@@ -29,6 +29,12 @@
       line-height: 16px;
       font-weight: 600;
       white-space: nowrap;
+    }
+
+    /* The account sheet and « Gérer le compte »: the pale blue chip of their mock-ups (task 2026-11-18-281). */
+    .od-plus-chip--on-sheet {
+      background: var(--od-account-chip);
+      color: var(--od-account-chip-ink);
     }
 
     .od-plus-chip--on-light {

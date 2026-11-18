@@ -79,7 +79,8 @@ test('Google, Apple and the purchase are inert: one function each, nothing is bo
 test('« Continuer sans compte » and « Continuer sans abonnement » create nothing', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   const fn = steps.slice(steps.indexOf('function withoutAccount()'));
-  assert.match(fn.slice(0, 120), /goBackTo\('start'\)/);
+  // Outside the menu entry (the free account sheet) it goes back to the first step, as before.
+  assert.match(fn.slice(0, 300), /goBackTo\('start'\)/);
   const screen = read('components/FirstLaunchOdPlus.svelte');
   assert.equal([...screen.matchAll(/onclick=\{onwithout\}/g)].length, 2);
 });

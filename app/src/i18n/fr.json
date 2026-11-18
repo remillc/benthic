@@ -1028,7 +1028,55 @@
     "serverName": "Serveur OpenDives",
     "serverDives": "Plongées sur le serveur",
     "serverSignOut": "Se déconnecter du serveur",
-    "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil."
+    "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
+    "free": {
+      "device": "Carnet sur cet appareil",
+      "sync": "Sauvegarde et synchronisation",
+      "syncText": "Votre carnet sur tous vos appareils"
+    },
+    "sheet": {
+      "maintenanceLate": {
+        "one": "Entretien : {n} pièce en retard",
+        "other": "Entretien : {n} pièces en retard"
+      }
+    },
+    "manage": {
+      "title": "Gérer le compte",
+      "signedIn": {
+        "google": "Connexion avec Google",
+        "apple": "Connexion avec Apple",
+        "email": "Connexion avec le courriel"
+      },
+      "subscription": "Abonnement",
+      "perYear": "{price} par an",
+      "renews": "Renouvelé le {date} · acheté sur {store}",
+      "boughtOn": "Acheté sur {store}",
+      "googlePlay": "Google Play",
+      "appStore": "l’App Store",
+      "manageGooglePlay": "Gérer dans Google Play",
+      "manageAppStore": "Gérer dans l’App Store",
+      "storeNote": "Mode de paiement, reçus et renouvellement automatique se gèrent dans {store}.",
+      "storeNoteDesktop": "Mode de paiement, reçus et renouvellement se gèrent dans {store}, sur le téléphone qui a servi à l’achat.",
+      "space": "Espace",
+      "photosVideos": "Photos et vidéos",
+      "spaceOf": "{used} sur {limit}",
+      "spaceUnknown": "Espace de {limit}, utilisation indisponible",
+      "spaceUsed": "Espace utilisé, {n} %",
+      "spaceNote": "Le carnet lui-même ne compte pas dans cet espace.",
+      "data": "Vos données",
+      "export": "Télécharger mes données",
+      "exportText": "Carnet, équipement, brevets, dans un format ouvert",
+      "exportUnavailable": "Le téléchargement des données n’est pas encore disponible.",
+      "signOut": "Se déconnecter",
+      "signOutText": "Le carnet reste sur cet appareil",
+      "delete": "Supprimer le compte",
+      "deleteSupporting": "Supprime le compte et les données gardées sur le serveur",
+      "deleteTitle": "Supprimer le compte ?",
+      "deleteText": "Le compte, les photos et les vidéos gardés sur le serveur sont supprimés, sans retour possible. Le carnet reste sur cet appareil. L’abonnement n’est pas résilié : résiliez-le dans {store}.",
+      "deleteConfirm": "Supprimer le compte",
+      "deleteFailed": "Le compte n’a pas pu être supprimé. Réessayez plus tard.",
+      "deleted": "Compte supprimé"
+    }
   },
   "welcome": {
     "title": "OpenDives",
@@ -2168,6 +2216,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte (version gratuite) : le bouton Compte reste, avec une silhouette. Sa feuille montre le carnet sur cet appareil, « S’abonner », « Déjà abonné ? Se connecter » et les rangées OpenDives+ qui ouvrent l’offre. Avec un compte OpenDives+, « Mon profil de plongeur » porte la pastille OpenDives+ et, quand une pièce est en retard d’entretien, un badge rouge et la ligne « Entretien : 1 pièce en retard » ; la croix de la feuille est à droite. « Gérer le compte » ouvre un écran (une fenêtre à deux colonnes sur tablette et ordinateur) : courriel et mode de connexion, abonnement avec « Gérer dans Google Play » (ou l’App Store), espace photos et vidéos de 10 Go, « Télécharger mes données », « Se déconnecter » et « Supprimer le compte » après confirmation. Sur Android, le retour ferme la feuille du compte. L’offre OpenDives+ propose « Déjà abonné ? Se connecter » (sauf juste après une connexion), et « Continuer sans compte » est centré sous les trois boutons sur tablette et ordinateur.",
       "Démarrage : l'écran de lancement reste maintenant jusqu'à ce que le premier vrai écran soit dessiné (le premier lancement au tout premier démarrage, le carnet sinon), avec un court fondu, et le premier lancement n'apparaît plus après un carnet vide. Le premier écran est mis en page une seule fois, avec la vraie hauteur de la barre d'état : plus rien ne saute.",
       "« Se connecter ou créer un compte » : un peu plus d’espace entre les boutons, et « Continuer sans compte » en bleu, centré.",
       "Premiers écrans : une page ouverte pour la première fois attend maintenant ses styles avant de s'afficher, et les dessins des bandeaux bleus ont une taille fixe : plus rien ne clignote en grand à l'ouverture de l'écran de premier lancement.",
@@ -3733,7 +3782,8 @@
       "one": "{n} mise à jour de carte",
       "other": "{n} mises à jour de carte"
     },
-    "mapUpdateWaiting": "Mise à jour de carte disponible"
+    "mapUpdateWaiting": "Mise à jour de carte disponible",
+    "accountLabelFree": "Compte, réglages et à propos"
   },
   "health": {
     "title": "Apple Santé",
@@ -4798,7 +4848,9 @@
       "priceDetail": "soit 1,25 $ par mois · Résiliable en tout temps",
       "subscribe": "S’abonner",
       "without": "Continuer sans abonnement",
-      "noAccount": "Aucun compte n’est créé."
+      "noAccount": "Aucun compte n’est créé.",
+      "already": "Déjà abonné ?",
+      "signIn": "Se connecter"
     },
     "ready": {
       "title": "Votre carnet est prêt",

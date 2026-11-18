@@ -356,6 +356,12 @@
     --od-plus-price: #114477;
     --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
     --od-plus-chip: rgb(255 255 255 / 0.22);
+    /* The account sheet (task 2026-11-18-281): the OpenDives+ chip on a white card, the overdue maintenance (badge with white text, red line), the red tile of « Supprimer le compte ». */
+    --od-account-chip: #D4E2F2;
+    --od-account-chip-ink: #114477;
+    --od-late: #A1372B;
+    --od-late-text: #A1372B;
+    --od-late-tint: #F6E2DF;
     /* « Votre carnet est prêt » (task 2026-11-18-270): the logo's drop shadow, the ring that spreads at the end, the header's bubbles. */
     --od-plus-logo-shadow: rgb(3 18 36 / 0.3);
     --od-plus-ring: rgb(255 255 255 / 0.6);
@@ -508,6 +514,11 @@
     --od-release-chip-text: #BFD6F0;
     --od-release-divider: #2E3033;
     --od-release-note: #1E3552;
+    --od-account-chip: #1E3552;
+    --od-account-chip-ink: #BFD6F0;
+    --od-late: #C0453A;
+    --od-late-text: #FF8A80;
+    --od-late-tint: #3F2423;
     --od-release-hero: #1A2A3F;
     --od-release-field-border: #8F9296;
     --od-release-ok: #4C9F70;

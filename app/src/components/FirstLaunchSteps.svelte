@@ -26,7 +26,7 @@
   import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
-  import { hasBack, hasLogbookTitle, chooseOutcome } from '../lib/first-launch-steps.js';
+  import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch } from '../lib/first-launch-steps.js';
   import { entryRows } from '../lib/server-signin.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
@@ -213,7 +213,8 @@
   /** « Retour »: one step back; a sign-in still waiting in the browser is given up. */
   function back() {
     abandonSignIn();
-    goBack();
+    if (leavesFirstLaunch(flow.stack, flow.origin === 'menu')) leave();
+    else goBack();
   }
 
   /** « Retour » on the first screen of a first launch entered from the logbook's menu: the logbook stays as it was. */
@@ -628,7 +629,9 @@
 
   /** « Continuer sans compte » and « Continuer sans abonnement »: back to the first step, nothing was created. */
   function withoutAccount() {
-    goBackTo('start');
+    // Entered from the logbook's menu (the free account sheet): nothing to go back to, the first launch closes.
+    if (flow.origin === 'menu') leave();
+    else goBackTo('start');
   }
 </script>
 
