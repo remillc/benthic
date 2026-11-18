@@ -1910,7 +1910,8 @@ html.md {
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;
-  margin: 16px 0 0;
+  /* 8 px under the summary, 40 px of blue under it before the wave (task 284: up 8 px, same band height). */
+  margin: 8px 0 0;
   background: none;
   box-shadow: none;
 }

@@ -5732,7 +5732,7 @@ The mock-up shows a generic drawing in place of a photo. Do not fetch product ph
 
 **Test:** the « Gilet » tile shows the vest; a « Saucisse » item shows the new buoy; a new piece with a photo shows it in the thumbnail, without a photo the type icon.
 
-## [ ] 2026-11-18-284 Phone: the search box of the logbook header moves up 8 px
+## [x] 2026-11-18-284 Phone: the search box of the logbook header moves up 8 px
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/` (`android-carnet`, `nav-barre-android`, `nav-pastille-android`, `android-serveur-carnet`, `import-fit-importe-android`, `import-fit-deja-android`, `android-carnet-avion`, `carnet-evaluation-android`).
 
