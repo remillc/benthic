@@ -423,12 +423,6 @@
       color: var(--od-text);
     }
 
-    .od-server-create--sent {
-      margin: 8px 0 0;
-      font-size: 14px;
-      color: var(--od-text-2);
-    }
-
     .od-server-create--note {
       display: flex;
       gap: 14px;

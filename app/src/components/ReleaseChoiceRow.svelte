@@ -89,18 +89,7 @@
         }
       }
 
-      /* Android phone, first step (mock-up android-premier-lancement-production): 12 dp above and below, so that the
-       three choices, the chip and the text buttons fit. */
-    .od-release-row--dense {
-      padding-block: 12px;
-    }
-
-    .od-release-row--plus {
-      display: flex;
-      margin-bottom: 4px;
-    }
-
-    .od-release-row--tile {
+      .od-release-row--tile {
         background: var(--od-release-main-tile);
         color: var(--od-release-on-panel);
       }

@@ -215,7 +215,7 @@
 
       .od-release-field--input,
       .od-release-field--input:focus,
-      .od-release-field--error .od-release-field--input {
+      &.od-release-field--error .od-release-field--input {
         flex: 1;
         width: auto;
         min-width: 0;

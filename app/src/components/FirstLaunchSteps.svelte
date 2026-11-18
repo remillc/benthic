@@ -958,55 +958,55 @@
     }
 
     /* Shared axis X: 30 dp, the outgoing fades out in the first 30 %, the incoming fades in over the rest. */
-    @keyframes od-first-launch-in-forward {
+    @keyframes -global-od-first-launch-in-forward {
       from { translate: 30px 0; }
       to { translate: 0 0; }
     }
-    @keyframes od-first-launch-in-back {
+    @keyframes -global-od-first-launch-in-back {
       from { translate: -30px 0; }
       to { translate: 0 0; }
     }
-    @keyframes od-first-launch-out-forward {
+    @keyframes -global-od-first-launch-out-forward {
       to { translate: -30px 0; }
     }
-    @keyframes od-first-launch-out-back {
+    @keyframes -global-od-first-launch-out-back {
       to { translate: 30px 0; }
     }
-    @keyframes od-first-launch-fade-in {
+    @keyframes -global-od-first-launch-fade-in {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    @keyframes od-first-launch-fade-out {
+    @keyframes -global-od-first-launch-fade-out {
       to { opacity: 0; }
     }
 
-    .od-first-launch--in-forward,
-    .od-first-launch--in-back {
+    .od-first-launch--stage :global(.od-first-launch--in-forward),
+    .od-first-launch--stage :global(.od-first-launch--in-back) {
       animation:
         var(--od-first-launch-slide) var(--od-motion-spatial-default-ms, 350ms) var(--od-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
         od-first-launch-fade-in calc(var(--od-motion-effects-default-ms, 200ms) * 1) var(--od-motion-effects-default, ease-out)
           calc(var(--od-motion-spatial-default-ms, 350ms) * 0.3) both;
     }
 
-    .od-first-launch--in-forward { --od-first-launch-slide: od-first-launch-in-forward; }
-    .od-first-launch--in-back { --od-first-launch-slide: od-first-launch-in-back; }
+    .od-first-launch--stage :global(.od-first-launch--in-forward) { --od-first-launch-slide: od-first-launch-in-forward; }
+    .od-first-launch--stage :global(.od-first-launch--in-back) { --od-first-launch-slide: od-first-launch-in-back; }
 
-    .od-first-launch--out-forward,
-    .od-first-launch--out-back {
+    .od-first-launch--stage :global(.od-first-launch--out-forward),
+    .od-first-launch--stage :global(.od-first-launch--out-back) {
       pointer-events: none;
       animation:
         var(--od-first-launch-slide) var(--od-motion-spatial-default-ms, 350ms) var(--od-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
         od-first-launch-fade-out calc(var(--od-motion-spatial-default-ms, 350ms) * 0.3) var(--od-motion-effects-default, ease-out) both;
     }
 
-    .od-first-launch--out-forward { --od-first-launch-slide: od-first-launch-out-forward; }
-    .od-first-launch--out-back { --od-first-launch-slide: od-first-launch-out-back; }
+    .od-first-launch--stage :global(.od-first-launch--out-forward) { --od-first-launch-slide: od-first-launch-out-forward; }
+    .od-first-launch--stage :global(.od-first-launch--out-back) { --od-first-launch-slide: od-first-launch-out-back; }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch--in-forward,
-      .od-first-launch--in-back,
-      .od-first-launch--out-forward,
-      .od-first-launch--out-back {
+      .od-first-launch--stage :global(.od-first-launch--in-forward),
+      .od-first-launch--stage :global(.od-first-launch--in-back),
+      .od-first-launch--stage :global(.od-first-launch--out-forward),
+      .od-first-launch--stage :global(.od-first-launch--out-back) {
         animation: none;
       }
     }
@@ -1622,12 +1622,6 @@
       outline: 2px dashed var(--od-release-link);
       outline-offset: 8px;
       border-radius: 4px;
-    }
-
-    /* « Suivant » (task 2026-11-16-249): the MD3 button with a trailing icon, an 18 dp chevron 8 dp after the
-       label, 24 dp of padding at the start and 16 dp at the end. */
-    .od-first-launch--action.od-first-launch--action-next {
-      padding: 0 16px 0 24px;
     }
 
     .od-first-launch--action {
