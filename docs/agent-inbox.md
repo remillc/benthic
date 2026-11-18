@@ -5477,7 +5477,7 @@ The wave and the check mark are drawn with the same commands, so the path can be
 - On the first display of the screen, the sequence plays once, and it does not play again when coming back to the screen.
 - With reduced motion turned on, nothing moves.
 
-## [ ] 2026-11-18-271 Phone: OpenDives+ welcome, the optional consent for health data
+## [x] 2026-11-18-271 Phone: OpenDives+ welcome, the optional consent for health data
 
 Christian approved this on 18 November 2026. Work in `main` (task 268). Mock-ups in `docs/mockups-release/`.
 
