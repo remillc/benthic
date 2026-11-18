@@ -84,6 +84,25 @@ export function isNewer(a, b) {
 }
 
 /**
+ * Whether a region has an update to offer: one waits, the region is ready, and its build is
+ * older than the one announced (a stale mark left on a region already up to date shows no badge).
+ * @param {{ status: string, version?: string, update?: { version: string }|null }} r
+ */
+export function hasUpdate(r) {
+  return !!r.update && r.status === 'ready' && isNewer(r.version, r.update.version);
+}
+
+/**
+ * Whether the update of a region being updated is complete on the device: the file in its folder
+ * is the build the update asked for (the app was closed, or the event was missed, meanwhile).
+ * @param {{ status: string, update?: { version: string }|null }} r
+ * @param {{ version?: string }|undefined|null} file what the device holds for the region
+ */
+export function updateFinished(r, file) {
+  return r.status === 'updating' && !!r.update && !!file && file.version === r.update.version;
+}
+
+/**
  * Failed downloads whose partial file is older than 7 days.
  * @param {{ id: string, status: string, failedAt?: number }[]} regions @param {number} nowMs
  */
