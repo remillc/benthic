@@ -40,7 +40,8 @@ list(APPEND SOURCES
   "${ROOT}/core/libopendives/filter.cpp"
   "${ROOT}/core/libopendives/account.cpp"
   "${ROOT}/core/libopendives/stats.cpp"
-  "${ROOT}/core/libopendives/download.cpp")
+  "${ROOT}/core/libopendives/download.cpp"
+  "${ROOT}/core/libopendives/odgit.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
 

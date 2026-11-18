@@ -542,6 +542,19 @@ export { waterTypeOf };
  */
 
 /**
+ * Git on the device (core/libopendives/odgit.h). `dir` names a working copy: the folder `odgit/<dir>` of the app's
+ * data (Capacitor's Directory.Data on a phone, <userData> on the desktop), where JavaScript reads and writes the
+ * files (@capacitor/filesystem) and the core commits them. Credentials are the session's (serverSessionAccess).
+ * Every call rejects with a code: BAD_ADDRESS, BAD_CREDENTIALS, BAD_PATH, EXISTS, NO_WORKING_COPY, UNREACHABLE,
+ * REFUSED, REJECTED (push: pull first), CANCELLED, GIT_ERROR.
+ * @typedef {{dir: string, username: string, token: string, branch: string}} GitAccess
+ * @typedef {{phase: 'receiving'|'resolving'|'checkout'|'sending', done: number, total: number, dir?: string}} GitProgress
+ * @typedef {{path: string, base: string|null, ours: string|null, theirs: string|null}} GitConflictFile
+ * @typedef {{result: 'upToDate'|'fastForward'|'merged'|'empty', head: string|null}
+ *   | {result: 'conflict', ours: string, theirs: string, files: GitConflictFile[]}} GitPullResult
+ */
+
+/**
  * @typedef {Object} OpenDivesCorePlugin
  * @property {() => Promise<{count: number}>} importSample
  *   Saves the sample log as a local git repository.
@@ -559,6 +572,22 @@ export { waterTypeOf };
  *   with no token typed): as for a push, which checks the token and its right
  *   to write ('ok', 'denied', 'none'). Network only; nothing is stored.
  *   Rejects with BAD_ADDRESS (not HTTPS, or holding credentials) or BAD_CREDENTIALS.
+ * @property {(options: GitAccess & {url: string}) => Promise<{result: 'cloned'|'empty', head: string|null}>} odgitClone
+ *   Makes the working copy from the branch of the repository ('empty': the server has no such branch yet).
+ * @property {(options: GitAccess & {authorName?: string, authorEmail?: string}) => Promise<GitPullResult>} odgitPull
+ *   Fetch and merge. On a conflict nothing changes on disk: resolve the files in JavaScript, write them in the working
+ *   copy and call odgitCommit with `mergeParent` = `theirs`.
+ * @property {(options: {dir: string, paths: string[], message: string, mergeParent?: string, authorName?: string, authorEmail?: string}) => Promise<{commit: string|null}>} odgitCommit
+ *   Stages the files (a missing file is a deletion) and commits; `commit` is null when nothing changed.
+ * @property {(options: GitAccess) => Promise<{result: 'pushed'|'upToDate', head: string|null}>} odgitPush
+ * @property {(options: {dir: string, paths?: string[]}) => Promise<{changes: {path: string, state: 'new'|'modified'|'deleted'}[]}>} odgitStatus
+ * @property {(options: {dir: string, branch: string}) => Promise<{ahead: number, behind: number}>} odgitUnpushed
+ *   The commits the server does not have, as of the last fetch or push.
+ * @property {(options: {dir: string, branch: string}) => Promise<{head: string|null, remote: string|null}>} odgitHead
+ * @property {(options: {dir: string, prefix?: string}) => Promise<{files: string[]}>} odgitListFiles
+ * @property {(options: {dir: string}) => Promise<void>} odgitRemove
+ * @property {() => Promise<void>} odgitCancel
+ *   Stops the running git call, which rejects with CANCELLED.
  * @property {(options: {email: string, sessionToken: string, repositoryUrl: string, branch: string, gitUsername: string, gitToken: string}) => Promise<void>} serverSessionSave
  *   Release edition: keeps the OpenDives server's session (session token and git token) in the platform's secure
  *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
@@ -811,7 +840,7 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'mapsDownload', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
  *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (opendives.h,
@@ -838,6 +867,32 @@ export const OpenDivesCore = {
   async gitCheck(options) {
     return JSON.parse((await native.gitCheck(options)).json);
   },
+  async odgitClone(options) {
+    return JSON.parse((await native.odgitClone(options)).json);
+  },
+  async odgitPull(options) {
+    return JSON.parse((await native.odgitPull(options)).json);
+  },
+  async odgitCommit(options) {
+    return JSON.parse((await native.odgitCommit(options)).json);
+  },
+  async odgitPush(options) {
+    return JSON.parse((await native.odgitPush(options)).json);
+  },
+  async odgitStatus(options) {
+    return JSON.parse((await native.odgitStatus({ paths: [], ...options })).json);
+  },
+  async odgitUnpushed(options) {
+    return JSON.parse((await native.odgitUnpushed(options)).json);
+  },
+  async odgitHead(options) {
+    return JSON.parse((await native.odgitHead(options)).json);
+  },
+  async odgitListFiles(options) {
+    return JSON.parse((await native.odgitListFiles({ prefix: '', ...options })).json);
+  },
+  odgitRemove: (options) => native.odgitRemove(options),
+  odgitCancel: () => native.odgitCancel(),
   gitConfig: () => native.gitConfig(),
   serverSessionSave: (options) => native.serverSessionSave(options),
   serverSessionInfo: () => native.serverSessionInfo(),
