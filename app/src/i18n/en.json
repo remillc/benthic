@@ -2115,6 +2115,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
       "Offline maps: the dot on the account avatar goes away once a map update is done, including an update that finished while the app was closed.",
@@ -4752,6 +4753,18 @@
       "open": "Open my logbook"
     }
   },
+  "timeLeft": {
+    "seconds": "{n} s left",
+    "minutes": "{n} min left",
+    "secondsSpoken": {
+      "one": "{n} second left",
+      "other": "{n} seconds left"
+    },
+    "minutesSpoken": {
+      "one": "{n} minute left",
+      "other": "{n} minutes left"
+    }
+  },
   "serverCreate": {
     "title": "No logbook on your account",
     "lead": "Your OpenDives+ account is ready, but it holds no logbook yet. Create one, or send a logbook you already have.",
@@ -4782,12 +4795,6 @@
     "progress": {
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
-    },
-    "leftNone": "Working out the time left…",
-    "leftSeconds": "About {n} seconds",
-    "leftMinutes": {
-      "one": "About {n} minute",
-      "other": "About {n} minutes"
     },
     "safe": "The logbook is already saved on this tablet. You can leave the app: the upload resumes when you come back.",
     "safePhone": "The logbook is already saved on this phone. You can leave the app: the upload resumes when you come back.",

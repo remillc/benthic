@@ -2115,6 +2115,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
@@ -4752,6 +4753,21 @@
       "open": "Ouvrir mon carnet"
     }
   },
+  "timeLeft": {
+    "seconds": {
+      "one": "{n} s restante",
+      "other": "{n} s restantes"
+    },
+    "minutes": "{n} min restantes",
+    "secondsSpoken": {
+      "one": "{n} seconde restante",
+      "other": "{n} secondes restantes"
+    },
+    "minutesSpoken": {
+      "one": "{n} minute restante",
+      "other": "{n} minutes restantes"
+    }
+  },
   "serverCreate": {
     "title": "Aucun carnet sur votre compte",
     "lead": "Votre compte OpenDives+ est prêt, mais il ne contient pas encore de carnet. Créez-en un, ou envoyez un carnet que vous avez déjà.",
@@ -4782,12 +4798,6 @@
     "progress": {
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"
-    },
-    "leftNone": "Calcul du temps restant…",
-    "leftSeconds": "Environ {n} secondes",
-    "leftMinutes": {
-      "one": "Environ {n} minute",
-      "other": "Environ {n} minutes"
     },
     "safe": "Le carnet est déjà enregistré sur cette tablette. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
     "safePhone": "Le carnet est déjà enregistré sur ce téléphone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
