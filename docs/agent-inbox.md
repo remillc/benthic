@@ -5405,7 +5405,9 @@ Mock-ups in `docs/mockups-release/`, canvas « OpenDives — v. beta · Téléph
 - A piece added « hors inventaire » appears in the dive and not in the inventory.
 - Offline, the inventory reads and edits, and syncs when the network returns.
 
-## [ ] 2026-11-18-268 Repository: keep the alpha on `feature/release-alpha`, merge all the beta into `main`, then work in `main`
+## [x] 2026-11-18-268 Repository: keep the alpha on `feature/release-alpha`, merge all the beta into `main`, then work in `main`
+
+Done on 18 November 2026: the alpha is on `feature/release-alpha`; every `feature/release-…` branch and `feature/desktop-logbook` are merged into `main`; the beta is the default build (`VITE_EDITION=alpha` builds the alpha); AGENTS.md and the docs say that work starts from `main` and returns to it.
 
 Christian asked for this on 18 November 2026. It changes how we work, so read it all before starting.
 
