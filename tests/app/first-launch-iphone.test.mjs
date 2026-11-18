@@ -49,13 +49,12 @@ test('texts that name the device: « cet iPhone » on an iPhone, the others unch
 });
 
 test('« Dans mon nuage » lists iCloud Drive first on an iPhone', () => {
+  // The « Ouvrir mon carnet » rows for a cloud drive are gone from the beta (18 November 2026): only the create-path text remains.
   assert.ok(langs.fr.welcomeSteps.cloudHelpIphone.startsWith('iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV.'));
-  assert.ok(langs.fr.welcomeSteps.openCloudHelpIphone.startsWith('iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV.'));
   assert.ok(langs.en.welcomeSteps.cloudHelpIphone.startsWith('iCloud Drive, Google Drive, OneDrive, Dropbox or WebDAV.'));
   assert.doesNotMatch(langs.fr.welcomeSteps.cloudHelp, /iCloud/);
-  assert.doesNotMatch(langs.fr.welcomeSteps.openCloudHelp, /iCloud/);
-  const steps = src('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /iphoneKey\('welcomeSteps\.openCloudHelp', iphone\)/);
+  assert.equal(langs.fr.welcomeSteps.openCloudHelp, undefined);
+  assert.doesNotMatch(src('components/FirstLaunchSteps.svelte'), /openCloudHelp/);
 });
 
 test('iCloud Drive is the first service on an iPhone, with its line, and nowhere else', () => {

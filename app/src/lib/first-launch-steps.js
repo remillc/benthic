@@ -8,6 +8,8 @@
 //     cloudService → cloudConnect → cloudConnected | webdav | git (reached from the open and git-link paths)
 //   (iCloud Drive, iPhone and macOS only: cloudService → cloudConnected, no sign-in; tasks 2026-11-16-228 and 261)
 //   start → import → (file | importDivelogs → importProgress) → importNew (the name; « Importer le carnet » creates it on the device)
+//   (The beta's « open » step now offers the OpenDives server only, decided on 18 November 2026: no screen sends to the
+//   cloud-drive and git steps below any more; their transitions stay for the desktop paths and the tests.)
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
 //   open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
 //     e-mail step is `server`; « Le serveur ne répond pas » is `serverOffline`, over the step that failed)

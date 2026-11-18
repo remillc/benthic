@@ -162,13 +162,14 @@ test('the six boxes spread on the phone and stay together, 12 dp apart, on wide 
 
 // --- Entry points and steps ---------------------------------------------------------------------------------
 
-test('the OpenDives server is the first and the only highlighted choice of « Ouvrir mon carnet »', () => {
-  assert.deepEqual(entryRows('open').map((r) => r.key), ['server', 'cloud', 'git']);
+test('the OpenDives server is the only choice of « Ouvrir mon carnet »: no cloud drive, no personal git repository (18 November 2026)', () => {
+  // The decided change: the rows « Dans mon nuage » and « Dans un dépôt git » are gone from the beta.
+  assert.deepEqual(entryRows('open').map((r) => r.key), ['server']);
   assert.deepEqual(entryRows('open').filter((r) => r.main).map((r) => r.key), ['server']);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /entryRows\('open'\)/);
-  // « Dans mon nuage » is an ordinary white row: it no longer carries `main`.
-  assert.doesNotMatch(steps, /<ReleaseChoiceRow main icon="cloudUpload"/);
+  assert.doesNotMatch(steps, /go\('cloud'\)|go\('git'\)/);
+  assert.doesNotMatch(steps, /<ReleaseChoiceRow[^>]*icon="(cloudUpload|git)"/);
 });
 
 test('the server steps: e-mail, code, download; « Retour » goes back one; the download has none', () => {

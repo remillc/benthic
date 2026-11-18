@@ -54,16 +54,11 @@ export function resendLeft(resendAfterSeconds, sentAt, now) {
 }
 
 /**
- * The first choices of « Où est-il ? »: the OpenDives server first and highlighted, then the cloud and git. The
- * cloud row is an ordinary white row.
+ * The first choices of « Où est-il ? »: the OpenDives server only. The beta never offers to open a logbook in a cloud
+ * drive (OneDrive, Google Drive, WebDAV…) or in a personal git repository (decided on 18 November 2026).
  * @param {'open'} list
- * @returns {{ key: 'server'|'cloud'|'git', main: boolean }[]}
+ * @returns {{ key: 'server', main: boolean }[]}
  */
 export function entryRows(list) {
-  const rows = /** @type {{ key: 'server'|'cloud'|'git', main: boolean }[]} */ ([
-    { key: 'server', main: true },
-    { key: 'cloud', main: false },
-    { key: 'git', main: false },
-  ]);
-  return rows;
+  return [{ key: 'server', main: true }];
 }

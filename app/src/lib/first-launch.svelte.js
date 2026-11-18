@@ -11,8 +11,8 @@ import { t } from './i18n.js';
 /** @typedef {import('./import-summary.js').ImportSummary} ImportSummary */
 
 /**
- * What the diver brings: a picked file, or the divelogs.de logbook downloaded into the app's cache.
- * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('opendives-core').CsvParams, companion: File|null } }
+ * What the diver brings: a picked file (`alpha`: the alpha's logbook, read from this device), or the divelogs.de logbook downloaded into the app's cache.
+ * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('opendives-core').CsvParams, companion: File|null }, alpha?: boolean }
  *   | { kind: 'divelogs', path: string, paths?: string[], name: string, summary: ImportSummary }} ImportSource
  * A resumable divelogs.de download is several files (`paths`); `path` is the first one.
  */

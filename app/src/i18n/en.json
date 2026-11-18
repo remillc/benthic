@@ -168,6 +168,7 @@
         "other": "Your {n} changes stay on this phone and will be sent once the password is fixed."
       },
       "staysNone": "Your dives stay on this phone.",
+      "accountAction": "Open the account",
       "auth": {
         "row": "Can’t sync: password refused",
         "title": "The cloud refuses your password",
@@ -1127,10 +1128,8 @@
     "defaultName": "My logbook",
     "whereTitle": "Where to keep it?",
     "whereHelp": "You can change this later.",
-    "cloudTitle": "In my cloud",
     "cloudHelp": "Google Drive, OneDrive, Dropbox or WebDAV. Synced with your other devices.",
     "cloudHelpIphone": "iCloud Drive, Google Drive, OneDrive, Dropbox or WebDAV. Synced with your other devices.",
-    "gitTitle": "In a git repository",
     "gitHelp": "GitHub, GitLab or your own server. Synced with your other devices.",
     "deviceTitle": "Only on this tablet",
     "deviceTitlePhone": "Only on this phone",
@@ -1205,9 +1204,6 @@
     "summaryYears": "{text}, from {from} to {to}",
     "summaryYear": "{text}, in {year}",
     "openWhere": "Where is it?",
-    "openCloudHelp": "Google Drive, OneDrive, Dropbox or WebDAV.",
-    "openCloudHelpIphone": "iCloud Drive, Google Drive, OneDrive, Dropbox or WebDAV.",
-    "openGitHelp": "GitHub, GitLab or your own server.",
     "openService": "Which service?",
     "openConnectedHelp": "OpenDives will look for your logbooks in the OpenDives folder of this account.",
     "seeLogbooks": "See my logbooks",
@@ -1272,6 +1268,12 @@
     "localTitleIphone": "Start a logbook on this iPhone",
     "localHelp": "Kept here, even without a network.",
     "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
+    "alphaName": "Previous logbook",
+    "alphaTitle": "Previous version’s logbook",
+    "alphaHelp": {
+      "one": "1 dive, copied into a new logbook.",
+      "other": "{n} dives, copied into a new logbook."
+    },
     "localTitleDesktop": "Start a logbook on this computer",
     "keptServer": "OpenDives server"
   },
@@ -2166,6 +2168,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch (public edition): if you come from the alpha, “Import a logbook” offers “Previous version’s logbook”, with its number of dives. It copies that logbook, read on the phone without the network, into a new logbook; the alpha’s files are not touched and the row disappears after the copy.",
+      "Public edition: no choice is left to open a logbook in OneDrive, Google Drive or a personal git repository. “Open my logbook” offers the OpenDives server, and the account no longer offers “Use my own git repository”.",
       "A logbook that was on the Subsurface cloud is not opened here: after an update from the alpha, the app starts from its first launch and leaves that logbook's files on the phone as they were. The Account page no longer offers signing in to the Subsurface cloud. A dive that cannot be read shows a page with « Try again ».",
       "Logbook on a phone: dives are grouped by year, each year in a white card. Each row shows the date on a pale blue block, the site (or “Dive site not set” with a crossed-out pin), the dive number in bold and the time, the small profile, then the maximum depth in bold and the duration, in the units of the settings. A trip is its own card, with a pale blue header (suitcase, number of dives, depths) and an arrow to fold it. A screen reader reads each row as one item.",
       "Android: the screen edges are the same at every launch and in every navigation mode: sheets, messages, buttons and the bottom bar stay above the gesture bar or the navigation buttons, and the top no longer jumps.",

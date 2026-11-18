@@ -33,12 +33,14 @@
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
+  import { alphaLogbookFile, findAlphaLogbook, markAlphaImportDone } from '../lib/alpha-logbook.js';
+  import { isRelease } from '../lib/edition.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
   import { errorCode } from '../lib/account.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
   import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
-  import { deviceKind, deviceKey, iphoneKey, iosPhone } from '../lib/first-launch-phone.js';
+  import { deviceKind, deviceKey, iosPhone } from '../lib/first-launch-phone.js';
   import { layout, ios, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { cloudErrorKey, creationErrorKey } from '../lib/desktop-logbooks.js';
@@ -349,6 +351,7 @@
         },
         importer(),
       );
+      if (flow.source?.alpha) markAlphaImportDone(deviceStore);
       resetFlow();
     } catch (e) {
       failed(e);
@@ -414,6 +417,36 @@
     flow.name = flow.source.name;
     csv = null;
     go('file');
+  }
+
+  /**
+   * The logbook the alpha left on this device (decided on 18 November 2026): offered once on « Importer un carnet », read
+   * from the device's copy without the network. Null when there is none, or once it was imported.
+   * @type {import('../lib/alpha-logbook.js').AlphaLogbook|null}
+   */
+  let alphaFound = $state(null);
+  let alphaLooked = false;
+  $effect(() => {
+    if (step !== 'import' || alphaLooked || windowTakes) return;
+    alphaLooked = true;
+    void findAlphaLogbook(OpenDivesCore, deviceStore, isRelease).then((found) => (alphaFound = found));
+  });
+
+  /** « Carnet de la version précédente »: its dives become a file in memory, then « Nouveau carnet » as for any file. */
+  async function useAlphaLogbook() {
+    if (busy || !alphaFound) return;
+    busy = true;
+    try {
+      const name = t('welcomeSteps.alphaName');
+      const { file, text } = await alphaLogbookFile(OpenDivesCore, alphaFound, name);
+      flow.source = { kind: 'file', file, name, summary: summariseImport(alphaFound.dives, text), alpha: true };
+      flow.name = name;
+      go('file');
+    } catch (e) {
+      failed(e);
+    } finally {
+      busy = false;
+    }
   }
 
   /** « Essayer avec un carnet d’exemple »: only on a device without a logbook (lib/demo.svelte.js). */
@@ -784,6 +817,9 @@
             </div>
           {/if}
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
+            {#if alphaFound}
+              <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={t('welcomeSteps.alphaHelp', { n: alphaFound.dives })} disabled={busy} onclick={useAlphaLogbook} />
+            {/if}
             <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp', { n: IMPORT_FORMAT_COUNT })} disabled={busy} onclick={() => fileInput?.click()} />
             <!-- Task 2026-11-16-226: the link sits right under « Un fichier », a 48 dp target 4 dp from each row. -->
             <ImportFormats />
@@ -799,14 +835,9 @@
         {:else if step === 'open'}
           <p class="od-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
+            <!-- The OpenDives server only: the beta never opens a logbook in a cloud drive or a personal git repository. -->
             {#each entryRows('open') as row (row.key)}
-              {#if row.key === 'server'}
-                <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.openHelp')} onclick={() => go('server')} />
-              {:else if row.key === 'cloud'}
-                <ReleaseChoiceRow icon="cloudUpload" title={t('welcomeSteps.cloudTitle')} help={t(iphoneKey('welcomeSteps.openCloudHelp', iphone))} onclick={() => go('cloud')} />
-              {:else}
-                <ReleaseChoiceRow icon="git" title={t('welcomeSteps.gitTitle')} help={t('welcomeSteps.openGitHelp')} onclick={() => go('git')} />
-              {/if}
+              <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.openHelp')} onclick={() => go('server')} />
             {/each}
           </nav>
         {:else if step === 'openCloudService'}

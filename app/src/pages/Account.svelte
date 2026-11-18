@@ -267,7 +267,8 @@
 
     {#if server}
       <!-- The OpenDives server: the repository is the account's, there is nothing to edit here. -->
-    {:else if git}
+    {:else if git && !isRelease}
+      <!-- « Modifier le dépôt »: the alpha's. The beta never offers the personal git repository. -->
       <div class="block-title">{t('account.gitGroup')}</div>
       <div class="list list-strong inset list-dividers">
         <ul>
@@ -283,7 +284,7 @@
           </li>
         </ul>
       </div>
-    {:else}
+    {:else if !git}
       <div class="block-title">{t('account.subsurfaceGroup')}</div>
       <div class="list list-strong inset list-dividers">
         <ul>
@@ -342,11 +343,12 @@
         <span class="od-account--status">{t('account.deviceDives', { n: count })}</span>
       </span>
     </div>
+    <!-- The beta has none of these: no Subsurface cloud, no personal git repository (the OpenDives+ server is signed in to from the first launch). -->
+    {#if !isRelease}
     <p class="od-account--pitch">{t('account.pitch')}</p>
     <!-- Three choices, each with its consequence and a decorative icon (task 2026-11-14-135,
          compte-android-sans-compte.dc.html); the git repository is the third, on no background. -->
     <div class="od-account--choices">
-      {#if !isRelease}
       <a href="/account/create" class="od-account--choice od-account--primary">
         <Icon name="personAdd" />
         <span class="od-account--choice-texts">
@@ -361,7 +363,6 @@
           <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
         </span>
       </a>
-      {/if}
       <a href="/account/git/new" class="od-account--choice od-account--third">
         <Icon name="git" />
         <span class="od-account--choice-texts">
@@ -370,6 +371,7 @@
         </span>
       </a>
     </div>
+    {/if}
   {/if}
 </Page>
 

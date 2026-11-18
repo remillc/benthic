@@ -33,6 +33,9 @@
     close();
     if (cause === 'server') {
       syncNow();
+    } else if (isRelease) {
+      // The beta has no git form to repair the access with: the account page holds « Se déconnecter ».
+      f7.views.main.router.navigate('/account');
     } else {
       f7.views.main.router.navigate(cause === 'auth' && !isRelease ? '/account/sign-in' : '/account/git', {
         props: cause === 'auth' && !isRelease ? { prefilledEmail: logbook.email } : {},
@@ -53,7 +56,7 @@
     </p>
     <div class="od-sync-failure-sheet--actions">
       <button type="button" class="od-sync-failure-sheet--text-button" onclick={close}>{t(cause === 'server' ? 'sync.failure.close' : 'sync.failure.later')}</button>
-      <button type="button" class="od-sync-failure-sheet--tonal" onclick={act}>{t(`sync.failure.${cause}.action`)}</button>
+      <button type="button" class="od-sync-failure-sheet--tonal" onclick={act}>{cause !== 'server' && isRelease ? t('sync.failure.accountAction') : t(`sync.failure.${cause}.action`)}</button>
     </div>
   </div>
 </Sheet>

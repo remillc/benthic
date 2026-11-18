@@ -168,6 +168,7 @@
         "other": "Vos {n} modifications restent sur ce téléphone et partiront dès que le mot de passe sera corrigé."
       },
       "staysNone": "Vos plongées restent sur ce téléphone.",
+      "accountAction": "Ouvrir le compte",
       "auth": {
         "row": "Synchronisation impossible : mot de passe refusé",
         "title": "Le cloud refuse votre mot de passe",
@@ -1127,10 +1128,8 @@
     "defaultName": "Mon carnet",
     "whereTitle": "Où le garder ?",
     "whereHelp": "Vous pourrez changer d’endroit plus tard.",
-    "cloudTitle": "Dans mon nuage",
     "cloudHelp": "Google Drive, OneDrive, Dropbox ou WebDAV. Synchronisé avec vos autres appareils.",
     "cloudHelpIphone": "iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV. Synchronisé avec vos autres appareils.",
-    "gitTitle": "Dans un dépôt git",
     "gitHelp": "GitHub, GitLab ou votre serveur. Synchronisé avec vos autres appareils.",
     "deviceTitle": "Seulement sur cette tablette",
     "deviceTitlePhone": "Seulement sur ce téléphone",
@@ -1205,9 +1204,6 @@
     "summaryYears": "{text}, de {from} à {to}",
     "summaryYear": "{text}, en {year}",
     "openWhere": "Où est-il ?",
-    "openCloudHelp": "Google Drive, OneDrive, Dropbox ou WebDAV.",
-    "openCloudHelpIphone": "iCloud Drive, Google Drive, OneDrive, Dropbox ou WebDAV.",
-    "openGitHelp": "GitHub, GitLab ou votre serveur.",
     "openService": "Dans quel service ?",
     "openConnectedHelp": "OpenDives cherchera vos carnets dans le dossier OpenDives de ce compte.",
     "seeLogbooks": "Voir mes carnets",
@@ -1272,6 +1268,12 @@
     "localTitleIphone": "Commencer un carnet sur cet iPhone",
     "localHelp": "Gardé ici, même sans réseau.",
     "importStartHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
+    "alphaName": "Carnet précédent",
+    "alphaTitle": "Carnet de la version précédente",
+    "alphaHelp": {
+      "one": "1 plongée, copiée dans un nouveau carnet.",
+      "other": "{n} plongées, copiées dans un nouveau carnet."
+    },
     "localTitleDesktop": "Commencer un carnet sur cet ordinateur",
     "keptServer": "Serveur OpenDives"
   },
@@ -2166,6 +2168,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement (édition publique) : si vous venez de l’alpha, « Importer un carnet » propose « Carnet de la version précédente », avec son nombre de plongées. Il copie ce carnet, lu sur le téléphone sans réseau, dans un nouveau carnet ; les fichiers de l’alpha ne sont pas touchés et la rangée disparaît après la copie.",
+      "Édition publique : plus aucun choix pour ouvrir un carnet dans OneDrive, Google Drive ou un dépôt git personnel. « Ouvrir mon carnet » propose le serveur OpenDives, et le compte n’offre plus « Utiliser mon propre dépôt git ».",
       "Un carnet qui était sur le cloud Subsurface n'est pas ouvert ici : après une mise à jour depuis l'alpha, l'application repart de son premier lancement et laisse les fichiers de ce carnet sur le téléphone, tels quels. La page Compte ne propose plus de se connecter au cloud Subsurface. Une plongée qui ne peut pas être lue affiche une page avec « Réessayer ».",
       "Carnet sur téléphone : les plongées sont groupées par année, chaque année dans une carte blanche. Chaque ligne montre la date sur un bloc bleu pâle, le site (ou « Site à préciser » avec un repère barré), le numéro en gras et l'heure, le petit profil, puis la profondeur maximale en gras et la durée, dans les unités des réglages. Un voyage est sa propre carte, avec un en-tête bleu pâle (valise, nombre de plongées, profondeurs) et une flèche pour le replier. Chaque ligne se lit comme un seul élément par les lecteurs d'écran.",
       "Android : les bords de l'écran sont les mêmes à chaque lancement et avec chaque mode de navigation : les feuilles, les messages, les boutons et la barre du bas restent au-dessus de la barre de gestes ou des boutons de navigation, et le haut ne saute plus.",

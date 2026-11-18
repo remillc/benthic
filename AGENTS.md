@@ -52,6 +52,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
   - Statistics apply to the filtered results.
 - **Statistics tab:** opens on precompiled statistics with a "Free filter" button. Examples: number of dives per buddy, dive hours per suit.
 - **First launch:** three choices (existing account, create an account, no account), each with its consequence written out; "no account" means the log stays on the device, with an upload possible later.
+- **Beta (the default build, decided on 18 November 2026):** it never offers to open a logbook in OneDrive, Google Drive or a personal git repository (no first-launch choice, no Account choice, no git form route; the alpha build keeps them, gated by `isRelease`); the OpenDives server keeps using the git code internally. An alpha user who upgraded is offered, once, a copy of the alpha's Subsurface-cloud logbook (read from the device, no network, the alpha's files untouched) as a row of « Importer un carnet »: `app/src/lib/alpha-logbook.js`.
 - **Units:** each measure is set separately (depth, temperature, pressure, volume, weight), like Subsurface's "personalised" mode.
 - **Planner:** can start from a dive in the log (gases, measured SAC). Results are volumes per gas. Saved plans are planned dives of the logbook, listed by the planner only.
 - **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, an OpenDives addition).

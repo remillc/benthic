@@ -150,12 +150,18 @@
         ]),
     { path: '/account/import', ...lazy(() => import('./pages/BringLogbook.svelte')), beforeEnter: accountGuard },
     { path: '/account/importing', ...lazy(() => import('./pages/ImportProgress.svelte')) },
-    // The logbook in the user's own git repository (Modifier le dépôt).
-    { path: '/account/git', ...lazy(() => import('./pages/GitRepository.svelte'), { edit: true }), beforeEnter: accountGuard },
-    { path: '/account/git/token', ...lazy(() => import('./pages/TokenHelp.svelte')) },
-    { path: '/account/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte')) },
-    // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
-    { path: '/account/git/new', ...lazy(() => import('./pages/GitRepository.svelte')) },
+    // The logbook in the user's own git repository (Modifier le dépôt) is the alpha's: the beta never offers to open a
+    // logbook in a personal git repository (nor, on its first launch, in a cloud drive); the OpenDives server does not
+    // use these pages.
+    ...(isRelease
+      ? []
+      : [
+          { path: '/account/git', ...lazy(() => import('./pages/GitRepository.svelte'), { edit: true }), beforeEnter: accountGuard },
+          { path: '/account/git/token', ...lazy(() => import('./pages/TokenHelp.svelte')) },
+          { path: '/account/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte')) },
+          // Without an account (task 2026-11-14-135): the same setup, then this device's dives sent there.
+          { path: '/account/git/new', ...lazy(() => import('./pages/GitRepository.svelte')) },
+        ]),
     // First launch, in the view of its popup (components/Welcome.svelte).
     // The release edition has its own first launch (pages/WelcomeEntry.svelte); the alpha keeps WelcomeStart.
     { path: '/welcome', component: isRelease ? WelcomeEntry : WelcomeStart },
@@ -170,11 +176,15 @@
     { path: '/welcome/local', ...lazy(() => import('./pages/WithoutAccount.svelte')) },
     { path: '/welcome/import', ...lazy(() => import('./pages/BringLogbook.svelte')) },
     { path: '/welcome/importing', ...lazy(() => import('./pages/ImportProgress.svelte')) },
-    { path: '/welcome/git', ...lazy(() => import('./pages/GitRepository.svelte'), { welcome: true }) },
-    { path: '/welcome/git/token', ...lazy(() => import('./pages/TokenHelp.svelte')) },
-    { path: '/welcome/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte')) },
-    // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
-    { path: '/welcome/git/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
+    ...(isRelease
+      ? []
+      : [
+          { path: '/welcome/git', ...lazy(() => import('./pages/GitRepository.svelte'), { welcome: true }) },
+          { path: '/welcome/git/token', ...lazy(() => import('./pages/TokenHelp.svelte')) },
+          { path: '/welcome/git/repository', ...lazy(() => import('./pages/RepositoryHelp.svelte')) },
+          // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
+          { path: '/welcome/git/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
+        ]),
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {

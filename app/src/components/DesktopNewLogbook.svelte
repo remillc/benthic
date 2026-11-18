@@ -11,6 +11,7 @@
   import { fade } from 'svelte/transition';
   import Icon from './Icon.svelte';
   import ChoiceRow from './ChoiceRow.svelte';
+  import { isRelease } from '../lib/edition.js';
   import { t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
@@ -305,6 +306,8 @@
                   <span class="od-new-logbook--row-help">{t('desktopLogbooks.new.computerHelp')}</span>
                 </span>
               </ChoiceRow>
+              <!-- The beta keeps its logbook on the computer: no cloud drive, no personal git repository (decided on 18 November 2026). -->
+              {#if !isRelease}
               <ChoiceRow name="od-new-logbook-where" selected={where === 'cloud'} onselect={() => (where = 'cloud')}>
                 <span class="od-new-logbook--tile"><Icon name="cloud" size={22} /></span>
                 <span class="od-new-logbook--text">
@@ -319,6 +322,7 @@
                   <span class="od-new-logbook--row-help">{t('desktopLogbooks.new.gitHelp')}</span>
                 </span>
               </ChoiceRow>
+              {/if}
             </div>
             {#if error}<p class="od-new-logbook--error" role="alert">{error}</p>{/if}
           </div>

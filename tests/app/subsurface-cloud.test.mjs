@@ -35,7 +35,25 @@ test('the Subsurface-cloud sign-in routes exist only in the alpha', () => {
     assert.ok(at > 0, route);
     assert.match(app.slice(Math.max(0, at - 520), at), /isRelease\s*\?\s*\[\]/, `${route} sits in the alpha-only branch`);
   }
-  assert.match(src('pages/Account.svelte'), /\{#if !isRelease\}\s*<a href="\/account\/create"/);
+  // The pitch and the three choices of the Account page without an account (create, sign in, own git) are the alpha's.
+  assert.match(src('pages/Account.svelte'), /\{#if !isRelease\}\s*<p class="od-account--pitch">[\s\S]*<a href="\/account\/create"[\s\S]*<a href="\/account\/git\/new"/);
+});
+
+test('the beta never offers to open a logbook in a personal git repository: no route, no link (18 November 2026)', () => {
+  const app = src('App.svelte');
+  for (const route of ['/account/git', '/account/git/token', '/account/git/repository', '/account/git/new', '/welcome/git', '/welcome/git/token', '/welcome/git/repository', '/welcome/git/downloading']) {
+    const at = app.indexOf(`path: '${route}'`);
+    assert.ok(at > 0, route);
+    assert.match(app.slice(Math.max(0, at - 700), at), /isRelease\s*\?\s*\[\]/, `${route} sits in the alpha-only branch`);
+  }
+  // « Modifier le dépôt » of the Account page, and the sync failure's way to the git form.
+  const account = src('pages/Account.svelte');
+  assert.match(account, /\{:else if git && !isRelease\}/);
+  assert.match(account, /\{:else if !git\}/);
+  const sheet = src('components/SyncFailureSheet.svelte');
+  assert.match(sheet, /\} else if \(isRelease\) \{[^}]*navigate\('\/account'\)/);
+  // The desktop's « Nouveau carnet » keeps the computer only.
+  assert.match(src('components/DesktopNewLogbook.svelte'), /\{#if !isRelease\}[\s\S]*where === 'cloud'[\s\S]*where === 'git'[\s\S]*\{\/if\}/);
 });
 
 test('the error state of a dive has the app styling: own class, title font, tokens only, a way on', () => {
