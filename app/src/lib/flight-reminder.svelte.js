@@ -131,6 +131,8 @@ export async function setFlightNotify(on) {
 export function startFlightReminder() {
   if (native()) {
     LocalNotifications.addListener('localNotificationActionPerformed', (event) => {
+      // The maintenance notifications have their own listener (lib/maintenance-notify.js).
+      if (event.notification?.extra?.maintenance === true) return;
       const link = event.notification?.extra?.link;
       handleLink(typeof link === 'string' ? link : FLIGHT_LINK);
     });

@@ -255,6 +255,7 @@
     --od-release-row-main-hover: #246AAE;
     --od-release-tile: #E6EEF7;
     --od-tile-violet: #EBE3F3;
+    --od-tile-amber: #F5E8CC;
     --od-release-tile-icon: #1F5C99;
     /* The link « Voir les formats acceptés » (task 223) and the extension chips of its dialog. */
     --od-release-link: #1F5C99;
@@ -429,6 +430,7 @@
     /* First launch of the release edition: the panel keeps its blues; tiles, label, dividers and scrim follow dark mode. */
     --od-release-tile: #1E3552;
     --od-tile-violet: #35294A;
+    --od-tile-amber: #4A3A1C;
     --od-release-tile-icon: #8FB6E6;
     --od-release-link: #8FB6E6;
     --od-release-chip-text: #BFD6F0;

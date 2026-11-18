@@ -12,7 +12,8 @@
   import GearIcon from '../components/GearIcon.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
-  import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
+  import { tagText } from '../lib/maintenance-text.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatDepth, formatLongDate, formatNumber, formatHours } from '../lib/format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
@@ -29,6 +30,16 @@
   let computerStats = $state(null);
 
   const piece = $derived(gear.pieces.find((g) => g.id === id));
+  /** The piece's photo, when it has one. */
+  let photoUrl = $state('');
+  $effect(() => {
+    const photoId = piece?.photoId;
+    if (!photoId) photoUrl = '';
+    else readPhoto(photoId).then((u) => (photoUrl = u));
+  });
+  /** The piece's reminders, for the « Entretien » row: the number overdue and the soonest tag. */
+  const reminders = $derived(evaluations().filter((e) => e.item.gearId === id && e.active));
+  const worst = $derived([...reminders].sort((a, b) => (a.sortDays ?? 9999) - (b.sortDays ?? 9999))[0]);
 
   onMount(async () => {
     await loadInventory();
@@ -152,7 +163,9 @@
   <ReadOnlyNotice />
 
   {#if piece}
-    <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}><GearIcon type={piece.type} size={72} /></div>
+    <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
+      {#if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} size={72} />{/if}
+    </div>
     <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}{#if piece.retired}<span class="od-piece-page--badge">{t('gear.piece.archived')}</span>{/if}</p>
     <h2 class="od-piece-page--name">{piece.name}</h2>
 
@@ -161,6 +174,15 @@
       <span class="od-piece-page--figure"><span class="od-piece-page--value">{figures.seconds ? formatHours(figures.seconds) : '–'}</span><span class="od-piece-page--legend">{t('gear.piece.hours')}</span></span>
       <span class="od-piece-page--figure"><span class="od-piece-page--value">{figures.deepestMm ? formatDepth(figures.deepestMm, logbook.prefs) : '–'}</span><span class="od-piece-page--legend">{t('gear.piece.deepest')}</span></span>
     </div>
+
+    <a href={`/profile/gear/${id}/maintenance`} class="od-piece-page--maintenance" aria-label={t('maintenance.piece.openAria', { name: piece.name })}>
+      <Icon name="clock" size={22} />
+      <span class="od-piece-page--maintenance-texts">
+        <span class="od-piece-page--maintenance-title">{t('maintenance.piece.title')}</span>
+        <span class="od-piece-page--maintenance-line" class:od-piece-page--late={worst?.status === 'overdue'}>{worst ? tagText(worst) : t('maintenance.piece.noRuleLine')}</span>
+      </span>
+      <Icon name="chevron" size={20} />
+    </a>
 
     {#if details.length}
       <h3 class="od-piece-page--title">{t('gear.piece.details')}</h3>
@@ -202,7 +224,51 @@
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
+    .od-piece-page--photo {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      object-fit: cover;
+    }
+
+    .od-piece-page--maintenance {
+      margin: 12px 16px 0;
+      min-height: 56px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      text-decoration: none;
+    }
+
+    .od-piece-page--maintenance-texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .od-piece-page--maintenance-title {
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+
+    .od-piece-page--maintenance-line {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+    }
+
+    .od-piece-page--late {
+      color: var(--od-alarm);
+    }
+
     .od-piece-page--image {
+      overflow: hidden;
       margin: 8px 16px 0;
       height: 160px;
       border-radius: 20px;

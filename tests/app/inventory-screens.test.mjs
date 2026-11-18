@@ -29,9 +29,9 @@ test('every literal gear key used by the screens exists in fr and en', () => {
 
 test('the dynamic gear keys have every type and group in both languages', () => {
   for (const lang of [fr, en]) {
-    for (const type of ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other']) assert.ok(lang.gear.inventory.type[type], type);
+    for (const type of ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other']) assert.ok(lang.gear.inventory.type[type], type);
     for (const g of ['computer', 'regulator', 'suit', 'cylinder', 'other']) assert.ok(lang.gear.inventory.group[g], g);
-    for (const g of ['regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other']) assert.ok(lang.gear.inventory.typePlural[g], g);
+    for (const g of ['regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other']) assert.ok(lang.gear.inventory.typePlural[g], g);
   }
   assert.equal(fr.gear.inventory.exportHeader.split('|').length, 9);
   assert.equal(en.gear.inventory.exportHeader.split('|').length, 9);

@@ -2115,6 +2115,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
+      "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
@@ -4866,7 +4868,9 @@
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
         "light": "Lampes",
-        "other": "Autres"
+        "other": "Autres",
+        "bcd": "Gilets",
+        "weights": "Ceintures de lest"
       },
       "type": {
         "computer": "Ordinateur de plongée",
@@ -4875,7 +4879,9 @@
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
         "light": "Lampe",
-        "other": "Autre"
+        "other": "Autre",
+        "bcd": "Gilet",
+        "weights": "Ceinture de lest"
       },
       "dives": {
         "one": "{n} plongée",
@@ -4935,14 +4941,25 @@
         "other": "{n} choisies"
       },
       "noPiece": "Choisissez au moins une pièce",
-      "hint": "Dans une plongée, « Appliquer un kit » ajoute toutes ses pièces, sauf les ordinateurs : ceux d’une plongée viennent de son téléchargement.",
+      "hint": "Dans une plongée, « Remplir avec » ajoute toutes les pièces du kit, sauf les ordinateurs : ceux d’une plongée viennent de son téléchargement.",
       "delete": "Supprimer le kit",
       "deleteTitle": "Supprimer le kit ?",
       "deleteText": "{name} est supprimé. Les plongées qui l’ont utilisé gardent leurs pièces.",
       "deleted": "Kit supprimé",
       "saved": "Kit enregistré",
       "noGear": "Ajoutez d’abord des pièces à l’inventaire",
-      "pickGear": "Pièces de ce kit"
+      "pickGear": "Pièces de ce kit",
+      "usedIn": {
+        "one": "Utilisé dans {n} plongée, la dernière le {date}.",
+        "other": "Utilisé dans {n} plongées, la dernière le {date}."
+      },
+      "neverUsed": "Pas encore utilisé dans une plongée.",
+      "more": "Plus d’options",
+      "duplicate": "Dupliquer le kit",
+      "deleteNote": "Supprimer le kit ne change pas l’équipement des plongées déjà remplies.",
+      "copyName": "{name} (copie)",
+      "copyNameN": "{name} (copie {n})",
+      "duplicated": "Kit dupliqué"
     },
     "piece": {
       "image": "Image du modèle",
@@ -4975,7 +4992,7 @@
       "shareText": "{name}\n{type}\n{details}"
     },
     "pieceEdit": {
-      "addTitle": "Ajouter une pièce",
+      "addTitle": "Nouvelle pièce",
       "editTitle": "Modifier la pièce",
       "close": "Fermer",
       "save": "Enregistrer",
@@ -4987,8 +5004,8 @@
       "purchasedOn": "Date d’achat",
       "purchasedOnHint": "Année, mois, jour",
       "dateInvalid": "Saisissez une date réelle, comme 2021-05-12",
-      "note": "Ligne sous le nom",
-      "noteHint": "Affichée sous le nom dans les listes",
+      "note": "Notes (facultatif)",
+      "noteHint": "Par exemple, le détendeur principal",
       "nameEmpty": "Saisissez un nom",
       "readFromDownload": "Le numéro de série et le firmware sont lus sur l’ordinateur à chaque téléchargement.",
       "saved": "Pièce enregistrée"
@@ -5008,7 +5025,7 @@
       "kitLine": "{n} pièces · {summary}",
       "manageKits": "Gérer les kits",
       "noKits": "Aucun kit",
-      "kitMenu": "Kits",
+      "kitMenu": "Remplir avec un kit",
       "kitApplied": "Kit « {name} » appliqué",
       "copied": "Équipement de la plongée précédente copié",
       "renameLabel": "Renommer l’ordinateur {name}",
@@ -5021,7 +5038,10 @@
       "renamed": "Ordinateur renommé",
       "renameFailed": "L’ordinateur n’a pas pu être renommé",
       "locked": "Lecture seule : l’équipement ne change plus tant que vous ne vous abonnez pas de nouveau.",
-      "kitDetail": "Kit « {name} »"
+      "kitDetail": "Kit « {name} »",
+      "fillWith": "Remplir avec",
+      "oneKit": "Un kit",
+      "previousDive": "Plongée précédente"
     },
     "addSheet": {
       "title": "Ajouter de l’équipement",
@@ -5036,10 +5056,236 @@
       "confirm": "Ajouter à la plongée",
       "empty": "L’inventaire n’a aucune pièce à ajouter",
       "noResults": "Aucune pièce ne correspond"
+    },
+    "pieceNew": {
+      "typeTitle": "Type de pièce",
+      "tile": {
+        "computer": "Ordinateur",
+        "regulator": "Détendeur",
+        "suit": "Combinaison",
+        "undersuit": "Sous-vêtement",
+        "cylinder": "Bouteille",
+        "bcd": "Gilet",
+        "light": "Lampe",
+        "weights": "Ceinture de lest",
+        "other": "Autre"
+      },
+      "otherName": "Nom de la pièce",
+      "photoAdd": "Ajouter une photo",
+      "photoChange": "Changer la photo",
+      "photoRemove": "Retirer la photo",
+      "photoFailed": "La photo n’a pas pu être lue",
+      "serialHint": "Numéro gravé sur la pièce",
+      "needName": "Saisissez une marque, un modèle ou un nom"
     }
   },
   "desktopLanguage": {
     "system": "Comme le système",
     "button": "Langue de l’app : {language}"
+  },
+  "maintenance": {
+    "title": "Révisions",
+    "entry": "Révisions",
+    "back": "Retour",
+    "figures": {
+      "overdue": "en retard",
+      "soon": "dans 60 jours",
+      "ok": "à jour"
+    },
+    "sections": {
+      "overdue": "En retard",
+      "soon": "Bientôt",
+      "ok": "À jour"
+    },
+    "tag": {
+      "lateDays": {
+        "one": "En retard de {n} jour",
+        "other": "En retard de {n} jours"
+      },
+      "lateDives": {
+        "one": "En retard de {n} plongée",
+        "other": "En retard de {n} plongées"
+      },
+      "dueNow": "À faire maintenant",
+      "today": "Aujourd’hui",
+      "inDays": {
+        "one": "Dans {n} jour",
+        "other": "Dans {n} jours"
+      },
+      "inMonths": {
+        "one": "Dans {n} mois",
+        "other": "Dans {n} mois"
+      },
+      "inDives": {
+        "one": "Dans environ {n} plongée",
+        "other": "Dans environ {n} plongées"
+      }
+    },
+    "line": {
+      "overdueOn": "Due le {date}",
+      "overdueDives": "Les {n} plongées sont atteintes",
+      "on": "Le {date}",
+      "onOrDives": {
+        "one": "Le {date}, ou dans {n} plongée",
+        "other": "Le {date}, ou dans {n} plongées"
+      },
+      "divesLeft": {
+        "one": "{n} plongée restante",
+        "other": "{n} plongées restantes"
+      }
+    },
+    "listNote": "Une notification vous prévient avant chaque échéance, puis le jour même.",
+    "emptyTitle": "Aucun rappel",
+    "emptyText": "Ajoutez un rappel depuis la page d’une pièce : détendeur, bouteille, ordinateur…",
+    "cardLine": {
+      "overdue": {
+        "one": "{n} en retard",
+        "other": "{n} en retard"
+      },
+      "soon": {
+        "one": "{n} bientôt",
+        "other": "{n} bientôt"
+      },
+      "allGood": "Tout est à jour",
+      "none": "Aucun rappel"
+    },
+    "badge": {
+      "one": "{n} rappel en retard",
+      "other": "{n} rappels en retard"
+    },
+    "piece": {
+      "title": "Révision",
+      "cardTitle": "Révision",
+      "note": "Noter une révision",
+      "editRule": "Modifier le rappel",
+      "add": "Ajouter",
+      "none": "Aucun rappel",
+      "history": "Historique",
+      "historyEmpty": "Aucune entrée pour l’instant",
+      "countNote": "Les plongées comptées sont celles où cette pièce figure dans l’équipement.",
+      "dives": {
+        "one": "{done} plongée sur {total}",
+        "other": "{done} plongées sur {total}"
+      },
+      "due": "Échéance : {date}",
+      "openAria": "Révisions de {name}",
+      "openLine": "{rule}",
+      "noRuleLine": "Aucun rappel",
+      "by": "par {who}",
+      "byYou": "par vous"
+    },
+    "rule": {
+      "every": {
+        "years": {
+          "one": "Tous les ans",
+          "other": "Tous les {n} ans"
+        },
+        "months": {
+          "one": "Tous les mois",
+          "other": "Tous les {n} mois"
+        },
+        "dives": {
+          "one": "Chaque plongée",
+          "other": "Toutes les {n} plongées"
+        },
+        "or": "{time} ou {dives}"
+      }
+    },
+    "task": {
+      "service": "Révision",
+      "inspection": "Inspection visuelle",
+      "hydrostatic": "Requalification",
+      "battery": "Pile",
+      "seals": "Joints et fermeture",
+      "travelCheck": "Contrôle avant voyage"
+    },
+    "kind": {
+      "service": "Révision",
+      "inspection": "Inspection",
+      "other": "Autre"
+    },
+    "kindHelp": {
+      "service": "Révision : démontage complet par un technicien, pièces d’usure changées et réglage.",
+      "inspection": "Inspection : contrôle de l’état et du fonctionnement, sans changer de pièce.",
+      "other": "Autre : toute intervention qui n’est ni une révision ni une inspection, comme un nettoyage ou une réparation."
+    },
+    "note": {
+      "title": "Noter une révision",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "type": "Type",
+      "date": "Date",
+      "dateHint": "Année, mois, jour",
+      "dateInvalid": "Saisissez une date réelle, comme 2026-11-17",
+      "doneBy": "Fait par",
+      "doneByHint": "Un centre de plongée ou vous-même",
+      "cost": "Coût (facultatif)",
+      "costInvalid": "Saisissez un montant, comme 190 ou 190,50",
+      "notes": "Notes (facultatif)",
+      "invoiceAdd": "Ajouter une photo de la facture",
+      "invoiceChange": "Changer la photo de la facture",
+      "invoiceRemove": "Retirer la photo",
+      "invoiceAlt": "Photo de la facture",
+      "nextBoth": "Prochaine révision : le {date}, ou après {n} plongées.",
+      "nextDate": "Prochaine révision : le {date}.",
+      "nextDives": "Prochaine révision : après {n} plongées.",
+      "nextNone": "Aucun rappel n’est réglé pour cette pièce.",
+      "saved": "Révision notée",
+      "failed": "La révision n’a pas pu être enregistrée"
+    },
+    "ruleSheet": {
+      "title": "Rappel de révision",
+      "lead": "{name} · choisissez un critère, ou les deux.",
+      "time": "Après une durée",
+      "timeHelp": "Depuis la dernière révision",
+      "dives": "Selon les plongées",
+      "divesHelp": "Les plongées où la pièce figure",
+      "both": "Avec les deux, le premier atteint déclenche le rappel.",
+      "years": "ans",
+      "months": "mois",
+      "divesUnit": "plongées",
+      "unit": "Unité de la durée",
+      "more": "Augmenter",
+      "less": "Diminuer",
+      "value": "Valeur",
+      "notify": "Me prévenir avant",
+      "days": "{n} jours",
+      "warn": "Avertir dans une plongée",
+      "warnHelp": "Quand la pièce est en retard de révision",
+      "remove": "Retirer le rappel",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "none": "Choisissez au moins un critère",
+      "range": "Saisissez un nombre entier supérieur à 0",
+      "saved": "Rappel enregistré",
+      "removed": "Rappel retiré",
+      "failed": "Le rappel n’a pas pu être enregistré"
+    },
+    "reminderCard": {
+      "title": "Rappel de révision",
+      "suggest": {
+        "computer": "Suggéré pour un ordinateur : {rule}",
+        "regulator": "Suggéré pour un détendeur : {rule}",
+        "suit": "Suggéré pour une combinaison : {rule}",
+        "cylinder": "Suggéré pour une bouteille : {rule}",
+        "bcd": "Suggéré pour un gilet : {rule}"
+      },
+      "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
+      "add": "Ajouter",
+      "edit": "Modifier"
+    },
+    "diveWarning": "{what} : retard de révision",
+    "diveWarningTitle": "Révision en retard",
+    "notify": {
+      "leadTitle": "Révision à prévoir",
+      "dueTitle": "Révision à faire aujourd’hui",
+      "leadBody": "{what} : échéance dans {n} jours.",
+      "dueBody": "{what} : échéance aujourd’hui.",
+      "denied": "Les notifications sont désactivées pour OpenDives : le rappel reste dans l’app."
+    },
+    "channel": {
+      "name": "Révisions de l’équipement",
+      "description": "Prévient avant la date d’une révision, et le jour même"
+    }
   }
 }
