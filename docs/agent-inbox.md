@@ -5448,3 +5448,29 @@ Mock-ups in `docs/mockups-release/`: `android-serveur-telechargement`, `android-
 **Test:**
 - A download of more than 5 seconds shows the time left on the right; a short one never shows it.
 - The value decreases smoothly and switches from seconds to minutes as described.
+
+## [ ] 2026-11-18-270 Phone: animate « Votre carnet est prêt » (the logo turns into the check mark)
+
+Christian approved this on 18 November 2026. Work in `main` (task 268).
+
+Mock-up: `docs/mockups-release/android-odplus-pret.dc.html` (OpenDives+, the logbook is ready). The animation is written in the mock-up's CSS and SVG: the `od-pop`, `od-logo`, `odring`, `odbub` and `odsway` rules, and the two `<animate>` of the check path. Open the file to read the exact values.
+
+**The check mark (plays once, 2 s in all, when the screen appears).**
+1. 0 to 0.3 s: the logo appears and grows (scale 0 to 1). It is the app logo: a blue disc (#1F5C99) with the white wave.
+2. 0.3 to 1.3 s: the logo turns two full turns on itself, slowing down until it stops.
+3. 1.3 to 1.8 s: once it has stopped, the wave morphs into the check mark. At the same time the disc turns white and the line turns blue (#1F5C99), with a small bounce of the disc (1.14, then 0.95, then 1).
+4. 1.5 to 2 s: a white ring spreads out around the disc and fades.
+The wave and the check mark are drawn with the same commands, so the path can be interpolated: wave `M5 13 Q8.5 10 12 13 Q15.5 16 19 13`, check `M5 12.5 Q7.25 14.75 9.5 17 Q14.25 12.25 19 7.5` (24 × 24 box).
+
+**The bubbles (the small circles of the header).**
+- They are there from the start and start rising at once, at a constant speed, until they leave the top of the header. Each takes 1.6 to 2.5 s, the lowest ones longer.
+- While rising, they sway gently left and right (±5 px, one back-and-forth every 1.4 s, each bubble starting at a different point of the sway).
+- No new bubble appears. Once they have left, the header has no bubbles.
+
+**Reduced motion.** When the system asks for less motion: no animation. The check mark is shown directly, white disc, and the bubbles stay still in place.
+
+**Also in this mock-up:** the header now has the band of the dive profile above the bottom wave, as on « Se connecter » and the other setup screens.
+
+**Test:**
+- On the first display of the screen, the sequence plays once, and it does not play again when coming back to the screen.
+- With reduced motion turned on, nothing moves.
