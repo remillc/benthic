@@ -93,7 +93,7 @@ class OpenDivesCorePlugin : Plugin() {
                 try {
                     try {
                         if (!cached) exportSystemCertificates(caFile)
-                        NativeCore.setCaFile(caFile.absolutePath)
+                        NativeCore.setCaFile(withDevAuthority(caFile).absolutePath)
                     } catch (e: Exception) {
                         Log.e(TAG, "Cannot export the certificate authorities", e)
                     }
@@ -123,7 +123,7 @@ class OpenDivesCorePlugin : Plugin() {
                         Thread.sleep(CERTIFICATES_RECHECK_MS)
                         val count = exportSystemCertificates(caFile)
                         if (count >= 0) {
-                            NativeCore.setCaFile(caFile.absolutePath)
+                            NativeCore.setCaFile(withDevAuthority(caFile).absolutePath)
                             Log.i(TAG, "$count system certificate authorities exported")
                         }
                     } catch (e: Exception) {
@@ -1799,6 +1799,22 @@ class OpenDivesCorePlugin : Plugin() {
      * Writes Android's trusted authorities (system and user) as PEM; -1 when the
      * file already holds them.
      */
+    /**
+     * Development builds only: the authority of a development server (assets/dev-ca.pem, which is not in git) is trusted
+     * as well, in a file of its own next to the exported one. A release build never reads it.
+     */
+    private fun withDevAuthority(caFile: File): File {
+        if ((context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) == 0) return caFile
+        return try {
+            val dev = context.assets.open("dev-ca.pem").use { it.readBytes() }
+            val combined = File(context.cacheDir, "cacerts-dev.pem")
+            combined.writeBytes(caFile.readBytes() + "\n".toByteArray() + dev)
+            combined
+        } catch (e: java.io.IOException) {
+            caFile
+        }
+    }
+
     private fun exportSystemCertificates(target: File): Int {
         val store = KeyStore.getInstance("AndroidCAStore")
         store.load(null, null)
