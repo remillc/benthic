@@ -5731,3 +5731,14 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 The mock-up shows a generic drawing in place of a photo. Do not fetch product photos from the web, from manufacturers or from retailers: where model photos could come from later is an open idea (#99 in `docs/IDEAS.md`), not decided.
 
 **Test:** the « Gilet » tile shows the vest; a « Saucisse » item shows the new buoy; a new piece with a photo shows it in the thumbnail, without a photo the type icon.
+
+## [ ] 2026-11-18-284 Phone: the search box of the logbook header moves up 8 px
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/` (`android-carnet`, `nav-barre-android`, `nav-pastille-android`, `android-serveur-carnet`, `import-fit-importe-android`, `import-fit-deja-android`, `android-carnet-avion`, `carnet-evaluation-android`).
+
+The search box (« Rechercher dans le carnet ») sat too close to the wave at the bottom of the blue header. Move it up 8 px **without changing the header's height**:
+- the space between the summary line (« 9 plongées · 4 sites · … ») and the search box goes from 16 to 8 px;
+- the header's bottom padding goes from 32 to 40 px.
+The wave, the title row and the list below do not move.
+
+**Test:** the header has the same height as before; the search box has 40 px of blue below it before the wave.
