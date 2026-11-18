@@ -130,6 +130,19 @@ const sharedDeps = {
   toFirstLaunch: (/** @type {string} */ name, /** @type {string} */ data) => {
     sharedFile.file = fileFromBase64(name, data);
   },
+  logbookName: () => deviceStore.getItem('od.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
+  // One logbook at a time on a phone or a tablet (the device's copy, or the account's): « Nouveau carnet » would
+  // replace the open one, so it is not offered there; the desktop opens one logbook per window and takes no shared file.
+  canCreateLogbook: () => false,
+  choose: (/** @type {{ name: string, canCreate: boolean }} */ o, /** @type {{ merge: () => Promise<void>, create?: () => Promise<void> }} */ actions) => {
+    /** @type {any[]} */
+    const buttons = [{ text: t('dialog.cancel') }];
+    if (actions.create) buttons.push({ text: t('link.fileNew'), bold: true, onClick: actions.create });
+    buttons.push({ text: t('link.fileMerge'), onClick: actions.merge });
+    f7.dialog
+      .create({ title: t('link.fileTitle'), text: t(actions.create ? 'link.fileChoose' : 'link.fileChooseOne', { name: o.name }), buttons, verticalButtons: buttons.length > 2 })
+      .open();
+  },
   confirm: (/** @type {any} */ o, /** @type {() => Promise<void>} */ run) =>
     confirmAction({ title: t('link.fileTitle'), text: t(o.textKey, o.values), action: t(o.actionKey), onConfirm: run }),
   refuse: (/** @type {string} */ key, /** @type {Record<string, string|number>} */ values) =>

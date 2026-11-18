@@ -279,3 +279,75 @@ test('the wiring: manifest filters, plugin event, first launch and the two langu
     assert.ok(fr.link[key] && en.link[key], key);
   }
 });
+
+/** The screen's choice for a dives file: records the actions it is given. */
+function withChoice(options = {}) {
+  const f = fake(options);
+  f.log.choices = [];
+  f.log.created = [];
+  f.deps.choose = (o, actions) => f.log.choices.push({ o, actions });
+  f.deps.logbookName = () => 'Mon carnet';
+  return f;
+}
+
+test('a logbook is open and this device can hold another: the choice offers « Nouveau carnet » and « Ajouter à ce carnet »', async () => {
+  const { deps, log } = withChoice();
+  deps.newLogbook = async (n, data) => log.created.push({ n, text: Buffer.from(data, 'base64').toString('utf8') });
+  assert.equal(await openSharedFile(deps, 'content://x/1'), 'confirm-dives');
+  assert.equal(log.confirms.length, 0, 'the single confirmation is replaced by the choice');
+  assert.equal(log.choices[0].o.canCreate, true);
+  assert.ok(log.choices[0].actions.create && log.choices[0].actions.merge);
+  assert.equal(log.imported.length + log.created.length, 0, 'never silently');
+});
+
+test('« Nouveau carnet » creates a logbook from the file and never imports into the open one', async () => {
+  const { deps, log } = withChoice();
+  deps.newLogbook = async (n, data) => log.created.push({ n, text: Buffer.from(data, 'base64').toString('utf8') });
+  await openSharedFile(deps, 'content://x/1');
+  await log.choices[0].actions.create();
+  assert.equal(log.created.length, 1);
+  assert.equal(log.created[0].n, 'Subsurface.ssrf');
+  assert.equal(log.created[0].text, DIVES);
+  assert.equal(log.imported.length, 0, 'the open logbook is untouched');
+  assert.equal(log.changes.length, 0);
+});
+
+test('« Ajouter à ce carnet » is today\'s merge, with its Undo', async () => {
+  const { deps, log } = withChoice();
+  deps.newLogbook = async () => {};
+  await openSharedFile(deps, 'content://x/1');
+  await log.choices[0].actions.merge();
+  assert.equal(log.imported.length, 1);
+  assert.deepEqual(log.notes.at(-1), { key: 'imported', values: { n: 2 } });
+});
+
+test('a device that holds one logbook at a time does not offer « Nouveau carnet » and replaces nothing', async () => {
+  const { deps, log } = withChoice();
+  deps.newLogbook = async (n) => log.created.push(n);
+  deps.canCreateLogbook = () => false;
+  await openSharedFile(deps, 'content://x/1');
+  assert.equal(log.choices[0].o.canCreate, false);
+  assert.equal(log.choices[0].actions.create, undefined);
+  await log.choices[0].actions.merge();
+  assert.equal(log.created.length, 0);
+});
+
+test('the sites file names the open logbook; nothing is merged before the diver confirms; no logbook keeps them for later', async () => {
+  const open = withChoice({ name: 'Subsurface_divesites.xml', text: SITES });
+  assert.equal(await openSharedFile(open.deps, 'content://x/2'), 'confirm-sites');
+  assert.equal(open.log.confirms[0].o.values.logbook, 'Mon carnet');
+  assert.equal(open.log.changes.length, 0);
+  const first = withChoice({ welcome: true, name: 'Subsurface_divesites.xml', text: SITES });
+  assert.equal(await openSharedFile(first.deps, 'content://x/2'), 'refused');
+  assert.equal(first.log.changes.length, 0);
+});
+
+test('the choice texts exist in both languages, the choice is wired in open-link.js', () => {
+  const read = (p) => fs.readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+  for (const l of ['fr', 'en']) {
+    const j = JSON.parse(read(`app/src/i18n/${l}.json`));
+    for (const k of ['fileChoose', 'fileChooseOne', 'fileNew', 'fileMerge']) assert.ok(j.link[k], `${l} ${k}`);
+    assert.match(j.link.sitesText, /\{logbook\}/);
+  }
+  assert.match(read('app/src/lib/open-link.js'), /choose:/);
+});

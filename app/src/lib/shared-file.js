@@ -12,7 +12,7 @@
 //   - a dives file whose site uuids are not in the file gets one <site> entry per missing uuid before the core
 //     reads it: the site's own data when a sites file was shared earlier (remembered on this device), else a
 //     placeholder named « Site <uuid> », which carries the link;
-//   - a sites file is merged into the open logbook: a site with a known uuid whose name is still the
+//   - a sites file is merged into the open logbook, named in the question: a site with a known uuid whose name is still the
 //     placeholder is completed (name, position, description, notes, country, region, city); a site the logbook
 //     already has (same uuid, or same name and position) is left alone; the others are added. The sites are
 //     remembered so that a dives file shared afterwards finds them.
@@ -284,6 +284,12 @@ export function fileFromBase64(name, base64) {
  * @property {(n: number) => void} imported « n dives imported », with Undo
  * @property {(e: unknown) => void} importFailed
  * @property {() => Promise<void>} [ready] resolves once the logbook is read
+ * @property {() => string} [logbookName] the name of the open logbook, for the sites confirmation
+ * @property {(options: { name: string, canCreate: boolean }, actions: { merge: () => Promise<void>, create?: () => Promise<void> }) => void} [choose]
+ *   the choice for a dives file with a logbook open: « Nouveau carnet » (`create`, only when this device can hold
+ *   another logbook) or « Ajouter à ce carnet » (`merge`); without it, the single confirmation `confirm` is used
+ * @property {(name: string, data: string) => Promise<void>} [newLogbook] creates a logbook from the file, keeps the open one untouched
+ * @property {() => boolean} [canCreateLogbook] false when this device holds one logbook at a time (a phone)
  */
 
 /**
@@ -327,7 +333,8 @@ export async function openSharedFile(deps, uri) {
       deps.refuse('link.sitesFirstLaunch', { name: label });
       return 'refused';
     }
-    deps.confirm({ textKey: 'link.sitesText', values: { name: label, n: sites.length }, actionKey: 'link.sitesAction' }, async () => {
+    // The sites go to the open logbook, named in the question: never to one the diver did not choose.
+    deps.confirm({ textKey: 'link.sitesText', values: { name: label, n: sites.length, logbook: deps.logbookName?.() ?? '' }, actionKey: 'link.sitesAction' }, async () => {
       try {
         // The file's sites are remembered first: a dives file shared next finds them even if this merge adds nothing.
         deps.keep(remember(deps.remembered(), sites));
@@ -355,12 +362,28 @@ export async function openSharedFile(deps, uri) {
     deps.toFirstLaunch(name, data);
     return 'first-launch';
   }
-  deps.confirm({ textKey: 'link.fileText', values: { name: label || name }, actionKey: 'link.fileAction' }, async () => {
+  const merge = async () => {
     try {
       deps.imported(await deps.importData(name, data));
     } catch (e) {
       deps.importFailed(e);
     }
-  });
+  };
+  if (!deps.choose) {
+    deps.confirm({ textKey: 'link.fileText', values: { name: label || name }, actionKey: 'link.fileAction' }, merge);
+    return 'confirm-dives';
+  }
+  const newLogbook = deps.newLogbook;
+  const canCreate = !!newLogbook && (deps.canCreateLogbook?.() ?? true);
+  const create = canCreate && newLogbook
+    ? async () => {
+        try {
+          await newLogbook(name, data);
+        } catch (e) {
+          deps.importFailed(e);
+        }
+      }
+    : undefined;
+  deps.choose({ name: label || name, canCreate }, { merge, create });
   return 'confirm-dives';
 }
