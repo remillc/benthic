@@ -2115,6 +2115,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "OpenDives+ offer: a « Service reminders » tile under the four others says that the regulator, cylinder and battery reminders arrive 30 days before they are due.",
       "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
@@ -4719,6 +4720,8 @@
       "gearText": "Cylinders, kits, computers.",
       "certifications": "Certifications",
       "certificationsText": "Your cards, always with you.",
+      "maintenance": "Service reminders",
+      "maintenanceText": "Regulator, cylinder, battery: notified 30 days before they are due.",
       "price": "US $14.99",
       "per": "a year",
       "priceDetail": "that is $1.25 a month · Cancel any time",

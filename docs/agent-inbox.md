@@ -5568,7 +5568,7 @@ Christian approved this on 18 November 2026. Work in `main`. Do it after tasks 2
 
 **Test:** on a tablet in landscape and portrait, and on desktop, every screen of tasks 271 to 274 is reachable and keeps its state when the window is resized.
 
-## [ ] 2026-11-18-276 Phone: the OpenDives+ offer shows the maintenance reminders
+## [x] 2026-11-18-276 Phone: the OpenDives+ offer shows the maintenance reminders
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-odplus-offre.dc.html`.
 

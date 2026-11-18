@@ -75,3 +75,20 @@ test('the name steps end with « Créer le carnet » and « Importer le carnet �
   assert.equal(langs.fr.welcomeSteps.importLogbook, 'Importer le carnet');
   assert.equal(langs.fr.welcomeSteps.createLogbook, 'Créer le carnet');
 });
+
+test('the offer has a full-width « Service reminders » tile under the four tiles, in the maintenance colours', () => {
+  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const css = read('theme.css');
+  const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusReady'}"));
+  assert.ok(offer.indexOf('od-plus--cards') < offer.indexOf('od-plus--card-maintenance'));
+  assert.ok(offer.indexOf('od-plus--card-maintenance') < offer.indexOf('od-plus--price'));
+  assert.match(offer, /name="bell"/);
+  assert.match(plus, /\.od-plus--card-maintenance \{\s*background: var\(--od-maintenance\);/);
+  assert.equal(langs.fr.odplus.offer.maintenance, 'Rappels d’entretien');
+  assert.equal(langs.fr.odplus.offer.maintenanceText, 'Détendeur, bouteille, pile : prévenu 30 jours avant l’échéance.');
+  assert.equal(langs.en.odplus.offer.maintenance, 'Service reminders');
+  assert.equal(langs.en.odplus.offer.maintenanceText, 'Regulator, cylinder, battery: notified 30 days before they are due.');
+  // Light, then dark.
+  assert.match(css, /--od-maintenance: #F6E3E0;\s*--od-maintenance-icon: #8A2A1F;/);
+  assert.match(css, /--od-maintenance: #4A2723;\s*--od-maintenance-icon: #F0A59B;/);
+});

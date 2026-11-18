@@ -2115,6 +2115,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Offre OpenDives+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
       "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
@@ -4719,6 +4720,8 @@
       "gearText": "Bouteilles, kits, ordinateurs.",
       "certifications": "Brevets",
       "certificationsText": "Vos cartes, toujours sur vous.",
+      "maintenance": "Rappels d’entretien",
+      "maintenanceText": "Détendeur, bouteille, pile : prévenu 30 jours avant l’échéance.",
       "price": "14,99 $ US",
       "per": "par an",
       "priceDetail": "soit 1,25 $ par mois · Résiliable en tout temps",
