@@ -1,0 +1,1 @@
+{"name":"spike-git","private":true,"type":"module","description":"Speed spike: git on the device (docs/spike-git-on-device.md)","dependencies":{"@isomorphic-git/lightning-fs":"^4.10.5","buffer":"^6.0.3","esbuild":"^0.28.2","fflate":"^0.8.3","isomorphic-git":"^1.44.17","puppeteer-core":"^25.18.1"}}
