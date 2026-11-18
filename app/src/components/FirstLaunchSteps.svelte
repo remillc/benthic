@@ -1673,10 +1673,9 @@
       }
 
       /* Android: the extra height of a tall screen goes above the link (auto margin), as in the mock-up, and the link
-         ends 20 dp above the system bar. The WebView reports no bottom inset (gesture bar or buttons, 24 dp at least),
-         so the bar's height is a floor. */
+         ends 20 dp above the system bar (--f7-safe-area-bottom is the native navigation bar inset, lib/safe-area.js). */
       :global(.md) .od-first-launch :global(.od-welcome-help-link) {
-        margin-bottom: calc(max(var(--f7-safe-area-bottom), 24px) + 20px);
+        margin-bottom: calc(var(--f7-safe-area-bottom) + 20px);
       }
 
       .od-first-launch--title {

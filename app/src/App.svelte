@@ -432,8 +432,8 @@
       /* The rail or sidebar takes the left safe area (camera cut-out in
          landscape): the pages beside it must not add it again. */
       --f7-safe-area-left: 0px;
-      margin-left: calc(var(--od-nav-width) + env(safe-area-inset-left));
-      width: calc(100% - var(--od-nav-width) - env(safe-area-inset-left));
+      margin-left: calc(var(--od-nav-width) + var(--od-safe-left));
+      width: calc(100% - var(--od-nav-width) - var(--od-safe-left));
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */

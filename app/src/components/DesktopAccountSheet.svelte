@@ -135,7 +135,7 @@
     .od-desktop-account {
       position: fixed;
       z-index: 13000;
-      left: calc(var(--od-nav-width) + env(safe-area-inset-left) + 8px);
+      left: calc(var(--od-nav-width) + var(--od-safe-left) + 8px);
       bottom: 16px;
       width: 380px;
       max-height: calc(100vh - 32px);

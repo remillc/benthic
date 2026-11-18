@@ -42,6 +42,60 @@
 @import 'framework7/components/toggle/css' layer(framework7);
 @import 'framework7/components/typography/css' layer(framework7);
 
+/* The safe area: env() on iOS, desktop and in a browser. On Android the WebView's env() is unreliable
+   (no navigation bar, a top that varies from one launch to the next), so the native side reports the
+   window insets and lib/safe-area.js sets --od-safe-* inline on <html>, which wins over these defaults.
+   Every safe-area use in the app reads --od-safe-*, never env() directly. Framework7's safe areas read
+   them too, in the same places where it reads env(). */
+@layer od.base {
+  :root {
+    --od-safe-top: env(safe-area-inset-top, 0px);
+    --od-safe-right: env(safe-area-inset-right, 0px);
+    --od-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --od-safe-left: env(safe-area-inset-left, 0px);
+    --f7-safe-area-top: var(--od-safe-top);
+    --f7-safe-area-bottom: var(--od-safe-bottom);
+  }
+
+  .ios-left-edge,
+  .ios-edges,
+  .safe-area-left,
+  .safe-areas,
+  .popup,
+  .sheet-modal,
+  .panel-left {
+    --f7-safe-area-left: var(--od-safe-left);
+    --f7-safe-area-outer-left: var(--od-safe-left);
+  }
+
+  .ios-right-edge,
+  .ios-edges,
+  .safe-area-right,
+  .safe-areas,
+  .popup,
+  .sheet-modal,
+  .panel-right {
+    --f7-safe-area-right: var(--od-safe-right);
+    --f7-safe-area-outer-right: var(--od-safe-right);
+  }
+
+  .no-safe-areas,
+  .no-safe-area-left,
+  .no-ios-edges,
+  .no-ios-left-edge {
+    --f7-safe-area-left: 0px;
+    --f7-safe-area-outer-left: 0px;
+  }
+
+  .no-safe-areas,
+  .no-safe-area-right,
+  .no-ios-edges,
+  .no-ios-right-edge {
+    --f7-safe-area-right: 0px;
+    --f7-safe-area-outer-right: 0px;
+  }
+}
+
 @layer od.tokens {
   /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
      the other curves keep --od-profile-line-width, and high contrast keeps its 2 dp. */

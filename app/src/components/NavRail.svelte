@@ -84,9 +84,9 @@
       inset: 0 auto 0 0;
       z-index: 6000;
       /* It also covers the left safe area (camera cut-out in landscape). */
-      width: calc(var(--od-nav-width) + env(safe-area-inset-left));
+      width: calc(var(--od-nav-width) + var(--od-safe-left));
       box-sizing: border-box;
-      padding: calc(var(--f7-safe-area-top) + 24px) 0 calc(var(--f7-safe-area-bottom) + 16px) env(safe-area-inset-left);
+      padding: calc(var(--f7-safe-area-top) + 24px) 0 calc(var(--f7-safe-area-bottom) + 16px) var(--od-safe-left);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -210,7 +210,7 @@
       align-items: stretch;
       gap: 2px;
       padding: calc(var(--f7-safe-area-top) + 32px) 12px calc(var(--f7-safe-area-bottom) + 16px)
-        calc(12px + env(safe-area-inset-left));
+        calc(12px + var(--od-safe-left));
       border-right: 0.5px solid var(--od-separator);
 
       .od-nav-rail--title {

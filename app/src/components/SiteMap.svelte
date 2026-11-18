@@ -681,7 +681,7 @@
       }
 
       .od-map-fullscreen & {
-        top: calc(var(--f7-safe-area-top, env(safe-area-inset-top)) + 8px);
+        top: calc(var(--f7-safe-area-top, var(--od-safe-top)) + 8px);
         right: 16px;
       }
     }
@@ -705,7 +705,7 @@
     /* Full screen: « Centrer sur ma position » at the bottom right, above the credits. */
     .od-map-fullscreen .od-map-fullscreen-button.od-map-fullscreen--locate {
       top: auto;
-      bottom: calc(env(safe-area-inset-bottom) + 56px);
+      bottom: calc(var(--od-safe-bottom) + 56px);
     }
 
     /* The heat: its own layer over the map, taps go through to the map. */
@@ -745,7 +745,7 @@
       .od-map-fullscreen & {
         top: auto;
         right: 8px;
-        bottom: calc(env(safe-area-inset-bottom) + 24px);
+        bottom: calc(var(--od-safe-bottom) + 24px);
       }
     }
 

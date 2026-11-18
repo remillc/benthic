@@ -2127,6 +2127,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Android: the screen edges are the same at every launch and in every navigation mode: sheets, messages, buttons and the bottom bar stay above the gesture bar or the navigation buttons, and the top no longer jumps.",
       "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",
       "Equipment service (OpenDives+): “Service” in My profile and the card at the top of “Equipment” list what is overdue, coming up or up to date. A reminder can be set by time, by number of dives (those where the piece is in the equipment), or both: the first one reached counts. “Note a service” keeps the date, who did it, the cost and a photo of the invoice, and “Edit the dive” warns when a piece is overdue. A notification warns 7, 30 or 60 days before, then on the day.",

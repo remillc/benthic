@@ -50,7 +50,7 @@
       z-index: 5100;
       box-sizing: content-box;
       height: 64px;
-      padding: 0 8px env(safe-area-inset-bottom);
+      padding: 0 8px var(--od-safe-bottom);
       background: var(--od-surface-container-high);
       box-shadow: 0 -1px 0 color-mix(in srgb, var(--od-text) 6%, transparent);
       display: flex;
