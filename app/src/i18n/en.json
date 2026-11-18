@@ -268,6 +268,7 @@
     "loading": "Loading the dive",
     "errorTitle": "This dive could not be read",
     "errorText": "No dive was changed. Go back to the logbook and open the dive again.",
+    "retry": "Try again",
     "edit": "Edit",
     "moreOptions": "More options",
     "actions": "Dive actions",
@@ -2149,6 +2150,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "A logbook that was on the Subsurface cloud is not opened here: after an update from the alpha, the app starts from its first launch and leaves that logbook's files on the phone as they were. The Account page no longer offers signing in to the Subsurface cloud. A dive that cannot be read shows a page with « Try again ».",
       "OpenDives server (release edition): your logbook downloads from the server and opens like any logbook, with « Your logbook is ready » after the download. It stays in Subsurface’s format, syncs like a git repository (automatic sync, offline, conflicts) and is named « OpenDives server » in the menu, the account and the sync messages. « Create an empty logbook », « Import a Subsurface file » and « Send the logbook of this phone » create it on the server; an interrupted sending resumes where it stopped.",
       "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",

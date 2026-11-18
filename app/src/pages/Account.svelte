@@ -29,6 +29,7 @@
   }
   import { formatDateTime, formatNumber, formatTimeOfDay } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
+  import { isRelease } from '../lib/edition.js';
 
   const signedIn = $derived(!!logbook.email);
   /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
@@ -345,6 +346,7 @@
     <!-- Three choices, each with its consequence and a decorative icon (task 2026-11-14-135,
          compte-android-sans-compte.dc.html); the git repository is the third, on no background. -->
     <div class="od-account--choices">
+      {#if !isRelease}
       <a href="/account/create" class="od-account--choice od-account--primary">
         <Icon name="personAdd" />
         <span class="od-account--choice-texts">
@@ -359,6 +361,7 @@
           <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
         </span>
       </a>
+      {/if}
       <a href="/account/git/new" class="od-account--choice od-account--third">
         <Icon name="git" />
         <span class="od-account--choice-texts">

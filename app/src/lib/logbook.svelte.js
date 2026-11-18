@@ -21,6 +21,7 @@ import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfter
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
+import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
@@ -734,16 +735,20 @@ async function syncEdits() {
 }
 
 /**
- * "od.welcome": "show" after signing out, "done" once a way to start was
+ * "od.welcome" (the beta: "od.welcomeBeta"): "show" after signing out, "done" once a way to start was
  * chosen, absent before the first start.
  * @returns {string|null}
  */
+// The beta has its own key: after the alpha it starts from its first launch, whatever the alpha chose (the alpha's
+// files and settings stay as they were).
+const WELCOME_KEY = isRelease ? 'od.welcomeBeta' : 'od.welcome';
+
 function readWelcomeState() {
   // A window that holds a logbook of its own (a file or a git repository) or none has no first launch:
   // that belongs to the logbook of this computer (task 2026-11-15-173).
   if (ownLogbookWindow()) return 'done';
   try {
-    return deviceStore.getItem('od.welcome');
+    return deviceStore.getItem(WELCOME_KEY);
   } catch {
     return 'done';
   }
@@ -757,7 +762,7 @@ function readWelcome() {
 function writeWelcomeState(value) {
   if (ownLogbookWindow()) return;
   try {
-    deviceStore.setItem('od.welcome', value);
+    deviceStore.setItem(WELCOME_KEY, value);
   } catch {
     // Not fatal: first launch may be shown again at the next start.
   }
@@ -773,7 +778,8 @@ function writeWelcomeState(value) {
 let early = null;
 
 /** Set when an account was found: lets the next start send the probe at once. */
-const ACCOUNT_HINT = 'od.cloudAccount';
+// The beta has its own key: the alpha's hint says a Subsurface-cloud account, which the beta ignores (no probe at start).
+const ACCOUNT_HINT = isRelease ? 'od.repositoryAccount' : 'od.cloudAccount';
 
 /** @param {boolean} has */
 function rememberAccount(has) {
@@ -827,7 +833,9 @@ export async function startApp() {
   if (readWelcomeState() === null) {
     let configured = false;
     try {
-      configured = (await OpenDivesCore.configureCloud()).available;
+      const account = await OpenDivesCore.configureCloud();
+      // The beta after the alpha: a Subsurface-cloud account is not opened, first launch is shown (its files stay).
+      configured = account.available && !isIgnoredCloudAccount(account, isRelease);
     } catch (e) {
       console.error('Reading the cloud account', e);
     }
@@ -1195,9 +1203,10 @@ async function onOpenDivesServer(repository) {
  */
 async function loadCloud(force, pre = null) {
   const account = await (pre?.configure ?? OpenDivesCore.configureCloud());
-  rememberAccount(account.available);
+  const ignored = isIgnoredCloudAccount(account, isRelease);
+  rememberAccount(account.available && !ignored);
   mark('configured');
-  if (!account.available) {
+  if (!account.available || ignored) {
     logbook.email = '';
     logbook.mode = 'cloud';
     logbook.repository = '';

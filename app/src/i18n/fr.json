@@ -268,6 +268,7 @@
     "loading": "Chargement de la plongée",
     "errorTitle": "Cette plongée n'a pas pu être lue",
     "errorText": "Aucune plongée n'a été modifiée. Revenez au carnet, puis rouvrez la plongée.",
+    "retry": "Réessayer",
     "edit": "Modifier",
     "moreOptions": "Plus d'options",
     "actions": "Actions de la plongée",
@@ -2149,6 +2150,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Un carnet qui était sur le cloud Subsurface n'est pas ouvert ici : après une mise à jour depuis l'alpha, l'application repart de son premier lancement et laisse les fichiers de ce carnet sur le téléphone, tels quels. La page Compte ne propose plus de se connecter au cloud Subsurface. Une plongée qui ne peut pas être lue affiche une page avec « Réessayer ».",
       "Serveur OpenDives (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur OpenDives » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
       "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
       "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",

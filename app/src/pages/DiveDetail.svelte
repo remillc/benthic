@@ -8,7 +8,7 @@
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, List, ListItem, Block, Popover, f7, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
@@ -306,6 +306,11 @@
     const ids = listOrder();
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
+  }
+  /** « Réessayer » on the error state: reads the dive again. */
+  function retry() {
+    failed = false;
+    loadDive();
   }
   onMount(() => {
     if (isRelease) loadInventory();
@@ -751,10 +756,12 @@
   </Popover>
 
   {#if failed}
-    <Block>
-      <h2 class="od-state-title">{t('detail.errorTitle')}</h2>
-      <p>{t('detail.errorText')}</p>
-    </Block>
+    <!-- Error state (docs/system-design.md, section 9): what happened, what did not change, then a way on. -->
+    <div class="od-dive-detail--error" role="alert">
+      <h2 class="od-state-title od-dive-detail--error-title">{t('detail.errorTitle')}</h2>
+      <p class="od-dive-detail--error-text">{t('detail.errorText')}</p>
+      <Button fill class="od-primary-action od-dive-detail--error-retry" onClick={retry}>{t('detail.retry')}</Button>
+    </div>
   {:else if !dive}
     <div class="skeleton-text" aria-busy="true" aria-label={t('detail.loading')}>
       <div class="od-dive-detail--head" aria-hidden="true">
@@ -1019,6 +1026,26 @@
 
 <style>
   @layer od.components {
+    /* Error state: a centred column under the bar, the title in the title font. */
+    .od-dive-detail--error {
+      max-width: 440px;
+      margin: 32px auto 0;
+      padding: 0 24px 24px;
+      box-sizing: border-box;
+      color: var(--od-text);
+    }
+
+    .od-dive-detail--error-title {
+      color: var(--od-text);
+    }
+
+    .od-dive-detail--error-text {
+      margin: 0 0 24px;
+      color: var(--od-text-2);
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     /* Desktop detail pane (task 2026-11-15-169). */
     /* No top bar on desktop: the pane's own header carries the actions. */
     :global(.od-dive-detail--desk.page) {

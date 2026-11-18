@@ -140,9 +140,14 @@
     { path: '/account', component: Account },
     { path: '/account/delete', ...lazy(() => import('./pages/DeleteAccount.svelte')) },
     // Signing in and creating an account, from the Account screen without an account.
-    { path: '/account/sign-in', ...lazy(() => import('./pages/SignIn.svelte')), beforeEnter: accountGuard },
-    { path: '/account/create', ...lazy(() => import('./pages/CreateAccount.svelte')), beforeEnter: accountGuard },
-    { path: '/account/code', ...lazy(() => import('./pages/ConfirmCode.svelte')) },
+    // The Subsurface cloud (sign in, create an account) is the alpha's: the beta never opens that logbook.
+    ...(isRelease
+      ? []
+      : [
+          { path: '/account/sign-in', ...lazy(() => import('./pages/SignIn.svelte')), beforeEnter: accountGuard },
+          { path: '/account/create', ...lazy(() => import('./pages/CreateAccount.svelte')), beforeEnter: accountGuard },
+          { path: '/account/code', ...lazy(() => import('./pages/ConfirmCode.svelte')) },
+        ]),
     { path: '/account/import', ...lazy(() => import('./pages/BringLogbook.svelte')), beforeEnter: accountGuard },
     { path: '/account/importing', ...lazy(() => import('./pages/ImportProgress.svelte')) },
     // The logbook in the user's own git repository (Modifier le dépôt).
@@ -154,10 +159,14 @@
     // First launch, in the view of its popup (components/Welcome.svelte).
     // The release edition has its own first launch (pages/WelcomeEntry.svelte); the alpha keeps WelcomeStart.
     { path: '/welcome', component: isRelease ? WelcomeEntry : WelcomeStart },
-    { path: '/welcome/sign-in', ...lazy(() => import('./pages/SignIn.svelte'), { welcome: true }) },
-    { path: '/welcome/create', ...lazy(() => import('./pages/CreateAccount.svelte'), { welcome: true }) },
-    { path: '/welcome/code', ...lazy(() => import('./pages/ConfirmCode.svelte'), { welcome: true }) },
-    { path: '/welcome/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
+    ...(isRelease
+      ? []
+      : [
+          { path: '/welcome/sign-in', ...lazy(() => import('./pages/SignIn.svelte'), { welcome: true }) },
+          { path: '/welcome/create', ...lazy(() => import('./pages/CreateAccount.svelte'), { welcome: true }) },
+          { path: '/welcome/code', ...lazy(() => import('./pages/ConfirmCode.svelte'), { welcome: true }) },
+          { path: '/welcome/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
+        ]),
     { path: '/welcome/local', ...lazy(() => import('./pages/WithoutAccount.svelte')) },
     { path: '/welcome/import', ...lazy(() => import('./pages/BringLogbook.svelte')) },
     { path: '/welcome/importing', ...lazy(() => import('./pages/ImportProgress.svelte')) },

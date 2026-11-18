@@ -13,9 +13,11 @@
  */
 
 import { logbookKey } from './window-logbook.js';
+import { isRelease } from './edition.js';
 
 /** One snapshot per logbook: the desktop's windows share the storage (task 2026-11-15-173). */
-const KEY = logbookKey('od.logbookSnapshot');
+// The beta has its own: the alpha's snapshot may show a Subsurface-cloud logbook, which the beta never opens.
+const KEY = logbookKey(isRelease ? 'od.logbookSnapshotBeta' : 'od.logbookSnapshot');
 const VERSION = 1;
 /** Dives and collapsed trips kept: a little more than a screen. */
 const ENTRIES = 16;

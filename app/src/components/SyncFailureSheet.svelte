@@ -5,6 +5,7 @@
   // only from the status row, never by itself.
   import { Sheet, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import { isRelease } from '../lib/edition.js';
   import { logbook, syncNow, syncFlavour } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -33,8 +34,8 @@
     if (cause === 'server') {
       syncNow();
     } else {
-      f7.views.main.router.navigate(cause === 'auth' ? '/account/sign-in' : '/account/git', {
-        props: cause === 'auth' ? { prefilledEmail: logbook.email } : {},
+      f7.views.main.router.navigate(cause === 'auth' && !isRelease ? '/account/sign-in' : '/account/git', {
+        props: cause === 'auth' && !isRelease ? { prefilledEmail: logbook.email } : {},
       });
     }
   }

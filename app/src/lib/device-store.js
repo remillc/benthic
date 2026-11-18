@@ -16,7 +16,7 @@
 // start, too large for preferences and rebuilt from the logbook when missing.
 
 /** Keys that are not settings: they stay in the WebView's storage. */
-export const NOT_SETTINGS = new Set(['od.logbookSnapshot']);
+export const NOT_SETTINGS = new Set(['od.logbookSnapshot', 'od.logbookSnapshotBeta']);
 /** Set once the values kept in localStorage before 15 November 2026 have been copied. */
 const MOVED_KEY = 'od.storeVersion';
 
