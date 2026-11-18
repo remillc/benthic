@@ -136,7 +136,7 @@
     </button>
   </div>
   <p class="od-plus--note">{t('odplus.connect.note')}</p>
-  <button type="button" class="od-plus--text" onclick={onwithout}>{t('odplus.connect.without')}</button>
+  <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
 {:else if step === 'odplusOffer'}
   <div class="od-plus--screen">
     {@render hero('offer')}
@@ -234,7 +234,7 @@
     .od-plus--buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
     }
 
     .od-plus--provider {
@@ -373,6 +373,14 @@
       &:focus-visible {
         outline: 2px solid var(--od-release-row-main);
       }
+    }
+
+    /* « Continuer sans compte » on the connection screen: centred, in the main blue (android-odplus-connexion). */
+    .od-plus--text-link {
+      align-self: center;
+      margin-left: 0;
+      margin-top: 8px;
+      color: var(--od-release-link);
     }
 
     .od-plus--text-centre {
