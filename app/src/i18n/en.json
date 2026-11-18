@@ -2115,6 +2115,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",

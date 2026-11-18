@@ -2115,6 +2115,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
       "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
