@@ -3,7 +3,7 @@
 // the logbook's name, what is being imported, the cloud service. The steps and their order are in
 // first-launch-steps.js (pure); this file holds them as reactive state for the screens. The blue
 // panel does not read it: it stays as it is on every step.
-import { back, backToName, backToStep, enterCreate, enterOffer, forward, importRead, menuEntry, replaceTop } from './first-launch-steps.js';
+import { back, backToName, backToStep, enterCreate, enterDownload, enterOffer, forward, importRead, menuEntry, replaceTop } from './first-launch-steps.js';
 import { newDownloadProgress } from './first-launch-import.js';
 import { t } from './i18n.js';
 
@@ -122,6 +122,12 @@ export function goCreate() {
 export function goOffer() {
   flow.direction = 'forward';
   flow.stack = enterOffer(flow.stack);
+}
+
+/** Development only (simulated Google sign-in): a subscribed account goes to the download. */
+export function goDownload() {
+  flow.direction = 'forward';
+  flow.stack = enterDownload(flow.stack);
 }
 
 /** « Retour »: one step back, the transition played backwards. */
