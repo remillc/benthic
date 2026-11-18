@@ -396,6 +396,8 @@ Granularity is **the file** first, then **the field**. The device does the merge
 
 **Reading the format (decided on 17 November 2026):** the app reads and writes the OpenDives format in JavaScript and shows the logbook from it; a dive goes to the C++ core only for what needs Subsurface's calculations (tissues, ceiling, planner, gas use), through a façade call that takes one dive as JSON. The format code itself (reading, writing, merging, import mapping) is JavaScript in `app/src/lib`, tested in `tests/app`, as AGENTS.md asks; only loading into and saving from the core's own structures needs the façade.
 
+**Git on the device (decided on 18 November 2026):** the app keeps a real git working copy of the logbook on the device and talks to the server with git over HTTPS, in JavaScript (isomorphic-git), through the plugin's native HTTP. The working copy is plain files in the app's data directory (`@capacitor/filesystem` on Android and iOS, the file system on the desktop); the app never shares a working copy with another git implementation. Clone, pull and push replace the git host's web API, which was minutes per logbook in the speed test (`docs/spike-git-on-device.md` on branch `spike/git-on-device`): 1,000 dives cloned in about 2.4 s and pushed in about 6 s on a desktop machine. The first upload is pushed in packs of about 100 to 200 dives to bound memory. Still to check during the first step: the speed on a mid-range phone and the three-way merge; libgit2, already in the core, is the fallback behind the same contract.
+
 ### 11.4 Import from and export to Subsurface
 
 Subsurface's format is **not** the format of an OpenDives-server logbook; it is the exchange format.
