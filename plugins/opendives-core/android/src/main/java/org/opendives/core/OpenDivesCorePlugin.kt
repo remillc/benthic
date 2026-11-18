@@ -446,6 +446,127 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    // --- Git on the device (odgit.h): the working copies of the OpenDives server's logbooks ---
+
+    /** Git work runs on its own thread: it never waits for the core, and a long clone does not hold the others. */
+    private val gitThread: ExecutorService = Executors.newSingleThreadExecutor()
+
+    /** The working copies: `<files>/odgit/<dir>`, the folder @capacitor/filesystem calls `Directory.Data` + `odgit/<dir>`. */
+    private val odgitRoot: File by lazy { File(context.filesDir, "odgit") }
+
+    /**
+     * Runs one git call (options: `dir`, the working copy's name under odgit/) off the main thread and resolves
+     * `json`; rejects with the error code (UNREACHABLE, REFUSED, REJECTED, CANCELLED, ...). The development server is
+     * plain http: allowed in debuggable builds only. Progress goes out as "gitProgress" events ({dir, phase, done, total}).
+     */
+    private fun odgit(call: PluginCall, work: (String, DownloadListener) -> String) {
+        val name = call.getString("dir").orEmpty()
+        if (name.isEmpty() || name.startsWith("/") || name.contains("..") || name.contains("\\")) {
+            call.reject("BAD_PATH", "BAD_PATH")
+            return
+        }
+        gitThread.execute {
+            try {
+                setupDone.await()
+                val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+                NativeCore.odgitAllowHttp(debuggable)
+                val listener = DownloadListener { json ->
+                    try {
+                        notifyListeners("gitProgress", JSObject(json).put("dir", name))
+                    } catch (e: Exception) {
+                        // A progress report is never worth a failure.
+                    }
+                }
+                call.resolve(JSObject().put("json", work(File(odgitRoot, name).absolutePath, listener)))
+            } catch (e: IllegalStateException) {
+                call.reject(e.message, e.message.orEmpty().substringBefore(':'))
+            } catch (e: Exception) {
+                Log.e(TAG, "Git error", e)
+                call.reject("CORE_ERROR", "CORE_ERROR")
+            }
+        }
+    }
+
+    private fun PluginCall.paths(): Array<String> = getArray("paths")?.toList<String>()?.toTypedArray() ?: emptyArray()
+
+    /** Makes the working copy from a branch of the repository (options: url, dir, branch, username, token). */
+    @PluginMethod
+    fun odgitClone(call: PluginCall) {
+        val url = call.getString("url").orEmpty()
+        val branch = call.getString("branch").orEmpty()
+        val user = call.getString("username").orEmpty()
+        val token = call.getString("token").orEmpty()
+        odgit(call) { dir, listener -> NativeCore.odgitClone(url, dir, branch, user, token, listener) }
+    }
+
+    /** Fetches the branch and merges it (options: dir, branch, username, token). */
+    @PluginMethod
+    fun odgitPull(call: PluginCall) {
+        val branch = call.getString("branch").orEmpty()
+        val user = call.getString("username").orEmpty()
+        val token = call.getString("token").orEmpty()
+        odgit(call) { dir, listener -> NativeCore.odgitPull(dir, branch, user, token, call.getString("authorName"), call.getString("authorEmail"), listener) }
+    }
+
+    /** Stages the files and commits (options: dir, paths, message, mergeParent). */
+    @PluginMethod
+    fun odgitCommit(call: PluginCall) {
+        val paths = call.paths()
+        val message = call.getString("message").orEmpty()
+        odgit(call) { dir, _ ->
+            NativeCore.odgitCommit(dir, paths, message, call.getString("authorName"), call.getString("authorEmail"), call.getString("mergeParent"))
+        }
+    }
+
+    /** Sends the branch (options: dir, branch, username, token). */
+    @PluginMethod
+    fun odgitPush(call: PluginCall) {
+        val branch = call.getString("branch").orEmpty()
+        val user = call.getString("username").orEmpty()
+        val token = call.getString("token").orEmpty()
+        odgit(call) { dir, listener -> NativeCore.odgitPush(dir, branch, user, token, listener) }
+    }
+
+    @PluginMethod
+    fun odgitStatus(call: PluginCall) {
+        val paths = call.paths()
+        odgit(call) { dir, _ -> NativeCore.odgitStatus(dir, paths) }
+    }
+
+    @PluginMethod
+    fun odgitUnpushed(call: PluginCall) {
+        val branch = call.getString("branch").orEmpty()
+        odgit(call) { dir, _ -> NativeCore.odgitUnpushed(dir, branch) }
+    }
+
+    @PluginMethod
+    fun odgitHead(call: PluginCall) {
+        val branch = call.getString("branch").orEmpty()
+        odgit(call) { dir, _ -> NativeCore.odgitHead(dir, branch) }
+    }
+
+    @PluginMethod
+    fun odgitListFiles(call: PluginCall) {
+        val prefix = call.getString("prefix").orEmpty()
+        odgit(call) { dir, _ -> NativeCore.odgitListFiles(dir, prefix) }
+    }
+
+    /** Removes the working copy's folder. */
+    @PluginMethod
+    fun odgitRemove(call: PluginCall) {
+        odgit(call) { dir, _ ->
+            NativeCore.odgitRemove(dir)
+            "{}"
+        }
+    }
+
+    /** Stops the running git call (it fails with CANCELLED). Runs at once, on the calling thread. */
+    @PluginMethod
+    fun odgitCancel(call: PluginCall) {
+        NativeCore.odgitCancel()
+        call.resolve()
+    }
+
     /** Keeps the OpenDives server's session (the e-mail sign-in's answer) in the Keystore; nothing is returned. */
     @PluginMethod
     fun serverSessionSave(call: PluginCall) {

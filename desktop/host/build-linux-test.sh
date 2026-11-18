@@ -32,8 +32,8 @@ OBJ=$(dirname "$OUT")/host.o
 g++ $FLAGS -Wall -Wextra -c "$ROOT/desktop/host/host.cpp" -o "$OBJ"
 
 # The same objects as poc/build.sh links, without the test programs.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|fit_import_test|opendives|edit|tools|settings|plan|filter|account|stats|download)[.]o$')
-FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o"
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|odgit_test|opendives|edit|tools|settings|plan|filter|account|stats|download|odgit)[.]o$')
+FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/odgit.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm -lpthread"
 g++ $OBJS $FACADE "$OBJ" -o "$OUT" $LIBS
 echo "built $OUT"

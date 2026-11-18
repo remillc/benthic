@@ -41,6 +41,16 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createAccount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitCheck", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitClone", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitPull", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitCommit", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitPush", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitUnpushed", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitHead", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitListFiles", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitRemove", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "odgitCancel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConfig", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionSave", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
@@ -955,6 +965,61 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
+
+    // MARK: Git on the device (odgit.h)
+
+    /// Git work runs on its own queue: it never waits for the core, and a long clone does not hold the others.
+    private let gitQueue = DispatchQueue(label: "org.opendives.core.git")
+
+    /// The working copies: `<Documents>/odgit/<dir>`. NOT BUILT OR TESTED YET (no Mac): this must be the folder
+    /// @capacitor/filesystem calls `Directory.Data` + `odgit/<dir>` (check which folder Directory.Data is on iOS).
+    private let odgitRoot: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("odgit")
+
+    /// Runs one git call off the main thread and resolves `json`; rejects with the error code (UNREACHABLE, REFUSED,
+    /// REJECTED, CANCELLED, ...). Progress goes out as "gitProgress" events ({dir, phase, done, total}).
+    private func odgit(_ call: CAPPluginCall, _ operation: String) {
+        let name = call.getString("dir") ?? ""
+        if operation != "cancel" && (name.isEmpty || name.hasPrefix("/") || name.contains("..") || name.contains("\\")) {
+            call.reject("BAD_PATH", "BAD_PATH")
+            return
+        }
+        var args: [String: Any] = [:]
+        for key in ["url", "branch", "username", "token", "message", "mergeParent", "prefix", "authorName", "authorEmail"] {
+            if let value = call.getString(key) { args[key] = value }
+        }
+        args["paths"] = (call.getArray("paths") ?? []).compactMap { $0 as? String }
+        args["dir"] = odgitRoot.appendingPathComponent(name).path
+        #if DEBUG
+        args["allowHttp"] = true // the development server is plain http
+        #endif
+        let run = { [self] in
+            setupDone.wait()
+            do {
+                let json = try OpenDivesNative.odgit(operation, args: args, progress: { [weak self] progress in
+                    var data = parseObject(progress)
+                    data["dir"] = name
+                    self?.notifyListeners("gitProgress", data: data)
+                })
+                call.resolve(["json": json])
+            } catch {
+                let message = error.localizedDescription
+                call.reject(message, message.components(separatedBy: ":")[0])
+            }
+        }
+        // Cancelling must not wait behind the call it stops.
+        if operation == "cancel" { run() } else { gitQueue.async(execute: run) }
+    }
+
+    @objc func odgitClone(_ call: CAPPluginCall) { odgit(call, "clone") }
+    @objc func odgitPull(_ call: CAPPluginCall) { odgit(call, "pull") }
+    @objc func odgitCommit(_ call: CAPPluginCall) { odgit(call, "commit") }
+    @objc func odgitPush(_ call: CAPPluginCall) { odgit(call, "push") }
+    @objc func odgitStatus(_ call: CAPPluginCall) { odgit(call, "status") }
+    @objc func odgitUnpushed(_ call: CAPPluginCall) { odgit(call, "unpushed") }
+    @objc func odgitHead(_ call: CAPPluginCall) { odgit(call, "head") }
+    @objc func odgitListFiles(_ call: CAPPluginCall) { odgit(call, "listFiles") }
+    @objc func odgitRemove(_ call: CAPPluginCall) { odgit(call, "remove") }
+    @objc func odgitCancel(_ call: CAPPluginCall) { odgit(call, "cancel") }
 
     /// Keeps the OpenDives server's session (release edition) in the Keychain.
     @objc func serverSessionSave(_ call: CAPPluginCall) {

@@ -109,6 +109,7 @@ export class OpenDivesCoreDesktop extends WebPlugin {
       this.eventsBound = true;
       // The messages of the cloud log's git work, as the Android plugin's "syncProgress" ({message}).
       bridge.onCoreEvent('syncProgress', (/** @type {any} */ data) => this.notifyListeners('syncProgress', data));
+      bridge.onCoreEvent('gitProgress', (/** @type {any} */ data) => this.notifyListeners('gitProgress', data));
       // The core's process died and started again: what was loaded is gone.
       bridge.onCoreEvent('coreRestarted', () => this.notifyListeners('coreRestarted', {}));
     }
@@ -415,6 +416,29 @@ export class OpenDivesCoreDesktop extends WebPlugin {
       throw reject(message, message.split(':')[0] || 'CORE_ERROR');
     }
   }
+
+  // --- Git on the device (odgit.h): the bridge maps `dir` onto <userData>/odgit/<dir> ---
+
+  /** @param {string} method @param {Record<string, any>} options */
+  async odgit(method, options) {
+    try {
+      return { json: await this.bridge.core(method, options ?? {}) };
+    } catch (/** @type {any} */ e) {
+      // The core's error: a code, then ": details" (UNREACHABLE: ..., REFUSED, REJECTED, CANCELLED...).
+      const message = String(e?.message ?? '');
+      throw reject(message, message.split(':')[0] || 'CORE_ERROR');
+    }
+  }
+  odgitClone(/** @type {any} */ o) { return this.odgit('odgitClone', o); }
+  odgitPull(/** @type {any} */ o) { return this.odgit('odgitPull', o); }
+  odgitCommit(/** @type {any} */ o) { return this.odgit('odgitCommit', o); }
+  odgitPush(/** @type {any} */ o) { return this.odgit('odgitPush', o); }
+  odgitStatus(/** @type {any} */ o) { return this.odgit('odgitStatus', o); }
+  odgitUnpushed(/** @type {any} */ o) { return this.odgit('odgitUnpushed', o); }
+  odgitHead(/** @type {any} */ o) { return this.odgit('odgitHead', o); }
+  odgitListFiles(/** @type {any} */ o) { return this.odgit('odgitListFiles', o); }
+  async odgitRemove(/** @type {any} */ o) { await this.odgit('odgitRemove', o); }
+  async odgitCancel() { await this.bridge.core('odgitCancel', {}); }
 
   /** Release edition: the OpenDives server's session, in safeStorage (bridge.cjs, kind 'server'). */
   async serverSessionSave(options) {

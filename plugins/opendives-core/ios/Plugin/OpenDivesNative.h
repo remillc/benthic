@@ -86,6 +86,17 @@ NS_ASSUME_NONNULL_BEGIN
 	      branch:(NSString *)branch
 	       error:(NSError **)error NS_SWIFT_NAME(gitConfigure(url:username:token:branch:));
 + (nullable NSString *)gitCreateLogWithError:(NSError **)error NS_SWIFT_NAME(gitCreateLog());
+/**
+ * Git on the device (core/libopendives/odgit.h), one entry for all its calls. `operation`: clone, pull, commit, push,
+ * status, unpushed, head, listFiles, remove, cancel. `args` holds the call's strings (url, dir, branch, username,
+ * token, message, mergeParent, prefix, authorName, authorEmail), `paths` (array of strings) and `allowHttp` (boolean,
+ * development builds only). Any queue, one call at a time per working copy; `progress` gets {phase, done, total} as
+ * JSON on the calling thread. Resolves the call's JSON; the error's text is its code ("UNREACHABLE: ...").
+ */
++ (nullable NSString *)odgit:(NSString *)operation
+			args:(NSDictionary<NSString *, id> *)args
+		    progress:(nullable void (^)(NSString *json))progress
+		       error:(NSError **)error NS_SWIFT_NAME(odgit(_:args:progress:));
 /** Network only: the one call that may run off the core queue, during a load. */
 + (nullable NSString *)cloudProbeWithError:(NSError **)error NS_SWIFT_NAME(cloudProbe());
 

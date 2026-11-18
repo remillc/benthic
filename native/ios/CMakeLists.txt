@@ -30,7 +30,8 @@ list(APPEND SOURCES
   "${ROOT}/core/libopendives/filter.cpp"
   "${ROOT}/core/libopendives/account.cpp"
   "${ROOT}/core/libopendives/stats.cpp"
-  "${ROOT}/core/libopendives/download.cpp")
+  "${ROOT}/core/libopendives/download.cpp"
+  "${ROOT}/core/libopendives/odgit.cpp")
 
 # Written once: a new time stamp at each configuration would rebuild the whole core.
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")

@@ -84,6 +84,9 @@ const CORE_METHODS = new Set([
   'saveLogbookFile', 'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
   'dcBluetoothModels', 'downloadPartial', 'downloadCancel', 'setSyncListener', 'ping',
+  // Git on the device (odgit.h): the working copies of the OpenDives server's logbooks, under <userData>/odgit.
+  'odgitClone', 'odgitPull', 'odgitCommit', 'odgitPush', 'odgitStatus', 'odgitUnpushed', 'odgitHead', 'odgitListFiles',
+  'odgitRemove', 'odgitCancel',
 ]);
 
 /**
@@ -624,10 +627,26 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     return inside(plain, userData) || inside(plain, tempDir) || inside(plain, resources);
   }
 
+  /**
+   * The folder of a git working copy: the page names it (`dir`, relative), the bridge makes it absolute under
+   * <userData>/odgit, the same folder the page's file backend writes to (desktop/odgit-fs.cjs).
+   */
+  function odgitDir(name) {
+    if (typeof name !== 'string' || !name || name.includes('\0') || name.includes('\\') || path.isAbsolute(name)) throw new Error('BAD_PATH');
+    const root = path.join(userData, 'odgit');
+    const full = path.resolve(root, name);
+    if (!inside(full, root)) throw new Error('BAD_PATH');
+    return full;
+  }
+
   /** The core call after its path arguments are checked. */
   function checkedArgs(method, args) {
     if (args === undefined || args === null) return {};
     if (typeof args !== 'object' || Array.isArray(args)) throw new Error('BAD_ARGUMENT: the arguments are not an object');
+    if (method.startsWith('odgit') && method !== 'odgitCancel') {
+      // http (the development server) only when the app is not a packaged build; the page cannot ask for it.
+      return { ...args, dir: odgitDir(args.dir), allowHttp: !app.isPackaged };
+    }
     for (const [name, kind] of Object.entries(PATH_ARGS[method] || {})) {
       const value = args[name];
       // An empty value is "none" (cloudCreateLog, cloudDeleteAccount).

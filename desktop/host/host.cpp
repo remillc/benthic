@@ -22,8 +22,10 @@
 // reentrant). The calls the facade allows off the core thread run at once on
 // the reader thread (downloadCancel, the dive computer name lookups, setCaFile,
 // setXsltDir) or on a second, network thread (cloudProbe, gitCheck: they run
-// while the core thread loads the log). stdout writes are serialised. When
+// while the core thread loads the log). The odgit* calls (git on the device, odgit.h) run in order on a third,
+// git thread: a long clone blocks neither the core nor gitCheck; odgitCancel runs at once. stdout writes are serialised. When
 // stdin closes, the requests already received finish, then the process exits.
+#include "core/libopendives/odgit.h"
 #include "core/libopendives/opendives.h"
 #include "desktop/host/json_value.h"
 
@@ -193,7 +195,7 @@ std::vector<opendives::filter_rule> rules_of(const std::vector<std::string> &fla
 
 // --- The methods -------------------------------------------------------------------
 
-enum class Lane { Core, Network, Immediate };
+enum class Lane { Core, Network, Git, Immediate };
 
 struct Method {
 	Lane lane;
@@ -333,6 +335,77 @@ void register_methods()
 		if (opendives::cloud_probe(json, error))
 			fail(error);
 		return S(json);
+	});
+
+	// --- Git on the device (odgit.h): the working copies of the OpenDives server's logbooks ---
+	// `dir` is the absolute folder (the bridge maps the page's name onto it); `allowHttp` is set by the bridge in
+	// development only. The token is only passed through. Progress goes out as "gitProgress" events.
+	auto git_progress = [](const Args &) -> opendives::OdgitProgress {
+		return [](const char *phase, uint64_t done, uint64_t total) {
+			emit(std::string("{\"event\":\"gitProgress\",\"data\":{\"phase\":") + json_string(phase) + ",\"done\":" +
+			     std::to_string(done) + ",\"total\":" + std::to_string(total) + "}}");
+		};
+	};
+	auto git_author = [](const Args &a) {
+		opendives::OdgitAuthor author;
+		if (!a.str("authorName").empty() && !a.str("authorEmail").empty()) {
+			author.name = a.str("authorName");
+			author.email = a.str("authorEmail");
+		}
+		return author;
+	};
+	add("odgitClone", Lane::Git, [git_progress](const Args &a) {
+		std::string json, error;
+		opendives::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(opendives::odgit_clone(a.str("url"), a.str("dir"), a.str("branch"),
+							   { a.str("username"), a.str("token") }, git_progress(a), json, error),
+				    json, error);
+	});
+	add("odgitPull", Lane::Git, [git_progress, git_author](const Args &a) {
+		std::string json, error;
+		opendives::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(opendives::odgit_pull(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+							  git_author(a), git_progress(a), json, error),
+				    json, error);
+	});
+	add("odgitCommit", Lane::Git, [git_author](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::odgit_commit(a.str("dir"), a.strs("paths"), a.str("message"), git_author(a),
+							    a.str("mergeParent"), json, error),
+				    json, error);
+	});
+	add("odgitPush", Lane::Git, [git_progress](const Args &a) {
+		std::string json, error;
+		opendives::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(opendives::odgit_push(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+							  git_progress(a), json, error),
+				    json, error);
+	});
+	add("odgitStatus", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::odgit_status(a.str("dir"), a.strs("paths"), json, error), json, error);
+	});
+	add("odgitUnpushed", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::odgit_unpushed(a.str("dir"), a.str("branch"), json, error), json, error);
+	});
+	add("odgitHead", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::odgit_head(a.str("dir"), a.str("branch"), json, error), json, error);
+	});
+	add("odgitListFiles", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::odgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
+	});
+	add("odgitRemove", Lane::Git, [](const Args &a) {
+		std::string error;
+		if (opendives::odgit_remove(a.str("dir"), error))
+			fail(error);
+		return NOTHING;
+	});
+	add("odgitCancel", Lane::Immediate, [](const Args &) {
+		opendives::odgit_cancel();
+		return NOTHING;
 	});
 
 	// --- Own git repository: the token is only passed through, never kept or logged ---
@@ -774,7 +847,7 @@ private:
 	std::thread thread; // last: started when the rest exists
 };
 
-void handle_line(const std::string &line, Worker &core, Worker &network)
+void handle_line(const std::string &line, Worker &core, Worker &network, Worker &git)
 {
 	Request r;
 	odhost::JsonParser parser(line);
@@ -803,6 +876,9 @@ void handle_line(const std::string &line, Worker &core, Worker &network)
 	case Lane::Network:
 		network.push(std::move(r), &m);
 		break;
+	case Lane::Git:
+		git.push(std::move(r), &m);
+		break;
 	case Lane::Immediate:
 		execute(r, m);
 		break;
@@ -822,18 +898,19 @@ int main()
 	std::ios::sync_with_stdio(false);
 	register_methods();
 	{
-		Worker core, network;
+		Worker core, network, git;
 		std::string line;
 		while (std::getline(std::cin, line)) {
 			if (!line.empty() && line.back() == '\r')
 				line.pop_back();
 			if (line.empty())
 				continue;
-			handle_line(line, core, network);
+			handle_line(line, core, network, git);
 		}
 		// stdin is closed: the queued requests finish, then the workers stop.
 		core.finish();
 		network.finish();
+		git.finish();
 	}
 	return 0;
 }

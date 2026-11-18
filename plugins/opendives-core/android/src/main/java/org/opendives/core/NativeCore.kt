@@ -66,6 +66,22 @@ internal object NativeCore {
     external fun gitCheck(url: String, username: String, token: String): String
     external fun gitConfigure(url: String, username: String, token: String, branch: String)
     external fun gitCreateLog(): String
+    /**
+     * Git on the device (odgit.h): clone, pull, commit, push, status of a working copy. Any thread, one call at a
+     * time per working copy; each returns JSON or throws with the error code. `listener` gets {phase, done, total}.
+     */
+    external fun odgitAllowHttp(allowed: Boolean)
+    external fun odgitCancel()
+    external fun odgitClone(url: String, dir: String, branch: String, user: String, token: String, listener: DownloadListener?): String
+    external fun odgitPull(dir: String, branch: String, user: String, token: String, authorName: String?, authorEmail: String?, listener: DownloadListener?): String
+    external fun odgitCommit(dir: String, paths: Array<String>, message: String, authorName: String?, authorEmail: String?, mergeParent: String?): String
+    external fun odgitPush(dir: String, branch: String, user: String, token: String, listener: DownloadListener?): String
+    external fun odgitStatus(dir: String, paths: Array<String>): String
+    external fun odgitUnpushed(dir: String, branch: String): String
+    external fun odgitHead(dir: String, branch: String): String
+    external fun odgitListFiles(dir: String, prefix: String): String
+    external fun odgitRemove(dir: String)
+
     external fun importCount(path: String): String
     external fun divelogsCheck(user: String, password: String): String
     external fun divelogsDownload(user: String, password: String, outPath: String): String

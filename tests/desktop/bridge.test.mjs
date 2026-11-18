@@ -136,6 +136,14 @@ test('path arguments of core calls: userData and temp only, resources to read, n
   assert.equal(await invoke('od:core', 'cloudCreateLog', { importPath: '' }), 'cloudCreateLog');
 });
 
+test('git working copies: the page names a folder under userData/odgit, nothing else', async () => {
+  assert.equal(await invoke('od:core', 'odgitStatus', { dir: 'server/main' }), 'odgitStatus');
+  assert.equal(await invoke('od:core', 'odgitCancel', {}), 'odgitCancel');
+  for (const dir of ['', '..', '../carnet', 'a/../../x', '/etc', 'a\\b', undefined]) {
+    assert.match((await rejection(invoke('od:core', 'odgitStatus', { dir }))).message, /BAD_PATH/, String(dir));
+  }
+});
+
 test('host process: results, errors, events and exact text', async () => {
   const events = [];
   const host = new HostProcess({ hostPath: process.execPath, hostArgs: [fakeHost], log: () => {}, onEvent: (n, d) => events.push([n, d]) });

@@ -3,6 +3,7 @@
 
 #include "BluetoothTransport.h"
 #include "core/compat/bt_transport.h"
+#include "core/libopendives/odgit.h"
 #include "core/libopendives/opendives.h"
 
 #include <cstdint>
@@ -364,6 +365,62 @@ static void send_sync_progress(const char *message)
 {
 	std::string json, message;
 	int ret = opendives::divelogs_download(str(user), str(password), str(outPath), json, message);
+	return json_or_fail(ret, json, message, error);
+}
+
++ (NSString *)odgit:(NSString *)operation
+		args:(NSDictionary<NSString *, id> *)args
+	    progress:(void (^)(NSString *))progress
+	       error:(NSError **)error
+{
+	auto text = [&](NSString *key) {
+		id v = args[key];
+		return [v isKindOfClass:[NSString class]] ? str((NSString *)v) : std::string();
+	};
+	std::vector<std::string> paths;
+	id list = args[@"paths"];
+	if ([list isKindOfClass:[NSArray class]])
+		for (id item in (NSArray *)list)
+			paths.push_back([item isKindOfClass:[NSString class]] ? str((NSString *)item) : std::string());
+	opendives::OdgitAuthor author;
+	if (!text(@"authorName").empty() && !text(@"authorEmail").empty()) {
+		author.name = text(@"authorName");
+		author.email = text(@"authorEmail");
+	}
+	opendives::OdgitAuth auth{ text(@"username"), text(@"token") };
+	opendives::OdgitProgress report;
+	if (progress)
+		report = [progress](const char *phase, uint64_t done, uint64_t total) {
+			progress([NSString stringWithFormat:@"{\"phase\":\"%s\",\"done\":%llu,\"total\":%llu}", phase,
+				  (unsigned long long)done, (unsigned long long)total]);
+		};
+	opendives::odgit_allow_http([args[@"allowHttp"] boolValue]);
+	std::string op = str(operation), json, message;
+	int ret = -1;
+	if (op == "cancel") {
+		opendives::odgit_cancel();
+		return @"{}";
+	} else if (op == "clone")
+		ret = opendives::odgit_clone(text(@"url"), text(@"dir"), text(@"branch"), auth, report, json, message);
+	else if (op == "pull")
+		ret = opendives::odgit_pull(text(@"dir"), text(@"branch"), auth, author, report, json, message);
+	else if (op == "commit")
+		ret = opendives::odgit_commit(text(@"dir"), paths, text(@"message"), author, text(@"mergeParent"), json, message);
+	else if (op == "push")
+		ret = opendives::odgit_push(text(@"dir"), text(@"branch"), auth, report, json, message);
+	else if (op == "status")
+		ret = opendives::odgit_status(text(@"dir"), paths, json, message);
+	else if (op == "unpushed")
+		ret = opendives::odgit_unpushed(text(@"dir"), text(@"branch"), json, message);
+	else if (op == "head")
+		ret = opendives::odgit_head(text(@"dir"), text(@"branch"), json, message);
+	else if (op == "listFiles")
+		ret = opendives::odgit_list_files(text(@"dir"), text(@"prefix"), json, message);
+	else if (op == "remove") {
+		ret = opendives::odgit_remove(text(@"dir"), message);
+		json = "{}";
+	} else
+		message = "BAD_REQUEST";
 	return json_or_fail(ret, json, message, error);
 }
 
