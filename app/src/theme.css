@@ -182,6 +182,15 @@
     /* Desktop (task 2026-11-15-169): the selected row of a table, and a destructive menu item. */
     --od-table-selected: #D4E2F2;
     --od-on-table-selected: #114477;
+    /* « Continue with Google » and « Continue with Apple » (Google's Sign in with Google branding guidelines: light theme
+       white, #747775 stroke, #1F1F1F text; dark theme #131314, #8E918F, #E3E3E3. Apple: white or black button, logo and title
+       the same colour). Fixed by the providers, not by the OpenDives theme. */
+    --od-brand-google-bg: #FFFFFF;
+    --od-brand-google-border: #747775;
+    --od-brand-google-ink: #1F1F1F;
+    --od-brand-apple-bg: #FFFFFF;
+    --od-brand-apple-border: #1F1F1F;
+    --od-brand-apple-ink: #000000;
     /* Desktop Statistiques (tasks 2026-11-15-171 and 176): the chart bars, the previews of the list, the heat map's grid, the tooltip's second line. */
     --od-desk-stats-bar: #7FA3C8;
     --od-desk-stats-bar-strong: #114477;
@@ -590,6 +599,12 @@
     --od-selected-container: #1A2D47;
     --od-table-selected: #1A2D47;
     --od-on-table-selected: #BFD6F0;
+    --od-brand-google-bg: #131314;
+    --od-brand-google-border: #8E918F;
+    --od-brand-google-ink: #E3E3E3;
+    --od-brand-apple-bg: #000000;
+    --od-brand-apple-border: #8E918F;
+    --od-brand-apple-ink: #FFFFFF;
     --od-desk-stats-bar: #4C7FB8;
     --od-desk-stats-bar-strong: #BFD6F0;
     --od-desk-stats-preview: #4C7FB8;

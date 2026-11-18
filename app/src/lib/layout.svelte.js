@@ -60,6 +60,7 @@ export const railBreakpoint = splitBreakpoint;
 const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 767.98px)') : null;
 const railQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${railBreakpoint}px)`) : null;
 const splitQuery = typeof matchMedia === 'function' ? matchMedia(`(min-width: ${splitBreakpoint}px)`) : null;
+const portraitQuery = typeof matchMedia === 'function' ? matchMedia('(orientation: portrait)') : null;
 const desktopQuery = desktopApp && typeof matchMedia === 'function' ? matchMedia(`(min-width: ${desktopBreakpoint}px)`) : null;
 
 export const layout = $state({
@@ -68,6 +69,8 @@ export const layout = $state({
   rail: railQuery ? railQuery.matches : false,
   /** Tablet layout with room for the list and the detail side by side. */
   split: splitQuery ? splitQuery.matches : false,
+  /** The window is taller than wide (the tablet's list opens its trips in portrait, folds them in landscape). */
+  portrait: portraitQuery ? portraitQuery.matches : true,
   /** Desktop app, wide enough for the logbook's table and the detail pane. */
   desktop: desktopQuery ? desktopQuery.matches : false,
 });
@@ -95,6 +98,9 @@ railQuery?.addEventListener('change', (e) => {
 });
 splitQuery?.addEventListener('change', (e) => {
   layout.split = e.matches;
+});
+portraitQuery?.addEventListener('change', (e) => {
+  layout.portrait = e.matches;
 });
 desktopQuery?.addEventListener('change', (e) => {
   layout.desktop = e.matches;

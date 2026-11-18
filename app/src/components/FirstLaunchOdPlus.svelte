@@ -9,6 +9,9 @@
   import Icon from './Icon.svelte';
   import OdPlusChip from './OdPlusChip.svelte';
   import OdPlusReadyLogo from './OdPlusReadyLogo.svelte';
+  import googleLogo from '../assets/brands/google-g.svg?raw';
+  import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
+  import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
   import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
   import { claimReadyMotion } from '../lib/ready-animation.js';
   import { flow, go } from '../lib/first-launch.svelte.js';
@@ -121,11 +124,13 @@
   <h2 class="od-plus--title">{t('odplus.connect.title')}</h2>
   <p class="od-plus--lead">{t('odplus.connect.lead')}</p>
   <div class="od-plus--buttons">
-    <button type="button" class="od-plus--provider" onclick={() => provider('google')}>
-      <span class="od-plus--disc" aria-hidden="true">G</span>{t('odplus.connect.google')}
+    <!-- The official logos and rules of each provider (assets/brands/README.md): the logos are never altered. -->
+    <button type="button" class="od-plus--provider od-plus--provider-google" onclick={() => provider('google')}>
+      <span class="od-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
     </button>
-    <button type="button" class="od-plus--provider" onclick={() => provider('apple')}>
-      <span class="od-plus--disc" aria-hidden="true">A</span>{t('odplus.connect.apple')}
+    <button type="button" class="od-plus--provider od-plus--provider-apple" onclick={() => provider('apple')}>
+      <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" />
+      <img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
     </button>
     <button type="button" class="od-plus--provider od-plus--provider-main" onclick={() => go('email')}>
       <Icon name="mail" size={22} />{t('odplus.connect.email')}
@@ -273,18 +278,67 @@
       }
     }
 
-    /* The mark of Google and Apple, a plain letter disc as in the mock-up; replaced by each provider's official button when they are wired. */
-    .od-plus--disc {
-      width: 28px;
-      height: 28px;
-      border-radius: 14px;
+    /* Google: white (light) or #131314 (dark) with a thin stroke, the "G" at its fixed 20 px with 12 px before it and
+       10 px after it (Sign in with Google branding guidelines, custom button). */
+    .od-plus--provider-google {
+      gap: 10px;
+      padding: 0 16px 0 12px;
+      border-color: var(--od-brand-google-border);
+      background: var(--od-brand-google-bg);
+      color: var(--od-brand-google-ink);
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-brand-google-bg);
+          filter: brightness(0.96);
+        }
+      }
+    }
+
+    .od-plus--google-logo {
+      flex: none;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-release-tile-icon);
-      font-size: 15px;
-      font-weight: 700;
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Apple: a white or black button, the logo file as high as the button (its own padding positions it), the title in the
+       logo's colour (Sign in with Apple guidelines, custom button). */
+    .od-plus--provider-apple {
+      gap: 0;
+      padding: 0 20px 0 0;
+      border-color: var(--od-brand-apple-border);
+      background: var(--od-brand-apple-bg);
+      color: var(--od-brand-apple-ink);
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-brand-apple-bg);
+          filter: brightness(0.96);
+        }
+      }
+    }
+
+    .od-plus--apple-logo {
+      flex: none;
+      height: 100%;
+      width: auto;
+      /* The logo file is a square-cornered picture on the button's own colour: the button's corners clip it. */
+      border-radius: 28px 0 0 28px;
+    }
+
+    .od-plus--apple-logo-dark {
+      display: none;
+    }
+
+    :global(html.dark) {
+      .od-plus--apple-logo-light {
+        display: none;
+      }
+
+      .od-plus--apple-logo-dark {
+        display: block;
+      }
     }
 
     .od-plus--note {

@@ -123,10 +123,18 @@ test('a row with a site reads the site as written; with no number it reads "Plon
   assert.ok(label.endsWith('55 minutes'));
 });
 
-test('the phone logbook draws the cards, the tablet and the desktop keep their rows', () => {
+test('the phone and the tablet logbook draw the cards, the desktop keeps its table (task 2026-11-18-279)', () => {
   const logbook = src('pages/Logbook.svelte');
-  assert.match(logbook, /const cards = \$derived\(!layout\.split\)/);
-  assert.match(logbook, /buildRows\(monthGroups, expanded, cards\)/);
+  assert.match(logbook, /const cards = true/);
+  assert.ok(!/const cards = \$derived\(!layout\.split\)/.test(logbook), 'the cards are not limited to the phone any more');
+  assert.match(logbook, /buildRows\(monthGroups, isOpen, cards\)/);
+  // Tablet: trips open in portrait and folded in landscape until the diver chooses.
+  assert.match(logbook, /openByDefault = \$derived\(layout\.split && layout\.portrait\)/);
+  assert.match(logbook, /expanded\[id\] \?\? openByDefault/);
+  assert.match(src('lib/layout.svelte.js'), /\(orientation: portrait\)/);
+  // The selected dive keeps the pale blue token on the card's surface.
+  const row = src('components/DiveRow.svelte');
+  assert.match(row, /od-dive-row--card-selected \.od-dive-row--surface \{\s*background: var\(--od-table-selected\)/);
   assert.match(logbook, /card=\{cards\}/);
   // The list stays virtual and its dives stay a raw array.
   assert.match(logbook, /f7\.virtualList\.create/);
@@ -167,4 +175,14 @@ test('the right column gives way before the site: the site ellipsizes and the co
   assert.match(row, /\.od-dive-row--site \{[^}]*text-overflow: ellipsis/);
   assert.match(row, /\.od-dive-row--right \{[^}]*max-width: 40%/);
   assert.match(row, /\.od-dive-row--date \{[^}]*min-width: 48px;[^}]*min-height: 48px/, 'the date block grows with a large text');
+});
+
+test('buildRows takes a function that says which trips are open (the tablet opens them by orientation)', () => {
+  const trip = (id, date) => [1, 2].map((n) => ({ id: id * 10 + n, number: id * 10 + n, date, trip: { id }, maxDepthMm: 1, durationSeconds: 1 }));
+  const groups = groupByMonth(trip(7, '2026-02-07T09:00:00'));
+  const closed = buildRows(groups, () => false, true);
+  const open = buildRows(groups, (id) => id === 7, true);
+  assert.deepEqual(closed.map((r) => r.kind), ['year', 'trip']);
+  assert.deepEqual(open.map((r) => r.kind), ['year', 'trip', 'inTrip', 'inTrip']);
+  assert.equal(open[3].cardLast, true);
 });
