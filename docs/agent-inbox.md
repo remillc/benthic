@@ -5627,7 +5627,7 @@ The rest of the screen (header, search, navigation bar, the « + » button) does
 
 **Test:** grouping by year across years; a dive without a site; folding a trip; a large font size (the right column must not overlap the site name, which is cut with an ellipsis).
 
-## [ ] 2026-11-18-279 Tablet and desktop: clearer logbook list, and « Se connecter ou créer un compte »
+## [x] 2026-11-18-279 Tablet and desktop: clearer logbook list, and « Se connecter ou créer un compte »
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
 
