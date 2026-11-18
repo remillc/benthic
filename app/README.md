@@ -276,6 +276,8 @@ The emulator is shared and its speed drifted between sessions (the WebView navig
 
 ## Editions (15 November 2026)
 
+Since 18 November 2026 (task 268) `main` holds the beta work, and the alpha is kept on `feature/release-alpha`. The edition switch below is unchanged; the code of the release edition is in `main` and is no longer kept off it.
+
 One source, two editions, chosen at build time by `VITE_EDITION`, read in one place (`src/lib/edition.js`, which exports `edition` and `isRelease`):
 
 - unset, or any value other than `release`: the **beta** edition (the default). Its first launch is `pages/WelcomeStart.svelte`, with tasks 210 and 211.

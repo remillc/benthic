@@ -222,7 +222,7 @@ OpenDives also runs on **Windows, macOS and Linux**, as an **Electron** app (tas
 
 ## 11. OpenDives server (release edition)
 
-Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and the app keeps working without any server (Subsurface cloud, own git repository, local mode). The Subsurface cloud mode of section 6 is unchanged: there the log stays in Subsurface's format and desktop Subsurface reads and writes it (see AGENTS.md, "Coexistence"). This section is only the OpenDives-server edition. The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on. The logbook format (11.3) was decided finally on 18 November 2026: the dives stay in Subsurface's git format, and this decision replaces the earlier ones of this section.
+Decided on 16 November 2026. **Release edition** (`VITE_EDITION=release`, in `main` since 18 November 2026): the app keeps working without any server (Subsurface cloud, own git repository, local mode). The Subsurface cloud mode of section 6 is unchanged: there the log stays in Subsurface's format and desktop Subsurface reads and writes it (see AGENTS.md, "Coexistence"). This section is only the OpenDives-server edition. The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on. The logbook format (11.3) was decided finally on 18 November 2026: the dives stay in Subsurface's git format, and this decision replaces the earlier ones of this section.
 
 ### 11.1 Components and what lives where
 
