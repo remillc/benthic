@@ -54,6 +54,9 @@ export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];
 export const PICKER_GROUPS = ['regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other'];
 
 /** @param {GearType} type @returns {typeof GROUPS[number]} */
+/** True when a piece name is a surface marker buoy (« Saucisse », « parachute de palier », « Surface marker buoy »), to show its icon. @param {string} name */
+export const isBuoyName = (name) => /saucisse|parachute|bou[eé]e|\b(?:d?smb|sausage)\b|marker buoy/i.test(name ?? '');
+
 export const groupOfType = (type) => (type === 'undersuit' ? 'suit' : type === 'light' || type === 'bcd' || type === 'weights' ? 'other' : type);
 
 /** Days the inventory stays readable after a subscription ends. */

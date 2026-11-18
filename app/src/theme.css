@@ -107,9 +107,9 @@
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
-    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a violet apart from the meaning colours; 6.4:1 on white. */
-    --od-dev: #5B33A8;
-    --od-dev-tint: #EFE8FA;
+    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a crimson red on white, close to but apart from the alarm red; 6.0:1 on white. */
+    --od-dev: #C4143C;
+    --od-dev-tint: #FDEDF0;
     --od-on-dev: #FFFFFF;
     /* Pale tint behind an alarm icon; the icon in --od-alarm on it: 4.8:1 (AA non-text 3:1). */
     --od-alarm-tint: #FBE9E7;
@@ -462,6 +462,9 @@
     --od-trace-block: var(--od-trace);
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
+    /* Model thumbnail in « Nouvelle pièce » (task 2026-11-18-283). */
+    --od-piece-thumb-background: #FFFFFF;
+    --od-piece-thumb-border: #DCDAD3;
     --od-thumbnail-background: var(--od-surface-2);
     /* Phone logbook (task 2026-11-18-278): date block and trip header, the profile chip on the right of a row. */
     --od-date-block: #E6EEF7;
@@ -549,10 +552,10 @@
     --od-release-disabled-text: rgb(255 255 255 / 0.38);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
-    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a violet apart from the meaning colours. */
-    --od-dev: #C9B2F5;
-    --od-dev-tint: #2F2547;
-    --od-on-dev: #1B1030;
+    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a light crimson (pinker than the alarm). */
+    --od-dev: #FF93A8;
+    --od-dev-tint: #3A1C24;
+    --od-on-dev: #3A0A14;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
     --od-alarm-tint: #3F2423;
     --od-language-divider: #4A4C50;
@@ -751,6 +754,8 @@
     --od-on-tint: var(--od-text);
     --od-oxygen: #7FD283;
     --od-status-ok: var(--od-oxygen);
+    --od-piece-thumb-background: var(--od-surface);
+    --od-piece-thumb-border: #4B4D52;
     --od-thumbnail-background: var(--od-surface-2);
     --od-date-block: #1B2E45;
     --od-on-date-block: var(--od-secondary);
