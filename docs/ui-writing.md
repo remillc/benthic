@@ -71,6 +71,8 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 ### 9. Vocabulary (French)
 
 - **Canadian French (fr-CA): « courriel »; French (fr): « e-mail »** (to-do #18, tasks 140 and 141 of 14 November 2026). fr-CA: « Adresse courriel », « Courriel » as a short row label, « envoyé par courriel », « Cette adresse courriel n’est pas valide »; fr: « Adresse e-mail », « E-mail », « envoyé par e-mail », « Cette adresse e-mail n’est pas valide ». The fr-CA words go in `fr-CA.json`, which holds only what differs from `fr.json`. The mock-ups are in Canadian French. English keeps « email ». Code comments and identifiers are not concerned.
+- **Equipment service: fr-CA « entretien »; fr « révision »** (Christian, 18 November 2026). The professional service of a regulator or another piece, done by a technician. fr-CA: « Entretien », « Noter un entretien », « Rappel d’entretien », « Prochain entretien »; fr: « Révision », « Noter une révision », « Rappel de révision », « Prochaine révision ». Do not offer both words as two different types: they mean the same thing. English: « Service ».
+- **Cylinder pressure test: fr-CA « test hydrostatique »; fr « requalification »** (18 November 2026). « Inspection visuelle » is the same in both. English: « hydrostatic test », « visual inspection ».
 
 
 ### 8. No promise about where the data never goes
