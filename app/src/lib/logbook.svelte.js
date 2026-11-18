@@ -1,5 +1,8 @@
 // @ts-check
 // Shared logbook state: dives, the log's units, sync status.
+import { Network } from '@capacitor/network';
+import { App as CapacitorApp } from '@capacitor/app';
+import { shouldReconnect } from './reconnect.js';
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { defaultPrefs } from './format.js';
@@ -930,9 +933,50 @@ async function countPending() {
 
 // Offline: sending starts by itself when the network is back (spec, section 6).
 if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => {
-    if (logbook.email && logbook.autoSync && logbook.sync === 'offline' && logbook.pending) syncEdits();
-  });
+  // The same when started offline or with nothing pending: the logbook leaves
+  // "offline" by exchanging with the server, whatever woke it (the WebView's
+  // 'online' event, the Network plugin, the app coming back to the front).
+  let reconnecting = false;
+  // The network came back while a load or a sync was still running: the exchange
+  // is made as soon as the logbook is shown as offline.
+  let wanted = false;
+  const reconnect = async () => {
+    if (reconnecting) return;
+    if (!shouldReconnect(logbook)) {
+      wanted = logbook.loading || logbook.sync === 'syncing';
+      return;
+    }
+    wanted = false;
+    reconnecting = true;
+    try {
+      await syncNow();
+    } finally {
+      reconnecting = false;
+    }
+  };
+  window.addEventListener('online', reconnect);
+  Network.addListener('networkStatusChange', (/** @type {{ connected: boolean }} */ s) => {
+    if (s.connected) reconnect();
+  }).catch((/** @type {unknown} */ e) => console.error('Network status', e));
+  CapacitorApp.addListener('resume', async () => {
+    try {
+      const s = await Network.getStatus();
+      if (s.connected) reconnect();
+    } catch {
+      reconnect();
+    }
+  }).catch((/** @type {unknown} */ e) => console.error('App resume', e));
+  // Safety net for a missed event: while the logbook is offline or a gain came
+  // during a load, the connection is read again every few seconds.
+  setInterval(async () => {
+    if (!wanted && logbook.sync !== 'offline') return;
+    try {
+      const s = await Network.getStatus();
+      if (s.connected && (wanted || !logbook.syncFailure)) reconnect();
+    } catch {
+      /* no plugin: the events above are all there is */
+    }
+  }, 5000);
   // Where the sync is: only while one is shown as running.
   OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
     if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);

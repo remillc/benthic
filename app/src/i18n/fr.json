@@ -1873,6 +1873,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
       "Carnet : une barre de progression s'affiche en haut de la liste pendant que l'app met le carnet à jour au démarrage ; la liste est déjà là.",
