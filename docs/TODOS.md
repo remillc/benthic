@@ -41,7 +41,6 @@ Next number: 97
 - #87 [design] retirer réglages et à propos du compte.
 - #47 [design] [hors compat. SS] Rappels d'entretien de l'équipement : date de la dernière révision du détendeur, de l'inspection visuelle et de l'épreuve hydraulique des bouteilles, avec un avertissement avant l'échéance. Décider où ranger ces données (voir #61 : branche à part, dépôt séparé ou appareil seulement).
 - #88 [code] Quand l'app démarre, elle affiche les données locales rapidement, puis fait un pull, pour mettre à jour les données, vrai ? Dans ce cas, mettre un progress bar.
-- #89 [code] Quand un chip annonce des mises à jour de cartes, on ouvre l'icône compte, le message indiquant une mise à jour devrait pointer directement dans la portion carte des réglages et non aux réglages.
 - #90 [design] Mises à jour disponibles de cartes : revoir la chorégraphie en l'absence de wifi.
 - #91 [design] Améliorer le visuel de la page carnet.
 - #92 [code] Bogue sur nettoyer les sites : l'effet touch sur un bouton s'affiche au haut de l'écran au lieu de sur le bouton.

@@ -107,8 +107,9 @@ export function goToSection(section) {
  * with a list and a detail (Logbook, Statistics, Tools) would show it beside
  * its list: it opens full width in the Account section instead.
  * @param {string} path
+ * @param {{ animate?: boolean }} [options] passed to the router
  */
-export function openOver(path) {
+export function openOver(path, options) {
   let view = f7.views.current;
   // Réglages on a tablet: always in the Account view, where its overview and a subpage sit
   // side by side (task 2026-11-13-111).
@@ -117,12 +118,26 @@ export function openOver(path) {
     view = f7.views.get('#view-account');
   }
   const router = view?.router;
-  if (router && router.currentRoute?.path !== path) router.navigate(path);
+  if (router && router.currentRoute?.path !== path) router.navigate(path, options);
 }
 
 /** Settings open over the current section, from the side menu or the tablet navigation. */
 export function openSettings() {
   openOver('/settings/');
+}
+
+/**
+ * The offline maps part of Settings, from the message announcing a map update. Settings opens
+ * first (without animation), so that the back arrow of the maps leads to Settings, as it does
+ * when the diver goes through Settings himself.
+ */
+export async function openMapSettings() {
+  openOver('/settings/', { animate: false });
+  const start = Date.now();
+  while (f7.views.current?.router.currentRoute?.path !== '/settings/' && Date.now() - start < 1500) {
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  }
+  openOver('/settings/maps/');
 }
 
 /** About opens over the current section, from the side menu or the tablet navigation. */

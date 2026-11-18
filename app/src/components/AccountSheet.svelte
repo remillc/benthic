@@ -13,7 +13,7 @@
   import SyncButton from './SyncButton.svelte';
   import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
   import { showUnsent } from '../lib/filter.svelte.js';
-  import { navigation, openOver, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
   import { layout, ios } from '../lib/layout.svelte.js';
@@ -145,13 +145,21 @@
     <div class="od-account-sheet--ios-group">
       <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openSettings)}>
         <Icon name="settings" />
-        <span class="od-account-sheet--row-label">
-          {t('settings.title')}
-          {#if mapUpdates > 0}<span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>{/if}
-        </span>
-        {#if mapUpdates > 0}<span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>{/if}
+        <span class="od-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />
       </button>
+      {#if mapUpdates > 0}
+        <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
+        <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openMapSettings)}>
+          <Icon name="map" />
+          <span class="od-account-sheet--row-label">
+            {t('settings.groups.maps')}
+            <span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
+          </span>
+          <span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
+          <Icon name="chevron" size={20} />
+        </button>
+      {/if}
       <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openAbout)}>
         <Icon name="info" />
         <span class="od-account-sheet--row-label">{t('about.title')}</span>
@@ -223,14 +231,23 @@
     <div class="od-account-sheet--card">
       <a href="#settings" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openSettings))}>
         <Icon name="settings" />
-        <span class="od-account-sheet--row-label">
-          {t('settings.title')}
-          {#if mapUpdates > 0}<span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>{/if}
-        </span>
-        {#if mapUpdates > 0}<span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>{/if}
+        <span class="od-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />
       </a>
       <div class="od-account-sheet--divider od-account-sheet--inset"></div>
+      {#if mapUpdates > 0}
+        <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
+        <a href="#settings-maps" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openMapSettings))}>
+          <Icon name="map" />
+          <span class="od-account-sheet--row-label">
+            {t('settings.groups.maps')}
+            <span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
+          </span>
+          <span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
+          <Icon name="chevron" size={20} />
+        </a>
+        <div class="od-account-sheet--divider od-account-sheet--inset"></div>
+      {/if}
       <a href="#about" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openAbout))}>
         <Icon name="info" />
         <span class="od-account-sheet--row-label">{t('about.title')}</span>
