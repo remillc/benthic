@@ -11,6 +11,8 @@ import {
   canResume,
   updateCheckDue,
   isNewer,
+  hasUpdate,
+  updateFinished,
   stalePartials,
   usedBytes,
   inBbox,
@@ -211,4 +213,20 @@ test("the version of OpenFreeMap data is the build in the tile address", async (
   assert.equal(versionOfTemplate("https://tiles.openfreemap.org/planet/20261104_001001_pt/{z}/{x}/{y}.pbf"), "20261104_001001_pt");
   assert.equal(versionOfTemplate("{z}/{x}/{y}"), "{z}/{x}/{y}");
   assert.equal(isNewer("20261028_001001_pt", "20261104_001001_pt"), true);
+});
+
+// Todo 93: the badge announcing a map update stays on once the update is done.
+test('hasUpdate: only a ready region whose announced build is newer than its own', () => {
+  assert.equal(hasUpdate({ status: 'ready', version: '20261001', update: { version: '20261104' } }), true);
+  assert.equal(hasUpdate({ status: 'ready', version: '20261104', update: { version: '20261104' } }), false, 'a stale mark on a region up to date');
+  assert.equal(hasUpdate({ status: 'ready', version: '20261104', update: null }), false);
+  assert.equal(hasUpdate({ status: 'updating', version: '20261001', update: { version: '20261104' } }), false);
+});
+
+test('updateFinished: the device holds the build the update asked for', () => {
+  const r = { status: 'updating', version: '20261001', update: { version: '20261104' } };
+  assert.equal(updateFinished(r, { version: '20261104' }), true, 'finished while the app was closed');
+  assert.equal(updateFinished(r, { version: '20261001' }), false, 'the old build is still the one in the folder');
+  assert.equal(updateFinished(r, undefined), false);
+  assert.equal(updateFinished({ ...r, status: 'ready' }, { version: '20261104' }), false);
 });

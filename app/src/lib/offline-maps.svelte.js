@@ -22,6 +22,8 @@ import {
   floorBytes,
   updateCheckDue,
   isNewer,
+  hasUpdate,
+  updateFinished,
   stalePartials,
   usedBytes as sumUsed,
 } from './maps-logic.js';
@@ -139,7 +141,7 @@ export const downloadsList = () => visibleRegions().filter((r) => ['queued', 'wa
 export const readyList = () => visibleRegions().filter((r) => r.status === 'ready' || r.status === 'updating');
 
 /** Number of regions with an update available: the badge of Settings. */
-export const updatesCount = () => visibleRegions().filter((r) => r.update && r.status === 'ready').length;
+export const updatesCount = () => visibleRegions().filter(hasUpdate).length;
 
 /** The free-space floor of this device, bytes. */
 export const floor = () => floorBytes(offlineMaps.totalBytes);
@@ -591,7 +593,10 @@ async function reconcile() {
       const file = files.find((/** @type {{id: string}} */ f) => f.id === r.id);
       const d = downloads.find((/** @type {{id: string}} */ x) => x.id === r.id);
       if (d && d.status !== 'ready') applyDownload(d);
-      else if (file && (r.status === 'ready' || r.status === 'updating')) r.sizeBytes = r.status === 'ready' ? file.sizeBytes : r.sizeBytes;
+      else if (updateFinished(r, file)) {
+        // The update finished while the app was closed or in the background: its event was missed.
+        applyDownload({ id: r.id, status: 'ready', tilesDone: r.tilesTotal, tilesTotal: r.tilesTotal, bytesReceived: file.sizeBytes });
+      } else if (file && (r.status === 'ready' || r.status === 'updating')) r.sizeBytes = r.status === 'ready' ? file.sizeBytes : r.sizeBytes;
       else if (file && !d) {
         // The region became ready while the app was closed.
         applyDownload({ id: r.id, status: 'ready', tilesDone: r.tilesTotal, tilesTotal: r.tilesTotal, bytesReceived: file.sizeBytes });
