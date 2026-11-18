@@ -5,25 +5,25 @@ Their use follows each provider's guidelines (button titles, colours, minimum si
 
 ## Google
 
-- `google-g.svg`: the Google "G" (standard colour version).
-- Source: the download bundle `signin-assets.zip` of the Sign in with Google branding guidelines,
-  <https://developers.google.com/identity/branding-guidelines> (bundle: <https://developers.google.com/static/identity/images/signin-assets.zip>).
-- The file is `Android + Web/SVG/Light/Theme=Light, Show text=No, Shape=Pill, Platform=Android+Web.svg` of the bundle, with
-  only its two button-boundary paths (white disc and grey stroke) removed and the `viewBox` set to the logo's own
-  20 x 20 square (`10 10 20 20`). The logo's paths, mask, gradient and filters are unchanged.
+- `google-g.svg`: the four-colour Google "G" (24 x 24, the logo has a 1 px margin), shown at 22 x 22 so the letter itself is
+  about 20 px.
+- Source: supplied by Christian, 18 November 2026 (`docs/brand/google-g.svg`), the same icon as in the mock-ups; the
+  paths are the ones of the Google identity branding guidelines, <https://developers.google.com/identity/branding-guidelines>.
 - Rules followed (custom button): "Continue with Google" title; light theme fill `#FFFFFF`, stroke `#747775`, text
   `#1F1F1F`; dark theme fill `#131314`, stroke `#8E918F`, text `#E3E3E3` (`--od-brand-google-*` in `theme.css`); the
-  "G" at its fixed size of 20 px, 12 px of padding before it and 10 px after it; same standard colour "G" in both themes.
-  The title uses the app's font (weight 500), not Google Sans.
+  standard colour "G" in both themes, never recoloured; 12 px of padding before it and 10 px after it. The title uses
+  the app's font (weight 500), not Google Sans.
 
 ## Apple
 
-- `apple-logo-black.svg` ("Left Black Logo Medium") and `apple-logo-white.svg` ("Left White Logo Medium"): unchanged
-  files of the Sign in with Apple logo artwork (logo with text, medium size, 44 pt high).
-- Source: "Sign in with Apple Logo" of Apple Design Resources, <https://developer.apple.com/design/resources/>
-  (<https://devimages-cdn.apple.com/design/resources/download/Logo-Sign-in-with-Apple.dmg>); guidelines:
-  <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>.
+- `apple-logo-black.svg`: the Apple logo, black. Source: supplied by Christian, 18 November 2026
+  (`docs/brand/apple-logo-black.svg`), unchanged.
+- `apple-logo-white.svg`: the same file with the fill colour set to white (`fill="#FFFFFF"` on its path), nothing else
+  changed; it is used on the black button of the dark theme.
+- Shown 22 px high, the width follows (about 18 px).
+- Guidelines: Sign in with Apple, <https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple>;
+  logo artwork: Apple Design Resources, <https://developer.apple.com/design/resources/>.
 - Rules followed (custom button): title "Continue with Apple" (translated); the button is white with the black logo and
   black title (light theme) or black with the white logo and white title (dark theme), the colour being the only
-  difference (`--od-brand-apple-*` in `theme.css`); the logo file is as high as the button and is not cropped; no
-  vertical padding is added; the button is far above the 140 x 30 pt minimum.
+  difference (`--od-brand-apple-*` in `theme.css`); the logo is never recoloured other than black or white; the button
+  is far above the 140 x 30 pt minimum.

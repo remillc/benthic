@@ -129,8 +129,7 @@
       <span class="od-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
     </button>
     <button type="button" class="od-plus--provider od-plus--provider-apple" onclick={() => provider('apple')}>
-      <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" />
-      <img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
+      <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
     </button>
     <button type="button" class="od-plus--provider od-plus--provider-main" onclick={() => go('email')}>
       <Icon name="mail" size={22} />{t('odplus.connect.email')}
@@ -278,8 +277,8 @@
       }
     }
 
-    /* Google: white (light) or #131314 (dark) with a thin stroke, the "G" at its fixed 20 px with 12 px before it and
-       10 px after it (Sign in with Google branding guidelines, custom button). */
+    /* Google: white (light) or #131314 (dark) with a thin stroke. The supplied "G" is a 24 x 24 picture with a 1 px margin,
+       shown at 22 x 22: the letter itself is about 20 px, the size the guidelines fix (custom button). */
     .od-plus--provider-google {
       gap: 10px;
       padding: 0 16px 0 12px;
@@ -298,15 +297,20 @@
     .od-plus--google-logo {
       flex: none;
       display: flex;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
+
+      :global(svg) {
+        width: 22px;
+        height: 22px;
+      }
     }
 
-    /* Apple: a white or black button, the logo file as high as the button (its own padding positions it), the title in the
-       logo's colour (Sign in with Apple guidelines, custom button). */
+    /* Apple: a white or black button, the logo 22 px high (width follows), the title in the logo's colour
+       (Sign in with Apple guidelines, custom button). */
     .od-plus--provider-apple {
-      gap: 0;
-      padding: 0 20px 0 0;
+      gap: 12px;
+      padding: 0 20px;
       border-color: var(--od-brand-apple-border);
       background: var(--od-brand-apple-bg);
       color: var(--od-brand-apple-ink);
@@ -321,10 +325,8 @@
 
     .od-plus--apple-logo {
       flex: none;
-      height: 100%;
+      height: 22px;
       width: auto;
-      /* The logo file is a square-cornered picture on the button's own colour: the button's corners clip it. */
-      border-radius: 28px 0 0 28px;
     }
 
     .od-plus--apple-logo-dark {
