@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 96
+Next number: 97
 
 ## List
 
@@ -48,3 +48,4 @@ Next number: 96
 - #93 [code] Bogue : après une mise à jour de cartes, le chip sur l'icône du bureau s'affiche toujours.
 - #94 [code] Bogue (capture d'écran du 18 novembre 2026, Sites sur téléphone, carte des Bahamas, « 13 sites dans cette zone ») : la punaise indique 2 sites alors qu'il y en a davantage.
 - #95 [design] Sites : utiliser une icône distincte pour les sites groupés.
+- #96 [design] trouver des photos de tous les ordinateurs de plongée
