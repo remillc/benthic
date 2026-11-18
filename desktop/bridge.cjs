@@ -30,6 +30,7 @@
 //   credentials.clear(kind?) forgets one kind, or both without an argument
 //   fs.writeFile({area, name, base64})  stages a file in <temp>/<area> ('import' or 'share'):
 //                            resolves { path }; the name is reduced to its base name
+//   fs.appendFile({path, base64})  adds bytes to a file of <temp> (the full export is written chunk by chunk)
 //   fs.readFile({path})      the bytes of a file of <temp>, base64 (at most 100 MB)
 //   fs.remove({path})        deletes a file of <temp>; resolves true when it existed
 //   fs.exists({path})        a path of userData or temp exists
@@ -800,6 +801,12 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
         const file = path.join(dir, safeName(options.name, 'file'));
         fs.writeFileSync(file, Buffer.from(options.base64, 'base64'));
         return { path: file };
+      }
+      case 'appendFile': {
+        if (!allowed(options.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
+        if (typeof options.base64 !== 'string') throw new Error('BAD_ARGUMENT: no data');
+        fs.appendFileSync(options.path, Buffer.from(options.base64, 'base64'));
+        return true;
       }
       case 'readFile': {
         if (!allowed(options.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');

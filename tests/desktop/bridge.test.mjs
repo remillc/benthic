@@ -240,6 +240,15 @@ test('files: staged in temp, read back, deleted; names reduced; nothing outside'
   assert.match((await rejection(invoke('od:fs', 'exists', { path: path.join(root, 'outside') }))).message, /not an allowed path/);
 });
 
+test('files: appendFile adds bytes to a staged file, in temp only', async () => {
+  const b64 = (t) => Buffer.from(t).toString('base64');
+  const { path: staged } = await invoke('od:fs', 'writeFile', { area: 'share', name: 'export.zip', base64: b64('ab') });
+  assert.equal(await invoke('od:fs', 'appendFile', { path: staged, base64: b64('cd') }), true);
+  assert.equal(Buffer.from(await invoke('od:fs', 'readFile', { path: staged }), 'base64').toString(), 'abcd');
+  await invoke('od:fs', 'remove', { path: staged });
+  assert.match((await rejection(invoke('od:fs', 'appendFile', { path: path.join(root, 'outside'), base64: b64('x') }))).message, /not an allowed path/);
+});
+
 test('files: only logbook folders of userData are removed or renamed', async () => {
   const kept = path.join(userData, 'carnet.new');
   mkdirSync(kept);

@@ -437,7 +437,17 @@ An OD+ logbook already holds Subsurface data, so **the export to Subsurface is d
 
 Using the dives in Subsurface desktop is supported **through this export**. Opening the `main` branch of the repository directly is technically possible but not the supported way. Data that Subsurface has no place for (inventory, kits, maintenance, certifications, gas analyses, diver profile) lives on the `opendives` branch and is not in the Subsurface export.
 
-**Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the dives, the files of the `opendives` branch, the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, distinct from the Subsurface export; its exact packaging is decided when its screen is designed.
+**Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the dives, the files of the `opendives` branch, the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, distinct from the Subsurface export.
+
+**Packaging (decided on 18 November 2026, engine in `app/src/lib/full-export.js` and `zip-stream.js`):** one ZIP archive in open formats, named `opendives-data-YYYY-MM-DD.zip`:
+
+- `manifest.json` at the root: format version, app version, export date, whether the media are in it, whether it holds sensitive data, and every file with its size and SHA-256 (the files not fetched are listed under `skipped`);
+- `logbook/logbook.ssrf`: the logbook in Subsurface's format, written by the core's own export;
+- `opendives/`: what only OpenDives keeps, as JSON: `gear/`, `kits/`, `maintenance/`, `dive-equipment/` (as stored, unknown fields kept), `profile/diver.json`, `certifications/<id>.json` with their card photos in `certifications/photos/`, `media/` (photos of pieces and invoices), `settings.json` (the device's settings and the core's preferences). The device's own state (`meta/`: data key, pending list) and the account's credentials are never exported;
+- `dive-media/`: the original photos and videos of the dives, **only when the diver chooses it at export time** (the screen shows the size with and without them; originals only on the OpenDives server count as « to download »);
+- the **sensitive items are in clear text** in the archive (date of birth, emergency contact, blood group while the health consent is given, certifications and their photos): the device opens them with its key before writing. An explicit warning screen comes before the export. The archive is not encrypted.
+
+It is written chunk by chunk (a streaming ZIP writer, stored or deflated entries, ZIP64 for entries of 4 GiB and more) to a file in the app's cache (phone) or temp folder (desktop), so memory stays flat with large videos; it reports its progress in bytes (for the time-left estimator), can be cancelled, and deletes the partial file on cancel or failure. The last step is the system's: the share sheet on the phone, the save dialog on the desktop; the cache copy is deleted afterwards.
 
 ### 11.5 Sensitive data: encrypted on the device
 

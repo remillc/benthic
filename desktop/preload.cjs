@@ -48,6 +48,7 @@ contextBridge.exposeInMainWorld('odDesktop', {
   server: { request: (options) => invoke('od:server', options) },
   fs: {
     writeFile: (options) => invoke('od:fs', 'writeFile', options),
+    appendFile: (options) => invoke('od:fs', 'appendFile', options),
     readFile: (options) => invoke('od:fs', 'readFile', options),
     remove: (options) => invoke('od:fs', 'remove', options),
     exists: (options) => invoke('od:fs', 'exists', options),

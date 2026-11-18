@@ -95,3 +95,18 @@ export const deviceStore = {
     system?.remove({ key }).catch((/** @type {unknown} */ e) => console.error('Removing a setting', key, e));
   },
 };
+
+/**
+ * Every setting kept on this device, for the full export: key to text, without the store's own bookkeeping key and
+ * without any key that names a secret (the account's credentials live in the secure storage, never here).
+ * @returns {Record<string, string>}
+ */
+export function deviceSettingsSnapshot() {
+  /** @type {Record<string, string>} */
+  const out = {};
+  for (const [key, value] of [...memory].sort(([a], [b]) => a.localeCompare(b))) {
+    if (key === MOVED_KEY || NOT_SETTINGS.has(key) || /token|password|secret|session|credential/i.test(key)) continue;
+    out[key] = value;
+  }
+  return out;
+}
