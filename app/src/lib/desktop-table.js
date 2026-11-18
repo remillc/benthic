@@ -12,6 +12,7 @@
 
 /**
  * @typedef {{key: string, label: string, numeric: boolean, defaultShown: boolean,
+ *   sortable?: boolean,
  *   value: (dive: import('opendives-core').Dive, extra: DiveColumns|undefined) => string|number}} Column
  */
 
@@ -31,6 +32,8 @@ export const COLUMNS = [
   { key: 'maxDepth', label: 'desktop.column.maxDepth', numeric: true, defaultShown: true, value: (d) => d.maxDepthMm },
   { key: 'duration', label: 'desktop.column.duration', numeric: true, defaultShown: true, value: (d) => d.durationSeconds },
   { key: 'buddies', label: 'desktop.column.buddies', numeric: false, defaultShown: true, value: (_, x) => x?.buddies?.[0] ?? '' },
+  // The small dive graphs (task 2026-11-18-279): off by default, chosen with the columns button; not sortable.
+  { key: 'profile', label: 'desktop.column.profile', numeric: false, defaultShown: false, sortable: false, value: (d) => d.maxDepthMm },
   { key: 'waterTemp', label: 'desktop.column.waterTemp', numeric: true, defaultShown: false, value: (_, x) => x?.waterTempMk ?? 0 },
   { key: 'guides', label: 'desktop.column.guides', numeric: false, defaultShown: false, value: (_, x) => joined(x?.guides) },
   { key: 'computer', label: 'desktop.column.computer', numeric: false, defaultShown: false, value: (_, x) => x?.computer ?? '' },
@@ -45,7 +48,7 @@ export const COLUMNS = [
 ];
 
 /** The narrowest a column reads well, in px (fluid layout: the columns that do not fit are left out). */
-export const COLUMN_MIN_WIDTH = { number: 48, date: 170, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+export const COLUMN_MIN_WIDTH = { number: 48, date: 170, profile: 88, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
 
 /**
  * The columns that fit in a table `width` px wide: N° and Date always, then the others in the diver's order while
@@ -72,7 +75,7 @@ export function fittingColumns(columns, width, widths = {}) {
 }
 
 /** The width the stylesheet gives a column when the diver gave none, in px (the others: 140). */
-const COLUMN_DEFAULT_WIDTH = { number: 48, date: 170, site: 244, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+const COLUMN_DEFAULT_WIDTH = { number: 56, date: 188, profile: 96, site: 244, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
 
 /**
  * The width a column has when every column has its own: the diver's, else the default.
@@ -223,7 +226,7 @@ export function sortDives(dives, extras, sort) {
 }
 
 /**
- * @typedef {{type: 'dive', dive: import('opendives-core').Dive, inTrip: boolean}
+ * @typedef {{type: 'dive', dive: import('opendives-core').Dive, inTrip: boolean, last?: boolean}
  *   | {type: 'trip', id: number, location: string, dives: import('opendives-core').Dive[], expanded: boolean}} TableRow
  */
 
@@ -260,7 +263,8 @@ export function tableRows(sorted, sort, collapsed) {
     const dives = byTrip.get(d.trip.id) ?? [d];
     const expanded = !collapsed[d.trip.id];
     rows.push({ type: 'trip', id: d.trip.id, location: d.trip.location, dives, expanded });
-    if (expanded) for (const dive of dives) rows.push({ type: 'dive', dive, inTrip: true });
+    // `last`: the dive that closes the trip's card (its bottom corners are the card's).
+    if (expanded) dives.forEach((dive, i) => rows.push({ type: 'dive', dive, inTrip: true, last: i === dives.length - 1 }));
   }
   return rows;
 }
@@ -459,6 +463,8 @@ export const ROW_HEIGHT = 50;
 export const TRIP_HEIGHT = 46;
 /** From the top of the table to the first row: spacing, header (36), spacing. */
 export const BODY_TOP = 40;
+/** The same with the sticky year line under the header: its 30 px and the spacing after it (task 2026-11-18-279). */
+export const BODY_TOP_YEAR = BODY_TOP + 32;
 /** Rows kept drawn above and below the view, so a fast scroll or a held key finds rows in place. */
 export const OVERSCAN = 10;
 
@@ -495,11 +501,12 @@ export function rowAt(offsets, y) {
  * @param {Float64Array} offsets from rowOffsets
  * @param {number} scrollTop
  * @param {number} viewHeight the scroll area's height; unknown (0) counts as a tall screen
+ * @param {number} [bodyTop] from the top of the table to the first row (BODY_TOP, or BODY_TOP_YEAR with the year line)
  * @returns {{start: number, end: number, padTop: number, padBottom: number}}
  */
-export function windowRange(offsets, scrollTop, viewHeight) {
+export function windowRange(offsets, scrollTop, viewHeight, bodyTop = BODY_TOP) {
   const n = offsets.length - 1;
-  const top = scrollTop - BODY_TOP;
+  const top = scrollTop - bodyTop;
   const start = Math.max(0, rowAt(offsets, top) - OVERSCAN);
   const end = Math.min(n, rowAt(offsets, top + (viewHeight || 900)) + 1 + OVERSCAN);
   return {
@@ -516,13 +523,52 @@ export function windowRange(offsets, scrollTop, viewHeight) {
  * @param {number} index
  * @param {number} scrollTop
  * @param {number} viewHeight
+ * @param {number} [bodyTop] from the top of the table to the first row (BODY_TOP, or BODY_TOP_YEAR with the year line)
  */
-export function scrollForRow(offsets, index, scrollTop, viewHeight) {
+export function scrollForRow(offsets, index, scrollTop, viewHeight, bodyTop = BODY_TOP) {
   if (index < 0 || index >= offsets.length - 1) return scrollTop;
-  const top = BODY_TOP + offsets[index];
+  const top = bodyTop + offsets[index];
   const bottom = top + (offsets[index + 1] - offsets[index]) - 2;
-  const head = BODY_TOP - 2;
+  const head = bodyTop - 2;
   if (top - head < scrollTop) return Math.max(0, top - head);
   if (bottom > scrollTop + viewHeight) return bottom - viewHeight;
   return scrollTop;
+}
+
+// --- The sticky year line (task 2026-11-18-279): « 2026 · 3 plongées », the year of the first visible dive. ---
+
+/** The year line only means something when the rows follow the dates (or the numbers, which follow them). @param {Sort} sort */
+export const showsYearLine = (sort) => sort.key === 'date' || sort.key === 'number';
+
+/**
+ * How many of the listed dives each year holds.
+ * @param {import('opendives-core').Dive[]} dives
+ * @returns {Map<string, number>}
+ */
+export function yearCounts(dives) {
+  /** @type {Map<string, number>} */
+  const counts = new Map();
+  for (const d of dives) {
+    const year = d.date.slice(0, 4);
+    counts.set(year, (counts.get(year) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
+ * The year and dive count the sticky line shows for a scroll position: those of the first row that reaches below
+ * the sticky header (a trip counts by its first dive). Null when there is no row.
+ * @param {TableRow[]} rows
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} scrollTop
+ * @param {Map<string, number>} counts from yearCounts
+ * @returns {{year: string, count: number}|null}
+ */
+export function yearLineAt(rows, offsets, scrollTop, counts) {
+  if (!rows.length) return null;
+  const row = rows[Math.min(rows.length - 1, rowAt(offsets, Math.max(0, scrollTop)))];
+  const dive = row.type === 'trip' ? row.dives[0] : row.dive;
+  if (!dive) return null;
+  const year = dive.date.slice(0, 4);
+  return { year, count: counts.get(year) ?? 0 };
 }

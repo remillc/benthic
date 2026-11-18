@@ -11,6 +11,7 @@
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import FabMenu from '../components/FabMenu.svelte';
+  import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
   import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
   import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
@@ -59,8 +60,13 @@
     rowOffsets,
     windowRange,
     scrollForRow,
+    BODY_TOP,
+    BODY_TOP_YEAR,
+    showsYearLine,
+    yearCounts,
+    yearLineAt,
   } from '../lib/desktop-table.js';
-  import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatShortDate, formatTimeOfDay } from '../lib/format.js';
+  import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatWeekdayDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
 
@@ -134,7 +140,12 @@
   let scrollTop = $state(0);
   let viewHeight = $state(0);
   const offsets = $derived(rowOffsets(rows));
-  const win = $derived(windowRange(offsets, scrollTop, viewHeight));
+  // The sticky year line sits under the header when the rows follow the dates (task 2026-11-18-279).
+  const yearLineShown = $derived(showsYearLine(desk.sort));
+  const bodyTop = $derived(yearLineShown ? BODY_TOP_YEAR : BODY_TOP);
+  const counts = $derived(yearCounts(sorted));
+  const yearLine = $derived(yearLineShown ? yearLineAt(rows, offsets, scrollTop, counts) : null);
+  const win = $derived(windowRange(offsets, scrollTop, viewHeight, bodyTop));
   const windowStart = $derived(win.start);
   const windowEnd = $derived(win.end);
   const visibleRows = $derived(rows.slice(windowStart, windowEnd));
@@ -145,12 +156,12 @@
   function scrollToDive(/** @type {number|null} */ id) {
     if (!tableEl || id == null) return;
     const i = rows.findIndex((r) => r.type === 'dive' && r.dive.id === id);
-    tableEl.scrollTop = scrollForRow(offsets, i, tableEl.scrollTop, tableEl.clientHeight);
+    tableEl.scrollTop = scrollForRow(offsets, i, tableEl.scrollTop, tableEl.clientHeight, bodyTop);
     scrollTop = tableEl.scrollTop;
   }
 
   // The columns' extra values follow the logbook, when a shown column or the sort reads them.
-  const NO_EXTRAS = new Set(['number', 'date', 'site', 'maxDepth', 'duration']);
+  const NO_EXTRAS = new Set(['number', 'date', 'site', 'maxDepth', 'duration', 'profile']);
   const needsExtras = $derived(columnsNow.some((c) => !NO_EXTRAS.has(c.key)) || !NO_EXTRAS.has(desk.sort.key));
   $effect(() => {
     if (logbook.loading || logbook.error || !needsExtras) return;
@@ -209,11 +220,13 @@
       case 'number':
         return dive.number ? String(dive.number) : '';
       case 'date':
-        return t('desktop.dateTime', { date: formatShortDate(dive.date), time: formatTimeOfDay(dive.date) });
+        return t('desktop.dateTime', { date: formatWeekdayDate(dive.date), time: formatTimeOfDay(dive.date) });
       case 'site':
         return dive.site || t('desktop.noSite');
       case 'maxDepth':
         return dive.maxDepthMm ? formatDepth(dive.maxDepthMm, p) : '';
+      case 'profile':
+        return '';
       case 'duration':
         return dive.durationSeconds ? formatMinutes(dive.durationSeconds) : '';
       case 'waterTemp':
@@ -515,7 +528,7 @@
     /** @param {PointerEvent} m */
     const move = (m) => {
       if (!dragging && Math.abs(m.clientX - startX) < 5) return;
-      const heads = [...table.querySelectorAll('th')].map((h) => {
+      const heads = [...table.querySelectorAll('th[data-col]')].map((h) => {
         const r = h.getBoundingClientRect();
         return { key: /** @type {string} */ (h.dataset.col), left: r.left, right: r.right };
       });
@@ -560,6 +573,7 @@
       movedByDrag = false;
       return;
     }
+    if (COLUMNS.find((c) => c.key === key)?.sortable === false) return;
     setSort(nextSort(desk.sort, key));
   }
 
@@ -971,6 +985,7 @@
                   data-col={column.key}
                   class:od-desktop-logbook--slot={dragging?.key === column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
+                  class:od-desktop-logbook--plain={column.sortable === false}
                   style:width={desk.columnWidths[column.key] || exactWidths ? `${columnWidth(column.key, desk.columnWidths)}px` : undefined}
                   onpointerdown={(e) => headDown(e, column.key)}
                 >
@@ -995,13 +1010,21 @@
                 </th>
               {/each}
             </tr>
+            {#if yearLineShown}
+              <!-- The year and dive count of the first visible dive; sticky under the header. Decorative: the rows say the rest. -->
+              <tr class="od-desktop-logbook--year-row" aria-hidden="true">
+                <th class="od-desktop-logbook--year" colspan={columnsNow.length}>
+                  {#if yearLine}<span class="od-desktop-logbook--year-title">{t('desktop.yearLine', { year: yearLine.year, dives: t('trip.dives', { n: yearLine.count }) })}</span>{/if}
+                </th>
+              </tr>
+            {/if}
           </thead>
           <tbody>
             {#if padTop}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padTop}px"></td></tr>{/if}
             {#each visibleRows as row, at (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
-                <tr class="od-desktop-logbook--trip" aria-rowindex={windowStart + at + 2}>
+                <tr class="od-desktop-logbook--trip" class:od-desktop-logbook--folded={!row.expanded} aria-rowindex={windowStart + at + 2}>
                   <td colspan={columnsNow.length}>
                     <button
                       type="button"
@@ -1019,6 +1042,8 @@
                 {@const dive = row.dive}
                 <tr
                   class="od-desktop-logbook--row"
+                  class:od-desktop-logbook--in-trip={row.inTrip}
+                  class:od-desktop-logbook--trip-end={row.inTrip && row.last}
                   class:od-desktop-logbook--selected={selected.has(dive.id)}
                   class:od-desktop-logbook--focus={desk.selection.focus === dive.id}
                   aria-selected={selected.has(dive.id)}
@@ -1032,10 +1057,14 @@
                     <td
                       data-col={column.key}
                       class:od-desktop-logbook--numeric={column.numeric}
-                      class:od-desktop-logbook--deep={column.key === 'maxDepth' && dive.maxDepthMm >= 40000}
+                      class:od-desktop-logbook--strong={column.key === 'maxDepth' || column.key === 'number'}
                     >
                       {#if column.key === 'site'}
-                        {#if dive.site}<span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="place" size={14} /></span>{dive.site}{:else}<span class="od-desktop-logbook--no-site">{t('desktop.noSite')}</span>{/if}
+                        {#if dive.site}<span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="place" size={14} /></span>{dive.site}{:else}<span class="od-desktop-logbook--no-site"><span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="pinOff" size={14} /></span>{t('desktop.noSite')}</span>{/if}
+                      {:else if column.key === 'date'}
+                        {formatWeekdayDate(dive.date)}<span class="od-desktop-logbook--time">{' · ' + formatTimeOfDay(dive.date)}</span>
+                      {:else if column.key === 'profile'}
+                        <span class="od-desktop-logbook--profile"><ProfileThumbnail profile={dive.profile ?? []} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} wide /></span>
                       {:else if column.key === 'buddies'}
                         {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="od-desktop-logbook--buddy"><span class="od-desktop-logbook--initial" aria-hidden="true">{name.charAt(0).toLocaleUpperCase()}</span>{name}</span>{/each}
                       {:else}{cell(column.key, dive)}{/if}
@@ -1250,10 +1279,29 @@
       height: 36px;
       padding: 0;
       background: var(--od-background);
+      /* The 2 px between the header and the year line (or the first row) hides the rows passing under. */
+      box-shadow: 0 2px 0 var(--od-background);
       font-size: 13px;
       font-weight: 500;
       text-align: start;
       color: var(--od-text-2);
+    }
+    /* The sticky year line (task 2026-11-18-279): under the header, on the list's background; the rows pass under both. */
+    .od-desktop-logbook--year {
+      position: sticky;
+      top: 38px;
+      z-index: 1;
+      height: 30px;
+      padding: 0 10px;
+      background: var(--od-background);
+      box-shadow: 0 2px 0 var(--od-background);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: start;
+      color: var(--od-text-2);
+    }
+    .od-desktop-logbook--plain button {
+      cursor: default;
     }
     .od-desktop-logbook--head button {
       width: 100%;
@@ -1298,10 +1346,13 @@
       margin-inline-start: 4px;
     }
     [data-col='number'] {
-      width: 48px;
+      width: 56px;
     }
     [data-col='date'] {
-      width: 170px;
+      width: 188px;
+    }
+    [data-col='profile'] {
+      width: 96px;
     }
     [data-col='maxDepth'] {
       width: 84px;
@@ -1339,39 +1390,77 @@
       border-radius: 0 12px 12px 0;
     }
     .od-desktop-logbook--row td[data-col='number'] {
-      font-size: 13px;
+      font-weight: 600;
+    }
+    .od-desktop-logbook--row td[data-col='site'] {
+      font-weight: 500;
+    }
+    .od-desktop-logbook--time {
+      font-size: 12px;
       color: var(--od-text-2);
+    }
+    .od-desktop-logbook--profile {
+      display: inline-flex;
+      vertical-align: middle;
     }
     .od-desktop-logbook--row:hover td {
       background: color-mix(in srgb, var(--od-text) 4%, transparent);
     }
+    /* Selection (task 2026-11-18-279): pale blue, with the number and the site in blue. */
     .od-desktop-logbook--selected td,
     .od-desktop-logbook--selected:hover td {
       background: var(--od-table-selected);
+    }
+    .od-desktop-logbook--selected td[data-col='number'],
+    .od-desktop-logbook--selected td[data-col='site'] {
       color: var(--od-on-table-selected);
     }
     @media (hover: hover) and (pointer: fine) {
       .od-desktop-logbook--selected:hover td {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--od-on-table-selected) 8%, transparent);
       }
-    }
-    .od-desktop-logbook--selected td[data-col='number'] {
-      color: inherit;
+      .od-desktop-logbook--in-trip.od-desktop-logbook--selected:hover td {
+        box-shadow:
+          inset 0 0 0 100vmax color-mix(in srgb, var(--od-on-table-selected) 8%, transparent),
+          0 2px 0 var(--od-surface);
+      }
     }
     .od-desktop-logbook--pin {
       display: inline-flex;
       vertical-align: -2px;
       margin-inline-end: 6px;
+      color: var(--od-text-2);
     }
     .od-desktop-logbook--no-site {
       font-style: italic;
+      font-weight: 400;
       color: var(--od-text-2);
     }
-    .od-desktop-logbook--selected .od-desktop-logbook--no-site {
-      color: inherit;
+    .od-desktop-logbook--strong {
+      font-weight: 700;
     }
-    .od-desktop-logbook--deep {
-      font-weight: 600;
+    /* A trip is a white card of 20 px corners: its header, then its dives (their gaps filled in white). */
+    .od-desktop-logbook--in-trip:not(.od-desktop-logbook--selected) td {
+      background: var(--od-surface);
+    }
+    .od-desktop-logbook--in-trip td {
+      box-shadow: 0 2px 0 var(--od-surface);
+    }
+    .od-desktop-logbook--in-trip td:first-child,
+    .od-desktop-logbook--in-trip td:last-child {
+      border-radius: 0;
+    }
+    .od-desktop-logbook--trip-end td {
+      box-shadow: none;
+    }
+    .od-desktop-logbook--trip-end td:first-child {
+      border-radius: 0 0 0 20px;
+    }
+    .od-desktop-logbook--trip-end td:last-child {
+      border-radius: 0 0 20px 0;
+    }
+    .od-desktop-logbook--in-trip:not(.od-desktop-logbook--selected):hover td {
+      background: color-mix(in srgb, var(--od-text) 4%, var(--od-surface));
     }
     .od-desktop-logbook--buddy {
       display: inline-flex;
@@ -1395,7 +1484,14 @@
       height: 44px;
     }
     .od-desktop-logbook--trip td {
-      padding: 4px 0;
+      padding: 0;
+      background: var(--od-surface);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 2px 0 var(--od-surface);
+    }
+    .od-desktop-logbook--folded td {
+      border-radius: 20px;
+      box-shadow: none;
     }
     .od-desktop-logbook--pad td {
       padding: 0;
@@ -1405,11 +1501,11 @@
       align-items: center;
       gap: 8px;
       width: 100%;
-      height: 36px;
-      padding: 0 12px;
+      height: 44px;
+      padding: 0 16px;
       border: 0;
-      border-radius: 12px;
-      background: var(--od-trip-band);
+      border-radius: inherit;
+      background: none;
       font: inherit;
       color: var(--od-text);
       text-align: start;

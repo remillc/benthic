@@ -273,3 +273,55 @@ test('columns and widths are stored per logbook through the device store only (t
   assert.match(src, /deviceStore\.setItem\(logbookKey\(COLUMN_WIDTHS_KEY\)/);
   assert.doesNotMatch(src, /localStorage/);
 });
+
+// --- Task 2026-11-18-279, item 2: the lighter desktop list. ---
+
+test('the Profile column is in the picker, off by default, and never sortable', async () => {
+  const { COLUMNS, DEFAULT_COLUMNS, shownColumns, toggleColumn } = await import('../../app/src/lib/desktop-table.js');
+  const profile = COLUMNS.find((c) => c.key === 'profile');
+  assert.ok(profile);
+  assert.equal(profile.defaultShown, false);
+  assert.equal(profile.sortable, false);
+  assert.ok(!DEFAULT_COLUMNS.includes('profile'));
+  assert.deepEqual(DEFAULT_COLUMNS, ['number', 'date', 'site', 'maxDepth', 'duration', 'buddies']);
+  // The picker adds it last; a saved order is kept as it is (defaults apply only when nothing is saved).
+  const saved = ['number', 'buddies', 'date', 'site'];
+  assert.deepEqual(shownColumns(toggleColumn(saved, 'profile')).map((c) => c.key), ['number', 'buddies', 'date', 'site', 'profile']);
+  assert.deepEqual(shownColumns(saved).map((c) => c.key), saved);
+});
+
+test('tableRows marks the dive that closes a trip card', async () => {
+  const { tableRows, DEFAULT_SORT } = await import('../../app/src/lib/desktop-table.js');
+  const d = (id, tripId) => ({ id, number: id, date: `2013-02-0${id}T10:00:00`, trip: tripId ? { id: tripId, location: '' } : null });
+  const rows = tableRows([d(3, 7), d(2, 7), d(1, 0)], DEFAULT_SORT, {});
+  assert.deepEqual(rows.filter((r) => r.type === 'dive').map((r) => [r.dive.id, r.inTrip, !!r.last]), [[3, true, false], [2, true, true], [1, false, false]]);
+});
+
+test('the year line follows the first visible dive and counts the year', async () => {
+  const { yearCounts, yearLineAt, rowOffsets, tableRows, DEFAULT_SORT, showsYearLine, windowRange, BODY_TOP, BODY_TOP_YEAR, ROW_HEIGHT } = await import('../../app/src/lib/desktop-table.js');
+  const dives = [];
+  for (let i = 0; i < 3; i++) dives.push({ id: 10 - i, number: 10 - i, date: `2026-0${3 - i}-01T10:00:00`, trip: null });
+  for (let i = 0; i < 4; i++) dives.push({ id: 6 - i, number: 6 - i, date: `2013-02-0${4 - i}T10:00:00`, trip: { id: 1, location: '' } });
+  const rows = tableRows(dives, DEFAULT_SORT, {});
+  const counts = yearCounts(dives);
+  assert.equal(counts.get('2026'), 3);
+  const o = rowOffsets(rows);
+  assert.deepEqual(yearLineAt(rows, o, 0, counts), { year: '2026', count: 3 });
+  assert.deepEqual(yearLineAt(rows, o, 2 * ROW_HEIGHT + 10, counts), { year: '2026', count: 3 });
+  // The trip row reaches the top: its first dive's year.
+  assert.deepEqual(yearLineAt(rows, o, 3 * ROW_HEIGHT, counts), { year: '2013', count: 4 });
+  assert.equal(yearLineAt([], new Float64Array(1), 0, counts), null);
+  assert.equal(showsYearLine({ key: 'date', descending: true }), true);
+  assert.equal(showsYearLine({ key: 'maxDepth', descending: true }), false);
+  // The window starts later when the year line makes the sticky area taller.
+  const big = rowOffsets(Array.from({ length: 500 }, () => ({ type: 'dive' })));
+  assert.ok(windowRange(big, 5000, 800, BODY_TOP_YEAR).start <= windowRange(big, 5000, 800, BODY_TOP).start);
+  assert.equal(BODY_TOP_YEAR - BODY_TOP, 32);
+});
+
+test('the Date column reads « lun. 14 sept. 2026 » with the weekday', async () => {
+  const { formatWeekdayDate } = await import('../../app/src/lib/format.js');
+  const text = formatWeekdayDate('2026-09-14T10:15:00');
+  assert.match(text, /^\p{L}+\.? /u);
+  assert.match(text, /2026/);
+});

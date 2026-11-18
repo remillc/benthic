@@ -256,6 +256,17 @@ export function formatShortDate(iso) {
   return settings.dateFormat === 'system' ? dateOnlyFormat.format(date) : formatDateChoice(date, settings.dateFormat);
 }
 
+const weekdayFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
+
+/**
+ * Short date with the day of the week before it, in the format chosen in Settings: "lun. 14 sept. 2026" (the desktop
+ * logbook's Date column; the time follows it in small grey text).
+ * @param {string} iso
+ */
+export function formatWeekdayDate(iso) {
+  return `${weekdayFormat.format(toDate(iso))} ${formatShortDate(iso)}`;
+}
+
 /** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */
 export function formatLongDate(iso) {
   return firstOfMonth(longDateFormat.format(toDate(iso)));

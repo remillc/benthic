@@ -2168,6 +2168,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet sur ordinateur : le tableau est plus léger. Colonnes par défaut : numéro en gras, date avec le jour de la semaine et l'heure en petit gris, site (ou « Site à préciser » en gris italique avec un repère barré), profondeur maximale en gras, durée, compagnons. La colonne « Profil » (petits graphiques de plongée) est cachée par défaut et se coche avec le bouton des colonnes ; les colonnes et largeurs que vous avez choisies sont conservées. Une ligne sous les en-têtes indique l'année et le nombre de plongées de la première plongée visible, et reste en haut pendant le défilement. Un voyage est une carte blanche qui se replie. La plongée sélectionnée est en bleu pâle, avec son numéro et son site en bleu.",
       "Premier lancement (édition publique) : si vous venez de l’alpha, « Importer un carnet » propose « Carnet de la version précédente », avec son nombre de plongées. Il copie ce carnet, lu sur le téléphone sans réseau, dans un nouveau carnet ; les fichiers de l’alpha ne sont pas touchés et la rangée disparaît après la copie.",
       "Édition publique : plus aucun choix pour ouvrir un carnet dans OneDrive, Google Drive ou un dépôt git personnel. « Ouvrir mon carnet » propose le serveur OpenDives, et le compte n’offre plus « Utiliser mon propre dépôt git ».",
       "Un carnet qui était sur le cloud Subsurface n'est pas ouvert ici : après une mise à jour depuis l'alpha, l'application repart de son premier lancement et laisse les fichiers de ce carnet sur le téléphone, tels quels. La page Compte ne propose plus de se connecter au cloud Subsurface. Une plongée qui ne peut pas être lue affiche une page avec « Réessayer ».",
@@ -4464,6 +4465,7 @@
     "seeInLogbook": "Voir dans le carnet"
   },
   "desktop": {
+    "yearLine": "{year} · {dives}",
     "dateTime": "{date} · {time}",
     "noSite": "Site à préciser",
     "selected": {
@@ -4490,6 +4492,7 @@
       "duration": "Durée",
       "waterTemp": "Temp.",
       "buddies": "Compagnons",
+      "profile": "Profil",
       "guides": "Guides",
       "computer": "Ordinateur",
       "gases": "Gaz",
