@@ -10,6 +10,7 @@ import { boot } from './lib/logbook.svelte.js';
 import { noteFirstOpen } from './lib/review-prompt.js';
 import { releaseLaunchScreen } from './lib/launch.js';
 import { deviceStore } from './lib/device-store.js';
+import { installRippleFix } from './lib/ripple-fix.js';
 
 observePaints();
 mark('main');
@@ -20,6 +21,7 @@ noteFirstOpen();
 // The paper grain trial's choice (task 2026-11-13-108): the grain is now always on (task 109).
 deviceStore.removeItem('od.paperGrain');
 boot();
+installRippleFix();
 
 Framework7.use(Framework7Svelte);
 

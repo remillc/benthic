@@ -44,7 +44,6 @@ Next number: 97
 - #89 [code] Quand un chip annonce des mises à jour de cartes, on ouvre l'icône compte, le message indiquant une mise à jour devrait pointer directement dans la portion carte des réglages et non aux réglages.
 - #90 [design] Mises à jour disponibles de cartes : revoir la chorégraphie en l'absence de wifi.
 - #91 [design] Améliorer le visuel de la page carnet.
-- #92 [code] Bogue sur nettoyer les sites : l'effet touch sur un bouton s'affiche au haut de l'écran au lieu de sur le bouton.
 - #93 [code] Bogue : après une mise à jour de cartes, le chip sur l'icône du bureau s'affiche toujours.
 - #94 [code] Bogue (capture d'écran du 18 novembre 2026, Sites sur téléphone, carte des Bahamas, « 13 sites dans cette zone ») : la punaise indique 2 sites alors qu'il y en a davantage.
 - #95 [design] Sites : utiliser une icône distincte pour les sites groupés.
