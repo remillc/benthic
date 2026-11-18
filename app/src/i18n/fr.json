@@ -1875,6 +1875,7 @@
     "releaseNotes": [
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
+      "Carnet : une barre de progression s'affiche en haut de la liste pendant que l'app met le carnet à jour au démarrage ; la liste est déjà là.",
       "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
       "Aides « Créer un dépôt » et « Créer un jeton d’accès » : les libellés du site sont dans des cases et les valeurs à saisir en police à chasse fixe ; les onglets GitLab et Codeberg donnent les libellés du site dans la langue de l’app, et GitLab et Codeberg ont leurs propres étapes pour le jeton.",
       "Synchronisation avec un dépôt git : un serveur qui ne répond pas n’est plus présenté comme un jeton refusé ; l’app réessaie seule.",
