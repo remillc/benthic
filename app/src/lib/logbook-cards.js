@@ -10,22 +10,23 @@
 /**
  * The rows of the logbook's virtual list, from the month groups (newest first).
  *
- * With `cards` (phone): a `year` row before the first dive of each year; the dives outside trips of a year
+ * With `cards` (phone and tablet): a `year` row before the first dive of each year; the dives outside trips of a year
  * form white cards (a run of dives between two trips); a trip is its own card, its header (`trip` row) then,
  * when it is expanded, its dives (`inTrip`). Each row of a card says whether it opens it (`cardFirst`) or
  * closes it (`cardLast`), and `gapBefore` when another card ends right above it, so that the list draws the
  * corners and the space between cards.
  *
- * Without `cards` (tablet): the flat list, the dives of an expanded trip after its row.
+ * Without `cards`: the flat list, the dives of an expanded trip after its row.
  * @template {{ id: number, trip?: {id: number}|null }} D
  * @param {{ key: string, year: number, entries: ({ type: 'dive', key: string, dive: D } | { type: 'trip', key: string, location: string, dives: D[] })[] }[]} groups
- * @param {Record<number, boolean>} expanded expanded trips, by trip identifier
+ * @param {Record<number, boolean>|((id: number) => boolean)} expanded expanded trips, by trip identifier, or a function that says it
  * @param {boolean} cards
  * @returns {any[]}
  */
 export function buildRows(groups, expanded, cards) {
   /** @type {any[]} */
   const list = [];
+  const isOpen = typeof expanded === 'function' ? expanded : (/** @type {number} */ id) => !!expanded[id];
   let year = -1;
   let run = 0;
   for (const group of groups) {
@@ -42,7 +43,7 @@ export function buildRows(groups, expanded, cards) {
       }
       const id = entry.dives[0].trip?.id ?? 0;
       list.push({ kind: 'trip', key: entry.key, index: list.length, month, id, location: entry.location, dives: entry.dives, card: `t${id}` });
-      if (expanded[id]) {
+      if (isOpen(id)) {
         entry.dives.forEach((dive, i) =>
           list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, month, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1, card: `t${id}` }),
         );

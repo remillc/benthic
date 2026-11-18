@@ -75,6 +75,7 @@
     class:od-dive-row--card-last={cardLast}
     class:od-dive-row--under-header={inTrip && tripFirst}
     class:od-dive-row--gap-before={gapBefore}
+    class:od-dive-row--card-selected={layout.split && navigation.dive === String(dive.id)}
     class:od-dive-row--appear={appear}
     data-virtual-list-index={index}
     style:top={top === undefined ? undefined : `${top}px`}
@@ -229,6 +230,11 @@
       background: var(--od-surface);
       color: var(--od-text);
       text-decoration: none;
+    }
+
+    /* Beside the detail (tablet): the dive shown keeps the pale blue of the selected rows. */
+    .od-dive-row--card-selected .od-dive-row--surface {
+      background: var(--od-table-selected);
     }
 
     .od-dive-row--card-first .od-dive-row--surface {

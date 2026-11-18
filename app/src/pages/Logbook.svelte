@@ -86,13 +86,13 @@
   /** @param {number} id */
   function toggleTrip(id) {
     if (!id) return;
-    if (!expanded[id]) {
+    if (!isOpen(id)) {
       appearing = id;
       clearTimeout(appearTimer);
       // Only while it opens: rows scrolled into view later do not slide.
       appearTimer = setTimeout(() => (appearing = 0), 400);
     }
-    expanded[id] = !expanded[id];
+    expanded[id] = !isOpen(id);
   }
 
   const all = $derived([...logbook.dives].sort((a, b) => b.date.localeCompare(a.date)));
@@ -866,13 +866,18 @@
   const monthGroups = $derived(results ? groupByMonth(results, true) : groups);
 
   /**
-   * Phone: the dives are grouped by year, in white cards (task 2026-11-18-278). The tablet keeps the flat list.
-   * Mounted from the layout, so that the rows follow a change of width.
+   * The dives are grouped by year, in white cards, on the phone (task 2026-11-18-278) and on the tablet's list pane
+   * (task 2026-11-18-279). The desktop has its own table (DesktopLogbook).
    */
-  const cards = $derived(!layout.split);
+  const cards = true;
+
+  /** Tablet: the trips are open in portrait and folded in landscape, until the diver folds or unfolds one. */
+  const openByDefault = $derived(layout.split && layout.portrait);
+  /** @param {number} id */
+  const isOpen = (id) => expanded[id] ?? openByDefault;
 
   /** Rows shown: the search results, or the dives and trips with the expanded trips' dives, under their year on a phone. */
-  const rows = $derived(/** @type {Row[]} */ (buildRows(monthGroups, expanded, cards)));
+  const rows = $derived(/** @type {Row[]} */ (buildRows(monthGroups, isOpen, cards)));
 
   /** The start snapshot (the top of the list at the last load) in the same cards, every trip folded. */
   const previewRows = $derived.by(() => {
@@ -1492,7 +1497,7 @@
               dives={row.dives}
               location={row.location}
               prefs={logbook.prefs}
-              expanded={!!expanded[row.id]}
+              expanded={isOpen(row.id)}
               ontoggle={() => toggleTrip(row.id)}
               index={row.index}
               top={visible.topPosition}
