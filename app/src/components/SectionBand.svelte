@@ -49,7 +49,8 @@
       }
 
       /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
-      &.od-section-band--tall:has(.od-band-search) {
+      /* :global: the search field comes from the page (a slot); Svelte would drop the rule otherwise. */
+      &.od-section-band--tall:has(:global(.od-band-search)) {
         padding-bottom: 40px;
       }
 
