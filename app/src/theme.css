@@ -291,6 +291,10 @@
     --od-plus-price: #114477;
     --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
     --od-plus-chip: rgb(255 255 255 / 0.22);
+    /* « Votre carnet est prêt » (task 2026-11-18-270): the logo's drop shadow, the ring that spreads at the end, the header's bubbles. */
+    --od-plus-logo-shadow: rgb(3 18 36 / 0.3);
+    --od-plus-ring: rgb(255 255 255 / 0.6);
+    --od-plus-bubble: rgb(255 255 255 / 0.35);
     --od-release-surface-line: rgb(255 255 255 / 0.35);
     --od-release-dot-ring: rgb(255 255 255 / 0.22);
     --od-release-row-shadow: rgb(31 33 36 / 0.06);

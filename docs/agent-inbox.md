@@ -5451,7 +5451,7 @@ Mock-ups in `docs/mockups-release/`: `android-serveur-telechargement`, `android-
 - A download of more than 5 seconds shows the time left on the right; a short one never shows it.
 - The value decreases smoothly and switches from seconds to minutes as described.
 
-## [ ] 2026-11-18-270 Phone: animate « Votre carnet est prêt » (the logo turns into the check mark)
+## [x] 2026-11-18-270 Phone: animate « Votre carnet est prêt » (the logo turns into the check mark)
 
 Christian approved this on 18 November 2026. Work in `main` (task 268).
 
@@ -5476,3 +5476,94 @@ The wave and the check mark are drawn with the same commands, so the path can be
 **Test:**
 - On the first display of the screen, the sequence plays once, and it does not play again when coming back to the screen.
 - With reduced motion turned on, nothing moves.
+
+## [ ] 2026-11-18-271 Phone: OpenDives+ welcome, the optional consent for health data
+
+Christian approved this on 18 November 2026. Work in `main` (task 268). Mock-ups in `docs/mockups-release/`.
+
+**Decision (Christian).** The app never stops a task to ask for the health-data consent. It is asked once, at the start of the subscription, as a real choice. The old consent dialog over « Informations » is removed: do not build it.
+
+1. **`android-odplus-abonne`, « Abonnement réussi ».** The button becomes « Continuer » and opens the next screen (it said « Ouvrir mon carnet »).
+2. **`android-odplus-sante`, « Vos données de santé ».** Same header as the other OpenDives+ screens. A card with the switch « Garder des données de santé » (« Votre groupe sanguin, utile en cas d'urgence »), **off by default**, and the sentence « C'est une donnée de santé. OpenDives+ la garde seulement avec votre accord. » Under it, the lock note: encrypted, visible by the diver only, the consent can be withdrawn in « Mon profil » or in Réglages, and the data is then deleted. One button, « Continuer », whatever the choice. It opens « Votre carnet est prêt ».
+3. **`profil-infos-sans-accord-android`.** When the consent was not given, « Groupe sanguin » shows « Non gardé » with a lock icon and an « Autoriser » button on the row. Tapping it turns the consent on at once (no dialog: the diver just asked for it) and opens the edit of the field.
+4. The consent is also shown and withdrawn in « Informations » (« Vous avez donné votre accord le … · Retirer l'accord ») and in Réglages › Confidentialité. Withdrawing deletes the blood group on the server and on the devices.
+5. **Headers.** The headers of `android-odplus-offre`, `android-odplus-abonne` and `android-odplus-sante` get the band of the dive profile above the bottom wave, as on « Se connecter ».
+
+Store the consent with its date on the account. It is separate from the terms of use and never ticked in advance.
+
+**Test:** the switch is off on a new account; « Continuer » works in both states; with the consent off, the blood group cannot be saved and « Autoriser » turns it on; withdrawing deletes the value.
+
+## [ ] 2026-11-18-272 Phone: « Mon profil de plongeur », Informations and Brevets (OpenDives+)
+
+Christian approved this on 18 November 2026. Work in `main`. This is the part of « Mon profil » that task 267 left for later. Mock-ups in `docs/mockups-release/`.
+
+**Informations**
+1. **`profil-infos-android`.** Sections « Vous » (date of birth), « Contact d'urgence » (name and relation, phone), « Santé » (blood group, with the « Vous seul » tag). The phone number is shown with its country code: « +1 514 555-0142 ». A lock note on the encryption and the consent date, with « Retirer l'accord ». ✏ opens the edit.
+2. **`profil-infos-modifier-android`, « Modifier les informations ».** ✕ and « Enregistrer ».
+   - Phone: two fields side by side, « Indicatif » (a country menu, « CA +1 ») and « Téléphone ». The number formats itself for the chosen country as it is typed. The note says so.
+   - « Groupe sanguin » is a dropdown menu with « Inconnu », O−, O+, A−, A+, B−, B+, AB−, AB+. The mock-up shows it open with O+ selected. Note: « Inconnu » if the diver does not know it.
+3. **`profil-infos-sans-accord-android`.** See task 271.
+
+**Brevets**
+4. **`profil-brevets-android`.** The cards, each with the agency name in its colour, the level, the number and date. The note « Montrez une carte au centre de plongée, même sans réseau. » The extended FAB « Ajouter un brevet ».
+5. **`profil-brevet-android`, the sheet of a card.** The photo of the card with a Recto / Verso toggle, then the details: Agence, Niveau, Numéro, Date, Moniteur. In the top bar: show the card full screen, Modifier, ⋮.
+6. **`profil-brevet-nouveau-android`, « Nouveau brevet ».** Two photo slots, recto and verso. « Avec une photo, l'app propose l'agence, le niveau et le numéro. Vérifiez-les. » Then Agence (a menu of agencies), Niveau (a text field with suggestions for the chosen agency, as in the mock-up), Numéro, Date, Moniteur (optional). Reading the card from the photo is done on the device.
+7. **The smart photo of the card**, three screens:
+   - **`profil-brevet-photo-android`.** The camera finds the card and frames its corners. When the card is sharp, « Carte détectée. Ne bougez plus. » and the photo is taken by itself. Flash button, gallery button.
+   - **`profil-brevet-photo-verifier-android`, « Vérifier la photo ».** The card cropped to its edges, straightened (perspective), and with the glare removed. An Avant / Après toggle. « Corrections »: Recadrée, Redressée, and the switch « Retirer les reflets ». « Ajuster les coins », « Reprendre », « Utiliser la photo ». The processing is done on the device; nothing is sent.
+   - **`profil-brevet-photo-coins-android`, « Ajuster les coins ».** Each corner is dragged by hand, with a magnifier. « Détection auto » puts back the detected corners. « Appliquer ».
+
+The cards and the profile are OpenDives+ data, kept on the account with a working copy on the device (as in task 267).
+
+**Test:** the phone number formats itself for CA, FR and US; « Inconnu » can be saved; a card photo is cropped, straightened and its glare removed; the corners can be adjusted by hand.
+
+## [ ] 2026-11-18-273 Phone: equipment, what changed since task 267
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
+
+1. **`profil-piece-nouvelle-android`, « Nouvelle pièce »** (the FAB « Ajouter une pièce » of `profil-equipement-android`).
+   - « Type de pièce »: a grid of 3 × 3 tiles, each with the type icon (the same as in the inventory) and its name: Ordinateur, Détendeur, Combinaison, Sous-vêtement, Bouteille, Gilet, Lampe, Ceinture de lest, Autre. The chosen tile is blue with a check in its corner. « Autre » takes a free name.
+   - « Ajouter une photo », then Marque, Modèle, Numéro de série, Date d'achat, Notes.
+   - A card « Rappel d'entretien » with a suggestion for the type (« Suggéré pour un détendeur : tous les 2 ans ») and « Ajouter » (see task 274).
+2. **`profil-kit-modifier-android`, « Modifier le kit ».** Like « Nouveau kit », with the number of dives that used the kit. The ⋮ menu: « Dupliquer le kit », « Supprimer le kit ». The note: deleting a kit does not change the equipment of dives already filled.
+3. **`edition-equipement-plus-android` and `edition-kit-menu-android`.** The two tonal buttons of task 267 are replaced by one connected button group « Remplir avec »: « Un kit ▾ » (opens the menu « Remplir avec un kit », with the kits and « Gérer les kits ») and « Plongée précédente ».
+
+**Test:** a new piece of each type can be created; a kit can be duplicated and deleted; « Remplir avec » fills the dive.
+
+## [ ] 2026-11-18-274 Phone: maintenance of the equipment (to-do #47, OpenDives+)
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`. Vocabulary: fr-CA « entretien », fr « révision » (English « Service »); for cylinders, fr-CA « test hydrostatique », fr « requalification ».
+
+1. **Entry points.** « Entretien » in « Mon profil » (with a red badge for the overdue count), and the card « Entretien » at the top of « Équipement ».
+2. **`ent-liste-android`, « Entretien ».** Three figures: en retard, dans 60 jours, à jour. Sections « En retard », « Bientôt », « À jour ». Each row: the piece icon, « piece · task », the due date or the dives left, and a coloured tag (« En retard de 46 jours », « Dans 25 jours », « Dans 5 mois »). The note: a notification 30 days before each due date, and on the day.
+3. **`ent-piece-android`, the maintenance of one piece.** The card « Entretien » with its rule (« Tous les 2 ans ou toutes les 100 plongées »), the progress (« 82 plongées sur 100 », « Échéance : 12 décembre 2026 »), « Noter un entretien » and « Modifier le rappel ». A second reminder can be added (« Contrôle avant voyage »). « Historique » lists the past entries. The dives counted are those where the piece is in the equipment.
+4. **`ent-noter-android`, « Noter un entretien ».** « Type »: a connected group Entretien / Inspection / Autre, with one sentence explaining the chosen type. Date. « Fait par », a text field with suggestions from the shops already used. Cost (optional) and « Ajouter une photo de la facture ». The result note: the next due date.
+5. **`ent-regle-android`, « Rappel d'entretien »** (bottom sheet).
+   - Two criteria, each a card with a switch: « Après une durée » (a stepper, in years or months, since the last service) and « Selon les plongées ». With both, the first reached triggers the reminder.
+   - « Me prévenir avant »: chips 7, 30, 60 jours.
+   - « Avertir dans une plongée »: a switch, warns when the piece is used while overdue.
+   - « Retirer le rappel », « Annuler », « Enregistrer ».
+6. **New piece.** The « Rappel d'entretien » card of « Nouvelle pièce » (task 273) proposes a rule for the type.
+
+**Test:** the due dates by time and by dives; the first reached wins; the notifications; the badge count.
+
+## [ ] 2026-11-18-275 Tablet and desktop: « Mon profil de plongeur », and the OpenDives+ welcome
+
+Christian approved this on 18 November 2026. Work in `main`. Do it after tasks 271 to 274: the behaviour is the same, only the layout changes. Mock-ups in `docs/mockups-release/`, files `android-tablette-profil-…-paysage` (and two `-portrait`), `android-tablette-odplus-…`, `bureau-profil-…` and `bureau-odplus-…`.
+
+**Layout**
+- **The account sheet** (`…-profil-compte`) gets the card « Mon profil de plongeur », as on the phone.
+- **The profile pane.** On the left, the profile: the avatar, the name, the OpenDives+ chip, and the list Équipement, Entretien (with the badge), Brevets, Informations. The chosen entry is highlighted, and its content is on the right (`…-profil-infos`, `…-profil-brevets`, `…-profil-brevet`).
+- **Équipement and Entretien use three panes:** the profile, the list, then the sheet of the chosen piece (`…-profil-equipement`, `…-profil-entretien`). A kit opens on the right (`…-profil-kit`, with its ⋮ menu).
+- **Forms open as centred dialogs:** Nouveau brevet, Nouvelle pièce (the type tiles in 5 columns), Nouveau kit (pieces in two columns), Noter un entretien, Rappel d'entretien, Modifier les informations (stays in the right pane; the blood-group menu is a grid of 3 columns), Ajouter de l'équipement.
+- **The photo of a card.** Tablet: the camera full screen in landscape, the shutter on the right (`android-tablette-profil-brevet-photo-paysage`). Desktop: there is no camera, so the diver chooses, drops or pastes an image (Ctrl+V), and the same detection runs (`bureau-profil-brevet-photo`). « Vérifier la photo » shows Avant and Après side by side.
+- **A dive's equipment** (`…-profil-plongee-kit`, `…-profil-plongee-ajout`): the logbook on the left, « Modifier la plongée » on the right with « Remplir avec » and its menu open; « Ajouter de l'équipement » as a dialog.
+- **Tablet portrait** (`android-tablette-profil-hub-portrait`, `…-equipement-portrait`): one column, as on the phone.
+
+**OpenDives+ welcome** (`…-odplus-sante`, `…-odplus-pret`): the layout of the other OpenDives+ setup screens, the blue panel on the left.
+- « Vos données de santé »: the content of task 271 on the right.
+- « Votre carnet est prêt »: the animation of task 270 plays in the blue panel (the disc is 120 px, the ring 56 px, about fifteen bubbles across the panel). On the right: the summary of the logbook, the sync line and « Ouvrir mon carnet ».
+
+**Removed from the beta:** the tablet screens « Dépôt git » and « Créer un jeton d'accès » are no longer part of the beta (moved to « Mis de côté » on the canvas). Do not build them.
+
+**Test:** on a tablet in landscape and portrait, and on desktop, every screen of tasks 271 to 274 is reachable and keeps its state when the window is resized.
