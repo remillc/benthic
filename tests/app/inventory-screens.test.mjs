@@ -78,3 +78,14 @@ test('the CSV has a header, quotes where needed and a line per piece', () => {
 test('the release notes mention the profile and the equipment', () => {
   for (const lang of [fr, en]) assert.ok(lang.about.releaseNotes.some((n) => /profil|profile/i.test(n) && /(quipment|quipement)/.test(n)));
 });
+
+test('the BCD has the vest icon, the buoy the flat-top icon, and « Nouvelle pièce » a model thumbnail', async () => {
+  const { readFileSync } = await import('node:fs');
+  const icon = readFileSync(new URL('../../app/src/components/GearIcon.svelte', import.meta.url), 'utf8');
+  assert.match(icon, /bcd: 'M8\.5 3L5 5\.5V19/, 'vest: collar, centre opening, straps');
+  assert.match(icon, /buoy: 'M9\.5 17V3\.5a\.5\.5 0 0 1 \.5-\.5h4/, 'buoy: flat top');
+  const edit = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
+  assert.match(edit, /od-piece-edit--thumb-image" \/>[\s\S]*<GearIcon \{type\} \{name\}/, 'photo, else the type icon');
+  assert.match(edit, /width: 56px;\s*height: 56px;[\s\S]*border-radius: 12px/);
+  assert.ok(!/fetch\(|https?:\/\//.test(edit.split('<style>')[0].replace(/\/\/.*/g, '')), 'no product photo from the web');
+});

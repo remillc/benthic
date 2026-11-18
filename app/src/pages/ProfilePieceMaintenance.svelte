@@ -116,7 +116,7 @@
 
   {#if piece}
     <div class="od-piece-maintenance--head">
-      <span class="od-piece-maintenance--tile"><GearIcon type={piece.type} size={26} /></span>
+      <span class="od-piece-maintenance--tile"><GearIcon type={piece.type} name={piece.name} size={26} /></span>
       <span class="od-piece-maintenance--who">
         <span class="od-piece-maintenance--type">{t(`gear.inventory.type.${piece.type}`)}</span>
         <span class="od-piece-maintenance--name">{piece.name}</span>

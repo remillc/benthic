@@ -5717,7 +5717,7 @@ Christian approved this on 18 November 2026. Work in `main`. Follows task 281. M
 
 **Test:** the subscriber's sheet shows the « + » chip, the free one does not; on tablet, the free sheet opens the tablet offer.
 
-## [ ] 2026-11-18-283 Equipment: the BCD icon, « Saucisse », and a thumbnail of the model
+## [x] 2026-11-18-283 Equipment: the BCD icon, « Saucisse », and a thumbnail of the model
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
 

@@ -42,7 +42,7 @@
     {#each pieces as g (g?.id)}
       {#if g}
         <li class="od-dive-gear--row">
-          <span class="od-dive-gear--icon"><GearIcon type={g.type} size={22} /></span>
+          <span class="od-dive-gear--icon"><GearIcon type={g.type} name={g.name} size={22} /></span>
           <span class="od-dive-gear--texts">
             <span class="od-dive-gear--name">{g.name}</span>
             <span class="od-dive-gear--line">{g.note || t(`gear.inventory.type.${g.type}`)}</span>
@@ -55,7 +55,7 @@
     {/each}
     {#each equipment.adhoc as p (p.id)}
       <li class="od-dive-gear--row">
-        <span class="od-dive-gear--icon"><GearIcon type="other" size={22} /></span>
+        <span class="od-dive-gear--icon"><GearIcon type="other" name={p.name} size={22} /></span>
         <span class="od-dive-gear--texts">
           <span class="od-dive-gear--name">{p.name}</span>
           <span class="od-dive-gear--line">{t('gear.diveGear.outside')}</span>

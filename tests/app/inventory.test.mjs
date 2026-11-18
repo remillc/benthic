@@ -157,15 +157,15 @@ test('a retired piece of a kit is not applied', () => {
 
 test('a piece outside the inventory lives on its dive only', async () => {
   const { inventory } = setup();
-  const e = addToEquipment(emptyEquipment(), { adhocName: ' Bouée de signalisation ' });
-  assert.deepEqual(e.adhoc.map((p) => p.name), ['Bouée de signalisation']);
+  const e = addToEquipment(emptyEquipment(), { adhocName: ' Saucisse ' });
+  assert.deepEqual(e.adhoc.map((p) => p.name), ['Saucisse']);
   assert.ok(isUuid(e.adhoc[0].id));
-  assert.equal(addToEquipment(e, { adhocName: 'bouée de signalisation' }).adhoc.length, 1, 'the same name twice is one piece');
+  assert.equal(addToEquipment(e, { adhocName: 'saucisse' }).adhoc.length, 1, 'the same name twice is one piece');
   assert.equal(addToEquipment(e, { adhocName: '   ' }).adhoc.length, 1);
   await inventory.saveDiveEquipment('2014-04-02T10:00:00', e);
   assert.deepEqual(await inventory.listGear(), [], 'nothing enters the inventory');
   const rec = (await inventory.listDiveEquipment())[0];
-  assert.equal(rec.adhoc[0].name, 'Bouée de signalisation');
+  assert.equal(rec.adhoc[0].name, 'Saucisse');
   assert.equal(removeFromEquipment(e, { adhocId: e.adhoc[0].id }).adhoc.length, 0);
 });
 
@@ -315,4 +315,10 @@ test('ids are UUID v4', () => {
   assert.ok(isUuid(newId()));
   assert.notEqual(newId(), newId());
   assert.equal(isUuid('123'), false);
+});
+
+test('isBuoyName recognises the surface marker buoy by its names', async () => {
+  const { isBuoyName } = await import('../../app/src/lib/inventory.js');
+  for (const n of ['Saucisse', 'saucisse orange', 'Parachute de palier', 'Surface marker buoy', 'DSMB', 'Bouée']) assert.ok(isBuoyName(n), n);
+  for (const n of ['Détendeur', 'Gilet', '', undefined]) assert.ok(!isBuoyName(n), String(n));
 });

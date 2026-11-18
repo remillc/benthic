@@ -458,6 +458,9 @@
     --od-trace-block: var(--od-trace);
     --od-tint: var(--od-surface-2);
     --od-on-tint: var(--od-text);
+    /* Model thumbnail in « Nouvelle pièce » (task 2026-11-18-283). */
+    --od-piece-thumb-background: #FFFFFF;
+    --od-piece-thumb-border: #DCDAD3;
     --od-thumbnail-background: var(--od-surface-2);
     /* Phone logbook (task 2026-11-18-278): date block and trip header, the profile chip on the right of a row. */
     --od-date-block: #E6EEF7;
@@ -743,6 +746,8 @@
     --od-on-tint: var(--od-text);
     --od-oxygen: #7FD283;
     --od-status-ok: var(--od-oxygen);
+    --od-piece-thumb-background: var(--od-surface);
+    --od-piece-thumb-border: #4B4D52;
     --od-thumbnail-background: var(--od-surface-2);
     --od-date-block: #1B2E45;
     --od-on-date-block: var(--od-secondary);

@@ -178,9 +178,6 @@
     {/if}
 
     <div class="od-piece-edit--photo">
-      {#if photoUrl}
-        <img src={photoUrl} alt="" class="od-piece-edit--photo-image" />
-      {/if}
       <button type="button" class="od-piece-edit--photo-button" onclick={() => fileInput?.click()}>
         <Icon name="camera" size={20} />{photoUrl ? t('gear.pieceNew.photoChange') : t('gear.pieceNew.photoAdd')}
       </button>
@@ -191,7 +188,16 @@
     </div>
 
     <TextField label={t('gear.pieceEdit.brand')} bind:value={brand} />
-    <TextField label={t('gear.pieceEdit.model')} bind:value={model} />
+    <div class="od-piece-edit--model">
+      <span class="od-piece-edit--thumb" data-testid="piece-thumb">
+        {#if photoUrl}
+          <img src={photoUrl} alt="" class="od-piece-edit--thumb-image" />
+        {:else}
+          <GearIcon {type} {name} size={32} />
+        {/if}
+      </span>
+      <div class="od-piece-edit--model-field"><TextField label={t('gear.pieceEdit.model')} bind:value={model} /></div>
+    </div>
     {#if computer}
       <p class="od-piece-edit--help">{t('gear.pieceEdit.readFromDownload')}</p>
     {:else}
@@ -339,10 +345,34 @@
       gap: 8px;
     }
 
-    .od-piece-edit--photo-image {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
+    .od-piece-edit--model {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .od-piece-edit--model-field {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .od-piece-edit--thumb {
+      flex: none;
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--od-piece-thumb-border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-piece-thumb-background);
+      color: var(--od-text);
+    }
+
+    .od-piece-edit--thumb-image {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 

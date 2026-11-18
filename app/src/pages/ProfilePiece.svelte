@@ -164,7 +164,7 @@
 
   {#if piece}
     <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
-      {#if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} size={72} />{/if}
+      {#if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
     </div>
     <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}{#if piece.retired}<span class="od-piece-page--badge">{t('gear.piece.archived')}</span>{/if}</p>
     <h2 class="od-piece-page--name">{piece.name}</h2>

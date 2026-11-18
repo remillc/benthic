@@ -158,7 +158,7 @@
     <div class="od-gear-page--list">
       {#each items as g (g.id)}
         <button type="button" class="od-gear-page--row" onclick={() => open(g.id)}>
-          <span class="od-gear-page--tile"><GearIcon type={g.type} size={22} /></span>
+          <span class="od-gear-page--tile"><GearIcon type={g.type} name={g.name} size={22} /></span>
           <span class="od-gear-page--texts">
             <span class="od-gear-page--name">{g.name}{#if g.retired}<span class="od-gear-page--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
             {#if subLine(g)}<span class="od-gear-page--supporting">{subLine(g)}</span>{/if}

@@ -59,7 +59,7 @@
           {@const p = piece(e)}
           {#if p}
             <a href={open(p.id)} class="od-maintenance-page--row">
-              <span class="od-maintenance-page--tile"><GearIcon type={p.type} size={22} /></span>
+              <span class="od-maintenance-page--tile"><GearIcon type={p.type} name={p.name} size={22} /></span>
               <span class="od-maintenance-page--texts">
                 <span class="od-maintenance-page--name">{p.name} · {taskInline(e.item)}</span>
                 <span class="od-maintenance-page--line">{lineText(e, formatLongDate)}</span>
