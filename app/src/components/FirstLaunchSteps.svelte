@@ -26,7 +26,7 @@
   import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
-  import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch } from '../lib/first-launch-steps.js';
+  import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch, offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { entryRows } from '../lib/server-signin.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
@@ -55,6 +55,8 @@
   let { f7router, recents = false } = $props();
 
   const step = $derived(currentStep());
+  /** « Retour » of the tablet's offer (task 2026-11-18-282), except right after a sign-in where the code is spent. */
+  const tabletOfferBack = $derived(step === 'odplusOffer' && !layout.phone && !desktopApp && offerShowsSignIn(flow.stack));
   /** The first step's rows are 12 dp high on an Android phone (mock-up android-premier-lancement-production). */
   const denseRows = $derived(layout.phone && !ios);
   /** The iPhone variant of the first launch (task 2026-11-16-261): iCloud Drive first, iOS rows and alert. */
@@ -636,7 +638,7 @@
 </script>
 
 {#snippet backButton()}
-  {#if hasBack(step, flow.origin === 'menu')}
+  {#if hasBack(step, flow.origin === 'menu') || tabletOfferBack}
     <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : back}>
       <span class="od-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>

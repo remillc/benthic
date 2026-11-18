@@ -218,7 +218,8 @@
   <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
 {:else if step === 'odplusOffer'}
   <div class="od-plus--screen">
-    {@render hero('offer')}
+    <!-- A tablet's blue panel (pages/WelcomeStartRelease.svelte) carries the chip, the title and the lead: the hero is the phone's. -->
+    {#if layout.phone || desktopApp}{@render hero('offer')}{/if}
     <div class="od-plus--cards">
       {#each BENEFITS as b (b.key)}
         <div class="od-plus--card od-plus--card-{b.tone}">
@@ -616,6 +617,11 @@
       flex-direction: column;
       gap: 12px;
       max-width: 520px;
+
+      /* A tablet: the help link is pinned over the column's foot; the last line scrolls clear of it. */
+      @media (min-width: 768px) {
+        padding-bottom: 64px;
+      }
     }
 
     .od-plus-hero {

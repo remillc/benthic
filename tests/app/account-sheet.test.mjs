@@ -332,3 +332,24 @@ test('every new text exists in French and in English, and the release notes name
   assert.equal(langs.fr.account.manage.renews, 'Renouvelé le {date} · acheté sur {store}');
   assert.equal(langs.fr.account.free.device, 'Carnet sur cet appareil');
 });
+
+// --- Task 2026-11-18-282: the « + » chip after the name, and the tablet's offer ---
+
+test('the subscriber sheet shows the round « + » chip after the name, read « OpenDives Plus »; the free sheet does not', () => {
+  assert.match(sheet, /\{#if subscriber\}\s*<span class="od-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="od-account-sheet--plus-dot">\+<\/span><\/span><span class="od-sr-only">\{t\('odplus\.chipName'\)\}<\/span>/);
+  assert.match(sheet, /\.od-account-sheet--plus-dot \{[^}]*width: 18px;[^}]*height: 18px;[^}]*margin-left: 3px;[^}]*var\(--od-account-chip\)[^}]*var\(--od-account-chip-ink\)[^}]*font-weight: 700/);
+  assert.equal(langs.fr.odplus.chipName, 'OpenDives Plus');
+  assert.equal(langs.en.odplus.chipName, 'OpenDives Plus');
+});
+
+test('the tablet offer: the blue panel carries the chip, title and lead; the phone hero stays on phones; Retour except right after a sign-in', () => {
+  const release = read('pages/WelcomeStartRelease.svelte');
+  const steps = read('components/FirstLaunchSteps.svelte');
+  assert.match(release, /offerPanel\b[\s\S]*<OdPlusChip \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
+  assert.match(offer, /\{#if layout\.phone \|\| desktopApp\}\{@render hero\('offer'\)\}\{\/if\}/);
+  assert.match(steps, /tabletOfferBack = \$derived\(step === 'odplusOffer' && !layout\.phone && !desktopApp && offerShowsSignIn\(flow\.stack\)\)/);
+  assert.equal(hasBack('odplusOffer', true), false, 'the phone offer keeps no Retour');
+  assert.deepEqual(menuEntry('offer'), ['start', 'odplusOffer']);
+  assert.equal(offerShowsSignIn(menuEntry('offer')), true);
+  assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'email', 'server'])), false);
+});

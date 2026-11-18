@@ -5703,7 +5703,7 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Done (18 November 2026), with seams:** the server has no `GET /v1/account` (sign-in method, store, price, renewal date, space used) nor `DELETE /v1/account` yet: « Gérer le compte » shows a placeholder for the space and hides the sign-in method, and « Supprimer le compte » reports a failure (`app/src/lib/odplus-account.js`, `server-api.js`). « Télécharger mes données » waits for the full export (to-do #57) and says so. The tablet and desktop free sheets open the phone's offer content; the iPhone free sheet has no mock-up and uses a plain grouped list. Account deletion also needs, on the server, the revocation of the Sign in with Apple token (Apple 5.1.1(v)) and a public web page to request deletion for the Play Data safety form.
 
-## [ ] 2026-11-18-282 « OpenDives+ » in the subscriber's account sheet, and the tablet offer
+## [x] 2026-11-18-282 « OpenDives+ » in the subscriber's account sheet, and the tablet offer
 
 Christian approved this on 18 November 2026. Work in `main`. Follows task 281. Mock-ups in `docs/mockups-release/`.
 

@@ -241,7 +241,12 @@
       <span class="od-account-sheet--brand">
         <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
         <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
-        <span class="od-account-sheet--title">{t('menu.title')}</span>
+        <!-- A subscriber's sheet: a small round « + » after the name, read « OpenDives Plus » (task 2026-11-18-282). -->
+        {#if subscriber}
+          <span class="od-account-sheet--title"><span aria-hidden="true">{t('menu.title')}<span class="od-account-sheet--plus-dot">+</span></span><span class="od-sr-only">{t('odplus.chipName')}</span></span>
+        {:else}
+          <span class="od-account-sheet--title">{t('menu.title')}</span>
+        {/if}
       </span>
       <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
         <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
@@ -507,6 +512,22 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+    }
+
+    .od-account-sheet--plus-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-left: 3px;
+      border-radius: 9px;
+      background: var(--od-account-chip);
+      color: var(--od-account-chip-ink);
+      font-size: 14px;
+      line-height: 1;
+      font-weight: 700;
+      vertical-align: 1px;
     }
 
     .od-account-sheet--close {
