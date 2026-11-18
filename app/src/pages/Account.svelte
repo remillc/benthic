@@ -500,7 +500,7 @@
       font-size: 14px;
       line-height: 20px;
 
-      strong {
+      :global(strong) {
         font-weight: 600;
       }
     }

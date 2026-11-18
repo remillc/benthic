@@ -1171,9 +1171,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-desktop-logbook--spacer {
-      flex: 1;
-    }
     .od-desktop-logbook--search {
       display: flex;
       align-items: center;

@@ -544,12 +544,6 @@
         color: var(--od-text-2);
       }
 
-      .od-settings-maps--value {
-        flex: none;
-        font-size: 14px;
-        color: var(--od-text-2);
-      }
-
       :global(svg) {
         flex: none;
         color: var(--od-text-2);

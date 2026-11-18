@@ -209,19 +209,6 @@
       color: var(--od-text-2);
     }
 
-    .od-kit-page--delete {
-      margin: 16px 16px 0;
-      height: 40px;
-      padding: 0 20px;
-      border: var(--od-outline-width) solid var(--od-outline);
-      border-radius: 20px;
-      background: none;
-      color: var(--od-menu-danger);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
     .od-kit-page--bottom {
       height: 48px;
     }

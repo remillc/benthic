@@ -166,10 +166,6 @@
       border-top: 1px solid var(--od-separator);
     }
 
-    .od-profile--inert {
-      opacity: 0.6;
-    }
-
     .od-profile--tile {
       flex: none;
       width: 40px;
