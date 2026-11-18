@@ -111,3 +111,45 @@ isomorphic-git needs a `Buffer` implementation in the browser (the `buffer` pack
 ## How to rerun
 
 Start the dev stack, `proxy.mjs 3100 0` and `proxy.mjs 3180 80`, load the credentials into `OD_FORGEJO_USER` / `OD_FORGEJO_PASSWORD` in the environment, then `tools/spike-git/run-all.sh`, `node tools/spike-git/tables.mjs`, `node tools/spike-git/merge.mjs`, `node tools/spike-git/browser-run.mjs 1000`.
+
+## Second round (18 November 2026): the app's real git layer at phone CPU speed
+
+The harness `tools/spike-git/odgit-entry.js` + `build-odgit.mjs` + `odgit-run.mjs` runs the app's own git layer (`app/src/lib/odgit/`: `repo.js`, `fs-adapter.js`, `http-adapter.js`) in headless Chrome 142 with CPU throttling 4x, against the dev Forgejo through `proxy.mjs 3100 0` (no latency, CORS added). Two file backends under the same adapter:
+
+- `lightning`: LightningFS (IndexedDB), the pure web-view case.
+- `bridge`: every file operation leaves the page as an asynchronous call with base64 data and is done by Node's `fs` (puppeteer `exposeFunction`). It models the shape of `@capacitor/filesystem` (JSON bridge, base64), not its speed: the Node side is not throttled, the CDP binding is slower than Capacitor's bridge. Read it as a pessimistic bound for the bridge cost.
+
+Same generated logbooks as before (300 dives = 994 files, 1,000 dives = 2,394 files). Round trip = edit one `dive.json` and one gear file, commit, push from copy A, then copy B pulls (fast-forward). One-file status = `statusMatrix` limited to the edited file. Runs are noisy on this machine (Docker running next to it): ranges are given when several runs differ.
+
+| 4x CPU | Clone | Round trip (push + pull) | One-file status | Peak JS heap |
+|---|---|---|---|---|
+| 300 dives, LightningFS | 3.5 s | 2.8 to 5.2 s, median 3.3 s | 132 to 157 ms | 62 MB |
+| 300 dives, bridge | 6.4 s | median 4.7 s | 260 to 274 ms | 160 MB |
+| 1,000 dives, LightningFS | 13.1 to 13.5 s | 5.2 to 9.2 s, medians 5.5 to 7.6 s | 176 to 276 ms | 99 to 102 MB |
+| 1,000 dives, bridge | 24.2 s | median 12.9 s | 321 ms | 179 MB |
+
+Thresholds of the first report: clone of 1,000 dives under about 15 s, round trip under about 5 s, one-file status under 100 ms, JS heap under about 300 MB.
+
+- **Memory holds** everywhere (at most 179 MB).
+- **Clone of 1,000 dives holds with LightningFS (13 s) but not on a bridge-shaped backend (24 s).**
+- **The round trip misses at 1,000 dives** (5.2 to 9.2 s on LightningFS) and sits at the limit at 300 dives. Split for 1,000 dives, LightningFS: writing the files 2 ms, `add` + `commit` 1.6 to 4.3 s, `push` 2.5 to 4.2 s, pull about 1 s. The cost is isomorphic-git's own CPU work (it rewrites the tree objects of the whole logbook at each commit and walks them again to choose the objects to push), not the file system. A persistent `cache` object passed to every call (the index parsed once) did not change it measurably.
+- **The one-file status misses** at both sizes (132 to 321 ms): even limited to one file it reads and parses the whole index (994 or 2,394 entries) at each call. An app that knows what it wrote does not need it per edit; as a general check it is over the threshold.
+- **Verdict: the thresholds do not hold for the 1,000-dive logbook at 4x throttling** (round trip, one-file status; the clone only on LightningFS). They hold for memory. The 4x factor on this i9-13900K is a modelled phone, not a measured one; the Android emulator run would give the real file-system and native-HTTP costs but cannot fix the CPU-bound part, so it was not run before this decision point.
+
+### Merge behaviour (merge.mjs, Node, 300 dives, Forgejo)
+
+Two copies, A pushes first, B (with a local commit) fetches then `git.merge({ abortOnConflict: true })`:
+
+| Case | Result |
+|---|---|
+| Edits to two different dives | merges (a merge commit, 130 ms), both edits kept, push accepted |
+| Same dive, different fields (`notes` and `rating`, not adjacent lines) | merges cleanly by the text three-way merge, both fields kept |
+| Same dive, adjacent fields (`maxDepthMm`, `meanDepthMm` on neighbouring lines) | `MergeConflictError` although the fields differ: git merges lines, and neighbouring lines conflict |
+| Same dive, same field | `MergeConflictError` naming the file (`bothModified`) |
+
+On a conflict with `abortOnConflict: true` the working copy is left as it was (checked in `tests/app/odgit-repo.test.mjs`). With `abortOnConflict: false`, isomorphic-git writes `<<<<<<<`/`=======`/`>>>>>>>` markers into the JSON file and still throws. The three versions are readable in about 8 to 10 ms (`findMergeBase`, `readBlob` on the merge base, ours and theirs), which is what a field-level JSON merge by the app needs: it would turn the adjacent-field conflicts into clean merges. `merge.mjs` ran at 300 dives (the merge does not depend on the size).
+
+### Not done in this round
+
+- The Android emulator run with the real `@capacitor/filesystem` and native HTTP (stopped at the decision point above).
+- 3,000 dives, long history (`history.mjs`), 80 ms RTT.

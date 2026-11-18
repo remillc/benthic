@@ -78,6 +78,8 @@ export function openRepo(o) {
   const author = o.author ?? AUTHOR;
   const headers = { Authorization: `token ${o.token}` };
   const remoteRef = `refs/remotes/origin/${branch}`;
+  // isomorphic-git keeps the parsed index and the packs it read in this object: one per working copy, reused by every call.
+  const cache = {};
   /** @param {string} p */
   const file = (p) => `${dir}/${p}`;
 
@@ -127,7 +129,7 @@ export function openRepo(o) {
         return 'empty';
       }
       try {
-        await git.clone({ fs, http, dir, url, ref: branch, singleBranch: true, noTags: true, headers, onProgress });
+        await git.clone({ fs, http, dir, cache, url, ref: branch, singleBranch: true, noTags: true, headers, onProgress });
       } catch (e) {
         // A half-made working copy would pass for a complete one: removed.
         await fs.promises.rmdir(dir).catch(() => {});
@@ -144,13 +146,13 @@ export function openRepo(o) {
     async pull(onProgress) {
       if (!(await remoteHasBranch())) return 'empty';
       try {
-        await git.fetch({ fs, http, dir, url, remote: 'origin', ref: branch, singleBranch: true, tags: false, headers, onProgress });
+        await git.fetch({ fs, http, dir, cache, url, remote: 'origin', ref: branch, singleBranch: true, tags: false, headers, onProgress });
         const ours = await git.resolveRef({ fs, dir, ref: branch }).catch(() => null);
         const theirs = await git.resolveRef({ fs, dir, ref: remoteRef });
         if (ours === theirs) return 'upToDate';
-        const result = await git.merge({ fs, dir, ours: branch, theirs: remoteRef, author, abortOnConflict: true });
+        const result = await git.merge({ fs, dir, cache, ours: branch, theirs: remoteRef, author, abortOnConflict: true });
         if (result.alreadyMerged) return 'upToDate';
-        await git.checkout({ fs, dir, ref: branch, onProgress });
+        await git.checkout({ fs, dir, cache, ref: branch, onProgress });
         return result.fastForward ? 'fastForward' : 'merged';
       } catch (e) {
         return fail(e);
@@ -174,8 +176,8 @@ export function openRepo(o) {
     async commitStaged(paths, message) {
       if (!paths.length) return null;
       try {
-        await git.add({ fs, dir, filepath: paths, parallel: true });
-        return await git.commit({ fs, dir, message, author, committer: author });
+        await git.add({ fs, dir, cache, filepath: paths, parallel: true });
+        return await git.commit({ fs, dir, cache, message, author, committer: author });
       } catch (e) {
         return fail(e);
       }
@@ -196,7 +198,7 @@ export function openRepo(o) {
     /** Sends the commits the host does not have. @param {(p: Progress) => void} [onProgress] */
     async push(onProgress) {
       try {
-        const result = await git.push({ fs, http, dir, url, remote: 'origin', ref: branch, remoteRef: branch, headers, onProgress });
+        const result = await git.push({ fs, http, dir, cache, url, remote: 'origin', ref: branch, remoteRef: branch, headers, onProgress });
         if (!result.ok) throw new GitError('REFUSED');
       } catch (e) {
         return fail(e);
@@ -220,7 +222,7 @@ export function openRepo(o) {
     },
 
     /** Everything staged or committed, as paths. @returns {Promise<string[]>} */
-    listFiles: () => git.listFiles({ fs, dir }),
+    listFiles: () => git.listFiles({ fs, dir, cache }),
 
     /**
      * What differs from the last commit: `'unmodified'`, `'modified'`, `'added'`, `'deleted'` or `'absent'`, for the
@@ -229,7 +231,7 @@ export function openRepo(o) {
      * @returns {Promise<Record<string, 'unmodified'|'modified'|'added'|'deleted'|'absent'>>}
      */
     async status(paths) {
-      const rows = await git.statusMatrix({ fs, dir, filepaths: paths });
+      const rows = await git.statusMatrix({ fs, dir, cache, filepaths: paths });
       /** @type {Record<string, 'unmodified'|'modified'|'added'|'deleted'|'absent'>} */
       const out = {};
       for (const [p, head, workdir, stage] of rows) {
