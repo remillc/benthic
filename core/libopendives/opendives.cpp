@@ -25,6 +25,8 @@
 #include <git2.h>
 #include <chrono>
 #include <cstdio>
+#include <cstdlib>
+#include <sys/stat.h>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
@@ -798,6 +800,142 @@ int cloud_list_cached_dives(std::string &json, std::string &error)
 	apply_log_prefs();
 	divelog.process_loaded_dives();
 	json = cloud_json(loaded_git_commit, false, std::string(), true);
+	return 0;
+}
+
+// --- The previous version's cloud cache ---
+// The alpha kept its Subsurface-cloud logbook as a git cache under $HOME/.subsurface/cloudstorage/<hash>. These
+// two functions read it as a local repository, "<folder>[<branch>]" (transport RT_LOCAL: libgit2 opens the
+// folder and the core reads the branch; no remote, no fetch, no credentials). Nothing is ever written there.
+
+static std::string alpha_cache_root()
+{
+	const char *home = getenv("HOME");
+	if (!home || !*home)
+		return std::string();
+	return (std::filesystem::path(home) / ".subsurface" / "cloudstorage").string();
+}
+
+// The branch the cache's HEAD names, else its first local branch. Empty when there is none, or when the
+// name cannot be written in the "<folder>[<branch>]" form.
+static std::string alpha_cache_branch(const std::string &folder)
+{
+	git_repository *repo = nullptr;
+	if (git_repository_open(&repo, folder.c_str()))
+		return std::string();
+	std::string branch;
+	git_reference *head = nullptr;
+	if (!git_repository_head(&head, repo)) {
+		if (git_reference_is_branch(head)) {
+			const char *name = nullptr;
+			if (!git_branch_name(&name, head) && name)
+				branch = name;
+		}
+		git_reference_free(head);
+	}
+	if (branch.empty()) {
+		git_branch_iterator *it = nullptr;
+		if (!git_branch_iterator_new(&it, repo, GIT_BRANCH_LOCAL)) {
+			git_reference *ref = nullptr;
+			git_branch_t type;
+			if (!git_branch_next(&ref, &type, it)) {
+				const char *name = nullptr;
+				if (!git_branch_name(&name, ref) && name)
+					branch = name;
+				git_reference_free(ref);
+			}
+			git_branch_iterator_free(it);
+		}
+	}
+	git_repository_free(repo);
+	if (branch.find('[') != std::string::npos || branch.find(']') != std::string::npos)
+		return std::string();
+	return branch;
+}
+
+static bool alpha_cache_valid_id(const std::string &id)
+{
+	return !id.empty() && id != "." && id != ".." && id.find_first_of("/\\") == std::string::npos;
+}
+
+int alpha_cache_list(std::string &json)
+{
+	namespace fs = std::filesystem;
+	json = "[";
+	const std::string root = alpha_cache_root();
+	std::error_code ec;
+	if (root.empty() || !fs::is_directory(root, ec)) {
+		json += ']';
+		return 0;
+	}
+	std::vector<std::string> ids;
+	for (fs::directory_iterator it(root, ec), end; !ec && it != end; it.increment(ec)) {
+		std::error_code dir_ec;
+		if (it->is_directory(dir_ec))
+			ids.push_back(it->path().filename().string());
+	}
+	std::sort(ids.begin(), ids.end());
+	bool first = true;
+	for (const std::string &id : ids) {
+		if (!alpha_cache_valid_id(id))
+			continue;
+		const std::string folder = (fs::path(root) / id).string();
+		const std::string branch = alpha_cache_branch(folder);
+		if (branch.empty())
+			continue;
+		// Size and last change: every file of the folder, the repository's own included.
+		long long bytes = 0;
+		long long modified = 0;
+		std::error_code walk_ec;
+		for (fs::recursive_directory_iterator it(folder, fs::directory_options::skip_permission_denied, walk_ec), end;
+		     !walk_ec && it != end; it.increment(walk_ec)) {
+			std::error_code file_ec;
+			if (!it->is_regular_file(file_ec))
+				continue;
+			struct stat st;
+			if (stat(it->path().string().c_str(), &st))
+				continue;
+			bytes += static_cast<long long>(st.st_size);
+			if (static_cast<long long>(st.st_mtime) > modified)
+				modified = static_cast<long long>(st.st_mtime);
+		}
+		std::string error;
+		int dives = count_dives(folder + "[" + branch + "]", error);
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":";
+		append_json_string(json, id);
+		json += ",\"branch\":";
+		append_json_string(json, branch);
+		json += ",\"bytes\":" + std::to_string(bytes);
+		json += ",\"modified\":" + std::to_string(modified);
+		json += ",\"dives\":" + std::to_string(dives < 0 ? 0 : dives) + '}';
+	}
+	json += ']';
+	return 0;
+}
+
+int alpha_cache_open(const std::string &id, std::string &json, std::string &error)
+{
+	json.clear();
+	if (!alpha_cache_valid_id(id)) {
+		error = "Invalid cache folder";
+		return -1;
+	}
+	const std::string folder = (std::filesystem::path(alpha_cache_root()) / id).string();
+	const std::string branch = alpha_cache_branch(folder);
+	if (branch.empty()) {
+		error = "No logbook in this cache";
+		return -1;
+	}
+	loaded_cloud_url.clear();
+	if (load(folder + "[" + branch + "]", error))
+		return -1;
+	// Read-only: the loaded log has no address, so no edit or save can reach the cache.
+	current_log_path.clear();
+	divelog.process_loaded_dives();
+	json = dives_json();
 	return 0;
 }
 

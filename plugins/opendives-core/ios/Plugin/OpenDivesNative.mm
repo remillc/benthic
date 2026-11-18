@@ -303,6 +303,20 @@ static void send_sync_progress(const char *message)
 	return ns(json);
 }
 
++ (NSString *)alphaCacheList
+{
+	std::string json;
+	opendives::alpha_cache_list(json);
+	return ns(json);
+}
+
++ (NSString *)alphaCacheOpen:(NSString *)identifier error:(NSError **)error
+{
+	std::string json, message;
+	int ret = opendives::alpha_cache_open(str(identifier), json, message);
+	return json_or_fail(ret, json, message, error);
+}
+
 + (NSString *)pendingChanges
 {
 	std::string json;

@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 				error:(NSError **)error NS_SWIFT_NAME(cloudListDives(email:password:));
 /** Empty string when there is no local cache yet. */
 + (nullable NSString *)cloudListCachedDivesWithError:(NSError **)error NS_SWIFT_NAME(cloudListCachedDives());
++ (NSString *)alphaCacheList;
++ (nullable NSString *)alphaCacheOpen:(NSString *)identifier error:(NSError **)error NS_SWIFT_NAME(alphaCacheOpen(_:));
 + (NSString *)pendingChanges;
 + (BOOL)cloudSignOut:(BOOL)deleteCopy error:(NSError **)error NS_SWIFT_NAME(cloudSignOut(deleteCopy:));
 + (nullable NSString *)cloudDeleteAccount:(NSString *)password

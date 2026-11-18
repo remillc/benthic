@@ -9,8 +9,8 @@
 
   const english = typeof navigator !== 'undefined' && !/^fr/i.test(navigator.language);
   const text = english
-    ? { title: 'Development tools', free: 'Free', subscribed: 'Subscribed', none: 'no session', server: 'Server', toFreeOut: 'Switch to a free account (sign out, keep the device logbook)', toFreeKeep: 'Switch to a free account (keep the session, mark not subscribed)', toSub: 'Switch to a subscribed account', fresh: 'New test account', del: 'Delete this test account', replay: 'Replay the first launch', close: 'Close', done: 'Done', failed: 'Failed: ' }
-    : { title: 'Outils de développement', free: 'Gratuit', subscribed: 'Abonné', none: 'aucune session', server: 'Serveur', toFreeOut: 'Passer en compte gratuit (se déconnecter, garder le carnet de l’appareil)', toFreeKeep: 'Passer en compte gratuit (garder la session, marquer non abonné)', toSub: 'Passer en compte abonné', fresh: 'Nouveau compte d’essai', del: 'Supprimer ce compte d’essai', replay: 'Rejouer le premier lancement', close: 'Fermer', done: 'Fait', failed: 'Échec : ' };
+    ? { title: 'Development tools', free: 'Free', subscribed: 'Subscribed', none: 'no session', server: 'Server', toFreeOut: 'Switch to a free account (sign out, keep the device logbook)', toFreeKeep: 'Switch to a free account (keep the session, mark not subscribed)', toSub: 'Switch to a subscribed account', fresh: 'New test account', del: 'Delete this test account', replay: 'Replay the first launch', alpha: 'Import the previous version’s logbook', close: 'Close', done: 'Done', failed: 'Failed: ' }
+    : { title: 'Outils de développement', free: 'Gratuit', subscribed: 'Abonné', none: 'aucune session', server: 'Serveur', toFreeOut: 'Passer en compte gratuit (se déconnecter, garder le carnet de l’appareil)', toFreeKeep: 'Passer en compte gratuit (garder la session, marquer non abonné)', toSub: 'Passer en compte abonné', fresh: 'Nouveau compte d’essai', del: 'Supprimer ce compte d’essai', replay: 'Rejouer le premier lancement', alpha: 'Importer le carnet de la version précédente', close: 'Fermer', done: 'Fait', failed: 'Échec : ' };
 
   /** @type {Awaited<ReturnType<typeof realDevTools>>|null} */
   let tools = $state(null);
@@ -58,6 +58,7 @@
       <button type="button" disabled={busy || !tools} onclick={() => run(() => tools?.newAccount())}>{text.fresh}</button>
       <button type="button" disabled={busy || !tools || !current?.temporary} onclick={() => run(() => tools?.deleteAccount())}>{text.del}</button>
       <button type="button" disabled={busy || !tools} onclick={() => run(() => tools?.replayFirstLaunch())}>{text.replay}</button>
+      <button type="button" disabled={busy || !tools} onclick={() => run(() => tools?.importAlphaLogbook())}>{text.alpha}</button>
       <button type="button" class="od-dev-tools-menu--close" onclick={() => (devUi.open = false)}>{text.close}</button>
     </div>
   </div>

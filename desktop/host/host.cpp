@@ -285,6 +285,16 @@ void register_methods()
 			fail(error);
 		return S(json);
 	});
+	// The previous version's cloud cache (read-only): the folders, or one opened (id).
+	add("alphaCacheList", core, [](const Args &) {
+		std::string json;
+		opendives::alpha_cache_list(json);
+		return S(json);
+	});
+	add("alphaCacheOpen", core, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::alpha_cache_open(a.str("id"), json, error), json, error);
+	});
 	add("cloudSignOut", core, [](const Args &a) {
 		std::string error;
 		if (opendives::cloud_sign_out(a.flag("deleteCopy"), error))

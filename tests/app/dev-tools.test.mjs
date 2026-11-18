@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createDevApi } from '../../app/src/lib/dev-accounts.js';
+import { ALPHA_IMPORT_KEY } from '../../app/src/lib/alpha-logbook.js';
 import { createDevTools, SUBSCRIBED_KEY, WELCOME_KEY } from '../../app/src/lib/dev-tools.js';
 
 const read = (path) => readFileSync(new URL('../../app/src/' + path, import.meta.url), 'utf8');
@@ -96,6 +97,16 @@ test('delete: dev-reset with the token, then sign out with the copy; refuses a r
 test('replay the first launch: only the beta key, then reload', () => {
   const t = setup({ session: { email: 'a@opendives.test', token: 't' } });
   t.tools.replayFirstLaunch();
+  assert.equal(t.mem.get(WELCOME_KEY), 'show');
+  assert.deepEqual(t.events, ['reload']);
+  assert.deepEqual(t.calls, []);
+});
+
+test('import the previous version’s logbook: the done mark is cleared, the first launch replays, nothing else changes', () => {
+  const t = setup({ session: { email: 'a@opendives.test', token: 't' } });
+  t.mem.set(ALPHA_IMPORT_KEY, '1');
+  t.tools.importAlphaLogbook();
+  assert.equal(t.mem.has(ALPHA_IMPORT_KEY), false);
   assert.equal(t.mem.get(WELCOME_KEY), 'show');
   assert.deepEqual(t.events, ['reload']);
   assert.deepEqual(t.calls, []);

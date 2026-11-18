@@ -5,6 +5,7 @@
 //        facade list <path[branch]>
 //        facade dive <log> <number>
 #include "core/libopendives/opendives.h"
+#include "core/libopendives/internal.h"
 #include "core/dive.h"
 #include "core/divelog.h"
 #include <cstdio>
@@ -24,6 +25,21 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		printf("%d\n", n);
+		return 0;
+	}
+	if (argc == 2 && !strcmp(argv[1], "alpha-list")) {
+		// alpha-list: the previous version's cache folders under $HOME/.subsurface/cloudstorage.
+		opendives::alpha_cache_list(json);
+		printf("%s\n", json.c_str());
+		return 0;
+	}
+	if (argc == 3 && !strcmp(argv[1], "alpha-open")) {
+		// alpha-open <folder>: reads that folder read-only; prints its dive count and the loaded log's address.
+		if (opendives::alpha_cache_open(argv[2], json, error)) {
+			fprintf(stderr, "%s\n", error.c_str());
+			return 1;
+		}
+		printf("dives=%d address=[%s]\n", static_cast<int>(divelog.dives.size()), opendives::internal::current_log().c_str());
 		return 0;
 	}
 	if (argc == 3 && !strcmp(argv[1], "list")) {

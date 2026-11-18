@@ -77,7 +77,7 @@ const logbooks = require('./logbooks.cjs');
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
 const CORE_METHODS = new Set([
   'logExists', 'countDives', 'importFile', 'cloudListDives', 'cloudConfigure', 'cloudListCachedDives',
-  'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
+  'alphaCacheList', 'alphaCacheOpen', 'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
   'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'cloudProbe', 'gitCheck',
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
   'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'renumberDives', 'importDives', 'filterPresets',

@@ -128,6 +128,15 @@ int cloud_list_dives(const std::string &email, const std::string &password, std:
 // Returns 1, with `json` empty, when there is no local cache yet.
 int cloud_list_cached_dives(std::string &json, std::string &error);
 
+// The previous version's cloud cache: $HOME/.subsurface/cloudstorage/<folder>, a git repository that the alpha
+// synced with the Subsurface cloud. Read-only, no network, no credentials, nothing written.
+// alpha_cache_list: an array of {"id":folder,"branch":…,"bytes":…,"modified":epoch s,"dives":n}, one per folder
+// that holds a branch (the branch is the one HEAD names); "[]" when there is none.
+int alpha_cache_list(std::string &json);
+// Loads that folder's branch into the core as a log without address (it can be exported, not edited or saved) and
+// writes the dives like cloud_list_cached_dives ("[…]", the dives array). Fails for an id that is not a folder name.
+int alpha_cache_open(const std::string &id, std::string &json, std::string &error);
+
 // Signs out of the cloud account (spec, section 4, "Sign out"): closes the log
 // in memory and forgets the account. The local copy of the account's log is
 // kept, and reused if the diver signs in again, unless `delete_copy`: then it

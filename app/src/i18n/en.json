@@ -1322,6 +1322,10 @@
       "one": "1 dive, copied into a new logbook.",
       "other": "{n} dives, copied into a new logbook."
     },
+    "alphaHelpDated": {
+      "one": "1 dive, last changed {date}, copied into a new logbook.",
+      "other": "{n} dives, last changed {date}, copied into a new logbook."
+    },
     "localTitleDesktop": "Start a logbook on this computer",
     "keptServer": "OpenDives server"
   },
@@ -2221,7 +2225,7 @@
       "« Sign in or create an account »: a little more space between the buttons, and « Continue without an account » in blue, centred.",
       "First screens: a page opened for the first time now waits for its styles before it is shown, and the drawings of the blue bands have a fixed size, so nothing flashes at a large size while the first launch screen opens.",
       "Desktop logbook: the table is lighter. Default columns: number in bold, date with the day of the week and the time in small grey, site (or \"Site not set\" in grey italics with a crossed-out pin), deepest depth in bold, duration, buddies. The \"Profile\" column (small dive graphs) is hidden by default and added with the columns button; the columns and widths you chose are kept. A line under the headers gives the year and dive count of the first visible dive and stays at the top while scrolling. A trip is a white card that folds. The selected dive is pale blue, with its number and site in blue.",
-      "First launch (public edition): if you come from the alpha, “Import a logbook” offers “Previous version’s logbook”, with its number of dives. It copies that logbook, read on the phone without the network, into a new logbook; the alpha’s files are not touched and the row disappears after the copy.",
+      "First launch (public edition): if you come from the alpha, “Import a logbook” offers “Previous version’s logbook”, with its number of dives. It copies that logbook, read from the alpha’s copy on the phone without the network and without the alpha’s account (even if the alpha’s sign-in is gone), into a new logbook; with several copies, one row per copy shows its number of dives and its date. The alpha’s files are not touched and the row disappears after the copy.",
       "Public edition: no choice is left to open a logbook in OneDrive, Google Drive or a personal git repository. “Open my logbook” offers the OpenDives server, and the account no longer offers “Use my own git repository”.",
       "A logbook that was on the Subsurface cloud is not opened here: after an update from the alpha, the app starts from its first launch and leaves that logbook's files on the phone as they were. The Account page no longer offers signing in to the Subsurface cloud. A dive that cannot be read shows a page with « Try again ».",
       "Logbook on a phone and on a tablet: dives are grouped by year, each year in a white card. Each row shows the date on a pale blue block, the site (or “Dive site not set” with a crossed-out pin), the dive number in bold and the time, the small profile, then the maximum depth in bold and the duration, in the units of the settings. A trip is its own card, with a pale blue header (suitcase, number of dives, depths) and an arrow to fold it. A screen reader reads each row as one item. On a tablet, trips are open in portrait and folded in landscape until you open or fold one yourself, and the dive shown keeps its pale blue background.",

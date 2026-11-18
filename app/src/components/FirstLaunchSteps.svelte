@@ -33,7 +33,7 @@
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
-  import { alphaLogbookFile, findAlphaLogbook, markAlphaImportDone } from '../lib/alpha-logbook.js';
+  import { alphaLogbookFile, findAlphaLogbooks, markAlphaImportDone } from '../lib/alpha-logbook.js';
   import { isRelease } from '../lib/edition.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
@@ -423,26 +423,28 @@
   }
 
   /**
-   * The logbook the alpha left on this device (decided on 18 November 2026): offered once on « Importer un carnet », read
-   * from the device's copy without the network. Null when there is none, or once it was imported.
-   * @type {import('../lib/alpha-logbook.js').AlphaLogbook|null}
+   * The logbooks the alpha left on this device (decided on 18 November 2026): offered once on « Importer un carnet »,
+   * read from the alpha's local copy, without the network and without an account. Empty when there is none, or once it
+   * was imported; several when the alpha synced more than one account.
+   * @type {import('../lib/alpha-logbook.js').AlphaLogbook[]}
    */
-  let alphaFound = $state(null);
+  let alphaFound = $state([]);
   let alphaLooked = false;
   $effect(() => {
     if (step !== 'import' || alphaLooked || windowTakes) return;
     alphaLooked = true;
-    void findAlphaLogbook(OpenDivesCore, deviceStore, isRelease).then((found) => (alphaFound = found));
+    void findAlphaLogbooks(OpenDivesCore, deviceStore, isRelease).then((found) => (alphaFound = found));
   });
 
   /** « Carnet de la version précédente »: its dives become a file in memory, then « Nouveau carnet » as for any file. */
-  async function useAlphaLogbook() {
-    if (busy || !alphaFound) return;
+  /** @param {import('../lib/alpha-logbook.js').AlphaLogbook} found */
+  async function useAlphaLogbook(found) {
+    if (busy) return;
     busy = true;
     try {
       const name = t('welcomeSteps.alphaName');
-      const { file, text } = await alphaLogbookFile(OpenDivesCore, alphaFound, name);
-      flow.source = { kind: 'file', file, name, summary: summariseImport(alphaFound.dives, text), alpha: true };
+      const { file, text } = await alphaLogbookFile(OpenDivesCore, found, name);
+      flow.source = { kind: 'file', file, name, summary: summariseImport(found.dives, text), alpha: true };
       flow.name = name;
       go('file');
     } catch (e) {
@@ -822,9 +824,9 @@
             </div>
           {/if}
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
-            {#if alphaFound}
-              <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={t('welcomeSteps.alphaHelp', { n: alphaFound.dives })} disabled={busy} onclick={useAlphaLogbook} />
-            {/if}
+            {#each alphaFound as found (found.id)}
+              <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={alphaFound.length > 1 ? t('welcomeSteps.alphaHelpDated', { n: found.dives, date: new Date(found.modified * 1000).toLocaleDateString() }) : t('welcomeSteps.alphaHelp', { n: found.dives })} disabled={busy} onclick={() => useAlphaLogbook(found)} />
+            {/each}
             <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp', { n: IMPORT_FORMAT_COUNT })} disabled={busy} onclick={() => fileInput?.click()} />
             <!-- Task 2026-11-16-226: the link sits right under « Un fichier », a 48 dp target 4 dp from each row. -->
             <ImportFormats />

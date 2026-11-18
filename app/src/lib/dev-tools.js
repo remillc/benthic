@@ -4,6 +4,7 @@
 // build without VITE_DEV_ACCOUNTS=1 does not contain it. The dev routes refuse any server that is not local (dev-accounts.js).
 // Every dependency is given, so that node:test runs the actions with a fake transport and no device.
 import { createDevApi, randomTempEmail, isTempEmail } from './dev-accounts.js';
+import { ALPHA_IMPORT_KEY } from './alpha-logbook.js';
 
 /** The remembered answer of the last dev action: the server has no « am I subscribed » route yet. */
 export const SUBSCRIBED_KEY = 'od.devSubscribed';
@@ -106,6 +107,16 @@ export function createDevTools(deps) {
 
     /** « Rejouer le premier lancement »: only the beta's first-launch key; the logbooks and the session stay. */
     replayFirstLaunch() {
+      store.setItem(WELCOME_KEY, 'show');
+      reload();
+    },
+
+    /**
+     * « Importer le carnet de la version précédente »: the one-off import is offered again (its « done » mark is cleared)
+     * and the first launch replays; « Importer un carnet » then lists the alpha's local copies, if the device has some.
+     */
+    importAlphaLogbook() {
+      store.removeItem(ALPHA_IMPORT_KEY);
       store.setItem(WELCOME_KEY, 'show');
       reload();
     },

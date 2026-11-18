@@ -1,12 +1,10 @@
-// @ts-check
 // The one-off import of the alpha's logbook (decided on 18 November 2026). A diver who upgraded from the alpha keeps,
-// on the device, the alpha's Subsurface-cloud logbook: the core's own copy of it, in the cache of the cloud account the
-// alpha signed in to. The beta ignores that account (lib/subsurface-cloud.js) and never reads the network for it, but it
-// offers to copy the logbook ONCE into a new logbook on this device. Nothing here writes to the alpha's files or to the
-// cloud: the copy is read from the device (`listCloudDives({ cached: true })`, no network) and exported as a Subsurface
-// file, which the first launch then imports like any other file.
-import { isIgnoredCloudAccount } from './subsurface-cloud.js';
-
+// on the device, the alpha's Subsurface-cloud logbook: the core's own copy of it, a git repository in
+// `.subsurface/cloudstorage/<folder>`. The beta ignores that cloud account (lib/subsurface-cloud.js) and never reads
+// the network for it, but it offers to copy the logbook ONCE into a new logbook on this device. The copy needs no
+// account, no stored credential and no network: the plugin lists the folders (`alphaCacheList`) and the core reads the
+// chosen one as a local git repository, read-only (`alphaCacheOpen`); its dives are exported as a Subsurface file,
+// which the first launch then imports like any other file. Nothing here writes into the alpha's folder.
 /** The device-store key that says the alpha's logbook was imported; the row of « Importer un carnet » is gone from then on. */
 export const ALPHA_IMPORT_KEY = 'od.alphaImportDone';
 
@@ -29,34 +27,31 @@ export function markAlphaImportDone(store) {
 }
 
 /**
- * @typedef {{ dives: number, ids: number[] }} AlphaLogbook
+ * @typedef {{ id: string, branch: string, dives: number, bytes: number, modified: number }} AlphaLogbook
  * @typedef {{
- *   configureCloud: () => Promise<{ available?: boolean, mode?: string }>,
- *   listCloudDives: (options: { cached: boolean }) => Promise<{ available?: boolean, dives?: { id: number }[] }>,
+ *   alphaCacheList: () => Promise<AlphaLogbook[]>,
+ *   alphaCacheOpen: (options: { id: string }) => Promise<{ id: number }[]>,
  *   exportDives: (options: { ids: number[], format: 'ssrf', anonymize: boolean, name: string, text: boolean }) => Promise<{ text?: string }>,
  * }} AlphaCore
  */
 
 /**
- * The alpha's logbook on this device, when there is one to offer: only in the release edition, only before it was
- * imported, only with a Subsurface-cloud account left by the alpha and a device copy of its logbook that holds dives.
- * Reads nothing from the network.
+ * The alpha's logbooks on this device, when there are some to offer: only in the release edition, only before the
+ * import was done, one per cache folder that holds dives, the most recent first. Reads nothing from the network and
+ * needs no account.
  * @param {AlphaCore} core
  * @param {{ getItem: (key: string) => string|null }} store
  * @param {boolean} release
- * @returns {Promise<AlphaLogbook|null>}
+ * @returns {Promise<AlphaLogbook[]>}
  */
-export async function findAlphaLogbook(core, store, release) {
-  if (!release || alphaImportDone(store)) return null;
+export async function findAlphaLogbooks(core, store, release) {
+  if (!release || alphaImportDone(store)) return [];
   try {
-    const account = await core.configureCloud();
-    if (!isIgnoredCloudAccount(account, release)) return null;
-    const copy = await core.listCloudDives({ cached: true });
-    const dives = copy.dives ?? [];
-    return dives.length ? { dives: dives.length, ids: dives.map((d) => d.id) } : null;
+    const folders = await core.alphaCacheList();
+    return folders.filter((f) => f.dives > 0).sort((a, b) => b.modified - a.modified);
   } catch (e) {
     console.error('Reading the previous version’s logbook', /** @type {any} */ (e)?.message);
-    return null;
+    return [];
   }
 }
 
@@ -68,7 +63,8 @@ export async function findAlphaLogbook(core, store, release) {
  * @returns {Promise<{ file: File, text: string }>}
  */
 export async function alphaLogbookFile(core, found, name) {
-  const { text = '' } = await core.exportDives({ ids: found.ids, format: 'ssrf', anonymize: false, name: 'previous-version.ssrf', text: true });
+  const dives = await core.alphaCacheOpen({ id: found.id });
+  const { text = '' } = await core.exportDives({ ids: dives.map((d) => d.id), format: 'ssrf', anonymize: false, name: 'previous-version.ssrf', text: true });
   if (!text) throw new Error('NO_DIVES');
   return { file: new File([text], `${name}.ssrf`, { type: 'application/xml' }), text };
 }

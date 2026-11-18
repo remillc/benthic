@@ -293,6 +293,12 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     return { available: true, json };
   }
 
+  /** The previous version's cloud cache: never present on the desktop, but the contract is the same. */
+  async alphaCache(options) {
+    if (options?.action === 'open') return { json: await this.core('alphaCacheOpen', { id: options.id ?? '' }) };
+    return { json: await this.core('alphaCacheList') };
+  }
+
   async pendingChanges() {
     return { json: await this.core('pendingChanges') };
   }

@@ -386,6 +386,16 @@ export { waterTypeOf };
  */
 
 /**
+ * A folder of the previous version's cloud cache.
+ * @typedef {Object} AlphaCacheFolder
+ * @property {string} id the folder name (a hash)
+ * @property {string} branch the branch the folder holds
+ * @property {number} bytes size of the folder
+ * @property {number} modified last change, seconds since 1970
+ * @property {number} dives number of dives of the branch
+ */
+
+/**
  * Result of reading the cloud. `available` is false when no credentials are
  * configured; the other fields are then absent.
  * @typedef {Object} CloudDives
@@ -618,6 +628,11 @@ export { waterTypeOf };
  *   Read-only access to the Subsurface cloud log (development credentials).
  *   `cached`: the device's copy only, without network, to show the log at once
  *   (after configureCloud).
+ * @property {() => Promise<AlphaCacheFolder[]>} alphaCacheList
+ *   The previous version's cloud cache on this device (`.subsurface/cloudstorage/<folder>`): one entry per folder that
+ *   holds a logbook. Read-only, no network, no credentials.
+ * @property {(options: {id: string}) => Promise<{id: number}[]>} alphaCacheOpen
+ *   Reads that folder's logbook into the core, without address (exportable, not editable), and returns its dives.
  * @property {() => Promise<{id: string, summary: string, message: string}[]>} pendingChanges
  *   Local commits of the loaded cloud log not yet on the server, newest first;
  *   empty for a log without account.
@@ -925,6 +940,14 @@ export const OpenDivesCore = {
     if (!available) return { available: false };
     if (!json) return { available: true, cached: false };
     return { available: true, ...JSON.parse(json) };
+  },
+  async alphaCacheList() {
+    const { json } = await native.alphaCache({ action: 'list' });
+    return JSON.parse(json);
+  },
+  async alphaCacheOpen(options) {
+    const { json } = await native.alphaCache({ action: 'open', id: options.id });
+    return JSON.parse(json);
   },
   async pendingChanges() {
     const { json } = await native.pendingChanges();

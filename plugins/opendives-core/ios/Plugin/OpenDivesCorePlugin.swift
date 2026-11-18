@@ -35,6 +35,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "configureCloud", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "probeCloud", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "listCloudDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "alphaCache", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pendingChanges", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "signOut", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteAccount", returnType: CAPPluginReturnPromise),
@@ -819,6 +820,17 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 json = try OpenDivesNative.cloudListDives(email: stored.email, password: stored.password)
             }
             call.resolve(["available": true, "json": json])
+        }
+    }
+
+    /// The previous version's cloud cache (`<Documents>/.subsurface/cloudstorage/<folder>`), read-only, without network or
+    /// credentials. action "list": the folders; action "open" (id): loads that folder's logbook, without address.
+    @objc func alphaCache(_ call: CAPPluginCall) {
+        let action = call.getString("action", "list")
+        let id = call.getString("id", "")
+        onCoreThread(call, afterSetup: false) {
+            let json = action == "open" ? try OpenDivesNative.alphaCacheOpen(id) : OpenDivesNative.alphaCacheList()
+            call.resolve(["json": json])
         }
     }
 

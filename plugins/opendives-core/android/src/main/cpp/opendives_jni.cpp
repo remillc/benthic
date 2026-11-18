@@ -375,6 +375,26 @@ Java_org_opendives_core_NativeCore_cloudListCachedDives(JNIEnv *env, jobject)
 	return env->NewStringUTF(json.c_str());
 }
 
+// The previous version's cloud cache, read-only (alpha_cache_list / alpha_cache_open).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_alphaCacheList(JNIEnv *env, jobject)
+{
+	std::string json;
+	opendives::alpha_cache_list(json);
+	return env->NewStringUTF(json.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_alphaCacheOpen(JNIEnv *env, jobject, jstring id)
+{
+	std::string json, error;
+	if (opendives::alpha_cache_open(to_string(env, id), json, error) < 0) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_cloudSignOut(JNIEnv *env, jobject, jboolean deleteCopy)
 {

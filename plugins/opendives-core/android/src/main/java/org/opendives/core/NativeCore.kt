@@ -24,6 +24,8 @@ internal object NativeCore {
     external fun cloudListDives(email: String, password: String): String
     external fun cloudConfigure(email: String, password: String)
     external fun cloudListCachedDives(): String
+    external fun alphaCacheList(): String
+    external fun alphaCacheOpen(id: String): String
     external fun pendingChanges(): String
     external fun cloudSignOut(deleteCopy: Boolean)
     external fun editDive(id: Int, changes: String): String

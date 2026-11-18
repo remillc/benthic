@@ -306,6 +306,20 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("available", true).put("json", json))
     }
 
+    /**
+     * The previous version's cloud cache (`<files>/.subsurface/cloudstorage/<folder>`), read-only, without network or
+     * credentials. action "list": the folders (id, branch, bytes, modified, dives); action "open" (id): loads that
+     * folder's logbook into the core, as a log without address, and returns its dives.
+     */
+    @PluginMethod
+    fun alphaCache(call: PluginCall) = onCoreThread(call, afterSetup = false) {
+        val json = when (call.getString("action", "list")) {
+            "open" -> NativeCore.alphaCacheOpen(call.getString("id", "") ?: "")
+            else -> NativeCore.alphaCacheList()
+        }
+        call.resolve(JSObject().put("json", json))
+    }
+
     /** Local commits of the loaded cloud log not yet on the server (manual synchronisation). */
     @PluginMethod
     fun pendingChanges(call: PluginCall) = onCoreThread(call, afterSetup = false) {
