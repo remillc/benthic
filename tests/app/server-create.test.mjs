@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { MARKER_PATH, diveFile, divePath, filesOfDive, markerFile, newId, profileFile, profilePath, stableJson, uniqueKeys } from '../../app/src/lib/server-logbook-format.js';
-import { UPLOAD_KEY, UploadError, pendingUpload, timeLeft, uploadLogbook } from '../../app/src/lib/server-upload.js';
+import { UPLOAD_KEY, UploadError, pendingUpload, uploadLogbook } from '../../app/src/lib/server-upload.js';
 import { isEmptyBranch } from '../../app/src/lib/server-logbook.js';
 import { createChoices } from '../../app/src/lib/server-create.js';
 import { afterSignIn, summaryRows } from '../../app/src/lib/odplus.js';
@@ -204,13 +204,6 @@ test('a state of another repository is not resumed, and no token is ever stored'
   assert.ok(!store.getItem(UPLOAD_KEY).includes(access.token));
 });
 
-test('the time left is unknown at first, then in seconds, then in minutes', () => {
-  assert.deepEqual(timeLeft({ done: 0, total: 10, startedDone: 0, elapsedMs: 5000 }), { unit: 'none', n: 0 });
-  assert.deepEqual(timeLeft({ done: 5, total: 10, startedDone: 0, elapsedMs: 10000 }), { unit: 'seconds', n: 10 });
-  assert.deepEqual(timeLeft({ done: 100, total: 312, startedDone: 0, elapsedMs: 60000 }), { unit: 'minutes', n: 2 });
-  assert.deepEqual(timeLeft({ done: 10, total: 10, startedDone: 0, elapsedMs: 9000 }), { unit: 'none', n: 0 });
-});
-
 test('an unfinished upload is offered again at the start: a fresh one goes straight on, a stopped one asks', () => {
   assert.equal(resumeStep(null), null);
   assert.equal(resumeStep({ v: 1, fresh: true }), 'createSend');
@@ -311,7 +304,7 @@ test('every text of the new screens is in fr and en, and the price is the one of
     const c = langs[lang];
     for (const base of ['sendTitle', 'nameHelp', 'safe', 'created', 'offlineHelp', 'interruptedHelp']) for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`${base}${s}` in c.serverCreate, `${lang}: ${base}${s}`);
     for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`lead${s}` in c.odplus.ready, `${lang}: ready lead${s}`);
-    for (const key of ['progress', 'sendHelp', 'sendingName', 'leftMinutes', 'interruptedSent', 'sentCount']) assert.equal(typeof c.serverCreate[key], 'object', `${lang}: ${key} is a plural`);
+    for (const key of ['progress', 'sendHelp', 'sendingName', 'interruptedSent', 'sentCount']) assert.equal(typeof c.serverCreate[key], 'object', `${lang}: ${key} is a plural`);
     assert.ok(c.serverSteps.backHome);
     assert.ok(!('title' in c.serverSteps), 'no « Serveur OpenDives » overline text');
   }

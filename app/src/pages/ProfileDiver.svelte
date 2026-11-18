@@ -51,7 +51,7 @@
       <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
     <a href="/profile/maintenance/" class="od-profile--row">
-      <span class="od-profile--tile od-profile--tile-amber"><Icon name="clock" size={22} weight={1.8} /></span>
+      <span class="od-profile--tile od-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
       <span class="od-profile--texts">
         <span class="od-profile--label">{t('maintenance.entry')}</span>
       </span>
@@ -183,7 +183,8 @@
     }
 
     .od-profile--tile-amber {
-      background: var(--od-tile-amber, var(--od-tile-violet));
+      background: var(--od-maintenance);
+      color: var(--od-maintenance-icon);
     }
 
     .od-profile--badge {

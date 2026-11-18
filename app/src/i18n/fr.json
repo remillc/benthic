@@ -2117,6 +2117,8 @@
     "releaseNotes": [
       "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
       "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
+      "Offre OpenDives+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
+      "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
@@ -4720,6 +4722,8 @@
       "gearText": "Bouteilles, kits, ordinateurs.",
       "certifications": "Brevets",
       "certificationsText": "Vos cartes, toujours sur vous.",
+      "maintenance": "Rappels d’entretien",
+      "maintenanceText": "Détendeur, bouteille, pile : prévenu 30 jours avant l’échéance.",
       "price": "14,99 $ US",
       "per": "par an",
       "priceDetail": "soit 1,25 $ par mois · Résiliable en tout temps",
@@ -4755,6 +4759,21 @@
       "open": "Ouvrir mon carnet"
     }
   },
+  "timeLeft": {
+    "seconds": {
+      "one": "{n} s restante",
+      "other": "{n} s restantes"
+    },
+    "minutes": "{n} min restantes",
+    "secondsSpoken": {
+      "one": "{n} seconde restante",
+      "other": "{n} secondes restantes"
+    },
+    "minutesSpoken": {
+      "one": "{n} minute restante",
+      "other": "{n} minutes restantes"
+    }
+  },
   "serverCreate": {
     "title": "Aucun carnet sur votre compte",
     "lead": "Votre compte OpenDives+ est prêt, mais il ne contient pas encore de carnet. Créez-en un, ou envoyez un carnet que vous avez déjà.",
@@ -4785,12 +4804,6 @@
     "progress": {
       "one": "{n} plongée sur {total}",
       "other": "{n} plongées sur {total}"
-    },
-    "leftNone": "Calcul du temps restant…",
-    "leftSeconds": "Environ {n} secondes",
-    "leftMinutes": {
-      "one": "Environ {n} minute",
-      "other": "Environ {n} minutes"
     },
     "safe": "Le carnet est déjà enregistré sur cette tablette. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
     "safePhone": "Le carnet est déjà enregistré sur ce téléphone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",

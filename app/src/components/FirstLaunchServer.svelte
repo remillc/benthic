@@ -11,6 +11,7 @@
   import ReleaseField from './ReleaseField.svelte';
   import CodeField from './CodeField.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
+  import ProgressLine from './ProgressLine.svelte';
   import OdPlusChip from './OdPlusChip.svelte';
   import { flow, go, goBack, goBackTo, goCreate, goOffer, goReplace } from '../lib/first-launch.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
@@ -320,7 +321,9 @@
         <span class="od-first-launch-server--mark od-first-launch-server--current"><span class="od-first-launch-server--dot"></span></span>
         <span class="od-first-launch-server--text">
           <span class="od-first-launch-server--name od-first-launch-server--name-current">{t('serverSteps.progressDownload')}</span>
-          <span class="od-first-launch-server--detail">{d.total ? t('serverSteps.progressCount', { done: d.done, total: d.total }) : t('serverSteps.progressListing')}</span>
+          <span class="od-first-launch-server--detail">
+            {#if d.total}<ProgressLine done={d.done} total={d.total} count={t('serverSteps.progressCount', { done: d.done, total: d.total })} />{:else}{t('serverSteps.progressListing')}{/if}
+          </span>
         </span>
       </div>
       <div class="od-first-launch-server--bar">
@@ -541,6 +544,7 @@
 
     .od-first-launch-server--text {
       display: flex;
+      flex: 1;
       flex-direction: column;
       gap: 2px;
       padding-top: 4px;
