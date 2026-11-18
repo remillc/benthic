@@ -1565,6 +1565,22 @@ class OpenDivesCorePlugin : Plugin() {
         if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
     }
 
+    /**
+     * The document scanner (DocumentScanActivity: ML Kit Document Scanner, then text recognition).
+     * Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.
+     */
+    @PluginMethod
+    fun scanDocument(call: PluginCall) {
+        val intent = Intent(context, DocumentScanActivity::class.java)
+        startActivityForResult(call, intent, "scanDocumentResult")
+    }
+
+    @ActivityCallback
+    private fun scanDocumentResult(call: PluginCall, result: ActivityResult) {
+        val json = result.data?.getStringExtra("result")
+        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+    }
+
     /** The brightness the window had before keepScreenAwake raised it (null when it is not raised). */
     private var savedBrightness: Float? = null
 

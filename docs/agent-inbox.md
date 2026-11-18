@@ -5605,3 +5605,5 @@ Christian approved this on 18 November 2026. Work in `main`. **This task correct
 **4. Suggested service interval for a regulator:** every year (« Suggéré pour un détendeur : tous les ans »), on all devices. It was every 2 years in tasks 273 and 275.
 
 **Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
+
+**Points 1 and 4 done; 2 and 3 with task 275.**

@@ -105,6 +105,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "enableBluetooth", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "qrScan", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "scanDocument", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "keepScreenAwake", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "installSource", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestReview", returnType: CAPPluginReturnPromise),
@@ -1523,6 +1524,25 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 }
             }
             host.present(scanner, animated: true)
+        }
+    }
+
+    /// The document scanner (DocumentScanController: VisionKit, then Vision text recognition).
+    /// Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.
+    @objc func scanDocument(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { [self] in
+            guard let host = bridge?.viewController else {
+                call.reject("No screen to show the scanner", "FAILED")
+                return
+            }
+            guard DocumentScanController.isSupported else {
+                call.resolve(["action": "unavailable"])
+                return
+            }
+            let scanner = DocumentScanController { result in
+                call.resolve(result)
+            }
+            host.present(scanner.viewController, animated: true)
         }
     }
 

@@ -59,7 +59,7 @@ export const SOON_DIVES = 10;
 export const SUGGESTIONS = {
   computer: [{ task: 'battery', months: 24 }],
   regulator: [
-    { task: 'service', months: 24 },
+    { task: 'service', months: 12 },
     { task: 'travelCheck', months: 12 },
   ],
   suit: [{ task: 'seals', months: 12 }],

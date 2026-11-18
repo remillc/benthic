@@ -11,7 +11,7 @@ import { createProfile, ConsentRequiredError, UNKNOWN_BLOOD, BLOOD_GROUPS, empty
 import { createHealthConsent } from '../../app/src/lib/health-consent.js';
 import { createServerApi } from '../../app/src/lib/server-api.js';
 import { formatNational, formatInternational, nationalDigits, isCompletePhone } from '../../app/src/lib/phone-format.js';
-import { parseCardText } from '../../app/src/lib/card-scan.js';
+import { parseCardText, findDate, scanCard } from '../../app/src/lib/card-scan.js';
 import { blank, warpPerspective, detectCard, removeGlare, orderCorners, homography, cardSize } from '../../app/src/lib/card-image.js';
 import { ReadOnlyError } from '../../app/src/lib/inventory.js';
 
@@ -281,17 +281,61 @@ test('the level suggestions follow the agency and what is typed', () => {
 });
 
 test('parseCardText proposes the agency, the level and the number from a scanned card', () => {
-  assert.deepEqual(parseCardText('PADI\nAdvanced Open Water Diver\nValérie Tremblay\nDiver No. 1504AB2231\nDate 12 JUN 2015'), { agency: 'PADI', level: 'Advanced Open Water Diver', number: '1504AB2231' });
-  assert.deepEqual(parseCardText('Scuba Schools International\nSSI\nStress & Rescue (Sauveteur)\nCert # 7721-0934'), { agency: 'SSI', level: 'Stress & Rescue (Sauveteur)', number: '7721-0934' });
-  assert.deepEqual(parseCardText('CMAS\n2 star diver\nCard number: BE-2234-98\n'), { agency: 'CMAS', level: '2 star diver', number: 'BE-2234-98' });
-  assert.deepEqual(parseCardText('NAUI\nAdvanced Scuba Diver\nN° 884102'), { agency: 'NAUI', level: 'Advanced Scuba Diver', number: '884102' });
+  assert.deepEqual(parseCardText('PADI\nAdvanced Open Water Diver\nValérie Tremblay\nDiver No. 1504AB2231\nDate 12 JUN 2015'), { agency: 'PADI', level: 'Advanced Open Water Diver', number: '1504AB2231', issuedOn: '2015-06-12' });
+  assert.deepEqual(parseCardText('Scuba Schools International\nSSI\nStress & Rescue (Sauveteur)\nCert # 7721-0934'), { agency: 'SSI', level: 'Stress & Rescue (Sauveteur)', number: '7721-0934', issuedOn: '' });
+  assert.deepEqual(parseCardText('CMAS\n2 star diver\nCard number: BE-2234-98\n'), { agency: 'CMAS', level: '2 star diver', number: 'BE-2234-98', issuedOn: '' });
+  assert.deepEqual(parseCardText('NAUI\nAdvanced Scuba Diver\nN° 884102'), { agency: 'NAUI', level: 'Advanced Scuba Diver', number: '884102', issuedOn: '' });
   const tdi = parseCardText('Technical Diving International\nTDI\nAdvanced Nitrox Diver\nDiver Number: 20231188');
   assert.equal(tdi.agency, 'TDI');
   assert.equal(tdi.level, 'Advanced Nitrox Diver');
   assert.equal(tdi.number, '20231188');
-  assert.deepEqual(parseCardText('PADI\nRescue Diver\n1608AC0412'), { agency: 'PADI', level: 'Rescue Diver', number: '1608AC0412' });
-  assert.deepEqual(parseCardText(''), { agency: '', level: '', number: '' });
-  assert.deepEqual(parseCardText('Hello world'), { agency: '', level: '', number: '' });
+  assert.deepEqual(parseCardText('PADI\nRescue Diver\n1608AC0412'), { agency: 'PADI', level: 'Rescue Diver', number: '1608AC0412', issuedOn: '' });
+  assert.deepEqual(parseCardText(''), { agency: '', level: '', number: '', issuedOn: '' });
+  assert.deepEqual(parseCardText('Hello world'), { agency: '', level: '', number: '', issuedOn: '' });
+});
+
+test('findDate reads the usual card formats, prefers a labelled date and skips future dates', () => {
+  const today = '2026-11-18';
+  assert.equal(findDate('Date 12 JUN 2015', today), '2015-06-12');
+  assert.equal(findDate('Délivré le 3 février 2019', today), '2019-02-03');
+  assert.equal(findDate('June 4, 2012', today), '2012-06-04');
+  assert.equal(findDate('12/06/2015', today), '2015-06-12', 'day first');
+  assert.equal(findDate('06/25/2015', today), '2015-06-25', 'month first when the second number cannot be a month');
+  assert.equal(findDate('2015-06-12', today), '2015-06-12');
+  assert.equal(findDate('Expires 12 JUN 2031\nIssued 04 MAR 2016', today), '2016-03-04', 'the labelled issue date wins');
+  assert.equal(findDate('Valid until 12/06/2031', today), '', 'a future date is not proposed');
+  assert.equal(findDate('31/02/2015', today), '', 'not a real date');
+  assert.equal(findDate('Hello', today), '');
+});
+
+test('scanCard: the native scanner answers, a cancel changes nothing, no scanner falls back to the picker', async () => {
+  const picked = { image: new Blob(['p']), text: '' };
+  const picker = async () => picked;
+  const b64 = Buffer.from('jpegbytes').toString('base64');
+  const done = await scanCard('front', { scanner: async () => ({ action: 'done', image: b64, text: 'PADI\nRescue Diver' }), picker });
+  assert.equal(done?.text, 'PADI\nRescue Diver');
+  assert.equal(await done?.image.text(), 'jpegbytes');
+  assert.equal(await scanCard('back', { scanner: async () => ({ action: 'cancelled' }), picker: async () => assert.fail('no picker after a cancel') }), null);
+  assert.equal(await scanCard('front', { scanner: async () => ({ action: 'unavailable' }), picker }), picked);
+  assert.equal(await scanCard('front', { scanner: async () => { throw new Error('UNAVAILABLE'); }, picker }), picked);
+  assert.equal(await scanCard('front', { scanner: async () => ({ action: 'done', image: '', text: '' }), picker }), picked, 'an empty scan falls back');
+});
+
+test('« Nouveau brevet »: the scan fills agency, level, number and date with the mark; nothing found stays silent', () => {
+  const page = read('pages/ProfileCertEdit.svelte');
+  assert.ok(page.includes('readFrom.agency = agency = found.agency'));
+  assert.ok(page.includes('readFrom.issuedOn = issuedOn = found.issuedOn'));
+  assert.ok(page.includes("readFrom[field] === value ? t('diverProfile.cert.readMark')"), 'the mark shows only while the field still holds the scanned value');
+  assert.ok(page.includes('if (!scanned) return;'), 'a cancel changes nothing');
+  assert.equal(page.split('showSnackbar(').length - 1, 3, 'only the save and photo failures show a message: nothing read stays silent');
+  for (const lang of ['fr', 'en']) {
+    const j = JSON.parse(read(`i18n/${lang}.json`)).diverProfile.cert;
+    for (const k of ['photoFront', 'photoBack', 'photoReplace', 'readMark', 'photoHint', 'sideFront', 'sideBack']) assert.ok(j[k], `${lang} ${k}`);
+  }
+  const fr = JSON.parse(read('i18n/fr.json')).diverProfile.cert;
+  assert.equal(fr.photoFront, 'Scanner le recto');
+  assert.equal(fr.readMark, 'Lu sur la carte, à vérifier');
+  assert.equal(fr.photoHint, 'Scannez la carte : l’app y lit l’agence, le niveau et le numéro. Vérifiez-les.');
 });
 
 // ---- Card image (desktop module) ----
