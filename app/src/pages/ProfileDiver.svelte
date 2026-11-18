@@ -6,7 +6,7 @@
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import OdPlusChip from '../components/OdPlusChip.svelte';
-  import { gear, loadInventory, visibleGear } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -15,6 +15,7 @@
   const total = $derived(logbook.dives.length);
   const since = $derived(logbook.dives.reduce((year, d) => Math.min(year, Number(d.date.slice(0, 4)) || year), 9999));
   const divesLine = $derived(total ? t('gear.profile.divesSince', { n: total, year: String(since) }) : t('gear.profile.noDive'));
+  const overdue = $derived(overdueBadge());
   const equipmentLine = $derived(
     gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
   );
@@ -47,6 +48,14 @@
         <span class="od-profile--label">{t('gear.profile.equipment')}</span>
         <span class="od-profile--supporting">{equipmentLine}</span>
       </span>
+      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+    </a>
+    <a href="/profile/maintenance/" class="od-profile--row">
+      <span class="od-profile--tile od-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
+      <span class="od-profile--texts">
+        <span class="od-profile--label">{t('maintenance.entry')}</span>
+      </span>
+      {#if overdue > 0}<span class="od-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
       <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
     <!-- Later tasks: shown, inert. -->
@@ -171,6 +180,28 @@
 
     .od-profile--tile-blue {
       background: var(--od-release-tile);
+    }
+
+    .od-profile--tile-amber {
+      background: var(--od-maintenance);
+      color: var(--od-maintenance-icon);
+    }
+
+    .od-profile--badge {
+      flex: none;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-alarm);
+      color: #FFFFFF;
+      font-size: 13px;
+      line-height: 22px;
+      font-weight: 600;
     }
 
     .od-profile--tile-violet {

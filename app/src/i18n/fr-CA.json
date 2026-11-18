@@ -96,5 +96,51 @@
   "about": {
     "issuesText": "Par courriel, avec les informations techniques",
     "opensMail": "s'ouvre dans l'application de courriel"
+  },
+  "maintenance": {
+    "title": "Entretien",
+    "entry": "Entretien",
+    "piece": {
+      "title": "Entretien",
+      "cardTitle": "Entretien",
+      "note": "Noter un entretien",
+      "openAria": "Entretien de {name}"
+    },
+    "task": {
+      "service": "Entretien",
+      "hydrostatic": "Test hydrostatique"
+    },
+    "kind": {
+      "service": "Entretien"
+    },
+    "kindHelp": {
+      "service": "Entretien : démontage complet par un technicien, pièces d’usure changées et réglage."
+    },
+    "note": {
+      "title": "Noter un entretien",
+      "nextBoth": "Prochain entretien : le {date}, ou après {n} plongées.",
+      "nextDate": "Prochain entretien : le {date}.",
+      "nextDives": "Prochain entretien : après {n} plongées.",
+      "saved": "Entretien noté",
+      "failed": "L’entretien n’a pas pu être enregistré"
+    },
+    "ruleSheet": {
+      "title": "Rappel d’entretien",
+      "timeHelp": "Depuis le dernier entretien",
+      "warnHelp": "Quand la pièce est en retard d’entretien"
+    },
+    "reminderCard": {
+      "title": "Rappel d’entretien"
+    },
+    "diveWarning": "{what} : retard d’entretien",
+    "diveWarningTitle": "Entretien en retard",
+    "notify": {
+      "leadTitle": "Entretien à prévoir",
+      "dueTitle": "Entretien à faire aujourd’hui"
+    },
+    "channel": {
+      "name": "Entretien de l’équipement",
+      "description": "Prévient avant la date d’un entretien, et le jour même"
+    }
   }
 }

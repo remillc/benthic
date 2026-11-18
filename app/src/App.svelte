@@ -125,6 +125,9 @@
           { path: '/profile/gear/new', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
           { path: '/profile/gear/:id', ...lazy(() => import('./pages/ProfilePiece.svelte')) },
           { path: '/profile/gear/:id/edit', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
+          { path: '/profile/gear/:id/maintenance', ...lazy(() => import('./pages/ProfilePieceMaintenance.svelte')) },
+          { path: '/profile/gear/:id/maintenance/note', ...lazy(() => import('./pages/ProfileMaintenanceNote.svelte')) },
+          { path: '/profile/maintenance/', ...lazy(() => import('./pages/ProfileMaintenance.svelte')) },
           { path: '/profile/kits/new', ...lazy(() => import('./pages/ProfileKit.svelte')) },
           { path: '/profile/kits/:id', ...lazy(() => import('./pages/ProfileKit.svelte')) },
         ]
@@ -350,6 +353,14 @@
     enableTopBarScroll();
     enableDeepLinks();
     startFlightReminder();
+    if (isRelease) {
+      // The maintenance notifications follow the reminders: read the inventory once at start so that they are right.
+      import('./lib/maintenance-notify.js')
+        .then((m) => m.startMaintenanceNotifications())
+        .then(() => import('./lib/inventory.svelte.js'))
+        .then((m) => m.loadInventory())
+        .catch((e) => console.error('Inventory', e));
+    }
     enableAccessibility();
     enableDetailPageCleanup();
     enableModalCleanup();
