@@ -101,7 +101,7 @@ test('a build without the switch contains nothing of it; a build with it does', 
   const app = fileURLToPath(new URL('../../app/', import.meta.url));
   const vite = fileURLToPath(new URL('../../app/node_modules/vite/bin/vite.js', import.meta.url));
   const tmp = mkdtempSync(join(tmpdir(), 'od-devaccounts-'));
-  const marks = /dev-google|dev-subscribe|dev-reset|DevGoogle|od-dev-google|od-dev-delete|essai-/;
+  const marks = /dev-google|dev-subscribe|dev-unsubscribe|dev-reset|DevGoogle|od-dev-google|od-dev-delete|od-dev-tools|Outils de développement|essai-/;
   try {
     for (const [name, on] of [['off', ''], ['on', '1']]) {
       const outDir = join(tmp, name);

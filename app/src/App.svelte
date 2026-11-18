@@ -31,6 +31,7 @@
   import { logbookToNarrow, settingsToNarrow, settingsToWide, statisticsToNarrow, statisticsToWide, toolsToNarrow, toolsToWide } from './lib/adaptive-handoff.js';
   import DesktopSites from './pages/DesktopSites.svelte';
   import RouteBadge from './components/RouteBadge.svelte';
+  import { devAccounts } from './lib/dev-switch.js';
   /** Development aid: the address of the page on screen (app/.env.local, VITE_SHOW_ROUTE=1). */
   // The route badge, for development builds: shown when app/.env.local (not in git) sets
   // VITE_SHOW_ROUTE=1, on the development server and in the APKs built here. A release is
@@ -423,6 +424,7 @@
   <QrReceived />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
+  {#if devAccounts}{#await import('./components/DevToolsHost.svelte') then { default: DevToolsHost }}<DevToolsHost />{/await}{/if}
   <Welcome />
   <DemoHost />
   <!-- Desktop: a window with no logbook shows its start screen. The release edition shows « Pour commencer » (task 2026-11-16-228); the new-logbook dialog opens from the selector and the menu bar (task 2026-11-15-173). -->

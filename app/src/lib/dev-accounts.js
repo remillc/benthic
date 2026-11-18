@@ -76,6 +76,10 @@ export function createDevApi({ baseUrl = serverUrl(), transport = serverTranspor
     async subscribe(sessionToken) {
       await post('/v1/account/dev-subscribe', {}, { Authorization: `Bearer ${sessionToken}` });
     },
+    /** Marks the account not subscribed again (the development route). @param {string} sessionToken */
+    async unsubscribe(sessionToken) {
+      await post('/v1/account/dev-unsubscribe', {}, { Authorization: `Bearer ${sessionToken}` });
+    },
     /** Deletes the temporary account with its repository. @param {string} sessionToken */
     async reset(sessionToken) {
       await post('/v1/account/dev-reset', {}, { Authorization: `Bearer ${sessionToken}` });

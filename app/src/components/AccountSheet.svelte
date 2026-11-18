@@ -19,6 +19,7 @@
   import { t } from '../lib/i18n.js';
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { isRelease } from '../lib/edition.js';
+  import { devAccounts } from '../lib/dev-switch.js';
   import OdPlusChip from './OdPlusChip.svelte';
   import { openManageAccount } from '../lib/navigation.svelte.js';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
@@ -162,6 +163,7 @@
         <Icon name="chevron" size={20} />
       </button>
     </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if !logbook.loading && !logbook.error}
       <div class="od-account-sheet--ios-group">
         {#if logbook.syncFailure}
@@ -262,6 +264,7 @@
         <span class="od-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
       </div>
     </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if isRelease && !desktopApp}
       <div class="od-account-sheet--card">
         <a href="#offer-sync" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
@@ -330,6 +333,8 @@
         </div>
       {/if}
     </div>
+
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages. An OpenDives+
          account sees the chip above its title and, when a piece is overdue, the red badge and line (task 2026-11-18-281). -->

@@ -1,5 +1,6 @@
 <script>
   // @ts-check
+  import { devAccounts } from '../lib/dev-switch.js';
   // Desktop app: the account sheet (task 2026-11-15-202, docs/mockups/bureau-compte.dc.html), a
   // 380 dp card anchored above the rail's account initial: the account, « Synchroniser maintenant »,
   // the two sync switches, then « Se déconnecter ». Escape or a click outside closes it. Réglages
@@ -135,6 +136,7 @@
       </span>
     </div>
 
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if free}
       <div class="od-desktop-account--offer">
         <button type="button" class="od-desktop-account--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>

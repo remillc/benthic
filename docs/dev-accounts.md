@@ -30,3 +30,17 @@ The script takes the stack from `OPENDIVES_SERVER_DIR` (default: the `opendives-
 3. In the app: « Se connecter » → « Continuer avec Google » → the simulated sheet.
 
 The reverse ports last until the phone is unplugged or adb restarts. The emulator works the same way (`adb -s emulator-5554 reverse ...`).
+
+## The « Outils de développement » menu
+
+Same switch (`VITE_DEV_ACCOUNTS=1`), same local-server guard. A row marked « DEV » sits just under the first card of the account sheet (free and subscriber sheets; phone, iPhone, tablet and desktop); with `VITE_SHOW_ROUTE=1`, a long press (0.6 s) on the route badge opens it too. It is a bottom sheet with the current state (free or subscribed, the session's e-mail, the server) and:
+
+- **Passer en compte gratuit** (two items): sign out of OpenDives+ keeping the device logbook (the app opens it), or keep the session and mark the account not subscribed (`POST /v1/account/dev-unsubscribe`).
+- **Passer en compte abonné**: without a session, a temporary account (`dev-google`) then `dev-subscribe`; with a session, `dev-subscribe`.
+- **Nouveau compte d'essai**: a fresh temporary account, not subscribed, replacing the session.
+- **Supprimer ce compte d'essai**: `dev-reset`, then sign out with the device copy (temporary `@opendives.test` accounts only).
+- **Rejouer le premier lancement**: sets `od.welcomeBeta` to `show`; logbooks and session stay.
+
+Each action ends with a snackbar and an automatic reload of the app, so that every screen (sheet, profile access, sync) reads the new state. The subscribed state is remembered on the device (`od.devSubscribed`) because the server has no « am I subscribed » route yet.
+
+Code: `app/src/lib/dev-tools.js` (actions, tested in `tests/app/dev-tools.test.mjs`), `components/DevToolsRow.svelte`, `DevToolsMenu.svelte`, `DevToolsHost.svelte`. `vite.config.js` stubs these files in a build without the switch, and `tests/app/dev-accounts.test.mjs` searches the bundle for them.
