@@ -44,6 +44,75 @@ export const COLUMNS = [
   { key: 'tags', label: 'desktop.column.tags', numeric: false, defaultShown: false, value: (_, x) => joined(x?.tags) },
 ];
 
+/** The narrowest a column reads well, in px (fluid layout: the columns that do not fit are left out). */
+export const COLUMN_MIN_WIDTH = { number: 48, date: 170, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+
+/**
+ * The columns that fit in a table `width` px wide: N° and Date always, then the others in the diver's order while
+ * they fit. The ones left out stay chosen; they come back when the pane is wider (docs/system-design.md,
+ * section 7, « Fluid desktop layout »).
+ * @param {Column[]} columns the shown columns, in order
+ * @param {number} width the room the table has, in px; 0 when not measured yet
+ * @param {Record<string, number>} [widths] the widths the diver gave to some columns (a column needs its own width)
+ * @returns {Column[]}
+ */
+export function fittingColumns(columns, width, widths = {}) {
+  if (!width) return columns;
+  let used = 0;
+  /** @type {Column[]} */
+  const kept = [];
+  for (const column of columns) {
+    const need = widths[column.key] ?? /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[column.key] ?? 120;
+    const required = column.key === 'number' || column.key === 'date';
+    if (!required && used + need > width) continue;
+    kept.push(column);
+    used += need;
+  }
+  return kept;
+}
+
+/** The width the stylesheet gives a column when the diver gave none, in px (the others: 140). */
+const COLUMN_DEFAULT_WIDTH = { number: 48, date: 170, site: 244, maxDepth: 84, duration: 76, buddies: 116, waterTemp: 84, airTemp: 84, meanDepth: 84, rating: 84 };
+
+/**
+ * The width a column has when every column has its own: the diver's, else the default.
+ * @param {string} key
+ * @param {Record<string, number>} [widths]
+ * @returns {number}
+ */
+export const columnWidth = (key, widths = {}) => widths[key] ?? /** @type {Record<string, number>} */ (COLUMN_DEFAULT_WIDTH)[key] ?? 140;
+
+/** The widest a column can be dragged to, in px. */
+export const COLUMN_MAX_WIDTH = 640;
+
+/** The narrowest width a column can be given (task 2026-11-15-181): its reading minimum, at least 48 px. @param {string} key */
+export const minColumnWidth = (key) => (key === 'site' ? 96 : /** @type {Record<string, number>} */ (COLUMN_MIN_WIDTH)[key] ?? 72);
+
+/**
+ * A width the diver gave to a column, kept between its minimum and COLUMN_MAX_WIDTH.
+ * @param {string} key
+ * @param {number} width
+ * @returns {number}
+ */
+export function clampColumnWidth(key, width) {
+  return Math.round(Math.max(minColumnWidth(key), Math.min(COLUMN_MAX_WIDTH, width)));
+}
+
+/**
+ * The remembered widths, cleaned: only known columns, finite numbers within the limits.
+ * @param {unknown} stored
+ * @returns {Record<string, number>}
+ */
+export function cleanColumnWidths(stored) {
+  /** @type {Record<string, number>} */
+  const out = {};
+  if (!stored || typeof stored !== 'object') return out;
+  for (const [key, value] of Object.entries(stored)) {
+    if (COLUMNS.some((c) => c.key === key) && typeof value === 'number' && Number.isFinite(value)) out[key] = clampColumnWidth(key, value);
+  }
+  return out;
+}
+
 /** The columns shown when the diver has chosen none. */
 export const DEFAULT_COLUMNS = COLUMNS.filter((c) => c.defaultShown).map((c) => c.key);
 
@@ -348,6 +417,17 @@ export function clampTableWidth(wanted, available, { minTable = 420, minDetail =
 }
 
 /**
+ * The width of the table's pane: what the diver dragged it to, or, until then, 760 dp in a wide window and
+ * 57 % of the view in a narrower one (fluid layout: the detail keeps its room in a 1200 dp window).
+ * @param {number|null|undefined} stored the remembered width, null when the diver never moved the handle
+ * @param {number} available the width of the view
+ * @returns {number}
+ */
+export function tableWidthFor(stored, available) {
+  return typeof stored === 'number' ? stored : Math.min(760, Math.round(available * 0.57));
+}
+
+/**
  * The trips the selected dives can join (task 2026-11-15-194, « Fusionner avec le voyage
  * précédent / suivant »): in the logbook's order, newest first, the selection must be one run
  * of consecutive dives; « previous » is the trip of the dive just above it (more recent), « next »
@@ -370,4 +450,79 @@ export function adjacentTrips(dives, ids) {
   /** @param {import('opendives-core').Dive|undefined} d */
   const tripOf = (d) => (d?.trip && !(inside.size === 1 && inside.has(d.trip.id)) ? { id: d.trip.id, location: d.trip.location } : null);
   return { previous: tripOf(order[first - 1]), next: tripOf(order[last + 1]) };
+}
+
+// --- Windowing: the table draws only the rows in view. ----------------------------------------
+
+/** A dive row is 48 px plus the 2 px between rows; a trip row 44 px plus 2 (the table's styles set the 48 and the 44). */
+export const ROW_HEIGHT = 50;
+export const TRIP_HEIGHT = 46;
+/** From the top of the table to the first row: spacing, header (36), spacing. */
+export const BODY_TOP = 40;
+/** Rows kept drawn above and below the view, so a fast scroll or a held key finds rows in place. */
+export const OVERSCAN = 10;
+
+/**
+ * Where each row starts, in px from the first row's top; one more entry holds the total height.
+ * @param {{type: string}[]} rows
+ * @returns {Float64Array}
+ */
+export function rowOffsets(rows) {
+  const out = new Float64Array(rows.length + 1);
+  for (let i = 0; i < rows.length; i++) out[i + 1] = out[i] + (rows[i].type === 'trip' ? TRIP_HEIGHT : ROW_HEIGHT);
+  return out;
+}
+
+/**
+ * The first row whose bottom is below `y` (px from the first row's top); the row count when none.
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} y
+ */
+export function rowAt(offsets, y) {
+  let lo = 0;
+  let hi = offsets.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (offsets[mid + 1] > y) hi = mid;
+    else lo = mid + 1;
+  }
+  return lo;
+}
+
+/**
+ * The rows to draw for a scroll position: those in view plus the overscan, and the height of the
+ * two spacer rows that stand for the others (less the 2 px a row of their own would add around them).
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} scrollTop
+ * @param {number} viewHeight the scroll area's height; unknown (0) counts as a tall screen
+ * @returns {{start: number, end: number, padTop: number, padBottom: number}}
+ */
+export function windowRange(offsets, scrollTop, viewHeight) {
+  const n = offsets.length - 1;
+  const top = scrollTop - BODY_TOP;
+  const start = Math.max(0, rowAt(offsets, top) - OVERSCAN);
+  const end = Math.min(n, rowAt(offsets, top + (viewHeight || 900)) + 1 + OVERSCAN);
+  return {
+    start,
+    end,
+    padTop: start > 0 ? offsets[start] - 2 : 0,
+    padBottom: end < n ? offsets[n] - offsets[end] - 2 : 0,
+  };
+}
+
+/**
+ * The scroll position that brings row `index` fully into view (under the sticky header), the current one when it already is.
+ * @param {Float64Array} offsets from rowOffsets
+ * @param {number} index
+ * @param {number} scrollTop
+ * @param {number} viewHeight
+ */
+export function scrollForRow(offsets, index, scrollTop, viewHeight) {
+  if (index < 0 || index >= offsets.length - 1) return scrollTop;
+  const top = BODY_TOP + offsets[index];
+  const bottom = top + (offsets[index + 1] - offsets[index]) - 2;
+  const head = BODY_TOP - 2;
+  if (top - head < scrollTop) return Math.max(0, top - head);
+  if (bottom > scrollTop + viewHeight) return bottom - viewHeight;
+  return scrollTop;
 }

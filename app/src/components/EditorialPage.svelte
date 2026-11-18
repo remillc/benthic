@@ -28,7 +28,7 @@
   import WelcomeHelpLink from './WelcomeHelpLink.svelte';
   import FirstLaunchBand from './FirstLaunchBand.svelte';
   import FirstLaunchPanel from './FirstLaunchPanel.svelte';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -94,11 +94,13 @@
   /** The title ends with a full stop, unless it is a question. */
   const shownHeading = $derived(/[.?!…]$/.test(heading) ? heading : `${heading}.`);
   /** Tablet (Android): the actions are the last element of the card. */
-  const actionsInCard = $derived(!ios && !layout.phone);
+  /** A phone layout; never the desktop app's, which is at least 768 dp wide and takes the tablet's screens (task 2026-11-16-242). */
+  const phone = $derived(layout.phone && !desktopApp);
+  const actionsInCard = $derived(!ios && !phone);
   /** The alpha first launch on an Android phone (task 2026-11-16-233). */
-  const band = $derived(firstLaunch && !ios && layout.phone);
+  const band = $derived(firstLaunch && !ios && phone);
   /** The alpha first launch on an Android tablet (task 2026-11-16-239): the blue panel of task 237, still, and the step beside it. */
-  const panel = $derived(firstLaunch && !ios && !layout.phone);
+  const panel = $derived(firstLaunch && !ios && !phone);
   /** Both give the step the compact layout: « Retour », title, content on the page, no card. */
   const compact = $derived(band || panel);
 
@@ -639,6 +641,58 @@
           font-size: 15px;
         }
       }
+    }
+
+    /* The desktop app (task 2026-11-16-242): the step is always beside the panel (48.6 % of the window, 700 dp at
+       most), its column keeps its room in a narrow window. */
+    :global(html.od-desktop-app .od-editorial-page--panelled .page-content) {
+      flex-direction: row;
+    }
+    :global(html.od-desktop-app.md) .od-editorial-page--panel-body {
+      padding: 24px clamp(24px, 4.4vw, 64px) 56px;
+      overflow-y: auto;
+      justify-content: safe center;
+
+      /* A low window: the help link at the bottom keeps its own room, and a long step scrolls. */
+      @media (max-height: 700px) {
+        padding-top: 16px;
+        padding-bottom: 80px;
+      }
+
+      /* A short window (fluid layout, docs/system-design.md, section 7): the step's own spacing gives way so that it
+         fits without a scrollbar. */
+      @media (max-height: 640px) {
+        padding-top: 8px;
+
+        .od-editorial-page--retour {
+          min-height: 36px;
+        }
+
+        .od-editorial-page--eyebrow {
+          margin-bottom: 2px;
+        }
+
+        .od-editorial-page--title {
+          margin-bottom: 4px;
+          font-size: 24px;
+          line-height: 30px;
+        }
+
+        .od-editorial-page--intro {
+          margin-bottom: 12px;
+          font-size: 15px;
+          line-height: 20px;
+        }
+
+        .od-editorial-page--actions {
+          padding-top: 12px;
+        }
+      }
+    }
+    :global(html.od-desktop-app) .od-editorial-page--linear.od-editorial-page--linear-panel {
+      left: calc(min(700px, 48.6%) + clamp(24px, 4.4vw, 64px));
+      right: clamp(24px, 4.4vw, 64px);
+      top: 24px;
     }
 
     /* The busy indicator runs at the top of the step's column. */

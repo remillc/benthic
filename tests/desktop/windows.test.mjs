@@ -213,6 +213,22 @@ test('windows: closing a logbook leaves the start screen; opening from it reuses
   assert.equal(bridge.descriptorOf(main.webContents.id).location, path.resolve(file));
 });
 
+test('windows (task 242): the window without a logbook, after first use, lists the logbook of this computer; the first start is not that window', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const store = new logbooks.LogbookStore(userData);
+  store.clear();
+  // First start: the window holds the logbook of this computer (its first launch is the page's, « od.welcome » absent), never none.
+  const main = wm.openMain();
+  assert.equal(bridge.descriptorOf(main.webContents.id).kind, 'main');
+  // « Fermer le carnet »: the window has none, and the recent list, which the screen shows, holds the logbook just closed.
+  await wm.closeLogbook(main);
+  assert.equal(bridge.descriptorOf(main.webContents.id), null);
+  const recent = await wm.handle({ sender: main.webContents }, 'recent');
+  assert.deepEqual(recent.map((e) => [e.kind, e.open]), [['main', false]]);
+  assert.deepEqual(await wm.handle({ sender: main.webContents }, 'exists'), { main: true });
+});
+
 test('windows: a recent logbook whose file is gone is told and forgotten', async () => {
   const fake = fakeElectron();
   const wm = manager(fake);

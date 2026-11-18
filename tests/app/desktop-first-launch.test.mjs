@@ -67,7 +67,7 @@ test('the help link opens the desktop About where there is no view of its own', 
   const link = read('components/WelcomeHelpLink.svelte');
   assert.match(link, /if \(!view\) f7\.views\.get\('#view-logbook'\)\?\.router\.navigate\('\/about'\);/);
   // About is a popup on the desktop (App.svelte): it opens above the screen, which only steps aside for the token help page.
-  assert.match(read('App.svelte'), /path: '\/about'.*popup: \{ component: About \}/);
+  assert.match(read('App.svelte'), /path: '\/about',[\s\S]*?popup: \{ component: About \}/);
   assert.match(read('components/DesktopFirstLaunch.svelte'), /pushed = path\.startsWith\('\/welcome\/'\)/);
 });
 

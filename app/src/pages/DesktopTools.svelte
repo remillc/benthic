@@ -7,11 +7,8 @@
   import { Page } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
-  import DesktopPlanner from '../components/DesktopPlanner.svelte';
-  import DesktopDesaturation from '../components/DesktopDesaturation.svelte';
   import DesktopEadMod from '../components/DesktopEadMod.svelte';
   import DesktopBestMix from '../components/DesktopBestMix.svelte';
-  import DesktopBlender from '../components/DesktopBlender.svelte';
   import { t } from '../lib/i18n.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -21,6 +18,21 @@
   import { formatDuration, localNowIso } from '../lib/format.js';
   import { DESKTOP_TOOLS, desaturationLine, plansLine } from '../lib/desktop-tools.js';
   import { desktopTools, openTool } from '../lib/desktop-tools.svelte.js';
+
+  // The tools that are their own chunks, read when first shown. Not `{#await import(...)}`: an await block left
+  // in a layout that the adaptive swap removes kept that layout (and the other sections' DOM) alive in Svelte's batch.
+  const chunks = {
+    planner: () => import('../components/DesktopPlanner.svelte'),
+    desaturation: () => import('../components/DesktopDesaturation.svelte'),
+    blender: () => import('../components/DesktopBlender.svelte'),
+  };
+  /** @type {Record<string, any>} */
+  let loaded = $state.raw({});
+  /** @param {string} id */
+  function load(id) {
+    const read = /** @type {Record<string, (() => Promise<{ default: any }>) | undefined>} */ (chunks)[id];
+    if (read && !loaded[id]) read().then((m) => (loaded = { ...loaded, [id]: m.default }));
+  }
 
   // The time moves: read the clock again every 30 seconds, and when the window comes back.
   let now = $state(localNowIso());
@@ -89,6 +101,7 @@
     queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-desktop-tools--row[data-tool="${next.id}"]`))?.focus());
   }
   const current = $derived(DESKTOP_TOOLS.find((tool) => tool.id === desktopTools.tool) ?? DESKTOP_TOOLS[0]);
+  $effect(() => load(current.id));
 </script>
 
 <Page class="od-desktop-tools" pageContent={false}>
@@ -99,7 +112,7 @@
     </header>
 
     <div class="od-desktop-tools--columns">
-      <nav class="od-desktop-tools--list" aria-label={t('tools.title')}>
+      <nav class="od-desktop-tools--list" data-od-scroll aria-label={t('tools.title')}>
         {#each groups as group (group.id)}
           <h2 class="od-desktop-tools--heading">{t(group.heading)}</h2>
           <ul role="list" onkeydown={listKey}>
@@ -125,19 +138,20 @@
         {/each}
       </nav>
 
-      <main class="od-desktop-tools--pane" aria-label={t(current.name)}>
+      <main class="od-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
-          <DesktopPlanner />
+          <!-- The tools are their own chunks, read when first shown. -->
+          {#if loaded.planner}{@const Planner = loaded.planner}<Planner />{/if}
         {:else}
           <h2 class="od-desktop-tools--pane-title">{t(current.name)}</h2>
           {#if current.id === 'desaturation'}
-            <DesktopDesaturation />
+            {#if loaded.desaturation}{@const Desaturation = loaded.desaturation}<Desaturation />{/if}
           {:else if current.id === 'eadMod'}
             <DesktopEadMod />
           {:else if current.id === 'bestMix'}
             <DesktopBestMix />
           {:else}
-            <DesktopBlender />
+            {#if loaded.blender}{@const Blender = loaded.blender}<Blender />{/if}
           {/if}
         {/if}
       </main>
@@ -178,7 +192,8 @@
     }
     .od-desktop-tools--list {
       flex: none;
-      width: 320px;
+      /* Fluid layout: 320 dp from 1280 dp of window, narrower below. */
+      width: clamp(260px, 25vw, 320px);
       padding: 8px 8px 24px 12px;
       border-right: 1px solid var(--od-separator);
       overflow-y: auto;
@@ -264,6 +279,8 @@
       min-width: 0;
       padding: 8px 32px 32px;
       overflow-y: auto;
+      /* The tools lay out by the pane's width, not the window's (@container od-tool). */
+      container: od-tool / inline-size;
     }
     .od-desktop-tools--pane-title {
       margin: 0 0 20px;
@@ -273,6 +290,28 @@
       color: var(--od-text);
     }
 
+
+    /* A short window: the bar, the rows and the pane's margins take less room, so that more of the tool shows. */
+    @media (max-height: 700px) {
+      .od-desktop-tools--bar {
+        padding-top: 8px;
+        padding-bottom: 4px;
+      }
+      .od-desktop-tools--row {
+        height: 56px;
+      }
+      .od-desktop-tools--heading {
+        margin-top: 8px;
+      }
+      .od-desktop-tools--pane {
+        padding-top: 4px;
+        padding-bottom: 16px;
+      }
+      .od-desktop-tools--pane-title {
+        margin-bottom: 12px;
+        font-size: 20px;
+      }
+    }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {

@@ -22,6 +22,8 @@
     statistics: 'M3 20h18M6 16v-4M10.5 16V6M15 16v-6M19.5 16V9',
     tools: 'M4 7h10M18 7h2M4 17h4M12 17h8M18 7a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM12 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0z',
     plus: 'M12 5v14M5 12h14',
+    // A folder (the window without a logbook, « Ouvrir un carnet… »).
+    folder: 'M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V9.5A1.5 1.5 0 0 0 19.5 8H12l-2-2.5H4.5A1.5 1.5 0 0 0 3 7z',
     // Sharing and scanning by QR code: the three finder squares and the data blocks.
     qr: 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 18h2v2h-2z M18 14v2 M14 20v-2',
     copy: 'M9 9h11v11H9zM5 15H4V4h11v1',

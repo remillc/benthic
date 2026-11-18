@@ -151,7 +151,8 @@
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     },
     "emptyLocal": "On this phone only, no dives",
-    "emptyLocalTablet": "On this tablet only, no dives"
+    "emptyLocalTablet": "On this tablet only, no dives",
+    "emptyLocalDesktop": "On this computer only, no dives"
   },
   "sync": {
     "failure": {
@@ -936,8 +937,10 @@
     "signOutDevice": "Sign out of this device",
     "signOutKeepsPhone": "The account and the dives stay in the cloud. This phone keeps its copy.",
     "signOutKeepsTablet": "The account and the dives stay in the cloud. This tablet keeps its copy.",
+    "signOutKeepsDesktop": "The account and the dives stay in the cloud. This computer keeps its copy.",
     "deleteKeepsPhone": "Permanently erases the account and its dives from the cloud. This phone can keep its copy.",
     "deleteKeepsTablet": "Permanently erases the account and its dives from the cloud. This tablet can keep its copy.",
+    "deleteKeepsDesktop": "Permanently erases the account and its dives from the cloud. This computer can keep its copy.",
     "delete": "Delete the cloud account",
     "server": "Connected through the {region} server ({host}).",
     "serverHost": "Connected through the {host} server.",
@@ -993,7 +996,8 @@
     "createShort": "Create an account",
     "createNote": "Free. Shared across your devices",
     "noAccountNotePhone": "Your logbook stays on this phone. You can back it up later",
-    "noAccountNoteTablet": "Your logbook stays on this device. You can back it up later"
+    "noAccountNoteTablet": "Your logbook stays on this device. You can back it up later",
+    "noAccountNoteDesktop": "Your logbook stays on this computer. You can back it up later"
   },
   "welcomeRelease": {
     "headline": "Your dive log,\non all your devices.",
@@ -1224,9 +1228,7 @@
     "localTitleIphone": "Start a logbook on this iPhone",
     "localHelp": "Kept here, even without a network.",
     "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
-    "localTitleDesktop": "Start a logbook on this computer",
-    "openHelp": "It is already in your cloud or in a git repository.",
-    "createHelp": "You will choose where to keep it next."
+    "localTitleDesktop": "Start a logbook on this computer"
   },
   "signOut": {
     "title": "Sign out?",
@@ -1283,11 +1285,14 @@
     "eraseElsewhereText": "Will no longer find this logbook",
     "nextPhone": "Next, you choose what happens to your dives on this phone.",
     "nextTablet": "Next, you choose what happens to your dives on this tablet.",
+    "nextDesktop": "Next, you choose what happens to your dives on this computer.",
     "questionPhone": "What happens to your dives on this phone?",
     "questionTablet": "What happens to your dives on this tablet?",
+    "questionDesktop": "What happens to your dives on this computer?",
     "keep": "Keep my dives on this device",
     "keepText": "They move to a logbook without account, on this phone only",
     "keepTextTablet": "They move to a logbook without account, on this tablet only",
+    "keepTextDesktop": "They move to a logbook without account, on this computer only",
     "export": "Export a copy of the logbook",
     "exportText": "A Subsurface file (.ssrf), to keep elsewhere",
     "nothingKeptLead": "If you uncheck without exporting",
@@ -1300,12 +1305,14 @@
     },
     "keptPhone": "Kept on this phone",
     "keptTablet": "Kept on this tablet",
+    "keptDesktop": "Kept on this computer",
     "keptText": {
       "one": "{n} dive, in a logbook without an account",
       "other": "{n} dives, in a logbook without an account"
     },
     "keptNothingPhone": "Nothing is kept on this phone",
     "keptNothingTablet": "Nothing is kept on this tablet",
+    "keptNothingDesktop": "Nothing is kept on this computer",
     "password": "Account password",
     "passwordText": "To confirm that it is you",
     "note": "Pending changes are sent first. The account is only deleted after the server confirms.",
@@ -2426,7 +2433,15 @@
       "Public edition: an account with no logbook offers to create an empty logbook, import a Subsurface file (.ssrf or .xml) or send the logbook of the device. The logbook is written in OpenDives' format on the server, in small uploads; it also stays on the device.",
       "Public edition: the upload shows « n dives of m » and the time left. If the connection drops, « Upload interrupted » says so and « Resume the upload » restarts after the last dive sent; the upload is also offered again at the next start.",
       "Public edition: « Sign in or create an account », the OpenDives+ offer (US $14.99 a year), « Your logbook is ready » and « Welcome to OpenDives+! ». Signing in with Google or Apple and subscribing are not available yet; an account without a subscription keeps nothing on the device.",
-      "Public edition: the server screens no longer show « OpenDives server » above the title, the « The server is not responding » icon is centred and « Back to the start » replaces « Choose another place »."
+      "Public edition: the server screens no longer show « OpenDives server » above the title, the « The server is not responding » icon is centred and « Back to the start » replaces « Choose another place ».",
+      "In the desktop app, you can resize a Logbook column by dragging the edge of its header (or ← → on the edge, a double click to fit it), and each logbook keeps its own column order, visible columns and widths on this computer.",
+      "In the desktop app, « Only on Wi-Fi or cable » now works: the automatic sync waits while the computer is on a metered connection (a phone's hotspot, mobile broadband) and runs when it is back on Wi-Fi or cable; « Sync now » still works.",
+      "Lighter start-up and faster dive selection: the app loads half as much code and style at start, each screen and each language when it is first needed, and selecting a dive in the desktop logbook asks the core for that dive only instead of eighteen answers.",
+      "In the desktop app, a long dive's profile is drawn with a few points per pixel instead of every sample, and the window no longer keeps the other layout in memory after you resize it across the narrow and wide layouts.",
+      "In the desktop app, a large logbook is fast: the Logbook table draws only the rows in view, so selecting a dive, searching, sorting and coming back to the Logbook stay quick with thousands of dives.",
+      "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",
+      "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
+      "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3292,6 +3307,7 @@
     "titlePhone": "Your own git repository",
     "introPhone": "Keep your logbook in your git repository, with a copy on this phone.",
     "introPhoneTablet": "Keep your logbook in your git repository, with a copy on this tablet.",
+    "introPhoneDesktop": "Keep your logbook in your git repository, with a copy on this computer.",
     "repositoryHow": "How to create a repository",
     "branchWaitingAccess": "The branch list appears once access is accepted."
   },
@@ -3306,12 +3322,14 @@
       "s1": "Sign in to GitHub, then open [kbd]Settings[/kbd] (menu of your profile picture).",
       "s2": "At the bottom of the left column, open [kbd]Developer settings[/kbd].",
       "s3": "Open [kbd]Personal access tokens[/kbd], then [kbd]Fine-grained tokens[/kbd], then tap [kbd]Generate new token[/kbd].",
+      "s3Desktop": "Open [kbd]Personal access tokens[/kbd], then [kbd]Fine-grained tokens[/kbd], then click [kbd]Generate new token[/kbd].",
       "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
       "s5": "[kbd]Expiration[/kbd]: choose [kbd]No expiration[/kbd], otherwise OpenDives can no longer sync on the chosen date. If the repository belongs to an organisation, it may impose an end date.",
       "s6": "[kbd]Resource owner[/kbd]: your account, or the organisation that owns the repository.",
       "s7": "[kbd]Repository access[/kbd]: choose [kbd]Only select repositories[/kbd], then the repository of your logbook.",
       "s8": "[kbd]Permissions[/kbd]: under [kbd]Repository permissions[/kbd], set [kbd]Contents[/kbd] to [kbd]Read and write[/kbd]. Add no other permission.",
-      "s9": "Tap [kbd]Generate token[/kbd], then copy the token."
+      "s9": "Tap [kbd]Generate token[/kbd], then copy the token.",
+      "s9Desktop": "Click [kbd]Generate token[/kbd], then copy the token."
     },
     "gitlab": {
       "name": "GitLab",
@@ -3319,12 +3337,14 @@
       "open": "Open GitLab’s token page",
       "note": "On GitLab, a personal token gives access to all your repositories and must have an expiry date.",
       "s1": "Sign in to GitLab, tap your avatar, then [kbd]Edit profile[/kbd].",
+      "s1Desktop": "Sign in to GitLab, click your avatar, then [kbd]Edit profile[/kbd].",
       "s2": "In the left sidebar, open [kbd]Access[/kbd], then [kbd]Personal access tokens[/kbd].",
       "s3": "In the [kbd]Generate token[/kbd] list, choose [kbd]Legacy token[/kbd].",
       "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
       "s5": "[kbd]Expiration date[/kbd]: choose the latest date allowed. GitLab requires a date; on that date, create a new token and paste it into OpenDives.",
       "s6": "[kbd]Select scopes[/kbd]: tick only [kbd]write_repository[/kbd], which allows reading and writing in your repositories.",
-      "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
+      "s7": "Tap [kbd]Generate token[/kbd], then copy the token.",
+      "s7Desktop": "Click [kbd]Generate token[/kbd], then copy the token."
     },
     "codeberg": {
       "name": "Codeberg",
@@ -3332,12 +3352,15 @@
       "open": "Open Codeberg’s applications page",
       "note": "On Codeberg, a token does not expire. You can delete it at any time.",
       "s1": "Sign in to Codeberg, tap your avatar, then [kbd]Settings[/kbd].",
+      "s1Desktop": "Sign in to Codeberg, click your avatar, then [kbd]Settings[/kbd].",
       "s2": "Open the [kbd]Applications[/kbd] tab.",
       "s3": "Under [kbd]Access tokens[/kbd], tap [kbd]New access token[/kbd].",
+      "s3Desktop": "Under [kbd]Access tokens[/kbd], click [kbd]New access token[/kbd].",
       "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
       "s5": "Choose [kbd]All (public, private, and limited)[/kbd] so that the token reaches your private repository.",
       "s6": "Under [kbd]Select permissions[/kbd], set [kbd]repository[/kbd] to [kbd]Read and write[/kbd]. Leave the others on [kbd]No access[/kbd].",
-      "s7": "Tap [kbd]Generate token[/kbd], then copy the token."
+      "s7": "Tap [kbd]Generate token[/kbd], then copy the token.",
+      "s7Desktop": "Click [kbd]Generate token[/kbd], then copy the token."
     },
     "hosts": "Hosts"
   },
@@ -3837,7 +3860,9 @@
       "notALogbook": "This file is not a logbook (.ssrf or .xml).",
       "openFailed": "This logbook could not be opened.",
       "dropHere": "Drop the file to open it",
-      "forget": "Remove from the list"
+      "forget": "Remove from the list",
+      "openHint": "An .ssrf or .xml file, or a git repository folder.",
+      "newHint": "You will then choose where to keep it."
     },
     "recents": {
       "title": "Recent logbooks",
@@ -4057,7 +4082,11 @@
       "use": "Use",
       "startPressure": "Start pressure",
       "endPressure": "End pressure",
-      "gasChanges": "Gas changes"
+      "gasChanges": "Gas changes",
+      "weights": "Weights",
+      "mix": "Mix",
+      "pressure": "Pressure",
+      "coordinates": "Coordinates"
     },
     "invitation": {
       "site": "Site not set",
@@ -4076,8 +4105,51 @@
       "notes": "Add notes",
       "weight": "Add the weight",
       "cylinderType": "Choose a type",
-      "pressure": "Add the pressure"
-    }
+      "pressure": "Add the pressure",
+      "mix": "Type the mix, such as 32 or 18/45"
+    },
+    "notRated": "Not rated",
+    "add": "Add",
+    "weightTotal": "total",
+    "weightPlace": "Weight place",
+    "openSite": "Open the site",
+    "openSiteLink": "See the site in Sites",
+    "serial": "no. {serial}",
+    "addComputer": "Add a computer",
+    "computerRole": {
+      "0": "Main",
+      "1": "Second",
+      "2": "Third",
+      "n": "Computer {n}"
+    },
+    "section": {
+      "computers": "Dive computers",
+      "protection": "Protection and weights",
+      "otherGear": "Other gear"
+    },
+    "gasCards": "Cylinders of the dive",
+    "gasCardLabel": "Cylinder {n}, {gas}, {type}, {range}",
+    "addCylinderUses": "deco, relay, bailout",
+    "legendStart": "At the start",
+    "legendEnd": "At the exit",
+    "cylinderSpan": "from {from} to {to} min",
+    "consumption": "Consumption",
+    "sacSurface": "at the surface (SAC)",
+    "breathed": "breathed",
+    "usedOf": "used out of {start}",
+    "barLabel": "Pressure from {end} at the exit to {start} at the start",
+    "barZero": "0 bar",
+    "reserve": "reserve {value}",
+    "atExit": "{value} at the exit",
+    "marginAbove": "Exit {value} above the reserve.",
+    "marginBelow": "Exit {value} under the reserve.",
+    "otherGearList": "Other gear worn",
+    "otherGearRemove": "Remove {name} from this dive",
+    "otherGearRemoveTip": "Remove from this dive",
+    "otherGearAdd": "Add gear",
+    "otherGearSoon": "Not available yet",
+    "mixNote": "O₂ {o2} % · He {he} %",
+    "pressureNote": "start → end"
   },
   "desktopSettings": {
     "saved": "Saved at once, on this computer",
@@ -4387,7 +4459,7 @@
       "file": "File",
       "newDive": "New Dive",
       "import": "Import…",
-      "download": "Download from a Dive Computer",
+      "download": "Download my dives…",
       "export": "Export…",
       "print": "Print…",
       "edit": "Edit",
@@ -4493,7 +4565,8 @@
       "fileDives": "dives",
       "fileLogbook": "logbook",
       "logbook": "Export the logbook…"
-    }
+    },
+    "resizeColumn": "Resize the “{column}” column"
   },
   "desktopFollowups": {
     "newLogbook": {
@@ -4516,7 +4589,9 @@
       "passwordText": "Kept only in the secure storage of this phone.",
       "invalidEmail": "This email address is not valid.",
       "introTablet": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this tablet.",
-      "passwordTextTablet": "Kept only in the secure storage of this tablet."
+      "passwordTextTablet": "Kept only in the secure storage of this tablet.",
+      "introDesktop": "The same account as in Subsurface on a computer. Your dives are downloaded, then a copy stays on this computer.",
+      "passwordTextDesktop": "Kept only in the secure storage of this computer."
     },
     "create": {
       "intro": "Free. A code is sent to you by email to confirm the address.",
@@ -4531,6 +4606,7 @@
       "note": "Keep the app open until it is done. Then your logbook opens, and you can read it offline.",
       "progressLabel": "Downloading the dives",
       "copyTablet": "Copying the logbook to this tablet",
+      "copyDesktop": "Copying the logbook to this computer",
       "gitConnect": "Connecting to the repository"
     },
     "local": {
@@ -4543,16 +4619,21 @@
       "laterText": "To a Subsurface account or to your git repository, from Account. Your dives follow.",
       "start": "Start",
       "phoneOnlyTablet": "On this tablet only",
-      "noBackupTextTablet": "If you lose or change your tablet, the logbook is lost."
+      "phoneOnlyDesktop": "On this computer only",
+      "noBackupTextTablet": "If you lose or change your tablet, the logbook is lost.",
+      "noBackupTextDesktop": "If you lose or change your computer, the logbook is lost."
     },
     "snackbar": {
       "downloaded": "Logbook downloaded. It stays on this phone, even offline.",
       "created": "Account created. Your logbook is ready.",
       "local": "Logbook created on this phone.",
       "downloadedTablet": "Logbook downloaded. It stays on this tablet, even offline.",
+      "downloadedDesktop": "Logbook downloaded. It stays on this computer, even offline.",
       "localTablet": "Logbook created on this tablet.",
+      "localDesktop": "Logbook created on this computer.",
       "gitDownloaded": "Logbook downloaded from your repository. It stays on this phone, even without a network.",
-      "gitDownloadedTablet": "Logbook downloaded from your repository. It stays on this tablet, even without a network."
+      "gitDownloadedTablet": "Logbook downloaded from your repository. It stays on this tablet, even without a network.",
+      "gitDownloadedDesktop": "Logbook downloaded from your repository. It stays on this computer, even without a network."
     },
     "tabletStart": "Get started",
     "profileLabel": "Dive profile",
@@ -4572,10 +4653,12 @@
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitHub, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
+      "s1Desktop": "Sign in to GitHub, then click [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
       "s2": "[kbd]Repository name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
       "s3": "Choose [kbd]Private[/kbd].",
       "s4": "Tick nothing under [kbd]Initialize this repository[/kbd]: no README, no .gitignore, no licence. The repository must stay empty.",
       "s5": "Tap [kbd]Create repository[/kbd].",
+      "s5Desktop": "Click [kbd]Create repository[/kbd].",
       "s6": "Under [kbd]Quick setup[/kbd], choose [kbd]HTTPS[/kbd], then copy the address, for example [code]https://github.com/you/carnet-plongee.git[/code]."
     },
     "gitlab": {
@@ -4584,12 +4667,16 @@
       "page": "New project",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitLab, then tap [kbd]+ (Create new)[/kbd] at the top of the menu and [kbd]New project/repository[/kbd].",
+      "s1Desktop": "Sign in to GitLab, then click [kbd]+ (Create new)[/kbd] at the top of the menu and [kbd]New project/repository[/kbd].",
       "s2": "Tap [kbd]Create blank project[/kbd].",
+      "s2Desktop": "Click [kbd]Create blank project[/kbd].",
       "s3": "[kbd]Project name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
       "s4": "Under [kbd]Visibility Level[/kbd], choose [kbd]Private[/kbd].",
       "s5": "Untick [kbd]Initialize repository with a README[/kbd]. The repository must stay empty.",
       "s6": "Tap [kbd]Create project[/kbd].",
-      "s7": "Tap [kbd]Code[/kbd], then copy the address under [kbd]Clone with HTTPS[/kbd], for example [code]https://gitlab.com/you/carnet-plongee.git[/code]."
+      "s6Desktop": "Click [kbd]Create project[/kbd].",
+      "s7": "Tap [kbd]Code[/kbd], then copy the address under [kbd]Clone with HTTPS[/kbd], for example [code]https://gitlab.com/you/carnet-plongee.git[/code].",
+      "s7Desktop": "Click [kbd]Code[/kbd], then copy the address under [kbd]Clone with HTTPS[/kbd], for example [code]https://gitlab.com/you/carnet-plongee.git[/code]."
     },
     "codeberg": {
       "name": "Codeberg",
@@ -4597,10 +4684,12 @@
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to Codeberg, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
+      "s1Desktop": "Sign in to Codeberg, then click [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
       "s2": "[kbd]Repository name[/kbd]: a name you will recognise, for example [code]carnet-plongee[/code].",
       "s3": "Tick [kbd]Make repository private[/kbd].",
       "s4": "Leave [kbd]Initialize repository[/kbd] unticked. The repository must stay empty.",
       "s5": "Tap [kbd]Create repository[/kbd].",
+      "s5Desktop": "Click [kbd]Create repository[/kbd].",
       "s6": "Choose [kbd]HTTPS[/kbd] above the repository address, then copy it, for example [code]https://codeberg.org/you/carnet-plongee.git[/code]."
     }
   },
@@ -4947,5 +5036,9 @@
       "empty": "The inventory has no piece to add",
       "noResults": "No piece matches"
     }
+  },
+  "desktopLanguage": {
+    "system": "Same as the system",
+    "button": "App language: {language}"
   }
 }

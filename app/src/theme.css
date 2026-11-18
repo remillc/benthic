@@ -16,8 +16,31 @@
  */
 @layer framework7, maplibre, od.tokens, od.base, od.components;
 
-@import 'framework7/css/bundle' layer(framework7);
-@import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
+/* Framework7's core, then the components the app uses (src/framework7.js): the bundle also holds the
+   calendar, the pickers, the photo browser, the swiper, the messages, the data tables... that no screen opens.
+   MapLibre's CSS comes with the map code (src/maplibre.css, lib/maplibre.js). */
+@import 'framework7/css' layer(framework7);
+@import 'framework7/components/actions/css' layer(framework7);
+@import 'framework7/components/card/css' layer(framework7);
+@import 'framework7/components/checkbox/css' layer(framework7);
+@import 'framework7/components/chip/css' layer(framework7);
+@import 'framework7/components/dialog/css' layer(framework7);
+@import 'framework7/components/fab/css' layer(framework7);
+@import 'framework7/components/input/css' layer(framework7);
+@import 'framework7/components/panel/css' layer(framework7);
+@import 'framework7/components/popover/css' layer(framework7);
+@import 'framework7/components/popup/css' layer(framework7);
+@import 'framework7/components/preloader/css' layer(framework7);
+@import 'framework7/components/progressbar/css' layer(framework7);
+@import 'framework7/components/radio/css' layer(framework7);
+@import 'framework7/components/searchbar/css' layer(framework7);
+@import 'framework7/components/sheet/css' layer(framework7);
+@import 'framework7/components/skeleton/css' layer(framework7);
+@import 'framework7/components/swipeout/css' layer(framework7);
+@import 'framework7/components/tabs/css' layer(framework7);
+@import 'framework7/components/toast/css' layer(framework7);
+@import 'framework7/components/toggle/css' layer(framework7);
+@import 'framework7/components/typography/css' layer(framework7);
 
 @layer od.tokens {
   /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
@@ -118,11 +141,19 @@
     --od-menu-danger: #B71C1C;
     /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
     --od-buddy-badge: #E3E1DC;
+    /* Desktop first launch (task 2026-11-16-246): the thin divider between the help link and the language button. */
+    --od-language-divider: #C8C6BF;
     --od-trip-band: #ECEAE4;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185): an editable field at rest, its hover outline,
        the average-depth line of the profile, a chip of a person in a field. */
     --od-field-rest: #ECEAE4;
     --od-field-hover: #8F8D86;
+    /* Gaz tab of the desktop detail (task 2026-11-16-262): the selected cylinder card, the dashed add card, the reserve mark and the empty consumption bar. */
+    --od-gas-card-selected: #F5F4F0;
+    --od-gas-card-selected-outline: #1F2124;
+    --od-gas-card-add-outline: #B9B6AE;
+    --od-gas-reserve: #B3261E;
+    --od-gas-track: #F1EFEA;
     --od-profile-mean: #114477;
     --od-tonal: var(--od-secondary-container);
     --od-oxygen: #2E7D32;
@@ -181,6 +212,10 @@
     --od-code-active: #1F5C99;
     --od-code-border: #75787C;
     --od-code-error: #B3261E;
+    /* The window without a logbook (task 2026-11-16-242): the filled action of its dialog, the blue of the panel. */
+    --od-start-fill: #1F5C99;
+    --od-on-start-fill: #FFFFFF;
+    --od-start-hover: rgb(31 33 36 / 0.06);
     /* The heat of « Où je plonge le plus »: blue (least) to red (most), 1 to 6, the lowest density
        fading out through light blue (task 2026-11-14-161). Same in dark mode for now. */
     --od-heat-fade: #6FC3F0;
@@ -421,9 +456,14 @@
     --od-alarm: #FF8A80;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
     --od-alarm-tint: #3F2423;
+    --od-language-divider: #4A4C50;
     --od-code-active: #7FB0E6;
     --od-code-border: #8E9196;
     --od-code-error: #FF8A80;
+    /* The window without a logbook (task 2026-11-16-242). */
+    --od-start-fill: #7FB0E6;
+    --od-on-start-fill: #0C2A4A;
+    --od-start-hover: rgb(255 255 255 / 0.08);
     --od-primary: #F4F4F2;
     --od-on-primary: #1F2124;
     --od-primary-container: #2E3033;
@@ -494,6 +534,11 @@
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
     --od-field-rest: #2A2D31;
     --od-field-hover: #8A8D91;
+    --od-gas-card-selected: #26282B;
+    --od-gas-card-selected-outline: #F4F4F2;
+    --od-gas-card-add-outline: #5A5D62;
+    --od-gas-reserve: #FF8A80;
+    --od-gas-track: #2A2D31;
     --od-profile-mean: #9DC1EA;
     --od-on-error: #3A0A08;
     --od-error-container: #5C1A16;
@@ -799,6 +844,25 @@ html.ios {
     :where(button:disabled, [aria-disabled='true'], input:disabled, select:disabled) {
       cursor: default;
     }
+  }
+}
+
+/* Desktop app, scrollbars (docs/system-design.md, section 7, « Fluid desktop layout »): a pane that scrolls
+   (a list, a long detail) shows a thin bar whose thumb is faint and whose track is transparent. A bar that takes
+   15 dp from a pane is never left to the system. */
+@layer od.base {
+  html.od-desktop-app {
+    scrollbar-color: color-mix(in srgb, var(--od-text) 30%, transparent) transparent;
+  }
+
+  html.od-desktop-app * {
+    scrollbar-width: thin;
+  }
+
+  /* The page itself never shows a bar (Framework7 hides the body's). */
+  html.od-desktop-app,
+  html.od-desktop-app body {
+    scrollbar-width: none;
   }
 }
 

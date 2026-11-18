@@ -13,7 +13,7 @@
   import { errorCode, finishAccount, phoneFirstLaunch, showFailure, validEmail, validPassword } from '../lib/account.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { deviceKind } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, prefilledEmail?: string }} */
@@ -67,7 +67,7 @@
   firstLaunch={welcome}
   title={t('signIn.title')}
   heading={t('signIn.heading')}
-  intro={t(look ? deviceKey('firstLaunch.signIn.intro', layout.phone) : 'signIn.intro')}
+  intro={t(look ? deviceKey('firstLaunch.signIn.intro', deviceKind()) : 'signIn.intro')}
   action={t('signIn.submit')}
   busyLabel={t('signIn.busy')}
   {busy}
@@ -93,7 +93,7 @@
       type="password"
       autocomplete="current-password"
       bind:value={password}
-      supporting={t(look ? deviceKey('firstLaunch.signIn.passwordText', layout.phone) : 'signIn.passwordText')}
+      supporting={t(look ? deviceKey('firstLaunch.signIn.passwordText', deviceKind()) : 'signIn.passwordText')}
       error={passwordError}
       footer={emailShown || passwordError || t('signIn.passwordText')}
       footerError={!!(emailShown || passwordError)}

@@ -7,12 +7,18 @@
   import { t } from '../lib/i18n.js';
   import { f7 } from 'framework7-svelte';
 
-  /** @type {{ inColumn?: boolean }} inColumn: the last item of a scrolling column (the first launch of a tablet and of the desktop, task 2026-11-16-257), not pinned to the page. */
-  let { inColumn = false } = $props();
+  /**
+   * onopen: where the link is outside a view (the desktop's window without a logbook, task 2026-11-16-242).
+   * inline: in a line of its own (the desktop first launch beside the language menu, task 2026-11-16-246).
+   * inColumn: the last item of a scrolling column (the first launch of a tablet and of the desktop, task 2026-11-16-257), not pinned to the page.
+   * @type {{ onopen?: () => void, inline?: boolean, inColumn?: boolean }}
+   */
+  let { onopen, inline = false, inColumn = false } = $props();
 
   /** @param {MouseEvent} e */
   function open(e) {
     e.preventDefault();
+    if (onopen) return onopen();
     // The router of the view the link is in (first launch has a view of its own, in a popup).
     const view = /** @type {HTMLElement} */ (e.currentTarget).closest('.view');
     // The desktop app's window without a logbook has no view of its own: About opens over it, in the main view
@@ -22,7 +28,7 @@
   }
 </script>
 
-<a href="/about" class="od-welcome-help-link" class:od-welcome-help-link--column={inColumn} aria-label={t('welcomeHelp.label')} onclick={open}>
+<a href="/about" class="od-welcome-help-link" class:od-welcome-help-link--column={inColumn} class:od-welcome-help-link--inline={inline} aria-label={t('welcomeHelp.label')} onclick={open}>
   <svg class="od-welcome-help-link--icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="12" cy="12" r="9"></circle>
     <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"></path>
@@ -87,6 +93,32 @@
       @media (orientation: portrait) {
         --od-help-link-left: 50%;
       }
+    }
+
+    /* The desktop app: the panel is 48.6 % of the window at most 700 dp (components/FirstLaunchPanel.svelte), in any shape. */
+    :global(html.od-desktop-app .od-welcome-help-link) {
+      position: absolute;
+      left: var(--od-help-link-left, 50%);
+      bottom: 28px;
+      margin: 0;
+      transform: translateX(-50%);
+      white-space: nowrap;
+
+      /* A low window: a step may scroll under the link, which then keeps its own ground. */
+      @media (max-height: 700px) {
+        background: var(--od-background);
+      }
+    }
+    :global(html.od-desktop-app .od-first-panelled) {
+      --od-help-link-left: calc(min(700px, 48.6%) + (100% - min(700px, 48.6%)) / 2);
+    }
+
+    /* In a line of its own: no pinning. */
+    :global(html.od-desktop-app .od-welcome-help-link.od-welcome-help-link--inline) {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
     }
 
     .od-welcome-help-link--icon {

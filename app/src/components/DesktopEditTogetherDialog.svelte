@@ -12,6 +12,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
+  import { cachedSites } from '../lib/core-cache.js';
   import { logbookValues } from '../lib/people.js';
   import { editDivesTogether } from '../lib/logbook.svelte.js';
   import { siteChange } from '../lib/sites.svelte.js';
@@ -72,7 +73,7 @@
       logbookValues('buddy'),
       logbookValues('tag'),
       logbookValues('suit'),
-      OpenDivesCore.siteQuery({ kind: 'list' }).catch(() => []),
+      cachedSites().catch(() => []),
     ]);
     known = { guide, buddy, tag, suit: suitList };
     sites = siteList;

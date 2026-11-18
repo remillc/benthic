@@ -32,13 +32,14 @@ const sources = {
   state: read('lib/first-launch.svelte.js'),
 };
 
-test('the edition is the beta unless VITE_EDITION is release', () => {
-  assert.equal(editionFrom(undefined), 'beta');
-  assert.equal(editionFrom(''), 'beta');
-  assert.equal(editionFrom('nonsense'), 'beta');
-  assert.equal(editionFrom(' Release '), 'release');
-  assert.equal(edition, 'beta');
-  assert.equal(isRelease, false);
+test('the edition is the release unless VITE_EDITION is alpha', () => {
+  assert.equal(editionFrom(undefined), 'release');
+  assert.equal(editionFrom(''), 'release');
+  assert.equal(editionFrom('nonsense'), 'release');
+  assert.equal(editionFrom('release'), 'release');
+  assert.equal(editionFrom(' Alpha '), 'alpha');
+  assert.equal(edition, 'release');
+  assert.equal(isRelease, true);
 });
 
 test('the edition is read in one place', () => {
@@ -55,7 +56,7 @@ test('the beta path is unchanged: WelcomeStart knows nothing of the edition, the
   // The alpha's own phone band and tablet panel (FirstLaunchBand, FirstLaunchPanel, tasks 233 and 237, on main) is not the release edition.
   assert.doesNotMatch(beta, /edition|release|FirstLaunch(?!Band|Panel|.tabletStart)/i);
   assert.match(beta, /od-first-panelled/);
-  assert.match(beta, /welcome\.noAccountNoteTablet/);
+  assert.match(beta, /welcome\.noAccountNote\$\{deviceSuffix\(deviceKind\(\)\)\}/);
   assert.match(read('App.svelte'), /component: isRelease \? WelcomeEntry : WelcomeStart/);
   // The release edition shows its own screen on phones too (task 2026-11-16-227): never the beta one.
   assert.doesNotMatch(sources.entry, /<WelcomeStart /);

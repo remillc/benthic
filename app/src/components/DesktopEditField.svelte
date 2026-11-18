@@ -13,7 +13,6 @@
   // decided by lib/desktop-edit.js; this component only edits and reports the new value.
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
-  import Stars from './Stars.svelte';
   import StarsInput from './StarsInput.svelte';
   import { editKeyAction, listSuggestions, withItem, withoutItem } from '../lib/desktop-edit.js';
   import { t } from '../lib/i18n.js';
@@ -36,10 +35,17 @@
    *   valid?: (text: string) => boolean,
    *   unit?: string,
    *   name?: string,
+   *   stacked?: boolean,
+   *   note?: string,
+   *   disabled?: boolean,
+   *   card?: boolean,
+   *   emptyText?: string,
+   *   onopen?: () => void,
+   *   openLabel?: string,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -195,17 +201,23 @@
   const hint = $derived(t(multiline ? 'desktopDetail.hintNotes' : 'desktopDetail.hint'));
 </script>
 
-<div class="od-desktop-edit-field" class:od-desktop-edit-field--multiline={multiline} data-field={name || undefined}>
-  <span class="od-desktop-edit-field--label" id="od-df-{uid}">{label}</span>
+<div class="od-desktop-edit-field" class:od-desktop-edit-field--multiline={multiline} class:od-desktop-edit-field--stacked={stacked} class:od-desktop-edit-field--card-root={card} data-field={name || undefined}>
+  <span class="od-desktop-edit-field--label" class:od-sr-only={card} id="od-df-{uid}">{label}</span>
 
   {#if readonly}
     <span class="od-desktop-edit-field--value od-value" aria-labelledby="od-df-{uid}">{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
+  {:else if disabled}
+    <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
+    <div class="od-desktop-edit-field--rest od-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
+      <span class="od-desktop-edit-field--content od-value">{shownText || (empty ? invitation : '')}</span>
+    </div>
   {:else if !editing}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="od-desktop-edit-field--rest"
       class:od-desktop-edit-field--empty={empty && !display}
       class:od-desktop-edit-field--hover={hovered}
+      class:od-desktop-edit-field--card={card}
       role="button"
       tabindex="0"
       aria-label="{label}, {restText}"
@@ -215,18 +227,30 @@
       onmouseenter={() => (hovered = true)}
       onmouseleave={() => (hovered = false)}
     >
+      {#if card}<span class="od-desktop-edit-field--lead" aria-hidden="true"><Icon name="place" size={20} /></span>{/if}
       <span class="od-desktop-edit-field--content od-value">
-        {#if kind === 'list' && Array.isArray(value) && value.length}
+        {#if card}
+          <span class="od-desktop-edit-field--main">{shownText || invitation}</span>
+          {#if note}<span class="od-desktop-edit-field--note-line">{note}</span>{/if}
+        {:else if kind === 'stars'}
+          <span class="od-desktop-edit-field--stars" role="radiogroup" aria-label={label}>
+            {#each [1, 2, 3, 4, 5] as star (star)}
+              <button type="button" role="radio" aria-checked={value === star} aria-label={String(star)} tabindex="-1" class="od-desktop-edit-field--star" onclick={(e) => { e.stopPropagation(); onsave?.(value === star ? 0 : star); }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.8 19.5l1-5.8-4.2-4.1 5.8-.8z" class:od-desktop-edit-field--star-on={star <= Number(value)} /></svg>
+              </button>
+            {/each}
+          </span>
+          {#if !Number(value) && emptyText}<span class="od-desktop-edit-field--note">{emptyText}</span>{/if}
+        {:else if kind === 'list' && Array.isArray(value) && value.length}
           {#each value as item, i (i)}<span class="od-desktop-edit-field--chip">{item}</span>{/each}
-        {:else if kind === 'stars' && typeof value === 'number' && value > 0}
-          <Stars {value} size={18} label={t('desktopDetail.starsLabel', { label, n: value })} />
         {:else if empty && !display}
           {invitation}
         {:else}
           {shownText}{#if unit && shownText}&nbsp;{unit}{/if}
         {/if}
       </span>
-      <span class="od-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>
+      {#if note && !card && kind !== 'stars'}<span class="od-desktop-edit-field--note">{note}</span>{/if}
+      {#if onopen}<button type="button" class="od-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else}<span class="od-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
     </div>
   {:else}
     <div class="od-desktop-edit-field--edit-wrap">
@@ -278,10 +302,117 @@
     .od-desktop-edit-field {
       position: relative;
       display: grid;
-      grid-template-columns: 150px minmax(0, 1fr);
+      grid-template-columns: 140px minmax(0, 1fr);
       align-items: start;
       column-gap: 12px;
       margin-bottom: 8px;
+    }
+
+    /* The label above the field (Informations tab). */
+    .od-desktop-edit-field--stacked {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 4px;
+      margin-bottom: 0;
+    }
+
+    .od-desktop-edit-field--stacked .od-desktop-edit-field--label {
+      min-height: 0;
+      font-size: 13px;
+    }
+
+    .od-desktop-edit-field--note,
+    .od-desktop-edit-field--note-line {
+      font-size: 13px;
+      color: var(--od-text-2);
+      white-space: nowrap;
+    }
+
+    .od-desktop-edit-field--note-line {
+      white-space: normal;
+    }
+
+    .od-desktop-edit-field--card {
+      min-height: 56px;
+      gap: 12px;
+      padding: 0 8px 0 10px;
+      border-radius: 12px;
+    }
+
+    /* The card has no visible label (od-sr-only): its name is read out. */
+    .od-desktop-edit-field--card-root {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .od-desktop-edit-field--disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    /* The site card: a pin in a blue circle, the name, its country and dives, a chevron. */
+    .od-desktop-edit-field--lead {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--od-secondary-container);
+      color: var(--od-on-secondary-container);
+    }
+
+    .od-desktop-edit-field--card .od-desktop-edit-field--content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .od-desktop-edit-field--main {
+      display: block;
+      font-weight: 500;
+    }
+
+    .od-desktop-edit-field--open {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--od-text);
+      cursor: pointer;
+    }
+
+    .od-desktop-edit-field--open:hover {
+      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    }
+
+    .od-desktop-edit-field--stars {
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    .od-desktop-edit-field--star {
+      width: auto;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .od-desktop-edit-field--star path {
+      fill: none;
+      stroke: var(--od-text);
+      stroke-width: 1.6;
+      stroke-linejoin: round;
+    }
+
+    .od-desktop-edit-field--star path.od-desktop-edit-field--star-on {
+      fill: var(--od-text);
     }
 
     .od-desktop-edit-field--label {

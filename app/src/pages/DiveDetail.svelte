@@ -46,7 +46,7 @@
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
-  import { forgetDive, keepDive, preloadDives, readyDive } from '../lib/dive-preload.js';
+  import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
     formatDepth,
@@ -62,7 +62,6 @@
     formatShortDate,
     formatTimeOfDay,
   } from '../lib/format.js';
-  import SiteMap from '../components/SiteMap.svelte';
   import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
   import { deviceStore } from '../lib/device-store.js';
   import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
@@ -296,14 +295,14 @@
   async function loadDive() {
     const id = Number(diveId);
     try {
-      dive = await OpenDivesCore.getDive({ id });
-      keepDive(id, dive);
+      dive = await readDive(id);
     } catch (e) {
       console.error('Dive detail', e);
       failed = true;
       return;
     }
-    // The dives a swipe can lead to, the next (older) one first.
+    // The dives a swipe can lead to, the next (older) one first. Beside the list (desktop) there is no swipe.
+    if (layout.desktop) return;
     const ids = listOrder();
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
@@ -690,7 +689,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page data-od-scroll onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}
@@ -962,15 +961,8 @@
     {/if}
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
-    {#if desk && tab !== 'map'}
-      <DesktopDiveFields {dive} {prefs} tab={tab === 'equipment' || tab === 'gas' || tab === 'notes' ? tab : 'info'} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
-    {/if}
-    {#if desk && tab === 'map'}
-      {#if dive.siteCoordinates}
-        <div class="od-dive-detail--desk-map"><SiteMap pin={dive.siteCoordinates} height="320px" /></div>
-      {:else}
-        <p class="od-dive-detail--desk-empty">{t('desktop.noMap')}</p>
-      {/if}
+    {#if desk}
+      <DesktopDiveFields {dive} {prefs} {tab} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
     {#if !desk && dive.pictures > 0 && settings.showPhotos}
@@ -1162,15 +1154,6 @@
       height: 3px;
       border-radius: 3px 3px 0 0;
       background: var(--od-on-table-selected);
-    }
-    .od-dive-detail--desk-empty {
-      margin: 16px 24px;
-      color: var(--od-text-2);
-    }
-    .od-dive-detail--desk-map {
-      margin: 8px 24px;
-      border-radius: 16px;
-      overflow: hidden;
     }
     .od-dive-detail--hero {
       position: relative;

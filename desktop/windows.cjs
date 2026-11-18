@@ -22,7 +22,7 @@ const logbooks = require('./logbooks.cjs');
  * @param {string} options.icon
  * @param {string} options.entryUrl the address of the interface
  * @param {(url: string) => boolean} options.isAppUrl
- * @param {{ load: Function, track: Function }} [options.windowState]
+ * @param {{ load: Function, track: Function, clamp?: Function, workAreas?: Function }} [options.windowState]
  * @param {() => void} [options.onChange] the recent list or the open logbooks changed (the Mac menu is rebuilt)
  * @param {string} [options.home]
  * @param {ReturnType<import('./cloud.cjs').createCloudService>} [options.cloud] the personal clouds (sign-in, cloud logbooks)
@@ -137,6 +137,9 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     if (!primary && from && !from.isDestroyed()) {
       const b = from.getBounds();
       place = { x: b.x + 28, y: b.y + 28, width: b.width, height: b.height };
+      // Kept inside the screen's work area: a window as tall as the screen, moved down by the offset,
+      // would have its bottom cut off, and the account button with it.
+      if (windowState?.clamp) place = windowState.clamp(place, windowState.workAreas());
     } else if (state.x !== undefined) {
       place = { x: state.x, y: state.y };
     }

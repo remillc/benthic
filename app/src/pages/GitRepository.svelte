@@ -27,16 +27,16 @@
   import { createGitForm } from '../lib/git-form.svelte.js';
   import { repositoryName } from '../lib/git-address.js';
   import { accountReady, deviceDiveCount, importDeviceDives, logbook, repositoryChanged, syncNow } from '../lib/logbook.svelte.js';
-  import { ios, layout } from '../lib/layout.svelte.js';
+  import { ios, layout, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any, welcome?: boolean, edit?: boolean }} */
   let { f7router, welcome = false, edit = false } = $props();
 
-  /** The Android phone's form (task 2026-11-16-247). */
-  const phone = $derived(!ios && layout.phone);
-  /** The Android tablet's first launch: the form in the step column beside the blue panel (task 2026-11-16-257). */
-  const panelled = $derived(welcome && !ios && !layout.phone);
+  /** The Android phone's form (task 2026-11-16-247); never the desktop app's, which can be a few pixels under 768 dp wide (task 2026-11-16-242). */
+  const phone = $derived(!ios && layout.phone && !desktopApp);
+  /** The first launch of an Android tablet and of the desktop app: the form in the step column beside the blue panel (task 2026-11-16-257). */
+  const panelled = $derived(welcome && !ios && !phone);
   /** The help shown in the column in place of the form, on a tablet. @type {'repository'|'token'|null} */
   let help = $state(null);
 

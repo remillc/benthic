@@ -161,6 +161,7 @@
 <style>
   @layer od.components {
     .od-without {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
       padding: 4px 12px 24px 4px;

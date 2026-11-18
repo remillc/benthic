@@ -8,6 +8,7 @@
   // Every map has the full-screen button (task 2026-11-14-147): the same map,
   // moved over the whole screen, keeps its position, zoom, pins and sources;
   // the system Back, Escape or the button leave it.
+  import { loadMapLibre } from '../lib/maplibre.js';
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
   import { mapLabel } from '../lib/map-label.js';
@@ -437,7 +438,7 @@
 
   onMount(async () => {
     if (!container) return;
-    const module = await import('maplibre-gl');
+    const module = await loadMapLibre();
     maplibregl = /** @type {any} */ (module).default ?? module;
     const { style } = await buildMapStyle(maplibregl);
     if (!container?.isConnected) return;

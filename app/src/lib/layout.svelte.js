@@ -36,6 +36,9 @@ export const navWidth = ios ? 220 : 96;
 // Read by the rail and by the views (App.svelte).
 if (typeof document !== 'undefined') document.documentElement.style.setProperty('--od-nav-width', `${navWidth}px`);
 
+// The desktop app's own rules in CSS (the first-launch panel stays a row in any window shape, task 2026-11-16-242).
+if (desktopApp) document.documentElement.classList.add('od-desktop-app');
+
 /** Width of the list pane of a list and detail pair (spec, section 3). */
 export const listWidth = 340;
 
@@ -72,6 +75,13 @@ export const layout = $state({
 query?.addEventListener('change', (e) => {
   layout.phone = e.matches;
 });
+
+/**
+ * What the first-launch and account texts call the device: « ce téléphone », « cette tablette » or, in the desktop
+ * app, « cet ordinateur » (lib/first-launch.js, `deviceKey`).
+ * @returns {'phone'|'tablet'|'desktop'}
+ */
+export const deviceKind = () => (desktopApp ? 'desktop' : layout.phone ? 'phone' : 'tablet');
 
 /**
  * Phones: the four sections are reached from the bottom navigation (Android: the Material bar,

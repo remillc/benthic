@@ -31,7 +31,7 @@
     previewOf,
     selectionOfBar,
   } from '../lib/desktop-stats.js';
-  import { deviceStore } from '../lib/device-store.js';
+  import { chooseStatistic, statSelection } from '../lib/statistics-selection.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { undoNameKey } from '../lib/undo-name.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -39,23 +39,17 @@
   import { depthUnit, depthValue, formatDepth, formatNumber, formatSac, formatShortDate, formatTotalTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
 
   /** @type {{ f7router?: any }} */
   let { f7router = undefined } = $props();
 
-  const SELECTED_KEY = 'od.desktopStatistic';
-  /** @type {string} */
-  let selected = $state(deviceStore.getItem(SELECTED_KEY) ?? 'byYear');
-
-  /** @param {string} key */
-  function choose(key) {
-    selected = key;
-    try {
-      deviceStore.setItem(SELECTED_KEY, key);
-    } catch {
-      // Not fatal: the choice lasts until the app closes.
-    }
-  }
+  /** Fluid layout: the chart keeps 380 dp in a tall window and shrinks in a short one, so the page does not scroll. */
+  let windowHeight = $state(900);
+  const chartHeight = $derived(Math.max(200, Math.min(380, windowHeight - 330)));
+  // One selection for both layouts (lib/statistics-selection.svelte.js).
+  const selected = $derived(statSelection.key);
+  const choose = chooseStatistic;
 
   // --- The data: the dives the core counted, on the free filter. ------------------------------
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
@@ -77,7 +71,7 @@
   $effect(() => {
     logbook.sitesVersion;
     if (logbook.loading) return;
-    OpenDivesCore.siteQuery({ kind: 'list' }).then(
+    cachedSites().then(
       (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
     );
@@ -416,6 +410,8 @@
   }
 </script>
 
+<svelte:window bind:innerHeight={windowHeight} />
+
 <Page class="od-desktop-statistics" pageContent={false}>
   <div class="od-desktop-statistics--frame">
     <header class="od-desktop-statistics--bar">
@@ -443,7 +439,7 @@
     {:else}
       <div class="od-desktop-statistics--body">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <section class="od-desktop-statistics--list" aria-label={t('desktopStats.list')} onkeydown={listKey}>
+        <section class="od-desktop-statistics--list" data-od-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
           <ul role="list">
             {#each rows as row (row.key)}
               <li>
@@ -478,13 +474,14 @@
             {/if}
           </div>
           {#if isHeat}
-            <HeatMapCard dives={chartDives} {sites} height="420px" />
+            <HeatMapCard dives={chartDives} {sites} height="clamp(200px, calc(100vh - 330px), 420px)" />
           {:else}
             <div class="od-desktop-statistics--card">
               {#if bars.length}
                 <DesktopStatChart
                   bind:svg={chartSvg}
                   {bars}
+                  height={chartHeight}
                   label={current.title}
                   {tip}
                   valueText={valueShort}

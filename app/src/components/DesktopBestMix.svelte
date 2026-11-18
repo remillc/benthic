@@ -53,8 +53,10 @@
       const endMm = trimix ? Math.round(endValue * mmPerUnit) : -1;
       const depthMm = Math.round(depthValue * mmPerUnit);
       // The gas only matters for the MOD, which is not shown from this call: air.
-      result = gasCalculator(210, 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
-      mix = gasCalculator(result.bestO2, trimix ? result.bestHe : 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
+      // A local: reading `result` back here would make this effect depend on the state it writes.
+      const advised = gasCalculator(210, 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
+      result = advised;
+      mix = gasCalculator(advised.bestO2, trimix ? advised.bestHe : 0, Number(po2), depthMm, logbook.prefs, endMm, salinity);
     } catch (e) {
       console.error('Best mix', e);
       result = mix = null;
@@ -117,6 +119,13 @@
       gap: 32px;
       align-items: start;
     }
+    /* Fluid layout: in a narrow pane the results go under the inputs. */
+    @container od-tool (max-width: 799px) {
+      .od-desktop-best-mix {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+    }
     .od-desktop-best-mix--inputs {
       display: flex;
       flex-direction: column;
@@ -138,8 +147,9 @@
     }
     .od-desktop-best-mix--advised {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 20px;
+      gap: 12px 20px;
       padding: 20px 24px;
       border-radius: 16px;
       background: var(--od-surface);
@@ -153,7 +163,7 @@
       white-space: nowrap;
     }
     .od-desktop-best-mix--kind {
-      flex: 1;
+      flex: 1 1 140px;
       display: flex;
       flex-direction: column;
       gap: 2px;

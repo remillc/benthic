@@ -30,6 +30,8 @@ function readOrder() {
 export const desktopTools = $state({
   /** The tool shown in the right pane. */
   tool: /** @type {DesktopToolId} */ ('planner'),
+  /** A tool was opened on purpose (a click, a narrow page): narrowing the window opens it as a page. */
+  chosen: false,
   /** A start the planner has not taken yet: a new dive (null: keep the plan in progress), or a logbook dive. */
   plannerStart: /** @type {{ kind: 'new' }|{ kind: 'dive', id: number }|{ kind: 'plan', id: number }|null} */ (null),
   /** The planner has taken its first start: later visits keep the plan in progress. */
@@ -54,6 +56,7 @@ export const desktopTools = $state({
 /** @param {DesktopToolId} id */
 export function openTool(id) {
   desktopTools.tool = id;
+  desktopTools.chosen = true;
 }
 
 /** @param {'nitrox'|'trimix'} mode */

@@ -12,7 +12,8 @@
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import { logbook, accountDeleted, syncNow } from '../lib/logbook.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, deviceKind } from '../lib/layout.svelte.js';
+  import { deviceSuffix } from '../lib/first-launch.js';
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
 
@@ -31,6 +32,8 @@
   const offline = $derived(logbook.sync === 'offline');
   const dives = $derived(logbook.dives.length);
   const phone = $derived(layout.phone);
+  /** « Phone », « Tablet » or « Desktop »: the device the texts name. */
+  const suffix = $derived(deviceSuffix(deviceKind()));
   const titles = ['deleteAccount.stepErase', 'deleteAccount.stepDives', 'deleteAccount.stepConfirm'];
 
   /** "Export a copy of the logbook" (.ssrf): file export does not exist yet. */
@@ -147,15 +150,15 @@
           </span>
         </div>
       </div>
-      <p class="od-delete-wizard--note">{t(phone ? 'deleteAccount.nextPhone' : 'deleteAccount.nextTablet')}</p>
+      <p class="od-delete-wizard--note">{t(`deleteAccount.next${suffix}`)}</p>
     {:else if step === 2}
-      <h2 class="od-delete-wizard--question">{t(phone ? 'deleteAccount.questionPhone' : 'deleteAccount.questionTablet')}</h2>
+      <h2 class="od-delete-wizard--question">{t(`deleteAccount.question${suffix}`)}</h2>
       <div class="od-delete-wizard--card">
         <label class="od-delete-wizard--keep">
           <span class="checkbox"><input type="checkbox" bind:checked={keepDives} /><i class="icon-checkbox"></i></span>
           <span class="od-delete-wizard--texts">
             <span class="od-delete-wizard--label">{t('deleteAccount.keep')}</span>
-            <span class="od-delete-wizard--supporting">{t(phone ? 'deleteAccount.keepText' : 'deleteAccount.keepTextTablet')}</span>
+            <span class="od-delete-wizard--supporting">{t(`deleteAccount.keepText${suffix === 'Phone' ? '' : suffix}`)}</span>
           </span>
         </label>
         <div class="od-delete-wizard--export">
@@ -183,10 +186,10 @@
           <Icon name="device" size={24} />
           <span class="od-delete-wizard--texts">
             {#if keepDives}
-              <span class="od-delete-wizard--label">{t(phone ? 'deleteAccount.keptPhone' : 'deleteAccount.keptTablet')}</span>
+              <span class="od-delete-wizard--label">{t(`deleteAccount.kept${suffix}`)}</span>
               <span class="od-delete-wizard--supporting">{t('deleteAccount.keptText', { n: dives })}</span>
             {:else}
-              <span class="od-delete-wizard--label">{t(phone ? 'deleteAccount.keptNothingPhone' : 'deleteAccount.keptNothingTablet')}</span>
+              <span class="od-delete-wizard--label">{t(`deleteAccount.keptNothing${suffix}`)}</span>
             {/if}
           </span>
         </div>

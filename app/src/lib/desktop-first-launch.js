@@ -145,3 +145,25 @@ export function droppedFiles(transfer) {
 
 /** The steps whose choices carry the drop line, and where a drop starts or continues the import. */
 export const DROP_STEPS = Object.freeze(['start', 'import']);
+
+/**
+ * A file dropped on the first-launch window: the logbook of this computer is started (the choice « Commencer sans
+ * compte »), then the dives of the file are imported into it, as « Importer un fichier » does. The files are
+ * imported one after the other; the result is what was added and the first error, if any.
+ * @param {File[]} files
+ * @param {{ start: () => Promise<unknown>, importFile: (file: File) => Promise<number> }} deps
+ * @returns {Promise<{ added: number, error: string }>} `error`: the core's code of the first failure, or ''
+ */
+export async function startWithDrop(files, deps) {
+  await deps.start();
+  let added = 0;
+  let error = '';
+  for (const file of files) {
+    try {
+      added += await deps.importFile(file);
+    } catch (e) {
+      if (!error) error = String(/** @type {any} */ (e)?.message ?? '');
+    }
+  }
+  return { added, error };
+}

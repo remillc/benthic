@@ -11,7 +11,7 @@ const OBSOLETE = ['intro', 'existing', 'existingText', 'create', 'createText', '
 test('iOS first launch uses the short keys and the tablet note on iPad', () => {
   for (const key of ['headline', 'existingShort', 'existingNote', 'createShort', 'createNote', 'noAccount', 'ownGit'])
     assert.ok(ios.includes(`'welcome.${key}'`), `iOS branch uses welcome.${key}`);
-  assert.ok(ios.includes("layout.phone ? 'welcome.noAccountNotePhone' : 'welcome.noAccountNoteTablet'"));
+  assert.ok(ios.includes('welcome.noAccountNote${deviceSuffix(deviceKind())}'));
   for (const key of OBSOLETE) assert.ok(!source.includes(`'welcome.${key}'`), `welcome.${key} is not used`);
 });
 

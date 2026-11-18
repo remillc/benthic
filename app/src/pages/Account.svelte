@@ -10,7 +10,8 @@
   import Icon from '../components/Icon.svelte';
   import SyncControl from '../components/SyncControl.svelte';
   import MenuButton from '../components/MenuButton.svelte';
-  import { bottomNav, layout, ios } from '../lib/layout.svelte.js';
+  import { bottomNav, layout, ios, deviceKind } from '../lib/layout.svelte.js';
+  import { deviceSuffix } from '../lib/first-launch.js';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -299,14 +300,14 @@
           <Icon name="logout" size={24} />
           <span class="od-account-leave--texts">
             <span class="od-account-leave--label">{t('account.signOutDevice')}</span>
-            <span class="od-account-leave--supporting">{t(layout.phone ? 'account.signOutKeepsPhone' : 'account.signOutKeepsTablet')}</span>
+            <span class="od-account-leave--supporting">{t(`account.signOutKeeps${deviceSuffix(deviceKind())}`)}</span>
           </span>
         </button>
         <button type="button" class="od-account-leave--row od-account-leave--delete" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
           <Icon name="delete" size={24} />
           <span class="od-account-leave--texts">
             <span class="od-account-leave--label">{t('account.delete')}</span>
-            <span class="od-account-leave--supporting">{t(layout.phone ? 'account.deleteKeepsPhone' : 'account.deleteKeepsTablet')}</span>
+            <span class="od-account-leave--supporting">{t(`account.deleteKeeps${deviceSuffix(deviceKind())}`)}</span>
           </span>
           <span class="od-account-leave--chevron"><Icon name="chevron" size={20} /></span>
         </button>

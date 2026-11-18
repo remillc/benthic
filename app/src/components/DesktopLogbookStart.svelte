@@ -1,32 +1,36 @@
 <script>
   // @ts-check
-  // The start screen of a window with no logbook open (task 2026-11-15-173; docs/mockups/
-  // bureau-carnets-accueil.dc.html): the logo, « Aucun carnet ouvert dans cette fenêtre », the two buttons, the
-  // recent logbooks with the icon of their source, and the hint about dropping a file. It covers the
-  // pages, right of the rail, whose sections are dimmed and inert (theme-level class set below);
-  // Réglages and the account stay active, and the screen steps aside while Réglages is open.
+  // The window without a logbook (« Fermer le carnet », a new window, « Choisir à chaque fois »; task
+  // 2026-11-16-242, replacing the centred screen of tasks 2026-11-15-173 and 2026-11-16-222; mock-ups docs/mockups/
+  // bureau-demarrage-actuel.dc.html and bureau-demarrage-introuvable.dc.html, a 1440 x 900 window): the blue panel of
+  // the first launch on the left, with its profile still, and on the right « Carnets récents » (components/
+  // RecentLogbooks.svelte), « Ou bien » with « Ouvrir un carnet… » and « Nouveau carnet… », the hint about dropping a
+  // file and « Une question ? À propos et contact ». It covers the whole window, rail included: the rail is not drawn
+  // here (the mock-ups have none); the screen steps aside while Réglages is open, and the rail, with its four sections
+  // dimmed and inert (task 2026-11-16-240), is back then. The first launch (no logbook and no account yet) is not
+  // this screen: it is pages/WelcomeStart.svelte (lib/desktop-first-launch.js says how the desktop tells them apart).
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
-  import { t, locale } from '../lib/i18n.js';
-  import { navigation } from '../lib/navigation.svelte.js';
+  import FirstLaunchPanel from './FirstLaunchPanel.svelte';
+  import RecentLogbooks from './RecentLogbooks.svelte';
+  import WelcomeHelpLink from './WelcomeHelpLink.svelte';
+  import { t } from '../lib/i18n.js';
+  import { navigation, openAbout } from '../lib/navigation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { logbooks, refreshRecent, openLogbookDialog, openRecent, enableDropToOpen } from '../lib/desktop-logbooks.svelte.js';
-  import { sourceKind, sourceText, whenText, displayName } from '../lib/desktop-logbooks.js';
+  import { logbooks, refreshRecent, checkRecent, openLogbookDialog, enableDropToOpen } from '../lib/desktop-logbooks.svelte.js';
 
   const visible = $derived(navigation.section !== 'account');
-  let now = $state(Date.now());
   let dragging = $state(false);
 
-  /** @param {number} time */
-  const formatDate = (time) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(time);
-
-  /** @type {Record<'device'|'file'|'cloud'|'git', 'desktop'|'file'|'cloud'|'git'>} */
-  const ICONS = { device: 'desktop', file: 'file', cloud: 'cloud', git: 'git' };
+  // The rail is out of sight while this screen is on top (its sections stay dimmed under it: theme-level class below).
+  $effect(() => {
+    document.documentElement.classList.toggle('od-start-screen', visible);
+    return () => document.documentElement.classList.remove('od-start-screen');
+  });
 
   onMount(() => {
     document.documentElement.classList.add('od-no-logbook');
-    refreshRecent();
-    const timer = setInterval(() => (now = Date.now()), 30000);
+    void refreshRecent().then(checkRecent);
     const stopDrop = enableDropToOpen(() => showSnackbar(t('desktopLogbooks.start.notALogbook')));
     const over = () => (dragging = true);
     const leave = () => (dragging = false);
@@ -35,7 +39,6 @@
     window.addEventListener('drop', leave);
     return () => {
       document.documentElement.classList.remove('od-no-logbook');
-      clearInterval(timer);
       stopDrop();
       window.removeEventListener('dragenter', over);
       window.removeEventListener('dragleave', leave);
@@ -46,38 +49,34 @@
 
 {#if visible}
   <main class="od-logbook-start" class:od-logbook-start--dragging={dragging} aria-label={t('desktopLogbooks.start.empty')}>
+    <FirstLaunchPanel still />
     <div class="od-logbook-start--column">
-      <div class="od-logbook-start--head">
-        <img class="od-logbook-start--logo od-logbook-start--light" src="logo-light.svg" alt="" width="96" height="96" />
-        <img class="od-logbook-start--logo od-logbook-start--dark" src="logo-dark.svg" alt="" width="96" height="96" />
-        <div>
-          <h1 class="od-logbook-start--title">OpenDives</h1>
-          <p class="od-logbook-start--subtitle">{t('desktopLogbooks.start.empty')}</p>
-        </div>
+      <div class="od-logbook-start--content">
+        {#if logbooks.recent.length}
+          <RecentLogbooks />
+          <h2 class="od-logbook-start--or">{t('desktopLogbooks.recents.orElse')}</h2>
+        {/if}
+        <nav class="od-logbook-start--choices" aria-label={t('desktopLogbooks.recents.otherChoices')}>
+          <button type="button" class="od-logbook-start--choice" onclick={openLogbookDialog}>
+            <span class="od-logbook-start--tile"><Icon name="folder" size={24} /></span>
+            <span class="od-logbook-start--text">
+              <span class="od-logbook-start--label">{t('desktopLogbooks.start.open')}</span>
+              <span class="od-logbook-start--hint">{t('desktopLogbooks.start.openHint')}</span>
+            </span>
+            <span class="od-logbook-start--chevron"><Icon name="chevron" size={20} weight={2} /></span>
+          </button>
+          <button type="button" class="od-logbook-start--choice" onclick={() => (logbooks.dialog = true)}>
+            <span class="od-logbook-start--tile"><Icon name="plus" size={24} weight={2} /></span>
+            <span class="od-logbook-start--text">
+              <span class="od-logbook-start--label">{t('desktopLogbooks.start.newLogbook')}</span>
+              <span class="od-logbook-start--hint">{t('desktopLogbooks.start.newHint')}</span>
+            </span>
+            <span class="od-logbook-start--chevron"><Icon name="chevron" size={20} weight={2} /></span>
+          </button>
+        </nav>
+        <p class="od-logbook-start--drop">{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
       </div>
-      <div class="od-logbook-start--actions">
-        <button type="button" class="od-logbook-start--primary" onclick={openLogbookDialog}>{t('desktopLogbooks.start.open')}</button>
-        <button type="button" class="od-logbook-start--secondary" onclick={() => (logbooks.dialog = true)}>{t('desktopLogbooks.start.newLogbook')}</button>
-      </div>
-      {#if logbooks.recent.length}
-        <h2 class="od-logbook-start--heading">{t('desktopLogbooks.start.recent')}</h2>
-        <ul class="od-logbook-start--list">
-          {#each logbooks.recent as entry (entry.id)}
-            {@const kind = sourceKind(entry)}
-            <li>
-              <button type="button" class="od-logbook-start--row" onclick={() => openRecent(entry.id)}>
-                <span class="od-logbook-start--tile"><Icon name={ICONS[kind]} size={22} /></span>
-                <span class="od-logbook-start--text">
-                  <span class="od-logbook-start--name">{displayName(entry, t)}</span>
-                  <span class="od-logbook-start--source">{[sourceText(entry, t), whenText(entry, now, t, formatDate)].filter(Boolean).join(' · ')}</span>
-                </span>
-                <Icon name="chevron" size={20} />
-              </button>
-            </li>
-          {/each}
-        </ul>
-      {/if}
-      <p class="od-logbook-start--hint">{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
+      <WelcomeHelpLink onopen={openAbout} />
     </div>
   </main>
 {/if}
@@ -86,127 +85,86 @@
   @layer od.components {
     .od-logbook-start {
       position: fixed;
-      inset: 0 0 0 calc(var(--od-nav-width) + env(safe-area-inset-left));
-      z-index: 5500;
+      inset: 0;
+      /* Above the rail (6000): the mock-ups show this window without it. */
+      z-index: 6100;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow-y: auto;
       background: var(--od-background);
       color: var(--od-text);
     }
 
+    /* The panel's own rules for the desktop app size it (components/FirstLaunchPanel.svelte); the rest is this column. */
     .od-logbook-start--column {
-      width: 600px;
-      max-width: calc(100% - 48px);
+      --od-help-link-left: 50%;
+      position: relative;
+      box-sizing: border-box;
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      overflow-y: auto;
+      padding: 0 clamp(24px, 4.4vw, 64px);
+    }
+
+    /* The choices are centred in what the help link leaves; the link stays under them, at the bottom. */
+    .od-logbook-start--content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       padding: 24px 0;
     }
 
-    /* A larger brand row with more space (task 2026-11-16-222): logo 96 px, 24 px gap, 48 px above the buttons
-       (the column's 20 px gap plus 28 px). */
-    .od-logbook-start--head {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 28px;
-    }
-
-    .od-logbook-start--logo {
+    :global(html.od-desktop-app) .od-logbook-start--column :global(.od-welcome-help-link) {
+      position: relative;
+      inset: auto;
       flex: none;
-    }
-    .od-logbook-start--dark {
-      display: none;
-    }
-    :global(html.dark) .od-logbook-start--light {
-      display: none;
-    }
-    :global(html.dark) .od-logbook-start--dark {
-      display: block;
+      transform: none;
+      margin: 0 auto 28px;
+      white-space: normal;
     }
 
-    .od-logbook-start--title {
-      margin: 0;
-      font-family: var(--od-title-font);
-      font-size: 44px;
-      line-height: 52px;
-      font-weight: 500;
-      letter-spacing: -0.5px;
-    }
-
-    .od-logbook-start--subtitle {
-      margin: 4px 0 0;
-      font-size: 18px;
-      line-height: 24px;
+    .od-logbook-start--or {
+      margin: 28px 0 10px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 600;
       color: var(--od-text-2);
     }
 
-    .od-logbook-start--actions {
+    .od-logbook-start--choices {
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .od-logbook-start--primary,
-    .od-logbook-start--secondary {
-      height: 44px;
-      padding: 0 22px;
-      border-radius: 22px;
-      font: inherit;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .od-logbook-start--primary {
-      border: none;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
-    }
-    .od-logbook-start--secondary {
-      border: 1px solid var(--od-outline);
-      background: transparent;
-      color: var(--od-text);
-    }
-
-    .od-logbook-start--heading {
-      margin: 8px 0 -8px;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 600;
-    }
-
-    .od-logbook-start--list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--od-surface);
-    }
-    .od-logbook-start--list li + li {
-      border-top: 1px solid var(--od-separator);
-    }
-
-    .od-logbook-start--row {
+    .od-logbook-start--choice {
+      box-sizing: border-box;
+      width: 100%;
       display: flex;
       align-items: center;
       gap: 16px;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px;
-      border: none;
-      background: transparent;
-      color: var(--od-text-2);
+      padding: 10px 16px;
+      border: 1px solid var(--od-separator);
+      border-radius: 16px;
+      background: var(--od-surface);
+      color: var(--od-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .od-logbook-start--row:hover {
-      background: var(--od-surface-2);
-    }
-    .od-logbook-start--row:focus-visible {
-      outline: 2px solid var(--od-action);
-      outline-offset: -2px;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.15s;
+
+      @media (hover: hover) {
+        &:hover {
+          background: color-mix(in srgb, var(--od-text) 6%, var(--od-surface));
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-start-fill);
+        outline-offset: 2px;
+      }
     }
 
     .od-logbook-start--tile {
@@ -217,8 +175,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface-2);
-      color: var(--od-text);
+      background: var(--od-first-tile);
+      color: var(--od-code-active);
     }
 
     .od-logbook-start--text {
@@ -226,53 +184,53 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-    }
-    .od-logbook-start--name {
-      color: var(--od-text);
-      font-size: 16px;
-      line-height: 22px;
-    }
-    .od-logbook-start--source {
-      font-size: 14px;
-      line-height: 18px;
-      color: var(--od-text-2);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      gap: 2px;
     }
 
-    .od-logbook-start--hint {
-      margin: 0;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--od-text-2);
-    }
-    .od-logbook-start--dragging .od-logbook-start--hint {
-      color: var(--od-action);
+    .od-logbook-start--label {
+      font-size: 17px;
+      line-height: 22px;
       font-weight: 600;
     }
 
-    /* The sections need a logbook: dimmed and inert, as the mock-up draws them; Réglages and the account stay. */
+    .od-logbook-start--hint {
+      font-size: 14px;
+      line-height: 19px;
+      color: var(--od-text-2);
+    }
+
+    .od-logbook-start--chevron {
+      flex: none;
+      display: flex;
+      color: var(--od-text-2);
+    }
+
+    .od-logbook-start--drop {
+      margin: 14px 0 0;
+      font-size: 14px;
+      line-height: 19px;
+      color: var(--od-text-2);
+    }
+    .od-logbook-start--dragging .od-logbook-start--drop {
+      color: var(--od-action);
+      font-weight: 600;
+    }
+    .od-logbook-start--dragging .od-logbook-start--column {
+      box-shadow: inset 0 0 0 2px var(--od-start-fill);
+    }
+
+    /* The sections need a logbook: dimmed and inert, as the mock-up draws them; Réglages and the account stay. Out of
+       sight while this screen is on top. */
     :global(html.od-no-logbook .od-nav-rail--item:not(.od-nav-rail--settings)) {
       opacity: 0.38;
       pointer-events: none;
     }
-
-
-    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
-    @media (hover: hover) and (pointer: fine) {
-      .od-logbook-start--primary,
-      .od-logbook-start--secondary {
-        transition: box-shadow 120ms linear;
-      }
-      .od-logbook-start--primary:hover,
-      .od-logbook-start--secondary:hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
-      }
+    :global(html.od-start-screen .od-nav-rail--rail) {
+      visibility: hidden;
     }
+
     @media (prefers-reduced-motion: reduce) {
-      .od-logbook-start--primary,
-      .od-logbook-start--secondary {
+      .od-logbook-start--choice {
         transition: none;
       }
     }

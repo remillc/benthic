@@ -1,0 +1,3 @@
+/* MapLibre's style sheet, in its own layer (see theme.css, which declares the layer order). It is loaded with
+   the map code (lib/maplibre.js), not with the first screen. */
+@import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);

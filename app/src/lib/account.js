@@ -9,8 +9,8 @@ import { accountReady, deviceDiveCount, importDeviceDives, logbook } from './log
 import { confirmAction } from './dialogs.js';
 import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
-import { FIRST_LAUNCH_SNACKBARS, FIRST_LAUNCH_SNACKBARS_TABLET, newFirstLaunch } from './first-launch.js';
-import { layout, ios } from './layout.svelte.js';
+import { FIRST_LAUNCH_SNACKBARS, FIRST_LAUNCH_SNACKBARS_DESKTOP, FIRST_LAUNCH_SNACKBARS_TABLET, newFirstLaunch } from './first-launch.js';
+import { layout, ios, desktopApp } from './layout.svelte.js';
 
 /**
  * The account being created: its email once the code is confirmed. Step 1
@@ -113,7 +113,7 @@ function toastText(text) {
  * @param {keyof typeof FIRST_LAUNCH_SNACKBARS} kind
  */
 export function announceFirstLaunch(kind) {
-  const keys = layout.phone ? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET;
+  const keys = desktopApp ? FIRST_LAUNCH_SNACKBARS_DESKTOP : layout.phone ? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET;
   // On a tablet it sits at the bottom left, 24 dp from the content's edge (task 2026-11-16-239).
   setTimeout(() => showSnackbar(t(keys[kind]), { placement: 'start' }), 400);
 }

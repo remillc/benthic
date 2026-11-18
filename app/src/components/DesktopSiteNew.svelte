@@ -124,7 +124,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<section class="od-site-form" aria-label={t('sites.newSite')} onkeydown={keydown}>
+<section class="od-site-form" data-od-scroll aria-label={t('sites.newSite')} onkeydown={keydown}>
   <h2 class="od-site-form--title">{t('sites.newSite')}</h2>
   <div class="od-site-form--body">
     <div class="od-site-form--left">
@@ -171,8 +171,10 @@
 <style>
   @layer od.components {
     .od-site-form {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
+      container-type: inline-size;
       padding: 4px 12px 24px 4px;
     }
     .od-site-form--title {
@@ -187,6 +189,11 @@
       grid-template-columns: minmax(280px, 330px) minmax(300px, 1fr);
       gap: 20px;
       align-items: start;
+    }
+    @container (max-width: 639px) {
+      .od-site-form--body {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
     .od-site-form--explain {
       margin: 8px 0 0;

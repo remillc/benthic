@@ -6,19 +6,31 @@
   // a dive profile, then three pill buttons of decreasing weight at the bottom: filled,
   // outlined, tonal (task 2026-11-14-123), and under a thin divider the git link.
   // iOS: an inset grouped list with chevrons.
-  import { Page, theme } from 'framework7-svelte';
+  import { onMount } from 'svelte';
+  import { Page, theme, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import WelcomeHelpLink from '../components/WelcomeHelpLink.svelte';
+  import DesktopLanguageMenu from '../components/DesktopLanguageMenu.svelte';
   import FirstLaunchBand from '../components/FirstLaunchBand.svelte';
   import FirstLaunchPanel from '../components/FirstLaunchPanel.svelte';
-  import { startWithoutAccount } from '../lib/logbook.svelte.js';
+  import { logbook, startWithoutAccount, importFile } from '../lib/logbook.svelte.js';
+  import { offerUndo } from '../lib/undo.js';
+  import { importErrorKey } from '../lib/deep-link.js';
+  import { droppedFiles, startWithDrop } from '../lib/desktop-first-launch.js';
+  import { deviceSuffix } from '../lib/first-launch.js';
   import { t } from '../lib/i18n.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopApp, deviceKind } from '../lib/layout.svelte.js';
   import { decorativeProfilePath } from '../lib/smooth-path.js';
 
   // The tablet's panel plays its profile animation each time the screen is shown (task 2026-11-16-237).
   let playKey = $state(0);
-  const panel = $derived(!theme.ios && !layout.phone);
+  /** The phone's blue band: never in the desktop app, whose window can be a few pixels under 768 dp (task 2026-11-16-242). */
+  const band = $derived(layout.phone && !desktopApp);
+  const panel = $derived(!theme.ios && !band);
+  /** This screen is the one on show (a step above it hides it), for the desktop's drop. */
+  let shown = $state(false);
+  /** A file is being dragged over the window (desktop). */
+  let dragging = $state(false);
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -36,6 +48,44 @@
     f7router.navigate(url);
   }
 
+  // Desktop (task 2026-11-16-242): a file dropped on the window starts the logbook of this computer and imports it.
+  onMount(() => {
+    if (!desktopApp) return;
+    /** @param {DragEvent} e */
+    const over = (e) => {
+      if (!(shown && logbook.welcome && e.dataTransfer?.types?.includes('Files'))) return;
+      e.preventDefault();
+      dragging = true;
+    };
+    const leave = (/** @type {DragEvent} */ e) => {
+      if (!e.relatedTarget) dragging = false;
+    };
+    /** @param {DragEvent} e */
+    const drop = async (e) => {
+      if (!shown || !logbook.welcome) return;
+      dragging = false;
+      const files = droppedFiles(e.dataTransfer);
+      if (!files.length) return;
+      // The logbook's own drop (pages/DesktopLogbook.svelte) must not take it as well.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const result = await startWithDrop(files, { start: startWithoutAccount, importFile });
+      if (result.error && !result.added) {
+        f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(result.error)), buttons: [{ text: t('dialog.ok') }] }).open();
+      } else {
+        offerUndo(t('logbook.imported', { n: result.added }));
+      }
+    };
+    window.addEventListener('dragover', over, true);
+    window.addEventListener('dragleave', leave, true);
+    window.addEventListener('drop', drop, true);
+    return () => {
+      window.removeEventListener('dragover', over, true);
+      window.removeEventListener('dragleave', leave, true);
+      window.removeEventListener('drop', drop, true);
+    };
+  });
+
   function withoutAccount(/** @type {MouseEvent} */ e) {
     e.preventDefault();
     // Android phone (task 2026-11-16-233): a screen says where the logbook stays before it is created.
@@ -44,10 +94,17 @@
   }
 </script>
 
-<Page class="od-welcome-start{panel ? ' od-first-panelled' : ''}{!theme.ios && layout.phone ? ' od-welcome-start--phone' : ''}" onPageBeforeIn={() => playKey++}>
+<Page
+  class="od-welcome-start{panel ? ' od-first-panelled' : ''}{!theme.ios && band ? ' od-welcome-start--phone' : ''}"
+  onPageBeforeIn={() => {
+    playKey++;
+    shown = true;
+  }}
+  onPageBeforeOut={() => (shown = false)}
+>
   {#if !theme.ios}
-    <div class="od-welcome-start--page" class:od-welcome-start--with-band={layout.phone} class:od-welcome-start--with-panel={panel}>
-      {#if layout.phone}
+    <div class="od-welcome-start--page" class:od-welcome-start--with-band={band} class:od-welcome-start--with-panel={panel}>
+      {#if band}
         <!-- Android phone (tasks 2026-11-16-233 to 236): the blue band replaces the brand row, the headline and the profile. -->
         <FirstLaunchBand variant="welcome" />
       {:else}
@@ -68,14 +125,22 @@
         </div>
         <div class="od-welcome-start--option">
           <a href="#no-account" class="od-welcome-start--pill od-welcome-start--pill-tonal external" onclick={withoutAccount}>{t('welcome.noAccount')}</a>
-          <p class="od-welcome-start--note">{t(layout.phone ? 'welcome.noAccountNotePhone' : 'welcome.noAccountNoteTablet')}</p>
+          <p class="od-welcome-start--note">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</p>
         </div>
       </nav>
       <div class="od-welcome-start--divider" role="presentation"></div>
       <a href="/welcome/git" class="od-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
+      {#if desktopApp}
+        <p class="od-welcome-start--drop" class:od-welcome-start--dragging={dragging}>{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
+      {/if}
       </div>
       <!-- Phone (android-accueil-c.dc.html): 12 dp under the git link, 20 dp above the bottom edge. Tablet: pinned 28 dp from the edge. -->
-      <WelcomeHelpLink />
+      {#if desktopApp}
+        <!-- Desktop (task 2026-11-16-246): the help link, a divider and the language menu on one centred line. -->
+        <div class="od-welcome-start--footer"><WelcomeHelpLink inline /><DesktopLanguageMenu /></div>
+      {:else}
+        <WelcomeHelpLink />
+      {/if}
     </div>
   {:else}
   <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
@@ -113,7 +178,7 @@
     <a href="#no-account" class="od-welcome-start--choice external" onclick={withoutAccount}>
       <span class="od-welcome-start--text">
         <span class="od-welcome-start--label">{t('welcome.noAccount')}</span>
-        <span class="od-welcome-start--consequence">{t(layout.phone ? 'welcome.noAccountNotePhone' : 'welcome.noAccountNoteTablet')}</span>
+        <span class="od-welcome-start--consequence">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</span>
       </span>
       <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
@@ -173,6 +238,40 @@
     /* The wrapper only matters on tablets. */
     .od-welcome-start--actions {
       display: contents;
+    }
+
+    /* The desktop app: the help link and the language menu share one line, 24 dp from the bottom, centred under the
+       choices (the same centre as the help link alone had). */
+    :global(html.od-desktop-app) .od-welcome-start--footer {
+      position: absolute;
+      left: var(--od-help-link-left, 50%);
+      bottom: 24px;
+      z-index: 2;
+      transform: translateX(-50%);
+      width: max-content;
+      /* Never wider than the choices' column (the window minus the blue panel): in a narrow window the link and the
+         language menu stack. */
+      max-width: calc(100% - min(700px, 48.6%) - 8px);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0 8px;
+
+      /* A narrow window: the link and the menu keep one line. */
+      @media (max-width: 900px) {
+        gap: 0 2px;
+
+        :global(.od-welcome-help-link),
+        :global(.od-desktop-language) {
+          padding-inline: 8px;
+        }
+      }
+
+      /* A low window: a step may scroll under the line, which then keeps its own ground. */
+      @media (max-height: 700px) {
+        background: var(--od-background);
+      }
     }
 
     /* « Alpha » after the name (tasks 2026-11-16-225 and 229): capitals, 14 sp, bold, a full pill 8 dp after the name. */
@@ -355,6 +454,29 @@
 
       .od-welcome-start--pill {
         cursor: pointer;
+      }
+
+      /* « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. » (desktop). */
+      .od-welcome-start--drop {
+        margin: 12px 0 0;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--od-text-2);
+
+        &.od-welcome-start--dragging {
+          color: var(--od-action);
+          font-weight: 600;
+        }
+      }
+    }
+
+    /* The desktop app (task 2026-11-16-242): always the panel on the left and the choices beside it, in a window of
+       any shape; the column keeps its room in a narrow window. */
+    :global(html.od-desktop-app) .od-welcome-start--with-panel {
+      flex-direction: row;
+
+      .od-welcome-start--actions {
+        padding: 24px clamp(24px, 4.4vw, 64px) 56px;
       }
     }
 

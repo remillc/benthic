@@ -134,6 +134,9 @@
     .od-logbook-selector {
       position: relative;
       display: inline-flex;
+      /* Fluid layout: in a narrow window the pill gives way and the logbook's name is cut with an ellipsis. */
+      max-width: 100%;
+      min-width: 0;
     }
     .od-logbook-selector--pill {
       display: inline-flex;
@@ -147,6 +150,8 @@
       color: var(--od-text);
       font: inherit;
       cursor: pointer;
+      max-width: 100%;
+      min-width: 0;
     }
     .od-logbook-selector--pill:focus-visible {
       outline: 2px solid var(--od-action);
@@ -159,6 +164,8 @@
       font-weight: 500;
     }
     .od-logbook-selector--name {
+      flex: 0 1 auto;
+      min-width: 0;
       max-width: 240px;
       overflow: hidden;
       text-overflow: ellipsis;

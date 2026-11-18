@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { GIT_HELP, helpStepKeys } from '../../app/src/lib/git-help.js';
-import { deviceKey } from '../../app/src/lib/first-launch.js';
+import { deviceKey, FIRST_LAUNCH_SNACKBARS_DESKTOP } from '../../app/src/lib/first-launch.js';
+import { parseMarked } from '../../app/src/lib/marked-text.js';
 
 const src = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 const lookup = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
@@ -19,7 +20,7 @@ test('the texts of the tablet: « cette tablette » in the form sentence and in 
   assert.equal(fr.firstLaunch.snackbar.gitDownloadedTablet, 'Carnet téléchargé depuis votre dépôt. Il reste sur cette tablette, même sans réseau.');
   assert.match(en.gitRepo.introPhoneTablet, /this tablet/);
   assert.match(en.firstLaunch.snackbar.gitDownloadedTablet, /this tablet/);
-  assert.match(src('components/GitForm.svelte'), /t\(deviceKey\('gitRepo\.introPhone', layout\.phone\)\)/);
+  assert.match(src('components/GitForm.svelte'), /t\(deviceKey\('gitRepo\.introPhone', deviceKind\(\)\)\)/);
   // The download names the tablet through the Subsurface account's keys, and the repository with its branch.
   assert.equal(fr.firstLaunch.download.copyTablet, 'Copie du carnet sur cette tablette');
 });
@@ -38,7 +39,8 @@ test('the help: every host has its steps in both languages, and the two helps sh
 
 test('on a tablet the form opens in the first-launch frame, and the help replaces it in the same column', () => {
   // The panel, still, is EditorialPage's (firstLaunch on a tablet); the form has no button of its own there.
-  assert.match(page, /const panelled = \$derived\(welcome && !ios && !layout\.phone\);/);
+  assert.match(page, /const phone = \$derived\(!ios && layout\.phone && !desktopApp\);/);
+  assert.match(page, /const panelled = \$derived\(welcome && !ios && !phone\);/);
   const block = page.slice(page.indexOf('{:else if panelled}'), page.indexOf('{:else if phone}'));
   assert.match(block, /<EditorialPage[^>]*\s+firstLaunch\s+helpLink=\{!help\}/);
   assert.match(block, /<GitHelp kind=\{help\} embedded \/>/);
@@ -69,4 +71,49 @@ test('the embedded help keeps the colours and the pointer of the phone\'s', () =
   assert.match(help, /class:od-git-help--embedded=\{embedded\}/);
   assert.match(help, /\.od-git-help--tab \{[\s\S]*?cursor: pointer;[\s\S]*?@media \(hover: hover\)/);
   assert.doesNotMatch(help.slice(help.indexOf('<style>')), /#[0-9a-f]{3,6}\b/i);
+});
+
+test('the desktop (task 2026-11-16-257): « cet ordinateur » in the texts, « Cliquez » in the steps that name a touch', () => {
+  assert.equal(deviceKey('gitRepo.introPhone', 'desktop'), 'gitRepo.introPhoneDesktop');
+  assert.equal(fr.gitRepo.introPhoneDesktop, 'Gardez votre carnet dans votre dépôt git, avec une copie sur cet ordinateur.');
+  assert.match(en.gitRepo.introPhoneDesktop, /this computer/);
+  assert.equal(FIRST_LAUNCH_SNACKBARS_DESKTOP.gitDownloaded, 'firstLaunch.snackbar.gitDownloadedDesktop');
+  assert.equal(fr.firstLaunch.snackbar.gitDownloadedDesktop, 'Carnet téléchargé depuis votre dépôt. Il reste sur cet ordinateur, même sans réseau.');
+  assert.equal(en.firstLaunch.snackbar.gitDownloadedDesktop, 'Logbook downloaded from your repository. It stays on this computer, even without a network.');
+  assert.equal(fr.firstLaunch.download.copyDesktop, 'Copie du carnet sur cet ordinateur');
+  // The form is the tablet's in the desktop app, never the phone's (the window can be a few pixels under 768 dp).
+  assert.match(page, /const phone = \$derived\(!ios && layout\.phone && !desktopApp\);/);
+});
+
+test('the desktop steps: every step with a touch verb has a variant with the same marks, and none keeps the verb', () => {
+  const touch = { fr: /\b[Tt]ouchez\b/, en: /\b[Tt]ap\b/ };
+  let variants = 0;
+  for (const [lang, json] of [['fr', fr], ['en', en]]) {
+    for (const sec of ['repoHelp', 'tokenHelp']) {
+      for (const [host, texts] of Object.entries(json[sec])) {
+        if (typeof texts !== 'object') continue;
+        for (const [key, text] of Object.entries(texts)) {
+          const m = /^(s\d+)$/.exec(key);
+          if (m) {
+            const variant = texts[`${key}Desktop`];
+            assert.equal(touch[lang].test(text), variant !== undefined, `${lang} ${sec}.${host}.${key}`);
+            if (variant === undefined) continue;
+            variants++;
+            assert.doesNotMatch(variant, touch[lang]);
+            assert.match(variant, lang === 'fr' ? /\b[Cc]liquez sur\b/ : /\b[Cc]lick\b/);
+            // The labels and the values are the same.
+            const marks = (s) => parseMarked(s).filter((x) => x.type !== 'text').map((x) => `${x.type}:${x.text}`);
+            assert.deepEqual(marks(variant), marks(text), `${lang} ${sec}.${host}.${key}`);
+          }
+        }
+      }
+    }
+  }
+  assert.equal(variants, 30);
+  // In the desktop app only: the component asks for the variant, the phone and the tablet keep « Touchez ».
+  const calls = (hasDesktop) => helpStepKeys('repository', GIT_HELP.repository.providers[0], hasDesktop);
+  const has = (key) => lookup(fr, key) !== undefined;
+  assert.deepEqual(calls(undefined).filter((k) => /Desktop$/.test(k)), []);
+  assert.deepEqual(calls(has).filter((k) => /Desktop$/.test(k)), ['repoHelp.github.s1Desktop', 'repoHelp.github.s5Desktop']);
+  assert.match(src('components/GitHelp.svelte'), /helpStepKeys\(kind, provider, desktopApp \? \(k\) => tIfExists\(k\) !== undefined : undefined\)/);
 });

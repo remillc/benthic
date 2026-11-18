@@ -184,7 +184,7 @@
 </script>
 
 {#if site}
-  <section class="od-site-sheet-desk" aria-label={site.name || t('sites.noName')}>
+  <section class="od-site-sheet-desk" data-od-scroll aria-label={site.name || t('sites.noName')}>
     <header class="od-site-sheet-desk--head">
       <div class="od-site-sheet-desk--titles">
         <h2 class="od-site-sheet-desk--title">{site.name || t('sites.noName')}</h2>
@@ -284,8 +284,11 @@
 <style>
   @layer od.components {
     .od-site-sheet-desk {
+      box-sizing: border-box;
       height: 100%;
       overflow: auto;
+      /* Fluid layout: the sheet lays out by its own width (@container below). */
+      container-type: inline-size;
       padding: 0 12px 24px 4px;
     }
     .od-site-sheet-desk--head {
@@ -346,6 +349,11 @@
       grid-template-columns: minmax(280px, 330px) minmax(300px, 1fr);
       gap: 20px;
       align-items: start;
+    }
+    @container (max-width: 639px) {
+      .od-site-sheet-desk--body {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
     .od-site-sheet-desk--figures {
       display: flex;

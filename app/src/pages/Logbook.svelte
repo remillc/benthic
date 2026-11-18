@@ -42,7 +42,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, deviceKind } from '../lib/layout.svelte.js';
+  import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -804,7 +805,9 @@
     if (!layout.split || navigation.section !== 'logbook' || logbook.loading || logbook.error || selecting || !listEl) return;
     const first = entries[0];
     const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
-    if (!dive || autoOpening || listEl.closest('.view')?.querySelector('.page-master-detail')) return;
+    // The emptied pane (PaneEmpty) is not a screen to keep: the desktop layout leaves it when the window narrows.
+    const pane = listEl.closest('.view')?.querySelector('.page-master-detail');
+    if (!dive || autoOpening || (pane && !pane.classList.contains('od-pane-empty'))) return;
     autoOpening = true;
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
@@ -1183,7 +1186,7 @@
   }
 </script>
 
-<Page class="od-logbook" onPageInit={keepInSvelteRange}>
+<Page data-od-scroll class="od-logbook" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -1341,7 +1344,7 @@
     {:else}
     {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? 'logbook.emptyGit' : 'logbook.emptyCloud')}</p>
     {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
-      <p class="od-logbook--count">{t(layout.phone ? 'logbook.emptyLocal' : 'logbook.emptyLocalTablet')}</p>{/if}
+      <p class="od-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
     <div class="od-logbook--empty">
       <div class="od-logbook--empty-illustration" aria-hidden="true">
         <DecorativeProfile trace class="od-logbook--empty-profile" />

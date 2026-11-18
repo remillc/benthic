@@ -5,7 +5,7 @@
   // the fill order with a cylinder drawn in layers and the numbered steps. The calculation is the
   // phone's (GasBlender.svelte): lib/gas-blend.js with the same arguments. The state is kept in
   // lib/desktop-tools.svelte.js so that « Préparer ce mélange » can set the target.
-  import { OpenDivesCore } from 'opendives-core';
+  import { cachedCylinderTypes } from '../lib/core-cache.js';
   import DesktopField from './DesktopField.svelte';
   import DesktopSegments from './DesktopSegments.svelte';
   import Icon from './Icon.svelte';
@@ -32,7 +32,7 @@
   // Read again when the logbook changes: its cylinders are part of the list.
   $effect(() => {
     if (logbook.loading) return;
-    OpenDivesCore.toolQuery({ kind: 'cylinders' })
+    cachedCylinderTypes()
       .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => {
         cylinders = list.types.filter((c) => c.ml > 0);
         const names = cylinders.map((c) => c.name);
@@ -287,6 +287,13 @@
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
       gap: 32px;
       align-items: start;
+    }
+    /* Fluid layout: in a narrow pane the results go under the inputs. */
+    @container od-tool (max-width: 799px) {
+      .od-desktop-blender {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
     }
     .od-desktop-blender--inputs {
       display: flex;

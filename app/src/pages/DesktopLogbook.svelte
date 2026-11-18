@@ -31,7 +31,7 @@
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { undoNameKey } from '../lib/undo-name.js';
-  import { desk, setSort, setColumns, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
+  import { desk, setSort, setColumns, setColumnWidths, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
   import {
     COLUMNS,
     shownColumns,
@@ -46,10 +46,19 @@
     contextMenuEntries,
     emptyAreaMenuEntries,
     clampTableWidth,
+    tableWidthFor,
+    fittingColumns,
+    clampColumnWidth,
+    columnWidth,
+    minColumnWidth,
+    COLUMN_MAX_WIDTH,
     adjacentTrips,
     moveColumn,
     dropTarget,
     DEFAULT_COLUMNS,
+    rowOffsets,
+    windowRange,
+    scrollForRow,
   } from '../lib/desktop-table.js';
   import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatShortDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -90,18 +99,71 @@
     logbook.dives.filter((d) => (!filter.ids || filter.ids.has(d.id)) && (!searchIds || searchIds.has(d.id))),
   );
   const columns = $derived(shownColumns(desk.columns));
+  /** The room the table has, in px (read from its scroll area). */
+  let tableRoom = $state(0);
+  /** The shown columns that fit in that room; the others stay chosen and come back in a wider pane. */
+  const columnsNow = $derived(fittingColumns(columns, tableRoom, desk.columnWidths));
+  /**
+   * Site is the column that takes the room the others leave. Once the diver gave it a width, nothing takes the room
+   * any more: every column gets its width as it is (the table is then as wide as they add up to, never stretched).
+   */
+  const exactWidths = $derived(columnsNow.some((c) => c.key === 'site') && desk.columnWidths.site != null);
+  const tableStyle = $derived(exactWidths ? `width: ${columnsNow.reduce((sum, c) => sum + columnWidth(c.key, desk.columnWidths), 0)}px` : undefined);
+  $effect(() => {
+    if (!tableEl) return;
+    const element = tableEl;
+    const measure = () => {
+      tableRoom = element.clientWidth - 9;
+      viewHeight = element.clientHeight;
+    };
+    measure();
+    scrollTop = element.scrollTop;
+    // Arriving with a dive selected (a resize across the layout switch): it is put in view.
+    untrack(() => scrollToDive(desk.selection.focus));
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  });
   const sorted = $derived(sortDives(listed, desk.extras, desk.sort));
   const rows = $derived(tableRows(sorted, desk.sort, desk.collapsed));
   const order = $derived(rowDiveIds(rows));
   const selected = $derived(new Set(desk.selection.ids));
   const summary = $derived(logbookSummary(logbook.dives));
 
-  // The columns' extra values follow the logbook.
+  // --- Windowing: only the rows in view (plus a margin) are in the DOM; two spacer rows hold the rest's height. ---
+  let scrollTop = $state(0);
+  let viewHeight = $state(0);
+  const offsets = $derived(rowOffsets(rows));
+  const win = $derived(windowRange(offsets, scrollTop, viewHeight));
+  const windowStart = $derived(win.start);
+  const windowEnd = $derived(win.end);
+  const visibleRows = $derived(rows.slice(windowStart, windowEnd));
+  const padTop = $derived(win.padTop);
+  const padBottom = $derived(win.padBottom);
+
+  /** Scrolls the table so the row of dive `id` is fully in view; computed from the row heights, so it works for rows not drawn. */
+  function scrollToDive(/** @type {number|null} */ id) {
+    if (!tableEl || id == null) return;
+    const i = rows.findIndex((r) => r.type === 'dive' && r.dive.id === id);
+    tableEl.scrollTop = scrollForRow(offsets, i, tableEl.scrollTop, tableEl.clientHeight);
+    scrollTop = tableEl.scrollTop;
+  }
+
+  // The columns' extra values follow the logbook, when a shown column or the sort reads them.
+  const NO_EXTRAS = new Set(['number', 'date', 'site', 'maxDepth', 'duration']);
+  const needsExtras = $derived(columnsNow.some((c) => !NO_EXTRAS.has(c.key)) || !NO_EXTRAS.has(desk.sort.key));
   $effect(() => {
-    if (logbook.loading || logbook.error) return;
+    if (logbook.loading || logbook.error || !needsExtras) return;
     logbook.dives;
     untrack(() => loadExtras());
   });
+
+  // Adaptive page: arriving from the tablet layout, the dive its detail pane shows is the selection.
+  {
+    const shown = /^\/dives\/(\d+)$/.exec(untrack(() => f7router.currentRoute?.url) ?? '');
+    const id = shown ? Number(shown[1]) : 0;
+    if (id && !desk.selection.ids.includes(id)) desk.selection = { ids: [id], anchor: id, focus: id };
+  }
 
   // The selection keeps the dives still listed; the detail pane follows it.
   $effect(() => {
@@ -236,8 +298,7 @@
 
   /** Keeps the focused row on screen after ↑ ↓. */
   async function revealFocus() {
-    await tick();
-    tableEl?.querySelector(`[data-dive="${desk.selection.focus}"]`)?.scrollIntoView({ block: 'nearest' });
+    scrollToDive(desk.selection.focus);
   }
 
   // --- Actions. ------------------------------------------------------------------------
@@ -523,6 +584,62 @@
     columnsOpen = false;
   }
 
+  // --- Resizing a column by the edge of its header (task 2026-11-15-181). ------------------------
+  /** The width a column has now: the diver's, or the one the stylesheet gives it. @param {string} key */
+  const widthOf = (key) => desk.columnWidths[key] ?? Math.round(tableEl?.querySelector(`th[data-col="${key}"]`)?.getBoundingClientRect().width ?? minColumnWidth(key));
+
+  /** @param {string} key @param {number} width @param {boolean} [keep] */
+  function giveWidth(key, width, keep = true) {
+    setColumnWidths({ ...desk.columnWidths, [key]: clampColumnWidth(key, width) }, keep);
+  }
+
+  /** The handle on a header's edge: drag to resize; the header's own drag and sort stay out of it. @param {PointerEvent} e @param {string} key */
+  function edgeDown(e, key) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startWidth = widthOf(key);
+    /** @param {PointerEvent} m */
+    const move = (m) => giveWidth(key, startWidth + (m.clientX - startX), false);
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      setColumnWidths(desk.columnWidths);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  /** Arrow keys on the focused edge: 8 px a step, 32 with Maj; Entrée fits the column to its content. @param {KeyboardEvent} e @param {string} key */
+  function edgeKey(e, key) {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      const step = (e.shiftKey ? 32 : 8) * (e.key === 'ArrowRight' ? 1 : -1);
+      giveWidth(key, widthOf(key) + step);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      fitColumn(key);
+    }
+  }
+
+  /** Double click on the edge: the width the widest value (or the header) needs. @param {string} key */
+  function fitColumn(key) {
+    const column = COLUMNS.find((c) => c.key === key);
+    if (!column || !tableEl) return;
+    const context = document.createElement('canvas').getContext('2d');
+    if (!context) return;
+    const family = getComputedStyle(tableEl).fontFamily;
+    context.font = `14px ${family}`;
+    let widest = 0;
+    const sample = logbook.dives.length > 3000 ? logbook.dives.filter((_, i) => i % Math.ceil(logbook.dives.length / 3000) === 0) : logbook.dives;
+    for (const dive of sample) widest = Math.max(widest, context.measureText(cell(key, dive)).width);
+    context.font = `500 13px ${family}`;
+    widest = Math.max(widest, context.measureText(t(column.label)).width + 16);
+    // 20 px of padding and a little room for the cell's own marks (a deep value, the sort arrow).
+    giveWidth(key, Math.ceil(widest) + 24);
+  }
+
   // --- The columns button. ----------------------------------------------------------------
   let columnsOpen = $state(false);
 
@@ -749,7 +866,7 @@
     const up = () => {
       handle.removeEventListener('pointermove', move);
       handle.removeEventListener('pointerup', up);
-      setTableWidth(desk.tableWidth);
+      if (desk.tableWidth !== null) setTableWidth(desk.tableWidth);
     };
     handle.addEventListener('pointermove', move);
     handle.addEventListener('pointerup', up);
@@ -760,16 +877,28 @@
     e.preventDefault();
     const view = /** @type {HTMLElement} */ (e.currentTarget).closest('.view');
     const available = view?.getBoundingClientRect().width ?? innerWidth;
-    setTableWidth(clampTableWidth(desk.tableWidth + (e.key === 'ArrowRight' ? 16 : -16), available));
+    setTableWidth(clampTableWidth(tableNow + (e.key === 'ArrowRight' ? 16 : -16), available));
   }
 
-  // The view gives the table its width (Framework7's master-detail).
+  /** The width the table has now, in px (the pane follows the window while the diver has not moved the handle). */
+  let tableNow = $state(760);
+  // The view gives the table its width (Framework7's master-detail), again each time the window changes size.
   $effect(() => {
     const view = /** @type {HTMLElement|null} */ (pageEl?.closest('.view') ?? null);
     if (!view) return;
-    const available = view.getBoundingClientRect().width;
-    view.style.setProperty('--f7-page-master-width', `${clampTableWidth(desk.tableWidth, available)}px`);
-    return () => view.style.removeProperty('--f7-page-master-width');
+    const stored = desk.tableWidth;
+    const place = () => {
+      const available = view.getBoundingClientRect().width;
+      tableNow = clampTableWidth(tableWidthFor(stored, available), available);
+      view.style.setProperty('--f7-page-master-width', `${tableNow}px`);
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(view);
+    return () => {
+      observer.disconnect();
+      view.style.removeProperty('--f7-page-master-width');
+    };
   });
 </script>
 
@@ -829,11 +958,11 @@
         <p class="od-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="od-desktop-logbook--scroll" bind:this={tableEl}>
-        <table class="od-desktop-logbook--table" aria-multiselectable="true" aria-rowcount={order.length}>
+      <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+        <table class="od-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
-            <tr>
-              {#each columns as column (column.key)}
+            <tr aria-rowindex="1">
+              {#each columnsNow as column (column.key)}
                 {@const sortedHere = desk.sort.key === column.key}
                 <th
                   scope="col"
@@ -842,21 +971,38 @@
                   data-col={column.key}
                   class:od-desktop-logbook--slot={dragging?.key === column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
+                  style:width={desk.columnWidths[column.key] || exactWidths ? `${columnWidth(column.key, desk.columnWidths)}px` : undefined}
                   onpointerdown={(e) => headDown(e, column.key)}
                 >
                   <button type="button" onclick={() => headClick(column.key)} onkeydown={(e) => headKey(e, column.key)}>
                     {t(column.label)}{#if sortedHere}<span class="od-desktop-logbook--arrow" aria-hidden="true">{desk.sort.descending ? '▾' : '▴'}</span>{/if}
                   </button>
+                  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                  <span
+                    class="od-desktop-logbook--edge"
+                    role="separator"
+                    tabindex="0"
+                    aria-orientation="vertical"
+                    aria-label={t('desktop.resizeColumn', { column: t(column.label) })}
+                    aria-valuemin={minColumnWidth(column.key)}
+                    aria-valuemax={COLUMN_MAX_WIDTH}
+                    aria-valuenow={desk.columnWidths[column.key] ?? undefined}
+                    onpointerdown={(e) => edgeDown(e, column.key)}
+                    ondblclick={() => fitColumn(column.key)}
+                    onkeydown={(e) => edgeKey(e, column.key)}
+                    onclick={(e) => e.stopPropagation()}
+                  ></span>
                 </th>
               {/each}
             </tr>
           </thead>
           <tbody>
-            {#each rows as row (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
+            {#if padTop}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padTop}px"></td></tr>{/if}
+            {#each visibleRows as row, at (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
-                <tr class="od-desktop-logbook--trip">
-                  <td colspan={columns.length}>
+                <tr class="od-desktop-logbook--trip" aria-rowindex={windowStart + at + 2}>
+                  <td colspan={columnsNow.length}>
                     <button
                       type="button"
                       aria-expanded={row.expanded}
@@ -876,12 +1022,13 @@
                   class:od-desktop-logbook--selected={selected.has(dive.id)}
                   class:od-desktop-logbook--focus={desk.selection.focus === dive.id}
                   aria-selected={selected.has(dive.id)}
+                  aria-rowindex={windowStart + at + 2}
                   data-dive={dive.id}
                   onclick={(e) => rowClick(e, dive.id)}
                   ondblclick={() => editSelected()}
                   oncontextmenu={(e) => rowMenu(e, dive.id)}
                 >
-                  {#each columns as column (column.key)}
+                  {#each columnsNow as column (column.key)}
                     <td
                       data-col={column.key}
                       class:od-desktop-logbook--numeric={column.numeric}
@@ -897,6 +1044,7 @@
                 </tr>
               {/if}
             {/each}
+            {#if padBottom}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padBottom}px"></td></tr>{/if}
           </tbody>
         </table>
         {#if !rows.length}<p class="od-desktop-logbook--state" role="status">{t('desktop.noMatch')}</p>{/if}
@@ -908,7 +1056,7 @@
       role="separator"
       aria-orientation="vertical"
       aria-label={t('desktop.resize')}
-      aria-valuenow={desk.tableWidth}
+      aria-valuenow={tableNow}
       tabindex="0"
       onpointerdown={startResize}
       onkeydown={resizeKey}
@@ -975,7 +1123,8 @@
       padding: 8px 8px 8px 12px;
     }
     .od-desktop-logbook--titles {
-      flex: 1;
+      /* Fluid layout: in a narrow pane the search field gives way first, then the title. */
+      flex: 1 0.2 auto;
       min-width: 0;
     }
     .od-desktop-logbook--title {
@@ -1001,7 +1150,7 @@
       align-items: center;
       gap: 12px;
       flex: 0 1 300px;
-      min-width: 220px;
+      min-width: 150px;
       height: 44px;
       padding: 0 12px 0 16px;
       border-radius: 22px;
@@ -1081,6 +1230,8 @@
     .od-desktop-logbook--scroll {
       flex: 1;
       overflow: auto;
+      /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
+      overflow-anchor: none;
       padding-right: 9px;
     }
     /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
@@ -1118,6 +1269,30 @@
     }
     .od-desktop-logbook--head button:hover {
       color: var(--od-text);
+    }
+    /* The edge to drag (task 181): 8 px wide on the header's right side, a thin line on hover and focus. */
+    .od-desktop-logbook--edge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: col-resize;
+      outline: none;
+    }
+    .od-desktop-logbook--edge::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 3px;
+      width: 2px;
+      border-radius: 1px;
+      background: transparent;
+    }
+    .od-desktop-logbook--edge:hover::after,
+    .od-desktop-logbook--edge:focus-visible::after {
+      background: var(--od-outline);
     }
     .od-desktop-logbook--arrow {
       margin-inline-start: 4px;
@@ -1215,8 +1390,15 @@
       font-size: 11px;
       font-weight: 600;
     }
+    /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
+    .od-desktop-logbook--trip {
+      height: 44px;
+    }
     .od-desktop-logbook--trip td {
       padding: 4px 0;
+    }
+    .od-desktop-logbook--pad td {
+      padding: 0;
     }
     .od-desktop-logbook--trip button {
       display: flex;

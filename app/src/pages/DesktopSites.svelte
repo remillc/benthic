@@ -9,6 +9,7 @@
   import { tick, untrack } from 'svelte';
   import { Page } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import DesktopSiteMap from '../components/DesktopSiteMap.svelte';
@@ -18,6 +19,7 @@
   import DesktopSitesCleanup from '../components/DesktopSitesCleanup.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
+  import { siteFocus } from '../lib/site-focus.svelte.js';
   import { deskSites, loadSitesChoices, setSitesSort, setSitesWidth, loadRegions, retryWaiting, showSiteDives } from '../lib/desktop-sites.svelte.js';
   import {
     SITE_COLUMNS,
@@ -54,7 +56,7 @@
 
   async function load() {
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await cachedSites();
       without = await OpenDivesCore.siteQuery({ kind: 'without' });
       pairs = await possibleDuplicates();
       loaded = true;
@@ -123,6 +125,15 @@
     const uuids = rows.map((s) => s.uuid);
     const next = reduceSelection(untrack(() => sel), { type: 'visible', uuids });
     if (next !== untrack(() => sel)) sel = next;
+  });
+
+  // A dive's « Voir le site dans Sites »: its site opens in the sheet.
+  $effect(() => {
+    const uuid = siteFocus.uuid;
+    if (uuid && sites.some((s) => s.uuid === uuid)) {
+      untrack(() => select({ type: 'row' }, uuid));
+      siteFocus.uuid = 0;
+    }
   });
 
   const selectedSite = $derived(sites.find((s) => s.uuid === sel.selected) ?? null);
@@ -388,7 +399,7 @@
           </div>
         {:else}
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-          <div class="od-desktop-sites--scroll" bind:this={scrollEl} onclick={emptyAreaClick}>
+          <div class="od-desktop-sites--scroll" data-od-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
             <table class="od-desktop-sites--table" aria-rowcount={rows.length} aria-label={t('sites.listLabel')}>
               <thead>
                 <tr>

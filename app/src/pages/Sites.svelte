@@ -10,6 +10,7 @@
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
+  import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
@@ -341,7 +342,7 @@ import { language } from '../lib/i18n.js';
 
   async function load() {
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await cachedSites();
       withoutSite = (await OpenDivesCore.siteQuery({ kind: 'without' })).length;
       duplicates = (await possibleDuplicates()).length;
     } catch (e) {
@@ -536,7 +537,7 @@ import { language } from '../lib/i18n.js';
       <div class="od-sites--split" class:ios>
         <div class="od-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
-          <div class="od-sites--scroll">{@render band(false)}{@render panel()}</div>
+          <div class="od-sites--scroll" data-od-scroll>{@render band(false)}{@render panel()}</div>
           {@render fab()}
         </div>
         <div class="od-sites--map-pane">{@render mapBlock('100%')}</div>

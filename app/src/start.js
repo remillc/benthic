@@ -2,7 +2,7 @@
 // The app itself, started by main.js once the settings of this device are loaded
 // (lib/device-store.js): every module below may read them as it loads.
 import { mount } from 'svelte';
-import Framework7 from 'framework7/lite-bundle';
+import Framework7 from './framework7.js';
 import Framework7Svelte from 'framework7-svelte';
 import App from './App.svelte';
 import { mark, observePaints } from './lib/perf.js';

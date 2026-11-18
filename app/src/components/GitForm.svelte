@@ -15,7 +15,7 @@
   import Icon from './Icon.svelte';
   import LoadingIndicator from './LoadingIndicator.svelte';
   import { deviceKey } from '../lib/first-launch.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { deviceKind } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -32,7 +32,7 @@
 </script>
 
 <div class="od-git-form">
-  <p class="od-git-form--intro">{t(deviceKey('gitRepo.introPhone', layout.phone))}</p>
+  <p class="od-git-form--intro">{t(deviceKey('gitRepo.introPhone', deviceKind()))}</p>
   <a href="/git/repository" class="od-git-form--link od-git-form--link-repository" onclick={(e) => onhelp('repository', e)}>{t('gitRepo.repositoryHow')}</a>
 
   <AccountField

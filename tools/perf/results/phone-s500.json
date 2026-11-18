@@ -1,0 +1,88 @@
+{
+ "label": "s500",
+ "cpu": 4,
+ "wideBefore": {
+  "elements": 10342,
+  "pages": {
+   "od-welcome-start.od-first-panelled": 61,
+   "od-desktop-logbook.page": 7473,
+   "od-dive-detail.no-swipeback": 251,
+   "od-desktop-sites.page": 1659,
+   "od-desktop-statistics.page": 122,
+   "od-desktop-tools.page": 468,
+   "od-account.page": 41
+  },
+  "cdpNodes": 31359,
+  "jsHeapMB": 55.4,
+  "layoutCount": 1,
+  "recalcStyle": 13
+ },
+ "phoneLayoutReadyMs": 665,
+ "phoneAfterSwap": {
+  "elements": 6430,
+  "pages": {
+   "od-welcome-start.od-first-panelled": 61,
+   "od-logbook.page": 928,
+   "od-dive-detail.no-swipeback": 238,
+   "od-sites.page": 2991,
+   "od-statistics.page": 1819,
+   "od-tools.page": 79,
+   "od-account.page": 44
+  },
+  "cdpNodes": 44392,
+  "jsHeapMB": 53.6,
+  "layoutCount": 30,
+  "recalcStyle": 53
+ },
+ "phoneRows": "{\"diveRows\":0,\"tripRows\":21,\"profileSvgs\":105,\"svgNodes\":2155}",
+ "longTasksSwap": [
+  186,
+  51,
+  192,
+  157,
+  64,
+  91,
+  85,
+  69,
+  62,
+  65,
+  137,
+  592,
+  308,
+  60,
+  229,
+  62,
+  73,
+  168,
+  259,
+  63,
+  107
+ ],
+ "scroll10Screens": {
+  "ms": 198,
+  "h": 1659
+ },
+ "longTasksTotal": [
+  186,
+  51,
+  192,
+  157,
+  64,
+  91,
+  85,
+  69,
+  62,
+  65,
+  137,
+  592,
+  308,
+  60,
+  229,
+  62,
+  73,
+  168,
+  259,
+  63,
+  107
+ ]
+}

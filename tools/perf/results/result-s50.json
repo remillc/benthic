@@ -1,0 +1,297 @@
+{
+ "label": "s50",
+ "ssrf": "build/perf/logbook-50.ssrf",
+ "cpu": 1,
+ "coldFromSpawnMs": 3707,
+ "idle": {
+  "nodes": 3400,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 799,
+   "od-dive-detail*": 233,
+   "od-desktop-sites*": 1660,
+   "od-desktop-statistics*": 121,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 226,
+  "jsHeapMB": 43.1,
+  "layoutCount": 21,
+  "recalcStyle": 65,
+  "layoutMs": 51,
+  "scriptMs": 635,
+  "taskMs": 1413,
+  "listeners": 409
+ },
+ "afterSelect": {
+  "nodes": 3418,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 799,
+   "od-dive-detail*": 251,
+   "od-desktop-sites*": 1660,
+   "od-desktop-statistics*": 121,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 235,
+  "jsHeapMB": 43.2,
+  "layoutCount": 34,
+  "recalcStyle": 81,
+  "layoutMs": 54,
+  "scriptMs": 824,
+  "taskMs": 1864,
+  "listeners": 410
+ },
+ "navs": [
+  "#logbook",
+  "#sites",
+  "#statistics",
+  "#tools",
+  "#settings"
+ ],
+ "after_sites": {
+  "nodes": 3150,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 241,
+   "od-dive-detail*": 256,
+   "od-desktop-sites*": 1945,
+   "od-desktop-statistics*": 121,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 190,
+  "jsHeapMB": 43,
+  "layoutCount": 59,
+  "recalcStyle": 114,
+  "layoutMs": 80,
+  "scriptMs": 1077,
+  "taskMs": 2609,
+  "listeners": 847
+ },
+ "after_statistics": {
+  "nodes": 3170,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 241,
+   "od-dive-detail*": 256,
+   "od-desktop-sites*": 1945,
+   "od-desktop-statistics*": 134,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 201,
+  "jsHeapMB": 44.4,
+  "layoutCount": 63,
+  "recalcStyle": 121,
+  "layoutMs": 83,
+  "scriptMs": 1199,
+  "taskMs": 2842,
+  "listeners": 876
+ },
+ "after_tools": {
+  "nodes": 3157,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 241,
+   "od-dive-detail*": 256,
+   "od-desktop-sites*": 1945,
+   "od-desktop-statistics*": 121,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 189,
+  "jsHeapMB": 45,
+  "layoutCount": 65,
+  "recalcStyle": 124,
+  "layoutMs": 88,
+  "scriptMs": 1259,
+  "taskMs": 2949,
+  "listeners": 872
+ },
+ "after_logbook": {
+  "nodes": 3716,
+  "pages": {
+   "od-welcome-start*": 61,
+   "od-desktop-logbook": 799,
+   "od-dive-detail*": 256,
+   "od-desktop-sites*": 1945,
+   "od-desktop-statistics*": 121,
+   "od-desktop-tools*": 218,
+   "od-account*": 41
+  },
+  "pageCount": 7,
+  "rows": 50,
+  "svgNodes": 240,
+  "jsHeapMB": 46.7,
+  "layoutCount": 72,
+  "recalcStyle": 131,
+  "layoutMs": 97,
+  "scriptMs": 1339,
+  "taskMs": 3124,
+  "listeners": 872
+ },
+ "timings": {
+  "selectDive": {
+   "sync": 9,
+   "total": 48
+  },
+  "selectOther": {
+   "sync": 7,
+   "total": 42
+  },
+  "sortByDepth": {
+   "sync": 10,
+   "total": 33
+  },
+  "sortByDate": {
+   "sync": 9,
+   "total": 23
+  },
+  "search": {
+   "keystrokes_sync_total_ms": [
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     33
+    ],
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     33
+    ],
+    [
+     1,
+     33
+    ],
+    [
+     1,
+     33
+    ]
+   ],
+   "rowsAfter": 50
+  },
+  "scrollList": {
+   "sync": 166,
+   "total": 199
+  },
+  "nav_sites": {
+   "sync": 6,
+   "total": 129
+  },
+  "nav_statistics": {
+   "sync": 6,
+   "total": 43
+  },
+  "nav_tools": {
+   "sync": 5,
+   "total": 16
+  },
+  "nav_logbook": {
+   "sync": 5,
+   "total": 57
+  }
+ },
+ "longTasksInteractions": [
+  221,
+  74,
+  142,
+  56,
+  114,
+  51
+ ],
+ "navLoop_heapMB_nodes_listeners": [
+  [
+   46.8,
+   12499,
+   872
+  ],
+  [
+   47.3,
+   12515,
+   876
+  ],
+  [
+   47.4,
+   12510,
+   882
+  ],
+  [
+   47.5,
+   12490,
+   872
+  ],
+  [
+   47.4,
+   12474,
+   872
+  ],
+  [
+   47.2,
+   12499,
+   872
+  ],
+  [
+   47.4,
+   12515,
+   872
+  ],
+  [
+   45.5,
+   12501,
+   847
+  ],
+  [
+   46.1,
+   12481,
+   847
+  ],
+  [
+   46.1,
+   12465,
+   847
+  ]
+ ],
+ "afterResizes": {
+  "heapMB": 48.6,
+  "nodes": 22403,
+  "listeners": 442
+ },
+ "reloadToRowsMs": 743,
+ "reload": {
+  "paint": [
+   [
+    "first-paint",
+    468
+   ],
+   [
+    "first-contentful-paint",
+    468
+   ]
+  ],
+  "longTasks": [
+   165
+  ],
+  "nav": {
+   "dcl": 33,
+   "load": 35
+  }
+ }
+}

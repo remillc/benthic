@@ -131,7 +131,7 @@ test('nothing from the demo is synced or kept: no account, no device dives offer
   assert.match(logbook, /export async function deviceDiveCount\(\) \{\s*[^]*?if \(storedDemo\(deviceStore\)\) return 0;/);
   assert.match(logbook, /export async function importDeviceDives\(\) \{\s*if \(storedDemo\(deviceStore\)\) throw/);
   // The automatic sync only runs with an account (persistChanges), and the demo has none.
-  assert.match(logbook, /if \(logbook\.email && logbook\.autoSync && !choiceHeld\) syncTimer/);
+  assert.match(logbook, /if \(logbook\.email && autoSyncing\(\) && !choiceHeld\) syncTimer/);
   // The demo opens the device's own logbook, with no account: startWithoutAccount.
   assert.match(src('lib/demo.svelte.js'), /start: startWithoutAccount/);
   // The routes that start an account open the exit dialog while the demo is on.

@@ -280,15 +280,19 @@ Since 18 November 2026 (task 268) `main` holds the beta work, and the alpha is k
 
 One source, two editions, chosen at build time by `VITE_EDITION`, read in one place (`src/lib/edition.js`, which exports `edition` and `isRelease`):
 
-- unset, or any value other than `release`: the **beta** edition (the default). Its first launch is `pages/WelcomeStart.svelte`, with tasks 210 and 211.
-- `VITE_EDITION=release`: the **release** edition. On tablets (from 768 px) its first launch is `pages/WelcomeStartRelease.svelte`, in steps (task 218): « Pour commencer », « Nouveau carnet », then the cloud, git, import and open steps (`components/FirstLaunchSteps.svelte`, order in `lib/first-launch-steps.js`). Its empty logbook on a tablet has its own layout (task 220, `components/ReleaseEmptyLogbook.svelte`). On a phone it still shows the beta screen: the release edition's phone layout comes in a later task. `App.svelte` picks the page; the other screens are the same in both editions.
+- unset, or any value other than `alpha`: the **release** edition (the beta, the default).
+- `VITE_EDITION=alpha`: the **alpha** behaviour, kept buildable from `main`: its first launch is `pages/WelcomeStart.svelte` (tasks 210 and 211), without the diver's profile, the equipment inventory or the server. The alpha itself is maintained on `feature/release-alpha`.
+
+Details of the release edition: On tablets (from 768 px) its first launch is `pages/WelcomeStartRelease.svelte`, in steps (task 218): « Pour commencer », « Nouveau carnet », then the cloud, git, import and open steps (`components/FirstLaunchSteps.svelte`, order in `lib/first-launch-steps.js`). Its empty logbook on a tablet has its own layout (task 220, `components/ReleaseEmptyLogbook.svelte`). On a phone it still shows the beta screen: the release edition's phone layout comes in a later task. `App.svelte` picks the page; the other screens are the same in both editions.
 
 ```sh
-VITE_EDITION=release npx vite          # development server, release edition
-VITE_EDITION=release npm run build     # build for the release edition (then npm run android:sync)
+npx vite                               # development server, release edition (the default)
+npm run build                          # build for the release edition (then npm run android:sync)
+VITE_EDITION=alpha npx vite            # development server, alpha behaviour
+VITE_EDITION=alpha npm run build       # build with the alpha behaviour
 ```
 
-On Windows PowerShell: `$env:VITE_EDITION = "release"` first. A line `VITE_EDITION=release` in `.env.local` does the same. In the release edition, every cloud action (« Se connecter à {service} » and the others) only says that the cloud comes in a later version (idea #74). The logbook's name is kept as a label on the device (`od.logbookName`); renaming the device logbook file needs a native change (see task 218). In a development build, `window.__firstLaunch` exposes the first launch's state for headless checks.
+On Windows PowerShell: `$env:VITE_EDITION = "alpha"` first. A line `VITE_EDITION=alpha` in `.env.local` does the same. In the release edition, every cloud action (« Se connecter à {service} » and the others) only says that the cloud comes in a later version (idea #74). The logbook's name is kept as a label on the device (`od.logbookName`); renaming the device logbook file needs a native change (see task 218). In a development build, `window.__firstLaunch` exposes the first launch's state for headless checks.
 
 ## Reproduce
 

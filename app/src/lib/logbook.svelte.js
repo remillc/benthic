@@ -3,7 +3,10 @@
 import { Network } from '@capacitor/network';
 import { App as CapacitorApp } from '@capacitor/app';
 import { shouldReconnect } from './reconnect.js';
+import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
+import { syncNetwork, syncAllowedOnThisNetwork, networkKnown, onSyncAllowedAgain } from './sync-network.svelte.js';
+import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
 import { OpenDivesCore } from 'opendives-core';
 import { runCsvImport } from './csv-import.js';
 import { storedDemo } from './demo.js';
@@ -38,9 +41,21 @@ import { isRelease } from './edition.js';
  * @typedef {Extract<import('opendives-core').SyncConflicts, {conflict: true}>} Conflict
  */
 
+/**
+ * The dive list: always replaced whole on a change, never edited in place, so it is not a deep reactive
+ * proxy (3,000 dives would be 3,000 proxies read by every derived value); only the swap of the array is tracked.
+ * @type {Dive[]}
+ */
+let diveList = $state.raw([]);
+
 export const logbook = $state({
   /** @type {Dive[]} */
-  dives: [],
+  get dives() {
+    return diveList;
+  },
+  set dives(value) {
+    diveList = value;
+  },
   /** The core's preferences (units, Settings); only the units until the first read. */
   prefs: /** @type {Prefs} */ ({ ...defaultPrefs }),
   /** @type {SyncState} */
@@ -119,6 +134,10 @@ export const logbook = $state({
   sitesVersion: 0,
 });
 
+// What the kept answers of the core (lib/core-cache.js, lib/dive-preload.js) are tied to: they are read
+// again once the list was read again or the sites changed.
+setCacheVersions(() => untrack(() => [logbook.dives, logbook.sitesVersion]));
+
 /**
  * One trip change (spec, section 4, "Trip"), saved and synced like a dive
  * edit; the logbook list is read again, as trips changed.
@@ -156,6 +175,7 @@ export async function setAutogroup(on) {
  */
 export async function renameCylinderType(name, newName) {
   const result = await OpenDivesCore.cylinderTypes({ action: 'rename', name, value: newName });
+  invalidateCoreCache();
   keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
@@ -176,6 +196,7 @@ let syncTimer;
  */
 export async function saveDiveChanges(id, changes) {
   const result = await OpenDivesCore.editDive({ id, changes });
+  invalidateCoreCache(); // the buddies, tags and site counts may have moved
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
@@ -622,6 +643,7 @@ export async function cancelConflictChoice() {
  */
 export async function undoLastChange(redo = false) {
   const result = await OpenDivesCore.undo({ redo });
+  invalidateCoreCache();
   if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
   if (result.list) {
     logbook.dives = await OpenDivesCore.listLoadedDives();
@@ -647,7 +669,7 @@ async function persistChanges() {
   await countPending();
   clearTimeout(syncTimer);
   // With a conflict waiting, the automatic sync that would run only brings the dialog back (syncEdits).
-  if (logbook.email && logbook.autoSync && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
+  if (logbook.email && autoSyncing() && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
@@ -662,6 +684,11 @@ function undoCleared() {
  * (the server did not answer); failed (it answered, the exchange stopped).
  * @typedef {'done'|'offline'|'failed'} SyncOutcome
  */
+
+/** Automatic synchronisation is on and the connection allows it (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js). */
+function autoSyncing() {
+  return logbook.autoSync && syncAllowedOnThisNetwork();
+}
 
 /**
  * Sends the saved edits (automatic synchronisation).
@@ -690,7 +717,7 @@ async function syncEdits() {
     }
     const reached = status.status !== 'offline' && status.status !== 'stopped';
     // Manual synchronisation: the state says so again once done (spec, section 4).
-    logbook.sync = !reached ? 'offline' : logbook.autoSync ? 'cloud' : 'manual';
+    logbook.sync = !reached ? 'offline' : autoSyncing() ? 'cloud' : 'manual';
     if (reached) markSynced();
     outcome = reached ? 'done' : status.status === 'offline' ? 'offline' : 'failed';
     if (!reached) noteFailure(status.cause === 'auth');
@@ -770,7 +797,7 @@ export function boot() {
     try {
       // The probe runs on the plugin's network thread, not in the core's
       // order: it is sent once the account is set, or it finds none.
-      if (logbook.autoSync && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
+      if (logbook.autoSync && !syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }
@@ -1028,6 +1055,8 @@ if (typeof window !== 'undefined') {
   let wanted = false;
   const reconnect = async () => {
     if (reconnecting) return;
+    // Metered link with « Seulement sur Wi-Fi ou câble »: nothing automatic; onSyncAllowedAgain sends what waited.
+    if (!autoSyncing()) return;
     if (!shouldReconnect(logbook)) {
       wanted = logbook.loading || logbook.sync === 'syncing';
       return;
@@ -1063,6 +1092,10 @@ if (typeof window !== 'undefined') {
       /* no plugin: the events above are all there is */
     }
   }, 5000);
+  // The metered link went away (or the switch was turned off): what waited goes now.
+  onSyncAllowedAgain(() => {
+    if (logbook.email && logbook.autoSync && logbook.pending && logbook.sync !== 'syncing' && logbook.sync !== 'offline') syncEdits();
+  });
   // Where the sync is: only while one is shown as running.
   OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
     if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);
@@ -1097,9 +1130,10 @@ function noteFailure(refused) {
   clearTimeout(retryTimer);
   logbook.retryMinutes = 0;
   // Only the unreachable server is tried again; the other two wait for the diver.
-  if (logbook.syncFailure === 'server' && logbook.autoSync) {
+  if (logbook.syncFailure === 'server' && autoSyncing()) {
     logbook.retryMinutes = retryDelay(retries++);
-    retryTimer = setTimeout(syncNow, logbook.retryMinutes * 60000);
+    // An automatic retry: it waits again when the link became metered meanwhile.
+    retryTimer = setTimeout(() => (autoSyncing() ? syncNow() : undefined), logbook.retryMinutes * 60000);
   }
 }
 
@@ -1149,7 +1183,8 @@ async function loadCloud(force, pre = null) {
   logbook.mode = account.mode === 'git' ? 'git' : 'cloud';
   logbook.repository = account.repository ?? '';
 
-  if (!logbook.autoSync && !force) {
+  await networkKnown();
+  if (!autoSyncing() && !force) {
     try {
       const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
       if (cached.dives) {
@@ -1248,7 +1283,7 @@ export async function loadLogbook({ force = false } = {}) {
     if (await loadCloud(force, pre)) {
       // Manual synchronisation: the state says so at all times, after a
       // "Sync" too (spec, section 4).
-      if (!logbook.autoSync) logbook.sync = 'manual';
+      if (!autoSyncing()) logbook.sync = 'manual';
       await countPending();
       await readConflicts();
     } else {

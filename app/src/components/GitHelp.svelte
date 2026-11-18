@@ -10,7 +10,8 @@
   import Icon from './Icon.svelte';
   import MarkedText from './MarkedText.svelte';
   import { GIT_HELP, helpStepKeys } from '../lib/git-help.js';
-  import { t } from '../lib/i18n.js';
+  import { desktopApp } from '../lib/layout.svelte.js';
+  import { t, tIfExists } from '../lib/i18n.js';
 
   /** @type {{ kind: 'repository'|'token', embedded?: boolean }} */
   let { kind, embedded = false } = $props();
@@ -89,7 +90,7 @@
   >
     <p class="od-git-help--note">{t(`${prefix}.${provider.id}.note`)}</p>
     <ol>
-      {#each helpStepKeys(kind, provider) as key (key)}<li><MarkedText text={t(key)} /></li>{/each}
+      {#each helpStepKeys(kind, provider, desktopApp ? (k) => tIfExists(k) !== undefined : undefined) as key (key)}<li><MarkedText text={t(key)} /></li>{/each}
     </ol>
     <a href={provider.page} class="od-git-help--open external" target="_blank" rel="noopener">
       <span>{kind === 'repository' ? t('repoHelp.open', { name, page: t(`repoHelp.${provider.id}.page`) }) : t(`tokenHelp.${provider.id}.open`)}</span>

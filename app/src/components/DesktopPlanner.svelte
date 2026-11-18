@@ -695,9 +695,10 @@
     }
     .od-desktop-planner--head {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 8px 16px;
       min-height: 48px;
     }
     .od-desktop-planner--title {
@@ -764,6 +765,13 @@
       grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
       gap: 32px;
       align-items: start;
+    }
+    /* Fluid layout: in a narrow pane the results go under the inputs. */
+    @container od-tool (max-width: 659px) {
+      .od-desktop-planner--body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
     }
     .od-desktop-planner--pair {
       display: grid;

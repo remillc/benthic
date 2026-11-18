@@ -42,6 +42,7 @@
 <style>
   @layer od.components {
     .od-desktop-selection--body {
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;

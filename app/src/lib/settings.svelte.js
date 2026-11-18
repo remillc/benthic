@@ -10,6 +10,7 @@
 // coordinates, Bluetooth filter) live here only.
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
+import { invalidateCoreCache } from './core-cache.js';
 import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
 import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor, reserveSettings } from './reserve-factor.js';
 import { OD_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
@@ -216,6 +217,7 @@ export async function prefsAfterLoad() {
  */
 export async function setCorePrefs(changes) {
   await OpenDivesCore.setPrefs({ changes });
+  invalidateCoreCache(); // the planner's setup follows the preferences
   // Changing one unit makes the system "personalize" in the core: kept too.
   const prefs = await OpenDivesCore.getPrefs();
   Object.assign(storedCore, changes);
@@ -293,6 +295,7 @@ export function keepDiveComputers(list) {
  * @param {string[]} library
  */
 export function keepCylinderLibrary(library) {
+  invalidateCoreCache(); // the cylinder types the tools list
   writeJson(LIBRARY_KEY, library);
 }
 

@@ -22,14 +22,16 @@ export const menuHeight = (options) => 16 + options.reduce((sum, o) => sum + (o.
  * @param {{ top: number, bottom: number, right: number }} row the row's rectangle
  * @param {{ width: number, height: number }} viewport
  * @param {number} height the menu's natural height
+ * @param {{ width?: number, above?: boolean }} [opts] width: another menu width (the desktop's language menu is
+ * 260 dp); above: always above the anchor, when it fits better than below (the button at the bottom of a screen)
  * @returns {{ left: number, width: number, up: boolean, top?: number, bottom?: number, maxHeight: number }}
  */
-export function placeRowMenu(row, viewport, height) {
-  const width = Math.min(MENU_WIDTH, viewport.width - 2 * SCREEN_MARGIN);
+export function placeRowMenu(row, viewport, height, opts = {}) {
+  const width = Math.min(opts.width ?? MENU_WIDTH, viewport.width - 2 * SCREEN_MARGIN);
   const left = Math.max(SCREEN_MARGIN, Math.min(row.right, viewport.width - SCREEN_MARGIN) - width);
   const below = viewport.height - row.bottom - SCREEN_MARGIN;
   const above = row.top - SCREEN_MARGIN;
-  const up = opensUp(below, above, height);
+  const up = opts.above ? above >= Math.min(height, 120) || above > below : opensUp(below, above, height);
   const room = up ? above : below;
   const maxHeight = Math.max(120, room - ROW_GAP);
   return up

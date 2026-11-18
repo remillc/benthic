@@ -30,11 +30,16 @@ export const GIT_HELP = {
 };
 
 /**
- * The keys of a host's steps.
+ * The keys of a host's steps. In the desktop app a step that names a touch (« Touchez », « Tap ») has a variant
+ * `sNDesktop` (« Cliquez sur », « Click ») that replaces it; `hasDesktop` tells whether that key exists.
  * @param {'repository'|'token'} kind
  * @param {HelpProvider} provider
+ * @param {(key: string) => boolean} [hasDesktop] given in the desktop app only
  * @returns {string[]}
  */
-export function helpStepKeys(kind, provider) {
-  return Array.from({ length: provider.steps }, (_, i) => `${GIT_HELP[kind].prefix}.${provider.id}.s${i + 1}`);
+export function helpStepKeys(kind, provider, hasDesktop) {
+  return Array.from({ length: provider.steps }, (_, i) => {
+    const key = `${GIT_HELP[kind].prefix}.${provider.id}.s${i + 1}`;
+    return hasDesktop?.(`${key}Desktop`) ? `${key}Desktop` : key;
+  });
 }

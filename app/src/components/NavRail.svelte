@@ -91,8 +91,23 @@
       flex-direction: column;
       align-items: center;
       gap: 12px;
+      /* Never cut at the foot: a window too low for the rail's items makes it scroll, with no visible bar. */
+      overflow-y: auto;
+      scrollbar-width: none;
       background: var(--od-background);
       color: var(--od-text);
+    }
+
+    .od-nav-rail--rail > :not(.od-nav-rail--spacer) {
+      flex-shrink: 0;
+    }
+
+    /* A low window (the desktop app's smallest is 560 dp, less its title bar): closer items keep the account button in view. */
+    @media (max-height: 520px) {
+      .od-nav-rail--rail {
+        gap: 4px;
+        padding-top: calc(var(--f7-safe-area-top) + 12px);
+      }
     }
 
     .od-nav-rail--item {

@@ -76,6 +76,18 @@ contextBridge.exposeInMainWorld('odDesktop', {
     ipcRenderer.on('od:menu', listener);
     return () => ipcRenderer.removeListener('od:menu', listener);
   },
+  /** The connection type (network.cjs): 'metered', 'unmetered' or 'unknown' (cached; asked again when the network changes). */
+  network: {
+    status: () => invoke('od:network', 'status'),
+    refresh: () => invoke('od:network', 'refresh'),
+    watch: () => invoke('od:network', 'watch'),
+    onChange(callback) {
+      if (typeof callback !== 'function') return () => {};
+      const listener = (_event, cost) => callback(cost);
+      ipcRenderer.on('od:network', listener);
+      return () => ipcRenderer.removeListener('od:network', listener);
+    },
+  },
   placesSearch: (options) => invoke('od:placesSearch', options),
   /** Several logbooks (task 2026-11-15-173): one window per logbook; windows.cjs answers. */
   logbooks: {

@@ -4,21 +4,24 @@
 // their site's map picture decoded, so that the next screen comes in whole
 // instead of filling in during the slide.
 import { OpenDivesCore } from 'opendives-core';
-import { sharedSiteMap } from './site-image.js';
+import { currentStamp, sameStamp } from './core-cache.js';
 
 /** @typedef {import('opendives-core').DiveDetail} DiveDetail */
 
 /** A few details: the one shown and its neighbours, with some margin. */
 const KEPT = 6;
-/** @type {Map<number, DiveDetail>} id → detail, the most recent last */
+/** @type {Map<number, { dive: DiveDetail, stamp: unknown[] }>} id → detail and the logbook version it was read at, the most recent last */
 const details = new Map();
 /** @type {Map<number, Promise<DiveDetail>>} */
 const reading = new Map();
 
-/** @param {number} id @param {DiveDetail} dive */
-export function keepDive(id, dive) {
+/**
+ * @param {number} id @param {DiveDetail} dive
+ * @param {unknown[]} [stamp] the logbook version the detail was asked at (now, by default)
+ */
+export function keepDive(id, dive, stamp = currentStamp()) {
   details.delete(id);
-  details.set(id, dive);
+  details.set(id, { dive, stamp });
   while (details.size > KEPT) details.delete(details.keys().next().value);
 }
 
@@ -28,7 +31,19 @@ export function keepDive(id, dive) {
  * @param {number} id
  */
 export function readyDive(id) {
-  return details.get(id) ?? null;
+  return details.get(id)?.dive ?? null;
+}
+
+/**
+ * The detail of a dive, read once: the one kept while the logbook did not change since (no call),
+ * the one being read (shared), else read from the core. Replaces a getDive on each screen mount.
+ * @param {number} id
+ * @returns {Promise<DiveDetail>}
+ */
+export function loadDive(id) {
+  const kept = details.get(id);
+  if (kept && sameStamp(kept.stamp, currentStamp())) return Promise.resolve(kept.dive);
+  return read(id);
 }
 
 /** Forgets a dive (deleted, or changed in a way the screen does not follow). @param {number} id */
@@ -40,9 +55,10 @@ export function forgetDive(id) {
 function read(id) {
   let promise = reading.get(id);
   if (!promise) {
+    const stamp = currentStamp();
     promise = OpenDivesCore.getDive({ id })
       .then((dive) => {
-        keepDive(id, dive);
+        keepDive(id, dive, stamp);
         return dive;
       })
       .finally(() => reading.delete(id));
@@ -62,9 +78,12 @@ export async function preloadDives(ids) {
   await Promise.all(
     ids.map(async (id) => {
       try {
-        const dive = details.get(id) ?? (await read(id));
+        const dive = await loadDive(id);
         const c = dive.siteCoordinates;
-        if (c) await sharedSiteMap(c.latUdeg, c.lonUdeg).catch(() => {});
+        if (c) {
+          const { sharedSiteMap } = await import('./site-image.js'); // not loaded with the details (phone swipes only)
+          await sharedSiteMap(c.latUdeg, c.lonUdeg).catch(() => {});
+        }
       } catch (e) {
         console.warn('Preparing a dive', id, e);
       }
