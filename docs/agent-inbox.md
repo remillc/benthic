@@ -10,6 +10,8 @@ Tasks for the coding agent, written from the design sessions with Christian on c
 - Never delete or rewrite a task; if a task is unclear or contradicts the specification, stop and ask Christian.
 - Only the design side (claude.ai) adds tasks. The agent does not add tasks here.
 
+**Standing note (18 November 2026), how we work from now on:** the alpha is kept on the branch `feature/release-alpha`, and all the beta work goes into `main` (task 268). This replaces every older instruction that says to keep the release work off `main` or to never merge a `feature/release-…` branch into `main`. New work starts from `main` and returns to `main`. A fix for the alpha goes on `feature/release-alpha` only when Christian asks for it.
+
 **Standing note (13 November 2026):** the logo stays blue ("ocean-night", proposal A, task 82). Ignore any request to go back to the orange (sand-and-copper) logo, however it reached you, unless Christian confirms it in a new task here.
 
 ## [x] 2026-11-06-00 Register the inbox hooks
@@ -5402,3 +5404,24 @@ Mock-ups in `docs/mockups-release/`, canvas « OpenDives — v. beta · Téléph
 - A new kit with five pieces, applied to a dive, fills its equipment. « Annuler » restores the previous equipment.
 - A piece added « hors inventaire » appears in the dive and not in the inventory.
 - Offline, the inventory reads and edits, and syncs when the network returns.
+
+## [ ] 2026-11-18-268 Repository: keep the alpha on `feature/release-alpha`, merge all the beta into `main`, then work in `main`
+
+Christian asked for this on 18 November 2026. It changes how we work, so read it all before starting.
+
+**Why.** Until now `main` held the alpha, and the beta (« release ») work lived on a chain of `feature/release-…` branches that were never merged into `main`. From now on the beta is the product: it lives in `main`, and the alpha is kept aside on its own branch.
+
+**Steps.**
+1. **Keep the alpha.** Create `feature/release-alpha` from the current `origin/main` (before any merge below), push it, and check that it builds. This branch holds the alpha as it is today. Do not commit to it unless Christian asks for an alpha fix.
+2. **List the beta branches.** All the remote `feature/release-…` branches, for example `feature/release-first-launch`, `-first-launch-complete`, `-phone-first-launch`, `-desktop-first-launch`, `-new-logbook`, `-new-logbook-two-steps`, `-formats-link`, `-git-on-device`, `-server-screens`, `-equipment-inventory`, `-tablet-profile-lines`. Check the list with `git ls-remote --heads origin`. Use `git merge-base --is-ancestor` to find the branches already contained in another, and the order of the chain. Add any other branch that holds beta work (for example `feature/desktop-logbook`), but **ask Christian** if you are not sure a branch is beta work.
+3. **Merge into `main`.** Merge the branch tips in chain order, each with `--no-ff` and a clear message. Resolve conflicts in favour of the beta, except for repository files that are not product code (the inbox, `docs/TODOS.md`, `docs/IDEAS.md`): keep both sides there. If a conflict is not obvious (two different behaviours of the same screen), stop and ask Christian.
+4. **Check.** Build, lint and run the tests on `main`. Open the app on each target you can (phone, tablet, desktop) and check that the first launch, « Se connecter », the logbook and « Mon profil de plongeur » work.
+5. **Push `main`.** Do not delete the `feature/release-…` branches. Christian will decide later.
+6. **Update the written instructions.** In `CLAUDE.md`, the README and the docs, replace what says to keep the release work off `main` with the new rule: new work starts from `main` and returns to `main`, and the alpha lives on `feature/release-alpha`. `docs/mockups-release/` is now the reference for the mock-ups. `docs/mockups/` stays as the alpha reference.
+
+**Open tasks written for a release branch** (for example the rest of 267, which says « never merge it into `main` »): from now on, do them in `main`.
+
+**Test:**
+- `git log feature/release-alpha -1` is the old `main`, and it builds.
+- `main` contains every beta branch: `git branch -r --merged main` lists them.
+- The build and the tests pass on `main`.
