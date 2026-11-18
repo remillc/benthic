@@ -15,7 +15,7 @@
 //     account: serverDownload → odplusReady (« Votre carnet est prêt »), or createChoice when the account holds no
 //     logbook (task 2026-11-17-266: createChoice → createName | createSend → createInterrupted | createOffline);
 //     any other account: odplusOffer
-//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase)
+//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase) → odplusHealth (« Vos données de santé », the optional consent, task 2026-11-18-271) → odplusReady
 //   Both entries (`signIn`, `discover`) are the choices of the first step; « Continuer sans compte » and
 //   « Continuer sans abonnement » go back to it and create nothing (task 2026-11-17-265).
 //
@@ -27,7 +27,7 @@
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
- *   |'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'
+ *   |'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'|'odplusHealth'
  *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
@@ -65,6 +65,8 @@ const FORWARD = {
   'start:discover': 'odplusOffer',
   'odplusConnect:email': 'server',
   'odplusOffer:welcome': 'odplusWelcome',
+  'odplusWelcome:next': 'odplusHealth',
+  'odplusHealth:next': 'odplusReady',
   'serverDownload:ready': 'odplusReady',
   'createChoice:blank': 'createName',
   'createChoice:send': 'createSend',
@@ -165,7 +167,7 @@ export function hasBack(step, leavable = false) {
  * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the OpenDives+ screens, which
  * leave through their own buttons.
  */
-const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome']);
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth']);
 
 /**
  * A signed-in account that holds no logbook: « Aucun carnet sur votre compte ». « Retour » leaves for the address

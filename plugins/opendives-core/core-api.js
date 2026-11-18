@@ -593,10 +593,17 @@ export { waterTypeOf };
  *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
  * @property {() => Promise<{signedIn: boolean, email: string, repositoryUrl: string, branch: string}>} serverSessionInfo
  *   Who is signed in to the OpenDives server, without any token.
- * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string}>} serverSessionAccess
- *   The access to the repository, for the download. Rejects with NOT_SIGNED_IN.
+ * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string, sessionToken: string}>} serverSessionAccess
+ *   The access to the repository, for the download, and the session token for the account calls (the health-data
+ *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
  *   Signs out of the OpenDives server: the tokens are erased.
+ * @property {() => Promise<{key: string}>} dataKeyRead
+ *   Release edition (docs/architecture.md, section 11.5): the device's data key for the sensitive items (blood group,
+ *   emergency contact, certifications), 32 random bytes as base64, from the platform's secure storage (Android
+ *   Keystore, iOS Keychain, Electron safeStorage). `key` is '' when the device has none yet.
+ * @property {(options: {key: string}) => Promise<void>} dataKeyWrite
+ *   Keeps the data key. Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
  * @property {() => Promise<{url: string, username: string, branch: string}>} gitConfig
  *   The connected repository without its token, empty strings when none (for editing it).
  * @property {(options: {url: string, username: string, token: string, branch: string, empty?: boolean}) => Promise<{created: boolean}>} gitConnect
@@ -898,6 +905,8 @@ export const OpenDivesCore = {
   serverSessionInfo: () => native.serverSessionInfo(),
   serverSessionAccess: () => native.serverSessionAccess(),
   serverSessionClear: () => native.serverSessionClear(),
+  dataKeyRead: () => native.dataKeyRead(),
+  dataKeyWrite: (options) => native.dataKeyWrite(options),
   gitConnect: (options) => native.gitConnect(options),
   async probeCloud() {
     const { json } = await native.probeCloud();

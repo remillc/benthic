@@ -534,7 +534,7 @@
   });
 
   /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
-  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome'];
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'];
 
   /** The server was downloaded and opened: the snackbar says where the logbook is now (mock-ups …-serveur-carnet). */
   function serverOpened() {
@@ -850,7 +850,7 @@
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {makeDeviceLogbook} onfinished={serverCreated} onlater={serverLater} />
-        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome'}
+        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
           <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>

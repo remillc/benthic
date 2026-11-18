@@ -526,7 +526,8 @@
       "download": "Ordinateurs et téléchargement",
       "maps": "Cartes hors ligne",
       "advanced": "Avancé",
-      "about": "À propos"
+      "about": "À propos",
+      "privacy": "Confidentialité"
     },
     "overview": {
       "theme": "Thème : {value}",
@@ -540,7 +541,8 @@
       "remembered": "{name} mémorisé",
       "noComputer": "Aucun ordinateur mémorisé",
       "advanced": "Réinitialiser tous les réglages",
-      "version": "Version {version}"
+      "version": "Version {version}",
+      "privacy": "Données de santé : {state}"
     },
     "flight": {
       "label": "Durée de l’attente",
@@ -873,6 +875,16 @@
     "showPhotos": {
       "label": "Afficher les champs photos et vidéos",
       "text": "Dans le détail et la modification d’une plongée"
+    },
+    "privacy": {
+      "on": "accordées",
+      "off": "non accordées",
+      "health": "Garder des données de santé",
+      "healthHelp": "Votre groupe sanguin, utile en cas d’urgence.",
+      "since": "Vous avez donné votre accord le {date}.",
+      "note": "Chiffré sur votre compte et visible par vous seul. Retirer l’accord supprime le groupe sanguin.",
+      "withdraw": "Retirer l’accord",
+      "allow": "Autoriser"
     }
   },
   "gas": {
@@ -2121,6 +2133,7 @@
       "Carnet : une barre de progression s'affiche en haut de la liste pendant que l'app met le carnet à jour au démarrage ; la liste est déjà là.",
       "Feuille du compte : le message « Mise à jour de carte disponible » est une rangée à part, « Cartes hors ligne », qui ouvre directement les cartes hors ligne dans Réglages.",
       "Mon profil de plongeur (OpenDives+) : la feuille du compte l’ouvre, et « Équipement » garde vos ordinateurs de plongée, détendeurs, combinaisons, bouteilles et kits sur ce téléphone, lisibles sans réseau. Dans « Modifier la plongée », « Appliquer un kit » et « Comme la précédente » remplissent l’équipement (avec « Annuler »), les combinaisons se choisissent dans l’inventaire, une pièce peut être ajoutée pour une seule plongée, et un ordinateur peut être renommé. Un ordinateur entre dans l’inventaire au premier téléchargement.",
+      "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; l’agence, le niveau et le numéro peuvent être proposés d’après la photo.",
       "Premier lancement (édition publique) : « Se connecter » devient le premier choix, en bleu foncé avec la pastille OpenDives+ ; « Commencer un carnet sur ce téléphone » et « Importer un carnet » suivent, puis deux boutons texte, « Essayer avec un carnet d’exemple » et « Découvrir OpenDives+ ». Les choix ont des coins de 24 dp, des titres de 24 sp sur tablette et ordinateur, et le logo du bandeau a un fin anneau clair au lieu d’une ombre. « Nouveau carnet » se termine par « Créer le carnet », l’import par « Importer le carnet ».",
       "Serveur OpenDives (édition de publication) : « Sur le serveur OpenDives » est le premier choix de « Ouvrir mon carnet ». Vous vous connectez avec votre adresse courriel et un code à 6 chiffres, sans mot de passe ; les écrans disent un code incorrect, un code expiré, trop d’essais (attente de 10 minutes) et un serveur qui ne répond pas. Le carnet est ensuite téléchargé.",
       "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
@@ -4750,7 +4763,17 @@
       "backup": "Sauvegarde automatique",
       "gearCertifications": "Équipement et brevets",
       "account": "Compte : {email}",
-      "open": "Ouvrir mon carnet"
+      "open": "Ouvrir mon carnet",
+      "next": "Continuer"
+    },
+    "health": {
+      "title": "Vos données de santé",
+      "lead": "Facultatif. Vous pourrez changer d’avis en tout temps.",
+      "switch": "Garder des données de santé",
+      "switchHelp": "Votre groupe sanguin, utile en cas d’urgence",
+      "note": "C’est une donnée de santé. OpenDives+ la garde seulement avec votre accord.",
+      "lock": "Chiffrées sur votre compte et visibles par vous seul. Vous pouvez retirer votre accord dans Mon profil ou dans les Réglages : les données sont alors supprimées.",
+      "continue": "Continuer"
     }
   },
   "serverCreate": {
@@ -4838,7 +4861,10 @@
       "certifications": "Brevets",
       "information": "Informations",
       "later": "Pas encore disponible",
-      "noPiece": "Aucune pièce"
+      "noPiece": "Aucune pièce",
+      "informationLine": "Contact d’urgence, santé",
+      "certificationsLine": "{n} brevets",
+      "noCertification": "Aucun brevet"
     },
     "inventory": {
       "title": "Équipement",
@@ -5041,5 +5067,100 @@
   "desktopLanguage": {
     "system": "Comme le système",
     "button": "Langue de l’app : {language}"
+  },
+  "diverProfile": {
+    "info": {
+      "title": "Informations",
+      "back": "Retour",
+      "edit": "Modifier les informations",
+      "you": "Vous",
+      "dob": "Date de naissance",
+      "emergency": "Contact d’urgence",
+      "nameRelation": "Nom et lien",
+      "phone": "Téléphone",
+      "health": "Santé",
+      "blood": "Groupe sanguin",
+      "onlyYou": "Vous seul",
+      "notKept": "Non gardé",
+      "allow": "Autoriser",
+      "empty": "Non renseigné",
+      "lockNote": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous. Vous avez donné votre accord le {date}.",
+      "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous.",
+      "withdraw": "Retirer l’accord",
+      "deniedNote": "Pour garder votre groupe sanguin, autorisez les données de santé. Elles sont chiffrées et visibles par vous seul.",
+      "withdrawTitle": "Retirer l’accord ?",
+      "withdrawText": "Le groupe sanguin est supprimé de cet appareil et de votre compte. Vous pourrez autoriser de nouveau en tout temps.",
+      "withdrawn": "Accord retiré, groupe sanguin supprimé",
+      "allowed": "Données de santé autorisées",
+      "cancel": "Annuler",
+      "saved": "Informations enregistrées",
+      "saveFailed": "Les informations n’ont pas pu être enregistrées.",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "countryCode": "Indicatif",
+      "nameRelationLabel": "Nom et lien",
+      "nameRelationHint": "Par exemple Marc Tremblay, conjoint",
+      "phoneHint": "Le numéro se met en forme tout seul selon le pays.",
+      "bloodHint": "« Inconnu » si vous ne le connaissez pas. Chiffré et visible par vous seul.",
+      "bloodDenied": "Autorisez les données de santé pour garder le groupe sanguin.",
+      "unknown": "Inconnu",
+      "dobHint": "jj mois aaaa",
+      "dobPick": "Choisir la date de naissance",
+      "dobFuture": "La date est dans le futur.",
+      "phoneIncomplete": "Numéro incomplet pour ce pays.",
+      "onlyYouDevice": "Chiffré sur cet appareil."
+    },
+    "certs": {
+      "title": "Brevets",
+      "note": "Montrez une carte au centre de plongée, même sans réseau.",
+      "add": "Ajouter un brevet",
+      "empty": "Aucun brevet",
+      "emptyText": "Ajoutez vos cartes : elles restent chiffrées et disponibles sans réseau.",
+      "line": "N° {number} · {date}",
+      "lineNoDate": "N° {number}",
+      "back": "Retour"
+    },
+    "cert": {
+      "new": "Nouveau brevet",
+      "edit": "Modifier le brevet",
+      "save": "Enregistrer",
+      "close": "Fermer",
+      "photoFront": "Photo du recto",
+      "photoBack": "Photo du verso",
+      "photoHint": "Avec une photo, l’app propose l’agence, le niveau et le numéro. Vérifiez-les.",
+      "photoRemove": "Retirer la photo",
+      "photoFailed": "La photo n’a pas pu être lue.",
+      "proposed": "Proposé d’après la photo. Vérifiez.",
+      "agency": "Agence",
+      "agencyName": "Nom de l’agence",
+      "agencyOther": "Autre agence",
+      "level": "Niveau",
+      "number": "Numéro",
+      "numberHint": "Numéro sur la carte",
+      "date": "Date",
+      "dateHint": "jj mois aaaa",
+      "datePick": "Choisir la date",
+      "dateFuture": "La date est dans le futur.",
+      "instructor": "Moniteur (facultatif)",
+      "instructorHint": "Nom et numéro",
+      "required": "À remplir.",
+      "recto": "Recto",
+      "verso": "Verso",
+      "details": "Détails",
+      "photoOf": "Photo de la carte",
+      "noPhoto": "Aucune photo de ce côté",
+      "fullscreen": "Afficher la carte en plein écran",
+      "menu": "Plus d’actions",
+      "delete": "Supprimer le brevet",
+      "deleteTitle": "Supprimer ce brevet ?",
+      "deleteText": "La carte et ses photos sont supprimées de cet appareil et de votre compte.",
+      "deleteAction": "Supprimer",
+      "cancel": "Annuler",
+      "saved": "Brevet enregistré",
+      "saveFailed": "Le brevet n’a pas pu être enregistré.",
+      "deleted": "Brevet supprimé",
+      "readOnly": "Lecture seule : l’abonnement OpenDives+ est terminé.",
+      "notFound": "Ce brevet n’existe plus."
+    }
   }
 }

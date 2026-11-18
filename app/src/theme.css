@@ -397,6 +397,10 @@
     /* Divider between groups of a ⋮ menu. */
     --od-menu-divider: #C9C9C5;
     --od-scrim: rgb(0 0 0 / 0.32);
+    /* Full-screen viewer of a certification card photo: black, with white controls (the same in both themes). */
+    --od-viewer: #000000;
+    --od-viewer-on: #FFFFFF;
+    --od-viewer-control: rgb(255 255 255 / 0.2);
     /* Android tablet FAB menu (spec, section 8): its light scrim and its tonal choices. */
     --od-fab-scrim: rgb(0 0 0 / 0.16);
     --od-fab-tonal: #E3E1DC;

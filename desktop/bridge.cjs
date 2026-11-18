@@ -120,8 +120,10 @@ const CREDENTIAL_FIELDS = {
   git: ['url', 'username', 'branch', 'token'],
   // Release edition: the OpenDives server's session (the e-mail sign-in's answer), kept for the whole app.
   server: ['email', 'sessionToken', 'repositoryUrl', 'branch', 'gitUsername', 'gitToken'],
+  // Release edition: the device's data key for the sensitive items (docs/architecture.md, section 11.5), for the whole app.
+  datakey: ['key'],
 };
-const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin', server: 'server-session.bin' };
+const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin', server: 'server-session.bin', datakey: 'data-key.bin' };
 const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH', 'DENIED', 'NO_LOG', 'CREATE_FAILED', 'LOG_EXISTS', 'NOT_EMPTY']);
 const MAX_READ = 100 * 1024 * 1024;
 const NOMINATIM = 'https://nominatim.openstreetmap.org/';
@@ -698,7 +700,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function credentialFile(kind, ctx) {
     if (!CREDENTIAL_FILES[kind]) throw new Error('BAD_ARGUMENT: unknown credentials kind');
     // The server session belongs to the app, not to a logbook: the start screen (no logbook yet) signs in too.
-    if (kind === 'server') return path.join(userData, CREDENTIAL_FILES.server);
+    if (kind === 'server' || kind === 'datakey') return path.join(userData, CREDENTIAL_FILES[kind]);
     // A window with no logbook (the start screen) has no credentials.
     if (!ctx.descriptor) return null;
     const own = ctx.descriptor.kind !== 'main' ? ctx.descriptor : null;
@@ -745,7 +747,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   function clearCredentials(kind, ctx) {
     // Without a kind: the logbook's credentials; the server session is cleared by its own kind.
-    for (const k of kind ? [kind] : Object.keys(CREDENTIAL_FILES).filter((name) => name !== 'server')) {
+    for (const k of kind ? [kind] : Object.keys(CREDENTIAL_FILES).filter((name) => name !== 'server' && name !== 'datakey')) {
       const file = credentialFile(k, ctx);
       if (!file) continue;
       fs.rmSync(file, { force: true });
@@ -769,7 +771,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
     const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
     if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
-    const method = request?.method === 'POST' ? 'POST' : 'GET';
+    const method = request?.method === 'POST' || request?.method === 'PUT' ? request.method : 'GET';
     const headers = { Accept: 'application/json', 'User-Agent': 'OpenDives', ...(request?.headers ?? {}) };
     if (request?.body !== undefined) headers['Content-Type'] = 'application/json';
     const response = await fetch(url, { method, headers, body: request?.body !== undefined ? JSON.stringify(request.body) : undefined, signal: AbortSignal.timeout(20000) });

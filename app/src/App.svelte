@@ -125,6 +125,12 @@
           { path: '/profile/gear/new', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
           { path: '/profile/gear/:id', ...lazy(() => import('./pages/ProfilePiece.svelte')) },
           { path: '/profile/gear/:id/edit', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
+          { path: '/profile/info', ...lazy(() => import('./pages/ProfileInfo.svelte')) },
+          { path: '/profile/info/edit', ...lazy(() => import('./pages/ProfileInfoEdit.svelte')) },
+          { path: '/profile/certs/', ...lazy(() => import('./pages/ProfileCerts.svelte')) },
+          { path: '/profile/certs/new', ...lazy(() => import('./pages/ProfileCertEdit.svelte')) },
+          { path: '/profile/certs/:id', ...lazy(() => import('./pages/ProfileCert.svelte')) },
+          { path: '/profile/certs/:id/edit', ...lazy(() => import('./pages/ProfileCertEdit.svelte')) },
           { path: '/profile/kits/new', ...lazy(() => import('./pages/ProfileKit.svelte')) },
           { path: '/profile/kits/:id', ...lazy(() => import('./pages/ProfileKit.svelte')) },
         ]
