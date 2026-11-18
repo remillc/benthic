@@ -5702,3 +5702,17 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 **Test:** free user: the Compte button opens the free sheet, « S'abonner » opens the offer, « Se connecter » opens the sign-in screen. Subscriber with an overdue part: the badge and the red subtitle; with none: neither. « Gérer dans Google Play » opens the store page. Android Back closes the account sheet. Account deletion asks for confirmation.
 
 **Done (18 November 2026), with seams:** the server has no `GET /v1/account` (sign-in method, store, price, renewal date, space used) nor `DELETE /v1/account` yet: « Gérer le compte » shows a placeholder for the space and hides the sign-in method, and « Supprimer le compte » reports a failure (`app/src/lib/odplus-account.js`, `server-api.js`). « Télécharger mes données » waits for the full export (to-do #57) and says so. The tablet and desktop free sheets open the phone's offer content; the iPhone free sheet has no mock-up and uses a plain grouped list. Account deletion also needs, on the server, the revocation of the Sign in with Apple token (Apple 5.1.1(v)) and a public web page to request deletion for the Play Data safety form.
+
+## [ ] 2026-11-18-282 « OpenDives+ » in the subscriber's account sheet, and the tablet offer
+
+Christian approved this on 18 November 2026. Work in `main`. Follows task 281. Mock-ups in `docs/mockups-release/`.
+
+**1. Phone: the name at the top of the subscriber's account sheet** (`nav-option-barre-compte-android`, `nav-compte-profil-android`, `nav-compte-maj-android`). After the logo, « OpenDives » is followed by a small round chip with a « + »: 18 × 18 px, background #D4E2F2, « + » in #114477, bold, 3 px after the name. These are the pale colours of the OpenDives+ chips. Only for subscribers: the free sheet keeps « OpenDives » alone. Screen readers read « OpenDives Plus ».
+
+**2. Tablet: « OpenDives+, l'offre »** (`android-tablette-odplus-offre-paysage`). This replaces the « use the phone's offer content » note of task 281 for the tablet. It uses the two-pane layout of the tablet sign-in screens:
+- Left, the blue pane: the OpenDives+ chip, « Votre carnet, partout et en sécurité », « Tout OpenDives reste libre. OpenDives+ ajoute ce qui demande un serveur. », and the dive profile drawing.
+- Right: « Retour », the 5 tiles of the phone (2 columns, « Rappels d'entretien » across the width), the price card, « S'abonner », « Continuer sans abonnement », « Aucun compte n'est créé. » and « Déjà abonné ? Se connecter » (link to the tablet sign-in screen; hidden right after a sign-in, as on the phone).
+- In the tablet's free account sheet (`android-tablette-compte-gratuit-paysage`), « S'abonner » and the two rows with the chip open this screen.
+- Desktop: still to be decided with Christian (where the desktop app and the subscription are sold). Do not build a desktop offer yet.
+
+**Test:** the subscriber's sheet shows the « + » chip, the free one does not; on tablet, the free sheet opens the tablet offer.
