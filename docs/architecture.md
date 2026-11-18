@@ -193,7 +193,7 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 
 ## 11. OpenDives server (release edition)
 
-Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and the app keeps working without any server (Subsurface cloud, own git repository, local mode). The Subsurface cloud mode of section 6 is unchanged: there the log stays in Subsurface's format and desktop Subsurface reads and writes it (see AGENTS.md, "Coexistence"). This section is only the OpenDives-server edition. The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on.
+Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and the app keeps working without any server (Subsurface cloud, own git repository, local mode). The Subsurface cloud mode of section 6 is unchanged: there the log stays in Subsurface's format and desktop Subsurface reads and writes it (see AGENTS.md, "Coexistence"). This section is only the OpenDives-server edition. The server code, the development stack and the hosting plan live in a **private repository** (`opendives-server`); this section only fixes what the app and the server agree on. The logbook format (11.3) was decided finally on 18 November 2026: the dives stay in Subsurface's git format, and this decision replaces the earlier ones of this section.
 
 ### 11.1 Components and what lives where
 
@@ -219,12 +219,13 @@ Decided on 16 November 2026. **Release edition only**: not in `main`'s beta, and
 
 | What | Where | Notes |
 | --- | --- | --- |
-| Logbook and everything personal (dives, sites, gear, settings, inventory, maintenance, certifications, diver profile) | Git repository, branch `main`, **OpenDives' own format** (section 11.3) | Not read by Subsurface as is: Subsurface's format is only for import and export (section 11.4). |
+| The dives (with sites, trips, cylinders) | Git repository, branch `main`, **Subsurface's git format**, read and written by the core | One engine for the alpha and OD+ (section 11.3). |
+| Everything OpenDives-only (inventory, kits, maintenance, gas analyses, certifications, diver profile, settings) | Same repository, branch `opendives`, JSON files | Never read or written by Subsurface's code (section 11.3). |
 | Accounts, sessions, friends, public site base | PostgreSQL + PostGIS | Sharing is **opt-in** (section 11.7). |
 | Photos, videos, encrypted documents | S3-compatible object storage | Referenced by content hash (section 11.6). |
 | Sign-in | OpenDives API | E-mail code, no password (section 11.2). |
 
-The API never holds the logbook itself: the app talks to the git hosting directly with a scoped token that the API hands out at sign-in. Git gives what the format needs: history, offline work on the device and a merge when two devices changed the same logbook.
+The API never holds the logbook itself: the app talks to the git hosting directly with a scoped token that the API hands out at sign-in. Git gives what the logbook needs: history, offline work on the device and a merge when two devices changed the same logbook.
 
 ### 11.2 Sign-in contract (API v1)
 
@@ -278,20 +279,36 @@ The git token only reaches the repositories of that user. The app keeps `session
 
 The 6-digit code, the 10-minute expiry, the 5-attempt limit and the 10-minute wait are the values of the design tasks 259 and 260. They are server constants: the app reads the actual delays from `expiresInSeconds`, `resendAfterSeconds` and `retryAfterSeconds`, never from its own copy.
 
-### 11.3 The OpenDives logbook format (proposed)
+### 11.3 The logbook on the server (decided on 18 November 2026)
 
-**Status: proposed.** The principles (git, one branch `main`, JSON, a UUID per dive, per-file merge) are decided on 16 November 2026. The paths, field names and merge rules below are the proposal to build on; where a point is not decided it is marked **Open**. The format is versioned so that it can still change before the first release.
+This replaces the earlier proposal of an OpenDives-own JSON format for dives. **The dives stay in Subsurface's git format.**
 
-#### Layout
+- **One repository per diver** on the server's git host. The server is one more git host: the app syncs an OD+ logbook with the core's existing git code (libgit2), exactly as it already syncs a Subsurface logbook with the diver's own git repository ("Use my own git repository").
+- **One engine: Subsurface's core**, for the alpha and for OD+. Filters, statistics, planner, calculations, edits and undo are never rewritten: every screen works on an OD+ logbook as it does today. Dives, sites, trips, cylinders, dive numbers and profiles are Subsurface's own data, read and written by the core.
+- **Two branches in the same repository:**
+
+| Branch | Content | Read and written by |
+| --- | --- | --- |
+| `main` | The dives, in Subsurface's git format | The core (Subsurface's code), as today |
+| `opendives` | OpenDives-only data, as JSON files (below) | The app, through generic git calls of the façade; Subsurface's code never reads or writes it |
+
+- Subsurface desktop could open the `main` branch of an OD+ repository, but the supported way to use the dives in Subsurface remains the export (section 11.4). **The `opendives` branch must never be pushed to a Subsurface cloud repository** (alpha): on the Subsurface cloud nothing changes (AGENTS.md, "Coexistence").
+
+#### What goes in the dive's extra data
+
+Subsurface keeps the extra data (key-value pairs) of a dive when it loads and saves the git format (the `keyvalue` handling of `load-git.cpp` and `save-git.cpp`); unknown entries survive a round trip. OpenDives stores there:
+
+- the dive's **stable identifier**: a random UUID version 4, created once on the device that creates the dive, never recomputed, never reused (the Subsurface dive number can change; this id cannot);
+- the **links to equipment**: the ids of the inventory items used (`gear/<id>`), of the kit used (`kits/<id>`), and the free description of a piece used that is not in the inventory.
+
+Key-value is judged sufficient for OD+. The entries use the `OpenDives ` prefix (the same mechanism as `OpenDives title` for saved plans). Files on the `opendives` branch refer to a dive by this id (`"diveId"`).
+
+#### The `opendives` branch
 
 ```
-opendives.json                     { "format": 1, "kind": "opendives-logbook", "minReader": 1, "createdAt": "..." }
-dives/<id[0:2]>/<id>/dive.json     one dive: everything the diver can edit
-dives/<id[0:2]>/<id>/profile.json  the dive computers' samples, written once at import
-dives/<id[0:2]>/<id>/media.json    photos and videos of the dive, by hash (section 11.6)
-sites/<id>.json                    dive site (name, position, taxonomy, water type, notes)
-trips/<id>.json                    trip
+opendives.json                     { "format": 1, "kind": "opendives-data", "minReader": 1, "createdAt": "..." }
 gear/<id>.json                     inventory item: cylinder, regulator, suit, ... (#42)
+kits/<id>.json                     kit: a named set of inventory items
 maintenance/<id>.json              reminder or service record (#47)
 gas-analyses/<id>.json             analysis of a cylinder's gas (#49)
 certifications/<id>.json           certification or document (#48), sensitive: encrypted
@@ -300,51 +317,13 @@ settings/units.json                the units, each measure separately
 settings/planner.json              planner defaults
 settings/computers.json            dive computers list (nicknames, serials)
 keys/wrapped.json                  data key wrapped for the optional recovery phrase (section 11.5)
+media/<dive id>.json               photos and videos of a dive, by hash (section 11.6)
 ```
 
-- **`<id>` is a random UUID (version 4), created once on the device that creates the item, never recomputed, never reused.** It is a field of the OpenDives data model (`"id"` in the file) and also the folder or file name, so a path never changes when the date, the site or the number of a dive changes. The first two characters shard the `dives/` folder.
-- A dive references its site and trip by id (`"siteId"`, `"tripId"`) and its inventory items by `gearId`; a maintenance item holds the `gearId` of its item.
-- `dive.json` and `profile.json` are separate because the samples are large and never edited after import: a note or a rating edit on one device touches a small file, and two devices never conflict on the profile.
+- **`<id>` is a random UUID (version 4), created once on the device that creates the item, never recomputed, never reused.** It is a field of the file (`"id"`) and the file name.
+- A maintenance item holds the `gearId` of its item; a link to a dive is `"diveId": "<dive id from the extra data>"`.
 - JSON is written with sorted keys, two-space indent and a final newline, so that equal data gives equal files and text diffs stay readable.
-- Commits are made by the app, signed "OpenDives", one per validated action, like the logbook commits of section 6.
-
-#### A dive
-
-`dive.json` uses the units the app already handles (the core's: millimetres, millibars, milli-kelvins, millilitres, permille, seconds), whatever the display units. Its fields follow the `DiveDetail` that the core returns (`plugins/opendives-core/core-api.js`), without the values the core computes (`cns`, `otu`, `sacMlMin`, `gasUsedMl`, `switchDepthMm`, `waterType`): those are recomputed on load and never stored.
-
-```json
-{
-  "format": 1, "id": "5b0f3c0e-3a9d-4f6a-9d3e-2f6f3f0d7a11",
-  "createdAt": "2026-11-16T14:02:11Z", "updatedAt": "2026-11-16T14:02:11Z",
-  "number": 42,
-  "start": "2026-11-01T09:30:00", "utcOffsetSeconds": 3600,
-  "durationSeconds": 3120, "maxDepthMm": 28400, "meanDepthMm": 14200,
-  "siteId": "<uuid>", "tripId": null,
-  "divemode": "OC", "manual": false, "invalid": false,
-  "waterTempMk": 288150, "airTempMk": 0,
-  "userSalinity": 0, "surfacePressureMbar": 1013,
-  "rating": 4, "visibility": 3,
-  "conditions": { "wavesize": 0, "current": 2, "surge": 0, "chill": 1 },
-  "buddies": ["..."], "guides": [], "suit": "7 mm", "tags": ["night"],
-  "weights": [ { "grams": 6000, "description": "belt" } ],
-  "notes": "",
-  "cylinders": [ { "gearId": "<uuid>|null", "description": "AL80", "sizeMl": 11100,
-                   "workingPressureMbar": 207000, "startMbar": 200000, "endMbar": 60000,
-                   "o2Permille": 320, "hePermille": 0, "use": "OC-gas", "depthMm": 0 } ],
-  "events": [ { "type": "gaschange", "timeSeconds": 1200, "cylinder": 1 } ],
-  "computers": [ { "model": "Shearwater Perdix", "serial": "...", "firmware": "...",
-                   "deviceId": "<hex>", "diveId": "<hex>", "nickname": "" } ],
-  "origin": { "source": "subsurface", "importedAt": "...", "extra": { } }
-}
-```
-
-`profile.json` is columnar, like the `DiveSamples` of the core: `{ "format": 1, "diveId": "<id>", "computers": [ { "index": 0, "timeSeconds": [...], "depthMm": [...], "ppo2Mbar": [...], "temperatureMk": [...], "ceilingMm": [...], "cylinder": [...] } ] }`.
-
-The rows of the app's list (`Dive`: number, date, site name, depth, duration, thumbnail profile) are derived on load from these files and the site files; nothing is stored twice.
-
-#### Other items
-
-Gear, maintenance, gas analyses, certifications and the diver profile keep the shapes of the earlier design with two changes: ids are UUIDs version 4, and a link to a dive is `"diveId": "<id>"` (no composite dive key any more). A site holds the water type (`"waterType"`).
+- Commits on this branch are made by the app, signed "OpenDives", one per validated action.
 
 ```json
 // gear/<id>.json
@@ -376,44 +355,36 @@ Gear, maintenance, gas analyses, certifications and the diver profile keep the s
 
 #### Versions and unknown fields
 
-- Every file carries `"format": <integer>`; `opendives.json` carries `minReader`, the lowest app format that may write the logbook.
-- An app that finds `minReader` above its own format opens the logbook **read only** and says why; it never rewrites anything.
-- A file with a `format` newer than the app knows, in a logbook the app may write, is kept byte for byte and shown read only for that item.
-- **Unknown fields are preserved.** The app reads a file as a JSON object, changes only the keys it owns and writes the object back; it never rebuilds a file from its own model. Keys under `origin.extra` hold Subsurface data the model has no field for (section 11.4). The merge below follows the same rule.
+- Every file carries `"format": <integer>`; `opendives.json` carries `minReader`, the lowest app format that may write the branch.
+- An app that finds `minReader` above its own format leaves the branch **read only** and says why; it never rewrites anything.
+- A file with a `format` newer than the app knows, on a branch the app may write, is kept byte for byte and shown read only for that item.
+- **Unknown fields are preserved.** The app reads a file as a JSON object, changes only the keys it owns and writes the object back; it never rebuilds a file from its own model.
 - Adding an optional field is not a format change; changing the meaning of a field or removing one is, and raises `format`.
 
 #### Merge and conflicts
 
-Granularity is **the file** first, then **the field**. The device does the merge, never the server: the server only accepts fast-forward pushes. A device whose push is refused fetches, merges, then pushes again; offline work is a list of local commits that go through the same path when the network is back.
+- **`main`** (the dives): merged by the core's git code, as for any Subsurface logbook; the existing conflict handling applies.
+- **`opendives`**: granularity is **the file** first, then **the field**. The device does the merge, never the server: the server only accepts fast-forward pushes. A device whose push is refused fetches, merges, then pushes again; offline work is a list of local commits that go through the same path when the network is back.
+  1. Two devices that changed **different files** never conflict (git merges them).
+  2. Two devices that changed **the same file**: the app does a three-way merge of the JSON objects (base = common ancestor, ours, theirs), key by key, instead of git's text merge. A key changed on one side only takes that change. Arrays (`tags`, `documents`, ...) are one value: changed on one side only, taken; changed on both, a conflict on that key. A key changed on both sides to the same value is not a conflict.
+  3. A conflict on a key goes to the choice screen already built for the cloud conflicts (the "sync conflict" state, version choice). Until the person chooses, the later `updatedAt` is kept in the working copy and the other version stays in the history, so nothing is lost and a silent sync never blocks.
+  4. Deleting an item deletes its file (git keeps the history). Deleted on one side and changed on the other: the change wins and the file stays; the person can delete it again.
+  5. Two devices that **create** items never collide: the ids are random UUIDs, so the paths differ.
+  6. For an encrypted file the app decrypts base, ours and theirs, merges the plaintext objects, and encrypts the result with a fresh nonce.
 
-1. Two devices that changed **different files** never conflict (git merges them).
-2. Two devices that changed **the same file**: the app does a three-way merge of the JSON objects (base = common ancestor, ours, theirs), key by key, instead of git's text merge. A key changed on one side only takes that change. Arrays (`buddies`, `tags`, `weights`, `cylinders`, ...) are one value: changed on one side only, taken; changed on both, a conflict on that key. A key changed on both sides to the same value is not a conflict.
-3. A conflict on a key goes to the choice screen already built for the cloud conflicts (the "sync conflict" state, version choice). Until the person chooses, the later `updatedAt` is kept in the working copy and the other version stays in the history, so nothing is lost and a silent sync never blocks.
-4. Deleting an item deletes its file (git keeps the history). Deleted on one side and changed on the other: the change wins and the file stays; the person can delete it again.
-5. Two devices that **create** items never collide: the ids are random UUIDs, so the paths differ.
-6. **The `number` of a dive is derived (decided on 17 November 2026):** the displayed number comes from the order of `start` in the logbook and is not stored, so a renumbering never rewrites files or conflicts between devices. A `number` read from an imported file is not kept as the dive number.
-7. For an encrypted file the app decrypts base, ours and theirs, merges the plaintext objects, and encrypts the result with a fresh nonce.
+The merge of these JSON files is JavaScript in `app/src/lib`, tested in `tests/app`; it only needs the files, which the façade's git calls hand over.
 
-**Reading the format (decided on 17 November 2026):** the app reads and writes the OpenDives format in JavaScript and shows the logbook from it; a dive goes to the C++ core only for what needs Subsurface's calculations (tissues, ceiling, planner, gas use), through a façade call that takes one dive as JSON. The format code itself (reading, writing, merging, import mapping) is JavaScript in `app/src/lib`, tested in `tests/app`, as AGENTS.md asks; only loading into and saving from the core's own structures needs the façade.
+#### Git on the device (decided on 18 November 2026)
 
-**Git on the device (decided on 18 November 2026):** the app keeps a real git working copy of the logbook on the device, as plain files in the app's data directory, and talks to the server with git over HTTPS. **Git is libgit2, already linked in the core**, exposed by a few generic façade calls (clone, fetch and merge, commit of a list of files, push, status); this is a deliberate exception to "JavaScript first": git is not a Subsurface function, but isomorphic-git in JavaScript missed the speed thresholds on a mid-range phone (1,000 dives: 13 to 24 s to clone, 5 to 13 s per edit round trip; `docs/spike-git-on-device.md` on branch `spike/git-on-device`). The format code (reading, writing, merging the JSON files) stays in JavaScript; the core only moves files. The first upload is pushed in packs of about 100 to 200 dives. The git host's web API is no longer used for the logbook.
+The app keeps a real git working copy of the repository on the device, in the app's data directory, and talks to the server with git over HTTPS. **Git is libgit2, already linked in the core.** The core's own git code syncs the dives (`main`). For the `opendives` branch, the façade exposes a few generic libgit2 calls: clone, fetch and merge, commit of a list of files, push, status. This is a deliberate exception to "JavaScript first": git is not a Subsurface function, and isomorphic-git in JavaScript was rejected as too slow on a simulated mid-range phone (1,000 dives: 13 to 24 s to clone, 5 to 13 s per edit round trip; `docs/spike-git-on-device.md` on branch `spike/git-on-device`). A first push that is too big may be split into several pushes. The git host's web API is not used for the logbook.
 
-**The core is a calculator for this logbook (confirmed on 18 November 2026):** the logbook is read and shown from the OpenDives files in JavaScript; a dive goes to the core one at a time for Subsurface's calculations. Logbook-wide functions (filters, statistics) are therefore written in JavaScript for this logbook.
+### 11.4 Export to Subsurface and full export
 
-### 11.4 Import from and export to Subsurface
+An OD+ logbook already holds Subsurface data, so **the export to Subsurface is direct**: the core writes the dives it holds in Subsurface's format (XML or git), and the extra data (the `OpenDives ` entries) stays in them, so that re-importing the export into OpenDives maps to the same dives. Nothing is converted and nothing is dropped from the dives. Import from Subsurface (XML, `.ssrf` or a Subsurface git logbook) is the core's import as today; a dive already in the logbook is skipped when one of its computers has the same `deviceId` and `diveId`, or, for a manual dive, the same start and duration.
 
-Subsurface's format is **not** the format of an OpenDives-server logbook; it is the exchange format.
+Using the dives in Subsurface desktop is supported **through this export**. Opening the `main` branch of the repository directly is technically possible but not the supported way. Data that Subsurface has no place for (inventory, kits, maintenance, certifications, gas analyses, diver profile) lives on the `opendives` branch and is not in the Subsurface export.
 
-**Import** (Subsurface XML or `.ssrf`, or a Subsurface git logbook, read by the core as today):
-
-- Each imported dive gets a **new random UUID**, a `dive.json` built from what the core returns, and a `profile.json`.
-- Subsurface's site `uuid` is kept in the site as `"origin": { "subsurfaceUuid": "..." }`; sites, trips and cylinders map to `sites/`, `trips/` and the dive's `cylinders`.
-- Whatever has no field in the model (extra data, unknown attributes) goes to `origin.extra` of the item, so a later export can write it back.
-- **Re-import without duplicates:** a dive already in the logbook is skipped when one of its computers has the same `deviceId` and `diveId`, or, for a manual dive, the same `start` and `durationSeconds`. A file exported by OpenDives carries the dive id (below) and the match is exact.
-
-**Export** (Subsurface XML, written by the core as today): the ids are dropped, the units follow Subsurface's, and `origin.extra` is written back. The dive id is written as an extra-data entry `OpenDives id` on the first dive computer (the same mechanism as `OpenDives title` for saved plans), so that re-importing an export maps to the same dives. Opening an OpenDives logbook in Subsurface is supported **only through this export**; Subsurface never reads or writes the repository of the server.
-
-Data that Subsurface has no place for (inventory, maintenance, certifications, gas analyses, diver profile, site water type) is not in the Subsurface export, and it does not need to be: that export is for opening the dives in Subsurface. **Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the OpenDives files of the logbook (dives, sites, gear, maintenance, certifications, gas analyses, diver profile, settings), the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, not a Subsurface file; its exact packaging is decided when its screen is designed.
+**Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the dives, the files of the `opendives` branch, the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, distinct from the Subsurface export; its exact packaging is decided when its screen is designed.
 
 ### 11.5 Sensitive data: encrypted on the device
 
@@ -438,7 +409,7 @@ Until the key routes are built, the single-device case works with the device's o
 
 - Photos stay on the device by default (unchanged). Uploading the photos or videos of a dive is **opt-in**, per dive or album.
 - An uploaded file is stored once, under the **SHA-256 of its content** (`media/<hash>`), so the same photo uploaded twice, or from two devices, is one object.
-- The reference lives in the dive's folder, in `dives/<id[0:2]>/<id>/media.json`: `{ "format": 1, "diveId": "<id>", "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Merge: `items` are merged by `hash` (union); the caption is a field of the item.
+- The reference lives in `media/<dive id>.json` on the `opendives` branch: `{ "format": 1, "diveId": "<dive id>", "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Merge: `items` are merged by `hash` (union); the caption is a field of the item.
 - The app holds no storage credentials: it asks the API for short-lived signed URLs to upload or download an object. The API only signs for objects the person owns or that were shared with them (section 11.7).
 - Originals are never altered or recompressed on upload.
 
