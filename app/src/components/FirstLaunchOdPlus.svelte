@@ -8,6 +8,9 @@
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
   import OdPlusChip from './OdPlusChip.svelte';
+  import OdPlusReadyLogo from './OdPlusReadyLogo.svelte';
+  import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
+  import { claimReadyMotion } from '../lib/ready-animation.js';
   import { flow, go } from '../lib/first-launch.svelte.js';
   import { ACTIVATED, BENEFITS, summaryRows } from '../lib/odplus.js';
   import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
@@ -22,6 +25,18 @@
    * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome', onwithout: () => void, onopen: () => void }}
    */
   let { step, onwithout, onopen } = $props();
+
+  /** The section band's faint dive profile (the same path as SectionBand). */
+  const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+
+  // « Votre carnet est prêt » plays its sequence once (task 2026-11-18-270): decided when the step appears, kept while it shows.
+  /** @type {{ play: boolean, bubbles: boolean, still: boolean }} */
+  let motion = $state({ play: false, bubbles: false, still: false });
+  let motionStep = '';
+  $effect.pre(() => {
+    if (step === 'odplusReady' && motionStep !== 'odplusReady') motion = claimReadyMotion();
+    motionStep = step;
+  });
 
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 
@@ -51,6 +66,14 @@
 {#snippet hero(/** @type {'offer'|'ready'|'welcome'} */ which)}
   <header class="od-plus-hero od-plus-hero--{which}">
     <div class="od-plus-hero--bands" aria-hidden="true"></div>
+    {#if which === 'ready'}
+      {#if motion.bubbles}<OdPlusReadyBubbles still={motion.still} />{/if}
+      <svg class="od-plus-hero--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="{BAND_PROFILE} V140 H0 Z" class="od-plus-hero--profile-area" />
+        <path d={BAND_PROFILE} class="od-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
+      </svg>
+      <svg class="od-plus-hero--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    {/if}
     <div class="od-plus-hero--brand">
       <img src="logo-light.svg" alt="" width="32" height="32" />
       <span>{t('welcomeSteps.appName')}</span>
@@ -63,7 +86,11 @@
       </div>
     {:else}
       <div class="od-plus-hero--centre">
-        <span class="od-plus-hero--check" class:od-plus-hero--check-big={which === 'welcome'}><Icon name="check" size={which === 'welcome' ? 44 : 36} weight={2.6} /></span>
+        {#if which === 'ready'}
+          <OdPlusReadyLogo play={motion.play} />
+        {:else}
+          <span class="od-plus-hero--check od-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
+        {/if}
         <OdPlusChip />
         <h2 class="od-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : 'odplus.welcome.title')}</h2>
         <p class="od-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.welcome.lead')}</p>
@@ -323,6 +350,40 @@
       font-weight: 500;
     }
 
+    .od-plus-hero--profile,
+    .od-plus-hero--wave {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .od-plus-hero--profile {
+      bottom: 2px;
+      height: 34px;
+    }
+
+    .od-plus-hero--profile-area {
+      fill: var(--od-band-profile-area);
+    }
+
+    .od-plus-hero--profile-line {
+      fill: none;
+      stroke: var(--od-band-profile-line);
+      stroke-width: 1.5;
+      stroke-linejoin: round;
+    }
+
+    .od-plus-hero--wave {
+      bottom: -1px;
+      height: 18px;
+
+      path {
+        fill: var(--od-background);
+      }
+    }
+
     .od-plus-hero--text,
     .od-plus-hero--centre {
       position: relative;
@@ -572,6 +633,21 @@
 
       .od-plus-hero--offer {
         padding-bottom: 40px;
+      }
+
+      /* « Votre carnet est prêt »: the section band's dive profile above a wave in the page colour, as on the other setup screens. */
+      .od-plus-hero--ready {
+        border-radius: 0;
+        padding-bottom: 52px;
+        margin-bottom: 0;
+      }
+
+      .od-plus-hero--profile {
+        display: block;
+      }
+
+      .od-plus-hero--wave {
+        display: block;
       }
 
       .od-plus--provider,

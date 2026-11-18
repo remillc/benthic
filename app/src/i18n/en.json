@@ -2441,7 +2441,8 @@
       "In the desktop app, a large logbook is fast: the Logbook table draws only the rows in view, so selecting a dive, searching, sorting and coming back to the Logbook stay quick with thousands of dives.",
       "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",
       "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
-      "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off."
+      "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
+      "Phone, « Your logbook is ready » (OpenDives+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

@@ -5451,7 +5451,7 @@ Mock-ups in `docs/mockups-release/`: `android-serveur-telechargement`, `android-
 - A download of more than 5 seconds shows the time left on the right; a short one never shows it.
 - The value decreases smoothly and switches from seconds to minutes as described.
 
-## [ ] 2026-11-18-270 Phone: animate « Votre carnet est prêt » (the logo turns into the check mark)
+## [x] 2026-11-18-270 Phone: animate « Votre carnet est prêt » (the logo turns into the check mark)
 
 Christian approved this on 18 November 2026. Work in `main` (task 268).
 
