@@ -5582,3 +5582,26 @@ The maintenance notifications (task 274) are a strong reason to subscribe. On «
 English: « Service reminders », « Regulator, cylinder, battery: notified 30 days before they are due. »
 
 The rest of the screen does not change. The screen is now taller: check that it scrolls on small phones and that « S'abonner » stays reachable.
+
+## [ ] 2026-11-18-277 Brevets: the photo of a card uses the system document scanner; macOS access to the profile; small changes
+
+Christian approved this on 18 November 2026. Work in `main`. **This task corrects tasks 272 and 275**: where they differ, follow this one. Mock-ups in `docs/mockups-release/`.
+
+**1. The photo of a card (decision of Christian, 18 November 2026).**
+- **Phone and tablet:** « Scanner le recto » and « Scanner le verso » in « Nouveau brevet » open the system document scanner: ML Kit Document Scanner on Android, VisionKit on iPhone and iPad. That scanner has its own interface for framing, automatic capture, cropping, straightening, glare removal and adjusting the corners. OpenDives does not draw these steps.
+- **Do not build** `profil-brevet-photo-android`, `profil-brevet-photo-verifier-android`, `profil-brevet-photo-coins-android`, nor the tablet screens `android-tablette-profil-brevet-photo-…-paysage`. They are no longer part of the beta (moved to « Mis de côté » on the canvas). This replaces item 7 of task 272 and the tablet camera of task 275.
+- **After the scan** (`profil-brevet-nouveau-lu-android`): a thumbnail of each side, each with « Remplacer ». The device's text recognition reads the agency, the level, the number and the date. The values found pre-fill the fields, each with the small mark « Lu sur la carte, à vérifier » under it. A value not found leaves its field empty, with no error message. If nothing could be read, all the fields stay empty, still with no message.
+- The sentence under the slots becomes « Scannez la carte : l'app y lit l'agence, le niveau et le numéro. Vérifiez-les. » (`profil-brevet-nouveau-android`, `android-tablette-profil-brevet-nouveau-paysage`).
+- **Desktop only** keeps OpenDives' own flow (task 275): with no camera, the diver chooses, drops or pastes an image (Ctrl+V). OpenDives crops and straightens it, with « Vérifier la photo » (Before and After side by side) and « Ajuster les coins ».
+- Nothing else changes for the cards.
+
+**2. macOS: access to « Mon profil de plongeur ».**
+- **`bureau-profil-menu-macos`:** in the app menu « OpenDives », « Mon profil de plongeur… » (⇧⌘P), just above « Réglages… » (⌘,).
+- **`bureau-profil-macos`:** on macOS the profile opens in a separate window, as the settings do, titled « Mon profil de plongeur », with the same panes as on Windows and Linux.
+- Windows and Linux keep the entry in the account sheet (task 275).
+
+**3. « Nouvelle pièce » on tablet and desktop** (`android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`). The 9 types are a regular grid of 3 × 3 compact buttons, 56 px high. Each button has the type icon in a coloured square, then the name. The colours are those of the inventory: blue for computers and BCDs, green for regulators, beige for suits and undergarments, purple for cylinders, grey for the others. The chosen type has a pale blue background, a blue border and a check on the right. This replaces the 5-column tiles of task 275.
+
+**4. Suggested service interval for a regulator:** every year (« Suggéré pour un détendeur : tous les ans »), on all devices. It was every 2 years in tasks 273 and 275.
+
+**Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
