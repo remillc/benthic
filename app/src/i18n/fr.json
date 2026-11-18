@@ -223,6 +223,8 @@
   },
   "dive": {
     "siteNotSet": "Site à préciser",
+    "spokenDive": "Plongée",
+    "spokenNumber": "Plongée {number}",
     "screenReader": "{site}, {date}, durée {duration}, profondeur maximale {depth}",
     "screenReaderNoDepth": "{site}, {date}, durée {duration}",
     "thumbnail": "Profil, {depth} au plus profond",
@@ -252,6 +254,8 @@
     },
     "summarySingle": "{dives}, {depth}",
     "summaryRange": "{dives}, de {min} à {max}",
+    "cardSummarySingle": "{dives} · {depth}",
+    "cardSummaryRange": "{dives} · de {min} à {max}",
     "expand": "Déplier le voyage",
     "collapse": "Replier le voyage"
   },
@@ -462,6 +466,18 @@
     "miles": "mi",
     "kilometers": "km",
     "minutes": "min",
+    "feetSpoken": {
+      "one": "{v} pied",
+      "other": "{v} pieds"
+    },
+    "metersSpoken": {
+      "one": "{v} mètre",
+      "other": "{v} mètres"
+    },
+    "minutesSpoken": {
+      "one": "{v} minute",
+      "other": "{v} minutes"
+    },
     "liters": "L",
     "litersPerMinute": "L/min",
     "litersPerMinuteLong": {
@@ -2127,6 +2143,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet sur téléphone : les plongées sont groupées par année, chaque année dans une carte blanche. Chaque ligne montre la date sur un bloc bleu pâle, le site (ou « Site à préciser » avec un repère barré), le numéro en gras et l'heure, le petit profil, puis la profondeur maximale en gras et la durée, dans les unités des réglages. Un voyage est sa propre carte, avec un en-tête bleu pâle (valise, nombre de plongées, profondeurs) et une flèche pour le replier. Chaque ligne se lit comme un seul élément par les lecteurs d'écran.",
       "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
       "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
       "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",

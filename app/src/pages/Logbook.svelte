@@ -48,6 +48,7 @@
   import { formatDateTime, formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
+  import { buildRows } from '../lib/logbook-cards.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
@@ -63,8 +64,9 @@
   /**
    * A row of the virtual list. `kind` groups rows of the same layout, hence of
    * the same probable height.
-   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, month: string, dive: Dive, tripFirst?: boolean, tripLast?: boolean }
-   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[] }} Row
+   * @typedef {{ kind: 'dive'|'inTrip', key: string, index: number, month: string, dive: Dive, tripFirst?: boolean, tripLast?: boolean, cardFirst?: boolean, cardLast?: boolean, gapBefore?: boolean }
+   *   | { kind: 'trip', key: string, index: number, month: string, id: number, location: string, dives: Dive[], cardFirst?: boolean, cardLast?: boolean, gapBefore?: boolean }
+   *   | { kind: 'year', key: string, index: number, month: string, year: number }} Row
    */
 
   /** @type {{ f7router: any }} */
@@ -121,12 +123,14 @@
     e.preventDefault();
     e.stopPropagation();
     const target = /** @type {HTMLElement} */ (e.target);
-    const li = target.closest('li');
-    const index = li ? [...(li.parentElement?.children ?? [])].indexOf(li) : -1;
-    const entry = logbook.preview?.entries[index];
-    if (!entry) return;
-    const dive = entry.type === 'trip' ? entry.dives[0] : entry.dive;
-    heldTap = { date: dive.date, number: dive.number, expand: entry.type === 'trip' && !!target.closest('.od-trip-row--expand') };
+    const preview = logbook.preview;
+    if (!preview) return;
+    const flat = preview.entries.flatMap((entry) => (entry.type === 'trip' ? entry.dives : [entry.dive]));
+    const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.od-trip-row'));
+    const diveLink = /** @type {HTMLElement|null} */ (target.closest('a[data-dive]'));
+    const dive = tripRow ? flat.find((d) => d.trip?.id === Number(tripRow.dataset.trip)) : flat.find((d) => String(d.id) === diveLink?.dataset.dive);
+    if (!dive) return;
+    heldTap = { date: dive.date, number: dive.number, expand: !!tripRow && !!target.closest('.od-trip-row--expand') };
   }
 
   // The held tap is replayed on the real row once the dives are loaded.
@@ -861,27 +865,20 @@
   /** The months of the list on screen; the search results are flat, without trip rows. */
   const monthGroups = $derived(results ? groupByMonth(results, true) : groups);
 
-  /** Rows shown: the search results, or the dives and trips with the expanded trips' dives. */
-  const rows = $derived.by(() => {
-    /** @type {Row[]} */
-    const list = [];
-    for (const group of monthGroups) {
-      const month = group.key;
-      for (const entry of group.entries) {
-        if (entry.type === 'dive') {
-          list.push({ kind: 'dive', key: entry.key, index: list.length, month, dive: entry.dive });
-          continue;
-        }
-        const id = entry.dives[0].trip?.id ?? 0;
-        list.push({ kind: 'trip', key: entry.key, index: list.length, month, id, location: entry.location, dives: entry.dives });
-        if (expanded[id]) {
-          entry.dives.forEach((dive, i) =>
-            list.push({ kind: 'inTrip', key: `d${dive.id}`, index: list.length, month, dive, tripFirst: i === 0, tripLast: i === entry.dives.length - 1 }),
-          );
-        }
-      }
-    }
-    return list;
+  /**
+   * Phone: the dives are grouped by year, in white cards (task 2026-11-18-278). The tablet keeps the flat list.
+   * Mounted from the layout, so that the rows follow a change of width.
+   */
+  const cards = $derived(!layout.split);
+
+  /** Rows shown: the search results, or the dives and trips with the expanded trips' dives, under their year on a phone. */
+  const rows = $derived(/** @type {Row[]} */ (buildRows(monthGroups, expanded, cards)));
+
+  /** The start snapshot (the top of the list at the last load) in the same cards, every trip folded. */
+  const previewRows = $derived.by(() => {
+    const preview = logbook.preview;
+    if (!cards || !preview) return [];
+    return /** @type {Row[]} */ (buildRows(groupByMonth(preview.entries.flatMap((entry) => (entry.type === 'trip' ? entry.dives : [entry.dive]))), {}, true));
   });
 
   /**
@@ -940,11 +937,18 @@
   /** @type {Map<string, number>} */
   const measured = new Map();
   /** Height of a row not measured yet: the last one measured of the same kind. */
-  const typical = { dive: 72, inTrip: 72, trip: 96 };
+  const typical = { dive: 72, inTrip: 72, trip: 96, year: 44 };
+  /** The same on a phone (cards): a trip's header is a row like the others. */
+  const typicalCards = { dive: 72, inTrip: 72, trip: 72, year: 44 };
+  /** The space between two cards, in the padding of the row that opens the second one. */
+  const CARD_GAP = 12;
+
+  /** @param {Row} row */
+  const gapOf = (row) => (/** @type {any} */ (row).gapBefore ? CARD_GAP : 0);
 
   /** @param {Row} row */
   function rowHeight(row) {
-    return measured.get(row.key) ?? typical[row.kind];
+    return measured.get(row.key) ?? (cards ? typicalCards : typical)[row.kind] + gapOf(row);
   }
 
   async function measure() {
@@ -956,7 +960,7 @@
       const height = /** @type {HTMLElement} */ (li).offsetHeight;
       if (!row || !height || rowHeight(row) === height) continue;
       measured.set(row.key, height);
-      typical[/** @type {Row} */ (row).kind] = height;
+      (cards ? typicalCards : typical)[/** @type {Row} */ (row).kind] = height - gapOf(row);
       changed = true;
     }
     if (changed) vl.update();
@@ -1281,15 +1285,27 @@
     <div class="od-logbook--preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
         <p class="od-logbook--count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list {theme.ios ? 'chevron-center od-logbook--dividers' : ''} od-dive-list">
+        <div class="list media-list {theme.ios && !cards ? 'chevron-center od-logbook--dividers' : ''} od-dive-list" class:od-logbook--cards={cards}>
           <ul>
-            {#each logbook.preview.entries as entry, i (i)}
-              {#if entry.type === 'trip'}
-                <TripRow dives={entry.dives} location={entry.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} />
-              {:else}
-                <DiveRow dive={entry.dive} prefs={logbook.preview.prefs} />
-              {/if}
-            {/each}
+            {#if cards}
+              {#each previewRows as row (row.key)}
+                {#if row.kind === 'year'}
+                  <li class="od-logbook--year"><h2 class="od-logbook--year-title">{row.year}</h2></li>
+                {:else if row.kind === 'trip'}
+                  <TripRow dives={row.dives} location={row.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} card cardFirst={row.cardFirst} cardLast={row.cardLast} gapBefore={row.gapBefore} />
+                {:else}
+                  <DiveRow dive={row.dive} prefs={logbook.preview.prefs} card cardFirst={row.cardFirst} cardLast={row.cardLast} gapBefore={row.gapBefore} />
+                {/if}
+              {/each}
+            {:else}
+              {#each logbook.preview.entries as entry, i (i)}
+                {#if entry.type === 'trip'}
+                  <TripRow dives={entry.dives} location={entry.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} />
+                {:else}
+                  <DiveRow dive={entry.dive} prefs={logbook.preview.prefs} />
+                {/if}
+              {/each}
+            {/if}
           </ul>
         </div>
       </div>
@@ -1464,10 +1480,14 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list {theme.ios ? 'chevron-center od-logbook--dividers' : ''} od-logbook--virtual-list od-dive-list" bind:this={listEl}>
+    <div class="list media-list {theme.ios && !cards ? 'chevron-center od-logbook--dividers' : ''} od-logbook--virtual-list od-dive-list" class:od-logbook--cards={cards} bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
-          {#if row.kind === 'trip'}
+          {#if row.kind === 'year'}
+            <li class="od-logbook--year" data-virtual-list-index={row.index} style:top="{visible.topPosition}px">
+              <h2 class="od-logbook--year-title">{row.year}</h2>
+            </li>
+          {:else if row.kind === 'trip'}
             <TripRow
               dives={row.dives}
               location={row.location}
@@ -1478,6 +1498,10 @@
               top={visible.topPosition}
               {selecting}
               checked={checkedTrips.includes(row.id)}
+              card={cards}
+              cardFirst={row.cardFirst}
+              cardLast={row.cardLast}
+              gapBefore={row.gapBefore}
             />
           {:else}
             <DiveRow
@@ -1492,6 +1516,10 @@
               appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}
               tripFirst={row.kind === 'inTrip' && row.tripFirst}
               tripLast={row.kind === 'inTrip' && row.tripLast}
+              card={cards}
+              cardFirst={row.cardFirst}
+              cardLast={row.cardLast}
+              gapBefore={row.gapBefore}
             />
           {/if}
         {/each}
@@ -1709,6 +1737,56 @@
     /* The dives follow the count and the sync status closely. */
     :global(.list.od-dive-list) {
       margin-top: 0;
+    }
+
+    /* Phone (task 2026-11-18-278): the dives by year in white cards on the screen's background. */
+    :global(.list.od-logbook--cards) {
+      margin-bottom: 0;
+    }
+
+    /* Android: the last card scrolls clear of the + button. */
+    :global(.md .list.od-logbook--cards) {
+      padding-bottom: 72px;
+    }
+
+    :global(.list.od-logbook--cards ul) {
+      background: none;
+    }
+
+    /* The title of a year: the row is measured by the virtual list, hence padding and no margin. */
+    :global(li.od-logbook--year) {
+      list-style: none;
+      padding: 16px 20px 8px;
+    }
+
+    :global(.od-logbook--year-title) {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--od-text-2);
+    }
+
+    /* A card row lifted by a long press or a drop target: the card's surface shows it, not the row's padding. */
+    :global(li.od-dive-row--card.od-logbook--drag-lift),
+    :global(li.od-trip-row--card.od-logbook--drag-lift) {
+      background: none;
+      box-shadow: none;
+    }
+
+    :global(li.od-dive-row--card.od-logbook--drag-lift > a),
+    :global(li.od-trip-row--card.od-logbook--drag-lift > a) {
+      box-shadow: 0 2px 6px 2px rgb(0 0 0 / 0.15), 0 1px 2px rgb(0 0 0 / 0.3);
+    }
+
+    :global(li.od-dive-row--card.od-logbook--drop-target),
+    :global(li.od-trip-row--card.od-logbook--drop-target) {
+      background: none;
+    }
+
+    :global(li.od-dive-row--card.od-logbook--drop-target > a),
+    :global(li.od-trip-row--card.od-logbook--drop-target > a) {
+      background: var(--od-tint);
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */

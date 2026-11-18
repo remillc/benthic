@@ -5606,7 +5606,7 @@ Christian approved this on 18 November 2026. Work in `main`. **This task correct
 
 **Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
 
-## [ ] 2026-11-18-278 Phone: a clearer list of dives in the logbook
+## [x] 2026-11-18-278 Phone: a clearer list of dives in the logbook
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-carnet.dc.html` (the release version of « Carnet »; the alpha one stays in `docs/mockups/`).
 

@@ -13,9 +13,10 @@
    *   maxDepthMm: number,
    *   prefs: import('opendives-core').Prefs,
    *   small?: boolean,
+   *   wide?: boolean,
    * }}
    */
-  let { profile, maxDepthMm, prefs, small = false } = $props();
+  let { profile, maxDepthMm, prefs, small = false, wide = false } = $props();
 
   const uid = $props.id();
   const W = 56;
@@ -44,11 +45,12 @@
 <svg
   class="od-profile-thumbnail od-profile-thumbnail--thumbnail"
   class:od-profile-thumbnail--small={small}
+  class:od-profile-thumbnail--wide={wide}
   viewBox="0 0 {W} {H}"
   preserveAspectRatio="none"
-  role={small ? undefined : 'img'}
-  aria-hidden={small ? 'true' : undefined}
-  aria-label={small ? undefined : t('dive.thumbnail', { depth: formatDepth(maxDepthMm, prefs) })}
+  role={small || wide ? undefined : 'img'}
+  aria-hidden={small || wide ? 'true' : undefined}
+  aria-label={small || wide ? undefined : t('dive.thumbnail', { depth: formatDepth(maxDepthMm, prefs) })}
 >
   <defs>
     <linearGradient id="water-{uid}" x1="0" y1="0" x2="0" y2="1">
@@ -76,6 +78,14 @@
       :global(.ios) & {
         height: 36px;
         border-radius: 4px;
+      }
+
+      /* Phone rows (task 2026-11-18-278): 64 × 28, on a light grey chip. */
+      &.od-profile-thumbnail--wide {
+        width: 64px;
+        height: 28px;
+        border-radius: 6px;
+        background: var(--od-profile-chip);
       }
 
       &.od-profile-thumbnail--small {

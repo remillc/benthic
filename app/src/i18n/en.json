@@ -223,6 +223,8 @@
   },
   "dive": {
     "siteNotSet": "Dive site not set",
+    "spokenDive": "Dive",
+    "spokenNumber": "Dive {number}",
     "screenReader": "{site}, {date}, duration {duration}, max. depth {depth}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
     "thumbnail": "Profile, {depth} max. depth",
@@ -252,6 +254,8 @@
     },
     "summarySingle": "{dives}, {depth}",
     "summaryRange": "{dives}, {min} to {max}",
+    "cardSummarySingle": "{dives} · {depth}",
+    "cardSummaryRange": "{dives} · {min} to {max}",
     "expand": "Expand the trip",
     "collapse": "Collapse the trip"
   },
@@ -462,6 +466,18 @@
     "miles": "mi",
     "kilometers": "km",
     "minutes": "min",
+    "feetSpoken": {
+      "one": "{v} foot",
+      "other": "{v} feet"
+    },
+    "metersSpoken": {
+      "one": "{v} meter",
+      "other": "{v} meters"
+    },
+    "minutesSpoken": {
+      "one": "{v} minute",
+      "other": "{v} minutes"
+    },
     "liters": "L",
     "litersPerMinute": "L/min",
     "litersPerMinuteLong": {
@@ -2127,6 +2143,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook on a phone: dives are grouped by year, each year in a white card. Each row shows the date on a pale blue block, the site (or “Dive site not set” with a crossed-out pin), the dive number in bold and the time, the small profile, then the maximum depth in bold and the duration, in the units of the settings. A trip is its own card, with a pale blue header (suitcase, number of dives, depths) and an arrow to fold it. A screen reader reads each row as one item.",
       "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",
       "Equipment service (OpenDives+): “Service” in My profile and the card at the top of “Equipment” list what is overdue, coming up or up to date. A reminder can be set by time, by number of dives (those where the piece is in the equipment), or both: the first one reached counts. “Note a service” keeps the date, who did it, the cost and a photo of the invoice, and “Edit the dive” warns when a piece is overdue. A notification warns 7, 30 or 60 days before, then on the day.",
