@@ -5666,3 +5666,37 @@ Christian approved this on 18 November 2026. Work in `main`. Follows task 279, i
 **Test:** the three buttons on phone, tablet and desktop, in light theme. In dark theme, the black Apple logo on a dark button needs a white version: tell Christian if the button is dark.
 
 Done on `feature/signin-icons`: Christian's two files are in `app/src/assets/brands/` (`google-g.svg`, `apple-logo-black.svg`); `apple-logo-white.svg` is the black file with the fill colour only. One component (`FirstLaunchOdPlus`) serves phone, tablet and desktop: the Google « G » at 22 × 22, the Apple logo 22 high (about 18 wide). In dark theme the Apple button is black (#000000) with the white logo and white title. Branding rules re-checked (Google 20 px letter inside the 22 px picture, fills, strokes and text colours; Apple black-or-white logo, title wording, size): no rule asks for a different button. README and `tests/app/brand-assets.test.mjs` updated; checked in headless Chromium at 390 × 800 and 1280 × 800, light and dark.
+
+## [ ] 2026-11-18-281 Account sheet for free users, « Gérer le compte », maintenance badge, small sign-in changes
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`. This follows the « one app » decision (to-do #97): the free version and OpenDives+ are the same app.
+
+**1. The Compte button stays in the free version** (`android-carnet-menu-gratuit`). Where a subscriber sees their initial, a free user sees a silhouette in the same white disc (aria-label « Compte, réglages et à propos »). Same place on every tab, and in the navigation rail on tablet and desktop. The ⋮ menu keeps only the page's actions (Réglages and À propos are NOT added to it).
+
+**2. The account sheet of a free user** (`nav-compte-gratuit-android`, `android-tablette-compte-gratuit-paysage`, `bureau-compte-gratuit`):
+- Top: a grey silhouette, « Carnet sur cet appareil », and the count (« 9 plongées »). No e-mail, no sync line.
+- « S'abonner » (filled button), opens the OpenDives+ offer. Under it: « Déjà abonné ? » in grey text, with « Se connecter » as the only link (underlined), which opens « Se connecter ou créer un compte ».
+- Two rows, each with the OpenDives+ chip above the title and a chevron, both open the offer: « Sauvegarde et synchronisation » (« Votre carnet sur tous vos appareils ») and « Mon profil de plongeur » (« Équipement, brevets, informations »).
+- Réglages and À propos, as for a subscriber.
+- Tablet and desktop: the offer screen is not drawn yet. Use the phone's offer content in the meantime and tell Christian.
+
+**3. The subscriber's account sheet** (`nav-option-barre-compte-android`, `nav-compte-profil-android`, `android-tablette-profil-compte-paysage`, `bureau-profil-compte`):
+- « Mon profil de plongeur » has the OpenDives+ chip above its title.
+- **Maintenance badge:** when at least one piece of equipment is overdue, the row shows a small red badge with the number of overdue pieces (#A1372B, white text) before the chevron, and its subtitle becomes « Entretien : 1 pièce en retard » in red. Only overdue pieces count, not the ones due soon. Same count as the badge on the Entretien row of the profile screen. Otherwise the subtitle stays « Équipement, brevets, informations ».
+- Phone: the ✕ of the sheet is on the **right**, at the logo's height (the logo stays centred). Remove any ✕ on the left.
+- « Gérer le compte » opens the new screen of item 4 (it led nowhere until now). The phone line under the e-mail stays « Cloud · 9 plongées » for now.
+
+**4. « Gérer le compte »** (`compte-android-connecte` on phone, a screen; `android-tablette-compte-gerer-paysage` and `bureau-compte-gerer`, a two-column dialog with ✕ on the right):
+- The account: e-mail and the sign-in method (Google, Apple or e-mail, with its icon).
+- **Subscription:** OpenDives+ chip, the price per year, « Renouvelé le … · acheté sur Google Play » (or the App Store), and « Gérer dans Google Play » (outlined button with an external-link icon). It opens the store's subscription page. The payment method, receipts and auto-renewal are managed by the store, not by OpenDives: do not build a billing tool. On desktop the note says it is managed in the store of the phone used to buy.
+- **Space:** « Photos et vidéos », used of 10 GB, with a progress bar. « Le carnet lui-même ne compte pas dans cet espace. »
+- **Your data:** « Télécharger mes données » (logbook, equipment, certifications, in an open format, task #57) and « Se déconnecter » (« Le carnet reste sur cet appareil »).
+- **« Supprimer le compte »**, in red, in its own card, with a confirmation. Apple and Google require in-app account deletion for apps that create accounts: check their current rules.
+
+**5. The account sheet in the browser history (Android only, this sheet only).** Opening the account sheet adds a fragment to the address (« #compte ») with a new history entry. The Back gesture closes the sheet instead of leaving the page. Closing it another way (scrim, swipe down, ✕) goes back one entry, so no orphan « #compte » is left. Other sheets and dialogs are decided case by case later: do not generalise.
+
+**6. Small sign-in changes.**
+- « OpenDives+, l'offre » (`android-odplus-offre`): under « Aucun compte n'est créé. », add « Déjà abonné ? » with « Se connecter » as an underlined link to « Se connecter ou créer un compte ». Hide it when the diver reaches the offer right after signing in (the first-launch flow), since they are already signed in.
+- Tablet and desktop « Se connecter ou créer un compte » (`android-tablette-odplus-connexion-paysage`, `bureau-odplus-connexion`): « Continuer sans compte » is centred under the three buttons, across their 440 px width, as on the phone.
+
+**Test:** free user: the Compte button opens the free sheet, « S'abonner » opens the offer, « Se connecter » opens the sign-in screen. Subscriber with an overdue part: the badge and the red subtitle; with none: neither. « Gérer dans Google Play » opens the store page. Android Back closes the account sheet. Account deletion asks for confirmation.
