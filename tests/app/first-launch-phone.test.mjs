@@ -9,6 +9,7 @@ import { PHONE_QUERY, BAND_HEIGHT, deviceKey, deviceKind } from '../../app/src/l
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
+const html = readFileSync(new URL('../index.html', root), 'utf8');
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
 const components = [
   'pages/WelcomeStartRelease.svelte',
@@ -181,4 +182,34 @@ test('the tablet layout is untouched: the phone sizes are only inside the max-wi
     assert.ok(at > 0, file);
     assert.doesNotMatch(src.slice(0, at), /ce téléphone|330px|96px - 24px/, file);
   }
+});
+
+test('the cascade layer order is declared first in the document, before any built stylesheet (spacing bug of task 263)', () => {
+  // The build links the shared chunk's CSS, which only names od.components, before the main CSS: without this line that
+  // layer comes first, so lowest, and Framework7's rules (p { margin: 1em 0 } ...) beat every component's.
+  const order = html.match(/@layer\s+([^;]+);/);
+  assert.ok(order, 'index.html declares the layer order');
+  assert.deepEqual(order[1].split(',').map((x) => x.trim()), ['framework7', 'maplibre', 'od.tokens', 'od.base', 'od.components']);
+  const theme = read('theme.css').match(/^@layer\s+([^;]+);/m);
+  assert.equal(order[1].replace(/\s/g, ''), theme[1].replace(/\s/g, ''));
+  assert.ok(html.indexOf('@layer') < (html.indexOf('/src/main.js')));
+});
+
+test('first step spacing: the mock-up vertical distances (title, choices, text buttons, help link)', () => {
+  const steps = read('components/FirstLaunchSteps.svelte');
+  // 20 dp under the band, the title 6 + the choices 14 = 20 dp apart, the choices 12 dp apart.
+  assert.match(steps, /\.od-first-launch--first \{\s*padding-top: 20px;/);
+  assert.match(steps, /\.od-first-launch--rows \{\s*display: flex;\s*flex-direction: column;\s*gap: 12px;/);
+  assert.match(steps, /\.od-first-launch--title \{\s*margin: 0 0 6px;/);
+  assert.match(steps, /\.od-first-launch--rows-start \{\s*margin-top: 14px;/);
+  // Text buttons: 40 dp high, 12 dp side padding, 8 dp apart, 16 dp above and below the group.
+  assert.match(steps, /\.od-first-launch--text-buttons \{[^}]*gap: 8px;\s*margin: 16px 0;/);
+  assert.match(steps, /\.od-first-launch--text-button \{[^}]*height: 40px;\s*padding: 0 12px;/);
+  // The help link takes the spare height above it (auto margin) and ends 20 dp above the system bar on Android.
+  assert.match(steps, /margin: auto auto calc\(var\(--f7-safe-area-bottom\) \+ 28px\);\s*padding-top: 24px;/);
+  assert.match(steps, /:global\(\.md\) \.od-first-launch :global\(\.od-welcome-help-link\) \{\s*margin-bottom: calc\(max\(var\(--f7-safe-area-bottom\), 24px\) \+ 20px\);/);
+  // The band: 330 dp including the status bar, the intro 8 dp under the headline.
+  const page = read('pages/WelcomeStartRelease.svelte');
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
+  assert.match(page, /\.od-welcome-release--intro \{[^}]*margin: 8px 0 0;/);
 });
