@@ -2127,13 +2127,16 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",
+      "Equipment service (OpenDives+): “Service” in My profile and the card at the top of “Equipment” list what is overdue, coming up or up to date. A reminder can be set by time, by number of dives (those where the piece is in the equipment), or both: the first one reached counts. “Note a service” keeps the date, who did it, the cost and a photo of the invoice, and “Edit the dive” warns when a piece is overdue. A notification warns 7, 30 or 60 days before, then on the day.",
+      "OpenDives+ offer: a « Service reminders » tile under the four others says that the regulator, cylinder and battery reminders arrive 30 days before they are due.",
+      "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
       "Offline maps: the dot on the account avatar goes away once a map update is done, including an update that finished while the app was closed.",
       "Logbook: a progress bar shows at the top of the list while the app brings the logbook up to date at start; the list is already there.",
       "Account sheet: the « Map update available » message is its own row, « Offline maps », and opens the offline maps in Settings directly.",
       "My diver profile (OpenDives+): the account sheet opens it, and « Equipment » holds your dive computers, regulators, suits, cylinders and kits, kept on this phone and readable offline. In « Edit dive », « Apply a kit » and « Same as the previous one » fill the equipment (with « Undo »), suits are picked from the inventory, a piece can be added for one dive only, and a dive computer can be renamed. A computer enters the inventory the first time you download from it.",
-      "My diver profile (OpenDives+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the agency, the level and the number can be suggested from the photo.",
       "First launch (public edition): « Sign in » is the first choice, in dark blue with the OpenDives+ chip; « Start a logbook on this phone » and « Import a logbook » follow, then two text buttons, « Try with a sample logbook » and « Discover OpenDives+ ». The choices have 24 dp corners, 24 sp titles on tablet and desktop, and the logo on the band has a thin light ring instead of a shadow. « New logbook » ends with « Create the logbook », the import with « Import the logbook ».",
       "OpenDives server (release edition): « On the OpenDives server » is the first choice of « Open my logbook ». You sign in with your e-mail address and a 6-digit code, no password; the screens tell a wrong code, an expired code, too many attempts (10-minute wait) and a server that does not answer. The logbook is then downloaded.",
       "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",
@@ -2455,7 +2458,8 @@
       "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",
       "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
       "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
-      "Phone, « Your logbook is ready » (OpenDives+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave."
+      "Phone, « Your logbook is ready » (OpenDives+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave.",
+      "My diver profile (OpenDives+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the agency, the level and the number can be suggested from the photo."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -4731,6 +4735,8 @@
       "gearText": "Cylinders, kits, computers.",
       "certifications": "Certifications",
       "certificationsText": "Your cards, always with you.",
+      "maintenance": "Service reminders",
+      "maintenanceText": "Regulator, cylinder, battery: notified 30 days before they are due.",
       "price": "US $14.99",
       "per": "a year",
       "priceDetail": "that is $1.25 a month · Cancel any time",
@@ -4776,6 +4782,18 @@
       "continue": "Continue"
     }
   },
+  "timeLeft": {
+    "seconds": "{n} s left",
+    "minutes": "{n} min left",
+    "secondsSpoken": {
+      "one": "{n} second left",
+      "other": "{n} seconds left"
+    },
+    "minutesSpoken": {
+      "one": "{n} minute left",
+      "other": "{n} minutes left"
+    }
+  },
   "serverCreate": {
     "title": "No logbook on your account",
     "lead": "Your OpenDives+ account is ready, but it holds no logbook yet. Create one, or send a logbook you already have.",
@@ -4806,12 +4824,6 @@
     "progress": {
       "one": "{n} dive of {total}",
       "other": "{n} dives of {total}"
-    },
-    "leftNone": "Working out the time left…",
-    "leftSeconds": "About {n} seconds",
-    "leftMinutes": {
-      "one": "About {n} minute",
-      "other": "About {n} minutes"
     },
     "safe": "The logbook is already saved on this tablet. You can leave the app: the upload resumes when you come back.",
     "safePhone": "The logbook is already saved on this phone. You can leave the app: the upload resumes when you come back.",
@@ -4892,7 +4904,9 @@
         "undersuit": "Undersuits",
         "cylinder": "Cylinders",
         "light": "Lamps",
-        "other": "Other"
+        "other": "Other",
+        "bcd": "BCDs",
+        "weights": "Weight belts"
       },
       "type": {
         "computer": "Dive computer",
@@ -4901,7 +4915,9 @@
         "undersuit": "Undersuit",
         "cylinder": "Cylinder",
         "light": "Lamp",
-        "other": "Other"
+        "other": "Other",
+        "bcd": "BCD",
+        "weights": "Weight belt"
       },
       "dives": {
         "one": "{n} dive",
@@ -4961,14 +4977,25 @@
         "other": "{n} chosen"
       },
       "noPiece": "Choose at least one piece",
-      "hint": "In a dive, “Apply a kit” adds all its pieces, except the computers: those of a dive come from its download.",
+      "hint": "In a dive, “Fill with” adds all the pieces of the kit, except the computers: those of a dive come from its download.",
       "delete": "Delete the kit",
       "deleteTitle": "Delete the kit?",
       "deleteText": "{name} is deleted. The dives that used it keep their pieces.",
       "deleted": "Kit deleted",
       "saved": "Kit saved",
       "noGear": "Add pieces to the inventory first",
-      "pickGear": "Pieces in this kit"
+      "pickGear": "Pieces in this kit",
+      "usedIn": {
+        "one": "Used in {n} dive, the latest on {date}.",
+        "other": "Used in {n} dives, the latest on {date}."
+      },
+      "neverUsed": "Not used in a dive yet.",
+      "more": "More options",
+      "duplicate": "Duplicate the kit",
+      "deleteNote": "Deleting a kit does not change the equipment of dives already filled.",
+      "copyName": "{name} (copy)",
+      "copyNameN": "{name} (copy {n})",
+      "duplicated": "Kit duplicated"
     },
     "piece": {
       "image": "Image of the model",
@@ -5001,7 +5028,7 @@
       "shareText": "{name}\n{type}\n{details}"
     },
     "pieceEdit": {
-      "addTitle": "Add a piece",
+      "addTitle": "New piece",
       "editTitle": "Edit the piece",
       "close": "Close",
       "save": "Save",
@@ -5013,8 +5040,8 @@
       "purchasedOn": "Purchase date",
       "purchasedOnHint": "Year, month, day",
       "dateInvalid": "Enter a real date, as 2021-05-12",
-      "note": "Line under the name",
-      "noteHint": "Shown under the name in the lists",
+      "note": "Notes (optional)",
+      "noteHint": "For example, the main regulator",
       "nameEmpty": "Enter a name",
       "readFromDownload": "The serial number and the firmware are read from the computer at each download.",
       "saved": "Piece saved"
@@ -5034,7 +5061,7 @@
       "kitLine": "{n} pieces · {summary}",
       "manageKits": "Manage the kits",
       "noKits": "No kit yet",
-      "kitMenu": "Kits",
+      "kitMenu": "Fill with a kit",
       "kitApplied": "Kit “{name}” applied",
       "copied": "Equipment of the previous dive copied",
       "renameLabel": "Rename the computer {name}",
@@ -5047,7 +5074,10 @@
       "renamed": "Computer renamed",
       "renameFailed": "The computer could not be renamed",
       "locked": "Read only: the equipment cannot change until you subscribe again.",
-      "kitDetail": "Kit “{name}”"
+      "kitDetail": "Kit “{name}”",
+      "fillWith": "Fill with",
+      "oneKit": "A kit",
+      "previousDive": "Previous dive"
     },
     "addSheet": {
       "title": "Add equipment",
@@ -5062,11 +5092,237 @@
       "confirm": "Add to the dive",
       "empty": "The inventory has no piece to add",
       "noResults": "No piece matches"
+    },
+    "pieceNew": {
+      "typeTitle": "Type of piece",
+      "tile": {
+        "computer": "Computer",
+        "regulator": "Regulator",
+        "suit": "Suit",
+        "undersuit": "Undersuit",
+        "cylinder": "Cylinder",
+        "bcd": "BCD",
+        "light": "Lamp",
+        "weights": "Weight belt",
+        "other": "Other"
+      },
+      "otherName": "Name of the piece",
+      "photoAdd": "Add a photo",
+      "photoChange": "Change the photo",
+      "photoRemove": "Remove the photo",
+      "photoFailed": "The photo could not be read",
+      "serialHint": "Number engraved on the piece",
+      "needName": "Enter a brand, a model or a name"
     }
   },
   "desktopLanguage": {
     "system": "Same as the system",
     "button": "App language: {language}"
+  },
+  "maintenance": {
+    "title": "Service",
+    "entry": "Service",
+    "back": "Back",
+    "figures": {
+      "overdue": "overdue",
+      "soon": "within 60 days",
+      "ok": "up to date"
+    },
+    "sections": {
+      "overdue": "Overdue",
+      "soon": "Soon",
+      "ok": "Up to date"
+    },
+    "tag": {
+      "lateDays": {
+        "one": "{n} day overdue",
+        "other": "{n} days overdue"
+      },
+      "lateDives": {
+        "one": "{n} dive overdue",
+        "other": "{n} dives overdue"
+      },
+      "dueNow": "Due now",
+      "today": "Today",
+      "inDays": {
+        "one": "In {n} day",
+        "other": "In {n} days"
+      },
+      "inMonths": {
+        "one": "In {n} month",
+        "other": "In {n} months"
+      },
+      "inDives": {
+        "one": "In about {n} dive",
+        "other": "In about {n} dives"
+      }
+    },
+    "line": {
+      "overdueOn": "Due on {date}",
+      "overdueDives": "The {n} dives are reached",
+      "on": "On {date}",
+      "onOrDives": {
+        "one": "On {date}, or in {n} dive",
+        "other": "On {date}, or in {n} dives"
+      },
+      "divesLeft": {
+        "one": "{n} dive left",
+        "other": "{n} dives left"
+      }
+    },
+    "listNote": "A notification warns you before each due date, then on the day.",
+    "emptyTitle": "No reminder",
+    "emptyText": "Add a reminder from the page of a piece: regulator, cylinder, computer…",
+    "cardLine": {
+      "overdue": {
+        "one": "{n} overdue",
+        "other": "{n} overdue"
+      },
+      "soon": {
+        "one": "{n} soon",
+        "other": "{n} soon"
+      },
+      "allGood": "Everything is up to date",
+      "none": "No reminder"
+    },
+    "badge": {
+      "one": "{n} overdue reminder",
+      "other": "{n} overdue reminders"
+    },
+    "piece": {
+      "title": "Service",
+      "cardTitle": "Service",
+      "note": "Note a service",
+      "editRule": "Edit the reminder",
+      "add": "Add",
+      "none": "No reminder",
+      "history": "History",
+      "historyEmpty": "No entry yet",
+      "countNote": "The dives counted are those where this piece is in the equipment.",
+      "dives": {
+        "one": "{done} dive out of {total}",
+        "other": "{done} dives out of {total}"
+      },
+      "due": "Due: {date}",
+      "openAria": "Service of {name}",
+      "openLine": "{rule}",
+      "noRuleLine": "No reminder",
+      "by": "by {who}",
+      "byYou": "by you"
+    },
+    "rule": {
+      "every": {
+        "years": {
+          "one": "Every year",
+          "other": "Every {n} years"
+        },
+        "months": {
+          "one": "Every month",
+          "other": "Every {n} months"
+        },
+        "dives": {
+          "one": "Every dive",
+          "other": "Every {n} dives"
+        },
+        "or": "{time} or {dives}"
+      }
+    },
+    "task": {
+      "service": "Service",
+      "inspection": "Visual inspection",
+      "hydrostatic": "Hydrostatic test",
+      "battery": "Battery",
+      "seals": "Seals and zipper",
+      "travelCheck": "Pre-trip check"
+    },
+    "kind": {
+      "service": "Service",
+      "inspection": "Inspection",
+      "other": "Other"
+    },
+    "kindHelp": {
+      "service": "Service: full teardown by a technician, wear parts changed and adjusted.",
+      "inspection": "Inspection: a check of the condition and the operation, with no part changed.",
+      "other": "Other: any work that is neither a service nor an inspection, such as cleaning or a repair."
+    },
+    "note": {
+      "title": "Note a service",
+      "close": "Close",
+      "save": "Save",
+      "type": "Type",
+      "date": "Date",
+      "dateHint": "Year, month, day",
+      "dateInvalid": "Enter a real date, like 2026-11-17",
+      "doneBy": "Done by",
+      "doneByHint": "A dive centre or yourself",
+      "cost": "Cost (optional)",
+      "costInvalid": "Enter an amount, like 190 or 190.50",
+      "notes": "Notes (optional)",
+      "invoiceAdd": "Add a photo of the invoice",
+      "invoiceChange": "Change the photo of the invoice",
+      "invoiceRemove": "Remove the photo",
+      "invoiceAlt": "Photo of the invoice",
+      "nextBoth": "Next service: {date}, or after {n} dives.",
+      "nextDate": "Next service: {date}.",
+      "nextDives": "Next service: after {n} dives.",
+      "nextNone": "No reminder is set for this piece.",
+      "saved": "Service noted",
+      "failed": "The service could not be saved"
+    },
+    "ruleSheet": {
+      "title": "Service reminder",
+      "lead": "{name} · choose a criterion, or both.",
+      "time": "After a time",
+      "timeHelp": "Since the last service",
+      "dives": "By dives",
+      "divesHelp": "The dives where the piece is in the equipment",
+      "both": "With both, the first one reached triggers the reminder.",
+      "years": "years",
+      "months": "months",
+      "divesUnit": "dives",
+      "unit": "Unit of the time",
+      "more": "Increase",
+      "less": "Decrease",
+      "value": "Value",
+      "notify": "Warn me before",
+      "days": "{n} days",
+      "warn": "Warn in a dive",
+      "warnHelp": "When the piece is overdue for service",
+      "remove": "Remove the reminder",
+      "cancel": "Cancel",
+      "save": "Save",
+      "none": "Choose at least one criterion",
+      "range": "Enter a whole number above 0",
+      "saved": "Reminder saved",
+      "removed": "Reminder removed",
+      "failed": "The reminder could not be saved"
+    },
+    "reminderCard": {
+      "title": "Service reminder",
+      "suggest": {
+        "computer": "Suggested for a computer: {rule}",
+        "regulator": "Suggested for a regulator: {rule}",
+        "suit": "Suggested for a suit: {rule}",
+        "cylinder": "Suggested for a cylinder: {rule}",
+        "bcd": "Suggested for a BCD: {rule}"
+      },
+      "noSuggestion": "No reminder suggested for this type of piece",
+      "add": "Add",
+      "edit": "Edit"
+    },
+    "diveWarning": "{what}: service overdue",
+    "diveWarningTitle": "Service overdue",
+    "notify": {
+      "leadTitle": "Service coming up",
+      "dueTitle": "Service due today",
+      "leadBody": "{what}: due in {n} days.",
+      "dueBody": "{what}: due today.",
+      "denied": "Notifications are turned off for OpenDives: the reminder stays in the app."
+    },
+    "channel": {
+      "name": "Equipment service",
+      "description": "Warns before the date of a service, and on the day"
+    }
   },
   "diverProfile": {
     "info": {

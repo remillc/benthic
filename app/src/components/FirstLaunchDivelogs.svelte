@@ -10,6 +10,7 @@
   import ReleaseField from './ReleaseField.svelte';
   import Icon from './Icon.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
+  import ProgressLine from './ProgressLine.svelte';
   import { flow, go, goBack } from '../lib/first-launch.svelte.js';
   import { canResume, checkDivelogs, discardParts, downloadDivelogs, downloadDivelogsResumable, failureKind } from '../lib/first-launch-import.js';
   import { errorCode } from '../lib/account.js';
@@ -148,7 +149,7 @@
         </span>
         <span class="od-first-launch-divelogs--text">
           <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-current">{t('welcomeSteps.progressDownload')}</span>
-          <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.progressCount', { done: d.done, total: d.total })}</span>
+          <span class="od-first-launch-divelogs--detail"><ProgressLine done={d.done} total={d.total} count={t('welcomeSteps.progressCount', { done: d.done, total: d.total })} /></span>
         </span>
       </div>
       <div class="od-first-launch-divelogs--bar">
@@ -265,6 +266,8 @@
 
     .od-first-launch-divelogs--text {
       display: flex;
+      flex: 1;
+      min-width: 0;
       flex-direction: column;
       gap: 2px;
       padding-top: 4px;

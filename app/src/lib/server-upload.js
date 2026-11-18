@@ -59,19 +59,6 @@ export function pendingUpload(store, repositoryUrl) {
 }
 
 /**
- * Time left of an upload, from what it did since this run started.
- * @param {{ done: number, total: number, startedDone: number, elapsedMs: number }} p
- * @returns {{ unit: 'seconds'|'minutes'|'none', n: number }} `none` until a few dives were sent
- */
-export function timeLeft({ done, total, startedDone, elapsedMs }) {
-  const sent = done - startedDone;
-  if (sent < 1 || elapsedMs < 1000 || total <= done) return { unit: 'none', n: 0 };
-  const seconds = ((total - done) * elapsedMs) / sent / 1000;
-  if (seconds < 45) return { unit: 'seconds', n: Math.max(5, Math.round(seconds / 5) * 5) };
-  return { unit: 'minutes', n: Math.max(1, Math.round(seconds / 60)) };
-}
-
-/**
  * @typedef {Object} UploadSource where the dives are read from (the core, through the plugin)
  * @property {() => Promise<{ id: number, date: string, site: string, number: number, durationSeconds: number, maxDepthMm: number, trip: { id: number, location: string, autogen: boolean }|null }[]>} list
  * @property {(id: number) => Promise<import('opendives-core').DiveDetail>} detail

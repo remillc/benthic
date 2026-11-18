@@ -9,11 +9,12 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from './Icon.svelte';
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
+  import ProgressLine from './ProgressLine.svelte';
   import ReleaseField from './ReleaseField.svelte';
   import { flow, go, goBackTo, goReplace } from '../lib/first-launch.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { serverTransport } from '../lib/server-transport.js';
-  import { UPLOAD_KEY, UploadError, timeLeft, uploadLogbook } from '../lib/server-upload.js';
+  import { UPLOAD_KEY, UploadError, uploadLogbook } from '../lib/server-upload.js';
   import { coreSource, emptySource } from '../lib/server-upload-source.js';
   import { createChoices } from '../lib/server-create.js';
   import { readImportFile } from '../lib/release-welcome.js';
@@ -155,22 +156,14 @@
 
   // --- « Envoi du carnet » -------------------------------------------------------------------------------
 
-  let startedAt = 0;
-  let startedDone = -1;
-
   /** @param {number} done @param {number} total */
   function progress(done, total) {
-    if (startedDone < 0) startedDone = done;
     c.done = done;
     c.total = total;
-    c.left = timeLeft({ done, total, startedDone, elapsedMs: Date.now() - startedAt });
   }
 
   async function send() {
     cancelled = false;
-    startedAt = Date.now();
-    startedDone = -1;
-    c.left = { unit: 'none', n: 0 };
     logbook.welcomeHold = true;
     try {
       const access = await OpenDivesCore.serverSessionAccess();
@@ -260,13 +253,6 @@
     if (action) action();
   }
 
-  const leftText = $derived(
-    c.left.unit === 'seconds'
-      ? t('serverCreate.leftSeconds', { n: c.left.n })
-      : c.left.unit === 'minutes'
-        ? t('serverCreate.leftMinutes', { n: c.left.n })
-        : t('serverCreate.leftNone'),
-  );
   const ratio = $derived(c.total ? Math.min(1, c.done / c.total) : 0);
 </script>
 
@@ -298,8 +284,11 @@
     <span class="od-server-create--bar-fill" style:width="{ratio * 100}%"></span>
   </div>
   <div class="od-server-create--counts">
-    <span class="od-server-create--count">{reading ? t('serverCreate.reading') : t('serverCreate.progress', { n: c.done, total: c.total })}</span>
-    <span class="od-server-create--left" aria-live="off">{reading ? '' : leftText}</span>
+    {#if reading}
+      <span class="od-server-create--count">{t('serverCreate.reading')}</span>
+    {:else}
+      <ProgressLine done={c.done} total={c.total} count={t('serverCreate.progress', { n: c.done, total: c.total })} />
+    {/if}
   </div>
   <p class="od-server-create--note">
     <Icon name={desktopApp ? 'desktop' : layout.phone ? 'phone' : 'tablet'} size={20} />
@@ -420,11 +409,6 @@
       margin: 8px 0 0;
       font-size: 14px;
       color: var(--od-text-2);
-    }
-
-    .od-server-create--left {
-      color: var(--od-text-2);
-      text-align: end;
     }
 
     .od-server-create--note {

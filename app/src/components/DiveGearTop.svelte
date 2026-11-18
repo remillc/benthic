@@ -9,7 +9,9 @@
   import SelectField from './SelectField.svelte';
   import ComboField from './ComboField.svelte';
   import Icon from './Icon.svelte';
-  import { gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
+  import { gear, gearMap, visibleGear, evaluations } from '../lib/inventory.svelte.js';
+  import { diveWarnings } from '../lib/maintenance.js';
+  import { taskInline } from '../lib/maintenance-text.js';
   import { applyKit, copyEquipment, cloneEquipment, kitSummary, equipmentIsEmpty } from '../lib/inventory.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -30,6 +32,9 @@
    * suitOptions: the suits of the logbook, for the free text; diveDate: this dive's start, to find the previous one.
    */
   let { equipment = $bindable(), suitText = $bindable(), suitOptions, diveDate } = $props();
+
+  /** The overdue services of the pieces this dive uses, for the reminders that ask to warn. */
+  const warnings = $derived(diveWarnings(equipment, evaluations()));
 
   const NONE = '';
   const TEXT = '__text__';
@@ -126,13 +131,16 @@
   }
 </script>
 
-<div class="od-dive-gear--buttons">
-  <button type="button" class="od-dive-gear--tonal" disabled={gear.readOnly} onclick={kitMenu} aria-haspopup="menu">
-    <Icon name="briefcase" size={20} />{t('gear.diveGear.applyKit')}
-  </button>
-  <button type="button" class="od-dive-gear--tonal" disabled={gear.readOnly} onclick={likePrevious}>
-    <Icon name="copy" size={20} />{t('gear.diveGear.likePrevious')}
-  </button>
+<div class="od-dive-gear--fill">
+  <span class="od-dive-gear--fill-label" id="od-fill-with">{t('gear.diveGear.fillWith')}</span>
+  <div class="od-dive-gear--group" role="group" aria-labelledby="od-fill-with">
+    <button type="button" class="od-dive-gear--segment" disabled={gear.readOnly} onclick={kitMenu} aria-haspopup="menu">
+      <Icon name="briefcase" size={20} />{t('gear.diveGear.oneKit')}<Icon name="expand" size={18} />
+    </button>
+    <button type="button" class="od-dive-gear--segment" disabled={gear.readOnly} onclick={likePrevious}>
+      <Icon name="copy" size={20} />{t('gear.diveGear.previousDive')}
+    </button>
+  </div>
 </div>
 
 {#if suits.length || equipment.suitGearId}
@@ -143,25 +151,69 @@
 {#if undersuits.length || equipment.undersuitGearId}
   <SelectField label={t('gear.diveGear.undersuit')} value={equipment.undersuitGearId} options={undersuitChoices} onchange={chooseUndersuit} disabled={gear.readOnly} />
 {/if}
+{#if warnings.length}
+  <ul class="od-dive-gear--warnings" aria-label={t('maintenance.diveWarningTitle')}>
+    {#each warnings as w (w.item.id)}
+      <li><Icon name="warning" size={20} /><span>{t('maintenance.diveWarning', { what: `${gear.pieces.find((g) => g.id === w.item.gearId)?.name ?? ''} · ${taskInline(w.item)}` })}</span></li>
+    {/each}
+  </ul>
+{/if}
 
 <style>
   @layer od.components {
-    .od-dive-gear--buttons {
+    .od-dive-gear--warnings {
+      margin: 8px 16px 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        padding: 8px 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--od-alarm);
+        background: var(--od-alarm-tint);
+      }
+
+      li + li {
+        margin-top: 4px;
+      }
+    }
+
+    .od-dive-gear--fill {
       margin: 4px 16px 8px;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      align-items: center;
+      gap: 8px 12px;
     }
 
-    .od-dive-gear--tonal {
+    .od-dive-gear--fill-label {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--od-text-2);
+    }
+
+    /* Connected button group (Material 3 Expressive): 2 dp between the buttons, outer ends fully rounded, inner corners 8 dp. */
+    .od-dive-gear--group {
+      display: flex;
+      gap: 2px;
+      max-width: 100%;
+    }
+
+    .od-dive-gear--segment {
       flex: none;
       width: auto;
-      max-width: 100%;
+      min-width: 0;
       box-sizing: border-box;
       height: 40px;
       padding: 0 16px 0 12px;
       border: none;
-      border-radius: 20px;
+      border-radius: 8px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -172,7 +224,15 @@
       font-weight: 500;
     }
 
-    .od-dive-gear--tonal:disabled {
+    .od-dive-gear--segment:first-child {
+      border-radius: 20px 8px 8px 20px;
+    }
+
+    .od-dive-gear--segment:last-child {
+      border-radius: 8px 20px 20px 8px;
+    }
+
+    .od-dive-gear--segment:disabled {
       opacity: 0.38;
     }
   }

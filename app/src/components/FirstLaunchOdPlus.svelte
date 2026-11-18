@@ -145,6 +145,13 @@
         </div>
       {/each}
     </div>
+    <div class="od-plus--card od-plus--card-maintenance od-plus--card-wide">
+      <span class="od-plus--card-icon"><Icon name="bell" size={24} weight={1.9} /></span>
+      <span class="od-plus--card-body">
+        <span class="od-plus--card-title">{t('odplus.offer.maintenance')}</span>
+        <span class="od-plus--card-text">{t('odplus.offer.maintenanceText')}</span>
+      </span>
+    </div>
     <div class="od-plus--price">
       <span class="od-plus--price-amount">{t('odplus.offer.price')} <span class="od-plus--price-per">{t('odplus.offer.per')}</span></span>
       <span class="od-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
@@ -554,6 +561,29 @@
     .od-plus--card-violet {
       background: var(--od-plus-violet);
       --od-plus-tone: var(--od-plus-violet-icon);
+    }
+
+    .od-plus--card-maintenance {
+      background: var(--od-maintenance);
+      --od-plus-tone: var(--od-maintenance-icon);
+    }
+
+    /* Full width under the four tiles: the icon beside the two lines. */
+    .od-plus--card-wide {
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+
+      .od-plus--card-icon {
+        flex: none;
+      }
+    }
+
+    .od-plus--card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .od-plus--card-icon,

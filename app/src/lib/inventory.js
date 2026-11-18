@@ -12,7 +12,12 @@
 // Everything is read and written through a FileStore (lib/file-store.js). An unknown field of a file is kept: a
 // file is read as an object, the keys the app owns are changed, and the object is written back.
 
+import { ruleProblems } from './maintenance.js';
+
 /** @typedef {import('./file-store.js').FileStore} FileStore */
+/** @typedef {import('./maintenance.js').MaintenanceItem} MaintenanceItem */
+/** @typedef {import('./maintenance.js').HistoryEntry} HistoryEntry */
+/** @typedef {import('./maintenance.js').Task} Task */
 
 /**
  * One piece of the inventory.
@@ -32,23 +37,24 @@
  * @property {string} [computerSerial]
  * @property {string} [purchasedOn] YYYY-MM-DD
  * @property {string} [note] the line under the name
+ * @property {string} [photoId] a file of media/: the piece's photo
  * @property {string[]} [tags]
  * @property {boolean} retired archived: hidden unless asked for
  */
 
-/** @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'light'|'other'} GearType */
+/** @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'other'} GearType */
 
 /** The types, in the order of the type menu. @type {GearType[]} */
-export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other'];
+export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other'];
 
 /** The groups of the inventory page and of the kit editor. @type {('computer'|'regulator'|'suit'|'cylinder'|'other')[]} */
 export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];
 
 /** The groups of the « Ajouter de l'équipement » sheet: one per type, no computers (a dive's computers come from its data). @type {GearType[]} */
-export const PICKER_GROUPS = ['regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other'];
+export const PICKER_GROUPS = ['regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other'];
 
 /** @param {GearType} type @returns {typeof GROUPS[number]} */
-export const groupOfType = (type) => (type === 'undersuit' ? 'suit' : type === 'light' ? 'other' : type);
+export const groupOfType = (type) => (type === 'undersuit' ? 'suit' : type === 'light' || type === 'bcd' || type === 'weights' ? 'other' : type);
 
 /** Days the inventory stays readable after a subscription ends. */
 export const READ_ONLY_DAYS = 30;
@@ -196,6 +202,23 @@ export function gearProblems(fields) {
 }
 
 /**
+ * Whether the fields of « Noter un entretien » are acceptable, for live validation. The cost is a number, typed with a
+ * point or a comma.
+ * @param {{ doneOn: string, cost: string }} fields
+ * @returns {{ doneOn?: 'date', cost?: 'number' }}
+ */
+export function entryProblems(fields) {
+  /** @type {{ doneOn?: 'date', cost?: 'number' }} */
+  const out = {};
+  const d = fields.doneOn.trim();
+  const real = /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(`${d}T00:00:00Z`)) && new Date(`${d}T00:00:00Z`).toISOString().startsWith(d);
+  if (!real) out.doneOn = 'date';
+  const c = fields.cost.trim().replace(',', '.');
+  if (c && !(/^\d+(\.\d{1,2})?$/.test(c))) out.cost = 'number';
+  return out;
+}
+
+/**
  * Whether a kit's fields are acceptable.
  * @param {{ name: string, gearIds: string[] }} fields
  * @param {{ id: string, name: string }[]} others the other kits
@@ -209,6 +232,39 @@ export function kitProblems(fields, others) {
   else if (others.some((k) => k.name.trim().toLocaleLowerCase() === name.toLocaleLowerCase())) out.name = 'taken';
   if (!fields.gearIds.length) out.gearIds = 'none';
   return out;
+}
+
+/**
+ * A name for a copy of a kit that no other kit has: « Eau froide (copie) », then « Eau froide (copie 2) ».
+ * @param {string} base the name with the word « copie » already applied: `copy(n)` gives the text for copy n
+ * @param {string[]} taken the names in use
+ * @param {(n: number) => string} copy
+ */
+export function uniqueKitName(base, taken, copy) {
+  const used = new Set(taken.map((n) => n.trim().toLocaleLowerCase()));
+  let n = 1;
+  let name = copy(n);
+  while (used.has(name.trim().toLocaleLowerCase())) name = copy(++n);
+  return name || base;
+}
+
+/**
+ * What a kit was used for: the dives whose record names it as the last kit applied, and the latest of them.
+ * @param {string} kitId
+ * @param {{ kitId?: string, diveKey?: { start: string } }[]} records
+ * @param {{ date: string }[]} dives the logbook's rows (a record whose dive is gone is not counted)
+ * @returns {{ dives: number, last: string }} `last`: the start of the latest dive, or ''
+ */
+export function kitUse(kitId, records, dives) {
+  const keys = new Set(records.filter((r) => r.kitId === kitId && r.diveKey).map((r) => /** @type {{ start: string }} */ (r.diveKey).start));
+  let n = 0;
+  let last = '';
+  for (const d of dives) {
+    if (!keys.has(diveKeyOf(d))) continue;
+    n++;
+    if (d.date > last) last = d.date;
+  }
+  return { dives: n, last };
 }
 
 /**
@@ -411,7 +467,17 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
           },
         ]);
       }
-      await commit(writes, [`gear/${gearId}.json`]);
+      // Its reminders and photos go with it.
+      /** @type {string[]} */
+      const removes = [`gear/${gearId}.json`];
+      const piece = await store.read(`gear/${gearId}.json`);
+      if (piece?.photoId) removes.push(`media/${piece.photoId}.json`);
+      for (const m of await store.readAll('maintenance/')) {
+        if (m.gearId !== gearId) continue;
+        removes.push(`maintenance/${m.id}.json`);
+        for (const h of m.history ?? []) if (h.invoicePhotoId) removes.push(`media/${h.invoicePhotoId}.json`);
+      }
+      await commit(writes, removes);
     },
 
     /**
@@ -480,6 +546,92 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
         if (rec.kitId === kitId) writes.push([`dive-equipment/${rec.id}.json`, { ...rec, kitId: '', updatedAt: stamp() }]);
       }
       await commit(writes, [`kits/${kitId}.json`]);
+    },
+
+    /** A copy of a kit under a new name. @param {string} kitId @param {string} name */
+    async duplicateKit(kitId, name) {
+      const kit = await store.read(`kits/${kitId}.json`);
+      if (!kit) throw new Error('KIT_NOT_FOUND');
+      return this.saveKit({ name, gearIds: kit.gearIds ?? [] });
+    },
+
+    /** @returns {Promise<MaintenanceItem[]>} */
+    async listMaintenance() {
+      return store.readAll('maintenance/');
+    },
+
+    /**
+     * Creates a reminder (no `id`) or changes one: the keys given replace those of the file, the others (the history
+     * included) stay.
+     * @param {{ id?: string, gearId: string, task: Task, label?: string, intervalMonths: number|null, intervalDives: number|null, startOn?: string, notifyDays?: 7|30|60, warnInDive?: boolean }} fields
+     * @returns {Promise<MaintenanceItem>}
+     */
+    async saveMaintenance(fields) {
+      const problems = ruleProblems({ months: fields.intervalMonths, dives: fields.intervalDives });
+      if (problems.months || problems.dives || problems.criteria) throw new Error(`INVALID_RULE:${Object.keys(problems).join(',')}`);
+      const existing = fields.id ? await store.read(`maintenance/${fields.id}.json`) : null;
+      /** @type {MaintenanceItem} */
+      const item = {
+        ...(existing ?? { format: 1, createdAt: stamp(), startOn: fields.startOn ?? stamp().slice(0, 10), notifyDays: 30, warnInDive: true, history: [] }),
+        ...fields,
+        id: existing?.id ?? id(),
+        updatedAt: stamp(),
+      };
+      if (item.task !== 'custom') delete item.label;
+      else item.label = (item.label ?? '').trim();
+      await commit([[`maintenance/${item.id}.json`, item]]);
+      return item;
+    },
+
+    /**
+     * « Retirer le rappel »: the rule goes, the history stays; a reminder without any history is deleted.
+     * @param {string} itemId
+     */
+    async removeRule(itemId) {
+      const item = await store.read(`maintenance/${itemId}.json`);
+      if (!item) return;
+      if (!item.history?.length) await commit([], [`maintenance/${itemId}.json`]);
+      else await commit([[`maintenance/${itemId}.json`, { ...item, intervalMonths: null, intervalDives: null, updatedAt: stamp() }]]);
+    },
+
+    /**
+     * « Noter un entretien »: adds an entry to the history of a reminder (found by `id`, else by piece and task, else
+     * created without a rule) and moves the last service to the latest date of the history.
+     * @param {{ id?: string, gearId: string, task: Task, label?: string }} target
+     * @param {{ kind: HistoryEntry['kind'], doneOn: string, doneBy?: string, cost?: number|null, notes?: string, invoicePhotoId?: string }} entry
+     * @returns {Promise<MaintenanceItem>}
+     */
+    async noteMaintenance(target, entry) {
+      const problems = entryProblems({ doneOn: entry.doneOn, cost: entry.cost == null ? '' : String(entry.cost) });
+      if (problems.doneOn || problems.cost) throw new Error(`INVALID_ENTRY:${Object.keys(problems).join(',')}`);
+      const all = await store.readAll('maintenance/');
+      let item = target.id ? all.find((m) => m.id === target.id) : all.find((m) => m.gearId === target.gearId && m.task === target.task && (target.task !== 'custom' || m.label === target.label));
+      if (!item) {
+        item = { format: 1, createdAt: stamp(), id: id(), gearId: target.gearId, task: target.task, intervalMonths: null, intervalDives: null, startOn: stamp().slice(0, 10), notifyDays: 30, warnInDive: true, history: [] };
+        if (target.task === 'custom') item.label = target.label ?? '';
+      }
+      /** @type {HistoryEntry} */
+      const row = { id: id(), kind: entry.kind, doneOn: entry.doneOn };
+      if (entry.doneBy?.trim()) row.doneBy = entry.doneBy.trim();
+      if (entry.cost != null) row.cost = entry.cost;
+      if (entry.notes?.trim()) row.notes = entry.notes.trim();
+      if (entry.invoicePhotoId) row.invoicePhotoId = entry.invoicePhotoId;
+      const history = [...(item.history ?? []), row].sort((a, b) => (a.doneOn < b.doneOn ? 1 : a.doneOn > b.doneOn ? -1 : 0));
+      const next = { ...item, history, lastDoneOn: history[0].doneOn, updatedAt: stamp() };
+      await commit([[`maintenance/${next.id}.json`, next]]);
+      return next;
+    },
+
+    /** A photo (a piece's, an invoice's) as a data URL, in its own file. @param {string} dataUrl @returns {Promise<string>} its id */
+    async savePhoto(dataUrl) {
+      const photoId = id();
+      await commit([[`media/${photoId}.json`, { format: 1, id: photoId, createdAt: stamp(), dataUrl }]]);
+      return photoId;
+    },
+
+    /** @param {string} photoId @returns {Promise<string>} the data URL, '' when the file is gone */
+    async readPhoto(photoId) {
+      return (await store.read(`media/${photoId}.json`))?.dataUrl ?? '';
     },
 
     /** @returns {Promise<(DiveEquipment & { id: string, diveKey: { start: string } })[]>} */
