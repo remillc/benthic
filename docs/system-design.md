@@ -59,6 +59,8 @@ The theme is **black and white**: a neutral light background, actions without a 
 | `--od-alarm` | #C62828 (5.1:1) | #FF8A80 (8.1:1) | #8E1010 / #FFC0B8 | Ceiling violated, fast ascent, insufficient gas reserve, errors; never anywhere else |
 | `--od-oxygen` | #2E7D32 (4.7:1) | #7FD283 | #1B5E20 / #B2EBB4 | ppO2 curve, nitrox and oxygen mixes |
 | `--od-pending` | #8A4B00 (6.2:1) | #F2B84B (10.4:1) | #5C3100 / #FFD98A | "Offline, waiting to be sent" state; text only, always with an icon |
+| `--od-maintenance` | #F6E3E0 | #4A2723 | unchanged | Background of the equipment-maintenance tiles and badges (decided on 18 November 2026; dark pair approved by Christian the same day) |
+| `--od-maintenance-icon` | #8A2A1F | #F0A59B | unchanged | Icon and text on `--od-maintenance` |
 
 **Colour roles (decided on 9 November 2026).** Besides the water of the dive data, the interface has four MD3 colour roles, each with a colour, an on-colour, a container and an on-container. Each becomes a `--od-*` token and the matching Framework7/MD3 variable.
 
