@@ -33,6 +33,16 @@
   const signedIn = $derived(!!logbook.email);
   /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
   const git = $derived(logbook.mode === 'git');
+  /** The git repository is the OpenDives server account's (release edition): named « Serveur OpenDives », not edited. */
+  const server = $derived(git && logbook.odplus);
+  let serverEmail = $state('');
+  $effect(() => {
+    if (!server) return;
+    OpenDivesCore.serverSessionInfo().then(
+      (info) => (serverEmail = info.email),
+      (e) => console.error('Reading the OpenDives session', e),
+    );
+  });
 
   /** Branch of the connected repository (never its token). */
   let gitBranch = $state('');
@@ -88,7 +98,7 @@
   function confirmSignOut(e) {
     e?.preventDefault();
     const pending = logbook.pending;
-    const text = pending ? t(git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(git ? 'signOut.textNoneGit' : 'signOut.textNone');
+    const text = pending ? t(server ? 'signOut.textPendingServer' : git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(server ? 'signOut.textNoneServer' : git ? 'signOut.textNoneGit' : 'signOut.textNone');
     // Android, cloud (task 2026-11-14-165; compte-android-deconnexion.dc.html): the waiting changes
     // in a box of the pending family (od-sign-out-dialog--pending), in place of the sentence.
     const box = pending && !git && !ios;
@@ -116,7 +126,7 @@
           { text: t('signOut.cancel') },
           { text: t('signOut.confirm'), bold: true, onClick: (/** @type {any} */ dialog) => runSignOut(deleteCopy(dialog)) },
         ];
-    const title = escape(t(git ? 'signOut.titleGit' : 'signOut.title'));
+    const title = escape(t(server ? 'signOut.titleServer' : git ? 'signOut.titleGit' : 'signOut.title'));
     // Android: the Material 3 dialog with icon, the sign-out icon centred over a centred title; iOS keeps its alert.
     const heroTitle = ios ? title : `<svg class="od-sign-out-dialog--icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${LOGOUT}"/></svg><span>${title}</span>`;
     f7.dialog.create({ title: heroTitle, content, buttons, verticalButtons: pending > 0, cssClass: `od-account--signout${ios ? '' : ' od-sign-out-dialog'}` }).open();
@@ -166,11 +176,17 @@
 
   <!-- Android: the band and its wave stay at the top while the page scrolls, as on Statistics and Tools. -->
   {#if !theme.ios}<BandBackdrop short />{/if}
-  <SectionBand bare={!theme.ios} summary={t(signedIn ? (git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />
+  <SectionBand bare={!theme.ios} summary={t(signedIn ? (server ? 'account.bandServer' : git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />
 
   {#if signedIn}
     <div class="od-account--identity">
-      {#if git}
+      {#if server}
+        <span class="od-account--avatar"><Icon name="cloud" size={28} /></span>
+        <span class="od-account--text">
+          <span class="od-account--name">{t('account.serverName')}</span>
+          <span class="od-account--status">{serverEmail}</span>
+        </span>
+      {:else if git}
         <span class="od-account--avatar"><Icon name="git" size={28} /></span>
         <span class="od-account--text">
           <span class="od-account--name">{gitName}</span>
@@ -225,7 +241,7 @@
         <li>
           <div class="item-content">
             <div class="item-inner">
-              <div class="item-title">{t(git ? 'account.gitDives' : 'account.cloudDives')}</div>
+              <div class="item-title">{t(server ? 'account.serverDives' : git ? 'account.gitDives' : 'account.cloudDives')}</div>
               <div class="item-after od-value">{formatNumber(count)}</div>
             </div>
           </div>
@@ -248,7 +264,9 @@
       </ul>
     </div>
 
-    {#if git}
+    {#if server}
+      <!-- The OpenDives server: the repository is the account's, there is nothing to edit here. -->
+    {:else if git}
       <div class="block-title">{t('account.gitGroup')}</div>
       <div class="list list-strong inset list-dividers">
         <ul>
@@ -286,8 +304,8 @@
       <!-- The git repository: signing out only (there is no account to delete); under the group,
            apart from it (tasks 2026-11-14-132 and 133). -->
       <div class="od-account--leave od-account--sign-out">
-        <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t('account.gitSignOut')}</button>
-        <span class="od-account--consequence">{t('account.gitSignOutText')}</span>
+        <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(server ? 'account.serverSignOut' : 'account.gitSignOut')}</button>
+        <span class="od-account--consequence">{t(server ? 'account.serverSignOutText' : 'account.gitSignOutText')}</span>
       </div>
     {:else}
       <!-- « Quitter le cloud » (task 2026-11-14-164): both ways out side by side, so that they are

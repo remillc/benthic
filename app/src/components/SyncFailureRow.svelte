@@ -6,7 +6,7 @@
   // closes the menu and reopens the conflict dialog (spec, "Sync conflict dialog").
   import Icon from './Icon.svelte';
   import SyncPill from './SyncPill.svelte';
-  import { logbook, reopenConflict } from '../lib/logbook.svelte.js';
+  import { logbook, reopenConflict, syncFlavour } from '../lib/logbook.svelte.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { closeMenu } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -29,7 +29,7 @@
       return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
     }
     if (logbook.syncFailure !== 'server') return t(`sync.failure.${logbook.syncFailure}.row`);
-    const git = logbook.mode === 'git' ? 'Git' : '';
+    const git = syncFlavour();
     return logbook.retryMinutes ? t(`sync.failure.server.row${git}`, { n: logbook.retryMinutes }) : t(`sync.failure.server.rowManual${git}`);
   });
 </script>

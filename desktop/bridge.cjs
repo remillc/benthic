@@ -629,7 +629,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   /**
    * The folder of a git working copy: the page names it (`dir`, relative), the bridge makes it absolute under
-   * <userData>/odgit, the same folder the page's file backend writes to (desktop/odgit-fs.cjs).
+   * <userData>/odgit.
    */
   function odgitDir(name) {
     if (typeof name !== 'string' || !name || name.includes('\0') || name.includes('\\') || path.isAbsolute(name)) throw new Error('BAD_PATH');

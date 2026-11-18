@@ -20,6 +20,7 @@
   const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(logbook.email || t('menu.noAccount'));
   const git = $derived(logbook.mode === 'git');
+  const server = $derived(git && logbook.odplus);
 
   /** @type {HTMLElement|undefined} */
   let sheet = $state();
@@ -64,8 +65,8 @@
   function confirmSignOut() {
     const pending = logbook.pending;
     confirmAction({
-      title: t(git ? 'signOut.titleGit' : 'signOut.title'),
-      text: pending ? t(git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(git ? 'signOut.textNoneGit' : 'signOut.textNone'),
+      title: t(server ? 'signOut.titleServer' : git ? 'signOut.titleGit' : 'signOut.title'),
+      text: pending ? t(server ? 'signOut.textPendingServer' : git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(server ? 'signOut.textNoneServer' : git ? 'signOut.textNoneGit' : 'signOut.textNone'),
       action: t('signOut.confirm'),
       onConfirm: async () => {
         try {

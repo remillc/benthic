@@ -152,7 +152,8 @@
     },
     "emptyLocal": "On this phone only, no dives",
     "emptyLocalTablet": "On this tablet only, no dives",
-    "emptyLocalDesktop": "On this computer only, no dives"
+    "emptyLocalDesktop": "On this computer only, no dives",
+    "emptyServer": "Connected to the OpenDives server, no dives"
   },
   "sync": {
     "failure": {
@@ -183,7 +184,11 @@
         "rowGit": "The git repository is not answering: trying again in {n} min",
         "rowManualGit": "The git repository is not answering",
         "titleGit": "The git repository is not answering",
-        "introGit": "The network works, but the repository server is not answering. It may be under maintenance."
+        "introGit": "The network works, but the repository server is not answering. It may be under maintenance.",
+        "rowServer": "The OpenDives server is not answering: trying again in {n} min",
+        "rowManualServer": "The OpenDives server is not answering",
+        "titleServer": "The OpenDives server is not answering",
+        "introServer": "The network works, but the OpenDives server is not answering. It may be under maintenance."
       },
       "repository": {
         "row": "Can’t sync: git repository refused",
@@ -199,7 +204,8 @@
       "merge": "Merging changes…",
       "send": "Sending changes…",
       "read": "Reading the logbook…",
-      "connectGit": "Connecting to the repository…"
+      "connectGit": "Connecting to the repository…",
+      "connectServer": "Connecting to the OpenDives server…"
     },
     "outcome": {
       "done": "Sync complete",
@@ -219,7 +225,9 @@
       "other": "Offline: {n} changes will be sent when the network is back"
     },
     "syncingGit": "Syncing with the git repository…",
-    "cloudGit": "Synced with the git repository"
+    "cloudGit": "Synced with the git repository",
+    "syncingServer": "Syncing with the OpenDives server…",
+    "cloudServer": "Synced with the OpenDives server"
   },
   "dive": {
     "siteNotSet": "Dive site not set",
@@ -908,6 +916,10 @@
     "gitDives": {
       "one": "Repository · {n} dive",
       "other": "Repository · {n} dives"
+    },
+    "serverDives": {
+      "one": "OpenDives server · {n} dive",
+      "other": "OpenDives server · {n} dives"
     }
   },
   "account": {
@@ -981,7 +993,12 @@
     "gitEdit": "Change the repository",
     "gitEditText": "Address, branch and token",
     "gitSignOut": "Disconnect from the repository",
-    "gitSignOutText": "Your dives stay in the repository. The token is erased from this device."
+    "gitSignOutText": "Your dives stay in the repository. The token is erased from this device.",
+    "bandServer": "Your logbook on the OpenDives server",
+    "serverName": "OpenDives server",
+    "serverDives": "Dives on the server",
+    "serverSignOut": "Sign out of the server",
+    "serverSignOutText": "Your dives stay on the server. The access is erased from this device."
   },
   "welcome": {
     "title": "OpenDives",
@@ -1051,7 +1068,7 @@
     "progressConnect": "Connecting to the server",
     "progressDownload": "Downloading the logbook",
     "progressCount": "{done} of {total}",
-    "progressListing": "Reading the list of files",
+    "progressListing": "Looking at the repository",
     "progressCopy": "Copying the logbook to this tablet",
     "progressCopyPhone": "Copying the logbook to this phone",
     "progressCopyIphone": "Copying the logbook to this iPhone",
@@ -1061,10 +1078,8 @@
     "downloadedPhone": "Logbook downloaded from the OpenDives server. It stays on this phone, even without a network.",
     "downloadedIphone": "Logbook downloaded from the OpenDives server. It stays on this iPhone, even without a network.",
     "downloadedDesktop": "Logbook downloaded from the OpenDives server. It stays on this computer, even without a network.",
-    "unreadableTitle": "This logbook cannot be opened yet",
-    "unreadableDetail": "This version cannot read the format of the server's logbook yet. Nothing was changed.",
-    "emptyTitle": "No logbook on the server",
-    "emptyDetail": "This account has no logbook yet.",
+    "refusedTitle": "The server refused this access",
+    "refusedDetail": "Sign in again to get a new access. Nothing was changed.",
     "backHome": "Back to the start"
   },
   "welcomeSteps": {
@@ -1228,7 +1243,8 @@
     "localTitleIphone": "Start a logbook on this iPhone",
     "localHelp": "Kept here, even without a network.",
     "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
-    "localTitleDesktop": "Start a logbook on this computer"
+    "localTitleDesktop": "Start a logbook on this computer",
+    "keptServer": "OpenDives server"
   },
   "signOut": {
     "title": "Sign out?",
@@ -1258,6 +1274,12 @@
     "textPendingGit": {
       "one": "{n} change is not sent to the repository yet. If you disconnect anyway, it will be sent the next time you connect to this repository from this device. The token is erased from this device.",
       "other": "{n} changes are not sent to the repository yet. If you disconnect anyway, they will be sent the next time you connect to this repository from this device. The token is erased from this device."
+    },
+    "titleServer": "Sign out of the OpenDives server?",
+    "textNoneServer": "The logbook stays on the server. A copy stays on this device, not shown, and is used if you sign in again. The access is erased from this device.",
+    "textPendingServer": {
+      "one": "{n} change is not sent to the server yet. If you sign out anyway, it will be sent the next time you sign in from this device. The access is erased from this device.",
+      "other": "{n} changes are not sent to the server yet. If you sign out anyway, they will be sent the next time you sign in from this device. The access is erased from this device."
     }
   },
   "deleteAccount": {
@@ -2115,6 +2137,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "OpenDives server (release edition): your logbook downloads from the server and opens like any logbook, with « Your logbook is ready » after the download. It stays in Subsurface’s format, syncs like a git repository (automatic sync, offline, conflicts) and is named « OpenDives server » in the menu, the account and the sync messages. « Create an empty logbook », « Import a Subsurface file » and « Send the logbook of this phone » create it on the server; an interrupted sending resumes where it stopped.",
       "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
@@ -2479,7 +2502,8 @@
       "dives": "Dives",
       "lastSync": "Last synchronisation",
       "lastError": "Last error",
-      "git": "Git repository"
+      "git": "Git repository",
+      "server": "OpenDives server"
     },
     "opensElsewhere": "opens in the browser",
     "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors.",
@@ -4772,7 +4796,7 @@
     "blankTitle": "Create an empty logbook",
     "blankHelp": "You add your dives afterwards.",
     "importTitle": "Import a Subsurface file",
-    "importHelp": "An .ssrf or .xml file, converted to OpenDives’ format.",
+    "importHelp": "An .ssrf or .xml file, added to your new logbook.",
     "sendTitle": "Send the logbook of this tablet",
     "sendTitlePhone": "Send the logbook of this phone",
     "sendTitleIphone": "Send the logbook of this iPhone",
@@ -4793,15 +4817,11 @@
       "other": "“{name}” · {n} dives"
     },
     "reading": "Reading the file…",
-    "progress": {
-      "one": "{n} dive of {total}",
-      "other": "{n} dives of {total}"
-    },
-    "safe": "The logbook is already saved on this tablet. You can leave the app: the upload resumes when you come back.",
-    "safePhone": "The logbook is already saved on this phone. You can leave the app: the upload resumes when you come back.",
-    "safeIphone": "The logbook is already saved on this iPhone. You can leave the app: the upload resumes when you come back.",
-    "safeDesktop": "The logbook is already saved on this computer. You can leave the app: the upload resumes when you come back.",
-    "cancel": "Cancel the upload",
+    "safe": "The logbook is already saved on this tablet. You can leave the app: the dives are sent at the next sync.",
+    "safePhone": "The logbook is already saved on this phone. You can leave the app: the dives are sent at the next sync.",
+    "safeIphone": "The logbook is already saved on this iPhone. You can leave the app: the dives are sent at the next sync.",
+    "safeDesktop": "The logbook is already saved on this computer. You can leave the app: the dives are sent at the next sync.",
+    "cancel": "Don’t wait",
     "created": "Logbook sent to the OpenDives server. It also stays on this tablet.",
     "createdPhone": "Logbook sent to the OpenDives server. It also stays on this phone.",
     "createdIphone": "Logbook sent to the OpenDives server. It also stays on this iPhone.",
@@ -4813,21 +4833,18 @@
     "offlineHelpDesktop": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this computer, then try again.",
     "offlineNote": "Nothing was created.",
     "interruptedTitle": "Upload interrupted",
-    "interruptedHelp": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this tablet, and the upload resumes where it stopped.",
-    "interruptedHelpPhone": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this phone, and the upload resumes where it stopped.",
-    "interruptedHelpIphone": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this iPhone, and the upload resumes where it stopped.",
-    "interruptedHelpDesktop": "The connection dropped after {sent} of {total}. Nothing is lost: the whole logbook is still on this computer, and the upload resumes where it stopped.",
-    "interruptedSent": {
-      "one": "{n} dive of {total} sent",
-      "other": "{n} dives of {total} sent"
-    },
-    "sentCount": {
-      "one": "{n} dive",
-      "other": "{n} dives"
-    },
+    "interruptedHelp": "The connection dropped. Nothing is lost: the whole logbook is still on this tablet, and the sending resumes where it stopped.",
+    "interruptedHelpPhone": "The connection dropped. Nothing is lost: the whole logbook is still on this phone, and the sending resumes where it stopped.",
+    "interruptedHelpIphone": "The connection dropped. Nothing is lost: the whole logbook is still on this iPhone, and the sending resumes where it stopped.",
+    "interruptedHelpDesktop": "The connection dropped. Nothing is lost: the whole logbook is still on this computer, and the sending resumes where it stopped.",
     "later": "Later",
     "resume": "Resume the upload",
-    "refused": "The server refused the upload. Sign in again, then resume it."
+    "refused": "The server refused the upload. Sign in again, then resume it.",
+    "importing": "Adding the dives…",
+    "sending": "Sending to the OpenDives server…",
+    "objects": "{n} of {total}",
+    "notEmpty": "This account’s repository already holds data without a logbook. Nothing was created.",
+    "failed": "The logbook could not be created. Nothing was lost on this device."
   },
   "gear": {
     "profile": {

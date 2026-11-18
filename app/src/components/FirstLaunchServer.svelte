@@ -18,10 +18,11 @@
   import { ServerError, createServerApi, plausibleEmail } from '../lib/server-api.js';
   import { serverTransport } from '../lib/server-transport.js';
   import { serverUrl } from '../lib/server-url.js';
-  import { downloadServerLogbook } from '../lib/server-logbook.js';
+  import { ServerLogbookError, openServerLogbook } from '../lib/server-logbook.js';
+  import { nextProgress } from '../lib/sync-progress.js';
+  import { transferCount } from '../lib/first-launch.js';
   import { codeScreen, formatCountdown, lockMinutes } from '../lib/server-signin.js';
   import { afterSignIn } from '../lib/odplus.js';
-  import { unfinishedUpload } from '../lib/server-upload-resume.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { t } from '../lib/i18n.js';
@@ -199,48 +200,46 @@
 
   // --- The download ---------------------------------------------------------------------------------------
 
-  const d = $state({ done: 0, total: 0, phase: /** @type {'listing'|'download'|'unreadable'|'empty'} */ ('listing'), dives: 0 });
+  const d = $state({ done: 0, total: 0, phase: /** @type {'listing'|'download'|'refused'} */ ('listing'), fraction: 0 });
   let cancelled = false;
+  /** The desktop window without a logbook downloads when it opens the logbook: here the repository is only looked at. */
+  const windowTakes = desktopApp && /** @type {any} */ (globalThis).odDesktop?.logbook === null;
 
   async function download() {
     cancelled = false;
-    Object.assign(d, { done: 0, total: 0, phase: 'listing', dives: 0 });
+    Object.assign(d, { done: 0, total: 0, phase: 'listing', fraction: 0 });
+    /** @type {{ remove: () => Promise<void> }|null} */
+    let listener = null;
     try {
       const access = await OpenDivesCore.serverSessionAccess();
-      const result = await downloadServerLogbook({
-        transport: serverTransport,
-        repositoryUrl: access.repositoryUrl,
-        branch: access.branch,
-        token: access.token,
-        cancelled: () => cancelled,
-        onProgress: (done, total) => {
-          d.done = done;
-          d.total = total;
-          d.phase = 'download';
-        },
+      // The core's git messages say how far the download is (« Transfer from storage (30/80) »).
+      /** @type {import('../lib/sync-progress.js').SyncProgress|null} */
+      let progress = null;
+      listener = await OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
+        progress = nextProgress(message, progress);
+        d.phase = 'download';
+        d.fraction = progress?.fraction ?? d.fraction;
+        const count = transferCount(message);
+        if (count) Object.assign(d, { done: count.n, total: count.total });
       });
-      d.dives = result.dives;
-      if (result.marker === 'empty') {
-        // No logbook on the account: the choices that create one (task 2026-11-17-266). An upload left unfinished on
-        // this device is offered for resuming first.
-        const left = unfinishedUpload(access.repositoryUrl);
-        if (left) {
-          Object.assign(flow.create, { name: left.name, total: left.total, done: 0, source: 'device', deviceReady: true });
-          goCreate();
-          goReplace('createInterrupted');
-        } else goCreate();
+      const opened = await openServerLogbook(OpenDivesCore, { repositoryUrl: access.repositoryUrl, branch: access.branch, username: access.username, token: access.token }, { download: !windowTakes });
+      if (cancelled) return;
+      if (opened.state === 'none') {
+        // No logbook on the account: the choices that create one (task 2026-11-17-266).
+        goCreate();
         return;
       }
-      // The diver's logbook is on the server, but this version cannot load it yet (docs/architecture.md, 11.3, open point).
-      d.phase = 'unreadable';
-      // A logbook the app can load is announced by « Votre carnet est prêt »; see `openable` in server-logbook.js.
-      if (result.openable) {
-        Object.assign(flow.plus.counts, { dives: result.dives, sites: result.sites, gear: result.gear, certifications: result.certifications });
-        go('ready');
-      }
+      Object.assign(flow.plus.counts, opened.counts);
+      go('ready');
     } catch (e) {
-      if (cancelled || (e instanceof Error && e.message === 'CANCELLED')) return;
+      if (cancelled) return;
+      if (e instanceof ServerLogbookError && e.code === 'REFUSED') {
+        d.phase = 'refused';
+        return;
+      }
       unreachable(null);
+    } finally {
+      void listener?.remove();
     }
   }
 
@@ -308,12 +307,12 @@
         <span class="od-first-launch-server--detail">{s.email}</span>
       </span>
     </div>
-    {#if d.phase === 'unreadable' || d.phase === 'empty'}
+    {#if d.phase === 'refused'}
       <div class="od-first-launch-server--step" role="alert">
         <span class="od-first-launch-server--mark od-first-launch-server--failed"><span class="od-first-launch-server--bang" aria-hidden="true">!</span></span>
         <span class="od-first-launch-server--text">
-          <span class="od-first-launch-server--name od-first-launch-server--name-failed">{t(d.phase === 'empty' ? 'serverSteps.emptyTitle' : 'serverSteps.unreadableTitle')}</span>
-          <span class="od-first-launch-server--detail">{t(d.phase === 'empty' ? 'serverSteps.emptyDetail' : 'serverSteps.unreadableDetail', { n: d.dives })}</span>
+          <span class="od-first-launch-server--name od-first-launch-server--name-failed">{t('serverSteps.refusedTitle')}</span>
+          <span class="od-first-launch-server--detail">{t('serverSteps.refusedDetail')}</span>
         </span>
       </div>
     {:else}
@@ -327,7 +326,7 @@
         </span>
       </div>
       <div class="od-first-launch-server--bar">
-        <LinearWavyProgress value={d.total ? d.done / d.total : 0} label={t('serverSteps.progressDownload')} />
+        <LinearWavyProgress value={d.fraction} label={t('serverSteps.progressDownload')} />
       </div>
     {/if}
     <div class="od-first-launch-server--step">
@@ -337,7 +336,7 @@
       </span>
     </div>
   </div>
-  {#if d.phase === 'unreadable' || d.phase === 'empty'}
+  {#if d.phase === 'refused'}
     <div class="od-first-launch-server--space"></div>
     <button type="button" class="od-first-launch-server--action" onclick={otherPlace}>{t('serverSteps.otherPlace')}</button>
   {:else}
