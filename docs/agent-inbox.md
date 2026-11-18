@@ -5425,3 +5425,26 @@ Christian asked for this on 18 November 2026. It changes how we work, so read it
 - `git log feature/release-alpha -1` is the old `main`, and it builds.
 - `main` contains every beta branch: `git branch -r --merged main` lists them.
 - The build and the tests pass on `main`.
+
+## [ ] 2026-11-18-269 All devices: show the time left on long downloads and imports
+
+Christian approved this on 18 November 2026. Work in `main` (task 268).
+
+**What changes.** On a progress line, when the operation is expected to take more than 5 seconds, show the time left on the right of the line, aligned with the end of the progress bar. The count stays on the left: « 184 sur 312 » on the left, « 20 s restantes » on the right. No « environ ».
+
+**Where.**
+- « Téléchargement du carnet » (OpenDives+, download of the logbook from the server): phone, tablet (landscape and portrait), desktop.
+- « Importer depuis divelogs.de », progress step: phone, tablet (landscape and portrait), desktop.
+
+Mock-ups in `docs/mockups-release/`: `android-serveur-telechargement`, `android-premier-lancement-production-importer-divelogs-progres`, `android-tablette-serveur-telechargement-paysage` and `-portrait`, `android-tablette-premier-lancement-production-importer-divelogs-progres-paysage` and `-portrait`, `bureau-serveur-telechargement`, `bureau-premier-lancement-production-importer-divelogs-progres`.
+
+**Rules.**
+- Estimate from the speed so far, once at least a few items or a few seconds have been measured. Before that, show nothing on the right.
+- Hide the time left if the whole operation is expected to finish within 5 seconds.
+- Round it: seconds under one minute (« 20 s restantes »), whole minutes after (« 2 min restantes »). Smooth the estimate so that it does not jump back and forth.
+- English: « 20 s left », « 2 min left ».
+- The time left is part of the progress line's accessible text: « 184 sur 312, 20 secondes restantes ».
+
+**Test:**
+- A download of more than 5 seconds shows the time left on the right; a short one never shows it.
+- The value decreases smoothly and switches from seconds to minutes as described.
