@@ -35,6 +35,17 @@ export function isZipName(name) {
  *   cannot be read, or is too large
  */
 export async function fitFilesInZip(bytes) {
+  return (await filesInZip(bytes, /\.fit$/i)).map(({ name, data }) => ({ name, data }));
+}
+
+/**
+ * The entries of a .zip archive whose path matches, with their contents (`name` is the last part of the path,
+ * `path` the whole path).
+ * @param {Uint8Array} bytes the whole archive
+ * @param {RegExp} pattern tested on the entry's path
+ * @returns {Promise<{ name: string, path: string, data: Uint8Array }[]>}
+ */
+export async function filesInZip(bytes, pattern) {
   if (bytes.length < 22 || bytes.length > MAX_ZIP_BYTES) return [];
   // The end of central directory record, searched from the end (it may carry a comment).
   let end = -1;
@@ -60,14 +71,14 @@ export async function fitFilesInZip(bytes) {
     const name = new TextDecoder().decode(bytes.subarray(at + 46, at + 46 + nameLength));
     at += 46 + nameLength + extraLength + commentLength;
     // Encrypted entries and other methods than stored (0) and deflated (8) are skipped.
-    if (!/\.fit$/i.test(name) || flags & 1 || (method !== 0 && method !== 8)) continue;
+    if (!pattern.test(name) || flags & 1 || (method !== 0 && method !== 8)) continue;
     if (local + 30 > bytes.length || u32(bytes, local) !== 0x04034b50) continue;
     const start = local + 30 + u16(bytes, local + 26) + u16(bytes, local + 28);
     if (start + size > bytes.length) continue;
     const raw = bytes.subarray(start, start + size);
     try {
       const data = method === 0 ? raw.slice() : await inflate(raw);
-      found.push({ name: name.split('/').pop() || name, data });
+      found.push({ name: name.split('/').pop() || name, path: name, data });
     } catch {
       // A damaged entry: the others are still imported.
     }

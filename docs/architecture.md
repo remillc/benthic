@@ -114,6 +114,8 @@ The whole logbook lives in **a local Git repository**, in the app's private stor
 
 **Settings.** Settings that change calculations (GF, max ppO2, default SAC) and units follow Subsurface: saved in the repository when Subsurface does so, otherwise on the device. OpenDives' display settings stay on the device.
 
+**One logbook on a phone or a tablet (decided on 18 November 2026).** The core holds one logbook; moving to another one goes through Subsurface files. "Remplacer ce carnet" (`app/src/lib/replace-logbook.js`, `replace-logbook-ui.js`, `replaceDeviceLogbook` in `logbook.svelte.js`) removes the dives and sites of the device logbook and imports the file with the core's own import, after taking an `.ssrf` copy it puts back if the import fails. It refuses a logbook connected to an account (cloud, git, OpenDives+ server), because those deletions would be synchronised. The core has no notion of several logbooks in one file: an archive with several `.ssrf` is read in JavaScript (`filesInZip`) and only the main one is handed to the core.
+
 ## 7. The interface
 
 The interface is a single-page web app in **modern JavaScript (ES modules) documented with JSDoc**, bundled by Vite and embedded by Capacitor. It contains no business rule: it displays what the core returns and sends it commands. Its visual design is set out in the [System design](system-design.md), the [UI foundations](ui-foundations.md) and the [UI specification](ui-specification.md).

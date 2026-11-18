@@ -32,6 +32,8 @@
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
+  import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
+  import { startReplace } from '../lib/replace-logbook-ui.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import CsvImportDialog from '../components/CsvImportDialog.svelte';
   import { pickCsvFiles } from '../lib/csv-import.js';
@@ -1141,6 +1143,39 @@
     f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
   }
 
+  /**
+   * « Remplacer ce carnet » for a logbook file picked in « Importer un fichier » (lib/replace-logbook-ui.js).
+   * @param {File} file
+   * @returns {Promise<boolean>} true when the file was dealt with here (replaced, or the diver cancelled)
+   */
+  async function offerReplace(file) {
+    let what;
+    try {
+      what = await replacementFromFile(file.name, new Uint8Array(await file.arrayBuffer()));
+    } catch {
+      return false;
+    }
+    if (!what) return false;
+    const eligibility = replaceEligibility(logbook);
+    /** @type {'merge'|'replace'|'cancel'} */
+    const answer = await new Promise((resolve) => {
+      const buttons = [{ text: t('dialog.cancel'), onClick: () => resolve('cancel') }];
+      if (eligibility === 'ok') buttons.push({ text: t('link.fileReplace'), onClick: () => resolve('replace') });
+      buttons.push({ text: t('link.fileMerge'), onClick: () => resolve('merge') });
+      const text = [
+        t(eligibility === 'ok' ? 'link.fileChooseReplace' : 'link.fileChooseOne', { name: file.name }),
+        eligibility === 'ok' ? '' : t(`link.replace_${eligibility}`),
+        what.several ? t('replace.several', what.several) : '',
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+      f7.dialog.create({ title: t('link.fileTitle'), text, buttons, verticalButtons: buttons.length > 2 }).open();
+    });
+    if (answer === 'merge') return false;
+    if (answer === 'replace') await startReplace({ file: file.name, fileName: what.name, data: what.data, several: what.several });
+    return true;
+  }
+
   async function fileChosen() {
     // Several files at once (a Suunto .json and its .fit are read as one dive); a .csv opens the CSV dialog.
     const files = Array.from(fileInput?.files ?? []);
@@ -1151,6 +1186,8 @@
       csv = { file: picked.csv, companion: picked.companion };
       return;
     }
+    // A phone or a tablet keeps one logbook: a Subsurface logbook file can also replace the open one.
+    if (files.length === 1 && logbook.dives.length && (await offerReplace(files[0]))) return;
     importing = true;
     try {
       const n = await importFiles(files);

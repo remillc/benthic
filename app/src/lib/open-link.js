@@ -12,6 +12,8 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, importData } from './logbook.svelte.js';
+import { replaceEligibility } from './replace-logbook.js';
+import { startReplace } from './replace-logbook-ui.js';
 import { goToSection, openOver, backToFirstScreen } from './navigation.svelte.js';
 import { anyDirty } from './leave-guard.js';
 import { checkSharedFile, importErrorKey, parseLink } from './deep-link.js';
@@ -131,17 +133,21 @@ const sharedDeps = {
     sharedFile.file = fileFromBase64(name, data);
   },
   logbookName: () => deviceStore.getItem('od.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
-  // One logbook at a time on a phone or a tablet (the device's copy, or the account's): « Nouveau carnet » would
-  // replace the open one, so it is not offered there; the desktop opens one logbook per window and takes no shared file.
+  // One logbook at a time on a phone or a tablet (the device's copy, or the account's): no « Nouveau carnet »; its
+  // place is « Remplacer ce carnet », a guarded flow for the device's own logbook (lib/replace-logbook-ui.js). The
+  // desktop opens one logbook per window and takes no shared file.
   canCreateLogbook: () => false,
-  choose: (/** @type {{ name: string, canCreate: boolean }} */ o, /** @type {{ merge: () => Promise<void>, create?: () => Promise<void> }} */ actions) => {
+  replaceEligibility: () => replaceEligibility(logbook),
+  replaceLogbook: startReplace,
+  choose: (/** @type {any} */ o, /** @type {{ merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void> }} */ actions) => {
     /** @type {any[]} */
     const buttons = [{ text: t('dialog.cancel') }];
     if (actions.create) buttons.push({ text: t('link.fileNew'), bold: true, onClick: actions.create });
-    buttons.push({ text: t('link.fileMerge'), onClick: actions.merge });
-    f7.dialog
-      .create({ title: t('link.fileTitle'), text: t(actions.create ? 'link.fileChoose' : 'link.fileChooseOne', { name: o.name }), buttons, verticalButtons: buttons.length > 2 })
-      .open();
+    if (actions.replace) buttons.push({ text: t('link.fileReplace'), onClick: actions.replace });
+    buttons.push({ text: t('link.fileMerge'), bold: !actions.create, onClick: actions.merge });
+    const key = actions.create ? 'link.fileChoose' : actions.replace ? 'link.fileChooseReplace' : 'link.fileChooseOne';
+    const text = [t(key, { name: o.name }), o.whyNot ? t(`link.replace_${o.whyNot}`) : '', o.several ? t('replace.several', o.several) : ''].filter(Boolean).join('\n\n');
+    f7.dialog.create({ title: t('link.fileTitle'), text, buttons, verticalButtons: buttons.length > 2 }).open();
   },
   confirm: (/** @type {any} */ o, /** @type {() => Promise<void>} */ run) =>
     confirmAction({ title: t('link.fileTitle'), text: t(o.textKey, o.values), action: t(o.actionKey), onConfirm: run }),

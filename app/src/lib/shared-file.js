@@ -17,6 +17,7 @@
 //     already has (same uuid, or same name and position) is left alone; the others are added. The sites are
 //     remembered so that a dives file shared afterwards finds them.
 // Nothing here touches the screen or the core: lib/open-link.js gives the actions in `deps`.
+import { logbookLabel, logbooksInFile } from './replace-logbook.js';
 
 /** The name of the site that stands in for one whose data have not arrived. @param {number} uuid */
 export function placeholderName(uuid) {
@@ -285,11 +286,17 @@ export function fileFromBase64(name, base64) {
  * @property {(e: unknown) => void} importFailed
  * @property {() => Promise<void>} [ready] resolves once the logbook is read
  * @property {() => string} [logbookName] the name of the open logbook, for the sites confirmation
- * @property {(options: { name: string, canCreate: boolean }, actions: { merge: () => Promise<void>, create?: () => Promise<void> }) => void} [choose]
+ * @property {(options: { name: string, canCreate: boolean, canReplace?: boolean, whyNot?: '' | 'server' | 'account', several?: { count: number, main: string }|null }, actions: { merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void> }) => void} [choose]
  *   the choice for a dives file with a logbook open: « Nouveau carnet » (`create`, only when this device can hold
- *   another logbook) or « Ajouter à ce carnet » (`merge`); without it, the single confirmation `confirm` is used
+ *   another logbook), « Remplacer ce carnet » (`replace`, a device that holds one logbook: only its own logbook, never
+ *   an account's or the server's, `whyNot` says which) or « Ajouter à ce carnet » (`merge`); `several`: the file is an
+ *   archive of several logbooks, only `main` is taken; without `choose`, the single confirmation `confirm` is used
  * @property {(name: string, data: string) => Promise<void>} [newLogbook] creates a logbook from the file, keeps the open one untouched
  * @property {() => boolean} [canCreateLogbook] false when this device holds one logbook at a time (a phone)
+ * @property {() => 'ok'|'server'|'account'} [replaceEligibility] whether the open logbook may be replaced (a phone or a
+ *   tablet only: leave it out where `newLogbook` is offered)
+ * @property {(what: { file: string, fileName: string, data: string, several: { count: number, main: string }|null }) => Promise<unknown>} [replaceLogbook]
+ *   the guarded flow of lib/replace-logbook-ui.js
  */
 
 /**
@@ -319,9 +326,21 @@ export async function openSharedFile(deps, uri) {
     deps.refuse(key, { name: label });
     return 'refused';
   }
-  const { name } = check;
-  const isXml = /\.(ssrf|xml)$/i.test(name) && /^\s*(<\?xml|<)/.test(head.replace(/^﻿/, ''));
-  const text = isXml ? new TextDecoder().decode(bytes) : '';
+  let { name } = check;
+  /** @type {{ count: number, main: string }|null} */
+  let several = null;
+  let data = file.data;
+  // An archive of logbooks (OpenDives' own export, or several .ssrf): one logbook is taken, the main one.
+  const inside = await logbooksInFile(name, bytes);
+  if (inside) {
+    name = inside.main.name;
+    data = bytesToBase64(inside.main.data);
+    if (inside.count > 1) several = { count: inside.count, main: logbookLabel(inside.main.name) };
+  }
+  const body = inside ? inside.main.data : bytes;
+  const bodyHead = new TextDecoder().decode(body.subarray(0, 4096));
+  const isXml = /\.(ssrf|xml)$/i.test(name) && /^\s*(<\?xml|<)/.test(bodyHead.replace(/^﻿/, ''));
+  const text = isXml ? new TextDecoder().decode(body) : '';
 
   if (isXml && isSitesOnly(text)) {
     const sites = readSites(text);
@@ -353,7 +372,6 @@ export async function openSharedFile(deps, uri) {
     return 'confirm-sites';
   }
 
-  let data = file.data;
   if (isXml) {
     const fixed = completeSiteReferences(text, deps.remembered());
     if (fixed.text !== text) data = bytesToBase64(new TextEncoder().encode(fixed.text));
@@ -384,6 +402,16 @@ export async function openSharedFile(deps, uri) {
         }
       }
     : undefined;
-  deps.choose({ name: label || name, canCreate }, { merge, create });
+  const eligibility = deps.replaceEligibility?.();
+  const canReplace = !canCreate && eligibility === 'ok' && !!deps.replaceLogbook && isXml;
+  const replace = canReplace
+    ? async () => {
+        await deps.replaceLogbook?.({ file: label || name, fileName: name, data, several });
+      }
+    : undefined;
+  deps.choose(
+    { name: label || name, canCreate, canReplace, whyNot: !canCreate && deps.replaceLogbook && eligibility && eligibility !== 'ok' ? eligibility : '', several },
+    { merge, create, replace },
+  );
   return 'confirm-dives';
 }

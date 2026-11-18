@@ -2569,7 +2569,8 @@
       "My diver profile (OpenDives+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
       "Equipment: the BCD has its own icon (collar, centre opening, two straps) and the surface marker buoy its own, with a flat top. In « New piece » (and when editing), a thumbnail left of the « Model » field shows your photo of the piece, otherwise the icon of its type, large.",
       "Files from another app: OpenDives is in “Open with” and “Share to” for a logbook (.ssrf, .xml), a UDDF, FIT or DLD file and the other formats it imports. The file is read, then a choice is asked: “Add to this logbook” adds the dives to the open logbook, with Undo (“New logbook”, which keeps the open logbook and creates another, is not offered: this device keeps one logbook at a time); with no logbook yet it opens “Import a logbook”. The sites file of a two-file export is accepted: sites already there are not duplicated. The sites go to the logbook named in the question, never to another one.",
-      "First launch: the slide between steps now plays (it was dropped from the build). The waiting-changes box of the sign-out dialog shows its count in bold, and an iPhone field in error no longer keeps a red frame inside its row."
+      "First launch: the slide between steps now plays (it was dropped from the build). The waiting-changes box of the sign-out dialog shows its count in bold, and an iPhone field in error no longer keeps a red frame inside its row.",
+      "Replace this logbook: this device keeps one logbook at a time. A logbook file (Subsurface .ssrf, or an archive holding one) opened with OpenDives or chosen in “+” › Import a file now offers “Replace this logbook”: a screen says the logbook leaves this device and offers “Export this logbook first”; “Replace” asks a second time when it was not exported or when changes are not synchronised, then you name the new logbook. The current logbook is put back if the file cannot be read. The OpenDives server logbook and a logbook synchronised with an account are never replaced, with a line that says why. When an archive holds several logbooks, only the main one is imported and the dialog says so."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3309,7 +3310,7 @@
     "fileTitle": "Open a logbook file",
     "fileText": "Import the dives of “{name}” into this logbook? Dives already there are not added twice.",
     "fileChoose": "What to do with the dives of “{name}”?\n\nNew logbook: keeps this logbook as it is and creates a logbook from the file.\n\nAdd to this logbook: adds the dives of the file to the open logbook.",
-    "fileChooseOne": "Adds the dives of “{name}” to the open logbook. Dives already there are not added twice. This device keeps one logbook at a time: a new logbook would replace this one.",
+    "fileChooseOne": "Adds the dives of “{name}” to the open logbook. Dives already there are not added twice.",
     "fileNew": "New logbook",
     "fileMerge": "Add to this logbook",
     "fileAction": "Import",
@@ -3324,7 +3325,11 @@
     "sitesDone": "Sites: {added} added, {completed} completed, {present} already there.",
     "sitesNothing": "Every site of this file is already in the logbook.",
     "sitesFirstLaunch": "“{name}” holds only sites. Import the dives file first, then open this one.",
-    "sitesFailed": "The sites could not be added."
+    "sitesFailed": "The sites could not be added.",
+    "fileChooseReplace": "What to do with “{name}”?\n\nReplace this logbook: removes the open logbook from this device and keeps the file’s instead. This device keeps one logbook at a time.\n\nAdd to this logbook: adds the dives of the file to the open logbook, without duplicates.",
+    "fileReplace": "Replace this logbook",
+    "replace_server": "This logbook is the one on the OpenDives server: it cannot be replaced from a file, so its data stays safe.",
+    "replace_account": "This logbook is synchronised with an account: replacing it would remove its dives from the shared log, so it can only receive dives."
   },
   "share": {
     "title": "Share",
@@ -5542,5 +5547,24 @@
       "readOnly": "Read only: the OpenDives+ subscription has ended.",
       "notFound": "This certification no longer exists."
     }
+  },
+  "replace": {
+    "title": "Replace the logbook “{logbook}”",
+    "text": "“{logbook}” will be removed from this device and replaced by the logbook of “{file}”. This device keeps one logbook at a time.\n\nTo keep “{logbook}”, export it first: you can import it again later.",
+    "several": "This file holds {count} logbooks: only “{main}” is imported.",
+    "pending": "{n} changes are not synchronised yet: they will be lost.",
+    "exported": "The logbook is exported.",
+    "exportFirst": "Export this logbook first",
+    "action": "Replace",
+    "confirmTitle": "Remove the logbook from this device?",
+    "confirmText": "“{logbook}” was not exported. It will be removed from this device and cannot be brought back.",
+    "confirmPending": "“{logbook}” has {n} changes that are not synchronised yet. It will be removed from this device and they will be lost.",
+    "confirmAction": "Remove the logbook and replace",
+    "nameTitle": "Name of the new logbook",
+    "nameText": "The name of the logbook that replaces the current one.",
+    "done": "Logbook “{name}” in place: {n} dives.",
+    "failedTitle": "Replace this logbook",
+    "failed": "The logbook could not be replaced. The current logbook is kept.",
+    "failedNoDives": "The file holds no dive. The current logbook is kept."
   }
 }

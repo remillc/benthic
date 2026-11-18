@@ -897,6 +897,54 @@ export async function eraseDemoLogbook() {
   undoCleared();
 }
 
+/**
+ * « Remplacer ce carnet » (decided on 18 November 2026): the logbook of this device becomes the file's. Only a device
+ * logbook: an account's logbook (cloud, git, OpenDives+ server) is never touched, because removing its dives would be
+ * sent to the shared log. The dives of the file are brought in after the current ones are removed; if that fails, the
+ * current logbook is put back from a copy taken first, so a bad file never leaves the device without its logbook.
+ * @param {string} name the new logbook's name (kept as its label on this device)
+ * @param {string} data the file's contents, base64 (a Subsurface `.ssrf`)
+ * @param {string} fileName the file's name; the core reads the format from its extension
+ * @returns {Promise<number>} the dives of the new logbook
+ */
+export async function replaceDeviceLogbook(name, data, fileName) {
+  if (logbook.email || logbook.odplus || logbook.repository) throw new Error('NOT_REPLACEABLE');
+  const ids = logbook.dives.map((d) => d.id);
+  const { text: backup = '' } = ids.length ? await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', text: true }) : { text: '' };
+  await wipeDeviceLogbook();
+  try {
+    await OpenDivesCore.importDives({ name: fileName, data });
+    const dives = await OpenDivesCore.listLoadedDives();
+    if (!dives.length) throw new Error('NO_DIVES');
+  } catch (e) {
+    await wipeDeviceLogbook();
+    if (backup) await OpenDivesCore.importDives({ name: 'replaced-logbook.ssrf', data: toBase64(new TextEncoder().encode(backup)) });
+    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.sitesVersion++;
+    await OpenDivesCore.saveLocal();
+    undoCleared();
+    throw e;
+  }
+  await OpenDivesCore.saveLocal();
+  undoCleared();
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  try {
+    deviceStore.setItem('od.logbookName', name);
+  } catch {
+    // Not fatal.
+  }
+  return logbook.dives.length;
+}
+
+/** Every dive and every site of the open logbook is removed (the core's undoable steps; the caller drops the history). */
+async function wipeDeviceLogbook() {
+  const ids = (await OpenDivesCore.listLoadedDives()).map((d) => d.id);
+  if (ids.length) await OpenDivesCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+}
+
 /** First launch is shown again: the logbook on screen is gone (the demo was erased). */
 export function showFirstLaunchAgain() {
   forgetAccount(true);
