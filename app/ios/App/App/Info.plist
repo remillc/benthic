@@ -83,6 +83,31 @@
 				<string>application/x-subsurface</string>
 			</dict>
 		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>org.opendives.divefile</string>
+			<key>UTTypeDescription</key>
+			<string>Dive log file</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>uddf</string>
+					<string>udcf</string>
+					<string>fit</string>
+					<string>sde</string>
+					<string>dive</string>
+					<string>dlf</string>
+					<string>dld</string>
+					<string>divelogs</string>
+					<string>jlb</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -97,6 +122,18 @@
 			<array>
 				<string>org.opendives.ssrf</string>
 				<string>public.xml</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Dive log file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.opendives.divefile</string>
 			</array>
 		</dict>
 	</array>

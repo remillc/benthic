@@ -866,7 +866,7 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
  *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (opendives.h,

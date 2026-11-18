@@ -78,6 +78,8 @@ class OpenDivesCorePlugin : Plugin() {
     private val setupThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun load() {
+        // A file shared with the app before the web layer was up (cold start from « Share to »).
+        offerSharedFiles(activity?.intent)
         MapsManager.init(context)
         MapsManager.listener = { event -> notifyListeners("mapsDownload", JSObject(event.toString())) }
         val home = context.filesDir.absolutePath
@@ -1912,6 +1914,42 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     // --- A file sent to the app (deep links, "Open with OpenDives") ------------
+
+    /** « Share to OpenDives » while the app runs (singleTask: the new intent arrives here). */
+    override fun handleOnNewIntent(intent: Intent) {
+        super.handleOnNewIntent(intent)
+        offerSharedFiles(intent)
+    }
+
+    /**
+     * An ACTION_SEND or ACTION_SEND_MULTIPLE intent carries the files in EXTRA_STREAM (content:// addresses
+     * the sender granted read access to). Each one goes to the web layer as a "sharedFile" event ({uri}), kept
+     * until a listener exists (cold start); the web layer reads it with readSharedFile and decides whether it is
+     * a logbook. An ACTION_VIEW is left to Capacitor's "appUrlOpen". The intent is replaced afterwards so that
+     * a restart of the activity does not offer the same file again.
+     */
+    private fun offerSharedFiles(intent: Intent?) {
+        if (intent == null) return
+        val uris = ArrayList<Uri>()
+        @Suppress("DEPRECATION")
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                val one = if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java) else intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                if (one != null) uris.add(one)
+            }
+            Intent.ACTION_SEND_MULTIPLE -> {
+                val many = if (Build.VERSION.SDK_INT >= 33) intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java) else intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                if (many != null) uris.addAll(many)
+            }
+            else -> return
+        }
+        // Text shared without a file (EXTRA_TEXT only) is not ours.
+        for (uri in uris) {
+            if (uri.scheme != "content") continue
+            notifyListeners("sharedFile", JSObject().put("uri", uri.toString()), true)
+        }
+        activity?.intent = Intent(Intent.ACTION_MAIN)
+    }
 
     /**
      * Reads a file another app handed to OpenDives (a content:// address of an ACTION_VIEW

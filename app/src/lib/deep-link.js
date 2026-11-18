@@ -27,6 +27,8 @@
 // same second (two computers) are the same dive for Subsurface's merge; the link
 // opens the first. A site has a uuid, kept by the cloud, used as is (decimal).
 
+import { IMPORT_FORMATS } from './import-formats.js';
+
 /** The host of the verified links. */
 export const LINK_HOST = 'opendives.app';
 
@@ -155,24 +157,44 @@ export function isSubsurfaceXml(head) {
   return !!root && /^(divelog|dives)$/i.test(root[1]);
 }
 
+/** Extensions the core reads by themselves (no column mapping), besides Subsurface XML: from the list « Importer un carnet » shows, and .zip (Garmin Connect's FIT archive). */
+const OTHER_EXTENSIONS = new Set([...IMPORT_FORMATS.flatMap((f) => f.extensions), '.zip'].filter((e) => !['.ssrf', '.xml', '.csv', '.tsv'].includes(e)));
+
+/**
+ * Whether the beginning of a file is a Subsurface dive sites export (Subsurface-mobile's « dive sites » share):
+ * XML whose root element is <divesites>.
+ * @param {string} head the first characters of the file, as text
+ */
+export function isSitesXml(head) {
+  const text = head.replace(/^(﻿|\xEF\xBB\xBF)/, '').replace(/<!--[\s\S]*?-->/g, '');
+  const root = /<(?![?!])([A-Za-z][\w:.-]*)/.exec(text);
+  return !!root && /^divesites$/i.test(root[1]);
+}
+
 /**
  * Decides whether a shared file is imported, and under which name for the core (which
  * reads the format from the extension). The mime type is never trusted: mail and
- * Drive send .ssrf as application/octet-stream or text/plain. A name ending in .ssrf or
- * .xml is accepted when its contents are Subsurface XML; any other name (or none: some
- * providers give an opaque name) is accepted only when the contents are.
+ * Drive send .ssrf as application/octet-stream or text/plain. Subsurface XML (a dive log, or a
+ * dive sites export) is accepted by its contents, whatever its name ends in (a name that
+ * does not end in .ssrf or .xml becomes .ssrf). Any other file is accepted by an extension
+ * of the import list; a .csv needs its column mapping and is refused here (CSV).
  * @param {string} name display name of the file
  * @param {string} head the first characters of the file, as text
  * @param {number} size bytes
- * @returns {{ ok: true, name: string } | { ok: false, reason: 'EMPTY'|'TOO_BIG'|'NOT_A_LOGBOOK' }}
+ * @returns {{ ok: true, name: string } | { ok: false, reason: 'EMPTY'|'TOO_BIG'|'NOT_A_LOGBOOK'|'CSV' }}
  */
 export function checkSharedFile(name, head, size) {
   if (size <= 0) return { ok: false, reason: 'EMPTY' };
   if (size > MAX_FILE_BYTES) return { ok: false, reason: 'TOO_BIG' };
-  if (!isSubsurfaceXml(head)) return { ok: false, reason: 'NOT_A_LOGBOOK' };
   const base = (name || '').split(/[\\/]/).pop() || '';
-  const ext = /\.(ssrf|xml)$/i.test(base);
-  return { ok: true, name: ext ? base : `${base.replace(/\.[^.]*$/, '') || 'import'}.ssrf` };
+  const extension = (/\.[^.]*$/.exec(base)?.[0] ?? '').toLowerCase();
+  if (isSubsurfaceXml(head) || isSitesXml(head)) {
+    const ext = /\.(ssrf|xml)$/i.test(base);
+    return { ok: true, name: ext ? base : `${base.replace(/\.[^.]*$/, '') || 'import'}.ssrf` };
+  }
+  if (extension === '.csv' || extension === '.tsv') return { ok: false, reason: 'CSV' };
+  if (OTHER_EXTENSIONS.has(extension)) return { ok: true, name: base };
+  return { ok: false, reason: 'NOT_A_LOGBOOK' };
 }
 
 /**

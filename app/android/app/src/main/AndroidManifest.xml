@@ -48,9 +48,9 @@
                 <data android:pathPrefix="/statistics/" />
             </intent-filter>
 
-            <!-- "Open with OpenDives" on a logbook file. Mail and Drive often send a .ssrf as
-                 application/octet-stream: the app checks the contents (lib/deep-link.js), so
-                 anything else is refused with a message. -->
+            <!-- "Open with OpenDives" on a logbook file (ACTION_VIEW on a content:// address). Mail, Drive and file
+                 managers often send a logbook as application/octet-stream or text/plain: the app checks the
+                 contents (lib/deep-link.js, lib/shared-file.js) and refuses what is not a logbook with a message. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -60,8 +60,14 @@
                 <data android:mimeType="text/xml" />
                 <data android:mimeType="application/octet-stream" />
                 <data android:mimeType="application/x-subsurface" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-sqlite3" />
+                <data android:mimeType="application/vnd.sqlite3" />
             </intent-filter>
-            <!-- A file manager that gives no usable type: the name ends in .ssrf. -->
+            <!-- A file manager that gives no usable type: the name ends in one of the extensions of the import list
+                 (the same as lib/import-formats.js; .csv needs its column mapping and is not offered). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -71,6 +77,117 @@
                 <data android:pathPattern=".*\\.ssrf" />
                 <data android:pathPattern=".*\\..*\\.ssrf" />
                 <data android:pathPattern=".*\\..*\\..*\\.ssrf" />
+                <data android:pathPattern=".*\\.SSRF" />
+                <data android:pathPattern=".*\\..*\\.SSRF" />
+                <data android:pathPattern=".*\\..*\\..*\\.SSRF" />
+                <data android:pathPattern=".*\\.xml" />
+                <data android:pathPattern=".*\\..*\\.xml" />
+                <data android:pathPattern=".*\\..*\\..*\\.xml" />
+                <data android:pathPattern=".*\\.XML" />
+                <data android:pathPattern=".*\\..*\\.XML" />
+                <data android:pathPattern=".*\\..*\\..*\\.XML" />
+                <data android:pathPattern=".*\\.uddf" />
+                <data android:pathPattern=".*\\..*\\.uddf" />
+                <data android:pathPattern=".*\\..*\\..*\\.uddf" />
+                <data android:pathPattern=".*\\.UDDF" />
+                <data android:pathPattern=".*\\..*\\.UDDF" />
+                <data android:pathPattern=".*\\..*\\..*\\.UDDF" />
+                <data android:pathPattern=".*\\.udcf" />
+                <data android:pathPattern=".*\\..*\\.udcf" />
+                <data android:pathPattern=".*\\..*\\..*\\.udcf" />
+                <data android:pathPattern=".*\\.UDCF" />
+                <data android:pathPattern=".*\\..*\\.UDCF" />
+                <data android:pathPattern=".*\\..*\\..*\\.UDCF" />
+                <data android:pathPattern=".*\\.fit" />
+                <data android:pathPattern=".*\\..*\\.fit" />
+                <data android:pathPattern=".*\\..*\\..*\\.fit" />
+                <data android:pathPattern=".*\\.FIT" />
+                <data android:pathPattern=".*\\..*\\.FIT" />
+                <data android:pathPattern=".*\\..*\\..*\\.FIT" />
+                <data android:pathPattern=".*\\.sde" />
+                <data android:pathPattern=".*\\..*\\.sde" />
+                <data android:pathPattern=".*\\..*\\..*\\.sde" />
+                <data android:pathPattern=".*\\.SDE" />
+                <data android:pathPattern=".*\\..*\\.SDE" />
+                <data android:pathPattern=".*\\..*\\..*\\.SDE" />
+                <data android:pathPattern=".*\\.db" />
+                <data android:pathPattern=".*\\..*\\.db" />
+                <data android:pathPattern=".*\\..*\\..*\\.db" />
+                <data android:pathPattern=".*\\.DB" />
+                <data android:pathPattern=".*\\..*\\.DB" />
+                <data android:pathPattern=".*\\..*\\..*\\.DB" />
+                <data android:pathPattern=".*\\.dive" />
+                <data android:pathPattern=".*\\..*\\.dive" />
+                <data android:pathPattern=".*\\..*\\..*\\.dive" />
+                <data android:pathPattern=".*\\.DIVE" />
+                <data android:pathPattern=".*\\..*\\.DIVE" />
+                <data android:pathPattern=".*\\..*\\..*\\.DIVE" />
+                <data android:pathPattern=".*\\.dlf" />
+                <data android:pathPattern=".*\\..*\\.dlf" />
+                <data android:pathPattern=".*\\..*\\..*\\.dlf" />
+                <data android:pathPattern=".*\\.DLF" />
+                <data android:pathPattern=".*\\..*\\.DLF" />
+                <data android:pathPattern=".*\\..*\\..*\\.DLF" />
+                <data android:pathPattern=".*\\.dld" />
+                <data android:pathPattern=".*\\..*\\.dld" />
+                <data android:pathPattern=".*\\..*\\..*\\.dld" />
+                <data android:pathPattern=".*\\.DLD" />
+                <data android:pathPattern=".*\\..*\\.DLD" />
+                <data android:pathPattern=".*\\..*\\..*\\.DLD" />
+                <data android:pathPattern=".*\\.divelogs" />
+                <data android:pathPattern=".*\\..*\\.divelogs" />
+                <data android:pathPattern=".*\\..*\\..*\\.divelogs" />
+                <data android:pathPattern=".*\\.DIVELOGS" />
+                <data android:pathPattern=".*\\..*\\.DIVELOGS" />
+                <data android:pathPattern=".*\\..*\\..*\\.DIVELOGS" />
+                <data android:pathPattern=".*\\.jlb" />
+                <data android:pathPattern=".*\\..*\\.jlb" />
+                <data android:pathPattern=".*\\..*\\..*\\.jlb" />
+                <data android:pathPattern=".*\\.JLB" />
+                <data android:pathPattern=".*\\..*\\.JLB" />
+                <data android:pathPattern=".*\\..*\\..*\\.JLB" />
+                <data android:pathPattern=".*\\.sql" />
+                <data android:pathPattern=".*\\..*\\.sql" />
+                <data android:pathPattern=".*\\..*\\..*\\.sql" />
+                <data android:pathPattern=".*\\.SQL" />
+                <data android:pathPattern=".*\\..*\\.SQL" />
+                <data android:pathPattern=".*\\..*\\..*\\.SQL" />
+                <data android:pathPattern=".*\\.log" />
+                <data android:pathPattern=".*\\..*\\.log" />
+                <data android:pathPattern=".*\\..*\\..*\\.log" />
+                <data android:pathPattern=".*\\.LOG" />
+                <data android:pathPattern=".*\\..*\\.LOG" />
+                <data android:pathPattern=".*\\..*\\..*\\.LOG" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\..*\\.json" />
+                <data android:pathPattern=".*\\..*\\..*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathPattern=".*\\..*\\.JSON" />
+                <data android:pathPattern=".*\\..*\\..*\\.JSON" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\.ZIP" />
+                <data android:pathPattern=".*\\..*\\.ZIP" />
+                <data android:pathPattern=".*\\..*\\..*\\.ZIP" />
+            </intent-filter>
+
+            <!-- "Share to OpenDives" (ACTION_SEND and SEND_MULTIPLE): the file is in EXTRA_STREAM; the plugin hands
+                 it to the web layer as the "sharedFile" event (OpenDivesCorePlugin.offerSharedFiles). A share of
+                 plain text without a file does nothing. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-subsurface" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-sqlite3" />
+                <data android:mimeType="application/vnd.sqlite3" />
             </intent-filter>
 
         </activity>

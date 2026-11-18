@@ -4,7 +4,8 @@
 // closest collection with a short message when its target is not in this logbook; a
 // logbook file is imported after a confirmation, never silently.
 //
-// Cold start: App.getLaunchUrl(). Running app: the "appUrlOpen" event. Both give the
+// Cold start: App.getLaunchUrl(). Running app: the "appUrlOpen" event; a file shared with « Share to » (Android
+// ACTION_SEND) comes as the plugin's "sharedFile" event. Both give the
 // address of an https link (App Links, Universal Links), of opendives://, or of a file
 // (Android content://, iOS file://).
 import { App as CapacitorApp } from '@capacitor/app';
@@ -18,6 +19,13 @@ import { confirmAction } from './dialogs.js';
 import { showSnackbar } from './snackbar.js';
 import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
+import { deviceStore } from './device-store.js';
+import { siteChange } from './sites.svelte.js';
+import { openSharedFile, fileFromBase64 } from './shared-file.js';
+import { sharedFile } from './shared-file.svelte.js';
+
+/** The sites of a shared sites file, kept for the dives file shared next (lib/shared-file.js). */
+const SITES_KEY = 'od.sharedSites';
 
 /** How long a link waits for the logbook to be read (cold start), in ms. */
 const READY_LIMIT = 20000;
@@ -103,47 +111,37 @@ async function openTarget(target) {
   }
 }
 
-/**
- * A logbook file sent by another app: read, checked, confirmed, imported.
- * @param {string} uri
- */
-async function openFile(uri) {
-  /** @param {string} key @param {Record<string, string>} [values] */
-  const refuse = (key, values) => f7.dialog.create({ title: t('link.fileTitle'), text: t(key, values), buttons: [{ text: t('dialog.ok') }] }).open();
-  let file;
-  try {
-    file = await OpenDivesCore.readSharedFile({ uri });
-  } catch (e) {
-    const code = String(/** @type {any} */ (e)?.code ?? /** @type {any} */ (e)?.message ?? '');
-    console.error('Read a shared file', code);
-    refuse(code.includes('TOO_BIG') ? 'link.fileTooBig' : 'link.fileUnreadable');
-    return;
-  }
-  // The mime type is unreliable (.ssrf often arrives as application/octet-stream): the contents decide.
-  const head = atob(file.data.slice(0, 5464));
-  const check = checkSharedFile(file.name, head, file.size);
-  const label = file.name || t('link.fileUnnamed');
-  if (!check.ok) {
-    refuse(check.reason === 'TOO_BIG' ? 'link.fileTooBig' : check.reason === 'EMPTY' ? 'link.fileEmpty' : 'link.fileNotLogbook', { name: label });
-    return;
-  }
-  const { name } = check;
-  confirmAction({
-    title: t('link.fileTitle'),
-    text: t('link.fileText', { name: label }),
-    action: t('link.fileAction'),
-    onConfirm: async () => {
-      try {
-        const n = await importData(name, file.data);
-        offerUndo(t('logbook.imported', { n }));
-      } catch (e) {
-        const code = String(/** @type {any} */ (e)?.message ?? '');
-        console.error('Import a shared file', code);
-        f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
-      }
-    },
-  });
-}
+/** What the screen and the core give to lib/shared-file.js. */
+const sharedDeps = {
+  read: (/** @type {string} */ uri) => OpenDivesCore.readSharedFile({ uri }),
+  check: checkSharedFile,
+  welcome: () => logbook.welcome,
+  remembered: () => {
+    try {
+      return JSON.parse(deviceStore.getItem(SITES_KEY) ?? '{}');
+    } catch {
+      return {};
+    }
+  },
+  keep: (/** @type {Record<string, any>} */ sites) => deviceStore.setItem(SITES_KEY, JSON.stringify(sites)),
+  listSites: () => OpenDivesCore.siteQuery({ kind: 'list' }),
+  siteChange,
+  importData,
+  toFirstLaunch: (/** @type {string} */ name, /** @type {string} */ data) => {
+    sharedFile.file = fileFromBase64(name, data);
+  },
+  confirm: (/** @type {any} */ o, /** @type {() => Promise<void>} */ run) =>
+    confirmAction({ title: t('link.fileTitle'), text: t(o.textKey, o.values), action: t(o.actionKey), onConfirm: run }),
+  refuse: (/** @type {string} */ key, /** @type {Record<string, string|number>} */ values) =>
+    f7.dialog.create({ title: t('link.fileTitle'), text: t(key, values), buttons: [{ text: t('dialog.ok') }] }).open(),
+  notify: (/** @type {string} */ key, /** @type {Record<string, string|number>} */ values) => showSnackbar(t(key, values)),
+  imported: (/** @type {number} */ n) => offerUndo(t('logbook.imported', { n })),
+  importFailed: (/** @type {unknown} */ e) => {
+    const code = String(/** @type {any} */ (e)?.message ?? '');
+    console.error('Import a shared file', code);
+    f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();
+  },
+};
 
 /** Opens a dive of the logbook by its identifier (after a dive received by QR code). @param {number} id */
 export async function openDiveById(id) {
@@ -178,18 +176,19 @@ export function handleLink(url) {
         return;
       }
       if (!(await whenReady())) return;
-      // First launch, before any way to start was chosen: nothing to open it in yet.
-      if (logbook.welcome) {
+      // First launch, before any way to start was chosen: nothing to open a link in yet; a logbook file
+      // goes to « Importer un carnet ».
+      if (logbook.welcome && target.kind !== 'file') {
         showSnackbar(t('link.notReady'));
         return;
       }
       // A form with unsaved changes is not left behind by a link.
-      if (anyDirty()) {
+      if (!logbook.welcome && anyDirty()) {
         showSnackbar(t('link.unsaved'));
         return;
       }
       clearOverlays();
-      if (target.kind === 'file') await openFile(target.uri);
+      if (target.kind === 'file') await openSharedFile(sharedDeps, target.uri);
       else await openTarget(target);
     })
     .catch((e) => console.error('Open a link', e));
@@ -198,6 +197,12 @@ export function handleLink(url) {
 /** Listens for links: the one that started the app, then those that come while it runs. */
 export function enableDeepLinks() {
   CapacitorApp.addListener('appUrlOpen', (event) => handleLink(event.url));
+  // « Share to OpenDives » (Android ACTION_SEND): the plugin keeps the event until this listener exists.
+  try {
+    Promise.resolve(OpenDivesCore.addListener('sharedFile', (/** @type {{ uri: string }} */ e) => handleLink(e.uri))).catch(() => {});
+  } catch {
+    // The desktop plugin has no events: nothing is shared to it.
+  }
   CapacitorApp.getLaunchUrl()
     .then((launch) => {
       if (launch?.url) handleLink(launch.url);

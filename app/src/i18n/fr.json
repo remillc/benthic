@@ -2567,7 +2567,8 @@
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
       "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
       "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
-      "Équipement : le gilet a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand."
+      "Équipement : le gilet a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand.",
+      "Fichiers reçus d’une autre application : OpenDives apparaît dans « Ouvrir avec » et « Partager vers » pour un carnet (.ssrf, .xml), un fichier UDDF, FIT, DLD et les autres formats importables. Le fichier est lu, puis « Importer » est demandé ; sans carnet, il ouvre « Importer un carnet ». Le fichier de sites d’un export à deux fichiers est accepté : les sites déjà présents ne sont pas dupliqués."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3308,10 +3309,17 @@
     "fileText": "Importer les plongées de « {name} » dans ce carnet ? Celles qui y sont déjà ne sont pas ajoutées deux fois.",
     "fileAction": "Importer",
     "fileUnnamed": "ce fichier",
-    "fileNotLogbook": "« {name} » n’est pas un carnet Subsurface (.ssrf ou .xml). Aucune plongée n’a été modifiée.",
+    "fileNotLogbook": "« {name} » n’est pas un fichier que OpenDives sait importer. Aucune plongée n’a été modifiée.",
     "fileEmpty": "« {name} » est vide. Aucune plongée n’a été modifiée.",
     "fileTooBig": "Ce fichier est trop gros pour être importé (plus de 100 Mo). Aucune plongée n’a été modifiée.",
-    "fileUnreadable": "Ce fichier n’a pas pu être ouvert. Aucune plongée n’a été modifiée."
+    "fileUnreadable": "Ce fichier n’a pas pu être ouvert. Aucune plongée n’a été modifiée.",
+    "fileCsv": "« {name} » est un fichier CSV : importez-le par « + », « Importer un fichier », qui demande ses colonnes. Aucune plongée n’a été modifiée.",
+    "sitesText": "Ajouter à ce carnet les {n} sites de « {name} » ? Un site déjà dans le carnet n’est pas modifié ni ajouté deux fois ; un site dont seul le nom provisoire est connu est complété.",
+    "sitesAction": "Ajouter",
+    "sitesDone": "Sites : {added} ajoutés, {completed} complétés, {present} déjà présents.",
+    "sitesNothing": "Tous les sites de ce fichier sont déjà dans le carnet.",
+    "sitesFirstLaunch": "« {name} » ne contient que des sites. Importez d’abord le fichier des plongées, puis ouvrez celui-ci.",
+    "sitesFailed": "Les sites n’ont pas pu être ajoutés."
   },
   "share": {
     "title": "Partager",

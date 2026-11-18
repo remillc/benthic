@@ -2567,7 +2567,8 @@
       "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
       "Phone, « Your logbook is ready » (OpenDives+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave.",
       "My diver profile (OpenDives+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
-      "Equipment: the BCD has its own icon (collar, centre opening, two straps) and the surface marker buoy its own, with a flat top. In « New piece » (and when editing), a thumbnail left of the « Model » field shows your photo of the piece, otherwise the icon of its type, large."
+      "Equipment: the BCD has its own icon (collar, centre opening, two straps) and the surface marker buoy its own, with a flat top. In « New piece » (and when editing), a thumbnail left of the « Model » field shows your photo of the piece, otherwise the icon of its type, large.",
+      "Files from another app: OpenDives is in “Open with” and “Share to” for a logbook (.ssrf, .xml), a UDDF, FIT or DLD file and the other formats it imports. The file is read, then “Import” is asked; with no logbook yet it opens “Import a logbook”. The sites file of a two-file export is accepted: sites already there are not duplicated."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3308,10 +3309,17 @@
     "fileText": "Import the dives of “{name}” into this logbook? Dives already there are not added twice.",
     "fileAction": "Import",
     "fileUnnamed": "this file",
-    "fileNotLogbook": "“{name}” is not a Subsurface logbook (.ssrf or .xml). No dive was changed.",
+    "fileNotLogbook": "“{name}” is not a file OpenDives can import. No dive was changed.",
     "fileEmpty": "“{name}” is empty. No dive was changed.",
     "fileTooBig": "This file is too big to import (over 100 MB). No dive was changed.",
-    "fileUnreadable": "This file could not be opened. No dive was changed."
+    "fileUnreadable": "This file could not be opened. No dive was changed.",
+    "fileCsv": "“{name}” is a CSV file: import it from “+”, “Import a file”, which asks for its columns. No dive was changed.",
+    "sitesText": "Add the {n} sites of “{name}” to this logbook? A site already in the logbook is neither changed nor added twice; a site known only by its temporary name is completed.",
+    "sitesAction": "Add",
+    "sitesDone": "Sites: {added} added, {completed} completed, {present} already there.",
+    "sitesNothing": "Every site of this file is already in the logbook.",
+    "sitesFirstLaunch": "“{name}” holds only sites. Import the dives file first, then open this one.",
+    "sitesFailed": "The sites could not be added."
   },
   "share": {
     "title": "Share",

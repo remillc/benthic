@@ -5,7 +5,8 @@
   // first launch »). The order of the steps is in lib/first-launch-steps.js, their state in
   // lib/first-launch.svelte.js. Moving between steps plays the forward shared-axis X transition on this column
   // only (« Retour » plays it backwards); the blue panel next to it does not move.
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
+  import { sharedFile } from '../lib/shared-file.svelte.js';
   import { f7 } from 'framework7-svelte';
   import { Capacitor } from '@capacitor/core';
   import { OpenDivesCore } from 'opendives-core';
@@ -493,6 +494,20 @@
       window.removeEventListener('drop', drop);
       window.removeEventListener('dragleave', leave);
     };
+  });
+
+  // A logbook file another app shared (« Open with », « Share to », lib/open-link.js): « Importer un carnet »
+  // with the file already read, then « Nouveau carnet » with its summary. Nothing is created before the diver
+  // confirms there. Waits while another file is being read.
+  $effect(() => {
+    const file = sharedFile.file;
+    if (!file || busy) return;
+    untrack(() => {
+      sharedFile.file = null;
+      resetFlow();
+      go('import');
+      void bring([file]);
+    });
   });
 
   /** A file picked for the import (« Un fichier »). */
