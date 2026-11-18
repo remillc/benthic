@@ -465,6 +465,7 @@ Until the key routes are built, the single-device case works with the device's o
 - The reference lives in `media/<dive id>.json` on the `opendives` branch: `{ "format": 1, "diveId": "<dive id>", "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Merge: `items` are merged by `hash` (union); the caption is a field of the item.
 - The app holds no storage credentials: it asks the API for short-lived signed URLs to upload or download an object. The API only signs for objects the person owns or that were shared with them (section 11.7).
 - Originals are never altered or recompressed on upload.
+- **Offline (decided on 18 November 2026).** Uploads made offline wait and leave when the network returns, like other changes. On the diver's other devices: **thumbnails are always downloaded and kept**, so the whole logbook stays readable offline; **originals are downloaded on Wi-Fi only**, following a setting « Toutes », « Celles des 12 derniers mois », « À la demande »; the default is « Celles des 12 derniers mois » for photos and « À la demande » for videos (they follow the setting if the diver changes it). An original not downloaded opens on demand when the network is there.
 
 ### 11.7 Shared data: opt-in
 
