@@ -30,7 +30,7 @@ test('no page is lazy and static at once, and every lazy route resolves its page
     assert.ok(!statics.has(m[1]), `${m[1]} is imported both ways`);
     assert.ok(readFileSync(path.join(src, 'pages', `${m[1]}.svelte`), 'utf8').length > 0);
   }
-  assert.match(app, /const lazy = \(load, props\) =>/);
+  assert.match(app, /const lazy = lazyRoute;/);
 });
 
 test('the language catalogs are loaded one by one, only the ones the language needs', () => {

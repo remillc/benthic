@@ -71,7 +71,7 @@
 <div class="od-band-backdrop od-band-backdrop--holder" bind:this={holder}>
   <div class="od-band-backdrop--layer" class:od-band-backdrop--layer-pill={pill} class:od-band-backdrop--layer-short={short} bind:this={panel}>
     <div class="od-band-backdrop--fill"></div>
-    <svg class="od-band-backdrop--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="od-band-backdrop--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{PROFILE} V140 H0 Z" class="od-band-backdrop--area" />
       <path d={PROFILE} class="od-band-backdrop--line" vector-effect="non-scaling-stroke" />
     </svg>

@@ -2168,6 +2168,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First screens: a page opened for the first time now waits for its styles before it is shown, and the drawings of the blue bands have a fixed size, so nothing flashes at a large size while the first launch screen opens.",
       "Desktop logbook: the table is lighter. Default columns: number in bold, date with the day of the week and the time in small grey, site (or \"Site not set\" in grey italics with a crossed-out pin), deepest depth in bold, duration, buddies. The \"Profile\" column (small dive graphs) is hidden by default and added with the columns button; the columns and widths you chose are kept. A line under the headers gives the year and dive count of the first visible dive and stays at the top while scrolling. A trip is a white card that folds. The selected dive is pale blue, with its number and site in blue.",
       "First launch (public edition): if you come from the alpha, “Import a logbook” offers “Previous version’s logbook”, with its number of dives. It copies that logbook, read on the phone without the network, into a new logbook; the alpha’s files are not touched and the row disappears after the copy.",
       "Public edition: no choice is left to open a logbook in OneDrive, Google Drive or a personal git repository. “Open my logbook” offers the OpenDives server, and the account no longer offers “Use my own git repository”.",

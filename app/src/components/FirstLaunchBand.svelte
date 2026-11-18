@@ -29,11 +29,11 @@
   {#if welcome}<div class="od-first-launch-band--sheen" aria-hidden="true"></div>{/if}
   <div class="od-first-launch-band--hatch" aria-hidden="true"></div>
   {#if !welcome}
-    <svg class="od-first-launch-band--step-profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="od-first-launch-band--step-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{STEP_PROFILE} V140 H0 Z" class="od-first-launch-band--step-area" />
       <path d={STEP_PROFILE} class="od-first-launch-band--step-line" vector-effect="non-scaling-stroke" />
     </svg>
-    <svg class="od-first-launch-band--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    <svg class="od-first-launch-band--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
   <div class="od-first-launch-band--brand" role="img" aria-label={t('welcome.brandAlpha')}>
     <img class="od-first-launch-band--logo" src="logo-light.svg" alt="" width={welcome ? 40 : 32} height={welcome ? 40 : 32} />

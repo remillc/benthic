@@ -82,7 +82,7 @@
 >
   <nav class="od-nav-menu--menu" aria-label={t('menu.sections')} bind:this={menu} use:tolerantTaps>
     <div class="od-nav-menu--band">
-      <svg class="od-nav-menu--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="od-nav-menu--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
         <path d="{PROFILE} V140 H0 Z" class="od-nav-menu--area" />
         <path d={PROFILE} class="od-sync-status--line" />
       </svg>
@@ -98,7 +98,7 @@
         </span>
         <Icon name="chevron" size={20} />
       </a>
-      <svg class="od-nav-menu--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+      <svg class="od-nav-menu--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
     </div>
 
     {#each sections as section (section)}

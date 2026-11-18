@@ -69,6 +69,7 @@
   import { logbook } from './lib/logbook.svelte.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
+  import { lazyRoute, stylesheetsReady } from './lib/lazy-route.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
   import MapsDialogs from './components/MapsDialogs.svelte';
@@ -81,9 +82,7 @@
    * @param {() => Promise<{ default: any }>} load
    * @param {Record<string, any>} [props]
    */
-  const lazy = (load, props) => ({
-    async: async (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ component: (await load()).default }, props ? { props } : undefined),
-  });
+  const lazy = lazyRoute;
 
   // Addresses: a resource has no trailing slash, a collection has one (AGENTS.md).
   const appRoutes = [
@@ -100,6 +99,7 @@
     { path: '/settings/', ...(settingsWindow ? { component: Settings, options: { props: { desk: true, windowed: true } } } : { component: AdaptivePage, options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false } } } }) },
     { path: '/about', async: async (/** @type {{ resolve: Function }} */ { resolve }) => {
       const { default: About } = await import('./pages/About.svelte');
+      await stylesheetsReady();
       resolve(layout.desktop ? { popup: { component: About } } : { component: About });
     },
     },

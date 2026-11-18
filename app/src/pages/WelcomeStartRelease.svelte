@@ -37,11 +37,11 @@
     <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
       <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
       <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
-      <svg class="od-welcome-release--panel-profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="od-welcome-release--panel-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
         <path d="{BAND_PROFILE} V140 H0 Z" class="od-welcome-release--panel-profile-area" />
         <path d={BAND_PROFILE} class="od-welcome-release--panel-profile-line" vector-effect="non-scaling-stroke" />
       </svg>
-      <svg class="od-welcome-release--panel-wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+      <svg class="od-welcome-release--panel-wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
       {@render panelContent()}
     </section>
 

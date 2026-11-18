@@ -88,11 +88,11 @@
     <div class="od-plus-hero--bands" aria-hidden="true"></div>
     {#if which === 'ready' && motion.bubbles}<OdPlusReadyBubbles still={motion.still} />{/if}
     <!-- Every OpenDives+ header: the band of the dive profile above the bottom wave, as on « Se connecter ». -->
-    <svg class="od-plus-hero--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="od-plus-hero--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{BAND_PROFILE} V140 H0 Z" class="od-plus-hero--profile-area" />
       <path d={BAND_PROFILE} class="od-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
     </svg>
-    <svg class="od-plus-hero--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    <svg class="od-plus-hero--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
     <div class="od-plus-hero--brand">
       <img src="logo-light.svg" alt="" width="32" height="32" />
       <span>{t('welcomeSteps.appName')}</span>

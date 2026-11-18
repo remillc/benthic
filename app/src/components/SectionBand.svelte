@@ -15,13 +15,13 @@
 
 <div class="od-section-band od-section-band--band" class:od-section-band--tall={tall} class:od-section-band--over-map={overMap} class:od-section-band--pill={pill} class:od-section-band--with-chip={chip} class:od-section-band--bare={bare}>
   {#if !bare}
-    <svg class="od-section-band--profile" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="od-section-band--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{PROFILE} V140 H0 Z" class="od-section-band--area" />
       <path d={PROFILE} class="od-section-band--line" vector-effect="non-scaling-stroke" />
     </svg>
   {/if}
   {#if !overMap && !bare}
-    <svg class="od-section-band--wave" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    <svg class="od-section-band--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
   <!-- A new summaryKey cross-fades to the new summary (Sites: the search count). -->
   {#key summaryKey}
