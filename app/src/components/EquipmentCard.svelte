@@ -14,6 +14,7 @@
    * @type {{
    *   label: string,
    *   suit: string,
+   *   undersuit?: string,
    *   weightTotal: string,
    *   weights: { place: string, weight: string }[],
    *   computer?: string,
@@ -36,7 +37,7 @@
    * With several computers (task 2026-11-14-144), a block « Ordinateurs » under the card's rows,
    * open or closed: one row per computer, « Principal » on the first; a tap calls oncomputers.
    */
-  let { label, suit, weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle, feedback = '', onfeedback, oncomputers } = $props();
+  let { label, suit, undersuit = '', weightTotal, weights, computer = '', computers = [], open, opens = true, ontoggle, feedback = '', onfeedback, oncomputers } = $props();
 
   /** Several computers: their own block, always shown, instead of the « Ordinateur » row. */
   const several = $derived(computers.length > 1);
@@ -64,6 +65,9 @@
     <span class="od-equipment-card--rows">
       {#if suit}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.suitRow')}</span><span class="od-equipment-card--value">{suit}</span></span>
+      {/if}
+      {#if undersuit}
+        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('gear.diveGear.undersuit')}</span><span class="od-equipment-card--value">{undersuit}</span></span>
       {/if}
       {#if weightTotal}
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
@@ -276,6 +280,22 @@
         font-size: 14px;
         line-height: 20px;
         color: var(--od-text-2);
+      }
+    }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-equipment-card--summary {
+        transition: box-shadow 120ms linear;
+      }
+      .od-equipment-card--summary:not(.od-equipment-card--static):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-equipment-card--summary {
+        transition: none;
       }
     }
   }

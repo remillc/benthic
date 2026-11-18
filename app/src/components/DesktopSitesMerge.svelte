@@ -1,0 +1,79 @@
+<script>
+  // @ts-check
+  // « Fusionner » in the desktop Sites clean-up asks which of the two sites to keep, as the phone's
+  // clean-up does (pages/SitesCleanup.svelte): the two sites as choice rows, the one with more dives
+  // chosen first, a line that says what the merge does, then « Fusionner ». The merge can be undone.
+  import Md3Dialog from './Md3Dialog.svelte';
+  import ChoiceRow from './ChoiceRow.svelte';
+  import { mergeSides } from '../lib/desktop-sites.js';
+  import { t } from '../lib/i18n.js';
+
+  /** @typedef {import('opendives-core').SiteSummary} Site */
+
+  /**
+   * @type {{
+   *   a: Site,
+   *   b: Site,
+   *   describe: (site: Site) => string,
+   *   onmerge: (keep: Site, other: Site) => void,
+   *   onclose: () => void,
+   * }}
+   */
+  let { a, b, describe, onmerge, onclose } = $props();
+
+  /** @type {number|null} */
+  let kept = $state(null);
+  const sides = $derived(mergeSides(a, b, kept));
+  const name = (/** @type {Site} */ s) => s.name || t('sites.noName');
+</script>
+
+<Md3Dialog class="od-sites-merge" title={t('desktopFollowups.siteMerge.title')} oncancel={onclose}>
+  <p class="od-sites-merge--lead">{t('desktopFollowups.siteMerge.which')}</p>
+  <div class="od-sites-merge--choices" role="radiogroup" aria-label={t('desktopFollowups.siteMerge.which')}>
+    {#each [sides.first, sides.second] as s (s.uuid)}
+      <ChoiceRow name="od-sites-merge-keep" selected={sides.keep === s} onselect={() => (kept = s.uuid)}>
+        <span class="od-sites-merge--label">{name(s)}</span>
+        <span class="od-sites-merge--line">{describe(s)}</span>
+      </ChoiceRow>
+    {/each}
+  </div>
+  <p class="od-sites-merge--effect">{t('sites.mergeText', { keep: name(sides.keep), other: name(sides.other) })}</p>
+
+  {#snippet actions()}
+    <button type="button" class="button" onclick={onclose}>{t('dialog.cancel')}</button>
+    <button type="button" class="button button-fill" onclick={() => onmerge(sides.keep, sides.other)}>{t('sites.merge')}</button>
+  {/snippet}
+</Md3Dialog>
+
+<style>
+  @layer od.components {
+    .od-sites-merge--lead,
+    .od-sites-merge--effect {
+      margin: 0;
+      padding-inline: 24px;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+    .od-sites-merge--lead {
+      margin-bottom: 8px;
+    }
+    .od-sites-merge--effect {
+      margin-top: 12px;
+    }
+    .od-sites-merge--choices {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .od-sites-merge--label {
+      display: block;
+      font-size: 15px;
+      color: var(--od-text);
+    }
+    .od-sites-merge--line {
+      display: block;
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+  }
+</style>

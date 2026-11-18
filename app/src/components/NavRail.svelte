@@ -11,7 +11,7 @@
   import AccountAvatar from './AccountAvatar.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { ios } from '../lib/layout.svelte.js';
+  import { ios, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { navigation, sections, goToSection, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { tolerantTaps } from '../lib/tap.js';
@@ -44,7 +44,15 @@
     </a>
   {/each}
   <div class="od-nav-rail--spacer"></div>
-  {#if !ios}<AccountAvatar rail />{:else}
+  {#if !ios}
+  <!-- Desktop, Windows and Linux: Réglages above the avatar (task 2026-11-15-169); the Mac has it in its menu bar. -->
+  {#if desktopApp && !desktopMac}
+    <a href="#settings" class="od-nav-rail--item od-nav-rail--settings" aria-current={navigation.page === 'settings' ? 'page' : undefined} title="{t('settings.title')} (Ctrl+,)" onclick={(e) => choose(e, openSettings)}>
+      <span class="od-nav-rail--icon"><Icon name="settings" size={24} /></span>
+      <span class="od-nav-rail--label">{t('settings.title')}</span>
+    </a>
+  {/if}
+  <AccountAvatar rail />{:else}
   <a
     href="#account"
     class="od-nav-rail--item od-nav-rail--bottom"
@@ -128,6 +136,48 @@
           height: 48px;
           border-radius: 24px;
         }
+      }
+    }
+
+    /* Mouse (the desktop app, task 2026-11-15-180): the Material 3 hover layer on the pill, ink
+       for the icon and label; the active pill keeps its colours under the layer. An action: the hand pointer
+       (docs/system-design.md, « Pointer »). */
+    @media (hover: hover) and (pointer: fine) {
+      .od-nav-rail--item {
+        cursor: pointer;
+
+        .od-nav-rail--icon {
+          position: relative;
+        }
+        .od-nav-rail--icon::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: var(--od-text);
+          opacity: 0;
+          transition: opacity 120ms linear;
+        }
+        &:hover .od-nav-rail--icon::after {
+          opacity: 0.08;
+        }
+        &:hover:not([aria-current='page']) {
+          color: var(--od-text);
+        }
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-nav-rail--item .od-nav-rail--icon::after {
+        transition: none;
+      }
+    }
+    /* Keyboard focus: the Material 3 focus ring, 2 dp outside the pill. */
+    .od-nav-rail--item:focus-visible {
+      outline: none;
+
+      .od-nav-rail--icon {
+        outline: 2px solid var(--od-on-table-selected);
+        outline-offset: 2px;
       }
     }
 

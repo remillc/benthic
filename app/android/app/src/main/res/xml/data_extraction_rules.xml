@@ -6,9 +6,13 @@
     <cloud-backup>
         <exclude domain="file" path="git-remote.bin" />
         <exclude domain="file" path="git-remote.bin.tmp" />
+        <exclude domain="file" path="server-session.bin" />
+        <exclude domain="file" path="server-session.bin.tmp" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="git-remote.bin" />
         <exclude domain="file" path="git-remote.bin.tmp" />
+        <exclude domain="file" path="server-session.bin" />
+        <exclude domain="file" path="server-session.bin.tmp" />
     </device-transfer>
 </data-extraction-rules>

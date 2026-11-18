@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -51,6 +51,18 @@
     redo: 'M15 14l5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13',
     // A desktop computer: a screen on a stand (task 2026-11-14-167).
     desktop: 'M4 5h16v10H4zM2 19h20',
+    // Desktop logbook (task 2026-11-15-169): a suitcase (add to a trip), an upload arrow (export),
+    // three columns (the columns button).
+    trip: 'M9 7V5h6v2M4 7h16v12H4zM4 12h16',
+    export: 'M12 15V4M7 9l5-5 5 5M5 15v5h14v-5',
+    columns: 'M4 5h16v14H4zM9.5 5v14M14.5 5v14',
+    // OpenDives+ (task 2026-11-17-265): a card with a portrait (certifications), a briefcase (gear), a phone, a cloud
+    // with a down arrow (backup), a four-pointed mark (the OpenDives+ chip).
+    idCard: 'M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM8.5 11.5a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM6 15.5c.4-1.5 1.4-2.2 2.5-2.2s2.1.7 2.5 2.2M14 10h4M14 13.5h3',
+    briefcase: 'M9 7V5h6v2M4 7h16v12H4zM4 12.5h16M11 12.5v2h2v-2',
+    phone: 'M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5zM11 18.5h2',
+    cloudDownload: 'M7 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17 8.5a4.75 4.75 0 0 1 .5 9.5M12 11v8M9 16l3 3 3-3',
+    plusMark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
     computer: 'M9 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM10 7h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM10 17h4',
     tripRemove: 'M4 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM5.5 7V4.5h5V7M6 11v8M10 11v8M17 13h5',
     renumber: 'M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 11h2.5l-2.5 3h2.5M3.5 16h2.5v4.5h-2.5M4 18.2h2',
@@ -64,6 +76,15 @@
     wristComputer: 'M9.5 6.5h5a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4v-3a4 4 0 0 1 4-4zM8.5 6.5 9.3 3h5.4l.8 3.5M8.5 17.5l.8 3.5h5.4l.8-3.5M18.5 10.5h1.5',
     warning: 'M12 4l9 16H3zM12 10v4M12 17h.01',
     lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5zM12 15v2',
+    // First launch of the release edition (task 2026-11-15-213): a cloud with an upward arrow, a tablet,
+    // a folder with a downward arrow, and a server (WebDAV): generic shapes, never a brand logo.
+    cloudUpload: 'M7 19h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 10.1 4.5 4.5 0 0 0 7 19zM12 16.5v-5m-2.2 2.2L12 11.5l2.2 2.2',
+    tablet: 'M6.5 2.5h11a2.5 2.5 0 0 1 2.5 2.5v14a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19V5a2.5 2.5 0 0 1 2.5-2.5zM10 18.5h4',
+    folderDownload: 'M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V9.5A1.5 1.5 0 0 0 19.5 8H12l-2-2.5H4.5A1.5 1.5 0 0 0 3 7zM12 11v5m-2.2-2.2L12 16l2.2-2.2',
+    server: 'M6 4h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 13h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM8 7.5h.01M8 16.5h.01',
+    // An upload tray and a globe (« Importer un carnet », divelogs.de).
+    upload: 'M12 15V4m-4 4l4-4 4 4M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5',
+    globe: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9',
     blank: '',
     cloud: 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z',
     close: 'M6 6l12 12M18 6L6 18',

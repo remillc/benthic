@@ -5,15 +5,19 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { shouldReconnect } from './reconnect.js';
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
+import { runCsvImport } from './csv-import.js';
+import { storedDemo } from './demo.js';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
+import { ownLogbookWindow, noLogbookWindow } from './window-logbook.js';
 import { nextProgress } from './sync-progress.js';
 import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
 import { importPayload } from './import-files.js';
+import { isRelease } from './edition.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -98,6 +102,11 @@ export const logbook = $state({
   conflictLater: false,
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
+  /**
+   * Release edition: the first launch stays on screen over the logbook while a logbook is being sent to the OpenDives
+   * server (task 2026-11-17-266); the logbook is already open under it.
+   */
+  welcomeHold: false,
   /** Last dive changed by an edit or an undo, for the detail screen. */
   edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
   /** Last trip changed by a trip change or an undo, for the trip screen. */
@@ -433,6 +442,43 @@ export async function importData(name, data) {
 }
 
 /**
+ * A CSV file with the column mapping the diver chose (components/CsvImportDialog.svelte, task 2026-11-16-224):
+ * the core's CSV import, one undoable step, saved and synced like any import. The files are staged in the app's
+ * cache for the call and discarded after it.
+ * @param {File} file
+ * @param {import('opendives-core').CsvParams} params the mapping (lib/csv-import.js, buildParams)
+ * @param {File|null} [companion] Poseidon MkVI: the .txt of the same dive
+ * @returns {Promise<number>} the number of dives added to the logbook
+ */
+export async function importCsvFile(file, params, companion = null) {
+  const before = logbook.dives.length;
+  const result = await runCsvImport(
+    {
+      stage: async (f) => (await OpenDivesCore.stageImport({ name: f.name, data: await fileBase64(f) })).path,
+      discard: (path) => OpenDivesCore.discardImport({ path }),
+      importCsv: (o) => OpenDivesCore.importCsv(o),
+    },
+    { file, companion, params, dryRun: false },
+  );
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+  return Math.max(0, logbook.dives.length - before);
+}
+
+/** @param {File} file @returns {Promise<string>} the contents, base64 */
+function fileBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
  * A dive or a plan received by QR code (lib/qr-receive.svelte.js): its .ssrf text goes through the
  * core's import, as a normal dive of the logbook (new number), one undoable step, saved and synced
  * like any import.
@@ -455,6 +501,8 @@ export async function importReceived(xml) {
 
 /** Dives logged on this device without an account (0 when none, or unreadable). */
 export async function deviceDiveCount() {
+  // The demo logbook is never offered to an account (task 2026-11-16-224).
+  if (storedDemo(deviceStore)) return 0;
   try {
     return (await OpenDivesCore.deviceLog({ action: 'count' })).count;
   } catch (e) {
@@ -469,6 +517,7 @@ export async function deviceDiveCount() {
  * @returns {Promise<number>} the number of dives added
  */
 export async function importDeviceDives() {
+  if (storedDemo(deviceStore)) throw new Error('NO_DIVES');
   const before = logbook.dives.length;
   const result = await OpenDivesCore.deviceLog({ action: 'import' });
   logbook.undoText = result.undo;
@@ -493,12 +542,19 @@ export async function afterDownload(result) {
   } catch (e) {
     console.error('Reading the remembered dive computers', e);
   }
-  if (!result?.downloaded) return;
+  // Release edition: the computer enters the equipment inventory the first time it is downloaded from
+  // (task 2026-11-17-267). Imported after the dives, so that the logbook's list of computers is up to date.
+  const noteComputer = result && isRelease ? () => import('./inventory.svelte.js').then((m) => m.noteDownloadedComputer(result)) : null;
+  if (!result?.downloaded) {
+    noteComputer?.();
+    return;
+  }
   logbook.undoText = result.undo;
   logbook.redoText = '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
+  noteComputer?.();
 }
 
 /**
@@ -653,6 +709,9 @@ async function syncEdits() {
  * @returns {string|null}
  */
 function readWelcomeState() {
+  // A window that holds a logbook of its own (a file or a git repository) or none has no first launch:
+  // that belongs to the logbook of this computer (task 2026-11-15-173).
+  if (ownLogbookWindow()) return 'done';
   try {
     return deviceStore.getItem('od.welcome');
   } catch {
@@ -666,6 +725,7 @@ function readWelcome() {
 
 /** @param {'show'|'done'} value */
 function writeWelcomeState(value) {
+  if (ownLogbookWindow()) return;
   try {
     deviceStore.setItem('od.welcome', value);
   } catch {
@@ -729,6 +789,11 @@ export function boot() {
 export async function startApp() {
   mark('startApp');
   if (logbook.welcome) return;
+  // The desktop's start screen: no logbook is open in this window (task 2026-11-15-173).
+  if (noLogbookWindow()) {
+    logbook.loading = false;
+    return;
+  }
   if (readWelcomeState() === null) {
     let configured = false;
     try {
@@ -766,6 +831,27 @@ export async function signOut({ deleteCopy = false } = {}) {
 export async function accountDeleted({ keepDives }) {
   forgetAccount(!keepDives);
   if (keepDives) await loadLogbook();
+}
+
+/**
+ * The demo logbook is erased from this device (« Commencer mon carnet »): its dives and the sites they leave unused,
+ * saved, then first launch is shown again as after signing out. The demo has no account, so nothing is sent anywhere.
+ * @returns {Promise<void>}
+ */
+export async function eraseDemoLogbook() {
+  // Only this device's own logbook: an account's logbook is never touched, whatever the stored flag says.
+  if (logbook.email) throw new Error('NOT_DEMO');
+  const ids = logbook.dives.map((d) => d.id);
+  if (ids.length) await OpenDivesCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+  await OpenDivesCore.saveLocal();
+  undoCleared();
+}
+
+/** First launch is shown again: the logbook on screen is gone (the demo was erased). */
+export function showFirstLaunchAgain() {
+  forgetAccount(true);
 }
 
 /** @param {boolean} showWelcome */

@@ -11,16 +11,18 @@ import { noteFirstOpen } from './lib/review-prompt.js';
 import { releaseLaunchScreen } from './lib/launch.js';
 import { deviceStore } from './lib/device-store.js';
 import { installRippleFix } from './lib/ripple-fix.js';
+import { settingsWindow } from './lib/layout.svelte.js';
 
 observePaints();
 mark('main');
 // The core starts on the logbook now, on its own thread, while the screens are
 // built: the settings of this device first, then the account and the device's
 // copy of the log (on a first launch, nothing is loaded until a choice).
-noteFirstOpen();
+// The Mac's Réglages window shows the settings only: the main window owns the logbook.
+if (!settingsWindow) noteFirstOpen();
 // The paper grain trial's choice (task 2026-11-13-108): the grain is now always on (task 109).
 deviceStore.removeItem('od.paperGrain');
-boot();
+if (!settingsWindow) boot();
 installRippleFix();
 
 Framework7.use(Framework7Svelte);

@@ -370,5 +370,21 @@
     .od-statistic-new--end {
       height: 32px;
     }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-statistic-new--text-button {
+        transition: box-shadow 120ms linear;
+      }
+      .od-statistic-new--text-button:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-statistic-new--text-button {
+        transition: none;
+      }
+    }
   }
 </style>

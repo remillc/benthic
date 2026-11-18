@@ -4471,7 +4471,7 @@ Mock-ups (`P` = `docs/mockups/android-tablette-premier-lancement-production-`, a
 
 **Test:** on each device, create and import each reach « Où le garder ? » after « Suivant »; the name typed in step 1 is the title of step 2 and the file name; the pencil returns to step 1 with the name kept; `main` is untouched.
 
-Done on `feature/release-new-logbook-two-steps` (not merged): « Nouveau carnet » (name, « Suivant ») then « Où le garder ? » (the name as title with the pencil back to the name, the three rows by device), for creating and importing, on phone, tablet and desktop; « Retour » one step back with the backward transition.
+Done: « Nouveau carnet » is two steps on phone, tablet (both orientations) and desktop. New step `where` in `lib/first-launch-steps.js` (« Suivant » is the choice `next` from `new` and `importNew`; `cloud` and `git` now leave `where`; the pencil still pops to the last name step, so the name is kept). `FirstLaunchSteps.svelte`: `nameStep` (summary card for an import, name field, « Suivant », Enter also goes on; `ReleaseField` got an `onenter` prop) and `whereStep` (the name as the page title with the pencil, subtitle, help line, the three rows with the device texts by device). « Retour » pops one step with the existing backward shared-axis transition. New key `welcomeSteps.next` (fr, en). No release note. Tests: `tests/app/release-welcome.test.mjs`, `first-launch-complete.test.mjs` and `desktop-first-launch.test.mjs` updated for the extra `where` step. Branch `feature/release-new-logbook-two-steps`.
 
 ## [x] 2026-11-16-232 Alpha: the confirmation code in six boxes
 

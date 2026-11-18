@@ -21,6 +21,7 @@
 #include "core/trip.h"
 #include "core/compat/platform_https.h"
 
+#include <algorithm>
 #include <git2.h>
 #include <chrono>
 #include <cstdio>
@@ -654,6 +655,63 @@ int get_dive(int id, std::string &json, std::string &error)
 	else
 		append_json_array(json, tissues);
 	json += "}}";
+	return 0;
+}
+
+int dive_columns(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	// The same dives as dives_json(), in the same order.
+	for (const auto &d: divelog.dives) {
+		if (d->invalid && !prefs.display_invalid_dives)
+			continue;
+		if (internal::is_plan_only(*d))
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		const struct divecomputer *dc = d->get_dc(0);
+		json += "{\"id\":" + std::to_string(d->id);
+		json += ",\"waterTempMk\":" + std::to_string(d->watertemp.mkelvin);
+		json += ",\"airTempMk\":" + std::to_string(d->airtemp.mkelvin);
+		json += ",\"meanDepthMm\":" + std::to_string(d->meandepth.mm);
+		json += ",\"sacMlMin\":" + std::to_string(d->sac);
+		json += ",\"rating\":" + std::to_string(d->rating);
+		json += ",\"buddies\":";
+		append_names(json, d->buddy);
+		json += ",\"guides\":";
+		append_names(json, d->diveguide);
+		json += ",\"computer\":";
+		append_json_string(json, dc ? dc->model : std::string());
+		json += ",\"suit\":";
+		append_json_string(json, d->suit);
+		json += ",\"gases\":[";
+		std::vector<std::string> gases;
+		for (size_t i = 0; i < d->cylinders.size(); i++) {
+			if (!d->is_cylinder_used(static_cast<int>(i)))
+				continue;
+			std::string name = d->cylinders[i].gasmix.name();
+			if (std::find(gases.begin(), gases.end(), name) != gases.end())
+				continue;
+			if (!gases.empty())
+				json += ',';
+			gases.push_back(name);
+			append_json_string(json, name);
+		}
+		json += "],\"tags\":[";
+		for (size_t i = 0; i < d->tags.size(); i++) {
+			if (i)
+				json += ',';
+			append_json_string(json, d->tags[i]->name);
+		}
+		json += "],\"divemode\":";
+		append_json_string(json, dc ? divemode_text[dc->divemode] : "OC");
+		json += ",\"country\":";
+		append_json_string(json, d->dive_site ? taxonomy_get_country(d->dive_site->taxonomy) : std::string());
+		json += '}';
+	}
+	json += ']';
 	return 0;
 }
 
@@ -1401,6 +1459,22 @@ int export_dives(const std::vector<int> &ids, const std::string &format, bool an
 	for (auto &[d, selected]: saved)
 		d->selected = selected;
 	return ret;
+}
+
+int save_logbook_file(const std::string &path, std::string &error)
+{
+	if (path.empty()) {
+		error = "BAD_REQUEST";
+		return -1;
+	}
+	// File > Save As in Subsurface's main window: save_dives() writes the whole
+	// log (every dive, site, trip reached by a dive, the settings, the filter
+	// presets), not the selected dives only.
+	if (save_dives(path.c_str())) {
+		error = "SAVE_FAILED";
+		return -1;
+	}
+	return 0;
 }
 
 namespace internal {

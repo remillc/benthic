@@ -325,6 +325,13 @@
       justify-content: center;
     }
 
+    /* Mouse: the 8 % layer of the content colour on a round state area. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-number-combo--chevron:hover {
+        background: radial-gradient(circle closest-side, color-mix(in srgb, var(--od-text) 8%, transparent) 99%, transparent) center / 40px 40px no-repeat;
+      }
+    }
+
     .od-number-combo--arrow {
       display: flex;
       transition: transform 150ms;

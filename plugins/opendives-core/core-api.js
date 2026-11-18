@@ -9,6 +9,15 @@ import { sortCylinderTypes } from './cylinder-sort.js';
 export { waterTypeOf };
 
 /**
+ * The column mapping of a CSV import (import_csv in core/libopendives/opendives.h): `format` is `samples` (a
+ * profile per file), `dives` (a dive per line), `seabear` or `poseidon`; `template` the stylesheet of `samples`
+ * (`csv`, `SensusCSV`); the other keys are the stylesheets' own: a column index (`timeField`, `depthField`, ...,
+ * -1 for none), an option index (`separatorIndex`, `units`, `datefmt`, `durationfmt`) or a text (`date`, `time`, `hw`).
+ * Key order counts: `date` comes first when given.
+ * @typedef {{ format: 'samples'|'dives'|'seabear'|'poseidon', template?: string, [key: string]: string|number|undefined }} CsvParams
+ */
+
+/**
  * Trip identifiers change on every load: never store them.
  * @typedef {Object} DiveTrip
  * @property {number} id
@@ -550,6 +559,15 @@ export { waterTypeOf };
  *   with no token typed): as for a push, which checks the token and its right
  *   to write ('ok', 'denied', 'none'). Network only; nothing is stored.
  *   Rejects with BAD_ADDRESS (not HTTPS, or holding credentials) or BAD_CREDENTIALS.
+ * @property {(options: {email: string, sessionToken: string, repositoryUrl: string, branch: string, gitUsername: string, gitToken: string}) => Promise<void>} serverSessionSave
+ *   Release edition: keeps the OpenDives server's session (session token and git token) in the platform's secure
+ *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
+ * @property {() => Promise<{signedIn: boolean, email: string, repositoryUrl: string, branch: string}>} serverSessionInfo
+ *   Who is signed in to the OpenDives server, without any token.
+ * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string}>} serverSessionAccess
+ *   The access to the repository, for the download. Rejects with NOT_SIGNED_IN.
+ * @property {() => Promise<void>} serverSessionClear
+ *   Signs out of the OpenDives server: the tokens are erased.
  * @property {() => Promise<{url: string, username: string, branch: string}>} gitConfig
  *   The connected repository without its token, empty strings when none (for editing it).
  * @property {(options: {url: string, username: string, token: string, branch: string, empty?: boolean}) => Promise<{created: boolean}>} gitConnect
@@ -593,8 +611,19 @@ export { waterTypeOf };
  *   A picked file (base64 data) written to the app's cache for the import steps.
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
+ * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
+ *   A CSV file (staged with stageImport) with its column mapping, as import_csv in opendives.h. `companionPath`: for
+ *   Poseidon MkVI, the staged .txt of the same dive. With `dryRun` nothing is added and the answer is the preview
+ *   {dives:[{when, number, durationSeconds, maxDepthMm, profile:[[seconds, mm]]}]}; otherwise the dives are
+ *   imported (EditResult), one undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
  * @property {(options: {path: string}) => Promise<void>} discardImport
  *   Deletes a downloaded file (cancelled or failed import).
+ * @property {(options: {name: string}) => Promise<{path: string, created: boolean}>} createIcloudLogbook
+ *   iOS only (task 2026-11-16-261): the logbook `name` (a file name) is created in the OpenDives folder of the
+ *   app's iCloud Drive container, which uses the device's Apple account, so there is no sign-in. `path` is the
+ *   folder's path; `created` is false when it already existed. Rejects with NOT_AVAILABLE (Android, or iCloud Drive
+ *   turned off or signed out on the iPhone) or BAD_REQUEST (empty name). Only the iOS side has an implementation;
+ *   the JavaScript calls it on an iPhone only.
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
  * @property {(options: {action: 'count'|'import'}) => Promise<any>} deviceLog
  *   The dives logged on this device without an account: "count" ({count}),
@@ -790,7 +819,12 @@ export { waterTypeOf };
  */
 
 /** @type {any} */
-const native = registerPlugin('OpenDivesCore');
+// On Android and iOS the native plugin answers. In the desktop app (Electron, which runs as a "web"
+// platform) desktop.js does, through window.odDesktop; in a plain browser its methods reject with
+// UNAVAILABLE.
+const native = registerPlugin('OpenDivesCore', {
+  web: () => import('./desktop.js').then((m) => new m.OpenDivesCoreDesktop()),
+});
 
 
 /**
@@ -805,6 +839,10 @@ export const OpenDivesCore = {
     return JSON.parse((await native.gitCheck(options)).json);
   },
   gitConfig: () => native.gitConfig(),
+  serverSessionSave: (options) => native.serverSessionSave(options),
+  serverSessionInfo: () => native.serverSessionInfo(),
+  serverSessionAccess: () => native.serverSessionAccess(),
+  serverSessionClear: () => native.serverSessionClear(),
   gitConnect: (options) => native.gitConnect(options),
   async probeCloud() {
     const { json } = await native.probeCloud();
@@ -834,6 +872,11 @@ export const OpenDivesCore = {
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),
+  createIcloudLogbook: (options) => native.createIcloudLogbook(options),
+  async importCsv(options) {
+    const result = await native.importCsv({ ...options, params: JSON.stringify(options.params) });
+    return JSON.parse(result.json);
+  },
   async createLog(options) {
     return JSON.parse((await native.createLog(options)).json);
   },
@@ -912,6 +955,10 @@ export const OpenDivesCore = {
   htmlToPdf: (options) => native.htmlToPdf(options),
   grantShareFile: (options) => native.grantShareFile(options),
   exportDives: (options) => native.exportDives(options),
+  /** Desktop only: the extra columns of the logbook's table, for every listed dive. */
+  async diveColumns() {
+    return JSON.parse((await native.diveColumns()).json);
+  },
   async listLoadedDives() {
     return JSON.parse((await native.listLoadedDives()).json);
   },

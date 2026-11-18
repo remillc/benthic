@@ -21,9 +21,11 @@
    * @type {{
    *   dives: { site: string }[],
    *   sites: import('opendives-core').SiteSummary[],
+   *   height?: string,
    * }}
+   * `height`: of the map (the desktop Statistiques screen gives it more room).
    */
-  let { dives, sites } = $props();
+  let { dives, sites, height = '170px' } = $props();
 
   const spots = $derived(siteHeat(dives, sites));
   const frame = $derived(/** @type {[number, number][]} */ (busiestArea(spots).map((s) => [s.lon, s.lat])));
@@ -75,7 +77,7 @@
         credits={false}
         desaturated
         closerInFullScreen
-        height="170px"
+        {height}
         label={t('stats.heatTitle')}
         fullscreenLabel={t('stats.heatFullscreen')}
         onlocate={centreOnMe}

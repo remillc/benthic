@@ -49,6 +49,12 @@
   import { deletionOutcome, fillRatio, gasChangeMoments, typeLine } from '../lib/gas-group.js';
   import { t, tIfExists } from '../lib/i18n.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
+  import DiveGearTop from '../components/DiveGearTop.svelte';
+  import DiveGearOther from '../components/DiveGearOther.svelte';
+  import RenameComputerDialog from '../components/RenameComputerDialog.svelte';
+  import { isRelease } from '../lib/edition.js';
+  import { loadInventory, change as changeInventory, equipmentOf } from '../lib/inventory.svelte.js';
+  import { cloneEquipment, diveKeyOf, emptyEquipment, sameEquipment } from '../lib/inventory.js';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import { FEEDBACK_CHOICES, feedbackOf, isFeedbackTag, toggleFeedback, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { cylinderKey, isMostRecent, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
@@ -68,6 +74,12 @@
 
   /** @type {import('opendives-core').DiveDetail|null} */
   let dive = $state(null);
+  // Release edition (task 2026-11-17-267): what this dive used from the equipment inventory, edited here and
+  // saved with the dive; and the computer being renamed.
+  let equipment = $state(emptyEquipment());
+  let initialEquipment = emptyEquipment();
+  /** @type {{ model: string, serial: string, nickname: string }|null} */
+  let renaming = $state(null);
   let failed = $state(false);
   let saving = $state(false);
   const prefs = $derived(logbook.prefs);
@@ -199,6 +211,12 @@
   onMount(async () => {
     try {
       const d = await OpenDivesCore.getDive({ id: Number(f7route.params.id) });
+      // Release edition: the inventory is read before the form shows (it awaits).
+      if (isRelease) {
+        await loadInventory();
+        equipment = equipmentOf(d);
+        initialEquipment = cloneEquipment(equipment);
+      }
       dive = d;
       const [y, mo, da, h, mi, se] = d.date.split(/[-T:]/).map(Number);
       date = { year: y, month: mo - 1, day: da, hour: h, minute: mi, second: se || 0 };
@@ -861,10 +879,13 @@
     return out;
   }
 
+  /** The equipment of the inventory differs from what was opened. */
+  const equipmentChanged = () => isRelease && !sameEquipment(equipment, initialEquipment);
+
   /** Something differs from what was opened: the fields, the site, the trip, the main computer. */
   function dirty() {
     if (!dive) return false;
-    if (Object.keys(changes()).length || mainComputer > 0) return true;
+    if (Object.keys(changes()).length || mainComputer > 0 || equipmentChanged()) return true;
     if (siteName.trim() !== dive.site) return true;
     const oldTrip = dive.trip?.location ?? '';
     const tripText = tripName === NEW_TRIP ? newTripName.trim() || oldTrip : tripName.trim();
@@ -934,13 +955,27 @@
           }
         }
       }
+      // The inventory's side: this dive's pieces, under its start time (re-keyed when the start time changed).
+      let equipmentSaved = false;
+      if (equipmentChanged()) {
+        const from = diveKeyOf({ date: initialDate });
+        const to = diveKeyOf({ date: isoDate });
+        await changeInventory(async (inv) => {
+          await inv.rekeyDive(from, to);
+          await inv.saveDiveEquipment(to, equipment);
+        });
+        equipmentSaved = true;
+      } else if (isRelease && isoDate !== initialDate) {
+        await changeInventory((inv) => inv.rekeyDive(diveKeyOf({ date: initialDate }), diveKeyOf({ date: isoDate })));
+      }
       leave();
       if (steps) offerUndo(t('edit.saved'), undefined, 6000, steps);
+      else if (equipmentSaved) toast(t('edit.saved'));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Save dive', code);
       toast(
-        code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : code.startsWith('CYLINDER_IN_USE') ? t('edit.cylinderInUse') : t('edit.failed'),
+        code.startsWith('INVENTORY_READ_ONLY') ? t('gear.inventory.readOnlyRefused') : code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : code.startsWith('CYLINDER_IN_USE') ? t('edit.cylinderInUse') : t('edit.failed'),
       );
     } finally {
       saving = false;
@@ -1183,7 +1218,11 @@
     <!-- Équipement -->
     <section class="card od-edit-dive--card">
       {@render header(t('edit.equipmentGroup'))}
-      <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
+      {#if isRelease}
+        <DiveGearTop bind:equipment bind:suitText={f.suit} suitOptions={known.suit} diveDate={dive.date} />
+      {:else}
+        <ComboField label={t('edit.suit')} bind:value={f.suit} options={known.suit} />
+      {/if}
 
       <h3 class="od-edit-dive--sub">{t('edit.weightsTitle')}</h3>
       {#if suggestion && suggestionShown}
@@ -1231,15 +1270,27 @@
         <h3 class="od-edit-dive--sub">{t('edit.computersGroup')}</h3>
         <div class="od-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
           {#each dive.diveComputers as computer, i (i)}
-            <ChoiceRow class="od-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
-              <span class="od-edit-dive--texts">
-                <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
-                {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
-              </span>
-            </ChoiceRow>
+            <div class="od-edit-dive--computer-line">
+              <ChoiceRow class="od-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
+                <span class="od-edit-dive--texts">
+                  <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
+                  {#if i === mainComputer}<span class="od-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
+                </span>
+              </ChoiceRow>
+              <!-- Release edition: « Renommer » changes the computer's name in the whole logbook. The name is kept by serial number. -->
+              {#if isRelease && computer.serial && computer.model}
+                <button type="button" class="od-edit-dive--rename" aria-label={t('gear.diveGear.renameLabel', { name: computer.nickname || computer.model })} onclick={() => (renaming = { model: computer.model, serial: computer.serial, nickname: computer.nickname })}>
+                  <Icon name="edit" size={20} />
+                </button>
+              {/if}
+            </div>
           {/each}
           <p class="od-edit-dive--helper">{t('edit.mainComputerHelp')}</p>
         </div>
+      {/if}
+
+      {#if isRelease}
+        <DiveGearOther bind:equipment />
       {/if}
     </section>
 
@@ -1408,6 +1459,22 @@
     moments={details.moments}
     oncancel={() => (deleteKey = null)}
     onconfirm={confirmDelete}
+  />
+{/if}
+
+{#if renaming}
+  <RenameComputerDialog
+    computer={renaming}
+    oncancel={() => (renaming = null)}
+    ondone={async () => {
+      renaming = null;
+      // The dive's computers, read again under their new name.
+      try {
+        if (dive) dive = { ...dive, diveComputers: (await OpenDivesCore.getDive({ id: dive.id })).diveComputers };
+      } catch (e) {
+        console.error('Reading the computers again', e);
+      }
+    }}
   />
 {/if}
 
@@ -1720,6 +1787,30 @@
     /* The 8 px under the help text are those of the card. */
     .od-edit-dive--computers {
       padding: 0 16px;
+    }
+
+    .od-edit-dive--computer-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      :global(.od-edit-dive--computer) {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    .od-edit-dive--rename {
+      flex: none;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 24px;
+      background: var(--od-tonal);
+      color: var(--od-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* The main computer: tinted and checked, 12 dp at the sides (no radio button). */

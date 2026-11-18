@@ -41,13 +41,9 @@ Results: **works** (every dive read, a profile on each, identical to Subsurface'
 | FIT (Garmin Descent, Suunto) | `.fit` | `garmin_2023-08-17-08-51-59.fit`, `garmin_2023-10-21-12-13-38.fit`, `suunto_ocean_nitrox.fit` | works | 1 dive each, with profile. The values are checked in `tests/fit_import_test.cpp`. A Garmin Connect `.zip` is not read by the core; the app takes the `.fit` out first. |
 | Suunto app JSON | `.json` | `suunto_eon_core_nitrox.json`, `suunto_nautic_multigas.json`, `suunto_nautic_sidemount.json`, `suunto_ocean_air.json`, `suunto_ocean_nitrox.json` | works with differences | Four are identical to the references. `suunto_ocean_nitrox.json` alone lacks the gas mix and gradient factors, which the Suunto app puts in the `.fit` of the same dive: the core reads the two files as one dive when both are given (`suunto_json_fit_pair_import()`, identical to the reference; checked in the test), but `import_dives()` reads one file, so the app does not pair them today. |
 | SmartTrak | `.slg` | `Demo_SmartTrak.slg` | not reachable | The core has no reader: Subsurface reads it with a separate program (`smtk-import/`, not part of the core). |
-| DL7 | `.zxu` | `DL7.zxu` | not reachable | Read only through the column-mapping dialog. |
-| CSV: Seabear | `.csv` | `TestDiveSeabearHUDC.csv`, `TestDiveSeabearH3_0002SBDT.CSV` | not reachable | The core refuses any `.csv` opened directly. Needs the column-mapping dialog. |
-| CSV: Poseidon | `.csv` | `Poseidon_MkVILog.csv` | not reachable | Same. |
-| CSV: Sensus | `.csv` | `TestSensusSingle.csv` | not reachable | Same. |
-| CSV: generic and TSV | `.csv`, `.tsv` | `TestComma.csv`, `test41.csv`, `test41.tsv` | not reachable | Same; a `.tsv` is not known to the core at all. |
-
-Total: **18 formats work** (17 without differences, 1 with differences: Suunto app JSON); 7 are not reachable (SmartTrak, DL7, and CSV in four families); none fails. Counting only the formats other than Subsurface's own log, 17 work.
+| CSV with a column mapping | `.csv`, `.tsv` | `test41.csv`, `test41.tsv`, `TestDiveSeabearHUDC.csv`, `TestDiveSeabearH3_0002SBDT.CSV` to `…T1_0005…`, `TestSensusSingle.csv`, `Poseidon_MkVILog.csv` and `.txt`, `test-csv-detail-bare-samples.csv` | works | The core refuses a `.csv` opened directly; the app asks for the column mapping (task 2026-11-16-224), then calls the façade's `import_csv()`. See « CSV » below. |
+| DL7 | `.zxu` | `DL7.zxu` | not reachable | Read only through the column-mapping dialog, which has no DL7 type yet. |
+Total: **19 formats work** (18 without differences, 1 with differences: Suunto app JSON); 2 are not reachable (SmartTrak and DL7); none fails. Counting only the formats other than Subsurface's own log, 18 work.
 
 ## What differs from Subsurface's references
 
@@ -62,16 +58,22 @@ Total: **18 formats work** (17 without differences, 1 with differences: Suunto a
 
 The core reads these too, but Subsurface has no sample file for them, so they were not checked: Shearwater (desktop `.db`), Atomic Cobalt (`.db`), Cochran (`.CAN`, and the `.DPT`, `.TMP`, `.HP1` exports), Liquivision (`.LVD`), Scubapro Logtrak (`.script`), Scubapro ASD (`.asd`), and the XML exports of MacDive, Mares, DiveLog, AV1, Suunto Dive Manager (SDM) and Diving Log, JDiveLog (`.xml`). They are not counted in the total.
 
-## Samples that need the column mapping (CSV)
+## CSV
 
-Out of scope; the core refuses them as `.csv` and asks for its mapping dialog.
+`import_csv()` (`core/libopendives/edit.cpp`, declared in `opendives.h`; the plugin's `importCsv`) runs the core's own functions with the mapping the diver chose in the dialog, the way Subsurface's desktop does it (`DiveLogImportDialog::on_buttonBox_accepted()`): `parse_csv_file()` for a profile per file (`csv2xml.xslt`, and `sensuscsv.xslt` for Sensus), `parse_manual_file()` for a dive per line (`manualcsv2xml.xslt`), `parse_seabear_log()` for the newer Seabear files, `parse_txt_file()` for Poseidon MkVI (the `.csv` and the `.txt` of the same dive; the app asks for both). `tests/import_csv_test.cpp`, built by `poc/build.sh` as `build/poc/import-csv`, checks each sample, compared with Subsurface's reference where there is one:
 
-- Seabear: `TestDiveSeabearHUDC.csv`, `TestDiveSeabearH3_0002SBDT.CSV` to `…0005…`, `TestDiveSeabearT1_0001SBDT.CSV` to `…0005…`.
-- Poseidon: `Poseidon_MkVILog.csv` (and `Poseidon_MkVILog.txt`).
-- Sensus: `TestSensusSingle.csv`.
-- Generic CSV and TSV: `TestComma.csv`, `test41.csv`, `test41.tsv`, `test-csv-detail-bare-samples.csv`.
-- Subsurface's own CSV exports: `test-export-sensors-detail.csv`, `test-export-sensors-summary.csv`, `exportprofilereference.csv`, `exportprofilereferenceVPMB.csv`.
-- DL7: `DL7.zxu` (read through the same dialog).
+| Sample | Mapping | Result |
+|---|---|---|
+| `test41.csv`, `test41.tsv` | a dive per line, columns by hand | 4 dives each, identical to `test-csv.xml` and `test-tsv.xml` |
+| `TestDiveSeabearHUDC.csv` | « Seabear », the older layout, the dive's date given | identical to `TestDiveSeabearHUDC.xml` (its time is the time of the import in Subsurface's own test, so the test sets it, as `testparse.cpp` does) |
+| `TestDiveSeabearH3_0002SBDT.CSV` to `…0005…`, `TestDiveSeabearT1_0001SBDT.CSV` to `…0005…` | « Seabear », their own header | 9 dives, each identical to its dive of `TestDiveSeabearNewFormat.xml` apart from `otu` and `cns`, which the reference accumulates over its nine dives in one log; two of the nine are the same dive as another (same time) and the import merges them, so each file is imported into a log of its own in the test |
+| `TestSensusSingle.csv` | « Sensus » | 1 dive, 6 970 s, 54.41 m, 698 samples; no reference |
+| `Poseidon_MkVILog.csv` and `.txt` | « Poseidon MkVI » | 1 dive with its profile; no reference; refused without the `.txt` |
+| `test-csv-detail-bare-samples.csv` | a profile, columns by hand, date given | 1 dive with its profile; no reference |
+
+Seabear's header is read by `parse_seabear_header()` of Subsurface's `core/qthelper.cpp`, which `core/compat/qthelper_compat.cpp` had as an empty function; it is now ported line for line, without Qt (quirks included: every scan stops at the first empty line, so a file whose header has an empty line before the Seabear block, as the HUDC file, gives no column to `parse_seabear_log()`: those go through the mapping instead).
+
+Not covered: Subsurface's own CSV exports (`test-export-sensors-*.csv`, `exportprofilereference*.csv`, the `SubsurfaceCSV` template), the APD, XP5, AV1 and DL7 types of the desktop dialog (DL7: `DL7.zxu` stays not reachable). The dialog offers the three known formats of the task (Seabear, Poseidon MkVI, Sensus) and the manual mapping.
 
 ## Not a dive log
 

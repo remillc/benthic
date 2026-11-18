@@ -58,6 +58,9 @@ class OpenDivesCorePlugin : Plugin() {
     /** The user's own git repository, instead of the cloud account (see GitRemoteStore). */
     private val gitStore: GitRemoteStore by lazy { GitRemoteStore(context) }
 
+    /** The OpenDives server's session (release edition), see ServerSessionStore. */
+    private val serverStore: ServerSessionStore by lazy { ServerSessionStore(context) }
+
     /**
      * An account being created or signed in to whose logbook does not exist
      * yet: kept in memory only, and stored once its logbook is created.
@@ -443,6 +446,66 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /** Keeps the OpenDives server's session (the e-mail sign-in's answer) in the Keystore; nothing is returned. */
+    @PluginMethod
+    fun serverSessionSave(call: PluginCall) {
+        try {
+            serverStore.write(
+                ServerSession(
+                    email = call.getString("email").orEmpty(),
+                    sessionToken = call.getString("sessionToken").orEmpty(),
+                    repositoryUrl = call.getString("repositoryUrl").orEmpty(),
+                    branch = call.getString("branch").orEmpty(),
+                    gitUsername = call.getString("gitUsername").orEmpty(),
+                    gitToken = call.getString("gitToken").orEmpty(),
+                ),
+            )
+            call.resolve()
+        } catch (e: IllegalArgumentException) {
+            call.reject("BAD_ARGUMENT", "BAD_ARGUMENT")
+        } catch (e: Exception) {
+            Log.e(TAG, "serverSessionSave failed", e)
+            call.reject("CREDENTIALS_NOT_SAVED", "CREDENTIALS_NOT_SAVED")
+        }
+    }
+
+    /** Who is signed in to the OpenDives server, without any token. */
+    @PluginMethod
+    fun serverSessionInfo(call: PluginCall) {
+        val stored = serverStore.read()
+        call.resolve(
+            JSObject()
+                .put("signedIn", stored != null)
+                .put("email", stored?.email.orEmpty())
+                .put("repositoryUrl", stored?.repositoryUrl.orEmpty())
+                .put("branch", stored?.branch.orEmpty()),
+        )
+    }
+
+    /** The access to the repository (the git user name and token), for the download only. */
+    @PluginMethod
+    fun serverSessionAccess(call: PluginCall) {
+        val stored = serverStore.read()
+        if (stored == null) {
+            call.reject("NOT_SIGNED_IN", "NOT_SIGNED_IN")
+            return
+        }
+        call.resolve(
+            JSObject()
+                .put("repositoryUrl", stored.repositoryUrl)
+                .put("branch", stored.branch)
+                .put("username", stored.gitUsername)
+                .put("token", stored.gitToken),
+        )
+    }
+
+    /** Signs out of the OpenDives server: the tokens are erased from this device. */
+    @PluginMethod
+    fun serverSessionClear(call: PluginCall) {
+        serverStore.delete()
+        call.resolve()
+    }
+
     /** The stored repository without its token ({url, username, branch}), or empty: for the form that edits it. */
     @PluginMethod
     fun gitConfig(call: PluginCall) {
@@ -608,6 +671,43 @@ class OpenDivesCorePlugin : Plugin() {
             return@onCoreThread
         }
         call.resolve(JSObject(NativeCore.importCount(file.absolutePath)))
+    }
+
+    /**
+     * A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+     * `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is
+     * the mapping as JSON text. With `dryRun` nothing is added and the answer is the preview
+     * ({dives:[{when, durationSeconds, maxDepthMm, profile}]}); otherwise the dives are imported, one
+     * undoable step. Rejects with IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
+     */
+    @PluginMethod
+    fun importCsv(call: PluginCall) = onCoreThread(call) {
+        val file = importFile(call.getString("path").orEmpty())
+        val companionPath = call.getString("companionPath").orEmpty()
+        val companion = if (companionPath.isEmpty()) null else importFile(companionPath)
+        if (file == null || (companionPath.isNotEmpty() && companion == null)) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val name = File(call.getString("name").orEmpty()).name.ifEmpty { "import.csv" }
+        call.resolve(
+            JSObject().put(
+                "json",
+                NativeCore.importCsv(
+                    file.absolutePath,
+                    companion?.absolutePath.orEmpty(),
+                    call.getString("params").orEmpty(),
+                    name,
+                    call.getBoolean("dryRun", true) == true,
+                ),
+            ),
+        )
+    }
+
+    /** iCloud Drive exists on iOS only (task 2026-11-16-261): Android never offers it and rejects if it is asked. */
+    @PluginMethod
+    fun createIcloudLogbook(call: PluginCall) {
+        call.reject("NOT_AVAILABLE", "NOT_AVAILABLE")
     }
 
     /** Cancelled or failed import: the downloaded file is deleted. */

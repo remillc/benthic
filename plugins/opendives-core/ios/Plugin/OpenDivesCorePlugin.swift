@@ -42,6 +42,10 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "createAccount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitCheck", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConfig", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionSave", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConnect", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resendCode", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "verifyPin", returnType: CAPPluginReturnPromise),
@@ -50,6 +54,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stageImport", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "discardImport", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "createIcloudLogbook", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getTrip", returnType: CAPPluginReturnPromise),
@@ -75,6 +80,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deviceLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "filterPresets", returnType: CAPPluginReturnPromise),
@@ -140,6 +146,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     private let credentials = CredentialStore()
     private let gitStore = GitRemoteStore()
+    /// The OpenDives server's session (release edition).
+    private let serverStore = ServerSessionStore()
 
     /// An account being created or signed in to whose logbook does not exist yet:
     /// in memory only, stored once its logbook is created. Core queue only.
@@ -574,6 +582,28 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// A CSV file with the column mapping chosen in the web layer (import_csv in opendives.h). `path` and
+    /// `companionPath` (Poseidon MkVI: the .txt of the dive) are files staged with stageImport; `params` is the
+    /// mapping as JSON text. With `dryRun` nothing is added and the answer is the preview; otherwise the dives
+    /// are imported, one undoable step.
+    @objc func importCsv(_ call: CAPPluginCall) {
+        let path = call.getString("path") ?? ""
+        let companionPath = call.getString("companionPath") ?? ""
+        let params = call.getString("params") ?? ""
+        let dryRun = call.getBool("dryRun") ?? true
+        var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
+        if name.isEmpty { name = "import.csv" }
+        let importName = name
+        onCoreThread(call) { [self] in
+            guard let file = stagedImport(path), companionPath.isEmpty || stagedImport(companionPath) != nil else {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return
+            }
+            let companion = companionPath.isEmpty ? "" : (stagedImport(companionPath)?.path ?? "")
+            call.resolve(["json": try OpenDivesNative.importCsv(file: file.path, companion: companion, params: params, source: importName, dryRun: dryRun)])
+        }
+    }
+
     /// Several files chosen together: "files" is a list of {name, data} (base64, original name).
     /// They go to one temporary folder, so that a Suunto app .json and the .fit with the same
     /// base name are read as one dive; the other files are read on their own.
@@ -926,6 +956,56 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// Keeps the OpenDives server's session (release edition) in the Keychain.
+    @objc func serverSessionSave(_ call: CAPPluginCall) {
+        let session = ServerSession(
+            email: call.getString("email") ?? "",
+            sessionToken: call.getString("sessionToken") ?? "",
+            repositoryUrl: call.getString("repositoryUrl") ?? "",
+            branch: call.getString("branch") ?? "",
+            gitUsername: call.getString("gitUsername") ?? "",
+            gitToken: call.getString("gitToken") ?? ""
+        )
+        do {
+            try serverStore.write(session)
+            call.resolve()
+        } catch {
+            let message = error.localizedDescription
+            call.reject(message, message.components(separatedBy: ":")[0])
+        }
+    }
+
+    /// Who is signed in to the OpenDives server, without any token.
+    @objc func serverSessionInfo(_ call: CAPPluginCall) {
+        let stored = serverStore.read()
+        call.resolve([
+            "signedIn": stored != nil,
+            "email": stored?.email ?? "",
+            "repositoryUrl": stored?.repositoryUrl ?? "",
+            "branch": stored?.branch ?? "",
+        ])
+    }
+
+    /// The access to the repository, for the download only.
+    @objc func serverSessionAccess(_ call: CAPPluginCall) {
+        guard let stored = serverStore.read() else {
+            call.reject("NOT_SIGNED_IN", "NOT_SIGNED_IN")
+            return
+        }
+        call.resolve([
+            "repositoryUrl": stored.repositoryUrl,
+            "branch": stored.branch,
+            "username": stored.gitUsername,
+            "token": stored.gitToken,
+        ])
+    }
+
+    /// Signs out of the OpenDives server: the tokens are erased from this device.
+    @objc func serverSessionClear(_ call: CAPPluginCall) {
+        serverStore.delete()
+        call.resolve()
+    }
+
     /// The stored repository without its token, for the form that edits it.
     @objc func gitConfig(_ call: CAPPluginCall) {
         let stored = gitStore.read()
@@ -1058,6 +1138,37 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             if let file = stagedImport(path) { try? FileManager.default.removeItem(at: file) }
             call.resolve()
+        }
+    }
+
+    /// iCloud Drive (task 2026-11-16-261; UNTESTED: written without a Mac, to be run on a device signed in to
+    /// iCloud). Creates `<name>` in the OpenDives folder of the app's ubiquity container, so that it shows in the
+    /// Files app under iCloud Drive › OpenDives. No sign-in: the container belongs to the device's Apple account.
+    /// `url(forUbiquityContainerIdentifier:)` may block, so it runs off the main thread; it returns nil when iCloud
+    /// Drive is off, the account is signed out, or the iCloud entitlement is missing (NOT_AVAILABLE).
+    @objc func createIcloudLogbook(_ call: CAPPluginCall) {
+        let name = (call.getString("name") ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        networkQueue.async { [self] in
+            do {
+                // A file name only: no path separator, no hidden file.
+                guard !name.isEmpty, !name.contains("/"), !name.contains(":"), !name.hasPrefix(".") else {
+                    throw Failure("BAD_REQUEST")
+                }
+                guard let container = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+                    throw Failure("NOT_AVAILABLE")
+                }
+                // `Documents` is the part of the container the Files app shows.
+                let folder = container.appendingPathComponent("Documents", isDirectory: true)
+                    .appendingPathComponent("OpenDives", isDirectory: true)
+                    .appendingPathComponent(name, isDirectory: true)
+                let existed = FileManager.default.fileExists(atPath: folder.path)
+                if !existed {
+                    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                }
+                call.resolve(["path": folder.path, "created": !existed])
+            } catch {
+                reject(call, error)
+            }
         }
     }
 

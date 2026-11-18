@@ -5,6 +5,7 @@
   // « Retour » comes back to the screen it was opened from.
   // Tablet: centred, pinned 28 dp above the bottom of the page. Phone: centred at the end of the content, 20 dp above the edge on the welcome screen (--od-help-link-bottom).
   import { t } from '../lib/i18n.js';
+  import { f7 } from 'framework7-svelte';
 
   /** @type {{ inColumn?: boolean }} inColumn: the last item of a scrolling column (the first launch of a tablet and of the desktop, task 2026-11-16-257), not pinned to the page. */
   let { inColumn = false } = $props();
@@ -14,7 +15,10 @@
     e.preventDefault();
     // The router of the view the link is in (first launch has a view of its own, in a popup).
     const view = /** @type {HTMLElement} */ (e.currentTarget).closest('.view');
-    /** @type {any} */ (view)?.f7View?.router.navigate('/about');
+    // The desktop app's window without a logbook has no view of its own: About opens over it, in the main view
+    // (task 2026-11-16-228; not `f7.views.current`, which can be the view of the first launch's hidden popup).
+    if (!view) f7.views.get('#view-logbook')?.router.navigate('/about');
+    else /** @type {any} */ (view).f7View?.router.navigate('/about');
   }
 </script>
 

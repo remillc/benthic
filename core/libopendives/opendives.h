@@ -91,6 +91,13 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 // into `json`. Returns 0, or -1 with `error` set.
 int list_dives(const std::string &log, std::string &json, std::string &error);
 
+// The desktop logbook's table columns beyond those of list_dives, for every dive
+// list_dives lists, in the same order: a JSON array of
+// {id, waterTempMk, airTempMk, meanDepthMm, sacMlMin, rating, buddies: [], guides: [],
+//  computer, suit, gases: [] (the used cylinders' mixes, without repeats), tags: [],
+//  divemode, country}. Read only.
+int dive_columns(std::string &json);
+
 // Sets the Subsurface cloud account and writes the log address into `url`,
 // in Subsurface's format: "https://<server>/git/<email>[<email>]".
 // Needs no network.
@@ -377,6 +384,11 @@ void set_xslt_dir(const std::string &dir);
 // not changed. Errors: NOT_FOUND, BAD_REQUEST, EXPORT_FAILED: <message>.
 int export_dives(const std::vector<int> &ids, const std::string &format, bool anonymize, const std::string &path,
 		 std::string &error);
+// The whole loaded log written to `path` as a plain .ssrf file, with the function
+// File > Save As uses in Subsurface (save_dives): every dive, the dive sites, the
+// trips, the log's settings (computer nicknames, autogroup) and the filter
+// presets. Nothing of the log is changed. Errors: BAD_REQUEST, SAVE_FAILED.
+int save_logbook_file(const std::string &path, std::string &error);
 // Possible duplicates: same name ignoring case within same_name_m, or
 // different names within same_place_m: [{"a":…, "b":…, "distanceM":…}].
 int sites_duplicates(int same_name_m, int same_place_m, std::string &json);
@@ -569,6 +581,23 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 // QMLManager::importDivesFromFile() does; `source` names the file in the
 // command text. IMPORT_FAILED, NO_DIVES, NO_NEW_DIVES (all already there).
 int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error);
+
+// Imports a CSV file with the column mapping the diver chose (the core refuses a .csv opened directly:
+// import_dives() cannot read it). `params_json` is a flat object: "format" is "samples" (a profile per
+// file, parse_csv_file), "dives" (a dive per line, parse_manual_file), "seabear" (parse_seabear_log, and
+// the mapping below when the file is of the older HUDC kind) or "poseidon" (parse_txt_file: `file` is the
+// .csv, `companion` the .txt of the same dive); "template" names the stylesheet of "samples" ("csv" by
+// default, "SensusCSV" for Sensus); every other key goes to the stylesheets as Subsurface's dialog gives
+// it: numbers are column indexes (-1: none; "timeField", "depthField", "tempField", ..., "dateField",
+// "starttimeField", "numberField", "maxDepthField", ...) or option indexes ("separatorIndex" 0 tab,
+// 1 comma, 2 semicolon, 3 pipe; "units" 0 metric, 1 imperial; "datefmt" 0 dd.mm.yyyy, 1 mm/dd/yyyy,
+// 2 yyyy-mm-dd; "durationfmt" 0 seconds, 1 minutes, 2 mm:ss), texts are the dive's "date" (YYYYMMDD) and
+// "time" ("1" and HHMM: a leading zero would be lost) when the file has none, "hw" (the hardware name).
+// In key order: "date" must come first when given. With `dry_run` nothing is added: the result is
+// {"dives":[{"when", "number", "durationSeconds", "maxDepthMm", "profile":[[seconds, mm]…]}]} (the
+// preview); otherwise the dives are imported as import_dives(). IMPORT_FAILED, NO_DIVES, BAD_REQUEST.
+int import_csv(const std::string &file, const std::string &companion, const std::string &params_json,
+	       const std::string &source, bool dry_run, std::string &result_json, std::string &error);
 
 // Several files at once, as the desktop import does (MainWindow::importFiles()): a Suunto app
 // .json and the .fit with the same base name are read as one dive (suunto_json_fit_pair_import(),

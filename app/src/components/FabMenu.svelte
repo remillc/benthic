@@ -297,7 +297,24 @@
       transition:
         border-radius var(--od-fab-spatial-ms) var(--od-fab-spatial),
         background-color var(--od-fab-effects-ms) var(--od-fab-effects),
-        color var(--od-fab-effects-ms) var(--od-fab-effects);
+        color var(--od-fab-effects-ms) var(--od-fab-effects),
+        box-shadow 120ms linear;
+    }
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour, over the elevation shadow. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-fab-menu--item:hover {
+        box-shadow:
+          inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
+          0 1px 3px rgb(0 0 0 / 0.3),
+          0 4px 8px 3px rgb(0 0 0 / 0.15);
+      }
+      .od-fab-menu--button:hover {
+        box-shadow:
+          inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
+          0 1px 3px rgb(0 0 0 / 0.3),
+          0 4px 8px 3px rgb(0 0 0 / 0.15);
+      }
     }
 
     .od-fab-menu--open .od-fab-menu--button {

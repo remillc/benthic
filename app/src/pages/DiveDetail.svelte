@@ -17,6 +17,10 @@
   import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
   import GasCard from '../components/GasCard.svelte';
   import EquipmentCard from '../components/EquipmentCard.svelte';
+  import DiveGearBlock from '../components/DiveGearBlock.svelte';
+  import { isRelease } from '../lib/edition.js';
+  import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
+  import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
@@ -35,7 +39,7 @@
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
   import { offerUndo } from '../lib/undo.js';
@@ -54,7 +58,15 @@
     formatSac,
     formatTemperature,
     formatWeight,
+    formatMinutes,
+    formatShortDate,
+    formatTimeOfDay,
   } from '../lib/format.js';
+  import SiteMap from '../components/SiteMap.svelte';
+  import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
+  import { deviceStore } from '../lib/device-store.js';
+  import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
+  import { hasRecordedValues } from '../lib/desktop-edit.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -296,7 +308,10 @@
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
-  onMount(loadDive);
+  onMount(() => {
+    if (isRelease) loadInventory();
+    return loadDive();
+  });
 
   /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
   let computersOpen = $state(false);
@@ -576,7 +591,66 @@
 
   // A freediving dive has no Gas section (Christian, 13 November 2026).
   const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
-  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0);
+  // Release edition: what the equipment inventory says this dive used (task 2026-11-17-267).
+  const inventoryEquipment = $derived(isRelease && dive ? equipmentOf(dive) : null);
+  const undersuit = $derived(inventoryEquipment?.undersuitGearId ? (gearMap().get(inventoryEquipment.undersuitGearId)?.name ?? '') : '');
+  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0 || !!(inventoryEquipment && !equipmentIsEmpty(inventoryEquipment)));
+
+  // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
+  // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
+  const desk = $derived(layout.desktop);
+  /** The last tab chosen is kept for the next dive and the next session (task 2026-11-15-191). */
+  let tab = $state(readTab(deviceStore));
+  const deskTabs = DETAIL_TABS;
+  /** @param {import('../lib/detail-tab.js').DetailTab} key */
+  function chooseTab(key) {
+    tab = key;
+    saveTab(deviceStore, key);
+  }
+  /** The key figures: Prof. max, Durée, Prof. moy., Temp., Gaz, Consommation (those known). */
+  const deskFigures = $derived.by(() => {
+    if (!dive) return [];
+    const first = gasCylinders[0];
+    const gas = first ? [first.gas, first.start && first.end ? `${first.start} → ${first.end}` : ''].filter(Boolean).join(' · ') : '';
+    return [
+      { label: t('desktop.figure.maxDepth'), value: dive.maxDepthMm ? formatDepth(dive.maxDepthMm, prefs) : '' },
+      { label: t('desktop.figure.duration'), value: dive.durationSeconds ? formatMinutes(dive.durationSeconds) : '' },
+      { label: t('desktop.figure.meanDepth'), value: dive.meanDepthMm ? formatDepth(dive.meanDepthMm, prefs) : '' },
+      { label: t('desktop.figure.temperature'), value: dive.waterTempMk ? formatTemperature(dive.waterTempMk, prefs) : '' },
+      { label: t('desktop.figure.gas'), value: gas },
+      { label: t('desktop.figure.sac'), value: sac },
+    ].filter((x) => x.value);
+  });
+  /** « Agrandir le profil »: the profile fills the pane; Échap returns. */
+  let profileBig = $state(false);
+  /**
+   * The icons right of the title (task 2026-11-15-194). Export, share and delete act through the
+   * Carnet's selection, which is this dive: the table handles them (DesktopLogbook.svelte).
+   * @param {'export'|'share'|'delete'} command
+   */
+  function deskCommand(command) {
+    window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: command }));
+  }
+  $effect(() => {
+    if (!desk) return;
+    /** @param {KeyboardEvent} e */
+    const key = (e) => {
+      if (profileBig && e.key === 'Escape') profileBig = false;
+      else if ((desktopMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 'p' && navigation.section === 'logbook') {
+        e.preventDefault();
+        profileBig = !profileBig;
+      }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  });
+  /** ← → between the tabs (WAI-ARIA tabs). @param {KeyboardEvent} e */
+  function tabKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    chooseTab(stepTab(tab, e.key));
+    /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.currentTarget).querySelector(`[data-tab="${tab}"]`))?.focus();
+  }
 
   // Collapsed by default; a tap opens the weights by location and "Ce lest était".
   let equipmentOpen = $state(false);
@@ -616,7 +690,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}
@@ -691,6 +765,24 @@
       <div class="skeleton-block od-dive-detail--skeleton-profile"></div>
     </div>
   {:else}
+    {#if desk}
+    <!-- The site's map behind the header, 170 dp from the top of the pane (task 2026-11-15-193). -->
+    <div class="od-dive-detail--desk-hero">
+      {#if dive.siteCoordinates}
+        <SiteHeaderImage desk latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={() => {}} />
+      {/if}
+      <header class="od-dive-detail--desk-head">
+        <div class="od-dive-detail--desk-titles">
+          <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
+          <p class="od-dive-detail--desk-sub od-value">{[formatShortDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
+        </div>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.export')} title="{t('desktopDetail.export')} ({desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E'})" onclick={() => deskCommand('export')}><Icon name="export" size={22} /></button>
+        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.delete')} title="{t('desktopDetail.delete')} ({desktopMac ? '⌫' : 'Suppr'})" onclick={() => deskCommand('delete')}><Icon name="delete" size={22} /></button>
+      </header>
+    </div>
+    {:else}
     <div class="od-dive-detail--hero" use:watchScroll>
       {#if dive.siteCoordinates}
         <SiteHeaderImage latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={(shown) => (imageShown = shown)} />
@@ -712,10 +804,14 @@
       {/if}
     </header>
     </div>
+    {/if}
 
-    <DiveFigures {dive} {prefs} />
+    {#if !desk}<DiveFigures {dive} {prefs} />{/if}
 
+    <div class:od-dive-detail--desk-card={desk} class:od-dive-detail--desk-big={desk && profileBig}>
     <DiveProfile
+      hover={desk}
+      onenlarge={desk ? () => (profileBig = !profileBig) : undefined}
       samples={dive.samples}
       cylinders={dive.cylinders}
       divemode={dive.divemode}
@@ -725,8 +821,28 @@
       meanDepthMm={dive.meanDepthMm}
       {prefs}
     />
+    </div>
 
-    {#if facts.length}
+    {#if desk}
+      {#if deskFigures.length}
+        <dl class="od-dive-detail--desk-figures">
+          {#each deskFigures as figure (figure.label)}
+            <div><dt>{figure.label}</dt><dd class="od-value">{figure.value}</dd></div>
+          {/each}
+        </dl>
+      {/if}
+      {#if hasRecordedValues(dive)}
+        <p class="od-dive-detail--desk-recorded"><Icon name="computer" size={16} />{t('desktopDetail.recorded')}</p>
+      {/if}
+      <!-- svelte-ignore a11y_interactive_supports_focus -->
+      <div class="od-dive-detail--desk-tabs" role="tablist" tabindex="-1" onkeydown={tabKey}>
+        {#each deskTabs as key (key)}
+          <button type="button" role="tab" data-tab={key} aria-selected={tab === key} tabindex={tab === key ? 0 : -1} onclick={() => chooseTab(key)}>{t(`desktop.tab.${key}`)}</button>
+        {/each}
+      </div>
+    {/if}
+
+    {#if !desk && facts.length}
       <dl class="od-dive-detail--facts">
         {#each facts as fact (fact.label)}
           <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
@@ -734,7 +850,7 @@
       </dl>
     {/if}
 
-    {#if dive.guides.length || dive.buddies.length}
+    {#if !desk && (dive.guides.length || dive.buddies.length)}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
         <div class="od-dive-detail--group">
@@ -749,7 +865,7 @@
     {/if}
 
     <!-- Notes right under Personnes (task 2026-11-12-64). -->
-    {#if dive.notes.trim()}
+    {#if !desk && dive.notes.trim()}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
         <!-- Shown in full, line breaks kept: no "Read more". -->
@@ -758,7 +874,7 @@
     {/if}
 
     <!-- Tags right under Notes (task 2026-11-12-66). -->
-    {#if visibleTags(dive.tags).length}
+    {#if !desk && visibleTags(dive.tags).length}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
         <ul class="od-dive-detail--tags">
@@ -767,7 +883,7 @@
       </section>
     {/if}
 
-    {#if hasGas}
+    {#if !desk && hasGas}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
         <GasCard
@@ -780,12 +896,13 @@
       </section>
     {/if}
 
-    {#if hasEquipment}
+    {#if !desk && hasEquipment}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
         <EquipmentCard
           label={equipmentName}
           suit={dive.suit ?? ''}
+          {undersuit}
           weightTotal={weights.length ? weightTotal : ''}
           {weights}
           computer={computers[0]?.name ?? ''}
@@ -797,6 +914,7 @@
           onfeedback={setFeedback}
           oncomputers={() => (computersOpen = true)}
         />
+        {#if inventoryEquipment}<DiveGearBlock equipment={inventoryEquipment} />{/if}
       </section>
       {#if computers.length > 1}
         <ComputersSheet
@@ -813,7 +931,7 @@
     {/if}
 
 
-    {#if conditions.length}
+    {#if !desk && conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
       <section class="od-dive-detail--section">
         <div class="od-dive-detail--group">
@@ -844,7 +962,18 @@
     {/if}
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
-    {#if dive.pictures > 0 && settings.showPhotos}
+    {#if desk && tab !== 'map'}
+      <DesktopDiveFields {dive} {prefs} tab={tab === 'equipment' || tab === 'gas' || tab === 'notes' ? tab : 'info'} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
+    {/if}
+    {#if desk && tab === 'map'}
+      {#if dive.siteCoordinates}
+        <div class="od-dive-detail--desk-map"><SiteMap pin={dive.siteCoordinates} height="320px" /></div>
+      {:else}
+        <p class="od-dive-detail--desk-empty">{t('desktop.noMap')}</p>
+      {/if}
+    {/if}
+
+    {#if !desk && dive.pictures > 0 && settings.showPhotos}
       <section class="od-dive-detail--section">
         <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
         <div class="od-dive-detail--group">
@@ -860,7 +989,7 @@
 
   {#snippet fixedContent()}
     <!-- Android: the actions in a floating toolbar (Material 3 Expressive); iOS keeps the top bar. -->
-    {#if !theme.ios && dive && !failed}
+    {#if !theme.ios && dive && !failed && !desk}
       <FloatingToolbar
         label={t('detail.actions')}
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
@@ -898,6 +1027,151 @@
 
 <style>
   @layer od.components {
+    /* Desktop detail pane (task 2026-11-15-169). */
+    /* No top bar on desktop: the pane's own header carries the actions. */
+    :global(.od-dive-detail--desk.page) {
+      --f7-page-bg-color: var(--od-background);
+      background: var(--od-background);
+    }
+    :global(.od-dive-detail--desk > .navbar) {
+      display: none;
+    }
+    :global(.od-dive-detail--desk > .page-content) {
+      padding-top: 0;
+    }
+    /* 36 dp above the title, room for the site map behind the header (task 2026-11-15-193). */
+    .od-dive-detail--desk-hero {
+      position: relative;
+    }
+    .od-dive-detail--desk-head {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 36px 16px 8px 24px;
+    }
+    .od-dive-detail--desk-titles {
+      flex: 1;
+      min-width: 0;
+    }
+    .od-dive-detail--desk-title {
+      margin: 0;
+      font-family: var(--od-title-font);
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 28px;
+      color: var(--od-text);
+    }
+    /* The date line stays on one line, cut with an ellipsis (task 2026-11-15-194). */
+    .od-dive-detail--desk-sub {
+      margin: 2px 0 0;
+      font-size: 14px;
+      color: var(--od-text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .od-dive-detail--desk-action {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--od-text);
+      cursor: pointer;
+    }
+    .od-dive-detail--desk-action:hover {
+      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    }
+    .od-dive-detail--desk-card {
+      margin: 8px 24px 0;
+      padding: 8px 0 12px;
+      border-radius: 16px;
+      background: var(--od-surface);
+    }
+    /* « Agrandir le profil »: the card covers the pane. */
+    .od-dive-detail--desk-big {
+      position: fixed;
+      inset: 16px 16px 16px calc(var(--f7-page-master-width, 50%) + var(--od-nav-width) + 16px);
+      z-index: 50;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
+    }
+    .od-dive-detail--desk-figures {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 28px;
+      margin: 16px 24px 0;
+    }
+    .od-dive-detail--desk-figures dt {
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-figures dd {
+      margin: 2px 0 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--od-text);
+    }
+    .od-dive-detail--desk-tabs {
+      display: flex;
+      gap: 4px;
+      margin: 20px 24px 8px;
+      border-bottom: 1px solid var(--od-separator);
+    }
+    /* Under the key figures: the dive computer's values cannot be edited (task 2026-11-15-172). */
+    .od-dive-detail--desk-recorded {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 12px 24px 0;
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-tabs button {
+      position: relative;
+      height: 48px;
+      padding: 0 16px;
+      border: 0;
+      background: none;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--od-text-2);
+      cursor: pointer;
+    }
+    .od-dive-detail--desk-tabs button:hover {
+      color: var(--od-text);
+      background: color-mix(in srgb, var(--od-text) 4%, transparent);
+    }
+    .od-dive-detail--desk-tabs button[aria-selected='true'] {
+      font-weight: 600;
+      color: var(--od-on-table-selected);
+    }
+    .od-dive-detail--desk-tabs button[aria-selected='true']::after {
+      content: '';
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: -1px;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: var(--od-on-table-selected);
+    }
+    .od-dive-detail--desk-empty {
+      margin: 16px 24px;
+      color: var(--od-text-2);
+    }
+    .od-dive-detail--desk-map {
+      margin: 8px 24px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
     .od-dive-detail--hero {
       position: relative;
     }
@@ -1152,6 +1426,22 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+
+    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+    @media (hover: hover) and (pointer: fine) {
+      .od-dive-detail--disclosure {
+        transition: box-shadow 120ms linear;
+      }
+      .od-dive-detail--disclosure:not(:disabled):hover {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .od-dive-detail--disclosure {
         transition: none;
       }
     }
