@@ -1,0 +1,334 @@
+// The account sheet for a free diver, the OpenDives+ sheet with its maintenance badge, « Gérer le compte », the store's
+// subscription page, the « #compte » history entry of the Android sheet and the account deletion (task 2026-11-18-281;
+// mock-ups docs/mockups-release/nav-compte-gratuit-android, nav-compte-profil-android, compte-android-connecte,
+// bureau-compte-gerer, ...). The screens need Framework7 and a WebView: their routes and texts are read from the source;
+// the rules are tested as pure functions; the real screens were looked at in a browser and in Electron.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
+import { createAccountHistory, ACCOUNT_HASH } from '../../app/src/lib/account-history.js';
+import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
+import { evaluate, overdueCount, todayIso } from '../../app/src/lib/maintenance.js';
+import { createServerApi, overviewOf } from '../../app/src/lib/server-api.js';
+
+const root = new URL('../../app/src/', import.meta.url);
+// Line endings are the checkout's (CRLF on Windows): the patterns below are written with LF.
+const read = (path) => readFileSync(new URL(path, root), 'utf8').split('\r\n').join('\n');
+const sheet = read('components/AccountSheet.svelte');
+const desktopSheet = read('components/DesktopAccountSheet.svelte');
+const manage = read('components/AccountManage.svelte');
+const avatar = read('components/AccountAvatar.svelte');
+const offer = read('components/FirstLaunchOdPlus.svelte');
+const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
+
+// --- Which sheet ---
+
+test('the release edition without an OpenDives+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
+  assert.equal(sheetVariant({ release: true, odplus: false, email: '' }), 'free');
+  assert.equal(sheetVariant({ release: true, odplus: true, email: 'a@b.c' }), 'subscriber');
+  assert.equal(sheetVariant({ release: true, odplus: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
+  assert.equal(sheetVariant({ release: false, odplus: false, email: '' }), 'account', 'the alpha keeps its sheet');
+});
+
+test('the Compte button stays for a free diver: named « Compte, réglages et à propos », a silhouette in the same disc', () => {
+  assert.equal(langs.fr.nav.accountLabelFree, 'Compte, réglages et à propos');
+  assert.match(avatar, /sheetVariant\(/);
+  assert.match(avatar, /nav\.accountLabelFree/);
+  // The disc already draws the account icon (the silhouette) when there is no e-mail.
+  assert.match(avatar, /\{#if initial\}\{initial\}\{:else\}<Icon name="account"/);
+});
+
+// --- The free sheet's routes ---
+
+test('free sheet: « S’abonner » opens the offer, « Se connecter » opens the sign-in screen, both OpenDives+ rows open the offer', () => {
+  const free = sheet.slice(sheet.indexOf('{#if free}'), sheet.indexOf('{:else}\n    <div class="od-account-sheet--card od-account-sheet--identity">'));
+  assert.match(free, /od-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
+  assert.match(free, /od-account-sheet--sign-in" onclick=\{\(\) => plus\('signIn'\)\}/);
+  assert.equal([...free.matchAll(/od-account-sheet--plus-row" onclick=\{\(e\) => \(e\.preventDefault\(\), plus\('offer'\)\)\}/g)].length, 2);
+  assert.equal([...free.matchAll(/<OdPlusChip onSheet \/>/g)].length, 2, 'the chip is above each title');
+  assert.ok(!/@/.test(free.replace(/<!--[\s\S]*?-->/g, '').replace(/\{[^}]*\}/g, '')), 'no e-mail, no sync line');
+  assert.ok(!free.includes('SyncStatus') && !free.includes('SyncButton'));
+  assert.match(sheet, /import \{ openOdPlus \} from '..\/lib\/open-offer.svelte.js'/);
+});
+
+test('the offer and the sign-in screen are the first launch entered from the menu, and leave it where they came from', () => {
+  assert.deepEqual(menuEntry('offer'), ['start', 'odplusOffer']);
+  assert.deepEqual(menuEntry('signIn'), ['start', 'odplusConnect']);
+  assert.deepEqual(menuEntry('open'), ['start', 'open'], 'the other entries are unchanged');
+  assert.equal(hasBack('odplusConnect', true), true);
+  assert.equal(leavesFirstLaunch(menuEntry('signIn'), true), true, 'Retour on the sign-in screen leaves');
+  assert.equal(leavesFirstLaunch(menuEntry('offer'), true), true);
+  assert.equal(leavesFirstLaunch(['start', 'odplusOffer', 'odplusConnect'], true), false, 'from the offer, Retour returns to the offer');
+  assert.equal(leavesFirstLaunch(['start', 'odplusConnect'], false), false, 'never outside the menu entry');
+  assert.deepEqual(back(['start', 'odplusOffer', 'odplusConnect']), ['start', 'odplusOffer']);
+  const steps = read('components/FirstLaunchSteps.svelte');
+  assert.match(steps, /if \(flow\.origin === 'menu'\) leave\(\);\n\s+else goBackTo\('start'\)/, '« Continuer sans compte » closes the first launch');
+});
+
+test('the offer’s « Déjà abonné ? Se connecter » opens « Se connecter ou créer un compte », and is hidden right after signing in', () => {
+  assert.deepEqual(forward(['start', 'odplusOffer'], 'signIn'), ['start', 'odplusOffer', 'odplusConnect']);
+  assert.equal(offerShowsSignIn(['start', 'odplusOffer']), true, 'the offer reached from « Découvrir OpenDives+ »');
+  assert.equal(offerShowsSignIn(['start', 'odplusConnect', 'server', 'serverCode', 'odplusOffer']), false);
+  assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'server', 'serverCode'])), false, 'after the sign-in of an account that has not subscribed');
+  assert.match(offer, /\{#if offerShowsSignIn\(flow\.stack\)\}/);
+  assert.match(offer, /od-plus--link" onclick=\{\(\) => go\('signIn'\)\}/);
+  assert.equal(langs.fr.odplus.offer.already, 'Déjà abonné ?');
+  assert.equal(langs.fr.odplus.offer.signIn, 'Se connecter');
+  // The offer's order: « Aucun compte n’est créé. » then the line.
+  assert.ok(offer.indexOf("odplus.offer.noAccount") < offer.indexOf('offerShowsSignIn(flow.stack)'));
+});
+
+test('tablet and desktop: « Continuer sans compte » is centred across the 440 px of the three buttons', () => {
+  const css = offer.slice(offer.indexOf('@media (min-width: 768px)'));
+  assert.match(css, /\.od-plus--buttons,\s*\.od-plus--note \{\s*width: 100%;\s*max-width: 440px;/);
+  assert.match(css, /\.od-plus--text-link \{[^}]*width: 100%;[^}]*max-width: 440px;[^}]*text-align: center;/);
+});
+
+// --- The subscriber's sheet: chip, overdue badge, red line, cross on the right ---
+
+test('« Mon profil de plongeur »: the badge and the red line only for overdue pieces, with the count of the Entretien row', () => {
+  assert.deepEqual(profileRow(0), { badge: 0, late: false });
+  assert.deepEqual(profileRow(1), { badge: 1, late: true });
+  assert.deepEqual(profileRow(3), { badge: 3, late: true });
+  assert.deepEqual(profileRow(-2), { badge: 0, late: false });
+  assert.deepEqual(profileRow(Number.NaN), { badge: 0, late: false });
+  // The same count as the badge of the Entretien row (lib/maintenance.js overdueCount): a piece due soon is not counted.
+  const today = '2026-11-18';
+  const item = (id, extra) => ({ id, gearId: id, task: 'service', ...extra });
+  const evals = [
+    evaluate(item('a', { intervalMonths: 12, lastDoneOn: '2025-01-01' }), [], today), // overdue
+    evaluate(item('b', { intervalMonths: 12, lastDoneOn: '2025-12-20' }), [], today), // due soon
+    evaluate(item('c', { intervalMonths: 12, lastDoneOn: '2026-10-01' }), [], today), // fine
+  ];
+  assert.deepEqual(evals.map((e) => e.status), ['overdue', 'soon', 'ok']);
+  assert.equal(profileRow(overdueCount(evals)).badge, 1);
+  assert.equal(profileRow(overdueCount(evals.slice(1))).late, false, 'none overdue: neither the badge nor the red line');
+  assert.match(todayIso(new Date(2026, 10, 18)), /^2026-11-18$/);
+  // The sheets read the same function as the profile screen.
+  assert.match(sheet, /overdueBadge\(\)/);
+  assert.match(read('pages/ProfileDiver.svelte'), /overdueBadge\(\)/);
+});
+
+test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
+  const row = sheet.slice(sheet.indexOf('od-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
+  assert.match(row, /\{#if subscriber\}<OdPlusChip onSheet \/>\{\/if\}/);
+  assert.match(row, /\{#if late\.late\}\s*<span class="od-account-sheet--row-line od-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
+  assert.match(row, /\{:else\}\s*<span class="od-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
+  assert.match(row, /\{#if late\.late\}<span class="od-account-sheet--late-badge"/);
+  assert.equal(langs.fr.gear.profile.cardLine, 'Équipement, brevets, informations');
+  assert.equal(langs.fr.account.sheet.maintenanceLate.one, 'Entretien : {n} pièce en retard');
+  assert.equal(langs.fr.account.sheet.maintenanceLate.other, 'Entretien : {n} pièces en retard');
+  // The red of the mock-up, white text on the badge.
+  const theme = read('theme.css');
+  assert.match(theme, /--od-late: #A1372B;/);
+  assert.match(sheet, /\.od-account-sheet--late-badge \{[^}]*background: var\(--od-late\);[^}]*color: #FFFFFF;/);
+});
+
+test('Android phone: the ✕ of the sheet is on the right at the logo’s height, none on the left', () => {
+  const head = sheet.slice(sheet.indexOf('<div class="od-account-sheet--head">'), sheet.indexOf('{#if free}'));
+  assert.ok(head.indexOf('od-account-sheet--brand') < head.indexOf('od-account-sheet--close'), 'the cross comes after the logo');
+  assert.equal([...head.matchAll(/od-account-sheet--close/g)].length, 1);
+  assert.match(head, /<span aria-hidden="true"><\/span>\s*<!--/);
+});
+
+test('« Gérer le compte » opens the new screen for an OpenDives+ account: a page on the phone, a dialog elsewhere', () => {
+  assert.match(sheet, /function manage\(\) \{\s*navigation\.accountOpen = false;\s*if \(subscriber\) openManageAccount\(\);\s*else openOver\('\/account'\);/);
+  const nav = read('lib/navigation.svelte.js');
+  assert.match(nav, /export function openManageAccount\(\) \{\s*if \(layout\.phone\) openOver\('\/account\/manage'\);\s*else navigation\.manageOpen = true;/);
+  assert.match(read('App.svelte'), /path: '\/account\/manage'/);
+  assert.match(read('App.svelte'), /<AccountManageDialog \/>/);
+  assert.match(desktopSheet, /if \(subscriber\) openManageAccount\(\)/);
+});
+
+// --- « Gérer le compte » ---
+
+test('the store link: Google Play’s subscription page for this app, the App Store’s for iOS, opened by the system', () => {
+  assert.equal(storeSubscriptionsUrl('google', 'org.opendives.app'), 'https://play.google.com/store/account/subscriptions?package=org.opendives.app');
+  assert.equal(storeSubscriptionsUrl('apple', 'org.opendives.app'), 'https://apps.apple.com/account/subscriptions');
+  assert.equal(subscriptionStore({ store: 'apple' }, false), 'apple', 'the server says where it was bought');
+  assert.equal(subscriptionStore({ store: 'google' }, true), 'google');
+  assert.equal(subscriptionStore(null, true), 'apple', 'else the store of this device');
+  assert.equal(subscriptionStore(undefined, false), 'google');
+  const appId = JSON.parse(readFileSync(new URL('../../app/capacitor.config.json', import.meta.url), 'utf8')).appId;
+  assert.match(manage, new RegExp(`const APP_ID = '${appId.replace(/\./g, '\\.')}'`), 'the package is the app’s id');
+  assert.match(manage, /<a class="od-account-manage--store" href=\{storeSubscriptionsUrl\(store, APP_ID\)\} target="_blank" rel="noopener noreferrer">/);
+  assert.match(manage, /<Icon name="openInNew"/, 'the outlined button carries the external-link icon');
+  // No billing tool of our own: nothing here changes a payment method or cancels.
+  assert.ok(!/cancelSubscription|updatePayment|purchaseSubscription/i.test(manage));
+  assert.equal(langs.fr.account.manage.manageGooglePlay, 'Gérer dans Google Play');
+  assert.equal(langs.en.account.manage.manageGooglePlay, 'Manage in Google Play');
+});
+
+test('the photo space is 10 GB and shows its use; unknown use is a placeholder, never a number', () => {
+  assert.equal(SPACE_LIMIT_BYTES, 10_000_000_000);
+  assert.deepEqual(spaceUse(2_300_000_000), { known: true, used: 2_300_000_000, limit: 10_000_000_000, percent: 23 });
+  assert.equal(spaceUse(12_000_000_000).percent, 100);
+  assert.equal(spaceUse(null).known, false);
+  assert.equal(spaceUse(-1).known, false);
+  assert.match(manage, /role="progressbar" aria-valuenow=\{space\.percent\}/);
+  assert.match(manage, /\{#if space\.known\}[\s\S]*role="progressbar"/);
+  assert.equal(langs.fr.account.manage.spaceNote, 'Le carnet lui-même ne compte pas dans cet espace.');
+});
+
+test('the server’s account answer is read with care: only well-formed parts are kept', () => {
+  assert.deepEqual(overviewOf({ email: 'a@b.c', signInMethod: 'google', subscription: { store: 'google', price: '14,99 $ US', renewsOn: '2027-11-18T00:00:00Z' }, storage: { usedBytes: 5, limitBytes: 10 } }), {
+    email: 'a@b.c',
+    signInMethod: 'google',
+    subscription: { store: 'google', price: '14,99 $ US', renewsOn: '2027-11-18' },
+    storage: { usedBytes: 5, limitBytes: 10 },
+  });
+  assert.deepEqual(overviewOf({ signInMethod: 'carrier-pigeon', subscription: { store: 'x', renewsOn: 'soon' }, storage: { usedBytes: 'many' } }), { subscription: {} });
+  assert.deepEqual(overviewOf(null), {});
+});
+
+test('deleting the account asks first; the server is called only after the confirmation', async () => {
+  const body = manage.slice(manage.indexOf('function askDelete()'), manage.indexOf('</script>'));
+  assert.match(body, /^function askDelete\(\) \{\s*confirmAction\(\{/);
+  assert.ok(body.indexOf('confirmAction(') < body.indexOf('deleteServerAccount()'), 'the call comes after the dialog');
+  assert.match(body, /onConfirm: async \(\) => \{\s*try \{\s*await deleteServerAccount\(\);/);
+  assert.equal([...manage.matchAll(/deleteServerAccount\(\)/g)].length, 1, 'one call, inside onConfirm');
+  // The button itself only opens the dialog.
+  assert.match(manage, /od-account-manage--delete" onclick=\{askDelete\}/);
+  // The dialog tells what is deleted and that the subscription stays until it is cancelled in the store.
+  assert.match(langs.fr.account.manage.deleteText, /résiliez-le dans \{store\}/);
+  assert.match(langs.en.account.manage.deleteText, /cancel it in \{store\}/);
+  // A failure keeps the device as it is: the device copy is signed out only after the server deleted.
+  assert.ok(body.indexOf('deleteServerAccount()') < body.indexOf('signOut({ deleteCopy: false })'));
+  assert.match(body, /catch \(e\) \{\s*console\.error\('Deleting the account', e\);\s*showSnackbar\(t\('account\.manage\.deleteFailed'\)\);\s*return;/);
+
+  // The call itself: DELETE /v1/account with the session, an empty answer being a success.
+  const calls = [];
+  const api = createServerApi({ baseUrl: 'https://server.example', transport: async (req) => (calls.push(req), { status: 204, text: '' }) });
+  await api.deleteAccount('tok');
+  assert.deepEqual([calls[0].method, calls[0].url, calls[0].headers.Authorization], ['DELETE', 'https://server.example/v1/account', 'Bearer tok']);
+  const refused = createServerApi({ baseUrl: 'https://server.example', transport: async () => ({ status: 404, text: '' }) });
+  await assert.rejects(() => refused.deleteAccount('tok'), { code: 'UNREACHABLE' }, 'a server without the route: the account is not deleted');
+});
+
+test('« Télécharger mes données » is a seam until the full export (to-do #57) exists: it says so', async () => {
+  const { downloadMyData } = await import('../../app/src/lib/odplus-account.js').catch(() => ({ downloadMyData: null }));
+  // The module imports the native plugin; in node it may not load: the source then says the same thing.
+  const src = read('lib/odplus-account.js');
+  assert.match(src, /export async function downloadMyData\(\) \{\s*return \{ status: 'unavailable' \};/);
+  assert.match(manage, /answer\.status === 'unavailable'\) showSnackbar\(t\('account\.manage\.exportUnavailable'\)\)/);
+  if (downloadMyData) assert.deepEqual(await downloadMyData(), { status: 'unavailable' });
+});
+
+test('signing out keeps the logbook on the device', () => {
+  assert.match(manage, /signOut\(\{ deleteCopy: false \}\)/);
+  assert.equal(langs.fr.account.manage.signOutText, 'Le carnet reste sur cet appareil');
+});
+
+// --- « #compte » in the history (Android, this sheet only) ---
+
+/** A window with a real history stack: pushState adds an entry, back() pops it and fires popstate. */
+function fakeWindow() {
+  const entries = [''];
+  const listeners = [];
+  const win = {
+    entries,
+    get location() {
+      return { hash: entries[entries.length - 1] };
+    },
+    history: {
+      pushState: (_s, _t, url) => entries.push(url),
+      back() {
+        if (entries.length > 1) entries.pop();
+        // The event comes later, as in a browser.
+        queueMicrotask(() => listeners.forEach((fn) => fn()));
+      },
+    },
+    addEventListener: (_type, fn) => listeners.push(fn),
+    removeEventListener: (_type, fn) => listeners.splice(listeners.indexOf(fn), 1),
+    /** The system's Back gesture. */
+    systemBack() {
+      win.history.back();
+    },
+  };
+  return win;
+}
+const tick = () => new Promise((r) => setTimeout(r));
+
+test('opening the account sheet adds « #compte » with a new history entry', () => {
+  const win = fakeWindow();
+  const h = createAccountHistory(win, { close() {} });
+  h.sync(true);
+  assert.deepEqual(win.entries, ['', ACCOUNT_HASH]);
+  h.sync(true);
+  assert.equal(win.entries.length, 2, 'opening twice adds nothing');
+  h.destroy();
+});
+
+test('the Back gesture closes the sheet and leaves the page where it was', async () => {
+  const win = fakeWindow();
+  let open = false;
+  const h = createAccountHistory(win, { close: () => ((open = false), h.sync(false)) });
+  open = true;
+  h.sync(true);
+  win.systemBack();
+  await tick();
+  assert.equal(open, false, 'the sheet closed');
+  assert.deepEqual(win.entries, [''], 'one entry back, nothing orphan');
+  h.destroy();
+});
+
+test('closing another way (scrim, swipe, ✕) goes back one entry: no orphan « #compte »', async () => {
+  const win = fakeWindow();
+  let closed = 0;
+  const h = createAccountHistory(win, { close: () => closed++ });
+  h.sync(true);
+  h.sync(false); // the sheet's state went to closed
+  await tick();
+  assert.deepEqual(win.entries, [''], 'the entry we added is gone');
+  assert.equal(closed, 0, 'the popstate that follows closes nothing twice');
+  // It opens again as often as needed, one entry each time.
+  h.sync(true);
+  h.sync(false);
+  h.sync(true);
+  assert.deepEqual(win.entries, ['', ACCOUNT_HASH]);
+  h.destroy();
+});
+
+test('a sheet that was never opened by us does not touch the history', () => {
+  const win = fakeWindow();
+  const h = createAccountHistory(win, { close() {} });
+  h.sync(false);
+  assert.deepEqual(win.entries, ['']);
+  h.destroy();
+});
+
+test('only the Android account sheet uses it: not the iPhone’s page sheet, not the desktop, no other sheet', () => {
+  assert.match(sheet, /const history = !ios && !desktopApp && typeof window !== 'undefined' \? createAccountHistory\(/);
+  assert.match(sheet, /history\?\.sync\(navigation\.accountOpen\)/);
+  const users = ['components', 'pages', 'lib'].flatMap((dir) =>
+    readdirSync(new URL(`../../app/src/${dir}/`, import.meta.url))
+      .filter((f) => /\.(svelte|js)$/.test(f) && f !== 'account-history.js' && read(`${dir}/${f}`).includes('account-history'))
+      .map((f) => `${dir}/${f}`),
+  );
+  assert.deepEqual(users, ['components/AccountSheet.svelte']);
+  assert.ok(!desktopSheet.includes('account-history'));
+});
+
+// --- Texts ---
+
+/** @param {any} o @param {string} [p] */
+function keys(o, p = '') {
+  return Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' && !('one' in v && 'other' in v) ? keys(v, `${p}${k}.`) : [`${p}${k}`]));
+}
+
+test('every new text exists in French and in English, and the release notes name the change', () => {
+  for (const group of ['free', 'manage', 'sheet']) {
+    assert.deepEqual(keys(langs.en.account[group]).sort(), keys(langs.fr.account[group]).sort(), group);
+  }
+  for (const lang of ['fr', 'en']) {
+    for (const key of ['nav.accountLabelFree', 'odplus.offer.already', 'odplus.offer.signIn']) {
+      assert.ok(key.split('.').reduce((o, k) => o?.[k], langs[lang]), `${lang} ${key}`);
+    }
+  }
+  assert.match(langs.fr.about.releaseNotes[0], /Gérer le compte/);
+  assert.match(langs.en.about.releaseNotes[0], /Manage the account/);
+  assert.equal(langs.fr.account.manage.perYear, '{price} par an');
+  assert.equal(langs.fr.account.manage.renews, 'Renouvelé le {date} · acheté sur {store}');
+  assert.equal(langs.fr.account.free.device, 'Carnet sur cet appareil');
+});

@@ -5667,7 +5667,7 @@ Christian approved this on 18 November 2026. Work in `main`. Follows task 279, i
 
 Done on `feature/signin-icons`: Christian's two files are in `app/src/assets/brands/` (`google-g.svg`, `apple-logo-black.svg`); `apple-logo-white.svg` is the black file with the fill colour only. One component (`FirstLaunchOdPlus`) serves phone, tablet and desktop: the Google « G » at 22 × 22, the Apple logo 22 high (about 18 wide). In dark theme the Apple button is black (#000000) with the white logo and white title. Branding rules re-checked (Google 20 px letter inside the 22 px picture, fills, strokes and text colours; Apple black-or-white logo, title wording, size): no rule asks for a different button. README and `tests/app/brand-assets.test.mjs` updated; checked in headless Chromium at 390 × 800 and 1280 × 800, light and dark.
 
-## [ ] 2026-11-18-281 Account sheet for free users, « Gérer le compte », maintenance badge, small sign-in changes
+## [x] 2026-11-18-281 Account sheet for free users, « Gérer le compte », maintenance badge, small sign-in changes
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`. This follows the « one app » decision (to-do #97): the free version and OpenDives+ are the same app.
 
@@ -5700,3 +5700,5 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 - Tablet and desktop « Se connecter ou créer un compte » (`android-tablette-odplus-connexion-paysage`, `bureau-odplus-connexion`): « Continuer sans compte » is centred under the three buttons, across their 440 px width, as on the phone.
 
 **Test:** free user: the Compte button opens the free sheet, « S'abonner » opens the offer, « Se connecter » opens the sign-in screen. Subscriber with an overdue part: the badge and the red subtitle; with none: neither. « Gérer dans Google Play » opens the store page. Android Back closes the account sheet. Account deletion asks for confirmation.
+
+**Done (18 November 2026), with seams:** the server has no `GET /v1/account` (sign-in method, store, price, renewal date, space used) nor `DELETE /v1/account` yet: « Gérer le compte » shows a placeholder for the space and hides the sign-in method, and « Supprimer le compte » reports a failure (`app/src/lib/odplus-account.js`, `server-api.js`). « Télécharger mes données » waits for the full export (to-do #57) and says so. The tablet and desktop free sheets open the phone's offer content; the iPhone free sheet has no mock-up and uses a plain grouped list. Account deletion also needs, on the server, the revocation of the Sign in with Apple token (Apple 5.1.1(v)) and a public web page to request deletion for the Play Data safety form.

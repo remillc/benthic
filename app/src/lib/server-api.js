@@ -58,6 +58,40 @@ function consentOf(r) {
 }
 
 /**
+ * @typedef {{
+ *   email?: string,
+ *   signInMethod?: 'google'|'apple'|'email',
+ *   subscription?: { store?: 'google'|'apple', price?: string, renewsOn?: string },
+ *   storage?: { usedBytes?: number, limitBytes?: number },
+ * }} AccountOverview
+ */
+
+/**
+ * The parts of the account overview that are well formed; anything else is dropped (the screen has a placeholder).
+ * @param {any} r
+ * @returns {AccountOverview}
+ */
+export function overviewOf(r) {
+  /** @type {AccountOverview} */
+  const out = {};
+  if (typeof r?.email === 'string') out.email = r.email;
+  if (['google', 'apple', 'email'].includes(r?.signInMethod)) out.signInMethod = r.signInMethod;
+  const sub = r?.subscription;
+  if (sub && typeof sub === 'object') {
+    out.subscription = {};
+    if (sub.store === 'google' || sub.store === 'apple') out.subscription.store = sub.store;
+    if (typeof sub.price === 'string' && sub.price) out.subscription.price = sub.price;
+    if (typeof sub.renewsOn === 'string' && /^\d{4}-\d{2}-\d{2}/.test(sub.renewsOn)) out.subscription.renewsOn = sub.renewsOn.slice(0, 10);
+  }
+  const st = r?.storage;
+  if (st && typeof st === 'object' && typeof st.usedBytes === 'number' && st.usedBytes >= 0) {
+    out.storage = { usedBytes: st.usedBytes };
+    if (typeof st.limitBytes === 'number' && st.limitBytes > 0) out.storage.limitBytes = st.limitBytes;
+  }
+  return out;
+}
+
+/**
  * @param {{ baseUrl: string, transport: ServerTransport }} options an empty `baseUrl`: no server configured
  */
 export function createServerApi({ baseUrl, transport }) {
@@ -79,7 +113,8 @@ export function createServerApi({ baseUrl, transport }) {
     } catch {
       json = null;
     }
-    if (response.status >= 200 && response.status < 300 && json) return json;
+    // A deletion answers with an empty body (204) as well as with a JSON one.
+    if (response.status >= 200 && response.status < 300 && (json || method === 'DELETE')) return json ?? {};
     throw errorFromResponse(response.status, json);
   }
 
@@ -121,6 +156,28 @@ export function createServerApi({ baseUrl, transport }) {
      */
     async setHealthConsent(sessionToken, consent) {
       return consentOf(await call('PUT', '/v1/account/health-consent', { consent }, { Authorization: `Bearer ${sessionToken}` }));
+    },
+
+    /**
+     * What the account screen shows (task 2026-11-18-281): how the diver signs in, the subscription and the photo space.
+     * The server does not answer this route yet (UNREACHABLE): every field is optional and the screen shows a placeholder
+     * for what is missing. Expected shape: `{ email, signInMethod: 'google'|'apple'|'email', subscription: { store:
+     * 'google'|'apple', price: string, renewsOn: 'YYYY-MM-DD' }, storage: { usedBytes, limitBytes } }`.
+     * @param {string} sessionToken
+     * @returns {Promise<AccountOverview>}
+     */
+    async accountOverview(sessionToken) {
+      return overviewOf(await call('GET', '/v1/account', undefined, { Authorization: `Bearer ${sessionToken}` }));
+    },
+
+    /**
+     * Deletes the account and what the server keeps for it (the logbook's repository, the photos). The server does not
+     * answer this route yet. The logbook on the device is not touched.
+     * @param {string} sessionToken
+     * @returns {Promise<void>}
+     */
+    async deleteAccount(sessionToken) {
+      await call('DELETE', '/v1/account', undefined, { Authorization: `Bearer ${sessionToken}` });
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

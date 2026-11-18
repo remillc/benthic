@@ -15,6 +15,7 @@
   import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
   import { claimReadyMotion } from '../lib/ready-animation.js';
   import { flow, go, goDownload, goOffer } from '../lib/first-launch.svelte.js';
+  import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
   import { ServerError } from '../lib/server-api.js';
   import { ACTIVATED, BENEFITS, afterSignIn, summaryRows } from '../lib/odplus.js';
@@ -241,6 +242,10 @@
     <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     <button type="button" class="od-plus--text od-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
     <p class="od-plus--no-account">{t('odplus.offer.noAccount')}</p>
+    {#if offerShowsSignIn(flow.stack)}
+      <!-- « Déjà abonné ? Se connecter » (task 2026-11-18-281): hidden right after a sign-in, where the diver is already in. -->
+      <p class="od-plus--already">{t('odplus.offer.already')} <button type="button" class="od-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
+    {/if}
   </div>
 {:else if step === 'odplusReady'}
   <div class="od-plus--screen">
@@ -461,6 +466,25 @@
       color: var(--od-release-link);
     }
 
+    /* Tablet and desktop (task 2026-11-18-281): the three buttons and their note are 440 px wide, and « Continuer sans compte » is centred across that width. */
+    @media (min-width: 768px) {
+      .od-plus--buttons,
+      .od-plus--note {
+        width: 100%;
+        max-width: 440px;
+      }
+
+      .od-plus--text-link {
+        align-self: flex-start;
+        width: 100%;
+        max-width: 440px;
+        margin-left: 0;
+        padding: 0 16px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+    }
+
     .od-plus--text-centre {
       align-self: center;
       margin-left: 0;
@@ -551,6 +575,39 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
+
+    /* « Déjà abonné ? Se connecter »: grey text, the link underlined in the main blue (task 2026-11-18-281). */
+    .od-plus--already {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      column-gap: 4px;
+      min-height: 40px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-plus--link {
+      width: auto;
+      min-height: 40px;
+      padding: 0 4px;
+      border: none;
+      background: none;
+      color: var(--od-release-link);
+      font: inherit;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-row-main);
+        border-radius: 8px;
+      }
     }
 
     /* The three screens with the blue hero. On a phone they use the whole width, the first launch's own band is hidden. */

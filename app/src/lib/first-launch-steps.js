@@ -67,6 +67,7 @@ const FORWARD = {
   'start:discover': 'odplusOffer',
   'odplusConnect:email': 'server',
   'odplusOffer:welcome': 'odplusWelcome',
+  'odplusOffer:signIn': 'odplusConnect',
   'odplusWelcome:next': 'odplusHealth',
   'odplusHealth:next': 'odplusReady',
   'serverDownload:ready': 'odplusReady',
@@ -220,12 +221,34 @@ export function replaceTop(stack, step) {
 
 /**
  * The stack of the first launch entered from the logbook's menu: « Ouvrir un autre carnet » opens the « Ouvrir mon
- * carnet OpenDives » step, « Nouveau carnet » the name step, both above the first screen.
- * @param {'open'|'new'} first
+ * carnet OpenDives » step, « Nouveau carnet » the name step, both above the first screen. The free account sheet
+ * (task 2026-11-18-281) opens the offer (« S'abonner ») or « Se connecter ou créer un compte » (« Se connecter »).
+ * @param {'open'|'new'|'offer'|'signIn'} first
  * @returns {Step[]}
  */
 export function menuEntry(first) {
+  if (first === 'offer') return ['start', 'odplusOffer'];
+  if (first === 'signIn') return ['start', 'odplusConnect'];
   return ['start', first];
+}
+
+/**
+ * Whether the offer shows « Déjà abonné ? Se connecter »: not right after a sign-in (the stack holds the address step
+ * then), where the diver is already signed in (task 2026-11-18-281).
+ * @param {Step[]} stack
+ */
+export function offerShowsSignIn(stack) {
+  return !stack.includes('server');
+}
+
+/**
+ * Whether « Retour » (or « Continuer sans compte ») on this stack leaves the first launch: it was entered from the
+ * logbook's menu on one of the OpenDives+ screens, with nothing before it but the first screen.
+ * @param {Step[]} stack
+ * @param {boolean} fromMenu
+ */
+export function leavesFirstLaunch(stack, fromMenu) {
+  return fromMenu && stack.length <= 2 && stack[0] === 'start' && (stack[1] === 'odplusOffer' || stack[1] === 'odplusConnect');
 }
 
 /**

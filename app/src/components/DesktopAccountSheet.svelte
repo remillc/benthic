@@ -11,7 +11,12 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import OdPlusChip from './OdPlusChip.svelte';
+  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
+  import { profileRow, sheetVariant } from '../lib/account-sheet.js';
+  import { isRelease } from '../lib/edition.js';
   import { syncNetwork, setUnmeteredOnly } from '../lib/sync-network.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -21,6 +26,17 @@
   const accountName = $derived(logbook.email || t('menu.noAccount'));
   const git = $derived(logbook.mode === 'git');
   const server = $derived(git && logbook.odplus);
+
+  // The versions of the sheet (task 2026-11-18-281; bureau-compte-gratuit, bureau-profil-compte). The release edition
+  // without an OpenDives+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
+  // the phone's offer content.
+  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }));
+  const free = $derived(variant === 'free');
+  const subscriber = $derived(variant === 'subscriber');
+  const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
+  $effect(() => {
+    if (navigation.accountOpen && subscriber) loadInventory().catch((e) => console.error('Reading the equipment', e));
+  });
 
   /** @type {HTMLElement|undefined} */
   let sheet = $state();
@@ -59,7 +75,20 @@
 
   function manage() {
     close();
-    openOver('/account');
+    if (subscriber) openManageAccount();
+    else openOver('/account');
+  }
+
+  /** @param {'offer'|'signIn'} screen */
+  function plus(screen) {
+    close();
+    openOdPlus(screen);
+  }
+
+  /** @param {() => void} open */
+  function leaveTo(open) {
+    close();
+    open();
   }
 
   function confirmSignOut() {
@@ -85,11 +114,11 @@
 {#if navigation.accountOpen}
   <div class="od-desktop-account" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
     <div class="od-desktop-account--head">
-      <span class="od-desktop-account--initial" aria-hidden="true">
+      <span class="od-desktop-account--initial" class:od-desktop-account--silhouette={free} aria-hidden="true">
         {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
       </span>
       <span class="od-desktop-account--texts">
-        <span class="od-desktop-account--name">{accountName}</span>
+        <span class="od-desktop-account--name">{free ? t('account.free.device') : accountName}</span>
         {#if logbook.email && !logbook.loading && !logbook.error}
           <span class="od-desktop-account--status">
             {#if logbook.syncFailure}
@@ -98,14 +127,35 @@
               <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
             {/if}
           </span>
+        {:else if free}
+          <span class="od-desktop-account--status">{t('logbook.count', { n: logbook.dives.length })}</span>
         {:else if !logbook.email}
           <span class="od-desktop-account--status">{t('menu.localDives', { n: logbook.dives.length })}</span>
         {/if}
       </span>
     </div>
 
-    {#if logbook.email}
-      <div class="od-desktop-account--sync"><SyncButton label={t('desktopSettings.account.syncNow')} /></div>
+    {#if free}
+      <div class="od-desktop-account--offer">
+        <button type="button" class="od-desktop-account--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
+        <span class="od-desktop-account--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-desktop-account--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+      </div>
+      <div class="od-desktop-account--divider"></div>
+      <button type="button" class="od-desktop-account--row od-desktop-account--plus-row" onclick={() => plus('offer')}>
+        <Icon name="cloudDownload" size={22} />
+        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('account.free.sync')}</span><span class="od-desktop-account--row-line">{t('account.free.syncText')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-desktop-account--row od-desktop-account--plus-row" onclick={() => plus('offer')}>
+        <Icon name="briefcase" size={22} />
+        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('gear.profile.title')}</span><span class="od-desktop-account--row-line">{t('gear.profile.cardLine')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+    {:else if logbook.email}
+      <div class="od-desktop-account--sync od-desktop-account--buttons">
+        {#if subscriber}<button type="button" class="od-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>{/if}
+        <SyncButton label={t('desktopSettings.account.syncNow')} />
+      </div>
       <label class="od-desktop-account--switch">
         <span class="od-desktop-account--switch-texts">
           <span class="od-desktop-account--switch-label">{t('desktopSettings.account.auto')}</span>
@@ -127,6 +177,32 @@
       </button>
     {:else}
       <div class="od-desktop-account--sync"><button type="button" class="od-tonal-button" onclick={manage}>{t('desktopSettings.account.manage')}</button></div>
+    {/if}
+    {#if subscriber}
+      <div class="od-desktop-account--divider"></div>
+      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(() => openOver('/profile'))}>
+        <Icon name="briefcase" size={22} />
+        <span class="od-desktop-account--row-texts">
+          <OdPlusChip onSheet />
+          <span>{t('gear.profile.title')}</span>
+          <span class="od-desktop-account--row-line" class:od-desktop-account--late-line={late.late}>{late.late ? t('account.sheet.maintenanceLate', { n: late.badge }) : t('gear.profile.cardLine')}</span>
+        </span>
+        {#if late.late}<span class="od-desktop-account--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
+        <Icon name="chevron" size={20} />
+      </button>
+    {/if}
+    {#if free || subscriber}
+      <div class="od-desktop-account--divider"></div>
+      <button type="button" class="od-desktop-account--row" onclick={() => leaveTo(openSettings)}>
+        <Icon name="settings" size={22} />
+        <span class="od-desktop-account--row-texts"><span>{t('settings.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-desktop-account--row" onclick={() => leaveTo(openAbout)}>
+        <Icon name="info" size={22} />
+        <span class="od-desktop-account--row-texts"><span>{t('about.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
     {/if}
   </div>
 {/if}
@@ -233,6 +309,96 @@
         outline: 2px solid var(--od-text);
         outline-offset: -2px;
       }
+    }
+    /* Free version and OpenDives+ rows (task 2026-11-18-281). */
+    .od-desktop-account--silhouette {
+      background: var(--od-surface-container-high);
+      color: var(--od-text-2);
+    }
+    .od-desktop-account--offer {
+      padding: 12px 16px 12px 76px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .od-desktop-account--subscribe {
+      width: auto;
+      height: 40px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-release-row-main);
+      color: var(--od-release-on-panel);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .od-desktop-account--already {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-account--sign-in {
+      width: auto;
+      padding: 10px 4px;
+      margin: 0 -4px;
+      border: none;
+      background: none;
+      color: var(--od-release-link);
+      font: inherit;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+    }
+    .od-desktop-account--buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .od-desktop-account--row-texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      :global(.od-plus-chip) {
+        align-self: flex-start;
+        height: 22px;
+        padding: 0 8px 0 6px;
+        border-radius: 11px;
+      }
+    }
+    .od-desktop-account--plus-row,
+    .od-desktop-account--profile {
+      min-height: 56px;
+    }
+    .od-desktop-account--row-line {
+      font-size: 13px;
+      color: var(--od-text-2);
+    }
+    .od-desktop-account--row-line.od-desktop-account--late-line {
+      color: var(--od-late-text);
+    }
+    .od-desktop-account--late-badge {
+      flex: none;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      border-radius: 12px;
+      background: var(--od-late);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
     }
     /* « Synchroniser maintenant »: the page's main action, in the ink (the mock-up's black button). */
     .od-desktop-account--sync :global(.od-sync-button) {

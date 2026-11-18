@@ -30,6 +30,8 @@ export const navigation = $state({
   atRoot: true,
   /** The account sheet (Android phone): account, sync, Réglages and À propos. */
   accountOpen: false,
+  /** « Gérer le compte » as a dialog (tablet and desktop; the phone opens a page): task 2026-11-18-281. */
+  manageOpen: false,
 });
 
 /** Whether the current view shows its first page, for the bottom navigation bar. */
@@ -121,6 +123,12 @@ export function openOver(path, options) {
   // The desktop layout shows Réglages' list with its detail pane emptied: that is Réglages already open.
   const open = router?.currentRoute?.path;
   if (router && open !== path && !(path === '/settings/' && open === '/pane/empty')) router.navigate(path, options);
+}
+
+/** « Gérer le compte » (an OpenDives+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
+export function openManageAccount() {
+  if (layout.phone) openOver('/account/manage');
+  else navigation.manageOpen = true;
 }
 
 /** Settings open over the current section, from the side menu or the tablet navigation. */

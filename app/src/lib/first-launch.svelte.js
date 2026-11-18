@@ -165,7 +165,7 @@ export function importIsRead(source) {
 /**
  * « Ouvrir un autre carnet » and « Nouveau carnet » of the logbook's menu: the first launch opens at that step,
  * with a « Retour » on its first screen that leaves it.
- * @param {'open'|'new'} first
+ * @param {'open'|'new'|'offer'|'signIn'} first
  */
 export function enterFromMenu(first) {
   resetFlow();

@@ -39,6 +39,7 @@
   import NavMenu from './components/NavMenu.svelte';
   import NavigationBar from './components/NavigationBar.svelte';
   import AccountSheet from './components/AccountSheet.svelte';
+  import AccountManageDialog from './components/AccountManageDialog.svelte';
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
@@ -138,6 +139,7 @@
         ]
       : []),
     { path: '/account', component: Account },
+    { path: '/account/manage', ...lazy(() => import('./pages/AccountManage.svelte')) },
     { path: '/account/delete', ...lazy(() => import('./pages/DeleteAccount.svelte')) },
     // Signing in and creating an account, from the Account screen without an account.
     // The Subsurface cloud (sign in, create an account) is the alpha's: the beta never opens that logbook.
@@ -415,6 +417,7 @@
   {#if layout.rail}<NavRail />{:else if !bottomNav()}<NavMenu />{/if}
   {#if layout.desktop}<DesktopAccountSheet />{:else if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
+  <AccountManageDialog />
   <SyncFailureSheet />
   <ConflictHost />
   <QrReceived />

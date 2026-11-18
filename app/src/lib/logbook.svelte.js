@@ -1351,3 +1351,6 @@ export async function loadLogbook({ force = false } = {}) {
     logbook.pulling = false;
   }
 }
+
+// Development builds only: lets a headless check put the logbook in any state (account, OpenDives+).
+if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (window).__logbook = logbook;

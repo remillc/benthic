@@ -5,6 +5,7 @@
   // menu held that is not a section: the account (« Gérer le compte » opens Compte), the sync
   // line with « Synchroniser » (and its other options in manual mode), Réglages and À propos.
   // Compte, Réglages and À propos open over the current section, with a back arrow.
+  import { onDestroy } from 'svelte';
   import { Sheet, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
@@ -18,6 +19,12 @@
   import { t } from '../lib/i18n.js';
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { isRelease } from '../lib/edition.js';
+  import OdPlusChip from './OdPlusChip.svelte';
+  import { openManageAccount } from '../lib/navigation.svelte.js';
+  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
+  import { createAccountHistory } from '../lib/account-history.js';
+  import { profileRow, sheetVariant } from '../lib/account-sheet.js';
 
   const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(logbook.email || t('menu.noAccount'));
@@ -25,6 +32,39 @@
     t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
   );
   const mapUpdates = $derived(updatesCount());
+
+  // The three versions of the sheet (task 2026-11-18-281): without an OpenDives+ account (the release edition's free
+  // version), with one, and the alpha's or a cloud account's, which keeps what it had.
+  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }));
+  const free = $derived(variant === 'free');
+  const subscriber = $derived(variant === 'subscriber');
+  /** The overdue pieces: the badge and the red line of « Mon profil de plongeur » (the count of the Entretien row). */
+  const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
+  // The reminders are read when the sheet opens, so that the count is the one of the profile's Entretien row.
+  $effect(() => {
+    if (navigation.accountOpen && subscriber && !desktopApp) loadInventory().catch((e) => console.error('Reading the equipment', e));
+  });
+
+  // Android only (not the iPhone's page sheet, not the desktop's card): « #compte » in the history, so that Back closes
+  // the sheet and closing it another way leaves no orphan entry (lib/account-history.js). This sheet only.
+  const history = !ios && !desktopApp && typeof window !== 'undefined' ? createAccountHistory(/** @type {any} */ (window), { close: () => (navigation.accountOpen = false) }) : null;
+  $effect(() => {
+    history?.sync(navigation.accountOpen);
+  });
+  onDestroy(() => history?.destroy());
+
+  /** « Gérer le compte »: the new screen for an OpenDives+ account, the account page for the others. */
+  function manage() {
+    navigation.accountOpen = false;
+    if (subscriber) openManageAccount();
+    else openOver('/account');
+  }
+
+  /** The free sheet's doors into the OpenDives+ screens. @param {'offer'|'signIn'} screen */
+  function plus(screen) {
+    navigation.accountOpen = false;
+    openOdPlus(screen);
+  }
 
   /** Manual sync with an account: the changes waiting, a filled « Synchroniser », and its other options under ⋮. */
   const manual = $derived(!!logbook.email && !logbook.autoSync);
@@ -100,7 +140,7 @@
   backdrop
   swipeToClose
   push={false}
-  aria-label={t('nav.accountSheet')}
+  aria-label={t(free ? 'nav.accountLabelFree' : 'nav.accountSheet')}
 >
   {#if ios}
   <!-- iPhone (task 2026-11-14-127, appbar-tiroir-ios-ouvert.dc.html): a page sheet « Compte » with
@@ -111,7 +151,7 @@
       <button type="button" class="od-account-sheet--ios-ok" onclick={() => (navigation.accountOpen = false)}>{t('dialog.ok')}</button>
     </div>
     <div class="od-account-sheet--ios-group">
-      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/account'))}>
+      <button type="button" class="od-account-sheet--ios-row" onclick={manage}>
         <span class="od-account-sheet--initial" aria-hidden="true">
           {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
         </span>
@@ -143,7 +183,17 @@
         {/if}
       </div>
     {/if}
-    {#if isRelease && !desktopApp}
+    {#if free && isRelease}
+      <!-- Free version on iPhone: the offer and « Se connecter » in the sheet's own grouped lists (no iOS mock-up yet). -->
+      <div class="od-account-sheet--ios-group">
+        <button type="button" class="od-account-sheet--ios-row" onclick={() => plus('offer')}>
+          <Icon name="plusMark" />
+          <span class="od-account-sheet--row-label">{t('odplus.offer.subscribe')}<span class="od-account-sheet--row-line">{t('account.free.syncText')}</span></span>
+          <Icon name="chevron" size={20} />
+        </button>
+        <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={() => plus('signIn')}>{t('odplus.offer.already')} {t('odplus.offer.signIn')}</button>
+      </div>
+    {:else if isRelease && !desktopApp}
       <div class="od-account-sheet--ios-group">
         <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
           <Icon name="briefcase" />
@@ -183,19 +233,59 @@
   {:else}
   <div class="od-account-sheet--content">
     <div class="od-account-sheet--head">
-      <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
-        <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
-      </button>
-      <!-- Centred on the sheet's width: an empty 48 dp slot on the right balances ✕ (task 2026-11-14-156).
+      <span aria-hidden="true"></span>
+      <!-- Centred on the sheet's width: an empty 48 dp slot on the left balances the ✕ on the right (task 2026-11-18-281).
            The simple logo with relief (the same drawing in both files, no inline gradient to share) (task 2026-11-14-123). -->
       <span class="od-account-sheet--brand">
         <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
         <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
         <span class="od-account-sheet--title">{t('menu.title')}</span>
       </span>
-      <span aria-hidden="true"></span>
+      <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
+        <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
+      </button>
     </div>
 
+    {#if free}
+    <!-- Free version (docs/mockups-release/nav-compte-gratuit-android.dc.html): the logbook on this device, the offer, and
+         the two OpenDives+ rows that open it. No e-mail, no sync line. -->
+    <div class="od-account-sheet--card od-account-sheet--identity od-account-sheet--free">
+      <div class="od-account-sheet--account">
+        <span class="od-account-sheet--initial od-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
+        <span class="od-account-sheet--texts">
+          <span class="od-account-sheet--name">{t('account.free.device')}</span>
+          <span class="od-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
+        </span>
+      </div>
+      <div class="od-account-sheet--offer">
+        <button type="button" class="od-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
+        <span class="od-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+      </div>
+    </div>
+    {#if isRelease && !desktopApp}
+      <div class="od-account-sheet--card">
+        <a href="#offer-sync" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
+          <Icon name="cloudDownload" />
+          <span class="od-account-sheet--row-label">
+            <OdPlusChip onSheet />
+            {t('account.free.sync')}
+            <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+          </span>
+          <Icon name="chevron" size={20} />
+        </a>
+        <div class="od-account-sheet--divider od-account-sheet--margin"></div>
+        <a href="#offer-profile" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
+          <Icon name="briefcase" />
+          <span class="od-account-sheet--row-label">
+            <OdPlusChip onSheet />
+            {t('gear.profile.title')}
+            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+          </span>
+          <Icon name="chevron" size={20} />
+        </a>
+      </div>
+    {/if}
+    {:else}
     <div class="od-account-sheet--card od-account-sheet--identity">
       <div class="od-account-sheet--account">
         <span class="od-account-sheet--initial" aria-hidden="true">
@@ -207,7 +297,7 @@
         </span>
       </div>
       <div class="od-account-sheet--manage">
-        <button type="button" class="od-outlined-button" onclick={() => go(() => openOver('/account'))}>{t('nav.manageAccount')}</button>
+        <button type="button" class="od-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>
       </div>
       {#if !logbook.loading && !logbook.error}
         <div class="od-account-sheet--divider"></div>
@@ -241,18 +331,26 @@
       {/if}
     </div>
 
-    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages. -->
+    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages. An OpenDives+
+         account sees the chip above its title and, when a piece is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
       <div class="od-account-sheet--card">
-        <a href="#profile" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
+        <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
+            {#if subscriber}<OdPlusChip onSheet />{/if}
             {t('gear.profile.title')}
-            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+            {#if late.late}
+              <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
+            {:else}
+              <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+            {/if}
           </span>
+          {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
           <Icon name="chevron" size={20} />
         </a>
       </div>
+    {/if}
     {/if}
 
     <!-- Desktop: Réglages and À propos leave the sheet (rail, or the Mac's menu bar; task 2026-11-15-169). -->
@@ -592,6 +690,113 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the OpenDives+ rows. */
+    .od-account-sheet--silhouette {
+      background: var(--od-surface-container-high);
+      color: var(--od-text-2);
+    }
+
+    .od-account-sheet--offer {
+      padding: 0 16px 12px 68px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .od-account-sheet--subscribe {
+      width: auto;
+      height: 40px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 20px;
+      background: var(--od-release-row-main);
+      color: var(--od-release-on-panel);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .od-account-sheet--already {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
+    .od-account-sheet--sign-in {
+      width: auto;
+      padding: 10px 4px;
+      margin: 0 -4px;
+      border: none;
+      background: none;
+      color: var(--od-release-link);
+      font: inherit;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+    }
+
+    .od-account-sheet--plus-row {
+      min-height: 64px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .od-account-sheet--plus-row .od-account-sheet--row-label {
+      gap: 2px;
+      font-size: 16px;
+
+      :global(.od-plus-chip) {
+        align-self: flex-start;
+        height: 22px;
+        margin-bottom: 2px;
+        border-radius: 11px;
+        padding: 0 8px 0 6px;
+      }
+    }
+
+    .od-account-sheet--divider.od-account-sheet--margin {
+      margin: 0 16px;
+    }
+
+    /* « Mon profil de plongeur » of an OpenDives+ account: the chip above the title, the overdue pieces in red. */
+    .od-account-sheet--profile .od-account-sheet--row-label {
+      font-size: 16px;
+      gap: 2px;
+
+      :global(.od-plus-chip) {
+        align-self: flex-start;
+        height: 22px;
+        margin-bottom: 2px;
+        border-radius: 11px;
+        padding: 0 8px 0 6px;
+      }
+    }
+
+    .od-account-sheet--row-line.od-account-sheet--late-line {
+      color: var(--od-late-text);
+    }
+
+    .od-account-sheet--late-badge {
+      flex: none;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      border-radius: 12px;
+      background: var(--od-late);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .od-account-sheet--badge {

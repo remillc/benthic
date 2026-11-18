@@ -275,7 +275,7 @@ test('the sign-in is the desktop’s own in the window without a logbook, on the
   assert.match(steps, /cloudCancelSignIn\(\{ provider: flow\.service \}\)/);
   assert.match(steps, /cloudReopenSignIn\(\{ provider: flow\.service \}\)/);
   // « Retour » and « Annuler » give the sign-in up, and the answer of a sign-in given up is dropped.
-  assert.match(steps, /function back\(\) \{\s*abandonSignIn\(\);\s*goBack\(\);/);
+  assert.match(steps, /function back\(\) \{\s*abandonSignIn\(\);\s*(if \(leavesFirstLaunch\([^)]*\)\) leave\(\);\s*else )?goBack\(\);/);
   assert.match(steps, /if \(run !== signInRun\) return;/);
   // Opening a logbook of the account is not built: the list of the account’s logbooks keeps its « coming » message.
   assert.match(steps, /function seeLogbooks\(\) \{[\s\S]*?cloud\(\);/);
