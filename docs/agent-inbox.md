@@ -5428,7 +5428,7 @@ Christian asked for this on 18 November 2026. It changes how we work, so read it
 - `main` contains every beta branch: `git branch -r --merged main` lists them.
 - The build and the tests pass on `main`.
 
-## [ ] 2026-11-18-269 All devices: show the time left on long downloads and imports
+## [x] 2026-11-18-269 All devices: show the time left on long downloads and imports
 
 Christian approved this on 18 November 2026. Work in `main` (task 268).
 
