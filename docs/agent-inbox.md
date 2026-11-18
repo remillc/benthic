@@ -5716,3 +5716,29 @@ Christian approved this on 18 November 2026. Work in `main`. Follows task 281. M
 - Desktop: still to be decided with Christian (where the desktop app and the subscription are sold). Do not build a desktop offer yet.
 
 **Test:** the subscriber's sheet shows the « + » chip, the free one does not; on tablet, the free sheet opens the tablet offer.
+
+## [ ] 2026-11-18-283 Equipment: the BCD icon, « Saucisse », and a thumbnail of the model
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
+
+**1. The BCD (« Gilet ») has its own icon** (`profil-piece-nouvelle-android`, `android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`). The « Gilet » type tile was using the surface marker buoy icon. It now shows a vest: collar, centre opening, two straps (24 × 24, stroke icon). Use it wherever the BCD type appears.
+
+**2. The surface marker buoy is called « Saucisse »** in fr-CA (« parachute de palier » in fr-FR), not « Bouée de signalisation ». Its icon is redrawn: a tube with a **flat top** and two bands, floating on two wave lines. The old rounded-top tube must not be used anywhere. Screens: `detail-equipement-plus-android`, `edition-equipement-plus-android`, `edition-kit-menu-android`, `equipement-ajout-android`, `android-tablette-profil-plongee-ajout-paysage`, `bureau-profil-plongee-ajout` (also the « Retirer … de cette plongée » labels).
+
+**3. A thumbnail of the model** (`profil-piece-nouvelle-android`): left of the « Modèle » field, a 56 × 56 px square with 12 px corners, white background, 1 px border #DCDAD3, aligned with the field. It shows:
+- the diver's own photo of the piece (« Ajouter une photo »), cropped to fill;
+- otherwise the icon of the piece's type, large and centred.
+The mock-up shows a generic drawing in place of a photo. Do not fetch product photos from the web, from manufacturers or from retailers: where model photos could come from later is an open idea (#99 in `docs/IDEAS.md`), not decided.
+
+**Test:** the « Gilet » tile shows the vest; a « Saucisse » item shows the new buoy; a new piece with a photo shows it in the thumbnail, without a photo the type icon.
+
+## [x] 2026-11-18-284 Phone: the search box of the logbook header moves up 8 px
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/` (`android-carnet`, `nav-barre-android`, `nav-pastille-android`, `android-serveur-carnet`, `import-fit-importe-android`, `import-fit-deja-android`, `android-carnet-avion`, `carnet-evaluation-android`).
+
+The search box (« Rechercher dans le carnet ») sat too close to the wave at the bottom of the blue header. Move it up 8 px **without changing the header's height**:
+- the space between the summary line (« 9 plongées · 4 sites · … ») and the search box goes from 16 to 8 px;
+- the header's bottom padding goes from 32 to 40 px.
+The wave, the title row and the list below do not move.
+
+**Test:** the header has the same height as before; the search box has 40 px of blue below it before the wave.

@@ -107,6 +107,10 @@
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
+    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a violet apart from the meaning colours; 6.4:1 on white. */
+    --od-dev: #5B33A8;
+    --od-dev-tint: #EFE8FA;
+    --od-on-dev: #FFFFFF;
     /* Pale tint behind an alarm icon; the icon in --od-alarm on it: 4.8:1 (AA non-text 3:1). */
     --od-alarm-tint: #FBE9E7;
     /* MD3 colour roles (spec, section 1, "Colour roles"), light. */
@@ -545,6 +549,10 @@
     --od-release-disabled-text: rgb(255 255 255 / 0.38);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
+    /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a violet apart from the meaning colours. */
+    --od-dev: #C9B2F5;
+    --od-dev-tint: #2F2547;
+    --od-on-dev: #1B1030;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
     --od-alarm-tint: #3F2423;
     --od-language-divider: #4A4C50;
@@ -1902,7 +1910,8 @@ html.md {
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;
-  margin: 16px 0 0;
+  /* 8 px under the summary, 40 px of blue under it before the wave (task 284: up 8 px, same band height). */
+  margin: 8px 0 0;
   background: none;
   box-shadow: none;
 }
