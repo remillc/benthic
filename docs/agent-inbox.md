@@ -5567,3 +5567,16 @@ Christian approved this on 18 November 2026. Work in `main`. Do it after tasks 2
 **Removed from the beta:** the tablet screens « Dépôt git » and « Créer un jeton d'accès » are no longer part of the beta (moved to « Mis de côté » on the canvas). Do not build them.
 
 **Test:** on a tablet in landscape and portrait, and on desktop, every screen of tasks 271 to 274 is reachable and keeps its state when the window is resized.
+
+## [ ] 2026-11-18-276 Phone: the OpenDives+ offer shows the maintenance reminders
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-odplus-offre.dc.html`.
+
+The maintenance notifications (task 274) are a strong reason to subscribe. On « L'offre », under the four tiles (Synchronisé, Sauvegardé, Équipement, Brevets), add a full-width tile:
+- a bell icon on a white square, on the pale red background of the maintenance colours (#F6E3E0, icon #8A2A1F);
+- the title « Rappels d'entretien »;
+- the text « Détendeur, bouteille, pile : prévenu 30 jours avant l'échéance. »
+
+English: « Service reminders », « Regulator, cylinder, battery: notified 30 days before they are due. »
+
+The rest of the screen does not change. The screen is now taller: check that it scrolls on small phones and that « S'abonner » stays reachable.
