@@ -60,6 +60,7 @@ class OpenDivesCorePlugin : Plugin() {
 
     /** The OpenDives server's session (release edition), see ServerSessionStore. */
     private val serverStore: ServerSessionStore by lazy { ServerSessionStore(context) }
+    private val dataKeyFile: SealedFile by lazy { SealedFile(context, "opendives-data-key", "data-key.bin") }
 
     /**
      * An account being created or signed in to whose logbook does not exist
@@ -616,8 +617,31 @@ class OpenDivesCorePlugin : Plugin() {
                 .put("repositoryUrl", stored.repositoryUrl)
                 .put("branch", stored.branch)
                 .put("username", stored.gitUsername)
-                .put("token", stored.gitToken),
+                .put("token", stored.gitToken)
+                .put("sessionToken", stored.sessionToken),
         )
+    }
+
+    /** The device's data key for the sensitive items (section 11.5 of the architecture): base64, or "" when there is none. */
+    @PluginMethod
+    fun dataKeyRead(call: PluginCall) {
+        call.resolve(JSObject().put("key", dataKeyFile.read().orEmpty()))
+    }
+
+    @PluginMethod
+    fun dataKeyWrite(call: PluginCall) {
+        val key = call.getString("key").orEmpty()
+        if (!Regex("[A-Za-z0-9+/=]{16,128}").matches(key)) {
+            call.reject("BAD_ARGUMENT", "BAD_ARGUMENT")
+            return
+        }
+        try {
+            dataKeyFile.write(key)
+            call.resolve()
+        } catch (e: Exception) {
+            Log.e(TAG, "dataKeyWrite failed", e)
+            call.reject("CREDENTIALS_NOT_SAVED", "CREDENTIALS_NOT_SAVED")
+        }
     }
 
     /** Signs out of the OpenDives server: the tokens are erased from this device. */
@@ -1537,6 +1561,22 @@ class OpenDivesCorePlugin : Plugin() {
 
     @ActivityCallback
     private fun qrScanResult(call: PluginCall, result: ActivityResult) {
+        val json = result.data?.getStringExtra("result")
+        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+    }
+
+    /**
+     * The document scanner (DocumentScanActivity: ML Kit Document Scanner, then text recognition).
+     * Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.
+     */
+    @PluginMethod
+    fun scanDocument(call: PluginCall) {
+        val intent = Intent(context, DocumentScanActivity::class.java)
+        startActivityForResult(call, intent, "scanDocumentResult")
+    }
+
+    @ActivityCallback
+    private fun scanDocumentResult(call: PluginCall, result: ActivityResult) {
         val json = result.data?.getStringExtra("result")
         if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
     }

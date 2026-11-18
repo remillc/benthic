@@ -1,13 +1,14 @@
 <script>
   // @ts-check
   // « Mon profil de plongeur » (task 2026-11-17-267, docs/mockups-release/profil-plongeur-android.dc.html): the
-  // diver's initial, name, number of dives and the OpenDives+ chip, then three entries. Only « Équipement » works;
-  // « Brevets » and « Informations » are later tasks and show as not available.
+  // diver's initial, name, number of dives and the OpenDives+ chip, then three entries: « Équipement », « Brevets » and
+  // « Informations » (task 2026-11-18-272).
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import OdPlusChip from '../components/OdPlusChip.svelte';
-  import { gear, loadInventory, visibleGear } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
 
   const name = $derived(logbook.email || t('gear.profile.defaultName'));
@@ -15,12 +16,14 @@
   const total = $derived(logbook.dives.length);
   const since = $derived(logbook.dives.reduce((year, d) => Math.min(year, Number(d.date.slice(0, 4)) || year), 9999));
   const divesLine = $derived(total ? t('gear.profile.divesSince', { n: total, year: String(since) }) : t('gear.profile.noDive'));
+  const certsLine = $derived(diver.certs.length ? t('gear.profile.certificationsLine', { n: diver.certs.length }) : t('gear.profile.noCertification'));
+  const overdue = $derived(overdueBadge());
   const equipmentLine = $derived(
     gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
   );
 </script>
 
-<Page class="od-profile" onPageBeforeIn={loadInventory}>
+<Page class="od-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
   <Navbar title={t('gear.profile.title')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -49,21 +52,30 @@
       </span>
       <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <!-- Later tasks: shown, inert. -->
-    <div class="od-profile--row od-profile--inert" aria-disabled="true">
+    <a href="/profile/maintenance/" class="od-profile--row">
+      <span class="od-profile--tile od-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
+      <span class="od-profile--texts">
+        <span class="od-profile--label">{t('maintenance.entry')}</span>
+      </span>
+      {#if overdue > 0}<span class="od-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
+      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+    </a>
+    <a href="/profile/certs/" class="od-profile--row">
       <span class="od-profile--tile od-profile--tile-violet"><Icon name="idCard" size={22} weight={1.8} /></span>
       <span class="od-profile--texts">
         <span class="od-profile--label">{t('gear.profile.certifications')}</span>
-        <span class="od-profile--supporting">{t('gear.profile.later')}</span>
+        <span class="od-profile--supporting">{certsLine}</span>
       </span>
-    </div>
-    <div class="od-profile--row od-profile--inert" aria-disabled="true">
+      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+    </a>
+    <a href="/profile/info" class="od-profile--row">
       <span class="od-profile--tile od-profile--tile-red"><Icon name="account" size={22} weight={1.8} /></span>
       <span class="od-profile--texts">
         <span class="od-profile--label">{t('gear.profile.information')}</span>
-        <span class="od-profile--supporting">{t('gear.profile.later')}</span>
+        <span class="od-profile--supporting">{t('gear.profile.informationLine')}</span>
       </span>
-    </div>
+      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+    </a>
   </div>
 
   <p class="od-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
@@ -171,6 +183,28 @@
 
     .od-profile--tile-blue {
       background: var(--od-release-tile);
+    }
+
+    .od-profile--tile-amber {
+      background: var(--od-maintenance);
+      color: var(--od-maintenance-icon);
+    }
+
+    .od-profile--badge {
+      flex: none;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-alarm);
+      color: #FFFFFF;
+      font-size: 13px;
+      line-height: 22px;
+      font-weight: 600;
     }
 
     .od-profile--tile-violet {

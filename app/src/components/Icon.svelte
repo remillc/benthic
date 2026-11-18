@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark',
+   *   name: 'logbook'|'sites'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark'|'bell',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -64,6 +64,7 @@
     briefcase: 'M9 7V5h6v2M4 7h16v12H4zM4 12.5h16M11 12.5v2h2v-2',
     phone: 'M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5zM11 18.5h2',
     cloudDownload: 'M7 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17 8.5a4.75 4.75 0 0 1 .5 9.5M12 11v8M9 16l3 3 3-3',
+    bell: 'M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
     plusMark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
     computer: 'M9 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM10 7h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM10 17h4',
     tripRemove: 'M4 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM5.5 7V4.5h5V7M6 11v8M10 11v8M17 13h5',

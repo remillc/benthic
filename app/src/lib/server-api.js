@@ -51,19 +51,25 @@ export function errorFromResponse(status, body) {
  * @property {{ username: string, token: string }} git
  */
 
+/** @param {any} r the answer of the consent calls @returns {{ consent: boolean, consentedAt: string }} */
+function consentOf(r) {
+  if (typeof r?.consent !== 'boolean') throw new ServerError('UNREACHABLE');
+  return { consent: r.consent, consentedAt: r.consent && typeof r.consentedAt === 'string' ? r.consentedAt : '' };
+}
+
 /**
  * @param {{ baseUrl: string, transport: ServerTransport }} options an empty `baseUrl`: no server configured
  */
 export function createServerApi({ baseUrl, transport }) {
   /**
-   * @param {string} method @param {string} path @param {unknown} [body]
+   * @param {string} method @param {string} path @param {unknown} [body] @param {Record<string, string>} [headers]
    * @returns {Promise<any>}
    */
-  async function call(method, path, body) {
+  async function call(method, path, body, headers) {
     if (!baseUrl) throw new ServerError('UNREACHABLE');
     let response;
     try {
-      response = await transport({ method, url: baseUrl + path, body });
+      response = await transport({ method, url: baseUrl + path, body, ...(headers ? { headers } : {}) });
     } catch {
       throw new ServerError('UNREACHABLE');
     }
@@ -97,6 +103,24 @@ export function createServerApi({ baseUrl, transport }) {
       const r = await call('POST', '/v1/auth/verify', { email: email.trim(), code });
       if (typeof r.sessionToken !== 'string' || !r.repository?.url || !r.git?.token) throw new ServerError('UNREACHABLE');
       return r;
+    },
+
+    /**
+     * The optional consent to keep health data (the blood group), with its date.
+     * @param {string} sessionToken
+     * @returns {Promise<{ consent: boolean, consentedAt: string }>} `consentedAt`: '' when not given
+     */
+    async healthConsent(sessionToken) {
+      return consentOf(await call('GET', '/v1/account/health-consent', undefined, { Authorization: `Bearer ${sessionToken}` }));
+    },
+
+    /**
+     * Gives or withdraws the consent.
+     * @param {string} sessionToken @param {boolean} consent
+     * @returns {Promise<{ consent: boolean, consentedAt: string }>}
+     */
+    async setHealthConsent(sessionToken, consent) {
+      return consentOf(await call('PUT', '/v1/account/health-consent', { consent }, { Authorization: `Bearer ${sessionToken}` }));
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

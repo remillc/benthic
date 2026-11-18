@@ -462,7 +462,17 @@ export class OpenDivesCoreDesktop extends WebPlugin {
   async serverSessionAccess() {
     const stored = await this.bridge.credentials.get('server');
     if (!stored) throw Object.assign(new Error('NOT_SIGNED_IN'), { code: 'NOT_SIGNED_IN' });
-    return { repositoryUrl: stored.repositoryUrl, branch: stored.branch, username: stored.gitUsername, token: stored.gitToken };
+    return { repositoryUrl: stored.repositoryUrl, branch: stored.branch, username: stored.gitUsername, token: stored.gitToken, sessionToken: stored.sessionToken };
+  }
+
+  /** The device's data key for the sensitive items (safeStorage, bridge.cjs, kind 'datakey'); '' when there is none. */
+  async dataKeyRead() {
+    const stored = await this.bridge.credentials.get('datakey');
+    return { key: stored?.key ?? '' };
+  }
+
+  async dataKeyWrite(options) {
+    await this.bridge.credentials.set('datakey', { key: options?.key ?? '' });
   }
 
   /** Signs out of the OpenDives server. */
@@ -1011,6 +1021,10 @@ export class OpenDivesCoreDesktop extends WebPlugin {
 
   async qrScan() {
     throw unavailable('The QR scanner');
+  }
+
+  async scanDocument() {
+    throw unavailable('The document scanner');
   }
 
   async healthDives() {

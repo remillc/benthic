@@ -7,6 +7,7 @@ import { OpenDivesCore } from 'opendives-core';
 import { createFileStore, indexedDbBackend, memoryBackend, requestPersistence } from './file-store.js';
 import { createInventory, diveKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook } from './logbook.svelte.js';
+import { evaluate, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -23,6 +24,8 @@ export const gear = $state({
   kits: [],
   /** @type {(DiveEquipment & { id: string, diveKey: { start: string } })[]} */
   records: [],
+  /** @type {import('./maintenance.js').MaintenanceItem[]} every reminder */
+  maintenance: [],
   /** The inventory is read only (the OpenDives+ subscription ended). */
   readOnly: false,
   daysLeft: 30,
@@ -44,7 +47,8 @@ function open() {
 /** Reads everything again from the store. */
 export async function loadInventory() {
   const inv = open();
-  const [pieces, kits, records, state, pending] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths()]);
+  const [pieces, kits, records, state, pending, maintenance] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance()]);
+  gear.maintenance = maintenance;
   gear.pieces = pieces;
   gear.kits = kits;
   gear.records = records;
@@ -54,6 +58,33 @@ export async function loadInventory() {
   gear.until = info.until;
   gear.pending = pending.length;
   gear.ready = true;
+  scheduleNotifications();
+}
+
+/**
+ * The reminders with their due dates, today: the ones of pieces that are not archived. Reads the reactive state, so
+ * a screen can use it in a $derived.
+ * @returns {import('./maintenance.js').Evaluation[]}
+ */
+export function evaluations() {
+  const live = new Set(gear.pieces.filter((g) => !g.retired).map((g) => g.id));
+  const today = todayIso();
+  return gear.maintenance.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today));
+}
+
+/** The number on the red badge: reminders overdue. */
+export const overdueBadge = () => overdueCount(evaluations());
+
+/** The three sections of the « Entretien » list. */
+export const maintenanceSections = () => sections(evaluations());
+
+/** Hands the notifications to come to the seam (lib/maintenance.js); nothing is delivered until a plugin is installed. */
+export function scheduleNotifications() {
+  try {
+    applyNotificationPlan(notificationPlan(evaluations(), todayIso())).catch((e) => console.error('Scheduling the maintenance notifications', e));
+  } catch (e) {
+    console.error('Planning the maintenance notifications', e);
+  }
 }
 
 /**
@@ -70,6 +101,9 @@ export async function change(work) {
     await loadInventory();
   }
 }
+
+/** A photo kept in the inventory, as a data URL; '' when the file is gone. @param {string} photoId */
+export const readPhoto = (photoId) => open().readPhoto(photoId);
 
 /** @returns {Map<string, Gear>} */
 export const gearMap = () => new Map(gear.pieces.map((g) => [g.id, g]));

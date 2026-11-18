@@ -5477,7 +5477,7 @@ The wave and the check mark are drawn with the same commands, so the path can be
 - On the first display of the screen, the sequence plays once, and it does not play again when coming back to the screen.
 - With reduced motion turned on, nothing moves.
 
-## [ ] 2026-11-18-271 Phone: OpenDives+ welcome, the optional consent for health data
+## [x] 2026-11-18-271 Phone: OpenDives+ welcome, the optional consent for health data
 
 Christian approved this on 18 November 2026. Work in `main` (task 268). Mock-ups in `docs/mockups-release/`.
 
@@ -5517,7 +5517,7 @@ The cards and the profile are OpenDives+ data, kept on the account with a workin
 
 **Test:** the phone number formats itself for CA, FR and US; « Inconnu » can be saved; a card photo is cropped, straightened and its glare removed; the corners can be adjusted by hand.
 
-## [ ] 2026-11-18-273 Phone: equipment, what changed since task 267
+## [x] 2026-11-18-273 Phone: equipment, what changed since task 267
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`.
 
@@ -5530,7 +5530,7 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** a new piece of each type can be created; a kit can be duplicated and deleted; « Remplir avec » fills the dive.
 
-## [ ] 2026-11-18-274 Phone: maintenance of the equipment (to-do #47, OpenDives+)
+## [x] 2026-11-18-274 Phone: maintenance of the equipment (to-do #47, OpenDives+)
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`. Vocabulary: fr-CA « entretien », fr « révision » (English « Service »); for cylinders, fr-CA « test hydrostatique », fr « requalification ».
 
@@ -5546,6 +5546,8 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 6. **New piece.** The « Rappel d'entretien » card of « Nouvelle pièce » (task 273) proposes a rule for the type.
 
 **Test:** the due dates by time and by dives; the first reached wins; the notifications; the badge count.
+
+**Done (18 November 2026).** Notifications use `@capacitor/local-notifications` (`app/src/lib/maintenance-notify.js`): 7, 30 or 60 days before the due date and on the day, at 9:00; rescheduled at start and after each change; the permission is asked when the first reminder is saved; a tap opens the piece's maintenance. Android builds (`assembleDebug`) and `cap sync ios` lists the plugin; iOS was not built here (no Mac). Desktop (Electron): no scheduled notification while the app is closed, so none is delivered there. A reminder by dives is dated from the pace of the last 365 days; without a pace it has no notification. The photos (piece, invoice) come from `<input type="file" accept="image/*">`, scaled to 1280 px and kept in `media/<id>.json` on the device.
 
 ## [ ] 2026-11-18-275 Tablet and desktop: « Mon profil de plongeur », and the OpenDives+ welcome
 
@@ -5567,3 +5569,60 @@ Christian approved this on 18 November 2026. Work in `main`. Do it after tasks 2
 **Removed from the beta:** the tablet screens « Dépôt git » and « Créer un jeton d'accès » are no longer part of the beta (moved to « Mis de côté » on the canvas). Do not build them.
 
 **Test:** on a tablet in landscape and portrait, and on desktop, every screen of tasks 271 to 274 is reachable and keeps its state when the window is resized.
+
+## [x] 2026-11-18-276 Phone: the OpenDives+ offer shows the maintenance reminders
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-odplus-offre.dc.html`.
+
+The maintenance notifications (task 274) are a strong reason to subscribe. On « L'offre », under the four tiles (Synchronisé, Sauvegardé, Équipement, Brevets), add a full-width tile:
+- a bell icon on a white square, on the pale red background of the maintenance colours (#F6E3E0, icon #8A2A1F);
+- the title « Rappels d'entretien »;
+- the text « Détendeur, bouteille, pile : prévenu 30 jours avant l'échéance. »
+
+English: « Service reminders », « Regulator, cylinder, battery: notified 30 days before they are due. »
+
+The rest of the screen does not change. The screen is now taller: check that it scrolls on small phones and that « S'abonner » stays reachable.
+
+## [ ] 2026-11-18-277 Brevets: the photo of a card uses the system document scanner; macOS access to the profile; small changes
+
+Christian approved this on 18 November 2026. Work in `main`. **This task corrects tasks 272 and 275**: where they differ, follow this one. Mock-ups in `docs/mockups-release/`.
+
+**1. The photo of a card (decision of Christian, 18 November 2026).**
+- **Phone and tablet:** « Scanner le recto » and « Scanner le verso » in « Nouveau brevet » open the system document scanner: ML Kit Document Scanner on Android, VisionKit on iPhone and iPad. That scanner has its own interface for framing, automatic capture, cropping, straightening, glare removal and adjusting the corners. OpenDives does not draw these steps.
+- **Do not build** `profil-brevet-photo-android`, `profil-brevet-photo-verifier-android`, `profil-brevet-photo-coins-android`, nor the tablet screens `android-tablette-profil-brevet-photo-…-paysage`. They are no longer part of the beta (moved to « Mis de côté » on the canvas). This replaces item 7 of task 272 and the tablet camera of task 275.
+- **After the scan** (`profil-brevet-nouveau-lu-android`): a thumbnail of each side, each with « Remplacer ». The device's text recognition reads the agency, the level, the number and the date. The values found pre-fill the fields, each with the small mark « Lu sur la carte, à vérifier » under it. A value not found leaves its field empty, with no error message. If nothing could be read, all the fields stay empty, still with no message.
+- The sentence under the slots becomes « Scannez la carte : l'app y lit l'agence, le niveau et le numéro. Vérifiez-les. » (`profil-brevet-nouveau-android`, `android-tablette-profil-brevet-nouveau-paysage`).
+- **Desktop only** keeps OpenDives' own flow (task 275): with no camera, the diver chooses, drops or pastes an image (Ctrl+V). OpenDives crops and straightens it, with « Vérifier la photo » (Before and After side by side) and « Ajuster les coins ».
+- Nothing else changes for the cards.
+
+**2. macOS: access to « Mon profil de plongeur ».**
+- **`bureau-profil-menu-macos`:** in the app menu « OpenDives », « Mon profil de plongeur… » (⇧⌘P), just above « Réglages… » (⌘,).
+- **`bureau-profil-macos`:** on macOS the profile opens in a separate window, as the settings do, titled « Mon profil de plongeur », with the same panes as on Windows and Linux.
+- Windows and Linux keep the entry in the account sheet (task 275).
+
+**3. « Nouvelle pièce » on tablet and desktop** (`android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`). The 9 types are a regular grid of 3 × 3 compact buttons, 56 px high. Each button has the type icon in a coloured square, then the name. The colours are those of the inventory: blue for computers and BCDs, green for regulators, beige for suits and undergarments, purple for cylinders, grey for the others. The chosen type has a pale blue background, a blue border and a check on the right. This replaces the 5-column tiles of task 275.
+
+**4. Suggested service interval for a regulator:** every year (« Suggéré pour un détendeur : tous les ans »), on all devices. It was every 2 years in tasks 273 and 275.
+
+**Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
+
+**Points 1 and 4 done; 2 and 3 with task 275.**
+
+## [ ] 2026-11-18-278 Phone: a clearer list of dives in the logbook
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-carnet.dc.html` (the release version of « Carnet »; the alpha one stays in `docs/mockups/`).
+
+**The list**
+- **Grouping:** the dives are grouped by year, under a small title (« 2026 », « 2025 »…). Each year is a white card with 20 px corners, and a thin divider between dives.
+- **Each dive, from left to right:**
+  - a date block: a 48 × 48 rounded square, pale blue (#E6EEF7), with the day in large bold blue (19 px) and the month in small capitals (« FÉVR. »);
+  - the site in bold. With no site, « Site à préciser » in grey italics, with a crossed-out pin icon;
+  - under it, the dive number **in bold** (« N° 9 »), then the time (« 9 h 09 »). The number matters to divers: keep it visible;
+  - on the right, the small profile of the dive (64 × 28, on a light grey background), and under it the maximum depth in bold, then the duration (« **91 pi** · 55 min »).
+- **A trip** (group of dives) is its own card. Its header is pale blue: a suitcase icon, « Voyage du 2 février 2013 », « 4 plongées · de 69 à 94 pi », and the chevron to fold it. The trip's dives follow, in the same row format.
+
+The rest of the screen (header, search, navigation bar, the « + » button) does not change. The units follow the settings (feet in the mock-up).
+
+**Accessibility:** each row reads as one item, for example « Plongée 9, 7 février 2026, 9 h 09, site à préciser, 91 pieds, 55 minutes ».
+
+**Test:** grouping by year across years; a dive without a site; folding a trip; a large font size (the right column must not overlap the site name, which is cut with an ellipsis).

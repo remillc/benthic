@@ -10,7 +10,7 @@
   import GearIcon from '../components/GearIcon.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import GearExportSheet from '../components/GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { connection } from '../lib/online.svelte.js';
@@ -28,6 +28,15 @@
 
   const shown = $derived(searchGear(visibleGear(showArchived), query));
   const groups = $derived(groupGear(shown));
+  const upkeep = $derived(maintenanceSections().counts);
+  /** The line of the « Entretien » card: what is overdue, what is coming up, else that all is well. */
+  const upkeepLine = $derived(
+    upkeep.overdue || upkeep.soon
+      ? [upkeep.overdue ? t('maintenance.cardLine.overdue', { n: upkeep.overdue }) : '', upkeep.soon ? t('maintenance.cardLine.soon', { n: upkeep.soon }) : ''].filter(Boolean).join(' · ')
+      : upkeep.ok
+        ? t('maintenance.cardLine.allGood')
+        : t('maintenance.cardLine.none'),
+  );
   const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !showArchived);
 
   async function refresh() {
@@ -113,6 +122,15 @@
   {/if}
 
   {#if !searching}
+    <a href="/profile/maintenance/" class="od-gear-page--upkeep">
+      <span class="od-gear-page--tile"><Icon name="clock" size={22} /></span>
+      <span class="od-gear-page--texts">
+        <span class="od-gear-page--name">{t('maintenance.entry')}</span>
+        <span class="od-gear-page--supporting" class:od-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
+      </span>
+      {#if upkeep.overdue > 0}<span class="od-gear-page--badge-red" role="status" aria-label={t('maintenance.badge', { n: upkeep.overdue })}>{upkeep.overdue}</span>{/if}
+      <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+    </a>
     <h2 class="od-gear-page--title">{t('gear.inventory.kits')}</h2>
     <div class="od-gear-page--chips">
       {#each gear.kits as kit (kit.id)}
@@ -167,6 +185,40 @@
 
 <style>
   @layer od.components {
+    .od-gear-page--upkeep {
+      margin: 8px 16px 0;
+      min-height: 64px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      text-decoration: none;
+    }
+
+    .od-gear-page--late {
+      color: var(--od-alarm);
+    }
+
+    .od-gear-page--badge-red {
+      flex: none;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      box-sizing: border-box;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-alarm);
+      color: #FFFFFF;
+      font-size: 13px;
+      line-height: 22px;
+      font-weight: 600;
+    }
+
     /* Fluid layout: the content keeps a readable width on a tablet. */
     :global(.od-gear-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));

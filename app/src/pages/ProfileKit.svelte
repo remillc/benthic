@@ -11,7 +11,10 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, visibleGear } from '../lib/inventory.svelte.js';
-  import { groupGear, kitProblems } from '../lib/inventory.js';
+  import { groupGear, kitProblems, kitUse, uniqueKitName } from '../lib/inventory.js';
+  import { logbook } from '../lib/logbook.svelte.js';
+  import { formatLongDate } from '../lib/format.js';
+  import { openPopupMenu } from '../lib/popup-menu.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -38,6 +41,8 @@
   });
 
   const groups = $derived(groupGear(visibleGear()));
+  const use = $derived(kitUse(kitId, gear.records, logbook.dives));
+  const useLine = $derived(use.dives ? t('gear.kit.usedIn', { n: use.dives, date: formatLongDate(use.last) }) : t('gear.kit.neverUsed'));
   const others = $derived(gear.kits.filter((k) => k.id !== kitId));
   const problems = $derived(kitProblems({ name, gearIds: selected }, others));
   const live = liveError(
@@ -58,6 +63,32 @@
     } finally {
       saving = false;
     }
+  }
+
+  /** A copy of the kit under a name no other kit has, then its own page. */
+  async function duplicate() {
+    const kit = gear.kits.find((k) => k.id === kitId);
+    if (!kit) return;
+    const copy = (/** @type {number} */ n) => t(n === 1 ? 'gear.kit.copyName' : 'gear.kit.copyNameN', { name: kit.name, n });
+    try {
+      const made = await change((inv) => inv.duplicateKit(kitId, uniqueKitName(kit.name, gear.kits.map((k) => k.name), copy)));
+      showSnackbar(t('gear.kit.duplicated'));
+      f7router.navigate(`/profile/kits/${made.id}`, { reloadCurrent: true });
+    } catch (e) {
+      showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
+    }
+  }
+
+  /** @param {MouseEvent} e */
+  function more(e) {
+    openPopupMenu(
+      /** @type {HTMLElement} */ (e.currentTarget),
+      [
+        { label: t('gear.kit.duplicate'), onclick: () => (gear.readOnly ? showSnackbar(t('gear.inventory.readOnlyRefused')) : duplicate()) },
+        { label: t('gear.kit.delete'), onclick: () => (gear.readOnly ? showSnackbar(t('gear.inventory.readOnlyRefused')) : (confirmDelete = true)), danger: true },
+      ],
+      t('gear.kit.more'),
+    );
   }
 
   async function remove() {
@@ -81,6 +112,11 @@
     {/snippet}
     {#snippet title()}{kitId ? t('gear.kit.editTitle') : t('gear.kit.newTitle')}{/snippet}
     {#snippet right()}
+      {#if kitId}
+        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
+          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.kit.more')}</span>
+        </a>
+      {/if}
       <button type="button" class="od-kit-page--save" disabled={!canSave} onclick={save}>{t('gear.kit.save')}</button>
     {/snippet}
   </Navbar>
@@ -88,7 +124,7 @@
   <ReadOnlyNotice />
 
   <div class="od-kit-page--field">
-    <TextField label={t('gear.kit.name')} bind:value={name} invalid={!!live.error} supporting={live.error || t('gear.kit.nameHint')} disabled={gear.readOnly} />
+    <TextField label={t('gear.kit.name')} bind:value={name} invalid={!!live.error} supporting={live.error || (kitId ? useLine : t('gear.kit.nameHint'))} disabled={gear.readOnly} />
   </div>
 
   {#if loaded}
@@ -102,9 +138,7 @@
       <p class="od-kit-page--none">{t('gear.kit.noGear')}</p>
     {/if}
     <p class="od-kit-page--hint">{t('gear.kit.hint')}</p>
-    {#if kitId && !gear.readOnly}
-      <button type="button" class="od-kit-page--delete" onclick={() => (confirmDelete = true)}>{t('gear.kit.delete')}</button>
-    {/if}
+    {#if kitId}<p class="od-kit-page--hint">{t('gear.kit.deleteNote')}</p>{/if}
   {/if}
   <div class="od-kit-page--bottom"></div>
 </Page>

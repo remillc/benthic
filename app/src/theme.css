@@ -288,6 +288,8 @@
     --od-plus-amber-icon: #8A4B0F;
     --od-plus-violet: #EBE3F3;
     --od-plus-violet-icon: #5B3A8A;
+    --od-maintenance: #F6E3E0;
+    --od-maintenance-icon: #8A2A1F;
     --od-plus-price: #114477;
     --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
     --od-plus-chip: rgb(255 255 255 / 0.22);
@@ -397,6 +399,10 @@
     /* Divider between groups of a ⋮ menu. */
     --od-menu-divider: #C9C9C5;
     --od-scrim: rgb(0 0 0 / 0.32);
+    /* Full-screen viewer of a certification card photo: black, with white controls (the same in both themes). */
+    --od-viewer: #000000;
+    --od-viewer-on: #FFFFFF;
+    --od-viewer-control: rgb(255 255 255 / 0.2);
     /* Android tablet FAB menu (spec, section 8): its light scrim and its tonal choices. */
     --od-fab-scrim: rgb(0 0 0 / 0.16);
     --od-fab-tonal: #E3E1DC;
@@ -451,6 +457,8 @@
     --od-plus-amber-icon: #E8B46E;
     --od-plus-violet: #33284A;
     --od-plus-violet-icon: #C2A8EA;
+    --od-maintenance: #4A2723;
+    --od-maintenance-icon: #F0A59B;
     --od-release-hover: rgb(255 255 255 / 0.08);
     --od-release-row-shadow: rgb(0 0 0 / 0.3);
     --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);

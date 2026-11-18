@@ -534,7 +534,7 @@
   });
 
   /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
-  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome'];
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'];
 
   /**
    * « Ouvrir mon carnet » of « Votre carnet est prêt »: the core downloaded the logbook through the git sync (mobile), so
@@ -861,7 +861,7 @@
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
-        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome'}
+        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
           <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>
@@ -1681,6 +1681,13 @@
       .od-first-launch :global(.od-welcome-help-link) {
         margin: auto auto calc(var(--f7-safe-area-bottom) + 28px);
         padding-top: 24px;
+      }
+
+      /* Android: the extra height of a tall screen goes above the link (auto margin), as in the mock-up, and the link
+         ends 20 dp above the system bar. The WebView reports no bottom inset (gesture bar or buttons, 24 dp at least),
+         so the bar's height is a floor. */
+      :global(.md) .od-first-launch :global(.od-welcome-help-link) {
+        margin-bottom: calc(max(var(--f7-safe-area-bottom), 24px) + 20px);
       }
 
       .od-first-launch--title {

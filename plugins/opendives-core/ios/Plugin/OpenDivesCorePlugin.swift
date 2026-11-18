@@ -56,6 +56,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "dataKeyRead", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "dataKeyWrite", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConnect", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resendCode", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "verifyPin", returnType: CAPPluginReturnPromise),
@@ -103,6 +105,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "enableBluetooth", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "qrScan", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "scanDocument", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "keepScreenAwake", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "installSource", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestReview", returnType: CAPPluginReturnPromise),
@@ -1062,7 +1065,27 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             "branch": stored.branch,
             "username": stored.gitUsername,
             "token": stored.gitToken,
+            "sessionToken": stored.sessionToken,
         ])
+    }
+
+    /// The device's data key for the sensitive items (section 11.5 of the architecture): base64, or "" when there is none.
+    @objc func dataKeyRead(_ call: CAPPluginCall) {
+        call.resolve(["key": KeychainText(account: "data-key").read() ?? ""])
+    }
+
+    @objc func dataKeyWrite(_ call: CAPPluginCall) {
+        let key = call.getString("key") ?? ""
+        guard key.count >= 16, key.count <= 128, key.range(of: "^[A-Za-z0-9+/=]+$", options: .regularExpression) != nil else {
+            call.reject("BAD_ARGUMENT", "BAD_ARGUMENT")
+            return
+        }
+        do {
+            try KeychainText(account: "data-key").write(key)
+            call.resolve()
+        } catch {
+            call.reject("CREDENTIALS_NOT_SAVED", "CREDENTIALS_NOT_SAVED")
+        }
     }
 
     /// Signs out of the OpenDives server: the tokens are erased from this device.
@@ -1501,6 +1524,25 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 }
             }
             host.present(scanner, animated: true)
+        }
+    }
+
+    /// The document scanner (DocumentScanController: VisionKit, then Vision text recognition).
+    /// Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.
+    @objc func scanDocument(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { [self] in
+            guard let host = bridge?.viewController else {
+                call.reject("No screen to show the scanner", "FAILED")
+                return
+            }
+            guard DocumentScanController.isSupported else {
+                call.resolve(["action": "unavailable"])
+                return
+            }
+            let scanner = DocumentScanController { result in
+                call.resolve(result)
+            }
+            host.present(scanner.viewController, animated: true)
         }
     }
 

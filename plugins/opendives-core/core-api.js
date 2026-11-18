@@ -593,10 +593,17 @@ export { waterTypeOf };
  *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
  * @property {() => Promise<{signedIn: boolean, email: string, repositoryUrl: string, branch: string}>} serverSessionInfo
  *   Who is signed in to the OpenDives server, without any token.
- * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string}>} serverSessionAccess
- *   The access to the repository, for the download. Rejects with NOT_SIGNED_IN.
+ * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string, sessionToken: string}>} serverSessionAccess
+ *   The access to the repository, for the download, and the session token for the account calls (the health-data
+ *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
  *   Signs out of the OpenDives server: the tokens are erased.
+ * @property {() => Promise<{key: string}>} dataKeyRead
+ *   Release edition (docs/architecture.md, section 11.5): the device's data key for the sensitive items (blood group,
+ *   emergency contact, certifications), 32 random bytes as base64, from the platform's secure storage (Android
+ *   Keystore, iOS Keychain, Electron safeStorage). `key` is '' when the device has none yet.
+ * @property {(options: {key: string}) => Promise<void>} dataKeyWrite
+ *   Keeps the data key. Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
  * @property {() => Promise<{url: string, username: string, branch: string}>} gitConfig
  *   The connected repository without its token, empty strings when none (for editing it).
  * @property {(options: {url: string, username: string, token: string, branch: string, empty?: boolean}) => Promise<{created: boolean}>} gitConnect
@@ -800,6 +807,10 @@ export { waterTypeOf };
  * @property {(options: QrScanOptions) => Promise<QrScanResult>} qrScan
  *   The full-screen camera that reads the QR codes of a dive or a plan (see QrScanResult).
  *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
+ * @property {() => Promise<{action: 'cancelled'|'unavailable'|'done', image?: string, text?: string}>} scanDocument
+ *   The system document scanner for a certification card, then text recognition on the device. Android: ML Kit
+ *   Document Scanner + ML Kit Text Recognition; iOS: VisionKit + Vision. `image` is a base64 JPEG, `text` the
+ *   recognised lines. Desktop: rejects as unavailable (the app falls back to its own image flow).
  * @property {(options: {on: boolean}) => Promise<void>} keepScreenAwake
  *   While on: the screen stays on and at full brightness (the QR sending screen); off restores both.
  * @property {(options: {from: number, to: number}) => Promise<{available: boolean, depth: {id: string, at: number, value: number}[], temperature: {id: string, at: number, value: number}[]}>} healthDives
@@ -898,6 +909,8 @@ export const OpenDivesCore = {
   serverSessionInfo: () => native.serverSessionInfo(),
   serverSessionAccess: () => native.serverSessionAccess(),
   serverSessionClear: () => native.serverSessionClear(),
+  dataKeyRead: () => native.dataKeyRead(),
+  dataKeyWrite: (options) => native.dataKeyWrite(options),
   gitConnect: (options) => native.gitConnect(options),
   async probeCloud() {
     const { json } = await native.probeCloud();
@@ -1068,6 +1081,7 @@ export const OpenDivesCore = {
   readSharedFile: (options) => native.readSharedFile(options),
   gaugeCamera: (options) => native.gaugeCamera(options),
   qrScan: (options) => native.qrScan(options),
+  scanDocument: () => native.scanDocument(),
   keepScreenAwake: (options) => native.keepScreenAwake(options),
   healthDives: (options) => native.healthDives(options),
   installSource: () => native.installSource(),

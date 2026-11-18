@@ -16,7 +16,7 @@
   let { f7router } = $props();
 
   /** The OpenDives+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
-  const plusHero = $derived(['odplusOffer', 'odplusReady', 'odplusWelcome'].includes(currentStep()));
+  const plusHero = $derived(['odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'].includes(currentStep()));
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';

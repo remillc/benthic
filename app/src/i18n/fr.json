@@ -534,7 +534,8 @@
       "download": "Ordinateurs et téléchargement",
       "maps": "Cartes hors ligne",
       "advanced": "Avancé",
-      "about": "À propos"
+      "about": "À propos",
+      "privacy": "Confidentialité"
     },
     "overview": {
       "theme": "Thème : {value}",
@@ -548,7 +549,8 @@
       "remembered": "{name} mémorisé",
       "noComputer": "Aucun ordinateur mémorisé",
       "advanced": "Réinitialiser tous les réglages",
-      "version": "Version {version}"
+      "version": "Version {version}",
+      "privacy": "Données de santé : {state}"
     },
     "flight": {
       "label": "Durée de l’attente",
@@ -881,6 +883,16 @@
     "showPhotos": {
       "label": "Afficher les champs photos et vidéos",
       "text": "Dans le détail et la modification d’une plongée"
+    },
+    "privacy": {
+      "on": "accordées",
+      "off": "non accordées",
+      "health": "Garder des données de santé",
+      "healthHelp": "Votre groupe sanguin, utile en cas d’urgence.",
+      "since": "Vous avez donné votre accord le {date}.",
+      "note": "Chiffré sur votre compte et visible par vous seul. Retirer l’accord supprime le groupe sanguin.",
+      "withdraw": "Retirer l’accord",
+      "allow": "Autoriser"
     }
   },
   "gas": {
@@ -2138,6 +2150,10 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Serveur OpenDives (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur OpenDives » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
+      "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
+      "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
+      "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
+      "Offre OpenDives+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
       "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
@@ -2466,7 +2482,8 @@
       "Détail d’une plongée sur ordinateur : cinq onglets. Informations : la fiche du site, les compagnons, le moniteur, le type d’eau en boutons segmentés et la visibilité en cinq étoiles ; Équipement : les ordinateurs, la combinaison et plusieurs lests en pastilles avec leur total ; Gaz : une carte par bouteille avec ses champs et une carte Consommation ; Notes : la note, les notes et les étiquettes ; Carte garde sa hauteur. Les champs gris s’enregistrent avec Entrée ou en les quittant.",
       "Sur ordinateur, agrandir ou réduire la fenêtre au-delà de 1200 dp passe de la grande à la petite disposition sans quitter l’écran : la plongée sélectionnée dans le Carnet, la statistique enregistrée dans Statistiques, la catégorie dans Réglages et l’outil dans Outils restent en place.",
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
-      "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague."
+      "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
+      "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4743,6 +4760,8 @@
       "gearText": "Bouteilles, kits, ordinateurs.",
       "certifications": "Brevets",
       "certificationsText": "Vos cartes, toujours sur vous.",
+      "maintenance": "Rappels d’entretien",
+      "maintenanceText": "Détendeur, bouteille, pile : prévenu 30 jours avant l’échéance.",
       "price": "14,99 $ US",
       "per": "par an",
       "priceDetail": "soit 1,25 $ par mois · Résiliable en tout temps",
@@ -4775,7 +4794,17 @@
       "backup": "Sauvegarde automatique",
       "gearCertifications": "Équipement et brevets",
       "account": "Compte : {email}",
-      "open": "Ouvrir mon carnet"
+      "open": "Ouvrir mon carnet",
+      "next": "Continuer"
+    },
+    "health": {
+      "title": "Vos données de santé",
+      "lead": "Facultatif. Vous pourrez changer d’avis en tout temps.",
+      "switch": "Garder des données de santé",
+      "switchHelp": "Votre groupe sanguin, utile en cas d’urgence",
+      "note": "C’est une donnée de santé. OpenDives+ la garde seulement avec votre accord.",
+      "lock": "Chiffrées sur votre compte et visibles par vous seul. Vous pouvez retirer votre accord dans Mon profil ou dans les Réglages : les données sont alors supprimées.",
+      "continue": "Continuer"
     }
   },
   "timeLeft": {
@@ -4865,7 +4894,10 @@
       "certifications": "Brevets",
       "information": "Informations",
       "later": "Pas encore disponible",
-      "noPiece": "Aucune pièce"
+      "noPiece": "Aucune pièce",
+      "informationLine": "Contact d’urgence, santé",
+      "certificationsLine": "{n} brevets",
+      "noCertification": "Aucun brevet"
     },
     "inventory": {
       "title": "Équipement",
@@ -4893,7 +4925,9 @@
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
         "light": "Lampes",
-        "other": "Autres"
+        "other": "Autres",
+        "bcd": "Gilets",
+        "weights": "Ceintures de lest"
       },
       "type": {
         "computer": "Ordinateur de plongée",
@@ -4902,7 +4936,9 @@
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
         "light": "Lampe",
-        "other": "Autre"
+        "other": "Autre",
+        "bcd": "Gilet",
+        "weights": "Ceinture de lest"
       },
       "dives": {
         "one": "{n} plongée",
@@ -4962,14 +4998,25 @@
         "other": "{n} choisies"
       },
       "noPiece": "Choisissez au moins une pièce",
-      "hint": "Dans une plongée, « Appliquer un kit » ajoute toutes ses pièces, sauf les ordinateurs : ceux d’une plongée viennent de son téléchargement.",
+      "hint": "Dans une plongée, « Remplir avec » ajoute toutes les pièces du kit, sauf les ordinateurs : ceux d’une plongée viennent de son téléchargement.",
       "delete": "Supprimer le kit",
       "deleteTitle": "Supprimer le kit ?",
       "deleteText": "{name} est supprimé. Les plongées qui l’ont utilisé gardent leurs pièces.",
       "deleted": "Kit supprimé",
       "saved": "Kit enregistré",
       "noGear": "Ajoutez d’abord des pièces à l’inventaire",
-      "pickGear": "Pièces de ce kit"
+      "pickGear": "Pièces de ce kit",
+      "usedIn": {
+        "one": "Utilisé dans {n} plongée, la dernière le {date}.",
+        "other": "Utilisé dans {n} plongées, la dernière le {date}."
+      },
+      "neverUsed": "Pas encore utilisé dans une plongée.",
+      "more": "Plus d’options",
+      "duplicate": "Dupliquer le kit",
+      "deleteNote": "Supprimer le kit ne change pas l’équipement des plongées déjà remplies.",
+      "copyName": "{name} (copie)",
+      "copyNameN": "{name} (copie {n})",
+      "duplicated": "Kit dupliqué"
     },
     "piece": {
       "image": "Image du modèle",
@@ -5002,7 +5049,7 @@
       "shareText": "{name}\n{type}\n{details}"
     },
     "pieceEdit": {
-      "addTitle": "Ajouter une pièce",
+      "addTitle": "Nouvelle pièce",
       "editTitle": "Modifier la pièce",
       "close": "Fermer",
       "save": "Enregistrer",
@@ -5014,8 +5061,8 @@
       "purchasedOn": "Date d’achat",
       "purchasedOnHint": "Année, mois, jour",
       "dateInvalid": "Saisissez une date réelle, comme 2021-05-12",
-      "note": "Ligne sous le nom",
-      "noteHint": "Affichée sous le nom dans les listes",
+      "note": "Notes (facultatif)",
+      "noteHint": "Par exemple, le détendeur principal",
       "nameEmpty": "Saisissez un nom",
       "readFromDownload": "Le numéro de série et le firmware sont lus sur l’ordinateur à chaque téléchargement.",
       "saved": "Pièce enregistrée"
@@ -5035,7 +5082,7 @@
       "kitLine": "{n} pièces · {summary}",
       "manageKits": "Gérer les kits",
       "noKits": "Aucun kit",
-      "kitMenu": "Kits",
+      "kitMenu": "Remplir avec un kit",
       "kitApplied": "Kit « {name} » appliqué",
       "copied": "Équipement de la plongée précédente copié",
       "renameLabel": "Renommer l’ordinateur {name}",
@@ -5048,7 +5095,10 @@
       "renamed": "Ordinateur renommé",
       "renameFailed": "L’ordinateur n’a pas pu être renommé",
       "locked": "Lecture seule : l’équipement ne change plus tant que vous ne vous abonnez pas de nouveau.",
-      "kitDetail": "Kit « {name} »"
+      "kitDetail": "Kit « {name} »",
+      "fillWith": "Remplir avec",
+      "oneKit": "Un kit",
+      "previousDive": "Plongée précédente"
     },
     "addSheet": {
       "title": "Ajouter de l’équipement",
@@ -5063,10 +5113,334 @@
       "confirm": "Ajouter à la plongée",
       "empty": "L’inventaire n’a aucune pièce à ajouter",
       "noResults": "Aucune pièce ne correspond"
+    },
+    "pieceNew": {
+      "typeTitle": "Type de pièce",
+      "tile": {
+        "computer": "Ordinateur",
+        "regulator": "Détendeur",
+        "suit": "Combinaison",
+        "undersuit": "Sous-vêtement",
+        "cylinder": "Bouteille",
+        "bcd": "Gilet",
+        "light": "Lampe",
+        "weights": "Ceinture de lest",
+        "other": "Autre"
+      },
+      "otherName": "Nom de la pièce",
+      "photoAdd": "Ajouter une photo",
+      "photoChange": "Changer la photo",
+      "photoRemove": "Retirer la photo",
+      "photoFailed": "La photo n’a pas pu être lue",
+      "serialHint": "Numéro gravé sur la pièce",
+      "needName": "Saisissez une marque, un modèle ou un nom"
     }
   },
   "desktopLanguage": {
     "system": "Comme le système",
     "button": "Langue de l’app : {language}"
+  },
+  "maintenance": {
+    "title": "Révisions",
+    "entry": "Révisions",
+    "back": "Retour",
+    "figures": {
+      "overdue": "en retard",
+      "soon": "dans 60 jours",
+      "ok": "à jour"
+    },
+    "sections": {
+      "overdue": "En retard",
+      "soon": "Bientôt",
+      "ok": "À jour"
+    },
+    "tag": {
+      "lateDays": {
+        "one": "En retard de {n} jour",
+        "other": "En retard de {n} jours"
+      },
+      "lateDives": {
+        "one": "En retard de {n} plongée",
+        "other": "En retard de {n} plongées"
+      },
+      "dueNow": "À faire maintenant",
+      "today": "Aujourd’hui",
+      "inDays": {
+        "one": "Dans {n} jour",
+        "other": "Dans {n} jours"
+      },
+      "inMonths": {
+        "one": "Dans {n} mois",
+        "other": "Dans {n} mois"
+      },
+      "inDives": {
+        "one": "Dans environ {n} plongée",
+        "other": "Dans environ {n} plongées"
+      }
+    },
+    "line": {
+      "overdueOn": "Due le {date}",
+      "overdueDives": "Les {n} plongées sont atteintes",
+      "on": "Le {date}",
+      "onOrDives": {
+        "one": "Le {date}, ou dans {n} plongée",
+        "other": "Le {date}, ou dans {n} plongées"
+      },
+      "divesLeft": {
+        "one": "{n} plongée restante",
+        "other": "{n} plongées restantes"
+      }
+    },
+    "listNote": "Une notification vous prévient avant chaque échéance, puis le jour même.",
+    "emptyTitle": "Aucun rappel",
+    "emptyText": "Ajoutez un rappel depuis la page d’une pièce : détendeur, bouteille, ordinateur…",
+    "cardLine": {
+      "overdue": {
+        "one": "{n} en retard",
+        "other": "{n} en retard"
+      },
+      "soon": {
+        "one": "{n} bientôt",
+        "other": "{n} bientôt"
+      },
+      "allGood": "Tout est à jour",
+      "none": "Aucun rappel"
+    },
+    "badge": {
+      "one": "{n} rappel en retard",
+      "other": "{n} rappels en retard"
+    },
+    "piece": {
+      "title": "Révision",
+      "cardTitle": "Révision",
+      "note": "Noter une révision",
+      "editRule": "Modifier le rappel",
+      "add": "Ajouter",
+      "none": "Aucun rappel",
+      "history": "Historique",
+      "historyEmpty": "Aucune entrée pour l’instant",
+      "countNote": "Les plongées comptées sont celles où cette pièce figure dans l’équipement.",
+      "dives": {
+        "one": "{done} plongée sur {total}",
+        "other": "{done} plongées sur {total}"
+      },
+      "due": "Échéance : {date}",
+      "openAria": "Révisions de {name}",
+      "openLine": "{rule}",
+      "noRuleLine": "Aucun rappel",
+      "by": "par {who}",
+      "byYou": "par vous"
+    },
+    "rule": {
+      "every": {
+        "years": {
+          "one": "Tous les ans",
+          "other": "Tous les {n} ans"
+        },
+        "months": {
+          "one": "Tous les mois",
+          "other": "Tous les {n} mois"
+        },
+        "dives": {
+          "one": "Chaque plongée",
+          "other": "Toutes les {n} plongées"
+        },
+        "or": "{time} ou {dives}"
+      }
+    },
+    "task": {
+      "service": "Révision",
+      "inspection": "Inspection visuelle",
+      "hydrostatic": "Requalification",
+      "battery": "Pile",
+      "seals": "Joints et fermeture",
+      "travelCheck": "Contrôle avant voyage"
+    },
+    "kind": {
+      "service": "Révision",
+      "inspection": "Inspection",
+      "other": "Autre"
+    },
+    "kindHelp": {
+      "service": "Révision : démontage complet par un technicien, pièces d’usure changées et réglage.",
+      "inspection": "Inspection : contrôle de l’état et du fonctionnement, sans changer de pièce.",
+      "other": "Autre : toute intervention qui n’est ni une révision ni une inspection, comme un nettoyage ou une réparation."
+    },
+    "note": {
+      "title": "Noter une révision",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "type": "Type",
+      "date": "Date",
+      "dateHint": "Année, mois, jour",
+      "dateInvalid": "Saisissez une date réelle, comme 2026-11-17",
+      "doneBy": "Fait par",
+      "doneByHint": "Un centre de plongée ou vous-même",
+      "cost": "Coût (facultatif)",
+      "costInvalid": "Saisissez un montant, comme 190 ou 190,50",
+      "notes": "Notes (facultatif)",
+      "invoiceAdd": "Ajouter une photo de la facture",
+      "invoiceChange": "Changer la photo de la facture",
+      "invoiceRemove": "Retirer la photo",
+      "invoiceAlt": "Photo de la facture",
+      "nextBoth": "Prochaine révision : le {date}, ou après {n} plongées.",
+      "nextDate": "Prochaine révision : le {date}.",
+      "nextDives": "Prochaine révision : après {n} plongées.",
+      "nextNone": "Aucun rappel n’est réglé pour cette pièce.",
+      "saved": "Révision notée",
+      "failed": "La révision n’a pas pu être enregistrée"
+    },
+    "ruleSheet": {
+      "title": "Rappel de révision",
+      "lead": "{name} · choisissez un critère, ou les deux.",
+      "time": "Après une durée",
+      "timeHelp": "Depuis la dernière révision",
+      "dives": "Selon les plongées",
+      "divesHelp": "Les plongées où la pièce figure",
+      "both": "Avec les deux, le premier atteint déclenche le rappel.",
+      "years": "ans",
+      "months": "mois",
+      "divesUnit": "plongées",
+      "unit": "Unité de la durée",
+      "more": "Augmenter",
+      "less": "Diminuer",
+      "value": "Valeur",
+      "notify": "Me prévenir avant",
+      "days": "{n} jours",
+      "warn": "Avertir dans une plongée",
+      "warnHelp": "Quand la pièce est en retard de révision",
+      "remove": "Retirer le rappel",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "none": "Choisissez au moins un critère",
+      "range": "Saisissez un nombre entier supérieur à 0",
+      "saved": "Rappel enregistré",
+      "removed": "Rappel retiré",
+      "failed": "Le rappel n’a pas pu être enregistré"
+    },
+    "reminderCard": {
+      "title": "Rappel de révision",
+      "suggest": {
+        "computer": "Suggéré pour un ordinateur : {rule}",
+        "regulator": "Suggéré pour un détendeur : {rule}",
+        "suit": "Suggéré pour une combinaison : {rule}",
+        "cylinder": "Suggéré pour une bouteille : {rule}",
+        "bcd": "Suggéré pour un gilet : {rule}"
+      },
+      "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
+      "add": "Ajouter",
+      "edit": "Modifier"
+    },
+    "diveWarning": "{what} : retard de révision",
+    "diveWarningTitle": "Révision en retard",
+    "notify": {
+      "leadTitle": "Révision à prévoir",
+      "dueTitle": "Révision à faire aujourd’hui",
+      "leadBody": "{what} : échéance dans {n} jours.",
+      "dueBody": "{what} : échéance aujourd’hui.",
+      "denied": "Les notifications sont désactivées pour OpenDives : le rappel reste dans l’app."
+    },
+    "channel": {
+      "name": "Révisions de l’équipement",
+      "description": "Prévient avant la date d’une révision, et le jour même"
+    }
+  },
+  "diverProfile": {
+    "info": {
+      "title": "Informations",
+      "back": "Retour",
+      "edit": "Modifier les informations",
+      "you": "Vous",
+      "dob": "Date de naissance",
+      "emergency": "Contact d’urgence",
+      "nameRelation": "Nom et lien",
+      "phone": "Téléphone",
+      "health": "Santé",
+      "blood": "Groupe sanguin",
+      "onlyYou": "Vous seul",
+      "notKept": "Non gardé",
+      "allow": "Autoriser",
+      "empty": "Non renseigné",
+      "lockNote": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous. Vous avez donné votre accord le {date}.",
+      "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous.",
+      "withdraw": "Retirer l’accord",
+      "deniedNote": "Pour garder votre groupe sanguin, autorisez les données de santé. Elles sont chiffrées et visibles par vous seul.",
+      "withdrawTitle": "Retirer l’accord ?",
+      "withdrawText": "Le groupe sanguin est supprimé de cet appareil et de votre compte. Vous pourrez autoriser de nouveau en tout temps.",
+      "withdrawn": "Accord retiré, groupe sanguin supprimé",
+      "allowed": "Données de santé autorisées",
+      "cancel": "Annuler",
+      "saved": "Informations enregistrées",
+      "saveFailed": "Les informations n’ont pas pu être enregistrées.",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "countryCode": "Indicatif",
+      "nameRelationLabel": "Nom et lien",
+      "nameRelationHint": "Par exemple Marc Tremblay, conjoint",
+      "phoneHint": "Le numéro se met en forme tout seul selon le pays.",
+      "bloodHint": "« Inconnu » si vous ne le connaissez pas. Chiffré et visible par vous seul.",
+      "bloodDenied": "Autorisez les données de santé pour garder le groupe sanguin.",
+      "unknown": "Inconnu",
+      "dobHint": "jj mois aaaa",
+      "dobPick": "Choisir la date de naissance",
+      "dobFuture": "La date est dans le futur.",
+      "phoneIncomplete": "Numéro incomplet pour ce pays.",
+      "onlyYouDevice": "Chiffré sur cet appareil."
+    },
+    "certs": {
+      "title": "Brevets",
+      "note": "Montrez une carte au centre de plongée, même sans réseau.",
+      "add": "Ajouter un brevet",
+      "empty": "Aucun brevet",
+      "emptyText": "Ajoutez vos cartes : elles restent chiffrées et disponibles sans réseau.",
+      "line": "N° {number} · {date}",
+      "lineNoDate": "N° {number}",
+      "back": "Retour"
+    },
+    "cert": {
+      "new": "Nouveau brevet",
+      "edit": "Modifier le brevet",
+      "save": "Enregistrer",
+      "close": "Fermer",
+      "photoFront": "Scanner le recto",
+      "photoBack": "Scanner le verso",
+      "sideFront": "Recto",
+      "sideBack": "Verso",
+      "photoReplace": "Remplacer",
+      "readMark": "Lu sur la carte, à vérifier",
+      "photoHint": "Scannez la carte : l’app y lit l’agence, le niveau et le numéro. Vérifiez-les.",
+      "photoRemove": "Retirer la photo",
+      "photoFailed": "La photo n’a pas pu être lue.",
+      "agency": "Agence",
+      "agencyName": "Nom de l’agence",
+      "agencyOther": "Autre agence",
+      "level": "Niveau",
+      "number": "Numéro",
+      "numberHint": "Numéro sur la carte",
+      "date": "Date",
+      "dateHint": "jj mois aaaa",
+      "datePick": "Choisir la date",
+      "dateFuture": "La date est dans le futur.",
+      "instructor": "Moniteur (facultatif)",
+      "instructorHint": "Nom et numéro",
+      "required": "À remplir.",
+      "recto": "Recto",
+      "verso": "Verso",
+      "details": "Détails",
+      "photoOf": "Photo de la carte",
+      "noPhoto": "Aucune photo de ce côté",
+      "fullscreen": "Afficher la carte en plein écran",
+      "menu": "Plus d’actions",
+      "delete": "Supprimer le brevet",
+      "deleteTitle": "Supprimer ce brevet ?",
+      "deleteText": "La carte et ses photos sont supprimées de cet appareil et de votre compte.",
+      "deleteAction": "Supprimer",
+      "cancel": "Annuler",
+      "saved": "Brevet enregistré",
+      "saveFailed": "Le brevet n’a pas pu être enregistré.",
+      "deleted": "Brevet supprimé",
+      "readOnly": "Lecture seule : l’abonnement OpenDives+ est terminé.",
+      "notFound": "Ce brevet n’existe plus."
+    }
   }
 }

@@ -29,9 +29,9 @@ test('every literal gear key used by the screens exists in fr and en', () => {
 
 test('the dynamic gear keys have every type and group in both languages', () => {
   for (const lang of [fr, en]) {
-    for (const type of ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other']) assert.ok(lang.gear.inventory.type[type], type);
+    for (const type of ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other']) assert.ok(lang.gear.inventory.type[type], type);
     for (const g of ['computer', 'regulator', 'suit', 'cylinder', 'other']) assert.ok(lang.gear.inventory.group[g], g);
-    for (const g of ['regulator', 'suit', 'undersuit', 'cylinder', 'light', 'other']) assert.ok(lang.gear.inventory.typePlural[g], g);
+    for (const g of ['regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other']) assert.ok(lang.gear.inventory.typePlural[g], g);
   }
   assert.equal(fr.gear.inventory.exportHeader.split('|').length, 9);
   assert.equal(en.gear.inventory.exportHeader.split('|').length, 9);
@@ -44,10 +44,13 @@ test('the routes and the account card exist in the release edition only', () => 
   assert.match(read('components/AccountSheet.svelte'), /isRelease && !desktopApp/);
 });
 
-test('Brevets and Informations are shown and inert', () => {
+// Task 2026-11-18-272 builds Brevets and Informations: they are links now, no row is inert any more.
+test('Brevets and Informations open their pages', () => {
   const page = read('pages/ProfileDiver.svelte');
-  assert.equal((page.match(/aria-disabled="true"/g) ?? []).length, 2);
+  assert.equal((page.match(/aria-disabled="true"/g) ?? []).length, 0);
   assert.match(page, /href="\/profile\/gear\/"/);
+  assert.match(page, /href="\/profile\/certs\/"/);
+  assert.match(page, /href="\/profile\/info"/);
 });
 
 test('the dive editor uses the inventory in the release edition only, and the rename dialog says it is logbook-wide', () => {
