@@ -1873,6 +1873,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
       "Offline maps: the dot on the account avatar goes away once a map update is done, including an update that finished while the app was closed.",
       "Logbook: a progress bar shows at the top of the list while the app brings the logbook up to date at start; the list is already there.",
