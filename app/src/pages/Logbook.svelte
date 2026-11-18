@@ -10,6 +10,7 @@
   import SyncStatus from '../components/SyncStatus.svelte';
   import SyncFailureRow from '../components/SyncFailureRow.svelte';
   import SyncPill from '../components/SyncPill.svelte';
+  import PullProgress from '../components/PullProgress.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
@@ -1179,6 +1180,9 @@
 
   <!-- A wait before flying is running (task 2026-11-13-98): under the search field. -->
   <FlightBanner />
+
+  <!-- Start: the copy of this device is shown while the exchange with the server runs (todo 88). -->
+  {#if logbook.pulling && !logbook.loading && !logbook.error}<PullProgress />{/if}
 
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}

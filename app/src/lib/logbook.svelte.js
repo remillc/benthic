@@ -48,6 +48,11 @@ export const logbook = $state({
   firstDownload: null,
   loading: true,
   /**
+   * Start (or a full reload): the device's copy is shown and the exchange with the server is still
+   * running (todo 88); the Carnet shows a progress bar meanwhile. Not set by the syncs that follow an edit.
+   */
+  pulling: false,
+  /**
    * The top of the list as it was at the last load (lib/snapshot.js): drawn
    * while the dives are read at start, never used as data.
    * @type {import('./snapshot.js').Snapshot|null}
@@ -1047,6 +1052,7 @@ async function loadCloud(force, pre = null) {
       logbook.prefs = await prefsAfterLoad();
       logbook.syncProgress = null;
       logbook.sync = 'syncing';
+      logbook.pulling = true;
       logbook.loading = false;
       shownHead = cached.head ?? '';
     }
@@ -1133,5 +1139,6 @@ export async function loadLogbook({ force = false } = {}) {
     logbook.error = 'load';
   } finally {
     logbook.loading = false;
+    logbook.pulling = false;
   }
 }

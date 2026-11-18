@@ -1873,6 +1873,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: a progress bar shows at the top of the list while the app brings the logbook up to date at start; the list is already there.",
       "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",
       "« Create a repository » and « Create an access token » help: the site's labels are in boxes and the values to type in a monospace font; the GitLab and Codeberg tabs give the site's labels in the app's language, and GitLab and Codeberg have their own token steps.",
       "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",

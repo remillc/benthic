@@ -398,6 +398,7 @@ Each screen has five states to build, besides the normal one: loading, empty, er
 | Loading | Rows keep their place (greyed thumbnails and texts); never a blank screen or a lone spinner in the middle |
 | Empty | A title that states the situation ("No dives yet"), a sentence that says what to do, then the possible actions: pair a dive computer, import a file, download from divelogs.de, log by hand |
 | Error | What happened, what did not change ("No dive was changed"), what to check, as a numbered list, then Retry; never the raw text of a core error |
+| Syncing at start | The device's copy is shown at once; while the app exchanges with the server (`logbook.pulling`), a progress bar lies over the top of the list without taking height (`<PullProgress>`): the Material 3 Expressive wavy linear indicator on Android, the 8 pt bar on iPhone; determinate with the stages of the sync once the core reports them, indeterminate before. No text; the screen reader reads « Synchronisation… ». The syncs that follow an edit show nothing (todo 88) |
 | Offline | Everything works; `<SyncStatus>` counts the pending changes and each affected dive says so; sending starts by itself when the network is back |
 | Conflict | Only when Subsurface cannot merge ("Remote storage and local data diverged"): a sheet (iOS) or a dialog (Android) offers to keep the device version or the cloud version, after comparing them; nothing is lost before the choice. **To validate**: an OpenDives addition |
 
