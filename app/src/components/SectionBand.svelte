@@ -48,6 +48,11 @@
         --od-band-h: calc(var(--f7-safe-area-top) + 190px);
       }
 
+      /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
+      &.od-section-band--tall:has(.od-band-search) {
+        padding-bottom: 40px;
+      }
+
       &.od-section-band--pill {
         --od-band-h: calc(var(--f7-safe-area-top) + 242px);
       }
