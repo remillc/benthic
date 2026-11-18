@@ -5605,3 +5605,24 @@ Christian approved this on 18 November 2026. Work in `main`. **This task correct
 **4. Suggested service interval for a regulator:** every year (« Suggéré pour un détendeur : tous les ans »), on all devices. It was every 2 years in tasks 273 and 275.
 
 **Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
+
+**Points 1 and 4 done; 2 and 3 with task 275.**
+
+## [ ] 2026-11-18-278 Phone: a clearer list of dives in the logbook
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-up: `docs/mockups-release/android-carnet.dc.html` (the release version of « Carnet »; the alpha one stays in `docs/mockups/`).
+
+**The list**
+- **Grouping:** the dives are grouped by year, under a small title (« 2026 », « 2025 »…). Each year is a white card with 20 px corners, and a thin divider between dives.
+- **Each dive, from left to right:**
+  - a date block: a 48 × 48 rounded square, pale blue (#E6EEF7), with the day in large bold blue (19 px) and the month in small capitals (« FÉVR. »);
+  - the site in bold. With no site, « Site à préciser » in grey italics, with a crossed-out pin icon;
+  - under it, the dive number **in bold** (« N° 9 »), then the time (« 9 h 09 »). The number matters to divers: keep it visible;
+  - on the right, the small profile of the dive (64 × 28, on a light grey background), and under it the maximum depth in bold, then the duration (« **91 pi** · 55 min »).
+- **A trip** (group of dives) is its own card. Its header is pale blue: a suitcase icon, « Voyage du 2 février 2013 », « 4 plongées · de 69 à 94 pi », and the chevron to fold it. The trip's dives follow, in the same row format.
+
+The rest of the screen (header, search, navigation bar, the « + » button) does not change. The units follow the settings (feet in the mock-up).
+
+**Accessibility:** each row reads as one item, for example « Plongée 9, 7 février 2026, 9 h 09, site à préciser, 91 pieds, 55 minutes ».
+
+**Test:** grouping by year across years; a dive without a site; folding a trip; a large font size (the right column must not overlap the site name, which is cut with an ellipsis).

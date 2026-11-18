@@ -31,7 +31,7 @@
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summaryText } from '../lib/import-summary.js';
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
-  import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile } from '../lib/logbook.svelte.js';
+  import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
@@ -536,49 +536,60 @@
   /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
   const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'];
 
-  /** The server was downloaded and opened: the snackbar says where the logbook is now (mock-ups …-serveur-carnet). */
-  function serverOpened() {
+  /**
+   * « Ouvrir mon carnet » of « Votre carnet est prêt »: the core downloaded the logbook through the git sync (mobile), so
+   * it opens now; in the desktop window without a logbook the main process opens it in a window of its own, which
+   * downloads it. The snackbar says where the logbook is now (mock-ups …-serveur-carnet).
+   */
+  async function serverOpened() {
+    if (windowTakes) {
+      try {
+        await createInWindow({ where: 'git', ...(await serverGitAccess()) }, serverLogbookName());
+      } catch (e) {
+        creationFailed(e);
+      }
+      return;
+    }
+    await accountReady();
     showSnackbar(t(deviceKey('serverSteps.downloaded', kind)));
     resetFlow();
   }
 
+  /** The signed-in account's repository, for the main process of the desktop app (the token goes there, never back). */
+  async function serverGitAccess() {
+    const access = await OpenDivesCore.serverSessionAccess();
+    return { url: access.repositoryUrl, username: access.username, branch: access.branch, token: access.token };
+  }
+
+  /** The name the desktop window gives the logbook: the one typed at « Nouveau carnet », else the repository's. */
+  function serverLogbookName() {
+    return flow.create.name.trim() ? sanitiseLogbookName(flow.create.name) : t('welcomeSteps.defaultName');
+  }
+
   /**
-   * « Créer le carnet » and the upload of a logbook to the OpenDives server (task 2026-11-17-266): the logbook on this
-   * device that goes with it, empty or with the dives of the file. In the desktop window without a logbook the main
-   * process creates it and the window reloads on it; the upload goes on from there (lib/server-upload-resume.js).
+   * « Créer le carnet » with the desktop window without a logbook: the main process creates the logbook in the account's
+   * repository (the core makes the branch and pushes it) and the window reloads on it; the dives of a file are parked
+   * and imported once it is open, then the normal sync sends them (lib/desktop-pending-import.js).
    * @param {File|null} file
-   * @returns {Promise<'ready'|'reload'|'cancelled'>}
+   * @returns {Promise<boolean>} false when the diver cancelled
    */
-  async function makeDeviceLogbook(file) {
-    if (windowTakes) {
-      if (file) flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary: summariseImport(flow.create.total) };
-      const made = await createInWindow({ where: 'computer' }, sanitiseLogbookName(flow.create.name));
-      return made ? 'reload' : 'cancelled';
-    }
-    await createDeviceLogbook(
-      {
-        deviceLogExists: async () => (await OpenDivesCore.listDives()).exists,
-        start: startWithoutAccount,
-        sampleIds: () => logbook.dives.map((d) => d.id),
-        remove: deleteDives,
-      },
-      file ? () => importFile(file) : null,
-    );
-    return 'ready';
+  async function openInWindow(file) {
+    if (file) flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary: summariseImport(flow.create.total) };
+    return createInWindow({ where: 'git', ...(await serverGitAccess()) }, serverLogbookName());
   }
 
   /** The logbook is on the server and on this device: it opens, the snackbar says where it is. */
-  function serverCreated() {
+  async function serverCreated() {
     logbook.welcomeHold = false;
-    logbook.welcome = false;
+    await accountReady();
     showSnackbar(t(deviceKey('serverCreate.created', kind)));
     resetFlow();
   }
 
-  /** « Plus tard » of « Envoi interrompu »: the logbook on this device opens; the upload waits for the next start. */
-  function serverLater() {
+  /** « Plus tard » and « Ne pas attendre »: the logbook opens; what is not sent yet goes at the next sync. */
+  async function serverLater() {
     logbook.welcomeHold = false;
-    logbook.welcome = false;
+    await accountReady();
     resetFlow();
   }
 
@@ -849,7 +860,7 @@
         {:else if step === 'server' || step === 'serverCode' || step === 'serverOffline' || step === 'serverDownload'}
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
-          <FirstLaunchServerCreate {step} {makeDeviceLogbook} onfinished={serverCreated} onlater={serverLater} />
+          <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
         {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
           <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}

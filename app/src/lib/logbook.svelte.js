@@ -21,6 +21,7 @@ import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfter
 import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
+import { isServerRepository } from './server-logbook.js';
 
 /** @typedef {import('opendives-core').Dive} Dive */
 /** @typedef {import('opendives-core').Prefs} Prefs */
@@ -88,6 +89,8 @@ export const logbook = $state({
   mode: /** @type {'cloud'|'git'} */ ('cloud'),
   /** The git repository, "host/owner/name"; empty for the cloud. */
   repository: '',
+  /** The git repository is the signed-in OpenDives server account's (release edition): shown as « Serveur OpenDives ». */
+  odplus: false,
   /** Cloud server host in use, e.g. ssrf-cloud-eu.subsurface-divelog.org. */
   server: '',
   /** Local time of the last successful sync (ISO, no time zone), or null. */
@@ -846,6 +849,8 @@ export async function startApp() {
  */
 export async function signOut({ deleteCopy = false } = {}) {
   await OpenDivesCore.signOut({ deleteCopy });
+  // The OpenDives server's session goes with the logbook that was connected through it (the tokens are erased).
+  if (logbook.odplus) await OpenDivesCore.serverSessionClear();
   forgetAccount(true);
 }
 
@@ -889,6 +894,7 @@ function forgetAccount(showWelcome) {
   logbook.email = '';
   logbook.mode = 'cloud';
   logbook.repository = '';
+  logbook.odplus = false;
   logbook.server = '';
   logbook.sync = 'local';
   logbook.pending = 0;
@@ -1158,6 +1164,25 @@ function markSynced() {
 }
 
 /**
+ * The suffix of the texts that name where the sync goes: '' (Subsurface cloud), 'Git' (the diver's own repository) or
+ * 'Server' (the OpenDives server account's repository, release edition).
+ * @returns {''|'Git'|'Server'}
+ */
+export function syncFlavour() {
+  return logbook.mode === 'git' ? (logbook.odplus ? 'Server' : 'Git') : '';
+}
+
+/** Whether the connected repository is the signed-in OpenDives server account's (the release edition's sign-in). @param {string} repository */
+async function onOpenDivesServer(repository) {
+  if (!isRelease) return false;
+  try {
+    return isServerRepository(repository, await OpenDivesCore.serverSessionInfo());
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Cloud log: the device's copy is read (no network) while the server is asked
  * for its head (network only), at the same time. The copy is shown as soon as
  * it is read; when the server's head is the copy's, the log is up to date and
@@ -1176,12 +1201,14 @@ async function loadCloud(force, pre = null) {
     logbook.email = '';
     logbook.mode = 'cloud';
     logbook.repository = '';
+    logbook.odplus = false;
     logbook.server = '';
     return false;
   }
   logbook.email = account.email;
   logbook.mode = account.mode === 'git' ? 'git' : 'cloud';
   logbook.repository = account.repository ?? '';
+  logbook.odplus = logbook.mode === 'git' ? await onOpenDivesServer(logbook.repository) : false;
 
   await networkKnown();
   if (!autoSyncing() && !force) {

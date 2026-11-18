@@ -807,6 +807,10 @@ export { waterTypeOf };
  * @property {(options: QrScanOptions) => Promise<QrScanResult>} qrScan
  *   The full-screen camera that reads the QR codes of a dive or a plan (see QrScanResult).
  *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
+ * @property {() => Promise<{action: 'cancelled'|'unavailable'|'done', image?: string, text?: string}>} scanDocument
+ *   The system document scanner for a certification card, then text recognition on the device. Android: ML Kit
+ *   Document Scanner + ML Kit Text Recognition; iOS: VisionKit + Vision. `image` is a base64 JPEG, `text` the
+ *   recognised lines. Desktop: rejects as unavailable (the app falls back to its own image flow).
  * @property {(options: {on: boolean}) => Promise<void>} keepScreenAwake
  *   While on: the screen stays on and at full brightness (the QR sending screen); off restores both.
  * @property {(options: {from: number, to: number}) => Promise<{available: boolean, depth: {id: string, at: number, value: number}[], temperature: {id: string, at: number, value: number}[]}>} healthDives
@@ -1077,6 +1081,7 @@ export const OpenDivesCore = {
   readSharedFile: (options) => native.readSharedFile(options),
   gaugeCamera: (options) => native.gaugeCamera(options),
   qrScan: (options) => native.qrScan(options),
+  scanDocument: () => native.scanDocument(),
   keepScreenAwake: (options) => native.keepScreenAwake(options),
   healthDives: (options) => native.healthDives(options),
   installSource: () => native.installSource(),

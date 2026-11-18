@@ -3,7 +3,7 @@
   // <SyncStatus> (spec, section 4, "EtatSynchro"): one line under the Logbook
   // title, never a window. An icon always goes with the color.
   import Icon from './Icon.svelte';
-  import { logbook } from '../lib/logbook.svelte.js';
+  import { logbook, syncFlavour } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
   import { formatShortAgo, localNowIso } from '../lib/format.js';
 
@@ -37,11 +37,11 @@
   /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync'|'cloud', text: string, pending: boolean}>} */
   const states = $derived({
     manual: { icon: 'cloud', text: t('sync.manual', { n: pending }), pending: true },
-    syncing: { icon: 'sync', text: t(logbook.mode === 'git' ? 'sync.syncingGit' : 'sync.syncing'), pending: false },
+    syncing: { icon: 'sync', text: t(`sync.syncing${syncFlavour()}`), pending: false },
     // With a known last sync: "Synchronisé il y a 2 min", as the side menu's mock-up says.
     cloud: {
       icon: logbook.lastSync ? 'cloud' : 'check',
-      text: logbook.lastSync ? t('sync.syncedAgo', { ago: formatShortAgo(logbook.lastSync, now) }) : t(logbook.mode === 'git' ? 'sync.cloudGit' : 'sync.cloud'),
+      text: logbook.lastSync ? t('sync.syncedAgo', { ago: formatShortAgo(logbook.lastSync, now) }) : t(`sync.cloud${syncFlavour()}`),
       pending: false,
     },
     offline: {
@@ -58,7 +58,7 @@
   <div class="od-sync-status--line">
     <Icon name={state.icon} size={18} />
     <!-- The stage is announced, not each percent: the bar carries the value. -->
-    <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' && logbook.mode === 'git' ? 'Git' : ''}`) : state.text}</span>
+    <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' ? syncFlavour() : ''}`) : state.text}</span>
     {#if showProgress}<span class="od-sync-status--percent od-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
   </div>
   {#if showProgress}

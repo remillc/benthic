@@ -152,7 +152,8 @@
     },
     "emptyLocal": "Sur ce téléphone seulement, aucune plongée",
     "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée",
-    "emptyLocalDesktop": "Sur cet ordinateur seulement, aucune plongée"
+    "emptyLocalDesktop": "Sur cet ordinateur seulement, aucune plongée",
+    "emptyServer": "Connecté au serveur OpenDives, aucune plongée"
   },
   "sync": {
     "failure": {
@@ -183,7 +184,11 @@
         "rowGit": "Le dépôt git ne répond pas : nouvel essai dans {n} min",
         "rowManualGit": "Le dépôt git ne répond pas",
         "titleGit": "Le dépôt git ne répond pas",
-        "introGit": "Le réseau fonctionne, mais le serveur du dépôt ne répond pas. Il est peut-être en maintenance."
+        "introGit": "Le réseau fonctionne, mais le serveur du dépôt ne répond pas. Il est peut-être en maintenance.",
+        "rowServer": "Le serveur OpenDives ne répond pas : nouvel essai dans {n} min",
+        "rowManualServer": "Le serveur OpenDives ne répond pas",
+        "titleServer": "Le serveur OpenDives ne répond pas",
+        "introServer": "Le réseau fonctionne, mais le serveur OpenDives ne répond pas. Il est peut-être en maintenance."
       },
       "repository": {
         "row": "Synchro impossible : dépôt git refusé",
@@ -199,7 +204,8 @@
       "merge": "Fusion des modifications…",
       "send": "Envoi des modifications…",
       "read": "Lecture du carnet…",
-      "connectGit": "Connexion au dépôt…"
+      "connectGit": "Connexion au dépôt…",
+      "connectServer": "Connexion au serveur OpenDives…"
     },
     "outcome": {
       "done": "Synchronisation terminée",
@@ -219,7 +225,9 @@
       "other": "Hors ligne : {n} modifications seront envoyées au retour du réseau"
     },
     "syncingGit": "Synchronisation avec le dépôt git…",
-    "cloudGit": "Synchronisé avec le dépôt git"
+    "cloudGit": "Synchronisé avec le dépôt git",
+    "syncingServer": "Synchronisation avec le serveur OpenDives…",
+    "cloudServer": "Synchronisé avec le serveur OpenDives"
   },
   "dive": {
     "siteNotSet": "Site à préciser",
@@ -920,6 +928,10 @@
     "gitDives": {
       "one": "Dépôt · {n} plongée",
       "other": "Dépôt · {n} plongées"
+    },
+    "serverDives": {
+      "one": "Serveur OpenDives · {n} plongée",
+      "other": "Serveur OpenDives · {n} plongées"
     }
   },
   "account": {
@@ -993,7 +1005,12 @@
     "gitEdit": "Modifier le dépôt",
     "gitEditText": "Adresse, branche et jeton",
     "gitSignOut": "Se déconnecter du dépôt",
-    "gitSignOutText": "Vos plongées restent dans le dépôt. Le jeton est effacé de cet appareil."
+    "gitSignOutText": "Vos plongées restent dans le dépôt. Le jeton est effacé de cet appareil.",
+    "bandServer": "Votre carnet sur le serveur OpenDives",
+    "serverName": "Serveur OpenDives",
+    "serverDives": "Plongées sur le serveur",
+    "serverSignOut": "Se déconnecter du serveur",
+    "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil."
   },
   "welcome": {
     "title": "OpenDives",
@@ -1063,7 +1080,7 @@
     "progressConnect": "Connexion au serveur",
     "progressDownload": "Téléchargement du carnet",
     "progressCount": "{done} sur {total}",
-    "progressListing": "Lecture de la liste des fichiers",
+    "progressListing": "Examen du dépôt",
     "progressCopy": "Copie du carnet sur cette tablette",
     "progressCopyPhone": "Copie du carnet sur ce téléphone",
     "progressCopyIphone": "Copie du carnet sur cet iPhone",
@@ -1073,10 +1090,8 @@
     "downloadedPhone": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur ce téléphone, même sans réseau.",
     "downloadedIphone": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur cet iPhone, même sans réseau.",
     "downloadedDesktop": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur cet ordinateur, même sans réseau.",
-    "unreadableTitle": "Ce carnet ne peut pas encore s’ouvrir",
-    "unreadableDetail": "Cette version ne sait pas encore lire le format du carnet du serveur. Rien n’a été modifié.",
-    "emptyTitle": "Aucun carnet sur le serveur",
-    "emptyDetail": "Ce compte ne contient pas encore de carnet.",
+    "refusedTitle": "Le serveur a refusé cet accès",
+    "refusedDetail": "Connectez-vous de nouveau pour obtenir un nouvel accès. Rien n’a été modifié.",
     "backHome": "Revenir à l’accueil"
   },
   "welcomeSteps": {
@@ -1240,7 +1255,8 @@
     "localTitleIphone": "Commencer un carnet sur cet iPhone",
     "localHelp": "Gardé ici, même sans réseau.",
     "importStartHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
-    "localTitleDesktop": "Commencer un carnet sur cet ordinateur"
+    "localTitleDesktop": "Commencer un carnet sur cet ordinateur",
+    "keptServer": "Serveur OpenDives"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -1270,6 +1286,12 @@
     "textPendingGit": {
       "one": "{n} modification n’est pas encore envoyée au dépôt. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil.",
       "other": "{n} modifications ne sont pas encore envoyées au dépôt. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil."
+    },
+    "titleServer": "Se déconnecter du serveur OpenDives ?",
+    "textNoneServer": "Le carnet reste sur le serveur. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez. L’accès est effacé de cet appareil.",
+    "textPendingServer": {
+      "one": "{n} modification n’est pas encore envoyée au serveur. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion depuis cet appareil. L’accès est effacé de cet appareil.",
+      "other": "{n} modifications ne sont pas encore envoyées au serveur. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion depuis cet appareil. L’accès est effacé de cet appareil."
     }
   },
   "deleteAccount": {
@@ -2128,6 +2150,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Android : les bords de l'écran sont les mêmes à chaque lancement et avec chaque mode de navigation : les feuilles, les messages, les boutons et la barre du bas restent au-dessus de la barre de gestes ou des boutons de navigation, et le haut ne saute plus.",
+      "Serveur OpenDives (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur OpenDives » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
       "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
       "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
       "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
@@ -2461,7 +2484,7 @@
       "Sur ordinateur, agrandir ou réduire la fenêtre au-delà de 1200 dp passe de la grande à la petite disposition sans quitter l’écran : la plongée sélectionnée dans le Carnet, la statistique enregistrée dans Statistiques, la catégorie dans Réglages et l’outil dans Outils restent en place.",
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
       "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
-      "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; l’agence, le niveau et le numéro peuvent être proposés d’après la photo."
+      "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -2497,7 +2520,8 @@
       "dives": "Plongées",
       "lastSync": "Dernière synchronisation",
       "lastError": "Dernière erreur",
-      "git": "Dépôt git"
+      "git": "Dépôt git",
+      "server": "Serveur OpenDives"
     },
     "opensElsewhere": "s'ouvre dans le navigateur",
     "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.",
@@ -4805,7 +4829,7 @@
     "blankTitle": "Créer un carnet vide",
     "blankHelp": "Vous y ajouterez vos plongées ensuite.",
     "importTitle": "Importer un fichier Subsurface",
-    "importHelp": "Un fichier .ssrf ou .xml, converti au format d’OpenDives.",
+    "importHelp": "Un fichier .ssrf ou .xml, ajouté à votre nouveau carnet.",
     "sendTitle": "Envoyer le carnet de cette tablette",
     "sendTitlePhone": "Envoyer le carnet de ce téléphone",
     "sendTitleIphone": "Envoyer le carnet de cet iPhone",
@@ -4826,15 +4850,11 @@
       "other": "« {name} » · {n} plongées"
     },
     "reading": "Lecture du fichier…",
-    "progress": {
-      "one": "{n} plongée sur {total}",
-      "other": "{n} plongées sur {total}"
-    },
-    "safe": "Le carnet est déjà enregistré sur cette tablette. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
-    "safePhone": "Le carnet est déjà enregistré sur ce téléphone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
-    "safeIphone": "Le carnet est déjà enregistré sur cet iPhone. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
-    "safeDesktop": "Le carnet est déjà enregistré sur cet ordinateur. Vous pouvez quitter l’app : l’envoi reprendra au retour.",
-    "cancel": "Annuler l’envoi",
+    "safe": "Le carnet est déjà enregistré sur cette tablette. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
+    "safePhone": "Le carnet est déjà enregistré sur ce téléphone. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
+    "safeIphone": "Le carnet est déjà enregistré sur cet iPhone. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
+    "safeDesktop": "Le carnet est déjà enregistré sur cet ordinateur. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
+    "cancel": "Ne pas attendre",
     "created": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cette tablette.",
     "createdPhone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur ce téléphone.",
     "createdIphone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cet iPhone.",
@@ -4846,21 +4866,18 @@
     "offlineHelpDesktop": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cet ordinateur, puis réessayez.",
     "offlineNote": "Rien n’a été créé.",
     "interruptedTitle": "Envoi interrompu",
-    "interruptedHelp": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cette tablette, et l’envoi reprendra là où il s’est arrêté.",
-    "interruptedHelpPhone": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur ce téléphone, et l’envoi reprendra là où il s’est arrêté.",
-    "interruptedHelpIphone": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cet iPhone, et l’envoi reprendra là où il s’est arrêté.",
-    "interruptedHelpDesktop": "La connexion s’est coupée après {sent} sur {total}. Rien n’est perdu : le carnet complet est toujours sur cet ordinateur, et l’envoi reprendra là où il s’est arrêté.",
-    "interruptedSent": {
-      "one": "{n} plongée sur {total} envoyée",
-      "other": "{n} plongées sur {total} envoyées"
-    },
-    "sentCount": {
-      "one": "{n} plongée",
-      "other": "{n} plongées"
-    },
+    "interruptedHelp": "La connexion s’est coupée. Rien n’est perdu : le carnet complet est toujours sur cette tablette, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpPhone": "La connexion s’est coupée. Rien n’est perdu : le carnet complet est toujours sur ce téléphone, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpIphone": "La connexion s’est coupée. Rien n’est perdu : le carnet complet est toujours sur cet iPhone, et l’envoi reprendra là où il s’est arrêté.",
+    "interruptedHelpDesktop": "La connexion s’est coupée. Rien n’est perdu : le carnet complet est toujours sur cet ordinateur, et l’envoi reprendra là où il s’est arrêté.",
     "later": "Plus tard",
     "resume": "Reprendre l’envoi",
-    "refused": "Le serveur a refusé l’envoi. Reconnectez-vous, puis reprenez-le."
+    "refused": "Le serveur a refusé l’envoi. Reconnectez-vous, puis reprenez-le.",
+    "importing": "Ajout des plongées…",
+    "sending": "Envoi au serveur OpenDives…",
+    "objects": "{n} sur {total}",
+    "notEmpty": "Le dépôt de ce compte contient déjà des données sans carnet. Rien n’a été créé.",
+    "failed": "Le carnet n’a pas pu être créé. Rien n’a été perdu sur cet appareil."
   },
   "gear": {
     "profile": {
@@ -5386,12 +5403,15 @@
       "edit": "Modifier le brevet",
       "save": "Enregistrer",
       "close": "Fermer",
-      "photoFront": "Photo du recto",
-      "photoBack": "Photo du verso",
-      "photoHint": "Avec une photo, l’app propose l’agence, le niveau et le numéro. Vérifiez-les.",
+      "photoFront": "Scanner le recto",
+      "photoBack": "Scanner le verso",
+      "sideFront": "Recto",
+      "sideBack": "Verso",
+      "photoReplace": "Remplacer",
+      "readMark": "Lu sur la carte, à vérifier",
+      "photoHint": "Scannez la carte : l’app y lit l’agence, le niveau et le numéro. Vérifiez-les.",
       "photoRemove": "Retirer la photo",
       "photoFailed": "La photo n’a pas pu être lue.",
-      "proposed": "Proposé d’après la photo. Vérifiez.",
       "agency": "Agence",
       "agencyName": "Nom de l’agence",
       "agencyOther": "Autre agence",

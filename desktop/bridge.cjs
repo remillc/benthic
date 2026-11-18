@@ -631,7 +631,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   /**
    * The folder of a git working copy: the page names it (`dir`, relative), the bridge makes it absolute under
-   * <userData>/odgit, the same folder the page's file backend writes to (desktop/odgit-fs.cjs).
+   * <userData>/odgit.
    */
   function odgitDir(name) {
     if (typeof name !== 'string' || !name || name.includes('\0') || name.includes('\\') || path.isAbsolute(name)) throw new Error('BAD_PATH');
@@ -662,7 +662,15 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   function writeCaFile() {
     // Node's root certificates, as Android's store is exported for the core (libgit2 needs a file).
-    const pem = require('node:tls').rootCertificates.join('\n');
+    let pem = require('node:tls').rootCertificates.join('\n');
+    // Running from the sources only: the authority of a development server (OPENDIVES_DEV_CA, a PEM file) is trusted too.
+    if (!app.isPackaged && process.env.OPENDIVES_DEV_CA) {
+      try {
+        pem += `\n${fs.readFileSync(process.env.OPENDIVES_DEV_CA, 'utf8')}`;
+      } catch (e) {
+        log(`Cannot read OPENDIVES_DEV_CA: ${e.message}`);
+      }
+    }
     let current = '';
     try {
       current = fs.readFileSync(paths.caFile, 'utf8');

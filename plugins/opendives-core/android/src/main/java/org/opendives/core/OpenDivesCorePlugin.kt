@@ -94,7 +94,7 @@ class OpenDivesCorePlugin : Plugin() {
                 try {
                     try {
                         if (!cached) exportSystemCertificates(caFile)
-                        NativeCore.setCaFile(caFile.absolutePath)
+                        NativeCore.setCaFile(withDevAuthority(caFile).absolutePath)
                     } catch (e: Exception) {
                         Log.e(TAG, "Cannot export the certificate authorities", e)
                     }
@@ -124,7 +124,7 @@ class OpenDivesCorePlugin : Plugin() {
                         Thread.sleep(CERTIFICATES_RECHECK_MS)
                         val count = exportSystemCertificates(caFile)
                         if (count >= 0) {
-                            NativeCore.setCaFile(caFile.absolutePath)
+                            NativeCore.setCaFile(withDevAuthority(caFile).absolutePath)
                             Log.i(TAG, "$count system certificate authorities exported")
                         }
                     } catch (e: Exception) {
@@ -1565,6 +1565,22 @@ class OpenDivesCorePlugin : Plugin() {
         if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
     }
 
+    /**
+     * The document scanner (DocumentScanActivity: ML Kit Document Scanner, then text recognition).
+     * Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.
+     */
+    @PluginMethod
+    fun scanDocument(call: PluginCall) {
+        val intent = Intent(context, DocumentScanActivity::class.java)
+        startActivityForResult(call, intent, "scanDocumentResult")
+    }
+
+    @ActivityCallback
+    private fun scanDocumentResult(call: PluginCall, result: ActivityResult) {
+        val json = result.data?.getStringExtra("result")
+        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+    }
+
     /** The brightness the window had before keepScreenAwake raised it (null when it is not raised). */
     private var savedBrightness: Float? = null
 
@@ -1823,6 +1839,22 @@ class OpenDivesCorePlugin : Plugin() {
      * Writes Android's trusted authorities (system and user) as PEM; -1 when the
      * file already holds them.
      */
+    /**
+     * Development builds only: the authority of a development server (assets/dev-ca.pem, which is not in git) is trusted
+     * as well, in a file of its own next to the exported one. A release build never reads it.
+     */
+    private fun withDevAuthority(caFile: File): File {
+        if ((context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) == 0) return caFile
+        return try {
+            val dev = context.assets.open("dev-ca.pem").use { it.readBytes() }
+            val combined = File(context.cacheDir, "cacerts-dev.pem")
+            combined.writeBytes(caFile.readBytes() + "\n".toByteArray() + dev)
+            combined
+        } catch (e: java.io.IOException) {
+            caFile
+        }
+    }
+
     private fun exportSystemCertificates(target: File): Int {
         val store = KeyStore.getInstance("AndroidCAStore")
         store.load(null, null)

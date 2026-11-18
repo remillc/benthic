@@ -1023,6 +1023,10 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     throw unavailable('The QR scanner');
   }
 
+  async scanDocument() {
+    throw unavailable('The document scanner');
+  }
+
   async healthDives() {
     throw unavailable('Health data');
   }

@@ -62,7 +62,7 @@
   /** Map updates waiting: the badge on Settings (appbar-tiroir-android-maj-cartes.dc.html). */
   const mapUpdates = $derived(updatesCount());
   const accountName = $derived(logbook.email || t('menu.noAccount'));
-  const accountLine = $derived(t(logbook.email ? (logbook.mode === 'git' ? 'menu.gitDives' : 'menu.cloudDives') : 'menu.localDives',{ n: logbook.dives.length }));
+  const accountLine = $derived(t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives',{ n: logbook.dives.length }));
 </script>
 
 <Panel

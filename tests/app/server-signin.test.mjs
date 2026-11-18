@@ -11,7 +11,7 @@ import { serverUrl } from '../../app/src/lib/server-url.js';
 import { codeScreen, entryRows, formatCountdown, lockMinutes, resendLeft } from '../../app/src/lib/server-signin.js';
 import { codeComplete, sanitizeCode } from '../../app/src/lib/code-input.js';
 import { back, forward, hasBack, nextStep } from '../../app/src/lib/first-launch-steps.js';
-import { checkMarker, downloadServerLogbook, repositoryApi } from '../../app/src/lib/server-logbook.js';
+import { ServerLogbookError, createServerLogbook, isServerRepository, logbookCounts, openServerLogbook, pushToServer, repositoryKey } from '../../app/src/lib/server-logbook.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -259,53 +259,136 @@ test('the session goes to the plugin\'s secure storage, never to the device stor
   assert.match(bridge, /server: 'server-session\.bin'/);
 });
 
-// --- The download ---------------------------------------------------------------------------------------------
+// --- The logbook, through the core's git code ----------------------------------------------------------------
 
-test('the repository address gives the git host\'s API address', () => {
-  assert.equal(repositoryApi('https://git.example/diver/logbook.git'), 'https://git.example/api/v1/repos/diver/logbook');
-  assert.equal(repositoryApi('http://127.0.0.1:3000/demo1/logbook.git'), 'http://127.0.0.1:3000/api/v1/repos/demo1/logbook');
-  assert.equal(repositoryApi('https://git.example/only-one'), null);
-  assert.equal(repositoryApi('nonsense'), null);
-});
+const access = { repositoryUrl: 'https://git.example/diver/logbook.git', branch: 'main', username: 'diver', token: 'tok-9f3a1c' };
 
-test('the marker tells a logbook the app can read, a newer one and something else', () => {
-  assert.equal(checkMarker({ format: 1, kind: 'opendives-logbook', minReader: 1 }), 'ok');
-  assert.equal(checkMarker({ format: 2, kind: 'opendives-logbook', minReader: 2 }), 'newer');
-  assert.equal(checkMarker({ format: 1, kind: 'other' }), 'notALogbook');
-  assert.equal(checkMarker(null), 'notALogbook');
-});
-
-test('the download lists the branch, fetches the small files with the git token and reports each one', async () => {
-  const files = {
-    'opendives.json': { format: 1, kind: 'opendives-logbook', minReader: 1 },
-    'dives/ab/ab12/dive.json': { id: 'ab12' },
-    'dives/ab/ab12/profile.json': { big: true },
-    'dives/cd/cd34/dive.json': { id: 'cd34' },
-    'sites/s1.json': { id: 's1' },
+/** A fake core that records its calls. */
+function fakeCore(over = {}) {
+  const calls = [];
+  const core = {
+    calls,
+    gitCheck: async (o) => (calls.push(['gitCheck', o.url]), { status: 'ok', empty: false, branches: ['main'] }),
+    gitConnect: async (o) => (calls.push(['gitConnect', o.empty, o.branch, o.username]), { created: !!o.empty }),
+    listCloudDives: async () => (calls.push(['listCloudDives']), { dives: [{ site: 'Reef' }, { site: 'Reef' }, { site: 'Quarry' }, { site: '' }] }),
+    deviceLog: async (o) => (calls.push(['deviceLog', o.action]), {}),
+    saveLocal: async () => calls.push(['saveLocal']),
+    syncChanges: async () => (calls.push(['syncChanges']), { status: 'ok', pending: 0, reloaded: false }),
+    ...over,
   };
-  const requests = [];
-  const transport = async (request) => {
-    requests.push(request);
-    const url = new URL(request.url);
-    if (url.pathname.endsWith('/git/trees/main')) return json(200, { tree: Object.keys(files).map((path) => ({ path, type: 'blob' })).concat([{ path: 'dives', type: 'tree' }]), truncated: false });
-    const path = decodeURIComponent(url.pathname.split('/raw/')[1]);
-    return json(200, files[path]);
-  };
-  const progress = [];
-  const result = await downloadServerLogbook({ transport, repositoryUrl: 'https://git.example/diver/logbook.git', branch: 'main', token: 'secret', onProgress: (d, t) => progress.push([d, t]) });
-  assert.deepEqual({ ...result }, { marker: 'ok', dives: 2, sites: 1, trips: 0, gear: 0, certifications: 0, openable: false });
-  assert.deepEqual(progress[0], [0, 4]);
-  assert.deepEqual(progress.at(-1), [4, 4]);
-  assert.ok(requests.every((r) => r.headers.Authorization === 'token secret'));
-  // The samples wait until a dive is opened.
-  assert.ok(!requests.some((r) => r.url.includes('profile.json')));
+  return core;
+}
+
+test('the account repository is compared without scheme, .git, branch suffix or case', () => {
+  assert.equal(repositoryKey('https://Git.Example/Diver/logbook.git'), 'git.example/diver/logbook');
+  assert.equal(repositoryKey('git.example/diver/logbook.git[main]'), 'git.example/diver/logbook');
+  assert.ok(isServerRepository('git.example/diver/logbook.git', { signedIn: true, repositoryUrl: 'https://git.example/diver/logbook.git' }));
+  assert.ok(!isServerRepository('git.example/diver/logbook.git', { signedIn: false, repositoryUrl: 'https://git.example/diver/logbook.git' }));
+  assert.ok(!isServerRepository('github.com/diver/own.git', { signedIn: true, repositoryUrl: 'https://git.example/diver/logbook.git' }));
+  assert.ok(!isServerRepository('', { signedIn: true, repositoryUrl: '' }));
 });
 
-test('an empty repository is an empty answer; a failing server is unreachable; a cancelled download stops', async () => {
-  const empty = async () => ({ status: 409, text: '{}' });
-  assert.equal((await downloadServerLogbook({ transport: empty, repositoryUrl: 'https://git.example/a/b.git', branch: 'main', token: 't' })).marker, 'empty');
-  const down = async () => ({ status: 502, text: '' });
-  await assert.rejects(downloadServerLogbook({ transport: down, repositoryUrl: 'https://git.example/a/b.git', branch: 'main', token: 't' }), /UNREACHABLE/);
-  const files = async (request) => (request.url.includes('/git/trees/') ? json(200, { tree: [{ path: 'opendives.json', type: 'blob' }] }) : json(200, {}));
-  await assert.rejects(downloadServerLogbook({ transport: files, repositoryUrl: 'https://git.example/a/b.git', branch: 'main', token: 't', cancelled: () => true }), /CANCELLED/);
+test('the counts of the ready screen come from the dives the core listed', () => {
+  assert.deepEqual(logbookCounts([{ site: 'A' }, { site: 'A' }, { site: 'B' }, {}]), { dives: 4, sites: 2, gear: 0, certifications: 0, known: true });
+  assert.deepEqual(logbookCounts([]), { dives: 0, sites: 0, gear: 0, certifications: 0, known: true });
+});
+
+test('opening: the repository is looked at, connected like a personal git repository, then downloaded by the core', async () => {
+  const core = fakeCore();
+  const opened = await openServerLogbook(core, access);
+  assert.deepEqual(core.calls.map((c) => c[0]), ['gitCheck', 'gitConnect', 'listCloudDives']);
+  assert.deepEqual(core.calls[1], ['gitConnect', false, 'main', 'diver']);
+  assert.deepEqual(opened, { state: 'ready', counts: { dives: 4, sites: 2, gear: 0, certifications: 0, known: true } });
+});
+
+test('opening: an empty repository, or one without the main branch, has no logbook; nothing is connected', async () => {
+  for (const found of [{ status: 'ok', empty: true, branches: [] }, { status: 'ok', empty: false, branches: ['opendives'] }]) {
+    const core = fakeCore({ gitCheck: async () => found });
+    assert.deepEqual(await openServerLogbook(core, access), { state: 'none' });
+    assert.deepEqual(core.calls, []);
+  }
+});
+
+test('opening: the desktop window only looks, its logbook window downloads', async () => {
+  const core = fakeCore();
+  const opened = await openServerLogbook(core, access, { download: false });
+  assert.equal(opened.state, 'ready');
+  assert.equal(opened.counts.known, false);
+  assert.deepEqual(core.calls.map((c) => c[0]), ['gitCheck']);
+});
+
+test('opening: a refused token is refused, a server that does not answer is unreachable', async () => {
+  await assert.rejects(openServerLogbook(fakeCore({ gitCheck: async () => ({ status: 'denied', empty: false, branches: [] }) }), access), (e) => e instanceof ServerLogbookError && e.code === 'REFUSED');
+  await assert.rejects(openServerLogbook(fakeCore({ gitCheck: async () => ({ status: 'none', empty: false, branches: [] }) }), access), (e) => e.code === 'UNREACHABLE');
+  await assert.rejects(
+    openServerLogbook(
+      fakeCore({
+        gitCheck: async () => {
+          throw Object.assign(new Error('NETWORK'), { code: 'NETWORK' });
+        },
+      }),
+      access,
+    ),
+    (e) => e.code === 'UNREACHABLE',
+  );
+  await assert.rejects(
+    openServerLogbook(
+      fakeCore({
+        listCloudDives: async () => {
+          throw new Error('boom');
+        },
+      }),
+      access,
+    ),
+    (e) => e.code === 'FAILED',
+  );
+});
+
+test('an empty logbook is created and pushed by the core own git code, nothing else is sent', async () => {
+  const core = fakeCore();
+  await createServerLogbook(core, access, { source: 'blank' });
+  assert.deepEqual(core.calls, [['gitConnect', true, 'main', 'diver']]);
+});
+
+test('a Subsurface file is imported into the new logbook, saved, then pushed; the stages are told in order', async () => {
+  const core = fakeCore();
+  const stages = [];
+  await createServerLogbook(core, access, { source: 'file', importFile: async () => core.calls.push(['importFile']), onStage: (s) => stages.push(s) });
+  assert.deepEqual(core.calls.map((c) => c[0]), ['gitConnect', 'importFile', 'saveLocal', 'syncChanges']);
+  assert.deepEqual(stages, ['importing', 'sending']);
+});
+
+test('the logbook of this device is brought into the new one by the core, then pushed', async () => {
+  const core = fakeCore();
+  await createServerLogbook(core, access, { source: 'device' });
+  assert.deepEqual(core.calls.map((c) => c.join(':')), ['gitConnect:true:main:diver', 'deviceLog:import', 'saveLocal', 'syncChanges']);
+});
+
+test('a repository that already holds data without a logbook is refused, not overwritten', async () => {
+  const core = fakeCore({
+    gitConnect: async () => {
+      throw Object.assign(new Error('NOT_EMPTY'), { code: 'NOT_EMPTY' });
+    },
+  });
+  await assert.rejects(createServerLogbook(core, access, { source: 'blank' }), (e) => e.code === 'NOT_EMPTY');
+  assert.deepEqual(core.calls, []);
+});
+
+test('a cut push is unreachable and sending again is the same push (git sends what the server lacks)', async () => {
+  let cut = true;
+  const core = fakeCore({ syncChanges: async () => (cut ? { status: 'offline', pending: 3, reloaded: false } : { status: 'ok', pending: 0, reloaded: false }) });
+  await assert.rejects(createServerLogbook(core, access, { source: 'device' }), (e) => e.code === 'UNREACHABLE');
+  cut = false;
+  await pushToServer(core);
+  assert.equal(core.calls.filter((c) => c[0] === 'gitConnect').length, 1, 'the logbook is not created twice');
+});
+
+test('the screens use the core git code and its progress', () => {
+  const screen = read('components/FirstLaunchServer.svelte');
+  assert.match(screen, /addListener\('syncProgress'/);
+  assert.match(screen, /openServerLogbook\(OpenDivesCore/);
+  assert.doesNotMatch(screen, /openable|unreadable/);
+  const create = read('components/FirstLaunchServerCreate.svelte');
+  assert.match(create, /createServerLogbook\(OpenDivesCore/);
+  assert.match(create, /pushToServer\(OpenDivesCore\)/);
 });
