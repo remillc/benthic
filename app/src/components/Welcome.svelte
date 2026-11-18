@@ -9,6 +9,13 @@
   import { Popup, View, f7 } from 'framework7-svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { accountFlow } from '../lib/account.js';
+  import { markFirstScreenReady } from '../lib/launch.js';
+
+  // The launch screen waits for the first real screen: this one when the app starts on the first launch (opened without
+  // animation at start), nothing to wait for when it starts on the logbook.
+  $effect(() => {
+    if (!logbook.welcome && !logbook.welcomeHold) markFirstScreenReady();
+  });
 
   /** Back to the three choices once closed, for the next time it opens. */
   function reset() {
@@ -19,6 +26,6 @@
   }
 </script>
 
-<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome || logbook.welcomeHold} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset}>
+<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome || logbook.welcomeHold} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset} onPopupOpened={markFirstScreenReady}>
   <View name="welcome" url="/welcome" />
 </Popup>

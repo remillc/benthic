@@ -26,6 +26,10 @@ final class SafeAreaInsets {
 
     private final WebView webView;
     private volatile String json = "{\"top\":0,\"right\":0,\"bottom\":0,\"left\":0}";
+    /** The window's insets were read at least once: until then get() only has zeros and the page would lay out twice. */
+    private volatile boolean known = false;
+    /** When the last insets were sent to the page (uptime ms); 0 before. */
+    private volatile long sentAt = 0;
 
     SafeAreaInsets(WebView webView) {
         this.webView = webView;
@@ -35,6 +39,16 @@ final class SafeAreaInsets {
             return windowInsets;
         });
         ViewCompat.requestApplyInsets(webView);
+    }
+
+    /** True once the window's insets were read; the launch screen waits for it (MainActivity). */
+    boolean isKnown() {
+        return known;
+    }
+
+    /** Uptime (ms) when the insets were last pushed to the page; 0 when none were. */
+    long lastSentAt() {
+        return sentAt;
     }
 
     /** The current insets as JSON in CSS pixels: {"top":..,"right":..,"bottom":..,"left":..}. */
@@ -54,8 +68,10 @@ final class SafeAreaInsets {
             + ",\"right\":" + css(insets.right, density)
             + ",\"bottom\":" + css(insets.bottom, density)
             + ",\"left\":" + css(insets.left, density) + "}";
+        known = true;
         if (next.equals(json)) return;
         json = next;
+        sentAt = android.os.SystemClock.uptimeMillis();
         Log.i(TAG, "insets " + next + " density " + density);
         webView.post(() -> webView.evaluateJavascript(
             "window.__odSetInsets && window.__odSetInsets(" + next + ")", null));

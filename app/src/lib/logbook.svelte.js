@@ -754,8 +754,13 @@ function readWelcomeState() {
   }
 }
 
+/**
+ * The first launch is shown at start unless the logbook was started before. The very first start (no value yet) counts
+ * as a first launch from the first paint, so that the Logbook is never drawn before the choice is known: startApp
+ * then closes it again only when an account is already configured on this device (see startApp).
+ */
 function readWelcome() {
-  return readWelcomeState() === 'show';
+  return readWelcomeState() !== 'done';
 }
 
 /** @param {'show'|'done'} value */
@@ -824,13 +829,15 @@ export function boot() {
  */
 export async function startApp() {
   mark('startApp');
-  if (logbook.welcome) return;
+  // The very first start: the first launch is already on screen (readWelcome); only an account found on this device closes it.
+  const firstStart = readWelcomeState() === null;
+  if (logbook.welcome && !firstStart) return;
   // The desktop's start screen: no logbook is open in this window (task 2026-11-15-173).
   if (noLogbookWindow()) {
     logbook.loading = false;
     return;
   }
-  if (readWelcomeState() === null) {
+  if (firstStart) {
     let configured = false;
     try {
       const account = await OpenDivesCore.configureCloud();
@@ -844,6 +851,7 @@ export async function startApp() {
       logbook.loading = false;
       return;
     }
+    logbook.welcome = false;
     writeWelcomeState('done');
   }
   await loadLogbook();
