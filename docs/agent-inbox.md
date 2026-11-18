@@ -5653,3 +5653,14 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 
 Item 2 done (18 November 2026, `feature/desktop-list-lighter`): the desktop table as described. The default columns were already N°, Date, Site, Prof. max, Durée, Compagnons, so a saved order, widths or columns are untouched and the defaults only apply when nothing is saved; « Profil » is a new column, off by default, not sortable. The year line is shown when the table is sorted by date or number. Trips are white cards with 20 px corners.
 **Items 1 and 3 done** (branch `feature/tablet-list-signin`): the tablet list uses the cards (trips open in portrait, folded in landscape, selection kept); the connection screen already opened from « Se connecter » in the two-pane layout on tablet and desktop, and the Google and Apple buttons now carry the official logos on every device (`app/src/assets/brands/`, sources in its README). Item 2 (desktop list) is left to the other branch.
+
+## [ ] 2026-11-18-280 The Google and Apple icons for the sign-in buttons
+
+Christian approved this on 18 November 2026. Work in `main`. Follows task 279, item 3.
+
+- Christian supplied the two icons used in the mock-ups: `docs/brand/google-g.svg` (the four-colour Google « G », 24 × 24) and `docs/brand/apple-logo-black.svg` (the black Apple logo).
+- Use them in « Continuer avec Google » and « Continuer avec Apple » on every device: phone (`android-odplus-connexion`), tablet (`android-tablette-odplus-connexion-paysage`) and desktop (`bureau-odplus-connexion`). Size 22 × 22, in place of the letter discs, the Apple logo scaled to fit the height.
+- Copy them into the app's assets (not referenced from `docs/`).
+- Before release, check each provider's sign-in branding rules (Google Identity, Sign in with Apple), as task 279 says. If a rule asks for a different button, follow the rule and tell Christian.
+
+**Test:** the three buttons on phone, tablet and desktop, in light theme. In dark theme, the black Apple logo on a dark button needs a white version: tell Christian if the button is dark.
