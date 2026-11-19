@@ -5742,3 +5742,17 @@ The search box (« Rechercher dans le carnet ») sat too close to the wave at th
 The wave, the title row and the list below do not move.
 
 **Test:** the header has the same height as before; the search box has 40 px of blue below it before the wave.
+
+## [ ] 2026-11-18-285 Settings: delete one of your own cylinder types
+
+Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`: `reglages2-bouteilles-android` (list), `reglages2-bouteille-vos-modifier-android` (edit one of your types), `reglages2-bouteille-supprimer-android` (confirmation).
+
+Réglages › Équipement › Types de bouteilles › Vos types › a type (e.g. « ALU 3L ») opens « Modifier le type ».
+
+- Under the explanation (« Votre type, utilisé dans 12 plongées. … »), a red outlined button « Supprimer ce type » (#A1372B, trash icon), with a line under it: « Retire cette bouteille des 12 plongées qui l'utilisent. » The number is the real count of dives using this type. If no dive uses it: « N'est utilisé dans aucune plongée. »
+- Tapping it opens a basic dialog (no ✕): « Supprimer « ALU 3L » ? » / « Cette bouteille sera retirée des 12 plongées qui l'utilisent, avec ses pressions et son mélange. Cette action ne peut pas être annulée. » / « Annuler », « Supprimer » (red). If no dive uses the type, no dialog: delete directly.
+- **Supprimer** deletes the type and removes the cylinders of that type from those dives (with their pressures and gas mix). This is a deliberate change: until now, removing a type left the dives untouched. **Before building it, check with Christian** what to do when the removed cylinder is the only one of a dive, or when the dive's gas switches or pressure graph depend on it. Do not delete a dive's only cylinder silently.
+- The list's explanation now reads: « … Changer sa taille ne modifie pas les plongées existantes. Supprimer un de vos types retire ses bouteilles des plongées qui l'utilisent. »
+- Standard types keep « Retirer ce type » (hides it from the list, no change to dives).
+
+**Test:** delete a type used in dives: the count shown matches, the confirmation appears, the cylinders are gone from those dives after confirming, « Annuler » changes nothing. Delete an unused type: no dialog.
