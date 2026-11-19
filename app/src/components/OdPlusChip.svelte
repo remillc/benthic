@@ -6,12 +6,12 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ onLight?: boolean, onSheet?: boolean }} */
-  let { onLight = false, onSheet = false } = $props();
+  /** @type {{ onLight?: boolean, onSheet?: boolean, label?: string, large?: boolean }} */
+  let { onLight = false, onSheet = false, label = '', large = false } = $props();
 </script>
 
-<span class="od-plus-chip" class:od-plus-chip--on-light={onLight} class:od-plus-chip--on-sheet={onSheet}>
-  <Icon name="plusMark" size={12} weight={2.2} />{t('odplus.chip')}
+<span class="od-plus-chip" class:od-plus-chip--on-light={onLight} class:od-plus-chip--on-sheet={onSheet} class:od-plus-chip--large={large}>
+  <Icon name="plusMark" size={large ? 14 : 12} weight={2.2} />{label || t('odplus.chip')}
 </span>
 
 <style>
@@ -29,6 +29,15 @@
       line-height: 16px;
       font-weight: 600;
       white-space: nowrap;
+    }
+
+    /* The offer's header (task 2026-11-19-295): 28 dp high, 14/20, 8 dp between the mark and the text. */
+    .od-plus-chip--large {
+      gap: 8px;
+      height: 28px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 20px;
     }
 
     /* The account sheet and « Gérer le compte »: the pale blue chip of their mock-ups (task 2026-11-18-281). */

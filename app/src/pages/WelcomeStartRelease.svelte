@@ -18,10 +18,10 @@
   let { f7router } = $props();
 
   /** The OpenDives+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
-  const plusHero = $derived(['odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'].includes(currentStep()));
+  const plusHero = $derived(['odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome', 'odplusHealth'].includes(currentStep()));
 
   /** « OpenDives+, l'offre » on a tablet (task 2026-11-18-282): the panel carries the offer's chip, title and lead. */
-  const offerPanel = $derived(currentStep() === 'odplusOffer');
+  const offerPanel = $derived(currentStep() === 'odplusOffer' || currentStep() === 'odplusAll');
   /** « Vos données de santé » and « Votre carnet est prêt » (task 2026-11-18-275): the panel carries the header. @type {'odplusReady'|'odplusHealth'|''} */
   const plusPanel = $derived(['odplusReady', 'odplusHealth'].includes(currentStep()) ? /** @type {'odplusReady'|'odplusHealth'} */ (currentStep()) : '');
 
@@ -37,7 +37,7 @@
   {#if plusPanel}
     <OdPlusPanel step={plusPanel} />
   {:else if offerPanel}
-    <div class="od-welcome-release--chip"><OdPlusChip /></div>
+    <div class="od-welcome-release--chip"><OdPlusChip label={t('odplus.offer.pill')} /></div>
     <h1 class="od-welcome-release--headline od-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
     <p class="od-welcome-release--intro">{t('odplus.offer.lead')}</p>
   {:else}

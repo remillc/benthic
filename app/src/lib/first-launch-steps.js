@@ -18,6 +18,7 @@
 //     logbook (task 2026-11-17-266: createChoice → createName | createSend → createInterrupted | createOffline);
 //     any other account: odplusOffer
 //   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase) → odplusHealth (« Vos données de santé », the optional consent, task 2026-11-18-271) → odplusReady
+//   odplusOffer → odplusAll (« Tout ce qui est inclus », task 2026-11-19-295): « Retour » returns to the offer.
 //   Both entries (`signIn`, `discover`) are the choices of the first step; « Continuer sans compte » and
 //   « Continuer sans abonnement » go back to it and create nothing (task 2026-11-17-265).
 //
@@ -29,7 +30,7 @@
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
- *   |'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'|'odplusHealth'
+ *   |'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'|'odplusHealth'
  *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
@@ -67,6 +68,7 @@ const FORWARD = {
   'start:discover': 'odplusOffer',
   'odplusConnect:email': 'server',
   'odplusOffer:welcome': 'odplusWelcome',
+  'odplusOffer:all': 'odplusAll',
   'odplusOffer:signIn': 'odplusConnect',
   'odplusWelcome:next': 'odplusHealth',
   'odplusHealth:next': 'odplusReady',

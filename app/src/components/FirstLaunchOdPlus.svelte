@@ -14,10 +14,10 @@
   import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
   import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
   import { readyMotion, claimReady } from '../lib/ready-motion.svelte.js';
-  import { flow, go, goDownload, goOffer } from '../lib/first-launch.svelte.js';
+  import { flow, go, goBack, goDownload, goOffer } from '../lib/first-launch.svelte.js';
   import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
-  import { ACTIVATED, BENEFITS, afterSignIn, providerOrder, summaryRows } from '../lib/odplus.js';
+  import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/odplus.js';
   import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { services } from '../lib/profile.svelte.js';
@@ -28,7 +28,7 @@
   /**
    * `onwithout`: « Continuer sans compte » and « Continuer sans abonnement » (back to the first step, nothing created).
    * `onopen`: « Ouvrir mon carnet ».
-   * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusReady'|'odplusWelcome'|'odplusHealth', onwithout: () => void, onopen: () => void }}
+   * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'|'odplusHealth', onwithout: () => void, onopen: () => void }}
    */
   let { step, onwithout, onopen } = $props();
 
@@ -178,7 +178,7 @@
     </div>
     {#if which === 'offer'}
       <div class="od-plus-hero--text">
-        <OdPlusChip />
+        <OdPlusChip label={t('odplus.offer.pill')} large />
         <h2 class="od-plus-hero--title">{t('odplus.offer.title')}</h2>
         <p class="od-plus-hero--lead">{t('odplus.offer.lead')}</p>
       </div>
@@ -197,6 +197,16 @@
       </div>
     {/if}
   </header>
+{/snippet}
+
+{#snippet priceBlock()}
+  <!-- Plain centred text, not a card (task 2026-11-19-295): the grey label is not tappable. -->
+  <div class="od-plus--price">
+    <span class="od-plus--price-label">{t('odplus.offer.priceLabel')}</span>
+    <span class="od-plus--price-amount">{t('odplus.offer.price')} <span class="od-plus--price-per">{t('odplus.offer.per')}</span></span>
+    <span class="od-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
+    <span class="od-plus--price-cancel"><Icon name="check" size={20} weight={2.4} />{t('odplus.offer.cancelAnytime')}</span>
+  </div>
 {/snippet}
 
 {#if devAccounts && devOpen}
@@ -231,15 +241,17 @@
   <p class="od-plus--note">{t('odplus.connect.note')}</p>
   <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
 {:else if step === 'odplusOffer'}
-  <div class="od-plus--screen">
+  <div class="od-plus--screen od-plus--screen-offer" class:od-plus--screen-ios={ios}>
     <!-- A tablet's blue panel (pages/WelcomeStartRelease.svelte) carries the chip, the title and the lead: the hero is the phone's. -->
     {#if layout.phone || desktopApp}{@render hero('offer')}{/if}
     <div class="od-plus--cards">
       {#each BENEFITS as b (b.key)}
         <div class="od-plus--card od-plus--card-{b.tone}">
           <span class="od-plus--card-icon"><Icon name={b.icon} size={24} weight={1.9} /></span>
-          <span class="od-plus--card-title">{t(`odplus.offer.${b.key}`)}</span>
-          <span class="od-plus--card-text">{t(`odplus.offer.${b.key}Text`)}</span>
+          <span class="od-plus--card-copy">
+            <span class="od-plus--card-title">{t(`odplus.offer.${b.key}`)}</span>
+            <span class="od-plus--card-text">{t(`odplus.offer.${b.key}Text`)}</span>
+          </span>
         </div>
       {/each}
     </div>
@@ -250,10 +262,9 @@
         <span class="od-plus--card-text">{t('odplus.offer.maintenanceText')}</span>
       </span>
     </div>
-    <div class="od-plus--price">
-      <span class="od-plus--price-amount">{t('odplus.offer.price')} <span class="od-plus--price-per">{t('odplus.offer.per')}</span></span>
-      <span class="od-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
-    </div>
+    <!-- « Voir tout ce qui est inclus » (task 2026-11-19-295): opens the list of everything the subscription includes. -->
+    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={20} weight={2.2} /></button>
+    {@render priceBlock()}
     <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     {#if ios}
       <!-- App Store requirements (task 289): restoring purchases, and the terms of the automatic renewal. -->
@@ -263,9 +274,49 @@
     <button type="button" class="od-plus--text od-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
     <p class="od-plus--no-account">{t('odplus.offer.noAccount')}</p>
     {#if offerShowsSignIn(flow.stack)}
-      <!-- « Déjà abonné ? Se connecter » (task 2026-11-18-281): hidden right after a sign-in, where the diver is already in. -->
-      <p class="od-plus--already">{t('odplus.offer.already')} <button type="button" class="od-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
+      <!-- « Déjà abonné ? Se connecter » (task 2026-11-18-281): hidden right after a sign-in, where the diver is already in.
+           On a tablet it sits at the top right, on the row of « Retour » (task 2026-11-19-295). -->
+      <p class="od-plus--already" class:od-plus--already-top={!layout.phone && !desktopApp}>{t('odplus.offer.already')} <button type="button" class="od-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
     {/if}
+  </div>
+{:else if step === 'odplusAll'}
+  <!-- « Tout ce qui est inclus » (task 2026-11-19-295; mock-ups android-odplus-complet, ios-odplus-complet and
+       android-tablette-odplus-complet-paysage): the rows of each group, then the price footer that stays at the bottom. -->
+  <div class="od-plus-all" class:od-plus-all--ios={kind === 'iphone'}>
+    <div class="od-plus-all--bar">
+      <button type="button" class="od-plus-all--back" aria-label={t('welcomeSteps.back')} onclick={goBack}>
+        {#if kind === 'iphone'}
+          <span class="od-plus-all--back-chevron"><Icon name="chevron" size={22} weight={2.4} /></span>{t('odplus.chip')}
+        {:else}
+          <Icon name="arrowBack" size={24} weight={2} />
+        {/if}
+      </button>
+      {#if kind !== 'iphone'}<h1 class="od-plus-all--title">{t('odplus.all.title')}</h1>{/if}
+    </div>
+    {#if kind === 'iphone'}<h1 class="od-plus-all--title od-plus-all--title-large">{t('odplus.all.title')}</h1>{/if}
+    <div class="od-plus-all--body">
+      <OdPlusChip onSheet />
+      <p class="od-plus-all--subtitle">{t('odplus.all.subtitle')}</p>
+      {#each includedGroups() as group (group.key)}
+        <h2 class="od-plus-all--group">{t(`odplus.all.${group.key}`)}</h2>
+        <ul class="od-plus-all--rows">
+          {#each group.rows as row (row.key)}
+            <li class="od-plus-all--row">
+              <span class="od-plus-all--tile od-plus-all--tile-{row.tone}"><Icon name={row.icon} size={22} weight={2} /></span>
+              <span class="od-plus-all--texts">
+                <span class="od-plus-all--row-title">{t(`odplus.all.${row.key}`)}</span>
+                <span class="od-plus-all--row-text">{t(row.key === 'sync' ? deviceKey('odplus.all.syncText', kind) : `odplus.all.${row.key}Text`)}</span>
+              </span>
+            </li>
+          {/each}
+        </ul>
+      {/each}
+      <p class="od-plus-all--free">{t('odplus.all.free')}</p>
+    </div>
+    <div class="od-plus-all--footer">
+      {@render priceBlock()}
+      <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+    </div>
   </div>
 {:else if step === 'odplusReady'}
   <div class="od-plus--screen">
@@ -508,8 +559,8 @@
     .od-plus--text-centre {
       align-self: center;
       margin-left: 0;
-      margin-top: 4px;
-      height: 40px;
+      margin-top: 0;
+      height: 48px;
       color: var(--od-text-2);
     }
 
@@ -605,15 +656,23 @@
       justify-content: center;
       flex-wrap: wrap;
       column-gap: 4px;
-      min-height: 40px;
+      min-height: 48px;
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
     }
 
+    /* A tablet: « Déjà abonné ? Se connecter » sits at the top right, on the row of « Retour » (task 2026-11-19-295). */
+    .od-plus--already-top {
+      position: absolute;
+      top: -52px;
+      right: 0;
+      min-height: 40px;
+    }
+
     .od-plus--link {
       width: auto;
-      min-height: 40px;
+      min-height: 48px;
       padding: 0 4px;
       border: none;
       background: none;
@@ -632,6 +691,7 @@
 
     /* The three screens with the blue hero. On a phone they use the whole width, the first launch's own band is hidden. */
     .od-plus--screen {
+      position: relative;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -764,7 +824,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding: 14px 14px 16px;
+      padding: 16px;
       border-radius: 20px;
       color: var(--od-text);
     }
@@ -798,8 +858,8 @@
     .od-plus--card-wide {
       flex-direction: row;
       align-items: center;
-      gap: 14px;
-      padding: 14px;
+      gap: 16px;
+      padding: 16px;
 
       .od-plus--card-icon {
         flex: none;
@@ -812,7 +872,24 @@
       gap: 4px;
     }
 
-    .od-plus--card-icon,
+    .od-plus--card-icon {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-surface);
+      color: var(--od-plus-tone);
+    }
+
+    /* The title and the line of a small card: on a phone they are two rows of the card's column (8 dp apart); on a tablet the
+       icon sits to their left to save height. */
+    .od-plus--card-copy {
+      display: contents;
+    }
+
     .od-plus--activated-icon {
       width: 44px;
       height: 44px;
@@ -826,14 +903,29 @@
 
     .od-plus--card-title {
       font-size: 16px;
-      line-height: 20px;
+      line-height: 24px;
       font-weight: 600;
     }
 
     .od-plus--card-text {
-      font-size: 13px;
-      line-height: 17px;
+      font-size: 14px;
+      line-height: 20px;
       color: var(--od-text-2);
+    }
+
+    @media (min-width: 768px) {
+      .od-plus--cards .od-plus--card {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .od-plus--card-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
     }
 
     .od-plus--terms {
@@ -844,31 +936,82 @@
       text-align: center;
     }
 
+    /* The price: plain centred text, not a card (task 2026-11-19-295): the grey label is not tappable. */
     .od-plus--price {
       display: flex;
       flex-direction: column;
-      padding: 16px 20px;
-      border-radius: 20px;
-      background: var(--od-plus-price);
-      color: var(--od-release-on-panel);
+      align-items: center;
+      margin: 8px 0 12px;
+      text-align: center;
+      color: var(--od-text);
+    }
+
+    .od-plus--price-label {
+      margin-bottom: 4px;
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600;
+      color: var(--od-text-2);
     }
 
     .od-plus--price-amount {
-      font-size: 24px;
-      line-height: 30px;
+      font-size: 40px;
+      line-height: 48px;
       font-weight: 600;
+      font-variant-numeric: tabular-nums;
     }
 
     .od-plus--price-per {
-      font-size: 15px;
+      margin-left: 2px;
+      font-size: 20px;
+      line-height: 28px;
       font-weight: 500;
-      color: var(--od-plus-on-price-soft);
+      color: var(--od-text-2);
     }
 
     .od-plus--price-detail {
-      font-size: 14px;
-      line-height: 19px;
-      color: var(--od-plus-on-price-soft);
+      margin-top: 4px;
+      font-size: 17px;
+      line-height: 24px;
+      color: var(--od-text-2);
+    }
+
+    .od-plus--price-cancel {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--od-release-ok);
+    }
+
+    /* « Voir tout ce qui est inclus ›»: a text link, 48 dp high. */
+    .od-plus--see-all {
+      align-self: center;
+      height: 48px;
+      padding: 0 8px 0 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      border: none;
+      border-radius: 24px;
+      background: transparent;
+      color: var(--od-release-link);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-release-hover);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-row-main);
+      }
     }
 
     .od-plus--summary {
@@ -958,6 +1101,237 @@
       font-weight: 600;
     }
 
+    .od-plus--screen-offer {
+      gap: 8px;
+    }
+
+    /* « Tout ce qui est inclus » (task 2026-11-19-295). */
+    .od-plus-all {
+      display: flex;
+      flex-direction: column;
+      max-width: 640px;
+      min-height: 100%;
+    }
+
+    .od-plus-all--bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 56px;
+      margin-left: -12px;
+    }
+
+    .od-plus-all--back {
+      width: auto;
+      min-width: 48px;
+      height: 48px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 24px;
+      background: transparent;
+      color: var(--od-text);
+      font: inherit;
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--od-release-hover);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--od-release-row-main);
+      }
+    }
+
+    /* The iPhone's navigation bar: « ‹ OpenDives+ » in the link colour, the large title under it. */
+    .od-plus-all--ios .od-plus-all--back {
+      padding: 0 8px 0 0;
+      gap: 0;
+      font-size: 17px;
+      color: var(--od-release-link);
+    }
+
+    .od-plus-all--back-chevron {
+      display: flex;
+      transform: rotate(180deg);
+    }
+
+    .od-plus-all--title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 400;
+      color: var(--od-text);
+    }
+
+    .od-plus-all--title-large {
+      margin: 0 0 8px;
+      font-size: 34px;
+      line-height: 41px;
+      font-weight: 700;
+    }
+
+    .od-plus-all--body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding-bottom: 24px;
+    }
+
+    .od-plus-all--subtitle {
+      margin: 8px 4px 0;
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--od-text-2);
+    }
+
+    .od-plus-all--group {
+      margin: 20px 4px 8px;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--od-text-2);
+    }
+
+    .od-plus-all--rows {
+      align-self: stretch;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      overflow: hidden;
+      border-radius: 20px;
+      background: var(--od-surface);
+    }
+
+    .od-plus-all--row {
+      position: relative;
+      min-height: 72px;
+      padding: 12px 16px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--od-text);
+
+      & + & {
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 72px;
+          right: 0;
+          height: 1px;
+          background: var(--od-release-divider);
+        }
+      }
+    }
+
+    .od-plus-all--tile {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .od-plus-all--tile-blue {
+      background: var(--od-plus-blue);
+      color: var(--od-plus-blue-icon);
+    }
+
+    .od-plus-all--tile-green {
+      background: var(--od-plus-green);
+      color: var(--od-plus-green-icon);
+    }
+
+    .od-plus-all--tile-amber {
+      background: var(--od-plus-amber);
+      color: var(--od-plus-amber-icon);
+    }
+
+    .od-plus-all--tile-violet {
+      background: var(--od-plus-violet);
+      color: var(--od-plus-violet-icon);
+    }
+
+    .od-plus-all--tile-red {
+      background: var(--od-maintenance);
+      color: var(--od-maintenance-icon);
+    }
+
+    .od-plus-all--texts {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .od-plus-all--row-title {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600;
+    }
+
+    .od-plus-all--row-text {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-plus-all--free {
+      margin: 20px 4px 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    /* The price footer stays at the bottom while the list scrolls. */
+    .od-plus-all--footer {
+      position: sticky;
+      bottom: 0;
+      margin-top: auto;
+      padding: 16px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      background: var(--od-background);
+      border-top: 1px solid var(--od-release-divider);
+
+      .od-plus--price {
+        margin: 0 0 24px;
+      }
+    }
+
+    /* A tablet: the footer is horizontal, the price on the left and the button on the right. */
+    @media (min-width: 768px) {
+      .od-plus-all--footer {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 0 24px;
+
+        .od-plus--price {
+          margin: 0;
+        }
+
+        .od-plus--price-amount {
+          white-space: nowrap;
+        }
+
+        .od-plus--primary {
+          flex: none;
+          width: 160px;
+        }
+      }
+    }
+
     /* Phone: the hero is edge to edge from the top of the page (the first launch's band is hidden for these steps). */
     @media (max-width: 767.98px) {
       .od-plus--title {
@@ -989,6 +1363,41 @@
         border-radius: 0;
         padding-bottom: 52px;
         margin-bottom: 0;
+      }
+
+      /* The offer's header: 264 dp high (292 on an iPhone), 24 dp between the lead and the wave's top (task 2026-11-19-295). */
+      .od-plus-hero--offer {
+        box-sizing: border-box;
+        min-height: 264px;
+        padding: 40px 16px 42px;
+
+        .od-plus-hero--brand {
+          margin-bottom: 20px;
+        }
+
+        .od-plus-hero--title {
+          font-size: 24px;
+          line-height: 32px;
+        }
+
+        .od-plus-hero--text {
+          gap: 0;
+
+          .od-plus-hero--title {
+            margin: 12px 0 8px;
+          }
+        }
+      }
+
+      .od-plus--screen-ios .od-plus-hero--offer {
+        min-height: 292px;
+      }
+
+      .od-plus-all--footer {
+        margin-left: -16px;
+        margin-right: -16px;
+        margin-bottom: -16px;
+        padding-bottom: max(24px, var(--f7-safe-area-bottom, 0px));
       }
 
       .od-plus-hero--profile {

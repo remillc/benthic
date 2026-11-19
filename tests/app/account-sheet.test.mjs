@@ -348,7 +348,7 @@ test('the subscriber sheet shows the round « + » chip after the name, read « 
 test('the tablet offer: the blue panel carries the chip, title and lead; the phone hero stays on phones; Retour except right after a sign-in', () => {
   const release = read('pages/WelcomeStartRelease.svelte');
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(release, /offerPanel\b[\s\S]*<OdPlusChip \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
+  assert.match(release, /offerPanel\b[\s\S]*<OdPlusChip label=\{t\('odplus\.offer\.pill'\)\} \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
   assert.match(offer, /\{#if layout\.phone \|\| desktopApp\}\{@render hero\('offer'\)\}\{\/if\}/);
   assert.match(steps, /tabletOfferBack = \$derived\(step === 'odplusOffer' && !layout\.phone && !desktopApp && offerShowsSignIn\(flow\.stack\)\)/);
   assert.equal(hasBack('odplusOffer', true), false, 'the phone offer keeps no Retour');
