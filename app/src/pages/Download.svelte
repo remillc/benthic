@@ -30,7 +30,7 @@
   import { downloadSalinity } from '../lib/tools.js';
   import { errorCode } from '../lib/account.js';
   import { askReviewAfterDownload } from '../lib/review-prompt.js';
-  import { addressFor, announceDownload, keepReceived, lastAttempt, macOf } from '../lib/download.js';
+  import { addressFor, announceDownload, diveIdsNow, keepReceived, startQuickEntry, lastAttempt, macOf } from '../lib/download.js';
   import { ProgressSmoother } from '../lib/progress-smoothing.js';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -197,6 +197,7 @@
     phase = 'downloading';
     scanning = false;
     console.info('Download from', c.vendor, c.product, c.address);
+    const before = diveIdsNow();
     try {
       const result = await OpenDivesCore.downloadDives({ ...c, forceDownload, defaultSalinity: downloadSalinity(settings.downloadWater) });
       await afterDownload(result);
@@ -205,8 +206,10 @@
       f7router.back();
       // Back on the logbook after a successful download: the system may ask for a review.
       if (result.downloaded) setTimeout(() => askReviewAfterDownload({ dives: logbook.dives.length, error: !!logbook.error, conflict: !!logbook.conflict }), 1500);
-      if (result.downloaded) announceDownload(result);
-      else toast(t('download.noneNew', { computer: result.product || c.product }));
+      // New dives without a site: « Compléter la plongée » first, the message when it closes.
+      if (result.downloaded) {
+        if (!startQuickEntry(f7router, result, before)) announceDownload(result);
+      } else toast(t('download.noneNew', { computer: result.product || c.product }));
     } catch (e) {
       const code = errorCode(e);
       console.error('Download', code, /** @type {any} */ (e)?.message);

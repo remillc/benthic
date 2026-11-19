@@ -2855,7 +2855,8 @@
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
       "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager).",
-      "iPhone : Carnet sans miniature de profil (jour et mois, « N° · heure », profondeur au-dessus de la durée, titres d’année avec leur nombre de plongées) ; Réglages en grand titre avec groupes en petites capitales ; fiche d’un site en cartes groupées, avec « Ouvrir dans Plans » expliqué ; À propos et Bibliothèques libres avec le bouton de retour nommé."
+      "iPhone : Carnet sans miniature de profil (jour et mois, « N° · heure », profondeur au-dessus de la durée, titres d’année avec leur nombre de plongées) ; Réglages en grand titre avec groupes en petites capitales ; fiche d’un site en cartes groupées, avec « Ouvrir dans Plans » expliqué ; À propos et Bibliothèques libres avec le bouton de retour nommé.",
+      "Après un téléchargement depuis un ordinateur de plongée, « Compléter la plongée » s’ouvre pour chaque nouvelle plongée sans site (Android et iPhone) : les trois sites les plus proches de la position du téléphone, ou les trois plus récemment plongés sans position, le plus proche présélectionné à moins de 500 m, « Créer un site à ma position actuelle », « Chercher un autre site », les compagnons et la note. « Plus tard » laisse la plongée telle quelle."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3272,6 +3273,23 @@
       "title": "divelogs.de",
       "text": "La reprise d'un carnet divelogs.de viendra dans une prochaine version. Vos identifiants divelogs.de ne seront jamais enregistrés."
     }
+  },
+  "quickEntry": {
+    "title": "Compléter la plongée",
+    "titleShort": "Compléter",
+    "later": "Plus tard",
+    "diveOf": "Plongée du {date}",
+    "diveLine": "{depth} au plus profond, {duration}",
+    "site": "Site",
+    "chooseSite": "Choisir le site",
+    "nearest": "Le plus proche",
+    "lastDive": "dernière plongée le {date}",
+    "noDive": "aucune plongée",
+    "searchOther": "Chercher un autre site",
+    "siteNote": "Du plus proche au plus loin de votre position. Sans position, du plus récemment plongé au plus ancien.",
+    "addBuddy": "Ajouter un compagnon",
+    "buddiesNote": "Vos compagnons seront ensuite proposés en un toucher.",
+    "ratingLabel": "Note de la plongée"
   },
   "download": {
     "title": "Téléchargement",

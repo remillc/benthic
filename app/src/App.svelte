@@ -218,6 +218,8 @@
         resolve(!layout.rail ? { component: EditDivesTogether } : { popup: { component: EditDivesTogether } });
       },
     },
+    // « Compléter la plongée »: the quick entry after a download (task 2026-11-14-151), a full screen.
+    { path: '/dives/:id/complete', ...lazy(() => import('./pages/QuickEntry.svelte')) },
     // A dive opened from another section (site, tools) or from a trip: the
     // same screen, without the master-detail routing of the Logbook, which
     // would put a second Logbook in the history.

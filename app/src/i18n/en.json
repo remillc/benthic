@@ -2855,7 +2855,8 @@
       "Dive computers show their photo (dive detail, download choice, Equipment); it is downloaded once, then kept on the device. With no photo, or offline, the icon stays.",
       "“This ballast was” is now a rail: a pill slides from one choice to the next; touching the chosen choice clears it.",
       "Equipment: “Edit the dive computer” (brand and model with suggestions, or free text; “Change image” keeps your photo in your account, not shared).",
-      "iPhone: the logbook has no profile thumbnail (day and month, “No. · time”, depth over duration, year titles with their dive count); Settings with a large title and small-capitals groups; a site's page in grouped cards, with “Open in Maps” explained; About and Open-source libraries with a named back button."
+      "iPhone: the logbook has no profile thumbnail (day and month, “No. · time”, depth over duration, year titles with their dive count); Settings with a large title and small-capitals groups; a site's page in grouped cards, with “Open in Maps” explained; About and Open-source libraries with a named back button.",
+      "After a download from a dive computer, “Complete the dive” opens for each new dive without a site (Android and iPhone): the three nearest sites by distance from the phone, or the three most recently dived without a position, with the nearest one preselected within 500 m, “Create a site at my current position”, “Search for another site”, buddies and the rating. “Later” leaves the dive as it is."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3272,6 +3273,23 @@
       "title": "divelogs.de",
       "text": "Bringing a divelogs.de logbook will come in a later version. Your divelogs.de credentials will never be stored."
     }
+  },
+  "quickEntry": {
+    "title": "Complete the dive",
+    "titleShort": "Complete",
+    "later": "Later",
+    "diveOf": "Dive of {date}",
+    "diveLine": "{depth} at the deepest, {duration}",
+    "site": "Site",
+    "chooseSite": "Choose the site",
+    "nearest": "Nearest",
+    "lastDive": "last dive on {date}",
+    "noDive": "no dives",
+    "searchOther": "Search for another site",
+    "siteNote": "From nearest to farthest from your position. Without a position, from most recently dived to oldest.",
+    "addBuddy": "Add a buddy",
+    "buddiesNote": "Your buddies are then offered in one tap.",
+    "ratingLabel": "Dive rating"
   },
   "download": {
     "title": "Download",

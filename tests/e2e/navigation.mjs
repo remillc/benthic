@@ -278,7 +278,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
       };
     }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
   });
-  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=md${desktop ? '&desktop=1' : ''}` });
+  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${process.env.OD_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
     if (await tab.run((w) => !!document.querySelector(w ? '.od-welcome.modal-in .od-first-launch, .od-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
@@ -394,6 +394,13 @@ const hardwareBack = async (tab) => {
   await sleep(60);
 };
 
+/** With OD_SHOTS=<folder>: a screenshot of the page, for a visual check against the mock-ups. */
+async function shot(tab, name) {
+  const { data } = await tab.send('Page.captureScreenshot', { format: 'png' });
+  mkdirSync(process.env.OD_SHOTS, { recursive: true });
+  writeFileSync(path.join(process.env.OD_SHOTS, `${name}.png`), Buffer.from(data, 'base64'));
+}
+
 // --- Flows -------------------------------------------------------------------------------------------------------
 
 async function phoneFlows() {
@@ -432,6 +439,53 @@ async function phoneFlows() {
   await settled(tab, 'after Save', { route: diveRoute });
   await tapBack(tab);
   await settled(tab, 'back after Save', { route: '/' });
+
+  console.log(' quick entry after a download (Complete the dive)');
+  // The phone is at a known site: the nearest site is preselected and named.
+  const here = JSON.parse(await core('siteQuery', { kind: 'list', uuid: 0, lat: 0, lon: 0, a: 0, b: 0, text: '' })).find((x) => x.hasLocation !== false && (x.latUdeg || x.lonUdeg) && x.dives);
+  if (here) {
+    await tab.send('Emulation.setGeolocationOverride', { latitude: here.latUdeg / 1e6, longitude: here.lonUdeg / 1e6, accuracy: 5 });
+    await tab.send('Browser.grantPermissions', { permissions: ['geolocation'] }).catch(() => {});
+  }
+  const quickRoute = await tab.run(() => {
+    const view = document.querySelector('.view-main');
+    const id = view?.querySelector('a[href^="/dives/"]')?.getAttribute('href')?.split('/')[2];
+    view.f7View.router.navigate(`/dives/${id}/complete`);
+    return `/dives/${id}/complete`;
+  });
+  await settled(tab, 'quick entry opened', { route: quickRoute });
+  for (let i = 0; i < 40 && here && !(await tab.run(() => !!document.querySelector('.od-quick-entry [role=option][aria-selected=true]'))); i++) await sleep(200);
+  if (process.env.OD_SHOTS) await shot(tab, `quick-entry-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
+  if (here) {
+    const preselected = await tab.run(() => document.querySelector('.od-quick-entry [role=option][aria-selected=true] .od-quick-entry--nearest')?.textContent ?? '');
+    checks++;
+    if (!/\S/.test(preselected)) {
+      failures.push({ label: 'quick entry: nearest site', problems: [`no preselected nearest site for ${here.name}`] });
+      console.log('  FAIL quick entry: the nearest site is not preselected');
+    } else console.log('  ok   quick entry: the nearest site is preselected');
+  }
+  const sawSite = await tab.run(() => !!document.querySelector('.od-quick-entry [role=listbox]') && document.querySelectorAll('.od-quick-entry [role=option]').length > 0);
+  checks++;
+  if (!sawSite) {
+    failures.push({ label: 'quick entry: site list', problems: ['no site rows'] });
+    console.log('  FAIL quick entry: the site list is empty');
+  } else console.log('  ok   quick entry: the site list shows');
+  await tapText(tab, '^\s*(Chercher un autre site|Search for another site)\s*$', '.od-quick-entry');
+  await settled(tab, 'quick entry > Choose a site', { route: '/sites/choose' });
+  await tapBack(tab);
+  await settled(tab, 'back to the quick entry', { route: quickRoute });
+  // A second tap on the chosen site clears it (the Windows host reads a JSON number as a 32-bit long, so a site uuid above
+  // 2^31 cannot be saved there: Save then keeps the dive without a site).
+  if (here) {
+    const row = await tab.run(() => {
+      const r = document.querySelector('.od-quick-entry [role=option][aria-selected=true]')?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+    });
+    if (row) await tab.tapAt(row.x, row.y);
+  }
+  await tapText(tab, '^\s*(Enregistrer|Save)\s*$', '.od-quick-entry');
+  await settled(tab, 'quick entry saved', { route: '/' });
+  await toLogbook(tab, 'after the quick entry');
 
   console.log(' edit > Back arrow, then Back at once after Save');
   await tapDive(tab);
