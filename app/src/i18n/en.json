@@ -67,6 +67,7 @@
     },
     "expiresOn": "Expires on {date}",
     "expiredOn": "Expired on {date}",
+    "readMark": "Read from the document, to check",
     "reminderSent": "Reminder received on {date}.",
     "reminderComing": "Reminder on {date}.",
     "bannerLine": "On {date}. {reminder}",
@@ -3137,7 +3138,8 @@
       "Emergency sheet (OpenDives+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile (only with the health-data consent), the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
       "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive validated” with OpenDives+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
       "Site map: in a site’s card, on the edit screen and on the desktop, the map keeps a 2.1 to 1 width to height ratio at every width; the height follows the width.",
-      "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”."
+      "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”.",
+      "Cards and documents: a scan now reads more from the card, on the device only. A certification card gives the agency (also RAID, PSS, ANMP), the level, the number, the date and the instructor, with both sides read together; an insurance card gives the insurer, plan, number, emergency phone and dates; a medical certificate gives the doctor, the date and the expiry; another document gives its title and expiry. Each value is marked “to check”, a field you typed is never replaced, and nothing is shown when the text is unclear. The scanned picture now always appears in its slot (it was lost on Android when the scan was large)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

@@ -294,18 +294,21 @@ test('the level suggestions follow the agency and what is typed', () => {
   assert.ok(!levelSuggestions('PADI', 'Rescue Diver').includes('Rescue Diver'));
 });
 
+/** The four fields this test is about (the parser also proposes the agency name and the instructor). @param {any} r */
+const four = ({ agency, level, number, issuedOn }) => ({ agency, level, number, issuedOn });
+
 test('parseCardText proposes the agency, the level and the number from a scanned card', () => {
-  assert.deepEqual(parseCardText('PADI\nAdvanced Open Water Diver\nValérie Tremblay\nDiver No. 1504AB2231\nDate 12 JUN 2015'), { agency: 'PADI', level: 'Advanced Open Water Diver', number: '1504AB2231', issuedOn: '2015-06-12' });
-  assert.deepEqual(parseCardText('Scuba Schools International\nSSI\nStress & Rescue (Sauveteur)\nCert # 7721-0934'), { agency: 'SSI', level: 'Stress & Rescue (Sauveteur)', number: '7721-0934', issuedOn: '' });
-  assert.deepEqual(parseCardText('CMAS\n2 star diver\nCard number: BE-2234-98\n'), { agency: 'CMAS', level: '2 star diver', number: 'BE-2234-98', issuedOn: '' });
-  assert.deepEqual(parseCardText('NAUI\nAdvanced Scuba Diver\nN° 884102'), { agency: 'NAUI', level: 'Advanced Scuba Diver', number: '884102', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('PADI\nAdvanced Open Water Diver\nValérie Tremblay\nDiver No. 1504AB2231\nDate 12 JUN 2015')), { agency: 'PADI', level: 'Advanced Open Water Diver', number: '1504AB2231', issuedOn: '2015-06-12' });
+  assert.deepEqual(four(parseCardText('Scuba Schools International\nSSI\nStress & Rescue (Sauveteur)\nCert # 7721-0934')), { agency: 'SSI', level: 'Stress & Rescue (Sauveteur)', number: '7721-0934', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('CMAS\n2 star diver\nCard number: BE-2234-98\n')), { agency: 'CMAS', level: '2 star diver', number: 'BE-2234-98', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('NAUI\nAdvanced Scuba Diver\nN° 884102')), { agency: 'NAUI', level: 'Advanced Scuba Diver', number: '884102', issuedOn: '' });
   const tdi = parseCardText('Technical Diving International\nTDI\nAdvanced Nitrox Diver\nDiver Number: 20231188');
   assert.equal(tdi.agency, 'TDI');
   assert.equal(tdi.level, 'Advanced Nitrox Diver');
   assert.equal(tdi.number, '20231188');
-  assert.deepEqual(parseCardText('PADI\nRescue Diver\n1608AC0412'), { agency: 'PADI', level: 'Rescue Diver', number: '1608AC0412', issuedOn: '' });
-  assert.deepEqual(parseCardText(''), { agency: '', level: '', number: '', issuedOn: '' });
-  assert.deepEqual(parseCardText('Hello world'), { agency: '', level: '', number: '', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('PADI\nRescue Diver\n1608AC0412')), { agency: 'PADI', level: 'Rescue Diver', number: '1608AC0412', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('')), { agency: '', level: '', number: '', issuedOn: '' });
+  assert.deepEqual(four(parseCardText('Hello world')), { agency: '', level: '', number: '', issuedOn: '' });
 });
 
 test('findDate reads the usual card formats, prefers a labelled date and skips future dates', () => {
