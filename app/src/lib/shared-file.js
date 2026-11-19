@@ -20,6 +20,7 @@
 // string: it is streamed into the cache by the plugin and read in pieces (lib/staged-file.js).
 import { logbookLabel, logbooksInFile } from './replace-logbook.js';
 import { isZipName, MAX_ZIP_BYTES } from './zip-fit.js';
+import { isCancelled } from './import-progress.js';
 import { MAX_SITES_FILE, readAllBytes, scanIsSitesOnly, scanLogbook, stageBytes, stagedHead } from './staged-file.js';
 
 /** The largest old-format file (`<dives>` root) whose dangling site references are cleaned in memory. */
@@ -210,9 +211,10 @@ export function planSitesMerge(sites, existing) {
  * Applies a plan: one undoable step per change, as the Sites screens do.
  * @param {{ complete: SharedSite[], add: SharedSite[] }} plan
  * @param {(options: any) => Promise<any>} siteChange lib/sites.svelte.js
+ * @param {(done: number, total: number) => void} [onProgress] after each site
  * @returns {Promise<{ added: number, completed: number }>}
  */
-export async function applySitesMerge(plan, siteChange) {
+export async function applySitesMerge(plan, siteChange, onProgress) {
   /** @param {number} uuid @param {SharedSite} s */
   const fill = async (uuid, s) => {
     if (s.description) await siteChange({ action: 'edit', uuid, field: 'description', value: s.description });
@@ -223,17 +225,20 @@ export async function applySitesMerge(plan, siteChange) {
   };
   let added = 0;
   let completed = 0;
+  const total = plan.complete.length + plan.add.length;
   for (const s of plan.complete) {
     await siteChange({ action: 'edit', uuid: s.uuid, field: 'name', value: s.name });
     if (s.hasLocation) await siteChange({ action: 'edit', uuid: s.uuid, field: 'location', value: '', lat: s.latUdeg, lon: s.lonUdeg });
     await fill(s.uuid, s);
     completed++;
+    onProgress?.(completed, total);
   }
   for (const s of plan.add) {
     const created = await siteChange({ action: 'create', value: s.name, ...(s.hasLocation ? { lat: s.latUdeg, lon: s.lonUdeg } : {}) });
     const uuid = Number(created?.uuid ?? created?.site?.uuid ?? 0);
     if (uuid) await fill(uuid, s);
     added++;
+    onProgress?.(completed + added, total);
   }
   return { added, completed };
 }
@@ -324,8 +329,11 @@ export async function completeStagedSites(core, staged, scan, remembered) {
 
 /**
  * @typedef {Object} SharedDeps what the screen and the core give
- * @property {(uri: string) => Promise<{ name: string, size: number, path: string }>} stage the plugin's stageSharedFile: the
- *   file is streamed into the app's cache, only its path comes back
+ * @property {(uri: string, onProgress?: (done: number, total: number) => void) => Promise<{ name: string, size: number, path: string }>} stage the plugin's stageSharedFile: the
+ *   file is streamed into the app's cache, only its path comes back; `onProgress` gets the bytes copied
+ * @property {(uri: string) => unknown} [cancelStage] the plugin's cancelStage: stops the copy of `uri`
+ * @property {import('./import-progress.js').ImportProgress} [progress] the one progress line of the import (lib/import-progress.js):
+ *   copy and check run here, import and save in `importData`; it stays (hidden) while the diver answers the question
  * @property {import('./staged-file.js').StagedCore} core the plugin's calls on staged files (readFileChunk, assembleFile, discardImport…)
  * @property {(name: string, head: string, size: number) => ({ ok: true, name: string } | { ok: false, reason: string })} check checkSharedFile
  * @property {() => boolean} welcome no logbook yet (first launch)
@@ -336,7 +344,7 @@ export async function completeStagedSites(core, staged, scan, remembered) {
  * @property {(name: string, data: StagedPayload) => Promise<number>} importData
  * @property {(name: string, staged: import('./staged-file.js').StagedFile, summary: { sites: number, firstYear: number|null, lastYear: number|null }|null) => void} toFirstLaunch
  *   hands the staged file to « Importer un carnet »
- * @property {(options: { textKey: string, values: Record<string, string|number>, actionKey: string }, run: () => Promise<void>) => void} confirm
+ * @property {(options: { textKey: string, values: Record<string, string|number>, actionKey: string }, run: () => Promise<void>, cancel?: () => void) => void} confirm
  * @property {(key: string, values?: Record<string, string|number>) => void} refuse a dialog with an OK
  * @property {(key: string, values?: Record<string, string|number>) => void} notify a snackbar
  * @property {(n: number) => void} imported « n dives imported », with Undo
@@ -363,15 +371,31 @@ export async function completeStagedSites(core, staged, scan, remembered) {
  * whole in memory, here or in the plugin: only its path moves, and the core imports from it. Resolves with what was done.
  * @param {SharedDeps} deps
  * @param {string} uri
- * @returns {Promise<'refused'|'first-launch'|'confirm-dives'|'confirm-sites'>}
+ * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'>}
  */
 export async function openSharedFile(deps, uri) {
   if (deps.ready) await deps.ready();
+  const progress = deps.progress;
+  progress?.begin(['copy', 'check', 'import', 'save']);
+  /** The flow is over, unless a question is waiting for its answer (the line then stays, hidden). */
+  let waiting = false;
+  const unhook = progress?.onCancel(() => void deps.cancelStage?.(uri));
   /** @type {{ name: string, size: number, path: string }} */
   let staged;
   try {
-    staged = await deps.stage(uri);
+    progress?.phase('copy');
+    const report = progress?.reporter('copy');
+    staged = await deps.stage(uri, (done, total) => {
+      try {
+        report?.(done, total);
+      } catch {
+        // Cancelled: the plugin was told through cancelStage, its copy rejects.
+      }
+    });
   } catch (e) {
+    unhook?.();
+    progress?.end();
+    if (isCancelled(e)) return 'cancelled';
     const code = String(/** @type {any} */ (e)?.code ?? /** @type {any} */ (e)?.message ?? '');
     console.error('Read a shared file', code);
     deps.refuse(code.includes('TOO_BIG') ? 'link.fileTooBig' : 'link.fileUnreadable');
@@ -381,9 +405,20 @@ export async function openSharedFile(deps, uri) {
   // The staged file is deleted unless a later step (first launch, the dialog's actions) took it over.
   let kept = false;
   try {
-    const result = await handleStaged(deps, staged, (next) => (current = next), () => (kept = true));
+    const result = await handleStaged(
+      deps,
+      staged,
+      (next) => (current = next),
+      () => (kept = true),
+      () => (waiting = true),
+    );
     return result;
+  } catch (e) {
+    if (isCancelled(e)) return 'cancelled';
+    throw e;
   } finally {
+    unhook?.();
+    if (!waiting) progress?.end();
     if (!kept) await deps.core.discardImport({ path: current.path }).catch(() => {});
   }
 }
@@ -393,10 +428,16 @@ export async function openSharedFile(deps, uri) {
  * @param {{ name: string, size: number, path: string }} staged
  * @param {(next: { name: string, size: number, path: string }) => void} replaced the staged file changed (an archive's logbook, sites added)
  * @param {() => void} keep from now on the file belongs to the next step
- * @returns {Promise<'refused'|'first-launch'|'confirm-dives'|'confirm-sites'>}
+ * @param {() => void} wait a question is shown: the progress line stays, hidden, and the answer ends it
+ * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'>}
  */
-async function handleStaged(deps, staged, replaced, keep) {
+async function handleStaged(deps, staged, replaced, keep, wait) {
   const core = deps.core;
+  const progress = deps.progress;
+  /** The flow's end, once the diver answered (or cancelled). */
+  const over = () => progress?.end();
+  progress?.phase('check', staged.size);
+  const checking = progress?.reporter('check');
   const label = staged.name || '';
   const head = new TextDecoder().decode(await stagedHead(core, staged.path));
   const check = deps.check(staged.name, head, staged.size);
@@ -428,7 +469,7 @@ async function handleStaged(deps, staged, replaced, keep) {
   let scan = null;
 
   if (isXml) {
-    scan = await scanLogbook(core, current.path, current.size);
+    scan = await scanLogbook(core, current.path, current.size, checking && ((done, total) => checking(done, total)));
     if (scanIsSitesOnly(scan)) {
       if (current.size > MAX_SITES_FILE) {
         deps.refuse('link.fileNotLogbook', { name: label });
@@ -446,6 +487,8 @@ async function handleStaged(deps, staged, replaced, keep) {
       // The file is read: it is not needed any more (the sites are in memory).
       await core.discardImport({ path: current.path }).catch(() => {});
       // The sites go to the open logbook, named in the question: never to one the diver did not choose.
+      progress?.pause();
+      wait();
       deps.confirm({ textKey: 'link.sitesText', values: { name: label, n: sites.length, logbook: deps.logbookName?.() ?? '' }, actionKey: 'link.sitesAction' }, async () => {
         try {
           // The file's sites are remembered first: a dives file shared next finds them even if this merge adds nothing.
@@ -455,13 +498,16 @@ async function handleStaged(deps, staged, replaced, keep) {
             deps.notify('link.sitesNothing');
             return;
           }
-          const done = await applySitesMerge(plan, deps.siteChange);
+          progress?.phase('import', plan.add.length + plan.complete.length);
+          const done = await applySitesMerge(plan, deps.siteChange, progress?.reporter('import'));
           deps.notify('link.sitesDone', { added: done.added, completed: done.completed, present: plan.present });
         } catch (e) {
           console.error('Add shared sites', e);
           deps.refuse('link.sitesFailed');
+        } finally {
+          over();
         }
-      });
+      }, over);
       return 'confirm-sites';
     }
     const fixed = await completeStagedSites(core, current, scan, deps.remembered());
@@ -476,25 +522,30 @@ async function handleStaged(deps, staged, replaced, keep) {
   const payload = { path: current.path };
   if (deps.welcome()) {
     keep();
+    // The first launch has its own steps (the name, the choice of where to keep it); the import there starts its own line.
+    over();
     deps.toFirstLaunch(name, current, scan ? { sites: scan.sites, firstYear: scan.firstYear, lastYear: scan.lastYear } : null);
     return 'first-launch';
   }
   const discard = () => core.discardImport({ path: payload.path }).then(
-    () => {},
-    () => {},
+    () => over(),
+    () => over(),
   );
   const merge = async () => {
     try {
       deps.imported(await deps.importData(name, payload));
     } catch (e) {
-      deps.importFailed(e);
+      if (!isCancelled(e)) deps.importFailed(e);
     } finally {
       await discard();
     }
   };
   keep();
+  // The diver answers a question: the line waits, hidden, and comes back with the import.
+  progress?.pause();
+  wait();
   if (!deps.choose) {
-    deps.confirm({ textKey: 'link.fileText', values: { name: label || name }, actionKey: 'link.fileAction' }, merge);
+    deps.confirm({ textKey: 'link.fileText', values: { name: label || name }, actionKey: 'link.fileAction' }, merge, () => void discard());
     return 'confirm-dives';
   }
   const newLogbook = deps.newLogbook;

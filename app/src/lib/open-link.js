@@ -25,6 +25,7 @@ import { deviceStore } from './device-store.js';
 import { siteChange } from './sites.svelte.js';
 import { openSharedFile } from './shared-file.js';
 import { sharedFile } from './shared-file.svelte.js';
+import { importProgress } from './import-progress.svelte.js';
 
 /** The sites of a shared sites file, kept for the dives file shared next (lib/shared-file.js). */
 const SITES_KEY = 'od.sharedSites';
@@ -116,7 +117,25 @@ async function openTarget(target) {
 /** What the screen and the core give to lib/shared-file.js. */
 const sharedDeps = {
   // The file is streamed into the app's cache by the plugin: only its path comes back (never the contents).
-  stage: (/** @type {string} */ uri) => OpenDivesCore.stageSharedFile({ uri }),
+  // `stageProgress` events give the bytes copied while it runs; « Annuler » stops the copy (cancelStage).
+  stage: async (/** @type {string} */ uri, /** @type {((done: number, total: number) => void)|undefined} */ onProgress) => {
+    /** @type {{ remove: () => Promise<void> }|undefined} */
+    let handle;
+    try {
+      handle = await OpenDivesCore.addListener('stageProgress', (/** @type {{ uri: string, done: number, total: number }} */ e) => {
+        if (e.uri === uri) onProgress?.(e.done, e.total);
+      });
+    } catch {
+      // The desktop plugin has no events: the line stays indeterminate until the copy is over.
+    }
+    try {
+      return await OpenDivesCore.stageSharedFile({ uri });
+    } finally {
+      void handle?.remove();
+    }
+  },
+  cancelStage: (/** @type {string} */ uri) => OpenDivesCore.cancelStage({ uri }).catch(() => {}),
+  progress: importProgress,
   core: OpenDivesCore,
   check: checkSharedFile,
   welcome: () => logbook.welcome,
@@ -151,8 +170,8 @@ const sharedDeps = {
     const text = [t(key, { name: o.name }), o.whyNot ? t(`link.replace_${o.whyNot}`) : '', o.several ? t('replace.several', o.several) : ''].filter(Boolean).join('\n\n');
     f7.dialog.create({ title: t('link.fileTitle'), text, buttons, verticalButtons: buttons.length > 2 }).open();
   },
-  confirm: (/** @type {any} */ o, /** @type {() => Promise<void>} */ run) =>
-    confirmAction({ title: t('link.fileTitle'), text: t(o.textKey, o.values), action: t(o.actionKey), onConfirm: run }),
+  confirm: (/** @type {any} */ o, /** @type {() => Promise<void>} */ run, /** @type {(() => void)|undefined} */ cancel) =>
+    confirmAction({ title: t('link.fileTitle'), text: t(o.textKey, o.values), action: t(o.actionKey), onConfirm: run, onCancel: cancel }),
   refuse: (/** @type {string} */ key, /** @type {Record<string, string|number>} */ values) =>
     f7.dialog.create({ title: t('link.fileTitle'), text: t(key, values), buttons: [{ text: t('dialog.ok') }] }).open(),
   notify: (/** @type {string} */ key, /** @type {Record<string, string|number>} */ values) => showSnackbar(t(key, values)),
@@ -209,7 +228,9 @@ export function handleLink(url) {
         return;
       }
       clearOverlays();
-      if (target.kind === 'file') await openSharedFile(sharedDeps, target.uri);
+      if (target.kind === 'file') {
+        if ((await openSharedFile(sharedDeps, target.uri)) === 'cancelled') showSnackbar(t('importFlow.cancelled'));
+      }
       else await openTarget(target);
     })
     .catch((e) => console.error('Open a link', e));

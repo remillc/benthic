@@ -62,9 +62,9 @@ export async function stageFile(core, blob, name = /** @type {File} */ (blob).na
   return { path, name, size: blob.size };
 }
 
-/** @param {StagedCore} core @param {string} name @param {Uint8Array} bytes @returns {Promise<StagedFile>} */
-export function stageBytes(core, name, bytes) {
-  return stageFile(core, new Blob([/** @type {BlobPart} */ (bytes)]), name);
+/** @param {StagedCore} core @param {string} name @param {Uint8Array} bytes @param {(done: number, total: number) => void} [onProgress] @returns {Promise<StagedFile>} */
+export function stageBytes(core, name, bytes, onProgress) {
+  return stageFile(core, new Blob([/** @type {BlobPart} */ (bytes)]), name, onProgress);
 }
 
 /**

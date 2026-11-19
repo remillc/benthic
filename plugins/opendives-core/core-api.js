@@ -664,7 +664,11 @@ export { waterTypeOf };
  *   `append: true`. A logbook never crosses the bridge as one string (it ran the Android Java heap out of memory).
  * @property {(options: {uri: string}) => Promise<{name: string, size: number, path: string}>} stageSharedFile
  *   A file another app handed over (Android content://, iOS file://), streamed into the app's cache: only its path
- *   comes back. Rejects TOO_BIG (above 2 GB or no room), NOT_FOUND, FAILED, BAD_ARGUMENT.
+ *   comes back. Rejects TOO_BIG (above 2 GB or no room), NOT_FOUND, FAILED, BAD_ARGUMENT, CANCELLED (cancelStage).
+ *   While it copies, the event stageProgress {uri, done, total} gives the bytes copied (total 0 when the provider
+ *   gives no size).
+ * @property {(options: {uri: string}) => Promise<void>} cancelStage
+ *   Stops the copy of `uri` (stageSharedFile) at its next piece and deletes the partial file; the copy rejects CANCELLED.
  * @property {(options: {path: string, offset: number, length: number}) => Promise<{data: string, size: number}>} readFileChunk
  *   Up to 4 MB of a staged file, base64, with the file's size: to look at the start of a logbook or scan it.
  * @property {(options: {name: string, parts: ({path: string, start: number, end: number}|{text: string})[]}) => Promise<{path: string}>} assembleFile
@@ -878,7 +882,7 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
  *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (opendives.h,
@@ -973,6 +977,7 @@ export const OpenDivesCore = {
   divelogsCheck: (options) => native.divelogsCheck(options),
   stageImport: (options) => native.stageImport(options),
   stageSharedFile: (options) => native.stageSharedFile(options),
+  cancelStage: (options) => native.cancelStage(options),
   readFileChunk: (options) => native.readFileChunk(options),
   assembleFile: (options) => native.assembleFile(options),
   divelogsDownload: (options) => native.divelogsDownload(options),

@@ -44,6 +44,7 @@
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
+  import FileImportProgress from './components/FileImportProgress.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
@@ -422,6 +423,7 @@
   <SyncFailureSheet />
   <ConflictHost />
   <QrReceived />
+  <FileImportProgress />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   {#if devAccounts}{#await import('./components/DevToolsHost.svelte') then { default: DevToolsHost }}<DevToolsHost />{/await}{/if}

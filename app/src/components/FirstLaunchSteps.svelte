@@ -35,6 +35,8 @@
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
   import { logbook, startWithoutAccount, deleteDives, importFile, importData, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
+  import { importProgress } from '../lib/import-progress.svelte.js';
+  import { isCancelled } from '../lib/import-progress.js';
   import { alphaLogbookFile, findAlphaLogbooks, markAlphaImportDone } from '../lib/alpha-logbook.js';
   import { isRelease } from '../lib/edition.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -436,13 +438,24 @@
     try {
       const name = t('welcomeSteps.alphaName');
       // The core writes the alpha's dives to a file in the app's cache; only its path comes back.
-      const staged = await alphaLogbookFile(OpenDivesCore, found, name);
-      const scan = await scanLogbook(OpenDivesCore, staged.path, staged.size);
-      flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name, summary: summariseScan(found.dives, scan), alpha: true };
-      flow.name = name;
-      go('file');
+      await importProgress.session(['read', 'check'], name, async () => {
+        importProgress.phase('read');
+        const staged = await alphaLogbookFile(OpenDivesCore, found, name);
+        let scan;
+        try {
+          importProgress.phase('check', staged.size);
+          scan = await scanLogbook(OpenDivesCore, staged.path, staged.size, importProgress.reporter('check'));
+        } catch (e) {
+          await OpenDivesCore.discardImport({ path: staged.path }).catch(() => {});
+          throw e;
+        }
+        flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name, summary: summariseScan(found.dives, scan), alpha: true };
+        flow.name = name;
+        go('file');
+      });
     } catch (e) {
-      failed(e);
+      if (isCancelled(e)) showSnackbar(t('importFlow.cancelled'));
+      else failed(e);
     } finally {
       busy = false;
     }
@@ -520,6 +533,8 @@
     busy = true;
     unreadable = '';
     try {
+      importProgress.begin(['read']);
+      importProgress.phase('read');
       const { dives } = await OpenDivesCore.importCount({ path: staged.path });
       if (!dives) throw new Error('NO_DIVES');
       const summary = staged.summary ? { dives, sites: staged.summary.sites || null, firstYear: staged.summary.firstYear, lastYear: staged.summary.lastYear } : summariseImport(dives);
@@ -530,6 +545,7 @@
       await OpenDivesCore.discardImport({ path: staged.path }).catch(() => {});
       failed(e, null);
     } finally {
+      importProgress.end();
       busy = false;
     }
   }
@@ -557,20 +573,29 @@
     }
     busy = true;
     try {
+      // One line: the copy into the app, the core counting the dives, the pass over the file (lib/import-progress.js).
+      importProgress.begin(['copy', 'read', 'check']);
+      importProgress.phase('copy', file.size);
       const dives = await readImportFile(file, {
-        stage: (f) => stageFile(OpenDivesCore, f),
-        count: (o) => OpenDivesCore.importCount(o),
+        stage: (f) => stageFile(OpenDivesCore, f, undefined, importProgress.reporter('copy')),
+        count: (o) => {
+          importProgress.phase('read');
+          return OpenDivesCore.importCount(o);
+        },
         discard: (o) => OpenDivesCore.discardImport(o),
       });
       // The sites and years come from a streaming pass (a window of 2 MB at a time), not from the file as one text.
       const head = await file.slice(0, 2048).text();
-      const summary = isSubsurfaceXml(head) ? summariseScan(dives, await scanBlob(file)) : summariseImport(dives);
+      importProgress.phase('check', file.size);
+      const summary = isSubsurfaceXml(head) ? summariseScan(dives, await scanBlob(file, importProgress.reporter('check'))) : summariseImport(dives);
       flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary };
       flow.name = flow.source.name;
       go('file');
     } catch (e) {
-      failed(e, file);
+      if (isCancelled(e)) showSnackbar(t('importFlow.cancelled'));
+      else failed(e, file);
     } finally {
+      importProgress.end();
       busy = false;
     }
   }

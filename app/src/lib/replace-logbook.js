@@ -114,13 +114,13 @@ export function replaceOffer(open) {
  * pieces (a logbook is never one string), the archive's own logbook when it is one.
  * @param {import('./staged-file.js').StagedCore} core
  * @param {File} file
- * @returns {Promise<{ name: string, stage: () => Promise<{ path: string }>, several: { count: number, main: string }|null }|null>}
+ * @returns {Promise<{ name: string, stage: (onProgress?: (done: number, total: number) => void) => Promise<{ path: string }>, several: { count: number, main: string }|null }|null>}
  */
 export async function replacementFromFile(core, file) {
   const name = file.name;
   const head = (await file.slice(0, 4096).text()).replace(/^﻿/, '');
   if (/\.(ssrf|xml)$/i.test(name) && isSubsurfaceXml(head)) {
-    return { name, stage: () => stageFile(core, file), several: null };
+    return { name, stage: (onProgress) => stageFile(core, file, undefined, onProgress), several: null };
   }
   // An archive is small next to what it holds: read whole (up to 64 MB), its logbook goes to the cache in pieces.
   if (!isZipName(name) || file.size > MAX_ZIP_BYTES) return null;
@@ -129,7 +129,7 @@ export async function replacementFromFile(core, file) {
   const main = inside.main;
   return {
     name: main.name,
-    stage: () => stageBytes(core, main.name, main.data),
+    stage: (onProgress) => stageBytes(core, main.name, main.data, onProgress),
     several: inside.count > 1 ? { count: inside.count, main: logbookLabel(main.name) } : null,
   };
 }

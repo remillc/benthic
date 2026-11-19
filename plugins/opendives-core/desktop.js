@@ -586,6 +586,9 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     throw unavailable('Reading a shared file');
   }
 
+  /** Nothing is copied from a shared file on the desktop: nothing to cancel. */
+  async cancelStage() {}
+
   /**
    * Up to 4 MB of a staged file, base64, with its size.
    * @param {{path?: string, offset?: number, length?: number}} options

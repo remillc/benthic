@@ -2082,12 +2082,16 @@ class OpenDivesCorePlugin : Plugin() {
                     return@Thread
                 }
                 var name = ""
+                var expected = 0L
                 try {
-                    context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
-                        if (c.moveToFirst()) name = c.getString(0).orEmpty()
+                    context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME, android.provider.OpenableColumns.SIZE), null, null, null)?.use { c ->
+                        if (c.moveToFirst()) {
+                            name = c.getString(0).orEmpty()
+                            if (!c.isNull(1)) expected = maxOf(0L, c.getLong(1))
+                        }
                     }
                 } catch (e: Exception) {
-                    // No display name: the web layer names the import from its contents.
+                    // No display name or size: the web layer names the import from its contents; the progress has no total.
                 }
                 if (name.isEmpty()) name = uri.lastPathSegment.orEmpty().substringAfterLast('/')
                 val input = context.contentResolver.openInputStream(uri)
@@ -2098,6 +2102,9 @@ class OpenDivesCorePlugin : Plugin() {
                 val file = newStagedFile(name)
                 target = file
                 var size = 0L
+                var reported = 0L
+                var reportedAt = 0L
+                cancelledStages.remove(text)
                 input.use { stream ->
                     java.io.FileOutputStream(file).use { out ->
                         val buffer = ByteArray(64 * 1024)
@@ -2107,20 +2114,44 @@ class OpenDivesCorePlugin : Plugin() {
                             out.write(buffer, 0, n)
                             size += n
                             if (size > MAX_SHARED_FILE) throw java.io.IOException("TOO_BIG")
+                            if (cancelledStages.contains(text)) throw java.io.IOException("CANCELLED")
+                            // Progress for the web layer: at most every 100 ms, and at least 256 KB apart.
+                            val now = System.currentTimeMillis()
+                            if (now - reportedAt >= 100 && size - reported >= 256 * 1024) {
+                                reported = size
+                                reportedAt = now
+                                notifyListeners("stageProgress", JSObject().put("uri", text).put("done", size).put("total", maxOf(expected, size)))
+                            }
                         }
                     }
                 }
+                notifyListeners("stageProgress", JSObject().put("uri", text).put("done", size).put("total", size))
                 call.resolve(JSObject().put("name", name).put("size", size).put("path", file.absolutePath))
             } catch (e: SecurityException) {
                 target?.delete()
                 call.reject("Cannot open the file", "NOT_FOUND", e)
             } catch (e: Exception) {
                 target?.delete()
+                if (e.message == "CANCELLED") {
+                    call.reject("Cancelled", "CANCELLED")
+                    return@Thread
+                }
                 Log.e(TAG, "stageSharedFile", e)
                 val tooBig = e.message == "TOO_BIG" || e.message?.contains("ENOSPC") == true
                 call.reject(if (tooBig) "The file is too big" else "Cannot read the file", if (tooBig) "TOO_BIG" else "FAILED", e)
             }
         }.start()
+    }
+
+    /** The addresses whose copy (stageSharedFile) the diver cancelled; the copy stops at its next piece and rejects CANCELLED. */
+    private val cancelledStages = java.util.Collections.synchronizedSet(HashSet<String>())
+
+    /** « Annuler » on the import progress: stops the copy of `uri` and deletes the partial file. */
+    @PluginMethod
+    fun cancelStage(call: PluginCall) {
+        val text = call.getString("uri")
+        if (!text.isNullOrEmpty()) cancelledStages.add(text)
+        call.resolve()
     }
 
     /**

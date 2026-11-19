@@ -20,6 +20,7 @@ import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, MAX_ZIP_BYTES, toBase64 } from './zip-fit.js';
 import { stageFile } from './staged-file.js';
+import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
@@ -396,15 +397,19 @@ export async function savePlan(request, replaceId = 0, title = '') {
  * @param {File} file
  * @returns {Promise<number>} the number of dives added to the logbook
  */
-export async function importFile(file) {
-  if (isZipName(file.name) && file.size <= MAX_ZIP_BYTES) {
-    const fits = await fitFilesInZip(new Uint8Array(await file.arrayBuffer()));
-    if (fits.length) return importFits(fits);
-  }
-  // The file goes to the app's cache in pieces and the core reads it there: a logbook is never one string
-  // (the plugin's bridge and the Android Java heap cannot hold 100 MB).
-  const staged = await stageFile(OpenDivesCore, file);
-  return importData(file.name, { path: staged.path });
+export function importFile(file) {
+  // One progress line from the copy to the end of the import (lib/import-progress.js).
+  return importProgress.session(['copy', 'import', 'save'], file.name, async () => {
+    if (isZipName(file.name) && file.size <= MAX_ZIP_BYTES) {
+      const fits = await fitFilesInZip(new Uint8Array(await file.arrayBuffer()));
+      if (fits.length) return importFits(fits);
+    }
+    // The file goes to the app's cache in pieces and the core reads it there: a logbook is never one string
+    // (the plugin's bridge and the Android Java heap cannot hold 100 MB).
+    importProgress.phase('copy', file.size);
+    const staged = await stageFile(OpenDivesCore, file, undefined, importProgress.reporter('copy'));
+    return importData(file.name, { path: staged.path });
+  });
 }
 
 /**
@@ -463,15 +468,20 @@ async function importFits(fits) {
  *   (a logbook; it is deleted after the import)
  * @returns {Promise<number>} the number of dives added to the logbook
  */
-export async function importData(name, data) {
-  const before = logbook.dives.length;
-  const result = await OpenDivesCore.importDives(typeof data === 'string' ? { name, data } : { name, path: data.path });
-  logbook.undoText = result.undo;
-  logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
-  logbook.sitesVersion++;
-  await persistChanges();
-  return Math.max(0, logbook.dives.length - before);
+export function importData(name, data) {
+  return importProgress.session(['import', 'save'], name, async () => {
+    const before = logbook.dives.length;
+    // The core reports nothing inside the import: the segment is indeterminate (« Lecture des plongées… »).
+    importProgress.phase('import');
+    const result = await OpenDivesCore.importDives(typeof data === 'string' ? { name, data } : { name, path: data.path });
+    importProgress.phase('save');
+    logbook.undoText = result.undo;
+    logbook.redoText = result.redo ?? '';
+    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.sitesVersion++;
+    await persistChanges();
+    return Math.max(0, logbook.dives.length - before);
+  });
 }
 
 /**
@@ -910,6 +920,7 @@ export async function replaceDeviceLogbook(name, data, fileName) {
   if (logbook.email || logbook.odplus || logbook.repository) throw new Error('NOT_REPLACEABLE');
   const ids = logbook.dives.map((d) => d.id);
   // The copy taken first is a file in the app's cache, written by the core: it never goes through the bridge as a string.
+  importProgress.phase('import');
   const backup = ids.length ? (await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', stage: true })).path ?? '' : '';
   await wipeDeviceLogbook();
   try {
@@ -926,6 +937,7 @@ export async function replaceDeviceLogbook(name, data, fileName) {
     throw e;
   }
   if (backup) await OpenDivesCore.discardImport({ path: backup }).catch(() => {});
+  importProgress.phase('save');
   await OpenDivesCore.saveLocal();
   undoCleared();
   logbook.dives = await OpenDivesCore.listLoadedDives();
