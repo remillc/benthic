@@ -6297,3 +6297,11 @@ The floating toolbar at the bottom of a dive's detail has exactly these actions,
 The accessible name of the three-dots button lists what the menu holds (« Plus d’options : faire valider, renuméroter, retirer du voyage, supprimer », without « faire valider » in the free version). Same toolbar on iPhone (with iOS icons and its context menu) and on tablet in the detail pane.
 
 **Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
+
+## [ ] 2026-11-19-314 Site card: keep the map's aspect ratio
+
+Christian asked for this on 19 November 2026 (canvas comment on `sites-fiche-android`, map of « Fiche d’un site »). Work in `main`.
+
+The map in a site's card has a fixed **aspect ratio of 2.1 : 1** (width : height), as drawn on the phone: 358 × 170 dp at 390 dp wide (16 dp side margins, 16 dp corner radius). Keep this ratio at every width: the height follows the width (CSS `aspect-ratio: 2.1 / 1`, or the equivalent in the native layout), never a fixed height that stretches or crops the map differently on tablet, desktop or in landscape. The pin stays centred on the site and the OpenStreetMap credit stays at the bottom right, inside the map. Same rule for the map of a site from the shared map (`sites-commun-fiche-android`, task to come) and of « Nouveau site » / « Modifier le site ».
+
+**Test:** open a site's card on a phone, then on a tablet in portrait and landscape and on desktop: the map is always 2.1 times wider than tall.
