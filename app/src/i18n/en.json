@@ -3137,7 +3137,7 @@
       "Emergency sheet (OpenDives+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile (only with the health-data consent), the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
       "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive validated” with OpenDives+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
       "Site map: in a site’s card, on the edit screen and on the desktop, the map keeps a 2.1 to 1 width to height ratio at every width; the height follows the width.",
-      "Emergency sheet: the certificate shown is your highest by level (instructor, divemaster, rescue, advanced, open water), not the most recent card; with equal levels, the most recent one."
+      "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -6568,7 +6568,7 @@
       "one": "{n} page",
       "other": "{n} pages"
     },
-    "certificate": "Highest certificate",
+    "certificate": "Most recent certificate",
     "cardNumber": "No. {number}",
     "born": "Born: {date}",
     "bornAge": "Born: {date} · {age}",
@@ -6610,7 +6610,7 @@
       "insuranceText": "{name}, with its emergency line",
       "medical": "Medical certificate",
       "medicalText": "Valid until {date}",
-      "certificate": "Highest certificate",
+      "certificate": "Most recent certificate",
       "back": "Back to the emergency sheet"
     }
   }

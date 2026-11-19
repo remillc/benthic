@@ -9,7 +9,7 @@
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
   import { diver, loadProfile, refreshConsent } from '../lib/profile.svelte.js';
-  import { ITEMS, buildSheet, readInclude, writeInclude, highestCertificate } from '../lib/emergency.js';
+  import { ITEMS, buildSheet, readInclude, writeInclude, latestCertificate } from '../lib/emergency.js';
   import { agencyLabel } from '../lib/documents.js';
   import { deviceStore } from '../lib/device-store.js';
   import { formatDate } from '../lib/format.js';
@@ -26,7 +26,7 @@
   const consent = $derived(diver.consent.consent);
   // What each switch would show now, from everything on: the line under its name.
   const all = $derived(buildSheet({ info: diver.info, docs: diver.certs, include: Object.fromEntries(ITEMS.map((k) => [k, true])), consent: true, today: todayIso() }));
-  const cert = $derived(highestCertificate(diver.certs));
+  const cert = $derived(latestCertificate(diver.certs));
 
   /** @param {(typeof ITEMS)[number]} key */
   function line(key) {
