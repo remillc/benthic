@@ -39,3 +39,4 @@ plugins/opendives-core/ios/Resources/
 
 # Desktop: OAuth client ids of the cloud services, kept out of git until they ship (task 173)
 desktop/oauth-clients.local.json
+benthic.code-workspace
