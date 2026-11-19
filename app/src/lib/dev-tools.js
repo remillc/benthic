@@ -20,10 +20,11 @@ export const WELCOME_KEY = 'od.welcomeBeta';
  * @property {() => void} reload the app starts again so that every screen reads the new state
  * @property {() => string} server the server's address
  * @property {() => string} [email] a fresh temporary address
+ * @property {() => Promise<number>} [alphaFolders] how many logbooks of the previous version the device keeps
  */
 
 /**
- * @typedef {{ kind: 'free'|'subscribed', signedIn: boolean, subscribed: boolean, email: string, server: string, temporary: boolean, fromServer: boolean }} DevState
+ * @typedef {{ kind: 'free'|'subscribed', signedIn: boolean, subscribed: boolean, email: string, server: string, temporary: boolean, fromServer: boolean, alphaFolders: number|null }} DevState
  */
 
 /** @param {DevToolsDeps} deps */
@@ -55,7 +56,14 @@ export function createDevTools(deps) {
         // Offline or refused: the remembered flag.
       }
     }
-    return { fromServer, kind: subscribed ? 'subscribed' : 'free', signedIn: info.signedIn, subscribed, email: info.signedIn ? info.email : '', server: server(), temporary: info.signedIn && isTempEmail(info.email) };
+    let alphaFolders = null;
+    try {
+      const n = deps.alphaFolders ? await deps.alphaFolders() : null;
+      alphaFolders = Number.isInteger(n) ? n : null;
+    } catch {
+      // Not listable here (desktop, browser): unknown, the action stays enabled.
+    }
+    return { alphaFolders, fromServer, kind: subscribed ? 'subscribed' : 'free', signedIn: info.signedIn, subscribed, email: info.signedIn ? info.email : '', server: server(), temporary: info.signedIn && isTempEmail(info.email) };
   }
 
   return {
@@ -69,8 +77,15 @@ export function createDevTools(deps) {
     async toFree(how = 'signOut') {
       const s = await state();
       if (how === 'unsubscribe') {
-        if (!s.signedIn) throw new Error('NO_SESSION');
-        await api.unsubscribe(await token());
+        if (s.signedIn) {
+          // Idempotent on the server: an account that is not subscribed stays so.
+          await api.unsubscribe(await token());
+        } else {
+          // No session: a temporary account is signed in (as « Abonné » does) and left not subscribed.
+          const created = await api.signIn(fresh(), 'Plongeur d’essai');
+          if (created.user?.subscribed === true) await api.unsubscribe(created.sessionToken);
+          await session.save(created);
+        }
         store.setItem(SUBSCRIBED_KEY, '0');
       } else {
         if (s.signedIn) await app.signOut({ deleteCopy: false });
@@ -131,7 +146,9 @@ export function createDevTools(deps) {
      * « Importer le carnet de la version précédente »: the one-off import is offered again (its « done » mark is cleared)
      * and the first launch replays; « Importer un carnet » then lists the alpha's local copies, if the device has some.
      */
-    importAlphaLogbook() {
+    async importAlphaLogbook() {
+      const s = await state();
+      if (s.alphaFolders === 0) throw new Error('NO_ALPHA');
       store.removeItem(ALPHA_IMPORT_KEY);
       store.setItem(WELCOME_KEY, 'show');
       reload();
@@ -175,5 +192,6 @@ export async function realDevTools() {
     // A moment later, so that the « done » message is seen before the app starts again.
     reload: () => void setTimeout(() => window.location.reload(), 900),
     server: serverUrl,
+    alphaFolders: async () => (await OpenDivesCore.alphaCacheList()).length,
   });
 }

@@ -71,7 +71,48 @@ test('free, keeping the session: dev-unsubscribe with the token, then reload', a
   assert.deepEqual(t.calls, ['/v1/account/dev-unsubscribe Bearer tok']);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '0');
   assert.deepEqual(t.events, ['reload']);
-  await assert.rejects(setup().tools.toFree('unsubscribe'), /NO_SESSION/);
+});
+
+test('free, keeping the session, from no session: a temporary account is signed in and left not subscribed', async () => {
+  const t = setup();
+  await t.tools.toFree('unsubscribe');
+  assert.deepEqual(t.calls, ['/v1/auth/dev-google']);
+  assert.deepEqual(t.events, ['save', 'reload']);
+  const s = await t.tools.state();
+  assert.deepEqual([s.signedIn, s.kind, s.temporary], [true, 'free', true]);
+});
+
+test('free, keeping the session, from a subscribed session: dev-unsubscribe, still signed in', async () => {
+  const t = setup({ session: { email: 'a@opendives.test', token: 'tok' } });
+  await t.tools.toFree('unsubscribe');
+  const s = await t.tools.state();
+  assert.deepEqual([s.signedIn, s.kind], [true, 'free']);
+});
+
+test('free signed out and subscribed work from every starting state, with or without a session', async () => {
+  for (const make of [() => setup(), () => setup({ session: { email: 'a@opendives.test', token: 't' }, subscribed: '0' }), () => setup({ session: { email: 'a@opendives.test', token: 't' } })]) {
+    const a = make();
+    await a.tools.toFree('signOut');
+    assert.equal((await a.tools.state()).signedIn, false);
+    const b = make();
+    await b.tools.toSubscribed();
+    assert.equal((await b.tools.state()).kind, 'subscribed');
+  }
+});
+
+test('import of the previous version: refused with NO_ALPHA when the device keeps no copy, allowed when unknown', async () => {
+  const mk = (n) => createDevTools({ api: createDevApi({ baseUrl: 'http://127.0.0.1:8080', transport: async () => ({ status: 200, text: '{}' }) }), session: { info: async () => ({ signedIn: false, email: '' }), access: async () => ({ sessionToken: '' }), save: async () => {} }, app: { signOut: async () => {}, startWithoutAccount: async () => {} }, store: { getItem: () => null, setItem() {}, removeItem() {} }, reload() {}, server: () => '', alphaFolders: n === null ? undefined : async () => n });
+  await assert.rejects(mk(0).importAlphaLogbook(), /NO_ALPHA/);
+  await mk(2).importAlphaLogbook();
+  await mk(null).importAlphaLogbook();
+});
+
+test('the pill of the account selector slides, stays still on the first render and with reduced motion', () => {
+  const menu = read('components/DevToolsMenu.svelte');
+  assert.match(menu, /segments-pill/);
+  assert.match(menu, /transition: transform 0\.3s cubic-bezier\(0\.2, 0\.9, 0\.3, 1\.2\)/);
+  assert.match(menu, /prefers-reduced-motion: reduce\) \{\s+\.od-dev-tools-menu--segments-pill-slide/);
+  assert.match(menu, /target = -1/);
 });
 
 test('subscribed without a session: dev-google, dev-subscribe, session kept, reload', async () => {
@@ -115,10 +156,10 @@ test('replay the first launch: only the beta key, then reload', () => {
   assert.deepEqual(t.calls, []);
 });
 
-test('import the previous version’s logbook: the done mark is cleared, the first launch replays, nothing else changes', () => {
+test('import the previous version’s logbook: the done mark is cleared, the first launch replays, nothing else changes', async () => {
   const t = setup({ session: { email: 'a@opendives.test', token: 't' } });
   t.mem.set(ALPHA_IMPORT_KEY, '1');
-  t.tools.importAlphaLogbook();
+  await t.tools.importAlphaLogbook();
   assert.equal(t.mem.has(ALPHA_IMPORT_KEY), false);
   assert.equal(t.mem.get(WELCOME_KEY), 'show');
   assert.deepEqual(t.events, ['reload']);
@@ -193,10 +234,6 @@ test('selector: each segment calls the right action from each starting state, an
       const t = make();
       const enabled = accountSegments(await t.tools.state()).find((x) => x.id === id);
       if (enabled.disabled) continue; // the current state: not tappable
-      if (name === 'none' && id === 'keep') {
-        await assert.rejects(runSegment(t.tools, id), /NO_SESSION/); // nothing to keep: a visible failure, not silence
-        continue;
-      }
       await runSegment(t.tools, id);
       assert.ok(t.events.includes('reload'), name + ' -> ' + id);
       const after = accountSegments(await t.tools.state());

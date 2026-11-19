@@ -17,7 +17,6 @@
   import { flow, go, goDownload, goOffer } from '../lib/first-launch.svelte.js';
   import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
-  import { ServerError } from '../lib/server-api.js';
   import { ACTIVATED, BENEFITS, afterSignIn, summaryRows } from '../lib/odplus.js';
   import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -119,7 +118,7 @@
         goDownload();
       }
     } catch (e) {
-      devError = e instanceof ServerError ? 'Serveur de développement injoignable ou refusé (' + e.code + ').' : String(e);
+      if (devAccounts) devError = (await import('../lib/dev-errors.js')).devErrorText(e, /^fr/i.test(navigator.language) ? 'fr' : 'en').text;
     } finally {
       devBusy = false;
     }
