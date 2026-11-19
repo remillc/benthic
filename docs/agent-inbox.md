@@ -6240,3 +6240,20 @@ Take the SVG paths from the mock-ups.
 **3. Photo in « Nouvelle pièce »** (types that have a photo: not Combinaison, not Bouteille). Remove « Ajouter une photo » and the small model thumbnail next to « Modèle ». Below the type field, show the model's photo large (192 dp tile, as in « Modifier l’ordinateur de plongée ») with the « Changer d’image » button under it. The photo comes from the model photo database once Marque and Modèle are known. Without a photo for the model, show the type icon. « Changer d’image » lets the diver use his own photo.
 
 **Test:** on a phone, open « Nouvelle pièce », pick each type from the menu and check the form changes. Enter a known brand and model and check the photo appears, then change it. Check the five icons on phone, tablet and desktop.
+
+## [ ] 2026-11-19-311 Dates in the format from Réglages everywhere, emergency sheet (#63)
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (about 350 files updated for the dates). The design canvases are being republished with the same files.
+
+**1. Dates follow Réglages › Langue et date everywhere.** Every date the app shows or asks for uses the format chosen in Réglages (default shown in the mock-ups: 2026-11-06). No hard-coded long French dates (« 12 décembre 2026 »), no placeholder « jj mois aaaa ». Date fields show the format as their hint (« aaaa-mm-jj » for the default). A month-only value (hydrostatic test stamp) uses the year and month in the same order (2022-03). Check: logbook list and headers, dive detail, equipment and maintenance, certificates and documents, validation, account, backup, offline maps, PDF export. Trip names typed by the diver (« Canterbury, avril 2014 ») are text and stay as typed. Relative phrases without a year (« le 9 novembre ») can stay until we decide otherwise.
+
+**2. Emergency sheet (#63).** OpenDives+. Stored on the OpenDives server, encrypted, blood type included (already behind the explicit consent in `profil-sante-accord-android`). One emergency contact.
+- « Informations › Modifier » (`profil-infos-modifier-android`): the contact has two fields, « Nom » and « Lien ». « Lien » is a menu with free text (conjoint, parent, enfant, ami…).
+- « Mon profil de plongeur » (`profil-plongeur-android`): a red entry « Fiche d’urgence » under the identity card.
+- « Fiche d’urgence » (`urgence-fiche-android`): full screen, works offline. Red header with the name, birth date and age, blood type in a large tile. Contact with « Appeler Marc » (opens the phone dialer). Diving insurance from « Brevets et documents » (#48) with « Ligne d’urgence ». Medical certificate, opens the document. Header: share and edit (pencil).
+- « Contenu de la fiche » (`urgence-contenu-android`): one switch per item (birth date, blood type, contact, insurance, medical certificate, highest certificate, off by default). The name is always shown.
+- Share (`urgence-partager-android`): as an image or a PDF, with the reminder that the sheet contains the blood type.
+- Not now: lock-screen display (post-launch #108) and several contacts (post-launch #107).
+- Privacy policy: mention that the emergency sheet can be shared by the diver and contains health data.
+
+**Test:** change the date format in Réglages and check dates across the screens above. Fill the emergency contact, open the sheet in airplane mode, call the contact, turn items off, share as PDF.
