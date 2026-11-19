@@ -6,6 +6,7 @@
   // and the privacy policy; the credit to Subsurface at the bottom, which its
   // licence requires. Links that leave the app say so and show the
   // external-link icon.
+  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, Popup, View } from 'framework7-svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { layout, bottomNav } from '../lib/layout.svelte.js';
@@ -159,10 +160,7 @@
       {:else if !layout.rail && !bottomNav()}
         <MenuButton />
       {:else}
-        <Link back iconOnly>
-          <i class="icon icon-back"></i>
-          <span class="od-sr-only">{t('detail.back')}</span>
-        </Link>
+        <BackLink label={t('account.title')} name={t('detail.back')} />
       {/if}
     {/snippet}
   </Navbar>

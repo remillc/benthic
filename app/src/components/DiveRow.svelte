@@ -107,8 +107,14 @@
         {#if pendingText}<span class="od-dive-row--meta od-dive-row--pending">{pendingText}</span>{/if}
       </span>
       <span class="od-dive-row--right" aria-hidden="true">
-        <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} wide />
-        <span class="od-dive-row--figures">{#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{' · '}{/if}{formatDuration(dive.durationSeconds)}</span>
+        {#if theme.ios}
+          <!-- iPhone (docs/mockups/ios-carnet): no thumbnail, the depth over the duration. -->
+          {#if dive.maxDepthMm}<strong class="od-dive-row--ios-depth">{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
+          <span class="od-dive-row--ios-duration">{formatDuration(dive.durationSeconds)}</span>
+        {:else}
+          <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} wide />
+          <span class="od-dive-row--figures">{#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{' · '}{/if}{formatDuration(dive.durationSeconds)}</span>
+        {/if}
       </span>
     </a>
   </li>
@@ -368,6 +374,94 @@
       strong {
         font-weight: 600;
       }
+    }
+
+    /* iPhone (docs/mockups/ios-carnet): inset list rows, a plain day and month, the depth over the duration. */
+    :global(.ios) .od-dive-row--card {
+      padding: 0 16px;
+    }
+
+    :global(.ios) .od-dive-row--surface {
+      min-height: 60px;
+      gap: 12px;
+      padding: 8px 16px;
+    }
+
+    :global(.ios) .od-dive-row--card-first .od-dive-row--surface {
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    :global(.ios) .od-dive-row--card-last .od-dive-row--surface {
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    :global(.ios) .od-dive-row--card:not(.od-dive-row--card-first, .od-dive-row--under-header) .od-dive-row--surface::before {
+      left: 68px;
+    }
+
+    :global(.ios) .od-dive-row--date {
+      width: 40px;
+      min-width: 40px;
+      min-height: 0;
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      color: var(--od-text);
+    }
+
+    :global(.ios) .od-dive-row--day {
+      font-size: 22px;
+      line-height: 26px;
+    }
+
+    :global(.ios) .od-dive-row--month {
+      margin-top: 0;
+      font-size: 11px;
+      line-height: 13px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--od-text-2);
+    }
+
+    :global(.ios) .od-dive-row--site {
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    :global(.ios) .od-dive-row--number {
+      font-weight: 400;
+      color: var(--od-text-2);
+    }
+
+    :global(.ios) .od-dive-row--number + .od-dive-row--time::before {
+      content: '·';
+      margin: 0 6px;
+    }
+
+    :global(.ios) .od-dive-row--meta {
+      gap: 0;
+    }
+
+    :global(.ios) .od-dive-row--right {
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .od-dive-row--ios-depth {
+      font-size: 17px;
+      line-height: 22px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .od-dive-row--ios-duration {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+      font-variant-numeric: tabular-nums;
     }
 
     .od-dive-row--card .checkbox {

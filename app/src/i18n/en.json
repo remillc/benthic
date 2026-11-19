@@ -16,6 +16,10 @@
     "planText": "The planner, prefilled with this dive, will appear here."
   },
   "logbook": {
+    "yearHeader": {
+      "one": "{year} · {n} dive",
+      "other": "{year} · {n} dives"
+    },
     "title": "Logbook",
     "search": "Search the logbook",
     "cancel": "Cancel",
@@ -1914,6 +1918,7 @@
     },
     "openInMaps": "Open in Maps",
     "openInPlans": "Open in Maps",
+    "opensInPlans": "Opens in Maps, or your default maps app",
     "divesHere": "Dives at this site",
     "about": "About the site",
     "description": "Description",
@@ -2854,7 +2859,8 @@
       "Dive computers show their photo (dive detail, download choice, Equipment); it is downloaded once, then kept on the device. With no photo, or offline, the icon stays.",
       "“This ballast was” is now a rail: a pill slides from one choice to the next; touching the chosen choice clears it.",
       "Equipment: “Edit the dive computer” (brand and model with suggestions, or free text; “Change image” keeps your photo in your account, not shared).",
-      "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
+      "iPhone: the logbook has no profile thumbnail (day and month, “No. · time”, depth over duration, year titles with their dive count); Settings with a large title and small-capitals groups; a site's page in grouped cards, with “Open in Maps” explained; About and Open-source libraries with a named back button.",
+      "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
       "Dive computer photos show wherever the model appears: the equipment, kits and maintenance lists, the part sheet, the dive detail, Réglages › Dive computers of the logbook and the dive edit. Your own photo wins over the model’s.",
       "After a download from a dive computer that is not in your equipment (OpenDives+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
       "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards)."

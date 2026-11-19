@@ -275,6 +275,21 @@
       color: var(--od-text-2);
     }
 
+    /* iPhone (docs/mockups/ios-stats-tableau): small-capitals titles. */
+    :global(.ios) .block-title {
+      margin: 22px 32px 6px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    :global(.ios) .od-statistics--toggle-text {
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
     /* The title of a "By …" section: a 48 dp button (mock-up android-stats). */
     .od-statistics--heading {
       margin: 14px 8px 0;

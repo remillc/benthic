@@ -16,6 +16,10 @@
     "planText": "Le planificateur, prérempli avec cette plongée, viendra ici."
   },
   "logbook": {
+    "yearHeader": {
+      "one": "{year} · {n} plongée",
+      "other": "{year} · {n} plongées"
+    },
     "title": "Carnet",
     "search": "Rechercher dans le carnet",
     "cancel": "Annuler",
@@ -1914,6 +1918,7 @@
     },
     "openInMaps": "Ouvrir dans Cartes",
     "openInPlans": "Ouvrir dans Plans",
+    "opensInPlans": "S’ouvre dans l’app Plans, ou celle choisie par défaut",
     "divesHere": "Plongées à ce site",
     "about": "À propos du site",
     "description": "Description",
@@ -2854,7 +2859,8 @@
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
       "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager).",
-      "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
+      "iPhone : Carnet sans miniature de profil (jour et mois, « N° · heure », profondeur au-dessus de la durée, titres d’année avec leur nombre de plongées) ; Réglages en grand titre avec groupes en petites capitales ; fiche d’un site en cartes groupées, avec « Ouvrir dans Plans » expliqué ; À propos et Bibliothèques libres avec le bouton de retour nommé.",
+      "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
       "Les photos des ordinateurs de plongée s’affichent partout où le modèle apparaît : listes d’équipement, de kits et d’entretien, fiche de la pièce, détail de la plongée, Réglages › Ordinateurs du carnet et modification de la plongée. Votre propre photo passe avant celle du modèle.",
       "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (OpenDives+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
       "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait)."
