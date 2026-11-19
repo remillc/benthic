@@ -17,6 +17,7 @@
   import OdPlusChip from './OdPlusChip.svelte';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
   import { isRelease } from '../lib/edition.js';
   import { logbooks } from '../lib/desktop-logbooks.svelte.js';
@@ -25,8 +26,12 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
-  const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
-  const accountName = $derived(logbook.email || odplusAccount.email || t('menu.noAccount'));
+  const email = $derived(logbook.email || odplusAccount.email);
+  // An OpenDives+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
+  const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
+  const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
+  const accountName = $derived(fullName || email || t('menu.noAccount'));
+  const accountEmail = $derived(fullName ? email : '');
   const git = $derived(logbook.mode === 'git');
   const server = $derived(git && logbook.odplus);
 
@@ -40,6 +45,7 @@
   const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
   $effect(() => {
     if (navigation.accountOpen && subscriber) loadInventory().catch((e) => console.error('Reading the equipment', e));
+    if (navigation.accountOpen && subscriber) loadProfile().catch((e) => console.error('Reading the profile', e));
   });
 
   /** @type {HTMLElement|undefined} */
@@ -132,6 +138,7 @@
         <span class="od-desktop-account--avatar" aria-hidden="true">{initial}<span class="od-desktop-account--avatar-plus">+</span></span>
         <span class="od-desktop-account--texts">
           <span class="od-desktop-account--name">{accountName}</span>
+          {#if accountEmail}<span class="od-desktop-account--email">{accountEmail}</span>{/if}
           <span class="od-desktop-account--status">{t('account.sheet.plusDives', { n: logbook.dives.length })}</span>
           <button type="button" class="od-outlined-button od-desktop-account--manage" onclick={manage}>{t('nav.manageAccount')}</button>
         </span>
@@ -387,6 +394,13 @@
     .od-desktop-account--name {
       font-size: 16px;
       font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .od-desktop-account--email {
+      font-size: 13px;
+      color: var(--od-text-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

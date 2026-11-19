@@ -26,11 +26,16 @@
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { createAccountHistory } from '../lib/account-history.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
 
-  const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
-  const accountName = $derived(logbook.email || odplusAccount.email || t('menu.noAccount'));
+  const email = $derived(logbook.email || odplusAccount.email);
+  // An OpenDives+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
+  const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
+  const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
+  const accountName = $derived(fullName || email || t('menu.noAccount'));
+  const accountEmail = $derived(fullName ? email : '');
   const accountLine = $derived(
     t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
   );
@@ -46,6 +51,7 @@
   // The reminders are read when the sheet opens, so that the count is the one of the profile's Entretien row.
   $effect(() => {
     if (navigation.accountOpen && subscriber && !desktopApp) loadInventory().catch((e) => console.error('Reading the equipment', e));
+    if (navigation.accountOpen && subscriber) loadProfile().catch((e) => console.error('Reading the profile', e));
   });
 
   // Android only (not the iPhone's page sheet, not the desktop's card): « #compte » in the history, so that Back closes
@@ -203,6 +209,7 @@
               {accountName}
               {#if subscriber}<span class="od-account-sheet--plus-dot" aria-hidden="true">+</span><span class="od-sr-only">{t('odplus.chipName')}</span>{/if}
             </span>
+            {#if accountEmail}<span class="od-account-sheet--email">{accountEmail}</span>{/if}
             <span class="od-account-sheet--line">{accountLine}</span>
           </span>
         </div>
@@ -356,6 +363,7 @@
         </span>
         <span class="od-account-sheet--texts">
           <span class="od-account-sheet--name">{accountName}</span>
+          {#if accountEmail}<span class="od-account-sheet--email">{accountEmail}</span>{/if}
           <span class="od-account-sheet--line">{accountLine}</span>
         </span>
       </div>
@@ -731,6 +739,15 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .od-account-sheet--email {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-text-2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .od-account-sheet--line {

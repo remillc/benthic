@@ -15,7 +15,7 @@
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
 
-  const name = $derived(logbook.email || t('gear.profile.defaultName'));
+  const name = $derived(diver.info.fullName || logbook.email || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
   const total = $derived(logbook.dives.length);
   const since = $derived(logbook.dives.reduce((year, d) => Math.min(year, Number(d.date.slice(0, 4)) || year), 9999));

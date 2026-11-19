@@ -180,9 +180,9 @@ test('every text of the validation screens exists in French and in English', () 
   for (const m of ['signature', 'qr']) assert.ok(have.has(`method.${m}`));
   for (const e of ['offline', 'tooMany', 'plus', 'failed']) assert.ok(have.has(`qrError.${e}`));
   for (const e of ['expired', 'used', 'own', 'plus', 'unknown', 'tooMany', 'failed']) assert.ok(have.has(`confirmError.${e}`));
-  // The release notes end with this task's line.
-  assert.match(fr.about.releaseNotes.at(-1), /Faire valider/);
-  assert.match(en.about.releaseNotes.at(-1), /Get the dive validated/);
+  // The release notes carry this task's line (later tasks append theirs after it).
+  assert.ok(fr.about.releaseNotes.some((n) => /Faire valider/.test(n)));
+  assert.ok(en.about.releaseNotes.some((n) => /Get the dive validated/.test(n)));
 });
 
 test('the privacy policy says what is kept about a signer, in both languages', () => {

@@ -6262,7 +6262,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** change the date format in Réglages and check dates across the screens above. Fill the emergency contact, open the sheet in airplane mode, call the contact, turn items off, share as PDF.
 
-## [ ] 2026-11-19-312 Diver's full name in the profile, used for validation, emergency sheet, PDF and account sheet
+## [x] 2026-11-19-312 Diver's full name in the profile, used for validation, emergency sheet, PDF and account sheet
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Answers the question from the code session about the missing name (task 309, point 2). OpenDives+ data, stored on the OpenDives server with the rest of the profile, never written into the Subsurface logbook.
 

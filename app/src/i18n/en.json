@@ -3125,7 +3125,8 @@
       "OpenDives+ offer: the price is a little smaller, and the « Service reminders » tile mentions the regulator, the cylinder and the vest.",
       "Edit dive: the suggestion lists of Guide, Buddies and Tags (and of the suit) now open above the following cards, inside the screen, and above the field when there is no room below.",
       "Logbook: on Android, the floating toolbar of a selection sits above the bottom navigation bar (and above the sample logbook banner) instead of under it.",
-      "Dive validation (OpenDives+): “Get the dive validated” in the dive menu, and “Get the dives validated” in the selection menu (one validation for several dives). The buddy or instructor signs with a finger on the screen, or scans a QR code with OpenDives+ (the code expires after 10 minutes; without a network, the dive shows “Validation pending” until the confirmation arrives). The dive detail has a “Validations” section (name, role, method, date, signature) and says “Changed after the validation” when the dive changed; a validated dive carries a small tick in the logbook. Validations appear on the PDF sheet and in the logbook’s PDF export, and can be removed one by one."
+      "Dive validation (OpenDives+): “Get the dive validated” in the dive menu, and “Get the dives validated” in the selection menu (one validation for several dives). The buddy or instructor signs with a finger on the screen, or scans a QR code with OpenDives+ (the code expires after 10 minutes; without a network, the dive shows “Validation pending” until the confirmation arrives). The dive detail has a “Validations” section (name, role, method, date, signature) and says “Changed after the validation” when the dive changed; a validated dive carries a small tick in the logbook. Validations appear on the PDF sheet and in the logbook’s PDF export, and can be removed one by one.",
+      "My diver profile: an optional “Full name” field, first in “You” of Information and its edit screen. It shows at the top of “My diver profile” (the e-mail without it) and, with an OpenDives+ account, on the first line of the account sheet, with the e-mail under it in smaller grey text. When you confirm another diver’s dive, “Your name” comes from the profile (a correction applies to that confirmation only), the sentence under it gives your role and your instructor certification number, and “I confirm” stays off while the name is empty; if the profile has no name, the name you type is saved there. The name is added at the top of the PDF sheets of a dive and of the logbook (switch “My name in the header” when exporting a PDF; “Anonymize” removes it too)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3956,6 +3957,8 @@
     },
     "anonymize": "Anonymize",
     "anonymizeText": "Removes people’s names, notes and GPS positions",
+    "showName": "My name in the header",
+    "showNameText": "PDF: “{name}” at the top of each page",
     "action": "Export",
     "failed": "The export could not be done."
   },
@@ -6329,6 +6332,9 @@
       "edit": "Edit information",
       "you": "You",
       "dob": "Date of birth",
+      "fullName": "Full name",
+      "fullNameLabel": "Full name (optional)",
+      "fullNameHint": "On your emergency sheet, your PDFs and when you confirm another diver’s dive.",
       "emergency": "Emergency contact",
       "nameRelation": "Name and relationship",
       "phone": "Phone",
@@ -6457,6 +6463,11 @@
     "sign": "Validate",
     "name": "Name",
     "nameRequired": "Enter the signer’s name.",
+    "yourName": "Your name",
+    "yourNameHint": "Taken from your profile. A correction here applies to this confirmation only.",
+    "confirmAsInstructor": "You confirm as an instructor {number}, from your instructor certification.",
+    "confirmAsBuddy": "You confirm as a dive buddy.",
+    "savedToProfile": "Saved in your profile",
     "role": "Role",
     "roles": {
       "buddy": "Buddy",

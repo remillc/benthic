@@ -5,7 +5,9 @@
   // then « Exporter… » opens the system's save dialog with a proposed name. Choice rows, no
   // radio buttons; the last format is remembered on this computer.
   import Md3Dialog from './Md3Dialog.svelte';
+  import { onMount } from 'svelte';
   import ChoiceRow from './ChoiceRow.svelte';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { exportFile } from '../lib/share.js';
   import { deviceStore } from '../lib/device-store.js';
   import { defaultScope, exportFileName } from '../lib/desktop-export.js';
@@ -34,6 +36,11 @@
   let scope = $state(whole ? 'all' : defaultScope(selected.length, !!filtered));
   let format = $state(/** @type {(typeof FORMATS)[number]} */ (FORMATS.find((f) => f === deviceStore.getItem(FORMAT_KEY)) ?? 'ssrf'));
   let anonymize = $state(false);
+  let showName = $state(true);
+  const fullName = $derived(diver.info.fullName);
+  onMount(() => {
+    if (!diver.ready) loadProfile().catch((e) => console.error('Reading the profile', e));
+  });
   let busy = $state(false);
 
   const ids = $derived(scope === 'selection' ? selected.map((d) => d.id) : scope === 'filtered' ? (filtered ?? []) : all);
@@ -51,7 +58,7 @@
       const day = localDay();
       const entry = windowLogbook();
       const name = exportFileName(/** @type {any} */ (scope), numbers, format, day, { dives: t('desktop.export.fileDives'), logbook: t('desktop.export.fileLogbook') }, entry ? displayName(entry, t) : '');
-      const { uri } = await exportFile(ids, format, anonymize, prefs, name);
+      const { uri } = await exportFile(ids, format, anonymize, prefs, name, showName);
       const result = await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
       onclose();
       if (result?.saved) showSnackbar(t('desktop.export.saved', { n: ids.length }));
@@ -100,6 +107,16 @@
     </span>
     <input type="checkbox" role="switch" bind:checked={anonymize} />
   </label>
+
+  {#if format === 'pdf' && fullName}
+    <label class="od-desktop-export--switch">
+      <span>
+        <span class="od-desktop-export--label">{t('export.showName')}</span>
+        <span class="od-desktop-export--line">{t('export.showNameText', { name: fullName })}</span>
+      </span>
+      <input type="checkbox" role="switch" bind:checked={showName} disabled={anonymize} />
+    </label>
+  {/if}
 
   {#snippet actions()}
     <button type="button" class="button" onclick={onclose}>{t('dialog.cancel')}</button>

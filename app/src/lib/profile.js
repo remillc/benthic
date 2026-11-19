@@ -24,13 +24,14 @@ export const UNKNOWN_BLOOD = 'unknown';
 
 /**
  * @typedef {Object} DiverInfo
+ * @property {string} fullName the diver's full name, '' when none (task 2026-11-19-312; sealed block, OpenDives+ data)
  * @property {string} dateOfBirth YYYY-MM-DD, '' when none
  * @property {{ name: string, relation: string, phone: { country: string, number: string } }} emergency
  * @property {string} bloodGroup '' when none, `UNKNOWN_BLOOD`, or one of BLOOD_GROUPS
  */
 
 /** @returns {DiverInfo} */
-export const emptyInfo = () => ({ dateOfBirth: '', emergency: { name: '', relation: '', phone: { country: 'CA', number: '' } }, bloodGroup: '' });
+export const emptyInfo = () => ({ fullName: '', dateOfBirth: '', emergency: { name: '', relation: '', phone: { country: 'CA', number: '' } }, bloodGroup: '' });
 
 /** Thrown when the blood group is saved while the consent is off. */
 export class ConsentRequiredError extends Error {
@@ -39,6 +40,9 @@ export class ConsentRequiredError extends Error {
     this.name = 'ConsentRequiredError';
   }
 }
+
+/** The full name as it is kept: one line, single spaces, at most 80 characters. @param {string} name */
+export const cleanFullName = (name) => name.trim().replace(/\s+/g, ' ').slice(0, 80);
 
 /** @param {string} d YYYY-MM-DD */
 const realDate = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && new Date(`${d}T00:00:00Z`).toISOString().startsWith(d);
@@ -304,6 +308,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const consent = (await readConsent()).consent;
       const info = emptyInfo();
       info.dateOfBirth = typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
+      info.fullName = typeof sealed.fullName === 'string' ? sealed.fullName : '';
       const e = sealed.emergencyContact;
       if (e) info.emergency = { name: e.name ?? '', relation: e.relation ?? '', phone: { country: e.phone?.country ?? 'CA', number: e.phone?.number ?? '' } };
       info.bloodGroup = consent && typeof sealed.bloodGroup === 'string' ? sealed.bloodGroup : '';
@@ -328,6 +333,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       };
       if (info.bloodGroup) next.bloodGroup = info.bloodGroup;
       else delete next.bloodGroup;
+      const fullName = cleanFullName(info.fullName ?? '');
+      if (fullName) next.fullName = fullName;
+      else delete next.fullName;
       const restOfFile = { ...file };
       delete restOfFile.dateOfBirth;
       const dob = info.dateOfBirth.trim();
