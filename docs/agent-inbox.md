@@ -5855,3 +5855,18 @@ Christian approved this on 19 November 2026. Work in `main`. Follows task 290 (d
 In the subscriber account sheet on every platform, the order of the two entries is now: **« Mon profil de plongeur »** first, then **« Sauvegarde et restauration »** (task 290 had them the other way round). Mock-ups in `docs/mockups/`: `nav-option-barre-compte-android`, `nav-compte-profil-android`, `android-tablette-profil-compte-paysage`, `bureau-profil-compte`, `ios-compte-abonne`.
 
 **Test:** open the account sheet as a subscriber on each platform: « Mon profil de plongeur » is above « Sauvegarde et restauration ».
+
+## [ ] 2026-11-19-292 Desktop account sheet: new layout
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-up: `docs/mockups/bureau-profil-compte.dc.html` (the popover opened from the account initial at the bottom of the navigation rail). Follows tasks 290 and 291 (do not edit them).
+
+From top to bottom, on the sheet background (#F5F4F0), with white rounded groups:
+1. **OpenDives logo** centred at the top (wave logo, « OpenDives », the « + » chip), as on the phone sheet. No close button: the popover closes on a click outside or Esc.
+2. **Account group**:
+   - 48 px avatar with the « + » chip at its bottom-right corner (subscribers), e-mail, « OpenDives+ · 312 plongées »;
+   - « Gérer le compte » outlined button at its natural width, **aligned with the text column** (not under the avatar);
+   - a thin divider, then the sync line: green check, « Synchronisé il y a 2 min », and « Synchroniser » (tonal button) on the right.
+3. **Group**: « Mon profil de plongeur » (red maintenance subtitle and badge), then « Sauvegarde et restauration ». Each entry has its icon in a small blue tile (36 px, #E6EEF7). No highlighted background on « Mon profil ».
+4. **Group**: « Réglages », « À propos ».
+
+**Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
