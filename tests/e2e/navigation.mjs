@@ -420,6 +420,33 @@ async function phoneFlows() {
   let tab = await openTab(390, 844, true);
   await settled(tab, 'logbook at start', { route: '/' });
 
+  console.log(' selection toolbar above the bottom bar');
+  for (const demo of [false, true]) {
+    await tab.run((on) => document.documentElement.classList.toggle('od-demo-bottom-on', on), demo);
+    const row = await tab.run(() => {
+      const r = document.querySelector('.page-current a.od-dive-row--link')?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
+    });
+    if (!row) throw new Error('no dive row');
+    await tab.touch('touchStart', row.x, row.y);
+    await sleep(900);
+    await tab.touch('touchEnd', row.x, row.y);
+    await sleep(900);
+    if (process.env.OD_SHOTS) await shot(tab, `selection-toolbar${demo ? '-demo' : ''}`);
+    const g = await tab.run(() => {
+      const t = document.querySelector('.od-floating-toolbar')?.getBoundingClientRect();
+      const b = document.querySelector('.od-navigation-bar')?.getBoundingClientRect();
+      return { toolbar: t ? t.bottom : null, bar: b ? b.top : null };
+    });
+    checks++;
+    if (g.toolbar === null || g.bar === null || g.toolbar > g.bar) failures.push({ label: `selection toolbar (banner ${demo})`, problems: [`toolbar bottom ${g.toolbar}, bottom bar top ${g.bar}`] });
+    else console.log(`  ok   toolbar bottom ${Math.round(g.toolbar)} <= bar top ${Math.round(g.bar)} (banner ${demo})`);
+    await hardwareBack(tab);
+    await sleep(500);
+  }
+  await tab.run(() => document.documentElement.classList.remove('od-demo-bottom-on'));
+  await settled(tab, 'after the selection', { route: '/' });
+
   console.log(' logbook > dive > back');
   await tapDive(tab);
   await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });

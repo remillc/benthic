@@ -2896,7 +2896,8 @@
       "Account: choosing “Subscriber” in the development menu (or any OpenDives+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”.",
       "Download: a lamp or a scale whose name starts with “S1” (“S19 A69C LE”) is no longer offered as an Oceans S1. Each device in the nearby list has a menu with “This is not a dive computer”, which hides it for good (Undo in the message); Settings › Download lists the hidden devices with “Show again”.",
       "Android: the Back key works while a message such as “Dive saved / Undo” is on screen; it was ignored until the message disappeared.",
-      "Edit dive: the suggestion lists of Guide, Buddies and Tags (and of the suit) now open above the following cards, inside the screen, and above the field when there is no room below."
+      "Edit dive: the suggestion lists of Guide, Buddies and Tags (and of the suit) now open above the following cards, inside the screen, and above the field when there is no room below.",
+      "Logbook: on Android, the floating toolbar of a selection sits above the bottom navigation bar (and above the sample logbook banner) instead of under it."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
