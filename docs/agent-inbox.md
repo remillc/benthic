@@ -6222,3 +6222,21 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **4. OpenDives+ offer.** The price is smaller: 32 dp / 40 dp line height (was 40 / 48), on the offer and « Voir tout ce qui est inclus », Android, iPhone and tablet. The tile « Rappels d’entretien » now reads « Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance. » (no battery, task 308).
 
 **Test:** create a piece of each example type and check its fields. Validate a dive by signature, then by QR code with the second phone offline, then online. Add an insurance and a medical certificate, check the expiry badges and notifications, open a page in full screen and share it as PDF.
+
+## [ ] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. This follows task 309. The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
+
+**1. « Type de pièce » becomes a menu, phone only.** On Android and iPhone phones, the grid of 16 type tiles in « Nouvelle pièce » is replaced by one filled field « Type de pièce » that opens a menu (`profil-piece-nouvelle-android`, `-ordinateur-android`, `-bouteille-android`, `-combinaison-android`). The field shows the icon and name of the chosen type and a chevron. The open menu (`profil-piece-nouvelle-type-menu-android`) lists the 16 types with their icons, and the chosen one is highlighted with a check. On iPhone, use the native pull-down menu. Tablet and desktop keep the grid of icon tiles.
+
+**2. Five new icons**, everywhere they appear (type grid and menu, Équipement list, kits, add equipment to a dive, tablet and desktop):
+- Ceinture de lest: a horizontal band with some height, one weight near each end, belt visible past each weight.
+- Scooter: body, handle on top, propeller in its shroud at the back.
+- Couteau: a line cutter (V notch, blade, lanyard hole). The label stays « Couteau ».
+- Palmes: two fins, each with its foot pocket and a rib.
+- Lampe: body and head, with a pistol grip underneath.
+Take the SVG paths from the mock-ups.
+
+**3. Photo in « Nouvelle pièce »** (types that have a photo: not Combinaison, not Bouteille). Remove « Ajouter une photo » and the small model thumbnail next to « Modèle ». Below the type field, show the model's photo large (192 dp tile, as in « Modifier l’ordinateur de plongée ») with the « Changer d’image » button under it. The photo comes from the model photo database once Marque and Modèle are known. Without a photo for the model, show the type icon. « Changer d’image » lets the diver use his own photo.
+
+**Test:** on a phone, open « Nouvelle pièce », pick each type from the menu and check the form changes. Enter a known brand and model and check the photo appears, then change it. Check the five icons on phone, tablet and desktop.
