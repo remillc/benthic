@@ -31,6 +31,7 @@
    *   onselect?: (uuid: number) => void,
    *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   height?: string,
+   *   ratio?: number,
    *   matching?: Set<number>|null,
    *   onlocate?: () => void,
    *   overlay?: import('svelte').Snippet<[boolean]>,
@@ -81,6 +82,7 @@
     onselect,
     onview,
     height = '240px',
+    ratio = 0,
     matching = null,
     onlocate,
     overlay,
@@ -592,7 +594,8 @@
   class:od-site-map--desaturated={desaturated}
   class:od-site-map--pins-hidden={pinsHidden}
   class:od-site-map--names-on={namesOn}
-  style:height={full ? '100%' : height}
+  style:height={full ? '100%' : ratio ? 'auto' : height}
+  style:aspect-ratio={!full && ratio ? `${ratio} / 1` : null}
   role="region"
   aria-label={label}
   bind:this={root}

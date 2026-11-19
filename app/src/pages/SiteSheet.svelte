@@ -168,9 +168,9 @@
     </header>
 
     {#if site.hasLocation}
-      <!-- Inside the margins, 16 dp corners, 170 dp high (task 2026-11-07-24). -->
+      <!-- Inside the margins, 16 dp corners, aspect ratio 2.1 : 1 (tasks 2026-11-07-24, 2026-11-19-314). -->
       <div class="od-site-sheet--map">
-        <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} height="170px" />
+        <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} ratio={2.1} />
       </div>
       {#if ios}
         <!-- iPhone (docs/mockups/ios-sites-fiche): the coordinates and « Ouvrir dans Plans » in one grouped card. -->

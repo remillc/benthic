@@ -254,7 +254,7 @@
 
   <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
   <div class="od-site-edit--map-card">
-    <SiteMap pin={position} editable onmove={setPosition} height="190px">
+    <SiteMap pin={position} editable onmove={setPosition} ratio={2.1}>
       {#snippet overlay(/** @type {boolean} */ full)}
         <span class="chip od-site-edit--chip" class:od-site-edit--full={full}>{t('sites.movePin')}</span>
         {#if full && coordsText}<span class="od-site-edit--coords od-value">{coordsText}</span>{/if}

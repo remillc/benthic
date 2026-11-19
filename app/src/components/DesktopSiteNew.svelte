@@ -128,7 +128,7 @@
   <h2 class="od-site-form--title">{t('sites.newSite')}</h2>
   <div class="od-site-form--body">
     <div class="od-site-form--left">
-      <DesktopSitePosMap {position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick height={260} onmove={setPosition} />
+      <DesktopSitePosMap {position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick onmove={setPosition} />
       <p class="od-site-form--explain">{t('desktopSites.placeExplain')}</p>
     </div>
     <div class="od-site-form--right">

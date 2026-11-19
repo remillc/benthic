@@ -18,14 +18,13 @@
    *   others?: { uuid: number, name: string, latUdeg: number, lonUdeg: number }[],
    *   hint?: string,
    *   placeOnClick?: boolean,
-   *   height?: number,
    *   onmove: (pos: { latUdeg: number, lonUdeg: number }) => void,
    * }}
    * position: where the crosshair is (null: not placed yet; the map frames the other sites).
    * previous: the position before an uncommitted change, drawn as a dashed crosshair.
    * onmove: the diver moved the crosshair or the map (not a move made by the code).
    */
-  let { position, previous = null, others = [], hint = '', placeOnClick = false, height = 220, onmove } = $props();
+  let { position, previous = null, others = [], hint = '', placeOnClick = false, onmove } = $props();
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
@@ -151,7 +150,7 @@
   });
 </script>
 
-<div class="od-desktop-pos-map" style:height="{height}px">
+<div class="od-desktop-pos-map">
   <div class="od-desktop-pos-map--canvas" bind:this={container}></div>
   {#if hint}<p class="od-desktop-pos-map--hint">{hint}</p>{/if}
   {#if position || placeOnClick}
@@ -177,6 +176,7 @@
     .od-desktop-pos-map {
       position: relative;
       width: 100%;
+      aspect-ratio: 2.1 / 1;
       overflow: hidden;
       border-radius: 16px;
       background: var(--od-surface-2);

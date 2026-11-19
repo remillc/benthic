@@ -6298,7 +6298,7 @@ The accessible name of the three-dots button lists what the menu holds (« Plus 
 
 **Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
 
-## [ ] 2026-11-19-314 Site card: keep the map's aspect ratio
+## [x] 2026-11-19-314 Site card: keep the map's aspect ratio
 
 Christian asked for this on 19 November 2026 (canvas comment on `sites-fiche-android`, map of « Fiche d’un site »). Work in `main`.
 
