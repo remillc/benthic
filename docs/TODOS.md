@@ -49,3 +49,4 @@ Next number: 97
 - #98 [design] ajuster les rayons lumineux de l'en-tête.
 - #100 [design] dans équipement, distinguer liftbag de marqueur de surface.
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide.
+- #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
