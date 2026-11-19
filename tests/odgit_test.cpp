@@ -8,9 +8,14 @@
 //        odgit-test [--http] push <dir> <branch> <user> <token>
 //        odgit-test status <dir> [path...]      odgit-test unpushed <dir> <branch>
 //        odgit-test head <dir> <branch>         odgit-test list <dir> [prefix]
+//        odgit-test hlog <dir> <branch> <skip> <limit> <changes 0|1>    odgit-test hstats <dir> <commit>...
+//        odgit-test hdiff <dir> <from|-> <to>   odgit-test hread <dir> <commit> <path>
+//        odgit-test hfiles <dir> <commit> [prefix]
+//        odgit-test hrestore <dir> <branch> <commit> <message> [path...]   odgit-test hborrow <dir> <commit> <into>
 #include "core/libopendives/odgit.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -55,6 +60,26 @@ int main(int argc, char **argv)
 		rc = odgit_head(arg(0), arg(1), json, error);
 	else if (cmd == "list")
 		rc = odgit_list_files(arg(0), arg(1), json, error);
+	else if (cmd == "hlog")
+		rc = odgit_history_log(arg(0), arg(1), atoi(arg(2).c_str()), atoi(arg(3).c_str()), arg(4) == "1", json, error);
+	else if (cmd == "hstats") {
+		std::vector<std::string> commits;
+		for (int i = 1; a + i < argc; i++)
+			commits.push_back(argv[a + i]);
+		rc = odgit_history_stats(arg(0), commits, json, error);
+	} else if (cmd == "hdiff")
+		rc = odgit_history_diff(arg(0), arg(1) == "-" ? "" : arg(1), arg(2), json, error);
+	else if (cmd == "hread")
+		rc = odgit_history_read(arg(0), arg(1), arg(2), json, error);
+	else if (cmd == "hfiles")
+		rc = odgit_history_files(arg(0), arg(1), arg(2), json, error);
+	else if (cmd == "hrestore") {
+		std::vector<std::string> paths;
+		for (int i = 4; a + i < argc; i++)
+			paths.push_back(argv[a + i]);
+		rc = odgit_history_restore(arg(0), arg(1), arg(2), paths, arg(3), OdgitAuthor(), json, error);
+	} else if (cmd == "hborrow")
+		rc = odgit_history_borrow(arg(0), arg(1), arg(2), json, error);
 	if (rc) {
 		printf("ERROR %s\n", error.c_str());
 		return 1;

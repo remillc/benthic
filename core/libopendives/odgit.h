@@ -96,6 +96,44 @@ int odgit_head(const std::string &dir, const std::string &branch, std::string &j
 // The files of the last commit's index that start with `prefix` (all when empty). {"files":[…]}. No network.
 int odgit_list_files(const std::string &dir, const std::string &prefix, std::string &json, std::string &error);
 
+// --- History (task 2026-11-19-290): read the commits of a branch, restore an older state as a NEW commit. ---
+// Nothing here rewrites history. They work on a working copy or on a bare repository (the core's own cache).
+
+// The commits of `branch` (the local branch, else the server's as of the last fetch), newest first by time, `limit`
+// (1..1000) after `skip`. {"commits":[{"id","time","author","summary","message","parents":[…],"changes":[{"path",
+// "state"}] (with_changes: the difference with the first parent)}], "more": bool}.
+int odgit_history_log(const std::string &dir, const std::string &branch, int skip, int limit, bool with_changes,
+		      std::string &json, std::string &error);
+
+// Counts of Subsurface's git format at each commit: {"stats":[{"id","dives","sites","pieces":n|null}]}. A dive is a
+// "Dive" or "Dive-<n>" file; a site a "Site-*" file of 01-Divesites; the pieces are the files of gear/ (OpenDives' branch).
+int odgit_history_stats(const std::string &dir, const std::vector<std::string> &commits, std::string &json,
+			std::string &error);
+
+// {"changes":[{"path","state":"new"|"modified"|"deleted"}]} from commit `from` ("" = nothing) to commit `to`.
+int odgit_history_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
+		       std::string &error);
+
+// A file as of a commit: {"text": string|null} (null: absent; also {"binary":true} for a file that is not UTF-8 text).
+int odgit_history_read(const std::string &dir, const std::string &commit, const std::string &path, std::string &json,
+		       std::string &error);
+
+// The files of a commit that start with `prefix`: {"files":[…]}.
+int odgit_history_files(const std::string &dir, const std::string &commit, const std::string &prefix, std::string &json,
+			std::string &error);
+
+// Adds a commit on top of the local `branch` whose content is that of `commit`: all of it when `paths` is empty, else
+// only those paths (a folder or a file), the rest staying as the branch has it now (a path absent from `commit` is
+// removed). A working copy follows. {"commit": sha|null} (null: nothing would change). UNKNOWN_COMMIT, BAD_PATH.
+int odgit_history_restore(const std::string &dir, const std::string &branch, const std::string &commit,
+			  const std::vector<std::string> &paths, const std::string &message, const OdgitAuthor &author,
+			  std::string &json, std::string &error);
+
+// Makes the bare repository `into` (replaced if it exists) that reads the objects of `dir` and has the commit as its
+// branch "v": a version that a reader of "<folder>[v]" can open, with nothing copied. {"branch":"v"}.
+int odgit_history_borrow(const std::string &dir, const std::string &commit, const std::string &into, std::string &json,
+			 std::string &error);
+
 // Removes the working copy's folder and everything in it. No error when it is already gone.
 int odgit_remove(const std::string &dir, std::string &error);
 

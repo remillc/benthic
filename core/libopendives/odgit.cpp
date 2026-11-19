@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <memory>
@@ -1020,6 +1021,602 @@ int odgit_remove(const std::string &dir, std::string &error)
 		error = "GIT_ERROR: " + ec.message();
 		return -1;
 	}
+	return 0;
+}
+
+// --- History (task 2026-11-19-290) -------------------------------------------------------------------------------
+// Reading the commits of a branch and the files of any commit, and restoring an older state as a NEW commit. Nothing
+// here rewrites or removes a commit: a restore only adds one on top of the branch. They work on any repository
+// folder (a working copy or a bare cache), with libgit2 only.
+
+namespace {
+
+bool valid_utf8(const char *s, size_t n)
+{
+	size_t i = 0;
+	while (i < n) {
+		unsigned char c = s[i];
+		size_t len = c < 0x80 ? 1 : (c >> 5) == 6 ? 2 : (c >> 4) == 14 ? 3 : (c >> 3) == 30 ? 4 : 0;
+		if (!len || i + len > n)
+			return false;
+		for (size_t k = 1; k < len; k++)
+			if ((static_cast<unsigned char>(s[i + k]) & 0xC0) != 0x80)
+				return false;
+		i += len;
+	}
+	return true;
+}
+
+// The branch's head: the local branch, else the one the server had at the last fetch.
+bool branch_head(git_repository *repo, const std::string &branch, git_oid &oid)
+{
+	return lookup_oid(repo, ref_of(branch), oid) || lookup_oid(repo, remote_ref_of(branch), oid);
+}
+
+bool commit_by_name(git_repository *repo, const std::string &name, Commit &out)
+{
+	git_oid oid;
+	if (name.size() != 40 || git_oid_fromstr(&oid, name.c_str()))
+		return false;
+	git_commit *raw = nullptr;
+	if (git_commit_lookup(&raw, repo, &oid))
+		return false;
+	out.reset(raw);
+	return true;
+}
+
+// The tree of a commit, or the empty tree for "" (nothing).
+int tree_of(git_repository *repo, const std::string &name, Tree &tree, std::string &error)
+{
+	if (name.empty()) {
+		git_treebuilder *builder = nullptr;
+		git_oid oid;
+		if (git_treebuilder_new(&builder, repo, nullptr) || git_treebuilder_write(&oid, builder)) {
+			git_treebuilder_free(builder);
+			error = local_error(-1);
+			return -1;
+		}
+		git_treebuilder_free(builder);
+		git_tree *raw = nullptr;
+		if (git_tree_lookup(&raw, repo, &oid)) {
+			error = local_error(-1);
+			return -1;
+		}
+		tree.reset(raw);
+		return 0;
+	}
+	Commit commit;
+	if (!commit_by_name(repo, name, commit)) {
+		error = "UNKNOWN_COMMIT";
+		return -1;
+	}
+	git_tree *raw = nullptr;
+	if (git_commit_tree(&raw, commit.get())) {
+		error = local_error(-1);
+		return -1;
+	}
+	tree.reset(raw);
+	return 0;
+}
+
+struct DiffOut {
+	std::string json;
+	bool first = true;
+};
+
+int diff_file_cb(const git_diff_delta *delta, float, void *payload)
+{
+	DiffOut *out = static_cast<DiffOut *>(payload);
+	const char *state;
+	const char *path = delta->new_file.path;
+	switch (delta->status) {
+	case GIT_DELTA_ADDED: state = "new"; break;
+	case GIT_DELTA_DELETED: state = "deleted"; path = delta->old_file.path; break;
+	case GIT_DELTA_MODIFIED:
+	case GIT_DELTA_TYPECHANGE: state = "modified"; break;
+	default: return 0;
+	}
+	if (!out->first)
+		out->json += ',';
+	out->first = false;
+	out->json += "{\"path\":";
+	append_json_string(out->json, path);
+	out->json += std::string(",\"state\":\"") + state + "\"}";
+	return 0;
+}
+
+// `{"path","state"}` items for the difference between two trees, appended without brackets.
+int append_changes(git_repository *repo, git_tree *from, git_tree *to, std::string &json, std::string &error)
+{
+	git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
+	git_diff *raw = nullptr;
+	int rc = git_diff_tree_to_tree(&raw, repo, from, to, &opts);
+	if (rc) {
+		error = local_error(rc);
+		return -1;
+	}
+	std::unique_ptr<git_diff, Free<git_diff, git_diff_free>> diff(raw);
+	DiffOut out;
+	rc = git_diff_foreach(diff.get(), diff_file_cb, nullptr, nullptr, nullptr, &out);
+	if (rc) {
+		error = local_error(rc);
+		return -1;
+	}
+	json += out.json;
+	return 0;
+}
+
+// "Dive" or "Dive-<number>": the file of a dive in Subsurface's git format (save-git.cpp, save_one_dive).
+bool is_dive_file(const char *name)
+{
+	if (strncmp(name, "Dive", 4) != 0)
+		return false;
+	if (!name[4])
+		return true;
+	if (name[4] != '-' || !name[5])
+		return false;
+	for (const char *p = name + 5; *p; p++)
+		if (*p < '0' || *p > '9')
+			return false;
+	return true;
+}
+
+struct Counts {
+	long dives = 0, sites = 0, pieces = -1;
+};
+
+void count_tree(git_repository *repo, git_tree *tree, bool in_sites, Counts &counts, int depth)
+{
+	size_t n = git_tree_entrycount(tree);
+	for (size_t i = 0; i < n; i++) {
+		const git_tree_entry *e = git_tree_entry_byindex(tree, i);
+		const char *name = git_tree_entry_name(e);
+		if (git_tree_entry_type(e) == GIT_OBJECT_BLOB) {
+			if (in_sites) {
+				if (strncmp(name, "Site-", 5) == 0)
+					counts.sites++;
+			} else if (is_dive_file(name)) {
+				counts.dives++;
+			}
+		} else if (git_tree_entry_type(e) == GIT_OBJECT_TREE && depth < 8 && strcmp(name, "Pictures") != 0) {
+			git_tree *sub = nullptr;
+			if (git_tree_lookup(&sub, repo, git_tree_entry_id(e)))
+				continue;
+			Tree hold(sub);
+			count_tree(repo, sub, in_sites || (depth == 0 && strcmp(name, "01-Divesites") == 0), counts, depth + 1);
+		}
+	}
+}
+
+} // namespace
+
+int odgit_history_log(const std::string &dir, const std::string &branch, int skip, int limit, bool with_changes,
+		      std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	if (!valid_branch(branch) || skip < 0 || limit < 1 || limit > 1000) {
+		error = "GIT_ERROR: bad arguments";
+		return -1;
+	}
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	git_oid head;
+	if (!branch_head(repo.get(), branch, head)) {
+		json = "{\"commits\":[],\"more\":false}";
+		return 0;
+	}
+	git_revwalk *rawwalk = nullptr;
+	if (git_revwalk_new(&rawwalk, repo.get()) || git_revwalk_push(rawwalk, &head)) {
+		git_revwalk_free(rawwalk);
+		error = local_error(-1);
+		return -1;
+	}
+	std::unique_ptr<git_revwalk, Free<git_revwalk, git_revwalk_free>> walk(rawwalk);
+	git_revwalk_sorting(walk.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
+	json = "{\"commits\":[";
+	git_oid oid;
+	int index = 0, written = 0;
+	bool more = false;
+	while (git_revwalk_next(&oid, walk.get()) == 0) {
+		if (index++ < skip)
+			continue;
+		if (written == limit) {
+			more = true;
+			break;
+		}
+		git_commit *raw = nullptr;
+		if (git_commit_lookup(&raw, repo.get(), &oid)) {
+			error = local_error(-1);
+			return -1;
+		}
+		Commit commit(raw);
+		if (written++)
+			json += ',';
+		json += "{\"id\":";
+		append_oid(json, &oid);
+		json += ",\"time\":" + std::to_string(static_cast<long long>(git_commit_time(commit.get())));
+		const git_signature *author = git_commit_author(commit.get());
+		json += ",\"author\":";
+		append_json_string(json, author && author->name ? author->name : "");
+		const char *summary = git_commit_summary(commit.get());
+		json += ",\"summary\":";
+		append_json_string(json, summary && valid_utf8(summary, strlen(summary)) ? summary : "");
+		json += ",\"message\":";
+		const char *message = git_commit_message(commit.get());
+		append_json_string(json, message && valid_utf8(message, strlen(message)) ? message : "");
+		json += ",\"parents\":[";
+		for (unsigned i = 0; i < git_commit_parentcount(commit.get()); i++) {
+			if (i)
+				json += ',';
+			append_oid(json, git_commit_parent_id(commit.get(), i));
+		}
+		json += ']';
+		if (with_changes) {
+			Tree to, from;
+			git_tree *t = nullptr;
+			if (git_commit_tree(&t, commit.get())) {
+				error = local_error(-1);
+				return -1;
+			}
+			to.reset(t);
+			if (git_commit_parentcount(commit.get()) > 0) {
+				git_commit *p = nullptr;
+				if (git_commit_parent(&p, commit.get(), 0)) {
+					error = local_error(-1);
+					return -1;
+				}
+				Commit parent(p);
+				git_tree *pt = nullptr;
+				if (git_commit_tree(&pt, parent.get())) {
+					error = local_error(-1);
+					return -1;
+				}
+				from.reset(pt);
+			} else if (tree_of(repo.get(), "", from, error)) {
+				return -1;
+			}
+			json += ",\"changes\":[";
+			if (append_changes(repo.get(), from.get(), to.get(), json, error))
+				return -1;
+			json += ']';
+		}
+		json += '}';
+	}
+	json += std::string("],\"more\":") + (more ? "true" : "false") + "}";
+	return 0;
+}
+
+int odgit_history_stats(const std::string &dir, const std::vector<std::string> &commits, std::string &json,
+			std::string &error)
+{
+	cancel_flag = false;
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	json = "{\"stats\":[";
+	bool first = true;
+	for (const std::string &name : commits) {
+		Tree tree;
+		if (tree_of(repo.get(), name, tree, error))
+			return -1;
+		Counts counts;
+		count_tree(repo.get(), tree.get(), false, counts, 0);
+		// OpenDives' own branch: the pieces of the inventory are the files of gear/.
+		const git_tree_entry *gear = git_tree_entry_byname(tree.get(), "gear");
+		if (gear && git_tree_entry_type(gear) == GIT_OBJECT_TREE) {
+			git_tree *sub = nullptr;
+			if (!git_tree_lookup(&sub, repo.get(), git_tree_entry_id(gear))) {
+				Tree hold(sub);
+				counts.pieces = static_cast<long>(git_tree_entrycount(sub));
+			}
+		}
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":";
+		append_json_string(json, name);
+		json += ",\"dives\":" + std::to_string(counts.dives) + ",\"sites\":" + std::to_string(counts.sites) +
+			",\"pieces\":" + (counts.pieces < 0 ? std::string("null") : std::to_string(counts.pieces)) + "}";
+	}
+	json += "]}";
+	return 0;
+}
+
+int odgit_history_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
+		       std::string &error)
+{
+	cancel_flag = false;
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	Tree a, b;
+	if (tree_of(repo.get(), from, a, error) || tree_of(repo.get(), to, b, error))
+		return -1;
+	json = "{\"changes\":[";
+	if (append_changes(repo.get(), a.get(), b.get(), json, error))
+		return -1;
+	json += "]}";
+	return 0;
+}
+
+int odgit_history_read(const std::string &dir, const std::string &commit, const std::string &path, std::string &json,
+		       std::string &error)
+{
+	cancel_flag = false;
+	if (!valid_path(path)) {
+		error = "BAD_PATH";
+		return -1;
+	}
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	Tree tree;
+	if (tree_of(repo.get(), commit, tree, error))
+		return -1;
+	git_tree_entry *rawentry = nullptr;
+	if (git_tree_entry_bypath(&rawentry, tree.get(), path.c_str())) {
+		json = "{\"text\":null}";
+		return 0;
+	}
+	std::unique_ptr<git_tree_entry, Free<git_tree_entry, git_tree_entry_free>> entry(rawentry);
+	git_blob *rawblob = nullptr;
+	if (git_tree_entry_type(entry.get()) != GIT_OBJECT_BLOB ||
+	    git_blob_lookup(&rawblob, repo.get(), git_tree_entry_id(entry.get()))) {
+		json = "{\"text\":null}";
+		return 0;
+	}
+	Blob blob(rawblob);
+	const char *data = static_cast<const char *>(git_blob_rawcontent(blob.get()));
+	size_t size = git_blob_rawsize(blob.get());
+	if (!valid_utf8(data, size)) {
+		json = "{\"text\":null,\"binary\":true}";
+		return 0;
+	}
+	json = "{\"text\":";
+	append_json_string(json, std::string(data, size));
+	json += "}";
+	return 0;
+}
+
+namespace {
+
+struct FilesOut {
+	std::string prefix, json;
+	bool first = true;
+};
+
+int files_walk_cb(const char *root, const git_tree_entry *entry, void *payload)
+{
+	FilesOut *out = static_cast<FilesOut *>(payload);
+	if (git_tree_entry_type(entry) != GIT_OBJECT_BLOB)
+		return 0;
+	std::string path = std::string(root) + git_tree_entry_name(entry);
+	if (path.compare(0, out->prefix.size(), out->prefix) != 0)
+		return 0;
+	if (!out->first)
+		out->json += ',';
+	out->first = false;
+	append_json_string(out->json, path);
+	return 0;
+}
+
+} // namespace
+
+int odgit_history_files(const std::string &dir, const std::string &commit, const std::string &prefix, std::string &json,
+			std::string &error)
+{
+	cancel_flag = false;
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	Tree tree;
+	if (tree_of(repo.get(), commit, tree, error))
+		return -1;
+	FilesOut out;
+	out.prefix = prefix;
+	if (git_tree_walk(tree.get(), GIT_TREEWALK_PRE, files_walk_cb, &out)) {
+		error = local_error(-1);
+		return -1;
+	}
+	json = "{\"files\":[" + out.json + "]}";
+	return 0;
+}
+
+namespace {
+
+struct CopyState {
+	git_index *index;
+	std::string prefix;
+};
+
+int copy_walk_cb(const char *root, const git_tree_entry *entry, void *payload)
+{
+	CopyState *state = static_cast<CopyState *>(payload);
+	if (git_tree_entry_type(entry) != GIT_OBJECT_BLOB)
+		return 0;
+	std::string path = std::string(root) + git_tree_entry_name(entry);
+	if (path != state->prefix && path.compare(0, state->prefix.size() + 1, state->prefix + "/") != 0)
+		return 0;
+	git_index_entry ie;
+	memset(&ie, 0, sizeof(ie));
+	ie.path = path.c_str();
+	ie.id = *git_tree_entry_id(entry);
+	ie.mode = git_tree_entry_filemode(entry);
+	return git_index_add(state->index, &ie);
+}
+
+} // namespace
+
+int odgit_history_restore(const std::string &dir, const std::string &branch, const std::string &commit,
+			  const std::vector<std::string> &paths, const std::string &message, const OdgitAuthor &author,
+			  std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	if (!valid_branch(branch)) {
+		error = "GIT_ERROR: bad branch";
+		return -1;
+	}
+	for (const std::string &p : paths)
+		if (!valid_path(p)) {
+			error = "BAD_PATH";
+			return -1;
+		}
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	git_oid head_id;
+	if (!lookup_oid(repo.get(), ref_of(branch), head_id)) {
+		error = "GIT_ERROR: no such branch";
+		return -1;
+	}
+	git_commit *rawhead = nullptr;
+	if (git_commit_lookup(&rawhead, repo.get(), &head_id)) {
+		error = local_error(-1);
+		return -1;
+	}
+	Commit head(rawhead);
+	Tree target;
+	if (tree_of(repo.get(), commit, target, error))
+		return -1;
+	git_tree *rawcurrent = nullptr;
+	if (git_commit_tree(&rawcurrent, head.get())) {
+		error = local_error(-1);
+		return -1;
+	}
+	Tree current(rawcurrent);
+
+	Tree result;
+	if (paths.empty()) {
+		git_tree *copy = nullptr;
+		if (git_tree_dup(&copy, target.get())) {
+			error = local_error(-1);
+			return -1;
+		}
+		result.reset(copy);
+	} else {
+		git_index *rawindex = nullptr;
+		if (git_index_new(&rawindex)) {
+			error = local_error(-1);
+			return -1;
+		}
+		Index index(rawindex);
+		if (git_index_read_tree(index.get(), current.get())) {
+			error = local_error(-1);
+			return -1;
+		}
+		for (const std::string &p : paths) {
+			// What the path holds now goes, then what the old version had there comes in.
+			git_index_remove_directory(index.get(), p.c_str(), 0);
+			git_index_remove_bypath(index.get(), p.c_str());
+			CopyState state{ index.get(), p };
+			if (git_tree_walk(target.get(), GIT_TREEWALK_PRE, copy_walk_cb, &state)) {
+				error = local_error(-1);
+				return -1;
+			}
+		}
+		git_oid tree_id;
+		if (git_index_write_tree_to(&tree_id, index.get(), repo.get())) {
+			error = local_error(-1);
+			return -1;
+		}
+		git_tree *rawresult = nullptr;
+		if (git_tree_lookup(&rawresult, repo.get(), &tree_id)) {
+			error = local_error(-1);
+			return -1;
+		}
+		result.reset(rawresult);
+	}
+	if (git_oid_equal(git_tree_id(result.get()), git_tree_id(current.get()))) {
+		json = "{\"commit\":null}";
+		return 0;
+	}
+	Sig sig;
+	if (make_signature(author, sig)) {
+		error = local_error(-1);
+		return -1;
+	}
+	// A working copy that has this branch checked out follows it; a bare cache has nothing to bring along.
+	if (!git_repository_is_bare(repo.get())) {
+		git_reference *rawref = nullptr;
+		if (!git_repository_head(&rawref, repo.get())) {
+			Ref headref(rawref);
+			if (ref_of(branch) == git_reference_name(headref.get())) {
+				Call call;
+				if (checkout_to(repo.get(), result.get(), call)) {
+					error = local_error(-1);
+					return -1;
+				}
+			}
+		}
+	}
+	git_oid created;
+	ParentPtr parents[] = { head.get() };
+	int rc = git_commit_create(&created, repo.get(), ref_of(branch).c_str(), sig.get(), sig.get(), nullptr,
+				   message.c_str(), result.get(), 1, parents);
+	if (rc) {
+		error = local_error(rc);
+		return -1;
+	}
+	json = "{\"commit\":";
+	append_oid(json, &created);
+	json += "}";
+	return 0;
+}
+
+int odgit_history_borrow(const std::string &dir, const std::string &commit, const std::string &into, std::string &json,
+			 std::string &error)
+{
+	cancel_flag = false;
+	if (into.empty() || into == dir) {
+		error = "BAD_PATH";
+		return -1;
+	}
+	Library lib;
+	Repo source;
+	if (open_repo(dir, source, error))
+		return -1;
+	Commit wanted;
+	if (!commit_by_name(source.get(), commit, wanted)) {
+		error = "UNKNOWN_COMMIT";
+		return -1;
+	}
+	std::error_code ec;
+	std::filesystem::remove_all(into, ec);
+	git_repository *raw = nullptr;
+	if (git_repository_init(&raw, into.c_str(), 1)) {
+		error = local_error(-1);
+		return -1;
+	}
+	Repo borrowed(raw);
+	// The old objects are read from the logbook's own repository: nothing is copied.
+	std::filesystem::path objects = std::filesystem::path(git_repository_path(source.get())) / "objects";
+	std::filesystem::create_directories(std::filesystem::path(into) / "objects" / "info", ec);
+	FILE *f = fopen((std::filesystem::path(into) / "objects" / "info" / "alternates").string().c_str(), "wb");
+	if (!f) {
+		error = "GIT_ERROR: cannot write alternates";
+		return -1;
+	}
+	std::string line = objects.generic_string() + "\n";
+	fwrite(line.data(), 1, line.size(), f);
+	fclose(f);
+	// The repository is opened again to see the alternates.
+	borrowed.reset();
+	if (open_repo(into, borrowed, error))
+		return -1;
+	git_reference *ref = nullptr;
+	if (git_reference_create(&ref, borrowed.get(), "refs/heads/v", git_commit_id(wanted.get()), 1, "OpenDives version")) {
+		error = local_error(-1);
+		return -1;
+	}
+	git_reference_free(ref);
+	json = "{\"branch\":\"v\"}";
 	return 0;
 }
 
