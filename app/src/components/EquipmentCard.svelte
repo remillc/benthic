@@ -7,6 +7,7 @@
   // aria-expanded.
   import Icon from './Icon.svelte';
   import ButtonGroup from './ButtonGroup.svelte';
+  import DcTile from './DcTile.svelte';
   import { FEEDBACK_CHOICES } from '../lib/weight-feedback.js';
   import { t } from '../lib/i18n.js';
 
@@ -18,7 +19,7 @@
    *   weightTotal: string,
    *   weights: { place: string, weight: string }[],
    *   computer?: string,
-   *   computers?: { name: string, main: boolean }[],
+   *   computers?: { name: string, model?: string, main: boolean }[],
    *   open: boolean,
    *   opens?: boolean,
    *   ontoggle: () => void,
@@ -88,7 +89,7 @@
   {#if spread && weightTotal && onfeedback}
     <div class="od-equipment-card--feedback">
       <p class="od-equipment-card--feedback-title" id="od-weight-feedback-title">{t('weightFeedback.title')}</p>
-      <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable marked />
+      <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable rail />
     </div>
   {/if}
   {#if spread && computer && !computerInSummary && !several}
@@ -105,7 +106,7 @@
       </span>
       {#each computers as c, i (i)}
         <span class="od-equipment-card--computer-row">
-          <Icon name="wristComputer" size={24} weight={1.8} />
+          <DcTile model={c.model ?? c.name} />
           <span class="od-equipment-card--computer-name">{c.name}</span>
           {#if c.main}<span class="od-equipment-card--main">{t('detail.mainBadge')}</span>{/if}
         </span>
@@ -142,7 +143,7 @@
     }
 
     .od-equipment-card--computer-row {
-      min-height: 48px;
+      min-height: 64px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -152,6 +153,11 @@
       :global(.od-icon) {
         flex: none;
         color: var(--od-text-2);
+      }
+
+      /* iPhone: 68 pt rows (detail-ordinateurs-feuille-ios). */
+      :global(.ios) & {
+        min-height: 68px;
       }
     }
 

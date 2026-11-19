@@ -2838,7 +2838,9 @@
       "Tablet: “Export” and the list of dives at one map point open as a dialog in the middle of the screen, and so do conflicts on several dives; when downloading, a Bluetooth that is not allowed or is off shows as a card under the remembered computers.",
       "iPad: the same dialogs and the same Bluetooth card as on the Android tablet, with iOS sheet corners.",
       "iPhone: About has 50 pt buttons with iOS rounded corners; tablet in portrait: in Offline maps, “Add a region” moves under the list.",
-      "Desktop: a trip of a single dive is no longer a trip row in the logbook, as on the phone."
+      "Desktop: a trip of a single dive is no longer a trip row in the logbook, as on the phone.",
+      "Dive computers show their photo (dive detail, download choice, Equipment); it is downloaded once, then kept on the device. With no photo, or offline, the icon stays.",
+      "“This ballast was” is now a rail: a pill slides from one choice to the next; touching the chosen choice clears it."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5494,6 +5496,15 @@
       "lastDiveNoSite": "Last dive on {date}.",
       "noDive": "No dive with this piece yet.",
       "shareText": "{name}\n{type}\n{details}"
+    },
+    "computerEdit": {
+      "title": "Edit the dive computer",
+      "imageLabel": "Dive computer image",
+      "changeImage": "Change image",
+      "removeImage": "Remove my photo",
+      "photoNote": "This photo stays in your account. It is not shared.",
+      "noteHint": "For example, the backup computer",
+      "delete": "Delete the piece"
     },
     "pieceEdit": {
       "addTitle": "New piece",

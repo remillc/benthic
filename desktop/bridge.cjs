@@ -47,7 +47,7 @@
 //   clipboard.read()         resolves { text, dives }: the plain text, and the dives' XML while the clipboard
 //                            still holds the text copied with them ('' otherwise)
 //   server.request({method, url, headers, body})   release edition: one call to the OpenDives server, https or
-//                            the development server's loopback; resolves { status, text }
+//                            the development server's loopback; resolves { status, text } (`binary: true`: { status, base64 })
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
 // One window, one logbook, one helper (task 2026-11-15-173): `od:paths` also returns `logbook`, the
@@ -788,9 +788,15 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
     if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
     const method = request?.method === 'POST' || request?.method === 'PUT' ? request.method : 'GET';
-    const headers = { Accept: 'application/json', 'User-Agent': 'OpenDives', ...(request?.headers ?? {}) };
+    const headers = { Accept: request?.binary ? 'image/webp,*/*' : 'application/json', 'User-Agent': 'OpenDives', ...(request?.headers ?? {}) };
     if (request?.body !== undefined) headers['Content-Type'] = 'application/json';
     const response = await fetch(url, { method, headers, body: request?.body !== undefined ? JSON.stringify(request.body) : undefined, signal: AbortSignal.timeout(20000) });
+    // `binary`: a picture (the dive computer images, task 2026-11-19-302): the body comes back as base64, 2 MB at most.
+    if (request?.binary) {
+      const bytes = Buffer.from(await response.arrayBuffer());
+      if (bytes.length > 2 * 1024 * 1024) throw new Error('TOO_BIG');
+      return { status: response.status, base64: bytes.toString('base64') };
+    }
     return { status: response.status, text: await response.text() };
   }
 

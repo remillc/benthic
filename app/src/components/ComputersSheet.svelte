@@ -9,6 +9,7 @@
   // Android: a bottom sheet, a dialog on the tablet. iPhone: a page sheet « Ordinateurs » with OK.
   import { Sheet } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import DcTile from './DcTile.svelte';
   import { layout, ios } from '../lib/layout.svelte.js';
   import { formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -69,7 +70,7 @@
             disabled={ios && !main ? busy : undefined}
             onclick={ios && !main ? () => onmain(c.index) : undefined}
           >
-            <Icon name="wristComputer" size={24} weight={1.8} />
+            <DcTile model={c.model} />
             <span class="od-computers-sheet--texts">
               <span class="od-computers-sheet--name">{c.name}</span>
               {#if detail(c)}<span class="od-computers-sheet--line">{detail(c)}</span>{/if}
@@ -201,6 +202,11 @@
       :global(.od-icon) {
         flex: none;
         color: var(--od-text-2);
+      }
+
+      /* iPhone: 68 pt rows, so the 48 pt photo has room (detail-ordinateurs-feuille-ios). */
+      :global(.ios) & {
+        min-height: 68px;
       }
     }
 

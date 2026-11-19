@@ -6066,7 +6066,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
 
-## [ ] 2026-11-19-302 Dive-computer photos and a sliding rail for « Ce lest était »
+## [x] 2026-11-19-302 Dive-computer photos and a sliding rail for « Ce lest était »
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
 

@@ -2838,7 +2838,9 @@
       "Tablette : « Exporter » et la liste des plongées d’un point de la carte s’ouvrent en dialogue au milieu de l’écran ; les conflits sur plusieurs plongées aussi ; au téléchargement, un Bluetooth non autorisé ou éteint s’affiche en carte sous les ordinateurs mémorisés.",
       "iPad : les mêmes dialogues et la même carte Bluetooth que sur la tablette Android, aux coins des feuilles iOS.",
       "iPhone : À propos a des boutons de 50 pt aux coins arrondis iOS ; tablette en portrait : dans Cartes hors ligne, « Ajouter une région » passe sous la liste.",
-      "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone."
+      "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone.",
+      "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
+      "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -5497,6 +5499,15 @@
       "lastDiveNoSite": "Dernière plongée le {date}.",
       "noDive": "Aucune plongée avec cette pièce pour l’instant.",
       "shareText": "{name}\n{type}\n{details}"
+    },
+    "computerEdit": {
+      "title": "Modifier l’ordinateur de plongée",
+      "imageLabel": "Image de l’ordinateur de plongée",
+      "changeImage": "Changer d’image",
+      "removeImage": "Retirer ma photo",
+      "photoNote": "Cette photo reste dans votre compte. Elle n’est pas partagée.",
+      "noteHint": "Par exemple, l’ordinateur de secours",
+      "delete": "Supprimer la pièce"
     },
     "pieceEdit": {
       "addTitle": "Nouvelle pièce",

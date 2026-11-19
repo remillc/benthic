@@ -156,13 +156,13 @@ test('two dive computers after a merge: both listed, the first main, the card op
     { model: 'Shearwater Petrel 3', nickname: 'Petrel de Christian' },
   ]);
   assert.deepEqual(list, [
-    { name: 'Shearwater Perdix AI', main: true },
-    { name: 'Petrel de Christian', main: false },
+    { name: 'Shearwater Perdix AI', model: 'Shearwater Perdix AI', main: true },
+    { name: 'Petrel de Christian', model: 'Shearwater Petrel 3', main: false },
   ]);
   // Since task 2026-11-14-144 several computers have their own block, always shown: the card
   // does not need to open for them.
   assert.equal(equipmentOpens([], list.length), false, 'no weight, two computers: the computers show without opening');
   assert.equal(equipmentOpens([], computerList([{ model: 'Shearwater Petrel 3' }]).length), false);
-  assert.deepEqual(computerList([{ model: '' }, { model: 'Shearwater Petrel 3' }]), [{ name: 'Shearwater Petrel 3', main: true }], 'a computer without a model is not listed');
+  assert.deepEqual(computerList([{ model: '' }, { model: 'Shearwater Petrel 3' }]), [{ name: 'Shearwater Petrel 3', model: 'Shearwater Petrel 3', main: true }], 'a computer without a model is not listed');
   assert.deepEqual(computerList(undefined), []);
 });

@@ -7,6 +7,10 @@
   // Option `clearable`: a tap on the selected button clears the choice (onchange
   // gets ''). Option `marked`: a check icon on the selected button, in the
   // secondary colour (the "Ce lest était" choice, docs/mockups/android-edition.dc.html).
+  // Option `rail` (« Ce lest était », task 2026-11-19-302, docs/mockups/detail-ordinateurs-android.dc.html): one
+  // rounded rail, 48 high, with 4 inside padding; a pill slides from one choice to the next in 300 ms (none when
+  // reduced motion is on); the chosen label turns white, no check mark; with `clearable`, the pill fades out when
+  // the chosen choice is touched again. The same on every platform.
   // Accessibility: a radio group, roving tabindex, arrow keys move the choice.
 
   import Icon from './Icon.svelte';
@@ -21,12 +25,20 @@
    *   class?: string,
    *   clearable?: boolean,
    *   marked?: boolean,
+   *   rail?: boolean,
    * }}
    */
-  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '', clearable = false, marked = false } = $props();
+  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '', clearable = false, marked = false, rail = false } = $props();
 
   /** @type {HTMLDivElement|undefined} */
   let group = $state();
+
+  /** The rail's pill rests on the last choice made while none is chosen, so it fades out in place. */
+  let lastIndex = $state(0);
+  const selectedIndex = $derived(options.findIndex((o) => o.value === value));
+  $effect(() => {
+    if (selectedIndex >= 0) lastIndex = selectedIndex;
+  });
 
   /** @param {KeyboardEvent} e @param {number} index */
   function key(e, index) {
@@ -40,7 +52,10 @@
   }
 </script>
 
-<div bind:this={group} class="od-button-group {extra}" class:od-button-group--marked={marked} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
+<div bind:this={group} class="od-button-group {extra}" class:od-button-group--marked={marked && !rail} class:od-button-group--rail={rail} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
+  {#if rail}
+    <span class="od-button-group--pill" class:od-button-group--pill-hidden={selectedIndex < 0} style:width="calc((100% - 8px) / {options.length})" style:transform="translateX({lastIndex * 100}%)" aria-hidden="true"></span>
+  {/if}
   {#each options as option, i (option.value)}
     <button
       type="button"
@@ -52,7 +67,7 @@
       onclick={() => (value !== option.value ? onchange(option.value) : clearable && onchange(''))}
       onkeydown={(e) => key(e, i)}
     >
-      {#if marked && value === option.value}<Icon name="check" size={18} weight={2.4} />{/if}
+      {#if marked && !rail && value === option.value}<Icon name="check" size={18} weight={2.4} />{/if}
       {option.label}
     </button>
   {/each}
@@ -109,6 +124,60 @@
       }
     }
 
+    /* The rail (« Ce lest était »): the pill is the selection, the buttons are transparent labels over it. */
+    .od-button-group--rail {
+      position: relative;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      gap: 0;
+      height: 48px;
+      padding: 4px;
+      box-sizing: border-box;
+      border-radius: 24px;
+      background: var(--od-surface-container-high);
+
+      .od-button-group--pill {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        height: 40px;
+        border-radius: 20px;
+        background: var(--od-secondary);
+        transition:
+          transform 300ms cubic-bezier(0.2, 0, 0, 1),
+          opacity 200ms linear;
+      }
+
+      .od-button-group--pill-hidden {
+        opacity: 0;
+      }
+
+      .od-button-group--button,
+      .od-button-group--button.od-button-group--selected {
+        position: relative;
+        z-index: 1;
+        min-height: 40px;
+        height: 40px;
+        padding: 0 4px;
+        border-radius: 20px;
+        background: none;
+        color: var(--od-text);
+        transition: color 200ms linear;
+      }
+
+      .od-button-group--button.od-button-group--selected {
+        color: var(--od-on-secondary);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .od-button-group--pill,
+        .od-button-group--button {
+          transition: none;
+        }
+      }
+    }
+
     /* The marked variant: secondary colour, with the check icon. */
     .od-button-group--marked .od-button-group--button.od-button-group--selected {
       background: var(--od-secondary);
@@ -120,7 +189,7 @@
       .od-button-group--button {
         transition: box-shadow 120ms linear;
       }
-      .od-button-group--button:not(:disabled):hover {
+      .od-button-group:not(.od-button-group--rail) .od-button-group--button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
@@ -130,7 +199,7 @@
       }
     }
     /* iOS: a segmented control. */
-    :global(.ios) .od-button-group {
+    :global(.ios) .od-button-group:not(.od-button-group--rail) {
       gap: 2px;
       padding: 2px;
       border-radius: 9px;

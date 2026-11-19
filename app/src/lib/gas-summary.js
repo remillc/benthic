@@ -158,7 +158,7 @@ export const equipmentOpens = (weights, _computers = 0) => weights.length > 0;
  * already logged by another computer holds both (Subsurface merges them, the downloaded one first):
  * none may be left out (14 November 2026, a Perdix AI over a Petrel 3).
  * @param {{ model?: string, nickname?: string }[] | undefined} diveComputers get_dive's list
- * @returns {{ name: string, main: boolean }[]}
+ * @returns {{ name: string, model: string, main: boolean }[]} `model`: the computer's model, for its photo
  */
 export const computerList = (diveComputers) =>
-  (diveComputers ?? []).filter((dc) => dc.model).map((dc, i) => ({ name: /** @type {string} */ (dc.nickname || dc.model), main: i === 0 }));
+  (diveComputers ?? []).filter((dc) => dc.model).map((dc, i) => ({ name: /** @type {string} */ (dc.nickname || dc.model), model: /** @type {string} */ (dc.model), main: i === 0 }));

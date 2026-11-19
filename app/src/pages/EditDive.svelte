@@ -1263,7 +1263,7 @@
           onchange={(v) => (feedback = toggleFeedback(feedback, /** @type {any} */ (v)))}
           ariaLabelledby="od-edit-weight-feedback"
           clearable
-          marked
+          rail
         />
       </div>
 

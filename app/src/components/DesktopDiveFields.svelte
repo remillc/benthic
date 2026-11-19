@@ -401,7 +401,7 @@
     {#if dive.weights?.some((w) => w.grams > 0)}
       <div class="od-desktop-dive-fields--row">
         <span class="od-desktop-dive-fields--row-label" id="od-df-feedback">{t('weightFeedback.title')}</span>
-        <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="od-df-feedback" clearable marked />
+        <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="od-df-feedback" clearable rail />
       </div>
     {/if}
 
