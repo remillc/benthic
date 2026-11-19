@@ -118,7 +118,8 @@ test('every text of the new screens is in fr and en, and the price is the one of
   }
   assert.equal(langs.fr.odplus.offer.price, '14,99 $ US');
   assert.equal(langs.fr.odplus.offer.per, 'par an');
-  assert.equal(langs.fr.odplus.offer.priceDetail, 'soit 1,25 $ par mois · Résiliable en tout temps');
+  assert.equal(langs.fr.odplus.offer.priceDetail, 'soit 1,25 $ par mois');
+  assert.equal(langs.fr.odplus.offer.cancelAnytime, 'Résiliable en tout temps');
   assert.equal(langs.fr.odplus.offer.subscribe, 'S’abonner');
   assert.equal(langs.fr.odplus.offer.without, 'Continuer sans abonnement');
   assert.equal(langs.fr.odplus.offer.noAccount, 'Aucun compte n’est créé.');

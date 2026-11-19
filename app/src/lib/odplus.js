@@ -50,3 +50,53 @@ export function summaryRows(c) {
     { key: /** @type {const} */ ('certifications'), n: c.certifications },
   ].filter((row) => row.n > 0 || row.key === 'dives' || row.key === 'sites');
 }
+
+/**
+ * « Tout ce qui est inclus » (task 2026-11-19-295): the rows of each group, with their icon and soft colour. A row whose
+ * feature is not built yet carries `built: false` and is not listed (`includedGroups`): the screen never promises
+ * what the app cannot do. Turn `built` on when the feature ships.
+ * @typedef {{ key: string, icon: string, tone: 'blue'|'green'|'amber'|'violet'|'red', built: boolean }} IncludedRow
+ */
+export const INCLUDED = /** @type {{ key: string, rows: IncludedRow[] }[]} */ ([
+  {
+    key: 'carnet',
+    rows: [
+      { key: 'sync', icon: 'sync', tone: 'blue', built: true },
+      { key: 'backup', icon: 'cloudDownload', tone: 'green', built: true },
+      { key: 'restore', icon: 'history', tone: 'blue', built: true },
+      { key: 'media', icon: 'image', tone: 'violet', built: false },
+      { key: 'desktop', icon: 'desktop', tone: 'blue', built: true },
+    ],
+  },
+  {
+    key: 'profile',
+    rows: [
+      { key: 'gear', icon: 'briefcase', tone: 'amber', built: true },
+      { key: 'maintenance', icon: 'bell', tone: 'red', built: true },
+      { key: 'certifications', icon: 'idCard', tone: 'violet', built: true },
+      { key: 'info', icon: 'account', tone: 'blue', built: true },
+      { key: 'gasAnalysis', icon: 'blender', tone: 'green', built: false },
+      { key: 'gaugePhoto', icon: 'camera', tone: 'amber', built: true },
+    ],
+  },
+  {
+    key: 'maps',
+    rows: [
+      { key: 'offlineMaps', icon: 'map', tone: 'green', built: true },
+      { key: 'divers', icon: 'sites', tone: 'blue', built: false },
+    ],
+  },
+  {
+    key: 'friends',
+    rows: [
+      { key: 'buddies', icon: 'personAdd', tone: 'violet', built: false },
+      { key: 'verified', icon: 'checkCircle', tone: 'green', built: false },
+      { key: 'publicProfile', icon: 'qr', tone: 'blue', built: false },
+    ],
+  },
+]);
+
+/** The groups of « Tout ce qui est inclus » with only their built rows; a group left empty is dropped. */
+export function includedGroups() {
+  return INCLUDED.map((g) => ({ key: g.key, rows: g.rows.filter((r) => r.built) })).filter((g) => g.rows.length > 0);
+}
