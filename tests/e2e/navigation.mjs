@@ -512,6 +512,10 @@ async function phoneFlows() {
     await tab.touch('touchMove', pad.x + pad.w * (0.2 + 0.075 * i), pad.y + pad.h * (0.6 - 0.3 * Math.sin(i / 2)));
     await sleep(16);
   }
+  // The finger rests before it is lifted. Lifted while moving, the stroke ends as a fling, and the browser takes the tap
+  // that follows within a moment for « stop the fling »: it sends the touch to « Valider » but no click (seen on
+  // 19 November 2026: the page stayed on /validate because the button was never clicked, not because Back failed).
+  await sleep(300);
   await tab.touch('touchEnd', pad.x + pad.w * 0.8, pad.y + pad.h * 0.5);
   await sleep(200);
   const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Valider|Validate/.test(a.textContent) && a.classList.contains('disabled')));

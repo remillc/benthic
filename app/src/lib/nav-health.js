@@ -15,6 +15,9 @@ export const STUCK_MS = 10000;
 /** At most this many repairs a minute: a fault that comes back at once must not loop. */
 const MAX_REPAIRS = 3;
 
+/** How lib/nav-invariants.js words a fragment in the address. */
+const FRAGMENT = 'the address has a fragment';
+
 /** Events of this module, which must not start a new check by themselves. */
 const OWN = new Set(['broken', 'repair']);
 
@@ -120,7 +123,8 @@ export function startNavHealth({ doc = document, report = () => {}, read = () =>
       return stuck;
     }
     movingSince = null;
-    const problems = checkApp(app);
+    // A fragment in the address harms nothing on screen: the tests refuse it, the app does not repair or report it.
+    const problems = checkApp(app).filter((p) => !p.startsWith(FRAGMENT));
     if (problems.length) broken(problems);
     return problems;
   }

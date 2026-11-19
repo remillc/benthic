@@ -575,7 +575,7 @@ This section is the contract of everything that moves the app from one screen to
 
 `app/src/lib/nav-invariants.js` holds them, as pure functions on a snapshot of the page; the app and the tests run the same code. Once a navigation has settled, for every view: exactly one current page (the list and its detail in a master-detail view); the current page's route is the router's current route and the last entry of its history; no page waits as `page-next`; no transition, swipe or push class is left on the view or its pages; the current page has no transform and sits at the view's edge; the router accepts page changes and is not held. For the app: no fragment in the address, one section shown, no scrim with nothing above it.
 
-`app/src/lib/nav-health.js` checks them 700 ms after the last navigation event (and again while the pages still move, up to 10 s). A broken state is written to the trace, **repaired at once** (`tidyView`: classes, styles and switches put back; when the pages and the history no longer agree, the view is loaded again on its first screen) and **offered as an error report** with the trace.
+`app/src/lib/nav-health.js` checks them 700 ms after the last navigation event (and again while the pages still move, up to 10 s). A page stuck moving for 10 s (as seen by checks that follow each other, with no finger on the screen) counts as broken too; a fragment in the address is refused by the tests only. A broken state is written to the trace, **repaired at once** (`tidyView`: classes, styles and switches put back; when the pages and the history no longer agree, the view is loaded again on its first screen) and **offered as an error report** with the trace.
 
 ### 13.5 The navigation trace
 

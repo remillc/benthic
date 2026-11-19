@@ -68,7 +68,7 @@ final class SafeAreaInsets {
         Insets insets = windowInsets.getInsetsIgnoringVisibility(
             WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
         );
-        // Where the system reads its Back gesture; the safe area itself is not part of the zone the page must leave alone.
+        // The left and right edges where the system reads its Back gesture (gesture navigation); 0 with three buttons.
         Insets gestures = windowInsets.getInsets(WindowInsetsCompat.Type.systemGestures());
         float density = webView.getResources().getDisplayMetrics().density;
         String next = "{\"top\":" + css(insets.top, density)

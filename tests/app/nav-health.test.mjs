@@ -192,3 +192,12 @@ test('tidying a view removes what a page change or a swipe left behind and reope
   assert.deepEqual([router.odLocks, router.swipeBackActive, router.odAnimating, router.allowPageChange], [0, false, false, true]);
   assert.equal(props.length, 3);
 });
+
+test('a fragment in the address is left to the tests: the app neither repairs nor reports it', () => {
+  const { state, advance } = fixture();
+  state.page = { ...app(view()), hash: '#compte' };
+  trace('route', 'logbook / (1)');
+  advance(2000);
+  assert.deepEqual(state.reports, []);
+  assert.deepEqual(state.repairs, []);
+});
