@@ -5952,3 +5952,15 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - **Settings pages**: Langue et formats, Profil et décompression (with the warning), Gaz et pressions partielles, Recycleur (O₂ consumption in l/min or ft³/min per the Volume unit), Ordinateurs et téléchargement (adds « Ports USB »), Cartes hors ligne (free space of this disk), Avancé — `bureau-reglages-langue`, `-decompression`, `-gaz`, `-recycleur`, `-ordinateurs`, `-cartes`, `-avance`.
 
 **Test:** in the desktop app, reach each screen and compare with its mock-up.
+
+## [ ] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-demo`, `android-demo-ajout`, `android-demo-quitter`, `android-import-csv-type`, `android-import-csv-colonnes`, `android-import-csv-apercu`, `android-etat-vide`, `android-tablette-carnet-vide-paysage`, `-portrait`, `-menu-paysage`, `bureau-profil-compte-git`. The tablet and iPad follow the phone layouts (task 294).
+
+- **Demo logbook** (phone): the demo is a sample logbook the person can browse (`android-demo`), add a dive to (`android-demo-ajout`) and leave (`android-demo-quitter`). Texts and buttons are in the mock-ups.
+- **CSV import** (phone): choose the file type (`android-import-csv-type`), match the columns (`android-import-csv-colonnes`), preview before importing (`android-import-csv-apercu`).
+- **Empty logbook**: the free offer keeps the logbook on the device only, so the header reads « Sur ce téléphone · aucune plongée » (tablet: « Mon carnet · sur cette tablette »). Remove « Changer d’endroit » from the empty states.
+- **Desktop account sheet, one-off licence (29,99 $) with git sync** (`bureau-profil-compte-git`): the person’s git repository card with « Changer de dépôt », the sync row, « Sauvegarde et restauration » (« Selon l’historique de votre dépôt git »), no « Mon profil », then a « Passer à OpenDives+ » card with « Découvrir », then Réglages and À propos.
+- The old desktop « Compte · bureau » sheet is replaced by the mock-ups above; do not implement it.
+
+**Test:** open the demo logbook, add a dive and leave it. Import a CSV file through the three steps. Open an empty logbook on a phone and a tablet. On the desktop with a git repository, open the account sheet and compare with the mock-up.
