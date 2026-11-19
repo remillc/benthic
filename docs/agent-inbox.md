@@ -6188,3 +6188,33 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - The Android delete dialog of task 306 (« Supprimer l’ordinateur ») is replaced by point 1.
 
 **Test:** retire a piece with a reason, find it in « Pièces retirées », put it back in service, then retire and delete it for good. Turn the maintenance notifications off and on in Réglages › Notifications and change the lead time. Open the AL80 sheet and check the two deadlines. Add the overdue AL80 to a dive. Export a piece's history.
+
+## [ ] 2026-11-19-309 Equipment fields by type, dive validation, certificates and documents, offer price
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. All OpenDives+. New screens are drawn for the Android phone only: build the other platforms with their own conventions (iPhone with iOS conventions, tablet and desktop with the layouts of the existing profile screens). The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
+
+**1. Equipment: fields by piece type (#42).** See the new `docs/equipment-fields.md`: the fields of each of the 16 types, the type as the only required field, « Date d’achat » and « Notes » as the only common fields. Decision of 19 November 2026: the equipment inventory, maintenance and certificates/documents are stored on the OpenDives server, next to the logbook; nothing is written into the Subsurface logbook.
+- « Gilet » is now « Veste » everywhere (fr-CA). « Intégré au gilet » becomes « Intégré à la veste ».
+- The type grid of « Nouvelle pièce » has 16 tiles: add Masque, Palmes, Scooter, Caméra, Parachute de palier, Bouée de surface, Couteau (`profil-piece-nouvelle-android`, `profil-piece-nouvelle-ordinateur-android`).
+- Two examples of a form that adapts to the type: `profil-piece-nouvelle-bouteille-android` (name, cylinder type from Réglages › Équipement which gives volume and working pressure, material and valve as segmented buttons, serial number, O₂ clean switch, last visual inspection, last hydrostatic test with the stamped date, suggested reminders) and `profil-piece-nouvelle-combinaison-android` (no photo, optional serial number, type Humide / Semi-étanche / Étanche, thickness, size, material).
+
+**2. Dive validation by a buddy or an instructor (#37).** OpenDives+ only, on both sides.
+- Entry points: « Faire valider la plongée » in the dive menu (`validation-menu-android`) and « Faire valider les plongées » in the selection menu, one validation for several dives (`validation-selection-menu-android`).
+- Method (`validation-choix-android`): « Signature sur cet écran » (the signer does not need OpenDives) or « Code QR ».
+- Signature (`validation-signature-android`): name, role (Compagnon, Moniteur, Guide de palanquée), instructor number (optional), signature pad with « Effacer », « Valider ».
+- QR code (`validation-qr-android`): expires after 10 minutes. The buddy scans it with OpenDives+ (« + » › « Scanner un code QR ») and confirms (`validation-confirmer-android`); his name, role and instructor number come from his profile. The confirmation travels through the OpenDives server. Without network, the dive shows « Validation en attente » until it arrives.
+- Dive detail, section « Validations » (`validation-detail-android`): each validation (name, role, method, date, signature thumbnail), pending ones, « + Faire valider ». Not drawn: when a validated dive is edited, the validation stays and shows « modifiée après la validation »; validated dives carry a small mark in the logbook list. The diver can remove a validation. Validations appear in the dive PDF and the logbook export.
+- Privacy policy: add a paragraph on the signer's name, role, instructor number and signature kept in the diver's logbook. No consent screen.
+
+**3. Certificates and documents (#48)** (`doc-*` files).
+- « Brevets » becomes « Brevets et documents » (`profil-plongeur-android`, `doc-liste-android`): sections Brevets, Assurance et santé, Autres documents, a folded « Expirés » section, badges for the expiry (« Expire dans 20 jours », « Dans 4 mois »). Each row shows a reproduction of the card from the diver's photo or scan; without a photo, the app draws one from the entered details.
+- « Ajouter » offers Brevet, Assurance plongée, Certificat médical, Autre document (`doc-ajout-android`).
+- Insurance (`doc-assurance-nouvelle-android`): scan of the card (fields read from it, to check) or a PDF, insurer, plan, policy number, emergency phone, start and expiry dates, reminder lead time (2 semaines, 30 jours, 60 jours), notes.
+- Medical certificate (`doc-medical-android`): several pages, each with a centred full-screen button, the expiry banner, the details. Share as images (one per page) or as one PDF (`doc-partager-android`).
+- Full screen (`doc-plein-ecran-android`): the card large, brightness at maximum, tap to see the back.
+- Instructor certificate (`doc-brevet-moniteur-android`): switch « Brevet de moniteur »; its number is used when the diver confirms another diver's dive (point 2).
+- Expiry notifications (`notif-document-android`) and a new section « Brevets et documents » with the switch « Expiration des documents » in Réglages › Notifications (`reglages-notifications-android`). The lead time is set in each document.
+
+**4. OpenDives+ offer.** The price is smaller: 32 dp / 40 dp line height (was 40 / 48), on the offer and « Voir tout ce qui est inclus », Android, iPhone and tablet. The tile « Rappels d’entretien » now reads « Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance. » (no battery, task 308).
+
+**Test:** create a piece of each example type and check its fields. Validate a dive by signature, then by QR code with the second phone offline, then online. Add an insurance and a medical certificate, check the expiry badges and notifications, open a page in full screen and share it as PDF.
