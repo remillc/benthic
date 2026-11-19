@@ -317,6 +317,21 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     await this.bridge.fs.deleteDevEnv({ name: DEV_CREDENTIALS });
   }
 
+  /**
+   * DEVELOPMENT ONLY: the first-install reset (see core-api.js). The core closes its log, the credentials go, the device
+   * logbook (`carnet`) is removed; the desktop has no alpha cache, so `keepAlpha` changes nothing. Only the
+   * development menu calls it (dev builds contain it, behind VITE_DEV_ACCOUNTS); `fs.removeTree` only reaches `carnet*`.
+   * @param {{keepAlpha?: boolean}} [_options]
+   */
+  async devResetApp(_options) {
+    await this.core('cloudSignOut', { deleteCopy: false });
+    await this.bridge.credentials.clear();
+    this.pendingAccount = null;
+    await this.bridge.fs.deleteDevEnv({ name: DEV_CREDENTIALS });
+    const fs = this.bridge.fs;
+    if (await fs.exists({ path: this.repoDir })) await fs.removeTree({ path: this.repoDir });
+  }
+
   /** @param {{password?: string, keepDives?: boolean}} options */
   async deleteAccount(options) {
     const password = options?.password ?? '';

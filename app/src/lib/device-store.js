@@ -74,6 +74,15 @@ function check(key) {
   if (!key.startsWith('od.') || NOT_SETTINGS.has(key)) throw new Error(`Not a setting of this device: ${key}`);
 }
 
+/**
+ * DEVELOPMENT ONLY (lib/dev-reset.js): forgets every setting, in memory and in the system's preferences.
+ * @returns {Promise<void>}
+ */
+export async function clearDeviceStore() {
+  memory.clear();
+  await system?.clear();
+}
+
 /** The settings of this device, read and written as with localStorage. */
 export const deviceStore = {
   /** @param {string} key @returns {string|null} */

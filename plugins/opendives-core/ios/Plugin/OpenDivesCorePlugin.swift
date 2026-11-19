@@ -57,6 +57,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "devResetApp", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyRead", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyWrite", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConnect", returnType: CAPPluginReturnPromise),
@@ -1114,6 +1115,36 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         } catch {
             call.reject("CREDENTIALS_NOT_SAVED", "CREDENTIALS_NOT_SAVED")
         }
+    }
+
+    /// DEVELOPMENT ONLY (debug builds; refused otherwise): « Rejouer le premier lancement » as a full reset. The core closes
+    /// its log; the device logbook, the server's working copies, the credentials and the data key, the staged files go.
+    /// Kept: the alpha's cache (`.subsurface`, unless keepAlpha is false), the development authority and the maps.
+    @objc func devResetApp(_ call: CAPPluginCall) {
+        #if DEBUG
+        let keepAlpha = call.getBool("keepAlpha", true)
+        onCoreThread(call) { [self] in
+            try OpenDivesNative.cloudSignOut(deleteCopy: false)
+            credentials.delete()
+            gitStore.delete()
+            serverStore.delete()
+            KeychainText(account: "data-key").delete()
+            pendingAccount = nil
+            let fileManager = FileManager.default
+            for item in (try? fileManager.contentsOfDirectory(atPath: home.path)) ?? [] {
+                let device = item == "carnet" || item.hasPrefix("carnet.") || item == "odgit"
+                let alpha = item == ".subsurface" && !keepAlpha
+                if device || alpha { try? fileManager.removeItem(at: home.appendingPathComponent(item)) }
+            }
+            try? fileManager.removeItem(at: odgitRoot)
+            for item in (try? fileManager.contentsOfDirectory(atPath: cacheDir.path)) ?? [] where item.hasPrefix("import") || item == "exports" {
+                try? fileManager.removeItem(at: cacheDir.appendingPathComponent(item))
+            }
+            call.resolve()
+        }
+        #else
+        call.reject("NOT_DEBUG", "NOT_DEBUG")
+        #endif
     }
 
     /// Signs out of the OpenDives server: the tokens are erased from this device.

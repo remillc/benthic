@@ -617,6 +617,11 @@ export { waterTypeOf };
  *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
  *   Signs out of the OpenDives server: the tokens are erased.
+ * @property {(options?: {keepAlpha?: boolean}) => Promise<void>} devResetApp
+ *   DEVELOPMENT ONLY (debug builds: rejects NOT_DEBUG otherwise): the app's own data is erased as on a first install. The
+ *   core closes its log; the device logbook, the working copies of the server, every credential and the data key, the
+ *   staged imports and exports go. Kept: the alpha's cache (`.subsurface`) unless `keepAlpha` is false, the development
+ *   authority file, the offline maps. No server is called.
  * @property {() => Promise<{key: string}>} dataKeyRead
  *   Release edition (docs/architecture.md, section 11.5): the device's data key for the sensitive items (blood group,
  *   emergency contact, certifications), 32 random bytes as base64, from the platform's secure storage (Android
@@ -951,6 +956,7 @@ export const OpenDivesCore = {
   serverSessionInfo: () => native.serverSessionInfo(),
   serverSessionAccess: () => native.serverSessionAccess(),
   serverSessionClear: () => native.serverSessionClear(),
+  devResetApp: (options) => native.devResetApp(options ?? {}),
   dataKeyRead: () => native.dataKeyRead(),
   dataKeyWrite: (options) => native.dataKeyWrite(options),
   gitConnect: (options) => native.gitConnect(options),
