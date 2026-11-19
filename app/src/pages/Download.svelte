@@ -15,7 +15,10 @@
   // 4. The new dives are one undoable step: back to the logbook with "3
   //    dives downloaded" and "Annuler". A failure opens "Download failed".
   import { onDestroy, onMount } from 'svelte';
-  import { Page, Navbar, Link, Button, theme, f7 } from 'framework7-svelte';
+  import { Page, Navbar, Link, Button, List, Popover, theme, f7 } from 'framework7-svelte';
+  import MenuItem from '../components/MenuItem.svelte';
+  import { confirmedComputer } from '../lib/bluetooth-names.js';
+  import { hiddenBluetooth, hideBluetooth, showBluetooth } from '../lib/hidden-bluetooth.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
@@ -94,10 +97,32 @@
   const rememberedMacs = $derived(new Set(remembered.map((c) => macOf(c.address))));
   const nearby = $derived(
     Object.values(found)
-      .filter((d) => !rememberedMacs.has(d.mac))
+      .filter((d) => !rememberedMacs.has(d.mac) && !hiddenBluetooth.addresses.includes(d.mac))
       .filter((d) => d.computer || (settings.showAllBluetooth && d.name))
       .sort((a, b) => Number(!!b.computer) - Number(!!a.computer) || a.name.localeCompare(b.name)),
   );
+
+  const uid = $props.id();
+  const deviceMenuId = `od-download-menu-${uid}`;
+  let menuDevice = $state(/** @type {BluetoothDevice|null} */ (null));
+
+  /** @param {MouseEvent} e @param {BluetoothDevice} d */
+  function openDeviceMenu(e, d) {
+    menuDevice = d;
+    f7.popover.open(`#${deviceMenuId}`, /** @type {HTMLElement} */ (e.currentTarget));
+  }
+
+  /** "Not a dive computer": hidden for good, undone from the snackbar or in Settings. */
+  function hideDevice() {
+    f7.popover.close(`#${deviceMenuId}`);
+    const d = menuDevice;
+    if (!d) return;
+    hideBluetooth(d.mac);
+    showSnackbar(t('download.hidden', { name: d.computer ? d.computer.product : d.name }), {
+      action: t('dialog.cancel'),
+      onAction: () => showBluetooth(d.mac),
+    });
+  }
 
   /** Bluetooth and its permission, then the scan. */
   async function check() {
@@ -321,7 +346,7 @@
     navigation.downloadPanes++;
     listeners.push(
       await OpenDivesCore.addListener('bluetoothDevice', (/** @type {BluetoothDevice} */ d) => {
-        found = { ...found, [d.mac]: d };
+        found = { ...found, [d.mac]: { ...d, computer: confirmedComputer(d.name, d.computer) } };
       }),
       await OpenDivesCore.addListener('bluetoothScanStopped', () => {
         scanning = false;
@@ -491,7 +516,7 @@
     {#if nearby.length}
       <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
         {#each nearby as d (d.mac)}
-          <li>
+          <li class="od-download--nearby">
             <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => pick(d)}>
               {@render avatar(d.computer?.vendor ?? "", d.computer?.product ?? "")}
               <span class="od-download--texts">
@@ -501,9 +526,15 @@
                 </span>
               </span>
             </button>
+            <button type="button" class="od-download--more" aria-label={t('download.moreFor', { name: d.computer ? d.computer.product : d.name })} onclick={(e) => openDeviceMenu(e, d)}><Icon name="more" weight={4} /></button>
           </li>
         {/each}
       </ul>
+      <Popover id={deviceMenuId} class="od-menu" backdrop={false}>
+        <List noChevron>
+          <MenuItem icon="visibilityOff" text={t('download.notAComputer')} onclick={hideDevice} />
+        </List>
+      </Popover>
     {:else}
       <p class="od-download--empty">{scanning ? t('download.searching') : t('download.noneFound')}</p>
     {/if}
@@ -744,6 +775,32 @@
     }
 
     .od-download--row {
+      cursor: pointer;
+    }
+
+    .od-download--nearby {
+      display: flex;
+      align-items: center;
+
+      .od-download--row {
+        flex: 1;
+        min-width: 0;
+        padding-inline-end: 0;
+      }
+    }
+
+    .od-download--more {
+      flex: none;
+      width: 48px;
+      height: 48px;
+      margin-inline-end: 8px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--od-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
     }
 

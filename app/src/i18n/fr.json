@@ -818,6 +818,9 @@
       "forgetOneText": "Il ne sera plus proposé au téléchargement. Les plongées déjà téléchargées ne changent pas.",
       "showAll": "Montrer tous les appareils Bluetooth",
       "showAllText": "Affiche aussi les appareils non reconnus comme ordinateurs de plongée",
+      "hidden": "Appareils masqués ({n})",
+      "hiddenText": "Absents de la liste à proximité de l’écran de téléchargement",
+      "showHidden": "Afficher de nouveau",
       "forgetAll": {
         "one": "Oublier l’ordinateur mémorisé",
         "other": "Oublier les ordinateurs mémorisés"
@@ -2890,7 +2893,8 @@
       "Une bouteille a deux échéances, chacune avec sa carte, sa barre, son bouton « Noter … » et son rappel : l’inspection visuelle (chaque année) et la requalification (tous les 5 ans, avec la date frappée sur la bouteille, comme 03/22). La carte d’entretien montre aussi les heures sous l’eau à côté des plongées (« 82 plongées sur 100 · 61 h »). Dans « Ajouter de l’équipement », une pièce en retard reste choisissable mais indique en rouge ce qui est en retard, quand son rappel avertit dans une plongée.",
       "Le téléchargement depuis un ordinateur de plongée ne fige plus l'écran quand la fiche d'envoi d'un rapport d'erreur s'ouvre.",
       "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
-      "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur »."
+      "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur ».",
+      "Téléchargement : une lampe ou une balance dont le nom commence par « S1 » (« S19 A69C LE ») n’est plus proposée comme un Oceans S1. Chaque appareil de la liste à proximité a un menu « Ce n’est pas un ordinateur de plongée » qui le masque pour de bon (Annuler dans le message) ; Réglages › Téléchargement liste les appareils masqués avec « Afficher de nouveau »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3335,6 +3339,9 @@
     "pairingNote": "La première fois, le téléphone peut demander le code affiché par l'ordinateur.",
     "remembered": "Ordinateurs mémorisés",
     "nearby": "À proximité",
+    "moreFor": "Plus d’options pour {name}",
+    "notAComputer": "Ce n’est pas un ordinateur de plongée",
+    "hidden": "{name} masqué",
     "seen": "Visible",
     "searching": "Recherche des ordinateurs de plongée…",
     "noneFound": "Aucun ordinateur de plongée trouvé.",
