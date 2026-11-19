@@ -6162,7 +6162,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Done (19 November 2026).** Réglages › Modifier l’ordinateur on a tablet (440 dp side sheet over the list with photos; 96 dp tile with « Changer d’image », filled « Enregistrer », sand and white cards; scrolls), iPhone and iPad (grouped lists, Annuler / OK, footers, red « Retirer de la liste ») and desktop (760 dp dialog, photo left, cards side by side, Annuler / Enregistrer). Checked in headless Chrome at 390 dp (Material and ?theme=ios), 1024 and 1440 px; the duplicate cards could not be seen against real data (the sample log has one computer), so they follow the mock-up CSS only.
 
-## [ ] 2026-11-19-308 Maintenance reminders (#47): retire a piece, notifications, bottles, warnings, export
+## [x] 2026-11-19-308 Maintenance reminders (#47): retire a piece, notifications, bottles, warnings, export
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. OpenDives+ only. It completes the maintenance screens of 18 November and tasks 306 and 307.
 
