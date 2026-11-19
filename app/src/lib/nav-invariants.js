@@ -17,6 +17,7 @@
  * @property {string} classes
  * @property {boolean} visible the view is on screen (the active section, an open popup)
  * @property {string} current the router's current route
+ * @property {boolean} [modalRoute] the current route is a popup or a sheet opened by the router (Edit dive on a tablet): the page under it stays the current page
  * @property {string[]} history
  * @property {boolean} allow the router accepts a page change
  * @property {number} locks holds taken on the router (lib/router-guard.js)
@@ -30,6 +31,9 @@
  * @property {boolean} orphanBackdrop a scrim is shown with no sheet, popup or dialog above it
  * @property {ViewSnapshot[]} views
  */
+
+/** The kinds of route Framework7 opens as a modal over the view's pages. */
+const MODAL_ROUTES = ['popup', 'popover', 'sheet', 'loginScreen', 'actions', 'customModal', 'panel'];
 
 /** A route without its query. @param {string} url */
 const path = (url) => String(url ?? '').replace(/[?#].*$/, '');
@@ -64,7 +68,8 @@ export function checkView(view) {
   if (!split && current.length !== 1) problems.push(`${current.length} current pages`);
   if (split && (current.length < 1 || current.length > 2)) problems.push(`${current.length} current pages (list and detail)`);
   const top = current[current.length - 1];
-  if (top && path(top.route) !== path(view.current)) problems.push(`the current page is ${path(top.route) || '?'}, the router says ${path(view.current)}`);
+  // A route shown as a popup or a sheet has no page of its own in the view: the page under it is still the current one.
+  if (top && !view.modalRoute && path(top.route) !== path(view.current)) problems.push(`the current page is ${path(top.route) || '?'}, the router says ${path(view.current)}`);
   const last = view.history[view.history.length - 1] ?? '';
   if (path(last) !== path(view.current)) problems.push(`the history ends on ${path(last) || '?'}, the router says ${path(view.current)}`);
   for (const p of view.pages) {
@@ -121,6 +126,7 @@ export function readView(viewEl) {
     classes: viewEl.className,
     visible,
     current: router.currentRoute?.url ?? '',
+    modalRoute: !!router.currentRoute?.modal || MODAL_ROUTES.some((kind) => !!router.currentRoute?.route?.[kind]),
     history: [...router.history],
     allow: router.allowPageChange !== false,
     locks: router.odLocks ?? 0,

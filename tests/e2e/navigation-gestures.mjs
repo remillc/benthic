@@ -15,7 +15,13 @@
  * @param {object} h the harness of navigation.mjs
  */
 export async function gestureFlows(h) {
-  const { sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect } = h;
+  const { sleep, tapDive, tapText, tapBack, hardwareBack, readStack, expect } = h;
+  /** `settled` of navigation.mjs; a failure also prints the end of the app's navigation trace. */
+  const settled = async (t, label, o) => {
+    const before = h.failureCount();
+    await h.settled(t, label, o);
+    if (h.failureCount() > before) console.log(`    trace: ${await t.run(async () => (await import('/src/lib/nav-trace.js')).traceText().split('\n').slice(-12).join(' / ')).catch(() => '')}`);
+  };
   console.log('Phone, 390x844: touches the system takes away');
   const tab = await h.openTab(390, 844, true);
   const touch = (type, x = 0, y = 0) => tab.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' || type === 'touchCancel' ? [] : [{ x, y }] });
@@ -41,9 +47,22 @@ export async function gestureFlows(h) {
     await tapDive(tab);
     await settled(tab, `${label}: dive opened`, { route: /^\/dives\/\d+$/ });
     const dive = (await tab.run(readStack)).current;
+    // The dive page is still filling in (its profile, its site): the button is tapped once it has stopped moving.
+    const place = () => tab.run(() => {
+      const r = [...document.querySelectorAll('.page-current a, .page-current button')].find((b) => /^\s*(Modifier|Edit)\s*$/.test(b.textContent))?.getBoundingClientRect();
+      return r ? `${Math.round(r.x)},${Math.round(r.y)}` : '';
+    });
+    for (let i = 0, last = ''; i < 20; i++) {
+      const at = await place();
+      if (at && at === last) break;
+      last = at;
+      await sleep(150);
+    }
     await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
     // The first opening of a page loaded on demand can take longer than `settled` waits: its route first.
     for (let i = 0; i < 100 && !(await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
+    // When the page did not open: what the app's navigation trace says of the tap.
+    if (!(await tab.run(readStack)).current.endsWith('/edit')) console.log(`    trace: ${await tab.run(async () => (await import('/src/lib/nav-trace.js')).traceText().split('\n').slice(-10).join(' / '))} ${JSON.stringify(tab.logs.slice(-3))}`);
     await settled(tab, `${label}: edit opened`, { route: /\/edit$/ });
     return dive;
   };
@@ -172,5 +191,35 @@ export async function gestureFlows(h) {
     expect('the sheet is closed after Back', { open: false, scrim: false }, await tab.run(() => ({ open: !!document.querySelector('.od-account-sheet.modal-in'), scrim: !!document.querySelector('.sheet-backdrop.backdrop-in') })));
     await sound('after the sheet: sound');
   }
+  // The app's own check ran after each of these navigations (lib/nav-health.js): it found nothing to repair.
+  const broken = (t) => t.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type === 'broken' || e.type === 'repair').map((e) => `${e.type} ${e.detail}`).join(' | '));
+  expect('phone: the app found nothing broken', { broken: '' }, { broken: await broken(tab) });
   tab.ws.close();
+
+  // A route opened as a popup has no page of its own in the view (Edit dive on a tablet): the app's check must
+  // not take the view for broken, and Back closes the popup.
+  console.log('Tablet, 1280x800: a route opened as a popup');
+  const wide = await h.openTab(1280, 800, false);
+  const state = () => wide.run(async () => {
+    const inv = await import('/src/lib/nav-invariants.js');
+    const app = inv.readApp();
+    const view = document.querySelector('.views > .view.tab-active');
+    return { moving: inv.appIsMoving(app), problems: inv.checkApp(app).join('; '), popup: !!document.querySelector('.popup.modal-in'), route: view?.f7View?.router?.currentRoute?.path ?? '' };
+  });
+  await tapDive(wide);
+  await settled(wide, 'tablet: dive shown beside the list', { split: true });
+  const shownDive = (await state()).route;
+  await tapText(wide, '^\\s*(Modifier|Edit)\\s*$', '.page-current, .page-master-detail');
+  for (let i = 0; i < 100 && !(await state()).popup; i++) await sleep(100);
+  // Long enough for the app's own check to run (700 ms after the last navigation event).
+  await sleep(1600);
+  let now = await state();
+  expect('tablet: Edit dive is open as a popup, the view is sound', { popup: true, moving: false, problems: '', edit: true }, { ...now, edit: /\/edit$/.test(now.route) });
+  await hardwareBack(wide);
+  for (let i = 0; i < 50 && (await state()).popup; i++) await sleep(100);
+  await sleep(1600);
+  now = await state();
+  expect('tablet: Back closes the popup, the dive is still beside the list', { popup: false, moving: false, problems: '', route: shownDive }, now);
+  expect('tablet: the app found nothing broken', { broken: '' }, { broken: await broken(wide) });
+  wide.ws.close();
 }

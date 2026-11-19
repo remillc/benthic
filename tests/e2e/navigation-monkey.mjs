@@ -5,6 +5,7 @@
 //   node tests/e2e/navigation.mjs --monkey-only
 //   OD_MONKEY_SEEDS=7,8,9 OD_MONKEY_STEPS=400 node tests/e2e/navigation.mjs --monkey-only     (a long run)
 //   OD_MONKEY_SEED=1234 OD_MONKEY_CONFIG=phone-md node tests/e2e/navigation.mjs --monkey-only  (replays one failure)
+// OD_MONKEY_VERBOSE=1 prints each action; OD_MONKEY_MAX_MIN stops the run after that many minutes.
 //
 // Each step is one action picked by the seed: a tap on something of the top layer, the navbar's arrow, the system
 // Back, a swipe back from the edge, the system's own back gesture (the touch starts in the page, the system takes it
@@ -147,6 +148,9 @@ export async function monkeyFlows(h) {
       ? Object.fromEntries(Object.keys(CONFIGS).filter((c) => !only || c === only).map((c) => [c, process.env.OD_MONKEY_SEEDS.split(',').map(Number)]))
       : { 'phone-md': [101, 102, 103], 'phone-ios': [201], 'tablet-md': [301] };
   const summary = [];
+  /** OD_MONKEY_IGNORE: problems that are not counted (a regular expression), to compare with an older code that has them by design. */
+  const ignore = process.env.OD_MONKEY_IGNORE ? new RegExp(process.env.OD_MONKEY_IGNORE) : null;
+  const counted = (/** @type {string[]} */ list) => (ignore ? list.filter((p) => !ignore.test(p)) : list);
   const blank = await h.blankTab();
   const started = Date.now();
   /** OD_MONKEY_MAX_MIN: the run stops by itself after this many minutes (the seeds left are not run). */
@@ -315,7 +319,9 @@ export async function monkeyFlows(h) {
         // A fresh page for the rest of the seed.
         await send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] }).catch(() => {});
         await h.activate(tab.targetId).catch(() => {});
-        await send('Page.reload', {}).catch(() => {});
+        // The same address without a fragment (an older code left « #compte » there, which a reload keeps).
+        const address = await run(() => location.href.split('#')[0]).catch(() => '');
+        await (address ? send('Page.navigate', { url: address }) : send('Page.reload', {})).catch(() => {});
         for (let i = 0; i < 100; i++) {
           await sleep(200);
           if (await run(() => !!document.querySelector('a[href^="/dives/"]')).catch(() => false)) break;
@@ -339,7 +345,7 @@ export async function monkeyFlows(h) {
           await report(step, ['the page did not answer']);
           continue;
         }
-        const problems = [...health.problems];
+        const problems = counted([...health.problems]);
         if (health.moving) problems.push('the page never came to rest');
         if (!health.layerOk) problems.push(`the middle of the screen is not in the top layer (${health.hit})`);
         if (health.broken > brokenSeen) problems.push('the app found its navigation broken (see the trace)');
@@ -365,7 +371,7 @@ export async function monkeyFlows(h) {
           }
           const after = await settle();
           h.count();
-          const late = after ? [...after.problems, ...(after.moving ? ['the page never came to rest'] : []), ...(after.layerOk ? [] : [`the middle of the screen is not in the top layer (${after.hit})`])] : ['the page did not answer'];
+          const late = after ? [...counted(after.problems), ...(after.moving ? ['the page never came to rest'] : []), ...(after.layerOk ? [] : [`the middle of the screen is not in the top layer (${after.hit})`])] : ['the page did not answer'];
           if (after && after.broken > brokenSeen) late.push('the app found its navigation broken (see the trace)');
           brokenSeen = after?.broken ?? brokenSeen;
           if (late.length) await report(step, late);

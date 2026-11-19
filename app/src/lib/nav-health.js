@@ -54,26 +54,38 @@ export function reloadView(router) {
 
 /**
  * Starts the checks.
+ *
+ * « Stuck » means moving for `STUCK_MS` without a rest, seen by looks that follow each other: a look that comes
+ * long after the one before proves nothing about the time between them (the events of a busy session push the
+ * look back; the pages rested in between). And while a finger is down the pages are where the finger holds them.
  * @param {object} options
  * @param {Document} [options.doc]
  * @param {(message: string) => void} [options.report] offers an error report (the trace is added to every report)
+ * @param {() => import('./nav-invariants.js').AppSnapshot} [options.read] the page as it is (the tests give their own)
+ * @param {(problems: string[]) => string} [options.repair] puts the page back in a sound state and says what it did (the tests give their own)
  * @param {{ setTimeout?: typeof setTimeout, clearTimeout?: typeof clearTimeout, now?: () => number }} [options.clock] for the tests
  * @returns {{ check: () => string[], stop: () => void }} `check` looks now and returns what it found (and repaired)
  */
-export function startNavHealth({ doc = document, report = () => {}, clock = {} } = {}) {
+export function startNavHealth({ doc = document, report = () => {}, read = () => readApp(doc), repair = () => repairViews(doc), clock = {} } = {}) {
   const wait = clock.setTimeout ?? setTimeout;
   const unwait = clock.clearTimeout ?? clearTimeout;
   const now = clock.now ?? Date.now;
-  /** @type {any} */
-  let timer = 0;
-  /** Since when the pages have been moving without a rest; 0 when they were last seen at rest. */
-  let movingSince = 0;
+  /** The look that follows the last navigation event. @type {any} */
+  let settleTimer = 0;
+  /** The next look while the pages move: events do not push it back. @type {any} */
+  let retryTimer = 0;
+  /** Since when the pages have been seen moving by looks that follow each other; null at rest. @type {number|null} */
+  let movingSince = null;
+  /** When the pages were last seen moving. */
+  let lastMoving = 0;
+  /** Fingers on the screen, as the last touch event said. */
+  let fingers = 0;
   /** @type {number[]} */
   const repairs = [];
 
-  const schedule = (/** @type {number} */ ms) => {
-    unwait(timer);
-    timer = wait(run, ms);
+  const schedule = () => {
+    unwait(settleTimer);
+    settleTimer = wait(run, SETTLE_MS);
   };
 
   /** @param {string[]} problems */
@@ -83,59 +95,78 @@ export function startNavHealth({ doc = document, report = () => {}, clock = {} }
     while (repairs.length && t - repairs[0] > 60000) repairs.shift();
     if (repairs.length >= MAX_REPAIRS) return;
     repairs.push(t);
-    /** @type {string[]} */
-    const done = [];
-    for (const viewEl of doc.querySelectorAll('.view')) {
-      const router = /** @type {any} */ (viewEl).f7View?.router;
-      const before = router && readViewSafe(viewEl);
-      if (!before || (!checkView(before).length && !isMoving(before))) continue;
-      tidyView(router);
-      const after = readViewSafe(viewEl);
-      if (after && checkView(after).length) {
-        reloadView(router);
-        done.push(`${before.id} reloaded`);
-      } else done.push(`${before.id} tidied`);
-    }
-    // A scrim with nothing above it takes every tap.
-    if (!doc.querySelector('.modal-in:not(.toast), .modal-out')) for (const b of doc.querySelectorAll('.backdrop-in:not(.panel-backdrop)')) b.classList.remove('backdrop-in');
-    trace('repair', done.join(', ') || 'nothing to do');
+    trace('repair', repair(problems) || 'nothing to do');
     report(`Navigation left in a broken state (repaired): ${problems.join('; ')}`.slice(0, 600));
   }
 
   function run() {
-    timer = 0;
+    unwait(settleTimer);
+    unwait(retryTimer);
+    settleTimer = retryTimer = 0;
     if (doc.hidden) return [];
-    const app = readApp(doc);
+    const app = read();
+    const t = now();
     if (appIsMoving(app)) {
-      movingSince ||= now();
-      if (now() - movingSince < STUCK_MS) {
-        schedule(RETRY_MS);
+      // The count starts again after a rest, after a gap between two looks, and while a finger holds the pages.
+      if (movingSince === null || fingers > 0 || t - lastMoving > 3 * RETRY_MS) movingSince = t;
+      lastMoving = t;
+      if (t - movingSince < STUCK_MS) {
+        retryTimer = wait(run, RETRY_MS);
         return [];
       }
-      movingSince = 0;
-      const stuck = app.views.filter(isMoving).map((v) => `${v.id}: still moving after ${STUCK_MS / 1000} s on ${pathOf(v.current)} (${v.allow ? '' : 'closed '}${v.locks ? 'held ' : ''}${v.classes.split(/\s+/).filter((c) => /transition|push/.test(c)).join(' ')})`.replace(/\s+\)/, ')'));
+      movingSince = null;
+      const stuck = app.views.filter(isMoving).map((v) => `${v.id}: still moving after ${STUCK_MS / 1000} s on ${pathOf(v.current)} (${[v.allow ? '' : 'closed', v.locks ? 'held' : '', ...v.classes.split(' ').filter((c) => c.includes('transition') || c.includes('push'))].filter(Boolean).join(' ')})`);
       broken(stuck);
       return stuck;
     }
-    movingSince = 0;
+    movingSince = null;
     const problems = checkApp(app);
     if (problems.length) broken(problems);
     return problems;
   }
 
   const stopTrace = onTrace((event) => {
-    if (!OWN.has(event.type)) schedule(SETTLE_MS);
+    if (!OWN.has(event.type)) schedule();
   });
-  const onVisible = () => !doc.hidden && schedule(SETTLE_MS);
+  const onVisible = () => !doc.hidden && schedule();
+  const onTouch = (/** @type {Event} */ e) => (fingers = /** @type {TouchEvent} */ (e).touches?.length ?? 0);
+  const touches = ['touchstart', 'touchend', 'touchcancel'];
   doc.addEventListener?.('visibilitychange', onVisible);
+  for (const type of touches) doc.addEventListener?.(type, onTouch, { capture: true, passive: true });
   return {
     check: run,
     stop() {
-      unwait(timer);
+      unwait(settleTimer);
+      unwait(retryTimer);
       stopTrace();
       doc.removeEventListener?.('visibilitychange', onVisible);
+      for (const type of touches) doc.removeEventListener?.(type, onTouch, { capture: true });
     },
   };
+}
+
+/**
+ * Repairs every view that is not sound: tidied, or loaded again when tidying is not enough. A scrim left with
+ * nothing above it is removed (it takes every tap).
+ * @param {Document} doc
+ * @returns {string} what was done
+ */
+function repairViews(doc) {
+  /** @type {string[]} */
+  const done = [];
+  for (const viewEl of doc.querySelectorAll('.view')) {
+    const router = /** @type {any} */ (viewEl).f7View?.router;
+    const before = router && readViewSafe(viewEl);
+    if (!before || (!checkView(before).length && !isMoving(before))) continue;
+    tidyView(router);
+    const after = readViewSafe(viewEl);
+    if (after && checkView(after).length) {
+      reloadView(router);
+      done.push(`${before.id} reloaded`);
+    } else done.push(`${before.id} tidied`);
+  }
+  if (!doc.querySelector('.modal-in:not(.toast), .modal-out')) for (const b of doc.querySelectorAll('.backdrop-in:not(.panel-backdrop)')) b.classList.remove('backdrop-in');
+  return done.join(', ');
 }
 
 /** How long a sheet, a popup or a dialog may take to close before its end is given by hand (ms). */

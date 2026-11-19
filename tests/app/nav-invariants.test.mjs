@@ -111,3 +111,15 @@ test('the app: a fragment in the address, two sections shown, a scrim with nothi
   assert.equal(appIsMoving(app(moving)), true);
   assert.ok(checkApp(app(moving))[0].startsWith('view-logbook: '));
 });
+
+test('a route opened as a popup (Edit dive on a tablet) keeps the page under it as the current page', () => {
+  const v = sound();
+  v.current = '/dives/3/edit';
+  v.history = ['/', '/dives/3', '/dives/3/edit'];
+  assert.ok(checkView(v).some((p) => /the current page is \/dives\/3, the router says \/dives\/3\/edit/.test(p)), 'a page route would be a fault');
+  v.modalRoute = true;
+  assert.deepEqual(checkView(v), []);
+  // Its history must still end on it.
+  v.history = ['/', '/dives/3'];
+  assert.ok(checkView(v).some((p) => /the history ends on/.test(p)));
+});

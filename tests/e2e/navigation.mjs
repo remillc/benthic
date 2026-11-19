@@ -920,7 +920,7 @@ try {
   if (fixed && !args.has('--phone-only') && !args.has('--tablet-only')) await desktopFlows();
   // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
   if (args.has('--gestures-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
-    await gestureFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect });
+    await gestureFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
   }
   // Seeded random sequences (tests/e2e/navigation-monkey.mjs).
   if (args.has('--monkey-only') || (fixed && !args.has('--no-monkey') && !args.has('--tablet-only') && !args.has('--phone-only') && !args.has('--welcome-only'))) {
