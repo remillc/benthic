@@ -42,7 +42,8 @@ test('the Compte button stays for a free diver: named « Compte, réglages et à
 // --- The free sheet's routes ---
 
 test('free sheet: « S’abonner » opens the offer, « Se connecter » opens the sign-in screen, both OpenDives+ rows open the offer', () => {
-  const free = sheet.slice(sheet.indexOf('{#if free}'), sheet.indexOf('{:else}\n    <div class="od-account-sheet--card od-account-sheet--identity">'));
+  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
+  const free = android.slice(android.indexOf('{#if free}'), android.indexOf('{:else}\n    <div class="od-account-sheet--card od-account-sheet--identity">'));
   assert.match(free, /od-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
   assert.match(free, /od-account-sheet--sign-in" onclick=\{\(\) => plus\('signIn'\)\}/);
   assert.equal([...free.matchAll(/od-account-sheet--plus-row" onclick=\{\(e\) => \(e\.preventDefault\(\), plus\('offer'\)\)\}/g)].length, 2);
@@ -126,7 +127,8 @@ test('the profile row shows the badge and the red subtitle only when a piece is 
 });
 
 test('Android phone: the ✕ of the sheet is on the right at the logo’s height, none on the left', () => {
-  const head = sheet.slice(sheet.indexOf('<div class="od-account-sheet--head">'), sheet.indexOf('{#if free}'));
+  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
+  const head = android.slice(android.indexOf('<div class="od-account-sheet--head">'), android.indexOf('{#if free}'));
   assert.ok(head.indexOf('od-account-sheet--brand') < head.indexOf('od-account-sheet--close'), 'the cross comes after the logo');
   assert.equal([...head.matchAll(/od-account-sheet--close/g)].length, 1);
   assert.match(head, /<span aria-hidden="true"><\/span>\s*<!--/);
@@ -358,7 +360,8 @@ test('the tablet offer: the blue panel carries the chip, title and lead; the pho
 
 test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sheets open the backup page and the profile', () => {
   // Free: the two rows open the offer (phone, iPhone, desktop).
-  assert.equal((sheet.match(/plus\('offer'\)/g) ?? []).length, 4);
+  // The iPhone's free sheet has its own two rows (task 289), so six in all.
+  assert.equal((sheet.match(/plus\('offer'\)/g) ?? []).length, 6);
   assert.match(sheet, /href="#offer-sync"[^\n]*plus\('offer'\)/);
   assert.match(sheet, /href="#offer-profile"[^\n]*plus\('offer'\)/);
   assert.match(desktopSheet, /plus-row" onclick=\{\(\) => plus\('offer'\)\}[\s\S]*plus-row" onclick=\{\(\) => plus\('offer'\)\}/);

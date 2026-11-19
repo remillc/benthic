@@ -5824,3 +5824,26 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 7. **Cylinder types** (`ios-reglages2-bouteilles`, `ios-reglages2-bouteille-vos-modifier`, `ios-reglages2-bouteille-supprimer`, and `ios-reglages-equipement` now links to the list): same rules as tasks 285 and 287. On iOS, « Supprimer ce type » is a red row, and the confirmation is an **action sheet** (« Supprimer « ALU 3L » » in red, « Annuler »), not a centred alert.
 
 **Test:** on an iPhone (or the simulator), walk through each screen above from the tab bar and the account initial.
+
+**Partly done (19 November 2026, checked in Chromium with the iOS theme at 390 x 844, no Mac):** no band on the four sections (large title, grey search field, summary), account sheet (free and subscriber) per the mock-ups, back-button labels and « + » in the bar (profile, equipment, cylinder types), red « Supprimer ce type » and « Supprimer le site » rows, action sheet for deleting a cylinder type, « Annuler » / « OK » on the site and type forms, « Ouvrir dans Plans » (`maps://?ll=…&q=…`, Apple Maps web address as fallback), « Continuer avec Apple » first, « Restaurer les achats » and the renewal terms on the offer, « Gérer dans l’App Store » (apps.apple.com/account/subscriptions) and « Supprimer le compte » in « Gérer le compte ». Not drawn as in the mock-up: the dive rows keep the profile thumbnail of task 278. Missing: StoreKit purchase/restore and Sign in with Apple (waiting for go-ahead; the buttons stay on the inert seams of `lib/odplus-billing.js` with the « not available yet » messages), device check (no Mac). Not ticked.
+
+## [ ] 2026-11-19-290 Backup and restore (OpenDives+), and the subscriber account sheet
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
+
+**Account sheet for a subscriber** (`nav-option-barre-compte-android`, `nav-compte-profil-android`, `android-tablette-profil-compte-paysage`, `bureau-profil-compte`, `ios-compte-abonne`):
+- When the user is subscribed, **no OpenDives+ chip next to menu entries** (« Mon profil de plongeur » loses its chip). The chips stay in the free version, where they sell the offer.
+- New entry **« Sauvegarde et restauration »** (history icon, subtitle « Revenir à une version du carnet ou d'une plongée ») above « Mon profil de plongeur ». Subscribers only. The free sheet keeps « Sauvegarde et synchronisation », which leads to the offer.
+
+**Backup and restore screens** (phone: `sauvegarde-android`, `sauvegarde-version-android`, `sauvegarde-restaurer-android`, `sauvegarde-plongee-android`; tablet: `android-tablette-sauvegarde-paysage`, `-restaurer-paysage`, `-plongee-paysage`, two panes; desktop: `bureau-sauvegarde`, `-restaurer`, `-plongee`, a 1000 px dialog; iPhone: `ios-sauvegarde`, `-version`, `-restaurer`, `-plongee`):
+
+The logbook on the OpenDives server is a git repository. Each sync is a commit, and that is a version.
+1. Main screen: status (« Carnet sauvegardé », time of the last sync, encrypted on the server). « Revenir à une version du carnet »: versions by date (the current one marked « Actuelle »), each with its dive count and what changed since (« 3 plongées ajoutées depuis »). « Versions plus anciennes » loads more. « Restaurer seulement »: « Une plongée » and « Plongées supprimées ».
+2. A version: counts (dives, sites, pieces), the differences with the current logbook, « Restaurer cette version » and « Parcourir cette version » (opens it read-only, changes nothing).
+3. Restore confirmation: says what will be removed or reverted. **Restoring creates a new commit** with the old content. The current logbook stays in the history, so a restore can itself be undone. Never rewrite or force-push history.
+4. One dive: pick a dive (« Changer »), list its versions with what changed (from the commits that touched it), « Restaurer » on each. Restoring changes only that dive, as a new commit. Also reachable from the dive detail menu: add « Versions de cette plongée ».
+5. **Deleted dives**: they stay in the history, so they are **always recoverable** (no time limit).
+
+Points to confirm with Christian before building: photos and videos are not in git (10 GB storage), so how long a deleted photo is kept. « Supprimer le compte » must erase the whole history, deleted dives included.
+
+**Test:** make three syncs with changes, restore the middle version, check the counts and that the newest version is still listed and can be restored back. Delete a dive, sync, restore it from « Plongées supprimées ».

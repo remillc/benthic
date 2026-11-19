@@ -5,6 +5,7 @@
   // figures (dives, hours under water, deepest), the details, the last dive. ✎ Modifier and ⋮ (Partager la
   // fiche, Archiver, Supprimer) in the top bar. The firmware of a computer is read only: it is filled at each
   // download (« 91 · lu au téléchargement du 3 novembre 2026 »), and hidden for a computer never downloaded.
+  import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { Share } from '@capacitor/share';
@@ -130,10 +131,7 @@
 <Page class="od-piece-page">
   <Navbar>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('gear.piece.back')}</span>
-      </Link>
+      <BackLink label={t('gear.profile.equipment')} name={t('gear.piece.back')} />
     {/snippet}
     {#snippet right()}
       {#if piece}

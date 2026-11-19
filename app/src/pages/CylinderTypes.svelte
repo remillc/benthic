@@ -5,10 +5,12 @@
   // types" (from the logbook and added on this device) then "Standard" (the
   // core's default table), each with its volume and working pressure. A tap
   // opens the type's sheet; "Add a type" opens an empty one.
+  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
+  import { ios } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { formatCylinderSize, formatNumber, formatPressure } from '../lib/format.js';
@@ -65,10 +67,10 @@
 <Page class="od-cylinder-types" onPageBeforeIn={refresh}>
   <Navbar title={t('settings.cylinders.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      <BackLink label={t('common.back')} name={t('common.back')} />
+    {/snippet}
+    {#snippet right()}
+      {#if ios}<Link href="/settings/cylinders/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('settings.cylinders.add')}</span></Link>{/if}
     {/snippet}
   </Navbar>
 
@@ -89,6 +91,7 @@
   <div class="od-cylinder-types--bottom"></div>
 
   {#snippet fixedContent()}
+    {#if !ios}
     <!-- Extended floating button, written by hand as in the Logbook. -->
     <div class="fab fab-right-bottom fab-extended od-fab-add">
       <a href="/settings/cylinders/new">
@@ -96,6 +99,7 @@
         <div class="fab-text">{t('settings.cylinders.add')}</div>
       </a>
     </div>
+    {/if}
   {/snippet}
 </Page>
 

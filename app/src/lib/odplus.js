@@ -9,6 +9,16 @@
  * @param {{ subscribed?: boolean }|undefined} user the `user` of the server's sign-in answer
  * @returns {'download'|'offer'}
  */
+/**
+ * The sign-in buttons in the order of the platform (task 2026-11-19-289): « Continuer avec Apple » comes first on iOS
+ * (Apple's guidelines), then Google; the e-mail comes last everywhere. Android and the others: Google, Apple, e-mail.
+ * @param {boolean} ios
+ * @returns {('apple'|'google'|'email')[]}
+ */
+export function providerOrder(ios) {
+  return ios ? ['apple', 'google', 'email'] : ['google', 'apple', 'email'];
+}
+
 export function afterSignIn(user) {
   return user?.subscribed === true ? 'download' : 'offer';
 }

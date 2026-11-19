@@ -21,7 +21,8 @@
   import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
   import { deletable, deletionSentences, sizeFields, typedSize as readSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
-  import { confirmAction } from '../lib/dialogs.js';
+  import { confirmAction, confirmActionSheet } from '../lib/dialogs.js';
+  import { ios } from '../lib/layout.svelte.js';
   import { formatNumber, locale } from '../lib/format.js';
 
   /** @type {{ f7route: { query: { name?: string } }, f7router: any }} */
@@ -147,6 +148,15 @@
         return;
       }
       const counts = deletion ?? (await previewCylinderTypeDeletion(original));
+      if (ios) {
+        // iPhone: an action sheet, « Supprimer « ALU 3L » » in red (task 289).
+        confirmActionSheet({
+          text: [...deletionSentences(counts), t('settings.cylinders.deleteIrreversible')].join(' '),
+          action: t('settings.cylinders.deleteTypeSheet', { name: original }),
+          onConfirm: deleteNow,
+        });
+        return;
+      }
       confirmAction({
         title: t('settings.cylinders.deleteTypeTitle', { name: original }),
         text: [...deletionSentences(counts), t('settings.cylinders.deleteIrreversible')].join(' '),
@@ -188,13 +198,17 @@
 <Page class="od-cylinder-type">
   <Navbar title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')}>
     {#snippet left()}
-      <Link iconOnly onClick={() => guard?.attempt()}>
-        <Icon name="close" />
-        <span class="od-sr-only">{t('plan.chooseClose')}</span>
-      </Link>
+      {#if ios}
+        <Link onClick={() => guard?.attempt()}>{t('dialog.cancel')}</Link>
+      {:else}
+        <Link iconOnly onClick={() => guard?.attempt()}>
+          <Icon name="close" />
+          <span class="od-sr-only">{t('plan.chooseClose')}</span>
+        </Link>
+      {/if}
     {/snippet}
     {#snippet right()}
-      <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
+      <Link onClick={save} class={saving ? 'disabled' : ''}>{t(ios ? 'dialog.ok' : 'edit.save')}</Link>
     {/snippet}
   </Navbar>
   <LeaveGuard bind:this={guard} noun="cylinderType" {dirty} {save} leave={() => f7router.back()} />
@@ -216,8 +230,8 @@
   {#if editing && type}
     {#if deletable(type)}
       <div class="od-cylinder-type--action">
-        <button type="button" class="od-outlined-button od-danger od-cylinder-type--delete" onclick={deleteTheType}>
-          <Icon name="delete" size={18} />
+        <button type="button" class={ios ? 'od-cylinder-type--delete-ios' : 'od-outlined-button od-danger od-cylinder-type--delete'} onclick={deleteTheType}>
+          {#if !ios}<Icon name="delete" size={18} />{/if}
           {t('settings.cylinders.deleteType')}
         </button>
         {#if deleteNote}<p class="od-cylinder-type--delete-note">{deleteNote}</p>{/if}
@@ -256,6 +270,19 @@
     }
 
     /* The red of « Supprimer le compte » (--od-late), not the alarm red. */
+    /* iPhone: a red row of a grouped list (ios-reglages2-bouteille-vos-modifier.dc.html). */
+    .od-cylinder-type--delete-ios {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: var(--od-surface);
+      color: var(--od-alarm);
+      font: inherit;
+      font-size: 17px;
+    }
+
     .od-cylinder-type--delete {
       display: inline-flex;
       align-items: center;

@@ -3,6 +3,7 @@
   // « Mon profil de plongeur » (task 2026-11-17-267, docs/mockups-release/profil-plongeur-android.dc.html): the
   // diver's initial, name, number of dives and the OpenDives+ chip, then three entries: « Équipement », « Brevets » and
   // « Informations » (task 2026-11-18-272).
+  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import OdPlusChip from '../components/OdPlusChip.svelte';
@@ -26,10 +27,7 @@
 <Page class="od-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
   <Navbar title={t('gear.profile.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('gear.piece.back')}</span>
-      </Link>
+      <BackLink label={t('account.title')} name={t('gear.piece.back')} />
     {/snippet}
   </Navbar>
 

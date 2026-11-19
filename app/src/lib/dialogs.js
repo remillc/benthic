@@ -4,6 +4,12 @@
 // Cancel comes first.
 import { f7 } from 'framework7-svelte';
 import { t } from './i18n.js';
+import { actionSheetButtons } from './action-sheet.js';
+
+/** @param {{ text: string, action: string, onConfirm: () => void, cancel?: string }} o */
+export function confirmActionSheet(o) {
+  f7.actions.create({ buttons: actionSheetButtons(o) }).open();
+}
 
 /**
  * @param {{ title: string, text: string, action: string, onConfirm: () => void, cancel?: string, onCancel?: () => void }} options

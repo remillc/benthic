@@ -1925,6 +1925,23 @@ html.md {
   padding: 0;
 }
 
+/* iPhone (task 289, ios-carnet.dc.html): the large title without a band; the search field is the system's grey one. */
+.ios .searchbar.od-ios-search {
+  --f7-searchbar-height: 40px;
+  --f7-searchbar-input-height: 36px;
+  --f7-searchbar-input-border-radius: 10px;
+  --f7-searchbar-input-bg-color: var(--od-surface-container-highest);
+  --f7-searchbar-inner-padding-left: 0px;
+  --f7-searchbar-inner-padding-right: 0px;
+  margin: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.ios .searchbar.od-ios-search .searchbar-inner {
+  padding: 0;
+}
+
 /*
  * The snackbar (ui-foundations, section 8): Framework7's toast, one style for
  * every message of the app (lib/snackbar.js). The same on iOS and Android.
