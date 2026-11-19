@@ -80,6 +80,11 @@ class OpenDivesCorePlugin : Plugin() {
     override fun load() {
         // A file shared with the app before the web layer was up (cold start from « Share to »).
         offerSharedFiles(activity?.intent)
+        // Staged files a killed app left behind (a logbook can be 100 MB): those older than half a day go.
+        Thread {
+            val limit = System.currentTimeMillis() - 12L * 3600 * 1000
+            context.cacheDir.listFiles { f -> f.isFile && f.name.startsWith(IMPORT_PREFIX) && f.lastModified() < limit }?.forEach { it.delete() }
+        }.start()
         MapsManager.init(context)
         MapsManager.listener = { event -> notifyListeners("mapsDownload", JSObject(event.toString())) }
         val home = context.filesDir.absolutePath
@@ -806,21 +811,107 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /**
-     * Step 2's "Depuis un fichier": the file picked in the web layer
-     * (`name`, base64 `data`) is written to the app's cache for the import
-     * steps (importCount, createLog); {path}.
+     * Step 2's "Depuis un fichier": the file picked in the web layer is written to the app's cache for the
+     * import steps (importCount, createLog, importDives); {path}. A big file comes in pieces, never as one
+     * string (the bridge and the Java heap cannot hold a logbook): the first call (`name`, base64 `data` of the
+     * first piece) creates the file, the next ones give `path` and `append: true` to add their piece.
      */
     @PluginMethod
     fun stageImport(call: PluginCall) = onCoreThread(call) {
-        val name = File(call.getString("name").orEmpty()).name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifEmpty { "import.xml" }
         val data = call.getString("data")
         if (data == null) {
             call.reject("BAD_REQUEST", "BAD_REQUEST")
             return@onCoreThread
         }
-        val file = File(context.cacheDir, "$IMPORT_PREFIX${System.currentTimeMillis()}-$name")
+        if (call.getBoolean("append", false) == true) {
+            val file = importFile(call.getString("path").orEmpty())
+            if (file == null || !file.exists()) {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return@onCoreThread
+            }
+            java.io.FileOutputStream(file, true).use { it.write(Base64.decode(data, Base64.DEFAULT)) }
+            call.resolve(JSObject().put("path", file.absolutePath))
+            return@onCoreThread
+        }
+        val file = newStagedFile(call.getString("name").orEmpty())
         file.writeBytes(Base64.decode(data, Base64.DEFAULT))
         call.resolve(JSObject().put("path", file.absolutePath))
+    }
+
+    /** A new file in the cache that the import calls accept (importFile): a unique name that keeps the extension. */
+    private fun newStagedFile(name: String): File {
+        val clean = File(name).name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifEmpty { "import.xml" }
+        return File(context.cacheDir, "$IMPORT_PREFIX${System.nanoTime()}-$clean")
+    }
+
+    /**
+     * A piece of a staged file, base64 (at most 4 MB): {data, size}. The web layer reads a big logbook this way
+     * to look at its beginning or to scan it; the whole file never crosses the bridge.
+     */
+    @PluginMethod
+    fun readFileChunk(call: PluginCall) = onCoreThread(call) {
+        val file = importFile(call.getString("path").orEmpty())
+        if (file == null || !file.exists()) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val offset = call.data.optLong("offset", 0L).coerceAtLeast(0L)
+        val length = (call.getInt("length") ?: 65536).coerceIn(0, MAX_CHUNK)
+        val buffer = ByteArray(length)
+        var read = 0
+        java.io.RandomAccessFile(file, "r").use { raf ->
+            raf.seek(offset)
+            while (read < length) {
+                val n = raf.read(buffer, read, length - read)
+                if (n < 0) break
+                read += n
+            }
+        }
+        call.resolve(JSObject().put("data", Base64.encodeToString(buffer, 0, read, Base64.NO_WRAP)).put("size", file.length()))
+    }
+
+    /**
+     * A new staged file made of pieces: `parts` is a list of {path, start, end} (a byte range of a staged file)
+     * and {text} (literal text, UTF-8), copied in order with a small buffer. Used to put the sites a dives file
+     * lacks into it without reading the whole file into memory. {path}.
+     */
+    @PluginMethod
+    fun assembleFile(call: PluginCall) = onCoreThread(call) {
+        val parts = call.getArray("parts")
+        if (parts == null || parts.length() == 0) {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return@onCoreThread
+        }
+        val target = newStagedFile(call.getString("name").orEmpty())
+        try {
+            java.io.FileOutputStream(target).use { out ->
+                val buffer = ByteArray(64 * 1024)
+                for (i in 0 until parts.length()) {
+                    val part = parts.getJSONObject(i)
+                    if (part.has("text")) {
+                        out.write(part.getString("text").toByteArray(Charsets.UTF_8))
+                        continue
+                    }
+                    val source = importFile(part.optString("path"))
+                    if (source == null || !source.exists()) throw IllegalArgumentException("BAD_REQUEST")
+                    val start = part.optLong("start", 0L)
+                    var left = part.optLong("end", source.length()) - start
+                    java.io.RandomAccessFile(source, "r").use { raf ->
+                        raf.seek(start)
+                        while (left > 0) {
+                            val n = raf.read(buffer, 0, minOf(buffer.size.toLong(), left).toInt())
+                            if (n < 0) break
+                            out.write(buffer, 0, n)
+                            left -= n
+                        }
+                    }
+                }
+            }
+            call.resolve(JSObject().put("path", target.absolutePath))
+        } catch (e: Exception) {
+            target.delete()
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+        }
     }
 
     /** Import, step 2: reads the downloaded file (read-only), {dives}. */
@@ -1339,13 +1430,28 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /**
-     * Imports a file chosen in the WebView (import_dives): its bytes arrive in
-     * base64, are written to a temporary file with the original name (the core
-     * reads the format from it), imported, then the copy is deleted.
+     * Imports a file (import_dives). Either `path`, a file staged in the cache (stageImport, stageSharedFile,
+     * assembleFile, exportDives with `stage`): the core reads it where it is, and it is deleted afterwards; or,
+     * for a small file, `data` in base64, written to a temporary file with the original `name` (the core reads
+     * the format from it), imported, then the copy is deleted. A logbook is never sent as `data`.
      */
     @PluginMethod
     fun importDives(call: PluginCall) = onCoreThread(call) {
         val name = File(call.getString("name").orEmpty()).name.ifEmpty { "import.xml" }
+        val staged = call.getString("path")
+        if (staged != null) {
+            val file = importFile(staged)
+            if (file == null || !file.exists()) {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return@onCoreThread
+            }
+            try {
+                call.resolve(JSObject().put("json", NativeCore.importDives(file.absolutePath, name)))
+            } finally {
+                file.delete()
+            }
+            return@onCoreThread
+        }
         val data = call.getString("data")
         if (data == null) {
             call.reject("Missing data", "BAD_ARGUMENT")
@@ -1952,11 +2058,74 @@ class OpenDivesCorePlugin : Plugin() {
     }
 
     /**
-     * Reads a file another app handed to OpenDives (a content:// address of an ACTION_VIEW
-     * intent). Resolves {name, data (base64), size}; the name
-     * is the provider's display name (OpenableColumns), "" when it gives none. The web layer
-     * decides whether it is a logbook (lib/deep-link.js). Rejects TOO_BIG above 100 MB,
-     * NOT_FOUND, FAILED. Not on the core thread: reading a file from Drive may take a while.
+     * A file another app handed to OpenDives (a content:// address: "Share to", "Open with"): streamed, in
+     * pieces of 64 KB, into a file of the app's cache; {name, size, path}. The name is the provider's display
+     * name (OpenableColumns), "" when it gives none. Nothing but the path crosses the bridge: a logbook of 100 MB
+     * as one base64 string ran the Java heap (256 MB) out of memory. The web layer looks at the beginning with
+     * readFileChunk, and imports with importDives({path}), which deletes the file. Rejects TOO_BIG above 2 GB or
+     * when the device lacks the room, NOT_FOUND, FAILED. Not on the core thread: reading from Drive may be slow.
+     */
+    @PluginMethod
+    fun stageSharedFile(call: PluginCall) {
+        val text = call.getString("uri")
+        if (text.isNullOrEmpty()) {
+            call.reject("Missing uri", "BAD_ARGUMENT")
+            return
+        }
+        Thread {
+            var target: File? = null
+            try {
+                val uri = Uri.parse(text)
+                // content:// only: a file:// address could point into the app's own private files.
+                if (uri.scheme != "content") {
+                    call.reject("Not a file", "BAD_ARGUMENT")
+                    return@Thread
+                }
+                var name = ""
+                try {
+                    context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                        if (c.moveToFirst()) name = c.getString(0).orEmpty()
+                    }
+                } catch (e: Exception) {
+                    // No display name: the web layer names the import from its contents.
+                }
+                if (name.isEmpty()) name = uri.lastPathSegment.orEmpty().substringAfterLast('/')
+                val input = context.contentResolver.openInputStream(uri)
+                if (input == null) {
+                    call.reject("Cannot open the file", "NOT_FOUND")
+                    return@Thread
+                }
+                val file = newStagedFile(name)
+                target = file
+                var size = 0L
+                input.use { stream ->
+                    java.io.FileOutputStream(file).use { out ->
+                        val buffer = ByteArray(64 * 1024)
+                        while (true) {
+                            val n = stream.read(buffer)
+                            if (n < 0) break
+                            out.write(buffer, 0, n)
+                            size += n
+                            if (size > MAX_SHARED_FILE) throw java.io.IOException("TOO_BIG")
+                        }
+                    }
+                }
+                call.resolve(JSObject().put("name", name).put("size", size).put("path", file.absolutePath))
+            } catch (e: SecurityException) {
+                target?.delete()
+                call.reject("Cannot open the file", "NOT_FOUND", e)
+            } catch (e: Exception) {
+                target?.delete()
+                Log.e(TAG, "stageSharedFile", e)
+                val tooBig = e.message == "TOO_BIG" || e.message?.contains("ENOSPC") == true
+                call.reject(if (tooBig) "The file is too big" else "Cannot read the file", if (tooBig) "TOO_BIG" else "FAILED", e)
+            }
+        }.start()
+    }
+
+    /**
+     * Small files only (at most 8 MB, as base64 in the answer; a bigger one rejects TOO_BIG): the bytes of a
+     * content:// file. The shared logbooks go through stageSharedFile.
      */
     @PluginMethod
     fun readSharedFile(call: PluginCall) {
@@ -1994,7 +2163,7 @@ class OpenDivesCorePlugin : Plugin() {
                         val n = stream.read(buffer)
                         if (n < 0) break
                         out.write(buffer, 0, n)
-                        if (out.size() > MAX_SHARED_FILE) {
+                        if (out.size() > MAX_INLINE_FILE) {
                             call.reject("The file is too big", "TOO_BIG")
                             return@Thread
                         }
@@ -2079,11 +2248,25 @@ class OpenDivesCorePlugin : Plugin() {
             call.reject("Missing ids, format or name", "BAD_ARGUMENT")
             return@onCoreThread
         }
+        if (call.getBoolean("stage", false) == true) {
+            // Written where the import calls read it (a staged file): the core writes the file and only its
+            // path comes back. The caller imports it, reads it in pieces or deletes it (discardImport).
+            val staged = newStagedFile(name)
+            NativeCore.exportDives(ids, format, call.getBoolean("anonymize", false) == true, staged.absolutePath)
+            call.resolve(JSObject().put("uri", "").put("path", staged.absolutePath).put("size", staged.length()))
+            return@onCoreThread
+        }
         val dir = File(context.cacheDir, SHARE_DIR).apply { mkdirs() }
         val file = File(dir, File(name).name)
         NativeCore.exportDives(ids, format, call.getBoolean("anonymize", false) == true, file.absolutePath)
         if (call.getBoolean("text", false) == true) {
-            // The contents come back in the answer (the QR share): the file is not kept.
+            // The contents come back in the answer (the QR share, a few dives): the file is not kept. A big
+            // export never goes through the bridge as a string (it ran the Java heap out of memory).
+            if (file.length() > MAX_INLINE_FILE) {
+                file.delete()
+                call.reject("The export is too big to be returned as text", "TOO_BIG")
+                return@onCoreThread
+            }
             val text = file.readText(Charsets.UTF_8)
             file.delete()
             call.resolve(JSObject().put("uri", "").put("text", text))
@@ -2136,7 +2319,10 @@ class OpenDivesCorePlugin : Plugin() {
     private companion object {
         const val TAG = "OpenDives"
         const val SHARE_DIR = "share"
-        const val MAX_SHARED_FILE = 100 * 1024 * 1024
+        const val MAX_SHARED_FILE = 2L * 1024 * 1024 * 1024
+        /** The most a call may carry as a string (base64 or text) across the bridge. */
+        const val MAX_INLINE_FILE = 8 * 1024 * 1024
+        const val MAX_CHUNK = 4 * 1024 * 1024
         const val XSLT_DIR = "xslt"
         const val CERTIFICATES_RECHECK_MS = 20_000L
         const val SAMPLE_ASSET = "SampleDivesV2.ssrf"

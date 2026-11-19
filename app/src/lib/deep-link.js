@@ -141,8 +141,8 @@ export function siteLink(uuid) {
 
 // --- A file sent to the app -----------------------------------------------------
 
-/** A logbook file is read whole to be imported: nothing larger than this is opened. */
-export const MAX_FILE_BYTES = 100 * 1024 * 1024;
+/** A logbook file is streamed into the app's cache and read by the core from there: nothing larger than this is opened. */
+export const MAX_FILE_BYTES = 1024 * 1024 * 1024;
 
 /**
  * Whether the beginning of a file is a Subsurface logbook: XML whose root element is

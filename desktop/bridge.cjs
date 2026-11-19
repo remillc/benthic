@@ -31,7 +31,9 @@
 //   fs.writeFile({area, name, base64})  stages a file in <temp>/<area> ('import' or 'share'):
 //                            resolves { path }; the name is reduced to its base name
 //   fs.appendFile({path, base64})  adds bytes to a file of <temp> (the full export is written chunk by chunk)
-//   fs.readFile({path})      the bytes of a file of <temp>, base64 (at most 100 MB)
+//   fs.readFile({path})      the bytes of a file of <temp>, base64 (at most 100 MB; a bigger file is read with readChunk)
+//   fs.readChunk({path, offset, length})  up to 4 MB of a file of <temp>, base64, with the file's size
+//   fs.assemble({name, parts})  a new file in <temp>/import made of byte ranges of files of <temp> and literal text
 //   fs.remove({path})        deletes a file of <temp>; resolves true when it existed
 //   fs.exists({path})        a path of userData or temp exists
 //   fs.removeTree({path})    deletes a folder <userData>/carnet*
@@ -126,7 +128,9 @@ const CREDENTIAL_FIELDS = {
 };
 const CREDENTIAL_FILES = { cloud: 'cloud-account.bin', git: 'git-remote.bin', server: 'server-session.bin', datakey: 'data-key.bin' };
 const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH', 'DENIED', 'NO_LOG', 'CREATE_FAILED', 'LOG_EXISTS', 'NOT_EMPTY']);
+/** The most one fs.readFile answers: a bigger file is read in pieces (readChunk). */
 const MAX_READ = 100 * 1024 * 1024;
+const MAX_CHUNK = 4 * 1024 * 1024;
 const NOMINATIM = 'https://nominatim.openstreetmap.org/';
 const REPO_URL = 'https://github.com/remillc/opendives';
 
@@ -812,6 +816,60 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
         if (!allowed(options.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
         if (fs.statSync(options.path).size > MAX_READ) throw new Error('TOO_BIG');
         return fs.readFileSync(options.path).toString('base64');
+      }
+      case 'readChunk': {
+        if (!allowed(options.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
+        const offset = Math.max(0, Math.floor(Number(options.offset) || 0));
+        const length = Math.min(MAX_CHUNK, Math.max(0, Math.floor(Number(options.length) || 0)));
+        const handle = fs.openSync(options.path, 'r');
+        try {
+          const buffer = Buffer.alloc(length);
+          let read = 0;
+          while (read < length) {
+            const n = fs.readSync(handle, buffer, read, length - read, offset + read);
+            if (n <= 0) break;
+            read += n;
+          }
+          return { data: buffer.subarray(0, read).toString('base64'), size: fs.fstatSync(handle).size };
+        } finally {
+          fs.closeSync(handle);
+        }
+      }
+      case 'assemble': {
+        if (!Array.isArray(options.parts) || !options.parts.length) throw new Error('BAD_ARGUMENT: no parts');
+        const dir = path.join(tempDir, 'import');
+        fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+        const file = path.join(dir, safeName(options.name, 'file'));
+        const out = fs.openSync(file, 'w');
+        try {
+          const buffer = Buffer.alloc(64 * 1024);
+          for (const part of options.parts) {
+            if (typeof part?.text === 'string') {
+              fs.writeSync(out, Buffer.from(part.text, 'utf8'));
+              continue;
+            }
+            if (!allowed(part?.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
+            const input = fs.openSync(part.path, 'r');
+            try {
+              let at = Math.max(0, Number(part.start) || 0);
+              const end = part.end == null ? fs.fstatSync(input).size : Number(part.end);
+              while (at < end) {
+                const n = fs.readSync(input, buffer, 0, Math.min(buffer.length, end - at), at);
+                if (n <= 0) break;
+                fs.writeSync(out, buffer, 0, n);
+                at += n;
+              }
+            } finally {
+              fs.closeSync(input);
+            }
+          }
+        } catch (e) {
+          fs.closeSync(out);
+          fs.rmSync(file, { force: true });
+          throw e;
+        }
+        fs.closeSync(out);
+        return { path: file };
       }
       case 'remove': {
         if (!allowed(options.path, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');

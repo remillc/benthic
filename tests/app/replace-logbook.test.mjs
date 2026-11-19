@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { test } from 'node:test';
 import { deflateRawSync } from 'node:zlib';
 import { checkSharedFile } from '../../app/src/lib/deep-link.js';
+import { fakeStagedCore } from './fake-staged-core.mjs';
 import { bytesToBase64, openSharedFile } from '../../app/src/lib/shared-file.js';
 import { logbooksInFile, replaceEligibility, replaceOffer, replacementFromFile, runReplace } from '../../app/src/lib/replace-logbook.js';
 
@@ -74,7 +75,7 @@ function screen({ answers = ['replace'], confirm = true, name = 'Neuf', exportOk
   };
   return { deps, log };
 }
-const what = { logbook: 'Mon carnet', file: 'Autre.ssrf', data: 'QQ==' };
+const what = { logbook: 'Mon carnet', file: 'Autre.ssrf', data: { path: '/cache/import-1-Autre.ssrf' } };
 
 test('only a logbook of the device is replaceable; the server and an account are not', () => {
   assert.equal(replaceEligibility({ email: '', odplus: false, repository: '' }), 'ok');
@@ -108,7 +109,7 @@ test('« Exporter d’abord ce carnet » exports, comes back to the explanation,
   assert.equal(s.log.explained.length, 2);
   assert.equal(s.log.explained[1].exported, true);
   assert.equal(s.log.confirms.length, 0);
-  assert.deepEqual(s.log.replaced, [{ n: 'Neuf', d: 'QQ==' }]);
+  assert.deepEqual(s.log.replaced, [{ n: 'Neuf', d: { path: '/cache/import-1-Autre.ssrf' } }]);
   assert.deepEqual(s.log.done, [{ n: 'Neuf', c: 3 }]);
   assert.deepEqual(s.log.names, ['Autre'], 'the name is suggested from the file');
 });
@@ -140,8 +141,11 @@ test('cancelling the name keeps the logbook; a replacement that fails reports an
 function shared({ raw, name = 'Autre.ssrf', eligibility = 'ok' }) {
   const bytes = raw ?? enc(DIVES);
   const log = { choices: [], replaced: [], merged: [] };
+  const staging = fakeStagedCore();
+  log.staging = staging;
   const deps = {
-    read: async () => ({ name, size: bytes.length, data: bytesToBase64(bytes) }),
+    stage: async () => staging.put(name, bytes),
+    core: staging.core,
     check: checkSharedFile,
     welcome: () => false,
     remembered: () => ({}),
@@ -159,7 +163,7 @@ function shared({ raw, name = 'Autre.ssrf', eligibility = 'ok' }) {
     canCreateLogbook: () => false,
     newLogbook: async () => {},
     replaceEligibility: () => eligibility,
-    replaceLogbook: async (w) => void log.replaced.push(w),
+    replaceLogbook: async (w) => void log.replaced.push({ ...w, text: staging.text(w.data.path) }),
   };
   return { deps, log };
 }
@@ -175,8 +179,10 @@ test('a device logbook: « Remplacer ce carnet » replaces « Nouveau carnet »;
   await c.actions.replace();
   assert.equal(log.replaced.length, 1);
   assert.equal(log.replaced[0].file, 'Autre.ssrf');
-  assert.equal(Buffer.from(log.replaced[0].data, 'base64').toString('utf8'), DIVES);
+  assert.equal(log.replaced[0].text, DIVES);
   assert.equal(log.merged.length, 0);
+  // The staged file is deleted once the replacement is over.
+  assert.equal(log.staging.files.size, 0);
 });
 
 test('the OpenDives+ server logbook and an account logbook are never offered « Remplacer »; they say why', async () => {
@@ -205,7 +211,8 @@ test('an archive of several logbooks: only the main one is taken, and the dialog
   assert.deepEqual(log.choices[0].o.several, { count: 2, main: 'first' });
   await log.choices[0].actions.replace();
   assert.equal(log.replaced[0].fileName, 'first.ssrf');
-  assert.equal(Buffer.from(log.replaced[0].data, 'base64').toString('utf8'), DIVES);
+  assert.equal(log.replaced[0].text, DIVES);
+  assert.equal(log.staging.files.size, 0, 'the archive and the extracted logbook are gone');
 });
 
 test('OpenDives’ own export keeps its main logbook; a plain file or an archive without a logbook is not an archive of logbooks', async () => {
@@ -221,16 +228,24 @@ test('OpenDives’ own export keeps its main logbook; a plain file or an archive
 });
 
 test('« + › Importer un fichier »: a Subsurface file or an archive can replace; a dive computer file only adds', async () => {
-  const one = await replacementFromFile('Autre.ssrf', enc(DIVES));
+  const staging = fakeStagedCore();
+  const file = (name, bytes) => new File([bytes], name);
+  const one = await replacementFromFile(staging.core, file('Autre.ssrf', enc(DIVES)));
   assert.equal(one.name, 'Autre.ssrf');
   assert.equal(one.several, null);
-  assert.equal(await replacementFromFile('dive.fit', enc('FIT')), null);
-  assert.equal(await replacementFromFile('notes.xml', enc('<other/>')), null);
+  assert.equal(staging.files.size, 0, 'nothing is staged until the diver chooses « Remplacer »');
+  const staged = await one.stage();
+  assert.equal(staging.text(staged.path), DIVES);
+  const archive = await replacementFromFile(staging.core, file('all.zip', zip([{ name: 'logbook/logbook.ssrf', data: enc(DIVES) }])));
+  assert.equal(archive.name, 'logbook.ssrf');
+  assert.equal(staging.text((await archive.stage()).path), DIVES);
+  assert.equal(await replacementFromFile(staging.core, file('dive.fit', enc('FIT'))), null);
+  assert.equal(await replacementFromFile(staging.core, file('notes.xml', enc('<other/>'))), null);
 });
 
 test('the core call refuses an account logbook and keeps a copy to put the logbook back; the dialogs and the entry points are wired', () => {
   const core = read('app/src/lib/logbook.svelte.js');
-  assert.match(core, /export async function replaceDeviceLogbook[^]*?NOT_REPLACEABLE[^]*?text: true[^]*?wipeDeviceLogbook[^]*?importDives[^]*?catch[^]*?wipeDeviceLogbook[^]*?importDives/);
+  assert.match(core, /export async function replaceDeviceLogbook[^]*?NOT_REPLACEABLE[^]*?stage: true[^]*?wipeDeviceLogbook[^]*?importDives[^]*?catch[^]*?wipeDeviceLogbook[^]*?importDives/);
   assert.match(read('app/src/lib/open-link.js'), /replaceLogbook: startReplace/);
   const page = read('app/src/pages/Logbook.svelte');
   assert.match(page, /offerReplace/);

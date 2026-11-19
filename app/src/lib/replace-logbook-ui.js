@@ -56,12 +56,25 @@ function ask(o) {
 /**
  * The guarded flow on screen: explanation with « Exporter d'abord ce carnet », the second confirmation, the name,
  * then the replacement. Resolves with what happened.
- * @param {{ file: string, data: string, fileName: string, several?: { count: number, main: string }|null }} what
- *   `file` is what the diver sees (the file's name), `fileName` the name the core reads the format from
+ * @param {{ file: string, data: { path: string }, fileName: string, several?: { count: number, main: string }|null }} what
+ *   `file` is what the diver sees (the file's name), `fileName` the name the core reads the format from, `data` the
+ *   logbook as a staged file in the app's cache (deleted here whatever the outcome)
  * @returns {Promise<'cancelled'|'replaced'|'failed'>}
  */
-export function startReplace(what) {
+export async function startReplace(what) {
   const logbookName = openLogbookName();
+  try {
+    return await replaceFlow(what, logbookName);
+  } finally {
+    await OpenDivesCore.discardImport({ path: what.data.path }).catch(() => {});
+  }
+}
+
+/**
+ * @param {{ file: string, data: { path: string }, fileName: string, several?: { count: number, main: string }|null }} what
+ * @param {string} logbookName
+ */
+function replaceFlow(what, logbookName) {
   return runReplace(
     {
       explain: async ({ logbook: current, file, pending, exported }) =>

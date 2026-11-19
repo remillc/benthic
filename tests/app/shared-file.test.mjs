@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import { checkSharedFile } from '../../app/src/lib/deep-link.js';
+import { fakeStagedCore } from './fake-staged-core.mjs';
 import {
   applySitesMerge,
   bytesToBase64,
@@ -168,16 +169,20 @@ test('the merge is a list of site changes, a created site then its details', asy
 function fake({ welcome = false, name = 'Subsurface.ssrf', text = DIVES, raw, existing = [] } = {}) {
   const log = { confirms: [], refused: [], notes: [], first: [], imported: [], changes: [], kept: {} };
   const bytes = raw ?? new TextEncoder().encode(text);
+  // The plugin streams the shared file into its cache: the web layer only gets the path (never the contents).
+  const staging = fakeStagedCore();
+  log.staging = staging;
   const deps = {
-    read: async () => ({ name, size: bytes.length, data: bytesToBase64(bytes) }),
+    stage: async () => staging.put(name, bytes),
+    core: staging.core,
     check: checkSharedFile,
     welcome: () => welcome,
     remembered: () => log.kept,
     keep: (s) => (log.kept = s),
     listSites: async () => existing,
     siteChange: async (o) => (log.changes.push(o), o.action === 'create' ? { uuid: 900 + log.changes.length } : {}),
-    importData: async (n, data) => (log.imported.push({ n, text: Buffer.from(data, 'base64').toString('utf8') }), 2),
-    toFirstLaunch: (n, data) => log.first.push({ n, text: Buffer.from(data, 'base64').toString('utf8') }),
+    importData: async (n, data) => (log.imported.push({ n, text: staging.text(data.path) }), 2),
+    toFirstLaunch: (n, staged, summary) => log.first.push({ n, text: staging.text(staged.path), summary }),
     confirm: (o, run) => log.confirms.push({ o, run }),
     refuse: (key, values) => log.refused.push({ key, values }),
     notify: (key, values) => log.notes.push({ key, values }),
@@ -243,7 +248,7 @@ test('an unsupported file gets a clear message and nothing else happens', async 
     assert.equal(log.confirms.length + log.first.length + log.imported.length, 0, name);
   }
   const broken = fake();
-  broken.deps.read = async () => {
+  broken.deps.stage = async () => {
     throw Object.assign(new Error('x'), { code: 'TOO_BIG' });
   };
   await openSharedFile(broken.deps, 'content://x/4');
@@ -271,7 +276,8 @@ test('the wiring: manifest filters, plugin event, first launch and the two langu
   for (const ext of ['ssrf', 'xml', 'uddf', 'fit', 'dld', 'sde', 'jlb']) assert.ok(manifest.includes(`\\\\.${ext}"`), ext);
   assert.match(read('plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt'), /notifyListeners\("sharedFile"/);
   assert.match(read('app/src/lib/open-link.js'), /addListener\('sharedFile'/);
-  assert.match(read('app/src/components/FirstLaunchSteps.svelte'), /sharedFile\.file/);
+  assert.match(read('app/src/components/FirstLaunchSteps.svelte'), /sharedFile\.staged/);
+  assert.match(read('app/src/lib/open-link.js'), /stageSharedFile/);
   assert.match(read('app/ios/App/App/Info.plist'), /org\.opendives\.divefile/);
   const fr = JSON.parse(read('app/src/i18n/fr.json'));
   const en = JSON.parse(read('app/src/i18n/en.json'));
@@ -292,7 +298,7 @@ function withChoice(options = {}) {
 
 test('a logbook is open and this device can hold another: the choice offers « Nouveau carnet » and « Ajouter à ce carnet »', async () => {
   const { deps, log } = withChoice();
-  deps.newLogbook = async (n, data) => log.created.push({ n, text: Buffer.from(data, 'base64').toString('utf8') });
+  deps.newLogbook = async (n, data) => log.created.push({ n, text: log.staging.text(data.path) });
   assert.equal(await openSharedFile(deps, 'content://x/1'), 'confirm-dives');
   assert.equal(log.confirms.length, 0, 'the single confirmation is replaced by the choice');
   assert.equal(log.choices[0].o.canCreate, true);
@@ -302,7 +308,7 @@ test('a logbook is open and this device can hold another: the choice offers « N
 
 test('« Nouveau carnet » creates a logbook from the file and never imports into the open one', async () => {
   const { deps, log } = withChoice();
-  deps.newLogbook = async (n, data) => log.created.push({ n, text: Buffer.from(data, 'base64').toString('utf8') });
+  deps.newLogbook = async (n, data) => log.created.push({ n, text: log.staging.text(data.path) });
   await openSharedFile(deps, 'content://x/1');
   await log.choices[0].actions.create();
   assert.equal(log.created.length, 1);

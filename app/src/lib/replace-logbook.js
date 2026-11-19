@@ -3,7 +3,8 @@
 // to another logbook goes through files: export the current one, then replace it with a file. Pure functions and one
 // guarded flow over `deps`, so that node:test can drive them; the dialogs are in lib/replace-logbook-ui.js and the
 // core calls in lib/logbook.svelte.js (replaceDeviceLogbook).
-import { filesInZip, isZipName, toBase64 } from './zip-fit.js';
+import { filesInZip, isZipName, MAX_ZIP_BYTES } from './zip-fit.js';
+import { stageBytes, stageFile } from './staged-file.js';
 import { isSubsurfaceXml } from './deep-link.js';
 
 /**
@@ -53,8 +54,8 @@ export function logbookLabel(fileName) {
  *   or save sheet; true when it was handed over
  * @property {(o: { logbook: string, pending: number }) => Promise<boolean>} confirmRemoval the second confirmation
  * @property {(suggested: string) => Promise<string|null>} askName the name step; null when the diver cancels
- * @property {(name: string, data: string) => Promise<number>} replace the core: the logbook of this device becomes the
- *   file's, the dives added are counted
+ * @property {(name: string, data: { path: string }) => Promise<number>} replace the core: the logbook of this device becomes the
+ *   file's (a staged file in the app's cache), the dives added are counted
  * @property {(name: string, n: number) => void} done
  * @property {(e: unknown) => void} failed
  */
@@ -64,7 +65,7 @@ export function logbookLabel(fileName) {
  * wants); « Remplacer » asks a second time when the logbook was not exported, or when changes are not synced.
  * Nothing is removed before the name step is confirmed.
  * @param {ReplaceDeps} deps
- * @param {{ logbook: string, file: string, data: string, pending?: number }} what
+ * @param {{ logbook: string, file: string, data: { path: string }, pending?: number }} what
  * @returns {Promise<'cancelled'|'replaced'|'failed'>}
  */
 export async function runReplace(deps, what) {
@@ -109,16 +110,26 @@ export function replaceOffer(open) {
 /**
  * A file picked for « + › Importer un fichier » is replaceable when it is a Subsurface logbook (XML) or an archive
  * with a `.ssrf` inside; a dive computer file or a CSV only adds dives.
- * @param {string} name
- * @param {Uint8Array} bytes
- * @returns {Promise<{ name: string, data: string, several: { count: number, main: string }|null }|null>}
+ * Nothing is staged until the diver chooses « Remplacer »: `stage()` then writes the logbook to the app's cache in
+ * pieces (a logbook is never one string), the archive's own logbook when it is one.
+ * @param {import('./staged-file.js').StagedCore} core
+ * @param {File} file
+ * @returns {Promise<{ name: string, stage: () => Promise<{ path: string }>, several: { count: number, main: string }|null }|null>}
  */
-export async function replacementFromFile(name, bytes) {
-  const head = new TextDecoder().decode(bytes.subarray(0, 4096)).replace(/^﻿/, '');
+export async function replacementFromFile(core, file) {
+  const name = file.name;
+  const head = (await file.slice(0, 4096).text()).replace(/^﻿/, '');
   if (/\.(ssrf|xml)$/i.test(name) && isSubsurfaceXml(head)) {
-    return { name, data: toBase64(bytes), several: null };
+    return { name, stage: () => stageFile(core, file), several: null };
   }
-  const inside = await logbooksInFile(name, bytes);
+  // An archive is small next to what it holds: read whole (up to 64 MB), its logbook goes to the cache in pieces.
+  if (!isZipName(name) || file.size > MAX_ZIP_BYTES) return null;
+  const inside = await logbooksInFile(name, new Uint8Array(await file.arrayBuffer()));
   if (!inside) return null;
-  return { name: inside.main.name, data: toBase64(inside.main.data), several: inside.count > 1 ? { count: inside.count, main: logbookLabel(inside.main.name) } : null };
+  const main = inside.main;
+  return {
+    name: main.name,
+    stage: () => stageBytes(core, main.name, main.data),
+    several: inside.count > 1 ? { count: inside.count, main: logbookLabel(main.name) } : null,
+  };
 }

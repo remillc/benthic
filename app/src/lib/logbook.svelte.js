@@ -18,7 +18,8 @@ import { nextProgress } from './sync-progress.js';
 import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
-import { fitFilesInZip, isZipName, toBase64 } from './zip-fit.js';
+import { fitFilesInZip, isZipName, MAX_ZIP_BYTES, toBase64 } from './zip-fit.js';
+import { stageFile } from './staged-file.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
@@ -396,17 +397,14 @@ export async function savePlan(request, replaceId = 0, title = '') {
  * @returns {Promise<number>} the number of dives added to the logbook
  */
 export async function importFile(file) {
-  if (isZipName(file.name)) {
+  if (isZipName(file.name) && file.size <= MAX_ZIP_BYTES) {
     const fits = await fitFilesInZip(new Uint8Array(await file.arrayBuffer()));
     if (fits.length) return importFits(fits);
   }
-  const data = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-  return importData(file.name, String(data));
+  // The file goes to the app's cache in pieces and the core reads it there: a logbook is never one string
+  // (the plugin's bridge and the Android Java heap cannot hold 100 MB).
+  const staged = await stageFile(OpenDivesCore, file);
+  return importData(file.name, { path: staged.path });
 }
 
 /**
@@ -418,6 +416,12 @@ export async function importFile(file) {
  */
 export async function importFiles(files) {
   if (files.length === 1) return importFile(files[0]);
+  // Small files travel together (a Suunto .json and its .fit are read as one dive); a big one cannot, it goes alone.
+  if (files.reduce((n, f) => n + f.size, 0) > MAX_TOGETHER_BYTES) {
+    let added = 0;
+    for (const file of files) added += await importFile(file);
+    return added;
+  }
   const before = logbook.dives.length;
   const result = await OpenDivesCore.importDivesFiles({ files: await importPayload(files) });
   logbook.undoText = result.undo;
@@ -427,6 +431,9 @@ export async function importFiles(files) {
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
 }
+
+/** Files chosen together travel in one call (as base64) up to this many bytes in all; above, one import each. */
+const MAX_TOGETHER_BYTES = 6 * 1024 * 1024;
 
 /**
  * The .fit files taken out of a .zip, one import each. The dives added are counted together; an
@@ -450,14 +457,15 @@ async function importFits(fits) {
 }
 
 /**
- * The same import from contents already read (a file another app sent, lib/open-link.js).
+ * The same import from a file already in the cache (a file another app sent, lib/open-link.js) or from small contents.
  * @param {string} name the file's name; the core reads the format from its extension
- * @param {string} data base64 contents
+ * @param {string|{ path: string }} data base64 contents (a small file), or the staged file the core reads where it is
+ *   (a logbook; it is deleted after the import)
  * @returns {Promise<number>} the number of dives added to the logbook
  */
 export async function importData(name, data) {
   const before = logbook.dives.length;
-  const result = await OpenDivesCore.importDives({ name, data });
+  const result = await OpenDivesCore.importDives(typeof data === 'string' ? { name, data } : { name, path: data.path });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await OpenDivesCore.listLoadedDives();
@@ -479,7 +487,7 @@ export async function importCsvFile(file, params, companion = null) {
   const before = logbook.dives.length;
   const result = await runCsvImport(
     {
-      stage: async (f) => (await OpenDivesCore.stageImport({ name: f.name, data: await fileBase64(f) })).path,
+      stage: async (f) => (await stageFile(OpenDivesCore, f)).path,
       discard: (path) => OpenDivesCore.discardImport({ path }),
       importCsv: (o) => OpenDivesCore.importCsv(o),
     },
@@ -491,16 +499,6 @@ export async function importCsvFile(file, params, companion = null) {
   logbook.sitesVersion++;
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
-}
-
-/** @param {File} file @returns {Promise<string>} the contents, base64 */
-function fileBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 }
 
 /**
@@ -903,28 +901,31 @@ export async function eraseDemoLogbook() {
  * sent to the shared log. The dives of the file are brought in after the current ones are removed; if that fails, the
  * current logbook is put back from a copy taken first, so a bad file never leaves the device without its logbook.
  * @param {string} name the new logbook's name (kept as its label on this device)
- * @param {string} data the file's contents, base64 (a Subsurface `.ssrf`)
+ * @param {string|{ path: string }} data the file: a staged file (a Subsurface `.ssrf` in the app's cache, read by the core where
+ *   it is), or its contents in base64 for a small one
  * @param {string} fileName the file's name; the core reads the format from its extension
  * @returns {Promise<number>} the dives of the new logbook
  */
 export async function replaceDeviceLogbook(name, data, fileName) {
   if (logbook.email || logbook.odplus || logbook.repository) throw new Error('NOT_REPLACEABLE');
   const ids = logbook.dives.map((d) => d.id);
-  const { text: backup = '' } = ids.length ? await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', text: true }) : { text: '' };
+  // The copy taken first is a file in the app's cache, written by the core: it never goes through the bridge as a string.
+  const backup = ids.length ? (await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', stage: true })).path ?? '' : '';
   await wipeDeviceLogbook();
   try {
-    await OpenDivesCore.importDives({ name: fileName, data });
+    await OpenDivesCore.importDives(typeof data === 'string' ? { name: fileName, data } : { name: fileName, path: data.path });
     const dives = await OpenDivesCore.listLoadedDives();
     if (!dives.length) throw new Error('NO_DIVES');
   } catch (e) {
     await wipeDeviceLogbook();
-    if (backup) await OpenDivesCore.importDives({ name: 'replaced-logbook.ssrf', data: toBase64(new TextEncoder().encode(backup)) });
+    if (backup) await OpenDivesCore.importDives({ name: 'replaced-logbook.ssrf', path: backup });
     logbook.dives = await OpenDivesCore.listLoadedDives();
     logbook.sitesVersion++;
     await OpenDivesCore.saveLocal();
     undoCleared();
     throw e;
   }
+  if (backup) await OpenDivesCore.discardImport({ path: backup }).catch(() => {});
   await OpenDivesCore.saveLocal();
   undoCleared();
   logbook.dives = await OpenDivesCore.listLoadedDives();

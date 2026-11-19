@@ -39,6 +39,14 @@ const WRITE_CHUNK = 1024 * 1024;
 const enc = new TextEncoder();
 
 /**
+ * The logbook as the core wrote it to a file; read in order, deleted by `dispose`.
+ * @typedef {Object} LogbookFile
+ * @property {number} size bytes
+ * @property {() => AsyncIterable<Uint8Array>} chunks
+ * @property {() => Promise<unknown>} dispose
+ */
+
+/**
  * One original photo or video of a dive.
  * @typedef {Object} MediaItem
  * @property {string} name file name in `dive-media/` (unique)
@@ -70,7 +78,9 @@ const enc = new TextEncoder();
  * @property {import('./profile.js').Profile} profile the diver profile and the certifications, with their key
  * @property {string} appVersion
  * @property {() => Date} [now]
- * @property {{ diveCount: () => Promise<number>, read: () => Promise<Uint8Array|null> }} logbook `read` is the `.ssrf`, null when there is no logbook
+ * @property {{ diveCount: () => Promise<number>, read?: () => Promise<Uint8Array|null>, open?: () => Promise<LogbookFile|null> }} logbook
+ *   `open` is the `.ssrf` as a file in the app's cache that is read in pieces (a logbook can be 100 MB: it never
+ *   crosses the plugin's bridge as one string); `read` is the same in memory, for a small one (the tests); null when there is no logbook
  * @property {() => Promise<Record<string, unknown>>} settings the device's settings and the core's preferences
  * @property {() => Promise<MediaItem[]>} [media] the originals of the dives; none when missing
  * @property {(name: string) => Promise<SinkFile>} openFile where the archive is written
@@ -288,7 +298,10 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
   check();
 
   const data = await collectData(deps);
-  const logbookBytes = await deps.logbook.read();
+  const logbookFile = deps.logbook.open ? await deps.logbook.open() : null;
+  const logbookBytes = logbookFile ? null : ((await deps.logbook.read?.()) ?? null);
+  const logbookSize = logbookFile?.size ?? logbookBytes?.length ?? 0;
+  const hasLogbook = !!logbookFile || !!logbookBytes;
   const mediaItems = withMedia ? ((await deps.media?.()) ?? []) : [];
   /** @type {{ path: string, reason: string }[]} */
   const skipped = [];
@@ -300,14 +313,21 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
   });
 
   const readme = enc.encode(README);
-  const totalBytes = (logbookBytes?.length ?? 0) + data.reduce((n, e) => n + e.size, 0) + media.reduce((n, m) => n + m.size, 0) + readme.length;
-  const totalFiles = (logbookBytes ? 1 : 0) + data.length + media.length + 2;
+  const totalBytes = logbookSize + data.reduce((n, e) => n + e.size, 0) + media.reduce((n, m) => n + m.size, 0) + readme.length;
+  const totalFiles = (hasLogbook ? 1 : 0) + data.length + media.length + 2;
   let doneBytes = 0;
   let doneFiles = 0;
   /** @param {ExportProgress['phase']} phase @param {string} file */
   const report = (phase, file) => onProgress?.({ phase, file, doneBytes, totalBytes, doneFiles, totalFiles });
 
-  const sink = await deps.openFile(exportFileName(now));
+  /** @type {SinkFile} */
+  let sink;
+  try {
+    sink = await deps.openFile(exportFileName(now));
+  } catch (e) {
+    await logbookFile?.dispose().catch(() => {});
+    throw e;
+  }
   let pending = new Uint8Array(WRITE_CHUNK * 2);
   let filled = 0;
   const flush = async () => {
@@ -356,7 +376,8 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
       report(phase, path);
     };
 
-    if (logbookBytes) await addFile('logbook/logbook.ssrf', logbookBytes, logbookBytes.length, true, 'logbook');
+    if (logbookFile) await addFile('logbook/logbook.ssrf', logbookFile.chunks(), logbookFile.size, true, 'logbook');
+    else if (logbookBytes) await addFile('logbook/logbook.ssrf', logbookBytes, logbookBytes.length, true, 'logbook');
     await addFile('README.txt', readme, readme.length, true, 'data');
     for (const e of data) await addFile(e.path, await e.data(), e.size, e.path.endsWith('.json'), 'data');
     for (const m of media) {
@@ -391,6 +412,8 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
   } catch (e) {
     await sink.abort().catch(() => {});
     throw e;
+  } finally {
+    await logbookFile?.dispose().catch(() => {});
   }
 }
 
@@ -490,11 +513,14 @@ export async function defaultDeps(overrides = {}) {
         const { exists, dives } = await OpenDivesCore.listDives();
         return exists ? dives.length : 0;
       },
-      async read() {
+      // The core writes the .ssrf to a file of the cache; the archive reads it in pieces of 3 MB.
+      async open() {
         const { exists, dives } = await OpenDivesCore.listDives();
         if (!exists || !dives.length) return null;
-        const { text } = await OpenDivesCore.exportDives({ ids: dives.map((d) => d.id), format: 'ssrf', anonymize: false, name: 'logbook.ssrf', text: true });
-        return enc.encode(text ?? '');
+        const { path = '', size = 0 } = await OpenDivesCore.exportDives({ ids: dives.map((d) => d.id), format: 'ssrf', anonymize: false, name: 'logbook.ssrf', stage: true });
+        if (!path) return null;
+        const { readChunks } = await import('./staged-file.js');
+        return { size, chunks: () => readChunks(OpenDivesCore, path, size), dispose: () => OpenDivesCore.discardImport({ path }) };
       },
     },
     async settings() {

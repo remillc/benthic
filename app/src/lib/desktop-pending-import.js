@@ -21,7 +21,19 @@ export async function resumePendingImport() {
   if (!pending) return;
   try {
     const added = await runPending(pending, {
-      read: async (path) => Uint8Array.from(atob(await bridge().fs.readFile({ path })), (c) => c.charCodeAt(0)),
+      // Read in pieces: a logbook can be bigger than one call may carry.
+      read: async (path) => {
+        const { size } = await bridge().fs.readChunk({ path, offset: 0, length: 0 });
+        const out = new Uint8Array(size);
+        for (let at = 0; at < size; ) {
+          const { data } = await bridge().fs.readChunk({ path, offset: at, length: 3 * 1024 * 1024 });
+          const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+          if (!bytes.length) throw new Error('SHORT_READ');
+          out.set(bytes, at);
+          at += bytes.length;
+        }
+        return out;
+      },
       importFile,
       importCsv: importCsvFile,
       remove: (path) => bridge().fs.remove({ path }),

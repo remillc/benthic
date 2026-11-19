@@ -10,6 +10,7 @@
   import Icon from './Icon.svelte';
   import ReleaseField from './ReleaseField.svelte';
   import { OpenDivesCore } from 'opendives-core';
+  import { stageFile } from '../lib/staged-file.js';
   import {
     SEPARATORS,
     KNOWN_FORMATS,
@@ -58,22 +59,10 @@
 
   /** The calls of the plugin, with the staging of the files. */
   const calls = {
-    stage: async (/** @type {File} */ f) => (await OpenDivesCore.stageImport({ name: f.name, data: await base64(f) })).path,
+    stage: async (/** @type {File} */ f) => (await stageFile(OpenDivesCore, f)).path,
     discard: (/** @type {string} */ path) => OpenDivesCore.discardImport({ path }),
     importCsv: (/** @type {any} */ o) => OpenDivesCore.importCsv(o),
   };
-
-  /** @param {File} f */
-  function base64(f) {
-    return /** @type {Promise<string>} */ (
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(f);
-      })
-    );
-  }
 
   onMount(async () => {
     try {

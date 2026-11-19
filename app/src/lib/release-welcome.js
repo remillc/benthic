@@ -106,8 +106,7 @@ export async function createDeviceLogbook(deps, importer = null) {
  * that a file that cannot be read leaves first launch as it was.
  * @param {File} file
  * @param {{
- *   readBase64: (file: File) => Promise<string>,
- *   stage: (options: { name: string, data: string }) => Promise<{ path: string }>,
+ *   stage: (file: File) => Promise<{ path: string }>,
  *   count: (options: { path: string }) => Promise<{ dives: number }>,
  *   discard: (options: { path: string }) => Promise<unknown>,
  * }} deps
@@ -115,7 +114,7 @@ export async function createDeviceLogbook(deps, importer = null) {
  * @throws {Error} `NO_DIVES` or the core's code (IMPORT_FAILED…)
  */
 export async function readImportFile(file, deps) {
-  const staged = await deps.stage({ name: file.name, data: await deps.readBase64(file) });
+  const staged = await deps.stage(file);
   let dives = 0;
   try {
     dives = (await deps.count({ path: staged.path })).dives;

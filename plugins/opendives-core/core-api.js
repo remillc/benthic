@@ -658,8 +658,17 @@ export { waterTypeOf };
  *   NETWORK, INVALID_RESPONSE, INVALID_ARCHIVE.
  * @property {(options: {user: string, password: string}) => Promise<{dives: number}>} divelogsCheck
  *   Checks the divelogs.de credentials before the import (LOGIN_FAILED, NETWORK…).
- * @property {(options: {name: string, data: string}) => Promise<{path: string}>} stageImport
- *   A picked file (base64 data) written to the app's cache for the import steps.
+ * @property {(options: {name?: string, data: string, path?: string, append?: boolean}) => Promise<{path: string}>} stageImport
+ *   A picked file (base64 data) written to the app's cache for the import steps. A big file goes in pieces
+ *   (lib/staged-file.js): the first call gives `name` and the first piece, the next ones `path` and
+ *   `append: true`. A logbook never crosses the bridge as one string (it ran the Android Java heap out of memory).
+ * @property {(options: {uri: string}) => Promise<{name: string, size: number, path: string}>} stageSharedFile
+ *   A file another app handed over (Android content://, iOS file://), streamed into the app's cache: only its path
+ *   comes back. Rejects TOO_BIG (above 2 GB or no room), NOT_FOUND, FAILED, BAD_ARGUMENT.
+ * @property {(options: {path: string, offset: number, length: number}) => Promise<{data: string, size: number}>} readFileChunk
+ *   Up to 4 MB of a staged file, base64, with the file's size: to look at the start of a logbook or scan it.
+ * @property {(options: {name: string, parts: ({path: string, start: number, end: number}|{text: string})[]}) => Promise<{path: string}>} assembleFile
+ *   A new staged file made of byte ranges of staged files and literal text, copied in order.
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
  * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
@@ -715,8 +724,9 @@ export { waterTypeOf };
  * @property {(options: {ids: number[], start: number, numbers?: number[]}) => Promise<EditResult>} renumberDives
  *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives);
  *   with numbers (one per id), each dive gets its own number instead.
- * @property {(options: {name: string, data: string}) => Promise<EditResult>} importDives
- *   Imports a file (base64 contents, original name), one undoable step (import_dives).
+ * @property {(options: {name: string, data?: string, path?: string}) => Promise<EditResult>} importDives
+ *   Imports a file, one undoable step (import_dives): a small one as base64 `data`, a logbook as `path`, a staged
+ *   file the core reads where it is and that is deleted afterwards. `name` is the original name (the format).
  * @property {(options: {files: {name: string, data: string}[]}) => Promise<EditResult>} importDivesFiles
  *   Imports several files chosen together (base64 contents, original names), one undoable step
  *   (import_dives_files): a Suunto app .json and the .fit with the same base name are read as one
@@ -748,8 +758,10 @@ export { waterTypeOf };
  *   The dives of the log in memory, without loading anything.
  * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile
  *   A file to share (the profile image), written in the app's cache; its file URI.
- * @property {(options: {ids: number[], format: 'ssrf'|'uddf'|'csv'|'csvProfiles', anonymize: boolean, name: string, text?: boolean}) => Promise<{uri: string, text?: string}>} exportDives
- *   The dives exported by the core (export_dives) into the app's cache; the logbook is not changed.
+ * @property {(options: {ids: number[], format: 'ssrf'|'uddf'|'csv'|'csvProfiles', anonymize: boolean, name: string, text?: boolean, stage?: boolean}) => Promise<{uri: string, text?: string, path?: string, size?: number}>} exportDives
+ *   The dives exported by the core (export_dives) into the app's cache; the logbook is not changed. `text`: the
+ *   contents come back (a few dives only: TOO_BIG above 8 MB). `stage`: the file is a staged file, only its `path`
+ *   and `size` come back (read it with readFileChunk, import it with importDives, delete it with discardImport).
  * @property {(options: {uri: string, mime: string}) => Promise<{apps: number}>} grantShareFile
  *   Read access to a shared file for every app that can receive it (Gmail sends attachments later).
  * @property {(options: {html: string, name: string, letter?: boolean}) => Promise<{uri: string}>} htmlToPdf
@@ -842,8 +854,8 @@ export { waterTypeOf };
  * @property {() => Promise<void>} openStorePage
  *   The app's page in the store, to write a review (Android market://, with the https fallback; iOS action=write-review).
  * @property {(options: {uri: string}) => Promise<{name: string, size: number, data: string}>} readSharedFile
- *   Reads a file another app handed over (Android content://, iOS file://): its name, its size in
- *   bytes and its contents in base64. Rejects TOO_BIG (above 100 MB), NOT_FOUND, FAILED, BAD_ARGUMENT.
+ *   Small files only: a file another app handed over, its name, its size in bytes and its contents in base64.
+ *   Rejects TOO_BIG (above 8 MB), NOT_FOUND, FAILED, BAD_ARGUMENT. A logbook goes through stageSharedFile.
  * @property {() => Promise<void>} contentShown
  *   The first screen is drawn: the launch screen (splash) can go (Android; no effect elsewhere).
  * @property {(options?: {durationMs?: number}) => Promise<void>} startBluetoothScan
@@ -960,6 +972,9 @@ export const OpenDivesCore = {
   verifyPin: (options) => native.verifyPin(options),
   divelogsCheck: (options) => native.divelogsCheck(options),
   stageImport: (options) => native.stageImport(options),
+  stageSharedFile: (options) => native.stageSharedFile(options),
+  readFileChunk: (options) => native.readFileChunk(options),
+  assembleFile: (options) => native.assembleFile(options),
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
   discardImport: (options) => native.discardImport(options),

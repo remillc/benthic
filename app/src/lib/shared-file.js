@@ -16,8 +16,14 @@
 //     placeholder is completed (name, position, description, notes, country, region, city); a site the logbook
 //     already has (same uuid, or same name and position) is left alone; the others are added. The sites are
 //     remembered so that a dives file shared afterwards finds them.
-// Nothing here touches the screen or the core: lib/open-link.js gives the actions in `deps`.
+// Nothing here touches the screen or the core: lib/open-link.js gives the actions in `deps`. The file itself is never a
+// string: it is streamed into the cache by the plugin and read in pieces (lib/staged-file.js).
 import { logbookLabel, logbooksInFile } from './replace-logbook.js';
+import { isZipName, MAX_ZIP_BYTES } from './zip-fit.js';
+import { MAX_SITES_FILE, readAllBytes, scanIsSitesOnly, scanLogbook, stageBytes, stagedHead } from './staged-file.js';
+
+/** The largest old-format file (`<dives>` root) whose dangling site references are cleaned in memory. */
+const MAX_REWRITE_FILE = 48 * 1024 * 1024;
 
 /** The name of the site that stands in for one whose data have not arrived. @param {number} uuid */
 export function placeholderName(uuid) {
@@ -244,7 +250,7 @@ export function remember(memory, sites) {
   return next;
 }
 
-// --- Bytes and text -------------------------------------------------------------------
+// --- Bytes and text (small things only: a logbook is never turned into a string, see lib/staged-file.js) ----------
 
 /** @param {string} base64 */
 export function base64ToBytes(base64) {
@@ -261,24 +267,75 @@ export function bytesToBase64(bytes) {
   return btoa(binary);
 }
 
-/** A file in memory from the base64 contents the plugin gives (first launch: the import step reads Files). @param {string} name @param {string} base64 */
+/** A file in memory from the base64 contents the plugin gives (small files only). @param {string} name @param {string} base64 */
 export function fileFromBase64(name, base64) {
   return new File([/** @type {BlobPart} */ (base64ToBytes(base64))], name);
+}
+
+// --- Dive sites a dives file lacks, on a staged file ----------------------------------------------------------------
+
+/**
+ * The same staged file with every site its dives point to defined: a site the file lacks gets its own data when it was
+ * remembered from a sites file, else a placeholder (as completeSiteReferences, on text). The new staged file is
+ * assembled from byte ranges of the first one (assembleFile): the sites go before `</divesites>`, or in a
+ * `<divesites>` made before `<dives>`; the first file is deleted. Without a `<divelog>` root (the older `<dives>`
+ * root takes no `<divesites>`) the dangling references are removed instead, which needs the text: done in memory for
+ * a file of at most 48 MB, else `tooBig` is true and nothing changes (the core would not survive the dangling
+ * references: the caller refuses the file).
+ * @param {import('./staged-file.js').StagedCore} core
+ * @param {import('./staged-file.js').StagedFile} staged
+ * @param {import('./staged-file.js').LogbookScan} scan
+ * @param {Record<string, SharedSite>} remembered
+ * @returns {Promise<{ staged: import('./staged-file.js').StagedFile, tooBig: boolean }>}
+ */
+export async function completeStagedSites(core, staged, scan, remembered) {
+  const missing = [...scan.referenced].filter((uuid) => uuid > 0 && !scan.siteUuids.has(uuid));
+  if (!missing.length) return { staged, tooBig: false };
+  const insertAt = scan.divesitesEnd >= 0 ? scan.divesitesEnd : scan.divesStart;
+  if (!scan.hasDivelog || insertAt < 0) {
+    if (staged.size > MAX_REWRITE_FILE) return { staged, tooBig: true };
+    const text = new TextDecoder().decode(await readAllBytes(core, staged.path, staged.size));
+    const next = await stageBytes(core, staged.name, new TextEncoder().encode(completeSiteReferences(text, remembered).text));
+    await core.discardImport({ path: staged.path }).catch(() => {});
+    return { staged: next, tooBig: false };
+  }
+  const entries = missing
+    .map((uuid) => {
+      const known = remembered[hex(uuid)];
+      return known ? siteXml({ ...known, uuid }) : `<site uuid='${hex(uuid)}' name='${escapeXml(placeholderName(uuid))}'>\n</site>\n`;
+    })
+    .join('');
+  const text = scan.divesitesEnd >= 0 ? entries : `<divesites>\n${entries}</divesites>\n`;
+  const next = await core.assembleFile({
+    name: staged.name,
+    parts: [{ path: staged.path, start: 0, end: insertAt }, { text }, { path: staged.path, start: insertAt, end: staged.size }],
+  });
+  await core.discardImport({ path: staged.path }).catch(() => {});
+  return { staged: { path: next.path, name: staged.name, size: staged.size + new TextEncoder().encode(text).length }, tooBig: false };
 }
 
 // --- What is done with the file -------------------------------------------------------
 
 /**
+ * What a logbook handed to the core is: a staged file in the app's cache (`{ path }`), read by the core where it is
+ * and deleted after the import. A small file made in memory (a few KB: a QR share, the clipboard) may still be base64.
+ * @typedef {{ path: string }} StagedPayload
+ */
+
+/**
  * @typedef {Object} SharedDeps what the screen and the core give
- * @property {(uri: string) => Promise<{ name: string, size: number, data: string }>} read the plugin's readSharedFile
+ * @property {(uri: string) => Promise<{ name: string, size: number, path: string }>} stage the plugin's stageSharedFile: the
+ *   file is streamed into the app's cache, only its path comes back
+ * @property {import('./staged-file.js').StagedCore} core the plugin's calls on staged files (readFileChunk, assembleFile, discardImport…)
  * @property {(name: string, head: string, size: number) => ({ ok: true, name: string } | { ok: false, reason: string })} check checkSharedFile
  * @property {() => boolean} welcome no logbook yet (first launch)
  * @property {() => Record<string, SharedSite>} remembered
  * @property {(sites: Record<string, SharedSite>) => void} keep
  * @property {() => Promise<{ uuid: number, name: string, hasLocation: boolean, latUdeg: number, lonUdeg: number }[]>} listSites
  * @property {(options: any) => Promise<any>} siteChange
- * @property {(name: string, data: string) => Promise<number>} importData
- * @property {(name: string, data: string) => void} toFirstLaunch hands the file to « Importer un carnet »
+ * @property {(name: string, data: StagedPayload) => Promise<number>} importData
+ * @property {(name: string, staged: import('./staged-file.js').StagedFile, summary: { sites: number, firstYear: number|null, lastYear: number|null }|null) => void} toFirstLaunch
+ *   hands the staged file to « Importer un carnet »
  * @property {(options: { textKey: string, values: Record<string, string|number>, actionKey: string }, run: () => Promise<void>) => void} confirm
  * @property {(key: string, values?: Record<string, string|number>) => void} refuse a dialog with an OK
  * @property {(key: string, values?: Record<string, string|number>) => void} notify a snackbar
@@ -286,41 +343,63 @@ export function fileFromBase64(name, base64) {
  * @property {(e: unknown) => void} importFailed
  * @property {() => Promise<void>} [ready] resolves once the logbook is read
  * @property {() => string} [logbookName] the name of the open logbook, for the sites confirmation
- * @property {(options: { name: string, canCreate: boolean, canReplace?: boolean, whyNot?: '' | 'server' | 'account', several?: { count: number, main: string }|null }, actions: { merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void> }) => void} [choose]
+ * @property {(options: { name: string, canCreate: boolean, canReplace?: boolean, whyNot?: '' | 'server' | 'account', several?: { count: number, main: string }|null }, actions: { merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void>, discard: () => Promise<void> }) => void} [choose]
  *   the choice for a dives file with a logbook open: « Nouveau carnet » (`create`, only when this device can hold
  *   another logbook), « Remplacer ce carnet » (`replace`, a device that holds one logbook: only its own logbook, never
  *   an account's or the server's, `whyNot` says which) or « Ajouter à ce carnet » (`merge`); `several`: the file is an
- *   archive of several logbooks, only `main` is taken; without `choose`, the single confirmation `confirm` is used
- * @property {(name: string, data: string) => Promise<void>} [newLogbook] creates a logbook from the file, keeps the open one untouched
+ *   archive of several logbooks, only `main` is taken; `discard`: the diver cancelled, the staged file goes;
+ *   without `choose`, the single confirmation `confirm` is used
+ * @property {(name: string, data: StagedPayload) => Promise<void>} [newLogbook] creates a logbook from the file, keeps the open one untouched
  * @property {() => boolean} [canCreateLogbook] false when this device holds one logbook at a time (a phone)
  * @property {() => 'ok'|'server'|'account'} [replaceEligibility] whether the open logbook may be replaced (a phone or a
  *   tablet only: leave it out where `newLogbook` is offered)
- * @property {(what: { file: string, fileName: string, data: string, several: { count: number, main: string }|null }) => Promise<unknown>} [replaceLogbook]
+ * @property {(what: { file: string, fileName: string, data: StagedPayload, several: { count: number, main: string }|null }) => Promise<unknown>} [replaceLogbook]
  *   the guarded flow of lib/replace-logbook-ui.js
  */
 
 /**
- * A file shared with the app: read, checked, then handed to the first launch (no logbook yet) or confirmed and
- * imported into the open logbook. Never imported silently. Resolves with what was done.
+ * A file shared with the app: streamed into the cache, looked at in pieces, checked, then handed to the first launch
+ * (no logbook yet) or confirmed and imported into the open logbook. Never imported silently. The file is never held
+ * whole in memory, here or in the plugin: only its path moves, and the core imports from it. Resolves with what was done.
  * @param {SharedDeps} deps
  * @param {string} uri
  * @returns {Promise<'refused'|'first-launch'|'confirm-dives'|'confirm-sites'>}
  */
 export async function openSharedFile(deps, uri) {
   if (deps.ready) await deps.ready();
-  let file;
+  /** @type {{ name: string, size: number, path: string }} */
+  let staged;
   try {
-    file = await deps.read(uri);
+    staged = await deps.stage(uri);
   } catch (e) {
     const code = String(/** @type {any} */ (e)?.code ?? /** @type {any} */ (e)?.message ?? '');
     console.error('Read a shared file', code);
     deps.refuse(code.includes('TOO_BIG') ? 'link.fileTooBig' : 'link.fileUnreadable');
     return 'refused';
   }
-  const bytes = base64ToBytes(file.data);
-  const head = new TextDecoder().decode(bytes.subarray(0, 4096));
-  const label = file.name || '';
-  const check = deps.check(file.name, head, file.size);
+  let current = staged;
+  // The staged file is deleted unless a later step (first launch, the dialog's actions) took it over.
+  let kept = false;
+  try {
+    const result = await handleStaged(deps, staged, (next) => (current = next), () => (kept = true));
+    return result;
+  } finally {
+    if (!kept) await deps.core.discardImport({ path: current.path }).catch(() => {});
+  }
+}
+
+/**
+ * @param {SharedDeps} deps
+ * @param {{ name: string, size: number, path: string }} staged
+ * @param {(next: { name: string, size: number, path: string }) => void} replaced the staged file changed (an archive's logbook, sites added)
+ * @param {() => void} keep from now on the file belongs to the next step
+ * @returns {Promise<'refused'|'first-launch'|'confirm-dives'|'confirm-sites'>}
+ */
+async function handleStaged(deps, staged, replaced, keep) {
+  const core = deps.core;
+  const label = staged.name || '';
+  const head = new TextDecoder().decode(await stagedHead(core, staged.path));
+  const check = deps.check(staged.name, head, staged.size);
   if (!check.ok) {
     const key = check.reason === 'TOO_BIG' ? 'link.fileTooBig' : check.reason === 'EMPTY' ? 'link.fileEmpty' : check.reason === 'CSV' ? 'link.fileCsv' : 'link.fileNotLogbook';
     deps.refuse(key, { name: label });
@@ -329,64 +408,91 @@ export async function openSharedFile(deps, uri) {
   let { name } = check;
   /** @type {{ count: number, main: string }|null} */
   let several = null;
-  let data = file.data;
-  // An archive of logbooks (OpenDives' own export, or several .ssrf): one logbook is taken, the main one.
-  const inside = await logbooksInFile(name, bytes);
-  if (inside) {
-    name = inside.main.name;
-    data = bytesToBase64(inside.main.data);
-    if (inside.count > 1) several = { count: inside.count, main: logbookLabel(inside.main.name) };
+  let current = { ...staged, name };
+  // An archive of logbooks (OpenDives' own export, or several .ssrf): one logbook is taken, the main one. An archive is
+  // small next to what it holds (it is read whole, up to 64 MB); the logbook inside goes back to the cache in pieces.
+  if (isZipName(name) && staged.size <= MAX_ZIP_BYTES) {
+    const inside = await logbooksInFile(name, await readAllBytes(core, staged.path, staged.size));
+    if (inside) {
+      name = inside.main.name;
+      if (inside.count > 1) several = { count: inside.count, main: logbookLabel(inside.main.name) };
+      const next = await stageBytes(core, inside.main.name, inside.main.data);
+      await core.discardImport({ path: staged.path }).catch(() => {});
+      current = next;
+      replaced(next);
+    }
   }
-  const body = inside ? inside.main.data : bytes;
-  const bodyHead = new TextDecoder().decode(body.subarray(0, 4096));
+  const bodyHead = new TextDecoder().decode(await stagedHead(core, current.path));
   const isXml = /\.(ssrf|xml)$/i.test(name) && /^\s*(<\?xml|<)/.test(bodyHead.replace(/^﻿/, ''));
-  const text = isXml ? new TextDecoder().decode(body) : '';
-
-  if (isXml && isSitesOnly(text)) {
-    const sites = readSites(text);
-    if (!sites.length) {
-      deps.refuse('link.fileEmpty', { name: label });
-      return 'refused';
-    }
-    if (deps.welcome()) {
-      deps.refuse('link.sitesFirstLaunch', { name: label });
-      return 'refused';
-    }
-    // The sites go to the open logbook, named in the question: never to one the diver did not choose.
-    deps.confirm({ textKey: 'link.sitesText', values: { name: label, n: sites.length, logbook: deps.logbookName?.() ?? '' }, actionKey: 'link.sitesAction' }, async () => {
-      try {
-        // The file's sites are remembered first: a dives file shared next finds them even if this merge adds nothing.
-        deps.keep(remember(deps.remembered(), sites));
-        const plan = planSitesMerge(sites, await deps.listSites());
-        if (!plan.add.length && !plan.complete.length) {
-          deps.notify('link.sitesNothing');
-          return;
-        }
-        const done = await applySitesMerge(plan, deps.siteChange);
-        deps.notify('link.sitesDone', { added: done.added, completed: done.completed, present: plan.present });
-      } catch (e) {
-        console.error('Add shared sites', e);
-        deps.refuse('link.sitesFailed');
-      }
-    });
-    return 'confirm-sites';
-  }
+  /** @type {import('./staged-file.js').LogbookScan|null} */
+  let scan = null;
 
   if (isXml) {
-    const fixed = completeSiteReferences(text, deps.remembered());
-    if (fixed.text !== text) data = bytesToBase64(new TextEncoder().encode(fixed.text));
+    scan = await scanLogbook(core, current.path, current.size);
+    if (scanIsSitesOnly(scan)) {
+      if (current.size > MAX_SITES_FILE) {
+        deps.refuse('link.fileNotLogbook', { name: label });
+        return 'refused';
+      }
+      const sites = readSites(new TextDecoder().decode(await readAllBytes(core, current.path, current.size)));
+      if (!sites.length) {
+        deps.refuse('link.fileEmpty', { name: label });
+        return 'refused';
+      }
+      if (deps.welcome()) {
+        deps.refuse('link.sitesFirstLaunch', { name: label });
+        return 'refused';
+      }
+      // The file is read: it is not needed any more (the sites are in memory).
+      await core.discardImport({ path: current.path }).catch(() => {});
+      // The sites go to the open logbook, named in the question: never to one the diver did not choose.
+      deps.confirm({ textKey: 'link.sitesText', values: { name: label, n: sites.length, logbook: deps.logbookName?.() ?? '' }, actionKey: 'link.sitesAction' }, async () => {
+        try {
+          // The file's sites are remembered first: a dives file shared next finds them even if this merge adds nothing.
+          deps.keep(remember(deps.remembered(), sites));
+          const plan = planSitesMerge(sites, await deps.listSites());
+          if (!plan.add.length && !plan.complete.length) {
+            deps.notify('link.sitesNothing');
+            return;
+          }
+          const done = await applySitesMerge(plan, deps.siteChange);
+          deps.notify('link.sitesDone', { added: done.added, completed: done.completed, present: plan.present });
+        } catch (e) {
+          console.error('Add shared sites', e);
+          deps.refuse('link.sitesFailed');
+        }
+      });
+      return 'confirm-sites';
+    }
+    const fixed = await completeStagedSites(core, current, scan, deps.remembered());
+    if (fixed.tooBig) {
+      deps.refuse('link.fileNotLogbook', { name: label });
+      return 'refused';
+    }
+    current = { ...fixed.staged, name };
+    replaced(current);
   }
+
+  const payload = { path: current.path };
   if (deps.welcome()) {
-    deps.toFirstLaunch(name, data);
+    keep();
+    deps.toFirstLaunch(name, current, scan ? { sites: scan.sites, firstYear: scan.firstYear, lastYear: scan.lastYear } : null);
     return 'first-launch';
   }
+  const discard = () => core.discardImport({ path: payload.path }).then(
+    () => {},
+    () => {},
+  );
   const merge = async () => {
     try {
-      deps.imported(await deps.importData(name, data));
+      deps.imported(await deps.importData(name, payload));
     } catch (e) {
       deps.importFailed(e);
+    } finally {
+      await discard();
     }
   };
+  keep();
   if (!deps.choose) {
     deps.confirm({ textKey: 'link.fileText', values: { name: label || name }, actionKey: 'link.fileAction' }, merge);
     return 'confirm-dives';
@@ -396,9 +502,11 @@ export async function openSharedFile(deps, uri) {
   const create = canCreate && newLogbook
     ? async () => {
         try {
-          await newLogbook(name, data);
+          await newLogbook(name, payload);
         } catch (e) {
           deps.importFailed(e);
+        } finally {
+          await discard();
         }
       }
     : undefined;
@@ -406,12 +514,16 @@ export async function openSharedFile(deps, uri) {
   const canReplace = !canCreate && eligibility === 'ok' && !!deps.replaceLogbook && isXml;
   const replace = canReplace
     ? async () => {
-        await deps.replaceLogbook?.({ file: label || name, fileName: name, data, several });
+        try {
+          await deps.replaceLogbook?.({ file: label || name, fileName: name, data: payload, several });
+        } finally {
+          await discard();
+        }
       }
     : undefined;
   deps.choose(
     { name: label || name, canCreate, canReplace, whyNot: !canCreate && deps.replaceLogbook && eligibility && eligibility !== 'ok' ? eligibility : '', several },
-    { merge, create, replace },
+    { merge, create, replace, discard },
   );
   return 'confirm-dives';
 }

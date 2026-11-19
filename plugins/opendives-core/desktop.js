@@ -28,6 +28,8 @@ const unavailable = (/** @type {string} */ what) => reject(`${what} is not avail
 const TEST_ACCOUNT = 'cloud-test.env';
 const DEV_CREDENTIALS = 'cloud-dev.env';
 const IMPORT_PREFIX = 'import-';
+/** The most an export may be to come back as text. */
+const MAX_TEXT = 8 * 1024 * 1024;
 const SAMPLE = 'SampleDivesV2.ssrf';
 const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH', 'DENIED', 'NO_LOG', 'CREATE_FAILED', 'LOG_EXISTS', 'NOT_EMPTY']);
 
@@ -567,10 +569,41 @@ export class OpenDivesCoreDesktop extends WebPlugin {
    * @param {{name?: string, data?: string}} options
    */
   async stageImport(options) {
-    const name = baseName(options?.name ?? '').replace(/[^A-Za-z0-9._-]/g, '_') || 'import.xml';
     if (options?.data == null) throw reject('BAD_REQUEST');
+    if (options.append === true) {
+      // The next piece of a big file (lib/staged-file.js): added to the file the first call made.
+      if (!this.isImportFile(options.path ?? '')) throw reject('BAD_REQUEST');
+      await this.bridge.fs.appendFile({ path: options.path, base64: options.data });
+      return { path: options.path };
+    }
+    const name = baseName(options?.name ?? '').replace(/[^A-Za-z0-9._-]/g, '_') || 'import.xml';
     const { path } = await this.bridge.fs.writeFile({ area: 'import', name: `${IMPORT_PREFIX}${Date.now()}-${name}`, base64: options.data });
     return { path };
+  }
+
+  /** A shared file is a mobile intent: the desktop receives none. */
+  async stageSharedFile() {
+    throw unavailable('Reading a shared file');
+  }
+
+  /**
+   * Up to 4 MB of a staged file, base64, with its size.
+   * @param {{path?: string, offset?: number, length?: number}} options
+   */
+  async readFileChunk(options) {
+    if (!this.isImportFile(options?.path ?? '')) throw reject('BAD_REQUEST');
+    return this.bridge.fs.readChunk({ path: options.path, offset: options.offset ?? 0, length: options.length ?? 65536 });
+  }
+
+  /**
+   * A new staged file made of ranges of staged files and literal text.
+   * @param {{name?: string, parts?: ({path: string, start: number, end: number}|{text: string})[]}} options
+   */
+  async assembleFile(options) {
+    const parts = options?.parts ?? [];
+    if (!parts.length || parts.some((p) => !('text' in p) && !this.isImportFile(p.path))) throw reject('BAD_REQUEST');
+    const name = baseName(options?.name ?? '').replace(/[^A-Za-z0-9._-]/g, '_') || 'import.xml';
+    return this.bridge.fs.assemble({ name: `${IMPORT_PREFIX}${Date.now()}-${name}`, parts });
   }
 
   /** @param {{path?: string}} options */
@@ -625,6 +658,15 @@ export class OpenDivesCoreDesktop extends WebPlugin {
    */
   async importDives(options) {
     const name = baseName(options?.name ?? '') || 'import.xml';
+    if (options?.path != null) {
+      // A staged file (a logbook): the core reads it where it is, and it is deleted afterwards.
+      if (!this.isImportFile(options.path)) throw reject('BAD_REQUEST');
+      try {
+        return { json: await this.core('importDives', { file: options.path, source: name }) };
+      } finally {
+        await this.bridge.fs.remove({ path: options.path }).catch(() => {});
+      }
+    }
     if (options?.data == null) throw reject('Missing data', 'BAD_ARGUMENT');
     // A name of its own: on Windows the helper may still hold the previous file of that name open
     // (EBUSY), and removing the staged file must never hide what the import answered.
@@ -888,9 +930,22 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     const format = options?.format ?? '';
     const name = baseName(options?.name ?? '');
     if (ids.length === 0 || !format || !name) throw reject('Missing ids, format or name', 'BAD_ARGUMENT');
+    if (options.stage === true) {
+      // A staged file: only its path comes back (read it with readFileChunk, import it, discard it).
+      const staged = joinPath(this.importDir, `${IMPORT_PREFIX}${Date.now()}-${name.replace(/[^A-Za-z0-9._-]/g, '_')}`);
+      await this.core('exportDives', { ids, format, anonymize: options.anonymize === true, path: staged });
+      const { size } = await this.bridge.fs.readChunk({ path: staged, offset: 0, length: 0 });
+      return { uri: '', path: staged, size };
+    }
     const file = joinPath(this.bridge.paths.temp, 'share', name);
     await this.core('exportDives', { ids, format, anonymize: options.anonymize === true, path: file });
     if (options.text === true) {
+      // A few dives (the QR share, the clipboard); a big export is never returned as one string.
+      const { size } = await this.bridge.fs.readChunk({ path: file, offset: 0, length: 0 });
+      if (size > MAX_TEXT) {
+        await this.bridge.fs.remove({ path: file });
+        throw reject('The export is too big to be returned as text', 'TOO_BIG');
+      }
       const text = base64ToText(await this.bridge.fs.readFile({ path: file }));
       await this.bridge.fs.remove({ path: file });
       return { uri: '', text };

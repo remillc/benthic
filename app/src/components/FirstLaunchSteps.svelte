@@ -30,9 +30,10 @@
   import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch, offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { entryRows } from '../lib/server-signin.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
-  import { summariseImport, summaryText } from '../lib/import-summary.js';
+  import { summariseImport, summariseScan, summaryText } from '../lib/import-summary.js';
+  import { scanBlob, scanLogbook, stageFile } from '../lib/staged-file.js';
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
-  import { logbook, startWithoutAccount, deleteDives, importFile, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
+  import { logbook, startWithoutAccount, deleteDives, importFile, importData, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { alphaLogbookFile, findAlphaLogbooks, markAlphaImportDone } from '../lib/alpha-logbook.js';
   import { isRelease } from '../lib/edition.js';
@@ -236,6 +237,8 @@
     const source = flow.source;
     if (!source) return null;
     if (source.kind === 'file') return source.csv ? () => importCsvFile(source.file, source.csv.params, source.csv.companion) : () => importFile(source.file);
+    // Already in the app's cache: the core reads it where it is (and deletes it).
+    if (source.kind === 'staged') return () => importData(source.fileName, { path: source.path });
     return async () => {
       // A resumable download is several files (one per batch), each imported then discarded.
       let added = 0;
@@ -278,7 +281,7 @@
     let parked = false;
     try {
       if (flow.source) {
-        const pending = await pendingFromSource(flow.source, async (file) => (await OpenDivesCore.stageImport({ name: file.name, data: await readBase64(file) })).path);
+        const pending = await pendingFromSource(flow.source, async (file) => (await stageFile(OpenDivesCore, file)).path);
         parkPending(sessionStorage, pending);
         parked = true;
       }
@@ -392,18 +395,6 @@
       .open();
   }
 
-  /** @param {File} file */
-  function readBase64(file) {
-    return /** @type {Promise<string>} */ (
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      })
-    );
-  }
-
   /** The CSV file being mapped (task 2026-11-16-224): its column mapping waits for the new logbook. */
   let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
 
@@ -444,8 +435,10 @@
     busy = true;
     try {
       const name = t('welcomeSteps.alphaName');
-      const { file, text } = await alphaLogbookFile(OpenDivesCore, found, name);
-      flow.source = { kind: 'file', file, name, summary: summariseImport(found.dives, text), alpha: true };
+      // The core writes the alpha's dives to a file in the app's cache; only its path comes back.
+      const staged = await alphaLogbookFile(OpenDivesCore, found, name);
+      const scan = await scanLogbook(OpenDivesCore, staged.path, staged.size);
+      flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name, summary: summariseScan(found.dives, scan), alpha: true };
       flow.name = name;
       go('file');
     } catch (e) {
@@ -509,6 +502,37 @@
       void bring([file]);
     });
   });
+  // A big logbook shared with the app arrives already in the app's cache (only its path): counted by the core, then
+  // « Nouveau carnet »; if the diver leaves, the staged file is deleted.
+  $effect(() => {
+    const staged = sharedFile.staged;
+    if (!staged || busy) return;
+    untrack(() => {
+      sharedFile.staged = null;
+      resetFlow();
+      go('import');
+      void bringStaged(staged);
+    });
+  });
+
+  /** @param {NonNullable<typeof sharedFile.staged>} staged */
+  async function bringStaged(staged) {
+    busy = true;
+    unreadable = '';
+    try {
+      const { dives } = await OpenDivesCore.importCount({ path: staged.path });
+      if (!dives) throw new Error('NO_DIVES');
+      const summary = staged.summary ? { dives, sites: staged.summary.sites || null, firstYear: staged.summary.firstYear, lastYear: staged.summary.lastYear } : summariseImport(dives);
+      flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name: nameFromFile(staged.name, t('welcomeSteps.defaultName')), summary };
+      flow.name = flow.source.name;
+      go('file');
+    } catch (e) {
+      await OpenDivesCore.discardImport({ path: staged.path }).catch(() => {});
+      failed(e, null);
+    } finally {
+      busy = false;
+    }
+  }
 
   /** A file picked for the import (« Un fichier »). */
   async function fileChosen() {
@@ -534,14 +558,14 @@
     busy = true;
     try {
       const dives = await readImportFile(file, {
-        readBase64,
-        stage: (o) => OpenDivesCore.stageImport(o),
+        stage: (f) => stageFile(OpenDivesCore, f),
         count: (o) => OpenDivesCore.importCount(o),
         discard: (o) => OpenDivesCore.discardImport(o),
       });
+      // The sites and years come from a streaming pass (a window of 2 MB at a time), not from the file as one text.
       const head = await file.slice(0, 2048).text();
-      const text = isSubsurfaceXml(head) ? await file.text() : '';
-      flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary: summariseImport(dives, text) };
+      const summary = isSubsurfaceXml(head) ? summariseScan(dives, await scanBlob(file)) : summariseImport(dives);
+      flow.source = { kind: 'file', file, name: nameFromFile(file.name, t('welcomeSteps.defaultName')), summary };
       flow.name = flow.source.name;
       go('file');
     } catch (e) {
@@ -753,7 +777,7 @@
     <div class="od-first-launch--summary">
       <span class="od-first-launch--summary-icon"><Icon name="file" size={20} /></span>
       <span class="od-first-launch--summary-text">
-        <span class="od-first-launch--summary-name">{flow.source.kind === 'file' ? flow.source.file.name : t('welcomeSteps.divelogsTitle')}</span>
+        <span class="od-first-launch--summary-name">{flow.source.kind === 'file' ? flow.source.file.name : flow.source.kind === 'staged' ? flow.source.fileName : t('welcomeSteps.divelogsTitle')}</span>
         <span class="od-first-launch--summary-detail">{summaryText(flow.source.summary, t)}</span>
       </span>
     </div>

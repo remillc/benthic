@@ -113,6 +113,9 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openStorePage", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "contentShown", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readSharedFile", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "stageSharedFile", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readFileChunk", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "assembleFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bluetoothModels", returnType: CAPPluginReturnPromise),
@@ -572,12 +575,24 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// A file chosen in the WebView: its bytes arrive in base64, are written to a
-    /// temporary file with the original name (the core reads the format from it),
-    /// imported, then the copy is deleted.
+    /// A file imported by the core. Either `path`, a file staged in the cache (stageImport, stageSharedFile,
+    /// assembleFile, exportDives with `stage`): the core reads it where it is, and it is deleted afterwards; or,
+    /// for a small file, `data` in base64, written to a temporary file with the original name (the core reads
+    /// the format from it), imported, then the copy is deleted. A logbook is never sent as `data`.
     @objc func importDives(_ call: CAPPluginCall) {
         var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
         if name.isEmpty { name = "import.xml" }
+        if let staged = call.getString("path") {
+            let importName = name
+            onCoreThread(call) { [self] in
+                guard let file = stagedImport(staged), FileManager.default.fileExists(atPath: file.path) else {
+                    throw Failure("BAD_REQUEST")
+                }
+                defer { try? FileManager.default.removeItem(at: file) }
+                call.resolve(["json": try OpenDivesNative.importDives(file: file.path, source: importName)])
+            }
+            return
+        }
         guard let data = call.getString("data") else {
             call.reject("Missing data", "BAD_ARGUMENT")
             return
@@ -1201,9 +1216,28 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// A file picked in the web layer (`name`, base64 `data`) written to the app's
-    /// cache for the import steps (importCount, createLog).
+    /// A file picked in the web layer written to the app's cache for the import steps (importCount, createLog,
+    /// importDives); {path}. A big file comes in pieces, never as one string: the first call (`name`, base64
+    /// `data` of the first piece) creates the file, the next ones give `path` and `append: true`.
     @objc func stageImport(_ call: CAPPluginCall) {
+        if call.getBool("append", false) {
+            guard let data = call.getString("data"), let path = call.getString("path") else {
+                call.reject("BAD_REQUEST", "BAD_REQUEST")
+                return
+            }
+            onCoreThread(call) { [self] in
+                guard let file = stagedImport(path), FileManager.default.fileExists(atPath: file.path),
+                      let bytes = Data(base64Encoded: data, options: .ignoreUnknownCharacters) else {
+                    throw Failure("BAD_REQUEST")
+                }
+                let handle = try FileHandle(forWritingTo: file)
+                defer { try? handle.close() }
+                try handle.seekToEnd()
+                try handle.write(contentsOf: bytes)
+                call.resolve(["path": file.path])
+            }
+            return
+        }
         var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
         name = name.replacingOccurrences(of: "[^A-Za-z0-9._-]", with: "_", options: .regularExpression)
         if name.isEmpty { name = "import.xml" }
@@ -1728,9 +1762,119 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     // MARK: - A file sent to the app (deep links, "Open in OpenDives")
 
-    /// Reads a file another app handed over (a file:// URL of the Inbox or of a provider):
-    /// its name, its size and its contents in base64. The web layer decides whether it is a
-    /// logbook (lib/deep-link.js). Rejects TOO_BIG above 100 MB, NOT_FOUND, FAILED.
+    /// A file another app handed over (a file:// URL of the Inbox or of a provider), copied in pieces of
+    /// 64 KB into the app's cache: {name, size, path}. Only the path crosses the bridge (a logbook of 100 MB as
+    /// one base64 string is too much for the Android twin of this call, and for the WebView). Rejects TOO_BIG
+    /// above 2 GB, NOT_FOUND, FAILED.
+    @objc func stageSharedFile(_ call: CAPPluginCall) {
+        guard let text = call.getString("uri"), !text.isEmpty else {
+            call.reject("Missing uri", "BAD_ARGUMENT")
+            return
+        }
+        guard let url = URL(string: text), url.isFileURL else {
+            call.reject("Not a file", "BAD_ARGUMENT")
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async { [self] in
+            // A file opened in place (outside the app) needs its security scope.
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            var target: URL?
+            do {
+                let clean = url.lastPathComponent.replacingOccurrences(of: "[^A-Za-z0-9._-]", with: "_", options: .regularExpression)
+                let file = cacheDir.appendingPathComponent("\(importPrefix)\(timestamp())-\(clean.isEmpty ? "import.xml" : clean)")
+                target = file
+                let input = try FileHandle(forReadingFrom: url)
+                defer { try? input.close() }
+                FileManager.default.createFile(atPath: file.path, contents: nil)
+                let output = try FileHandle(forWritingTo: file)
+                defer { try? output.close() }
+                var size = 0
+                while let piece = try input.read(upToCount: 64 * 1024), !piece.isEmpty {
+                    try output.write(contentsOf: piece)
+                    size += piece.count
+                    if size > 2 * 1024 * 1024 * 1024 { throw Failure("TOO_BIG") }
+                }
+                call.resolve(["name": url.lastPathComponent, "size": size, "path": file.path])
+            } catch let error as Failure where error.code == "TOO_BIG" {
+                if let target { try? FileManager.default.removeItem(at: target) }
+                call.reject("The file is too big", "TOO_BIG")
+            } catch let error as NSError where error.code == NSFileReadNoSuchFileError {
+                call.reject("Cannot open the file", "NOT_FOUND")
+            } catch {
+                if let target { try? FileManager.default.removeItem(at: target) }
+                call.reject("Cannot read the file", "FAILED")
+            }
+        }
+    }
+
+    /// Up to 4 MB of a staged file, base64, with the file's size ({data, size}).
+    @objc func readFileChunk(_ call: CAPPluginCall) {
+        guard let path = call.getString("path") else {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return
+        }
+        let offset = UInt64(max(0, call.getInt("offset") ?? 0))
+        let length = min(4 * 1024 * 1024, max(0, call.getInt("length") ?? 65536))
+        onCoreThread(call) { [self] in
+            guard let file = stagedImport(path), FileManager.default.fileExists(atPath: file.path) else {
+                throw Failure("BAD_REQUEST")
+            }
+            let handle = try FileHandle(forReadingFrom: file)
+            defer { try? handle.close() }
+            let size = try handle.seekToEnd()
+            try handle.seek(toOffset: min(offset, size))
+            let bytes = try handle.read(upToCount: length) ?? Data()
+            call.resolve(["data": bytes.base64EncodedString(), "size": Int(size)])
+        }
+    }
+
+    /// A new staged file made of pieces: `parts` is a list of {path, start, end} (a byte range of a staged
+    /// file) and {text} (literal text, UTF-8), copied in order. {path}.
+    @objc func assembleFile(_ call: CAPPluginCall) {
+        guard let parts = call.getArray("parts") as? [[String: Any]], !parts.isEmpty else {
+            call.reject("BAD_REQUEST", "BAD_REQUEST")
+            return
+        }
+        var name = ((call.getString("name") ?? "") as NSString).lastPathComponent
+        name = name.replacingOccurrences(of: "[^A-Za-z0-9._-]", with: "_", options: .regularExpression)
+        if name.isEmpty { name = "import.xml" }
+        let fileName = name
+        onCoreThread(call) { [self] in
+            let target = cacheDir.appendingPathComponent("\(importPrefix)\(timestamp())-\(fileName)")
+            FileManager.default.createFile(atPath: target.path, contents: nil)
+            do {
+                let output = try FileHandle(forWritingTo: target)
+                defer { try? output.close() }
+                for part in parts {
+                    if let text = part["text"] as? String {
+                        try output.write(contentsOf: Data(text.utf8))
+                        continue
+                    }
+                    guard let path = part["path"] as? String, let source = stagedImport(path),
+                          let start = (part["start"] as? NSNumber)?.uint64Value,
+                          let end = (part["end"] as? NSNumber)?.uint64Value, end >= start else {
+                        throw Failure("BAD_REQUEST")
+                    }
+                    let input = try FileHandle(forReadingFrom: source)
+                    defer { try? input.close() }
+                    try input.seek(toOffset: start)
+                    var left = Int(end - start)
+                    while left > 0, let piece = try input.read(upToCount: min(64 * 1024, left)), !piece.isEmpty {
+                        try output.write(contentsOf: piece)
+                        left -= piece.count
+                    }
+                }
+            } catch {
+                try? FileManager.default.removeItem(at: target)
+                throw Failure("BAD_REQUEST")
+            }
+            call.resolve(["path": target.path])
+        }
+    }
+
+    /// Small files only (at most 8 MB, as base64 in the answer; a bigger one rejects TOO_BIG): a file another
+    /// app handed over, its name, its size and its contents. The shared logbooks go through stageSharedFile.
     @objc func readSharedFile(_ call: CAPPluginCall) {
         guard let text = call.getString("uri"), !text.isEmpty else {
             call.reject("Missing uri", "BAD_ARGUMENT")
@@ -1746,7 +1890,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             defer { if scoped { url.stopAccessingSecurityScopedResource() } }
             do {
                 let size = (try url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
-                if size > 100 * 1024 * 1024 {
+                if size > 8 * 1024 * 1024 {
                     call.reject("The file is too big", "TOO_BIG")
                     return
                 }
@@ -1807,10 +1951,26 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         onCoreThread(call) { [self] in
+            if call.getBool("stage", false) {
+                // Written where the import calls read it (a staged file): the core writes the file and only its
+                // path comes back. The caller imports it, reads it in pieces or deletes it (discardImport).
+                let clean = (name as NSString).lastPathComponent.replacingOccurrences(of: "[^A-Za-z0-9._-]", with: "_", options: .regularExpression)
+                let staged = cacheDir.appendingPathComponent("\(importPrefix)\(timestamp())-\(clean)")
+                try OpenDivesNative.exportDives(ids: numbers(ids), format: format, anonymize: anonymize, path: staged.path)
+                let size = (try? staged.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                call.resolve(["uri": "", "path": staged.path, "size": size])
+                return
+            }
             let file = shareDir.appendingPathComponent((name as NSString).lastPathComponent)
             try OpenDivesNative.exportDives(ids: numbers(ids), format: format, anonymize: anonymize, path: file.path)
             if call.getBool("text", false) {
-                // The contents come back in the answer (the QR share): the file is not kept.
+                // The contents come back in the answer (the QR share, a few dives): the file is not kept. A big
+                // export never goes through the bridge as a string.
+                let size = (try? file.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                if size > 8 * 1024 * 1024 {
+                    try? FileManager.default.removeItem(at: file)
+                    throw Failure("TOO_BIG", "The export is too big to be returned as text")
+                }
                 let text = try String(contentsOf: file, encoding: .utf8)
                 try? FileManager.default.removeItem(at: file)
                 call.resolve(["uri": "", "text": text])

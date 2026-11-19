@@ -13,6 +13,7 @@
   // account already created. Also reached when signing in to an account
   // that has no logbook yet.
   import { OpenDivesCore } from 'opendives-core';
+  import { stageFile } from '../lib/staged-file.js';
   import TextField from '../components/TextField.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
   import { theme } from 'framework7-svelte';
@@ -90,14 +91,7 @@
     fileInput.value = '';
     busy = true;
     try {
-      /** @type {string} */
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
-      const { path } = await OpenDivesCore.stageImport({ name: file.name, data: base64 });
+      const { path } = await stageFile(OpenDivesCore, file);
       f7router.navigate(`${base}/importing`, { props: { source: 'file', path } });
     } catch (e) {
       showFailure(errorCode(e));

@@ -27,7 +27,9 @@ function core({ folders = [{ id: 'f3a9', branch: 'diver@example.org', bytes: 57_
       if (!folders.some((f) => f.id === options.id)) throw new Error('No logbook in this cache');
       return dives;
     },
-    exportDives: async (options) => ({ text: options.text ? text : '' }),
+    // The core writes the file in the app's cache: only its path and size come back (never the text).
+    exportDives: async (options) => (options.stage ? { uri: '', path: '/cache/import-1-previous.ssrf', size: text.length } : { text: 'NEVER' }),
+    discardImport: async () => {},
   };
   return {
     calls,
@@ -84,17 +86,18 @@ test('the row appears only once: after the import it is remembered in the device
   assert.deepEqual(c.calls, [], 'once imported, the core is not even asked');
 });
 
-test('the copy is a Subsurface file made from the dives; the alpha’s files and account are not touched', async () => {
+test('the copy is a Subsurface file written by the core into the cache, core to core: no text comes back; the alpha’s files and account are not touched', async () => {
   const c = core();
   const [found] = await findAlphaLogbooks(c.api, store(), true);
-  const { file, text } = await alphaLogbookFile(c.api, found, 'Carnet précédent');
-  assert.equal(file.name, 'Carnet précédent.ssrf');
-  assert.equal(await file.text(), text);
-  assert.match(text, /<dive /);
+  const staged = await alphaLogbookFile(c.api, found, 'Carnet précédent');
+  assert.deepEqual(staged, { path: '/cache/import-1-previous.ssrf', name: 'Carnet précédent.ssrf', size: staged.size });
+  assert.ok(staged.size > 0);
   const exported = c.calls.find((call) => call[0] === 'exportDives')[1];
-  assert.deepEqual(exported, { ids: [3, 5, 9], format: 'ssrf', anonymize: false, name: 'previous-version.ssrf', text: true });
+  assert.deepEqual(exported, { ids: [3, 5, 9], format: 'ssrf', anonymize: false, name: 'Carnet précédent.ssrf', stage: true });
+  assert.equal('text' in exported, false, 'the contents never travel to the web layer');
   // Only reads: the Proxy above throws on a sign-out, a sync, a deletion or a listing that is not cached.
   assert.deepEqual([...new Set(c.calls.map((call) => call[0]))].sort(), ['alphaCacheList', 'alphaCacheOpen', 'exportDives']);
+  assert.equal(c.calls.some((call) => call[0] === 'readSharedFile'), false);
   assert.deepEqual(c.calls.find((call) => call[0] === 'alphaCacheOpen')[1], { id: 'f3a9' });
   await assert.rejects(alphaLogbookFile(core({ text: '' }).api, found, 'x'), /NO_DIVES/);
 });
@@ -105,7 +108,7 @@ test('first launch: the row sits in « Importer un carnet », is shown only with
   assert.match(rows, /\{#each alphaFound as found \(found\.id\)\}\s*<ReleaseChoiceRow icon="logbook" title=\{t\('welcomeSteps\.alphaTitle'\)\}/);
   assert.match(rows, /welcomeSteps\.alphaHelpDated/);
   // The same name step and the same import as a picked file.
-  assert.match(steps, /flow\.source = \{ kind: 'file', file, name, summary: summariseImport\(found.dives, text\), alpha: true \};\s*flow\.name = name;\s*go\('file'\);/);
+  assert.match(steps, /flow\.source = \{ kind: 'staged', path: staged\.path, fileName: staged\.name, name, summary: summariseScan\(found\.dives, scan\), alpha: true \};\s*flow\.name = name;\s*go\('file'\);/);
   assert.match(steps, /findAlphaLogbooks\(OpenDivesCore, deviceStore, isRelease\)/);
   const created = steps.slice(steps.indexOf('await createDeviceLogbook('), steps.indexOf('resetFlow();', steps.indexOf('await createDeviceLogbook(')));
   assert.match(created, /if \(flow\.source\?\.alpha\) markAlphaImportDone\(deviceStore\);/);

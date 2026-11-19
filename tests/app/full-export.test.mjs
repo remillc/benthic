@@ -12,6 +12,8 @@ import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 import { createProfile } from '../../app/src/lib/profile.js';
 import { buildExport, capacitorSink, containsSensitive, desktopSink, exportFileName, planExport, EXPORT_FORMAT } from '../../app/src/lib/full-export.js';
 import { crc32Update, createSha256, createZipWriter } from '../../app/src/lib/zip-stream.js';
+import { readChunks } from '../../app/src/lib/staged-file.js';
+import { fakeStagedCore } from './fake-staged-core.mjs';
 
 const FIXED = new Date('2026-11-18T10:30:00Z');
 const jpeg = (n, seed) => Uint8Array.from({ length: n }, (_, i) => (i * 7 + seed) & 255);
@@ -140,6 +142,36 @@ async function fixture({ media } = {}) {
   };
   return { deps, cert, cert2, front, back, ssrf, store };
 }
+
+test('a logbook the core wrote to a file is streamed into the archive in pieces, then the file is deleted (it never crosses the bridge as a string)', async () => {
+  const dir = tempDir();
+  try {
+    const { deps, ssrf } = await fixture();
+    deps.openFile = folderSink(dir);
+    const staging = fakeStagedCore();
+    const staged = staging.put('logbook.ssrf', Buffer.from(ssrf));
+    let disposed = 0;
+    deps.logbook = {
+      diveCount: async () => 1,
+      open: async () => ({ size: staged.size, chunks: () => readChunks(staging.core, staged.path, staged.size, 16), dispose: async () => (disposed++, staging.core.discardImport({ path: staged.path })) }),
+    };
+    const { file } = await buildExport({}, deps);
+    assert.deepEqual(readZip(readFileSync(file.path)).get('logbook/logbook.ssrf').data, Buffer.from(ssrf));
+    assert.equal(disposed, 1);
+    assert.equal(staging.files.size, 0);
+    // The file is deleted when the export fails, too.
+    const again = fakeStagedCore();
+    const second = again.put('logbook.ssrf', Buffer.from(ssrf));
+    deps.openFile = async () => {
+      throw new Error('no room');
+    };
+    deps.logbook.open = async () => ({ size: second.size, chunks: () => readChunks(again.core, second.path, second.size), dispose: async () => again.core.discardImport({ path: second.path }) });
+    await assert.rejects(buildExport({}, deps), /no room/);
+    assert.equal(again.files.size, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 test('crc32 and the incremental sha256 give the standard values, whatever the chunking', () => {
   assert.equal(crc32Update(0, new TextEncoder().encode('123456789')), 0xcbf43926);

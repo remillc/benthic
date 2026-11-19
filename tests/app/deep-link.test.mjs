@@ -85,7 +85,9 @@ test('a shared file: contents decide, the name only gives the extension', () => 
   // A good name does not save a wrong content.
   assert.deepEqual(checkSharedFile('dives.ssrf', '<html>', 1000), { ok: false, reason: 'NOT_A_LOGBOOK' });
   assert.deepEqual(checkSharedFile('dives.ssrf', SSRF, 0), { ok: false, reason: 'EMPTY' });
-  assert.deepEqual(checkSharedFile('dives.ssrf', SSRF, 200 * 1024 * 1024), { ok: false, reason: 'TOO_BIG' });
+  // A logbook of a thousand dives with profiles is about 100 MB: it is accepted now that it is streamed to the cache (the limit was 100 MB, when the file went through the bridge as one string).
+  assert.deepEqual(checkSharedFile('dives.ssrf', SSRF, 150 * 1024 * 1024), { ok: true, name: 'dives.ssrf' });
+  assert.deepEqual(checkSharedFile('dives.ssrf', SSRF, 2 * 1024 * 1024 * 1024), { ok: false, reason: 'TOO_BIG' });
 });
 
 test('import errors keep their message', () => {

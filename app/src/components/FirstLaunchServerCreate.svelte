@@ -18,6 +18,7 @@
   import { nextProgress } from '../lib/sync-progress.js';
   import { createChoices } from '../lib/server-create.js';
   import { readImportFile } from '../lib/release-welcome.js';
+  import { stageFile } from '../lib/staged-file.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { deviceStore } from '../lib/device-store.js';
@@ -104,8 +105,7 @@
     busy = true;
     try {
       const dives = await readImportFile(file, {
-        readBase64: (f) => toBase64(f),
-        stage: (o) => OpenDivesCore.stageImport(o),
+        stage: (f) => stageFile(OpenDivesCore, f),
         count: (o) => OpenDivesCore.importCount(o),
         discard: (o) => OpenDivesCore.discardImport(o),
       });
@@ -121,16 +121,6 @@
     } finally {
       busy = false;
     }
-  }
-
-  /** @param {File} file @returns {Promise<string>} */
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
   }
 
   // --- « Nouveau carnet »: an empty logbook ---------------------------------------------------------------

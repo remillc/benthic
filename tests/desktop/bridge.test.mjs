@@ -249,6 +249,25 @@ test('files: appendFile adds bytes to a staged file, in temp only', async () => 
   assert.match((await rejection(invoke('od:fs', 'appendFile', { path: path.join(root, 'outside'), base64: b64('x') }))).message, /not an allowed path/);
 });
 
+test('files: a big file is read in pieces (readChunk) and built from ranges and text (assemble), in temp only', async () => {
+  const b64 = (t) => Buffer.from(t).toString('base64');
+  const { path: staged } = await invoke('od:fs', 'writeFile', { area: 'import', name: 'import-1-big.ssrf', base64: b64('<divelog><dives/></divelog>') });
+  const piece = await invoke('od:fs', 'readChunk', { path: staged, offset: 9, length: 7 });
+  assert.deepEqual({ text: Buffer.from(piece.data, 'base64').toString(), size: piece.size }, { text: '<dives/', size: 27 });
+  // Past the end: what is left; a length of 0 gives only the size; never more than 4 MB at once.
+  assert.equal(Buffer.from((await invoke('od:fs', 'readChunk', { path: staged, offset: 20, length: 100 })).data, 'base64').toString(), 'ivelog>');
+  assert.equal((await invoke('od:fs', 'readChunk', { path: staged, offset: 0, length: 0 })).size, 27);
+  const joined = await invoke('od:fs', 'assemble', { name: 'import-2-big.ssrf', parts: [{ path: staged, start: 0, end: 9 }, { text: '<divesites/>' }, { path: staged, start: 9, end: 27 }] });
+  assert.equal(path.dirname(joined.path), path.join(temp, 'import'));
+  assert.equal(readFileSync(joined.path, 'utf8'), '<divelog><divesites/><dives/></divelog>');
+  const outside = path.join(root, 'outside');
+  assert.match((await rejection(invoke('od:fs', 'readChunk', { path: outside, offset: 0, length: 1 }))).message, /not an allowed path/);
+  assert.match((await rejection(invoke('od:fs', 'assemble', { name: 'x.ssrf', parts: [{ path: outside, start: 0, end: 1 }] }))).message, /not an allowed path/);
+  assert.ok(!existsSync(path.join(temp, 'import', 'x.ssrf')), 'a refused assembly leaves no file');
+  await invoke('od:fs', 'remove', { path: staged });
+  await invoke('od:fs', 'remove', { path: joined.path });
+});
+
 test('files: only logbook folders of userData are removed or renamed', async () => {
   const kept = path.join(userData, 'carnet.new');
   mkdirSync(kept);

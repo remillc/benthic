@@ -29,6 +29,8 @@ export const PENDING_IMPORT_KEY = 'od.pendingImport';
  */
 export async function pendingFromSource(source, stage) {
   if (source.kind === 'divelogs') return { files: (source.paths ?? [source.path]).map((path) => ({ path, name: 'divelogs.dld' })) };
+  // A staged source is already in the import folder: only its path is parked.
+  if (source.kind === 'staged') return { files: [{ path: source.path, name: source.fileName }] };
   const files = [{ path: await stage(source.file), name: source.file.name }];
   if (source.csv?.companion) files.push({ path: await stage(source.csv.companion), name: source.csv.companion.name });
   return source.csv ? { files, csv: { params: source.csv.params, companion: !!source.csv.companion } } : { files };

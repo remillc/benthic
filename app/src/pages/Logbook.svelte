@@ -1151,7 +1151,7 @@
   async function offerReplace(file) {
     let what;
     try {
-      what = await replacementFromFile(file.name, new Uint8Array(await file.arrayBuffer()));
+      what = await replacementFromFile(OpenDivesCore, file);
     } catch {
       return false;
     }
@@ -1172,7 +1172,17 @@
       f7.dialog.create({ title: t('link.fileTitle'), text, buttons, verticalButtons: buttons.length > 2 }).open();
     });
     if (answer === 'merge') return false;
-    if (answer === 'replace') await startReplace({ file: file.name, fileName: what.name, data: what.data, several: what.several });
+    if (answer === 'replace') {
+      try {
+        // Only now is the logbook written to the app's cache (in pieces); the replacement deletes it afterwards.
+        const data = await what.stage();
+        await startReplace({ file: file.name, fileName: what.name, data, several: what.several });
+      } catch (e) {
+        const code = String(/** @type {any} */ (e)?.message ?? '');
+        console.error('Replace from a file', code);
+        f7.dialog.create({ title: t('replace.failedTitle'), text: t('replace.failed'), buttons: [{ text: t('dialog.ok') }] }).open();
+      }
+    }
     return true;
   }
 

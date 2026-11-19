@@ -53,6 +53,20 @@ function fakeBridge(answers = {}) {
       async readFile({ path }) {
         return files.get(path);
       },
+      async appendFile({ path, base64 }) {
+        files.set(path, Buffer.concat([Buffer.from(files.get(path) ?? '', 'base64'), Buffer.from(base64, 'base64')]).toString('base64'));
+        return true;
+      },
+      async readChunk({ path, offset, length }) {
+        const bytes = Buffer.from(files.get(path) ?? '', 'base64');
+        return { data: bytes.subarray(offset, offset + length).toString('base64'), size: bytes.length };
+      },
+      async assemble({ name, parts }) {
+        const path = `${paths.temp}/import/${name}`;
+        const out = parts.map((p) => (typeof p.text === 'string' ? Buffer.from(p.text) : Buffer.from(files.get(p.path), 'base64').subarray(p.start, p.end)));
+        files.set(path, Buffer.concat(out).toString('base64'));
+        return { path };
+      },
       async remove({ path }) {
         return files.delete(path);
       },
@@ -269,6 +283,27 @@ test('stageImport, importCount and discardImport work on files of the import fol
   assert.equal((await rejection(plugin.stageImport({ name: 'a' }))).code, 'BAD_REQUEST');
 });
 
+test('a logbook goes to the core by path: stageImport in pieces, readFileChunk, assembleFile, importDives({ path })', async () => {
+  install({ importDives: '{"dive":{}}' });
+  const first = await plugin.stageImport({ name: 'big.ssrf', data: Buffer.from('<divelog>').toString('base64') });
+  const next = await plugin.stageImport({ path: first.path, data: Buffer.from('<dives/></divelog>').toString('base64'), append: true });
+  assert.equal(next.path, first.path);
+  const piece = await plugin.readFileChunk({ path: first.path, offset: 3, length: 4 });
+  assert.deepEqual({ text: Buffer.from(piece.data, 'base64').toString(), size: piece.size }, { text: 'velo', size: 27 });
+  const joined = await plugin.assembleFile({ name: 'big.ssrf', parts: [{ path: first.path, start: 0, end: 9 }, { text: '<divesites/>' }, { path: first.path, start: 9, end: 27 }] });
+  assert.equal(Buffer.from(bridge.files.get(joined.path), 'base64').toString(), '<divelog><divesites/><dives/></divelog>');
+  // Only files of the import folder: nothing else is read, appended to, assembled or imported by path.
+  assert.equal((await rejection(plugin.readFileChunk({ path: '/etc/passwd', offset: 0, length: 4 }))).code, 'BAD_REQUEST');
+  assert.equal((await rejection(plugin.stageImport({ path: '/etc/passwd', data: 'QQ==', append: true }))).code, 'BAD_REQUEST');
+  assert.equal((await rejection(plugin.assembleFile({ parts: [{ path: '/etc/passwd', start: 0, end: 4 }] }))).code, 'BAD_REQUEST');
+  assert.equal((await rejection(plugin.importDives({ name: 'x.ssrf', path: '/etc/passwd' }))).code, 'BAD_REQUEST');
+  // The core reads the staged file where it is; it is deleted afterwards.
+  assert.deepEqual(await plugin.importDives({ name: 'My Log.ssrf', path: joined.path }), { json: '{"dive":{}}' });
+  assert.deepEqual(lastCall().args, { file: joined.path, source: 'My Log.ssrf' });
+  assert.equal(bridge.files.has(joined.path), false);
+  assert.equal((await rejection(plugin.stageSharedFile({ uri: 'content://x/1' }))).code, 'UNAVAILABLE');
+});
+
 test('importDives stages the file under its name, imports it, then deletes it', async () => {
   install({ importDives: '{"dive":{}}' });
   assert.deepEqual(await plugin.importDives({ name: 'dir/trip.ssrf', data: 'QQ==' }), { json: '{"dive":{}}' });
@@ -366,6 +401,16 @@ test('exportDives writes to the share folder and gives its address, or the text'
   bridge.files.set('/tmp/opendives/share/q.xml', Buffer.from('plong\u00e9e').toString('base64'));
   assert.deepEqual(await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'q.xml', text: true }), { uri: '', text: 'plong\u00e9e' });
   assert.equal(bridge.files.has('/tmp/opendives/share/q.xml'), false);
+  // A big export is never returned as one string: TOO_BIG above 8 MB (the Android heap ran out of memory on it).
+  bridge.files.set('/tmp/opendives/share/big.xml', Buffer.alloc(9 * 1024 * 1024, 65).toString('base64'));
+  assert.equal((await rejection(plugin.exportDives({ ids: [1], format: 'ssrf', name: 'big.xml', text: true }))).code, 'TOO_BIG');
+  assert.equal(bridge.files.has('/tmp/opendives/share/big.xml'), false);
+  // `stage`: the core writes a staged file of the import folder; only its path and size come back.
+  bridge.files.set('/tmp/opendives/import/x', Buffer.from('abc').toString('base64'));
+  const staged = await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'logbook.ssrf', stage: true });
+  assert.equal(staged.uri, '');
+  assert.match(staged.path, /^\/tmp\/opendives\/import\/import-\d+-logbook\.ssrf$/);
+  assert.equal(lastCall().args.path, staged.path);
   assert.equal((await rejection(plugin.exportDives({ ids: [], format: 'ssrf', name: 'x' }))).code, 'BAD_ARGUMENT');
 });
 

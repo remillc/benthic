@@ -50,6 +50,8 @@ contextBridge.exposeInMainWorld('odDesktop', {
     writeFile: (options) => invoke('od:fs', 'writeFile', options),
     appendFile: (options) => invoke('od:fs', 'appendFile', options),
     readFile: (options) => invoke('od:fs', 'readFile', options),
+    readChunk: (options) => invoke('od:fs', 'readChunk', options),
+    assemble: (options) => invoke('od:fs', 'assemble', options),
     remove: (options) => invoke('od:fs', 'remove', options),
     exists: (options) => invoke('od:fs', 'exists', options),
     removeTree: (options) => invoke('od:fs', 'removeTree', options),

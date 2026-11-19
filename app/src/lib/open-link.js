@@ -23,7 +23,7 @@ import { offerUndo } from './undo.js';
 import { t } from './i18n.js';
 import { deviceStore } from './device-store.js';
 import { siteChange } from './sites.svelte.js';
-import { openSharedFile, fileFromBase64 } from './shared-file.js';
+import { openSharedFile } from './shared-file.js';
 import { sharedFile } from './shared-file.svelte.js';
 
 /** The sites of a shared sites file, kept for the dives file shared next (lib/shared-file.js). */
@@ -115,7 +115,9 @@ async function openTarget(target) {
 
 /** What the screen and the core give to lib/shared-file.js. */
 const sharedDeps = {
-  read: (/** @type {string} */ uri) => OpenDivesCore.readSharedFile({ uri }),
+  // The file is streamed into the app's cache by the plugin: only its path comes back (never the contents).
+  stage: (/** @type {string} */ uri) => OpenDivesCore.stageSharedFile({ uri }),
+  core: OpenDivesCore,
   check: checkSharedFile,
   welcome: () => logbook.welcome,
   remembered: () => {
@@ -129,8 +131,8 @@ const sharedDeps = {
   listSites: () => OpenDivesCore.siteQuery({ kind: 'list' }),
   siteChange,
   importData,
-  toFirstLaunch: (/** @type {string} */ name, /** @type {string} */ data) => {
-    sharedFile.file = fileFromBase64(name, data);
+  toFirstLaunch: (/** @type {string} */ name, /** @type {{ path: string, size: number }} */ staged, /** @type {any} */ summary) => {
+    sharedFile.staged = { path: staged.path, size: staged.size, name, summary };
   },
   logbookName: () => deviceStore.getItem('od.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
   // One logbook at a time on a phone or a tablet (the device's copy, or the account's): no « Nouveau carnet »; its
@@ -139,9 +141,9 @@ const sharedDeps = {
   canCreateLogbook: () => false,
   replaceEligibility: () => replaceEligibility(logbook),
   replaceLogbook: startReplace,
-  choose: (/** @type {any} */ o, /** @type {{ merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void> }} */ actions) => {
+  choose: (/** @type {any} */ o, /** @type {{ merge: () => Promise<void>, create?: () => Promise<void>, replace?: () => Promise<void>, discard: () => Promise<void> }} */ actions) => {
     /** @type {any[]} */
-    const buttons = [{ text: t('dialog.cancel') }];
+    const buttons = [{ text: t('dialog.cancel'), onClick: () => void actions.discard() }];
     if (actions.create) buttons.push({ text: t('link.fileNew'), bold: true, onClick: actions.create });
     if (actions.replace) buttons.push({ text: t('link.fileReplace'), onClick: actions.replace });
     buttons.push({ text: t('link.fileMerge'), bold: !actions.create, onClick: actions.merge });

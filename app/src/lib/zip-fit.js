@@ -6,7 +6,7 @@
 // deflated, no ZIP64, no encryption. Deflate is undone by the platform (DecompressionStream).
 
 /** Archives larger than this are left to the core as they are. */
-const MAX_ZIP_BYTES = 64 * 1024 * 1024;
+export const MAX_ZIP_BYTES = 64 * 1024 * 1024;
 
 /**
  * @param {Uint8Array} bytes

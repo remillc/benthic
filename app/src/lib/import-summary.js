@@ -27,6 +27,17 @@ export function summariseImport(dives, text = '') {
 }
 
 /**
+ * The summary from a streaming scan of the file (lib/staged-file.js), for a file too big to read as text.
+ * @param {number} dives the core's count (importCount)
+ * @param {{ hasDivelog: boolean, hasDives: boolean, sites: number, firstYear: number|null, lastYear: number|null }} scan
+ * @returns {ImportSummary}
+ */
+export function summariseScan(dives, scan) {
+  if (!scan.hasDivelog && !scan.hasDives) return { dives, sites: null, firstYear: null, lastYear: null };
+  return { dives, sites: scan.sites, firstYear: scan.firstYear, lastYear: scan.lastYear };
+}
+
+/**
  * « 312 plongées et 48 sites, de 2009 à 2026 » for the summary card; what is not known is left out.
  * @param {ImportSummary} summary
  * @param {(key: string, params?: Record<string, string|number>) => string} t
