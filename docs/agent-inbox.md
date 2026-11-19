@@ -5991,3 +5991,63 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - The iPad follows the same portrait layouts with iOS conventions (task 294).
 
 **Test:** open the iPhone About screen and compare with the mock-up. On a tablet in portrait, reach each of the listed screens and compare with its mock-up.
+
+## 301 — Sample logbook: more dives, closer to a typical logbook
+
+**Why:** the sample logbook had too few dives per year to look like a real logbook. The mock-ups now show 40 dives over 2023 to 2026.
+
+**Mock-ups (updated, same names as in tasks 298 and 299):** `android-demo`, `android-demo-ajout`, `android-demo-quitter`, and the six `android-tablette-demo-*` files (landscape and portrait).
+
+**What to do:** make the real sample logbook match this list.
+- 40 dives, numbered 1 to 40, oldest first. 8 sites that come back often (the last dive has no site).
+- Only the most recent dive (N° 40) has no site: it shows « Site à préciser ». All the others have a site.
+- One trip of 6 dives, « Voyage du 30 mars 2025 » (N° 23 to 28), at Canterbury lakes.
+- Fresh and salt water. N° 26 (Lake Coleridge, 2 April 2025, 128 ft, 78 min) is the rebreather dive and is the one open in the tablet detail pane.
+- Dates are fixed, so keep them as listed. The « Dernière plongée il y a 9 mois » line follows from N° 40.
+- Header count: « 40 plongées · 8 sites ». Tasks 298 and 299 are already sent and unchanged: the banner, dialogs and wording stay as they are.
+- Tablet list: no hour in the rows, year headings, and the trip is open when the open dive belongs to it.
+
+| N° | Date | Time | Site | Max depth | Duration | Trip |
+|---|---|---|---|---|---|---|
+| 1 | 2023-05-14 | 09:30 | Lac Memphrémagog | 54 ft | 48 min |  |
+| 2 | 2023-05-28 | 10:10 | Lac Memphrémagog | 62 ft | 52 min |  |
+| 3 | 2023-06-11 | 09:45 | Lock 23 | 48 ft | 44 min |  |
+| 4 | 2023-06-25 | 13:20 | Lock 23 | 66 ft | 57 min |  |
+| 5 | 2023-07-09 | 10:00 | Les Escoumins | 82 ft | 58 min |  |
+| 6 | 2023-07-23 | 09:25 | Les Escoumins | 95 ft | 61 min |  |
+| 7 | 2023-08-13 | 11:05 | Cap-de-Bon-Désir | 71 ft | 55 min |  |
+| 8 | 2023-09-03 | 09:50 | Les Escoumins | 104 ft | 63 min |  |
+| 9 | 2023-09-17 | 10:35 | Parc de la Gatineau | 58 ft | 49 min |  |
+| 10 | 2023-10-08 | 12:15 | Lac Memphrémagog | 45 ft | 42 min |  |
+| 11 | 2024-05-12 | 09:40 | Lock 23 | 52 ft | 46 min |  |
+| 12 | 2024-05-26 | 10:20 | Lock 23 | 70 ft | 59 min |  |
+| 13 | 2024-06-09 | 09:15 | Lac Memphrémagog | 64 ft | 51 min |  |
+| 14 | 2024-06-22 | 14:00 | Parc de la Gatineau | 61 ft | 54 min |  |
+| 15 | 2024-07-06 | 09:35 | Les Escoumins | 88 ft | 60 min |  |
+| 16 | 2024-07-13 | 10:50 | Les Escoumins | 112 ft | 64 min |  |
+| 17 | 2024-07-20 | 09:20 | Cap-de-Bon-Désir | 76 ft | 57 min |  |
+| 18 | 2024-08-10 | 10:05 | Les Escoumins | 99 ft | 62 min |  |
+| 19 | 2024-08-24 | 11:30 | Cap-de-Bon-Désir | 83 ft | 58 min |  |
+| 20 | 2024-09-07 | 09:55 | Lock 23 | 67 ft | 55 min |  |
+| 21 | 2024-09-21 | 10:40 | Les Escoumins | 106 ft | 63 min |  |
+| 22 | 2024-10-12 | 12:00 | Lac Memphrémagog | 47 ft | 43 min |  |
+| 23 | 2025-03-30 | 09:40 | Lake Pearson | 58 ft | 55 min | Voyage du 30 mars 2025 |
+| 24 | 2025-03-31 | 10:15 | Lake Coleridge | 96 ft | 70 min | Voyage du 30 mars 2025 |
+| 25 | 2025-04-01 | 09:50 | Lake Tekapo | 74 ft | 62 min | Voyage du 30 mars 2025 |
+| 26 | 2025-04-02 | 10:00 | Lake Coleridge | 128 ft | 78 min | Voyage du 30 mars 2025 |
+| 27 | 2025-04-03 | 09:30 | Lake Pearson | 62 ft | 58 min | Voyage du 30 mars 2025 |
+| 28 | 2025-04-04 | 10:20 | Lake Coleridge | 110 ft | 74 min | Voyage du 30 mars 2025 |
+| 29 | 2025-05-17 | 09:45 | Lock 23 | 58 ft | 50 min |  |
+| 30 | 2025-05-31 | 10:15 | Lac Memphrémagog | 55 ft | 47 min |  |
+| 31 | 2025-06-14 | 09:30 | Les Escoumins | 92 ft | 60 min |  |
+| 32 | 2025-07-05 | 10:00 | Les Escoumins | 109 ft | 65 min |  |
+| 33 | 2025-07-19 | 09:20 | Cap-de-Bon-Désir | 79 ft | 56 min |  |
+| 34 | 2025-08-09 | 11:10 | Les Escoumins | 101 ft | 62 min |  |
+| 35 | 2025-08-23 | 09:50 | Cap-de-Bon-Désir | 86 ft | 59 min |  |
+| 36 | 2025-09-27 | 11:55 | Les Escoumins | 113 ft | 66 min |  |
+| 37 | 2026-01-12 | 10:30 | Lac Memphrémagog | 33 ft | 38 min |  |
+| 38 | 2026-01-24 | 09:40 | Lock 23 | 41 ft | 41 min |  |
+| 39 | 2026-01-31 | 10:05 | Lock 23 | 56 ft | 50 min |  |
+| 40 | 2026-02-07 | 09:09 | (no site) | 91 ft | 55 min |  |
+
+**Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
