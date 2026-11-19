@@ -6059,3 +6059,20 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 | 40 | 2026-02-07 | 09:09 | (no site) | 91 ft | 55 min |  |
 
 **Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
+
+## [ ] 2026-11-19-302 Dive-computer photos and a sliding rail for « Ce lest était »
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
+
+**1. Dive-computer photos (idea #65, see `docs/IDEAS.md`).** Wherever a dive computer is listed, show its photo instead of the generic computer icon.
+- Mock-ups updated: `detail-ordinateurs-android` (dive detail, Équipement › Ordinateurs), `detail-ordinateurs-feuille-android`, `detail-ordinateurs-feuille-ios`, `android-tablette-detail-ordinateurs-paysage` and `bureau-detail-ordinateurs`. The two computers shown are the Shearwater Perdix AI and the Shearwater Petrel 3.
+- Tile: 48 dp square, rounded corners (12 dp on Android, tablet and desktop; 10 pt on iPhone), the photo fills the tile on a white background. The row is 64 to 72 dp tall (68 pt on iPhone) so the tile has room.
+- A model with no image keeps the generic computer icon (24 dp, as before).
+- Images are free for everyone, downloaded on demand without an account and kept on the device for good. They are hosted on the OpenDives+ server and refreshed when libdivecomputer is updated (`docs/maintenance.md`).
+- The same tile will go on the other screens that list a computer (download choice, Réglages › Ordinateurs du carnet, filters). Do those after the image database exists. The mock-ups for them are not changed yet.
+
+**2. « Ce lest était » is now a sliding rail.** The three buttons « Trop léger / Juste / Trop lourd » become one rounded rail (48 dp tall, track `#EBEAE5`, 4 dp inside padding). A blue pill (`#114477`) slides from one choice to the next in 300 ms (`cubic-bezier(.2, 0, 0, 1)`), no animation when reduced motion is on. The chosen label turns white and there is no check mark. Touching the chosen choice again clears it: the pill fades out and no choice is kept.
+- Mock-ups updated: `detail-ordinateurs-android`, `detail3-android`, `detail-equipement-plus-android`, `android-edition`, `edition-equipement-plus-android`, `edition-kit-menu-android`.
+- No tablet, desktop or iPhone mock-up has this control yet. When they get it, use the same rail.
+
+**Test:** open a dive with two computers and compare the list with the mock-ups. Open the ballast of a dive (detail and edit screens) and check that the pill slides and that a second touch clears the choice.
