@@ -66,6 +66,9 @@ contextBridge.exposeInMainWorld('odDesktop', {
   showInFolder: (options) => invoke('od:showInFolder', options),
   /** The Mac's Réglages window (desktop/main.cjs): opens it, or brings it forward. */
   openSettingsWindow: () => invoke('od:settingsWindow'),
+  /** The Mac's « Mon profil de plongeur » window, and the menu item's availability (the diver has OpenDives+). */
+  openProfileWindow: () => invoke('od:profileWindow'),
+  setProfileAvailable: (on) => invoke('od:profileAvailable', !!on),
   saveAs: (options) => invoke('od:saveAs', options),
   /** Copy and paste of dives (task 2026-11-15-178): text plus the private type application/x-opendives-dives. */
   clipboard: {

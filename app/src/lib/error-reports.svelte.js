@@ -8,7 +8,7 @@ import { deviceStore } from './device-store.js';
 import { edition } from './edition.js';
 import { serverUrl } from './server-url.js';
 import { serverTransport } from './server-transport.js';
-import { settingsWindow } from './layout.svelte.js';
+import { sideWindow } from './layout.svelte.js';
 import {
   buildReport, describeError, deviceFromUserAgent, dropReport, noteLog, pendingReports, queueReport, recentLog, reportKey, sendReport,
 } from './error-report.js';
@@ -140,7 +140,7 @@ async function collectNativeCrash() {
  * @param {{ route?: () => string }} [options]
  */
 export function startErrorReports({ route } = {}) {
-  if (started || settingsWindow) return;
+  if (started || sideWindow) return;
   started = true;
   if (route) routeNow = route;
   for (const level of /** @type {const} */ (['warn', 'error'])) {

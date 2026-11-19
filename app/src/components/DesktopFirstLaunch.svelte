@@ -14,6 +14,8 @@
   import { onMount } from 'svelte';
   import { f7, f7ready } from 'framework7-svelte';
   import ReleaseProfile from './ReleaseProfile.svelte';
+  import OdPlusPanel from './OdPlusPanel.svelte';
+  import { currentStep } from '../lib/first-launch.svelte.js';
   import FirstLaunchSteps from './FirstLaunchSteps.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { logbooks, refreshRecent, checkRecent } from '../lib/desktop-logbooks.svelte.js';
@@ -24,6 +26,8 @@
   let pushed = $state(false);
   const visible = $derived(navigation.section !== 'account' && !pushed);
   /** The screen: the first launch, or the recent logbooks; null until the list is read. */
+  /** « Vos données de santé » and « Votre carnet est prêt »: the panel carries the header (task 2026-11-18-275). @type {'odplusReady'|'odplusHealth'|''} */
+  const plusPanel = $derived(['odplusReady', 'odplusHealth'].includes(currentStep()) ? /** @type {'odplusReady'|'odplusHealth'} */ (currentStep()) : '');
   const mode = $derived(startMode(logbooks.recentLoaded ? logbooks.recent : null));
 
   /** The same router the pages use, read when it is needed (the views are built after this component). */
@@ -65,9 +69,13 @@
       <img class="od-desktop-first-launch--logo" src="logo-light.svg" alt="" width="96" height="96" />
       <span>OpenDives</span>
     </div>
-    <h1 class="od-desktop-first-launch--headline">{t('welcomeRelease.headline')}</h1>
-    <p class="od-desktop-first-launch--intro">{t('welcomeRelease.intro')}</p>
-    <div class="od-desktop-first-launch--profile"><ReleaseProfile still={mode === 'recents'} /></div>
+    {#if plusPanel}
+      <OdPlusPanel step={plusPanel} />
+    {:else}
+      <h1 class="od-desktop-first-launch--headline">{t('welcomeRelease.headline')}</h1>
+      <p class="od-desktop-first-launch--intro">{t('welcomeRelease.intro')}</p>
+      <div class="od-desktop-first-launch--profile"><ReleaseProfile still={mode === 'recents'} /></div>
+    {/if}
   </section>
 
   <div class="od-desktop-first-launch--steps">

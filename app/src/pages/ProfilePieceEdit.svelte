@@ -22,6 +22,11 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
+
+  /** The colour of a type's icon square on a wide screen, the inventory's: blue, green, beige, purple, else grey. @type {Record<string, string>} */
+  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet' };
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -137,23 +142,12 @@
   }
 </script>
 
-<Page class="od-piece-edit">
-  <Navbar>
-    {#snippet left()}
-      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('gear.pieceEdit.close')}</span>
-      </a>
-    {/snippet}
-    {#snippet title()}{id ? t('gear.pieceEdit.editTitle') : t('gear.pieceEdit.addTitle')}{/snippet}
-    {#snippet right()}
-      <button type="button" class="od-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
   <h2 class="od-piece-edit--title" id="od-piece-type">{t('gear.pieceNew.typeTitle')}</h2>
-  <div class="od-piece-edit--tiles" role="radiogroup" aria-labelledby="od-piece-type">
+  <div class="od-piece-edit--tiles" class:od-piece-edit--compact={profileWide()} role="radiogroup" aria-labelledby="od-piece-type">
     {#each GEAR_TYPES as value (value)}
       {@const on = type === value}
       <button
@@ -166,8 +160,8 @@
         onclick={() => (type = value)}
       >
         {#if on}<span class="od-piece-edit--check" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>{/if}
-        <GearIcon type={value} size={26} />
-        <span>{t(`gear.pieceNew.tile.${value}`)}</span>
+        <span class="od-piece-edit--tile-icon od-piece-edit--tone-{TONES[value] ?? 'grey'}"><GearIcon type={value} size={profileWide() ? 22 : 26} /></span>
+        <span class="od-piece-edit--tile-name">{t(`gear.pieceNew.tile.${value}`)}</span>
       </button>
     {/each}
   </div>
@@ -228,6 +222,25 @@
     {/if}
   </div>
   <div class="od-piece-edit--bottom"></div>
+{/snippet}
+
+<Page class="od-piece-edit">
+  <Navbar>
+    {#snippet left()}
+      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
+        <Icon name="close" /><span class="od-sr-only">{t('gear.pieceEdit.close')}</span>
+      </a>
+    {/snippet}
+    {#snippet title()}{id ? t('gear.pieceEdit.editTitle') : t('gear.pieceEdit.addTitle')}{/snippet}
+    {#snippet right()}
+      <button type="button" class="od-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="gear" list="gear" selected={id} bar="dialog" size="l">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <MaintenanceRuleSheet
@@ -311,6 +324,41 @@
       background: var(--od-selected-container);
       color: var(--od-on-selected-container, var(--od-text));
     }
+
+    /* Tablet and desktop (task 2026-11-18-277): a regular grid of 3 × 3 compact buttons, 56 px high, the icon in a coloured square. */
+    .od-piece-edit--compact .od-piece-edit--tile {
+      min-height: 56px;
+      padding: 0 12px;
+      border-radius: 12px;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      text-align: start;
+    }
+    .od-piece-edit--compact .od-piece-edit--tile-on {
+      border-color: var(--od-secondary);
+    }
+    .od-piece-edit--compact .od-piece-edit--check {
+      position: static;
+      margin-inline-start: auto;
+      order: 3;
+    }
+    .od-piece-edit--compact .od-piece-edit--tile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--od-background);
+    }
+    .od-piece-edit--compact .od-piece-edit--tone-blue { background: var(--od-release-tile); }
+    .od-piece-edit--compact .od-piece-edit--tone-green { background: var(--od-tile-green); }
+    .od-piece-edit--compact .od-piece-edit--tone-beige { background: var(--od-tile-beige); }
+    .od-piece-edit--compact .od-piece-edit--tone-violet { background: var(--od-tile-violet); }
+    .od-piece-edit--tile-icon { display: contents; }
+    .od-piece-edit--compact .od-piece-edit--tile-icon { display: grid; }
 
     .od-piece-edit--tile:disabled {
       opacity: 0.38;

@@ -28,6 +28,8 @@ export const navigation = $state({
    * navigation bar is shown (Android phone, task 2026-11-14-120).
    */
   atRoot: true,
+  /** A screen opened over the section (the profile, Réglages, About) shows in the current view: the logbook's + steps aside. */
+  over: false,
   /** The account sheet (Android phone): account, sync, Réglages and À propos. */
   accountOpen: false,
   /** « Gérer le compte » as a dialog (tablet and desktop; the phone opens a page): task 2026-11-18-281. */
@@ -41,6 +43,7 @@ function updateAtRoot() {
   const view = f7.views.current;
   const id = view?.el?.id?.replace('view-', '');
   navigation.atRoot = sections.includes(/** @type {Section} */ (id)) && (view?.router?.history?.length ?? 1) <= 1;
+  navigation.over = isOverPath(String(view?.router?.currentRoute?.path ?? ''));
 }
 
 /** Element that opened the menu; it gets the focus back on close. */
@@ -125,6 +128,16 @@ export function openOver(path, options) {
   // The desktop layout shows Réglages' list with its detail pane emptied: that is Réglages already open.
   const open = router?.currentRoute?.path;
   if (router && open !== path && !(path === '/settings/' && open === '/pane/empty')) router.navigate(path, options);
+}
+
+/** « Mon profil de plongeur »: the Mac opens its own window (task 2026-11-18-277); elsewhere it opens over the section. */
+export function openProfile() {
+  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop;
+  if (desktopMac && desk?.openProfileWindow) {
+    desk.openProfileWindow().catch((/** @type {unknown} */ e) => console.error('Profile window', e));
+    return;
+  }
+  openOver('/profile');
 }
 
 /** « Gérer le compte » (an OpenDives+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */

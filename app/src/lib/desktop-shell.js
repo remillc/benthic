@@ -3,7 +3,7 @@
 // Ctrl++ / Ctrl+- / Ctrl+0 change « Taille du texte », and the Mac's menu bar commands « À propos
 // d'OpenDives » and the text size. On the Mac, a change made in the separate Réglages window
 // reaches this window through the shared storage.
-import { desktopApp, desktopMac, settingsWindow } from './layout.svelte.js';
+import { desktopApp, desktopMac, sideWindow } from './layout.svelte.js';
 import { openSettings, openAbout } from './navigation.svelte.js';
 import { applyTextSize, stepSize } from './text-size.svelte.js';
 
@@ -23,7 +23,7 @@ export function startDesktopShell() {
 
   window.addEventListener('keydown', (e) => {
     if (!(desktopMac ? e.metaKey : e.ctrlKey) || e.altKey) return;
-    if (e.key === ',' && !settingsWindow) {
+    if (e.key === ',' && !sideWindow) {
       e.preventDefault();
       openSettings();
       return;
@@ -37,7 +37,7 @@ export function startDesktopShell() {
   });
 
   bridge.onMenu?.((/** @type {string} */ command) => {
-    if (command === 'about' && !settingsWindow) openAbout();
+    if (command === 'about' && !sideWindow) openAbout();
     else if (command === 'text:bigger') stepSize(1);
     else if (command === 'text:smaller') stepSize(-1);
     else if (command === 'text:actual') stepSize(0);
@@ -45,7 +45,7 @@ export function startDesktopShell() {
 
   // Mac: the Réglages window writes the settings (Capacitor's Preferences are the web storage's
   // « CapacitorStorage.od.* » keys); this window reads them again from a fresh start.
-  if (desktopMac && !settingsWindow) {
+  if (desktopMac && !sideWindow) {
     /** @type {ReturnType<typeof setTimeout>|undefined} */
     let timer;
     window.addEventListener('storage', (e) => {

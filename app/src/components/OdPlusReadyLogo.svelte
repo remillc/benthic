@@ -5,8 +5,8 @@
   import { onMount } from 'svelte';
   import { CHECK_PATH, MORPH, WAVE_PATH } from '../lib/ready-animation.js';
 
-  /** @type {{ play: boolean }} */
-  let { play } = $props();
+  /** `size`: the disc's diameter, 72 on a phone, 120 on the blue panel (the ring then spreads 56). @type {{ play: boolean, size?: number }} */
+  let { play, size = 72 } = $props();
 
   /** @type {SVGAnimateElement | undefined} */
   let morph = $state();
@@ -17,11 +17,11 @@
   });
 </script>
 
-<span class="od-ready-logo" class:od-ready-logo--play={play}>
+<span class="od-ready-logo" class:od-ready-logo--play={play} style="--od-ready-size: {size}px; --od-ready-ring: {1 + (size === 72 ? 36 : 56) / (size / 2)}">
   <span class="od-ready-logo--ring" aria-hidden="true"></span>
   <span class="od-ready-logo--disc">
     <span class="od-ready-logo--white"></span>
-    <svg class="od-ready-logo--mark" width="38" height="38" viewBox="0 0 24 24" aria-hidden="true">
+    <svg class="od-ready-logo--mark" width={Math.round((size * 38) / 72)} height={Math.round((size * 38) / 72)} viewBox="0 0 24 24" aria-hidden="true">
       <path d={play ? WAVE_PATH : CHECK_PATH}>
         {#if play}
           <animate bind:this={morph} attributeName="d" begin="indefinite" values={MORPH.values} keyTimes={MORPH.keyTimes} dur={MORPH.dur} calcMode="spline" keySplines={MORPH.keySplines} fill="freeze" />
@@ -35,8 +35,8 @@
   @layer od.components {
     .od-ready-logo {
       position: relative;
-      width: 72px;
-      height: 72px;
+      width: var(--od-ready-size, 72px);
+      height: var(--od-ready-size, 72px);
       flex: none;
       display: block;
     }
@@ -156,7 +156,7 @@
       }
       100% {
         opacity: 0;
-        transform: scale(2);
+        transform: scale(var(--od-ready-ring, 2));
       }
     }
 

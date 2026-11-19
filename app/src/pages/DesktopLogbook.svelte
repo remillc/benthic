@@ -1104,7 +1104,7 @@
   </div>
 
   <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
-  {#if logbook.dives.length}<FabMenu choices={addChoices} onchoose={choose} />{/if}
+  {#if logbook.dives.length && !navigation.over}<FabMenu choices={addChoices} onchoose={choose} />{/if}
   {#if moreAt}
     <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
   {/if}

@@ -12,7 +12,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import OdPlusChip from './OdPlusChip.svelte';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
@@ -182,7 +182,7 @@
     {/if}
     {#if subscriber}
       <div class="od-desktop-account--divider"></div>
-      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(() => openOver('/profile'))}>
+      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(openProfile)}>
         <Icon name="briefcase" size={22} />
         <span class="od-desktop-account--row-texts">
           <span>{t('gear.profile.title')}</span>

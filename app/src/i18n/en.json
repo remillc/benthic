@@ -2825,7 +2825,8 @@
       "Account sheet (free version): Back from the OpenDives+ offer or from “Sign in or create an account”, opened from the sheet, shows the sheet again as it was.",
       "Backup and restore (OpenDives+): a subscriber’s account sheet lists “My diver profile”, then “Backup and restore”, with no OpenDives+ chip next to the rows. Every sync is a version of the logbook, with its number of dives and what changed since. “Restore this version” adds a new version with the old content: the current logbook stays in the list and can be restored in turn, and nothing of the history is rewritten. “Browse this version” opens it read-only. “One dive” shows the versions of a dive (also from “Versions of this dive” in its menu) and “Deleted dives” brings a deleted dive back, with no time limit. Deleted photos and videos are kept for 90 days, then erased, and “Delete the account” also erases the whole history of the logbook, deleted dives included. On a phone these are pages, on a tablet two panes, on a computer a 1,000 px dialog.",
       "Error reports: after an error or a crash, the version, system, device, open page, error message and last lines of the log appear in a sheet with “Send” and “Don’t send”. Nothing is sent without that tap; without a connection the report is kept and offered again later. A report contains no dive, site, name or account; it is kept 180 days.",
-      "Export of the whole logbook: the file is named after the logbook and the date, for example “carnet-de-roger-2026-11-19.ssrf”."
+      "Export of the whole logbook: the file is named after the logbook and the date, for example “carnet-de-roger-2026-11-19.ssrf”.",
+      "Tablet in landscape and desktop: “My diver profile” shows in panes: the profile on the left, the list (equipment or maintenance) in the middle, the sheet on the right. The forms (new piece, new kit, new certification, note a service) open in a centred dialog; the piece types form a 3 × 3 grid. On the desktop, the photo of a certification is chosen, dropped or pasted (Ctrl+V); the card is cropped and straightened, with “Remove glare” and “Adjust the corners”. On a Mac, “My diver profile…” (⇧⌘P) opens the profile in its own window. “Your health data” and “Your logbook is ready” appear in the blue panel. On the desktop, the logbook’s + no longer stays over a page opened on the right."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -4857,6 +4858,7 @@
     "macMenu": {
       "about": "About OpenDives",
       "settings": "Settings…",
+      "profile": "My diver profile…",
       "services": "Services",
       "hide": "Hide OpenDives",
       "hideOthers": "Hide Others",
@@ -5280,7 +5282,9 @@
       "noPiece": "No piece yet",
       "informationLine": "Emergency contact, health",
       "certificationsLine": "{n} certifications",
-      "noCertification": "No certification"
+      "noCertification": "No certification",
+      "keptWide": "Kept on your OpenDives+ account and on this device, even without a network.",
+      "paneEmpty": "Choose an item to see it here"
     },
     "inventory": {
       "title": "Equipment",
@@ -5795,6 +5799,7 @@
       "photoHint": "Scan the card: the app reads the agency, the level and the number from it. Check them.",
       "photoRemove": "Remove the photo",
       "photoFailed": "The photo could not be read.",
+      "photoDialog": {"title": "Check the photo", "titleFront": "Front of the card", "titleBack": "Back of the card", "drop": "Drop an image here", "paste": "or paste it with Ctrl+V", "choose": "Choose an image", "before": "Before", "after": "After", "framed": "Cropped to the card", "notFramed": "Card not found: adjust the corners", "straightened": "Straightened", "glare": "Remove glare", "local": "The processing happens on your device. The photo is sent nowhere.", "adjust": "Adjust the corners", "adjustDone": "Done adjusting", "other": "Choose another image", "use": "Use the photo"},
       "agency": "Agency",
       "agencyName": "Agency name",
       "agencyOther": "Other agency",

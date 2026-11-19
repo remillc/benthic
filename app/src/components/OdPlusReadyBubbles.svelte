@@ -4,14 +4,15 @@
   // constant speed (1.6 to 2.5 s, the lowest the longest) and leaves through the top; none comes back. While rising it
   // sways 5 px left and right, a round trip every 1.4 s, each starting at another point of the sway.
   // `still`: they stay in place (reduced motion).
-  import { BUBBLES } from '../lib/ready-animation.js';
+  import { BUBBLES, BUBBLES_PANEL } from '../lib/ready-animation.js';
 
-  /** @type {{ still: boolean }} */
-  let { still } = $props();
+  /** `panel`: over a blue panel (700 × 900) instead of the phone's header. @type {{ still: boolean, panel?: boolean }} */
+  let { still, panel = false } = $props();
+  const bubbles = $derived(panel ? BUBBLES_PANEL : BUBBLES);
 </script>
 
-<svg class="od-ready-bubbles" class:od-ready-bubbles--still={still} viewBox="0 0 390 372" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
-  {#each BUBBLES as b, i (i)}
+<svg class="od-ready-bubbles" class:od-ready-bubbles--still={still} viewBox={panel ? '0 0 700 900' : '0 0 390 372'} preserveAspectRatio={panel ? 'xMidYMid slice' : 'xMidYMin slice'} aria-hidden="true">
+  {#each bubbles as b, i (i)}
     <circle class="od-ready-bubbles--bubble" cx={b.cx} cy={b.cy} r={b.r} style="--dy: {b.dy}px; --d: {b.duration}ms; --phase: -{b.phase}ms" />
   {/each}
 </svg>

@@ -49,7 +49,7 @@
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
-  import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, settingsWindow } from './lib/layout.svelte.js';
+  import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, desktopMac, settingsWindow, profileWindow, sideWindow } from './lib/layout.svelte.js';
   import { logbooks, noLogbook, enableLogbookCommands } from './lib/desktop-logbooks.svelte.js';
   import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
   import { releaseModalListeners } from './lib/f7-modal-cleanup.js';
@@ -71,7 +71,8 @@
   import { enableDetailPageCleanup } from './lib/detail-pages.js';
   import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
-  import { logbook } from './lib/logbook.svelte.js';
+  import { logbook, isSubscriber } from './lib/logbook.svelte.js';
+  import { rememberHero, heroOf } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
   import { lazyRoute, stylesheetsReady } from './lib/lazy-route.js';
@@ -362,7 +363,7 @@
 
   // Desktop app: the dives the first launch brought are imported once the new logbook it made is open (task 2026-11-16-228).
   $effect(() => {
-    if (desktopApp && !noLogbook && !settingsWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
+    if (desktopApp && !noLogbook && !sideWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
   });
 
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
@@ -371,11 +372,20 @@
     document.documentElement.classList.toggle('od-bottom-nav', bottomNav());
   });
 
+  // The Mac's menu item « Mon profil de plongeur… » is on while the diver has OpenDives+; the separate profile window
+  // reads the diver's line from the device's store (task 2026-11-18-277).
+  $effect(() => {
+    if (!desktopMac || sideWindow) return;
+    const on = isSubscriber();
+    /** @type {any} */ (window).odDesktop.setProfileAvailable?.(on);
+    if (on) rememberHero(heroOf(logbook));
+  });
+
   onMount(() => {
     applyMotionTokens();
     // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
     startDesktopShell();
-    if (settingsWindow) {
+    if (sideWindow) {
       enableDialogFit(f7);
       return;
     }
@@ -418,10 +428,10 @@
   });
 </script>
 
-{#if settingsWindow}
+{#if sideWindow}
 <App {...f7params}>
   <Views class="safe-areas">
-    <View id="view-settings-window" main url="/settings/" />
+    <View id={profileWindow ? 'view-profile-window' : 'view-settings-window'} main url={profileWindow ? '/profile/gear/' : '/settings/'} />
   </Views>
 </App>
 {:else}

@@ -10,6 +10,7 @@
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
   import OdPlusChip from '../components/OdPlusChip.svelte';
+  import OdPlusPanel from '../components/OdPlusPanel.svelte';
   import { flow, currentStep } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -21,6 +22,8 @@
 
   /** « OpenDives+, l'offre » on a tablet (task 2026-11-18-282): the panel carries the offer's chip, title and lead. */
   const offerPanel = $derived(currentStep() === 'odplusOffer');
+  /** « Vos données de santé » and « Votre carnet est prêt » (task 2026-11-18-275): the panel carries the header. @type {'odplusReady'|'odplusHealth'|''} */
+  const plusPanel = $derived(['odplusReady', 'odplusHealth'].includes(currentStep()) ? /** @type {'odplusReady'|'odplusHealth'} */ (currentStep()) : '');
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
@@ -31,7 +34,9 @@
     <span class="od-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
     <span>OpenDives</span>
   </div>
-  {#if offerPanel}
+  {#if plusPanel}
+    <OdPlusPanel step={plusPanel} />
+  {:else if offerPanel}
     <div class="od-welcome-release--chip"><OdPlusChip /></div>
     <h1 class="od-welcome-release--headline od-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
     <p class="od-welcome-release--intro">{t('odplus.offer.lead')}</p>
@@ -39,7 +44,7 @@
     <h1 class="od-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
     <p class="od-welcome-release--intro">{t('welcomeRelease.intro')}</p>
   {/if}
-  <div class="od-welcome-release--profile"><ReleaseProfile /></div>
+  {#if !plusPanel}<div class="od-welcome-release--profile"><ReleaseProfile /></div>{/if}
 {/snippet}
 
 <Page class="od-welcome-release" noToolbar>

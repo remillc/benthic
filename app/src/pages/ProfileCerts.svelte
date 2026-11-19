@@ -13,6 +13,8 @@
   import { AGENCIES } from '../lib/profile.js';
   import { formatLongDate } from '../lib/profile-format.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   onMount(() => Promise.all([loadProfile(), loadInventory()]));
 
@@ -26,12 +28,7 @@
   const open = (id) => f7.views.current.router.navigate(`/profile/certs/${id}`);
 </script>
 
-<Page class="od-certs">
-  <Navbar title={t('diverProfile.certs.title')}>
-    {#snippet left()}
-      <BackLink label={t('gear.profile.title')} name={t('diverProfile.certs.back')} />
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -56,9 +53,21 @@
 
   <p class="od-certs--note"><Icon name="info" size={18} /><span>{t('diverProfile.certs.note')}</span></p>
   <div class="od-certs--bottom"></div>
+{/snippet}
 
+<Page class="od-certs">
+  <Navbar title={t('diverProfile.certs.title')}>
+    {#snippet left()}
+      <BackLink label={t('gear.profile.title')} name={t('diverProfile.certs.back')} />
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="certs">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || profileWide() ? 'none' : null}>
       <a href="/profile/certs/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('diverProfile.certs.add')}</div>
