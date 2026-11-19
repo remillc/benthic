@@ -8,6 +8,7 @@
   // links, 13 November 2026). The system's share sheet follows.
   import { Sheet } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** An icon name of Icon.svelte, from a row's text. @param {string} name @returns {any} */
@@ -27,7 +28,7 @@
   let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined, onlink = undefined, linkText = t('share.linkText'), onqr = undefined } = $props();
 </script>
 
-<Sheet opened swipeToClose backdrop class="od-share-sheet" style="height: auto" onSheetClosed={onclose}>
+<Sheet opened swipeToClose backdrop class="od-share-sheet{layout.split ? ' od-share-sheet--dialog' : ''}" style="height: auto" onSheetClosed={onclose}>
   <div class="od-share-sheet--sheet" role="dialog" aria-labelledby="od-share-title">
     <div class="od-share-sheet--handle" aria-hidden="true"></div>
     <h2 id="od-share-title" class="od-share-sheet--title">{heading}</h2>
@@ -82,6 +83,22 @@
 
     .od-share-sheet--sheet {
       padding: 8px 0 calc(16px + var(--f7-safe-area-bottom, 0px));
+    }
+
+    /* Tablet and desktop (tasks 2026-11-19-293 and 297, bureau-partage): a dialog in the middle of the window, no handle. */
+    :global(.sheet-modal.od-share-sheet.od-share-sheet--dialog) {
+      left: 50%;
+      bottom: 50%;
+      width: 480px;
+      max-width: calc(100% - 48px);
+      border-radius: 28px;
+      translate: -50% 50%;
+    }
+    :global(.od-share-sheet--dialog) .od-share-sheet--handle {
+      display: none;
+    }
+    :global(.od-share-sheet--dialog) .od-share-sheet--title {
+      margin-top: 24px;
     }
 
     .od-share-sheet--handle {

@@ -187,8 +187,20 @@
     });
   });
 
+  /** The selection the pane last followed: another one (a click on a dive, the keyboard) leaves the trip page. */
+  let followed = desk.selection;
   $effect(() => {
     if (!layout.desktop || navigation.section !== 'logbook' || logbook.loading) return;
+    const selection = desk.selection;
+    if (selection !== followed) {
+      followed = selection;
+      untrack(() => (desk.trip = null));
+    }
+    // A trip row chosen: the trip's page replaces the pane.
+    if (desk.trip !== null && order.length) {
+      showDetail(`/trips/${desk.trip}`);
+      return;
+    }
     const ids = desk.selection.ids;
     // Nothing selected yet: the first dive of the table, as the tablet does.
     if (!ids.length) {
@@ -677,7 +689,7 @@
   async function importOne(file) {
     try {
       const n = await importFile(file);
-      offerUndo(t('logbook.imported', { n }));
+      offerUndo(t('logbook.importedFrom', { n, name: file.name }));
     } catch (e) {
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Import a file', code);
@@ -1024,12 +1036,22 @@
             {#each visibleRows as row, at (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
-                <tr class="od-desktop-logbook--trip" class:od-desktop-logbook--folded={!row.expanded} aria-rowindex={windowStart + at + 2}>
+                <tr class="od-desktop-logbook--trip" class:od-desktop-logbook--folded={!row.expanded} class:od-desktop-logbook--trip-selected={desk.trip === row.id} aria-rowindex={windowStart + at + 2}>
                   <td colspan={columnsNow.length}>
                     <button
                       type="button"
                       aria-expanded={row.expanded}
-                      onclick={() => (desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded })}
+                      onclick={(e) => {
+                        // The chevron folds the trip; the rest of the row opens its page beside the table (task 2026-11-19-297).
+                        if (/** @type {HTMLElement} */ (e.target).closest('.od-desktop-logbook--chevron')) desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded };
+                        else desk.trip = row.id;
+                      }}
+                      onkeydown={(e) => {
+                        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                          e.preventDefault();
+                          desk.collapsed = { ...desk.collapsed, [row.id]: e.key === 'ArrowLeft' };
+                        }
+                      }}
                     >
                       <span class="od-desktop-logbook--chevron" class:od-desktop-logbook--open={row.expanded} aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                       <span class="od-desktop-logbook--trip-icon" aria-hidden="true"><Icon name="trip" size={16} /></span>
@@ -1485,6 +1507,10 @@
       background: var(--od-surface);
       border-radius: 20px 20px 0 0;
       box-shadow: 0 2px 0 var(--od-surface);
+    }
+    .od-desktop-logbook--trip-selected td {
+      background: var(--od-selected-container);
+      box-shadow: 0 2px 0 var(--od-selected-container);
     }
     .od-desktop-logbook--folded td {
       border-radius: 20px;

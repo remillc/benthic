@@ -122,6 +122,7 @@
       "one": "{n} dive imported",
       "other": "{n} dives imported"
     },
+    "importedFrom": {"one": "{n} dive imported from “{name}”", "other": "{n} dives imported from “{name}”"},
     "importTitle": "Import a file",
     "importNothingNew": "Every dive of this file is already in the logbook. No dive was changed.",
     "importNoDives": "This file holds no dive. No dive was changed.",
@@ -724,6 +725,7 @@
       "setpointsText": "The target value",
       "ocDiluent": "Open-circuit gas as diluent",
       "o2consumption": "Metabolic O₂ consumption (pSCR)",
+      "o2consumptionText": "In l/min or ft³/min, following the Volume unit",
       "o2consumptionDialog": "In litres per minute.",
       "o2consumptionDialogCuft": "In cubic feet per minute.",
       "dilution": "Dilution ratio (pSCR)",
@@ -2828,7 +2830,8 @@
       "Error reports: after an error or a crash, the version, system, device, open page, error message and last lines of the log appear in a sheet with “Send” and “Don’t send”. Nothing is sent without that tap; without a connection the report is kept and offered again later. A report contains no dive, site, name or account; it is kept 180 days.",
       "Export of the whole logbook: the file is named after the logbook and the date, for example “carnet-de-roger-2026-11-19.ssrf”.",
       "Tablet in landscape and desktop: “My diver profile” shows in panes: the profile on the left, the list (equipment or maintenance) in the middle, the sheet on the right. The forms (new piece, new kit, new certification, note a service) open in a centred dialog; the piece types form a 3 × 3 grid. On the desktop, the photo of a certification is chosen, dropped or pasted (Ctrl+V); the card is cropped and straightened, with “Remove glare” and “Adjust the corners”. On a Mac, “My diver profile…” (⇧⌘P) opens the profile in its own window. “Your health data” and “Your logbook is ready” appear in the blue panel. On the desktop, the logbook’s + no longer stays over a page opened on the right.",
-      "Desktop: the account sheet of an OpenDives+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile."
+      "Desktop: the account sheet of an OpenDives+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile.",
+      "Desktop: “Share” opens as a dialog in the middle of the window; a click on a trip in the logbook shows the trip page on the right (the chevron folds it); importing a file says where the dives come from (“1 dive imported from “…””) with Undo; “Saved plans” opens a “Planned dives” side panel with “New plan”; in Settings › Rebreather, the O₂ consumption says it follows the Volume unit."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
