@@ -1,7 +1,7 @@
 // The emergency sheet (task 2026-11-19-311): what it shows, what each switch removes, the call link, the blood type behind the consent.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DEFAULT_INCLUDE, INCLUDE_KEY, ageOn, buildSheet, readInclude, sheetText, telHref, writeInclude } from '../../app/src/lib/emergency.js';
+import { DEFAULT_INCLUDE, certificateRank, highestCertificate, INCLUDE_KEY, ageOn, buildSheet, readInclude, sheetText, telHref, writeInclude } from '../../app/src/lib/emergency.js';
 
 const info = {
   fullName: 'Valérie Tremblay',
@@ -68,4 +68,49 @@ test('the switches are kept as JSON, the highest certificate off by default', ()
   assert.deepEqual(readInclude(store), { ...DEFAULT_INCLUDE, blood: false, certificate: true });
   mem.set(INCLUDE_KEY, 'not json');
   assert.deepEqual(readInclude(store), DEFAULT_INCLUDE);
+});
+
+const cert = (id, agency, level, issuedOn, o = {}) => doc({ id, kind: 'certification', agency, level, issuedOn, instructorCert: false, ...o });
+
+test('the rank follows the level across agencies', () => {
+  const r = (agency, level) => certificateRank({ agency, level, instructorCert: false });
+  assert.equal(r('PADI', 'Open Water Diver'), 1);
+  assert.equal(r('SSI', 'Advanced Open Water Diver'), 2);
+  assert.equal(r('SSI', 'Stress & Rescue (Sauveteur)'), 3);
+  assert.equal(r('NAUI', 'Master Scuba Diver'), 3.5);
+  assert.equal(r('PADI', 'Divemaster'), 4);
+  assert.equal(r('CMAS', '1 star diver'), 1);
+  assert.equal(r('CMAS', '2 star diver'), 2);
+  assert.equal(r('CMAS', '3 star diver'), 4);
+  assert.equal(r('CMAS', 'Instructor 1 star'), 5);
+  assert.equal(r('FFESSM', 'Niveau 2'), 2);
+  assert.equal(r('FFESSM', 'Niveau 4'), 4);
+  assert.equal(r('FFESSM', 'MF1'), 5);
+  assert.equal(r('BSAC', 'Sport Diver'), 2);
+  assert.equal(r('BSAC', 'Advanced Diver'), 3);
+  assert.equal(r('TDI', 'Trimix Diver'), 0.5);
+  assert.equal(r('PADI', 'Tec 45'), 0.5);
+  assert.equal(r('other', 'Licence xyz'), 0);
+  assert.equal(r('PADI', ''), 0);
+});
+
+test('the highest certificate wins over the most recent card', () => {
+  assert.equal(highestCertificate([cert('a', 'PADI', 'Open Water Diver', '2010-01-01'), cert('b', 'PADI', 'Rescue Diver', '2012-01-01'), cert('c', 'PADI', 'Enriched Air Diver (Nitrox)', '2020-01-01')])?.id, 'b');
+  assert.equal(highestCertificate([cert('a', 'CMAS', '3 star diver', '2005-01-01'), cert('b', 'SSI', 'Advanced Open Water Diver', '2022-01-01'), cert('c', 'FFESSM', 'Niveau 3', '2018-01-01')])?.id, 'a');
+  assert.equal(highestCertificate([cert('a', 'FFESSM', 'Niveau 2', '2001-01-01'), cert('b', 'NAUI', 'Advanced Scuba Diver', '2003-01-01')])?.id, 'b');
+});
+
+test('the instructor switch ranks first, whatever the level text', () => {
+  const got = highestCertificate([cert('a', 'PADI', 'Divemaster', '2015-01-01'), cert('b', 'other', 'Autre', '2010-01-01', { instructorCert: true }), cert('c', 'PADI', 'Rescue Diver', '2020-01-01')]);
+  assert.equal(got?.id, 'b');
+});
+
+test('an unknown level ranks lowest, even when recent; a technical card beats it', () => {
+  assert.equal(highestCertificate([cert('a', 'other', 'Licence xyz', '2024-01-01'), cert('b', 'PADI', 'Open Water Diver', '2000-01-01')])?.id, 'b');
+  assert.equal(highestCertificate([cert('a', 'other', 'Licence xyz', '2024-01-01'), cert('b', 'TDI', 'Extended Range', '2000-01-01')])?.id, 'b');
+});
+
+test('equal ranks: the most recent issue date; no certificate gives null', () => {
+  assert.equal(highestCertificate([cert('a', 'PADI', 'Advanced Open Water Diver', '2010-01-01'), cert('b', 'SDI', 'Advanced Diver', '2016-01-01'), cert('c', 'FFESSM', 'Niveau 2', '2013-01-01')])?.id, 'b');
+  assert.equal(highestCertificate([doc({ kind: 'insurance' })]), null);
 });

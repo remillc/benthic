@@ -58,9 +58,50 @@ function validOf(docs, kind, today) {
     .sort((a, b) => (b.expiresOn || '9999').localeCompare(a.expiresOn || '9999'));
 }
 
-/** The most recent card, taken as the highest certificate. @param {Doc[]} docs */
+/**
+ * Rank of a certification on one scale across agencies (the highest certificate is the one of the highest rank).
+ *   5    instructor: the « Brevet de moniteur » switch, or a level naming an instructor (Instructor, Moniteur, MF1, MF2, CMAS Instructor)
+ *   4    Divemaster / Dive Master / Dive Leader / First Class Diver / CMAS 3 star / FFESSM Niveau 4
+ *   3.5  Master Scuba Diver / Master Diver (a Rescue Diver plus specialties)
+ *   3    Rescue Diver / Stress & Rescue / Niveau 3 / BSAC Advanced Diver
+ *   2    Advanced (Open Water) Diver / Sport Diver / CMAS 2 star / Niveau 2 / Initiateur / Recreational Diver 2
+ *   1.5  SSI Advanced Adventurer
+ *   1    Open Water / Scuba Diver / Ocean Diver / CMAS 1 star / Niveau 1 / Recreational Diver 1
+ *   0.5  specialty, technical and rebreather cards (Nitrox, Deep, Solo, Tec, Trimix, Decompression, Extended Range, Fundamentals, Tech 1/2...):
+ *        below every recreational level, above a level that is not recognised
+ *   0    free text that is not recognised, or no level
+ * @param {Pick<Doc, 'agency'|'level'|'instructorCert'>} c
+ */
+export function certificateRank(c) {
+  if (c.instructorCert) return 5;
+  const t = (c.level || '').toLocaleLowerCase();
+  if (!t.trim()) return 0;
+  if (/instructor|instructeur|moniteur|\bmf[12]\b/.test(t)) return 5;
+  const star = /\b([1-3])\s*(star|stars|etoile|étoile|étoiles|\*|★)/.exec(t);
+  if (star) return [0, 1, 2, 4][Number(star[1])];
+  const niveau = /\b(?:niveau|level)\s*([1-4])\b|\bn([1-4])\b/.exec(t);
+  if (niveau) return Number(niveau[1] ?? niveau[2]);
+  if (/divemaster|dive master|dive leader|first class/.test(t)) return 4;
+  if (/master/.test(t)) return 3.5;
+  if (/rescue|sauveteur/.test(t)) return 3;
+  if (/nitrox|enriched|trimix|\btec\b|\btec ?\d|\btech\b|deep|solo|decompression|extended|normoxic|fundamentals|rebreather|ccr|cave|wreck/.test(t)) {
+    const rec = /recreational diver ([12])/.exec(t);
+    return rec ? Number(rec[1]) : 0.5;
+  }
+  if (/advanced adventurer/.test(t)) return 1.5;
+  if (/advanced/.test(t)) return c.agency === 'BSAC' ? 3 : 2;
+  if (/sport diver|initiateur/.test(t)) return 2;
+  if (/open water|ocean diver|scuba diver|recreational diver 1/.test(t)) return 1;
+  return 0;
+}
+
+/** The highest certificate by level (certificateRank); on equal ranks the most recent issue date. @param {Doc[]} docs */
 export function highestCertificate(docs) {
-  return docs.filter((d) => d.kind === 'certification').sort((a, b) => (b.issuedOn || '').localeCompare(a.issuedOn || ''))[0] ?? null;
+  return (
+    docs
+      .filter((d) => d.kind === 'certification')
+      .sort((a, b) => certificateRank(b) - certificateRank(a) || (b.issuedOn || '').localeCompare(a.issuedOn || ''))[0] ?? null
+  );
 }
 
 /** A number as a `tel:` address for the system's dialer. @param {string} number */
