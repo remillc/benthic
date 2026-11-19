@@ -88,7 +88,7 @@ namespace {
 
 // Minimal reader for the plan request: one object whose values are integers,
 // booleans or an array of such flat objects ("cylinders").
-using Flat = std::map<std::string, long>;
+using Flat = std::map<std::string, int64_t>;
 
 class Reader {
 public:
@@ -125,7 +125,7 @@ public:
 					}
 				}
 			} else {
-				long v;
+				int64_t v;
 				if (!number(v))
 					return false;
 				values[key] = v;
@@ -183,7 +183,7 @@ private:
 		i += n;
 		return true;
 	}
-	bool number(long &v)
+	bool number(int64_t &v)
 	{
 		space();
 		if (word("true")) {
@@ -201,7 +201,7 @@ private:
 			i++;
 		if (i == start || (i == start + 1 && s[start] == '-'))
 			return false;
-		v = strtol(s.substr(start, i - start).c_str(), nullptr, 10);
+		v = strtoll(s.substr(start, i - start).c_str(), nullptr, 10);
 		return true;
 	}
 	bool flat(Flat &out)
@@ -212,7 +212,7 @@ private:
 			return true;
 		for (;;) {
 			std::string key;
-			long v;
+			int64_t v;
 			if (!string(key) || !colon() || !number(v))
 				return false;
 			out[key] = v;
@@ -228,7 +228,7 @@ void dp_add(diveplan &dp, int duration, depth_t depth)
 	plan_add_segment(dp, duration, depth, 0, 0, true, OC);
 }
 
-long get(const Flat &values, const char *key, long fallback)
+int64_t get(const Flat &values, const char *key, int64_t fallback)
 {
 	auto it = values.find(key);
 	return it == values.end() ? fallback : it->second;
@@ -251,7 +251,7 @@ const char *error_name(planner_error_t error)
 	return "UNKNOWN";
 }
 
-void add(std::string &json, const char *key, long value, bool comma = true)
+void add(std::string &json, const char *key, int64_t value, bool comma = true)
 {
 	if (comma)
 		json += ',';
@@ -359,7 +359,7 @@ std::string result_json(const diveplan &plan, struct dive &d, planner_error_t er
 	json += "\",\"setup\":" + setup_json();
 	add(json, "effGfLow", plan.eff_gflow);
 	add(json, "effGfHigh", plan.eff_gfhigh);
-	add(json, "when", static_cast<long>(plan.when));
+	add(json, "when", static_cast<int64_t>(plan.when));
 	add(json, "surfaceIntervalSeconds", plan.surface_interval);
 	add(json, "runtimeSeconds", dc.duration.seconds);
 	int max_depth = 0;
@@ -489,7 +489,7 @@ std::string result_json(const diveplan &plan, struct dive &d, planner_error_t er
 		// The reserve of this gas: the minimum gas for the last bottom gas, the
 		// gas of the ascent for the others (shared with a buddy).
 		{
-			long reserve = cyl.deco_gas_used.mliter;
+			int64_t reserve = cyl.deco_gas_used.mliter;
 			if (mindp && static_cast<int>(i) == mindp->cylinderid && cyl.type.size.mliter) {
 				double bar = mindp->minimum_gas.mbar / 1000.0;
 				reserve = lrint(bar * cyl.type.size.mliter / gas_compressibility_factor(cyl.gasmix, bar));
@@ -534,8 +534,8 @@ bool parse(const std::string &request, PlanRun &run, std::string &error)
 		return false;
 	}
 	const Flat &v = run.v;
-	long depth = get(v, "depthMm", 0), bottom_time = get(v, "bottomTimeSeconds", 0);
-	long source_id = get(v, "sourceDiveId", 0);
+	int64_t depth = get(v, "depthMm", 0), bottom_time = get(v, "bottomTimeSeconds", 0);
+	int64_t source_id = get(v, "sourceDiveId", 0);
 	if (source_id) {
 		run.source = divelog.dives.get_by_uniq_id(static_cast<int>(source_id));
 		if (!run.source) {
@@ -543,9 +543,9 @@ bool parse(const std::string &request, PlanRun &run, std::string &error)
 			return false;
 		}
 	}
-	long total = 0;
+	int64_t total = 0;
 	for (const Flat &l: run.levels) {
-		long mm = get(l, "depthMm", 0), seconds = get(l, "durationSeconds", 0);
+		int64_t mm = get(l, "depthMm", 0), seconds = get(l, "durationSeconds", 0);
 		if (mm <= 0 || mm > 300000 || seconds <= 0) {
 			error = "BAD_REQUEST: invalid level";
 			return false;
@@ -559,7 +559,7 @@ bool parse(const std::string &request, PlanRun &run, std::string &error)
 		return false;
 	}
 	for (const Flat &c: run.cylinders) {
-		long o2 = get(c, "o2Permille", 0), he = get(c, "hePermille", 0);
+		int64_t o2 = get(c, "o2Permille", 0), he = get(c, "hePermille", 0);
 		if (o2 <= 0 || o2 > 1000 || he < 0 || o2 + he > 1000 || get(c, "sizeMl", 0) < 0 || get(c, "startMbar", 0) < 0) {
 			error = "BAD_REQUEST: invalid cylinder";
 			return false;
@@ -571,7 +571,7 @@ bool parse(const std::string &request, PlanRun &run, std::string &error)
 		error = "BAD_REQUEST: date";
 		return false;
 	}
-	long gf_low = get(v, "gfLow", 30), gf_high = get(v, "gfHigh", 75), conservatism = get(v, "vpmbConservatism", 0);
+	int64_t gf_low = get(v, "gfLow", 30), gf_high = get(v, "gfHigh", 75), conservatism = get(v, "vpmbConservatism", 0);
 	if (gf_low < 10 || gf_low > 150 || gf_high < 40 || gf_high > 150 || conservatism < 0 || conservatism > 4) {
 		error = "BAD_REQUEST: invalid decompression settings";
 		return false;
@@ -654,9 +654,9 @@ void add_source_waypoints(diveplan &dp, struct dive *source, const std::map<int,
 // it is added at the descent or ascent rate. All on the bottom gas.
 void add_levels(diveplan &dp, const std::vector<Flat> &levels)
 {
-	long previous = 0;
+	int64_t previous = 0;
 	for (const Flat &level: levels) {
-		long mm = get(level, "depthMm", 0);
+		int64_t mm = get(level, "depthMm", 0);
 		depth_t depth { .mm = static_cast<int32_t>(mm) };
 		if (mm != previous) {
 			int transit = mm > previous ? (prefs.drop_stone_mode ? 1 : static_cast<int>((mm - previous) / prefs.descrate))
@@ -684,7 +684,7 @@ planner_error_t run_plan(const PlanRun &run, struct dive &d, diveplan &dp, bool 
 	std::map<int, int> gas_of;
 	for (size_t i = 0; i < cylinders.size(); i++) {
 		cylinder_t &cyl = d.cylinders[i];
-		long size = get(cylinders[i], "sizeMl", 0), start = get(cylinders[i], "startMbar", 0);
+		int64_t size = get(cylinders[i], "sizeMl", 0), start = get(cylinders[i], "startMbar", 0);
 		bool nominal = !saving && !size && !start;
 		cyl.gasmix.o2.permille = get(cylinders[i], "o2Permille", 209);
 		cyl.gasmix.he.permille = get(cylinders[i], "hePermille", 0);
@@ -693,8 +693,8 @@ planner_error_t run_plan(const PlanRun &run, struct dive &d, diveplan &dp, bool 
 		cyl.cylinder_use = OC_GAS;
 		cyl.manually_added = true;
 		// 0: the MOD at the ppO2 for deco, set by reset_cylinders() below.
-		cyl.depth.mm = static_cast<int32_t>(std::max(0L, get(cylinders[i], "switchDepthMm", 0)));
-		long source_cylinder = get(cylinders[i], "sourceCylinder", -1);
+		cyl.depth.mm = static_cast<int32_t>(std::max<int64_t>(0, get(cylinders[i], "switchDepthMm", 0)));
+		int64_t source_cylinder = get(cylinders[i], "sourceCylinder", -1);
 		if (source_cylinder >= 0)
 			gas_of[static_cast<int>(source_cylinder)] = static_cast<int>(i);
 	}
@@ -724,7 +724,7 @@ planner_error_t run_plan(const PlanRun &run, struct dive &d, diveplan &dp, bool 
 		add_levels(dp, run.levels);
 	} else {
 		depth_t bottom { .mm = static_cast<int32_t>(get(v, "depthMm", 0)) };
-		long bottom_time = get(v, "bottomTimeSeconds", 0);
+		int64_t bottom_time = get(v, "bottomTimeSeconds", 0);
 		// The descent at the descent rate, counted in the bottom time (Subsurface's
 		// runtime of the last entered waypoint); with the instant descent setting
 		// (drop_stone_mode), the whole bottom time is spent at depth: one second,

@@ -2887,7 +2887,8 @@
       "Réglages › Notifications (OpenDives+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more.",
       "Equipment (OpenDives+): “Retire from equipment” replaces deleting, with an optional reason (sold, lost, worn out). A retired piece leaves the lists, the kits and the reminders but keeps its service history and its dives; it is found in “Retired pieces”, where it can be put back in service, have its history exported as a PDF, or be deleted for good. “Export the history” is also in a piece’s menu.",
       "A cylinder has two deadlines, each with its own card, bar, “Record …” button and reminder: the visual inspection (every year) and the hydrostatic test (every 5 years, with the date stamped on the cylinder, like 03/22). The maintenance card also shows the hours under water next to the dives (“82 dives out of 100 · 61 h”). In “Add equipment”, an overdue piece stays selectable but says in red what is late, when its reminder warns in a dive.",
-      "Downloading from a dive computer no longer freezes the screen when the error report sheet opens."
+      "Downloading from a dive computer no longer freezes the screen when the error report sheet opens.",
+      "On Windows, “Edit dive” and the quick entry now save every site: some sites (more than half of them) could not be found when saving."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

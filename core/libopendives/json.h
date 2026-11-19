@@ -6,6 +6,7 @@
 #define OPENDIVES_JSON_H
 
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <utility>
@@ -16,7 +17,7 @@ namespace opendives::internal {
 struct JsonValue {
 	enum Kind { STRING, NUMBER, LIST } kind = STRING;
 	std::string text;
-	long number = 0;
+	int64_t number = 0;
 	std::vector<std::string> list;
 };
 
@@ -202,7 +203,7 @@ private:
 		if (i == start || (i == start + 1 && s[start] == '-'))
 			return false;
 		v.kind = JsonValue::NUMBER;
-		v.number = strtol(s.substr(start, i - start).c_str(), nullptr, 10);
+		v.number = strtoll(s.substr(start, i - start).c_str(), nullptr, 10);
 		return true;
 	}
 };

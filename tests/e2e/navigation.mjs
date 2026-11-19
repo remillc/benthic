@@ -474,18 +474,22 @@ async function phoneFlows() {
   await settled(tab, 'quick entry > Choose a site', { route: '/sites/choose' });
   await tapBack(tab);
   await settled(tab, 'back to the quick entry', { route: quickRoute });
-  // A second tap on the chosen site clears it (the Windows host reads a JSON number as a 32-bit long, so a site uuid above
-  // 2^31 cannot be saved there: Save then keeps the dive without a site).
-  if (here) {
-    const row = await tab.run(() => {
-      const r = document.querySelector('.od-quick-entry [role=option][aria-selected=true]')?.getBoundingClientRect();
-      return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
-    });
-    if (row) await tab.tapAt(row.x, row.y);
-  }
   await tapText(tab, '^\s*(Enregistrer|Save)\s*$', '.od-quick-entry');
+  // Saving a site writes the log: the screen is left when the write is done.
+  for (let i = 0; i < 50 && (await tab.run(() => /\/complete$/.test(document.querySelector('.view-main')?.f7View?.router?.currentRoute?.url ?? ''))); i++) await sleep(200);
   await settled(tab, 'quick entry saved', { route: '/' });
+  if (here) {
+    // The dive was saved with the preselected site (its uuid may be above 2^31: JSON integers are 64-bit in the core).
+    const savedSite = JSON.parse(await core('getDive', { id: Number(quickRoute.split('/')[2]) })).site;
+    checks++;
+    if (savedSite !== here.name) {
+      failures.push({ label: 'quick entry: saved site', problems: [`the dive's site is "${savedSite}", expected "${here.name}"`] });
+      console.log('  FAIL quick entry: the dive was not saved with the preselected site');
+    } else console.log('  ok   quick entry: the dive was saved with the preselected site');
+  }
   await toLogbook(tab, 'after the quick entry');
+  // The Undo message of the save stays 6 s over the screen: wait for it to go before the next flow.
+  for (let i = 0; i < 60 && (await tab.run(() => !!document.querySelector('.toast.od-undo-toast'))); i++) await sleep(200);
 
   console.log(' error report sheet over the Download page and over the logbook');
   for (const where of ['/download', '/']) {
