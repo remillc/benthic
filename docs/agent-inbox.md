@@ -6103,3 +6103,13 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - No maintenance reminder for a dive computer.
 
 **Test:** open the download screen and check that only a model with an image shows its photo. Open a dive computer in Équipement, tap the pencil and compare with the mock-up. Type a brand and a model that are not in the lists and save.
+
+## [ ] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre` and `ios-odplus-offre` (updated).
+
+**Problem:** the header of the real OpenDives+ offer screen (the blue band with the logo, the « L’offre OpenDives+ » chip, the title and the subtitle) does not match the mock-up.
+
+**What to do:** compare the real header with the mock-up and fix every difference: band height (264 dp), gradient, bubbles and wave at the bottom, logo and name position, chip, spacing, and the texts. One change is new in the mock-up: the title « Votre carnet, partout et en sécurité » is now 24 dp with a 32 dp line height (it was 28 / 36), weight 500, white. Do the same on iPhone. Check that the title wraps on two lines at 390 dp without touching the subtitle.
+
+**Test:** open the offer on a 390 dp wide phone (Android and iPhone) and compare the header with the mock-up side by side.
