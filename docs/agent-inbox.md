@@ -5864,7 +5864,7 @@ In the subscriber account sheet on every platform, the order of the two entries 
 
 **Done (19 November 2026).** In the three sheets (Android phone and tablet, iPhone, desktop) « Mon profil de plongeur » now comes first and « Sauvegarde et restauration » second; the test `tests/app/account-sheet.test.mjs` checks the order in each source.
 
-## [ ] 2026-11-19-292 Desktop account sheet: new layout
+## [x] 2026-11-19-292 Desktop account sheet: new layout
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-up: `docs/mockups/bureau-profil-compte.dc.html` (the popover opened from the account initial at the bottom of the navigation rail). Follows tasks 290 and 291 (do not edit them).
 
