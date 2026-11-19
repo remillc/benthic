@@ -6193,7 +6193,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** retire a piece with a reason, find it in « Pièces retirées », put it back in service, then retire and delete it for good. Turn the maintenance notifications off and on in Réglages › Notifications and change the lead time. Open the AL80 sheet and check the two deadlines. Add the overdue AL80 to a dive. Export a piece's history.
 
-## [ ] 2026-11-19-309 Equipment fields by type, dive validation, certificates and documents, offer price
+## [x] 2026-11-19-309 Equipment fields by type, dive validation, certificates and documents, offer price
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. All OpenDives+. New screens are drawn for the Android phone only: build the other platforms with their own conventions (iPhone with iOS conventions, tablet and desktop with the layouts of the existing profile screens). The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
 
@@ -6222,3 +6222,42 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **4. OpenDives+ offer.** The price is smaller: 32 dp / 40 dp line height (was 40 / 48), on the offer and « Voir tout ce qui est inclus », Android, iPhone and tablet. The tile « Rappels d’entretien » now reads « Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance. » (no battery, task 308).
 
 **Test:** create a piece of each example type and check its fields. Validate a dive by signature, then by QR code with the second phone offline, then online. Add an insurance and a medical certificate, check the expiry badges and notifications, open a page in full screen and share it as PDF.
+
+**Done (19 November 2026).** Point 1 (fields by type in lib/gear-fields.js, 16 tiles, Veste, suggested reminders), point 2 (validation), point 3 (Brevets et documents: kinds, expiry badges and notifications, scan of an insurance card, pages, full screen, share as images or PDF, instructor certificate wired into signerIdentity()) and point 4 (offer price 32/40 dp, tile text) are in main. Left: the photo of the model for each equipment type (idea #65) and a name for the signer (the profile keeps none yet); the iPhone and desktop screens reuse the Android components and the existing profile layouts, to be compared with their mock-ups when drawn.
+
+**Point 2 done (19 November 2026), by one agent; points 1, 3 and 4 are another agent's, so this task stays open until they are in.** Validation by signature on the screen and by QR code through the server (routes `/v1/validations/*` in the private repository: one-time code valid 10 minutes, summary, confirm, result; OpenDives+ on both sides; rate limits; `scripts/validations-test.mjs`). The signer who is offline confirms later: the scan time is sent and the server accepts it for 7 days after the code expired. Stored in the OpenDives data store (`dive-validations/<id>.json`, with a hash of each dive to show « Modifiée après la validation »), not in the Subsurface dive file: the façade has no generic dive extra-data door, and no C++ was added. The QR travels as a kind « d » transfer of the existing format (the native scanner accepts only « d » and « p »), read back as a validation by its JSON. The signer's name, role and instructor number come from the last confirmation on the phone until the instructor certificate of point 3 exists; then `signerIdentity()` in `lib/validation.svelte.js` reads the profile. The dev API on 8080 needs a `git pull` in the private repository and a rebuild to have the routes.
+
+## [ ] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. This follows task 309. The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
+
+**1. « Type de pièce » becomes a menu, phone only.** On Android and iPhone phones, the grid of 16 type tiles in « Nouvelle pièce » is replaced by one filled field « Type de pièce » that opens a menu (`profil-piece-nouvelle-android`, `-ordinateur-android`, `-bouteille-android`, `-combinaison-android`). The field shows the icon and name of the chosen type and a chevron. The open menu (`profil-piece-nouvelle-type-menu-android`) lists the 16 types with their icons, and the chosen one is highlighted with a check. On iPhone, use the native pull-down menu. Tablet and desktop keep the grid of icon tiles.
+
+**2. Five new icons**, everywhere they appear (type grid and menu, Équipement list, kits, add equipment to a dive, tablet and desktop):
+- Ceinture de lest: a horizontal band with some height, one weight near each end, belt visible past each weight.
+- Scooter: body, handle on top, propeller in its shroud at the back.
+- Couteau: a line cutter (V notch, blade, lanyard hole). The label stays « Couteau ».
+- Palmes: two fins, each with its foot pocket and a rib.
+- Lampe: body and head, with a pistol grip underneath.
+Take the SVG paths from the mock-ups.
+
+**3. Photo in « Nouvelle pièce »** (types that have a photo: not Combinaison, not Bouteille). Remove « Ajouter une photo » and the small model thumbnail next to « Modèle ». Below the type field, show the model's photo large (192 dp tile, as in « Modifier l’ordinateur de plongée ») with the « Changer d’image » button under it. The photo comes from the model photo database once Marque and Modèle are known. Without a photo for the model, show the type icon. « Changer d’image » lets the diver use his own photo.
+
+**Test:** on a phone, open « Nouvelle pièce », pick each type from the menu and check the form changes. Enter a known brand and model and check the photo appears, then change it. Check the five icons on phone, tablet and desktop.
+
+## [ ] 2026-11-19-311 Dates in the format from Réglages everywhere, emergency sheet (#63)
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (about 350 files updated for the dates). The design canvases are being republished with the same files.
+
+**1. Dates follow Réglages › Langue et date everywhere.** Every date the app shows or asks for uses the format chosen in Réglages (default shown in the mock-ups: 2026-11-06). No hard-coded long French dates (« 12 décembre 2026 »), no placeholder « jj mois aaaa ». Date fields show the format as their hint (« aaaa-mm-jj » for the default). A month-only value (hydrostatic test stamp) uses the year and month in the same order (2022-03). Check: logbook list and headers, dive detail, equipment and maintenance, certificates and documents, validation, account, backup, offline maps, PDF export. Trip names typed by the diver (« Canterbury, avril 2014 ») are text and stay as typed. Relative phrases without a year (« le 9 novembre ») can stay until we decide otherwise.
+
+**2. Emergency sheet (#63).** OpenDives+. Stored on the OpenDives server, encrypted, blood type included (already behind the explicit consent in `profil-sante-accord-android`). One emergency contact.
+- « Informations › Modifier » (`profil-infos-modifier-android`): the contact has two fields, « Nom » and « Lien ». « Lien » is a menu with free text (conjoint, parent, enfant, ami…).
+- « Mon profil de plongeur » (`profil-plongeur-android`): a red entry « Fiche d’urgence » under the identity card.
+- « Fiche d’urgence » (`urgence-fiche-android`): full screen, works offline. Red header with the name, birth date and age, blood type in a large tile. Contact with « Appeler Marc » (opens the phone dialer). Diving insurance from « Brevets et documents » (#48) with « Ligne d’urgence ». Medical certificate, opens the document. Header: share and edit (pencil).
+- « Contenu de la fiche » (`urgence-contenu-android`): one switch per item (birth date, blood type, contact, insurance, medical certificate, highest certificate, off by default). The name is always shown.
+- Share (`urgence-partager-android`): as an image or a PDF, with the reminder that the sheet contains the blood type.
+- Not now: lock-screen display (post-launch #108) and several contacts (post-launch #107).
+- Privacy policy: mention that the emergency sheet can be shared by the diver and contains health data.
+
+**Test:** change the date format in Réglages and check dates across the screens above. Fill the emergency contact, open the sheet in airplane mode, call the contact, turn items off, share as PDF.

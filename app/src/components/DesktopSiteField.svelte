@@ -6,6 +6,7 @@
   // under it. Entrée or leaving the field keeps the value (the parent saves it); Échap restores
   // it. Tab goes to the next field. With `complete`, the most likely completion shows in grey
   // inside the field, with a list under it; Tab or Entrée accepts it, Échap cancels.
+  import { floatMenu } from '../lib/float-menu.js';
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
   import { inlineCompletion } from '../lib/desktop-sites.js';
@@ -157,7 +158,7 @@
       <span class="od-site-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>
     {/if}
     {#if proposals.length}
-      <ul class="od-site-field--list" role="listbox">
+      <ul class="od-site-field--list" role="listbox" use:floatMenu>
         {#each proposals as p, i (p.value)}
           <!-- A press, not a click: the field would lose the focus first and keep what is typed. -->
           <li role="option" aria-selected={i === active} class:od-site-field--active={i === active} onmousedown={(e) => (e.preventDefault(), accept(p.value), keep(), field?.blur())}>
@@ -263,11 +264,12 @@
       color: transparent;
     }
     .od-site-field--list {
-      position: absolute;
-      z-index: 20;
-      left: 0;
-      right: 0;
-      top: 44px;
+      /* In the top layer, placed by floatMenu (lib/float-menu.js). */
+      position: fixed;
+      inset: auto;
+      box-sizing: border-box;
+      border: none;
+      color: var(--od-text);
       margin: 0;
       padding: 4px 0;
       list-style: none;

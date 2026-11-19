@@ -357,6 +357,7 @@ settings/planner.json              planner defaults
 settings/computers.json            dive computers list (nicknames, serials)
 keys/wrapped.json                  data key wrapped for the optional recovery phrase (section 11.5)
 media/<dive id>.json               photos and videos of a dive, by hash (section 11.6)
+dive-validations/<id>.json        validation of one or several dives by a buddy or an instructor (#37, task 309): signer, role, instructor number, method, date, signature PNG, and for each dive its start key and a hash of the dive at the time of signing ("modified after the validation"); one record may hold several dives. Never written into the Subsurface dive file: the façade has no generic door for a dive's extra data, so the record sits beside the logbook keyed like `dive-equipment/` (by start time until dives have their own UUID)
 ```
 
 - **`<id>` is a random UUID (version 4), created once on the device that creates the item, never recomputed, never reused.** It is a field of the file (`"id"`) and the file name.

@@ -11,6 +11,7 @@
   import { layout } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { isValidated } from '../lib/validation.svelte.js';
 
   /**
    * `inTrip`: the row belongs to an expanded trip and is shifted to the right.
@@ -64,7 +65,9 @@
       duration: formatDuration(dive.durationSeconds),
     }),
   );
-  const label = $derived(card ? [diveRowLabel(dive, prefs), pendingText].filter(Boolean).join(', ') : [number, details, pendingText].filter(Boolean).join(', '));
+  // A dive a buddy or an instructor validated carries a small mark (task 2026-11-19-309, point 2).
+  const validated = $derived(isValidated(dive));
+  const label = $derived(card ? [diveRowLabel(dive, prefs), validated ? t('validation.mark') : '', pendingText].filter(Boolean).join(', ') : [number, details, validated ? t('validation.mark') : '', pendingText].filter(Boolean).join(', '));
 </script>
 
 {#if card}
@@ -103,7 +106,7 @@
         {:else}
           <span class="od-dive-row--site od-dive-row--site-not-set"><span class="od-dive-row--pin"><Icon name="pinOff" size={14} weight={2} /></span><span class="od-dive-row--site-text">{t('dive.siteNotSet')}</span></span>
         {/if}
-        <span class="od-dive-row--meta">{#if number}<strong class="od-dive-row--number">{number}</strong>{/if}<span class="od-dive-row--time">{formatTimeOfDay(dive.date)}</span></span>
+        <span class="od-dive-row--meta">{#if number}<strong class="od-dive-row--number">{number}</strong>{/if}<span class="od-dive-row--time">{formatTimeOfDay(dive.date)}</span>{#if validated}<span class="od-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</span>
         {#if pendingText}<span class="od-dive-row--meta od-dive-row--pending">{pendingText}</span>{/if}
       </span>
       <span class="od-dive-row--right" aria-hidden="true">
@@ -144,7 +147,7 @@
         <div class="item-title">
           {#if dive.site}{dive.site}{:else}<span class="od-dive-row--not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        <div class="item-text">{#if number}{number}<span class="od-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}</div>
+        <div class="item-text">{#if number}{number}<span class="od-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}{#if validated}<span class="od-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</div>
         {#if pendingText}<div class="item-text od-dive-row--pending">{pendingText}</div>{/if}
       </div>
       <div class="od-dive-row--values od-value">
@@ -347,6 +350,13 @@
     .od-dive-row--number {
       font-weight: 700;
       color: var(--od-text);
+    }
+
+    .od-dive-row--validated {
+      margin-left: 6px;
+      display: inline-flex;
+      vertical-align: middle;
+      color: var(--od-text-2);
     }
 
     .od-dive-row--card .od-dive-row--pending {

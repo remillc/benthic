@@ -45,6 +45,10 @@
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
+  import ValidationConfirm from './components/ValidationConfirm.svelte';
+  import { connection } from './lib/online.svelte.js';
+  import { flushQueue, loadValidations, refreshPending } from './lib/validation.svelte.js';
+  import { odplusAccount } from './lib/odplus-state.svelte.js';
   import FileImportProgress from './components/FileImportProgress.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
@@ -206,6 +210,8 @@
           // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
           { path: '/welcome/git/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
         ]),
+    // « Faire valider la plongée » (task 2026-11-19-309): the choice, the signature and the QR code, one full screen.
+    { path: '/validate', ...lazy(() => import('./pages/Validate.svelte')) },
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {
@@ -374,6 +380,14 @@
     if (desktopApp && !noLogbook && !sideWindow && !logbook.loading && !logbook.welcome && !logbook.error) void resumePendingImport();
   });
 
+  // Dive validations (task 2026-11-19-309): read the records; once online and signed in, send the confirmations this phone
+  // queued offline and ask the server about the validations still waiting.
+  $effect(() => {
+    if (!odplusAccount.signedIn || !odplusAccount.subscribed) return;
+    const online = connection.online;
+    void loadValidations().then(() => (online ? Promise.all([flushQueue(), refreshPending()]) : undefined)).catch((e) => console.error('Validations', e));
+  });
+
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
     document.documentElement.classList.toggle('od-bottom-nav-on', bottomNav() && navigation.atRoot);
@@ -463,6 +477,7 @@
   <ErrorReportHost />
   <ConflictHost />
   <QrReceived />
+  <ValidationConfirm />
   <FileImportProgress />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}

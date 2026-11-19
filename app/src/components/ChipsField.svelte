@@ -7,6 +7,7 @@
   // new one with Enter or a comma. Several values are allowed.
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
+  import { floatMenu } from '../lib/float-menu.js';
 
   /**
    * @type {{
@@ -111,7 +112,7 @@
     </div>
   </div>
   {#if proposals.length || isNew}
-    <ul class="od-chips-field--proposals" role="listbox" aria-label={label}>
+    <ul class="od-chips-field--proposals" role="listbox" aria-label={label} use:floatMenu={'.od-chips-field--box'}>
       {#each proposals as p (p)}
         <li><button type="button" onmousedown={(e) => e.preventDefault()} onclick={() => add(p)}>{p}</button></li>
       {/each}
@@ -259,11 +260,14 @@
       font-size: 16px;
     }
 
+    /* In the top layer, placed by floatMenu (lib/float-menu.js). */
     .od-chips-field--proposals {
-      position: absolute;
-      left: 0;
-      right: 0;
-      z-index: 20;
+      position: fixed;
+      inset: auto;
+      box-sizing: border-box;
+      overflow-y: auto;
+      border: none;
+      color: var(--od-text);
       margin: 0;
       padding: 8px 0;
       list-style: none;

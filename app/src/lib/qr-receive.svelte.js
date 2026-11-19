@@ -10,6 +10,8 @@ import { showSnackbar } from './snackbar.js';
 import { decodeTexts } from './qr-transfer.js';
 import { readPreview, startKey } from './qr-preview.js';
 import { openDiveById, openPlans } from './open-link.js';
+import { odplusSubscriber } from './odplus-state.svelte.js';
+import { openConfirmation, readValidationCode } from './validation.svelte.js';
 
 /**
  * What the received screen shows; `open` is false when it is closed.
@@ -69,6 +71,13 @@ export async function scanQr() {
   } catch (e) {
     console.error('QR decode', e);
     showSnackbar(t('qr.corrupt'));
+    return;
+  }
+  // A code of a dive validation (lib/validation.js): the confirmation sheet, not the received dive.
+  const validation = readValidationCode(decoded.xml);
+  if (validation) {
+    if (!odplusSubscriber()) showSnackbar(t('validation.confirmError.plus'));
+    else openConfirmation(validation);
     return;
   }
   const preview = readPreview(decoded.xml);

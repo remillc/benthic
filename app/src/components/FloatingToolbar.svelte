@@ -255,7 +255,7 @@
       z-index: 50;
       left: 0;
       right: 0;
-      bottom: calc(24px + var(--f7-safe-area-bottom, 0px));
+      bottom: calc(24px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
       width: max-content;
       max-width: calc(100% - 16px);
       margin: 0 auto;
@@ -282,7 +282,7 @@
     }
 
     .od-floating-toolbar--hidden {
-      transform: translateY(calc(100% + 24px + var(--f7-safe-area-bottom, 0px)));
+      transform: translateY(calc(100% + 24px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px)));
       opacity: 0;
       visibility: hidden;
       transition:
@@ -357,7 +357,7 @@
 
     /* The content never ends under the toolbar. */
     :global(.page:has(.od-floating-toolbar) .page-content) {
-      padding-bottom: calc(104px + var(--f7-safe-area-bottom, 0px));
+      padding-bottom: calc(104px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
     }
 
     /* "Remove animations": it appears and disappears at once. */
