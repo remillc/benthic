@@ -130,6 +130,62 @@
     });
   }
 
+  /**
+   * The grip above the title: the sheet follows the finger downwards; past a quarter of its height, or on a quick flick,
+   * it leaves and closes; otherwise it springs back. With reduced motion the sheet only jumps (no animation).
+   * @param {HTMLElement} grip
+   */
+  function dragToClose(grip) {
+    const panel = /** @type {HTMLElement} */ (grip.closest('.od-dev-tools-menu--panel'));
+    const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let startY = 0;
+    let lastY = 0;
+    let lastT = 0;
+    let velocity = 0;
+    let active = false;
+    /** @param {PointerEvent} e */
+    const down = (e) => {
+      active = true;
+      startY = lastY = e.clientY;
+      lastT = e.timeStamp;
+      velocity = 0;
+      panel.style.transition = 'none';
+      grip.setPointerCapture(e.pointerId);
+    };
+    /** @param {PointerEvent} e */
+    const move = (e) => {
+      if (!active) return;
+      const dt = e.timeStamp - lastT;
+      if (dt > 0) velocity = (e.clientY - lastY) / dt;
+      lastY = e.clientY;
+      lastT = e.timeStamp;
+      panel.style.translate = '0 ' + Math.max(0, e.clientY - startY) + 'px';
+    };
+    /** @param {PointerEvent} e */
+    const up = (e) => {
+      if (!active) return;
+      active = false;
+      const dy = Math.max(0, e.clientY - startY);
+      const height = panel.offsetHeight || 1;
+      const close = dy > height / 4 || (velocity > 0.5 && dy > 8);
+      panel.style.transition = reduced() ? 'none' : close ? 'translate 0.2s ease-in' : 'translate 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2)';
+      panel.style.translate = close ? '0 ' + height + 'px' : '0 0';
+      if (close) setTimeout(() => (devUi.open = false), reduced() ? 0 : 200);
+    };
+    grip.addEventListener('pointerdown', down);
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+    grip.addEventListener('pointercancel', up);
+    return {
+      destroy() {
+        grip.removeEventListener('pointerdown', down);
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', up);
+        grip.removeEventListener('pointercancel', up);
+      },
+    };
+  }
+
   /** @param {KeyboardEvent} e */
   function onKey(e) {
     if (devUi.open && e.key === 'Escape') devUi.open = false;
@@ -162,7 +218,7 @@
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div class="od-dev-tools-menu" onclick={(e) => e.target === e.currentTarget && (devUi.open = false)}>
     <div class="od-dev-tools-menu--panel" role="dialog" aria-modal="true" aria-label={text.title}>
-      <span class="od-dev-tools-menu--handle" aria-hidden="true"></span>
+      <div class="od-dev-tools-menu--grip" use:dragToClose aria-hidden="true"><span class="od-dev-tools-menu--handle"></span></div>
       <header class="od-dev-tools-menu--head">
         <span class="od-dev-tools-menu--title">{text.title}</span>
         <span class="od-dev-tools-menu--tag">DEV</span>
@@ -299,7 +355,7 @@
         border-radius: 28px;
         padding-top: 16px;
       }
-      .od-dev-tools-menu--handle {
+      .od-dev-tools-menu--grip {
         display: none;
       }
     }
@@ -314,12 +370,20 @@
         animation: none;
       }
     }
+    .od-dev-tools-menu--grip {
+      display: flex;
+      flex: none;
+      justify-content: center;
+      margin: 0 -16px;
+      padding: 8px 0;
+      cursor: grab;
+      touch-action: none;
+    }
     .od-dev-tools-menu--handle {
       align-self: center;
       flex: none;
       width: 32px;
       height: 4px;
-      margin: 4px 0 4px;
       border-radius: 2px;
       background: var(--od-text-2);
       opacity: 0.5;

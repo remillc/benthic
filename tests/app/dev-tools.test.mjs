@@ -263,3 +263,11 @@ test('segment “Free” has no qualifier and a device icon; the other two keep 
   assert.match(menu, /toFreeKeepTag: 'signed in'/);
   assert.match(menu, /toSubTag: 'OpenDives\+'/);
 });
+
+test('the sheet follows a drag on its grip: closes past a quarter of its height or on a flick, springs back otherwise, honours reduced motion', () => {
+  const menu = read('components/DevToolsMenu.svelte');
+  assert.match(menu, /use:dragToClose/);
+  assert.match(menu, /dy > height \/ 4 \|\| \(velocity > 0\.5/);
+  assert.match(menu, /prefers-reduced-motion: reduce\)'\)\.matches/);
+  assert.match(menu, /touch-action: none/);
+});
