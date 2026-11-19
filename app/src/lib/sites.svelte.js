@@ -8,6 +8,8 @@ import { language, tIfExists } from './i18n.js';
 import { placeAt } from './place-lookup.js';
 import { settings } from './settings.svelte.js';
 import { formatMinutes } from './format.js';
+import { mapsLinks } from './maps-link.js';
+import { ios } from './layout.svelte.js';
 import { isDismissed, parseMarks, withMark, withoutMark } from './site-dismissed.js';
 
 export { pairKey } from './site-dismissed.js';
@@ -200,9 +202,21 @@ export function parseCoordinates(text) {
 
 /** Maps app link for a position ("Open in Maps"): the system's geo: link on Android. */
 export function mapsLink(/** @type {number} */ latUdeg, /** @type {number} */ lonUdeg, /** @type {string} */ name) {
-  const lat = latUdeg / 1e6;
-  const lon = lonUdeg / 1e6;
-  return `geo:${lat},${lon}?q=${lat},${lon}(${encodeURIComponent(name)})`;
+  return mapsLinks(latUdeg, lonUdeg, name, ios).primary;
+}
+
+/**
+ * Opens the position in the maps app (task 2026-11-19-289): the system link, and on iPhone the web address of Apple Maps
+ * when the maps: scheme cannot be opened.
+ * @param {number} latUdeg @param {number} lonUdeg @param {string} name
+ */
+export function openInMapsApp(latUdeg, lonUdeg, name) {
+  const { primary, fallback } = mapsLinks(latUdeg, lonUdeg, name, ios);
+  try {
+    window.location.href = primary;
+  } catch {
+    window.location.href = fallback;
+  }
 }
 
 export { logbook };

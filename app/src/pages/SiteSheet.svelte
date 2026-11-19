@@ -3,6 +3,7 @@
   // Site sheet (docs/mockups/sites-fiche-android.dc.html): name and country,
   // map, coordinates with "Open in Maps", description, notes, region and city
   // found from the position, then the dives at this site.
+  import { ios } from '../lib/layout.svelte.js';
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
@@ -21,7 +22,7 @@
   import SiteMap from '../components/SiteMap.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { diveLines, formatCoordinates, mapsLink, siteChange } from '../lib/sites.svelte.js';
+  import { diveLines, formatCoordinates, mapsLink, openInMapsApp, siteChange } from '../lib/sites.svelte.js';
   import { formatLongDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
@@ -69,9 +70,7 @@
   /** "Open in Maps" from the toolbar: the same system link as the text button, opened by a click on it. */
   function openInMaps() {
     if (!site) return;
-    const a = document.createElement('a');
-    a.href = mapsLink(site.latUdeg, site.lonUdeg, site.name);
-    a.click();
+    openInMapsApp(site.latUdeg, site.lonUdeg, site.name);
   }
 
   // As the Sites list's "Merge sites": the other site's dives come to this one,
@@ -175,8 +174,8 @@
       </div>
       <div class="od-site-sheet--coords">
         <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
-        <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)}>
-          {t('sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
+        <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={ios ? (e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name)) : undefined}>
+          {t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
         </a>
       </div>
     {/if}
@@ -228,7 +227,7 @@
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
         actions={[
           { key: 'edit', icon: 'edit', label: t('sites.edit'), text: t('detail.edit'), onclick: edit },
-          ...(site.hasLocation ? [{ key: 'maps', icon: /** @type {const} */ ('map'), label: t('sites.openInMaps'), onclick: openInMaps }] : []),
+          ...(site.hasLocation ? [{ key: 'maps', icon: /** @type {const} */ ('map'), label: t(ios ? 'sites.openInPlans' : 'sites.openInMaps'), onclick: openInMaps }] : []),
           { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
           { key: 'more', icon: 'more', label: t('sites.moreOptionsList'), menu: `#${menuId}` },
         ]}

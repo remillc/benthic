@@ -854,6 +854,7 @@
       "deleteType": "Supprimer ce type",
       "deleteTypeTitle": "Supprimer « {name} » ?",
       "deleteTypeAction": "Supprimer",
+      "deleteTypeSheet": "Supprimer « {name} »",
       "deleteTypeNone": "N’est utilisé dans aucune plongée.",
       "deleteRemoved": { "one": "Retire cette bouteille de {n} plongée.", "other": "Retire cette bouteille de {n} plongées." },
       "deleteKept": { "one": "Dans {n} plongée où elle sert au profil ou est la seule bouteille, elle reste, sans type.", "other": "Dans {n} plongées où elle sert au profil ou est la seule bouteille, elle reste, sans type." },
@@ -1687,6 +1688,7 @@
       "other": "{n} plongées, pas de position GPS"
     },
     "openInMaps": "Ouvrir dans Cartes",
+    "openInPlans": "Ouvrir dans Plans",
     "divesHere": "Plongées à ce site",
     "about": "À propos du site",
     "description": "Description",
@@ -2591,7 +2593,8 @@
       "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré.",
       "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée.",
       "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique.",
-      "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre."
+      "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre.",
+      "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » d’OpenDives+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4896,6 +4899,8 @@
       "subscribe": "S’abonner",
       "without": "Continuer sans abonnement",
       "noAccount": "Aucun compte n’est créé.",
+      "restore": "Restaurer les achats",
+      "terms": "L’abonnement se renouvelle automatiquement chaque année, au prix de {price}, sauf résiliation au moins 24 heures avant la fin de la période. Le paiement est prélevé sur votre compte Apple à la confirmation de l’achat. Vous gérez ou résiliez l’abonnement dans Réglages › votre nom › Abonnements.",
       "already": "Déjà abonné ?",
       "signIn": "Se connecter"
     },

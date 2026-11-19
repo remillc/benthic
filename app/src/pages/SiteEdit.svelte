@@ -9,6 +9,7 @@
   // site is set on that dive (dives without a site).
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
+  import { ios } from '../lib/layout.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
@@ -237,10 +238,14 @@
 <Page class="od-site-edit">
   <Navbar title={editing ? t('sites.editTitle') : t('sites.newSite')}>
     {#snippet left()}
-      <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
+      {#if ios}
+        <Link onClick={() => guard?.attempt()}>{t('dialog.cancel')}</Link>
+      {:else}
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
+      {/if}
     {/snippet}
     {#snippet right()}
-      <Link onClick={save} class={saving ? 'disabled' : ''}>{t('edit.save')}</Link>
+      <Link onClick={save} class={saving ? 'disabled' : ''}>{t(ios ? 'dialog.ok' : 'edit.save')}</Link>
     {/snippet}
   </Navbar>
   <LeaveGuard bind:this={guard} noun="site" {dirty} {save} leave={() => f7router.back()} />
@@ -292,7 +297,7 @@
 
   {#if editing}
     <div class="od-form-surface od-site-edit--delete">
-      <button type="button" class="od-outlined-button od-danger" onclick={deleteSite}>{t('sites.deleteSite')}</button>
+      <button type="button" class={ios ? 'od-site-edit--delete-ios' : 'od-outlined-button od-danger'} onclick={deleteSite}>{t('sites.deleteSite')}</button>
       <p class="od-site-edit--explain">{t('sites.deleteSiteHint')}</p>
     </div>
   {/if}
@@ -345,6 +350,19 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
+
+    /* iPhone: a red row at the bottom of the form (ios-sites-modifier.dc.html). */
+    .od-site-edit--delete-ios {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: var(--od-surface);
+      color: var(--od-alarm);
+      font: inherit;
+      font-size: 17px;
     }
 
     .od-site-edit--delete {
