@@ -1171,7 +1171,7 @@
       "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé."
     },
     "browse": {
-      "banner": "Version du {date}, en lecture seule",
+      "banner": "Version en lecture seule : {date}",
       "back": "Revenir au carnet",
       "empty": "Cette version ne contient aucune plongée",
       "failed": "Cette version n’a pas pu être ouverte",

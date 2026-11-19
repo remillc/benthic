@@ -1171,7 +1171,7 @@
       "restoreFailed": "The dive could not be brought back. The logbook did not change."
     },
     "browse": {
-      "banner": "Version of {date}, read-only",
+      "banner": "Read-only version: {date}",
       "back": "Back to the logbook",
       "empty": "This version has no dive",
       "failed": "This version could not be opened",
