@@ -226,7 +226,11 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
     const { token, kind, method, a } = JSON.parse(payload);
     let reply;
     try {
-      if (kind === 'core') reply = { ok: true, v: await core(method, a) };
+      // The sample logbook has no cloud account: the host answers « Cloud account not configured » to the cached cloud read
+      // the app makes at start, and the error report sheet (task #102) opens over the page and takes the taps. The stand-in
+      // answers « nothing cached » instead, as the app's own start does without an account.
+      if (kind === 'core' && method === 'cloudListCachedDives') reply = { ok: true, v: '' };
+      else if (kind === 'core') reply = { ok: true, v: await core(method, a) };
       else if (method === 'writeFile') {
         const p = path.join(temp, a.area, path.basename(a.name));
         mkdirSync(path.dirname(p), { recursive: true });
@@ -250,6 +254,9 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
         localStorage.setItem('CapacitorStorage.od.welcomeBeta', 'done');
         localStorage.setItem('CapacitorStorage.od.welcome', 'done');
       }
+      // The hardware Back flow ends on App.minimizeApp, which a browser does not implement: that error is queued as a report
+      // (task #102) and would be offered over the next tab. Each tab starts with no report waiting.
+      localStorage.removeItem('CapacitorStorage.od.errorReports');
       const answers = new Map();
       let n = 0;
       window.__odAnswer = (token, reply) => answers.get(token)?.(reply);
@@ -265,6 +272,8 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
         core: (m, a) => call('core', m, a),
         onCoreEvent: () => () => {},
         credentials: { get: async () => null, set: async () => {}, clear: async () => {} },
+        // The recent logbooks (the desktop layout reads them at start): none, as on a first run.
+        logbooks: { recent: async () => [], exists: async () => ({}), forget: async () => [], clearRecent: async () => [] },
         fs: new Proxy({}, { get: (_, op) => (o) => call('fs', op, o) }),
       };
     }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
