@@ -10,6 +10,7 @@
   import OdPlusChip from './OdPlusChip.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import { gear, gearMap } from '../lib/inventory.svelte.js';
+  import { isSubscriber } from '../lib/logbook.svelte.js';
   import { removeFromEquipment } from '../lib/inventory.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -18,12 +19,16 @@
   let { equipment = $bindable() } = $props();
 
   let adding = $state(false);
+  /** Only an OpenDives+ account changes the equipment of a dive; without one the block shows and stays inert. */
+  const plus = $derived(isSubscriber());
+  const locked = $derived(gear.readOnly || !plus);
 
   /** The pieces of the dive that still exist in the inventory. */
   const pieces = $derived(equipment.gearIds.map((id) => gearMap().get(id)).filter((g) => !!g));
   const empty = $derived(!pieces.length && !equipment.adhoc.length);
 
   function openAdd() {
+    if (!plus) return;
     if (gear.readOnly) showSnackbar(t('gear.inventory.readOnlyRefused'));
     else {
       // The « Annuler » of a kit just applied would sit over the sheet's buttons.
@@ -47,7 +52,7 @@
             <span class="od-dive-gear--name">{g.name}</span>
             <span class="od-dive-gear--line">{g.note || t(`gear.inventory.type.${g.type}`)}</span>
           </span>
-          <button type="button" class="od-dive-gear--remove" disabled={gear.readOnly} aria-label={t('gear.diveGear.remove', { name: g.name })} onclick={() => (equipment = removeFromEquipment(equipment, { gearId: g.id }))}>
+          <button type="button" class="od-dive-gear--remove" disabled={locked} aria-label={t('gear.diveGear.remove', { name: g.name })} onclick={() => (equipment = removeFromEquipment(equipment, { gearId: g.id }))}>
             <Icon name="close" size={20} />
           </button>
         </li>
@@ -60,7 +65,7 @@
           <span class="od-dive-gear--name">{p.name}</span>
           <span class="od-dive-gear--line">{t('gear.diveGear.outside')}</span>
         </span>
-        <button type="button" class="od-dive-gear--remove" disabled={gear.readOnly} aria-label={t('gear.diveGear.remove', { name: p.name })} onclick={() => (equipment = removeFromEquipment(equipment, { adhocId: p.id }))}>
+        <button type="button" class="od-dive-gear--remove" disabled={locked} aria-label={t('gear.diveGear.remove', { name: p.name })} onclick={() => (equipment = removeFromEquipment(equipment, { adhocId: p.id }))}>
           <Icon name="close" size={20} />
         </button>
       </li>
@@ -68,10 +73,10 @@
   </ul>
 {/if}
 
-<button type="button" class="od-dive-gear--add" onclick={openAdd}>
+<button type="button" class="od-dive-gear--add" disabled={!plus} onclick={openAdd}>
   <Icon name="plus" size={20} />{t('gear.diveGear.add')}
 </button>
-{#if gear.readOnly}<p class="od-dive-gear--locked">{t('gear.diveGear.locked')}</p>{/if}
+{#if !plus}<p class="od-dive-gear--locked">{t('gear.diveGear.plusOnly')}</p>{:else if gear.readOnly}<p class="od-dive-gear--locked">{t('gear.diveGear.locked')}</p>{/if}
 
 <AddEquipmentSheet opened={adding} {equipment} onclose={() => (adding = false)} onadd={(next) => (equipment = next)} />
 

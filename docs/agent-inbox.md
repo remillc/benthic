@@ -5861,3 +5861,80 @@ In the subscriber account sheet on every platform, the order of the two entries 
 **Test:** open the account sheet as a subscriber on each platform: « Mon profil de plongeur » is above « Sauvegarde et restauration ».
 
 **Done (19 November 2026).** In the three sheets (Android phone and tablet, iPhone, desktop) « Mon profil de plongeur » now comes first and « Sauvegarde et restauration » second; the test `tests/app/account-sheet.test.mjs` checks the order in each source.
+
+## [ ] 2026-11-19-292 Desktop account sheet: new layout
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-up: `docs/mockups/bureau-profil-compte.dc.html` (the popover opened from the account initial at the bottom of the navigation rail). Follows tasks 290 and 291 (do not edit them).
+
+From top to bottom, on the sheet background (#F5F4F0), with white rounded groups:
+1. **OpenDives logo** centred at the top (wave logo, « OpenDives », the « + » chip), as on the phone sheet. No close button: the popover closes on a click outside or Esc.
+2. **Account group**:
+   - 48 px avatar with the « + » chip at its bottom-right corner (subscribers), e-mail, « OpenDives+ · 312 plongées »;
+   - « Gérer le compte » outlined button at its natural width, **aligned with the text column** (not under the avatar);
+   - a thin divider, then the sync line: green check, « Synchronisé il y a 2 min », and « Synchroniser » (tonal button) on the right.
+3. **Group**: « Mon profil de plongeur » (red maintenance subtitle and badge), then « Sauvegarde et restauration ». Each entry has its icon in a small blue tile (36 px, #E6EEF7). No highlighted background on « Mon profil ».
+4. **Group**: « Réglages », « À propos ».
+
+**Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
+
+## [ ] 2026-11-19-293 Android tablet: catch up with the phone
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (landscape; portrait follows the same pattern). On a large screen, what is a full screen on the phone becomes a dialog, a side sheet, a banner or a snackbar over the tablet screen (Material 3 large-screen guidance). Behaviour and texts are those of the phone tasks.
+
+- **Selection**: « Exporter des plongées » dialog (formats as a selectable list, « Anonymiser » switch, Annuler / Exporter) — `android-tablette-carnet-export-paysage`. Merging two dives ends with a snackbar « 2 plongées fusionnées · Annuler » — `android-tablette-carnet-fusion-paysage`.
+- **Share**: choice dialog (Fiche PDF, Résumé et image, Code QR) — `android-tablette-partage-paysage`; QR dialog with « Code 3 sur 8 » — `android-tablette-partage-qr-paysage`.
+- **Several dive computers**: « Ordinateurs de cette plongée » dialog with « Définir comme principal » — `android-tablette-detail-ordinateurs-paysage`; end of download snackbar « 3 plongées téléchargées. 1 réunie avec une plongée déjà au carnet. · Voir » — `android-tablette-telechargement-fusion-paysage`.
+- **Bluetooth** (right pane of the download screen): authorise, denied, disabled — `android-tablette-telechargement-autorisation-paysage`, `-refusee-paysage`, `-desactive-paysage`.
+- **Sync states**: offline banner at the top of the logbook list — `android-tablette-etat-horsligne-paysage`; conflict on one dive (two versions side by side) — `android-tablette-etat-conflit-paysage`; conflict on several dives — `android-tablette-etat-conflit-plusieurs-paysage`; password refused — `android-tablette-etat-synchro-motdepasse-paysage`.
+- **Sites**: search opens over the list pane — `android-tablette-sites-recherche-paysage`; overlapping pins open a popup list of the sites at that spot — `android-tablette-sites-superposes-paysage`. No separate full-screen map on tablet.
+- **Offline maps** (left pane of the maps screen): region menu, downloads in progress, no network and failure, mobile data dialog, not enough space dialog, delete region, replace on update — `android-tablette-cartes-menu-paysage`, `-telechargement-paysage`, `-echec-paysage`, `-donnees-mobiles-paysage`, `-espace-paysage`, `-suppression-paysage`, `-maj-remplacer-paysage`.
+- **Before flying**: the reminder switch in Désaturation — `android-tablette-desaturation-rappel-paysage`; the « Avion dans 17 h 05 » banner in the logbook — `android-tablette-carnet-avion-paysage`.
+- **Logbook computers**: edit in a side sheet — `android-tablette-ordinateur-modifier-paysage`; merge confirmation — `android-tablette-ordinateur-fusion-paysage`.
+- **OpenDives+**: « Bienvenue dans OpenDives+ ! » after subscribing — `android-tablette-odplus-abonne-paysage`.
+
+**Test:** on a tablet (or a large emulator) in landscape and portrait, reach each of these screens and check that nothing opens full screen where the mock-up shows a dialog, sheet or banner.
+
+## [ ] 2026-11-19-294 iPad follows the Android tablet
+
+Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
+
+## [ ] 2026-11-19-295 OpenDives+ offer: new layout and "everything included" screen
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre`, `android-odplus-complet`, `ios-odplus-offre`, `ios-odplus-complet`, `android-tablette-odplus-offre-paysage`, `android-tablette-odplus-complet-paysage`. The iPad follows the Android tablet (task 294). No desktop offer screen yet.
+
+**Offer screen** (all platforms):
+- Header: the pill reads « L’offre OpenDives+ ». Subtitle: « Votre carnet à l’abri, sur tous vos appareils. » Keep 24 dp between the subtitle and the top of the wave (phone header 264 dp, iPhone 292 dp).
+- Feature cards: 16 dp padding, 40 dp icon tiles, titles 16/24, descriptions 14/20. On the tablet, the four small cards put the icon on the left of the text to save height.
+- New text link under the cards: « Voir tout ce qui est inclus › », 17 sp, 48 dp tall. It opens the new screen below.
+- The price is no longer in a dark blue card (it looked like a button). It is plain centred text: « Abonnement OpenDives+ » (16/24, grey, not blue: it is not tappable), « 14,99 $ US » 40/48 with « par an » 20/28, « soit 1,25 $ par mois » 17/24, then « ✓ Résiliable en tout temps » in green 16/24. 16 dp above the block, 24 dp before « S’abonner ».
+- « Continuer sans abonnement », « Se connecter » and « À propos et contact » are 48 dp touch targets, 8 dp apart. Margins 16 dp on phone. Everything on the 4 dp grid.
+- On the tablet, « Déjà abonné ? Se connecter » moves to the top right, on the same row as « Retour ».
+
+**New screen « Tout ce qui est inclus »** (phone: full screen with back arrow; iPhone: navigation bar « ‹ OpenDives+ » and large title; tablet: replaces the right pane, back arrow returns to the offer).
+- Four groups of rows (icon tile 40 dp, title, one-line description saying what changes compared with the free version):
+  - Votre carnet: Synchronisé, Sauvegardé, Sauvegarde et restauration, Photos et vidéos (10 Go), L’app de bureau (included instead of 29,99 $).
+  - Votre profil de plongeur: Équipement et kits, Rappels d’entretien, Brevets, Informations personnelles, Analyses de gaz, Pression lue par photo.
+  - Sites et cartes: Cartes hors ligne (as many regions as wanted instead of one), Sites des plongeurs.
+  - Avec vos compagnons: Compagnons, Plongée validée, Profil public.
+- Then the line « Toujours gratuit, sans abonnement : … ».
+- A footer stays fixed at the bottom while the list scrolls: the same price block as the offer, then « S’abonner ». On the tablet the footer is horizontal (price on the left, button on the right).
+- Texts are in the mock-ups. Only features already decided as paid are listed: hide a row whose feature is not built yet, rather than promising it.
+
+**Test:** on a phone, an iPhone and a tablet, open the offer, check the spacing against the mock-ups, tap « Voir tout ce qui est inclus », scroll the list and check that the price footer stays in place and « S’abonner » works from both screens.
+
+## [ ] 2026-11-19-296 About screen texts and buttons, "everything included" subtitle
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `apropos-android`, `android-tablette-apropos-paysage`, `android-tablette-apropos-portrait`, `bureau-apropos`, plus `android-odplus-complet`, `ios-odplus-complet`, `android-tablette-odplus-complet-paysage`. The iPad and the iPhone follow these (task 294 and task 289).
+
+**About screen (all platforms)**
+- Under the version: « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. » (replaces « compatible avec les carnets Subsurface »).
+- Block « Libre, et votre carnet aussi » (phone and tablet; the tablet did not have it, add it before « Projet »):
+  - « L’offre de base reste toujours gratuite. Les apps et leur code sont sur GitHub : chacun peut toujours y télécharger les apps gratuitement, lire le code, le modifier et le partager. »
+  - « Exportable en tout temps, votre carnet vous appartient. » Do not name the logbook file format anywhere on this screen.
+- Buttons « Voir sur GitHub » (tonal, GitHub mark on the left) and « Exporter mon carnet » (outlined, download icon on the left). Icons 20 dp, 8 dp from the text, 48 dp tall. Phone: full width, one per line, 12 dp apart, 16 dp below the text. Tablet: side by side, 12 dp apart.
+- GitHub mark: use the official « GitHub Invertocat » black SVG supplied by Christian (path in the mock-ups), coloured #1F2124. Do not redraw it. It joins the Google and Apple logos as the only brand marks allowed.
+- Desktop: same first sentence. Text: « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient. » The desktop app is paid, so it does not say « gratuit » (Christian has not yet decided whether a free compiled desktop build is published). The two buttons sit side by side under the text, 40 dp tall.
+
+**« Tout ce qui est inclus » (task 295)**: add the subtitle « Tout ce qui est inclus dans l’offre OpenDives+. » under the title, 16/24, grey, on phone, iPhone and tablet.
+
+**Test:** open À propos on a phone, a tablet and the desktop app, compare texts and buttons with the mock-ups, tap « Voir sur GitHub » (opens the repository) and « Exporter mon carnet » (opens the export flow).

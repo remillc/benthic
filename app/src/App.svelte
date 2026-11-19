@@ -477,9 +477,21 @@
       border-right: 0;
     }
     /* ... and no detail pane or empty-pane notice beside it (a detail opened in the tablet layout comes back when the window narrows). */
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail),
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail:is(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection)),
     :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings))::after) {
       display: none;
+    }
+    /* A screen opened over the section (the profile, an equipment piece, About's pages) is a detail page to Framework7 too:
+       over the full-width desktop page it takes the whole view. Hidden, it measured 0 wide (bug of 19 November 2026). */
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection)) {
+      inset: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    /* ... and it is not a pane's first screen: its Back button stays (nothing else leads back to the page under it). */
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail-root:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection) .navbar .left),
+    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail-root:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection) .navbar .left .back) {
+      display: flex;
     }
     :global(.view-master-detail .page-master-detail) {
       background: var(--od-surface);

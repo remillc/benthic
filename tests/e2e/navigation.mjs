@@ -205,7 +205,7 @@ class Tab {
   }
 }
 
-async function openTab(width, height, mobile, welcome = false) {
+async function openTab(width, height, mobile, welcome = false, desktop = false) {
   const target = await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json();
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
@@ -269,7 +269,7 @@ async function openTab(width, height, mobile, welcome = false) {
       };
     }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
   });
-  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=md` });
+  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=md${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
     if (await tab.run((w) => !!document.querySelector(w ? '.od-welcome.modal-in .od-first-launch, .od-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
@@ -483,6 +483,32 @@ async function phoneFlows() {
   await tapBack(tab);
   await settled(tab, 'back after the sheet', { route: '/' });
 
+  console.log(' free account sheet > OpenDives+ offer > Back reopens the sheet');
+  const sheetState = () => tab.run(() => ({ hash: location.hash, sheet: !!document.querySelector('.od-account-sheet.modal-in, .sheet-modal.modal-in .od-account-sheet--row, .modal-in .od-account-sheet--row'), welcome: !!document.querySelector('.od-welcome.modal-in'), len: history.length }));
+  const expectState = (label, want, got) => {
+    checks++;
+    const bad = Object.entries(want).filter(([k, v]) => got[k] !== v).map(([k, v]) => `${k} is ${got[k]}, expected ${v}`);
+    if (bad.length) {
+      failures.push({ label, problems: bad, got });
+      console.log(`  FAIL ${label}: ${bad.join('; ')}`);
+    } else console.log(`  ok   ${label}`);
+  };
+  for (const row of ['#offer-sync', '#offer-profile']) {
+    await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
+    await sleep(800);
+    expectState(`${row}: the sheet is open with #compte`, { hash: '#compte', sheet: true }, await sheetState());
+    await tab.run((r) => document.querySelector(`a[href="${r}"]`)?.click(), row);
+    await sleep(1000);
+    expectState(`${row}: the offer is open`, { welcome: true, sheet: false }, await sheetState());
+    await hardwareBack(tab);
+    await sleep(900);
+    expectState(`${row}: Back from the offer reopens the sheet`, { welcome: false, sheet: true, hash: '#compte' }, await sheetState());
+    await hardwareBack(tab);
+    await sleep(900);
+    expectState(`${row}: a second Back closes the sheet`, { welcome: false, sheet: false, hash: '' }, await sheetState());
+    await settled(tab, `${row}: logbook after the sheet`, { route: '/' });
+  }
+
   console.log(' sections: sites, statistics, tools, settings');
   for (const [label, pattern] of [['Sites', '^\\s*Sites\\s*$'], ['Statistiques', '^\\s*Statistiques\\s*$'], ['Outils', '^\\s*Outils\\s*$']]) {
     await tapText(tab, pattern, '.toolbar, .od-bottom-nav, .tabbar').catch(() => tab.run((l) => [...document.querySelectorAll('.toolbar a, .tabbar a')].find((a) => a.textContent.trim() === l)?.click(), label));
@@ -562,10 +588,43 @@ async function tabletFlows() {
   tab.ws.close();
 }
 
+/** Pages opened over a section (the profile, an equipment piece) must have room in the desktop layout, with Settings opened before. */
+async function desktopFlows() {
+  console.log('Desktop, 1400x900: pages opened over Réglages');
+  const tab = await openTab(1400, 900, false, false, true);
+  await tab.run(() => !!document.querySelector('.od-desktop-logbook--table'));
+  const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
+  await open('/settings/');
+  await sleep(1200);
+  for (const path of ['/profile/gear/new', '/about/libraries']) {
+    await open(path);
+    await sleep(1200);
+    const room = await tab.run((path) => {
+      const page = [...document.querySelectorAll('.view.tab-active > .page')].find((p) => p.f7Page?.route?.path === path) ?? document.body;
+      const r = page.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return { cls: page.className, width: Math.round(r.width), onTop: !!hit && page.contains(hit), back: [...page.querySelectorAll('.navbar .left a, .navbar .left button')].some((b) => b.getClientRects().length > 0) };
+    }, path);
+    checks++;
+    const problems = [];
+    if (room.width < 600) problems.push(`the page is ${room.width} px wide`);
+    if (!room.onTop) problems.push('Réglages covers the page');
+    if (!room.back) problems.push('no Back or close button');
+    if (problems.length) {
+      failures.push({ label: `${path} over Réglages (desktop)`, problems, room });
+      console.log(`  FAIL ${path} over Réglages: ${problems.join('; ')}`);
+    } else console.log(`  ok   ${path} over Réglages: ${room.width} px`);
+    await tab.run(() => { document.querySelector('.view.tab-active').f7View.router.back({ animate: false }); return 1; });
+    await sleep(600);
+  }
+  tab.ws.close();
+}
+
 try {
   if (!args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (!args.has('--tablet-only')) await welcomeFlows();
   if (!args.has('--phone-only')) await tabletFlows();
+  if (!args.has('--phone-only') && !args.has('--tablet-only')) await desktopFlows();
 } catch (e) {
   failures.push({ label: 'the run', problems: [String(e.stack ?? e)] });
   console.log(`  ERROR ${e.stack ?? e}`);

@@ -2809,8 +2809,9 @@
       "Desktop: « Other gear » on the Equipment tab shows the pieces of your inventory used by the dive, with the same icon as on the phone (the « Saucisse » has its own), « Add gear » adds them and the cross removes them from this dive. Every desktop logbook view (map, tabs, menus, windows) shares the same list: weekday, one year line that stays at the top, trip cards.",
       "Cylinders on desktop: Settings › Equipment shows « Cylinders added to new dives » (open circuit, diluent, oxygen, bailout with « Edit ») and « Cylinder types » (your types with their dive counts, a few standard types then « And N other standard types… », « Add a type », and the two switches). A type opens in the « Edit type » dialog, with « Delete this type » at the left of the footer and the same confirmation as on the phone. On the phone, the explanation and the line under « Delete this type » sit on the 16 dp margin, and « Remove this type » stays a neutral button.",
       "iPhone: the logbook has no blue band any more, with a large title, a grey search field, « + » and the account initial in the bar. The « Account » sheet follows the mock-ups (« Logbook on this iPhone », « Subscribe », « Manage account », the OpenDives+ dot, « My diver profile » with its overdue maintenance). The profile and cylinder type screens show the previous page's title on the Back button, with « + » in the bar. « Delete this type » is a red row, and the deletion is confirmed in an action sheet. « Open in Maps » opens the site in Apple Maps. « Continue with Apple » comes first, and the offer adds « Restore purchases » and the automatic renewal terms (the purchase and the sign-in with Apple are not active yet).",
-      "OpenDives+ account: “Backup and sync” opens its own page (sync status, pending changes, “Sync now”, server) instead of the offer; “My diver profile” opens the profile.",
       "First launch: the Android Back key and gesture (and, on iPhone, a swipe from the left edge) go to the previous step, like “Back”; on the first step Back sends the app to the background. A running import, download or upload is cancelled by Back, the offer’s Back is “Continue without a subscription”, and nothing created or bought is undone.",
+      "Other equipment: adding or removing a piece on a dive is for OpenDives+ subscribers. Without an account the list shows with the OpenDives+ chip, on the phone, the tablet and the desktop, and cannot be changed.",
+      "Account sheet (free version): Back from the OpenDives+ offer or from “Sign in or create an account”, opened from the sheet, shows the sheet again as it was.",
       "Backup and restore (OpenDives+): a subscriber’s account sheet lists “My diver profile”, then “Backup and restore”, with no OpenDives+ chip next to the rows. Every sync is a version of the logbook, with its number of dives and what changed since. “Restore this version” adds a new version with the old content: the current logbook stays in the list and can be restored in turn, and nothing of the history is rewritten. “Browse this version” opens it read-only. “One dive” shows the versions of a dive (also from “Versions of this dive” in its menu) and “Deleted dives” brings a deleted dive back, with no time limit. Deleted photos and videos are kept for 90 days, then erased, and “Delete the account” also erases the whole history of the logbook, deleted dives included. On a phone these are pages, on a tablet two panes, on a computer a 1,000 px dialog."
     ],
     "source": "Source code",
@@ -4536,6 +4537,7 @@
     "otherGearAdd": "Add gear",
     "otherGearFailed": "The equipment of this dive could not be saved.",
     "otherGearSoon": "Not available yet",
+    "otherGearPlusOnly": "For OpenDives+ subscribers",
     "mixNote": "O₂ {o2} % · He {he} %",
     "pressureNote": "start → end"
   },
@@ -5463,6 +5465,7 @@
       "renamed": "Computer renamed",
       "renameFailed": "The computer could not be renamed",
       "locked": "Read only: the equipment cannot change until you subscribe again.",
+      "plusOnly": "For OpenDives+ subscribers: the equipment of a dive changes with an account.",
       "kitDetail": "Kit “{name}”",
       "fillWith": "Fill with",
       "oneKit": "A kit",

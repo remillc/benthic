@@ -2809,8 +2809,9 @@
       "Ordinateur : « Autre équipement » de l’onglet Équipement montre les pièces de votre inventaire utilisées par la plongée, avec la même icône que sur téléphone (la « Saucisse » a la sienne), « Ajouter de l’équipement » les ajoute et la croix les retire de cette plongée. Toutes les vues du carnet sur ordinateur (cartes, onglets, menus, fenêtres) partagent la même liste : jour de la semaine, une ligne d’année qui reste en haut, cartes de voyage.",
       "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre.",
       "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » d’OpenDives+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs).",
-      "Compte OpenDives+ : « Sauvegarde et synchronisation » ouvre sa propre page (état de la synchronisation, modifications en attente, « Synchroniser maintenant », serveur) au lieu de l’offre ; « Mon profil de plongeur » ouvre le profil.",
       "Premier lancement : la touche et le geste Retour d’Android (et, sur iPhone, un balayage depuis le bord gauche) reviennent à l’étape précédente, comme « Retour » ; sur la première étape, Retour met l’application en arrière-plan. Un import, un téléchargement ou un envoi en cours est annulé par Retour, le retour de l’offre est « Continuer sans abonnement », et rien de ce qui a été créé ou acheté n’est défait.",
+      "Autre équipement : ajouter ou retirer une pièce sur une plongée est réservé aux abonnés OpenDives+. Sans compte, la liste s’affiche avec la pastille OpenDives+, sur téléphone, tablette et ordinateur, et ne se modifie pas.",
+      "Compte (version gratuite) : Retour depuis l’offre OpenDives+ ou « Se connecter ou créer un compte », ouverts depuis la fiche, réaffiche la fiche comme elle était.",
       "Sauvegarde et restauration (OpenDives+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille OpenDives+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px."
     ],
     "source": "Code source",
@@ -4536,6 +4537,7 @@
     "otherGearAdd": "Ajouter de l’équipement",
     "otherGearFailed": "L’équipement de la plongée n’a pas pu être enregistré.",
     "otherGearSoon": "Pas encore disponible",
+    "otherGearPlusOnly": "Réservé aux abonnés OpenDives+",
     "mixNote": "O₂ {o2} % · He {he} %",
     "pressureNote": "début → fin"
   },
@@ -5466,6 +5468,7 @@
       "renamed": "Ordinateur renommé",
       "renameFailed": "L’ordinateur n’a pas pu être renommé",
       "locked": "Lecture seule : l’équipement ne change plus tant que vous ne vous abonnez pas de nouveau.",
+      "plusOnly": "Réservé aux abonnés OpenDives+ : l’équipement d’une plongée se modifie avec un compte.",
       "kitDetail": "Kit « {name} »",
       "fillWith": "Remplir avec",
       "oneKit": "Un kit",

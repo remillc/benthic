@@ -13,12 +13,13 @@
   import DesktopSegments from './DesktopSegments.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
+  import OdPlusChip from './OdPlusChip.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
-  import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
+  import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap } from '../lib/inventory.svelte.js';
   import { diveKeyOf, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
@@ -66,6 +67,7 @@
         ]
       : [],
   );
+  const plus = $derived(isSubscriber());
   let addingGear = $state(false);
   /** @param {import('../lib/inventory.js').DiveEquipment} next */
   async function saveEquipment(next) {
@@ -403,10 +405,13 @@
       </div>
     {/if}
 
-    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}</h3>
-    {#if equipment}
+    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<OdPlusChip onLight />{/if}</h3>
+    {#if equipment && plus}
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
+    {:else if equipment}
+      <!-- Without an OpenDives+ account the list shows, with the chip, and cannot change. -->
+      <DesktopOtherGear items={otherItems} locked />
     {:else}
       <!-- Alpha edition: the list is not stored anywhere. -->
       <DesktopOtherGear />
@@ -470,6 +475,13 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
+
+    .od-desktop-dive-fields--heading :global(.od-plus-chip) {
+      margin-inline-start: 10px;
+      vertical-align: middle;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     .od-desktop-dive-fields--stack {

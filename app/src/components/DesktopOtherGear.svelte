@@ -17,12 +17,13 @@
    *   items?: { id: string, name: string, type?: import('../lib/inventory.js').GearType }[],
    *   onadd?: () => void,
    *   onremove?: (id: string) => void,
+   *   locked?: boolean,
    * }}
    */
-  let { items = [], onadd, onremove } = $props();
+  let { items = [], onadd, onremove, locked = false } = $props();
 </script>
 
-<div class="od-desktop-other-gear" role="list" aria-label={t('desktopDetail.otherGearList')}>
+<div class="od-desktop-other-gear" class:od-desktop-other-gear--locked={locked} role="list" aria-label={t('desktopDetail.otherGearList')}>
   {#each items as item (item.id)}
     <div class="od-desktop-other-gear--tile" role="listitem">
       <span class="od-desktop-other-gear--icon" aria-hidden="true"><GearIcon type={item.type ?? 'other'} name={item.name} size={18} /></span>
@@ -32,7 +33,7 @@
       {/if}
     </div>
   {/each}
-  <button type="button" class="od-desktop-other-gear--add" disabled={!onadd} title={onadd ? undefined : t('desktopDetail.otherGearSoon')} onclick={() => onadd?.()}>
+  <button type="button" class="od-desktop-other-gear--add" disabled={!onadd} title={onadd ? undefined : t(locked ? 'desktopDetail.otherGearPlusOnly' : 'desktopDetail.otherGearSoon')} onclick={() => onadd?.()}>
     <span class="od-desktop-other-gear--plus" aria-hidden="true"><Icon name="plus" size={20} /></span>{t('desktopDetail.otherGearAdd')}
   </button>
 </div>

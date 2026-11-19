@@ -26,6 +26,7 @@
   import FirstLaunchServerCreate from './FirstLaunchServerCreate.svelte';
   import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
   import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch, offerShowsSignIn, systemBack } from '../lib/first-launch-steps.js';
   import { setWelcomeBack, welcomeBack } from '../lib/first-launch-back.js';
@@ -226,8 +227,11 @@
 
   /** « Retour » on the first screen of a first launch entered from the logbook's menu: the logbook stays as it was. */
   function leave() {
+    // Opened from the account sheet: leaving shows the sheet again, as it was (its « #compte » entry comes back).
+    const toAccount = flow.returnTo === 'account';
     logbook.welcome = false;
     resetFlow();
+    if (toAccount) navigation.accountOpen = true;
   }
 
   /** « Changer de compte » of « Aucun carnet dans ce compte »: the list of services. */
