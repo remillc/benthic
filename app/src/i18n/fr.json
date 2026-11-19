@@ -5403,14 +5403,14 @@
   "gear": {
     "forever": {
       "button": "Supprimer pour de bon",
-      "title": "Supprimer pour de bon ?",
+      "title": "Supprimer pour de bon ?",
       "text": "{name} et tout son historique de révision seront effacés. Ce choix est définitif. Les plongées restent dans le carnet.",
       "confirm": "Supprimer"
     },
     "retire": {
       "button": "Retirer de l’équipement",
-      "title": "Retirer le {name} ?",
-      "titleOther": "Retirer {name} ?",
+      "title": "Retirer le {name} ?",
+      "titleOther": "Retirer {name} ?",
       "text": "Il quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés. Vous le retrouvez dans « Pièces retirées ».",
       "textOther": "Cette pièce quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés. Vous la retrouvez dans « Pièces retirées ».",
       "textShort": "Il quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés.",

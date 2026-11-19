@@ -68,7 +68,7 @@
 <style>
   @layer od.components {
     :global(.od-retire-dialog .od-retire-dialog--reason) {
-      margin-top: 16px;
+      margin: 16px 24px 0;
     }
 
     :global(.od-retire-dialog .od-retire-dialog--label) {
