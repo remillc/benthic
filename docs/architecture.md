@@ -496,7 +496,7 @@ Until the key routes are built, the single-device case works with the device's o
 
 Everything social lives in PostgreSQL + PostGIS, never in the logbook.
 
-- **Off by default.** The account works fully with nothing shared. Each kind of sharing is a separate switch, each with a sentence that says exactly what leaves the device: for example "Follow friends" (name and the dives a friend chooses to show) and "Contribute my sites to the public site base" (site name, position, water type; no dive, no date, no name).
+- **Off by default.** The account works fully with nothing shared. Each kind of sharing is a separate switch, each with a sentence that says exactly what leaves the device: for example "Follow friends" (name and the dives a friend chooses to show) and "Contribute my sites to the public site base" (site name, position, water type; no dive, no date, no name). **Exception for OpenDives+ (decided on 19 November 2026):** the shared base of dive sites has no switch, because the terms of use say so; see 11.10.
 - Sharing a site to the public base copies only the listed fields; the person's own logbook entry is not modified. Withdrawing deletes the copy.
 - A follow needs the other person's acceptance.
 - Nothing from the sensitive items (section 11.5) is ever shared.
@@ -520,6 +520,60 @@ The server code, the local development stack (containers, seed data, smoke test)
 
   Required: `kind`, `appVersion`, `edition`, `platform`, `message`. Unknown fields are ignored; texts are cut (message 2000, stack 12000, log 200 lines of 500). Answers: `200 { "ok": true, "id": "..." }`; `400 INVALID_REQUEST`; `413` over 64 KB; `429 TOO_MANY_REPORTS` with `Retry-After` (rate limit per address). The app keeps the report on `429`, `5xx` or no answer, and drops it on any other 4xx. Reports are kept 180 days. The address is the server of the build (`VITE_SERVER_URL` in development); without one nothing is kept or asked.
 - **Reading them.** A protected page of the server lists and shows the reports (development only for now). Its operation and the production needs are in the private repository.
+
+### 11.10 Shared dive sites (decided on 19 November 2026, task 315)
+
+Every OpenDives+ diver's sites feed one **shared base of dive sites**, read as the « Carte commune » of the Sites tab. This replaces the opt-in "public site base" of 11.7 for OpenDives+: the terms of use say so, there is **no opt-out**, neither global nor site by site. Only non-personal data goes to the base: **name, position, country, region, water type, depth, number of dives**. Never the notes, never the diver's name; diver names are shown nowhere, not even to the administrator. The server matches and merges duplicates by itself; a merge **never changes the divers' logbooks**.
+
+All calls are JSON with `Authorization: Bearer <sessionToken>` (11.2). Base site ids are decimal strings. Errors use the format of 11.2. The calls need an OpenDives+ account (`403 SUBSCRIPTION_REQUIRED` otherwise), except where a switch says more (below).
+
+**Who may read the map** is not decided (task 101). The server has one switch: `subscribers` (default: OpenDives+ only), `signed-in` (free accounts read) or `public` (no account; the website). Reading calls therefore answer `403 SUBSCRIPTION_REQUIRED` for a free account today; the app shows its OpenDives+ offer on that code and does not hard-code who may read. Contributing and the terms are OpenDives+ only whatever the switch says.
+
+**Terms of use.** Accepted once per account and version, before the first contribution.
+
+- `GET /v1/sites/terms` returns `{ "currentVersion": "2026-11-19", "accepted": false, "acceptedVersion": null, "acceptedAt": null }`. Any signed-in account may read it. `accepted` is true only for the **current** version: when the server raises the version, the app shows the terms screen again.
+- `POST /v1/sites/terms/accept` with `{ "version": "2026-11-19" }` (the `currentVersion` the app showed) returns the same object with the date. `409 TERMS_VERSION_MISMATCH` when the version is not the current one (reread the status); `403 SUBSCRIPTION_REQUIRED` for a free account. Accepting again keeps the first date.
+
+**Contributing.** `PUT /v1/sites/contribution` with the diver's **whole** list of sites, each time (a site missing from the list leaves the base):
+
+```json
+{ "sites": [
+  { "id": "<the site's id in the logbook, any text up to 80>", "name": "Poor Knights", "lat": -35.46, "lon": 174.74,
+    "country": "Nouvelle-Zélande", "region": "Northland", "waterType": "salt",
+    "depthMm": 30000, "diveCount": 6, "recentDives": 2, "baseSiteId": "123" } ] }
+```
+
+Required: `id`, `name`, `lat`, `lon`, `diveCount` (>= 1, the number of the diver's dives on this site). Optional: `country`, `region`, `waterType` (`fresh`, `salt`, `brackish`), `depthMm` (the depth the diver usually notes there, in mm), `recentDives` (dives of the last 12 months, counted by the app at each sync), `baseSiteId` (set when the diver added the site from the base: the server joins it to that site without matching). Any other field is ignored, so the app must not put a note or a name in it. Texts are cut (name 120, country and region 80).
+
+Answer `200`: `{ "ok": true, "sites": [{ "id": "<local id>", "baseSiteId": "123" }], "removed": 0, "skipped": [{ "id": "...", "reason": "no-dives" | "no-position" | "no-name" | "invalid" }], "total": 4 }`. `sites` gives the base site of every kept site: the app stores it with the site (in the logbook's extra data, `opendives` branch) to mark « Dans vos sites » and to open its card; ids can change when the server merges two sites (below). A site with no dive, no position or at 0/0 is skipped, not an error. Errors: `403 TERMS_REQUIRED` (the current terms are not accepted: show the terms), `400 INVALID_REQUEST`, `413` (over 2 MB or 5000 sites), `429 TOO_MANY_REQUESTS` with `Retry-After` (20 per hour and account). Send it after the terms are accepted, then after each sync that changed sites or dives.
+
+**Reading the base.**
+
+- `GET /v1/sites/base?bbox=west,south,east,north&zoom=Z&limit=N` (`zoom` 0 to 22, default 10; `limit` 1 to 500, default 200; `west` greater than `east` crosses the antimeridian) returns `{ "mode": "sites" | "clusters", "total": 214, "zoom": 10, "sites": [Site], "clusters": [{ "lat": 0, "lon": 0, "count": 12 }] }`. In `sites` mode (zoom 13 and above, or few sites in the box) `clusters` is empty and `sites` has them all. In `clusters` mode the server has grouped the crowded cells into `clusters` (numbered teal markers; zoom in on tap) and returns the lone sites of the other cells in `sites`. Ask again when the map stops moving.
+- `GET /v1/sites/base/nearby?lat=&lon=&radiusM=&limit=&q=` (`radiusM` 1 to 50000, default 5000; `limit` 1 to 100, default 30; `q` filters by name) returns `{ "sites": [Site + "distanceM"] }`, nearest first: the list under the map, « Choisir un site » and the suggestion « La carte commune a déjà un site à 160 pi » when the diver creates a site (call it with the new site's position and a small radius, for example 300).
+- `GET /v1/sites/base/{id}` returns the card:
+
+  ```json
+  { "id": "123", "name": "Poor Knights", "lat": -35.46, "lon": 174.74, "country": "Nouvelle-Zélande", "region": "Northland",
+    "waterType": "salt", "closed": false, "dives": 214, "fewDives": false,
+    "carnets": { "waterType": "salt", "depthMm": 30000, "depthRangeMm": [18000, 40000], "divesLast12Months": 38, "fewDivesLast12Months": false } }
+  ```
+
+  `carnets` is « Ce que disent les carnets ». A **Site** (in lists) is the same without `carnets`. Under 5 dives the server sends `dives: null` and `fewDives: true`: the app writes « Moins de 5 plongées », and likewise for `divesLast12Months` / `fewDivesLast12Months`. The number of logbooks is never sent. A site merged into another answers **the other site** with `redirectedFrom` set to the id asked: the app replaces the id it stored. `404 SITE_GONE` when the site left the base. `closed: true` is a site reported and marked closed or forbidden.
+- `POST /v1/sites/base/{id}/link` (empty body) returns `{ "baseSiteId": "123", "site": { "name", "lat", "lon", "country", "region", "waterType" } }`: what « Ajouter à mes sites » copies into the diver's logbook, with the current id (after merges) to keep as `baseSiteId` of that site. The copy is the diver's own: the base never changes it.
+
+Reading is limited to 240 calls a minute and account (`429 TOO_MANY_REQUESTS`).
+
+**Reporting.** `POST /v1/sites/base/{id}/report` with
+
+```json
+{ "reason": "wrong_position" | "duplicate" | "wrong_name_or_country" | "closed_or_forbidden" | "other",
+  "details": "free text, up to 500, optional", "position": { "lat": -35.4586, "lon": 174.7421 }, "otherSiteId": "456" }
+```
+
+returns `{ "ok": true, "id": "..." }`. For « Mauvaise position » the app sends the diver's own position of that site as `position` (the administrator moves the site to the mean of the reports); for « Doublon d'un autre site » `otherSiteId` when the diver names one. Reports are anonymous to the administrator. One open report per account, site and reason (a second one replaces the first); `400 INVALID_REQUEST`, `429 TOO_MANY_REPORTS` (20 a day). A report needs a session even when the map is `public`.
+
+**What the app never does.** It never sends a note, a diver's name or a dive date in these calls; it never writes to the base other than through `PUT /v1/sites/contribution`; it does not merge or edit base sites (the administrator does, on the server side: undecidable pairs, reports, positions).
 
 ## 12. Dive computer images (decided on 19 November 2026)
 
