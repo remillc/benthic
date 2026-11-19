@@ -99,9 +99,6 @@ export function attachSwipeBack(f7, router) {
     const split = router.params?.masterDetailBreakpoint > 0 && f7.width >= router.params.masterDetailBreakpoint;
     const pages = swipeBackPages({ target, viewEl: /** @type {HTMLElement} */ (viewEl), busy: isBusy(router) || releasing, split, swipeoutOpen: !!f7.swipeout?.el });
     if (!pages || f7.preventSwipeBack) return null;
-    // As Framework7 did: a sheet without a scrim (a picker) closes when the page under it starts to leave.
-    const sheet = document.querySelector('.sheet-modal.modal-in');
-    if (sheet && f7.sheet) f7.sheet.close(/** @type {HTMLElement} */ (sheet));
     let shadow = null;
     let shade = null;
     if (ios) {

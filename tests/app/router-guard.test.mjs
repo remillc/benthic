@@ -146,7 +146,7 @@ test('a router closed while its page animation runs is left alone', () => {
 });
 
 /** A router with Framework7's `animate`, whose end the test decides. */
-function animated() {
+function animated(frame) {
   const events = [];
   const listeners = new Map();
   const page = (name) => ({
@@ -177,7 +177,7 @@ function animated() {
     },
   };
   const timers = [];
-  guardRouter(router, { setTimeout: (fn, ms) => timers.push([fn, ms]), clearTimeout: () => {}, now: () => 0 });
+  guardRouter(router, { setTimeout: (fn, ms) => timers.push([fn, ms]), clearTimeout: () => {}, now: () => 0, ...(frame ? { frame } : {}) });
   return { router, timers, events, classes, oldPage, newPage, listeners };
 }
 
@@ -232,4 +232,18 @@ test('a page under the current one leaves the history, its props and the documen
   assert.deepEqual(removed, [page]);
   assert.equal(dropPreviousPage({ history: ['/'] }, page), false);
   assert.equal(dropPreviousPage(router, { isConnected: false }), false);
+});
+
+test('the watchdog of a page animation starts counting at the first frames, not while nothing is drawn', () => {
+  const frames = [];
+  const { router, timers, oldPage, newPage } = animated((fn) => frames.push(fn));
+  let ended = 0;
+  router.animate([oldPage], [newPage], 'forward', undefined, () => ended++);
+  assert.equal(timers.length, 0, 'no frame yet (a slow first frame, an app in the background): no limit runs');
+  frames.shift()();
+  assert.equal(timers.length, 0);
+  frames.shift()();
+  assert.equal(timers.length, 1);
+  timers[0][0]();
+  assert.equal(ended, 1);
 });

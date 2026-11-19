@@ -109,6 +109,11 @@ export function horizontalSwipe(target, { accept, move, end, cancel }) {
     touched = null;
   }
 
+  // The browser decides when a touch starts whether its moves can be held back (preventDefault): only where a
+  // listener that may do so already exists. The real listener is put on the touched element once the touch has
+  // started, too late for that decision: this one, on the container, makes the decision for it.
+  target.addEventListener('touchmove', () => {}, { passive: false });
+
   target.addEventListener(
     'touchstart',
     (event) => {

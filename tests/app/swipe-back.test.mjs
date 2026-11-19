@@ -131,8 +131,12 @@ test('a sideways swipe is followed to its end; the moves and the end are heard o
   assert.equal(s.prevented(), 2);
   // Nothing is left listening on the element.
   assert.deepEqual([s.touched.listeners.touchmove.length, s.touched.listeners.touchend.length, s.touched.listeners.touchcancel.length], [0, 0, 0]);
-  // The container only hears the start: an element that left the document still ends its swipe.
-  assert.deepEqual(Object.keys(s.container.listeners), ['touchstart']);
+  // The container hears the start; its move listener does nothing (it only tells the browser that moves may be held
+  // back there). The end is never listened to on the container: an element that left the document still ends its swipe.
+  assert.deepEqual(Object.keys(s.container.listeners).sort(), ['touchmove', 'touchstart']);
+  const before = s.calls.length;
+  s.container.fire('touchmove', { touches: [{ clientX: 300, clientY: 100 }], timeStamp: 999, cancelable: true, preventDefault() {} });
+  assert.equal(s.calls.length, before);
 });
 
 test('the system takes the touch: `cancel` is called, not `end`', () => {

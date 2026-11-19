@@ -24,8 +24,8 @@ import { trace, pathOf } from './nav-trace.js';
 const MAX_WAIT = 3000;
 /** How often a waiting navigation looks again (ms). */
 const POLL = 40;
-/** Added to the length of a page animation before it is ended by hand (ms). */
-const ANIMATION_MARGIN = 500;
+/** Added to the length of a page animation before it is ended by hand (ms), counted from the first frames drawn. */
+const ANIMATION_MARGIN = 700;
 /** A router that has refused page changes for this long, with no page animation running, is reopened (ms). A page loaded on demand waits at most 3 s for its style sheets. */
 export const BUSY_LIMIT = 5000;
 /** A hold is released by itself after this long (ms): a touch whose end never came must not close the view for ever. */
@@ -97,7 +97,7 @@ function animationMs(els) {
 
 /**
  * @param {GuardedRouter} router
- * @param {{ setTimeout?: typeof setTimeout, clearTimeout?: typeof clearTimeout, now?: () => number }} [clock] for the tests
+ * @param {{ setTimeout?: typeof setTimeout, clearTimeout?: typeof clearTimeout, now?: () => number, frame?: (fn: () => void) => void }} [clock] for the tests
  * @returns {GuardedRouter} the same router
  */
 export function guardRouter(router, clock = {}) {
@@ -105,6 +105,8 @@ export function guardRouter(router, clock = {}) {
   const wait = clock.setTimeout ?? setTimeout;
   const unwait = clock.clearTimeout ?? clearTimeout;
   const now = clock.now ?? Date.now;
+  /** After the next frame is drawn (at once where there are no frames: the tests). */
+  const frame = clock.frame ?? (typeof requestAnimationFrame === 'function' ? (/** @type {() => void} */ fn) => void requestAnimationFrame(fn) : (/** @type {() => void} */ fn) => fn());
   const raw = { back: router.back.bind(router), navigate: router.navigate.bind(router) };
   router.odRaw = raw;
   /** The address waiting to run (the latest one only: a tap sequence ends on the last tap). @type {{ args: any[], url: string, from: string }|null} */
@@ -194,7 +196,7 @@ export function guardRouter(router, clock = {}) {
   };
 
   // A page animation that does not end: Framework7 waits for the `animationend` of one page, which never comes when
-  // the animation does not run (a hidden page, a style that removes it). The watchdog ends it in its place.
+  // the animation does not run (a page that is not drawn, a style that removes it). The watchdog ends it in its place.
   const rawAnimate = router.animate?.bind(router);
   if (rawAnimate) {
     router.animate = function (/** @type {any} */ $old, /** @type {any} */ $new, /** @type {string} */ direction, /** @type {any} */ transition, /** @type {Function|undefined} */ callback) {
@@ -213,7 +215,8 @@ export function guardRouter(router, clock = {}) {
       trace('anim', `${nameOf(router)} ${direction}`);
       rawAnimate($old, $new, direction, transition, finish);
       const pages = [$old?.[0], $new?.[0]];
-      timer = wait(() => {
+      const limit = Math.max(animationMs(pages), 300) + ANIMATION_MARGIN;
+      const force = () => {
         if (done) return;
         trace('anim-forced', `${nameOf(router)} ${direction}`);
         // Framework7's own listener ends the change when the page it waits on says its animation is over.
@@ -223,7 +226,10 @@ export function guardRouter(router, clock = {}) {
           router.el?.classList.remove(...classes);
           finish();
         }
-      }, Math.max(animationMs(pages), 300) + ANIMATION_MARGIN);
+      };
+      // The time runs from the first frames of the animation, not from now: a page that takes long to draw its first
+      // frame (or an app in the background, where no frame is drawn) must not have its animation cut short.
+      frame(() => frame(() => !done && (timer = wait(force, limit))));
     };
   }
   return router;
