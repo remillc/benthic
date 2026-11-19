@@ -6364,3 +6364,16 @@ Christian approved this on 19 November 2026 (#59, closed). Work in `main`.
 **Test:** the launcher shows « Benthic Log »; a notification shows « Benthic Log »; About shows « Benthic »; the Benthic+ offer and account screens say Benthic+; no « OpenDives » left in the UI in French and English (grep the i18n files and the built app).
 
 **Done (19 November 2026):** texts, names under the icon, both link hosts, server e-mails and console, and the project files whose names carried the old brand (commit 733c63ec). Leftovers that would break installed apps, data or sign-in are listed with their risk in `docs/rename-leftovers.md`, for Christian to decide.
+
+## [ ] 2026-11-19-317 Wordmark: « Benthic » in Outfit, with « DIVE LOG » under it
+
+Christian approved this on 19 November 2026. Work in `main`. Rules in `docs/system-design.md`, paragraph « Wordmark font » (just after « Fonts »).
+
+- Bundle `docs/brand/fonts/outfit-latin-variable.woff2` with the app (with `OFL-Outfit.txt` in the licences screen, « À propos › Bibliothèques »), registered as font family `Outfit`, weights 100 to 900. Use it for the wordmark only.
+- Every place where the name sits next to the logo on the blue header band (first launch and its steps, Benthic+ offer, sign-in, ready, health screens, on phone, iPhone, tablet and desktop): « Benthic » in Outfit 600, white. On the main screens add « DIVE LOG » under it, Source Sans 3 600, caps, letter-spacing as in the system design, #D6EAFF; the logo stays vertically centred on the two lines. Sizes: phone 30/32 + 11/14, compact phone band 26/28 + 10/13, tablet and desktop 52/54 + 15/18; following steps: name alone, 22/26.
+- The text must scale with the system text size like the rest, and screen readers read it as one label « Benthic Dive Log » (the « DIVE LOG » line is not read twice).
+- Not in scope: the title bar text of the desktop window, the launcher label, the side-menu and account sheet.
+
+**Mock-ups:** the design canvases are the reference (phone `android-premier-lancement-production`, `android-odplus-offre`, tablet `android-tablette-premier-lancement-production-paysage`, desktop `bureau-premier-lancement-production`). Update the matching files in `docs/mockups/` the same way, with `@font-face` pointing to `../brand/fonts/outfit-latin-variable.woff2`.
+
+**Test:** first launch on each platform shows « Benthic » in Outfit with « DIVE LOG » under it; a larger system font scales both lines without overlap; TalkBack and VoiceOver read « Benthic Dive Log » once.
