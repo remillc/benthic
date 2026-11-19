@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Importer un CSV, aperçu, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/1ec8b3890a436b9c9428e71205fcad03) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/2f9b7ca7505604e0f969218db9cf0733) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/291d32fbde106f2eee5d95dcde50f8d8) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fdee8e76efc2394eb2f1340de9b1596) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/a45df9a7276bc208cca25dcf11a4eabe) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fca0b76bd4cf1e04073a1ce5b5e149d8) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 844px; box-sizing: border-box; background: #F5F4F0; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124; display: flex; flex-direction: column"><div aria-hidden="true" style="height: 24px; padding: 0 16px; display: flex; align-items: center; font-size: 13px; font-weight: 500">10 h 30</div><div style="height: 64px; padding: 0 4px; display: flex; align-items: center; gap: 4px"><a href="#" aria-label="Fermer" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" style="fill: none; stroke: #1F2124; stroke-width: 2; stroke-linecap: round"></path></svg></a><span style="display: flex; flex-direction: column"><span style="font-size: 12px; line-height: 16px; color: #4B4A47">Importer un fichier CSV · étape 3 sur 3</span><h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 400">Aperçu</h1></span></div><div style="flex: 1; padding: 8px 16px 16px"><div style="margin-top: 0px; border-radius: 16px; background: #FFFFFF; overflow: hidden"><div style="padding: 12px 16px"><div style="font-size: 16px; line-height: 24px; font-weight: 600">plongees-2024.csv</div><div style="font-size: 14px; line-height: 20px; color: #4B4A47">1 plongée · 41 min · 18,3 m au plus profond</div></div></div><p style="margin: 16px 4px 8px; font-size: 14px; line-height: 20px; color: #4B4A47">Vérifiez la plongée lue avant de l’ajouter au carnet.</p><div style="margin-top: 0px; border-radius: 16px; background: #FFFFFF; overflow: hidden"><div style="padding: 12px 16px; display: flex; align-items: center; gap: 12px"><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 16px; line-height: 24px; font-weight: 600">Nouvelle plongée</span><span style="font-size: 14px; line-height: 20px; color: #4B4A47">12 mars 2024, 9 h 40 · Site à préciser</span></span><span style="display: flex; flex-direction: column; align-items: flex-end; font-size: 14px"><b>41 min</b><span style="color: #4B4A47">18,3 m</span></span></div><svg viewBox="0 0 300 90" width="100%" height="110" aria-hidden="true" style="display: block"><path d="M0 4 L20 30 L45 70 L90 82 L150 78 L200 60 L240 40 L270 20 L300 6" style="fill: none; stroke: #1F5C99; stroke-width: 2"></path></svg></div><p style="margin: 12px 4px 0; font-size: 14px; line-height: 20px; color: #4B4A47">Le site, l’équipement et les gaz se complètent ensuite dans Modifier.</p></div><div style="padding: 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E1DC"><a href="android-import-csv-colonnes.dc.html" style="height: 40px; padding: 0 12px; display: flex; align-items: center; color: #1F5C99; font-size: 14px; font-weight: 600; text-decoration: none">Retour</a><a href="#" style="height: 40px; padding: 0 24px; border-radius: 20px; background: #114477; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 600; text-decoration: none">Ajouter au carnet</a></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>
