@@ -6113,3 +6113,13 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **What to do:** compare the real header with the mock-up and fix every difference: band height (264 dp), gradient, bubbles and wave at the bottom, logo and name position, chip, spacing, and the texts. One change is new in the mock-up: the title « Votre carnet, partout et en sécurité » is now 24 dp with a 32 dp line height (it was 28 / 36), weight 500, white. Do the same on iPhone. Check that the title wraps on two lines at 390 dp without touching the subtitle.
 
 **Test:** open the offer on a 390 dp wide phone (Android and iPhone) and compare the header with the mock-up side by side.
+
+## [ ] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mockups/`: `android-odplus-offre` (and `ios-odplus-offre`, same link).
+
+**Problem:** on the real offer screen the link « Voir tout ce qui est inclus ›» looks off center. In `FirstLaunchOdPlus.svelte`, `.od-plus--see-all` has `padding: 0 8px 0 16px`, so the text and the arrow sit to the right of the middle of the screen.
+
+**What to do:** match the mock-up. Link centered in the column (`align-self: center`), 48 dp high, symmetric padding `0 16px`, 4 dp gap between the text and the arrow, 17 dp text, weight 600, colour `#1F5C99`, 22 dp arrow. The pill hover/press area is 48 dp high and as wide as the link. Do the same on iPhone and on the tablet offer if it uses the same link. While there, check that the other buttons and texts of this screen are centered the way the mock-up shows.
+
+**Test:** open the offer on a phone and measure: the space left of the link equals the space right of it.
