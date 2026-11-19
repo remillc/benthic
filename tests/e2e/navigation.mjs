@@ -483,6 +483,32 @@ async function phoneFlows() {
   await tapBack(tab);
   await settled(tab, 'back after the sheet', { route: '/' });
 
+  console.log(' free account sheet > OpenDives+ offer > Back reopens the sheet');
+  const sheetState = () => tab.run(() => ({ hash: location.hash, sheet: !!document.querySelector('.od-account-sheet.modal-in, .sheet-modal.modal-in .od-account-sheet--row, .modal-in .od-account-sheet--row'), welcome: !!document.querySelector('.od-welcome.modal-in'), len: history.length }));
+  const expectState = (label, want, got) => {
+    checks++;
+    const bad = Object.entries(want).filter(([k, v]) => got[k] !== v).map(([k, v]) => `${k} is ${got[k]}, expected ${v}`);
+    if (bad.length) {
+      failures.push({ label, problems: bad, got });
+      console.log(`  FAIL ${label}: ${bad.join('; ')}`);
+    } else console.log(`  ok   ${label}`);
+  };
+  for (const row of ['#offer-sync', '#offer-profile']) {
+    await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
+    await sleep(800);
+    expectState(`${row}: the sheet is open with #compte`, { hash: '#compte', sheet: true }, await sheetState());
+    await tab.run((r) => document.querySelector(`a[href="${r}"]`)?.click(), row);
+    await sleep(1000);
+    expectState(`${row}: the offer is open`, { welcome: true, sheet: false }, await sheetState());
+    await hardwareBack(tab);
+    await sleep(900);
+    expectState(`${row}: Back from the offer reopens the sheet`, { welcome: false, sheet: true, hash: '#compte' }, await sheetState());
+    await hardwareBack(tab);
+    await sleep(900);
+    expectState(`${row}: a second Back closes the sheet`, { welcome: false, sheet: false, hash: '' }, await sheetState());
+    await settled(tab, `${row}: logbook after the sheet`, { route: '/' });
+  }
+
   console.log(' sections: sites, statistics, tools, settings');
   for (const [label, pattern] of [['Sites', '^\\s*Sites\\s*$'], ['Statistiques', '^\\s*Statistiques\\s*$'], ['Outils', '^\\s*Outils\\s*$']]) {
     await tapText(tab, pattern, '.toolbar, .od-bottom-nav, .tabbar').catch(() => tab.run((l) => [...document.querySelectorAll('.toolbar a, .tabbar a')].find((a) => a.textContent.trim() === l)?.click(), label));

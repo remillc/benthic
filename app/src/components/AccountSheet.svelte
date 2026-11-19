@@ -65,7 +65,7 @@
   /** The free sheet's doors into the OpenDives+ screens. @param {'offer'|'signIn'} screen */
   function plus(screen) {
     navigation.accountOpen = false;
-    openOdPlus(screen);
+    openOdPlus(screen, 'account');
   }
 
   /** Manual sync with an account: the changes waiting, a filled « Synchroniser », and its other options under ⋮. */

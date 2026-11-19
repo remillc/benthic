@@ -2603,7 +2603,8 @@
       "iPhone: the logbook has no blue band any more, with a large title, a grey search field, « + » and the account initial in the bar. The « Account » sheet follows the mock-ups (« Logbook on this iPhone », « Subscribe », « Manage account », the OpenDives+ dot, « My diver profile » with its overdue maintenance). The profile and cylinder type screens show the previous page's title on the Back button, with « + » in the bar. « Delete this type » is a red row, and the deletion is confirmed in an action sheet. « Open in Maps » opens the site in Apple Maps. « Continue with Apple » comes first, and the offer adds « Restore purchases » and the automatic renewal terms (the purchase and the sign-in with Apple are not active yet).",
       "OpenDives+ account: “Backup and sync” opens its own page (sync status, pending changes, “Sync now”, server) instead of the offer; “My diver profile” opens the profile.",
       "First launch: the Android Back key and gesture (and, on iPhone, a swipe from the left edge) go to the previous step, like “Back”; on the first step Back sends the app to the background. A running import, download or upload is cancelled by Back, the offer’s Back is “Continue without a subscription”, and nothing created or bought is undone.",
-      "Other equipment: adding or removing a piece on a dive is for OpenDives+ subscribers. Without an account the list shows with the OpenDives+ chip, on the phone, the tablet and the desktop, and cannot be changed."
+      "Other equipment: adding or removing a piece on a dive is for OpenDives+ subscribers. Without an account the list shows with the OpenDives+ chip, on the phone, the tablet and the desktop, and cannot be changed.",
+      "Account sheet (free version): Back from the OpenDives+ offer or from “Sign in or create an account”, opened from the sheet, shows the sheet again as it was."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
