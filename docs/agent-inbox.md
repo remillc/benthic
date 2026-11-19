@@ -5964,3 +5964,14 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - The old desktop « Compte · bureau » sheet is replaced by the mock-ups above; do not implement it.
 
 **Test:** open the demo logbook, add a dive and leave it. Import a CSV file through the three steps. Open an empty logbook on a phone and a tablet. On the desktop with a git repository, open the account sheet and compare with the mock-up.
+
+## [ ] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
+
+Christian approved this on 19 November 2026. Work in `main`. The sample logbook interface that was built differs from the mock-up. Redo it to match the mock-ups in `docs/mockups/` (task 298 has the context): `android-demo`, `android-demo-ajout`, `android-demo-quitter`. The tablet follows `android-tablette-demo-paysage` and `-portrait`.
+
+- **The banner is at the bottom**, in a rounded card just above the bottom navigation bar, not at the top of the screen. Flask icon on the left. Text: « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » with « Carnet d’exemple. » in bold. Button « Commencer » on the right. The header, the list and the navigation bar stay as in the normal logbook.
+- **Adding a dive** (tap « + », import, download): dialog « Vous êtes dans le carnet d’exemple ». Text: « Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé. » Buttons « Annuler » and « Commencer mon carnet ».
+- **« Commencer »** (banner): dialog « Commencer mon carnet ? ». Text: « Le carnet d’exemple sera effacé de ce téléphone. Vous choisirez ensuite de créer ou d’importer votre carnet. » Buttons « Annuler » and « Commencer mon carnet ».
+- The sample logbook is never synchronised and never mixed with the diver’s own logbook (todo #69).
+
+**Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
