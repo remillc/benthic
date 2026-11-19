@@ -3126,7 +3126,9 @@
       "Modifier la plongée : les listes de suggestions des champs Guide de palanquée, Compagnons et Étiquettes (et de la combinaison) s’ouvrent maintenant au-dessus des cartes suivantes, dans l’écran, et au-dessus du champ quand il n’y a pas de place en dessous.",
       "Carnet : sur Android, la barre d’actions flottante d’une sélection se place au-dessus de la barre de navigation du bas (et de la bannière du carnet d’exemple) au lieu de passer dessous.",
       "Validation d’une plongée (OpenDives+) : « Faire valider la plongée » dans le menu de la plongée, et « Faire valider les plongées » dans le menu de la sélection (une validation pour plusieurs plongées). Le compagnon ou le moniteur signe au doigt sur l’écran, ou scanne un code QR avec OpenDives+ (le code expire après 10 minutes ; sans réseau, la plongée affiche « Validation en attente » jusqu’à l’arrivée de la confirmation). Le détail de la plongée a une section « Validations » (nom, rôle, méthode, date, signature) et indique « Modifiée après la validation » quand la plongée a changé ; une plongée validée porte une petite coche dans le carnet. Les validations figurent sur la fiche PDF et dans l’export PDF du carnet, et se retirent une à une.",
-      "Navigation : un balayage depuis le bord de l’écran (le geste Retour d’Android) ne laisse plus la page à moitié déplacée, avec un Retour et des liens sans effet ; le Retour qui suit revient d’un écran. Deux Retours depuis un écran ouvert en profondeur dans le Carnet (Réglages › Types de bouteilles › nouveau type ; une plongée › son planificateur › les plans › un nouveau plan) ne laissent plus un écran vide où Retour ne répond plus. Un écran resté dans un mauvais état est remis en place et un rapport d’erreur est proposé. La touche Échap ferme la feuille, la fenêtre ou le menu ouvert. « Question / signaler un problème » joint au message les derniers écrans parcourus."
+      "Navigation : un balayage depuis le bord de l’écran (le geste Retour d’Android) ne laisse plus la page à moitié déplacée, avec un Retour et des liens sans effet ; le Retour qui suit revient d’un écran. Deux Retours depuis un écran ouvert en profondeur dans le Carnet (Réglages › Types de bouteilles › nouveau type ; une plongée › son planificateur › les plans › un nouveau plan) ne laissent plus un écran vide où Retour ne répond plus. Un écran resté dans un mauvais état est remis en place et un rapport d’erreur est proposé. La touche Échap ferme la feuille, la fenêtre ou le menu ouvert. « Question / signaler un problème » joint au message les derniers écrans parcourus.",
+      "Mon profil de plongeur : un champ « Nom complet » (facultatif), en premier dans « Vous » des Informations et de leur édition. Il s’affiche en haut de « Mon profil de plongeur » (sans lui, le courriel) et, avec un compte OpenDives+, sur la première ligne de la feuille du compte, le courriel dessous en plus petit gris. Quand vous confirmez la plongée d’un autre plongeur, le champ « Votre nom » vient du profil (une correction vaut pour cette confirmation seulement), la phrase dessous donne votre rôle et le numéro de votre brevet de moniteur, et « Je confirme » reste grisé tant que le nom est vide ; si le profil n’a pas de nom, celui que vous tapez y est enregistré. Le nom s’ajoute en haut des fiches PDF d’une plongée et du carnet (interrupteur « Mon nom dans l’en-tête » à l’export en PDF ; « Anonymiser » le retire aussi).",
+      "« Nouvelle pièce » : sur téléphone, « Type de pièce » est un champ qui ouvre un menu des 16 types (icône, nom, coche sur le type choisi ; liste du système sur iPhone) ; la grille de tuiles reste sur tablette et ordinateur. Sous le champ, la photo du modèle en grand avec « Changer d’image » (le dessin du type sans photo du modèle ; « Ajouter une photo » et la petite vignette à côté de « Modèle » disparaissent). Cinq icônes redessinées partout dans l’équipement : ceinture de lest, scooter, couteau, palmes et lampe."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3958,6 +3960,8 @@
     },
     "anonymize": "Anonymiser",
     "anonymizeText": "Retire les noms des personnes, les notes et les positions GPS",
+    "showName": "Mon nom dans l’en-tête",
+    "showNameText": "PDF : « {name} » en haut de chaque page",
     "action": "Exporter",
     "failed": "L’export n’a pas pu être fait."
   },
@@ -6334,6 +6338,9 @@
       "edit": "Modifier les informations",
       "you": "Vous",
       "dob": "Date de naissance",
+      "fullName": "Nom complet",
+      "fullNameLabel": "Nom complet (facultatif)",
+      "fullNameHint": "Sur votre fiche d’urgence, vos PDF et quand vous confirmez la plongée d’un autre plongeur.",
       "emergency": "Contact d’urgence",
       "nameRelation": "Nom et lien",
       "phone": "Téléphone",
@@ -6462,6 +6469,11 @@
     "sign": "Valider",
     "name": "Nom",
     "nameRequired": "Entrez le nom du signataire.",
+    "yourName": "Votre nom",
+    "yourNameHint": "Tiré de votre profil. Une correction ici vaut pour cette confirmation seulement.",
+    "confirmAsInstructor": "Vous confirmez comme moniteur {number}, d’après votre brevet de moniteur.",
+    "confirmAsBuddy": "Vous confirmez comme compagnon de plongée.",
+    "savedToProfile": "Enregistré dans votre profil",
     "role": "Rôle",
     "roles": {
       "buddy": "Compagnon",

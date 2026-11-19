@@ -28,6 +28,7 @@
    *   noResultsLabel?: string,
    *   onnew?: (query: string) => void,
    *   outlined?: boolean,
+   *   icon?: import('svelte').Snippet<[string]>,
    * }}
    * ariaLabel: the accessible name when the label alone is not enough (the
    * full label and the unit).
@@ -36,6 +37,8 @@
    * the sites). newLabel: a last choice, "New site…", that calls onnew with
    * what was searched. outlined: the outlined field of the alpha first launch (52 dp, 12 dp corners, the label
    * on the border), as AccountField's.
+   * icon: a drawing before each option, in the field and in the menu (the chosen option gets a check), as the type of a
+   * piece of equipment (task 2026-11-19-310); the iPhone's system list shows the drawing in the field only.
    */
   let {
     label,
@@ -52,6 +55,7 @@
     noResultsLabel = '',
     onnew,
     outlined = false,
+    icon,
   } = $props();
 
   /** With `clearLabel` and a value: a ✕ sets the field back to the empty choice. */
@@ -223,7 +227,8 @@
   <div class="od-select-field--box" bind:this={box}>
     {#if ios}
       <label class="od-select-field--label" for={id}>{label}</label>
-      <select {id} {disabled} aria-label={ariaLabel} aria-invalid={invalid} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
+      {#if icon}<span class="od-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
+      <select {id} {disabled} class:od-select-field--with-icon={!!icon} aria-label={ariaLabel} aria-invalid={invalid} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
         {#each all as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
       </select>
     {:else}
@@ -233,6 +238,7 @@
         bind:this={trigger}
         class="od-select-field--trigger"
         class:od-select-field--clearable={clearLabel && value}
+        class:od-select-field--with-icon={!!icon}
         {disabled}
         role="combobox"
         aria-haspopup="listbox"
@@ -245,6 +251,7 @@
         <span class="od-select-field--label">{label}</span>
         <span class="od-select-field--value">{shownLabel}</span>
       </button>
+      {#if icon}<span class="od-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
     {/if}
     {#if clearLabel && value}
       <button type="button" class="od-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
@@ -292,7 +299,7 @@
               class:od-select-field--active={i === active}
               onmousedown={(e) => e.preventDefault()}
               onclick={() => pick(option.value)}
-            >{option.label}</li>
+            >{#if icon}<span class="od-select-field--option-icon" aria-hidden="true">{@render icon(option.value)}</span><span class="od-select-field--option-text">{option.label}</span>{#if option.value === value}<span class="od-select-field--check" aria-hidden="true"><Icon name="check" size={20} /></span>{/if}{:else}{option.label}{/if}</li>
           {/each}
           {#if searchLabel && shown.length === 0 && noResultsLabel}<li class="od-select-field--none" role="presentation">{noResultsLabel}</li>{/if}
           {#if newLabel}
@@ -406,6 +413,41 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    /* The drawing of the chosen option, before its name (task 2026-11-19-310). */
+    .od-select-field--lead {
+      position: absolute;
+      left: 16px;
+      bottom: 6px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      color: var(--od-text-2);
+      pointer-events: none;
+    }
+
+    .od-select-field--trigger.od-select-field--with-icon,
+    select.od-select-field--with-icon {
+      padding-left: 52px;
+    }
+
+    .od-select-field--option-icon {
+      flex: none;
+      margin-right: 16px;
+      display: flex;
+      color: var(--od-text-2);
+    }
+
+    .od-select-field--option-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .od-select-field--check {
+      flex: none;
+      display: flex;
+      color: var(--od-text);
     }
 
     select {

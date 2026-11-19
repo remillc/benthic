@@ -65,6 +65,13 @@
 
   <h2 class="od-profile-info--section">{t('diverProfile.info.you')}</h2>
   <div class="od-profile-info--card">
+    <div class="od-profile-info--row od-profile-info--row-icon">
+      <span class="od-profile-info--tile" aria-hidden="true"><Icon name="account" size={22} weight={1.8} /></span>
+      <span class="od-profile-info--texts">
+        <span class="od-profile-info--label">{t('diverProfile.info.fullName')}</span>
+        <span class="od-profile-info--value" class:od-profile-info--empty={!info.fullName}>{info.fullName || t('diverProfile.info.empty')}</span>
+      </span>
+    </div>
     <div class="od-profile-info--row">
       <span class="od-profile-info--label">{t('diverProfile.info.dob')}</span>
       <span class="od-profile-info--value" class:od-profile-info--empty={!info.dateOfBirth}>{formatLongDate(info.dateOfBirth) || t('diverProfile.info.empty')}</span>
@@ -147,6 +154,33 @@
       border-radius: 20px;
       background: var(--od-surface);
       overflow: hidden;
+    }
+
+    .od-profile-info--row.od-profile-info--row-icon {
+      min-height: 72px;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .od-profile-info--tile {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-release-tile);
+      color: var(--od-text);
+    }
+
+    .od-profile-info--texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .od-profile-info--row {

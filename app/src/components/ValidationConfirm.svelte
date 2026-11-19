@@ -7,27 +7,27 @@
   import { Popup, Page, Navbar, Link } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import TextField from './TextField.svelte';
-  import ButtonGroup from './ButtonGroup.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatDepth, formatLongDateTime, formatMinutes } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
-  import { ROLES, signerProblems } from '../lib/validation.js';
+  import { signerProblems } from '../lib/validation.js';
   import { closeConfirmation, confirmation, submitConfirmation } from '../lib/validation.svelte.js';
 
   const prefs = $derived(logbook.prefs);
   const many = $derived(confirmation.summary.dives.length > 1);
   const problems = $derived(signerProblems(confirmation));
   const valid = $derived(!problems.name && !problems.role);
-  let touched = $state(false);
-  const roleOptions = ROLES.map((r) => ({ value: r, label: t(`validation.roles.${r}`) }));
+  const roleLine = $derived(
+    confirmation.role === 'instructor' && confirmation.instructorLine ? t('validation.confirmAsInstructor', { number: confirmation.instructorLine }) : t('validation.confirmAsBuddy'),
+  );
 
   async function confirm() {
-    touched = true;
     if (!valid) return;
     const how = await submitConfirmation();
-    if (how === 'sent') showSnackbar(t(many ? 'validation.confirmedMany' : 'validation.confirmed'));
-    else if (how === 'queued') showSnackbar(t('validation.confirmQueued'));
+    if (!how) return;
+    const saved = confirmation.savedToProfile ? ` ${t('validation.savedToProfile')}` : '';
+    showSnackbar(t(how === 'sent' ? (many ? 'validation.confirmedMany' : 'validation.confirmed') : 'validation.confirmQueued') + saved);
   }
 </script>
 
@@ -57,12 +57,8 @@
       <p class="od-validation-confirm--text">{t(many ? 'validation.confirmTextMany' : 'validation.confirmText')}</p>
 
       <div class="od-validation-confirm--fields">
-        <TextField label={t('validation.name')} bind:value={confirmation.name} invalid={touched && !!problems.name} supporting={touched && problems.name ? t('validation.nameRequired') : ''} autocomplete="name" />
-        <div class="od-validation-confirm--role">
-          <span class="od-validation-confirm--role-label" id="od-validation-confirm-role">{t('validation.role')}</span>
-          <ButtonGroup options={roleOptions} value={confirmation.role} onchange={(v) => (confirmation.role = v)} ariaLabelledby="od-validation-confirm-role" />
-        </div>
-        <TextField label={t('validation.number')} bind:value={confirmation.instructorNumber} />
+        <TextField label={t('validation.yourName')} bind:value={confirmation.name} supporting={t('validation.yourNameHint')} autocomplete="name" />
+        <p class="od-validation-confirm--role">{roleLine}</p>
       </div>
       <p class="od-validation-confirm--note">{t('validation.confirmNote')}</p>
 
@@ -72,7 +68,7 @@
 
       <div class="od-validation-confirm--actions">
         <Link popupClose class="od-validation-confirm--cancel">{t('qr.cancel')}</Link>
-        <button type="button" class="od-validation-confirm--ok" disabled={confirmation.working} onclick={confirm}>{t('validation.confirmButton')}</button>
+        <button type="button" class="od-validation-confirm--ok" disabled={confirmation.working || !valid} onclick={confirm}>{t('validation.confirmButton')}</button>
       </div>
     </Page>
   </Popup>
@@ -132,14 +128,10 @@
     }
 
     .od-validation-confirm--role {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .od-validation-confirm--role-label {
-      font-size: 14px;
-      color: var(--od-text-2);
+      margin: 0 4px;
+      font-size: 15px;
+      line-height: 22px;
+      color: var(--od-text);
     }
 
     .od-validation-confirm--error {

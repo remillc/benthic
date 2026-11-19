@@ -7,7 +7,8 @@
   import OdPlusChip from './OdPlusChip.svelte';
   import { gear, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { diver } from '../lib/profile.svelte.js';
+  import { onMount } from 'svelte';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
   import { PROFILE_SECTIONS, showProfilePath, heroOf, readHero } from '../lib/profile-frame.js';
   import { profileWindow } from '../lib/layout.svelte.js';
@@ -17,9 +18,13 @@
   /** @type {{ section: keyof typeof PROFILE_SECTIONS }} */
   let { section } = $props();
 
+  onMount(() => {
+    if (!diver.ready) loadProfile().catch((e) => console.error('Reading the profile', e));
+  });
+
   // The Mac's profile window does not load the logbook: the main window left the diver's line.
   const hero = $derived(profileWindow ? readHero() : heroOf(logbook));
-  const name = $derived(hero.name || t('gear.profile.defaultName'));
+  const name = $derived(diver.info.fullName || hero.name || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
   const total = $derived(hero.total);
   const since = $derived(hero.since);

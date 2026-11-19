@@ -24,6 +24,7 @@
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
+  let fullName = $state('');
   let dateOfBirth = $state('');
   let nameRelation = $state('');
   let country = $state('CA');
@@ -34,6 +35,7 @@
   onMount(async () => {
     await Promise.all([loadProfile(), loadInventory()]);
     const i = diver.info;
+    fullName = i.fullName;
     dateOfBirth = i.dateOfBirth;
     nameRelation = [i.emergency.name, i.emergency.relation].filter(Boolean).join(' · ');
     country = i.emergency.phone.country;
@@ -57,7 +59,7 @@
     return at < 0 ? { name: text.trim(), relation: '' } : { name: text.slice(0, at).trim(), relation: text.slice(at + 1).trim() };
   }
 
-  const draft = $derived({ dateOfBirth, emergency: { ...splitContact(nameRelation), phone: { country, number } }, bloodGroup: consent ? blood : '' });
+  const draft = $derived({ fullName, dateOfBirth, emergency: { ...splitContact(nameRelation), phone: { country, number } }, bloodGroup: consent ? blood : '' });
   const problems = $derived(infoProblems(draft));
   const dobLive = liveError(
     () => dateOfBirth,
@@ -90,6 +92,7 @@
 
   <h2 class="od-profile-edit--section">{t('diverProfile.info.you')}</h2>
   <div class="od-profile-edit--fields">
+    <TextField label={t('diverProfile.info.fullNameLabel')} bind:value={fullName} supporting={t('diverProfile.info.fullNameHint')} autocomplete="name" />
     <DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} placeholder={t('diverProfile.info.dobHint')} supporting={dobLive.error} />
   </div>
 

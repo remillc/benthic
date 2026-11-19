@@ -157,6 +157,7 @@ export async function collectData(deps) {
         {
           format: 1,
           updatedAt: diverFile.updatedAt ?? '',
+          ...(info.fullName ? { fullName: info.fullName } : {}),
           ...(info.dateOfBirth ? { dateOfBirth: info.dateOfBirth } : {}),
           emergencyContact: info.emergency,
           ...(info.bloodGroup ? { bloodGroup: info.bloodGroup } : {}),

@@ -6227,7 +6227,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Point 2 done (19 November 2026), by one agent; points 1, 3 and 4 are another agent's, so this task stays open until they are in.** Validation by signature on the screen and by QR code through the server (routes `/v1/validations/*` in the private repository: one-time code valid 10 minutes, summary, confirm, result; OpenDives+ on both sides; rate limits; `scripts/validations-test.mjs`). The signer who is offline confirms later: the scan time is sent and the server accepts it for 7 days after the code expired. Stored in the OpenDives data store (`dive-validations/<id>.json`, with a hash of each dive to show « Modifiée après la validation »), not in the Subsurface dive file: the façade has no generic dive extra-data door, and no C++ was added. The QR travels as a kind « d » transfer of the existing format (the native scanner accepts only « d » and « p »), read back as a validation by its JSON. The signer's name, role and instructor number come from the last confirmation on the phone until the instructor certificate of point 3 exists; then `signerIdentity()` in `lib/validation.svelte.js` reads the profile. The dev API on 8080 needs a `git pull` in the private repository and a rebuild to have the routes.
 
-## [ ] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
+## [x] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. This follows task 309. The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
 
@@ -6262,7 +6262,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** change the date format in Réglages and check dates across the screens above. Fill the emergency contact, open the sheet in airplane mode, call the contact, turn items off, share as PDF.
 
-## [ ] 2026-11-19-312 Diver's full name in the profile, used for validation, emergency sheet, PDF and account sheet
+## [x] 2026-11-19-312 Diver's full name in the profile, used for validation, emergency sheet, PDF and account sheet
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Answers the question from the code session about the missing name (task 309, point 2). OpenDives+ data, stored on the OpenDives server with the rest of the profile, never written into the Subsurface logbook.
 
@@ -6279,3 +6279,29 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - Account sheet (OpenDives+): the name on the first line, the e-mail under it in smaller grey text (`nav-compte-profil-android`). Without a name, the e-mail stays on the first line as today. Free users: unchanged.
 
 **Test:** fill the name, check Informations, the profile header, the account sheet, the emergency sheet and a PDF. Empty it and check each fallback. Confirm a buddy's dive with an empty profile name, check it is saved to the profile.
+
+## [ ] 2026-11-19-313 Dive detail: floating toolbar actions, « Carte » becomes « Planifier depuis cette plongée »
+
+Christian asked for this on 19 November 2026 (canvas comment on `detail3-android-curseur`). Work in `main`. Mock-ups in `docs/mockups/`.
+
+The floating toolbar at the bottom of a dive's detail has exactly these actions, left to right:
+1. **Modifier** (filled pill with the pencil and its label): opens « Modifier une plongée ».
+2. **Planifier depuis cette plongée** (icon button): opens the planner filled from this dive (depth, time, gases), as `android-planificateur`. **This replaces the « Carte » button in the app.** The map stays where it is in the detail page (site section); the toolbar no longer opens it.
+3. **Partager** (icon button): opens the share choices (`partage-android`: PDF sheet, QR code, file).
+4. **Plus d’options** (three dots): opens the menu, anchored above the toolbar on the right (`validation-menu-android` for OpenDives+, `detail2-android-menu` for the free version):
+   - « Faire valider la plongée » — OpenDives+ only (task 309). Free version: not shown.
+   - « Renuméroter la plongée ».
+   - « Retirer du voyage » — only when the dive belongs to a trip.
+   - « Supprimer la plongée » — in red, with the confirmation and undo already in place.
+
+The accessible name of the three-dots button lists what the menu holds (« Plus d’options : faire valider, renuméroter, retirer du voyage, supprimer », without « faire valider » in the free version). Same toolbar on iPhone (with iOS icons and its context menu) and on tablet in the detail pane.
+
+**Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
+
+## [ ] 2026-11-19-314 Site card: keep the map's aspect ratio
+
+Christian asked for this on 19 November 2026 (canvas comment on `sites-fiche-android`, map of « Fiche d’un site »). Work in `main`.
+
+The map in a site's card has a fixed **aspect ratio of 2.1 : 1** (width : height), as drawn on the phone: 358 × 170 dp at 390 dp wide (16 dp side margins, 16 dp corner radius). Keep this ratio at every width: the height follows the width (CSS `aspect-ratio: 2.1 / 1`, or the equivalent in the native layout), never a fixed height that stretches or crops the map differently on tablet, desktop or in landscape. The pin stays centred on the site and the OpenStreetMap credit stays at the bottom right, inside the map. Same rule for the map of a site from the shared map (`sites-commun-fiche-android`, task to come) and of « Nouveau site » / « Modifier le site ».
+
+**Test:** open a site's card on a phone, then on a tablet in portrait and landscape and on desktop: the map is always 2.1 times wider than tall.

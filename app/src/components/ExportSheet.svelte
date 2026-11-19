@@ -8,7 +8,9 @@
   // by default) and Annuler / Exporter. The last format is remembered on the
   // device.
   import { Sheet } from 'framework7-svelte';
+  import { onMount } from 'svelte';
   import ChoiceRow from './ChoiceRow.svelte';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @typedef {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} ExportFormat */
@@ -16,7 +18,7 @@
   /**
    * @type {{
    *   count: number,
-   *   onexport: (format: ExportFormat, anonymize: boolean) => void,
+   *   onexport: (format: ExportFormat, anonymize: boolean, showName: boolean) => void,
    *   onclose: () => void,
    * }}
    */
@@ -28,12 +30,18 @@
   const stored = /** @type {ExportFormat} */ (deviceStore.getItem(KEY) ?? 'ssrf');
   let format = $state(FORMATS.includes(stored) ? stored : 'ssrf');
   let anonymize = $state(false);
+  // « Mon nom dans l’en-tête » (task 2026-11-19-312): for the PDF only, on by default, offered when the profile has a name.
+  let showName = $state(true);
+  const fullName = $derived(diver.info.fullName);
+  onMount(() => {
+    if (!diver.ready) loadProfile().catch((e) => console.error('Reading the profile', e));
+  });
   let opened = $state(true);
 
   function submit() {
     deviceStore.setItem(KEY, format);
     opened = false;
-    onexport(format, anonymize);
+    onexport(format, anonymize, showName);
   }
 </script>
 
@@ -62,6 +70,18 @@
         <span class="toggle-icon"></span>
       </span>
     </label>
+    {#if format === 'pdf' && fullName}
+      <label class="od-export-sheet--switch-row od-export-sheet--show-name">
+        <span class="od-export-sheet--texts">
+          <span class="od-export-sheet--headline">{t('export.showName')}</span>
+          <span class="od-export-sheet--supporting">{t('export.showNameText', { name: fullName })}</span>
+        </span>
+        <span class="toggle">
+          <input type="checkbox" bind:checked={showName} disabled={anonymize} />
+          <span class="toggle-icon"></span>
+        </span>
+      </label>
+    {/if}
     <div class="od-export-sheet--actions">
       <button type="button" class="od-export-sheet--text-button" onclick={() => (opened = false)}>{t('dialog.cancel')}</button>
       <button type="button" class="od-export-sheet--filled" onclick={submit}>{t('export.action')}</button>

@@ -6,8 +6,8 @@ import { OpenDivesCore } from 'opendives-core';
 import { inventoryApi } from './inventory.svelte.js';
 import { diveKeyOf, newId } from './inventory.js';
 import { deviceStore } from './device-store.js';
-import { diver } from './profile.svelte.js';
-import { instructorNumber } from './profile.js';
+import { diver, loadProfile, changeProfile } from './profile.svelte.js';
+import { instructorNumber, cleanFullName } from './profile.js';
 import { createServerApi, ServerError } from './server-api.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
@@ -127,28 +127,18 @@ export async function refreshPending() {
 
 // --- The signer's side -----------------------------------------------------------------------------------------------
 
-const SIGNER_KEY = 'od.validationSigner';
 const QUEUE_KEY = 'od.validationQueue';
 
 /**
- * Who confirms: the name, role and instructor number of the diver. The instructor number comes from the card marked
- * « Brevet de moniteur » in « Brevets et documents » (task 2026-11-19-309, point 3), and a diver who has one is offered the
- * role « Moniteur » first. The profile keeps no name, so the name is what this diver confirmed last; the confirmation
- * screen lets all three be corrected.
+ * Who confirms: the diver's full name from his profile (task 2026-11-19-312; empty until he fills it in), the role and the
+ * instructor number. The number comes from the card marked « Brevet de moniteur » in « Brevets et documents » (task
+ * 2026-11-19-309, point 3): a diver who has one confirms as an instructor with that number, else as a buddy without one.
+ * The confirmation screen lets the name be corrected for that confirmation only.
  * @returns {{ name: string, role: string, instructorNumber: string }}
  */
 export function signerIdentity() {
   const own = instructorNumber(diver.certs)?.number ?? '';
-  try {
-    const v = JSON.parse(deviceStore.getItem(SIGNER_KEY) ?? 'null');
-    if (v && typeof v.name === 'string') {
-      const stored = typeof v.instructorNumber === 'string' ? v.instructorNumber : '';
-      return { name: v.name, role: typeof v.role === 'string' ? v.role : own ? 'instructor' : 'buddy', instructorNumber: own || stored };
-    }
-  } catch {
-    // Unreadable: start again from nothing.
-  }
-  return { name: '', role: own ? 'instructor' : 'buddy', instructorNumber: own };
+  return { name: diver.info.fullName ?? '', role: own ? 'instructor' : 'buddy', instructorNumber: own };
 }
 
 /** What the scan decoded, when it is a validation code. @param {string} text */
@@ -163,7 +153,6 @@ export const readValidationCode = (text) => parseQrText(text);
  */
 export async function confirmCode(code, signerFields) {
   const signer = cleanSigner(signerFields);
-  deviceStore.setItem(SIGNER_KEY, JSON.stringify(signer));
   const item = { token: code.token, signer, scannedAt: new Date().toISOString() };
   if (connection.online) {
     try {
@@ -204,14 +193,29 @@ export const confirmation = $state({
   name: '',
   role: 'buddy',
   instructorNumber: '',
+  /** The agency and number of the instructor card, for the sentence under the name; '' when there is none. */
+  instructorLine: '',
+  /** Set once the name typed here was saved to an empty profile (the message « Enregistré dans votre profil »). */
+  savedToProfile: false,
   working: false,
   /** '' or a key of validation.confirmError.* */
   error: '',
 });
 
 /** Opens the sheet for a scanned code, with the identity this diver confirmed last. @param {{ token: string, summary: import('./validation.js').Summary }} code */
-export function openConfirmation(code) {
-  Object.assign(confirmation, { open: true, token: code.token, summary: code.summary, ...signerIdentity(), working: false, error: '' });
+export async function openConfirmation(code) {
+  if (!diver.ready) await loadProfile().catch((e) => console.error('Reading the profile', e));
+  const card = instructorNumber(diver.certs);
+  Object.assign(confirmation, {
+    open: true,
+    token: code.token,
+    summary: code.summary,
+    ...signerIdentity(),
+    instructorLine: card ? [card.agency, card.number].filter(Boolean).join(' ') : '',
+    savedToProfile: false,
+    working: false,
+    error: '',
+  });
 }
 
 export function closeConfirmation() {
@@ -229,6 +233,7 @@ export async function submitConfirmation() {
   try {
     const how = await confirmCode({ token: confirmation.token }, { name: confirmation.name, role: confirmation.role, instructorNumber: confirmation.instructorNumber });
     confirmation.open = false;
+    await keepNameInProfile(confirmation.name);
     return how;
   } catch (e) {
     const code = e instanceof ServerError ? e.code : 'UNREACHABLE';
@@ -236,5 +241,24 @@ export async function submitConfirmation() {
     return null;
   } finally {
     confirmation.working = false;
+  }
+}
+
+/**
+ * The name typed in the confirmation goes to the profile when the profile has none (task 2026-11-19-312, point 2): the
+ * next confirmation starts from it. A profile that has a name is never changed from here.
+ * @param {string} typed
+ * @returns {Promise<boolean>} true when the profile was filled
+ */
+export async function keepNameInProfile(typed) {
+  const name = cleanFullName(typed);
+  if (!name || diver.info.fullName) return false;
+  try {
+    await changeProfile((p) => p.saveInfo({ ...diver.info, fullName: name }));
+    confirmation.savedToProfile = true;
+    return true;
+  } catch (e) {
+    console.error('Save the name to the profile', e);
+    return false;
   }
 }

@@ -100,6 +100,20 @@ test('the sensitive data is not readable in the files of the store', async () =>
   }
 });
 
+// ---- Full name (task 2026-11-19-312) ----
+
+test('the full name is kept sealed, cleaned, and emptying it removes it', async () => {
+  const { profile, backend } = setup();
+  assert.equal((await profile.readInfo()).fullName, '');
+  const info = emptyInfo();
+  info.fullName = '  Valérie   Tremblay ';
+  await profile.saveInfo(info);
+  assert.equal((await profile.readInfo()).fullName, 'Valérie Tremblay');
+  for (const path of await backend.list('')) assert.ok(!((await backend.get(path)) ?? '').includes('Tremblay'), `name in ${path}`);
+  await profile.saveInfo({ ...info, fullName: '   ' });
+  assert.equal((await profile.readInfo()).fullName, '');
+});
+
 // ---- Consent ----
 
 test('the consent is off by default', async () => {

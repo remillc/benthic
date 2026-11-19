@@ -190,11 +190,13 @@ const stars = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
  * with the people.
  * @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|string|null} svg @param {boolean} [anonymize]
  * @param {import('./validation.js').ValidationItem[]} [validations] the confirmed ones
+ * @param {string} [diverName] the diver's full name, in the header before « Plongée n° » (task 2026-11-19-312); '' leaves it out
  */
-export function sheetHtml(dive, prefs, svg, anonymize = false, validations = []) {
+export function sheetHtml(dive, prefs, svg, anonymize = false, validations = [], diverName = '') {
   if (anonymize) {
     dive = { ...dive, guides: [], buddies: [], notes: '' };
     validations = [];
+    diverName = '';
   }
   const validationRows = validations
     .filter((v) => !v.pending)
@@ -283,7 +285,7 @@ td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; } td.n { font-variant-n
 footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4B4A47; font-size: 8.5pt; }
 </style></head><body>
 <header><div>
-<div class="over"><b>${esc(dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'))}</b> · ${esc(formatFullDate(dive.date))}</div>
+<div class="over">${diverName ? `${esc(diverName)} · ` : ''}<b>${esc(dive.number ? t('share.sheetNumber', { number: String(dive.number) }) : t('share.sheetDive'))}</b> · ${esc(formatFullDate(dive.date))}</div>
 <h1>${esc(dive.site || t('dive.siteNotSet'))}</h1>
 <div class="place">${esc([place, trip].filter(Boolean).join(' · '))}</div>
 </div><div class="figures">${figures.map((f) => `<div class="figure"><b>${esc(/** @type {string[]} */ (f)[0])}</b><span>${esc(/** @type {string[]} */ (f)[1])}</span></div>`).join('')}</div></header>
@@ -343,15 +345,16 @@ export function profileSvgFromSamples(dive, prefs) {
  * @param {boolean} anonymize
  * @param {Prefs} prefs
  * @param {boolean} [whole] the whole logbook in .ssrf: named after the logbook (« carnet-de-roger-2026-11-19.ssrf »)
+ * @param {boolean} [showName] « Mon nom dans l’en-tête » of a PDF
  */
-export async function exportDives(ids, format, anonymize, prefs, whole = false) {
+export async function exportDives(ids, format, anonymize, prefs, whole = false, showName = true) {
   const day = localDay();
   const ext = format === 'csvProfiles' ? 'csv' : format;
   const name =
     whole && format === 'ssrf'
       ? logbookExportName(deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName'), day, t('desktop.export.fileLogbook'))
       : `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
-  const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name);
+  const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name, showName);
   await OpenDivesCore.grantShareFile({ uri, mime });
   await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
 }
@@ -364,15 +367,16 @@ export async function exportDives(ids, format, anonymize, prefs, whole = false) 
  * @param {boolean} anonymize
  * @param {any} prefs
  * @param {string} name the file's name
+ * @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF only; « Anonymiser » removes the name anyway)
  * @returns {Promise<{uri: string, mime: string}>}
  */
-export async function exportFile(ids, format, anonymize, prefs, name) {
+export async function exportFile(ids, format, anonymize, prefs, name, showName = true) {
   let uri;
   if (format === 'pdf') {
     const pages = [];
     for (const id of ids) {
       const dive = await OpenDivesCore.getDive({ id });
-      pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize, await validationItems(dive)));
+      pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize, await validationItems(dive), await diverNameFor(anonymize, showName)));
     }
     // One document: the style of the first sheet, each sheet's body on its own page.
     const head = pages[0].slice(0, pages[0].indexOf('<body>') + 6);
@@ -402,9 +406,26 @@ async function validationItems(dive) {
   }
 }
 
+/**
+ * The diver's full name for the header of a PDF sheet: his profile's (OpenDives+ data; '' without one), left out when
+ * the export is anonymized or the switch « Mon nom dans l’en-tête » is off (task 2026-11-19-312).
+ * @param {boolean} anonymize @param {boolean} show
+ */
+export async function diverNameFor(anonymize, show) {
+  if (anonymize || !show) return '';
+  try {
+    const p = await import('./profile.svelte.js');
+    if (!p.diver.ready) await p.loadProfile();
+    return p.diver.info.fullName ?? '';
+  } catch (e) {
+    console.error('The name for the sheet', e);
+    return '';
+  }
+}
+
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */
 export async function sharePdf(dive, prefs, svg) {
-  const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg, false, await validationItems(dive)), name: fileName(dive, 'pdf'), letter: letterPaper() });
+  const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg, false, await validationItems(dive), await diverNameFor(false, true)), name: fileName(dive, 'pdf'), letter: letterPaper() });
   await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title: shareTitle(dive), files: [uri], dialogTitle: t('share.title') });
 }

@@ -400,11 +400,11 @@
 
   /**
    * The checked dives exported, then the system's share sheet; the selection is kept.
-   * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize
+   * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF)
    */
-  async function exportChecked(format, anonymize) {
+  async function exportChecked(format, anonymize, showName = true) {
     try {
-      await exportDives(checkedIds, format, anonymize, logbook.prefs, checkedIds.length > 0 && checkedIds.length === logbook.dives.length);
+      await exportDives(checkedIds, format, anonymize, logbook.prefs, checkedIds.length > 0 && checkedIds.length === logbook.dives.length, showName);
     } catch (e) {
       // Closing the system's share sheet without choosing is not an error.
       if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
