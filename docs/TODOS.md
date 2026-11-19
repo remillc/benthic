@@ -44,3 +44,4 @@ Next number: 112
 - #98 [design] ajuster les rayons lumineux de l'en-tête.
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide.
 - #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
+- #76 [design] Idée : constituer une base de données des sites de plongée de tous les carnets utilisés, et offrir cette carte comme service. Distincte de #23 (fermée le 14 novembre 2026, `docs/explore-decision.md`) : #23 partait d'un fournisseur externe de sites ; #76 se remplit avec les sites que les plongeurs d'OpenDives choisissent de partager depuis leur carnet, et tout le monde peut la consulter. Décidé le 19 novembre 2026 : le consentement est donné dans les conditions d’utilisation, lues et acceptées au premier démarrage de l’app payante (OpenDives+). À décider : les doublons et la modération.
