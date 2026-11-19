@@ -432,7 +432,6 @@
         }
       }
 
-      .od-quick-entry--row + .od-quick-entry--row,
       .od-quick-entry--list li + li {
         border-top: 0.5px solid var(--od-row-divider);
       }
