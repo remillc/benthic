@@ -866,7 +866,7 @@ function writeWelcomeState(value) {
  * core reads the device copy while the interface starts; the first load
  * takes their answers instead of asking again. The core runs the calls in the
  * order they were sent: settings, account, device copy.
- * @type {{ configure: Promise<any>, cached: Promise<any>, probe: Promise<any>|null }|null}
+ * @type {{ configure: Promise<any>, cached: Promise<any>|null, probe: Promise<any>|null }|null}
  */
 let early = null;
 
@@ -894,7 +894,9 @@ export function boot() {
   const settingsApplied = applyDeviceSettings().then(() => mark('settings'));
   if (readWelcomeState() === 'done') {
     const configure = OpenDivesCore.configureCloud();
-    const cached = OpenDivesCore.listCloudDives({ cached: true });
+    // Without a remembered account (the beta's local logbook) the device copy of a cloud log is not asked for: the core
+    // would answer « Cloud account not configured ». loadCloud asks for it itself once an account is found.
+    const cached = deviceStore.getItem(ACCOUNT_HINT) ? OpenDivesCore.listCloudDives({ cached: true }) : null;
     let probe = null;
     try {
       // The probe runs on the plugin's network thread, not in the core's

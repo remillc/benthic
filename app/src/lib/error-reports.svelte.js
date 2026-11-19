@@ -156,10 +156,10 @@ export function startErrorReports({ route } = {}) {
     reportError('js', event.error ?? event.message);
   });
   globalThis.addEventListener('unhandledrejection', (event) => reportError('js', event.reason));
-  setCoreErrorHook((method, error) => {
+  setCoreErrorHook((method, error, caller) => {
     const base = describeError(error);
     const e = new Error(`${method}: ${base.message}`);
-    e.stack = base.stack;
+    e.stack = [base.stack, caller ? `called from:\n${caller}` : ''].filter(Boolean).join('\n');
     reportError('core', e);
   });
   // Pending reports (offline last time, or a crash of the last run) are offered a few seconds after the start.

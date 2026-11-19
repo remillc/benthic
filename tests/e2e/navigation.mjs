@@ -487,6 +487,62 @@ async function phoneFlows() {
   await settled(tab, 'quick entry saved', { route: '/' });
   await toLogbook(tab, 'after the quick entry');
 
+  console.log(' error report sheet over the Download page and over the logbook');
+  for (const where of ['/download', '/']) {
+    if (where !== '/') {
+      await tab.run((r) => { document.querySelector('.view-main').f7View.router.navigate(r); }, where);
+      await settled(tab, 'download opened', { route: where });
+    }
+    // A forced error: the report sheet opens, both buttons answer, and the page is usable afterwards.
+    // At most three offers per session: decline over both pages, and « Envoyer » once over the Download page (no server
+    // answers in this test: the sheet then shows « Plus tard », which closes it).
+    for (const [button, label] of where === '/' ? [['.od-error-report--secondary', 'decline']] : [['.od-error-report--secondary', 'decline'], ['.od-error-report--primary', 'send']]) {
+      await tab.run((n) => window.dispatchEvent(new ErrorEvent('error', { error: new Error(`forced report ${n}`), message: `forced report ${n}` })), `${where}-${label}-${Date.now()}`);
+      let up = false;
+      for (let i = 0; i < 25 && !up; i++) {
+        await sleep(200);
+        up = await tab.run(() => !!document.querySelector('.od-error-report.modal-in'));
+      }
+      checks++;
+      if (!up) {
+        failures.push({ label: `report sheet over ${where}`, problems: ['the sheet did not open'] });
+        console.log(`  FAIL report sheet over ${where}: not opened`);
+        continue;
+      }
+      await sleep(500);
+      const box = await boxOf(tab, (sel) => {
+        const r = document.querySelector(sel)?.getBoundingClientRect();
+        return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+      }, button);
+      if (box) await tab.tapAt(box.x, box.y);
+      if (label === 'send') {
+        await sleep(1500);
+        if (await tab.run(() => !!document.querySelector('.od-error-report.modal-in'))) {
+          const later = await boxOf(tab, () => {
+            const r = document.querySelector('.od-error-report--secondary')?.getBoundingClientRect();
+            return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+          });
+          if (later) await tab.tapAt(later.x, later.y);
+        }
+      }
+      let closed = false;
+      for (let i = 0; i < 25 && !closed; i++) {
+        await sleep(200);
+        closed = await tab.run(() => !document.querySelector('.od-error-report.modal-in') && !document.querySelector('.sheet-backdrop-in'));
+      }
+      checks++;
+      if (!closed) {
+        failures.push({ label: `report sheet over ${where}`, problems: [`« ${label} » did not close the sheet`] });
+        console.log(`  FAIL report sheet over ${where}: ${label} does not close it`);
+      } else console.log(`  ok   report sheet over ${where}: ${label} closes it`);
+    }
+    if (where !== '/') {
+      await hardwareBack(tab);
+      await settled(tab, 'back from the download page', { route: '/' });
+    }
+  }
+
+  await sleep(600);
   console.log(' edit > Back arrow, then Back at once after Save');
   await tapDive(tab);
   await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });

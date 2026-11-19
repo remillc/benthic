@@ -7,6 +7,7 @@
   // already had it. A failed fetch is asked again when the device is back online, or at the next display after a pause.
   // A model the catalog does not list has no tile: the `fallback` (by default the generic icon, 24 px) as before.
   // `photo`: the diver's own photo of this piece (OpenDives+ inventory, account data): it wins over the catalog.
+  import { untrack } from 'svelte';
   import Icon from './Icon.svelte';
   import { loadComputerImage, knownImageEntry, getCatalog, forgetFailures, sizeFor } from '../lib/dc-images.js';
   import { initialImageState, nextImageState } from '../lib/dc-image-state.js';
@@ -44,25 +45,31 @@
     void model;
     void vendor;
     if (photo) return;
-    token++;
-    state = initialImageState();
-    let current = true;
-    if (knownImageEntry(model, vendor)) send({ type: 'show', now: Date.now() });
-    getCatalog().then(() => {
-      if (!current) return;
-      catalogReady = true;
-      if (state.phase === 'idle' && knownImageEntry(model, vendor)) send({ type: 'show', now: Date.now() });
+    // Only the model, the vendor and the photo start it again: `send` reads the state it writes, which would make
+    // this effect depend on its own output (effect_update_depth_exceeded).
+    return untrack(() => {
+      token++;
+      state = initialImageState();
+      let current = true;
+      if (knownImageEntry(model, vendor)) send({ type: 'show', now: Date.now() });
+      getCatalog().then(() => {
+        if (!current) return;
+        catalogReady = true;
+        if (state.phase === 'idle' && knownImageEntry(model, vendor)) send({ type: 'show', now: Date.now() });
+      });
+      return () => {
+        current = false;
+      };
     });
-    return () => {
-      current = false;
-    };
   });
 
   // Back online: ask again for what failed.
   $effect(() => {
     if (!connection.online || photo) return;
-    forgetFailures();
-    send({ type: 'online', now: Date.now() });
+    untrack(() => {
+      forgetFailures();
+      send({ type: 'online', now: Date.now() });
+    });
   });
 
   const hasPhoto = $derived(!!photo || (catalogReady && !!knownImageEntry(model, vendor)));

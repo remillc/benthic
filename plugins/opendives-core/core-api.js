@@ -918,13 +918,22 @@ const plugin = registerPlugin('OpenDivesCore', {
   web: () => import('./desktop.js').then((m) => new m.OpenDivesCoreDesktop()),
 });
 
-/** @type {((method: string, error: any) => void)|null} */
+/** @type {((method: string, error: any, caller?: string) => void)|null} */
 let coreErrorHook = null;
+
+/**
+ * The core answers some expected states with a generic CORE_ERROR and only the message tells them apart: no account is set
+ * (the beta's local logbook has none). They are never a fault, so never a report.
+ * @param {unknown} message
+ */
+export function isExpectedCoreMessage(message) {
+  return typeof message === 'string' && /account not configured|repository not configured/i.test(message);
+}
 
 /**
  * Error reports (task #102): `hook(method, error)` is called for every call the core fails (code CORE_ERROR), before the
  * error goes on to the caller. The hook only offers a report to the user; it never changes the outcome of the call.
- * @param {((method: string, error: any) => void)|null} hook
+ * @param {((method: string, error: any, caller?: string) => void)|null} hook
  */
 export function setCoreErrorHook(hook) {
   coreErrorHook = hook;
@@ -937,12 +946,14 @@ const native = new Proxy(plugin, {
     const value = Reflect.get(target, name, receiver);
     if (typeof value !== 'function' || typeof name !== 'string' || name === 'then' || name.startsWith('add') || name.startsWith('remove')) return value;
     return (/** @type {any[]} */ ...args) => {
+      // The bridge's own stack only shows its frames: the caller's is kept for the report.
+      const caller = new Error().stack ?? '';
       const result = value.apply(target, args);
       if (!result || typeof result.then !== 'function') return result;
       return result.then(undefined, (/** @type {any} */ e) => {
-        if (coreErrorHook && e?.code === 'CORE_ERROR') {
+        if (coreErrorHook && e?.code === 'CORE_ERROR' && !isExpectedCoreMessage(e?.message)) {
           try {
-            coreErrorHook(name, e);
+            coreErrorHook(name, e, caller.split('\n').slice(2).join('\n'));
           } catch {
             // The hook never changes the outcome of the call.
           }
