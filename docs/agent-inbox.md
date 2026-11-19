@@ -6337,3 +6337,26 @@ Christian approved this on 19 November 2026. Work in `main`. App mock-ups in `do
 - `admin-journal`: every change to the base, manual or automatic, with date, author, decision, site and detail, filters, and « Annuler » on each line (restores the site as it was).
 
 **Test:** accept the terms on a new OpenDives+ account; check the diver's sites appear in the base without notes; switch the Sites tab to « Carte commune », open a base site, add it, report it; create a site next to a base site and check the suggestion; on the website, handle the report, a merge, an undo in the journal, and a split from the map.
+
+## [ ] 2026-11-19-316 Rename the app: OpenDives becomes Benthic
+
+Christian approved this on 19 November 2026 (#59, closed). Work in `main`.
+
+**Names**
+- Brand in texts: « Benthic »; the paid offer: « Benthic+ » (was OpenDives+).
+- Name under the app icon (launcher label, Android `app_name`, iOS `CFBundleDisplayName`, desktop window title and menu) and as the app label in system notifications: « Benthic Log ».
+- Store name (Google Play, App Store): « Benthic – Dive Log ».
+- Domain: `benthicdivelog.app` replaces `opendives.app` everywhere (links, e-mail addresses, deep links, server URLs once the server moves). Christian still owns opendives.app: keep it working as a redirect, do not drop it.
+- French elisions: « de Benthic », « que Benthic » (never « d’Benthic »).
+
+**Scope**
+- All user-facing texts (`app/src/i18n/*.json`, desktop host, notifications, About screens, PDF export footer, emails sent by the server, terms of use and privacy policy).
+- App metadata: `app/capacitor.config.json` app name, Android and iOS display names, desktop `package.json` product name, installer names.
+- Do **not** change for now: the application ID / bundle ID (`appId`), the GitHub repo name `remillc/opendives`, package and folder names, file names of the mock-ups, `docs/brand/opendives-logo.svg`, and anything that would break an installed app's data or sign-in. List these leftovers in a short note at the end of the task so Christian can decide later.
+- Internal identifiers (CSS class names, variable names, the font family « Source Sans 3 OD ») can stay.
+
+**Mock-ups:** all of `docs/mockups/` (phone, iPhone, tablet, desktop, admin) is already renamed in this commit, using the rules above; they are the reference for wording (for example the notification header « Benthic Log · 9 h 00 », the rating dialog « Évaluer Benthic Log », « À propos de Benthic »).
+
+**Docs:** update README and other docs that name the app, except history (CHANGELOG entries, closed tasks in this inbox).
+
+**Test:** the launcher shows « Benthic Log »; a notification shows « Benthic Log »; About shows « Benthic »; the Benthic+ offer and account screens say Benthic+; no « OpenDives » left in the UI in French and English (grep the i18n files and the built app).
