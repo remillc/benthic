@@ -2572,6 +2572,7 @@
       "Premier lancement : le glissement entre les étapes joue maintenant (il était absent de la version compilée). La boîte des changements en attente de la déconnexion affiche le nombre en gras, et un champ iPhone en erreur ne garde plus de cadre rouge dans sa ligne.",
       "Remplacer ce carnet : cet appareil ne garde qu’un carnet à la fois. Un fichier de carnet (.ssrf Subsurface, ou archive qui en contient un) ouvert avec OpenDives ou choisi dans « + » › Importer un fichier propose maintenant « Remplacer ce carnet » : un écran dit que le carnet quitte cet appareil et propose « Exporter d’abord ce carnet » ; « Remplacer » demande une seconde confirmation si le carnet n’a pas été exporté ou si des modifications ne sont pas synchronisées, puis vous nommez le nouveau carnet. Le carnet actuel est remis en place si le fichier ne peut pas être lu. Le carnet du serveur OpenDives et un carnet synchronisé avec un compte ne sont jamais remplacés, avec une ligne qui dit pourquoi. Quand une archive contient plusieurs carnets, seul le principal est importé et la fenêtre le dit.",
       "Gros carnets : un carnet de mille plongées avec profils (environ 100 Mo) peut maintenant être partagé vers OpenDives depuis une autre application, choisi avec « Importer un fichier », servir à remplacer le carnet, être exporté d’abord, copié depuis la version précédente ou inclus dans « Télécharger mes données » sans que l’application manque de mémoire. Le fichier passe désormais directement entre le stockage du téléphone et le cœur en petits morceaux, au lieu de traverser l’écran en un seul texte.",
+      "Import : un carnet ou un fichier de sites de plongée affiche une seule ligne de progression, du moment où il est reçu ou choisi jusqu’à la fin de l’import : « Copie du fichier », « Vérification », « Import des plongées », « Enregistrement », avec la taille copiée, le pourcentage et le temps restant. « Annuler » arrête la copie et la vérification et supprime la copie partielle. Un message dit combien de plongées ou de sites ont été ajoutés.",
       "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré."
     ],
     "source": "Code source",
@@ -4916,6 +4917,24 @@
       "lock": "Chiffrées sur votre compte et visibles par vous seul. Vous pouvez retirer votre accord dans Mon profil ou dans les Réglages : les données sont alors supprimées.",
       "continue": "Continuer"
     }
+  },
+  "importFlow": {
+    "copy": "Copie du fichier",
+    "read": "Lecture des plongées",
+    "check": "Vérification",
+    "import": "Import des plongées",
+    "save": "Enregistrement",
+    "reading": "Lecture des plongées…",
+    "saving": "Enregistrement…",
+    "group": "Progression de l’import",
+    "size": "{done} sur {total}",
+    "percent": "{n} %",
+    "kb": "{n} Ko",
+    "mb": "{n} Mo",
+    "gb": "{n} Go",
+    "spoken": "{phase}, {n} %",
+    "cancel": "Annuler",
+    "cancelled": "Import annulé. Aucune plongée n’a été modifiée."
   },
   "timeLeft": {
     "seconds": {

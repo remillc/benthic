@@ -55,6 +55,8 @@
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { offerUndo } from '../lib/undo.js';
+  import { importProgress } from '../lib/import-progress.svelte.js';
+  import { isCancelled } from '../lib/import-progress.js';
   import { Capacitor } from '@capacitor/core';
   import { OpenDivesCore } from 'opendives-core';
 
@@ -1175,9 +1177,17 @@
     if (answer === 'replace') {
       try {
         // Only now is the logbook written to the app's cache (in pieces); the replacement deletes it afterwards.
-        const data = await what.stage();
-        await startReplace({ file: file.name, fileName: what.name, data, several: what.several });
+        // One progress line: the copy here, then the import and the save once the diver confirmed (lib/import-progress.js).
+        await importProgress.session(['copy', 'import', 'save'], file.name, async () => {
+          const data = await what.stage(importProgress.reporter('copy'));
+          importProgress.pause();
+          await startReplace({ file: file.name, fileName: what.name, data, several: what.several });
+        });
       } catch (e) {
+        if (isCancelled(e)) {
+          showSnackbar(t('importFlow.cancelled'));
+          return true;
+        }
         const code = String(/** @type {any} */ (e)?.message ?? '');
         console.error('Replace from a file', code);
         f7.dialog.create({ title: t('replace.failedTitle'), text: t('replace.failed'), buttons: [{ text: t('dialog.ok') }] }).open();
@@ -1203,6 +1213,10 @@
       const n = await importFiles(files);
       offerUndo(t('logbook.imported', { n }));
     } catch (e) {
+      if (isCancelled(e)) {
+        showSnackbar(t('importFlow.cancelled'));
+        return;
+      }
       const code = String(/** @type {any} */ (e)?.message ?? '');
       console.error('Import a file', code);
       f7.dialog.create({ title: t('logbook.importTitle'), text: t(importErrorKey(code)), buttons: [{ text: t('dialog.ok') }] }).open();

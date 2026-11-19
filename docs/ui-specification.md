@@ -453,6 +453,17 @@ A phone or a tablet keeps one logbook at a time: the device's own logbook, or th
 
 Never replaced: the OpenDives+ server logbook (its data is never deleted or overwritten from a file; the dialog says so in one line and offers only "Ajouter à ce carnet"), and a logbook synchronised with a Subsurface cloud or git account (removing its dives would be sent to the shared log). A file holding several logbooks (an archive with several `.ssrf`; OpenDives' own export holds `logbook/logbook.ssrf`) imports one only, the main one, and says "Ce fichier contient N carnets : seul « X » est importé." A `.ssrf` or Subsurface XML file holds one logbook; the other formats the core imports (dive computer files, `.db`, `.dld`) are merged as dives and are never offered "Remplacer".
 
+### Import progress (decided on 18 November 2026)
+
+One progress line from the moment a logbook file or a sites file is received or chosen until the import is finished, on every path: a file shared with the app or opened from another app, "+" > "Importer un fichier", the first launch ("Importer un carnet", "Carnet de la version précédente"), "Remplacer ce carnet" and the merge of a sites file. It is a card over every screen (`od-import-progress`, mounted once in the app, 12 px from the sides, above the bottom bar, at most 480 px wide), so it stays across the screens of a flow and nothing moves under it.
+
+- Phases, with the share of the bar each one takes among the phases the path goes through (the bar always ends at 100 %): "Copie du fichier" (30), "Lecture des plongées" (30, the core counting the dives on the first launch), "Vérification" (20, the file read in windows of 2 MB), "Import des plongées" (40), "Enregistrement" (10). The weights are estimates of the time each takes on a 100 MB logbook; the bar never goes back.
+- The copy reports bytes (Android and iOS: the plugin's `stageProgress` event, at most every 100 ms; a file picked in the web layer: its pieces of 3 MB). The check reports the windows of the scan. The core reports nothing inside a read or an import: the bar is indeterminate there (the sliding segment) and the count says "Lecture des plongées…". Sites merge: one step per site.
+- Under the bar, `<ProgressLine>`: the count on the left ("45 Mo sur 100 Mo" during the copy and the check, "62 %" otherwise) and the time left on the right (task 269's estimator, started again each time the line comes back). Android: the wavy linear indicator; iPhone: the 8 pt bar.
+- "Annuler" is shown in the copy and check phases only (nothing is in the logbook yet): the copy stops, the partial file is deleted, "Import annulé. Aucune plongée n'a été modifiée." is shown. The import and save phases cannot be cancelled.
+- When the flow asks a question (the share confirmation, "Remplacer ce carnet" and its name step), the line is hidden while the diver answers and comes back, where it stopped, with the import. The first launch has its own steps: the line ends after the check and starts again, for the import, when the logbook is created.
+- A screen reader hears one text that follows the phase: "Import des plongées, 42 %, 20 secondes restantes". The end of the import is the existing snackbar with the counts ("N plongées ajoutées", "N sites ajoutés").
+
 ### Desktop logbook (decided on 15 November 2026)
 
 The desktop app (Windows, macOS, Linux; docs/system-design.md, section 7) from 1200 dp wide; below, the tablet layout. Mock-ups `bureau-carnet-profil-droite`, `bureau-carnet-macos`, `bureau-carnet-menu-contextuel`.

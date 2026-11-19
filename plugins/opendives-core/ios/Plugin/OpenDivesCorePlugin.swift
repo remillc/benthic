@@ -114,6 +114,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "contentShown", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stageSharedFile", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "cancelStage", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readFileChunk", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "assembleFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
@@ -1789,16 +1790,32 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 FileManager.default.createFile(atPath: file.path, contents: nil)
                 let output = try FileHandle(forWritingTo: file)
                 defer { try? output.close() }
+                let expected = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                stageLock.lock(); cancelledStages.remove(text); stageLock.unlock()
                 var size = 0
+                var reported = 0
+                var reportedAt = Date.distantPast
                 while let piece = try input.read(upToCount: 64 * 1024), !piece.isEmpty {
                     try output.write(contentsOf: piece)
                     size += piece.count
                     if size > 2 * 1024 * 1024 * 1024 { throw Failure("TOO_BIG") }
+                    stageLock.lock(); let stop = cancelledStages.contains(text); stageLock.unlock()
+                    if stop { throw Failure("CANCELLED") }
+                    // Progress for the web layer: at most every 100 ms, and at least 256 KB apart.
+                    if Date().timeIntervalSince(reportedAt) >= 0.1 && size - reported >= 256 * 1024 {
+                        reported = size
+                        reportedAt = Date()
+                        notifyListeners("stageProgress", data: ["uri": text, "done": size, "total": max(expected, size)])
+                    }
                 }
+                notifyListeners("stageProgress", data: ["uri": text, "done": size, "total": size])
                 call.resolve(["name": url.lastPathComponent, "size": size, "path": file.path])
             } catch let error as Failure where error.code == "TOO_BIG" {
                 if let target { try? FileManager.default.removeItem(at: target) }
                 call.reject("The file is too big", "TOO_BIG")
+            } catch let error as Failure where error.code == "CANCELLED" {
+                if let target { try? FileManager.default.removeItem(at: target) }
+                call.reject("Cancelled", "CANCELLED")
             } catch let error as NSError where error.code == NSFileReadNoSuchFileError {
                 call.reject("Cannot open the file", "NOT_FOUND")
             } catch {
@@ -1806,6 +1823,18 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("Cannot read the file", "FAILED")
             }
         }
+    }
+
+    /// The addresses whose copy (stageSharedFile) the diver cancelled; the copy stops at its next piece and rejects CANCELLED.
+    private var cancelledStages = Set<String>()
+    private let stageLock = NSLock()
+
+    /// "Annuler" on the import progress: stops the copy of `uri` and deletes the partial file.
+    @objc func cancelStage(_ call: CAPPluginCall) {
+        if let text = call.getString("uri"), !text.isEmpty {
+            stageLock.lock(); cancelledStages.insert(text); stageLock.unlock()
+        }
+        call.resolve()
     }
 
     /// Up to 4 MB of a staged file, base64, with the file's size ({data, size}).

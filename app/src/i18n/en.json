@@ -2572,6 +2572,7 @@
       "First launch: the slide between steps now plays (it was dropped from the build). The waiting-changes box of the sign-out dialog shows its count in bold, and an iPhone field in error no longer keeps a red frame inside its row.",
       "Replace this logbook: this device keeps one logbook at a time. A logbook file (Subsurface .ssrf, or an archive holding one) opened with OpenDives or chosen in “+” › Import a file now offers “Replace this logbook”: a screen says the logbook leaves this device and offers “Export this logbook first”; “Replace” asks a second time when it was not exported or when changes are not synchronised, then you name the new logbook. The current logbook is put back if the file cannot be read. The OpenDives server logbook and a logbook synchronised with an account are never replaced, with a line that says why. When an archive holds several logbooks, only the main one is imported and the dialog says so.",
       "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to OpenDives from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
+      "Import: a logbook or a dive sites file shows one progress line, from the moment it is received or chosen until the import is finished: “Copying the file”, “Checking the file”, “Importing the dives”, “Saving”, with the size copied, the percentage and the time left. “Cancel” stops the copy and the check and deletes the partial copy. A message tells how many dives or sites were added.",
       "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored."
     ],
     "source": "Source code",
@@ -4916,6 +4917,24 @@
       "lock": "Encrypted on your account and visible only to you. You can withdraw your consent in My profile or in Settings: the data is then deleted.",
       "continue": "Continue"
     }
+  },
+  "importFlow": {
+    "copy": "Copying the file",
+    "read": "Reading the dives",
+    "check": "Checking the file",
+    "import": "Importing the dives",
+    "save": "Saving",
+    "reading": "Reading the dives…",
+    "saving": "Saving…",
+    "group": "Import progress",
+    "size": "{done} of {total}",
+    "percent": "{n} %",
+    "kb": "{n} KB",
+    "mb": "{n} MB",
+    "gb": "{n} GB",
+    "spoken": "{phase}, {n} %",
+    "cancel": "Cancel",
+    "cancelled": "Import cancelled. No dive was changed."
   },
   "timeLeft": {
     "seconds": "{n} s left",

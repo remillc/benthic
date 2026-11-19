@@ -8,16 +8,17 @@
   import { createTimeLeft, timeLeftText } from '../lib/time-left.js';
 
   /**
-   * @type {{ done: number, total: number, count: string, now?: () => number }}
-   * `count`: the text of the count (« 184 sur 312 »). `now`: the clock, for tests.
+   * @type {{ done: number, total: number, count: string, label?: string, now?: () => number }}
+   * `count`: the text of the count (« 184 sur 312 »). `label`: what the screen reader hears first (« Import des plongées, 42 % »).
+   * `now`: the clock, for tests.
    */
-  let { done, total, count, now = Date.now } = $props();
+  let { done, total, count, label = '', now = Date.now } = $props();
 
   const estimator = createTimeLeft();
   let clock = $state(now());
   const left = $derived(estimator.update(done, total, clock));
   const short = $derived(timeLeftText(t, left));
-  const spoken = $derived(left ? `${count}, ${timeLeftText(t, left, true)}` : count);
+  const spoken = $derived([label, count, left ? timeLeftText(t, left, true) : ''].filter(Boolean).join(', '));
 
   // Re-read the clock every second and at each new count, so that a stalled operation does not keep its old value.
   $effect(() => {
