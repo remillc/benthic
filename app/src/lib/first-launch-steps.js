@@ -173,6 +173,38 @@ export function hasBack(step, leavable = false) {
 const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth']);
 
 /**
+ * What the system Back (Android back key and gesture, predictive back; the iOS left-edge swipe) does on a step. It does
+ * what the on-screen « Retour » does, and never goes where it must not:
+ *   - the first step leaves the first launch when it was entered from the logbook's menu, else sends the app to the
+ *     background (the first launch cannot be dismissed);
+ *   - a step with a « Retour » goes one step back (the stack already cuts the steps that must not be re-entered: after an
+ *     e-mail code the stack holds the address step, never the spent code step, see `enterCreate` and `enterOffer`);
+ *   - a running import, download or upload presses its own « Annuler » (`cancel`);
+ *   - the offer presses « Continuer sans abonnement » (`without`: back to the first step, nothing was created);
+ *   - the end screens (purchase done, health, ready) and the stops of an upload do nothing (`ignore`): what was
+ *     created or bought is not undone by a gesture.
+ * @param {Step[]} stack
+ * @param {boolean} fromMenu the first launch was entered from the logbook's menu
+ * @returns {{ kind: 'minimize'|'leave'|'back'|'cancel'|'without'|'ignore', selector?: string }}
+ */
+export function systemBack(stack, fromMenu) {
+  const step = stack[stack.length - 1];
+  if (step === 'start') return { kind: fromMenu && stack.length === 1 ? 'leave' : 'minimize' };
+  if (leavesFirstLaunch(stack, fromMenu)) return { kind: 'leave' };
+  if (CANCEL_BUTTON[step]) return { kind: 'cancel', selector: CANCEL_BUTTON[step] };
+  if (step === 'odplusOffer') return stack.length > 1 ? { kind: 'without' } : { kind: 'ignore' };
+  if (NO_BACK.includes(step)) return { kind: 'ignore' };
+  return { kind: 'back' };
+}
+
+/** The « Annuler » button of the steps that have no « Retour » (it stops what is running). */
+const CANCEL_BUTTON = /** @type {Record<string, string>} */ ({
+  importProgress: '.od-first-launch-divelogs--cancel',
+  serverDownload: '.od-first-launch-server--cancel',
+  createSend: '.od-server-create--text',
+});
+
+/**
  * A signed-in account that holds no logbook: « Aucun carnet sur votre compte ». « Retour » leaves for the address
  * step (the code is spent), not for the download.
  * @param {Step[]} stack

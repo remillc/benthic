@@ -205,7 +205,7 @@ class Tab {
   }
 }
 
-async function openTab(width, height, mobile) {
+async function openTab(width, height, mobile, welcome = false) {
   const target = await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json();
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
@@ -241,9 +241,12 @@ async function openTab(width, height, mobile) {
     tab.run((t, r) => window.__odAnswer(t, r), token, reply).catch(() => {});
   };
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
-    source: `(${function (home, temp, stage) {
-      localStorage.setItem('CapacitorStorage.od.welcomeBeta', 'done');
-      localStorage.setItem('CapacitorStorage.od.welcome', 'done');
+    source: `(${function (home, temp, stage, welcome) {
+      // The very first start (no value) shows the first launch; otherwise the logbook.
+      if (!welcome) {
+        localStorage.setItem('CapacitorStorage.od.welcomeBeta', 'done');
+        localStorage.setItem('CapacitorStorage.od.welcome', 'done');
+      }
       const answers = new Map();
       let n = 0;
       window.__odAnswer = (token, reply) => answers.get(token)?.(reply);
@@ -261,12 +264,12 @@ async function openTab(width, height, mobile) {
         credentials: { get: async () => null, set: async () => {}, clear: async () => {} },
         fs: new Proxy({}, { get: (_, op) => (o) => call('fs', op, o) }),
       };
-    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))})`,
+    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
   });
   await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=md` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
-    if (await tab.run(() => !!document.querySelector('a[href^="/dives/"]')).catch(() => false)) break;
+    if (await tab.run((w) => !!document.querySelector(w ? '.od-welcome.modal-in .od-first-launch, .od-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
   }
   await sleep(500);
   return tab;
@@ -502,6 +505,47 @@ async function phoneFlows() {
   tab.ws.close();
 }
 
+/** The step of the first launch on screen (data-step of lib/first-launch-steps.js), once its transition is over. */
+async function welcomeStep(tab) {
+  await sleep(700);
+  return tab.run(() => document.querySelector('.od-welcome.modal-in .od-first-launch--step:last-of-type')?.getAttribute('data-step') ?? null);
+}
+/** Checks the step reached; counts as one check. */
+async function expectStep(tab, label, expected) {
+  const got = await welcomeStep(tab);
+  checks++;
+  if (got !== expected) {
+    failures.push({ label, problems: [`first launch on step ${got}, expected ${expected}`] });
+    console.log(`  FAIL ${label}: ${got} instead of ${expected}`);
+    console.log((await tab.run(() => document.body.innerText.slice(0, 300) + ' | ' + [...document.querySelectorAll('.modal-in')].map((m) => m.className).join(';'))));
+  }
+}
+
+async function welcomeFlows() {
+  console.log('First launch, 390x844: the system Back goes to the previous step');
+  const tab = await openTab(390, 844, true, true);
+  console.log(await tab.run(() => document.querySelector('.od-welcome')?.outerHTML.slice(0, 1500)));
+  await expectStep(tab, 'first launch opens on the first step', 'start');
+  const welcomeTap = (pattern) => tapText(tab, pattern, '.od-welcome.modal-in');
+  const cases = [
+    ['Import a logbook / Importer un carnet', '^\s*(Import a logbook|Importer un carnet)', 'import'],
+    ['New logbook / Commencer un carnet', '^\s*(Start a logbook|Commencer un carnet)', 'new'],
+    ['Sign in or create an account', '(Sign in|Se connecter)', 'odplusConnect'],
+  ];
+  for (const [name, pattern, step] of cases) {
+    await welcomeTap(pattern).catch(async (e) => { console.log(await tab.run(() => [...document.querySelectorAll('.od-welcome.modal-in button, .od-welcome.modal-in a')].map((b) => b.textContent.trim().slice(0, 30) + '@' + Math.round(b.getBoundingClientRect().y)).join(' | '))); throw e; });
+    await expectStep(tab, `${name}: opens`, step);
+    await hardwareBack(tab);
+    await expectStep(tab, `${name}: Back returns to the first step`, 'start');
+  }
+  await hardwareBack(tab);
+  await sleep(300);
+  checks++;
+  if (!(await tab.run(() => !!document.querySelector('.od-welcome.modal-in')))) failures.push({ label: 'first step', problems: ['Back on the first step closed the first launch'] });
+  await expectStep(tab, 'Back on the first step keeps the first launch', 'start');
+  tab.ws.close();
+}
+
 async function tabletFlows() {
   console.log('Tablet, 1280x800');
   const tab = await openTab(1280, 800, false);
@@ -516,7 +560,8 @@ async function tabletFlows() {
 }
 
 try {
-  if (!args.has('--tablet-only')) await phoneFlows();
+  if (!args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
+  if (!args.has('--tablet-only')) await welcomeFlows();
   if (!args.has('--phone-only')) await tabletFlows();
 } catch (e) {
   failures.push({ label: 'the run', problems: [String(e.stack ?? e)] });
