@@ -2837,7 +2837,8 @@
       "Desktop: “Share” opens as a dialog in the middle of the window; a click on a trip in the logbook shows the trip page on the right (the chevron folds it); importing a file says where the dives come from (“1 dive imported from “…””) with Undo; “Saved plans” opens a “Planned dives” side panel with “New plan”; in Settings › Rebreather, the O₂ consumption says it follows the Volume unit.",
       "Tablet: “Export” and the list of dives at one map point open as a dialog in the middle of the screen, and so do conflicts on several dives; when downloading, a Bluetooth that is not allowed or is off shows as a card under the remembered computers.",
       "iPad: the same dialogs and the same Bluetooth card as on the Android tablet, with iOS sheet corners.",
-      "iPhone: About has 50 pt buttons with iOS rounded corners; tablet in portrait: in Offline maps, “Add a region” moves under the list."
+      "iPhone: About has 50 pt buttons with iOS rounded corners; tablet in portrait: in Offline maps, “Add a region” moves under the list.",
+      "Desktop: a trip of a single dive is no longer a trip row in the logbook, as on the phone."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

@@ -234,7 +234,7 @@ export function sortDives(dives, extras, sort) {
  * The table's rows. Sorted by date or number, the dives of a trip gather under one
  * expandable trip row (at the place of its first dive in that order); sorted by any other
  * column, the rows are the dives alone, since a trip's dives no longer follow each other.
- * A trip of one dive is still a trip row.
+ * A trip of one dive is no trip: its dive is a row of its own, as in the phone's logbook (lib/trip-shown.js).
  * @param {import('opendives-core').Dive[]} sorted
  * @param {Sort} sort
  * @param {Record<number, boolean>} collapsed trips the diver folded, by trip id
@@ -254,7 +254,7 @@ export function tableRows(sorted, sort, collapsed) {
   const rows = [];
   const placed = new Set();
   for (const d of sorted) {
-    if (!d.trip) {
+    if (!d.trip || (byTrip.get(d.trip.id)?.length ?? 0) < 2) {
       rows.push({ type: 'dive', dive: d, inTrip: false });
       continue;
     }

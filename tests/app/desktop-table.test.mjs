@@ -111,6 +111,16 @@ test('by date, a trip is one expandable row at its place; folded, its dives hide
   assert.deepEqual(rowDiveIds(folded), [19, 18, 17, 16, 15]);
 });
 
+test('a trip of one dive is no trip row: its dive stands alone, as on the phone', () => {
+  const lone = [...dives, dive(20, 10, '2026-03-01T09:00:00', '', 20000, 3000, 200)];
+  const rows = tableRows(sortDives(lone, extras, DEFAULT_SORT), DEFAULT_SORT, {});
+  assert.deepEqual(
+    rows.map((r) => (r.type === 'trip' ? `trip${r.id}` : r.dive.number)),
+    [10, 9, 8, 7, 6, 5, 'trip100', 4, 3, 2, 1],
+  );
+  assert.equal(rows[0].type === 'dive' && rows[0].inTrip, false);
+});
+
 test('by another column, rows are the dives alone', () => {
   const sort = { key: 'maxDepth', descending: true };
   const rows = tableRows(sortDives(dives, extras, sort), sort, {});
