@@ -19,13 +19,18 @@ import androidx.core.view.WindowInsetsCompat;
  *  - every change (rotation, gesture or 3-button navigation, multi-window, cutout) is pushed to the
  *    page by calling window.__odSetInsets (src/lib/safe-area.js).
  * The insets are not consumed: the WebView still receives them.
+ *
+ * The same message carries the widths of the system's Back gesture zones at the left and right edges
+ * (gestureLeft, gestureRight; 0 with the 3-button navigation). A touch that starts there is taken away
+ * from the page by the system once it reads its gesture: the page's own swipes do not start there
+ * (src/lib/swipe.js; docs/architecture.md, section 13).
  */
 final class SafeAreaInsets {
 
     private static final String TAG = "OpenDivesInsets";
 
     private final WebView webView;
-    private volatile String json = "{\"top\":0,\"right\":0,\"bottom\":0,\"left\":0}";
+    private volatile String json = "{\"top\":0,\"right\":0,\"bottom\":0,\"left\":0,\"gestureLeft\":0,\"gestureRight\":0}";
     /** The window's insets were read at least once: until then get() only has zeros and the page would lay out twice. */
     private volatile boolean known = false;
     /** When the last insets were sent to the page (uptime ms); 0 before. */
@@ -51,7 +56,7 @@ final class SafeAreaInsets {
         return sentAt;
     }
 
-    /** The current insets as JSON in CSS pixels: {"top":..,"right":..,"bottom":..,"left":..}. */
+    /** The current insets as JSON in CSS pixels: {"top":..,"right":..,"bottom":..,"left":..,"gestureLeft":..,"gestureRight":..}. */
     @JavascriptInterface
     public String get() {
         Log.i(TAG, "page reads " + json);
@@ -63,11 +68,15 @@ final class SafeAreaInsets {
         Insets insets = windowInsets.getInsetsIgnoringVisibility(
             WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
         );
+        // Where the system reads its Back gesture; the safe area itself is not part of the zone the page must leave alone.
+        Insets gestures = windowInsets.getInsets(WindowInsetsCompat.Type.systemGestures());
         float density = webView.getResources().getDisplayMetrics().density;
         String next = "{\"top\":" + css(insets.top, density)
             + ",\"right\":" + css(insets.right, density)
             + ",\"bottom\":" + css(insets.bottom, density)
-            + ",\"left\":" + css(insets.left, density) + "}";
+            + ",\"left\":" + css(insets.left, density)
+            + ",\"gestureLeft\":" + css(Math.max(0, gestures.left), density)
+            + ",\"gestureRight\":" + css(Math.max(0, gestures.right), density) + "}";
         known = true;
         if (next.equals(json)) return;
         json = next;

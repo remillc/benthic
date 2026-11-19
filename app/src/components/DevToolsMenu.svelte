@@ -12,6 +12,7 @@
   import { devUi } from '../lib/dev-tools-ui.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { traceText } from '../lib/nav-trace.js';
 
   const english = typeof navigator !== 'undefined' && !/^fr/i.test(navigator.language);
   const text = english
@@ -32,6 +33,8 @@
         resetKeepAlpha: 'Keep the previous version’s copy', resetExport: 'Export the logbook first', resetAll: 'Erase everything', resetAgain: 'Tap again to erase', resetKept: 'Kept: the development authority and the offline maps. No server is called.',
         statusBusy: 'Working…', statusOk: 'Done. The app restarts.',
         alpha: 'Import the previous version’s logbook', alphaHint: 'Copies, read-only, the logbook left on the device.',
+        nav: 'Navigation', navLog: 'Navigation log', navHint: 'The last 200 navigation events (pages, Back, swipes, sheets): copy it or share it when a screen is left in a wrong state.',
+        navCopy: 'Copy', navShare: 'Share', navEmpty: 'No event yet.', navCopied: 'Navigation log copied',
         close: 'Close', foot: 'Only visible in development builds.', done: 'Done', failed: 'Failed', noSession: 'No account is signed in, so there is nothing to delete.', noAlpha: 'No logbook of the previous version on this device.',
       }
     : {
@@ -51,6 +54,8 @@
         resetKeepAlpha: 'Garder la copie de la version précédente', resetExport: 'Exporter d’abord le carnet', resetAll: 'Tout effacer', resetAgain: 'Toucher encore pour effacer', resetKept: 'Gardés : l’autorité de développement et les cartes hors ligne. Aucun appel au serveur.',
         statusBusy: 'En cours…', statusOk: 'Fait. L’app redémarre.',
         alpha: 'Importer le carnet de la version précédente', alphaHint: 'Copie, en lecture seule, le carnet resté sur l’appareil.',
+        nav: 'Navigation', navLog: 'Journal de navigation', navHint: 'Les 200 derniers événements de navigation (pages, Retour, balayages, feuilles) : à copier ou partager quand un écran reste dans un mauvais état.',
+        navCopy: 'Copier', navShare: 'Partager', navEmpty: 'Aucun événement pour l’instant.', navCopied: 'Journal de navigation copié',
         close: 'Fermer', foot: 'Visible seulement dans les versions de développement.', done: 'Fait', failed: 'Échec', noSession: 'Aucun compte connecté : il n’y a rien à supprimer.', noAlpha: 'Aucun carnet de la version précédente sur cet appareil.',
       };
 
@@ -212,6 +217,32 @@
     };
   }
 
+  /** « Journal de navigation » (lib/nav-trace.js): the trace as text, read when the panel opens. */
+  let navOpen = $state(false);
+  let navText = $state('');
+  function openNav() {
+    navText = traceText();
+    navOpen = true;
+  }
+  async function copyNav() {
+    try {
+      await navigator.clipboard.writeText(navText);
+      showSnackbar(text.navCopied);
+    } catch (e) {
+      console.error('Navigation log', e);
+      status = failure(e);
+    }
+  }
+  async function shareNav() {
+    try {
+      const { Share } = await import('@capacitor/share');
+      await Share.share({ title: text.navLog, text: navText });
+    } catch (e) {
+      // No share sheet here (a browser, the desktop), or the diver closed it: the copy is the other way.
+      await copyNav();
+    }
+  }
+
   /** @param {KeyboardEvent} e */
   function onKey(e) {
     if (devUi.open && e.key === 'Escape') devUi.open = false;
@@ -331,6 +362,31 @@
               </div>
             {:else}
               {@render row('replay', 'refresh', text.replay, text.replayHint, () => (resetOpen = true))}
+            {/if}
+          </div>
+        </section>
+
+        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-nav">
+          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-nav">{text.nav}</h3>
+          <div class="od-dev-tools-menu--group">
+            {#if navOpen}
+              <div class="od-dev-tools-menu--reset" role="group" aria-label={text.navLog}>
+                <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                <pre class="od-dev-tools-menu--trace" tabindex="0">{navText || text.navEmpty}</pre>
+                <div class="od-dev-tools-menu--reset-buttons">
+                  <button type="button" class="od-dev-tools-menu--confirm-cancel" onclick={() => (navOpen = false)}>{text.close}</button>
+                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!navText} onclick={shareNav}>{text.navShare}</button>
+                  <button type="button" class="od-dev-tools-menu--confirm-yes" disabled={!navText} onclick={copyNav}>{text.navCopy}</button>
+                </div>
+              </div>
+            {:else}
+              <button type="button" class="od-dev-tools-menu--action" onclick={openNav}>
+                <span class="od-dev-tools-menu--action-icon"><Icon name="history" size={22} /></span>
+                <span class="od-dev-tools-menu--action-text">
+                  <span class="od-dev-tools-menu--action-title">{text.navLog}</span>
+                  <span class="od-dev-tools-menu--action-hint">{text.navHint}</span>
+                </span>
+              </button>
             {/if}
           </div>
         </section>
@@ -799,6 +855,19 @@
       font-size: 12px;
       line-height: 16px;
       text-align: center;
+    }
+    /* « Journal de navigation »: the trace, one event a line, scrolled inside its box. */
+    .od-dev-tools-menu--trace {
+      max-height: 280px;
+      margin: 0;
+      padding: 8px;
+      overflow: auto;
+      border-radius: 8px;
+      background: var(--od-surface);
+      color: var(--od-text);
+      font: 11px/15px ui-monospace, Menlo, Consolas, monospace;
+      white-space: pre;
+      user-select: text;
     }
     .od-dev-tools-menu button:focus-visible {
       outline: 2px solid var(--od-dev);

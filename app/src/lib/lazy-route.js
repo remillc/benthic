@@ -23,17 +23,35 @@ export function stylesheetsReady(doc = document, timeout = 3000) {
 }
 
 /**
- * A Framework7 async route for a page loaded on demand.
+ * Wraps the `async` function of a route: when it fails, the route is rejected before the error goes on. Framework7
+ * refuses every other page change until an async route is resolved or rejected; left pending, the view would never
+ * answer again (docs/architecture.md, section 13).
+ * @param {(context: { resolve: Function, reject: Function }) => Promise<void>} fn
+ */
+export function safeAsync(fn) {
+  return async (/** @type {{ resolve: Function, reject: Function }} */ context) => {
+    try {
+      await fn(context);
+    } catch (e) {
+      context.reject();
+      throw e;
+    }
+  };
+}
+
+/**
+ * A Framework7 async route for a page loaded on demand. Framework7 refuses every other page change until the route
+ * is resolved or rejected: a failed load rejects it, never leaves it pending (docs/architecture.md, section 13).
  * @param {() => Promise<{ default: any }>} load the dynamic import of the page
  * @param {Record<string, any>} [props] the page's props
  * @param {() => Promise<unknown>} [ready] what to wait for after the import (the style sheets)
  */
 export function lazyRoute(load, props, ready = () => stylesheetsReady()) {
   return {
-    async: async (/** @type {{ resolve: Function }} */ { resolve }) => {
+    async: safeAsync(async ({ resolve }) => {
       const page = (await load()).default;
       await ready();
       resolve({ component: page }, props ? { props } : undefined);
-    },
+    }),
   };
 }

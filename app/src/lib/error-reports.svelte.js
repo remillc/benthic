@@ -12,6 +12,7 @@ import { sideWindow } from './layout.svelte.js';
 import {
   buildReport, describeError, deviceFromUserAgent, dropReport, noteLog, pendingReports, queueReport, recentLog, reportKey, sendReport,
 } from './error-report.js';
+import { traceLines } from './nav-trace.js';
 
 /** What the report dialog shows. `status`: idle, sending, or offline (the last try found no network). */
 export const errorReport = $state({
@@ -67,7 +68,7 @@ export function reportError(kind, reason) {
     if (typeof code === 'string' && EXPECTED.has(code)) return;
     noteLog('error', message);
     if (!canSend()) return;
-    const report = buildReport({ kind, message, stack, route: routeNow(), log: recentLog(), info: info() });
+    const report = buildReport({ kind, message, stack, route: routeNow(), log: recentLog(), nav: traceLines(), info: info() });
     if (seen.has(reportKey(report))) return;
     seen.add(reportKey(report));
     queueReport(deviceStore, report);

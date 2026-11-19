@@ -1,5 +1,5 @@
 // The account sheet for a free diver, the OpenDives+ sheet with its maintenance badge, « Gérer le compte », the store's
-// subscription page, the « #compte » history entry of the Android sheet and the account deletion (task 2026-11-18-281;
+// subscription page, how Back closes the Android sheet and the account deletion (task 2026-11-18-281;
 // mock-ups docs/mockups-release/nav-compte-gratuit-android, nav-compte-profil-android, compte-android-connecte,
 // bureau-compte-gerer, ...). The screens need Framework7 and a WebView: their routes and texts are read from the source;
 // the rules are tested as pure functions; the real screens were looked at in a browser and in Electron.
@@ -8,7 +8,6 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/odplus-state.js';
 import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
-import { createAccountHistory, ACCOUNT_HASH } from '../../app/src/lib/account-history.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
 import { evaluate, overdueCount, todayIso } from '../../app/src/lib/maintenance.js';
 import { createServerApi, overviewOf } from '../../app/src/lib/server-api.js';
@@ -228,94 +227,21 @@ test('signing out keeps the logbook on the device', () => {
   assert.equal(langs.fr.account.manage.signOutText, 'Le carnet reste sur cet appareil');
 });
 
-// --- « #compte » in the history (Android, this sheet only) ---
+// --- Back closes the sheet; nothing is written to the browser's history ---
+// Task 2026-11-18-281 (point 5) had the Android sheet add « #compte » to the browser's history so that Back closed it.
+// Since the navigation contract of 19 November 2026 (docs/architecture.md, section 13) the routers own the history and
+// the one Back dispatcher closes the sheet, like every other sheet: what the task wanted (Back closes the sheet, no
+// orphan entry) holds with no entry at all. tests/e2e/navigation.mjs checks it on the real page.
 
-/** A window with a real history stack: pushState adds an entry, back() pops it and fires popstate. */
-function fakeWindow() {
-  const entries = [''];
-  const listeners = [];
-  const win = {
-    entries,
-    get location() {
-      return { hash: entries[entries.length - 1] };
-    },
-    history: {
-      pushState: (_s, _t, url) => entries.push(url),
-      back() {
-        if (entries.length > 1) entries.pop();
-        // The event comes later, as in a browser.
-        queueMicrotask(() => listeners.forEach((fn) => fn()));
-      },
-    },
-    addEventListener: (_type, fn) => listeners.push(fn),
-    removeEventListener: (_type, fn) => listeners.splice(listeners.indexOf(fn), 1),
-    /** The system's Back gesture. */
-    systemBack() {
-      win.history.back();
-    },
-  };
-  return win;
-}
-const tick = () => new Promise((r) => setTimeout(r));
-
-test('opening the account sheet adds « #compte » with a new history entry', () => {
-  const win = fakeWindow();
-  const h = createAccountHistory(win, { close() {} });
-  h.sync(true);
-  assert.deepEqual(win.entries, ['', ACCOUNT_HASH]);
-  h.sync(true);
-  assert.equal(win.entries.length, 2, 'opening twice adds nothing');
-  h.destroy();
-});
-
-test('the Back gesture closes the sheet and leaves the page where it was', async () => {
-  const win = fakeWindow();
-  let open = false;
-  const h = createAccountHistory(win, { close: () => ((open = false), h.sync(false)) });
-  open = true;
-  h.sync(true);
-  win.systemBack();
-  await tick();
-  assert.equal(open, false, 'the sheet closed');
-  assert.deepEqual(win.entries, [''], 'one entry back, nothing orphan');
-  h.destroy();
-});
-
-test('closing another way (scrim, swipe, ✕) goes back one entry: no orphan « #compte »', async () => {
-  const win = fakeWindow();
-  let closed = 0;
-  const h = createAccountHistory(win, { close: () => closed++ });
-  h.sync(true);
-  h.sync(false); // the sheet's state went to closed
-  await tick();
-  assert.deepEqual(win.entries, [''], 'the entry we added is gone');
-  assert.equal(closed, 0, 'the popstate that follows closes nothing twice');
-  // It opens again as often as needed, one entry each time.
-  h.sync(true);
-  h.sync(false);
-  h.sync(true);
-  assert.deepEqual(win.entries, ['', ACCOUNT_HASH]);
-  h.destroy();
-});
-
-test('a sheet that was never opened by us does not touch the history', () => {
-  const win = fakeWindow();
-  const h = createAccountHistory(win, { close() {} });
-  h.sync(false);
-  assert.deepEqual(win.entries, ['']);
-  h.destroy();
-});
-
-test('only the Android account sheet uses it: not the iPhone’s page sheet, not the desktop, no other sheet', () => {
-  assert.match(sheet, /const history = !ios && !desktopApp && typeof window !== 'undefined' \? createAccountHistory\(/);
-  assert.match(sheet, /history\?\.sync\(navigation\.accountOpen\)/);
-  const users = ['components', 'pages', 'lib'].flatMap((dir) =>
-    readdirSync(new URL(`../../app/src/${dir}/`, import.meta.url))
-      .filter((f) => /\.(svelte|js)$/.test(f) && f !== 'account-history.js' && read(`${dir}/${f}`).includes('account-history'))
-      .map((f) => `${dir}/${f}`),
-  );
-  assert.deepEqual(users, ['components/AccountSheet.svelte']);
-  assert.ok(!desktopSheet.includes('account-history'));
+test('the account sheet writes nothing to the browser history: Back closes it through the dispatcher', () => {
+  assert.ok(!existsSync(new URL('lib/account-history.js', root)), 'lib/account-history.js is gone');
+  for (const text of [sheet, desktopSheet]) {
+    for (const word of ['pushState', 'replaceState', 'history.back', 'popstate', 'account-history']) assert.ok(!text.includes(word), word);
+  }
+  // The dispatcher closes the topmost sheet, whichever it is.
+  assert.ok(read('lib/back-button.js').includes("classList.contains('sheet-modal')) f7.sheet.close(el)"));
+  // Closing by Back, the scrim or a swipe down all end in the same state.
+  assert.ok(sheet.includes('onSheetClosed={() => (navigation.accountOpen = false)}'));
 });
 
 // --- Texts ---

@@ -5,7 +5,6 @@
   // menu held that is not a section: the account (« Gérer le compte » opens Compte), the sync
   // line with « Synchroniser » (and its other options in manual mode), Réglages and À propos.
   // Compte, Réglages and À propos open over the current section, with a back arrow.
-  import { onDestroy } from 'svelte';
   import { Sheet, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
@@ -26,7 +25,6 @@
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
-  import { createAccountHistory } from '../lib/account-history.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
 
   const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
@@ -48,13 +46,9 @@
     if (navigation.accountOpen && subscriber && !desktopApp) loadInventory().catch((e) => console.error('Reading the equipment', e));
   });
 
-  // Android only (not the iPhone's page sheet, not the desktop's card): « #compte » in the history, so that Back closes
-  // the sheet and closing it another way leaves no orphan entry (lib/account-history.js). This sheet only.
-  const history = !ios && !desktopApp && typeof window !== 'undefined' ? createAccountHistory(/** @type {any} */ (window), { close: () => (navigation.accountOpen = false) }) : null;
-  $effect(() => {
-    history?.sync(navigation.accountOpen);
-  });
-  onDestroy(() => history?.destroy());
+  // Back closes the sheet through the app's one Back dispatcher (lib/back-button.js), like every other sheet. The
+  // sheet used to add « #compte » to the browser's history (task 2026-11-18-281, point 5); the routers own the history
+  // and nothing is written to the browser's any more (docs/architecture.md, section 13).
 
   /** « Gérer le compte »: the new screen for an OpenDives+ account, the account page for the others. */
   function manage() {
@@ -147,7 +141,8 @@
 >
   {#if ios}
   <!-- iPhone (task 2026-11-14-127, appbar-tiroir-ios-ouvert.dc.html): a page sheet « Compte » with
-       OK, in grouped lists: the account, the sync, then Réglages and À propos. -->
+       OK, in grouped lists: the account, the sync, then Réglages and À propos. Its rows are buttons: `data-row` names
+       them as the Android rows' addresses do (« #profile » there, data-row="profile" here), for the navigation tests. -->
   <div class="od-account-sheet--ios">
     <div class="od-account-sheet--ios-bar">
       <span class="od-account-sheet--ios-title">{t('account.title')}</span>
@@ -171,7 +166,7 @@
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       <div class="od-account-sheet--ios-group">
-        <button type="button" class="od-account-sheet--ios-row" onclick={() => plus('offer')}>
+        <button type="button" class="od-account-sheet--ios-row" data-row="offer-sync" onclick={() => plus('offer')}>
           <Icon name="cloudDownload" />
           <span class="od-account-sheet--row-label">
             <OdPlusChip onSheet />
@@ -180,7 +175,7 @@
           </span>
           <Icon name="chevron" size={20} />
         </button>
-        <button type="button" class="od-account-sheet--ios-row" onclick={() => plus('offer')}>
+        <button type="button" class="od-account-sheet--ios-row" data-row="offer-profile" onclick={() => plus('offer')}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
             <OdPlusChip onSheet />
@@ -235,7 +230,7 @@
       {#if isRelease && !desktopApp}
         <!-- « Mon profil de plongeur », then « Sauvegarde et restauration » (tasks 267, 281, 290, 291): the red line and the badge when a piece is overdue. -->
         <div class="od-account-sheet--ios-group">
-          <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
+          <button type="button" class="od-account-sheet--ios-row" data-row="profile" onclick={() => go(() => openOver('/profile'))}>
             <Icon name="briefcase" />
             <span class="od-account-sheet--row-label">
               {t('gear.profile.title')}
@@ -250,7 +245,7 @@
           </button>
           {#if subscriber}
             <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
-            <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
+            <button type="button" class="od-account-sheet--ios-row" data-row="backup" onclick={() => go(openBackup)}>
               <Icon name="history" />
               <span class="od-account-sheet--row-label">
                 {t('account.sheet.backup')}
@@ -263,7 +258,7 @@
       {/if}
     {/if}
     <div class="od-account-sheet--ios-group">
-      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openSettings)}>
+      <button type="button" class="od-account-sheet--ios-row" data-row="settings" onclick={() => go(openSettings)}>
         <Icon name="settings" />
         <span class="od-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />

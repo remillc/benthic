@@ -2932,6 +2932,7 @@
       "dives": "Plongées",
       "lastSync": "Dernière synchronisation",
       "lastError": "Dernière erreur",
+      "navigation": "Navigation (derniers écrans)",
       "git": "Dépôt git",
       "server": "Serveur OpenDives"
     },

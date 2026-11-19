@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildReport, clearLog, deviceFromUserAgent, describeError, dropReport, LOG_LINES, MAX_PENDING, noteLog, pendingReports,
+  buildReport, clearLog, deviceFromUserAgent, describeError, dropReport, LOG_LINES, MAX_PENDING, NAV_LINES, noteLog, pendingReports,
   queueReport, recentLog, reportKey, reportText, sendReport,
 } from '../../app/src/lib/error-report.js';
 
@@ -98,4 +98,17 @@ test('sending: sent, offline (kept) and refused (dropped)', async () => {
   assert.equal(await sendReport(report, { baseUrl: 'http://s', transport: answer(413) }), 'refused');
   assert.equal(await sendReport(report, { baseUrl: 'http://s', transport: async () => { throw new Error('network'); } }), 'offline');
   assert.equal(await sendReport(report, { baseUrl: '', transport: answer(200) }), 'offline');
+});
+
+test('a report carries the navigation trace after the log: scrubbed lines, at most NAV_LINES of them', () => {
+  const nav = Array.from({ length: NAV_LINES + 5 }, (_, i) => `nav 10:27:42:${String(i).padStart(3, '0')} back logbook from /dives/${i} | +40 route logbook / (1)`);
+  nav[nav.length - 1] = 'nav 10:27:50:000 route logbook /sites/ for marie@example.org';
+  const report = buildReport({ kind: 'js', message: 'boom', log: ['12:00:00 route /dives/3'], nav, info });
+  assert.equal(report.log.length, 1 + NAV_LINES);
+  assert.equal(report.log[0], '12:00:00 route /dives/3');
+  assert.ok(report.log.slice(1).every((line) => line.startsWith('nav ')));
+  assert.equal(report.log[report.log.length - 1], 'nav 10:27:50:000 route logbook /sites/ for [email]');
+  // The server takes up to 200 lines of 500 characters (docs/architecture.md, section 11.9).
+  assert.ok(LOG_LINES + NAV_LINES <= 200);
+  assert.ok(reportText(report).includes('nav 10:27:50:000'), 'the diver reads the trace before sending');
 });
