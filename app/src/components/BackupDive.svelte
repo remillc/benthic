@@ -121,7 +121,7 @@
     {:else if !versions.length}
       <p class="od-backup--empty">{t('backup.dive.none')}</p>
     {:else}
-      <div class="od-backup--list">
+      <div class="od-backup--list" role="list">
         {#each versions as v (v.id)}
           <div class="od-backup--row" role="listitem">
             <span class="od-backup--texts">
