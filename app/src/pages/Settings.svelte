@@ -54,6 +54,7 @@
   import { waterTypeName, downloadWaterName, FLIGHT_WAIT_MODES, flightWaitName } from '../lib/tools.js';
   import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
+  import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
   /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
@@ -1114,6 +1115,23 @@
           : null;
       case 'reset':
         return { title: '', rows: [{ kind: 'reset', id: 'reset', label: t('settings.advanced.reset'), text: t('settings.advanced.resetText') }], note: t('settings.advanced.note') };
+      // Équipement (task 2026-11-19-287, bureau-reglages-equipement): the cylinders added to new dives, then the
+      // cylinder types with their two switches. The phone's « Types de bouteilles » link is the card itself here.
+      case 'equipment':
+        return group
+          ? {
+              title: t('desktopSettings.equipment.defaults'),
+              rows: group.rows
+                .filter((row) => ['defaultCylinder', 'defaultDiluent', 'defaultOxygen', 'defaultBailout'].includes(row.id))
+                .map((row) => (row.id === 'defaultBailout' ? { ...row, kind: 'bailout', text: row.value, value: '' } : row)),
+            }
+          : null;
+      case 'cylinderTypes':
+        return {
+          title: t('settings.cylinders.title'),
+          custom: 'cylinderTypes',
+          rows: (groups.find((g) => g.id === 'equipment')?.rows ?? []).filter((row) => row.kind === 'switch'),
+        };
       case 'deco':
         return group ? { title: group.title, rows: group.rows, warning: t('settings.deco.warning'), note: t('settings.deco.note') } : null;
       case 'conditions':
@@ -1303,6 +1321,8 @@
         <ButtonGroup ariaLabel={row.label} value={p.unitSystem} marked options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
       {:else if row.kind === 'textSize'}
         <ButtonGroup ariaLabel={row.label} value={textSize.id} marked options={TEXT_SIZES.map((s) => ({ value: s.id, label: t(`desktopSettings.textSize.${s.id}`) }))} onchange={(v) => setTextSize(textSizeOf(v))} />
+      {:else if row.kind === 'bailout'}
+        <button type="button" class="od-outlined-button" onclick={() => f7.views.current.router.navigate(row.href)}>{t('settings.defaultCylinder.bailoutEdit')}</button>
       {:else if row.kind === 'file'}
         <button type="button" class="od-outlined-button" onclick={showLogbookFolder}>{t('desktopSettings.file.show')}</button>
       {:else if row.kind === 'computer'}
@@ -1407,7 +1427,13 @@
                   </div>
                 {/if}
                 <div class="od-desktop-settings--card" role="list">
-                  {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
+                  {#if block.custom === 'cylinderTypes'}
+                    <DesktopCylinderTypes>
+                      {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
+                    </DesktopCylinderTypes>
+                  {:else}
+                    {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
+                  {/if}
                 </div>
                 {#if block.note}<p class="od-desktop-settings--note">{block.note}</p>{/if}
               {/each}
