@@ -94,6 +94,17 @@ contextBridge.exposeInMainWorld('odDesktop', {
       return () => ipcRenderer.removeListener('od:network', listener);
     },
   },
+  /** The maintenance notifications (notifications.cjs): `schedule({ notifications })` replaces this window's list
+   *  ({ id, title, body, at (ms), extra }); `onClick(cb)` gives a clicked notification's `extra` back. */
+  notifications: {
+    schedule: (options) => invoke('od:notifications', options),
+    onClick(callback) {
+      if (typeof callback !== 'function') return () => {};
+      const listener = (_event, extra) => callback(extra);
+      ipcRenderer.on('od:notification-click', listener);
+      return () => ipcRenderer.removeListener('od:notification-click', listener);
+    },
+  },
   /** Error reports (crash-reports.cjs): the crash saved before the app died, as JSON text ('' when none); nothing is sent from here. */
   crash: {
     pending: () => invoke('od:crash', 'pending'),

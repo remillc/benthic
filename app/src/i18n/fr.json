@@ -517,6 +517,21 @@
     "daysHours": "{d} j {h} h"
   },
   "settings": {
+    "notifications": {
+      "maintenance": "Rappels d’entretien",
+      "maintenanceText": "Une notification quand une pièce approche de sa date ou de son nombre de plongées.",
+      "leadDays": "Délai par défaut",
+      "leadDaysText": "Combien de temps avant l’échéance. Chaque rappel d’une pièce peut avoir son propre délai.",
+      "weeks2": "2 semaines",
+      "days": "{n} jours",
+      "overdue": "Rappeler si en retard",
+      "overdueText": "Une fois par semaine, jusqu’à ce que l’entretien soit noté.",
+      "flight": "Avion permis",
+      "flightText": "Quand l’attente avant l’avion est terminée.",
+      "note": "Les notifications arrivent à 9 h, sauf celle de l’avion. Pour les couper toutes, passez par les réglages du système.",
+      "on": "activés",
+      "off": "désactivés"
+    },
     "title": "Réglages",
     "search": "Rechercher dans les réglages",
     "noResult": "Aucun réglage ne correspond à « {text} »",
@@ -525,6 +540,8 @@
     "defaults": "Valeurs par défaut",
     "defaultValue": "Par défaut {value}",
     "groups": {
+      "notifyDive": "Après la plongée",
+      "notifyMaintenance": "Entretien de l’équipement",
       "language": "Langue et formats",
       "units": "Unités",
       "conditions": "Conditions des outils",
@@ -543,6 +560,7 @@
       "advanced": "Avancé"
     },
     "sections": {
+      "notifications": "Notifications",
       "general": "Général",
       "diving": "Plongée",
       "devices": "Appareils et données",
@@ -561,6 +579,7 @@
       "privacy": "Confidentialité"
     },
     "overview": {
+      "notifications": "Rappels d’entretien : {state}",
       "theme": "Thème : {value}",
       "paper": "papier {value}",
       "units": "{system} : {units}",
@@ -2863,7 +2882,8 @@
       "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
       "Les photos des ordinateurs de plongée s’affichent partout où le modèle apparaît : listes d’équipement, de kits et d’entretien, fiche de la pièce, détail de la plongée, Réglages › Ordinateurs du carnet et modification de la plongée. Votre propre photo passe avant celle du modèle.",
       "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (OpenDives+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
-      "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait)."
+      "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait).",
+      "Réglages › Notifications (OpenDives+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4613,6 +4633,7 @@
     "system": "Système",
     "unitValues": "Affichage des valeurs",
     "categories": {
+      "notifications": "Notifications",
       "language": "Langue et formats",
       "units": "Unités",
       "display": "Affichage",
@@ -5846,10 +5867,23 @@
     "diveWarning": "{what} : retard de révision",
     "diveWarningTitle": "Révision en retard",
     "notify": {
-      "leadTitle": "Révision à prévoir",
-      "dueTitle": "Révision à faire aujourd’hui",
-      "leadBody": "{what} : échéance dans {n} jours.",
-      "dueBody": "{what} : échéance aujourd’hui.",
+      "snooze": "Me le rappeler dans 1 semaine",
+      "note": "Noter la révision",
+      "view": "Voir",
+      "overdueDives": "Les {n} plongées sont atteintes.",
+      "overdueDate": "L’échéance était le {date}.",
+      "bodyDives": {
+        "one": "Prévu dans {n} plongée.",
+        "other": "Prévu dans {n} plongées."
+      },
+      "bodyDateDives": {
+        "one": "Prévu le {date}, ou dans {n} plongée.",
+        "other": "Prévu le {date}, ou dans {n} plongées."
+      },
+      "bodyDate": "Prévu le {date}.",
+      "overdueTitle": "{task} en retard : {name}",
+      "dueTitle": "{task} aujourd’hui : {name}",
+      "leadTitle": "{task} dans {n} jours : {name}",
       "denied": "Les notifications sont désactivées pour OpenDives : le rappel reste dans l’app."
     },
     "channel": {
@@ -5901,7 +5935,6 @@
     },
     "certs": {
       "title": "Brevets",
-      "note": "Montrez une carte au centre de plongée, même sans réseau.",
       "add": "Ajouter un brevet",
       "empty": "Aucun brevet",
       "emptyText": "Ajoutez vos cartes : elles restent chiffrées et disponibles sans réseau.",

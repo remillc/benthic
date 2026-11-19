@@ -1,8 +1,8 @@
 <script>
   // @ts-check
-  // « Rappel d'entretien » (task 2026-11-18-274, docs/mockups-release/ent-regle-android.dc.html): a bottom sheet with
+  // « Rappel d'entretien » (task 2026-11-18-274, docs/mockups/ent-regle-android.dc.html): a bottom sheet with
   // two criteria, each a card with a switch (« Après une durée »: a stepper in years or months; « Selon les
-  // plongées »: a number of dives), « Me prévenir avant » 7, 30 or 60 days, « Avertir dans une plongée », then
+  // plongées »: a number of dives), « Me prévenir avant » 14, 30 or 60 days (task 2026-11-19-308), « Avertir dans une plongée », then
   // Retirer le rappel, Annuler and Enregistrer. With both criteria the first one reached triggers the reminder.
   import { Sheet } from 'framework7-svelte';
   import ButtonGroup from './ButtonGroup.svelte';
@@ -14,10 +14,10 @@
    * @type {{
    *   opened: boolean,
    *   name: string,
-   *   initial: { months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean },
+   *   initial: { months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean },
    *   removable?: boolean,
    *   onclose: () => void,
-   *   onsave: (rule: { months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }) => void,
+   *   onsave: (rule: { months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }) => void,
    *   onremove?: () => void,
    * }}
    * initial: the rule to start from (a suggestion, or the reminder's own); removable: « Retirer le rappel » is shown.
@@ -29,7 +29,7 @@
   let timeValue = $state('2');
   let divesOn = $state(false);
   let divesValue = $state('100');
-  /** @type {7|30|60} */
+  /** @type {14|30|60} */
   let notifyDays = $state(30);
   let warn = $state(true);
 

@@ -64,6 +64,10 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   of hours. Counted from the surfacing time of the last dive. Per device
  * @property {boolean} flightNotify "Me prévenir quand je peux prendre l'avion": a local notification at the
  *   end of the wait (lib/flight-reminder.svelte.js). Per device
+ * @property {boolean} maintenanceNotify "Rappels d'entretien" (task 2026-11-19-308): the maintenance notifications
+ *   (lib/maintenance-notify.js). Per device
+ * @property {14|30|60} maintenanceLeadDays the default lead time before a due date; a reminder may have its own
+ * @property {boolean} maintenanceOverdue "Rappeler si en retard": once a week until the maintenance is recorded
  */
 
 /** @type {AppSettings} */
@@ -91,6 +95,9 @@ const APP_DEFAULTS = {
   reserveDivers: DEFAULT_DIVERS,
   flightWait: 'auto',
   flightNotify: false,
+  maintenanceNotify: true,
+  maintenanceLeadDays: 30,
+  maintenanceOverdue: true,
 };
 
 /**

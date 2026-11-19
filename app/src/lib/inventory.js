@@ -577,7 +577,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     /**
      * Creates a reminder (no `id`) or changes one: the keys given replace those of the file, the others (the history
      * included) stay.
-     * @param {{ id?: string, gearId: string, task: Task, label?: string, intervalMonths: number|null, intervalDives: number|null, startOn?: string, notifyDays?: 7|30|60, warnInDive?: boolean }} fields
+     * @param {{ id?: string, gearId: string, task: Task, label?: string, intervalMonths: number|null, intervalDives: number|null, startOn?: string, notifyDays?: 14|30|60|null, warnInDive?: boolean }} fields
      * @returns {Promise<MaintenanceItem>}
      */
     async saveMaintenance(fields) {
@@ -586,7 +586,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const existing = fields.id ? await store.read(`maintenance/${fields.id}.json`) : null;
       /** @type {MaintenanceItem} */
       const item = {
-        ...(existing ?? { format: 1, createdAt: stamp(), startOn: fields.startOn ?? stamp().slice(0, 10), notifyDays: 30, warnInDive: true, history: [] }),
+        ...(existing ?? { format: 1, createdAt: stamp(), startOn: fields.startOn ?? stamp().slice(0, 10), notifyDays: null, warnInDive: true, history: [] }),
         ...fields,
         id: existing?.id ?? id(),
         updatedAt: stamp(),
@@ -621,7 +621,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const all = await store.readAll('maintenance/');
       let item = target.id ? all.find((m) => m.id === target.id) : all.find((m) => m.gearId === target.gearId && m.task === target.task && (target.task !== 'custom' || m.label === target.label));
       if (!item) {
-        item = { format: 1, createdAt: stamp(), id: id(), gearId: target.gearId, task: target.task, intervalMonths: null, intervalDives: null, startOn: stamp().slice(0, 10), notifyDays: 30, warnInDive: true, history: [] };
+        item = { format: 1, createdAt: stamp(), id: id(), gearId: target.gearId, task: target.task, intervalMonths: null, intervalDives: null, startOn: stamp().slice(0, 10), notifyDays: null, warnInDive: true, history: [] };
         if (target.task === 'custom') item.label = target.label ?? '';
       }
       /** @type {HistoryEntry} */

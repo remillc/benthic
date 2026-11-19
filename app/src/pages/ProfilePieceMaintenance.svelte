@@ -11,7 +11,8 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { gear, loadInventory, change, evaluations, figuresOf } from '../lib/inventory.svelte.js';
-  import { suggestionsFor } from '../lib/maintenance.js';
+  import { suggestionsFor, leadDays, ownLeadDays } from '../lib/maintenance.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel, tagText } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
   import { formatLongDate, formatNumber } from '../lib/format.js';
@@ -44,29 +45,29 @@
 
   /**
    * The rule sheet's target: an existing reminder, or a suggestion to add.
-   * @type {{ item?: import('../lib/maintenance.js').MaintenanceItem, task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }|null}
+   * @type {{ item?: import('../lib/maintenance.js').MaintenanceItem, task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }|null}
    */
   let target = $state(null);
 
   /** @param {import('../lib/maintenance.js').Evaluation} e */
   function editRule(e) {
-    target = { item: e.item, task: e.item.task, months: e.item.intervalMonths, dives: e.item.intervalDives, notifyDays: e.item.notifyDays, warnInDive: e.item.warnInDive };
+    target = { item: e.item, task: e.item.task, months: e.item.intervalMonths, dives: e.item.intervalDives, notifyDays: leadDays(e.item, settings.maintenanceLeadDays), warnInDive: e.item.warnInDive };
   }
 
   /** @param {import('../lib/maintenance.js').Suggestion} s */
   function addRule(s) {
     const existing = all.find((e) => e.item.task === s.task)?.item;
-    target = { item: existing, task: s.task, months: s.months ?? null, dives: s.dives ?? null, notifyDays: existing?.notifyDays ?? 30, warnInDive: existing?.warnInDive ?? true };
+    target = { item: existing, task: s.task, months: s.months ?? null, dives: s.dives ?? null, notifyDays: existing ? leadDays(existing, settings.maintenanceLeadDays) : settings.maintenanceLeadDays, warnInDive: existing?.warnInDive ?? true };
   }
 
-  /** @param {{ months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }} rule */
+  /** @param {{ months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }} rule */
   async function saveRule(rule) {
     const tg = target;
     if (!tg) return;
     target = null;
     try {
       await change((inv) =>
-        inv.saveMaintenance({ id: tg.item?.id, gearId: id, task: tg.task, label: tg.item?.label, intervalMonths: rule.months, intervalDives: rule.dives, notifyDays: rule.notifyDays, warnInDive: rule.warnInDive }),
+        inv.saveMaintenance({ id: tg.item?.id, gearId: id, task: tg.task, label: tg.item?.label, intervalMonths: rule.months, intervalDives: rule.dives, notifyDays: ownLeadDays(rule.notifyDays, settings.maintenanceLeadDays), warnInDive: rule.warnInDive }),
       );
       showSnackbar(t('maintenance.ruleSheet.saved'));
       afterReminderSaved();
@@ -208,7 +209,7 @@
 <MaintenanceRuleSheet
   opened={!!target}
   name={piece?.name ?? ''}
-  initial={{ months: target?.months ?? null, dives: target?.dives ?? null, notifyDays: target?.notifyDays ?? 30, warnInDive: target?.warnInDive ?? true }}
+  initial={{ months: target?.months ?? null, dives: target?.dives ?? null, notifyDays: target?.notifyDays ?? settings.maintenanceLeadDays, warnInDive: target?.warnInDive ?? true }}
   removable={!!target?.item && (target.item.intervalMonths != null || target.item.intervalDives != null)}
   onclose={() => (target = null)}
   onsave={saveRule}

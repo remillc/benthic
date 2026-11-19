@@ -55,3 +55,24 @@ export function lineText(e, formatDate) {
   if (date) return t('maintenance.line.on', { date });
   return t('maintenance.line.divesLeft', { n: e.divesLeft ?? 0 });
 }
+
+/**
+ * The title and the line of a maintenance notification (title: task, days left and piece; line: the date, the dives).
+ * @param {'lead'|'due'|'overdue'} kind
+ * @param {import('./maintenance.js').Evaluation} e
+ * @param {{ pieceName: string, days: number, formatDate: (iso: string) => string }} context `days`: the lead time of a lead notification
+ * @returns {{ title: string, body: string }}
+ */
+export function notificationText(kind, e, { pieceName, days, formatDate }) {
+  const task = taskLabel(e.item);
+  const date = e.dueDate ? formatDate(e.dueDate) : '';
+  const left = e.divesLeft ?? 0;
+  if (kind === 'overdue') {
+    const body = e.timeReached && date ? t('maintenance.notify.overdueDate', { date }) : t('maintenance.notify.overdueDives', { n: e.item.intervalDives ?? 0 });
+    return { title: t('maintenance.notify.overdueTitle', { task, name: pieceName }), body };
+  }
+  const body =
+    date && e.divesLeft != null ? t('maintenance.notify.bodyDateDives', { date, n: left }) : date ? t('maintenance.notify.bodyDate', { date }) : t('maintenance.notify.bodyDives', { n: left });
+  const title = kind === 'lead' ? t('maintenance.notify.leadTitle', { task, n: days, name: pieceName }) : t('maintenance.notify.dueTitle', { task, name: pieceName });
+  return { title, body };
+}

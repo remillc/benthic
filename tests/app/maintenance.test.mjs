@@ -99,7 +99,9 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 test('suggestions per type, and the rule fields are validated', () => {
   // Decided 18 November 2026 (task 277): the suggested service of a regulator is yearly, it was every 2 years.
   assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12 });
-  assert.deepEqual(suggestionsFor('regulator')[1].task, 'travelCheck');
+  // Task 2026-11-19-308: « Contrôle avant voyage » is gone (an inspection noted by hand), and a computer has no reminder.
+  assert.equal(suggestionsFor('regulator').length, 1);
+  assert.deepEqual(suggestionsFor('computer'), []);
   assert.deepEqual(suggestionsFor('cylinder').map((s) => s.task), ['inspection', 'hydrostatic']);
   assert.deepEqual(suggestionsFor('weights'), []);
   assert.deepEqual(ruleProblems({ months: null, dives: null }), { criteria: 'none' });
@@ -200,16 +202,19 @@ test('the dive edit warns about an overdue piece that is in the equipment, only 
 test('the notifications: 30 days before and on the day, the lead set by the rule, nothing for what is past', () => {
   const today = '2026-11-17';
   const e1 = evaluate(rule({ id: 'a', intervalMonths: 24 }), [], today); // due 2026-12-12
-  const e2 = evaluate(rule({ id: 'b', intervalMonths: 24, notifyDays: 7, lastDoneOn: '2025-02-01' }), [], today); // due 2027-02-01
+  const e2 = evaluate(rule({ id: 'b', intervalMonths: 24, notifyDays: 14, lastDoneOn: '2025-02-01' }), [], today); // due 2027-02-01
   const e3 = evaluate(rule({ id: 'c', intervalMonths: 24, lastDoneOn: '2024-10-02' }), [], today); // overdue
   const e4 = evaluate(rule({ id: 'd', intervalMonths: 6, notifyDays: 60, lastDoneOn: '2026-06-01' }), [], today); // due 2026-12-01, lead already past
-  const plan = notificationPlan([e1, e2, e3, e4], today);
+  const all = notificationPlan([e1, e2, e3, e4], today);
+  // Task 2026-11-19-308: an overdue reminder (c) now gets a weekly reminder; the lead and the due day are what this test reads.
+  const plan = all.filter((p) => p.kind !== 'overdue');
+  assert.ok(all.filter((p) => p.itemId === 'c').every((p) => p.kind === 'overdue'));
   assert.deepEqual(
     plan.map((p) => [p.id, p.on]),
     [
       ['d:due', '2026-12-01'],
       ['a:due', '2026-12-12'],
-      ['b:lead', '2027-01-25'],
+      ['b:lead', '2027-01-18'],
       ['b:due', '2027-02-01'],
     ],
   );
@@ -250,7 +255,7 @@ test('the store: a reminder, a service noted, the next date, the rule removed, t
   const reg = await inventory.saveGear({ type: 'regulator', name: 'Apeks XTX50' });
   await assert.rejects(inventory.saveMaintenance({ gearId: reg.id, task: 'service', intervalMonths: null, intervalDives: null }), /INVALID_RULE:criteria/);
   const item = await inventory.saveMaintenance({ gearId: reg.id, task: 'service', intervalMonths: 24, intervalDives: 100 });
-  assert.equal(item.notifyDays, 30);
+  assert.equal(item.notifyDays, null, 'a new reminder follows the default lead time');
   assert.equal(item.warnInDive, true);
   assert.deepEqual(item.history, []);
   const photo = await inventory.savePhoto('data:image/jpeg;base64,AAAA');
@@ -329,7 +334,7 @@ test('the dynamic maintenance keys exist for every task, kind, type and figure',
   }
 });
 
-test('the vocabulary: fr-CA entretien and test hydrostatique, fr révision and requalification, en Service', () => {
+test('the vocabulary: fr-CA entretien and épreuve hydraulique, fr révision and requalification, en Service', () => {
   const fr = catalog('fr');
   const ca = catalog('fr-CA');
   const en = catalog('en');
@@ -337,7 +342,7 @@ test('the vocabulary: fr-CA entretien and test hydrostatique, fr révision and r
   assert.equal(ca.maintenance.task.service, 'Entretien');
   assert.equal(en.maintenance.task.service, 'Service');
   assert.equal(fr.maintenance.task.hydrostatic, 'Requalification');
-  assert.equal(ca.maintenance.task.hydrostatic, 'Test hydrostatique');
+  assert.equal(ca.maintenance.task.hydrostatic, 'Épreuve hydraulique');
   assert.equal(en.maintenance.task.hydrostatic, 'Hydrostatic test');
   assert.equal(ca.maintenance.note.title, 'Noter un entretien');
   assert.equal(fr.maintenance.note.title, 'Noter une révision');

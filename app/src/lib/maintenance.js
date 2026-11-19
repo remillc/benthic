@@ -19,7 +19,8 @@
  * @property {number|null} intervalDives dives with the piece since the last service; null: no dive criterion
  * @property {string} startOn the day the rule was set: the start of the count until a first service is noted
  * @property {string} [lastDoneOn] the latest service in the history
- * @property {7|30|60} notifyDays how long before the due date the first notification comes
+ * @property {14|30|60|null} [notifyDays] this reminder's own lead time before the due date (null or absent: the default of
+ *   Réglages › Notifications; a stored 7 from before task 2026-11-19-308 reads as 14)
  * @property {boolean} warnInDive warn in the edit of a dive that uses the piece while the service is overdue
  * @property {HistoryEntry[]} history
  */
@@ -35,13 +36,29 @@
  * @property {string} [invoicePhotoId] a file of media/
  */
 
-/** @typedef {'service'|'inspection'|'hydrostatic'|'battery'|'seals'|'travelCheck'|'custom'} Task */
+/**
+ * `battery` and `travelCheck` are no longer offered (task 2026-11-19-308: a dive computer has no reminder, and a check
+ * before a trip is noted by hand as an inspection); files that already hold them stay readable.
+ * @typedef {'service'|'inspection'|'hydrostatic'|'battery'|'seals'|'travelCheck'|'custom'} Task
+ */
 
 /** @type {Task[]} */
-export const TASKS = ['service', 'inspection', 'hydrostatic', 'battery', 'seals', 'travelCheck', 'custom'];
+export const TASKS = ['service', 'inspection', 'hydrostatic', 'seals', 'custom'];
 
-/** The lead times of « Me prévenir avant ». @type {(7|30|60)[]} */
-export const NOTIFY_CHOICES = [7, 30, 60];
+/** The lead times of « Me prévenir avant » and of the default: 2 weeks, 30 days, 60 days. @type {(14|30|60)[]} */
+export const NOTIFY_CHOICES = [14, 30, 60];
+
+/** The default lead time until the diver chooses another. */
+export const DEFAULT_NOTIFY_DAYS = 30;
+
+/** What a reminder stores for the lead time the diver chose: nothing when it is the default (it follows the default). @param {number} chosen @param {number} fallback @returns {14|30|60|null} */
+export const ownLeadDays = (chosen, fallback) => (chosen === fallback ? null : leadDays({ notifyDays: chosen }, fallback));
+
+/** The lead time of a reminder: its own, else the default; a stored 7 days reads as 2 weeks. @param {{ notifyDays?: number|null }} item @param {number} [fallback] */
+export function leadDays(item, fallback = DEFAULT_NOTIFY_DAYS) {
+  const own = item.notifyDays == null ? fallback : item.notifyDays;
+  return NOTIFY_CHOICES.includes(/** @type {any} */ (own)) ? /** @type {14|30|60} */ (own) : own < 14 ? 14 : DEFAULT_NOTIFY_DAYS;
+}
 
 /** A reminder counts as « Bientôt » from this many days before the due date. */
 export const SOON_DAYS = 60;
@@ -57,11 +74,9 @@ export const SOON_DIVES = 10;
  * @type {Record<string, Suggestion[]>}
  */
 export const SUGGESTIONS = {
-  computer: [{ task: 'battery', months: 24 }],
-  regulator: [
-    { task: 'service', months: 12 },
-    { task: 'travelCheck', months: 12 },
-  ],
+  // A dive computer has no reminder (task 2026-11-19-308).
+  computer: [],
+  regulator: [{ task: 'service', months: 12 }],
   suit: [{ task: 'seals', months: 12 }],
   cylinder: [
     { task: 'inspection', months: 12 },
@@ -137,6 +152,8 @@ export const hasRule = (item) => item.intervalMonths != null || item.intervalDiv
  * @property {'time'|'dives'|null} first the criterion reached first, or, when none is yet, the one nearer
  * @property {'overdue'|'soon'|'ok'|'none'} status
  * @property {number|null} sortDays days until the earliest trigger, negative when overdue; null when no rule
+ * @property {string|null} overdueSince the day it fell due while overdue: the due date, or the day of the dive that reached
+ *   the count (the earlier of the two); null when not overdue
  */
 
 /**
@@ -153,7 +170,8 @@ export function evaluate(item, diveKeys, today) {
   const base = item.lastDoneOn || item.startOn || today;
   const serviced = !!item.lastDoneOn;
   const days = diveKeys.map((k) => k.slice(0, 10));
-  const divesSince = days.filter((d) => (serviced ? d > base : d >= base)).length;
+  const sinceDays = days.filter((d) => (serviced ? d > base : d >= base)).sort();
+  const divesSince = sinceDays.length;
 
   const dueDate = item.intervalMonths != null ? addMonths(base, item.intervalMonths) : null;
   const daysLeft = dueDate ? daysBetween(today, dueDate) : null;
@@ -184,6 +202,9 @@ export function evaluate(item, diveKeys, today) {
   const triggers = [daysLeft, divesReached ? 0 : estimatedDays].filter((x) => x != null);
   const sortDays = triggers.length ? Math.min(...triggers) : divesLeft != null ? 9999 : null;
 
+  const reachedOn = item.intervalDives != null && divesReached ? (sinceDays[item.intervalDives - 1] ?? today) : null;
+  const overdueSince = !overdue ? null : [timeReached ? dueDate : null, reachedOn].filter((d) => !!d).sort()[0] ?? today;
+
   const active = hasRule(item);
   return {
     item,
@@ -199,7 +220,19 @@ export function evaluate(item, diveKeys, today) {
     first,
     status: !active ? 'none' : overdue ? 'overdue' : soon ? 'soon' : 'ok',
     sortDays: active ? sortDays : null,
+    overdueSince: active ? overdueSince : null,
   };
+}
+
+/**
+ * Every reminder with its due date, for the pieces that count: a piece that is retired leaves the reminders (it keeps
+ * its history), and a dive computer has none (task 2026-11-19-308).
+ * @param {{ items: MaintenanceItem[], pieces: { id: string, type: string, retired?: boolean }[], diveKeysOf: (gearId: string) => string[], today: string }} input
+ * @returns {Evaluation[]}
+ */
+export function evaluateAll({ items, pieces, diveKeysOf, today }) {
+  const live = new Set(pieces.filter((g) => !g.retired && g.type !== 'computer').map((g) => g.id));
+  return items.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today));
 }
 
 /**
@@ -240,29 +273,63 @@ export const nextDueAfter = (rule, doneOn) => (rule.intervalMonths != null ? add
 
 /**
  * @typedef {Object} PlannedNotification
- * @property {string} id stable: `<item id>:lead` or `<item id>:due`
+ * @property {string} id stable: `<item id>:lead`, `<item id>:due` or `<item id>:overdue:<day>`
  * @property {string} itemId
- * @property {'lead'|'due'} kind
- * @property {string} on the day it comes (the app shows it in the morning)
+ * @property {'lead'|'due'|'overdue'} kind
+ * @property {string} on the day it comes (at 9:00 local time, lib/maintenance-notify.js)
  */
 
 /**
- * The notifications to schedule: one `notifyDays` before each due date and one on the day. The due date is the
- * duration's, or, for a dive criterion, the day the dives are expected to be reached (from the pace of the last year;
- * no notification without a pace). Days already past are left out. An overdue reminder has none to come.
+ * @typedef {Object} NotificationOptions Réglages › Notifications
+ * @property {boolean} [enabled] « Rappels d'entretien »: off, nothing is planned
+ * @property {number} [defaultDays] « Délai par défaut »: 14, 30 or 60
+ * @property {boolean} [remindOverdue] « Rappeler si en retard »: once a week until the maintenance is recorded
+ * @property {Record<string, string>} [snoozed] item id → the first day a late reminder may come again (« Me le rappeler dans 1 semaine »)
+ */
+
+/** Hour of the day the maintenance notifications come, local time. The flight reminder is apart: it comes when the wait ends. */
+export const NOTIFICATION_HOUR = 9;
+
+/** The moment a planned day's notification comes: 9:00 local time. @param {string} day YYYY-MM-DD */
+export const notificationMoment = (day) => new Date(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), NOTIFICATION_HOUR, 0, 0);
+
+/** How far ahead the weekly late reminders are planned; the plan is made again at every start of the app. */
+export const OVERDUE_HORIZON_WEEKS = 8;
+
+/**
+ * The notifications to schedule: one `leadDays` before each due date (the reminder's own, else the default) and one
+ * on the day. The due date is the duration's, or, for a dive criterion, the day the dives are expected to be reached
+ * (from the pace of the last year; no notification without a pace). Days already past are left out. A reminder that is
+ * overdue gets one notification a week, from the week after it fell due (or from the snooze day), until the service
+ * is noted, when « Rappeler si en retard » is on. Evaluations come from `evaluateAll`: retired pieces are not in them.
  * @param {Evaluation[]} evaluations
  * @param {string} today
+ * @param {NotificationOptions} [options]
  * @returns {PlannedNotification[]}
  */
-export function notificationPlan(evaluations, today) {
+export function notificationPlan(evaluations, today, options = {}) {
+  const { enabled = true, defaultDays = DEFAULT_NOTIFY_DAYS, remindOverdue = true, snoozed = {} } = options;
   /** @type {PlannedNotification[]} */
   const plan = [];
+  if (!enabled) return plan;
   for (const e of evaluations) {
-    if (!e.active || e.status === 'overdue') continue;
+    if (!e.active) continue;
+    if (e.status === 'overdue') {
+      if (!remindOverdue) continue;
+      // Weekly from the day it fell due, never before tomorrow; a snooze moves the first one.
+      const from = e.overdueSince ?? today;
+      const snooze = snoozed[e.item.id];
+      let day = addDays(from, 7);
+      while (day <= today) day = addDays(day, 7);
+      // A snooze asks for a precise day: the first reminder comes then, the next ones a week apart.
+      if (snooze && snooze > today) day = snooze;
+      for (let n = 0; n < OVERDUE_HORIZON_WEEKS; n++, day = addDays(day, 7)) plan.push({ id: `${e.item.id}:overdue:${day}`, itemId: e.item.id, kind: 'overdue', on: day });
+      continue;
+    }
     const candidates = [e.dueDate, e.estimatedDays != null ? addDays(today, e.estimatedDays) : null].filter((d) => !!d);
     if (!candidates.length) continue;
     const due = /** @type {string} */ (candidates.sort()[0]);
-    const lead = addDays(due, -e.item.notifyDays);
+    const lead = addDays(due, -leadDays(e.item, defaultDays));
     if (lead >= today && lead < due) plan.push({ id: `${e.item.id}:lead`, itemId: e.item.id, kind: 'lead', on: lead });
     if (due >= today) plan.push({ id: `${e.item.id}:due`, itemId: e.item.id, kind: 'due', on: due });
   }

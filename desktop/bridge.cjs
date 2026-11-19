@@ -40,6 +40,9 @@
 //   fs.rename({from, to})    renames a folder <userData>/carnet* to another one
 //   fs.readDevEnv({name})    the text of <userData>/cloud-dev.env or cloud-test.env, '' when absent
 //   fs.deleteDevEnv({name})  deletes cloud-dev.env
+//   notifications.schedule({notifications})   (main.cjs, notifications.cjs) replaces this window's maintenance notifications
+//                            [{id, title, body, at (ms), extra}], shown at their time while the app runs;
+//                            notifications.onClick(cb) gives a clicked one's `extra` back (sync, returns an unsubscribe)
 //   htmlToPdf({html, name, letter})   renders a page to a PDF in <temp>/share: resolves { path }
 //   saveAs({path, name})     the system's save dialog for a file of <temp>/share: resolves { saved, path }
 //   clipboard.write({text, dives})   the system clipboard gets the plain text; the dives' Subsurface XML is

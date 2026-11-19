@@ -53,6 +53,8 @@
   import { regionUsesLetter } from '../lib/share.js';
   import { waterTypeName, downloadWaterName, FLIGHT_WAIT_MODES, flightWaitName } from '../lib/tools.js';
   import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
+  import { NOTIFY_CHOICES } from '../lib/maintenance.js';
+  import { afterNotifyChange } from '../lib/maintenance-notify.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
@@ -66,6 +68,7 @@
    *   | { kind: 'number', id: string, label: string, text?: string, value: string, title?: string, dialogText?: string,
    *       wheels: () => {label: string, values: string[], index: number, defaultIndex: number}[], set: (indexes: number[]) => unknown, dimmed?: boolean, dropdowns?: boolean }
    *   | { kind: 'altitude', id: string, label: string }
+   *   | { kind: 'segmented', id: string, label: string, text?: string, current: string, options: { value: string, label: string }[], set: (v: string) => unknown, dimmed?: boolean }
    *   | { kind: 'link', id: string, label: string, text?: string, href?: string, action?: () => void, disabled?: boolean, value?: string, badge?: string }
    *   | { kind: 'info', id: string, label: string, value: string }} Row
    */
@@ -444,11 +447,60 @@
             })),
           set: (v) => setAppSetting('flightWait', /** @type {import('../lib/tools.js').FlightWaitMode} */ (v)),
         },
+      ],
+    },
+    {
+      // Réglages › Notifications (task 2026-11-19-308, reglages-notifications-android): the maintenance reminders, then the flight one.
+      id: 'notifyMaintenance',
+      title: t('settings.groups.notifyMaintenance'),
+      rows: [
+        {
+          kind: 'switch',
+          id: 'maintenanceNotify',
+          label: t('settings.notifications.maintenance'),
+          text: t('settings.notifications.maintenanceText'),
+          checked: settings.maintenanceNotify,
+          set: (v) => {
+            setAppSetting('maintenanceNotify', v);
+            afterNotifyChange();
+          },
+        },
+        {
+          kind: 'segmented',
+          id: 'maintenanceLeadDays',
+          label: t('settings.notifications.leadDays'),
+          text: t('settings.notifications.leadDaysText'),
+          current: String(settings.maintenanceLeadDays),
+          dimmed: !settings.maintenanceNotify,
+          options: NOTIFY_CHOICES.map((n) => ({ value: String(n), label: t(n === 14 ? 'settings.notifications.weeks2' : 'settings.notifications.days', { n }) })),
+          set: (v) => {
+            setAppSetting('maintenanceLeadDays', /** @type {14|30|60} */ (Number(v)));
+            afterNotifyChange();
+          },
+        },
+        {
+          kind: 'switch',
+          id: 'maintenanceOverdue',
+          label: t('settings.notifications.overdue'),
+          text: t('settings.notifications.overdueText'),
+          checked: settings.maintenanceOverdue,
+          dimmed: !settings.maintenanceNotify,
+          set: (v) => {
+            setAppSetting('maintenanceOverdue', v);
+            afterNotifyChange();
+          },
+        },
+      ],
+    },
+    {
+      id: 'notifyDive',
+      title: t('settings.groups.notifyDive'),
+      rows: [
         {
           kind: 'switch',
           id: 'flightNotify',
-          label: t('settings.flight.notify'),
-          text: t('settings.flight.notifyText'),
+          label: t('settings.notifications.flight'),
+          text: t('settings.notifications.flightText'),
           checked: settings.flightNotify,
           set: (v) => setFlightNotify(v),
         },
@@ -829,6 +881,12 @@
             system: t(`settings.unitSystem.${p.unitSystem}`),
             units: `${['length', 'pressure', 'weight'].map((k) => lower(rowOf(k)?.value ?? '')).join(', ')} · ${rowOf('temperature')?.value ?? ''}`,
           }),
+        },
+        {
+          id: 'notifications',
+          icon: 'M6 17V11a6 6 0 0 1 12 0v6l2 2H4z M10 21h4',
+          href: '/settings/notifications',
+          summary: t('settings.overview.notifications', { state: t(settings.maintenanceNotify ? 'settings.notifications.on' : 'settings.notifications.off') }),
         },
       ],
     },
@@ -1241,6 +1299,14 @@
         onchange={(v) => setAppSetting('defaultAltitudeMm', depthToMm(v, p.length === 'ft'))}
       />
     </div>
+  {:else if row.kind === 'segmented'}
+    <div class="od-settings--segmented-row" class:od-settings--dimmed={row.dimmed}>
+      <span class="od-settings--texts">
+        <span class="od-settings--label">{row.label}</span>
+        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
+      </span>
+      <ButtonGroup ariaLabel={row.label} value={row.current} options={row.options} onchange={(v) => !row.dimmed && row.set(v)} />
+    </div>
   {:else if row.kind === 'info'}
     <div class="od-settings--row">
       <span class="od-settings--texts"><span class="od-settings--label">{row.label}</span></span>
@@ -1318,6 +1384,8 @@
           <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
           <span class="toggle-icon"></span>
         </span>
+      {:else if row.kind === 'segmented'}
+        <ButtonGroup ariaLabel={row.label} value={row.current} marked options={row.options} onchange={(v) => !row.dimmed && row.set(v)} />
       {:else if row.kind === 'unitSystem'}
         <ButtonGroup ariaLabel={row.label} value={p.unitSystem} marked options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
       {:else if row.kind === 'textSize'}
@@ -1525,6 +1593,13 @@
         {#each group('units2').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/if}
+  {/if}
+
+  <!-- Notifications (task 2026-11-19-308): the maintenance reminders, then « Après la plongée ». -->
+  {#if inPage('notifications')}
+    {@render groupView('notifyMaintenance')}
+    {@render groupView('notifyDive')}
+    {#if !query}<p class="od-settings--note">{t('settings.notifications.note')}</p>{/if}
   {/if}
 
   {#if inPage('logbook')}{@render groupView('logbook', !section)}{/if}
@@ -1812,6 +1887,20 @@
 
     div.od-settings--row {
       cursor: default;
+    }
+
+    /* A row with a label and its segmented buttons under it (« Délai par défaut »). */
+    .od-settings--segmented-row {
+      box-sizing: border-box;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+
+      &.od-settings--dimmed {
+        opacity: 0.55;
+      }
     }
 
     /* MD3: two-line item, 72 dp. */

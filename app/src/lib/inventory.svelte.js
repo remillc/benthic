@@ -9,7 +9,9 @@ import { sameComputer } from './dc-model.js';
 import { deviceStore } from './device-store.js';
 import { createInventory, diveKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook } from './logbook.svelte.js';
-import { evaluate, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
+import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
+import { settings } from './settings.svelte.js';
+import { readSnoozed } from './maintenance-snooze.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -69,9 +71,7 @@ export async function loadInventory() {
  * @returns {import('./maintenance.js').Evaluation[]}
  */
 export function evaluations() {
-  const live = new Set(gear.pieces.filter((g) => !g.retired).map((g) => g.id));
-  const today = todayIso();
-  return gear.maintenance.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today));
+  return evaluateAll({ items: gear.maintenance, pieces: gear.pieces, diveKeysOf, today: todayIso() });
 }
 
 /** The number on the red badge: reminders overdue. */
@@ -80,10 +80,11 @@ export const overdueBadge = () => overdueCount(evaluations());
 /** The three sections of the « Entretien » list. */
 export const maintenanceSections = () => sections(evaluations());
 
-/** Hands the notifications to come to the seam (lib/maintenance.js); nothing is delivered until a plugin is installed. */
+/** Hands the notifications to come to the seam (lib/maintenance.js), with the choices of Réglages › Notifications. */
 export function scheduleNotifications() {
   try {
-    applyNotificationPlan(notificationPlan(evaluations(), todayIso())).catch((e) => console.error('Scheduling the maintenance notifications', e));
+    const options = { enabled: settings.maintenanceNotify, defaultDays: settings.maintenanceLeadDays, remindOverdue: settings.maintenanceOverdue, snoozed: readSnoozed() };
+    applyNotificationPlan(notificationPlan(evaluations(), todayIso(), options)).catch((e) => console.error('Scheduling the maintenance notifications', e));
   } catch (e) {
     console.error('Planning the maintenance notifications', e);
   }

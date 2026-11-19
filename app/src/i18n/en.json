@@ -517,6 +517,21 @@
     "daysHours": "{d} d {h} h"
   },
   "settings": {
+    "notifications": {
+      "maintenance": "Maintenance reminders",
+      "maintenanceText": "A notification when a piece nears its date or its number of dives.",
+      "leadDays": "Default lead time",
+      "leadDaysText": "How long before the due date. Each reminder of a piece can have its own.",
+      "weeks2": "2 weeks",
+      "days": "{n} days",
+      "overdue": "Remind me when late",
+      "overdueText": "Once a week, until the maintenance is recorded.",
+      "flight": "Flight allowed",
+      "flightText": "When the wait before flying is over.",
+      "note": "Notifications arrive at 9:00, except the flight one. To turn them all off, use the system settings.",
+      "on": "on",
+      "off": "off"
+    },
     "title": "Settings",
     "search": "Search settings",
     "noResult": "No setting matches “{text}”",
@@ -525,6 +540,8 @@
     "defaults": "Default values",
     "defaultValue": "Default {value}",
     "groups": {
+      "notifyDive": "After the dive",
+      "notifyMaintenance": "Equipment maintenance",
       "language": "Language and formats",
       "units": "Units",
       "conditions": "Tool conditions",
@@ -543,6 +560,7 @@
       "advanced": "Advanced"
     },
     "sections": {
+      "notifications": "Notifications",
       "general": "General",
       "diving": "Diving",
       "devices": "Devices and data",
@@ -561,6 +579,7 @@
       "privacy": "Privacy"
     },
     "overview": {
+      "notifications": "Maintenance reminders: {state}",
       "theme": "Theme: {value}",
       "paper": "{value} paper",
       "units": "{system}: {units}",
@@ -2863,7 +2882,8 @@
       "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
       "Dive computer photos show wherever the model appears: the equipment, kits and maintenance lists, the part sheet, the dive detail, Réglages › Dive computers of the logbook and the dive edit. Your own photo wins over the model’s.",
       "After a download from a dive computer that is not in your equipment (OpenDives+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
-      "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards)."
+      "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards).",
+      "Réglages › Notifications (OpenDives+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -4613,6 +4633,7 @@
     "system": "System",
     "unitValues": "How values are shown",
     "categories": {
+      "notifications": "Notifications",
       "language": "Language and formats",
       "units": "Units",
       "display": "Display",
@@ -5843,10 +5864,23 @@
     "diveWarning": "{what}: service overdue",
     "diveWarningTitle": "Service overdue",
     "notify": {
-      "leadTitle": "Service coming up",
-      "dueTitle": "Service due today",
-      "leadBody": "{what}: due in {n} days.",
-      "dueBody": "{what}: due today.",
+      "snooze": "Remind me in 1 week",
+      "note": "Record the service",
+      "view": "View",
+      "overdueDives": "The {n} dives are reached.",
+      "overdueDate": "It was due on {date}.",
+      "bodyDives": {
+        "one": "Due in {n} dive.",
+        "other": "Due in {n} dives."
+      },
+      "bodyDateDives": {
+        "one": "Due on {date}, or in {n} dive.",
+        "other": "Due on {date}, or in {n} dives."
+      },
+      "bodyDate": "Due on {date}.",
+      "overdueTitle": "{task} overdue: {name}",
+      "dueTitle": "{task} today: {name}",
+      "leadTitle": "{task} in {n} days: {name}",
       "denied": "Notifications are turned off for OpenDives: the reminder stays in the app."
     },
     "channel": {
@@ -5898,7 +5932,6 @@
     },
     "certs": {
       "title": "Certifications",
-      "note": "Show a card at the dive centre, even without a network.",
       "add": "Add a certification",
       "empty": "No certification",
       "emptyText": "Add your cards: they stay encrypted and available without a network.",

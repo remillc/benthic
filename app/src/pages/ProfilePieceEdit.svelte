@@ -20,7 +20,8 @@
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
   import { GEAR_TYPES, gearProblems } from '../lib/inventory.js';
-  import { suggestionsFor } from '../lib/maintenance.js';
+  import { suggestionsFor, ownLeadDays } from '../lib/maintenance.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
   import { photoToDataUrl } from '../lib/photo.js';
@@ -52,7 +53,7 @@
   /** @type {HTMLInputElement|undefined} */
   let fileInput = $state();
   let ruleOpen = $state(false);
-  /** The reminder set in the card (a new piece only), saved with the piece. @type {{ task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }|null} */
+  /** The reminder set in the card (a new piece only), saved with the piece. @type {{ task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }|null} */
   let reminder = $state(null);
 
   /** Brands and models for a dive computer (libdivecomputer's names; any other text can be typed). */
@@ -110,7 +111,7 @@
     photoChanged = true;
   }
 
-  /** @param {{ months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }} rule */
+  /** @param {{ months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }} rule */
   function setReminder(rule) {
     reminder = { task: suggestion?.task ?? 'service', months: rule.months, dives: rule.dives, notifyDays: rule.notifyDays, warnInDive: rule.warnInDive };
     ruleOpen = false;
@@ -135,7 +136,7 @@
           photoId: nextPhoto || undefined,
         });
         if (!id && reminder && !computer) {
-          await inv.saveMaintenance({ gearId: g.id, task: reminder.task, intervalMonths: reminder.months, intervalDives: reminder.dives, notifyDays: reminder.notifyDays, warnInDive: reminder.warnInDive });
+          await inv.saveMaintenance({ gearId: g.id, task: reminder.task, intervalMonths: reminder.months, intervalDives: reminder.dives, notifyDays: ownLeadDays(reminder.notifyDays, settings.maintenanceLeadDays), warnInDive: reminder.warnInDive });
         }
         return g;
       });
@@ -276,7 +277,7 @@
   initial={{
     months: reminder ? reminder.months : (suggestion?.months ?? 24),
     dives: reminder ? reminder.dives : (suggestion?.dives ?? null),
-    notifyDays: reminder?.notifyDays ?? 30,
+    notifyDays: reminder?.notifyDays ?? settings.maintenanceLeadDays,
     warnInDive: reminder?.warnInDive ?? true,
   }}
   removable={!!reminder}

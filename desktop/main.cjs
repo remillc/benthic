@@ -10,7 +10,7 @@
 
 const path = require('node:path');
 const fs = require('node:fs');
-const { app, BrowserWindow, ipcMain, safeStorage, shell, protocol, net, Menu, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, safeStorage, shell, protocol, net, Menu, dialog, Notification } = require('electron');
 const { pathToFileURL } = require('node:url');
 const { setupBridge } = require('./bridge.cjs');
 const { buildMenu } = require('./menu.cjs');
@@ -19,6 +19,7 @@ const { LogbookStore, isLogbookFile } = require('./logbooks.cjs');
 const { createWindowManager } = require('./windows.cjs');
 const { createCloudService, loadClients } = require('./cloud.cjs');
 const { createNetworkMonitor } = require('./network.cjs');
+const { createNotifier } = require('./notifications.cjs');
 const { createCrashStore } = require('./crash-reports.cjs');
 
 const devUrl = process.env.OD_DEV_URL || '';
@@ -230,6 +231,31 @@ app.whenReady().then(() => {
       return { ok: true, value: op === 'refresh' ? await network.refresh() : await network.status() };
     } catch (e) {
       return { ok: true, value: 'unknown' };
+    }
+  });
+  // The maintenance notifications (task 2026-11-19-308): shown at their time while the app runs (notifications.cjs).
+  const notifier = createNotifier({
+    Notification,
+    onClick: (windowId, extra) => {
+      const win = BrowserWindow.fromId(windowId);
+      if (!win || win.isDestroyed()) return;
+      if (win.isMinimized()) win.restore();
+      win.show();
+      win.focus();
+      win.webContents.send('od:notification-click', extra);
+    },
+  });
+  ipcMain.handle('od:notifications', (event, notifications) => {
+    try {
+      const id = event.sender.id;
+      notifier.schedule(id, notifications?.notifications);
+      if (!event.sender.__odNotifyWatch) {
+        event.sender.__odNotifyWatch = true;
+        event.sender.once('destroyed', () => notifier.forget(id));
+      }
+      return { ok: true, value: true };
+    } catch (e) {
+      return { ok: false, error: String(e && e.message ? e.message : e) };
     }
   });
   ipcMain.handle('od:crash', (_event, op) => {

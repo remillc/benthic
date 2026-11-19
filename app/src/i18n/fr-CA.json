@@ -108,7 +108,7 @@
     },
     "task": {
       "service": "Entretien",
-      "hydrostatic": "Test hydrostatique"
+      "hydrostatic": "Épreuve hydraulique"
     },
     "kind": {
       "service": "Entretien"
@@ -135,8 +135,7 @@
     "diveWarning": "{what} : retard d’entretien",
     "diveWarningTitle": "Entretien en retard",
     "notify": {
-      "leadTitle": "Entretien à prévoir",
-      "dueTitle": "Entretien à faire aujourd’hui"
+      "note": "Noter l’entretien"
     },
     "channel": {
       "name": "Entretien de l’équipement",
