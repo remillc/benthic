@@ -18,6 +18,7 @@
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import { scanQr } from '../lib/qr-receive.svelte.js';
+  import { odplusSubscriber } from '../lib/odplus-state.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import { enterFromMenu } from '../lib/first-launch.svelte.js';
@@ -359,6 +360,11 @@
   /** "Modifier ensemble…": a full-screen sheet for the checked dives (pages/EditDivesTogether.svelte). */
   function editChecked() {
     f7router.navigate(`/dives/edit-together?ids=${checkedIds.join(',')}`);
+  }
+
+  /** "Faire valider les plongées": the checked dives, one validation (pages/Validate.svelte). */
+  function validateChecked() {
+    f7router.navigate(`/validate?ids=${checkedIds.join(',')}`);
   }
 
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
@@ -1500,6 +1506,10 @@
           supporting={mergeable ? '' : t('multiDive.mergeBlocked')}
           onclick={mergeChecked}
         />
+      {/if}
+      <!-- Validation by a buddy or an instructor (task 2026-11-19-309): one validation for the checked dives. -->
+      {#if selecting && checkedCount >= 1 && odplusSubscriber()}
+        <MenuItem icon="edit" text={t('validation.menuMany')} disabled={checkedCount > 20} supporting={checkedCount > 20 ? t('validation.tooMany') : ''} onclick={validateChecked} />
       {/if}
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />

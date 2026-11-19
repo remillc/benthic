@@ -56,6 +56,7 @@
   import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
   import { NOTIFY_CHOICES } from '../lib/maintenance.js';
   import { afterNotifyChange } from '../lib/maintenance-notify.js';
+  import { afterDocumentNotifyChange } from '../lib/document-notify.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
@@ -489,6 +490,24 @@
           set: (v) => {
             setAppSetting('maintenanceOverdue', v);
             afterNotifyChange();
+          },
+        },
+      ],
+    },
+    {
+      // « Brevets et documents » (task 2026-11-19-309, reglages-notifications-android): the lead time is set in each document.
+      id: 'notifyDocuments',
+      title: t('settings.groups.notifyDocuments'),
+      rows: [
+        {
+          kind: 'switch',
+          id: 'documentNotify',
+          label: t('settings.notifications.documents'),
+          text: t('settings.notifications.documentsText'),
+          checked: settings.documentNotify,
+          set: (v) => {
+            setAppSetting('documentNotify', v);
+            afterDocumentNotifyChange();
           },
         },
       ],
@@ -1599,6 +1618,7 @@
   <!-- Notifications (task 2026-11-19-308): the maintenance reminders, then « Après la plongée ». -->
   {#if inPage('notifications')}
     {@render groupView('notifyMaintenance')}
+    {@render groupView('notifyDocuments')}
     {@render groupView('notifyDive')}
     {#if !query}<p class="od-settings--note">{t('settings.notifications.note')}</p>{/if}
   {/if}

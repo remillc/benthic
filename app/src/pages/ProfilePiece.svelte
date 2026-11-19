@@ -17,6 +17,7 @@
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
   import { tagText } from '../lib/maintenance-text.js';
+  import { detailRows } from '../lib/gear-fields.js';
   import { historyRows, exportHistory } from '../lib/maintenance-export.js';
   import { letterPaper } from '../lib/share.js';
   import { desktopApp } from '../lib/layout.svelte.js';
@@ -78,6 +79,7 @@
           { label: t('gear.piece.serial'), value: piece.serial },
           // Read only, from the download; hidden when the computer was never downloaded.
           { label: t('gear.piece.firmware'), value: piece.firmware && piece.firmwareReadAt ? t('gear.piece.firmwareRead', { version: piece.firmware, date: formatLongDate(piece.firmwareReadAt) }) : '' },
+          ...detailRows(piece.type, piece.details, { label: (key) => t(`gear.field.${key}`), option: (key, id) => t(`gear.fieldOption.${key}.${id}`), yes: t('gear.piece.yes'), date: formatLongDate }),
           { label: t('gear.piece.purchasedOn'), value: piece.purchasedOn ? formatLongDate(piece.purchasedOn) : '' },
           { label: t('gear.piece.inKits'), value: kitNames },
         ].filter((row) => row.value)

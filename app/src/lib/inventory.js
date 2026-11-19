@@ -15,6 +15,7 @@
 import { sameComputer } from './dc-model.js';
 
 import { ruleProblems } from './maintenance.js';
+import { rekey as rekeyValidations } from './validation.js';
 
 /** @typedef {import('./file-store.js').FileStore} FileStore */
 /** @typedef {import('./maintenance.js').MaintenanceItem} MaintenanceItem */
@@ -39,6 +40,7 @@ import { ruleProblems } from './maintenance.js';
  * @property {string} [computerSerial]
  * @property {string} [purchasedOn] YYYY-MM-DD
  * @property {string} [note] the line under the name
+ * @property {Record<string, string>} [details] the fields of the piece's type besides these (lib/gear-fields.js)
  * @property {string} [photoId] a file of media/: the piece's photo
  * @property {string[]} [tags]
  * @property {boolean} retired retired from the equipment (task 2026-11-19-308): out of the lists, the kits and the reminders; its
@@ -50,22 +52,26 @@ import { ruleProblems } from './maintenance.js';
 /** The reasons offered when a piece is retired. @type {readonly ('sold'|'lost'|'worn')[]} */
 export const RETIRE_REASONS = ['sold', 'lost', 'worn'];
 
-/** @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'other'} GearType */
+/**
+ * The 16 types of « Nouvelle pièce » (task 2026-11-19-309): `bcd` is « Veste », `dsmb` « Parachute de palier »,
+ * `floatBuoy` « Bouée de surface ».
+ * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'other'} GearType
+ */
 
-/** The types, in the order of the type menu. @type {GearType[]} */
-export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other'];
+/** The types, in the order of the type grid. @type {GearType[]} */
+export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'other'];
 
 /** The groups of the inventory page and of the kit editor. @type {('computer'|'regulator'|'suit'|'cylinder'|'other')[]} */
 export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];
 
 /** The groups of the « Ajouter de l'équipement » sheet: one per type, no computers (a dive's computers come from its data). @type {GearType[]} */
-export const PICKER_GROUPS = ['regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other'];
+export const PICKER_GROUPS = GEAR_TYPES.filter((type) => type !== 'computer');
 
 /** @param {GearType} type @returns {typeof GROUPS[number]} */
 /** True when a piece name is a surface marker buoy (« Saucisse », « parachute de palier », « Surface marker buoy »), to show its icon. @param {string} name */
 export const isBuoyName = (name) => /saucisse|parachute|bou[eé]e|\b(?:d?smb|sausage)\b|marker buoy/i.test(name ?? '');
 
-export const groupOfType = (type) => (type === 'undersuit' ? 'suit' : type === 'light' || type === 'bcd' || type === 'weights' ? 'other' : type);
+export const groupOfType = (type) => (type === 'undersuit' ? 'suit' : GROUPS.includes(/** @type {any} */ (type)) ? type : 'other');
 
 /** Days the inventory stays readable after a subscription ends. */
 export const READ_ONLY_DAYS = 30;
@@ -391,6 +397,9 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
 
   return {
     readState,
+    /** The store and the writes of the inventory, for the other OpenDives data of a dive (lib/validation.svelte.js). */
+    store,
+    commitFiles: commit,
 
     /**
      * The read-only flag: set when the subscription ends, cleared when it is renewed.
@@ -442,6 +451,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
           else delete piece[key];
         }
       }
+      if (piece.details && !Object.keys(piece.details).length) delete piece.details;
       await commit([[`gear/${piece.id}.json`, piece]]);
       return piece;
     },
@@ -713,7 +723,11 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     async rekeyDive(from, to) {
       if (from === to) return;
       const rec = (await store.readAll('dive-equipment/')).find((r) => r.diveKey?.start === from);
-      if (rec) await commit([[`dive-equipment/${rec.id}.json`, { ...rec, diveKey: { start: to }, updatedAt: stamp() }]]);
+      const writes = /** @type {[string, unknown][]} */ ([]);
+      if (rec) writes.push([`dive-equipment/${rec.id}.json`, { ...rec, diveKey: { start: to }, updatedAt: stamp() }]);
+      // The dive's validations follow it (lib/validation.js).
+      for (const v of rekeyValidations(await store.readAll('dive-validations/'), from, to)) writes.push([`dive-validations/${v.id}.json`, { ...v, updatedAt: stamp() }]);
+      if (writes.length) await commit(writes);
     },
 
     /** A dive was deleted from the logbook. @param {string} diveKey */

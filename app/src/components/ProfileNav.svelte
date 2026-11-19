@@ -12,6 +12,7 @@
   import { PROFILE_SECTIONS, showProfilePath, heroOf, readHero } from '../lib/profile-frame.js';
   import { profileWindow } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { documentsLine } from '../lib/documents-text.js';
 
   /** @type {{ section: keyof typeof PROFILE_SECTIONS }} */
   let { section } = $props();
@@ -28,7 +29,7 @@
   const lines = $derived({
     gear: gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
     maintenance: '',
-    certs: diver.certs.length ? t('gear.profile.certificationsLine', { n: diver.certs.length }) : t('gear.profile.noCertification'),
+    certs: documentsLine(diver.certs),
     info: t('gear.profile.informationLine'),
   });
   const entries = /** @type {const} */ ([

@@ -186,10 +186,26 @@ const stars = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
  * The profile: the chart of the screen, or one drawn from the samples (a
  * string) when the dive is not shown. Anonymized (the logbook's export), the
  * people and the notes are left out, as Subsurface's anonymize option does.
+ * The validations by a buddy or an instructor (task 2026-11-19-309) close the sheet; the anonymized export leaves them out
+ * with the people.
  * @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|string|null} svg @param {boolean} [anonymize]
+ * @param {import('./validation.js').ValidationItem[]} [validations] the confirmed ones
  */
-export function sheetHtml(dive, prefs, svg, anonymize = false) {
-  if (anonymize) dive = { ...dive, guides: [], buddies: [], notes: '' };
+export function sheetHtml(dive, prefs, svg, anonymize = false, validations = []) {
+  if (anonymize) {
+    dive = { ...dive, guides: [], buddies: [], notes: '' };
+    validations = [];
+  }
+  const validationRows = validations
+    .filter((v) => !v.pending)
+    .map((v) => {
+      const role = (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase(locale);
+      const detail = [t(`validation.method.${v.method}`), v.at ? new Date(v.at).toLocaleDateString(locale, { dateStyle: 'long' }) : '', v.instructorNumber].filter(Boolean).join(' · ');
+      const image = v.signature ? `<img class="sig" src="${esc(v.signature)}" alt="">` : '';
+      const modified = v.modified ? `<div class="modified">${esc(t('validation.modified'))}</div>` : '';
+      return `<div class="validation"><div><b>${esc(t('validation.itemName', { name: v.name, role }))}</b><div class="legend">${esc(detail)}</div>${modified}</div>${image}</div>`;
+    })
+    .join('');
   const time = formatTimeOfDay(dive.date);
   const end = new Date(new Date(dive.date).getTime() + dive.durationSeconds * 1000);
   const endText = end.toLocaleTimeString(locale, { timeStyle: 'short' });
@@ -263,6 +279,7 @@ td { padding: 3px 4px; border-bottom: 1px solid #ECECEA; } td.n { font-variant-n
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
 .list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin: 6px 0 0; }
 .notes { white-space: pre-wrap; }
+.validation { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #ECECEA; padding: 4px 0; break-inside: avoid; } .sig { height: 34px; width: auto; border: 1px solid #DADAD6; border-radius: 3px; } .modified { color: #9C2B1A; font-size: 9pt; }
 footer { margin-top: 16px; border-top: 1px solid #DADAD6; padding-top: 6px; color: #4B4A47; font-size: 8.5pt; }
 </style></head><body>
 <header><div>
@@ -282,6 +299,7 @@ ${cylinders.length ? `<table><thead><tr><th>${esc(t('share.cylinder'))}</th><th>
 ${equipment.length ? `<dl class="list">${rows(equipment)}</dl>` : ''}
 ${people.length || conditions.length ? `<div class="two"><div>${people.length ? `<h2>${esc(t('detail.people'))}</h2><dl class="list" style="grid-template-columns:1fr">${rows(people)}</dl>` : ''}</div><div>${conditions.length ? `<h2>${esc(t('detail.conditions'))}</h2><dl class="list" style="grid-template-columns:1fr">${rows(conditions)}</dl>` : ''}</div></div>` : ''}
 ${dive.notes ? `<h2>${esc(t('detail.notes'))}</h2><div class="notes">${esc(dive.notes)}</div>` : ''}
+${validationRows ? `<h2>${esc(t('validation.pdfSection'))}</h2>${validationRows}` : ''}
 <footer>${esc(t('share.footer', { date: created }))}</footer>
 </body></html>`;
 }
@@ -354,7 +372,7 @@ export async function exportFile(ids, format, anonymize, prefs, name) {
     const pages = [];
     for (const id of ids) {
       const dive = await OpenDivesCore.getDive({ id });
-      pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize));
+      pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize, await validationItems(dive)));
     }
     // One document: the style of the first sheet, each sheet's body on its own page.
     const head = pages[0].slice(0, pages[0].indexOf('<body>') + 6);
@@ -368,9 +386,25 @@ export async function exportFile(ids, format, anonymize, prefs, name) {
   return { uri, mime };
 }
 
+/**
+ * The confirmed validations of a dive, for its sheet. Loaded when the screens have not (the export of a selection).
+ * @param {DiveDetail} dive
+ * @returns {Promise<import('./validation.js').ValidationItem[]>}
+ */
+async function validationItems(dive) {
+  try {
+    const v = await import('./validation.svelte.js');
+    if (!v.validations.ready) await v.loadValidations();
+    return v.validationsOf(dive).filter((i) => !i.pending);
+  } catch (e) {
+    console.error('Validations for the sheet', e);
+    return [];
+  }
+}
+
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */
 export async function sharePdf(dive, prefs, svg) {
-  const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg), name: fileName(dive, 'pdf'), letter: letterPaper() });
+  const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg, false, await validationItems(dive)), name: fileName(dive, 'pdf'), letter: letterPaper() });
   await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title: shareTitle(dive), files: [uri], dialogTitle: t('share.title') });
 }

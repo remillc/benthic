@@ -362,6 +362,14 @@
     --od-plus-violet-icon: #5B3A8A;
     --od-maintenance: #F6E3E0;
     --od-maintenance-icon: #8A2A1F;
+    /* The card reproductions of « Brevets et documents » (task 2026-11-19-309): a card is a dark gradient with white text in both themes. */
+    --od-card-blue: linear-gradient(135deg, #1F5C99, #0C3866);
+    --od-card-green: linear-gradient(135deg, #2E7D4F, #15502F);
+    --od-card-amber: linear-gradient(135deg, #A66A0A, #6B4306);
+    --od-card-violet: linear-gradient(135deg, #6A4C93, #3D2A5C);
+    --od-card-red: linear-gradient(135deg, #C62828, #7F1414);
+    --od-card-neutral: linear-gradient(135deg, #5B6168, #33383D);
+    --od-card-on: #FFFFFF;
     --od-plus-price: #114477;
     --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
     --od-plus-chip: rgb(255 255 255 / 0.22);

@@ -181,3 +181,77 @@ export function findDate(text, today) {
   }
   return found[0].date;
 }
+
+/**
+ * Every real date in a text, in the order they are written (an expiry date is in the future, which `findDate` leaves out).
+ * @param {string} text
+ * @returns {{ at: number, date: string }[]}
+ */
+export function findDates(text) {
+  /** @type {{ at: number, date: string }[]} */
+  const found = [];
+  const flat = text.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const add = (/** @type {RegExpMatchArray} */ m, /** @type {string} */ date) => date && found.push({ at: m.index ?? 0, date });
+  for (const m of flat.matchAll(/\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b/g)) add(m, iso(+m[1], +m[2], +m[3]));
+  for (const m of flat.matchAll(/\b(\d{1,2})[-/. ](\d{1,2})[-/. ](\d{4}|\d{2})\b/g)) {
+    const [a, b] = [+m[1], +m[2]];
+    add(m, b > 12 ? iso(+m[3], a, b) : iso(+m[3], b, a));
+  }
+  for (const m of flat.matchAll(/\b(\d{1,2})(?:st|nd|rd|th|er)?[-. ]+([a-z]{3,9})\.?[-, ]+(\d{4})\b/gi)) add(m, MONTHS[m[2].toLowerCase()] ? iso(+m[3], MONTHS[m[2].toLowerCase()], +m[1]) : '');
+  for (const m of flat.matchAll(/\b([a-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/gi)) add(m, MONTHS[m[1].toLowerCase()] ? iso(+m[3], MONTHS[m[1].toLowerCase()], +m[2]) : '');
+  return found.sort((x, y) => x.at - y.at);
+}
+
+/** The diving insurers a card names. @type {{ test: RegExp, name: (text: string) => string }[]} */
+const INSURERS = [
+  { test: /\bDAN\b|divers alert network/i, name: (text) => (/canada/i.test(text) ? 'DAN Canada' : /europe/i.test(text) ? 'DAN Europe' : /\bDAN\b.*\bworld|asia.?pacific/i.test(text) ? 'DAN World' : 'DAN') },
+  { test: /\bAXA\b/i, name: () => 'AXA' },
+  { test: /\bAllianz\b/i, name: () => 'Allianz' },
+  { test: /dive\s*assure|diveassure/i, name: () => 'DiveAssure' },
+  { test: /\bHiscox\b/i, name: () => 'Hiscox' },
+  { test: /\bPADI\b.*insurance|dive insurance/i, name: () => 'PADI Dive Insurance' },
+];
+
+/**
+ * What an insurance card's text suggests: the insurer, the plan, the policy number, the emergency phone and the dates. It
+ * only proposes; the diver checks every value.
+ * @param {string} text the recognised text, lines separated by line breaks
+ * @returns {{ insurer: string, plan: string, policyNumber: string, emergencyPhone: string, startsOn: string, expiresOn: string }} '' for what is not found
+ */
+export function parseInsuranceText(text) {
+  const out = { insurer: '', plan: '', policyNumber: '', emergencyPhone: '', startsOn: '', expiresOn: '' };
+  if (!text.trim()) return out;
+  out.insurer = INSURERS.find((i) => i.test.test(text))?.name(text) ?? '';
+
+  const plan = /\bplan\s*[:\-]?\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ+ ]{1,20}?)(?=\s*(?:\r?\n|$|[·,;]|\d))/i.exec(text);
+  if (plan) out.plan = plan[1].trim();
+
+  const labelled = /(?:\bpolic[ye]\b|\bpolice\b|\bcontrat\b|\bmember(?:ship)?\b|\bmembre\b|\badh[ée]rent\b)[^\n\d]{0,25}?(?:n[°o˚º]\.?|no\.?|number|num[ée]ro|#|:)?\s*([A-Z0-9][A-Z0-9 -]{4,19}\d)/i.exec(text);
+  if (labelled) out.policyNumber = labelled[1].trim().replace(/\s+/g, ' ');
+
+  const phones = [...text.matchAll(/(\+\d[\d\s().-]{7,18}\d)/g)].map((m) => ({ at: m.index ?? 0, value: m[1].trim() }));
+  if (phones.length) {
+    const label = /(?:emergency|urgence|urgences|hotline|24\s*h)/i.exec(text);
+    const near = label ? phones.find((p) => p.at >= (label.index ?? 0)) : undefined;
+    out.emergencyPhone = (near ?? phones[0]).value;
+  }
+
+  const dates = findDates(text);
+  if (dates.length) {
+    const after = (/** @type {RegExp} */ re) => {
+      for (const m of text.normalize('NFD').replace(/[̀-ͯ]/g, '').matchAll(re)) {
+        const start = m.index ?? 0;
+        const hit = dates.find((d) => d.at >= start && d.at <= start + m[0].length + 3);
+        if (hit) return hit.date;
+      }
+      return '';
+    };
+    out.expiresOn = after(/\b(?:expir\w*|valid(?:e|ity)?\s*(?:until|thru|through|to)|valable\s*jusqu\w*|until|jusqu\w*|exp\.?|end(?:s)?|fin)\b[^\n]{0,24}/gi);
+    out.startsOn = after(/\b(?:start\w*|d[ée]but|effective|valid\s*from|from|depuis|du|begin\w*)\b[^\n]{0,24}/gi);
+    const sorted = [...dates].map((d) => d.date).sort();
+    if (!out.expiresOn && sorted.length > 1) out.expiresOn = sorted[sorted.length - 1];
+    if (!out.startsOn && sorted.length > 1 && sorted[0] !== out.expiresOn) out.startsOn = sorted[0];
+    if (!out.expiresOn && sorted.length === 1) out.expiresOn = sorted[0];
+  }
+  return out;
+}

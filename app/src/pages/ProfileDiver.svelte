@@ -11,6 +11,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { documentsLine } from '../lib/documents-text.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
 
@@ -19,7 +20,7 @@
   const total = $derived(logbook.dives.length);
   const since = $derived(logbook.dives.reduce((year, d) => Math.min(year, Number(d.date.slice(0, 4)) || year), 9999));
   const divesLine = $derived(total ? t('gear.profile.divesSince', { n: total, year: String(since) }) : t('gear.profile.noDive'));
-  const certsLine = $derived(diver.certs.length ? t('gear.profile.certificationsLine', { n: diver.certs.length }) : t('gear.profile.noCertification'));
+  const certsLine = $derived(documentsLine(diver.certs));
   const overdue = $derived(overdueBadge());
   const equipmentLine = $derived(
     gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),

@@ -6,7 +6,10 @@
 /** The codes the screens know. */
 export const SERVER_ERRORS = /** @type {const} */ (['INVALID_ADDRESS', 'WRONG_CODE', 'CODE_EXPIRED', 'TOO_MANY_ATTEMPTS', 'RESEND_TOO_SOON', 'UNREACHABLE']);
 
-/** @typedef {typeof SERVER_ERRORS[number]} ServerErrorCode */
+/** The codes of the dive validation routes (lib/validation.js); they have no sentence in the dev tools. */
+export const VALIDATION_ERRORS = /** @type {const} */ (['TOKEN_UNKNOWN', 'TOKEN_EXPIRED', 'TOKEN_USED', 'OWN_CODE', 'SUBSCRIPTION_REQUIRED', 'TOO_MANY_REQUESTS']);
+
+/** @typedef {typeof SERVER_ERRORS[number]|typeof VALIDATION_ERRORS[number]} ServerErrorCode */
 
 export class ServerError extends Error {
   /**
@@ -31,7 +34,7 @@ export class ServerError extends Error {
 export function errorFromResponse(status, body) {
   const code = body?.error?.code;
   const retry = Number.isFinite(body?.error?.retryAfterSeconds) ? Number(body.error.retryAfterSeconds) : undefined;
-  if (typeof code === 'string' && /** @type {readonly string[]} */ (SERVER_ERRORS).includes(code) && code !== 'UNREACHABLE') {
+  if (typeof code === 'string' && (/** @type {readonly string[]} */ (SERVER_ERRORS).includes(code) || /** @type {readonly string[]} */ (VALIDATION_ERRORS).includes(code)) && code !== 'UNREACHABLE') {
     return new ServerError(/** @type {ServerErrorCode} */ (code), retry);
   }
   return new ServerError('UNREACHABLE');
@@ -188,6 +191,36 @@ export function createServerApi({ baseUrl, transport }) {
      */
     async deleteAccount(sessionToken) {
       await call('DELETE', '/v1/account', undefined, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * Dive validation by QR code (inbox task 2026-11-19-309): a one-time code for the dives, valid 10 minutes.
+     * @param {string} sessionToken @param {import('./validation.js').Summary} summary
+     * @returns {Promise<{ token: string, expiresAt: string }>}
+     */
+    async createValidationCode(sessionToken, summary) {
+      const r = await call('POST', '/v1/validations/tokens', { summary }, { Authorization: `Bearer ${sessionToken}` });
+      if (typeof r.token !== 'string' || typeof r.expiresAt !== 'string') throw new ServerError('UNREACHABLE');
+      return { token: r.token, expiresAt: r.expiresAt };
+    },
+
+    /**
+     * The signer confirms: his name, role and instructor number; `scannedAt` when the confirmation was queued offline.
+     * @param {string} sessionToken
+     * @param {{ token: string, signer: { name: string, role: string, instructorNumber: string }, scannedAt?: string }} f
+     * @returns {Promise<void>}
+     */
+    async confirmValidation(sessionToken, { token, signer, scannedAt }) {
+      await call('POST', '/v1/validations/confirm', { token, ...signer, ...(scannedAt ? { scannedAt } : {}) }, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * What the signer answered, for the diver's pending validation.
+     * @param {string} sessionToken @param {string} token
+     * @returns {Promise<{ status: 'waiting'|'confirmed'|'expired', signer?: { name: string, role: string, instructorNumber?: string }, confirmedAt?: string }>}
+     */
+    async validationResult(sessionToken, token) {
+      return call('POST', '/v1/validations/result', { token }, { Authorization: `Bearer ${sessionToken}` });
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

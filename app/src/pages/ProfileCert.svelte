@@ -8,6 +8,7 @@
   import Icon from '../components/Icon.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
+  import DocumentFullScreen from '../components/DocumentFullScreen.svelte';
   import { services, loadProfile } from '../lib/profile.svelte.js';
   import { changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
@@ -108,6 +109,7 @@
       <div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.number')}</span><span class="od-cert--value">{card.number}</span></div>
       {#if card.issuedOn}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.date')}</span><span class="od-cert--value">{formatLongDate(card.issuedOn)}</span></div>{/if}
       {#if card.instructor}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.instructor')}</span><span class="od-cert--value">{card.instructor}</span></div>{/if}
+      {#if card.instructorCert}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.instructorCert')}</span><span class="od-cert--value od-cert--value-small">{t('diverProfile.cert.instructorCertText')}</span></div>{/if}
     </div>
   {/if}
 {/snippet}
@@ -135,10 +137,16 @@
 </Page>
 
 {#if full && photo}
-  <div class="od-cert--full" role="dialog" aria-modal="true" aria-label={t('diverProfile.cert.fullscreen')}>
-    <img src={photo} alt={t('diverProfile.cert.photoOf')} />
-    <button type="button" class="od-cert--full-close" onclick={() => (full = false)} aria-label={t('diverProfile.cert.close')}><Icon name="close" /></button>
-  </div>
+  <DocumentFullScreen
+    images={[
+      ...(urls.front ? [{ url: urls.front, label: t('diverProfile.cert.recto') }] : []),
+      ...(urls.back ? [{ url: urls.back, label: t('diverProfile.cert.verso') }] : []),
+    ]}
+    start={side === 'back' && urls.front ? 1 : 0}
+    title={[agency, card?.level].filter(Boolean).join(' ')}
+    line={card ? (card.issuedOn ? t('diverProfile.certs.line', { number: card.number, date: formatLongDate(card.issuedOn) }) : t('diverProfile.certs.lineNoDate', { number: card.number })) : ''}
+    onclose={() => (full = false)}
+  />
 {/if}
 
 <style>
@@ -224,41 +232,17 @@
       line-height: 24px;
     }
 
+    .od-cert--value-small {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
     .od-cert--missing {
       margin: 32px;
       text-align: center;
       color: var(--od-text-2);
     }
 
-    .od-cert--full {
-      position: fixed;
-      inset: 0;
-      z-index: 20000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--od-viewer);
-    }
-
-    .od-cert--full img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    .od-cert--full-close {
-      position: absolute;
-      top: 12px;
-      inset-inline-end: 12px;
-      width: 48px;
-      height: 48px;
-      border: none;
-      border-radius: 24px;
-      background: var(--od-viewer-control);
-      color: var(--od-viewer-on);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
   }
 </style>

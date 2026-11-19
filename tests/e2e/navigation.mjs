@@ -426,6 +426,33 @@ async function phoneFlows() {
   let tab = await openTab(390, 844, true);
   await settled(tab, 'logbook at start', { route: '/' });
 
+  console.log(' selection toolbar above the bottom bar');
+  for (const demo of [false, true]) {
+    await tab.run((on) => document.documentElement.classList.toggle('od-demo-bottom-on', on), demo);
+    const row = await tab.run(() => {
+      const r = document.querySelector('.page-current a.od-dive-row--link')?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
+    });
+    if (!row) throw new Error('no dive row');
+    await tab.touch('touchStart', row.x, row.y);
+    await sleep(900);
+    await tab.touch('touchEnd', row.x, row.y);
+    await sleep(900);
+    if (process.env.OD_SHOTS) await shot(tab, `selection-toolbar${demo ? '-demo' : ''}`);
+    const g = await tab.run(() => {
+      const t = document.querySelector('.od-floating-toolbar')?.getBoundingClientRect();
+      const b = document.querySelector('.od-navigation-bar')?.getBoundingClientRect();
+      return { toolbar: t ? t.bottom : null, bar: b ? b.top : null };
+    });
+    checks++;
+    if (g.toolbar === null || g.bar === null || g.toolbar > g.bar) failures.push({ label: `selection toolbar (banner ${demo})`, problems: [`toolbar bottom ${g.toolbar}, bottom bar top ${g.bar}`] });
+    else console.log(`  ok   toolbar bottom ${Math.round(g.toolbar)} <= bar top ${Math.round(g.bar)} (banner ${demo})`);
+    await hardwareBack(tab);
+    await sleep(500);
+  }
+  await tab.run(() => document.documentElement.classList.remove('od-demo-bottom-on'));
+  await settled(tab, 'after the selection', { route: '/' });
+
   console.log(' logbook > dive > back');
   await tapDive(tab);
   await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
@@ -457,6 +484,72 @@ async function phoneFlows() {
   await settled(tab, 'after Save', { route: diveRoute });
   await tapBack(tab);
   await settled(tab, 'back after Save', { route: '/' });
+
+  // Dive validation by signature (task 2026-11-19-309, point 2; OpenDives+): « Faire valider » of the dive's Validations
+  // section, the choice, the signature drawn with the finger, « Valider »; the dive shows the validation, the logbook marks
+  // the dive, and the validation can be removed. The stack stays sound at every step.
+  console.log(' dive > validate by signature > Back');
+  await tapDive(tab);
+  await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/ });
+  const validated = (await tab.run(readStack)).current;
+  await tab.run(() => window.__odplusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
+  await sleep(800);
+  await tapText(tab, '^\\s*(Faire valider|Get it validated)\\s*$');
+  await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/ });
+  await tapText(tab, 'Signature sur cet écran|Signature on this screen');
+  await sleep(300);
+  await tab.run(() => {
+    const field = document.querySelector('.page-current .od-validate--fields input');
+    field.value = 'Marc Gagnon';
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const pad = await tab.run(() => {
+    const r = document.querySelector('.page-current canvas.od-signature-pad').getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
+  });
+  await tab.touch('touchStart', pad.x + pad.w * 0.2, pad.y + pad.h * 0.6);
+  for (let i = 1; i <= 8; i++) {
+    await tab.touch('touchMove', pad.x + pad.w * (0.2 + 0.075 * i), pad.y + pad.h * (0.6 - 0.3 * Math.sin(i / 2)));
+    await sleep(16);
+  }
+  await tab.touch('touchEnd', pad.x + pad.w * 0.8, pad.y + pad.h * 0.5);
+  await sleep(200);
+  const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Valider|Validate/.test(a.textContent) && a.classList.contains('disabled')));
+  checks++;
+  if (!enabled) failures.push({ label: 'validation: Valider enabled', problems: ['« Valider » stays disabled after a name and a signature'] });
+  if (process.env.OD_SHOTS) await shot(tab, 'validation-signature');
+  await tapText(tab, '^\\s*(Valider|Validate)\\s*$', '.page-current .navbar');
+  for (let i = 0; i < 60 && (await tab.run(readStack)).current !== validated; i++) await sleep(100);
+  await settled(tab, 'validation: back on the dive', { route: validated });
+  const shown = await tab.run(() => ({
+    text: document.querySelector('.page-current .od-dive-validations')?.textContent ?? '',
+    signature: !!document.querySelector('.page-current .od-dive-validations--signature'),
+  }));
+  checks++;
+  if (!/Marc Gagnon/.test(shown.text) || !shown.signature) failures.push({ label: 'validation: section', problems: ['the Validations section shows "' + shown.text.slice(0, 80) + '", signature ' + shown.signature] });
+  if (process.env.OD_SHOTS) await shot(tab, 'validation-detail');
+  await tapBack(tab);
+  await settled(tab, 'validation: back to the logbook', { route: '/' });
+  const marked = await tab.run(() => !!document.querySelector('.page-current .od-dive-row--validated'));
+  checks++;
+  if (!marked) failures.push({ label: 'validation: mark', problems: ['no mark on the validated dive in the logbook list'] });
+  await tapDive(tab);
+  await settled(tab, 'validation: dive reopened', { route: /^\/dives\/\d+$/ });
+  await tapText(tab, 'Retirer la validation|Remove the validation');
+  await sleep(500);
+  await tapText(tab, '^\\s*(Retirer|Remove)\\s*$', '.dialog');
+  await sleep(500);
+  const gone = await tab.run(() => !document.querySelector('.page-current .od-dive-validations--item'));
+  checks++;
+  if (!gone) failures.push({ label: 'validation: removed', problems: ['the validation is still listed after « Retirer »'] });
+  await tapBack(tab);
+  await settled(tab, 'validation: back after removing', { route: '/' });
+  // The « Validation retirée » message covers the dive's toolbar: wait for it to go before the next flow.
+  for (let i = 0; i < 100 && (await tab.run(() => !!document.querySelector('.toast'))); i++) await sleep(100);
+  await sleep(300);
+  // Back to a free, signed-out account: the flows below test the account sheet and the offer of that case.
+  await tab.run(() => window.__odplusAccount({ signedIn: false, subscribed: false }));
+  await sleep(300);
 
   // The reported regression: a dive, Edit, a field changed, Save, then Back (arrow, Android Back key, edge swipe), with the
   // « Dive saved / Undo » message on screen. The stack must be sound, and Back again must reach the logbook.
