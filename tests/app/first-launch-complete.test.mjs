@@ -290,7 +290,9 @@ test('the logbook menu opens the first launch at its step, and its first screen 
   assert.deepEqual(back(menuEntry('open')), ['start']);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /hasBack\(step, flow\.origin === 'menu'\)/);
-  assert.match(steps, /function leave\(\) \{\s*logbook\.welcome = false;\s*resetFlow\(\);/);
+  assert.match(steps, /function leave\(\) \{[^}]*logbook\.welcome = false;\s*resetFlow\(\);/);
+  // Opened from the account sheet, leaving shows the sheet again.
+  assert.match(steps, /resetFlow\(\);\s*if \(toAccount\) navigation\.accountOpen = true;/);
   const state = read('lib/first-launch.svelte.js');
   assert.match(state, /export function enterFromMenu\(first\) \{\s*resetFlow\(\);\s*flow\.origin = 'menu';/);
   assert.match(state, /export function resetFlow\(\) \{\s*flow\.origin = '';/);
