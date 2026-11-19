@@ -6000,7 +6000,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the iPhone About screen and compare with the mock-up. On a tablet in portrait, reach each of the listed screens and compare with its mock-up.
 
-## 301 — Sample logbook: more dives, closer to a typical logbook
+## [x] 2026-11-19-301 Sample logbook: more dives, closer to a typical logbook
 
 **Why:** the sample logbook had too few dives per year to look like a real logbook. The mock-ups now show 40 dives over 2023 to 2026.
 
@@ -6059,3 +6059,5 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 | 40 | 2026-02-07 | 09:09 | (no site) | 91 ft | 55 min |  |
 
 **Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
+
+**Done (19 November 2026).** `core/sample/make-sample.mjs` writes `core/sample/SampleLogbook.ssrf` (40 synthetic dives, 8 sites, the 6-dive trip, N° 26 as a rebreather dive, N° 40 without a site); the Android, iOS and desktop builds copy it under the name the plugins read (`SampleDivesV2.ssrf`). Rebuild the Android libs (`native/build-android.sh`) to ship it.

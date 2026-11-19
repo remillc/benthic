@@ -23,7 +23,7 @@ for ABI in $ABIS; do
 done
 
 mkdir -p "$OUT/assets"
-cp "$SS/dives/SampleDivesV2.ssrf" "$OUT/assets/"
+cp "$(dirname "$0")/../core/sample/SampleLogbook.ssrf" "$OUT/assets/SampleDivesV2.ssrf"
 # Subsurface's XSLT stylesheets (exports, CSV imports), copied to the app's
 # files at start (set_xslt_dir).
 rm -rf "$OUT/assets/xslt"

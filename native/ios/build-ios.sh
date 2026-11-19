@@ -30,7 +30,7 @@ done
 
 rm -rf "$OUT/headers"
 mkdir -p "$OUT/assets/xslt" "$OUT/headers/core/libopendives" "$OUT/headers/core/compat"
-cp "$SS/dives/SampleDivesV2.ssrf" "$OUT/assets/"
+cp "$(dirname "$0")/../../core/sample/SampleLogbook.ssrf" "$OUT/assets/SampleDivesV2.ssrf"
 cp "$SS"/xslt/*.xsl* "$OUT/assets/xslt/"
 # iOS cannot export its trust store for Mbed TLS: Mozilla's list ships with the app.
 curl -fsSL --retry 3 -o "$OUT/assets/cacert.pem" https://curl.se/ca/cacert.pem
