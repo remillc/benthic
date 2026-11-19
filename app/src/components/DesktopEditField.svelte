@@ -11,6 +11,7 @@
   // Kinds: text, multiline (notes), list (chips: buddies, guides, tags), choice (a menu), stars,
   // site (one name chosen in the logbook's list, or a new one). What a value becomes in the core is
   // decided by lib/desktop-edit.js; this component only edits and reports the new value.
+  import { floatMenu } from '../lib/float-menu.js';
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
   import StarsInput from './StarsInput.svelte';
@@ -279,7 +280,7 @@
       </div>
       {#if kind !== 'choice' && kind !== 'stars'}<p class="od-desktop-edit-field--hint" class:od-desktop-edit-field--hint-invalid={invalid}>{invalid ? t('desktopDetail.invalid') : hint}</p>{/if}
       {#if (kind === 'list' || kind === 'site') && rows.length}
-        <ul class="od-desktop-edit-field--suggestions" role="listbox" aria-label={label}>
+        <ul class="od-desktop-edit-field--suggestions" role="listbox" aria-label={label} use:floatMenu>
           {#each rows as row, i (row.add ? `add-${row.key}` : row.key)}
             <li role="option" aria-selected={highlighted === i}>
               <button type="button" class="od-desktop-edit-field--suggestion" class:od-desktop-edit-field--suggestion-on={highlighted === i} onmousedown={(e) => e.preventDefault()} onclick={() => pick(row.key)}>
@@ -583,10 +584,12 @@
     }
 
     .od-desktop-edit-field--suggestions {
-      position: absolute;
-      inset-inline: 0;
-      top: calc(100% + 2px);
-      z-index: 20;
+      /* In the top layer, placed by floatMenu (lib/float-menu.js). */
+      position: fixed;
+      inset: auto;
+      box-sizing: border-box;
+      border: none;
+      color: var(--od-text);
       margin: 0;
       padding: 4px;
       list-style: none;

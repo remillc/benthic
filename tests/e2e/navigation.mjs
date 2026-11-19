@@ -112,7 +112,18 @@ const core = (method, a) => new Promise((resolve, reject) => {
 });
 await core('init', { home });
 if (stage) await core('setXsltDir', { dir: path.join(stage, 'xslt') }).catch(() => {});
-await core('importFile', { source: sample, repo: `${path.join(home, 'carnet')}[main]` });
+// A few dives with other buddies and guides: the people fields then list several values (the tallest suggestion list).
+const seeded = path.join(work, 'sample-people.ssrf');
+{
+  let n = 0;
+  const names = ['Bea', 'Cal', 'Dan', 'Eli', 'Fay', 'Gus'];
+  writeFileSync(
+    seeded,
+    readFileSync(sample, 'utf8').replace(/<buddy>Alex<\/buddy>/g, (m) => (n < names.length ? `<buddy>${names[n]}</buddy>
+  <divemaster>${names[n++]} Guide</divemaster>` : m)),
+  );
+}
+await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[main]` });
 
 // The app's development server.
 const vite = spawn(process.execPath, [path.join(root, 'app/node_modules/vite/bin/vite.js'), '--config', 'vite.e2e.config.js'], {
@@ -498,6 +509,66 @@ async function phoneFlows() {
     await settled(tab, `${how}: Back again on the logbook`, { route: '/' });
     await sleep(300);
   }
+
+  console.log(' edit > suggestion lists float above the following cards');
+  await tapDive(tab);
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await tapText(tab, '^\s*(Modifier|Edit)\s*$');
+  await settled(tab, 'edit opened', { route: /\/edit$/ });
+  // Each field is brought to the bottom of the screen (little room below) and to the middle (the list passes over the
+  // cards that follow).
+  for (const [label, block] of [['^(Guide|Dive guide|Guides)', 'end'], ['^(Compagnons|Buddies|Buddy)', 'end'], ['^(Guide|Dive guide|Guides)', 'center'], ['^(Compagnons|Buddies|Buddy)', 'center']]) {
+    const placed = await tab.run((label, block) => {
+      const re = new RegExp(label, 'i');
+      const l = [...document.querySelectorAll('.page-current .od-chips-field--label')].find((x) => re.test(x.textContent.trim()));
+      const input = l && document.getElementById(l.getAttribute('for'));
+      if (!input) return false;
+      input.scrollIntoView({ block });
+      input.focus();
+      return true;
+    }, label, block);
+    checks++;
+    if (!placed) {
+      failures.push({ label: `suggestions ${label} (${block})`, problems: ['field not found'] });
+      console.log(`  FAIL suggestions ${label} (${block}): field not found`);
+      continue;
+    }
+    // Focused and empty, the field lists the logbook's values (up to six): the tallest list it can show.
+    await sleep(300);
+    if (!(await tab.run(() => document.querySelectorAll('.page-current .od-chips-field--proposals button').length > 1))) await tab.send('Input.insertText', { text: 'a' });
+    await sleep(300);
+    if (process.env.OD_SHOTS) await shot(tab, `suggestions-${label.replace(/\W/g, '')}-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
+    const res = await tab.run(() => {
+      const ul = [...document.querySelectorAll('.page-current .od-chips-field--proposals')].find((u) => u.getClientRects().length);
+      if (!ul) return { problem: 'no open list' };
+      const items = [...ul.querySelectorAll('button')];
+      const bad = [];
+      for (const b of items) {
+        const r = b.getBoundingClientRect();
+        const x = r.x + r.width / 2;
+        // Both edges of the row, not only its centre: a card's clipping cuts the lower part.
+        for (const y of [r.top + 4, r.top + r.height / 2, r.bottom - 4]) {
+          if (y < 0 || y > innerHeight) bad.push(`${b.textContent.trim()} is off screen (y=${Math.round(y)})`);
+          else if (!b.contains(document.elementFromPoint(x, y))) bad.push(`${b.textContent.trim()} is covered at y=${Math.round(y)} by ${document.elementFromPoint(x, y)?.className || '?'}`);
+        }
+      }
+      const ir = document.activeElement?.getBoundingClientRect();
+      return { n: items.length, bad, at: `${document.activeElement?.id} input y=${Math.round(ir?.top ?? -1)} list y=${Math.round(ul.getBoundingClientRect().top)}-${Math.round(ul.getBoundingClientRect().bottom)}` };
+    });
+    if (res.problem || res.bad.length || !res.n) {
+      failures.push({ label: `suggestions ${label} (${block})`, problems: [res.problem ?? (res.bad.join('; ') || 'empty list')] });
+      console.log(`  FAIL suggestions ${label} (${block}): ${res.problem ?? res.bad.join('; ')}`);
+    } else console.log(`  ok   suggestions ${label} (${block}): ${res.n} rows on top (${res.at})`);
+    await tab.run(() => document.activeElement?.blur());
+    await sleep(300);
+  }
+  // Leave without saving: the dive stays as it was for the next flows.
+  await tapBack(tab);
+  await sleep(500);
+  // Typed text asks first; a field only focused does not.
+  await tapText(tab, '^(Quitter|Leave)$', '.od-leave-guard--dialog').catch(() => {});
+  await settled(tab, 'after leaving the edit page', { route: /^\/dives\/\d+$/ });
+  await toLogbook(tab, 'after the suggestions check');
 
   console.log(' quick entry after a download (Complete the dive)');
   // The phone is at a known site: the nearest site is preselected and named.

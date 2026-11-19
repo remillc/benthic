@@ -7,6 +7,7 @@
   import Icon from './Icon.svelte';
   import DropdownArrow from './DropdownArrow.svelte';
   import { t } from '../lib/i18n.js';
+  import { floatMenu } from '../lib/float-menu.js';
 
   /**
    * @type {{
@@ -115,7 +116,7 @@
     <span class="od-combo-field--arrow" class:od-combo-field--up={open}><DropdownArrow /></span>
   </div>
   {#if proposals.length || isNew}
-    <ul class="od-combo-field--menu" role="listbox" aria-label={label} bind:this={menu}>
+    <ul class="od-combo-field--menu" role="listbox" aria-label={label} bind:this={menu} use:floatMenu={'.od-combo-field--box'}>
       {#each proposals as o (o)}
         <li>
           <button type="button" role="option" aria-selected={o === value} onmousedown={(e) => e.preventDefault()} onclick={() => choose(o)}>
@@ -235,11 +236,13 @@
       }
     }
 
+    /* In the top layer, placed by floatMenu (lib/float-menu.js). */
     .od-combo-field--menu {
-      position: absolute;
-      left: 0;
-      right: 0;
-      z-index: 20;
+      position: fixed;
+      inset: auto;
+      box-sizing: border-box;
+      border: none;
+      color: var(--od-text);
       margin: 0;
       padding: 8px 0;
       list-style: none;

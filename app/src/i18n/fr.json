@@ -2895,7 +2895,8 @@
       "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
       "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur ».",
       "Téléchargement : une lampe ou une balance dont le nom commence par « S1 » (« S19 A69C LE ») n’est plus proposée comme un Oceans S1. Chaque appareil de la liste à proximité a un menu « Ce n’est pas un ordinateur de plongée » qui le masque pour de bon (Annuler dans le message) ; Réglages › Téléchargement liste les appareils masqués avec « Afficher de nouveau ».",
-      "Android : la touche Retour fonctionne tant qu’un message comme « Plongée enregistrée / Annuler » est affiché ; elle était ignorée jusqu’à la disparition du message."
+      "Android : la touche Retour fonctionne tant qu’un message comme « Plongée enregistrée / Annuler » est affiché ; elle était ignorée jusqu’à la disparition du message.",
+      "Modifier la plongée : les listes de suggestions des champs Guide de palanquée, Compagnons et Étiquettes (et de la combinaison) s’ouvrent maintenant au-dessus des cartes suivantes, dans l’écran, et au-dessus du champ quand il n’y a pas de place en dessous."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
