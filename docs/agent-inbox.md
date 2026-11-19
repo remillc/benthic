@@ -5775,3 +5775,34 @@ Do not offer pressure per minute (psi/min, bar/min): it depends on the cylinder,
 Under « Volume » in the Units settings, on every platform (Android phone and tablet, iPhone, iPad, desktop Windows/Linux and macOS), add the supporting line: « Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d'O₂, en pi³/min » — with the unit matching the current Volume unit (« en l/min » in metric).
 
 **Test:** switch Volume between litres and cubic feet: the line under Volume, the SAC fields of the planner and the metabolic O₂ consumption all change unit and value (1 ft³ = 28.3168 l).
+
+## [ ] 2026-11-19-287 Delete one of your cylinder types: alignment, tablet and desktop
+
+Christian approved this on 19 November 2026. Work in `main`. Follows task 285 (do not edit 285).
+
+**Phone** (`docs/mockups-release/`: `reglages2-bouteille-modifier-android`, `reglages2-bouteille-vos-modifier-android`, `reglages2-bouteille-supprimer-android`). Material 3 alignment: the explanation paragraph sits on the 16 dp margin (it was 20 dp), like the fields and the button. The line under « Supprimer ce type » starts at the button's left edge (no 16 dp indent). « Retirer ce type » on standard types stays a neutral outlined button; only « Supprimer ce type » uses the error colour.
+
+**Android tablet** (`docs/mockups/`: `android-tablette-bouteilles-paysage`, `-portrait`, `android-tablette-bouteille-vos-modifier-paysage`, `android-tablette-bouteille-supprimer-paysage`):
+- The cylinder types list: tapping one of « Vos types » opens « Modifier le type ». Its explanation now reads « … Changer sa taille ne modifie pas les plongées existantes. Supprimer un de vos types retire ses bouteilles des plongées qui l'utilisent. »
+- « Modifier le type » (your type): same layout as « Nouveau type », plus the explanation, the red outlined « Supprimer ce type » button and the line « Retire cette bouteille des 12 plongées qui l'utilisent. »
+- Confirmation: the same basic dialog as the phone, centred.
+
+**Desktop** (`docs/mockups/`: `bureau-reglages-equipement`, `bureau-reglages-equipement-type`, `bureau-reglages-equipement-supprimer`). The Équipement section of Settings was not drawn before:
+- Card « Bouteilles ajoutées aux nouvelles plongées »: open circuit (dropdown), diluent and oxygen for rebreathers (dropdowns), bailout (« AL40, AL80 » with a « Modifier » button).
+- Card « Types de bouteilles »: explanation, « Vos types » (count of dives, « Inutilisé » chip), a few standard types, « Et 33 autres types standard… » with « Ajouter un type », then the switches « Afficher les bouteilles inutilisées » and « Proposer les tailles standard ». Values in the current units (metric in the mock-up: L, bar).
+- Clicking one of your types opens a 560 px dialog « Modifier le type » (Nom, Volume d'eau, Pression de service), the explanation including « Le supprimer retire cette bouteille de ces 12 plongées. », and a footer with « Supprimer ce type » (red, outlined, left) and « Annuler » / « Enregistrer » (right).
+- « Supprimer ce type » opens the same confirmation as on the phone.
+
+The open question from 285 still applies: check with Christian before removing the only cylinder of a dive.
+
+**Test:** on each platform, open one of your types, delete it, confirm: the count is right and the cylinders are gone from those dives.
+
+## [ ] 2026-11-19-288 Desktop logbook list everywhere, « Saucisse », model thumbnail
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
+
+1. **Desktop logbook list** (the layout of task 279) now appears in every desktop mock-up that shows the list: `bureau-carnet-onglet-carte`, `-onglet-equipement`, `-onglet-gaz`, `-onglet-notes`, `bureau-carnet-menu-contextuel`, `bureau-carnet-edition-sur-place`, `bureau-carnet-colonnes`, `bureau-carnet-exporter`, `bureau-carnets-selecteur`, `bureau-compte`, `bureau-compte-gratuit`, `bureau-compte-gerer`, `bureau-profil-compte`, `bureau-serveur-carnet`. There is one list component: make sure no screen still uses the older table (profile column, a year row between every year, no weekday).
+2. **« Saucisse »** (not « Parachute de palier ») in the desktop dive detail, Équipement tab (`bureau-carnet-onglet-equipement`). Same word as the phone (task 283).
+3. **Model thumbnail** (56 px, left of the « Modèle » field) in « Nouvelle pièce » on the Android tablet and desktop (`android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`), as on the phone (task 283).
+
+**Test:** open every desktop screen listed above: same list, weekday shown, one sticky year line. Add a « Saucisse » to a dive on desktop. Open « Nouvelle pièce » on tablet and desktop: thumbnail left of « Modèle ».
