@@ -8,7 +8,13 @@ import { backTarget, readPane } from './pane-history.js';
 import { backThroughGuard } from './leave-guard.js';
 
 export function enableBackButton() {
-  CapacitorApp.addListener('backButton', () => {
+  // The same handler answers the page event « od:back » (tests/e2e/navigation.mjs sends the Android Back key that way).
+  window.addEventListener('od:back', () => onBack());
+  CapacitorApp.addListener('backButton', () => onBack());
+}
+
+function onBack() {
+  {
     // 0. The card of a selected pin on the Sites map closes (pages/Sites.svelte), then
     // a map shown full screen (components/SiteMap.svelte) goes back to its place.
     const siteCard = document.querySelector('.od-map-site-card');
@@ -118,5 +124,5 @@ export function enableBackButton() {
     if (target === 'pane' || target === 'page') view.router.back();
     else if (target === 'logbook') f7.tab.show('#view-logbook');
     else CapacitorApp.minimizeApp();
-  });
+  }
 }

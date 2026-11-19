@@ -5,7 +5,7 @@
   // iPad sidebar or the Android rail and, in the Logbook, the list and the
   // dive side by side from `splitBreakpoint` (Framework7's master-detail).
   import { onMount } from 'svelte';
-  import { App, Views, View, f7 } from 'framework7-svelte';
+  import { App, Views, View, f7, f7ready } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
   import Placeholder from './pages/Placeholder.svelte';
@@ -53,6 +53,7 @@
   import { releaseModalListeners } from './lib/f7-modal-cleanup.js';
   import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
+  import { enableRouterGuard } from './lib/router-guard.js';
   import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
@@ -370,6 +371,7 @@
     }
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
+    f7ready(() => enableRouterGuard(f7));
     enableBackButton();
     // High contrast when the system asks for more contrast (task 2026-11-14-149).
     followContrast({

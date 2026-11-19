@@ -9,6 +9,7 @@
   // never shown.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
+  import { lockRouter } from '../lib/router-guard.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
@@ -107,6 +108,21 @@
   }
 
   /**
+   * The list under the dive pages is left « stacked » by Framework7 (`display: none` on a phone) while a second page
+   * sits over the first dive. When the swipe leaves one dive page over the list, the list is unstacked, as Framework7
+   * does when it goes back itself: a Back to a list that stays hidden never ends its transition (the view stayed in
+   * « router-transition-backward » with the dive page on screen).
+   * @param {HTMLElement} view
+   */
+  function unstackMaster(view) {
+    if (f7router.history.length > 2) return;
+    for (const el of view.querySelectorAll(':scope > .page-master-stacked')) {
+      el.classList.remove('page-master-stacked');
+      f7.$(el).trigger('page:masterunstack');
+    }
+  }
+
+  /**
    * Phone (Christian's request of 14 November 2026): the two dives side by side. As soon as the
    * finger moves, the neighbour dive's page opens without animation beside this one (its detail is
    * preloaded), and both follow the finger (the --od-push-dx of theme.css, as Réglages → À propos).
@@ -118,6 +134,8 @@
     /** @type {null|{ view: HTMLElement, dir: -1|1, width: number }} */
     let push = null;
     let busy = false;
+    /** Releases the router hold taken when the swipe started. */
+    let unlock = () => {};
     const clamp = (/** @type {number} */ dx) => (push ? (push.dir < 0 ? Math.min(dx, 0) : Math.max(dx, 0)) : dx);
     return {
       /** @param {number} dx */
@@ -128,12 +146,14 @@
           const view = /** @type {HTMLElement|null} */ (pageEl.parentElement);
           if (id === undefined || !view) return false;
           push = { view, dir: dx < 0 ? -1 : 1, width: view.clientWidth };
+          // Until this swipe has settled, a Back or a link waits (or is ignored): the history is rewritten at the end.
+          unlock = lockRouter(f7router);
           pageEl.classList.add('od-push-from');
           view.style.setProperty('--od-push-dx', '0px');
           view.classList.add('od-pushing');
           if (push.dir > 0) view.classList.add('od-pushing-back');
           const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
-          f7router.navigate(`${base}${id}`, { animate: false });
+          (f7router.odRaw ?? f7router).navigate(`${base}${id}`, { animate: false });
         }
         push.view.style.setProperty('--od-push-dx', `${clamp(dx)}px`);
         return true;
@@ -152,20 +172,28 @@
         view.classList.add('od-push-settle');
         view.style.setProperty('--od-push-dx', `${target}px`);
         setTimeout(() => {
-          if (through) {
-            // This dive's page leaves the history: the new one takes its place.
+          try {
             const history = f7router.history;
-            history.splice(history.length - 2, 1);
-            f7router.view.history = [...history];
-            f7router.saveHistory?.();
-            f7router.pageCallback?.('beforeRemove', f7.$(pageEl), 'previous', undefined, {});
-            f7router.removePage(pageEl);
-          } else {
-            f7router.back({ animate: false });
+            // The history is rewritten only when it still is what the swipe made: the neighbour on top, this dive's page
+            // just under it, and this page still in the document.
+            const intact = pageEl.isConnected && history.length >= 2;
+            if (through && intact) {
+              // This dive's page leaves the history: the new one takes its place.
+              history.splice(history.length - 2, 1);
+              f7router.view.history = [...history];
+              f7router.saveHistory?.();
+              f7router.pageCallback?.('beforeRemove', f7.$(pageEl), 'previous', undefined, {});
+              f7router.removePage(pageEl);
+            } else if (!through && intact) {
+              (f7router.odRaw ?? f7router).back({ animate: false });
+            }
+          } finally {
+            unstackMaster(view);
+            view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
+            for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
+            pageEl.classList.remove('od-push-from');
+            unlock();
           }
-          view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
-          for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
-          pageEl.classList.remove('od-push-from');
           push = null;
           busy = false;
         }, ms);
