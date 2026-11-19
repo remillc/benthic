@@ -487,6 +487,20 @@
     !!shownTrip(dive, logbook.dives),
   );
 
+  /** The ⋮ button's name lists what its menu holds, in the menu's order. */
+  const moreOptionsLabel = $derived(
+    t('detail.moreOptionsList', {
+      items: [
+        odplusSubscriber() ? t('detail.moreItemValidate') : '',
+        t('detail.moreItemRenumber'),
+        removableFromTrip ? t('detail.moreItemTrip') : '',
+        t('detail.moreItemDelete'),
+      ]
+        .filter(Boolean)
+        .join(', '),
+    }),
+  );
+
   // "Retirer du voyage": at once, as Subsurface's "Remove dive(s) from trip".
   // A trip left empty is deleted by the core; "Annuler" brings both back.
   async function removeFromTrip() {
@@ -1118,7 +1132,7 @@
           // This page's router, not a link: see the overflow menu. Plan before Share (task 2026-11-12-59).
           { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveId}`) },
           { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
-          { key: 'more', icon: 'more', label: t('detail.moreOptionsList'), menu: `#${menuId}` },
+          { key: 'more', icon: 'more', label: moreOptionsLabel, menu: `#${menuId}` },
         ]}
       />
     {/if}
