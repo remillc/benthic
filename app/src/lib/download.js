@@ -19,6 +19,7 @@ import { showSnackbar } from './snackbar.js';
 import { showSection } from './navigation.svelte.js';
 import { showDives } from './filter.svelte.js';
 import { t } from './i18n.js';
+import { newDivesWithoutSite, quickEntryUrl } from './quick-entry.js';
 
 /**
  * The message at the end of a download that added dives (task 2026-11-14-144). When the core merged
@@ -48,6 +49,42 @@ export function announceDownload(result) {
       }
     },
   });
+}
+
+/** The ids of the dives in the logbook, taken before a download to tell the new ones. */
+export const diveIdsNow = () => new Set(logbook.dives.map((d) => d.id));
+
+/**
+ * The quick entry after a download (task 2026-11-14-151, « Compléter la plongée »): when the download
+ * added dives that have no site, it opens for the oldest of them, then for the next, and the message of
+ * the download (« N plongées téléchargées », « Annuler ») comes when it is closed. Nothing opens when
+ * every new dive already has a site.
+ * @param {any} router
+ * @param {{ downloaded?: number, list?: { merged?: number, mergedIds?: number[] } }} result
+ * @param {Set<number>} before the dive ids before the download (diveIdsNow)
+ * @returns {boolean} the quick entry was opened (it announces the download itself)
+ */
+export function startQuickEntry(router, result, before) {
+  if (!result.downloaded) return false;
+  const wanted = newDivesWithoutSite(logbook.dives, before, result.list?.mergedIds);
+  if (!wanted.length) return false;
+  pendingAnnounce = result;
+  router.navigate(quickEntryUrl(wanted));
+  return true;
+}
+
+/** @type {Parameters<typeof announceDownload>[0]|null} */
+let pendingAnnounce = null;
+
+/**
+ * The quick entry is over: the download's message, unless a save already made its own (an Undo must
+ * take back the last change, which is then the save).
+ * @param {boolean} [announce]
+ */
+export function endQuickEntry(announce = true) {
+  const result = pendingAnnounce;
+  pendingAnnounce = null;
+  if (result && announce) announceDownload(result);
 }
 
 /**

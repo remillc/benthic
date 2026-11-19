@@ -21,6 +21,19 @@ export function chooseSite(router, apply) {
   router.navigate('/sites/choose');
 }
 
+/**
+ * « Créer un site à ma position actuelle »: « Nouveau site » opens at the phone's position (when known) and
+ * the site it saves, or the one nearby it uses, is given to `apply`.
+ * @param {any} router
+ * @param {(site: ChosenSite) => void} apply
+ * @param {{ latUdeg: number, lonUdeg: number }|null} position
+ */
+export function createSiteHere(router, apply, position) {
+  pending = apply;
+  const at = position ? `&lat=${position.latUdeg}&lon=${position.lonUdeg}` : '';
+  router.navigate(`/sites/new?choose=1${at}`);
+}
+
 /** Whether a screen is waiting for a site (« Nouveau site » then gives it back). */
 export const waitingForSite = () => pending !== null;
 
