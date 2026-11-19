@@ -896,7 +896,7 @@
    */
   const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
 
-  /** « Renommer le carnet » and « Changer d'endroit »: no flow yet, the message says so. */
+  /** « Renommer le carnet »: no flow yet, the message says so. */
   function emptyMenuSoon() {
     showSnackbar(t('welcomeSteps.menuSoon'));
   }
@@ -1461,15 +1461,13 @@
 
   <!--
     The menu of the empty logbook on a release tablet (mock-up android-tablette-carnet-vide-menu-paysage): the
-    logbook's name and where it is kept, then what can be done with the logbook itself. Rename and « Changer
-    d'endroit » have no flow yet (they say so); the two others open the first launch at its step.
+    logbook's name and where it is kept, then what can be done with the logbook itself. Rename has no flow yet (it says so); the two others open the first launch at its step.
   -->
   {#if releaseEmpty}
     <Popover class="od-menu od-logbook-empty-menu" backdrop={false}>
       <List noChevron mediaList>
         <li class="od-menu-label">{emptyBand.split('\n')[0]}</li>
         <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={emptyMenuSoon} />
-        <MenuItem icon="cloudUpload" text={t('welcomeSteps.menuMove')} supporting={t('welcomeSteps.menuMoveHint')} onclick={emptyMenuSoon} />
         <li class="od-menu-divider" role="separator"></li>
         <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
         <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />

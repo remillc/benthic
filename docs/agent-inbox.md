@@ -5965,7 +5965,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Partly done (19 November 2026).** Done: the share dialog (`bureau-partage`), the trip page in the detail pane (`bureau-voyage`), the .fit import snackbar naming the file (`bureau-import-fit`), the planned dives side panel (`bureau-plans`), the O₂ consumption line of Recycleur; the Réglages pages Langue, Profil et décompression, Gaz and Avancé already existed; the several-computers dialog already was a dialog from the tablet's width. **Left, each needs something that does not exist on the desktop yet:** the download dialogs (`bureau-telechargement*`: there is no desktop download engine, Bluetooth through Web Bluetooth and USB are still to build), « Ports USB » and the remembered Bluetooth computer of Ordinateurs et téléchargement (same reason), and Cartes hors ligne with its regions, sizes and free disk space (offline maps are Android only for now; `mapsFreeSpace` is a stub on the desktop).
 
-## [ ] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
+## [x] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-demo`, `android-demo-ajout`, `android-demo-quitter`, `android-import-csv-type`, `android-import-csv-colonnes`, `android-import-csv-apercu`, `android-etat-vide`, `android-tablette-carnet-vide-paysage`, `-portrait`, `-menu-paysage`, `bureau-profil-compte-git`. The tablet and iPad follow the phone layouts (task 294).
 
@@ -5977,7 +5977,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the demo logbook, add a dive and leave it. Import a CSV file through the three steps. Open an empty logbook on a phone and a tablet. On the desktop with a git repository, open the account sheet and compare with the mock-up.
 
-## [ ] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
+**Done (19 November 2026).** Demo logbook: see 299 and 301. CSV import: the three steps (type, columns, preview) already existed and read the phone mock-ups' texts; they go through the core's `importCsv` (no C++ added). Empty logbook: header wording, « Changer d’endroit » removed. Desktop git account sheet: new `git` variant of `DesktopAccountSheet` (« Changer de dépôt » opens the new-logbook dialog). Not done: the Android phone's git sheet (`compte-git-android`).
+
+## [x] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
 
 Christian approved this on 19 November 2026. Work in `main`. The sample logbook interface that was built differs from the mock-up. Redo it to match the mock-ups in `docs/mockups/` (task 298 has the context): `android-demo`, `android-demo-ajout`, `android-demo-quitter`. The tablet follows `android-tablette-demo-paysage` and `-portrait`.
 
@@ -5987,6 +5989,8 @@ Christian approved this on 19 November 2026. Work in `main`. The sample logbook 
 - The sample logbook is never synchronised and never mixed with the diver’s own logbook (todo #69).
 
 **Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
+
+**Done (19 November 2026).** Phone: the banner is a card above the bottom navigation bar (« Commencer »), on the four first pages; the lists end above it and the « + » rises with it; the exit dialog names the device (phone, iPhone, tablet, computer). Tablet and desktop keep the band at the top, as in the tablet mock-ups. Not shown on pages opened over a section on a phone (no bottom bar there).
 
 ## [x] 2026-11-19-300 iPhone About screen, tablet portrait layouts
 
@@ -6006,7 +6010,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the iPhone About screen and compare with the mock-up. On a tablet in portrait, reach each of the listed screens and compare with its mock-up.
 
-## 301 — Sample logbook: more dives, closer to a typical logbook
+## [x] 2026-11-19-301 Sample logbook: more dives, closer to a typical logbook
 
 **Why:** the sample logbook had too few dives per year to look like a real logbook. The mock-ups now show 40 dives over 2023 to 2026.
 
@@ -6066,6 +6070,8 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
 
+**Done (19 November 2026).** `core/sample/make-sample.mjs` writes `core/sample/SampleLogbook.ssrf` (40 synthetic dives, 8 sites, the 6-dive trip, N° 26 as a rebreather dive, N° 40 without a site); the Android, iOS and desktop builds copy it under the name the plugins read (`SampleDivesV2.ssrf`). Rebuild the Android libs (`native/build-android.sh`) to ship it.
+
 ## [x] 2026-11-19-302 Dive-computer photos and a sliding rail for « Ce lest était »
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
@@ -6097,3 +6103,41 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - No maintenance reminder for a dive computer.
 
 **Test:** open the download screen and check that only a model with an image shows its photo. Open a dive computer in Équipement, tap the pencil and compare with the mock-up. Type a brand and a model that are not in the lists and save.
+
+## [ ] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre` and `ios-odplus-offre` (updated).
+
+**Problem:** the header of the real OpenDives+ offer screen (the blue band with the logo, the « L’offre OpenDives+ » chip, the title and the subtitle) does not match the mock-up.
+
+**What to do:** compare the real header with the mock-up and fix every difference: band height (264 dp), gradient, bubbles and wave at the bottom, logo and name position, chip, spacing, and the texts. One change is new in the mock-up: the title « Votre carnet, partout et en sécurité » is now 24 dp with a 32 dp line height (it was 28 / 36), weight 500, white. Do the same on iPhone. Check that the title wraps on two lines at 390 dp without touching the subtitle.
+
+**Test:** open the offer on a 390 dp wide phone (Android and iPhone) and compare the header with the mock-up side by side.
+
+## [ ] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mockups/`: `android-odplus-offre` (and `ios-odplus-offre`, same link).
+
+**Problem:** on the real offer screen the link « Voir tout ce qui est inclus ›» looks off center. In `FirstLaunchOdPlus.svelte`, `.od-plus--see-all` has `padding: 0 8px 0 16px`, so the text and the arrow sit to the right of the middle of the screen.
+
+**What to do:** match the mock-up. Link centered in the column (`align-self: center`), 48 dp high, symmetric padding `0 16px`, 4 dp gap between the text and the arrow, 17 dp text, weight 600, colour `#1F5C99`, 22 dp arrow. The pill hover/press area is 48 dp high and as wide as the link. Do the same on iPhone and on the tablet offer if it uses the same link. While there, check that the other buttons and texts of this screen are centered the way the mock-up shows.
+
+**Test:** open the offer on a phone and measure: the space left of the link equals the space right of it.
+
+## [ ] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. It follows tasks 302 and 303 (idea #65). Image loading states (downloading, failed, offline) are yours, already in progress: no mock-up.
+
+**1. Photos wherever a computer model is shown.** A model that has an image shows its photo instead of the generic computer icon, at the size of the icon it replaces (40 dp in lists, 36 pt on iPhone, 32 dp next to a value in the dive detail). A model with no image keeps the generic icon (in the mock-ups: Suunto D6i, Garmin Descent G1). Updated mock-ups (47): download screens (phone, tablet, desktop, in progress included), Réglages › Ordinateurs du carnet (`reglages2-ordinateurs-android`, `android-tablette-ordinateurs-paysage`/`-portrait`, photo added at the start of each row), Mon profil de plongeur › Équipement, kits, entretien and the part sheet (phone, iPhone, tablet, desktop), dive edit with the inventory, and the dive detail « Ordinateur » row (`detail3-android`, `detail-equipement-plus-android`). On the part sheet of a computer, the large drawing is replaced by the model photo.
+
+**2. Logbook computer and equipment are linked.** A dive computer in the equipment and a computer of the logbook are the same when brand, model and serial number match: the part sheet counts its dives from the logbook. After a download from a computer that is not yet in the equipment (OpenDives+ only), the end of the download shows a card « Ajouter le Petrel 3 à votre équipement ? » with « Plus tard » and « Ajouter » (`android-telechargement-fin-equipement`). « Ajouter » creates the part with brand, model, serial number and photo filled in. « Plus tard » hides the card for that computer.
+
+**3. « Modifier l’ordinateur de plongée » on every device.** Phone (`profil-piece-modifier-android`, task 303), now also iPhone (`ios-profil-piece-modifier`), tablet (`android-tablette-profil-piece-modifier-paysage`, a dialog like « Nouvelle pièce ») and desktop (`bureau-profil-piece-modifier`). The iPad follows the tablet with iOS conventions. The delete button is now « Supprimer l’ordinateur ».
+
+**4. Delete confirmation** (`profil-piece-supprimer-android`). Basic dialog: « Supprimer le Shearwater Perdix 2 ? », « Il sera retiré de votre équipement et de vos kits. Les plongées faites avec lui restent dans le carnet. », « Annuler » and « Supprimer » (red). Same text on every device, with each platform's alert style.
+
+**5. « Nouvelle pièce » adapts to the type** (`profil-piece-nouvelle-ordinateur-android`). With type Ordinateur: « Marque » and « Modèle » are text fields with suggestions from the libdivecomputer list (any text allowed), the model photo shows as soon as the model is known, the hints speak of a computer (« Affiché dans les réglages de l’ordinateur », « Par exemple, l’ordinateur de secours ») and there is no maintenance reminder card. Each type keeps its own hints and suggested reminder.
+
+**6. Réglages › « Modifier l’ordinateur » restyled** (`reglages2-ordinateur-modifier-android`). Same look as the profile edit screen: close and filled « Enregistrer » in the bar, large title, model photo with « Changer d’image », then the name field and the info card. The duplicate block is now two cards: a sand card « Doublon possible » (icon, explanation, full-width filled « Fusionner avec Perdix » and its hint) and a white card « Pas un doublon, ou plus utilisé ? » with the outlined « Retirer de la liste » and its hint. Buttons are full width and the hints centered. Apply the same to the tablet versions (`android-tablette-ordinateur-modifier-*`).
+
+**Test:** check a model with and without image in each listed screen. Download a computer that is not in the equipment and add it from the card. Edit and delete a computer from the profile on each device. Create a new part of type Ordinateur. Open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with the mock-up.

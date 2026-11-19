@@ -298,13 +298,13 @@ test('the logbook menu opens the first launch at its step, and its first screen 
   assert.match(state, /export function resetFlow\(\) \{\s*flow\.origin = '';/);
 });
 
-test('the empty logbook menu: rename and move say « coming », open and new enter the first launch, export is off', () => {
+test('the empty logbook menu: rename says « coming », open and new enter the first launch, export is off', () => {
   const page = read('pages/Logbook.svelte');
   const menu = page.slice(page.indexOf('od-logbook-empty-menu" backdrop'), page.indexOf('Overflow menu: Filter'));
-  const order = ['menuRename', 'menuMove', 'menuOpenOther', 'menuNew', 'menuExport'];
+  const order = ['menuRename', 'menuOpenOther', 'menuNew', 'menuExport'];
   const at = order.map((k) => menu.indexOf(`welcomeSteps.${k}'`));
-  assert.ok(at.every((i) => i > 0) && [...at].sort((a, b) => a - b).join() === at.join(), 'the five items, in the mock-up’s order');
-  assert.match(menu, /welcomeSteps\.menuMoveHint/);
+  assert.ok(at.every((i) => i > 0) && [...at].sort((a, b) => a - b).join() === at.join(), 'the four items, in the mock-up’s order');
+  assert.doesNotMatch(menu, /menuMove/, 'no « Changer d’endroit » (task 298)');
   assert.match(menu, /welcomeSteps\.menuExportNone'\)\} disabled/);
   assert.match(menu, /onclick=\{\(\) => openFirstLaunch\('open'\)\}/);
   assert.match(menu, /onclick=\{\(\) => openFirstLaunch\('new'\)\}/);
@@ -314,13 +314,11 @@ test('the empty logbook menu: rename and move say « coming », open and new ent
   assert.match(page, /\{#if releaseEmpty\}\s*<!-- The empty logbook of the release edition/);
   const fr = langs.fr.welcomeSteps;
   assert.equal(fr.menuRename, 'Renommer le carnet');
-  assert.equal(fr.menuMove, 'Changer d’endroit');
-  assert.equal(fr.menuMoveHint, 'Nuage, dépôt git ou cette tablette');
   assert.equal(fr.menuOpenOther, 'Ouvrir un autre carnet');
   assert.equal(fr.menuNew, 'Nouveau carnet');
   assert.equal(fr.menuExport, 'Exporter le carnet');
   assert.equal(fr.menuExportNone, 'Aucune plongée à exporter');
-  for (const lang of ['fr', 'en']) for (const k of ['menuRename', 'menuMove', 'menuMoveHint', 'menuOpenOther', 'menuNew', 'menuExport', 'menuExportNone', 'menuSoon']) assert.ok(langs[lang].welcomeSteps[k], `${lang}: ${k}`);
+  for (const lang of ['fr', 'en']) for (const k of ['menuRename', 'menuOpenOther', 'menuNew', 'menuExport', 'menuExportNone', 'menuSoon']) assert.ok(langs[lang].welcomeSteps[k], `${lang}: ${k}`);
 });
 
 test('the empty logbook profile is 724 dp wide in landscape and 624 dp in portrait, inside the pane', () => {

@@ -163,6 +163,8 @@ test('the banner and its dialogs read the texts of the mock-ups, with hand point
   assert.equal(fr.banner.start, 'Commencer mon carnet');
   assert.equal(fr.exit.title, 'Commencer mon carnet ?');
   assert.equal(fr.exit.text, 'Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.');
+  assert.equal(fr.banner.startShort, 'Commencer');
+  assert.equal(fr.exit.textPhone, 'Le carnet d’exemple sera effacé de ce téléphone. Vous choisirez ensuite de créer ou d’importer votre carnet.');
   assert.equal(fr.add.title, 'Vous êtes dans le carnet d’exemple');
   assert.equal(fr.add.text, 'Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé.');
   const host = src('components/DemoHost.svelte');

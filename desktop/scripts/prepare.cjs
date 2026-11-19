@@ -38,7 +38,7 @@ const xslt = path.join(root, 'third_party', 'subsurface', 'xslt');
 for (const name of fs.readdirSync(xslt).filter((n) => /\.xslt?$/.test(n))) fs.copyFileSync(path.join(xslt, name), path.join(stage, 'xslt', name));
 
 // The sample logbook (« Essayer avec des plongées d'exemple »), as on Android.
-fs.copyFileSync(path.join(xslt, '..', 'dives', 'SampleDivesV2.ssrf'), path.join(stage, 'SampleDivesV2.ssrf'));
+fs.copyFileSync(path.join(root, 'core', 'sample', 'SampleLogbook.ssrf'), path.join(stage, 'SampleDivesV2.ssrf'));
 
 for (const lang of ['fr', 'en']) fs.copyFileSync(path.join(root, 'app', 'src', 'i18n', `${lang}.json`), path.join(stage, 'i18n', `${lang}.json`));
 console.log(`staged ${target} in ${stage}`);

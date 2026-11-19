@@ -112,9 +112,9 @@ test('task 239: the tablet logbook opens with the snackbar at the bottom left an
   assert.match(read('lib/account.js'), /\{ placement: 'start' \}/);
   assert.match(read('lib/snackbar-logic.js'), /placement === 'start' \? 'od-snackbar-start'/);
   assert.match(read('theme.css'), /&\.od-snackbar-start \{\s*left: calc\(var\(--od-nav-width, 96px\) \+ 24px\);\s*right: auto;\s*bottom: calc\(24px \+ var\(--f7-safe-area-bottom\)\);/);
-  assert.equal(langs.fr.logbook.emptyLocalTablet, 'Sur cette tablette seulement, aucune plongée');
+  assert.equal(langs.fr.logbook.emptyLocalTablet, 'Sur cette tablette · aucune plongée');
   assert.ok(langs.en.logbook.emptyLocalTablet);
-  assert.equal(langs.fr.logbook.emptyLocalDesktop, 'Sur cet ordinateur seulement, aucune plongée');
+  assert.equal(langs.fr.logbook.emptyLocalDesktop, 'Sur cet ordinateur · aucune plongée');
 });
 
 test('the snackbars of the three paths and the empty logbook line, in French and English', () => {
@@ -124,7 +124,7 @@ test('the snackbars of the three paths and the empty logbook line, in French and
     assert.equal(get(langs.fr, key), fr[kind]);
     assert.ok(get(langs.en, key), `${key} in English`);
   }
-  assert.equal(langs.fr.logbook.emptyLocal, 'Sur ce téléphone seulement, aucune plongée');
+  assert.equal(langs.fr.logbook.emptyLocal, 'Sur ce téléphone · aucune plongée');
   assert.match(read('pages/Logbook.svelte'), /else if !theme\.ios\}[\s\S]*deviceKey\('logbook\.emptyLocal', deviceKind\(\)\)/);
   assert.match(read('lib/account.js'), /showSnackbar\(t\(keys\[kind\]\), \{ placement: 'start' \}\)/);
 });

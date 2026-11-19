@@ -18,6 +18,7 @@
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
   import { isRelease } from '../lib/edition.js';
+  import { logbooks } from '../lib/desktop-logbooks.svelte.js';
   import { syncNetwork, setUnmeteredOnly } from '../lib/sync-network.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -31,9 +32,10 @@
   // The versions of the sheet (task 2026-11-18-281; bureau-compte-gratuit, bureau-profil-compte). The release edition
   // without an OpenDives+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
   // the phone's offer content.
-  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }));
+  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email, git, repository: logbook.repository }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
+  const gitSheet = $derived(variant === 'git');
   const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
   $effect(() => {
     if (navigation.accountOpen && subscriber) loadInventory().catch((e) => console.error('Reading the equipment', e));
@@ -161,6 +163,69 @@
         <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('account.sheet.backup')}</span><span class="od-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
+    </div>
+
+    <div class="od-desktop-account--group">
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openSettings)}>
+        <span class="od-desktop-account--tile"><Icon name="settings" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('settings.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openAbout)}>
+        <span class="od-desktop-account--tile"><Icon name="info" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('about.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+  </div>
+{:else if navigation.accountOpen && gitSheet}
+  <!-- The one-off licence with git sync (task 2026-11-19-298, docs/mockups/bureau-profil-compte-git.dc.html): the
+       repository card with « Changer de dépôt » and the sync row, the backup (the repository's own history), the
+       « Passer à OpenDives+ » card, then Réglages and À propos. No « Mon profil de plongeur ». -->
+  <div class="od-desktop-account od-desktop-account--plus od-desktop-account--git" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
+    <div class="od-desktop-account--brand">
+      <img class="od-desktop-account--logo od-desktop-account--light" src="/logo-light.svg" alt="" width="24" height="24" />
+      <img class="od-desktop-account--logo od-desktop-account--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
+      <span class="od-desktop-account--brand-name">{t('menu.title')}</span>
+    </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
+
+    <div class="od-desktop-account--group">
+      <div class="od-desktop-account--identity">
+        <span class="od-desktop-account--tile od-desktop-account--repo-tile" aria-hidden="true"><Icon name="git" size={26} /></span>
+        <span class="od-desktop-account--texts">
+          <span class="od-desktop-account--name">{t('account.sheet.gitTitle')}</span>
+          <span class="od-desktop-account--status">{t('account.sheet.gitLine', { repository: logbook.repository, n: logbook.dives.length })}</span>
+          <button type="button" class="od-outlined-button od-desktop-account--manage" onclick={() => leaveTo(() => (logbooks.dialog = true))}>{t('account.sheet.changeRepository')}</button>
+        </span>
+      </div>
+      {#if !logbook.loading && !logbook.error}
+        <div class="od-desktop-account--divider-line"></div>
+        <div class="od-desktop-account--syncline">
+          {#if logbook.syncFailure}
+            <SyncFailureRow />
+          {:else}
+            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+          {/if}
+          <SyncButton />
+        </div>
+      {/if}
+    </div>
+
+    <div class="od-desktop-account--group">
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openBackup)}>
+        <span class="od-desktop-account--tile"><Icon name="history" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('account.sheet.backup')}</span><span class="od-desktop-account--row-line">{t('account.sheet.backupTextGit')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+
+    <div class="od-desktop-account--upgrade">
+      <span class="od-desktop-account--row-texts">
+        <span class="od-desktop-account--entry-title">{t('account.sheet.upgradeTitle')}</span>
+        <span class="od-desktop-account--row-line">{t('account.sheet.upgradeText')}</span>
+      </span>
+      <button type="button" class="od-desktop-account--upgrade-action" onclick={() => plus('offer')}>{t('account.sheet.upgradeAction')}</button>
     </div>
 
     <div class="od-desktop-account--group">
@@ -619,6 +684,45 @@
     .od-desktop-account--entry-title {
       font-size: 16px;
       font-weight: 500;
+    }
+    /* The git sheet: the repository's icon in a round tile where the avatar sits, and the upgrade card in the release blue. */
+    .od-desktop-account--repo-tile {
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+    }
+    .od-desktop-account--upgrade {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 12px 12px 16px;
+      border-radius: 16px;
+      background: var(--od-release-tile);
+    }
+    .od-desktop-account--upgrade .od-desktop-account--row-texts {
+      flex: 1;
+      min-width: 0;
+    }
+    .od-desktop-account--upgrade-action {
+      flex: none;
+      width: auto;
+      height: 36px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--od-release-tile-icon);
+      color: var(--od-background);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .od-desktop-account--upgrade-action:hover {
+      opacity: 0.88;
+    }
+    .od-desktop-account--upgrade-action:focus-visible {
+      outline: 2px solid var(--od-text);
+      outline-offset: 2px;
     }
   }
 </style>

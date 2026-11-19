@@ -151,9 +151,9 @@
       "one": "La plongée est retirée du carnet, sur cet appareil et dans le dépôt. Vous pourrez l’annuler pendant quelques secondes.",
       "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le dépôt. Vous pourrez les annuler pendant quelques secondes."
     },
-    "emptyLocal": "Sur ce téléphone seulement, aucune plongée",
-    "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée",
-    "emptyLocalDesktop": "Sur cet ordinateur seulement, aucune plongée",
+    "emptyLocal": "Sur ce téléphone · aucune plongée",
+    "emptyLocalTablet": "Sur cette tablette · aucune plongée",
+    "emptyLocalDesktop": "Sur cet ordinateur · aucune plongée",
     "emptyServer": "Connecté au serveur OpenDives, aucune plongée"
   },
   "sync": {
@@ -1267,6 +1267,13 @@
       "backup": "Sauvegarde et restauration",
       "backupText": "Revenir à une version du carnet ou d’une plongée",
       "plusDives": {"one": "OpenDives+ · {n} plongée", "other": "OpenDives+ · {n} plongées"},
+      "gitTitle": "Dépôt git personnel",
+      "gitLine": {"one":"{repository} · {n} plongée","other":"{repository} · {n} plongées"},
+      "changeRepository": "Changer de dépôt",
+      "backupTextGit": "Selon l’historique de votre dépôt git",
+      "upgradeTitle": "Passer à OpenDives+",
+      "upgradeText": "Votre profil de plongeur, l’équipement et la synchro avec le téléphone",
+      "upgradeAction": "Découvrir",
       "maintenanceLate": {
         "one": "Entretien : {n} pièce en retard",
         "other": "Entretien : {n} pièces en retard"
@@ -1498,7 +1505,7 @@
     "gitBranchMissing": "Cette branche n’existe pas dans le dépôt.",
     "keptGit": "Dépôt git",
     "keptCloud": "Nuage",
-    "keptDevice": "Cette tablette",
+    "keptDevice": "sur cette tablette",
     "bandNoDives": "Aucune plongée",
     "connectHint": "La page de connexion du service s’ouvre.\nVous revenez ici ensuite.",
     "connecting": "Connexion en cours…",
@@ -1531,8 +1538,6 @@
     },
     "resume": "Reprendre",
     "menuRename": "Renommer le carnet",
-    "menuMove": "Changer d’endroit",
-    "menuMoveHint": "Nuage, dépôt git ou cette tablette",
     "menuOpenOther": "Ouvrir un autre carnet",
     "menuNew": "Nouveau carnet",
     "menuExport": "Exporter le carnet",
@@ -2838,6 +2843,9 @@
       "Tablette : « Exporter » et la liste des plongées d’un point de la carte s’ouvrent en dialogue au milieu de l’écran ; les conflits sur plusieurs plongées aussi ; au téléchargement, un Bluetooth non autorisé ou éteint s’affiche en carte sous les ordinateurs mémorisés.",
       "iPad : les mêmes dialogues et la même carte Bluetooth que sur la tablette Android, aux coins des feuilles iOS.",
       "iPhone : À propos a des boutons de 50 pt aux coins arrondis iOS ; tablette en portrait : dans Cartes hors ligne, « Ajouter une région » passe sous la liste.",
+      "Carnet d’exemple : 40 plongées de 2023 à 2026 sur 8 sites, avec un voyage de 6 plongées et une plongée en recycleur, plus proche d’un carnet réel.",
+      "Carnet d’exemple sur téléphone : le bandeau « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » est une carte arrondie juste au-dessus de la barre du bas, avec « Commencer » ; la liste, le « + » et les messages s’arrêtent au-dessus. « Commencer mon carnet ? » nomme l’appareil (ce téléphone, cette tablette, cet ordinateur).",
+      "Carnet vide : l’en-tête dit « Sur ce téléphone · aucune plongée » (« Mon carnet · sur cette tablette » sur tablette) et « Changer d’endroit » disparaît du menu. Ordinateur avec un dépôt git : la feuille du compte montre le dépôt avec « Changer de dépôt », la synchronisation, « Sauvegarde et restauration » (selon l’historique du dépôt) et la carte « Passer à OpenDives+ », sans « Mon profil de plongeur ».",
       "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone.",
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
@@ -4099,11 +4107,15 @@
     "banner": {
       "lead": "Carnet d’exemple.",
       "text": "Ces plongées ne sont pas les vôtres.",
-      "start": "Commencer mon carnet"
+      "start": "Commencer mon carnet",
+      "startShort": "Commencer"
     },
     "exit": {
       "title": "Commencer mon carnet ?",
       "text": "Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.",
+      "textPhone": "Le carnet d’exemple sera effacé de ce téléphone. Vous choisirez ensuite de créer ou d’importer votre carnet.",
+      "textIphone": "Le carnet d’exemple sera effacé de cet iPhone. Vous choisirez ensuite de créer ou d’importer votre carnet.",
+      "textDesktop": "Le carnet d’exemple sera effacé de cet ordinateur. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.",
       "cancel": "Annuler",
       "confirm": "Commencer mon carnet"
     },
