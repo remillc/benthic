@@ -19,7 +19,7 @@
   import { t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
-  import { deletable, deletionSentences } from '../lib/cylinder-types.js';
+  import { deletable, deletionSentences, sizeFields, typedSize as readSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { formatNumber, locale } from '../lib/format.js';
@@ -42,15 +42,10 @@
 
   const cuft = $derived(logbook.prefs.volume === 'cuft');
   const psi = $derived(logbook.prefs.pressure === 'psi');
-  const PSI_MBAR = 68.947572932;
-  const CUFT_ML = 28316.8466;
 
   /** @param {number} value @param {number} decimals */
   const number = (value, decimals) =>
     new Intl.NumberFormat(locale, { maximumFractionDigits: decimals, useGrouping: false }).format(value);
-
-  /** A number typed with a comma or a point; NaN when invalid. @param {string} text */
-  const parse = (text) => (text.trim() === '' ? 0 : Number(text.trim().replace(',', '.')));
 
   // Leaving with changes asks first (components/LeaveGuard.svelte): the fields as
   // filled at opening (a type being edited: once it is read), against now.
@@ -66,9 +61,7 @@
       type = types.find((ty) => ty.name === original) ?? null;
       if (!type) return;
       if (deletable(type)) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
-      pressure = type.mbar ? number(psi ? type.mbar / PSI_MBAR : type.mbar / 1000, 0) : '';
-      // In cubic feet, the gas volume at working pressure, as Subsurface shows it.
-      volume = type.ml ? number(cuft ? (type.ml / CUFT_ML) * (type.mbar / 1013.25) : type.ml / 1000, cuft ? 0 : 1) : '';
+      ({ volume, pressure } = sizeFields(type, { cuft, psi }, number));
     } catch (e) {
       console.error('Reading the cylinder type', e);
     }
@@ -87,19 +80,12 @@
 
   /** The size typed, in ml and mbar; null with `error` set when invalid. */
   function typedSize() {
-    const p = parse(pressure);
-    const v = parse(volume);
-    if (Number.isNaN(p) || p < 0) {
-      error = t('settings.cylinders.pressureInvalid');
+    const size = readSize(volume, pressure, { cuft, psi });
+    if ('invalid' in size) {
+      error = t(size.invalid === 'pressure' ? 'settings.cylinders.pressureInvalid' : 'settings.cylinders.volumeInvalid');
       return null;
     }
-    const mbar = Math.round(psi ? p * PSI_MBAR : p * 1000);
-    if (Number.isNaN(v) || v <= 0 || (cuft && !mbar)) {
-      error = t('settings.cylinders.volumeInvalid');
-      return null;
-    }
-    const ml = Math.round(cuft ? (v * CUFT_ML) / (mbar / 1013.25) : v * 1000);
-    return { ml, mbar };
+    return size;
   }
 
   /** @param {unknown} e */
@@ -234,11 +220,11 @@
           <Icon name="delete" size={18} />
           {t('settings.cylinders.deleteType')}
         </button>
+        {#if deleteNote}<p class="od-cylinder-type--delete-note">{deleteNote}</p>{/if}
       </div>
-      {#if deleteNote}<p class="od-cylinder-type--note od-cylinder-type--delete-note">{deleteNote}</p>{/if}
     {:else if type.library}
       <div class="od-cylinder-type--action">
-        <button type="button" class="od-outlined-button od-danger" onclick={remove}>{t('settings.cylinders.delete')}</button>
+        <button type="button" class="od-outlined-button" onclick={remove}>{t('settings.cylinders.delete')}</button>
       </div>
     {:else}
       <p class="od-cylinder-type--note">{t('settings.cylinders.fromLogbook')}</p>
@@ -264,10 +250,9 @@
       color: var(--od-text-2);
     }
 
+    /* The button and the line under it start on the page margin, 16 dp, like the fields (Material 3). */
     .od-cylinder-type--action {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
+      margin: 16px 16px 0;
     }
 
     /* The red of « Supprimer le compte » (--od-late), not the alarm red. */
@@ -280,17 +265,22 @@
     }
 
     .od-cylinder-type--delete-note {
-      text-align: center;
+      margin: 6px 0 0;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
     }
 
     .od-cylinder-type--note.od-cylinder-type--first {
-      margin-top: 12px;
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 16px;
     }
 
     .od-cylinder-type--note {
-      margin: 8px 20px 0;
-      font-size: 13px;
-      line-height: 18px;
+      margin: 20px 16px 0;
+      font-size: 14px;
+      line-height: 20px;
       color: var(--od-text-2);
     }
   }
