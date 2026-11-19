@@ -30,7 +30,7 @@ Task 2026-11-19-316. The app is Benthic everywhere the diver reads (texts, names
 | `tests/app/opendives-core-stub.mjs`, env vars `OPENDIVES_HOST`, `OPENDIVES_STAGE` | Rename with the plugin; scripts and the CI use the variables | Low |
 | Logcat tag `OpenDives`, HTTP User-Agent `OpenDives/<version>` of the map downloads (Kotlin, Swift), `OpenDivesInsets` JavaScript bridge | The User-Agent may be allow-listed by the tile host | Low to medium |
 | CSS `od-*` classes, `--od-*` variables, font family "Source Sans 3 OD", `odplus` identifiers (`logbook.odplus`) | Mechanical but large | Low |
-| GitHub repositories `remillc/opendives` and `opendives-server`, Cloudflare Pages project `opendives` | Rename on GitHub (redirects stay) and update `SOURCE` in `site/build.mjs` and the remotes | Low |
+| GitHub repositories `remillc/opendives` and `opendives-server`, Cloudflare Pages project `opendives` | Rename on GitHub (redirects stay) and update `SOURCE` in `site/build.mjs` and the remotes | Low | **Done 19 November 2026:** repositories renamed `remillc/benthic` and `remillc/benthic-server` (GitHub redirects the old addresses); links in the code updated.
 | `docs/mockups` and `docs/mockups-release` file names (`*odplus*`), one design file that points to `docs/brand/opendives-*` | Design files, referenced by name in the inbox | Low |
 | History: `CHANGELOG.md`, closed tasks of `docs/agent-inbox.md`, `docs/TODOS.md`, `docs/IDEAS.md` | Left as written | None |
 

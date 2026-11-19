@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'build', 'site');
-const SOURCE = 'https://github.com/remillc/opendives';
+const SOURCE = 'https://github.com/remillc/benthic';
 
 // --- Links that open the app (decided on 13 November 2026) -----------------------
 /** The Android package and the iOS bundle identifier of the app. */

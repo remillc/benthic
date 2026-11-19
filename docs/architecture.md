@@ -148,7 +148,7 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 
 ## 8. Repository, build, tests and licence
 
-**Organisation of the `remillc/opendives` repository**
+**Organisation of the `remillc/benthic` repository**
 
 | Folder | Content |
 | --- | --- |

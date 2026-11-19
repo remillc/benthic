@@ -49,7 +49,7 @@ object MapsManager {
     const val MAX_TILES = 3000
     const val MAX_BYTES = 50L * 1024 * 1024
     const val MAX_PARALLEL = 4
-    const val REPO_URL = "https://github.com/remillc/opendives"
+    const val REPO_URL = "https://github.com/remillc/benthic"
 
     val ID_PATTERN = Regex("[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 

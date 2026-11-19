@@ -135,7 +135,7 @@ const KNOWN_GIT_CODES = new Set(['BAD_ADDRESS', 'BAD_CREDENTIALS', 'BAD_BRANCH',
 const MAX_READ = 100 * 1024 * 1024;
 const MAX_CHUNK = 4 * 1024 * 1024;
 const NOMINATIM = 'https://nominatim.openstreetmap.org/';
-const REPO_URL = 'https://github.com/remillc/opendives';
+const REPO_URL = 'https://github.com/remillc/benthic';
 
 /** @param {string} child @param {string} root */
 function inside(child, root) {

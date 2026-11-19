@@ -36,7 +36,7 @@ public final class MapsManager {
     static let maxTiles = 3000
     static let maxBytes: Int64 = 50 * 1024 * 1024
     static let maxParallel = 4
-    static let repoURL = "https://github.com/remillc/opendives"
+    static let repoURL = "https://github.com/remillc/benthic"
     private static let maxLatitude = 85.0511287798
     private static let partialMaxAge: TimeInterval = 7 * 24 * 3600
     private static let progressEventInterval: TimeInterval = 0.5

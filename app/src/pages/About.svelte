@@ -38,7 +38,7 @@
   const SUPPORT_EMAIL = String(/** @type {any} */ (import.meta).env?.VITE_SUPPORT_EMAIL ?? '').trim();
 
   const LINKS = {
-    source: 'https://github.com/remillc/opendives',
+    source: 'https://github.com/remillc/benthic',
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
   };

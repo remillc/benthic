@@ -824,7 +824,7 @@ export { waterTypeOf };
  *   enforces the terms of the tile server, whatever the caller does: it counts the tiles itself
  *   and rejects with TOO_MANY_TILES above 3,000 (BAD_ARGUMENT for a malformed request; `id` is
  *   letters, digits, ".", "-", "_"); it sends at most 4 requests at a time, each with the
- *   User-Agent `OpenDives/<versionName> (dive log app; https://github.com/remillc/opendives)`;
+ *   User-Agent `OpenDives/<versionName> (dive log app; https://github.com/remillc/benthic)`;
  *   it stops at 50 MiB with status "failed", error "limit", and removes the tiles. One region
  *   runs at a time, in the background with a notification titled `title`. Wi-Fi (an unmetered
  *   network) only unless `allowCellular`: status "waiting-wifi" meanwhile. The same request
