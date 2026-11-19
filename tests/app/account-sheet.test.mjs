@@ -353,3 +353,35 @@ test('the tablet offer: the blue panel carries the chip, title and lead; the pho
   assert.equal(offerShowsSignIn(menuEntry('offer')), true);
   assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'email', 'server'])), false);
 });
+
+// --- The subscriber's rows: « Sauvegarde et synchronisation » and « Mon profil de plongeur » open their own sections ---
+
+test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sheets open the backup page and the profile', () => {
+  // Free: the two rows open the offer (phone, iPhone, desktop).
+  assert.equal((sheet.match(/plus\('offer'\)/g) ?? []).length, 4);
+  assert.match(sheet, /href="#offer-sync"[^\n]*plus\('offer'\)/);
+  assert.match(sheet, /href="#offer-profile"[^\n]*plus\('offer'\)/);
+  assert.match(desktopSheet, /plus-row" onclick=\{\(\) => plus\('offer'\)\}[\s\S]*plus-row" onclick=\{\(\) => plus\('offer'\)\}/);
+  // Subscriber: the backup row opens the backup page (the three sheets), the profile row the profile.
+  assert.equal((sheet.match(/go\(openBackup\)/g) ?? []).length, 2, 'Android and iPhone');
+  assert.match(sheet, /\{#if subscriber\}\s*<a href="#backup"/);
+  assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
+  assert.match(desktopSheet, /leaveTo\(openBackup\)/);
+  assert.match(desktopSheet, /leaveTo\(\(\) => openOver\('\/profile'\)\)/);
+  assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*openOver\('\/account\/backup'\);/);
+});
+
+test('the backup page is a resource route without a trailing slash and shows the sync status, the server and the sync button', () => {
+  assert.match(read('App.svelte'), /path: '\/account\/backup', \.\.\.lazy\(\(\) => import\('\.\/pages\/AccountBackup\.svelte'\)\)/);
+  const page = read('pages/AccountBackup.svelte');
+  for (const part of ['SyncStatus', 'SyncButton', 'logbook.pending', 'serverName(serverUrl())', 'account.backup.history']) assert.ok(page.includes(part), part);
+  for (const l of ['fr', 'en']) for (const k of ['title', 'server', 'history']) assert.ok(langs[l].account.backup[k], `${l} ${k}`);
+});
+
+test('serverName gives the host of the server address', async () => {
+  const { serverName } = await import('../../app/src/lib/backup-info.js');
+  assert.equal(serverName('https://api.opendives.org/v1'), 'api.opendives.org');
+  assert.equal(serverName('http://localhost:8787'), 'localhost:8787');
+  assert.equal(serverName(''), '');
+  assert.equal(serverName('not a url'), '');
+});

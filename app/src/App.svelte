@@ -142,6 +142,7 @@
         ]
       : []),
     { path: '/account', component: Account },
+    { path: '/account/backup', ...lazy(() => import('./pages/AccountBackup.svelte')) },
     { path: '/account/manage', ...lazy(() => import('./pages/AccountManage.svelte')) },
     { path: '/account/delete', ...lazy(() => import('./pages/DeleteAccount.svelte')) },
     // Signing in and creating an account, from the Account screen without an account.

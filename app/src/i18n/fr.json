@@ -1040,6 +1040,11 @@
     "serverDives": "Plongées sur le serveur",
     "serverSignOut": "Se déconnecter du serveur",
     "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
+    "backup": {
+      "title": "Sauvegarde et synchronisation",
+      "server": "Serveur",
+      "history": "Le serveur garde l’historique de votre carnet."
+    },
     "free": {
       "device": "Carnet sur cet appareil",
       "sync": "Sauvegarde et synchronisation",
@@ -2586,7 +2591,8 @@
       "Import : un carnet ou un fichier de sites de plongée affiche une seule ligne de progression, du moment où il est reçu ou choisi jusqu’à la fin de l’import : « Copie du fichier », « Vérification », « Import des plongées », « Enregistrement », avec la taille copiée, le pourcentage et le temps restant. « Annuler » arrête la copie et la vérification et supprime la copie partielle. Un message dit combien de plongées ou de sites ont été ajoutés.",
       "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré.",
       "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée.",
-      "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique."
+      "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique.",
+      "Compte OpenDives+ : « Sauvegarde et synchronisation » ouvre sa propre page (état de la synchronisation, modifications en attente, « Synchroniser maintenant », serveur) au lieu de l’offre ; « Mon profil de plongeur » ouvre le profil."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
