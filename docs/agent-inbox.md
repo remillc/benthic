@@ -5848,10 +5848,12 @@ Points to confirm with Christian before building: photos and videos are not in g
 
 **Test:** make three syncs with changes, restore the middle version, check the counts and that the newest version is still listed and can be restored back. Delete a dive, sync, restore it from « Plongées supprimées ».
 
-## [ ] 2026-11-19-291 Subscriber account sheet: « Mon profil de plongeur » before « Sauvegarde et restauration »
+## [x] 2026-11-19-291 Subscriber account sheet: « Mon profil de plongeur » before « Sauvegarde et restauration »
 
 Christian approved this on 19 November 2026. Work in `main`. Follows task 290 (do not edit 290).
 
 In the subscriber account sheet on every platform, the order of the two entries is now: **« Mon profil de plongeur »** first, then **« Sauvegarde et restauration »** (task 290 had them the other way round). Mock-ups in `docs/mockups/`: `nav-option-barre-compte-android`, `nav-compte-profil-android`, `android-tablette-profil-compte-paysage`, `bureau-profil-compte`, `ios-compte-abonne`.
 
 **Test:** open the account sheet as a subscriber on each platform: « Mon profil de plongeur » is above « Sauvegarde et restauration ».
+
+**Done (19 November 2026).** In the three sheets (Android phone and tablet, iPhone, desktop) « Mon profil de plongeur » now comes first and « Sauvegarde et restauration » second; the test `tests/app/account-sheet.test.mjs` checks the order in each source.

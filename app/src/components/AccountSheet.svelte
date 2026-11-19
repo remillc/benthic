@@ -232,19 +232,8 @@
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       {#if isRelease && !desktopApp}
-        <!-- « Mon profil de plongeur » (tasks 267 and 281): the chip, the red line and the badge when a piece is overdue. -->
+        <!-- « Mon profil de plongeur », then « Sauvegarde et restauration » (tasks 267, 281, 290, 291): the red line and the badge when a piece is overdue. -->
         <div class="od-account-sheet--ios-group">
-          {#if subscriber}
-            <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
-            <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
-              <Icon name="history" />
-              <span class="od-account-sheet--row-label">
-                {t('account.sheet.backup')}
-                <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
-              </span>
-              <Icon name="chevron" size={20} />
-            </button>
-          {/if}
           <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
             <Icon name="briefcase" />
             <span class="od-account-sheet--row-label">
@@ -258,6 +247,17 @@
             {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
             <Icon name="chevron" size={20} />
           </button>
+          {#if subscriber}
+            <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
+            <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
+              <Icon name="history" />
+              <span class="od-account-sheet--row-label">
+                {t('account.sheet.backup')}
+                <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
+              </span>
+              <Icon name="chevron" size={20} />
+            </button>
+          {/if}
         </div>
       {/if}
     {/if}
@@ -395,21 +395,11 @@
 
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
-    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages. An OpenDives+
-         account sees the chip above its title and, when a piece is overdue, the red badge and line (task 2026-11-18-281). -->
+    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for an OpenDives+
+         account « Sauvegarde et restauration » below it (tasks 290 and 291); no chip next to a subscriber's entries. When a piece
+         is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
       <div class="od-account-sheet--card">
-        {#if subscriber}
-          <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
-            <Icon name="history" />
-            <span class="od-account-sheet--row-label">
-              {t('account.sheet.backup')}
-              <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
-            </span>
-            <Icon name="chevron" size={20} />
-          </a>
-          <div class="od-account-sheet--divider od-account-sheet--margin"></div>
-        {/if}
         <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
@@ -423,6 +413,17 @@
           {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
           <Icon name="chevron" size={20} />
         </a>
+        {#if subscriber}
+          <div class="od-account-sheet--divider od-account-sheet--margin"></div>
+          <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
+            <Icon name="history" />
+            <span class="od-account-sheet--row-label">
+              {t('account.sheet.backup')}
+              <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
+            </span>
+            <Icon name="chevron" size={20} />
+          </a>
+        {/if}
       </div>
     {/if}
     {/if}

@@ -368,7 +368,7 @@ test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sh
   assert.match(desktopSheet, /plus-row" onclick=\{\(\) => plus\('offer'\)\}[\s\S]*plus-row" onclick=\{\(\) => plus\('offer'\)\}/);
   // Subscriber: the backup row opens the backup page (the three sheets), the profile row the profile.
   assert.equal((sheet.match(/go\(openBackup\)/g) ?? []).length, 2, 'Android and iPhone');
-  assert.match(sheet, /\{#if subscriber\}\s*<a href="#backup"/);
+  assert.match(sheet, /\{#if subscriber\}\s*<div class="od-account-sheet--divider od-account-sheet--margin"><\/div>\s*<a href="#backup"/);
   assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
   assert.match(desktopSheet, /leaveTo\(openBackup\)/);
   assert.match(desktopSheet, /leaveTo\(\(\) => openOver\('\/profile'\)\)/);
@@ -376,7 +376,8 @@ test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sh
   // The subscriber's entries carry no chip, whatever the platform; the history icon and the new texts are on all three sheets.
   for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'))], ['desktop', desktopSheet]]) {
     const at = source.indexOf("t('account.sheet.backup')");
-    const rows = source.slice(at - 400, source.indexOf("t('gear.profile.title')", at) + 200);
+    const profileAt = source.lastIndexOf("t('gear.profile.title')", at + 2000) >= 0 && source.indexOf("t('gear.profile.title')", at - 1500) >= 0 ? source.indexOf("t('gear.profile.title')", at - 1500) : at;
+    const rows = source.slice(Math.min(at, profileAt) - 400, Math.max(at, profileAt) + 400);
     assert.match(rows, /name="history"/, name);
     assert.match(rows, /t\('account\.sheet\.backupText'\)/, name);
     assert.doesNotMatch(rows, /OdPlusChip/, `${name}: no chip on a subscriber's entries`);
@@ -400,3 +401,20 @@ test('the backup and restore screens are routes of the account: the list, a vers
   assert.ok(!existsSync(new URL('../../app/src/lib/backup-info.js', import.meta.url)));
 });
 
+
+test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sauvegarde et restauration », on every platform (task 291)', () => {
+  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
+  const iphone = sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'));
+  for (const [name, source, profile, backup] of [
+    ['Android phone and tablet', android, 'href="#profile"', 'href="#backup"'],
+    ['iPhone', iphone, "openOver('/profile')", 'go(openBackup)'],
+    ['desktop', desktopSheet, "leaveTo(() => openOver('/profile'))", 'leaveTo(openBackup)'],
+  ]) {
+    const p = source.indexOf(profile, source.indexOf('{#if subscriber}') >= 0 ? 0 : 0);
+    const b = source.indexOf(backup);
+    assert.ok(p >= 0 && b >= 0, name);
+    assert.ok(p < b, `${name}: the profile comes before the backup`);
+    // Nothing else sits between them but the row's own markup and a divider.
+    assert.doesNotMatch(source.slice(p, b), /Settings|settings\.title|about\.title/, name);
+  }
+});
