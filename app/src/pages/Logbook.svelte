@@ -398,7 +398,7 @@
    */
   async function exportChecked(format, anonymize) {
     try {
-      await exportDives(checkedIds, format, anonymize, logbook.prefs);
+      await exportDives(checkedIds, format, anonymize, logbook.prefs, checkedIds.length > 0 && checkedIds.length === logbook.dives.length);
     } catch (e) {
       // Closing the system's share sheet without choosing is not an error.
       if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;

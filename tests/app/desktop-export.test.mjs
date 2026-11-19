@@ -14,6 +14,9 @@ test('the default choice: selection, else filter, else everything', () => {
 test('the proposed file names', () => {
   assert.equal(exportFileName('selection', [7, 6], 'ssrf', '2026-11-15', fr), 'plongees-6-7.ssrf');
   assert.equal(exportFileName('all', [], 'uddf', '2026-11-15', fr), 'carnet-2026-11-15.uddf');
+  // The whole logbook in .ssrf is named after the logbook (rule of 19 November 2026).
+  assert.equal(exportFileName('all', [], 'ssrf', '2026-11-19', fr, 'Carnet de Roger'), 'carnet-de-roger-2026-11-19.ssrf');
+  assert.equal(exportFileName('all', [], 'ssrf', '2026-11-19', fr, ''), 'carnet-2026-11-19.ssrf');
   assert.equal(exportFileName('filtered', [], 'csvProfiles', '2026-11-15', fr), 'plongees-2026-11-15.csv');
   assert.equal(exportFileName('selection', [1, 2, 3, 4, 5], 'pdf', '2026-11-15', fr), 'plongees-2026-11-15.pdf');
   assert.equal(exportFileName('selection', [3], 'ssrf', '2026-11-15', { dives: 'dives', logbook: 'logbook' }), 'dives-3.ssrf');

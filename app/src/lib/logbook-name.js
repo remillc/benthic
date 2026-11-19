@@ -56,3 +56,37 @@ export function nameFromFile(fileName, fallback) {
   const base = String(fileName).replace(/^.*[\\/]/, '').replace(/\.[^.]*$/, '').trim();
   return base || fallback;
 }
+
+/**
+ * A name as a file-name slug: lowercase, accents removed, any run of characters other than a-z and 0-9 becomes
+ * one `-`, none at either end. A trailing `.ssrf` is dropped first. Empty when nothing is left.
+ * @param {string} name
+ * @returns {string}
+ */
+export function slugify(name) {
+  return String(name ?? '')
+    .replace(/\.ssrf$/i, '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * The file name of an export of the whole logbook: `<logbook name slug>-<YYYY-MM-DD>.ssrf`
+ * (« Carnet de Roger » gives `carnet-de-roger-2026-11-19.ssrf`).
+ * @param {string} name the logbook's name as the app shows it (a file name is accepted)
+ * @param {string} day YYYY-MM-DD, the local date
+ * @param {string} fallback the translated word for « logbook », used when the name leaves nothing
+ * @returns {string}
+ */
+export function logbookExportName(name, day, fallback) {
+  return `${slugify(name) || slugify(fallback) || 'logbook'}-${day}.ssrf`;
+}
+
+/** Today's local date as YYYY-MM-DD. @param {Date} [now] */
+export function localDay(now = new Date()) {
+  const p = (/** @type {number} */ n) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
+}

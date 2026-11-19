@@ -48,6 +48,7 @@
         'ssrf',
         false,
         logbook.prefs,
+        true,
       );
     } catch (e) {
       // Closing the system's share sheet without choosing is not an error.
