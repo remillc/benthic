@@ -235,13 +235,12 @@
         <!-- « Mon profil de plongeur » (tasks 267 and 281): the chip, the red line and the badge when a piece is overdue. -->
         <div class="od-account-sheet--ios-group">
           {#if subscriber}
-            <!-- « Sauvegarde et synchronisation » (task 290): its own page. -->
+            <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
             <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
-              <Icon name="cloudDownload" />
+              <Icon name="history" />
               <span class="od-account-sheet--row-label">
-                <OdPlusChip onSheet />
-                {t('account.free.sync')}
-                <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+                {t('account.sheet.backup')}
+                <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
               </span>
               <Icon name="chevron" size={20} />
             </button>
@@ -249,7 +248,6 @@
           <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
             <Icon name="briefcase" />
             <span class="od-account-sheet--row-label">
-              {#if subscriber}<OdPlusChip onSheet />{/if}
               {t('gear.profile.title')}
               {#if late.late}
                 <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
@@ -403,11 +401,10 @@
       <div class="od-account-sheet--card">
         {#if subscriber}
           <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
-            <Icon name="cloudDownload" />
+            <Icon name="history" />
             <span class="od-account-sheet--row-label">
-              <OdPlusChip onSheet />
-              {t('account.free.sync')}
-              <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+              {t('account.sheet.backup')}
+              <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
             </span>
             <Icon name="chevron" size={20} />
           </a>
@@ -416,7 +413,6 @@
         <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
-            {#if subscriber}<OdPlusChip onSheet />{/if}
             {t('gear.profile.title')}
             {#if late.late}
               <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>

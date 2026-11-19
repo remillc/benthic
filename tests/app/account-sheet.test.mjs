@@ -5,7 +5,7 @@
 // the rules are tested as pure functions; the real screens were looked at in a browser and in Electron.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
 import { createAccountHistory, ACCOUNT_HASH } from '../../app/src/lib/account-history.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
@@ -113,7 +113,8 @@ test('« Mon profil de plongeur »: the badge and the red line only for overdue 
 
 test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
   const row = sheet.slice(sheet.indexOf('od-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
-  assert.match(row, /\{#if subscriber\}<OdPlusChip onSheet \/>\{\/if\}/);
+  // A subscriber sees no OpenDives+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
+  assert.doesNotMatch(row, /OdPlusChip/);
   assert.match(row, /\{#if late\.late\}\s*<span class="od-account-sheet--row-line od-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
   assert.match(row, /\{:else\}\s*<span class="od-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
   assert.match(row, /\{#if late\.late\}<span class="od-account-sheet--late-badge"/);
@@ -371,20 +372,31 @@ test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sh
   assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
   assert.match(desktopSheet, /leaveTo\(openBackup\)/);
   assert.match(desktopSheet, /leaveTo\(\(\) => openOver\('\/profile'\)\)/);
-  assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*openOver\('\/account\/backup'\);/);
+  assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*if \(layout\.desktop\) navigation\.backupOpen = true;\s*else openOver\('\/account\/backup'\);/);
+  // The subscriber's entries carry no chip, whatever the platform; the history icon and the new texts are on all three sheets.
+  for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'))], ['desktop', desktopSheet]]) {
+    const at = source.indexOf("t('account.sheet.backup')");
+    const rows = source.slice(at - 400, source.indexOf("t('gear.profile.title')", at) + 200);
+    assert.match(rows, /name="history"/, name);
+    assert.match(rows, /t\('account\.sheet\.backupText'\)/, name);
+    assert.doesNotMatch(rows, /OdPlusChip/, `${name}: no chip on a subscriber's entries`);
+  }
+  for (const l of ['fr', 'en']) for (const k of ['backup', 'backupText']) assert.ok(langs[l].account.sheet[k], `${l} ${k}`);
+  assert.equal(langs.fr.account.sheet.backup, 'Sauvegarde et restauration');
+  assert.equal(langs.fr.account.sheet.backupText, 'Revenir à une version du carnet ou d’une plongée');
 });
 
-test('the backup page is a resource route without a trailing slash and shows the sync status, the server and the sync button', () => {
-  assert.match(read('App.svelte'), /path: '\/account\/backup', \.\.\.lazy\(\(\) => import\('\.\/pages\/AccountBackup\.svelte'\)\)/);
-  const page = read('pages/AccountBackup.svelte');
-  for (const part of ['SyncStatus', 'SyncButton', 'logbook.pending', 'serverName(serverUrl())', 'account.backup.history']) assert.ok(page.includes(part), part);
-  for (const l of ['fr', 'en']) for (const k of ['title', 'server', 'history']) assert.ok(langs[l].account.backup[k], `${l} ${k}`);
+test('the backup and restore screens are routes of the account: the list, a version, a dive, the deleted dives and a read-only version', () => {
+  const app = read('App.svelte');
+  assert.match(app, /path: '\/account\/backup', \.\.\.lazy\(\(\) => import\('\.\/pages\/AccountBackup\.svelte'\)\)/);
+  assert.match(app, /path: '\/account\/backup\/version\/:id'/);
+  assert.match(app, /path: '\/account\/backup\/dive\/:key'/);
+  assert.match(app, /path: '\/account\/backup\/dive\/',/);
+  assert.match(app, /path: '\/account\/backup\/deleted\/'/);
+  assert.match(app, /path: '\/account\/backup\/browse\/:id'/);
+  assert.match(app, /\{#if layout\.desktop\}<BackupDialog \/>\{\/if\}/);
+  // The old provisional page (sync status, server, history line) is gone.
+  assert.ok(!langs.fr.account.backup && !langs.en.account.backup);
+  assert.ok(!existsSync(new URL('../../app/src/lib/backup-info.js', import.meta.url)));
 });
 
-test('serverName gives the host of the server address', async () => {
-  const { serverName } = await import('../../app/src/lib/backup-info.js');
-  assert.equal(serverName('https://api.opendives.org/v1'), 'api.opendives.org');
-  assert.equal(serverName('http://localhost:8787'), 'localhost:8787');
-  assert.equal(serverName(''), '');
-  assert.equal(serverName('not a url'), '');
-});

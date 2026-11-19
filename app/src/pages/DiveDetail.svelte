@@ -41,6 +41,7 @@
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
   import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
+  import { openDiveVersions } from '../lib/backup-nav.js';
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -767,6 +768,17 @@
       />
       {#if removableFromTrip}
         <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
+      {/if}
+      <!-- OpenDives+ (task 2026-11-19-290): the syncs that touched this dive, to restore one of them. -->
+      {#if logbook.odplus && dive}
+        <MenuItem
+          icon="history"
+          text={t('backup.dive.fromMenu')}
+          onclick={() => {
+            f7.popover.close(`#${menuId}`);
+            if (dive) openDiveVersions(dive.date);
+          }}
+        />
       {/if}
       {#if theme.ios}
         <MenuItem

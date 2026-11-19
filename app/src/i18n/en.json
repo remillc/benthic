@@ -967,6 +967,217 @@
       "other": "OpenDives server · {n} dives"
     }
   },
+  "backup": {
+    "title": "Backup and restore",
+    "media": "Deleted photos and videos are kept for 90 days, then erased.",
+    "status": {
+      "saved": "Logbook backed up",
+      "savedLine": "{when}, encrypted on the OpenDives server",
+      "neverLine": "Not sent to the OpenDives server yet",
+      "pending": {
+        "one": "{n} change waiting to be sent",
+        "other": "{n} changes waiting to be sent"
+      },
+      "pendingLine": "They are sent at the next sync",
+      "offline": "Offline",
+      "offlineLine": "Changes are sent when the network is back",
+      "failed": "Logbook not backed up",
+      "failedLine": "The last sync failed"
+    },
+    "versions": {
+      "title": "Go back to a version of the logbook",
+      "current": "Current",
+      "older": "Older versions",
+      "note": "A version is kept at every sync. Restoring a version also keeps the current logbook as a version.",
+      "empty": "No version yet",
+      "loading": "Reading the history",
+      "failed": "The history could not be read",
+      "retry": "Try again",
+      "dives": {
+        "one": "{n} dive",
+        "other": "{n} dives"
+      },
+      "sinceAdded": {
+        "one": "{n} dive added since",
+        "other": "{n} dives added since"
+      },
+      "sinceRemoved": {
+        "one": "{n} dive deleted since",
+        "other": "{n} dives deleted since"
+      },
+      "sinceModified": {
+        "one": "{n} dive changed since",
+        "other": "{n} dives changed since"
+      },
+      "sinceSites": {
+        "one": "{n} site changed since",
+        "other": "{n} sites changed since"
+      },
+      "sinceNone": "Same as the current logbook"
+    },
+    "only": {
+      "title": "Restore only",
+      "dive": "One dive",
+      "diveLine": "Pick a version of the dive",
+      "deleted": "Deleted dives",
+      "deletedLine": {
+        "one": "{n} dive, always recoverable",
+        "other": "{n} dives, always recoverable"
+      },
+      "deletedNone": "No deleted dive",
+      "deletedSearching": "Searching the history"
+    },
+    "pane": {
+      "empty": "Pick a version to see what it holds"
+    },
+    "version": {
+      "title": "Version",
+      "dives": {
+        "one": "{n} dive",
+        "other": "{n} dives"
+      },
+      "sites": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "pieces": {
+        "one": "{n} piece",
+        "other": "{n} pieces"
+      },
+      "differences": "Differences with the current logbook",
+      "none": "No difference: this is the current logbook.",
+      "addedDetail": {
+        "one": "{numbers}. It will be removed.",
+        "other": "{numbers}. They will be removed."
+      },
+      "removedDetail": {
+        "one": "{numbers}. It will be brought back.",
+        "other": "{numbers}. They will be brought back."
+      },
+      "modifiedRow": "{number}: {changes}",
+      "more": {
+        "one": "and {n} other dive",
+        "other": "and {n} other dives"
+      },
+      "sitesDetail": "The logbook takes this version’s sites back.",
+      "restore": "Restore this version",
+      "browse": "Browse this version",
+      "browseNote": "“Browse” opens this version read-only, without changing anything.",
+      "number": "No. {n}",
+      "numbers": "No. {list}"
+    },
+    "confirm": {
+      "and": "and",
+      "title": "Restore the logbook of {date}?",
+      "removed": {
+        "one": "Dive {numbers} will be removed",
+        "other": "Dives {numbers} will be removed"
+      },
+      "restored": {
+        "one": "dive {numbers} will be brought back",
+        "other": "dives {numbers} will be brought back"
+      },
+      "reverted": {
+        "one": "dive {numbers} will go back to how it was in this version",
+        "other": "dives {numbers} will go back to how they were in this version"
+      },
+      "revertedSite": "dive {number} will go back to {value}",
+      "keep": "The current logbook stays available in the versions.",
+      "nothing": "The dives do not change.",
+      "action": "Restore",
+      "done": "Logbook restored",
+      "failed": "The restore could not be done. The logbook did not change.",
+      "pending": "Send the waiting changes first."
+    },
+    "dive": {
+      "title": "Versions of a dive",
+      "pick": "Dive",
+      "change": "Change",
+      "choose": "Choose",
+      "search": "Search for a dive",
+      "versions": "Versions",
+      "restore": "Restore",
+      "note": "Restoring changes only this dive. The rest of the logbook does not move.",
+      "noneChosen": "Pick a dive to see its versions",
+      "none": "No version found for this dive.",
+      "restored": "Dive restored",
+      "restoreFailed": "The dive could not be restored. The logbook did not change.",
+      "created": "Dive added",
+      "downloaded": "Downloaded from the {model}",
+      "deleted": "Dive deleted",
+      "fromMenu": "Versions of this dive",
+      "row": "{number} · {site} · {date}",
+      "rowNoSite": "{number} · {date}"
+    },
+    "change": {
+      "site": "Site: {to}, previously “{from}”",
+      "siteSet": "Site: {to}",
+      "siteRemoved": "Site removed, previously “{from}”",
+      "buddyAdded": "Buddy added: {to}",
+      "buddyRemoved": "Buddy removed: {from}",
+      "buddy": "Buddies: {to}, previously “{from}”",
+      "divemasterSet": "Divemaster: {to}",
+      "divemasterRemoved": "Divemaster removed",
+      "suitSet": "Suit: {to}",
+      "suitRemoved": "Suit removed",
+      "notes": "Notes changed",
+      "tags": "Tags: {to}",
+      "tagsRemoved": "Tags removed",
+      "rating": "Rating: {to}",
+      "ratingRemoved": "Rating removed",
+      "visibility": "Visibility changed",
+      "duration": "Duration changed",
+      "watertemp": "Water temperature changed",
+      "airtemp": "Air temperature changed",
+      "cylinder": "Cylinders changed",
+      "weightsystem": "Weights changed",
+      "watersalinity": "Salinity changed",
+      "trip": "Trip changed",
+      "profile": "Profile changed",
+      "other": "Dive changed"
+    },
+    "revert": {
+      "site": "the site was “{value}”",
+      "siteEmpty": "the site was not set",
+      "buddy": "the buddies were “{value}”",
+      "buddyEmpty": "there was no buddy",
+      "divemaster": "the divemaster was “{value}”",
+      "divemasterEmpty": "there was no divemaster",
+      "suit": "the suit was “{value}”",
+      "suitEmpty": "the suit was not set",
+      "tags": "the tags were “{value}”",
+      "tagsEmpty": "there was no tag",
+      "rating": "the rating was {value}",
+      "ratingEmpty": "there was no rating",
+      "notes": "the notes were different",
+      "visibility": "the visibility was different",
+      "duration": "the duration was different",
+      "watertemp": "the water temperature was different",
+      "airtemp": "the air temperature was different",
+      "cylinder": "the cylinders were different",
+      "weightsystem": "the weights were different",
+      "watersalinity": "the salinity was different",
+      "trip": "the trip was different",
+      "profile": "the profile was different",
+      "other": "the dive was different"
+    },
+    "deleted": {
+      "title": "Deleted dives",
+      "empty": "No deleted dive",
+      "row": "Deleted {when}",
+      "restore": "Restore",
+      "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
+      "restored": "Dive brought back",
+      "restoreFailed": "The dive could not be brought back. The logbook did not change."
+    },
+    "browse": {
+      "banner": "Version of {date}, read-only",
+      "back": "Back to the logbook",
+      "empty": "This version has no dive",
+      "failed": "This version could not be opened",
+      "dive": "Dive {number}"
+    }
+  },
   "account": {
     "addDeviceDives": "Add the dives of this device",
     "addDeviceDivesText": {
@@ -1044,11 +1255,6 @@
     "serverDives": "Dives on the server",
     "serverSignOut": "Sign out of the server",
     "serverSignOutText": "Your dives stay on the server. The access is erased from this device.",
-    "backup": {
-      "title": "Backup and sync",
-      "server": "Server",
-      "history": "The server keeps the history of your logbook."
-    },
     "free": {
       "device": "Logbook on this device",
       "deviceIos": "Logbook on this iPhone",
@@ -1056,6 +1262,8 @@
       "syncText": "Your logbook on all your devices"
     },
     "sheet": {
+      "backup": "Backup and restore",
+      "backupText": "Go back to a version of the logbook or of a dive",
       "maintenanceLate": {
         "one": "Maintenance: {n} piece overdue",
         "other": "Maintenance: {n} pieces overdue"
@@ -1093,7 +1301,7 @@
       "delete": "Delete the account",
       "deleteSupporting": "Deletes the account and the data kept on the server",
       "deleteTitle": "Delete the account?",
-      "deleteText": "The account, and the photos and videos kept on the server, are deleted and cannot be recovered. The logbook stays on this device. The subscription is not cancelled: cancel it in {store}.",
+      "deleteText": "The account, the whole history of the logbook (deleted dives included), and the photos and videos kept on the server are deleted and cannot be recovered. The logbook stays on this device. The subscription is not cancelled: cancel it in {store}.",
       "deleteConfirm": "Delete the account",
       "deleteFailed": "The account could not be deleted. Try again later.",
       "deleted": "Account deleted"

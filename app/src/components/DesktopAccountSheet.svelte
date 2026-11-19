@@ -183,14 +183,13 @@
     {#if subscriber}
       <div class="od-desktop-account--divider"></div>
       <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(openBackup)}>
-        <Icon name="cloudDownload" size={22} />
-        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('account.free.sync')}</span><span class="od-desktop-account--row-line">{t('account.free.syncText')}</span></span>
+        <Icon name="history" size={22} />
+        <span class="od-desktop-account--row-texts"><span>{t('account.sheet.backup')}</span><span class="od-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
       <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(() => openOver('/profile'))}>
         <Icon name="briefcase" size={22} />
         <span class="od-desktop-account--row-texts">
-          <OdPlusChip onSheet />
           <span>{t('gear.profile.title')}</span>
           <span class="od-desktop-account--row-line" class:od-desktop-account--late-line={late.late}>{late.late ? t('account.sheet.maintenanceLate', { n: late.badge }) : t('gear.profile.cardLine')}</span>
         </span>

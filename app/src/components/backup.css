@@ -1,0 +1,325 @@
+/*
+ * Backup and restore (task 2026-11-19-290; mock-ups docs/mockups/sauvegarde-*, android-tablette-sauvegarde-*,
+ * bureau-sauvegarde-*, ios-sauvegarde-*): the cards, the rows and the texts the screens share. The phone's pages, the
+ * tablet's two panes and the desktop's dialog use the same classes.
+ */
+@layer od.components {
+  .od-backup {
+    box-sizing: border-box;
+    padding: 8px 0 calc(16px + var(--od-safe-bottom, 0px));
+    color: var(--od-text);
+  }
+
+  .od-backup--card {
+    margin: 8px 16px 0;
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--od-surface);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .od-backup--status-tile {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--od-link-ok-badge);
+    color: var(--od-link-ok);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .od-backup--status-tile.od-backup--pending {
+    background: var(--od-late-tint);
+    color: var(--od-pending);
+  }
+
+  .od-backup--texts {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .od-backup--title {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 500;
+  }
+
+  .od-backup--line {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--section {
+    margin: 20px 32px 8px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--list {
+    margin: 0 16px;
+    border-radius: 20px;
+    background: var(--od-surface);
+    overflow: hidden;
+  }
+
+  .od-backup--row {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--od-text);
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .od-backup--row + .od-backup--row {
+    border-top: 1px solid var(--od-separator);
+  }
+
+  .od-backup--row:disabled,
+  .od-backup--row[aria-disabled='true'] {
+    cursor: default;
+  }
+
+  .od-backup--row-selected {
+    background: var(--od-desktop-selected, var(--od-surface-container));
+  }
+
+  .od-backup--row-title {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .od-backup--row-line {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--chip {
+    flex: none;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: var(--od-surface-container-high);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .od-backup--chevron {
+    flex: none;
+    color: var(--od-text-2);
+    display: flex;
+  }
+
+  .od-backup--tile {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: var(--od-release-tile);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .od-backup--more {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 16px;
+    border: none;
+    border-top: 1px solid var(--od-separator);
+    background: none;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: start;
+    color: var(--od-action);
+    cursor: pointer;
+  }
+
+  .od-backup--note {
+    margin: 8px 32px 0;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--error,
+  .od-backup--empty {
+    margin: 16px 32px 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--error button {
+    margin-top: 8px;
+  }
+
+  .od-backup--counts {
+    margin: 8px 16px 0;
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--od-surface);
+    display: flex;
+    gap: 24px;
+  }
+
+  .od-backup--count {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .od-backup--count-n {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+
+  .od-backup--count-label {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--od-text-2);
+  }
+
+  .od-backup--diff {
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .od-backup--diff + .od-backup--diff {
+    border-top: 1px solid var(--od-separator);
+  }
+
+  .od-backup--diff-detail {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--od-text-2);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .od-backup--actions {
+    margin: 16px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .od-backup--actions button {
+    width: 100%;
+  }
+
+  .od-backup--dive-card {
+    margin: 8px 16px 0;
+    padding: 12px 16px;
+    border-radius: 20px;
+    background: var(--od-surface);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .od-backup--search {
+    box-sizing: border-box;
+    width: calc(100% - 32px);
+    height: 48px;
+    margin: 8px 16px 0;
+    padding: 0 16px;
+    border: var(--od-outline-width, 1px) solid var(--od-outline);
+    border-radius: 24px;
+    background: var(--od-surface);
+    color: var(--od-text);
+    font: inherit;
+    font-size: 16px;
+  }
+
+  .od-backup--restore {
+    flex: none;
+    height: 40px;
+    padding: 0 16px;
+    border: var(--od-outline-width, 1px) solid var(--od-text-2);
+    border-radius: 20px;
+    background: none;
+    color: var(--od-text);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .od-backup--restore:disabled {
+    opacity: 0.5;
+  }
+
+  .od-backup--banner {
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--od-desktop-banner, var(--od-surface-container-high));
+    color: var(--od-desktop-banner-ink, var(--od-text));
+    font-size: 14px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .od-backup--banner span {
+    flex: 1;
+  }
+
+  /* Two panes: the list, then what the choice shows. */
+  .od-backup-panes {
+    height: 100%;
+    display: flex;
+    min-height: 0;
+  }
+
+  .od-backup-panes--list {
+    flex: none;
+    width: 380px;
+    overflow-y: auto;
+    border-inline-end: 1px solid var(--od-separator);
+  }
+
+  .od-backup-panes--detail {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+  }
+
+  .od-backup-panes--empty {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    color: var(--od-text-2);
+    font-size: 15px;
+  }
+}

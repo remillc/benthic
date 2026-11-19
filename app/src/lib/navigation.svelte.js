@@ -32,6 +32,8 @@ export const navigation = $state({
   accountOpen: false,
   /** « Gérer le compte » as a dialog (tablet and desktop; the phone opens a page): task 2026-11-18-281. */
   manageOpen: false,
+  /** « Sauvegarde et restauration » as a dialog (the desktop; the phone and the tablet open a page): task 2026-11-19-290. */
+  backupOpen: false,
 });
 
 /** Whether the current view shows its first page, for the bottom navigation bar. */
@@ -131,9 +133,10 @@ export function openManageAccount() {
   else navigation.manageOpen = true;
 }
 
-/** « Sauvegarde et synchronisation » of an OpenDives+ account: its own page, opened over the current section. */
+/** « Sauvegarde et restauration » of an OpenDives+ account: a dialog on the desktop, a page over the current section elsewhere. */
 export function openBackup() {
-  openOver('/account/backup');
+  if (layout.desktop) navigation.backupOpen = true;
+  else openOver('/account/backup');
 }
 
 /** Settings open over the current section, from the side menu or the tablet navigation. */

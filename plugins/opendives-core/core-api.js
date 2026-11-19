@@ -986,7 +986,7 @@ export const OpenDivesCore = {
   async history(action, args = []) {
     const { json } = await native.history({ action, args });
     return JSON.parse(json);
-  }
+  },
   async pendingChanges() {
     const { json } = await native.pendingChanges();
     return JSON.parse(json);

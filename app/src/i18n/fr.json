@@ -967,6 +967,217 @@
       "other": "Serveur OpenDives · {n} plongées"
     }
   },
+  "backup": {
+    "title": "Sauvegarde et restauration",
+    "media": "Les photos et vidéos supprimées sont gardées 90 jours, puis effacées.",
+    "status": {
+      "saved": "Carnet sauvegardé",
+      "savedLine": "{when}, chiffré sur le serveur OpenDives",
+      "neverLine": "Pas encore envoyé au serveur OpenDives",
+      "pending": {
+        "one": "{n} modification en attente d’envoi",
+        "other": "{n} modifications en attente d’envoi"
+      },
+      "pendingLine": "Elles partent à la prochaine synchronisation",
+      "offline": "Hors connexion",
+      "offlineLine": "Les modifications partent au retour du réseau",
+      "failed": "Carnet non sauvegardé",
+      "failedLine": "La dernière synchronisation a échoué"
+    },
+    "versions": {
+      "title": "Revenir à une version du carnet",
+      "current": "Actuelle",
+      "older": "Versions plus anciennes",
+      "note": "Une version est gardée à chaque synchronisation. Restaurer une version garde aussi le carnet actuel comme version.",
+      "empty": "Aucune version pour l’instant",
+      "loading": "Lecture de l’historique",
+      "failed": "L’historique n’a pas pu être lu",
+      "retry": "Réessayer",
+      "dives": {
+        "one": "{n} plongée",
+        "other": "{n} plongées"
+      },
+      "sinceAdded": {
+        "one": "{n} plongée ajoutée depuis",
+        "other": "{n} plongées ajoutées depuis"
+      },
+      "sinceRemoved": {
+        "one": "{n} plongée supprimée depuis",
+        "other": "{n} plongées supprimées depuis"
+      },
+      "sinceModified": {
+        "one": "{n} plongée modifiée depuis",
+        "other": "{n} plongées modifiées depuis"
+      },
+      "sinceSites": {
+        "one": "{n} site changé depuis",
+        "other": "{n} sites changés depuis"
+      },
+      "sinceNone": "Identique au carnet actuel"
+    },
+    "only": {
+      "title": "Restaurer seulement",
+      "dive": "Une plongée",
+      "diveLine": "Choisir une version de la plongée",
+      "deleted": "Plongées supprimées",
+      "deletedLine": {
+        "one": "{n} plongée, toujours récupérable",
+        "other": "{n} plongées, toujours récupérables"
+      },
+      "deletedNone": "Aucune plongée supprimée",
+      "deletedSearching": "Recherche dans l’historique"
+    },
+    "pane": {
+      "empty": "Choisissez une version pour voir ce qu’elle contient"
+    },
+    "version": {
+      "title": "Version",
+      "dives": {
+        "one": "{n} plongée",
+        "other": "{n} plongées"
+      },
+      "sites": {
+        "one": "{n} site",
+        "other": "{n} sites"
+      },
+      "pieces": {
+        "one": "{n} pièce",
+        "other": "{n} pièces"
+      },
+      "differences": "Différences avec le carnet actuel",
+      "none": "Aucune différence : c’est le carnet actuel.",
+      "addedDetail": {
+        "one": "{numbers}. Elle sera retirée.",
+        "other": "{numbers}. Elles seront retirées."
+      },
+      "removedDetail": {
+        "one": "{numbers}. Elle sera rétablie.",
+        "other": "{numbers}. Elles seront rétablies."
+      },
+      "modifiedRow": "{number} : {changes}",
+      "more": {
+        "one": "et {n} autre plongée",
+        "other": "et {n} autres plongées"
+      },
+      "sitesDetail": "Le carnet reprend les sites de cette version.",
+      "restore": "Restaurer cette version",
+      "browse": "Parcourir cette version",
+      "browseNote": "« Parcourir » ouvre cette version en lecture seule, sans rien changer.",
+      "number": "N° {n}",
+      "numbers": "N° {list}"
+    },
+    "confirm": {
+      "and": "et",
+      "title": "Restaurer le carnet du {date} ?",
+      "removed": {
+        "one": "La plongée {numbers} sera retirée",
+        "other": "Les plongées {numbers} seront retirées"
+      },
+      "restored": {
+        "one": "la plongée {numbers} sera rétablie",
+        "other": "les plongées {numbers} seront rétablies"
+      },
+      "reverted": {
+        "one": "la plongée {numbers} retrouvera son état de cette version",
+        "other": "les plongées {numbers} retrouveront leur état de cette version"
+      },
+      "revertedSite": "la plongée {number} reprendra {value}",
+      "keep": "Le carnet actuel reste disponible dans les versions.",
+      "nothing": "Les plongées ne changent pas.",
+      "action": "Restaurer",
+      "done": "Carnet restauré",
+      "failed": "La restauration n’a pas pu se faire. Le carnet n’a pas changé.",
+      "pending": "Envoyez d’abord les modifications en attente."
+    },
+    "dive": {
+      "title": "Versions d’une plongée",
+      "pick": "Plongée",
+      "change": "Changer",
+      "choose": "Choisir",
+      "search": "Rechercher une plongée",
+      "versions": "Versions",
+      "restore": "Restaurer",
+      "note": "Restaurer change seulement cette plongée. Le reste du carnet ne bouge pas.",
+      "noneChosen": "Choisissez une plongée pour voir ses versions",
+      "none": "Aucune version trouvée pour cette plongée.",
+      "restored": "Plongée restaurée",
+      "restoreFailed": "La plongée n’a pas pu être restaurée. Le carnet n’a pas changé.",
+      "created": "Plongée ajoutée",
+      "downloaded": "Téléchargée du {model}",
+      "deleted": "Plongée supprimée",
+      "fromMenu": "Versions de cette plongée",
+      "row": "{number} · {site} · {date}",
+      "rowNoSite": "{number} · {date}"
+    },
+    "change": {
+      "site": "Site : {to}, auparavant « {from} »",
+      "siteSet": "Site : {to}",
+      "siteRemoved": "Site retiré, auparavant « {from} »",
+      "buddyAdded": "Compagnon ajouté : {to}",
+      "buddyRemoved": "Compagnon retiré : {from}",
+      "buddy": "Compagnons : {to}, auparavant « {from} »",
+      "divemasterSet": "Moniteur : {to}",
+      "divemasterRemoved": "Moniteur retiré",
+      "suitSet": "Combinaison : {to}",
+      "suitRemoved": "Combinaison retirée",
+      "notes": "Notes modifiées",
+      "tags": "Étiquettes : {to}",
+      "tagsRemoved": "Étiquettes retirées",
+      "rating": "Note : {to}",
+      "ratingRemoved": "Note retirée",
+      "visibility": "Visibilité modifiée",
+      "duration": "Durée modifiée",
+      "watertemp": "Température de l’eau modifiée",
+      "airtemp": "Température de l’air modifiée",
+      "cylinder": "Bouteilles modifiées",
+      "weightsystem": "Lestage modifié",
+      "watersalinity": "Salinité modifiée",
+      "trip": "Voyage modifié",
+      "profile": "Profil modifié",
+      "other": "Plongée modifiée"
+    },
+    "revert": {
+      "site": "le site était « {value} »",
+      "siteEmpty": "le site n’était pas renseigné",
+      "buddy": "les compagnons étaient « {value} »",
+      "buddyEmpty": "il n’y avait pas de compagnon",
+      "divemaster": "le moniteur était « {value} »",
+      "divemasterEmpty": "il n’y avait pas de moniteur",
+      "suit": "la combinaison était « {value} »",
+      "suitEmpty": "la combinaison n’était pas renseignée",
+      "tags": "les étiquettes étaient « {value} »",
+      "tagsEmpty": "il n’y avait pas d’étiquette",
+      "rating": "la note était {value}",
+      "ratingEmpty": "il n’y avait pas de note",
+      "notes": "les notes étaient différentes",
+      "visibility": "la visibilité était différente",
+      "duration": "la durée était différente",
+      "watertemp": "la température de l’eau était différente",
+      "airtemp": "la température de l’air était différente",
+      "cylinder": "les bouteilles étaient différentes",
+      "weightsystem": "le lestage était différent",
+      "watersalinity": "la salinité était différente",
+      "trip": "le voyage était différent",
+      "profile": "le profil était différent",
+      "other": "la plongée était différente"
+    },
+    "deleted": {
+      "title": "Plongées supprimées",
+      "empty": "Aucune plongée supprimée",
+      "row": "Supprimée {when}",
+      "restore": "Restaurer",
+      "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
+      "restored": "Plongée rétablie",
+      "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé."
+    },
+    "browse": {
+      "banner": "Version du {date}, en lecture seule",
+      "back": "Revenir au carnet",
+      "empty": "Cette version ne contient aucune plongée",
+      "failed": "Cette version n’a pas pu être ouverte",
+      "dive": "Plongée {number}"
+    }
+  },
   "account": {
     "addDeviceDives": "Ajouter les plongées de cet appareil",
     "addDeviceDivesText": {
@@ -1044,11 +1255,6 @@
     "serverDives": "Plongées sur le serveur",
     "serverSignOut": "Se déconnecter du serveur",
     "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
-    "backup": {
-      "title": "Sauvegarde et synchronisation",
-      "server": "Serveur",
-      "history": "Le serveur garde l’historique de votre carnet."
-    },
     "free": {
       "device": "Carnet sur cet appareil",
       "deviceIos": "Carnet sur cet iPhone",
@@ -1056,6 +1262,8 @@
       "syncText": "Votre carnet sur tous vos appareils"
     },
     "sheet": {
+      "backup": "Sauvegarde et restauration",
+      "backupText": "Revenir à une version du carnet ou d’une plongée",
       "maintenanceLate": {
         "one": "Entretien : {n} pièce en retard",
         "other": "Entretien : {n} pièces en retard"
@@ -1093,7 +1301,7 @@
       "delete": "Supprimer le compte",
       "deleteSupporting": "Supprime le compte et les données gardées sur le serveur",
       "deleteTitle": "Supprimer le compte ?",
-      "deleteText": "Le compte, les photos et les vidéos gardés sur le serveur sont supprimés, sans retour possible. Le carnet reste sur cet appareil. L’abonnement n’est pas résilié : résiliez-le dans {store}.",
+      "deleteText": "Le compte, tout l’historique du carnet (les plongées supprimées comprises), les photos et les vidéos gardés sur le serveur sont supprimés, sans retour possible. Le carnet reste sur cet appareil. L’abonnement n’est pas résilié : résiliez-le dans {store}.",
       "deleteConfirm": "Supprimer le compte",
       "deleteFailed": "Le compte n’a pas pu être supprimé. Réessayez plus tard.",
       "deleted": "Compte supprimé"

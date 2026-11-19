@@ -138,6 +138,11 @@ export const logbook = $state({
   redoText: '',
   /** Increases at each site change, so that site screens read the sites again. */
   sitesVersion: 0,
+  /**
+   * An earlier version of the logbook is open read only (Sauvegarde et restauration, « Parcourir »): the core holds it
+   * instead of the logbook, so nothing is saved or synced until it is closed (lib/backup.svelte.js).
+   */
+  browsing: false,
 });
 
 // What the kept answers of the core (lib/core-cache.js, lib/dive-preload.js) are tied to: they are read
@@ -712,6 +717,50 @@ async function persistChanges() {
   if (logbook.email && autoSyncing() && !choiceHeld) syncTimer = setTimeout(syncEdits, SYNC_DELAY_MS);
 }
 
+/**
+ * After the core restored a version of the logbook (or of a dive) as a new commit and read the log again: the list is read
+ * again, the undo history is gone, and the commit is sent like any saved change.
+ */
+export async function afterRestore() {
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.sitesVersion++;
+  invalidateCoreCache();
+  undoCleared();
+  await persistChanges();
+}
+
+/**
+ * Opens an earlier version of the logbook read only (the core's `history('open')`); the dives of the version are returned.
+ * Close it with `closeVersion`.
+ * @param {string} commit
+ * @returns {Promise<Dive[]>}
+ */
+export async function openVersion(commit) {
+  clearTimeout(syncTimer);
+  logbook.browsing = true;
+  try {
+    return await OpenDivesCore.history('open', [commit]);
+  } catch (e) {
+    await closeVersion();
+    throw e;
+  }
+}
+
+/** Closes the version opened read only: the core reads the logbook again. */
+export async function closeVersion() {
+  if (!logbook.browsing) return;
+  try {
+    const cached = await OpenDivesCore.history('close');
+    if (cached.dives) logbook.dives = cached.dives;
+    logbook.sitesVersion++;
+    invalidateCoreCache();
+    undoCleared();
+  } finally {
+    logbook.browsing = false;
+  }
+  await countPending();
+}
+
 /** The core's undo history was emptied (a load): no "Undo" may be offered any more. */
 function undoCleared() {
   logbook.undoText = '';
@@ -727,7 +776,7 @@ function undoCleared() {
 
 /** Automatic synchronisation is on and the connection allows it (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js). */
 function autoSyncing() {
-  return logbook.autoSync && syncAllowedOnThisNetwork();
+  return logbook.autoSync && syncAllowedOnThisNetwork() && !logbook.browsing;
 }
 
 /**
@@ -735,6 +784,8 @@ function autoSyncing() {
  * @returns {Promise<SyncOutcome>}
  */
 async function syncEdits() {
+  // A version opened read only holds the core: nothing is sent from it.
+  if (logbook.browsing) return /** @type {SyncOutcome} */ ('failed');
   // Paused while a conflict waits for the diver: a sync attempt brings its dialog
   // back ("Plus tard" lasts until the next attempt), and nothing is sent.
   if (logbook.conflict) {

@@ -41,6 +41,7 @@
   import NavigationBar from './components/NavigationBar.svelte';
   import AccountSheet from './components/AccountSheet.svelte';
   import AccountManageDialog from './components/AccountManageDialog.svelte';
+  import BackupDialog from './components/BackupDialog.svelte';
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
@@ -143,6 +144,11 @@
       : []),
     { path: '/account', component: Account },
     { path: '/account/backup', ...lazy(() => import('./pages/AccountBackup.svelte')) },
+    { path: '/account/backup/version/:id', ...lazy(() => import('./pages/AccountBackupVersion.svelte')) },
+    { path: '/account/backup/dive/', ...lazy(() => import('./pages/AccountBackupDive.svelte')) },
+    { path: '/account/backup/dive/:key', ...lazy(() => import('./pages/AccountBackupDive.svelte')) },
+    { path: '/account/backup/deleted/', ...lazy(() => import('./pages/AccountBackupDeleted.svelte')) },
+    { path: '/account/backup/browse/:id', ...lazy(() => import('./pages/AccountBackupBrowse.svelte')) },
     { path: '/account/manage', ...lazy(() => import('./pages/AccountManage.svelte')) },
     { path: '/account/delete', ...lazy(() => import('./pages/DeleteAccount.svelte')) },
     // Signing in and creating an account, from the Account screen without an account.
@@ -423,6 +429,7 @@
   {#if layout.desktop}<DesktopAccountSheet />{:else if bottomNav() || (layout.rail && !ios)}<AccountSheet />{/if}
   {#if bottomNav() && navigation.atRoot}<NavigationBar />{/if}
   <AccountManageDialog />
+  {#if layout.desktop}<BackupDialog />{/if}
   <SyncFailureSheet />
   <ConflictHost />
   <QrReceived />
