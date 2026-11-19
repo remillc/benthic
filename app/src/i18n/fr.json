@@ -2840,7 +2840,8 @@
       "iPhone : À propos a des boutons de 50 pt aux coins arrondis iOS ; tablette en portrait : dans Cartes hors ligne, « Ajouter une région » passe sous la liste.",
       "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone.",
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
-      "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface."
+      "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
+      "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

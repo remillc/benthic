@@ -10,9 +10,10 @@
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
+  import DcTile from '../components/DcTile.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import GearExportSheet from '../components/GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, readPhoto } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { connection } from '../lib/online.svelte.js';
@@ -21,6 +22,13 @@
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
 
+  /** The diver's own photos of their computers, by piece id (they win over the catalog photo). @type {Record<string, string>} */
+  let photos = $state({});
+  $effect(() => {
+    for (const g of gear.pieces) {
+      if (g.type === 'computer' && g.photoId && !(g.id in photos)) readPhoto(g.photoId).then((url) => (photos[g.id] = url));
+    }
+  });
   let showArchived = $state(false);
   let searching = $state(false);
   let query = $state('');
@@ -86,6 +94,10 @@
   }
 </script>
 
+{#snippet computerIcon()}
+  <GearIcon type="computer" size={22} />
+{/snippet}
+
 {#snippet body()}
 
   <ReadOnlyNotice onexport={() => (exporting = true)} />
@@ -134,7 +146,7 @@
     <div class="od-gear-page--list">
       {#each items as g (g.id)}
         <button type="button" class="od-gear-page--row" onclick={() => open(g.id)}>
-          <span class="od-gear-page--tile"><GearIcon type={g.type} name={g.name} size={22} /></span>
+          <span class="od-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={40} radius={10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
           <span class="od-gear-page--texts">
             <span class="od-gear-page--name">{g.name}{#if g.retired}<span class="od-gear-page--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
             {#if subLine(g)}<span class="od-gear-page--supporting">{subLine(g)}</span>{/if}
@@ -359,6 +371,7 @@
       width: 40px;
       height: 40px;
       border-radius: 14px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;

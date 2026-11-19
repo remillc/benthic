@@ -6083,7 +6083,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open a dive with two computers and compare the list with the mock-ups. Open the ballast of a dive (detail and edit screens) and check that the pill slides and that a second touch clears the choice.
 
-## [ ] 2026-11-19-303 Dive-computer photos in the download screens, « Modifier l’ordinateur de plongée »
+## [x] 2026-11-19-303 Dive-computer photos in the download screens, « Modifier l’ordinateur de plongée »
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. It follows task 302 (photos of the dive computers, idea #65).
 

@@ -11,6 +11,7 @@
   import { Share } from '@capacitor/share';
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
+  import DcTile from '../components/DcTile.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
@@ -58,6 +59,8 @@
 
   const figures = $derived(piece ? (piece.type === 'computer' && computerStats ? computerStats : figuresOf(piece)) : { dives: 0, seconds: 0, deepestMm: 0, last: '' });
   const lastDive = $derived(figures.last ? logbook.dives.find((d) => d.date === figures.last) : undefined);
+  /** A dive computer has its own edit screen (task 2026-11-19-303). */
+  const editPath = $derived(`/profile/gear/${id}/${piece?.type === 'computer' ? 'edit-computer' : 'edit'}`);
   const kitNames = $derived(piece ? kitsOf(piece.id).map((k) => k.name).join(', ') : '');
 
   /** The details, in the order of the mock-up; a row without a value is left out. */
@@ -130,13 +133,17 @@
   }
 </script>
 
+{#snippet genericIcon()}
+  <GearIcon type="computer" size={72} />
+{/snippet}
+
 {#snippet body()}
 
   <ReadOnlyNotice />
 
   {#if piece}
     <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
-      {#if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
+      {#if piece.type === 'computer' && !photoUrl}<DcTile model={piece.computerModel || piece.name} size={144} radius={20} fallback={genericIcon} />{:else if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
     </div>
     <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}{#if piece.retired}<span class="od-piece-page--badge">{t('gear.piece.archived')}</span>{/if}</p>
     <h2 class="od-piece-page--name">{piece.name}</h2>
@@ -187,7 +194,7 @@
     {#snippet right()}
       {#if piece}
         <a
-          href={`/profile/gear/${id}/edit`}
+          href={editPath}
           class="link icon-only external"
           role="button"
           onclick={(e) => {
@@ -196,7 +203,7 @@
               refused();
             } else {
               e.preventDefault();
-              f7router.navigate(`/profile/gear/${id}/edit`);
+              f7router.navigate(editPath);
             }
           }}
         >

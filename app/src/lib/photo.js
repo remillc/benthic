@@ -4,7 +4,7 @@
 // are reached by the input itself.
 
 /** The longest side kept, in pixels. */
-export const MAX_SIDE = 1280;
+export const MAX_SIDE = 1024;
 
 /** The size an image is scaled to so that its longest side is at most `max`. @param {number} w @param {number} h @param {number} [max] */
 export function fitSize(w, h, max = MAX_SIDE) {
@@ -32,7 +32,7 @@ export async function photoToDataUrl(file) {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('PHOTO_UNREADABLE');
     ctx.drawImage(/** @type {HTMLImageElement} */ (img), 0, 0, width, height);
-    return canvas.toDataURL('image/jpeg', 0.82);
+    return canvas.toDataURL('image/jpeg', 0.8);
   } finally {
     URL.revokeObjectURL(url);
   }

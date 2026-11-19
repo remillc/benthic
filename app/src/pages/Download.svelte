@@ -34,6 +34,7 @@
   import { ProgressSmoother } from '../lib/progress-smoothing.js';
   import { formatDateTime, formatDepth, formatDuration } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import DcTile from '../components/DcTile.svelte';
 
   /** @typedef {import('../lib/download.js').Computer} Computer */
   /** @typedef {import('opendives-core').BluetoothDevice} BluetoothDevice */
@@ -350,6 +351,18 @@
   const subtitle = (c) => t('download.vendorBluetooth', { vendor: c.vendor });
 </script>
 
+{#snippet avatar(/** @type {string} */ vendor, /** @type {string} */ product)}
+  {#snippet bluetoothAvatar()}
+    <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+  {/snippet}
+  <!-- A model with a photo shows it (40 dp tile, 48 pt on iPhone); the others keep the Bluetooth circle (tasks 2026-11-19-303). -->
+  {#if product}
+    <span class="od-download--photo" aria-hidden="true"><DcTile model={product} {vendor} size={theme.ios ? 48 : 40} fallback={bluetoothAvatar} /></span>
+  {:else}
+    {@render bluetoothAvatar()}
+  {/if}
+{/snippet}
+
 <Page class="od-download">
   <Navbar title={t('download.title')}>
     {#snippet left()}
@@ -391,7 +404,7 @@
         {#each remembered as c (c.address)}
           <li>
             <div class="od-download--row" class:od-download--card={card}>
-              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              {@render avatar(c.vendor, c.product)}
               <span class="od-download--texts">
                 <span class="od-download--headline">{c.product}</span>
                 <span class="od-download--supporting">{subtitle(c)}</span>
@@ -422,7 +435,7 @@
         {#each remembered as c (c.address)}
           <li>
             <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => download(c)}>
-              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              {@render avatar(c.vendor, c.product)}
               <span class="od-download--texts">
                 <span class="od-download--headline">{c.product}</span>
                 <span class="od-download--supporting">{subtitle(c)}</span>
@@ -443,7 +456,7 @@
         {#each nearby as d (d.mac)}
           <li>
             <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => pick(d)}>
-              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              {@render avatar(d.computer?.vendor ?? "", d.computer?.product ?? "")}
               <span class="od-download--texts">
                 <span class="od-download--headline">{d.computer ? d.computer.product : d.name}</span>
                 <span class="od-download--supporting">
@@ -474,7 +487,7 @@
   {:else if phase === 'downloading' && computer}
     <h2 class="od-download--subheader">{t('download.computer')}</h2>
     <div class="od-download--computer" class:od-download--card={card}>
-      <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+      {@render avatar(computer.vendor, computer.product)}
       <span class="od-download--texts">
         <span class="od-download--headline">{computer.product}</span>
         <span class="od-download--supporting">{subtitle(computer)}</span>
@@ -635,6 +648,10 @@
 
     .od-download--row {
       cursor: pointer;
+    }
+
+    .od-download--photo {
+      display: contents;
     }
 
     .od-download--avatar {

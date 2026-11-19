@@ -132,6 +132,7 @@
           { path: '/profile/gear/new', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
           { path: '/profile/gear/:id', ...lazy(() => import('./pages/ProfilePiece.svelte')) },
           { path: '/profile/gear/:id/edit', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
+          { path: '/profile/gear/:id/edit-computer', ...lazy(() => import('./pages/ProfileComputerEdit.svelte')) },
           { path: '/profile/gear/:id/maintenance', ...lazy(() => import('./pages/ProfilePieceMaintenance.svelte')) },
           { path: '/profile/gear/:id/maintenance/note', ...lazy(() => import('./pages/ProfileMaintenanceNote.svelte')) },
           { path: '/profile/maintenance/', ...lazy(() => import('./pages/ProfileMaintenance.svelte')) },
