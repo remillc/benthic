@@ -13,3 +13,4 @@ Rules:
 - #105 [design] Faire des rappels d'entretien basés sur le nombre d'heures plongées plutôt que le nombre de plongées ou une date calendrier.
 - #109 [design] Permettre d’ajouter plus d’un contact d’urgence dans le profil du plongeur (pour l’instant, un seul). Numéro corrigé le 19 novembre 2026 : la tâche 311 le cite comme #107.
 - #110 [design] Afficher la fiche d’urgence sans déverrouiller le téléphone (comme la fiche médicale d’Android et d’iPhone) : notification fixe, widget ou fiche médicale du système. Écarté du lancement le 19 novembre 2026. Numéro corrigé le 19 novembre 2026 : la tâche 311 le cite comme #108.
+- #111 [design] Vérifier périodiquement s’il existe de nouveaux modèles d’ordinateurs de plongée à ajouter (photos et base de modèles).
