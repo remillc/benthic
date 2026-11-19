@@ -32,6 +32,29 @@ export const BUBBLES = [
   { cx: 346, cy: 300, r: 3, dy: -340, duration: 2261, phase: 670 },
 ];
 
+/**
+ * The same bubbles over a tablet's or the desktop's blue panel (task 2026-11-18-275, bureau-odplus-pret): about fifteen,
+ * spread across the panel's 700 × 900 box.
+ * @type {ReadonlyArray<{ cx: number, cy: number, r: number, dy: number, duration: number, phase: number }>}
+ */
+export const BUBBLES_PANEL = [
+  { cx: 70, cy: 700, r: 6, dy: -760, duration: 2400, phase: 230 },
+  { cx: 140, cy: 800, r: 4, dy: -860, duration: 2500, phase: 460 },
+  { cx: 230, cy: 620, r: 5, dy: -680, duration: 2200, phase: 690 },
+  { cx: 310, cy: 760, r: 3, dy: -820, duration: 2450, phase: 220 },
+  { cx: 380, cy: 560, r: 6, dy: -620, duration: 2000, phase: 450 },
+  { cx: 450, cy: 700, r: 4, dy: -760, duration: 2350, phase: 680 },
+  { cx: 520, cy: 610, r: 3.5, dy: -670, duration: 2150, phase: 210 },
+  { cx: 600, cy: 780, r: 5, dy: -840, duration: 2480, phase: 440 },
+  { cx: 650, cy: 520, r: 4, dy: -580, duration: 1900, phase: 670 },
+  { cx: 100, cy: 480, r: 3, dy: -540, duration: 1800, phase: 100 },
+  { cx: 200, cy: 420, r: 4, dy: -480, duration: 1700, phase: 340 },
+  { cx: 340, cy: 400, r: 2.5, dy: -460, duration: 1650, phase: 560 },
+  { cx: 560, cy: 440, r: 3, dy: -500, duration: 1750, phase: 120 },
+  { cx: 420, cy: 840, r: 3, dy: -900, duration: 2500, phase: 380 },
+  { cx: 40, cy: 580, r: 3.5, dy: -640, duration: 2100, phase: 600 },
+];
+
 let played = false;
 
 /** @returns {boolean} the system asks for less motion */

@@ -13,7 +13,7 @@
   import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
   import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
   import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
-  import { claimReadyMotion } from '../lib/ready-animation.js';
+  import { readyMotion, claimReady } from '../lib/ready-motion.svelte.js';
   import { flow, go, goBack, goDownload, goOffer } from '../lib/first-launch.svelte.js';
   import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
@@ -36,14 +36,15 @@
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 
   // « Votre carnet est prêt » plays its sequence once (task 2026-11-18-270): decided when the step appears, kept while it shows.
-  /** @type {{ play: boolean, bubbles: boolean, still: boolean }} */
-  let motion = $state({ play: false, bubbles: false, still: false });
+  const motion = readyMotion;
   let motionStep = '';
   $effect.pre(() => {
-    if (step === 'odplusReady' && motionStep !== 'odplusReady') motion = claimReadyMotion();
+    if (step === 'odplusReady' && motionStep !== 'odplusReady') claimReady();
     motionStep = step;
   });
 
+  /** Ready and health: a tablet's and the desktop's blue panel carries the header; only a phone draws it here. */
+  const panelless = $derived(layout.phone && !desktopApp);
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 
   // « Vos données de santé » (task 2026-11-18-271): the optional consent, off until the diver turns it on. « Continuer »
@@ -319,7 +320,7 @@
   </div>
 {:else if step === 'odplusReady'}
   <div class="od-plus--screen">
-    {@render hero('ready')}
+    {#if panelless}{@render hero('ready')}{/if}
     {#if summaryRows(flow.plus.counts).length}
     <dl class="od-plus--summary">
       {#each summaryRows(flow.plus.counts) as row (row.key)}
@@ -351,7 +352,7 @@
   </div>
 {:else if step === 'odplusHealth'}
   <div class="od-plus--screen">
-    {@render hero('health')}
+    {#if panelless}{@render hero('health')}{/if}
     <div class="od-plus--health">
       <label class="od-plus--health-row">
         <span class="od-plus--health-texts">

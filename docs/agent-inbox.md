@@ -5493,7 +5493,7 @@ Store the consent with its date on the account. It is separate from the terms of
 
 **Test:** the switch is off on a new account; « Continuer » works in both states; with the consent off, the blood group cannot be saved and « Autoriser » turns it on; withdrawing deletes the value.
 
-## [ ] 2026-11-18-272 Phone: « Mon profil de plongeur », Informations and Brevets (OpenDives+)
+## [x] 2026-11-18-272 Phone: « Mon profil de plongeur », Informations and Brevets (OpenDives+)
 
 Christian approved this on 18 November 2026. Work in `main`. This is the part of « Mon profil » that task 267 left for later. Mock-ups in `docs/mockups-release/`.
 
@@ -5516,6 +5516,8 @@ Christian approved this on 18 November 2026. Work in `main`. This is the part of
 The cards and the profile are OpenDives+ data, kept on the account with a working copy on the device (as in task 267).
 
 **Test:** the phone number formats itself for CA, FR and US; « Inconnu » can be saved; a card photo is cropped, straightened and its glare removed; the corners can be adjusted by hand.
+
+**Done (19 November 2026): items 1 to 6 are in `main`; item 7 on the phone replaced by task 277; the desktop crop flow is done in 275/277.**
 
 ## [x] 2026-11-18-273 Phone: equipment, what changed since task 267
 
@@ -5549,7 +5551,7 @@ Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Done (18 November 2026).** Notifications use `@capacitor/local-notifications` (`app/src/lib/maintenance-notify.js`): 7, 30 or 60 days before the due date and on the day, at 9:00; rescheduled at start and after each change; the permission is asked when the first reminder is saved; a tap opens the piece's maintenance. Android builds (`assembleDebug`) and `cap sync ios` lists the plugin; iOS was not built here (no Mac). Desktop (Electron): no scheduled notification while the app is closed, so none is delivered there. A reminder by dives is dated from the pace of the last 365 days; without a pace it has no notification. The photos (piece, invoice) come from `<input type="file" accept="image/*">`, scaled to 1280 px and kept in `media/<id>.json` on the device.
 
-## [ ] 2026-11-18-275 Tablet and desktop: « Mon profil de plongeur », and the OpenDives+ welcome
+## [x] 2026-11-18-275 Tablet and desktop: « Mon profil de plongeur », and the OpenDives+ welcome
 
 Christian approved this on 18 November 2026. Work in `main`. Do it after tasks 271 to 274: the behaviour is the same, only the layout changes. Mock-ups in `docs/mockups-release/`, files `android-tablette-profil-…-paysage` (and two `-portrait`), `android-tablette-odplus-…`, `bureau-profil-…` and `bureau-odplus-…`.
 
@@ -5583,7 +5585,7 @@ English: « Service reminders », « Regulator, cylinder, battery: notified 30 d
 
 The rest of the screen does not change. The screen is now taller: check that it scrolls on small phones and that « S'abonner » stays reachable.
 
-## [ ] 2026-11-18-277 Brevets: the photo of a card uses the system document scanner; macOS access to the profile; small changes
+## [x] 2026-11-18-277 Brevets: the photo of a card uses the system document scanner; macOS access to the profile; small changes
 
 Christian approved this on 18 November 2026. Work in `main`. **This task corrects tasks 272 and 275**: where they differ, follow this one. Mock-ups in `docs/mockups-release/`.
 
@@ -5606,7 +5608,7 @@ Christian approved this on 18 November 2026. Work in `main`. **This task correct
 
 **Test:** on Android, « Scanner le recto » opens ML Kit and the fields fill from the scan, with empty fields left silent; on macOS, ⇧⌘P opens the profile window.
 
-**Points 1 and 4 done; 2 and 3 with task 275.**
+**Points 1 and 4 done; points 2 and 3 done with task 275 (19 November 2026).**
 
 ## [x] 2026-11-18-278 Phone: a clearer list of dives in the logbook
 
@@ -5862,7 +5864,7 @@ In the subscriber account sheet on every platform, the order of the two entries 
 
 **Done (19 November 2026).** In the three sheets (Android phone and tablet, iPhone, desktop) « Mon profil de plongeur » now comes first and « Sauvegarde et restauration » second; the test `tests/app/account-sheet.test.mjs` checks the order in each source.
 
-## [ ] 2026-11-19-292 Desktop account sheet: new layout
+## [x] 2026-11-19-292 Desktop account sheet: new layout
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-up: `docs/mockups/bureau-profil-compte.dc.html` (the popover opened from the account initial at the bottom of the navigation rail). Follows tasks 290 and 291 (do not edit them).
 
@@ -5956,6 +5958,8 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - **Settings pages**: Langue et formats, Profil et décompression (with the warning), Gaz et pressions partielles, Recycleur (O₂ consumption in l/min or ft³/min per the Volume unit), Ordinateurs et téléchargement (adds « Ports USB »), Cartes hors ligne (free space of this disk), Avancé — `bureau-reglages-langue`, `-decompression`, `-gaz`, `-recycleur`, `-ordinateurs`, `-cartes`, `-avance`.
 
 **Test:** in the desktop app, reach each screen and compare with its mock-up.
+
+**Partly done (19 November 2026).** Done: the share dialog (`bureau-partage`), the trip page in the detail pane (`bureau-voyage`), the .fit import snackbar naming the file (`bureau-import-fit`), the planned dives side panel (`bureau-plans`), the O₂ consumption line of Recycleur; the Réglages pages Langue, Profil et décompression, Gaz and Avancé already existed; the several-computers dialog already was a dialog from the tablet's width. **Left, each needs something that does not exist on the desktop yet:** the download dialogs (`bureau-telechargement*`: there is no desktop download engine, Bluetooth through Web Bluetooth and USB are still to build), « Ports USB » and the remembered Bluetooth computer of Ordinateurs et téléchargement (same reason), and Cartes hors ligne with its regions, sizes and free disk space (offline maps are Android only for now; `mapsFreeSpace` is a stub on the desktop).
 
 ## [ ] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
 

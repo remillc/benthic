@@ -27,6 +27,15 @@ export const desktopMac = desktopApp && /** @type {any} */ (window).odDesktop.pl
  */
 export const settingsWindow = desktopApp && new URLSearchParams(location.search).has('settings-window');
 
+/**
+ * The Mac's separate « Mon profil de plongeur » window (task 2026-11-18-277, desktop/main.cjs): the same app, loaded at
+ * `?profile-window=1`, which shows the profile only and does not load the logbook (the main window owns it).
+ */
+export const profileWindow = desktopApp && new URLSearchParams(location.search).has('profile-window');
+
+/** A window that shows one screen of the app and leaves the logbook to the main window. */
+export const sideWindow = settingsWindow || profileWindow;
+
 /** From this width the desktop app shows the logbook as a table beside the detail; below, the tablet layout. */
 export const desktopBreakpoint = 1200;
 

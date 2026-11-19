@@ -18,6 +18,8 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -82,18 +84,7 @@
   }
 </script>
 
-<Page class="od-profile-edit">
-  <Navbar>
-    {#snippet left()}
-      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.info.close')}</span>
-      </a>
-    {/snippet}
-    {#snippet title()}{t('diverProfile.info.title')}{/snippet}
-    {#snippet right()}
-      <button type="button" class="od-profile-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.info.save')}</button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -118,6 +109,25 @@
     <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} disabled={!consent} supporting={consent ? t('diverProfile.info.bloodHint') : t('diverProfile.info.bloodDenied')} />
   </div>
   <div class="od-profile-edit--bottom"></div>
+{/snippet}
+
+<Page class="od-profile-edit">
+  <Navbar>
+    {#snippet left()}
+      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
+        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.info.close')}</span>
+      </a>
+    {/snippet}
+    {#snippet title()}{t('diverProfile.info.title')}{/snippet}
+    {#snippet right()}
+      <button type="button" class="od-profile-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.info.save')}</button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="info">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <style>

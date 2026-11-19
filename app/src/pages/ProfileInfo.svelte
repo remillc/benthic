@@ -16,6 +16,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -59,15 +61,7 @@
   }
 </script>
 
-<Page class="od-profile-info">
-  <Navbar title={t('diverProfile.info.title')}>
-    {#snippet left()}
-      <BackLink label={t('gear.profile.title')} name={t('diverProfile.info.back')} />
-    {/snippet}
-    {#snippet right()}
-      <a href="/profile/info/edit" class="link icon-only" aria-label={t('diverProfile.info.edit')}><Icon name="edit" /></a>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <h2 class="od-profile-info--section">{t('diverProfile.info.you')}</h2>
   <div class="od-profile-info--card">
@@ -116,6 +110,22 @@
       <span>{t('diverProfile.info.deniedNote')}</span>
     {/if}
   </p>
+{/snippet}
+
+<Page class="od-profile-info">
+  <Navbar title={t('diverProfile.info.title')}>
+    {#snippet left()}
+      <BackLink label={t('gear.profile.title')} name={t('diverProfile.info.back')} />
+    {/snippet}
+    {#snippet right()}
+      <a href="/profile/info/edit" class="link icon-only" aria-label={t('diverProfile.info.edit')}><Icon name="edit" /></a>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="info">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <style>

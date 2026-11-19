@@ -18,6 +18,8 @@
   import { connection } from '../lib/online.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   let showArchived = $state(false);
   let searching = $state(false);
@@ -84,33 +86,7 @@
   }
 </script>
 
-<Page class="od-gear-page">
-  <Navbar>
-    {#snippet left()}
-      <BackLink label={t('gear.profile.title')} name={t('gear.piece.back')} />
-    {/snippet}
-    {#snippet right()}
-      {#if !searching}
-        {#if ios && !gear.readOnly}<Link href="/profile/gear/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('gear.inventory.add')}</span></Link>{/if}
-        <a href="#search" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), openSearch())}>
-          <Icon name="search" /><span class="od-sr-only">{t('gear.inventory.search')}</span>
-        </a>
-        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.inventory.more')}</span>
-        </a>
-      {/if}
-    {/snippet}
-    {#snippet title()}
-      {#if searching}
-        <div class="od-gear-page--search">
-          <input bind:this={field} type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
-          <button type="button" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
-        </div>
-      {:else}
-        {t('gear.inventory.title')}
-      {/if}
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice onexport={() => (exporting = true)} />
 
@@ -169,10 +145,43 @@
     </div>
   {/each}
   <div class="od-gear-page--bottom"></div>
+{/snippet}
 
+<Page class="od-gear-page">
+  <Navbar>
+    {#snippet left()}
+      <BackLink label={t('gear.profile.title')} name={t('gear.piece.back')} />
+    {/snippet}
+    {#snippet right()}
+      {#if !searching}
+        {#if ios && !gear.readOnly}<Link href="/profile/gear/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('gear.inventory.add')}</span></Link>{/if}
+        <a href="#search" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), openSearch())}>
+          <Icon name="search" /><span class="od-sr-only">{t('gear.inventory.search')}</span>
+        </a>
+        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
+          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.inventory.more')}</span>
+        </a>
+      {/if}
+    {/snippet}
+    {#snippet title()}
+      {#if searching}
+        <div class="od-gear-page--search">
+          <input bind:this={field} type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
+          <button type="button" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
+        </div>
+      {:else}
+        {t('gear.inventory.title')}
+      {/if}
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="gear" list="gear" bar="none" />
+  {:else}
+    {@render body()}
+  {/if}
   {#snippet fixedContent()}
     <!-- Read only: the button goes away (hidden, not removed: the slot is drawn once). -->
-    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || ios ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || ios || profileWide() ? 'none' : null}>
       <a href="/profile/gear/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('gear.inventory.add')}</div>

@@ -12,6 +12,8 @@
   import { taskInline, tagText, lineText } from '../lib/maintenance-text.js';
   import { formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   onMount(loadInventory);
 
@@ -26,12 +28,7 @@
   const open = (id) => `/profile/gear/${id}/maintenance`;
 </script>
 
-<Page class="od-maintenance-page" onPageBeforeIn={loadInventory}>
-  <Navbar title={t('maintenance.title')}>
-    {#snippet left()}
-      <BackLink label={t('gear.profile.equipment')} name={t('maintenance.back')} />
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <div class="od-maintenance-page--figures">
     {#each figures as key (key)}
@@ -72,6 +69,19 @@
 
   <p class="od-maintenance-page--note"><Icon name="info" size={18} /><span>{t('maintenance.listNote')}</span></p>
   <div class="od-maintenance-page--bottom"></div>
+{/snippet}
+
+<Page class="od-maintenance-page" onPageBeforeIn={loadInventory}>
+  <Navbar title={t('maintenance.title')}>
+    {#snippet left()}
+      <BackLink label={t('gear.profile.equipment')} name={t('maintenance.back')} />
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="maintenance" list="maintenance" bar="none" />
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <style>

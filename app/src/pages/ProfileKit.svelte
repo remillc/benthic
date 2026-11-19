@@ -18,6 +18,8 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -103,23 +105,7 @@
   }
 </script>
 
-<Page class="od-kit-page">
-  <Navbar>
-    {#snippet left()}
-      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('gear.kit.close')}</span>
-      </a>
-    {/snippet}
-    {#snippet title()}{kitId ? t('gear.kit.editTitle') : t('gear.kit.newTitle')}{/snippet}
-    {#snippet right()}
-      {#if kitId}
-        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.kit.more')}</span>
-        </a>
-      {/if}
-      <button type="button" class="od-kit-page--save" disabled={!canSave} onclick={save}>{t('gear.kit.save')}</button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -141,6 +127,30 @@
     {#if kitId}<p class="od-kit-page--hint">{t('gear.kit.deleteNote')}</p>{/if}
   {/if}
   <div class="od-kit-page--bottom"></div>
+{/snippet}
+
+<Page class="od-kit-page">
+  <Navbar>
+    {#snippet left()}
+      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
+        <Icon name="close" /><span class="od-sr-only">{t('gear.kit.close')}</span>
+      </a>
+    {/snippet}
+    {#snippet title()}{kitId ? t('gear.kit.editTitle') : t('gear.kit.newTitle')}{/snippet}
+    {#snippet right()}
+      {#if kitId}
+        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
+          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.kit.more')}</span>
+        </a>
+      {/if}
+      <button type="button" class="od-kit-page--save" disabled={!canSave} onclick={save}>{t('gear.kit.save')}</button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="gear" list="gear" bar={kitId ? 'main' : 'dialog'} size="m">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 {#if confirmDelete}
