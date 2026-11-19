@@ -144,6 +144,9 @@
           { path: '/profile/certs/new', ...lazy(() => import('./pages/ProfileCertEdit.svelte')) },
           { path: '/profile/certs/:id', ...lazy(() => import('./pages/ProfileCert.svelte')) },
           { path: '/profile/certs/:id/edit', ...lazy(() => import('./pages/ProfileCertEdit.svelte')) },
+          { path: '/profile/documents/new/:kind', ...lazy(() => import('./pages/ProfileDocumentEdit.svelte')) },
+          { path: '/profile/documents/:id', ...lazy(() => import('./pages/ProfileDocument.svelte')) },
+          { path: '/profile/documents/:id/edit', ...lazy(() => import('./pages/ProfileDocumentEdit.svelte')) },
           { path: '/profile/kits/new', ...lazy(() => import('./pages/ProfileKit.svelte')) },
           { path: '/profile/kits/:id', ...lazy(() => import('./pages/ProfileKit.svelte')) },
         ]
@@ -418,6 +421,10 @@
         .then(() => import('./lib/inventory.svelte.js'))
         .then((m) => m.loadInventory())
         .catch((e) => console.error('Inventory', e));
+      // The same for the documents that expire (task 2026-11-19-309).
+      import('./lib/document-notify.js')
+        .then((m) => m.startDocumentNotifications())
+        .catch((e) => console.error('Documents', e));
     }
     enableAccessibility();
     enableDetailPageCleanup();

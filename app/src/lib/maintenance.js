@@ -76,17 +76,25 @@ export const SOON_DIVES = 10;
 export const SUGGESTIONS = {
   // A dive computer has no reminder (task 2026-11-19-308).
   computer: [],
-  regulator: [{ task: 'service', months: 12 }],
+  regulator: [{ task: 'service', months: 24, dives: 100 }],
   suit: [{ task: 'seals', months: 12 }],
   cylinder: [
     { task: 'inspection', months: 12 },
     { task: 'hydrostatic', months: 60 },
   ],
-  bcd: [{ task: 'service', months: 24 }],
+  bcd: [{ task: 'service', months: 12 }],
 };
 
-/** @param {string} type @returns {Suggestion[]} */
-export const suggestionsFor = (type) => SUGGESTIONS[type] ?? [];
+/**
+ * @param {string} type
+ * @param {Record<string, string>} [details] the piece's fields: only a drysuit has seals to change (docs/equipment-fields.md);
+ *   without them the suggestion of the type stands
+ * @returns {Suggestion[]}
+ */
+export function suggestionsFor(type, details) {
+  if (type === 'suit' && details && details.suitType !== 'dry') return [];
+  return SUGGESTIONS[type] ?? [];
+}
 
 /**
  * The date stamped on a cylinder (« 03/22 »: March 2022) as the first of that month, or null when the text is not one.

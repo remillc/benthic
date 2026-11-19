@@ -17,6 +17,7 @@ import { showSnackbar } from './snackbar.js';
 import { notificationText } from './maintenance-text.js';
 import { formatLongDate } from './format.js';
 import { openOver } from './navigation.svelte.js';
+import { setDesktopNotifications, desktopBridge } from './desktop-notifications.js';
 import { t } from './i18n.js';
 
 const CHANNEL_ID = 'maintenance';
@@ -27,7 +28,7 @@ const TYPE_LATE = 'maintenance-late';
 
 const native = () => Capacitor.isNativePlatform();
 /** The desktop bridge's notifications, when the app runs in Electron. */
-const desktop = () => /** @type {any} */ (globalThis).odDesktop?.notifications ?? null;
+const desktop = desktopBridge;
 
 /** A stable integer for a notification id like `<uuid>:lead`. @param {string} key */
 export function notificationId(key) {
@@ -110,7 +111,8 @@ async function deliver(plan) {
   const bridge = desktop();
   if (bridge) {
     try {
-      await bridge.schedule({ notifications: list.map((n) => ({ id: n.id, title: n.title, body: n.body, at: n.at.getTime(), extra: { itemId: n.itemId, gearId: n.gearId, kind: n.kind } })) });
+      // The bridge keeps one list per window: the documents' part (lib/document-notify.js) is sent with this one.
+      await setDesktopNotifications('maintenance', list.map((n) => ({ id: n.id, title: n.title, body: n.body, at: n.at.getTime(), extra: { itemId: n.itemId, gearId: n.gearId, kind: n.kind } })));
     } catch (e) {
       console.error('Maintenance notifications (desktop)', e);
     }

@@ -1,4 +1,224 @@
 {
+  "docs": {
+    "title": "Brevets et documents",
+    "sections": {
+      "certs": "Brevets",
+      "health": "Assurance et santé",
+      "others": "Autres documents",
+      "expired": "Expirés"
+    },
+    "add": "Ajouter",
+    "note": "Les cartes sont reproduites d’après vos photos ou vos scans. Sans photo, l’app en dessine une avec les détails saisis.",
+    "empty": "Aucun document",
+    "emptyText": "Ajoutez vos brevets, votre assurance et votre certificat médical : ils restent chiffrés et disponibles sans réseau.",
+    "back": "Retour",
+    "kind": {
+      "certification": "Brevet",
+      "insurance": "Assurance",
+      "medical": "Médical",
+      "other": "Document"
+    },
+    "choose": {
+      "title": "Ajouter",
+      "certification": {
+        "title": "Brevet",
+        "text": "Une carte de certification, scannée recto verso"
+      },
+      "insurance": {
+        "title": "Assurance plongée",
+        "text": "Assureur, police, téléphone d’urgence, expiration"
+      },
+      "medical": {
+        "title": "Certificat médical",
+        "text": "Une ou plusieurs pages, avec sa date d’expiration"
+      },
+      "other": {
+        "title": "Autre document",
+        "text": "Carte de club, questionnaire médical, permis…"
+      }
+    },
+    "badge": {
+      "today": "Expire aujourd’hui",
+      "tomorrow": "Expire demain",
+      "inDays": {
+        "one": "Expire dans {n} jour",
+        "other": "Expire dans {n} jours"
+      },
+      "inMonths": {
+        "one": "Dans {n} mois",
+        "other": "Dans {n} mois"
+      },
+      "inYears": {
+        "one": "Dans {n} an",
+        "other": "Dans {n} ans"
+      },
+      "expiredDays": {
+        "one": "Expiré depuis {n} jour",
+        "other": "Expiré depuis {n} jours"
+      },
+      "expiredMonths": {
+        "one": "Expiré depuis {n} mois",
+        "other": "Expiré depuis {n} mois"
+      },
+      "expiredYears": {
+        "one": "Expiré depuis {n} an",
+        "other": "Expiré depuis {n} ans"
+      }
+    },
+    "expiresOn": "Expire le {date}",
+    "expiredOn": "Expiré le {date}",
+    "reminderSent": "Rappel reçu le {date}.",
+    "reminderComing": "Rappel le {date}.",
+    "bannerLine": "Le {date}. {reminder}",
+    "insurance": {
+      "title": "Assurance",
+      "titlePlan": "{insurer}, plan {plan}",
+      "new": "Nouvelle assurance",
+      "edit": "Modifier l’assurance",
+      "scanned": "Carte scannée. Les champs ont été lus sur la carte : vérifiez-les.",
+      "scan": "Scanner la carte",
+      "scanAgain": "Scanner de nouveau",
+      "pdf": "Ajouter un PDF",
+      "fileKept": "Fichier PDF ajouté",
+      "removeFile": "Retirer",
+      "insurer": "Assureur",
+      "plan": "Plan (facultatif)",
+      "policy": "Numéro de police",
+      "phone": "Téléphone d’urgence",
+      "phoneHint": "Le numéro à appeler en cas d’accident de plongée.",
+      "phoneInvalid": "Saisissez le numéro avec l’indicatif, comme +1 919 684-9111",
+      "startsOn": "Début",
+      "expiresOn": "Expiration",
+      "notify": "Me prévenir avant l’expiration",
+      "notes": "Notes (facultatif)",
+      "notesHint": "Par exemple, couvre la plongée technique",
+      "policyLine": "Police {number}",
+      "emergency": "Urgence {phone}"
+    },
+    "medical": {
+      "title": "Certificat médical",
+      "new": "Nouveau certificat",
+      "edit": "Modifier le certificat",
+      "doctor": "Médecin",
+      "doctorHint": "Par exemple, Dr Hélène Lafleur",
+      "date": "Date",
+      "expiresOn": "Expiration",
+      "pages": "Pages",
+      "page": "Page {n}",
+      "pagesCount": {
+        "one": "{n} page",
+        "other": "{n} pages"
+      },
+      "addPage": "Ajouter une page",
+      "scanPage": "Scanner une page",
+      "removePage": "Retirer la page {n}",
+      "notify": "Me prévenir avant l’expiration",
+      "notes": "Notes (facultatif)",
+      "notesHint": "Par exemple, apte à la plongée avec bouteille",
+      "reminder": "Rappel",
+      "reminderValue": "{n} jours avant"
+    },
+    "other": {
+      "title": "Autre document",
+      "new": "Nouveau document",
+      "edit": "Modifier le document",
+      "name": "Nom du document",
+      "nameHint": "Par exemple, carte de club",
+      "expiresOn": "Expiration (facultatif)",
+      "notes": "Notes (facultatif)",
+      "notesHint": "Par exemple, membre n° 2231, saison 2026",
+      "notifyHint": "Le délai de la notification"
+    },
+    "sheet": {
+      "details": "Détails",
+      "insurer": "Assureur",
+      "plan": "Plan",
+      "policy": "Numéro de police",
+      "phone": "Téléphone d’urgence",
+      "startsOn": "Début",
+      "expiresOn": "Expiration",
+      "reminder": "Rappel",
+      "notes": "Notes",
+      "call": "Appeler",
+      "fullscreen": "Plein écran",
+      "pageFull": "Afficher la page {n} en plein écran",
+      "pdfFile": "Fichier PDF",
+      "openPdf": "Ouvrir le PDF",
+      "noFile": "Aucune photo ni aucun fichier"
+    },
+    "share": {
+      "title": "Partager le document",
+      "text": "Par exemple, pour l’envoyer à un centre avant un voyage.",
+      "images": "En images",
+      "imagesText": "Une image par page",
+      "pdf": "En PDF",
+      "pdfText": "Un seul fichier, toutes les pages",
+      "cancel": "Annuler",
+      "failed": "Le document n’a pas pu être partagé.",
+      "menu": "Partager"
+    },
+    "full": {
+      "hint": "Luminosité au maximum · Touchez la carte pour voir le verso",
+      "hintOne": "Luminosité au maximum",
+      "close": "Fermer"
+    },
+    "delete": {
+      "menu": "Supprimer le document",
+      "title": "Supprimer ce document ?",
+      "text": "Le document et ses photos sont supprimés de cet appareil et de votre compte.",
+      "action": "Supprimer",
+      "cancel": "Annuler",
+      "done": "Document supprimé"
+    },
+    "saved": "Document enregistré",
+    "saveFailed": "Le document n’a pas pu être enregistré.",
+    "fileFailed": "Le fichier n’a pas pu être lu.",
+    "notFound": "Ce document n’existe plus.",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "readOnly": "Lecture seule : l’abonnement OpenDives+ est terminé.",
+    "errors": {
+      "required": "À remplir.",
+      "date": "Saisissez une date réelle.",
+      "future": "La date est dans le futur.",
+      "order": "L’expiration précède le début."
+    },
+    "notifyChoice": {
+      "weeks2": "2 semaines",
+      "days": "{n} jours"
+    },
+    "notify": {
+      "title": {
+        "one": "{name} : expire dans {n} jour",
+        "other": "{name} : expire dans {n} jours"
+      },
+      "titleToday": "{name} : expire aujourd’hui",
+      "body": {
+        "medical": "Il expire le {date}. Prenez rendez-vous avec votre médecin.",
+        "insurance": "Votre police expire le {date}.",
+        "other": "Il expire le {date}."
+      },
+      "view": "Voir",
+      "addNew": "Ajouter le nouveau",
+      "snooze": "Me le rappeler dans 2 semaines",
+      "insurance": "Assurance {insurer}",
+      "channel": "Documents",
+      "channelText": "Expiration d’une assurance, d’un certificat médical ou d’un autre document"
+    },
+    "line": {
+      "certs": {
+        "one": "{n} brevet",
+        "other": "{n} brevets"
+      },
+      "insurance": "assurance",
+      "medical": "certificat médical",
+      "others": {
+        "one": "{n} autre document",
+        "other": "{n} autres documents"
+      },
+      "none": "Aucun document"
+    }
+  },
   "searchField": {
     "clear": "Effacer la recherche"
   },
@@ -365,7 +585,7 @@
     "weights": "Lest",
     "weightsByPlace": "Lest par emplacement",
     "weightPlaces": {
-      "integrated": "Intégré au gilet",
+      "integrated": "Intégré à la veste",
       "belt": "Ceinture",
       "ankle": "Chevilles",
       "backplate": "Plaque dorsale",
@@ -518,6 +738,8 @@
   },
   "settings": {
     "notifications": {
+      "documents": "Expiration des documents",
+      "documentsText": "Assurance, certificat médical et autres documents qui ont une date d’expiration. Le délai se choisit dans chaque document.",
       "maintenance": "Rappels d’entretien",
       "maintenanceText": "Une notification quand une pièce approche de sa date ou de son nombre de plongées.",
       "leadDays": "Délai par défaut",
@@ -540,6 +762,7 @@
     "defaults": "Valeurs par défaut",
     "defaultValue": "Par défaut {value}",
     "groups": {
+      "notifyDocuments": "Brevets et documents",
       "notifyDive": "Après la plongée",
       "notifyMaintenance": "Entretien de l’équipement",
       "language": "Langue et formats",
@@ -2516,7 +2739,7 @@
       "Android : les bords de l'écran sont les mêmes à chaque lancement et avec chaque mode de navigation : les feuilles, les messages, les boutons et la barre du bas restent au-dessus de la barre de gestes ou des boutons de navigation, et le haut ne saute plus.",
       "Serveur OpenDives (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur OpenDives » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
       "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
-      "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, gilet, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
+      "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, veste, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
       "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
       "Offre OpenDives+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
       "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
@@ -2849,7 +3072,7 @@
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
       "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
       "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
-      "Équipement : le gilet a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand.",
+      "Équipement : la veste a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand.",
       "Fichiers reçus d’une autre application : OpenDives apparaît dans « Ouvrir avec » et « Partager vers » pour un carnet (.ssrf, .xml), un fichier UDDF, FIT, DLD et les autres formats importables. Le fichier est lu, puis un choix est demandé : « Ajouter à ce carnet » ajoute les plongées au carnet ouvert, avec Annuler (« Nouveau carnet », qui garde le carnet ouvert et en crée un autre, n’est pas proposé : cet appareil ne garde qu’un carnet à la fois) ; sans carnet, il ouvre « Importer un carnet ». Le fichier de sites d’un export à deux fichiers est accepté : les sites déjà présents ne sont pas dupliqués. Les sites sont ajoutés au carnet nommé dans la question, jamais à un autre.",
       "Premier lancement : le glissement entre les étapes joue maintenant (il était absent de la version compilée). La boîte des changements en attente de la déconnexion affiche le nombre en gras, et un champ iPhone en erreur ne garde plus de cadre rouge dans sa ligne.",
       "Remplacer ce carnet : cet appareil ne garde qu’un carnet à la fois. Un fichier de carnet (.ssrf Subsurface, ou archive qui en contient un) ouvert avec OpenDives ou choisi dans « + » › Importer un fichier propose maintenant « Remplacer ce carnet » : un écran dit que le carnet quitte cet appareil et propose « Exporter d’abord ce carnet » ; « Remplacer » demande une seconde confirmation si le carnet n’a pas été exporté ou si des modifications ne sont pas synchronisées, puis vous nommez le nouveau carnet. Le carnet actuel est remis en place si le fichier ne peut pas être lu. Le carnet du serveur OpenDives et un carnet synchronisé avec un compte ne sont jamais remplacés, avec une ligne qui dit pourquoi. Quand une archive contient plusieurs carnets, seul le principal est importé et la fenêtre le dit.",
@@ -2895,7 +3118,11 @@
       "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
       "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur ».",
       "Téléchargement : une lampe ou une balance dont le nom commence par « S1 » (« S19 A69C LE ») n’est plus proposée comme un Oceans S1. Chaque appareil de la liste à proximité a un menu « Ce n’est pas un ordinateur de plongée » qui le masque pour de bon (Annuler dans le message) ; Réglages › Téléchargement liste les appareils masqués avec « Afficher de nouveau ».",
-      "Android : la touche Retour fonctionne tant qu’un message comme « Plongée enregistrée / Annuler » est affiché ; elle était ignorée jusqu’à la disparition du message."
+      "Android : la touche Retour fonctionne tant qu’un message comme « Plongée enregistrée / Annuler » est affiché ; elle était ignorée jusqu’à la disparition du message.",
+      "Équipement : « Nouvelle pièce » propose 16 types (masque, palmes, scooter, caméra, parachute de palier, bouée de surface et couteau s’ajoutent) et n’affiche que les champs du type choisi ; seul le type est obligatoire. Une bouteille garde son type (le volume et la pression de service viennent de Réglages › Équipement), son matériau, son robinet, son numéro de série, « Propre O₂ », sa dernière inspection visuelle et son dernier test hydrostatique ; une combinaison, son type, son épaisseur, sa taille et son matériau. Le gilet devient « Veste » partout. Rappels proposés : détendeur tous les 2 ans ou 100 plongées, bouteille (inspection chaque année, test hydrostatique aux 5 ans), veste chaque année, joints d’une combinaison étanche chaque année.",
+      "Brevets et documents : « Brevets » devient « Brevets et documents » : brevets, assurance plongée (carte scannée et lue sur l’appareil, ou PDF), certificat médical de plusieurs pages et autres documents, chacun avec une reproduction de la carte et un badge d’expiration. Un document s’ouvre en plein écran, à la luminosité maximale, et se partage en images ou en PDF. Un brevet peut être marqué « Brevet de moniteur ».",
+      "Notifications : Réglages › Notifications a une section « Brevets et documents » avec « Expiration des documents ». La notification arrive au délai choisi dans chaque document (2 semaines, 30 jours ou 60 jours) et le jour de l’expiration.",
+      "Offre OpenDives+ : le prix est un peu plus petit, et la tuile « Rappels d’entretien » parle du détendeur, de la bouteille et de la veste."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -5229,7 +5456,7 @@
       "certifications": "Brevets",
       "certificationsText": "Vos cartes, toujours sur vous.",
       "maintenance": "Rappels d’entretien",
-      "maintenanceText": "Détendeur, bouteille, pile : prévenu 30 jours avant l’échéance.",
+      "maintenanceText": "Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance.",
       "price": "14,99 $ US",
       "per": "par an",
       "priceDetail": "soit 1,25 $ par mois",
@@ -5413,6 +5640,94 @@
     "failed": "Le carnet n’a pas pu être créé. Rien n’a été perdu sur cet appareil."
   },
   "gear": {
+    "field": {
+      "serialSecond": "Numéro de série du deuxième étage",
+      "connection": "Raccord",
+      "secondStages": "Nombre de deuxièmes étages",
+      "nitrox": "Compatible nitrox",
+      "coldWater": "Eau froide",
+      "suitType": "Type",
+      "thickness": "Épaisseur",
+      "size": "Taille",
+      "material": "Matériau",
+      "bcdType": "Type de veste",
+      "lift": "Portance",
+      "weightCapacity": "Lest intégré",
+      "lumens": "Puissance (lumens)",
+      "battery": "Batterie",
+      "burnTime": "Autonomie",
+      "weightsType": "Type",
+      "corrective": "Verres correcteurs",
+      "finType": "Type",
+      "speed": "Vitesse",
+      "housingDepth": "Profondeur du caisson",
+      "colour": "Couleur",
+      "typeName": "Type de pièce",
+      "cylinderType": "Type de bouteille",
+      "valve": "Robinet",
+      "o2Clean": "Propre O₂",
+      "lastInspection": "Dernière inspection visuelle",
+      "lastHydro": "Dernier test hydrostatique"
+    },
+    "fieldHint": {
+      "nitrox": "Préparé pour un mélange riche en oxygène",
+      "coldWater": "Protégé contre le givrage",
+      "thickness": "Par exemple, 5 mm",
+      "lift": "Par exemple, 14 kg",
+      "weightCapacity": "Poids que la veste peut porter, par exemple 8 kg",
+      "battery": "Par exemple, accumulateur lithium 12 Ah",
+      "burnTime": "Par exemple, 3 h à pleine puissance",
+      "corrective": "Le masque porte des verres à votre vue",
+      "speed": "Par exemple, 2,5 km/h",
+      "housingDepth": "Par exemple, 60 m",
+      "typeName": "Par exemple, trousse de réparation",
+      "o2Clean": "Préparée pour l’oxygène pur ou le nitrox riche",
+      "lastHydro": "La date frappée sur la bouteille, comme 03/22.",
+      "cylinderType": "Volume et pression de service viennent du type. Les types se gèrent dans Réglages › Équipement.",
+      "datePlaceholder": "jj mois aaaa"
+    },
+    "fieldOption": {
+      "none": "Aucun",
+      "connection": {
+        "din": "DIN",
+        "yoke": "Étrier"
+      },
+      "valve": {
+        "din": "DIN",
+        "yoke": "Étrier"
+      },
+      "suitType": {
+        "wet": "Humide",
+        "semi": "Semi-étanche",
+        "dry": "Étanche"
+      },
+      "material": {
+        "neoprene": "Néoprène",
+        "compressed": "Néoprène compressé",
+        "trilaminate": "Trilaminé",
+        "other": "Autre",
+        "aluminium": "Aluminium",
+        "steel": "Acier"
+      },
+      "bcdType": {
+        "jacket": "Veste",
+        "wing": "Wing",
+        "sidemount": "Side-mount"
+      },
+      "weightsType": {
+        "shot": "À plombs",
+        "pockets": "À poches",
+        "harness": "Harnais"
+      },
+      "finType": {
+        "boot": "Chausson",
+        "adjustable": "Réglables"
+      }
+    },
+    "fieldError": {
+      "number": "Saisissez un nombre entier",
+      "stamp": "Saisissez le mois et l’année, comme 03/22"
+    },
     "forever": {
       "button": "Supprimer pour de bon",
       "title": "Supprimer pour de bon ?",
@@ -5458,7 +5773,7 @@
       "keep": "Ce que vous gardez ici",
       "kept": "Gardé sur ce téléphone, même sans réseau.",
       "equipment": "Équipement",
-      "certifications": "Brevets",
+      "certifications": "Brevets et documents",
       "information": "Informations",
       "later": "Pas encore disponible",
       "noPiece": "Aucune pièce",
@@ -5494,16 +5809,30 @@
         "other": "Autres"
       },
       "typePlural": {
+        "mask": "Masques",
+        "fins": "Palmes",
+        "scooter": "Scooters",
+        "camera": "Caméras",
+        "dsmb": "Parachutes de palier",
+        "floatBuoy": "Bouées de surface",
+        "knife": "Couteaux",
         "regulator": "Détendeurs",
         "suit": "Combinaisons",
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
         "light": "Lampes",
         "other": "Autres",
-        "bcd": "Gilets",
+        "bcd": "Vestes",
         "weights": "Ceintures de lest"
       },
       "type": {
+        "mask": "Masque",
+        "fins": "Palmes",
+        "scooter": "Scooter",
+        "camera": "Caméra",
+        "dsmb": "Parachute de palier",
+        "floatBuoy": "Bouée de surface",
+        "knife": "Couteau",
         "computer": "Ordinateur de plongée",
         "regulator": "Détendeur",
         "suit": "Combinaison",
@@ -5511,7 +5840,7 @@
         "cylinder": "Bouteille",
         "light": "Lampe",
         "other": "Autre",
-        "bcd": "Gilet",
+        "bcd": "Veste",
         "weights": "Ceinture de lest"
       },
       "dives": {
@@ -5590,6 +5919,7 @@
       "duplicated": "Kit dupliqué"
     },
     "piece": {
+      "yes": "Oui",
       "image": "Image du modèle",
       "back": "Retour",
       "edit": "Modifier",
@@ -5634,6 +5964,7 @@
       "added": "{name} ajouté à votre équipement"
     },
     "pieceEdit": {
+      "serialOptional": "Numéro de série (facultatif)",
       "addTitle": "Nouvelle pièce",
       "editTitle": "Modifier la pièce",
       "close": "Fermer",
@@ -5701,14 +6032,24 @@
       "noResults": "Aucune pièce ne correspond"
     },
     "pieceNew": {
+      "serialHint_suit": "Sur l’étiquette des combinaisons étanches",
+      "serialHint_cylinder": "Numéro gravé sur la bouteille",
+      "cylinderNameHint": "Par exemple, AL80 jaune",
       "typeTitle": "Type de pièce",
       "tile": {
+        "mask": "Masque",
+        "fins": "Palmes",
+        "scooter": "Scooter",
+        "camera": "Caméra",
+        "dsmb": "Parachute de palier",
+        "floatBuoy": "Bouée de surface",
+        "knife": "Couteau",
         "computer": "Ordinateur",
         "regulator": "Détendeur",
         "suit": "Combinaison",
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
-        "bcd": "Gilet",
+        "bcd": "Veste",
         "light": "Lampe",
         "weights": "Ceinture de lest",
         "other": "Autre"
@@ -5940,13 +6281,15 @@
       "failed": "Le rappel n’a pas pu être enregistré"
     },
     "reminderCard": {
-      "title": "Rappel de révision",
+      "title": "Rappels d’entretien",
+      "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
+      "suggestDrysuit": "Suggéré pour une combinaison étanche : les joints, chaque année",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",
         "suit": "Suggéré pour une combinaison : {rule}",
         "cylinder": "Suggéré pour une bouteille : {rule}",
-        "bcd": "Suggéré pour un gilet : {rule}"
+        "bcd": "Suggéré pour une veste : {rule}"
       },
       "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
       "add": "Ajouter",
@@ -6031,6 +6374,8 @@
       "back": "Retour"
     },
     "cert": {
+      "instructorCert": "Brevet de moniteur",
+      "instructorCertText": "Votre nom et ce numéro s’ajoutent quand vous confirmez la plongée d’un autre plongeur.",
       "new": "Nouveau brevet",
       "edit": "Modifier le brevet",
       "save": "Enregistrer",

@@ -12,6 +12,7 @@
   import SelectField from '../components/SelectField.svelte';
   import ComboField from '../components/ComboField.svelte';
   import DateField from '../components/DateField.svelte';
+  import SwitchField from '../components/SwitchField.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import { services, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
@@ -36,6 +37,8 @@
   let number = $state('');
   let issuedOn = $state('');
   let instructor = $state('');
+  /** « Brevet de moniteur »: its number is used when the diver confirms another diver's dive (task 2026-11-19-309). */
+  let instructorCert = $state(false);
   let saving = $state(false);
   /** What the scan filled in, to mark it « Lu sur la carte » while the field still holds it. */
   let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '' });
@@ -53,6 +56,7 @@
     number = c.number;
     issuedOn = c.issuedOn;
     instructor = c.instructor;
+    instructorCert = c.instructorCert;
     for (const d of c.documents) {
       const bytes = await services().profile.readPhoto(c.id, d.hash);
       if (bytes) photos[d.side] = { url: photoUrl(bytes) };
@@ -127,6 +131,7 @@
           number,
           issuedOn,
           instructor,
+          instructorCert,
           photos: { ...(photos.front.bytes !== undefined ? { front: photos.front.bytes } : {}), ...(photos.back.bytes !== undefined ? { back: photos.back.bytes } : {}) },
         }),
       );
@@ -177,6 +182,7 @@
     <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
     <DateField label={t('diverProfile.cert.date')} bind:value={issuedOn} placeholder={t('diverProfile.cert.dateHint')} maxYear={new Date().getFullYear()} supporting={dateLive.error || mark('issuedOn', issuedOn)} />
     <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={t('diverProfile.cert.instructorHint')} />
+    <SwitchField label={t('diverProfile.cert.instructorCert')} bind:checked={instructorCert} supporting={t('diverProfile.cert.instructorCertText')} />
   </div>
   <div class="od-cert-edit--bottom"></div>
 {/snippet}
@@ -314,6 +320,11 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--od-text-2);
+    }
+
+    /* The switch sits on the margin of the text fields (16 dp page + 16 dp field). */
+    .od-cert-edit--fields > :global(.od-switch-field) {
+      margin-inline: 16px;
     }
 
     .od-cert-edit--fields {

@@ -68,6 +68,8 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   (lib/maintenance-notify.js). Per device
  * @property {14|30|60} maintenanceLeadDays the default lead time before a due date; a reminder may have its own
  * @property {boolean} maintenanceOverdue "Rappeler si en retard": once a week until the maintenance is recorded
+ * @property {boolean} documentNotify "Expiration des documents" (task 2026-11-19-309): the notifications before an insurance,
+ *   a medical certificate or another document expires (lib/document-notify.js). Per device; the lead time is set in each document
  */
 
 /** @type {AppSettings} */
@@ -98,6 +100,7 @@ const APP_DEFAULTS = {
   maintenanceNotify: true,
   maintenanceLeadDays: 30,
   maintenanceOverdue: true,
+  documentNotify: true,
 };
 
 /**

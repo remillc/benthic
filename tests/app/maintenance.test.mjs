@@ -46,16 +46,17 @@ const rule = (extra = {}) => ({
   ...extra,
 });
 
-test('a new piece can be created for each of the nine types', async () => {
-  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'other']);
+// Task 2026-11-19-309 (docs/equipment-fields.md): the grid has 16 types, the seven new ones after the weight belt.
+test('a new piece can be created for each of the sixteen types', async () => {
+  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'other']);
   const { inventory } = setup();
   for (const type of GEAR_TYPES) await inventory.saveGear({ type, name: `piece ${type}`, brand: 'Apeks' });
   const all = await inventory.listGear();
-  assert.equal(all.length, 9);
+  assert.equal(all.length, 16);
   assert.deepEqual(new Set(all.map((g) => g.type)), new Set(GEAR_TYPES));
-  // The vest and the weight belt go in « Autres », with the lamps.
+  // The vest, the weight belt and the seven new types go in « Autres », with the lamps.
   const groups = groupGear(all);
-  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'light', 'other', 'weights']);
+  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'camera', 'dsmb', 'fins', 'floatBuoy', 'knife', 'light', 'mask', 'other', 'scooter', 'weights']);
 });
 
 test('a kit can be duplicated under a name no other kit has, then deleted without touching the dives', async () => {
@@ -97,8 +98,14 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 });
 
 test('suggestions per type, and the rule fields are validated', () => {
-  // Decided 18 November 2026 (task 277): the suggested service of a regulator is yearly, it was every 2 years.
-  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12 });
+  // Decided 19 November 2026 (task 309, docs/equipment-fields.md): the suggested service of a regulator is every 2
+  // years or 100 dives (18 November had said yearly); a vest every year (it was every 2 years).
+  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 24, dives: 100 });
+  assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
+  // Only a drysuit has seals to change.
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }]);
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'wet' }), []);
+  assert.deepEqual(suggestionsFor('suit', {}), []);
   // Task 2026-11-19-308: « Contrôle avant voyage » is gone (an inspection noted by hand), and a computer has no reminder.
   assert.equal(suggestionsFor('regulator').length, 1);
   assert.deepEqual(suggestionsFor('computer'), []);

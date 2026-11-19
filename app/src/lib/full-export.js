@@ -17,7 +17,7 @@
 //   opendives/gear/<id>.json, kits/<id>.json, maintenance/<id>.json, dive-equipment/<id>.json   (copied as stored)
 //   opendives/profile/diver.json                    decrypted: dateOfBirth, emergencyContact, bloodGroup, healthConsent
 //   opendives/certifications/<id>.json              decrypted, `documents` point at the photos
-//   opendives/certifications/photos/<id>-<side>.jpg
+//   opendives/certifications/photos/<id>-<side>.jpg   (<id>-page-<n>.jpg for the pages of a document, .pdf for a PDF)
 //   opendives/media/<id>.jpg                         the photos of pieces and invoices
 //   opendives/settings.json                          the device's settings and the core's preferences
 //   dive-media/<name>                                the dives' original photos and videos (only when asked)
@@ -27,6 +27,7 @@
 import { sortedJson } from './file-store.js';
 import { toBase64 } from './secret-box.js';
 import { createZipWriter } from './zip-stream.js';
+import { fileExtension } from './profile.js';
 
 /** The archive's format, in `manifest.json`: raised when its layout changes in a way a reader must know. */
 export const EXPORT_FORMAT = 1;
@@ -170,8 +171,9 @@ export async function collectData(deps) {
   for (const c of await profile.listCertifications()) {
     const documents = [];
     for (const d of c.documents) {
-      const file = `certifications/photos/${c.id}-${d.side}.jpg`;
-      documents.push({ side: d.side, mime: d.mime, size: d.size, file });
+      // A page of a medical certificate is `<id>-page-2.jpg`; a PDF keeps its extension (task 2026-11-19-309).
+      const file = `certifications/photos/${c.id}-${d.side}${d.page ? `-${d.page}` : ''}.${fileExtension(d.mime)}`;
+      documents.push({ side: d.side, ...(d.page ? { page: d.page } : {}), mime: d.mime, size: d.size, file });
       out.push({
         path: `opendives/${file}`,
         area: 'certificationPhotos',

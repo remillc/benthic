@@ -979,8 +979,8 @@
     }
 
     .od-plus--price-amount {
-      font-size: 40px;
-      line-height: 48px;
+      font-size: 32px;
+      line-height: 40px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }

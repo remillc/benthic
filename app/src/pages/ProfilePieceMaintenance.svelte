@@ -53,7 +53,7 @@
   }
 
   /** The suggestions of the type that have no reminder yet: the first of them is offered as the next one to add. */
-  const free = $derived(suggestionsFor(piece?.type ?? '').filter((s) => !all.some((e) => e.item.task === s.task && e.active)));
+  const free = $derived(suggestionsFor(piece?.type ?? '', piece?.details ?? {}).filter((s) => !all.some((e) => e.item.task === s.task && e.active)));
   const next = $derived(free[0]);
 
   /** The history of all the piece's reminders, latest first. */

@@ -1,4 +1,224 @@
 {
+  "docs": {
+    "title": "Certifications and documents",
+    "sections": {
+      "certs": "Certifications",
+      "health": "Insurance and health",
+      "others": "Other documents",
+      "expired": "Expired"
+    },
+    "add": "Add",
+    "note": "Cards are reproduced from your photos or scans. Without a photo, the app draws one with the details entered.",
+    "empty": "No documents",
+    "emptyText": "Add your certifications, your insurance and your medical certificate: they stay encrypted and available without a network.",
+    "back": "Back",
+    "kind": {
+      "certification": "Certification",
+      "insurance": "Insurance",
+      "medical": "Medical",
+      "other": "Document"
+    },
+    "choose": {
+      "title": "Add",
+      "certification": {
+        "title": "Certification",
+        "text": "A certification card, scanned front and back"
+      },
+      "insurance": {
+        "title": "Diving insurance",
+        "text": "Insurer, policy, emergency phone, expiry"
+      },
+      "medical": {
+        "title": "Medical certificate",
+        "text": "One or more pages, with its expiry date"
+      },
+      "other": {
+        "title": "Other document",
+        "text": "Club card, medical questionnaire, licence…"
+      }
+    },
+    "badge": {
+      "today": "Expires today",
+      "tomorrow": "Expires tomorrow",
+      "inDays": {
+        "one": "Expires in {n} day",
+        "other": "Expires in {n} days"
+      },
+      "inMonths": {
+        "one": "In {n} month",
+        "other": "In {n} months"
+      },
+      "inYears": {
+        "one": "In {n} year",
+        "other": "In {n} years"
+      },
+      "expiredDays": {
+        "one": "Expired {n} day ago",
+        "other": "Expired {n} days ago"
+      },
+      "expiredMonths": {
+        "one": "Expired {n} month ago",
+        "other": "Expired {n} months ago"
+      },
+      "expiredYears": {
+        "one": "Expired {n} year ago",
+        "other": "Expired {n} years ago"
+      }
+    },
+    "expiresOn": "Expires on {date}",
+    "expiredOn": "Expired on {date}",
+    "reminderSent": "Reminder received on {date}.",
+    "reminderComing": "Reminder on {date}.",
+    "bannerLine": "On {date}. {reminder}",
+    "insurance": {
+      "title": "Insurance",
+      "titlePlan": "{insurer}, {plan} plan",
+      "new": "New insurance",
+      "edit": "Edit insurance",
+      "scanned": "Card scanned. The fields were read from the card: check them.",
+      "scan": "Scan the card",
+      "scanAgain": "Scan again",
+      "pdf": "Add a PDF",
+      "fileKept": "PDF file added",
+      "removeFile": "Remove",
+      "insurer": "Insurer",
+      "plan": "Plan (optional)",
+      "policy": "Policy number",
+      "phone": "Emergency phone",
+      "phoneHint": "The number to call after a diving accident.",
+      "phoneInvalid": "Enter the number with its country code, like +1 919 684-9111",
+      "startsOn": "Start",
+      "expiresOn": "Expiry",
+      "notify": "Notify me before it expires",
+      "notes": "Notes (optional)",
+      "notesHint": "For example, covers technical diving",
+      "policyLine": "Policy {number}",
+      "emergency": "Emergency {phone}"
+    },
+    "medical": {
+      "title": "Medical certificate",
+      "new": "New certificate",
+      "edit": "Edit certificate",
+      "doctor": "Doctor",
+      "doctorHint": "For example, Dr Hélène Lafleur",
+      "date": "Date",
+      "expiresOn": "Expiry",
+      "pages": "Pages",
+      "page": "Page {n}",
+      "pagesCount": {
+        "one": "{n} page",
+        "other": "{n} pages"
+      },
+      "addPage": "Add a page",
+      "scanPage": "Scan a page",
+      "removePage": "Remove page {n}",
+      "notify": "Notify me before it expires",
+      "notes": "Notes (optional)",
+      "notesHint": "For example, fit to dive with a cylinder",
+      "reminder": "Reminder",
+      "reminderValue": "{n} days before"
+    },
+    "other": {
+      "title": "Other document",
+      "new": "New document",
+      "edit": "Edit document",
+      "name": "Document name",
+      "nameHint": "For example, club card",
+      "expiresOn": "Expiry (optional)",
+      "notes": "Notes (optional)",
+      "notesHint": "For example, member no. 2231, 2026 season",
+      "notifyHint": "How long before"
+    },
+    "sheet": {
+      "details": "Details",
+      "insurer": "Insurer",
+      "plan": "Plan",
+      "policy": "Policy number",
+      "phone": "Emergency phone",
+      "startsOn": "Start",
+      "expiresOn": "Expiry",
+      "reminder": "Reminder",
+      "notes": "Notes",
+      "call": "Call",
+      "fullscreen": "Full screen",
+      "pageFull": "Show page {n} full screen",
+      "pdfFile": "PDF file",
+      "openPdf": "Open the PDF",
+      "noFile": "No photo or file"
+    },
+    "share": {
+      "title": "Share the document",
+      "text": "For example, to send it to a centre before a trip.",
+      "images": "As images",
+      "imagesText": "One image per page",
+      "pdf": "As a PDF",
+      "pdfText": "One file, every page",
+      "cancel": "Cancel",
+      "failed": "The document could not be shared.",
+      "menu": "Share"
+    },
+    "full": {
+      "hint": "Brightness at maximum · Tap the card to see the back",
+      "hintOne": "Brightness at maximum",
+      "close": "Close"
+    },
+    "delete": {
+      "menu": "Delete the document",
+      "title": "Delete this document?",
+      "text": "The document and its photos are deleted from this device and from your account.",
+      "action": "Delete",
+      "cancel": "Cancel",
+      "done": "Document deleted"
+    },
+    "saved": "Document saved",
+    "saveFailed": "The document could not be saved.",
+    "fileFailed": "The file could not be read.",
+    "notFound": "This document no longer exists.",
+    "close": "Close",
+    "save": "Save",
+    "readOnly": "Read only: the OpenDives+ subscription has ended.",
+    "errors": {
+      "required": "Required.",
+      "date": "Enter a real date.",
+      "future": "The date is in the future.",
+      "order": "The expiry is before the start."
+    },
+    "notifyChoice": {
+      "weeks2": "2 weeks",
+      "days": "{n} days"
+    },
+    "notify": {
+      "title": {
+        "one": "{name}: expires in {n} day",
+        "other": "{name}: expires in {n} days"
+      },
+      "titleToday": "{name}: expires today",
+      "body": {
+        "medical": "It expires on {date}. Book an appointment with your doctor.",
+        "insurance": "Your policy expires on {date}.",
+        "other": "It expires on {date}."
+      },
+      "view": "View",
+      "addNew": "Add the new one",
+      "snooze": "Remind me in 2 weeks",
+      "insurance": "{insurer} insurance",
+      "channel": "Documents",
+      "channelText": "An insurance, a medical certificate or another document expiring"
+    },
+    "line": {
+      "certs": {
+        "one": "{n} certification",
+        "other": "{n} certifications"
+      },
+      "insurance": "insurance",
+      "medical": "medical certificate",
+      "others": {
+        "one": "{n} other document",
+        "other": "{n} other documents"
+      },
+      "none": "No documents"
+    }
+  },
   "searchField": {
     "clear": "Clear search"
   },
@@ -518,6 +738,8 @@
   },
   "settings": {
     "notifications": {
+      "documents": "Document expiry",
+      "documentsText": "Insurance, medical certificate and other documents that have an expiry date. The lead time is set in each document.",
       "maintenance": "Maintenance reminders",
       "maintenanceText": "A notification when a piece nears its date or its number of dives.",
       "leadDays": "Default lead time",
@@ -540,6 +762,7 @@
     "defaults": "Default values",
     "defaultValue": "Default {value}",
     "groups": {
+      "notifyDocuments": "Certifications and documents",
       "notifyDive": "After the dive",
       "notifyMaintenance": "Equipment maintenance",
       "language": "Language and formats",
@@ -2895,7 +3118,11 @@
       "On Windows, “Edit dive” and the quick entry now save every site: some sites (more than half of them) could not be found when saving.",
       "Account: choosing “Subscriber” in the development menu (or any OpenDives+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”.",
       "Download: a lamp or a scale whose name starts with “S1” (“S19 A69C LE”) is no longer offered as an Oceans S1. Each device in the nearby list has a menu with “This is not a dive computer”, which hides it for good (Undo in the message); Settings › Download lists the hidden devices with “Show again”.",
-      "Android: the Back key works while a message such as “Dive saved / Undo” is on screen; it was ignored until the message disappeared."
+      "Android: the Back key works while a message such as “Dive saved / Undo” is on screen; it was ignored until the message disappeared.",
+      "Equipment: « New piece » offers 16 types (mask, fins, scooter, camera, surface marker buoy, surface float and knife are added) and shows only the fields of the chosen type; only the type is required. A cylinder keeps its type (volume and working pressure come from Settings › Equipment), material, valve, serial number, « O₂ clean », last visual inspection and last hydrostatic test; a suit, its type, thickness, size and material. The BCD is now called « Vest » (« Veste » in French) everywhere. Reminders suggested: regulator every 2 years or 100 dives, cylinder (inspection every year, hydrostatic test every 5 years), vest every year, drysuit seals every year.",
+      "Certifications and documents: « Certifications » becomes « Certifications and documents »: certifications, diving insurance (card scanned and read on the device, or a PDF), a medical certificate of several pages and other documents, each with a reproduction of the card and an expiry badge. A document opens full screen at maximum brightness and is shared as images or as a PDF. A certification can be marked « Instructor certification ».",
+      "Notifications: Settings › Notifications has a « Certifications and documents » section with « Document expiry ». The notification comes at the lead time chosen in each document (2 weeks, 30 days or 60 days) and on the day it expires.",
+      "OpenDives+ offer: the price is a little smaller, and the « Service reminders » tile mentions the regulator, the cylinder and the vest."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5229,7 +5456,7 @@
       "certifications": "Certifications",
       "certificationsText": "Your cards, always with you.",
       "maintenance": "Service reminders",
-      "maintenanceText": "Regulator, cylinder, battery: notified 30 days before they are due.",
+      "maintenanceText": "Regulator, cylinder, vest: notified 30 days before they are due.",
       "price": "US $14.99",
       "per": "a year",
       "priceDetail": "that is $1.25 a month",
@@ -5410,6 +5637,94 @@
     "failed": "The logbook could not be created. Nothing was lost on this device."
   },
   "gear": {
+    "field": {
+      "serialSecond": "Second stage serial number",
+      "connection": "Connection",
+      "secondStages": "Number of second stages",
+      "nitrox": "Nitrox compatible",
+      "coldWater": "Cold water",
+      "suitType": "Type",
+      "thickness": "Thickness",
+      "size": "Size",
+      "material": "Material",
+      "bcdType": "Type of vest",
+      "lift": "Lift",
+      "weightCapacity": "Integrated weight",
+      "lumens": "Output (lumens)",
+      "battery": "Battery",
+      "burnTime": "Burn time",
+      "weightsType": "Type",
+      "corrective": "Corrective lenses",
+      "finType": "Type",
+      "speed": "Speed",
+      "housingDepth": "Housing depth rating",
+      "colour": "Colour",
+      "typeName": "Type of piece",
+      "cylinderType": "Cylinder type",
+      "valve": "Valve",
+      "o2Clean": "O₂ clean",
+      "lastInspection": "Last visual inspection",
+      "lastHydro": "Last hydrostatic test"
+    },
+    "fieldHint": {
+      "nitrox": "Prepared for an oxygen-rich mix",
+      "coldWater": "Protected against freezing",
+      "thickness": "For example, 5 mm",
+      "lift": "For example, 14 kg",
+      "weightCapacity": "Weight the vest can carry, for example 8 kg",
+      "battery": "For example, 12 Ah lithium pack",
+      "burnTime": "For example, 3 h at full power",
+      "corrective": "The mask has lenses for your sight",
+      "speed": "For example, 2.5 km/h",
+      "housingDepth": "For example, 60 m",
+      "typeName": "For example, repair kit",
+      "o2Clean": "Prepared for pure oxygen or rich nitrox",
+      "lastHydro": "The date stamped on the cylinder, like 03/22.",
+      "cylinderType": "Volume and working pressure come from the type. Types are managed in Settings › Equipment.",
+      "datePlaceholder": "dd mmm yyyy"
+    },
+    "fieldOption": {
+      "none": "None",
+      "connection": {
+        "din": "DIN",
+        "yoke": "Yoke"
+      },
+      "valve": {
+        "din": "DIN",
+        "yoke": "Yoke"
+      },
+      "suitType": {
+        "wet": "Wet",
+        "semi": "Semi-dry",
+        "dry": "Dry"
+      },
+      "material": {
+        "neoprene": "Neoprene",
+        "compressed": "Compressed neoprene",
+        "trilaminate": "Trilaminate",
+        "other": "Other",
+        "aluminium": "Aluminium",
+        "steel": "Steel"
+      },
+      "bcdType": {
+        "jacket": "Jacket",
+        "wing": "Wing",
+        "sidemount": "Side-mount"
+      },
+      "weightsType": {
+        "shot": "Shot",
+        "pockets": "Pockets",
+        "harness": "Harness"
+      },
+      "finType": {
+        "boot": "Full foot",
+        "adjustable": "Adjustable"
+      }
+    },
+    "fieldError": {
+      "number": "Enter a whole number",
+      "stamp": "Enter the month and the year, like 03/22"
+    },
     "forever": {
       "button": "Delete for good",
       "title": "Delete for good?",
@@ -5455,7 +5770,7 @@
       "keep": "What you keep here",
       "kept": "Kept on this phone, even without a network.",
       "equipment": "Equipment",
-      "certifications": "Certifications",
+      "certifications": "Certifications and documents",
       "information": "Information",
       "later": "Not available yet",
       "noPiece": "No piece yet",
@@ -5491,6 +5806,13 @@
         "other": "Other"
       },
       "typePlural": {
+        "mask": "Masks",
+        "fins": "Fins",
+        "scooter": "Scooters",
+        "camera": "Cameras",
+        "dsmb": "Surface marker buoys",
+        "floatBuoy": "Surface floats",
+        "knife": "Knives",
         "regulator": "Regulators",
         "suit": "Suits",
         "undersuit": "Undersuits",
@@ -5501,6 +5823,13 @@
         "weights": "Weight belts"
       },
       "type": {
+        "mask": "Mask",
+        "fins": "Fins",
+        "scooter": "Scooter",
+        "camera": "Camera",
+        "dsmb": "Surface marker buoy",
+        "floatBuoy": "Surface float",
+        "knife": "Knife",
         "computer": "Dive computer",
         "regulator": "Regulator",
         "suit": "Suit",
@@ -5587,6 +5916,7 @@
       "duplicated": "Kit duplicated"
     },
     "piece": {
+      "yes": "Yes",
       "image": "Image of the model",
       "back": "Back",
       "edit": "Edit",
@@ -5631,6 +5961,7 @@
       "added": "{name} added to your equipment"
     },
     "pieceEdit": {
+      "serialOptional": "Serial number (optional)",
       "addTitle": "New piece",
       "editTitle": "Edit the piece",
       "close": "Close",
@@ -5698,8 +6029,18 @@
       "noResults": "No piece matches"
     },
     "pieceNew": {
+      "serialHint_suit": "On the label of drysuits",
+      "serialHint_cylinder": "The number stamped on the cylinder",
+      "cylinderNameHint": "For example, yellow AL80",
       "typeTitle": "Type of piece",
       "tile": {
+        "mask": "Mask",
+        "fins": "Fins",
+        "scooter": "Scooter",
+        "camera": "Camera",
+        "dsmb": "Surface marker buoy",
+        "floatBuoy": "Surface float",
+        "knife": "Knife",
         "computer": "Computer",
         "regulator": "Regulator",
         "suit": "Suit",
@@ -5937,7 +6278,9 @@
       "failed": "The reminder could not be saved"
     },
     "reminderCard": {
-      "title": "Service reminder",
+      "title": "Maintenance reminders",
+      "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
+      "suggestDrysuit": "Suggested for a drysuit: the seals, every year",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
         "regulator": "Suggested for a regulator: {rule}",
@@ -6028,6 +6371,8 @@
       "back": "Back"
     },
     "cert": {
+      "instructorCert": "Instructor certification",
+      "instructorCertText": "Your name and this number are added when you confirm another diver’s dive.",
       "new": "New certification",
       "edit": "Edit certification",
       "save": "Save",
