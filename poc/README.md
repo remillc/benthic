@@ -1,6 +1,6 @@
 # Proof of concept: the Subsurface core without Qt
 
-**Goal:** check that OpenDives can reuse Subsurface's business code as is, without changing a single line, to read and write the dive log in the Subsurface cloud git format.
+**Goal:** check that Benthic can reuse Subsurface's business code as is, without changing a single line, to read and write the dive log in the Subsurface cloud git format.
 
 **Result (5 November 2026):** the core builds and the round-trip test passes on 97 of Subsurface's 98 sample logs.
 
@@ -8,7 +8,7 @@
 
 - **Subsurface** at commit `258beb4` (4 November 2026). 72 files from `core/`, including `load-git`, `save-git`, `git-access`, `parse-xml`, `save-xml`, `filterconstraint` and `fulltext`. No modifications.
 - **libdivecomputer**, Subsurface-NG version at commit `617ffd7`, the one Subsurface pins itself. Built as a static library, without USB or Bluetooth: transports will be provided by the Capacitor layer.
-- **`core/compat/`**: everything OpenDives adds.
+- **`core/compat/`**: everything Benthic adds.
   - `qtshim/`: fake Qt headers (`QString`, `QDateTime`, `QRegularExpression`…) in standard C++. They cover only what the core uses. Internal storage is UTF-32, and only the "C" locale is supported.
   - `shadow/commands/command.h`: it replaces the header of the Qt undo stack, which `save-git.cpp` includes to write the commit message.
   - `qthelper_compat.cpp`: it rewrites the functions of `qthelper.cpp`, `string-format.cpp`, `metadata.cpp`, etc.
@@ -110,10 +110,10 @@ The repositories `A[main]`, `B[main]`, etc. are local git repositories: this tes
 **What we learned:**
 
 - **Log settings:** the units and preferences of `00-Subsurface` are read into `git_prefs`, but `save-git` writes `prefs`. Subsurface-mobile copies them over after every load. Without this step, now in `apply_log_prefs()`, the first save would have replaced `units PERSONALIZE FEET CUFT PSI CELSIUS LBS MINUTES` with `units METRIC`. **The app must call `apply_log_prefs()` after every load.**
-- **Simultaneous events:** two events at the same instant with the same name are considered equal (`divecomputer.cpp:337`). Since `add_event_to_dc()` inserts with `lower_bound`, their order is reversed on every load, and therefore on every save. Two dives of the account have two `gaschange` events at 0:10. Nothing is lost, but their file changes on every save, in Subsurface as in OpenDives. This finding comes from reading the code, without checking with the Subsurface application.
+- **Simultaneous events:** two events at the same instant with the same name are considered equal (`divecomputer.cpp:337`). Since `add_event_to_dc()` inserts with `lower_bound`, their order is reversed on every load, and therefore on every save. Two dives of the account have two `gaschange` events at 0:10. Nothing is lost, but their file changes on every save, in Subsurface as in Benthic. This finding comes from reading the code, without checking with the Subsurface application.
 - **Subsurface bug, `git-access.cpp:52`:** `includes_string_caseinsensitive()` returns true as soon as the first characters **differ**. Almost any clone failure is then treated as "branch missing on the server". The core creates a repository with an empty commit, "Initial commit to create empty repo.", then attempts a sync.
   - If the branch exists on the server, there is no common ancestor: nothing is pushed, and the cache is set aside.
-  - Hence the prior probe in OpenDives.
+  - Hence the prior probe in Benthic.
   - To be reported to Subsurface once there is a contact.
 - **Certificates:** `certificate_check_cb()` accepts any X.509 certificate for the cloud servers. Subsurface relies on `canReachCloudServer()` having validated TLS just before. Our port does validate the certificate, but the git connection itself remains without validation, as in Subsurface.
 - **WSL:** libgit2 cannot `mmap` on a Windows drive (`/mnt/c`, `/mnt/f`): "failed to mmap. Could not write data". The test's working directory must be on the WSL file system.

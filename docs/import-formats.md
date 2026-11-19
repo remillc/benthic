@@ -1,6 +1,6 @@
 # Import formats
 
-What OpenDives reads when a file is opened with « + › Importer un fichier » (task 2026-11-16-221, for the website's selling points, to-do #80). Every line below was checked with real files: the sample files of Subsurface's `third_party/subsurface/dives/` (pinned commit `258beb44`), through the façade's `import_dives()`.
+What Benthic reads when a file is opened with « + › Importer un fichier » (task 2026-11-16-221, for the website's selling points, to-do #80). Every line below was checked with real files: the sample files of Subsurface's `third_party/subsurface/dives/` (pinned commit `258beb44`), through the façade's `import_dives()`.
 
 ## How it was checked
 

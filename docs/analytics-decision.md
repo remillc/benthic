@@ -1,6 +1,6 @@
 # Analytics in the app (to-do #1): paused
 
-**Decision, 9 November 2026 (Christian):** to-do #1 is on pause. For now, OpenDives relies on the statistics of the stores (Google Play Console, App Store Connect). The app measures nothing and sends nothing about its use. The privacy policy stays as it is ("no audience measurement, no tracker").
+**Decision, 9 November 2026 (Christian):** to-do #1 is on pause. For now, Benthic relies on the statistics of the stores (Google Play Console, App Store Connect). The app measures nothing and sends nothing about its use. The privacy policy stays as it is ("no audience measurement, no tracker").
 
 Read this before restarting to-do #1.
 

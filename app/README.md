@@ -49,7 +49,7 @@ The libraries already contain all dependencies, except the system zlib. No relea
 
 ## Worth knowing for later
 
-- **Commit author:** commits are signed "Subsurface", the core's default behaviour, whereas the architecture calls for "OpenDives". Nothing is set up for this yet.
+- **Commit author:** commits are signed "Subsurface", the core's default behaviour, whereas the architecture calls for "Benthic". Nothing is set up for this yet.
 - **Error message on save:** the core writes `origin lookup failed` for a repository without a remote, and the save still succeeds. Local mode will have to avoid showing this message.
 - **`HEAD` branch:** `git_create_local_repo` leaves `HEAD` on `master`, with no commit, whereas the data is on `main`. This is Subsurface's code, and the core does read `main`.
 - **Trips on screen:** the file declares 4, but it also enables automatic grouping. `listDives` therefore returns 6, with 5 different names, because two isolated dives each form an automatic trip. The location "Hoodsport" appears twice, because these are two separate trips.
@@ -156,7 +156,7 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 - **Previous page still readable:** Framework7 keeps the previous page in the document, and TalkBack could go there. It now gets `inert`.
 - **Back link:** in MD3, Framework7 hides its text, and it was read "#". It is replaced by a link named "back to the logbook" (« Retour au carnet » in French).
 - **Android Back key:** it closed the application. It is now wired to the router.
-- **Transient Capacitor error:** "Cannot read properties of undefined (reading 'triggerEvent')" appears once, on the first launch after a reinstall. It comes from Capacitor, not from OpenDives.
+- **Transient Capacitor error:** "Cannot read properties of undefined (reading 'triggerEvent')" appears once, on the first launch after a reinstall. It comes from Capacitor, not from Benthic.
 
 **Languages (rule of 5 November 2026):**
 
@@ -256,7 +256,7 @@ Checked on the Pixel with the cloud log (1,353 dives).
 
 ## Start-up time (6 November 2026)
 
-Measured on the emulator (1,353 dives), cold starts after `am force-stop`; times in ms from the process start, medians of 9 to 10 runs. The WebView logs `[perf] name ms` marks (`src/lib/perf.js`, tag Capacitor/Console, ms since the navigation started; only with `VITE_SHOW_PERF=1` in `app/.env.local`) and the plugin logs `perf:` lines (tag OpenDives).
+Measured on the emulator (1,353 dives), cold starts after `am force-stop`; times in ms from the process start, medians of 9 to 10 runs. The WebView logs `[perf] name ms` marks (`src/lib/perf.js`, tag Capacitor/Console, ms since the navigation started; only with `VITE_SHOW_PERF=1` in `app/.env.local`) and the plugin logs `perf:` lines (tag Benthic).
 
 | | before | after |
 | --- | --- | --- |

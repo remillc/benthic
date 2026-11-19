@@ -21,7 +21,7 @@
   <div class="od-first-launch-panel--hatch" aria-hidden="true"></div>
   <div class="od-first-launch-panel--brand" role="img" aria-label={t('welcome.brandAlpha')}>
     <img class="od-first-launch-panel--logo" src="logo-light.svg" alt="" width="96" height="96" />
-    <span class="od-first-launch-panel--name" aria-hidden="true">OpenDives</span>
+    <span class="od-first-launch-panel--name" aria-hidden="true">Benthic</span>
     <span class="od-first-launch-panel--alpha" aria-hidden="true">{t('welcome.alpha')}</span>
   </div>
   <h1 class="od-first-launch-panel--title">{t('firstLaunch.bandHeadline')}</h1>

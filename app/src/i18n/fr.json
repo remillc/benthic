@@ -176,7 +176,7 @@
     "notFound": "Ce document n’existe plus.",
     "close": "Fermer",
     "save": "Enregistrer",
-    "readOnly": "Lecture seule : l’abonnement OpenDives+ est terminé.",
+    "readOnly": "Lecture seule : l’abonnement Benthic+ est terminé.",
     "errors": {
       "required": "À remplir.",
       "date": "Saisissez une date réelle.",
@@ -378,7 +378,7 @@
     "emptyLocal": "Sur ce téléphone · aucune plongée",
     "emptyLocalTablet": "Sur cette tablette · aucune plongée",
     "emptyLocalDesktop": "Sur cet ordinateur · aucune plongée",
-    "emptyServer": "Connecté au serveur OpenDives, aucune plongée"
+    "emptyServer": "Connecté au serveur Benthic, aucune plongée"
   },
   "sync": {
     "failure": {
@@ -411,10 +411,10 @@
         "rowManualGit": "Le dépôt git ne répond pas",
         "titleGit": "Le dépôt git ne répond pas",
         "introGit": "Le réseau fonctionne, mais le serveur du dépôt ne répond pas. Il est peut-être en maintenance.",
-        "rowServer": "Le serveur OpenDives ne répond pas : nouvel essai dans {n} min",
-        "rowManualServer": "Le serveur OpenDives ne répond pas",
-        "titleServer": "Le serveur OpenDives ne répond pas",
-        "introServer": "Le réseau fonctionne, mais le serveur OpenDives ne répond pas. Il est peut-être en maintenance."
+        "rowServer": "Le serveur Benthic ne répond pas : nouvel essai dans {n} min",
+        "rowManualServer": "Le serveur Benthic ne répond pas",
+        "titleServer": "Le serveur Benthic ne répond pas",
+        "introServer": "Le réseau fonctionne, mais le serveur Benthic ne répond pas. Il est peut-être en maintenance."
       },
       "repository": {
         "row": "Synchro impossible : dépôt git refusé",
@@ -431,7 +431,7 @@
       "send": "Envoi des modifications…",
       "read": "Lecture du carnet…",
       "connectGit": "Connexion au dépôt…",
-      "connectServer": "Connexion au serveur OpenDives…"
+      "connectServer": "Connexion au serveur Benthic…"
     },
     "outcome": {
       "done": "Synchronisation terminée",
@@ -452,8 +452,8 @@
     },
     "syncingGit": "Synchronisation avec le dépôt git…",
     "cloudGit": "Synchronisé avec le dépôt git",
-    "syncingServer": "Synchronisation avec le serveur OpenDives…",
-    "cloudServer": "Synchronisé avec le serveur OpenDives"
+    "syncingServer": "Synchronisation avec le serveur Benthic…",
+    "cloudServer": "Synchronisé avec le serveur Benthic"
   },
   "dive": {
     "siteNotSet": "Site à préciser",
@@ -1205,7 +1205,7 @@
   },
   "menu": {
     "open": "Menu",
-    "title": "OpenDives",
+    "title": "Benthic",
     "sections": "Sections",
     "noAccount": "Sans compte",
     "cloudDives": {
@@ -1222,18 +1222,18 @@
       "other": "Dépôt · {n} plongées"
     },
     "serverDives": {
-      "one": "Serveur OpenDives · {n} plongée",
-      "other": "Serveur OpenDives · {n} plongées"
+      "one": "Serveur Benthic · {n} plongée",
+      "other": "Serveur Benthic · {n} plongées"
     }
   },
   "backup": {
-    "notOnServer": {"title": "Carnet pas encore sur le serveur", "line": "Les versions sont conservées sur le serveur OpenDives. Ce carnet n’est que sur cet appareil.", "send": "Envoyer le carnet au serveur"},
+    "notOnServer": {"title": "Carnet pas encore sur le serveur", "line": "Les versions sont conservées sur le serveur Benthic. Ce carnet n’est que sur cet appareil.", "send": "Envoyer le carnet au serveur"},
     "title": "Sauvegarde et restauration",
     "media": "Les photos et vidéos supprimées sont gardées 90 jours, puis effacées.",
     "status": {
       "saved": "Carnet sauvegardé",
-      "savedLine": "{when}, chiffré sur le serveur OpenDives",
-      "neverLine": "Pas encore envoyé au serveur OpenDives",
+      "savedLine": "{when}, chiffré sur le serveur Benthic",
+      "neverLine": "Pas encore envoyé au serveur Benthic",
       "pending": {
         "one": "{n} modification en attente d’envoi",
         "other": "{n} modifications en attente d’envoi"
@@ -1510,8 +1510,8 @@
     "gitEditText": "Adresse, branche et jeton",
     "gitSignOut": "Se déconnecter du dépôt",
     "gitSignOutText": "Vos plongées restent dans le dépôt. Le jeton est effacé de cet appareil.",
-    "bandServer": "Votre carnet sur le serveur OpenDives",
-    "serverName": "Serveur OpenDives",
+    "bandServer": "Votre carnet sur le serveur Benthic",
+    "serverName": "Serveur Benthic",
     "serverDives": "Plongées sur le serveur",
     "serverSignOut": "Se déconnecter du serveur",
     "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
@@ -1524,12 +1524,12 @@
     "sheet": {
       "backup": "Sauvegarde et restauration",
       "backupText": "Revenir à une version du carnet ou d’une plongée",
-      "plusDives": {"one": "OpenDives+ · {n} plongée", "other": "OpenDives+ · {n} plongées"},
+      "plusDives": {"one": "Benthic+ · {n} plongée", "other": "Benthic+ · {n} plongées"},
       "gitTitle": "Dépôt git personnel",
       "gitLine": {"one":"{repository} · {n} plongée","other":"{repository} · {n} plongées"},
       "changeRepository": "Changer de dépôt",
       "backupTextGit": "Selon l’historique de votre dépôt git",
-      "upgradeTitle": "Passer à OpenDives+",
+      "upgradeTitle": "Passer à Benthic+",
       "upgradeText": "Votre profil de plongeur, l’équipement et la synchro avec le téléphone",
       "upgradeAction": "Découvrir",
       "maintenanceLate": {
@@ -1576,9 +1576,9 @@
     }
   },
   "welcome": {
-    "title": "OpenDives",
+    "title": "Benthic",
     "alpha": "Alpha",
-    "brandAlpha": "OpenDives, alpha",
+    "brandAlpha": "Benthic, alpha",
     "noAccount": "Commencer sans compte",
     "choicesLabel": "Façons de commencer",
     "ownGit": "Utiliser mon propre dépôt git",
@@ -1611,9 +1611,9 @@
     }
   },
   "serverSteps": {
-    "rowTitle": "Sur le serveur OpenDives",
-    "openHelp": "Avec votre compte OpenDives.",
-    "accountTitle": "Votre compte OpenDives",
+    "rowTitle": "Sur le serveur Benthic",
+    "openHelp": "Avec votre compte Benthic.",
+    "accountTitle": "Votre compte Benthic",
     "accountHelp": "Entrez votre adresse courriel : un code vous y est envoyé. Pas de mot de passe à retenir.",
     "emailLabel": "Adresse courriel",
     "emailHelp": "Sans compte à cette adresse, il est créé avec le code.",
@@ -1649,10 +1649,10 @@
     "progressCopyIphone": "Copie du carnet sur cet iPhone",
     "progressCopyDesktop": "Copie du carnet sur cet ordinateur",
     "progressHelp": "Gardez l’app ouverte jusqu’à la fin. Ensuite, votre carnet s’ouvre, et il reste consultable sans réseau.",
-    "downloaded": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur cette tablette, même sans réseau.",
-    "downloadedPhone": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur ce téléphone, même sans réseau.",
-    "downloadedIphone": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur cet iPhone, même sans réseau.",
-    "downloadedDesktop": "Carnet téléchargé depuis le serveur OpenDives. Il reste sur cet ordinateur, même sans réseau.",
+    "downloaded": "Carnet téléchargé depuis le serveur Benthic. Il reste sur cette tablette, même sans réseau.",
+    "downloadedPhone": "Carnet téléchargé depuis le serveur Benthic. Il reste sur ce téléphone, même sans réseau.",
+    "downloadedIphone": "Carnet téléchargé depuis le serveur Benthic. Il reste sur cet iPhone, même sans réseau.",
+    "downloadedDesktop": "Carnet téléchargé depuis le serveur Benthic. Il reste sur cet ordinateur, même sans réseau.",
     "refusedTitle": "Le serveur a refusé cet accès",
     "refusedDetail": "Connectez-vous de nouveau pour obtenir un nouvel accès. Rien n’a été modifié.",
     "backHome": "Revenir à l’accueil"
@@ -1663,7 +1663,7 @@
     "createHelp": "Vous choisirez ensuite où le garder.",
     "importTitle": "Importer un carnet",
     "importHelp": "Un fichier .ssrf, .xml, UDDF ou FIT, ou votre compte divelogs.de.",
-    "openTitle": "Ouvrir mon carnet OpenDives",
+    "openTitle": "Ouvrir mon carnet Benthic",
     "openHelp": "Il est déjà dans votre nuage ou dans un dépôt git.",
     "back": "Retour",
     "newTitle": "Nouveau carnet",
@@ -1686,7 +1686,7 @@
     "deviceHelpIphone": "Aucun compte requis. Vous ne pourrez l’ouvrir que sur cet iPhone.",
     "renameLabel": "Renommer le carnet",
     "serviceTitle": "Choisissez votre service",
-    "serviceHelp": "Le carnet est créé dans un dossier OpenDives de votre compte.",
+    "serviceHelp": "Le carnet est créé dans un dossier Benthic de votre compte.",
     "icloud": "iCloud Drive",
     "icloudHelp": "Le compte Apple de cet iPhone, sans connexion à faire.",
     "icloudAccountIphone": "Compte Apple de cet iPhone",
@@ -1700,8 +1700,8 @@
     "connectTitle": "Connexion à {service}",
     "notConnected": "Pas encore connecté",
     "connect": "Se connecter à {service}",
-    "appName": "OpenDives",
-    "connectedCreate": "« {file} » sera créé dans le dossier OpenDives de ce compte.",
+    "appName": "Benthic",
+    "connectedCreate": "« {file} » sera créé dans le dossier Benthic de ce compte.",
     "changeAccount": "Changer de compte",
     "createLogbook": "Créer le carnet",
     "creating": "Création…",
@@ -1728,7 +1728,7 @@
     "divelogsFormTitle": "Importer depuis divelogs.de",
     "divelogsUser": "Nom d’utilisateur",
     "divelogsPassword": "Mot de passe",
-    "credentialsNote": "OpenDives ne garde pas ces identifiants.",
+    "credentialsNote": "Benthic ne garde pas ces identifiants.",
     "importAction": "Importer",
     "progressConnect": "Connexion à divelogs.de",
     "progressAccount": "Compte « {user} »",
@@ -1750,16 +1750,16 @@
     "summaryYear": "{text}, en {year}",
     "openWhere": "Où est-il ?",
     "openService": "Dans quel service ?",
-    "openConnectedHelp": "OpenDives cherchera vos carnets dans le dossier OpenDives de ce compte.",
+    "openConnectedHelp": "Benthic cherchera vos carnets dans le dossier Benthic de ce compte.",
     "seeLogbooks": "Voir mes carnets",
     "chooseTitle": "Choisissez votre carnet",
-    "chooseHelp": "Dans le dossier OpenDives de {account}, sur {service}.",
+    "chooseHelp": "Dans le dossier Benthic de {account}, sur {service}.",
     "foundLogbook": {
       "one": "{n} plongée · modifié le {date}",
       "other": "{n} plongées · modifié le {date}"
     },
     "openLogbook": "Ouvrir le carnet",
-    "gitEmptyOpen": "Ce dépôt ne contient pas de carnet OpenDives.",
+    "gitEmptyOpen": "Ce dépôt ne contient pas de carnet Benthic.",
     "gitBranchMissing": "Cette branche n’existe pas dans le dépôt.",
     "keptGit": "Dépôt git",
     "keptCloud": "Nuage",
@@ -1785,7 +1785,7 @@
     "gitNotEmptyHint": "Pour l’utiliser, passez par {link}.",
     "gitEmptyOpenHint": "Pour commencer un carnet dans ce dépôt, passez par {link}.",
     "noLogbookTitle": "Aucun carnet dans ce compte",
-    "noLogbookText": "Le dossier OpenDives de ce compte est vide, ou il n’existe pas encore.",
+    "noLogbookText": "Le dossier Benthic de ce compte est vide, ou il n’existe pas encore.",
     "createHere": "Créer un carnet ici",
     "divelogsDenied": "Nom d’utilisateur ou mot de passe incorrect.",
     "interrupted": "Téléchargement interrompu",
@@ -1804,13 +1804,13 @@
     "cloudSoon": "Le nuage arrive dans une prochaine version.",
     "signInTitle": "Se connecter",
     "signInHelp": "Ou créer un compte.",
-    "discoverPlus": "Découvrir OpenDives+",
+    "discoverPlus": "Découvrir Benthic+",
     "importLogbook": "Importer le carnet",
     "localTitle": "Commencer un carnet sur cette tablette",
     "localTitlePhone": "Commencer un carnet sur ce téléphone",
     "localTitleIphone": "Commencer un carnet sur cet iPhone",
     "localHelp": "Gardé ici, même sans réseau.",
-    "importStartHelp": "Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.",
+    "importStartHelp": "Un fichier de Benthic ou d’une autre app, ou divelogs.de.",
     "alphaName": "Carnet précédent",
     "alphaTitle": "Carnet de la version précédente",
     "alphaHelp": {
@@ -1822,7 +1822,7 @@
       "other": "{n} plongées, dernière modification le {date}, copiées dans un nouveau carnet."
     },
     "localTitleDesktop": "Commencer un carnet sur cet ordinateur",
-    "keptServer": "Serveur OpenDives"
+    "keptServer": "Serveur Benthic"
   },
   "signOut": {
     "title": "Se déconnecter ?",
@@ -1853,7 +1853,7 @@
       "one": "{n} modification n’est pas encore envoyée au dépôt. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil.",
       "other": "{n} modifications ne sont pas encore envoyées au dépôt. Si vous vous déconnectez quand même, elles seront envoyées à votre prochaine connexion à ce dépôt, depuis cet appareil. Le jeton est effacé de cet appareil."
     },
-    "titleServer": "Se déconnecter du serveur OpenDives ?",
+    "titleServer": "Se déconnecter du serveur Benthic ?",
     "textNoneServer": "Le carnet reste sur le serveur. Une copie reste sur cet appareil, non affichée, et sert si vous vous reconnectez. L’accès est effacé de cet appareil.",
     "textPendingServer": {
       "one": "{n} modification n’est pas encore envoyée au serveur. Si vous vous déconnectez quand même, elle sera envoyée à votre prochaine connexion depuis cet appareil. L’accès est effacé de cet appareil.",
@@ -1936,7 +1936,7 @@
     "manual": "Saisir à la main",
     "nothingTitle": "Aucune pression lue sur la photo",
     "nothingText": "Rapprochez-vous, évitez les reflets ou allumez le flash. Vous pouvez aussi saisir la pression à la main.",
-    "permissionReason": "OpenDives n’utilise l’appareil photo que pour lire la pression sur un manomètre. La photo reste sur cet appareil et n’est pas conservée.",
+    "permissionReason": "Benthic n’utilise l’appareil photo que pour lire la pression sur un manomètre. La photo reste sur cet appareil et n’est pas conservée.",
     "permissionButton": "Autoriser l’appareil photo",
     "permissionDenied": "L’appareil photo n’est pas autorisé. Vous pouvez choisir une photo existante ou saisir la pression à la main.",
     "cameraFailed": "L’appareil photo ne répond pas. Vous pouvez choisir une photo existante ou saisir la pression à la main.",
@@ -1990,7 +1990,7 @@
     "redone": "Modification rétablie",
     "undoFailed": "La modification ne peut plus être annulée",
     "failed": "La modification n’a pas pu être enregistrée. Rien n’a changé.",
-    "writeLocked": "Ce compte ne peut pas encore être modifié depuis OpenDives. Rien n’a changé.",
+    "writeLocked": "Ce compte ne peut pas encore être modifié depuis Benthic. Rien n’a changé.",
     "date": "Date",
     "time": "Heure",
     "maxDepth": "Profondeur max.",
@@ -2189,8 +2189,8 @@
     "region": "Région",
     "withoutTitle": "Plongées sans site",
     "withoutIntro": {
-      "one": "{n} plongée n’a pas de site. OpenDives propose le site le plus proche quand la plongée a une position, ou le site des autres plongées du même voyage.",
-      "other": "{n} plongées n’ont pas de site. OpenDives propose le site le plus proche quand la plongée a une position, ou le site des autres plongées du même voyage."
+      "one": "{n} plongée n’a pas de site. Benthic propose le site le plus proche quand la plongée a une position, ou le site des autres plongées du même voyage.",
+      "other": "{n} plongées n’ont pas de site. Benthic propose le site le plus proche quand la plongée a une position, ou le site des autres plongées du même voyage."
     },
     "withoutMapNote": "Position enregistrée par l’ordinateur ou le téléphone. Les plongées sans position ne sont pas sur la carte.",
     "withoutMapLabel": {
@@ -2625,7 +2625,7 @@
     "usedDives": "Calculé à partir de",
     "noDives": "Aucune plongée du carnet ne compte dans ce calcul.",
     "note": "Ce calcul ne connaît que les plongées du carnet. Une plongée manquante le fausse. Votre ordinateur de plongée fait foi.",
-    "recommendation": "L’attente avant l’avion est une recommandation d’OpenDives, pas un calcul du modèle : 18 heures après plusieurs plongées dans une journée, 12 heures après une seule, ou la durée choisie dans les Réglages. Ce n’est jamais une garantie."
+    "recommendation": "L’attente avant l’avion est une recommandation de Benthic, pas un calcul du modèle : 18 heures après plusieurs plongées dans une journée, 12 heures après une seule, ou la durée choisie dans les Réglages. Ce n’est jamais une garantie."
   },
   "flight": {
     "at": "{day} à {time}",
@@ -2648,9 +2648,9 @@
     },
     "permission": {
       "title": "Être prévenu pour l’avion",
-      "text": "OpenDives peut vous envoyer une notification quand l’attente avant l’avion est terminée. Le téléphone va vous demander l’autorisation d’afficher des notifications.",
+      "text": "Benthic peut vous envoyer une notification quand l’attente avant l’avion est terminée. Le téléphone va vous demander l’autorisation d’afficher des notifications.",
       "action": "Continuer",
-      "denied": "Notifications refusées. Autorisez celles d’OpenDives dans les réglages du téléphone pour être prévenu."
+      "denied": "Notifications refusées. Autorisez celles de Benthic dans les réglages du téléphone pour être prévenu."
     }
   },
   "accountStep": {
@@ -2721,7 +2721,7 @@
     "project": "Projet",
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
-    "rate": "Évaluer OpenDives",
+    "rate": "Évaluer Benthic",
     "rateTextAndroid": "Donner une note dans Google Play",
     "rateTextIos": "Donner une note dans l’App Store",
     "rateOpensAndroid": "s’ouvre dans Google Play",
@@ -2729,32 +2729,32 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Compte (version gratuite) : le bouton Compte reste, avec une silhouette. Sa feuille montre le carnet sur cet appareil, « S’abonner », « Déjà abonné ? Se connecter » et les rangées OpenDives+ qui ouvrent l’offre. Avec un compte OpenDives+, « Mon profil de plongeur » porte la pastille OpenDives+ et, quand une pièce est en retard d’entretien, un badge rouge et la ligne « Entretien : 1 pièce en retard » ; la croix de la feuille est à droite. « Gérer le compte » ouvre un écran (une fenêtre à deux colonnes sur tablette et ordinateur) : courriel et mode de connexion, abonnement avec « Gérer dans Google Play » (ou l’App Store), espace photos et vidéos de 10 Go, « Télécharger mes données », « Se déconnecter » et « Supprimer le compte » après confirmation. Sur Android, le retour ferme la feuille du compte. L’offre OpenDives+ propose « Déjà abonné ? Se connecter » (sauf juste après une connexion), et « Continuer sans compte » est centré sous les trois boutons sur tablette et ordinateur. Le nom « OpenDives » de la feuille d’un compte OpenDives+ est suivi d’une petite pastille ronde « + ». Sur tablette, « S’abonner » et les deux lignes avec la pastille ouvrent l’offre OpenDives+ en deux volets : le panneau bleu à gauche, les cinq tuiles, le prix et « S’abonner » à droite.",
+      "Compte (version gratuite) : le bouton Compte reste, avec une silhouette. Sa feuille montre le carnet sur cet appareil, « S’abonner », « Déjà abonné ? Se connecter » et les rangées Benthic+ qui ouvrent l’offre. Avec un compte Benthic+, « Mon profil de plongeur » porte la pastille Benthic+ et, quand une pièce est en retard d’entretien, un badge rouge et la ligne « Entretien : 1 pièce en retard » ; la croix de la feuille est à droite. « Gérer le compte » ouvre un écran (une fenêtre à deux colonnes sur tablette et ordinateur) : courriel et mode de connexion, abonnement avec « Gérer dans Google Play » (ou l’App Store), espace photos et vidéos de 10 Go, « Télécharger mes données », « Se déconnecter » et « Supprimer le compte » après confirmation. Sur Android, le retour ferme la feuille du compte. L’offre Benthic+ propose « Déjà abonné ? Se connecter » (sauf juste après une connexion), et « Continuer sans compte » est centré sous les trois boutons sur tablette et ordinateur. Le nom « Benthic » de la feuille d’un compte Benthic+ est suivi d’une petite pastille ronde « + ». Sur tablette, « S’abonner » et les deux lignes avec la pastille ouvrent l’offre Benthic+ en deux volets : le panneau bleu à gauche, les cinq tuiles, le prix et « S’abonner » à droite.",
       "Carnet : la boîte de recherche remonte un peu, plus loin de la vague du bandeau.",
       "Démarrage : l'écran de lancement reste maintenant jusqu'à ce que le premier vrai écran soit dessiné (le premier lancement au tout premier démarrage, le carnet sinon), avec un court fondu, et le premier lancement n'apparaît plus après un carnet vide. Le premier écran est mis en page une seule fois, avec la vraie hauteur de la barre d'état : plus rien ne saute.",
       "« Se connecter ou créer un compte » : un peu plus d’espace entre les boutons, et « Continuer sans compte » en bleu, centré.",
       "Premiers écrans : une page ouverte pour la première fois attend maintenant ses styles avant de s'afficher, et les dessins des bandeaux bleus ont une taille fixe : plus rien ne clignote en grand à l'ouverture de l'écran de premier lancement.",
       "Carnet sur ordinateur : le tableau est plus léger. Colonnes par défaut : numéro en gras, date avec le jour de la semaine et l'heure en petit gris, site (ou « Site à préciser » en gris italique avec un repère barré), profondeur maximale en gras, durée, compagnons. La colonne « Profil » (petits graphiques de plongée) est cachée par défaut et se coche avec le bouton des colonnes ; les colonnes et largeurs que vous avez choisies sont conservées. Une ligne sous les en-têtes indique l'année et le nombre de plongées de la première plongée visible, et reste en haut pendant le défilement. Un voyage est une carte blanche qui se replie. La plongée sélectionnée est en bleu pâle, avec son numéro et son site en bleu.",
       "Premier lancement (édition publique) : si vous venez de l’alpha, « Importer un carnet » propose « Carnet de la version précédente », avec son nombre de plongées. Il copie ce carnet, lu dans la copie de l’alpha sur le téléphone, sans réseau et sans le compte de l’alpha (même si sa connexion a disparu), dans un nouveau carnet ; avec plusieurs copies, une rangée par copie indique son nombre de plongées et sa date. Les fichiers de l’alpha ne sont pas touchés et la rangée disparaît après la copie.",
-      "Édition publique : plus aucun choix pour ouvrir un carnet dans OneDrive, Google Drive ou un dépôt git personnel. « Ouvrir mon carnet » propose le serveur OpenDives, et le compte n’offre plus « Utiliser mon propre dépôt git ».",
+      "Édition publique : plus aucun choix pour ouvrir un carnet dans OneDrive, Google Drive ou un dépôt git personnel. « Ouvrir mon carnet » propose le serveur Benthic, et le compte n’offre plus « Utiliser mon propre dépôt git ».",
       "Un carnet qui était sur le cloud Subsurface n'est pas ouvert ici : après une mise à jour depuis l'alpha, l'application repart de son premier lancement et laisse les fichiers de ce carnet sur le téléphone, tels quels. La page Compte ne propose plus de se connecter au cloud Subsurface. Une plongée qui ne peut pas être lue affiche une page avec « Réessayer ».",
       "Carnet sur téléphone et sur tablette : les plongées sont groupées par année, chaque année dans une carte blanche. Chaque ligne montre la date sur un bloc bleu pâle, le site (ou « Site à préciser » avec un repère barré), le numéro en gras et l'heure, le petit profil, puis la profondeur maximale en gras et la durée, dans les unités des réglages. Un voyage est sa propre carte, avec un en-tête bleu pâle (valise, nombre de plongées, profondeurs) et une flèche pour le replier. Chaque ligne se lit comme un seul élément par les lecteurs d'écran. Sur tablette, les voyages sont ouverts en portrait et repliés en paysage tant que vous n'en ouvrez ou n'en repliez pas un vous-même, et la plongée affichée garde son fond bleu pâle.",
       "« Se connecter ou créer un compte » : les boutons Google et Apple portent maintenant les logos officiels de chaque fournisseur, sur le téléphone, la tablette et l'ordinateur, avec les couleurs de leurs règles de marque. Sur tablette et sur ordinateur, l'écran s'ouvre depuis « Se connecter » du premier lancement, dans la mise en page à deux volets.",
       "Android : les bords de l'écran sont les mêmes à chaque lancement et avec chaque mode de navigation : les feuilles, les messages, les boutons et la barre du bas restent au-dessus de la barre de gestes ou des boutons de navigation, et le haut ne saute plus.",
-      "Serveur OpenDives (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur OpenDives » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
+      "Serveur Benthic (édition de diffusion) : votre carnet se télécharge depuis le serveur et s’ouvre comme n’importe quel carnet, avec « Votre carnet est prêt » après le téléchargement. Il reste au format de Subsurface, se synchronise comme un dépôt git (synchronisation automatique, hors ligne, conflits) et s’appelle « Serveur Benthic » dans le menu, le compte et les messages de synchronisation. « Créer un carnet vide », « Importer un fichier Subsurface » et « Envoyer le carnet de ce téléphone » le créent sur le serveur ; un envoi interrompu reprend là où il s’est arrêté.",
       "Premier lancement sur Android : les espacements verticaux suivent la maquette (titre, choix, boutons sous les choix, lien « Une question ? ») et le lien du bas reste au-dessus de la barre de navigation du système. Le style des composants prime de nouveau sur celui de Framework7 dans la version publiée, ce qui corrige aussi des marges d’autres écrans.",
       "Équipement : « Nouvelle pièce » choisit le type en tuiles (ordinateur, détendeur, combinaison, sous-vêtement, bouteille, veste, lampe, ceinture de lest, autre) avec une photo et une suggestion de rappel de révision ; « Modifier le kit » donne le nombre de plongées du kit et permet de le dupliquer ; dans « Modifier la plongée », « Remplir avec » regroupe « Un kit » et « Plongée précédente ».",
-      "Révisions de l’équipement (OpenDives+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
-      "Offre OpenDives+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
+      "Révisions de l’équipement (Benthic+) : « Révisions » dans Mon profil et la carte du haut d’« Équipement » listent ce qui est en retard, bientôt ou à jour. Un rappel se règle par durée, par nombre de plongées (celles où la pièce figure dans l’équipement), ou les deux : le premier atteint compte. « Noter une révision » garde la date, qui l’a faite, le coût et la photo de la facture, et un avertissement s’affiche dans « Modifier la plongée » quand une pièce est en retard. Une notification prévient 7, 30 ou 60 jours avant, puis le jour même.",
+      "Offre Benthic+ : une tuile « Rappels d’entretien » sous les quatre autres dit que les rappels du détendeur, de la bouteille et de la pile arrivent 30 jours avant l’échéance.",
       "Téléchargement du carnet et import depuis divelogs.de : le temps restant s’affiche à droite de la ligne de progression quand l’opération dépasse 5 secondes, comme « 20 s restantes », puis en minutes. Il remplace l’ancien « Environ … » de l’envoi du carnet.",
       "Journal : quand le réseau revient, le journal quitte « Hors ligne » et se met à jour tout seul, même sans modification en attente, y compris au retour dans l'application.",
       "Boutons : l'effet du toucher s'affiche sur le bouton touché et non en haut de l'écran (vu dans Nettoyer les sites).",
       "Cartes hors ligne : le point sur l'avatar du compte disparaît une fois la mise à jour d'une carte terminée, même si elle s'est terminée pendant que l'app était fermée.",
       "Carnet : une barre de progression s'affiche en haut de la liste pendant que l'app met le carnet à jour au démarrage ; la liste est déjà là.",
       "Feuille du compte : le message « Mise à jour de carte disponible » est une rangée à part, « Cartes hors ligne », qui ouvre directement les cartes hors ligne dans Réglages.",
-      "Mon profil de plongeur (OpenDives+) : la feuille du compte l’ouvre, et « Équipement » garde vos ordinateurs de plongée, détendeurs, combinaisons, bouteilles et kits sur ce téléphone, lisibles sans réseau. Dans « Modifier la plongée », « Appliquer un kit » et « Comme la précédente » remplissent l’équipement (avec « Annuler »), les combinaisons se choisissent dans l’inventaire, une pièce peut être ajoutée pour une seule plongée, et un ordinateur peut être renommé. Un ordinateur entre dans l’inventaire au premier téléchargement.",
-      "Premier lancement (édition publique) : « Se connecter » devient le premier choix, en bleu foncé avec la pastille OpenDives+ ; « Commencer un carnet sur ce téléphone » et « Importer un carnet » suivent, puis deux boutons texte, « Essayer avec un carnet d’exemple » et « Découvrir OpenDives+ ». Les choix ont des coins de 24 dp, des titres de 24 sp sur tablette et ordinateur, et le logo du bandeau a un fin anneau clair au lieu d’une ombre. « Nouveau carnet » se termine par « Créer le carnet », l’import par « Importer le carnet ».",
-      "Serveur OpenDives (édition de publication) : « Sur le serveur OpenDives » est le premier choix de « Ouvrir mon carnet ». Vous vous connectez avec votre adresse courriel et un code à 6 chiffres, sans mot de passe ; les écrans disent un code incorrect, un code expiré, trop d’essais (attente de 10 minutes) et un serveur qui ne répond pas. Le carnet est ensuite téléchargé.",
+      "Mon profil de plongeur (Benthic+) : la feuille du compte l’ouvre, et « Équipement » garde vos ordinateurs de plongée, détendeurs, combinaisons, bouteilles et kits sur ce téléphone, lisibles sans réseau. Dans « Modifier la plongée », « Appliquer un kit » et « Comme la précédente » remplissent l’équipement (avec « Annuler »), les combinaisons se choisissent dans l’inventaire, une pièce peut être ajoutée pour une seule plongée, et un ordinateur peut être renommé. Un ordinateur entre dans l’inventaire au premier téléchargement.",
+      "Premier lancement (édition publique) : « Se connecter » devient le premier choix, en bleu foncé avec la pastille Benthic+ ; « Commencer un carnet sur ce téléphone » et « Importer un carnet » suivent, puis deux boutons texte, « Essayer avec un carnet d’exemple » et « Découvrir Benthic+ ». Les choix ont des coins de 24 dp, des titres de 24 sp sur tablette et ordinateur, et le logo du bandeau a un fin anneau clair au lieu d’une ombre. « Nouveau carnet » se termine par « Créer le carnet », l’import par « Importer le carnet ».",
+      "Serveur Benthic (édition de publication) : « Sur le serveur Benthic » est le premier choix de « Ouvrir mon carnet ». Vous vous connectez avec votre adresse courriel et un code à 6 chiffres, sans mot de passe ; les écrans disent un code incorrect, un code expiré, trop d’essais (attente de 10 minutes) et un serveur qui ne répond pas. Le carnet est ensuite téléchargé.",
       "Premier lancement sur tablette Android : « Utiliser mon propre dépôt git » ouvre le formulaire à côté du panneau bleu, avec « cette tablette » dans les textes ; « Comment créer un dépôt » et « Comment créer un jeton d’accès » remplacent le formulaire dans la même colonne, et « Retour » le ramène avec les champs remplis. Le carnet se télécharge, puis s’ouvre avec un message en bas à gauche.",
       "Aides « Créer un dépôt » et « Créer un jeton d’accès » : les libellés du site sont dans des cases et les valeurs à saisir en police à chasse fixe ; les onglets GitLab et Codeberg donnent les libellés du site dans la langue de l’app, et GitLab et Codeberg ont leurs propres étapes pour le jeton.",
       "Synchronisation avec un dépôt git : un serveur qui ne répond pas n’est plus présenté comme un jeton refusé ; l’app réessaie seule.",
@@ -2769,9 +2769,9 @@
       "Premier lancement : après la connexion, l’écran de téléchargement montre trois étapes avec la progression des plongées, puis le carnet s’ouvre avec un message.",
       "Création de compte : l’écran du code dit « étape 2 sur 2 », et le carnet vide s’ouvre avec le message « Compte créé. Votre carnet est prêt. ».",
       "« Commencer sans compte » : un écran dit où reste le carnet (ce téléphone seulement, sans sauvegarde, à relier plus tard) avant de le créer. Le carnet vide indique « Sur ce téléphone seulement, aucune plongée ».",
-      "Premier lancement : un badge « Alpha » suit le nom OpenDives.",
+      "Premier lancement : un badge « Alpha » suit le nom Benthic.",
       "Création de compte : le code de confirmation s’écrit dans six boîtes, une par chiffre. Le code reçu par courriel se colle d’un coup.",
-      "Premier lancement : un badge « Bêta » suit le nom OpenDives.",
+      "Premier lancement : un badge « Bêta » suit le nom Benthic.",
       "Importer un fichier : vous pouvez en choisir plusieurs à la fois. Un .json de l’app Suunto et le .fit du même nom sont lus comme une seule plongée, avec le mélange gazeux et les facteurs de gradient du .fit.",
       "Icône de l’app sur iPhone, iPad et Mac : bleue jusqu’au bord, avec la vague, sans fond blanc.",
       "Icône de l’app sur Android : le disque bleu remplit toute l’icône, sans anneau blanc autour.",
@@ -2779,7 +2779,7 @@
       "Premier lancement : le lien « Une question ? À propos et contact » en bas de l’écran ouvre À propos, avec l’adresse du support.",
       "Le profil de plongée décoratif (premier lancement, carnet vide, pages du compte) est une courbe lisse, sans angles.",
       "Premier lancement sur tablette : le profil de plongée ne touche plus les bords de l’écran.",
-      "Premier lancement sur tablette : le logo et le nom OpenDives sont plus grands.",
+      "Premier lancement sur tablette : le logo et le nom Benthic sont plus grands.",
       "Premier lancement sur iPhone et iPad : une phrase sous le titre et une ligne d’aide sous chaque choix, comme sur Android.",
       "Carnet vide : le profil d'une plongée, un grand bouton « Associer un ordinateur de plongée » et, dans une carte, les autres façons d'ajouter des plongées (importer un fichier, télécharger depuis divelogs.de, noter une plongée à la main).",
       "Carnet : « Fusionner en une plongée » et « Modifier ensemble… » dans le menu ⋮ des plongées cochées. La fusion n'est offerte que pour des plongées qui se suivent, à moins d'une heure d'intervalle ; « Modifier ensemble… » change le site, le guide, les compagnons, les étiquettes, la combinaison, le type d'eau et les notes de plusieurs plongées à la fois, et « Annuler » défait tout d'un coup.",
@@ -2859,7 +2859,7 @@
       "Logo, mode clair : le demi-cercle sous les vagues est gris clair et les deux bulles sont bleues ; dans l’icône de l’app, l’arc du haut a le même gris, donc l’anneau est d’une seule couleur. Le mode sombre ne change pas.",
       "Filtre, critère Voyage : les voyages sont triés par ordre alphabétique.",
       "Fiche d’une plongée : en faisant défiler, le nom du site s’affiche dans la barre du haut.",
-      "Évaluer OpenDives : une ligne sous « Nouveautés » ouvre la page de l’app dans Google Play (ou l’App Store) ; après un téléchargement réussi depuis un ordinateur de plongée, l’app peut demander la note avec la fenêtre du système (au plus une fois tous les 120 jours). Hors d’un magasin, la ligne devient « Donner votre avis ».",
+      "Évaluer Benthic : une ligne sous « Nouveautés » ouvre la page de l’app dans Google Play (ou l’App Store) ; après un téléchargement réussi depuis un ordinateur de plongée, l’app peut demander la note avec la fenêtre du système (au plus une fois tous les 120 jours). Hors d’un magasin, la ligne devient « Donner votre avis ».",
       "Menu latéral : le bouton s’appelle « Synchroniser » et l’état dit depuis quand le carnet est synchronisé (« Synchronisé il y a 2 min »), avec l’icône du nuage ; nouvelle icône Statistiques.",
       "Menu latéral : carte du compte et ligne active en texte foncé, carte de synchronisation et logo conformes aux maquettes.",
       "Lest : « Modifier la plongée » suggère un lest d’après la plongée la plus récente avec la même combinaison, les mêmes bouteilles et le même type d’eau, corrigé de 2 lb (1 kg) selon que ce lest était trop léger ou trop lourd ; « Utiliser » le met dans la plongée. « Ce lest était » (Trop léger, Juste, Trop lourd) se choisit dans « Modifier la plongée » et dans le détail, sous Équipement ; le choix est enregistré comme une étiquette anglaise (weight-too-light, weight-ok, weight-too-heavy), que Subsurface affiche aussi.",
@@ -2872,7 +2872,7 @@
       "Planificateur : l’exposition à l’oxygène suit la même présentation que les gaz (CNS en gros, limite et OTU sous la barre).",
       "Planificateur : chaque gaz montre son volume total en gros, puis la barre et sa légende (consommé, réserve).",
       "Mélangeur de gaz : l’étape d’hélium d’un trimix est corrigée (elle était trop courte d’environ 0,8 %, et l’oxygène d’autant trop long).",
-      "Liens : les adresses opendives:// et opendives.app ouvrent dans l’application une plongée, un site, le planificateur ou un outil, et un fichier de carnet Subsurface (.ssrf, .xml) reçu par courriel ou depuis une application de fichiers s’ouvre dans OpenDives pour être importé. Une plongée et un site se partagent sous forme de lien depuis leur menu Partager.",
+      "Liens : les adresses opendives:// et benthicdivelog.app ouvrent dans l’application une plongée, un site, le planificateur ou un outil, et un fichier de carnet Subsurface (.ssrf, .xml) reçu par courriel ou depuis une application de fichiers s’ouvre dans Benthic pour être importé. Une plongée et un site se partagent sous forme de lien depuis leur menu Partager.",
       "Menus déroulants : à l’ouverture, la liste montre la valeur choisie.",
       "Planificateur : le clavier ne se ferme plus quand on tape dans un champ (niveaux, gaz, GF).",
       "Planificateur : la liste du CAS va de 0,01 en 0,01 pi³/min et s’ouvre sur la valeur actuelle.",
@@ -3062,10 +3062,10 @@
       "Meilleur mélange : « Préparer ce mélange » ouvre le Mélangeur de gaz avec ce mélange comme mélange voulu (sur tablette, le bouton nomme le mélange).",
       "Mélangeur de gaz : « Pression finale désirée » (ex « Pression finale ») reprend la pression de service de la bouteille choisie, sous le nom « Service : 3 365 psi ». Une valeur saisie reste quand on change de bouteille ; au-dessus de la pression de service, un avertissement s'affiche et le calcul continue.",
       "Mélangeur de gaz : la bouteille se choisit avant la pression finale ; « Dans la bouteille » met Pression et Mélange (nitrox) ou Oxygène et Hélium (trimix) ; la note sur les pressions n'est plus en rouge ; « Analysez le mélange avant de plonger. » est dans un bandeau ambre.",
-      "Édition publique : un compte sans carnet propose de créer un carnet vide, d’importer un fichier Subsurface (.ssrf ou .xml) ou d’envoyer le carnet de l’appareil. Le carnet est écrit au format d’OpenDives sur le serveur, par petits envois ; le carnet reste aussi sur l’appareil.",
+      "Édition publique : un compte sans carnet propose de créer un carnet vide, d’importer un fichier Subsurface (.ssrf ou .xml) ou d’envoyer le carnet de l’appareil. Le carnet est écrit au format de Benthic sur le serveur, par petits envois ; le carnet reste aussi sur l’appareil.",
       "Édition publique : l’envoi du carnet affiche « n plongées sur m » et le temps restant. Si la connexion se coupe, « Envoi interrompu » le dit et « Reprendre l’envoi » repart de la dernière plongée envoyée ; l’envoi se propose aussi au démarrage suivant.",
-      "Édition publique : « Se connecter ou créer un compte », l’offre OpenDives+ (14,99 $ US par an), « Votre carnet est prêt » et « Bienvenue dans OpenDives+ ! ». La connexion avec Google ou Apple et l’abonnement ne sont pas encore disponibles ; un compte sans abonnement ne garde rien sur l’appareil.",
-      "Édition publique : les écrans du serveur n’affichent plus « Serveur OpenDives » au-dessus du titre, l’icône « Le serveur ne répond pas » est centrée et « Revenir à l’accueil » remplace « Choisir un autre endroit ».",
+      "Édition publique : « Se connecter ou créer un compte », l’offre Benthic+ (14,99 $ US par an), « Votre carnet est prêt » et « Bienvenue dans Benthic+ ! ». La connexion avec Google ou Apple et l’abonnement ne sont pas encore disponibles ; un compte sans abonnement ne garde rien sur l’appareil.",
+      "Édition publique : les écrans du serveur n’affichent plus « Serveur Benthic » au-dessus du titre, l’icône « Le serveur ne répond pas » est centrée et « Revenir à l’accueil » remplace « Choisir un autre endroit ».",
       "Dans l'application de bureau, vous pouvez redimensionner une colonne du Carnet en tirant le bord de son en-tête (ou ← → sur le bord, un double clic pour l'ajuster), et chaque carnet garde son propre ordre de colonnes, ses colonnes visibles et leurs largeurs sur cet ordinateur.",
       "Dans l'application de bureau, « Seulement sur Wi-Fi ou câble » fonctionne : la synchronisation automatique attend tant que l'ordinateur est sur une connexion limitée (partage de connexion d'un téléphone, réseau mobile) et reprend sur Wi-Fi ou câble ; « Synchroniser maintenant » fonctionne toujours.",
       "Démarrage plus léger et sélection d’une plongée plus rapide : l’application charge deux fois moins de code et de styles au démarrage, chaque écran et chaque langue au moment où on en a besoin, et choisir une plongée dans le carnet du bureau ne demande plus au cœur que cette plongée au lieu de dix-huit réponses.",
@@ -3074,70 +3074,71 @@
       "Détail d’une plongée sur ordinateur : cinq onglets. Informations : la fiche du site, les compagnons, le moniteur, le type d’eau en boutons segmentés et la visibilité en cinq étoiles ; Équipement : les ordinateurs, la combinaison et plusieurs lests en pastilles avec leur total ; Gaz : une carte par bouteille avec ses champs et une carte Consommation ; Notes : la note, les notes et les étiquettes ; Carte garde sa hauteur. Les champs gris s’enregistrent avec Entrée ou en les quittant.",
       "Sur ordinateur, agrandir ou réduire la fenêtre au-delà de 1200 dp passe de la grande à la petite disposition sans quitter l’écran : la plongée sélectionnée dans le Carnet, la statistique enregistrée dans Statistiques, la catégorie dans Réglages et l’outil dans Outils restent en place.",
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
-      "Téléphone, « Votre carnet est prêt » (OpenDives+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
-      "Mon profil de plongeur (OpenDives+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
+      "Téléphone, « Votre carnet est prêt » (Benthic+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
+      "Mon profil de plongeur (Benthic+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
       "Équipement : la veste a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand.",
-      "Fichiers reçus d’une autre application : OpenDives apparaît dans « Ouvrir avec » et « Partager vers » pour un carnet (.ssrf, .xml), un fichier UDDF, FIT, DLD et les autres formats importables. Le fichier est lu, puis un choix est demandé : « Ajouter à ce carnet » ajoute les plongées au carnet ouvert, avec Annuler (« Nouveau carnet », qui garde le carnet ouvert et en crée un autre, n’est pas proposé : cet appareil ne garde qu’un carnet à la fois) ; sans carnet, il ouvre « Importer un carnet ». Le fichier de sites d’un export à deux fichiers est accepté : les sites déjà présents ne sont pas dupliqués. Les sites sont ajoutés au carnet nommé dans la question, jamais à un autre.",
+      "Fichiers reçus d’une autre application : Benthic apparaît dans « Ouvrir avec » et « Partager vers » pour un carnet (.ssrf, .xml), un fichier UDDF, FIT, DLD et les autres formats importables. Le fichier est lu, puis un choix est demandé : « Ajouter à ce carnet » ajoute les plongées au carnet ouvert, avec Annuler (« Nouveau carnet », qui garde le carnet ouvert et en crée un autre, n’est pas proposé : cet appareil ne garde qu’un carnet à la fois) ; sans carnet, il ouvre « Importer un carnet ». Le fichier de sites d’un export à deux fichiers est accepté : les sites déjà présents ne sont pas dupliqués. Les sites sont ajoutés au carnet nommé dans la question, jamais à un autre.",
       "Premier lancement : le glissement entre les étapes joue maintenant (il était absent de la version compilée). La boîte des changements en attente de la déconnexion affiche le nombre en gras, et un champ iPhone en erreur ne garde plus de cadre rouge dans sa ligne.",
-      "Remplacer ce carnet : cet appareil ne garde qu’un carnet à la fois. Un fichier de carnet (.ssrf Subsurface, ou archive qui en contient un) ouvert avec OpenDives ou choisi dans « + » › Importer un fichier propose maintenant « Remplacer ce carnet » : un écran dit que le carnet quitte cet appareil et propose « Exporter d’abord ce carnet » ; « Remplacer » demande une seconde confirmation si le carnet n’a pas été exporté ou si des modifications ne sont pas synchronisées, puis vous nommez le nouveau carnet. Le carnet actuel est remis en place si le fichier ne peut pas être lu. Le carnet du serveur OpenDives et un carnet synchronisé avec un compte ne sont jamais remplacés, avec une ligne qui dit pourquoi. Quand une archive contient plusieurs carnets, seul le principal est importé et la fenêtre le dit.",
-      "Gros carnets : un carnet de mille plongées avec profils (environ 100 Mo) peut maintenant être partagé vers OpenDives depuis une autre application, choisi avec « Importer un fichier », servir à remplacer le carnet, être exporté d’abord, copié depuis la version précédente ou inclus dans « Télécharger mes données » sans que l’application manque de mémoire. Le fichier passe désormais directement entre le stockage du téléphone et le cœur en petits morceaux, au lieu de traverser l’écran en un seul texte.",
+      "Remplacer ce carnet : cet appareil ne garde qu’un carnet à la fois. Un fichier de carnet (.ssrf Subsurface, ou archive qui en contient un) ouvert avec Benthic ou choisi dans « + » › Importer un fichier propose maintenant « Remplacer ce carnet » : un écran dit que le carnet quitte cet appareil et propose « Exporter d’abord ce carnet » ; « Remplacer » demande une seconde confirmation si le carnet n’a pas été exporté ou si des modifications ne sont pas synchronisées, puis vous nommez le nouveau carnet. Le carnet actuel est remis en place si le fichier ne peut pas être lu. Le carnet du serveur Benthic et un carnet synchronisé avec un compte ne sont jamais remplacés, avec une ligne qui dit pourquoi. Quand une archive contient plusieurs carnets, seul le principal est importé et la fenêtre le dit.",
+      "Gros carnets : un carnet de mille plongées avec profils (environ 100 Mo) peut maintenant être partagé vers Benthic depuis une autre application, choisi avec « Importer un fichier », servir à remplacer le carnet, être exporté d’abord, copié depuis la version précédente ou inclus dans « Télécharger mes données » sans que l’application manque de mémoire. Le fichier passe désormais directement entre le stockage du téléphone et le cœur en petits morceaux, au lieu de traverser l’écran en un seul texte.",
       "Import : un carnet ou un fichier de sites de plongée affiche une seule ligne de progression, du moment où il est reçu ou choisi jusqu’à la fin de l’import : « Copie du fichier », « Vérification », « Import des plongées », « Enregistrement », avec la taille copiée, le pourcentage et le temps restant. « Annuler » arrête la copie et la vérification et supprime la copie partielle. Un message dit combien de plongées ou de sites ont été ajoutés.",
       "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré.",
       "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée.",
       "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique.",
       "Ordinateur : « Autre équipement » de l’onglet Équipement montre les pièces de votre inventaire utilisées par la plongée, avec la même icône que sur téléphone (la « Saucisse » a la sienne), « Ajouter de l’équipement » les ajoute et la croix les retire de cette plongée. Toutes les vues du carnet sur ordinateur (cartes, onglets, menus, fenêtres) partagent la même liste : jour de la semaine, une ligne d’année qui reste en haut, cartes de voyage.",
       "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre.",
-      "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » d’OpenDives+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs).",
+      "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » de Benthic+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs).",
       "Premier lancement : la touche et le geste Retour d’Android (et, sur iPhone, un balayage depuis le bord gauche) reviennent à l’étape précédente, comme « Retour » ; sur la première étape, Retour met l’application en arrière-plan. Un import, un téléchargement ou un envoi en cours est annulé par Retour, le retour de l’offre est « Continuer sans abonnement », et rien de ce qui a été créé ou acheté n’est défait.",
-      "Autre équipement : ajouter ou retirer une pièce sur une plongée est réservé aux abonnés OpenDives+. Sans compte, la liste s’affiche avec la pastille OpenDives+, sur téléphone, tablette et ordinateur, et ne se modifie pas.",
-      "Compte (version gratuite) : Retour depuis l’offre OpenDives+ ou « Se connecter ou créer un compte », ouverts depuis la fiche, réaffiche la fiche comme elle était.",
-      "Sauvegarde et restauration (OpenDives+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille OpenDives+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px.",
+      "Autre équipement : ajouter ou retirer une pièce sur une plongée est réservé aux abonnés Benthic+. Sans compte, la liste s’affiche avec la pastille Benthic+, sur téléphone, tablette et ordinateur, et ne se modifie pas.",
+      "Compte (version gratuite) : Retour depuis l’offre Benthic+ ou « Se connecter ou créer un compte », ouverts depuis la fiche, réaffiche la fiche comme elle était.",
+      "Sauvegarde et restauration (Benthic+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille Benthic+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px.",
       "Rapports d’erreur : après une erreur ou un arrêt de l’app, la version, le système, l’appareil, la page ouverte, le message d’erreur et les dernières lignes du journal s’affichent dans une feuille avec « Envoyer » et « Ne pas envoyer ». Rien n’est envoyé sans cet appui ; sans connexion, le rapport est gardé et reproposé plus tard. Le rapport ne contient ni plongée, ni site, ni nom, ni compte ; il est conservé 180 jours.",
       "Export de tout le carnet : le fichier porte le nom du carnet et la date, par exemple « carnet-de-roger-2026-11-19.ssrf ».",
-      "Offre OpenDives+ : l’en-tête devient « L’offre OpenDives+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour ».",
+      "Offre Benthic+ : l’en-tête devient « L’offre Benthic+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour ».",
       "À propos : « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. », un bloc « Libre, et votre carnet aussi » (l’offre de base reste gratuite, le code est sur GitHub, le carnet est exportable en tout temps) avec « Voir sur GitHub » (logo de GitHub) et « Exporter mon carnet » (icône de téléchargement), l’un sous l’autre sur téléphone et côte à côte sur tablette ; sur ordinateur, un seul paragraphe et les deux boutons. « Tout ce qui est inclus » dit sous son titre ce qu’il liste.",
       "Tablette en paysage et ordinateur : « Mon profil de plongeur » s’affiche en volets : le profil à gauche, la liste (équipement ou entretien) au milieu, la fiche à droite. Les formulaires (nouvelle pièce, nouveau kit, nouveau brevet, noter une révision) s’ouvrent dans une fenêtre centrée ; les types de pièce forment une grille de 3 × 3. Sur ordinateur, la photo d’un brevet se choisit, se dépose ou se colle (Ctrl+V) ; la carte est recadrée et redressée, avec « Retirer les reflets » et « Ajuster les coins ». Sur Mac, « Mon profil de plongeur… » (⇧⌘P) ouvre le profil dans sa propre fenêtre. « Vos données de santé » et « Votre carnet est prêt » se présentent dans le panneau bleu. Sur ordinateur, le + du carnet ne reste plus affiché au-dessus d’une page ouverte à droite.",
-      "Ordinateur : la feuille du compte d’un abonné OpenDives+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
+      "Ordinateur : la feuille du compte d’un abonné Benthic+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
       "Ordinateur : « Partager » s’ouvre en boîte de dialogue au milieu de la fenêtre ; un clic sur un voyage du carnet affiche la page du voyage à droite (le chevron le replie) ; l’import d’un fichier dit d’où viennent les plongées (« 1 plongée importée depuis « … » ») avec Annuler ; « Plans enregistrés » ouvre un volet « Plongées planifiées » avec « Nouveau plan » ; dans Réglages › Recycleur, la consommation d’O₂ dit qu’elle suit l’unité de Volume.",
       "Tablette : « Exporter » et la liste des plongées d’un point de la carte s’ouvrent en dialogue au milieu de l’écran ; les conflits sur plusieurs plongées aussi ; au téléchargement, un Bluetooth non autorisé ou éteint s’affiche en carte sous les ordinateurs mémorisés.",
       "iPad : les mêmes dialogues et la même carte Bluetooth que sur la tablette Android, aux coins des feuilles iOS.",
       "iPhone : À propos a des boutons de 50 pt aux coins arrondis iOS ; tablette en portrait : dans Cartes hors ligne, « Ajouter une région » passe sous la liste.",
       "Carnet d’exemple : 40 plongées de 2023 à 2026 sur 8 sites, avec un voyage de 6 plongées et une plongée en recycleur, plus proche d’un carnet réel.",
       "Carnet d’exemple sur téléphone : le bandeau « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » est une carte arrondie juste au-dessus de la barre du bas, avec « Commencer » ; la liste, le « + » et les messages s’arrêtent au-dessus. « Commencer mon carnet ? » nomme l’appareil (ce téléphone, cette tablette, cet ordinateur).",
-      "Carnet vide : l’en-tête dit « Sur ce téléphone · aucune plongée » (« Mon carnet · sur cette tablette » sur tablette) et « Changer d’endroit » disparaît du menu. Ordinateur avec un dépôt git : la feuille du compte montre le dépôt avec « Changer de dépôt », la synchronisation, « Sauvegarde et restauration » (selon l’historique du dépôt) et la carte « Passer à OpenDives+ », sans « Mon profil de plongeur ».",
+      "Carnet vide : l’en-tête dit « Sur ce téléphone · aucune plongée » (« Mon carnet · sur cette tablette » sur tablette) et « Changer d’endroit » disparaît du menu. Ordinateur avec un dépôt git : la feuille du compte montre le dépôt avec « Changer de dépôt », la synchronisation, « Sauvegarde et restauration » (selon l’historique du dépôt) et la carte « Passer à Benthic+ », sans « Mon profil de plongeur ».",
       "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone.",
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
       "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager).",
       "iPhone : Carnet sans miniature de profil (jour et mois, « N° · heure », profondeur au-dessus de la durée, titres d’année avec leur nombre de plongées) ; Réglages en grand titre avec groupes en petites capitales ; fiche d’un site en cartes groupées, avec « Ouvrir dans Plans » expliqué ; À propos et Bibliothèques libres avec le bouton de retour nommé.",
-      "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
+      "L’offre Benthic+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
       "Les photos des ordinateurs de plongée s’affichent partout où le modèle apparaît : listes d’équipement, de kits et d’entretien, fiche de la pièce, détail de la plongée, Réglages › Ordinateurs du carnet et modification de la plongée. Votre propre photo passe avant celle du modèle.",
-      "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (OpenDives+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
+      "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (Benthic+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
       "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait).",
       "Après un téléchargement depuis un ordinateur de plongée, « Compléter la plongée » s’ouvre pour chaque nouvelle plongée sans site (Android et iPhone) : les trois sites les plus proches de la position du téléphone, ou les trois plus récemment plongés sans position, le plus proche présélectionné à moins de 500 m, « Créer un site à ma position actuelle », « Chercher un autre site », les compagnons et la note. « Plus tard » laisse la plongée telle quelle.",
-      "Réglages › Notifications (OpenDives+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel.",
-      "Équipement (OpenDives+) : « Retirer de l’équipement » remplace la suppression, avec une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce.",
+      "Réglages › Notifications (Benthic+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel.",
+      "Équipement (Benthic+) : « Retirer de l’équipement » remplace la suppression, avec une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce.",
       "Une bouteille a deux échéances, chacune avec sa carte, sa barre, son bouton « Noter … » et son rappel : l’inspection visuelle (chaque année) et la requalification (tous les 5 ans, avec la date frappée sur la bouteille, comme 03/22). La carte d’entretien montre aussi les heures sous l’eau à côté des plongées (« 82 plongées sur 100 · 61 h »). Dans « Ajouter de l’équipement », une pièce en retard reste choisissable mais indique en rouge ce qui est en retard, quand son rappel avertit dans une plongée.",
       "Le téléchargement depuis un ordinateur de plongée ne fige plus l'écran quand la fiche d'envoi d'un rapport d'erreur s'ouvre.",
       "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
-      "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur ».",
+      "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement Benthic+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur ».",
       "Téléchargement : une lampe ou une balance dont le nom commence par « S1 » (« S19 A69C LE ») n’est plus proposée comme un Oceans S1. Chaque appareil de la liste à proximité a un menu « Ce n’est pas un ordinateur de plongée » qui le masque pour de bon (Annuler dans le message) ; Réglages › Téléchargement liste les appareils masqués avec « Afficher de nouveau ».",
       "Android : la touche Retour fonctionne tant qu’un message comme « Plongée enregistrée / Annuler » est affiché ; elle était ignorée jusqu’à la disparition du message.",
       "Équipement : « Nouvelle pièce » propose 16 types (masque, palmes, scooter, caméra, parachute de palier, bouée de surface et couteau s’ajoutent) et n’affiche que les champs du type choisi ; seul le type est obligatoire. Une bouteille garde son type (le volume et la pression de service viennent de Réglages › Équipement), son matériau, son robinet, son numéro de série, « Propre O₂ », sa dernière inspection visuelle et son dernier test hydrostatique ; une combinaison, son type, son épaisseur, sa taille et son matériau. Le gilet devient « Veste » partout. Rappels proposés : détendeur tous les 2 ans ou 100 plongées, bouteille (inspection chaque année, test hydrostatique aux 5 ans), veste chaque année, joints d’une combinaison étanche chaque année.",
       "Brevets et documents : « Brevets » devient « Brevets et documents » : brevets, assurance plongée (carte scannée et lue sur l’appareil, ou PDF), certificat médical de plusieurs pages et autres documents, chacun avec une reproduction de la carte et un badge d’expiration. Un document s’ouvre en plein écran, à la luminosité maximale, et se partage en images ou en PDF. Un brevet peut être marqué « Brevet de moniteur ».",
       "Notifications : Réglages › Notifications a une section « Brevets et documents » avec « Expiration des documents ». La notification arrive au délai choisi dans chaque document (2 semaines, 30 jours ou 60 jours) et le jour de l’expiration.",
-      "Offre OpenDives+ : le prix est un peu plus petit, et la tuile « Rappels d’entretien » parle du détendeur, de la bouteille et de la veste.",
+      "Offre Benthic+ : le prix est un peu plus petit, et la tuile « Rappels d’entretien » parle du détendeur, de la bouteille et de la veste.",
       "Modifier la plongée : les listes de suggestions des champs Guide de palanquée, Compagnons et Étiquettes (et de la combinaison) s’ouvrent maintenant au-dessus des cartes suivantes, dans l’écran, et au-dessus du champ quand il n’y a pas de place en dessous.",
       "Carnet : sur Android, la barre d’actions flottante d’une sélection se place au-dessus de la barre de navigation du bas (et de la bannière du carnet d’exemple) au lieu de passer dessous.",
-      "Validation d’une plongée (OpenDives+) : « Faire valider la plongée » dans le menu de la plongée, et « Faire valider les plongées » dans le menu de la sélection (une validation pour plusieurs plongées). Le compagnon ou le moniteur signe au doigt sur l’écran, ou scanne un code QR avec OpenDives+ (le code expire après 10 minutes ; sans réseau, la plongée affiche « Validation en attente » jusqu’à l’arrivée de la confirmation). Le détail de la plongée a une section « Validations » (nom, rôle, méthode, date, signature) et indique « Modifiée après la validation » quand la plongée a changé ; une plongée validée porte une petite coche dans le carnet. Les validations figurent sur la fiche PDF et dans l’export PDF du carnet, et se retirent une à une.",
+      "Validation d’une plongée (Benthic+) : « Faire valider la plongée » dans le menu de la plongée, et « Faire valider les plongées » dans le menu de la sélection (une validation pour plusieurs plongées). Le compagnon ou le moniteur signe au doigt sur l’écran, ou scanne un code QR avec Benthic+ (le code expire après 10 minutes ; sans réseau, la plongée affiche « Validation en attente » jusqu’à l’arrivée de la confirmation). Le détail de la plongée a une section « Validations » (nom, rôle, méthode, date, signature) et indique « Modifiée après la validation » quand la plongée a changé ; une plongée validée porte une petite coche dans le carnet. Les validations figurent sur la fiche PDF et dans l’export PDF du carnet, et se retirent une à une.",
       "Navigation : un balayage depuis le bord de l’écran (le geste Retour d’Android) ne laisse plus la page à moitié déplacée, avec un Retour et des liens sans effet ; le Retour qui suit revient d’un écran. Deux Retours depuis un écran ouvert en profondeur dans le Carnet (Réglages › Types de bouteilles › nouveau type ; une plongée › son planificateur › les plans › un nouveau plan) ne laissent plus un écran vide où Retour ne répond plus. Un écran resté dans un mauvais état est remis en place et un rapport d’erreur est proposé. La touche Échap ferme la feuille, la fenêtre ou le menu ouvert. « Question / signaler un problème » joint au message les derniers écrans parcourus.",
-      "Mon profil de plongeur : un champ « Nom complet » (facultatif), en premier dans « Vous » des Informations et de leur édition. Il s’affiche en haut de « Mon profil de plongeur » (sans lui, le courriel) et, avec un compte OpenDives+, sur la première ligne de la feuille du compte, le courriel dessous en plus petit gris. Quand vous confirmez la plongée d’un autre plongeur, le champ « Votre nom » vient du profil (une correction vaut pour cette confirmation seulement), la phrase dessous donne votre rôle et le numéro de votre brevet de moniteur, et « Je confirme » reste grisé tant que le nom est vide ; si le profil n’a pas de nom, celui que vous tapez y est enregistré. Le nom s’ajoute en haut des fiches PDF d’une plongée et du carnet (interrupteur « Mon nom dans l’en-tête » à l’export en PDF ; « Anonymiser » le retire aussi).",
+      "Mon profil de plongeur : un champ « Nom complet » (facultatif), en premier dans « Vous » des Informations et de leur édition. Il s’affiche en haut de « Mon profil de plongeur » (sans lui, le courriel) et, avec un compte Benthic+, sur la première ligne de la feuille du compte, le courriel dessous en plus petit gris. Quand vous confirmez la plongée d’un autre plongeur, le champ « Votre nom » vient du profil (une correction vaut pour cette confirmation seulement), la phrase dessous donne votre rôle et le numéro de votre brevet de moniteur, et « Je confirme » reste grisé tant que le nom est vide ; si le profil n’a pas de nom, celui que vous tapez y est enregistré. Le nom s’ajoute en haut des fiches PDF d’une plongée et du carnet (interrupteur « Mon nom dans l’en-tête » à l’export en PDF ; « Anonymiser » le retire aussi).",
       "« Nouvelle pièce » : sur téléphone, « Type de pièce » est un champ qui ouvre un menu des 16 types (icône, nom, coche sur le type choisi ; liste du système sur iPhone) ; la grille de tuiles reste sur tablette et ordinateur. Sous le champ, la photo du modèle en grand avec « Changer d’image » (le dessin du type sans photo du modèle ; « Ajouter une photo » et la petite vignette à côté de « Modèle » disparaissent). Cinq icônes redessinées partout dans l’équipement : ceinture de lest, scooter, couteau, palmes et lampe.",
       "Dates : toutes les dates suivent le format choisi dans Réglages › Langue et date (2026-11-06 par défaut) : carnet, détail d’une plongée, équipement et entretien, brevets et documents, validation, compte, sauvegarde, cartes hors ligne, PDF. Les champs de date montrent ce format en indication (« aaaa-mm-jj »), la saisie au clavier du calendrier le suit, et une date connue au mois près (test hydrostatique) s’écrit dans le même ordre (2022-03).",
-      "Fiche d’urgence (OpenDives+) : une entrée rouge « Fiche d’urgence » sous la carte d’identité de « Mon profil de plongeur » ouvre une fiche plein écran, disponible sans réseau : le nom complet du profil, la date de naissance et l’âge, le groupe sanguin dans une tuile (seulement avec l’accord pour les données de santé), le contact d’urgence avec « Appeler Marc » (ouvre le composeur du téléphone), l’assurance de plongée avec sa « Ligne d’urgence » et le certificat médical, qui ouvrent le document. Le crayon ouvre « Contenu de la fiche » : un interrupteur par élément (le brevet le plus élevé est désactivé au départ), le nom est toujours affiché. Le partage envoie la fiche en image ou en PDF, avec le rappel qu’elle contient le groupe sanguin. Dans « Modifier les informations », le contact d’urgence a deux champs, « Nom » et « Lien » (un menu qui accepte aussi un texte libre).",
-      "Détail d’une plongée : sur Android, la barre flottante contient Modifier, « Planifier depuis cette plongée », Partager et un menu ⋮ (« Faire valider la plongée » avec OpenDives+, « Renuméroter la plongée », « Retirer du voyage » dans un voyage, « Supprimer la plongée »). Le nom du bouton ⋮ énumère ce que contient son menu.",
+      "Fiche d’urgence (Benthic+) : une entrée rouge « Fiche d’urgence » sous la carte d’identité de « Mon profil de plongeur » ouvre une fiche plein écran, disponible sans réseau : le nom complet du profil, la date de naissance et l’âge, le groupe sanguin dans une tuile (seulement avec l’accord pour les données de santé), le contact d’urgence avec « Appeler Marc » (ouvre le composeur du téléphone), l’assurance de plongée avec sa « Ligne d’urgence » et le certificat médical, qui ouvrent le document. Le crayon ouvre « Contenu de la fiche » : un interrupteur par élément (le brevet le plus élevé est désactivé au départ), le nom est toujours affiché. Le partage envoie la fiche en image ou en PDF, avec le rappel qu’elle contient le groupe sanguin. Dans « Modifier les informations », le contact d’urgence a deux champs, « Nom » et « Lien » (un menu qui accepte aussi un texte libre).",
+      "Détail d’une plongée : sur Android, la barre flottante contient Modifier, « Planifier depuis cette plongée », Partager et un menu ⋮ (« Faire valider la plongée » avec Benthic+, « Renuméroter la plongée », « Retirer du voyage » dans un voyage, « Supprimer la plongée »). Le nom du bouton ⋮ énumère ce que contient son menu.",
       "Carte d’un site : dans la fiche, à la modification et sur le bureau, la carte garde un rapport largeur/hauteur de 2,1 à toutes les largeurs ; la hauteur suit la largeur.",
-      "Fiche d’urgence : le brevet affiché est votre carte la plus récente (date d’obtention la plus récente), quel que soit son niveau ou son type ; à date égale, la dernière ajoutée. L’interrupteur de « Contenu de la fiche » s’appelle « Brevet le plus récent »."
+      "Fiche d’urgence : le brevet affiché est votre carte la plus récente (date d’obtention la plus récente), quel que soit son niveau ou son type ; à date égale, la dernière ajoutée. L’interrupteur de « Contenu de la fiche » s’appelle « Brevet le plus récent ».",
+      "Nouveau nom : l’app s’appelle Benthic, et l’offre payante Benthic+. Sous l’icône, l’app s’appelle « Benthic Log ». Les anciennes adresses opendives.app ouvrent toujours l’application."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3160,7 +3161,7 @@
     "privacyText": "Vos plongées restent sur l'appareil et dans votre compte",
     "opensMail": "s'ouvre dans l'application de messagerie",
     "report": {
-      "subject": "OpenDives {version} : question ou problème",
+      "subject": "Benthic {version} : question ou problème",
       "technical": "Informations techniques (à laisser dans le message)",
       "version": "Version de l'app",
       "platform": "Système",
@@ -3175,7 +3176,7 @@
       "lastError": "Dernière erreur",
       "navigation": "Navigation (derniers écrans)",
       "git": "Dépôt git",
-      "server": "Serveur OpenDives"
+      "server": "Serveur Benthic"
     },
     "opensElsewhere": "s'ouvre dans le navigateur",
     "credit": "Le cœur de calcul vient de Subsurface, créé par Linus Torvalds et Dirk Hohndel, et de ses contributeurs.",
@@ -3201,10 +3202,10 @@
     "intro": "Ajoutez maintenant les plongées que vous avez déjà.",
     "sourceLabel": "Source du carnet",
     "divelogs": "Depuis divelogs.de",
-    "divelogsText": "Les plongées sont copiées une seule fois dans votre compte. divelogs.de et OpenDives ne restent pas synchronisés.",
+    "divelogsText": "Les plongées sont copiées une seule fois dans votre compte. divelogs.de et Benthic ne restent pas synchronisés.",
     "user": "Nom d'utilisateur divelogs.de",
     "password": "Mot de passe divelogs.de",
-    "credentialsNote": "Ces identifiants servent seulement à ce téléchargement. OpenDives ne les garde pas.",
+    "credentialsNote": "Ces identifiants servent seulement à ce téléchargement. Benthic ne les garde pas.",
     "file": "Depuis un fichier",
     "fileText": "Carnet Subsurface (.ssrf, .xml), export divelogs.de (.dld), montre Garmin (.fit) ou d'un autre logiciel",
     "empty": "Commencer avec un carnet vide",
@@ -3336,7 +3337,7 @@
     "titleDialog": "Enregistrer le plan",
     "titleLabel": "Titre",
     "saveFailed": "Le plan n’a pas pu être enregistré.",
-    "filePrefix": "OpenDives-plan",
+    "filePrefix": "Benthic-plan",
     "noStartDive": "Sans plongée de départ",
     "profilePlanned": "Profil prévu",
     "profileOfDive": "Profil de la plongée",
@@ -3624,12 +3625,12 @@
     },
     "permission": {
       "title": "Autoriser le Bluetooth",
-      "text": "Android demande l'autorisation « Appareils à proximité » pour trouver l'ordinateur de plongée. OpenDives ne s'en sert pas pour autre chose.",
+      "text": "Android demande l'autorisation « Appareils à proximité » pour trouver l'ordinateur de plongée. Benthic ne s'en sert pas pour autre chose.",
       "button": "Autoriser"
     },
     "denied": {
       "title": "Autorisation refusée",
-      "text": "Sans l'autorisation Bluetooth, OpenDives ne peut pas trouver l'ordinateur de plongée. Vous pouvez la donner dans les réglages d'Android, rubrique Autorisations.",
+      "text": "Sans l'autorisation Bluetooth, Benthic ne peut pas trouver l'ordinateur de plongée. Vous pouvez la donner dans les réglages d'Android, rubrique Autorisations.",
       "button": "Ouvrir les réglages",
       "again": "Demander à nouveau"
     },
@@ -3803,7 +3804,7 @@
   },
   "importProgress": {
     "title": "Import de votre carnet",
-    "text": "Gardez OpenDives ouverte jusqu'à la fin. Rien n'est envoyé à votre compte avant la dernière étape.",
+    "text": "Gardez Benthic ouverte jusqu'à la fin. Rien n'est envoyé à votre compte avant la dernière étape.",
     "failedTitle": "L'import n'a pas abouti",
     "failedText": "Votre compte est créé. Rien n'a été enregistré dedans.",
     "stepsLabel": "Étapes de l'import",
@@ -3894,8 +3895,8 @@
     "done": "Plongée renumérotée n° {n}"
   },
   "link": {
-    "unknown": "Ce lien ne mène à rien dans OpenDives.",
-    "notReady": "Terminez la configuration d’OpenDives, puis rouvrez le lien.",
+    "unknown": "Ce lien ne mène à rien dans Benthic.",
+    "notReady": "Terminez la configuration de Benthic, puis rouvrez le lien.",
     "unsaved": "Terminez ou abandonnez vos modifications, puis rouvrez le lien.",
     "diveNotFound": "Cette plongée n’est pas dans ce carnet.",
     "siteNotFound": "Ce site n’est pas dans ce carnet.",
@@ -3907,7 +3908,7 @@
     "fileMerge": "Ajouter à ce carnet",
     "fileAction": "Importer",
     "fileUnnamed": "ce fichier",
-    "fileNotLogbook": "« {name} » n’est pas un fichier que OpenDives sait importer. Aucune plongée n’a été modifiée.",
+    "fileNotLogbook": "« {name} » n’est pas un fichier que Benthic sait importer. Aucune plongée n’a été modifiée.",
     "fileEmpty": "« {name} » est vide. Aucune plongée n’a été modifiée.",
     "fileTooBig": "Ce fichier est trop gros pour être importé (plus de 100 Mo). Aucune plongée n’a été modifiée.",
     "fileUnreadable": "Ce fichier n’a pas pu être ouvert. Aucune plongée n’a été modifiée.",
@@ -3920,7 +3921,7 @@
     "sitesFailed": "Les sites n’ont pas pu être ajoutés.",
     "fileChooseReplace": "Que faire de « {name} » ?\n\nRemplacer ce carnet : retire le carnet ouvert de cet appareil et garde celui du fichier. Cet appareil ne garde qu’un carnet à la fois.\n\nAjouter à ce carnet : ajoute les plongées du fichier au carnet ouvert, sans doublon.",
     "fileReplace": "Remplacer ce carnet",
-    "replace_server": "Ce carnet est celui du serveur OpenDives : il ne se remplace pas depuis un fichier, ses données restent à l’abri.",
+    "replace_server": "Ce carnet est celui du serveur Benthic : il ne se remplace pas depuis un fichier, ses données restent à l’abri.",
     "replace_account": "Ce carnet est synchronisé avec un compte : le remplacer retirerait ses plongées du carnet partagé, il ne peut que recevoir des plongées."
   },
   "share": {
@@ -3931,12 +3932,12 @@
     "summaryText": "Un court texte et l’image du profil",
     "failed": "La plongée n’a pas pu être partagée.",
     "link": "Lien",
-    "linkText": "Une adresse web qui ouvre cette plongée dans OpenDives",
+    "linkText": "Une adresse web qui ouvre cette plongée dans Benthic",
     "qr": "Code QR",
-    "qrText": "Pour un compagnon qui a OpenDives, sans internet",
-    "siteLinkText": "Une adresse web qui ouvre ce site dans OpenDives",
+    "qrText": "Pour un compagnon qui a Benthic, sans internet",
+    "siteLinkText": "Une adresse web qui ouvre ce site dans Benthic",
     "siteFailed": "Le site n’a pas pu être partagé.",
-    "filePrefix": "OpenDives-plongee",
+    "filePrefix": "Benthic-plongee",
     "sheetNumber": "Plongée n° {number}",
     "sheetDive": "Plongée",
     "profile": "Profil",
@@ -3944,8 +3945,8 @@
     "legendTemperature": "Noir : profondeur. Bleu : température de l’eau.",
     "cylinder": "Bouteille",
     "gas": "Gaz",
-    "footer": "Fiche créée avec OpenDives le {date}",
-    "exportPrefix": "OpenDives-{n}-plongees"
+    "footer": "Fiche créée avec Benthic le {date}",
+    "exportPrefix": "Benthic-{n}-plongees"
   },
   "export": {
     "title": {
@@ -3961,7 +3962,7 @@
       "pdf": "Fiches PDF"
     },
     "formatTexts": {
-      "ssrf": "Format Subsurface, lisible aussi par OpenDives",
+      "ssrf": "Format Subsurface, lisible aussi par Benthic",
       "uddf": "Format d’échange entre logiciels de plongée",
       "csv": "Une ligne par plongée, pour un tableur",
       "csvProfiles": "Temps, profondeur et température, point par point",
@@ -4052,18 +4053,18 @@
   },
   "tokenHelp": {
     "title": "Créer un jeton d’accès",
-    "afterwards": "Collez ensuite le jeton dans OpenDives, avec votre nom d’utilisateur. Le jeton n’est montré qu’une fois par le site : copiez-le avant de quitter la page.",
+    "afterwards": "Collez ensuite le jeton dans Benthic, avec votre nom d’utilisateur. Le jeton n’est montré qu’une fois par le site : copiez-le avant de quitter la page.",
     "github": {
       "name": "GitHub",
-      "intro": "OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton limité à ce seul dépôt, avec le droit de lire et d’écrire son contenu et rien d’autre. GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface.",
+      "intro": "Benthic se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton limité à ce seul dépôt, avec le droit de lire et d’écrire son contenu et rien d’autre. GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface.",
       "open": "Ouvrir la page des jetons de GitHub",
       "note": "Un jeton « fine-grained » peut être limité à un seul dépôt.",
       "s1": "Connectez-vous à GitHub, puis ouvrez [kbd]Settings[/kbd] (menu de votre photo de profil).",
       "s2": "Tout en bas de la colonne de gauche, ouvrez [kbd]Developer settings[/kbd].",
       "s3": "Ouvrez [kbd]Personal access tokens[/kbd], puis [kbd]Fine-grained tokens[/kbd], puis touchez [kbd]Generate new token[/kbd].",
       "s3Desktop": "Ouvrez [kbd]Personal access tokens[/kbd], puis [kbd]Fine-grained tokens[/kbd], puis cliquez sur [kbd]Generate new token[/kbd].",
-      "s4": "[kbd]Token name[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
-      "s5": "[kbd]Expiration[/kbd] : choisissez [kbd]No expiration[/kbd], sinon OpenDives ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite.",
+      "s4": "[kbd]Token name[/kbd] : un nom reconnaissable, par exemple [code]Benthic[/code].",
+      "s5": "[kbd]Expiration[/kbd] : choisissez [kbd]No expiration[/kbd], sinon Benthic ne pourra plus se synchroniser à la date choisie. Si le dépôt appartient à une organisation, elle peut imposer une date limite.",
       "s6": "[kbd]Resource owner[/kbd] : votre compte, ou l’organisation qui possède le dépôt.",
       "s7": "[kbd]Repository access[/kbd] : choisissez [kbd]Only select repositories[/kbd], puis le dépôt de votre carnet.",
       "s8": "[kbd]Permissions[/kbd] : dans [kbd]Repository permissions[/kbd], réglez [kbd]Contents[/kbd] sur [kbd]Read and write[/kbd]. N’ajoutez aucune autre permission.",
@@ -4072,22 +4073,22 @@
     },
     "gitlab": {
       "name": "GitLab",
-      "intro": "OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "intro": "Benthic se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site.",
       "open": "Ouvrir la page des jetons de GitLab",
       "note": "Sur GitLab, un jeton personnel donne accès à tous vos dépôts et doit avoir une date d’expiration.",
       "s1": "Connectez-vous à GitLab, touchez votre avatar, puis [kbd]Modifier le profil[/kbd].",
       "s1Desktop": "Connectez-vous à GitLab, cliquez sur votre avatar, puis [kbd]Modifier le profil[/kbd].",
       "s2": "Dans la colonne de gauche, ouvrez [kbd]Accès[/kbd], puis [kbd]Jetons d’accès personnel[/kbd].",
       "s3": "Dans la liste [kbd]Générer un jeton[/kbd], choisissez [kbd]Ancien jeton[/kbd].",
-      "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
-      "s5": "[kbd]Date d’expiration[/kbd] : choisissez la date la plus lointaine permise. GitLab exige une date ; à cette date, créez un nouveau jeton et collez-le dans OpenDives.",
+      "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]Benthic[/code].",
+      "s5": "[kbd]Date d’expiration[/kbd] : choisissez la date la plus lointaine permise. GitLab exige une date ; à cette date, créez un nouveau jeton et collez-le dans Benthic.",
       "s6": "[kbd]Sélectionner les portées[/kbd] : cochez seulement [kbd]write_repository[/kbd], qui permet de lire et d’écrire dans vos dépôts.",
       "s7": "Touchez [kbd]Générer un jeton[/kbd], puis copiez le jeton.",
       "s7Desktop": "Cliquez sur [kbd]Générer un jeton[/kbd], puis copiez le jeton."
     },
     "codeberg": {
       "name": "Codeberg",
-      "intro": "OpenDives se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "intro": "Benthic se connecte à votre dépôt avec un jeton d’accès personnel, jamais avec votre mot de passe. Créez un jeton qui peut seulement lire et écrire vos dépôts. Les libellés ci-dessous sont ceux de l’interface française du site.",
       "open": "Ouvrir la page des applications de Codeberg",
       "note": "Sur Codeberg, un jeton n’expire pas. Vous pouvez le supprimer à tout moment.",
       "s1": "Connectez-vous à Codeberg, touchez votre avatar, puis [kbd]Configuration[/kbd].",
@@ -4095,7 +4096,7 @@
       "s2": "Ouvrez l’onglet [kbd]Applications[/kbd].",
       "s3": "Sous [kbd]Jetons d’accès[/kbd], touchez [kbd]Nouveau jeton d’accès[/kbd].",
       "s3Desktop": "Sous [kbd]Jetons d’accès[/kbd], cliquez sur [kbd]Nouveau jeton d’accès[/kbd].",
-      "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]OpenDives[/code].",
+      "s4": "[kbd]Nom du jeton[/kbd] : un nom reconnaissable, par exemple [code]Benthic[/code].",
       "s5": "Choisissez [kbd]Tout (public, privé et limité)[/kbd] pour que le jeton atteigne votre dépôt privé.",
       "s6": "Sous [kbd]Sélectionner les autorisations[/kbd], réglez [kbd]repository[/kbd] sur [kbd]Lecture et écriture[/kbd]. Laissez les autres sur [kbd]Aucun accès[/kbd].",
       "s7": "Touchez [kbd]Générer un jeton[/kbd], puis copiez le jeton.",
@@ -4186,11 +4187,11 @@
       },
       "space": {
         "title": "Espace insuffisant",
-        "text": "{name} peut demander jusqu’à {size}. Il resterait {remaining}, sous le minimum de {floor} qu’OpenDives garde libre. Supprimez une région ou libérez de l’espace."
+        "text": "{name} peut demander jusqu’à {size}. Il resterait {remaining}, sous le minimum de {floor} que Benthic garde libre. Supprimez une région ou libérez de l’espace."
       },
       "manage": {
         "title": "Espace sur l’appareil",
-        "text": "Il reste {free} libres sur l’appareil. OpenDives garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner. Supprimez des régions ou libérez de l’espace sur l’appareil : le téléchargement reprendra de lui-même."
+        "text": "Il reste {free} libres sur l’appareil. Benthic garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner. Supprimez des régions ou libérez de l’espace sur l’appareil : le téléchargement reprendra de lui-même."
       },
       "replace": {
         "title": "Remplacer la carte ?",
@@ -4266,8 +4267,8 @@
     "close": "Fermer",
     "codeOf": "Code {n} sur {total}",
     "imageLabel": "Code QR {n} sur {total}",
-    "helpDive": "Sur l’autre téléphone, ouvrez OpenDives, touchez « + » puis « Scanner un code QR ». Les codes défilent tout seuls. Gardez cet écran face à la caméra jusqu’à la fin.",
-    "helpPlan": "Sur l’autre téléphone, ouvrez OpenDives, touchez « + » puis « Scanner un code QR ». Gardez cet écran face à la caméra.",
+    "helpDive": "Sur l’autre téléphone, ouvrez Benthic, touchez « + » puis « Scanner un code QR ». Les codes défilent tout seuls. Gardez cet écran face à la caméra jusqu’à la fin.",
+    "helpPlan": "Sur l’autre téléphone, ouvrez Benthic, touchez « + » puis « Scanner un code QR ». Gardez cet écran face à la caméra.",
     "done": "Terminé",
     "preparing": "Préparation des codes…",
     "failed": "Les codes QR n’ont pas pu être créés.",
@@ -4279,16 +4280,16 @@
     "progress": "{n} codes lus sur {total}",
     "progressOne": "1 code lu sur {total}",
     "progressBar": "Codes lus",
-    "foreign": "Ce code QR ne vient pas d’OpenDives.",
-    "newerVersion": "Ce code vient d’une version plus récente d’OpenDives. Mettez l’application à jour pour le lire.",
+    "foreign": "Ce code QR ne vient pas de Benthic.",
+    "newerVersion": "Ce code vient d’une version plus récente de Benthic. Mettez l’application à jour pour le lire.",
     "otherTitle": "Une autre plongée",
     "otherText": "Ce code appartient à une autre plongée ou à un autre plan. Recommencer avec lui ? Les codes déjà lus seront perdus.",
     "otherRestart": "Recommencer",
     "otherKeep": "Garder la première",
-    "permissionReason": "OpenDives utilise la caméra uniquement pour lire les codes QR d’une plongée partagée depuis un autre téléphone. Rien n’est enregistré.",
+    "permissionReason": "Benthic utilise la caméra uniquement pour lire les codes QR d’une plongée partagée depuis un autre téléphone. Rien n’est enregistré.",
     "permissionButton": "Autoriser la caméra",
     "permissionDeniedTitle": "Caméra refusée",
-    "permissionDenied": "Sans l’autorisation de la caméra, OpenDives ne peut pas lire les codes. Vous pouvez l’accorder dans les réglages du système, sous Autorisations.",
+    "permissionDenied": "Sans l’autorisation de la caméra, Benthic ne peut pas lire les codes. Vous pouvez l’accorder dans les réglages du système, sous Autorisations.",
     "permissionSettings": "Ouvrir les réglages",
     "cameraFailed": "La caméra n’a pas pu démarrer.",
     "receivedDive": "Plongée reçue",
@@ -4327,7 +4328,7 @@
     "textText": "Niveaux, paliers, gaz et volumes",
     "ssrfFailed": "Le fichier de carnet n’a pas pu être créé.",
     "qr": "Code QR",
-    "qrText": "Pour un compagnon qui a OpenDives, sans internet"
+    "qrText": "Pour un compagnon qui a Benthic, sans internet"
   },
   "slate": {
     "title": "Ardoise pour l’eau",
@@ -4383,8 +4384,8 @@
     "at": "{gas} à {depth}",
     "note": "Fin en minutes depuis la mise à l’eau. Gaz souligné : changement de gaz.",
     "gasNeeded": "Gaz nécessaire : {gases}",
-    "footer": "Créé avec OpenDives le {date}. À vérifier avant la plongée.",
-    "filePrefix": "OpenDives-ardoise",
+    "footer": "Créé avec Benthic le {date}. À vérifier avant la plongée.",
+    "filePrefix": "Benthic-ardoise",
     "failed": "L’ardoise n’a pas pu être partagée."
   },
   "nav": {
@@ -4412,7 +4413,7 @@
     "reading": "Lecture d’Apple Santé…",
     "unavailable": "Apple Santé n’a pas de données de plongée sur cet appareil. Il faut un iPhone avec iOS 16 ou plus et une Apple Watch Ultra.",
     "failed": "Apple Santé n’a pas pu être lu.",
-    "none": "Aucune plongée dans Apple Santé depuis un an. Si l’accès a été refusé, autorisez OpenDives dans Santé › Partage › Apps.",
+    "none": "Aucune plongée dans Apple Santé depuis un an. Si l’accès a été refusé, autorisez Benthic dans Santé › Partage › Apps.",
     "known": "déjà dans le carnet",
     "what": "Apple Santé ne garde que l’heure, la profondeur et la température : le site, le gaz et les compagnons se complètent dans la plongée."
   },
@@ -4707,9 +4708,9 @@
   "desktopCloud": {
     "browserPage": {
       "done": "Connexion réussie",
-      "doneText": "Vous pouvez fermer cet onglet et revenir à OpenDives.",
+      "doneText": "Vous pouvez fermer cet onglet et revenir à Benthic.",
       "failed": "Connexion impossible",
-      "failedText": "Revenez à OpenDives et réessayez."
+      "failedText": "Revenez à Benthic et réessayez."
     },
     "conflict": {
       "title": "« {name} » a changé à deux endroits",
@@ -4724,17 +4725,17 @@
       "notYetText": "Connectez-vous à {service} dans votre navigateur, puis revenez ici pour créer le carnet.",
       "waiting": "Connexion dans le navigateur…",
       "waitingText": "La page de connexion de {service} est ouverte dans votre navigateur.",
-      "ready": "Le carnet « {file} » sera créé dans un dossier OpenDives de ce compte.",
+      "ready": "Le carnet « {file} » sera créé dans un dossier Benthic de ce compte.",
       "noAccount": "Compte connecté",
       "switchAccount": "Changer de compte",
       "signIn": "Se connecter à {service}",
       "cancel": "Annuler la connexion",
       "reopen": "Rouvrir la page",
-      "privacy": "OpenDives n’a accès qu’aux fichiers qu’il crée ou que vous ouvrez.",
-      "linkSign": "Lien entre OpenDives et {service}"
+      "privacy": "Benthic n’a accès qu’aux fichiers qu’il crée ou que vous ouvrez.",
+      "linkSign": "Lien entre Benthic et {service}"
     },
     "webdav": {
-      "intro": "OpenDives créera le fichier « {file} » dans un dossier OpenDives de votre serveur.",
+      "intro": "Benthic créera le fichier « {file} » dans un dossier Benthic de votre serveur.",
       "server": "Adresse du serveur",
       "serverPlaceholder": "https://cloud.exemple.com",
       "username": "Nom d’utilisateur",
@@ -4893,7 +4894,7 @@
     "otherGearAdd": "Ajouter de l’équipement",
     "otherGearFailed": "L’équipement de la plongée n’a pas pu être enregistré.",
     "otherGearSoon": "Pas encore disponible",
-    "otherGearPlusOnly": "Réservé aux abonnés OpenDives+",
+    "otherGearPlusOnly": "Réservé aux abonnés Benthic+",
     "mixNote": "O₂ {o2} % · He {he} %",
     "pressureNote": "début → fin"
   },
@@ -4947,7 +4948,7 @@
       "unmeteredText": "Jamais sur un partage de connexion",
       "manage": "Gérer le compte"
     },
-    "about": "À propos d’OpenDives",
+    "about": "À propos de Benthic",
     "filterFree": "Filtre libre…"
   },
   "desktopSites": {
@@ -5037,7 +5038,7 @@
     "filterActive": "Filtrer, un filtre est actif",
     "exportChart": "Exporter le graphique",
     "exportFailed": "Le graphique n'a pas pu être exporté.",
-    "filePrefix": "OpenDives-statistique",
+    "filePrefix": "Benthic-statistique",
     "newStatistic": "+ Nouvelle statistique",
     "more": "Plus d'options pour les statistiques",
     "hoursUnit": "h",
@@ -5199,14 +5200,14 @@
       "deleteDive": "Supprimer la plongée"
     },
     "macMenu": {
-      "about": "À propos d'OpenDives",
+      "about": "À propos de Benthic",
       "settings": "Réglages…",
       "profile": "Mon profil de plongeur…",
       "services": "Services",
-      "hide": "Masquer OpenDives",
+      "hide": "Masquer Benthic Log",
       "hideOthers": "Masquer les autres",
       "showAll": "Tout afficher",
-      "quit": "Quitter OpenDives",
+      "quit": "Quitter Benthic Log",
       "file": "Fichier",
       "newDive": "Nouvelle plongée",
       "import": "Importer…",
@@ -5239,7 +5240,7 @@
       "addToTrip": "Ajouter à un voyage…",
       "window": "Fenêtre",
       "help": "Aide",
-      "helpAbout": "À propos d'OpenDives"
+      "helpAbout": "À propos de Benthic"
     },
     "figure": {
       "maxDepth": "Prof. max",
@@ -5396,11 +5397,11 @@
   "repoHelp": {
     "title": "Créer un dépôt",
     "tabs": "Sites",
-    "afterwards": "Revenez ensuite dans OpenDives, collez l’adresse, puis créez un jeton d’accès pour ce dépôt.",
+    "afterwards": "Revenez ensuite dans Benthic, collez l’adresse, puis créez un jeton d’accès pour ce dépôt.",
     "open": "Ouvrir la page « {page} » de {name}",
     "github": {
       "name": "GitHub",
-      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface.",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans Benthic. GitHub n’existe qu’en anglais : les libellés ci-dessous sont ceux de son interface.",
       "page": "New repository",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
       "s1": "Connectez-vous à GitHub, puis touchez [kbd]+[/kbd] en haut de la page et [kbd]New repository[/kbd].",
@@ -5414,7 +5415,7 @@
     },
     "gitlab": {
       "name": "GitLab",
-      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans Benthic. Les libellés ci-dessous sont ceux de l’interface française du site.",
       "page": "Nouveau projet",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
       "s1": "Connectez-vous à GitLab, puis touchez [kbd]+ (Créer un nouveau)[/kbd] en haut du menu et [kbd]Nouveau projet/dépôt[/kbd].",
@@ -5431,7 +5432,7 @@
     },
     "codeberg": {
       "name": "Codeberg",
-      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans OpenDives. Les libellés ci-dessous sont ceux de l’interface française du site.",
+      "intro": "Créez un dépôt privé et vide pour votre carnet, puis copiez son adresse HTTPS dans Benthic. Les libellés ci-dessous sont ceux de l’interface française du site.",
       "page": "Nouveau dépôt",
       "note": "Un dépôt privé : vous seul pouvez le voir.",
       "s1": "Connectez-vous à Codeberg, puis touchez [kbd]+[/kbd] en haut de la page et [kbd]Nouveau dépôt[/kbd].",
@@ -5445,8 +5446,8 @@
     }
   },
   "odplus": {
-    "chip": "OpenDives+",
-    "chipName": "OpenDives Plus",
+    "chip": "Benthic+",
+    "chipName": "Benthic Plus",
     "providerUnavailable": "La connexion avec {provider} n’est pas encore disponible. Utilisez votre courriel.",
     "purchaseUnavailable": "L’abonnement n’est pas encore disponible dans cette version.",
     "connect": {
@@ -5455,15 +5456,15 @@
       "google": "Continuer avec Google",
       "apple": "Continuer avec Apple",
       "email": "Continuer avec mon courriel",
-      "note": "Pas encore abonné ? On vous présentera OpenDives+. Aucun compte n’est créé tant que vous ne vous abonnez pas.",
+      "note": "Pas encore abonné ? On vous présentera Benthic+. Aucun compte n’est créé tant que vous ne vous abonnez pas.",
       "without": "Continuer sans compte"
     },
     "offer": {
       "title": "Votre carnet, partout et en sécurité",
-      "pill": "L’offre OpenDives+",
+      "pill": "L’offre Benthic+",
       "lead": "Votre carnet à l’abri, sur tous vos appareils.",
       "seeAll": "Voir tout ce qui est inclus",
-      "priceLabel": "Abonnement OpenDives+",
+      "priceLabel": "Abonnement Benthic+",
       "cancelAnytime": "Résiliable en tout temps",
       "sync": "Synchronisé",
       "syncText": "Sur tous vos appareils.",
@@ -5488,7 +5489,7 @@
     },
     "all": {
       "title": "Tout ce qui est inclus",
-      "subtitle": "Tout ce qui est inclus dans l’offre OpenDives+.",
+      "subtitle": "Tout ce qui est inclus dans l’offre Benthic+.",
       "carnet": "Votre carnet",
       "profile": "Votre profil de plongeur",
       "maps": "Sites et cartes",
@@ -5548,8 +5549,8 @@
       "open": "Ouvrir mon carnet"
     },
     "welcome": {
-      "title": "Bienvenue dans OpenDives+ !",
-      "lead": "Votre abonnement est actif. Merci de soutenir OpenDives.",
+      "title": "Bienvenue dans Benthic+ !",
+      "lead": "Votre abonnement est actif. Merci de soutenir Benthic.",
       "activated": "Ce qui est activé",
       "sync": "Synchronisé sur vos appareils",
       "backup": "Sauvegarde automatique",
@@ -5563,7 +5564,7 @@
       "lead": "Facultatif. Vous pourrez changer d’avis en tout temps.",
       "switch": "Garder des données de santé",
       "switchHelp": "Votre groupe sanguin, utile en cas d’urgence",
-      "note": "C’est une donnée de santé. OpenDives+ la garde seulement avec votre accord.",
+      "note": "C’est une donnée de santé. Benthic+ la garde seulement avec votre accord.",
       "lock": "Chiffrées sur votre compte et visibles par vous seul. Vous pouvez retirer votre accord dans Mon profil ou dans les Réglages : les données sont alors supprimées.",
       "continue": "Continuer"
     }
@@ -5603,7 +5604,7 @@
   },
   "serverCreate": {
     "title": "Aucun carnet sur votre compte",
-    "lead": "Votre compte OpenDives+ est prêt, mais il ne contient pas encore de carnet. Créez-en un, ou envoyez un carnet que vous avez déjà.",
+    "lead": "Votre compte Benthic+ est prêt, mais il ne contient pas encore de carnet. Créez-en un, ou envoyez un carnet que vous avez déjà.",
     "blankTitle": "Créer un carnet vide",
     "blankHelp": "Vous y ajouterez vos plongées ensuite.",
     "importTitle": "Importer un fichier Subsurface",
@@ -5617,10 +5618,10 @@
       "other": "« {name} », {n} plongées, déjà sur cet appareil."
     },
     "nameTitle": "Nouveau carnet",
-    "nameHelp": "Il sera gardé sur le serveur OpenDives et sur cette tablette.",
-    "nameHelpPhone": "Il sera gardé sur le serveur OpenDives et sur ce téléphone.",
-    "nameHelpIphone": "Il sera gardé sur le serveur OpenDives et sur cet iPhone.",
-    "nameHelpDesktop": "Il sera gardé sur le serveur OpenDives et sur cet ordinateur.",
+    "nameHelp": "Il sera gardé sur le serveur Benthic et sur cette tablette.",
+    "nameHelpPhone": "Il sera gardé sur le serveur Benthic et sur ce téléphone.",
+    "nameHelpIphone": "Il sera gardé sur le serveur Benthic et sur cet iPhone.",
+    "nameHelpDesktop": "Il sera gardé sur le serveur Benthic et sur cet ordinateur.",
     "create": "Créer le carnet",
     "sendingTitle": "Envoi du carnet",
     "sendingName": {
@@ -5633,15 +5634,15 @@
     "safeIphone": "Le carnet est déjà enregistré sur cet iPhone. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
     "safeDesktop": "Le carnet est déjà enregistré sur cet ordinateur. Vous pouvez quitter l’app : les plongées seront envoyées à la prochaine synchronisation.",
     "cancel": "Ne pas attendre",
-    "created": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cette tablette.",
-    "createdPhone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur ce téléphone.",
-    "createdIphone": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cet iPhone.",
-    "createdDesktop": "Carnet envoyé sur le serveur OpenDives. Il reste aussi sur cet ordinateur.",
+    "created": "Carnet envoyé sur le serveur Benthic. Il reste aussi sur cette tablette.",
+    "createdPhone": "Carnet envoyé sur le serveur Benthic. Il reste aussi sur ce téléphone.",
+    "createdIphone": "Carnet envoyé sur le serveur Benthic. Il reste aussi sur cet iPhone.",
+    "createdDesktop": "Carnet envoyé sur le serveur Benthic. Il reste aussi sur cet ordinateur.",
     "offlineTitle": "Serveur injoignable",
-    "offlineHelp": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cette tablette, puis réessayez.",
-    "offlineHelpPhone": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de ce téléphone, puis réessayez.",
-    "offlineHelpIphone": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cet iPhone, puis réessayez.",
-    "offlineHelpDesktop": "Le carnet n’a pas pu être créé : le serveur OpenDives ne répond pas. Vérifiez la connexion de cet ordinateur, puis réessayez.",
+    "offlineHelp": "Le carnet n’a pas pu être créé : le serveur Benthic ne répond pas. Vérifiez la connexion de cette tablette, puis réessayez.",
+    "offlineHelpPhone": "Le carnet n’a pas pu être créé : le serveur Benthic ne répond pas. Vérifiez la connexion de ce téléphone, puis réessayez.",
+    "offlineHelpIphone": "Le carnet n’a pas pu être créé : le serveur Benthic ne répond pas. Vérifiez la connexion de cet iPhone, puis réessayez.",
+    "offlineHelpDesktop": "Le carnet n’a pas pu être créé : le serveur Benthic ne répond pas. Vérifiez la connexion de cet ordinateur, puis réessayez.",
     "offlineNote": "Rien n’a été créé.",
     "interruptedTitle": "Envoi interrompu",
     "interruptedHelp": "La connexion s’est coupée. Rien n’est perdu : le carnet complet est toujours sur cette tablette, et l’envoi reprendra là où il s’est arrêté.",
@@ -5652,7 +5653,7 @@
     "resume": "Reprendre l’envoi",
     "refused": "Le serveur a refusé l’envoi. Reconnectez-vous, puis reprenez-le.",
     "importing": "Ajout des plongées…",
-    "sending": "Envoi au serveur OpenDives…",
+    "sending": "Envoi au serveur Benthic…",
     "objects": "{n} sur {total}",
     "notEmpty": "Le dépôt de ce compte contient déjà des données sans carnet. Rien n’a été créé.",
     "failed": "Le carnet n’a pas pu être créé. Rien n’a été perdu sur cet appareil."
@@ -5797,7 +5798,7 @@
       "informationLine": "Contact d’urgence, santé",
       "certificationsLine": "{n} brevets",
       "noCertification": "Aucun brevet",
-      "keptWide": "Gardé sur votre compte OpenDives+ et sur cet appareil, même sans réseau.",
+      "keptWide": "Gardé sur votre compte Benthic+ et sur cet appareil, même sans réseau.",
       "paneEmpty": "Choisissez un élément pour le voir ici"
     },
     "inventory": {
@@ -5875,7 +5876,7 @@
       "add": "Ajouter une pièce",
       "emptyTitle": "Aucune pièce",
       "emptyText": "Ordinateurs de plongée, détendeurs, combinaisons et bouteilles. Chaque plongée peut ensuite choisir ses pièces ici.",
-      "readOnlyTitle": "OpenDives+ est terminé",
+      "readOnlyTitle": "Benthic+ est terminé",
       "readOnlyText": "Votre équipement est en lecture seule jusqu’au {date}. Après cette date, vous le perdez, sauf si vous vous abonnez de nouveau ou l’exportez.",
       "readOnlyExpired": "Les 30 jours sont écoulés. Abonnez-vous de nouveau ou exportez votre équipement pour le garder.",
       "readOnlyExport": "Exporter",
@@ -6027,7 +6028,7 @@
       "renamed": "Ordinateur renommé",
       "renameFailed": "L’ordinateur n’a pas pu être renommé",
       "locked": "Lecture seule : l’équipement ne change plus tant que vous ne vous abonnez pas de nouveau.",
-      "plusOnly": "Réservé aux abonnés OpenDives+ : l’équipement d’une plongée se modifie avec un compte.",
+      "plusOnly": "Réservé aux abonnés Benthic+ : l’équipement d’une plongée se modifie avec un compte.",
       "kitDetail": "Kit « {name} »",
       "fillWith": "Remplir avec",
       "oneKit": "Un kit",
@@ -6106,8 +6107,8 @@
       "by": "Fait par",
       "cost": "Coût",
       "notes": "Notes",
-      "footer": "Produit par OpenDives.",
-      "footerInvoices": "Produit par OpenDives. Les factures jointes sont ajoutées à la suite de cette page.",
+      "footer": "Produit par Benthic.",
+      "footerInvoices": "Produit par Benthic. Les factures jointes sont ajoutées à la suite de cette page.",
       "file": "historique-revision",
       "share": "Historique de révision",
       "failed": "L’historique n’a pas pu être exporté"
@@ -6331,7 +6332,7 @@
       "overdueTitle": "{task} en retard : {name}",
       "dueTitle": "{task} aujourd’hui : {name}",
       "leadTitle": "{task} dans {n} jours : {name}",
-      "denied": "Les notifications sont désactivées pour OpenDives : le rappel reste dans l’app."
+      "denied": "Les notifications sont désactivées pour Benthic : le rappel reste dans l’app."
     },
     "channel": {
       "name": "Révisions de l’équipement",
@@ -6357,8 +6358,8 @@
       "notKept": "Non gardé",
       "allow": "Autoriser",
       "empty": "Non renseigné",
-      "lockNote": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous. Vous avez donné votre accord le {date}.",
-      "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte OpenDives+ et n’est visible que par vous.",
+      "lockNote": "Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous. Vous avez donné votre accord le {date}.",
+      "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous.",
       "withdraw": "Retirer l’accord",
       "deniedNote": "Pour garder votre groupe sanguin, autorisez les données de santé. Elles sont chiffrées et visibles par vous seul.",
       "withdrawTitle": "Retirer l’accord ?",
@@ -6438,7 +6439,7 @@
       "saved": "Brevet enregistré",
       "saveFailed": "Le brevet n’a pas pu être enregistré.",
       "deleted": "Brevet supprimé",
-      "readOnly": "Lecture seule : l’abonnement OpenDives+ est terminé.",
+      "readOnly": "Lecture seule : l’abonnement Benthic+ est terminé.",
       "notFound": "Ce brevet n’existe plus."
     }
   },
@@ -6470,9 +6471,9 @@
     "chooseTitleMany": "Faire valider {n} plongées",
     "summaryMany": "{n} plongées",
     "chooseSignature": "Signature sur cet écran",
-    "chooseSignatureText": "Votre compagnon ou votre moniteur signe au doigt. Il n’a pas besoin d’OpenDives.",
+    "chooseSignatureText": "Votre compagnon ou votre moniteur signe au doigt. Il n’a pas besoin de Benthic.",
     "chooseQr": "Code QR",
-    "chooseQrText": "Votre compagnon le scanne avec OpenDives+. Sa confirmation arrive par le serveur.",
+    "chooseQrText": "Votre compagnon le scanne avec Benthic+. Sa confirmation arrive par le serveur.",
     "signTitle": "Signature",
     "sign": "Valider",
     "name": "Nom",
@@ -6498,7 +6499,7 @@
     "signed": "Plongée validée.",
     "signedMany": "Plongées validées.",
     "confirmedBy": "{name} a validé la plongée.",
-    "readOnly": "Votre abonnement OpenDives+ est terminé : le carnet est en lecture seule.",
+    "readOnly": "Votre abonnement Benthic+ est terminé : le carnet est en lecture seule.",
     "saveFailed": "La validation n’a pas été enregistrée.",
     "loadFailed": "Les plongées n’ont pas pu être lues.",
     "qrTitle": "Faire valider par code QR",
@@ -6507,13 +6508,13 @@
     "qrExpires": "Ce code expire dans {time}",
     "qrExpired": "Ce code a expiré.",
     "qrNew": "Nouveau code",
-    "qrHelp": "Votre compagnon ouvre OpenDives+, touche « + » puis « Scanner un code QR ». Sa confirmation arrive par le serveur. Sans réseau, la plongée affiche « Validation en attente ».",
+    "qrHelp": "Votre compagnon ouvre Benthic+, touche « + » puis « Scanner un code QR ». Sa confirmation arrive par le serveur. Sans réseau, la plongée affiche « Validation en attente ».",
     "qrDone": "Terminé",
     "retry": "Réessayer",
     "qrError": {
       "offline": "Le code QR demande une connexion. Réessayez avec du réseau, ou faites signer sur cet écran.",
       "tooMany": "Trop de codes en peu de temps. Réessayez dans quelques minutes.",
-      "plus": "Le code QR fait partie d’OpenDives+.",
+      "plus": "Le code QR fait partie de Benthic+.",
       "failed": "Le code n’a pas pu être créé."
     },
     "confirmTitle": "Confirmer la plongée",
@@ -6531,7 +6532,7 @@
       "expired": "Ce code a expiré. Demandez-en un nouveau.",
       "used": "Ce code a déjà servi.",
       "own": "Vous ne pouvez pas valider vos propres plongées.",
-      "plus": "Valider une plongée demande OpenDives+.",
+      "plus": "Valider une plongée demande Benthic+.",
       "unknown": "Ce code n’est pas reconnu.",
       "tooMany": "Trop d’essais. Réessayez dans quelques minutes.",
       "failed": "La confirmation n’a pas pu être envoyée."

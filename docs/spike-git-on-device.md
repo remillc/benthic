@@ -4,7 +4,7 @@ Status: **partial**. The spike was stopped on request before it finished. Number
 
 ## Question
 
-For logbooks stored on the OpenDives server (format of `docs/architecture.md`, section 11.3), should the app run git on the device (isomorphic-git, pure JavaScript), keep using the git host's web API (today: Forgejo contents API for writing, tree list + raw files for reading), or fall back to libgit2 (already linked in the core)?
+For logbooks stored on the Benthic server (format of `docs/architecture.md`, section 11.3), should the app run git on the device (isomorphic-git, pure JavaScript), keep using the git host's web API (today: Forgejo contents API for writing, tree list + raw files for reading), or fall back to libgit2 (already linked in the core)?
 
 ## Method
 

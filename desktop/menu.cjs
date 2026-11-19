@@ -39,7 +39,7 @@ function buildMenu(texts, send, logbooks = {}) {
   /** @type {import('electron').MenuItemConstructorOptions[]} */
   const template = [
     {
-      label: 'OpenDives',
+      label: 'Benthic Log',
       submenu: [
         item(m.about, 'about'),
         { type: 'separator' },

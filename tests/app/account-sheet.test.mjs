@@ -1,4 +1,4 @@
-// The account sheet for a free diver, the OpenDives+ sheet with its maintenance badge, « Gérer le compte », the store's
+// The account sheet for a free diver, the Benthic+ sheet with its maintenance badge, « Gérer le compte », the store's
 // subscription page, how Back closes the Android sheet and the account deletion (task 2026-11-18-281;
 // mock-ups docs/mockups-release/nav-compte-gratuit-android, nav-compte-profil-android, compte-android-connecte,
 // bureau-compte-gerer, ...). The screens need Framework7 and a WebView: their routes and texts are read from the source;
@@ -24,7 +24,7 @@ const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i1
 
 // --- Which sheet ---
 
-test('the release edition without an OpenDives+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
+test('the release edition without an Benthic+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
   assert.equal(sheetVariant({ release: true, subscriber: false, email: '' }), 'free');
   assert.equal(sheetVariant({ release: true, subscriber: true, email: 'a@b.c' }), 'subscriber');
   assert.equal(sheetVariant({ release: true, subscriber: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
@@ -43,7 +43,7 @@ test('the Compte button stays for a free diver: named « Compte, réglages et à
 
 // --- The free sheet's routes ---
 
-test('free sheet: « S’abonner » opens the offer, « Se connecter » opens the sign-in screen, both OpenDives+ rows open the offer', () => {
+test('free sheet: « S’abonner » opens the offer, « Se connecter » opens the sign-in screen, both Benthic+ rows open the offer', () => {
   const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
   const free = android.slice(android.indexOf('{#if free}'), android.indexOf('{:else}\n    <div class="od-account-sheet--card od-account-sheet--identity">'));
   assert.match(free, /od-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
@@ -73,7 +73,7 @@ test('the offer and the sign-in screen are the first launch entered from the men
 
 test('the offer’s « Déjà abonné ? Se connecter » opens « Se connecter ou créer un compte », and is hidden right after signing in', () => {
   assert.deepEqual(forward(['start', 'odplusOffer'], 'signIn'), ['start', 'odplusOffer', 'odplusConnect']);
-  assert.equal(offerShowsSignIn(['start', 'odplusOffer']), true, 'the offer reached from « Découvrir OpenDives+ »');
+  assert.equal(offerShowsSignIn(['start', 'odplusOffer']), true, 'the offer reached from « Découvrir Benthic+ »');
   assert.equal(offerShowsSignIn(['start', 'odplusConnect', 'server', 'serverCode', 'odplusOffer']), false);
   assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'server', 'serverCode'])), false, 'after the sign-in of an account that has not subscribed');
   assert.match(offer, /\{#if offerShowsSignIn\(flow\.stack\)\}/);
@@ -117,7 +117,7 @@ test('« Mon profil de plongeur »: the badge and the red line only for overdue 
 
 test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
   const row = sheet.slice(sheet.indexOf('od-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
-  // A subscriber sees no OpenDives+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
+  // A subscriber sees no Benthic+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
   assert.doesNotMatch(row, /OdPlusChip/);
   assert.match(row, /\{#if late\.late\}\s*<span class="od-account-sheet--row-line od-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
   assert.match(row, /\{:else\}\s*<span class="od-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
@@ -139,7 +139,7 @@ test('Android phone: the ✕ of the sheet is on the right at the logo’s height
   assert.match(head, /<span aria-hidden="true"><\/span>\s*<!--/);
 });
 
-test('« Gérer le compte » opens the new screen for an OpenDives+ account: a page on the phone, a dialog elsewhere', () => {
+test('« Gérer le compte » opens the new screen for an Benthic+ account: a page on the phone, a dialog elsewhere', () => {
   assert.match(sheet, /function manage\(\) \{\s*navigation\.accountOpen = false;\s*if \(subscriber\) openManageAccount\(\);\s*else openOver\('\/account'\);/);
   const nav = read('lib/navigation.svelte.js');
   assert.match(nav, /export function openManageAccount\(\) \{\s*if \(layout\.phone\) openOver\('\/account\/manage'\);\s*else navigation\.manageOpen = true;/);
@@ -269,11 +269,11 @@ test('every new text exists in French and in English, and the release notes name
 
 // --- Task 2026-11-18-282: the « + » chip after the name, and the tablet's offer ---
 
-test('the subscriber sheet shows the round « + » chip after the name, read « OpenDives Plus »; the free sheet does not', () => {
+test('the subscriber sheet shows the round « + » chip after the name, read « Benthic Plus »; the free sheet does not', () => {
   assert.match(sheet, /\{#if subscriber\}\s*<span class="od-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="od-account-sheet--plus-dot">\+<\/span><\/span><span class="od-sr-only">\{t\('odplus\.chipName'\)\}<\/span>/);
   assert.match(sheet, /\.od-account-sheet--plus-dot \{[^}]*width: 18px;[^}]*height: 18px;[^}]*margin-left: 3px;[^}]*var\(--od-account-chip\)[^}]*var\(--od-account-chip-ink\)[^}]*font-weight: 700/);
-  assert.equal(langs.fr.odplus.chipName, 'OpenDives Plus');
-  assert.equal(langs.en.odplus.chipName, 'OpenDives Plus');
+  assert.equal(langs.fr.odplus.chipName, 'Benthic Plus');
+  assert.equal(langs.en.odplus.chipName, 'Benthic Plus');
 });
 
 test('the tablet offer: the blue panel carries the chip, title and lead; the phone hero stays on phones; Retour except right after a sign-in', () => {
@@ -290,7 +290,7 @@ test('the tablet offer: the blue panel carries the chip, title and lead; the pho
 
 // --- The subscriber's rows: « Sauvegarde et synchronisation » and « Mon profil de plongeur » open their own sections ---
 
-test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sheets open the backup page and the profile', () => {
+test('the free sheet opens the offer for both Benthic+ rows; the subscriber sheets open the backup page and the profile', () => {
   // Free: the two rows open the offer (phone, iPhone, desktop).
   // The iPhone's free sheet has its own two rows (task 289), so six in all.
   assert.equal((sheet.match(/plus\('offer'\)/g) ?? []).length, 6);
@@ -362,7 +362,7 @@ test('the account variant, across every state: free, signed in not subscribed, s
   assert.equal(sheetVariant({ release: false, subscriber: isSubscribed(state(true, true)), email: 'a@b.c' }), 'account', 'the alpha keeps its sheet');
 });
 
-test('the OpenDives+ account: the session says who, the server says subscribed, else the remembered answer', () => {
+test('the Benthic+ account: the session says who, the server says subscribed, else the remembered answer', () => {
   const info = { signedIn: true, email: 'a@b.c' };
   assert.deepEqual(resolveOdplusAccount({ info: { signedIn: false, email: '' }, cached: '1', remote: true }), { signedIn: false, email: '', subscribed: false });
   assert.equal(resolveOdplusAccount({ info, cached: '0', remote: true }).subscribed, true, 'the server wins');

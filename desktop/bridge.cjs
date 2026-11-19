@@ -940,7 +940,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     try {
       const response = await fetch(url, {
         signal: controller.signal,
-        headers: { 'User-Agent': `OpenDives/${app.getVersion()} (dive log app; ${REPO_URL})`, Accept: 'application/json' },
+        headers: { 'User-Agent': `Benthic/${app.getVersion()} (dive log app; ${REPO_URL})`, Accept: 'application/json' },
       });
       const body = response.ok ? await response.text() : '';
       return { status: response.status, body };

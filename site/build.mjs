@@ -1,4 +1,4 @@
-// Builds the public web pages of OpenDives from the app's own files, into
+// Builds the public web pages of Benthic from the app's own files, into
 // build/site/ (not in git), ready to be published on Cloudflare Pages. One
 // folder per language, the same pages in each:
 //   build/site/index.html          /           sends the visitor to their language
@@ -50,33 +50,33 @@ const languages = {
   en: {
     other: 'Version française',
     privacy: {
-      title: 'OpenDives privacy policy',
+      title: 'Benthic privacy policy',
       heading: 'Privacy policy',
-      description: 'Which data the OpenDives dive log uses, where it goes and how to erase it.',
+      description: 'Which data the Benthic dive log uses, where it goes and how to erase it.',
     },
-    home: { title: 'OpenDives, a free dive log', privacyLink: 'Privacy policy', sourceLink: 'Source code' },
+    home: { title: 'Benthic, a free dive log', privacyLink: 'Privacy policy', sourceLink: 'Source code' },
     open: {
-      title: 'Open in OpenDives',
-      heading: 'This link opens in the OpenDives app',
-      text: 'It leads to a dive, a site or a tool of an OpenDives dive log. If OpenDives is installed on this phone or tablet, open the link from there.',
+      title: 'Open in Benthic',
+      heading: 'This link opens in the Benthic app',
+      text: 'It leads to a dive, a site or a tool of an Benthic dive log. If Benthic is installed on this phone or tablet, open the link from there.',
       button: 'Open in the app',
-      install: 'OpenDives is not installed yet? It is a free dive log for phones and tablets; the source code is open.',
+      install: 'Benthic is not installed yet? It is a free dive log for phones and tablets; the source code is open.',
     },
   },
   fr: {
     other: 'English version',
     privacy: {
-      title: 'Politique de confidentialité d’OpenDives',
+      title: 'Politique de confidentialité de Benthic',
       heading: 'Politique de confidentialité',
-      description: 'Les données qu’utilise le carnet de plongée OpenDives, où elles vont et comment les effacer.',
+      description: 'Les données qu’utilise le carnet de plongée Benthic, où elles vont et comment les effacer.',
     },
-    home: { title: 'OpenDives, un carnet de plongée libre', privacyLink: 'Politique de confidentialité', sourceLink: 'Code source' },
+    home: { title: 'Benthic, un carnet de plongée libre', privacyLink: 'Politique de confidentialité', sourceLink: 'Code source' },
     open: {
-      title: 'Ouvrir dans OpenDives',
-      heading: 'Ce lien s’ouvre dans l’application OpenDives',
-      text: 'Il mène à une plongée, à un site ou à un outil d’un carnet OpenDives. Si OpenDives est installé sur ce téléphone ou cette tablette, ouvrez le lien depuis l’appareil.',
+      title: 'Ouvrir dans Benthic',
+      heading: 'Ce lien s’ouvre dans l’application Benthic',
+      text: 'Il mène à une plongée, à un site ou à un outil d’un carnet Benthic. Si Benthic est installé sur ce téléphone ou cette tablette, ouvrez le lien depuis l’appareil.',
       button: 'Ouvrir dans l’application',
-      install: 'OpenDives n’est pas encore installé ? C’est un carnet de plongée libre pour téléphones et tablettes ; le code source est ouvert.',
+      install: 'Benthic n’est pas encore installé ? C’est un carnet de plongée libre pour téléphones et tablettes ; le code source est ouvert.',
     },
   },
 };
@@ -107,7 +107,7 @@ ${codes.map((c) => `<link rel="alternate" hreflang="${c}" href="/${c}/${tail}">`
 <body>
 <header>
   <a href="/${lang}/"><img src="/assets/logo-light.svg" alt="" width="56" height="56"></a>
-  <p class="name">OpenDives</p>
+  <p class="name">Benthic</p>
   <a class="other" href="/${other}/${tail}" hreflang="${other}" lang="${other}">${languages[lang].other}</a>
 </header>
 <main>
@@ -124,7 +124,7 @@ const chooser = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenDives</title>
+<title>Benthic</title>
 ${codes.map((c) => `<link rel="alternate" hreflang="${c}" href="/${c}/">`).join('\n')}
 <link rel="alternate" hreflang="x-default" href="/en/">
 <link rel="icon" href="/assets/logo-light.svg" type="image/svg+xml">
@@ -132,7 +132,7 @@ ${codes.map((c) => `<link rel="alternate" hreflang="${c}" href="/${c}/">`).join(
 <script>location.replace(/^fr\\b/i.test(navigator.language) ? '/fr/' : '/en/');</script>
 </head>
 <body>
-<header><img src="/assets/logo-light.svg" alt="" width="56" height="56"><p class="name">OpenDives</p></header>
+<header><img src="/assets/logo-light.svg" alt="" width="56" height="56"><p class="name">Benthic</p></header>
 <main><p><a href="/en/" lang="en">English</a> · <a href="/fr/" lang="fr">Français</a></p></main>
 </body>
 </html>
@@ -155,7 +155,7 @@ for (const [lang, l] of Object.entries(languages)) {
   await write(`${lang}/privacy.html`, page(lang, 'privacy', l.privacy, content(policy)));
   const app = JSON.parse(await readFile(join(root, 'app', 'src', 'i18n', `${lang}.json`), 'utf8'));
   const tagline = app.about.tagline;
-  const home = `<h1>OpenDives</h1>
+  const home = `<h1>Benthic</h1>
 <p>${tagline}</p>
 <ul>
   <li><a href="/${lang}/privacy">${l.home.privacyLink}</a></li>
@@ -174,7 +174,7 @@ const openSection = (/** @type {string} */ lang) => {
 <p>${o.text}</p>
 <p><a class="button" id="open-app-${lang}" href="opendives://">${o.button}</a></p>
 <p>${o.install}</p>
-<p><a href="${SOURCE}">${languages[lang].home.sourceLink}</a> · <a href="/${lang}/">OpenDives</a></p>
+<p><a href="${SOURCE}">${languages[lang].home.sourceLink}</a> · <a href="/${lang}/">Benthic</a></p>
 </section>`;
 };
 await write(
@@ -190,7 +190,7 @@ await write(
 <link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
-<header><img src="/assets/logo-light.svg" alt="" width="56" height="56"><p class="name">OpenDives</p></header>
+<header><img src="/assets/logo-light.svg" alt="" width="56" height="56"><p class="name">Benthic</p></header>
 <main>
 ${codes.map(openSection).join('\n')}
 </main>
@@ -233,7 +233,7 @@ await write(
   JSON.stringify({ applinks: { details: [{ appIDs: [`${APPLE_TEAM_ID}.${IOS_BUNDLE_ID}`], components: APP_PATHS.map((p) => ({ '/': p })) }] } }, null, 2) + '\n',
 );
 // Without a 404 page, Cloudflare Pages answers any unknown address with the home page.
-await write('404.html', chooser.replace(/<script>.*<\/script>\n/, '').replace('<title>OpenDives</title>', '<title>OpenDives: page not found / page introuvable</title>').replace('<main><p>', '<main><p>Page not found. Page introuvable.</p><p>'));
+await write('404.html', chooser.replace(/<script>.*<\/script>\n/, '').replace('<title>Benthic</title>', '<title>Benthic: page not found / page introuvable</title>').replace('<main><p>', '<main><p>Page not found. Page introuvable.</p><p>'));
 
 await copyFile(join(root, 'app', 'src', 'fonts', 'SourceSans3VF-Upright.ttf.woff2'), join(out, 'assets', 'SourceSans3VF-Upright.ttf.woff2'));
 await copyFile(join(root, 'app', 'src', 'fonts', 'OFL.txt'), join(out, 'assets', 'OFL.txt'));

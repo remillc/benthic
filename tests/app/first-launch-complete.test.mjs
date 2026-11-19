@@ -132,7 +132,7 @@ test('git: a repository that does not fit the path is told under the address, wi
   const fr = langs.fr.welcomeSteps;
   assert.equal(fr.gitNotEmpty, 'Ce dépôt contient déjà un carnet.');
   assert.equal(fr.gitNotEmptyHint, 'Pour l’utiliser, passez par {link}.');
-  assert.equal(fr.gitEmptyOpen, 'Ce dépôt ne contient pas de carnet OpenDives.');
+  assert.equal(fr.gitEmptyOpen, 'Ce dépôt ne contient pas de carnet Benthic.');
   assert.equal(fr.gitEmptyOpenHint, 'Pour commencer un carnet dans ce dépôt, passez par {link}.');
   const git = read('components/FirstLaunchGit.svelte');
   assert.match(git, /error=\{addressLive\.error \|\| problemText\}/);
@@ -146,7 +146,7 @@ test('« Aucun carnet dans ce compte »: the card and its two buttons', () => {
   assert.match(steps, /goBackTo\('openCloudService'\)/);
   const fr = langs.fr.welcomeSteps;
   assert.equal(fr.noLogbookTitle, 'Aucun carnet dans ce compte');
-  assert.equal(fr.noLogbookText, 'Le dossier OpenDives de ce compte est vide, ou il n’existe pas encore.');
+  assert.equal(fr.noLogbookText, 'Le dossier Benthic de ce compte est vide, ou il n’existe pas encore.');
   assert.equal(fr.createHere, 'Créer un carnet ici');
 });
 

@@ -41,12 +41,12 @@ test('the tablet head of tasks 210 and 211 is gone, the phone and iOS keep what 
   assert.match(source, /@media \(max-width: 767\.98px\) and \(max-height: 820px\) \{\s*\.od-welcome-start--buttons \{\s*gap: 8px;/);
 });
 
-test('tasks 225 and 229: iOS keeps the pill badge after the name, read once as « OpenDives, alpha »', () => {
+test('tasks 225 and 229: iOS keeps the pill badge after the name, read once as « Benthic, alpha »', () => {
   const fr = JSON.parse(readFileSync(new URL('../../app/src/i18n/fr.json', import.meta.url), 'utf8'));
   const en = JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8'));
   assert.equal(fr.welcome.alpha, 'Alpha');
   assert.equal(en.welcome.alpha, 'Alpha');
-  assert.equal(fr.welcome.brandAlpha, 'OpenDives, alpha');
+  assert.equal(fr.welcome.brandAlpha, 'Benthic, alpha');
   assert.match(ios, /<h1 aria-label=\{t\('welcome\.brandAlpha'\)\}>[\s\S]*od-welcome-start--alpha/);
   assert.match(source, /\.od-welcome-start--alpha \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
   const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');

@@ -1,4 +1,4 @@
-# OpenDives — Analysis of the Subsurface project
+# Benthic — Analysis of the Subsurface project
 
 2026-11-05 · Christian Rémillard
 
@@ -6,7 +6,7 @@ English copy of the French original kept on claude.ai ([online](https://claude.a
 
 ## 1. Summary
 
-Subsurface is a mature, free (GPLv2) dive log. All the code is in a single C++/Qt repository: a shared business core of about 62,000 lines and two interfaces, one for desktop and one for mobile. For OpenDives, the decision that shapes everything else is this one: reuse this core and libdivecomputer, or rewrite the business logic.
+Subsurface is a mature, free (GPLv2) dive log. All the code is in a single C++/Qt repository: a shared business core of about 62,000 lines and two interfaces, one for desktop and one for mobile. For Benthic, the decision that shapes everything else is this one: reuse this core and libdivecomputer, or rewrite the business logic.
 
 - **Strengths to keep:** 366 dive computers with direct download, recognised decompression calculations (Bühlmann ZH-L16 and VPM-B), an open data format, a free Git-based cloud, and offline operation.
 - **Weaknesses to fix:** the mobile app is only a companion to the desktop. Its interface is dense and inherited from the desktop, its logic is concentrated in a monolithic controller (`QMLManager`, 2,715 lines), there is no GPS tracking while diving, and the iOS and Android versions do not do the same things.
@@ -100,9 +100,9 @@ The project itself describes Subsurface-mobile as a **limited version, a compani
 
 The privacy policy fits in one sentence: the service keeps only the account email, with servers in the United States and Germany, and no use of the data. The FAQ stresses the volunteer nature of the project, its independence from manufacturers and the VPM-B/Bühlmann planner. The website offers **no logbook viewable online** and no documented public API for the cloud: access is only through Git.
 
-## 5. Strengths, weaknesses and opportunities for OpenDives
+## 5. Strengths, weaknesses and opportunities for Benthic
 
-|  | Finding | Consequence for OpenDives |
+|  | Finding | Consequence for Benthic |
 | --- | --- | --- |
 | Strength | 366 dive computers supported through libdivecomputer, with Bluetooth detection | Must be reused: rewriting it would take years |
 | Strength | Proven decompression calculations and planner, covered by tests | Reuse, or port with its tests as the reference |
@@ -112,8 +112,8 @@ The privacy policy fits in one sentence: the service keeps only the account emai
 | Weakness | Monolithic `QMLManager`, interface logic mixed with business logic | Clearly separate the layers (domain, data, interface) |
 | Weakness | Heavy Qt mobile build and few mobile contributors | Choose a mobile stack with a larger pool of developers |
 | Weakness | iOS lagging behind (BLE only, rare releases) | iOS/Android parity from the design stage |
-| Opportunity | Photos, offline map, widgets, watch, sharing, wet-screen mode missing | Possible differentiators for OpenDives |
-| Constraint | GPLv2 code; libdivecomputer under LGPL-2.1 | Reusing `core` makes OpenDives GPLv2; libdivecomputer alone is more flexible (see section 6) |
+| Opportunity | Photos, offline map, widgets, watch, sharing, wet-screen mode missing | Possible differentiators for Benthic |
+| Constraint | GPLv2 code; libdivecomputer under LGPL-2.1 | Reusing `core` makes Benthic GPLv2; libdivecomputer alone is more flexible (see section 6) |
 
 ## 6. Criteria and options for choosing the frameworks
 
@@ -122,8 +122,8 @@ The choice depends first on the answers to the five questions below. The table t
 **Questions to settle before choosing**
 
 1. **Reuse:** keep Subsurface's C++ `core` as is, keep only libdivecomputer and rewrite the business logic, or rewrite everything?
-2. **Compatibility — decided on 5 November 2026:** OpenDives connects to the existing Subsurface cloud and does not replace it. It reads and writes Subsurface users' data.
-3. **Licence:** reusing `core` requires OpenDives to be GPLv2. libdivecomputer alone (LGPL-2.1) leaves more freedom, but imposes linking rules that are tricky on iOS. This is not legal advice: this point deserves checking.
+2. **Compatibility — decided on 5 November 2026:** Benthic connects to the existing Subsurface cloud and does not replace it. It reads and writes Subsurface users' data.
+3. **Licence:** reusing `core` requires Benthic to be GPLv2. libdivecomputer alone (LGPL-2.1) leaves more freedom, but imposes linking rules that are tricky on iOS. This is not legal advice: this point deserves checking.
 4. **Platforms:** mobile only (Android and iOS) or also desktop and web? A watch?
 5. **Skills:** which languages do the developers or targeted contributors know (Dart, Kotlin, Swift, TypeScript, C++)?
 
@@ -139,11 +139,11 @@ The choice depends first on the answers to the five questions below. The table t
 
 **Consequences of the decision to connect to the Subsurface cloud**
 
-- OpenDives must embed a **Git client** (libgit2, like Subsurface-mobile) and talk HTTPS to the `ssrf-cloud-*.subsurface-divelog.org` servers. There is no REST API: the Git repository **is** the interface.
+- Benthic must embed a **Git client** (libgit2, like Subsurface-mobile) and talk HTTPS to the `ssrf-cloud-*.subsurface-divelog.org` servers. There is no REST API: the Git repository **is** the interface.
 - Subsurface's **Git storage format** (`year/month/…` tree, one text file per dive, `00-Subsurface`, `01-Divesites`) must be reproduced byte for byte, otherwise the desktop app and Subsurface-mobile may corrupt or reject the data. The reference is `core/load-git.cpp` and `core/save-git.cpp`. Unknown data must be kept as is.
 - The **account cycle** must be reproduced: email and password credentials, PIN validation (`/verify`), password reset, choice of US or EU server, and offline local cache with merging of concurrent changes, including the `classify_git_save` protection.
 - This strongly favours reusing the C++ `core` (Git loading and saving already tested), hence options A, B (through FFI), E and F (through a native plugin). Options C and D remain possible, but would require either rewriting the Git parser and serialiser, or bridging the `core`.
-- Licence: reusing `load-git` and `save-git` puts OpenDives under GPLv2. It would also be courteous to tell the Subsurface maintainers, who fund the servers themselves, that a new client will connect to them.
+- Licence: reusing `load-git` and `save-git` puts Benthic under GPLv2. It would also be courteous to tell the Subsurface maintainers, who fund the servers themselves, that a new client will connect to them.
 
 **CORS test of 5 November 2026.** The test was run from the built-in browser (Chromium), with `fetch` requests to `/git/<account>/info/refs?service=git-upload-pack` on `ssrf-cloud-eu`, `ssrf-cloud-us` and `cloud.subsurface-divelog.org`. All three servers are reachable, but **none sends an `Access-Control-Allow-Origin` header**. Both the simple request and the `OPTIONS` preflight (with `Authorization`) are blocked by the browser. A web app running in a browser therefore cannot reach the Subsurface cloud directly: it needs either a native or hybrid app (requests made on the native side), or a relay server.
 

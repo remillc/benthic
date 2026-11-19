@@ -1,4 +1,4 @@
-# OpenDives performance audit
+# Benthic performance audit
 
 Branch `audit/performance`, 16 November 2026, from `feature/desktop-logbook` (plus `origin/main`).
 Nothing in the app was changed: this document and the scripts in `tools/perf/` are the whole delivery.

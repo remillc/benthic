@@ -1,6 +1,6 @@
 {
   "appId": "org.opendives.app",
-  "appName": "OpenDives",
+  "appName": "Benthic Log",
   "webDir": "dist",
   "loggingBehavior": "none",
   "appendUserAgent": "OpenDives",

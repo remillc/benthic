@@ -1,10 +1,10 @@
-# OpenDives
+# Benthic
 
 An improved version of the Subsurface Mobile app.
 
 ## About
 
-OpenDives aims to offer a modern mobile app to log, review and share dives, building on Subsurface Mobile.
+Benthic aims to offer a modern mobile app to log, review and share dives, building on Subsurface Mobile.
 
 ## Status
 

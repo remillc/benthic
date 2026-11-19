@@ -1,6 +1,6 @@
 # Writing the interface text
 
-How to write every text the diver reads in OpenDives: labels, help lines, buttons, messages, empty states. The rules come from Christian's corrections on the mock-ups. Read this before writing or changing any visible text, on the canvas or in `app/src/i18n/*.json`.
+How to write every text the diver reads in Benthic: labels, help lines, buttons, messages, empty states. The rules come from Christian's corrections on the mock-ups. Read this before writing or changing any visible text, on the canvas or in `app/src/i18n/*.json`.
 
 The examples are in French, the app's reference language. The rules apply to every language.
 
@@ -48,7 +48,7 @@ Do not add "saved", "stored", "kept" or advice the diver did not ask for when th
 
 ### 6. Do not mention Subsurface
 
-The app is OpenDives. Mention Subsurface only where the diver must know it to act (file format names, the Subsurface cloud account). Never as a comparison or an explanation.
+The app is Benthic. Mention Subsurface only where the diver must know it to act (file format names, the Subsurface cloud account). Never as a comparison or an explanation.
 
 - Christian's correction: « Arrête d'évoquer SS. Ce n'est pas utile. »
 
@@ -77,9 +77,9 @@ The app is OpenDives. Mention Subsurface only where the diver must know it to ac
 
 ### 8. No promise about where the data never goes
 
-Do not write that dives or data are never sent to OpenDives, or similar promises about the future. Paid hosting on an OpenDives server may come later, and such a line would then be false. Say where the logbook is kept, not where it will never go.
+Do not write that dives or data are never sent to Benthic, or similar promises about the future. Paid hosting on a Benthic server may come later, and such a line would then be false. Say where the logbook is kept, not where it will never go.
 
-- Removed on 15 November 2026: « Aucune plongée n’est envoyée à OpenDives. »
+- Removed on 15 November 2026: « Aucune plongée n’est envoyée à Benthic. »
 
 ## Before publishing a text
 

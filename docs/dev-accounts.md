@@ -1,6 +1,6 @@
-# Trying the OpenDives+ flow with a simulated Google account
+# Trying the Benthic+ flow with a simulated Google account
 
-Development only. Real Google Sign-In and real store billing are not wired yet; this simulation lets a developer go through the whole OpenDives+ flow (sign-in, offer, purchase, health data, import of a Subsurface file) against the local development server, with a temporary account.
+Development only. Real Google Sign-In and real store billing are not wired yet; this simulation lets a developer go through the whole Benthic+ flow (sign-in, offer, purchase, health data, import of a Subsurface file) against the local development server, with a temporary account.
 
 Nothing of it exists in a release: the switch below is read at build time, and a build without it contains none of the code (`tests/app/dev-accounts.test.mjs` builds both ways and searches the bundle).
 
@@ -8,7 +8,7 @@ Nothing of it exists in a release: the switch below is read at build time, and a
 
 - **The switch:** `VITE_DEV_ACCOUNTS=1` in `app/.env.local` (git-ignored; never set it in a release build).
 - **« Continuer avec Google »** opens a small sheet marked « Simulation (développement) » with an e-mail (prefilled with `essai-xxxx@opendives.test`) and a name. It calls the development server's simulated sign-in and continues the real flow: a subscribed account goes to its logbook (download, or the choices that create one); any other account goes to the offer.
-- **« S'abonner »** (offer) calls the simulated purchase, then « Bienvenue dans OpenDives+ », « Vos données de santé » and the download (or the choices that create a logbook: import a Subsurface file, send the logbook of this device, start blank).
+- **« S'abonner »** (offer) calls the simulated purchase, then « Bienvenue dans Benthic+ », « Vos données de santé » and the download (or the choices that create a logbook: import a Subsurface file, send the logbook of this device, start blank).
 - **« Supprimer ce compte d'essai »** on the account page (temporary accounts only) deletes the account and its repository on the development server, then signs out of the device.
 - The app refuses these calls at run time when the server address is not this machine's (`127.0.0.1`, `10.0.2.2`, `localhost`, `[::1]`).
 - Without the switch nothing changes: the Google button answers that the sign-in is not available yet.
@@ -35,7 +35,7 @@ The reverse ports last until the phone is unplugged or adb restarts. The emulato
 
 Same switch (`VITE_DEV_ACCOUNTS=1`), same local-server guard. A row marked « DEV » sits just under the first card of the account sheet (free and subscriber sheets; phone, iPhone, tablet and desktop); with `VITE_SHOW_ROUTE=1`, a long press (0.6 s) on the route badge opens it too. It is a bottom sheet with the current state (free or subscribed, the session's e-mail, the server) and:
 
-- **Passer en compte gratuit** (two items): sign out of OpenDives+ keeping the device logbook (the app opens it), or keep the session and mark the account not subscribed (`POST /v1/account/dev-unsubscribe`).
+- **Passer en compte gratuit** (two items): sign out of Benthic+ keeping the device logbook (the app opens it), or keep the session and mark the account not subscribed (`POST /v1/account/dev-unsubscribe`).
 - **Passer en compte abonné**: without a session, a temporary account (`dev-google`) then `dev-subscribe`; with a session, `dev-subscribe`.
 - **Nouveau compte d'essai**: a fresh temporary account, not subscribed, replacing the session.
 - **Supprimer ce compte d'essai**: `dev-reset`, then sign out with the device copy (temporary `@opendives.test` accounts only).

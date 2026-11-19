@@ -302,7 +302,7 @@ test('segment “Free” has no qualifier and a device icon; the other two keep 
   assert.match(menu, /toFreeOut: 'Gratuit', toFreeOutTag: ''/);
   assert.match(menu, /segment\('out', 0, 'phone'/);
   assert.match(menu, /toFreeKeepTag: 'signed in'/);
-  assert.match(menu, /toSubTag: 'OpenDives\+'/);
+  assert.match(menu, /toSubTag: 'Benthic\+'/);
 });
 
 test('the sheet follows a drag on its grip: closes past a quarter of its height or on a flick, springs back otherwise, honours reduced motion', () => {

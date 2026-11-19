@@ -250,12 +250,12 @@ export async function planExport({ withMedia = false } = {}, deps) {
   };
 }
 
-const README = `OpenDives: all my data
+const README = `Benthic: all my data
 ======================
 
 manifest.json              every file of this archive with its size and its SHA-256
 logbook/logbook.ssrf       the dive log in Subsurface's format (open it with Subsurface)
-opendives/                 what only OpenDives keeps, as JSON: gear, kits, maintenance, what each dive used,
+opendives/                 what only Benthic keeps, as JSON: gear, kits, maintenance, what each dive used,
                            the diver profile, the certifications, the settings of the device
 opendives/media/           the photos of pieces and of invoices
 dive-media/                the original photos and videos of the dives (only when they were asked for)

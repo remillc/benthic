@@ -176,7 +176,7 @@
     "notFound": "This document no longer exists.",
     "close": "Close",
     "save": "Save",
-    "readOnly": "Read only: the OpenDives+ subscription has ended.",
+    "readOnly": "Read only: the Benthic+ subscription has ended.",
     "errors": {
       "required": "Required.",
       "date": "Enter a real date.",
@@ -378,7 +378,7 @@
     "emptyLocal": "On this phone · no dives",
     "emptyLocalTablet": "On this tablet · no dives",
     "emptyLocalDesktop": "On this computer · no dives",
-    "emptyServer": "Connected to the OpenDives server, no dives"
+    "emptyServer": "Connected to the Benthic server, no dives"
   },
   "sync": {
     "failure": {
@@ -411,10 +411,10 @@
         "rowManualGit": "The git repository is not answering",
         "titleGit": "The git repository is not answering",
         "introGit": "The network works, but the repository server is not answering. It may be under maintenance.",
-        "rowServer": "The OpenDives server is not answering: trying again in {n} min",
-        "rowManualServer": "The OpenDives server is not answering",
-        "titleServer": "The OpenDives server is not answering",
-        "introServer": "The network works, but the OpenDives server is not answering. It may be under maintenance."
+        "rowServer": "The Benthic server is not answering: trying again in {n} min",
+        "rowManualServer": "The Benthic server is not answering",
+        "titleServer": "The Benthic server is not answering",
+        "introServer": "The network works, but the Benthic server is not answering. It may be under maintenance."
       },
       "repository": {
         "row": "Can’t sync: git repository refused",
@@ -431,7 +431,7 @@
       "send": "Sending changes…",
       "read": "Reading the logbook…",
       "connectGit": "Connecting to the repository…",
-      "connectServer": "Connecting to the OpenDives server…"
+      "connectServer": "Connecting to the Benthic server…"
     },
     "outcome": {
       "done": "Sync complete",
@@ -452,8 +452,8 @@
     },
     "syncingGit": "Syncing with the git repository…",
     "cloudGit": "Synced with the git repository",
-    "syncingServer": "Syncing with the OpenDives server…",
-    "cloudServer": "Synced with the OpenDives server"
+    "syncingServer": "Syncing with the Benthic server…",
+    "cloudServer": "Synced with the Benthic server"
   },
   "dive": {
     "siteNotSet": "Dive site not set",
@@ -1205,7 +1205,7 @@
   },
   "menu": {
     "open": "Menu",
-    "title": "OpenDives",
+    "title": "Benthic",
     "sections": "Sections",
     "noAccount": "No account",
     "cloudDives": {
@@ -1222,18 +1222,18 @@
       "other": "Repository · {n} dives"
     },
     "serverDives": {
-      "one": "OpenDives server · {n} dive",
-      "other": "OpenDives server · {n} dives"
+      "one": "Benthic server · {n} dive",
+      "other": "Benthic server · {n} dives"
     }
   },
   "backup": {
-    "notOnServer": {"title": "Logbook not on the server", "line": "Versions are kept on the OpenDives server. This logbook is only on this device.", "send": "Send the logbook to the server"},
+    "notOnServer": {"title": "Logbook not on the server", "line": "Versions are kept on the Benthic server. This logbook is only on this device.", "send": "Send the logbook to the server"},
     "title": "Backup and restore",
     "media": "Deleted photos and videos are kept for 90 days, then erased.",
     "status": {
       "saved": "Logbook backed up",
-      "savedLine": "{when}, encrypted on the OpenDives server",
-      "neverLine": "Not sent to the OpenDives server yet",
+      "savedLine": "{when}, encrypted on the Benthic server",
+      "neverLine": "Not sent to the Benthic server yet",
       "pending": {
         "one": "{n} change waiting to be sent",
         "other": "{n} changes waiting to be sent"
@@ -1510,8 +1510,8 @@
     "gitEditText": "Address, branch and token",
     "gitSignOut": "Disconnect from the repository",
     "gitSignOutText": "Your dives stay in the repository. The token is erased from this device.",
-    "bandServer": "Your logbook on the OpenDives server",
-    "serverName": "OpenDives server",
+    "bandServer": "Your logbook on the Benthic server",
+    "serverName": "Benthic server",
     "serverDives": "Dives on the server",
     "serverSignOut": "Sign out of the server",
     "serverSignOutText": "Your dives stay on the server. The access is erased from this device.",
@@ -1524,12 +1524,12 @@
     "sheet": {
       "backup": "Backup and restore",
       "backupText": "Go back to a version of the logbook or of a dive",
-      "plusDives": {"one": "OpenDives+ · {n} dive", "other": "OpenDives+ · {n} dives"},
+      "plusDives": {"one": "Benthic+ · {n} dive", "other": "Benthic+ · {n} dives"},
       "gitTitle": "Personal git repository",
       "gitLine": {"one":"{repository} · {n} dive","other":"{repository} · {n} dives"},
       "changeRepository": "Change repository",
       "backupTextGit": "Following your git repository’s history",
-      "upgradeTitle": "Upgrade to OpenDives+",
+      "upgradeTitle": "Upgrade to Benthic+",
       "upgradeText": "Your diver profile, equipment and sync with your phone",
       "upgradeAction": "Discover",
       "maintenanceLate": {
@@ -1576,9 +1576,9 @@
     }
   },
   "welcome": {
-    "title": "OpenDives",
+    "title": "Benthic",
     "alpha": "Alpha",
-    "brandAlpha": "OpenDives, alpha",
+    "brandAlpha": "Benthic, alpha",
     "noAccount": "Start without an account",
     "choicesLabel": "Ways to start",
     "ownGit": "Use my own git repository",
@@ -1611,9 +1611,9 @@
     }
   },
   "serverSteps": {
-    "rowTitle": "On the OpenDives server",
-    "openHelp": "With your OpenDives account.",
-    "accountTitle": "Your OpenDives account",
+    "rowTitle": "On the Benthic server",
+    "openHelp": "With your Benthic account.",
+    "accountTitle": "Your Benthic account",
     "accountHelp": "Enter your e-mail address: a code is sent to it. No password to remember.",
     "emailLabel": "E-mail address",
     "emailHelp": "If there is no account at this address, it is created with the code.",
@@ -1649,10 +1649,10 @@
     "progressCopyIphone": "Copying the logbook to this iPhone",
     "progressCopyDesktop": "Copying the logbook to this computer",
     "progressHelp": "Keep the app open until it finishes. Then your logbook opens, and you can still view it without a network.",
-    "downloaded": "Logbook downloaded from the OpenDives server. It stays on this tablet, even without a network.",
-    "downloadedPhone": "Logbook downloaded from the OpenDives server. It stays on this phone, even without a network.",
-    "downloadedIphone": "Logbook downloaded from the OpenDives server. It stays on this iPhone, even without a network.",
-    "downloadedDesktop": "Logbook downloaded from the OpenDives server. It stays on this computer, even without a network.",
+    "downloaded": "Logbook downloaded from the Benthic server. It stays on this tablet, even without a network.",
+    "downloadedPhone": "Logbook downloaded from the Benthic server. It stays on this phone, even without a network.",
+    "downloadedIphone": "Logbook downloaded from the Benthic server. It stays on this iPhone, even without a network.",
+    "downloadedDesktop": "Logbook downloaded from the Benthic server. It stays on this computer, even without a network.",
     "refusedTitle": "The server refused this access",
     "refusedDetail": "Sign in again to get a new access. Nothing was changed.",
     "backHome": "Back to the start"
@@ -1663,7 +1663,7 @@
     "createHelp": "You will choose where to keep it next.",
     "importTitle": "Import a logbook",
     "importHelp": "A .ssrf, .xml, UDDF or FIT file, or your divelogs.de account.",
-    "openTitle": "Open my OpenDives logbook",
+    "openTitle": "Open my Benthic logbook",
     "openHelp": "It is already in your cloud or in a git repository.",
     "back": "Back",
     "newTitle": "New logbook",
@@ -1686,7 +1686,7 @@
     "deviceHelpIphone": "No account needed. You will only be able to open it on this iPhone.",
     "renameLabel": "Rename the logbook",
     "serviceTitle": "Choose your service",
-    "serviceHelp": "The logbook is created in an OpenDives folder of your account.",
+    "serviceHelp": "The logbook is created in an Benthic folder of your account.",
     "icloud": "iCloud Drive",
     "icloudHelp": "The Apple account of this iPhone, no sign-in needed.",
     "icloudAccountIphone": "Apple account of this iPhone",
@@ -1700,8 +1700,8 @@
     "connectTitle": "Connecting to {service}",
     "notConnected": "Not connected yet",
     "connect": "Sign in to {service}",
-    "appName": "OpenDives",
-    "connectedCreate": "“{file}” will be created in the OpenDives folder of this account.",
+    "appName": "Benthic",
+    "connectedCreate": "“{file}” will be created in the Benthic folder of this account.",
     "changeAccount": "Change account",
     "createLogbook": "Create the logbook",
     "creating": "Creating…",
@@ -1728,7 +1728,7 @@
     "divelogsFormTitle": "Import from divelogs.de",
     "divelogsUser": "User name",
     "divelogsPassword": "Password",
-    "credentialsNote": "OpenDives does not keep these credentials.",
+    "credentialsNote": "Benthic does not keep these credentials.",
     "importAction": "Import",
     "progressConnect": "Connecting to divelogs.de",
     "progressAccount": "Account “{user}”",
@@ -1750,16 +1750,16 @@
     "summaryYear": "{text}, in {year}",
     "openWhere": "Where is it?",
     "openService": "Which service?",
-    "openConnectedHelp": "OpenDives will look for your logbooks in the OpenDives folder of this account.",
+    "openConnectedHelp": "Benthic will look for your logbooks in the Benthic folder of this account.",
     "seeLogbooks": "See my logbooks",
     "chooseTitle": "Choose your logbook",
-    "chooseHelp": "In the OpenDives folder of {account}, on {service}.",
+    "chooseHelp": "In the Benthic folder of {account}, on {service}.",
     "foundLogbook": {
       "one": "{n} dive · changed on {date}",
       "other": "{n} dives · changed on {date}"
     },
     "openLogbook": "Open the logbook",
-    "gitEmptyOpen": "This repository holds no OpenDives logbook.",
+    "gitEmptyOpen": "This repository holds no Benthic logbook.",
     "gitBranchMissing": "This branch does not exist in the repository.",
     "keptGit": "Git repository",
     "keptCloud": "Cloud",
@@ -1785,7 +1785,7 @@
     "gitNotEmptyHint": "To use it, go through {link}.",
     "gitEmptyOpenHint": "To start a logbook in this repository, go through {link}.",
     "noLogbookTitle": "No logbook in this account",
-    "noLogbookText": "The OpenDives folder of this account is empty, or does not exist yet.",
+    "noLogbookText": "The Benthic folder of this account is empty, or does not exist yet.",
     "createHere": "Create a logbook here",
     "divelogsDenied": "Incorrect user name or password.",
     "interrupted": "Download interrupted",
@@ -1804,13 +1804,13 @@
     "cloudSoon": "The cloud is coming in a later version.",
     "signInTitle": "Sign in",
     "signInHelp": "Or create an account.",
-    "discoverPlus": "Discover OpenDives+",
+    "discoverPlus": "Discover Benthic+",
     "importLogbook": "Import the logbook",
     "localTitle": "Start a logbook on this tablet",
     "localTitlePhone": "Start a logbook on this phone",
     "localTitleIphone": "Start a logbook on this iPhone",
     "localHelp": "Kept here, even without a network.",
-    "importStartHelp": "A file from OpenDives or another app, or divelogs.de.",
+    "importStartHelp": "A file from Benthic or another app, or divelogs.de.",
     "alphaName": "Previous logbook",
     "alphaTitle": "Previous version’s logbook",
     "alphaHelp": {
@@ -1822,7 +1822,7 @@
       "other": "{n} dives, last changed {date}, copied into a new logbook."
     },
     "localTitleDesktop": "Start a logbook on this computer",
-    "keptServer": "OpenDives server"
+    "keptServer": "Benthic server"
   },
   "signOut": {
     "title": "Sign out?",
@@ -1853,7 +1853,7 @@
       "one": "{n} change is not sent to the repository yet. If you disconnect anyway, it will be sent the next time you connect to this repository from this device. The token is erased from this device.",
       "other": "{n} changes are not sent to the repository yet. If you disconnect anyway, they will be sent the next time you connect to this repository from this device. The token is erased from this device."
     },
-    "titleServer": "Sign out of the OpenDives server?",
+    "titleServer": "Sign out of the Benthic server?",
     "textNoneServer": "The logbook stays on the server. A copy stays on this device, not shown, and is used if you sign in again. The access is erased from this device.",
     "textPendingServer": {
       "one": "{n} change is not sent to the server yet. If you sign out anyway, it will be sent the next time you sign in from this device. The access is erased from this device.",
@@ -1936,7 +1936,7 @@
     "manual": "Type it",
     "nothingTitle": "No pressure read in the photo",
     "nothingText": "Move closer, avoid reflections or turn on the flash. You can also type the pressure.",
-    "permissionReason": "OpenDives uses the camera only to read the pressure on a gauge. The photo stays on this device and is not kept.",
+    "permissionReason": "Benthic uses the camera only to read the pressure on a gauge. The photo stays on this device and is not kept.",
     "permissionButton": "Allow the camera",
     "permissionDenied": "The camera is not allowed. You can choose an existing photo or type the pressure.",
     "cameraFailed": "The camera does not answer. You can choose an existing photo or type the pressure.",
@@ -1990,7 +1990,7 @@
     "redone": "Change redone",
     "undoFailed": "The change can no longer be undone",
     "failed": "The change could not be saved. Nothing changed.",
-    "writeLocked": "This account cannot be edited from OpenDives yet. Nothing changed.",
+    "writeLocked": "This account cannot be edited from Benthic yet. Nothing changed.",
     "date": "Date",
     "time": "Time",
     "maxDepth": "Max. depth",
@@ -2189,8 +2189,8 @@
     "region": "Region",
     "withoutTitle": "Dives without a site",
     "withoutIntro": {
-      "one": "{n} dive has no site. OpenDives suggests the nearest site when the dive has a position, or the site of the other dives of the same trip.",
-      "other": "{n} dives have no site. OpenDives suggests the nearest site when the dive has a position, or the site of the other dives of the same trip."
+      "one": "{n} dive has no site. Benthic suggests the nearest site when the dive has a position, or the site of the other dives of the same trip.",
+      "other": "{n} dives have no site. Benthic suggests the nearest site when the dive has a position, or the site of the other dives of the same trip."
     },
     "withoutMapNote": "Position recorded by the dive computer or the phone. Dives without a position are not on the map.",
     "withoutMapLabel": {
@@ -2625,7 +2625,7 @@
     "usedDives": "Calculated from",
     "noDives": "No logbook dive counts in this calculation.",
     "note": "This calculation only knows the dives in the logbook. A missing dive makes it wrong. Your dive computer prevails.",
-    "recommendation": "The wait before flying is an OpenDives recommendation, not a result of the model: 18 hours after several dives in a day, 12 hours after a single one, or the length chosen in Settings. It is never a guarantee."
+    "recommendation": "The wait before flying is an Benthic recommendation, not a result of the model: 18 hours after several dives in a day, 12 hours after a single one, or the length chosen in Settings. It is never a guarantee."
   },
   "flight": {
     "at": "{day} at {time}",
@@ -2648,9 +2648,9 @@
     },
     "permission": {
       "title": "Get a reminder for flying",
-      "text": "OpenDives can send you a notification when the wait before flying is over. Your phone will ask you to allow notifications.",
+      "text": "Benthic can send you a notification when the wait before flying is over. Your phone will ask you to allow notifications.",
       "action": "Continue",
-      "denied": "Notifications refused. Allow OpenDives notifications in the phone's settings to get the reminder."
+      "denied": "Notifications refused. Allow Benthic notifications in the phone's settings to get the reminder."
     }
   },
   "accountStep": {
@@ -2721,7 +2721,7 @@
     "project": "Project",
     "notes": "What's new",
     "notesText": "What changed in this version",
-    "rate": "Rate OpenDives",
+    "rate": "Rate Benthic",
     "rateTextAndroid": "Give a rating in Google Play",
     "rateTextIos": "Give a rating in the App Store",
     "rateOpensAndroid": "opens in Google Play",
@@ -2729,32 +2729,32 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Account (free version): the Account button stays, with a silhouette. Its sheet shows the logbook on this device, “Subscribe”, “Already subscribed? Sign in” and the OpenDives+ rows that open the offer. With an OpenDives+ account, “My diver profile” carries the OpenDives+ chip and, when a piece is overdue for maintenance, a red badge and the line “Maintenance: 1 piece overdue”; the sheet’s cross is on the right. “Manage the account” opens a screen (a two-column dialog on a tablet and on the desktop): e-mail and sign-in method, subscription with “Manage in Google Play” (or the App Store), a 10 GB photo and video space, “Download my data”, “Sign out” and “Delete the account” after a confirmation. On Android, Back closes the account sheet. The OpenDives+ offer has “Already subscribed? Sign in” (except right after signing in), and “Continue without an account” is centred under the three buttons on a tablet and on the desktop. The “OpenDives” name on an OpenDives+ account’s sheet is followed by a small round “+” chip. On a tablet, “Subscribe” and the two rows with the chip open the OpenDives+ offer in two panes: the blue panel on the left, the five tiles, the price and “Subscribe” on the right.",
+      "Account (free version): the Account button stays, with a silhouette. Its sheet shows the logbook on this device, “Subscribe”, “Already subscribed? Sign in” and the Benthic+ rows that open the offer. With an Benthic+ account, “My diver profile” carries the Benthic+ chip and, when a piece is overdue for maintenance, a red badge and the line “Maintenance: 1 piece overdue”; the sheet’s cross is on the right. “Manage the account” opens a screen (a two-column dialog on a tablet and on the desktop): e-mail and sign-in method, subscription with “Manage in Google Play” (or the App Store), a 10 GB photo and video space, “Download my data”, “Sign out” and “Delete the account” after a confirmation. On Android, Back closes the account sheet. The Benthic+ offer has “Already subscribed? Sign in” (except right after signing in), and “Continue without an account” is centred under the three buttons on a tablet and on the desktop. The “Benthic” name on an Benthic+ account’s sheet is followed by a small round “+” chip. On a tablet, “Subscribe” and the two rows with the chip open the Benthic+ offer in two panes: the blue panel on the left, the five tiles, the price and “Subscribe” on the right.",
       "Logbook: the search box moves up a little, further from the header wave.",
       "Start: the launch screen now stays until the first real screen is drawn (the first launch on a first start, the logbook otherwise), with a short fade, and the first launch no longer appears after an empty logbook. The first screen is laid out once, with the real height of the status bar, so nothing jumps.",
       "« Sign in or create an account »: a little more space between the buttons, and « Continue without an account » in blue, centred.",
       "First screens: a page opened for the first time now waits for its styles before it is shown, and the drawings of the blue bands have a fixed size, so nothing flashes at a large size while the first launch screen opens.",
       "Desktop logbook: the table is lighter. Default columns: number in bold, date with the day of the week and the time in small grey, site (or \"Site not set\" in grey italics with a crossed-out pin), deepest depth in bold, duration, buddies. The \"Profile\" column (small dive graphs) is hidden by default and added with the columns button; the columns and widths you chose are kept. A line under the headers gives the year and dive count of the first visible dive and stays at the top while scrolling. A trip is a white card that folds. The selected dive is pale blue, with its number and site in blue.",
       "First launch (public edition): if you come from the alpha, “Import a logbook” offers “Previous version’s logbook”, with its number of dives. It copies that logbook, read from the alpha’s copy on the phone without the network and without the alpha’s account (even if the alpha’s sign-in is gone), into a new logbook; with several copies, one row per copy shows its number of dives and its date. The alpha’s files are not touched and the row disappears after the copy.",
-      "Public edition: no choice is left to open a logbook in OneDrive, Google Drive or a personal git repository. “Open my logbook” offers the OpenDives server, and the account no longer offers “Use my own git repository”.",
+      "Public edition: no choice is left to open a logbook in OneDrive, Google Drive or a personal git repository. “Open my logbook” offers the Benthic server, and the account no longer offers “Use my own git repository”.",
       "A logbook that was on the Subsurface cloud is not opened here: after an update from the alpha, the app starts from its first launch and leaves that logbook's files on the phone as they were. The Account page no longer offers signing in to the Subsurface cloud. A dive that cannot be read shows a page with « Try again ».",
       "Logbook on a phone and on a tablet: dives are grouped by year, each year in a white card. Each row shows the date on a pale blue block, the site (or “Dive site not set” with a crossed-out pin), the dive number in bold and the time, the small profile, then the maximum depth in bold and the duration, in the units of the settings. A trip is its own card, with a pale blue header (suitcase, number of dives, depths) and an arrow to fold it. A screen reader reads each row as one item. On a tablet, trips are open in portrait and folded in landscape until you open or fold one yourself, and the dive shown keeps its pale blue background.",
       "“Sign in or create an account”: the Google and Apple buttons now carry each provider’s official logo, on the phone, the tablet and the computer, with the colours of their brand rules. On a tablet and on a computer, the screen opens from “Sign in” on the first launch, in the two-pane layout.",
       "Android: the screen edges are the same at every launch and in every navigation mode: sheets, messages, buttons and the bottom bar stay above the gesture bar or the navigation buttons, and the top no longer jumps.",
-      "OpenDives server (release edition): your logbook downloads from the server and opens like any logbook, with « Your logbook is ready » after the download. It stays in Subsurface’s format, syncs like a git repository (automatic sync, offline, conflicts) and is named « OpenDives server » in the menu, the account and the sync messages. « Create an empty logbook », « Import a Subsurface file » and « Send the logbook of this phone » create it on the server; an interrupted sending resumes where it stopped.",
+      "Benthic server (release edition): your logbook downloads from the server and opens like any logbook, with « Your logbook is ready » after the download. It stays in Subsurface’s format, syncs like a git repository (automatic sync, offline, conflicts) and is named « Benthic server » in the menu, the account and the sync messages. « Create an empty logbook », « Import a Subsurface file » and « Send the logbook of this phone » create it on the server; an interrupted sending resumes where it stopped.",
       "First launch on Android: the vertical spacing follows the mock-up (title, choices, buttons under the choices, « A question? » link) and the bottom link stays above the system navigation bar. Component styles again take precedence over Framework7's in the released build, which also fixes margins on other screens.",
       "Equipment: “New piece” picks the type from tiles (computer, regulator, suit, undersuit, cylinder, BCD, lamp, weight belt, other) with a photo and a suggested service reminder; “Edit the kit” shows how many dives used the kit and lets you duplicate it; in “Edit the dive”, “Fill with” groups “A kit” and “Previous dive”.",
-      "Equipment service (OpenDives+): “Service” in My profile and the card at the top of “Equipment” list what is overdue, coming up or up to date. A reminder can be set by time, by number of dives (those where the piece is in the equipment), or both: the first one reached counts. “Note a service” keeps the date, who did it, the cost and a photo of the invoice, and “Edit the dive” warns when a piece is overdue. A notification warns 7, 30 or 60 days before, then on the day.",
-      "OpenDives+ offer: a « Service reminders » tile under the four others says that the regulator, cylinder and battery reminders arrive 30 days before they are due.",
+      "Equipment service (Benthic+): “Service” in My profile and the card at the top of “Equipment” list what is overdue, coming up or up to date. A reminder can be set by time, by number of dives (those where the piece is in the equipment), or both: the first one reached counts. “Note a service” keeps the date, who did it, the cost and a photo of the invoice, and “Edit the dive” warns when a piece is overdue. A notification warns 7, 30 or 60 days before, then on the day.",
+      "Benthic+ offer: a « Service reminders » tile under the four others says that the regulator, cylinder and battery reminders arrive 30 days before they are due.",
       "Logbook download and divelogs.de import: the time left shows on the right of the progress line when the operation takes more than 5 seconds, as « 20 s left », then in minutes. It replaces the earlier « About … » on the logbook upload.",
       "Logbook: when the network comes back, the logbook leaves « Offline » and updates by itself, even with no change waiting, including when you return to the app.",
       "Buttons: the touch effect shows on the pressed button, not at the top of the screen (seen in Clean up sites).",
       "Offline maps: the dot on the account avatar goes away once a map update is done, including an update that finished while the app was closed.",
       "Logbook: a progress bar shows at the top of the list while the app brings the logbook up to date at start; the list is already there.",
       "Account sheet: the « Map update available » message is its own row, « Offline maps », and opens the offline maps in Settings directly.",
-      "My diver profile (OpenDives+): the account sheet opens it, and « Equipment » holds your dive computers, regulators, suits, cylinders and kits, kept on this phone and readable offline. In « Edit dive », « Apply a kit » and « Same as the previous one » fill the equipment (with « Undo »), suits are picked from the inventory, a piece can be added for one dive only, and a dive computer can be renamed. A computer enters the inventory the first time you download from it.",
-      "First launch (public edition): « Sign in » is the first choice, in dark blue with the OpenDives+ chip; « Start a logbook on this phone » and « Import a logbook » follow, then two text buttons, « Try with a sample logbook » and « Discover OpenDives+ ». The choices have 24 dp corners, 24 sp titles on tablet and desktop, and the logo on the band has a thin light ring instead of a shadow. « New logbook » ends with « Create the logbook », the import with « Import the logbook ».",
-      "OpenDives server (release edition): « On the OpenDives server » is the first choice of « Open my logbook ». You sign in with your e-mail address and a 6-digit code, no password; the screens tell a wrong code, an expired code, too many attempts (10-minute wait) and a server that does not answer. The logbook is then downloaded.",
+      "My diver profile (Benthic+): the account sheet opens it, and « Equipment » holds your dive computers, regulators, suits, cylinders and kits, kept on this phone and readable offline. In « Edit dive », « Apply a kit » and « Same as the previous one » fill the equipment (with « Undo »), suits are picked from the inventory, a piece can be added for one dive only, and a dive computer can be renamed. A computer enters the inventory the first time you download from it.",
+      "First launch (public edition): « Sign in » is the first choice, in dark blue with the Benthic+ chip; « Start a logbook on this phone » and « Import a logbook » follow, then two text buttons, « Try with a sample logbook » and « Discover Benthic+ ». The choices have 24 dp corners, 24 sp titles on tablet and desktop, and the logo on the band has a thin light ring instead of a shadow. « New logbook » ends with « Create the logbook », the import with « Import the logbook ».",
+      "Benthic server (release edition): « On the Benthic server » is the first choice of « Open my logbook ». You sign in with your e-mail address and a 6-digit code, no password; the screens tell a wrong code, an expired code, too many attempts (10-minute wait) and a server that does not answer. The logbook is then downloaded.",
       "First launch on Android tablets: « Use my own git repository » opens the form beside the blue panel, with « this tablet » in the texts; « How to create a repository » and « How to create an access token » replace the form in the same column, and « Back » brings it back with the fields filled. The logbook downloads, then opens with a message at the bottom left.",
       "« Create a repository » and « Create an access token » help: the site's labels are in boxes and the values to type in a monospace font; the GitLab and Codeberg tabs give the site's labels in the app's language, and GitLab and Codeberg have their own token steps.",
       "Sync with a git repository: a server that does not answer is no longer shown as a refused token; the app tries again on its own.",
@@ -2769,9 +2769,9 @@
       "First launch: after signing in, the download screen shows three steps with the progress of the dives, then the logbook opens with a message.",
       "Account creation: the code screen says « step 2 of 2 », and the empty logbook opens with the message « Account created. Your logbook is ready. ».",
       "« Start without an account »: a screen says where the logbook stays (this phone only, no backup, to link later) before it is created. The empty logbook reads « On this phone only, no dives ».",
-      "First launch: an « Alpha » badge follows the OpenDives name.",
+      "First launch: an « Alpha » badge follows the Benthic name.",
       "Account creation: the confirmation code goes in six boxes, one per digit. The code from the email can be pasted in one go.",
-      "First launch: a « Beta » badge follows the OpenDives name.",
+      "First launch: a « Beta » badge follows the Benthic name.",
       "Import a file: you can choose several files at once. A Suunto app .json and the .fit with the same name are read as one dive, with the gas mix and the gradient factors from the .fit.",
       "App icon on iPhone, iPad and Mac: blue to its edge, with the wave, no white background.",
       "App icon on Android: the blue disc fills the whole icon, with no white ring around it.",
@@ -2779,7 +2779,7 @@
       "First launch: the « Any questions? About and contact » link at the bottom of the screen opens About, with the support address.",
       "The decorative dive profile (first launch, empty logbook, account pages) is a smooth curve, without corners.",
       "First launch on a tablet: the dive profile no longer touches the screen edges.",
-      "First launch on a tablet: a larger logo and OpenDives name.",
+      "First launch on a tablet: a larger logo and Benthic name.",
       "First launch on iPhone and iPad: one line under the title and a one-line helper under each choice, as on Android.",
       "Empty logbook: a dive profile, a large « Pair a dive computer » button and, in a card, the other ways to add dives (import a file, download from divelogs.de, log a dive by hand).",
       "Logbook: « Merge into one dive » and « Edit together… » in the ⋮ menu of the checked dives. Merging is offered only for dives that follow one another, less than an hour apart; « Edit together… » changes the site, guide, buddies, tags, suit, water type and notes of several dives at once, and « Undo » reverts it in one go.",
@@ -2859,7 +2859,7 @@
       "Logo, light mode: the half-circle under the waves is light grey and the two bubbles are blue; in the app icon the upper arc is the same grey, so the ring is one colour. Dark mode is unchanged.",
       "Filter, Trip criterion: trips are sorted alphabetically.",
       "Dive page: when you scroll down, the site’s name shows in the top bar.",
-      "Rate OpenDives: a row under “What’s new” opens the app’s page in Google Play (or the App Store); after a successful download from a dive computer, the app may ask for a rating with the system’s own window (at most once every 120 days). Outside a store, the row becomes “Give feedback”.",
+      "Rate Benthic: a row under “What’s new” opens the app’s page in Google Play (or the App Store); after a successful download from a dive computer, the app may ask for a rating with the system’s own window (at most once every 120 days). Outside a store, the row becomes “Give feedback”.",
       "Side menu: the button is now ",
       "Side menu: dark text on the account card and the active row; the sync card and the logo match the mock-ups.",
       "Weights: Edit dive suggests a weight from the most recent dive with the same suit, cylinders and water type, adjusted by 2 lb (1 kg) if that weight was too light or too heavy; Use puts it in the dive. “This weight was” (Too light, Just right, Too heavy) is set in Edit dive and in the dive detail, under Equipment; the choice is saved as an English tag (weight-too-light, weight-ok, weight-too-heavy), which Subsurface also shows.",
@@ -2872,7 +2872,7 @@
       "Planner: the oxygen exposure follows the gas rows’ layout (CNS in large type, limit and OTU under the bar).",
       "Planner: each gas shows its total volume in large type, then the bar and its legend (used, reserve).",
       "Gas blender: the helium step of a trimix is corrected (it was about 0.8 % short, and the oxygen as much too long).",
-      "Links: opendives:// and opendives.app addresses open a dive, a site, the planner or a tool in the app, and a Subsurface logbook file (.ssrf, .xml) sent from a mail or a file app opens in OpenDives to be imported. A dive and a site can be shared as a link from their Share menu.",
+      "Links: opendives:// and benthicdivelog.app addresses open a dive, a site, the planner or a tool in the app, and a Subsurface logbook file (.ssrf, .xml) sent from a mail or a file app opens in Benthic to be imported. A dive and a site can be shared as a link from their Share menu.",
       "Dropdown menus: when they open, the list shows the chosen value.",
       "Planner: the keyboard no longer closes while typing in a field (levels, gases, GF).",
       "Planner: the SAC list goes in steps of 0.01 cu ft/min and opens on the current value.",
@@ -3062,10 +3062,10 @@
       "Best mix: « Prepare this mix » opens the Gas blender with that mix as the wanted mix (on a tablet, the button names the mix).",
       "Gas blender: « Desired final pressure » (was « Final pressure ») starts at the working pressure of the chosen cylinder, shown as « Working pressure: 3,365 psi ». A typed value stays when the cylinder changes; above the working pressure a warning shows and the calculation goes on.",
       "Gas blender: the cylinder is chosen before the final pressure; « In the cylinder » puts Pressure and Mix (nitrox) or Oxygen and Helium (trimix); the note on pressures is no longer red; « Analyse the mix before diving. » is in an amber banner.",
-      "Public edition: an account with no logbook offers to create an empty logbook, import a Subsurface file (.ssrf or .xml) or send the logbook of the device. The logbook is written in OpenDives' format on the server, in small uploads; it also stays on the device.",
+      "Public edition: an account with no logbook offers to create an empty logbook, import a Subsurface file (.ssrf or .xml) or send the logbook of the device. The logbook is written in Benthic' format on the server, in small uploads; it also stays on the device.",
       "Public edition: the upload shows « n dives of m » and the time left. If the connection drops, « Upload interrupted » says so and « Resume the upload » restarts after the last dive sent; the upload is also offered again at the next start.",
-      "Public edition: « Sign in or create an account », the OpenDives+ offer (US $14.99 a year), « Your logbook is ready » and « Welcome to OpenDives+! ». Signing in with Google or Apple and subscribing are not available yet; an account without a subscription keeps nothing on the device.",
-      "Public edition: the server screens no longer show « OpenDives server » above the title, the « The server is not responding » icon is centred and « Back to the start » replaces « Choose another place ».",
+      "Public edition: « Sign in or create an account », the Benthic+ offer (US $14.99 a year), « Your logbook is ready » and « Welcome to Benthic+! ». Signing in with Google or Apple and subscribing are not available yet; an account without a subscription keeps nothing on the device.",
+      "Public edition: the server screens no longer show « Benthic server » above the title, the « The server is not responding » icon is centred and « Back to the start » replaces « Choose another place ».",
       "In the desktop app, you can resize a Logbook column by dragging the edge of its header (or ← → on the edge, a double click to fit it), and each logbook keeps its own column order, visible columns and widths on this computer.",
       "In the desktop app, « Only on Wi-Fi or cable » now works: the automatic sync waits while the computer is on a metered connection (a phone's hotspot, mobile broadband) and runs when it is back on Wi-Fi or cable; « Sync now » still works.",
       "Lighter start-up and faster dive selection: the app loads half as much code and style at start, each screen and each language when it is first needed, and selecting a dive in the desktop logbook asks the core for that dive only instead of eighteen answers.",
@@ -3074,70 +3074,71 @@
       "Desktop dive detail: five tabs. Information has the site card, buddies, guide, a segmented water type and five-star visibility; Equipment has the computers, the suit and several weights as chips with their total; Gas has one card per cylinder with its fields and a Consumption card; Notes has the rating, notes and tags; Map keeps its height. Grey fields save when you press Enter or leave them.",
       "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
       "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
-      "Phone, « Your logbook is ready » (OpenDives+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave.",
-      "My diver profile (OpenDives+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
+      "Phone, « Your logbook is ready » (Benthic+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave.",
+      "My diver profile (Benthic+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
       "Equipment: the BCD has its own icon (collar, centre opening, two straps) and the surface marker buoy its own, with a flat top. In « New piece » (and when editing), a thumbnail left of the « Model » field shows your photo of the piece, otherwise the icon of its type, large.",
-      "Files from another app: OpenDives is in “Open with” and “Share to” for a logbook (.ssrf, .xml), a UDDF, FIT or DLD file and the other formats it imports. The file is read, then a choice is asked: “Add to this logbook” adds the dives to the open logbook, with Undo (“New logbook”, which keeps the open logbook and creates another, is not offered: this device keeps one logbook at a time); with no logbook yet it opens “Import a logbook”. The sites file of a two-file export is accepted: sites already there are not duplicated. The sites go to the logbook named in the question, never to another one.",
+      "Files from another app: Benthic is in “Open with” and “Share to” for a logbook (.ssrf, .xml), a UDDF, FIT or DLD file and the other formats it imports. The file is read, then a choice is asked: “Add to this logbook” adds the dives to the open logbook, with Undo (“New logbook”, which keeps the open logbook and creates another, is not offered: this device keeps one logbook at a time); with no logbook yet it opens “Import a logbook”. The sites file of a two-file export is accepted: sites already there are not duplicated. The sites go to the logbook named in the question, never to another one.",
       "First launch: the slide between steps now plays (it was dropped from the build). The waiting-changes box of the sign-out dialog shows its count in bold, and an iPhone field in error no longer keeps a red frame inside its row.",
-      "Replace this logbook: this device keeps one logbook at a time. A logbook file (Subsurface .ssrf, or an archive holding one) opened with OpenDives or chosen in “+” › Import a file now offers “Replace this logbook”: a screen says the logbook leaves this device and offers “Export this logbook first”; “Replace” asks a second time when it was not exported or when changes are not synchronised, then you name the new logbook. The current logbook is put back if the file cannot be read. The OpenDives server logbook and a logbook synchronised with an account are never replaced, with a line that says why. When an archive holds several logbooks, only the main one is imported and the dialog says so.",
-      "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to OpenDives from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
+      "Replace this logbook: this device keeps one logbook at a time. A logbook file (Subsurface .ssrf, or an archive holding one) opened with Benthic or chosen in “+” › Import a file now offers “Replace this logbook”: a screen says the logbook leaves this device and offers “Export this logbook first”; “Replace” asks a second time when it was not exported or when changes are not synchronised, then you name the new logbook. The current logbook is put back if the file cannot be read. The Benthic server logbook and a logbook synchronised with an account are never replaced, with a line that says why. When an archive holds several logbooks, only the main one is imported and the dialog says so.",
+      "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to Benthic from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
       "Import: a logbook or a dive sites file shows one progress line, from the moment it is received or chosen until the import is finished: “Copying the file”, “Checking the file”, “Importing the dives”, “Saving”, with the size copied, the percentage and the time left. “Cancel” stops the copy and the check and deletes the partial copy. A message tells how many dives or sites were added.",
       "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored.",
       "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive.",
       "Units: gas consumption per minute follows the Volume unit. In cubic feet it is in cu ft/min (SAC, RMV and the metabolic O₂ consumption of the pSCR in Settings), in litres in L/min, converted from the same stored value. Under “Volume”, a line says so.",
       "Desktop: « Other gear » on the Equipment tab shows the pieces of your inventory used by the dive, with the same icon as on the phone (the « Saucisse » has its own), « Add gear » adds them and the cross removes them from this dive. Every desktop logbook view (map, tabs, menus, windows) shares the same list: weekday, one year line that stays at the top, trip cards.",
       "Cylinders on desktop: Settings › Equipment shows « Cylinders added to new dives » (open circuit, diluent, oxygen, bailout with « Edit ») and « Cylinder types » (your types with their dive counts, a few standard types then « And N other standard types… », « Add a type », and the two switches). A type opens in the « Edit type » dialog, with « Delete this type » at the left of the footer and the same confirmation as on the phone. On the phone, the explanation and the line under « Delete this type » sit on the 16 dp margin, and « Remove this type » stays a neutral button.",
-      "iPhone: the logbook has no blue band any more, with a large title, a grey search field, « + » and the account initial in the bar. The « Account » sheet follows the mock-ups (« Logbook on this iPhone », « Subscribe », « Manage account », the OpenDives+ dot, « My diver profile » with its overdue maintenance). The profile and cylinder type screens show the previous page's title on the Back button, with « + » in the bar. « Delete this type » is a red row, and the deletion is confirmed in an action sheet. « Open in Maps » opens the site in Apple Maps. « Continue with Apple » comes first, and the offer adds « Restore purchases » and the automatic renewal terms (the purchase and the sign-in with Apple are not active yet).",
+      "iPhone: the logbook has no blue band any more, with a large title, a grey search field, « + » and the account initial in the bar. The « Account » sheet follows the mock-ups (« Logbook on this iPhone », « Subscribe », « Manage account », the Benthic+ dot, « My diver profile » with its overdue maintenance). The profile and cylinder type screens show the previous page's title on the Back button, with « + » in the bar. « Delete this type » is a red row, and the deletion is confirmed in an action sheet. « Open in Maps » opens the site in Apple Maps. « Continue with Apple » comes first, and the offer adds « Restore purchases » and the automatic renewal terms (the purchase and the sign-in with Apple are not active yet).",
       "First launch: the Android Back key and gesture (and, on iPhone, a swipe from the left edge) go to the previous step, like “Back”; on the first step Back sends the app to the background. A running import, download or upload is cancelled by Back, the offer’s Back is “Continue without a subscription”, and nothing created or bought is undone.",
-      "Other equipment: adding or removing a piece on a dive is for OpenDives+ subscribers. Without an account the list shows with the OpenDives+ chip, on the phone, the tablet and the desktop, and cannot be changed.",
-      "Account sheet (free version): Back from the OpenDives+ offer or from “Sign in or create an account”, opened from the sheet, shows the sheet again as it was.",
-      "Backup and restore (OpenDives+): a subscriber’s account sheet lists “My diver profile”, then “Backup and restore”, with no OpenDives+ chip next to the rows. Every sync is a version of the logbook, with its number of dives and what changed since. “Restore this version” adds a new version with the old content: the current logbook stays in the list and can be restored in turn, and nothing of the history is rewritten. “Browse this version” opens it read-only. “One dive” shows the versions of a dive (also from “Versions of this dive” in its menu) and “Deleted dives” brings a deleted dive back, with no time limit. Deleted photos and videos are kept for 90 days, then erased, and “Delete the account” also erases the whole history of the logbook, deleted dives included. On a phone these are pages, on a tablet two panes, on a computer a 1,000 px dialog.",
+      "Other equipment: adding or removing a piece on a dive is for Benthic+ subscribers. Without an account the list shows with the Benthic+ chip, on the phone, the tablet and the desktop, and cannot be changed.",
+      "Account sheet (free version): Back from the Benthic+ offer or from “Sign in or create an account”, opened from the sheet, shows the sheet again as it was.",
+      "Backup and restore (Benthic+): a subscriber’s account sheet lists “My diver profile”, then “Backup and restore”, with no Benthic+ chip next to the rows. Every sync is a version of the logbook, with its number of dives and what changed since. “Restore this version” adds a new version with the old content: the current logbook stays in the list and can be restored in turn, and nothing of the history is rewritten. “Browse this version” opens it read-only. “One dive” shows the versions of a dive (also from “Versions of this dive” in its menu) and “Deleted dives” brings a deleted dive back, with no time limit. Deleted photos and videos are kept for 90 days, then erased, and “Delete the account” also erases the whole history of the logbook, deleted dives included. On a phone these are pages, on a tablet two panes, on a computer a 1,000 px dialog.",
       "Error reports: after an error or a crash, the version, system, device, open page, error message and last lines of the log appear in a sheet with “Send” and “Don’t send”. Nothing is sent without that tap; without a connection the report is kept and offered again later. A report contains no dive, site, name or account; it is kept 180 days.",
       "Export of the whole logbook: the file is named after the logbook and the date, for example “carnet-de-roger-2026-11-19.ssrf”.",
-      "OpenDives+ offer: the header now reads “The OpenDives+ plan” with “Your logbook, safe on all your devices.”, the cards have more room (on a tablet the icon sits to the left of the text), and the price is plain text, not a blue card, with “Cancel any time”. The new “See everything included” link opens the “Everything included” screen: the subscription’s features by group, what stays free, and the price with “Subscribe” that stays at the bottom while you scroll. On a tablet, “Already subscribed? Sign in” moves to the top right, on the row of “Back”.",
+      "Benthic+ offer: the header now reads “The Benthic+ plan” with “Your logbook, safe on all your devices.”, the cards have more room (on a tablet the icon sits to the left of the text), and the price is plain text, not a blue card, with “Cancel any time”. The new “See everything included” link opens the “Everything included” screen: the subscription’s features by group, what stays free, and the price with “Subscribe” that stays at the bottom while you scroll. On a tablet, “Already subscribed? Sign in” moves to the top right, on the row of “Back”.",
       "About: “Open-source dive logbook, built on the solid, proven foundations of Subsurface.”, a block “Free, and so is your logbook” (the base plan stays free, the code is on GitHub, the logbook can be exported at any time) with “See on GitHub” (the GitHub mark) and “Export my logbook” (a download icon), one under the other on a phone and side by side on a tablet; on the desktop, one paragraph and the two buttons. “Everything included” says under its title what it lists.",
       "Tablet in landscape and desktop: “My diver profile” shows in panes: the profile on the left, the list (equipment or maintenance) in the middle, the sheet on the right. The forms (new piece, new kit, new certification, note a service) open in a centred dialog; the piece types form a 3 × 3 grid. On the desktop, the photo of a certification is chosen, dropped or pasted (Ctrl+V); the card is cropped and straightened, with “Remove glare” and “Adjust the corners”. On a Mac, “My diver profile…” (⇧⌘P) opens the profile in its own window. “Your health data” and “Your logbook is ready” appear in the blue panel. On the desktop, the logbook’s + no longer stays over a page opened on the right.",
-      "Desktop: the account sheet of an OpenDives+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile.",
+      "Desktop: the account sheet of an Benthic+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile.",
       "Desktop: “Share” opens as a dialog in the middle of the window; a click on a trip in the logbook shows the trip page on the right (the chevron folds it); importing a file says where the dives come from (“1 dive imported from “…””) with Undo; “Saved plans” opens a “Planned dives” side panel with “New plan”; in Settings › Rebreather, the O₂ consumption says it follows the Volume unit.",
       "Tablet: “Export” and the list of dives at one map point open as a dialog in the middle of the screen, and so do conflicts on several dives; when downloading, a Bluetooth that is not allowed or is off shows as a card under the remembered computers.",
       "iPad: the same dialogs and the same Bluetooth card as on the Android tablet, with iOS sheet corners.",
       "iPhone: About has 50 pt buttons with iOS rounded corners; tablet in portrait: in Offline maps, “Add a region” moves under the list.",
       "Sample logbook: 40 dives from 2023 to 2026 at 8 sites, with a trip of 6 dives and a rebreather dive, closer to a real logbook.",
       "Sample logbook on a phone: the “Sample logbook. These dives are not yours.” banner is a rounded card just above the bottom bar, with “Start”; the list, the + and the messages stop above it. “Start my logbook?” names the device (this phone, this tablet, this computer).",
-      "Empty logbook: the header reads “On this phone · no dives” (“My logbook · on this tablet” on a tablet) and “Change location” is gone from the menu. Desktop with a git repository: the account sheet shows the repository with “Change repository”, the sync row, “Backup and restore” (following the repository’s history) and the “Upgrade to OpenDives+” card, without “My diver profile”.",
+      "Empty logbook: the header reads “On this phone · no dives” (“My logbook · on this tablet” on a tablet) and “Change location” is gone from the menu. Desktop with a git repository: the account sheet shows the repository with “Change repository”, the sync row, “Backup and restore” (following the repository’s history) and the “Upgrade to Benthic+” card, without “My diver profile”.",
       "Desktop: a trip of a single dive is no longer a trip row in the logbook, as on the phone.",
       "Dive computers show their photo (dive detail, download choice, Equipment); it is downloaded once, then kept on the device. With no photo, or offline, the icon stays.",
       "“This ballast was” is now a rail: a pill slides from one choice to the next; touching the chosen choice clears it.",
       "Equipment: “Edit the dive computer” (brand and model with suggestions, or free text; “Change image” keeps your photo in your account, not shared).",
       "iPhone: the logbook has no profile thumbnail (day and month, “No. · time”, depth over duration, year titles with their dive count); Settings with a large title and small-capitals groups; a site's page in grouped cards, with “Open in Maps” explained; About and Open-source libraries with a named back button.",
-      "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
+      "Benthic+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
       "Dive computer photos show wherever the model appears: the equipment, kits and maintenance lists, the part sheet, the dive detail, Réglages › Dive computers of the logbook and the dive edit. Your own photo wins over the model’s.",
-      "After a download from a dive computer that is not in your equipment (OpenDives+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
+      "After a download from a dive computer that is not in your equipment (Benthic+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
       "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards).",
       "After a download from a dive computer, “Complete the dive” opens for each new dive without a site (Android and iPhone): the three nearest sites by distance from the phone, or the three most recently dived without a position, with the nearest one preselected within 500 m, “Create a site at my current position”, “Search for another site”, buddies and the rating. “Later” leaves the dive as it is.",
-      "Réglages › Notifications (OpenDives+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more.",
-      "Equipment (OpenDives+): “Retire from equipment” replaces deleting, with an optional reason (sold, lost, worn out). A retired piece leaves the lists, the kits and the reminders but keeps its service history and its dives; it is found in “Retired pieces”, where it can be put back in service, have its history exported as a PDF, or be deleted for good. “Export the history” is also in a piece’s menu.",
+      "Réglages › Notifications (Benthic+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more.",
+      "Equipment (Benthic+): “Retire from equipment” replaces deleting, with an optional reason (sold, lost, worn out). A retired piece leaves the lists, the kits and the reminders but keeps its service history and its dives; it is found in “Retired pieces”, where it can be put back in service, have its history exported as a PDF, or be deleted for good. “Export the history” is also in a piece’s menu.",
       "A cylinder has two deadlines, each with its own card, bar, “Record …” button and reminder: the visual inspection (every year) and the hydrostatic test (every 5 years, with the date stamped on the cylinder, like 03/22). The maintenance card also shows the hours under water next to the dives (“82 dives out of 100 · 61 h”). In “Add equipment”, an overdue piece stays selectable but says in red what is late, when its reminder warns in a dive.",
       "Downloading from a dive computer no longer freezes the screen when the error report sheet opens.",
       "On Windows, “Edit dive” and the quick entry now save every site: some sites (more than half of them) could not be found when saving.",
-      "Account: choosing “Subscriber” in the development menu (or any OpenDives+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”.",
+      "Account: choosing “Subscriber” in the development menu (or any Benthic+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”.",
       "Download: a lamp or a scale whose name starts with “S1” (“S19 A69C LE”) is no longer offered as an Oceans S1. Each device in the nearby list has a menu with “This is not a dive computer”, which hides it for good (Undo in the message); Settings › Download lists the hidden devices with “Show again”.",
       "Android: the Back key works while a message such as “Dive saved / Undo” is on screen; it was ignored until the message disappeared.",
       "Equipment: « New piece » offers 16 types (mask, fins, scooter, camera, surface marker buoy, surface float and knife are added) and shows only the fields of the chosen type; only the type is required. A cylinder keeps its type (volume and working pressure come from Settings › Equipment), material, valve, serial number, « O₂ clean », last visual inspection and last hydrostatic test; a suit, its type, thickness, size and material. The BCD is now called « Vest » (« Veste » in French) everywhere. Reminders suggested: regulator every 2 years or 100 dives, cylinder (inspection every year, hydrostatic test every 5 years), vest every year, drysuit seals every year.",
       "Certifications and documents: « Certifications » becomes « Certifications and documents »: certifications, diving insurance (card scanned and read on the device, or a PDF), a medical certificate of several pages and other documents, each with a reproduction of the card and an expiry badge. A document opens full screen at maximum brightness and is shared as images or as a PDF. A certification can be marked « Instructor certification ».",
       "Notifications: Settings › Notifications has a « Certifications and documents » section with « Document expiry ». The notification comes at the lead time chosen in each document (2 weeks, 30 days or 60 days) and on the day it expires.",
-      "OpenDives+ offer: the price is a little smaller, and the « Service reminders » tile mentions the regulator, the cylinder and the vest.",
+      "Benthic+ offer: the price is a little smaller, and the « Service reminders » tile mentions the regulator, the cylinder and the vest.",
       "Edit dive: the suggestion lists of Guide, Buddies and Tags (and of the suit) now open above the following cards, inside the screen, and above the field when there is no room below.",
       "Logbook: on Android, the floating toolbar of a selection sits above the bottom navigation bar (and above the sample logbook banner) instead of under it.",
-      "Dive validation (OpenDives+): “Get the dive validated” in the dive menu, and “Get the dives validated” in the selection menu (one validation for several dives). The buddy or instructor signs with a finger on the screen, or scans a QR code with OpenDives+ (the code expires after 10 minutes; without a network, the dive shows “Validation pending” until the confirmation arrives). The dive detail has a “Validations” section (name, role, method, date, signature) and says “Changed after the validation” when the dive changed; a validated dive carries a small tick in the logbook. Validations appear on the PDF sheet and in the logbook’s PDF export, and can be removed one by one.",
+      "Dive validation (Benthic+): “Get the dive validated” in the dive menu, and “Get the dives validated” in the selection menu (one validation for several dives). The buddy or instructor signs with a finger on the screen, or scans a QR code with Benthic+ (the code expires after 10 minutes; without a network, the dive shows “Validation pending” until the confirmation arrives). The dive detail has a “Validations” section (name, role, method, date, signature) and says “Changed after the validation” when the dive changed; a validated dive carries a small tick in the logbook. Validations appear on the PDF sheet and in the logbook’s PDF export, and can be removed one by one.",
       "Navigation: a swipe from the edge of the screen (Android’s Back gesture) no longer leaves the page half moved, with Back and links doing nothing; the Back that follows goes back one screen. Going back twice from a screen opened deep in the Logbook (Settings › Cylinder types › new type; a dive › its planner › the plans › a new plan) no longer leaves an empty screen where Back does nothing. A screen left in a wrong state is put back in place and an error report is offered. The Escape key closes the open sheet, dialog or menu. “Question / report a problem” adds the last screens visited to the message.",
-      "My diver profile: an optional “Full name” field, first in “You” of Information and its edit screen. It shows at the top of “My diver profile” (the e-mail without it) and, with an OpenDives+ account, on the first line of the account sheet, with the e-mail under it in smaller grey text. When you confirm another diver’s dive, “Your name” comes from the profile (a correction applies to that confirmation only), the sentence under it gives your role and your instructor certification number, and “I confirm” stays off while the name is empty; if the profile has no name, the name you type is saved there. The name is added at the top of the PDF sheets of a dive and of the logbook (switch “My name in the header” when exporting a PDF; “Anonymize” removes it too).",
+      "My diver profile: an optional “Full name” field, first in “You” of Information and its edit screen. It shows at the top of “My diver profile” (the e-mail without it) and, with an Benthic+ account, on the first line of the account sheet, with the e-mail under it in smaller grey text. When you confirm another diver’s dive, “Your name” comes from the profile (a correction applies to that confirmation only), the sentence under it gives your role and your instructor certification number, and “I confirm” stays off while the name is empty; if the profile has no name, the name you type is saved there. The name is added at the top of the PDF sheets of a dive and of the logbook (switch “My name in the header” when exporting a PDF; “Anonymize” removes it too).",
       "“New piece”: on a phone, “Piece type” is a field that opens a menu of the 16 types (icon, name, a check on the chosen type; the system list on iPhone); the grid of tiles stays on tablets and desktop. Under the field, the model’s photo, large, with “Change image” (the type’s drawing when the model has no photo; “Add a photo” and the small thumbnail beside “Model” are gone). Five icons redrawn everywhere in the equipment: weight belt, scooter, knife, fins and light.",
       "Dates: every date follows the format chosen in Settings › Language and date (2026-11-06 by default): logbook, dive detail, equipment and maintenance, certificates and documents, validation, account, backup, offline maps, PDF. Date fields show that format as their hint (“yyyy-mm-dd”), typing in the calendar follows it, and a date known to the month only (hydrostatic test) is written in the same order (2022-03).",
-      "Emergency sheet (OpenDives+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile (only with the health-data consent), the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
-      "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive validated” with OpenDives+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
+      "Emergency sheet (Benthic+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile (only with the health-data consent), the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
+      "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive validated” with Benthic+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
       "Site map: in a site’s card, on the edit screen and on the desktop, the map keeps a 2.1 to 1 width to height ratio at every width; the height follows the width.",
-      "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”."
+      "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”.",
+      "New name: the app is now called Benthic, and the paid offer Benthic+. The name under the icon is “Benthic Log”. Old opendives.app links still open the app."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3160,7 +3161,7 @@
     "privacyText": "Your dives stay on the device and in your account",
     "opensMail": "opens in the mail app",
     "report": {
-      "subject": "OpenDives {version}: question or problem",
+      "subject": "Benthic {version}: question or problem",
       "technical": "Technical information (please leave it in the message)",
       "version": "App version",
       "platform": "System",
@@ -3175,7 +3176,7 @@
       "lastError": "Last error",
       "navigation": "Navigation (last screens)",
       "git": "Git repository",
-      "server": "OpenDives server"
+      "server": "Benthic server"
     },
     "opensElsewhere": "opens in the browser",
     "credit": "The dive core comes from Subsurface, created by Linus Torvalds and Dirk Hohndel, and its contributors.",
@@ -3201,10 +3202,10 @@
     "intro": "Add the dives you already have now.",
     "sourceLabel": "Source of the logbook",
     "divelogs": "From divelogs.de",
-    "divelogsText": "The dives are copied once into your account. divelogs.de and OpenDives do not stay in sync.",
+    "divelogsText": "The dives are copied once into your account. divelogs.de and Benthic do not stay in sync.",
     "user": "divelogs.de user name",
     "password": "divelogs.de password",
-    "credentialsNote": "These credentials are only used for this download. OpenDives does not keep them.",
+    "credentialsNote": "These credentials are only used for this download. Benthic does not keep them.",
     "file": "From a file",
     "fileText": "Subsurface logbook (.ssrf, .xml), divelogs.de export (.dld), Garmin watch (.fit) or from another program",
     "empty": "Start with an empty logbook",
@@ -3336,7 +3337,7 @@
     "titleDialog": "Save plan",
     "titleLabel": "Title",
     "saveFailed": "The plan could not be saved.",
-    "filePrefix": "OpenDives-plan",
+    "filePrefix": "Benthic-plan",
     "noStartDive": "No starting dive",
     "profilePlanned": "Planned profile",
     "profileOfDive": "Profile of the dive",
@@ -3624,12 +3625,12 @@
     },
     "permission": {
       "title": "Allow Bluetooth",
-      "text": "Android asks for the \"Nearby devices\" permission to find the dive computer. OpenDives does not use it for anything else.",
+      "text": "Android asks for the \"Nearby devices\" permission to find the dive computer. Benthic does not use it for anything else.",
       "button": "Allow"
     },
     "denied": {
       "title": "Permission refused",
-      "text": "Without the Bluetooth permission, OpenDives cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+      "text": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the Android settings, under Permissions.",
       "button": "Open settings",
       "again": "Ask again"
     },
@@ -3803,7 +3804,7 @@
   },
   "importProgress": {
     "title": "Importing your logbook",
-    "text": "Keep OpenDives open until the end. Nothing is sent to your account before the last step.",
+    "text": "Keep Benthic open until the end. Nothing is sent to your account before the last step.",
     "failedTitle": "The import did not go through",
     "failedText": "Your account is created. Nothing was saved in it.",
     "stepsLabel": "Import steps",
@@ -3894,8 +3895,8 @@
     "done": "Dive renumbered no. {n}"
   },
   "link": {
-    "unknown": "This link does not lead anywhere in OpenDives.",
-    "notReady": "Finish setting up OpenDives, then open the link again.",
+    "unknown": "This link does not lead anywhere in Benthic.",
+    "notReady": "Finish setting up Benthic, then open the link again.",
     "unsaved": "Finish or discard your changes, then open the link again.",
     "diveNotFound": "That dive is not in this logbook.",
     "siteNotFound": "That site is not in this logbook.",
@@ -3907,7 +3908,7 @@
     "fileMerge": "Add to this logbook",
     "fileAction": "Import",
     "fileUnnamed": "this file",
-    "fileNotLogbook": "“{name}” is not a file OpenDives can import. No dive was changed.",
+    "fileNotLogbook": "“{name}” is not a file Benthic can import. No dive was changed.",
     "fileEmpty": "“{name}” is empty. No dive was changed.",
     "fileTooBig": "This file is too big to import (over 100 MB). No dive was changed.",
     "fileUnreadable": "This file could not be opened. No dive was changed.",
@@ -3920,7 +3921,7 @@
     "sitesFailed": "The sites could not be added.",
     "fileChooseReplace": "What to do with “{name}”?\n\nReplace this logbook: removes the open logbook from this device and keeps the file’s instead. This device keeps one logbook at a time.\n\nAdd to this logbook: adds the dives of the file to the open logbook, without duplicates.",
     "fileReplace": "Replace this logbook",
-    "replace_server": "This logbook is the one on the OpenDives server: it cannot be replaced from a file, so its data stays safe.",
+    "replace_server": "This logbook is the one on the Benthic server: it cannot be replaced from a file, so its data stays safe.",
     "replace_account": "This logbook is synchronised with an account: replacing it would remove its dives from the shared log, so it can only receive dives."
   },
   "share": {
@@ -3931,12 +3932,12 @@
     "summaryText": "A short text and the profile image",
     "failed": "The dive could not be shared.",
     "link": "Link",
-    "linkText": "A web address that opens this dive in OpenDives",
+    "linkText": "A web address that opens this dive in Benthic",
     "qr": "QR code",
-    "qrText": "For a companion who has OpenDives, without internet",
-    "siteLinkText": "A web address that opens this site in OpenDives",
+    "qrText": "For a companion who has Benthic, without internet",
+    "siteLinkText": "A web address that opens this site in Benthic",
     "siteFailed": "The site could not be shared.",
-    "filePrefix": "OpenDives-dive",
+    "filePrefix": "Benthic-dive",
     "sheetNumber": "Dive no. {number}",
     "sheetDive": "Dive",
     "profile": "Profile",
@@ -3944,8 +3945,8 @@
     "legendTemperature": "Black: depth. Blue: water temperature.",
     "cylinder": "Cylinder",
     "gas": "Gas",
-    "footer": "Sheet made with OpenDives on {date}",
-    "exportPrefix": "OpenDives-{n}-dives"
+    "footer": "Sheet made with Benthic on {date}",
+    "exportPrefix": "Benthic-{n}-dives"
   },
   "export": {
     "title": {
@@ -3961,7 +3962,7 @@
       "pdf": "PDF sheets"
     },
     "formatTexts": {
-      "ssrf": "Subsurface format, also readable by OpenDives",
+      "ssrf": "Subsurface format, also readable by Benthic",
       "uddf": "Exchange format between dive programs",
       "csv": "One line per dive, for a spreadsheet",
       "csvProfiles": "Time, depth and temperature, point by point",
@@ -4052,18 +4053,18 @@
   },
   "tokenHelp": {
     "title": "Create an access token",
-    "afterwards": "Then paste the token into OpenDives, with your user name. The site shows the token only once: copy it before leaving the page.",
+    "afterwards": "Then paste the token into Benthic, with your user name. The site shows the token only once: copy it before leaving the page.",
     "github": {
       "name": "GitHub",
-      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token limited to this one repository, allowed to read and write its contents and nothing else. GitHub exists only in English: the labels below are those of its interface.",
+      "intro": "Benthic connects to your repository with a personal access token, never with your password. Create a token limited to this one repository, allowed to read and write its contents and nothing else. GitHub exists only in English: the labels below are those of its interface.",
       "open": "Open GitHub’s token page",
       "note": "A fine-grained token can be limited to a single repository.",
       "s1": "Sign in to GitHub, then open [kbd]Settings[/kbd] (menu of your profile picture).",
       "s2": "At the bottom of the left column, open [kbd]Developer settings[/kbd].",
       "s3": "Open [kbd]Personal access tokens[/kbd], then [kbd]Fine-grained tokens[/kbd], then tap [kbd]Generate new token[/kbd].",
       "s3Desktop": "Open [kbd]Personal access tokens[/kbd], then [kbd]Fine-grained tokens[/kbd], then click [kbd]Generate new token[/kbd].",
-      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
-      "s5": "[kbd]Expiration[/kbd]: choose [kbd]No expiration[/kbd], otherwise OpenDives can no longer sync on the chosen date. If the repository belongs to an organisation, it may impose an end date.",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]Benthic[/code].",
+      "s5": "[kbd]Expiration[/kbd]: choose [kbd]No expiration[/kbd], otherwise Benthic can no longer sync on the chosen date. If the repository belongs to an organisation, it may impose an end date.",
       "s6": "[kbd]Resource owner[/kbd]: your account, or the organisation that owns the repository.",
       "s7": "[kbd]Repository access[/kbd]: choose [kbd]Only select repositories[/kbd], then the repository of your logbook.",
       "s8": "[kbd]Permissions[/kbd]: under [kbd]Repository permissions[/kbd], set [kbd]Contents[/kbd] to [kbd]Read and write[/kbd]. Add no other permission.",
@@ -4072,22 +4073,22 @@
     },
     "gitlab": {
       "name": "GitLab",
-      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
+      "intro": "Benthic connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
       "open": "Open GitLab’s token page",
       "note": "On GitLab, a personal token gives access to all your repositories and must have an expiry date.",
       "s1": "Sign in to GitLab, tap your avatar, then [kbd]Edit profile[/kbd].",
       "s1Desktop": "Sign in to GitLab, click your avatar, then [kbd]Edit profile[/kbd].",
       "s2": "In the left sidebar, open [kbd]Access[/kbd], then [kbd]Personal access tokens[/kbd].",
       "s3": "In the [kbd]Generate token[/kbd] list, choose [kbd]Legacy token[/kbd].",
-      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
-      "s5": "[kbd]Expiration date[/kbd]: choose the latest date allowed. GitLab requires a date; on that date, create a new token and paste it into OpenDives.",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]Benthic[/code].",
+      "s5": "[kbd]Expiration date[/kbd]: choose the latest date allowed. GitLab requires a date; on that date, create a new token and paste it into Benthic.",
       "s6": "[kbd]Select scopes[/kbd]: tick only [kbd]write_repository[/kbd], which allows reading and writing in your repositories.",
       "s7": "Tap [kbd]Generate token[/kbd], then copy the token.",
       "s7Desktop": "Click [kbd]Generate token[/kbd], then copy the token."
     },
     "codeberg": {
       "name": "Codeberg",
-      "intro": "OpenDives connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
+      "intro": "Benthic connects to your repository with a personal access token, never with your password. Create a token that can only read and write your repositories. The labels below are those of the site’s English interface.",
       "open": "Open Codeberg’s applications page",
       "note": "On Codeberg, a token does not expire. You can delete it at any time.",
       "s1": "Sign in to Codeberg, tap your avatar, then [kbd]Settings[/kbd].",
@@ -4095,7 +4096,7 @@
       "s2": "Open the [kbd]Applications[/kbd] tab.",
       "s3": "Under [kbd]Access tokens[/kbd], tap [kbd]New access token[/kbd].",
       "s3Desktop": "Under [kbd]Access tokens[/kbd], click [kbd]New access token[/kbd].",
-      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]OpenDives[/code].",
+      "s4": "[kbd]Token name[/kbd]: a name you will recognise, for example [code]Benthic[/code].",
       "s5": "Choose [kbd]All (public, private, and limited)[/kbd] so that the token reaches your private repository.",
       "s6": "Under [kbd]Select permissions[/kbd], set [kbd]repository[/kbd] to [kbd]Read and write[/kbd]. Leave the others on [kbd]No access[/kbd].",
       "s7": "Tap [kbd]Generate token[/kbd], then copy the token.",
@@ -4186,11 +4187,11 @@
       },
       "space": {
         "title": "Not enough space",
-        "text": "{name} can take up to {size}. Only {remaining} would be left, below the {floor} minimum OpenDives keeps free. Delete a region or free up space."
+        "text": "{name} can take up to {size}. Only {remaining} would be left, below the {floor} minimum Benthic keeps free. Delete a region or free up space."
       },
       "manage": {
         "title": "Space on the device",
-        "text": "{free} is free on the device. OpenDives always keeps at least {floor} free so that the phone keeps working well. Delete regions or free space on the device: the download will resume by itself."
+        "text": "{free} is free on the device. Benthic always keeps at least {floor} free so that the phone keeps working well. Delete regions or free space on the device: the download will resume by itself."
       },
       "replace": {
         "title": "Replace the map?",
@@ -4266,8 +4267,8 @@
     "close": "Close",
     "codeOf": "Code {n} of {total}",
     "imageLabel": "QR code {n} of {total}",
-    "helpDive": "On the other phone, open OpenDives, tap “+” then “Scan a QR code”. The codes scroll by themselves. Keep this screen facing the camera until the end.",
-    "helpPlan": "On the other phone, open OpenDives, tap “+” then “Scan a QR code”. Keep this screen facing the camera.",
+    "helpDive": "On the other phone, open Benthic, tap “+” then “Scan a QR code”. The codes scroll by themselves. Keep this screen facing the camera until the end.",
+    "helpPlan": "On the other phone, open Benthic, tap “+” then “Scan a QR code”. Keep this screen facing the camera.",
     "done": "Done",
     "preparing": "Preparing the codes…",
     "failed": "The QR codes could not be made.",
@@ -4279,16 +4280,16 @@
     "progress": "{n} codes read out of {total}",
     "progressOne": "1 code read out of {total}",
     "progressBar": "Codes read",
-    "foreign": "This QR code does not come from OpenDives.",
-    "newerVersion": "This code comes from a newer version of OpenDives. Update the app to read it.",
+    "foreign": "This QR code does not come from Benthic.",
+    "newerVersion": "This code comes from a newer version of Benthic. Update the app to read it.",
     "otherTitle": "Another dive",
     "otherText": "This code belongs to another dive or plan. Start over with it? The codes already read are lost.",
     "otherRestart": "Start over",
     "otherKeep": "Keep the first",
-    "permissionReason": "OpenDives uses the camera only to read the QR codes of a dive shared from another phone. Nothing is recorded.",
+    "permissionReason": "Benthic uses the camera only to read the QR codes of a dive shared from another phone. Nothing is recorded.",
     "permissionButton": "Allow the camera",
     "permissionDeniedTitle": "Camera refused",
-    "permissionDenied": "Without the camera permission, OpenDives cannot read the codes. You can give it in the system settings, under Permissions.",
+    "permissionDenied": "Without the camera permission, Benthic cannot read the codes. You can give it in the system settings, under Permissions.",
     "permissionSettings": "Open settings",
     "cameraFailed": "The camera could not be started.",
     "receivedDive": "Dive received",
@@ -4327,7 +4328,7 @@
     "textText": "Levels, stops, gases and volumes",
     "ssrfFailed": "The logbook file could not be created.",
     "qr": "QR code",
-    "qrText": "For a companion who has OpenDives, without internet"
+    "qrText": "For a companion who has Benthic, without internet"
   },
   "slate": {
     "title": "Slate for the water",
@@ -4383,8 +4384,8 @@
     "at": "{gas} at {depth}",
     "note": "End in minutes since entering the water. Underlined gas: gas switch.",
     "gasNeeded": "Gas needed: {gases}",
-    "footer": "Made with OpenDives on {date}. Check before the dive.",
-    "filePrefix": "OpenDives-slate",
+    "footer": "Made with Benthic on {date}. Check before the dive.",
+    "filePrefix": "Benthic-slate",
     "failed": "The slate could not be shared."
   },
   "nav": {
@@ -4412,7 +4413,7 @@
     "reading": "Reading Apple Health…",
     "unavailable": "Apple Health has no dive data on this device. It needs an iPhone with iOS 16 or later and an Apple Watch Ultra.",
     "failed": "Apple Health could not be read.",
-    "none": "No dives in Apple Health in the last year. If access was refused, allow OpenDives in Health › Sharing › Apps.",
+    "none": "No dives in Apple Health in the last year. If access was refused, allow Benthic in Health › Sharing › Apps.",
     "known": "already in the logbook",
     "what": "Apple Health only keeps the time, depth and temperature: the site, gas and buddies are completed in the dive."
   },
@@ -4707,9 +4708,9 @@
   "desktopCloud": {
     "browserPage": {
       "done": "Connected",
-      "doneText": "You can close this tab and go back to OpenDives.",
+      "doneText": "You can close this tab and go back to Benthic.",
       "failed": "Sign-in failed",
-      "failedText": "Go back to OpenDives and try again."
+      "failedText": "Go back to Benthic and try again."
     },
     "conflict": {
       "title": "“{name}” changed in two places",
@@ -4724,17 +4725,17 @@
       "notYetText": "Sign in to {service} in your browser, then come back here to create the logbook.",
       "waiting": "Signing in, in your browser…",
       "waitingText": "The sign-in page of {service} is open in your browser.",
-      "ready": "The logbook “{file}” will be created in an OpenDives folder of this account.",
+      "ready": "The logbook “{file}” will be created in an Benthic folder of this account.",
       "noAccount": "Account signed in",
       "switchAccount": "Switch account",
       "signIn": "Sign in to {service}",
       "cancel": "Cancel sign-in",
       "reopen": "Open the page again",
-      "privacy": "OpenDives only reaches the files it creates or that you open.",
-      "linkSign": "Link between OpenDives and {service}"
+      "privacy": "Benthic only reaches the files it creates or that you open.",
+      "linkSign": "Link between Benthic and {service}"
     },
     "webdav": {
-      "intro": "OpenDives will create the file “{file}” in an OpenDives folder of your server.",
+      "intro": "Benthic will create the file “{file}” in an Benthic folder of your server.",
       "server": "Server address",
       "serverPlaceholder": "https://cloud.example.com",
       "username": "Username",
@@ -4893,7 +4894,7 @@
     "otherGearAdd": "Add gear",
     "otherGearFailed": "The equipment of this dive could not be saved.",
     "otherGearSoon": "Not available yet",
-    "otherGearPlusOnly": "For OpenDives+ subscribers",
+    "otherGearPlusOnly": "For Benthic+ subscribers",
     "mixNote": "O₂ {o2} % · He {he} %",
     "pressureNote": "start → end"
   },
@@ -4947,7 +4948,7 @@
       "unmeteredText": "Never on a tethered connection",
       "manage": "Manage account"
     },
-    "about": "About OpenDives",
+    "about": "About Benthic",
     "filterFree": "Free filter…"
   },
   "desktopSites": {
@@ -5037,7 +5038,7 @@
     "filterActive": "Filter, a filter is on",
     "exportChart": "Export the chart",
     "exportFailed": "The chart could not be exported.",
-    "filePrefix": "OpenDives-statistic",
+    "filePrefix": "Benthic-statistic",
     "newStatistic": "+ New statistic",
     "more": "More statistics options",
     "hoursUnit": "h",
@@ -5199,14 +5200,14 @@
       "deleteDive": "Delete the dive"
     },
     "macMenu": {
-      "about": "About OpenDives",
+      "about": "About Benthic",
       "settings": "Settings…",
       "profile": "My diver profile…",
       "services": "Services",
-      "hide": "Hide OpenDives",
+      "hide": "Hide Benthic Log",
       "hideOthers": "Hide Others",
       "showAll": "Show All",
-      "quit": "Quit OpenDives",
+      "quit": "Quit Benthic Log",
       "file": "File",
       "newDive": "New Dive",
       "import": "Import…",
@@ -5239,7 +5240,7 @@
       "addToTrip": "Add to a Trip…",
       "window": "Window",
       "help": "Help",
-      "helpAbout": "About OpenDives"
+      "helpAbout": "About Benthic"
     },
     "figure": {
       "maxDepth": "Max depth",
@@ -5396,11 +5397,11 @@
   "repoHelp": {
     "title": "Create a repository",
     "tabs": "Sites",
-    "afterwards": "Then come back to OpenDives, paste the address, and create an access token for this repository.",
+    "afterwards": "Then come back to Benthic, paste the address, and create an access token for this repository.",
     "open": "Open {name}’s “{page}” page",
     "github": {
       "name": "GitHub",
-      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. GitHub exists only in English: the labels below are those of its interface.",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into Benthic. GitHub exists only in English: the labels below are those of its interface.",
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitHub, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
@@ -5414,7 +5415,7 @@
     },
     "gitlab": {
       "name": "GitLab",
-      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into Benthic. The labels below are those of the site’s English interface.",
       "page": "New project",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to GitLab, then tap [kbd]+ (Create new)[/kbd] at the top of the menu and [kbd]New project/repository[/kbd].",
@@ -5431,7 +5432,7 @@
     },
     "codeberg": {
       "name": "Codeberg",
-      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into OpenDives. The labels below are those of the site’s English interface.",
+      "intro": "Create a private, empty repository for your logbook, then copy its HTTPS address into Benthic. The labels below are those of the site’s English interface.",
       "page": "New repository",
       "note": "A private repository: only you can see it.",
       "s1": "Sign in to Codeberg, then tap [kbd]+[/kbd] at the top of the page and [kbd]New repository[/kbd].",
@@ -5445,8 +5446,8 @@
     }
   },
   "odplus": {
-    "chip": "OpenDives+",
-    "chipName": "OpenDives Plus",
+    "chip": "Benthic+",
+    "chipName": "Benthic Plus",
     "providerUnavailable": "Signing in with {provider} is not available yet. Use your e-mail address.",
     "purchaseUnavailable": "Subscribing is not available in this version yet.",
     "connect": {
@@ -5455,15 +5456,15 @@
       "google": "Continue with Google",
       "apple": "Continue with Apple",
       "email": "Continue with my e-mail",
-      "note": "Not subscribed yet? OpenDives+ will be presented to you. No account is created until you subscribe.",
+      "note": "Not subscribed yet? Benthic+ will be presented to you. No account is created until you subscribe.",
       "without": "Continue without an account"
     },
     "offer": {
       "title": "Your logbook, everywhere and safe",
-      "pill": "The OpenDives+ plan",
+      "pill": "The Benthic+ plan",
       "lead": "Your logbook, safe on all your devices.",
       "seeAll": "See everything included",
-      "priceLabel": "OpenDives+ subscription",
+      "priceLabel": "Benthic+ subscription",
       "cancelAnytime": "Cancel any time",
       "sync": "Synced",
       "syncText": "On all your devices.",
@@ -5488,7 +5489,7 @@
     },
     "all": {
       "title": "Everything included",
-      "subtitle": "Everything included in the OpenDives+ plan.",
+      "subtitle": "Everything included in the Benthic+ plan.",
       "carnet": "Your logbook",
       "profile": "Your diver profile",
       "maps": "Sites and maps",
@@ -5548,8 +5549,8 @@
       "open": "Open my logbook"
     },
     "welcome": {
-      "title": "Welcome to OpenDives+!",
-      "lead": "Your subscription is active. Thank you for supporting OpenDives.",
+      "title": "Welcome to Benthic+!",
+      "lead": "Your subscription is active. Thank you for supporting Benthic.",
       "activated": "What is turned on",
       "sync": "Synced across your devices",
       "backup": "Automatic backup",
@@ -5563,7 +5564,7 @@
       "lead": "Optional. You can change your mind at any time.",
       "switch": "Keep health data",
       "switchHelp": "Your blood group, useful in an emergency",
-      "note": "This is health data. OpenDives+ keeps it only with your consent.",
+      "note": "This is health data. Benthic+ keeps it only with your consent.",
       "lock": "Encrypted on your account and visible only to you. You can withdraw your consent in My profile or in Settings: the data is then deleted.",
       "continue": "Continue"
     }
@@ -5600,7 +5601,7 @@
   },
   "serverCreate": {
     "title": "No logbook on your account",
-    "lead": "Your OpenDives+ account is ready, but it holds no logbook yet. Create one, or send a logbook you already have.",
+    "lead": "Your Benthic+ account is ready, but it holds no logbook yet. Create one, or send a logbook you already have.",
     "blankTitle": "Create an empty logbook",
     "blankHelp": "You add your dives afterwards.",
     "importTitle": "Import a Subsurface file",
@@ -5614,10 +5615,10 @@
       "other": "“{name}”, {n} dives, already on this device."
     },
     "nameTitle": "New logbook",
-    "nameHelp": "It will be kept on the OpenDives server and on this tablet.",
-    "nameHelpPhone": "It will be kept on the OpenDives server and on this phone.",
-    "nameHelpIphone": "It will be kept on the OpenDives server and on this iPhone.",
-    "nameHelpDesktop": "It will be kept on the OpenDives server and on this computer.",
+    "nameHelp": "It will be kept on the Benthic server and on this tablet.",
+    "nameHelpPhone": "It will be kept on the Benthic server and on this phone.",
+    "nameHelpIphone": "It will be kept on the Benthic server and on this iPhone.",
+    "nameHelpDesktop": "It will be kept on the Benthic server and on this computer.",
     "create": "Create the logbook",
     "sendingTitle": "Sending the logbook",
     "sendingName": {
@@ -5630,15 +5631,15 @@
     "safeIphone": "The logbook is already saved on this iPhone. You can leave the app: the dives are sent at the next sync.",
     "safeDesktop": "The logbook is already saved on this computer. You can leave the app: the dives are sent at the next sync.",
     "cancel": "Don’t wait",
-    "created": "Logbook sent to the OpenDives server. It also stays on this tablet.",
-    "createdPhone": "Logbook sent to the OpenDives server. It also stays on this phone.",
-    "createdIphone": "Logbook sent to the OpenDives server. It also stays on this iPhone.",
-    "createdDesktop": "Logbook sent to the OpenDives server. It also stays on this computer.",
+    "created": "Logbook sent to the Benthic server. It also stays on this tablet.",
+    "createdPhone": "Logbook sent to the Benthic server. It also stays on this phone.",
+    "createdIphone": "Logbook sent to the Benthic server. It also stays on this iPhone.",
+    "createdDesktop": "Logbook sent to the Benthic server. It also stays on this computer.",
     "offlineTitle": "Server unreachable",
-    "offlineHelp": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this tablet, then try again.",
-    "offlineHelpPhone": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this phone, then try again.",
-    "offlineHelpIphone": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this iPhone, then try again.",
-    "offlineHelpDesktop": "The logbook could not be created: the OpenDives server is not responding. Check the connection of this computer, then try again.",
+    "offlineHelp": "The logbook could not be created: the Benthic server is not responding. Check the connection of this tablet, then try again.",
+    "offlineHelpPhone": "The logbook could not be created: the Benthic server is not responding. Check the connection of this phone, then try again.",
+    "offlineHelpIphone": "The logbook could not be created: the Benthic server is not responding. Check the connection of this iPhone, then try again.",
+    "offlineHelpDesktop": "The logbook could not be created: the Benthic server is not responding. Check the connection of this computer, then try again.",
     "offlineNote": "Nothing was created.",
     "interruptedTitle": "Upload interrupted",
     "interruptedHelp": "The connection dropped. Nothing is lost: the whole logbook is still on this tablet, and the sending resumes where it stopped.",
@@ -5649,7 +5650,7 @@
     "resume": "Resume the upload",
     "refused": "The server refused the upload. Sign in again, then resume it.",
     "importing": "Adding the dives…",
-    "sending": "Sending to the OpenDives server…",
+    "sending": "Sending to the Benthic server…",
     "objects": "{n} of {total}",
     "notEmpty": "This account’s repository already holds data without a logbook. Nothing was created.",
     "failed": "The logbook could not be created. Nothing was lost on this device."
@@ -5794,7 +5795,7 @@
       "informationLine": "Emergency contact, health",
       "certificationsLine": "{n} certifications",
       "noCertification": "No certification",
-      "keptWide": "Kept on your OpenDives+ account and on this device, even without a network.",
+      "keptWide": "Kept on your Benthic+ account and on this device, even without a network.",
       "paneEmpty": "Choose an item to see it here"
     },
     "inventory": {
@@ -5872,7 +5873,7 @@
       "add": "Add a piece",
       "emptyTitle": "No piece yet",
       "emptyText": "Dive computers, regulators, suits and cylinders. Each dive can then pick its pieces from here.",
-      "readOnlyTitle": "OpenDives+ has ended",
+      "readOnlyTitle": "Benthic+ has ended",
       "readOnlyText": "Your equipment is read only until {date}. After that date you lose it, unless you subscribe again or export it.",
       "readOnlyExpired": "The 30 days are over. Subscribe again or export your equipment to keep it.",
       "readOnlyExport": "Export",
@@ -6024,7 +6025,7 @@
       "renamed": "Computer renamed",
       "renameFailed": "The computer could not be renamed",
       "locked": "Read only: the equipment cannot change until you subscribe again.",
-      "plusOnly": "For OpenDives+ subscribers: the equipment of a dive changes with an account.",
+      "plusOnly": "For Benthic+ subscribers: the equipment of a dive changes with an account.",
       "kitDetail": "Kit “{name}”",
       "fillWith": "Fill with",
       "oneKit": "A kit",
@@ -6103,8 +6104,8 @@
       "by": "Done by",
       "cost": "Cost",
       "notes": "Notes",
-      "footer": "Made by OpenDives.",
-      "footerInvoices": "Made by OpenDives. The attached invoices follow this page.",
+      "footer": "Made by Benthic.",
+      "footerInvoices": "Made by Benthic. The attached invoices follow this page.",
       "file": "service-history",
       "share": "Service history",
       "failed": "The history could not be exported"
@@ -6328,7 +6329,7 @@
       "overdueTitle": "{task} overdue: {name}",
       "dueTitle": "{task} today: {name}",
       "leadTitle": "{task} in {n} days: {name}",
-      "denied": "Notifications are turned off for OpenDives: the reminder stays in the app."
+      "denied": "Notifications are turned off for Benthic: the reminder stays in the app."
     },
     "channel": {
       "name": "Equipment service",
@@ -6354,8 +6355,8 @@
       "notKept": "Not kept",
       "allow": "Allow",
       "empty": "Not set",
-      "lockNote": "The blood group is encrypted on your OpenDives+ account and only you can see it. You gave your consent on {date}.",
-      "lockNoteNoDate": "The blood group is encrypted on your OpenDives+ account and only you can see it.",
+      "lockNote": "The blood group is encrypted on your Benthic+ account and only you can see it. You gave your consent on {date}.",
+      "lockNoteNoDate": "The blood group is encrypted on your Benthic+ account and only you can see it.",
       "withdraw": "Withdraw consent",
       "deniedNote": "To keep your blood group, allow health data. It is encrypted and only you can see it.",
       "withdrawTitle": "Withdraw consent?",
@@ -6435,7 +6436,7 @@
       "saved": "Certification saved",
       "saveFailed": "The certification could not be saved.",
       "deleted": "Certification deleted",
-      "readOnly": "Read only: the OpenDives+ subscription has ended.",
+      "readOnly": "Read only: the Benthic+ subscription has ended.",
       "notFound": "This certification no longer exists."
     }
   },
@@ -6467,9 +6468,9 @@
     "chooseTitleMany": "Get {n} dives validated",
     "summaryMany": "{n} dives",
     "chooseSignature": "Signature on this screen",
-    "chooseSignatureText": "Your buddy or instructor signs with a finger. They do not need OpenDives.",
+    "chooseSignatureText": "Your buddy or instructor signs with a finger. They do not need Benthic.",
     "chooseQr": "QR code",
-    "chooseQrText": "Your buddy scans it with OpenDives+. The confirmation comes back through the server.",
+    "chooseQrText": "Your buddy scans it with Benthic+. The confirmation comes back through the server.",
     "signTitle": "Signature",
     "sign": "Validate",
     "name": "Name",
@@ -6495,7 +6496,7 @@
     "signed": "Dive validated.",
     "signedMany": "Dives validated.",
     "confirmedBy": "{name} validated the dive.",
-    "readOnly": "Your OpenDives+ subscription has ended: the logbook is read-only.",
+    "readOnly": "Your Benthic+ subscription has ended: the logbook is read-only.",
     "saveFailed": "The validation was not saved.",
     "loadFailed": "The dives could not be read.",
     "qrTitle": "Validate with a QR code",
@@ -6504,13 +6505,13 @@
     "qrExpires": "This code expires in {time}",
     "qrExpired": "This code has expired.",
     "qrNew": "New code",
-    "qrHelp": "Your buddy opens OpenDives+, taps “+” then “Scan a QR code”. The confirmation comes back through the server. Without a network, the dive shows “Validation pending”.",
+    "qrHelp": "Your buddy opens Benthic+, taps “+” then “Scan a QR code”. The confirmation comes back through the server. Without a network, the dive shows “Validation pending”.",
     "qrDone": "Done",
     "retry": "Try again",
     "qrError": {
       "offline": "The QR code needs a connection. Try again with a network, or have it signed on this screen.",
       "tooMany": "Too many codes in a short time. Try again in a few minutes.",
-      "plus": "The QR code is part of OpenDives+.",
+      "plus": "The QR code is part of Benthic+.",
       "failed": "The code could not be made."
     },
     "confirmTitle": "Confirm the dive",
@@ -6528,7 +6529,7 @@
       "expired": "This code has expired. Ask for a new one.",
       "used": "This code was already used.",
       "own": "You cannot validate your own dives.",
-      "plus": "Validating a dive needs OpenDives+.",
+      "plus": "Validating a dive needs Benthic+.",
       "unknown": "This code is not recognised.",
       "tooMany": "Too many attempts. Try again in a few minutes.",
       "failed": "The confirmation could not be sent."

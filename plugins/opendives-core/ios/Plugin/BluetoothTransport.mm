@@ -222,7 +222,7 @@ struct IosBluetoothTransport::Impl {
 				error = "Bluetooth Low Energy is not supported on this device";
 				return false;
 			case CBManagerStateUnauthorized:
-				error = "Bluetooth permission denied: allow Bluetooth for OpenDives in the iOS Settings";
+				error = "Bluetooth permission denied: allow Bluetooth for Benthic in the iOS Settings";
 				return false;
 			case CBManagerStatePoweredOff:
 				error = "Bluetooth is turned off";

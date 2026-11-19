@@ -179,9 +179,9 @@ function fileHash(file) {
 
 /** The window's title bar text. @param {{ name?: string }|null} descriptor @param {string} [mainName] */
 function windowTitle(descriptor, mainName = '') {
-  if (!descriptor) return 'OpenDives';
+  if (!descriptor) return 'Benthic Log';
   const name = descriptor.name || mainName;
-  return name ? `OpenDives \u00b7 ${name}` : 'OpenDives';
+  return name ? `Benthic Log \u00b7 ${name}` : 'Benthic Log';
 }
 
 /**

@@ -2,7 +2,7 @@
 
 2026-11-06 · Christian Rémillard
 
-This plan is for the coding agent. It covers the first write path of OpenDives: change a dive, save it in the local git repository, and synchronise it with the Subsurface cloud. It is the riskiest step so far: a mistake can damage a real logbook that Subsurface desktop and Subsurface-mobile also use. Everything below is ordered so that nothing touches Christian's real account before every safety gate has passed.
+This plan is for the coding agent. It covers the first write path of Benthic: change a dive, save it in the local git repository, and synchronise it with the Subsurface cloud. It is the riskiest step so far: a mistake can damage a real logbook that Subsurface desktop and Subsurface-mobile also use. Everything below is ordered so that nothing touches Christian's real account before every safety gate has passed.
 
 ## 1. Scope of the first increment
 

@@ -43,5 +43,5 @@ test('« Tout ce qui est inclus » has its subtitle, 16/24 grey', () => {
   const plus = read('components/FirstLaunchOdPlus.svelte');
   assert.match(plus, /odplus\.all\.subtitle/);
   assert.match(plus, /\.od-plus-all--subtitle \{[^}]*font-size: 16px;\s*line-height: 24px;\s*color: var\(--od-text-2\);/s);
-  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre OpenDives+.');
+  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
 });

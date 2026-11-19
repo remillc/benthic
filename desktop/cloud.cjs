@@ -274,7 +274,7 @@ function createCloudService({ userData, safeStorage, openExternal, clients, fetc
   function redirectPage(ok) {
     const page = texts()?.desktopCloud?.browserPage || {};
     const title = ok ? page.done || 'Connected' : page.failed || 'Sign-in failed';
-    const text = ok ? page.doneText || 'You can close this tab and go back to OpenDives.' : page.failedText || 'Go back to OpenDives and try again.';
+    const text = ok ? page.doneText || 'You can close this tab and go back to Benthic.' : page.failedText || 'Go back to Benthic and try again.';
     const esc = (/** @type {string} */ s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] || c);
     return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title></head><body style="font-family:sans-serif;max-width:32em;margin:4em auto;padding:0 1em"><h1>${esc(title)}</h1><p>${esc(text)}</p></body></html>`;
   }

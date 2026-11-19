@@ -1,4 +1,4 @@
-# OpenDives — Functional reverse engineering of Subsurface
+# Benthic — Functional reverse engineering of Subsurface
 
 2026-11-05 · Christian Rémillard
 
@@ -6,10 +6,10 @@ English copy of the French original kept on claude.ai ([online](https://claude.a
 
 ## 1. Summary and scope
 
-Subsurface covers **13 functional domains** and about 75 undoable actions. The mobile app covers only part of them. OpenDives, which will be a complete app, must aim for the whole. This document describes **what** Subsurface does (features, data, rules, integrations), never **how** its screens present it: OpenDives' interface is designed separately, from a blank page.
+Subsurface covers **13 functional domains** and about 75 undoable actions. The mobile app covers only part of them. Benthic, which will be a complete app, must aim for the whole. This document describes **what** Subsurface does (features, data, rules, integrations), never **how** its screens present it: Benthic's interface is designed separately, from a blank page.
 
 - **Analysed:** the desktop app and the mobile app, from the code (`core/`, `commands/` which lists every undoable action, `stats/`, `profile-widget/`), the user manual (desktop, 5,600 lines) and the mobile manual v3. The reference commit is `258beb4` of 4 November 2026.
-- **Decisions already made:** OpenDives connects to the existing Subsurface cloud, uses Capacitor (web interface in a native app), and Subsurface's C++ core is reused or reproduced to stay compatible.
+- **Decisions already made:** Benthic connects to the existing Subsurface cloud, uses Capacitor (web interface in a native app), and Subsurface's C++ core is reused or reproduced to stay compatible.
 - **What follows:** from the catalogue (section 2), the features of the first version are chosen. Architecture and interface design can then move forward in parallel.
 
 Not everything belongs on a phone: section 2 ranks each feature in tiers (essential, adapted, not very relevant, impossible, new). This ranking has been validated.
@@ -55,12 +55,12 @@ Two consequences follow. "Not very relevant" features must still **preserve the 
 Clarifications of 5 November 2026:
 
 - **Dive mode:** the open circuit or rebreather filter is put forward (Subsurface's "mode" criterion, which also distinguishes pSCR and freediving).
-- **Weights:** no filter on weight or weight type in OpenDives. The core keeps these criteria; they are simply not offered.
+- **Weights:** no filter on weight or weight type in Benthic. The core keeps these criteria; they are simply not offered.
 - **Other equipment** (regulator, BCD, fins, torch…): Subsurface has no field for them. They are recorded as **tags** on the dive (for example "Regulator: …"), which can be filtered and counted, without breaking compatibility.
 
 ## 3. Data model
 
-A **log** contains dives, trips, sites, devices and saved filters. Each dive brings together the data of one or more dive computers. OpenDives must take this model as is to stay compatible with the cloud.
+A **log** contains dives, trips, sites, devices and saved filters. Each dive brings together the data of one or more dive computers. Benthic must take this model as is to stay compatible with the cloud.
 
 | Entity | Key attributes | Relationships |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ A **log** contains dives, trips, sites, devices and saved filters. Each dive bri
 
 ## 4. Business rules and calculations
 
-These rules determine the figures the diver sees. OpenDives must produce **exactly the same results** as Subsurface, otherwise the same dive would show different values depending on the app. This is a strong argument for reusing `core` rather than rewriting it.
+These rules determine the figures the diver sees. Benthic must produce **exactly the same results** as Subsurface, otherwise the same dive would show different values depending on the app. This is a strong argument for reusing `core` rather than rewriting it.
 
 | Rule | Behaviour in Subsurface | Source |
 | --- | --- | --- |
@@ -145,13 +145,13 @@ Subsurface depends on five external services and reads about twenty formats. The
 - **Files of a dive:** `Dive` (header: date, duration, depths, site, cylinders, weights, people, tags, notes…), then `Divecomputer`, `Divecomputer-001`… (samples and events as line-by-line text), and a `Pictures` folder with one file per picture, named after its offset within the dive. **Fingerprints** make it possible to download only a dive computer's new dives, even from another device.
 - **Synchronisation:** fetch, then fast-forward if possible. Otherwise, libgit2's automatic merge ("Automatic merge" commit). Conflicts are resolved per file: a deletion on one side wins; otherwise one side is kept. A save that would overwrite unrelated data requires a confirmation (`classify_git_save`).
 - **Local cache:** a full clone on the device, usable offline, synchronised on demand or automatically.
-- **References for OpenDives:** `core/load-git.cpp`, `core/save-git.cpp`, `core/git-access.cpp` and the tests `tests/testgitstorage.cpp`.
+- **References for Benthic:** `core/load-git.cpp`, `core/save-git.cpp`, `core/git-access.cpp` and the tests `tests/testgitstorage.cpp`.
 
 ## 7. Cross-cutting requirements
 
-These requirements affect every feature. The first ones are inherited from Subsurface; the last ones are gaps to fill in OpenDives.
+These requirements affect every feature. The first ones are inherited from Subsurface; the last ones are gaps to fill in Benthic.
 
-| Requirement | What Subsurface does | For OpenDives |
+| Requirement | What Subsurface does | For Benthic |
 | --- | --- | --- |
 | Offline first | Full Git clone on the device; everything works without network, synchronisation afterwards | Essential (boat, islands, countries without a data plan) |
 | Units | Metric, imperial or choice per quantity (depth, pressure, volume, temperature, weight); always stored in SI | To reuse; the unit choice is also saved in `00-Subsurface` |
@@ -172,19 +172,19 @@ These requirements affect every feature. The first ones are inherited from Subsu
    **Decided on 5 November 2026:** a tablet version is planned from the start. The "Tablet" column of section 2 therefore applies to the first version. The tier ranking is validated as is.
 3. **New mobile features:** which mobile-specific features (site GPS, gallery photos, widget, offline map, reminders) come first?
    **Decided on 5 November 2026:** all new mobile features are kept for the first version (site GPS, gallery photos, sharing as an image, widget, offline map, reminders).
-4. **No-cloud mode:** should OpenDives work without a Subsurface account (local logbook only, manual export or import)?
-   **Decided on 5 November 2026:** yes, OpenDives also works without a Subsurface account, with a local logbook and manual import or export. It must be possible to move later from a local logbook to a cloud account without losing data.
+4. **No-cloud mode:** should Benthic work without a Subsurface account (local logbook only, manual export or import)?
+   **Decided on 5 November 2026:** yes, Benthic also works without a Subsurface account, with a local logbook and manual import or export. It must be possible to move later from a local logbook to a cloud account without losing data.
 5. **Photos:** the cloud does not store media files. Keep them on the device only, or plan a storage solution (iCloud, Google Photos, other)?
    **Decided on 5 November 2026:** photos and videos stay on the device, and only their reference is synchronised, as in Subsurface. On another device, the dive will show that a photo exists without being able to display it.
 6. **External services:** keep GeoNames and divelogs.de? Which map provider (Google Maps like Subsurface, or OpenStreetMap, free and usable offline)?
    **Decided on 5 November 2026:** GeoNames and divelogs.de are kept. For divelogs.de, the aim is to reproduce what Subsurface does (importing and uploading dives), without synchronisation: the Subsurface cloud remains the only data source. Maps use OpenStreetMap, which also allows the offline map.
 7. **Relationship with Subsurface:** tell the maintainers before connecting a new client to their servers? Contribute to the project (for example, making `core` independent of Qt) rather than copying it?
    **Decided on 5 November 2026:** nothing for now; the maintainers are not contacted and no contribution is made to the project. To revisit before publication.
-8. **Coexistence:** OpenDives and Subsurface-mobile on the same phone with the same account: is this a case to handle explicitly?
+8. **Coexistence:** Benthic and Subsurface-mobile on the same phone with the same account: is this a case to handle explicitly?
    **Decided on 5 November 2026:** yes, coexistence is handled explicitly:
-   - keep in full the data OpenDives does not know;
+   - keep in full the data Benthic does not know;
    - synchronise often and report resolved conflicts;
    - read without writing if the format has a newer version;
    - release the Bluetooth connection after each download;
    - rely on fingerprints and duplicate detection;
-   - sign commits "OpenDives".
+   - sign commits "Benthic".

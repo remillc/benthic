@@ -1,5 +1,5 @@
 // The new first step of the release edition (tasks 2026-11-17-263 and 264; mock-ups
-// docs/mockups-release/*-premier-lancement-production*.dc.html): « Se connecter » with the OpenDives+ chip, the device,
+// docs/mockups-release/*-premier-lancement-production*.dc.html): « Se connecter » with the Benthic+ chip, the device,
 // the import, then two text buttons; choice buttons with 24 dp corners and 48 dp tiles with 16 dp corners everywhere,
 // 24 sp titles on tablet and desktop, the logo with a thin ring and no shadow. The screens need Framework7 and a
 // WebView: their markup and CSS are read from the source; the real sizes were measured in a browser.
@@ -22,8 +22,8 @@ test('the three choices come in the order of the mock-up, « Se connecter » fir
   assert.equal(langs.fr.welcomeSteps.signInTitle, 'Se connecter');
   assert.equal(langs.fr.welcomeSteps.signInHelp, 'Ou créer un compte.');
   assert.equal(langs.fr.welcomeSteps.localHelp, 'Gardé ici, même sans réseau.');
-  assert.equal(langs.fr.welcomeSteps.importStartHelp, 'Un fichier d’OpenDives ou d’une autre app, ou divelogs.de.');
-  assert.equal(langs.fr.welcomeSteps.discoverPlus, 'Découvrir OpenDives+');
+  assert.equal(langs.fr.welcomeSteps.importStartHelp, 'Un fichier de Benthic ou d’une autre app, ou divelogs.de.');
+  assert.equal(langs.fr.welcomeSteps.discoverPlus, 'Découvrir Benthic+');
 });
 
 test('the two text buttons are centred, 40 dp high, 12 dp padding, 8 dp apart, 16 dp above and below', () => {
@@ -53,7 +53,7 @@ test('tablet and desktop: 24 sp titles on 30, « Se connecter » larger (20 dp, 
   assert.match(row, /\.od-release-row--title \{[^}]*font-weight: 600/);
 });
 
-test('the OpenDives+ chip is a small component with tokens only', () => {
+test('the Benthic+ chip is a small component with tokens only', () => {
   const chip = read('components/OdPlusChip.svelte');
   assert.match(chip, /class="od-plus-chip"/);
   assert.match(chip, /height: 24px;[^}]*padding: 0 10px 0 8px;[^}]*border-radius: 12px/);
@@ -120,8 +120,8 @@ test('the list shows only the features that are built, in the four groups of the
     }
     for (const key of ['title', 'subtitle', 'free', 'syncTextPhone', 'syncTextIphone', 'syncTextDesktop']) assert.ok(all[key], `${lang}: ${key}`);
   }
-  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre OpenDives+.');
-  assert.equal(langs.fr.odplus.offer.pill, 'L’offre OpenDives+');
+  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
+  assert.equal(langs.fr.odplus.offer.pill, 'L’offre Benthic+');
   assert.equal(langs.fr.odplus.offer.lead, 'Votre carnet à l’abri, sur tous vos appareils.');
   assert.equal(langs.fr.odplus.offer.seeAll, 'Voir tout ce qui est inclus');
 });

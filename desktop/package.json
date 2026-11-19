@@ -1,7 +1,7 @@
 {
   "name": "opendives-desktop",
   "private": true,
-  "description": "OpenDives, the desktop app (Windows, macOS, Linux): the app's interface in Electron, the Subsurface core in a helper process.",
+  "description": "Benthic, the desktop app (Windows, macOS, Linux): the app's interface in Electron, the Subsurface core in a helper process.",
   "license": "GPL-2.0-only",
   "author": "Christian Rémillard",
   "main": "main.cjs",
@@ -18,7 +18,7 @@
   },
   "build": {
     "appId": "org.opendives.app",
-    "productName": "OpenDives",
+    "productName": "Benthic Log",
     "directories": {
       "output": "../build/desktop/dist",
       "buildResources": "resources"

@@ -5,7 +5,7 @@
 //
 // Two forms of the same address, both opening the app:
 //   opendives://sites/12                 custom scheme
-//   https://opendives.app/sites/12       verified link (Android App Links, iOS Universal Links)
+//   https://benthicdivelog.app/sites/12  verified link (https://opendives.app/... still opens too) (Android App Links, iOS Universal Links)
 // They differ only by the prefix; the path is the table below. Only screens that
 // are safe to land on are listed: never an editor, an account screen or a delete.
 //
@@ -30,7 +30,10 @@
 import { IMPORT_FORMATS } from './import-formats.js';
 
 /** The host of the verified links. */
-export const LINK_HOST = 'opendives.app';
+export const LINK_HOST = 'benthicdivelog.app';
+
+/** The host of the links shared before the rename: they keep opening the app. */
+export const OLD_LINK_HOST = 'opendives.app';
 
 /**
  * @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} LinkSection
@@ -73,7 +76,7 @@ function linkPath(url) {
   if (custom) rest = custom[1];
   else {
     const https = /^https:\/\/([^/?#:]+)(?::443)?([^?#]*)/i.exec(url);
-    if (!https || https[1].toLowerCase() !== LINK_HOST) return null;
+    if (!https || ![LINK_HOST, OLD_LINK_HOST].includes(https[1].toLowerCase())) return null;
     rest = https[2].replace(/^\//, '');
   }
   return '/' + rest;

@@ -6,10 +6,10 @@ import { checkSharedFile, diveLink, importErrorKey, isSubsurfaceXml, parseLink, 
 
 test('both forms of an address mean the same thing', () => {
   for (const [custom, https] of [
-    ['opendives://sites/12', 'https://opendives.app/sites/12'],
-    ['opendives://plan/new', 'https://opendives.app/plan/new'],
-    ['opendives://tools/', 'https://opendives.app/tools/'],
-    ['opendives://dives/at/20121105T101500', 'https://opendives.app/dives/at/20121105T101500'],
+    ['opendives://sites/12', 'https://benthicdivelog.app/sites/12'],
+    ['opendives://plan/new', 'https://benthicdivelog.app/plan/new'],
+    ['opendives://tools/', 'https://benthicdivelog.app/tools/'],
+    ['opendives://dives/at/20121105T101500', 'https://benthicdivelog.app/dives/at/20121105T101500'],
   ]) {
     assert.deepEqual(parseLink(custom), parseLink(https), custom);
     assert.notEqual(parseLink(custom).kind, 'unknown', custom);
@@ -17,14 +17,14 @@ test('both forms of an address mean the same thing', () => {
 });
 
 test('a dive is found by its local start time', () => {
-  assert.deepEqual(parseLink('https://opendives.app/dives/at/20121105T101500'), { kind: 'dive', stamp: '20121105T101500', date: '2012-11-05T10:15:00' });
-  assert.equal(parseLink('https://opendives.app/dives/42').kind, 'unknown');
-  assert.equal(parseLink('https://opendives.app/dives/at/2012-11-05').kind, 'unknown');
+  assert.deepEqual(parseLink('https://benthicdivelog.app/dives/at/20121105T101500'), { kind: 'dive', stamp: '20121105T101500', date: '2012-11-05T10:15:00' });
+  assert.equal(parseLink('https://benthicdivelog.app/dives/42').kind, 'unknown');
+  assert.equal(parseLink('https://benthicdivelog.app/dives/at/2012-11-05').kind, 'unknown');
 });
 
 test('the links the app shares come back as the same dive and site', () => {
   const link = diveLink('2012-11-05T10:15:00');
-  assert.equal(link, 'https://opendives.app/dives/at/20121105T101500');
+  assert.equal(link, 'https://benthicdivelog.app/dives/at/20121105T101500');
   assert.equal(parseLink(link ?? '').kind, 'dive');
   assert.equal(diveLink('garbage'), null);
   assert.deepEqual(parseLink(siteLink(305419896)), { kind: 'site', uuid: 305419896 });
@@ -49,9 +49,9 @@ test('only listed screens open: no editor, account or delete', () => {
 
 test('another host, another scheme and http are not ours', () => {
   assert.equal(parseLink('https://example.com/sites/12').kind, 'unknown');
-  assert.equal(parseLink('https://opendives.app.evil.com/sites/12').kind, 'unknown');
-  assert.equal(parseLink('http://opendives.app/sites/12').kind, 'unknown');
-  assert.equal(parseLink('https://user@opendives.app/sites/12').kind, 'unknown');
+  assert.equal(parseLink('https://benthicdivelog.app.evil.com/sites/12').kind, 'unknown');
+  assert.equal(parseLink('http://benthicdivelog.app/sites/12').kind, 'unknown');
+  assert.equal(parseLink('https://user@benthicdivelog.app/sites/12').kind, 'unknown');
   assert.equal(parseLink('').kind, 'unknown');
   assert.equal(parseLink(/** @type {any} */ (undefined)).kind, 'unknown');
   assert.equal(parseLink('opendives://sites/%E0%A4%A').kind, 'unknown');
@@ -95,4 +95,10 @@ test('import errors keep their message', () => {
   assert.equal(importErrorKey('NO_DIVES'), 'logbook.importNoDives');
   assert.equal(importErrorKey('WRITE_LOCKED'), 'edit.writeLocked');
   assert.equal(importErrorKey('IMPORT_FAILED'), 'logbook.importFailed');
+});
+
+test('the links shared before the rename (opendives.app) still open the app', () => {
+  assert.deepEqual(parseLink('https://opendives.app/dives/at/20121105T101500'), parseLink('https://benthicdivelog.app/dives/at/20121105T101500'));
+  assert.equal(parseLink('https://opendives.app/sites/12').kind, 'site');
+  assert.equal(parseLink('http://opendives.app/sites/12').kind, 'unknown');
 });

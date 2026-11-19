@@ -1,6 +1,6 @@
 # Dive computer images
 
-`catalog.json` lists one entry per libdivecomputer model (vendor, product, slug, `hasImage`, server paths `image512`/`image128`, source page and original URLs, `confidence`, `approx` (true when confidence is low: a close model's picture), `fetched_at`, original width and height, `cropped`: `manual` or `auto`). The normalized webp files are not in git: they are published by the OpenDives server (`/v1/dc-images/512/<slug>.webp`, `/v1/dc-images/128/<slug>.webp`).
+`catalog.json` lists one entry per libdivecomputer model (vendor, product, slug, `hasImage`, server paths `image512`/`image128`, source page and original URLs, `confidence`, `approx` (true when confidence is low: a close model's picture), `fetched_at`, original width and height, `cropped`: `manual` or `auto`). The normalized webp files are not in git: they are published by the Benthic server (`/v1/dc-images/512/<slug>.webp`, `/v1/dc-images/128/<slug>.webp`).
 
 `crops.json` holds the manual crops: `{"<vendor>|<product>": {"x","y","w","h"}}` in original pixels. A model without a crop is trimmed automatically.
 

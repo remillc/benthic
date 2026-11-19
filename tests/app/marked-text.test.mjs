@@ -61,7 +61,7 @@ test('steps: the example values are code (name, address, token name)', () => {
       const code = parseMarked(text).filter((s) => s.type === 'code').map((s) => s.text);
       if (/\.git\b/.test(text)) assert.ok(code.some((c) => /^https:\/\/.+\.git$/.test(c)), key);
       if (/carnet-plongee/.test(text.replace(/https:\/\/\S+/, ''))) assert.ok(code.includes('carnet-plongee'), key);
-      if (/(par exemple|for example) \[code\]OpenDives/.test(text)) assert.ok(code.includes('OpenDives'), key);
+      if (/(par exemple|for example) \[code\]OpenDives/.test(text)) assert.ok(code.includes('Benthic'), key);
     }
   }
 });

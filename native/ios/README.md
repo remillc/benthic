@@ -37,6 +37,6 @@ open app/ios/App/App.xcworkspace
 ## The workflow
 
 It runs on `main` when the native side changes, and by hand (Actions → iOS →
-Run workflow) on any branch. The `OpenDives-simulator` artifact is the app for
+Run workflow) on any branch. The `Benthic-simulator` artifact is the app for
 the simulator, to upload to Appetize. The minimum iOS version, `IOS_MIN` in
 `native/ios/env.sh`, follows Capacitor's.

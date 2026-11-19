@@ -67,7 +67,7 @@
     <div class="od-desktop-first-launch--panel-bands" aria-hidden="true"></div>
     <div class="od-desktop-first-launch--brand">
       <img class="od-desktop-first-launch--logo" src="logo-light.svg" alt="" width="96" height="96" />
-      <span>OpenDives</span>
+      <span>Benthic</span>
     </div>
     {#if plusPanel}
       <OdPlusPanel step={plusPanel} />

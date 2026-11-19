@@ -95,7 +95,7 @@ function openSettingsWindow() {
     minWidth: 768,
     minHeight: 520,
     show: false,
-    title: 'OpenDives',
+    title: 'Benthic Log',
     backgroundColor: '#F5F4F0',
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false },
   });
@@ -128,7 +128,7 @@ function openProfileWindow() {
     minWidth: 900,
     minHeight: 560,
     show: false,
-    title: 'OpenDives',
+    title: 'Benthic Log',
     backgroundColor: '#F5F4F0',
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false },
   });

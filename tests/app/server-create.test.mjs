@@ -1,4 +1,4 @@
-// Creating a logbook on the OpenDives server and the OpenDives+ screens (tasks 2026-11-17-265 and 266): the format
+// Creating a logbook on the OpenDives server and the Benthic+ screens (tasks 2026-11-17-265 and 266): the format
 // writer, the upload and its resume after a cut connection, the choices, where an account goes after the code, the
 // inert billing seams, the steps and their order, and the texts. The screens are read from their source.
 import test from 'node:test';
@@ -46,7 +46,7 @@ test('the two entries of the first step, and the way of the offer', () => {
   assert.deepEqual(forward(['start', 'odplusConnect', 'server', 'serverCode', 'serverDownload'], 'ready').at(-1), 'odplusReady');
 });
 
-// --- OpenDives+ --------------------------------------------------------------------------------------------
+// --- Benthic+ --------------------------------------------------------------------------------------------
 
 test('a subscribed account goes to its logbook, any other one to the offer', () => {
   assert.equal(afterSignIn({ subscribed: true }), 'download');
@@ -85,7 +85,7 @@ test('« Continuer sans compte » and « Continuer sans abonnement » create not
   assert.equal([...screen.matchAll(/onclick=\{onwithout\}/g)].length, 2);
 });
 
-test('the development switch to « Bienvenue dans OpenDives+ » exists in development builds only', () => {
+test('the development switch to « Bienvenue dans Benthic+ » exists in development builds only', () => {
   const screen = read('components/FirstLaunchOdPlus.svelte');
   assert.match(screen, /if \(!import\.meta\.env\?\.DEV \|\| step !== 'odplusOffer'\) return;/);
   assert.equal([...screen.matchAll(/__odplus/g)].length, 3);
@@ -123,7 +123,7 @@ test('every text of the new screens is in fr and en, and the price is the one of
   assert.equal(langs.fr.odplus.offer.subscribe, 'S’abonner');
   assert.equal(langs.fr.odplus.offer.without, 'Continuer sans abonnement');
   assert.equal(langs.fr.odplus.offer.noAccount, 'Aucun compte n’est créé.');
-  assert.equal(langs.fr.odplus.welcome.title, 'Bienvenue dans OpenDives+ !');
+  assert.equal(langs.fr.odplus.welcome.title, 'Bienvenue dans Benthic+ !');
   assert.equal(langs.fr.serverSteps.backHome, 'Revenir à l’accueil');
 });
 

@@ -32,7 +32,7 @@
 {#snippet panelContent()}
   <div class="od-welcome-release--brand">
     <span class="od-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
-    <span>OpenDives</span>
+    <span>Benthic</span>
   </div>
   {#if plusPanel}
     <OdPlusPanel step={plusPanel} />

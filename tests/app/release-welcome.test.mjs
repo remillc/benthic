@@ -237,14 +237,14 @@ test('the texts of the mock-ups, in French', () => {
   assert.equal(s.startTitle, 'Pour commencer');
   assert.equal(s.createTitle, 'Créer un carnet');
   assert.equal(s.importTitle, 'Importer un carnet');
-  assert.equal(s.openTitle, 'Ouvrir mon carnet OpenDives');
+  assert.equal(s.openTitle, 'Ouvrir mon carnet Benthic');
   assert.equal(s.nameLabel, 'Nom du carnet');
   assert.equal(s.nameHelp, 'Il s’affiche en haut du carnet et nomme son fichier.');
   assert.equal(s.whereTitle, 'Où le garder ?');
   assert.equal(s.deviceTitle, 'Seulement sur cette tablette');
   assert.equal(s.connect, 'Se connecter à {service}');
-  assert.equal(s.connectedCreate, '« {file} » sera créé dans le dossier OpenDives de ce compte.');
-  assert.equal(s.credentialsNote, 'OpenDives ne garde pas ces identifiants.');
+  assert.equal(s.connectedCreate, '« {file} » sera créé dans le dossier Benthic de ce compte.');
+  assert.equal(s.credentialsNote, 'Benthic ne garde pas ces identifiants.');
   assert.equal(s.progressDownload, 'Téléchargement des plongées');
   assert.equal(s.seeLogbooks, 'Voir mes carnets');
   assert.equal(s.openLogbook, 'Ouvrir le carnet');

@@ -1,4 +1,4 @@
-# OpenDives desktop
+# Benthic desktop
 
 The desktop app is Electron (Windows, macOS, Linux). The Svelte app is the same as on phones; the
 core (Subsurface's C++ code through the facade) runs in a helper process.

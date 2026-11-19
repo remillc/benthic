@@ -81,7 +81,7 @@ export function dirSize(dir) {
 export function gitCli(cwd, args, env = {}) {
   return execFileSync('git', args, { cwd, env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'core.autocrlf', GIT_CONFIG_VALUE_0: 'false', ...env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 1 << 28 });
 }
-export const AUTHOR = { name: 'OpenDives', email: 'noreply@opendives.app' };
+export const AUTHOR = { name: 'OpenDives', email: 'noreply@benthicdivelog.app' };
 
 /** Prepares a repository on the server with a complete logbook (git CLI push, not measured). */
 export async function seedRepo(files, ownerDir) {

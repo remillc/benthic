@@ -22,7 +22,7 @@ export const FORMAT_COLUMNS = /** @type {const} */ (['open', 'devices', 'logbook
 
 /** @type {ImportFormat[]} */
 export const IMPORT_FORMATS = [
-  { report: 'Subsurface log and XML', column: 'open', name: 'OpenDives, Subsurface', extensions: ['.ssrf', '.xml'] },
+  { report: 'Subsurface log and XML', column: 'open', name: 'Benthic, Subsurface', extensions: ['.ssrf', '.xml'] },
   { report: 'UDDF 3.0 to 3.2', column: 'open', name: 'UDDF', extensions: ['.uddf'] },
   { report: 'UDDF of the APD Inspiration', column: 'open', name: 'UDDF APD Inspiration', extensions: ['.uddf'] },
   { report: 'UDCF', column: 'open', name: 'UDCF', extensions: ['.udcf'] },

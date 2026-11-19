@@ -37,7 +37,7 @@
   {/if}
   <div class="od-first-launch-band--brand" role="img" aria-label={t('welcome.brandAlpha')}>
     <img class="od-first-launch-band--logo" src="logo-light.svg" alt="" width={welcome ? 40 : 32} height={welcome ? 40 : 32} />
-    <span class="od-first-launch-band--name" aria-hidden="true">OpenDives</span>
+    <span class="od-first-launch-band--name" aria-hidden="true">Benthic</span>
     <span class="od-first-launch-band--alpha" aria-hidden="true">{t('welcome.alpha')}</span>
   </div>
   {#if welcome}

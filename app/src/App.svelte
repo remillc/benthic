@@ -343,7 +343,7 @@
   const statisticsListWidth = ios ? 420 : 400;
 
   const f7params = {
-    name: 'OpenDives',
+    name: 'Benthic',
     theme: ios ? 'ios' : 'md',
     // Settings, Display, Theme: the device's, or light or dark.
     darkMode: settings.theme === 'system' ? 'auto' : settings.theme === 'dark',

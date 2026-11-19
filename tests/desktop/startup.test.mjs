@@ -189,7 +189,7 @@ test('« Choisir à chaque fois »: one window on the start screen, nothing open
   const windows = await second.wm.openStartup();
   assert.equal(windows.length, 1);
   assert.equal(logbookOf(second, windows[0]), null);
-  assert.equal(windows[0].title, 'OpenDives');
+  assert.equal(windows[0].title, 'Benthic Log');
   const recent = await second.wm.handle({}, 'recent');
   assert.ok(recent.some((e) => e.location === path.resolve(a)));
   await second.bridge.stop();

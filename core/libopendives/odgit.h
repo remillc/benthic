@@ -42,7 +42,7 @@ struct OdgitAuth {
 
 // Who the commits are made by.
 struct OdgitAuthor {
-	std::string name = "OpenDives", email = "noreply@opendives.app";
+	std::string name = "OpenDives", email = "noreply@benthicdivelog.app";
 };
 
 // http:// addresses are refused unless this is on. Only the development builds turn it on (the dev stack is plain

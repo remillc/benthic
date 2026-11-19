@@ -1,6 +1,6 @@
 # Explore: nearby dive sites (to-do #23): closed
 
-**Decision, 14 November 2026 (Christian):** to-do #23 is closed. Sharing dive sites worldwide turned out to be hard to achieve and laborious, so OpenDives does not offer it. Sites stays limited to the diver's own sites.
+**Decision, 14 November 2026 (Christian):** to-do #23 is closed. Sharing dive sites worldwide turned out to be hard to achieve and laborious, so Benthic does not offer it. Sites stays limited to the diver's own sites.
 
 Read this before reopening the idea.
 
@@ -25,7 +25,7 @@ Explore would have lived in Sites, not as a fifth destination. Two filter chips 
 ## The only way found to cover the world
 
 Divers contribute their own sites from their logbook, site by site, never in bulk, because some sites are private or confidential. There were two options:
-- a shared base hosted by OpenDives, with a server, deduplication and moderation;
+- a shared base hosted by Benthic, with a server, deduplication and moderation;
 - the app adds each site to OpenStreetMap under the diver's own OSM account. Uploading a whole logbook at once would be an OSM "import" and would need the community's agreement first.
 
 Starting point if the idea comes back: OSM dive sites and dive centres, plus contributions from divers.

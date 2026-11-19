@@ -1,6 +1,6 @@
 # Design documents
 
-OpenDives' design documents, in English. The three analysis documents (Subsurface analysis, reverse engineering, architecture) are copies of French originals on claude.ai, whose diagrams are only visible online. Since 10 November 2026, the UI documents (System design, UI foundations, UI specification) are maintained here only: these files are the reference, and their old French versions on claude.ai are abandoned.
+Benthic's design documents, in English. The three analysis documents (Subsurface analysis, reverse engineering, architecture) are copies of French originals on claude.ai, whose diagrams are only visible online. Since 10 November 2026, the UI documents (System design, UI foundations, UI specification) are maintained here only: these files are the reference, and their old French versions on claude.ai are abandoned.
 
 | Document | Content | Original (French) |
 | --- | --- | --- |

@@ -186,13 +186,13 @@ test('windows: opening a logbook opens a window; the same logbook again only foc
   const fake = fakeElectron();
   const wm = manager(fake);
   const main = wm.openMain();
-  assert.equal(main.title, 'OpenDives · Main');
+  assert.equal(main.title, 'Benthic Log · Main');
   const file = path.join(root, 'w.ssrf');
   writeFileSync(file, 'x');
   const first = await wm.openPath(file, main);
   assert.equal(first.opened, true);
   assert.equal(fake.created.length, 2);
-  assert.equal(fake.created[1].title, 'OpenDives · w.ssrf');
+  assert.equal(fake.created[1].title, 'Benthic Log · w.ssrf');
   await wm.openPath(file, main);
   assert.equal(fake.created.length, 2);
   assert.equal(fake.created[1].focused, true);
@@ -204,7 +204,7 @@ test('windows: closing a logbook leaves the start screen; opening from it reuses
   const main = wm.openMain();
   await wm.closeLogbook(main);
   assert.equal(bridge.descriptorOf(main.webContents.id), null);
-  assert.equal(main.title, 'OpenDives');
+  assert.equal(main.title, 'Benthic Log');
   assert.equal(main.reloads, 1);
   const file = path.join(root, 'r.ssrf');
   writeFileSync(file, 'x');

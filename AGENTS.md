@@ -1,12 +1,14 @@
-# AGENTS.md — OpenDives
+# AGENTS.md — Benthic
 
 Instructions for coding agents (Claude Code and others) working in this repository.
+
+**Name (decided on 19 November 2026):** the app is called **Benthic** (paid offer **Benthic+**, name under the icon and in notifications **Benthic Log**, stores **Benthic – Dive Log**, domain `benthicdivelog.app`). The old internal names stay where renaming would break installed data or sign-in: see `docs/rename-leftovers.md`.
 
 **Language rule:** all code, comments, identifiers, commit messages and documentation in this repository are written in **English**. The app's user-visible texts are the exception: they live in the translation files (`app/src/i18n/fr.json`, `en.json`). Conversations with the project owner are in French.
 
 ## The project
 
-OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, but it is not a mere companion to the desktop app. It runs on iPhone, Android phones and tablets (iPad and Android) from the first version; a desktop version (Windows, macOS, Linux) follows.
+Benthic is a full dive log app for mobile. It improves on Subsurface-mobile, but it is not a mere companion to the desktop app. It runs on iPhone, Android phones and tablets (iPad and Android) from the first version; a desktop version (Windows, macOS, Linux) follows.
 
 - **Data:** the Subsurface cloud (git repositories on `ssrf-cloud-*.subsurface-divelog.org`) is **the only synchronised data source**. We connect to it; we do not replace it. No other providers.
 - **GeoNames and divelogs.de** work as in Subsurface: one-off import or upload, no synchronisation.
@@ -20,14 +22,14 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 - **App:** Capacitor (hybrid).
 - **Web layer:** Svelte 5 + Framework7 v9, in **JavaScript with JSDoc**. No TypeScript.
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
-- **JavaScript first (decided on 14 November 2026):** OpenDives' own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
+- **JavaScript first (decided on 14 November 2026):** Benthic's own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
 - **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
 - **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the core runs in a helper process (`desktop/host`, JSON lines over stdio) reached from Electron's main process, and `plugins/opendives-core/desktop.js` implements the plugin's JSDoc contract on it, so the app's code does not depend on the platform (docs/architecture.md, section 10). Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
 
 ## Golden rule: Subsurface is never modified
 
 - `third_party/subsurface` is a **pinned submodule**. None of its files are modified. To follow Subsurface, change the pinned commit, then rerun the tests.
-- Everything OpenDives adds to build that code goes in `core/compat/`:
+- Everything Benthic adds to build that code goes in `core/compat/`:
   - fake Qt headers (`qtshim/`);
   - replacement headers (`shadow/`, found through `-iquote`);
   - rewritten helper functions (`*_compat.cpp`).
@@ -38,7 +40,7 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
 
 - **Reference for coding the UI:** `docs/system-design.md` (principles, CSS naming, colours, type, layout, shared components, states) and `docs/ui-specification.md` (each screen, core data). They take precedence over the mock-ups. These UI documents exist only here, in English (their old French versions on claude.ai were abandoned on 10 November 2026).
 - **iPhone and iPad:** iOS conventions (Human Interface Guidelines).
-- **Android:** **Material 3 Expressive** is the reference (decided on 11 November 2026): its components, shapes, motion (springs) and type are used by default; a standard Material 3 component is used only where Expressive has no version of it. No dynamic colour: the OpenDives theme stays (see docs/system-design.md, sections 3 and 5).
+- **Android:** **Material 3 Expressive** is the reference (decided on 11 November 2026): its components, shapes, motion (springs) and type are used by default; a standard Material 3 component is used only where Expressive has no version of it. No dynamic colour: the Benthic theme stays (see docs/system-design.md, sections 3 and 5).
 - **Tablets:** an iOS variant and an Android variant.
 - **No UI patterns or features typical of AI agents:** no chat assistant, no "magic" summary, no sparkle button, etc.
 - **Do not copy Subsurface-mobile's screens:** they are its main weakness.
@@ -52,10 +54,10 @@ OpenDives is a full dive log app for mobile. It improves on Subsurface-mobile, b
   - Statistics apply to the filtered results.
 - **Statistics tab:** opens on precompiled statistics with a "Free filter" button. Examples: number of dives per buddy, dive hours per suit.
 - **First launch:** three choices (existing account, create an account, no account), each with its consequence written out; "no account" means the log stays on the device, with an upload possible later.
-- **Beta (the default build, decided on 18 November 2026):** it never offers to open a logbook in OneDrive, Google Drive or a personal git repository (no first-launch choice, no Account choice, no git form route; the alpha build keeps them, gated by `isRelease`); the OpenDives server keeps using the git code internally. An alpha user who upgraded is offered, once, a copy of the alpha's Subsurface-cloud logbook (read from the device, no network, the alpha's files untouched) as a row of « Importer un carnet »: `app/src/lib/alpha-logbook.js`.
+- **Beta (the default build, decided on 18 November 2026):** it never offers to open a logbook in OneDrive, Google Drive or a personal git repository (no first-launch choice, no Account choice, no git form route; the alpha build keeps them, gated by `isRelease`); the Benthic server keeps using the git code internally. An alpha user who upgraded is offered, once, a copy of the alpha's Subsurface-cloud logbook (read from the device, no network, the alpha's files untouched) as a row of « Importer un carnet »: `app/src/lib/alpha-logbook.js`.
 - **Units:** each measure is set separately (depth, temperature, pressure, volume, weight), like Subsurface's "personalised" mode.
 - **Planner:** can start from a dive in the log (gases, measured SAC). Results are volumes per gas. Saved plans are planned dives of the logbook, listed by the planner only.
-- **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, an OpenDives addition).
+- **States to build:** empty log, failed download, offline with pending changes, sync conflict (version choice: to be confirmed, a Benthic addition).
 - **Log screen:** no permanent Download button; a "+" button opens download, import or manual entry.
 - **Navigation:** on Android phones, a Material 3 Expressive bottom navigation bar (Logbook, Sites, Statistics, Tools) on those four pages only, an account avatar at the top right opening a sheet with the account, sync, Settings and About, and a back arrow on every other page (decided on 14 November 2026). iPhone keeps the top bar with a ☰ side menu (decided on 6 November 2026). Tablets keep the iPad sidebar and the Android navigation rail. See docs/system-design.md, section 7.
 - **divelogs.de:** one-off import of the log when creating an account; divelogs.de credentials are never stored.
@@ -68,7 +70,7 @@ AGENTS.md                 this file
 app/                      Capacitor app (Svelte 5, Framework7) + report (README.md)
 plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/); desktop.js (desktop)
 desktop/                  Electron app (Windows, macOS, Linux): main process, bridge, the core's helper (host/)
-core/compat/              OpenDives additions to build Subsurface's core without Qt
+core/compat/              Benthic additions to build Subsurface's core without Qt
 core/libopendives/        C++ facade over the core
 native/                   Android build of the core and its dependencies; ios/: the iOS build
 poc/                      proof of concept: build.sh + report (README.md)
@@ -140,7 +142,7 @@ There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub ma
 - Every commit is pushed right away (`git push`, or `git push -u origin <branch>` for a new branch); so is every merge.
 - Commit messages in English, imperative mood, short summary line.
 - Author of every commit: Christian Rémillard. No `Co-Authored-By` or `Claude-Session` line in commit messages.
-- Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. OpenDives is GPLv2 because it reuses Subsurface's core.
+- Code files taken from or derived from Subsurface: `SPDX-License-Identifier: GPL-2.0` header. Benthic is GPLv2 because it reuses Subsurface's core.
 - Never commit Subsurface cloud credentials or a personal dive log.
 - The settings of the device and its remembered choices (sort orders, last export format, and so on) are stored in one place and one way: through `app/src/lib/device-store.js` (`@capacitor/preferences`: SharedPreferences on Android, UserDefaults on iOS), keys `od.<name>`, values as text (JSON for objects). Never `localStorage` directly; the only exception is the logbook snapshot, a cache (decided on 15 November 2026). Account credentials stay in the secure storage of the plugin.
 - Existing French comments and documentation are translated to English when the file is next touched.

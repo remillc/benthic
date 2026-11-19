@@ -32,13 +32,14 @@
                 <data android:scheme="opendives" />
             </intent-filter>
 
-            <!-- Verified links (App Links): https://opendives.app/sites/12. The paths are those of the
+            <!-- Verified links (App Links): https://benthicdivelog.app/sites/12 (and the old host opendives.app, kept). The paths are those of the
                  fallback page of the site (site/build.mjs); the fingerprints are in
                  site/.well-known/assetlinks.json. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="benthicdivelog.app" />
                 <data android:scheme="https" android:host="opendives.app" />
                 <data android:pathPrefix="/dives/at/" />
                 <data android:pathPrefix="/sites/" />
@@ -48,7 +49,7 @@
                 <data android:pathPrefix="/statistics/" />
             </intent-filter>
 
-            <!-- "Open with OpenDives" on a logbook file (ACTION_VIEW on a content:// address). Mail, Drive and file
+            <!-- "Open with Benthic" on a logbook file (ACTION_VIEW on a content:// address). Mail, Drive and file
                  managers often send a logbook as application/octet-stream or text/plain: the app checks the
                  contents (lib/deep-link.js, lib/shared-file.js) and refuses what is not a logbook with a message. -->
             <intent-filter>

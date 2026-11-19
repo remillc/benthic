@@ -387,7 +387,7 @@
                 <span class="od-new-logbook--big-tile">
                   <img class="od-new-logbook--mark" src="logo-light.svg" alt="" width="44" height="44" />
                 </span>
-                <span class="od-new-logbook--end-name">OpenDives</span>
+                <span class="od-new-logbook--end-name">Benthic</span>
               </div>
               <div class="od-new-logbook--link" class:od-new-logbook--link-ok={connection === 'connected'} role="img" aria-label={t('desktopCloud.connect.linkSign', { service: serviceName(provider) })}>
                 <span class="od-new-logbook--line"></span>

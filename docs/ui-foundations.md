@@ -1,4 +1,4 @@
-# OpenDives — UI foundations
+# Benthic — UI foundations
 
 2026-11-05 · Christian Rémillard
 
@@ -6,7 +6,7 @@ English copy of the French original kept on claude.ai ([online](https://claude.a
 
 ## 1. Summary
 
-OpenDives targets **recreational and technical divers**. The interface is simple by default, and technical features (deco, trimix, rebreather) stay within reach without cluttering the recreational diver's screen. It follows the native conventions of iOS and Android, thanks to Framework7. It uses **no feature and no visual pattern typical of AI-generated interfaces** (section 3).
+Benthic targets **recreational and technical divers**. The interface is simple by default, and technical features (deco, trimix, rebreather) stay within reach without cluttering the recreational diver's screen. It follows the native conventions of iOS and Android, thanks to Framework7. It uses **no feature and no visual pattern typical of AI-generated interfaces** (section 3).
 
 - **This document sets** the usage situations, the principles, the app's organisation and a visual direction. It does not contain screens yet.
 - **Starting point:** the tasks and the tier ranking from the reverse engineering, not Subsurface's screens.
@@ -18,7 +18,7 @@ The same diver does not use the app the same way on the boat, in the evening and
 
 **Three profiles**
 
-| Profile | What they do | What they expect from OpenDives |
+| Profile | What they do | What they expect from Benthic |
 | --- | --- | --- |
 | Recreational diver on a trip | 2 to 3 dives a day for a week, Bluetooth dive computer, often without network | Download fast, note the site and buddies, review dives, keep a clean logbook |
 | Regular local diver | Lake, quarry or river, all year round, same sites and same buddies | Almost automatic entry (detected site, usual buddies), long-term statistics, temperatures |
@@ -86,9 +86,9 @@ The mock-ups now cover, on iPhone and Android phone: first launch, sites and off
 | Units | Each measurement is set separately: depth, temperature, pressure, volume, weight (for example depth in feet and temperature in °C). This is Subsurface's "personalised" mode, already synchronised through the cloud |
 | Planner | It can start from a dive in the logbook: it reuses its gas, cylinder, start pressure and measured consumption (SAC). Reached from Tools ("New dive or from the logbook") and from a dive's detail (menu "Plan from this dive") |
 | Gas reserve | When less than the minimum reserve to bring two divers up would remain, the planner shows it in the alarm colour, with the gap in bar |
-| Synchronisation conflict | Subsurface merges most concurrent changes itself; when it cannot ("Remote storage and local data diverged"), OpenDives would offer to keep the device version or the cloud version, after comparing them, without losing anything before the choice. **To validate**: an addition to OpenDives' synchronisation layer, without modifying Subsurface |
+| Synchronisation conflict | Subsurface merges most concurrent changes itself; when it cannot ("Remote storage and local data diverged"), Benthic would offer to keep the device version or the cloud version, after comparing them, without losing anything before the choice. **To validate**: an addition to Benthic's synchronisation layer, without modifying Subsurface |
 
-**divelogs.de (decided on 5 November 2026).** When creating an account, the diver can bring their divelogs.de logbook: dives are downloaded once into the Subsurface account, with no synchronisation afterwards. OpenDives does not keep the divelogs.de credentials.
+**divelogs.de (decided on 5 November 2026).** When creating an account, the diver can bring their divelogs.de logbook: dives are downloaded once into the Subsurface account, with no synchronisation afterwards. Benthic does not keep the divelogs.de credentials.
 
 The values in the planner mock-ups come from Subsurface's real planner, compiled without Qt in the proof of concept.
 
