@@ -268,9 +268,18 @@ export { waterTypeOf };
  */
 
 /**
+ * What deleting one of the diver's types does to the dives (cylinder_type_delete in opendives.h).
+ * @typedef {Object} CylinderTypeDeletion
+ * @property {number} removed dives that lose the cylinder
+ * @property {number} kept dives where a cylinder stays, its type cleared (it is the dive's only
+ *   cylinder, or a gas change or the pressure graph depends on it)
+ */
+
+/**
  * @typedef {Object} CylinderTypes
  * @property {CylinderType[]} types the runtime table, sorted by name
  * @property {string[]} library the device's library, to keep as is and set again at start
+ * @property {CylinderTypeDeletion} [deletion] after 'delete' and 'deletePreview'
  * @property {string} undo
  * @property {string} redo
  */
@@ -785,8 +794,10 @@ export { waterTypeOf };
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
  * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number, diveComputerList?: string[]}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in opendives.h); a device setting, kept by the app.
- * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
+ * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename'|'delete'|'deletePreview', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
+ *   "delete" removes one of the diver's types and its cylinders from the dives (one undoable
+ *   step; `deletion` has the counts), "deletePreview" only returns the counts,
  *   "library" sets the device's library (value: JSON {"library": [...]}).
  * @property {() => Promise<PlannerSetup>} plannerSetup
  *   The planner's settings as the core's preferences hold them.

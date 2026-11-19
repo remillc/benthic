@@ -8,6 +8,7 @@ import { fillLevels } from './gas-summary.js';
 import { gasName, pressureUsed, typeHelper } from './cylinder-card.js';
 import { formatCylinderSize, formatNumber, formatPressure, formatSac, formatWeight } from './format.js';
 import { t, tIfExists } from './i18n.js';
+import { cylinderTypeLabel } from './cylinder-types.js';
 
 /** The two segments of « Type d'eau »; any other water type (brackish, EN 13319) selects neither. */
 export const WATER_SEGMENTS = /** @type {const} */ (['fresh', 'salt']);
@@ -63,7 +64,7 @@ export function gasCards(cylinders, prefs) {
     const levels = fillLevels(c.startMbar, c.endMbar, c.workingPressureMbar);
     const size = typeHelper(formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), c.workingPressureMbar);
     const gas = gasName(c.o2Permille || 210, c.hePermille, words);
-    const type = [c.description, size].filter(Boolean).join(' · ');
+    const type = [cylinderTypeLabel(c.description), size].filter(Boolean).join(' · ');
     const range = c.startMbar > 0 && c.endMbar > 0 ? t('detail.pressureRange', { start: pressureNumber(c.startMbar, prefs), end: formatPressure(c.endMbar, prefs) }) : c.startMbar > 0 ? formatPressure(c.startMbar, prefs) : c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '';
     return {
       index,

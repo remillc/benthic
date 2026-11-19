@@ -26,6 +26,7 @@
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
+  import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
@@ -522,7 +523,7 @@
         return {
           gas: gasName(c.o2Permille, c.hePermille, gasWords),
           use: c.use,
-          line: typeLine(c.description, size, use),
+          line: typeLine(cylinderTypeLabel(c.description), size, use),
           start: c.startMbar > 0 && c.endMbar > 0 ? pressureValue(c.startMbar) : '',
           end: c.endMbar > 0 ? formatPressure(c.endMbar, prefs) : '',
           // An unused cylinder without pressure gets no line (Christian, 13 November 2026).

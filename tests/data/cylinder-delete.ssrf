@@ -1,0 +1,91 @@
+<divelog program='subsurface' version='3'>
+<settings>
+</settings>
+<divesites>
+</divesites>
+<dives>
+<dive number='1' date='2026-01-01' time='10:00:00' duration='20:00 min'>
+  <notes>removable second cylinder</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' o2='32.0%' start='190.0 bar' end='150.0 bar' />
+  <divecomputer model='manual' >
+  <depth max='10.0 m' mean='6.0 m' />
+  <sample time='0:00 min' depth='0.0 m' />
+  <sample time='10:00 min' depth='10.0 m' />
+  <sample time='20:00 min' depth='0.0 m' />
+  </divecomputer>
+</dive>
+<dive number='2' date='2026-01-02' time='10:00:00' duration='20:00 min'>
+  <notes>only cylinder</notes>
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' start='200.0 bar' end='80.0 bar' />
+  <divecomputer model='manual' >
+  <depth max='10.0 m' mean='6.0 m' />
+  <sample time='0:00 min' depth='0.0 m' />
+  <sample time='10:00 min' depth='10.0 m' />
+  <sample time='20:00 min' depth='0.0 m' />
+  </divecomputer>
+</dive>
+<dive number='3' date='2026-01-03' time='10:00:00' duration='30:00 min'>
+  <notes>gas switch to the cylinder</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' o2='50.0%' start='200.0 bar' end='120.0 bar' />
+  <divecomputer model='manual' >
+  <depth max='20.0 m' mean='12.0 m' />
+  <event time='10:00 min' type='25' value='50' name='gaschange' cylinder='1' o2='50.0%' />
+  <sample time='0:00 min' depth='0.0 m' />
+  <sample time='10:00 min' depth='20.0 m' />
+  <sample time='20:00 min' depth='10.0 m' />
+  <sample time='30:00 min' depth='0.0 m' />
+  </divecomputer>
+</dive>
+<dive number='4' date='2026-01-04' time='10:00:00' duration='30:00 min'>
+  <notes>removable middle cylinder, gas switch to the one after it</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' o2='32.0%' />
+  <cylinder size='7.0 l' workpressure='200.0 bar' description='S80' o2='100.0%' start='200.0 bar' end='150.0 bar' />
+  <divecomputer model='manual' >
+  <depth max='20.0 m' mean='12.0 m' />
+  <event time='12:00 min' type='25' value='100' name='gaschange' cylinder='2' o2='100.0%' />
+  <sample time='0:00 min' depth='0.0 m' />
+  <sample time='10:00 min' depth='20.0 m' />
+  <sample time='20:00 min' depth='6.0 m' />
+  <sample time='30:00 min' depth='0.0 m' />
+  </divecomputer>
+</dive>
+<dive number='5' date='2026-01-05' time='10:00:00' duration='20:00 min'>
+  <notes>pressure samples of the cylinder (implied sensor mapping)</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' start='200.0 bar' end='120.0 bar' />
+  <divecomputer model='Test computer' >
+  <depth max='10.0 m' mean='6.0 m' />
+  <sample time='0:00 min' depth='0.0 m' pressure0='200.0 bar' pressure1='200.0 bar' />
+  <sample time='10:00 min' depth='10.0 m' pressure0='150.0 bar' pressure1='160.0 bar' />
+  <sample time='20:00 min' depth='0.0 m' pressure0='100.0 bar' pressure1='120.0 bar' />
+  </divecomputer>
+</dive>
+<dive number='6' date='2026-01-06' time='10:00:00' duration='20:00 min'>
+  <notes>explicit sensor mapping: the sensor of the cylinder after the removed one follows it</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <cylinder size='3.0 l' workpressure='200.0 bar' description='Mon 3L' />
+  <cylinder size='7.0 l' workpressure='200.0 bar' description='S80' start='200.0 bar' end='120.0 bar' />
+  <divecomputer model='Test computer' >
+  <depth max='10.0 m' mean='6.0 m' />
+  <tanksensormapping sensorid='0' cylinderindex='0' />
+  <tanksensormapping sensorid='2' cylinderindex='2' />
+  <sample time='0:00 min' depth='0.0 m' pressure0='200.0 bar' pressure2='200.0 bar' />
+  <sample time='10:00 min' depth='10.0 m' pressure0='150.0 bar' pressure2='160.0 bar' />
+  <sample time='20:00 min' depth='0.0 m' pressure0='100.0 bar' pressure2='120.0 bar' />
+  </divecomputer>
+</dive>
+<dive number='7' date='2026-01-07' time='10:00:00' duration='20:00 min'>
+  <notes>does not use the type</notes>
+  <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' start='200.0 bar' end='100.0 bar' />
+  <divecomputer model='manual' >
+  <depth max='10.0 m' mean='6.0 m' />
+  <sample time='0:00 min' depth='0.0 m' />
+  <sample time='10:00 min' depth='10.0 m' />
+  <sample time='20:00 min' depth='0.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>

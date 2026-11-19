@@ -2065,6 +2065,11 @@ html.md.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
   margin-left: 16px;
 }
 
+/* The confirm button of a deletion that cannot be undone (confirmAction with danger): the red of the delete tiles. */
+.dialog .dialog-button.od-dialog-danger {
+  color: var(--od-late-text);
+}
+
 /*
  * Dialog buttons that do not fit side by side (task 2026-11-14-143, lib/dialog-fit.js measures them):
  * one per line, aligned to the end, the main action (the last one) on top, 8 dp apart, labels that

@@ -9,12 +9,12 @@ import { t } from './i18n.js';
  * @param {{ title: string, text: string, action: string, onConfirm: () => void, cancel?: string, onCancel?: () => void }} options
  *   `cancel` and `onCancel`: another label for Cancel, and what to do when it is chosen
  */
-export function confirmAction({ title, text, action, onConfirm, cancel, onCancel }) {
+export function confirmAction({ title, text, action, onConfirm, cancel, onCancel, danger = false }) {
   f7.dialog
     .create({
       title,
       text,
-      buttons: [{ text: cancel ?? t('dialog.cancel'), onClick: onCancel }, { text: action, onClick: onConfirm }],
+      buttons: [{ text: cancel ?? t('dialog.cancel'), onClick: onCancel }, { text: action, onClick: onConfirm, cssClass: danger ? 'od-dialog-danger' : undefined }],
     })
     .open();
 }

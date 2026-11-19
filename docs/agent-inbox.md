@@ -5743,7 +5743,7 @@ The wave, the title row and the list below do not move.
 
 **Test:** the header has the same height as before; the search box has 40 px of blue below it before the wave.
 
-## [ ] 2026-11-18-285 Settings: delete one of your own cylinder types
+## [x] 2026-11-18-285 Settings: delete one of your own cylinder types
 
 Christian approved this on 18 November 2026. Work in `main`. Mock-ups in `docs/mockups-release/`: `reglages2-bouteilles-android` (list), `reglages2-bouteille-vos-modifier-android` (edit one of your types), `reglages2-bouteille-supprimer-android` (confirmation).
 
@@ -5756,3 +5756,5 @@ Réglages › Équipement › Types de bouteilles › Vos types › a type (e.g.
 - Standard types keep « Retirer ce type » (hides it from the list, no change to dives).
 
 **Test:** delete a type used in dives: the count shown matches, the confirmation appears, the cylinders are gone from those dives after confirming, « Annuler » changes nothing. Delete an unused type: no dialog.
+
+**Done (19 November 2026), decision of Christian on the open point:** deleting one of « Vos types » deletes the type and removes its cylinders from the dives that use them, with their pressures and gas mix, EXCEPT where removing would damage the dive: (1) the cylinder is the cylinder the dive starts on (so also a dive's only cylinder), or (2) the dive depends on it (a gas change to it, a tank sensor mapped to it, or, with no explicit sensor mapping, a sensor from its index up). There the cylinder stays with its pressures, mix and events, and only its type is replaced by « unknown » (Subsurface's own name for a cylinder without a type; shown as « Type inconnu »). The removal uses Subsurface's own sequence (`get_cylinder_map_for_remove`, `remove_cylinder`, `cylinder_renumber`), so the other cylinders' gas changes and sensors keep pointing at the right cylinders. One undoable step in the core (façade `cylinder_type_delete`, actions `delete` and `deletePreview` of `cylinderTypes`); the dialog counts come from the core. Tests: `tests/cylinder_delete_test.cpp` on `tests/data/cylinder-delete.ssrf`, `tests/app/cylinder-type-delete.test.mjs`.

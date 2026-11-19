@@ -10,6 +10,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import { t } from '../lib/i18n.js';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { formatCylinderSize, formatNumber, formatPressure } from '../lib/format.js';
 
   /** @type {import('opendives-core').CylinderType[]} */
@@ -50,7 +51,7 @@
       <div role="listitem">
         <button type="button" class="od-cylinder-types--row" onclick={() => open(type.name)}>
           <span class="od-cylinder-types--texts">
-            <span class="od-cylinder-types--label">{type.name}{#if usage && !type.dives}<span class="od-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
+            <span class="od-cylinder-types--label">{cylinderTypeLabel(type.name)}{#if usage && !type.dives}<span class="od-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
             {#if usage}<span class="od-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
           </span>
           <span class="od-cylinder-types--value">{size(type)}</span>

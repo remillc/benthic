@@ -24,6 +24,7 @@
 #include "core/dive.h"
 #include "core/divecomputer.h"
 #include "core/sample.h"
+#include "core/tanksensormapping.h"
 #include "core/divefilter.h"
 #include "core/divelog.h"
 #include "core/divesite.h"
@@ -1556,6 +1557,111 @@ int cylinder_type_rename(const std::string &old_name, const std::string &new_nam
 	apply_cylinder_type(step);
 	push_step(std::move(step));
 	return cylinder_types(json);
+}
+
+// Deleting one of the diver's cylinder types (an OpenDives addition): the
+// cylinders of that type leave the dives that use them, with their pressures
+// and gas mix, unless taking one out would damage the dive. A cylinder stays
+// (only its type description is replaced by "unknown", size, pressures and mix are kept) when:
+//  - it is the cylinder the dive starts on (so also a dive's only cylinder);
+//  - a gas change refers to it;
+//  - a tank sensor of the profile is mapped to it, or, when the computer has
+//    no explicit mapping, a sensor with an index from this cylinder up (the
+//    implied sensor n -> cylinder n mapping would shift).
+// The others are removed with Subsurface's own sequence (get_cylinder_map_for_remove,
+// remove_cylinder, cylinder_renumber), so that the other cylinders' gas changes
+// and sensor mappings follow. With dry_run, nothing changes: only the counts.
+static int check_writable_log(std::string &error);
+
+// How Subsurface itself names a cylinder whose type is not known (add_default_cylinder()): it is
+// written to the log as the description and read back as such.
+static const char *const UNKNOWN_CYLINDER_TYPE = "unknown";
+
+static bool cylinder_removable(const dive &d, int idx)
+{
+	for (const divecomputer &dc: d.dcs) {
+		if (d.has_gaschange_event(&dc, idx))
+			return false;
+		int start = gasmix_loop(d, dc).next_cylinder_index().first;
+		if (start < 0 || start == idx)
+			return false;
+		bool explicit_map = false;
+		for (const tank_sensor_mapping &m: dc.tank_sensor_mappings) {
+			if (m.sensor_id == NO_SENSOR)
+				continue;
+			explicit_map = true;
+			if (static_cast<int>(m.cylinder_index) == idx)
+				return false;
+		}
+		if (!explicit_map && dc.tank_sensor_mappings.empty())
+			for (int16_t s: get_tank_sensor_ids(dc))
+				if (s >= idx)
+					return false;
+	}
+	return true;
+}
+
+int cylinder_type_delete(const std::string &name, bool dry_run, std::string &json, std::string &error)
+{
+	std::vector<tank_info> &library = get_tank_info_baseline();
+	std::vector<tank_info> standard = default_tank_info_table();
+	if (name == UNKNOWN_CYLINDER_TYPE || (!get_tank_info(library, name) && !get_tank_info(tank_info_table, name)) || get_tank_info(standard, name)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::DIVES_EDIT;
+	int removed = 0, kept = 0;
+	std::vector<dive *> changed;
+	for (const auto &dp: divelog.dives) {
+		dive *d = dp.get();
+		if (internal::is_plan_only(*d))
+			continue;
+		std::vector<int> removable, clear;
+		for (int i = 0; i < static_cast<int>(d->cylinders.size()); i++) {
+			if (d->cylinders[i].type.description != name)
+				continue;
+			(cylinder_removable(*d, i) ? removable : clear).push_back(i);
+		}
+		if (removable.empty() && clear.empty())
+			continue;
+		(clear.empty() ? removed : kept)++;
+		if (dry_run)
+			continue;
+		auto copy = std::make_unique<dive>(*d);
+		for (int i: clear)
+			copy->cylinders[i].type.description = UNKNOWN_CYLINDER_TYPE;
+		for (auto it = removable.rbegin(); it != removable.rend(); ++it) {
+			std::vector<int> mapping = get_cylinder_map_for_remove(static_cast<int>(copy->cylinders.size()), *it);
+			remove_cylinder(copy.get(), *it);
+			cylinder_renumber(*copy, &mapping[0]);
+		}
+		changed.push_back(d);
+		step.dive_swaps.emplace_back(d->id, std::move(copy));
+	}
+	if (!dry_run) {
+		if (!changed.empty() && check_writable_log(error))
+			return -1;
+		if (!changed.empty()) {
+			step.text = changed.size() == 1 ? "Delete cylinder type [" + dive_number_or_date(*changed[0]) + "]"
+							: "Delete cylinder type (" + std::to_string(changed.size()) + " dive(s))";
+			for (auto &[id, other]: step.dive_swaps)
+				if (dive *d = divelog.dives.get_by_uniq_id(id))
+					exchange(d, *other);
+			push_step(std::move(step));
+		}
+		// The type itself: out of the runtime table and of the device's library.
+		auto same = [&name](const tank_info &ti) { return ti.name == name; };
+		tank_info_table.erase(std::remove_if(tank_info_table.begin(), tank_info_table.end(), same), tank_info_table.end());
+		library.erase(std::remove_if(library.begin(), library.end(), same), library.end());
+		if (prefs.default_cylinder == name)
+			prefs.default_cylinder.clear();
+	}
+	if (cylinder_types(json))
+		return -1;
+	json.pop_back(); // the closing brace
+	json += ",\"deletion\":{\"removed\":" + std::to_string(removed) + ",\"kept\":" + std::to_string(kept) + "}}";
+	return 0;
 }
 
 // ---------------------------------------------------------------------------

@@ -1202,6 +1202,8 @@ Java_org_opendives_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstring a
 	}
 	else if (action == "rename")
 		ret = opendives::cylinder_type_rename(name, value, json, error);
+	else if (action == "delete" || action == "deletePreview")
+		ret = opendives::cylinder_type_delete(name, action == "deletePreview", json, error);
 	else
 		ret = opendives::cylinder_type_action(action, name, ml, mbar, json, error);
 	if (ret) {

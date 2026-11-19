@@ -832,7 +832,7 @@
     },
     "cylinders": {
       "title": "Types de bouteilles",
-      "intro": "Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ou le retirer ne modifie pas les plongées existantes.",
+      "intro": "Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes. Supprimer un de vos types retire ses bouteilles des plongées qui l’utilisent.",
       "yours": "Vos types",
       "standard": "Standard",
       "standardNote": "Les types standard sont modifiables comme les vôtres.",
@@ -847,6 +847,14 @@
       "deleteTitle": "Retirer {name} ?",
       "deleteText": "Le type n’est plus proposé. Les plongées existantes ne changent pas.",
       "deleteAction": "Retirer",
+      "deleteType": "Supprimer ce type",
+      "deleteTypeTitle": "Supprimer « {name} » ?",
+      "deleteTypeAction": "Supprimer",
+      "deleteTypeNone": "N’est utilisé dans aucune plongée.",
+      "deleteRemoved": { "one": "Retire cette bouteille de {n} plongée.", "other": "Retire cette bouteille de {n} plongées." },
+      "deleteKept": { "one": "Dans {n} plongée où elle sert au profil ou est la seule bouteille, elle reste, sans type.", "other": "Dans {n} plongées où elle sert au profil ou est la seule bouteille, elle reste, sans type." },
+      "deleteIrreversible": "Cette action ne peut pas être annulée.",
+      "unknown": "Type inconnu",
       "fromLogbook": "Ce type vient des plongées du carnet. Il reste proposé tant qu’une plongée l’utilise.",
       "nameInUse": "Ce nom est déjà celui d’un type",
       "nameMissing": "Indiquez un nom",
@@ -2573,7 +2581,8 @@
       "Remplacer ce carnet : cet appareil ne garde qu’un carnet à la fois. Un fichier de carnet (.ssrf Subsurface, ou archive qui en contient un) ouvert avec OpenDives ou choisi dans « + » › Importer un fichier propose maintenant « Remplacer ce carnet » : un écran dit que le carnet quitte cet appareil et propose « Exporter d’abord ce carnet » ; « Remplacer » demande une seconde confirmation si le carnet n’a pas été exporté ou si des modifications ne sont pas synchronisées, puis vous nommez le nouveau carnet. Le carnet actuel est remis en place si le fichier ne peut pas être lu. Le carnet du serveur OpenDives et un carnet synchronisé avec un compte ne sont jamais remplacés, avec une ligne qui dit pourquoi. Quand une archive contient plusieurs carnets, seul le principal est importé et la fenêtre le dit.",
       "Gros carnets : un carnet de mille plongées avec profils (environ 100 Mo) peut maintenant être partagé vers OpenDives depuis une autre application, choisi avec « Importer un fichier », servir à remplacer le carnet, être exporté d’abord, copié depuis la version précédente ou inclus dans « Télécharger mes données » sans que l’application manque de mémoire. Le fichier passe désormais directement entre le stockage du téléphone et le cœur en petits morceaux, au lieu de traverser l’écran en un seul texte.",
       "Import : un carnet ou un fichier de sites de plongée affiche une seule ligne de progression, du moment où il est reçu ou choisi jusqu’à la fin de l’import : « Copie du fichier », « Vérification », « Import des plongées », « Enregistrement », avec la taille copiée, le pourcentage et le temps restant. « Annuler » arrête la copie et la vérification et supprime la copie partielle. Un message dit combien de plongées ou de sites ont été ajoutés.",
-      "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré."
+      "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré.",
+      "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
