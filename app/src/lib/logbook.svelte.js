@@ -24,7 +24,7 @@ import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
 import { sheetVariant } from './account-sheet.js';
-import { loadOdplusAccount, odplusAccount, odplusSubscriber, setOdplusAccount } from './odplus-state.svelte.js';
+import { loadOdplusAccount, odplusAccount, odplusSubscriber, setOdplusAccount } from './benthic-plus-state.svelte.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 

@@ -6,7 +6,7 @@
   // dive has none of this.
   import GearIcon from './GearIcon.svelte';
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, gearMap } from '../lib/inventory.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -20,7 +20,7 @@
 {#if pieces.length || equipment.adhoc.length || kit}
   <div class="od-dive-gear-block">
     {#if pieces.length || equipment.adhoc.length}
-      <div class="od-dive-gear-block--head"><h3>{t('gear.diveGear.other')}</h3><OdPlusChip onLight /></div>
+      <div class="od-dive-gear-block--head"><h3>{t('gear.diveGear.other')}</h3><BenthicPlusChip onLight /></div>
       <ul class="od-dive-gear-block--list">
         {#each pieces as g (g?.id)}
           {#if g}

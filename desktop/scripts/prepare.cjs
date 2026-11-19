@@ -30,9 +30,9 @@ execSync('npx vite build --mode production', {
 });
 fs.cpSync(path.join(root, 'app', 'dist'), path.join(stage, 'web'), { recursive: true });
 
-const host = path.join(root, 'build', 'desktop', target, 'bin', `opendives-host${exe}`);
+const host = path.join(root, 'build', 'desktop', target, 'bin', `benthic-host${exe}`);
 if (!fs.existsSync(host)) throw new Error(`missing ${host}: run native/desktop/build.sh ${target}`);
-fs.copyFileSync(host, path.join(stage, 'bin', `opendives-host${exe}`));
+fs.copyFileSync(host, path.join(stage, 'bin', `benthic-host${exe}`));
 
 const xslt = path.join(root, 'third_party', 'subsurface', 'xslt');
 for (const name of fs.readdirSync(xslt).filter((n) => /\.xslt?$/.test(n))) fs.copyFileSync(path.join(xslt, name), path.join(stage, 'xslt', name));

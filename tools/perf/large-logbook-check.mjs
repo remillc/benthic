@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Large-logbook check: the web layer's file paths and (optionally) the real core, on a logbook of ~100 MB or more.
-// usage: node tools/perf/large-logbook-check.mjs <logbook.ssrf> [opendives-host executable]
+// usage: node tools/perf/large-logbook-check.mjs <logbook.ssrf> [benthic-host executable]
 //   (make one with: node tools/perf/gen-logbook.mjs 1386 build/perf/big.ssrf 1 3 70)
 // It stages the file in pieces through a plugin fake backed by real files (what the desktop bridge does), scans it,
 // runs the shared-file flow (sites a dives file lacks are added by assembling), and reports the largest piece any call
@@ -16,7 +16,7 @@ import { scanLogbook, stageFile } from '../../app/src/lib/staged-file.js';
 
 const [source, hostExe] = process.argv.slice(2);
 if (!source) {
-  console.error('usage: node tools/perf/large-logbook-check.mjs <logbook.ssrf> [opendives-host]');
+  console.error('usage: node tools/perf/large-logbook-check.mjs <logbook.ssrf> [benthic-host]');
   process.exit(2);
 }
 const MB = 1024 * 1024;

@@ -8,7 +8,7 @@ core (Subsurface's C++ code through the facade) runs in a helper process.
 ```
 renderer (app/)                      main process                        helper process
 core-api.js                          desktop/bridge.cjs                  desktop/host/host.cpp
-  -> plugins/opendives-core/           ipc 'od:*' handlers   <-- stdio -->  opendives-host
+  -> plugins/opendives-core/           ipc 'od:*' handlers   <-- stdio -->  benthic-host
      desktop.js  -> window.odDesktop   + HostProcess (restarts it)          (the facade)
                     (desktop/preload.cjs)
 ```
@@ -62,8 +62,8 @@ Left out of the host: `downloadDives` (Bluetooth will come from the web layer, W
 
 ```sh
 poc/build.sh                                   # Linux or WSL: the core objects
-desktop/host/build-linux-test.sh               # build/desktop/opendives-host
-OPENDIVES_HOST=build/desktop/opendives-host node --test tests/desktop/host.test.mjs
+desktop/host/build-linux-test.sh               # build/desktop/benthic-host
+OPENDIVES_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
 node --test tests/desktop/bridge.test.mjs      # the bridge, with a fake host: no native build needed
 node --import ./tests/app/register.mjs --test tests/app/desktop-plugin.test.mjs
 ```

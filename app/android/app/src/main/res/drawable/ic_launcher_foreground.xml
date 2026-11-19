@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive icon foreground: the wave of the logo with relief (docs/brand/opendives-logo.svg) and its shadow.
+<!-- Adaptive icon foreground: the wave of the logo with relief (docs/brand/benthic-logo.svg) and its shadow.
      The disc is the background (ic_launcher_background.xml), so it fills the launcher's mask: no white ring.
      The wave keeps its share of the disc: drawn for a disc of radius 30, scaled by 1.2 to the visible
      circle of radius 36. No rim: on a squircle mask it would show as a ring. -->

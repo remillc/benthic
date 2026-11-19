@@ -1,6 +1,6 @@
 #!/bin/bash
 # Builds the dependencies, then the core: libopendives_core.a and the test
-# executables (and opendives-host when desktop/host/ exists).
+# executables (and benthic-host when desktop/host/ exists).
 # usage: [TARGET=linux-x64|win-x64|mac-arm64|mac-x64] native/desktop/build.sh [TARGET]
 # Output: build/desktop/<target>/{deps,lib,bin}
 set -euo pipefail

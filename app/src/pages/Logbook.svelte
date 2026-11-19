@@ -18,7 +18,7 @@
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import { scanQr } from '../lib/qr-receive.svelte.js';
-  import { odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import { enterFromMenu } from '../lib/first-launch.svelte.js';

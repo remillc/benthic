@@ -4,7 +4,7 @@
   // docs/mockups/android-tablette-premier-lancement-production-*.dc.html): a 48 dp tonal icon tile, a title,
   // a help line and a chevron. `main` is the filled row (the first choice of a list). No radio button.
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
 
   /**
    * @type {{
@@ -27,7 +27,7 @@
 <button type="button" class="od-release-row {extra}" class:od-release-row--main={main} class:od-release-row--compact={compact} class:od-release-row--prominent={prominent} class:od-release-row--dense={dense} {disabled} {onclick}>
   <span class="od-release-row--tile"><Icon name={/** @type {any} */ (icon)} size={24} /></span>
   <span class="od-release-row--text">
-    {#if plus}<span class="od-release-row--plus"><OdPlusChip /></span>{/if}
+    {#if plus}<span class="od-release-row--plus"><BenthicPlusChip /></span>{/if}
     <span class="od-release-row--title">{title}</span>
     {#if help}<span class="od-release-row--help">{help}</span>{/if}
   </span>

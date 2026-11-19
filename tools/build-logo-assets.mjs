@@ -32,7 +32,7 @@ export function logoBody(id = 'od') {
 }
 // The favicon drops the rim and the shadow wave: at 16 px they turn the wave grey. Disc gradient and one white wave stay.
 const FAVICON =
-  '<!-- The simple logo with relief, simplified for 16 px (docs/brand/opendives-logo.svg without the rim and the shadow wave); the same in light and dark mode. -->' +
+  '<!-- The simple logo with relief, simplified for 16 px (docs/brand/benthic-logo.svg without the rim and the shadow wave); the same in light and dark mode. -->' +
   '<defs><linearGradient id="od-disc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
   '<circle cx="12" cy="12" r="11" fill="url(#od-disc)"/>' +
   '<path d="M5 13q3.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>';
@@ -57,11 +57,11 @@ const icon = (_bg, shape) => {
 /** Files of the repository: [path, content]. */
 function svgFiles() {
   const f = [];
-  f.push(['docs/brand/opendives-logo.svg', svg(240, 240, '0 0 24 24', logoBody())]);
+  f.push(['docs/brand/benthic-logo.svg', svg(240, 240, '0 0 24 24', logoBody())]);
   for (const mode of ['light', 'dark']) {
     const bg = mode === 'light' ? LIGHT_BG : DARK_BG;
-    for (const shape of ['round', 'squircle', 'fullbleed']) f.push([`docs/brand/opendives-icon-${mode}-${shape}.svg`, icon(bg, shape)]);
-    f.push([`docs/brand/opendives-logo-${mode}.svg`, svg(264, 264, '21 21 66 66', placed)]);
+    for (const shape of ['round', 'squircle', 'fullbleed']) f.push([`docs/brand/benthic-icon-${mode}-${shape}.svg`, icon(bg, shape)]);
+    f.push([`docs/brand/benthic-logo-${mode}.svg`, svg(264, 264, '21 21 66 66', placed)]);
     f.push([`app/public/logo-${mode}.svg`, svg(264, 264, '21 21 66 66', placed)]);
   }
   f.push(['app/public/logo-menu.svg', svg(44, 44, '0 0 24 24', logoBody())]);
@@ -124,8 +124,8 @@ function raster(svgText, size, out, opaque = false) {
 if (arg !== '--png-only') for (const [p, c] of svgFiles()) { mkdirSync(dirname(join(root, p)), { recursive: true }); writeFileSync(join(root, p), c); }
 if (arg !== '--svg-only') {
   const res = 'app/android/app/src/main/res';
-  raster(icon(LIGHT_BG, 'squircle'), 1024, 'docs/brand/opendives-icon-1024.png');
-  raster(svg(264, 264, '21 21 66 66', placed), 1024, 'docs/brand/opendives-logo-1024.png');
+  raster(icon(LIGHT_BG, 'squircle'), 1024, 'docs/brand/benthic-icon-1024.png');
+  raster(svg(264, 264, '21 21 66 66', placed), 1024, 'docs/brand/benthic-logo-1024.png');
   for (const [d, s] of Object.entries({ mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 })) {
     raster(icon(LIGHT_BG, 'squircle'), s, `${res}/mipmap-${d}/ic_launcher.png`);
     raster(icon(LIGHT_BG, 'round'), s, `${res}/mipmap-${d}/ic_launcher_round.png`);

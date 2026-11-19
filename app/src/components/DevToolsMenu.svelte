@@ -4,7 +4,7 @@
   // the state of the account and the actions of lib/dev-tools.js. Loaded through `import()` behind the development
   // switch. Its texts are not in the translation files: they must not reach a release catalogue.
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { realDevTools, accountSegments, runSegment } from '../lib/dev-tools.js';
   import { realDevReset, resetLines } from '../lib/dev-reset.js';
   import { devErrorText } from '../lib/dev-errors.js';
@@ -293,7 +293,7 @@
               <span class="od-dev-tools-menu--avatar" aria-hidden="true">{initial}</span>
               <div class="od-dev-tools-menu--state-who">
                 {#if current.kind === 'subscribed'}
-                  <span class="od-dev-tools-menu--badge od-dev-tools-menu--badge-plus"><OdPlusChip onLight />{text.subscribed}</span>
+                  <span class="od-dev-tools-menu--badge od-dev-tools-menu--badge-plus"><BenthicPlusChip onLight />{text.subscribed}</span>
                 {:else}
                   <span class="od-dev-tools-menu--badge">{text.free}</span>
                 {/if}

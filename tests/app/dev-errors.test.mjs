@@ -30,7 +30,7 @@ test('codes come from error.code or from the start of the message; unknown thing
 });
 
 test('the menu and the first-launch dev sign-in show the mapped text, never e.message or e.code', () => {
-  for (const path of ['components/DevToolsMenu.svelte', 'components/FirstLaunchOdPlus.svelte']) {
+  for (const path of ['components/DevToolsMenu.svelte', 'components/FirstLaunchBenthicPlus.svelte']) {
     const src = readFileSync(new URL('../../app/src/' + path, import.meta.url), 'utf8');
     assert.doesNotMatch(src, /text.failed +|e.message : String(e)|' + e.code/, path);
   }

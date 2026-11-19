@@ -5,7 +5,7 @@
 // bar on macOS only (menu.cjs).
 //
 // Development: run the Vite server (`npx vite --port 5180` in app/), then `npm run dev`
-// here. OD_HOST points at the helper (build/desktop/<target>/bin/opendives-host).
+// here. OD_HOST points at the helper (build/desktop/<target>/bin/benthic-host).
 'use strict';
 
 const path = require('node:path');
@@ -31,7 +31,7 @@ const webRoot = path.join(resources, 'web');
 /** The helper: OD_HOST in development, else the one shipped with the app. */
 function hostPath() {
   if (process.env.OD_HOST) return process.env.OD_HOST;
-  return path.join(resources, 'bin', process.platform === 'win32' ? 'opendives-host.exe' : 'opendives-host');
+  return path.join(resources, 'bin', process.platform === 'win32' ? 'benthic-host.exe' : 'benthic-host');
 }
 
 // The interface is served from app://opendives/, a stable origin (its storage stays

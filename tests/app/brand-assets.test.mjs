@@ -24,7 +24,7 @@ test('the brand assets are the providers\' files and the README names their sour
 });
 
 test('the sign-in buttons use the logos, not letter discs, and the provider colours come from tokens', () => {
-  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
   assert.ok(!plus.includes('od-plus--disc'));
   assert.match(plus, /google-g\.svg\?raw/);
   assert.match(plus, /apple-logo-black\.svg/);
@@ -36,7 +36,7 @@ test('the sign-in buttons use the logos, not letter discs, and the provider colo
 });
 
 test('both logos are shown at 22 px high on the one connection screen used by phone, tablet and desktop', () => {
-  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(plus, /od-plus--google-logo {[^}]*width: 22px;\s*height: 22px;/);
   assert.match(plus, /od-plus--apple-logo {[^}]*height: 22px;[^}]*width: auto;/);
   assert.match(read('theme.css'), /--od-brand-apple-bg: #000000;/);

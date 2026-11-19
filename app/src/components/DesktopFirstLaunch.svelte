@@ -14,7 +14,7 @@
   import { onMount } from 'svelte';
   import { f7, f7ready } from 'framework7-svelte';
   import ReleaseProfile from './ReleaseProfile.svelte';
-  import OdPlusPanel from './OdPlusPanel.svelte';
+  import BenthicPlusPanel from './BenthicPlusPanel.svelte';
   import { currentStep } from '../lib/first-launch.svelte.js';
   import FirstLaunchSteps from './FirstLaunchSteps.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -70,7 +70,7 @@
       <span>Benthic</span>
     </div>
     {#if plusPanel}
-      <OdPlusPanel step={plusPanel} />
+      <BenthicPlusPanel step={plusPanel} />
     {:else}
       <h1 class="od-desktop-first-launch--headline">{t('welcomeRelease.headline')}</h1>
       <p class="od-desktop-first-launch--intro">{t('welcomeRelease.intro')}</p>

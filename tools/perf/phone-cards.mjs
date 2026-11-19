@@ -19,7 +19,7 @@ const out = path.resolve(root, outDir);
 mkdirSync(out, { recursive: true });
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5401}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5401}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9421}`, `--lang=${lang}`, '--disable-features=CalculateNativeWinOcclusion', '--disable-backgrounding-occluded-windows', path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();

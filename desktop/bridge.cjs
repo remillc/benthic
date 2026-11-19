@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 'use strict';
 // The bridge of the desktop app, main-process side. It starts the core's helper
-// process (opendives-host, desktop/host/host.cpp), keeps it alive, and gives
+// process (benthic-host, desktop/host/host.cpp), keeps it alive, and gives
 // the renderer a small, checked API through the preload (desktop/preload.cjs).
 // The renderer side of the plugin is plugins/opendives-core/desktop.js.
 //
@@ -189,7 +189,7 @@ class HostProcess {
       this.pending.clear();
       if (!this.stopping) {
         this.restarts += 1;
-        this.log(`opendives-host stopped: ${reason}`);
+        this.log(`benthic-host stopped: ${reason}`);
         this.onExit?.(reason);
       }
     };
@@ -213,7 +213,7 @@ class HostProcess {
     try {
       message = JSON.parse(text);
     } catch {
-      this.log(`opendives-host: not a protocol line: ${text.slice(0, 200)}`);
+      this.log(`benthic-host: not a protocol line: ${text.slice(0, 200)}`);
       return;
     }
     if (message.event) {
@@ -270,7 +270,7 @@ class HostProcess {
  * @param {import('electron').IpcMain} options.ipcMain
  * @param {import('electron').App} options.app
  * @param {import('electron').SafeStorage} options.safeStorage
- * @param {string} options.hostPath path of the opendives-host executable
+ * @param {string} options.hostPath path of the benthic-host executable
  * @param {string[]} [options.hostArgs] arguments before the protocol (tests)
  * @param {string} [options.resourcesDir] the bundled files; default: <process.resourcesPath>/resources when
  *   packaged, else desktop/resources

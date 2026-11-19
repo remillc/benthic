@@ -189,7 +189,7 @@ const KEPT_FOR_WHERE = ['createHelp', 'openHelp', 'importHelp', 'deviceTitleDesk
 
 test('every text of the release screens is in fr and en, none is unused', () => {
   const keys = new Set();
-  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state, read('components/OdPlusChip.svelte')]) {
+  for (const src of [sources.page, sources.steps, sources.git, sources.divelogs, sources.webdav, sources.profile, sources.logic, sources.summary, sources.logbook, sources.state, read('components/BenthicPlusChip.svelte')]) {
     for (const m of src.matchAll(/'(welcome(?:Release|Steps)\.\w+)'/g)) keys.add(m[1]);
     // A text that names the device has a phone variant, chosen by layout.phone (lib/first-launch-phone.js).
     // The desktop app's variant (« cet ordinateur », task 2026-11-16-228) and the iPhone's (task 2026-11-16-261);

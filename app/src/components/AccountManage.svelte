@@ -4,16 +4,16 @@
   // compte-android-connecte, android-tablette-compte-gerer-paysage, bureau-compte-gerer): the account and its sign-in
   // method, the subscription (managed in the store, never here), the photo and video space, the diver's data, and the
   // deletion of the account. One body for the phone's page and for the dialog of a tablet and of the desktop (`columns`).
-  // What the server cannot tell yet (lib/odplus-account.js) shows a placeholder, never a made-up number.
+  // What the server cannot tell yet (lib/benthic-plus-account.js) shows a placeholder, never a made-up number.
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import googleLogo from '../assets/brands/google-g.svg?raw';
   import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
   import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
   import { logbook, signOut } from '../lib/logbook.svelte.js';
   import { showSection } from '../lib/navigation.svelte.js';
-  import { deleteServerAccount, downloadMyData, loadOverview } from '../lib/odplus-account.js';
+  import { deleteServerAccount, downloadMyData, loadOverview } from '../lib/benthic-plus-account.js';
   import { spaceUse, storeSubscriptionsUrl, subscriptionStore } from '../lib/account-sheet.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -122,7 +122,7 @@
 
     <h2 class="od-account-manage--heading">{t('account.manage.subscription')}</h2>
     <div class="od-account-manage--card od-account-manage--subscription">
-      <span class="od-account-manage--chip"><OdPlusChip onSheet /></span>
+      <span class="od-account-manage--chip"><BenthicPlusChip onSheet /></span>
       <span class="od-account-manage--price">{t('account.manage.perYear', { price })}</span>
       <span class="od-account-manage--line">
         {#if renews}{t('account.manage.renews', { date: formatDate(renews), store: storeName })}{:else}{t('account.manage.boughtOn', { store: storeName })}{/if}

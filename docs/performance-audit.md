@@ -26,7 +26,7 @@ Top findings, ranked (details in section 5):
 ## 2. Method
 
 Machine: Windows 11, the audit's own Vite dev server (port 5241) and own Electron 39 (CDP 9391) run from the
-worktree `F:/projets/OD-perf`; the helper (`opendives-host.exe`) and Electron come read-only from the main
+worktree `F:/projets/OD-perf`; the helper (`benthic-host.exe`) and Electron come read-only from the main
 checkout's `build/desktop` and `desktop/node_modules`. Nothing touched the main working tree, the emulator, or any cloud.
 
 - Data: synthetic logbooks (section 3), opened as a `.ssrf` file logbook, a fresh user-data folder per label.

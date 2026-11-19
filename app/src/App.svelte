@@ -48,7 +48,7 @@
   import ValidationConfirm from './components/ValidationConfirm.svelte';
   import { connection } from './lib/online.svelte.js';
   import { flushQueue, loadValidations, refreshPending } from './lib/validation.svelte.js';
-  import { odplusAccount } from './lib/odplus-state.svelte.js';
+  import { odplusAccount } from './lib/benthic-plus-state.svelte.js';
   import FileImportProgress from './components/FileImportProgress.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
@@ -80,7 +80,7 @@
   import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook, isSubscriber } from './lib/logbook.svelte.js';
-  import { loadOdplusAccount } from './lib/odplus-state.svelte.js';
+  import { loadOdplusAccount } from './lib/benthic-plus-state.svelte.js';
   import { rememberHero, heroOf } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';

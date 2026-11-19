@@ -20,7 +20,7 @@ test('the switch is off by default (no constant defined outside a build made wit
 });
 
 test('without the switch the Google button keeps its not-available answer and the dev files are only reached behind the switch', () => {
-  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(plus, /odplus\.providerUnavailable/);
   assert.match(plus, /if \(devAccounts && provider === 'google'\)/);
   for (const m of plus.matchAll(/import\('\.\.\/lib\/dev-accounts\.js'\)/g)) {

@@ -17,7 +17,7 @@ const results = [];
 for (let run = 0; run < Number(runsArg); run++) {
   killMine();
   await sleep(1500);
-  const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: path.join(root, 'build/perf', process.env.STAGE || 'stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+  const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: path.join(root, 'build/perf', process.env.STAGE || 'stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.OD_DEV_URL;
   const t0 = Date.now();

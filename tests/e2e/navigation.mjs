@@ -13,7 +13,7 @@
 // The flows try to break the stack: Back tapped twice, Back during the opening animation, Back in the middle of the
 // dive page's side-by-side swipe, Back after the account sheet, the Android Back key, Back right after a save.
 //
-// The core: the real one (opendives-host) holding Subsurface's sample log, reached through a stand-in of the
+// The core: the real one (benthic-host) holding Subsurface's sample log, reached through a stand-in of the
 // desktop bridge (the browser has no plugin). Set OPENDIVES_HOST to the host binary, or build it for the desktop
 // (desktop/README.md); without it the suite stops with exit code 2 and says why. Chrome: set CHROME to its path
 // when it is not in a usual place. Never uses the ports 5180, 9333, 8080 and 3443.
@@ -57,10 +57,11 @@ function findHost() {
   const exe = process.platform === 'win32' ? '.exe' : '';
   return findFirst([
     process.env.OPENDIVES_HOST,
-    path.join(root, 'build/desktop/stage/bin', `opendives-host${exe}`),
-    path.join(root, 'build/desktop/win-x64/bin', `opendives-host${exe}`),
-    path.join(root, 'build/desktop/opendives-host'),
-    'F:/projets/OpenDives/build/desktop/stage/bin/opendives-host.exe',
+    path.join(root, 'build/desktop/stage/bin', `benthic-host${exe}`),
+    path.join(root, 'build/desktop/win-x64/bin', `benthic-host${exe}`),
+    path.join(root, 'build/desktop/benthic-host'),
+    'F:/projets/OpenDives/build/desktop/stage/bin/benthic-host.exe',
+    'F:/projets/OpenDives/build/desktop/stage/bin/opendives-host.exe', // before the main folder is rebuilt after the rename
   ]);
 }
 const chromePath = findChrome();

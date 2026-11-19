@@ -10,7 +10,7 @@ import { showSnackbar } from './snackbar.js';
 import { decodeTexts } from './qr-transfer.js';
 import { readPreview, startKey } from './qr-preview.js';
 import { openDiveById, openPlans } from './open-link.js';
-import { odplusSubscriber } from './odplus-state.svelte.js';
+import { odplusSubscriber } from './benthic-plus-state.svelte.js';
 import { openConfirmation, readValidationCode } from './validation.svelte.js';
 
 /**

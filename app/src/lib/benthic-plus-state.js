@@ -1,7 +1,7 @@
 // @ts-check
 // The OpenDives+ account of this device, one answer for the whole app: signed in, and subscribed. Being a subscriber is a
 // property of the account, not of where the logbook lives (a subscriber whose logbook is still on the device is one too).
-// Pure so that node:test can check it; the reactive copy is lib/odplus-state.svelte.js.
+// Pure so that node:test can check it; the reactive copy is lib/benthic-plus-state.svelte.js.
 
 /** The remembered « subscribed » answer: the fallback when the server cannot be asked; `'0'` or `'1'`. */
 export const ODPLUS_SUBSCRIBED_KEY = 'od.odplusSubscribed';

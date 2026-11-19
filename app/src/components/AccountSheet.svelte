@@ -11,7 +11,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncControl from './SyncControl.svelte';
   import SyncButton from './SyncButton.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
   import { showUnsent } from '../lib/filter.svelte.js';
   import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
@@ -20,7 +20,7 @@
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { isRelease } from '../lib/edition.js';
   import { devAccounts } from '../lib/dev-switch.js';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { openManageAccount } from '../lib/navigation.svelte.js';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { openBackup } from '../lib/navigation.svelte.js';
@@ -175,7 +175,7 @@
         <button type="button" class="od-account-sheet--ios-row" data-row="offer-sync" onclick={() => plus('offer')}>
           <Icon name="cloudDownload" />
           <span class="od-account-sheet--row-label">
-            <OdPlusChip onSheet />
+            <BenthicPlusChip onSheet />
             {t('account.free.sync')}
             <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
           </span>
@@ -184,7 +184,7 @@
         <button type="button" class="od-account-sheet--ios-row" data-row="offer-profile" onclick={() => plus('offer')}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
-            <OdPlusChip onSheet />
+            <BenthicPlusChip onSheet />
             {t('gear.profile.title')}
             <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
           </span>
@@ -332,7 +332,7 @@
         <a href="#offer-sync" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
           <Icon name="cloudDownload" />
           <span class="od-account-sheet--row-label">
-            <OdPlusChip onSheet />
+            <BenthicPlusChip onSheet />
             {t('account.free.sync')}
             <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
           </span>
@@ -342,7 +342,7 @@
         <a href="#offer-profile" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
-            <OdPlusChip onSheet />
+            <BenthicPlusChip onSheet />
             {t('gear.profile.title')}
             <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
           </span>

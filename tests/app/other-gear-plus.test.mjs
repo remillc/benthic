@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { isSubscriber, logbook } from '../../app/src/lib/logbook.svelte.js';
-import { setOdplusAccount } from '../../app/src/lib/odplus-state.svelte.js';
+import { setOdplusAccount } from '../../app/src/lib/benthic-plus-state.svelte.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8').split('\r\n').join('\n');
@@ -34,7 +34,7 @@ test('the desktop and the phone editor gate adding and removing on the subscript
   const desktop = read('components/DesktopDiveFields.svelte');
   assert.match(desktop, /equipment && plus\}\n\s+<DesktopOtherGear items=\{otherItems\} onadd=/);
   assert.match(desktop, /<DesktopOtherGear items=\{otherItems\} locked \/>/);
-  assert.match(desktop, /equipment && !plus\}<OdPlusChip/);
+  assert.match(desktop, /equipment && !plus\}<BenthicPlusChip/);
   const phone = read('components/DiveGearOther.svelte');
   assert.match(phone, /disabled=\{!plus\} onclick=\{openAdd\}/);
   assert.match(phone, /disabled=\{locked\}/);

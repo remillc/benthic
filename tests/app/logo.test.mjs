@@ -1,4 +1,4 @@
-// The simple logo with relief (docs/brand/opendives-logo.svg) is the only logo in the app:
+// The simple logo with relief (docs/brand/benthic-logo.svg) is the only logo in the app:
 // no logo file or logo component still draws the old « Trois vagues » waves or the flat simple logo.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -88,17 +88,17 @@ test('the favicon keeps the disc gradient and one thick white wave, simplified f
 });
 
 test('the brand files are the relief drawing; the flat ones are in previous/', () => {
-  for (const f of ['opendives-logo.svg', 'opendives-logo-light.svg', 'opendives-logo-dark.svg']) {
+  for (const f of ['benthic-logo.svg', 'benthic-logo-light.svg', 'benthic-logo-dark.svg']) {
     assert.match(read(join(root, 'docs/brand', f)), RELIEF, f);
   }
   // App icons are blue to their edge (no white ring once masked): the gradient over the whole icon, the wave on top.
-  for (const f of ['opendives-icon-light-round.svg', 'opendives-icon-dark-squircle.svg', 'opendives-icon-light-fullbleed.svg']) {
+  for (const f of ['benthic-icon-light-round.svg', 'benthic-icon-dark-squircle.svg', 'benthic-icon-light-fullbleed.svg']) {
     const icon = read(join(root, 'docs/brand', f));
     assert.ok(icon.includes('<rect width="108" height="108" fill="url(#od-icon)"/>'), f);
     assert.doesNotMatch(icon, /#F4F4F2|#121314/i, f);
   }
-  assert.ok(!existsSync(join(root, 'docs/brand/opendives-logo-relief.svg')));
-  assert.match(read(join(root, 'docs/brand/previous/opendives-logo-simple.svg')), /#114477/);
+  assert.ok(!existsSync(join(root, 'docs/brand/benthic-logo-relief.svg')));
+  assert.match(read(join(root, 'docs/brand/previous/benthic-logo-simple.svg')), /#114477/);
 });
 
 test('the Android launcher icon is blue to its edge: gradient background, the wave and its shadow on top (no white ring)', () => {

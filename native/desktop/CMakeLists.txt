@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Subsurface core (unmodified) + core/compat + façade, as a static library, for
 # desktop targets (linux-x64, win-x64, mac-*), plus the test executables and,
-# when desktop/host/ exists, the opendives-host executable.
+# when desktop/host/ exists, the benthic-host executable.
 # Run by native/desktop/build.sh. Options taken from native/CMakeLists.txt.
 cmake_minimum_required(VERSION 3.22)
 project(opendives_desktop LANGUAGES C CXX)
@@ -99,16 +99,16 @@ foreach(t ${TESTS})
   target_link_libraries(${t} PRIVATE opendives_core)
 endforeach()
 
-# opendives-host: the desktop application's native host, written in desktop/host/.
+# benthic-host: the desktop application's native host, written in desktop/host/.
 file(GLOB HOST_SOURCES "${ROOT}/desktop/host/*.cpp")
 if(HOST_SOURCES)
-  add_executable(opendives-host ${HOST_SOURCES} ${OD_EXE_EXTRA})
-  target_compile_options(opendives-host PRIVATE ${OD_COMPILE_OPTIONS})
-  target_link_libraries(opendives-host PRIVATE opendives_core)
+  add_executable(benthic-host ${HOST_SOURCES} ${OD_EXE_EXTRA})
+  target_compile_options(benthic-host PRIVATE ${OD_COMPILE_OPTIONS})
+  target_link_libraries(benthic-host PRIVATE opendives_core)
 endif()
 
 # Binaries in <build>/bin.
 set_target_properties(${TESTS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${OD_BIN_DIR}")
 if(HOST_SOURCES)
-  set_target_properties(opendives-host PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${OD_BIN_DIR}")
+  set_target_properties(benthic-host PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${OD_BIN_DIR}")
 endif()

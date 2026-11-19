@@ -2,7 +2,7 @@
 
 Builds Subsurface's core (unmodified) + `core/compat` + the façade `core/libopendives` as a
 static library `opendives_core`, with the test programs `roundtrip` and `facade` (and
-`opendives-host` when `desktop/host/` exists). Mbed TLS is the TLS library on every target.
+`benthic-host` when `desktop/host/` exists). Mbed TLS is the TLS library on every target.
 
 Targets: `linux-x64`, `win-x64` (cross-compiled from Linux or WSL with llvm-mingw, UCRT,
 C++ runtime linked statically), `mac-arm64` and `mac-x64` (native clang on macOS).

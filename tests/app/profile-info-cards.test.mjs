@@ -471,7 +471,7 @@ test('the subscription screens: « Continuer » then « Vos données de santé �
   const steps = read('lib/first-launch-steps.js');
   assert.match(steps, /'odplusWelcome:next': 'odplusHealth'/);
   assert.match(steps, /'odplusHealth:next': 'odplusReady'/);
-  const screen = read('components/FirstLaunchOdPlus.svelte');
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /odplus\.welcome\.next/);
   assert.match(screen, /odplus\.health\.continue/);
 });

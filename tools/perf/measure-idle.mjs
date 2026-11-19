@@ -12,7 +12,7 @@ const root = path.resolve(import.meta.dirname, '../..');
 const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/opendives-host.exe`, OD_STAGE: path.join(root, 'build/perf/stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: path.join(root, 'build/perf/stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
 delete env.ELECTRON_RUN_AS_NODE; delete env.OD_DEV_URL;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 await sleep(20000);

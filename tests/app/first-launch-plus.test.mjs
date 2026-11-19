@@ -54,7 +54,7 @@ test('tablet and desktop: 24 sp titles on 30, « Se connecter » larger (20 dp, 
 });
 
 test('the Benthic+ chip is a small component with tokens only', () => {
-  const chip = read('components/OdPlusChip.svelte');
+  const chip = read('components/BenthicPlusChip.svelte');
   assert.match(chip, /class="od-plus-chip"/);
   assert.match(chip, /height: 24px;[^}]*padding: 0 10px 0 8px;[^}]*border-radius: 12px/);
   assert.match(chip, /var\(--od-plus-chip\)/);
@@ -78,7 +78,7 @@ test('the name steps end with « Créer le carnet » and « Importer le carnet �
 
 // Task 2026-11-19-309, point 4: the tile no longer names the battery (task 308 dropped it) but the vest, the piece that does need a yearly check.
 test('the offer has a full-width « Service reminders » tile under the four tiles, in the maintenance colours', () => {
-  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
   const css = read('theme.css');
   const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusReady'}"));
   assert.ok(offer.indexOf('od-plus--cards') < offer.indexOf('od-plus--card-maintenance'));
@@ -107,7 +107,7 @@ test('the offer opens « Tout ce qui est inclus », which goes back to the offer
 });
 
 test('the list shows only the features that are built, in the four groups of the mock-up', async () => {
-  const { INCLUDED, includedGroups } = await import('../../app/src/lib/odplus.js');
+  const { INCLUDED, includedGroups } = await import('../../app/src/lib/benthic-plus.js');
   assert.deepEqual(INCLUDED.map((g) => g.key), ['carnet', 'profile', 'maps', 'friends']);
   const shown = includedGroups();
   assert.ok(shown.every((g) => g.rows.length > 0 && g.rows.every((r) => r.built)));
@@ -127,7 +127,7 @@ test('the list shows only the features that are built, in the four groups of the
 });
 
 test('the offer has the new price block, the « see all » link and 48 dp buttons', () => {
-  const plus = read('components/FirstLaunchOdPlus.svelte');
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
   const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusAll'}"));
   assert.ok(offer.indexOf('od-plus--card-maintenance') < offer.indexOf('od-plus--see-all'));
   assert.ok(offer.indexOf('od-plus--see-all') < offer.indexOf('priceBlock'));

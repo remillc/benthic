@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// A stand-in for opendives-host that speaks its protocol, for the bridge's tests.
+// A stand-in for benthic-host that speaks its protocol, for the bridge's tests.
 'use strict';
 const readline = require('node:readline');
 

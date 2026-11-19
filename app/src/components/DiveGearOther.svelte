@@ -7,7 +7,7 @@
   import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import GearIcon from './GearIcon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import { gear, gearMap } from '../lib/inventory.svelte.js';
   import { isSubscriber } from '../lib/logbook.svelte.js';
@@ -39,7 +39,7 @@
 </script>
 
 <h3 class="od-dive-gear--sub od-dive-gear--other-head">
-  {t('gear.diveGear.other')}<OdPlusChip onLight />
+  {t('gear.diveGear.other')}<BenthicPlusChip onLight />
 </h3>
 
 {#if !empty}

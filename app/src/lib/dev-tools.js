@@ -5,9 +5,9 @@
 // Every dependency is given, so that node:test runs the actions with a fake transport and no device.
 import { createDevApi, randomTempEmail, isTempEmail } from './dev-accounts.js';
 import { ALPHA_IMPORT_KEY } from './alpha-logbook.js';
-import { ODPLUS_SUBSCRIBED_KEY } from './odplus-state.js';
+import { ODPLUS_SUBSCRIBED_KEY } from './benthic-plus-state.js';
 
-/** The remembered « subscribed » answer of the app (lib/odplus-state.js): the fallback when the server cannot be asked (GET /v1/account). */
+/** The remembered « subscribed » answer of the app (lib/benthic-plus-state.js): the fallback when the server cannot be asked (GET /v1/account). */
 export const SUBSCRIBED_KEY = ODPLUS_SUBSCRIBED_KEY;
 /** The beta's first-launch key (logbook.svelte.js): « show » replays it; the logbooks are not touched. */
 export const WELCOME_KEY = 'od.welcomeBeta';
@@ -18,7 +18,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
  * @property {{ info: () => Promise<{ signedIn: boolean, email: string }>, access: () => Promise<{ sessionToken: string }>, save: (session: any) => Promise<void>, clear?: () => Promise<void> }} session
  * @property {{ signOut: (options?: { deleteCopy?: boolean }) => Promise<void>, startWithoutAccount: () => Promise<any> }} app
  * @property {{ getItem: (key: string) => string|null, setItem: (key: string, value: string) => void, removeItem: (key: string) => void }} store
- * @property {(account: { signedIn: boolean, email: string, subscribed: boolean }) => void} [account] sets the app's OpenDives+ account at once (lib/odplus-state.svelte.js): the whole app follows, with no restart
+ * @property {(account: { signedIn: boolean, email: string, subscribed: boolean }) => void} [account] sets the app's OpenDives+ account at once (lib/benthic-plus-state.svelte.js): the whole app follows, with no restart
  * @property {() => void} reload the app starts again so that every screen reads the new state
  * @property {() => string} server the server's address
  * @property {() => string} [email] a fresh temporary address
@@ -196,7 +196,7 @@ export async function realDevTools() {
     import('./logbook.svelte.js'),
     import('./dev-accounts.js'),
     import('./server-url.js'),
-    import('./odplus-state.svelte.js'),
+    import('./benthic-plus-state.svelte.js'),
   ]);
   return createDevTools({
     api: accounts.createDevApi(),

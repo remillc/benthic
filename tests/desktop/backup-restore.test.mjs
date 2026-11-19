@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 // Backup and restore of an OpenDives+ logbook (task 2026-11-19-290) against the development server stack: the app's own
-// version engine (app/src/lib/backup-history.js) on the core's `history` calls (opendives-host over stdio), with a real
+// version engine (app/src/lib/backup-history.js) on the core's `history` calls (benthic-host over stdio), with a real
 // account, a real repository on the dev Forgejo and real pushes. Three syncs with changes, the middle version restored, the
 // newest still listed and restorable back; a dive deleted, synced and restored from the deleted ones; a version opened
 // read only; the account deleted with its whole history. Skipped unless the stack is up and the host is given:
 //
-//   OPENDIVES_HOST=<host binary>  [OPENDIVES_HOST_ARGS='["-d","Ubuntu","-e","/home/me/opendives-host"]']
+//   OPENDIVES_HOST=<host binary>  [OPENDIVES_HOST_ARGS='["-d","Ubuntu","-e","/home/me/benthic-host"]']
 //   OPENDIVES_DEV_API=http://127.0.0.1:8080  OPENDIVES_DEV_MAILPIT=http://127.0.0.1:8025
 //   OPENDIVES_DEV_CA=<ca.pem, as the host sees it>  OPENDIVES_TEST_DIR=<a directory, as the host sees it>
 //

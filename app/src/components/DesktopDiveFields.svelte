@@ -13,7 +13,7 @@
   import DesktopSegments from './DesktopSegments.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
@@ -405,7 +405,7 @@
       </div>
     {/if}
 
-    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<OdPlusChip onLight />{/if}</h3>
+    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<BenthicPlusChip onLight />{/if}</h3>
     {#if equipment && plus}
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />

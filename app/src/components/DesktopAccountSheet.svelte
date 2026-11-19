@@ -11,10 +11,10 @@
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
@@ -282,12 +282,12 @@
       <div class="od-desktop-account--divider"></div>
       <button type="button" class="od-desktop-account--row od-desktop-account--plus-row" onclick={() => plus('offer')}>
         <Icon name="cloudDownload" size={22} />
-        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('account.free.sync')}</span><span class="od-desktop-account--row-line">{t('account.free.syncText')}</span></span>
+        <span class="od-desktop-account--row-texts"><BenthicPlusChip onSheet /><span>{t('account.free.sync')}</span><span class="od-desktop-account--row-line">{t('account.free.syncText')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
       <button type="button" class="od-desktop-account--row od-desktop-account--plus-row" onclick={() => plus('offer')}>
         <Icon name="briefcase" size={22} />
-        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('gear.profile.title')}</span><span class="od-desktop-account--row-line">{t('gear.profile.cardLine')}</span></span>
+        <span class="od-desktop-account--row-texts"><BenthicPlusChip onSheet /><span>{t('gear.profile.title')}</span><span class="od-desktop-account--row-line">{t('gear.profile.cardLine')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
     {:else if logbook.email}

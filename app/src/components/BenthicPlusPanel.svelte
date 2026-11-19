@@ -5,9 +5,9 @@
   // (the lock or the logo that turns into the check mark, the chip, the title and the lead), in the panel; on « prêt » the
   // disc is 120 px, the ring spreads 56 px and the bubbles rise across the whole panel.
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
-  import OdPlusReadyLogo from './OdPlusReadyLogo.svelte';
-  import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
+  import BenthicPlusReadyLogo from './BenthicPlusReadyLogo.svelte';
+  import BenthicPlusReadyBubbles from './BenthicPlusReadyBubbles.svelte';
   import { readyMotion } from '../lib/ready-motion.svelte.js';
   import { deviceKey, deviceKind } from '../lib/first-launch-phone.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
@@ -20,14 +20,14 @@
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 </script>
 
-{#if ready && readyMotion.bubbles}<OdPlusReadyBubbles panel still={readyMotion.still} />{/if}
+{#if ready && readyMotion.bubbles}<BenthicPlusReadyBubbles panel still={readyMotion.still} />{/if}
 <div class="od-plus-panel">
   {#if ready}
-    <OdPlusReadyLogo play={readyMotion.play} size={120} />
+    <BenthicPlusReadyLogo play={readyMotion.play} size={120} />
   {:else}
     <span class="od-plus-panel--lock"><Icon name="lock" size={44} weight={2} /></span>
   {/if}
-  <OdPlusChip />
+  <BenthicPlusChip />
   <h1 class="od-plus-panel--title">{t(ready ? 'odplus.ready.title' : 'odplus.health.title')}</h1>
   <p class="od-plus-panel--lead">{ready ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.health.lead')}</p>
 </div>

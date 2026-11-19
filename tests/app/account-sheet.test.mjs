@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/odplus-state.js';
+import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/benthic-plus-state.js';
 import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
 import { evaluate, overdueCount, todayIso } from '../../app/src/lib/maintenance.js';
@@ -19,7 +19,7 @@ const sheet = read('components/AccountSheet.svelte');
 const desktopSheet = read('components/DesktopAccountSheet.svelte');
 const manage = read('components/AccountManage.svelte');
 const avatar = read('components/AccountAvatar.svelte');
-const offer = read('components/FirstLaunchOdPlus.svelte');
+const offer = read('components/FirstLaunchBenthicPlus.svelte');
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
 
 // --- Which sheet ---
@@ -49,7 +49,7 @@ test('free sheet: « S’abonner » opens the offer, « Se connecter » opens th
   assert.match(free, /od-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
   assert.match(free, /od-account-sheet--sign-in" onclick=\{\(\) => plus\('signIn'\)\}/);
   assert.equal([...free.matchAll(/od-account-sheet--plus-row" onclick=\{\(e\) => \(e\.preventDefault\(\), plus\('offer'\)\)\}/g)].length, 2);
-  assert.equal([...free.matchAll(/<OdPlusChip onSheet \/>/g)].length, 2, 'the chip is above each title');
+  assert.equal([...free.matchAll(/<BenthicPlusChip onSheet \/>/g)].length, 2, 'the chip is above each title');
   assert.ok(!/@/.test(free.replace(/<!--[\s\S]*?-->/g, '').replace(/\{[^}]*\}/g, '')), 'no e-mail, no sync line');
   assert.ok(!free.includes('SyncStatus') && !free.includes('SyncButton'));
   assert.match(sheet, /import \{ openOdPlus \} from '..\/lib\/open-offer.svelte.js'/);
@@ -118,7 +118,7 @@ test('« Mon profil de plongeur »: the badge and the red line only for overdue 
 test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
   const row = sheet.slice(sheet.indexOf('od-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
   // A subscriber sees no Benthic+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
-  assert.doesNotMatch(row, /OdPlusChip/);
+  assert.doesNotMatch(row, /BenthicPlusChip/);
   assert.match(row, /\{#if late\.late\}\s*<span class="od-account-sheet--row-line od-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
   assert.match(row, /\{:else\}\s*<span class="od-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
   assert.match(row, /\{#if late\.late\}<span class="od-account-sheet--late-badge"/);
@@ -214,9 +214,9 @@ test('deleting the account asks first; the server is called only after the confi
 });
 
 test('« Télécharger mes données » is a seam until the full export (to-do #57) exists: it says so', async () => {
-  const { downloadMyData } = await import('../../app/src/lib/odplus-account.js').catch(() => ({ downloadMyData: null }));
+  const { downloadMyData } = await import('../../app/src/lib/benthic-plus-account.js').catch(() => ({ downloadMyData: null }));
   // The module imports the native plugin; in node it may not load: the source then says the same thing.
-  const src = read('lib/odplus-account.js');
+  const src = read('lib/benthic-plus-account.js');
   assert.match(src, /export async function downloadMyData\(\) \{\s*return \{ status: 'unavailable' \};/);
   assert.match(manage, /answer\.status === 'unavailable'\) showSnackbar\(t\('account\.manage\.exportUnavailable'\)\)/);
   if (downloadMyData) assert.deepEqual(await downloadMyData(), { status: 'unavailable' });
@@ -279,7 +279,7 @@ test('the subscriber sheet shows the round « + » chip after the name, read « 
 test('the tablet offer: the blue panel carries the chip, title and lead; the phone hero stays on phones; Retour except right after a sign-in', () => {
   const release = read('pages/WelcomeStartRelease.svelte');
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(release, /offerPanel\b[\s\S]*<OdPlusChip label=\{t\('odplus\.offer\.pill'\)\} \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
+  assert.match(release, /offerPanel\b[\s\S]*<BenthicPlusChip label=\{t\('odplus\.offer\.pill'\)\} \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
   assert.match(offer, /\{#if layout\.phone \|\| desktopApp\}\{@render hero\('offer'\)\}\{\/if\}/);
   assert.match(steps, /tabletOfferBack = \$derived\(step === 'odplusOffer' && !layout\.phone && !desktopApp && offerShowsSignIn\(flow\.stack\)\)/);
   assert.equal(hasBack('odplusOffer', true), false, 'the phone offer keeps no Retour');
@@ -311,7 +311,7 @@ test('the free sheet opens the offer for both Benthic+ rows; the subscriber shee
     const rows = source.slice(Math.min(at, profileAt) - 400, Math.max(at, profileAt) + 400);
     assert.match(rows, /name="history"/, name);
     assert.match(rows, /t\('account\.sheet\.backupText'\)/, name);
-    assert.doesNotMatch(rows, /OdPlusChip/, `${name}: no chip on a subscriber's entries`);
+    assert.doesNotMatch(rows, /BenthicPlusChip/, `${name}: no chip on a subscriber's entries`);
   }
   for (const l of ['fr', 'en']) for (const k of ['backup', 'backupText']) assert.ok(langs[l].account.sheet[k], `${l} ${k}`);
   assert.equal(langs.fr.account.sheet.backup, 'Sauvegarde et restauration');

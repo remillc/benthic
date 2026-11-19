@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// opendives-host: the desktop app's helper process around the C++ facade.
+// benthic-host: the desktop app's helper process around the C++ facade.
 // It is the desktop twin of plugins/opendives-core/android/src/main/cpp/
 // opendives_jni.cpp: one handler per NativeCore function, with the same names,
 // the same arguments, the same results and the same errors. Electron's main

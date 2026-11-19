@@ -5,7 +5,7 @@
   // without an account) in a 48 dp target; it opens the account sheet. A small badge says that
   // something waits: changes not sent or a map update (tertiary), a sync error (alarm).
   import Icon from './Icon.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { bottomNav, layout, ios } from '../lib/layout.svelte.js';

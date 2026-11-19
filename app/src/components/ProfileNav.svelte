@@ -4,7 +4,7 @@
   // (avatar, name, OpenDives+ chip) and the four entries; the chosen one is lit.
   import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { onMount } from 'svelte';
@@ -63,7 +63,7 @@
     <span class="od-profile-nav--who">
       <span class="od-profile-nav--name">{name}</span>
       <span class="od-profile-nav--line">{divesLine}</span>
-      <OdPlusChip onLight />
+      <BenthicPlusChip onLight />
     </span>
   </div>
   <h2 class="od-profile-nav--section">{t('gear.profile.keep')}</h2>

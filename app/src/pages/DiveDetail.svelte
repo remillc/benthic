@@ -21,7 +21,7 @@
   import EquipmentCard from '../components/EquipmentCard.svelte';
   import DiveGearBlock from '../components/DiveGearBlock.svelte';
   import { isRelease } from '../lib/edition.js';
-  import { odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
   import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';

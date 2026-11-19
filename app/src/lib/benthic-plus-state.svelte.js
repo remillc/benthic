@@ -1,5 +1,5 @@
 // @ts-check
-// The reactive OpenDives+ account (lib/odplus-state.js): loaded at start from the session of the device and the device
+// The reactive OpenDives+ account (lib/benthic-plus-state.js): loaded at start from the session of the device and the device
 // store, refreshed from the server when it answers, set by the sign-in, purchase and sign-out flows and by the development
 // tools. The account sheet, the avatar and every OpenDives+ feature read it, never where the logbook lives.
 import { OpenDivesCore } from 'opendives-core';
@@ -7,7 +7,7 @@ import { deviceStore } from './device-store.js';
 import { createServerApi } from './server-api.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
-import { ODPLUS_SUBSCRIBED_KEY, SIGNED_OUT, isSubscribed, resolveOdplusAccount } from './odplus-state.js';
+import { ODPLUS_SUBSCRIBED_KEY, SIGNED_OUT, isSubscribed, resolveOdplusAccount } from './benthic-plus-state.js';
 
 export const odplusAccount = $state({ ...SIGNED_OUT });
 
@@ -16,7 +16,7 @@ export const odplusSubscriber = () => isSubscribed(odplusAccount);
 
 /**
  * Sets the account at once (no restart): a purchase, a sign-in, a sign-out, a development choice.
- * @param {Partial<import('./odplus-state.js').OdplusAccount>} next
+ * @param {Partial<import('./benthic-plus-state.js').OdplusAccount>} next
  */
 export function setOdplusAccount(next) {
   Object.assign(odplusAccount, next);

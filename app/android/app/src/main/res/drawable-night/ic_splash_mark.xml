@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Splash screen mark in dark mode: the simple logo with relief (docs/brand/opendives-logo.svg), the same drawing as in light mode. -->
+<!-- Splash screen mark in dark mode: the simple logo with relief (docs/brand/benthic-logo.svg), the same drawing as in light mode. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- The disc: radius 30 of the 108 grid, centred, vertical gradient #1F5C99 to #0C3866 (docs/brand/opendives-logo.svg scaled by 30/11). -->
+    <!-- The disc: radius 30 of the 108 grid, centred, vertical gradient #1F5C99 to #0C3866 (docs/brand/benthic-logo.svg scaled by 30/11). -->
     <path android:pathData="M24,54a30,30 0,1 0,60 0a30,30 0,1 0,-60 0Z">
         <aapt:attr name="android:fillColor">
             <gradient

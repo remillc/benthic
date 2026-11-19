@@ -4,21 +4,21 @@
   // android-odplus-connexion, -offre, -pret and -abonne): « Se connecter ou créer un compte », the offer, « Votre carnet
   // est prêt » and « Bienvenue dans OpenDives+ ! ». There is no free account: an account exists only for a diver who
   // subscribed. The sign-in with Google or Apple and the purchase need native parts that are not wired yet: their
-  // buttons call the one function each of lib/odplus-billing.js, which answers « unavailable » for now.
+  // buttons call the one function each of lib/benthic-plus-billing.js, which answers « unavailable » for now.
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
-  import OdPlusReadyLogo from './OdPlusReadyLogo.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
+  import BenthicPlusReadyLogo from './BenthicPlusReadyLogo.svelte';
   import googleLogo from '../assets/brands/google-g.svg?raw';
   import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
   import appleLogoWhite from '../assets/brands/apple-logo-white.svg';
-  import OdPlusReadyBubbles from './OdPlusReadyBubbles.svelte';
+  import BenthicPlusReadyBubbles from './BenthicPlusReadyBubbles.svelte';
   import { readyMotion, claimReady } from '../lib/ready-motion.svelte.js';
   import { flow, go, goBack, goDownload, goOffer } from '../lib/first-launch.svelte.js';
   import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
-  import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/odplus.js';
-  import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
+  import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/benthic-plus.js';
+  import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/benthic-plus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { services } from '../lib/profile.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
@@ -149,7 +149,7 @@
     else if (answer.status === 'purchased') go('welcome');
   }
 
-  /** « Restaurer les achats »: inert until StoreKit is wired (lib/odplus-billing.js). */
+  /** « Restaurer les achats »: inert until StoreKit is wired (lib/benthic-plus-billing.js). */
   async function restore() {
     const answer = await restorePurchases();
     if (answer.status === 'unavailable') showSnackbar(t('odplus.purchaseUnavailable'));
@@ -168,7 +168,7 @@
 {#snippet hero(/** @type {'offer'|'ready'|'welcome'|'health'} */ which)}
   <header class="od-plus-hero od-plus-hero--{which}">
     <div class="od-plus-hero--bands" aria-hidden="true"></div>
-    {#if which === 'ready' && motion.bubbles}<OdPlusReadyBubbles still={motion.still} />{/if}
+    {#if which === 'ready' && motion.bubbles}<BenthicPlusReadyBubbles still={motion.still} />{/if}
     {#if which === 'offer'}
       <!-- The offer's own bubbles: still, at the places of the mock-up (task 2026-11-19-304). -->
       <svg class="od-plus-hero--bubbles" viewBox="0 0 390 300" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
@@ -187,20 +187,20 @@
     </div>
     {#if which === 'offer'}
       <div class="od-plus-hero--text">
-        <OdPlusChip label={t('odplus.offer.pill')} large />
+        <BenthicPlusChip label={t('odplus.offer.pill')} large />
         <h2 class="od-plus-hero--title">{t('odplus.offer.title')}</h2>
         <p class="od-plus-hero--lead">{t('odplus.offer.lead')}</p>
       </div>
     {:else}
       <div class="od-plus-hero--centre">
         {#if which === 'ready'}
-          <OdPlusReadyLogo play={motion.play} />
+          <BenthicPlusReadyLogo play={motion.play} />
         {:else if which === 'health'}
           <span class="od-plus-hero--check"><Icon name="lock" size={36} weight={2} /></span>
         {:else}
           <span class="od-plus-hero--check od-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
         {/if}
-        <OdPlusChip />
+        <BenthicPlusChip />
         <h2 class="od-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : which === 'health' ? 'odplus.health.title' : 'odplus.welcome.title')}</h2>
         <p class="od-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : which === 'health' ? t('odplus.health.lead') : t('odplus.welcome.lead')}</p>
       </div>
@@ -304,7 +304,7 @@
     </div>
     {#if kind === 'iphone'}<h1 class="od-plus-all--title od-plus-all--title-large">{t('odplus.all.title')}</h1>{/if}
     <div class="od-plus-all--body">
-      <OdPlusChip onSheet />
+      <BenthicPlusChip onSheet />
       <p class="od-plus-all--subtitle">{t('odplus.all.subtitle')}</p>
       {#each includedGroups() as group (group.key)}
         <h2 class="od-plus-all--group">{t(`odplus.all.${group.key}`)}</h2>

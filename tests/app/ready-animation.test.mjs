@@ -44,7 +44,7 @@ test('the bubbles: 1.6 to 2.5 s, the lowest the longest, at a constant speed, at
 });
 
 test('the logo and the bubbles: the timings of the brief, on transform and opacity, colours as tokens', () => {
-  const logo = read('components/OdPlusReadyLogo.svelte');
+  const logo = read('components/BenthicPlusReadyLogo.svelte');
   assert.match(logo, /od-ready-pop 2000ms linear 1 both/);
   assert.match(logo, /15% \{\s*transform: scale\(1\) rotate\(0deg\)/);
   assert.match(logo, /65% \{\s*transform: scale\(1\) rotate\(720deg\)/);
@@ -53,7 +53,7 @@ test('the logo and the bubbles: the timings of the brief, on transform and opaci
   assert.match(logo, /@keyframes od-ready-ring/);
   assert.match(logo, /prefers-reduced-motion: reduce/);
   assert.match(logo, /<animate [^>]*attributeName="d"/);
-  const bubbles = read('components/OdPlusReadyBubbles.svelte');
+  const bubbles = read('components/BenthicPlusReadyBubbles.svelte');
   assert.match(bubbles, /700ms ease-in-out var\(--phase\) 6 alternate/);
   assert.match(bubbles, /translate: -5px 0/);
   assert.match(bubbles, /translate: 5px 0/);
@@ -66,11 +66,11 @@ test('the logo and the bubbles: the timings of the brief, on transform and opaci
 });
 
 test('the screen claims the motion when the step appears and draws the profile band above the wave', () => {
-  const screen = read('components/FirstLaunchOdPlus.svelte');
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
   // The motion is decided in lib/ready-motion.svelte.js (shared with the blue panel of a tablet and the desktop).
   assert.match(screen, /claimReady\(\)/);
   assert.match(read('lib/ready-motion.svelte.js'), /claimReadyMotion\(\)/);
-  assert.match(screen, /<OdPlusReadyLogo play=\{motion\.play\} \/>/);
+  assert.match(screen, /<BenthicPlusReadyLogo play=\{motion\.play\} \/>/);
   assert.match(screen, /od-plus-hero--profile/);
   assert.match(screen, /od-plus-hero--wave/);
 });

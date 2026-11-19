@@ -24,7 +24,7 @@
   import FirstLaunchWebdav from './FirstLaunchWebdav.svelte';
   import FirstLaunchServer from './FirstLaunchServer.svelte';
   import FirstLaunchServerCreate from './FirstLaunchServerCreate.svelte';
-  import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
+  import FirstLaunchBenthicPlus from './FirstLaunchBenthicPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
@@ -1010,7 +1010,7 @@
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
         {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusAll' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
-          <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
+          <FirstLaunchBenthicPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>
     {/key}

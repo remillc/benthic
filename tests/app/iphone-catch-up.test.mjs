@@ -4,10 +4,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { providerOrder } from '../../app/src/lib/odplus.js';
+import { providerOrder } from '../../app/src/lib/benthic-plus.js';
 import { mapsLinks } from '../../app/src/lib/maps-link.js';
 import { APP_STORE_SUBSCRIPTIONS, storeSubscriptionsUrl, subscriptionStore } from '../../app/src/lib/account-sheet.js';
-import { purchaseSubscription, restorePurchases, signInWithApple } from '../../app/src/lib/odplus-billing.js';
+import { purchaseSubscription, restorePurchases, signInWithApple } from '../../app/src/lib/benthic-plus-billing.js';
 
 const src = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 
@@ -50,7 +50,7 @@ test('StoreKit and Sign in with Apple stay inert: the same « not available » a
 });
 
 test('the offer shows « Restaurer les achats » and the renewal terms on iOS; the texts exist in both languages', () => {
-  const offer = src('components/FirstLaunchOdPlus.svelte');
+  const offer = src('components/FirstLaunchBenthicPlus.svelte');
   assert.match(offer, /\{#if ios\}[\s\S]*odplus\.offer\.restore[\s\S]*odplus\.offer\.terms/);
   for (const lang of ['fr', 'en']) {
     const json = JSON.parse(src(`i18n/${lang}.json`));

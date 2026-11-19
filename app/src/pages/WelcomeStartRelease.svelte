@@ -9,8 +9,8 @@
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
-  import OdPlusChip from '../components/OdPlusChip.svelte';
-  import OdPlusPanel from '../components/OdPlusPanel.svelte';
+  import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
+  import BenthicPlusPanel from '../components/BenthicPlusPanel.svelte';
   import { flow, currentStep } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -35,9 +35,9 @@
     <span>Benthic</span>
   </div>
   {#if plusPanel}
-    <OdPlusPanel step={plusPanel} />
+    <BenthicPlusPanel step={plusPanel} />
   {:else if offerPanel}
-    <div class="od-welcome-release--chip"><OdPlusChip label={t('odplus.offer.pill')} /></div>
+    <div class="od-welcome-release--chip"><BenthicPlusChip label={t('odplus.offer.pill')} /></div>
     <h1 class="od-welcome-release--headline od-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
     <p class="od-welcome-release--intro">{t('odplus.offer.lead')}</p>
   {:else}

@@ -12,7 +12,7 @@
   import CodeField from './CodeField.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
   import ProgressLine from './ProgressLine.svelte';
-  import OdPlusChip from './OdPlusChip.svelte';
+  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { flow, go, goBack, goBackTo, goCreate, goOffer, goReplace } from '../lib/first-launch.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { ServerError, createServerApi, plausibleEmail } from '../lib/server-api.js';
@@ -22,7 +22,7 @@
   import { nextProgress } from '../lib/sync-progress.js';
   import { transferCount } from '../lib/first-launch.js';
   import { codeScreen, formatCountdown, lockMinutes } from '../lib/server-signin.js';
-  import { afterSignIn } from '../lib/odplus.js';
+  import { afterSignIn } from '../lib/benthic-plus.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { t } from '../lib/i18n.js';
@@ -297,7 +297,7 @@
   <button type="button" class="od-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
   <button type="button" class="od-first-launch-server--quiet od-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
 {:else if step === 'serverDownload'}
-  <div class="od-first-launch-server--chip"><OdPlusChip onLight /></div>
+  <div class="od-first-launch-server--chip"><BenthicPlusChip onLight /></div>
   <h2 class="od-first-launch-server--heading">{t('serverSteps.progressDownload')}</h2>
   <div class="od-first-launch-server--paper">
     <div class="od-first-launch-server--step">

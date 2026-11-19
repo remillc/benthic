@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
-// Tests of opendives-host (desktop/host/host.cpp) through its stdio protocol.
+// Tests of benthic-host (desktop/host/host.cpp) through its stdio protocol.
 // Skipped when the host binary is not there.
 //
 //   desktop/host/build-linux-test.sh                  # after poc/build.sh, Linux or WSL
-//   OPENDIVES_HOST=build/desktop/opendives-host node --test tests/desktop/host.test.mjs
+//   OPENDIVES_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
 //
 // Other environment variables (all optional):
 //   OPENDIVES_HOST_ARGS  JSON array of arguments put before the protocol, for a host that
@@ -93,7 +93,7 @@ function startHost() {
   };
 }
 
-describe('opendives-host', { skip }, () => {
+describe('benthic-host', { skip }, () => {
   let host;
   let dir;
   let ownsDir = false;

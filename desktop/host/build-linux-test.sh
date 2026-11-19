@@ -1,10 +1,10 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# Builds opendives-host on Linux / WSL for tests, from the core objects that
+# Builds benthic-host on Linux / WSL for tests, from the core objects that
 # poc/build.sh leaves in build/poc/obj (system libraries, as the POC build).
 # The desktop packages are built elsewhere (native/desktop/CMakeLists.txt).
 #
-# usage: desktop/host/build-linux-test.sh [output]     (default: build/desktop/opendives-host)
+# usage: desktop/host/build-linux-test.sh [output]     (default: build/desktop/benthic-host)
 # env:   OPENDIVES_POC_BUILD  the poc/build.sh build directory (default: build/poc; run
 #                             poc/build.sh first, or point at another checkout's)
 #        OPENDIVES_SUBSURFACE the Subsurface tree (default: third_party/subsurface)
@@ -12,7 +12,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 B=${OPENDIVES_POC_BUILD:-$ROOT/build/poc}
 SS=${OPENDIVES_SUBSURFACE:-$ROOT/third_party/subsurface}
-OUT=${1:-$ROOT/build/desktop/opendives-host}
+OUT=${1:-$ROOT/build/desktop/benthic-host}
 COMPAT=$ROOT/core/compat
 
 [ -f "$B/libdc/lib/libdivecomputer.a" ] && [ -f "$B/obj/opendives.o" ] || {

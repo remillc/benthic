@@ -5,8 +5,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createChoices } from '../../app/src/lib/server-create.js';
-import { afterSignIn, summaryRows } from '../../app/src/lib/odplus.js';
-import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../../app/src/lib/odplus-billing.js';
+import { afterSignIn, summaryRows } from '../../app/src/lib/benthic-plus.js';
+import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../../app/src/lib/benthic-plus-billing.js';
 import { back, enterCreate, enterOffer, forward, hasBack, replaceTop } from '../../app/src/lib/first-launch-steps.js';
 
 const root = new URL('../../app/src/', import.meta.url);
@@ -67,9 +67,9 @@ test('Google, Apple and the purchase are inert: one function each, nothing is bo
   assert.deepEqual(await signInWithGoogle(), { status: 'unavailable' });
   assert.deepEqual(await signInWithApple(), { status: 'unavailable' });
   assert.deepEqual(await purchaseSubscription(), { status: 'unavailable' });
-  const billing = read('lib/odplus-billing.js');
+  const billing = read('lib/benthic-plus-billing.js');
   assert.doesNotMatch(billing, /^import /m, 'no native dependency');
-  const screen = read('components/FirstLaunchOdPlus.svelte');
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /signInWithGoogle\(\)/);
   assert.match(screen, /purchaseSubscription\(\)/);
   const pkg = JSON.parse(readFileSync(new URL('../../app/package.json', import.meta.url), 'utf8'));
@@ -81,12 +81,12 @@ test('« Continuer sans compte » and « Continuer sans abonnement » create not
   const fn = steps.slice(steps.indexOf('function withoutAccount()'));
   // Outside the menu entry (the free account sheet) it goes back to the first step, as before.
   assert.match(fn.slice(0, 300), /goBackTo\('start'\)/);
-  const screen = read('components/FirstLaunchOdPlus.svelte');
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.equal([...screen.matchAll(/onclick=\{onwithout\}/g)].length, 2);
 });
 
 test('the development switch to « Bienvenue dans Benthic+ » exists in development builds only', () => {
-  const screen = read('components/FirstLaunchOdPlus.svelte');
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /if \(!import\.meta\.env\?\.DEV \|\| step !== 'odplusOffer'\) return;/);
   assert.equal([...screen.matchAll(/__odplus/g)].length, 3);
 });
@@ -100,7 +100,7 @@ test('the summary card lists dives, sites, gear and certifications', () => {
 });
 
 test('no development address in the screens of the release edition', () => {
-  for (const file of ['components/FirstLaunchOdPlus.svelte', 'components/FirstLaunchServerCreate.svelte', 'lib/server-logbook.js', 'lib/odplus-billing.js']) {
+  for (const file of ['components/FirstLaunchBenthicPlus.svelte', 'components/FirstLaunchServerCreate.svelte', 'lib/server-logbook.js', 'lib/benthic-plus-billing.js']) {
     assert.doesNotMatch(read(file), /127\.0\.0\.1|10\.0\.2\.2|localhost/, file);
   }
 });

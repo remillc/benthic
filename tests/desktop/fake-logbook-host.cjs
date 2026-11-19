@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// A stand-in for opendives-host that behaves like a core holding one logbook, for the windows' tests.
+// A stand-in for benthic-host that behaves like a core holding one logbook, for the windows' tests.
 'use strict';
 const fs = require('node:fs');
 const readline = require('node:readline');

@@ -6,7 +6,7 @@
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import OdPlusChip from '../components/OdPlusChip.svelte';
+  import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
   import { gear, loadInventory, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
@@ -34,7 +34,7 @@
     <span class="od-profile--who">
       <span class="od-profile--name">{name}</span>
       <span class="od-profile--line">{divesLine}</span>
-      <OdPlusChip onLight />
+      <BenthicPlusChip onLight />
     </span>
   </div>
 
