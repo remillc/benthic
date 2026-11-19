@@ -655,7 +655,8 @@
       "diluent": "Diluant, recycleur",
       "oxygen": "Oxygène, recycleur",
       "bailout": "Secours (bailout), recycleur",
-      "bailoutText": "Une ou plusieurs bouteilles"
+      "bailoutText": "Une ou plusieurs bouteilles",
+      "bailoutEdit": "Modifier"
     },
     "unusedTanks": {
       "label": "Afficher les bouteilles inutilisées",
@@ -857,6 +858,8 @@
       "deleteRemoved": { "one": "Retire cette bouteille de {n} plongée.", "other": "Retire cette bouteille de {n} plongées." },
       "deleteKept": { "one": "Dans {n} plongée où elle sert au profil ou est la seule bouteille, elle reste, sans type.", "other": "Dans {n} plongées où elle sert au profil ou est la seule bouteille, elle reste, sans type." },
       "deleteIrreversible": "Cette action ne peut pas être annulée.",
+      "deleteRemovedDialog": { "one": "Le supprimer retire cette bouteille de cette plongée.", "other": "Le supprimer retire cette bouteille de ces {n} plongées." },
+      "standardMore": { "one": "Et {n} autre type standard…", "other": "Et {n} autres types standard…" },
       "unknown": "Type inconnu",
       "fromLogbook": "Ce type vient des plongées du carnet. Il reste proposé tant qu’une plongée l’utilise.",
       "nameInUse": "Ce nom est déjà celui d’un type",
@@ -2592,6 +2595,7 @@
       "Page d’une plongée : après un balayage vers la plongée voisine, Retour ne laisse plus la page à moitié de sa transition avec le carnet décalé sur le côté ; un Retour pressé pendant que le balayage se termine est ignoré.",
       "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée.",
       "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique.",
+      "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre.",
       "Compte OpenDives+ : « Sauvegarde et synchronisation » ouvre sa propre page (état de la synchronisation, modifications en attente, « Synchroniser maintenant », serveur) au lieu de l’offre ; « Mon profil de plongeur » ouvre le profil."
     ],
     "source": "Code source",
@@ -4328,6 +4332,7 @@
       "other": "{n} réglages pour « {text} »"
     },
     "resultsIn": "Dans {categories}",
+    "equipment": { "defaults": "Bouteilles ajoutées aux nouvelles plongées" },
     "system": "Système",
     "unitValues": "Affichage des valeurs",
     "categories": {

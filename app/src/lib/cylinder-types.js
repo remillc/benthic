@@ -36,3 +36,40 @@ export function deletionSentences(counts) {
     counts.kept ? t('settings.cylinders.deleteKept', { n: counts.kept }) : '',
   ].filter(Boolean);
 }
+
+const PSI_MBAR = 68.947572932;
+const CUFT_ML = 28316.8466;
+
+/** A number typed with a comma or a point; NaN when invalid, 0 when empty. @param {string} text */
+export const parseSizeNumber = (text) => (text.trim() === '' ? 0 : Number(text.trim().replace(',', '.')));
+
+/**
+ * The volume and pressure fields of a type, in the units of the settings: litres and bar, or (in
+ * cubic feet) the gas volume at working pressure, as Subsurface shows it, and psi.
+ * @param {{ ml: number, mbar: number }} type
+ * @param {{ cuft: boolean, psi: boolean }} units
+ * @param {(value: number, decimals: number) => string} format
+ * @returns {{ volume: string, pressure: string }}
+ */
+export function sizeFields(type, { cuft, psi }, format) {
+  return {
+    pressure: type.mbar ? format(psi ? type.mbar / PSI_MBAR : type.mbar / 1000, 0) : '',
+    volume: type.ml ? format(cuft ? (type.ml / CUFT_ML) * (type.mbar / 1013.25) : type.ml / 1000, cuft ? 0 : 1) : '',
+  };
+}
+
+/**
+ * The size typed, in ml and mbar; the field that is wrong when invalid.
+ * @param {string} volume
+ * @param {string} pressure
+ * @param {{ cuft: boolean, psi: boolean }} units
+ * @returns {{ ml: number, mbar: number }|{ invalid: 'volume'|'pressure' }}
+ */
+export function typedSize(volume, pressure, { cuft, psi }) {
+  const p = parseSizeNumber(pressure);
+  const v = parseSizeNumber(volume);
+  if (Number.isNaN(p) || p < 0) return { invalid: 'pressure' };
+  const mbar = Math.round(psi ? p * PSI_MBAR : p * 1000);
+  if (Number.isNaN(v) || v <= 0 || (cuft && !mbar)) return { invalid: 'volume' };
+  return { ml: Math.round(cuft ? (v * CUFT_ML) / (mbar / 1013.25) : v * 1000), mbar };
+}

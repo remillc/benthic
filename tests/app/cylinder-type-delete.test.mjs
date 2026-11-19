@@ -57,3 +57,24 @@ test('the texts exist in both languages', () => {
       assert.ok(c[key], `${lang}: ${key}`);
   }
 });
+
+test('the size fields and the size typed agree, in litres and bar and in cubic feet and psi', async () => {
+  const { sizeFields, typedSize } = await import('../../app/src/lib/cylinder-types.js');
+  const format = (value, decimals) => String(Number(value.toFixed(decimals)));
+  const metric = { cuft: false, psi: false };
+  assert.deepEqual(sizeFields({ ml: 3000, mbar: 200000 }, metric, format), { volume: '3', pressure: '200' });
+  assert.deepEqual(typedSize('3', '200', metric), { ml: 3000, mbar: 200000 });
+  const imperial = { cuft: true, psi: true };
+  const fields = sizeFields({ ml: 11100, mbar: 207000 }, imperial, format);
+  const back = typedSize(fields.volume, fields.pressure, imperial);
+  assert.ok(Math.abs(back.mbar - 207000) < 1000);
+  assert.ok(Math.abs(back.ml - 11100) < 400);
+});
+
+test('a size with a wrong volume or pressure names the field that is wrong', async () => {
+  const { typedSize } = await import('../../app/src/lib/cylinder-types.js');
+  const metric = { cuft: false, psi: false };
+  assert.deepEqual(typedSize('0', '200', metric), { invalid: 'volume' });
+  assert.deepEqual(typedSize('3', 'x', metric), { invalid: 'pressure' });
+  assert.deepEqual(typedSize('80', '', { cuft: true, psi: false }), { invalid: 'volume' });
+});
