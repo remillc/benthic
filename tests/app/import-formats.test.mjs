@@ -90,7 +90,9 @@ test('the link opens the dialog; « Fermer », the scrim and Back all end in the
   const dialog = src('components/Md3Dialog.svelte');
   assert.match(dialog, /od-md3-dialog--scrim" onclick=\{oncancel\}/);
   assert.match(dialog, /addEventListener\('od-cancel'/);
-  assert.match(src('lib/back-button.js'), /classList\.contains\('od-md3-dialog'\)[^]*od-cancel/);
+  // The Back dispatcher sends « od-cancel » to the dialog through its `cancel` helper.
+  assert.match(src('lib/back-button.js'), /classList\.contains\('od-md3-dialog'\)[^\n]*return cancel\(modal, 'od-dialog'\)/);
+  assert.match(src('lib/back-button.js'), /function cancel\(el, name\) \{\s*el\.dispatchEvent\(new CustomEvent\('od-cancel'\)\);/);
   assert.equal(json('fr').dialog.close, 'Fermer');
 });
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -23,6 +23,9 @@ import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { monkeyFlows } from './navigation-monkey.mjs';
+import { gestureFlows } from './navigation-gestures.mjs';
+import { regressionFlows } from './navigation-regressions.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.OD_E2E_PORT || 5541);
@@ -180,7 +183,7 @@ class Tab {
         this.logs.push(`exception: ${m.params.exceptionDetails?.exception?.description ?? m.params.exceptionDetails?.text}`);
       } else if (m.method === 'Runtime.bindingCalled') {
         this.onBinding?.(m.params.name, m.params.payload);
-      }
+      } else this.onEvent?.(m);
     });
   }
   send(method, params = {}) {
@@ -216,7 +219,8 @@ class Tab {
   }
 }
 
-async function openTab(width, height, mobile, welcome = false, desktop = false) {
+/** `opts`: `theme` (md or ios; else OD_THEME), `reducedMotion` (« Remove animations »), `throttle` (a slower processor; else OD_THROTTLE). */
+async function openTab(width, height, mobile, welcome = false, desktop = false, opts = {}) {
   const target = await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json();
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
@@ -228,7 +232,9 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
   await tab.send('Runtime.enable');
   await tab.send('Page.enable');
   await tab.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile });
-  if (process.env.OD_THROTTLE) await tab.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.OD_THROTTLE) });
+  const throttle = Number(opts.throttle || process.env.OD_THROTTLE || 0);
+  if (throttle) await tab.send('Emulation.setCPUThrottlingRate', { rate: throttle });
+  if (opts.reducedMotion) await tab.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   await tab.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await tab.send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36' });
   // The stand-in of the desktop bridge: the core through this process, files in the work folder, nothing else.
@@ -290,7 +296,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
       };
     }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
   });
-  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${process.env.OD_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
+  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.OD_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
     if (await tab.run((w) => !!document.querySelector(w ? '.od-welcome.modal-in .od-first-launch, .od-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
@@ -329,7 +335,8 @@ async function settled(tab, label, o = {}) {
   for (let i = 0; i < 30; i++) {
     await sleep(100);
     stack = await tab.run(readStack);
-    if (!/router-transition|od-pushing|od-push-settle/.test(stack.view) && stack.allow !== false) break;
+    // A swipe that follows the finger holds the router until its release animation has ended (lib/router-guard.js).
+    if (!/router-transition|od-pushing|od-push-settle/.test(stack.view) && stack.allow !== false && !stack.locks) break;
   }
   const problems = [];
   if (stack.locks) problems.push(`the router is still held (${stack.locks})`);
@@ -506,6 +513,10 @@ async function phoneFlows() {
     await tab.touch('touchMove', pad.x + pad.w * (0.2 + 0.075 * i), pad.y + pad.h * (0.6 - 0.3 * Math.sin(i / 2)));
     await sleep(16);
   }
+  // The finger rests before it is lifted. Lifted while moving, the stroke ends as a fling, and the browser takes the tap
+  // that follows within a moment for « stop the fling »: it sends the touch to « Valider » but no click (seen on
+  // 19 November 2026: the page stayed on /validate because the button was never clicked, not because Back failed).
+  await sleep(300);
   await tab.touch('touchEnd', pad.x + pad.w * 0.8, pad.y + pad.h * 0.5);
   await sleep(200);
   const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Valider|Validate/.test(a.textContent) && a.classList.contains('disabled')));
@@ -583,7 +594,7 @@ async function phoneFlows() {
     await settled(tab, `${how}: logbook before the sheet`, { route: '/' });
     await tab.run(() => document.querySelector('.page-current .od-account-avatar, .od-account-avatar')?.click());
     await sleep(700);
-    await tab.run(() => [...document.querySelectorAll('.od-account-sheet a, .od-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
+    await tab.run(() => [...document.querySelectorAll('.od-account-sheet a, .od-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || el.getAttribute('data-row') === 'settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
     await settled(tab, `${how}: Settings opened`, { route: '/settings/' });
     if (how === 'arrow') await tapBack(tab);
     else if (how === 'hardware') await hardwareBack(tab);
@@ -842,13 +853,14 @@ async function phoneFlows() {
   for (const row of ['#offer-sync', '#offer-profile']) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
-    expectState(`${row}: the sheet is open with #compte`, { hash: '#compte', sheet: true }, await sheetState());
-    await tab.run((r) => document.querySelector(`a[href="${r}"]`)?.click(), row);
+    // The sheet writes nothing to the browser's history (no « #compte » since 19 November 2026: docs/architecture.md, section 13).
+    expectState(`${row}: the sheet is open, the address has no fragment`, { hash: '', sheet: true }, await sheetState());
+    await tab.run((r) => document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`)?.click(), row);
     await sleep(1000);
     expectState(`${row}: the offer is open`, { welcome: true, sheet: false }, await sheetState());
     await hardwareBack(tab);
     await sleep(900);
-    expectState(`${row}: Back from the offer reopens the sheet`, { welcome: false, sheet: true, hash: '#compte' }, await sheetState());
+    expectState(`${row}: Back from the offer reopens the sheet`, { welcome: false, sheet: true, hash: '' }, await sheetState());
     await hardwareBack(tab);
     await sleep(900);
     expectState(`${row}: a second Back closes the sheet`, { welcome: false, sheet: false, hash: '' }, await sheetState());
@@ -861,10 +873,10 @@ async function phoneFlows() {
   for (const [row, route, page] of [['#profile', '/profile', '.od-profile, .od-profile-page, .page-current'], ['#backup', '/account/backup', '.od-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
-    expectState(`subscriber ${row}: the sheet is open`, { hash: '#compte', sheet: true }, await sheetState());
-    const rows = await tab.run((r) => ({ row: !!document.querySelector(`a[href="${r}"]`), offer: !!document.querySelector('a[href^="#offer-"]') }), row);
+    expectState(`subscriber ${row}: the sheet is open`, { hash: '', sheet: true }, await sheetState());
+    const rows = await tab.run((r) => ({ row: !!document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`), offer: !!document.querySelector('a[href^="#offer-"], [data-row^="offer-"]') }), row);
     expectState(`subscriber ${row}: the row is there and the sheet shows no offer`, { row: true, offer: false }, rows);
-    await tab.run((r) => document.querySelector(`a[href="${r}"]`)?.click(), row);
+    await tab.run((r) => document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`)?.click(), row);
     await sleep(1000);
     await settled(tab, `subscriber ${row}: its page is open`, { route });
     expectState(`subscriber ${row}: the page, not the offer`, { welcome: false, shown: true }, { ...(await sheetState()), shown: await tab.run((q) => !!document.querySelector(q), page) });
@@ -874,7 +886,7 @@ async function phoneFlows() {
   await tab.run(() => window.__odplusAccount({ signedIn: false }));
   await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
   await sleep(800);
-  expectState('free again: the sheet offers again', { sheet: true }, { ...(await sheetState()), sheet: await tab.run(() => !!document.querySelector('a[href="#offer-profile"]')) });
+  expectState('free again: the sheet offers again', { sheet: true }, { ...(await sheetState()), sheet: await tab.run(() => !!document.querySelector('a[href="#offer-profile"], [data-row="offer-profile"]')) });
   await hardwareBack(tab);
   await sleep(900);
 
@@ -960,7 +972,7 @@ async function tabletFlows() {
 /** Pages opened over a section (the profile, an equipment piece) must have room in the desktop layout, with Settings opened before. */
 async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
-  const tab = await openTab(1400, 900, false, false, true);
+  const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
   await tab.run(() => !!document.querySelector('.od-desktop-logbook--table'));
   const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
   await open('/settings/');
@@ -990,10 +1002,42 @@ async function desktopFlows() {
 }
 
 try {
-  if (!args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
-  if (!args.has('--tablet-only')) await welcomeFlows();
-  if (!args.has('--phone-only')) await tabletFlows();
-  if (!args.has('--phone-only') && !args.has('--tablet-only')) await desktopFlows();
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only');
+  /** One check: every key of `want` has that value in `got`. */
+  const expect = (label, want, got) => {
+    checks++;
+    const bad = Object.entries(want).filter(([k, v]) => got[k] !== v).map(([k, v]) => `${k} is ${JSON.stringify(got[k])}, expected ${JSON.stringify(v)}`);
+    if (bad.length) {
+      failures.push({ label, problems: bad, got });
+      console.log(`  FAIL ${label}: ${bad.join('; ')}`);
+    } else console.log(`  ok   ${label}`);
+  };
+  if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
+  if (fixed && !args.has('--tablet-only')) await welcomeFlows();
+  if (fixed && !args.has('--phone-only')) await tabletFlows();
+  if (fixed && !args.has('--phone-only') && !args.has('--tablet-only')) await desktopFlows();
+  // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
+  if (args.has('--gestures-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
+    await gestureFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
+  }
+  // The faults the random sequences found (tests/e2e/navigation-regressions.mjs).
+  if (args.has('--regressions-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
+    await regressionFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
+  }
+  // Seeded random sequences (tests/e2e/navigation-monkey.mjs).
+  if (args.has('--monkey-only') || (fixed && !args.has('--no-monkey') && !args.has('--tablet-only') && !args.has('--phone-only') && !args.has('--welcome-only'))) {
+    await monkeyFlows({
+      openTab,
+      sleep,
+      blankTab: async () => (await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json()).id,
+      activate: (id) => fetch(`${wsBase}/json/activate/${id}`),
+      count: () => void checks++,
+      fail: (label, problems, extra = {}) => {
+        failures.push({ label, problems, ...extra });
+        console.log(`  FAIL ${label}: ${problems.join('; ')}`);
+      },
+    });
+  }
 } catch (e) {
   failures.push({ label: 'the run', problems: [String(e.stack ?? e)] });
   console.log(`  ERROR ${e.stack ?? e}`);

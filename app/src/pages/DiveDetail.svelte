@@ -9,7 +9,8 @@
   // never shown.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
-  import { lockRouter } from '../lib/router-guard.js';
+  import { dropPreviousPage, heldBack, heldNavigate, lockRouter } from '../lib/router-guard.js';
+  import { trace } from '../lib/nav-trace.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
   import DiveProfile from '../components/DiveProfile.svelte';
@@ -130,7 +131,9 @@
    * finger moves, the neighbour dive's page opens without animation beside this one (its detail is
    * preloaded), and both follow the finger (the --od-push-dx of theme.css, as Réglages → À propos).
    * Through: this page leaves the history, so that back still goes to the list. Not through: back
-   * to this one, without animation.
+   * to this one, without animation. The router is held from the first move to the end (lib/router-guard.js); when the
+   * system takes the touch (its own Back gesture from the edge), everything is put back at once (`cancel`), so that
+   * the Back that follows finds the view at rest.
    * @param {HTMLElement} pageEl
    */
   function sideBySide(pageEl) {
@@ -150,15 +153,22 @@
           if (id === undefined || !view) return false;
           push = { view, dir: dx < 0 ? -1 : 1, width: view.clientWidth };
           // Until this swipe has settled, a Back or a link waits (or is ignored): the history is rewritten at the end.
-          unlock = lockRouter(f7router);
+          unlock = lockRouter(f7router, 'dive-swipe');
+          trace('swipe', 'dive');
           pageEl.classList.add('od-push-from');
           view.style.setProperty('--od-push-dx', '0px');
           view.classList.add('od-pushing');
           if (push.dir > 0) view.classList.add('od-pushing-back');
           const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
-          (f7router.odRaw ?? f7router).navigate(`${base}${id}`, { animate: false });
+          heldNavigate(f7router, `${base}${id}`, { animate: false });
         }
         push.view.style.setProperty('--od-push-dx', `${clamp(dx)}px`);
+        return true;
+      },
+      /** The system took the touch: back to this dive at once, no animation. */
+      cancel() {
+        if (!push || busy) return false;
+        settled(push.view, false);
         return true;
       },
       /** @param {number} dx @param {number} velocity */
@@ -174,35 +184,35 @@
         view.style.setProperty('--od-push-ms', `${ms}ms`);
         view.classList.add('od-push-settle');
         view.style.setProperty('--od-push-dx', `${target}px`);
-        setTimeout(() => {
-          try {
-            const history = f7router.history;
-            // The history is rewritten only when it still is what the swipe made: the neighbour on top, this dive's page
-            // just under it, and this page still in the document.
-            const intact = pageEl.isConnected && history.length >= 2;
-            if (through && intact) {
-              // This dive's page leaves the history: the new one takes its place.
-              history.splice(history.length - 2, 1);
-              f7router.view.history = [...history];
-              f7router.saveHistory?.();
-              f7router.pageCallback?.('beforeRemove', f7.$(pageEl), 'previous', undefined, {});
-              f7router.removePage(pageEl);
-            } else if (!through && intact) {
-              (f7router.odRaw ?? f7router).back({ animate: false });
-            }
-          } finally {
-            unstackMaster(view);
-            view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
-            for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
-            pageEl.classList.remove('od-push-from');
-            unlock();
-          }
-          push = null;
-          busy = false;
-        }, ms);
+        setTimeout(() => settled(view, through), ms);
         return true;
       },
     };
+
+    /**
+     * The end of the swipe: the history takes its final shape and the view is given back to the router.
+     * @param {HTMLElement} view
+     * @param {boolean} through the neighbour dive stays
+     */
+    function settled(view, through) {
+      try {
+        // The history is rewritten only when it still is what the swipe made: the neighbour on top, this dive's page
+        // just under it, and this page still in the document.
+        const intact = pageEl.isConnected && f7router.history.length >= 2;
+        // Through: this dive's page leaves the history, the new one takes its place. Else back to this dive.
+        if (through && intact) dropPreviousPage(f7router, pageEl);
+        else if (!through && intact) heldBack(f7router, { animate: false });
+      } finally {
+        unstackMaster(view);
+        view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
+        for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
+        pageEl.classList.remove('od-push-from');
+        unlock();
+        trace('swipe-end', through ? 'dive through' : 'dive reset');
+      }
+      push = null;
+      busy = false;
+    }
   }
 
   /**
@@ -230,6 +240,12 @@
         content.style.transition = '';
         content.style.transform = `translateX(${shown}px)`;
         content.style.opacity = String(1 - Math.min(Math.abs(shown) / content.clientWidth, 1) / 2);
+      },
+      cancel() {
+        if (!layout.split && pair.cancel()) return;
+        content.style.transition = '';
+        content.style.transform = '';
+        content.style.opacity = '';
       },
       end(dx, velocity) {
         if (!layout.split && pair.end(dx, velocity)) return;

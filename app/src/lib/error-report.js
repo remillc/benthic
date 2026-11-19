@@ -2,7 +2,8 @@
 // Error and crash reports (task #102). Pure apart from what it is given (the store, the transport), so that node:test
 // drives it. Nothing here sends by itself: the screen shows the report (reportText) and sends only when the diver taps
 // « Envoyer ». What a report holds: the version and edition, the platform, the system and the model, the message and
-// the stack of the error, the route at the time, and the last lines of the app's own log. Never a dive, a site, a name,
+// the stack of the error, the route at the time, the last lines of the app's own log and the navigation trace (how the
+// diver got to that page: lib/nav-trace.js, paths only). Never a dive, a site, a name,
 // an address, an account, a position or a token: scrub() (error-scrub.js) is the last net on every text.
 // The contract of the server (POST /v1/error-reports) is in docs/architecture.md, section 11.9.
 import { scrub, scrubLines, scrubRoute } from './error-scrub.js';
@@ -20,11 +21,13 @@ import { scrub, scrubLines, scrubRoute } from './error-scrub.js';
  * @property {string} occurredAt ISO date
  * @property {string} message
  * @property {string} stack
- * @property {string[]} log the last lines of the app's own log
+ * @property {string[]} log the last lines of the app's own log, then the navigation trace (lines that start with `nav `)
  */
 
 /** Lines kept in the log of the app, and in a report. */
 export const LOG_LINES = 40;
+/** Lines of the navigation trace in a report (lib/nav-trace.js packs several events a line). */
+export const NAV_LINES = 60;
 /** Reports kept for a later offer (offline, or the app was closed before the answer). */
 export const MAX_PENDING = 5;
 const STORE_KEY = 'od.errorReports';
@@ -105,11 +108,12 @@ export function describeError(reason) {
  * @param {string} [input.stack]
  * @param {string} [input.route]
  * @param {string[]} [input.log]
+ * @param {string[]} [input.nav] the navigation trace, packed (lib/nav-trace.js, traceLines)
  * @param {string} [input.occurredAt]
  * @param {{ appVersion: string, edition: 'alpha'|'beta', platform: string, osVersion: string, device: string }} input.info
  * @returns {ErrorReport} every text scrubbed and cut
  */
-export function buildReport({ kind, message, stack = '', route = '', log = [], occurredAt, info }) {
+export function buildReport({ kind, message, stack = '', route = '', log = [], nav = [], occurredAt, info }) {
   const stamp = occurredAt && !Number.isNaN(Date.parse(occurredAt)) ? new Date(occurredAt).toISOString() : new Date().toISOString();
   return {
     kind,
@@ -122,7 +126,7 @@ export function buildReport({ kind, message, stack = '', route = '', log = [], o
     occurredAt: stamp,
     message: scrub(message, 2000),
     stack: scrub(stack, 12000),
-    log: scrubLines(log.slice(-LOG_LINES), 300),
+    log: [...scrubLines(log.slice(-LOG_LINES), 300), ...scrubLines(nav.slice(-NAV_LINES), 300)],
   };
 }
 

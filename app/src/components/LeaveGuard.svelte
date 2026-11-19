@@ -67,7 +67,7 @@
     if (!page) return;
     page.classList.toggle('no-swipeback', isDirty);
     const modal = popup?.f7Modal;
-    if (!modal) return;
+    if (!modal?.params) return;
     const wasSwipe = modal.params.swipeToClose;
     const wasBackdrop = modal.params.closeByBackdropClick;
     if (isDirty) {
@@ -75,6 +75,10 @@
       modal.params.closeByBackdropClick = false;
     }
     return () => {
+      // Framework7 empties a popup it has destroyed: when the form leaves with its popup there is nothing to put back.
+      // (Writing to it threw in the middle of the form's removal, and the view under the popup was left with pages
+      // that should have gone: found by the random sequences on a tablet, docs/architecture.md, section 13.3.)
+      if (!modal.params) return;
       modal.params.swipeToClose = wasSwipe;
       modal.params.closeByBackdropClick = wasBackdrop;
     };

@@ -6297,3 +6297,43 @@ The floating toolbar at the bottom of a dive's detail has exactly these actions,
 The accessible name of the three-dots button lists what the menu holds (« Plus d’options : faire valider, renuméroter, retirer du voyage, supprimer », without « faire valider » in the free version). Same toolbar on iPhone (with iOS icons and its context menu) and on tablet in the detail pane.
 
 **Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
+
+## [ ] 2026-11-19-314 Site card: keep the map's aspect ratio
+
+Christian asked for this on 19 November 2026 (canvas comment on `sites-fiche-android`, map of « Fiche d’un site »). Work in `main`.
+
+The map in a site's card has a fixed **aspect ratio of 2.1 : 1** (width : height), as drawn on the phone: 358 × 170 dp at 390 dp wide (16 dp side margins, 16 dp corner radius). Keep this ratio at every width: the height follows the width (CSS `aspect-ratio: 2.1 / 1`, or the equivalent in the native layout), never a fixed height that stretches or crops the map differently on tablet, desktop or in landscape. The pin stays centred on the site and the OpenStreetMap credit stays at the bottom right, inside the map. Same rule for the map of a site from the shared map (`sites-commun-fiche-android`, task to come) and of « Nouveau site » / « Modifier le site ».
+
+**Test:** open a site's card on a phone, then on a tablet in portrait and landscape and on desktop: the map is always 2.1 times wider than tall.
+
+## [ ] 2026-11-19-315 Shared map of dive sites (#76): app screens, terms of use, server, admin pages on the website
+
+Christian approved this on 19 November 2026. Work in `main`. App mock-ups in `docs/mockups/` (Android phone; build iPhone, tablet and desktop with their own conventions). Admin mock-ups in `docs/mockups/admin/` (web pages, 1440 wide, fluid). Nothing here is published on the design canvases yet: the files are the reference. OpenDives+ only.
+
+**Decisions (19 November 2026)**
+- Every OpenDives+ diver's sites feed one shared base of dive sites. The terms of use say so; there is no opt-out, neither global nor site by site.
+- Only non-personal data goes to the base: name, position, country, region, water type, depth. Never the notes, never the diver's name. Diver names are never shown anywhere, admin included.
+- A site of the base shows its number of dives (« 214 plongées »); under 5 dives it shows « Moins de 5 plongées ».
+- Duplicates are merged automatically on the server (close position and similar name). Cases the server cannot settle go to the admin page « Fusions à décider ».
+- Who may view the shared map (OpenDives+ only, free users read-only, or public on the website) is not decided: it will be decided in #101. Build it for OpenDives+ for now, behind one server-side switch.
+
+**1. Terms of use at the first start of OpenDives+** (`odplus-conditions-android`): « Avant de commencer », three points (your logbook is yours, your data is encrypted, the shared map of sites), « Lire les conditions complètes », « J’accepte les conditions ». Shown once, before the OpenDives+ features. The full terms and the privacy policy get a paragraph on the shared base.
+
+**2. Sites tab** (`sites-commun-android`): a segmented button « Mes sites | Carte commune » over the map. In « Carte commune », sites of the base are teal dots and numbered clusters, the diver's own sites stay dark; the list shows the base sites in the area with their number of dives and distance; « Dans vos sites » marks a site the diver already has.
+
+**3. Card of a base site** (`sites-commun-fiche-android`): name, country and region, chip « Carte commune · 214 plongées », map (aspect ratio 2.1 : 1, task 314), coordinates, « Ce que disent les carnets » (water type, most often noted depth, dives in the last 12 months), « Ajouter à mes sites » (copies the site into the diver's logbook, linked to the base site), « Signaler ».
+
+**4. Report** (`sites-commun-signaler-android`): dialog with five reasons (Mauvaise position, Doublon d’un autre site, Mauvais nom ou pays, Site fermé ou interdit, Autre chose), a free text « Précisez (facultatif) », « Envoyer ». Reports go to the server, anonymous to the admin.
+
+**5. Choose a site** (`choisir-site-commun-android`): under the diver's sites, a section « Dans la carte commune » with nearby base sites; choosing one adds it to the diver's sites.
+
+**6. New site** (`sites-edition-commun-android`): when a base site is close, a teal banner « La carte commune a déjà un site à 160 pi : Poor Knights, 214 plongées. » with « Utiliser ce site ».
+
+**7. Admin on the website** (Christian only at first; sign-in with an admin role). Side menu: Signalements, Fusions à décider, Sites de la base, Carte des sites, Journal des décisions.
+- `admin-signalements`: reports grouped by site and reason, filters À traiter / Traités / Rejetés. Detail: map with the current and proposed position (mean of the reports), divers' comments without names, actions « Déplacer à la position proposée », « Placer moi-même », « Fusionner avec… », « Marquer fermé », « Rejeter ».
+- `admin-fusions`: unsettled merges; both sites on the map and side by side (dives, logbooks, water type, depth), editable name of the merged site, « Fusionner », « Garder séparés », « Décider plus tard ». A merge keeps the position of the most-dived site and never changes the divers' logbooks.
+- `admin-sites`: search, filters Tous / Signalés / Fermés / Moins de 5 plongées, paginated table (site, country, dives, logbooks, state), card with editable name, country, region, position, « Enregistrer », « Fusionner avec… », « Marquer fermé », « Voir l’historique ».
+- `admin-carte`: map of the base; clicking a pin shows the site, its counts, and « Formé à partir de ces sites des carnets » (each source name as written in the logbooks, number of logbooks and dives, distance to the kept position; source positions drawn as orange dots linked to the pin), « Ouvrir dans Sites de la base », « Séparer un site… » (undo a wrong merge for one source), « Voir l’historique ».
+- `admin-journal`: every change to the base, manual or automatic, with date, author, decision, site and detail, filters, and « Annuler » on each line (restores the site as it was).
+
+**Test:** accept the terms on a new OpenDives+ account; check the diver's sites appear in the base without notes; switch the Sites tab to « Carte commune », open a base site, add it, report it; create a site next to a base site and check the suggestion; on the website, handle the report, a merge, an undo in the journal, and a split from the map.

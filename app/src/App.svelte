@@ -60,7 +60,11 @@
   import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { enableRouterGuard } from './lib/router-guard.js';
-  import { trackSection, enableSectionSwipes, enableFullSwipeBack } from './lib/navigation.svelte.js';
+  import { trackSection, enableSectionSwipes } from './lib/navigation.svelte.js';
+  import { enableSwipeBack } from './lib/swipe-back.js';
+  import { enablePageOrder } from './lib/page-order.js';
+  import { startNavHealth, watchNavigation } from './lib/nav-health.js';
+  import { reportError } from './lib/error-reports.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
@@ -80,7 +84,7 @@
   import { rememberHero, heroOf } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
-  import { lazyRoute, stylesheetsReady } from './lib/lazy-route.js';
+  import { lazyRoute, safeAsync, stylesheetsReady } from './lib/lazy-route.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
   import MapsDialogs from './components/MapsDialogs.svelte';
@@ -110,11 +114,11 @@
     // Desktop app from 1200 dp: Réglages as categories with a search, and À propos as a dialog
     // (task 2026-11-15-202); else the phone's pages.
     { path: '/settings/', ...(settingsWindow ? { component: Settings, options: { props: { desk: true, windowed: true } } } : { component: AdaptivePage, options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false } } } }) },
-    { path: '/about', async: async (/** @type {{ resolve: Function }} */ { resolve }) => {
+    { path: '/about', async: safeAsync(async ({ resolve }) => {
       const { default: About } = await import('./pages/About.svelte');
       await stylesheetsReady();
       resolve(layout.desktop ? { popup: { component: About } } : { component: About });
-    },
+    }),
     },
     { path: '/about/notes', ...lazy(() => import('./pages/AboutText.svelte'), { which: 'notes' }) },
     { path: '/about/licence', ...lazy(() => import('./pages/AboutText.svelte'), { which: 'licence' }) },
@@ -218,18 +222,18 @@
     // list and the dive, chosen when the screen opens (EditDive.svelte).
     {
       path: '/dives/:id/edit',
-      async: async (/** @type {{ resolve: Function }} */ { resolve }) => {
+      async: safeAsync(async ({ resolve }) => {
         const { default: EditDive } = await import('./pages/EditDive.svelte');
         resolve(!layout.rail ? { component: EditDive } : { popup: { component: EditDive } });
-      },
+      }),
     },
     // « Modifier ensemble… » on the checked dives (?ids=1,2,3): the same kind of screen.
     {
       path: '/dives/edit-together',
-      async: async (/** @type {{ resolve: Function }} */ { resolve }) => {
+      async: safeAsync(async ({ resolve }) => {
         const { default: EditDivesTogether } = await import('./pages/EditDivesTogether.svelte');
         resolve(!layout.rail ? { component: EditDivesTogether } : { popup: { component: EditDivesTogether } });
-      },
+      }),
     },
     // « Compléter la plongée »: the quick entry after a download (task 2026-11-14-151), a full screen.
     { path: '/dives/:id/complete', ...lazy(() => import('./pages/QuickEntry.svelte')) },
@@ -263,7 +267,7 @@
     // Android: a full-screen dialog; iPhone: a sheet (the popup pushes the view back).
     {
       path: '/statistics/new',
-      async: async (/** @type {{ resolve: Function }} */ { resolve }) => resolve({ popup: { component: (await import('./pages/StatisticNew.svelte')).default } }),
+      async: safeAsync(async ({ resolve }) => resolve({ popup: { component: (await import('./pages/StatisticNew.svelte')).default } })),
     },
     // Desktop app from 1200 dp: the tools list and the chosen tool side by side (task 2026-11-15-196).
     { path: '/tools/', component: AdaptivePage, options: { props: { wide: DesktopTools, narrow: Tools, toWide: (/** @type {any} */ r) => toolsToWide(r, '/tools/'), toNarrow: (/** @type {any} */ r) => toolsToNarrow(r, '/tools/') } } },
@@ -355,17 +359,13 @@
     // anywhere on it (not only from the edge); the page follows the finger.
     // Not where the swipe already means something: the dive detail (previous
     // dive), the map, the profile, the wheels (class no-swipeback).
+    // That swipe is OpenDives' own (lib/swipe-back.js), under the router guard: Framework7's is off (it never
+    // ends when the system takes the touch away; docs/architecture.md, section 13). The page under the current
+    // one is still kept in the document, as Framework7 does for its own swipe.
     view: {
-      mdSwipeBack: true,
-      iosSwipeBack: true,
-      mdSwipeBackActiveArea: 10000,
-      iosSwipeBackActiveArea: 10000,
-      // From anywhere, the gesture must not take a tap whose finger slid a little.
-      mdSwipeBackThreshold: TAP_SLOP,
-      iosSwipeBackThreshold: TAP_SLOP,
-      // On Android the pages only slide, like the sections (enableFullSwipeBack).
-      mdSwipeBackAnimateOpacity: false,
-      mdSwipeBackAnimateShadow: false,
+      mdSwipeBack: false,
+      iosSwipeBack: false,
+      preloadPreviousPage: true,
     },
     routes: appRoutes,
     // Framework7 leaves a swipeable sheet's or popup's app listeners behind when it is destroyed.
@@ -418,7 +418,13 @@
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
     f7ready(() => {
+      // Navigation (docs/architecture.md, section 13): the guard on every router, the swipe back under it, the
+      // pages kept in the order of the history, the trace, and the check of the page once each navigation has settled.
       enableRouterGuard(f7);
+      enableSwipeBack(f7);
+      enablePageOrder(f7);
+      watchNavigation(f7);
+      startNavHealth({ report: (message) => reportError('js', new Error(message)) });
       f7.on('routeChanged', (/** @type {any} */ to) => noteLog('route', to?.path ?? ''));
     });
     enableBackButton();
@@ -447,7 +453,6 @@
     enableModalCleanup();
     trackSection();
     enableSectionSwipes();
-    enableFullSwipeBack();
     // The settings are applied and the logbook is loaded from main.js, before
     // the screens are built.
     mark('onMount');

@@ -20,6 +20,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import { exportDives } from '../lib/share.js';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { traceLines } from '../lib/nav-trace.js';
 
   /**
    * Desktop app (task 2026-11-15-202): « À propos d'OpenDives » opens as a dialog over the section
@@ -102,7 +103,9 @@
       [t('about.report.lastSync'), [logbook.lastSync ?? '—', logbook.sync].join(', ')],
       [t('about.report.lastError'), logbook.error ?? '—'],
     ];
-    const body = ['', '', t('about.report.technical'), ...lines.map(([k, v]) => `${k} : ${v || '—'}`)].join('\n');
+    // How the diver got here (lib/nav-trace.js: paths and events only), so that a screen left in a wrong state can be explained.
+    const navigation = traceLines(200).slice(-12);
+    const body = ['', '', t('about.report.technical'), ...lines.map(([k, v]) => `${k} : ${v || '—'}`), ...(navigation.length ? ['', t('about.report.navigation'), ...navigation] : [])].join('\n');
     const subject = t('about.report.subject', { version: appVersion });
     location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }

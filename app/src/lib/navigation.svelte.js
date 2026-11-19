@@ -3,6 +3,8 @@
 import { f7 } from 'framework7-svelte';
 import { layout, bottomNav, desktopMac } from './layout.svelte.js';
 import { horizontalSwipe, swipeGoesThrough, settle } from './swipe.js';
+import { isBusy } from './router-guard.js';
+import { trace } from './nav-trace.js';
 
 /** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
 
@@ -56,6 +58,21 @@ export function showSection(section) {
 }
 
 /**
+ * Back from a page a swipe opened (Réglages, À propos), without animation, once the router is free: the page may
+ * still be loading when the finger is lifted. Only when that page is the one on top.
+ * @param {any} router a Framework7 router
+ * @param {string} route the page the swipe opened
+ */
+function backFromPush(router, route) {
+  const start = Date.now();
+  const attempt = () => {
+    if (isBusy(router) && Date.now() - start < 2000) return void setTimeout(attempt, 30);
+    if (router.currentRoute?.path === route && router.history.length > 1) router.back({ animate: false });
+  };
+  attempt();
+}
+
+/**
  * Settings or About opened over a section (openOver): back to the section's
  * own first screen.
  * @param {any} view a Framework7 view
@@ -84,8 +101,8 @@ function closeOverPages(view) {
 export async function backToFirstScreen(router) {
   const start = Date.now();
   while (router && router.history.length > 1 && Date.now() - start < 2000) {
-    // `transitioning` is not in Framework7's types: a back asked during a transition is dropped.
-    if (!router.transitioning) router.back({ animate: false });
+    // A back asked during a page change is dropped: it waits for the router to be free.
+    if (!isBusy(router)) router.back({ animate: false });
     await new Promise((resolve) => setTimeout(resolve, 30));
   }
 }
@@ -226,7 +243,7 @@ export function restoreFocus() {
  * (or flicked), the next one takes the screen, otherwise both go back. From
  * Account a swipe left opens Settings, and from Settings it opens About, as
  * pages over the section; a swipe right on them is the back gesture, which
- * moves the pages the same way (enableFullSwipeBack). Not on what has its own
+ * moves the pages the same way (lib/swipe-back.js). Not on what has its own
  * gestures (map, profile, fields, anything that scrolls sideways), nor while a
  * menu, a dialog, a search or the logbook's selection is open.
  */
@@ -246,7 +263,7 @@ export function enableSectionSwipes() {
   /** @type {HTMLElement|null} */
   let views = null;
   /** Towards a page: the page is opened at once and placed beside the screen. */
-  /** @type {null|{ router: any, view: HTMLElement, page: HTMLElement }} */
+  /** @type {null|{ router: any, view: HTMLElement, page: HTMLElement, route: string }} */
   let push = null;
   let width = 0;
   let settling = false;
@@ -319,7 +336,29 @@ export function enableSectionSwipes() {
     view.style.setProperty('--od-push-dx', '0px');
     view.classList.add('od-pushing');
     router.navigate(route, { animate: false });
-    return { router, view, page };
+    return { router, view, page, route };
+  }
+
+  /** Gives the view of a push back to the router. @param {NonNullable<typeof push>} p */
+  function clearPush({ view, page }) {
+    view.classList.remove('od-pushing', 'od-push-settle');
+    view.style.removeProperty('--od-push-dx');
+    view.style.removeProperty('--od-push-ease');
+    view.style.removeProperty('--od-push-ms');
+    page.classList.remove('od-push-from');
+  }
+
+  /** The system took the touch (its own gesture from the edge): everything back in place at once. */
+  function cancelSwipe() {
+    start = null;
+    if (push) {
+      const p = push;
+      push = null;
+      backFromPush(p.router, p.route);
+      clearPush(p);
+    }
+    dropSections();
+    trace('swipe-end', 'section cancelled');
   }
 
   /** @param {number} dx */
@@ -333,7 +372,8 @@ export function enableSectionSwipes() {
    */
   function endPush(dx, velocity) {
     if (!push) return;
-    const { router, view, page } = push;
+    const pushed = push;
+    const { router, view } = pushed;
     push = null;
     const through = dx < 0 && swipeGoesThrough(dx, velocity, width);
     const from = Math.min(dx, 0);
@@ -344,12 +384,8 @@ export function enableSectionSwipes() {
     view.classList.add('od-push-settle');
     view.style.setProperty('--od-push-dx', through ? `${-width}px` : '0px');
     setTimeout(() => {
-      if (!through) router.back({ animate: false });
-      view.classList.remove('od-pushing', 'od-push-settle');
-      view.style.removeProperty('--od-push-dx');
-      view.style.removeProperty('--od-push-ease');
-      view.style.removeProperty('--od-push-ms');
-      page.classList.remove('od-push-from');
+      if (!through) backFromPush(router, pushed.route);
+      clearPush(pushed);
       settling = false;
     }, ms);
   }
@@ -435,6 +471,7 @@ export function enableSectionSwipes() {
         el.style.transform = `translateX(${shown + (dx < 0 ? width : -width)}px)`;
       }
     },
+    cancel: cancelSwipe,
     end(dx, velocity) {
       // Where the swipe leads, read before its starting point is forgotten.
       const next = toward(dx);
@@ -467,23 +504,5 @@ export function enableSectionSwipes() {
         settling = false;
       }, ms);
     },
-  });
-}
-
-/**
- * Android: the back gesture moves the pages like a swipe between sections,
- * the page underneath coming in beside the one leaving, over the full width
- * (Framework7 only moves it by a fifth). Framework7 places the pages right
- * after announcing the move, so the correction comes just after it.
- */
-export function enableFullSwipeBack() {
-  f7.on('swipebackMove', (/** @type {any} */ data) => {
-    if (f7.theme !== 'md') return;
-    const current = /** @type {HTMLElement} */ (data.currentPageEl);
-    const previous = /** @type {HTMLElement} */ (data.previousPageEl);
-    queueMicrotask(() => {
-      const w = current.offsetWidth;
-      previous.style.transform = `translate3d(${Math.round(data.percentage * w - w)}px,0,0)`;
-    });
   });
 }
