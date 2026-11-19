@@ -151,9 +151,9 @@
       "one": "The dive is removed from the logbook, on this device and in the repository. You can undo for a few seconds.",
       "other": "The {n} dives are removed from the logbook, on this device and in the repository. You can undo for a few seconds."
     },
-    "emptyLocal": "On this phone only, no dives",
-    "emptyLocalTablet": "On this tablet only, no dives",
-    "emptyLocalDesktop": "On this computer only, no dives",
+    "emptyLocal": "On this phone · no dives",
+    "emptyLocalTablet": "On this tablet · no dives",
+    "emptyLocalDesktop": "On this computer · no dives",
     "emptyServer": "Connected to the OpenDives server, no dives"
   },
   "sync": {
@@ -1267,6 +1267,13 @@
       "backup": "Backup and restore",
       "backupText": "Go back to a version of the logbook or of a dive",
       "plusDives": {"one": "OpenDives+ · {n} dive", "other": "OpenDives+ · {n} dives"},
+      "gitTitle": "Personal git repository",
+      "gitLine": {"one":"{repository} · {n} dive","other":"{repository} · {n} dives"},
+      "changeRepository": "Change repository",
+      "backupTextGit": "Following your git repository’s history",
+      "upgradeTitle": "Upgrade to OpenDives+",
+      "upgradeText": "Your diver profile, equipment and sync with your phone",
+      "upgradeAction": "Discover",
       "maintenanceLate": {
         "one": "Maintenance: {n} piece overdue",
         "other": "Maintenance: {n} pieces overdue"
@@ -1498,7 +1505,7 @@
     "gitBranchMissing": "This branch does not exist in the repository.",
     "keptGit": "Git repository",
     "keptCloud": "Cloud",
-    "keptDevice": "This tablet",
+    "keptDevice": "on this tablet",
     "bandNoDives": "No dives",
     "connectHint": "The service’s sign-in page opens.\nYou come back here afterwards.",
     "connecting": "Connecting…",
@@ -1531,8 +1538,6 @@
     },
     "resume": "Resume",
     "menuRename": "Rename the logbook",
-    "menuMove": "Change where it is kept",
-    "menuMoveHint": "Cloud, git repository or this tablet",
     "menuOpenOther": "Open another logbook",
     "menuNew": "New logbook",
     "menuExport": "Export the logbook",
@@ -2836,7 +2841,8 @@
       "Desktop: the account sheet of an OpenDives+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile.",
       "Desktop: “Share” opens as a dialog in the middle of the window; a click on a trip in the logbook shows the trip page on the right (the chevron folds it); importing a file says where the dives come from (“1 dive imported from “…””) with Undo; “Saved plans” opens a “Planned dives” side panel with “New plan”; in Settings › Rebreather, the O₂ consumption says it follows the Volume unit.",
       "Sample logbook: 40 dives from 2023 to 2026 at 8 sites, with a trip of 6 dives and a rebreather dive, closer to a real logbook.",
-      "Sample logbook on a phone: the “Sample logbook. These dives are not yours.” banner is a rounded card just above the bottom bar, with “Start”; the list, the + and the messages stop above it. “Start my logbook?” names the device (this phone, this tablet, this computer)."
+      "Sample logbook on a phone: the “Sample logbook. These dives are not yours.” banner is a rounded card just above the bottom bar, with “Start”; the list, the + and the messages stop above it. “Start my logbook?” names the device (this phone, this tablet, this computer).",
+      "Empty logbook: the header reads “On this phone · no dives” (“My logbook · on this tablet” on a tablet) and “Change location” is gone from the menu. Desktop with a git repository: the account sheet shows the repository with “Change repository”, the sync row, “Backup and restore” (following the repository’s history) and the “Upgrade to OpenDives+” card, without “My diver profile”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

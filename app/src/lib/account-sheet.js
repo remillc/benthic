@@ -6,13 +6,15 @@
 /**
  * The version of the account sheet. `free`: the release edition without an OpenDives+ account (the logbook is on the
  * device; every OpenDives+ row opens the offer). `subscriber`: an OpenDives+ account (the server's logbook). `account`:
- * everything else (the alpha, a Subsurface cloud account), which keeps the sheet it always had.
- * @param {{ release: boolean, odplus: boolean, email: string }} state
- * @returns {'free'|'subscriber'|'account'}
+ * `git`: the desktop's one-off licence, a logbook in the diver's own git repository (task 2026-11-19-298). Everything
+ * else (the alpha, a Subsurface cloud account) is `account` and keeps the sheet it always had.
+ * @param {{ release: boolean, odplus: boolean, email: string, git?: boolean, repository?: string }} state
+ * @returns {'free'|'subscriber'|'git'|'account'}
  */
-export function sheetVariant({ release, odplus, email }) {
+export function sheetVariant({ release, odplus, email, git = false, repository = '' }) {
   if (!release) return 'account';
   if (odplus && email) return 'subscriber';
+  if (git && repository) return 'git';
   return email ? 'account' : 'free';
 }
 

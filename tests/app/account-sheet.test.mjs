@@ -28,6 +28,8 @@ test('the release edition without an OpenDives+ account has the free sheet; with
   assert.equal(sheetVariant({ release: true, odplus: false, email: '' }), 'free');
   assert.equal(sheetVariant({ release: true, odplus: true, email: 'a@b.c' }), 'subscriber');
   assert.equal(sheetVariant({ release: true, odplus: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
+  assert.equal(sheetVariant({ release: true, odplus: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'git', 'the git repository of the one-off licence');
+  assert.equal(sheetVariant({ release: false, odplus: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'account', 'the alpha keeps its sheet');
   assert.equal(sheetVariant({ release: false, odplus: false, email: '' }), 'account', 'the alpha keeps its sheet');
 });
 

@@ -5961,7 +5961,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Partly done (19 November 2026).** Done: the share dialog (`bureau-partage`), the trip page in the detail pane (`bureau-voyage`), the .fit import snackbar naming the file (`bureau-import-fit`), the planned dives side panel (`bureau-plans`), the O₂ consumption line of Recycleur; the Réglages pages Langue, Profil et décompression, Gaz and Avancé already existed; the several-computers dialog already was a dialog from the tablet's width. **Left, each needs something that does not exist on the desktop yet:** the download dialogs (`bureau-telechargement*`: there is no desktop download engine, Bluetooth through Web Bluetooth and USB are still to build), « Ports USB » and the remembered Bluetooth computer of Ordinateurs et téléchargement (same reason), and Cartes hors ligne with its regions, sizes and free disk space (offline maps are Android only for now; `mapsFreeSpace` is a stub on the desktop).
 
-## [ ] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
+## [x] 2026-11-19-298 Demo logbook, CSV import, empty logbook wording, desktop git account sheet
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-demo`, `android-demo-ajout`, `android-demo-quitter`, `android-import-csv-type`, `android-import-csv-colonnes`, `android-import-csv-apercu`, `android-etat-vide`, `android-tablette-carnet-vide-paysage`, `-portrait`, `-menu-paysage`, `bureau-profil-compte-git`. The tablet and iPad follow the phone layouts (task 294).
 
@@ -5972,6 +5972,8 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - The old desktop « Compte · bureau » sheet is replaced by the mock-ups above; do not implement it.
 
 **Test:** open the demo logbook, add a dive and leave it. Import a CSV file through the three steps. Open an empty logbook on a phone and a tablet. On the desktop with a git repository, open the account sheet and compare with the mock-up.
+
+**Done (19 November 2026).** Demo logbook: see 299 and 301. CSV import: the three steps (type, columns, preview) already existed and read the phone mock-ups' texts; they go through the core's `importCsv` (no C++ added). Empty logbook: header wording, « Changer d’endroit » removed. Desktop git account sheet: new `git` variant of `DesktopAccountSheet` (« Changer de dépôt » opens the new-logbook dialog). Not done: the Android phone's git sheet (`compte-git-android`).
 
 ## [x] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
 

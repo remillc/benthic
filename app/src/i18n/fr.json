@@ -151,9 +151,9 @@
       "one": "La plongée est retirée du carnet, sur cet appareil et dans le dépôt. Vous pourrez l’annuler pendant quelques secondes.",
       "other": "Les {n} plongées sont retirées du carnet, sur cet appareil et dans le dépôt. Vous pourrez les annuler pendant quelques secondes."
     },
-    "emptyLocal": "Sur ce téléphone seulement, aucune plongée",
-    "emptyLocalTablet": "Sur cette tablette seulement, aucune plongée",
-    "emptyLocalDesktop": "Sur cet ordinateur seulement, aucune plongée",
+    "emptyLocal": "Sur ce téléphone · aucune plongée",
+    "emptyLocalTablet": "Sur cette tablette · aucune plongée",
+    "emptyLocalDesktop": "Sur cet ordinateur · aucune plongée",
     "emptyServer": "Connecté au serveur OpenDives, aucune plongée"
   },
   "sync": {
@@ -1267,6 +1267,13 @@
       "backup": "Sauvegarde et restauration",
       "backupText": "Revenir à une version du carnet ou d’une plongée",
       "plusDives": {"one": "OpenDives+ · {n} plongée", "other": "OpenDives+ · {n} plongées"},
+      "gitTitle": "Dépôt git personnel",
+      "gitLine": {"one":"{repository} · {n} plongée","other":"{repository} · {n} plongées"},
+      "changeRepository": "Changer de dépôt",
+      "backupTextGit": "Selon l’historique de votre dépôt git",
+      "upgradeTitle": "Passer à OpenDives+",
+      "upgradeText": "Votre profil de plongeur, l’équipement et la synchro avec le téléphone",
+      "upgradeAction": "Découvrir",
       "maintenanceLate": {
         "one": "Entretien : {n} pièce en retard",
         "other": "Entretien : {n} pièces en retard"
@@ -1498,7 +1505,7 @@
     "gitBranchMissing": "Cette branche n’existe pas dans le dépôt.",
     "keptGit": "Dépôt git",
     "keptCloud": "Nuage",
-    "keptDevice": "Cette tablette",
+    "keptDevice": "sur cette tablette",
     "bandNoDives": "Aucune plongée",
     "connectHint": "La page de connexion du service s’ouvre.\nVous revenez ici ensuite.",
     "connecting": "Connexion en cours…",
@@ -1531,8 +1538,6 @@
     },
     "resume": "Reprendre",
     "menuRename": "Renommer le carnet",
-    "menuMove": "Changer d’endroit",
-    "menuMoveHint": "Nuage, dépôt git ou cette tablette",
     "menuOpenOther": "Ouvrir un autre carnet",
     "menuNew": "Nouveau carnet",
     "menuExport": "Exporter le carnet",
@@ -2836,7 +2841,8 @@
       "Ordinateur : la feuille du compte d’un abonné OpenDives+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
       "Ordinateur : « Partager » s’ouvre en boîte de dialogue au milieu de la fenêtre ; un clic sur un voyage du carnet affiche la page du voyage à droite (le chevron le replie) ; l’import d’un fichier dit d’où viennent les plongées (« 1 plongée importée depuis « … » ») avec Annuler ; « Plans enregistrés » ouvre un volet « Plongées planifiées » avec « Nouveau plan » ; dans Réglages › Recycleur, la consommation d’O₂ dit qu’elle suit l’unité de Volume.",
       "Carnet d’exemple : 40 plongées de 2023 à 2026 sur 8 sites, avec un voyage de 6 plongées et une plongée en recycleur, plus proche d’un carnet réel.",
-      "Carnet d’exemple sur téléphone : le bandeau « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » est une carte arrondie juste au-dessus de la barre du bas, avec « Commencer » ; la liste, le « + » et les messages s’arrêtent au-dessus. « Commencer mon carnet ? » nomme l’appareil (ce téléphone, cette tablette, cet ordinateur)."
+      "Carnet d’exemple sur téléphone : le bandeau « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » est une carte arrondie juste au-dessus de la barre du bas, avec « Commencer » ; la liste, le « + » et les messages s’arrêtent au-dessus. « Commencer mon carnet ? » nomme l’appareil (ce téléphone, cette tablette, cet ordinateur).",
+      "Carnet vide : l’en-tête dit « Sur ce téléphone · aucune plongée » (« Mon carnet · sur cette tablette » sur tablette) et « Changer d’endroit » disparaît du menu. Ordinateur avec un dépôt git : la feuille du compte montre le dépôt avec « Changer de dépôt », la synchronisation, « Sauvegarde et restauration » (selon l’historique du dépôt) et la carte « Passer à OpenDives+ », sans « Mon profil de plongeur »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
