@@ -305,6 +305,11 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     return { json: await this.core('pendingChanges') };
   }
 
+  /** The versions of the configured logbook (opendives.h, history_call). @param {{action: string, args?: string[]}} options */
+  async history(options) {
+    return { json: await this.core('history', { action: options?.action ?? '', args: options?.args ?? [] }) };
+  }
+
   /**
    * Signs out: the core closes the log and forgets the account (and deletes the device copy when
    * asked, never with changes not sent), then the stored credentials are forgotten.

@@ -1117,6 +1117,18 @@ Java_org_opendives_core_NativeCore_odgitListFiles(JNIEnv *env, jobject, jstring 
 	return json_or_throw(env, ret, json, error);
 }
 
+// History of the configured logbook (opendives.h, history_call).
+JNIEXPORT jstring JNICALL
+Java_org_opendives_core_NativeCore_history(JNIEnv *env, jobject, jstring action, jobjectArray args)
+{
+	std::string json, error;
+	if (opendives::history_call(to_string(env, action), string_array(env, args), json, error) < 0) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 JNIEXPORT void JNICALL
 Java_org_opendives_core_NativeCore_odgitRemove(JNIEnv *env, jobject, jstring dir)
 {

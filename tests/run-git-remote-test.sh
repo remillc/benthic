@@ -101,8 +101,43 @@ start_daemon
 run h2 back open "$URL/empty.git" someone "$TOKEN" main
 check "back online: the edit is sent" "[ \"\$(git -C '$W/srv/empty.git' rev-list --count main)\" = 3 ]"
 
+# 8. History and restore (task 290): three syncs with changes, the middle version restored, the newest restored back,
+# a deleted dive restored, a version opened read only. Nothing is ever rewritten on the server.
+git init -q --bare -b main "$W/srv/hist.git"
+run h5 hcreate create "$URL/hist.git" someone "$TOKEN" main
+run h5 hadd1 hist "$URL/hist.git" someone "$TOKEN" main add:2026-12-01T10:00:00
+run h5 hadd2 hist "$URL/hist.git" someone "$TOKEN" main add:2026-12-02T10:00:00
+run h5 hadd3 hist "$URL/hist.git" someone "$TOKEN" main add:2026-12-03T10:00:00
+check "history: three syncs, four versions on the server" "[ \"\$(git -C '$W/srv/hist.git' rev-list --count main)\" = 4 ]"
+V0=$(git -C "$W/srv/hist.git" rev-parse main~3); V1=$(git -C "$W/srv/hist.git" rev-parse main~2)
+V2=$(git -C "$W/srv/hist.git" rev-parse main~1); V3=$(git -C "$W/srv/hist.git" rev-parse main)
+run h5 hlog hist "$URL/hist.git" someone "$TOKEN" main call:log:0:20:1
+check "history: the log lists every version, newest first, with its changes" "grep -q '\"id\":\"$V3\"' '$W/out/hlog' && grep -q '\"id\":\"$V0\"' '$W/out/hlog' && grep -q '\"state\":\"new\"' '$W/out/hlog' && [ \"\$(grep -o '\"id\":\"[0-9a-f]\{40\}\",\"time' '$W/out/hlog' | head -1)\" = '\"id\":\"$V3\",\"time' ]"
+run h5 hstats hist "$URL/hist.git" someone "$TOKEN" main call:stats:$V0:$V1:$V2:$V3
+check "history: the counts per version (0, 1, 2, 3 dives)" "grep -q '\"id\":\"$V0\",\"dives\":0' '$W/out/hstats' && grep -q '\"id\":\"$V1\",\"dives\":1' '$W/out/hstats' && grep -q '\"id\":\"$V2\",\"dives\":2' '$W/out/hstats' && grep -q '\"id\":\"$V3\",\"dives\":3' '$W/out/hstats'"
+run h5 hdiff hist "$URL/hist.git" someone "$TOKEN" main call:diff:$V2:$V3
+check "history: what changed since the middle version is the newest dive" "[ \"\$(grep -o '\"state\":\"new\"' '$W/out/hdiff' | wc -l)\" -ge 1 ] && ! grep -q '\"state\":\"deleted\"' '$W/out/hdiff'"
+run h5 hrestore hist "$URL/hist.git" someone "$TOKEN" main restore:$V2
+check "history: restoring the middle version leaves two dives" "grep -q '^dives=2' '$W/out/hrestore'"
+check "history: the restore is a new commit with the old content, sent to the server" "[ \"\$(git -C '$W/srv/hist.git' rev-list --count main)\" = 5 ] && [ \"\$(git -C '$W/srv/hist.git' rev-parse 'main^{tree}')\" = \"\$(git -C '$W/srv/hist.git' rev-parse '$V2^{tree}')\" ]"
+check "history: no version was rewritten (every old commit is still in the history)" "(for c in $V0 $V1 $V2 $V3; do git -C '$W/srv/hist.git' merge-base --is-ancestor \$c main || exit 1; done)"
+run h5 hback hist "$URL/hist.git" someone "$TOKEN" main restore:$V3
+check "history: the newest version is still listed and restores back (three dives)" "grep -q '^dives=3' '$W/out/hback' && [ \"\$(git -C '$W/srv/hist.git' rev-parse 'main^{tree}')\" = \"\$(git -C '$W/srv/hist.git' rev-parse '$V3^{tree}')\" ]"
+BEFORE_DEL=$(git -C "$W/srv/hist.git" rev-parse main)
+run h5 hdel hist "$URL/hist.git" someone "$TOKEN" main delete-first
+check "history: a dive deleted and synced" "grep -q '^dives=2' '$W/out/hdel'"
+run h5 hdlog hist "$URL/hist.git" someone "$TOKEN" main call:log:0:1:1
+check "history: the deletion shows as deleted dive files in the log" "grep -q '\"state\":\"deleted\"' '$W/out/hdlog'"
+GONE=$(git -C "$W/srv/hist.git" diff-tree -r --no-commit-id --name-only --diff-filter=D $BEFORE_DEL main | head -1 | sed -E 's#/[^/]*$##')
+run h5 hundel hist "$URL/hist.git" someone "$TOKEN" main restore:$BEFORE_DEL:$GONE
+check "history: the deleted dive is restored alone (back to three dives)" "[ -n '$GONE' ] && grep -q '^dives=3' '$W/out/hundel'"
+run h5 hopen hist "$URL/hist.git" someone "$TOKEN" main open:$V1 close
+check "history: a version opens read only (one dive, no address, nothing can be saved)" "grep -q '^address=\[\]' '$W/out/hopen' && grep -q '^save=NO_LOG' '$W/out/hopen' && grep -q '^dives=1' '$W/out/hopen'"
+check "history: closing it brings the logbook back (three dives, an address)" "tail -2 '$W/out/hopen' | grep -q '^dives=3' && grep -q '^address=\[set\]' '$W/out/hopen'"
+check "history: opening a version changed nothing on the server" "[ \"\$(git -C '$W/srv/hist.git' rev-list --count main)\" = \"\$(git -C '$W/srv/hist.git' rev-list --count main)\" ] && git -C '$W/srv/hist.git' merge-base --is-ancestor $V3 main"
+
 # 7. The token is nowhere.
-check "the token is not in a local copy" "! grep -rqa '$TOKEN' '$W'/h1 '$W'/h2 '$W'/h3 2>/dev/null"
+check "the token is not in a local copy" "! grep -rqa '$TOKEN' '$W'/h1 '$W'/h2 '$W'/h3 '$W'/h5 2>/dev/null"
 check "the token is not in an output" "! grep -rqa '$TOKEN' '$W/out'"
 check "the token is not in the remote" "! grep -rqa '$TOKEN' '$W/srv'"
 

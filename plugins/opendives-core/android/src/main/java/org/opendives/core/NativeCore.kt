@@ -82,6 +82,7 @@ internal object NativeCore {
     external fun odgitUnpushed(dir: String, branch: String): String
     external fun odgitHead(dir: String, branch: String): String
     external fun odgitListFiles(dir: String, prefix: String): String
+    external fun history(action: String, args: Array<String>): String
     external fun odgitRemove(dir: String)
 
     external fun importCount(path: String): String

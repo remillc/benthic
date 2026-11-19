@@ -795,6 +795,16 @@ void set_sync_progress(sync_progress progress);
 // [{"id":…, "summary":…, "message":…}]. Empty for a log without account.
 int pending_changes(std::string &json);
 
+// History of the configured logbook (task 2026-11-19-290): its versions are the commits of its local repository, read
+// without network. `action` and `args` (strings): "info" -> {"head","remote","branch"}; "log" [skip, limit, changes 0|1]
+// (odgit_history_log); "stats" [commit…]; "diff" [from, to]; "read" [commit, path]; "files" [commit, prefix] (the
+// same JSON as odgit_history_*); "restore" [commit, message, path…] adds a commit with that version's content (all
+// of it, or only the paths), reads the log again from it, and leaves the sending to sync(); "open" [commit] loads
+// that version READ ONLY (no address: nothing can be saved or sent) and writes the dives as list_dives() does; "close"
+// reads the logbook again (as list_cloud_cached_dives) and forgets the opened version. Errors: NO_REPOSITORY,
+// UNKNOWN_COMMIT, BAD_PATH, BAD_ACTION, GIT_ERROR.
+int history_call(const std::string &action, const std::vector<std::string> &args, std::string &json, std::string &error);
+
 // The dives of the log in memory, as list_dives() returns them, without
 // loading anything.
 int list_loaded_dives(std::string &json);

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 #include "opendives.h"
 #include "internal.h"
+#include "odgit.h"
 
 #include "core/device.h"
 #include "core/dive.h"
@@ -1613,6 +1614,99 @@ int save_logbook_file(const std::string &path, std::string &error)
 		return -1;
 	}
 	return 0;
+}
+
+// --- History of the logbook (task 2026-11-19-290) -----------------------------------------------------------------
+// The commits of the logbook's own local repository are its versions (odgit.h, odgit_history_*). The repository is the
+// one the core keeps for the configured logbook; reading it needs neither the network nor a loaded log.
+
+static std::string version_folder(const std::string &localdir)
+{
+	return localdir + ".versions";
+}
+
+static void forget_versions(const std::string &localdir)
+{
+	std::error_code ec;
+	std::filesystem::remove_all(version_folder(localdir), ec);
+}
+
+int history_call(const std::string &action, const std::vector<std::string> &args, std::string &json, std::string &error)
+{
+	json.clear();
+	if (configured_url.empty()) {
+		error = "NO_REPOSITORY";
+		return -1;
+	}
+	struct git_info info;
+	if (!is_git_repository(configured_url.c_str(), &info) || !log_exists(info.localdir)) {
+		error = "NO_REPOSITORY";
+		return -1;
+	}
+	const std::string dir = info.localdir, branch = info.branch;
+	auto arg = [&](size_t i) { return i < args.size() ? args[i] : std::string(); };
+	if (action == "info") {
+		int rc = odgit_head(dir, branch, json, error);
+		if (rc)
+			return rc;
+		json.insert(json.size() - 1, ",\"branch\":\"" + branch + "\"");
+		return 0;
+	}
+	if (action == "log")
+		return odgit_history_log(dir, branch, atoi(arg(0).c_str()), atoi(arg(1).empty() ? "50" : arg(1).c_str()), arg(2) == "1",
+					 json, error);
+	if (action == "stats")
+		return odgit_history_stats(dir, args, json, error);
+	if (action == "diff")
+		return odgit_history_diff(dir, arg(0), arg(1), json, error);
+	if (action == "read")
+		return odgit_history_read(dir, arg(0), arg(1), json, error);
+	if (action == "files")
+		return odgit_history_files(dir, arg(0), arg(1), json, error);
+	if (action == "restore") {
+		// A restore is a new commit on the logbook's branch; the log in memory is then read again from it.
+		std::vector<std::string> paths(args.size() > 2 ? args.begin() + 2 : args.end(), args.end());
+		std::string message = arg(1).empty() ? "Restore an earlier version" : arg(1);
+		if (odgit_history_restore(dir, branch, arg(0), paths, message, OdgitAuthor(), json, error))
+			return -1;
+		std::string cached;
+		if (cloud_list_cached_dives(cached, error) < 0)
+			return -1;
+		return 0;
+	}
+	if (action == "open") {
+		// A version, read only: the objects stay in the logbook's repository, the log in memory gets no address, so
+		// nothing can be saved or sent from it. "close" reads the logbook again.
+		const std::string commit = arg(0);
+		if (commit.size() != 40) {
+			error = "UNKNOWN_COMMIT";
+			return -1;
+		}
+		const std::string into = version_folder(dir) + "/" + commit.substr(0, 12);
+		std::error_code ec;
+		std::filesystem::create_directories(version_folder(dir), ec);
+		std::string borrowed;
+		if (odgit_history_borrow(dir, commit, into, borrowed, error))
+			return -1;
+		bool was_local_only = git_local_only;
+		git_local_only = true;
+		int ret = load(into + "[v]", error);
+		git_local_only = was_local_only;
+		loaded_cloud_url.clear();
+		current_log_path.clear();
+		if (ret)
+			return -1;
+		divelog.process_loaded_dives();
+		json = dives_json();
+		return 0;
+	}
+	if (action == "close") {
+		int rc = cloud_list_cached_dives(json, error);
+		forget_versions(dir);
+		return rc < 0 ? -1 : 0;
+	}
+	error = "BAD_ACTION";
+	return -1;
 }
 
 namespace internal {

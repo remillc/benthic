@@ -319,6 +319,16 @@ static void send_sync_progress(const char *message)
 	return json_or_fail(ret, json, message, error);
 }
 
++ (NSString *)history:(NSString *)action args:(NSArray<NSString *> *)args error:(NSError **)error
+{
+	std::vector<std::string> list;
+	for (NSString *item in args)
+		list.push_back(str(item));
+	std::string json, message;
+	int ret = opendives::history_call(str(action), list, json, message);
+	return json_or_fail(ret, json, message, error);
+}
+
 + (NSString *)pendingChanges
 {
 	std::string json;

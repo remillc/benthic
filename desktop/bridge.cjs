@@ -80,7 +80,7 @@ const logbooks = require('./logbooks.cjs');
 const CORE_METHODS = new Set([
   'logExists', 'countDives', 'importFile', 'cloudListDives', 'cloudConfigure', 'cloudListCachedDives',
   'alphaCacheList', 'alphaCacheOpen', 'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
-  'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'cloudProbe', 'gitCheck',
+  'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'history', 'cloudProbe', 'gitCheck',
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
   'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',

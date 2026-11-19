@@ -291,6 +291,10 @@ void register_methods()
 		opendives::alpha_cache_list(json);
 		return S(json);
 	});
+	add("history", core, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(opendives::history_call(a.str("action"), a.strs("args"), json, error), json, error);
+	});
 	add("alphaCacheOpen", core, [](const Args &a) {
 		std::string json, error;
 		return json_or_fail(opendives::alpha_cache_open(a.str("id"), json, error), json, error);

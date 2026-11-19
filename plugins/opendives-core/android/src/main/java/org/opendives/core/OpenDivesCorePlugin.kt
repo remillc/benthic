@@ -327,6 +327,17 @@ class OpenDivesCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    /**
+     * The versions of the configured logbook (opendives.h, history_call): options `action` ("info", "log", "stats", "diff",
+     * "read", "files", "restore", "open", "close") and `args` (strings). Reads the logbook's local repository; "restore"
+     * adds a commit, "open" loads a version read only, "close" reads the logbook again.
+     */
+    @PluginMethod
+    fun history(call: PluginCall) = onCoreThread(call) {
+        val args = call.getArray("args")?.toList<String>()?.toTypedArray() ?: emptyArray()
+        call.resolve(JSObject().put("json", NativeCore.history(call.getString("action", "") ?: "", args)))
+    }
+
     /** Local commits of the loaded cloud log not yet on the server (manual synchronisation). */
     @PluginMethod
     fun pendingChanges(call: PluginCall) = onCoreThread(call, afterSetup = false) {

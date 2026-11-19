@@ -36,6 +36,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "probeCloud", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "listCloudDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "alphaCache", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "history", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pendingChanges", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "signOut", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteAccount", returnType: CAPPluginReturnPromise),
@@ -848,6 +849,15 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call, afterSetup: false) {
             let json = action == "open" ? try OpenDivesNative.alphaCacheOpen(id) : OpenDivesNative.alphaCacheList()
             call.resolve(["json": json])
+        }
+    }
+
+    /// The versions of the configured logbook (opendives.h, history_call): `action` and `args` (strings).
+    @objc func history(_ call: CAPPluginCall) {
+        let action = call.getString("action", "")
+        let args = (call.getArray("args") ?? []).compactMap { $0 as? String }
+        onCoreThread(call) {
+            call.resolve(["json": try OpenDivesNative.history(action, args: args)])
         }
     }
 

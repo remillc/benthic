@@ -57,6 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)alphaCacheList;
 + (nullable NSString *)alphaCacheOpen:(NSString *)identifier error:(NSError **)error NS_SWIFT_NAME(alphaCacheOpen(_:));
 + (NSString *)pendingChanges;
+/** The versions of the configured logbook (opendives.h, history_call). */
++ (nullable NSString *)history:(NSString *)action args:(NSArray<NSString *> *)args error:(NSError **)error NS_SWIFT_NAME(history(_:args:));
 + (BOOL)cloudSignOut:(BOOL)deleteCopy error:(NSError **)error NS_SWIFT_NAME(cloudSignOut(deleteCopy:));
 + (nullable NSString *)cloudDeleteAccount:(NSString *)password
 			      keepDivesIn:(NSString *)keepDivesIn

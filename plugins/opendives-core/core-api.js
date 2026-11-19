@@ -648,6 +648,7 @@ export { waterTypeOf };
  * @property {(options: {id: string}) => Promise<{id: number}[]>} alphaCacheOpen
  *   Reads that folder's logbook into the core, without address (exportable, not editable), and returns its dives.
  * @property {() => Promise<{id: string, summary: string, message: string}[]>} pendingChanges
+ * @property {(action: string, args?: string[]) => Promise<any>} history The versions of the configured logbook (opendives.h, history_call): `info`, `log` [skip, limit, changes], `stats` [commit...], `diff` [from, to], `read` [commit, path], `files` [commit, prefix], `restore` [commit, message, path...], `open` [commit] (read only), `close`.
  *   Local commits of the loaded cloud log not yet on the server, newest first;
  *   empty for a log without account.
  * @property {(options?: {deleteCopy?: boolean}) => Promise<void>} signOut
@@ -982,6 +983,10 @@ export const OpenDivesCore = {
     const { json } = await native.alphaCache({ action: 'open', id: options.id });
     return JSON.parse(json);
   },
+  async history(action, args = []) {
+    const { json } = await native.history({ action, args });
+    return JSON.parse(json);
+  }
   async pendingChanges() {
     const { json } = await native.pendingChanges();
     return JSON.parse(json);

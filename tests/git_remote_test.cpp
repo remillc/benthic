@@ -16,12 +16,20 @@
 //                                                 "edit" one dive is added, saved, synced
 //        git-remote offline <url> <user> <token> <branch>
 //                                                 the same, the server unreachable
+//        git-remote hist <url> <user> <token> <branch> <step>...
+//                                                 the history calls (task 290), each step on the log opened:
+//                                                 add:<ISO date> (a dive, saved, synced), delete-first (saved, synced),
+//                                                 call:<action>[:<arg>...] (history_call, prints json=), restore:<commit>
+//                                                 (history_call restore, then sync), open:<commit> (read only; tries to save),
+//                                                 close, dives (prints the number of dives in memory)
 // Prints KEY=VALUE lines; exit status 0 on success, 1 on failure.
 #include "core/libopendives/opendives.h"
+#include "core/libopendives/internal.h"
 
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 
 using namespace opendives;
 
@@ -146,6 +154,98 @@ int main(int argc, char **argv)
 			printf("sync=%s\n", status.c_str());
 			pending_changes(pending);
 			printf("pendingAfter=%s\n", pending == "[]" ? "0" : "some");
+		}
+		return 0;
+	}
+	if (mode == "hist" && argc >= 6) {
+		if (git_configure(argv[2], argv[3], argv[4], argv[5], address, error) ||
+		    cloud_list_dives("", "", json, error)) {
+			printf("error=%s\n", error.c_str());
+			return 1;
+		}
+		auto count = [] {
+			std::string list;
+			list_loaded_dives(list);
+			size_t n = 0;
+			for (size_t at = list.find("\"id\":"); at != std::string::npos; at = list.find("\"id\":", at + 1))
+				n++;
+			return n;
+		};
+		auto sync_now = [&] {
+			std::string status;
+			if (sync(status, error)) {
+				printf("error=sync: %s\n", error.c_str());
+				return false;
+			}
+			printf("sync=%s\n", status.c_str());
+			return true;
+		};
+		for (int i = 6; i < argc; i++) {
+			const std::string step = argv[i];
+			std::string result;
+			// "name:arg:arg..." (the argument of "add" is a date that keeps its own colons).
+			std::vector<std::string> parts;
+			for (size_t at = 0;;) {
+				size_t colon = step.find(':', at);
+				if (colon == std::string::npos) {
+					parts.push_back(step.substr(at));
+					break;
+				}
+				parts.push_back(step.substr(at, colon - at));
+				at = colon + 1;
+			}
+			const std::string &name = parts[0];
+			if (name == "add") {
+				if (create_dive("{\"date\":\"" + step.substr(4) + "\",\"durationSeconds\":1800,\"maxDepthMm\":12000}", result,
+						error) ||
+				    save_local(error) || !sync_now()) {
+					printf("error=add: %s\n", error.c_str());
+					return 1;
+				}
+			} else if (name == "delete-first") {
+				std::string list;
+				list_loaded_dives(list);
+				size_t at = list.find("\"id\":");
+				int id = at == std::string::npos ? 0 : atoi(list.c_str() + at + 5);
+				if (delete_dive(id, result, error) || save_local(error) || !sync_now()) {
+					printf("error=delete: %s\n", error.c_str());
+					return 1;
+				}
+			} else if (name == "call") {
+				std::vector<std::string> args(parts.begin() + 2, parts.end());
+				if (history_call(parts[1], args, result, error)) {
+					printf("error=%s\n", error.c_str());
+					return 1;
+				}
+				printf("json=%s\n", result.c_str());
+			} else if (name == "restore") {
+				// restore:<commit>[:<path>...]
+				std::vector<std::string> args = { parts[1], "Restore test" };
+				for (size_t k = 2; k < parts.size(); k++)
+					args.push_back(parts[k]);
+				if (history_call("restore", args, result, error) || !sync_now()) {
+					printf("error=restore: %s\n", error.c_str());
+					return 1;
+				}
+			} else if (name == "open") {
+				if (history_call("open", { parts[1] }, result, error)) {
+					printf("error=open: %s\n", error.c_str());
+					return 1;
+				}
+				printf("address=[%s]\n", internal::current_log().c_str());
+				std::string saved;
+				printf("save=%s\n", save_local(saved) ? saved.c_str() : "SAVED");
+			} else if (name == "close") {
+				if (history_call("close", {}, result, error)) {
+					printf("error=close: %s\n", error.c_str());
+					return 1;
+				}
+				printf("address=[%s]\n", internal::current_log().empty() ? "" : "set");
+			} else if (name != "dives") {
+				printf("error=unknown step\n");
+				return 1;
+			}
+			printf("dives=%zu\n", count());
 		}
 		return 0;
 	}
