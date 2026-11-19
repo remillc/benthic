@@ -5,7 +5,9 @@
   // switch. Its texts are not in the translation files: they must not reach a release catalogue.
   import Icon from './Icon.svelte';
   import OdPlusChip from './OdPlusChip.svelte';
-  import { realDevTools } from '../lib/dev-tools.js';
+  import { realDevTools, accountSegments, runSegment } from '../lib/dev-tools.js';
+  import { realDevReset, resetLines } from '../lib/dev-reset.js';
+  import { exportOpenLogbook } from '../lib/replace-logbook-ui.js';
   import { devUi } from '../lib/dev-tools-ui.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -15,26 +17,38 @@
     ? {
         title: 'Development tools', free: 'Free', subscribed: 'Subscriber', none: 'No session', dives: 'dives',
         account: 'Account', trial: 'Test accounts', first: 'First launch', alphaSection: 'Previous version’s logbook',
-        toFreeOut: 'Free', toFreeOutTag: 'signed out', toFreeOutHint: 'Switch to free: forgets the session and opens the logbook kept on this device.',
+        toFreeOut: 'Free', toFreeOutTag: '', toFreeOutHint: 'Free, never had an account: forgets the session and opens the logbook kept on this device.',
         toFreeKeep: 'Free', toFreeKeepTag: 'signed in', toFreeKeepHint: 'Switch to free: keeps the session and marks the account as not subscribed on the server.',
         toSub: 'Subscriber', toSubTag: 'OpenDives+', toSubHint: 'Switch to subscriber: marks the account as subscribed to OpenDives+ on the server.',
         fresh: 'New test account', freshHint: 'Creates an account with a temporary e-mail address and signs in with it.',
         del: 'Delete this test account', delHint: 'Deletes the account and its data on the local server.', delOnly: 'Only a test account (temporary address) can be deleted.',
         delConfirm: 'Delete the account for good?', delYes: 'Delete', cancel: 'Cancel',
-        replay: 'Replay the first launch', replayHint: 'Shows the welcome screens again; the logbooks are not touched.',
+        replay: 'Replay the first launch', replayHint: 'Resets the app as on a first install: erases the logbook of this device, the settings and the session.',
+        resetTitle: 'Erase everything on this device?', resetNothing: 'Your logbook is empty.',
+        resetLogbook: (n) => `Your logbook of ${n} dive${n === 1 ? '' : 's'} on this device`, resetSettings: 'Your settings and the choices remembered by the app',
+        resetSession: 'Your account session and tokens (the account itself stays on the server)', resetEquipment: 'Equipment, profile, certifications and maintenance',
+        resetFiles: 'Staged imports and exports', resetNotifications: 'Scheduled notifications', resetAlpha: 'The copy of the previous version’s logbook',
+        resetKeepAlpha: 'Keep the previous version’s copy', resetExport: 'Export the logbook first', resetAll: 'Erase everything', resetAgain: 'Tap again to erase', resetKept: 'Kept: the development authority and the offline maps. No server is called.',
+        statusBusy: 'Working…', statusOk: 'Done. The app restarts.',
         alpha: 'Import the previous version’s logbook', alphaHint: 'Copies, read-only, the logbook left on the device.',
         close: 'Close', foot: 'Only visible in development builds.', done: 'Done', failed: 'Failed: ',
       }
     : {
         title: 'Outils de développement', free: 'Gratuit', subscribed: 'Abonné', none: 'Aucune session', dives: 'plongées',
         account: 'Compte', trial: 'Comptes d’essai', first: 'Premier lancement', alphaSection: 'Carnet de la version précédente',
-        toFreeOut: 'Gratuit', toFreeOutTag: 'déconnecté', toFreeOutHint: 'Passer en gratuit : oublie la session et ouvre le carnet gardé sur cet appareil.',
+        toFreeOut: 'Gratuit', toFreeOutTag: '', toFreeOutHint: 'Gratuit, jamais de compte : oublie la session et ouvre le carnet gardé sur cet appareil.',
         toFreeKeep: 'Gratuit', toFreeKeepTag: 'connecté', toFreeKeepHint: 'Passer en gratuit : garde la session et marque le compte comme non abonné sur le serveur.',
         toSub: 'Abonné', toSubTag: 'OpenDives+', toSubHint: 'Passer en abonné : marque le compte comme abonné à OpenDives+ sur le serveur.',
         fresh: 'Nouveau compte d’essai', freshHint: 'Crée un compte avec une adresse e-mail temporaire et s’y connecte.',
         del: 'Supprimer ce compte d’essai', delHint: 'Supprime le compte et ses données sur le serveur local.', delOnly: 'Seul un compte d’essai (adresse temporaire) peut être supprimé.',
         delConfirm: 'Supprimer le compte pour de bon ?', delYes: 'Supprimer', cancel: 'Annuler',
-        replay: 'Rejouer le premier lancement', replayHint: 'Réaffiche les écrans d’accueil ; les carnets ne sont pas touchés.',
+        replay: 'Rejouer le premier lancement', replayHint: 'Remet l’app dans l’état d’une première installation : efface le carnet de cet appareil, les réglages et la session.',
+        resetTitle: 'Tout effacer sur cet appareil ?', resetNothing: 'Ton carnet est vide.',
+        resetLogbook: (n) => `Ton carnet de ${n} plongée${n === 1 ? '' : 's'} sur cet appareil`, resetSettings: 'Tes réglages et les choix retenus par l’app',
+        resetSession: 'Ta session de compte et ses jetons (le compte reste sur le serveur)', resetEquipment: 'Équipement, profil, certifications et entretien',
+        resetFiles: 'Les imports et exports en attente', resetNotifications: 'Les notifications programmées', resetAlpha: 'La copie du carnet de la version précédente',
+        resetKeepAlpha: 'Garder la copie de la version précédente', resetExport: 'Exporter d’abord le carnet', resetAll: 'Tout effacer', resetAgain: 'Toucher encore pour effacer', resetKept: 'Gardés : l’autorité de développement et les cartes hors ligne. Aucun appel au serveur.',
+        statusBusy: 'En cours…', statusOk: 'Fait. L’app redémarre.',
         alpha: 'Importer le carnet de la version précédente', alphaHint: 'Copie, en lecture seule, le carnet resté sur l’appareil.',
         close: 'Fermer', foot: 'Visible seulement dans les versions de développement.', done: 'Fait', failed: 'Échec : ',
       };
@@ -46,19 +60,33 @@
   /** The key of the action that runs, for its indicator. */
   let busy = $state('');
   let confirming = $state(false);
+  /** The last result, shown in the sheet itself (a snackbar can be hidden by the sheet). */
+  let status = $state({ kind: '', message: '' });
+  /** « Rejouer le premier lancement »: the confirmation, the checkbox, the second tap. */
+  let resetOpen = $state(false);
+  let keepAlpha = $state(true);
+  let resetArmed = $state(false);
 
   /** The segment of the account that matches the state: 0 free and signed out, 1 free and signed in, 2 subscriber. */
   const level = $derived(!current ? -1 : current.kind === 'subscribed' ? 2 : current.signedIn ? 1 : 0);
+  const segments = $derived(accountSegments(current, { busy, ready: !!tools }));
+  const lines = $derived(resetLines({ dives: logbook.dives.length, loggedIn: !!current?.signedIn, keepAlpha }));
   const initial = $derived((current?.email || 'D').charAt(0).toUpperCase());
 
   $effect(() => {
     if (!devUi.open) {
       confirming = false;
+      resetOpen = false;
+      resetArmed = false;
+      status = { kind: '', message: '' };
       return;
     }
     realDevTools().then(async (t) => {
       tools = t;
       current = await t.state();
+    }).catch((e) => {
+      console.error('Development tools', e);
+      status = { kind: 'error', message: text.failed + (e instanceof Error ? e.message : String(e)) };
     });
   });
 
@@ -69,17 +97,37 @@
   async function run(id, action) {
     if (busy || !tools) return;
     busy = id;
+    status = { kind: 'busy', message: text.statusBusy };
     try {
       await action();
+      status = { kind: 'ok', message: text.statusOk };
       showSnackbar(text.done);
-      devUi.open = false;
     } catch (e) {
       console.error('Development tools', e);
-      showSnackbar(text.failed + (e instanceof Error ? e.message : String(e)));
+      const message = text.failed + (e instanceof Error ? e.message : String(e));
+      status = { kind: 'error', message };
+      showSnackbar(message);
     } finally {
       busy = '';
       confirming = false;
     }
+  }
+
+  /** « Exporter d'abord le carnet »: the existing .ssrf export to the share sheet. */
+  async function exportFirst() {
+    await run('export', async () => {
+      await exportOpenLogbook();
+    });
+  }
+
+  async function resetNow() {
+    if (!resetArmed) {
+      resetArmed = true;
+      return;
+    }
+    await run('reset', async () => {
+      await (await realDevReset()).run({ keepAlpha });
+    });
   }
 
   /** @param {KeyboardEvent} e */
@@ -101,11 +149,12 @@
   </button>
 {/snippet}
 
-{#snippet segment(id, index, icon, title, tag, click)}
-  <button type="button" role="radio" class="od-dev-tools-menu--segment" class:od-dev-tools-menu--segment-on={level === index} aria-checked={level === index} disabled={!!busy || !tools} aria-busy={busy === id} onclick={() => level !== index && click()}>
+{#snippet segment(id, index, icon, title, tag)}
+  {@const seg = segments[index]}
+  <button type="button" role="radio" class="od-dev-tools-menu--segment" class:od-dev-tools-menu--segment-on={seg.on} aria-checked={seg.on} disabled={seg.disabled} aria-busy={busy === id} onclick={() => run(id, () => runSegment(tools, id))}>
     {#if busy === id}<span class="od-dev-tools-menu--spinner" aria-hidden="true"></span>{:else}<Icon name={icon} size={20} />{/if}
     <span class="od-dev-tools-menu--segment-title">{title}</span>
-    <span class="od-dev-tools-menu--segment-tag">{tag}</span>
+    {#if tag}<span class="od-dev-tools-menu--segment-tag">{tag}</span>{/if}
   </button>
 {/snippet}
 
@@ -119,6 +168,10 @@
         <span class="od-dev-tools-menu--tag">DEV</span>
         <button type="button" class="od-dev-tools-menu--close" aria-label={text.close} onclick={() => (devUi.open = false)}><Icon name="close" size={22} /></button>
       </header>
+
+      {#if status.message}
+        <p class="od-dev-tools-menu--status od-dev-tools-menu--status-{status.kind}" role="status" aria-live="polite">{status.message}</p>
+      {/if}
 
       <div class="od-dev-tools-menu--body">
         <section class="od-dev-tools-menu--state" aria-live="polite">
@@ -146,9 +199,9 @@
         <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-account">
           <h3 class="od-dev-tools-menu--heading" id="od-dev-s-account">{text.account}</h3>
           <div class="od-dev-tools-menu--segments" role="radiogroup" aria-labelledby="od-dev-s-account">
-            {@render segment('out', 0, 'logout', text.toFreeOut, text.toFreeOutTag, () => run('out', () => tools?.toFree('signOut')))}
-            {@render segment('keep', 1, 'lock', text.toFreeKeep, text.toFreeKeepTag, () => run('keep', () => tools?.toFree('unsubscribe')))}
-            {@render segment('sub', 2, 'plusMark', text.toSub, text.toSubTag, () => run('sub', () => tools?.toSubscribed()))}
+            {@render segment('out', 0, 'phone', text.toFreeOut, text.toFreeOutTag)}
+            {@render segment('keep', 1, 'lock', text.toFreeKeep, text.toFreeKeepTag)}
+            {@render segment('sub', 2, 'plusMark', text.toSub, text.toSubTag)}
           </div>
           {#if level >= 0}
             <p class="od-dev-tools-menu--caption">{[text.toFreeOutHint, text.toFreeKeepHint, text.toSubHint][level]}</p>
@@ -174,7 +227,28 @@
         <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-first">
           <h3 class="od-dev-tools-menu--heading" id="od-dev-s-first">{text.first}</h3>
           <div class="od-dev-tools-menu--group">
-            {@render row('replay', 'refresh', text.replay, text.replayHint, () => run('replay', () => tools?.replayFirstLaunch()))}
+            {#if resetOpen}
+              <div class="od-dev-tools-menu--reset" role="alertdialog" aria-label={text.resetTitle}>
+                <span class="od-dev-tools-menu--confirm-text"><Icon name="warning" size={20} />{text.resetTitle}</span>
+                <ul class="od-dev-tools-menu--reset-list">
+                  {#each lines as line}
+                    <li>{line === 'logbook' ? text.resetLogbook(logbook.dives.length) : line === 'settings' ? text.resetSettings : line === 'session' ? text.resetSession : line === 'equipment' ? text.resetEquipment : line === 'files' ? text.resetFiles : line === 'notifications' ? text.resetNotifications : text.resetAlpha}</li>
+                  {/each}
+                  {#if !lines.includes('logbook')}<li>{text.resetNothing}</li>{/if}
+                </ul>
+                <label class="od-dev-tools-menu--reset-check"><input type="checkbox" bind:checked={keepAlpha} disabled={!!busy} />{text.resetKeepAlpha}</label>
+                <p class="od-dev-tools-menu--caption">{text.resetKept}</p>
+                {#if logbook.dives.length}
+                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!!busy} aria-busy={busy === 'export'} onclick={exportFirst}>{text.resetExport}</button>
+                {/if}
+                <div class="od-dev-tools-menu--reset-buttons">
+                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!!busy} onclick={() => ((resetOpen = false), (resetArmed = false))}>{text.cancel}</button>
+                  <button type="button" class="od-dev-tools-menu--confirm-yes" disabled={!!busy} aria-busy={busy === 'reset'} onclick={resetNow}>{resetArmed ? text.resetAgain : text.resetAll}</button>
+                </div>
+              </div>
+            {:else}
+              {@render row('replay', 'refresh', text.replay, text.replayHint, () => (resetOpen = true))}
+            {/if}
           </div>
         </section>
 
@@ -195,7 +269,8 @@
     .od-dev-tools-menu {
       position: fixed;
       inset: 0;
-      z-index: 20001;
+      /* Under the snackbar (Framework7's toast is at 20000): a message must never be hidden by this sheet. */
+      z-index: 19000;
       display: flex;
       align-items: flex-end;
       justify-content: center;
@@ -523,6 +598,42 @@
       to {
         transform: rotate(360deg);
       }
+    }
+    .od-dev-tools-menu--status {
+      margin: 0 16px 8px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: var(--od-surface-container-high);
+      font-size: 14px;
+    }
+    .od-dev-tools-menu--status-error {
+      outline: 2px solid var(--od-dev);
+    }
+    .od-dev-tools-menu--reset {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 20px;
+      background: var(--od-surface-container-high);
+    }
+    .od-dev-tools-menu--reset-list {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 14px;
+    }
+    .od-dev-tools-menu--reset-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .od-dev-tools-menu--reset-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .od-dev-tools-menu--reset-buttons button {
+      flex: 1;
     }
     .od-dev-tools-menu--confirm {
       display: flex;

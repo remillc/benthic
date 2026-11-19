@@ -47,12 +47,12 @@ export function isTempEmail(email) {
  * @param {{ baseUrl?: string, transport?: import('./server-api.js').ServerTransport }} [options]
  */
 export function createDevApi({ baseUrl = serverUrl(), transport = serverTransport } = {}) {
-  /** @param {string} path @param {unknown} body @param {Record<string, string>} [headers] @returns {Promise<any>} */
-  async function post(path, body, headers) {
+  /** @param {string} path @param {unknown} body @param {Record<string, string>} [headers] @param {'GET'|'POST'} [method] @returns {Promise<any>} */
+  async function post(path, body, headers, method = 'POST') {
     if (!baseUrl || !isLocalServerUrl(baseUrl)) throw new ServerError('UNREACHABLE');
     let response;
     try {
-      response = await transport({ method: 'POST', url: baseUrl + path, body, ...(headers ? { headers } : {}) });
+      response = await transport({ method, url: baseUrl + path, ...(method === 'POST' ? { body } : {}), ...(headers ? { headers } : {}) });
     } catch {
       throw new ServerError('UNREACHABLE');
     }
@@ -79,6 +79,11 @@ export function createDevApi({ baseUrl = serverUrl(), transport = serverTranspor
     /** Marks the account not subscribed again (the development route). @param {string} sessionToken */
     async unsubscribe(sessionToken) {
       await post('/v1/account/dev-unsubscribe', {}, { Authorization: `Bearer ${sessionToken}` });
+    },
+    /** Who the server says this session is: `subscribed` is the server's answer (GET /v1/account). @param {string} sessionToken @returns {Promise<{ email: string, subscribed: boolean }>} */
+    async account(sessionToken) {
+      const r = await post('/v1/account', undefined, { Authorization: `Bearer ${sessionToken}` }, 'GET');
+      return { email: String(r.email ?? ''), subscribed: r.subscription?.subscribed === true };
     },
     /** Deletes the temporary account with its repository. @param {string} sessionToken */
     async reset(sessionToken) {

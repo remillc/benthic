@@ -6,7 +6,7 @@
 import { createDevApi, randomTempEmail, isTempEmail } from './dev-accounts.js';
 import { ALPHA_IMPORT_KEY } from './alpha-logbook.js';
 
-/** The remembered answer of the last dev action: the server has no « am I subscribed » route yet. */
+/** The remembered answer of the last dev action: only the fallback when the server cannot be asked (GET /v1/account). */
 export const SUBSCRIBED_KEY = 'od.devSubscribed';
 /** The beta's first-launch key (logbook.svelte.js): « show » replays it; the logbooks are not touched. */
 export const WELCOME_KEY = 'od.welcomeBeta';
@@ -14,7 +14,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
 /**
  * @typedef {Object} DevToolsDeps
  * @property {ReturnType<typeof createDevApi>} api
- * @property {{ info: () => Promise<{ signedIn: boolean, email: string }>, access: () => Promise<{ sessionToken: string }>, save: (session: any) => Promise<void> }} session
+ * @property {{ info: () => Promise<{ signedIn: boolean, email: string }>, access: () => Promise<{ sessionToken: string }>, save: (session: any) => Promise<void>, clear?: () => Promise<void> }} session
  * @property {{ signOut: (options?: { deleteCopy?: boolean }) => Promise<void>, startWithoutAccount: () => Promise<any> }} app
  * @property {{ getItem: (key: string) => string|null, setItem: (key: string, value: string) => void, removeItem: (key: string) => void }} store
  * @property {() => void} reload the app starts again so that every screen reads the new state
@@ -23,7 +23,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
  */
 
 /**
- * @typedef {{ kind: 'free'|'subscribed', signedIn: boolean, subscribed: boolean, email: string, server: string, temporary: boolean }} DevState
+ * @typedef {{ kind: 'free'|'subscribed', signedIn: boolean, subscribed: boolean, email: string, server: string, temporary: boolean, fromServer: boolean }} DevState
  */
 
 /** @param {DevToolsDeps} deps */
@@ -44,8 +44,18 @@ export function createDevTools(deps) {
     } catch {
       // No session.
     }
-    const subscribed = info.signedIn && store.getItem(SUBSCRIBED_KEY) !== '0';
-    return { kind: subscribed ? 'subscribed' : 'free', signedIn: info.signedIn, subscribed, email: info.signedIn ? info.email : '', server: server(), temporary: info.signedIn && isTempEmail(info.email) };
+    // The server is the truth when a session exists; the remembered flag only stands in when it cannot be asked.
+    let subscribed = info.signedIn && store.getItem(SUBSCRIBED_KEY) !== '0';
+    let fromServer = false;
+    if (info.signedIn) {
+      try {
+        subscribed = (await api.account(await token())).subscribed;
+        fromServer = true;
+      } catch {
+        // Offline or refused: the remembered flag.
+      }
+    }
+    return { fromServer, kind: subscribed ? 'subscribed' : 'free', signedIn: info.signedIn, subscribed, email: info.signedIn ? info.email : '', server: server(), temporary: info.signedIn && isTempEmail(info.email) };
   }
 
   return {
@@ -64,6 +74,8 @@ export function createDevTools(deps) {
         store.setItem(SUBSCRIBED_KEY, '0');
       } else {
         if (s.signedIn) await app.signOut({ deleteCopy: false });
+        // The session is forgotten even when the logbook was never connected through it (app.signOut only clears it then).
+        if (s.signedIn) await session.clear?.();
         store.removeItem(SUBSCRIBED_KEY);
         await app.startWithoutAccount();
       }
@@ -88,7 +100,10 @@ export function createDevTools(deps) {
     async newAccount() {
       const s = await state();
       const created = await api.signIn(fresh(), 'Plongeur d’essai');
-      if (s.signedIn) await app.signOut({ deleteCopy: false });
+      if (s.signedIn) {
+        await app.signOut({ deleteCopy: false });
+        await session.clear?.();
+      }
       await session.save(created);
       store.setItem(SUBSCRIBED_KEY, created.user?.subscribed === true ? '1' : '0');
       reload();
@@ -101,6 +116,7 @@ export function createDevTools(deps) {
       if (!s.temporary) throw new Error('NOT_TEMPORARY');
       await api.reset(await token());
       await app.signOut({ deleteCopy: true });
+      await session.clear?.();
       store.removeItem(SUBSCRIBED_KEY);
       reload();
     },
@@ -123,6 +139,25 @@ export function createDevTools(deps) {
   };
 }
 
+/**
+ * The three segments of the account selector. The current one (the account's true state) is on and disabled; the others
+ * are enabled, except while an action runs or before the tools are loaded.
+ * @param {DevState|null} state
+ * @param {{ busy?: string, ready?: boolean }} [options]
+ * @returns {{ id: 'out'|'keep'|'sub', index: number, on: boolean, disabled: boolean }[]}
+ */
+export function accountSegments(state, { busy = '', ready = true } = {}) {
+  const level = !state ? -1 : state.kind === 'subscribed' ? 2 : state.signedIn ? 1 : 0;
+  return /** @type {const} */ (['out', 'keep', 'sub']).map((id, index) => ({ id, index, on: level === index, disabled: !ready || !!busy || level === index }));
+}
+
+/** What a segment does. @param {ReturnType<typeof createDevTools>} tools @param {'out'|'keep'|'sub'} id */
+export function runSegment(tools, id) {
+  if (id === 'out') return tools.toFree('signOut');
+  if (id === 'keep') return tools.toFree('unsubscribe');
+  return tools.toSubscribed();
+}
+
 /** The real dependencies, read when the menu opens (dynamic imports: the app's modules are not loaded by the tests). */
 export async function realDevTools() {
   const [{ OpenDivesCore }, { deviceStore }, logbookModule, accounts, { serverUrl }] = await Promise.all([
@@ -134,10 +169,11 @@ export async function realDevTools() {
   ]);
   return createDevTools({
     api: accounts.createDevApi(),
-    session: { info: () => OpenDivesCore.serverSessionInfo(), access: () => OpenDivesCore.serverSessionAccess(), save: accounts.saveSession },
+    session: { info: () => OpenDivesCore.serverSessionInfo(), access: () => OpenDivesCore.serverSessionAccess(), save: accounts.saveSession, clear: () => OpenDivesCore.serverSessionClear() },
     app: { signOut: logbookModule.signOut, startWithoutAccount: logbookModule.startWithoutAccount },
     store: deviceStore,
-    reload: () => window.location.reload(),
+    // A moment later, so that the « done » message is seen before the app starts again.
+    reload: () => void setTimeout(() => window.location.reload(), 900),
     server: serverUrl,
   });
 }

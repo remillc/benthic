@@ -665,6 +665,40 @@ class OpenDivesCorePlugin : Plugin() {
         }
     }
 
+    /**
+     * DEVELOPMENT ONLY (debuggable builds; refused otherwise): « Rejouer le premier lancement » as a full reset. The core closes
+     * its log; the device logbook, the working copies of the server, every stored credential and the data key, the staged
+     * imports and exports go. Kept: the alpha's cache (`.subsurface`, unless `keepAlpha` is false), the development
+     * authority (`cacerts.pem`), the offline maps and the stylesheets. No server is called.
+     */
+    @PluginMethod
+    fun devResetApp(call: PluginCall) = onCoreThread(call) {
+        val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!debuggable) {
+            call.reject("NOT_DEBUG", "NOT_DEBUG")
+            return@onCoreThread
+        }
+        val keepAlpha = call.getBoolean("keepAlpha", true) != false
+        NativeCore.cloudSignOut(false)
+        credentialStore.delete()
+        gitStore.delete()
+        serverStore.delete()
+        dataKeyFile.delete()
+        pendingAccount = null
+        val files = context.filesDir
+        files.listFiles()?.forEach { f ->
+            val name = f.name
+            val device = name == "carnet" || name.startsWith("carnet.") || name == "odgit" || name == DEV_CREDENTIALS
+            val alpha = name == ".subsurface" && !keepAlpha
+            if (device || alpha) f.deleteRecursively()
+        }
+        context.cacheDir.listFiles()?.forEach { f ->
+            if (f.name.startsWith(IMPORT_PREFIX) || f.name == "import" || f.name == "exports") f.deleteRecursively()
+        }
+        Log.i(TAG, "devResetApp: device data erased (alpha kept: $keepAlpha)")
+        call.resolve()
+    }
+
     /** Signs out of the OpenDives server: the tokens are erased from this device. */
     @PluginMethod
     fun serverSessionClear(call: PluginCall) {
