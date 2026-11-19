@@ -6377,3 +6377,15 @@ Christian approved this on 19 November 2026. Work in `main`. Rules in `docs/syst
 **Mock-ups:** the design canvases are the reference (phone `android-premier-lancement-production`, `android-odplus-offre`, tablet `android-tablette-premier-lancement-production-paysage`, desktop `bureau-premier-lancement-production`). Update the matching files in `docs/mockups/` the same way, with `@font-face` pointing to `../brand/fonts/outfit-latin-variable.woff2`.
 
 **Test:** first launch on each platform shows « Benthic » in Outfit with « DIVE LOG » under it; a larger system font scales both lines without overlap; TalkBack and VoiceOver read « Benthic Dive Log » once.
+
+## [ ] 2026-11-19-318 Wordmark: logo size and name weight (follows 317)
+
+Christian approved this on 19 November 2026. Work in `main`. Apply together with task 317. Rules in `docs/system-design.md`, « Wordmark font », « Lockup proportions ».
+
+- The name « Benthic » is Outfit **700** (not 600 as written in 317).
+- The logo next to it is about 1.1 times the height of the text block, so that the letters' stroke matches the logo's wave: tablet and desktop logo 84 px (was 96) with the 52 px name; phone first launch logo 52 px (was 40) with the 30 px name; compact phone band (Benthic+ offer, sign-in) logo 48 px (was 32) with the 26 px name; following steps logo 32 px with the name alone in 22 px. Logo vertically centred on the two lines.
+- On the phone Benthic+ offer, check that the bigger logo keeps at least 8 dp above the « L'offre Benthic+ » chip.
+
+**Mock-ups:** the design canvases are the reference (same boards as 317); update the matching files in `docs/mockups/`.
+
+**Test:** compare the first launch on phone and tablet with the canvases; the wave and the letters look the same thickness.
