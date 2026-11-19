@@ -8,7 +8,7 @@
   import GearIcon from './GearIcon.svelte';
   import { gear, loadInventory, maintenanceSections } from '../lib/inventory.svelte.js';
   import { taskInline, tagText, lineText } from '../lib/maintenance-text.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { showProfilePath } from '../lib/profile-frame.js';
   import { t } from '../lib/i18n.js';
 
@@ -52,7 +52,7 @@
               <span class="od-maintenance-list--tile"><GearIcon type={p.type} name={p.name} size={22} piece={p} tile={40} /></span>
               <span class="od-maintenance-list--texts">
                 <span class="od-maintenance-list--name">{p.name} · {taskInline(e.item)}</span>
-                <span class="od-maintenance-list--line">{lineText(e, formatLongDate)}</span>
+                <span class="od-maintenance-list--line">{lineText(e, formatDate)}</span>
               </span>
               <span class="od-maintenance-list--tag od-maintenance-list--tag-{key}">{tagText(e)}</span>
             </button>

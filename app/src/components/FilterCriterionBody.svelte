@@ -11,7 +11,7 @@
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { filter, kindOf, choices, unitOf, validBound } from '../lib/filter.svelte.js';
-  import { formatLongDate, locale } from '../lib/format.js';
+  import { formatDate, dateHint, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @typedef {import('../lib/filter.svelte.js').Criteria} Criteria */
@@ -34,7 +34,7 @@
       const trips = new Map();
       for (const d of [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date))) {
         if (d.trip && !trips.has(String(d.trip.id)))
-          trips.set(String(d.trip.id), d.trip.location || t('trip.startingOn', { date: formatLongDate(d.date) }));
+          trips.set(String(d.trip.id), d.trip.location || t('trip.startingOn', { date: formatDate(d.date) }));
       }
       // Alphabetical, as the diver looks for a trip by its name.
       return [...trips].map(([value, text]) => ({ value, text })).sort((a, b) => a.text.localeCompare(b.text, locale, { sensitivity: 'base', numeric: true }));
@@ -57,7 +57,7 @@
   const unit = $derived(unitOf(key, logbook.prefs));
   /** @param {string} which */
   const fieldLabel = (which) => (unit ? t(`filter.${which}Unit`, { unit }) : t(`filter.${which}`));
-  const rangeHint = $derived(key === 'date' ? t('filter.dateHint') : key === 'timeOfDay' ? t('filter.timeHint') : '');
+  const rangeHint = $derived(key === 'date' ? t('filter.dateHint', { format: dateHint() }) : key === 'timeOfDay' ? t('filter.timeHint') : '');
 
   function clear() {
     /** @type {any} */ (filter.draft)[key] = [];

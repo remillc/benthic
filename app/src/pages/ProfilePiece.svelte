@@ -22,7 +22,7 @@
   import { letterPaper } from '../lib/share.js';
   import { desktopApp } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatDepth, formatLongDate, formatNumber, formatHours } from '../lib/format.js';
+  import { formatDepth, formatDate, formatNumber, formatHours } from '../lib/format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -78,9 +78,9 @@
           { label: t('gear.piece.model'), value: piece.model },
           { label: t('gear.piece.serial'), value: piece.serial },
           // Read only, from the download; hidden when the computer was never downloaded.
-          { label: t('gear.piece.firmware'), value: piece.firmware && piece.firmwareReadAt ? t('gear.piece.firmwareRead', { version: piece.firmware, date: formatLongDate(piece.firmwareReadAt) }) : '' },
-          ...detailRows(piece.type, piece.details, { label: (key) => t(`gear.field.${key}`), option: (key, id) => t(`gear.fieldOption.${key}.${id}`), yes: t('gear.piece.yes'), date: formatLongDate }),
-          { label: t('gear.piece.purchasedOn'), value: piece.purchasedOn ? formatLongDate(piece.purchasedOn) : '' },
+          { label: t('gear.piece.firmware'), value: piece.firmware && piece.firmwareReadAt ? t('gear.piece.firmwareRead', { version: piece.firmware, date: formatDate(piece.firmwareReadAt) }) : '' },
+          ...detailRows(piece.type, piece.details, { label: (key) => t(`gear.field.${key}`), option: (key, id) => t(`gear.fieldOption.${key}.${id}`), yes: t('gear.piece.yes'), date: formatDate }),
+          { label: t('gear.piece.purchasedOn'), value: piece.purchasedOn ? formatDate(piece.purchasedOn) : '' },
           { label: t('gear.piece.inKits'), value: kitNames },
         ].filter((row) => row.value)
       : [],
@@ -141,7 +141,7 @@
   function nextText() {
     const e = worst;
     if (!e) return '';
-    const date = e.dueDate ? formatLongDate(e.dueDate) : '';
+    const date = e.dueDate ? formatDate(e.dueDate) : '';
     if (date && e.divesLeft != null) return t('maintenance.export.nextBoth', { date, n: e.divesLeft });
     if (date) return date;
     return e.divesLeft != null ? t('maintenance.export.nextDives', { n: e.divesLeft }) : '';
@@ -205,7 +205,7 @@
     <h2 class="od-piece-page--name">{piece.name}</h2>
     {#if piece.retired}
       <!-- A retired piece (profil-piece-retiree-android): when and why, put back in service, export, no pencil. -->
-      <p class="od-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatLongDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
+      <p class="od-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
       <p class="od-piece-page--retired-line">{[piece.retiredReason ? t(`gear.retire.reason.${piece.retiredReason}`) : '', t('gear.retire.noReminders')].filter(Boolean).join('. ')}</p>
       <div class="od-piece-page--retired-buttons">
         <button type="button" class="od-piece-page--filled" disabled={gear.readOnly} onclick={restore}><Icon name="undo" size={20} />{t('gear.retire.restore')}</button>
@@ -241,9 +241,9 @@
 
     <p class="od-piece-page--last">
       {#if lastDive}
-        {lastDive.site ? t('gear.piece.lastDive', { date: formatLongDate(lastDive.date), site: lastDive.site }) : t('gear.piece.lastDiveNoSite', { date: formatLongDate(lastDive.date) })}
+        {lastDive.site ? t('gear.piece.lastDive', { date: formatDate(lastDive.date), site: lastDive.site }) : t('gear.piece.lastDiveNoSite', { date: formatDate(lastDive.date) })}
       {:else if figures.last}
-        {t('gear.piece.lastDiveNoSite', { date: formatLongDate(figures.last) })}
+        {t('gear.piece.lastDiveNoSite', { date: formatDate(figures.last) })}
       {:else}
         {t('gear.piece.noDive')}
       {/if}

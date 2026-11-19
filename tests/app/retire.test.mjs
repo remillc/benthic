@@ -106,7 +106,7 @@ test('the history PDF: the piece, a table from the latest entry, the invoices af
   const html = historyHtml({ name: 'Apeks <XTX50>', typeLabel: 'Détendeur', serial: 'AX50-118 322', dives: 180, next: '12 décembre 2026', rows, invoices: [{ label: 'Facture', dataUrl: 'data:image/jpeg;base64,AAAA' }], exportedOn: '19 novembre 2026', letter: true });
   assert.match(html, /size: letter/);
   assert.match(html, /Apeks &lt;XTX50&gt;/);
-  assert.ok(html.indexOf('12 décembre 2024') < html.indexOf('3 février 2024'));
+  assert.ok(html.indexOf('12 déc. 2024') < html.indexOf('3 févr. 2024'));
   assert.match(html, /<img src="data:image\/jpeg;base64,AAAA"/);
   assert.match(historyHtml({ name: 'x', typeLabel: 'y', dives: 0, next: '', rows: [], invoices: [], exportedOn: 'z', letter: false }), /size: A4/);
   assert.equal(historyFileName('Apeks XTX50 é', '2026-11-19').endsWith('apeks-xtx50-e-2026-11-19.pdf'), true);

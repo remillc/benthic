@@ -13,7 +13,7 @@
   import ShareSheet from '../components/ShareSheet.svelte';
   import { logbook, savePlan, deleteDives } from '../lib/logbook.svelte.js';
   import { planner, requestOfPlan, loadSetup } from '../lib/planner.svelte.js';
-  import { formatDepth, formatDuration, formatGasLong, formatLongDate, formatMixName, formatShortDate } from '../lib/format.js';
+  import { formatDepth, formatDuration, formatGasLong, formatDate, formatMixName } from '../lib/format.js';
   import { planRowTitle } from '../lib/plan-title.js';
   import { tick } from 'svelte';
   import { confirmAction } from '../lib/dialogs.js';
@@ -66,7 +66,7 @@
 
   /** @param {PlannedDive} plan */
   function title(plan) {
-    return planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatShortDate(plan.date) })).text;
+    return planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatDate(plan.date) })).text;
   }
 
   /** @param {PlannedDive} plan */
@@ -79,7 +79,7 @@
     const gas = plan.gases[0];
     const o2 = gas?.o2Permille ?? 209;
     const he = gas?.hePermille ?? 0;
-    return [he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he), formatLongDate(plan.date)].join(' · ');
+    return [he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he), formatDate(plan.date)].join(' · ');
   }
 
   /** @param {MouseEvent} e @param {PlannedDive} plan */

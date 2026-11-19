@@ -9,7 +9,7 @@
   import { diveVersions, keyOfDate } from '../lib/backup-history.js';
   import { diveVersionLine, versionWhen, versionDay } from '../lib/backup-text.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { t } from '../lib/i18n.js';
@@ -55,7 +55,7 @@
   /** @param {import('opendives-core').Dive} d */
   function rowText(d) {
     const number = t('backup.version.number', { n: d.number });
-    const date = formatLongDate(d.date);
+    const date = formatDate(d.date);
     return d.site ? t('backup.dive.row', { number, site: d.site, date }) : t('backup.dive.rowNoSite', { number, date });
   }
 

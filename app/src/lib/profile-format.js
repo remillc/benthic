@@ -1,16 +1,14 @@
 // @ts-check
 // Small formatting helpers of « Mon profil de plongeur » (task 2026-11-18-272).
-import { locale } from './format.js';
+import { formatDate as formatDay } from './format.js';
 
-/** « 14 mars 1979 » for a YYYY-MM-DD date; '' when it is not a date. @param {string} iso */
-export function formatLongDate(iso) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  if (!m) return '';
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]))));
+/** A YYYY-MM-DD date in the format chosen in Settings (« 1979-03-14 »); '' when it is not a date. @param {string} iso */
+export function formatDate(iso) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? formatDay(iso) : '';
 }
 
 /** The date of an ISO timestamp (the consent's), written out. @param {string} timestamp */
-export const formatStampDate = (timestamp) => formatLongDate(timestamp.slice(0, 10));
+export const formatStampDate = (timestamp) => formatDate(timestamp.slice(0, 10));
 
 /** The year, 0-based month and day the date picker starts on. @param {string} iso @param {number} fallbackYear */
 export function partsOf(iso, fallbackYear) {

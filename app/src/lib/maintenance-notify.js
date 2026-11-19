@@ -15,7 +15,7 @@ import { settings } from './settings.svelte.js';
 import { snoozeOneWeek } from './maintenance-snooze.js';
 import { showSnackbar } from './snackbar.js';
 import { notificationText } from './maintenance-text.js';
-import { formatLongDate } from './format.js';
+import { formatDate } from './format.js';
 import { openOver } from './navigation.svelte.js';
 import { setDesktopNotifications, desktopBridge } from './desktop-notifications.js';
 import { t } from './i18n.js';
@@ -99,7 +99,7 @@ function build(plan) {
     const piece = gear.pieces.find((g) => g.id === e?.item.gearId);
     const at = notificationMoment(p.on);
     if (!e || !piece || at.getTime() <= now) continue;
-    const { title, body } = notificationText(p.kind, e, { pieceName: piece.name, days: leadDays(e.item, settings.maintenanceLeadDays), formatDate: formatLongDate });
+    const { title, body } = notificationText(p.kind, e, { pieceName: piece.name, days: leadDays(e.item, settings.maintenanceLeadDays), formatDate: formatDate });
     out.push({ id: notificationId(p.id), title, body, at, kind: p.kind, itemId: e.item.id, gearId: piece.id });
   }
   return out;

@@ -17,7 +17,7 @@
   import { spaceUse, storeSubscriptionsUrl, subscriptionStore } from '../lib/account-sheet.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { formatMapSize } from '../lib/maps-format.js';
   import { desktopApp, ios } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -125,7 +125,7 @@
       <span class="od-account-manage--chip"><OdPlusChip onSheet /></span>
       <span class="od-account-manage--price">{t('account.manage.perYear', { price })}</span>
       <span class="od-account-manage--line">
-        {#if renews}{t('account.manage.renews', { date: formatLongDate(renews), store: storeName })}{:else}{t('account.manage.boughtOn', { store: storeName })}{/if}
+        {#if renews}{t('account.manage.renews', { date: formatDate(renews), store: storeName })}{:else}{t('account.manage.boughtOn', { store: storeName })}{/if}
       </span>
       <!-- The store's own page: payment method, receipts and renewal are managed there, not here. A link, opened by the
            system (the browser or the store's app): no billing tool in OpenDives. -->

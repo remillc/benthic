@@ -10,7 +10,7 @@
 import { deviceStore } from './device-store.js';
 import { OpenDivesCore } from 'opendives-core';
 import { t, tIfExists } from './i18n.js';
-import { formatGasLong, formatTotalTime, formatLongDate, locale } from './format.js';
+import { formatGasLong, formatTotalTime, formatDate, locale } from './format.js';
 import { filter } from './filter.svelte.js';
 import { withoutFeedbackTags } from './weight-feedback.js';
 
@@ -136,7 +136,7 @@ export function tripsOf(dives) {
 
 /** @param {{start: string, location: string}} trip */
 export function tripName(trip) {
-  return trip.location || t('trip.startingOn', { date: formatLongDate(trip.start) });
+  return trip.location || t('trip.startingOn', { date: formatDate(trip.start) });
 }
 
 /** @param {Dive[]} dives */
@@ -164,7 +164,7 @@ export function valueLabel(field, value, dives) {
   }
   if (field === 'trip') {
     const trip = tripsOf(dives).find((tr) => tr.start === value);
-    return trip ? tripName(trip) : t('trip.startingOn', { date: formatLongDate(value) });
+    return trip ? tripName(trip) : t('trip.startingOn', { date: formatDate(value) });
   }
   if (field === 'mode') return t(`detail.modes.${value}`);
   if (field === 'rating' && value) return t('stats.stars', { n: Number(value) });

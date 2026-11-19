@@ -32,7 +32,7 @@
   import { simplifyProfile } from '../lib/profile-levels.js';
   import { planRows } from '../lib/plan-rows.js';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatPartialPressure, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
+  import { formatDate, formatDateTime, formatDuration, formatGasVolume, formatMixName, formatGasLong, formatNumber, formatPartialPressure, formatSac, formatTimeOfDay, decoSummary, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
   import { WATER_TYPES, altitudeToPressureMbar, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
@@ -378,7 +378,7 @@
   // --- Date, for a new dive --------------------------------------------------
 
   const whenDate = $derived(new Date((planner.when || 0) * 1000));
-  const dateText = $derived(planner.when ? whenDate.toLocaleDateString(locale, { dateStyle: 'medium', timeZone: 'UTC' }) : '');
+  const dateText = $derived(planner.when ? formatDate(whenDate.toISOString().slice(0, 19)) : '');
   const timeText = $derived(planner.when ? formatTimeOfDay(whenDate.toISOString().slice(0, 19)) : '');
   const two = (/** @type {number} */ n) => String(n).padStart(2, '0');
   const thisYear = new Date().getFullYear();

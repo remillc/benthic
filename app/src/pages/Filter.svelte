@@ -45,7 +45,7 @@
     presetCriteria,
   } from '../lib/filter.svelte.js';
   import { t } from '../lib/i18n.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -71,7 +71,7 @@
     const names = new Map();
     for (const d of [...logbook.dives].sort((a, b) => a.date.localeCompare(b.date))) {
       if (d.trip && !names.has(String(d.trip.id)))
-        names.set(String(d.trip.id), d.trip.location || t('trip.startingOn', { date: formatLongDate(d.date) }));
+        names.set(String(d.trip.id), d.trip.location || t('trip.startingOn', { date: formatDate(d.date) }));
     }
     return names;
   });

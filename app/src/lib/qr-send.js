@@ -2,7 +2,7 @@
 // What the sending side of a QR share needs: the core's .ssrf text of one dive or plan, the
 // summary line of the screen, and the QR drawing of one code. The format is in qr-transfer.js.
 import { OpenDivesCore } from 'opendives-core';
-import { formatDepth, formatLongDate, formatMinutes } from './format.js';
+import { formatDepth, formatDate, formatMinutes } from './format.js';
 import { t } from './i18n.js';
 import { encodeTransfer } from './qr-transfer.js';
 import { labelOf } from './qr-preview.js';
@@ -27,5 +27,5 @@ export async function transferOf(id, kind) {
  * @param {import('opendives-core').Prefs} prefs
  */
 export function qrSummary(dive, prefs) {
-  return [dive.site || t('qr.noSite'), formatLongDate(dive.date), formatDepth(dive.maxDepthMm, prefs), formatMinutes(dive.durationSeconds)].join(' · ');
+  return [dive.site || t('qr.noSite'), formatDate(dive.date), formatDepth(dive.maxDepthMm, prefs), formatMinutes(dive.durationSeconds)].join(' · ');
 }

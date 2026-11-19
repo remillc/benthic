@@ -10,7 +10,8 @@
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
   import Md3Dialog from './Md3Dialog.svelte';
-  import { t, locale } from '../lib/i18n.js';
+  import { t } from '../lib/i18n.js';
+  import { formatInstantDate } from '../lib/format.js';
   import { logbooks, openRecent, forgetRecent, relocateRecent } from '../lib/desktop-logbooks.svelte.js';
   import { recentRows } from '../lib/desktop-recents.js';
 
@@ -20,12 +21,11 @@
   let busy = $state(false);
 
   /** @param {number} time */
-  const formatDate = (time) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(time);
 
   /** @type {Record<'device'|'file'|'cloud'|'git', 'desktop'|'file'|'cloud'|'git'>} */
   const ICONS = { device: 'desktop', file: 'file', cloud: 'cloud', git: 'git' };
 
-  const rows = $derived(recentRows(logbooks.recent, logbooks.exists, now, t, formatDate));
+  const rows = $derived(recentRows(logbooks.recent, logbooks.exists, now, t, formatInstantDate));
   const missing = $derived(rows.find((row) => row.id === asking) ?? null);
 
   onMount(() => {

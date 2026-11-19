@@ -148,6 +148,8 @@
           { path: '/profile/maintenance/', ...lazy(() => import('./pages/ProfileMaintenance.svelte')) },
           { path: '/profile/info', ...lazy(() => import('./pages/ProfileInfo.svelte')) },
           { path: '/profile/info/edit', ...lazy(() => import('./pages/ProfileInfoEdit.svelte')) },
+          { path: '/profile/emergency', ...lazy(() => import('./pages/EmergencySheet.svelte')) },
+          { path: '/profile/emergency/content', ...lazy(() => import('./pages/EmergencyContent.svelte')) },
           { path: '/profile/certs/', ...lazy(() => import('./pages/ProfileCerts.svelte')) },
           { path: '/profile/certs/new', ...lazy(() => import('./pages/ProfileCertEdit.svelte')) },
           { path: '/profile/certs/:id', ...lazy(() => import('./pages/ProfileCert.svelte')) },

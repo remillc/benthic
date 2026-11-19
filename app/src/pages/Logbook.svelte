@@ -48,7 +48,7 @@
   import { layout, deviceKind } from '../lib/layout.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { formatDateTime, formatLongDate } from '../lib/format.js';
+  import { formatDateTime, formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
   import { buildRows } from '../lib/logbook-cards.js';
@@ -642,7 +642,7 @@
       } else if (target.action === 'add') {
         const id = target.tripId;
         const inTrip = logbook.dives.filter((d) => d.trip?.id === id).sort((a, b) => a.date.localeCompare(b.date));
-        const name = inTrip[0]?.trip?.location || (inTrip[0] ? t('trip.startingOn', { date: formatLongDate(inTrip[0].date) }) : '');
+        const name = inTrip[0]?.trip?.location || (inTrip[0] ? t('trip.startingOn', { date: formatDate(inTrip[0].date) }) : '');
         label.textContent = t('logbook.dragAdd', { trip: name });
       } else {
         label.textContent = t('logbook.dragRemove');

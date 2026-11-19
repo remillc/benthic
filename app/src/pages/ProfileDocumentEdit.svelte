@@ -259,19 +259,19 @@
       <TextField label={t('docs.insurance.plan')} bind:value={plan} />
       <TextField label={t('docs.insurance.policy')} bind:value={policyNumber} />
       <TextField label={t('docs.insurance.phone')} bind:value={emergencyPhone} inputmode="numeric" invalid={!!live.phone.error} supporting={live.phone.error || t('docs.insurance.phoneHint')} />
-      <DateField label={t('docs.insurance.startsOn')} bind:value={startsOn} placeholder={t('gear.fieldHint.datePlaceholder')} minYear={year - 10} maxYear={year + 30} />
-      <DateField label={t('docs.insurance.expiresOn')} bind:value={expiresOn} placeholder={t('gear.fieldHint.datePlaceholder')} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
+      <DateField label={t('docs.insurance.startsOn')} bind:value={startsOn} minYear={year - 10} maxYear={year + 30} />
+      <DateField label={t('docs.insurance.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
       {@render notify()}
       <TextField label={t('docs.insurance.notes')} bind:value={notes} multiline supporting={t('docs.insurance.notesHint')} />
     {:else if kind === 'medical'}
       <TextField label={t('docs.medical.doctor')} bind:value={doctor} supporting={t('docs.medical.doctorHint')} />
-      <DateField label={t('docs.medical.date')} bind:value={issuedOn} placeholder={t('gear.fieldHint.datePlaceholder')} minYear={year - 10} maxYear={year} supporting={problems.issuedOn === 'future' ? t('docs.errors.future') : ''} />
-      <DateField label={t('docs.medical.expiresOn')} bind:value={expiresOn} placeholder={t('gear.fieldHint.datePlaceholder')} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
+      <DateField label={t('docs.medical.date')} bind:value={issuedOn} minYear={year - 10} maxYear={year} supporting={problems.issuedOn === 'future' ? t('docs.errors.future') : ''} />
+      <DateField label={t('docs.medical.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
       {@render notify()}
       <TextField label={t('docs.medical.notes')} bind:value={notes} multiline supporting={t('docs.medical.notesHint')} />
     {:else}
       <TextField label={t('docs.other.name')} bind:value={title} invalid={!!live.title.error} supporting={live.title.error || t('docs.other.nameHint')} />
-      <DateField label={t('docs.other.expiresOn')} bind:value={expiresOn} placeholder={t('gear.fieldHint.datePlaceholder')} minYear={year - 10} maxYear={year + 30} />
+      <DateField label={t('docs.other.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} />
       {#if expiresOn}{@render notify()}{/if}
       <TextField label={t('docs.other.notes')} bind:value={notes} multiline supporting={t('docs.other.notesHint')} />
     {/if}

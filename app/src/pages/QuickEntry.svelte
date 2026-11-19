@@ -16,7 +16,7 @@
   import { cachedSites } from '../lib/core-cache.js';
   import { endQuickEntry } from '../lib/download.js';
   import { quickEntryUrl } from '../lib/quick-entry.js';
-  import { formatDepth, formatLongDateTime, formatMinutes, formatNumber, formatLongDate } from '../lib/format.js';
+  import { formatDepth, formatDateTime, formatMinutes, formatNumber, formatDate } from '../lib/format.js';
   import { ios } from '../lib/layout.svelte.js';
   import { logbookValues } from '../lib/people.js';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
@@ -93,7 +93,7 @@
 
   /** « À 394 pi · dernière plongée le … », « À 1,1 mi · aucune plongée »; without a position, the last dive only. @param {{ site: import('opendives-core').SiteSummary, metres: number|null }} row */
   function line(row) {
-    const last = row.site.dives && row.site.lastDate ? t('quickEntry.lastDive', { date: formatLongDate(row.site.lastDate) }) : t('quickEntry.noDive');
+    const last = row.site.dives && row.site.lastDate ? t('quickEntry.lastDive', { date: formatDate(row.site.lastDate) }) : t('quickEntry.noDive');
     const away = row.metres === null ? '' : distanceText(row.metres);
     return [away.charAt(0).toLocaleUpperCase() + away.slice(1), last].filter(Boolean).join(' · ');
   }
@@ -186,7 +186,7 @@
     <div class="od-quick-entry--dive">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} />
       <span class="od-quick-entry--dive-texts">
-        <span class="od-quick-entry--dive-title">{t('quickEntry.diveOf', { date: formatLongDateTime(dive.date) })}</span>
+        <span class="od-quick-entry--dive-title">{t('quickEntry.diveOf', { date: formatDateTime(dive.date) })}</span>
         <span class="od-quick-entry--dive-line od-value">{t('quickEntry.diveLine', { depth: formatDepth(dive.maxDepthMm, logbook.prefs), duration: formatMinutes(dive.durationSeconds) })}</span>
       </span>
     </div>

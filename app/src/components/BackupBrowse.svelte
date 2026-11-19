@@ -8,7 +8,7 @@
   import { openVersion, closeVersion, logbook } from '../lib/logbook.svelte.js';
   import { backup } from '../lib/backup.svelte.js';
   import { versionWhen } from '../lib/backup-text.js';
-  import { formatDepth, formatDuration, formatLongDate } from '../lib/format.js';
+  import { formatDepth, formatDuration, formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** `id`: the version's commit. `onclose`: leaves the screen. @type {{ id: string, onclose: () => void }} */
@@ -47,7 +47,7 @@
   });
 
   /** @param {import('opendives-core').Dive} d */
-  const title = (d) => [d.number ? t('backup.version.number', { n: d.number }) : '', d.site].filter(Boolean).join(' · ') || formatLongDate(d.date);
+  const title = (d) => [d.number ? t('backup.version.number', { n: d.number }) : '', d.site].filter(Boolean).join(' · ') || formatDate(d.date);
 </script>
 
 <div class="od-backup od-backup-browse">
@@ -67,7 +67,7 @@
         <div class="od-backup--row" role="listitem">
           <span class="od-backup--texts">
             <span class="od-backup--row-title">{title(d)}</span>
-            <span class="od-backup--row-line">{formatLongDate(d.date)} · {formatDepth(d.maxDepthMm, logbook.prefs)} · {formatDuration(d.durationSeconds)}</span>
+            <span class="od-backup--row-line">{formatDate(d.date)} · {formatDepth(d.maxDepthMm, logbook.prefs)} · {formatDuration(d.durationSeconds)}</span>
           </span>
         </div>
       {/each}

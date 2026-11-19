@@ -7,7 +7,7 @@
 // one of Subsurface's filter presets, and a saved filter applied again.
 import { OpenDivesCore } from 'opendives-core';
 import { t } from './i18n.js';
-import { formatNumber } from './format.js';
+import { formatNumber, readTypedDate } from './format.js';
 import { withoutFeedbackTags } from './weight-feedback.js';
 import { logbook } from './logbook.svelte.js';
 
@@ -284,11 +284,10 @@ function toCore(key, text, prefs) {
   }
 }
 
-/** @param {string} text "YYYY-MM-DD"; null when invalid */
+/** @param {string} text a date in the format of Settings, or "YYYY-MM-DD"; null when invalid */
 function parseDate(text) {
-  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text.trim());
-  if (!m) return null;
-  return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')} 00:00:00`;
+  const iso = readTypedDate(text);
+  return iso ? `${iso} 00:00:00` : null;
 }
 
 /**

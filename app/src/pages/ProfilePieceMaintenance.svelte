@@ -15,7 +15,7 @@
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel, tagText } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
-  import { formatLongDate, formatMonthYear, formatNumber, formatHours } from '../lib/format.js';
+  import { formatDate, formatMonthYear, formatNumber, formatHours } from '../lib/format.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -36,7 +36,7 @@
   const isCylinder = $derived(piece?.type === 'cylinder');
 
   /** The date of a cylinder's hydrostatic test is known to the month (the stamp on the bottle). @param {import('../lib/maintenance.js').Evaluation} e @param {string} iso */
-  const dateText = (e, iso) => (e.item.task === 'hydrostatic' ? formatMonthYear(iso) : formatLongDate(iso));
+  const dateText = (e, iso) => (e.item.task === 'hydrostatic' ? formatMonthYear(iso) : formatDate(iso));
 
   /** The button of a card: « Noter l'inspection », « Noter l'épreuve » on a bottle, else « Noter un entretien ». @param {import('../lib/maintenance.js').Evaluation} e */
   const noteLabel = (e) => (e.item.task === 'inspection' && isCylinder ? t('maintenance.piece.noteInspection') : e.item.task === 'hydrostatic' ? t('maintenance.piece.noteHydrostatic') : t('maintenance.piece.note'));
@@ -198,7 +198,7 @@
             <span class="od-piece-maintenance--history-texts">
               <span class="od-piece-maintenance--history-title">{h.kind === 'service' ? taskLabel(h.item) : t(`maintenance.kind.${h.kind}`)}</span>
               <span class="od-piece-maintenance--history-line">
-                {[h.item.task === 'hydrostatic' ? formatMonthYear(h.doneOn) : formatLongDate(h.doneOn), h.item.task === 'hydrostatic' ? t('maintenance.piece.stampedEntry') : '', h.doneBy ? t('maintenance.piece.by', { who: h.doneBy }) : t('maintenance.piece.byYou'), h.cost != null ? money(h.cost) : ''].filter(Boolean).join(' · ')}
+                {[h.item.task === 'hydrostatic' ? formatMonthYear(h.doneOn) : formatDate(h.doneOn), h.item.task === 'hydrostatic' ? t('maintenance.piece.stampedEntry') : '', h.doneBy ? t('maintenance.piece.by', { who: h.doneBy }) : t('maintenance.piece.byYou'), h.cost != null ? money(h.cost) : ''].filter(Boolean).join(' · ')}
               </span>
             </span>
           </li>

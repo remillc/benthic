@@ -22,7 +22,7 @@
   import { possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
   import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../lib/site-merge.js';
   import { offerUndo } from '../lib/undo.js';
-  import { formatDepth, formatLongDate, locale } from '../lib/format.js';
+  import { formatDepth, formatDate, locale } from '../lib/format.js';
   import { layout, ios, listWidth } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
@@ -462,7 +462,7 @@ import { language } from '../lib/i18n.js';
                     <div class="item-title od-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
                     <div class="item-text">
                       {site.hasLocation
-                        ? t('sites.rowDives', { n: site.dives, date: formatLongDate(site.lastDate) })
+                        ? t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })
                         : t('sites.rowNoGps', { n: site.dives })}
                     </div>
                   </div>

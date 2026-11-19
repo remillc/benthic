@@ -2,7 +2,7 @@
 // The reminder of the end of the wait before flying (task 2026-11-13-98): what is shown and
 // when. Pure: the scheduling itself is in flight-reminder.svelte.js.
 import { t } from './i18n.js';
-import { formatLongDate } from './format.js';
+import { formatDate } from './format.js';
 import { flightWait } from './tools.js';
 
 /** Where a tap on the notification goes: the Desaturation tool (lib/deep-link.js). */
@@ -32,7 +32,7 @@ export function flightNotice(dives, mode, now) {
   const DAY = 86400000;
   const days = Math.floor(Date.parse(`${wait.endsAt}Z`) / DAY) - Math.floor(Date.parse(`${last.date}Z`) / DAY);
   const when =
-    days === 0 ? t('flight.notice.today') : days === 1 ? t('flight.notice.yesterday') : t('flight.notice.date', { date: formatLongDate(last.date) });
+    days === 0 ? t('flight.notice.today') : days === 1 ? t('flight.notice.yesterday') : t('flight.notice.date', { date: formatDate(last.date) });
   return {
     at: localDate(wait.endsAt),
     title: t('flight.notice.title'),

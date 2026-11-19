@@ -12,6 +12,7 @@ import {
   formatDepth,
   formatDuration,
   formatFullDate,
+  formatInstantDate,
   formatGas,
   formatGasLong,
   formatGasVolume,
@@ -202,7 +203,7 @@ export function sheetHtml(dive, prefs, svg, anonymize = false, validations = [],
     .filter((v) => !v.pending)
     .map((v) => {
       const role = (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase(locale);
-      const detail = [t(`validation.method.${v.method}`), v.at ? new Date(v.at).toLocaleDateString(locale, { dateStyle: 'long' }) : '', v.instructorNumber].filter(Boolean).join(' · ');
+      const detail = [t(`validation.method.${v.method}`), v.at ? formatInstantDate(new Date(v.at)) : '', v.instructorNumber].filter(Boolean).join(' · ');
       const image = v.signature ? `<img class="sig" src="${esc(v.signature)}" alt="">` : '';
       const modified = v.modified ? `<div class="modified">${esc(t('validation.modified'))}</div>` : '';
       return `<div class="validation"><div><b>${esc(t('validation.itemName', { name: v.name, role }))}</b><div class="legend">${esc(detail)}</div>${modified}</div>${image}</div>`;
@@ -259,7 +260,7 @@ export function sheetHtml(dive, prefs, svg, anonymize = false, validations = [],
   const profile = typeof svg === 'string' ? svg : svg ? new XMLSerializer().serializeToString(standaloneSvg(svg)) : '';
   const rows = (/** @type {(string|null)[][]} */ list) =>
     list.map(([k, v]) => `<div class="kv"><dt>${esc(k ?? '')}</dt><dd>${esc(v ?? '')}</dd></div>`).join('');
-  const created = new Date().toLocaleDateString(locale, { dateStyle: 'long' });
+  const created = formatInstantDate(new Date());
 
   return `<!DOCTYPE html><html lang="${esc(locale)}"><head><meta charset="utf-8"><style>
 @page { size: ${letterPaper() ? 'letter' : 'A4'}; margin: 14mm 14mm 16mm; }
@@ -525,7 +526,7 @@ export async function sharePlanSummary(result, request, prefs, title) {
  */
 export function planSheetHtml(result, request, prefs, title) {
   const f = planFacts(result, request, prefs);
-  const created = new Date().toLocaleDateString(locale, { dateStyle: 'long' });
+  const created = formatInstantDate(new Date());
   return `<!DOCTYPE html><html lang="${esc(locale)}"><head><meta charset="utf-8"><style>
 @page { size: ${letterPaper() ? 'letter' : 'A4'}; margin: 14mm; }
 body { margin: 0; font-family: sans-serif; color: #1F2124; font-size: 10pt; line-height: 1.35; }

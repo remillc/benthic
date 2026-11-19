@@ -20,7 +20,7 @@
   import { expiryState, cardTone } from '../lib/documents.js';
   import { badgeText, documentTitle, kindLabel, bannerLine } from '../lib/documents-text.js';
   import { todayIso } from '../lib/maintenance.js';
-  import { formatLongDate } from '../lib/profile-format.js';
+  import { formatDate } from '../lib/profile-format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -73,21 +73,21 @@
             { label: t('docs.sheet.plan'), value: doc.plan },
             { label: t('docs.sheet.policy'), value: doc.policyNumber },
             { label: t('docs.sheet.phone'), value: doc.emergencyPhone, tel: true },
-            { label: t('docs.sheet.startsOn'), value: doc.startsOn ? formatLongDate(doc.startsOn) : '' },
-            { label: t('docs.sheet.expiresOn'), value: doc.expiresOn ? formatLongDate(doc.expiresOn) : '' },
+            { label: t('docs.sheet.startsOn'), value: doc.startsOn ? formatDate(doc.startsOn) : '' },
+            { label: t('docs.sheet.expiresOn'), value: doc.expiresOn ? formatDate(doc.expiresOn) : '' },
             { label: t('docs.sheet.reminder'), value: doc.expiresOn ? t('docs.medical.reminderValue', { n: doc.notifyDays }) : '' },
             { label: t('docs.sheet.notes'), value: doc.notes },
           ]
         : doc.kind === 'medical'
           ? [
               { label: t('docs.medical.doctor'), value: doc.doctor },
-              { label: t('docs.medical.date'), value: doc.issuedOn ? formatLongDate(doc.issuedOn) : '' },
-              { label: t('docs.medical.expiresOn'), value: doc.expiresOn ? formatLongDate(doc.expiresOn) : '' },
+              { label: t('docs.medical.date'), value: doc.issuedOn ? formatDate(doc.issuedOn) : '' },
+              { label: t('docs.medical.expiresOn'), value: doc.expiresOn ? formatDate(doc.expiresOn) : '' },
               { label: t('docs.sheet.reminder'), value: doc.expiresOn ? t('docs.medical.reminderValue', { n: doc.notifyDays }) : '' },
               { label: t('docs.sheet.notes'), value: doc.notes },
             ]
           : [
-              { label: t('docs.sheet.expiresOn'), value: doc.expiresOn ? formatLongDate(doc.expiresOn) : '' },
+              { label: t('docs.sheet.expiresOn'), value: doc.expiresOn ? formatDate(doc.expiresOn) : '' },
               { label: t('docs.sheet.reminder'), value: doc.expiresOn ? t('docs.medical.reminderValue', { n: doc.notifyDays }) : '' },
               { label: t('docs.sheet.notes'), value: doc.notes },
             ],
@@ -158,7 +158,7 @@
         <Icon name={status.state === 'expired' ? 'warning' : 'clock'} size={22} />
         <span class="od-doc--banner-texts">
           <span class="od-doc--banner-title">{badgeText(status)}</span>
-          <span class="od-doc--banner-line">{bannerLine(doc, formatLongDate, today)}</span>
+          <span class="od-doc--banner-line">{bannerLine(doc, formatDate, today)}</span>
         </span>
       </div>
     {/if}

@@ -8,7 +8,7 @@
   import Icon from './Icon.svelte';
   import TextField from './TextField.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatDepth, formatLongDateTime, formatMinutes } from '../lib/format.js';
+  import { formatDepth, formatDateTime, formatMinutes } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
   import { signerProblems } from '../lib/validation.js';
@@ -45,7 +45,7 @@
       <div class="od-validation-confirm--card">
         {#each confirmation.summary.dives as dive}
           <div class="od-validation-confirm--dive">
-            <p class="od-validation-confirm--date">{formatLongDateTime(dive.date)}</p>
+            <p class="od-validation-confirm--date">{formatDateTime(dive.date)}</p>
             <p class="od-validation-confirm--site">{dive.site || t('qr.noSite')}</p>
             <p class="od-validation-confirm--figures">
               {[dive.maxDepthMm ? t('validation.deepest', { depth: formatDepth(dive.maxDepthMm, prefs) }) : '', dive.durationSeconds ? t('validation.underwater', { time: formatMinutes(dive.durationSeconds) }) : ''].filter(Boolean).join(' · ')}

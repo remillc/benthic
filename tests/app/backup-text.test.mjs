@@ -69,7 +69,7 @@ test('a moment is told as today, yesterday or a date', () => {
   assert.equal(local.length, 19);
   assert.match(nbsp(versionWhen(t0, local)), /^Aujourd’hui, /);
   assert.match(nbsp(versionWhen(t0 - 86400, local)), /^Hier, /);
-  assert.match(nbsp(versionWhen(t0 - 4 * 86400, local)), /novembre 2026/);
+  assert.match(nbsp(versionWhen(t0 - 4 * 86400, local)), /nov. 2026/);
 });
 
 /** Every key of an object, with the plural forms as one text. */

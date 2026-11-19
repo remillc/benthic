@@ -9,7 +9,8 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
-  import { locale } from '../lib/format.js';
+  import { locale, formatDateChoice } from '../lib/format.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { addDays, addMonths, daysInMonth, formatDateInput, monthGrid, parseDateInput, weekStart, weekday, weekdayOrder } from '../lib/date-time-picker.js';
 
   /**
@@ -31,12 +32,12 @@
   let mode = $state(/** @type {'calendar'|'input'} */ ('calendar'));
   let yearGrid = $state(false);
   // svelte-ignore state_referenced_locally
-  let text = $state(formatDateInput(selected, locale));
+  let text = $state(formatDateInput(selected, locale, settings.dateFormat));
   let touched = $state(false);
 
   const first = weekStart(locale);
   const rows = $derived(monthGrid(view.year, view.month, first));
-  const dayFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const weekdayShort = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
   const fullFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' });
   const monthFormat = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
   const narrow = new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' });
@@ -49,12 +50,12 @@
 
   /** @param {number} y @param {number} m @param {number} d */
   const utc = (y, m, d) => new Date(Date.UTC(y, m, d));
-  const headline = $derived(dayFormat.format(utc(selected.year, selected.month, selected.day)));
+  const headline = $derived(`${weekdayShort.format(utc(selected.year, selected.month, selected.day))} ${formatDateChoice(utc(selected.year, selected.month, selected.day), settings.dateFormat)}`);
   const monthLabel = $derived(monthFormat.format(utc(view.year, view.month, 1)));
   const monthName = $derived(new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' }).format(utc(view.year, view.month, 1)));
   const canPrev = $derived(view.year * 12 + view.month > minYear * 12);
   const canNext = $derived(view.year * 12 + view.month < maxYear * 12 + 11);
-  const parsed = $derived(parseDateInput(text, locale, minYear, maxYear));
+  const parsed = $derived(parseDateInput(text, locale, minYear, maxYear, settings.dateFormat));
   const invalid = $derived(mode === 'input' && !parsed);
 
   /** @param {number} delta */
@@ -69,7 +70,7 @@
   function pick(d) {
     selected = { year: view.year, month: view.month, day: d };
     focused = { ...selected };
-    text = formatDateInput(selected, locale);
+    text = formatDateInput(selected, locale, settings.dateFormat);
   }
 
   /** @param {KeyboardEvent} e */
@@ -125,7 +126,7 @@
 
   function toggleMode() {
     if (mode === 'calendar') {
-      text = formatDateInput(selected, locale);
+      text = formatDateInput(selected, locale, settings.dateFormat);
       touched = false;
       mode = 'input';
     } else {
@@ -155,7 +156,7 @@
   const pattern = $derived(
     (() => {
       const letters = { d: t('datePicker.pattern.d'), m: t('datePicker.pattern.m'), y: t('datePicker.pattern.y') };
-      return formatDateInput({ year: 3333, month: 10, day: 22 }, locale)
+      return formatDateInput({ year: 3333, month: 10, day: 22 }, locale, settings.dateFormat)
         .replace('22', letters.d)
         .replace('11', letters.m)
         .replace('3333', letters.y);

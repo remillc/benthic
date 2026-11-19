@@ -6245,7 +6245,7 @@ Take the SVG paths from the mock-ups.
 
 **Test:** on a phone, open « Nouvelle pièce », pick each type from the menu and check the form changes. Enter a known brand and model and check the photo appears, then change it. Check the five icons on phone, tablet and desktop.
 
-## [ ] 2026-11-19-311 Dates in the format from Réglages everywhere, emergency sheet (#63)
+## [x] 2026-11-19-311 Dates in the format from Réglages everywhere, emergency sheet (#63)
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (about 350 files updated for the dates). The design canvases are being republished with the same files.
 
