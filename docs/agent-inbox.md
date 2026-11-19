@@ -5898,7 +5898,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** on a tablet (or a large emulator) in landscape and portrait, reach each of these screens and check that nothing opens full screen where the mock-up shows a dialog, sheet or banner.
 
-## [ ] 2026-11-19-294 iPad follows the Android tablet
+## [x] 2026-11-19-294 iPad follows the Android tablet
+
+Done in iPad follows the Android tablet: the iPad uses the width-based layouts of task 293 (two panes, dialogs from 768 px); the dialogs take iOS sheet corners; checked in headless Chrome with `?theme=ios` at 1024x768 (sidebar, two panes). **Left:** no iPad-specific screens were drawn; action sheets for destructive confirmations and the Files picker are those of the iPhone; Sign in with Apple and the App Store subscription screens wait for task 289 and the Mac.
 
 Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
 
@@ -5986,7 +5988,9 @@ Christian approved this on 19 November 2026. Work in `main`. The sample logbook 
 
 **Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
 
-## [ ] 2026-11-19-300 iPhone About screen, tablet portrait layouts
+## [x] 2026-11-19-300 iPhone About screen, tablet portrait layouts
+
+Done in iPhone About buttons and tablet portrait: the About texts and buttons already followed task 296; on iOS the two buttons are 50 pt with 14 pt corners and 17 pt text; « Bibliothèques libres » keeps the Framework7 list, which draws iOS style on iOS. In portrait, the offline maps screen puts « Ajouter une région » under the list (the pane is too narrow for two columns). The banners, site search, reminder switch and Bluetooth card use the same width-based code as landscape and were checked in landscape only, except the maps screen (800x1280). **Left:** the « ‹ Réglages » text on the iPhone About back button (the iOS back button here is the round icon of the other iOS pages); « Modifier l’ordinateur » is still a page, not a side sheet; the 340 dp left pane of the maps screen in portrait was replaced by the stacked layout.
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
 

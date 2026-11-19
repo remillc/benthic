@@ -577,6 +577,31 @@
       min-width: 0;
     }
 
+    /* Tablet in portrait (task 2026-11-19-300): the detail pane is too narrow for two columns, the add pane goes under the list. */
+    @media (orientation: portrait) {
+      .od-settings-maps--panes {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .od-settings-maps--list-pane {
+        flex: none;
+      }
+
+      .od-settings-maps--add-pane {
+        flex: none;
+        align-self: auto;
+        margin: 16px 12px 24px;
+        padding-bottom: 20px;
+        border-radius: 28px;
+      }
+
+      :global(.ios) .od-settings-maps--add-pane {
+        border-radius: 10px;
+        border-left: none;
+      }
+    }
+
     .od-settings-maps--list-pane {
       flex: 1 1 0;
     }
