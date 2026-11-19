@@ -17,6 +17,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -80,21 +82,7 @@
   }
 </script>
 
-<Page class="od-cert">
-  <Navbar>
-    {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('diverProfile.certs.back')}</span>
-      </Link>
-    {/snippet}
-    {#snippet title()}{agency}{/snippet}
-    {#snippet right()}
-      <button type="button" class="link icon-only od-cert--bar" disabled={!photo} onclick={() => (full = true)} aria-label={t('diverProfile.cert.fullscreen')}><Icon name="fullscreen" /></button>
-      <a href={`/profile/certs/${id}/edit`} class="link icon-only" aria-label={t('diverProfile.cert.edit')}><Icon name="edit" /></a>
-      <button type="button" class="link icon-only od-cert--bar" onclick={more} aria-label={t('diverProfile.cert.menu')}><Icon name="more" /></button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -121,6 +109,28 @@
       {#if card.issuedOn}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.date')}</span><span class="od-cert--value">{formatLongDate(card.issuedOn)}</span></div>{/if}
       {#if card.instructor}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.instructor')}</span><span class="od-cert--value">{card.instructor}</span></div>{/if}
     </div>
+  {/if}
+{/snippet}
+
+<Page class="od-cert">
+  <Navbar>
+    {#snippet left()}
+      <Link back iconOnly>
+        <i class="icon icon-back"></i>
+        <span class="od-sr-only">{t('diverProfile.certs.back')}</span>
+      </Link>
+    {/snippet}
+    {#snippet title()}{agency}{/snippet}
+    {#snippet right()}
+      <button type="button" class="link icon-only od-cert--bar" disabled={!photo} onclick={() => (full = true)} aria-label={t('diverProfile.cert.fullscreen')}><Icon name="fullscreen" /></button>
+      <a href={`/profile/certs/${id}/edit`} class="link icon-only" aria-label={t('diverProfile.cert.edit')}><Icon name="edit" /></a>
+      <button type="button" class="link icon-only od-cert--bar" onclick={more} aria-label={t('diverProfile.cert.menu')}><Icon name="more" /></button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="certs">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
   {/if}
 </Page>
 

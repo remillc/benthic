@@ -11,7 +11,7 @@ import { noteFirstOpen } from './lib/review-prompt.js';
 import { releaseLaunchScreen } from './lib/launch.js';
 import { deviceStore } from './lib/device-store.js';
 import { installRippleFix } from './lib/ripple-fix.js';
-import { settingsWindow } from './lib/layout.svelte.js';
+import { sideWindow } from './lib/layout.svelte.js';
 import { startErrorReports } from './lib/error-reports.svelte.js';
 
 observePaints();
@@ -20,10 +20,10 @@ mark('main');
 // built: the settings of this device first, then the account and the device's
 // copy of the log (on a first launch, nothing is loaded until a choice).
 // The Mac's Réglages window shows the settings only: the main window owns the logbook.
-if (!settingsWindow) noteFirstOpen();
+if (!sideWindow) noteFirstOpen();
 // The paper grain trial's choice (task 2026-11-13-108): the grain is now always on (task 109).
 deviceStore.removeItem('od.paperGrain');
-if (!settingsWindow) boot();
+if (!sideWindow) boot();
 installRippleFix();
 // Error reports (task #102): the catchers start with the app; a report is only ever offered, never sent without a tap.
 startErrorReports({

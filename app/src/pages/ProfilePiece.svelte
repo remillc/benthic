@@ -20,6 +20,8 @@
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -128,35 +130,7 @@
   }
 </script>
 
-<Page class="od-piece-page">
-  <Navbar>
-    {#snippet left()}
-      <BackLink label={t('gear.profile.equipment')} name={t('gear.piece.back')} />
-    {/snippet}
-    {#snippet right()}
-      {#if piece}
-        <a
-          href={`/profile/gear/${id}/edit`}
-          class="link icon-only external"
-          role="button"
-          onclick={(e) => {
-            if (gear.readOnly) {
-              e.preventDefault();
-              refused();
-            } else {
-              e.preventDefault();
-              f7router.navigate(`/profile/gear/${id}/edit`);
-            }
-          }}
-        >
-          <Icon name="edit" /><span class="od-sr-only">{t('gear.piece.edit')}</span>
-        </a>
-        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.piece.more')}</span>
-        </a>
-      {/if}
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -202,6 +176,42 @@
     </p>
   {:else if loaded}
     <p class="od-piece-page--last">{t('gear.inventory.noResults')}</p>
+  {/if}
+{/snippet}
+
+<Page class="od-piece-page">
+  <Navbar>
+    {#snippet left()}
+      <BackLink label={t('gear.profile.equipment')} name={t('gear.piece.back')} />
+    {/snippet}
+    {#snippet right()}
+      {#if piece}
+        <a
+          href={`/profile/gear/${id}/edit`}
+          class="link icon-only external"
+          role="button"
+          onclick={(e) => {
+            if (gear.readOnly) {
+              e.preventDefault();
+              refused();
+            } else {
+              e.preventDefault();
+              f7router.navigate(`/profile/gear/${id}/edit`);
+            }
+          }}
+        >
+          <Icon name="edit" /><span class="od-sr-only">{t('gear.piece.edit')}</span>
+        </a>
+        <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
+          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.piece.more')}</span>
+        </a>
+      {/if}
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="gear" list="gear" selected={id}>{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
   {/if}
 </Page>
 

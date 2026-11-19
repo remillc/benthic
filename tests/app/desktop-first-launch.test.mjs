@@ -262,7 +262,7 @@ test('the window without a logbook creates through the main process; the rest ru
   // Elsewhere (the first start of the logbook of this computer) nothing changes.
   assert.match(steps, /if \(windowTakes\) \{\s*try \{\s*await createInWindow\(\{ where: 'computer' \}\);[\s\S]*?return;\s*\}\s*try \{\s*rememberName\(\);/);
   const app = read('App.svelte');
-  assert.match(app, /desktopApp && !noLogbook && !settingsWindow && !logbook\.loading && !logbook\.welcome && !logbook\.error\) void resumePendingImport\(\)/);
+  assert.match(app, /desktopApp && !noLogbook && !sideWindow && !logbook\.loading && !logbook\.welcome && !logbook\.error\) void resumePendingImport\(\)/);
   assert.match(read('lib/desktop-pending-import.js'), /takePending\(sessionStorage\)/);
 });
 

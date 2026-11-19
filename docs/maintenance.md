@@ -16,7 +16,7 @@ Decided by Christian on 19 November 2026.
 
 libdivecomputer is pinned inside the Subsurface submodule, so it moves with the core. Whenever it is updated:
 
-- Update the dive computer images. They are hosted on the OpenDives+ server, are free for everyone (decided 19 November 2026, to show the quality of the app), so they must be downloadable without an account, and the app downloads each one on demand, then keeps it on the device for good (idea #65, decided 19 November 2026). New models in libdivecomputer need their image added to the server.
+- Update the dive computer images. They are hosted on the OpenDives+ server, are free for everyone (decided 19 November 2026, to show the quality of the app), so they must be downloadable without an account. A model without an image keeps the generic computer icon (decided 19 November 2026). The app downloads each one on demand, then keeps it on the device for good (idea #65, decided 19 November 2026). New models in libdivecomputer need their image added to the server.
 - Check that the manufacturer and model pairs in the app still match the libdivecomputer list.
 
 Decided by Christian on 19 November 2026: the images are updated when libdivecomputer is updated.

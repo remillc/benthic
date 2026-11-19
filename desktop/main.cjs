@@ -71,6 +71,10 @@ let windows = null;
 
 /** @type {import('electron').BrowserWindow|null} */
 let settingsWin = null;
+/** @type {import('electron').BrowserWindow|null} */
+let profileWin = null;
+/** « Mon profil de plongeur » is an OpenDives+ feature: the menu item is on while the interface says the diver has it. */
+let profileAvailable = false;
 
 /**
  * The Mac's Réglages window (task 2026-11-15-202, bureau-reglages-macos): the same app loaded at
@@ -104,6 +108,39 @@ function openSettingsWindow() {
   settingsWin.loadURL(url.toString());
   settingsWin.on('closed', () => {
     settingsWin = null;
+  });
+}
+
+/**
+ * The Mac's « Mon profil de plongeur » window (task 2026-11-18-277, bureau-profil-macos): the same app loaded at
+ * `?profile-window=1` (the profile's panes only, the logbook stays with the main window), one at a time.
+ */
+function openProfileWindow() {
+  if (profileWin && !profileWin.isDestroyed()) {
+    if (profileWin.isMinimized()) profileWin.restore();
+    profileWin.focus();
+    return;
+  }
+  profileWin = new BrowserWindow({
+    width: 1180,
+    height: 760,
+    minWidth: 900,
+    minHeight: 560,
+    show: false,
+    title: 'OpenDives',
+    backgroundColor: '#F5F4F0',
+    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false },
+  });
+  profileWin.once('ready-to-show', () => profileWin?.show());
+  profileWin.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https?:/.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  const url = new URL(devUrl || 'app://opendives/index.html');
+  url.searchParams.set('profile-window', '1');
+  profileWin.loadURL(url.toString());
+  profileWin.on('closed', () => {
+    profileWin = null;
   });
 }
 
@@ -143,7 +180,9 @@ function rebuildMenu() {
   Menu.setApplicationMenu(
     buildMenu(menuTexts(), sendMenu, {
       recent: windows.recent(),
+      profileAvailable,
       actions: {
+        openProfile: () => openProfileWindow(),
         pickAndOpen: () => windows.pickAndOpen(BrowserWindow.getFocusedWindow()),
         openRecent: (id) => windows.handle({ sender: BrowserWindow.getFocusedWindow()?.webContents }, 'open', { id }).catch((e) => console.error('[desktop]', e.message)),
         clearRecent: () => windows.handle({}, 'clearRecent'),
@@ -196,6 +235,18 @@ app.whenReady().then(() => {
   ipcMain.handle('od:crash', (_event, op) => {
     if (op === 'clear') crashes.clear();
     return { ok: true, value: op === 'pending' ? crashes.pending() : true };
+  });
+  ipcMain.handle('od:profileAvailable', (_event, on) => {
+    const next = !!on;
+    if (next !== profileAvailable) {
+      profileAvailable = next;
+      rebuildMenu();
+    }
+    return { ok: true, value: true };
+  });
+  ipcMain.handle('od:profileWindow', () => {
+    openProfileWindow();
+    return { ok: true, value: true };
   });
   ipcMain.handle('od:settingsWindow', () => {
     openSettingsWindow();

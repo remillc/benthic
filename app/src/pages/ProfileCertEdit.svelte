@@ -18,9 +18,13 @@
   import { AGENCIES, LEVEL_SUGGESTIONS, certificationProblems } from '../lib/profile.js';
   import { scanCard, parseCardText } from '../lib/card-scan.js';
   import { toJpegBytes, photoUrl } from '../lib/card-canvas.js';
+  import CardPhotoDialog from '../components/CardPhotoDialog.svelte';
+  import { desktopApp } from '../lib/layout.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -66,8 +70,27 @@
   const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
   const canSave = $derived(!Object.keys(problems).length && !(agency === 'other' && !agencyName.trim()) && !saving && !gear.readOnly);
 
+  /** The side whose photo the desktop's dialog is asking for (a computer has no camera nor scanner). @type {'front'|'back'|null} */
+  let photoDialog = $state(null);
+
+  /** The straightened card from the desktop's dialog. @param {'front'|'back'} side @param {Blob} image */
+  async function useDesktopPhoto(side, image) {
+    photoDialog = null;
+    try {
+      const bytes = await toJpegBytes(image);
+      if (photos[side].url) URL.revokeObjectURL(photos[side].url);
+      photos[side] = { bytes, url: photoUrl(bytes) };
+    } catch {
+      showSnackbar(t('diverProfile.cert.photoFailed'));
+    }
+  }
+
   /** @param {'front'|'back'} side */
   async function pick(side) {
+    if (desktopApp) {
+      photoDialog = side;
+      return;
+    }
     try {
       const scanned = await scanCard(side);
       if (!scanned) return;
@@ -135,18 +158,7 @@
   </div>
 {/snippet}
 
-<Page class="od-cert-edit">
-  <Navbar>
-    {#snippet left()}
-      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.cert.close')}</span>
-      </a>
-    {/snippet}
-    {#snippet title()}{id ? t('diverProfile.cert.edit') : t('diverProfile.cert.new')}{/snippet}
-    {#snippet right()}
-      <button type="button" class="od-cert-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.cert.save')}</button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -167,7 +179,31 @@
     <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={t('diverProfile.cert.instructorHint')} />
   </div>
   <div class="od-cert-edit--bottom"></div>
+{/snippet}
+
+<Page class="od-cert-edit">
+  <Navbar>
+    {#snippet left()}
+      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
+        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.cert.close')}</span>
+      </a>
+    {/snippet}
+    {#snippet title()}{id ? t('diverProfile.cert.edit') : t('diverProfile.cert.new')}{/snippet}
+    {#snippet right()}
+      <button type="button" class="od-cert-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.cert.save')}</button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="certs" bar="dialog" size="l">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
+
+{#if photoDialog}
+  {@const side = photoDialog}
+  <CardPhotoDialog {side} oncancel={() => (photoDialog = null)} onuse={(image) => useDesktopPhoto(side, image)} />
+{/if}
 
 <style>
   @layer od.components {

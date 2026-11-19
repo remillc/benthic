@@ -11,6 +11,8 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   const name = $derived(logbook.email || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
@@ -24,12 +26,7 @@
   );
 </script>
 
-<Page class="od-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
-  <Navbar title={t('gear.profile.title')}>
-    {#snippet left()}
-      <BackLink label={t('account.title')} name={t('gear.piece.back')} />
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <div class="od-profile--hero">
     <span class="od-profile--initial" aria-hidden="true">{initial}</span>
@@ -77,6 +74,19 @@
   </div>
 
   <p class="od-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
+{/snippet}
+
+<Page class="od-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
+  <Navbar title={t('gear.profile.title')}>
+    {#snippet left()}
+      <BackLink label={t('account.title')} name={t('gear.piece.back')} />
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="gear" list="gear" bar="none" />
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <style>

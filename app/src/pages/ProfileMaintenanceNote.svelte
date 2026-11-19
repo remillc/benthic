@@ -21,6 +21,8 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string>, query?: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -100,18 +102,7 @@
   }
 </script>
 
-<Page class="od-maintenance-note">
-  <Navbar>
-    {#snippet left()}
-      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('maintenance.note.close')}</span>
-      </a>
-    {/snippet}
-    {#snippet title()}{t('maintenance.note.title')}{/snippet}
-    {#snippet right()}
-      <button type="button" class="od-maintenance-note--save" disabled={!canSave} onclick={save}>{t('maintenance.note.save')}</button>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -153,6 +144,25 @@
     <p class="od-maintenance-note--next"><Icon name="info" size={18} /><span>{nextLine}</span></p>
   </div>
   <div class="od-maintenance-note--bottom"></div>
+{/snippet}
+
+<Page class="od-maintenance-note">
+  <Navbar>
+    {#snippet left()}
+      <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
+        <Icon name="close" /><span class="od-sr-only">{t('maintenance.note.close')}</span>
+      </a>
+    {/snippet}
+    {#snippet title()}{t('maintenance.note.title')}{/snippet}
+    {#snippet right()}
+      <button type="button" class="od-maintenance-note--save" disabled={!canSave} onclick={save}>{t('maintenance.note.save')}</button>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="maintenance" list="maintenance" selected={gearId} bar="dialog" size="s">{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <style>

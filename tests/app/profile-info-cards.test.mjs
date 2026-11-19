@@ -327,7 +327,7 @@ test('« Nouveau brevet »: the scan fills agency, level, number and date with t
   assert.ok(page.includes('readFrom.issuedOn = issuedOn = found.issuedOn'));
   assert.ok(page.includes("readFrom[field] === value ? t('diverProfile.cert.readMark')"), 'the mark shows only while the field still holds the scanned value');
   assert.ok(page.includes('if (!scanned) return;'), 'a cancel changes nothing');
-  assert.equal(page.split('showSnackbar(').length - 1, 3, 'only the save and photo failures show a message: nothing read stays silent');
+  assert.equal(page.split('showSnackbar(').length - 1, 4, 'only the save and photo failures (on the phone and in the desktop dialog) show a message: nothing read stays silent');
   for (const lang of ['fr', 'en']) {
     const j = JSON.parse(read(`i18n/${lang}.json`)).diverProfile.cert;
     for (const k of ['photoFront', 'photoBack', 'photoReplace', 'readMark', 'photoHint', 'sideFront', 'sideBack']) assert.ok(j[k], `${lang} ${k}`);

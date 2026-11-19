@@ -122,6 +122,7 @@
       "one": "{n} plongée importée",
       "other": "{n} plongées importées"
     },
+    "importedFrom": {"one": "{n} plongée importée depuis « {name} »", "other": "{n} plongées importées depuis « {name} »"},
     "importTitle": "Importer un fichier",
     "importNothingNew": "Toutes les plongées de ce fichier sont déjà dans le carnet. Aucune plongée n'a été modifiée.",
     "importNoDives": "Ce fichier ne contient aucune plongée. Aucune plongée n'a été modifiée.",
@@ -724,6 +725,7 @@
       "setpointsText": "La valeur visée",
       "ocDiluent": "Gaz en circuit ouvert comme diluant",
       "o2consumption": "Consommation métabolique d’O₂ (pSCR)",
+      "o2consumptionText": "En l/min ou en pi³/min, selon l’unité de Volume",
       "o2consumptionDialog": "En litres par minute.",
       "o2consumptionDialogCuft": "En pieds cubes par minute.",
       "dilution": "Rapport de dilution (pSCR)",
@@ -1264,6 +1266,7 @@
     "sheet": {
       "backup": "Sauvegarde et restauration",
       "backupText": "Revenir à une version du carnet ou d’une plongée",
+      "plusDives": {"one": "OpenDives+ · {n} plongée", "other": "OpenDives+ · {n} plongées"},
       "maintenanceLate": {
         "one": "Entretien : {n} pièce en retard",
         "other": "Entretien : {n} pièces en retard"
@@ -2828,7 +2831,10 @@
       "Rapports d’erreur : après une erreur ou un arrêt de l’app, la version, le système, l’appareil, la page ouverte, le message d’erreur et les dernières lignes du journal s’affichent dans une feuille avec « Envoyer » et « Ne pas envoyer ». Rien n’est envoyé sans cet appui ; sans connexion, le rapport est gardé et reproposé plus tard. Le rapport ne contient ni plongée, ni site, ni nom, ni compte ; il est conservé 180 jours.",
       "Export de tout le carnet : le fichier porte le nom du carnet et la date, par exemple « carnet-de-roger-2026-11-19.ssrf ».",
       "Offre OpenDives+ : l’en-tête devient « L’offre OpenDives+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour ».",
-      "À propos : « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. », un bloc « Libre, et votre carnet aussi » (l’offre de base reste gratuite, le code est sur GitHub, le carnet est exportable en tout temps) avec « Voir sur GitHub » (logo de GitHub) et « Exporter mon carnet » (icône de téléchargement), l’un sous l’autre sur téléphone et côte à côte sur tablette ; sur ordinateur, un seul paragraphe et les deux boutons. « Tout ce qui est inclus » dit sous son titre ce qu’il liste."
+      "À propos : « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. », un bloc « Libre, et votre carnet aussi » (l’offre de base reste gratuite, le code est sur GitHub, le carnet est exportable en tout temps) avec « Voir sur GitHub » (logo de GitHub) et « Exporter mon carnet » (icône de téléchargement), l’un sous l’autre sur téléphone et côte à côte sur tablette ; sur ordinateur, un seul paragraphe et les deux boutons. « Tout ce qui est inclus » dit sous son titre ce qu’il liste.",
+      "Tablette en paysage et ordinateur : « Mon profil de plongeur » s’affiche en volets : le profil à gauche, la liste (équipement ou entretien) au milieu, la fiche à droite. Les formulaires (nouvelle pièce, nouveau kit, nouveau brevet, noter une révision) s’ouvrent dans une fenêtre centrée ; les types de pièce forment une grille de 3 × 3. Sur ordinateur, la photo d’un brevet se choisit, se dépose ou se colle (Ctrl+V) ; la carte est recadrée et redressée, avec « Retirer les reflets » et « Ajuster les coins ». Sur Mac, « Mon profil de plongeur… » (⇧⌘P) ouvre le profil dans sa propre fenêtre. « Vos données de santé » et « Votre carnet est prêt » se présentent dans le panneau bleu. Sur ordinateur, le + du carnet ne reste plus affiché au-dessus d’une page ouverte à droite.",
+      "Ordinateur : la feuille du compte d’un abonné OpenDives+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
+      "Ordinateur : « Partager » s’ouvre en boîte de dialogue au milieu de la fenêtre ; un clic sur un voyage du carnet affiche la page du voyage à droite (le chevron le replie) ; l’import d’un fichier dit d’où viennent les plongées (« 1 plongée importée depuis « … » ») avec Annuler ; « Plans enregistrés » ouvre un volet « Plongées planifiées » avec « Nouveau plan » ; dans Réglages › Recycleur, la consommation d’O₂ dit qu’elle suit l’unité de Volume."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4860,6 +4866,7 @@
     "macMenu": {
       "about": "À propos d'OpenDives",
       "settings": "Réglages…",
+      "profile": "Mon profil de plongeur…",
       "services": "Services",
       "hide": "Masquer OpenDives",
       "hideOthers": "Masquer les autres",
@@ -5334,7 +5341,9 @@
       "noPiece": "Aucune pièce",
       "informationLine": "Contact d’urgence, santé",
       "certificationsLine": "{n} brevets",
-      "noCertification": "Aucun brevet"
+      "noCertification": "Aucun brevet",
+      "keptWide": "Gardé sur votre compte OpenDives+ et sur cet appareil, même sans réseau.",
+      "paneEmpty": "Choisissez un élément pour le voir ici"
     },
     "inventory": {
       "title": "Équipement",
@@ -5849,6 +5858,7 @@
       "photoHint": "Scannez la carte : l’app y lit l’agence, le niveau et le numéro. Vérifiez-les.",
       "photoRemove": "Retirer la photo",
       "photoFailed": "La photo n’a pas pu être lue.",
+      "photoDialog": {"title": "Vérifier la photo", "titleFront": "Photo du recto", "titleBack": "Photo du verso", "drop": "Déposez une image ici", "paste": "ou collez-la avec Ctrl+V", "choose": "Choisir une image", "before": "Avant", "after": "Après", "framed": "Recadrée sur la carte", "notFramed": "Carte non trouvée : ajustez les coins", "straightened": "Redressée", "glare": "Retirer les reflets", "local": "Le traitement se fait sur votre appareil. La photo n’est envoyée nulle part.", "adjust": "Ajuster les coins", "adjustDone": "Terminer l’ajustement", "other": "Choisir une autre image", "use": "Utiliser la photo"},
       "agency": "Agence",
       "agencyName": "Nom de l’agence",
       "agencyOther": "Autre agence",

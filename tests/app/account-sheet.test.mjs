@@ -371,7 +371,7 @@ test('the free sheet opens the offer for both OpenDives+ rows; the subscriber sh
   assert.match(sheet, /\{#if subscriber\}\s*<div class="od-account-sheet--divider od-account-sheet--margin"><\/div>\s*<a href="#backup"/);
   assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
   assert.match(desktopSheet, /leaveTo\(openBackup\)/);
-  assert.match(desktopSheet, /leaveTo\(\(\) => openOver\('\/profile'\)\)/);
+  assert.match(desktopSheet, /leaveTo\(openProfile\)/);
   assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*if \(layout\.desktop\) navigation\.backupOpen = true;\s*else openOver\('\/account\/backup'\);/);
   // The subscriber's entries carry no chip, whatever the platform; the history icon and the new texts are on all three sheets.
   for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'))], ['desktop', desktopSheet]]) {
@@ -408,7 +408,7 @@ test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sau
   for (const [name, source, profile, backup] of [
     ['Android phone and tablet', android, 'href="#profile"', 'href="#backup"'],
     ['iPhone', iphone, "openOver('/profile')", 'go(openBackup)'],
-    ['desktop', desktopSheet, "leaveTo(() => openOver('/profile'))", 'leaveTo(openBackup)'],
+    ['desktop', desktopSheet, "leaveTo(openProfile)", 'leaveTo(openBackup)'],
   ]) {
     const p = source.indexOf(profile, source.indexOf('{#if subscriber}') >= 0 ? 0 : 0);
     const b = source.indexOf(backup);

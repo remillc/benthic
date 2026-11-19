@@ -36,6 +36,8 @@ export const desk = $state({
   columnWidths: {},
   /** @type {Record<number, boolean>} */
   collapsed: {},
+  /** The trip whose page the detail pane shows (task 2026-11-19-297, bureau-voyage), else null: a trip row is selected. @type {number|null} */
+  trip: null,
   /** Width of the table's pane, in px (the detail takes the rest); null until the diver moves the handle (desktop-table.js, tableWidthFor). */
   tableWidth: /** @type {number|null} */ (null),
   /** The extra values of the columns, by dive id (the core's dive_columns). */

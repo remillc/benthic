@@ -9,14 +9,14 @@
   import { OpenDivesCore } from 'opendives-core';
   import DesktopField from './DesktopField.svelte';
   import DesktopContextMenu from './DesktopContextMenu.svelte';
-  import ChoiceDialog from './ChoiceDialog.svelte';
   import PlanTitleDialog from './PlanTitleDialog.svelte';
   import PlanSlate from './PlanSlate.svelte';
   import ShareSheet from './ShareSheet.svelte';
+  import DesktopPlansPanel from './DesktopPlansPanel.svelte';
   import QrShare from './QrShare.svelte';
   import Icon from './Icon.svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { cleanPlanTitle, planRowTitle } from '../lib/plan-title.js';
+  import { cleanPlanTitle } from '../lib/plan-title.js';
   import { logbook, savePlan } from '../lib/logbook.svelte.js';
   import { planner, loadSetup, adoptUnitDefaults, planRequest, startFromDive, startNewDive, requestOfPlan, applyRequest, nextGas, planSettings } from '../lib/planner.svelte.js';
   import { desktopTools } from '../lib/desktop-tools.svelte.js';
@@ -24,7 +24,7 @@
   import { openOver } from '../lib/navigation.svelte.js';
   import { planRows } from '../lib/plan-rows.js';
   import { waterBottomColor } from '../lib/water-column.js';
-  import { formatDateTime, formatDuration, formatGasVolume, formatGasLong, formatMixName, formatNumber, formatPartialPressure, formatShortDate, depthUnit, locale } from '../lib/format.js';
+  import { formatDateTime, formatDuration, formatGasVolume, formatGasLong, formatMixName, formatNumber, formatPartialPressure, depthUnit, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { WATER_TYPES, formatHoursMinutes, pressureToAltitudeMm, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
@@ -408,24 +408,13 @@
 
   async function openSaved() {
     try {
-      const plans = await OpenDivesCore.listPlans();
-      if (!plans.length) {
-        showSnackbar(t('plans.empty'));
-        return;
-      }
-      savedPlans = plans;
+      // The side panel shows an empty list too (« Nouveau plan » is in it).
+      savedPlans = await OpenDivesCore.listPlans();
     } catch (e) {
       console.error('Planned dives', e);
       showSnackbar(t('plans.failed'));
     }
   }
-  const savedOptions = $derived(
-    (savedPlans ?? []).map((p) => ({
-      value: String(p.id),
-      label: planRowTitle(p.title, t('plans.fallbackTitle', { date: formatShortDate(p.date) })).text,
-      example: formatShortDate(p.date),
-    })),
-  );
   /** @param {string} id */
   async function savedChosen(id) {
     savedPlans = null;
@@ -666,7 +655,7 @@
   <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
 {/if}
 {#if savedPlans}
-  <ChoiceDialog title={t('desktopTools.savedPlans')} options={savedOptions} value={String(planner.planId || savedPlans[0]?.id)} onselect={savedChosen} oncancel={() => (savedPlans = null)} />
+  <DesktopPlansPanel plans={savedPlans} openId={planner.planId} onchoose={(id) => savedChosen(String(id))} onnew={() => ((savedPlans = null), startNewDive(prefs))} onclose={() => (savedPlans = null)} />
 {/if}
 {#if titling}
   <PlanTitleDialog title={planner.title} oncancel={() => (titling = false)} onsave={saveWith} />

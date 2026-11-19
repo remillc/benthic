@@ -12,7 +12,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import OdPlusChip from './OdPlusChip.svelte';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
@@ -112,7 +112,71 @@
   }
 </script>
 
-{#if navigation.accountOpen}
+{#if navigation.accountOpen && subscriber}
+  <!-- An OpenDives+ account (task 2026-11-19-292, docs/mockups/bureau-profil-compte.dc.html): the logo, the account group
+       (the buttons beside what they act on), « Mon profil de plongeur » and the backup, then Réglages and À propos, each
+       entry with its icon in a small blue tile. No close button: a click outside or Esc closes it. -->
+  <div class="od-desktop-account od-desktop-account--plus" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
+    <div class="od-desktop-account--brand">
+      <img class="od-desktop-account--logo od-desktop-account--light" src="/logo-light.svg" alt="" width="24" height="24" />
+      <img class="od-desktop-account--logo od-desktop-account--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
+      <span class="od-desktop-account--brand-name"><span aria-hidden="true">{t('menu.title')}<span class="od-desktop-account--dot">+</span></span><span class="od-sr-only">{t('odplus.chipName')}</span></span>
+    </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
+
+    <div class="od-desktop-account--group">
+      <div class="od-desktop-account--identity">
+        <span class="od-desktop-account--avatar" aria-hidden="true">{initial}<span class="od-desktop-account--avatar-plus">+</span></span>
+        <span class="od-desktop-account--texts">
+          <span class="od-desktop-account--name">{accountName}</span>
+          <span class="od-desktop-account--status">{t('account.sheet.plusDives', { n: logbook.dives.length })}</span>
+          <button type="button" class="od-outlined-button od-desktop-account--manage" onclick={manage}>{t('nav.manageAccount')}</button>
+        </span>
+      </div>
+      {#if !logbook.loading && !logbook.error}
+        <div class="od-desktop-account--divider-line"></div>
+        <div class="od-desktop-account--syncline">
+          {#if logbook.syncFailure}
+            <SyncFailureRow />
+          {:else}
+            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+          {/if}
+          <SyncButton />
+        </div>
+      {/if}
+    </div>
+
+    <div class="od-desktop-account--group">
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openProfile)}>
+        <span class="od-desktop-account--tile"><Icon name="account" size={22} /></span>
+        <span class="od-desktop-account--row-texts">
+          <span class="od-desktop-account--entry-title">{t('gear.profile.title')}</span>
+          <span class="od-desktop-account--row-line" class:od-desktop-account--late-line={late.late}>{late.late ? t('account.sheet.maintenanceLate', { n: late.badge }) : t('gear.profile.cardLine')}</span>
+        </span>
+        {#if late.late}<span class="od-desktop-account--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openBackup)}>
+        <span class="od-desktop-account--tile"><Icon name="history" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('account.sheet.backup')}</span><span class="od-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+
+    <div class="od-desktop-account--group">
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openSettings)}>
+        <span class="od-desktop-account--tile"><Icon name="settings" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('settings.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+      <button type="button" class="od-desktop-account--entry" onclick={() => leaveTo(openAbout)}>
+        <span class="od-desktop-account--tile"><Icon name="info" size={22} /></span>
+        <span class="od-desktop-account--row-texts"><span class="od-desktop-account--entry-title">{t('about.title')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
+    </div>
+  </div>
+{:else if navigation.accountOpen}
   <div class="od-desktop-account" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
     <div class="od-desktop-account--head">
       <span class="od-desktop-account--initial" class:od-desktop-account--silhouette={free} aria-hidden="true">
@@ -182,7 +246,7 @@
     {/if}
     {#if subscriber}
       <div class="od-desktop-account--divider"></div>
-      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(() => openOver('/profile'))}>
+      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(openProfile)}>
         <Icon name="briefcase" size={22} />
         <span class="od-desktop-account--row-texts">
           <span>{t('gear.profile.title')}</span>
@@ -410,6 +474,151 @@
     .od-desktop-account--sync :global(.od-sync-button) {
       background: var(--od-action);
       color: var(--od-on-action);
+    }
+
+    /* An OpenDives+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
+    .od-desktop-account--plus {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--od-background);
+    }
+    .od-desktop-account--brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 32px;
+    }
+    .od-desktop-account--brand-name {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .od-desktop-account--dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-left: 3px;
+      border-radius: 9px;
+      background: var(--od-account-chip);
+      color: var(--od-account-chip-ink);
+      font-size: 14px;
+      line-height: 1;
+      font-weight: 700;
+      vertical-align: 1px;
+    }
+    .od-desktop-account--dark,
+    :global(html.dark) .od-desktop-account--light {
+      display: none;
+    }
+    :global(html.dark) .od-desktop-account--dark {
+      display: inline;
+    }
+    .od-desktop-account--group {
+      border-radius: 20px;
+      background: var(--od-surface);
+      overflow: hidden;
+    }
+    .od-desktop-account--identity {
+      display: flex;
+      gap: 16px;
+      padding: 16px 16px 12px;
+    }
+    .od-desktop-account--avatar {
+      position: relative;
+      flex: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: var(--od-nav-avatar-ink);
+      color: #FFFFFF;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    .od-desktop-account--avatar-plus {
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 18px;
+      height: 18px;
+      box-sizing: border-box;
+      border: 2px solid var(--od-surface);
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: var(--od-account-chip);
+      color: var(--od-account-chip-ink);
+      font-size: 13px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .od-desktop-account--manage {
+      align-self: flex-start;
+      width: auto;
+      margin-top: 12px;
+    }
+    .od-desktop-account--divider-line {
+      height: 1px;
+      margin: 0 16px;
+      background: var(--od-separator);
+    }
+    .od-desktop-account--syncline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+    }
+    .od-desktop-account--syncline :global(.od-sync-button) {
+      flex: none;
+      white-space: nowrap;
+    }
+    .od-desktop-account--syncline :global(.od-sync-status) {
+      flex: 1;
+      min-width: 0;
+    }
+    .od-desktop-account--entry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 56px;
+      padding: 8px 16px;
+      border: 0;
+      background: none;
+      color: var(--od-text);
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+    }
+    .od-desktop-account--entry + .od-desktop-account--entry {
+      border-top: 1px solid var(--od-separator);
+    }
+    .od-desktop-account--entry:hover {
+      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    }
+    .od-desktop-account--entry:focus-visible {
+      outline: 2px solid var(--od-text);
+      outline-offset: -2px;
+    }
+    .od-desktop-account--tile {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--od-release-tile);
+      color: var(--od-release-tile-icon);
+    }
+    .od-desktop-account--entry-title {
+      font-size: 16px;
+      font-weight: 500;
     }
   }
 </style>

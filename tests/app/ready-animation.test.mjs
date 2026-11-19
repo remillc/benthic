@@ -67,7 +67,9 @@ test('the logo and the bubbles: the timings of the brief, on transform and opaci
 
 test('the screen claims the motion when the step appears and draws the profile band above the wave', () => {
   const screen = read('components/FirstLaunchOdPlus.svelte');
-  assert.match(screen, /claimReadyMotion\(\)/);
+  // The motion is decided in lib/ready-motion.svelte.js (shared with the blue panel of a tablet and the desktop).
+  assert.match(screen, /claimReady\(\)/);
+  assert.match(read('lib/ready-motion.svelte.js'), /claimReadyMotion\(\)/);
   assert.match(screen, /<OdPlusReadyLogo play=\{motion\.play\} \/>/);
   assert.match(screen, /od-plus-hero--profile/);
   assert.match(screen, /od-plus-hero--wave/);

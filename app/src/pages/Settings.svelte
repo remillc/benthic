@@ -669,6 +669,7 @@
           kind: 'number',
           id: 'o2consumption',
           label: t('settings.rebreather.o2consumption'),
+          text: t('settings.rebreather.o2consumptionText'),
           value: `${o2RateText(p.o2ConsumptionMlMin, cuft, locale)} ${sacUnit()}`,
           dialogText: t(cuft ? 'settings.rebreather.o2consumptionDialogCuft' : 'settings.rebreather.o2consumptionDialog'),
           wheels: () => {

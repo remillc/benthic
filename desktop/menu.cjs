@@ -10,7 +10,7 @@ const { Menu } = require('electron');
 /**
  * @param {any} texts the app's translations (app/src/i18n/<lang>.json)
  * @param {(command: string) => void} send
- * @param {{ recent?: { id: string, name: string, open: boolean }[], actions?: { pickAndOpen?: () => void, openRecent?: (id: string) => void, clearRecent?: () => void, closeLogbook?: () => void } }} [logbooks]
+ * @param {{ recent?: { id: string, name: string, open: boolean }[], profileAvailable?: boolean, actions?: { openProfile?: () => void, pickAndOpen?: () => void, openRecent?: (id: string) => void, clearRecent?: () => void, closeLogbook?: () => void } }} [logbooks]
  *   the recent logbooks and what the logbook items do in the main process (task 2026-11-15-173)
  * @returns {Menu}
  */
@@ -43,6 +43,7 @@ function buildMenu(texts, send, logbooks = {}) {
       submenu: [
         item(m.about, 'about'),
         { type: 'separator' },
+        { label: m.profile, accelerator: 'Shift+Cmd+P', enabled: !!logbooks.profileAvailable, click: () => actions.openProfile?.() },
         item(m.settings, 'settings', 'Cmd+,'),
         { type: 'separator' },
         { role: 'services', label: m.services },

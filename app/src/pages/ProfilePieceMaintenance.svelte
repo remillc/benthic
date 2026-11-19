@@ -17,6 +17,8 @@
   import { formatLongDate, formatNumber } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import ProfileFrame from '../components/ProfileFrame.svelte';
+  import { profileWide } from '../lib/profile-frame.js';
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -102,15 +104,7 @@
   const money = (cost) => formatNumber(cost, Number.isInteger(cost) ? 0 : 2);
 </script>
 
-<Page class="od-piece-maintenance" onPageBeforeIn={loadInventory}>
-  <Navbar title={t('maintenance.piece.title')}>
-    {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('maintenance.back')}</span>
-      </Link>
-    {/snippet}
-  </Navbar>
+{#snippet body()}
 
   <ReadOnlyNotice />
 
@@ -193,6 +187,22 @@
     <p class="od-piece-maintenance--note"><Icon name="info" size={18} /><span>{t('maintenance.piece.countNote')}</span></p>
   {/if}
   <div class="od-piece-maintenance--bottom"></div>
+{/snippet}
+
+<Page class="od-piece-maintenance" onPageBeforeIn={loadInventory}>
+  <Navbar title={t('maintenance.piece.title')}>
+    {#snippet left()}
+      <Link back iconOnly>
+        <i class="icon icon-back"></i>
+        <span class="od-sr-only">{t('maintenance.back')}</span>
+      </Link>
+    {/snippet}
+  </Navbar>
+  {#if profileWide()}
+    <ProfileFrame section="maintenance" list="maintenance" selected={id}>{@render body()}</ProfileFrame>
+  {:else}
+    {@render body()}
+  {/if}
 </Page>
 
 <MaintenanceRuleSheet
