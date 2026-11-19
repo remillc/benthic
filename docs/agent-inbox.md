@@ -5806,3 +5806,19 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 3. **Model thumbnail** (56 px, left of the « Modèle » field) in « Nouvelle pièce » on the Android tablet and desktop (`android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`), as on the phone (task 283).
 
 **Test:** open every desktop screen listed above: same list, weekday shown, one sticky year line. Add a « Saucisse » to a dive on desktop. Open « Nouvelle pièce » on tablet and desktop: thumbnail left of « Modèle ».
+
+## [ ] 2026-11-19-289 iPhone: catch up with Android (logbook, account, OpenDives+, diver profile, sites, cylinder types)
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. The iPhone app follows the Android behaviour of earlier tasks. These mock-ups show only what iOS changes. Screens not drawn (email sign-in, « Votre carnet est prêt », certifications, clean up sites…) work as on Android with iOS controls.
+
+1. **Logbook** (`ios-carnet`): large title « Carnet », « + » to add dives, the account initial with the « + » chip (subscribers), search field, dives grouped by year in inset lists (day and month on the left, site, « N° · hour », depth and duration on the right), the trip as a group header, tab bar.
+2. **Account sheet**, a page sheet with « OK »:
+   - subscriber (`ios-compte-abonne`): e-mail with the « + » chip, « Gérer le compte », sync status and « Synchroniser », « Mon profil de plongeur » with the OpenDives+ chip, red subtitle and badge (task 281), « Réglages », « À propos »;
+   - free (`ios-compte-gratuit`): « Carnet sur cet iPhone », « S'abonner », « Déjà abonné ? Se connecter », the two OpenDives+ entries, « Réglages », « À propos ».
+3. **Gérer le compte** (`compte-ios-connecte`): « Connexion avec Apple », « Gérer dans l'App Store » (opens the system subscription page), storage, download data, sign out, and **« Supprimer le compte » inside the app** (App Store requirement for apps with account creation).
+4. **OpenDives+ sign in and offer** (`ios-odplus-connexion`, `ios-odplus-offre`): « Continuer avec Apple » comes first on iOS. The offer adds « Restaurer les achats » and the auto-renewal terms (App Store requirements). Purchase with StoreKit.
+5. **Diver profile** (`ios-profil-plongeur`, `ios-profil-equipement`, `ios-ent-liste`): same content as Android in iOS lists. Back button labels, « + » in the navigation bar to add a piece. Equipment uses « Saucisse ».
+6. **Sites** (`ios-sites-fiche`, `ios-sites-modifier`): « Ouvrir dans Plans » (Apple Maps, or the default maps app). Editing is a form with « Annuler » / « OK ». « Supprimer le site » is a red row at the bottom.
+7. **Cylinder types** (`ios-reglages2-bouteilles`, `ios-reglages2-bouteille-vos-modifier`, `ios-reglages2-bouteille-supprimer`, and `ios-reglages-equipement` now links to the list): same rules as tasks 285 and 287. On iOS, « Supprimer ce type » is a red row, and the confirmation is an **action sheet** (« Supprimer « ALU 3L » » in red, « Annuler »), not a centred alert.
+
+**Test:** on an iPhone (or the simulator), walk through each screen above from the tab bar and the account initial.
