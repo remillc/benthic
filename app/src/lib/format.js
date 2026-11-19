@@ -193,6 +193,7 @@ export function formatPercent(permille) {
 // shown in UTC so that it is never shifted.
 const dateTimeFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' });
 const longDateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
+const monthYearFormat = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const dateOnlyFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' });
 const fullFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
 
@@ -265,6 +266,11 @@ const weekdayFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZo
  */
 export function formatWeekdayDate(iso) {
   return `${weekdayFormat.format(toDate(iso))} ${formatShortDate(iso)}`;
+}
+
+/** Month and year, for a date that is only known to the month (a cylinder's stamped test): "mars 2022". @param {string} iso */
+export function formatMonthYear(iso) {
+  return monthYearFormat.format(toDate(iso));
 }
 
 /** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */

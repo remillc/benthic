@@ -8,7 +8,8 @@
   import GearPicker from './GearPicker.svelte';
   import Icon from './Icon.svelte';
   import TextField from './TextField.svelte';
-  import { gear, visibleGear } from '../lib/inventory.svelte.js';
+  import { gear, visibleGear, evaluations } from '../lib/inventory.svelte.js';
+  import { taskLabel } from '../lib/maintenance-text.js';
   import { addToEquipment, groupGear, searchGear, adhocProblem } from '../lib/inventory.js';
   import { t } from '../lib/i18n.js';
 
@@ -41,6 +42,18 @@
   const ids = $derived(new Set(available.map((g) => g.id)));
   const kits = $derived(gear.kits.map((k) => ({ ...k, ours: k.gearIds.filter((id) => ids.has(id)) })).filter((k) => k.ours.length));
   const canAdd = $derived(selected.length > 0 || adhocProblem(adhocName) === '' && !!adhocName.trim());
+
+  /** The overdue reminders that warn in a dive, by piece: shown under the piece, which stays selectable (task 2026-11-19-308). */
+  const lateOf = $derived.by(() => {
+    /** @type {Map<string, string>} */
+    const map = new Map();
+    for (const e of evaluations()) {
+      if (e.status !== 'overdue' || !e.item.warnInDive) continue;
+      const text = t('maintenance.late', { task: taskLabel(e.item) });
+      map.set(e.item.gearId, map.has(e.item.gearId) ? `${map.get(e.item.gearId)} · ${text}` : text);
+    }
+    return map;
+  });
 
   /** A kit chip checks all its pieces, or clears them when they are all checked. @param {string[]} ours */
   function toggleKit(ours) {
@@ -76,7 +89,7 @@
       {/if}
 
       {#if groups.length}
-        <GearPicker {groups} bind:selected picker />
+        <GearPicker {groups} bind:selected picker warning={(g) => lateOf.get(g.id) ?? ''} />
       {:else}
         <p class="od-add-equipment--none">{t(query.trim() ? 'gear.addSheet.noResults' : 'gear.addSheet.empty')}</p>
       {/if}

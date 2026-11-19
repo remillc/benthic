@@ -88,6 +88,18 @@ export const SUGGESTIONS = {
 /** @param {string} type @returns {Suggestion[]} */
 export const suggestionsFor = (type) => SUGGESTIONS[type] ?? [];
 
+/**
+ * The date stamped on a cylinder (« 03/22 »: March 2022) as the first of that month, or null when the text is not one.
+ * @param {string} text @returns {string|null}
+ */
+export function parseStamp(text) {
+  const m = /^\s*(0?[1-9]|1[0-2])\s*\/\s*(\d{2})\s*$/.exec(text);
+  return m ? `20${m[2]}-${m[1].padStart(2, '0')}-01` : null;
+}
+
+/** The stamp of a date, « 03/22 ». @param {string} iso YYYY-MM-DD */
+export const stampOf = (iso) => `${iso.slice(5, 7)}/${iso.slice(2, 4)}`;
+
 /** @param {string} iso YYYY-MM-DD @returns {number} UTC midnight in ms */
 const day = (iso) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
 

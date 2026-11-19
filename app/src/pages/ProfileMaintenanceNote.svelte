@@ -14,7 +14,7 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import { gear, loadInventory, change } from '../lib/inventory.svelte.js';
   import { entryProblems } from '../lib/inventory.js';
-  import { todayIso, nextDueAfter } from '../lib/maintenance.js';
+  import { todayIso, nextDueAfter, parseStamp } from '../lib/maintenance.js';
   import { taskLabel } from '../lib/maintenance-text.js';
   import { photoToDataUrl } from '../lib/photo.js';
   import { formatLongDate } from '../lib/format.js';
@@ -49,7 +49,10 @@
   const shops = $derived(
     [...new Set(gear.maintenance.flatMap((m) => m.history ?? []).sort((a, b) => (a.doneOn < b.doneOn ? 1 : -1)).map((h) => h.doneBy ?? '').filter(Boolean))],
   );
-  const problems = $derived(entryProblems({ doneOn, cost }));
+  /** A hydrostatic test is dated by the stamp on the bottle (« 03/22 »: the first of March 2022), or by a full date. */
+  const hydro = $derived(item?.task === 'hydrostatic');
+  const effectiveDate = $derived((hydro ? parseStamp(doneOn) : null) ?? doneOn);
+  const problems = $derived(entryProblems({ doneOn: effectiveDate, cost }));
   const dateLive = liveError(
     () => doneOn,
     () => (problems.doneOn ? t('maintenance.note.dateInvalid') : ''),
@@ -63,7 +66,7 @@
   /** The note under the form: the next due date once this one is saved. */
   const nextLine = $derived.by(() => {
     if (!item || (item.intervalMonths == null && item.intervalDives == null)) return t('maintenance.note.nextNone');
-    const date = problems.doneOn ? null : nextDueAfter(item, doneOn);
+    const date = problems.doneOn ? null : nextDueAfter(item, effectiveDate);
     const n = item.intervalDives;
     if (date && n != null) return t('maintenance.note.nextBoth', { date: formatLongDate(date), n });
     if (date) return t('maintenance.note.nextDate', { date: formatLongDate(date) });
@@ -90,7 +93,7 @@
       const amount = cost.trim() ? Number(cost.trim().replace(',', '.')) : null;
       await change(async (inv) => {
         const invoicePhotoId = invoiceUrl ? await inv.savePhoto(invoiceUrl) : undefined;
-        await inv.noteMaintenance({ id: item?.id, gearId, task: item?.task ?? 'service', label: item?.label }, { kind, doneOn, doneBy, cost: amount, notes, invoicePhotoId });
+        await inv.noteMaintenance({ id: item?.id, gearId, task: item?.task ?? 'service', label: item?.label }, { kind, doneOn: effectiveDate, doneBy, cost: amount, notes, invoicePhotoId });
       });
       showSnackbar(t('maintenance.note.saved'));
       f7router.back();
@@ -123,7 +126,7 @@
     />
     <p class="od-maintenance-note--help">{t(`maintenance.kindHelp.${kind}`)}</p>
 
-    <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t('maintenance.note.dateHint')} />
+    <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t(hydro ? 'maintenance.note.stampHint' : 'maintenance.note.dateHint')} />
     <ComboField label={t('maintenance.note.doneBy')} bind:value={doneBy} options={shops} supporting={t('maintenance.note.doneByHint')} />
     <TextField label={t('maintenance.note.cost')} bind:value={cost} inputmode="decimal" invalid={!!costLive.error} supporting={costLive.error} />
     <TextField label={t('maintenance.note.notes')} bind:value={notes} multiline />

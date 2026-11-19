@@ -120,6 +120,7 @@
     "title": "Entretien",
     "entry": "Entretien",
     "piece": {
+      "noteHydrostatic": "Noter l’épreuve",
       "title": "Entretien",
       "cardTitle": "Entretien",
       "note": "Noter un entretien",

@@ -152,3 +152,22 @@ test('a retired piece and a dive computer have no reminder, no badge and no noti
   const back = evaluateAll({ items, pieces: [{ id: 'reg', type: 'regulator' }, { id: 'old', type: 'regulator' }], diveKeysOf: () => [], today });
   assert.deepEqual(back.map((e) => e.item.id).sort(), ['a', 'b']);
 });
+
+test('the stamp on a bottle: 03/22 is the first of March 2022, and back', async () => {
+  const { parseStamp, stampOf } = await import('../../app/src/lib/maintenance.js');
+  assert.equal(parseStamp('03/22'), '2022-03-01');
+  assert.equal(parseStamp(' 3 / 22 '), '2022-03-01');
+  assert.equal(parseStamp('13/22'), null);
+  assert.equal(parseStamp('2022-03-01'), null);
+  assert.equal(stampOf('2022-03-01'), '03/22');
+});
+
+test('adding an overdue piece to a dive: it stays selectable and says what is late, only when its reminder warns', () => {
+  const source = readFileSync(new URL('../../app/src/components/AddEquipmentSheet.svelte', import.meta.url), 'utf8');
+  assert.match(source, /e\.status !== 'overdue' \|\| !e\.item\.warnInDive\) continue/);
+  assert.match(source, /warning=\{\(g\) => lateOf\.get\(g\.id\) \?\? ''\}/);
+  const picker = readFileSync(new URL('../../app/src/components/GearPicker.svelte', import.meta.url), 'utf8');
+  assert.match(picker, /\{#if warning\(g\)\}<span class="od-gear-picker--warning"><Icon name="warning"/);
+  // The row is a checkbox button like any other: the warning does not disable it.
+  assert.match(picker, /role="checkbox" aria-checked=\{on\} \{disabled\}/);
+});

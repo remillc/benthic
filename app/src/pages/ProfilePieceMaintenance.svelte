@@ -10,12 +10,13 @@
   import GearIcon from '../components/GearIcon.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
-  import { gear, loadInventory, change, evaluations, figuresOf } from '../lib/inventory.svelte.js';
-  import { suggestionsFor, leadDays, ownLeadDays } from '../lib/maintenance.js';
+  import { gear, loadInventory, change, evaluations, figuresOf, diveKeysOf } from '../lib/inventory.svelte.js';
+  import { suggestionsFor, leadDays, ownLeadDays, stampOf } from '../lib/maintenance.js';
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel, tagText } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
-  import { formatLongDate, formatNumber } from '../lib/format.js';
+  import { formatLongDate, formatMonthYear, formatNumber, formatHours } from '../lib/format.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
@@ -30,7 +31,25 @@
   const piece = $derived(gear.pieces.find((g) => g.id === id));
   const all = $derived(evaluations().filter((e) => e.item.gearId === id));
   const withRule = $derived(all.filter((e) => e.active));
-  const figures = $derived(piece ? figuresOf(piece) : { dives: 0 });
+  const figures = $derived(piece ? figuresOf(piece) : { dives: 0, seconds: 0 });
+  const isCylinder = $derived(piece?.type === 'cylinder');
+
+  /** The date of a cylinder's hydrostatic test is known to the month (the stamp on the bottle). @param {import('../lib/maintenance.js').Evaluation} e @param {string} iso */
+  const dateText = (e, iso) => (e.item.task === 'hydrostatic' ? formatMonthYear(iso) : formatLongDate(iso));
+
+  /** The button of a card: « Noter l'inspection », « Noter l'épreuve » on a bottle, else « Noter un entretien ». @param {import('../lib/maintenance.js').Evaluation} e */
+  const noteLabel = (e) => (e.item.task === 'inspection' && isCylinder ? t('maintenance.piece.noteInspection') : e.item.task === 'hydrostatic' ? t('maintenance.piece.noteHydrostatic') : t('maintenance.piece.note'));
+
+  /** The line under a card's title: the rule, and for a hydrostatic test the stamp of the last one. @param {import('../lib/maintenance.js').Evaluation} e */
+  const ruleLine = (e) => (e.item.task === 'hydrostatic' && e.item.lastDoneOn ? t('maintenance.piece.stamped', { rule: ruleText(e.item), stamp: stampOf(e.item.lastDoneOn) }) : ruleText(e.item));
+
+  /** Hours under water since the last service, next to the dive count (« 82 plongées sur 100 · 61 h »). @param {import('../lib/maintenance.js').Evaluation} e */
+  function hoursSince(e) {
+    const since = new Set(diveKeysOf(e.item.gearId).filter((k) => (e.item.lastDoneOn ? k.slice(0, 10) > e.base : k.slice(0, 10) >= e.base)));
+    let seconds = 0;
+    for (const d of logbook.dives) if (since.has(String(d.date).slice(0, 19))) seconds += d.durationSeconds;
+    return seconds;
+  }
 
   /** The suggestions of the type that have no reminder yet: the first of them is offered as the next one to add. */
   const free = $derived(suggestionsFor(piece?.type ?? '').filter((s) => !all.some((e) => e.item.task === s.task && e.active)));
@@ -127,19 +146,22 @@
           <span class="od-piece-maintenance--task">{taskLabel(e.item)}</span>
           <span class="od-piece-maintenance--tag od-piece-maintenance--tag-{e.status}">{tagText(e)}</span>
         </div>
-        <p class="od-piece-maintenance--rule">{ruleText(e.item)}</p>
+        <p class="od-piece-maintenance--rule">{ruleLine(e)}</p>
         <div class="od-piece-maintenance--bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress(e) * 100)} aria-label={taskLabel(e.item)}>
           <span class="od-piece-maintenance--bar-fill od-piece-maintenance--bar-{e.status}" style:width={`${Math.round(progress(e) * 100)}%`}></span>
         </div>
         {#if e.item.intervalDives != null}
-          <p class="od-piece-maintenance--progress">{t('maintenance.piece.dives', { n: e.divesSince, done: e.divesSince, total: e.item.intervalDives })}</p>
+          <p class="od-piece-maintenance--progress">{t('maintenance.piece.dives', { n: e.divesSince, done: e.divesSince, total: e.item.intervalDives })}{#if hoursSince(e)} · {formatHours(hoursSince(e))}{/if}</p>
+        {/if}
+        {#if e.item.lastDoneOn}
+          <p class="od-piece-maintenance--progress">{t('maintenance.piece.last', { date: dateText(e, e.item.lastDoneOn) })}</p>
         {/if}
         {#if e.dueDate}
-          <p class="od-piece-maintenance--progress">{t('maintenance.piece.due', { date: formatLongDate(e.dueDate) })}</p>
+          <p class="od-piece-maintenance--progress">{t('maintenance.piece.due', { date: dateText(e, e.dueDate) })}</p>
         {/if}
         <div class="od-piece-maintenance--buttons">
           <button type="button" class="od-piece-maintenance--filled" disabled={gear.readOnly} onclick={() => go(`/profile/gear/${id}/maintenance/note?item=${e.item.id}`)}>
-            <Icon name="check" size={20} />{t('maintenance.piece.note')}
+            <Icon name="check" size={20} />{noteLabel(e)}
           </button>
           <button type="button" class="od-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => editRule(e)}>{t('maintenance.piece.editRule')}</button>
         </div>
@@ -175,7 +197,7 @@
             <span class="od-piece-maintenance--history-texts">
               <span class="od-piece-maintenance--history-title">{h.kind === 'service' ? taskLabel(h.item) : t(`maintenance.kind.${h.kind}`)}</span>
               <span class="od-piece-maintenance--history-line">
-                {[formatLongDate(h.doneOn), h.doneBy ? t('maintenance.piece.by', { who: h.doneBy }) : t('maintenance.piece.byYou'), h.cost != null ? money(h.cost) : ''].filter(Boolean).join(' · ')}
+                {[h.item.task === 'hydrostatic' ? formatMonthYear(h.doneOn) : formatLongDate(h.doneOn), h.item.task === 'hydrostatic' ? t('maintenance.piece.stampedEntry') : '', h.doneBy ? t('maintenance.piece.by', { who: h.doneBy }) : t('maintenance.piece.byYou'), h.cost != null ? money(h.cost) : ''].filter(Boolean).join(' · ')}
               </span>
             </span>
           </li>

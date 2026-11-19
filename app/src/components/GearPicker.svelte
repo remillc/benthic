@@ -14,10 +14,12 @@
    *   picker?: boolean,
    *   disabled?: boolean,
    *   line?: (g: import('../lib/inventory.js').Gear) => string,
+   *   warning?: (g: import('../lib/inventory.js').Gear) => string,
    * }}
    * picker: group titles are the types' plurals (the sheet), else the inventory page's groups.
+   * warning: a line in red with a warning icon under the piece (task 2026-11-19-308: « Inspection visuelle en retard »); the piece stays selectable.
    */
-  let { groups, selected = $bindable(), picker = false, disabled = false, line = (g) => g.note || '' } = $props();
+  let { groups, selected = $bindable(), picker = false, disabled = false, line = (g) => g.note || '', warning = () => '' } = $props();
 
   /** @param {string} id */
   function toggle(id) {
@@ -38,6 +40,7 @@
           <span class="od-gear-picker--texts">
             <span class="od-gear-picker--name">{g.name}</span>
             {#if line(g)}<span class="od-gear-picker--line">{line(g)}</span>{/if}
+            {#if warning(g)}<span class="od-gear-picker--warning"><Icon name="warning" size={16} />{warning(g)}</span>{/if}
           </span>
         </button>
       </li>
@@ -53,6 +56,15 @@
       line-height: 20px;
       font-weight: 600;
       color: var(--od-text-2);
+    }
+
+    .od-gear-picker--warning {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--od-alarm);
     }
 
     .od-gear-picker--list {
