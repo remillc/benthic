@@ -20,6 +20,8 @@
   import EquipmentCard from '../components/EquipmentCard.svelte';
   import DiveGearBlock from '../components/DiveGearBlock.svelte';
   import { isRelease } from '../lib/edition.js';
+  import { odplusSubscriber } from '../lib/odplus-state.svelte.js';
+  import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
   import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
@@ -271,6 +273,25 @@
     });
   }
 
+  /** @param {import('../lib/validation.js').ValidationItem} v */
+  function confirmRemoveValidation(v) {
+    confirmAction({
+      title: t('validation.removeTitle'),
+      text: v.pending ? t('validation.removePendingText') : t('validation.removeText', { name: v.name }),
+      action: t('validation.removeAction'),
+      danger: true,
+      onConfirm: async () => {
+        try {
+          await removeValidation(v.id);
+          showSnackbar(t('validation.removed'));
+        } catch (e) {
+          console.error('Remove a validation', e);
+          showSnackbar(t('validation.saveFailed'));
+        }
+      },
+    });
+  }
+
   async function deleteNow() {
     const id = Number(diveId);
     const order = [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date));
@@ -342,7 +363,10 @@
     failed = false;
     loadDive();
   }
+  // Validations (task 2026-11-19-309, point 2): OpenDives+ only. The pending ones are asked about when the page opens.
+  const validationItems = $derived(dive && odplusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
+    if (odplusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
     return loadDive();
   });
@@ -758,6 +782,16 @@
       {#if theme.ios}
         <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
       {/if}
+      {#if odplusSubscriber()}
+        <MenuItem
+          icon="edit"
+          text={t('validation.menuOne')}
+          onclick={() => {
+            f7.popover.close(`#${menuId}`);
+            f7router.navigate(`/validate?ids=${diveId}`);
+          }}
+        />
+      {/if}
       <MenuItem
         icon="renumber"
         text={t('renumberDive.title')}
@@ -895,6 +929,36 @@
           <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
         {/each}
       </dl>
+    {/if}
+
+    <!-- Validations by a buddy or an instructor (task 2026-11-19-309): OpenDives+ only. -->
+    {#if odplusSubscriber()}
+      <section class="od-dive-detail--section od-dive-validations">
+        <h2 class="od-dive-detail--section-title">{t('validation.section')}</h2>
+        <div class="od-dive-detail--group">
+          {#each validationItems as v (v.id)}
+            <div class="od-dive-validations--item" class:od-dive-validations--pending={v.pending}>
+              <div class="od-dive-validations--text">
+                {#if v.pending}
+                  <span class="od-dive-validations--name">{t('validation.pending')}</span>
+                  <span class="od-dive-validations--detail">{t('validation.pendingText')}</span>
+                {:else}
+                  <span class="od-dive-validations--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
+                  <span class="od-dive-validations--detail">{[t(`validation.method.${v.method}`), formatLongDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
+                  {#if v.modified}<span class="od-dive-validations--modified">{t('validation.modified')}</span>{/if}
+                {/if}
+              </div>
+              {#if v.signature}<img class="od-dive-validations--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
+              <button type="button" class="od-dive-validations--remove" onclick={() => confirmRemoveValidation(v)}>
+                <Icon name="close" /><span class="od-sr-only">{t('validation.remove')}</span>
+              </button>
+            </div>
+          {/each}
+          <button type="button" class="od-dive-validations--add" onclick={() => f7router.navigate(`/validate?ids=${diveId}`)}>
+            <Icon name="plus" /><span>{t('validation.add')}</span>
+          </button>
+        </div>
+      </section>
     {/if}
 
     {#if !desk && (dive.guides.length || dive.buddies.length)}
@@ -1322,6 +1386,89 @@
       background: var(--od-surface);
       color: var(--od-text);
       overflow: hidden;
+    }
+
+    .od-dive-validations--item {
+      box-sizing: border-box;
+      min-height: 56px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid var(--od-separator);
+    }
+
+    .od-dive-validations--item:first-child {
+      border-top: none;
+    }
+
+    .od-dive-validations--text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .od-dive-validations--name {
+      font-size: 16px;
+      color: var(--od-text);
+    }
+
+    .od-dive-validations--detail {
+      font-size: 14px;
+      color: var(--od-text-2);
+    }
+
+    .od-dive-validations--modified {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--od-alarm);
+    }
+
+    /* The signature is drawn black on white, in every mode: it keeps its paper. */
+    .od-dive-validations--signature {
+      width: 72px;
+      height: 29px;
+      border-radius: 6px;
+      object-fit: contain;
+      background: var(--od-qr-paper);
+      border: 1px solid var(--od-separator);
+    }
+
+    .od-dive-validations--remove {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      color: var(--od-text-2);
+    }
+
+    .od-dive-validations--add {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      border: none;
+      border-top: 1px solid var(--od-separator);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      background: none;
+      color: var(--od-text);
+    }
+
+    .od-dive-validations--item:first-child + .od-dive-validations--add,
+    .od-dive-validations--add:first-child {
+      border-top: none;
     }
 
     .od-dive-detail--row {

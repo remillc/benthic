@@ -15,6 +15,7 @@
 import { sameComputer } from './dc-model.js';
 
 import { ruleProblems } from './maintenance.js';
+import { rekey as rekeyValidations } from './validation.js';
 
 /** @typedef {import('./file-store.js').FileStore} FileStore */
 /** @typedef {import('./maintenance.js').MaintenanceItem} MaintenanceItem */
@@ -391,6 +392,9 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
 
   return {
     readState,
+    /** The store and the writes of the inventory, for the other OpenDives data of a dive (lib/validation.svelte.js). */
+    store,
+    commitFiles: commit,
 
     /**
      * The read-only flag: set when the subscription ends, cleared when it is renewed.
@@ -713,7 +717,11 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     async rekeyDive(from, to) {
       if (from === to) return;
       const rec = (await store.readAll('dive-equipment/')).find((r) => r.diveKey?.start === from);
-      if (rec) await commit([[`dive-equipment/${rec.id}.json`, { ...rec, diveKey: { start: to }, updatedAt: stamp() }]]);
+      const writes = /** @type {[string, unknown][]} */ ([]);
+      if (rec) writes.push([`dive-equipment/${rec.id}.json`, { ...rec, diveKey: { start: to }, updatedAt: stamp() }]);
+      // The dive's validations follow it (lib/validation.js).
+      for (const v of rekeyValidations(await store.readAll('dive-validations/'), from, to)) writes.push([`dive-validations/${v.id}.json`, { ...v, updatedAt: stamp() }]);
+      if (writes.length) await commit(writes);
     },
 
     /** A dive was deleted from the logbook. @param {string} diveKey */

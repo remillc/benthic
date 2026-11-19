@@ -261,3 +261,6 @@ export function putOffComputer() {
 }
 
 if (import.meta.env?.DEV) /** @type {any} */ (globalThis).__inventory = { gear, loadInventory, change, setReadOnly };
+
+/** The inventory's store and writes, for the other OpenDives data of a dive (lib/validation.svelte.js). */
+export const inventoryApi = () => open();
