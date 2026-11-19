@@ -5891,3 +5891,27 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 ## [ ] 2026-11-19-294 iPad follows the Android tablet
 
 Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
+
+## [ ] 2026-11-19-295 OpenDives+ offer: new layout and "everything included" screen
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre`, `android-odplus-complet`, `ios-odplus-offre`, `ios-odplus-complet`, `android-tablette-odplus-offre-paysage`, `android-tablette-odplus-complet-paysage`. The iPad follows the Android tablet (task 294). No desktop offer screen yet.
+
+**Offer screen** (all platforms):
+- Header: the pill reads « L’offre OpenDives+ ». Subtitle: « Votre carnet à l’abri, sur tous vos appareils. » Keep 24 dp between the subtitle and the top of the wave (phone header 264 dp, iPhone 292 dp).
+- Feature cards: 16 dp padding, 40 dp icon tiles, titles 16/24, descriptions 14/20. On the tablet, the four small cards put the icon on the left of the text to save height.
+- New text link under the cards: « Voir tout ce qui est inclus › », 17 sp, 48 dp tall. It opens the new screen below.
+- The price is no longer in a dark blue card (it looked like a button). It is plain centred text: « Abonnement OpenDives+ » (16/24, grey, not blue: it is not tappable), « 14,99 $ US » 40/48 with « par an » 20/28, « soit 1,25 $ par mois » 17/24, then « ✓ Résiliable en tout temps » in green 16/24. 16 dp above the block, 24 dp before « S’abonner ».
+- « Continuer sans abonnement », « Se connecter » and « À propos et contact » are 48 dp touch targets, 8 dp apart. Margins 16 dp on phone. Everything on the 4 dp grid.
+- On the tablet, « Déjà abonné ? Se connecter » moves to the top right, on the same row as « Retour ».
+
+**New screen « Tout ce qui est inclus »** (phone: full screen with back arrow; iPhone: navigation bar « ‹ OpenDives+ » and large title; tablet: replaces the right pane, back arrow returns to the offer).
+- Four groups of rows (icon tile 40 dp, title, one-line description saying what changes compared with the free version):
+  - Votre carnet: Synchronisé, Sauvegardé, Sauvegarde et restauration, Photos et vidéos (10 Go), L’app de bureau (included instead of 29,99 $).
+  - Votre profil de plongeur: Équipement et kits, Rappels d’entretien, Brevets, Informations personnelles, Analyses de gaz, Pression lue par photo.
+  - Sites et cartes: Cartes hors ligne (as many regions as wanted instead of one), Sites des plongeurs.
+  - Avec vos compagnons: Compagnons, Plongée validée, Profil public.
+- Then the line « Toujours gratuit, sans abonnement : … ».
+- A footer stays fixed at the bottom while the list scrolls: the same price block as the offer, then « S’abonner ». On the tablet the footer is horizontal (price on the left, button on the right).
+- Texts are in the mock-ups. Only features already decided as paid are listed: hide a row whose feature is not built yet, rather than promising it.
+
+**Test:** on a phone, an iPhone and a tablet, open the offer, check the spacing against the mock-ups, tap « Voir tout ce qui est inclus », scroll the list and check that the price footer stays in place and « S’abonner » works from both screens.
