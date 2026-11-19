@@ -27,3 +27,11 @@ Their use follows each provider's guidelines (button titles, colours, minimum si
   black title (light theme) or black with the white logo and white title (dark theme), the colour being the only
   difference (`--od-brand-apple-*` in `theme.css`); the logo is never recoloured other than black or white; the button
   is far above the 140 x 30 pt minimum.
+
+## GitHub
+
+- `github-invertocat.svg`: the official GitHub Invertocat mark, black. Source: supplied by Christian, 19 November 2026
+  (the path of the mock-ups `apropos-android` and `bureau-apropos`), unchanged.
+- Shown 20 x 20 on the « Voir sur GitHub » button of About, coloured #1F2124 (the page's ink, `--od-text`, in light mode).
+  It is never redrawn. With the Google and Apple logos it is one of the only brand marks the app shows.
+- Guidelines: GitHub logos and usage, <https://github.com/logos>.

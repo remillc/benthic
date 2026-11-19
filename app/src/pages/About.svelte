@@ -14,6 +14,7 @@
   import { Capacitor } from '@capacitor/core';
   import { logbook } from '../lib/logbook.svelte.js';
   import Icon from '../components/Icon.svelte';
+  import githubMark from '../assets/brands/github-invertocat.svg?raw';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
   import { exportDives } from '../lib/share.js';
@@ -172,19 +173,25 @@
     <img class="od-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>OpenDives</h1>
     {#if version}<p class="od-about--version od-value">{version}</p>{/if}
-    <p class="od-about--tagline">{t('about.tagline')}</p>
+    {#if !dialog}<p class="od-about--tagline">{t('about.tagline')}</p>{/if}
     <p class="od-about--author">{t('about.author', { name: AUTHOR })}</p>
   </header>
 
   <!-- « Libre, et votre carnet aussi » (task 2026-11-14-142, to-do #57): the app's code is open and
        the logbook stays the diver's. The licence itself is named below, in « Licences ». -->
-  <section class="od-about--free" aria-labelledby="od-about-free-title">
-    <h2 id="od-about-free-title" class="od-about--free-title">{t('about.free.title')}</h2>
-    <p>{t('about.free.code')}</p>
-    <p>{t('about.free.logbook')}</p>
+  <!-- Task 2026-11-19-296: the desktop dialog has one paragraph and no title (the app is paid there, so it never says « gratuit »);
+       the phone and the tablet have the block « Libre, et votre carnet aussi ». -->
+  <section class="od-about--free" class:od-about--free-desktop={dialog} aria-labelledby={dialog ? undefined : 'od-about-free-title'} aria-label={dialog ? t('about.free.title') : undefined}>
+    {#if dialog}
+      <p>{t('about.desktopText')}</p>
+    {:else}
+      <h2 id="od-about-free-title" class="od-about--free-title">{t('about.free.title')}</h2>
+      <p>{t('about.free.code')}</p>
+      <p>{t('about.free.logbook')}</p>
+    {/if}
     <div class="od-about--free-actions">
-      <a href={LINKS.source} class="external od-tonal-button" target="_blank" rel="noopener">{t('about.free.github')}</a>
-      <button type="button" class="od-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}>{t('about.free.export')}</button>
+      <a href={LINKS.source} class="external od-tonal-button" target="_blank" rel="noopener"><span class="od-about--free-icon od-about--free-github" aria-hidden="true">{@html githubMark}</span>{t('about.free.github')}</a>
+      <button type="button" class="od-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}><span class="od-about--free-icon" aria-hidden="true"><Icon name="download" size={20} weight={2} /></span>{t('about.free.export')}</button>
     </div>
   </section>
 
@@ -288,19 +295,65 @@
       font-weight: 700;
     }
 
+    /* The two buttons (task 2026-11-19-296): 48 dp high, a 20 dp icon 8 dp from the text. Phone: full width, one per line,
+       12 dp apart, 16 dp under the text; tablet: side by side, 12 dp apart; desktop: 40 dp high. */
     .od-about--free-actions {
       margin-top: 16px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      flex-direction: column;
+      gap: 12px;
 
-      /* A link drawn as a button: its label centred like the button's. */
-      a {
+      a,
+      button {
+        height: 48px;
+        padding: 0 16px;
+        border-radius: 24px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 600;
         text-decoration: none;
+
+        :global(.ios) & {
+          border-radius: 12px;
+        }
       }
+    }
+
+    @media (min-width: 768px) {
+      .od-about--free-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+
+    .od-about--free-desktop .od-about--free-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      a,
+      button {
+        height: 40px;
+      }
+    }
+
+    .od-about--free-icon {
+      flex: none;
+      width: 20px;
+      height: 20px;
+      display: flex;
+
+      :global(svg) {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    /* The GitHub mark in the page's ink (#1F2124 in light mode). */
+    .od-about--free-github :global(path) {
+      fill: currentColor;
     }
 
     .od-about--author {

@@ -2449,7 +2449,8 @@
     "versionDated": "Version {version} · {date}",
     "author": "Par {name}",
     "copyright": "© {year} {name}.",
-    "tagline": "Carnet de plongée libre, compatible avec les carnets Subsurface.",
+    "tagline": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface.",
+    "desktopText": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient.",
     "project": "Projet",
     "notes": "Nouveautés",
     "notesText": "Ce qui a changé dans cette version",
@@ -2826,7 +2827,8 @@
       "Sauvegarde et restauration (OpenDives+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille OpenDives+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px.",
       "Rapports d’erreur : après une erreur ou un arrêt de l’app, la version, le système, l’appareil, la page ouverte, le message d’erreur et les dernières lignes du journal s’affichent dans une feuille avec « Envoyer » et « Ne pas envoyer ». Rien n’est envoyé sans cet appui ; sans connexion, le rapport est gardé et reproposé plus tard. Le rapport ne contient ni plongée, ni site, ni nom, ni compte ; il est conservé 180 jours.",
       "Export de tout le carnet : le fichier porte le nom du carnet et la date, par exemple « carnet-de-roger-2026-11-19.ssrf ».",
-      "Offre OpenDives+ : l’en-tête devient « L’offre OpenDives+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour »."
+      "Offre OpenDives+ : l’en-tête devient « L’offre OpenDives+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour ».",
+      "À propos : « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. », un bloc « Libre, et votre carnet aussi » (l’offre de base reste gratuite, le code est sur GitHub, le carnet est exportable en tout temps) avec « Voir sur GitHub » (logo de GitHub) et « Exporter mon carnet » (icône de téléchargement), l’un sous l’autre sur téléphone et côte à côte sur tablette ; sur ordinateur, un seul paragraphe et les deux boutons. « Tout ce qui est inclus » dit sous son titre ce qu’il liste."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -2871,8 +2873,8 @@
     "libraryLink": "{name}, {licence} (s’ouvre dans le navigateur)",
     "free": {
       "title": "Libre, et votre carnet aussi",
-      "code": "L’app et son code sont toujours disponibles gratuitement sur GitHub. Chacun peut lire le code, le modifier et le partager.",
-      "logbook": "Votre carnet vous appartient : au format Subsurface, il se copie et s’ouvre aussi dans Subsurface sur ordinateur.",
+      "code": "L’offre de base reste toujours gratuite. Les apps et leur code sont sur GitHub : chacun peut toujours y télécharger les apps gratuitement, lire le code, le modifier et le partager.",
+      "logbook": "Exportable en tout temps, votre carnet vous appartient.",
       "github": "Voir sur GitHub",
       "export": "Exporter mon carnet"
     }

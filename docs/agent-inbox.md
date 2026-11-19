@@ -5924,7 +5924,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** on a phone, an iPhone and a tablet, open the offer, check the spacing against the mock-ups, tap « Voir tout ce qui est inclus », scroll the list and check that the price footer stays in place and « S’abonner » works from both screens.
 
-## [ ] 2026-11-19-296 About screen texts and buttons, "everything included" subtitle
+## [x] 2026-11-19-296 About screen texts and buttons, "everything included" subtitle
+
+Done in Update the About texts and buttons, add the GitHub mark (the "everything included" subtitle came with task 295).
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `apropos-android`, `android-tablette-apropos-paysage`, `android-tablette-apropos-portrait`, `bureau-apropos`, plus `android-odplus-complet`, `ios-odplus-complet`, `android-tablette-odplus-complet-paysage`. The iPad and the iPhone follow these (task 294 and task 289).
 
