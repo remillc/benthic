@@ -641,7 +641,7 @@
   });
 
   /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
-  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth'];
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome', 'odplusHealth'];
 
   /**
    * « Ouvrir mon carnet » of « Votre carnet est prêt »: the core downloaded the logbook through the git sync (mobile), so
@@ -750,7 +750,7 @@
 </script>
 
 {#snippet backButton()}
-  {#if hasBack(step, flow.origin === 'menu') || tabletOfferBack}
+  {#if (hasBack(step, flow.origin === 'menu') && step !== 'odplusAll') || tabletOfferBack}
     <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : back}>
       <span class="od-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
@@ -1009,7 +1009,7 @@
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
-        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
+        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusAll' || step === 'odplusReady' || step === 'odplusWelcome' || step === 'odplusHealth'}
           <FirstLaunchOdPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>

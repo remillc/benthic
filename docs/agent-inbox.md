@@ -5898,7 +5898,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
 
-## [ ] 2026-11-19-295 OpenDives+ offer: new layout and "everything included" screen
+## [x] 2026-11-19-295 OpenDives+ offer: new layout and "everything included" screen
+
+Done in Redesign the OpenDives+ offer and add the "everything included" screen (rows of features not built yet are hidden: media, gas analyses, divers' sites, buddies, verified dive, public profile).
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre`, `android-odplus-complet`, `ios-odplus-offre`, `ios-odplus-complet`, `android-tablette-odplus-offre-paysage`, `android-tablette-odplus-complet-paysage`. The iPad follows the Android tablet (task 294). No desktop offer screen yet.
 
