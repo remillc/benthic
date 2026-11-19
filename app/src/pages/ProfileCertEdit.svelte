@@ -19,6 +19,7 @@
   import { AGENCIES, LEVEL_SUGGESTIONS, certificationProblems } from '../lib/profile.js';
   import { scanCard, parseCardText, joinTexts } from '../lib/card-scan.js';
   import { toJpegBytes, scanJpegBytes, photoUrl } from '../lib/card-canvas.js';
+  import PhotoBusy from '../components/PhotoBusy.svelte';
   import CardPhotoDialog from '../components/CardPhotoDialog.svelte';
   import { desktopApp } from '../lib/layout.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
@@ -46,6 +47,8 @@
   const cardTexts = { front: '', back: '' };
   /** The photos: `bytes` is set when changed here (null: removed), `url` is what is shown. @type {Record<'front'|'back', { bytes?: Uint8Array|null, url: string }>} */
   let photos = $state({ front: { url: '' }, back: { url: '' } });
+  /** A picture is being read, shrunk and sealed: the slot shows its progress indicator and the card cannot be saved yet. */
+  let busy = $state({ front: false, back: false });
 
   onMount(async () => {
     await loadInventory();
@@ -66,7 +69,7 @@
   });
   onDestroy(() => Object.values(photos).forEach((p) => p.url && URL.revokeObjectURL(p.url)));
 
-  const agencyOptions = AGENCIES.map((a) => ({ value: a.id, label: a.id === 'other' ? t('diverProfile.cert.agencyOther') : a.id }));
+  const agencyOptions = AGENCIES.map((a) => ({ value: a.id, label: a.id === 'other' ? t('diverProfile.cert.agencyOther') : a.name ? `${a.id} · ${a.name}` : a.id }));
   const suggestions = $derived(LEVEL_SUGGESTIONS[agency] ?? []);
   const problems = $derived(certificationProblems({ agency, level, number, issuedOn }));
   const dateLive = liveError(
@@ -74,7 +77,7 @@
     () => (problems.issuedOn ? t('diverProfile.cert.dateFuture') : ''),
   );
   const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'|'instructor'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
-  const canSave = $derived(!Object.keys(problems).length && !(agency === 'other' && !agencyName.trim()) && !saving && !gear.readOnly);
+  const canSave = $derived(!Object.keys(problems).length && !(agency === 'other' && !agencyName.trim()) && !saving && !busy.front && !busy.back && !gear.readOnly);
 
   /** The side whose photo the desktop's dialog is asking for (a computer has no camera nor scanner). @type {'front'|'back'|null} */
   let photoDialog = $state(null);
@@ -82,12 +85,15 @@
   /** The straightened card from the desktop's dialog. @param {'front'|'back'} side @param {Blob} image */
   async function useDesktopPhoto(side, image) {
     photoDialog = null;
+    busy[side] = true;
     try {
       const bytes = await toJpegBytes(image);
       if (photos[side].url) URL.revokeObjectURL(photos[side].url);
       photos[side] = { bytes, url: photoUrl(bytes) };
     } catch {
       showSnackbar(t('diverProfile.cert.photoFailed'));
+    } finally {
+      busy[side] = false;
     }
   }
 
@@ -97,11 +103,16 @@
       photoDialog = side;
       return;
     }
+    busy[side] = true;
     try {
       const scanned = await scanCard(side);
       if (!scanned) return;
+      // The picture shows at once, from the file as it came; the shrunk, sealed copy replaces it when ready.
+      const before = photos[side].url;
+      photos[side] = { ...photos[side], url: URL.createObjectURL(scanned.image) };
+      if (before) URL.revokeObjectURL(before);
       const bytes = await scanJpegBytes(scanned.image);
-      if (photos[side].url) URL.revokeObjectURL(photos[side].url);
+      URL.revokeObjectURL(photos[side].url);
       photos[side] = { bytes, url: photoUrl(bytes) };
       // The text of both sides proposes what the diver has not typed: a field that still holds an earlier proposal may be replaced by a better one.
       cardTexts[side] = scanned.text;
@@ -116,6 +127,8 @@
       if (found.instructor && free('instructor', instructor)) readFrom.instructor = instructor = found.instructor;
     } catch {
       showSnackbar(t('diverProfile.cert.photoFailed'));
+    } finally {
+      busy[side] = false;
     }
   }
 
@@ -155,16 +168,17 @@
 {#snippet slot(/** @type {'front'|'back'} */ side)}
   <div class="od-cert-edit--slot">
     {#if photos[side].url}
-      <div class="od-cert-edit--slot-thumb"><img src={photos[side].url} alt="" /></div>
+      <div class="od-cert-edit--slot-thumb"><img src={photos[side].url} alt="" />{#if busy[side]}<PhotoBusy />{/if}</div>
       <button type="button" class="od-cert-edit--slot-remove" onclick={() => remove(side)} aria-label={t('diverProfile.cert.photoRemove')}><Icon name="close" size={18} /></button>
       <span class="od-cert-edit--slot-caption">
         <span>{side === 'front' ? t('diverProfile.cert.sideFront') : t('diverProfile.cert.sideBack')}</span>
-        <button type="button" class="od-cert-edit--slot-replace" onclick={() => pick(side)} disabled={gear.readOnly}>{t('diverProfile.cert.photoReplace')}</button>
+        <button type="button" class="od-cert-edit--slot-replace" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>{t('diverProfile.cert.photoReplace')}</button>
       </span>
     {:else}
-      <button type="button" class="od-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly}>
+      <button type="button" class="od-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>
         <Icon name="camera" size={28} weight={1.6} />
         <span class="od-cert-edit--slot-label">{side === 'front' ? t('diverProfile.cert.photoFront') : t('diverProfile.cert.photoBack')}</span>
+        {#if busy[side]}<PhotoBusy />{/if}
       </button>
     {/if}
   </div>
@@ -270,6 +284,7 @@
     }
 
     .od-cert-edit--slot-thumb {
+      position: relative;
       aspect-ratio: 85.6 / 54;
       border-radius: 12px;
       overflow: hidden;

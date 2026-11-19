@@ -53,9 +53,9 @@ test('certification cards: BSAC, SDI, TDI, IANTD, GUE, PDIC, ACUC and the agenci
   has('GUE\nRecreational Diver 2\nMember no. 120044', { agency: 'GUE', level: 'Recreational Diver 2' });
   has('ACUC\nAdvanced Diver\nNo 441122', { agency: 'ACUC', level: 'Advanced Diver' });
   has('PDIC\nRescue Diver\nNo 9988001', { agency: 'PDIC', level: 'Rescue Diver' });
-  has('RAID\nRescue Advanced Diver\nOpen Water 20\nN° 100200300', { agency: 'other', agencyName: 'RAID' });
-  has('PSS Worldwide\nProfessional Scuba Schools\nOpen Water\nNo 777000', { agency: 'other', agencyName: 'PSS' });
-  has('ANMP\nAssociation Nationale des Moniteurs de Plongée\nN° 4455', { agency: 'other', agencyName: 'ANMP' });
+  has('RAID\nRescue Advanced Diver\nOpen Water 20\nN° 100200300', { agency: 'RAID', agencyName: '' });
+  has('PSS Worldwide\nProfessional Scuba Schools\nOpen Water\nNo 777000', { agency: 'PSS', agencyName: '' });
+  has('ANMP\nAssociation Nationale des Moniteurs de Plongée\nN° 4455', { agency: 'ANMP', agencyName: '' });
 });
 
 test('certification cards: noise, broken lines, uppercase and nothing sure', () => {

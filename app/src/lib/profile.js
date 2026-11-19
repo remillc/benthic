@@ -10,6 +10,8 @@
 // kept only while the consent is given, and withdrawing the consent deletes it. Unknown fields of a file are kept.
 
 import { newId, ReadOnlyError } from './inventory.js';
+import { CERT_AGENCIES } from './cert-agencies.js';
+import { CERT_LEVELS } from './cert-levels.js';
 import { fromBase64 } from './secret-box.js';
 import { countryOf, nationalDigits } from './phone-format.js';
 
@@ -65,39 +67,11 @@ export function infoProblems(info, today = new Date().toISOString().slice(0, 10)
   return out;
 }
 
-/** The agencies of the menu with a tone for their name. */
-export const AGENCIES = /** @type {const} */ ([
-  { id: 'PADI', tone: 'blue' },
-  { id: 'SSI', tone: 'green' },
-  { id: 'NAUI', tone: 'amber' },
-  { id: 'CMAS', tone: 'violet' },
-  { id: 'FFESSM', tone: 'blue' },
-  { id: 'BSAC', tone: 'green' },
-  { id: 'SDI', tone: 'amber' },
-  { id: 'TDI', tone: 'violet' },
-  { id: 'IANTD', tone: 'blue' },
-  { id: 'GUE', tone: 'green' },
-  { id: 'PDIC', tone: 'amber' },
-  { id: 'ACUC', tone: 'violet' },
-  { id: 'other', tone: 'neutral' },
-]);
+/** The agencies of the menu with a tone for their name (the list and its sources: lib/cert-agencies.js). */
+export const AGENCIES = CERT_AGENCIES;
 
-/** The levels suggested for an agency (the field stays free text). @type {Record<string, string[]>} */
-export const LEVEL_SUGGESTIONS = {
-  PADI: ['Open Water Diver', 'Advanced Open Water Diver', 'Rescue Diver', 'Rescue Diver, Emergency First Response', 'Enriched Air Diver (Nitrox)', 'Deep Diver', 'Divemaster', 'Master Scuba Diver', 'Tec 40', 'Tec 45', 'Tec 50'],
-  SSI: ['Open Water Diver', 'Advanced Adventurer', 'Advanced Open Water Diver', 'Stress & Rescue (Sauveteur)', 'Enriched Air Nitrox', 'Deep Diving', 'Divemaster', 'Master Diver'],
-  NAUI: ['Scuba Diver', 'Advanced Scuba Diver', 'Rescue Scuba Diver', 'Master Scuba Diver', 'Enriched Air Nitrox', 'Divemaster'],
-  CMAS: ['1 star diver', '2 star diver', '3 star diver', 'Instructor 1 star'],
-  FFESSM: ['Niveau 1', 'Niveau 2', 'Niveau 3', 'Niveau 4', 'Plongeur Nitrox', 'Plongeur Nitrox confirmé', 'Initiateur', 'MF1', 'MF2'],
-  BSAC: ['Ocean Diver', 'Sport Diver', 'Dive Leader', 'Advanced Diver', 'First Class Diver'],
-  SDI: ['Open Water Scuba Diver', 'Advanced Diver', 'Rescue Diver', 'Solo Diver', 'Nitrox Diver'],
-  TDI: ['Nitrox Diver', 'Advanced Nitrox Diver', 'Decompression Procedures', 'Extended Range', 'Trimix Diver'],
-  IANTD: ['Open Circuit Nitrox', 'Advanced Nitrox', 'Technical Decompression', 'Normoxic Trimix'],
-  GUE: ['Fundamentals', 'Recreational Diver 1', 'Recreational Diver 2', 'Tech 1', 'Tech 2'],
-  PDIC: ['Open Water Diver', 'Advanced Diver', 'Rescue Diver'],
-  ACUC: ['Open Water Diver', 'Advanced Diver', 'Rescue Diver'],
-  other: [],
-};
+/** The levels suggested for an agency (the field stays free text; the list and its sources: lib/cert-levels.js). @type {Record<string, string[]>} */
+export const LEVEL_SUGGESTIONS = CERT_LEVELS;
 
 /**
  * The suggestions for what is typed in « Niveau »: the agency's levels that contain the text, the exact one dropped.

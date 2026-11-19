@@ -13,6 +13,7 @@
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import DocumentThumb from '../components/DocumentThumb.svelte';
+  import PhotoBusy from '../components/PhotoBusy.svelte';
   import CardPhotoDialog from '../components/CardPhotoDialog.svelte';
   import { services, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
@@ -57,6 +58,8 @@
   let pdfInput = $state();
   /** The desktop's photo dialog is asking for a file. */
   let photoDialog = $state(false);
+  /** A picture is being read, shrunk and sealed: its place shows the progress indicator, and the document cannot be saved yet. */
+  let busy = $state(false);
 
   onMount(async () => {
     await loadInventory();
@@ -87,7 +90,7 @@
     title: liveError(() => title, () => (problems.title ? t('docs.errors.required') : '')),
     phone: liveError(() => emergencyPhone, () => (problems.emergencyPhone ? t('docs.insurance.phoneInvalid') : '')),
   };
-  const canSave = $derived(!Object.keys(problems).length && !saving && !gear.readOnly);
+  const canSave = $derived(!Object.keys(problems).length && !saving && !busy && !gear.readOnly);
   const year = new Date().getFullYear();
   const heading = $derived(id ? t(`docs.${kind}.edit`) : t(`docs.${kind}.new`));
   const images = $derived(files.filter((f) => !f.pdf));
@@ -123,6 +126,7 @@
       photoDialog = true;
       return;
     }
+    busy = true;
     try {
       const result = await scanCard('front');
       if (!result) return;
@@ -131,6 +135,8 @@
       proposeFrom(joinTexts(...scanTexts));
     } catch {
       fail(t('docs.fileFailed'));
+    } finally {
+      busy = false;
     }
   }
 
@@ -163,10 +169,13 @@
   /** @param {Blob} image */
   async function useDesktopPhoto(image) {
     photoDialog = false;
+    busy = true;
     try {
       addImage(await toJpegBytes(image), kind === 'insurance');
     } catch {
       fail(t('docs.fileFailed'));
+    } finally {
+      busy = false;
     }
   }
 
@@ -229,11 +238,11 @@
 {#snippet filesBlock()}
   {#if kind === 'insurance'}
     <div class="od-doc-edit--card">
-      <DocumentThumb doc={preview} urls={images[0] ? [images[0].url] : []} width={150} />
+      <span class="od-doc-edit--thumb"><DocumentThumb doc={preview} urls={images[0] ? [images[0].url] : []} width={150} />{#if busy}<PhotoBusy />{/if}</span>
       <span class="od-doc-edit--card-texts">
         {#if images.length && scanned}<span class="od-doc-edit--scanned">{t('docs.insurance.scanned')}</span>{/if}
         <span class="od-doc-edit--buttons">
-          <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.insurance.scanAgain') : t('docs.insurance.scan')}</button>
+          <button type="button" class="od-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.insurance.scanAgain') : t('docs.insurance.scan')}</button>
           <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
         </span>
       </span>
@@ -251,9 +260,10 @@
           <button type="button" class="od-doc-edit--page-remove" onclick={() => removeFile(f.key)} aria-label={t('docs.medical.removePage', { n: i + 1 })}><Icon name="close" size={18} /></button>
         </div>
       {/each}
+      {#if busy}<div class="od-doc-edit--page od-doc-edit--page-busy"><span class="od-doc-edit--page-pdf"></span><PhotoBusy /></div>{/if}
     </div>
     <span class="od-doc-edit--buttons">
-      <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.medical.addPage') : t('docs.medical.scanPage')}</button>
+      <button type="button" class="od-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.medical.addPage') : t('docs.medical.scanPage')}</button>
       <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
     </span>
   {/if}
@@ -351,6 +361,14 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+
+    .od-doc-edit--thumb {
+      position: relative;
+      display: inline-flex;
+      flex: none;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     .od-doc-edit--card {

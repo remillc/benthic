@@ -261,9 +261,22 @@ const AGENCY_WORDS = [
   { id: 'GUE', re: /\bGUE\b|global underwater explorers/gi },
   { id: 'PDIC', re: /\bPDIC\b|professional diving instructors corporation/gi },
   { id: 'ACUC', re: /\bACUC\b|american canadian underwater certifications/gi },
-  { id: 'other', name: 'RAID', re: /\bRAID\b|rescue advanced diver/g },
-  { id: 'other', name: 'PSS', re: /\bPSS\b|professional scuba schools/g },
-  { id: 'other', name: 'ANMP', re: /\bANMP\b|association nationale des moniteurs de plong[ée]e/g },
+  { id: 'RAID', re: /\bRAID\b|rebreather association of international divers|rescue advanced diver/g },
+  { id: 'PSS', re: /\bPSS\b|professional scuba schools/g },
+  { id: 'ANMP', re: /\bANMP\b|association nationale des moniteurs de plong[ée]e/g },
+  { id: 'SAA', re: /\bSAA\b|sub-?aqua association/gi },
+  { id: 'UTD', re: /\bUTD\b|unified team diving/g },
+  { id: 'SNSI', re: /\bSNSI\b|scuba and nitrox safety international/gi },
+  { id: 'ANDI', re: /\bANDI\b|american nitrox divers international/g },
+  { id: 'NASE', re: /\bNASE\b|national academy of scuba educators/g },
+  { id: 'IDEA', re: /\bIDEA\b|international diving educators association/g },
+  { id: 'VDST', re: /\bVDST\b|verband deutscher sporttaucher/gi },
+  { id: 'FEDAS', re: /\bFEDAS\b|federacion espanola de actividades subacuaticas/gi },
+  { id: 'FIAS', re: /\bFIAS\b|federazione italiana attivita subacquee/gi },
+  { id: 'FIPSAS', re: /\bFIPSAS\b/g },
+  { id: 'SUSV', re: /\bSUSV\b|schweizer unterwassersport/gi },
+  { id: 'ERDI', re: /\bERDI\b|emergency response diving international/g },
+  { id: 'IART', re: /\bIART\b|international association of rebreather trainers/g },
 ];
 
 /**
@@ -300,6 +313,14 @@ const LEVEL_WORDS = [
   ['1 star diver', /\b(?:1|one) stars?(?: diver)?\b|\b1 etoiles?\b/],
   ['2 star diver', /\b(?:2|two) stars?(?: diver)?\b|\b2 etoiles?\b/],
   ['3 star diver', /\b(?:3|three) stars?(?: diver)?\b|\b3 etoiles?\b/],
+  ['4 star diver', /\b(?:4|four) stars?(?: diver)?\b|\b4 etoiles?\b/],
+  ['Instructor 2 star', /\binstructor (?:2|two) stars?\b|\bmoniteur 2 etoiles?\b/],
+  ['Instructor 3 star', /\binstructor (?:3|three) stars?\b|\bmoniteur 3 etoiles?\b/],
+  ['Guide de palanquée', /\bguide de palanquee\b|\bgp\b/],
+  ['Dive Guide', /\bdive guide\b/],
+  ['Assistant Instructor', /\bassistant instructor\b/],
+  ['Sports Diver', /\bsports? diver\b/],
+  ['Discovery Diver', /\bdiscovery diver\b/],
   ['Instructor 1 star', /\binstructor (?:1|one) stars?\b|\bmoniteur 1 etoiles?\b/],
   ['Niveau 1', /\bniveau (?:1|i|un)\b|\bniv 1\b|\bn1\b|\bplongeur (?:1|une) etoiles?\b|\b1 etoiles?\b/],
   ['Niveau 2', /\bniveau (?:2|ii|deux)\b|\bniv 2\b|\bn2\b|\bplongeur (?:2|deux) etoiles?\b|\b2 etoiles?\b/],
@@ -331,6 +352,7 @@ const LEVEL_WORDS = [
 function wordsOf(flat) {
   return ` ${flat
     .toLowerCase()
+    .replace(/\*{4}/g, ' 4 star ')
     .replace(/\*{3}/g, ' 3 star ')
     .replace(/\*{2}/g, ' 2 star ')
     .replace(/\*/g, ' 1 star ')
