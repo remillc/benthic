@@ -4,16 +4,17 @@
   // bureau-carnet-onglet-equipement): two columns of tiles, each with an icon in a blue circle, the
   // name and a cross that removes the item from this dive, then a dashed « Ajouter de l’équipement » tile.
   //
-  // INERT ON PURPOSE. The list is not stored yet (the log has no such list; it waits for the OpenDives server).
-  // Nothing here reads or writes any storage. The seam to wire it later is the
-  // three props: `items` (the list of this dive), `onadd` and `onremove`. While `onadd` is not given the
-  // add tile is disabled, and a tile has no cross without `onremove`.
+  // Nothing here reads or writes any storage: the parent gives the three props `items` (the list of this
+  // dive), `onadd` and `onremove`. Without `onadd` the add tile is disabled (the alpha edition, where the
+  // list is not stored), and a tile has no cross without `onremove`. The icon is the one of the phone
+  // (GearIcon): a piece named « Saucisse » shows the surface marker buoy (task 2026-11-19-288).
   import Icon from './Icon.svelte';
+  import GearIcon from './GearIcon.svelte';
   import { t } from '../lib/i18n.js';
 
   /**
    * @type {{
-   *   items?: { id: string, name: string }[],
+   *   items?: { id: string, name: string, type?: import('../lib/inventory.js').GearType }[],
    *   onadd?: () => void,
    *   onremove?: (id: string) => void,
    * }}
@@ -24,7 +25,7 @@
 <div class="od-desktop-other-gear" role="list" aria-label={t('desktopDetail.otherGearList')}>
   {#each items as item (item.id)}
     <div class="od-desktop-other-gear--tile" role="listitem">
-      <span class="od-desktop-other-gear--icon" aria-hidden="true"><Icon name="tune" size={18} /></span>
+      <span class="od-desktop-other-gear--icon" aria-hidden="true"><GearIcon type={item.type ?? 'other'} name={item.name} size={18} /></span>
       <span class="od-desktop-other-gear--name">{item.name}</span>
       {#if onremove}
         <button type="button" class="od-desktop-other-gear--remove" aria-label={t('desktopDetail.otherGearRemove', { name: item.name })} title={t('desktopDetail.otherGearRemoveTip')} onclick={() => onremove?.(item.id)}><Icon name="close" size={20} /></button>

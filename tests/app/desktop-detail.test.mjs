@@ -170,13 +170,14 @@ test('the span a cylinder was breathed', () => {
   assert.equal(cylinderSpan(samples, 2), null);
 });
 
-test('Autre équipement is inert: no storage, a disabled add tile, a seam of three props', () => {
+test('Autre équipement: a seam of three props, no storage of its own, inert in the alpha', () => {
   const gear = read('app/src/components/DesktopOtherGear.svelte');
   assert.match(gear, /let \{ items = \[\], onadd, onremove \} = \$props\(\)/);
   assert.match(gear, /disabled=\{!onadd\}/);
   assert.doesNotMatch(gear, /deviceStore|OpenDivesCore|localStorage|saveDiveChanges/);
   const fields = read('app/src/components/DesktopDiveFields.svelte');
-  assert.match(fields, /<DesktopOtherGear \/>/);
+  assert.match(fields, /<DesktopOtherGear \/>/); // the alpha edition
+  assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onadd=\{[^}]*\} onremove=\{removeGear\} \/>/); // the release edition
 });
 
 test('the Carte tab keeps its height and the tab content replaces the old map block', () => {

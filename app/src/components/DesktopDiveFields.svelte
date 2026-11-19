@@ -13,11 +13,15 @@
   import DesktopSegments from './DesktopSegments.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
+  import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
+  import { isRelease } from '../lib/edition.js';
+  import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap } from '../lib/inventory.svelte.js';
+  import { diveKeyOf, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
   import { siteChange } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
@@ -47,6 +51,40 @@
    * }}
    */
   let { dive, tab, prefs, trip = '', sac = '', gasChanges = '' } = $props();
+
+  // « Autre équipement »: in the release edition the pieces of the device's inventory used by this dive
+  // (the same record as the phone's editor); in the alpha the list stays inert.
+  const equipment = $derived(isRelease && gear.ready ? equipmentOf(dive) : null);
+  const otherItems = $derived(
+    equipment
+      ? [
+          ...equipment.gearIds.flatMap((id) => {
+            const g = gearMap().get(id);
+            return g ? [{ id: `g:${id}`, name: g.name, type: g.type }] : [];
+          }),
+          ...equipment.adhoc.map((p) => ({ id: `a:${p.id}`, name: p.name, type: /** @type {'other'} */ ('other') })),
+        ]
+      : [],
+  );
+  let addingGear = $state(false);
+  /** @param {import('../lib/inventory.js').DiveEquipment} next */
+  async function saveEquipment(next) {
+    if (!equipment || sameEquipment(next, equipment)) return;
+    try {
+      await changeInventory((inv) => inv.saveDiveEquipment(diveKeyOf(dive), next));
+    } catch (e) {
+      console.error('Dive equipment', e);
+      showSnackbar(t('desktopDetail.otherGearFailed'));
+    }
+  }
+  /** @param {string} id */
+  function removeGear(id) {
+    if (!equipment) return;
+    saveEquipment(id.startsWith('g:') ? removeFromEquipment(equipment, { gearId: id.slice(2) }) : removeFromEquipment(equipment, { adhocId: id.slice(2) }));
+  }
+  $effect(() => {
+    if (isRelease && tab === 'equipment') untrack(() => loadInventory().catch((e) => console.error('Inventory', e)));
+  });
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -366,8 +404,13 @@
     {/if}
 
     <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}</h3>
-    <!-- Inert: the list is not stored anywhere yet. Wire it through the three props of DesktopOtherGear. -->
-    <DesktopOtherGear />
+    {#if equipment}
+      <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
+      <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
+    {:else}
+      <!-- Alpha edition: the list is not stored anywhere. -->
+      <DesktopOtherGear />
+    {/if}
   {:else if tab === 'gas'}
     <!-- Gaz (mock-up bureau-carnet-onglet-gaz): one card per cylinder, the selected one's fields, Consommation. -->
     <div class="od-desktop-dive-fields--card">
