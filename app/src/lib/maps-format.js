@@ -1,7 +1,7 @@
 // @ts-check
 // Texts of the offline maps screens: sizes in Mo and Go, rows of regions.
 import { t } from './i18n.js';
-import { formatNumber, formatLongDate } from './format.js';
+import { formatNumber, formatDate } from './format.js';
 import { MB, GB } from './maps-logic.js';
 
 /**
@@ -28,5 +28,5 @@ export function percent(received, total) {
 
 /** "3 mars 2026". @param {string} iso */
 export function formatMapDate(iso) {
-  return iso ? formatLongDate(iso) : '';
+  return iso ? formatDate(iso) : '';
 }

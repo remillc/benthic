@@ -5,7 +5,7 @@
   // Shown only while the flag of the store (lib/inventory.svelte.js) is set.
   import Icon from './Icon.svelte';
   import { gear } from '../lib/inventory.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ onexport?: () => void }} */
@@ -18,7 +18,7 @@
     <span class="od-read-only-notice--texts">
       <span class="od-read-only-notice--title">{t('gear.inventory.readOnlyTitle')}</span>
       <span class="od-read-only-notice--text">
-        {gear.daysLeft > 0 ? t('gear.inventory.readOnlyText', { date: formatLongDate(gear.until) }) : t('gear.inventory.readOnlyExpired')}
+        {gear.daysLeft > 0 ? t('gear.inventory.readOnlyText', { date: formatDate(gear.until) }) : t('gear.inventory.readOnlyExpired')}
       </span>
       {#if onexport}<button type="button" class="od-read-only-notice--button" onclick={onexport}>{t('gear.inventory.readOnlyExport')}</button>{/if}
     </span>

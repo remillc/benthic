@@ -1,7 +1,7 @@
 // @ts-check
 // Logbook, phone layout: the name a screen reader gives a dive row as one item (task 2026-11-18-278):
 // "Plongée 9, 7 février 2026, 9 h 09, site à préciser, 91 pieds, 55 minutes".
-import { depthValue, formatLongDate, formatTimeOfDay } from './format.js';
+import { depthValue, formatDate, formatTimeOfDay } from './format.js';
 import { t } from './i18n.js';
 
 /**
@@ -30,7 +30,7 @@ export function diveRowLabel(dive, prefs) {
   const notSet = t('dive.siteNotSet');
   return [
     dive.number ? t('dive.spokenNumber', { number: String(dive.number) }) : t('dive.spokenDive'),
-    formatLongDate(dive.date),
+    formatDate(dive.date),
     formatTimeOfDay(dive.date),
     dive.site || notSet.charAt(0).toLocaleLowerCase() + notSet.slice(1),
     spokenDepth(dive.maxDepthMm, prefs),

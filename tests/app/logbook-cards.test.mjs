@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { groupByMonth } from '../../app/src/lib/carnet-months.js';
 import { buildRows, dayOfMonth, monthAbbreviation } from '../../app/src/lib/logbook-cards.js';
 import { diveRowLabel, spokenDepth, spokenDuration } from '../../app/src/lib/dive-row-text.js';
-import { formatLongDate, formatTimeOfDay, locale } from '../../app/src/lib/format.js';
+import { formatDate, formatTimeOfDay, locale } from '../../app/src/lib/format.js';
 import { language } from '../../app/src/lib/i18n.js';
 
 const src = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8').split(String.fromCharCode(13)).join('');
@@ -104,14 +104,14 @@ test('a row reads as one item: number, date, time, site, depth, duration', () =>
   const notSet = catalog(french ? 'fr' : 'en').dive.siteNotSet;
   assert.ok(label.startsWith(french ? 'Plongée 9, ' : 'Dive 9, '));
   // The long date of a language may hold a comma ("February 7, 2026"): the pieces are checked in order.
-  const order = [formatLongDate(example.date), formatTimeOfDay(example.date), notSet.charAt(0).toLocaleLowerCase() + notSet.slice(1), spokenDepth(example.maxDepthMm, { length: 'ft' }), spokenDuration(example.durationSeconds)].map(plain);
+  const order = [formatDate(example.date), formatTimeOfDay(example.date), notSet.charAt(0).toLocaleLowerCase() + notSet.slice(1), spokenDepth(example.maxDepthMm, { length: 'ft' }), spokenDuration(example.durationSeconds)].map(plain);
   let at = 0;
   for (const piece of order) {
     const found = label.indexOf(piece, at);
     assert.ok(found >= at, `"${piece}" in "${label}"`);
     at = found + piece.length;
   }
-  if (french) assert.match(label, /^Plongée 9, 7 février 2026, .+, site à préciser, 91 pieds, 55 minutes$/);
+  if (french) assert.match(label, /^Plongée 9, 7 févr. 2026, .+, site à préciser, 91 pieds, 55 minutes$/);
   else assert.match(label, /^Dive 9, February 7, 2026, .+, dive site not set, 91 feet, 55 minutes$/);
 });
 

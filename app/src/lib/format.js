@@ -6,6 +6,7 @@
 import { keepUnits } from './nbsp.js';
 import { t, locale } from './i18n.js';
 import { settings } from './settings.svelte.js';
+import { dateInputPattern, formatDateInput, parseDateInput } from './date-time-picker.js';
 
 /** Units only: the full preferences (logbook.prefs) can be passed. @typedef {import('opendives-core').Units} Prefs */
 
@@ -13,7 +14,6 @@ import { settings } from './settings.svelte.js';
 export { locale };
 
 const NBSP = ' '; // non-breaking space before units
-const isFrench = locale.toLowerCase().startsWith('fr');
 /** @type {Map<string, Intl.NumberFormat>} */
 const formats = new Map();
 
@@ -192,14 +192,12 @@ export function formatPercent(permille) {
 // The core gives the dive's local time without a time zone: it is read and
 // shown in UTC so that it is never shifted.
 const dateTimeFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' });
-const longDateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
-const monthYearFormat = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const dateOnlyFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' });
-const fullFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
 
 /** @param {string} iso */
 function toDate(iso) {
-  return new Date(`${iso}Z`);
+  // A date alone (2026-11-06) is read at midnight; a date with a time (2026-11-06T10:30:00) as it is.
+  return new Date(iso.length === 10 ? `${iso}T00:00:00Z` : `${iso}Z`);
 }
 
 /** @type {Map<string, Intl.DateTimeFormat>} */
@@ -233,6 +231,49 @@ export function formatDateChoice(date, choice) {
 }
 
 /**
+ * A month and year, for a date known to the month only (a cylinder's stamped test), in the order of the "Date format"
+ * setting: 2022-03, 03/2022, mars 2022.
+ * @param {Date} date read in UTC
+ * @param {'system'|'iso'|'medium'|'dmy'|'mdy'} choice
+ */
+export function formatMonthChoice(date, choice) {
+  const y = String(date.getUTCFullYear());
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  if (choice === 'iso') return `${y}-${m}`;
+  if (choice === 'dmy' || choice === 'mdy') return `${m}/${y}`;
+  if (choice === 'medium') return chosenFormat('monthMedium', { month: 'short', year: 'numeric' }).format(date);
+  return chosenFormat('monthShort', { month: '2-digit', year: 'numeric' }).format(date);
+}
+
+/**
+ * The format of the "Date format" setting written as the hint of a date field: "aaaa-mm-jj", "jj/mm/aaaa". The
+ * names (system) and the long ones (medium) follow the device's numeric order.
+ * @param {'system'|'iso'|'medium'|'dmy'|'mdy'} [choice]
+ */
+export function dateHint(choice = settings.dateFormat) {
+  const { order, separator } = dateInputPattern(locale, choice);
+  return order.map((k) => t(`datePicker.pattern.${k}`)).join(separator);
+}
+
+/** A YYYY-MM-DD date as typed in a field, in the numeric order of the "Date format" setting ("06/11/2026"); '' when it is not one. @param {string} iso */
+export function typedDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '');
+  return m ? formatDateInput({ year: Number(m[1]), month: Number(m[2]) - 1, day: Number(m[3]) }, locale, settings.dateFormat) : '';
+}
+
+/**
+ * A date typed in a field, read in the format of the "Date format" setting (the ISO form is always accepted): the
+ * YYYY-MM-DD date, or null when it is not a real date.
+ * @param {string} text
+ */
+export function readTypedDate(text) {
+  const iso = /^\s*(\d{4})-(\d{1,2})-(\d{1,2})\s*$/.exec(text);
+  const d = iso ? { year: Number(iso[1]), month: Number(iso[2]) - 1, day: Number(iso[3]) } : parseDateInput(text, locale, 1900, 2100, settings.dateFormat);
+  if (!d || d.month < 0 || d.month > 11 || d.day < 1 || d.day > new Date(Date.UTC(d.year, d.month + 1, 0)).getUTCDate()) return null;
+  return `${String(d.year).padStart(4, '0')}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`;
+}
+
+/**
  * A time of day as the "Time format" setting says: the device's, 24-hour or 12-hour.
  * @param {Date} date read in UTC
  * @param {'system'|'24'|'12'} choice
@@ -243,6 +284,21 @@ export function formatTimeChoice(date, choice) {
   return keepUnits(chosenFormat(`time${choice}`, { hour: 'numeric', minute: '2-digit', hour12: choice === '12' }).format(date));
 }
 
+/** The local wall-clock date and time of an instant, as the dives' own dates are written. @param {Date} date */
+function localIso(date) {
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+}
+
+/** A moment (a file's change time, a version's) as a date in the format chosen in Settings. @param {Date|number} instant */
+export function formatInstantDate(instant) {
+  return formatDate(localIso(new Date(instant)));
+}
+
+/** A moment as a date and time in the formats chosen in Settings. @param {Date|number} instant */
+export function formatInstantDateTime(instant) {
+  return formatDateTime(localIso(new Date(instant)));
+}
+
 /** Short date and time, for a list row, in the formats chosen in Settings. @param {string} iso */
 export function formatDateTime(iso) {
   if (settings.dateFormat === 'system' && settings.timeFormat === 'system') return keepUnits(dateTimeFormat.format(toDate(iso)));
@@ -251,8 +307,8 @@ export function formatDateTime(iso) {
   return `${day} ${formatTimeChoice(date, settings.timeFormat)}`;
 }
 
-/** Short date without the time, in the format chosen in Settings: "9 nov. 2026". @param {string} iso */
-export function formatShortDate(iso) {
+/** Date without the time, in the format chosen in Settings: "2026-11-09". @param {string} iso */
+export function formatDate(iso) {
   const date = toDate(iso);
   return settings.dateFormat === 'system' ? dateOnlyFormat.format(date) : formatDateChoice(date, settings.dateFormat);
 }
@@ -265,22 +321,12 @@ const weekdayFormat = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZo
  * @param {string} iso
  */
 export function formatWeekdayDate(iso) {
-  return `${weekdayFormat.format(toDate(iso))} ${formatShortDate(iso)}`;
+  return `${weekdayFormat.format(toDate(iso))} ${formatDate(iso)}`;
 }
 
-/** Month and year, for a date that is only known to the month (a cylinder's stamped test): "mars 2022". @param {string} iso */
+/** Month and year, for a date that is only known to the month (a cylinder's stamped test), in the format chosen in Settings: "2022-03". @param {string} iso */
 export function formatMonthYear(iso) {
-  return monthYearFormat.format(toDate(iso));
-}
-
-/** Long date without the time: "2 février 2013", "1er juillet 2016". @param {string} iso */
-export function formatLongDate(iso) {
-  return firstOfMonth(longDateFormat.format(toDate(iso)));
-}
-
-/** Long date and time, in the time format chosen in Settings: "24 avril 2022, 10:30". @param {string} iso */
-export function formatLongDateTime(iso) {
-  return `${formatLongDate(iso)}, ${formatTimeChoice(toDate(iso), settings.timeFormat)}`;
+  return formatMonthChoice(toDate(iso), settings.dateFormat);
 }
 
 /** Duration in whole minutes, as in a site's dive rows: "104 min". @param {number} seconds */
@@ -288,26 +334,17 @@ export function formatMinutes(seconds) {
   return `${Math.round(seconds / 60)}${NBSP}${t('units.minutes')}`;
 }
 
-/**
- * Intl writes "1 juillet"; French usage is "1er juillet" (dates follow the
- * device format).
- * @param {string} text
- */
-function firstOfMonth(text) {
-  return isFrench ? text.replace(/(^|\s)1 (?=\p{L})/u, '$11er ') : text;
-}
-
-/** Full date, for the dive detail. @param {string} iso */
-export function formatFullDate(iso) {
-  return firstOfMonth(fullFormat.format(toDate(iso)));
-}
-
-const dayFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' });
+const weekdayLong = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' });
 const timeFormat = new Intl.DateTimeFormat(locale, { timeStyle: 'short', timeZone: 'UTC' });
 
-/** Date with the weekday, capitalised for the start of a line: "Dimanche 24 avril 2022". @param {string} iso */
+/** Date and time with the weekday, for the dive detail: "dimanche 2026-04-24 10:30". @param {string} iso */
+export function formatFullDate(iso) {
+  return `${weekdayLong.format(toDate(iso))} ${formatDateTime(iso)}`;
+}
+
+/** Date with the weekday, capitalised for the start of a line: "Dimanche 2022-04-24". @param {string} iso */
 export function formatDiveDay(iso) {
-  const text = firstOfMonth(dayFormat.format(toDate(iso)));
+  const text = `${weekdayLong.format(toDate(iso))} ${formatDate(iso)}`;
   return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
 }
 
@@ -471,11 +508,12 @@ export function formatDayAt(iso, now = localNowIso()) {
 }
 
 /**
- * A range of days, e.g. "2–4 février 2013" (device format, Intl.formatRange);
- * a single day when both are the same.
+ * A range of days in the format chosen in Settings, e.g. "2013-02-02 – 2013-02-04"; a single day when both are the same.
  * @param {string} isoStart
  * @param {string} isoEnd
  */
 export function formatDateRange(isoStart, isoEnd) {
-  return firstOfMonth(longDateFormat.formatRange(toDate(isoStart), toDate(isoEnd)));
+  const start = formatDate(isoStart);
+  const end = formatDate(isoEnd);
+  return start === end ? start : `${start}${NBSP}–${NBSP}${end}`;
 }

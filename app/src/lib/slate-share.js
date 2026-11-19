@@ -6,7 +6,7 @@
 // from the core (one planDive call per extra plan, made by the page).
 import { Share } from '@capacitor/share';
 import { OpenDivesCore } from 'opendives-core';
-import { decoSummary, formatDepth, formatGasVolume, locale } from './format.js';
+import { decoSummary, formatDate, formatInstantDate, formatDepth, formatGasVolume, locale } from './format.js';
 import { t } from './i18n.js';
 import { planRows } from './plan-rows.js';
 import { letterPaper, planGas } from './share.js';
@@ -43,8 +43,8 @@ function headerOf(variant, base, prefs) {
  * @returns {SlateCard}
  */
 export function buildCard({ result, request, variants, prefs, title }) {
-  const day = new Date(result.when * 1000).toLocaleDateString(locale, { dateStyle: 'medium', timeZone: 'UTC' });
-  const created = new Date().toLocaleDateString(locale, { dateStyle: 'medium' });
+  const day = formatDate(new Date(result.when * 1000).toISOString().slice(0, 19));
+  const created = formatInstantDate(new Date());
   const model = decoSummary({ decoModel: request.decoModel === 1 ? 'vpmb' : 'buehlmann', gfLow: request.gfLow, gfHigh: request.gfHigh, vpmbConservatism: request.vpmbConservatism });
   const water = waterTypeName(waterTypeOfSalinity(request.salinity ?? 10300));
 

@@ -17,7 +17,7 @@
   import { todayIso, nextDueAfter, parseStamp } from '../lib/maintenance.js';
   import { taskLabel } from '../lib/maintenance-text.js';
   import { photoToDataUrl } from '../lib/photo.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { dateHint, formatDate, readTypedDate, typedDate } from '../lib/format.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -32,7 +32,7 @@
 
   /** @type {'service'|'inspection'|'other'} */
   let kind = $state('service');
-  let doneOn = $state(todayIso());
+  let doneOn = $state(typedDate(todayIso()));
   let doneBy = $state('');
   let cost = $state('');
   let notes = $state('');
@@ -51,11 +51,11 @@
   );
   /** A hydrostatic test is dated by the stamp on the bottle (« 03/22 »: the first of March 2022), or by a full date. */
   const hydro = $derived(item?.task === 'hydrostatic');
-  const effectiveDate = $derived((hydro ? parseStamp(doneOn) : null) ?? doneOn);
+  const effectiveDate = $derived((hydro ? parseStamp(doneOn) : null) ?? readTypedDate(doneOn) ?? doneOn);
   const problems = $derived(entryProblems({ doneOn: effectiveDate, cost }));
   const dateLive = liveError(
     () => doneOn,
-    () => (problems.doneOn ? t('maintenance.note.dateInvalid') : ''),
+    () => (problems.doneOn ? t('maintenance.note.dateInvalid', { example: typedDate('2026-11-17') }) : ''),
   );
   const costLive = liveError(
     () => cost,
@@ -68,8 +68,8 @@
     if (!item || (item.intervalMonths == null && item.intervalDives == null)) return t('maintenance.note.nextNone');
     const date = problems.doneOn ? null : nextDueAfter(item, effectiveDate);
     const n = item.intervalDives;
-    if (date && n != null) return t('maintenance.note.nextBoth', { date: formatLongDate(date), n });
-    if (date) return t('maintenance.note.nextDate', { date: formatLongDate(date) });
+    if (date && n != null) return t('maintenance.note.nextBoth', { date: formatDate(date), n });
+    if (date) return t('maintenance.note.nextDate', { date: formatDate(date) });
     return t('maintenance.note.nextDives', { n: n ?? 0 });
   });
 
@@ -126,7 +126,7 @@
     />
     <p class="od-maintenance-note--help">{t(`maintenance.kindHelp.${kind}`)}</p>
 
-    <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t(hydro ? 'maintenance.note.stampHint' : 'maintenance.note.dateHint')} />
+    <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || hydro ? t('maintenance.note.stampHint', { format: dateHint() }) : dateHint()} />
     <ComboField label={t('maintenance.note.doneBy')} bind:value={doneBy} options={shops} supporting={t('maintenance.note.doneByHint')} />
     <TextField label={t('maintenance.note.cost')} bind:value={cost} inputmode="decimal" invalid={!!costLive.error} supporting={costLive.error} />
     <TextField label={t('maintenance.note.notes')} bind:value={notes} multiline />

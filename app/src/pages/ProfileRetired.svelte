@@ -10,7 +10,7 @@
   import Icon from '../components/Icon.svelte';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { gear, loadInventory, retiredGear } from '../lib/inventory.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { profileWide, showProfilePath } from '../lib/profile-frame.js';
   import { t } from '../lib/i18n.js';
 
@@ -22,7 +22,7 @@
   const pieces = $derived(retiredGear());
 
   /** @param {import('../lib/inventory.js').Gear} g */
-  const line = (g) => [g.retiredOn ? t('gear.retire.retiredOn', { date: formatLongDate(g.retiredOn) }) : t('gear.retire.retired'), g.retiredReason ? t(`gear.retire.reason.${g.retiredReason}`) : ''].filter(Boolean).join(' · ');
+  const line = (g) => [g.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(g.retiredOn) }) : t('gear.retire.retired'), g.retiredReason ? t(`gear.retire.reason.${g.retiredReason}`) : ''].filter(Boolean).join(' · ');
 
   /** @param {string} id */
   const open = (id) => (profileWide() ? showProfilePath(`/profile/gear/${id}`) : f7router.navigate(`/profile/gear/${id}`));

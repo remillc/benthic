@@ -69,11 +69,15 @@ export function addDays(year, month, day, delta) {
 }
 
 /**
- * The order and separator of the numeric date of a locale:
- * `{ order: ['d','m','y'], separator: '/' }`.
+ * The order and separator of the numeric date as typed: the one of the "Date format" setting (2026-11-06,
+ * 06/11/2026, 11/06/2026), else the locale's: `{ order: ['d','m','y'], separator: '/' }`.
  * @param {string} locale
+ * @param {string} [choice] 'iso', 'dmy', 'mdy'; anything else follows the locale
  */
-export function dateInputPattern(locale) {
+export function dateInputPattern(locale, choice = 'system') {
+  if (choice === 'iso') return { order: /** @type {('d'|'m'|'y')[]} */ (['y', 'm', 'd']), separator: '-' };
+  if (choice === 'dmy') return { order: /** @type {('d'|'m'|'y')[]} */ (['d', 'm', 'y']), separator: '/' };
+  if (choice === 'mdy') return { order: /** @type {('d'|'m'|'y')[]} */ (['m', 'd', 'y']), separator: '/' };
   /** @type {('d'|'m'|'y')[]} */
   let order = ['d', 'm', 'y'];
   let separator = '/';
@@ -89,9 +93,9 @@ export function dateInputPattern(locale) {
   return { order, separator };
 }
 
-/** The numeric date as typed in the device's format ("22/11/2026"). @param {{year:number,month:number,day:number}} date @param {string} locale */
-export function formatDateInput(date, locale) {
-  const { order, separator } = dateInputPattern(locale);
+/** The numeric date as typed in the device's format ("22/11/2026"). @param {{year:number,month:number,day:number}} date @param {string} locale @param {string} [choice] */
+export function formatDateInput(date, locale, choice = 'system') {
+  const { order, separator } = dateInputPattern(locale, choice);
   const pad = (/** @type {number} */ n, /** @type {number} */ w) => String(n).padStart(w, '0');
   return order.map((k) => (k === 'd' ? pad(date.day, 2) : k === 'm' ? pad(date.month + 1, 2) : pad(date.year, 4))).join(separator);
 }
@@ -99,12 +103,12 @@ export function formatDateInput(date, locale) {
 /**
  * Reads a typed date in the device's format; null when it is not a real date or
  * lies outside [minYear, maxYear]. Any run of non-digits separates the parts.
- * @param {string} text @param {string} locale @param {number} minYear @param {number} maxYear
+ * @param {string} text @param {string} locale @param {number} minYear @param {number} maxYear @param {string} [choice]
  */
-export function parseDateInput(text, locale, minYear, maxYear) {
+export function parseDateInput(text, locale, minYear, maxYear, choice = 'system') {
   const parts = text.trim().split(/\D+/).filter(Boolean);
   if (parts.length !== 3) return null;
-  const { order } = dateInputPattern(locale);
+  const { order } = dateInputPattern(locale, choice);
   /** @type {Record<string, number>} */
   const v = {};
   order.forEach((k, i) => (v[k] = Number(parts[i])));

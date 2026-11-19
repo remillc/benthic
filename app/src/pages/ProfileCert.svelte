@@ -13,7 +13,7 @@
   import { changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
   import { photoUrl } from '../lib/card-canvas.js';
-  import { formatLongDate } from '../lib/profile-format.js';
+  import { formatDate } from '../lib/profile-format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -107,7 +107,7 @@
       <div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.agency')}</span><span class="od-cert--value">{agency}</span></div>
       <div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.level')}</span><span class="od-cert--value">{card.level}</span></div>
       <div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.number')}</span><span class="od-cert--value">{card.number}</span></div>
-      {#if card.issuedOn}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.date')}</span><span class="od-cert--value">{formatLongDate(card.issuedOn)}</span></div>{/if}
+      {#if card.issuedOn}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.date')}</span><span class="od-cert--value">{formatDate(card.issuedOn)}</span></div>{/if}
       {#if card.instructor}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.instructor')}</span><span class="od-cert--value">{card.instructor}</span></div>{/if}
       {#if card.instructorCert}<div class="od-cert--row"><span class="od-cert--label">{t('diverProfile.cert.instructorCert')}</span><span class="od-cert--value od-cert--value-small">{t('diverProfile.cert.instructorCertText')}</span></div>{/if}
     </div>
@@ -144,7 +144,7 @@
     ]}
     start={side === 'back' && urls.front ? 1 : 0}
     title={[agency, card?.level].filter(Boolean).join(' ')}
-    line={card ? (card.issuedOn ? t('diverProfile.certs.line', { number: card.number, date: formatLongDate(card.issuedOn) }) : t('diverProfile.certs.lineNoDate', { number: card.number })) : ''}
+    line={card ? (card.issuedOn ? t('diverProfile.certs.line', { number: card.number, date: formatDate(card.issuedOn) }) : t('diverProfile.certs.lineNoDate', { number: card.number })) : ''}
     onclose={() => (full = false)}
   />
 {/if}

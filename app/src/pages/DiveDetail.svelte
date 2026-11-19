@@ -55,7 +55,7 @@
   import {
     formatCylinderSize,
     formatDepth,
-    formatLongDate,
+    formatDate,
     formatDiveDay,
         formatGasLong,
     formatNumber,
@@ -64,7 +64,6 @@
     formatTemperature,
     formatWeight,
     formatMinutes,
-    formatShortDate,
     formatTimeOfDay,
   } from '../lib/format.js';
   import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
@@ -855,7 +854,7 @@
       <header class="od-dive-detail--desk-head">
         <div class="od-dive-detail--desk-titles">
           <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
-          <p class="od-dive-detail--desk-sub od-value">{[formatShortDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
+          <p class="od-dive-detail--desk-sub od-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
         </div>
         <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
         <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
@@ -875,7 +874,7 @@
       <h1 class="od-dive-detail--site" class:od-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location || trip}
         <p class="od-dive-detail--location">
-          {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) })}</a>{/if}
+          {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) })}</a>{/if}
         </p>
       {/if}
       {#if dive.rating > 0}
@@ -944,7 +943,7 @@
                   <span class="od-dive-validations--detail">{t('validation.pendingText')}</span>
                 {:else}
                   <span class="od-dive-validations--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
-                  <span class="od-dive-validations--detail">{[t(`validation.method.${v.method}`), formatLongDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
+                  <span class="od-dive-validations--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
                   {#if v.modified}<span class="od-dive-validations--modified">{t('validation.modified')}</span>{/if}
                 {/if}
               </div>
@@ -1074,7 +1073,7 @@
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
     {#if desk}
-      <DesktopDiveFields {dive} {prefs} {tab} trip={trip ? trip.location || t('trip.startingOn', { date: formatLongDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
+      <DesktopDiveFields {dive} {prefs} {tab} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
     {#if !desk && dive.pictures > 0 && settings.showPhotos}

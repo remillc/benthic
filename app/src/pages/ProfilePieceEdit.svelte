@@ -7,6 +7,7 @@
   // suggested for the type. The type is the only required field. The fields are checked as the diver types. A
   // computer's serial number and firmware are read at each download, so they are not typed. The name of a piece is its
   // brand and model (else its type); a cylinder, a weight belt and « Autre » have a name of their own.
+  import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -54,6 +55,8 @@
   let model = $state('');
   let serial = $state('');
   let purchasedOn = $state('');
+  /** The typed date as YYYY-MM-DD; the text itself when it is not a date, so that it is flagged. */
+  const purchasedIso = $derived(purchasedOn.trim() ? (readTypedDate(purchasedOn) ?? purchasedOn) : '');
   let note = $state('');
   /** The fields of the type besides these (lib/gear-fields.js), as text; a switch is 'yes' or ''. @type {Record<string, string>} */
   let details = $state({});
@@ -90,7 +93,7 @@
       brand = g.brand ?? '';
       model = g.model ?? '';
       serial = g.serial ?? '';
-      purchasedOn = g.purchasedOn ?? '';
+      purchasedOn = typedDate(g.purchasedOn ?? '');
       note = g.note ?? '';
       if (g.photoId) {
         photoId = g.photoId;
@@ -114,18 +117,18 @@
   const effectiveName = $derived(
     namedByHand ? name.trim() || (type === 'other' ? (details.typeName ?? '').trim() : '') || typeLabel : derivedName({ brand, model }, (piece && piece.type === type && piece.name) || typeLabel),
   );
-  const problems = $derived(gearProblems({ name: effectiveName, purchasedOn }));
+  const problems = $derived(gearProblems({ name: effectiveName, purchasedOn: purchasedIso }));
   const detailWrong = $derived(detailProblems(/** @type {any} */ (type), details, { stampText: stampTyped }));
   /** The message of a wrong field, shown once the diver has paused or left it (lib/live-validation.svelte.js). */
   const detailLive = {
-    lastInspection: liveError(() => details.lastInspection ?? '', () => (detailWrong.lastInspection ? t('gear.pieceEdit.dateInvalid') : '')),
+    lastInspection: liveError(() => details.lastInspection ?? '', () => (detailWrong.lastInspection ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastHydro: liveError(() => stampTyped, () => (detailWrong.lastHydro ? t('gear.fieldError.stamp') : '')),
     secondStages: liveError(() => details.secondStages ?? '', () => (detailWrong.secondStages ? t('gear.fieldError.number') : '')),
     lumens: liveError(() => details.lumens ?? '', () => (detailWrong.lumens ? t('gear.fieldError.number') : '')),
   };
   const dateLive = liveError(
     () => purchasedOn,
-    () => (problems.purchasedOn ? t('gear.pieceEdit.dateInvalid') : ''),
+    () => (problems.purchasedOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : ''),
   );
   const canSave = $derived(!problems.name && !problems.purchasedOn && !Object.keys(detailWrong).length && !saving && !gear.readOnly);
   const suggestions = $derived(suggestionsFor(type, details));
@@ -209,7 +212,7 @@
           brand: spec.brand ? brand : '',
           model: spec.brand ? model : '',
           serial: computer && piece?.computerModel ? piece.serial : spec.serial ? serial : '',
-          purchasedOn,
+          purchasedOn: purchasedIso,
           note,
           details: kept,
           photoId: nextPhoto || undefined,
@@ -287,7 +290,7 @@
   {:else if f.kind === 'switch'}
     <SwitchField label={t(`gear.field.${f.key}`)} checked={details[f.key] === 'yes'} onchange={(v) => setDetail(f.key, v ? 'yes' : '')} supporting={f.hint ? t(`gear.fieldHint.${f.key}`) : ''} />
   {:else if f.kind === 'date'}
-    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} placeholder={t('gear.fieldHint.datePlaceholder')} maxYear={new Date().getFullYear()} supporting={detailLive.lastInspection.error} />
+    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} maxYear={new Date().getFullYear()} supporting={detailLive.lastInspection.error} />
   {:else if f.kind === 'stamp'}
     <TextField
       label={t(`gear.field.${f.key}`)}
@@ -398,7 +401,7 @@
 
     {#each fields.after as f (f.key)}{@render detail(f)}{/each}
 
-    <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t('gear.pieceEdit.purchasedOnHint')} />
+    <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
     <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
 
     {#if showReminderCard}

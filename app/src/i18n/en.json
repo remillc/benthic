@@ -3127,7 +3127,8 @@
       "Logbook: on Android, the floating toolbar of a selection sits above the bottom navigation bar (and above the sample logbook banner) instead of under it.",
       "Dive validation (OpenDives+): “Get the dive validated” in the dive menu, and “Get the dives validated” in the selection menu (one validation for several dives). The buddy or instructor signs with a finger on the screen, or scans a QR code with OpenDives+ (the code expires after 10 minutes; without a network, the dive shows “Validation pending” until the confirmation arrives). The dive detail has a “Validations” section (name, role, method, date, signature) and says “Changed after the validation” when the dive changed; a validated dive carries a small tick in the logbook. Validations appear on the PDF sheet and in the logbook’s PDF export, and can be removed one by one.",
       "My diver profile: an optional “Full name” field, first in “You” of Information and its edit screen. It shows at the top of “My diver profile” (the e-mail without it) and, with an OpenDives+ account, on the first line of the account sheet, with the e-mail under it in smaller grey text. When you confirm another diver’s dive, “Your name” comes from the profile (a correction applies to that confirmation only), the sentence under it gives your role and your instructor certification number, and “I confirm” stays off while the name is empty; if the profile has no name, the name you type is saved there. The name is added at the top of the PDF sheets of a dive and of the logbook (switch “My name in the header” when exporting a PDF; “Anonymize” removes it too).",
-      "“New piece”: on a phone, “Piece type” is a field that opens a menu of the 16 types (icon, name, a check on the chosen type; the system list on iPhone); the grid of tiles stays on tablets and desktop. Under the field, the model’s photo, large, with “Change image” (the type’s drawing when the model has no photo; “Add a photo” and the small thumbnail beside “Model” are gone). Five icons redrawn everywhere in the equipment: weight belt, scooter, knife, fins and light."
+      "“New piece”: on a phone, “Piece type” is a field that opens a menu of the 16 types (icon, name, a check on the chosen type; the system list on iPhone); the grid of tiles stays on tablets and desktop. Under the field, the model’s photo, large, with “Change image” (the type’s drawing when the model has no photo; “Add a photo” and the small thumbnail beside “Model” are gone). Five icons redrawn everywhere in the equipment: weight belt, scooter, knife, fins and light.",
+      "Dates: every date follows the format chosen in Settings › Language and date (2026-11-06 by default): logbook, dive detail, equipment and maintenance, certificates and documents, validation, account, backup, offline maps, PDF. Date fields show that format as their hint (“yyyy-mm-dd”), typing in the calendar follows it, and a date known to the month only (hydrostatic test) is written in the same order (2022-03)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3476,7 +3477,7 @@
     "to": "To",
     "fromUnit": "From ({unit})",
     "toUnit": "To ({unit})",
-    "dateHint": "For example 2025-06-30",
+    "dateHint": "{format}",
     "timeHint": "For example 9:30",
     "invalid": "Value not recognised",
     "atLeast": "At least",
@@ -5687,8 +5688,7 @@
       "typeName": "For example, repair kit",
       "o2Clean": "Prepared for pure oxygen or rich nitrox",
       "lastHydro": "The date stamped on the cylinder, like 03/22.",
-      "cylinderType": "Volume and working pressure come from the type. Types are managed in Settings › Equipment.",
-      "datePlaceholder": "dd mmm yyyy"
+      "cylinderType": "Volume and working pressure come from the type. Types are managed in Settings › Equipment."
     },
     "fieldOption": {
       "none": "None",
@@ -5979,8 +5979,7 @@
       "model": "Model",
       "serial": "Serial number",
       "purchasedOn": "Purchase date",
-      "purchasedOnHint": "Year, month, day",
-      "dateInvalid": "Enter a real date, as 2021-05-12",
+      "dateInvalid": "Enter a real date, as {example}",
       "note": "Notes (optional)",
       "noteHint": "For example, the main regulator",
       "nameEmpty": "Enter a name",
@@ -6232,14 +6231,14 @@
       "other": "Other: any work that is neither a service nor an inspection, such as cleaning or a repair."
     },
     "note": {
-      "stampHint": "Date stamped on the cylinder, like 03/22, or a full date",
+      "stampHint": "Date stamped on the cylinder, like 03/22, or a full date ({format})",
       "title": "Note a service",
       "close": "Close",
       "save": "Save",
       "type": "Type",
       "date": "Date",
-      "dateHint": "Year, month, day",
-      "dateInvalid": "Enter a real date, like 2026-11-17",
+      "dateHint": "{format}",
+      "dateInvalid": "Enter a real date, like {example}",
       "doneBy": "Done by",
       "doneByHint": "A dive centre or yourself",
       "cost": "Cost (optional)",
@@ -6365,7 +6364,6 @@
       "bloodHint": "“Unknown” if you do not know it. Encrypted and only you can see it.",
       "bloodDenied": "Allow health data to keep the blood group.",
       "unknown": "Unknown",
-      "dobHint": "dd month yyyy",
       "dobPick": "Choose the date of birth",
       "dobFuture": "The date is in the future.",
       "phoneIncomplete": "The number is incomplete for this country.",
@@ -6404,7 +6402,6 @@
       "number": "Number",
       "numberHint": "Number on the card",
       "date": "Date",
-      "dateHint": "dd month yyyy",
       "datePick": "Choose the date",
       "dateFuture": "The date is in the future.",
       "instructor": "Instructor (optional)",

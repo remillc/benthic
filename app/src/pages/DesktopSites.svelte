@@ -36,7 +36,7 @@
   import { navigation, openAbout } from '../lib/navigation.svelte.js';
   import { connection } from '../lib/online.svelte.js';
   import { desktopMac, layout } from '../lib/layout.svelte.js';
-  import { formatDepth, formatShortDate, locale } from '../lib/format.js';
+  import { formatDepth, formatDate, locale } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { setDiveSite } from '../lib/dive-site.js';
   import { t } from '../lib/i18n.js';
@@ -425,7 +425,7 @@
                     <td class="od-desktop-sites--site">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}<span class="od-desktop-sites--muted">{t('sites.noName')}</span>{/if}</td>
                     <td class="od-desktop-sites--country">{#each highlightParts(site.country, typed ? query : '') as part}{#if part.match}<mark class="od-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</td>
                     <td class="od-desktop-sites--numeric od-value">{site.dives}</td>
-                    <td class="od-desktop-sites--last od-value">{site.lastDate ? formatShortDate(site.lastDate) : '—'}</td>
+                    <td class="od-desktop-sites--last od-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</td>
                   </tr>
                 {/each}
               </tbody>

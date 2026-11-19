@@ -66,7 +66,7 @@
     yearCounts,
     yearLineAt,
   } from '../lib/desktop-table.js';
-  import { formatDepth, formatLongDate, formatTemperature, formatSac, formatMinutes, depthValue, formatWeekdayDate, formatTimeOfDay } from '../lib/format.js';
+  import { formatDepth, formatDate, formatTemperature, formatSac, formatMinutes, depthValue, formatWeekdayDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
 
@@ -267,7 +267,7 @@
   /** « Voyage du 2 février 2013 · 4 plongées, de 21 à 29 m » */
   function tripText(/** @type {{location: string, dives: import('opendives-core').Dive[]}} */ row) {
     const dives = row.dives;
-    const title = row.location || t('trip.startingOn', { date: formatLongDate(dives.reduce((a, d) => (d.date < a ? d.date : a), dives[0].date)) });
+    const title = row.location || t('trip.startingOn', { date: formatDate(dives.reduce((a, d) => (d.date < a ? d.date : a), dives[0].date)) });
     const depths = dives.map((d) => d.maxDepthMm).filter(Boolean);
     const diveCount = t('trip.dives', { n: dives.length });
     const p = logbook.prefs;

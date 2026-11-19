@@ -44,7 +44,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { parseNumber } from '../lib/filter.svelte.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
-  import { formatCylinderSize, formatDepth, formatLongDate, formatMinSec, formatNumber, formatPressure, formatWeight, locale } from '../lib/format.js';
+  import { formatCylinderSize, formatDepth, formatDate, formatMinSec, formatNumber, formatPressure, formatWeight, locale } from '../lib/format.js';
   import { canMove, dropIndex, gasName, moveItem, OTHER_TYPE, pressureUsed, typeHelper } from '../lib/cylinder-card.js';
   import { deletionOutcome, fillRatio, gasChangeMoments, typeLine } from '../lib/gas-group.js';
   import { t, tIfExists } from '../lib/i18n.js';
@@ -348,7 +348,7 @@
   const weightsNow = $derived(weights.reduce((sum, w) => sum + (Number.isFinite(gramsOf(w)) ? gramsOf(w) : 0), 0));
   const suggestionShown = $derived(suggestionAllowed && showSuggestion(suggestion, weightsNow, prefs.weight));
   const suggestionTexts = $derived(
-    suggestion ? { weight: formatWeight(suggestion.grams, prefs), date: formatLongDate(suggestion.from.date) } : { weight: '', date: '' },
+    suggestion ? { weight: formatWeight(suggestion.grams, prefs), date: formatDate(suggestion.from.date) } : { weight: '', date: '' },
   );
 
   /** "Utiliser": the earlier dive's weights, adjusted, replace this dive's weights. */
@@ -363,7 +363,7 @@
   const isoDate = $derived(
     `${date.year}-${two(date.month + 1)}-${two(Math.min(date.day, daysIn(date.year, date.month)))}T${two(date.hour)}:${two(date.minute)}:${two(date.second)}`,
   );
-  const dateText = $derived(new Date(date.year, date.month, date.day).toLocaleDateString(locale, { dateStyle: 'medium' }));
+  const dateText = $derived(formatDate(isoDate));
   const timeText = $derived(new Date(2000, 0, 1, date.hour, date.minute).toLocaleTimeString(locale, { timeStyle: 'short' }));
   const thisYear = new Date().getFullYear();
   const years = Array.from({ length: thisYear + 2 - 1950 }, (_, i) => 1950 + i);
@@ -1155,7 +1155,7 @@
     {/if}
     <div class="od-edit-dive--cards" class:od-edit-dive--two-columns={sheet} class:od-edit-dive--hidden={gasPage}>
     <p class="od-edit-dive--subtitle od-value">
-      {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatLongDate(dive.date)].filter(Boolean).join(' · ')}
+      {[dive.number ? t('detail.number', { number: String(dive.number) }) : '', dive.site, formatDate(dive.date)].filter(Boolean).join(' · ')}
     </p>
 
     <!-- La plongée -->

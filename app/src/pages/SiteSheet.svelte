@@ -23,7 +23,7 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { diveLines, formatCoordinates, mapsLink, openInMapsApp, siteChange } from '../lib/sites.svelte.js';
-  import { formatLongDateTime } from '../lib/format.js';
+  import { formatDateTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7route: { params: { uuid: string } }, f7router: any }} */
@@ -228,7 +228,7 @@
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}
               <span class="od-site-sheet--text-column">
-                <span class="od-site-sheet--date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatLongDateTime(dive.date) }) : formatLongDateTime(dive.date)}</span>
+                <span class="od-site-sheet--date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatDateTime(dive.date) }) : formatDateTime(dive.date)}</span>
                 <span class="od-site-sheet--supporting od-value">{lines[dive.id] ?? ''}</span>
               </span>
               <span class="od-site-sheet--chevron"><Icon name="chevron" size={20} /></span>

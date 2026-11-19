@@ -36,7 +36,7 @@
     needsDiveDate,
     needsFormats,
   } from '../lib/csv-dialog.js';
-  import { formatDepth, formatLongDateTime, formatNumber } from '../lib/format.js';
+  import { formatDepth, formatDateTime, formatNumber } from '../lib/format.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -301,7 +301,7 @@
             <span class="od-csv-import--dive-thumb" aria-hidden="true"></span>
             <span class="od-csv-import--dive-text">
               <span class="od-csv-import--dive-title">{t('csvImport.preview.newDive')}</span>
-              <span class="od-csv-import--dive-detail">{formatLongDateTime(isoOf(first.when))} · {t('csvImport.preview.site')}</span>
+              <span class="od-csv-import--dive-detail">{formatDateTime(isoOf(first.when))} · {t('csvImport.preview.site')}</span>
             </span>
             <span class="od-csv-import--dive-figures">
               <span class="od-csv-import--dive-duration">{formatNumber(Math.round(first.durationSeconds / 60), 0)} min</span>

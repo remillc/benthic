@@ -25,7 +25,7 @@
   import { logbook, addDive, renumberDives, renumberPlanFrom } from '../lib/logbook.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { parseNumber } from '../lib/filter.svelte.js';
-  import { depthUnit, formatCylinderSize, formatLongDate, locale } from '../lib/format.js';
+  import { depthUnit, formatCylinderSize, formatDate, locale } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { ios } from '../lib/layout.svelte.js';
@@ -93,7 +93,7 @@
 
   const two = (/** @type {number} */ n) => String(n).padStart(2, '0');
   const daysIn = (/** @type {number} */ y, /** @type {number} */ m) => new Date(y, m + 1, 0).getDate();
-  const dateText = $derived(new Date(year, month, day).toLocaleDateString(locale, { dateStyle: 'long' }));
+  const dateText = $derived(formatDate(isoDate));
   const timeText = $derived(new Date(2000, 0, 1, hour, minute).toLocaleTimeString(locale, { timeStyle: 'short' }));
   const isoDate = $derived(`${year}-${two(month + 1)}-${two(Math.min(day, daysIn(year, month)))}T${two(hour)}:${two(minute)}`);
 
@@ -328,7 +328,7 @@
         <ChoiceRow class="od-new-dive--site" name="od-new-site" selected={site === s.uuid} onselect={() => (site = s.uuid)}>
           <span class="od-new-dive--site-text">
             <span>{s.name}</span>
-            {#if s.lastDate}<span class="od-new-dive--hint">{t('newDive.lastDive', { date: formatLongDate(s.lastDate) })}</span>{/if}
+            {#if s.lastDate}<span class="od-new-dive--hint">{t('newDive.lastDive', { date: formatDate(s.lastDate) })}</span>{/if}
           </span>
         </ChoiceRow>
       {/each}

@@ -6,7 +6,7 @@
   import Icon from './Icon.svelte';
   import { theme } from 'framework7-svelte';
   import ProfileThumbnail from './ProfileThumbnail.svelte';
-  import { depthValue, formatDepth, formatLongDate } from '../lib/format.js';
+  import { depthValue, formatDepth, formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -35,7 +35,7 @@
 
   // Dives arrive from the most recent to the oldest.
   const start = $derived(dives[dives.length - 1].date);
-  const title = $derived(location || t('trip.startingOn', { date: formatLongDate(start) }));
+  const title = $derived(location || t('trip.startingOn', { date: formatDate(start) }));
   const summary = $derived.by(() => {
     const diveCount = t('trip.dives', { n: dives.length });
     // A zero depth means "unknown": it is left out of the range.
@@ -121,7 +121,7 @@
       <div class="od-row-text">
         <div class="item-title">{title}</div>
         <div class="item-text od-value">{summary}</div>
-        {#if location && theme.ios}<div class="item-text">{t('trip.startingOn', { date: formatLongDate(start) })}</div>{/if}
+        {#if location && theme.ios}<div class="item-text">{t('trip.startingOn', { date: formatDate(start) })}</div>{/if}
       </div>
       <button
         type="button"

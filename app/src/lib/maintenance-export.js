@@ -5,7 +5,7 @@
 // that were attached, one per page. Made on the device, with the same HTML-to-PDF path as the dive sheet.
 import { Share } from '@capacitor/share';
 import { OpenDivesCore } from 'opendives-core';
-import { formatLongDate, formatNumber } from './format.js';
+import { formatDate, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { taskLabel } from './maintenance-text.js';
 import { localDay } from './logbook-name.js';
@@ -51,7 +51,7 @@ export function historyHtml({ name, typeLabel, note, serial, purchasedOn, dives,
   const figure = (/** @type {string} */ l, /** @type {string} */ v) => `<div><span style="${label}">${esc(l)}</span><span style="font-size:14px">${esc(v)}</span></div>`;
   const figures = [
     serial ? figure(t('gear.piece.serial'), serial) : '',
-    purchasedOn ? figure(t('gear.piece.purchasedOn'), formatLongDate(purchasedOn)) : '',
+    purchasedOn ? figure(t('gear.piece.purchasedOn'), formatDate(purchasedOn)) : '',
     figure(t('maintenance.export.dives'), String(dives)),
     next ? figure(t('maintenance.export.next'), next) : '',
   ].join('');
@@ -61,7 +61,7 @@ export function historyHtml({ name, typeLabel, note, serial, purchasedOn, dives,
     ? rows
         .map(
           (r) =>
-            `<tr>${td(esc(formatLongDate(r.date)))}${td(esc(r.type))}${td(esc(r.by || t('maintenance.piece.byYouShort')))}${td(r.cost != null ? `<span style="white-space:nowrap">${esc(money(r.cost))}</span>` : '', true)}${td(esc(r.notes))}</tr>`,
+            `<tr>${td(esc(formatDate(r.date)))}${td(esc(r.type))}${td(esc(r.by || t('maintenance.piece.byYouShort')))}${td(r.cost != null ? `<span style="white-space:nowrap">${esc(money(r.cost))}</span>` : '', true)}${td(esc(r.notes))}</tr>`,
         )
         .join('')
     : `<tr>${td(`<span style="color:#4B4A47">${esc(t('maintenance.piece.historyEmpty'))}</span>`)}<td colspan="4" style="border-bottom:1px solid #E3E1DC"></td></tr>`;
@@ -108,10 +108,10 @@ export async function exportHistory(input, { letter, readPhoto, desktop }) {
   for (const r of input.rows) {
     if (!r.invoice) continue;
     const dataUrl = await readPhoto(r.invoice);
-    if (dataUrl.startsWith('data:image/')) invoices.push({ label: `${formatLongDate(r.date)} · ${r.type}`, dataUrl });
+    if (dataUrl.startsWith('data:image/')) invoices.push({ label: `${formatDate(r.date)} · ${r.type}`, dataUrl });
   }
   const day = localDay();
-  const html = historyHtml({ ...input, invoices, exportedOn: formatLongDate(day), letter });
+  const html = historyHtml({ ...input, invoices, exportedOn: formatDate(day), letter });
   const name = historyFileName(input.name, day);
   const { uri } = await OpenDivesCore.htmlToPdf({ html, name, letter });
   if (desktop) {

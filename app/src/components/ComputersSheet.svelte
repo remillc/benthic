@@ -12,7 +12,7 @@
   import DcTile from './DcTile.svelte';
   import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import { layout, ios } from '../lib/layout.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -57,7 +57,7 @@
     {:else}
       <h2 class="od-computers-sheet--title">{t('detail.computersTitle')}</h2>
     {/if}
-    <p class="od-computers-sheet--subtitle">{[title, date ? formatLongDate(date) : ''].filter(Boolean).join(' · ')}</p>
+    <p class="od-computers-sheet--subtitle">{[title, date ? formatDate(date) : ''].filter(Boolean).join(' · ')}</p>
 
     <ul class="od-computers-sheet--list" role="list">
       {#each rows as c (c.index)}

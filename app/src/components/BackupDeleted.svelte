@@ -6,7 +6,7 @@
   import './backup.css';
   import { backup, restoreOne, loadDeleted } from '../lib/backup.svelte.js';
   import { versionDay, isoOfEpoch } from '../lib/backup-text.js';
-  import { formatLongDate, formatTimeAgo } from '../lib/format.js';
+  import { formatDate, formatTimeAgo } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
@@ -20,7 +20,7 @@
   /** @param {import('../lib/backup-history.js').DeletedDive} d */
   function rowTitle(d) {
     const number = d.number != null ? t('backup.version.number', { n: d.number }) : '';
-    const date = formatLongDate(d.key.replace(' ', 'T'));
+    const date = formatDate(d.key.replace(' ', 'T'));
     return [number, d.site, date].filter(Boolean).join(' · ');
   }
 

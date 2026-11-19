@@ -8,6 +8,7 @@
   // Numéro de série, Date d’achat, Notes and « Supprimer la pièce ». No maintenance reminder for a computer.
   // The diver’s photo belongs to this piece: it is kept in the inventory (account data, compressed), never added to
   // the shared catalog of computer images (docs/architecture.md, section 12).
+  import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -37,6 +38,8 @@
   let model = $state('');
   let serial = $state('');
   let purchasedOn = $state('');
+  /** The typed date as YYYY-MM-DD; the text itself when it is not a date, so that it is flagged. */
+  const purchasedIso = $derived(purchasedOn.trim() ? (readTypedDate(purchasedOn) ?? purchasedOn) : '');
   let note = $state('');
   let saving = $state(false);
   let confirmDelete = $state(false);
@@ -57,7 +60,7 @@
       brand = g.brand ?? '';
       model = g.model ?? '';
       serial = g.serial ?? '';
-      purchasedOn = g.purchasedOn ?? '';
+      purchasedOn = typedDate(g.purchasedOn ?? '');
       note = g.note ?? '';
       if (g.photoId) {
         photoId = g.photoId;
@@ -85,10 +88,10 @@
   /** A computer tied to dives in the logbook keeps its serial number: the download reads it. */
   const tied = $derived(!!piece?.computerModel);
   const name = $derived([brand, model].map((s) => s.trim()).filter(Boolean).join(' ') || piece?.name || '');
-  const problems = $derived(gearProblems({ name, purchasedOn }));
+  const problems = $derived(gearProblems({ name, purchasedOn: purchasedIso }));
   const dateLive = liveError(
     () => purchasedOn,
-    () => (problems.purchasedOn ? t('gear.pieceEdit.dateInvalid') : ''),
+    () => (problems.purchasedOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : ''),
   );
   const canSave = $derived(!problems.name && !problems.purchasedOn && !saving && !gear.readOnly);
   /** The text the catalog is searched with: brand and model as typed. */
@@ -128,7 +131,7 @@
           brand,
           model,
           serial: tied ? piece.serial : serial,
-          purchasedOn,
+          purchasedOn: purchasedIso,
           note,
           photoId: nextPhoto || undefined,
         });
@@ -187,7 +190,7 @@
   {:else}
     <TextField label={t('gear.pieceEdit.serial')} bind:value={serial} supporting={t('gear.pieceNew.serialHintComputer')} />
   {/if}
-  <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t('gear.pieceEdit.purchasedOnHint')} />
+  <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
   <div class="od-computer-edit--wide-note"><TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={t('gear.computerEdit.noteHint')} /></div>
 {/snippet}
 
@@ -202,7 +205,7 @@
   <p class="od-computer-edit--ios-footer">{t('gear.computerEdit.suggestHint')}</p>
   <div class="od-computer-edit--group" role="list">
     <label class="od-computer-edit--ios-row"><span>{t('gear.computerEdit.serialShort')}</span><input bind:value={serial} disabled={tied} /></label>
-    <label class="od-computer-edit--ios-row"><span>{t('gear.pieceEdit.purchasedOn')}</span><input bind:value={purchasedOn} inputmode="numeric" placeholder={t('gear.pieceEdit.purchasedOnHint')} aria-invalid={dateLive.error ? 'true' : undefined} /></label>
+    <label class="od-computer-edit--ios-row"><span>{t('gear.pieceEdit.purchasedOn')}</span><input bind:value={purchasedOn} inputmode="numeric" placeholder={dateHint()} aria-invalid={dateLive.error ? 'true' : undefined} /></label>
     <label class="od-computer-edit--ios-row"><span>{t('gear.computerEdit.noteShort')}</span><input bind:value={note} placeholder={t('gear.computerEdit.optional')} /></label>
   </div>
   {#if dateLive.error}<p class="od-computer-edit--ios-footer od-computer-edit--ios-error">{dateLive.error}</p>{/if}

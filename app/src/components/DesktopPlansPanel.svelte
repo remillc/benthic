@@ -7,7 +7,7 @@
   import { onMount, tick } from 'svelte';
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatDepth, formatDuration, formatGasLong, formatShortDate, formatMixName } from '../lib/format.js';
+  import { formatDepth, formatDuration, formatGasLong, formatDate, formatMixName } from '../lib/format.js';
   import { planRowTitle } from '../lib/plan-title.js';
   import { t } from '../lib/i18n.js';
 
@@ -16,13 +16,13 @@
 
   const prefs = $derived(logbook.prefs);
   /** @param {import('opendives-core').PlannedDive} plan */
-  const title = (plan) => planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatShortDate(plan.date) })).text;
+  const title = (plan) => planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatDate(plan.date) })).text;
   /** @param {import('opendives-core').PlannedDive} plan */
   function detail(plan) {
     const gas = plan.gases[0];
     const o2 = gas?.o2Permille ?? 209;
     const he = gas?.hePermille ?? 0;
-    return [he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he), formatShortDate(plan.date)].join(' · ');
+    return [he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he), formatDate(plan.date)].join(' · ');
   }
 
   /** @type {HTMLElement|undefined} */

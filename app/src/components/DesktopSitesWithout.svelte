@@ -12,7 +12,7 @@
   import { fillPlace } from '../lib/desktop-sites.svelte.js';
   import { groupWithout } from '../lib/desktop-sites.js';
   import { SITE_SUGGESTION_LIMIT_M, distanceInDepthUnit, suggestByDistance } from '../lib/site-suggestion.js';
-  import { formatDateTime, formatDepth, formatMinutes, formatNumber, depthUnit, formatLongDate } from '../lib/format.js';
+  import { formatDateTime, formatDepth, formatMinutes, formatNumber, depthUnit, formatDate } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
@@ -102,7 +102,7 @@
   function tripTitle(trip, all) {
     const dated = all.filter((d) => d.trip?.id === trip?.id);
     const start = dated.reduce((a, d) => (d.date < a ? d.date : a), dated[0]?.date ?? '');
-    const title = trip?.location || (start ? t('trip.startingOn', { date: formatLongDate(start) }) : '');
+    const title = trip?.location || (start ? t('trip.startingOn', { date: formatDate(start) }) : '');
     return `${title} · ${t('trip.dives', { n: dated.length })}`;
   }
 </script>

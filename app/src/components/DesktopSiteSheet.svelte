@@ -15,7 +15,7 @@
   import { diveLines, formatCoordinates, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { deskSites, fillPlace, openDiveInCarnet, showSiteDives } from '../lib/desktop-sites.svelte.js';
   import { completions, countValues, regionsOfCountry, worldCountries } from '../lib/desktop-sites.js';
-  import { formatDepth, formatLongDateTime, formatShortDate, formatMinutes } from '../lib/format.js';
+  import { formatDepth, formatDateTime, formatDate, formatMinutes } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
@@ -201,7 +201,7 @@
         <dl class="od-site-sheet-desk--figures">
           <div><dt>{t('desktopSites.column.dives')}</dt><dd class="od-value">{site.dives}</dd></div>
           <div><dt>{t('desktopSites.deepest')}</dt><dd class="od-value">{site.maxDepthMm ? formatDepth(site.maxDepthMm, logbook.prefs) : '—'}</dd></div>
-          <div><dt>{t('desktopSites.column.last')}</dt><dd class="od-value">{site.lastDate ? formatShortDate(site.lastDate) : '—'}</dd></div>
+          <div><dt>{t('desktopSites.column.last')}</dt><dd class="od-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</dd></div>
         </dl>
 
         {#if latestFirst.length}
@@ -213,7 +213,7 @@
                 <button type="button" class="od-site-sheet-desk--dive" onclick={() => openDiveInCarnet(dive.id)}>
                   <span class="od-site-sheet-desk--number od-value">{dive.number || ''}</span>
                   <span class="od-site-sheet-desk--dive-text">
-                    <span class="od-value">{formatLongDateTime(dive.date)}</span>
+                    <span class="od-value">{formatDateTime(dive.date)}</span>
                     <span class="od-site-sheet-desk--dive-sub od-value">{[lines[dive.id] ?? formatMinutes(dive.durationSeconds), listed?.maxDepthMm ? formatDepth(listed.maxDepthMm, logbook.prefs) : ''].filter(Boolean).join(' · ')}</span>
                   </span>
                   <Icon name="chevron" size={18} />

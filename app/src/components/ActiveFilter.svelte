@@ -6,7 +6,7 @@
   // filter is the same in the Logbook, the Statistics and the map.
   import Icon from './Icon.svelte';
   import { filter, activeKeys, valueText, removeCriterion, clearFilter } from '../lib/filter.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -24,7 +24,7 @@
   /** @param {string} id */
   function tripName(id) {
     const d = dives.find((x) => String(x.trip?.id) === id);
-    return d?.trip ? d.trip.location || t('trip.startingOn', { date: formatLongDate(d.date) }) : id;
+    return d?.trip ? d.trip.location || t('trip.startingOn', { date: formatDate(d.date) }) : id;
   }
 
   /** @param {any} key */

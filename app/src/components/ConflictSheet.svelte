@@ -12,7 +12,7 @@
   import ProfileThumbnail from './ProfileThumbnail.svelte';
   import { conflictChoices, conflictLayout } from '../lib/conflict-choices.js';
   import { SETTINGS_FILE, compareComputers, computerNames } from '../lib/conflict-text.js';
-  import { formatLongDateTime, locale } from '../lib/format.js';
+  import { formatDateTime, formatInstantDateTime, locale } from '../lib/format.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
@@ -65,7 +65,7 @@
   function fieldName(key, item) {
     const known = tIfExists(`conflict.fields.${key}`);
     if (known) return known;
-    return [diveOf(item)?.site, item.date ? formatLongDateTime(item.date) : ''].filter(Boolean).join(', ') || t('conflict.unknownDive');
+    return [diveOf(item)?.site, item.date ? formatDateTime(item.date) : ''].filter(Boolean).join(', ') || t('conflict.unknownDive');
   }
 
   /** @param {string} text */
@@ -78,7 +78,7 @@
     if (date.toDateString() === new Date().toDateString()) {
       return t('conflict.today', { time: date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' }) });
     }
-    return date.toLocaleString(locale, { dateStyle: 'long', timeStyle: 'short' });
+    return formatInstantDateTime(date);
   }
 
   /** @param {Item} item */
@@ -176,7 +176,7 @@
       {#if item.date}
         <span class="od-conflict-sheet--identity-title">{dive?.site || t('dive.siteNotSet')}</span>
         <span class="od-conflict-sheet--identity-sub od-value">
-          {[item.number ? t('detail.number', { number: String(item.number) }) : '', formatLongDateTime(item.date)].filter(Boolean).join(' · ')}
+          {[item.number ? t('detail.number', { number: String(item.number) }) : '', formatDateTime(item.date)].filter(Boolean).join(' · ')}
         </span>
       {:else if computersLine(item)}
         <span class="od-conflict-sheet--identity-title">{t('conflict.computersCard')}</span>
@@ -308,7 +308,7 @@
         <span class="od-conflict-sheet--identity-text">
           <span class="od-conflict-sheet--identity-title">{name}</span>
           <span class="od-conflict-sheet--identity-sub od-value">
-            {[item.number ? t('detail.number', { number: String(item.number) }) : '', item.date ? formatLongDateTime(item.date) : '', t('conflict.differs', { fields: differsText(item) })].filter(Boolean).join(' · ')}
+            {[item.number ? t('detail.number', { number: String(item.number) }) : '', item.date ? formatDateTime(item.date) : '', t('conflict.differs', { fields: differsText(item) })].filter(Boolean).join(' · ')}
           </span>
         </span>
       </button>

@@ -19,7 +19,7 @@
   import { openFiles, revokeFiles } from '../lib/document-files.js';
   import { documentPath } from '../lib/document-notify.js';
   import { todayIso } from '../lib/maintenance.js';
-  import { formatLongDate } from '../lib/profile-format.js';
+  import { formatDate } from '../lib/profile-format.js';
   import { t } from '../lib/i18n.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
@@ -82,7 +82,7 @@
     <span class="od-docs--texts">
       <span class="od-docs--kind od-docs--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
       <span class="od-docs--title">{documentTitle(doc)}</span>
-      <span class="od-docs--line">{documentLine(doc, formatLongDate, today)}</span>
+      <span class="od-docs--line">{documentLine(doc, formatDate, today)}</span>
       {#if doc.kind !== 'certification' && status.state !== 'none'}
         <span class="od-docs--badge od-docs--badge-{status.state}">{badgeText(status)}</span>
       {/if}

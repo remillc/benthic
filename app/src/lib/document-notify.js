@@ -15,7 +15,7 @@ import { daysBetween, notificationMoment, todayIso } from './maintenance.js';
 import { notificationId, ensureNotificationPermission } from './maintenance-notify.js';
 import { setDesktopNotifications, desktopBridge } from './desktop-notifications.js';
 import { deviceStore } from './device-store.js';
-import { formatLongDate } from './format.js';
+import { formatDate } from './format.js';
 import { openOver } from './navigation.svelte.js';
 import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
@@ -55,7 +55,7 @@ export const notificationName = (doc) => (doc.kind === 'medical' ? t('docs.medic
  */
 export function notificationText(doc, kind, on) {
   const name = notificationName(doc);
-  const date = formatLongDate(doc.expiresOn);
+  const date = formatDate(doc.expiresOn);
   const title = kind === 'day' ? t('docs.notify.titleToday', { name }) : t('docs.notify.title', { name, n: Math.max(1, daysBetween(on, doc.expiresOn)) });
   const body = t(`docs.notify.body.${doc.kind === 'medical' || doc.kind === 'insurance' ? doc.kind : 'other'}`, { date });
   return { title, body };

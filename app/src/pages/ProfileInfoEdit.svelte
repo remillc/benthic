@@ -93,7 +93,7 @@
   <h2 class="od-profile-edit--section">{t('diverProfile.info.you')}</h2>
   <div class="od-profile-edit--fields">
     <TextField label={t('diverProfile.info.fullNameLabel')} bind:value={fullName} supporting={t('diverProfile.info.fullNameHint')} autocomplete="name" />
-    <DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} placeholder={t('diverProfile.info.dobHint')} supporting={dobLive.error} />
+    <DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} supporting={dobLive.error} />
   </div>
 
   <h2 class="od-profile-edit--section">{t('diverProfile.info.emergency')}</h2>

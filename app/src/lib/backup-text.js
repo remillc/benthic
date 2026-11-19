@@ -2,7 +2,7 @@
 // The words of the backup and restore screens (task 2026-11-19-290), pure so that node:test can check them: how a version's
 // differences with the current logbook, and what a sync changed in a dive, read. The screens print what these return.
 import { t, locale } from './i18n.js';
-import { formatRelativeDateTime, formatLongDateTime, formatLongDate, formatShortAgo, localNowIso } from './format.js';
+import { formatRelativeDateTime, formatDateTime, formatDate, formatShortAgo, localNowIso } from './format.js';
 
 /** @typedef {import('./backup-history.js').FieldChange} FieldChange */
 /** @typedef {import('./backup-history.js').VersionDetail} VersionDetail */
@@ -170,12 +170,12 @@ export function versionWhen(seconds, now = localNowIso()) {
   const iso = isoOfEpoch(seconds);
   const DAY = 86400000;
   const days = Math.floor(Date.parse(`${now}Z`) / DAY) - Math.floor(Date.parse(`${iso}Z`) / DAY);
-  return days === 0 || days === 1 ? formatRelativeDateTime(iso, now) : formatLongDateTime(iso);
+  return days === 0 || days === 1 ? formatRelativeDateTime(iso, now) : formatDateTime(iso);
 }
 
 /** The day of a version, for « Restaurer le carnet du 15 novembre 2026 ? ». @param {number} seconds */
 export function versionDay(seconds) {
-  return formatLongDate(isoOfEpoch(seconds));
+  return formatDate(isoOfEpoch(seconds));
 }
 
 /** « Il y a 2 min » since a moment. @param {number} seconds */

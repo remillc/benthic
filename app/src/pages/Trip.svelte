@@ -16,7 +16,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import Icon from '../components/Icon.svelte';
   import { logbook, tripChange, undoLastChange } from '../lib/logbook.svelte.js';
-  import { formatDateRange, formatDateTime, formatDuration, formatLongDate } from '../lib/format.js';
+  import { formatDateRange, formatDateTime, formatDuration, formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
@@ -138,7 +138,7 @@
           [
             { text: t('tripScreen.mergeWith'), label: true },
             ...trips.map((other) => ({
-              text: `${other.location || t('tripScreen.placeToSpecify')} · ${formatLongDate(other.date)}`,
+              text: `${other.location || t('tripScreen.placeToSpecify')} · ${formatDate(other.date)}`,
               onClick: () => change({ action: 'merge', tripId, otherId: other.id }),
             })),
           ],

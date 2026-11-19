@@ -6,7 +6,8 @@
   // copie… and Fermer le carnet with their shortcuts. The Mac has no selector: its menu bar does the same.
   import { onMount, tick } from 'svelte';
   import Icon from './Icon.svelte';
-  import { t, locale } from '../lib/i18n.js';
+  import { t } from '../lib/i18n.js';
+  import { formatInstantDate } from '../lib/format.js';
   import {
     logbooks,
     windowLogbook,
@@ -31,7 +32,6 @@
   let pill = $state();
 
   /** @param {number} time */
-  const formatDate = (time) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(time);
 
   async function toggle() {
     open = !open;
@@ -99,7 +99,7 @@
             <span class="od-logbook-selector--check">{#if here}<Icon name="check" size={18} weight={2} />{/if}</span>
             <span class="od-logbook-selector--text">
               <span class="od-logbook-selector--item-name">{displayName(entry, t)}</span>
-              <span class="od-logbook-selector--item-source">{[sourceText(entry, t), whenText(entry, now, t, formatDate)].filter(Boolean).join(' · ')}</span>
+              <span class="od-logbook-selector--item-source">{[sourceText(entry, t), whenText(entry, now, t, formatInstantDate)].filter(Boolean).join(' · ')}</span>
             </span>
           </button>
         {:else}

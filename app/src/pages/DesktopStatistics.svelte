@@ -36,7 +36,7 @@
   import { undoNameKey } from '../lib/undo-name.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { profilePng } from '../lib/share.js';
-  import { depthUnit, depthValue, formatDepth, formatNumber, formatSac, formatShortDate, formatTotalTime } from '../lib/format.js';
+  import { depthUnit, depthValue, formatDepth, formatNumber, formatSac, formatDate, formatTotalTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { OpenDivesCore } from 'opendives-core';
   import { cachedSites } from '../lib/core-cache.js';
@@ -158,7 +158,7 @@
   /** @param {number} n */
   const diveCount = (n) => t('trip.dives', { n });
   /** @param {import('../lib/desktop-stats.js').StatBar} bar */
-  const when = (bar) => bar.year ?? (bar.date ? formatShortDate(bar.date) : (bar.site || t('desktopStats.noSite')));
+  const when = (bar) => bar.year ?? (bar.date ? formatDate(bar.date) : (bar.site || t('desktopStats.noSite')));
 
   /** What the bar says: its value in words, for the tooltip and the figures. @param {import('../lib/desktop-stats.js').StatBar} bar */
   function valueWords(bar) {

@@ -12,7 +12,7 @@
   import { diver, loadProfile, refreshConsent, changeProfile } from '../lib/profile.svelte.js';
   import { UNKNOWN_BLOOD } from '../lib/profile.js';
   import { formatInternational } from '../lib/phone-format.js';
-  import { formatLongDate, formatStampDate } from '../lib/profile-format.js';
+  import { formatDate, formatStampDate } from '../lib/profile-format.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
@@ -74,7 +74,7 @@
     </div>
     <div class="od-profile-info--row">
       <span class="od-profile-info--label">{t('diverProfile.info.dob')}</span>
-      <span class="od-profile-info--value" class:od-profile-info--empty={!info.dateOfBirth}>{formatLongDate(info.dateOfBirth) || t('diverProfile.info.empty')}</span>
+      <span class="od-profile-info--value" class:od-profile-info--empty={!info.dateOfBirth}>{formatDate(info.dateOfBirth) || t('diverProfile.info.empty')}</span>
     </div>
   </div>
 

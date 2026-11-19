@@ -13,7 +13,7 @@
   import { gear, loadInventory, change, visibleGear } from '../lib/inventory.svelte.js';
   import { groupGear, kitProblems, kitUse, uniqueKitName } from '../lib/inventory.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatLongDate } from '../lib/format.js';
+  import { formatDate } from '../lib/format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -44,7 +44,7 @@
 
   const groups = $derived(groupGear(visibleGear()));
   const use = $derived(kitUse(kitId, gear.records, logbook.dives));
-  const useLine = $derived(use.dives ? t('gear.kit.usedIn', { n: use.dives, date: formatLongDate(use.last) }) : t('gear.kit.neverUsed'));
+  const useLine = $derived(use.dives ? t('gear.kit.usedIn', { n: use.dives, date: formatDate(use.last) }) : t('gear.kit.neverUsed'));
   const others = $derived(gear.kits.filter((k) => k.id !== kitId));
   const problems = $derived(kitProblems({ name, gearIds: selected }, others));
   const live = liveError(

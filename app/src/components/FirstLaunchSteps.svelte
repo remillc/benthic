@@ -52,6 +52,7 @@
   import { cloudErrorKey, creationErrorKey } from '../lib/desktop-logbooks.js';
   import { DROP_STEPS, droppedFiles, nameFromGitUrl, parkPending, pendingFromSource, signInFailure, signInTo, PENDING_IMPORT_KEY } from '../lib/desktop-first-launch.js';
   import { t, locale } from '../lib/i18n.js';
+  import { formatInstantDate } from '../lib/format.js';
 
   /**
    * `recents`: the desktop window without a logbook, after first use (task 2026-11-16-241): the first step shows the
@@ -92,7 +93,6 @@
   /** @type {HTMLInputElement|undefined} */
   let fileInput = $state();
 
-  const dateFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   // --- The transition between steps (docs/system-design.md, « Steps of the first launch ») ---------
 
@@ -618,7 +618,7 @@
   }
 
   /** @param {number} ms */
-  const changed = (ms) => dateFormat.format(new Date(ms));
+  const changed = (ms) => formatInstantDate(ms);
 
   /** The steps whose page title is the step's own title (no logbook name above it). */
   const titles = /** @type {Record<string, string>} */ ({
@@ -935,7 +935,7 @@
           {/if}
           <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
             {#each alphaFound as found (found.id)}
-              <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={alphaFound.length > 1 ? t('welcomeSteps.alphaHelpDated', { n: found.dives, date: new Date(found.modified * 1000).toLocaleDateString() }) : t('welcomeSteps.alphaHelp', { n: found.dives })} disabled={busy} onclick={() => useAlphaLogbook(found)} />
+              <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={alphaFound.length > 1 ? t('welcomeSteps.alphaHelpDated', { n: found.dives, date: formatInstantDate(found.modified * 1000) }) : t('welcomeSteps.alphaHelp', { n: found.dives })} disabled={busy} onclick={() => useAlphaLogbook(found)} />
             {/each}
             <ReleaseChoiceRow main icon="file" title={t('welcomeSteps.fileTitle')} help={t('welcomeSteps.fileHelp', { n: IMPORT_FORMAT_COUNT })} disabled={busy} onclick={() => fileInput?.click()} />
             <!-- Task 2026-11-16-226: the link sits right under « Un fichier », a 48 dp target 4 dp from each row. -->

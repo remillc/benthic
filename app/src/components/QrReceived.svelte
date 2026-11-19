@@ -9,7 +9,7 @@
   import { Popup, Page, Navbar, Link } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { formatDepth, formatLongDateTime, formatMinutes, formatMixName, formatTemperature } from '../lib/format.js';
+  import { formatDepth, formatDateTime, formatMinutes, formatMixName, formatTemperature } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { addReceived, dismissReceived, received } from '../lib/qr-receive.svelte.js';
 
@@ -60,7 +60,7 @@
       {/if}
 
       <div class="od-qr-received--card">
-        <p class="od-qr-received--date">{formatLongDateTime(preview.date)}</p>
+        <p class="od-qr-received--date">{formatDateTime(preview.date)}</p>
         <p class="od-qr-received--site">{preview.site || t('qr.noSite')}</p>
         {#if preview.country}<p class="od-qr-received--country">{preview.country}</p>{/if}
         <div class="od-qr-received--figures">

@@ -3127,7 +3127,8 @@
       "Carnet : sur Android, la barre d’actions flottante d’une sélection se place au-dessus de la barre de navigation du bas (et de la bannière du carnet d’exemple) au lieu de passer dessous.",
       "Validation d’une plongée (OpenDives+) : « Faire valider la plongée » dans le menu de la plongée, et « Faire valider les plongées » dans le menu de la sélection (une validation pour plusieurs plongées). Le compagnon ou le moniteur signe au doigt sur l’écran, ou scanne un code QR avec OpenDives+ (le code expire après 10 minutes ; sans réseau, la plongée affiche « Validation en attente » jusqu’à l’arrivée de la confirmation). Le détail de la plongée a une section « Validations » (nom, rôle, méthode, date, signature) et indique « Modifiée après la validation » quand la plongée a changé ; une plongée validée porte une petite coche dans le carnet. Les validations figurent sur la fiche PDF et dans l’export PDF du carnet, et se retirent une à une.",
       "Mon profil de plongeur : un champ « Nom complet » (facultatif), en premier dans « Vous » des Informations et de leur édition. Il s’affiche en haut de « Mon profil de plongeur » (sans lui, le courriel) et, avec un compte OpenDives+, sur la première ligne de la feuille du compte, le courriel dessous en plus petit gris. Quand vous confirmez la plongée d’un autre plongeur, le champ « Votre nom » vient du profil (une correction vaut pour cette confirmation seulement), la phrase dessous donne votre rôle et le numéro de votre brevet de moniteur, et « Je confirme » reste grisé tant que le nom est vide ; si le profil n’a pas de nom, celui que vous tapez y est enregistré. Le nom s’ajoute en haut des fiches PDF d’une plongée et du carnet (interrupteur « Mon nom dans l’en-tête » à l’export en PDF ; « Anonymiser » le retire aussi).",
-      "« Nouvelle pièce » : sur téléphone, « Type de pièce » est un champ qui ouvre un menu des 16 types (icône, nom, coche sur le type choisi ; liste du système sur iPhone) ; la grille de tuiles reste sur tablette et ordinateur. Sous le champ, la photo du modèle en grand avec « Changer d’image » (le dessin du type sans photo du modèle ; « Ajouter une photo » et la petite vignette à côté de « Modèle » disparaissent). Cinq icônes redessinées partout dans l’équipement : ceinture de lest, scooter, couteau, palmes et lampe."
+      "« Nouvelle pièce » : sur téléphone, « Type de pièce » est un champ qui ouvre un menu des 16 types (icône, nom, coche sur le type choisi ; liste du système sur iPhone) ; la grille de tuiles reste sur tablette et ordinateur. Sous le champ, la photo du modèle en grand avec « Changer d’image » (le dessin du type sans photo du modèle ; « Ajouter une photo » et la petite vignette à côté de « Modèle » disparaissent). Cinq icônes redessinées partout dans l’équipement : ceinture de lest, scooter, couteau, palmes et lampe.",
+      "Dates : toutes les dates suivent le format choisi dans Réglages › Langue et date (2026-11-06 par défaut) : carnet, détail d’une plongée, équipement et entretien, brevets et documents, validation, compte, sauvegarde, cartes hors ligne, PDF. Les champs de date montrent ce format en indication (« aaaa-mm-jj »), la saisie au clavier du calendrier le suit, et une date connue au mois près (test hydrostatique) s’écrit dans le même ordre (2022-03)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3476,7 +3477,7 @@
     "to": "Jusqu'à",
     "fromUnit": "À partir de ({unit})",
     "toUnit": "Jusqu'à ({unit})",
-    "dateHint": "Par exemple 2025-06-30",
+    "dateHint": "{format}",
     "timeHint": "Par exemple 9:30",
     "invalid": "Valeur non reconnue",
     "atLeast": "Au moins",
@@ -5690,8 +5691,7 @@
       "typeName": "Par exemple, trousse de réparation",
       "o2Clean": "Préparée pour l’oxygène pur ou le nitrox riche",
       "lastHydro": "La date frappée sur la bouteille, comme 03/22.",
-      "cylinderType": "Volume et pression de service viennent du type. Les types se gèrent dans Réglages › Équipement.",
-      "datePlaceholder": "jj mois aaaa"
+      "cylinderType": "Volume et pression de service viennent du type. Les types se gèrent dans Réglages › Équipement."
     },
     "fieldOption": {
       "none": "Aucun",
@@ -5982,8 +5982,7 @@
       "model": "Modèle",
       "serial": "Numéro de série",
       "purchasedOn": "Date d’achat",
-      "purchasedOnHint": "Année, mois, jour",
-      "dateInvalid": "Saisissez une date réelle, comme 2021-05-12",
+      "dateInvalid": "Saisissez une date réelle, comme {example}",
       "note": "Notes (facultatif)",
       "noteHint": "Par exemple, le détendeur principal",
       "nameEmpty": "Saisissez un nom",
@@ -6235,14 +6234,14 @@
       "other": "Autre : toute intervention qui n’est ni une révision ni une inspection, comme un nettoyage ou une réparation."
     },
     "note": {
-      "stampHint": "Date frappée sur la bouteille, comme 03/22, ou une date complète",
+      "stampHint": "Date frappée sur la bouteille, comme 03/22, ou une date complète ({format})",
       "title": "Noter une révision",
       "close": "Fermer",
       "save": "Enregistrer",
       "type": "Type",
       "date": "Date",
-      "dateHint": "Année, mois, jour",
-      "dateInvalid": "Saisissez une date réelle, comme 2026-11-17",
+      "dateHint": "{format}",
+      "dateInvalid": "Saisissez une date réelle, comme {example}",
       "doneBy": "Fait par",
       "doneByHint": "Un centre de plongée ou vous-même",
       "cost": "Coût (facultatif)",
@@ -6368,7 +6367,6 @@
       "bloodHint": "« Inconnu » si vous ne le connaissez pas. Chiffré et visible par vous seul.",
       "bloodDenied": "Autorisez les données de santé pour garder le groupe sanguin.",
       "unknown": "Inconnu",
-      "dobHint": "jj mois aaaa",
       "dobPick": "Choisir la date de naissance",
       "dobFuture": "La date est dans le futur.",
       "phoneIncomplete": "Numéro incomplet pour ce pays.",
@@ -6407,7 +6405,6 @@
       "number": "Numéro",
       "numberHint": "Numéro sur la carte",
       "date": "Date",
-      "dateHint": "jj mois aaaa",
       "datePick": "Choisir la date",
       "dateFuture": "La date est dans le futur.",
       "instructor": "Moniteur (facultatif)",
