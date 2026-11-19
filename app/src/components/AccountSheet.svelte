@@ -23,6 +23,7 @@
   import OdPlusChip from './OdPlusChip.svelte';
   import { openManageAccount } from '../lib/navigation.svelte.js';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { createAccountHistory } from '../lib/account-history.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
@@ -233,6 +234,18 @@
       {#if isRelease && !desktopApp}
         <!-- « Mon profil de plongeur » (tasks 267 and 281): the chip, the red line and the badge when a piece is overdue. -->
         <div class="od-account-sheet--ios-group">
+          {#if subscriber}
+            <!-- « Sauvegarde et synchronisation » (task 290): its own page. -->
+            <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
+              <Icon name="cloudDownload" />
+              <span class="od-account-sheet--row-label">
+                <OdPlusChip onSheet />
+                {t('account.free.sync')}
+                <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+              </span>
+              <Icon name="chevron" size={20} />
+            </button>
+          {/if}
           <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
             <Icon name="briefcase" />
             <span class="od-account-sheet--row-label">
@@ -388,6 +401,18 @@
          account sees the chip above its title and, when a piece is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
       <div class="od-account-sheet--card">
+        {#if subscriber}
+          <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
+            <Icon name="cloudDownload" />
+            <span class="od-account-sheet--row-label">
+              <OdPlusChip onSheet />
+              {t('account.free.sync')}
+              <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+            </span>
+            <Icon name="chevron" size={20} />
+          </a>
+          <div class="od-account-sheet--divider od-account-sheet--margin"></div>
+        {/if}
         <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">

@@ -1044,6 +1044,11 @@
     "serverDives": "Plongées sur le serveur",
     "serverSignOut": "Se déconnecter du serveur",
     "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
+    "backup": {
+      "title": "Sauvegarde et synchronisation",
+      "server": "Serveur",
+      "history": "Le serveur garde l’historique de votre carnet."
+    },
     "free": {
       "device": "Carnet sur cet appareil",
       "deviceIos": "Carnet sur cet iPhone",
@@ -2594,7 +2599,8 @@
       "Réglages, Types de bouteilles : un type de « Vos types » a un bouton « Supprimer ce type », avec le nombre de plongées qui l’utilisent. Le supprimer retire ses bouteilles, avec leurs pressions et leur mélange, des plongées qui l’utilisent ; la confirmation dit dans combien de plongées la bouteille est retirée. Là où la bouteille est la seule de la plongée, ou qu’un changement de gaz ou le graphique de pression en dépend, elle reste dans la plongée avec le type « Type inconnu ». Un type utilisé dans aucune plongée est supprimé tout de suite. Les types standard gardent seulement « Retirer ce type », qui ne modifie aucune plongée.",
       "Unités : la consommation de gaz par minute suit l’unité de volume. En pieds cubes, elle est en pi³/min (SAC, RMV et consommation métabolique d’O₂ du pSCR dans les réglages), en litres en l/min, converties depuis la même valeur enregistrée. Sous « Volume », une ligne l’indique.",
       "Bouteilles sur ordinateur : Réglages › Équipement montre « Bouteilles ajoutées aux nouvelles plongées » (circuit ouvert, diluant, oxygène, secours avec « Modifier ») et « Types de bouteilles » (vos types avec le nombre de plongées, quelques types standard puis « Et N autres types standard… », « Ajouter un type », et les deux interrupteurs). Un type s’ouvre dans la fenêtre « Modifier le type », avec « Supprimer ce type » à gauche du pied et la même confirmation que sur téléphone. Sur téléphone, l’explication et le texte sous « Supprimer ce type » sont alignés sur la marge de 16 dp, et « Retirer ce type » reste un bouton neutre.",
-      "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » d’OpenDives+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs)."
+      "iPhone : le carnet n’a plus de bandeau bleu, avec un grand titre, un champ de recherche gris, « + » et l’initiale du compte dans la barre. La feuille « Compte » reprend les maquettes (« Carnet sur cet iPhone », « S’abonner », « Gérer le compte », le point « + » d’OpenDives+, « Mon profil de plongeur » avec son retard d’entretien). Les écrans du profil et des types de bouteilles montrent le titre de la page précédente sur le bouton de retour, avec « + » dans la barre. « Supprimer ce type » est une ligne rouge, et la suppression se confirme dans une feuille d’actions. « Ouvrir dans Plans » ouvre le site dans Apple Plans. « Continuer avec Apple » passe en premier, et l’offre ajoute « Restaurer les achats » et les conditions du renouvellement automatique (l’achat et la connexion avec Apple ne sont pas encore actifs).",
+      "Compte OpenDives+ : « Sauvegarde et synchronisation » ouvre sa propre page (état de la synchronisation, modifications en attente, « Synchroniser maintenant », serveur) au lieu de l’offre ; « Mon profil de plongeur » ouvre le profil."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

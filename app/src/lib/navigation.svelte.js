@@ -131,6 +131,11 @@ export function openManageAccount() {
   else navigation.manageOpen = true;
 }
 
+/** « Sauvegarde et synchronisation » of an OpenDives+ account: its own page, opened over the current section. */
+export function openBackup() {
+  openOver('/account/backup');
+}
+
 /** Settings open over the current section, from the side menu or the tablet navigation. */
 export function openSettings() {
   // The Mac: a separate window (task 2026-11-15-202, desktop/main.cjs).
