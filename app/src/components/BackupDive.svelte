@@ -91,9 +91,9 @@
 <div class="od-backup od-backup-dive">
   {#if picking}
     <input class="od-backup--search" type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
-    <div class="od-backup--list" role="list" style="margin-top: 12px">
+    <div class="od-backup--list" style="margin-top: 12px">
       {#each choices as d (d.id)}
-        <button type="button" role="listitem" class="od-backup--row" onclick={() => choose(d)}>
+        <button type="button" class="od-backup--row" onclick={() => choose(d)}>
           <span class="od-backup--texts">
             <span class="od-backup--row-title">{rowText(d)}</span>
           </span>
@@ -121,7 +121,7 @@
     {:else if !versions.length}
       <p class="od-backup--empty">{t('backup.dive.none')}</p>
     {:else}
-      <div class="od-backup--list" role="list">
+      <div class="od-backup--list">
         {#each versions as v (v.id)}
           <div class="od-backup--row" role="listitem">
             <span class="od-backup--texts">

@@ -63,10 +63,10 @@
   {:else if !backup.versions.length}
     <p class="od-backup--empty">{t('backup.versions.empty')}</p>
   {:else}
-    <div class="od-backup--list" role="list">
+    <div class="od-backup--list">
       {#each backup.versions as v (v.id)}
         {#if v.current}
-          <div class="od-backup--row od-backup-main--current" role="listitem" aria-current="true">
+          <div class="od-backup--row od-backup-main--current" aria-current="true">
             <span class="od-backup--texts">
               <span class="od-backup--row-title">{versionWhen(v.time)}</span>
               <span class="od-backup--row-line">{versionLine(v)}</span>
@@ -74,7 +74,7 @@
             <span class="od-backup--chip">{t('backup.versions.current')}</span>
           </div>
         {:else}
-          <button type="button" role="listitem" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'version' && selected.id === v.id} onclick={() => onversion(v.id)}>
+          <button type="button" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'version' && selected.id === v.id} onclick={() => onversion(v.id)}>
             <span class="od-backup--texts">
               <span class="od-backup--row-title">{versionWhen(v.time)}</span>
               <span class="od-backup--row-line">{versionLine(v)}</span>
@@ -91,8 +91,8 @@
   {/if}
 
   <h2 class="od-backup--section">{t('backup.only.title')}</h2>
-  <div class="od-backup--list" role="list">
-    <button type="button" role="listitem" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'dive'} onclick={ondive}>
+  <div class="od-backup--list">
+    <button type="button" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'dive'} onclick={ondive}>
       <span class="od-backup--tile"><Icon name="book" size={22} weight={1.8} /></span>
       <span class="od-backup--texts">
         <span class="od-backup--row-title">{t('backup.only.dive')}</span>
@@ -100,7 +100,7 @@
       </span>
       <span class="od-backup--chevron"><Icon name="chevron" size={20} /></span>
     </button>
-    <button type="button" role="listitem" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'deleted'} onclick={ondeleted}>
+    <button type="button" class="od-backup--row" class:od-backup--row-selected={selected?.kind === 'deleted'} onclick={ondeleted}>
       <span class="od-backup--tile"><Icon name="trash" size={22} weight={1.8} /></span>
       <span class="od-backup--texts">
         <span class="od-backup--row-title">{t('backup.only.deleted')}</span>
