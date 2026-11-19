@@ -243,7 +243,10 @@ async function openTab(width, height, mobile, welcome = false) {
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(${function (home, temp, stage, welcome) {
       // The very first start (no value) shows the first launch; otherwise the logbook.
-      if (!welcome) {
+      if (welcome) {
+        localStorage.removeItem('CapacitorStorage.od.welcomeBeta');
+        localStorage.removeItem('CapacitorStorage.od.welcome');
+      } else {
         localStorage.setItem('CapacitorStorage.od.welcomeBeta', 'done');
         localStorage.setItem('CapacitorStorage.od.welcome', 'done');
       }
