@@ -6148,7 +6148,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Done (19 November 2026).** Photos via GearIcon/DcTile in every list and the dive detail (own photo wins: lib/gear-photos.svelte.js); linking by brand/model/serial (sameComputer); download end card (Later/Add, hidden list in the device store, OD+ only; the download no longer adds the computer silently); ComputerDeleteDialog; Nouvelle pièce adapted to computers; Réglages › Modifier l’ordinateur restyled for all devices (also covers the layouts of task 307). The image button of a logbook computer shows with an OpenDives+ account only: the photo is kept on the matching equipment piece, created if missing.
 
-## [ ] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
+## [x] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Same screen as point 6 of task 306, on the other devices.
 
@@ -6157,3 +6157,5 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - **Desktop** (`bureau-reglages-ordinateur-modifier`, new). Dialog over Réglages › Ordinateurs et téléchargement: photo with « Changer d’image » on the left, name and info on the right, the two cards side by side, « Annuler » and « Enregistrer » at the bottom.
 
 **Test:** on each device open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with its mock-up.
+
+**Done (19 November 2026).** Réglages › Modifier l’ordinateur on a tablet (440 dp side sheet over the list with photos; 96 dp tile with « Changer d’image », filled « Enregistrer », sand and white cards; scrolls), iPhone and iPad (grouped lists, Annuler / OK, footers, red « Retirer de la liste ») and desktop (760 dp dialog, photo left, cards side by side, Annuler / Enregistrer). Checked in headless Chrome at 390 dp (Material and ?theme=ios), 1024 and 1440 px; the duplicate cards could not be seen against real data (the sample log has one computer), so they follow the mock-up CSS only.
