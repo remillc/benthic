@@ -46,3 +46,4 @@ Next number: 107
 - #98 [design] ajuster les rayons lumineux de l'en-tête.
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide.
 - #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
+- #37 [design] [hors compat. SS] Validation d'une plongée par un compagnon (buddy), un moniteur ou le guide de palanquée : signature manuscrite tracée au doigt sur l'écran, ou code QR affiché par le plongeur et scanné par le compagnon avec OpenDives sur son téléphone. Le format de Subsurface n'a pas de champ pour une signature ou une validation : décider où et comment la stocker sans casser un carnet lu par Subsurface (données ignorées par Subsurface, etc. ; pas un fichier à part dans le même arbre, voir #61). Même question de stockage que #47.
