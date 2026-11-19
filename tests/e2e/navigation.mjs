@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--monkey-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { monkeyFlows } from './navigation-monkey.mjs';
 import { gestureFlows } from './navigation-gestures.mjs';
+import { regressionFlows } from './navigation-regressions.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.OD_E2E_PORT || 5541);
@@ -1001,7 +1002,7 @@ async function desktopFlows() {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1018,6 +1019,10 @@ try {
   // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
   if (args.has('--gestures-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
     await gestureFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
+  }
+  // The faults the random sequences found (tests/e2e/navigation-regressions.mjs).
+  if (args.has('--regressions-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
+    await regressionFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
   }
   // Seeded random sequences (tests/e2e/navigation-monkey.mjs).
   if (args.has('--monkey-only') || (fixed && !args.has('--no-monkey') && !args.has('--tablet-only') && !args.has('--phone-only') && !args.has('--welcome-only'))) {

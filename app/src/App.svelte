@@ -62,6 +62,7 @@
   import { enableRouterGuard } from './lib/router-guard.js';
   import { trackSection, enableSectionSwipes } from './lib/navigation.svelte.js';
   import { enableSwipeBack } from './lib/swipe-back.js';
+  import { enablePageOrder } from './lib/page-order.js';
   import { startNavHealth, watchNavigation } from './lib/nav-health.js';
   import { reportError } from './lib/error-reports.svelte.js';
   import { applyMotionTokens } from './lib/motion.js';
@@ -416,9 +417,10 @@
     enableDialogFit(f7);
     f7ready(() => {
       // Navigation (docs/architecture.md, section 13): the guard on every router, the swipe back under it, the
-      // trace, and the check of the page once each navigation has settled.
+      // pages kept in the order of the history, the trace, and the check of the page once each navigation has settled.
       enableRouterGuard(f7);
       enableSwipeBack(f7);
+      enablePageOrder(f7);
       watchNavigation(f7);
       startNavHealth({ report: (message) => reportError('js', new Error(message)) });
       f7.on('routeChanged', (/** @type {any} */ to) => noteLog('route', to?.path ?? ''));
