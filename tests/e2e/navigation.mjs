@@ -217,6 +217,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false) 
   await tab.send('Runtime.enable');
   await tab.send('Page.enable');
   await tab.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile });
+  if (process.env.OD_THROTTLE) await tab.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.OD_THROTTLE) });
   await tab.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await tab.send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36' });
   // The stand-in of the desktop bridge: the core through this process, files in the work folder, nothing else.
@@ -439,6 +440,64 @@ async function phoneFlows() {
   await settled(tab, 'after Save', { route: diveRoute });
   await tapBack(tab);
   await settled(tab, 'back after Save', { route: '/' });
+
+  // The reported regression: a dive, Edit, a field changed, Save, then Back (arrow, Android Back key, edge swipe), with the
+  // « Dive saved / Undo » message on screen. The stack must be sound, and Back again must reach the logbook.
+  for (const how of ['arrow', 'hardware']) {
+    console.log(` dive > edit > change a field > save > Back (${how})`);
+    await tapDive(tab);
+    await settled(tab, `${how}: dive opened`, { route: /^\/dives\/\d+$/ });
+    const route = (await tab.run(readStack)).current;
+    await tapText(tab, '^\s*(Modifier|Edit)\s*$');
+    await settled(tab, `${how}: edit opened`, { route: /\/edit$/ });
+    await tab.run(() => {
+      const field = document.querySelector('.page-current textarea');
+      field.value = `navigation test ${Date.now()}`;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await sleep(150);
+    await tapText(tab, '^\s*(Enregistrer|Save)\s*$');
+    for (let i = 0; i < 100 && (await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
+    await settled(tab, `${how}: after Save`, { route });
+    const toast = await tab.run(() => !!document.querySelector('.toast.od-undo-toast'));
+    checks++;
+    if (!toast) failures.push({ label: `${how}: Undo message`, problems: ['no Undo message after the save'] });
+    if (how === 'arrow') await tapBack(tab);
+    else await hardwareBack(tab);
+    await settled(tab, `${how}: back after Save`, { route: '/' });
+    // Back must not have stacked anything: the logbook is the only page and its history holds one entry.
+    const after = await tab.run(readStack);
+    checks++;
+    if (after.history.length !== 1) failures.push({ label: `${how}: history`, problems: [`history after Back is ${JSON.stringify(after.history)}`] });
+    for (let i = 0; i < 100 && (await tab.run(() => !!document.querySelector('.toast'))); i++) await sleep(100);
+    await sleep(300);
+  }
+
+  // Second reported regression: the account avatar's sheet, Réglages, then Back (arrow, Android Back key, edge swipe), then Back again.
+  for (const how of ['arrow', 'hardware', 'edge swipe']) {
+    console.log(` avatar sheet > Settings > Back (${how})`);
+    await settled(tab, `${how}: logbook before the sheet`, { route: '/' });
+    await tab.run(() => document.querySelector('.page-current .od-account-avatar, .od-account-avatar')?.click());
+    await sleep(700);
+    await tab.run(() => [...document.querySelectorAll('.od-account-sheet a, .od-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
+    await settled(tab, `${how}: Settings opened`, { route: '/settings/' });
+    if (how === 'arrow') await tapBack(tab);
+    else if (how === 'hardware') await hardwareBack(tab);
+    else await tab.swipe(2, 330, 400);
+    await settled(tab, `${how}: back from Settings`, { route: '/' });
+    const after = await tab.run(readStack);
+    checks++;
+    if (after.history.length !== 1) failures.push({ label: `${how}: history`, problems: [`history after Back is ${JSON.stringify(after.history)}`] });
+    const sheet = await tab.run(() => ({ hash: location.hash, open: !!document.querySelector('.sheet-modal.modal-in') }));
+    checks++;
+    if (sheet.hash || sheet.open) failures.push({ label: `${how}: sheet`, problems: [`after Back: hash "${sheet.hash}", sheet open ${sheet.open}`] });
+    // The app still answers: a dive opens and Back returns to the logbook.
+    await tapDive(tab);
+    await settled(tab, `${how}: dive opens after Settings`, { route: /^\/dives\/\d+$/ });
+    await tapBack(tab);
+    await settled(tab, `${how}: Back again on the logbook`, { route: '/' });
+    await sleep(300);
+  }
 
   console.log(' quick entry after a download (Complete the dive)');
   // The phone is at a known site: the nearest site is preselected and named.

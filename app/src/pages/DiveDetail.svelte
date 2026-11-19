@@ -222,7 +222,7 @@
       return at >= 0 && ids[at + (dx < 0 ? 1 : -1)] !== undefined;
     };
     horizontalSwipe(content, {
-      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.od-dive-profile--profile')) && !document.querySelector('.modal-in'),
+      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.od-dive-profile--profile')) && !document.querySelector('.modal-in:not(.toast)'),
       move(dx) {
         if (!layout.split && pair.move(dx)) return;
         const shown = hasNeighbour(dx) ? dx : dx / 3;

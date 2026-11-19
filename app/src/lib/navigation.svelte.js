@@ -263,7 +263,7 @@ export function enableSectionSwipes() {
 
   /** @returns {typeof start} */
   function startingPoint() {
-    if (!layout.phone || document.querySelector('.panel-in, .modal-in, .searchbar-enabled, .od-sites--search.od-sites--open, .od-logbook--selection-bar')) return null;
+    if (!layout.phone || document.querySelector('.panel-in, .modal-in:not(.toast), .searchbar-enabled, .od-sites--search.od-sites--open, .od-logbook--selection-bar')) return null;
     const view = f7.views.current;
     const section = view?.el?.id?.replace('view-', '');
     if (!swipeOrder().includes(section)) return null;

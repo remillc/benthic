@@ -57,7 +57,9 @@ function onBack() {
     }
     // 3. An open sheet or dialog closes.
     // The topmost one: a dialog or a sheet opened over a popup comes later in the page.
-    const modals = document.querySelectorAll('.modal-in');
+    // A snackbar (Framework7's toast) is a `.modal-in` too, but it is no modal: Back right after a save, with « Dive saved /
+    // Undo » on screen, must go back (it used to be swallowed here).
+    const modals = document.querySelectorAll('.modal-in:not(.toast)');
     const modal = modals.length ? modals[modals.length - 1] : null;
     // First launch waits for a choice: its steps are not router pages but a stack (lib/first-launch.svelte.js), so
     // Back goes to the previous step like « Retour » (lib/first-launch-steps.js, systemBack); from the first step
