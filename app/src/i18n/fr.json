@@ -67,6 +67,7 @@
     },
     "expiresOn": "Expire le {date}",
     "expiredOn": "Expiré le {date}",
+    "readMark": "Lu sur le document, à vérifier",
     "reminderSent": "Rappel reçu le {date}.",
     "reminderComing": "Rappel le {date}.",
     "bannerLine": "Le {date}. {reminder}",
@@ -3138,6 +3139,7 @@
       "Détail d’une plongée : sur Android, la barre flottante contient Modifier, « Planifier depuis cette plongée », Partager et un menu ⋮ (« Faire valider la plongée » avec Benthic+, « Renuméroter la plongée », « Retirer du voyage » dans un voyage, « Supprimer la plongée »). Le nom du bouton ⋮ énumère ce que contient son menu.",
       "Carte d’un site : dans la fiche, à la modification et sur le bureau, la carte garde un rapport largeur/hauteur de 2,1 à toutes les largeurs ; la hauteur suit la largeur.",
       "Fiche d’urgence : le brevet affiché est votre carte la plus récente (date d’obtention la plus récente), quel que soit son niveau ou son type ; à date égale, la dernière ajoutée. L’interrupteur de « Contenu de la fiche » s’appelle « Brevet le plus récent ».",
+      "Cartes et documents : un scan lit davantage de la carte, sur l'appareil seulement. Une carte de brevet donne l'organisme (aussi RAID, PSS, ANMP), le niveau, le numéro, la date et le moniteur, les deux faces étant lues ensemble ; une carte d'assurance donne l'assureur, la formule, le numéro, le téléphone d'urgence et les dates ; un certificat médical donne le médecin, la date et l'expiration ; un autre document donne son titre et son expiration. Chaque valeur est marquée « à vérifier », un champ que vous avez saisi n'est jamais remplacé, et rien n'est proposé quand le texte n'est pas clair. L'image scannée apparaît maintenant toujours dans son emplacement (elle se perdait sur Android quand le scan était volumineux).",
       "Nouveau nom : l’app s’appelle Benthic, et l’offre payante Benthic+. Sous l’icône, l’app s’appelle « Benthic Log ». Les anciennes adresses opendives.app ouvrent toujours l’application."
     ],
     "source": "Code source",

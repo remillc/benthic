@@ -3,7 +3,6 @@ package org.opendives.core
 import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +22,7 @@ import java.util.concurrent.Executors
  * crop, the straightening and the corners are ML Kit Document Scanner's own screens (full mode, one
  * page, JPEG; the gallery import is allowed). The scanned picture is then read on the device by the
  * bundled ML Kit text recognition (the one the gauge camera uses). Ends with {action: "cancelled"}
- * or {action: "done", image: <base64 JPEG>, text: <the lines, separated by line breaks>}; every rule
+ * or {action: "done", path: <JPEG file in the cache; the plugin turns it into base64>, text: <the lines, separated by line breaks>}; every rule
  * about what the text means is in the app's JavaScript (app/src/lib/card-scan.js).
  */
 class DocumentScanActivity : ComponentActivity() {
@@ -41,9 +40,13 @@ class DocumentScanActivity : ComponentActivity() {
                     return@execute
                 }
                 val text = recognise(bytes)
+                // The picture goes through a cache file, not the result Intent: a Binder transaction is limited to about
+                // 1 MB, and a base64 scan above it was dropped (TransactionTooLargeException), so the screen got nothing.
+                val file = java.io.File(cacheDir, "scan-${System.nanoTime()}.jpg")
+                file.writeBytes(bytes)
                 val json = JSONObject()
                     .put("action", "done")
-                    .put("image", Base64.encodeToString(bytes, Base64.NO_WRAP))
+                    .put("path", file.absolutePath)
                     .put("text", text)
                 runOnUiThread { finishWith(json) }
             } catch (e: Exception) {

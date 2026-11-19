@@ -1758,7 +1758,22 @@ class OpenDivesCorePlugin : Plugin() {
     @ActivityCallback
     private fun scanDocumentResult(call: PluginCall, result: ActivityResult) {
         val json = result.data?.getStringExtra("result")
-        if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
+        if (json == null) return call.resolve(JSObject().put("action", "cancelled"))
+        val answer = JSObject(json)
+        val path = answer.optString("path", "")
+        if (path.isEmpty()) return call.resolve(answer)
+        // The scan comes as a cache file (the Intent is too small for a picture): read it, hand it over as base64, delete it.
+        Thread {
+            try {
+                val file = java.io.File(path)
+                answer.put("image", android.util.Base64.encodeToString(file.readBytes(), android.util.Base64.NO_WRAP))
+                answer.remove("path")
+                file.delete()
+                call.resolve(answer)
+            } catch (e: Exception) {
+                call.resolve(JSObject().put("action", "cancelled"))
+            }
+        }.start()
     }
 
     /** The brightness the window had before keepScreenAwake raised it (null when it is not raised). */

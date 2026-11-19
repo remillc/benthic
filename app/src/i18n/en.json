@@ -67,6 +67,7 @@
     },
     "expiresOn": "Expires on {date}",
     "expiredOn": "Expired on {date}",
+    "readMark": "Read from the document, to check",
     "reminderSent": "Reminder received on {date}.",
     "reminderComing": "Reminder on {date}.",
     "bannerLine": "On {date}. {reminder}",
@@ -3138,6 +3139,7 @@
       "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive validated” with Benthic+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
       "Site map: in a site’s card, on the edit screen and on the desktop, the map keeps a 2.1 to 1 width to height ratio at every width; the height follows the width.",
       "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”.",
+      "Cards and documents: a scan now reads more from the card, on the device only. A certification card gives the agency (also RAID, PSS, ANMP), the level, the number, the date and the instructor, with both sides read together; an insurance card gives the insurer, plan, number, emergency phone and dates; a medical certificate gives the doctor, the date and the expiry; another document gives its title and expiry. Each value is marked “to check”, a field you typed is never replaced, and nothing is shown when the text is unclear. The scanned picture now always appears in its slot (it was lost on Android when the scan was large).",
       "New name: the app is now called Benthic, and the paid offer Benthic+. The name under the icon is “Benthic Log”. Old opendives.app links still open the app."
     ],
     "source": "Source code",

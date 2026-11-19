@@ -17,8 +17,8 @@
   import { services, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
   import { documentProblems, EXPIRY_LEAD_CHOICES } from '../lib/profile.js';
-  import { scanCard, parseInsuranceText } from '../lib/card-scan.js';
-  import { toJpegBytes, photoUrl } from '../lib/card-canvas.js';
+  import { scanCard, parseInsuranceText, parseMedicalText, parseOtherText, joinTexts } from '../lib/card-scan.js';
+  import { toJpegBytes, scanJpegBytes, photoUrl } from '../lib/card-canvas.js';
   import { afterDocumentsChanged } from '../lib/document-notify.js';
   import { openFiles, revokeFiles } from '../lib/document-files.js';
   import { desktopApp } from '../lib/layout.svelte.js';
@@ -111,7 +111,13 @@
     files = [...files, { key: `k${++keySeed}`, side: 'page', page, bytes, mime: 'image/jpeg', url, pdf: false }];
   }
 
-  /** The scan of a card or of a page: the phone's scanner, else the image picker. The text read from an insurance card proposes its fields. */
+  /** The text read on each scan, in order: the pages of a certificate are read together, a new scan of an insurance card replaces the card. @type {string[]} */
+  let scanTexts = [];
+  /** What the scan proposed, per field, to mark it while the field still holds it. @type {Record<string, string>} */
+  let readFrom = $state({});
+  const mark = (/** @type {string} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('docs.readMark') : '');
+
+  /** The scan of a card or of a page: the phone's scanner, else the image picker. The text read proposes the fields the diver has not typed. */
   async function scan() {
     if (desktopApp) {
       photoDialog = true;
@@ -120,8 +126,9 @@
     try {
       const result = await scanCard('front');
       if (!result) return;
-      addImage(await toJpegBytes(result.image), kind === 'insurance');
-      if (kind === 'insurance') proposeFrom(result.text);
+      addImage(await scanJpegBytes(result.image), kind === 'insurance');
+      scanTexts = kind === 'insurance' ? [result.text] : [...scanTexts, result.text];
+      proposeFrom(joinTexts(...scanTexts));
     } catch {
       fail(t('docs.fileFailed'));
     }
@@ -129,15 +136,28 @@
 
   /** @param {string} text */
   function proposeFrom(text) {
-    const found = parseInsuranceText(text);
+    const today = new Date().toISOString().slice(0, 10);
+    /** @type {Record<string, string>} */
+    const found =
+      kind === 'insurance' ? parseInsuranceText(text) : kind === 'medical' ? parseMedicalText(text, today) : parseOtherText(text);
+    /** A field is proposed when it is empty or still holds an earlier proposal. @param {string} field @param {string} current @param {(v: string) => void} set */
+    const put = (field, current, set) => {
+      const value = found[field];
+      if (!value || value === current) return false;
+      if (current.trim() && !(readFrom[field] && readFrom[field] === current)) return false;
+      readFrom[field] = value;
+      set(value);
+      return true;
+    };
     let any = false;
-    if (found.insurer && !insurer.trim()) (insurer = found.insurer), (any = true);
-    if (found.plan && !plan.trim()) (plan = found.plan), (any = true);
-    if (found.policyNumber && !policyNumber.trim()) (policyNumber = found.policyNumber), (any = true);
-    if (found.emergencyPhone && !emergencyPhone.trim()) (emergencyPhone = found.emergencyPhone), (any = true);
-    if (found.startsOn && !startsOn) (startsOn = found.startsOn), (any = true);
-    if (found.expiresOn && !expiresOn) (expiresOn = found.expiresOn), (any = true);
-    if (any) scanned = true;
+    if (kind === 'insurance') {
+      any = [put('insurer', insurer, (v) => (insurer = v)), put('plan', plan, (v) => (plan = v)), put('policyNumber', policyNumber, (v) => (policyNumber = v)), put('emergencyPhone', emergencyPhone, (v) => (emergencyPhone = v)), put('startsOn', startsOn, (v) => (startsOn = v)), put('expiresOn', expiresOn, (v) => (expiresOn = v))].some(Boolean);
+    } else if (kind === 'medical') {
+      any = [put('doctor', doctor, (v) => (doctor = v)), put('issuedOn', issuedOn, (v) => (issuedOn = v)), put('expiresOn', expiresOn, (v) => (expiresOn = v))].some(Boolean);
+    } else {
+      any = [put('title', title, (v) => (title = v)), put('expiresOn', expiresOn, (v) => (expiresOn = v))].some(Boolean);
+    }
+    if (any && kind === 'insurance') scanned = true;
   }
 
   /** @param {Blob} image */
@@ -255,23 +275,23 @@
     {@render filesBlock()}
 
     {#if kind === 'insurance'}
-      <TextField label={t('docs.insurance.insurer')} bind:value={insurer} invalid={!!live.insurer.error} supporting={live.insurer.error} />
-      <TextField label={t('docs.insurance.plan')} bind:value={plan} />
-      <TextField label={t('docs.insurance.policy')} bind:value={policyNumber} />
-      <TextField label={t('docs.insurance.phone')} bind:value={emergencyPhone} inputmode="numeric" invalid={!!live.phone.error} supporting={live.phone.error || t('docs.insurance.phoneHint')} />
-      <DateField label={t('docs.insurance.startsOn')} bind:value={startsOn} minYear={year - 10} maxYear={year + 30} />
-      <DateField label={t('docs.insurance.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
+      <TextField label={t('docs.insurance.insurer')} bind:value={insurer} invalid={!!live.insurer.error} supporting={live.insurer.error || mark('insurer', insurer)} />
+      <TextField label={t('docs.insurance.plan')} bind:value={plan} supporting={mark('plan', plan)} />
+      <TextField label={t('docs.insurance.policy')} bind:value={policyNumber} supporting={mark('policyNumber', policyNumber)} />
+      <TextField label={t('docs.insurance.phone')} bind:value={emergencyPhone} inputmode="numeric" invalid={!!live.phone.error} supporting={live.phone.error || mark('emergencyPhone', emergencyPhone) || t('docs.insurance.phoneHint')} />
+      <DateField label={t('docs.insurance.startsOn')} bind:value={startsOn} minYear={year - 10} maxYear={year + 30} supporting={mark('startsOn', startsOn)} />
+      <DateField label={t('docs.insurance.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : mark('expiresOn', expiresOn)} />
       {@render notify()}
       <TextField label={t('docs.insurance.notes')} bind:value={notes} multiline supporting={t('docs.insurance.notesHint')} />
     {:else if kind === 'medical'}
-      <TextField label={t('docs.medical.doctor')} bind:value={doctor} supporting={t('docs.medical.doctorHint')} />
-      <DateField label={t('docs.medical.date')} bind:value={issuedOn} minYear={year - 10} maxYear={year} supporting={problems.issuedOn === 'future' ? t('docs.errors.future') : ''} />
-      <DateField label={t('docs.medical.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : ''} />
+      <TextField label={t('docs.medical.doctor')} bind:value={doctor} supporting={mark('doctor', doctor) || t('docs.medical.doctorHint')} />
+      <DateField label={t('docs.medical.date')} bind:value={issuedOn} minYear={year - 10} maxYear={year} supporting={problems.issuedOn === 'future' ? t('docs.errors.future') : mark('issuedOn', issuedOn)} />
+      <DateField label={t('docs.medical.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={problems.expiresOn === 'order' ? t('docs.errors.order') : mark('expiresOn', expiresOn)} />
       {@render notify()}
       <TextField label={t('docs.medical.notes')} bind:value={notes} multiline supporting={t('docs.medical.notesHint')} />
     {:else}
-      <TextField label={t('docs.other.name')} bind:value={title} invalid={!!live.title.error} supporting={live.title.error || t('docs.other.nameHint')} />
-      <DateField label={t('docs.other.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} />
+      <TextField label={t('docs.other.name')} bind:value={title} invalid={!!live.title.error} supporting={live.title.error || mark('title', title) || t('docs.other.nameHint')} />
+      <DateField label={t('docs.other.expiresOn')} bind:value={expiresOn} minYear={year - 10} maxYear={year + 30} supporting={mark('expiresOn', expiresOn)} />
       {#if expiresOn}{@render notify()}{/if}
       <TextField label={t('docs.other.notes')} bind:value={notes} multiline supporting={t('docs.other.notesHint')} />
     {/if}

@@ -17,8 +17,8 @@
   import { services, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
   import { AGENCIES, LEVEL_SUGGESTIONS, certificationProblems } from '../lib/profile.js';
-  import { scanCard, parseCardText } from '../lib/card-scan.js';
-  import { toJpegBytes, photoUrl } from '../lib/card-canvas.js';
+  import { scanCard, parseCardText, joinTexts } from '../lib/card-scan.js';
+  import { toJpegBytes, scanJpegBytes, photoUrl } from '../lib/card-canvas.js';
   import CardPhotoDialog from '../components/CardPhotoDialog.svelte';
   import { desktopApp } from '../lib/layout.svelte.js';
   import { liveError } from '../lib/live-validation.svelte.js';
@@ -41,7 +41,9 @@
   let instructorCert = $state(false);
   let saving = $state(false);
   /** What the scan filled in, to mark it « Lu sur la carte » while the field still holds it. */
-  let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '' });
+  let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '', instructor: '' });
+  /** The text read on each side, to read both together. */
+  const cardTexts = { front: '', back: '' };
   /** The photos: `bytes` is set when changed here (null: removed), `url` is what is shown. @type {Record<'front'|'back', { bytes?: Uint8Array|null, url: string }>} */
   let photos = $state({ front: { url: '' }, back: { url: '' } });
 
@@ -71,7 +73,7 @@
     () => issuedOn,
     () => (problems.issuedOn ? t('diverProfile.cert.dateFuture') : ''),
   );
-  const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
+  const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'|'instructor'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
   const canSave = $derived(!Object.keys(problems).length && !(agency === 'other' && !agencyName.trim()) && !saving && !gear.readOnly);
 
   /** The side whose photo the desktop's dialog is asking for (a computer has no camera nor scanner). @type {'front'|'back'|null} */
@@ -98,15 +100,20 @@
     try {
       const scanned = await scanCard(side);
       if (!scanned) return;
-      const bytes = await toJpegBytes(scanned.image);
+      const bytes = await scanJpegBytes(scanned.image);
       if (photos[side].url) URL.revokeObjectURL(photos[side].url);
       photos[side] = { bytes, url: photoUrl(bytes) };
-      // The text read from the card proposes what the diver has not typed yet.
-      const found = parseCardText(scanned.text);
-      if (found.agency && !agency) readFrom.agency = agency = found.agency;
-      if (found.level && !level.trim()) readFrom.level = level = found.level;
-      if (found.number && !number.trim()) readFrom.number = number = found.number;
-      if (found.issuedOn && !issuedOn) readFrom.issuedOn = issuedOn = found.issuedOn;
+      // The text of both sides proposes what the diver has not typed: a field that still holds an earlier proposal may be replaced by a better one.
+      cardTexts[side] = scanned.text;
+      const found = parseCardText(joinTexts(cardTexts.front, cardTexts.back));
+      /** @param {'agency'|'level'|'number'|'issuedOn'|'instructor'} field @param {string} current */
+      const free = (field, current) => !current.trim() || (readFrom[field] !== '' && readFrom[field] === current);
+      if (found.agency && free('agency', agency)) readFrom.agency = agency = found.agency;
+      if (found.agency === 'other' && found.agencyName && !agencyName.trim()) agencyName = found.agencyName;
+      if (found.level && free('level', level)) readFrom.level = level = found.level;
+      if (found.number && free('number', number)) readFrom.number = number = found.number;
+      if (found.issuedOn && free('issuedOn', issuedOn)) readFrom.issuedOn = issuedOn = found.issuedOn;
+      if (found.instructor && free('instructor', instructor)) readFrom.instructor = instructor = found.instructor;
     } catch {
       showSnackbar(t('diverProfile.cert.photoFailed'));
     }
@@ -181,7 +188,7 @@
     <ComboField label={t('diverProfile.cert.level')} bind:value={level} options={suggestions} supporting={mark('level', level)} />
     <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
     <DateField label={t('diverProfile.cert.date')} bind:value={issuedOn} maxYear={new Date().getFullYear()} supporting={dateLive.error || mark('issuedOn', issuedOn)} />
-    <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={t('diverProfile.cert.instructorHint')} />
+    <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={mark('instructor', instructor) || t('diverProfile.cert.instructorHint')} />
     <SwitchField label={t('diverProfile.cert.instructorCert')} bind:checked={instructorCert} supporting={t('diverProfile.cert.instructorCertText')} />
   </div>
   <div class="od-cert-edit--bottom"></div>

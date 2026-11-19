@@ -25,3 +25,17 @@ export async function toJpegBytes(image, maxSide = 1600) {
 
 /** An address for showing JPEG bytes in an <img>; revoke it with URL.revokeObjectURL. @param {Uint8Array} bytes */
 export const photoUrl = (bytes) => URL.createObjectURL(new Blob([/** @type {BlobPart} */ (bytes)], { type: 'image/jpeg' }));
+
+/**
+ * The picture of a scan as JPEG bytes: shrunk to 1600 pixels when the browser can decode it, else as it came (the system scanner
+ * already gives a JPEG), so that a scan is never lost to a decoding problem.
+ * @param {Blob} image
+ * @returns {Promise<Uint8Array>}
+ */
+export async function scanJpegBytes(image) {
+  try {
+    return await toJpegBytes(image);
+  } catch {
+    return new Uint8Array(await image.arrayBuffer());
+  }
+}
