@@ -107,6 +107,9 @@
   :root {
     /* Meaning colors. */
     --od-alarm: #C62828;
+    /* The emergency sheet (OpenDives+): a deep red band with white text, 7.2:1; white tiles with the red on them. */
+    --od-emergency: #A1372B;
+    --od-on-emergency: #FFFFFF;
     /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a crimson red on white, close to but apart from the alarm red; 6.0:1 on white. */
     --od-dev: #C4143C;
     --od-dev-tint: #FDEDF0;
@@ -567,6 +570,8 @@
     --od-release-disabled-text: rgb(255 255 255 / 0.38);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
     --od-alarm: #FF8A80;
+    --od-emergency: #8E2C21;
+    --od-on-emergency: #FFFFFF;
     /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a light crimson (pinker than the alarm). */
     --od-dev: #FF93A8;
     --od-dev-tint: #3A1C24;

@@ -9,6 +9,7 @@
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
+  import ComboField from '../components/ComboField.svelte';
   import DateField from '../components/DateField.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import { diver, loadProfile, changeProfile } from '../lib/profile.svelte.js';
@@ -26,7 +27,8 @@
 
   let fullName = $state('');
   let dateOfBirth = $state('');
-  let nameRelation = $state('');
+  let contactName = $state('');
+  let relation = $state('');
   let country = $state('CA');
   let number = $state('');
   let blood = $state('');
@@ -37,7 +39,8 @@
     const i = diver.info;
     fullName = i.fullName;
     dateOfBirth = i.dateOfBirth;
-    nameRelation = [i.emergency.name, i.emergency.relation].filter(Boolean).join(' · ');
+    contactName = i.emergency.name;
+    relation = i.emergency.relation;
     country = i.emergency.phone.country;
     number = formatNational(i.emergency.phone.number, country);
     blood = i.bloodGroup;
@@ -53,13 +56,10 @@
   const countryOptions = COUNTRIES.map((c) => ({ value: c.code, label: countryLabel(c.code) }));
   const bloodOptions = $derived([{ value: UNKNOWN_BLOOD, label: t('diverProfile.info.unknown') }, ...BLOOD_GROUPS.map((g) => ({ value: g, label: g }))]);
 
-  /** « Marc Tremblay · conjoint »: the name, then the relationship after the first « · ». @param {string} text */
-  function splitContact(text) {
-    const at = text.indexOf('·');
-    return at < 0 ? { name: text.trim(), relation: '' } : { name: text.slice(0, at).trim(), relation: text.slice(at + 1).trim() };
-  }
+  /** The usual relationships; « Lien » also takes any other text. */
+  const relationOptions = $derived(['spouse', 'parent', 'child', 'friend', 'sibling'].map((k) => t(`diverProfile.info.relations.${k}`)));
 
-  const draft = $derived({ fullName, dateOfBirth, emergency: { ...splitContact(nameRelation), phone: { country, number } }, bloodGroup: consent ? blood : '' });
+  const draft = $derived({ fullName, dateOfBirth, emergency: { name: contactName.trim(), relation: relation.trim(), phone: { country, number } }, bloodGroup: consent ? blood : '' });
   const problems = $derived(infoProblems(draft));
   const dobLive = liveError(
     () => dateOfBirth,
@@ -98,7 +98,8 @@
 
   <h2 class="od-profile-edit--section">{t('diverProfile.info.emergency')}</h2>
   <div class="od-profile-edit--fields">
-    <TextField label={t('diverProfile.info.nameRelationLabel')} bind:value={nameRelation} supporting={t('diverProfile.info.nameRelationHint')} />
+    <TextField label={t('diverProfile.info.contactNameLabel')} bind:value={contactName} supporting={t('diverProfile.info.contactNameHint')} autocomplete="off" />
+    <ComboField label={t('diverProfile.info.relationLabel')} bind:value={relation} options={relationOptions} supporting={t('diverProfile.info.relationHint')} />
     <div class="od-profile-edit--phone">
       <div class="od-profile-edit--country"><SelectField label={t('diverProfile.info.countryCode')} bind:value={country} options={countryOptions} /></div>
       <div class="od-profile-edit--number">

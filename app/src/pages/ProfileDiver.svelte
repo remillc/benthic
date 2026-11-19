@@ -38,6 +38,15 @@
     </span>
   </div>
 
+  <a href="/profile/emergency" class="od-profile--emergency">
+    <span class="od-profile--emergency-icon"><Icon name="warning" size={22} weight={1.8} /></span>
+    <span class="od-profile--texts">
+      <span class="od-profile--emergency-label">{t('emergency.entry')}</span>
+      <span class="od-profile--emergency-text">{t('emergency.entryText')}</span>
+    </span>
+    <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+  </a>
+
   <h2 class="od-profile--section">{t('gear.profile.keep')}</h2>
   <div class="od-profile--list">
     <a href="/profile/gear/" class="od-profile--row">
@@ -92,6 +101,49 @@
 
 <style>
   @layer od.components {
+    .od-profile--emergency {
+      margin: 12px 16px 0;
+      min-height: 72px;
+      padding: 12px 16px;
+      border-radius: 24px;
+      background: var(--od-emergency);
+      color: var(--od-on-emergency);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+    }
+
+    .od-profile--emergency .od-profile--chevron {
+      color: inherit;
+    }
+
+    .od-profile--emergency-icon {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: var(--od-surface);
+      color: var(--od-emergency);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .od-profile--emergency-label {
+      display: block;
+      font-size: 17px;
+      line-height: 22px;
+      font-weight: 600;
+    }
+
+    .od-profile--emergency-text {
+      display: block;
+      font-size: 14px;
+      line-height: 20px;
+      opacity: 0.95;
+    }
+
     /* Fluid layout: the content keeps a readable width on a tablet. */
     :global(.od-profile .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
