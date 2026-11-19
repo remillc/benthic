@@ -6,6 +6,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
 import { backTarget, readPane } from './pane-history.js';
 import { backThroughGuard } from './leave-guard.js';
+import { welcomeBack } from './first-launch-back.js';
 
 export function enableBackButton() {
   // The same handler answers the page event « od:back » (tests/e2e/navigation.mjs sends the Android Back key that way).
@@ -58,12 +59,11 @@ function onBack() {
     // The topmost one: a dialog or a sheet opened over a popup comes later in the page.
     const modals = document.querySelectorAll('.modal-in');
     const modal = modals.length ? modals[modals.length - 1] : null;
-    // First launch waits for a choice: Back returns to the three choices,
-    // then sends the app to the background.
+    // First launch waits for a choice: its steps are not router pages but a stack (lib/first-launch.svelte.js), so
+    // Back goes to the previous step like « Retour » (lib/first-launch-steps.js, systemBack); from the first step
+    // it sends the app to the background.
     if (modal?.classList.contains('od-welcome')) {
-      const welcome = /** @type {any} */ (f7.views).welcome;
-      if (welcome && welcome.router.history.length > 1) welcome.router.back();
-      else CapacitorApp.minimizeApp();
+      if (!welcomeBack()) CapacitorApp.minimizeApp();
       return;
     }
     // 3b. The Gas page of Edit dive (in the page, or in the tablet's popup) returns to the form.

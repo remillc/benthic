@@ -854,6 +854,7 @@
       "deleteType": "Delete this type",
       "deleteTypeTitle": "Delete “{name}”?",
       "deleteTypeAction": "Delete",
+      "deleteTypeSheet": "Delete “{name}”",
       "deleteTypeNone": "Not used in any dive.",
       "deleteRemoved": { "one": "Removes this cylinder from {n} dive.", "other": "Removes this cylinder from {n} dives." },
       "deleteKept": { "one": "In {n} dive where it is used for the profile or is the only cylinder, it stays, without a type.", "other": "In {n} dives where it is used for the profile or is the only cylinder, it stays, without a type." },
@@ -1043,8 +1044,14 @@
     "serverDives": "Dives on the server",
     "serverSignOut": "Sign out of the server",
     "serverSignOutText": "Your dives stay on the server. The access is erased from this device.",
+    "backup": {
+      "title": "Backup and sync",
+      "server": "Server",
+      "history": "The server keeps the history of your logbook."
+    },
     "free": {
       "device": "Logbook on this device",
+      "deviceIos": "Logbook on this iPhone",
       "sync": "Backup and sync",
       "syncText": "Your logbook on all your devices"
     },
@@ -1686,6 +1693,7 @@
       "other": "{n} dives, no GPS position"
     },
     "openInMaps": "Open in Maps",
+    "openInPlans": "Open in Maps",
     "divesHere": "Dives at this site",
     "about": "About the site",
     "description": "Description",
@@ -2588,11 +2596,13 @@
       "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to OpenDives from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
       "Import: a logbook or a dive sites file shows one progress line, from the moment it is received or chosen until the import is finished: “Copying the file”, “Checking the file”, “Importing the dives”, “Saving”, with the size copied, the percentage and the time left. “Cancel” stops the copy and the check and deletes the partial copy. A message tells how many dives or sites were added.",
       "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored.",
-      "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive."
-,
+      "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive.",
       "Units: gas consumption per minute follows the Volume unit. In cubic feet it is in cu ft/min (SAC, RMV and the metabolic O₂ consumption of the pSCR in Settings), in litres in L/min, converted from the same stored value. Under “Volume”, a line says so.",
       "Desktop: « Other gear » on the Equipment tab shows the pieces of your inventory used by the dive, with the same icon as on the phone (the « Saucisse » has its own), « Add gear » adds them and the cross removes them from this dive. Every desktop logbook view (map, tabs, menus, windows) shares the same list: weekday, one year line that stays at the top, trip cards.",
-      "Cylinders on desktop: Settings › Equipment shows « Cylinders added to new dives » (open circuit, diluent, oxygen, bailout with « Edit ») and « Cylinder types » (your types with their dive counts, a few standard types then « And N other standard types… », « Add a type », and the two switches). A type opens in the « Edit type » dialog, with « Delete this type » at the left of the footer and the same confirmation as on the phone. On the phone, the explanation and the line under « Delete this type » sit on the 16 dp margin, and « Remove this type » stays a neutral button."
+      "Cylinders on desktop: Settings › Equipment shows « Cylinders added to new dives » (open circuit, diluent, oxygen, bailout with « Edit ») and « Cylinder types » (your types with their dive counts, a few standard types then « And N other standard types… », « Add a type », and the two switches). A type opens in the « Edit type » dialog, with « Delete this type » at the left of the footer and the same confirmation as on the phone. On the phone, the explanation and the line under « Delete this type » sit on the 16 dp margin, and « Remove this type » stays a neutral button.",
+      "iPhone: the logbook has no blue band any more, with a large title, a grey search field, « + » and the account initial in the bar. The « Account » sheet follows the mock-ups (« Logbook on this iPhone », « Subscribe », « Manage account », the OpenDives+ dot, « My diver profile » with its overdue maintenance). The profile and cylinder type screens show the previous page's title on the Back button, with « + » in the bar. « Delete this type » is a red row, and the deletion is confirmed in an action sheet. « Open in Maps » opens the site in Apple Maps. « Continue with Apple » comes first, and the offer adds « Restore purchases » and the automatic renewal terms (the purchase and the sign-in with Apple are not active yet).",
+      "OpenDives+ account: “Backup and sync” opens its own page (sync status, pending changes, “Sync now”, server) instead of the offer; “My diver profile” opens the profile.",
+      "First launch: the Android Back key and gesture (and, on iPhone, a swipe from the left edge) go to the previous step, like “Back”; on the first step Back sends the app to the background. A running import, download or upload is cancelled by Back, the offer’s Back is “Continue without a subscription”, and nothing created or bought is undone."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -4898,6 +4908,8 @@
       "subscribe": "Subscribe",
       "without": "Continue without subscribing",
       "noAccount": "No account is created.",
+      "restore": "Restore purchases",
+      "terms": "The subscription renews automatically every year at {price}, unless it is cancelled at least 24 hours before the end of the period. Payment is charged to your Apple account when you confirm the purchase. You manage or cancel the subscription in Settings › your name › Subscriptions.",
       "already": "Already subscribed?",
       "signIn": "Sign in"
     },

@@ -29,6 +29,15 @@ export async function signInWithApple() {
 }
 
 /**
+ * « Restaurer les achats » (the App Store requires it on the offer). To wire: StoreKit's restore of the person's
+ * purchases, then the server confirms the subscription. Until then nothing is restored.
+ * @returns {Promise<Purchase>}
+ */
+export async function restorePurchases() {
+  return { status: 'unavailable' };
+}
+
+/**
  * « S’abonner ». To wire: Google Play Billing or the App Store's purchase of the yearly subscription, then the
  * server confirms it from the store's receipt. Until then nothing is bought and nothing is created.
  * @returns {Promise<Purchase>}

@@ -4,6 +4,8 @@
   // chips then « Nouveau kit », the inventory grouped by type (icon, name, a sub-line, the number of dives), a
   // search and ⋮ in the top bar (« Exporter ou imprimer… », « Afficher les pièces archivées »), and the extended
   // button « Ajouter une pièce ». Works offline: everything is read from the working copy on the device.
+  import { ios } from '../lib/layout.svelte.js';
+  import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -85,13 +87,11 @@
 <Page class="od-gear-page">
   <Navbar>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('gear.piece.back')}</span>
-      </Link>
+      <BackLink label={t('gear.profile.title')} name={t('gear.piece.back')} />
     {/snippet}
     {#snippet right()}
       {#if !searching}
+        {#if ios && !gear.readOnly}<Link href="/profile/gear/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('gear.inventory.add')}</span></Link>{/if}
         <a href="#search" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), openSearch())}>
           <Icon name="search" /><span class="od-sr-only">{t('gear.inventory.search')}</span>
         </a>
@@ -172,7 +172,7 @@
 
   {#snippet fixedContent()}
     <!-- Read only: the button goes away (hidden, not removed: the slot is drawn once). -->
-    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || ios ? 'none' : null}>
       <a href="/profile/gear/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('gear.inventory.add')}</div>

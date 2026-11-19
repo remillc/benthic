@@ -23,6 +23,7 @@
   import OdPlusChip from './OdPlusChip.svelte';
   import { openManageAccount } from '../lib/navigation.svelte.js';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { createAccountHistory } from '../lib/account-history.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
@@ -151,61 +152,116 @@
       <span class="od-account-sheet--ios-title">{t('account.title')}</span>
       <button type="button" class="od-account-sheet--ios-ok" onclick={() => (navigation.accountOpen = false)}>{t('dialog.ok')}</button>
     </div>
-    <div class="od-account-sheet--ios-group">
-      <button type="button" class="od-account-sheet--ios-row" onclick={manage}>
-        <span class="od-account-sheet--initial" aria-hidden="true">
-          {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
-        </span>
-        <span class="od-account-sheet--texts">
-          <span class="od-account-sheet--name">{accountName}</span>
-          <span class="od-account-sheet--line">{accountLine} · {t('nav.manageAccount')}</span>
-        </span>
-        <Icon name="chevron" size={20} />
-      </button>
-    </div>
-    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
-    {#if !logbook.loading && !logbook.error}
-      <div class="od-account-sheet--ios-group">
-        {#if logbook.syncFailure}
-          <div class="od-account-sheet--ios-row"><SyncFailureRow /></div>
-        {:else if logbook.conflict && logbook.conflictLater}
-          <div class="od-account-sheet--ios-row"><SyncFailureRow conflict /></div>
-        {:else if manual && logbook.pending > 0}
-          <div class="od-account-sheet--ios-row"><span class="od-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span></div>
-        {:else}
-          <div class="od-account-sheet--ios-row">
-            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
-          </div>
-        {/if}
-        {#if logbook.email}
-          <div class="od-account-sheet--ios-row od-account-sheet--ios-sync"><SyncButton /></div>
-          {#if manual}
-            <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
-          {/if}
-        {/if}
+    {#if free}
+      <!-- Free version (ios-compte-gratuit.dc.html, task 289): the logbook on this iPhone, « S'abonner », « Déjà abonné ? »,
+           then the two OpenDives+ rows that open the offer. -->
+      <div class="od-account-sheet--ios-group od-account-sheet--ios-free">
+        <div class="od-account-sheet--ios-row od-account-sheet--ios-identity">
+          <span class="od-account-sheet--initial od-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
+          <span class="od-account-sheet--texts">
+            <span class="od-account-sheet--name">{t('account.free.deviceIos')}</span>
+            <span class="od-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
+          </span>
+        </div>
+        <div class="od-account-sheet--ios-offer">
+          <button type="button" class="od-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
+          <span class="od-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+        </div>
       </div>
-    {/if}
-    {#if free && isRelease}
-      <!-- Free version on iPhone: the offer and « Se connecter » in the sheet's own grouped lists (no iOS mock-up yet). -->
+      {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       <div class="od-account-sheet--ios-group">
         <button type="button" class="od-account-sheet--ios-row" onclick={() => plus('offer')}>
-          <Icon name="plusMark" />
-          <span class="od-account-sheet--row-label">{t('odplus.offer.subscribe')}<span class="od-account-sheet--row-line">{t('account.free.syncText')}</span></span>
+          <Icon name="cloudDownload" />
+          <span class="od-account-sheet--row-label">
+            <OdPlusChip onSheet />
+            {t('account.free.sync')}
+            <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+          </span>
           <Icon name="chevron" size={20} />
         </button>
-        <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={() => plus('signIn')}>{t('odplus.offer.already')} {t('odplus.offer.signIn')}</button>
-      </div>
-    {:else if isRelease && !desktopApp}
-      <div class="od-account-sheet--ios-group">
-        <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
+        <button type="button" class="od-account-sheet--ios-row" onclick={() => plus('offer')}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
+            <OdPlusChip onSheet />
             {t('gear.profile.title')}
             <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
           </span>
           <Icon name="chevron" size={20} />
         </button>
       </div>
+    {:else}
+      <!-- An account (ios-compte-abonne.dc.html): the e-mail, with the « + » chip for OpenDives+, « Gérer le compte »,
+           the sync line with « Synchroniser ». -->
+      <div class="od-account-sheet--ios-group">
+        <div class="od-account-sheet--ios-row od-account-sheet--ios-identity">
+          <span class="od-account-sheet--initial" aria-hidden="true">
+            {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
+          </span>
+          <span class="od-account-sheet--texts">
+            <span class="od-account-sheet--name">
+              {accountName}
+              {#if subscriber}<span class="od-account-sheet--plus-dot" aria-hidden="true">+</span><span class="od-sr-only">{t('odplus.chipName')}</span>{/if}
+            </span>
+            <span class="od-account-sheet--line">{accountLine}</span>
+          </span>
+        </div>
+        <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={manage}>
+          <Icon name="account" />
+          <span class="od-account-sheet--row-label">{t('nav.manageAccount')}</span>
+          <Icon name="chevron" size={20} />
+        </button>
+        {#if !logbook.loading && !logbook.error}
+          {#if logbook.syncFailure}
+            <div class="od-account-sheet--ios-row"><SyncFailureRow /></div>
+          {:else if logbook.conflict && logbook.conflictLater}
+            <div class="od-account-sheet--ios-row"><SyncFailureRow conflict /></div>
+          {:else}
+            <div class="od-account-sheet--ios-row od-account-sheet--ios-sync">
+              {#if manual && logbook.pending > 0}
+                <span class="od-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
+              {:else}
+                <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} steady />
+              {/if}
+              {#if logbook.email}<SyncButton filled={manual && logbook.pending > 0} />{/if}
+            </div>
+          {/if}
+          {#if manual}
+            <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
+          {/if}
+        {/if}
+      </div>
+      {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
+      {#if isRelease && !desktopApp}
+        <!-- « Mon profil de plongeur » (tasks 267 and 281): the chip, the red line and the badge when a piece is overdue. -->
+        <div class="od-account-sheet--ios-group">
+          {#if subscriber}
+            <!-- « Sauvegarde et synchronisation » (task 290): its own page. -->
+            <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openBackup)}>
+              <Icon name="cloudDownload" />
+              <span class="od-account-sheet--row-label">
+                <OdPlusChip onSheet />
+                {t('account.free.sync')}
+                <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+              </span>
+              <Icon name="chevron" size={20} />
+            </button>
+          {/if}
+          <button type="button" class="od-account-sheet--ios-row" onclick={() => go(() => openOver('/profile'))}>
+            <Icon name="briefcase" />
+            <span class="od-account-sheet--row-label">
+              {#if subscriber}<OdPlusChip onSheet />{/if}
+              {t('gear.profile.title')}
+              {#if late.late}
+                <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
+              {:else}
+                <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+              {/if}
+            </span>
+            {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
+            <Icon name="chevron" size={20} />
+          </button>
+        </div>
+      {/if}
     {/if}
     <div class="od-account-sheet--ios-group">
       <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openSettings)}>
@@ -345,6 +401,18 @@
          account sees the chip above its title and, when a piece is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
       <div class="od-account-sheet--card">
+        {#if subscriber}
+          <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
+            <Icon name="cloudDownload" />
+            <span class="od-account-sheet--row-label">
+              <OdPlusChip onSheet />
+              {t('account.free.sync')}
+              <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+            </span>
+            <Icon name="chevron" size={20} />
+          </a>
+          <div class="od-account-sheet--divider od-account-sheet--margin"></div>
+        {/if}
         <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
           <span class="od-account-sheet--row-label">
@@ -488,7 +556,44 @@
     }
 
     .od-account-sheet--ios-sync {
+      justify-content: space-between;
+    }
+
+    .od-account-sheet--ios-identity {
+      min-height: 64px;
+    }
+
+    /* The chip keeps its own width above the title; the row's icons are the accent colour (the mock-ups' blue). */
+    .od-account-sheet--ios-row :global(.od-plus-chip) {
+      align-self: flex-start;
+    }
+
+    .od-account-sheet--ios-row > :global(.od-icon) {
+      color: var(--od-secondary);
+      flex: none;
+    }
+
+    .od-account-sheet--ios-sync :global(.od-sync-status) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .od-account-sheet--ios-sync > :global(:last-child:not(.od-sync-status)) {
+      flex: none;
+    }
+
+    .od-account-sheet--ios-offer .od-account-sheet--already {
       justify-content: center;
+    }
+
+    /* The free card: the row, then the offer button and « Déjà abonné ? » under it. */
+    .od-account-sheet--ios-offer {
+      padding: 0 16px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      text-align: center;
     }
 
     .od-account-sheet--ios-link {

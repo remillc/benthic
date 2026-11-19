@@ -85,7 +85,7 @@
 </script>
 
 <Page class="od-tools" onPageBeforeIn={readPlans}>
-  <Navbar class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('tools.title')}>
+  <Navbar large={theme.ios} class={theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-titled'} title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight><AccountAvatar /></NavRight>
   </Navbar>

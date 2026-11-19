@@ -12,7 +12,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import OdPlusChip from './OdPlusChip.svelte';
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
@@ -182,6 +182,11 @@
     {/if}
     {#if subscriber}
       <div class="od-desktop-account--divider"></div>
+      <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(openBackup)}>
+        <Icon name="cloudDownload" size={22} />
+        <span class="od-desktop-account--row-texts"><OdPlusChip onSheet /><span>{t('account.free.sync')}</span><span class="od-desktop-account--row-line">{t('account.free.syncText')}</span></span>
+        <Icon name="chevron" size={20} />
+      </button>
       <button type="button" class="od-desktop-account--row od-desktop-account--profile" onclick={() => leaveTo(() => openOver('/profile'))}>
         <Icon name="briefcase" size={22} />
         <span class="od-desktop-account--row-texts">

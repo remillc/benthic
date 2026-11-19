@@ -17,8 +17,8 @@
   import { flow, go, goDownload, goOffer } from '../lib/first-launch.svelte.js';
   import { offerShowsSignIn } from '../lib/first-launch-steps.js';
   import { devAccounts } from '../lib/dev-switch.js';
-  import { ACTIVATED, BENEFITS, afterSignIn, summaryRows } from '../lib/odplus.js';
-  import { purchaseSubscription, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
+  import { ACTIVATED, BENEFITS, afterSignIn, providerOrder, summaryRows } from '../lib/odplus.js';
+  import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/odplus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { services } from '../lib/profile.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
@@ -145,6 +145,13 @@
     else if (answer.status === 'purchased') go('welcome');
   }
 
+  /** « Restaurer les achats »: inert until StoreKit is wired (lib/odplus-billing.js). */
+  async function restore() {
+    const answer = await restorePurchases();
+    if (answer.status === 'unavailable') showSnackbar(t('odplus.purchaseUnavailable'));
+    else if (answer.status === 'purchased') go('welcome');
+  }
+
   // Development builds only: the purchase is inert, so « Bienvenue dans OpenDives+ » is reached from the console with
   // `__odplus.purchased()`. The branch is dropped from a production build (`import.meta.env.DEV` is a constant).
   onMount(() => {
@@ -203,15 +210,22 @@
   <p class="od-plus--lead">{t('odplus.connect.lead')}</p>
   <div class="od-plus--buttons">
     <!-- The official logos and rules of each provider (assets/brands/README.md): the logos are never altered. -->
-    <button type="button" class="od-plus--provider od-plus--provider-google" onclick={() => provider('google')}>
-      <span class="od-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
-    </button>
-    <button type="button" class="od-plus--provider od-plus--provider-apple" onclick={() => provider('apple')}>
-      <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
-    </button>
-    <button type="button" class="od-plus--provider od-plus--provider-main" onclick={() => go('email')}>
-      <Icon name="mail" size={22} />{t('odplus.connect.email')}
-    </button>
+    <!-- « Continuer avec Apple » first on iOS (task 2026-11-19-289, ios-odplus-connexion.dc.html). -->
+    {#each providerOrder(ios) as which (which)}
+      {#if which === 'google'}
+        <button type="button" class="od-plus--provider od-plus--provider-google" onclick={() => provider('google')}>
+          <span class="od-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
+        </button>
+      {:else if which === 'apple'}
+        <button type="button" class="od-plus--provider od-plus--provider-apple" onclick={() => provider('apple')}>
+          <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
+        </button>
+      {:else}
+        <button type="button" class="od-plus--provider od-plus--provider-main" onclick={() => go('email')}>
+          <Icon name="mail" size={22} />{t('odplus.connect.email')}
+        </button>
+      {/if}
+    {/each}
   </div>
   <p class="od-plus--note">{t('odplus.connect.note')}</p>
   <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
@@ -240,6 +254,11 @@
       <span class="od-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
     </div>
     <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+    {#if ios}
+      <!-- App Store requirements (task 289): restoring purchases, and the terms of the automatic renewal. -->
+      <button type="button" class="od-plus--text od-plus--text-centre" onclick={restore}>{t('odplus.offer.restore')}</button>
+      <p class="od-plus--terms">{t('odplus.offer.terms', { price: t('odplus.offer.price') })}</p>
+    {/if}
     <button type="button" class="od-plus--text od-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
     <p class="od-plus--no-account">{t('odplus.offer.noAccount')}</p>
     {#if offerShowsSignIn(flow.stack)}
@@ -814,6 +833,14 @@
       font-size: 13px;
       line-height: 17px;
       color: var(--od-text-2);
+    }
+
+    .od-plus--terms {
+      margin: 4px 0 0;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--od-text-2);
+      text-align: center;
     }
 
     .od-plus--price {

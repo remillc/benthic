@@ -162,7 +162,7 @@
 </script>
 
 <Page class="od-account">
-  <Navbar class="od-band-bar" title={t('account.title')}>
+  <Navbar large={theme.ios && !bottomNav()} class={theme.ios ? 'od-ios-bar' : 'od-band-bar'} title={t('account.title')}>
     {#snippet left()}
       {#if bottomNav()}
         <!-- Android phone: Compte opens from the account sheet, over a section (task 2026-11-14-120). -->

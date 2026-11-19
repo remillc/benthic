@@ -27,7 +27,8 @@
   import FirstLaunchOdPlus from './FirstLaunchOdPlus.svelte';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
-  import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch, offerShowsSignIn } from '../lib/first-launch-steps.js';
+  import { hasBack, hasLogbookTitle, chooseOutcome, leavesFirstLaunch, offerShowsSignIn, systemBack } from '../lib/first-launch-steps.js';
+  import { setWelcomeBack, welcomeBack } from '../lib/first-launch-back.js';
   import { entryRows } from '../lib/server-signin.js';
   import { logbookFileName, nameFromFile, sanitiseLogbookName } from '../lib/logbook-name.js';
   import { summariseImport, summariseScan, summaryText } from '../lib/import-summary.js';
@@ -701,6 +702,47 @@
     if (flow.origin === 'menu') leave();
     else goBackTo('start');
   }
+
+  /**
+   * The system Back (Android key, gesture and predictive back; lib/back-button.js) and the iOS edge swipe: the same as
+   * « Retour », by the rules of `systemBack`. Returns false on the first step, where the app goes to the background.
+   */
+  function systemBackStep() {
+    const action = systemBack(flow.stack, flow.origin === 'menu');
+    if (action.kind === 'minimize') return false;
+    if (action.kind === 'leave') leave();
+    else if (action.kind === 'back') back();
+    else if (action.kind === 'without') withoutAccount();
+    else if (action.kind === 'cancel') document.querySelector(/** @type {string} */ (action.selector))?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    return true;
+  }
+
+  onMount(() => {
+    setWelcomeBack(systemBackStep);
+    // iOS has no back key: a swipe from the left edge goes back (F7's swipe-back only applies to router pages).
+    /** @type {{ x: number, y: number }|null} */
+    let from = null;
+    /** @param {TouchEvent} e */
+    const start = (e) => {
+      const touch = e.touches[0];
+      from = ios && !desktopApp && e.touches.length === 1 && touch.clientX <= 24 ? { x: touch.clientX, y: touch.clientY } : null;
+    };
+    /** @param {TouchEvent} e */
+    const end = (e) => {
+      const touch = e.changedTouches[0];
+      const begun = from;
+      from = null;
+      if (!begun || !touch) return;
+      if (document.querySelector('.od-welcome.modal-in') && touch.clientX - begun.x > 60 && Math.abs(touch.clientY - begun.y) < 60) welcomeBack();
+    };
+    window.addEventListener('touchstart', start, { passive: true });
+    window.addEventListener('touchend', end, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', start);
+      window.removeEventListener('touchend', end);
+      setWelcomeBack(null);
+    };
+  });
 </script>
 
 {#snippet backButton()}
@@ -818,7 +860,7 @@
 <div class="od-first-launch" class:od-first-launch--first={step === 'start'} class:od-first-launch--dragging={dragging} class:od-first-launch--desktop={desktopApp}>
   <div class="od-first-launch--stage">
     {#key step}
-      <section class="od-first-launch--step" in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
+      <section class="od-first-launch--step" data-step={step} in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
         {@render backButton()}
 
         {#if hasLogbookTitle(step)}
