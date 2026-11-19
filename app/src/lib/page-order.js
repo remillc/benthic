@@ -12,6 +12,8 @@
 // screen and a route that says otherwise. Any stack four pages deep in the Logbook view ended that way on the second
 // Back (a dive, its planner, the plans, a new plan; Réglages, a subpage, a page under it).
 //
+// (The same file makes `removePage` remove every page it is given: see `keepPageOrder`.)
+//
 // The fix is the order: the new component is put just before the current page's in the list. Svelte then draws it
 // where Framework7 wants it, nothing is moved by hand, and each page stays inside its own part of the document.
 import { app as f7Shared } from 'framework7-svelte/shared/f7.js';
@@ -41,6 +43,24 @@ export function keepPageOrder(router) {
   const load = router?.pageComponentLoader;
   if (typeof load !== 'function' || router.odPageOrder) return;
   router.odPageOrder = true;
+  // Framework7 hands over several pages at once when a row of the list replaces a detail pane that holds more than
+  // one page (a tablet: a dive, then its planner opened in the pane, then another dive tapped in the list).
+  // Framework7-Svelte's `removePage` only removes the first of them: the others stayed in the pane, under the new
+  // page, still « current ». Each one is removed.
+  const remove = router.removePage;
+  if (typeof remove === 'function') {
+    router.removePage = function (/** @type {any} */ pages) {
+      const list = /** @type {Element[]} */ (pages && typeof pages === 'object' && !pages.nodeType && typeof pages.length === 'number' ? [...pages] : pages ? [pages] : []);
+      if (list.length > 1) for (const el of list) remove.call(this, el);
+      else remove.call(this, pages);
+      // Svelte removes a page's part of the document at the next tick. When Framework7 has moved pages around it
+      // (a pane replaced), that part no longer holds the page's element, which would stay under the new page: it
+      // goes just after.
+      setTimeout(() => {
+        for (const el of list) if (el?.isConnected && el.classList?.contains('page')) el.remove();
+      }, 0);
+    };
+  }
   router.pageComponentLoader = function (/** @type {any} */ request) {
     const result = load.call(this, request);
     if (request?.direction !== 'backward') return result;

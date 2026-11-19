@@ -14,6 +14,8 @@
 //    page already shown does not run; a wait that outlives the page it was asked from is dropped);
 //  - a page change that does not end is ended (`animate` watchdog), a router closed for too long is reopened, a hold
 //    kept too long is released: none of the three can block the view for ever;
+//  - a page of a list-and-detail pair asked from a page that is neither does not load the list a second time
+//    (`navigateKeepingMaster`);
 //  - `heldNavigate`, `heldBack` and `dropPreviousPage` are for the code that holds the router (a swipe that follows
 //    the finger): the only way past the hold.
 // The system Back (lib/back-button.js), the navbar's arrow and the swipe back (lib/swipe-back.js) all end on
@@ -34,7 +36,7 @@ export const LOCK_LIMIT = 8000;
 /**
  * @typedef {{
  *   allowPageChange?: boolean, currentRoute?: { url?: string, path?: string }, odLocks?: number,
- *   back: Function, navigate: Function, animate?: Function, history?: string[], el?: Element,
+ *   back: Function, navigate: Function, animate?: Function, history?: string[], el?: Element, params?: any, findMatchingRoute?: Function,
  *   odRaw?: { back: Function, navigate: Function }, odBusySince?: number|null, odAnimating?: boolean, odName?: string,
  *   [key: string]: any,
  * }} GuardedRouter
@@ -96,6 +98,33 @@ function animationMs(els) {
 }
 
 /**
+ * A navigation to a page of a list-and-detail pair (a dive of the Logbook), asked while the view shows a page that
+ * is neither the list nor one of its details (the planner opened from a dive, Réglages over the Logbook): Framework7
+ * then loads the list again, as a new page on top of the history, before the detail. The view ends with two lists,
+ * a history that goes through the list twice and, beside the list, a pane that is never emptied. When the list is
+ * already in the view, Framework7 is told so for the time of the call (it reads it on the current route).
+ * @param {GuardedRouter} router
+ * @param {(...args: any[]) => any} navigate the router's own navigate
+ * @param {any[]} args
+ */
+export function navigateKeepingMaster(router, navigate, args) {
+  const url = urlOf(args[0]);
+  const current = router.currentRoute?.route;
+  const master = router.params?.masterDetailBreakpoint > 0 && url && current && typeof router.findMatchingRoute === 'function' ? router.findMatchingRoute(url)?.route?.masterRoute : null;
+  // Framework7 gets it right from the list itself and from one of its details.
+  if (!master || current.master || current.masterRoute) return navigate(...args);
+  const loaded = [...(router.el?.children ?? [])].some((el) => el.classList.contains('page-master') && /** @type {any} */ (el).f7Page?.route?.route?.path === master.path);
+  if (!loaded) return navigate(...args);
+  trace('master-kept', `${nameOf(router)} ${pathOf(url)}`);
+  current.masterRoute = master;
+  try {
+    return navigate(...args);
+  } finally {
+    delete current.masterRoute;
+  }
+}
+
+/**
  * @param {GuardedRouter} router
  * @param {{ setTimeout?: typeof setTimeout, clearTimeout?: typeof clearTimeout, now?: () => number, frame?: (fn: () => void) => void }} [clock] for the tests
  * @returns {GuardedRouter} the same router
@@ -151,7 +180,7 @@ export function guardRouter(router, clock = {}) {
         return;
       }
       trace('nav', `${nameOf(router)} ${pathOf(next.url)} after wait`);
-      raw.navigate(...next.args);
+      navigateKeepingMaster(router, raw.navigate, next.args);
       return;
     }
     if (now() - since > MAX_WAIT) {
@@ -182,7 +211,7 @@ export function guardRouter(router, clock = {}) {
     const url = urlOf(args[0]);
     if (!isBusy(router)) {
       trace('nav', `${nameOf(router)} ${pathOf(url)}`);
-      return raw.navigate(...args);
+      return navigateKeepingMaster(router, raw.navigate, args);
     }
     if (queued && queued.url === url && url) return router;
     trace('nav-queued', `${nameOf(router)} ${pathOf(url)}`);
@@ -242,7 +271,7 @@ export function guardRouter(router, clock = {}) {
  */
 export function heldNavigate(router, ...args) {
   trace('nav', `${nameOf(router)} ${pathOf(urlOf(args[0]))} held`);
-  return (router.odRaw ?? router).navigate(...args);
+  return navigateKeepingMaster(router, (router.odRaw ?? router).navigate, args);
 }
 
 /**

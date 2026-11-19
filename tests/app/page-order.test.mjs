@@ -55,3 +55,24 @@ test('only a page loaded on the way back is moved; the router’s own loader sti
   assert.equal(router.pageComponentLoader({ direction: 'backward' }), 'loaded');
   assert.deepEqual(calls, ['forward', 'backward'], 'wrapped once');
 });
+
+test('every page handed to removePage is removed, not only the first', () => {
+  const removed = [];
+  const router = {
+    el: { children: [] },
+    pageComponentLoader() {},
+    removePage(page) {
+      // As Framework7-Svelte: a collection gives its first page only.
+      removed.push(page && typeof page === 'object' && 'length' in page ? page[0] : page);
+    },
+  };
+  keepPageOrder(router);
+  const a = { nodeType: 1, name: 'root' };
+  const b = { nodeType: 1, name: 'planner' };
+  router.removePage([a, b]);
+  assert.deepEqual(removed, [a, b]);
+  router.removePage([a]);
+  router.removePage(b);
+  router.removePage(null);
+  assert.deepEqual(removed, [a, b, a, b, null]);
+});

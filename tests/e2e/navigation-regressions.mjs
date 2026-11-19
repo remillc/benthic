@@ -65,7 +65,7 @@ export async function regressionFlows(h) {
 
   // The same fault on any stack four pages deep in the Logbook view, whose first page (the list) stays in the
   // document: Réglages opened over the Logbook, a subpage, a page under it, then Back three times.
-  console.log(' Réglages > Types de blocs > a new type > Back > Back > Back');
+  console.log(' Réglages > Types de bouteilles > a new type > Back > Back > Back');
   // A page of its own: the fault above must not be the cause of this one.
   tab.ws.close();
   tab = await h.openTab(390, 844, true);
@@ -94,5 +94,117 @@ export async function regressionFlows(h) {
   await settled(tab, 'deep stack: Back to the logbook', { route: '/' });
   await sound(tab, 'deep stack: the logbook is sound');
   expect('the app found nothing broken', { broken: '' }, { broken: await tab.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type === 'broken').map((e) => e.detail).join(' | ')) });
+
+  // Seeds 11 and 12 on unmodified code (both looks): a dive tapped, then another section tapped while the dive page
+  // comes in. The Logbook view is hidden in the middle of its page change; the animation Framework7 waits for never
+  // ends there, and the view stayed closed (« router-transition-forward », the dive waiting as page-next) for good.
+  console.log(' a dive, then another section during its opening, then back to the Logbook');
   tab.ws.close();
+  tab = await h.openTab(390, 844, true);
+  const section = async (name) => {
+    const at = await tab.run((n) => {
+      const link = [...document.querySelectorAll('.od-navigation-bar a, .od-navigation-bar button, .toolbar a, .tabbar a')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
+      const r = link?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+    }, name);
+    if (!at) throw new Error(`no section ${name}`);
+    await tab.tapAt(at.x, at.y);
+  };
+  for (const gap of [40, 150]) {
+    await tapDive(tab);
+    await sleep(gap);
+    await section('Sites');
+    await sleep(2500);
+    await section('Carnet');
+    await sleep(400);
+    await settled(tab, `section ${gap} ms after a dive: the Logbook view is at rest`, {});
+    await sound(tab, `section ${gap} ms after a dive: sound`);
+    const where = await route(tab);
+    expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/\d+$/.test(where) });
+    if (where !== '/') {
+      await hardwareBack(tab);
+      await settled(tab, `section ${gap} ms after a dive: Back to the list`, { route: '/' });
+    }
+  }
+  tab.ws.close();
+
+  // Tablet, seeds 11 and 13 on unmodified code: a swipe on the dive shown beside the list (the next dive), then a
+  // dive tapped in the list: two dives were left in the pane.
+  console.log('Tablet, 1280x800: a swipe to the next dive, then a dive tapped in the list');
+  const wide = await h.openTab(1280, 800, false);
+  await tapDive(wide);
+  await settled(wide, 'tablet swipe: a dive beside the list', { split: true });
+  await sleep(600);
+  const pane = await wide.run(() => {
+    const r = document.querySelector('.view.tab-active > .page-master-detail.page-current .page-content')?.getBoundingClientRect();
+    return r ? { x: r.x + r.width / 2, y: r.y + r.height - 120 } : null;
+  });
+  expect('tablet swipe: the dive pane is there', { pane: true }, { pane: !!pane });
+  if (pane) {
+    for (const [from, to] of [[pane.x + 150, pane.x - 250], [pane.x - 150, pane.x + 250]]) {
+      await wide.swipe(from, to, pane.y, 8);
+      await sleep(1200);
+      await settled(wide, `tablet swipe: after a swipe ${to < from ? 'left' : 'right'}`, { split: true });
+      await sound(wide, `tablet swipe: sound after a swipe ${to < from ? 'left' : 'right'}`);
+      const row = await wide.run(() => {
+        const rows = [...document.querySelectorAll('.view.tab-active > .page-master a[href^="/dives/"]')];
+        const r = rows[Math.min(3, rows.length - 1)]?.getBoundingClientRect();
+        return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
+      });
+      if (row) await wide.tapAt(row.x, row.y);
+      await sleep(900);
+      await settled(wide, 'tablet swipe: a dive tapped in the list', { split: true });
+      await sound(wide, 'tablet swipe: sound after the tap');
+    }
+  }
+  // Tablet, seeds 12 and 13: another section and back to the Logbook, then a dive tapped in the list.
+  console.log(' tablet: Statistiques, back to the Carnet, then a dive tapped in the list');
+  const rail = async (name) => {
+    const at = await wide.run((n) => {
+      const link = [...document.querySelectorAll('.od-nav-rail a, .od-nav-rail button')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
+      const r = link?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+    }, name);
+    if (!at) throw new Error(`no rail entry ${name}`);
+    await wide.tapAt(at.x, at.y);
+  };
+  const tapRow = async (n) => {
+    const row = await wide.run((n) => {
+      const rows = [...document.querySelectorAll('.view.tab-active > .page-master a[href^="/dives/"]')];
+      const r = rows[Math.min(n, rows.length - 1)]?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
+    }, n);
+    if (row) await wide.tapAt(row.x, row.y);
+  };
+  for (const how of ['rail', 'Back']) {
+    await rail('Statistiques');
+    await sleep(700);
+    if (how === 'rail') await rail('Carnet');
+    else await hardwareBack(wide);
+    await sleep(700);
+    await settled(wide, `tablet sections (${how}): back on the Carnet`, { split: true });
+    await sound(wide, `tablet sections (${how}): sound`);
+    await tapRow(how === 'rail' ? 1 : 2);
+    await sleep(900);
+    await settled(wide, `tablet sections (${how}): a dive tapped in the list`, { split: true });
+    await sound(wide, `tablet sections (${how}): sound after the tap`);
+  }
+
+  // Tablet, seeds 11, 12 and 13 on unmodified code: a page opened inside the detail pane (the planner, from the dive),
+  // then another dive tapped in the list. Framework7 hands both pages of the pane to be removed and only the first
+  // was: the planner stayed under the new dive, and the next tap in the list left two dives in the pane.
+  console.log(' tablet: the planner opened in the pane, then a dive tapped in the list, then another');
+  await tapText(wide, 'Planifier depuis cette plongée|Plan from this dive', '.view.tab-active > .page-master-detail.page-current');
+  for (let i = 0; i < 50 && !/^\/plan\/\d+$/.test(await route(wide)); i++) await sleep(100);
+  await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/\d+$/ });
+  for (const n of [0, 3]) {
+    await tapRow(n);
+    for (let i = 0; i < 30 && !/^\/dives\/\d+$/.test(await route(wide)); i++) await sleep(100);
+    await sleep(600);
+    await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/\d+$/ });
+    await sound(wide, `tablet pane: sound after dive ${n}`);
+    const stack = await wide.run(readStack);
+    expect(`tablet pane: the list and one dive, a history of two (dive ${n})`, { pages: 2, history: 2 }, { pages: stack.pages.length, history: stack.history.length });
+  }
+  wide.ws.close();
 }

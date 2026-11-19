@@ -85,7 +85,7 @@ async function readHealth() {
   // The middle of the screen belongs to the top layer: an open modal or its scrim, else the active section's current page.
   const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
   const current = view ? [...view.querySelectorAll(':scope > .page-current')] : [];
-  const layerOk = !hit || !!hit.closest('.modal-in, .modal-out, .backdrop-in, .panel, .panel-backdrop, .od-fab-menu, [popover], .od-map-fullscreen') || current.some((p) => p.contains(hit)) || !!hit.closest('.od-navigation-bar, .od-nav-rail') || (!!view && view.classList.contains('view-master-detail') && view.contains(hit));
+  const layerOk = !hit || !!hit.closest('.modal-in, .modal-out, .backdrop-in, .panel, .panel-backdrop, .od-fab-menu, [popover], .od-map-fullscreen, [class*="od-select-field--"], .od-row-menu') || current.some((p) => p.contains(hit)) || !!hit.closest('.od-navigation-bar, .od-nav-rail') || (!!view && view.classList.contains('view-master-detail') && view.contains(hit));
   let trace = null;
   try {
     trace = await import('/src/lib/nav-trace.js');
@@ -115,6 +115,13 @@ async function readHealth() {
     exit: !modals.length && view?.id === 'view-logbook' && (router?.history?.length ?? 1) <= 1 && !document.querySelector('.panel.panel-in, .od-fab-menu--open, .fab-opened, .searchbar-enabled, .od-logbook--selection-bar, .od-row-menu, .od-select-field--open, [popover]:popover-open'),
     exitSplit: !modals.length && view?.id === 'view-logbook' && !!view?.classList.contains('view-master-detail') && !!view.querySelector(':scope > .page-current.page-master-detail-root, :scope > .page-master:only-child'),
   };
+}
+
+/** The pages of the section on screen, with their place and role, and the history of its router. */
+function readPages() {
+  const view = document.querySelector('.views > .view.tab-active');
+  const pages = [...(view?.children ?? [])].filter((el) => el.classList.contains('page')).map((el) => `${(el.f7Page?.route?.url ?? '?').split('?')[0]}[${[...el.classList].filter((c) => c.startsWith('page-')).map((c) => c.slice(5)).join(',')}]`);
+  return `${pages.join('  ')} | history ${JSON.stringify(view?.f7View?.router?.history ?? [])} | ${view?.className ?? ''}`;
 }
 
 async function readTrace() {
@@ -313,8 +320,10 @@ export async function monkeyFlows(h) {
       const report = async (/** @type {number} */ step, /** @type {string[]} */ problems) => {
         failures++;
         const trace = await run(readTrace).catch(() => '');
+        const pages = await run(readPages).catch(() => '');
         h.fail(`monkey ${name} seed ${seed} step ${step}`, problems, { seed, config: name, step, reduced, throttle, actions: actions.slice(-12), trace: trace.split('\n').slice(-60) });
         console.log(`    last actions: ${actions.slice(-8).join(' → ')}`);
+        if (pages) console.log(`    pages: ${pages}`);
         if (trace) console.log(`    trace (end):\n      ${trace.split('\n').slice(-25).join('\n      ')}`);
         // A fresh page for the rest of the seed.
         await send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] }).catch(() => {});
@@ -341,6 +350,8 @@ export async function monkeyFlows(h) {
         }
         const health = await settle();
         h.count();
+        // OD_MONKEY_DUMP=1: the pages of the section on screen after each step (to find where a fault starts).
+        if (process.env.OD_MONKEY_DUMP) console.log(`      [${step}] ${await run(readPages).catch(() => '')}`);
         if (!health) {
           await report(step, ['the page did not answer']);
           continue;
