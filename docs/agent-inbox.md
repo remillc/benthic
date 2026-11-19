@@ -6227,7 +6227,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Point 2 done (19 November 2026), by one agent; points 1, 3 and 4 are another agent's, so this task stays open until they are in.** Validation by signature on the screen and by QR code through the server (routes `/v1/validations/*` in the private repository: one-time code valid 10 minutes, summary, confirm, result; OpenDives+ on both sides; rate limits; `scripts/validations-test.mjs`). The signer who is offline confirms later: the scan time is sent and the server accepts it for 7 days after the code expired. Stored in the OpenDives data store (`dive-validations/<id>.json`, with a hash of each dive to show « Modifiée après la validation »), not in the Subsurface dive file: the façade has no generic dive extra-data door, and no C++ was added. The QR travels as a kind « d » transfer of the existing format (the native scanner accepts only « d » and « p »), read back as a validation by its JSON. The signer's name, role and instructor number come from the last confirmation on the phone until the instructor certificate of point 3 exists; then `signerIdentity()` in `lib/validation.svelte.js` reads the profile. The dev API on 8080 needs a `git pull` in the private repository and a rebuild to have the routes.
 
-## [ ] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
+## [x] 2026-11-19-310 Piece type as a menu on the phone, five new equipment icons, model photo in « Nouvelle pièce »
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. This follows task 309. The design canvases are not updated yet: the files in `docs/mockups/` are the reference.
 

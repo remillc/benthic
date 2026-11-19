@@ -41,14 +41,14 @@ test('« Saucisse » gets the buoy icon wherever the app shows a piece, desktop 
   assert.doesNotMatch(tile, /name="tune"/);
 });
 
-test('« Nouvelle pièce » has the model thumbnail on every layout: one form, no layout of its own', () => {
+test('« Nouvelle pièce » has the model picture on every layout: one form, no layout of its own', () => {
   const form = read('app/src/pages/ProfilePieceEdit.svelte');
-  assert.match(form, /data-testid="piece-thumb"/);
-  assert.match(form, /od-piece-edit--thumb/);
+  assert.match(form, /data-testid="piece-picture"/);
+  assert.match(form, /od-piece-edit--picture/);
   assert.doesNotMatch(form, /isTablet|isDesktop|desk\b/);
   const routes = read('app/src/App.svelte').match(/ProfilePieceEdit\.svelte/g) ?? [];
   assert.equal(routes.length, 2); // new and edit: the same page on the phone, the tablet and the desktop
-  const others = walk('app/src').filter((f) => /\.svelte$/.test(f) && /data-testid="piece-thumb"|name="model"|gear\.pieceEdit\.model/.test(read(f)));
-  // « Modifier l’ordinateur de plongée » (task 303) is the computer's own screen: it has a large image, not the thumbnail.
+  const others = walk('app/src').filter((f) => /\.svelte$/.test(f) && /data-testid="piece-picture"|name="model"|gear\.pieceEdit\.model/.test(read(f)));
+  // « Modifier l’ordinateur de plongée » (task 303) is the computer's own screen: it has a large image, as « Nouvelle pièce » since task 310.
   assert.deepEqual(others, ['app/src/pages/ProfileComputerEdit.svelte', 'app/src/pages/ProfilePieceEdit.svelte']);
 });

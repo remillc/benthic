@@ -156,7 +156,7 @@
       overflow: hidden;
     }
 
-    .od-profile-info--row-icon {
+    .od-profile-info--row.od-profile-info--row-icon {
       min-height: 72px;
       flex-direction: row;
       align-items: center;

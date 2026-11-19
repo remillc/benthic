@@ -39,6 +39,7 @@
   import { t } from '../lib/i18n.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
+  import { ios } from '../lib/layout.svelte.js';
 
   /** The colour of a type's icon square on a wide screen, the inventory's: blue, green, beige, purple, else grey. @type {Record<string, string>} */
   const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet' };
@@ -104,6 +105,10 @@
   const fields = $derived(detailFields(/** @type {any} */ (type)));
   /** The name field is shown for the types the diver names (cylinder, weight belt, « Autre »); the others are named from brand and model. */
   const namedByHand = $derived(isNamedByHand(/** @type {any} */ (type)));
+  /** The menu of the types on a phone, in the order of the grid. */
+  const typeOptions = GEAR_TYPES.map((value) => ({ value, label: t(`gear.pieceNew.tile.${value}`) }));
+  /** The computer's catalog name from what is typed, for its photo. */
+  const catalogModel = $derived([brand, model].map((s) => s.trim()).filter(Boolean).join(' '));
   const typeLabel = $derived(t(`gear.pieceNew.tile.${type}`));
   /** The type is the only required field: a piece with nothing typed is named by its type. */
   const effectiveName = $derived(
@@ -240,8 +245,13 @@
   }
 </script>
 
-{#snippet thumbIcon()}
-  <GearIcon type="computer" size={32} />
+{#snippet typeIcon(/** @type {string} */ value)}
+  <GearIcon type={/** @type {any} */ (value)} size={24} />
+{/snippet}
+
+<!-- No photo for the model: the type's own drawing, large (task 2026-11-19-310). -->
+{#snippet pictureIcon()}
+  <span class="od-piece-edit--generic" aria-hidden="true"><GearIcon {type} {name} size={96} /></span>
 {/snippet}
 
 {#snippet detail(/** @type {import('../lib/gear-fields.js').DetailField} */ f)}
@@ -302,25 +312,49 @@
 
   <ReadOnlyNotice />
 
+  {#if profileWide()}
   <h2 class="od-piece-edit--title" id="od-piece-type">{t('gear.pieceNew.typeTitle')}</h2>
-  <div class="od-piece-edit--tiles" class:od-piece-edit--compact={profileWide()} role="radiogroup" aria-labelledby="od-piece-type">
-    {#each GEAR_TYPES as value (value)}
-      {@const on = type === value}
-      <button
-        type="button"
-        role="radio"
-        aria-checked={on}
-        class="od-piece-edit--tile"
-        class:od-piece-edit--tile-on={on}
-        disabled={!!piece?.computerModel && value !== type}
-        onclick={() => (type = value)}
-      >
-        {#if on}<span class="od-piece-edit--check" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>{/if}
-        <span class="od-piece-edit--tile-icon od-piece-edit--tone-{TONES[value] ?? 'grey'}"><GearIcon type={value} size={profileWide() ? 22 : 26} /></span>
-        <span class="od-piece-edit--tile-name">{t(`gear.pieceNew.tile.${value}`)}</span>
+    <div class="od-piece-edit--tiles" class:od-piece-edit--compact={profileWide()} role="radiogroup" aria-labelledby="od-piece-type">
+      {#each GEAR_TYPES as value (value)}
+        {@const on = type === value}
+        <button
+          type="button"
+          role="radio"
+          aria-checked={on}
+          class="od-piece-edit--tile"
+          class:od-piece-edit--tile-on={on}
+          disabled={!!piece?.computerModel && value !== type}
+          onclick={() => (type = value)}
+        >
+          {#if on}<span class="od-piece-edit--check" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>{/if}
+          <span class="od-piece-edit--tile-icon od-piece-edit--tone-{TONES[value] ?? 'grey'}"><GearIcon type={value} size={profileWide() ? 22 : 26} /></span>
+          <span class="od-piece-edit--tile-name">{t(`gear.pieceNew.tile.${value}`)}</span>
+        </button>
+      {/each}
+    </div>
+  
+{:else}
+    <!-- Phone: one filled field that opens a menu with the 16 types (task 2026-11-19-310); the iPhone uses the system list. -->
+    <div class="od-piece-edit--type-field">
+      <SelectField label={t('gear.pieceNew.typeTitle')} bind:value={type} options={typeOptions} disabled={!!piece?.computerModel} icon={typeIcon} />
+    </div>
+  {/if}
+
+  {#if spec.photo}
+    <div class="od-piece-edit--image">
+      <div class="od-piece-edit--picture" data-testid="piece-picture" class:od-piece-edit--picture-box={!ios && !profileWide()} role="img" aria-label={t('gear.computerEdit.imageLabel')}>
+        <DcTile model={computer ? catalogModel : ''} size={ios ? 176 : 160} radius={16} photo={photoUrl} fallback={pictureIcon} />
+      </div>
+      <button type="button" class="od-piece-edit--change" onclick={() => fileInput?.click()}>
+        {#if !ios}<Icon name="camera" size={20} />{/if}{t('gear.computerEdit.changeImage')}
       </button>
-    {/each}
-  </div>
+      {#if photoUrl}
+        <button type="button" class="od-piece-edit--photo-remove" onclick={removePhoto}>{t('gear.computerEdit.removeImage')}</button>
+        <p class="od-piece-edit--photo-note">{t('gear.computerEdit.photoNote')}</p>
+      {/if}
+      <input bind:this={fileInput} class="od-piece-edit--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickPhoto} />
+    </div>
+  {/if}
 
   <div class="od-piece-edit--fields">
     {#if type === 'other'}
@@ -328,18 +362,6 @@
     {/if}
     {#if namedByHand}
       <TextField label={type === 'other' ? t('gear.pieceNew.otherName') : t('gear.pieceEdit.name')} bind:value={name} supporting={type === 'cylinder' ? t('gear.pieceNew.cylinderNameHint') : ''} />
-    {/if}
-
-    {#if spec.photo}
-      <div class="od-piece-edit--photo">
-        <button type="button" class="od-piece-edit--photo-button" onclick={() => fileInput?.click()}>
-          <Icon name="camera" size={20} />{photoUrl ? t('gear.pieceNew.photoChange') : t('gear.pieceNew.photoAdd')}
-        </button>
-        {#if photoUrl}
-          <button type="button" class="od-piece-edit--photo-remove" onclick={removePhoto}>{t('gear.pieceNew.photoRemove')}</button>
-        {/if}
-        <input bind:this={fileInput} class="od-piece-edit--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickPhoto} />
-      </div>
     {/if}
 
     {#if type !== 'other'}
@@ -353,18 +375,6 @@
         <TextField label={t('gear.pieceEdit.brand')} bind:value={brand} />
       {/if}
       <div class="od-piece-edit--model">
-        {#if spec.photo}
-          <span class="od-piece-edit--thumb" data-testid="piece-thumb">
-            {#if photoUrl}
-              <img src={photoUrl} alt="" class="od-piece-edit--thumb-image" />
-            {:else if computer}
-              <!-- The model's photo as soon as the model is known (task 2026-11-19-306). -->
-              <DcTile model={[brand, model].map((s) => s.trim()).filter(Boolean).join(' ')} size={56} radius={12} fallback={thumbIcon} />
-            {:else}
-              <GearIcon {type} {name} size={32} />
-            {/if}
-          </span>
-        {/if}
         <div class="od-piece-edit--model-field">
           {#if computer}
             <ComboField label={t('gear.pieceEdit.model')} bind:value={model} options={lists.modelsOf(brand)} />
@@ -582,11 +592,82 @@
       gap: 12px;
     }
 
-    .od-piece-edit--photo {
+    .od-piece-edit--type-field {
+      --od-field-margin: 16px;
+    }
+
+    /* The model's photo, large, with « Changer d’image » under it (as « Modifier l’ordinateur de plongée »): Android phone a
+       white 192 box around the 160 photo, iPhone 176, a wide screen 160. */
+    .od-piece-edit--image {
+      margin: 16px 16px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .od-piece-edit--picture {
+      width: 160px;
+      height: 160px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .od-piece-edit--picture-box {
+      width: 192px;
+      height: 192px;
+      border-radius: 28px;
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
+      justify-content: center;
+      background: var(--od-photo-ground);
+    }
+
+    :global(.ios) .od-piece-edit--picture {
+      width: 176px;
+      height: 176px;
+    }
+
+    .od-piece-edit--generic {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-selected-container);
+      color: var(--od-secondary);
+    }
+
+    .od-piece-edit--change {
+      width: auto;
+      height: 48px;
+      padding: 0 20px;
+      border: 1px solid var(--od-outline);
+      border-radius: 24px;
+      background: transparent;
+      color: var(--od-secondary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
+    }
+
+    :global(.ios) .od-piece-edit--change {
+      height: 44px;
+      padding: 0 12px;
+      border: none;
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    .od-piece-edit--photo-note {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+      text-align: center;
     }
 
     .od-piece-edit--model {
@@ -600,47 +681,16 @@
       min-width: 0;
     }
 
-    .od-piece-edit--thumb {
-      flex: none;
-      width: 56px;
-      height: 56px;
-      border: 1px solid var(--od-piece-thumb-border);
-      border-radius: 12px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--od-piece-thumb-background);
-      color: var(--od-text);
-    }
-
-    .od-piece-edit--thumb-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .od-piece-edit--photo-button,
     .od-piece-edit--photo-remove {
       width: auto;
       height: 40px;
-      padding: 0 16px 0 12px;
+      padding: 0 16px;
       border: none;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: none;
+      color: var(--od-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .od-piece-edit--photo-remove {
-      padding: 0 12px;
-      background: none;
-      color: var(--od-secondary);
     }
 
     .od-piece-edit--file {
