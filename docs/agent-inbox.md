@@ -5975,3 +5975,19 @@ Christian approved this on 19 November 2026. Work in `main`. The sample logbook 
 - The sample logbook is never synchronised and never mixed with the diver’s own logbook (todo #69).
 
 **Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
+
+## [ ] 2026-11-19-300 iPhone About screen, tablet portrait layouts
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
+
+- **iPhone About screen** — `ios-apropos`. Same texts and the same two buttons as the other platforms (task 296), with iOS conventions: navigation bar « ‹ Réglages », grouped lists, « Donner une note dans l’App Store » instead of Google Play, filled-tonal and outlined rounded-rectangle buttons 50 pt tall (GitHub mark on « Voir sur GitHub », download icon on « Exporter mon carnet »). The « Bibliothèques libres » page has no iPhone mock-up yet: reuse the Android page with iOS list styling.
+- **Android tablet, portrait** (full-page screens only; dialogs keep the landscape mock-ups, a dialog is centred the same way in both orientations; task 293 and its mock-ups still apply). In portrait the layout keeps the two panes (list on the left, detail on the right), with these differences:
+  - Offline banner and « Avion dans 17 h 05 » banner over the logbook list (`android-tablette-etat-horsligne-portrait`, `android-tablette-carnet-avion-portrait`).
+  - Bluetooth states in the right pane of the download screen: authorise, denied, disabled (`android-tablette-telechargement-autorisation-portrait`, `-refusee-portrait`, `-desactive-portrait`).
+  - Site search over the left pane (`android-tablette-sites-recherche-portrait`).
+  - Offline maps, left pane 340 dp wide: region menu, downloads in progress, no network and failure (`android-tablette-cartes-menu-portrait`, `-telechargement-portrait`, `-echec-portrait`).
+  - Reminder switch in Désaturation (`android-tablette-desaturation-rappel-portrait`).
+  - « Modifier l’ordinateur » side sheet (`android-tablette-ordinateur-modifier-portrait`).
+- The iPad follows the same portrait layouts with iOS conventions (task 294).
+
+**Test:** open the iPhone About screen and compare with the mock-up. On a tablet in portrait, reach each of the listed screens and compare with its mock-up.
