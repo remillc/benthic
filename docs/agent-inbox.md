@@ -5973,7 +5973,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the demo logbook, add a dive and leave it. Import a CSV file through the three steps. Open an empty logbook on a phone and a tablet. On the desktop with a git repository, open the account sheet and compare with the mock-up.
 
-## [ ] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
+## [x] 2026-11-19-299 Sample logbook: follow the mock-up (banner at the bottom)
 
 Christian approved this on 19 November 2026. Work in `main`. The sample logbook interface that was built differs from the mock-up. Redo it to match the mock-ups in `docs/mockups/` (task 298 has the context): `android-demo`, `android-demo-ajout`, `android-demo-quitter`. The tablet follows `android-tablette-demo-paysage` and `-portrait`.
 
@@ -5983,6 +5983,8 @@ Christian approved this on 19 November 2026. Work in `main`. The sample logbook 
 - The sample logbook is never synchronised and never mixed with the diver’s own logbook (todo #69).
 
 **Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
+
+**Done (19 November 2026).** Phone: the banner is a card above the bottom navigation bar (« Commencer »), on the four first pages; the lists end above it and the « + » rises with it; the exit dialog names the device (phone, iPhone, tablet, computer). Tablet and desktop keep the band at the top, as in the tablet mock-ups. Not changed: the banner is not shown on pages opened over a section on a phone (no bottom bar there).
 
 ## [ ] 2026-11-19-300 iPhone About screen, tablet portrait layouts
 

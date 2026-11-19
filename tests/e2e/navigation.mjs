@@ -63,7 +63,7 @@ function findHost() {
 const chromePath = findChrome();
 const hostPath = findHost();
 const stage = findFirst([process.env.OPENDIVES_STAGE, path.join(root, 'build/desktop/stage'), 'F:/projets/OpenDives/build/desktop/stage']);
-const sample = findFirst([path.join(stage || '', 'SampleDivesV2.ssrf'), path.join(root, 'third_party/subsurface/dives/SampleDivesV2.ssrf')]);
+const sample = findFirst([path.join(root, 'core/sample/SampleLogbook.ssrf'), path.join(stage || '', 'SampleDivesV2.ssrf')]);
 if (!chromePath || !hostPath || !sample) {
   console.log(`navigation e2e skipped: ${!chromePath ? 'no Chrome (set CHROME)' : !hostPath ? 'no core host (set OPENDIVES_HOST)' : 'no sample log'}`);
   process.exit(2);

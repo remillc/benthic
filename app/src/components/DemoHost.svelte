@@ -9,13 +9,22 @@
   import { demo, demoBannerShown, requestExit, closeDialog, endDemo } from '../lib/demo.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import { layout, ios, desktopApp, bottomNav } from '../lib/layout.svelte.js';
+  import { navigation } from '../lib/navigation.svelte.js';
+  import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
 
   const shown = $derived(demoBannerShown());
+  // Phone (mock-up android-demo): the banner is a card just above the bottom navigation bar, on the four first pages.
+  // Tablet and desktop (android-tablette-demo-*): a band at the top of the window.
+  const bottom = $derived(bottomNav() && !desktopApp);
+  const bannerShown = $derived(shown && (!bottom || navigation.atRoot));
+  const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 
   // The app's content makes room for the banner (theme rules below, on the root element).
   $effect(() => {
-    document.documentElement.classList.toggle('od-demo-on', shown);
-    return () => document.documentElement.classList.remove('od-demo-on');
+    document.documentElement.classList.toggle('od-demo-on', bannerShown && !bottom);
+    document.documentElement.classList.toggle('od-demo-bottom-on', bannerShown && bottom);
+    return () => document.documentElement.classList.remove('od-demo-on', 'od-demo-bottom-on');
   });
 
   // The first launch's link could not open the demo.
@@ -31,13 +40,13 @@
   }
 </script>
 
-{#if shown}
-  <div class="od-demo-banner" role="region" aria-label={t('demoLogbook.banner.lead')}>
+{#if bannerShown}
+  <div class="od-demo-banner" class:od-demo-banner--bottom={bottom} role="status" aria-label={t('demoLogbook.banner.lead')}>
     <svg class="od-demo-banner--icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3M7.5 15h9" />
     </svg>
     <p class="od-demo-banner--text"><strong>{t('demoLogbook.banner.lead')}</strong> {t('demoLogbook.banner.text')}</p>
-    <button type="button" class="od-demo-banner--start" onclick={requestExit}>{t('demoLogbook.banner.start')}</button>
+    <button type="button" class="od-demo-banner--start" onclick={requestExit}>{bottom ? t('demoLogbook.banner.startShort') : t('demoLogbook.banner.start')}</button>
   </div>
 {/if}
 
@@ -48,7 +57,7 @@
     text=""
     oncancel={closeDialog}
   >
-    <p class="od-demo-dialog--text">{demo.dialog === 'exit' ? t('demoLogbook.exit.text') : t('demoLogbook.add.text')}</p>
+    <p class="od-demo-dialog--text">{demo.dialog === 'exit' ? t(deviceKey('demoLogbook.exit.text', kind)) : t('demoLogbook.add.text')}</p>
     {#snippet actions()}
       <button type="button" class="od-demo-dialog--cancel" onclick={closeDialog}>{t('demoLogbook.exit.cancel')}</button>
       <button type="button" class="od-demo-dialog--confirm" disabled={demo.busy} onclick={confirm}>{t('demoLogbook.exit.confirm')}</button>
@@ -69,10 +78,31 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 0 8px 0 18px;
-      border-radius: 26px;
+      padding: 0 8px 0 16px;
+      border-radius: 16px;
       background: var(--od-release-row-main);
       color: var(--od-release-on-panel);
+    }
+
+    /* Phone: above the bottom navigation bar, 8 dp from it, over the list's last row's room (theme rules below). */
+    .od-demo-banner--bottom {
+      top: auto;
+      bottom: calc(var(--od-bottom-nav-height, 64px) + var(--f7-safe-area-bottom, 0px) + 8px);
+      height: auto;
+      padding: 12px 12px 12px 16px;
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--od-release-row-main) 25%, transparent);
+    }
+
+    .od-demo-banner--bottom .od-demo-banner--text {
+      font-size: 15px;
+      line-height: 20px;
+    }
+
+    .od-demo-banner--bottom .od-demo-banner--start {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 20px;
+      font-size: 14px;
     }
 
     .od-demo-banner--icon {

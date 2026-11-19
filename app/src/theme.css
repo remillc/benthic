@@ -2068,6 +2068,20 @@ html.od-bottom-nav-on .view.tab-active > .page-current .fab-right-bottom {
   bottom: calc(var(--od-bottom-nav-room) + 24px + var(--f7-safe-area-bottom, 0px));
 }
 
+/*
+ * The sample logbook's banner on a phone (components/DemoHost.svelte, mock-up android-demo) sits above the bar:
+ * 64 dp of card and 8 dp of gap more under the lists, over the « + » and the snackbar.
+ */
+html.od-bottom-nav-on.od-demo-bottom-on {
+  --od-demo-bottom-room: 72px;
+  --od-bottom-nav-room: calc(56px + var(--od-demo-bottom-room));
+}
+
+html.od-bottom-nav-on.od-demo-bottom-on .view.tab-active > .page-current > .page-content,
+html.od-bottom-nav-on.od-demo-bottom-on .view.tab-active > .page-master > .page-content {
+  padding-bottom: calc(var(--od-bottom-nav-height) + var(--od-demo-bottom-room) + var(--f7-safe-area-bottom, 0px));
+}
+
 /* iPhone: the tab bar is 49 pt high, and there is no floating « + » to lift. */
 html.ios.od-bottom-nav-on {
   --od-bottom-nav-height: 49px;

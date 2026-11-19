@@ -2835,7 +2835,8 @@
       "Tablette en paysage et ordinateur : « Mon profil de plongeur » s’affiche en volets : le profil à gauche, la liste (équipement ou entretien) au milieu, la fiche à droite. Les formulaires (nouvelle pièce, nouveau kit, nouveau brevet, noter une révision) s’ouvrent dans une fenêtre centrée ; les types de pièce forment une grille de 3 × 3. Sur ordinateur, la photo d’un brevet se choisit, se dépose ou se colle (Ctrl+V) ; la carte est recadrée et redressée, avec « Retirer les reflets » et « Ajuster les coins ». Sur Mac, « Mon profil de plongeur… » (⇧⌘P) ouvre le profil dans sa propre fenêtre. « Vos données de santé » et « Votre carnet est prêt » se présentent dans le panneau bleu. Sur ordinateur, le + du carnet ne reste plus affiché au-dessus d’une page ouverte à droite.",
       "Ordinateur : la feuille du compte d’un abonné OpenDives+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
       "Ordinateur : « Partager » s’ouvre en boîte de dialogue au milieu de la fenêtre ; un clic sur un voyage du carnet affiche la page du voyage à droite (le chevron le replie) ; l’import d’un fichier dit d’où viennent les plongées (« 1 plongée importée depuis « … » ») avec Annuler ; « Plans enregistrés » ouvre un volet « Plongées planifiées » avec « Nouveau plan » ; dans Réglages › Recycleur, la consommation d’O₂ dit qu’elle suit l’unité de Volume.",
-      "Carnet d’exemple : 40 plongées de 2023 à 2026 sur 8 sites, avec un voyage de 6 plongées et une plongée en recycleur, plus proche d’un carnet réel."
+      "Carnet d’exemple : 40 plongées de 2023 à 2026 sur 8 sites, avec un voyage de 6 plongées et une plongée en recycleur, plus proche d’un carnet réel.",
+      "Carnet d’exemple sur téléphone : le bandeau « Carnet d’exemple. Ces plongées ne sont pas les vôtres. » est une carte arrondie juste au-dessus de la barre du bas, avec « Commencer » ; la liste, le « + » et les messages s’arrêtent au-dessus. « Commencer mon carnet ? » nomme l’appareil (ce téléphone, cette tablette, cet ordinateur)."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4093,11 +4094,15 @@
     "banner": {
       "lead": "Carnet d’exemple.",
       "text": "Ces plongées ne sont pas les vôtres.",
-      "start": "Commencer mon carnet"
+      "start": "Commencer mon carnet",
+      "startShort": "Commencer"
     },
     "exit": {
       "title": "Commencer mon carnet ?",
       "text": "Le carnet d’exemple sera effacé de cette tablette. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.",
+      "textPhone": "Le carnet d’exemple sera effacé de ce téléphone. Vous choisirez ensuite de créer ou d’importer votre carnet.",
+      "textIphone": "Le carnet d’exemple sera effacé de cet iPhone. Vous choisirez ensuite de créer ou d’importer votre carnet.",
+      "textDesktop": "Le carnet d’exemple sera effacé de cet ordinateur. Vous choisirez ensuite de créer, d’importer ou d’ouvrir votre carnet.",
       "cancel": "Annuler",
       "confirm": "Commencer mon carnet"
     },
