@@ -147,7 +147,7 @@
 </script>
 
 <Page data-od-scroll class="od-statistics" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="od-band-bar{theme.ios ? '' : ' od-band-titled'}" title={t('stats.title')}>
+  <Navbar large={theme.ios} class={theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-titled'} title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}

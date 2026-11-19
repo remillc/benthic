@@ -1042,6 +1042,7 @@
     "serverSignOutText": "Your dives stay on the server. The access is erased from this device.",
     "free": {
       "device": "Logbook on this device",
+      "deviceIos": "Logbook on this iPhone",
       "sync": "Backup and sync",
       "syncText": "Your logbook on all your devices"
     },

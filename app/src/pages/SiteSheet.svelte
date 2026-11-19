@@ -3,6 +3,7 @@
   // Site sheet (docs/mockups/sites-fiche-android.dc.html): name and country,
   // map, coordinates with "Open in Maps", description, notes, region and city
   // found from the position, then the dives at this site.
+  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
@@ -129,7 +130,7 @@
 <Page class="od-site-sheet">
   <Navbar>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
+      <BackLink label={t('sites.title')} name={t('common.back')} />
     {/snippet}
     <!-- Android: the actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}

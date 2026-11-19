@@ -5,6 +5,7 @@
   // phone with its country code) and « Santé » (blood group, « Vous seul »). The blood group is a health datum, kept
   // only with the diver's consent (task 2026-11-18-271): without it the row says « Non gardé » and has « Autoriser »,
   // which turns the consent on at once and opens the edit. The lock note shows the consent date and « Retirer l’accord ».
+  import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -61,10 +62,7 @@
 <Page class="od-profile-info">
   <Navbar title={t('diverProfile.info.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('diverProfile.info.back')}</span>
-      </Link>
+      <BackLink label={t('gear.profile.title')} name={t('diverProfile.info.back')} />
     {/snippet}
     {#snippet right()}
       <a href="/profile/info/edit" class="link icon-only" aria-label={t('diverProfile.info.edit')}><Icon name="edit" /></a>

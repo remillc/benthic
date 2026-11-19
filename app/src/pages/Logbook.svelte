@@ -1257,7 +1257,7 @@
 </script>
 
 <Page data-od-scroll class="od-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="od-band-bar od-band-tall{theme.ios ? '' : ' od-band-titled'} {showPill ? 'od-band-pill' : ''}" title={t('logbook.title')}>
+  <Navbar large={theme.ios} class="{theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-tall od-band-titled'} {showPill && !theme.ios ? 'od-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <!-- Scrolled, with the month headers in the band (Android, task 2026-11-14-125): the search
@@ -1309,7 +1309,7 @@
         inline
         customSearch
         backdrop={false}
-        class="od-band-search"
+        class={theme.ios ? 'od-ios-search' : 'od-band-search'}
         placeholder={t('logbook.search')}
         onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (query = q)}
         onSearchbarClear={() => (query = '')}

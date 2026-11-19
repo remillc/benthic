@@ -8,11 +8,22 @@
   // The page title is not here: it sits on the ☰ row of the top bar (task 2026-11-14-117).
 
   /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, children?: import('svelte').Snippet }} */
+  import { ios } from '../lib/layout.svelte.js';
   let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, children } = $props();
 
   const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
+{#if ios && !overMap}
+  <!-- iPhone (task 289, ios-carnet.dc.html): no band; the summary under the large title, then what the page puts there
+       (the search field). -->
+  <div class="od-section-band od-section-band--ios">
+    {#key summaryKey}
+      {#if summary}<p class="od-section-band--summary od-value">{summary}</p>{/if}
+    {/key}
+    {@render children?.()}
+  </div>
+{:else}
 <div class="od-section-band od-section-band--band" class:od-section-band--tall={tall} class:od-section-band--over-map={overMap} class:od-section-band--pill={pill} class:od-section-band--with-chip={chip} class:od-section-band--bare={bare}>
   {#if !bare}
     <svg class="od-section-band--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
@@ -29,6 +40,7 @@
   {/key}
   {@render children?.()}
 </div>
+{/if}
 
 <style>
   @layer od.components {
@@ -115,6 +127,18 @@
     @keyframes od-summary-in {
       from {
         opacity: 0;
+      }
+    }
+
+    /* iPhone: the summary and the search field under the large title, no band. */
+    .od-section-band--ios {
+      padding: 0 16px 8px;
+
+      .od-section-band--summary {
+        color: var(--od-text-2);
+        font-size: 13px;
+        line-height: 18px;
+        margin-bottom: 10px;
       }
     }
 

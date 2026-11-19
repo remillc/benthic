@@ -3,6 +3,7 @@
   // « Brevets » (task 2026-11-18-272, docs/mockups-release/profil-brevets-android.dc.html): the certification cards, each
   // with the agency's name in a colour, the level, the number and the date; « Montrez une carte au centre de plongée,
   // même sans réseau. » and the extended button « Ajouter un brevet ». Read from the sealed working copy on the device.
+  import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -28,10 +29,7 @@
 <Page class="od-certs">
   <Navbar title={t('diverProfile.certs.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('diverProfile.certs.back')}</span>
-      </Link>
+      <BackLink label={t('gear.profile.title')} name={t('diverProfile.certs.back')} />
     {/snippet}
   </Navbar>
 

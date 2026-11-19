@@ -1042,6 +1042,7 @@
     "serverSignOutText": "Vos plongées restent sur le serveur. L’accès est effacé de cet appareil.",
     "free": {
       "device": "Carnet sur cet appareil",
+      "deviceIos": "Carnet sur cet iPhone",
       "sync": "Sauvegarde et synchronisation",
       "syncText": "Votre carnet sur tous vos appareils"
     },

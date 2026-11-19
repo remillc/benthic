@@ -5,6 +5,7 @@
   // types" (from the logbook and added on this device) then "Standard" (the
   // core's default table), each with its volume and working pressure. A tap
   // opens the type's sheet; "Add a type" opens an empty one.
+  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -65,10 +66,7 @@
 <Page class="od-cylinder-types" onPageBeforeIn={refresh}>
   <Navbar title={t('settings.cylinders.title')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      <BackLink label={t('detail.back')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
 
