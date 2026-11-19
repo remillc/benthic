@@ -6088,3 +6088,18 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - No tablet, desktop or iPhone mock-up has this control yet. When they get it, use the same rail.
 
 **Test:** open a dive with two computers and compare the list with the mock-ups. Open the ballast of a dive (detail and edit screens) and check that the pill slides and that a second touch clears the choice.
+
+## [ ] 2026-11-19-303 Dive-computer photos in the download screens, « Modifier l’ordinateur de plongée »
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. It follows task 302 (photos of the dive computers, idea #65).
+
+**1. Photos in the download choice.** In the list of nearby computers, a model that has an image shows its photo (40 dp square, 12 dp corners, 10 pt on iPhone where the tile is 48 pt) instead of the Bluetooth or USB circle icon. A model with no image keeps the icon. The mock-ups use the Shearwater Petrel 3 photo only: `android-telechargement-choix`, `ios-telechargement`, `bureau-telechargement` and the eight `android-tablette-telechargement-*` files (landscape and portrait: choice, authorise, denied, disabled). The other rows (EON Core, HW-0412, Perdix 2) stay with their icon.
+
+**2. New screen « Modifier l’ordinateur de plongée »** (`profil-piece-modifier-android`, under Mon profil de plongeur › Équipement). It opens from the pencil on the part sheet (`profil-piece-android`, now linked). It edits one dive computer in the equipment inventory (OpenDives+).
+- Top bar: close and « Enregistrer ». The title « Modifier l’ordinateur de plongée » is a large headline below the bar.
+- The part type cannot be changed, so there is no type field.
+- Large image of the computer (192 dp): the photo when the model has one, the generic drawing if not. The button « Changer d’image » replaces « Ajouter une photo ».
+- « Marque » and « Modèle » are text fields with a suggestion list, and any other text can be typed. The model list follows the chosen brand (names from the libdivecomputer list). Changing the brand clears the model. The mock-up shows the « Modèle » list open, which hides the fields below it: « Numéro de série », « Date d’achat », « Notes (facultatif) » and the delete button « Supprimer la pièce », all present when the list is closed.
+- No maintenance reminder for a dive computer.
+
+**Test:** open the download screen and check that only a model with an image shows its photo. Open a dive computer in Équipement, tap the pencil and compare with the mock-up. Type a brand and a model that are not in the lists and save.
