@@ -11,6 +11,7 @@
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
+  import { odplusAccount, odplusSubscriber } from '../lib/odplus-state.svelte.js';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import OdPlusChip from './OdPlusChip.svelte';
@@ -24,15 +25,15 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
-  const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
-  const accountName = $derived(logbook.email || t('menu.noAccount'));
+  const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
+  const accountName = $derived(logbook.email || odplusAccount.email || t('menu.noAccount'));
   const git = $derived(logbook.mode === 'git');
   const server = $derived(git && logbook.odplus);
 
   // The versions of the sheet (task 2026-11-18-281; bureau-compte-gratuit, bureau-profil-compte). The release edition
   // without an OpenDives+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
   // the phone's offer content.
-  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email, git, repository: logbook.repository }));
+  const variant = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email, git, repository: logbook.repository }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
   const gitSheet = $derived(variant === 'git');

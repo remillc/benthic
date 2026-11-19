@@ -632,6 +632,29 @@ async function phoneFlows() {
     await settled(tab, `${row}: logbook after the sheet`, { route: '/' });
   }
 
+  console.log(' subscriber with the logbook still on the device: the profile and the backup page open, never the offer');
+  // What the development menu's « Abonné » does (lib/dev-tools.js): the account state, with no restart and the logbook untouched.
+  await tab.run(() => window.__odplusAccount({ signedIn: true, email: 'essai@opendives.test', subscribed: true }));
+  for (const [row, route, page] of [['#profile', '/profile', '.od-profile, .od-profile-page, .page-current'], ['#backup', '/account/backup', '.od-backup-not-on-server']]) {
+    await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
+    await sleep(800);
+    expectState(`subscriber ${row}: the sheet is open`, { hash: '#compte', sheet: true }, await sheetState());
+    const rows = await tab.run((r) => ({ row: !!document.querySelector(`a[href="${r}"]`), offer: !!document.querySelector('a[href^="#offer-"]') }), row);
+    expectState(`subscriber ${row}: the row is there and the sheet shows no offer`, { row: true, offer: false }, rows);
+    await tab.run((r) => document.querySelector(`a[href="${r}"]`)?.click(), row);
+    await sleep(1000);
+    await settled(tab, `subscriber ${row}: its page is open`, { route });
+    expectState(`subscriber ${row}: the page, not the offer`, { welcome: false, shown: true }, { ...(await sheetState()), shown: await tab.run((q) => !!document.querySelector(q), page) });
+    await tapBack(tab);
+    await settled(tab, `subscriber ${row}: back`, { route: '/' });
+  }
+  await tab.run(() => window.__odplusAccount({ signedIn: false }));
+  await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
+  await sleep(800);
+  expectState('free again: the sheet offers again', { sheet: true }, { ...(await sheetState()), sheet: await tab.run(() => !!document.querySelector('a[href="#offer-profile"]')) });
+  await hardwareBack(tab);
+  await sleep(900);
+
   console.log(' sections: sites, statistics, tools, settings');
   for (const [label, pattern] of [['Sites', '^\\s*Sites\\s*$'], ['Statistiques', '^\\s*Statistiques\\s*$'], ['Outils', '^\\s*Outils\\s*$']]) {
     await tapText(tab, pattern, '.toolbar, .od-bottom-nav, .tabbar').catch(() => tab.run((l) => [...document.querySelectorAll('.toolbar a, .tabbar a')].find((a) => a.textContent.trim() === l)?.click(), label));

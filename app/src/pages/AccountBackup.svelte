@@ -8,6 +8,8 @@
   import BackLink from '../components/BackLink.svelte';
   import BackupMain from '../components/BackupMain.svelte';
   import BackupPanes from '../components/BackupPanes.svelte';
+  import BackupNotOnServer from '../components/BackupNotOnServer.svelte';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -21,7 +23,9 @@
       <BackLink label={t('account.title')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
-  {#if layout.split}
+  {#if !logbook.odplus}
+    <BackupNotOnServer />
+  {:else if layout.split}
     <div class="od-account-backup-page--panes">
       <BackupPanes onbrowse={(id) => f7router.navigate(`/account/backup/browse/${id}`)} />
     </div>

@@ -5,9 +5,10 @@
 // Every dependency is given, so that node:test runs the actions with a fake transport and no device.
 import { createDevApi, randomTempEmail, isTempEmail } from './dev-accounts.js';
 import { ALPHA_IMPORT_KEY } from './alpha-logbook.js';
+import { ODPLUS_SUBSCRIBED_KEY } from './odplus-state.js';
 
-/** The remembered answer of the last dev action: only the fallback when the server cannot be asked (GET /v1/account). */
-export const SUBSCRIBED_KEY = 'od.devSubscribed';
+/** The remembered « subscribed » answer of the app (lib/odplus-state.js): the fallback when the server cannot be asked (GET /v1/account). */
+export const SUBSCRIBED_KEY = ODPLUS_SUBSCRIBED_KEY;
 /** The beta's first-launch key (logbook.svelte.js): « show » replays it; the logbooks are not touched. */
 export const WELCOME_KEY = 'od.welcomeBeta';
 
@@ -17,6 +18,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
  * @property {{ info: () => Promise<{ signedIn: boolean, email: string }>, access: () => Promise<{ sessionToken: string }>, save: (session: any) => Promise<void>, clear?: () => Promise<void> }} session
  * @property {{ signOut: (options?: { deleteCopy?: boolean }) => Promise<void>, startWithoutAccount: () => Promise<any> }} app
  * @property {{ getItem: (key: string) => string|null, setItem: (key: string, value: string) => void, removeItem: (key: string) => void }} store
+ * @property {(account: { signedIn: boolean, email: string, subscribed: boolean }) => void} [account] sets the app's OpenDives+ account at once (lib/odplus-state.svelte.js): the whole app follows, with no restart
  * @property {() => void} reload the app starts again so that every screen reads the new state
  * @property {() => string} server the server's address
  * @property {() => string} [email] a fresh temporary address
@@ -31,6 +33,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
 export function createDevTools(deps) {
   const { api, session, app, store, reload, server } = deps;
   const fresh = deps.email ?? randomTempEmail;
+  const setAccount = deps.account ?? (() => {});
 
   /** The token of the session on this device. */
   async function token() {
@@ -80,18 +83,23 @@ export function createDevTools(deps) {
         if (s.signedIn) {
           // Idempotent on the server: an account that is not subscribed stays so.
           await api.unsubscribe(await token());
+          setAccount({ signedIn: true, email: s.email, subscribed: false });
         } else {
           // No session: a temporary account is signed in (as « Abonné » does) and left not subscribed.
           const created = await api.signIn(fresh(), 'Plongeur d’essai');
           if (created.user?.subscribed === true) await api.unsubscribe(created.sessionToken);
           await session.save(created);
+          setAccount({ signedIn: true, email: created.user?.email ?? '', subscribed: false });
         }
         store.setItem(SUBSCRIBED_KEY, '0');
+        // No restart: the account sheet and every OpenDives+ feature follow the account state.
+        return;
       } else {
         if (s.signedIn) await app.signOut({ deleteCopy: false });
         // The session is forgotten even when the logbook was never connected through it (app.signOut only clears it then).
         if (s.signedIn) await session.clear?.();
         store.removeItem(SUBSCRIBED_KEY);
+        setAccount({ signedIn: false, email: '', subscribed: false });
         await app.startWithoutAccount();
       }
       reload();
@@ -100,15 +108,18 @@ export function createDevTools(deps) {
     /** « Passer en compte abonné »: a temporary account when there is no session, then the simulated purchase. */
     async toSubscribed() {
       const s = await state();
+      let email = s.email;
       if (s.signedIn) {
         await api.subscribe(await token());
       } else {
         const created = await api.signIn(fresh(), 'Plongeur d’essai');
         await api.subscribe(created.sessionToken);
         await session.save(created);
+        email = created.user?.email ?? '';
       }
       store.setItem(SUBSCRIBED_KEY, '1');
-      reload();
+      // No restart: the account state changes the whole app at once.
+      setAccount({ signedIn: true, email, subscribed: true });
     },
 
     /** « Nouveau compte d'essai »: a fresh temporary account that is not subscribed; the previous session is left. */
@@ -121,6 +132,7 @@ export function createDevTools(deps) {
       }
       await session.save(created);
       store.setItem(SUBSCRIBED_KEY, created.user?.subscribed === true ? '1' : '0');
+      setAccount({ signedIn: true, email: created.user?.email ?? '', subscribed: created.user?.subscribed === true });
       reload();
     },
 
@@ -133,6 +145,7 @@ export function createDevTools(deps) {
       await app.signOut({ deleteCopy: true });
       await session.clear?.();
       store.removeItem(SUBSCRIBED_KEY);
+      setAccount({ signedIn: false, email: '', subscribed: false });
       reload();
     },
 
@@ -177,18 +190,20 @@ export function runSegment(tools, id) {
 
 /** The real dependencies, read when the menu opens (dynamic imports: the app's modules are not loaded by the tests). */
 export async function realDevTools() {
-  const [{ OpenDivesCore }, { deviceStore }, logbookModule, accounts, { serverUrl }] = await Promise.all([
+  const [{ OpenDivesCore }, { deviceStore }, logbookModule, accounts, { serverUrl }, { setOdplusAccount }] = await Promise.all([
     import('opendives-core'),
     import('./device-store.js'),
     import('./logbook.svelte.js'),
     import('./dev-accounts.js'),
     import('./server-url.js'),
+    import('./odplus-state.svelte.js'),
   ]);
   return createDevTools({
     api: accounts.createDevApi(),
     session: { info: () => OpenDivesCore.serverSessionInfo(), access: () => OpenDivesCore.serverSessionAccess(), save: accounts.saveSession, clear: () => OpenDivesCore.serverSessionClear() },
     app: { signOut: logbookModule.signOut, startWithoutAccount: logbookModule.startWithoutAccount },
     store: deviceStore,
+    account: setOdplusAccount,
     // A moment later, so that the « done » message is seen before the app starts again.
     reload: () => void setTimeout(() => window.location.reload(), 900),
     server: serverUrl,

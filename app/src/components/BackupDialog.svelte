@@ -6,6 +6,8 @@
   import { Popup, f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import BackupPanes from './BackupPanes.svelte';
+  import BackupNotOnServer from './BackupNotOnServer.svelte';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { backup } from '../lib/backup.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -33,7 +35,7 @@
     </button>
   </div>
   <div class="od-backup-dialog--body">
-    {#if shown}<BackupPanes onbrowse={browse} />{/if}
+    {#if shown}{#if logbook.odplus}<BackupPanes onbrowse={browse} />{:else}<BackupNotOnServer />{/if}{/if}
   </div>
 </Popup>
 

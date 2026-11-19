@@ -12,6 +12,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncControl from './SyncControl.svelte';
   import SyncButton from './SyncButton.svelte';
+  import { odplusAccount, odplusSubscriber } from '../lib/odplus-state.svelte.js';
   import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
   import { showUnsent } from '../lib/filter.svelte.js';
   import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
@@ -28,8 +29,8 @@
   import { createAccountHistory } from '../lib/account-history.js';
   import { profileRow, sheetVariant } from '../lib/account-sheet.js';
 
-  const initial = $derived(logbook.email ? logbook.email.trim().charAt(0).toLocaleUpperCase() : '');
-  const accountName = $derived(logbook.email || t('menu.noAccount'));
+  const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
+  const accountName = $derived(logbook.email || odplusAccount.email || t('menu.noAccount'));
   const accountLine = $derived(
     t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
   );
@@ -37,7 +38,7 @@
 
   // The three versions of the sheet (task 2026-11-18-281): without an OpenDives+ account (the release edition's free
   // version), with one, and the alpha's or a cloud account's, which keeps what it had.
-  const variant = $derived(sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }));
+  const variant = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
   /** The overdue pieces: the badge and the red line of « Mon profil de plongeur » (the count of the Entretien row). */

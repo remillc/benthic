@@ -14,3 +14,13 @@ export function openOdPlus(screen, returnTo = '') {
   flow.returnTo = returnTo;
   logbook.welcome = true;
 }
+
+/**
+ * « Envoyer le carnet au serveur »: a subscriber whose logbook is still on the device. The first launch opens at « Aucun
+ * carnet sur votre compte », which offers to send the logbook of this device, with a way out that
+ * leaves the logbook as it was.
+ */
+export function openMoveToServer() {
+  enterFromMenu('move');
+  logbook.welcome = true;
+}

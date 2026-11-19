@@ -6,6 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/odplus-state.js';
 import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
 import { createAccountHistory, ACCOUNT_HASH } from '../../app/src/lib/account-history.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
@@ -25,12 +26,12 @@ const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i1
 // --- Which sheet ---
 
 test('the release edition without an OpenDives+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
-  assert.equal(sheetVariant({ release: true, odplus: false, email: '' }), 'free');
-  assert.equal(sheetVariant({ release: true, odplus: true, email: 'a@b.c' }), 'subscriber');
-  assert.equal(sheetVariant({ release: true, odplus: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
-  assert.equal(sheetVariant({ release: true, odplus: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'git', 'the git repository of the one-off licence');
-  assert.equal(sheetVariant({ release: false, odplus: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'account', 'the alpha keeps its sheet');
-  assert.equal(sheetVariant({ release: false, odplus: false, email: '' }), 'account', 'the alpha keeps its sheet');
+  assert.equal(sheetVariant({ release: true, subscriber: false, email: '' }), 'free');
+  assert.equal(sheetVariant({ release: true, subscriber: true, email: 'a@b.c' }), 'subscriber');
+  assert.equal(sheetVariant({ release: true, subscriber: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
+  assert.equal(sheetVariant({ release: true, subscriber: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'git', 'the git repository of the one-off licence');
+  assert.equal(sheetVariant({ release: false, subscriber: false, email: 'vous', git: true, repository: 'github.com/vous/carnet' }), 'account', 'the alpha keeps its sheet');
+  assert.equal(sheetVariant({ release: false, subscriber: false, email: '' }), 'account', 'the alpha keeps its sheet');
 });
 
 test('the Compte button stays for a free diver: named « Compte, réglages et à propos », a silhouette in the same disc', () => {
@@ -64,6 +65,8 @@ test('the offer and the sign-in screen are the first launch entered from the men
   assert.equal(leavesFirstLaunch(menuEntry('offer'), true), true);
   assert.equal(leavesFirstLaunch(['start', 'odplusOffer', 'odplusConnect'], true), false, 'from the offer, Retour returns to the offer');
   assert.equal(leavesFirstLaunch(['start', 'odplusConnect'], false), false, 'never outside the menu entry');
+  assert.deepEqual(menuEntry('move'), ['start', 'createChoice'], 'sending the logbook of the device to the server');
+  assert.equal(leavesFirstLaunch(['start', 'createChoice'], true), true);
   assert.deepEqual(back(['start', 'odplusOffer', 'odplusConnect']), ['start', 'odplusOffer']);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /if \(flow\.origin === 'menu'\) leave\(\);\n\s+else goBackTo\('start'\)/, '« Continuer sans compte » closes the first launch');
@@ -419,4 +422,25 @@ test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sau
     // Nothing else sits between them but the row's own markup and a divider.
     assert.doesNotMatch(source.slice(p, b), /Settings|settings\.title|about\.title/, name);
   }
+});
+
+test('the account variant, across every state: free, signed in not subscribed, subscribed with a device or a server logbook, alpha', () => {
+  const state = (signedIn, subscribed) => resolveOdplusAccount({ info: { signedIn, email: signedIn ? 'a@b.c' : '' }, cached: null, remote: signedIn ? subscribed : null });
+  const variant = (account, over = {}) => sheetVariant({ release: true, subscriber: isSubscribed(account), email: '', ...over });
+  assert.equal(variant(state(false, false)), 'free');
+  assert.equal(variant(state(true, false)), 'free', 'signed in, not subscribed: the offer');
+  assert.equal(variant(state(true, false), { email: 'a@b.c' }), 'account');
+  // Where the logbook lives does not matter: a device logbook has no e-mail, a server one has the account address.
+  assert.equal(variant(state(true, true), { email: '' }), 'subscriber', 'subscribed, logbook on the device');
+  assert.equal(variant(state(true, true), { email: 'a@b.c' }), 'subscriber', 'subscribed, logbook on the server');
+  assert.equal(sheetVariant({ release: false, subscriber: isSubscribed(state(true, true)), email: 'a@b.c' }), 'account', 'the alpha keeps its sheet');
+});
+
+test('the OpenDives+ account: the session says who, the server says subscribed, else the remembered answer', () => {
+  const info = { signedIn: true, email: 'a@b.c' };
+  assert.deepEqual(resolveOdplusAccount({ info: { signedIn: false, email: '' }, cached: '1', remote: true }), { signedIn: false, email: '', subscribed: false });
+  assert.equal(resolveOdplusAccount({ info, cached: '0', remote: true }).subscribed, true, 'the server wins');
+  assert.equal(resolveOdplusAccount({ info, cached: '1', remote: false }).subscribed, false);
+  assert.equal(resolveOdplusAccount({ info, cached: '0', remote: null }).subscribed, false, 'offline: the remembered answer');
+  assert.equal(resolveOdplusAccount({ info, cached: null, remote: null }).subscribed, true, 'a kept session is a subscribed one');
 });

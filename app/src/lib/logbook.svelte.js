@@ -24,6 +24,7 @@ import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
 import { sheetVariant } from './account-sheet.js';
+import { loadOdplusAccount, odplusAccount, odplusSubscriber, setOdplusAccount } from './odplus-state.svelte.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 
@@ -956,7 +957,8 @@ export async function startApp() {
 export async function signOut({ deleteCopy = false } = {}) {
   await OpenDivesCore.signOut({ deleteCopy });
   // The OpenDives server's session goes with the logbook that was connected through it (the tokens are erased).
-  if (logbook.odplus) await OpenDivesCore.serverSessionClear();
+  if (logbook.odplus || odplusAccount.signedIn) await OpenDivesCore.serverSessionClear();
+  setOdplusAccount({ signedIn: false });
   forgetAccount(true);
 }
 
@@ -1353,6 +1355,7 @@ async function onOpenDivesServer(repository) {
  * @returns {Promise<boolean>} false when no cloud account is configured
  */
 async function loadCloud(force, pre = null) {
+  void loadOdplusAccount();
   const account = await (pre?.configure ?? OpenDivesCore.configureCloud());
   const ignored = isIgnoredCloudAccount(account, isRelease);
   rememberAccount(account.available && !ignored);
@@ -1502,4 +1505,4 @@ if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (w
  * Whether the diver has an OpenDives+ account (the server's logbook): the equipment of a dive is theirs to change only then;
  * for everyone else « Autre équipement » shows with the OpenDives+ chip and stays inert.
  */
-export const isSubscriber = () => sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }) === 'subscriber';
+export const isSubscriber = () => sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }) === 'subscriber';

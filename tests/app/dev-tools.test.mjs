@@ -19,6 +19,7 @@ function setup({ session = null, subscribed } = {}) {
   const server = { subscribed: session ? subscribed !== '0' : false, down: false };
   const mem = new Map(subscribed === undefined ? [] : [[SUBSCRIBED_KEY, subscribed]]);
   let current = session;
+  const accounts = [];
   const transport = async (req) => {
     if (req.method === 'GET' && req.url.endsWith('/v1/account')) {
       reads.push(req.headers?.Authorization ?? '');
@@ -44,11 +45,12 @@ function setup({ session = null, subscribed } = {}) {
     },
     app: { signOut: async (o) => ((current = null), events.push('signOut' + (o?.deleteCopy ? ':copy' : ''))), startWithoutAccount: async () => events.push('free') },
     store: { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v), removeItem: (k) => mem.delete(k) },
+    account: (a) => accounts.push(a),
     reload: () => events.push('reload'),
     server: () => 'http://127.0.0.1:8080',
     email: () => 'essai-test@opendives.test',
   });
-  return { tools, calls, reads, events, mem, server };
+  return { tools, calls, reads, events, mem, server, accounts };
 }
 
 test('state: no session is free; a session is subscribed unless marked otherwise', async () => {
@@ -65,19 +67,20 @@ test('free, default: sign out keeping the device logbook, open it, reload; no se
   assert.deepEqual(t.calls, []);
 });
 
-test('free, keeping the session: dev-unsubscribe with the token, then reload', async () => {
+test('free, keeping the session: dev-unsubscribe with the token, the account state follows, no restart', async () => {
   const t = setup({ session: { email: 'essai-a@opendives.test', token: 'tok' } });
   await t.tools.toFree('unsubscribe');
   assert.deepEqual(t.calls, ['/v1/account/dev-unsubscribe Bearer tok']);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '0');
-  assert.deepEqual(t.events, ['reload']);
+  assert.deepEqual(t.events, []);
+  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-a@opendives.test', subscribed: false }]);
 });
 
 test('free, keeping the session, from no session: a temporary account is signed in and left not subscribed', async () => {
   const t = setup();
   await t.tools.toFree('unsubscribe');
   assert.deepEqual(t.calls, ['/v1/auth/dev-google']);
-  assert.deepEqual(t.events, ['save', 'reload']);
+  assert.deepEqual(t.events, ['save']);
   const s = await t.tools.state();
   assert.deepEqual([s.signedIn, s.kind, s.temporary], [true, 'free', true]);
 });
@@ -115,11 +118,12 @@ test('the pill of the account selector slides, stays still on the first render a
   assert.match(menu, /target = -1/);
 });
 
-test('subscribed without a session: dev-google, dev-subscribe, session kept, reload', async () => {
+test('subscribed without a session: dev-google, dev-subscribe, session kept, the account state follows, no restart', async () => {
   const t = setup();
   await t.tools.toSubscribed();
   assert.deepEqual(t.calls, ['/v1/auth/dev-google', '/v1/account/dev-subscribe Bearer tok-new']);
-  assert.deepEqual(t.events, ['save', 'reload']);
+  assert.deepEqual(t.events, ['save']);
+  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-test@opendives.test', subscribed: true }]);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '1');
 });
 
@@ -235,7 +239,7 @@ test('selector: each segment calls the right action from each starting state, an
       const enabled = accountSegments(await t.tools.state()).find((x) => x.id === id);
       if (enabled.disabled) continue; // the current state: not tappable
       await runSegment(t.tools, id);
-      assert.ok(t.events.includes('reload'), name + ' -> ' + id);
+      assert.ok(t.events.includes('reload') || t.accounts.length > 0, name + ' -> ' + id);
       const after = accountSegments(await t.tools.state());
       assert.equal(after.findIndex((x) => x.on), target[id], name + ' -> ' + id);
     }

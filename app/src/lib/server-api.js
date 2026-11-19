@@ -171,6 +171,16 @@ export function createServerApi({ baseUrl, transport }) {
     },
 
     /**
+     * Whether the server says the account is subscribed (`GET /v1/account`, `subscription.subscribed`).
+     * @param {string} sessionToken
+     * @returns {Promise<boolean|null>} null when the answer does not say
+     */
+    async subscribed(sessionToken) {
+      const r = await call('GET', '/v1/account', undefined, { Authorization: `Bearer ${sessionToken}` });
+      return typeof r?.subscription?.subscribed === 'boolean' ? r.subscription.subscribed : null;
+    },
+
+    /**
      * Deletes the account and what the server keeps for it (the logbook's repository, the photos). The server does not
      * answer this route yet. The logbook on the device is not touched.
      * @param {string} sessionToken

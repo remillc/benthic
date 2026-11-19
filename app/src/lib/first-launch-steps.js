@@ -257,10 +257,11 @@ export function replaceTop(stack, step) {
  * The stack of the first launch entered from the logbook's menu: « Ouvrir un autre carnet » opens the « Ouvrir mon
  * carnet OpenDives » step, « Nouveau carnet » the name step, both above the first screen. The free account sheet
  * (task 2026-11-18-281) opens the offer (« S'abonner ») or « Se connecter ou créer un compte » (« Se connecter »).
- * @param {'open'|'new'|'offer'|'signIn'} first
+ * @param {'open'|'new'|'offer'|'signIn'|'move'} first
  * @returns {Step[]}
  */
 export function menuEntry(first) {
+  if (first === 'move') return ['start', 'createChoice'];
   if (first === 'offer') return ['start', 'odplusOffer'];
   if (first === 'signIn') return ['start', 'odplusConnect'];
   return ['start', first];
@@ -282,7 +283,7 @@ export function offerShowsSignIn(stack) {
  * @param {boolean} fromMenu
  */
 export function leavesFirstLaunch(stack, fromMenu) {
-  return fromMenu && stack.length <= 2 && stack[0] === 'start' && (stack[1] === 'odplusOffer' || stack[1] === 'odplusConnect');
+  return fromMenu && stack.length <= 2 && stack[0] === 'start' && (stack[1] === 'odplusOffer' || stack[1] === 'odplusConnect' || stack[1] === 'createChoice');
 }
 
 /**

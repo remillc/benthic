@@ -997,6 +997,7 @@
     }
   },
   "backup": {
+    "notOnServer": {"title": "Carnet pas encore sur le serveur", "line": "Les versions sont conservées sur le serveur OpenDives. Ce carnet n’est que sur cet appareil.", "send": "Envoyer le carnet au serveur"},
     "title": "Sauvegarde et restauration",
     "media": "Les photos et vidéos supprimées sont gardées 90 jours, puis effacées.",
     "status": {
@@ -2888,7 +2889,8 @@
       "Équipement (OpenDives+) : « Retirer de l’équipement » remplace la suppression, avec une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce.",
       "Une bouteille a deux échéances, chacune avec sa carte, sa barre, son bouton « Noter … » et son rappel : l’inspection visuelle (chaque année) et la requalification (tous les 5 ans, avec la date frappée sur la bouteille, comme 03/22). La carte d’entretien montre aussi les heures sous l’eau à côté des plongées (« 82 plongées sur 100 · 61 h »). Dans « Ajouter de l’équipement », une pièce en retard reste choisissable mais indique en rouge ce qui est en retard, quand son rappel avertit dans une plongée.",
       "Le téléchargement depuis un ordinateur de plongée ne fige plus l'écran quand la fiche d'envoi d'un rapport d'erreur s'ouvre.",
-      "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement."
+      "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
+      "Compte : choisir « Abonné » dans le menu de développement (ou tout abonnement OpenDives+) donne tout de suite la fiche de l’abonné, quel que soit l’endroit du carnet. « Mon profil de plongeur » ouvre le profil, et « Sauvegarde et restauration » indique que le carnet n’est que sur cet appareil, avec « Envoyer le carnet au serveur »."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

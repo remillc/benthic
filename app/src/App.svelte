@@ -72,6 +72,7 @@
   import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook, isSubscriber } from './lib/logbook.svelte.js';
+  import { loadOdplusAccount } from './lib/odplus-state.svelte.js';
   import { rememberHero, heroOf } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
@@ -387,6 +388,8 @@
 
   onMount(() => {
     applyMotionTokens();
+    // The OpenDives+ account of the device (signed in, subscribed), whatever the place of the logbook.
+    void loadOdplusAccount();
     // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
     startDesktopShell();
     if (sideWindow) {
