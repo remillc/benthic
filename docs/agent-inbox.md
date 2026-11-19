@@ -6261,3 +6261,21 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - Privacy policy: mention that the emergency sheet can be shared by the diver and contains health data.
 
 **Test:** change the date format in Réglages and check dates across the screens above. Fill the emergency contact, open the sheet in airplane mode, call the contact, turn items off, share as PDF.
+
+## [ ] 2026-11-19-312 Diver's full name in the profile, used for validation, emergency sheet, PDF and account sheet
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Answers the question from the code session about the missing name (task 309, point 2). OpenDives+ data, stored on the OpenDives server with the rest of the profile, never written into the Subsurface logbook.
+
+**1. Field « Nom complet » (optional)**, one single field (not first and last name apart), first in the section « Vous », before the birth date.
+- Informations: row « Nom complet » with a person icon (`profil-infos-android`, `android-tablette-profil-infos-paysage`, `bureau-profil-infos`).
+- Modifier les informations: field « Nom complet (facultatif) » with the help text « Sur votre fiche d’urgence, vos PDF et quand vous confirmez la plongée d’un autre plongeur. » (`profil-infos-modifier-android`, `android-tablette-profil-infos-modifier-paysage`, `bureau-profil-infos-modifier`). iPhone: same field in its form, with iOS conventions.
+- This field is the source of the name shown at the top of « Mon profil de plongeur ». Empty: show the account e-mail there instead.
+
+**2. « Confirmer la plongée »** (`validation-confirmer-android`): a field « Votre nom », filled from the profile, with the help « Tiré de votre profil. Une correction ici vaut pour cette confirmation seulement. » Below it: « Vous confirmez comme moniteur PADI 412 778, d’après votre brevet de moniteur. » (the number comes from the instructor certificate, as in task 309; without one, say « comme compagnon » and no number). If the profile has no name, the name typed here is saved to the profile, and a short message « Enregistré dans votre profil » confirms it. « Je confirme » stays disabled while the name is empty. Drop the « last name typed » memory.
+
+**3. Other uses**
+- PDF of a dive and of the logbook: the name in the header, before « Plongée n° » (`partage-pdf-fiche`). The export sheet gets a switch « Mon nom dans l’en-tête », on by default, for PDF only (`carnet-export-android`). « Anonymiser » also removes it.
+- Emergency sheet (task 311): uses this name, always shown. Empty: the sheet asks to fill it in, with a link to « Modifier les informations ».
+- Account sheet (OpenDives+): the name on the first line, the e-mail under it in smaller grey text (`nav-compte-profil-android`). Without a name, the e-mail stays on the first line as today. Free users: unchanged.
+
+**Test:** fill the name, check Informations, the profile header, the account sheet, the emergency sheet and a PDF. Empty it and check each fallback. Confirm a buddy's dive with an empty profile name, check it is saved to the profile.
