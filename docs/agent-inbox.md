@@ -5870,3 +5870,24 @@ From top to bottom, on the sheet background (#F5F4F0), with white rounded groups
 4. **Group**: « Réglages », « À propos ».
 
 **Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
+
+## [ ] 2026-11-19-293 Android tablet: catch up with the phone
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (landscape; portrait follows the same pattern). On a large screen, what is a full screen on the phone becomes a dialog, a side sheet, a banner or a snackbar over the tablet screen (Material 3 large-screen guidance). Behaviour and texts are those of the phone tasks.
+
+- **Selection**: « Exporter des plongées » dialog (formats as a selectable list, « Anonymiser » switch, Annuler / Exporter) — `android-tablette-carnet-export-paysage`. Merging two dives ends with a snackbar « 2 plongées fusionnées · Annuler » — `android-tablette-carnet-fusion-paysage`.
+- **Share**: choice dialog (Fiche PDF, Résumé et image, Code QR) — `android-tablette-partage-paysage`; QR dialog with « Code 3 sur 8 » — `android-tablette-partage-qr-paysage`.
+- **Several dive computers**: « Ordinateurs de cette plongée » dialog with « Définir comme principal » — `android-tablette-detail-ordinateurs-paysage`; end of download snackbar « 3 plongées téléchargées. 1 réunie avec une plongée déjà au carnet. · Voir » — `android-tablette-telechargement-fusion-paysage`.
+- **Bluetooth** (right pane of the download screen): authorise, denied, disabled — `android-tablette-telechargement-autorisation-paysage`, `-refusee-paysage`, `-desactive-paysage`.
+- **Sync states**: offline banner at the top of the logbook list — `android-tablette-etat-horsligne-paysage`; conflict on one dive (two versions side by side) — `android-tablette-etat-conflit-paysage`; conflict on several dives — `android-tablette-etat-conflit-plusieurs-paysage`; password refused — `android-tablette-etat-synchro-motdepasse-paysage`.
+- **Sites**: search opens over the list pane — `android-tablette-sites-recherche-paysage`; overlapping pins open a popup list of the sites at that spot — `android-tablette-sites-superposes-paysage`. No separate full-screen map on tablet.
+- **Offline maps** (left pane of the maps screen): region menu, downloads in progress, no network and failure, mobile data dialog, not enough space dialog, delete region, replace on update — `android-tablette-cartes-menu-paysage`, `-telechargement-paysage`, `-echec-paysage`, `-donnees-mobiles-paysage`, `-espace-paysage`, `-suppression-paysage`, `-maj-remplacer-paysage`.
+- **Before flying**: the reminder switch in Désaturation — `android-tablette-desaturation-rappel-paysage`; the « Avion dans 17 h 05 » banner in the logbook — `android-tablette-carnet-avion-paysage`.
+- **Logbook computers**: edit in a side sheet — `android-tablette-ordinateur-modifier-paysage`; merge confirmation — `android-tablette-ordinateur-fusion-paysage`.
+- **OpenDives+**: « Bienvenue dans OpenDives+ ! » after subscribing — `android-tablette-odplus-abonne-paysage`.
+
+**Test:** on a tablet (or a large emulator) in landscape and portrait, reach each of these screens and check that nothing opens full screen where the mock-up shows a dialog, sheet or banner.
+
+## [ ] 2026-11-19-294 iPad follows the Android tablet
+
+Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
