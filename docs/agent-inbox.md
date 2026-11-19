@@ -5847,3 +5847,47 @@ The logbook on the OpenDives server is a git repository. Each sync is a commit, 
 Points to confirm with Christian before building: photos and videos are not in git (10 GB storage), so how long a deleted photo is kept. « Supprimer le compte » must erase the whole history, deleted dives included.
 
 **Test:** make three syncs with changes, restore the middle version, check the counts and that the newest version is still listed and can be restored back. Delete a dive, sync, restore it from « Plongées supprimées ».
+
+## [ ] 2026-11-19-291 Subscriber account sheet: « Mon profil de plongeur » before « Sauvegarde et restauration »
+
+Christian approved this on 19 November 2026. Work in `main`. Follows task 290 (do not edit 290).
+
+In the subscriber account sheet on every platform, the order of the two entries is now: **« Mon profil de plongeur »** first, then **« Sauvegarde et restauration »** (task 290 had them the other way round). Mock-ups in `docs/mockups/`: `nav-option-barre-compte-android`, `nav-compte-profil-android`, `android-tablette-profil-compte-paysage`, `bureau-profil-compte`, `ios-compte-abonne`.
+
+**Test:** open the account sheet as a subscriber on each platform: « Mon profil de plongeur » is above « Sauvegarde et restauration ».
+
+## [ ] 2026-11-19-292 Desktop account sheet: new layout
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-up: `docs/mockups/bureau-profil-compte.dc.html` (the popover opened from the account initial at the bottom of the navigation rail). Follows tasks 290 and 291 (do not edit them).
+
+From top to bottom, on the sheet background (#F5F4F0), with white rounded groups:
+1. **OpenDives logo** centred at the top (wave logo, « OpenDives », the « + » chip), as on the phone sheet. No close button: the popover closes on a click outside or Esc.
+2. **Account group**:
+   - 48 px avatar with the « + » chip at its bottom-right corner (subscribers), e-mail, « OpenDives+ · 312 plongées »;
+   - « Gérer le compte » outlined button at its natural width, **aligned with the text column** (not under the avatar);
+   - a thin divider, then the sync line: green check, « Synchronisé il y a 2 min », and « Synchroniser » (tonal button) on the right.
+3. **Group**: « Mon profil de plongeur » (red maintenance subtitle and badge), then « Sauvegarde et restauration ». Each entry has its icon in a small blue tile (36 px, #E6EEF7). No highlighted background on « Mon profil ».
+4. **Group**: « Réglages », « À propos ».
+
+**Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
+
+## [ ] 2026-11-19-293 Android tablet: catch up with the phone
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (landscape; portrait follows the same pattern). On a large screen, what is a full screen on the phone becomes a dialog, a side sheet, a banner or a snackbar over the tablet screen (Material 3 large-screen guidance). Behaviour and texts are those of the phone tasks.
+
+- **Selection**: « Exporter des plongées » dialog (formats as a selectable list, « Anonymiser » switch, Annuler / Exporter) — `android-tablette-carnet-export-paysage`. Merging two dives ends with a snackbar « 2 plongées fusionnées · Annuler » — `android-tablette-carnet-fusion-paysage`.
+- **Share**: choice dialog (Fiche PDF, Résumé et image, Code QR) — `android-tablette-partage-paysage`; QR dialog with « Code 3 sur 8 » — `android-tablette-partage-qr-paysage`.
+- **Several dive computers**: « Ordinateurs de cette plongée » dialog with « Définir comme principal » — `android-tablette-detail-ordinateurs-paysage`; end of download snackbar « 3 plongées téléchargées. 1 réunie avec une plongée déjà au carnet. · Voir » — `android-tablette-telechargement-fusion-paysage`.
+- **Bluetooth** (right pane of the download screen): authorise, denied, disabled — `android-tablette-telechargement-autorisation-paysage`, `-refusee-paysage`, `-desactive-paysage`.
+- **Sync states**: offline banner at the top of the logbook list — `android-tablette-etat-horsligne-paysage`; conflict on one dive (two versions side by side) — `android-tablette-etat-conflit-paysage`; conflict on several dives — `android-tablette-etat-conflit-plusieurs-paysage`; password refused — `android-tablette-etat-synchro-motdepasse-paysage`.
+- **Sites**: search opens over the list pane — `android-tablette-sites-recherche-paysage`; overlapping pins open a popup list of the sites at that spot — `android-tablette-sites-superposes-paysage`. No separate full-screen map on tablet.
+- **Offline maps** (left pane of the maps screen): region menu, downloads in progress, no network and failure, mobile data dialog, not enough space dialog, delete region, replace on update — `android-tablette-cartes-menu-paysage`, `-telechargement-paysage`, `-echec-paysage`, `-donnees-mobiles-paysage`, `-espace-paysage`, `-suppression-paysage`, `-maj-remplacer-paysage`.
+- **Before flying**: the reminder switch in Désaturation — `android-tablette-desaturation-rappel-paysage`; the « Avion dans 17 h 05 » banner in the logbook — `android-tablette-carnet-avion-paysage`.
+- **Logbook computers**: edit in a side sheet — `android-tablette-ordinateur-modifier-paysage`; merge confirmation — `android-tablette-ordinateur-fusion-paysage`.
+- **OpenDives+**: « Bienvenue dans OpenDives+ ! » after subscribing — `android-tablette-odplus-abonne-paysage`.
+
+**Test:** on a tablet (or a large emulator) in landscape and portrait, reach each of these screens and check that nothing opens full screen where the mock-up shows a dialog, sheet or banner.
+
+## [ ] 2026-11-19-294 iPad follows the Android tablet
+
+Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
