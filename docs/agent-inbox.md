@@ -6279,3 +6279,21 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - Account sheet (OpenDives+): the name on the first line, the e-mail under it in smaller grey text (`nav-compte-profil-android`). Without a name, the e-mail stays on the first line as today. Free users: unchanged.
 
 **Test:** fill the name, check Informations, the profile header, the account sheet, the emergency sheet and a PDF. Empty it and check each fallback. Confirm a buddy's dive with an empty profile name, check it is saved to the profile.
+
+## [ ] 2026-11-19-313 Dive detail: floating toolbar actions, « Carte » becomes « Planifier depuis cette plongée »
+
+Christian asked for this on 19 November 2026 (canvas comment on `detail3-android-curseur`). Work in `main`. Mock-ups in `docs/mockups/`.
+
+The floating toolbar at the bottom of a dive's detail has exactly these actions, left to right:
+1. **Modifier** (filled pill with the pencil and its label): opens « Modifier une plongée ».
+2. **Planifier depuis cette plongée** (icon button): opens the planner filled from this dive (depth, time, gases), as `android-planificateur`. **This replaces the « Carte » button in the app.** The map stays where it is in the detail page (site section); the toolbar no longer opens it.
+3. **Partager** (icon button): opens the share choices (`partage-android`: PDF sheet, QR code, file).
+4. **Plus d’options** (three dots): opens the menu, anchored above the toolbar on the right (`validation-menu-android` for OpenDives+, `detail2-android-menu` for the free version):
+   - « Faire valider la plongée » — OpenDives+ only (task 309). Free version: not shown.
+   - « Renuméroter la plongée ».
+   - « Retirer du voyage » — only when the dive belongs to a trip.
+   - « Supprimer la plongée » — in red, with the confirmation and undo already in place.
+
+The accessible name of the three-dots button lists what the menu holds (« Plus d’options : faire valider, renuméroter, retirer du voyage, supprimer », without « faire valider » in the free version). Same toolbar on iPhone (with iOS icons and its context menu) and on tablet in the detail pane.
+
+**Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
