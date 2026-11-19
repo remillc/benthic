@@ -5879,7 +5879,9 @@ From top to bottom, on the sheet background (#F5F4F0), with white rounded groups
 
 **Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
 
-## [ ] 2026-11-19-293 Android tablet: catch up with the phone
+## [x] 2026-11-19-293 Android tablet: catch up with the phone
+
+Done in Tablet catch-up: the export dialog, the map-point list and the sync failure sheet are dialogs from 768 dp (shared `od-sheet-dialog` rule in theme.css, like the share and computers dialogs); the several-dives conflict is a large dialog; the Bluetooth states are a card under the remembered computers. Already in place: share, QR, computers dialogs, offline maps panes, banners, sites search. **Left:** « Modifier l’ordinateur » is still a page in the right pane, not a side sheet (a route page cannot be a side sheet without reworking the pane stack); the download engine states for the end-of-download snackbar were not re-checked on a real tablet.
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (landscape; portrait follows the same pattern). On a large screen, what is a full screen on the phone becomes a dialog, a side sheet, a banner or a snackbar over the tablet screen (Material 3 large-screen guidance). Behaviour and texts are those of the phone tasks.
 
@@ -5896,7 +5898,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** on a tablet (or a large emulator) in landscape and portrait, reach each of these screens and check that nothing opens full screen where the mock-up shows a dialog, sheet or banner.
 
-## [ ] 2026-11-19-294 iPad follows the Android tablet
+## [x] 2026-11-19-294 iPad follows the Android tablet
+
+Done in iPad follows the Android tablet: the iPad uses the width-based layouts of task 293 (two panes, dialogs from 768 px); the dialogs take iOS sheet corners; checked in headless Chrome with `?theme=ios` at 1024x768 (sidebar, two panes). **Left:** no iPad-specific screens were drawn; action sheets for destructive confirmations and the Files picker are those of the iPhone; Sign in with Apple and the App Store subscription screens wait for task 289 and the Mac.
 
 Christian decided this on 19 November 2026. The iPad has very few mock-ups of its own. Rule: **the iPad uses the Android tablet layouts** (two panes, dialogs, side sheets), with iOS controls and conventions: tab bar instead of the navigation rail where it applies, iOS navigation bars, page sheets and form sheets, action sheets for destructive confirmations, alerts, the Files picker, Sign in with Apple first, App Store subscription screens (same differences as the iPhone, task 289). Only screens where iOS truly differs get an iPad mock-up. When in doubt, follow the Android tablet mock-up and ask Christian.
 
@@ -5986,9 +5990,11 @@ Christian approved this on 19 November 2026. Work in `main`. The sample logbook 
 
 **Test:** open the sample logbook from the first screen. Check that the banner sits above the navigation bar and does not hide the last row when scrolling. Tap « + » and « Commencer », compare both dialogs with the mock-ups.
 
-**Done (19 November 2026).** Phone: the banner is a card above the bottom navigation bar (« Commencer »), on the four first pages; the lists end above it and the « + » rises with it; the exit dialog names the device (phone, iPhone, tablet, computer). Tablet and desktop keep the band at the top, as in the tablet mock-ups. Not changed: the banner is not shown on pages opened over a section on a phone (no bottom bar there).
+**Done (19 November 2026).** Phone: the banner is a card above the bottom navigation bar (« Commencer »), on the four first pages; the lists end above it and the « + » rises with it; the exit dialog names the device (phone, iPhone, tablet, computer). Tablet and desktop keep the band at the top, as in the tablet mock-ups. Not shown on pages opened over a section on a phone (no bottom bar there).
 
-## [ ] 2026-11-19-300 iPhone About screen, tablet portrait layouts
+## [x] 2026-11-19-300 iPhone About screen, tablet portrait layouts
+
+Done in iPhone About buttons and tablet portrait: the About texts and buttons already followed task 296; on iOS the two buttons are 50 pt with 14 pt corners and 17 pt text; « Bibliothèques libres » keeps the Framework7 list, which draws iOS style on iOS. In portrait, the offline maps screen puts « Ajouter une région » under the list (the pane is too narrow for two columns). The banners, site search, reminder switch and Bluetooth card use the same width-based code as landscape and were checked in landscape only, except the maps screen (800x1280). **Left:** the « ‹ Réglages » text on the iPhone About back button (the iOS back button here is the round icon of the other iOS pages); « Modifier l’ordinateur » is still a page, not a side sheet; the 340 dp left pane of the maps screen in portrait was replaced by the stacked layout.
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
 
@@ -6065,3 +6071,20 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **Test:** start the app with the sample logbook. Check the dive count, the year groups (2026, 2025, 2024, 2023), the trip group and that only N° 40 shows « Site à préciser ». Compare the phone list and the tablet list with the mock-ups.
 
 **Done (19 November 2026).** `core/sample/make-sample.mjs` writes `core/sample/SampleLogbook.ssrf` (40 synthetic dives, 8 sites, the 6-dive trip, N° 26 as a rebreather dive, N° 40 without a site); the Android, iOS and desktop builds copy it under the name the plugins read (`SampleDivesV2.ssrf`). Rebuild the Android libs (`native/build-android.sh`) to ship it.
+
+## [ ] 2026-11-19-302 Dive-computer photos and a sliding rail for « Ce lest était »
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
+
+**1. Dive-computer photos (idea #65, see `docs/IDEAS.md`).** Wherever a dive computer is listed, show its photo instead of the generic computer icon.
+- Mock-ups updated: `detail-ordinateurs-android` (dive detail, Équipement › Ordinateurs), `detail-ordinateurs-feuille-android`, `detail-ordinateurs-feuille-ios`, `android-tablette-detail-ordinateurs-paysage` and `bureau-detail-ordinateurs`. The two computers shown are the Shearwater Perdix AI and the Shearwater Petrel 3.
+- Tile: 48 dp square, rounded corners (12 dp on Android, tablet and desktop; 10 pt on iPhone), the photo fills the tile on a white background. The row is 64 to 72 dp tall (68 pt on iPhone) so the tile has room.
+- A model with no image keeps the generic computer icon (24 dp, as before).
+- Images are free for everyone, downloaded on demand without an account and kept on the device for good. They are hosted on the OpenDives+ server and refreshed when libdivecomputer is updated (`docs/maintenance.md`).
+- The same tile will go on the other screens that list a computer (download choice, Réglages › Ordinateurs du carnet, filters). Do those after the image database exists. The mock-ups for them are not changed yet.
+
+**2. « Ce lest était » is now a sliding rail.** The three buttons « Trop léger / Juste / Trop lourd » become one rounded rail (48 dp tall, track `#EBEAE5`, 4 dp inside padding). A blue pill (`#114477`) slides from one choice to the next in 300 ms (`cubic-bezier(.2, 0, 0, 1)`), no animation when reduced motion is on. The chosen label turns white and there is no check mark. Touching the chosen choice again clears it: the pill fades out and no choice is kept.
+- Mock-ups updated: `detail-ordinateurs-android`, `detail3-android`, `detail-equipement-plus-android`, `android-edition`, `edition-equipement-plus-android`, `edition-kit-menu-android`.
+- No tablet, desktop or iPhone mock-up has this control yet. When they get it, use the same rail.
+
+**Test:** open a dive with two computers and compare the list with the mock-ups. Open the ballast of a dive (detail and edit screens) and check that the pill slides and that a second touch clears the choice.

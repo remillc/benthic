@@ -26,6 +26,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { afterDownload, logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { downloadSalinity } from '../lib/tools.js';
   import { errorCode } from '../lib/account.js';
   import { askReviewAfterDownload } from '../lib/review-prompt.js';
@@ -342,6 +343,8 @@
   );
   /** Android: each computer is a card (the iOS look keeps its grouped rows). */
   const card = $derived(!theme.ios);
+  /** Tablet (task 2026-11-19-293): the Bluetooth state is a card under the remembered computers, not the whole screen. */
+  const stateBelow = $derived(layout.split && (phase === 'permission' || phase === 'denied' || phase === 'off'));
   const percent = $derived(Math.round(fraction * 100));
   /** @param {Computer} c */
   const subtitle = (c) => t('download.vendorBluetooth', { vendor: c.vendor });
@@ -360,9 +363,7 @@
     {/snippet}
   </Navbar>
 
-  {#if phase === 'checking'}
-    <div class="od-download--state" aria-busy="true"></div>
-  {:else if phase === 'none' || phase === 'permission' || phase === 'denied' || phase === 'off'}
+  {#snippet bluetoothState()}
     <div class="od-download--state">
       <div class="od-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
       <h1>{t(`download.${phase}.title`)}</h1>
@@ -378,6 +379,40 @@
         {/if}
       </div>
     </div>
+  {/snippet}
+
+  {#if phase === 'checking'}
+    <div class="od-download--state" aria-busy="true"></div>
+  {:else if stateBelow}
+    <p class="od-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
+    {#if remembered.length}
+      <h2 class="od-download--subheader">{t('download.remembered')}</h2>
+      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
+        {#each remembered as c (c.address)}
+          <li>
+            <div class="od-download--row" class:od-download--card={card}>
+              <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+              <span class="od-download--texts">
+                <span class="od-download--headline">{c.product}</span>
+                <span class="od-download--supporting">{subtitle(c)}</span>
+              </span>
+            </div>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    <label class="od-download--switch-row">
+      <span class="od-download--texts">
+        <span class="od-download--headline">{t('download.forceAll')}</span>
+        <span class="od-download--supporting">{t('download.forceAllText')}</span>
+      </span>
+      <span class="toggle"><input type="checkbox" bind:checked={forceDownload} /><span class="toggle-icon"></span></span>
+    </label>
+    <div class="od-download--state-card">
+      {@render bluetoothState()}
+    </div>
+  {:else if phase === 'none' || phase === 'permission' || phase === 'denied' || phase === 'off'}
+    {@render bluetoothState()}
   {:else if phase === 'choose'}
     <p class="od-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
 
@@ -866,6 +901,17 @@
         font-size: 16px;
         line-height: 24px;
         color: var(--od-text-2);
+      }
+    }
+
+    .od-download--state-card {
+      margin: 16px 16px 0;
+      padding: 8px 0 24px;
+      border-radius: 16px;
+      background: var(--od-surface-container);
+
+      .od-download--state {
+        margin: 16px 16px 0;
       }
     }
 

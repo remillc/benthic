@@ -317,7 +317,9 @@
         text-decoration: none;
 
         :global(.ios) & {
-          border-radius: 12px;
+          height: 50px;
+          border-radius: 14px;
+          font-size: 17px;
         }
       }
     }
