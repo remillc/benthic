@@ -6280,7 +6280,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** fill the name, check Informations, the profile header, the account sheet, the emergency sheet and a PDF. Empty it and check each fallback. Confirm a buddy's dive with an empty profile name, check it is saved to the profile.
 
-## [ ] 2026-11-19-313 Dive detail: floating toolbar actions, « Carte » becomes « Planifier depuis cette plongée »
+## [x] 2026-11-19-313 Dive detail: floating toolbar actions, « Carte » becomes « Planifier depuis cette plongée »
 
 Christian asked for this on 19 November 2026 (canvas comment on `detail3-android-curseur`). Work in `main`. Mock-ups in `docs/mockups/`.
 
@@ -6297,6 +6297,8 @@ The floating toolbar at the bottom of a dive's detail has exactly these actions,
 The accessible name of the three-dots button lists what the menu holds (« Plus d’options : faire valider, renuméroter, retirer du voyage, supprimer », without « faire valider » in the free version). Same toolbar on iPhone (with iOS icons and its context menu) and on tablet in the detail pane.
 
 **Test:** open a dive, check the four buttons and their order, that « Planifier » opens the planner filled from the dive, and the menu items with and without OpenDives+, with and without a trip.
+
+**Done (19 November 2026):** the toolbar already had Modifier, Planifier depuis cette plongée, Partager and ⋮ with the menu items of this task; the accessible name of ⋮ now lists what the menu holds (commit 43e8a430).
 
 ## [x] 2026-11-19-314 Site card: keep the map's aspect ratio
 
@@ -6338,7 +6340,7 @@ Christian approved this on 19 November 2026. Work in `main`. App mock-ups in `do
 
 **Test:** accept the terms on a new OpenDives+ account; check the diver's sites appear in the base without notes; switch the Sites tab to « Carte commune », open a base site, add it, report it; create a site next to a base site and check the suggestion; on the website, handle the report, a merge, an undo in the journal, and a split from the map.
 
-## [ ] 2026-11-19-316 Rename the app: OpenDives becomes Benthic
+## [x] 2026-11-19-316 Rename the app: OpenDives becomes Benthic
 
 Christian approved this on 19 November 2026 (#59, closed). Work in `main`.
 
@@ -6360,3 +6362,5 @@ Christian approved this on 19 November 2026 (#59, closed). Work in `main`.
 **Docs:** update README and other docs that name the app, except history (CHANGELOG entries, closed tasks in this inbox).
 
 **Test:** the launcher shows « Benthic Log »; a notification shows « Benthic Log »; About shows « Benthic »; the Benthic+ offer and account screens say Benthic+; no « OpenDives » left in the UI in French and English (grep the i18n files and the built app).
+
+**Done (19 November 2026):** texts, names under the icon, both link hosts, server e-mails and console, and the project files whose names carried the old brand (commit 733c63ec). Leftovers that would break installed apps, data or sign-in are listed with their risk in `docs/rename-leftovers.md`, for Christian to decide.
