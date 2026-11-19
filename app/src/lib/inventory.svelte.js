@@ -54,7 +54,9 @@ export async function loadInventory() {
   const [pieces, kits, records, state, pending, maintenance] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance()]);
   gear.maintenance = maintenance;
   gear.pieces = pieces;
-  gear.kits = kits;
+  // A retired piece has left the kits' screens (it stays in the kit file, for « Remettre en service »).
+  const retiredIds = new Set(pieces.filter((g) => g.retired).map((g) => g.id));
+  gear.kits = kits.map((k) => ({ ...k, gearIds: k.gearIds.filter((gid) => !retiredIds.has(gid)) }));
   gear.records = records;
   const info = readOnlyInfo(state);
   gear.readOnly = info.readOnly;
@@ -111,8 +113,11 @@ export const readPhoto = (photoId) => open().readPhoto(photoId);
 /** @returns {Map<string, Gear>} */
 export const gearMap = () => new Map(gear.pieces.map((g) => [g.id, g]));
 
-/** The pieces the screens offer: the archived ones only when asked for. @param {boolean} [archived] */
-export const visibleGear = (archived = false) => gear.pieces.filter((g) => archived || !g.retired);
+/** The pieces the screens offer: the retired ones only when asked for. @param {boolean} [retired] */
+export const visibleGear = (retired = false) => gear.pieces.filter((g) => retired || !g.retired);
+
+/** « Pièces retirées »: the retired pieces, the latest retired first. */
+export const retiredGear = () => gear.pieces.filter((g) => g.retired).sort((a, b) => ((b.retiredOn ?? '') > (a.retiredOn ?? '') ? 1 : (b.retiredOn ?? '') < (a.retiredOn ?? '') ? -1 : a.name.localeCompare(b.name)));
 
 /** What a dive used, from the working copy; empty when nothing. @param {{ date: string }} dive @returns {DiveEquipment} */
 export function equipmentOf(dive) {

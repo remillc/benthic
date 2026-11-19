@@ -10,7 +10,7 @@
   import GearIcon from './GearIcon.svelte';
   import ReadOnlyNotice from './ReadOnlyNotice.svelte';
   import GearExportSheet from './GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { showProfilePath } from '../lib/profile-frame.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
@@ -23,7 +23,6 @@
   /** `selected`: the piece open in the right pane. @type {{ selected?: string|null }} */
   let { selected = null } = $props();
 
-  let showArchived = $state(false);
   let searching = $state(false);
   let query = $state('');
   let exporting = $state(false);
@@ -32,7 +31,7 @@
   /** @type {HTMLInputElement|undefined} */
   let field = $state();
 
-  const groups = $derived(groupGear(searchGear(visibleGear(showArchived), query)));
+  const groups = $derived(groupGear(searchGear(visibleGear(), query)));
   const upkeep = $derived(maintenanceSections().counts);
   const upkeepLine = $derived(
     upkeep.overdue || upkeep.soon
@@ -41,7 +40,9 @@
         ? t('maintenance.cardLine.allGood')
         : t('maintenance.cardLine.none'),
   );
-  const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !showArchived);
+  const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !retired.length);
+  /** « Pièces retirées »: the row at the end of the list (task 2026-11-19-308). */
+  const retired = $derived(retiredGear());
 
   onMount(async () => {
     await loadInventory();
@@ -69,7 +70,6 @@
     /** @type {import('../lib/popup-menu.js').MenuItem[]} */
     const items = [
       { label: t('gear.inventory.export'), onclick: () => (exporting = true), disabled: !gear.pieces.length },
-      { label: showArchived ? t('gear.inventory.hideArchived') : t('gear.inventory.showArchived'), onclick: () => (showArchived = !showArchived) },
     ];
     if (import.meta.env?.DEV) items.push({ label: gear.readOnly ? t('gear.inventory.devReadOnlyOff') : t('gear.inventory.devReadOnlyOn'), onclick: () => setReadOnly(!gear.readOnly), divider: true });
     openPopupMenu(/** @type {HTMLElement} */ (e.currentTarget), items, t('gear.inventory.more'));
@@ -129,12 +129,21 @@
         <button type="button" class="od-gear-list--row" class:od-gear-list--on={selected === g.id} aria-current={selected === g.id ? 'true' : undefined} onclick={() => showProfilePath(`/profile/gear/${g.id}`)}>
           <span class="od-gear-list--tile" style:background={TONES[g.type] ?? 'var(--od-background)'}><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
           <span class="od-gear-list--texts">
-            <span class="od-gear-list--name">{g.name}{#if g.retired}<span class="od-gear-list--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
+            <span class="od-gear-list--name">{g.name}</span>
             {#if subLine(g)}<span class="od-gear-list--supporting">{subLine(g)}</span>{/if}
           </span>
         </button>
       {/each}
     {/each}
+    {#if retired.length && !searching}
+      <button type="button" class="od-gear-list--row od-gear-list--retired" class:od-gear-list--on={selected === 'retired'} onclick={() => showProfilePath('/profile/gear/retired/')}>
+        <span class="od-gear-list--tile"><Icon name="archive" size={22} /></span>
+        <span class="od-gear-list--texts">
+          <span class="od-gear-list--name">{t('gear.inventory.retiredRow')}</span>
+          <span class="od-gear-list--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
+        </span>
+      </button>
+    {/if}
     <div class="od-gear-list--bottom"></div>
   </div>
   {#if !gear.readOnly}
@@ -297,13 +306,8 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-gear-list--badge {
-      margin-inline-start: 8px;
-      padding: 0 6px;
-      border-radius: 6px;
-      background: var(--od-background);
-      font-size: 12px;
-      font-weight: 500;
+    .od-gear-list--retired {
+      margin-top: 16px;
     }
     .od-gear-list--empty {
       margin: 24px 16px;

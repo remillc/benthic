@@ -17,6 +17,7 @@
   import { getCatalog } from '../lib/dc-images.js';
   import { brandModels } from '../lib/dc-model.js';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
+  import RetirePieceDialog from '../components/RetirePieceDialog.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
   import { GEAR_TYPES, gearProblems } from '../lib/inventory.js';
@@ -46,6 +47,7 @@
   let purchasedOn = $state('');
   let note = $state('');
   let saving = $state(false);
+  let confirmRetire = $state(false);
   /** The photo: a data URL to show, and the id of the file already kept (when editing). */
   let photoUrl = $state('');
   let photoId = $state('');
@@ -115,6 +117,18 @@
   function setReminder(rule) {
     reminder = { task: suggestion?.task ?? 'service', months: rule.months, dives: rule.dives, notifyDays: rule.notifyDays, warnInDive: rule.warnInDive };
     ruleOpen = false;
+  }
+
+  /** « Retirer de l'équipement » (task 2026-11-19-308): the piece keeps its history and its dives. @param {'sold'|'lost'|'worn'|undefined} reason */
+  async function retire(reason) {
+    confirmRetire = false;
+    try {
+      await change((inv) => inv.retireGear(id, reason));
+      showSnackbar(t('gear.retire.done'));
+      f7router.back('/profile/gear', { force: true });
+    } catch {
+      showSnackbar(t('gear.inventory.readOnlyRefused'));
+    }
   }
 
   async function save() {
@@ -248,6 +262,9 @@
         </button>
       </div>
     {/if}
+    {#if id}
+      <button type="button" class="od-piece-edit--retire" disabled={gear.readOnly} onclick={() => (confirmRetire = true)}><Icon name="archive" size={20} />{t('gear.retire.button')}</button>
+    {/if}
   </div>
   <div class="od-piece-edit--bottom"></div>
 {/snippet}
@@ -270,6 +287,10 @@
     {@render body()}
   {/if}
 </Page>
+
+{#if confirmRetire && id}
+  <RetirePieceDialog name={effectiveName || name} computer={computer} oncancel={() => (confirmRetire = false)} onconfirm={retire} />
+{/if}
 
 <MaintenanceRuleSheet
   opened={ruleOpen}
@@ -536,6 +557,28 @@
     }
 
     .od-piece-edit--reminder-button:disabled {
+      opacity: 0.38;
+    }
+
+    .od-piece-edit--retire {
+      margin-top: 16px;
+      width: auto;
+      align-self: flex-start;
+      height: 48px;
+      padding: 0 20px;
+      border: 1px solid var(--od-outline);
+      border-radius: 24px;
+      background: transparent;
+      color: var(--od-secondary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .od-piece-edit--retire:disabled {
       opacity: 0.38;
     }
 

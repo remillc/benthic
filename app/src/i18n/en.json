@@ -2883,7 +2883,8 @@
       "Dive computer photos show wherever the model appears: the equipment, kits and maintenance lists, the part sheet, the dive detail, Réglages › Dive computers of the logbook and the dive edit. Your own photo wins over the model’s.",
       "After a download from a dive computer that is not in your equipment (OpenDives+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
       "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards).",
-      "Réglages › Notifications (OpenDives+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more."
+      "Réglages › Notifications (OpenDives+): maintenance reminders, a default lead time of 2 weeks, 30 or 60 days, “Remind me when late” once a week until the maintenance is recorded, and “Flight allowed”. Notifications arrive at 9:00 (except the flight one) with the buttons “View”, “Record the service” and “Remind me in 1 week”. A reminder’s lead time is now 14, 30 or 60 days; “Pre-trip check” is gone, and a dive computer has no reminder any more.",
+      "Equipment (OpenDives+): “Retire from equipment” replaces deleting, with an optional reason (sold, lost, worn out). A retired piece leaves the lists, the kits and the reminders but keeps its service history and its dives; it is found in “Retired pieces”, where it can be put back in service, have its history exported as a PDF, or be deleted for good. “Export the history” is also in a piece’s menu."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5378,6 +5379,39 @@
     "failed": "The logbook could not be created. Nothing was lost on this device."
   },
   "gear": {
+    "forever": {
+      "button": "Delete for good",
+      "title": "Delete for good?",
+      "text": "{name} and all its service history will be erased. This cannot be undone. The dives stay in the logbook.",
+      "confirm": "Delete"
+    },
+    "retire": {
+      "button": "Retire from equipment",
+      "title": "Retire the {name}?",
+      "titleOther": "Retire {name}?",
+      "text": "It leaves your lists, your kits and the reminders. Its service history and its dives are kept. You will find it in “Retired pieces”.",
+      "textOther": "This piece leaves your lists, your kits and the reminders. Its service history and its dives are kept. You will find it in “Retired pieces”.",
+      "textShort": "It leaves your lists, your kits and the reminders. Its service history and its dives are kept.",
+      "textShortOther": "This piece leaves your lists, your kits and the reminders. Its service history and its dives are kept.",
+      "reasonLabel": "Reason (optional)",
+      "reason": {
+        "sold": "Sold",
+        "lost": "Lost",
+        "worn": "Worn out"
+      },
+      "sheet": "Retire · {reason}",
+      "sheetNone": "Retire without a reason",
+      "cancel": "Cancel",
+      "confirm": "Retire",
+      "done": "Piece retired",
+      "restored": "Piece back in service",
+      "retiredOn": "Retired on {date}",
+      "retired": "Retired",
+      "noReminders": "No more reminders for this piece.",
+      "restore": "Put back in service",
+      "empty": "No retired pieces",
+      "listNote": "They keep their service history and their dives."
+    },
     "profile": {
       "title": "My diver profile",
       "cardLine": "Equipment, certifications, information",
@@ -5401,6 +5435,11 @@
       "paneEmpty": "Choose an item to see it here"
     },
     "inventory": {
+      "retiredCount": {
+        "one": "{n} piece",
+        "other": "{n} pieces"
+      },
+      "retiredRow": "Retired pieces",
       "title": "Equipment",
       "pieces": {
         "one": "{n} piece",
@@ -5451,9 +5490,6 @@
       "noResults": "No piece matches",
       "more": "More options",
       "export": "Export or print…",
-      "showArchived": "Show archived pieces",
-      "hideArchived": "Hide archived pieces",
-      "archivedBadge": "Archived",
       "devReadOnlyOn": "Simulate the end of the subscription (development)",
       "devReadOnlyOff": "Lift the read-only state (development)",
       "add": "Add a piece",
@@ -5525,14 +5561,8 @@
       "edit": "Edit",
       "more": "More options",
       "share": "Share the sheet",
-      "archive": "Archive",
-      "unarchive": "Restore",
       "delete": "Delete",
-      "deleteTitle": "Delete this piece?",
-      "deleteText": "{name} leaves the inventory, the kits and the dives that used it. This cannot be undone.",
       "deleted": "Piece deleted",
-      "archived": "Archived",
-      "archivedText": "Hidden from the lists and from the kits",
       "dives": "dives",
       "hours": "under water",
       "deepest": "deepest",
@@ -5560,14 +5590,7 @@
       "serialShort": "Serial no.",
       "noteShort": "Notes",
       "optional": "Optional",
-      "ok": "OK",
-      "delete": "Delete the dive computer"
-    },
-    "computerDelete": {
-      "title": "Delete the {name}?",
-      "text": "It will be removed from your equipment and your kits. The dives made with it stay in the logbook.",
-      "cancel": "Cancel",
-      "confirm": "Delete"
+      "ok": "OK"
     },
     "computerOffer": {
       "title": "Add the {name} to your equipment?",
@@ -5671,6 +5694,32 @@
     "button": "App language: {language}"
   },
   "maintenance": {
+    "export": {
+      "menu": "Export the history",
+      "button": "Export the history",
+      "title": "Service history · exported on {date}",
+      "dives": "Dives",
+      "next": "Next service",
+      "nextBoth": {
+        "one": "{date} or in {n} dive",
+        "other": "{date} or in {n} dives"
+      },
+      "nextDives": {
+        "one": "In {n} dive",
+        "other": "In {n} dives"
+      },
+      "table": "Services",
+      "date": "Date",
+      "type": "Type",
+      "by": "Done by",
+      "cost": "Cost",
+      "notes": "Notes",
+      "footer": "Made by OpenDives.",
+      "footerInvoices": "Made by OpenDives. The attached invoices follow this page.",
+      "file": "service-history",
+      "share": "Service history",
+      "failed": "The history could not be exported"
+    },
     "title": "Service",
     "entry": "Service",
     "back": "Back",
@@ -5741,6 +5790,7 @@
       "other": "{n} overdue reminders"
     },
     "piece": {
+      "byYouShort": "By the diver",
       "title": "Service",
       "cardTitle": "Service",
       "note": "Note a service",

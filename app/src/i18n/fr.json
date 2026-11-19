@@ -2883,7 +2883,8 @@
       "Les photos des ordinateurs de plongée s’affichent partout où le modèle apparaît : listes d’équipement, de kits et d’entretien, fiche de la pièce, détail de la plongée, Réglages › Ordinateurs du carnet et modification de la plongée. Votre propre photo passe avant celle du modèle.",
       "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (OpenDives+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
       "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait).",
-      "Réglages › Notifications (OpenDives+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel."
+      "Réglages › Notifications (OpenDives+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel.",
+      "Équipement (OpenDives+) : « Retirer de l’équipement » remplace la suppression, avec une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -5381,6 +5382,39 @@
     "failed": "Le carnet n’a pas pu être créé. Rien n’a été perdu sur cet appareil."
   },
   "gear": {
+    "forever": {
+      "button": "Supprimer pour de bon",
+      "title": "Supprimer pour de bon ?",
+      "text": "{name} et tout son historique de révision seront effacés. Ce choix est définitif. Les plongées restent dans le carnet.",
+      "confirm": "Supprimer"
+    },
+    "retire": {
+      "button": "Retirer de l’équipement",
+      "title": "Retirer le {name} ?",
+      "titleOther": "Retirer {name} ?",
+      "text": "Il quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés. Vous le retrouvez dans « Pièces retirées ».",
+      "textOther": "Cette pièce quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés. Vous la retrouvez dans « Pièces retirées ».",
+      "textShort": "Il quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés.",
+      "textShortOther": "Cette pièce quitte vos listes, vos kits et les rappels. Son historique de révision et ses plongées sont gardés.",
+      "reasonLabel": "Raison (facultatif)",
+      "reason": {
+        "sold": "Vendue",
+        "lost": "Perdue",
+        "worn": "Hors d’usage"
+      },
+      "sheet": "Retirer · {reason}",
+      "sheetNone": "Retirer sans raison",
+      "cancel": "Annuler",
+      "confirm": "Retirer",
+      "done": "Pièce retirée",
+      "restored": "Pièce remise en service",
+      "retiredOn": "Retiré le {date}",
+      "retired": "Retiré",
+      "noReminders": "Plus de rappels pour cette pièce.",
+      "restore": "Remettre en service",
+      "empty": "Aucune pièce retirée",
+      "listNote": "Elles gardent leur historique de révision et leurs plongées."
+    },
     "profile": {
       "title": "Mon profil de plongeur",
       "cardLine": "Équipement, brevets, informations",
@@ -5404,6 +5438,11 @@
       "paneEmpty": "Choisissez un élément pour le voir ici"
     },
     "inventory": {
+      "retiredCount": {
+        "one": "{n} pièce",
+        "other": "{n} pièces"
+      },
+      "retiredRow": "Pièces retirées",
       "title": "Équipement",
       "pieces": {
         "one": "{n} pièce",
@@ -5454,9 +5493,6 @@
       "noResults": "Aucune pièce ne correspond",
       "more": "Plus d’options",
       "export": "Exporter ou imprimer…",
-      "showArchived": "Afficher les pièces archivées",
-      "hideArchived": "Masquer les pièces archivées",
-      "archivedBadge": "Archivée",
       "devReadOnlyOn": "Simuler la fin de l’abonnement (développement)",
       "devReadOnlyOff": "Lever la lecture seule (développement)",
       "add": "Ajouter une pièce",
@@ -5528,14 +5564,8 @@
       "edit": "Modifier",
       "more": "Plus d’options",
       "share": "Partager la fiche",
-      "archive": "Archiver",
-      "unarchive": "Restaurer",
       "delete": "Supprimer",
-      "deleteTitle": "Supprimer cette pièce ?",
-      "deleteText": "{name} quitte l’inventaire, les kits et les plongées qui l’ont utilisée. Cette action est définitive.",
       "deleted": "Pièce supprimée",
-      "archived": "Archivée",
-      "archivedText": "Masquée des listes et des kits",
       "dives": "plongées",
       "hours": "sous l’eau",
       "deepest": "au plus profond",
@@ -5563,14 +5593,7 @@
       "serialShort": "N° de série",
       "noteShort": "Notes",
       "optional": "Facultatif",
-      "ok": "OK",
-      "delete": "Supprimer l’ordinateur"
-    },
-    "computerDelete": {
-      "title": "Supprimer le {name} ?",
-      "text": "Il sera retiré de votre équipement et de vos kits. Les plongées faites avec lui restent dans le carnet.",
-      "cancel": "Annuler",
-      "confirm": "Supprimer"
+      "ok": "OK"
     },
     "computerOffer": {
       "title": "Ajouter le {name} à votre équipement ?",
@@ -5674,6 +5697,32 @@
     "button": "Langue de l’app : {language}"
   },
   "maintenance": {
+    "export": {
+      "menu": "Exporter l’historique",
+      "button": "Exporter l’historique",
+      "title": "Historique de révision · exporté le {date}",
+      "dives": "Plongées",
+      "next": "Prochaine révision",
+      "nextBoth": {
+        "one": "{date} ou dans {n} plongée",
+        "other": "{date} ou dans {n} plongées"
+      },
+      "nextDives": {
+        "one": "Dans {n} plongée",
+        "other": "Dans {n} plongées"
+      },
+      "table": "Révisions",
+      "date": "Date",
+      "type": "Type",
+      "by": "Fait par",
+      "cost": "Coût",
+      "notes": "Notes",
+      "footer": "Produit par OpenDives.",
+      "footerInvoices": "Produit par OpenDives. Les factures jointes sont ajoutées à la suite de cette page.",
+      "file": "historique-revision",
+      "share": "Historique de révision",
+      "failed": "L’historique n’a pas pu être exporté"
+    },
     "title": "Révisions",
     "entry": "Révisions",
     "back": "Retour",
@@ -5744,6 +5793,7 @@
       "other": "{n} rappels en retard"
     },
     "piece": {
+      "byYouShort": "Par le plongeur",
       "title": "Révision",
       "cardTitle": "Révision",
       "note": "Noter une révision",

@@ -130,6 +130,7 @@
           { path: '/profile', ...lazy(() => import('./pages/ProfileDiver.svelte')) },
           { path: '/profile/gear/', ...lazy(() => import('./pages/ProfileGear.svelte')) },
           { path: '/profile/gear/new', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
+          { path: '/profile/gear/retired/', ...lazy(() => import('./pages/ProfileRetired.svelte')) },
           { path: '/profile/gear/:id', ...lazy(() => import('./pages/ProfilePiece.svelte')) },
           { path: '/profile/gear/:id/edit', ...lazy(() => import('./pages/ProfilePieceEdit.svelte')) },
           { path: '/profile/gear/:id/edit-computer', ...lazy(() => import('./pages/ProfileComputerEdit.svelte')) },

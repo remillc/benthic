@@ -16,7 +16,7 @@
   import ComboField from '../components/ComboField.svelte';
   import TextField from '../components/TextField.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
-  import ComputerDeleteDialog from '../components/ComputerDeleteDialog.svelte';
+  import RetirePieceDialog from '../components/RetirePieceDialog.svelte';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
   import { gearProblems } from '../lib/inventory.js';
@@ -142,11 +142,12 @@
     }
   }
 
-  async function remove() {
+  /** « Retirer de l'équipement » (task 2026-11-19-308): the piece keeps its history and its dives. @param {'sold'|'lost'|'worn'|undefined} reason */
+  async function retire(reason) {
     confirmDelete = false;
     try {
-      await change((inv) => inv.deleteGear(id));
-      showSnackbar(t('gear.piece.deleted'));
+      await change((inv) => inv.retireGear(id, reason));
+      showSnackbar(t('gear.retire.done'));
       f7router.back('/profile/gear', { force: true });
     } catch {
       showSnackbar(t('gear.inventory.readOnlyRefused'));
@@ -210,7 +211,7 @@
 
 {#snippet deleteButton()}
   <button type="button" class="od-computer-edit--delete-button" disabled={gear.readOnly} onclick={() => (confirmDelete = true)}>
-    {#if !ios}<Icon name="delete" size={20} />{/if}{t('gear.computerEdit.delete')}
+    {#if !ios}<Icon name="archive" size={20} />{/if}{t('gear.retire.button')}
   </button>
 {/snippet}
 
@@ -246,7 +247,7 @@
   <Navbar>
     {#snippet left()}
       {#if ios}
-        <a href="#close" class="link external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>{t('gear.computerDelete.cancel')}</a>
+        <a href="#close" class="link external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>{t('gear.retire.cancel')}</a>
       {:else}
         <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
           <Icon name="close" /><span class="od-sr-only">{t('gear.pieceEdit.close')}</span>
@@ -269,7 +270,7 @@
 </Page>
 
 {#if confirmDelete && piece}
-  <ComputerDeleteDialog name={piece.name} oncancel={() => (confirmDelete = false)} onconfirm={remove} />
+  <RetirePieceDialog name={piece.name} computer oncancel={() => (confirmDelete = false)} onconfirm={retire} />
 {/if}
 
 <style>
@@ -384,13 +385,14 @@
       justify-content: flex-start;
     }
 
+    /* Outlined, not red: retiring keeps the history (task 2026-11-19-308). */
     .od-computer-edit--delete-button {
       height: 48px;
       padding: 0 20px;
-      border: none;
+      border: 1px solid var(--od-outline);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-alarm);
+      color: var(--od-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -499,7 +501,8 @@
         justify-content: center;
         font-size: 17px;
         font-weight: 400;
-        color: var(--od-alarm);
+        border: none;
+        color: var(--od-secondary);
       }
     }
 
@@ -556,10 +559,10 @@
       button {
         height: 48px;
         padding: 0 20px;
-        border: none;
+        border: 1px solid var(--od-outline);
         border-radius: 24px;
         background: transparent;
-        color: var(--od-alarm);
+        color: var(--od-secondary);
         font: inherit;
         font-size: 14px;
         font-weight: 500;

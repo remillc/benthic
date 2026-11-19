@@ -41,8 +41,14 @@ import { ruleProblems } from './maintenance.js';
  * @property {string} [note] the line under the name
  * @property {string} [photoId] a file of media/: the piece's photo
  * @property {string[]} [tags]
- * @property {boolean} retired archived: hidden unless asked for
+ * @property {boolean} retired retired from the equipment (task 2026-11-19-308): out of the lists, the kits and the reminders; its
+ *   maintenance history and its dives stay, and it shows in « Pièces retirées »
+ * @property {string} [retiredOn] YYYY-MM-DD, the day it was retired
+ * @property {'sold'|'lost'|'worn'} [retiredReason] « Vendue », « Perdue », « Hors d'usage »
  */
+
+/** The reasons offered when a piece is retired. @type {readonly ('sold'|'lost'|'worn')[]} */
+export const RETIRE_REASONS = ['sold', 'lost', 'worn'];
 
 /** @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'other'} GearType */
 
@@ -303,7 +309,7 @@ export function pieceFigures(diveKeys, dives) {
 export function kitSummary(kit, gearById, max = 4) {
   return kit.gearIds
     .map((gid) => gearById.get(gid))
-    .filter((g) => !!g && g.type !== 'computer')
+    .filter((g) => !!g && g.type !== 'computer' && !g.retired)
     .slice(0, max)
     .map((g) => /** @type {Gear} */ (g).name)
     .join(', ');
@@ -440,6 +446,28 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       return piece;
     },
 
+    /**
+     * « Retirer de l'équipement »: the piece leaves the lists, the kits and the reminders; its history and its dives stay.
+     * @param {string} gearId @param {'sold'|'lost'|'worn'} [reason]
+     */
+    async retireGear(gearId, reason) {
+      const piece = await store.read(`gear/${gearId}.json`);
+      if (!piece) return;
+      /** @type {Gear} */
+      const next = { ...piece, retired: true, retiredOn: stamp().slice(0, 10), updatedAt: stamp() };
+      if (reason && RETIRE_REASONS.includes(reason)) next.retiredReason = reason;
+      else delete next.retiredReason;
+      await commit([[`gear/${gearId}.json`, next]]);
+    },
+
+    /** « Remettre en service »: the piece is back in the lists, its kits and its reminders. @param {string} gearId */
+    async restoreGear(gearId) {
+      const piece = await store.read(`gear/${gearId}.json`);
+      if (!piece) return;
+      const { retiredOn, retiredReason, ...rest } = piece;
+      await commit([[`gear/${gearId}.json`, { ...rest, retired: false, updatedAt: stamp() }]]);
+    },
+
     /** @param {string} gearId @param {boolean} retired */
     async archiveGear(gearId, retired) {
       const piece = await store.read(`gear/${gearId}.json`);
@@ -547,7 +575,10 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const problems = kitProblems(fields, others);
       if (problems.name || problems.gearIds) throw new Error(`INVALID_KIT:${Object.keys(problems).join(',')}`);
       const existing = fields.id ? await store.read(`kits/${fields.id}.json`) : null;
-      const kit = { ...(existing ?? { format: 1, createdAt: stamp() }), id: existing?.id ?? id(), name: fields.name.trim(), gearIds: [...new Set(fields.gearIds)], updatedAt: stamp() };
+      // A retired piece does not show in the kit's screens, so the form does not send it: it stays in the kit, ready for « Remettre en service ».
+      const retired = new Set((await store.readAll('gear/')).filter((g) => g.retired).map((g) => g.id));
+      const kept = (existing?.gearIds ?? []).filter((/** @type {string} */ gid) => retired.has(gid));
+      const kit = { ...(existing ?? { format: 1, createdAt: stamp() }), id: existing?.id ?? id(), name: fields.name.trim(), gearIds: [...new Set([...fields.gearIds, ...kept])], updatedAt: stamp() };
       await commit([[`kits/${kit.id}.json`, kit]]);
       return kit;
     },

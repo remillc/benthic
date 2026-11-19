@@ -13,7 +13,7 @@
   import DcTile from '../components/DcTile.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import GearExportSheet from '../components/GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, readPhoto } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, readPhoto } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { connection } from '../lib/online.svelte.js';
@@ -29,7 +29,6 @@
       if (g.type === 'computer' && g.photoId && !(g.id in photos)) readPhoto(g.photoId).then((url) => (photos[g.id] = url));
     }
   });
-  let showArchived = $state(false);
   let searching = $state(false);
   let query = $state('');
   let exporting = $state(false);
@@ -38,7 +37,7 @@
   /** @type {HTMLInputElement|undefined} */
   let field = $state();
 
-  const shown = $derived(searchGear(visibleGear(showArchived), query));
+  const shown = $derived(searchGear(visibleGear(), query));
   const groups = $derived(groupGear(shown));
   const upkeep = $derived(maintenanceSections().counts);
   /** The line of the « Entretien » card: what is overdue, what is coming up, else that all is well. */
@@ -49,7 +48,9 @@
         ? t('maintenance.cardLine.allGood')
         : t('maintenance.cardLine.none'),
   );
-  const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !showArchived);
+  const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !retired.length);
+  /** « Pièces retirées »: the row at the end of the list (task 2026-11-19-308). */
+  const retired = $derived(retiredGear());
 
   async function refresh() {
     await loadInventory();
@@ -81,7 +82,6 @@
     /** @type {import('../lib/popup-menu.js').MenuItem[]} */
     const items = [
       { label: t('gear.inventory.export'), onclick: () => (exporting = true), disabled: !gear.pieces.length },
-      { label: showArchived ? t('gear.inventory.hideArchived') : t('gear.inventory.showArchived'), onclick: () => (showArchived = !showArchived) },
     ];
     // No billing exists yet: a development switch stands for the end of the subscription.
     if (import.meta.env?.DEV) items.push({ label: gear.readOnly ? t('gear.inventory.devReadOnlyOff') : t('gear.inventory.devReadOnlyOn'), onclick: () => setReadOnly(!gear.readOnly), divider: true });
@@ -148,7 +148,7 @@
         <button type="button" class="od-gear-page--row" onclick={() => open(g.id)}>
           <span class="od-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={ios ? 36 : 40} radius={ios ? 8 : 10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
           <span class="od-gear-page--texts">
-            <span class="od-gear-page--name">{g.name}{#if g.retired}<span class="od-gear-page--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
+            <span class="od-gear-page--name">{g.name}</span>
             {#if subLine(g)}<span class="od-gear-page--supporting">{subLine(g)}</span>{/if}
           </span>
           <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
@@ -156,6 +156,18 @@
       {/each}
     </div>
   {/each}
+  {#if retired.length && !searching}
+    <div class="od-gear-page--list od-gear-page--retired">
+      <a href="/profile/gear/retired/" class="od-gear-page--row">
+        <span class="od-gear-page--tile"><Icon name="archive" size={22} /></span>
+        <span class="od-gear-page--texts">
+          <span class="od-gear-page--name">{t('gear.inventory.retiredRow')}</span>
+          <span class="od-gear-page--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
+        </span>
+        <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+      </a>
+    </div>
+  {/if}
   <div class="od-gear-page--bottom"></div>
 {/snippet}
 
@@ -398,14 +410,8 @@
       line-height: 22px;
     }
 
-    .od-gear-page--badge {
-      margin-inline-start: 8px;
-      padding: 0 6px;
-      border: var(--od-outline-width) solid var(--od-text-2);
-      border-radius: 8px;
-      font-size: 11px;
-      line-height: 16px;
-      color: var(--od-text-2);
+    .od-gear-page--retired {
+      margin-top: 16px;
     }
 
     .od-gear-page--supporting {

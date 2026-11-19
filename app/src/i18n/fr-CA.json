@@ -1,4 +1,16 @@
 {
+  "gear": {
+    "retire": {
+      "text": "Il quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés. Vous le retrouvez dans « Pièces retirées ».",
+      "textOther": "Cette pièce quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés. Vous la retrouvez dans « Pièces retirées ».",
+      "textShort": "Il quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés.",
+      "textShortOther": "Cette pièce quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés.",
+      "listNote": "Elles gardent leur historique d’entretien et leurs plongées."
+    },
+    "forever": {
+      "text": "{name} et tout son historique d’entretien seront effacés. Ce choix est définitif. Les plongées restent dans le carnet."
+    }
+  },
   "logbook": {
     "deleteText": {
       "one": "La plongée est retirée du carnet, sur cet appareil et dans le nuage. Vous pourrez l'annuler pendant quelques secondes.",
@@ -98,6 +110,13 @@
     "opensMail": "s'ouvre dans l'application de courriel"
   },
   "maintenance": {
+    "export": {
+      "title": "Historique d’entretien · exporté le {date}",
+      "next": "Prochain entretien",
+      "table": "Entretiens",
+      "file": "historique-entretien",
+      "share": "Historique d’entretien"
+    },
     "title": "Entretien",
     "entry": "Entretien",
     "piece": {

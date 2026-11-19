@@ -315,6 +315,7 @@ test('every literal maintenance key used by the screens exists in fr and en', ()
     'components/DiveGearTop.svelte',
     'lib/maintenance-text.js',
     'lib/maintenance-notify.js',
+    'lib/maintenance-export.js',
   ];
   for (const f of files) {
     for (const [, key] of read(f).matchAll(/['`]((?:maintenance|gear\.pieceNew|gear\.kit|gear\.diveGear)\.[A-Za-z.]+)['`]/g)) {

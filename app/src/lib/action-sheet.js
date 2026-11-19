@@ -17,3 +17,23 @@ export function actionSheetButtons({ text, action, onConfirm, cancel }) {
     [{ text: cancel ?? t('dialog.cancel'), bold: true }],
   ];
 }
+
+/** Framework7 reads a button's text as HTML: the name of a piece is escaped. @param {string} s */
+const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
+
+/**
+ * iPhone: « Retirer le Shearwater Perdix 2 ? » as an action sheet (task 2026-11-19-308, ios-profil-piece-retirer): the explanation in
+ * grey, one button for each reason, one without a reason, then « Annuler » apart.
+ * @param {{ title: string, text: string, reasons: { reason: 'sold'|'lost'|'worn', label: string }[], none: string, onPick: (reason: 'sold'|'lost'|'worn'|undefined) => void, cancel?: string }} o
+ * @returns {object[][]}
+ */
+export function retireSheetButtons({ title, text, reasons, none, onPick, cancel }) {
+  return [
+    [
+      { text: `<span class="od-retire-sheet--title">${escapeHtml(title)}</span><br>${escapeHtml(text)}`, label: true },
+      ...reasons.map((r) => ({ text: r.label, onClick: () => onPick(r.reason) })),
+      { text: none, onClick: () => onPick(undefined) },
+    ],
+    [{ text: cancel ?? t('dialog.cancel'), bold: true }],
+  ];
+}

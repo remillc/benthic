@@ -12,11 +12,14 @@
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
   import DcTile from '../components/DcTile.svelte';
-  import ComputerDeleteDialog from '../components/ComputerDeleteDialog.svelte';
+  import RetirePieceDialog from '../components/RetirePieceDialog.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
   import { tagText } from '../lib/maintenance-text.js';
+  import { historyRows, exportHistory } from '../lib/maintenance-export.js';
+  import { letterPaper } from '../lib/share.js';
+  import { desktopApp } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatDepth, formatLongDate, formatNumber, formatHours } from '../lib/format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
@@ -30,7 +33,9 @@
 
   const id = f7route.params.id;
   let loaded = $state(false);
-  let confirmDelete = $state(false);
+  let confirmRetire = $state(false);
+  let confirmForever = $state(false);
+  let exportingHistory = $state(false);
   /** @type {{ dives: number, seconds: number, deepestMm: number, last: string }|null} */
   let computerStats = $state(null);
 
@@ -97,24 +102,72 @@
     }
   }
 
-  /** @param {boolean} retired */
-  async function archive(retired) {
-    if (!piece) return;
+  /** « Retirer de l'équipement » (task 2026-11-19-308): history and dives stay. @param {'sold'|'lost'|'worn'|undefined} reason */
+  async function retire(reason) {
+    confirmRetire = false;
     try {
-      await change((inv) => inv.archiveGear(piece.id, retired));
+      await change((inv) => inv.retireGear(id, reason));
+      showSnackbar(t('gear.retire.done'));
     } catch {
       refused();
     }
   }
 
-  async function remove() {
-    confirmDelete = false;
+  async function restore() {
+    try {
+      await change((inv) => inv.restoreGear(id));
+      showSnackbar(t('gear.retire.restored'));
+    } catch {
+      refused();
+    }
+  }
+
+  /** « Supprimer pour de bon »: only from a retired piece; the dives stay in the logbook. */
+  async function removeForGood() {
+    confirmForever = false;
+    if (!piece?.retired) return;
     try {
       await change((inv) => inv.deleteGear(id));
       showSnackbar(t('gear.piece.deleted'));
       f7router.back();
     } catch {
       refused();
+    }
+  }
+
+  /** The next maintenance of the piece in words, for the PDF: « 12 décembre 2026 ou dans 18 plongées ». */
+  function nextText() {
+    const e = worst;
+    if (!e) return '';
+    const date = e.dueDate ? formatLongDate(e.dueDate) : '';
+    if (date && e.divesLeft != null) return t('maintenance.export.nextBoth', { date, n: e.divesLeft });
+    if (date) return date;
+    return e.divesLeft != null ? t('maintenance.export.nextDives', { n: e.divesLeft }) : '';
+  }
+
+  /** « Exporter l'historique »: the PDF of the maintenance history (task 2026-11-19-308, ent-historique-pdf). */
+  async function exportPieceHistory() {
+    if (!piece || exportingHistory) return;
+    exportingHistory = true;
+    try {
+      await exportHistory(
+        {
+          name: piece.name,
+          typeLabel: t(`gear.inventory.type.${piece.type}`),
+          note: piece.note,
+          serial: piece.serial,
+          purchasedOn: piece.purchasedOn,
+          dives: figures.dives,
+          next: nextText(),
+          rows: historyRows(gear.maintenance.filter((m) => m.gearId === piece.id)),
+        },
+        { letter: letterPaper(), readPhoto, desktop: desktopApp },
+      );
+    } catch (e) {
+      console.error('Export the maintenance history', e);
+      showSnackbar(t('maintenance.export.failed'));
+    } finally {
+      exportingHistory = false;
     }
   }
 
@@ -126,8 +179,8 @@
       /** @type {HTMLElement} */ (e.currentTarget),
       [
         { label: t('gear.piece.share'), onclick: share },
-        { label: retired ? t('gear.piece.unarchive') : t('gear.piece.archive'), onclick: () => (gear.readOnly ? refused() : archive(!retired)) },
-        { label: t('gear.piece.delete'), onclick: () => (gear.readOnly ? refused() : (confirmDelete = true)), danger: true },
+        { label: t('maintenance.export.menu'), onclick: exportPieceHistory },
+        ...(retired ? [] : [{ label: t('gear.retire.button'), onclick: () => (gear.readOnly ? refused() : (confirmRetire = true)) }]),
       ],
       t('gear.piece.more'),
     );
@@ -146,8 +199,17 @@
     <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
       {#if piece.type === 'computer'}<DcTile model={piece.computerModel || piece.name} size={150} radius={16} photo={photoUrl} fallback={genericIcon} />{:else if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
     </div>
-    <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}{#if piece.retired}<span class="od-piece-page--badge">{t('gear.piece.archived')}</span>{/if}</p>
+    <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}</p>
     <h2 class="od-piece-page--name">{piece.name}</h2>
+    {#if piece.retired}
+      <!-- A retired piece (profil-piece-retiree-android): when and why, put back in service, export, no pencil. -->
+      <p class="od-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatLongDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
+      <p class="od-piece-page--retired-line">{[piece.retiredReason ? t(`gear.retire.reason.${piece.retiredReason}`) : '', t('gear.retire.noReminders')].filter(Boolean).join('. ')}</p>
+      <div class="od-piece-page--retired-buttons">
+        <button type="button" class="od-piece-page--filled" disabled={gear.readOnly} onclick={restore}><Icon name="undo" size={20} />{t('gear.retire.restore')}</button>
+        <button type="button" class="od-piece-page--outlined" disabled={exportingHistory} onclick={exportPieceHistory}><Icon name="export" size={20} />{t('maintenance.export.button')}</button>
+      </div>
+    {/if}
 
     <div class="od-piece-page--figures">
       <span class="od-piece-page--figure"><span class="od-piece-page--value">{formatNumber(figures.dives, 0)}</span><span class="od-piece-page--legend">{t('gear.piece.dives')}</span></span>
@@ -155,6 +217,7 @@
       <span class="od-piece-page--figure"><span class="od-piece-page--value">{figures.deepestMm ? formatDepth(figures.deepestMm, logbook.prefs) : '–'}</span><span class="od-piece-page--legend">{t('gear.piece.deepest')}</span></span>
     </div>
 
+    {#if !piece.retired}
     <a href={`/profile/gear/${id}/maintenance`} class="od-piece-page--maintenance" aria-label={t('maintenance.piece.openAria', { name: piece.name })}>
       <Icon name="clock" size={22} />
       <span class="od-piece-page--maintenance-texts">
@@ -163,6 +226,7 @@
       </span>
       <Icon name="chevron" size={20} />
     </a>
+    {/if}
 
     {#if details.length}
       <h3 class="od-piece-page--title">{t('gear.piece.details')}</h3>
@@ -182,6 +246,10 @@
         {t('gear.piece.noDive')}
       {/if}
     </p>
+
+    {#if piece.retired}
+      <button type="button" class="od-piece-page--forever" disabled={gear.readOnly} onclick={() => (confirmForever = true)}>{t('gear.forever.button')}</button>
+    {/if}
   {:else if loaded}
     <p class="od-piece-page--last">{t('gear.inventory.noResults')}</p>
   {/if}
@@ -193,7 +261,7 @@
       <BackLink label={t('gear.profile.equipment')} name={t('gear.piece.back')} />
     {/snippet}
     {#snippet right()}
-      {#if piece}
+      {#if piece && !piece.retired}
         <a
           href={editPath}
           class="link icon-only external"
@@ -223,14 +291,16 @@
   {/if}
 </Page>
 
-{#if confirmDelete && piece && piece.type === 'computer'}
-  <ComputerDeleteDialog name={piece.name} oncancel={() => (confirmDelete = false)} onconfirm={remove} />
-{:else if confirmDelete && piece}
-  <Md3Dialog title={t('gear.piece.deleteTitle')} text={t('gear.piece.deleteText', { name: piece.name })} role="alertdialog" oncancel={() => (confirmDelete = false)}>
+{#if confirmRetire && piece}
+  <RetirePieceDialog name={piece.name} computer={piece.type === 'computer'} oncancel={() => (confirmRetire = false)} onconfirm={retire} />
+{/if}
+{#if confirmForever && piece}
+  <!-- « Supprimer pour de bon ? » (profil-piece-supprimer-definitif-android): only from a retired piece. -->
+  <Md3Dialog class="od-piece-forever" title={t('gear.forever.title')} text={t('gear.forever.text', { name: piece.name })} role="alertdialog" oncancel={() => (confirmForever = false)}>
     <span></span>
     {#snippet actions()}
-      <button type="button" onclick={() => (confirmDelete = false)}>{t('gear.addSheet.cancel')}</button>
-      <button type="button" onclick={remove}>{t('gear.piece.delete')}</button>
+      <button type="button" onclick={() => (confirmForever = false)}>{t('gear.retire.cancel')}</button>
+      <button type="button" class="od-piece-page--forever-confirm" onclick={removeForGood}>{t('gear.forever.confirm')}</button>
     {/snippet}
   </Md3Dialog>
 {/if}
@@ -304,12 +374,75 @@
       color: var(--od-text-2);
     }
 
-    .od-piece-page--badge {
-      margin-inline-start: 8px;
-      padding: 0 6px;
-      border: var(--od-outline-width) solid var(--od-text-2);
-      border-radius: 8px;
-      font-size: 11px;
+    .od-piece-page--retired {
+      margin: 4px 20px 0;
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+
+    .od-piece-page--retired-line {
+      margin: 2px 20px 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    .od-piece-page--retired-buttons {
+      margin: 16px 16px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .od-piece-page--filled,
+    .od-piece-page--outlined {
+      width: auto;
+      height: 40px;
+      padding: 0 20px 0 16px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .od-piece-page--filled {
+      border: none;
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
+    }
+
+    .od-piece-page--outlined {
+      border: var(--od-outline-width) solid var(--od-outline);
+      background: none;
+      color: var(--od-secondary);
+    }
+
+    .od-piece-page--filled:disabled,
+    .od-piece-page--outlined:disabled {
+      opacity: 0.38;
+    }
+
+    /* Only from a retired piece, at the bottom: red text, no fill. */
+    .od-piece-page--forever {
+      width: auto;
+      margin: 0 12px 32px;
+      height: 48px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 24px;
+      background: none;
+      color: var(--od-alarm);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    :global(.od-md3-dialog--actions button.od-piece-page--forever-confirm) {
+      color: var(--od-alarm);
     }
 
     .od-piece-page--name {
