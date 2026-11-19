@@ -5758,3 +5758,20 @@ Réglages › Équipement › Types de bouteilles › Vos types › a type (e.g.
 **Test:** delete a type used in dives: the count shown matches, the confirmation appears, the cylinders are gone from those dives after confirming, « Annuler » changes nothing. Delete an unused type: no dialog.
 
 **Done (19 November 2026), decision of Christian on the open point:** deleting one of « Vos types » deletes the type and removes its cylinders from the dives that use them, with their pressures and gas mix, EXCEPT where removing would damage the dive: (1) the cylinder is the cylinder the dive starts on (so also a dive's only cylinder), or (2) the dive depends on it (a gas change to it, a tank sensor mapped to it, or, with no explicit sensor mapping, a sensor from its index up). There the cylinder stays with its pressures, mix and events, and only its type is replaced by « unknown » (Subsurface's own name for a cylinder without a type; shown as « Type inconnu »). The removal uses Subsurface's own sequence (`get_cylinder_map_for_remove`, `remove_cylinder`, `cylinder_renumber`), so the other cylinders' gas changes and sensors keep pointing at the right cylinders. One undoable step in the core (façade `cylinder_type_delete`, actions `delete` and `deletePreview` of `cylinderTypes`); the dialog counts come from the core. Tests: `tests/cylinder_delete_test.cpp` on `tests/data/cylinder-delete.ssrf`, `tests/app/cylinder-type-delete.test.mjs`.
+
+## [ ] 2026-11-19-286 Units: gas consumption per minute follows the Volume unit
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `reglages-unites-android`, `ios-reglages-unites`, `reglages-bouteille-choix-android`, `android-tablette-reglages-paysage`, `android-tablette-reglages-portrait`, `tablette-reglages`, `bureau-reglages`, `bureau-reglages-macos`.
+
+There is no separate unit setting for gas consumption. The Volume unit decides it:
+
+- Volume in cubic feet → consumption in **ft³/min** (shown « pi³/min » in French).
+- Volume in litres → consumption in **l/min**.
+
+This covers the surface consumption rate (SAC / RMV) wherever it is shown or entered (planner, statistics, dive details) and the **metabolic O₂ consumption** in Réglages › Gaz et recycleur (pSCR). That field already shows « 0,03 pi³/min » in the mock-up: it must convert and relabel when the Volume unit changes, like the other fields.
+
+Do not offer pressure per minute (psi/min, bar/min): it depends on the cylinder, and Subsurface shows volume per minute.
+
+Under « Volume » in the Units settings, on every platform (Android phone and tablet, iPhone, iPad, desktop Windows/Linux and macOS), add the supporting line: « Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d'O₂, en pi³/min » — with the unit matching the current Volume unit (« en l/min » in metric).
+
+**Test:** switch Volume between litres and cubic feet: the line under Volume, the SAC fields of the planner and the metabolic O₂ consumption all change unit and value (1 ft³ = 28.3168 l).
