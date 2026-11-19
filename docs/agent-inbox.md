@@ -5915,3 +5915,20 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - Texts are in the mock-ups. Only features already decided as paid are listed: hide a row whose feature is not built yet, rather than promising it.
 
 **Test:** on a phone, an iPhone and a tablet, open the offer, check the spacing against the mock-ups, tap « Voir tout ce qui est inclus », scroll the list and check that the price footer stays in place and « S’abonner » works from both screens.
+
+## [ ] 2026-11-19-296 About screen texts and buttons, "everything included" subtitle
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `apropos-android`, `android-tablette-apropos-paysage`, `android-tablette-apropos-portrait`, `bureau-apropos`, plus `android-odplus-complet`, `ios-odplus-complet`, `android-tablette-odplus-complet-paysage`. The iPad and the iPhone follow these (task 294 and task 289).
+
+**About screen (all platforms)**
+- Under the version: « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. » (replaces « compatible avec les carnets Subsurface »).
+- Block « Libre, et votre carnet aussi » (phone and tablet; the tablet did not have it, add it before « Projet »):
+  - « L’offre de base reste toujours gratuite. Les apps et leur code sont sur GitHub : chacun peut toujours y télécharger les apps gratuitement, lire le code, le modifier et le partager. »
+  - « Exportable en tout temps, votre carnet vous appartient. » Do not name the logbook file format anywhere on this screen.
+- Buttons « Voir sur GitHub » (tonal, GitHub mark on the left) and « Exporter mon carnet » (outlined, download icon on the left). Icons 20 dp, 8 dp from the text, 48 dp tall. Phone: full width, one per line, 12 dp apart, 16 dp below the text. Tablet: side by side, 12 dp apart.
+- GitHub mark: use the official « GitHub Invertocat » black SVG supplied by Christian (path in the mock-ups), coloured #1F2124. Do not redraw it. It joins the Google and Apple logos as the only brand marks allowed.
+- Desktop: same first sentence. Text: « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient. » The desktop app is paid, so it does not say « gratuit » (Christian has not yet decided whether a free compiled desktop build is published). The two buttons sit side by side under the text, 40 dp tall.
+
+**« Tout ce qui est inclus » (task 295)**: add the subtitle « Tout ce qui est inclus dans l’offre OpenDives+. » under the title, 16/24, grey, on phone, iPhone and tablet.
+
+**Test:** open À propos on a phone, a tablet and the desktop app, compare texts and buttons with the mock-ups, tap « Voir sur GitHub » (opens the repository) and « Exporter mon carnet » (opens the export flow).
