@@ -1576,6 +1576,10 @@ html.ios {
       border-radius: 28px;
       translate: -50% 50%;
     }
+    /* iPad: the system's form sheet corners. */
+    .ios .sheet-modal.od-sheet-dialog {
+      border-radius: 14px;
+    }
     .sheet-modal.od-sheet-dialog [class*='--handle'] {
       display: none;
     }
