@@ -16,7 +16,7 @@ export const CATEGORIES = [
   { id: 'units', icon: 'M3 17h18v-6H3z M7 11v3 M11 11v2 M15 11v3 M19 11v2', groups: ['unitSystem', 'units', 'units2'] },
   { id: 'display', icon: 'M12 3a9 9 0 1 0 0 18V3z M12 3a9 9 0 0 1 0 18', groups: ['display', 'textSize', 'profileDisplay', 'po2Graph'] },
   { id: 'logbook', icon: 'M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z M9 8h6 M9 12h6', groups: ['logbook', 'startup', 'logbookFile'] },
-  { id: 'equipment', icon: 'M10.6 3v2c-2.5.5-4.5 2.7-4.5 5.7V19c0 1.7 1.3 2.5 3 2.5h5.8c1.7 0 3-.8 3-2.5v-8.3c0-3-2-5.2-4.5-5.7V3z', groups: ['equipment'] },
+  { id: 'equipment', icon: 'M10.6 3v2c-2.5.5-4.5 2.7-4.5 5.7V19c0 1.7 1.3 2.5 3 2.5h5.8c1.7 0 3-.8 3-2.5v-8.3c0-3-2-5.2-4.5-5.7V3z', groups: ['equipment', 'cylinderTypes'] },
   { id: 'decompression', icon: 'M3 5l3 7 4 3 5 1 3-4 3-7', groups: ['deco', 'conditions', 'flight'] },
   { id: 'gases', icon: 'M8 21V9a4 4 0 0 1 8 0v12z M12 5V3 M8 14h8', groups: ['partialPressures'] },
   { id: 'rebreather', icon: 'M4 12a8 8 0 0 1 14-5 M20 4v4h-4 M20 12a8 8 0 0 1-14 5 M4 20v-4h4', groups: ['rebreather'] },
