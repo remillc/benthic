@@ -6153,3 +6153,28 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - **Desktop** (`bureau-reglages-ordinateur-modifier`, new). Dialog over Réglages › Ordinateurs et téléchargement: photo with « Changer d’image » on the left, name and info on the right, the two cards side by side, « Annuler » and « Enregistrer » at the bottom.
 
 **Test:** on each device open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with its mock-up.
+
+## [ ] 2026-11-19-308 Maintenance reminders (#47): retire a piece, notifications, bottles, warnings, export
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. OpenDives+ only. It completes the maintenance screens of 18 November and tasks 306 and 307.
+
+**1. Retire a piece instead of deleting it.** The maintenance history of a piece is always kept.
+- The button on « Modifier l’ordinateur de plongée » (and on any piece's edit screen) is now « Retirer de l’équipement » (outlined, archive icon). It opens a dialog: « Retirer le Shearwater Perdix 2 ? », the text « Il quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés. Vous le retrouvez dans « Pièces retirées ». », an optional reason as filter chips (Vendue, Perdue, Hors d’usage), « Annuler » and « Retirer ». Phone `profil-piece-supprimer-android` (the file name stays, the content is the retire dialog), tablet `android-tablette-profil-piece-retirer-paysage`, desktop `bureau-profil-piece-retirer`. On iPhone an action sheet offers the reasons (`ios-profil-piece-retirer`).
+- A retired piece leaves the lists, the kits and the reminders, keeps its history and its dives. « Équipement » ends with a row « Pièces retirées » and their count (`profil-equipement-android`). The list of retired pieces and the sheet of a retired piece: `profil-piece-retiree-android`, `android-tablette-profil-piece-retiree-paysage`, `bureau-profil-piece-retiree`. The sheet shows « Retiré le 2 mars 2024 », the reason, « Remettre en service » and « Exporter l’historique », no pencil, and at the bottom « Supprimer pour de bon ».
+- « Supprimer pour de bon » (only from a retired piece) asks: « Supprimer pour de bon ? », « Le Suunto Vyper Air et tout son historique d’entretien seront effacés. Ce choix est définitif. Les plongées restent dans le carnet. », « Annuler » and « Supprimer » in red (`profil-piece-supprimer-definitif-android` and the tablet and desktop files of the same name).
+
+**2. Notifications.** New page Réglages › Notifications (`reglages-notifications-android`, `ios-reglages-notifications`, `bureau-reglages-notifications`), with an entry « Notifications » under « Unités » (`reglages-apercu-android`, `ios-reglages-apercu`, desktop category list). Section « Entretien de l’équipement »: switch « Rappels d’entretien », the default lead time (2 semaines, 30 jours, 60 jours: segmented buttons), switch « Rappeler si en retard » (once a week until the maintenance is recorded). Section « Après la plongée »: switch « Avion permis ». Notifications arrive at 9:00 (except the flight one). Each piece's own reminder may override the lead time: its choices are now 14 jours, 30 jours, 60 jours (`ent-regle-android` and the tablet and desktop « rappel » files; 7 days is gone). The two notifications are in `notif-entretien-android`: « Entretien dans 30 jours : Apeks XTX50 » with « Voir » and « Noter l’entretien », and « Entretien en retard : AL80 jaune » with « Voir » and « Me le rappeler dans 1 semaine ».
+
+**3. Bottles have two deadlines** (`ent-bouteille-android`, `android-tablette-profil-entretien-bouteille-paysage`, `bureau-profil-entretien-bouteille`): « Inspection visuelle » (every year) and « Épreuve hydraulique » (every 5 years, with the date stamped on the bottle, for example 03/22). Each has its own card, progress bar, « Noter … » button and reminder.
+
+**4. Overdue piece in a dive.** In « Ajouter de l’équipement », a piece that is overdue stays selectable but shows « Inspection visuelle en retard » in red with a warning icon (`equipement-ajout-retard-android`, `android-tablette-profil-plongee-ajout-retard-paysage`, `bureau-profil-plongee-ajout-retard`). Shown only when the piece's reminder has « Avertir dans une plongée » on.
+
+**5. Export the history** (`ent-historique-pdf`, letter size): the piece, its type, serial number, purchase date, dive count and next maintenance, then a table Date, Type, Fait par, Coût, Notes, then the attached invoices. Offered from a retired piece and from a piece's menu.
+
+**6. Other changes.**
+- The maintenance card shows the hours under water next to the dive count: « 82 plongées sur 100 · 61 h » (phone, tablet, desktop).
+- « Contrôle avant voyage » is removed (a trip is only in the logbook afterwards). A check before a trip is recorded by hand as an « Inspection ».
+- Dive computers have no maintenance reminder: the « Pile » reminder of the Perdix 2 is removed from every list and sheet, the counts drop to « 1 bientôt ». Not on the new part form of type Ordinateur either (task 306). Idea kept for after the launch (`docs/POST-LAUNCH.md`, #104).
+- The Android delete dialog of task 306 (« Supprimer l’ordinateur ») is replaced by point 1.
+
+**Test:** retire a piece with a reason, find it in « Pièces retirées », put it back in service, then retire and delete it for good. Turn the maintenance notifications off and on in Réglages › Notifications and change the lead time. Open the AL80 sheet and check the two deadlines. Add the overdue AL80 to a dive. Export a piece's history.
