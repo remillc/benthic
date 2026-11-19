@@ -33,7 +33,7 @@ export async function regressionFlows(h) {
   };
 
   console.log('Phone, 390x844: faults found by the random sequences');
-  const tab = await h.openTab(390, 844, true);
+  let tab = await h.openTab(390, 844, true);
 
   // Seed 11 (phone, both looks): a dive, « Planifier depuis cette plongée », the planner's « Retour » (which replaces
   // the planner by the list of plans), « Nouveau plan », then Back twice: the view was left with no current page.
@@ -66,6 +66,9 @@ export async function regressionFlows(h) {
   // The same fault on any stack four pages deep in the Logbook view, whose first page (the list) stays in the
   // document: Réglages opened over the Logbook, a subpage, a page under it, then Back three times.
   console.log(' Réglages > Types de blocs > a new type > Back > Back > Back');
+  // A page of its own: the fault above must not be the cause of this one.
+  tab.ws.close();
+  tab = await h.openTab(390, 844, true);
   const open = async (path) => {
     await tab.run((p) => { document.querySelector('.views > .view.tab-active').f7View.router.navigate(p); }, path);
     await reach(tab, path);
