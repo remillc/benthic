@@ -5938,3 +5938,17 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **« Tout ce qui est inclus » (task 295)**: add the subtitle « Tout ce qui est inclus dans l’offre OpenDives+. » under the title, 16/24, grey, on phone, iPhone and tablet.
 
 **Test:** open À propos on a phone, a tablet and the desktop app, compare texts and buttons with the mock-ups, tap « Voir sur GitHub » (opens the repository) and « Exporter mon carnet » (opens the export flow).
+
+## [ ] 2026-11-19-297 Desktop: catch up with the phone
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/bureau-*.dc.html` (Windows and Linux look; macOS follows its usual conventions). Behaviour and texts are those of the phone tasks; on the desktop a full phone screen becomes a dialog, a side panel or a snackbar.
+
+- **Download from a dive computer**: dialog « Télécharger des plongées » with remembered computers, computers plugged in by USB and Bluetooth computers nearby, « Choisir le modèle » for an unknown one, « Tout retélécharger » switch — `bureau-telechargement`; progress dialog with dives received so far and « Arrêter le téléchargement » — `bureau-telechargement-encours`; computer not found, three checks, « Choisir un autre ordinateur » / « Réessayer » — `bureau-telechargement-echec`.
+- **Several computers on one dive**: dialog with « Définir comme principal » — `bureau-detail-ordinateurs`.
+- **Share**: dialog Fiche PDF, Résumé et image (copied to the clipboard), Code QR — `bureau-partage`.
+- **Trip**: the trip page replaces the detail pane when a trip row is selected — `bureau-voyage`.
+- **.fit import** (drag and drop or File › Import): snackbar « 1 plongée importée depuis « … » · Annuler » — `bureau-import-fit`.
+- **Planned dives**: side panel opened by « Plans enregistrés » in Outils — `bureau-plans`.
+- **Settings pages**: Langue et formats, Profil et décompression (with the warning), Gaz et pressions partielles, Recycleur (O₂ consumption in l/min or ft³/min per the Volume unit), Ordinateurs et téléchargement (adds « Ports USB »), Cartes hors ligne (free space of this disk), Avancé — `bureau-reglages-langue`, `-decompression`, `-gaz`, `-recycleur`, `-ordinateurs`, `-cartes`, `-avance`.
+
+**Test:** in the desktop app, reach each screen and compare with its mock-up.
