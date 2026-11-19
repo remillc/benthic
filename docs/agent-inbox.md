@@ -6104,7 +6104,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the download screen and check that only a model with an image shows its photo. Open a dive computer in Équipement, tap the pencil and compare with the mock-up. Type a brand and a model that are not in the lists and save.
 
-## [ ] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
+## [x] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre` and `ios-odplus-offre` (updated).
 
@@ -6114,7 +6114,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the offer on a 390 dp wide phone (Android and iPhone) and compare the header with the mock-up side by side.
 
-## [ ] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
+**Done (19 November 2026).** The phone offer header is 264 dp (292 on iPhone): logo at 36 dp, chip, 24/32 title (two lines at 390 dp), 16/24 lead at 88% white, still bubbles at the mock-up's places. Compared with the mock-up in headless Chrome at 390 dp, Material and iOS.
+
+## [x] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mockups/`: `android-odplus-offre` (and `ios-odplus-offre`, same link).
 
@@ -6123,6 +6125,8 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mo
 **What to do:** match the mock-up. Link centered in the column (`align-self: center`), 48 dp high, symmetric padding `0 16px`, 4 dp gap between the text and the arrow, 17 dp text, weight 600, colour `#1F5C99`, 22 dp arrow. The pill hover/press area is 48 dp high and as wide as the link. Do the same on iPhone and on the tablet offer if it uses the same link. While there, check that the other buttons and texts of this screen are centered the way the mock-up shows.
 
 **Test:** open the offer on a phone and measure: the space left of the link equals the space right of it.
+
+**Done (19 November 2026).** The link is centred with 16 dp padding on both sides (68 dp left and right on a 390 dp phone, 24 dp on a tablet column), 48 dp high, 4 dp gap, 17 dp semi-bold text, 22 dp arrow. The global width: 100% on buttons stretched it; it is now as wide as the link.
 
 ## [ ] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
 

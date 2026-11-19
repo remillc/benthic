@@ -272,7 +272,7 @@
       </span>
     </div>
     <!-- « Voir tout ce qui est inclus » (task 2026-11-19-295): opens the list of everything the subscription includes. -->
-    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={20} weight={2.2} /></button>
+    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
     {@render priceBlock()}
     <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     {#if ios}
@@ -1013,18 +1013,20 @@
     /* « Voir tout ce qui est inclus ›»: a text link, 48 dp high. */
     .od-plus--see-all {
       align-self: center;
+      width: auto;
       height: 48px;
-      padding: 0 8px 0 16px;
+      padding: 0 16px;
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       border: none;
       border-radius: 24px;
       background: transparent;
       color: var(--od-release-link);
       font: inherit;
       font-size: 17px;
-      font-weight: 500;
+      line-height: 24px;
+      font-weight: 600;
       cursor: pointer;
 
       @media (hover: hover) {
@@ -1396,18 +1398,18 @@
         padding: 36px 16px 40px;
 
         .od-plus-hero--brand {
-          margin-bottom: 20px;
-        }
           gap: 8px;
           line-height: 28px;
+          margin-bottom: 20px;
+        }
 
-        .od-plus-hero--title {
-          font-size: 24px;
         .od-plus-hero--lead {
           line-height: 24px;
           color: rgb(255 255 255 / 0.88);
         }
 
+        .od-plus-hero--title {
+          font-size: 24px;
           line-height: 32px;
         }
 
