@@ -146,7 +146,7 @@
     <div class="od-gear-page--list">
       {#each items as g (g.id)}
         <button type="button" class="od-gear-page--row" onclick={() => open(g.id)}>
-          <span class="od-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={40} radius={10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
+          <span class="od-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={ios ? 36 : 40} radius={ios ? 8 : 10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
           <span class="od-gear-page--texts">
             <span class="od-gear-page--name">{g.name}{#if g.retired}<span class="od-gear-page--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
             {#if subLine(g)}<span class="od-gear-page--supporting">{subLine(g)}</span>{/if}
@@ -377,6 +377,13 @@
       justify-content: center;
       background: var(--od-release-tile);
       color: var(--od-text);
+    }
+
+    /* iPhone: 36 pt tiles with 8 pt corners (task 2026-11-19-306). */
+    :global(.ios) .od-gear-page--tile {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
     }
 
     .od-gear-page--texts {

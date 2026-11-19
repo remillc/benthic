@@ -10,6 +10,7 @@
   import { Sheet } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import DcTile from './DcTile.svelte';
+  import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import { layout, ios } from '../lib/layout.svelte.js';
   import { formatLongDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
@@ -70,7 +71,7 @@
             disabled={ios && !main ? busy : undefined}
             onclick={ios && !main ? () => onmain(c.index) : undefined}
           >
-            <DcTile model={c.model} />
+            <DcTile model={c.model} photo={ownComputerPhoto(c.model, c.serial)} />
             <span class="od-computers-sheet--texts">
               <span class="od-computers-sheet--name">{c.name}</span>
               {#if detail(c)}<span class="od-computers-sheet--line">{detail(c)}</span>{/if}

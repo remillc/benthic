@@ -758,6 +758,10 @@
       "unknown": "Unknown",
       "possible": "Possible duplicate of “{name}” ({details}).",
       "possibleMany": "{n} possible duplicates.",
+      "possibleSame": {"one": "Same model as “{name}” ({details}). Its dive most likely comes from the same computer.", "other": "Same model as “{name}” ({details}). Its {n} dives most likely come from the same computer."},
+      "possibleNoSerial": {"one": "Same model as “{name}” ({details}), but with no serial number. Its dive most likely comes from the same computer.", "other": "Same model as “{name}” ({details}), but with no serial number. Its {n} dives most likely come from the same computer."},
+      "notDuplicate": "Not a duplicate, or no longer used?",
+      "imageLabel": "Image of the {name}",
       "mergeWith": "Merge with {name}",
       "mergeWithMany": "Merge with…",
       "mergeHelp": {
@@ -2850,7 +2854,10 @@
       "Dive computers show their photo (dive detail, download choice, Equipment); it is downloaded once, then kept on the device. With no photo, or offline, the icon stays.",
       "“This ballast was” is now a rail: a pill slides from one choice to the next; touching the chosen choice clears it.",
       "Equipment: “Edit the dive computer” (brand and model with suggestions, or free text; “Change image” keeps your photo in your account, not shared).",
-      "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred."
+      "OpenDives+ offer: the header follows its design (logo and name, chip, a 24-point title, still bubbles) and “See everything included” is centred.",
+      "Dive computer photos show wherever the model appears: the equipment, kits and maintenance lists, the part sheet, the dive detail, Réglages › Dive computers of the logbook and the dive edit. Your own photo wins over the model’s.",
+      "After a download from a dive computer that is not in your equipment (OpenDives+), a card offers to add it: “Later” or “Add”. A logbook computer and an equipment piece are the same when brand, model and serial number match.",
+      "Deleting a dive computer asks “Delete the … ?”; “New piece” of type Dive computer has brand and model suggestions, the model’s photo and no maintenance reminder; “Edit the dive computer” follows each device; Réglages › Edit the dive computer is restyled (image, duplicate and remove cards)."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3296,6 +3303,10 @@
     "percent": "{n}%",
     "progressLabel": "Download progress",
     "keepNear": "Keep the screen on and the phone near the dive computer.",
+    "finished": "Download finished",
+    "receivedAll": "Dives received",
+    "finishedCount": {"one": "{n} dive", "other": "{n} dives"},
+    "firstTime": "This is the first time this {name} is downloaded.",
     "notAgain": "Dives already in the logbook are not downloaded again.",
     "received": "Received so far",
     "newDive": "New dive",
@@ -5518,7 +5529,25 @@
       "removeImage": "Remove my photo",
       "photoNote": "This photo stays in your account. It is not shared.",
       "noteHint": "For example, the backup computer",
-      "delete": "Delete the piece"
+      "suggestHint": "Choose from the list or type another name.",
+      "serialShort": "Serial no.",
+      "noteShort": "Notes",
+      "optional": "Optional",
+      "ok": "OK",
+      "delete": "Delete the dive computer"
+    },
+    "computerDelete": {
+      "title": "Delete the {name}?",
+      "text": "It will be removed from your equipment and your kits. The dives made with it stay in the logbook.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "computerOffer": {
+      "title": "Add the {name} to your equipment?",
+      "text": "It will be in My diver profile, with its serial number and its dives.",
+      "later": "Later",
+      "add": "Add",
+      "added": "{name} added to your equipment"
     },
     "pieceEdit": {
       "addTitle": "New piece",
@@ -5606,6 +5635,7 @@
       "photoRemove": "Remove the photo",
       "photoFailed": "The photo could not be read",
       "serialHint": "Number engraved on the piece",
+      "serialHintComputer": "Shown in the dive computer’s settings",
       "needName": "Enter a brand, a model or a name"
     }
   },

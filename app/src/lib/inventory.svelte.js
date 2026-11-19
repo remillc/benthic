@@ -5,6 +5,8 @@
 // The server is not wired yet (it waits for the project owner): `pending` counts the files changed on this device.
 import { OpenDivesCore } from 'opendives-core';
 import { createFileStore, indexedDbBackend, memoryBackend, requestPersistence } from './file-store.js';
+import { sameComputer } from './dc-model.js';
+import { deviceStore } from './device-store.js';
 import { createInventory, diveKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook } from './logbook.svelte.js';
 import { evaluate, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
@@ -129,7 +131,12 @@ export const kitsOf = (gearId) => gear.kits.filter((k) => k.gearIds.includes(gea
 export function figuresOf(g, computerDives) {
   const figures = pieceFigures(diveKeysOf(g.id), logbook.dives);
   if (g.type === 'computer') {
-    const recorded = computerDives?.get(`${g.computerModel}|${g.computerSerial ?? ''}`) ?? 0;
+    // The logbook's computer with the same brand, model and serial number (task 2026-11-19-306).
+    let recorded = computerDives?.get(`${g.computerModel}|${g.computerSerial ?? ''}`) ?? 0;
+    for (const [key, n] of computerDives ?? []) {
+      const cut = key.lastIndexOf('|');
+      if (sameComputer(g, { model: key.slice(0, cut), serial: key.slice(cut + 1) })) recorded = Math.max(recorded, n);
+    }
     figures.dives = Math.max(figures.dives, recorded);
   }
   return figures;
@@ -184,8 +191,10 @@ export const setReadOnly = (on) => change((inv) => inv.setReadOnly(on));
  * After a download: the computer it came from enters the inventory the first time, with its serial number and
  * its firmware. The logbook's entry for it gives the serial as « Ordinateurs du carnet » writes it.
  * @param {import('opendives-core').DownloadResult} result
+ * @param {boolean} [subscriber] an OpenDives+ account: the end of the download offers to add the computer
  */
-export async function noteDownloadedComputer(result) {
+export async function noteDownloadedComputer(result, subscriber = false) {
+  computerOffer.computer = null;
   try {
     const hex = (result.serial >>> 0).toString(16).toLowerCase();
     const plain = String(result.serial);
@@ -200,10 +209,49 @@ export async function noteDownloadedComputer(result) {
     if (!model) return;
     const serial = entry?.serial || (result.serial ? plain : '');
     const firmware = entry?.firmware || (result.firmware ? String(result.firmware) : '');
-    await change((inv) => inv.recordDownloadedComputer({ vendor: result.vendor, model, serial, firmware }));
+    const computer = { vendor: result.vendor, model, serial, firmware };
+    // A computer already in the equipment (brand, model and serial number) gets its firmware refreshed. One that is not
+    // is offered at the end of the download (OpenDives+ only); « Plus tard » hides the offer for that computer.
+    const known = await change((inv) => inv.recordDownloadedComputer(computer, { add: false }));
+    const key = offerKey(computer);
+    if (!known?.gear && subscriber && !hiddenOffers().includes(key)) computerOffer.computer = computer;
   } catch (e) {
-    console.error('Adding the downloaded computer to the inventory', e);
+    console.error('Offering the downloaded computer for the inventory', e);
   }
+}
+
+/** The card « Ajouter le Petrel 3 à votre équipement ? » at the end of a download: the computer it is about, or null. @type {{ computer: { vendor?: string, model: string, serial: string, firmware: string }|null }} */
+export const computerOffer = $state({ computer: null });
+
+/** @param {{ model: string, serial: string }} c */
+const offerKey = (c) => `${c.model}|${c.serial}`;
+const HIDDEN_KEY = 'od.computerOfferHidden';
+/** The computers whose offer was put off with « Plus tard », on this device. @returns {string[]} */
+function hiddenOffers() {
+  try {
+    return JSON.parse(deviceStore.getItem(HIDDEN_KEY) ?? '[]');
+  } catch {
+    return [];
+  }
+}
+
+/** « Ajouter »: the piece is created with brand, model, serial number and firmware; its photo is the model's. */
+export async function addOfferedComputer() {
+  const c = computerOffer.computer;
+  if (!c) return null;
+  computerOffer.computer = null;
+  const done = await change((inv) => inv.recordDownloadedComputer(c));
+  return done?.gear ?? null;
+}
+
+/** « Plus tard »: the offer is hidden for that computer. */
+export function putOffComputer() {
+  const c = computerOffer.computer;
+  computerOffer.computer = null;
+  if (!c) return;
+  const list = hiddenOffers();
+  const key = offerKey(c);
+  if (!list.includes(key)) deviceStore.setItem(HIDDEN_KEY, JSON.stringify([...list, key]));
 }
 
 if (import.meta.env?.DEV) /** @type {any} */ (globalThis).__inventory = { gear, loadInventory, change, setReadOnly };

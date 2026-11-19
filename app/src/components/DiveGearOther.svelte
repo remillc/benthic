@@ -47,7 +47,7 @@
     {#each pieces as g (g?.id)}
       {#if g}
         <li class="od-dive-gear--row">
-          <span class="od-dive-gear--icon"><GearIcon type={g.type} name={g.name} size={22} /></span>
+          <span class="od-dive-gear--icon"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
           <span class="od-dive-gear--texts">
             <span class="od-dive-gear--name">{g.name}</span>
             <span class="od-dive-gear--line">{g.note || t(`gear.inventory.type.${g.type}`)}</span>

@@ -8,6 +8,7 @@
   import Icon from './Icon.svelte';
   import ButtonGroup from './ButtonGroup.svelte';
   import DcTile from './DcTile.svelte';
+  import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import { FEEDBACK_CHOICES } from '../lib/weight-feedback.js';
   import { t } from '../lib/i18n.js';
 
@@ -19,7 +20,7 @@
    *   weightTotal: string,
    *   weights: { place: string, weight: string }[],
    *   computer?: string,
-   *   computers?: { name: string, model?: string, main: boolean }[],
+   *   computers?: { name: string, model?: string, serial?: string, main: boolean }[],
    *   open: boolean,
    *   opens?: boolean,
    *   ontoggle: () => void,
@@ -52,6 +53,16 @@
   const feedbackOptions = $derived(FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) })));
 </script>
 
+{#snippet noPhoto()}{/snippet}
+<!-- The main computer: its photo at 32 dp before its name (task 2026-11-19-306); a model without a photo shows the name alone. -->
+{#snippet computerValue()}
+  {@const main = computers[0]}
+  <span class="od-equipment-card--value od-equipment-card--computer-value">
+    {#if main?.model}<DcTile model={main.model} size={32} radius={8} photo={ownComputerPhoto(main.model, main.serial)} fallback={noPhoto} />{/if}
+    <span>{computer}</span>
+  </span>
+{/snippet}
+
 <div class="od-equipment-card">
   <svelte:element
     this={opens ? 'button' : 'div'}
@@ -74,7 +85,7 @@
         <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
       {/if}
       {#if computer && computerInSummary && !several}
-        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
+        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
       {/if}
     </span>
     {#if opens}<span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
@@ -94,7 +105,7 @@
   {/if}
   {#if spread && computer && !computerInSummary && !several}
     <div class="od-equipment-card--computer">
-      <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span><span class="od-equipment-card--value">{computer}</span></span>
+      <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
     </div>
   {/if}
   {#if several}
@@ -106,7 +117,7 @@
       </span>
       {#each computers as c, i (i)}
         <span class="od-equipment-card--computer-row">
-          <DcTile model={c.model ?? c.name} />
+          <DcTile model={c.model ?? c.name} photo={ownComputerPhoto(c.model ?? c.name, c.serial)} />
           <span class="od-equipment-card--computer-name">{c.name}</span>
           {#if c.main}<span class="od-equipment-card--main">{t('detail.mainBadge')}</span>{/if}
         </span>
@@ -241,6 +252,12 @@
         font-weight: 600;
         color: var(--od-text);
       }
+    }
+
+    .od-equipment-card--computer-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .od-equipment-card--chevron {

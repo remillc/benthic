@@ -101,3 +101,27 @@ export function brandModels(bluetooth, catalog) {
     modelsOf: (vendor) => sort([...(byVendor.get(modelKey(vendor))?.products.values() ?? [])]),
   };
 }
+
+/** A serial number as comparable text: blanks, "0x" and leading zeros dropped, lower case. @param {string|undefined|null} serial */
+export const serialKey = (serial) =>
+  String(serial ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/^0x/, '')
+    .replace(/^0+/, '');
+
+/**
+ * A dive computer of the equipment and a computer of the logbook are the same when brand, model and serial number
+ * match (task 2026-11-19-306). The piece's model text is the logbook's when the piece came from a download
+ * (`computerModel`), else its brand and model, else its name. Pure.
+ * @param {{ computerModel?: string, computerSerial?: string, brand?: string, model?: string, name?: string, serial?: string }} piece
+ * @param {{ model: string, serial: string }} computer
+ * @returns {boolean}
+ */
+export function sameComputer(piece, computer) {
+  const typed = [piece.brand, piece.model].filter(Boolean).join(' ');
+  const texts = [piece.computerModel, typed, piece.name].filter(Boolean);
+  const key = modelKey(computer.model);
+  if (!key || !texts.some((text) => modelKey(/** @type {string} */ (text)) === key)) return false;
+  return serialKey(piece.computerSerial ?? piece.serial) === serialKey(computer.serial);
+}

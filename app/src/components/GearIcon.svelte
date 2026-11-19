@@ -3,10 +3,18 @@
   // The icon of a piece of equipment, by type (task 2026-11-17-267). Simple strokes on 24 × 24, as Icon.svelte.
   // Decorative: the row's text names the piece.
   import Icon from './Icon.svelte';
+  import DcTile from './DcTile.svelte';
   import { isBuoyName } from '../lib/inventory.js';
+  import { ownPhoto } from '../lib/gear-photos.svelte.js';
+  import { ios } from '../lib/layout.svelte.js';
 
-  /** @type {{ type: import('../lib/inventory.js').GearType|'kit'|'buoy', name?: string, size?: number }} */
-  let { type, name = '', size = 24 } = $props();
+  /**
+   * A computer shows its photo (task 2026-11-19-306) when `piece` is given: the diver's own, else the catalog's
+   * for the model; a model without a photo keeps the icon. `tile`: the side in px of the tile the photo fills (the
+   * size of the icon it replaces); `radius`: its corner.
+   * @type {{ type: import('../lib/inventory.js').GearType|'kit'|'buoy', name?: string, size?: number, piece?: { computerModel?: string, name?: string, photoId?: string }, tile?: number, radius?: number }}
+   */
+  let { type, name = '', size = 24, piece, tile = 0, radius = ios ? 8 : 10 } = $props();
 
   /** @type {Record<string, string>} */
   const paths = {
@@ -25,7 +33,13 @@
   const path = $derived(paths[shown]);
 </script>
 
-{#if type === 'computer'}
+{#snippet computerIcon()}
+  <Icon name="wristComputer" {size} weight={1.8} />
+{/snippet}
+
+{#if type === 'computer' && piece && tile}
+  <DcTile model={piece.computerModel || piece.name || name} size={tile} {radius} photo={ownPhoto(piece.photoId)} fallback={computerIcon} />
+{:else if type === 'computer'}
   <Icon name="wristComputer" {size} weight={1.8} />
 {:else if path}
   <svg class="od-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path} /></svg>

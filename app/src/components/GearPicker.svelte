@@ -34,7 +34,7 @@
       <li>
         <button type="button" class="od-gear-picker--row" role="checkbox" aria-checked={on} {disabled} onclick={() => toggle(g.id)}>
           <span class="od-gear-picker--check" class:od-gear-picker--on={on} aria-hidden="true">{#if on}<Icon name="check" size={16} weight={2.6} />{/if}</span>
-          <span class="od-gear-picker--icon"><GearIcon type={g.type} name={g.name} size={22} /></span>
+          <span class="od-gear-picker--icon"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
           <span class="od-gear-picker--texts">
             <span class="od-gear-picker--name">{g.name}</span>
             {#if line(g)}<span class="od-gear-picker--line">{line(g)}</span>{/if}

@@ -127,7 +127,7 @@
       <h2 class="od-gear-list--group">{t(`gear.inventory.group.${group}`)}</h2>
       {#each items as g (g.id)}
         <button type="button" class="od-gear-list--row" class:od-gear-list--on={selected === g.id} aria-current={selected === g.id ? 'true' : undefined} onclick={() => showProfilePath(`/profile/gear/${g.id}`)}>
-          <span class="od-gear-list--tile" style:background={TONES[g.type] ?? 'var(--od-background)'}><GearIcon type={g.type} name={g.name} size={22} /></span>
+          <span class="od-gear-list--tile" style:background={TONES[g.type] ?? 'var(--od-background)'}><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
           <span class="od-gear-list--texts">
             <span class="od-gear-list--name">{g.name}{#if g.retired}<span class="od-gear-list--badge">{t('gear.inventory.archivedBadge')}</span>{/if}</span>
             {#if subLine(g)}<span class="od-gear-list--supporting">{subLine(g)}</span>{/if}

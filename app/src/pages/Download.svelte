@@ -25,6 +25,7 @@
   import LinearWavyProgress from '../components/LinearWavyProgress.svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { afterDownload, logbook } from '../lib/logbook.svelte.js';
+  import { computerOffer, addOfferedComputer, putOffComputer } from '../lib/inventory.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { layout } from '../lib/layout.svelte.js';
   import { downloadSalinity } from '../lib/tools.js';
@@ -201,12 +202,16 @@
       const result = await OpenDivesCore.downloadDives({ ...c, forceDownload, defaultSalinity: downloadSalinity(settings.downloadWater) });
       await afterDownload(result);
       if (leaving) return;
+      // A computer that is not in the equipment yet (OpenDives+): the screen stays on « Téléchargement terminé » with the
+      // card « Ajouter le … à votre équipement ? » (task 2026-11-19-306); closing it leaves as below.
+      if (result.downloaded && computerOffer.computer) {
+        finished = result;
+        phase = 'finished';
+        return;
+      }
       leaving = true;
       f7router.back();
-      // Back on the logbook after a successful download: the system may ask for a review.
-      if (result.downloaded) setTimeout(() => askReviewAfterDownload({ dives: logbook.dives.length, error: !!logbook.error, conflict: !!logbook.conflict }), 1500);
-      if (result.downloaded) announceDownload(result);
-      else toast(t('download.noneNew', { computer: result.product || c.product }));
+      afterSuccess(result, c.product);
     } catch (e) {
       const code = errorCode(e);
       console.error('Download', code, /** @type {any} */ (e)?.message);
@@ -272,7 +277,29 @@
     showSnackbar(text);
   }
 
+  /** Back on the logbook after a download: the system may ask for a review, and the toast says what arrived. @param {import('opendives-core').DownloadResult} result @param {string} product */
+  function afterSuccess(result, product) {
+    if (result.downloaded) setTimeout(() => askReviewAfterDownload({ dives: logbook.dives.length, error: !!logbook.error, conflict: !!logbook.conflict }), 1500);
+    if (result.downloaded) announceDownload(result);
+    else toast(t('download.noneNew', { computer: result.product || product }));
+  }
+
+  /** The download that ended on the offer card. @type {import('opendives-core').DownloadResult|null} */
+  let finished = $state(null);
+
+  async function addComputer() {
+    const piece = await addOfferedComputer();
+    if (piece) showSnackbar(t('gear.computerOffer.added', { name: piece.name }));
+  }
+
   function close() {
+    if (phase === 'finished' && finished) {
+      putOffComputer();
+      leaving = true;
+      f7router.back();
+      afterSuccess(finished, lastAttempt.computer?.product ?? '');
+      return;
+    }
     if (phase === 'downloading') {
       // The core stops at its next step (up to a dive's read); the screen
       // closes once it has.
@@ -375,6 +402,10 @@
       {/if}
     {/snippet}
   </Navbar>
+
+  {#snippet offerIcon()}
+    <span class="od-download--offer-icon" aria-hidden="true"><Icon name="wristComputer" size={28} weight={1.8} /></span>
+  {/snippet}
 
   {#snippet bluetoothState()}
     <div class="od-download--state">
@@ -484,6 +515,66 @@
         <span class="toggle-icon"></span>
       </span>
     </label>
+  {:else if phase === 'finished' && computer && finished}
+    <h2 class="od-download--subheader">{t('download.computer')}</h2>
+    <div class="od-download--computer" class:od-download--card={card}>
+      {@render avatar(computer.vendor, computer.product)}
+      <span class="od-download--texts">
+        <span class="od-download--headline">{computer.product}</span>
+        <span class="od-download--supporting">{subtitle(computer)}</span>
+      </span>
+      <span class="od-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
+    </div>
+
+    <div class="od-download--progress">
+      <div class="od-download--progress-head">
+        <span class="od-download--headline">{t('download.finished')}</span>
+        <span class="od-download--percent">{t('download.finishedCount', { n: finished.downloaded })}</span>
+      </div>
+      {#if theme.ios}
+        <div class="od-download--bar" role="progressbar" aria-label={t('download.progressLabel')} aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <div class="od-download--fill" style:width="100%"></div>
+        </div>
+      {:else}
+        <LinearWavyProgress value={1} label={t('download.progressLabel')} />
+      {/if}
+      {#if computerOffer.computer}<p class="od-download--hint">{t('download.firstTime', { name: computer.product })}</p>{/if}
+    </div>
+
+    {#if computerOffer.computer}
+      <div class="od-download--offer" role="group" aria-label={t('gear.computerOffer.title', { name: computer.product })}>
+        <div class="od-download--offer-head">
+          <DcTile model={computerOffer.computer.model} size={56} radius={12} fallback={offerIcon} />
+          <span class="od-download--texts">
+            <span class="od-download--offer-title">{t('gear.computerOffer.title', { name: computer.product })}</span>
+            <span class="od-download--supporting">{t('gear.computerOffer.text')}</span>
+          </span>
+        </div>
+        <div class="od-download--offer-actions">
+          <button type="button" class="od-download--offer-later" onclick={putOffComputer}>{t('gear.computerOffer.later')}</button>
+          <button type="button" class="od-download--offer-add" onclick={addComputer}>{t('gear.computerOffer.add')}</button>
+        </div>
+      </div>
+    {/if}
+
+    {#if received.length}
+      <h2 class="od-download--subheader">{t('download.receivedAll')}</h2>
+      <ul class="od-download--rows od-dive-list">
+        {#each received as d, i (`${d.date}-${i}`)}
+          <li class="od-download--dive">
+            <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} prefs={logbook.prefs} />
+            <span class="od-download--texts">
+              <span class="od-download--headline">{t('download.newDive')}</span>
+              <span class="od-download--supporting">{formatDateTime(d.date)}</span>
+            </span>
+            <span class="od-download--values">
+              <span class="od-download--depth">{formatDuration(d.durationSeconds)}</span>
+              {#if d.maxDepthMm}<span class="od-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
+            </span>
+          </li>
+        {/each}
+      </ul>
+    {/if}
   {:else if phase === 'downloading' && computer}
     <h2 class="od-download--subheader">{t('download.computer')}</h2>
     <div class="od-download--computer" class:od-download--card={card}>
@@ -815,6 +906,70 @@
       border-top-color: var(--od-text);
       border-radius: 50%;
       animation: od-download-spin 0.9s linear infinite;
+    }
+
+    /* « Ajouter le … à votre équipement ? »: a pale blue card, the photo, two lines, « Plus tard » and « Ajouter ». */
+    .od-download--offer {
+      margin: 16px 16px 0;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--od-release-note);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .od-download--offer-head {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .od-download--offer-title {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600;
+      color: var(--od-text);
+    }
+
+    .od-download--offer-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--od-surface);
+      color: var(--od-text-2);
+    }
+
+    .od-download--offer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .od-download--offer-later,
+    .od-download--offer-add {
+      width: auto;
+      height: 40px;
+      border: none;
+      border-radius: 20px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .od-download--offer-later {
+      padding: 0 16px;
+      background: transparent;
+      color: var(--od-secondary);
+    }
+
+    .od-download--offer-add {
+      padding: 0 20px;
+      background: var(--od-secondary);
+      color: var(--od-on-secondary);
     }
 
     .od-download--progress {

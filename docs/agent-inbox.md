@@ -6128,7 +6128,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mo
 
 **Done (19 November 2026).** The link is centred with 16 dp padding on both sides (68 dp left and right on a 390 dp phone, 24 dp on a tablet column), 48 dp high, 4 dp gap, 17 dp semi-bold text, 22 dp arrow. The global width: 100% on buttons stretched it; it is now as wide as the link.
 
-## [ ] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
+## [x] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. It follows tasks 302 and 303 (idea #65). Image loading states (downloading, failed, offline) are yours, already in progress: no mock-up.
 
@@ -6145,6 +6145,8 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **6. Réglages › « Modifier l’ordinateur » restyled** (`reglages2-ordinateur-modifier-android`). Same look as the profile edit screen: close and filled « Enregistrer » in the bar, large title, model photo with « Changer d’image », then the name field and the info card. The duplicate block is now two cards: a sand card « Doublon possible » (icon, explanation, full-width filled « Fusionner avec Perdix » and its hint) and a white card « Pas un doublon, ou plus utilisé ? » with the outlined « Retirer de la liste » and its hint. Buttons are full width and the hints centered. Apply the same to the tablet versions (`android-tablette-ordinateur-modifier-*`).
 
 **Test:** check a model with and without image in each listed screen. Download a computer that is not in the equipment and add it from the card. Edit and delete a computer from the profile on each device. Create a new part of type Ordinateur. Open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with the mock-up.
+
+**Done (19 November 2026).** Photos via GearIcon/DcTile in every list and the dive detail (own photo wins: lib/gear-photos.svelte.js); linking by brand/model/serial (sameComputer); download end card (Later/Add, hidden list in the device store, OD+ only; the download no longer adds the computer silently); ComputerDeleteDialog; Nouvelle pièce adapted to computers; Réglages › Modifier l’ordinateur restyled for all devices (also covers the layouts of task 307). The image button of a logbook computer shows with an OpenDives+ account only: the photo is kept on the matching equipment piece, created if missing.
 
 ## [ ] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
 

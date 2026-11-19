@@ -611,9 +611,9 @@ export async function afterDownload(result) {
   }
   // Release edition: the computer enters the equipment inventory the first time it is downloaded from
   // (task 2026-11-17-267). Imported after the dives, so that the logbook's list of computers is up to date.
-  const noteComputer = result && isRelease ? () => import('./inventory.svelte.js').then((m) => m.noteDownloadedComputer(result)) : null;
+  const noteComputer = result && isRelease ? () => import('./inventory.svelte.js').then((m) => m.noteDownloadedComputer(result, isSubscriber())) : null;
   if (!result?.downloaded) {
-    noteComputer?.();
+    await noteComputer?.();
     return;
   }
   logbook.undoText = result.undo;
@@ -621,7 +621,7 @@ export async function afterDownload(result) {
   logbook.dives = await OpenDivesCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
-  noteComputer?.();
+  await noteComputer?.();
 }
 
 /**
