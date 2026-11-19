@@ -15,6 +15,7 @@
   // value is the core's preference (core/pref.h), with Subsurface's default,
   // kept as a setting of this device (lib/settings.svelte.js); trip grouping is
   // the logbook's. The planner's own parameters stay in the planner.
+  import { hiddenBluetooth, showAllBluetooth } from '../lib/hidden-bluetooth.svelte.js';
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -1641,6 +1642,15 @@
     {#if group('download').rows.length}
       <div class="od-settings--surface" role="list">
         {#each group('download').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
+        {#if hiddenBluetooth.addresses.length}
+          <div role="listitem" class="od-settings--row">
+            <span class="od-settings--texts">
+              <span class="od-settings--label">{t('settings.computers.hidden', { n: hiddenBluetooth.addresses.length })}</span>
+              <span class="od-settings--supporting">{t('settings.computers.hiddenText')}</span>
+            </span>
+            <button type="button" class="od-outlined-button" onclick={showAllBluetooth}>{t('settings.computers.showHidden')}</button>
+          </div>
+        {/if}
       </div>
     {/if}
     {#if computersShown}

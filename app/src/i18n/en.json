@@ -818,6 +818,9 @@
       "forgetOneText": "It will no longer be offered for download. Dives already downloaded do not change.",
       "showAll": "Show all Bluetooth devices",
       "showAllText": "Also shows devices not recognised as dive computers",
+      "hidden": "Hidden devices ({n})",
+      "hiddenText": "Left out of the nearby list on the download screen",
+      "showHidden": "Show again",
       "forgetAll": {
         "one": "Forget the remembered computer",
         "other": "Forget the remembered computers"
@@ -2890,7 +2893,8 @@
       "A cylinder has two deadlines, each with its own card, bar, “Record …” button and reminder: the visual inspection (every year) and the hydrostatic test (every 5 years, with the date stamped on the cylinder, like 03/22). The maintenance card also shows the hours under water next to the dives (“82 dives out of 100 · 61 h”). In “Add equipment”, an overdue piece stays selectable but says in red what is late, when its reminder warns in a dive.",
       "Downloading from a dive computer no longer freezes the screen when the error report sheet opens.",
       "On Windows, “Edit dive” and the quick entry now save every site: some sites (more than half of them) could not be found when saving.",
-      "Account: choosing “Subscriber” in the development menu (or any OpenDives+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”."
+      "Account: choosing “Subscriber” in the development menu (or any OpenDives+ subscription) now makes the account sheet the subscriber’s one at once, whatever the place of the logbook. “My diver profile” opens the profile, and “Backup and restore” says that the logbook is only on this device, with “Send the logbook to the server”.",
+      "Download: a lamp or a scale whose name starts with “S1” (“S19 A69C LE”) is no longer offered as an Oceans S1. Each device in the nearby list has a menu with “This is not a dive computer”, which hides it for good (Undo in the message); Settings › Download lists the hidden devices with “Show again”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3335,6 +3339,9 @@
     "pairingNote": "The first time, the phone may ask for the code shown by the dive computer.",
     "remembered": "Remembered dive computers",
     "nearby": "Nearby",
+    "moreFor": "More options for {name}",
+    "notAComputer": "This is not a dive computer",
+    "hidden": "{name} hidden",
     "seen": "In range",
     "searching": "Looking for dive computers…",
     "noneFound": "No dive computer found.",
