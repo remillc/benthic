@@ -6,10 +6,10 @@ header{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;
 header h1{font-size:16px;margin:0;flex:1}header input{padding:6px 8px;border-radius:6px;border:0;min-width:220px}
 button{font:inherit;padding:6px 12px;border-radius:6px;border:1px solid #1f2124;background:#1f2124;color:#fff;cursor:pointer}
 button.secondary{background:#fff;color:#1f2124}header button{border-color:#fff}
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;padding:16px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:16px}
 .card{background:#fff;border:1px solid #d6d9dc;border-radius:10px;padding:10px}.card.has-crop{border-color:#2f6fb5;box-shadow:0 0 0 2px #2f6fb5}
-.pair{display:flex;gap:8px}.pair div{flex:1;background:#eee;border-radius:6px;display:flex;align-items:center;justify-content:center;aspect-ratio:1;overflow:hidden}
-.pair img{max-width:100%;max-height:100%;object-fit:contain}
+.shot{background:#fff;border:1px solid #e3e5e8;border-radius:6px;aspect-ratio:1;overflow:hidden;cursor:pointer}
+.shot img,.shot canvas{width:100%;height:100%;display:block;object-fit:contain}
 .meta{margin:8px 0 6px;font-weight:600}.sub{font-size:12px;color:#5a6066;margin-bottom:6px}.low{color:#a4580a;font-weight:600}
 #overlay{position:fixed;inset:0;background:rgba(10,20,30,.88);display:none;z-index:10;flex-direction:column}
 #overlay.open{display:flex}#bar{display:flex;gap:8px;padding:10px 16px;align-items:center;color:#fff}#bar span{flex:1}
@@ -30,24 +30,52 @@ button.secondary{background:#fff;color:#1f2124}header button{border-color:#fff}
 <div id="stage"><div id="wrap"><img id="big" alt=""><div id="rect"><i class="h" data-d="nw"></i><i class="h" data-d="n"></i><i class="h" data-d="ne"></i><i class="h" data-d="e"></i><i class="h" data-d="se"></i><i class="h" data-d="s"></i><i class="h" data-d="sw"></i><i class="h" data-d="w"></i></div></div></div></div>
 <script>
 const ITEMS=/*ITEMS*/[];
-const crops=/*CROPS*/{};
+// The crops embedded at generation (crops.json), with this browser's changes on top (kept between visits).
+const STORE='dc-images-crops';
+const crops=Object.assign(/*CROPS*/{},JSON.parse(localStorage.getItem(STORE)||'{}'));
+for(const k of Object.keys(crops))if(crops[k]===null)delete crops[k];
+const local=JSON.parse(localStorage.getItem(STORE)||'{}');
+const remember=(k,v)=>{local[k]=v;localStorage.setItem(STORE,JSON.stringify(local));};
 const key=(i)=>i.vendor+'|'+i.product;
 const grid=document.getElementById('grid');
+// The image the card shows: with a manual crop, drawn here like build.mjs does (crop, fit inside 88 %, centred on
+// white); without one, the normalized file build.mjs wrote (background trimmed).
+const MARGIN=0.06,SIZE=512;
+const originals={};
+function loadOriginal(it){return originals[it.slug]||(originals[it.slug]=new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=ko;im.src=it.orig;}));}
+async function drawCrop(canvas,it,c){
+  const im=await loadOriginal(it);
+  canvas.width=SIZE;canvas.height=SIZE;const g=canvas.getContext('2d');
+  g.fillStyle='#fff';g.fillRect(0,0,SIZE,SIZE);
+  const inner=SIZE*(1-2*MARGIN),s=Math.min(inner/c.w,inner/c.h),w=c.w*s,h=c.h*s;
+  g.imageSmoothingQuality='high';g.drawImage(im,c.x,c.y,c.w,c.h,(SIZE-w)/2,(SIZE-h)/2,w,h);
+}
+function shot(it){
+  const d=document.createElement('div');d.className='shot';d.title='Recadrer';d.onclick=()=>openCrop(it);
+  const c=crops[key(it)];
+  if(c){const cv=document.createElement('canvas');d.append(cv);drawCrop(cv,it,c);}
+  else{const im=document.createElement('img');im.loading='lazy';im.src=it.norm+'?v='+Date.now();d.append(im);}
+  return d;
+}
+function card(it){
+  const c=document.createElement('div');c.className='card'+(crops[key(it)]?' has-crop':'');c.dataset.slug=it.slug;
+  const m=document.createElement('div');m.className='meta';m.textContent=it.vendor+' '+it.product;
+  const sub=document.createElement('div');sub.className='sub';
+  const conf=document.createElement('span');conf.textContent=it.confidence;if(it.confidence==='low')conf.className='low';
+  sub.append(conf,' · ',crops[key(it)]?'recadrage manuel':'recadrage auto');
+  const b=document.createElement('button');b.className='secondary';b.textContent='Recadrer';b.onclick=()=>openCrop(it);
+  c.append(shot(it),m,sub,b);return c;
+}
+// Only the card of the model just cropped is redrawn: the page keeps its place.
+function refresh(it){const old=grid.querySelector('[data-slug="'+it.slug+'"]');if(old)old.replaceWith(card(it));count();}
+function count(){document.getElementById('count').textContent=grid.children.length+' modèles · '+Object.keys(crops).length+' recadrés à la main';}
 function render(){
-  const q=document.getElementById('q').value.toLowerCase();grid.textContent='';let n=0;
+  const q=document.getElementById('q').value.toLowerCase();grid.textContent='';
   for(const it of ITEMS){
-    if(q&&!(it.vendor+' '+it.product).toLowerCase().includes(q))continue;n++;
-    const c=document.createElement('div');c.className='card'+(crops[key(it)]?' has-crop':'');
-    const pair=document.createElement('div');pair.className='pair';
-    for(const s of [it.norm,it.orig]){const d=document.createElement('div');const im=document.createElement('img');im.loading='lazy';im.src=s;d.append(im);pair.append(d);}
-    const m=document.createElement('div');m.className='meta';m.textContent=it.vendor+' '+it.product;
-    const sub=document.createElement('div');sub.className='sub';
-    const conf=document.createElement('span');conf.textContent=it.confidence;if(it.confidence==='low')conf.className='low';
-    sub.append(conf,' · ',crops[key(it)]?'recadrage manuel':'recadrage auto');
-    const b=document.createElement('button');b.className='secondary';b.textContent='Recadrer';b.onclick=()=>openCrop(it);
-    c.append(pair,m,sub,b);grid.append(c);
+    if(q&&!(it.vendor+' '+it.product).toLowerCase().includes(q))continue;
+    grid.append(card(it));
   }
-  document.getElementById('count').textContent=n+' modèles';
+  count();
 }
 document.getElementById('q').oninput=render;
 const ov=document.getElementById('overlay'),big=document.getElementById('big'),rect=document.getElementById('rect');
@@ -85,12 +113,13 @@ wrap.addEventListener('pointermove',(e)=>{
 const end=()=>{drag=null;};
 wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end);
 document.getElementById('cancel').onclick=()=>ov.classList.remove('open');
-document.getElementById('clear').onclick=()=>{delete crops[key(cur)];ov.classList.remove('open');render();};
+document.getElementById('clear').onclick=()=>{delete crops[key(cur)];remember(key(cur),null);ov.classList.remove('open');refresh(cur);};
 document.getElementById('apply').onclick=()=>{
   if(!box||box.w<8||box.h<8){alert('Tracez d’abord un rectangle.');return;}
   const k=big.naturalWidth/big.clientWidth;
   crops[key(cur)]={x:Math.round(box.x*k),y:Math.round(box.y*k),w:Math.round(box.w*k),h:Math.round(box.h*k)};
-  ov.classList.remove('open');render();
+  remember(key(cur),crops[key(cur)]);
+  ov.classList.remove('open');refresh(cur);
 };
 document.getElementById('export').onclick=()=>{
   const sorted=Object.fromEntries(Object.keys(crops).sort().map((k)=>[k,crops[k]]));
