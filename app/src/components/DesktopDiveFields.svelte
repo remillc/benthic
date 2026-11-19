@@ -32,6 +32,7 @@
   import { formatCoordinates } from '../lib/sites.svelte.js';
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
+  import { cylinderTypeLabel } from '../lib/cylinder-types.js';
 
   /**
    * `tab`: 'info', 'equipment', 'gas', 'notes' or 'map'. `location` and `trip` are the read-only lines of
@@ -228,8 +229,8 @@
   }
   /** @param {import('opendives-core').Cylinder} c */
   const typeOptions = (c) => {
-    const list = cylinderTypes.map((x) => ({ value: x.name, label: x.name }));
-    if (c.description && !list.some((o) => o.value === c.description)) list.unshift({ value: c.description, label: c.description });
+    const list = cylinderTypes.map((x) => ({ value: x.name, label: cylinderTypeLabel(x.name) }));
+    if (c.description && !list.some((o) => o.value === c.description)) list.unshift({ value: c.description, label: cylinderTypeLabel(c.description) });
     return list;
   };
   /** @param {number} index @param {string} name */

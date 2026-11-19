@@ -4,7 +4,9 @@
   // name, volume and working pressure, and "Remove" for a type of the device's
   // library. As Subsurface's cylinder-type manager: renaming also renames the
   // cylinders of that type in the logbook (one undoable step); resizing or
-  // removing changes the device's list only, never existing dives.
+  // removing a standard type changes the device's list only, never existing
+  // dives. Deleting one of the diver's own types also takes its cylinders out of
+  // the dives that use them, except where a dive depends on one (task 285).
 
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
@@ -16,7 +18,8 @@
   import { isDirty } from '../lib/leave-guard.js';
   import { t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
-  import { logbook, renameCylinderType } from '../lib/logbook.svelte.js';
+  import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
+  import { deletable, deletionSentences } from '../lib/cylinder-types.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { formatNumber, locale } from '../lib/format.js';
@@ -34,6 +37,8 @@
   let pressure = $state('');
   let error = $state('');
   let saving = $state(false);
+  /** What deleting the type does to the dives, read once the type is open. @type {import('opendives-core').CylinderTypeDeletion|null} */
+  let deletion = $state(null);
 
   const cuft = $derived(logbook.prefs.volume === 'cuft');
   const psi = $derived(logbook.prefs.pressure === 'psi');
@@ -60,6 +65,7 @@
       const { types } = await OpenDivesCore.cylinderTypes({ action: 'list' });
       type = types.find((ty) => ty.name === original) ?? null;
       if (!type) return;
+      if (deletable(type)) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
       pressure = type.mbar ? number(psi ? type.mbar / PSI_MBAR : type.mbar / 1000, 0) : '';
       // In cubic feet, the gas volume at working pressure, as Subsurface shows it.
       volume = type.ml ? number(cuft ? (type.ml / CUFT_ML) * (type.mbar / 1013.25) : type.ml / 1000, cuft ? 0 : 1) : '';
@@ -145,6 +151,37 @@
     return t(type.standard ? 'settings.cylinders.noteStandard' : 'settings.cylinders.noteYours', { use });
   });
 
+  const deleteNote = $derived(!type || !type.dives ? t('settings.cylinders.deleteTypeNone') : deletion ? deletionSentences(deletion).join(' ') : '');
+
+  async function deleteTheType() {
+    if (!type) return;
+    try {
+      if (!type.dives) {
+        await deleteNow();
+        return;
+      }
+      const counts = deletion ?? (await previewCylinderTypeDeletion(original));
+      confirmAction({
+        title: t('settings.cylinders.deleteTypeTitle', { name: original }),
+        text: [...deletionSentences(counts), t('settings.cylinders.deleteIrreversible')].join(' '),
+        action: t('settings.cylinders.deleteTypeAction'),
+        danger: true,
+        onConfirm: deleteNow,
+      });
+    } catch (e) {
+      failure(e);
+    }
+  }
+
+  async function deleteNow() {
+    try {
+      await deleteCylinderType(original);
+      f7router.back();
+    } catch (e) {
+      failure(e);
+    }
+  }
+
   function remove() {
     confirmAction({
       title: t('settings.cylinders.deleteTitle', { name: original }),
@@ -191,7 +228,15 @@
   {#if usageNote}<p class="od-cylinder-type--note">{usageNote}</p>{/if}
 
   {#if editing && type}
-    {#if type.library}
+    {#if deletable(type)}
+      <div class="od-cylinder-type--action">
+        <button type="button" class="od-outlined-button od-danger od-cylinder-type--delete" onclick={deleteTheType}>
+          <Icon name="delete" size={18} />
+          {t('settings.cylinders.deleteType')}
+        </button>
+      </div>
+      {#if deleteNote}<p class="od-cylinder-type--note od-cylinder-type--delete-note">{deleteNote}</p>{/if}
+    {:else if type.library}
       <div class="od-cylinder-type--action">
         <button type="button" class="od-outlined-button od-danger" onclick={remove}>{t('settings.cylinders.delete')}</button>
       </div>
@@ -223,6 +268,19 @@
       margin-top: 24px;
       display: flex;
       justify-content: center;
+    }
+
+    /* The red of « Supprimer le compte » (--od-late), not the alarm red. */
+    .od-cylinder-type--delete {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-color: var(--od-late);
+      color: var(--od-late-text);
+    }
+
+    .od-cylinder-type--delete-note {
+      text-align: center;
     }
 
     .od-cylinder-type--note.od-cylinder-type--first {

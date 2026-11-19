@@ -238,6 +238,8 @@ static void send_sync_progress(const char *message)
 		ret = opendives::cylinder_types(json);
 	} else if (action == "rename") {
 		ret = opendives::cylinder_type_rename(name, value, json, message);
+	} else if (action == "delete" || action == "deletePreview") {
+		ret = opendives::cylinder_type_delete(name, action == "deletePreview", json, message);
 	} else {
 		ret = opendives::cylinder_type_action(action, name, (int)ml, (int)mbar, json, message);
 	}

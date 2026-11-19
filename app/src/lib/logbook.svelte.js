@@ -189,6 +189,34 @@ export async function renameCylinderType(name, newName) {
   return result;
 }
 
+/**
+ * What deleting one of the diver's cylinder types would do to the dives: how many lose the
+ * cylinder and how many keep it, with its type cleared (the dive's only cylinder, or one a gas
+ * change or the pressure graph depends on). Nothing changes.
+ * @param {string} name
+ * @returns {Promise<import('opendives-core').CylinderTypeDeletion>}
+ */
+export async function previewCylinderTypeDeletion(name) {
+  const result = await OpenDivesCore.cylinderTypes({ action: 'deletePreview', name });
+  return result.deletion ?? { removed: 0, kept: 0 };
+}
+
+/**
+ * Deletes one of the diver's cylinder types: the type, and its cylinders from the dives that use
+ * them (one undoable step, saved and synced like an edit), except where a dive depends on one.
+ * @param {string} name
+ */
+export async function deleteCylinderType(name) {
+  const result = await OpenDivesCore.cylinderTypes({ action: 'delete', name });
+  invalidateCoreCache();
+  keepCylinderLibrary(result.library);
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await persistChanges();
+  return result;
+}
+
 /** Delay before an edit is synced: the time Undo is offered (spec: "a few seconds after a change"). */
 const SYNC_DELAY_MS = 5000;
 /** @type {ReturnType<typeof setTimeout>|undefined} */

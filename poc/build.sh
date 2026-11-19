@@ -50,7 +50,7 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/core/libopendives/settings.cpp"; echo "$ROOT/core/libopendives/plan.cpp"
   echo "$ROOT/core/libopendives/filter.cpp"; echo "$ROOT/core/libopendives/account.cpp"
   echo "$ROOT/core/libopendives/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"
-  echo "$ROOT/core/libopendives/download.cpp"; echo "$ROOT/core/libopendives/odgit.cpp"; echo "$ROOT/tests/odgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/core/libopendives/download.cpp"; echo "$ROOT/core/libopendives/odgit.cpp"; echo "$ROOT/tests/odgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/cylinder_delete_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; } > "$B/sources.txt"
 
 # Objects are only rebuilt when their source is newer: compiled again in full
 # when the flags change (BT_SUPPORT and BLE_SUPPORT enable Subsurface's
@@ -64,7 +64,7 @@ export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|opendives|edit|tools|settings|plan|filter|account|stats|download|odgit|odgit_test)[.]o$')
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|cylinder_delete_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|opendives|edit|tools|settings|plan|filter|account|stats|download|odgit|odgit_test)[.]o$')
 FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/odgit.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
@@ -80,6 +80,7 @@ g++ $OBJS $FACADE "$B/obj/git_remote_test.o" -o "$B/git-remote" $LIBS
 g++ $OBJS $FACADE "$B/obj/stats_test.o" -o "$B/stats" $LIBS
 g++ $OBJS $FACADE "$B/obj/download_test.o" -o "$B/download" $LIBS
 g++ $OBJS $FACADE "$B/obj/cylinder_reorder_test.o" -o "$B/cylinder-reorder" $LIBS
+g++ $OBJS $FACADE "$B/obj/cylinder_delete_test.o" -o "$B/cylinder-delete" $LIBS
 g++ $OBJS $FACADE "$B/obj/fit_import_test.o" -o "$B/fit-import" $LIBS
 g++ $OBJS $FACADE "$B/obj/multi_dive_test.o" -o "$B/multi-dive" $LIBS
 g++ $OBJS $FACADE "$B/obj/import_formats_test.o" -o "$B/import-formats" $LIBS

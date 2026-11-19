@@ -361,6 +361,16 @@ int dive_computer_action(const std::string &action, const std::string &model, co
 int cylinder_type_rename(const std::string &old_name, const std::string &new_name, std::string &json,
 			 std::string &error);
 
+// Deletes one of the diver's cylinder types (one of the library or of the dives, not a standard one;
+// NOT_FOUND otherwise): the cylinders of that type leave the dives that use
+// them (one undoable step), except where taking one out would damage the dive
+// (the cylinder the dive starts on, so a dive's only cylinder; a gas change or
+// a tank sensor refers to it): there it stays, with its type description
+// replaced by "unknown" (Subsurface's own name for it). With dry_run nothing changes. Writes cylinder_types() with
+// "deletion": {"removed": dives that lose the cylinder, "kept": dives that keep
+// at least one, type cleared}.
+int cylinder_type_delete(const std::string &name, bool dry_run, std::string &json, std::string &error);
+
 // Dive sites (spec, section 4, "Sites"), by uuid; each change one undoable
 // step as Subsurface's site commands. Coordinates in micro-degrees.
 // site_json: summary + description, notes, countryTaxonomy/region/city

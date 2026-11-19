@@ -57,6 +57,7 @@
   import { cloneEquipment, diveKeyOf, emptyEquipment, sameEquipment } from '../lib/inventory.js';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import { FEEDBACK_CHOICES, feedbackOf, isFeedbackTag, toggleFeedback, visibleTags, withFeedback } from '../lib/weight-feedback.js';
+  import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { cylinderKey, isMostRecent, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
 
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
@@ -385,8 +386,8 @@
   const waterOptions = $derived([{ value: '', label: t('edit.notSet') }, ...WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))]);
   /** The cylinder types, with this cylinder's own when it is not among them. @param {string} own */
   const cylinderTypeOptions = (own) => {
-    const list = cylinderTypes.map((c) => ({ value: c.name, label: c.name }));
-    if (own && !list.some((o) => o.value === own)) list.unshift({ value: own, label: own });
+    const list = cylinderTypes.map((c) => ({ value: c.name, label: cylinderTypeLabel(c.name) }));
+    if (own && !list.some((o) => o.value === own)) list.unshift({ value: own, label: cylinderTypeLabel(own) });
     if (!own) list.unshift({ value: '', label: t('edit.noType') });
     list.push({ value: OTHER_TYPE, label: t('edit.otherType') });
     return list;

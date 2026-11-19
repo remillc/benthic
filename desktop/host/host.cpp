@@ -710,6 +710,8 @@ void register_methods()
 			ret = opendives::cylinder_types(json);
 		} else if (action == "rename")
 			ret = opendives::cylinder_type_rename(name, value, json, error);
+		else if (action == "delete" || action == "deletePreview")
+			ret = opendives::cylinder_type_delete(name, action == "deletePreview", json, error);
 		else
 			ret = opendives::cylinder_type_action(action, name, a.i32("ml"), a.i32("mbar"), json, error);
 		if (ret)

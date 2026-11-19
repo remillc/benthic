@@ -832,7 +832,7 @@
     },
     "cylinders": {
       "title": "Cylinder types",
-      "intro": "Offered when choosing the type of a cylinder. Renaming a type also renames the cylinders of that type in the logbook. Changing its size or removing it does not change existing dives.",
+      "intro": "Offered when choosing the type of a cylinder. Renaming a type also renames the cylinders of that type in the logbook. Changing its size does not change existing dives. Deleting one of your types removes its cylinders from the dives that use them.",
       "yours": "Your types",
       "standard": "Standard",
       "standardNote": "Standard types can be changed like yours.",
@@ -847,6 +847,14 @@
       "deleteTitle": "Remove {name}?",
       "deleteText": "The type is no longer offered. Existing dives do not change.",
       "deleteAction": "Remove",
+      "deleteType": "Delete this type",
+      "deleteTypeTitle": "Delete “{name}”?",
+      "deleteTypeAction": "Delete",
+      "deleteTypeNone": "Not used in any dive.",
+      "deleteRemoved": { "one": "Removes this cylinder from {n} dive.", "other": "Removes this cylinder from {n} dives." },
+      "deleteKept": { "one": "In {n} dive where it is used for the profile or is the only cylinder, it stays, without a type.", "other": "In {n} dives where it is used for the profile or is the only cylinder, it stays, without a type." },
+      "deleteIrreversible": "This action cannot be undone.",
+      "unknown": "Unknown type",
       "fromLogbook": "This type comes from the dives of the logbook. It stays offered while a dive uses it.",
       "nameInUse": "This name is already a type",
       "nameMissing": "Enter a name",
@@ -2573,7 +2581,8 @@
       "Replace this logbook: this device keeps one logbook at a time. A logbook file (Subsurface .ssrf, or an archive holding one) opened with OpenDives or chosen in “+” › Import a file now offers “Replace this logbook”: a screen says the logbook leaves this device and offers “Export this logbook first”; “Replace” asks a second time when it was not exported or when changes are not synchronised, then you name the new logbook. The current logbook is put back if the file cannot be read. The OpenDives server logbook and a logbook synchronised with an account are never replaced, with a line that says why. When an archive holds several logbooks, only the main one is imported and the dialog says so.",
       "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to OpenDives from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
       "Import: a logbook or a dive sites file shows one progress line, from the moment it is received or chosen until the import is finished: “Copying the file”, “Checking the file”, “Importing the dives”, “Saving”, with the size copied, the percentage and the time left. “Cancel” stops the copy and the check and deletes the partial copy. A message tells how many dives or sites were added.",
-      "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored."
+      "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored.",
+      "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
