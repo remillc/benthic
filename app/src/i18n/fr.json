@@ -2849,7 +2849,8 @@
       "Bureau : un voyage d’une seule plongée n’est plus une ligne de voyage dans le carnet, comme sur le téléphone.",
       "Les ordinateurs de plongée montrent leur photo (détail de la plongée, choix du téléchargement, Équipement) ; elle est téléchargée une fois, puis gardée sur l’appareil. Sans photo ou hors connexion, l’icône reste.",
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
-      "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager)."
+      "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager).",
+      "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
