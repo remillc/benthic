@@ -172,7 +172,7 @@ test('the span a cylinder was breathed', () => {
 
 test('Autre équipement: a seam of three props, no storage of its own, inert in the alpha', () => {
   const gear = read('app/src/components/DesktopOtherGear.svelte');
-  assert.match(gear, /let \{ items = \[\], onadd, onremove \} = \$props\(\)/);
+  assert.match(gear, /let \{ items = \[\], onadd, onremove, locked = false \} = \$props\(\)/);
   assert.match(gear, /disabled=\{!onadd\}/);
   assert.doesNotMatch(gear, /deviceStore|OpenDivesCore|localStorage|saveDiveChanges/);
   const fields = read('app/src/components/DesktopDiveFields.svelte');

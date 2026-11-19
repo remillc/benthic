@@ -23,6 +23,7 @@ import { stageFile } from './staged-file.js';
 import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
+import { sheetVariant } from './account-sheet.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 
@@ -1443,3 +1444,9 @@ export async function loadLogbook({ force = false } = {}) {
 
 // Development builds only: lets a headless check put the logbook in any state (account, OpenDives+).
 if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (window).__logbook = logbook;
+
+/**
+ * Whether the diver has an OpenDives+ account (the server's logbook): the equipment of a dive is theirs to change only then;
+ * for everyone else « Autre équipement » shows with the OpenDives+ chip and stays inert.
+ */
+export const isSubscriber = () => sheetVariant({ release: isRelease, odplus: logbook.odplus, email: logbook.email }) === 'subscriber';
