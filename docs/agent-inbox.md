@@ -6141,3 +6141,13 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 **6. Réglages › « Modifier l’ordinateur » restyled** (`reglages2-ordinateur-modifier-android`). Same look as the profile edit screen: close and filled « Enregistrer » in the bar, large title, model photo with « Changer d’image », then the name field and the info card. The duplicate block is now two cards: a sand card « Doublon possible » (icon, explanation, full-width filled « Fusionner avec Perdix » and its hint) and a white card « Pas un doublon, ou plus utilisé ? » with the outlined « Retirer de la liste » and its hint. Buttons are full width and the hints centered. Apply the same to the tablet versions (`android-tablette-ordinateur-modifier-*`).
 
 **Test:** check a model with and without image in each listed screen. Download a computer that is not in the equipment and add it from the card. Edit and delete a computer from the profile on each device. Create a new part of type Ordinateur. Open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with the mock-up.
+
+## [ ] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Same screen as point 6 of task 306, on the other devices.
+
+- **Tablet** (`android-tablette-ordinateur-modifier-paysage`, `-portrait`, side sheet). Filled « Enregistrer » in the header, then the model photo (96 dp tile) with « Changer d’image » beside it, the name field, the info card, then the two cards « Doublon possible » (sand, full-width filled « Fusionner avec Perdix ») and « Pas un doublon, ou plus utilisé ? » (white, full-width outlined « Retirer de la liste »). The sheet scrolls in landscape. The logbook list behind now shows the model photos (`android-tablette-ordinateur-fusion-paysage` too). The iPad follows the tablet.
+- **iPhone** (`ios-reglages-ordinateur-modifier`, new). « Annuler » / « OK », large title, photo with « Changer d’image », grouped lists: Nom, then Modèle, N° de série, Firmware, Plongées. Section « Doublon possible » with the explanation and the blue row « Fusionner avec Perdix », then a red row « Retirer de la liste », each with its footer text.
+- **Desktop** (`bureau-reglages-ordinateur-modifier`, new). Dialog over Réglages › Ordinateurs et téléchargement: photo with « Changer d’image » on the left, name and info on the right, the two cards side by side, « Annuler » and « Enregistrer » at the bottom.
+
+**Test:** on each device open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with its mock-up.
