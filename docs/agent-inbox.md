@@ -5799,7 +5799,7 @@ The open question from 285 still applies: check with Christian before removing t
 
 **Done (19 November 2026).** The open question about the only cylinder of a dive was already decided (see the note under task 285): the only cylinder, or one the profile depends on, stays with its type cleared (« Type inconnu »); the core call does this, nothing was asked again. Phone: the explanation, the button and the line under « Supprimer ce type » sit on the 16 dp margin (the line starts at the button's left edge), « Retirer ce type » is a neutral outlined button. Tablet: the phone's pages carry the new explanation and the delete button. Desktop: Réglages › Équipement has the cards « Bouteilles ajoutées aux nouvelles plongées » (wired to the default-cylinder settings of the phone, bailout through « Modifier » to the bailout page) and « Types de bouteilles » (« Vos types » with counts and « Inutilisé », a few standard types, « Et N autres types standard… », « Ajouter un type », the two switches wired to the existing settings), and the 560 px « Modifier le type » dialog with « Supprimer ce type » at the left of the footer and the phone's confirmation. Checked in Electron on tests/data/cylinder-delete.ssrf: deleting « Mon 3L » (6 dives) removed it from 3 dives and left it, with type « unknown », in the 3 where it is the only cylinder or has a gas change. The phone and tablet layouts were not checked on screen in this session (only the desktop).
 
-## [ ] 2026-11-19-288 Desktop logbook list everywhere, « Saucisse », model thumbnail
+## [x] 2026-11-19-288 Desktop logbook list everywhere, « Saucisse », model thumbnail
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`.
 
