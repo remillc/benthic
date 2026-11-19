@@ -49,4 +49,3 @@ Next number: 97
 - #98 [design] ajuster les rayons lumineux de l'en-tête.
 - #100 [design] dans équipement, distinguer liftbag de marqueur de surface.
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide.
-- #102 [code] prévoir des rapports d'erreur ou de plantage à envoyer à une url du site pour archivage et consultation.

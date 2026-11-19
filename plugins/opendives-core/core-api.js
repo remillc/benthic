@@ -807,6 +807,10 @@ export { waterTypeOf };
  * @property {() => Promise<LogbookComputer[]>} diveComputers the computers the logbook's dives come from
  * @property {(options: {action: 'rename'|'remove'|'merge', model: string, serial: string, value?: string, intoModel?: string, intoSerial?: string}) => Promise<EditResult>} diveComputerAction
  *   One undoable step (opendives.h).
+ * @property {() => Promise<{json: string}>} pendingCrashReport
+ *   Error reports (task #102): the crash that Kotlin or Swift code saved before the app died, as JSON text
+ *   `{ occurredAt, osVersion, device, message, stack }`, or an empty `json` when there is none. Nothing is sent.
+ * @property {() => Promise<void>} clearCrashReport forgets the saved crash (after the user answered)
  * @property {() => Promise<{wifi: boolean}>} networkStatus whether the device is on Wi-Fi or Ethernet
  * @property {() => Promise<{level: number}>} contrastLevel
  *   The system contrast level: Android 14+ UiModeManager.getContrast() (0 by default, up to 1),
@@ -910,8 +914,43 @@ export { waterTypeOf };
 // On Android and iOS the native plugin answers. In the desktop app (Electron, which runs as a "web"
 // platform) desktop.js does, through window.odDesktop; in a plain browser its methods reject with
 // UNAVAILABLE.
-const native = registerPlugin('OpenDivesCore', {
+const plugin = registerPlugin('OpenDivesCore', {
   web: () => import('./desktop.js').then((m) => new m.OpenDivesCoreDesktop()),
+});
+
+/** @type {((method: string, error: any) => void)|null} */
+let coreErrorHook = null;
+
+/**
+ * Error reports (task #102): `hook(method, error)` is called for every call the core fails (code CORE_ERROR), before the
+ * error goes on to the caller. The hook only offers a report to the user; it never changes the outcome of the call.
+ * @param {((method: string, error: any) => void)|null} hook
+ */
+export function setCoreErrorHook(hook) {
+  coreErrorHook = hook;
+}
+
+// The plugin, seen through a proxy that tells the hook about the core's failures. The listeners are not wrapped: their
+// handle (remove) must stay the plugin's own.
+const native = new Proxy(plugin, {
+  get(target, name, receiver) {
+    const value = Reflect.get(target, name, receiver);
+    if (typeof value !== 'function' || typeof name !== 'string' || name === 'then' || name.startsWith('add') || name.startsWith('remove')) return value;
+    return (/** @type {any[]} */ ...args) => {
+      const result = value.apply(target, args);
+      if (!result || typeof result.then !== 'function') return result;
+      return result.then(undefined, (/** @type {any} */ e) => {
+        if (coreErrorHook && e?.code === 'CORE_ERROR') {
+          try {
+            coreErrorHook(name, e);
+          } catch {
+            // The hook never changes the outcome of the call.
+          }
+        }
+        throw e;
+      });
+    };
+  },
 });
 
 
@@ -1126,6 +1165,8 @@ export const OpenDivesCore = {
   async savePlan(options) {
     return JSON.parse((await native.savePlan(options)).json);
   },
+  pendingCrashReport: () => native.pendingCrashReport(),
+  clearCrashReport: () => native.clearCrashReport(),
   networkStatus: () => native.networkStatus(),
   contrastLevel: () => native.contrastLevel(),
   mapsFreeSpace: () => native.mapsFreeSpace(),

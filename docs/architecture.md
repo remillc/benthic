@@ -503,3 +503,19 @@ Everything social lives in PostgreSQL + PostGIS, never in the logbook.
 ### 11.8 Where the rest lives
 
 The server code, the local development stack (containers, seed data, smoke test) and the hosting plan (hosting, backups, restore, monitoring, privacy-law notes, go-live checklist) are in the **private repository `opendives-server`**. They are deliberately not described here: this repository only holds what the app depends on.
+
+### 11.9 Error and crash reports (decided on 19 November 2026)
+
+- **Consent.** Nothing is sent without asking. After an error or a crash the app shows the report as it will be sent and asks « Envoyer » or « Ne pas envoyer ». No automatic sending and no setting. Offline, the report is kept on the device (at most five) and offered again at the next launch.
+- **Content.** App version and edition (`alpha`, `beta`), platform, system version, device model, error message and stack, the route at the time (path only, e.g. `/dive/42`) and the last lines of the app's own log (a ring of 40 lines of warnings, errors and routes). Never a dive, a site, a name, a buddy, an e-mail address, an account identifier, a position, a token or a user name in a path: `app/src/lib/error-scrub.js` removes e-mails, tokens, coordinates and home folders from every text before it is shown.
+- **Caught.** Errors of the web layer (`error`, `unhandledrejection`), failures returned by the core through the plugin (code `CORE_ERROR`), uncaught Kotlin exceptions and Objective-C exceptions (`CrashReporter.kt`, `CrashReporter.swift`: written to a file, offered at the next launch through the plugin methods `pendingCrashReport` and `clearCrashReport`), and on the desktop the main process, the renderer and the core's helper (`desktop/crash-reports.cjs`). Native C++ crashes (signals) are not captured.
+- **Contract.** `POST /v1/error-reports` on the OpenDives API, no authentication, JSON body of at most 64 KB:
+
+  ```json
+  { "kind": "js" | "core" | "native", "appVersion": "0.3.0", "edition": "alpha" | "beta" | "release",
+    "platform": "android", "osVersion": "Android 15", "device": "Pixel 8", "route": "/dive/42",
+    "occurredAt": "2026-11-19T10:00:00Z", "message": "...", "stack": "...", "log": ["..."] }
+  ```
+
+  Required: `kind`, `appVersion`, `edition`, `platform`, `message`. Unknown fields are ignored; texts are cut (message 2000, stack 12000, log 200 lines of 500). Answers: `200 { "ok": true, "id": "..." }`; `400 INVALID_REQUEST`; `413` over 64 KB; `429 TOO_MANY_REPORTS` with `Retry-After` (rate limit per address). The app keeps the report on `429`, `5xx` or no answer, and drops it on any other 4xx. Reports are kept 180 days. The address is the server of the build (`VITE_SERVER_URL` in development); without one nothing is kept or asked.
+- **Reading them.** A protected page of the server lists and shows the reports (development only for now). Its operation and the production needs are in the private repository.

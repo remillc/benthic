@@ -2104,6 +2104,17 @@
     "ok": "OK",
     "cancel": "Annuler"
   },
+  "errorReport": {
+    "title": "Une erreur s’est produite",
+    "titleCrash": "L’app s’est arrêtée",
+    "text": "Ce rapport sert à corriger l’erreur. Il ne contient ni plongée, ni site, ni nom, ni compte.",
+    "contents": "Contenu du rapport",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "decline": "Ne pas envoyer",
+    "later": "Plus tard",
+    "offline": "Pas de connexion. Le rapport est gardé et vous sera proposé de nouveau."
+  },
   "common": {
     "back": "Retour"
   },
@@ -2812,7 +2823,8 @@
       "Premier lancement : la touche et le geste Retour d’Android (et, sur iPhone, un balayage depuis le bord gauche) reviennent à l’étape précédente, comme « Retour » ; sur la première étape, Retour met l’application en arrière-plan. Un import, un téléchargement ou un envoi en cours est annulé par Retour, le retour de l’offre est « Continuer sans abonnement », et rien de ce qui a été créé ou acheté n’est défait.",
       "Autre équipement : ajouter ou retirer une pièce sur une plongée est réservé aux abonnés OpenDives+. Sans compte, la liste s’affiche avec la pastille OpenDives+, sur téléphone, tablette et ordinateur, et ne se modifie pas.",
       "Compte (version gratuite) : Retour depuis l’offre OpenDives+ ou « Se connecter ou créer un compte », ouverts depuis la fiche, réaffiche la fiche comme elle était.",
-      "Sauvegarde et restauration (OpenDives+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille OpenDives+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px."
+      "Sauvegarde et restauration (OpenDives+) : la feuille du compte d’un abonné propose « Mon profil de plongeur », puis « Sauvegarde et restauration », sans pastille OpenDives+ à côté des rangées. Chaque synchronisation est une version du carnet, avec son nombre de plongées et ce qui a changé depuis. « Restaurer cette version » ajoute une nouvelle version avec l’ancien contenu : le carnet actuel reste dans la liste et peut être restauré à son tour, et rien de l’historique n’est réécrit. « Parcourir cette version » l’ouvre en lecture seule. « Une plongée » montre les versions d’une plongée (aussi par « Versions de cette plongée » dans son menu) et « Plongées supprimées » rétablit une plongée supprimée, sans limite de temps. Les photos et vidéos supprimées sont gardées 90 jours, puis effacées, et « Supprimer le compte » efface aussi tout l’historique du carnet, plongées supprimées comprises. Sur téléphone ce sont des pages, sur tablette deux volets, sur ordinateur une fenêtre de 1 000 px.",
+      "Rapports d’erreur : après une erreur ou un arrêt de l’app, la version, le système, l’appareil, la page ouverte, le message d’erreur et les dernières lignes du journal s’affichent dans une feuille avec « Envoyer » et « Ne pas envoyer ». Rien n’est envoyé sans cet appui ; sans connexion, le rapport est gardé et reproposé plus tard. Le rapport ne contient ni plongée, ni site, ni nom, ni compte ; il est conservé 180 jours."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

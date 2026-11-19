@@ -11,3 +11,5 @@ export const OpenDivesCore = new Proxy(
     deleteProperty: (_, name) => replaced.delete(name),
   },
 );
+
+export function setCoreErrorHook() {}

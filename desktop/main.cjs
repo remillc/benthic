@@ -19,6 +19,7 @@ const { LogbookStore, isLogbookFile } = require('./logbooks.cjs');
 const { createWindowManager } = require('./windows.cjs');
 const { createCloudService, loadClients } = require('./cloud.cjs');
 const { createNetworkMonitor } = require('./network.cjs');
+const { createCrashStore } = require('./crash-reports.cjs');
 
 const devUrl = process.env.OD_DEV_URL || '';
 const resources = app.isPackaged
@@ -42,6 +43,28 @@ protocol.registerSchemesAsPrivileged([
 if (process.env.OD_USER_DATA) app.setPath('userData', process.env.OD_USER_DATA);
 
 if (!app.requestSingleInstanceLock()) app.quit();
+
+// Error reports (task #102): exceptions of this process and renderer or helper processes that died are saved to a file;
+// the interface offers the report at the next launch (crash-reports.cjs). Nothing is sent from here.
+const crashes = createCrashStore({
+  dir: app.getPath('userData'),
+  osVersion: `${process.platform} ${process.getSystemVersion?.() ?? ''}`.trim(),
+  device: `Electron ${process.versions.electron} ${process.arch}`,
+});
+process.on('uncaughtException', (error) => {
+  crashes.write('Main process', error);
+  console.error('[desktop] Uncaught exception', error);
+});
+process.on('unhandledRejection', (reason) => {
+  crashes.write('Main process rejection', reason);
+  console.error('[desktop] Unhandled rejection', reason);
+});
+app.on('render-process-gone', (_event, _contents, details) => {
+  if (details.reason !== 'clean-exit' && details.reason !== 'killed') crashes.write('Window process gone', `${details.reason} (${details.exitCode})`);
+});
+app.on('child-process-gone', (_event, details) => {
+  if (details.reason !== 'clean-exit' && details.reason !== 'killed') crashes.write(`${details.type} process gone`, `${details.reason} (${details.exitCode})`);
+});
 
 /** @type {ReturnType<typeof createWindowManager>|null} */
 let windows = null;
@@ -155,7 +178,7 @@ app.whenReady().then(() => {
     locale: app.getLocale(),
     log: (text) => console.error('[desktop]', text),
   });
-  const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources, cloud });
+  const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources, cloud, onHostCrash: (reason) => crashes.write('Core helper', reason) });
   // « Seulement sur Wi-Fi ou câble » (task 2026-11-15-202): the connection type, asked of the system here (network.cjs).
   const network = createNetworkMonitor({
     onChange: (cost) => {
@@ -169,6 +192,10 @@ app.whenReady().then(() => {
     } catch (e) {
       return { ok: true, value: 'unknown' };
     }
+  });
+  ipcMain.handle('od:crash', (_event, op) => {
+    if (op === 'clear') crashes.clear();
+    return { ok: true, value: op === 'pending' ? crashes.pending() : true };
   });
   ipcMain.handle('od:settingsWindow', () => {
     openSettingsWindow();

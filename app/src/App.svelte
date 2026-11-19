@@ -78,6 +78,8 @@
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
   import MapsDialogs from './components/MapsDialogs.svelte';
+  import ErrorReportHost from './components/ErrorReportHost.svelte';
+  import { noteLog } from './lib/error-report.js';
   import { startOfflineMaps } from './lib/offline-maps.svelte.js';
 
   /**
@@ -379,7 +381,10 @@
     }
     // Dialog buttons stacked when they do not fit on one line (task 2026-11-14-143).
     enableDialogFit(f7);
-    f7ready(() => enableRouterGuard(f7));
+    f7ready(() => {
+      enableRouterGuard(f7);
+      f7.on('routeChanged', (/** @type {any} */ to) => noteLog('route', to?.path ?? ''));
+    });
     enableBackButton();
     // High contrast when the system asks for more contrast (task 2026-11-14-149).
     followContrast({
@@ -431,6 +436,7 @@
   <AccountManageDialog />
   {#if layout.desktop}<BackupDialog />{/if}
   <SyncFailureSheet />
+  <ErrorReportHost />
   <ConflictHost />
   <QrReceived />
   <FileImportProgress />

@@ -462,3 +462,13 @@ test('helpers: paths, file addresses, env files', () => {
   assert.equal(fileUrl('/tmp/x.png'), 'file:///tmp/x.png');
   assert.deepEqual(parseEnv('# c\nA=1\r\n\nB=x=y\nbad'), { A: '1', B: 'x=y' });
 });
+
+test('error reports: the crash the main process saved is offered, then cleared', async () => {
+  let saved = '{"message":"Main process: Error: boom"}';
+  bridge.crash = { pending: async () => saved, clear: async () => { saved = ''; } };
+  assert.deepEqual(await plugin.pendingCrashReport(), { json: '{"message":"Main process: Error: boom"}' });
+  await plugin.clearCrashReport();
+  assert.deepEqual(await plugin.pendingCrashReport(), { json: '' });
+  delete bridge.crash;
+  assert.deepEqual(await plugin.pendingCrashReport(), { json: '' });
+});

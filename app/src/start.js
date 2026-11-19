@@ -3,7 +3,7 @@
 // (lib/device-store.js): every module below may read them as it loads.
 import { mount } from 'svelte';
 import Framework7 from './framework7.js';
-import Framework7Svelte from 'framework7-svelte';
+import Framework7Svelte, { f7 } from 'framework7-svelte';
 import App from './App.svelte';
 import { mark, observePaints } from './lib/perf.js';
 import { boot } from './lib/logbook.svelte.js';
@@ -12,6 +12,7 @@ import { releaseLaunchScreen } from './lib/launch.js';
 import { deviceStore } from './lib/device-store.js';
 import { installRippleFix } from './lib/ripple-fix.js';
 import { settingsWindow } from './lib/layout.svelte.js';
+import { startErrorReports } from './lib/error-reports.svelte.js';
 
 observePaints();
 mark('main');
@@ -24,6 +25,16 @@ if (!settingsWindow) noteFirstOpen();
 deviceStore.removeItem('od.paperGrain');
 if (!settingsWindow) boot();
 installRippleFix();
+// Error reports (task #102): the catchers start with the app; a report is only ever offered, never sent without a tap.
+startErrorReports({
+  route: () => {
+    try {
+      return f7.views.main?.router?.currentRoute?.path ?? '';
+    } catch {
+      return '';
+    }
+  },
+});
 
 Framework7.use(Framework7Svelte);
 

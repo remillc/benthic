@@ -277,7 +277,7 @@ class HostProcess {
  * @param {ReturnType<import('./cloud.cjs').createCloudService>} [options.cloud] the personal clouds (cloud logbooks)
  * @returns {{ call: (method: string, args?: object) => Promise<any>, stop: () => Promise<void>, paths: object }}
  */
-function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resourcesDir, broadcast, electron, cloud }) {
+function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resourcesDir, broadcast, electron, cloud, onHostCrash }) {
   const userData = app.getPath('userData');
   const tempDir = path.join(app.getPath('temp'), 'opendives');
   const resources = resourcesDir
@@ -342,7 +342,10 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       hostArgs,
       log,
       onEvent: (name, data) => emit(ctx, 'od:core-event', name, data),
-      onExit: () => emit(ctx, 'od:core-event', 'coreRestarted', {}),
+      onExit: (reason) => {
+        onHostCrash?.(reason);
+        emit(ctx, 'od:core-event', 'coreRestarted', {});
+      },
       async onStart(sendRaw) {
         await coreSetup(sendRaw);
         if (isFileLike(ctx)) await prepareFileLogbook(ctx, sendRaw);

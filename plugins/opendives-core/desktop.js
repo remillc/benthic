@@ -989,6 +989,15 @@ export class OpenDivesCoreDesktop extends WebPlugin {
     }
   }
 
+  /** Error reports (task #102): the crash the main process saved (desktop/crash-reports.cjs); nothing is sent from here. */
+  async pendingCrashReport() {
+    return { json: (await this.bridge.crash?.pending?.()) ?? '' };
+  }
+
+  async clearCrashReport() {
+    await this.bridge.crash?.clear?.();
+  }
+
   /** No mobile data on a desktop: online means connected. */
   async networkStatus() {
     return { wifi: globalThis.navigator?.onLine !== false };

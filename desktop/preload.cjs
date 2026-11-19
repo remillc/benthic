@@ -91,6 +91,11 @@ contextBridge.exposeInMainWorld('odDesktop', {
       return () => ipcRenderer.removeListener('od:network', listener);
     },
   },
+  /** Error reports (crash-reports.cjs): the crash saved before the app died, as JSON text ('' when none); nothing is sent from here. */
+  crash: {
+    pending: () => invoke('od:crash', 'pending'),
+    clear: () => invoke('od:crash', 'clear'),
+  },
   placesSearch: (options) => invoke('od:placesSearch', options),
   /** Several logbooks (task 2026-11-15-173): one window per logbook; windows.cjs answers. */
   logbooks: {

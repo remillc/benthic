@@ -78,6 +78,7 @@ class OpenDivesCorePlugin : Plugin() {
     private val setupThread: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun load() {
+        CrashReporter.install(context)
         // A file shared with the app before the web layer was up (cold start from « Share to »).
         offerSharedFiles(activity?.intent)
         // Staged files a killed app left behind (a logbook can be 100 MB): those older than half a day go.
@@ -1226,6 +1227,18 @@ class OpenDivesCorePlugin : Plugin() {
                 call.reject(e.message ?: "Cannot reach the server", "NETWORK")
             }
         }
+    }
+
+    /** Error reports (task #102): the crash saved before the app died, as JSON text (empty when none). Nothing is sent from here. */
+    @PluginMethod
+    fun pendingCrashReport(call: PluginCall) {
+        call.resolve(JSObject().put("json", CrashReporter.pending(context)))
+    }
+
+    @PluginMethod
+    fun clearCrashReport(call: PluginCall) {
+        CrashReporter.clear(context)
+        call.resolve()
     }
 
     @PluginMethod

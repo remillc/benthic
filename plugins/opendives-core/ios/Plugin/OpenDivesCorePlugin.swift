@@ -83,6 +83,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "filterQuery", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createDive", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "placesSearch", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pendingCrashReport", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "clearCrashReport", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "networkStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "contrastLevel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cancelConflictResolution", returnType: CAPPluginReturnPromise),
@@ -182,6 +184,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     private let importPrefix = "import-"
 
     override public func load() {
+        CrashReporter.install()
         MapsManager.shared.listener = { [weak self] event in self?.notifyListeners("mapsDownload", data: event) }
         mapsIo.async { MapsManager.shared.load() }
         DispatchQueue.main.async { [weak self] in
@@ -1415,6 +1418,16 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     /// Whether the device is on Wi-Fi or Ethernet.
+    /// Error reports (task #102): the crash saved before the app died, as JSON text (empty when none). Nothing is sent from here.
+    @objc func pendingCrashReport(_ call: CAPPluginCall) {
+        call.resolve(["json": CrashReporter.pending()])
+    }
+
+    @objc func clearCrashReport(_ call: CAPPluginCall) {
+        CrashReporter.clear()
+        call.resolve()
+    }
+
     @objc func networkStatus(_ call: CAPPluginCall) {
         let monitor = NWPathMonitor()
         var answered = false
