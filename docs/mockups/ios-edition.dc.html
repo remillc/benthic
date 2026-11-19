@@ -12,16 +12,16 @@
 body{margin:0}
 a{color:#1F2124}a:hover{color:#1F2124}
 /* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
-@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-400-normal.woff2) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-500-normal.woff2) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-600-normal.woff2) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-700-normal.woff2) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-800-normal.woff2) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(../brand/fonts/source-sans-3-latin-900-normal.woff2) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/1ec8b3890a436b9c9428e71205fcad03) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/2f9b7ca7505604e0f969218db9cf0733) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/291d32fbde106f2eee5d95dcde50f8d8) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fdee8e76efc2394eb2f1340de9b1596) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/a45df9a7276bc208cca25dcf11a4eabe) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fca0b76bd4cf1e04073a1ce5b5e149d8) format('woff2')}
 h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:-apple-system, 'SF Pro Text', system-ui, sans-serif !important}
 </style>
 </helmet>
-<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F4F4F2; font-family: 'Source Sans 3 OD', -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; display: flex; flex-direction: column; overflow: hidden">
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F4F0; font-family: 'Source Sans 3 OD', -apple-system, 'SF Pro Text', system-ui, sans-serif; color: #000000; display: flex; flex-direction: column; overflow: hidden">
   <div style="padding: 54px 8px 0 8px; height: 98px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; background: #F9F9F7; border-bottom: 0.5px solid #DADAD6">
     <button style="justify-self: start; border: none; background: transparent; font-family: inherit; font-size: 17px; color: #1F2124; min-height: 44px; padding: 0 8px">Annuler</button>
     <span style="text-align: center; font-size: 17px; font-weight: 600">Modifier</span>
@@ -32,7 +32,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <h2 style="margin: 18px 16px 6px 32px; font-size: 13px; font-weight: 400; color: #3C3C43">Plongée</h2>
     <div style="margin: 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden">
       <sc-for list="{{general}}" as="r" hint-placeholder-count="4">
-        <a href="#champ" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; gap: 12px; color: #000000; text-decoration: none">
+        <a href="#champ" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #EBEAE5; gap: 12px; color: #000000; text-decoration: none">
           <span style="flex: 1; font-size: 17px">{{r.label}}</span>
           <span style="font-size: 17px; color: #3C3C43; font-variant-numeric: tabular-nums">{{r.value}}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -42,7 +42,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 
     <h2 style="margin: 20px 16px 6px 32px; font-size: 13px; font-weight: 400; color: #3C3C43">Compagnons</h2>
     <div style="margin: 0 16px; background: #FFFFFF; border-radius: 10px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px">
-      <span style="height: 32px; padding: 0 6px 0 12px; border-radius: 16px; background: #E8E8E5; color: #1F2124; display: flex; align-items: center; gap: 4px; font-size: 15px">
+      <span style="height: 32px; padding: 0 6px 0 12px; border-radius: 16px; background: #EBEAE5; color: #1F2124; display: flex; align-items: center; gap: 4px; font-size: 15px">
         Michael
         <button aria-label="Retirer Michael" style="width: 28px; height: 28px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0">
           <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #1F2124; stroke-width: 2.4; stroke-linecap: round"><path d="M6 6l12 12 M18 6L6 18"></path></svg>
@@ -53,15 +53,15 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 
     <h2 style="margin: 20px 16px 6px 32px; font-size: 13px; font-weight: 400; color: #3C3C43">Équipement</h2>
     <div style="margin: 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden">
-      <div style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; gap: 12px">
+      <div style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #EBEAE5; gap: 12px">
         <span id="mode-l" style="flex: 1; font-size: 17px">Mode</span>
-        <div role="radiogroup" aria-labelledby="mode-l" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #E8E8E5; border-radius: 9px; padding: 2px; width: 190px">
+        <div role="radiogroup" aria-labelledby="mode-l" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #EBEAE5; border-radius: 9px; padding: 2px; width: 190px">
           <button role="radio" aria-checked="false" style="height: 30px; border: none; border-radius: 7px; background: transparent; font-family: inherit; font-size: 14px">Circuit ouvert</button>
           <button role="radio" aria-checked="true" style="height: 30px; border: none; border-radius: 7px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.15); font-family: inherit; font-size: 14px; font-weight: 600">Recycleur</button>
         </div>
       </div>
       <sc-for list="{{gear}}" as="r" hint-placeholder-count="2">
-        <a href="#champ" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; gap: 12px; color: #000000; text-decoration: none">
+        <a href="#champ" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-bottom: 0.5px solid #EBEAE5; gap: 12px; color: #000000; text-decoration: none">
           <span style="flex: 1; font-size: 17px">{{r.label}}</span>
           <span style="font-size: 17px; color: #3C3C43">{{r.value}}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #8E8E93; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -72,7 +72,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
     <h2 style="margin: 20px 16px 6px 32px; font-size: 13px; font-weight: 400; color: #3C3C43">Bouteilles</h2>
     <div style="margin: 0 16px; background: #FFFFFF; border-radius: 10px; overflow: hidden">
       <sc-for list="{{cyl}}" as="c" hint-placeholder-count="3">
-        <a href="#bouteille" style="display: flex; align-items: center; min-height: 52px; padding: 0 16px; border-bottom: 0.5px solid #E8E8E5; gap: 12px; color: #000000; text-decoration: none">
+        <a href="#bouteille" style="display: flex; align-items: center; min-height: 52px; padding: 0 16px; border-bottom: 0.5px solid #EBEAE5; gap: 12px; color: #000000; text-decoration: none">
           <span style="flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 5px 0">
             <span style="font-size: 17px">{{c.name}}</span>
             <span style="font-size: 13px; color: #3C3C43">{{c.hint}}</span>
@@ -86,14 +86,14 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
-// Plongée réelle de test42.xml (Lake Coleridge, 2 avril 2014).
+// Plongée réelle de test42.xml (Lake Coleridge, 2014-04-02).
 class Component extends DCLogic {
   renderVals() {
     return {
       general: [
-        { label: 'Date et heure', value: '2 avr. 2014, 10 h 00' },
+        { label: 'Date et heure', value: '2014-04-02, 10 h 00' },
         { label: 'Site', value: 'Lake Coleridge' },
-        { label: 'Eau', value: '4,3 °C' },
+        { label: 'Eau', value: '4,3 °C' },
         { label: 'Tags', value: 'ccr_dive' }
       ],
       gear: [
@@ -101,9 +101,9 @@ class Component extends DCLogic {
         { label: 'Ordinateur', value: 'OSTC 3' }
       ],
       cyl: [
-        { name: 'Dil2, 16 pi³', hint: 'Diluant, trimix 16/45', press: '2 683 à 1 885 psi' },
-        { name: 'Oxy2, 16 pi³', hint: 'Oxygène', press: '2 756 à 1 885 psi' },
-        { name: 'AL80, 80 pi³', hint: 'Secours, air', press: '3 002 à 2 901 psi' }
+        { name: 'Dil2, 16 pi³', hint: 'Diluant, trimix 16/45', press: '2 683 à 1 885 psi' },
+        { name: 'Oxy2, 16 pi³', hint: 'Oxygène', press: '2 756 à 1 885 psi' },
+        { name: 'AL80, 80 pi³', hint: 'Secours, air', press: '3 002 à 2 901 psi' }
       ]
     };
   }

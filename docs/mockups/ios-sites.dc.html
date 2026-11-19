@@ -12,12 +12,12 @@
 body{margin:0}
 a{color:#1F2124}a:hover{color:#1F2124}
 /* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
-@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/98bdd40d9c9776c0342c6095fa88b728) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/76fec74eed7ca9cbf97f9dc41adaf95a) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/9b710693576c78c27e4c783038abf91e) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/839602f67bc365daeaccdf214af3f9bc) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fd76e9f7a6ebec405432b97fb664c642) format('woff2')}
-@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fda13f7bdf9af1e9052b5e364691135) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/1ec8b3890a436b9c9428e71205fcad03) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/2f9b7ca7505604e0f969218db9cf0733) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/291d32fbde106f2eee5d95dcde50f8d8) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/0fdee8e76efc2394eb2f1340de9b1596) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/a45df9a7276bc208cca25dcf11a4eabe) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/fca0b76bd4cf1e04073a1ce5b5e149d8) format('woff2')}
 h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:-apple-system, 'SF Pro Text', system-ui, sans-serif !important}
 </style>
 </helmet>
@@ -25,7 +25,7 @@ h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],
   
   <div style="position: absolute; left: 0; top: 0; width: 390px; height: 470px; background: #EBEAE5">
     <svg width="390" height="470" viewBox="0 0 390 470" role="img" aria-label="Carte des sites : Northern Arch au nord, 1 plongée. Lake Coleridge au sud, 1 plongée" style="display: block">
-      <image href="/_blob/0f8d6b43869c79d6442c1f53afc3c9a0" x="0" y="-10" width="390" height="480" preserveAspectRatio="none"></image>
+      <image href="/_blob/a034c66781a564620107b88e9ab9262a" x="0" y="-10" width="390" height="480" preserveAspectRatio="none"></image>
       <sc-for list="{{pins}}" as="p" hint-placeholder-count="2">
         <g transform="translate({{p.x}} {{p.y}})">
           <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" style="fill: #1F2124; stroke: #FFFFFF; stroke-width: 2"></path>
@@ -82,8 +82,8 @@ class Component extends DCLogic {
     return {
       pins: SITES.map(function (s) { var x = px(s.lon), y = py(s.lat); return { name: s.name, x: x, y: y, lx: x + 18, ly: y - 20, n: s.n }; }),
       sites: [
-        { name: 'Northern Arch', hint: '1 plongée, le 24 avril 2022', max: '198 pi' },
-        { name: 'Lake Coleridge', hint: '1 plongée, le 2 avril 2014', max: '128 pi' },
+        { name: 'Northern Arch', hint: '1 plongée, le 2022-04-24', max: '198 pi' },
+        { name: 'Lake Coleridge', hint: '1 plongée, le 2014-04-02', max: '128 pi' },
         { name: 'Hälvälä', hint: '1 plongée, pas de position GPS', max: '261 pi' }
       ]
     };
