@@ -1562,6 +1562,27 @@ html.ios {
 
 /* Overflow menus (⋮), components/MenuItem.svelte. */
 @layer od.components {
+  /*
+   * Tablet and desktop (task 2026-11-19-293): a modal bottom sheet becomes a dialog in the middle of the window from
+   * the tablet width (Material 3 large-screen guidance). The sheet keeps its content; the grab handle goes.
+   */
+  @media (min-width: 768px) {
+    .sheet-modal.od-sheet-dialog {
+      left: 50%;
+      bottom: 50%;
+      width: 480px;
+      max-width: calc(100% - 48px);
+      max-height: calc(100% - 48px);
+      border-radius: 28px;
+      translate: -50% 50%;
+    }
+    .sheet-modal.od-sheet-dialog [class*='--handle'] {
+      display: none;
+    }
+  }
+}
+
+@layer od.components {
     /*
      * Android menu (spec, section 1, "Menus"): 16 dp corners (decided on
      * 7 November 2026), surface-container, elevation level 2, 8 dp above and

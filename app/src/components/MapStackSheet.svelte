@@ -42,7 +42,7 @@
   const title = $derived(t('sites.stackTitle', { n: sites.length }));
 </script>
 
-<Sheet class="od-map-stack-sheet" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
+<Sheet class="od-map-stack-sheet od-sheet-dialog" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
   <div class="od-map-stack-sheet--content" bind:this={content}>
     <div class="od-map-stack-sheet--handle" aria-hidden="true"></div>
     <div class="od-map-stack-sheet--head">

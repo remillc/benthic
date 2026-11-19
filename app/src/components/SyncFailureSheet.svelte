@@ -44,7 +44,7 @@
   }
 </script>
 
-<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-sync-failure-sheet od-sync-failure-sheet--failure-sheet" style="height: auto" onSheetClosed={close}>
+<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-sync-failure-sheet od-sync-failure-sheet--failure-sheet od-sheet-dialog" style="height: auto" onSheetClosed={close}>
   <div class="od-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
     <div class="od-sync-failure-sheet--handle" aria-hidden="true"></div>
     <span class="badge" aria-hidden="true"><Icon name={gitServer && !logbook.odplus ? 'git' : ICONS[cause]} weight={2} /></span>

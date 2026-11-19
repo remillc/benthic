@@ -5879,7 +5879,9 @@ From top to bottom, on the sheet background (#F5F4F0), with white rounded groups
 
 **Test:** open the popover as a subscriber: same order and layout as the mock-up, buttons next to what they act on.
 
-## [ ] 2026-11-19-293 Android tablet: catch up with the phone
+## [x] 2026-11-19-293 Android tablet: catch up with the phone
+
+Done in Tablet catch-up: the export dialog, the map-point list and the sync failure sheet are dialogs from 768 dp (shared `od-sheet-dialog` rule in theme.css, like the share and computers dialogs); the several-dives conflict is a large dialog; the Bluetooth states are a card under the remembered computers. Already in place: share, QR, computers dialogs, offline maps panes, banners, sites search. **Left:** « Modifier l’ordinateur » is still a page in the right pane, not a side sheet (a route page cannot be a side sheet without reworking the pane stack); the download engine states for the end-of-download snackbar were not re-checked on a real tablet.
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/` (landscape; portrait follows the same pattern). On a large screen, what is a full screen on the phone becomes a dialog, a side sheet, a banner or a snackbar over the tablet screen (Material 3 large-screen guidance). Behaviour and texts are those of the phone tasks.
 

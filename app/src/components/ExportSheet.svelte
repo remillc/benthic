@@ -37,7 +37,7 @@
   }
 </script>
 
-<Sheet {opened} swipeToClose backdrop class="od-export-sheet" style="height: auto" onSheetClosed={onclose}>
+<Sheet {opened} swipeToClose backdrop class="od-export-sheet od-sheet-dialog" style="height: auto" onSheetClosed={onclose}>
   <div class="od-export-sheet--sheet" role="dialog" aria-labelledby="od-export-title">
     <div class="od-export-sheet--handle" aria-hidden="true"></div>
     <h2 id="od-export-title" class="od-export-sheet--title">{t('export.title', { n: count })}</h2>

@@ -628,6 +628,23 @@
       outline: none;
     }
 
+    /* Tablet (task 2026-11-19-293, android-tablette-etat-conflit-plusieurs): a large dialog over the screen, not a full page. */
+    @media (min-width: 768px) {
+      .od-conflict-sheet--full {
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      .od-conflict-sheet--full-surface {
+        inset: 50% auto auto 50%;
+        width: 720px;
+        max-width: calc(100% - 48px);
+        height: min(640px, calc(100% - 48px));
+        translate: -50% -50%;
+        border-radius: 28px;
+        overflow: hidden;
+      }
+    }
+
     .od-conflict-sheet--bar {
       flex: none;
       display: flex;
