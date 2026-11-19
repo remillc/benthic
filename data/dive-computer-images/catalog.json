@@ -480,22 +480,6 @@
     "cropped": "auto"
   },
   {
-    "vendor": "Divesoft",
-    "product": "Liberty",
-    "slug": "divesoft-liberty",
-    "hasImage": true,
-    "image512": "/v1/dc-images/512/divesoft-liberty.webp",
-    "image128": "/v1/dc-images/128/divesoft-liberty.webp",
-    "source_page_url": "https://eshop.divesoft.com/liberty-sidemount-stock-unit/8515",
-    "original_url": "https://api.divesoft.eu/resources/static/2026/8/25/fmmaw_glaqe_8194_divesoft_ccr-liberty_sidemount.png",
-    "confidence": "low",
-    "approx": true,
-    "fetched_at": "2026-11-19T12:55:52.211Z",
-    "width": 800,
-    "height": 800,
-    "cropped": "auto"
-  },
-  {
     "vendor": "DiveSystem",
     "product": "iDive X3M",
     "slug": "divesystem-idive-x3m",
@@ -2285,7 +2269,7 @@
     "fetched_at": "2026-11-19T12:54:06.389Z",
     "width": 1950,
     "height": 832,
-    "cropped": "auto"
+    "cropped": "manual"
   },
   {
     "vendor": "Shearwater",
@@ -2349,7 +2333,7 @@
     "fetched_at": "2026-11-19T12:53:48.809Z",
     "width": 1950,
     "height": 925,
-    "cropped": "auto"
+    "cropped": "manual"
   },
   {
     "vendor": "Shearwater",
