@@ -29,12 +29,17 @@ export function buildRows(groups, expanded, cards) {
   const isOpen = typeof expanded === 'function' ? expanded : (/** @type {number} */ id) => !!expanded[id];
   let year = -1;
   let run = 0;
+  /** @type {Map<number, number>} Dives per year (the iPhone's section titles say it). */
+  const perYear = new Map();
+  for (const group of groups) {
+    for (const entry of group.entries) perYear.set(group.year, (perYear.get(group.year) ?? 0) + (entry.type === 'dive' ? 1 : entry.dives.length));
+  }
   for (const group of groups) {
     const month = group.key;
     if (cards && group.year !== year) {
       year = group.year;
       run += 1;
-      if (year) list.push({ kind: 'year', key: `y${year}`, index: list.length, month, year, card: '' });
+      if (year) list.push({ kind: 'year', key: `y${year}`, index: list.length, month, year, count: perYear.get(year) ?? 0, card: '' });
     }
     for (const entry of group.entries) {
       if (entry.type === 'dive') {

@@ -172,12 +172,31 @@
       <div class="od-site-sheet--map">
         <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} height="170px" />
       </div>
-      <div class="od-site-sheet--coords">
-        <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
-        <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={ios ? (e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name)) : undefined}>
-          {t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
-        </a>
-      </div>
+      {#if ios}
+        <!-- iPhone (docs/mockups/ios-sites-fiche): the coordinates and « Ouvrir dans Plans » in one grouped card. -->
+        <ul class="od-site-sheet--surface od-site-sheet--ios-coords">
+          <li class="od-site-sheet--row">
+            <span class="od-site-sheet--headline od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
+            <span class="od-site-sheet--supporting">{t('sites.coordinates')}</span>
+          </li>
+          <li>
+            <a class="od-site-sheet--row od-site-sheet--ios-open external" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={(e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name))}>
+              <span class="od-site-sheet--text-column">
+                <span class="od-site-sheet--headline">{t('sites.openInPlans')}</span>
+                <span class="od-site-sheet--supporting">{t('sites.opensInPlans')}</span>
+              </span>
+              <span class="od-site-sheet--chevron"><Icon name="openInNew" size={18} /></span>
+            </a>
+          </li>
+        </ul>
+      {:else}
+        <div class="od-site-sheet--coords">
+          <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
+          <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={ios ? (e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name)) : undefined}>
+            {t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
+          </a>
+        </div>
+      {/if}
     {/if}
 
     <h2 class="od-site-sheet--title">{t('sites.about')}</h2>
@@ -205,7 +224,7 @@
           {@const listed = byId.get(dive.id)}
           <li>
             <a href="/dives/{dive.id}" class="od-site-sheet--row od-site-sheet--dive">
-              {#if listed}
+              {#if listed && !ios}
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}
               <span class="od-site-sheet--text-column">
@@ -304,6 +323,30 @@
       > li + li {
         border-top: 1px solid var(--od-separator);
       }
+    }
+
+    /* iPhone (docs/mockups/ios-sites-fiche): grouped cards with 10 px corners, small capitals titles. */
+    :global(.ios) .od-site-sheet--title {
+      margin: 22px 32px 6px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    :global(.ios) .od-site-sheet--surface {
+      border-radius: 10px;
+    }
+
+    .od-site-sheet--ios-coords {
+      margin-top: 12px;
+    }
+
+    .od-site-sheet--row.od-site-sheet--ios-open {
+      flex-direction: row;
+      align-items: center;
+      color: var(--od-text);
+      text-decoration: none;
     }
 
     .od-site-sheet--row {

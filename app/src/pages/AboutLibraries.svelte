@@ -3,7 +3,8 @@
   // About, "Bibliothèques libres": the open source components inside the app,
   // each with its licence (names and licences are not translated). A row opens
   // the library's website in the system browser.
-  import { Page, Navbar, Link } from 'framework7-svelte';
+  import { Page, Navbar } from 'framework7-svelte';
+  import BackLink from '../components/BackLink.svelte';
   import Icon from '../components/Icon.svelte';
   import { t } from '../lib/i18n.js';
 
@@ -40,10 +41,7 @@
 <Page data-od-scroll class="od-about-libraries">
   <Navbar title={t('about.libraries')}>
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
-      </Link>
+      <BackLink label={t('about.title')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
 
@@ -77,6 +75,36 @@
       margin: 8px 16px 0;
       font-size: 14px;
       line-height: 20px;
+      color: var(--od-text-2);
+    }
+
+    /* iPhone (docs/mockups/ios-apropos): inset groups with 10 px corners, titles in small capitals. */
+    :global(.ios) .od-about-libraries--intro {
+      margin: 8px 32px 0;
+      font-size: 13px;
+      line-height: 18px;
+    }
+
+    :global(.ios .od-about-libraries .block-title) {
+      margin: 22px 32px 6px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--od-text-2);
+    }
+
+    :global(.ios .od-about-libraries .list.inset) {
+      margin-left: 16px;
+      margin-right: 16px;
+      border-radius: 10px;
+    }
+
+    :global(.ios .od-about-libraries .list.inset ul) {
+      border-radius: 10px;
+    }
+
+    :global(.ios .od-about-libraries .item-after) {
       color: var(--od-text-2);
     }
   }

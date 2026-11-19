@@ -1450,7 +1450,7 @@
   {@render deskView()}
 {:else}
 <Page data-od-scroll class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
-  <Navbar title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
+  <Navbar large={ios && !section && !layout.split} title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
       {#if section && layout.split}
         <!-- Beside the overview on a tablet: nothing to go back to. -->
@@ -1657,6 +1657,61 @@
        page background, groups as rounded surfaces, no dividers, 48 px rows. */
     :global(.od-settings) {
       --od-settings-margin: 16px;
+    }
+
+    /* iPhone (docs/mockups/ios-reglages-apercu): small-capitals group titles, grouped lists with 10 px
+       corners and dividers, no icon discs, a grey search field. */
+    :global(.ios .od-settings .od-settings--title) {
+      padding: 22px 32px 6px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--od-text-2);
+    }
+
+    :global(.ios .od-settings .od-settings--surface) {
+      border-radius: 10px;
+    }
+
+    :global(.ios .od-settings .od-settings--overview-row) {
+      position: relative;
+    }
+
+    :global(.ios .od-settings .od-settings--surface [role='listitem'] + [role='listitem'] .od-settings--overview-row::before) {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 16px;
+      height: 1px;
+      background: var(--od-separator);
+    }
+
+    :global(.ios .od-settings .od-settings--overview-icon) {
+      display: none;
+    }
+
+    :global(.ios .od-settings .od-settings--overview-row) {
+      min-height: 56px;
+      gap: 12px;
+    }
+
+    :global(.ios .od-settings .od-settings--search) {
+      height: 36px;
+      padding: 0 8px;
+      gap: 6px;
+      border-radius: 10px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--od-text-2);
+      }
+
+      input {
+        font-size: 17px;
+      }
     }
 
     .od-settings--search {

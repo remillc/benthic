@@ -1356,7 +1356,7 @@
             {#if cards}
               {#each previewRows as row (row.key)}
                 {#if row.kind === 'year'}
-                  <li class="od-logbook--year"><h2 class="od-logbook--year-title">{row.year}</h2></li>
+                  <li class="od-logbook--year"><h2 class="od-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2></li>
                 {:else if row.kind === 'trip'}
                   <TripRow dives={row.dives} location={row.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} card cardFirst={row.cardFirst} cardLast={row.cardLast} gapBefore={row.gapBefore} />
                 {:else}
@@ -1549,7 +1549,7 @@
         {#each visible.items as row (row.key)}
           {#if row.kind === 'year'}
             <li class="od-logbook--year" data-virtual-list-index={row.index} style:top="{visible.topPosition}px">
-              <h2 class="od-logbook--year-title">{row.year}</h2>
+              <h2 class="od-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2>
             </li>
           {:else if row.kind === 'trip'}
             <TripRow
@@ -1829,6 +1829,18 @@
       line-height: 20px;
       font-weight: 600;
       color: var(--od-text-2);
+
+      /* iPhone (docs/mockups/ios-carnet): « 2026 · 1 plongée » in small capitals. */
+      :global(.ios) & {
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+    }
+
+    :global(.ios li.od-logbook--year) {
+      padding: 10px 32px 6px;
     }
 
     /* A card row lifted by a long press or a drop target: the card's surface shows it, not the row's padding. */
