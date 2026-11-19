@@ -1,0 +1,7 @@
+{
+  "name": "opendives-dc-images",
+  "private": true,
+  "type": "module",
+  "description": "Builds the dive computer image catalog (data/dive-computer-images).",
+  "devDependencies": { "sharp": "^0.34.0" }
+}

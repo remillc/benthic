@@ -519,3 +519,9 @@ The server code, the local development stack (containers, seed data, smoke test)
 
   Required: `kind`, `appVersion`, `edition`, `platform`, `message`. Unknown fields are ignored; texts are cut (message 2000, stack 12000, log 200 lines of 500). Answers: `200 { "ok": true, "id": "..." }`; `400 INVALID_REQUEST`; `413` over 64 KB; `429 TOO_MANY_REPORTS` with `Retry-After` (rate limit per address). The app keeps the report on `429`, `5xx` or no answer, and drops it on any other 4xx. Reports are kept 180 days. The address is the server of the build (`VITE_SERVER_URL` in development); without one nothing is kept or asked.
 - **Reading them.** A protected page of the server lists and shows the reports (development only for now). Its operation and the production needs are in the private repository.
+
+## 12. Dive computer images (decided on 19 November 2026)
+
+A catalog of normalized pictures of dive computers (512 and 128 px, one per libdivecomputer model) is built by `tools/dc-images` from `data/dive-computer-images/` (README there). The public repository holds the catalog (`catalog.json`, without image bytes) and the manual crops (`crops.json`); the webp files live on the OpenDives server (`GET /v1/dc-images/{512|128}/<slug>.webp`, public, immutable, cacheable; `GET /v1/dc-images/catalog.json`).
+
+Intended app behaviour (to be designed with the design agent, not built yet): the app fetches a picture the first time a model needs it, keeps it permanently in the device's app files directory, and shows it offline from then on. Nothing is bundled in the app. A model without a picture, or a download that fails, shows the usual placeholder; the picture is never required. Pictures whose catalog entry has `approx: true` are of a close model (low confidence) and are labelled as such where the design says so.
