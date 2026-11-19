@@ -68,3 +68,14 @@ test('brands and models merge the core list and the catalog, once each, any bran
   assert.deepEqual(modelsOf('shearwater'), ['Perdix', 'Petrel 3', 'Teric']);
   assert.deepEqual(modelsOf('Unknown brand'), []);
 });
+
+test('sameComputer: brand, model and serial number must match (task 306)', async () => {
+  const { sameComputer, serialKey } = await import('../../app/src/lib/dc-model.js');
+  assert.equal(serialKey('0x00A1'), 'a1');
+  const logbook = { model: 'Shearwater Perdix 2', serial: '4A21F7' };
+  assert.equal(sameComputer({ name: 'Perdix', brand: 'Shearwater', model: 'Perdix 2', serial: '4a21f7' }, logbook), true);
+  assert.equal(sameComputer({ name: 'Shearwater Perdix 2', computerModel: 'Shearwater Perdix 2', computerSerial: '4A21F7' }, logbook), true);
+  assert.equal(sameComputer({ name: 'Shearwater Perdix 2', brand: 'Shearwater', model: 'Perdix 2', serial: '99' }, logbook), false);
+  assert.equal(sameComputer({ name: 'Shearwater Perdix 2', brand: 'Shearwater', model: 'Perdix 2' }, logbook), false);
+  assert.equal(sameComputer({ name: 'Shearwater Petrel 3', brand: 'Shearwater', model: 'Petrel 3', serial: '4A21F7' }, logbook), false);
+});

@@ -6108,7 +6108,7 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the download screen and check that only a model with an image shows its photo. Open a dive computer in Équipement, tap the pencil and compare with the mock-up. Type a brand and a model that are not in the lists and save.
 
-## [ ] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
+## [x] 2026-11-19-304 OpenDives+ offer: header differs from the mock-up
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `android-odplus-offre` and `ios-odplus-offre` (updated).
 
@@ -6118,7 +6118,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** open the offer on a 390 dp wide phone (Android and iPhone) and compare the header with the mock-up side by side.
 
-## [ ] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
+**Done (19 November 2026).** The phone offer header is 264 dp (292 on iPhone): logo at 36 dp, chip, 24/32 title (two lines at 390 dp), 16/24 lead at 88% white, still bubbles at the mock-up's places. Compared with the mock-up in headless Chrome at 390 dp, Material and iOS.
+
+## [x] 2026-11-19-305 OpenDives+ offer: « Voir tout ce qui est inclus » is not centered
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mockups/`: `android-odplus-offre` (and `ios-odplus-offre`, same link).
 
@@ -6128,7 +6130,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-up in `docs/mo
 
 **Test:** open the offer on a phone and measure: the space left of the link equals the space right of it.
 
-## [ ] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
+**Done (19 November 2026).** The link is centred with 16 dp padding on both sides (68 dp left and right on a 390 dp phone, 24 dp on a tablet column), 48 dp high, 4 dp gap, 17 dp semi-bold text, 22 dp arrow. The global width: 100% on buttons stretched it; it is now as wide as the link.
+
+## [x] 2026-11-19-306 Dive-computer photos everywhere, equipment link, edit and delete a computer
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. It follows tasks 302 and 303 (idea #65). Image loading states (downloading, failed, offline) are yours, already in progress: no mock-up.
 
@@ -6146,7 +6150,9 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 
 **Test:** check a model with and without image in each listed screen. Download a computer that is not in the equipment and add it from the card. Edit and delete a computer from the profile on each device. Create a new part of type Ordinateur. Open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with the mock-up.
 
-## [ ] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
+**Done (19 November 2026).** Photos via GearIcon/DcTile in every list and the dive detail (own photo wins: lib/gear-photos.svelte.js); linking by brand/model/serial (sameComputer); download end card (Later/Add, hidden list in the device store, OD+ only; the download no longer adds the computer silently); ComputerDeleteDialog; Nouvelle pièce adapted to computers; Réglages › Modifier l’ordinateur restyled for all devices (also covers the layouts of task 307). The image button of a logbook computer shows with an OpenDives+ account only: the photo is kept on the matching equipment piece, created if missing.
+
+## [x] 2026-11-19-307 Réglages › « Modifier l’ordinateur » on tablet, iPhone and desktop
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. Same screen as point 6 of task 306, on the other devices.
 
@@ -6155,3 +6161,30 @@ Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/m
 - **Desktop** (`bureau-reglages-ordinateur-modifier`, new). Dialog over Réglages › Ordinateurs et téléchargement: photo with « Changer d’image » on the left, name and info on the right, the two cards side by side, « Annuler » and « Enregistrer » at the bottom.
 
 **Test:** on each device open Réglages › Ordinateurs du carnet › the duplicate « Shearwater Perdix 2 » and compare with its mock-up.
+
+**Done (19 November 2026).** Réglages › Modifier l’ordinateur on a tablet (440 dp side sheet over the list with photos; 96 dp tile with « Changer d’image », filled « Enregistrer », sand and white cards; scrolls), iPhone and iPad (grouped lists, Annuler / OK, footers, red « Retirer de la liste ») and desktop (760 dp dialog, photo left, cards side by side, Annuler / Enregistrer). Checked in headless Chrome at 390 dp (Material and ?theme=ios), 1024 and 1440 px; the duplicate cards could not be seen against real data (the sample log has one computer), so they follow the mock-up CSS only.
+
+## [ ] 2026-11-19-308 Maintenance reminders (#47): retire a piece, notifications, bottles, warnings, export
+
+Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`. OpenDives+ only. It completes the maintenance screens of 18 November and tasks 306 and 307.
+
+**1. Retire a piece instead of deleting it.** The maintenance history of a piece is always kept.
+- The button on « Modifier l’ordinateur de plongée » (and on any piece's edit screen) is now « Retirer de l’équipement » (outlined, archive icon). It opens a dialog: « Retirer le Shearwater Perdix 2 ? », the text « Il quitte vos listes, vos kits et les rappels. Son historique d’entretien et ses plongées sont gardés. Vous le retrouvez dans « Pièces retirées ». », an optional reason as filter chips (Vendue, Perdue, Hors d’usage), « Annuler » and « Retirer ». Phone `profil-piece-supprimer-android` (the file name stays, the content is the retire dialog), tablet `android-tablette-profil-piece-retirer-paysage`, desktop `bureau-profil-piece-retirer`. On iPhone an action sheet offers the reasons (`ios-profil-piece-retirer`).
+- A retired piece leaves the lists, the kits and the reminders, keeps its history and its dives. « Équipement » ends with a row « Pièces retirées » and their count (`profil-equipement-android`). The list of retired pieces and the sheet of a retired piece: `profil-piece-retiree-android`, `android-tablette-profil-piece-retiree-paysage`, `bureau-profil-piece-retiree`. The sheet shows « Retiré le 2 mars 2024 », the reason, « Remettre en service » and « Exporter l’historique », no pencil, and at the bottom « Supprimer pour de bon ».
+- « Supprimer pour de bon » (only from a retired piece) asks: « Supprimer pour de bon ? », « Le Suunto Vyper Air et tout son historique d’entretien seront effacés. Ce choix est définitif. Les plongées restent dans le carnet. », « Annuler » and « Supprimer » in red (`profil-piece-supprimer-definitif-android` and the tablet and desktop files of the same name).
+
+**2. Notifications.** New page Réglages › Notifications (`reglages-notifications-android`, `ios-reglages-notifications`, `bureau-reglages-notifications`), with an entry « Notifications » under « Unités » (`reglages-apercu-android`, `ios-reglages-apercu`, desktop category list). Section « Entretien de l’équipement »: switch « Rappels d’entretien », the default lead time (2 semaines, 30 jours, 60 jours: segmented buttons), switch « Rappeler si en retard » (once a week until the maintenance is recorded). Section « Après la plongée »: switch « Avion permis ». Notifications arrive at 9:00 (except the flight one). Each piece's own reminder may override the lead time: its choices are now 14 jours, 30 jours, 60 jours (`ent-regle-android` and the tablet and desktop « rappel » files; 7 days is gone). The two notifications are in `notif-entretien-android`: « Entretien dans 30 jours : Apeks XTX50 » with « Voir » and « Noter l’entretien », and « Entretien en retard : AL80 jaune » with « Voir » and « Me le rappeler dans 1 semaine ».
+
+**3. Bottles have two deadlines** (`ent-bouteille-android`, `android-tablette-profil-entretien-bouteille-paysage`, `bureau-profil-entretien-bouteille`): « Inspection visuelle » (every year) and « Épreuve hydraulique » (every 5 years, with the date stamped on the bottle, for example 03/22). Each has its own card, progress bar, « Noter … » button and reminder.
+
+**4. Overdue piece in a dive.** In « Ajouter de l’équipement », a piece that is overdue stays selectable but shows « Inspection visuelle en retard » in red with a warning icon (`equipement-ajout-retard-android`, `android-tablette-profil-plongee-ajout-retard-paysage`, `bureau-profil-plongee-ajout-retard`). Shown only when the piece's reminder has « Avertir dans une plongée » on.
+
+**5. Export the history** (`ent-historique-pdf`, letter size): the piece, its type, serial number, purchase date, dive count and next maintenance, then a table Date, Type, Fait par, Coût, Notes, then the attached invoices. Offered from a retired piece and from a piece's menu.
+
+**6. Other changes.**
+- The maintenance card shows the hours under water next to the dive count: « 82 plongées sur 100 · 61 h » (phone, tablet, desktop).
+- « Contrôle avant voyage » is removed (a trip is only in the logbook afterwards). A check before a trip is recorded by hand as an « Inspection ».
+- Dive computers have no maintenance reminder: the « Pile » reminder of the Perdix 2 is removed from every list and sheet, the counts drop to « 1 bientôt ». Not on the new part form of type Ordinateur either (task 306). Idea kept for after the launch (`docs/POST-LAUNCH.md`, #104).
+- The Android delete dialog of task 306 (« Supprimer l’ordinateur ») is replaced by point 1.
+
+**Test:** retire a piece with a reason, find it in « Pièces retirées », put it back in service, then retire and delete it for good. Turn the maintenance notifications off and on in Réglages › Notifications and change the lead time. Open the AL80 sheet and check the two deadlines. Add the overdue AL80 to a dive. Export a piece's history.

@@ -762,6 +762,10 @@
       "unknown": "Inconnu",
       "possible": "Doublon possible de « {name} » ({details}).",
       "possibleMany": "{n} doublons possibles.",
+      "possibleSame": {"one": "Même modèle que « {name} » ({details}). Sa plongée vient sans doute du même ordinateur.", "other": "Même modèle que « {name} » ({details}). Ses {n} plongées viennent sans doute du même ordinateur."},
+      "possibleNoSerial": {"one": "Même modèle que « {name} » ({details}), mais sans numéro de série. Sa plongée vient sans doute du même ordinateur.", "other": "Même modèle que « {name} » ({details}), mais sans numéro de série. Ses {n} plongées viennent sans doute du même ordinateur."},
+      "notDuplicate": "Pas un doublon, ou plus utilisé ?",
+      "imageLabel": "Image du {name}",
       "mergeWith": "Fusionner avec {name}",
       "mergeWithMany": "Fusionner avec…",
       "mergeHelp": {
@@ -2856,6 +2860,10 @@
       "« Ce lest était » devient un rail : une pastille glisse d’un choix à l’autre ; toucher le choix coché l’efface.",
       "Équipement : « Modifier l’ordinateur de plongée » (marque et modèle avec suggestions, ou texte libre ; « Changer d’image » garde votre photo dans votre compte, sans la partager).",
       "iPhone : Carnet sans miniature de profil (jour et mois, « N° · heure », profondeur au-dessus de la durée, titres d’année avec leur nombre de plongées) ; Réglages en grand titre avec groupes en petites capitales ; fiche d’un site en cartes groupées, avec « Ouvrir dans Plans » expliqué ; À propos et Bibliothèques libres avec le bouton de retour nommé.",
+      "L’offre OpenDives+ : l’en-tête suit sa maquette (logo et nom, pastille, titre de 24 points, bulles fixes) et « Voir tout ce qui est inclus » est centré.",
+      "Les photos des ordinateurs de plongée s’affichent partout où le modèle apparaît : listes d’équipement, de kits et d’entretien, fiche de la pièce, détail de la plongée, Réglages › Ordinateurs du carnet et modification de la plongée. Votre propre photo passe avant celle du modèle.",
+      "Après un téléchargement depuis un ordinateur qui n’est pas dans votre équipement (OpenDives+), une carte propose de l’ajouter : « Plus tard » ou « Ajouter ». Un ordinateur du carnet et une pièce d’équipement sont les mêmes quand la marque, le modèle et le numéro de série correspondent.",
+      "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait).",
       "Après un téléchargement depuis un ordinateur de plongée, « Compléter la plongée » s’ouvre pour chaque nouvelle plongée sans site (Android et iPhone) : les trois sites les plus proches de la position du téléphone, ou les trois plus récemment plongés sans position, le plus proche présélectionné à moins de 500 m, « Créer un site à ma position actuelle », « Chercher un autre site », les compagnons et la note. « Plus tard » laisse la plongée telle quelle."
     ],
     "source": "Code source",
@@ -3319,6 +3327,10 @@
     "percent": "{n} %",
     "progressLabel": "Progression du téléchargement",
     "keepNear": "Gardez l'écran allumé et le téléphone près de l'ordinateur.",
+    "finished": "Téléchargement terminé",
+    "receivedAll": "Plongées reçues",
+    "finishedCount": {"one": "{n} plongée", "other": "{n} plongées"},
+    "firstTime": "C’est la première fois que ce {name} est téléchargé.",
     "notAgain": "Les plongées déjà dans le carnet ne sont pas retéléchargées.",
     "received": "Reçues jusqu'ici",
     "newDive": "Nouvelle plongée",
@@ -5544,7 +5556,25 @@
       "removeImage": "Retirer ma photo",
       "photoNote": "Cette photo reste dans votre compte. Elle n’est pas partagée.",
       "noteHint": "Par exemple, l’ordinateur de secours",
-      "delete": "Supprimer la pièce"
+      "suggestHint": "Choisissez dans la liste ou tapez un autre nom.",
+      "serialShort": "N° de série",
+      "noteShort": "Notes",
+      "optional": "Facultatif",
+      "ok": "OK",
+      "delete": "Supprimer l’ordinateur"
+    },
+    "computerDelete": {
+      "title": "Supprimer le {name} ?",
+      "text": "Il sera retiré de votre équipement et de vos kits. Les plongées faites avec lui restent dans le carnet.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    },
+    "computerOffer": {
+      "title": "Ajouter le {name} à votre équipement ?",
+      "text": "Il sera dans Mon profil de plongeur, avec son numéro de série et ses plongées.",
+      "later": "Plus tard",
+      "add": "Ajouter",
+      "added": "{name} ajouté à votre équipement"
     },
     "pieceEdit": {
       "addTitle": "Nouvelle pièce",
@@ -5632,6 +5662,7 @@
       "photoRemove": "Retirer la photo",
       "photoFailed": "La photo n’a pas pu être lue",
       "serialHint": "Numéro gravé sur la pièce",
+      "serialHintComputer": "Affiché dans les réglages de l’ordinateur",
       "needName": "Saisissez une marque, un modèle ou un nom"
     }
   },

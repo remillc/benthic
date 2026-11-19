@@ -49,7 +49,7 @@
           {@const p = piece(e)}
           {#if p}
             <button type="button" class="od-maintenance-list--row" class:od-maintenance-list--on={selected === p.id} onclick={() => showProfilePath(`/profile/gear/${p.id}/maintenance`)}>
-              <span class="od-maintenance-list--tile"><GearIcon type={p.type} name={p.name} size={22} /></span>
+              <span class="od-maintenance-list--tile"><GearIcon type={p.type} name={p.name} size={22} piece={p} tile={40} /></span>
               <span class="od-maintenance-list--texts">
                 <span class="od-maintenance-list--name">{p.name} · {taskInline(e.item)}</span>
                 <span class="od-maintenance-list--line">{lineText(e, formatLongDate)}</span>

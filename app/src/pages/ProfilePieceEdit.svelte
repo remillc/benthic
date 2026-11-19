@@ -11,6 +11,11 @@
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
   import TextField from '../components/TextField.svelte';
+  import ComboField from '../components/ComboField.svelte';
+  import DcTile from '../components/DcTile.svelte';
+  import { OpenDivesCore } from 'opendives-core';
+  import { getCatalog } from '../lib/dc-images.js';
+  import { brandModels } from '../lib/dc-model.js';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
@@ -50,7 +55,10 @@
   /** The reminder set in the card (a new piece only), saved with the piece. @type {{ task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 7|30|60, warnInDive: boolean }|null} */
   let reminder = $state(null);
 
+  /** Brands and models for a dive computer (libdivecomputer's names; any other text can be typed). */
+  let lists = $state(brandModels([], []));
   onMount(async () => {
+    Promise.all([OpenDivesCore.bluetoothModels().catch(() => []), getCatalog().catch(() => [])]).then(([bluetooth, catalog]) => (lists = brandModels(bluetooth, catalog)));
     await loadInventory();
     const g = gear.pieces.find((x) => x.id === id);
     if (g) {
@@ -121,19 +129,19 @@
           name: effectiveName,
           brand,
           model,
-          serial: computer && piece ? piece.serial : serial,
+          serial: computer && piece?.computerModel ? piece.serial : serial,
           purchasedOn,
           note,
           photoId: nextPhoto || undefined,
         });
-        if (!id && reminder) {
+        if (!id && reminder && !computer) {
           await inv.saveMaintenance({ gearId: g.id, task: reminder.task, intervalMonths: reminder.months, intervalDives: reminder.dives, notifyDays: reminder.notifyDays, warnInDive: reminder.warnInDive });
         }
         return g;
       });
       showSnackbar(t('gear.pieceEdit.saved'));
       f7router.back();
-      if (!id && reminder && saved) afterReminderSaved();
+      if (!id && reminder && !computer && saved) afterReminderSaved();
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     } finally {
@@ -141,6 +149,10 @@
     }
   }
 </script>
+
+{#snippet thumbIcon()}
+  <GearIcon type="computer" size={32} />
+{/snippet}
 
 {#snippet body()}
 
@@ -181,26 +193,41 @@
       <input bind:this={fileInput} class="od-piece-edit--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickPhoto} />
     </div>
 
-    <TextField label={t('gear.pieceEdit.brand')} bind:value={brand} />
+    {#if computer}
+      <ComboField label={t('gear.pieceEdit.brand')} bind:value={brand} options={lists.vendors} />
+    {:else}
+      <TextField label={t('gear.pieceEdit.brand')} bind:value={brand} />
+    {/if}
     <div class="od-piece-edit--model">
       <span class="od-piece-edit--thumb" data-testid="piece-thumb">
         {#if photoUrl}
           <img src={photoUrl} alt="" class="od-piece-edit--thumb-image" />
+        {:else if computer}
+          <!-- The model's photo as soon as the model is known (task 2026-11-19-306). -->
+          <DcTile model={[brand, model].map((s) => s.trim()).filter(Boolean).join(' ')} size={56} radius={12} fallback={thumbIcon} />
         {:else}
           <GearIcon {type} {name} size={32} />
         {/if}
       </span>
-      <div class="od-piece-edit--model-field"><TextField label={t('gear.pieceEdit.model')} bind:value={model} /></div>
+      <div class="od-piece-edit--model-field">
+        {#if computer}
+          <ComboField label={t('gear.pieceEdit.model')} bind:value={model} options={lists.modelsOf(brand)} />
+        {:else}
+          <TextField label={t('gear.pieceEdit.model')} bind:value={model} />
+        {/if}
+      </div>
     </div>
-    {#if computer}
+    {#if computer && piece?.computerModel}
       <p class="od-piece-edit--help">{t('gear.pieceEdit.readFromDownload')}</p>
+    {:else if computer}
+      <TextField label={t('gear.pieceEdit.serial')} bind:value={serial} supporting={t('gear.pieceNew.serialHintComputer')} />
     {:else}
       <TextField label={t('gear.pieceEdit.serial')} bind:value={serial} supporting={t('gear.pieceNew.serialHint')} />
     {/if}
     <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t('gear.pieceEdit.purchasedOnHint')} />
-    <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={t('gear.pieceEdit.noteHint')} />
+    <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
 
-    {#if !id}
+    {#if !id && !computer}
       <div class="od-piece-edit--reminder">
         <span class="od-piece-edit--reminder-icon"><Icon name="clock" size={22} /></span>
         <span class="od-piece-edit--reminder-texts">

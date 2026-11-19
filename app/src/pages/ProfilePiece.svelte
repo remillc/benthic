@@ -12,6 +12,7 @@
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
   import DcTile from '../components/DcTile.svelte';
+  import ComputerDeleteDialog from '../components/ComputerDeleteDialog.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
@@ -143,7 +144,7 @@
 
   {#if piece}
     <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
-      {#if piece.type === 'computer' && !photoUrl}<DcTile model={piece.computerModel || piece.name} size={144} radius={20} fallback={genericIcon} />{:else if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
+      {#if piece.type === 'computer'}<DcTile model={piece.computerModel || piece.name} size={150} radius={16} photo={photoUrl} fallback={genericIcon} />{:else if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
     </div>
     <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}{#if piece.retired}<span class="od-piece-page--badge">{t('gear.piece.archived')}</span>{/if}</p>
     <h2 class="od-piece-page--name">{piece.name}</h2>
@@ -222,7 +223,9 @@
   {/if}
 </Page>
 
-{#if confirmDelete && piece}
+{#if confirmDelete && piece && piece.type === 'computer'}
+  <ComputerDeleteDialog name={piece.name} oncancel={() => (confirmDelete = false)} onconfirm={remove} />
+{:else if confirmDelete && piece}
   <Md3Dialog title={t('gear.piece.deleteTitle')} text={t('gear.piece.deleteText', { name: piece.name })} role="alertdialog" oncancel={() => (confirmDelete = false)}>
     <span></span>
     {#snippet actions()}

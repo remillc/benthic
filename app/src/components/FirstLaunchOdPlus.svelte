@@ -35,6 +35,9 @@
   /** The section band's faint dive profile (the same path as SectionBand). */
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 
+  /** The offer header's still bubbles: [cx, cy, r] on the mock-up's 390 × 300 drawing. */
+  const OFFER_BUBBLES = [[40, 210, 5], [78, 250, 3], [330, 190, 6], [352, 236, 3.5], [300, 120, 4], [64, 140, 3], [250, 260, 2.5], [120, 300, 4], [346, 300, 3]];
+
   // « Votre carnet est prêt » plays its sequence once (task 2026-11-18-270): decided when the step appears, kept while it shows.
   const motion = readyMotion;
   let motionStep = '';
@@ -166,6 +169,12 @@
   <header class="od-plus-hero od-plus-hero--{which}">
     <div class="od-plus-hero--bands" aria-hidden="true"></div>
     {#if which === 'ready' && motion.bubbles}<OdPlusReadyBubbles still={motion.still} />{/if}
+    {#if which === 'offer'}
+      <!-- The offer's own bubbles: still, at the places of the mock-up (task 2026-11-19-304). -->
+      <svg class="od-plus-hero--bubbles" viewBox="0 0 390 300" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+        {#each OFFER_BUBBLES as [cx, cy, r]}<circle {cx} {cy} {r} />{/each}
+      </svg>
+    {/if}
     <!-- Every OpenDives+ header: the band of the dive profile above the bottom wave, as on « Se connecter ». -->
     <svg class="od-plus-hero--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{BAND_PROFILE} V140 H0 Z" class="od-plus-hero--profile-area" />
@@ -263,7 +272,7 @@
       </span>
     </div>
     <!-- « Voir tout ce qui est inclus » (task 2026-11-19-295): opens the list of everything the subscription includes. -->
-    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={20} weight={2.2} /></button>
+    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
     {@render priceBlock()}
     <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     {#if ios}
@@ -729,6 +738,21 @@
       font-weight: 500;
     }
 
+    .od-plus-hero--bubbles {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 300px;
+      pointer-events: none;
+
+      circle {
+        fill: none;
+        stroke: var(--od-plus-bubble);
+        stroke-width: 1.2;
+      }
+    }
+
     .od-plus-hero--profile,
     .od-plus-hero--wave {
       display: none;
@@ -989,18 +1013,20 @@
     /* « Voir tout ce qui est inclus ›»: a text link, 48 dp high. */
     .od-plus--see-all {
       align-self: center;
+      width: auto;
       height: 48px;
-      padding: 0 8px 0 16px;
+      padding: 0 16px;
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       border: none;
       border-radius: 24px;
       background: transparent;
       color: var(--od-release-link);
       font: inherit;
       font-size: 17px;
-      font-weight: 500;
+      line-height: 24px;
+      font-weight: 600;
       cursor: pointer;
 
       @media (hover: hover) {
@@ -1369,10 +1395,17 @@
       .od-plus-hero--offer {
         box-sizing: border-box;
         min-height: 264px;
-        padding: 40px 16px 42px;
+        padding: 36px 16px 40px;
 
         .od-plus-hero--brand {
+          gap: 8px;
+          line-height: 28px;
           margin-bottom: 20px;
+        }
+
+        .od-plus-hero--lead {
+          line-height: 24px;
+          color: rgb(255 255 255 / 0.88);
         }
 
         .od-plus-hero--title {

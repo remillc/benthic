@@ -12,6 +12,8 @@
 // Everything is read and written through a FileStore (lib/file-store.js). An unknown field of a file is kept: a
 // file is read as an object, the keys the app owns are changed, and the object is written back.
 
+import { sameComputer } from './dc-model.js';
+
 import { ruleProblems } from './maintenance.js';
 
 /** @typedef {import('./file-store.js').FileStore} FileStore */
@@ -486,16 +488,25 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     /**
      * A computer downloaded from: enters the inventory the first time (serial and firmware), and its firmware and
      * download date are refreshed each time. Nothing is written while read only (the download itself is never blocked).
+     * `add: false` (task 2026-11-19-306): a computer that is not in the equipment is not added (the end of the download
+     * offers it); one that is, brand, model and serial number matching, only gets its firmware and its tie to the
+     * logbook refreshed.
      * @param {{ vendor?: string, model: string, serial: string, firmware: string }} computer
+     * @param {{ add?: boolean }} [options]
      * @returns {Promise<{ added: boolean, gear: Gear|null }>}
      */
-    async recordDownloadedComputer(computer) {
+    async recordDownloadedComputer(computer, { add = true } = {}) {
       if ((await readState()).readOnlyFrom) return { added: false, gear: null };
       const all = await store.readAll('gear/');
-      const found = all.find((g) => g.type === 'computer' && g.computerModel === computer.model && (g.computerSerial ?? '') === computer.serial);
+      const found = all.find((g) => g.type === 'computer' && ((g.computerModel === computer.model && (g.computerSerial ?? '') === computer.serial) || sameComputer(g, computer)));
       const read = stamp().slice(0, 10);
+      if (!found && !add) return { added: false, gear: null };
       if (found) {
         const next = { ...found };
+        if (!next.computerModel) {
+          next.computerModel = computer.model;
+          next.computerSerial = computer.serial;
+        }
         if (computer.firmware) {
           next.firmware = computer.firmware;
           next.firmwareReadAt = read;

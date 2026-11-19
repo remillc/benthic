@@ -161,4 +161,4 @@ export const equipmentOpens = (weights, _computers = 0) => weights.length > 0;
  * @returns {{ name: string, model: string, main: boolean }[]} `model`: the computer's model, for its photo
  */
 export const computerList = (diveComputers) =>
-  (diveComputers ?? []).filter((dc) => dc.model).map((dc, i) => ({ name: /** @type {string} */ (dc.nickname || dc.model), model: /** @type {string} */ (dc.model), main: i === 0 }));
+  (diveComputers ?? []).filter((dc) => dc.model).map((dc, i) => ({ name: /** @type {string} */ (dc.nickname || dc.model), model: /** @type {string} */ (dc.model), main: i === 0, ...(dc.serial ? { serial: /** @type {string} */ (dc.serial) } : {}) }));
