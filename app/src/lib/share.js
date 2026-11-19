@@ -24,6 +24,8 @@ import {
   locale,
 } from './format.js';
 import { t, tIfExists } from './i18n.js';
+import { deviceStore } from './device-store.js';
+import { logbookExportName, localDay } from './logbook-name.js';
 import { settings } from './settings.svelte.js';
 import { bottomVolumeKey, reserveLegendKey } from './reserve-factor.js';
 import { visibleTags } from './weight-feedback.js';
@@ -322,11 +324,15 @@ export function profileSvgFromSamples(dive, prefs) {
  * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format
  * @param {boolean} anonymize
  * @param {Prefs} prefs
+ * @param {boolean} [whole] the whole logbook in .ssrf: named after the logbook (« carnet-de-roger-2026-11-19.ssrf »)
  */
-export async function exportDives(ids, format, anonymize, prefs) {
-  const day = new Date().toISOString().slice(0, 10);
+export async function exportDives(ids, format, anonymize, prefs, whole = false) {
+  const day = localDay();
   const ext = format === 'csvProfiles' ? 'csv' : format;
-  const name = `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
+  const name =
+    whole && format === 'ssrf'
+      ? logbookExportName(deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName'), day, t('desktop.export.fileLogbook'))
+      : `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
   const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name);
   await OpenDivesCore.grantShareFile({ uri, mime });
   await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });

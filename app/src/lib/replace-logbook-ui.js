@@ -6,7 +6,7 @@ import { Share } from '@capacitor/share';
 import { OpenDivesCore } from 'opendives-core';
 import { logbook, replaceDeviceLogbook } from './logbook.svelte.js';
 import { deviceStore } from './device-store.js';
-import { sanitiseLogbookName } from './logbook-name.js';
+import { sanitiseLogbookName, logbookExportName, localDay } from './logbook-name.js';
 import { exportFile } from './share.js';
 import { importErrorKey } from './deep-link.js';
 import { runReplace } from './replace-logbook.js';
@@ -24,7 +24,7 @@ export const openLogbookName = () => deviceStore.getItem('od.logbookName') || t(
 export async function exportOpenLogbook() {
   const ids = logbook.dives.map((d) => d.id);
   if (!ids.length) return false;
-  const name = `${sanitiseLogbookName(openLogbookName()) || 'logbook'}.ssrf`;
+  const name = logbookExportName(openLogbookName(), localDay(), t('desktop.export.fileLogbook'));
   const { uri, mime } = await exportFile(ids, 'ssrf', false, logbook.prefs, name);
   await OpenDivesCore.grantShareFile({ uri, mime });
   try {

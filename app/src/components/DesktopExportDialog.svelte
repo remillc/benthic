@@ -9,6 +9,9 @@
   import { exportFile } from '../lib/share.js';
   import { deviceStore } from '../lib/device-store.js';
   import { defaultScope, exportFileName } from '../lib/desktop-export.js';
+  import { windowLogbook } from '../lib/desktop-logbooks.svelte.js';
+  import { displayName } from '../lib/desktop-logbooks.js';
+  import { localDay } from '../lib/logbook-name.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
@@ -45,8 +48,9 @@
     busy = true;
     deviceStore.setItem(FORMAT_KEY, format);
     try {
-      const day = new Date().toISOString().slice(0, 10);
-      const name = exportFileName(/** @type {any} */ (scope), numbers, format, day, { dives: t('desktop.export.fileDives'), logbook: t('desktop.export.fileLogbook') });
+      const day = localDay();
+      const entry = windowLogbook();
+      const name = exportFileName(/** @type {any} */ (scope), numbers, format, day, { dives: t('desktop.export.fileDives'), logbook: t('desktop.export.fileLogbook') }, entry ? displayName(entry, t) : '');
       const { uri } = await exportFile(ids, format, anonymize, prefs, name);
       const result = await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
       onclose();
