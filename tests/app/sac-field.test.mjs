@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ML_PER_CUFT } from '../../app/src/lib/planner-rules.js';
-import { parseSac, sacMax, sacPresets, sacPresetText, sacText } from '../../app/src/lib/sac-field.js';
+import { o2RateText, o2RateValues, parseSac, sacMax, sacPresets, sacPresetText, sacText } from '../../app/src/lib/sac-field.js';
 
 test('presets: 0 to 2 cuft/min by 0.01, 10 to 30 L/min by 5 (typing up to 60 L/min)', () => {
   const cuft = sacPresets(true).map((p) => p.unit);
@@ -61,4 +61,45 @@ test('what is shown can be typed back unchanged', () => {
       assert.equal(parseSac(sacText(kept, cuft, 'fr'), cuft), kept);
     }
   }
+});
+
+// Task 2026-11-19-286: gas consumption per minute follows the Volume unit.
+import fr from '../../app/src/i18n/fr.json' with { type: 'json' };
+import en from '../../app/src/i18n/en.json' with { type: 'json' };
+import { readFileSync } from 'node:fs';
+
+test('metabolic O2: the wheel lists core ml/min in both units, conversions in both ways', () => {
+  const l = o2RateValues(false);
+  assert.equal(l[0], 100);
+  assert.equal(l.at(-1), 3000);
+  const c = o2RateValues(true);
+  assert.equal(c[0], Math.round(0.004 * ML_PER_CUFT));
+  assert.ok(c.at(-1) <= 3000, 'stays inside the core range');
+  assert.ok(c.includes(Math.round(0.03 * ML_PER_CUFT)), '0.030 cu ft/min is offered');
+  // 1 cu ft = 28.3168 L: 0.03 cu ft/min writes 850 ml/min
+  assert.equal(Math.round(0.03 * ML_PER_CUFT), 850);
+  assert.equal(o2RateText(850, true, 'en'), '0.030');
+  assert.equal(o2RateText(850, false, 'en'), '0.85');
+  assert.equal(o2RateText(850, true, 'fr'), '0,030');
+  // the same stored value, shown in each unit, goes back to the same core value
+  const back = Math.round(Number(o2RateText(850, true, 'en')) * ML_PER_CUFT);
+  assert.equal(back, 850);
+});
+
+test('labels and the line under Volume, fr and en', () => {
+  assert.equal(fr.units.cubicFeetPerMinute, 'pi³/min');
+  assert.equal(fr.units.litersPerMinute, 'l/min');
+  assert.equal(en.units.cubicFeetPerMinute, 'cu ft/min');
+  assert.equal(en.units.litersPerMinute, 'L/min');
+  assert.equal(fr.settings.volumeNoteCuft, 'Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d’O₂, en pi³/min');
+  assert.equal(fr.settings.volumeNoteLitres, 'Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d’O₂, en l/min');
+  assert.match(en.settings.volumeNoteCuft, /cu ft\/min$/);
+  assert.match(en.settings.volumeNoteLitres, /L\/min$/);
+});
+
+test('Settings: the Volume row carries the line and the pSCR field follows the unit', () => {
+  const src = readFileSync(new URL('../../app/src/pages/Settings.svelte', import.meta.url), 'utf8');
+  assert.match(src, /unitRow\('volume'[^\n]*volumeNoteCuft[^\n]*volumeNoteLitres/);
+  assert.match(src, /o2ConsumptionMlMin: o2RateValues\(cuft\)\[i\]/);
+  assert.match(src, /o2RateText\(p\.o2ConsumptionMlMin, cuft, locale\)/);
 });

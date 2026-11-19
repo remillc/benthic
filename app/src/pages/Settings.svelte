@@ -28,7 +28,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
-  import { t, tIfExists, deviceLanguage } from '../lib/i18n.js';
+  import { t, tIfExists, deviceLanguage, locale } from '../lib/i18n.js';
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
   import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
@@ -49,6 +49,7 @@
   import { formatStampDate } from '../lib/profile-format.js';
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel, depthUnit } from '../lib/format.js';
   import { depthToMm, mmToDepth } from '../lib/planner-rules.js';
+  import { o2RateValues, o2RateText } from '../lib/sac-field.js';
   import { regionUsesLetter } from '../lib/share.js';
   import { waterTypeName, downloadWaterName, FLIGHT_WAIT_MODES, flightWaitName } from '../lib/tools.js';
   import { setFlightNotify } from '../lib/flight-reminder.svelte.js';
@@ -87,6 +88,9 @@
 
   /** The values shown: the core's, with Subsurface's defaults until they are read. */
   const p = $derived(/** @type {CorePrefValues} */ ({ ...(logbook.prefs.defaults ?? {}), ...logbook.prefs }));
+  const cuft = $derived(p.volume === 'cuft');
+  /** The unit of gas consumption per minute follows the Volume unit. */
+  const sacUnit = () => t(cuft ? 'units.cubicFeetPerMinute' : 'units.litersPerMinute');
   const defaults = $derived(/** @type {CorePrefValues} */ (logbook.prefs.defaults ?? p));
 
   /** @type {{ f7route?: { params?: { section?: string } }, f7router?: any, desk?: boolean, windowed?: boolean }} */
@@ -351,7 +355,7 @@
             }
           },
         },
-        unitRow('volume', t('settings.volume')),
+        { ...unitRow('volume', t('settings.volume')), text: t(cuft ? 'settings.volumeNoteCuft' : 'settings.volumeNoteLitres') },
         unitRow('temperature', t('settings.temperature')),
         unitRow('weight', t('settings.weight')),
       ],
@@ -664,10 +668,14 @@
           kind: 'number',
           id: 'o2consumption',
           label: t('settings.rebreather.o2consumption'),
-          value: `${litres(p.o2ConsumptionMlMin)}\u00A0${t('units.litersPerMinute')}`,
-          dialogText: t('settings.rebreather.o2consumptionDialog'),
-          wheels: () => [wheel(t('settings.rebreather.o2consumption'), range(100, 3000, 10), p.o2ConsumptionMlMin, defaults.o2ConsumptionMlMin, (v) => formatNumber(v / 1000, 3))],
-          set: ([i]) => setCore({ o2ConsumptionMlMin: 100 + i * 10 }),
+          value: `${o2RateText(p.o2ConsumptionMlMin, cuft, locale)} ${sacUnit()}`,
+          dialogText: t(cuft ? 'settings.rebreather.o2consumptionDialogCuft' : 'settings.rebreather.o2consumptionDialog'),
+          wheels: () => {
+            // The core keeps ml/min; the wheel lists them in the Volume unit.
+            const ml = o2RateValues(cuft);
+            return [wheel(t('settings.rebreather.o2consumption'), ml, p.o2ConsumptionMlMin, defaults.o2ConsumptionMlMin, (v) => o2RateText(v, cuft, locale))];
+          },
+          set: ([i]) => setCore({ o2ConsumptionMlMin: o2RateValues(cuft)[i] }),
         },
         {
           kind: 'number',
@@ -744,11 +752,6 @@
       ],
     },
   ]);
-
-  /** @param {number} ml */
-  function litres(ml) {
-    return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(ml / 1000);
-  }
 
   /** @param {'system'|'light'|'dark'} theme */
   function applyTheme(theme) {

@@ -5759,7 +5759,7 @@ Réglages › Équipement › Types de bouteilles › Vos types › a type (e.g.
 
 **Done (19 November 2026), decision of Christian on the open point:** deleting one of « Vos types » deletes the type and removes its cylinders from the dives that use them, with their pressures and gas mix, EXCEPT where removing would damage the dive: (1) the cylinder is the cylinder the dive starts on (so also a dive's only cylinder), or (2) the dive depends on it (a gas change to it, a tank sensor mapped to it, or, with no explicit sensor mapping, a sensor from its index up). There the cylinder stays with its pressures, mix and events, and only its type is replaced by « unknown » (Subsurface's own name for a cylinder without a type; shown as « Type inconnu »). The removal uses Subsurface's own sequence (`get_cylinder_map_for_remove`, `remove_cylinder`, `cylinder_renumber`), so the other cylinders' gas changes and sensors keep pointing at the right cylinders. One undoable step in the core (façade `cylinder_type_delete`, actions `delete` and `deletePreview` of `cylinderTypes`); the dialog counts come from the core. Tests: `tests/cylinder_delete_test.cpp` on `tests/data/cylinder-delete.ssrf`, `tests/app/cylinder-type-delete.test.mjs`.
 
-## [ ] 2026-11-19-286 Units: gas consumption per minute follows the Volume unit
+## [x] 2026-11-19-286 Units: gas consumption per minute follows the Volume unit
 
 Christian approved this on 19 November 2026. Work in `main`. Mock-ups in `docs/mockups/`: `reglages-unites-android`, `ios-reglages-unites`, `reglages-bouteille-choix-android`, `android-tablette-reglages-paysage`, `android-tablette-reglages-portrait`, `tablette-reglages`, `bureau-reglages`, `bureau-reglages-macos`.
 

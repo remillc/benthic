@@ -605,6 +605,8 @@
     "pressure": "Cylinder pressure",
     "ppUnit": "Partial pressures",
     "volume": "Volume",
+    "volumeNoteCuft": "Also gas consumption per minute (SAC, RMV) and metabolic O₂ consumption, in cu ft/min",
+    "volumeNoteLitres": "Also gas consumption per minute (SAC, RMV) and metabolic O₂ consumption, in L/min",
     "liters": "Litres",
     "cubicFeet": "Cubic feet",
     "temperature": "Temperature",
@@ -722,6 +724,7 @@
       "ocDiluent": "Open-circuit gas as diluent",
       "o2consumption": "Metabolic O₂ consumption (pSCR)",
       "o2consumptionDialog": "In litres per minute.",
+      "o2consumptionDialogCuft": "In cubic feet per minute.",
       "dilution": "Dilution ratio (pSCR)",
       "dilutionDialog": "One part dumped for N parts breathed (1:N).",
       "ocPo2": "Equivalent open-circuit pO₂ (pSCR)"
@@ -2582,7 +2585,8 @@
       "Large logbooks: a logbook of a thousand dives with profiles (about 100 MB) can now be shared to OpenDives from another app, picked with “Import a file”, used to replace the logbook, exported first, copied from the previous version or included in “Download my data” without the app running out of memory. The file now goes straight between the phone’s storage and the core in small pieces instead of passing through the screen as one text.",
       "Import: a logbook or a dive sites file shows one progress line, from the moment it is received or chosen until the import is finished: “Copying the file”, “Checking the file”, “Importing the dives”, “Saving”, with the size copied, the percentage and the time left. “Cancel” stops the copy and the check and deletes the partial copy. A message tells how many dives or sites were added.",
       "Dive page: after swiping to the neighbouring dive, Back no longer leaves the page half-way through its transition with the logbook shifted aside; Back pressed while a swipe settles is ignored.",
-      "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive."
+      "Settings, Cylinder types: a type of “Your types” has a “Delete this type” button, with the number of dives that use it. Deleting it removes its cylinders, with their pressures and gas mix, from the dives that use it; the confirmation says how many dives lose the cylinder. Where the cylinder is the dive’s only one, or a gas switch or the pressure graph depends on it, it stays in the dive with the type “Unknown type”. A type used in no dive is deleted at once. Standard types still only have “Remove this type”, which changes no dive.",
+      "Units: gas consumption per minute follows the Volume unit. In cubic feet it is in cu ft/min (SAC, RMV and the metabolic O₂ consumption of the pSCR in Settings), in litres in L/min, converted from the same stored value. Under “Volume”, a line says so."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

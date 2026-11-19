@@ -66,3 +66,26 @@ export function sacPresetText(unit, cuft, locale) {
   const digits = cuft ? 2 : 0;
   return new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(unit);
 }
+
+/**
+ * The values of the metabolic O2 consumption wheel (pSCR), in ml/min, the unit
+ * the core keeps: 0.1 to 3 L/min by 0.01, or 0.004 to 0.105 cuft/min by 0.001.
+ * @param {boolean} cuft
+ * @returns {number[]}
+ */
+export function o2RateValues(cuft) {
+  if (!cuft) return Array.from({ length: 291 }, (_, i) => 100 + i * 10);
+  return Array.from({ length: 102 }, (_, i) => Math.round(((4 + i) * ML_PER_CUFT) / 1000));
+}
+
+/**
+ * A metabolic O2 consumption as the wheel and the row show it: three decimals
+ * in cuft/min, two in litres (the core keeps ml/min), without the unit.
+ * @param {number} ml
+ * @param {boolean} cuft
+ * @param {string} locale
+ */
+export function o2RateText(ml, cuft, locale) {
+  const digits = cuft ? 3 : 2;
+  return new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: 3 }).format(ml / (cuft ? ML_PER_CUFT : 1000));
+}
