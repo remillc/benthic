@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   diveOfPath, siteOfPath, summarizeChanges, parseDiveFile, diveFieldChanges, computerModel,
   listVersions, versionDetail, diveVersions, deletedDives, restoreVersion, restoreDive, divesAt, keyOfDate,
+  restoredDiveNumberPlan,
 } from '../../app/src/lib/backup-history.js';
 import { GitLogbook } from './git-history-core.mjs';
 
@@ -229,6 +230,27 @@ test('a deleted dive is listed from the history and restored alone', async () =>
   } finally {
     lb.dispose();
   }
+});
+
+test('a restored dive fills a missing number without shifting, or shifts later dives when needed', () => {
+  const restored = { id: 20, date: '2026-09-13T09:15:48', number: 0 };
+  const before = { id: 19, date: '2026-09-12T10:00:00', number: 1373 };
+  const gapAfter = { id: 21, date: '2026-09-14T10:00:00', number: 1375 };
+  const later = { id: 22, date: '2026-11-17T10:00:00', number: 1388 };
+  assert.deepEqual(restoredDiveNumberPlan('2026-09-13 09:15:48', [later, gapAfter, restored, before]), {
+    ids: [20],
+    numbers: [1374],
+    number: 1374,
+    shifted: false,
+  });
+
+  const noGapAfter = { ...gapAfter, number: 1374 };
+  assert.deepEqual(restoredDiveNumberPlan('2026-09-13 09:15:48', [later, noGapAfter, restored, before]), {
+    ids: [20, 21, 22],
+    numbers: [1374, 1375, 1389],
+    number: 1374,
+    shifted: true,
+  });
 });
 
 test('a dive deleted long ago stays recoverable, past the first page of the history', async () => {

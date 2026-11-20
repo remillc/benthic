@@ -186,6 +186,7 @@
   function startSelection(id) {
     checked = { [id]: true };
     selecting = true;
+    logbook.checkedDiveIds = [id];
     closeMenu();
   }
 
@@ -193,6 +194,7 @@
     if (selecting) closeMenu();
     selecting = false;
     checked = {};
+    logbook.checkedDiveIds = [];
   }
 
   /** The ⋮ menu is placed for its items when it opens: it closes when the selection starts or ends. */
@@ -204,6 +206,7 @@
   function toggleChecked(id) {
     checked[id] = !checked[id];
     if (!Object.values(checked).some(Boolean)) endSelection();
+    else logbook.checkedDiveIds = checkedIds;
   }
 
   const checkedIds = $derived(Object.keys(checked).filter((id) => checked[Number(id)]).map(Number));
@@ -225,6 +228,7 @@
     if (!ids.length) return;
     if (!selecting) startSelection(ids[0]);
     for (const id of ids) checked[id] = true;
+    logbook.checkedDiveIds = checkedIds;
   }
 
   /** @param {number} tripId */
@@ -233,6 +237,7 @@
     const all = ids.every((id) => checked[id]);
     for (const id of ids) checked[id] = !all;
     if (!Object.values(checked).some(Boolean)) endSelection();
+    else logbook.checkedDiveIds = checkedIds;
   }
 
   /** "Supprimer ce voyage": the trip goes, its dives stay in the logbook. One undoable step. */
@@ -731,7 +736,10 @@
           dragRow?.classList.remove('bc-logbook--drag-lift');
           const id = dragIds[0];
           if (!selecting) startSelection(id);
-          else checked[id] = true;
+          else {
+            checked[id] = true;
+            logbook.checkedDiveIds = checkedIds;
+          }
         }
         if (pressedTrip) selectTrip(pressedTrip);
       }
@@ -1069,6 +1077,7 @@
   if (typeof window !== 'undefined') window.addEventListener('resize', forgetHeights);
   onDestroy(() => {
     window.removeEventListener('resize', forgetHeights);
+    logbook.checkedDiveIds = [];
     vl?.destroy();
     vl = null;
   });

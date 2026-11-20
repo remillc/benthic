@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const src = readFileSync(new URL('../../app/src/pages/DiveDetail.svelte', import.meta.url), 'utf8');
+const logbook = readFileSync(new URL('../../app/src/pages/Logbook.svelte', import.meta.url), 'utf8');
 const lang = (l) => JSON.parse(readFileSync(new URL(`../../app/src/i18n/${l}.json`, import.meta.url), 'utf8'));
 
 test('the dive detail toolbar: edit, plan, share, more, in that order, and no map', () => {
@@ -22,4 +23,23 @@ test('the overflow menu names its items in the menu order, validation only with 
     assert.match(d.moreOptionsList, /\{items\}/);
     for (const k of ['moreItemValidate', 'moreItemRenumber', 'moreItemTrip', 'moreItemDelete']) assert.ok(d[k]);
   }
+});
+
+test('checked dives on a tablet move detail actions to the top menu and add bulk delete', () => {
+  assert.match(src, /const selectionMenuActive = \$derived\(layout\.split && !desk && !f7route\.params\.trip && logbook\.checkedDiveIds\.length > 0\)/);
+  assert.match(src, /{:else if selectionMenuActive}\s*<Link iconOnly popoverOpen="#\{menuId\}">/);
+  assert.match(src, /!desk && !selectionMenuActive/);
+  assert.match(src, /detail\.deleteSelected/);
+  assert.match(src, /await deleteDives\(ids\)/);
+  assert.match(logbook, /logbook\.checkedDiveIds = checkedIds/);
+  for (const l of ['fr', 'en']) assert.ok(lang(l).detail.deleteSelected);
+});
+
+test('a stale dive route recovers to the empty pane or the Logbook', () => {
+  assert.match(src, /if \(code\.includes\('Dive not found'\) && logbook\.loading\)/);
+  assert.match(src, /awaitingLogbook = true/);
+  assert.match(src, /if \(!awaitingLogbook \|\| logbook\.loading\) return/);
+  assert.match(src, /code\.includes\('Dive not found'\)/);
+  assert.match(src, /f7router\.navigate\('\/pane\/empty', \{ reloadDetail: true, animate: false \}\)/);
+  assert.match(src, /f7router\.navigate\('\/', \{ animate: false \}\)/);
 });

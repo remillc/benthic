@@ -656,6 +656,7 @@
     },
     "photoNote": "On another device: only their reference is synced",
     "delete": "Delete the dive",
+    "deleteSelected": "Delete these dives",
     "deleteTitle": "Delete the dive",
     "deleted": "Dive deleted",
     "deleteFailed": "The dive could not be deleted. No dive was changed.",
@@ -1428,7 +1429,10 @@
       "restore": "Restore",
       "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
       "restored": "Dive brought back",
-      "restoreFailed": "The dive could not be brought back. The logbook did not change."
+      "restoreFailed": "The dive could not be brought back. The logbook did not change.",
+      "restoredWithNumber": "Dive restored as no. {number}",
+      "restoredAndShifted": "Dive restored as no. {number}. The later dives were shifted.",
+      "numberFailed": "Dive restored, but its number could not be assigned."
     },
     "browse": {
       "banner": "Read-only version: {date}",
@@ -2729,6 +2733,9 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Fixed tablet startup when the last open dive no longer exists.",
+      "Logbook on tablets: when dives are checked, detail actions move to the top ⋮ menu, which can delete the selection.",
+      "Restore: a dive takes the missing number at its position; if none is available, later dives are shifted.",
       "Profile on tablets and desktop: the Add equipment button fits its content and is aligned to the right.",
       "Profile on tablets: controls stay clear of the system bars.",
       "Certificates and documents: Add is pale blue and floats at the bottom right on tablets and desktop; the card reproduction note has been removed.",
