@@ -145,12 +145,12 @@
         <span class="bc-profile-info--tile" aria-hidden="true"><Icon name="account" size={22} weight={1.8} /></span>
         <span class="bc-profile-info--texts">
           <span class="bc-profile-info--label">{t('diverProfile.info.fullName')}</span>
-          <span class="bc-profile-info--value" class:bc-profile-info--empty={!info.fullName}>{info.fullName || t('diverProfile.info.empty')}</span>
+          {#if info.fullName}<span class="bc-profile-info--value">{info.fullName}</span>{/if}
         </span>
       </div>
       <div class="bc-profile-info--row">
         <span class="bc-profile-info--label">{t('diverProfile.info.dob')}</span>
-        <span class="bc-profile-info--value" class:bc-profile-info--empty={!info.dateOfBirth}>{formatDate(info.dateOfBirth) || t('diverProfile.info.empty')}</span>
+        {#if info.dateOfBirth}<span class="bc-profile-info--value">{formatDate(info.dateOfBirth)}</span>{/if}
       </div>
     </div>
 
@@ -158,11 +158,11 @@
     <div class="bc-profile-info--card">
       <div class="bc-profile-info--row">
         <span class="bc-profile-info--label">{t('diverProfile.info.nameRelation')}</span>
-        <span class="bc-profile-info--value" class:bc-profile-info--empty={!contact}>{contact || t('diverProfile.info.empty')}</span>
+        {#if contact}<span class="bc-profile-info--value">{contact}</span>{/if}
       </div>
       <div class="bc-profile-info--row">
         <span class="bc-profile-info--label">{t('diverProfile.info.phone')}</span>
-        <span class="bc-profile-info--value" class:bc-profile-info--empty={!phone}>{phone || t('diverProfile.info.empty')}</span>
+        {#if phone}<span class="bc-profile-info--value">{phone}</span>{/if}
       </div>
     </div>
 
@@ -170,10 +170,12 @@
     <div class="bc-profile-info--card">
       <div class="bc-profile-info--row">
         <span class="bc-profile-info--label">{t('diverProfile.info.blood')}</span>
-        <span class="bc-profile-info--line">
-          <span class="bc-profile-info--value" class:bc-profile-info--empty={!bloodLabel}>{bloodLabel || t('diverProfile.info.empty')}</span>
-          <span class="bc-profile-info--tag"><Icon name="lock" size={14} />{t('diverProfile.info.onlyYou')}</span>
-        </span>
+        {#if bloodLabel}
+          <span class="bc-profile-info--line">
+            <span class="bc-profile-info--value">{bloodLabel}</span>
+            <span class="bc-profile-info--tag"><Icon name="lock" size={14} />{t('diverProfile.info.onlyYou')}</span>
+          </span>
+        {/if}
       </div>
     </div>
 
@@ -291,10 +293,6 @@
       gap: 6px;
       font-size: 17px;
       line-height: 24px;
-    }
-
-    .bc-profile-info--empty {
-      color: var(--bc-text-2);
     }
 
     .bc-profile-info--tag {
