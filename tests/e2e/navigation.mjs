@@ -1358,6 +1358,14 @@ async function gearAddFlows(expect) {
     });
     expect(`${label}: gear Add fits its content at the right of the list`, { visible: true, contentWidth: true, right: true }, geometry);
     expect(`${label}: profile navigation has the expected width`, { navWidth: desktop ? 330 : 350 }, geometry);
+    const avatar = await tab.run(() => {
+      const circle = document.querySelector('.bc-account-avatar--rail .bc-account-avatar--circle');
+      const target = document.querySelector('.bc-account-avatar--rail')?.getBoundingClientRect();
+      const rail = document.querySelector('.bc-nav-rail--rail')?.getBoundingClientRect();
+      const rect = circle?.getBoundingClientRect();
+      return { circle: rect ? Math.round(rect.width) : 0, target: target ? Math.round(target.width) : 0, inRail: !!rect && !!rail && rect.left >= rail.left && rect.right <= rail.right };
+    });
+    expect(`${label}: the account button of the rail is 64 dp in an 80 dp target`, { circle: 64, target: 80, inRail: true }, avatar);
     await tab.run(() => document.querySelector('.page-current .bc-gear-list--add').click());
     await sleep(1000);
     expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.bc-piece-edit')) });
@@ -1735,6 +1743,16 @@ async function profileInfoWidthsFlows(expect) {
     };
     await edit();
     expect(`${label}: the pencil edits in place`, { route: '/profile/info', editing: true }, await state());
+    if (label === 'tablet') {
+      // The pane has no margin of its own: the page gives its sections one.
+      const margin = await tab.run(() => {
+        const page = document.querySelector('.page-current.bc-profile-info');
+        const pane = page.querySelector('.bc-pf--main').getBoundingClientRect();
+        const fields = page.querySelector('.bc-profile-info--fields').getBoundingClientRect();
+        return { margin: Math.round(fields.left - pane.left) >= 32 };
+      });
+      expect('tablet: the information sections have a horizontal margin in the pane', { margin: true }, margin);
+    }
     const result = await tab.run(() => {
       const page = document.querySelector('.page-current.bc-profile-info');
       if (!page) throw new Error('Information page is missing');
@@ -2031,19 +2049,23 @@ async function profileLayersFlows(expect) {
       await window.__layerTest.add();
       await window.__layerTest.add();
     });
-    expect(`${label}: the second profile starts with the existing default`, { state: JSON.stringify({ temperature: true, gas: false, ppo2: false, ceiling: false, tissues: false }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(1))) });
+    expect(`${label}: the second profile starts with no curve on (the default)`, { state: JSON.stringify({ temperature: false, gas: false, ppo2: false, ceiling: false, tissues: false }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(1))) });
     await tab.run(async () => {
       for (const name of ['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']) await window.__layerTest.toggle(0, name);
     });
-    expect(`${label}: choices update another mounted profile`, { state: JSON.stringify({ temperature: false, gas: true, ppo2: true, ceiling: true, tissues: true }), scale: 'ppo2' }, await tab.run(() => ({ state: JSON.stringify(window.__layerTest.state(1)), scale: window.__layerTest.scale(1) })));
+    expect(`${label}: choices update another mounted profile`, { state: JSON.stringify({ temperature: true, gas: true, ppo2: true, ceiling: true, tissues: true }), scale: 'ppo2' }, await tab.run(() => ({ state: JSON.stringify(window.__layerTest.state(1)), scale: window.__layerTest.scale(1) })));
     await tab.run(async () => {
       await window.__layerTest.remove(0);
       await window.__layerTest.remove(1);
       await window.__layerTest.add(window.__layerTest.sparse);
       await window.__layerTest.add();
     });
-    expect(`${label}: unavailable curves return when the next dive has data`, { state: JSON.stringify({ temperature: false, gas: true, ppo2: true, ceiling: true, tissues: true }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(3))) });
-    await tab.run(async () => window.__layerTest.toggle(3, 'temperature'));
+    expect(`${label}: unavailable curves return when the next dive has data`, { state: JSON.stringify({ temperature: true, gas: true, ppo2: true, ceiling: true, tissues: true }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(3))) });
+    // The temperature is already on: turned off then on again, it is the last right-hand scale turned on.
+    await tab.run(async () => {
+      await window.__layerTest.toggle(3, 'temperature');
+      await window.__layerTest.toggle(3, 'temperature');
+    });
     expect(`${label}: the last enabled right-hand scale wins`, { scale: 'temperature' }, await tab.run(() => ({ scale: window.__layerTest.scale(3) })));
     await tab.run(async () => {
       for (const name of ['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']) await window.__layerTest.toggle(3, name);
@@ -2060,7 +2082,7 @@ async function profileLayersFlows(expect) {
       unsubscribe();
       return JSON.stringify(value);
     });
-    expect(`${label}: a new app session restores the default`, { state: '["temperature"]' }, { state: restarted });
+    expect(`${label}: a new app session restores the default`, { state: '[]' }, { state: restarted });
     tab.ws.close();
   }
 }

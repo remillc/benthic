@@ -3154,7 +3154,9 @@
       "Cards and documents: a scan now reads more from the card, on the device only. A certification card gives the agency (also RAID, PSS, ANMP), the level, the number, the date and the instructor, with both sides read together; an insurance card gives the insurer, plan, number, emergency phone and dates; a medical certificate gives the doctor, the date and the expiry; another document gives its title and expiry. Each value is marked “to check”, a field you typed is never replaced, and nothing is shown when the text is unclear. The scanned picture now always appears in its slot (it was lost on Android when the scan was large).",
       "New name: the app is now called Benthic, and the paid offer Benthic+. The name under the icon is “Benthic Log”. Old opendives.app links still open the app.",
       "Certifications: the agency menu now lists many more agencies (recreational, technical, freediving and national federations), and the level suggestions cover the whole ladder of the main agencies, from entry level to instructor. A photo or scan slot now shows a progress indicator while the picture is read, and the picture appears at once.",
-      "Information (Benthic+): the page is edited in place. The pencil turns the sections into fields, “Save” is in the top bar and Back leaves without saving."
+      "Information (Benthic+): the page is edited in place. The pencil turns the sections into fields, “Save” is in the top bar and Back leaves without saving. An empty value no longer shows any text. On a tablet and the desktop, the sections have a horizontal margin.",
+      "Tablet and desktop: the Account button, at the bottom of the sidebar, is larger.",
+      "Dive profile: no curve is on by default any more, the water temperature included; turn on the ones you want, the choice is kept."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -6367,7 +6369,6 @@
       "blood": "Blood group",
       "clearBlood": "Clear blood group",
       "onlyYou": "Only you",
-      "empty": "Not set",
       "lockNoteNoDate": "The blood group is encrypted on your Benthic+ account and only you can see it.",
       "cancel": "Cancel",
       "saved": "Information saved",

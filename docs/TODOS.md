@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 136
+Next number: 138
 
 ## List
 
@@ -49,10 +49,11 @@ Next number: 136
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
-- #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
+- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
+- #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
