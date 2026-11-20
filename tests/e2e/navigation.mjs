@@ -1735,6 +1735,16 @@ async function profileInfoWidthsFlows(expect) {
     };
     await edit();
     expect(`${label}: the pencil edits in place`, { route: '/profile/info', editing: true }, await state());
+    if (label === 'tablet') {
+      // The pane has no margin of its own: the page gives its sections one.
+      const margin = await tab.run(() => {
+        const page = document.querySelector('.page-current.bc-profile-info');
+        const pane = page.querySelector('.bc-pf--main').getBoundingClientRect();
+        const fields = page.querySelector('.bc-profile-info--fields').getBoundingClientRect();
+        return { margin: Math.round(fields.left - pane.left) >= 32 };
+      });
+      expect('tablet: the information sections have a horizontal margin in the pane', { margin: true }, margin);
+    }
     const result = await tab.run(() => {
       const page = document.querySelector('.page-current.bc-profile-info');
       if (!page) throw new Error('Information page is missing');

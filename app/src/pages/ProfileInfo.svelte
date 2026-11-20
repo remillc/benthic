@@ -206,7 +206,7 @@
     {/snippet}
   </Navbar>
   {#if profileWide()}
-    <ProfileFrame section="info">{@render body()}</ProfileFrame>
+    <ProfileFrame section="info"><div class="bc-profile-info--wide">{@render body()}</div></ProfileFrame>
   {:else}
     {@render body()}
   {/if}
@@ -216,6 +216,11 @@
   @layer od.components {
     :global(.bc-profile-info .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
+    }
+
+    /* Tablet and desktop: the sections sit in the pane, which has no margin of its own. */
+    .bc-profile-info--wide {
+      padding-inline: 32px;
     }
 
     .bc-profile-info--section {
