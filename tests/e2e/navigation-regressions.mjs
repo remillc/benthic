@@ -65,26 +65,24 @@ export async function regressionFlows(h) {
   // the planner by the list of plans), « Nouveau plan », then Back twice: the view was left with no current page.
   console.log(' dive > plan from the dive > Retour (the plans) > new plan > Back > Back');
   await tapDive(tab);
-  await settled(tab, 'plans: dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'plans: dive opened', { route: /^\/dives\/\d+$/, setup: true });
   const dive = await route(tab);
   await sleep(400);
   await tapText(tab, 'Planifier depuis cette plongée|Plan from this dive');
   await reach(tab, /^\/plan\/\d+$/);
-  await settled(tab, 'plans: the planner opened from the dive', { route: /^\/plan\/\d+$/ });
+  await settled(tab, 'plans: the planner opened from the dive', { route: /^\/plan\/\d+$/, setup: true });
   await tapText(tab, '^\\s*(Retour|Back)\\s*$', '.page-current .navbar, .page-current');
   await reach(tab, '/plans/');
   await settled(tab, 'plans: Retour shows the plans', { route: '/plans/' });
-  await sound(tab, 'plans: the list of plans is sound');
   await tapText(tab, 'Nouveau plan|New plan');
   await reach(tab, '/plan/new');
-  await settled(tab, 'plans: a new plan', { route: '/plan/new' });
+  await settled(tab, 'plans: a new plan', { route: '/plan/new', setup: true });
   await hardwareBack(tab);
   await reach(tab, '/plans/');
   await settled(tab, 'plans: Back to the plans', { route: '/plans/' });
   await hardwareBack(tab);
   await reach(tab, dive);
   await settled(tab, 'plans: Back to the dive', { route: dive });
-  await sound(tab, 'plans: the dive is sound');
   await hardwareBack(tab);
   await settled(tab, 'plans: Back to the logbook', { route: '/' });
   await sound(tab, 'plans: the logbook is sound');
@@ -98,14 +96,13 @@ export async function regressionFlows(h) {
   const open = async (path) => {
     await tab.run((p) => { document.querySelector('.views > .view.tab-active').f7View.router.navigate(p); }, path);
     await reach(tab, path);
-    await settled(tab, `deep stack: ${path} opened`, { route: path });
+    await settled(tab, `deep stack: ${path} opened`, { route: path, setup: true });
   };
   for (const path of ['/settings/', '/settings/cylinders/', '/settings/cylinders/new']) await open(path);
   for (const back of ['/settings/cylinders/', '/settings/', '/']) {
     await hardwareBack(tab);
     await reach(tab, back);
     await settled(tab, `deep stack: Back to ${back}`, { route: back });
-    await sound(tab, `deep stack: ${back} is sound`);
   }
   // The stack again, left with the navbar's arrow and a swipe back.
   for (const path of ['/settings/', '/settings/cylinders/', '/settings/cylinders/new']) await open(path);
@@ -115,7 +112,6 @@ export async function regressionFlows(h) {
   await tab.swipe(60, 330, 500, 6);
   await reach(tab, '/settings/');
   await settled(tab, 'deep stack: a swipe back goes back to Réglages', { route: '/settings/' });
-  await sound(tab, 'deep stack: Réglages is sound after the swipe');
   await hardwareBack(tab);
   await settled(tab, 'deep stack: Back to the logbook', { route: '/' });
   await sound(tab, 'deep stack: the logbook is sound');
@@ -144,7 +140,6 @@ export async function regressionFlows(h) {
     await section('Carnet');
     await sleep(400);
     await settled(tab, `section ${gap} ms after a dive: the Logbook view is at rest`, {});
-    await sound(tab, `section ${gap} ms after a dive: sound`);
     const where = await route(tab);
     expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/\d+$/.test(where) });
     if (where !== '/') {
@@ -159,7 +154,7 @@ export async function regressionFlows(h) {
   console.log('Tablet, 1280x800: a swipe to the next dive, then a dive tapped in the list');
   const wide = await h.openTab(1280, 800, false);
   await tapDive(wide);
-  await settled(wide, 'tablet swipe: a dive beside the list', { split: true });
+  await settled(wide, 'tablet swipe: a dive beside the list', { split: true, setup: true });
   await sleep(600);
   const pane = await wide.run(() => {
     const r = document.querySelector('.view.tab-active > .page-master-detail.page-current .page-content')?.getBoundingClientRect();
@@ -171,7 +166,6 @@ export async function regressionFlows(h) {
       await wide.swipe(from, to, pane.y, 8);
       await sleep(1200);
       await settled(wide, `tablet swipe: after a swipe ${to < from ? 'left' : 'right'}`, { split: true });
-      await sound(wide, `tablet swipe: sound after a swipe ${to < from ? 'left' : 'right'}`);
       const row = await wide.run(() => {
         const rows = [...document.querySelectorAll('.view.tab-active > .page-master a[href^="/dives/"]')];
         const r = rows[Math.min(3, rows.length - 1)]?.getBoundingClientRect();
@@ -180,7 +174,6 @@ export async function regressionFlows(h) {
       if (row) await wide.tapAt(row.x, row.y);
       await sleep(900);
       await settled(wide, 'tablet swipe: a dive tapped in the list', { split: true });
-      await sound(wide, 'tablet swipe: sound after the tap');
     }
   }
   // Tablet, seeds 12 and 13: another section and back to the Logbook, then a dive tapped in the list.
@@ -208,12 +201,10 @@ export async function regressionFlows(h) {
     if (how === 'rail') await rail('Carnet');
     else await hardwareBack(wide);
     await sleep(700);
-    await settled(wide, `tablet sections (${how}): back on the Carnet`, { split: true });
-    await sound(wide, `tablet sections (${how}): sound`);
+    await settled(wide, `tablet sections (${how}): back on the Carnet`, { split: true, setup: true });
     await tapRow(how === 'rail' ? 1 : 2);
     await sleep(900);
     await settled(wide, `tablet sections (${how}): a dive tapped in the list`, { split: true });
-    await sound(wide, `tablet sections (${how}): sound after the tap`);
   }
 
   // Tablet, seeds 11, 12 and 13 on unmodified code: a page opened inside the detail pane (the planner, from the dive),
@@ -222,13 +213,12 @@ export async function regressionFlows(h) {
   console.log(' tablet: the planner opened in the pane, then a dive tapped in the list, then another');
   await tapText(wide, 'Planifier depuis cette plongée|Plan from this dive', '.view.tab-active > .page-master-detail.page-current');
   for (let i = 0; i < 50 && !/^\/plan\/\d+$/.test(await route(wide)); i++) await sleep(100);
-  await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/\d+$/ });
+  await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/\d+$/, setup: true });
   for (const n of [0, 3]) {
     await tapRow(n);
     for (let i = 0; i < 30 && !/^\/dives\/\d+$/.test(await route(wide)); i++) await sleep(100);
     await sleep(600);
     await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/\d+$/ });
-    await sound(wide, `tablet pane: sound after dive ${n}`);
     const stack = await wide.run(readStack);
     expect(`tablet pane: the list and one dive, a history of two (dive ${n})`, { pages: 2, history: 2 }, { pages: stack.pages.length, history: stack.history.length });
   }

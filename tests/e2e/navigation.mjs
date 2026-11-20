@@ -330,7 +330,11 @@ function readStack() {
 const failures = [];
 let checks = 0;
 
-/** Waits for the transitions to be over, then checks the stack. @param {Tab} tab @param {string} label @param {{ split?: boolean, route?: string|RegExp }} [o] */
+/**
+ * Waits for the transitions to be over, then checks the stack. With `setup`, the step only prepares the next one (a page
+ * opened, a Back on the way): it waits and checks as well, and reports a fault, but counts for nothing when it passes.
+ * @param {Tab} tab @param {string} label @param {{ split?: boolean, route?: string|RegExp, setup?: boolean }} [o]
+ */
 async function settled(tab, label, o = {}) {
   let stack;
   for (let i = 0; i < 30; i++) {
@@ -356,11 +360,11 @@ async function settled(tab, label, o = {}) {
     if (/bc-push-from/.test(p.cls)) problems.push(`${p.route} keeps bc-push-from`);
   }
   if (o.route && !(o.route instanceof RegExp ? o.route.test(stack.current) : route(stack.current) === o.route)) problems.push(`expected ${o.route}, on ${stack.current}`);
-  checks++;
+  if (!o.setup || problems.length) checks++;
   if (problems.length) {
     failures.push({ label, problems, stack });
     console.log(`  FAIL ${label}: ${problems.join('; ')}`);
-  } else console.log(`  ok   ${label}`);
+  } else if (!o.setup) console.log(`  ok   ${label}`);
 }
 
 // --- Actions -----------------------------------------------------------------------------------------------------
@@ -394,7 +398,7 @@ async function tapText(tab, pattern, scope = '.page-current') {
 async function toLogbook(tab, label) {
   for (let i = 0; i < 4 && (await tab.run(readStack)).current.replace(/\?.*$/, '') !== '/'; i++) {
     await tapBack(tab).catch(() => {});
-    await settled(tab, `${label}: Back ${i + 1}`);
+    await settled(tab, `${label}: Back ${i + 1}`, { setup: true });
   }
   await settled(tab, `${label}: logbook`, { route: '/' });
 }
@@ -457,13 +461,13 @@ async function phoneFlows() {
 
   console.log(' logbook > dive > back');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await tapBack(tab);
   await settled(tab, 'back to the logbook', { route: '/' });
 
   console.log(' rapid double Back taps');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await tapBack(tab);
   await sleep(40);
   await tapBack(tab).catch(() => {});
@@ -476,28 +480,18 @@ async function phoneFlows() {
   await settled(tab, 'after Back during the opening');
   await toLogbook(tab, 'after Back during the opening');
 
-  console.log(' dive > edit > save');
-  await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
-  const diveRoute = (await tab.run(readStack)).current;
-  await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
-  await settled(tab, 'edit opened', { route: /\/edit$/ });
-  await tapText(tab, '^\\s*(Enregistrer|Save)\\s*$');
-  await settled(tab, 'after Save', { route: diveRoute });
-  await tapBack(tab);
-  await settled(tab, 'back after Save', { route: '/' });
-
   // Dive validation by signature (task 2026-11-19-309, point 2; OpenDives+): « Faire signer » of the dive's Validations
   // section, the choice, the signature drawn with the finger, « Signer »; the dive shows the validation, the logbook marks
-  // the dive, and the validation can be removed. The stack stays sound at every step.
+  // the dive, and the validation can be removed. The stack stays sound at every step. The dive's own edit and save are
+  // in the flow below (« change a field »).
   console.log(' dive > validate by signature > Back');
   await tapDive(tab);
-  await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/, setup: true });
   const validated = (await tab.run(readStack)).current;
   await tab.run(() => window.__odplusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
   await sleep(800);
   await tapText(tab, '^\\s*(Faire signer|Get it signed)\\s*$');
-  await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/ });
+  await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/, setup: true });
   await tapText(tab, 'Signature sur cet écran|Signature on this screen');
   await sleep(300);
   await tab.run(() => {
@@ -540,7 +534,7 @@ async function phoneFlows() {
   checks++;
   if (!marked) failures.push({ label: 'validation: mark', problems: ['no mark on the validated dive in the logbook list'] });
   await tapDive(tab);
-  await settled(tab, 'validation: dive reopened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'validation: dive reopened', { route: /^\/dives\/\d+$/, setup: true });
   await tapText(tab, 'Retirer la validation|Remove the validation');
   await sleep(500);
   await tapText(tab, '^\\s*(Retirer|Remove)\\s*$', '.dialog');
@@ -562,10 +556,10 @@ async function phoneFlows() {
   for (const how of ['arrow', 'hardware']) {
     console.log(` dive > edit > change a field > save > Back (${how})`);
     await tapDive(tab);
-    await settled(tab, `${how}: dive opened`, { route: /^\/dives\/\d+$/ });
+    await settled(tab, `${how}: dive opened`, { route: /^\/dives\/\d+$/, setup: true });
     const route = (await tab.run(readStack)).current;
     await tapText(tab, '^\s*(Modifier|Edit)\s*$');
-    await settled(tab, `${how}: edit opened`, { route: /\/edit$/ });
+    await settled(tab, `${how}: edit opened`, { route: /\/edit$/, setup: true });
     await tab.run(() => {
       const field = document.querySelector('.page-current textarea');
       field.value = `navigation test ${Date.now()}`;
@@ -574,7 +568,7 @@ async function phoneFlows() {
     await sleep(150);
     await tapText(tab, '^\s*(Enregistrer|Save)\s*$');
     for (let i = 0; i < 100 && (await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
-    await settled(tab, `${how}: after Save`, { route });
+    await settled(tab, `${how}: after Save`, { route, setup: true });
     const toast = await tab.run(() => !!document.querySelector('.toast.bc-undo-toast'));
     checks++;
     if (!toast) failures.push({ label: `${how}: Undo message`, problems: ['no Undo message after the save'] });
@@ -592,11 +586,11 @@ async function phoneFlows() {
   // Second reported regression: the account avatar's sheet, Réglages, then Back (arrow, Android Back key, edge swipe), then Back again.
   for (const how of ['arrow', 'hardware', 'edge swipe']) {
     console.log(` avatar sheet > Settings > Back (${how})`);
-    await settled(tab, `${how}: logbook before the sheet`, { route: '/' });
+    await settled(tab, `${how}: logbook before the sheet`, { route: '/', setup: true });
     await tab.run(() => document.querySelector('.page-current .bc-account-avatar, .bc-account-avatar')?.click());
     await sleep(700);
     await tab.run(() => [...document.querySelectorAll('.bc-account-sheet a, .bc-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || el.getAttribute('data-row') === 'settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
-    await settled(tab, `${how}: Settings opened`, { route: '/settings/' });
+    await settled(tab, `${how}: Settings opened`, { route: '/settings/', setup: true });
     if (how === 'arrow') await tapBack(tab);
     else if (how === 'hardware') await hardwareBack(tab);
     else await tab.swipe(2, 330, 400);
@@ -609,7 +603,7 @@ async function phoneFlows() {
     if (sheet.hash || sheet.open) failures.push({ label: `${how}: sheet`, problems: [`after Back: hash "${sheet.hash}", sheet open ${sheet.open}`] });
     // The app still answers: a dive opens and Back returns to the logbook.
     await tapDive(tab);
-    await settled(tab, `${how}: dive opens after Settings`, { route: /^\/dives\/\d+$/ });
+    await settled(tab, `${how}: dive opens after Settings`, { route: /^\/dives\/\d+$/, setup: true });
     await tapBack(tab);
     await settled(tab, `${how}: Back again on the logbook`, { route: '/' });
     await sleep(300);
@@ -617,9 +611,9 @@ async function phoneFlows() {
 
   console.log(' edit > suggestion lists float above the following cards');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await tapText(tab, '^\s*(Modifier|Edit)\s*$');
-  await settled(tab, 'edit opened', { route: /\/edit$/ });
+  await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   // Each field is brought to the bottom of the screen (little room below) and to the middle (the list passes over the
   // cards that follow).
   for (const [label, block] of [['^(Guide|Dive guide|Guides)', 'end'], ['^(Compagnons|Buddies|Buddy)', 'end'], ['^(Guide|Dive guide|Guides)', 'center'], ['^(Compagnons|Buddies|Buddy)', 'center']]) {
@@ -632,8 +626,8 @@ async function phoneFlows() {
       input.focus();
       return true;
     }, label, block);
-    checks++;
     if (!placed) {
+      checks++;
       failures.push({ label: `suggestions ${label} (${block})`, problems: ['field not found'] });
       console.log(`  FAIL suggestions ${label} (${block}): field not found`);
       continue;
@@ -672,7 +666,7 @@ async function phoneFlows() {
   await sleep(500);
   // Typed text asks first; a field only focused does not.
   await tapText(tab, '^(Quitter|Leave)$', '.bc-leave-guard--dialog').catch(() => {});
-  await settled(tab, 'after leaving the edit page', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'after leaving the edit page', { route: /^\/dives\/\d+$/, setup: true });
   await toLogbook(tab, 'after the suggestions check');
 
   console.log(' quick entry after a download (Complete the dive)');
@@ -688,7 +682,7 @@ async function phoneFlows() {
     view.f7View.router.navigate(`/dives/${id}/complete`);
     return `/dives/${id}/complete`;
   });
-  await settled(tab, 'quick entry opened', { route: quickRoute });
+  await settled(tab, 'quick entry opened', { route: quickRoute, setup: true });
   for (let i = 0; i < 40 && here && !(await tab.run(() => !!document.querySelector('.bc-quick-entry [role=option][aria-selected=true]'))); i++) await sleep(200);
   if (process.env.OD_SHOTS) await shot(tab, `quick-entry-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
   if (here) {
@@ -708,7 +702,7 @@ async function phoneFlows() {
   await tapText(tab, '^\s*(Chercher un autre site|Search for another site)\s*$', '.bc-quick-entry');
   await settled(tab, 'quick entry > Choose a site', { route: '/sites/choose' });
   await tapBack(tab);
-  await settled(tab, 'back to the quick entry', { route: quickRoute });
+  await settled(tab, 'back to the quick entry', { route: quickRoute, setup: true });
   await tapText(tab, '^\s*(Enregistrer|Save)\s*$', '.bc-quick-entry');
   // Saving a site writes the log: the screen is left when the write is done.
   for (let i = 0; i < 50 && (await tab.run(() => /\/complete$/.test(document.querySelector('.view-main')?.f7View?.router?.currentRoute?.url ?? ''))); i++) await sleep(200);
@@ -784,13 +778,13 @@ async function phoneFlows() {
   await sleep(600);
   console.log(' edit > Back arrow, then Back at once after Save');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
-  await settled(tab, 'edit opened', { route: /\/edit$/ });
+  await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   await tapBack(tab);
-  await settled(tab, 'edit left with the arrow', { route: diveRoute });
+  await settled(tab, 'edit left with the arrow', { route: validated });
   await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
-  await settled(tab, 'edit opened again', { route: /\/edit$/ });
+  await settled(tab, 'edit opened again', { route: /\/edit$/, setup: true });
   await tapText(tab, '^\\s*(Enregistrer|Save)\\s*$');
   await sleep(120);
   await tapBack(tab).catch(() => {});
@@ -800,10 +794,11 @@ async function phoneFlows() {
   // Wherever the second Back led, the stack is sound; Back reaches the logbook.
   await toLogbook(tab, 'after Save');
 
+  // The extremes of the delay and one swipe that does not go through: the others fall between them.
   console.log(' dive page swipe, then Back (the half-transitioned stack)');
-  for (const [name, x1, gap] of [['through', 60, 10], ['through', 60, 100], ['through', 60, 250], ['short', 250, 10], ['short', 250, 100]]) {
+  for (const [name, x1, gap] of [['through', 60, 10], ['through', 60, 250], ['short', 250, 100]]) {
     await tapDive(tab);
-    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
     await tab.swipe(name === 'through' ? 330 : 300, x1, 700);
     await sleep(gap);
     await tapBack(tab).catch(() => {});
@@ -813,11 +808,11 @@ async function phoneFlows() {
 
   console.log(' the Android Back key');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await hardwareBack(tab);
   await settled(tab, 'hardware Back from the dive', { route: '/' });
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
   await hardwareBack(tab);
   await sleep(30);
   await hardwareBack(tab);
@@ -837,7 +832,7 @@ async function phoneFlows() {
   await sleep(500);
   await settled(tab, 'account sheet closed with Back', { route: '/' });
   await tapDive(tab);
-  await settled(tab, 'dive opened after the sheet', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'dive opened after the sheet', { route: /^\/dives\/\d+$/, setup: true });
   await tapBack(tab);
   await settled(tab, 'back after the sheet', { route: '/' });
 
@@ -855,10 +850,9 @@ async function phoneFlows() {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
     // The sheet writes nothing to the browser's history (no « #compte » since 19 November 2026: docs/architecture.md, section 13).
-    expectState(`${row}: the sheet is open, the address has no fragment`, { hash: '', sheet: true }, await sheetState());
+    if (row === '#offer-sync') expectState(`${row}: the sheet is open, the address has no fragment`, { hash: '', sheet: true }, await sheetState());
     await tab.run((r) => document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`)?.click(), row);
     await sleep(1000);
-    expectState(`${row}: the offer is open`, { welcome: true, sheet: false }, await sheetState());
     await hardwareBack(tab);
     await sleep(900);
     expectState(`${row}: Back from the offer reopens the sheet`, { welcome: false, sheet: true, hash: '' }, await sheetState());
@@ -874,12 +868,11 @@ async function phoneFlows() {
   for (const [row, route, page] of [['#profile', '/profile', '.bc-profile, .bc-profile-page, .page-current'], ['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
-    expectState(`subscriber ${row}: the sheet is open`, { hash: '', sheet: true }, await sheetState());
     const rows = await tab.run((r) => ({ row: !!document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`), offer: !!document.querySelector('a[href^="#offer-"], [data-row^="offer-"]') }), row);
     expectState(`subscriber ${row}: the row is there and the sheet shows no offer`, { row: true, offer: false }, rows);
     await tab.run((r) => document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`)?.click(), row);
     await sleep(1000);
-    await settled(tab, `subscriber ${row}: its page is open`, { route });
+    await settled(tab, `subscriber ${row}: its page is open`, { route, setup: true });
     expectState(`subscriber ${row}: the page, not the offer`, { welcome: false, shown: true }, { ...(await sheetState()), shown: await tab.run((q) => !!document.querySelector(q), page) });
     await tapBack(tab);
     await settled(tab, `subscriber ${row}: back`, { route: '/' });
@@ -974,7 +967,6 @@ async function settingsComputersFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['Android phone', 390, 844, true, false, 'md'],
     ['Android tablet', 1280, 800, false, false, 'md'],
-    ['iPad', 1280, 800, false, false, 'ios'],
     ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
@@ -1034,7 +1026,9 @@ async function settingsComputersFlows(expect) {
     expect(`${label}: Back leaves logbook computers`, desktop ? { computers: false } : { route: '/settings/download', computers: false }, back);
 
     if (!mobile && !desktop) {
-      for (const section of ['display', 'language', 'units', 'notifications', 'logbook', 'equipment', 'decompression', 'gases', 'tools', 'download', 'advanced']) {
+      // Every section of the route is also one that Settings.svelte renders (tests/app/navigation-contract.test.mjs); three
+      // of them show that a section stays a detail of the list.
+      for (const section of ['display', 'download', 'advanced']) {
         await tab.run((section) => { document.querySelector('#view-account').f7View.router.navigate(`/settings/${section}`, { reloadDetail: true }); }, section);
         await sleep(500);
         const detail = await tab.run(() => {
@@ -1339,7 +1333,7 @@ async function profileInsetsFlows(expect) {
 }
 
 async function gearAddFlows(expect) {
-  for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['iPad', 1280, 800, false, 'ios'], ['desktop', 1400, 900, true, 'md']]) {
+  for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['desktop', 1400, 900, true, 'md']]) {
     const tab = await openTab(width, height, false, false, desktop, { theme });
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
     await sleep(1600);
@@ -1372,7 +1366,7 @@ async function gearAddFlows(expect) {
 }
 
 async function certsFabFlows(expect) {
-  for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['iPhone', 390, 844, true, false, 'ios'], ['tablet landscape', 1280, 800, false, false, 'md'], ['tablet portrait', 800, 1280, false, false, 'md'], ['desktop', 1400, 900, false, true, 'md']]) {
+  for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['tablet landscape', 1280, 800, false, false, 'md']]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.send('Page.bringToFront');
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
@@ -1467,7 +1461,8 @@ async function certsFabFlows(expect) {
 }
 
 async function certificationAgencyFlows(expect) {
-  for (const [label, width, height, mobile, desktop] of [['phone', 390, 844, true, false], ['tablet', 1280, 800, false, false], ['desktop', 1400, 900, false, true]]) {
+  // The agencies and their levels are in tests/app/cert-agencies.test.mjs; one layout shows that the form uses them.
+  for (const [label, width, height, mobile, desktop] of [['phone', 390, 844, true, false]]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
     await tab.send('Page.bringToFront');
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/new'); });
@@ -1558,10 +1553,7 @@ async function certificationAgencyFlows(expect) {
 async function gearTypeDialogFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['Android phone', 390, 844, true, false, 'md'],
-    ['iPhone', 390, 844, true, false, 'ios'],
     ['Android tablet', 1280, 800, false, false, 'md'],
-    ['iPad', 1280, 800, false, false, 'ios'],
-    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
@@ -1691,7 +1683,8 @@ async function gearTypeDialogFlows(expect) {
       expect('tablet: an existing Other piece keeps its type name when saved', { typeName: 'Repair kit' }, { typeName: savedType });
     }
     if (label === 'Android tablet') {
-      for (const type of ['knife', 'diveKnife', 'compass']) {
+      // The fields of every type are in tests/app/gear-fields.test.mjs; one without the usual fields shows the form's wiring.
+      for (const type of ['compass']) {
         await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
         await sleep(1000);
         await selectType(type);
@@ -1724,9 +1717,7 @@ async function gearTypeDialogFlows(expect) {
 async function profileInfoWidthsFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['narrow phone', 320, 740, true, false, 'md'],
-    ['iPhone', 390, 844, true, false, 'ios'],
     ['tablet', 1280, 800, false, false, 'md'],
-    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info/edit'); });
@@ -1831,11 +1822,11 @@ async function profileInfoWidthsFlows(expect) {
   }
 }
 
+// The rule itself (which reminders count) is in tests/app/maintenance.test.mjs; here only that each layout's screens use it.
 async function maintenanceEntryFlows(expect) {
   for (const [label, width, height, mobile, desktop] of [
     ['phone', 390, 844, true, false],
     ['tablet', 1280, 800, false, false],
-    ['desktop', 1400, 900, false, true],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
     const id = await tab.run(async (name) => {
@@ -1871,35 +1862,6 @@ async function maintenanceEntryFlows(expect) {
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile'); });
     await sleep(900);
     expect(`${label}: an active reminder shows the profile entry`, { profile: true, visible: true }, await profileEntry());
-    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'); });
-    await sleep(900);
-    const secondId = await tab.run(async ({ id, reminder, name }) => {
-      const { change } = await import('/src/lib/inventory.svelte.js');
-      return change(async (inv) => {
-        const second = await inv.saveGear({ type: 'cylinder', name });
-        await inv.saveMaintenance({ gearId: second.id, task: 'inspection', intervalMonths: 12, intervalDives: null });
-        await inv.noteMaintenance({ id: reminder, gearId: id, task: 'service' }, { kind: 'service', doneOn: '2026-01-01' });
-        await inv.removeRule(reminder);
-        return second.id;
-      });
-    }, { id, reminder, name: `Second ${label}` });
-    await sleep(300);
-    expect(`${label}: another active piece keeps the entry visible`, { visible: true }, { visible: await gearEntry() });
-    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.deleteGear(id)); }, secondId);
-    await sleep(300);
-    expect(`${label}: history without an active rule does not show the entry`, { visible: false }, { visible: await gearEntry() });
-    await tab.run(async ({ id, reminder }) => {
-      const { change } = await import('/src/lib/inventory.svelte.js');
-      await change(async (inv) => {
-        await inv.saveMaintenance({ id: reminder, gearId: id, task: 'service', intervalMonths: 12, intervalDives: null });
-        await inv.retireGear(id);
-      });
-    }, { id, reminder });
-    await sleep(300);
-    expect(`${label}: a retired piece does not show the entry`, { visible: false }, { visible: await gearEntry() });
-    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.restoreGear(id)); }, id);
-    await sleep(300);
-    expect(`${label}: restoring the piece shows the entry again`, { visible: true }, { visible: await gearEntry() });
     await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.deleteGear(id)); }, id);
     await sleep(300);
     expect(`${label}: deleting the last reminder hides the entry`, { visible: false }, { visible: await gearEntry() });
@@ -1910,9 +1872,7 @@ async function maintenanceEntryFlows(expect) {
 async function gearDeleteFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['Android phone', 390, 844, true, false, 'md'],
-    ['iPhone', 390, 844, true, false, 'ios'],
     ['Android tablet', 1280, 800, false, false, 'md'],
-    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     const fixture = await tab.run(async (name) => {
@@ -2088,8 +2048,13 @@ async function profileLayersFlows(expect) {
   }
 }
 
+/** What each block of flows made and how long it took, for the summary at the end. @type {{ name: string, checks: number, seconds: number }[]} */
+const blocks = [];
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--maintenance-entry-only') && !args.has('--profile-info-widths-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
+  const ONLY = ['--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
+  const fixed = !ONLY.some((flag) => args.has(flag));
+  const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -2099,36 +2064,11 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
-  if (args.has('--export-only') || fixed) await exportFlows(expect);
-  if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
-  if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
-  if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
-  if (args.has('--profile-info-widths-only') || fixed) await profileInfoWidthsFlows(expect);
-  if (args.has('--maintenance-entry-only') || fixed) await maintenanceEntryFlows(expect);
-  if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
-  if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);
-  if (args.has('--gear-delete-only') || fixed) await gearDeleteFlows(expect);
-  if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
-  if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
-  if (args.has('--settings-computers-only') || fixed) await settingsComputersFlows(expect);
-  if (args.has('--profile-layers-only') || fixed) await profileLayersFlows(expect);
-  if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
-  if (fixed && !args.has('--tablet-only')) await welcomeFlows();
-  if (fixed && !args.has('--phone-only')) await tabletFlows();
-  if (fixed && !args.has('--phone-only') && !args.has('--tablet-only')) await desktopFlows();
-  // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
-  if (args.has('--gestures-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
-    await gestureFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
-  }
-  // The faults the random sequences found (tests/e2e/navigation-regressions.mjs).
-  if (args.has('--regressions-only') || (fixed && !args.has('--tablet-only') && !args.has('--welcome-only'))) {
-    await regressionFlows({ openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length });
-  }
-  // Seeded random sequences (tests/e2e/navigation-monkey.mjs).
-  if (args.has('--monkey-only') || (fixed && !args.has('--no-monkey') && !args.has('--tablet-only') && !args.has('--phone-only') && !args.has('--welcome-only'))) {
-    await monkeyFlows({
-      openTab,
-      sleep,
+  const harness = { openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
+  const monkey = (/** @type {string} */ only) => () =>
+    monkeyFlows({
+      ...harness,
+      only,
       blankTab: async () => (await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json()).id,
       activate: (id) => fetch(`${wsBase}/json/activate/${id}`),
       count: () => void checks++,
@@ -2137,11 +2077,62 @@ try {
         console.log(`  FAIL ${label}: ${problems.join('; ')}`);
       },
     });
+  /**
+   * Every block of flows: its name, the flag that runs it alone, its usual duration in seconds (to share the blocks among
+   * shards), whether the whole run includes it, and what it runs.
+   * @type {[string, string, number, boolean, () => Promise<unknown>][]}
+   */
+  const all = [
+    ['export', '--export-only', 17, true, () => exportFlows(expect)],
+    ['computer photo', '--computer-photo-only', 10, !phoneOnly && !tabletOnly && !welcomeOnly, () => computerPhotoFlows(expect)],
+    ['units', '--units-only', 2, true, () => unitsMenuFlows(expect)],
+    ['profile insets', '--profile-insets-only', 19, !phoneOnly && !welcomeOnly, () => profileInsetsFlows(expect)],
+    ['profile info', '--profile-info-widths-only', 20, true, () => profileInfoWidthsFlows(expect)],
+    ['maintenance entry', '--maintenance-entry-only', 15, true, () => maintenanceEntryFlows(expect)],
+    ['gear add', '--gear-add-only', 15, !phoneOnly && !welcomeOnly, () => gearAddFlows(expect)],
+    ['gear type', '--gear-type-dialog-only', 35, true, () => gearTypeDialogFlows(expect)],
+    ['gear delete', '--gear-delete-only', 30, true, () => gearDeleteFlows(expect)],
+    ['certifications add', '--certs-fab-only', 20, !phoneOnly && !welcomeOnly, () => certsFabFlows(expect)],
+    ['certification agencies', '--cert-agencies-only', 12, true, () => certificationAgencyFlows(expect)],
+    ['settings', '--settings-computers-only', 45, true, () => settingsComputersFlows(expect)],
+    ['profile layers', '--profile-layers-only', 5, true, () => profileLayersFlows(expect)],
+    ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
+    ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
+    ['tablet', '', 8, !phoneOnly, () => tabletFlows()],
+    ['desktop', '', 10, !phoneOnly && !tabletOnly, () => desktopFlows()],
+    // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
+    ['gestures', '--gestures-only', 18, !tabletOnly && !welcomeOnly, () => gestureFlows(harness)],
+    // The faults the random sequences found (tests/e2e/navigation-regressions.mjs).
+    ['regressions', '--regressions-only', 25, !tabletOnly && !welcomeOnly, () => regressionFlows(harness)],
+    // Seeded random sequences (tests/e2e/navigation-monkey.mjs), one block for each configuration.
+    ...['phone-md', 'phone-ios', 'tablet-md'].map((config) => /** @type {[string, string, number, boolean, () => Promise<unknown>]} */ ([`monkey ${config}`, '--monkey-only', 40, !args.has('--no-monkey') && !tabletOnly && !phoneOnly && !welcomeOnly, monkey(config)])),
+  ];
+  // --shard=2/3: this process runs its share of the blocks (the heaviest first, each to the lightest shard); see
+  // tests/e2e/navigation-parallel.mjs, which starts the shards together.
+  const shardArg = [...args].find((a) => a.startsWith('--shard='))?.slice(8).split('/').map(Number);
+  /** @type {Map<string, number>} */
+  const shardOf = new Map();
+  if (shardArg) {
+    const loads = Array(shardArg[1]).fill(0);
+    for (const [name, , seconds] of [...all].sort((a, b) => b[2] - a[2])) {
+      const lightest = loads.indexOf(Math.min(...loads));
+      loads[lightest] += seconds;
+      shardOf.set(name, lightest + 1);
+    }
+  }
+  for (const [name, flag, , inWholeRun, run] of all) {
+    if (!(inWholeRun && fixed) && !(flag && args.has(flag))) continue;
+    if (shardArg && shardOf.get(name) !== shardArg[0]) continue;
+    const checksBefore = checks;
+    const started = Date.now();
+    await run();
+    blocks.push({ name, checks: checks - checksBefore, seconds: Math.round((Date.now() - started) / 1000) });
   }
 } catch (e) {
   failures.push({ label: 'the run', problems: [String(e.stack ?? e)] });
   console.log(`  ERROR ${e.stack ?? e}`);
 }
+if (blocks.length) console.log(`\n${blocks.map((b) => `  ${b.name.padEnd(24)} ${String(b.checks).padStart(4)} checks  ${String(b.seconds).padStart(4)} s`).join('\n')}`);
 console.log(`\n${checks} checks, ${failures.length} failure(s)`);
 if (failures.length) console.log(JSON.stringify(failures.slice(0, 3), null, 1));
 process.exitCode = failures.length ? 1 : 0;

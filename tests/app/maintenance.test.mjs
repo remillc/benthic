@@ -9,6 +9,7 @@ import {
   addMonths,
   daysBetween,
   evaluate,
+  evaluateAll,
   sections,
   overdueCount,
   diveWarnings,
@@ -192,6 +193,21 @@ test('the sections order the reminders by urgency and the badge counts the overd
   assert.deepEqual(s.ok.map((e) => e.item.id), ['c']);
   assert.deepEqual(s.counts, { overdue: 2, soon: 1, ok: 1 });
   assert.equal(overdueCount(evals), 2);
+});
+
+test('the « Entretien » entry shows only with an active reminder on a piece that is not retired', () => {
+  const today = '2026-11-17';
+  const shown = (items, pieces) => evaluateAll({ items, pieces, diveKeysOf: () => [], today }).some((e) => e.active);
+  const reg = { id: 'g1', type: 'regulator' };
+  const timed = rule({ intervalMonths: 12 });
+  assert.equal(shown([], [reg]), false, 'no reminder');
+  assert.equal(shown([timed], [reg]), true, 'an active reminder');
+  assert.equal(shown([timed, rule({ id: 'm2', gearId: 'g2', intervalMonths: 12 })], [reg, { id: 'g2', type: 'cylinder' }]), true, 'a second piece');
+  assert.equal(shown([rule({ intervalMonths: null, intervalDives: null, history: [{ kind: 'service', doneOn: '2026-01-01' }] })], [reg]), false, 'history without a rule');
+  assert.equal(shown([timed], [{ ...reg, retired: true }]), false, 'a retired piece');
+  assert.equal(shown([timed], [reg]), true, 'a restored piece');
+  assert.equal(shown([timed], []), false, 'a deleted piece');
+  assert.equal(shown([rule({ intervalMonths: 12 })], [{ id: 'g1', type: 'computer' }]), false, 'a dive computer has no reminder');
 });
 
 test('the dive edit warns about an overdue piece that is in the equipment, only when the warning is on', () => {

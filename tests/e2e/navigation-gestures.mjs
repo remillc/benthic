@@ -45,7 +45,7 @@ export async function gestureFlows(h) {
   };
   const openEdit = async (label) => {
     await tapDive(tab);
-    await settled(tab, `${label}: dive opened`, { route: /^\/dives\/\d+$/ });
+    await settled(tab, `${label}: dive opened`, { route: /^\/dives\/\d+$/, setup: true });
     const dive = (await tab.run(readStack)).current;
     // The dive page is still filling in (its profile, its site): the button is tapped once it has stopped moving.
     const place = () => tab.run(() => {
@@ -63,7 +63,7 @@ export async function gestureFlows(h) {
     for (let i = 0; i < 100 && !(await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
     // When the page did not open: what the app's navigation trace says of the tap.
     if (!(await tab.run(readStack)).current.endsWith('/edit')) console.log(`    trace: ${await tab.run(async () => (await import('/src/lib/nav-trace.js')).traceText().split('\n').slice(-10).join(' / '))} ${JSON.stringify(tab.logs.slice(-3))}`);
-    await settled(tab, `${label}: edit opened`, { route: /\/edit$/ });
+    await settled(tab, `${label}: edit opened`, { route: /\/edit$/, setup: true });
     return dive;
   };
 
@@ -72,13 +72,14 @@ export async function gestureFlows(h) {
   await taken(4, 44, 400);
   // No wait: the pages are back in place at once, not after an animation.
   await sound('gesture given up: the pages are in place at once');
-  await settled(tab, 'gesture given up: still on the edit page', { route: /\/edit$/ });
+  await settled(tab, 'gesture given up: still on the edit page', { route: /\/edit$/, setup: true });
   await hardwareBack(tab);
   await settled(tab, 'gesture given up: Back still goes back', { route: dive });
   await tapBack(tab);
   await settled(tab, 'gesture given up: logbook', { route: '/' });
 
-  for (const gap of [0, 40, 250]) {
+  // The two extremes of the delay: Back at once, and Back after the swipe has been given up for good.
+  for (const gap of [0, 250]) {
     console.log(` the system takes a swipe back, then sends Back ${gap} ms later`);
     dive = await openEdit(`Back ${gap} ms after`);
     await taken(6, 60, 380, 4);
@@ -93,7 +94,7 @@ export async function gestureFlows(h) {
   console.log(' the system takes the touch from the right edge of a dive page (the neighbour dive had started to come in)');
   for (const gap of [0, 120]) {
     await tapDive(tab);
-    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/ });
+    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
     await taken(386, -70, 600, 4);
     if (gap) await sleep(gap);
     await hardwareBack(tab);
@@ -105,9 +106,9 @@ export async function gestureFlows(h) {
   console.log(' the system takes a swipe between sections');
   await taken(3, 80, 500, 4);
   await sound('section swipe taken: the sections are in place at once');
-  await settled(tab, 'section swipe taken: logbook', { route: '/' });
+  await settled(tab, 'section swipe taken: logbook', { route: '/', setup: true });
   await tapDive(tab);
-  await settled(tab, 'section swipe taken: a dive opens', { route: /^\/dives\/\d+$/ });
+  await settled(tab, 'section swipe taken: a dive opens', { route: /^\/dives\/\d+$/, setup: true });
   await hardwareBack(tab);
   await settled(tab, 'section swipe taken: Back', { route: '/' });
 
@@ -130,7 +131,7 @@ export async function gestureFlows(h) {
   await touch('touchEnd');
   await settled(tab, 'a swipe past half of the width goes back', { route: dive });
   await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
-  await settled(tab, 'swipe back: edit opened again', { route: /\/edit$/ });
+  await settled(tab, 'swipe back: edit opened again', { route: /\/edit$/, setup: true });
   await tab.swipe(60, 130, 400, 3);
   await settled(tab, 'a flick goes back', { route: dive });
   await sound('after the swipes: sound');
@@ -153,7 +154,7 @@ export async function gestureFlows(h) {
   expect('Back under the finger: on the edit page or the dive, never elsewhere', { ok: true }, { ok: /\/edit$/.test(where) || where === dive });
   for (let i = 0; i < 3 && (await tab.run(readStack)).current !== '/'; i++) {
     await hardwareBack(tab);
-    await settled(tab, `Back under the finger: Back ${i + 1}`, {});
+    await settled(tab, `Back under the finger: Back ${i + 1}`, { setup: true });
   }
   await settled(tab, 'Back under the finger: logbook', { route: '/' });
 
@@ -207,7 +208,7 @@ export async function gestureFlows(h) {
     return { moving: inv.appIsMoving(app), problems: inv.checkApp(app).join('; '), popup: !!document.querySelector('.popup.modal-in'), route: view?.f7View?.router?.currentRoute?.path ?? '' };
   });
   await tapDive(wide);
-  await settled(wide, 'tablet: dive shown beside the list', { split: true });
+  await settled(wide, 'tablet: dive shown beside the list', { split: true, setup: true });
   const shownDive = (await state()).route;
   await tapText(wide, '^\\s*(Modifier|Edit)\\s*$', '.page-current, .page-master-detail');
   for (let i = 0; i < 100 && !(await state()).popup; i++) await sleep(100);

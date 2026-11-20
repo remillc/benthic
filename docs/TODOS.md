@@ -55,6 +55,5 @@ Next number: 136
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
-- #133 [code] Reassess all navigation verification tests. There are about 780, which is too many.
 - #134 [code] On /profile/info/edit, place Save at the bottom right.
 - #135 [code] On /profile/info/edit, reduce the width of the Blood group field.

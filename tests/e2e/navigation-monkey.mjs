@@ -4,6 +4,7 @@
 //
 //   node tests/e2e/navigation.mjs --monkey-only
 //   OD_MONKEY_SEEDS=7,8,9 OD_MONKEY_STEPS=400 node tests/e2e/navigation.mjs --monkey-only     (a long run)
+//   OD_MONKEY_FULL=1 node tests/e2e/navigation.mjs --monkey-only                                (the five seeds, before a release)
 //   OD_MONKEY_SEED=1234 OD_MONKEY_CONFIG=phone-md node tests/e2e/navigation.mjs --monkey-only  (replays one failure)
 // OD_MONKEY_VERBOSE=1 prints each action; OD_MONKEY_MAX_MIN stops the run after that many minutes.
 //
@@ -160,6 +161,7 @@ async function readTrace() {
 /**
  * @param {object} h the harness of navigation.mjs
  * @param {Function} h.openTab
+ * @param {string} [h.only] the one configuration to run (phone-md, phone-ios or tablet-md), else every one
  * @param {(targetId: string) => Promise<unknown>} h.activate brings a tab to the front
  * @param {() => Promise<string>} h.blankTab opens an empty tab and returns its id
  * @param {(ms: number) => Promise<void>} h.sleep
@@ -169,14 +171,18 @@ async function readTrace() {
 export async function monkeyFlows(h) {
   const { sleep } = h;
   const steps = Number(process.env.OD_MONKEY_STEPS || 45);
-  const only = process.env.OD_MONKEY_CONFIG;
+  const only = h.only ?? process.env.OD_MONKEY_CONFIG;
   const one = process.env.OD_MONKEY_SEED;
+  /** Three seeds by default, one for each configuration and one for each way of running (a slow processor, « Remove animations », neither); OD_MONKEY_FULL=1 runs the five of the release check. */
+  const defaultPlan = process.env.OD_MONKEY_FULL
+    ? { 'phone-md': [101, 102, 103], 'phone-ios': [201], 'tablet-md': [301] }
+    : { 'phone-md': [101], 'phone-ios': [201], 'tablet-md': [301] };
   /** @type {Record<string, number[]>} */
   const plan = one
     ? { [only || 'phone-md']: [Number(one)] }
     : process.env.OD_MONKEY_SEEDS
       ? Object.fromEntries(Object.keys(CONFIGS).filter((c) => !only || c === only).map((c) => [c, process.env.OD_MONKEY_SEEDS.split(',').map(Number)]))
-      : { 'phone-md': [101, 102, 103], 'phone-ios': [201], 'tablet-md': [301] };
+      : defaultPlan;
   const summary = [];
   /** OD_MONKEY_IGNORE: problems that are not counted (a regular expression), to compare with an older code that has them by design. */
   const ignore = process.env.OD_MONKEY_IGNORE ? new RegExp(process.env.OD_MONKEY_IGNORE) : null;
@@ -186,7 +192,7 @@ export async function monkeyFlows(h) {
   /** OD_MONKEY_MAX_MIN: the run stops by itself after this many minutes (the seeds left are not run). */
   const maxMs = Number(process.env.OD_MONKEY_MAX_MIN || 0) * 60000;
 
-  for (const [name, seeds] of Object.entries(plan)) {
+  for (const [name, seeds] of Object.entries(plan).filter(([name]) => !only || name === only)) {
     const config = CONFIGS[name];
     for (const seed of seeds) {
       console.log(`Monkey ${name}, seed ${seed}, ${steps} steps`);

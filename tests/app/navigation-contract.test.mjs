@@ -94,3 +94,11 @@ test('error reports and the problem report of About carry the navigation trace',
   assert.match(read('pages/About.svelte'), /traceLines\(200\)/);
   assert.match(read('components/DevToolsMenu.svelte'), /traceText\(\)/);
 });
+
+test('every section the Settings route accepts is one that Settings.svelte renders, and the other way round', () => {
+  const route = read('App.svelte').match(/\/settings\/:section\(([^)]+)\)/);
+  assert.ok(route, 'the Settings detail route');
+  const routed = route[1].split('|').sort();
+  const rendered = [...new Set([...read('pages/Settings.svelte').matchAll(/inPage\('(\w+)'\)/g)].map((m) => m[1]))].sort();
+  assert.deepEqual(routed, rendered);
+});
