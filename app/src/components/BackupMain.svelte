@@ -58,6 +58,7 @@
     </span>
   </div>
 
+  <div class="bc-backup-main--versions">
   <h2 class="bc-backup--section">{t('backup.versions.title')}</h2>
   {#if backup.failed && !backup.versions.length}
     <div class="bc-backup--error">
@@ -95,7 +96,9 @@
     </div>
     <p class="bc-backup--note">{t('backup.versions.note')} {t('backup.media')}</p>
   {/if}
+  </div>
 
+  <div class="bc-backup-main--only">
   <h2 class="bc-backup--section">{t('backup.only.title')}</h2>
   <div class="bc-backup--list">
     <button type="button" class="bc-backup--row" class:bc-backup--row-selected={selected?.kind === 'dive'} onclick={ondive}>
@@ -114,5 +117,6 @@
       </span>
       <span class="bc-backup--chevron"><Icon name="chevron" size={20} /></span>
     </button>
+  </div>
   </div>
 </div>
