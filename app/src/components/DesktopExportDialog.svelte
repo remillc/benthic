@@ -70,49 +70,49 @@
   }
 </script>
 
-<Md3Dialog class="od-desktop-export" title={t('export.title', { n: ids.length })} oncancel={onclose}>
-  <h3 class="od-desktop-export--heading">{t('desktop.export.which')}</h3>
-  <div class="od-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.which')}>
+<Md3Dialog class="bc-desktop-export" title={t('export.title', { n: ids.length })} oncancel={onclose}>
+  <h3 class="bc-desktop-export--heading">{t('desktop.export.which')}</h3>
+  <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.which')}>
     {#if selected.length}
       <ChoiceRow name="od-export-scope" selected={scope === 'selection'} onselect={() => (scope = 'selection')}>
-        <span class="od-desktop-export--label">{t('desktop.export.selection', { n: selected.length })}</span>
-        {#if numbers.length}<span class="od-desktop-export--line">{t('desktop.numbers', { numbers: numbers.slice(0, 8).join(', ') + (numbers.length > 8 ? '…' : '') })}</span>{/if}
+        <span class="bc-desktop-export--label">{t('desktop.export.selection', { n: selected.length })}</span>
+        {#if numbers.length}<span class="bc-desktop-export--line">{t('desktop.numbers', { numbers: numbers.slice(0, 8).join(', ') + (numbers.length > 8 ? '…' : '') })}</span>{/if}
       </ChoiceRow>
     {/if}
     {#if filtered}
       <ChoiceRow name="od-export-scope" selected={scope === 'filtered'} onselect={() => (scope = 'filtered')}>
-        <span class="od-desktop-export--label">{t('desktop.export.filtered', { n: filtered.length })}</span>
+        <span class="bc-desktop-export--label">{t('desktop.export.filtered', { n: filtered.length })}</span>
       </ChoiceRow>
     {/if}
     <ChoiceRow name="od-export-scope" selected={scope === 'all'} onselect={() => (scope = 'all')}>
-      <span class="od-desktop-export--label">{t('desktop.export.all')}</span>
-      <span class="od-desktop-export--line">{t('trip.dives', { n: all.length })}</span>
+      <span class="bc-desktop-export--label">{t('desktop.export.all')}</span>
+      <span class="bc-desktop-export--line">{t('trip.dives', { n: all.length })}</span>
     </ChoiceRow>
   </div>
 
-  <h3 class="od-desktop-export--heading">{t('desktop.export.format')}</h3>
-  <div class="od-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.format')}>
+  <h3 class="bc-desktop-export--heading">{t('desktop.export.format')}</h3>
+  <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.format')}>
     {#each FORMATS as f (f)}
       <ChoiceRow name="od-export-format" selected={format === f} onselect={() => (format = f)}>
-        <span class="od-desktop-export--label">{t(`export.formats.${f}`)}</span>
-        <span class="od-desktop-export--line">{t(`export.formatTexts.${f}`)}</span>
+        <span class="bc-desktop-export--label">{t(`export.formats.${f}`)}</span>
+        <span class="bc-desktop-export--line">{t(`export.formatTexts.${f}`)}</span>
       </ChoiceRow>
     {/each}
   </div>
 
-  <label class="od-desktop-export--switch">
+  <label class="bc-desktop-export--switch">
     <span>
-      <span class="od-desktop-export--label">{t('export.anonymize')}</span>
-      <span class="od-desktop-export--line">{t('export.anonymizeText')}</span>
+      <span class="bc-desktop-export--label">{t('export.anonymize')}</span>
+      <span class="bc-desktop-export--line">{t('export.anonymizeText')}</span>
     </span>
     <input type="checkbox" role="switch" bind:checked={anonymize} />
   </label>
 
   {#if format === 'pdf' && fullName}
-    <label class="od-desktop-export--switch">
+    <label class="bc-desktop-export--switch">
       <span>
-        <span class="od-desktop-export--label">{t('export.showName')}</span>
-        <span class="od-desktop-export--line">{t('export.showNameText', { name: fullName })}</span>
+        <span class="bc-desktop-export--label">{t('export.showName')}</span>
+        <span class="bc-desktop-export--line">{t('export.showNameText', { name: fullName })}</span>
       </span>
       <input type="checkbox" role="switch" bind:checked={showName} disabled={anonymize} />
     </label>
@@ -126,32 +126,32 @@
 
 <style>
   @layer od.components {
-    .od-desktop-export--heading,
-    .od-desktop-export--switch {
+    .bc-desktop-export--heading,
+    .bc-desktop-export--switch {
       padding-inline: 24px;
     }
-    .od-desktop-export--heading {
+    .bc-desktop-export--heading {
       margin: 12px 0 4px;
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-export--choices {
+    .bc-desktop-export--choices {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
-    .od-desktop-export--label {
+    .bc-desktop-export--label {
       display: block;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-export--line {
+    .bc-desktop-export--line {
       display: block;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-export--switch {
+    .bc-desktop-export--switch {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -163,15 +163,15 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-export--switch {
+      .bc-desktop-export--switch {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-export--switch:hover {
+      .bc-desktop-export--switch:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-desktop-export--switch {
+      .bc-desktop-export--switch {
         transition: none;
       }
     }

@@ -52,16 +52,16 @@
   }
 </script>
 
-<div bind:this={group} class="od-button-group {extra}" class:od-button-group--marked={marked && !rail} class:od-button-group--rail={rail} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
+<div bind:this={group} class="bc-button-group {extra}" class:bc-button-group--marked={marked && !rail} class:bc-button-group--rail={rail} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
   {#if rail}
-    <span class="od-button-group--pill" class:od-button-group--pill-hidden={selectedIndex < 0} style:width="calc((100% - 8px) / {options.length})" style:transform="translateX({lastIndex * 100}%)" aria-hidden="true"></span>
+    <span class="bc-button-group--pill" class:bc-button-group--pill-hidden={selectedIndex < 0} style:width="calc((100% - 8px) / {options.length})" style:transform="translateX({lastIndex * 100}%)" aria-hidden="true"></span>
   {/if}
   {#each options as option, i (option.value)}
     <button
       type="button"
       role="radio"
-      class="od-button-group--button"
-      class:od-button-group--selected={value === option.value}
+      class="bc-button-group--button"
+      class:bc-button-group--selected={value === option.value}
       aria-checked={value === option.value}
       tabindex={value === option.value || (!options.some((o) => o.value === value) && i === 0) ? 0 : -1}
       onclick={() => (value !== option.value ? onchange(option.value) : clearable && onchange(''))}
@@ -75,12 +75,12 @@
 
 <style>
   @layer od.components {
-    .od-button-group {
+    .bc-button-group {
       display: flex;
       gap: 2px;
     }
 
-    .od-button-group--button {
+    .bc-button-group--button {
       flex: 1 1 0;
       min-width: 0;
       min-height: 40px;
@@ -88,8 +88,8 @@
       box-sizing: border-box;
       border: none;
       border-radius: 8px;
-      background: var(--od-surface-container-high);
-      color: var(--od-text);
+      background: var(--bc-surface-container-high);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       line-height: 20px;
@@ -112,20 +112,20 @@
         border-end-end-radius: 20px;
       }
 
-      &.od-button-group--selected {
+      &.bc-button-group--selected {
         border-radius: 20px;
-        background: var(--od-primary-action);
-        color: var(--od-on-primary-action);
+        background: var(--bc-primary-action);
+        color: var(--bc-on-primary-action);
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-primary-action);
+        outline: 2px solid var(--bc-primary-action);
         outline-offset: 2px;
       }
     }
 
     /* The rail (« Ce lest était »): the pill is the selection, the buttons are transparent labels over it. */
-    .od-button-group--rail {
+    .bc-button-group--rail {
       position: relative;
       display: grid;
       grid-auto-flow: column;
@@ -135,26 +135,26 @@
       padding: 4px;
       box-sizing: border-box;
       border-radius: 24px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
 
-      .od-button-group--pill {
+      .bc-button-group--pill {
         position: absolute;
         top: 4px;
         left: 4px;
         height: 40px;
         border-radius: 20px;
-        background: var(--od-secondary);
+        background: var(--bc-secondary);
         transition:
           transform 300ms cubic-bezier(0.2, 0, 0, 1),
           opacity 200ms linear;
       }
 
-      .od-button-group--pill-hidden {
+      .bc-button-group--pill-hidden {
         opacity: 0;
       }
 
-      .od-button-group--button,
-      .od-button-group--button.od-button-group--selected {
+      .bc-button-group--button,
+      .bc-button-group--button.bc-button-group--selected {
         position: relative;
         z-index: 1;
         min-height: 40px;
@@ -162,50 +162,50 @@
         padding: 0 4px;
         border-radius: 20px;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         transition: color 200ms linear;
       }
 
-      .od-button-group--button.od-button-group--selected {
-        color: var(--od-on-secondary);
+      .bc-button-group--button.bc-button-group--selected {
+        color: var(--bc-on-secondary);
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .od-button-group--pill,
-        .od-button-group--button {
+        .bc-button-group--pill,
+        .bc-button-group--button {
           transition: none;
         }
       }
     }
 
     /* The marked variant: secondary colour, with the check icon. */
-    .od-button-group--marked .od-button-group--button.od-button-group--selected {
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+    .bc-button-group--marked .bc-button-group--button.bc-button-group--selected {
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-button-group--button {
+      .bc-button-group--button {
         transition: box-shadow 120ms linear;
       }
-      .od-button-group:not(.od-button-group--rail) .od-button-group--button:not(:disabled):hover {
+      .bc-button-group:not(.bc-button-group--rail) .bc-button-group--button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-button-group--button {
+      .bc-button-group--button {
         transition: none;
       }
     }
     /* iOS: a segmented control. */
-    :global(.ios) .od-button-group:not(.od-button-group--rail) {
+    :global(.ios) .bc-button-group:not(.bc-button-group--rail) {
       gap: 2px;
       padding: 2px;
       border-radius: 9px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
 
-      .od-button-group--button {
+      .bc-button-group--button {
         min-height: 32px;
         border-radius: 7px;
         background: none;
@@ -213,10 +213,10 @@
         font-weight: 400;
         letter-spacing: 0;
 
-        &.od-button-group--selected {
+        &.bc-button-group--selected {
           border-radius: 7px;
-          background: var(--od-surface);
-          color: var(--od-text);
+          background: var(--bc-surface);
+          color: var(--bc-text);
           font-weight: 600;
           box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
         }

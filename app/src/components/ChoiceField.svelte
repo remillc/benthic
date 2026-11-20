@@ -98,12 +98,12 @@
 
 {#if editing}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="od-choice-field od-choice-field--field" bind:this={root} onfocusout={leave} onkeydown={keydown}>
+  <div class="bc-choice-field bc-choice-field--field" bind:this={root} onfocusout={leave} onkeydown={keydown}>
     <TextField {label} bind:value inputmode="numeric" {invalid} {oninput} keepTrailing>
       {#snippet trailing()}
-        <span class="od-choice-field--trailing">
-          <span class="od-choice-field--unit">{unit}</span>
-          <button type="button" class="od-choice-field--back" aria-label={backLabel} onclick={revert}><Icon name="expand" /></button>
+        <span class="bc-choice-field--trailing">
+          <span class="bc-choice-field--unit">{unit}</span>
+          <button type="button" class="bc-choice-field--back" aria-label={backLabel} onclick={revert}><Icon name="expand" /></button>
         </span>
       {/snippet}
     </TextField>
@@ -114,22 +114,22 @@
 
 <style>
   @layer od.components {
-    .od-choice-field--field {
+    .bc-choice-field--field {
       min-width: 0;
     }
 
-    .od-choice-field--trailing {
+    .bc-choice-field--trailing {
       display: flex;
       align-items: center;
     }
 
-    .od-choice-field--unit {
+    .bc-choice-field--unit {
       padding-inline-end: 4px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-choice-field--back {
+    .bc-choice-field--back {
       width: 40px;
       height: 40px;
       flex: none;
@@ -137,7 +137,7 @@
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;

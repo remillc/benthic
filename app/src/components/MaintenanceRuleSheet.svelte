@@ -64,23 +64,23 @@
   }
 </script>
 
-<Sheet class="od-rule-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('maintenance.ruleSheet.title')}>
-  <div class="od-rule-sheet--content">
-    <h2 class="od-rule-sheet--title">{t('maintenance.ruleSheet.title')}</h2>
-    <p class="od-rule-sheet--lead">{t('maintenance.ruleSheet.lead', { name })}</p>
+<Sheet class="bc-rule-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('maintenance.ruleSheet.title')}>
+  <div class="bc-rule-sheet--content">
+    <h2 class="bc-rule-sheet--title">{t('maintenance.ruleSheet.title')}</h2>
+    <p class="bc-rule-sheet--lead">{t('maintenance.ruleSheet.lead', { name })}</p>
 
-    <div class="od-rule-sheet--scroll">
-      <div class="od-rule-sheet--card" class:od-rule-sheet--card-on={timeOn}>
-        <div class="od-rule-sheet--row">
-          <span class="od-rule-sheet--icon"><Icon name="calendar" size={22} /></span>
-          <span class="od-rule-sheet--texts">
-            <span class="od-rule-sheet--label" id="od-rule-time">{t('maintenance.ruleSheet.time')}</span>
-            <span class="od-rule-sheet--help">{t('maintenance.ruleSheet.timeHelp')}</span>
+    <div class="bc-rule-sheet--scroll">
+      <div class="bc-rule-sheet--card" class:bc-rule-sheet--card-on={timeOn}>
+        <div class="bc-rule-sheet--row">
+          <span class="bc-rule-sheet--icon"><Icon name="calendar" size={22} /></span>
+          <span class="bc-rule-sheet--texts">
+            <span class="bc-rule-sheet--label" id="od-rule-time">{t('maintenance.ruleSheet.time')}</span>
+            <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.timeHelp')}</span>
           </span>
           <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-time" bind:checked={timeOn} /><span class="toggle-icon"></span></label>
         </div>
         {#if timeOn}
-          <div class="od-rule-sheet--stepper">
+          <div class="bc-rule-sheet--stepper">
             <button type="button" aria-label={t('maintenance.ruleSheet.less')} onclick={() => step('time', -1)}><Icon name="remove" size={20} /></button>
             <input type="text" inputmode="numeric" bind:value={timeValue} aria-label={t('maintenance.ruleSheet.value')} aria-invalid={!!problems.months} />
             <button type="button" aria-label={t('maintenance.ruleSheet.more')} onclick={() => step('time', 1)}><Icon name="plus" size={20} /></button>
@@ -94,146 +94,146 @@
               ]}
             />
           </div>
-          {#if problems.months}<p class="od-rule-sheet--error" role="alert">{t('maintenance.ruleSheet.range')}</p>{/if}
+          {#if problems.months}<p class="bc-rule-sheet--error" role="alert">{t('maintenance.ruleSheet.range')}</p>{/if}
         {/if}
       </div>
 
-      <div class="od-rule-sheet--card" class:od-rule-sheet--card-on={divesOn}>
-        <div class="od-rule-sheet--row">
-          <span class="od-rule-sheet--icon"><Icon name="logbook" size={22} /></span>
-          <span class="od-rule-sheet--texts">
-            <span class="od-rule-sheet--label" id="od-rule-dives">{t('maintenance.ruleSheet.dives')}</span>
-            <span class="od-rule-sheet--help">{t('maintenance.ruleSheet.divesHelp')}</span>
+      <div class="bc-rule-sheet--card" class:bc-rule-sheet--card-on={divesOn}>
+        <div class="bc-rule-sheet--row">
+          <span class="bc-rule-sheet--icon"><Icon name="logbook" size={22} /></span>
+          <span class="bc-rule-sheet--texts">
+            <span class="bc-rule-sheet--label" id="od-rule-dives">{t('maintenance.ruleSheet.dives')}</span>
+            <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.divesHelp')}</span>
           </span>
           <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-dives" bind:checked={divesOn} /><span class="toggle-icon"></span></label>
         </div>
         {#if divesOn}
-          <div class="od-rule-sheet--stepper">
+          <div class="bc-rule-sheet--stepper">
             <button type="button" aria-label={t('maintenance.ruleSheet.less')} onclick={() => step('dives', -10)}><Icon name="remove" size={20} /></button>
             <input type="text" inputmode="numeric" bind:value={divesValue} aria-label={t('maintenance.ruleSheet.value')} aria-invalid={!!problems.dives} />
             <button type="button" aria-label={t('maintenance.ruleSheet.more')} onclick={() => step('dives', 10)}><Icon name="plus" size={20} /></button>
-            <span class="od-rule-sheet--unit">{t('maintenance.ruleSheet.divesUnit')}</span>
+            <span class="bc-rule-sheet--unit">{t('maintenance.ruleSheet.divesUnit')}</span>
           </div>
-          {#if problems.dives}<p class="od-rule-sheet--error" role="alert">{t('maintenance.ruleSheet.range')}</p>{/if}
+          {#if problems.dives}<p class="bc-rule-sheet--error" role="alert">{t('maintenance.ruleSheet.range')}</p>{/if}
         {/if}
       </div>
 
-      <p class="od-rule-sheet--both" class:od-rule-sheet--error={!!problems.criteria} role={problems.criteria ? 'alert' : undefined}>
+      <p class="bc-rule-sheet--both" class:bc-rule-sheet--error={!!problems.criteria} role={problems.criteria ? 'alert' : undefined}>
         {problems.criteria ? t('maintenance.ruleSheet.none') : t('maintenance.ruleSheet.both')}
       </p>
 
-      <h3 class="od-rule-sheet--group" id="od-rule-notify">{t('maintenance.ruleSheet.notify')}</h3>
-      <div class="od-rule-sheet--chips" role="radiogroup" aria-labelledby="od-rule-notify">
+      <h3 class="bc-rule-sheet--group" id="od-rule-notify">{t('maintenance.ruleSheet.notify')}</h3>
+      <div class="bc-rule-sheet--chips" role="radiogroup" aria-labelledby="od-rule-notify">
         {#each NOTIFY_CHOICES as n (n)}
-          <button type="button" role="radio" aria-checked={notifyDays === n} class="od-rule-sheet--chip" class:od-rule-sheet--chip-on={notifyDays === n} onclick={() => (notifyDays = n)}>
+          <button type="button" role="radio" aria-checked={notifyDays === n} class="bc-rule-sheet--chip" class:bc-rule-sheet--chip-on={notifyDays === n} onclick={() => (notifyDays = n)}>
             {#if notifyDays === n}<Icon name="check" size={18} />{/if}{t('maintenance.ruleSheet.days', { n })}
           </button>
         {/each}
       </div>
 
-      <div class="od-rule-sheet--row od-rule-sheet--warn">
-        <span class="od-rule-sheet--texts">
-          <span class="od-rule-sheet--label" id="od-rule-warn">{t('maintenance.ruleSheet.warn')}</span>
-          <span class="od-rule-sheet--help">{t('maintenance.ruleSheet.warnHelp')}</span>
+      <div class="bc-rule-sheet--row bc-rule-sheet--warn">
+        <span class="bc-rule-sheet--texts">
+          <span class="bc-rule-sheet--label" id="od-rule-warn">{t('maintenance.ruleSheet.warn')}</span>
+          <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.warnHelp')}</span>
         </span>
         <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-warn" bind:checked={warn} /><span class="toggle-icon"></span></label>
       </div>
     </div>
 
-    <div class="od-rule-sheet--actions">
+    <div class="bc-rule-sheet--actions">
       {#if removable}
-        <button type="button" class="od-rule-sheet--remove" onclick={() => onremove?.()}>{t('maintenance.ruleSheet.remove')}</button>
+        <button type="button" class="bc-rule-sheet--remove" onclick={() => onremove?.()}>{t('maintenance.ruleSheet.remove')}</button>
       {/if}
-      <span class="od-rule-sheet--spacer"></span>
-      <button type="button" class="od-rule-sheet--text" onclick={onclose}>{t('maintenance.ruleSheet.cancel')}</button>
-      <button type="button" class="od-rule-sheet--main" disabled={!canSave} onclick={save}>{t('maintenance.ruleSheet.save')}</button>
+      <span class="bc-rule-sheet--spacer"></span>
+      <button type="button" class="bc-rule-sheet--text" onclick={onclose}>{t('maintenance.ruleSheet.cancel')}</button>
+      <button type="button" class="bc-rule-sheet--main" disabled={!canSave} onclick={save}>{t('maintenance.ruleSheet.save')}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-rule-sheet) {
-      --f7-sheet-bg-color: var(--od-drawer);
+    :global(.sheet-modal.bc-rule-sheet) {
+      --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
       max-height: 92%;
       border-radius: 28px 28px 0 0;
     }
 
-    .od-rule-sheet--content {
+    .bc-rule-sheet--content {
       display: flex;
       flex-direction: column;
       max-height: 90vh;
-      padding: 20px 0 calc(12px + var(--od-safe-bottom));
+      padding: 20px 0 calc(12px + var(--bc-safe-bottom));
     }
 
-    .od-rule-sheet--title {
+    .bc-rule-sheet--title {
       margin: 0 24px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
     }
 
-    .od-rule-sheet--lead {
+    .bc-rule-sheet--lead {
       margin: 4px 24px 12px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-rule-sheet--scroll {
+    .bc-rule-sheet--scroll {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       padding: 0 16px;
     }
 
-    .od-rule-sheet--card {
+    .bc-rule-sheet--card {
       margin-bottom: 8px;
       padding: 12px 16px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 20px;
       background: none;
     }
 
-    .od-rule-sheet--card-on {
+    .bc-rule-sheet--card-on {
       border-color: transparent;
-      background: var(--od-selected-container);
+      background: var(--bc-selected-container);
     }
 
-    .od-rule-sheet--row {
+    .bc-rule-sheet--row {
       min-height: 48px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-rule-sheet--icon {
+    .bc-rule-sheet--icon {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-rule-sheet--texts {
+    .bc-rule-sheet--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-rule-sheet--label {
+    .bc-rule-sheet--label {
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-rule-sheet--help {
+    .bc-rule-sheet--help {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-rule-sheet--stepper {
+    .bc-rule-sheet--stepper {
       margin-top: 8px;
       display: flex;
       align-items: center;
@@ -249,8 +249,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--od-tonal);
-        color: var(--od-on-secondary-container);
+        background: var(--bc-tonal);
+        color: var(--bc-on-secondary-container);
       }
 
       input {
@@ -258,111 +258,111 @@
         width: 64px;
         height: 40px;
         box-sizing: border-box;
-        border: var(--od-outline-width) solid var(--od-outline);
+        border: var(--bc-outline-width) solid var(--bc-outline);
         border-radius: 12px;
-        background: var(--od-surface);
-        color: var(--od-text);
+        background: var(--bc-surface);
+        color: var(--bc-text);
         font: inherit;
         font-size: 18px;
         text-align: center;
       }
 
       input[aria-invalid='true'] {
-        border-color: var(--od-alarm);
+        border-color: var(--bc-alarm);
       }
     }
 
-    .od-rule-sheet--unit {
+    .bc-rule-sheet--unit {
       font-size: 16px;
     }
 
-    .od-rule-sheet--both,
-    .od-rule-sheet--error {
+    .bc-rule-sheet--both,
+    .bc-rule-sheet--error {
       margin: 4px 4px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    p.od-rule-sheet--error {
-      color: var(--od-alarm);
+    p.bc-rule-sheet--error {
+      color: var(--bc-alarm);
     }
 
-    .od-rule-sheet--group {
+    .bc-rule-sheet--group {
       margin: 16px 4px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-rule-sheet--chips {
+    .bc-rule-sheet--chips {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .od-rule-sheet--chip {
+    .bc-rule-sheet--chip {
       width: auto;
       height: 40px;
       padding: 0 16px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-rule-sheet--chip-on {
+    .bc-rule-sheet--chip-on {
       border-color: transparent;
-      background: var(--od-selected-container);
+      background: var(--bc-selected-container);
     }
 
-    .od-rule-sheet--warn {
+    .bc-rule-sheet--warn {
       margin: 12px 4px 0;
     }
 
-    .od-rule-sheet--actions {
+    .bc-rule-sheet--actions {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 12px 16px 0;
     }
 
-    .od-rule-sheet--spacer {
+    .bc-rule-sheet--spacer {
       flex: 1;
     }
 
-    .od-rule-sheet--text,
-    .od-rule-sheet--main,
-    .od-rule-sheet--remove {
+    .bc-rule-sheet--text,
+    .bc-rule-sheet--main,
+    .bc-rule-sheet--remove {
       height: 40px;
       padding: 0 16px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-rule-sheet--remove {
-      color: var(--od-menu-danger);
+    .bc-rule-sheet--remove {
+      color: var(--bc-menu-danger);
     }
 
-    .od-rule-sheet--main {
+    .bc-rule-sheet--main {
       padding: 0 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-rule-sheet--main:disabled {
+    .bc-rule-sheet--main:disabled {
       opacity: 0.38;
     }
   }

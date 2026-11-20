@@ -183,11 +183,11 @@
   const current = $derived(drawings[shown]);
 </script>
 
-<Page class="od-validate">
+<Page class="bc-validate">
   <Navbar {title}>
     {#snippet left()}
       <Link iconOnly onClick={back}>
-        <Icon name="arrowBack" /><span class="od-sr-only">{t('detail.back')}</span>
+        <Icon name="arrowBack" /><span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
     {#snippet right()}
@@ -198,99 +198,99 @@
   </Navbar>
 
   {#if failed}
-    <p class="od-validate--message" role="alert">{t('validation.loadFailed')}</p>
+    <p class="bc-validate--message" role="alert">{t('validation.loadFailed')}</p>
   {:else if step === 'choose'}
-    <p class="od-validate--summary">{summary}</p>
-    <div class="od-validate--choices">
-      <button type="button" class="od-validate--choice od-validate--choice-signature" disabled={!dives.length} onclick={() => go('sign')}>
+    <p class="bc-validate--summary">{summary}</p>
+    <div class="bc-validate--choices">
+      <button type="button" class="bc-validate--choice bc-validate--choice-signature" disabled={!dives.length} onclick={() => go('sign')}>
         <Icon name="edit" />
-        <span class="od-validate--choice-text">
-          <span class="od-validate--choice-title">{t('validation.chooseSignature')}</span>
-          <span class="od-validate--choice-help">{t('validation.chooseSignatureText')}</span>
+        <span class="bc-validate--choice-text">
+          <span class="bc-validate--choice-title">{t('validation.chooseSignature')}</span>
+          <span class="bc-validate--choice-help">{t('validation.chooseSignatureText')}</span>
         </span>
         <Icon name="chevron" />
       </button>
-      <button type="button" class="od-validate--choice od-validate--choice-qr" disabled={!dives.length} onclick={() => go('qr')}>
+      <button type="button" class="bc-validate--choice bc-validate--choice-qr" disabled={!dives.length} onclick={() => go('qr')}>
         <Icon name="qr" />
-        <span class="od-validate--choice-text">
-          <span class="od-validate--choice-title">{t('validation.chooseQr')}</span>
-          <span class="od-validate--choice-help">{t('validation.chooseQrText')}</span>
+        <span class="bc-validate--choice-text">
+          <span class="bc-validate--choice-title">{t('validation.chooseQr')}</span>
+          <span class="bc-validate--choice-help">{t('validation.chooseQrText')}</span>
         </span>
         <Icon name="chevron" />
       </button>
     </div>
   {:else if step === 'sign'}
-    <p class="od-validate--summary">{summary}</p>
-    <div class="od-validate--fields">
+    <p class="bc-validate--summary">{summary}</p>
+    <div class="bc-validate--fields">
       <TextField label={t('validation.name')} bind:value={name} invalid={touched && !!problems.name} supporting={touched && problems.name ? t('validation.nameRequired') : ''} autocomplete="name" />
-      <div class="od-validate--role">
-        <span class="od-validate--label" id="od-validate-role">{t('validation.role')}</span>
+      <div class="bc-validate--role">
+        <span class="bc-validate--label" id="od-validate-role">{t('validation.role')}</span>
         <ButtonGroup options={roleOptions} value={role} onchange={(v) => (role = v)} ariaLabelledby="od-validate-role" />
       </div>
       <TextField label={t('validation.number')} bind:value={instructorNumber} />
-      <div class="od-validate--pad">
-        <span class="od-validate--label">{t('validation.padLabel')}</span>
+      <div class="bc-validate--pad">
+        <span class="bc-validate--label">{t('validation.padLabel')}</span>
         <SignaturePad bind:this={pad} label={t('validation.padLabel')} onchange={(v) => (inked = v)} />
-        <button type="button" class="od-text-button od-validate--clear" onclick={() => pad?.clear()} disabled={!inked}>{t('validation.clear')}</button>
+        <button type="button" class="bc-text-button bc-validate--clear" onclick={() => pad?.clear()} disabled={!inked}>{t('validation.clear')}</button>
       </div>
-      {#if touched && !inked}<p class="od-validate--error" role="alert">{t('validation.signatureRequired')}</p>{/if}
-      <p class="od-validate--attest">{t(many ? 'validation.attestMany' : 'validation.attest', { name: name.trim() || t('validation.theSigner') })}</p>
+      {#if touched && !inked}<p class="bc-validate--error" role="alert">{t('validation.signatureRequired')}</p>{/if}
+      <p class="bc-validate--attest">{t(many ? 'validation.attestMany' : 'validation.attest', { name: name.trim() || t('validation.theSigner') })}</p>
     </div>
   {:else}
-    <p class="od-validate--summary">{summary}</p>
+    <p class="bc-validate--summary">{summary}</p>
     {#if qrError}
-      <p class="od-validate--message" role="alert">{t(`validation.qrError.${qrError}`)}</p>
-      <div class="od-validate--actions">
+      <p class="bc-validate--message" role="alert">{t(`validation.qrError.${qrError}`)}</p>
+      <div class="bc-validate--actions">
         {#if qrError !== 'plus'}
-          <button type="button" class="od-validate--secondary" onclick={makeCode} disabled={making}>{t('validation.retry')}</button>
+          <button type="button" class="bc-validate--secondary" onclick={makeCode} disabled={making}>{t('validation.retry')}</button>
         {/if}
-        <button type="button" class="od-validate--primary" onclick={() => go('sign')}>{t('validation.chooseSignature')}</button>
+        <button type="button" class="bc-validate--primary" onclick={() => go('sign')}>{t('validation.chooseSignature')}</button>
       </div>
     {:else if current}
-      <div class="od-validate--qr" class:od-validate--qr-expired={secsLeft === 0} role="img" aria-label={t('validation.qrLabel')}>
-        <svg class="od-validate--code" viewBox="-4 -4 {current.size + 8} {current.size + 8}" shape-rendering="crispEdges" aria-hidden="true"><path d={current.d}></path></svg>
+      <div class="bc-validate--qr" class:bc-validate--qr-expired={secsLeft === 0} role="img" aria-label={t('validation.qrLabel')}>
+        <svg class="bc-validate--code" viewBox="-4 -4 {current.size + 8} {current.size + 8}" shape-rendering="crispEdges" aria-hidden="true"><path d={current.d}></path></svg>
       </div>
       {#if secsLeft > 0}
-        <p class="od-validate--expires" role="timer">{t('validation.qrExpires', { time: clocks })}</p>
+        <p class="bc-validate--expires" role="timer">{t('validation.qrExpires', { time: clocks })}</p>
       {:else}
-        <p class="od-validate--expires od-validate--expired" role="status">{t('validation.qrExpired')}</p>
-        <div class="od-validate--actions"><button type="button" class="od-validate--secondary" onclick={makeCode} disabled={making}>{t('validation.qrNew')}</button></div>
+        <p class="bc-validate--expires bc-validate--expired" role="status">{t('validation.qrExpired')}</p>
+        <div class="bc-validate--actions"><button type="button" class="bc-validate--secondary" onclick={makeCode} disabled={making}>{t('validation.qrNew')}</button></div>
       {/if}
-      <p class="od-validate--help">{t('validation.qrHelp')}</p>
-      <div class="od-validate--actions"><button type="button" class="od-validate--primary" onclick={done}>{t('validation.qrDone')}</button></div>
+      <p class="bc-validate--help">{t('validation.qrHelp')}</p>
+      <div class="bc-validate--actions"><button type="button" class="bc-validate--primary" onclick={done}>{t('validation.qrDone')}</button></div>
     {:else}
-      <p class="od-validate--message" role="status">{t('validation.qrPreparing')}</p>
+      <p class="bc-validate--message" role="status">{t('validation.qrPreparing')}</p>
     {/if}
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    :global(.od-validate.page) {
-      background: var(--od-background);
+    :global(.bc-validate.page) {
+      background: var(--bc-background);
     }
 
-    .od-validate--summary {
+    .bc-validate--summary {
       margin: 8px 20px 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validate--message {
+    .bc-validate--message {
       margin: 24px 24px 0;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-validate--choices {
+    .bc-validate--choices {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-validate--choice {
+    .bc-validate--choice {
       width: 100%;
       box-sizing: border-box;
       padding: 16px;
@@ -301,33 +301,33 @@
       gap: 16px;
       text-align: left;
       font: inherit;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
     }
 
-    .od-validate--choice:disabled {
+    .bc-validate--choice:disabled {
       opacity: 0.5;
     }
 
-    .od-validate--choice-text {
+    .bc-validate--choice-text {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .od-validate--choice-title {
+    .bc-validate--choice-title {
       font-size: 17px;
       font-weight: 600;
     }
 
-    .od-validate--choice-help {
+    .bc-validate--choice-help {
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validate--fields {
+    .bc-validate--fields {
       margin-top: 8px;
       padding: 0 16px calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
@@ -335,87 +335,87 @@
       gap: 12px;
     }
 
-    .od-validate--role,
-    .od-validate--pad {
+    .bc-validate--role,
+    .bc-validate--pad {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .od-validate--label {
+    .bc-validate--label {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validate--clear {
+    .bc-validate--clear {
       align-self: flex-end;
     }
 
-    .od-validate--attest {
+    .bc-validate--attest {
       margin: 0 4px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validate--error {
+    .bc-validate--error {
       margin: 0 4px;
       font-size: 14px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
     /* White 20 dp card: the code is always black on white, whatever the mode (as « Partager par code QR »). */
-    .od-validate--qr {
+    .bc-validate--qr {
       box-sizing: border-box;
       width: min(310px, calc(100% - 48px));
       aspect-ratio: 1;
       margin: 24px auto 0;
       padding: 20px;
       border-radius: 24px;
-      background: var(--od-qr-paper);
+      background: var(--bc-qr-paper);
     }
 
-    .od-validate--qr-expired {
+    .bc-validate--qr-expired {
       opacity: 0.25;
     }
 
-    .od-validate--code {
+    .bc-validate--code {
       display: block;
       width: 100%;
       height: 100%;
-      fill: var(--od-qr-ink);
+      fill: var(--bc-qr-ink);
     }
 
-    .od-validate--expires {
+    .bc-validate--expires {
       margin: 16px 0 0;
       text-align: center;
       font-size: 16px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-validate--expired {
-      color: var(--od-alarm);
+    .bc-validate--expired {
+      color: var(--bc-alarm);
     }
 
-    .od-validate--help {
+    .bc-validate--help {
       margin: 16px 32px 0;
       text-align: center;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validate--actions {
+    .bc-validate--actions {
       margin: 24px 16px calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       justify-content: center;
       gap: 12px;
     }
 
-    .od-validate--primary,
-    .od-validate--secondary {
+    .bc-validate--primary,
+    .bc-validate--secondary {
       height: 48px;
       padding: 0 28px;
       border-radius: 24px;
@@ -425,20 +425,20 @@
       width: auto;
     }
 
-    .od-validate--primary {
+    .bc-validate--primary {
       border: none;
-      background: var(--od-action);
-      color: var(--od-on-action);
+      background: var(--bc-action);
+      color: var(--bc-on-action);
     }
 
-    .od-validate--secondary {
+    .bc-validate--secondary {
       background: none;
-      border: var(--od-outline-width) solid var(--od-outline);
-      color: var(--od-text);
+      border: var(--bc-outline-width) solid var(--bc-outline);
+      color: var(--bc-text);
     }
 
-    .od-validate--primary:disabled,
-    .od-validate--secondary:disabled {
+    .bc-validate--primary:disabled,
+    .bc-validate--secondary:disabled {
       opacity: 0.5;
     }
   }

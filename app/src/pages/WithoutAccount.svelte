@@ -33,7 +33,7 @@
   }
 </script>
 
-<EditorialPage class="od-without-account"
+<EditorialPage class="bc-without-account"
   firstLaunch
   helpLink
   title={t('welcome.noAccount')}
@@ -43,13 +43,13 @@
   {busy}
   onaction={start}
 >
-  <ul class="od-without-account--rows">
+  <ul class="bc-without-account--rows">
     {#each rows as row (row.key)}
       <li>
-        <span class="od-without-account--tile" class:od-without-account--warn={row.warn} aria-hidden="true"><Icon name={row.icon} size={22} /></span>
-        <span class="od-without-account--text">
-          <span class="od-without-account--label">{t(row.key === 'phoneOnly' ? deviceKey('firstLaunch.local.phoneOnly', deviceKind()) : `firstLaunch.local.${row.key}`)}</span>
-          <span class="od-without-account--detail">{t(`firstLaunch.local.${row.text}`)}</span>
+        <span class="bc-without-account--tile" class:bc-without-account--warn={row.warn} aria-hidden="true"><Icon name={row.icon} size={22} /></span>
+        <span class="bc-without-account--text">
+          <span class="bc-without-account--label">{t(row.key === 'phoneOnly' ? deviceKey('firstLaunch.local.phoneOnly', deviceKind()) : `firstLaunch.local.${row.key}`)}</span>
+          <span class="bc-without-account--detail">{t(`firstLaunch.local.${row.text}`)}</span>
         </span>
       </li>
     {/each}
@@ -58,13 +58,13 @@
 
 <style>
   @layer od.components {
-    .od-without-account--rows {
+    .bc-without-account--rows {
       margin: 0;
       padding: 2px 16px;
       list-style: none;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       li {
         padding: 14px 0;
@@ -73,44 +73,44 @@
         align-items: flex-start;
 
         & + li {
-          border-top: 1px solid var(--od-first-row-line);
+          border-top: 1px solid var(--bc-first-row-line);
         }
       }
     }
 
-    .od-without-account--tile {
+    .bc-without-account--tile {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      background: var(--od-first-tile);
-      color: var(--od-secondary);
+      background: var(--bc-first-tile);
+      color: var(--bc-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
 
-      &.od-without-account--warn {
-        background: var(--od-first-tile-warn);
-        color: var(--od-tertiary);
+      &.bc-without-account--warn {
+        background: var(--bc-first-tile-warn);
+        color: var(--bc-tertiary);
       }
     }
 
-    .od-without-account--text {
+    .bc-without-account--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-without-account--label {
+    .bc-without-account--label {
       font-size: 16px;
       line-height: 21px;
       font-weight: 600;
     }
 
-    .od-without-account--detail {
+    .bc-without-account--detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

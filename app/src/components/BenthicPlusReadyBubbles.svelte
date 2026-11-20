@@ -11,15 +11,15 @@
   const bubbles = $derived(panel ? BUBBLES_PANEL : BUBBLES);
 </script>
 
-<svg class="od-ready-bubbles" class:od-ready-bubbles--still={still} viewBox={panel ? '0 0 700 900' : '0 0 390 372'} preserveAspectRatio={panel ? 'xMidYMid slice' : 'xMidYMin slice'} aria-hidden="true">
+<svg class="bc-ready-bubbles" class:bc-ready-bubbles--still={still} viewBox={panel ? '0 0 700 900' : '0 0 390 372'} preserveAspectRatio={panel ? 'xMidYMid slice' : 'xMidYMin slice'} aria-hidden="true">
   {#each bubbles as b, i (i)}
-    <circle class="od-ready-bubbles--bubble" cx={b.cx} cy={b.cy} r={b.r} style="--dy: {b.dy}px; --d: {b.duration}ms; --phase: -{b.phase}ms" />
+    <circle class="bc-ready-bubbles--bubble" cx={b.cx} cy={b.cy} r={b.r} style="--dy: {b.dy}px; --d: {b.duration}ms; --phase: -{b.phase}ms" />
   {/each}
 </svg>
 
 <style>
   @layer od.components {
-    .od-ready-bubbles {
+    .bc-ready-bubbles {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -27,16 +27,16 @@
       pointer-events: none;
     }
 
-    .od-ready-bubbles--bubble {
+    .bc-ready-bubbles--bubble {
       fill: none;
-      stroke: var(--od-plus-bubble);
+      stroke: var(--bc-plus-bubble);
       stroke-width: 1.2;
       animation:
         od-ready-rise var(--d) linear 1 forwards,
         od-ready-sway 700ms ease-in-out var(--phase) 6 alternate;
     }
 
-    .od-ready-bubbles--still .od-ready-bubbles--bubble {
+    .bc-ready-bubbles--still .bc-ready-bubbles--bubble {
       animation: none;
     }
 
@@ -59,7 +59,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-ready-bubbles--bubble {
+      .bc-ready-bubbles--bubble {
         animation: none;
       }
     }

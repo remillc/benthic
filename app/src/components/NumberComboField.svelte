@@ -167,14 +167,14 @@
 <svelte:window onpointerdown={outside} onresize={moved} />
 <svelte:document onscrollcapture={moved} />
 
-<div class="od-number-combo od-number-combo--field" class:od-number-combo--open={open} class:od-number-combo--focused={focused} bind:this={root}>
-  <div class="od-number-combo--box" bind:this={box}>
-    <label class="od-number-combo--label" for={id}>{label}</label>
+<div class="bc-number-combo bc-number-combo--field" class:bc-number-combo--open={open} class:bc-number-combo--focused={focused} bind:this={root}>
+  <div class="bc-number-combo--box" bind:this={box}>
+    <label class="bc-number-combo--label" for={id}>{label}</label>
     <input
       {id}
       bind:this={input}
       bind:value={text}
-      class="od-number-combo--input"
+      class="bc-number-combo--input"
       type="text"
       inputmode="decimal"
       autocomplete="off"
@@ -193,13 +193,13 @@
       oninput={typed}
       onkeydown={keydown}
     />
-    <span class="od-number-combo--unit" aria-hidden="true">{unit}</span>
-    <button type="button" class="od-number-combo--chevron" tabindex="-1" aria-label={openLabel} onmousedown={(e) => e.preventDefault()} onclick={() => (open ? close() : (input?.focus(), show()))}>
-      <span class="od-number-combo--arrow"><DropdownArrow /></span>
+    <span class="bc-number-combo--unit" aria-hidden="true">{unit}</span>
+    <button type="button" class="bc-number-combo--chevron" tabindex="-1" aria-label={openLabel} onmousedown={(e) => e.preventDefault()} onclick={() => (open ? close() : (input?.focus(), show()))}>
+      <span class="bc-number-combo--arrow"><DropdownArrow /></span>
     </button>
     {#if open}
       <ul
-        class="od-number-combo--menu"
+        class="bc-number-combo--menu"
         id="{id}-list"
         role="listbox"
         aria-label={ariaLabel}
@@ -216,8 +216,8 @@
           <li
             role="option"
             aria-selected={preset === value}
-            class="od-number-combo--option"
-            class:od-number-combo--active={i === active}
+            class="bc-number-combo--option"
+            class:bc-number-combo--active={i === active}
             onmousedown={(e) => e.preventDefault()}
             onclick={() => pick(preset)}
           >{presetText(preset)}&nbsp;{unit}</li>
@@ -225,22 +225,22 @@
       </ul>
     {/if}
   </div>
-  {#if open && helper}<p class="od-number-combo--helper">{helper}</p>{/if}
+  {#if open && helper}<p class="bc-number-combo--helper">{helper}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-number-combo--field {
-      margin: 18px var(--od-field-margin, 16px) 0;
+    .bc-number-combo--field {
+      margin: 18px var(--bc-field-margin, 16px) 0;
       min-width: 0;
     }
 
-    .od-number-combo--box {
+    .bc-number-combo--box {
       position: relative;
       height: 56px;
       box-sizing: border-box;
       border-radius: 4px 4px 0 0;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
 
       &::after {
         content: '';
@@ -249,18 +249,18 @@
         right: 0;
         bottom: 0;
         height: 1px;
-        background: var(--od-text-2);
+        background: var(--bc-text-2);
       }
 
-      .od-number-combo--open &::after,
+      .bc-number-combo--open &::after,
       &:focus-within::after {
         height: 2px;
-        background: var(--od-primary-action);
+        background: var(--bc-primary-action);
       }
 
       :global(.ios) & {
         border-radius: 10px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
 
         &::after {
           display: none;
@@ -268,22 +268,22 @@
       }
     }
 
-    .od-number-combo--label {
+    .bc-number-combo--label {
       position: absolute;
       left: 16px;
       top: 8px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
-    .od-number-combo--open .od-number-combo--label,
-    .od-number-combo--focused .od-number-combo--label {
-      color: var(--od-primary-action);
+    .bc-number-combo--open .bc-number-combo--label,
+    .bc-number-combo--focused .bc-number-combo--label {
+      color: var(--bc-primary-action);
     }
 
-    .od-number-combo--input {
+    .bc-number-combo--input {
       display: block;
       width: 100%;
       height: 100%;
@@ -294,23 +294,23 @@
       border-radius: inherit;
       outline: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-number-combo--unit {
+    .bc-number-combo--unit {
       position: absolute;
       right: 52px;
       bottom: 6px;
       font-size: 14px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
-    .od-number-combo--chevron {
+    .bc-number-combo--chevron {
       position: absolute;
       right: 0;
       top: 4px;
@@ -319,7 +319,7 @@
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -327,22 +327,22 @@
 
     /* Mouse: the 8 % layer of the content colour on a round state area. */
     @media (hover: hover) and (pointer: fine) {
-      .od-number-combo--chevron:hover {
-        background: radial-gradient(circle closest-side, color-mix(in srgb, var(--od-text) 8%, transparent) 99%, transparent) center / 40px 40px no-repeat;
+      .bc-number-combo--chevron:hover {
+        background: radial-gradient(circle closest-side, color-mix(in srgb, var(--bc-text) 8%, transparent) 99%, transparent) center / 40px 40px no-repeat;
       }
     }
 
-    .od-number-combo--arrow {
+    .bc-number-combo--arrow {
       display: flex;
       transition: transform 150ms;
 
-      .od-number-combo--open & {
+      .bc-number-combo--open & {
         transform: rotate(180deg);
       }
     }
 
     /* The exposed dropdown menu, as SelectField draws it (spec, section 8). */
-    .od-number-combo--menu {
+    .bc-number-combo--menu {
       position: fixed;
       z-index: 14000;
       box-sizing: border-box;
@@ -352,11 +352,11 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       border-radius: 4px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
     }
 
-    .od-number-combo--option {
+    .bc-number-combo--option {
       min-height: 48px;
       padding: 0 16px;
       box-sizing: border-box;
@@ -364,24 +364,24 @@
       align-items: center;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
-      &.od-number-combo--active {
-        background: var(--od-surface-2);
+      &.bc-number-combo--active {
+        background: var(--bc-surface-2);
       }
 
       &[aria-selected='true'] {
-        background: var(--od-surface-container-highest);
+        background: var(--bc-surface-container-highest);
       }
     }
 
-    .od-number-combo--helper {
+    .bc-number-combo--helper {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

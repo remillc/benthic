@@ -72,14 +72,14 @@
 
 {#if card}
   <li
-    class="od-dive-row od-dive-row--card"
+    class="bc-dive-row bc-dive-row--card"
     data-trip={inTrip ? dive.trip?.id : undefined}
-    class:od-dive-row--card-first={cardFirst}
-    class:od-dive-row--card-last={cardLast}
-    class:od-dive-row--under-header={inTrip && tripFirst}
-    class:od-dive-row--gap-before={gapBefore}
-    class:od-dive-row--card-selected={layout.split && navigation.dive === String(dive.id)}
-    class:od-dive-row--appear={appear}
+    class:bc-dive-row--card-first={cardFirst}
+    class:bc-dive-row--card-last={cardLast}
+    class:bc-dive-row--under-header={inTrip && tripFirst}
+    class:bc-dive-row--gap-before={gapBefore}
+    class:bc-dive-row--card-selected={layout.split && navigation.dive === String(dive.id)}
+    class:bc-dive-row--appear={appear}
     data-virtual-list-index={index}
     style:top={top === undefined ? undefined : `${top}px`}
   >
@@ -88,7 +88,7 @@
       data-reload-detail="true"
       data-dive={dive.id}
       draggable="false"
-      class="od-dive-row--link od-dive-row--surface"
+      class="bc-dive-row--link bc-dive-row--surface"
       role={selecting ? 'checkbox' : undefined}
       aria-checked={selecting ? checked : undefined}
       aria-label={label}
@@ -96,41 +96,41 @@
       {#if selecting}
         <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
       {/if}
-      <span class="od-dive-row--date" aria-hidden="true">
-        <span class="od-dive-row--day">{dayOfMonth(dive.date)}</span>
-        <span class="od-dive-row--month">{monthAbbreviation(dive.date, locale)}</span>
+      <span class="bc-dive-row--date" aria-hidden="true">
+        <span class="bc-dive-row--day">{dayOfMonth(dive.date)}</span>
+        <span class="bc-dive-row--month">{monthAbbreviation(dive.date, locale)}</span>
       </span>
-      <span class="od-dive-row--text" aria-hidden="true">
+      <span class="bc-dive-row--text" aria-hidden="true">
         {#if dive.site}
-          <span class="od-dive-row--site">{dive.site}</span>
+          <span class="bc-dive-row--site">{dive.site}</span>
         {:else}
-          <span class="od-dive-row--site od-dive-row--site-not-set"><span class="od-dive-row--pin"><Icon name="pinOff" size={14} weight={2} /></span><span class="od-dive-row--site-text">{t('dive.siteNotSet')}</span></span>
+          <span class="bc-dive-row--site bc-dive-row--site-not-set"><span class="bc-dive-row--pin"><Icon name="pinOff" size={14} weight={2} /></span><span class="bc-dive-row--site-text">{t('dive.siteNotSet')}</span></span>
         {/if}
-        <span class="od-dive-row--meta">{#if number}<strong class="od-dive-row--number">{number}</strong>{/if}<span class="od-dive-row--time">{formatTimeOfDay(dive.date)}</span>{#if validated}<span class="od-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</span>
-        {#if pendingText}<span class="od-dive-row--meta od-dive-row--pending">{pendingText}</span>{/if}
+        <span class="bc-dive-row--meta">{#if number}<strong class="bc-dive-row--number">{number}</strong>{/if}<span class="bc-dive-row--time">{formatTimeOfDay(dive.date)}</span>{#if validated}<span class="bc-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</span>
+        {#if pendingText}<span class="bc-dive-row--meta bc-dive-row--pending">{pendingText}</span>{/if}
       </span>
-      <span class="od-dive-row--right" aria-hidden="true">
+      <span class="bc-dive-row--right" aria-hidden="true">
         {#if theme.ios}
           <!-- iPhone (docs/mockups/ios-carnet): no thumbnail, the depth over the duration. -->
-          {#if dive.maxDepthMm}<strong class="od-dive-row--ios-depth">{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
-          <span class="od-dive-row--ios-duration">{formatDuration(dive.durationSeconds)}</span>
+          {#if dive.maxDepthMm}<strong class="bc-dive-row--ios-depth">{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
+          <span class="bc-dive-row--ios-duration">{formatDuration(dive.durationSeconds)}</span>
         {:else}
           <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} wide />
-          <span class="od-dive-row--figures">{#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{' · '}{/if}{formatDuration(dive.durationSeconds)}</span>
+          <span class="bc-dive-row--figures">{#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{' · '}{/if}{formatDuration(dive.durationSeconds)}</span>
         {/if}
       </span>
     </a>
   </li>
 {:else}
 
-<li class="od-dive-row" data-trip={inTrip ? dive.trip?.id : undefined} class:od-dive-row--in-trip={inTrip} class:od-dive-row--trip-first={tripFirst} class:od-dive-row--trip-last={tripLast} class:od-dive-row--appear={appear} class:od-dive-row--selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class="bc-dive-row" data-trip={inTrip ? dive.trip?.id : undefined} class:bc-dive-row--in-trip={inTrip} class:bc-dive-row--trip-first={tripFirst} class:bc-dive-row--trip-last={tripLast} class:bc-dive-row--appear={appear} class:bc-dive-row--selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
     href="/dives/{dive.id}"
     data-reload-detail="true"
     data-dive={dive.id}
     draggable="false"
-    class="item-link item-content od-dive-row--link"
+    class="item-link item-content bc-dive-row--link"
     class:no-chevron={selecting}
     role={selecting ? 'checkbox' : undefined}
     aria-checked={selecting ? checked : undefined}
@@ -142,15 +142,15 @@
     <div class="item-media">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} {prefs} />
     </div>
-    <div class="item-inner od-row">
-      <div class="od-row-text">
+    <div class="item-inner bc-row">
+      <div class="bc-row-text">
         <div class="item-title">
-          {#if dive.site}{dive.site}{:else}<span class="od-dive-row--not-set">{t('dive.siteNotSet')}</span>{/if}
+          {#if dive.site}{dive.site}{:else}<span class="bc-dive-row--not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
-        <div class="item-text">{#if number}{number}<span class="od-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}{#if validated}<span class="od-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</div>
-        {#if pendingText}<div class="item-text od-dive-row--pending">{pendingText}</div>{/if}
+        <div class="item-text">{#if number}{number}<span class="bc-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}{#if validated}<span class="bc-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</div>
+        {#if pendingText}<div class="item-text bc-dive-row--pending">{pendingText}</div>{/if}
       </div>
-      <div class="od-dive-row--values od-value">
+      <div class="bc-dive-row--values bc-value">
         {#if theme.ios}
           {#if dive.maxDepthMm}<strong>{formatDepth(dive.maxDepthMm, prefs)}</strong>{/if}
           <span>{formatDuration(dive.durationSeconds)}</span>
@@ -169,26 +169,26 @@
   @layer od.components {
     /* iOS: shifted on the left only, values and chevron aligned with the other
        rows. Android: a white surface, in theme.css. */
-    :global(.ios) .od-dive-row--in-trip .item-content {
+    :global(.ios) .bc-dive-row--in-trip .item-content {
       padding-left: calc(32px + var(--f7-safe-area-left));
     }
 
     /* Beside the list (tablet), the row of the dive shown. */
-    .od-dive-row--selected {
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+    .bc-dive-row--selected {
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
     }
 
     /* A trip just expanded: its dives slide down into place. */
-    .od-dive-row--appear {
+    .bc-dive-row--appear {
       animation: od-row-appear 220ms ease-out;
     }
 
     /* Android: the Expressive springs, the slide (spatial) and the fade (effects). */
-    :global(.md) .od-dive-row--appear {
+    :global(.md) .bc-dive-row--appear {
       animation:
-        od-row-slide var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default) backwards,
-        od-row-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+        od-row-slide var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards,
+        od-row-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
     @keyframes od-row-appear {
@@ -211,7 +211,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-dive-row--appear {
+      .bc-dive-row--appear {
         animation: none;
       }
     }
@@ -219,16 +219,16 @@
     /* Phone rows (task 2026-11-18-278): the dives of a year in a white card with 20 px corners. The row is
        transparent, its link is the card's surface: the space between cards is the row's own padding, so that
        the virtual list measures it. */
-    .od-dive-row--card {
+    .bc-dive-row--card {
       list-style: none;
       padding: 0 12px;
     }
 
-    .od-dive-row--gap-before {
+    .bc-dive-row--gap-before {
       padding-top: 12px;
     }
 
-    .od-dive-row--surface {
+    .bc-dive-row--surface {
       position: relative;
       display: flex;
       align-items: center;
@@ -236,38 +236,38 @@
       box-sizing: border-box;
       min-height: 72px;
       padding: 10px 14px 10px 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
     /* Beside the detail (tablet): the dive shown keeps the pale blue of the selected rows. */
-    .od-dive-row--card-selected .od-dive-row--surface {
-      background: var(--od-table-selected);
+    .bc-dive-row--card-selected .bc-dive-row--surface {
+      background: var(--bc-table-selected);
     }
 
-    .od-dive-row--card-first .od-dive-row--surface {
+    .bc-dive-row--card-first .bc-dive-row--surface {
       border-top-left-radius: 20px;
       border-top-right-radius: 20px;
     }
 
-    .od-dive-row--card-last .od-dive-row--surface {
+    .bc-dive-row--card-last .bc-dive-row--surface {
       border-bottom-left-radius: 20px;
       border-bottom-right-radius: 20px;
     }
 
     /* The thin divider between two dives of a card, from the start of the text. */
-    .od-dive-row--card:not(.od-dive-row--card-first, .od-dive-row--under-header) .od-dive-row--surface::before {
+    .bc-dive-row--card:not(.bc-dive-row--card-first, .bc-dive-row--under-header) .bc-dive-row--surface::before {
       content: '';
       position: absolute;
       top: 0;
       right: 0;
       left: 74px;
       height: 1px;
-      background: var(--od-row-divider);
+      background: var(--bc-row-divider);
     }
 
-    .od-dive-row--date {
+    .bc-dive-row--date {
       flex: none;
       display: flex;
       flex-direction: column;
@@ -278,24 +278,24 @@
       min-height: 48px;
       padding: 4px;
       border-radius: 14px;
-      background: var(--od-date-block);
-      color: var(--od-on-date-block);
+      background: var(--bc-date-block);
+      color: var(--bc-on-date-block);
       line-height: 1;
     }
 
-    .od-dive-row--day {
+    .bc-dive-row--day {
       font-size: 19px;
       font-weight: 700;
     }
 
-    .od-dive-row--month {
+    .bc-dive-row--month {
       margin-top: 3px;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.6px;
     }
 
-    .od-dive-row--text {
+    .bc-dive-row--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -303,32 +303,32 @@
       gap: 2px;
     }
 
-    .od-dive-row--site {
+    .bc-dive-row--site {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-dive-row--site-not-set {
+    .bc-dive-row--site-not-set {
       display: flex;
       align-items: center;
       gap: 4px;
       font-weight: 400;
       font-style: italic;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-row--pin {
+    .bc-dive-row--pin {
       flex: none;
       display: flex;
-      color: var(--od-outline);
+      color: var(--bc-outline);
     }
 
-    .od-dive-row--site-text {
+    .bc-dive-row--site-text {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -336,35 +336,35 @@
       padding-right: 2px;
     }
 
-    .od-dive-row--meta {
+    .bc-dive-row--meta {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
 
-    .od-dive-row--number {
+    .bc-dive-row--number {
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dive-row--validated {
+    .bc-dive-row--validated {
       margin-left: 6px;
       display: inline-flex;
       vertical-align: middle;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-row--card .od-dive-row--pending {
-      color: var(--od-tertiary);
+    .bc-dive-row--card .bc-dive-row--pending {
+      color: var(--bc-tertiary);
     }
 
     /* The right column gives way before the site does: at a large text size it wraps its two figures. */
-    .od-dive-row--right {
+    .bc-dive-row--right {
       flex: 0 1 auto;
       min-width: 64px;
       max-width: 40%;
@@ -374,11 +374,11 @@
       gap: 4px;
     }
 
-    .od-dive-row--figures {
+    .bc-dive-row--figures {
       font-size: 13px;
       line-height: 16px;
       text-align: right;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-variant-numeric: tabular-nums;
 
       strong {
@@ -387,94 +387,94 @@
     }
 
     /* iPhone (docs/mockups/ios-carnet): inset list rows, a plain day and month, the depth over the duration. */
-    :global(.ios) .od-dive-row--card {
+    :global(.ios) .bc-dive-row--card {
       padding: 0 16px;
     }
 
-    :global(.ios) .od-dive-row--surface {
+    :global(.ios) .bc-dive-row--surface {
       min-height: 60px;
       gap: 12px;
       padding: 8px 16px;
     }
 
-    :global(.ios) .od-dive-row--card-first .od-dive-row--surface {
+    :global(.ios) .bc-dive-row--card-first .bc-dive-row--surface {
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
     }
 
-    :global(.ios) .od-dive-row--card-last .od-dive-row--surface {
+    :global(.ios) .bc-dive-row--card-last .bc-dive-row--surface {
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
     }
 
-    :global(.ios) .od-dive-row--card:not(.od-dive-row--card-first, .od-dive-row--under-header) .od-dive-row--surface::before {
+    :global(.ios) .bc-dive-row--card:not(.bc-dive-row--card-first, .bc-dive-row--under-header) .bc-dive-row--surface::before {
       left: 68px;
     }
 
-    :global(.ios) .od-dive-row--date {
+    :global(.ios) .bc-dive-row--date {
       width: 40px;
       min-width: 40px;
       min-height: 0;
       padding: 0;
       border-radius: 0;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    :global(.ios) .od-dive-row--day {
+    :global(.ios) .bc-dive-row--day {
       font-size: 22px;
       line-height: 26px;
     }
 
-    :global(.ios) .od-dive-row--month {
+    :global(.ios) .bc-dive-row--month {
       margin-top: 0;
       font-size: 11px;
       line-height: 13px;
       font-weight: 600;
       letter-spacing: 0;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.ios) .od-dive-row--site {
+    :global(.ios) .bc-dive-row--site {
       font-size: 17px;
       font-weight: 400;
     }
 
-    :global(.ios) .od-dive-row--number {
+    :global(.ios) .bc-dive-row--number {
       font-weight: 400;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.ios) .od-dive-row--number + .od-dive-row--time::before {
+    :global(.ios) .bc-dive-row--number + .bc-dive-row--time::before {
       content: '·';
       margin: 0 6px;
     }
 
-    :global(.ios) .od-dive-row--meta {
+    :global(.ios) .bc-dive-row--meta {
       gap: 0;
     }
 
-    :global(.ios) .od-dive-row--right {
+    :global(.ios) .bc-dive-row--right {
       gap: 2px;
       min-width: 0;
     }
 
-    .od-dive-row--ios-depth {
+    .bc-dive-row--ios-depth {
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-dive-row--ios-duration {
+    .bc-dive-row--ios-duration {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-dive-row--card .checkbox {
+    .bc-dive-row--card .checkbox {
       margin-right: 0;
     }
 
@@ -490,21 +490,21 @@
       }
     }
 
-    .od-dive-row--separator {
+    .bc-dive-row--separator {
       margin: 0 0.4em;
     }
 
-    .item-text.od-dive-row--pending {
-      color: var(--od-tertiary);
+    .item-text.bc-dive-row--pending {
+      color: var(--bc-tertiary);
     }
 
-    .od-dive-row--not-set {
-      color: var(--od-text-2);
+    .bc-dive-row--not-set {
+      color: var(--bc-text-2);
       font-weight: normal;
     }
 
     /* The first value strong, the second small under it; both centred on the row. */
-    .od-dive-row--values {
+    .bc-dive-row--values {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -515,13 +515,13 @@
         font-size: 17px;
         line-height: 22px;
         font-weight: 700;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
       span {
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       /* Android: docs/mockups/android-carnet.dc.html. */

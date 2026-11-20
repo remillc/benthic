@@ -23,75 +23,75 @@
   };
 </script>
 
-<div class="od-maps-row">
-  <span class="od-maps-row--icon-box" aria-hidden="true">
+<div class="bc-maps-row">
+  <span class="bc-maps-row--icon-box" aria-hidden="true">
     <svg width="24" height="24" viewBox="0 0 24 24"><path d={paths[icon]} /></svg>
   </span>
-  <span class="od-maps-row--body">{@render body()}</span>
+  <span class="bc-maps-row--body">{@render body()}</span>
   {#if trailing}{@render trailing()}{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-maps-row {
+    .bc-maps-row {
       box-sizing: border-box;
       min-height: 72px;
       padding: 12px 24px 12px 16px;
       display: flex;
       align-items: flex-start;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    :global(.od-maps-row--surface > [role='listitem'] + [role='listitem']) .od-maps-row {
-      border-top: 1px solid var(--od-separator);
+    :global(.bc-maps-row--surface > [role='listitem'] + [role='listitem']) .bc-maps-row {
+      border-top: 1px solid var(--bc-separator);
     }
 
     /* The rounded surface of a group of rows, and the title above it (shared by the maps screens). */
-    :global(.od-maps-row--surface) {
+    :global(.bc-maps-row--surface) {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    :global(.od-maps-row--maps-title) {
+    :global(.bc-maps-row--maps-title) {
       margin: 0;
       padding: 20px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    :global(.od-maps-row--maps-note) {
+    :global(.bc-maps-row--maps-note) {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maps-row--icon-box {
+    .bc-maps-row--icon-box {
       flex: none;
       width: 40px;
       height: 40px;
       margin-top: 2px;
       border-radius: 12px;
-      background: var(--od-primary-container);
+      background: var(--bc-primary-container);
       display: flex;
       align-items: center;
       justify-content: center;
 
       svg {
         fill: none;
-        stroke: var(--od-text);
+        stroke: var(--bc-text);
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
     }
 
-    .od-maps-row--body {
+    .bc-maps-row--body {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -102,20 +102,20 @@
     }
 
     /* The lines the screens put in the body. */
-    .od-maps-row--body :global(.od-maps-row--supporting) {
+    .bc-maps-row--body :global(.bc-maps-row--supporting) {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-maps-row--body :global(.od-maps-row--note) {
+    .bc-maps-row--body :global(.bc-maps-row--note) {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maps-row--body :global(.od-maps-row--status) {
+    .bc-maps-row--body :global(.bc-maps-row--status) {
       margin-top: 4px;
       display: flex;
       align-items: center;
@@ -123,10 +123,10 @@
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-maps-row--body :global(.od-maps-row--status svg) {
+    .bc-maps-row--body :global(.bc-maps-row--status svg) {
       flex: none;
       fill: none;
       stroke: currentColor;
@@ -135,43 +135,43 @@
       stroke-linejoin: round;
     }
 
-    .od-maps-row--body :global(.od-maps-row--status.od-maps-row--error) {
-      color: var(--od-error);
+    .bc-maps-row--body :global(.bc-maps-row--status.bc-maps-row--error) {
+      color: var(--bc-error);
     }
 
-    .od-maps-row--body :global(.od-maps-row--status.od-maps-row--muted) {
+    .bc-maps-row--body :global(.bc-maps-row--status.bc-maps-row--muted) {
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maps-row--body :global(.od-maps-row--progress) {
+    .bc-maps-row--body :global(.bc-maps-row--progress) {
       margin-top: 8px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-primary-container);
+      background: var(--bc-primary-container);
       overflow: hidden;
     }
 
-    .od-maps-row--body :global(.od-maps-row--wavy) {
+    .bc-maps-row--body :global(.bc-maps-row--wavy) {
       margin-top: 4px;
     }
 
-    .od-maps-row--body :global(.od-maps-row--progress > span) {
+    .bc-maps-row--body :global(.bc-maps-row--progress > span) {
       display: block;
       height: 100%;
       border-radius: 2px;
-      background: var(--od-text);
+      background: var(--bc-text);
     }
 
     /* Text buttons under the texts: Framework7 stretches buttons, these keep their width. */
-    .od-maps-row--body :global(.od-maps-row--actions) {
+    .bc-maps-row--body :global(.bc-maps-row--actions) {
       margin: 4px 0 -8px -12px;
       display: flex;
       flex-wrap: wrap;
       gap: 0;
     }
 
-    .od-maps-row--body :global(.od-maps-row--actions button) {
+    .bc-maps-row--body :global(.bc-maps-row--actions button) {
       width: auto;
       flex: none;
       height: 40px;
@@ -179,7 +179,7 @@
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -188,7 +188,7 @@
     }
 
     /* A 48 dp icon button at the end of the row (the ⋮ menu, the download icon, ✕). */
-    :global(.od-maps-row--icon-button) {
+    :global(.bc-maps-row--icon-button) {
       flex: none;
       width: 48px;
       height: 48px;
@@ -200,7 +200,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
       &:disabled {

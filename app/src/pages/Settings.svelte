@@ -1022,16 +1022,16 @@
    */
   function computerMenu(e, computer) {
     const name = computerName(computer);
-    // The shared menu style (theme.css, od-menu): Android, a 24 dp leading
+    // The shared menu style (theme.css, bc-menu): Android, a 24 dp leading
     // icon (the "delete" one of Icon.svelte); iOS, the icon at the end.
-    const icon = `<svg class="od-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${f7.theme === 'ios' ? 1.8 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7"/></svg>`;
+    const icon = `<svg class="bc-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${f7.theme === 'ios' ? 1.8 : 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l1 13h9l1-13M9.5 7V4.5h5V7"/></svg>`;
     const item = (/** @type {string} */ action, /** @type {string} */ label) =>
       f7.theme === 'ios'
         ? `<li><a href="#" class="item-link item-content popover-close destructive" data-action="${action}"><div class="item-inner"><div class="item-title">${label}</div><div class="item-after">${icon}</div></div></a></li>`
         : `<li><a href="#" class="item-link item-content popover-close" data-action="${action}"><div class="item-media">${icon}</div><div class="item-inner"><div class="item-title">${label}</div></div></a></li>`;
     const popover = f7.popover.create({
       targetEl: /** @type {HTMLElement} */ (e.currentTarget),
-      content: `<div class="popover od-menu od-computer-menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
+      content: `<div class="popover bc-menu bc-computer-menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('forget', t('settings.computers.forgetOne'))}</ul></div></div></div>`,
       on: {
         opened(/** @type {any} */ p) {
           p.$el.find('[data-action]').on('click', (/** @type {Event} */ ev) => {
@@ -1272,7 +1272,7 @@
     const at = CATEGORIES.findIndex((c) => c.id === deskState.category);
     const next = CATEGORIES[Math.max(0, Math.min(CATEGORIES.length - 1, at + (e.key === 'ArrowDown' ? 1 : -1)))];
     chooseCategory(next.id);
-    queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-desktop-settings--category[data-category="${next.id}"]`))?.focus());
+    queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.bc-desktop-settings--category[data-category="${next.id}"]`))?.focus());
   }
 
   // Ctrl+F (⌘F) goes to the search field, on this page only.
@@ -1297,10 +1297,10 @@
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
-    <label class="od-settings--row" class:od-settings--dimmed={row.dimmed}>
-      <span class="od-settings--texts">
-        <span class="od-settings--label">{row.label}</span>
-        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
+    <label class="bc-settings--row" class:bc-settings--dimmed={row.dimmed}>
+      <span class="bc-settings--texts">
+        <span class="bc-settings--label">{row.label}</span>
+        {#if row.text}<span class="bc-settings--supporting">{row.text}</span>{/if}
       </span>
       <span class="toggle">
         <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
@@ -1308,7 +1308,7 @@
       </span>
     </label>
   {:else if row.kind === 'altitude'}
-    <div class="od-settings--altitude">
+    <div class="bc-settings--altitude">
       <AltitudeField
         label={row.label}
         value={defaultAltitude}
@@ -1320,35 +1320,35 @@
       />
     </div>
   {:else if row.kind === 'segmented'}
-    <div class="od-settings--segmented-row" class:od-settings--dimmed={row.dimmed}>
-      <span class="od-settings--texts">
-        <span class="od-settings--label">{row.label}</span>
-        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
+    <div class="bc-settings--segmented-row" class:bc-settings--dimmed={row.dimmed}>
+      <span class="bc-settings--texts">
+        <span class="bc-settings--label">{row.label}</span>
+        {#if row.text}<span class="bc-settings--supporting">{row.text}</span>{/if}
       </span>
       <ButtonGroup ariaLabel={row.label} value={row.current} options={row.options} onchange={(v) => !row.dimmed && row.set(v)} />
     </div>
   {:else if row.kind === 'info'}
-    <div class="od-settings--row">
-      <span class="od-settings--texts"><span class="od-settings--label">{row.label}</span></span>
-      <span class="od-settings--value">{row.value}</span>
+    <div class="bc-settings--row">
+      <span class="bc-settings--texts"><span class="bc-settings--label">{row.label}</span></span>
+      <span class="bc-settings--value">{row.value}</span>
     </div>
   {:else}
     <button
       type="button"
-      class="od-settings--row"
-      class:od-settings--dimmed={'dimmed' in row && row.dimmed}
+      class="bc-settings--row"
+      class:bc-settings--dimmed={'dimmed' in row && row.dimmed}
       disabled={row.kind === 'link' && row.disabled}
       aria-haspopup={row.kind === 'link' ? undefined : row.kind === 'choice' ? 'listbox' : 'dialog'}
       onclick={(e) => open(row, e.currentTarget)}
     >
-      <span class="od-settings--texts">
-        <span class="od-settings--label">{row.label}</span>
-        {#if row.text}<span class="od-settings--supporting">{row.text}</span>{/if}
+      <span class="bc-settings--texts">
+        <span class="bc-settings--label">{row.label}</span>
+        {#if row.text}<span class="bc-settings--supporting">{row.text}</span>{/if}
       </span>
       {#if row.kind === 'link' && row.badge}<span class="badge">{row.badge}</span>{/if}
-      {#if row.kind !== 'link' || row.value}<span class="od-settings--value">{row.value}</span>{/if}
+      {#if row.kind !== 'link' || row.value}<span class="bc-settings--value">{row.value}</span>{/if}
       <!-- A chevron only when the row opens a page; a menu, a dialog or an action has none (system-design, « Trailing chevron »). -->
-      {#if row.kind === 'link' && row.href}<svg class="od-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
+      {#if row.kind === 'link' && row.href}<svg class="bc-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
     </button>
   {/if}
 {/snippet}
@@ -1356,8 +1356,8 @@
 {#snippet groupView(/** @type {string} */ id, /** @type {boolean} */ titled = true)}
   {@const g = group(id)}
   {#if g.rows.length}
-    {#if titled}<h2 class="od-settings--title">{g.title}</h2>{/if}
-    <div class="od-settings--surface" role="list">
+    {#if titled}<h2 class="bc-settings--title">{g.title}</h2>{/if}
+    <div class="bc-settings--surface" role="list">
       {#each g.rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
   {/if}
@@ -1365,10 +1365,10 @@
 
 <!-- The desktop Réglages (task 2026-11-15-202, bureau-reglages*): the categories on the left, the
      chosen category's cards on the right, a search across every category. Same rows as the phone. -->
-{#snippet hl(/** @type {string} */ text)}{#each highlightParts(text, search) as part, i (i)}{#if part.hit}<mark class="od-desktop-settings--hit">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
+{#snippet hl(/** @type {string} */ text)}{#each highlightParts(text, search) as part, i (i)}{#if part.hit}<mark class="bc-desktop-settings--hit">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
 
 {#snippet deskSearchField()}
-  <div class="od-desktop-settings--search">
+  <div class="bc-desktop-settings--search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
     <input
       type="search"
@@ -1378,7 +1378,7 @@
       aria-label={t('desktopSettings.search')}
       onkeydown={(e) => e.key === 'Escape' && search && ((search = ''), e.stopPropagation())}
     />
-    {#if !windowed && !search}<kbd class="od-desktop-settings--kbd">{desktopMac ? '⌘F' : 'Ctrl+F'}</kbd>{/if}
+    {#if !windowed && !search}<kbd class="bc-desktop-settings--kbd">{desktopMac ? '⌘F' : 'Ctrl+F'}</kbd>{/if}
   </div>
 {/snippet}
 
@@ -1387,18 +1387,18 @@
   {@const small = row.kind === 'choice' ? smallChoice(row) : null}
   <svelte:element
     this={row.kind === 'switch' ? 'label' : 'div'}
-    class="od-desktop-settings--row"
-    class:od-desktop-settings--dimmed={row.dimmed}
+    class="bc-desktop-settings--row"
+    class:bc-desktop-settings--dimmed={row.dimmed}
     role={row.kind === 'switch' ? undefined : 'listitem'}
   >
-    <span class="od-desktop-settings--texts">
-      <span class="od-desktop-settings--label">{@render hl(row.label)}</span>
+    <span class="bc-desktop-settings--texts">
+      <span class="bc-desktop-settings--label">{@render hl(row.label)}</span>
       {#if lead || (row.text && row.kind !== 'file')}
-        <span class="od-desktop-settings--helper">{#if lead}{lead}{#if row.text && row.kind !== 'file'}{' · '}{/if}{/if}{#if row.kind !== 'file'}{@render hl(row.text ?? '')}{/if}</span>
+        <span class="bc-desktop-settings--helper">{#if lead}{lead}{#if row.text && row.kind !== 'file'}{' · '}{/if}{/if}{#if row.kind !== 'file'}{@render hl(row.text ?? '')}{/if}</span>
       {/if}
-      {#if row.kind === 'file'}<span class="od-desktop-settings--helper od-desktop-settings--path">{@render hl(row.value)}</span>{/if}
+      {#if row.kind === 'file'}<span class="bc-desktop-settings--helper bc-desktop-settings--path">{@render hl(row.value)}</span>{/if}
     </span>
-    <span class="od-desktop-settings--control">
+    <span class="bc-desktop-settings--control">
       {#if row.kind === 'switch'}
         <span class="toggle">
           <input type="checkbox" checked={row.checked} disabled={row.dimmed} onchange={(e) => row.set(e.currentTarget.checked)} />
@@ -1411,22 +1411,22 @@
       {:else if row.kind === 'textSize'}
         <ButtonGroup ariaLabel={row.label} value={textSize.id} marked options={TEXT_SIZES.map((s) => ({ value: s.id, label: t(`desktopSettings.textSize.${s.id}`) }))} onchange={(v) => setTextSize(textSizeOf(v))} />
       {:else if row.kind === 'bailout'}
-        <button type="button" class="od-outlined-button" onclick={() => f7.views.current.router.navigate(row.href)}>{t('settings.defaultCylinder.bailoutEdit')}</button>
+        <button type="button" class="bc-outlined-button" onclick={() => f7.views.current.router.navigate(row.href)}>{t('settings.defaultCylinder.bailoutEdit')}</button>
       {:else if row.kind === 'file'}
-        <button type="button" class="od-outlined-button" onclick={showLogbookFolder}>{t('desktopSettings.file.show')}</button>
+        <button type="button" class="bc-outlined-button" onclick={showLogbookFolder}>{t('desktopSettings.file.show')}</button>
       {:else if row.kind === 'computer'}
-        <button type="button" class="od-desktop-settings--more" aria-label={t('settings.computers.more', { name: row.label })} onclick={(e) => computerMenu(e, row.computer)}>
+        <button type="button" class="bc-desktop-settings--more" aria-label={t('settings.computers.more', { name: row.label })} onclick={(e) => computerMenu(e, row.computer)}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
         </button>
       {:else if small}
         <ButtonGroup ariaLabel={row.label} value={row.current} marked options={small} onchange={(v) => row.set(v)} />
       {:else if row.kind === 'choice' || row.kind === 'number'}
-        <button type="button" class="od-desktop-settings--field" aria-haspopup={row.kind === 'choice' ? 'listbox' : 'dialog'} aria-label="{row.label} : {row.value}" disabled={row.dimmed} onclick={(e) => open(row, e.currentTarget)}>
-          <span class="od-desktop-settings--field-value">{row.value}</span>
+        <button type="button" class="bc-desktop-settings--field" aria-haspopup={row.kind === 'choice' ? 'listbox' : 'dialog'} aria-label="{row.label} : {row.value}" disabled={row.dimmed} onclick={(e) => open(row, e.currentTarget)}>
+          <span class="bc-desktop-settings--field-value">{row.value}</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
       {:else if row.kind === 'altitude'}
-        <div class="od-desktop-settings--altitude">
+        <div class="bc-desktop-settings--altitude">
           <AltitudeField
             label={row.label}
             value={defaultAltitude}
@@ -1438,36 +1438,36 @@
           />
         </div>
       {:else if row.kind === 'info' || (row.kind === 'link' && row.value)}
-        <span class="od-desktop-settings--value">{row.value}</span>
+        <span class="bc-desktop-settings--value">{row.value}</span>
       {/if}
     </span>
     {#if whole}
       <!-- A row that opens a page or does one thing: the whole row is the button. -->
       <button
         type="button"
-        class="od-desktop-settings--row-button"
+        class="bc-desktop-settings--row-button"
         aria-label={row.label}
         disabled={row.kind === 'link' && row.disabled}
         onclick={(e) => (row.kind === 'reset' ? confirmReset() : row.kind === 'forgetAll' ? confirmForgetAll() : open(row, e.currentTarget))}
       ></button>
-      {#if row.kind === 'link' && row.href}<svg class="od-desktop-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
+      {#if row.kind === 'link' && row.href}<svg class="bc-desktop-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>{/if}
     {/if}
   </svelte:element>
 {/snippet}
 
 {#snippet deskView()}
-  <Page class="od-desktop-settings" pageContent={false} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
-    <div class="od-desktop-settings--frame" class:od-desktop-settings--windowed={windowed}>
+  <Page class="bc-desktop-settings" pageContent={false} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+    <div class="bc-desktop-settings--frame" class:bc-desktop-settings--windowed={windowed}>
       {#if !windowed}
-        <header class="od-desktop-settings--bar">
-          <h1 class="od-desktop-settings--title">{t('settings.title')}</h1>
-          <p class="od-desktop-settings--summary">{t('desktopSettings.saved')}</p>
-          <span class="od-desktop-settings--spacer"></span>
+        <header class="bc-desktop-settings--bar">
+          <h1 class="bc-desktop-settings--title">{t('settings.title')}</h1>
+          <p class="bc-desktop-settings--summary">{t('desktopSettings.saved')}</p>
+          <span class="bc-desktop-settings--spacer"></span>
           {@render deskSearchField()}
         </header>
       {/if}
-      <div class="od-desktop-settings--columns">
-        <nav class="od-desktop-settings--categories" data-od-scroll aria-label={t('settings.title')}>
+      <div class="bc-desktop-settings--columns">
+        <nav class="bc-desktop-settings--categories" data-od-scroll aria-label={t('settings.title')}>
           {#if windowed}{@render deskSearchField()}{/if}
           <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
           <ul role="list" onkeydown={categoryKey}>
@@ -1476,46 +1476,46 @@
               <li>
                 <button
                   type="button"
-                  class="od-desktop-settings--category"
-                  class:od-desktop-settings--selected={current}
+                  class="bc-desktop-settings--category"
+                  class:bc-desktop-settings--selected={current}
                   data-category={cat.id}
                   aria-current={current ? 'page' : undefined}
                   onclick={() => chooseCategory(cat.id)}
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d={cat.icon}></path></svg>
-                  <span class="od-desktop-settings--category-name">{t(`desktopSettings.categories.${cat.id}`)}</span>
+                  <span class="bc-desktop-settings--category-name">{t(`desktopSettings.categories.${cat.id}`)}</span>
                   {#if cat.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
                 </button>
               </li>
             {/each}
           </ul>
         </nav>
-        <main class="od-desktop-settings--pane" data-od-scroll aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
-          <div class="od-desktop-settings--content">
+        <main class="bc-desktop-settings--pane" data-od-scroll aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
+          <div class="bc-desktop-settings--content">
             {#if searching}
-              <h2 class="od-desktop-settings--pane-title">{t('desktopSettings.results', { n: found.count, text: search.trim() })}</h2>
+              <h2 class="bc-desktop-settings--pane-title">{t('desktopSettings.results', { n: found.count, text: search.trim() })}</h2>
               {#if found.count}
-                <p class="od-desktop-settings--pane-note">{t('desktopSettings.resultsIn', { categories: listCategories(found.blocks) })}</p>
-                <div class="od-desktop-settings--card" role="list">
+                <p class="bc-desktop-settings--pane-note">{t('desktopSettings.resultsIn', { categories: listCategories(found.blocks) })}</p>
+                <div class="bc-desktop-settings--card" role="list">
                   {#each found.blocks as block (block.id)}
                     {#each block.rows as row (row.id)}{@render deskRow(row, t(`desktopSettings.categories.${block.category}`))}{/each}
                   {/each}
                 </div>
               {:else}
-                <p class="od-desktop-settings--pane-note">{t('settings.noResult', { text: search.trim() })}</p>
+                <p class="bc-desktop-settings--pane-note">{t('settings.noResult', { text: search.trim() })}</p>
               {/if}
             {:else}
-              <h2 class="od-desktop-settings--pane-title">{t(`desktopSettings.categories.${deskState.category}`)}</h2>
-              {#if tIfExists(`desktopSettings.notes.${deskState.category}`)}<p class="od-desktop-settings--pane-note">{t(`desktopSettings.notes.${deskState.category}`)}</p>{/if}
+              <h2 class="bc-desktop-settings--pane-title">{t(`desktopSettings.categories.${deskState.category}`)}</h2>
+              {#if tIfExists(`desktopSettings.notes.${deskState.category}`)}<p class="bc-desktop-settings--pane-note">{t(`desktopSettings.notes.${deskState.category}`)}</p>{/if}
               {#each pageBlocks as block, i (block.id)}
-                {#if block.title && !(i === 0 && block.title === t(`desktopSettings.categories.${deskState.category}`))}<h3 class="od-desktop-settings--heading">{block.title}</h3>{/if}
+                {#if block.title && !(i === 0 && block.title === t(`desktopSettings.categories.${deskState.category}`))}<h3 class="bc-desktop-settings--heading">{block.title}</h3>{/if}
                 {#if block.warning}
-                  <div class="od-desktop-settings--warning" role="note">
+                  <div class="bc-desktop-settings--warning" role="note">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
                     <span>{block.warning}</span>
                   </div>
                 {/if}
-                <div class="od-desktop-settings--card" role="list">
+                <div class="bc-desktop-settings--card" role="list">
                   {#if block.custom === 'cylinderTypes'}
                     <DesktopCylinderTypes>
                       {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
@@ -1524,7 +1524,7 @@
                     {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
                   {/if}
                 </div>
-                {#if block.note}<p class="od-desktop-settings--note">{block.note}</p>{/if}
+                {#if block.note}<p class="bc-desktop-settings--note">{block.note}</p>{/if}
               {/each}
             {/if}
           </div>
@@ -1537,7 +1537,7 @@
 {#if desk}
   {@render deskView()}
 {:else}
-<Page data-od-scroll class="od-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-od-scroll class="bc-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar large={ios && !section && !layout.split} title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
       {#if section && layout.split}
@@ -1547,14 +1547,14 @@
       {:else}
         <Link back iconOnly>
           <i class="icon icon-back"></i>
-          <span class="od-sr-only">{t('detail.back')}</span>
+          <span class="bc-sr-only">{t('detail.back')}</span>
         </Link>
       {/if}
     {/snippet}
   </Navbar>
 
   {#if !section}
-    <div class="od-settings--search">
+    <div class="bc-settings--search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
       <input type="search" bind:value={search} placeholder={t('settings.search')} aria-label={t('settings.search')} />
       {#if search}<SearchClear onclear={() => (search = '')} />{/if}
@@ -1565,18 +1565,18 @@
        with the current values in one line. -->
   {#if overview}
     {#each cards as card (card.id)}
-      <h2 class="od-settings--title">{t(`settings.sections.${card.id}`)}</h2>
-      <div class="od-settings--surface" role="list">
+      <h2 class="bc-settings--title">{t(`settings.sections.${card.id}`)}</h2>
+      <div class="bc-settings--surface" role="list">
         {#each card.rows as row (row.id)}
           <div role="listitem">
-            <a href={row.href} class="od-settings--overview-row" class:od-settings--overview-selected={layout.split && selected.id === row.id} data-reload-detail={layout.split ? 'true' : undefined}>
-              <span class="od-settings--overview-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={row.icon}></path></svg></span>
-              <span class="od-settings--texts">
-                <span class="od-settings--label">{t(`settings.sections.${row.id}`)}</span>
-                <span class="od-settings--overview-summary">{row.summary}</span>
+            <a href={row.href} class="bc-settings--overview-row" class:bc-settings--overview-selected={layout.split && selected.id === row.id} data-reload-detail={layout.split ? 'true' : undefined}>
+              <span class="bc-settings--overview-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={row.icon}></path></svg></span>
+              <span class="bc-settings--texts">
+                <span class="bc-settings--label">{t(`settings.sections.${row.id}`)}</span>
+                <span class="bc-settings--overview-summary">{row.summary}</span>
               </span>
               {#if row.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
-              <svg class="od-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+              <svg class="bc-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
         {/each}
@@ -1596,20 +1596,20 @@
 
   <!-- Units: the system, the five units, then speeds, duration and coordinates. -->
   {#if inPage('units') && (unitsShown || group('units').rows.length || group('units2').rows.length)}
-    {#if !section}<h2 class="od-settings--title">{t('settings.groups.units')}</h2>{/if}
+    {#if !section}<h2 class="bc-settings--title">{t('settings.groups.units')}</h2>{/if}
     {#if unitsShown}
-      <div class="od-settings--segmented">
+      <div class="bc-settings--segmented">
         <ButtonGroup ariaLabel={t('settings.unitSystem.label')} value={p.unitSystem} options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
       </div>
     {/if}
     {#if group('units').rows.length}
-      <div class="od-settings--surface od-settings--spaced" role="list">
+      <div class="bc-settings--surface bc-settings--spaced" role="list">
         {#each group('units').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/if}
-    {#if unitsShown}<p class="od-settings--note">{t('settings.unitSystem.note')}</p>{/if}
+    {#if unitsShown}<p class="bc-settings--note">{t('settings.unitSystem.note')}</p>{/if}
     {#if group('units2').rows.length}
-      <div class="od-settings--surface od-settings--spaced" role="list">
+      <div class="bc-settings--surface bc-settings--spaced" role="list">
         {#each group('units2').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/if}
@@ -1620,33 +1620,33 @@
     {@render groupView('notifyMaintenance')}
     {@render groupView('notifyDocuments')}
     {@render groupView('notifyDive')}
-    {#if !query}<p class="od-settings--note">{t('settings.notifications.note')}</p>{/if}
+    {#if !query}<p class="bc-settings--note">{t('settings.notifications.note')}</p>{/if}
   {/if}
 
   {#if inPage('logbook')}{@render groupView('logbook', !section)}{/if}
   {#if inPage('equipment')}{@render groupView('equipment', !section)}{/if}
   <!-- Décompression: opens on the warning; the app bar names the page, so no heading there. -->
   {#if inPage('decompression') && decoWarningShown}
-    {#if !section}<h2 class="od-settings--title">{t('settings.groups.deco')}</h2>{/if}
-    <div class="od-settings--warning" role="note">
+    {#if !section}<h2 class="bc-settings--title">{t('settings.groups.deco')}</h2>{/if}
+    <div class="bc-settings--warning" role="note">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.5 17h-19z M12 10v4.5 M12 17.5v.01"></path></svg>
       <span>{t('settings.deco.warning')}</span>
     </div>
-    <div class="od-settings--surface" role="list">
+    <div class="bc-settings--surface" role="list">
       {#each group('deco').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
     </div>
-    <p class="od-settings--note">{t('settings.deco.note')}</p>
+    <p class="bc-settings--note">{t('settings.deco.note')}</p>
   {/if}
 
   <!-- Used by the tools only (task 2026-11-12-47): after Décompression. -->
   {#if inPage('tools') && group('conditions').rows.length}
     {@render groupView('conditions')}
-    <p class="od-settings--note">{t('settings.conditions.note')}</p>
+    <p class="bc-settings--note">{t('settings.conditions.note')}</p>
   {/if}
 
   {#if inPage('tools') && group('flight').rows.length}
     {@render groupView('flight')}
-    <p class="od-settings--note">{t('settings.flight.note')}</p>
+    <p class="bc-settings--note">{t('settings.flight.note')}</p>
   {/if}
 
   {#if inPage('gases')}
@@ -1658,34 +1658,34 @@
 
   <!-- Téléchargement: the Bluetooth switch, then the remembered computers on their own card. -->
   {#if inPage('download') && (group('download').rows.length || computersShown)}
-    <h2 class="od-settings--title">{t('settings.groups.download')}</h2>
+    <h2 class="bc-settings--title">{t('settings.groups.download')}</h2>
     {#if group('download').rows.length}
-      <div class="od-settings--surface" role="list">
+      <div class="bc-settings--surface" role="list">
         {#each group('download').rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
         {#if hiddenBluetooth.addresses.length}
-          <div role="listitem" class="od-settings--row">
-            <span class="od-settings--texts">
-              <span class="od-settings--label">{t('settings.computers.hidden', { n: hiddenBluetooth.addresses.length })}</span>
-              <span class="od-settings--supporting">{t('settings.computers.hiddenText')}</span>
+          <div role="listitem" class="bc-settings--row">
+            <span class="bc-settings--texts">
+              <span class="bc-settings--label">{t('settings.computers.hidden', { n: hiddenBluetooth.addresses.length })}</span>
+              <span class="bc-settings--supporting">{t('settings.computers.hiddenText')}</span>
             </span>
-            <button type="button" class="od-outlined-button" onclick={showAllBluetooth}>{t('settings.computers.showHidden')}</button>
+            <button type="button" class="bc-outlined-button" onclick={showAllBluetooth}>{t('settings.computers.showHidden')}</button>
           </div>
         {/if}
       </div>
     {/if}
     {#if computersShown}
-      <h3 class="od-settings--overline">{t('settings.computers.overline', { n: computers.length })}</h3>
-      <div class="od-settings--surface" role="list">
+      <h3 class="bc-settings--overline">{t('settings.computers.overline', { n: computers.length })}</h3>
+      <div class="bc-settings--surface" role="list">
         {#each computers as computer (computer.slot)}
-          <div role="listitem" class="od-settings--row">
-            <span class="od-settings--texts"><span class="od-settings--label">{computerName(computer)}</span></span>
-            <button type="button" class="od-settings--more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
+          <div role="listitem" class="bc-settings--row">
+            <span class="bc-settings--texts"><span class="bc-settings--label">{computerName(computer)}</span></span>
+            <button type="button" class="bc-settings--more" aria-label={t('settings.computers.more', { name: computerName(computer) })} onclick={(e) => computerMenu(e, computer)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
             </button>
           </div>
         {/each}
-        <div class="od-settings--action">
-          <button type="button" class="od-outlined-button" onclick={confirmForgetAll}>{t('settings.computers.forgetAll', { n: computers.length })}</button>
+        <div class="bc-settings--action">
+          <button type="button" class="bc-outlined-button" onclick={confirmForgetAll}>{t('settings.computers.forgetAll', { n: computers.length })}</button>
         </div>
       </div>
     {/if}
@@ -1695,34 +1695,34 @@
   {#if !section && query}{@render groupView('maps')}{/if}
 
   {#if isRelease && !desktopApp && inPage('privacy')}
-    <div class="od-settings--surface">
-      <div class="od-settings--consent">
-        <span class="od-settings--texts">
-          <span class="od-settings--label">{t('settings.privacy.health')}</span>
-          <span class="od-settings--overview-summary">{t('settings.privacy.healthHelp')}</span>
+    <div class="bc-settings--surface">
+      <div class="bc-settings--consent">
+        <span class="bc-settings--texts">
+          <span class="bc-settings--label">{t('settings.privacy.health')}</span>
+          <span class="bc-settings--overview-summary">{t('settings.privacy.healthHelp')}</span>
         </span>
         <span class="toggle"><input type="checkbox" role="switch" checked={diver.consent.consent} onchange={(e) => (e.currentTarget.checked ? setHealthConsent(true) : (e.currentTarget.checked = true, confirmWithdrawConsent()))} aria-label={t('settings.privacy.health')} /><span class="toggle-icon"></span></span>
       </div>
       {#if diver.consent.consent && diver.consent.at}
-        <p class="od-settings--action-text">{t('settings.privacy.since', { date: formatStampDate(diver.consent.at) })}</p>
+        <p class="bc-settings--action-text">{t('settings.privacy.since', { date: formatStampDate(diver.consent.at) })}</p>
       {/if}
     </div>
-    <p class="od-settings--note">{t('settings.privacy.note')}</p>
+    <p class="bc-settings--note">{t('settings.privacy.note')}</p>
   {/if}
 
   {#if inPage('advanced') && advancedShown}
-    {#if !section}<h2 class="od-settings--title">{t('settings.groups.advanced')}</h2>{/if}
-    <div class="od-settings--surface">
-      <p class="od-settings--action-text">{t('settings.advanced.resetText')}</p>
-      <div class="od-settings--action">
-        <button type="button" class="od-outlined-button" onclick={confirmReset}>{t('settings.advanced.reset')}</button>
+    {#if !section}<h2 class="bc-settings--title">{t('settings.groups.advanced')}</h2>{/if}
+    <div class="bc-settings--surface">
+      <p class="bc-settings--action-text">{t('settings.advanced.resetText')}</p>
+      <div class="bc-settings--action">
+        <button type="button" class="bc-outlined-button" onclick={confirmReset}>{t('settings.advanced.reset')}</button>
       </div>
     </div>
-    <p class="od-settings--note">{t('settings.advanced.note')}</p>
+    <p class="bc-settings--note">{t('settings.advanced.note')}</p>
   {/if}
 
-  {#if !section && nothingShown}<p class="od-settings--note od-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
-  <div class="od-settings--bottom"></div>
+  {#if !section && nothingShown}<p class="bc-settings--note bc-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
+  <div class="bc-settings--bottom"></div>
 </Page>
 {/if}
 
@@ -1760,49 +1760,49 @@
   @layer od.components {
     /* Spec, section 4, "Settings: what each row does", layout: titles on the
        page background, groups as rounded surfaces, no dividers, 48 px rows. */
-    :global(.od-settings) {
-      --od-settings-margin: 16px;
+    :global(.bc-settings) {
+      --bc-settings-margin: 16px;
     }
 
     /* iPhone (docs/mockups/ios-reglages-apercu): small-capitals group titles, grouped lists with 10 px
        corners and dividers, no icon discs, a grey search field. */
-    :global(.ios .od-settings .od-settings--title) {
+    :global(.ios .bc-settings .bc-settings--title) {
       padding: 22px 32px 6px;
       font-size: 13px;
       line-height: 18px;
       font-weight: 400;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.ios .od-settings .od-settings--surface) {
+    :global(.ios .bc-settings .bc-settings--surface) {
       border-radius: 10px;
     }
 
-    :global(.ios .od-settings .od-settings--overview-row) {
+    :global(.ios .bc-settings .bc-settings--overview-row) {
       position: relative;
     }
 
-    :global(.ios .od-settings .od-settings--surface [role='listitem'] + [role='listitem'] .od-settings--overview-row::before) {
+    :global(.ios .bc-settings .bc-settings--surface [role='listitem'] + [role='listitem'] .bc-settings--overview-row::before) {
       content: '';
       position: absolute;
       top: 0;
       right: 0;
       left: 16px;
       height: 1px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
 
-    :global(.ios .od-settings .od-settings--overview-icon) {
+    :global(.ios .bc-settings .bc-settings--overview-icon) {
       display: none;
     }
 
-    :global(.ios .od-settings .od-settings--overview-row) {
+    :global(.ios .bc-settings .bc-settings--overview-row) {
       min-height: 56px;
       gap: 12px;
     }
 
-    :global(.ios .od-settings .od-settings--search) {
+    :global(.ios .bc-settings .bc-settings--search) {
       height: 36px;
       padding: 0 8px;
       gap: 6px;
@@ -1811,7 +1811,7 @@
       svg {
         width: 16px;
         height: 16px;
-        stroke: var(--od-text-2);
+        stroke: var(--bc-text-2);
       }
 
       input {
@@ -1819,12 +1819,12 @@
       }
     }
 
-    .od-settings--search {
-      margin: 4px var(--od-settings-margin);
+    .bc-settings--search {
+      margin: 4px var(--bc-settings-margin);
       height: 56px;
       padding: 0 16px;
       border-radius: 28px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       display: flex;
       align-items: center;
       gap: 16px;
@@ -1834,7 +1834,7 @@
         width: 24px;
         height: 24px;
         fill: none;
-        stroke: var(--od-text);
+        stroke: var(--bc-text);
         stroke-width: 2;
         stroke-linecap: round;
       }
@@ -1846,25 +1846,25 @@
         background: none;
         font: inherit;
         font-size: 16px;
-        color: var(--od-text);
+        color: var(--bc-text);
         outline: none;
       }
     }
 
-    .od-settings--title {
+    .bc-settings--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-settings--consent .od-settings--overview-summary {
+    .bc-settings--consent .bc-settings--overview-summary {
       white-space: normal;
     }
 
-    .od-settings--consent {
+    .bc-settings--consent {
       min-height: 72px;
       padding: 10px 16px;
       display: flex;
@@ -1872,24 +1872,24 @@
       gap: 16px;
     }
 
-    .od-settings--surface {
-      margin: 0 var(--od-settings-margin);
+    .bc-settings--surface {
+      margin: 0 var(--bc-settings-margin);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
-      &.od-settings--spaced {
+      &.bc-settings--spaced {
         margin-top: 10px;
       }
     }
 
     /* An editable dropdown in its group: 12 dp from the edges, as every field in a white surface. */
-    .od-settings--altitude {
-      --od-field-margin: 12px;
+    .bc-settings--altitude {
+      --bc-field-margin: 12px;
       padding-bottom: 8px;
     }
 
-    .od-settings--row {
+    .bc-settings--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
@@ -1899,7 +1899,7 @@
       gap: 12px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
@@ -1909,18 +1909,18 @@
         opacity: 0.45;
       }
 
-      &.od-settings--dimmed .od-settings--texts,
-      &.od-settings--dimmed .od-settings--value {
+      &.bc-settings--dimmed .bc-settings--texts,
+      &.bc-settings--dimmed .bc-settings--value {
         opacity: 0.55;
       }
     }
 
-    div.od-settings--row {
+    div.bc-settings--row {
       cursor: default;
     }
 
     /* A row with a label and its segmented buttons under it (« Délai par défaut »). */
-    .od-settings--segmented-row {
+    .bc-settings--segmented-row {
       box-sizing: border-box;
       padding: 12px 16px;
       display: flex;
@@ -1928,22 +1928,22 @@
       align-items: stretch;
       gap: 12px;
 
-      &.od-settings--dimmed {
+      &.bc-settings--dimmed {
         opacity: 0.55;
       }
     }
 
     /* MD3: two-line item, 72 dp. */
-    :global(.md) .od-settings--row:has(.od-settings--supporting) {
+    :global(.md) .bc-settings--row:has(.bc-settings--supporting) {
       min-height: 72px;
     }
 
-    :global(.md) .od-settings--supporting {
+    :global(.md) .bc-settings--supporting {
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-settings--texts {
+    .bc-settings--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -1951,22 +1951,22 @@
       gap: 2px;
     }
 
-    .od-settings--label {
+    .bc-settings--label {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-settings--supporting {
+    .bc-settings--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-settings--value {
+    .bc-settings--value {
       flex: none;
       max-width: 45%;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
       text-align: end;
     }
@@ -1976,8 +1976,8 @@
       flex: none;
       padding: 2px 10px;
       border-radius: 12px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font-size: 12px;
       line-height: 18px;
       font-weight: 600;
@@ -1985,29 +1985,29 @@
 
     /* The overview's rows (reglages-apercu-android): a 40 dp icon disc, the subpage's name,
        its values in one line, a chevron. */
-    .od-settings--overview-row {
+    .bc-settings--overview-row {
       box-sizing: border-box;
       min-height: 72px;
       padding: 8px 20px 8px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
     /* Tablet: the subpage shown beside the overview. */
-    .od-settings--overview-selected {
-      background: var(--od-water-top);
-      color: var(--od-on-band-control);
+    .bc-settings--overview-selected {
+      background: var(--bc-water-top);
+      color: var(--bc-on-band-control);
     }
 
-    .od-settings--overview-icon {
+    .bc-settings--overview-icon {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 20px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2016,29 +2016,29 @@
         width: 22px;
         height: 22px;
         fill: none;
-        stroke: var(--od-text);
+        stroke: var(--bc-text);
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
     }
 
-    .od-settings--overview-summary {
+    .bc-settings--overview-summary {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-settings--chevron {
+    .bc-settings--chevron {
       flex: none;
       /* 20 dp, on every row that opens a page (system-design, « Trailing chevron »). */
       width: 20px;
       height: 20px;
       fill: none;
-      stroke: var(--od-text-2);
+      stroke: var(--bc-text-2);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -2048,7 +2048,7 @@
       flex: none;
     }
 
-    .od-settings--more {
+    .bc-settings--more {
       flex: none;
       width: 48px;
       height: 48px;
@@ -2064,40 +2064,40 @@
       svg {
         width: 24px;
         height: 24px;
-        fill: var(--od-text);
+        fill: var(--bc-text);
       }
     }
 
-    .od-settings--segmented {
-      margin: 4px var(--od-settings-margin) 0;
+    .bc-settings--segmented {
+      margin: 4px var(--bc-settings-margin) 0;
     }
 
     /* An overline on the page background, above a card (task 2026-11-12-51). */
-    .od-settings--overline {
+    .bc-settings--overline {
       margin: 16px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-settings--note {
+    .bc-settings--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-settings--empty {
+      &.bc-settings--empty {
         margin-top: 24px;
         text-align: center;
       }
     }
 
-    .od-settings--warning {
-      margin: 0 var(--od-settings-margin) 10px;
+    .bc-settings--warning {
+      margin: 0 var(--bc-settings-margin) 10px;
       padding: 12px 16px;
       border-radius: 12px;
-      border: 1px solid var(--od-alarm);
+      border: 1px solid var(--bc-alarm);
       display: flex;
       gap: 12px;
       align-items: flex-start;
@@ -2109,91 +2109,91 @@
         width: 20px;
         height: 20px;
         fill: none;
-        stroke: var(--od-alarm);
+        stroke: var(--bc-alarm);
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
     }
 
-    .od-settings--action {
+    .bc-settings--action {
       padding: 12px 16px 14px;
       display: flex;
       justify-content: center;
     }
 
-    .od-settings--action-text {
+    .bc-settings--action-text {
       margin: 0;
       padding: 14px 16px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
 
-    .od-outlined-button:disabled {
+    .bc-outlined-button:disabled {
       opacity: 0.45;
       cursor: default;
     }
 
-    .od-settings--bottom {
+    .bc-settings--bottom {
       height: 32px;
     }
 
     /* Tablets: a 600 px centred column (spec, section 3). */
     @media (min-width: 768px) {
-      :global(.od-settings .page-content) {
-        --od-settings-margin: max(16px, calc((100% - 600px) / 2));
+      :global(.bc-settings .page-content) {
+        --bc-settings-margin: max(16px, calc((100% - 600px) / 2));
       }
 
-      .od-settings--title,
-      .od-settings--note {
+      .bc-settings--title,
+      .bc-settings--note {
         padding-inline: max(20px, calc((100% - 600px) / 2 + 4px));
       }
 
-      .od-settings--note {
+      .bc-settings--note {
         margin-inline: 0;
       }
     }
 
     /* iOS: the same groups with the system's sizes. */
-    :global(.ios) .od-settings--row {
+    :global(.ios) .bc-settings--row {
       min-height: 44px;
       padding-right: 16px;
     }
 
-    :global(.ios) .od-settings--label {
+    :global(.ios) .bc-settings--label {
       font-size: 17px;
     }
     /* --- The desktop Réglages (task 2026-11-15-202, bureau-reglages*) ----------------------- */
-    .od-desktop-settings--frame {
+    .bc-desktop-settings--frame {
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
-    .od-desktop-settings--bar {
+    .bc-desktop-settings--bar {
       display: flex;
       align-items: center;
       gap: 16px;
       padding: 12px 24px 8px;
     }
-    .od-desktop-settings--title {
+    .bc-desktop-settings--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-settings--summary {
+    .bc-desktop-settings--summary {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-settings--spacer {
+    .bc-desktop-settings--spacer {
       flex: 1;
     }
-    .od-desktop-settings--search {
+    .bc-desktop-settings--search {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -2202,8 +2202,8 @@
       box-sizing: border-box;
       padding: 0 16px;
       border-radius: 22px;
-      background: var(--od-desktop-field);
-      color: var(--od-text);
+      background: var(--bc-desktop-field);
+      color: var(--bc-text);
 
       svg {
         flex: none;
@@ -2221,29 +2221,29 @@
         background: none;
         font: inherit;
         font-size: 15px;
-        color: var(--od-text);
+        color: var(--bc-text);
         outline: none;
       }
     }
-    .od-desktop-settings--kbd {
+    .bc-desktop-settings--kbd {
       padding: 1px 6px;
-      border: 1px solid var(--od-separator);
+      border: 1px solid var(--bc-separator);
       border-radius: 4px;
       font: inherit;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-settings--columns {
+    .bc-desktop-settings--columns {
       display: flex;
       flex: 1;
       min-height: 0;
     }
-    .od-desktop-settings--categories {
+    .bc-desktop-settings--categories {
       flex: none;
       width: 300px;
       box-sizing: border-box;
       padding: 8px 12px 24px 12px;
-      border-right: 1px solid var(--od-separator);
+      border-right: 1px solid var(--bc-separator);
       overflow-y: auto;
 
       ul {
@@ -2252,17 +2252,17 @@
         list-style: none;
       }
     }
-    .od-desktop-settings--windowed .od-desktop-settings--categories {
+    .bc-desktop-settings--windowed .bc-desktop-settings--categories {
       width: 240px;
       padding-top: 16px;
 
-      .od-desktop-settings--search {
+      .bc-desktop-settings--search {
         height: 34px;
         margin-bottom: 8px;
         border-radius: 8px;
       }
     }
-    .od-desktop-settings--category {
+    .bc-desktop-settings--category {
       display: flex;
       align-items: center;
       gap: 14px;
@@ -2276,7 +2276,7 @@
       font: inherit;
       font-size: 15px;
       text-align: left;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
       svg {
@@ -2290,74 +2290,74 @@
         stroke-linejoin: round;
       }
       &:hover {
-        background: color-mix(in srgb, var(--od-text) 6%, transparent);
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
       }
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: -2px;
       }
-      &.od-desktop-settings--selected,
-      &.od-desktop-settings--selected:hover {
-        background: var(--od-desktop-selected);
-        color: var(--od-desktop-selected-ink);
+      &.bc-desktop-settings--selected,
+      &.bc-desktop-settings--selected:hover {
+        background: var(--bc-desktop-selected);
+        color: var(--bc-desktop-selected-ink);
         font-weight: 500;
       }
     }
-    .od-desktop-settings--windowed .od-desktop-settings--category {
+    .bc-desktop-settings--windowed .bc-desktop-settings--category {
       height: 36px;
       border-radius: 8px;
       font-size: 14px;
     }
-    .od-desktop-settings--category-name {
+    .bc-desktop-settings--category-name {
       flex: 1;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-desktop-settings--pane {
+    .bc-desktop-settings--pane {
       flex: 1;
       min-width: 0;
       overflow-y: auto;
       padding: 8px 32px 40px;
     }
-    .od-desktop-settings--content {
+    .bc-desktop-settings--content {
       max-width: 720px;
     }
-    .od-desktop-settings--pane-title {
+    .bc-desktop-settings--pane-title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-settings--pane-note {
+    .bc-desktop-settings--pane-note {
       margin: 2px 0 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-settings--heading {
+    .bc-desktop-settings--heading {
       margin: 24px 0 8px;
       padding: 0 4px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-settings--pane-title + .od-desktop-settings--heading,
-    .od-desktop-settings--pane-note + .od-desktop-settings--heading {
+    .bc-desktop-settings--pane-title + .bc-desktop-settings--heading,
+    .bc-desktop-settings--pane-note + .bc-desktop-settings--heading {
       margin-top: 16px;
     }
-    .od-desktop-settings--pane-title + .od-desktop-settings--card,
-    .od-desktop-settings--pane-note + .od-desktop-settings--card {
+    .bc-desktop-settings--pane-title + .bc-desktop-settings--card,
+    .bc-desktop-settings--pane-note + .bc-desktop-settings--card {
       margin-top: 16px;
     }
-    .od-desktop-settings--card {
+    .bc-desktop-settings--card {
       margin: 0;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
-    .od-desktop-settings--row {
+    .bc-desktop-settings--row {
       position: relative;
       box-sizing: border-box;
       display: flex;
@@ -2365,61 +2365,61 @@
       gap: 16px;
       min-height: 64px;
       padding: 10px 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      & + .od-desktop-settings--row {
-        box-shadow: inset 0 1px 0 var(--od-separator);
+      & + .bc-desktop-settings--row {
+        box-shadow: inset 0 1px 0 var(--bc-separator);
         /* The line starts at the text, as the mock-up's rows. */
       }
     }
-    label.od-desktop-settings--row {
+    label.bc-desktop-settings--row {
       cursor: pointer;
     }
-    .od-desktop-settings--dimmed .od-desktop-settings--texts,
-    .od-desktop-settings--dimmed .od-desktop-settings--control {
+    .bc-desktop-settings--dimmed .bc-desktop-settings--texts,
+    .bc-desktop-settings--dimmed .bc-desktop-settings--control {
       opacity: 0.55;
     }
-    .od-desktop-settings--texts {
+    .bc-desktop-settings--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
-    .od-desktop-settings--label {
+    .bc-desktop-settings--label {
       font-size: 16px;
       line-height: 22px;
     }
-    .od-desktop-settings--helper {
+    .bc-desktop-settings--helper {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-settings--path {
+    .bc-desktop-settings--path {
       overflow-wrap: anywhere;
       user-select: text;
     }
-    .od-desktop-settings--control {
+    .bc-desktop-settings--control {
       flex: none;
       display: flex;
       align-items: center;
       justify-content: flex-end;
       max-width: 55%;
     }
-    .od-desktop-settings--control :global(.od-button-group--button) {
+    .bc-desktop-settings--control :global(.bc-button-group--button) {
       white-space: nowrap;
     }
-    .od-desktop-settings--value {
+    .bc-desktop-settings--value {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
-    .od-desktop-settings--hit {
+    .bc-desktop-settings--hit {
       border-radius: 3px;
-      background: var(--od-desktop-banner);
-      color: var(--od-desktop-banner-ink);
+      background: var(--bc-desktop-banner);
+      color: var(--bc-desktop-banner-ink);
     }
-    .od-desktop-settings--field {
+    .bc-desktop-settings--field {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -2431,10 +2431,10 @@
       padding: 0 8px 0 12px;
       border: 0;
       border-radius: 8px;
-      background: var(--od-desktop-field);
+      background: var(--bc-desktop-field);
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
       svg {
@@ -2451,20 +2451,20 @@
         cursor: default;
       }
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: 2px;
       }
     }
-    .od-desktop-settings--field-value {
+    .bc-desktop-settings--field-value {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-desktop-settings--altitude {
-      --od-field-margin: 0px;
+    .bc-desktop-settings--altitude {
+      --bc-field-margin: 0px;
       width: 220px;
     }
-    .od-desktop-settings--row-button {
+    .bc-desktop-settings--row-button {
       position: absolute;
       inset: 0;
       border: 0;
@@ -2472,10 +2472,10 @@
       cursor: pointer;
 
       &:hover {
-        background: color-mix(in srgb, var(--od-text) 5%, transparent);
+        background: color-mix(in srgb, var(--bc-text) 5%, transparent);
       }
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: -2px;
       }
       &:disabled {
@@ -2483,17 +2483,17 @@
         opacity: 0.45;
       }
     }
-    .od-desktop-settings--chevron {
+    .bc-desktop-settings--chevron {
       flex: none;
       width: 22px;
       height: 22px;
       fill: none;
-      stroke: var(--od-text-2);
+      stroke: var(--bc-text-2);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .od-desktop-settings--more {
+    .bc-desktop-settings--more {
       width: 40px;
       height: 40px;
       border: 0;
@@ -2504,21 +2504,21 @@
       svg {
         width: 22px;
         height: 22px;
-        fill: var(--od-text);
+        fill: var(--bc-text);
       }
       &:hover {
-        background: color-mix(in srgb, var(--od-text) 8%, transparent);
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
     }
-    .od-desktop-settings--warning {
+    .bc-desktop-settings--warning {
       display: flex;
       gap: 12px;
       align-items: flex-start;
       margin: 0 0 12px;
       padding: 12px 16px;
       border-radius: 12px;
-      background: var(--od-desktop-banner);
-      color: var(--od-desktop-banner-ink);
+      background: var(--bc-desktop-banner);
+      color: var(--bc-desktop-banner-ink);
       font-size: 14px;
 
       svg {
@@ -2532,23 +2532,23 @@
         stroke-linejoin: round;
       }
     }
-    .od-desktop-settings--note {
+    .bc-desktop-settings--note {
       margin: 8px 4px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour, on the fields and the selected category. */
     @media (hover: hover) and (pointer: fine) {
-      label.od-desktop-settings--row:not(:has(:disabled)):hover {
+      label.bc-desktop-settings--row:not(:has(:disabled)):hover {
         background: color-mix(in srgb, currentColor 8%, transparent);
       }
-      .od-desktop-settings--field {
+      .bc-desktop-settings--field {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-settings--field:not(:disabled):hover,
-      .od-desktop-settings--category.od-desktop-settings--selected:hover {
+      .bc-desktop-settings--field:not(:disabled):hover,
+      .bc-desktop-settings--category.bc-desktop-settings--selected:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }

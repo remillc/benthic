@@ -39,21 +39,21 @@
 </script>
 
 <div
-  class="od-cylinder-card"
-  class:od-cylinder-card--dragging={dragging}
-  class:od-cylinder-card--shifted={offset !== 0 && !dragging}
+  class="bc-cylinder-card"
+  class:bc-cylinder-card--dragging={dragging}
+  class:bc-cylinder-card--shifted={offset !== 0 && !dragging}
   style:transform={offset ? `translateY(${offset}px)` : undefined}
   bind:this={el}
 >
-  <div class="od-cylinder-card--head">
+  <div class="bc-cylinder-card--head">
     <CylinderIcon />
-    <span class="od-cylinder-card--titles">
-      <h4 class="od-cylinder-card--title">{t('edit.cylinderTitle', { n })}</h4>
-      <span class="od-cylinder-card--gas od-value">{gas}</span>
+    <span class="bc-cylinder-card--titles">
+      <h4 class="bc-cylinder-card--title">{t('edit.cylinderTitle', { n })}</h4>
+      <span class="bc-cylinder-card--gas bc-value">{gas}</span>
     </span>
     <button
       type="button"
-      class="od-cylinder-card--handle"
+      class="bc-cylinder-card--handle"
       aria-label={t('edit.moveCylinder', { n })}
       onpointerdown={onhandledown}
       onkeydown={key}
@@ -64,36 +64,36 @@
         <circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" />
       </svg>
     </button>
-    <span class="od-sr-only">
+    <span class="bc-sr-only">
       <button type="button" disabled={!canUp} onclick={() => onmove?.(-1)}>{t('edit.moveCylinderUp', { n })}</button>
       <button type="button" disabled={!canDown} onclick={() => onmove?.(1)}>{t('edit.moveCylinderDown', { n })}</button>
     </span>
   </div>
-  <div class="od-cylinder-card--fields">{@render children()}</div>
+  <div class="bc-cylinder-card--fields">{@render children()}</div>
   {#if onremove}
-    <div class="od-cylinder-card--footer">
-      <button type="button" class="od-cylinder-card--remove" onclick={onremove}>{removeLabel}</button>
+    <div class="bc-cylinder-card--footer">
+      <button type="button" class="bc-cylinder-card--remove" onclick={onremove}>{removeLabel}</button>
     </div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-cylinder-card {
+    .bc-cylinder-card {
       position: relative;
       margin: 16px 16px 0;
       padding: 12px;
       border-radius: 16px;
-      background: var(--od-background);
-      --od-field-margin: 0;
+      background: var(--bc-background);
+      --bc-field-margin: 0;
       /* Not split between the columns of the tablet sheet. */
       break-inside: avoid;
 
-      &.od-cylinder-card--shifted {
+      &.bc-cylinder-card--shifted {
         transition: transform 150ms ease;
       }
 
-      &.od-cylinder-card--dragging {
+      &.bc-cylinder-card--dragging {
         z-index: 3;
         box-shadow: 0 4px 16px rgb(0 0 0 / 0.24);
         pointer-events: none;
@@ -101,40 +101,40 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-cylinder-card.od-cylinder-card--shifted {
+      .bc-cylinder-card.bc-cylinder-card--shifted {
         transition: none;
       }
     }
 
-    .od-cylinder-card--head {
+    .bc-cylinder-card--head {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-cylinder-card--titles {
+    .bc-cylinder-card--titles {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-cylinder-card--title {
+    .bc-cylinder-card--title {
       margin: 0;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-cylinder-card--gas {
-      color: var(--od-text-2);
+    .bc-cylinder-card--gas {
+      color: var(--bc-text-2);
       font-size: 14px;
       line-height: 20px;
       white-space: nowrap;
     }
 
-    .od-cylinder-card--handle {
+    .bc-cylinder-card--handle {
       flex: none;
       width: 40px;
       height: 40px;
@@ -145,7 +145,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -155,27 +155,27 @@
       }
     }
 
-    .od-cylinder-card--footer {
+    .bc-cylinder-card--footer {
       margin-top: 8px;
       display: flex;
       justify-content: flex-end;
     }
 
-    .od-cylinder-card--remove {
+    .bc-cylinder-card--remove {
       width: auto;
       min-height: 40px;
       padding: 0 12px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
     }
 
-    .od-cylinder-card--fields {
+    .bc-cylinder-card--fields {
       margin-top: 12px;
       display: flex;
       flex-direction: column;

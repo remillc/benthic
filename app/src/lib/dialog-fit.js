@@ -6,7 +6,7 @@
 // Framework7's dialogs (f7.dialog) through enableDialogFit(), and to <Md3Dialog> through fitButtons().
 
 /** The class that stacks the buttons (theme.css for Framework7's dialogs, Md3Dialog.svelte for ours). */
-export const STACKED = 'od-dialog-stacked';
+export const STACKED = 'bc-dialog-stacked';
 
 /**
  * Whether a row of buttons does not fit its width: the row overflows, or a label is cut.

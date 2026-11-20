@@ -32,43 +32,43 @@
 </script>
 
 {#if confirmation.open}
-  <Popup opened onPopupClosed={closeConfirmation} class="od-validation-confirm">
+  <Popup opened onPopupClosed={closeConfirmation} class="bc-validation-confirm">
     <Page>
       <Navbar title={t(many ? 'validation.confirmTitleMany' : 'validation.confirmTitle')}>
         {#snippet left()}
           <Link popupClose iconOnly>
-            <Icon name="close" /><span class="od-sr-only">{t('qr.close')}</span>
+            <Icon name="close" /><span class="bc-sr-only">{t('qr.close')}</span>
           </Link>
         {/snippet}
       </Navbar>
 
-      <div class="od-validation-confirm--card">
+      <div class="bc-validation-confirm--card">
         {#each confirmation.summary.dives as dive}
-          <div class="od-validation-confirm--dive">
-            <p class="od-validation-confirm--date">{formatDateTime(dive.date)}</p>
-            <p class="od-validation-confirm--site">{dive.site || t('qr.noSite')}</p>
-            <p class="od-validation-confirm--figures">
+          <div class="bc-validation-confirm--dive">
+            <p class="bc-validation-confirm--date">{formatDateTime(dive.date)}</p>
+            <p class="bc-validation-confirm--site">{dive.site || t('qr.noSite')}</p>
+            <p class="bc-validation-confirm--figures">
               {[dive.maxDepthMm ? t('validation.deepest', { depth: formatDepth(dive.maxDepthMm, prefs) }) : '', dive.durationSeconds ? t('validation.underwater', { time: formatMinutes(dive.durationSeconds) }) : ''].filter(Boolean).join(' · ')}
             </p>
           </div>
         {/each}
       </div>
 
-      <p class="od-validation-confirm--text">{t(many ? 'validation.confirmTextMany' : 'validation.confirmText')}</p>
+      <p class="bc-validation-confirm--text">{t(many ? 'validation.confirmTextMany' : 'validation.confirmText')}</p>
 
-      <div class="od-validation-confirm--fields">
+      <div class="bc-validation-confirm--fields">
         <TextField label={t('validation.yourName')} bind:value={confirmation.name} supporting={t('validation.yourNameHint')} autocomplete="name" />
-        <p class="od-validation-confirm--role">{roleLine}</p>
+        <p class="bc-validation-confirm--role">{roleLine}</p>
       </div>
-      <p class="od-validation-confirm--note">{t('validation.confirmNote')}</p>
+      <p class="bc-validation-confirm--note">{t('validation.confirmNote')}</p>
 
       {#if confirmation.error}
-        <p class="od-validation-confirm--error" role="alert">{t(`validation.confirmError.${confirmation.error}`)}</p>
+        <p class="bc-validation-confirm--error" role="alert">{t(`validation.confirmError.${confirmation.error}`)}</p>
       {/if}
 
-      <div class="od-validation-confirm--actions">
-        <Link popupClose class="od-validation-confirm--cancel">{t('qr.cancel')}</Link>
-        <button type="button" class="od-validation-confirm--ok" disabled={confirmation.working || !valid} onclick={confirm}>{t('validation.confirmButton')}</button>
+      <div class="bc-validation-confirm--actions">
+        <Link popupClose class="bc-validation-confirm--cancel">{t('qr.cancel')}</Link>
+        <button type="button" class="bc-validation-confirm--ok" disabled={confirmation.working || !valid} onclick={confirm}>{t('validation.confirmButton')}</button>
       </div>
     </Page>
   </Popup>
@@ -76,50 +76,50 @@
 
 <style>
   @layer od.components {
-    :global(.od-validation-confirm .page) {
-      background: var(--od-background);
+    :global(.bc-validation-confirm .page) {
+      background: var(--bc-background);
     }
 
-    .od-validation-confirm--card {
+    .bc-validation-confirm--card {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-validation-confirm--card p {
+    .bc-validation-confirm--card p {
       margin: 0;
     }
 
-    .od-validation-confirm--date,
-    .od-validation-confirm--figures {
+    .bc-validation-confirm--date,
+    .bc-validation-confirm--figures {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-validation-confirm--site {
+    .bc-validation-confirm--site {
       margin-top: 2px;
       font-size: 18px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-validation-confirm--text,
-    .od-validation-confirm--note {
+    .bc-validation-confirm--text,
+    .bc-validation-confirm--note {
       margin: 16px 20px 0;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-validation-confirm--note {
-      color: var(--od-text-2);
+    .bc-validation-confirm--note {
+      color: var(--bc-text-2);
     }
 
-    .od-validation-confirm--fields {
+    .bc-validation-confirm--fields {
       margin-top: 8px;
       padding: 0 16px;
       display: flex;
@@ -127,28 +127,28 @@
       gap: 12px;
     }
 
-    .od-validation-confirm--role {
+    .bc-validation-confirm--role {
       margin: 0 4px;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-validation-confirm--error {
+    .bc-validation-confirm--error {
       margin: 16px 20px 0;
       font-size: 15px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-validation-confirm--actions {
+    .bc-validation-confirm--actions {
       margin: 24px 16px calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       justify-content: flex-end;
       gap: 12px;
     }
 
-    :global(.od-validation-confirm--cancel),
-    .od-validation-confirm--ok {
+    :global(.bc-validation-confirm--cancel),
+    .bc-validation-confirm--ok {
       height: 48px;
       padding: 0 24px;
       border-radius: 24px;
@@ -160,23 +160,23 @@
       justify-content: center;
     }
 
-    :global(.od-validation-confirm--cancel) {
-      border: var(--od-outline-width) solid var(--od-outline);
-      color: var(--od-text);
+    :global(.bc-validation-confirm--cancel) {
+      border: var(--bc-outline-width) solid var(--bc-outline);
+      color: var(--bc-text);
     }
 
-    .od-validation-confirm--ok {
+    .bc-validation-confirm--ok {
       border: none;
-      background: var(--od-action);
-      color: var(--od-on-action);
+      background: var(--bc-action);
+      color: var(--bc-on-action);
     }
 
-    .od-validation-confirm--ok:disabled {
+    .bc-validation-confirm--ok:disabled {
       opacity: 0.5;
     }
   }
 
-  .od-validation-confirm--ok {
+  .bc-validation-confirm--ok {
     width: auto;
   }
 </style>

@@ -26,6 +26,6 @@
   }
 </script>
 
-<Popup class="od-welcome" tabletFullscreen opened={logbook.welcome || logbook.welcomeHold} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset} onPopupOpened={markFirstScreenReady}>
+<Popup class="bc-welcome" tabletFullscreen opened={logbook.welcome || logbook.welcomeHold} swipeToClose={false} closeByBackdropClick={false} onPopupClosed={reset} onPopupOpened={markFirstScreenReady}>
   <View name="welcome" url="/welcome" />
 </Popup>

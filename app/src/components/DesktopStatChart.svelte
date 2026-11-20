@@ -77,18 +77,18 @@
   }
 </script>
 
-<div class="od-desktop-stat-chart" style:height="{height}px" bind:clientWidth={width}>
+<div class="bc-desktop-stat-chart" style:height="{height}px" bind:clientWidth={width}>
   {#if width}
     <svg bind:this={svg} {width} {height} viewBox="0 0 {width} {height}" role="group" aria-label={label}>
       {#each ticks.ticks as tick, i (tick)}
         {@const y = yOf(tick * scale)}
-        <line class="od-desktop-stat-chart--grid" x1={LEFT - 2} x2={width - RIGHT} y1={y} y2={y} />
-        <text class="od-desktop-stat-chart--tick" x={LEFT - 10} y={y + 4} text-anchor="end">{tickText(tick, i)}</text>
+        <line class="bc-desktop-stat-chart--grid" x1={LEFT - 2} x2={width - RIGHT} y1={y} y2={y} />
+        <text class="bc-desktop-stat-chart--tick" x={LEFT - 10} y={y + 4} text-anchor="end">{tickText(tick, i)}</text>
       {/each}
       {#each items as it (it.bar.key)}
         <rect
-          class="od-desktop-stat-chart--bar"
-          class:od-desktop-stat-chart--bar-hover={hovered === it.i}
+          class="bc-desktop-stat-chart--bar"
+          class:bc-desktop-stat-chart--bar-hover={hovered === it.i}
           x={it.x}
           y={it.y}
           width={barWidth}
@@ -96,17 +96,17 @@
           rx={barWidth >= 12 ? 6 : 1}
         />
         {#if showValues && it.bar.value > 0}
-          <text class="od-desktop-stat-chart--value" x={it.centre} y={it.y - 8} text-anchor="middle">{valueText ? valueText(it.bar) : it.bar.value}</text>
+          <text class="bc-desktop-stat-chart--value" x={it.centre} y={it.y - 8} text-anchor="middle">{valueText ? valueText(it.bar) : it.bar.value}</text>
         {/if}
         {#if it.i % labelEvery === 0}
-          <text class="od-desktop-stat-chart--label" x={it.centre} y={height - 10} text-anchor="middle">{it.bar.label}</text>
+          <text class="bc-desktop-stat-chart--label" x={it.centre} y={height - 10} text-anchor="middle">{it.bar.label}</text>
         {/if}
       {/each}
       <!-- The hit areas: a whole column each, so that a thin or empty bar is easy to reach. -->
       {#each items as it (it.bar.key)}
         {#if it.bar.diveIds.length}
           <rect
-            class="od-desktop-stat-chart--hit"
+            class="bc-desktop-stat-chart--hit"
             data-bar={it.bar.key}
             x={LEFT + it.i * slot}
             y={TOP}
@@ -126,9 +126,9 @@
       {/each}
     </svg>
     {#if tooltip}
-      <div class="od-desktop-stat-chart--tip" style:top="{tooltip.top}px" style:left={tooltip.left === undefined ? undefined : `${tooltip.left}px`} style:right={tooltip.right === undefined ? undefined : `${tooltip.right}px`} role="tooltip">
-        <span class="od-desktop-stat-chart--tip-title">{tooltip.lines[0]}</span>
-        <span class="od-desktop-stat-chart--tip-hint">{tooltip.lines[1]}</span>
+      <div class="bc-desktop-stat-chart--tip" style:top="{tooltip.top}px" style:left={tooltip.left === undefined ? undefined : `${tooltip.left}px`} style:right={tooltip.right === undefined ? undefined : `${tooltip.right}px`} role="tooltip">
+        <span class="bc-desktop-stat-chart--tip-title">{tooltip.lines[0]}</span>
+        <span class="bc-desktop-stat-chart--tip-hint">{tooltip.lines[1]}</span>
       </div>
     {/if}
   {/if}
@@ -136,7 +136,7 @@
 
 <style>
   @layer od.components {
-    .od-desktop-stat-chart {
+    .bc-desktop-stat-chart {
       position: relative;
       width: 100%;
     }
@@ -145,68 +145,68 @@
       display: block;
     }
 
-    .od-desktop-stat-chart--grid {
-      stroke: var(--od-chart-grid);
+    .bc-desktop-stat-chart--grid {
+      stroke: var(--bc-chart-grid);
       stroke-width: 1;
     }
 
-    .od-desktop-stat-chart--tick,
-    .od-desktop-stat-chart--label {
+    .bc-desktop-stat-chart--tick,
+    .bc-desktop-stat-chart--label {
       font-size: 12px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-desktop-stat-chart--value {
+    .bc-desktop-stat-chart--value {
       font-size: 13px;
-      fill: var(--od-text);
+      fill: var(--bc-text);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-desktop-stat-chart--bar {
-      fill: var(--od-desk-stats-bar);
+    .bc-desktop-stat-chart--bar {
+      fill: var(--bc-desk-stats-bar);
     }
 
-    .od-desktop-stat-chart--bar-hover {
-      fill: var(--od-desk-stats-bar-strong);
+    .bc-desktop-stat-chart--bar-hover {
+      fill: var(--bc-desk-stats-bar-strong);
     }
 
-    .od-desktop-stat-chart--hit {
+    .bc-desktop-stat-chart--hit {
       fill: transparent;
       cursor: pointer;
       outline: none;
     }
 
-    .od-desktop-stat-chart--hit:focus-visible {
-      stroke: var(--od-text);
+    .bc-desktop-stat-chart--hit:focus-visible {
+      stroke: var(--bc-text);
       stroke-width: 2;
     }
 
     /* The dark tooltip (as the dive profile's). */
-    .od-desktop-stat-chart--tip {
+    .bc-desktop-stat-chart--tip {
       position: absolute;
       display: flex;
       flex-direction: column;
       gap: 2px;
       padding: 7px 10px;
       border-radius: 8px;
-      background: var(--od-inverse-surface);
-      color: var(--od-inverse-on-surface);
+      background: var(--bc-inverse-surface);
+      color: var(--bc-inverse-on-surface);
       font-size: 12px;
       line-height: 1.3;
       white-space: nowrap;
       pointer-events: none;
     }
 
-    .od-desktop-stat-chart--tip-hint {
-      color: var(--od-desk-stats-tip-hint);
+    .bc-desktop-stat-chart--tip-hint {
+      color: var(--bc-desk-stats-tip-hint);
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-stat-chart--hit:hover {
-        fill: color-mix(in srgb, var(--od-text) 6%, transparent);
+      .bc-desktop-stat-chart--hit:hover {
+        fill: color-mix(in srgb, var(--bc-text) 6%, transparent);
       }
     }
   }

@@ -1,6 +1,6 @@
 // @ts-check
 // High contrast (task 2026-11-14-149): when the system asks for more contrast, the
-// class od-high-contrast on the root element switches the --od-* variables to their
+// class bc-high-contrast on the root element switches the --bc-* variables to their
 // high-contrast values (theme.css). The system says so through the media query
 // prefers-contrast: more (iOS « Augmenter le contraste », and Android's WebView if it
 // reports it) or, on Android 14 and later, through its contrast level, read by the
@@ -27,7 +27,7 @@ export function followContrast({ readLevel, onResume }) {
   const root = document.documentElement;
   const media = window.matchMedia?.('(prefers-contrast: more)');
   let level = 0;
-  const apply = () => root.classList.toggle('od-high-contrast', isHighContrast(!!media?.matches, level));
+  const apply = () => root.classList.toggle('bc-high-contrast', isHighContrast(!!media?.matches, level));
   const read = () =>
     readLevel().then(
       (value) => {

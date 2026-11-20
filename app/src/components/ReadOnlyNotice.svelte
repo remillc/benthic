@@ -13,63 +13,63 @@
 </script>
 
 {#if gear.readOnly}
-  <div class="od-read-only-notice" role="status">
-    <span class="od-read-only-notice--icon"><Icon name="warning" size={24} /></span>
-    <span class="od-read-only-notice--texts">
-      <span class="od-read-only-notice--title">{t('gear.inventory.readOnlyTitle')}</span>
-      <span class="od-read-only-notice--text">
+  <div class="bc-read-only-notice" role="status">
+    <span class="bc-read-only-notice--icon"><Icon name="warning" size={24} /></span>
+    <span class="bc-read-only-notice--texts">
+      <span class="bc-read-only-notice--title">{t('gear.inventory.readOnlyTitle')}</span>
+      <span class="bc-read-only-notice--text">
         {gear.daysLeft > 0 ? t('gear.inventory.readOnlyText', { date: formatDate(gear.until) }) : t('gear.inventory.readOnlyExpired')}
       </span>
-      {#if onexport}<button type="button" class="od-read-only-notice--button" onclick={onexport}>{t('gear.inventory.readOnlyExport')}</button>{/if}
+      {#if onexport}<button type="button" class="bc-read-only-notice--button" onclick={onexport}>{t('gear.inventory.readOnlyExport')}</button>{/if}
     </span>
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-read-only-notice {
+    .bc-read-only-notice {
       margin: 8px 16px 0;
       padding: 12px 16px;
       border-radius: 16px;
       display: flex;
       gap: 12px;
-      background: var(--od-alarm-tint);
-      color: var(--od-text);
+      background: var(--bc-alarm-tint);
+      color: var(--bc-text);
     }
 
-    .od-read-only-notice--icon {
+    .bc-read-only-notice--icon {
       flex: none;
       display: flex;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-read-only-notice--texts {
+    .bc-read-only-notice--texts {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 2px;
     }
 
-    .od-read-only-notice--title {
+    .bc-read-only-notice--title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-read-only-notice--text {
+    .bc-read-only-notice--text {
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-read-only-notice--button {
+    .bc-read-only-notice--button {
       width: auto;
       margin-top: 8px;
       height: 40px;
       padding: 0 16px;
       border: none;
       border-radius: 20px;
-      background: var(--od-tonal);
-      color: var(--od-text);
+      background: var(--bc-tonal);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;

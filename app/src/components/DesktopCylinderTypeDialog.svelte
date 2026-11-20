@@ -161,35 +161,35 @@
   }
 </script>
 
-<Md3Dialog title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')} class="od-desktop-cylinder-type" {oncancel}>
+<Md3Dialog title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')} class="bc-desktop-cylinder-type" {oncancel}>
   <form
-    class="od-desktop-cylinder-type--form"
+    class="bc-desktop-cylinder-type--form"
     onsubmit={(e) => {
       e.preventDefault();
       save();
     }}
   >
     <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />
-    <div class="od-desktop-cylinder-type--pair">
+    <div class="bc-desktop-cylinder-type--pair">
       <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal" invalid={!!volumeLive.error} supporting={volumeLive.error}>
-        {#snippet trailing()}<span class="od-desktop-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-desktop-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
       </TextField>
       <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal" invalid={!!pressureLive.error} supporting={pressureLive.error}>
-        {#snippet trailing()}<span class="od-desktop-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-desktop-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
       </TextField>
     </div>
-    <p class="od-desktop-cylinder-type--note">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
-    {#if explanation}<p class="od-desktop-cylinder-type--note">{explanation}</p>{/if}
-    <button type="submit" class="od-sr-only" tabindex="-1" aria-hidden="true"></button>
+    <p class="bc-desktop-cylinder-type--note">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
+    {#if explanation}<p class="bc-desktop-cylinder-type--note">{explanation}</p>{/if}
+    <button type="submit" class="bc-sr-only" tabindex="-1" aria-hidden="true"></button>
   </form>
   {#snippet actions()}
     {#if type && deletable(type)}
-      <button type="button" class="od-md3-dialog--start od-desktop-cylinder-type--delete" onclick={deleteTheType}>
+      <button type="button" class="bc-md3-dialog--start bc-desktop-cylinder-type--delete" onclick={deleteTheType}>
         <Icon name="delete" size={18} />
         {t('settings.cylinders.deleteType')}
       </button>
     {:else if type?.library}
-      <button type="button" class="od-md3-dialog--start od-desktop-cylinder-type--remove" onclick={remove}>{t('settings.cylinders.delete')}</button>
+      <button type="button" class="bc-md3-dialog--start bc-desktop-cylinder-type--remove" onclick={remove}>{t('settings.cylinders.delete')}</button>
     {/if}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" disabled={saving} onclick={save}>{t('edit.save')}</button>
@@ -198,15 +198,15 @@
 
 <style>
   @layer od.components {
-    .od-desktop-cylinder-type--form {
+    .bc-desktop-cylinder-type--form {
       padding: 0 24px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      --od-field-margin: 0px;
+      --bc-field-margin: 0px;
     }
 
-    .od-desktop-cylinder-type--pair {
+    .bc-desktop-cylinder-type--pair {
       display: flex;
       gap: 16px;
 
@@ -216,32 +216,32 @@
       }
     }
 
-    .od-desktop-cylinder-type--unit {
+    .bc-desktop-cylinder-type--unit {
       padding-inline-end: 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-cylinder-type--note {
+    .bc-desktop-cylinder-type--note {
       margin: 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    /* The footer's outlined buttons: the red of « Supprimer le compte » (--od-late), or the neutral outline. */
-    :global(.od-md3-dialog--actions) button.od-desktop-cylinder-type--delete,
-    :global(.od-md3-dialog--actions) button.od-desktop-cylinder-type--remove {
+    /* The footer's outlined buttons: the red of « Supprimer le compte » (--bc-late), or the neutral outline. */
+    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--delete,
+    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--remove {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 0 16px;
-      border: var(--od-outline-width) solid var(--od-text-2);
-      color: var(--od-text);
+      border: var(--bc-outline-width) solid var(--bc-text-2);
+      color: var(--bc-text);
     }
-    :global(.od-md3-dialog--actions) button.od-desktop-cylinder-type--delete {
-      border-color: var(--od-late);
-      color: var(--od-late-text);
+    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--delete {
+      border-color: var(--bc-late);
+      color: var(--bc-late-text);
     }
   }
 </style>

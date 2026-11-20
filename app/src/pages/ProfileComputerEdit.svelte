@@ -159,27 +159,27 @@
 </script>
 
 {#snippet generic()}
-  <span class="od-computer-edit--generic" aria-hidden="true"><Icon name="wristComputer" size={96} weight={1.4} /></span>
+  <span class="bc-computer-edit--generic" aria-hidden="true"><Icon name="wristComputer" size={96} weight={1.4} /></span>
 {/snippet}
 
 <!-- The image: Android phone, a white 192 box around the 160 photo; iPhone 176; a wide screen 160. The diver's own
      photo wins over the catalog's (docs/architecture.md, section 12). -->
 {#snippet picture()}
   {@const px = ios ? 176 : 160}
-  <div class="od-computer-edit--picture" class:od-computer-edit--picture-box={!ios && !wide} role="img" aria-label={t('gear.computerEdit.imageLabel')}>
+  <div class="bc-computer-edit--picture" class:bc-computer-edit--picture-box={!ios && !wide} role="img" aria-label={t('gear.computerEdit.imageLabel')}>
     <DcTile model={catalogModel} size={px} radius={16} photo={photoUrl} fallback={generic} />
   </div>
 {/snippet}
 
 {#snippet changeImage()}
-  <button type="button" class="od-computer-edit--change" onclick={() => fileInput?.click()}>
+  <button type="button" class="bc-computer-edit--change" onclick={() => fileInput?.click()}>
     {#if !ios}<Icon name="camera" size={20} />{/if}{t('gear.computerEdit.changeImage')}
   </button>
   {#if photoUrl}
-    <button type="button" class="od-computer-edit--remove-photo" onclick={removePhoto}>{t('gear.computerEdit.removeImage')}</button>
-    <p class="od-computer-edit--photo-note">{t('gear.computerEdit.photoNote')}</p>
+    <button type="button" class="bc-computer-edit--remove-photo" onclick={removePhoto}>{t('gear.computerEdit.removeImage')}</button>
+    <p class="bc-computer-edit--photo-note">{t('gear.computerEdit.photoNote')}</p>
   {/if}
-  <input bind:this={fileInput} class="od-computer-edit--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickPhoto} />
+  <input bind:this={fileInput} class="bc-computer-edit--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickPhoto} />
 {/snippet}
 
 {#snippet fields()}
@@ -191,77 +191,77 @@
     <TextField label={t('gear.pieceEdit.serial')} bind:value={serial} supporting={t('gear.pieceNew.serialHintComputer')} />
   {/if}
   <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
-  <div class="od-computer-edit--wide-note"><TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={t('gear.computerEdit.noteHint')} /></div>
+  <div class="bc-computer-edit--wide-note"><TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={t('gear.computerEdit.noteHint')} /></div>
 {/snippet}
 
 <!-- iPhone and iPad: grouped lists, label on the left, the value typed on the right (docs/mockups/ios-profil-piece-modifier.dc.html). -->
 {#snippet iosFields()}
-  <div class="od-computer-edit--group" role="list">
-    <label class="od-computer-edit--ios-row"><span>{t('gear.pieceEdit.brand')}</span><input list="od-computer-edit-brands" bind:value={brand} autocomplete="off" autocapitalize="words" /></label>
-    <label class="od-computer-edit--ios-row"><span>{t('gear.pieceEdit.model')}</span><input list="od-computer-edit-models" bind:value={model} autocomplete="off" autocapitalize="words" /></label>
+  <div class="bc-computer-edit--group" role="list">
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.brand')}</span><input list="od-computer-edit-brands" bind:value={brand} autocomplete="off" autocapitalize="words" /></label>
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.model')}</span><input list="od-computer-edit-models" bind:value={model} autocomplete="off" autocapitalize="words" /></label>
   </div>
   <datalist id="od-computer-edit-brands">{#each lists.vendors as v (v)}<option value={v}></option>{/each}</datalist>
   <datalist id="od-computer-edit-models">{#each lists.modelsOf(brand) as m (m)}<option value={m}></option>{/each}</datalist>
-  <p class="od-computer-edit--ios-footer">{t('gear.computerEdit.suggestHint')}</p>
-  <div class="od-computer-edit--group" role="list">
-    <label class="od-computer-edit--ios-row"><span>{t('gear.computerEdit.serialShort')}</span><input bind:value={serial} disabled={tied} /></label>
-    <label class="od-computer-edit--ios-row"><span>{t('gear.pieceEdit.purchasedOn')}</span><input bind:value={purchasedOn} inputmode="numeric" placeholder={dateHint()} aria-invalid={dateLive.error ? 'true' : undefined} /></label>
-    <label class="od-computer-edit--ios-row"><span>{t('gear.computerEdit.noteShort')}</span><input bind:value={note} placeholder={t('gear.computerEdit.optional')} /></label>
+  <p class="bc-computer-edit--ios-footer">{t('gear.computerEdit.suggestHint')}</p>
+  <div class="bc-computer-edit--group" role="list">
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.computerEdit.serialShort')}</span><input bind:value={serial} disabled={tied} /></label>
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.purchasedOn')}</span><input bind:value={purchasedOn} inputmode="numeric" placeholder={dateHint()} aria-invalid={dateLive.error ? 'true' : undefined} /></label>
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.computerEdit.noteShort')}</span><input bind:value={note} placeholder={t('gear.computerEdit.optional')} /></label>
   </div>
-  {#if dateLive.error}<p class="od-computer-edit--ios-footer od-computer-edit--ios-error">{dateLive.error}</p>{/if}
-  {#if tied}<p class="od-computer-edit--ios-footer">{t('gear.pieceEdit.readFromDownload')}</p>{/if}
+  {#if dateLive.error}<p class="bc-computer-edit--ios-footer bc-computer-edit--ios-error">{dateLive.error}</p>{/if}
+  {#if tied}<p class="bc-computer-edit--ios-footer">{t('gear.pieceEdit.readFromDownload')}</p>{/if}
 {/snippet}
 
 {#snippet deleteButton()}
-  <button type="button" class="od-computer-edit--delete-button" disabled={gear.readOnly} onclick={() => (confirmDelete = true)}>
+  <button type="button" class="bc-computer-edit--delete-button" disabled={gear.readOnly} onclick={() => (confirmDelete = true)}>
     {#if !ios}<Icon name="archive" size={20} />{/if}{t('gear.retire.button')}
   </button>
 {/snippet}
 
 {#snippet body()}
   <ReadOnlyNotice />
-  <h1 class="od-computer-edit--title">{t('gear.computerEdit.title')}</h1>
+  <h1 class="bc-computer-edit--title">{t('gear.computerEdit.title')}</h1>
 
   {#if wide}
     <!-- Tablet and desktop: the dialog of « Nouvelle pièce »; the image on the left, the fields in two columns. -->
-    <div class="od-computer-edit--wide">
-      <div class="od-computer-edit--image">{@render picture()}{@render changeImage()}</div>
+    <div class="bc-computer-edit--wide">
+      <div class="bc-computer-edit--image">{@render picture()}{@render changeImage()}</div>
       {#if ios}
-        <div class="od-computer-edit--ios-column">{@render iosFields()}</div>
+        <div class="bc-computer-edit--ios-column">{@render iosFields()}</div>
       {:else}
-        <div class="od-computer-edit--fields od-computer-edit--fields-wide">{@render fields()}</div>
+        <div class="bc-computer-edit--fields bc-computer-edit--fields-wide">{@render fields()}</div>
       {/if}
     </div>
-    <div class="od-computer-edit--delete od-computer-edit--delete-wide">{@render deleteButton()}</div>
+    <div class="bc-computer-edit--delete bc-computer-edit--delete-wide">{@render deleteButton()}</div>
   {:else}
-    <div class="od-computer-edit--image">{@render picture()}{@render changeImage()}</div>
+    <div class="bc-computer-edit--image">{@render picture()}{@render changeImage()}</div>
     {#if ios}
-      <div class="od-computer-edit--ios-column">{@render iosFields()}</div>
-      <div class="od-computer-edit--group od-computer-edit--group-delete">{@render deleteButton()}</div>
+      <div class="bc-computer-edit--ios-column">{@render iosFields()}</div>
+      <div class="bc-computer-edit--group bc-computer-edit--group-delete">{@render deleteButton()}</div>
     {:else}
-      <div class="od-computer-edit--fields">{@render fields()}</div>
-      <div class="od-computer-edit--delete">{@render deleteButton()}</div>
+      <div class="bc-computer-edit--fields">{@render fields()}</div>
+      <div class="bc-computer-edit--delete">{@render deleteButton()}</div>
     {/if}
   {/if}
-  <div class="od-computer-edit--bottom"></div>
+  <div class="bc-computer-edit--bottom"></div>
 {/snippet}
 
-<Page class="od-computer-edit{ios ? ' od-computer-edit--ios' : ''}">
+<Page class="bc-computer-edit{ios ? ' bc-computer-edit--ios' : ''}">
   <Navbar>
     {#snippet left()}
       {#if ios}
         <a href="#close" class="link external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>{t('gear.retire.cancel')}</a>
       {:else}
         <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-          <Icon name="close" /><span class="od-sr-only">{t('gear.pieceEdit.close')}</span>
+          <Icon name="close" /><span class="bc-sr-only">{t('gear.pieceEdit.close')}</span>
         </a>
       {/if}
     {/snippet}
     {#snippet right()}
       {#if ios}
-        <button type="button" class="od-computer-edit--ios-ok" disabled={!canSave} onclick={save}>{t('gear.computerEdit.ok')}</button>
+        <button type="button" class="bc-computer-edit--ios-ok" disabled={!canSave} onclick={save}>{t('gear.computerEdit.ok')}</button>
       {:else}
-        <button type="button" class="od-computer-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
+        <button type="button" class="bc-computer-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
       {/if}
     {/snippet}
   </Navbar>
@@ -278,37 +278,37 @@
 
 <style>
   @layer od.components {
-    :global(.od-computer-edit .page-content) {
+    :global(.bc-computer-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-computer-edit--save {
+    .bc-computer-edit--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-computer-edit--save:disabled {
+    .bc-computer-edit--save:disabled {
       opacity: 0.38;
     }
 
-    .od-computer-edit--title {
+    .bc-computer-edit--title {
       margin: 4px 20px 0;
       font-size: 28px;
       line-height: 36px;
       font-weight: 500;
       text-wrap: balance;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-computer-edit--image {
+    .bc-computer-edit--image {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
@@ -316,7 +316,7 @@
       gap: 12px;
     }
 
-    .od-computer-edit--picture {
+    .bc-computer-edit--picture {
       width: 160px;
       height: 160px;
       border-radius: 16px;
@@ -324,32 +324,32 @@
     }
 
     /* Android phone: the 160 photo on a white 192 box with 28 dp corners. */
-    .od-computer-edit--picture-box {
+    .bc-computer-edit--picture-box {
       width: 192px;
       height: 192px;
       border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-photo-ground);
+      background: var(--bc-photo-ground);
     }
 
-    :global(.ios) .od-computer-edit--picture {
+    :global(.ios) .bc-computer-edit--picture {
       width: 176px;
       height: 176px;
     }
 
-    .od-computer-edit--generic {
+    .bc-computer-edit--generic {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-selected-container);
-      color: var(--od-secondary);
+      background: var(--bc-selected-container);
+      color: var(--bc-secondary);
     }
 
-    :global(.ios) .od-computer-edit--change {
+    :global(.ios) .bc-computer-edit--change {
       height: 44px;
       padding: 0 12px;
       border: none;
@@ -357,20 +357,20 @@
       font-weight: 400;
     }
 
-    .od-computer-edit--wide {
+    .bc-computer-edit--wide {
       margin: 8px 24px 0;
       display: flex;
       gap: 20px;
       align-items: flex-start;
 
-      .od-computer-edit--image {
+      .bc-computer-edit--image {
         margin: 0;
         flex: none;
         width: 160px;
       }
     }
 
-    .od-computer-edit--fields-wide {
+    .bc-computer-edit--fields-wide {
       margin: 0;
       flex: 1;
       min-width: 0;
@@ -378,24 +378,24 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
 
-      .od-computer-edit--wide-note {
+      .bc-computer-edit--wide-note {
         grid-column: 1 / 3;
       }
     }
 
-    .od-computer-edit--delete-wide {
+    .bc-computer-edit--delete-wide {
       margin: 20px 24px 0;
       justify-content: flex-start;
     }
 
     /* Outlined, not red: retiring keeps the history (task 2026-11-19-308). */
-    .od-computer-edit--delete-button {
+    .bc-computer-edit--delete-button {
       height: 48px;
       padding: 0 20px;
-      border: 1px solid var(--od-outline);
+      border: 1px solid var(--bc-outline);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -404,27 +404,27 @@
       gap: 8px;
     }
 
-    .od-computer-edit--delete-button:disabled {
+    .bc-computer-edit--delete-button:disabled {
       opacity: 0.38;
     }
 
     /* iPhone and iPad: grouped lists (10 pt corners, 44 pt rows, hairlines), footers in grey 13 pt. */
-    .od-computer-edit--ios-column {
+    .bc-computer-edit--ios-column {
       margin: 8px 16px 0;
     }
 
-    .od-computer-edit--group {
+    .bc-computer-edit--group {
       margin-top: 16px;
       border-radius: 10px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-computer-edit--ios-column > .od-computer-edit--group:first-child {
+    .bc-computer-edit--ios-column > .bc-computer-edit--group:first-child {
       margin-top: 0;
     }
 
-    .od-computer-edit--ios-row {
+    .bc-computer-edit--ios-row {
       min-height: 44px;
       padding: 6px 16px;
       box-sizing: border-box;
@@ -432,7 +432,7 @@
       align-items: center;
       gap: 12px;
       font-size: 17px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       > span {
         flex: none;
@@ -447,57 +447,57 @@
         padding: 0;
         border: none;
         background: transparent;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         text-align: start;
       }
 
       > input:disabled {
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       > input::placeholder {
-        color: var(--od-text-3, #C7C7CC);
+        color: var(--bc-text-3, #C7C7CC);
       }
 
-      + .od-computer-edit--ios-row {
-        border-top: 0.5px solid var(--od-row-divider);
+      + .bc-computer-edit--ios-row {
+        border-top: 0.5px solid var(--bc-row-divider);
         margin-inline-start: 16px;
         padding-inline-start: 0;
       }
     }
 
-    .od-computer-edit--ios-footer {
+    .bc-computer-edit--ios-footer {
       margin: 6px 16px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-computer-edit--ios-error {
-      color: var(--od-alarm);
+    .bc-computer-edit--ios-error {
+      color: var(--bc-alarm);
     }
 
-    .od-computer-edit--ios-ok {
+    .bc-computer-edit--ios-ok {
       width: auto;
       height: 44px;
       padding: 0 8px;
       border: none;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 17px;
       font-weight: 600;
     }
 
-    .od-computer-edit--ios-ok:disabled {
+    .bc-computer-edit--ios-ok:disabled {
       opacity: 0.38;
     }
 
-    .od-computer-edit--group-delete {
+    .bc-computer-edit--group-delete {
       margin: 24px 16px 0;
 
-      .od-computer-edit--delete-button {
+      .bc-computer-edit--delete-button {
         width: 100%;
         height: 44px;
         border-radius: 0;
@@ -505,17 +505,17 @@
         font-size: 17px;
         font-weight: 400;
         border: none;
-        color: var(--od-secondary);
+        color: var(--bc-secondary);
       }
     }
 
-    .od-computer-edit--change {
+    .bc-computer-edit--change {
       height: 48px;
       padding: 0 20px;
-      border: 1px solid var(--od-outline);
+      border: 1px solid var(--bc-outline);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -524,37 +524,37 @@
       gap: 8px;
     }
 
-    .od-computer-edit--remove-photo {
+    .bc-computer-edit--remove-photo {
       height: 40px;
       padding: 0 16px;
       border: none;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-computer-edit--photo-note {
+    .bc-computer-edit--photo-note {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
 
-    .od-computer-edit--file {
+    .bc-computer-edit--file {
       display: none;
     }
 
-    .od-computer-edit--fields {
+    .bc-computer-edit--fields {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .od-computer-edit--delete {
+    .bc-computer-edit--delete {
       margin: 24px 16px 0;
       display: flex;
       justify-content: center;
@@ -562,10 +562,10 @@
       button {
         height: 48px;
         padding: 0 20px;
-        border: 1px solid var(--od-outline);
+        border: 1px solid var(--bc-outline);
         border-radius: 24px;
         background: transparent;
-        color: var(--od-secondary);
+        color: var(--bc-secondary);
         font: inherit;
         font-size: 14px;
         font-weight: 500;
@@ -579,8 +579,8 @@
       }
     }
 
-    .od-computer-edit--bottom {
-      height: calc(24px + var(--od-safe-bottom));
+    .bc-computer-edit--bottom {
+      height: calc(24px + var(--bc-safe-bottom));
     }
   }
 </style>

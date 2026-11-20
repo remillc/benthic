@@ -17,23 +17,23 @@
   let name = $state('Plongeur d’essai');
 </script>
 
-<div class="od-dev-google-sheet" role="dialog" aria-modal="true" aria-label={text.badge}>
-  <form class="od-dev-google-sheet--panel" onsubmit={(e) => { e.preventDefault(); if (!busy) onsubmit({ email, name }); }}>
-    <span class="od-dev-google-sheet--badge">{text.badge}</span>
-    <p class="od-dev-google-sheet--lead">{text.lead}</p>
-    <label class="od-dev-google-sheet--field"><span>{text.email}</span><input type="email" bind:value={email} autocapitalize="off" autocomplete="off" /></label>
-    <label class="od-dev-google-sheet--field"><span>{text.name}</span><input type="text" bind:value={name} autocomplete="off" /></label>
-    {#if error}<p class="od-dev-google-sheet--error" role="alert">{error}</p>{/if}
-    <div class="od-dev-google-sheet--actions">
-      <button type="button" class="od-dev-google-sheet--cancel" onclick={oncancel}>{text.cancel}</button>
-      <button type="submit" class="od-dev-google-sheet--go" disabled={busy || !email.trim()}>{text.go}</button>
+<div class="bc-dev-google-sheet" role="dialog" aria-modal="true" aria-label={text.badge}>
+  <form class="bc-dev-google-sheet--panel" onsubmit={(e) => { e.preventDefault(); if (!busy) onsubmit({ email, name }); }}>
+    <span class="bc-dev-google-sheet--badge">{text.badge}</span>
+    <p class="bc-dev-google-sheet--lead">{text.lead}</p>
+    <label class="bc-dev-google-sheet--field"><span>{text.email}</span><input type="email" bind:value={email} autocapitalize="off" autocomplete="off" /></label>
+    <label class="bc-dev-google-sheet--field"><span>{text.name}</span><input type="text" bind:value={name} autocomplete="off" /></label>
+    {#if error}<p class="bc-dev-google-sheet--error" role="alert">{error}</p>{/if}
+    <div class="bc-dev-google-sheet--actions">
+      <button type="button" class="bc-dev-google-sheet--cancel" onclick={oncancel}>{text.cancel}</button>
+      <button type="submit" class="bc-dev-google-sheet--go" disabled={busy || !email.trim()}>{text.go}</button>
     </div>
   </form>
 </div>
 
 <style>
   @layer od.components {
-    .od-dev-google-sheet {
+    .bc-dev-google-sheet {
       position: fixed;
       inset: 0;
       z-index: 20000;
@@ -43,68 +43,68 @@
       background: rgb(0 0 0 / 0.45);
     }
 
-    .od-dev-google-sheet--panel {
+    .bc-dev-google-sheet--panel {
       box-sizing: border-box;
       width: 100%;
       max-width: 480px;
       padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
       border-radius: 20px 20px 0 0;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-dev-google-sheet--badge {
+    .bc-dev-google-sheet--badge {
       align-self: flex-start;
       padding: 4px 10px;
-      border: 2px dashed var(--od-alarm, #b3261e);
+      border: 2px dashed var(--bc-alarm, #b3261e);
       border-radius: 8px;
-      color: var(--od-alarm, #b3261e);
+      color: var(--bc-alarm, #b3261e);
       font-size: 13px;
       font-weight: 600;
     }
 
-    .od-dev-google-sheet--lead {
+    .bc-dev-google-sheet--lead {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dev-google-sheet--field {
+    .bc-dev-google-sheet--field {
       display: flex;
       flex-direction: column;
       gap: 4px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       input {
         height: 44px;
         padding: 0 12px;
-        border: 1px solid var(--od-release-field-border);
+        border: 1px solid var(--bc-release-field-border);
         border-radius: 10px;
-        background: var(--od-surface);
-        color: var(--od-text);
+        background: var(--bc-surface);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
       }
     }
 
-    .od-dev-google-sheet--error {
+    .bc-dev-google-sheet--error {
       margin: 0;
-      color: var(--od-alarm, #b3261e);
+      color: var(--bc-alarm, #b3261e);
       font-size: 14px;
     }
 
-    .od-dev-google-sheet--actions {
+    .bc-dev-google-sheet--actions {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
     }
 
-    .od-dev-google-sheet--cancel,
-    .od-dev-google-sheet--go {
+    .bc-dev-google-sheet--cancel,
+    .bc-dev-google-sheet--go {
       height: 44px;
       padding: 0 20px;
       border: none;
@@ -114,14 +114,14 @@
       cursor: pointer;
     }
 
-    .od-dev-google-sheet--cancel {
+    .bc-dev-google-sheet--cancel {
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dev-google-sheet--go {
-      background: var(--od-release-row-main);
-      color: var(--od-release-on-panel);
+    .bc-dev-google-sheet--go {
+      background: var(--bc-release-row-main);
+      color: var(--bc-release-on-panel);
 
       &:disabled {
         opacity: 0.5;

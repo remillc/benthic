@@ -107,7 +107,7 @@
   }
 </script>
 
-<EditorialPage class="od-bring-logbook"
+<EditorialPage class="bc-bring-logbook"
   title={signedIn ? t('bringLogbook.signedInTitle') : t('createAccount.title')}
   step={signedIn ? '' : t('createAccount.step2')}
   heading={t('bringLogbook.heading')}
@@ -121,33 +121,33 @@
   previous
   back={!signedIn}
 >
-  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
-  <div class="od-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
+  <input type="file" class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <div class="bc-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
     {#if deviceCount}
       <!-- The dives already on this device come first when there are some. -->
-      <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'device'} onselect={() => (source = 'device')} disabled={busy}>
-        <span class="od-bring-logbook--text">
-          <span class="od-bring-logbook--label">{t('bringLogbook.device', { n: deviceCount })}</span>
-          <span class="od-bring-logbook--consequence">{t('bringLogbook.deviceText')}</span>
+      <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'device'} onselect={() => (source = 'device')} disabled={busy}>
+        <span class="bc-bring-logbook--text">
+          <span class="bc-bring-logbook--label">{t('bringLogbook.device', { n: deviceCount })}</span>
+          <span class="bc-bring-logbook--consequence">{t('bringLogbook.deviceText')}</span>
         </span>
       </ChoiceRow>
     {/if}
     <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
-    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'empty'} onselect={() => (source = 'empty')} disabled={busy}>
-      <span class="od-bring-logbook--text">
-        <span class="od-bring-logbook--label">{t('bringLogbook.empty')}</span>
+    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'empty'} onselect={() => (source = 'empty')} disabled={busy}>
+      <span class="bc-bring-logbook--text">
+        <span class="bc-bring-logbook--label">{t('bringLogbook.empty')}</span>
       </span>
     </ChoiceRow>
     <!-- Android: the chosen source and its fields form one tinted block. -->
-    <div class="od-bring-logbook--block" class:od-bring-logbook--open={source === 'divelogs' && !theme.ios}>
-    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'divelogs'} onselect={() => (source = 'divelogs')} disabled={busy} tinted={false}>
-      <span class="od-bring-logbook--text">
-        <span class="od-bring-logbook--label">{t('bringLogbook.divelogs')}</span>
-        <span class="od-bring-logbook--consequence">{t('bringLogbook.divelogsText')}</span>
+    <div class="bc-bring-logbook--block" class:bc-bring-logbook--open={source === 'divelogs' && !theme.ios}>
+    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'divelogs'} onselect={() => (source = 'divelogs')} disabled={busy} tinted={false}>
+      <span class="bc-bring-logbook--text">
+        <span class="bc-bring-logbook--label">{t('bringLogbook.divelogs')}</span>
+        <span class="bc-bring-logbook--consequence">{t('bringLogbook.divelogsText')}</span>
       </span>
     </ChoiceRow>
     {#if source === 'divelogs'}
-      <div class="od-bring-logbook--credentials">
+      <div class="bc-bring-logbook--credentials">
         <TextField label={t('bringLogbook.user')} bind:value={user} autocomplete="username" disabled={busy} />
         <TextField
           label={t('bringLogbook.password')}
@@ -161,10 +161,10 @@
       </div>
     {/if}
     </div>
-    <ChoiceRow class="od-bring-logbook--source" name="od-source" selected={source === 'file'} onselect={() => (source = 'file')} disabled={busy}>
-      <span class="od-bring-logbook--text">
-        <span class="od-bring-logbook--label">{t('bringLogbook.file')}</span>
-        <span class="od-bring-logbook--consequence">{t('bringLogbook.fileText')}</span>
+    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'file'} onselect={() => (source = 'file')} disabled={busy}>
+      <span class="bc-bring-logbook--text">
+        <span class="bc-bring-logbook--label">{t('bringLogbook.file')}</span>
+        <span class="bc-bring-logbook--consequence">{t('bringLogbook.fileText')}</span>
       </span>
     </ChoiceRow>
   </div>
@@ -173,36 +173,36 @@
 <style>
   @layer od.components {
     /* Android: plain rows on the page, the chosen one tinted and checked (no radio button). */
-    .od-bring-logbook--sources {
+    .bc-bring-logbook--sources {
       margin: 12px 16px 0;
       display: flex;
       flex-direction: column;
     }
 
-    :global(.od-bring-logbook--source) {
+    :global(.bc-bring-logbook--source) {
       align-items: flex-start;
     }
 
     /* The chosen source and its fields: one block, option on top, fields under it. */
-    .od-bring-logbook--block {
+    .bc-bring-logbook--block {
       border-radius: 12px;
 
-      &.od-bring-logbook--open {
-        background: var(--od-surface-container-highest);
+      &.bc-bring-logbook--open {
+        background: var(--bc-surface-container-highest);
 
         /* The fields sit on the page background. */
-        .od-bring-logbook--credentials {
-          --od-surface-2: var(--od-background);
+        .bc-bring-logbook--credentials {
+          --bc-surface-2: var(--bc-background);
         }
 
-        :global(.od-bring-logbook--source) {
+        :global(.bc-bring-logbook--source) {
           padding-bottom: 4px;
           border-radius: 12px 12px 0 0;
         }
       }
     }
 
-    .od-bring-logbook--text {
+    .bc-bring-logbook--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -210,34 +210,34 @@
       gap: 2px;
     }
 
-    .od-bring-logbook--label {
+    .bc-bring-logbook--label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-bring-logbook--consequence {
+    .bc-bring-logbook--consequence {
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Under the divelogs.de choice, aligned with its text. */
-    .od-bring-logbook--credentials {
+    .bc-bring-logbook--credentials {
       margin: 0;
       padding: 8px 12px 12px 48px;
       border-radius: 0 0 12px 12px;
-      --od-field-margin: 0;
+      --bc-field-margin: 0;
     }
 
     /* iOS: a white inset group, a check mark for the choice. */
-    :global(.ios) .od-bring-logbook--sources {
+    :global(.ios) .bc-bring-logbook--sources {
       margin-top: 16px;
       border-radius: 20px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
-      :global(.od-bring-logbook--source) {
+      :global(.bc-bring-logbook--source) {
         gap: 12px;
         padding: 12px 16px;
 
@@ -246,35 +246,35 @@
         }
       }
 
-      :global(.od-bring-logbook--source + .od-bring-logbook--source),
-      .od-bring-logbook--block {
-        box-shadow: inset 0 0.5px 0 var(--od-separator);
+      :global(.bc-bring-logbook--source + .bc-bring-logbook--source),
+      .bc-bring-logbook--block {
+        box-shadow: inset 0 0.5px 0 var(--bc-separator);
       }
 
-      :global(.od-bring-logbook--block + .od-bring-logbook--source) {
-        box-shadow: inset 0 0.5px 0 var(--od-separator);
+      :global(.bc-bring-logbook--block + .bc-bring-logbook--source) {
+        box-shadow: inset 0 0.5px 0 var(--bc-separator);
       }
 
-      .od-bring-logbook--text {
+      .bc-bring-logbook--text {
         gap: 3px;
       }
 
-      .od-bring-logbook--label {
+      .bc-bring-logbook--label {
         font-size: 17px;
         font-weight: 600;
       }
 
-      .od-bring-logbook--consequence {
+      .bc-bring-logbook--consequence {
         font-size: 13px;
         line-height: 18px;
         letter-spacing: 0;
       }
 
-      .od-bring-logbook--block {
+      .bc-bring-logbook--block {
         border-radius: 0;
       }
 
-      .od-bring-logbook--credentials {
+      .bc-bring-logbook--credentials {
         padding: 0 16px 12px 50px;
       }
     }

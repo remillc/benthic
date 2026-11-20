@@ -36,18 +36,18 @@
   }
 </script>
 
-<Md3Dialog class="od-shared-report" title={t('sharedSites.report.title')} text={t('sharedSites.report.text', { name })} {oncancel}>
-  <div class="od-shared-report--reasons" role="radiogroup" aria-label={t('sharedSites.report.title')}>
+<Md3Dialog class="bc-shared-report" title={t('sharedSites.report.title')} text={t('sharedSites.report.text', { name })} {oncancel}>
+  <div class="bc-shared-report--reasons" role="radiogroup" aria-label={t('sharedSites.report.title')}>
     {#each REPORT_REASONS as r (r)}
-      <ChoiceRow class="od-shared-report--reason" name={group} selected={reason === r} onselect={() => (reason = r)}>
-        <span class="od-shared-report--label">
+      <ChoiceRow class="bc-shared-report--reason" name={group} selected={reason === r} onselect={() => (reason = r)}>
+        <span class="bc-shared-report--label">
           {t(`sharedSites.report.reasons.${r}`)}
-          {#if r === 'wrong_position'}<span class="od-shared-report--hint">{t('sharedSites.report.wrongPositionHint')}</span>{/if}
+          {#if r === 'wrong_position'}<span class="bc-shared-report--hint">{t('sharedSites.report.wrongPositionHint')}</span>{/if}
         </span>
       </ChoiceRow>
     {/each}
   </div>
-  <div class="od-shared-report--details">
+  <div class="bc-shared-report--details">
     <TextField
       label={t('sharedSites.report.details')}
       bind:value={details}
@@ -64,30 +64,30 @@
 
 <style>
   @layer od.components {
-    .od-shared-report--reasons {
+    .bc-shared-report--reasons {
       display: flex;
       flex-direction: column;
       padding: 0 12px;
     }
-    :global(.od-shared-report--reason) {
+    :global(.bc-shared-report--reason) {
       min-height: 48px;
       padding: 0 12px;
     }
-    .od-shared-report--label {
+    .bc-shared-report--label {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
       font-size: 16px;
     }
-    .od-shared-report--hint {
+    .bc-shared-report--hint {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-report--details {
+    .bc-shared-report--details {
       margin-top: 8px;
-      --od-field-margin: 24px;
+      --bc-field-margin: 24px;
     }
   }
 </style>

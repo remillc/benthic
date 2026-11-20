@@ -31,21 +31,21 @@
   });
 </script>
 
-<span class="od-progress-line">
-  <span class="od-progress-line--count" aria-hidden="true">{count}</span>
-  <span class="od-progress-line--left" aria-hidden="true">{short}</span>
-  <span class="od-sr-only">{spoken}</span>
+<span class="bc-progress-line">
+  <span class="bc-progress-line--count" aria-hidden="true">{count}</span>
+  <span class="bc-progress-line--left" aria-hidden="true">{short}</span>
+  <span class="bc-sr-only">{spoken}</span>
 </span>
 
 <style>
   @layer od.components {
-    .od-progress-line {
+    .bc-progress-line {
       display: flex;
       justify-content: space-between;
       gap: 12px;
     }
 
-    .od-progress-line--left {
+    .bc-progress-line--left {
       white-space: nowrap;
       text-align: end;
     }

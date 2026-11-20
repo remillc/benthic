@@ -62,7 +62,7 @@
   }
 </script>
 
-<EditorialPage class="od-sign-in"
+<EditorialPage class="bc-sign-in"
   helpLink={welcome}
   firstLaunch={welcome}
   title={t('signIn.title')}
@@ -74,7 +74,7 @@
   actionDisabled={!email.trim() || !password}
   onaction={signIn}
 >
-  <div class="od-sign-in--fields">
+  <div class="bc-sign-in--fields">
     <AccountField
       label={t(look ? 'firstLaunch.signIn.email' : 'signIn.email')}
       rowLabel={t('accountStep.emailRow')}
@@ -105,11 +105,11 @@
 
 <style>
   @layer od.components {
-    .od-sign-in--fields {
+    .bc-sign-in--fields {
       margin: 6px 0 0;
 
       /* Alpha first launch on a phone: the outlined fields carry their own spacing. */
-      :global(.od-editorial-page--first-launch) & {
+      :global(.bc-editorial-page--first-launch) & {
         margin: 0;
       }
 

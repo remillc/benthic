@@ -127,130 +127,130 @@
 </script>
 
 {#snippet branchAndToken()}
-  <ReleaseField class="od-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} oninput={edited} />
-  <ReleaseField class="od-first-launch-git--token" label={t('welcomeSteps.gitToken')} bind:value={token} type="password" error={tokenLive.error} disabled={busy} />
+  <ReleaseField class="bc-first-launch-git--branch" label={t('welcomeSteps.gitBranch')} bind:value={branch} mono disabled={busy} oninput={edited} />
+  <ReleaseField class="bc-first-launch-git--token" label={t('welcomeSteps.gitToken')} bind:value={token} type="password" error={tokenLive.error} disabled={busy} />
 {/snippet}
 
-<div class="od-first-launch-git">
+<div class="bc-first-launch-git">
   <ReleaseField label={t('welcomeSteps.gitAddress')} bind:value={url} mono error={addressLive.error || problemText} disabled={busy} autocomplete="url" oninput={edited} />
   {#if iosPhone(ios, layout.phone)}
     <!-- iPhone: the three fields are rows of one grouped list (task 2026-11-16-261), not a pair side by side. -->
     {@render branchAndToken()}
   {:else}
-    <div class="od-first-launch-git--pair">
+    <div class="bc-first-launch-git--pair">
       {@render branchAndToken()}
     </div>
   {/if}
   {#if problem}
     <!-- The repository does not fit this path (mock-ups …-git-erreur-paysage, …-ouvrir-git-erreur-paysage). -->
-    <p class="od-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="od-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
+    <p class="bc-first-launch-git--hint">{hint[0]}<a href={create ? '/welcome/open' : '/welcome/new'} class="bc-first-launch-git--link" onclick={switchPath}>{switchText}</a>{hint[1]}</p>
   {:else}
-    <div class="od-first-launch-git--token-help" class:od-first-launch-git--token-help-ios={iosPhone(ios, layout.phone)}>
+    <div class="bc-first-launch-git--token-help" class:bc-first-launch-git--token-help-ios={iosPhone(ios, layout.phone)}>
       <span>{t(deviceKey('welcomeSteps.gitTokenHelp', deviceKind({ phone: layout.phone, ios, desktop: desktopApp })))}</span>
-      <a href="/welcome/git/token" class="od-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
+      <a href="/welcome/git/token" class="bc-first-launch-git--link" onclick={tokenHelp}>{t('welcomeSteps.gitTokenLink')}</a>
     </div>
 
     {#if create}
-      <p class="od-first-launch-git--note">
-        <span class="od-first-launch-git--note-icon"><Icon name="info" size={20} /></span>
-        <span>{note[0]}<a href="/welcome/open" class="od-first-launch-git--link od-first-launch-git--inline" onclick={switchPath}>{t('welcomeSteps.openTitle')}</a>{note[1]}</span>
+      <p class="bc-first-launch-git--note">
+        <span class="bc-first-launch-git--note-icon"><Icon name="info" size={20} /></span>
+        <span>{note[0]}<a href="/welcome/open" class="bc-first-launch-git--link bc-first-launch-git--inline" onclick={switchPath}>{t('welcomeSteps.openTitle')}</a>{note[1]}</span>
       </p>
     {/if}
   {/if}
-  {#if formError}<p class="od-first-launch-git--error" role="alert">{formError}</p>{/if}
+  {#if formError}<p class="bc-first-launch-git--error" role="alert">{formError}</p>{/if}
 
-  <button type="button" class="od-first-launch-git--action" disabled={!ready} aria-busy={busy} onclick={run}>
+  <button type="button" class="bc-first-launch-git--action" disabled={!ready} aria-busy={busy} onclick={run}>
     {busy ? t(create ? 'welcomeSteps.creating' : 'welcomeSteps.opening') : t(create ? 'welcomeSteps.createLogbook' : 'welcomeSteps.openLogbook')}
   </button>
 </div>
 
 <style>
   @layer od.components {
-    .od-first-launch-git {
+    .bc-first-launch-git {
       display: flex;
       flex-direction: column;
     }
 
-    .od-first-launch-git--pair {
+    .bc-first-launch-git--pair {
       display: flex;
       gap: 12px;
 
-      :global(.od-first-launch-git--branch) {
+      :global(.bc-first-launch-git--branch) {
         width: 160px;
         flex: none;
       }
 
-      :global(.od-first-launch-git--token) {
+      :global(.bc-first-launch-git--token) {
         flex: 1;
       }
     }
 
     /* iPhone: the help under the card in iOS's secondary label colour. */
-    .od-first-launch-git--token-help.od-first-launch-git--token-help-ios {
-      color: var(--od-release-ios-help);
+    .bc-first-launch-git--token-help.bc-first-launch-git--token-help-ios {
+      color: var(--bc-release-ios-help);
     }
 
-    .od-first-launch-git--token-help {
+    .bc-first-launch-git--token-help {
       display: flex;
       justify-content: space-between;
       gap: 12px;
       margin: 4px 0 0 16px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-git--hint {
+    .bc-first-launch-git--hint {
       margin: 6px 0 0 16px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-git--link {
-      color: var(--od-release-row-main);
+    .bc-first-launch-git--link {
+      color: var(--bc-release-row-main);
       text-decoration: underline;
       cursor: pointer;
 
       @media (hover: hover) {
         &:hover {
-          color: var(--od-release-row-main-hover);
+          color: var(--bc-release-row-main-hover);
         }
       }
     }
 
-    .od-first-launch-git--inline {
+    .bc-first-launch-git--inline {
       text-underline-offset: 2px;
       white-space: nowrap;
     }
 
-    .od-first-launch-git--note {
+    .bc-first-launch-git--note {
       display: flex;
       gap: 10px;
       align-items: flex-start;
       margin: 18px 0 0;
       padding: 12px 14px;
       border-radius: 14px;
-      background: var(--od-release-note);
+      background: var(--bc-release-note);
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-first-launch-git--note-icon {
+    .bc-first-launch-git--note-icon {
       flex: none;
       display: flex;
-      color: var(--od-release-row-main);
+      color: var(--bc-release-row-main);
     }
 
-    .od-first-launch-git--error {
+    .bc-first-launch-git--error {
       margin: 14px 0 0;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-first-launch-git--action {
+    .bc-first-launch-git--action {
       width: auto;
       align-self: flex-end;
       margin-top: 22px;
@@ -258,8 +258,8 @@
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -280,13 +280,13 @@
 
 /* Phone (task 2026-11-16-227): the button takes the width of the column. */
     @media (max-width: 767.98px) {
-      .od-first-launch-git--action {
+      .bc-first-launch-git--action {
         align-self: stretch;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch-git--action {
+      .bc-first-launch-git--action {
         transition: none;
       }
     }

@@ -84,8 +84,8 @@
   ]);
 </script>
 
-<Page class="od-tools" onPageBeforeIn={readPlans}>
-  <Navbar large={theme.ios} class={theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-titled'} title={t('tools.title')}>
+<Page class="bc-tools" onPageBeforeIn={readPlans}>
+  <Navbar large={theme.ios} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-titled'} title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight><AccountAvatar /></NavRight>
   </Navbar>
@@ -93,29 +93,29 @@
   {#if !theme.ios}<BandBackdrop short />{/if}
   <SectionBand bare={!theme.ios} summary={t('band.tools')} />
 
-  <div class="od-tools--content">
-    <div class="od-tools--dive">
-      <a class="od-tools--card" href="/plans/">
-        <span class="od-tools--card-row">
-          <span class="od-tools--card-icon od-tools--plan-icon"><Icon name="plan" /></span>
-          <span class="od-tools--texts">
-            <span class="od-tools--card-title">{t('tools.planner')}</span>
-            <span class="od-tools--card-line">{plansText}</span>
+  <div class="bc-tools--content">
+    <div class="bc-tools--dive">
+      <a class="bc-tools--card" href="/plans/">
+        <span class="bc-tools--card-row">
+          <span class="bc-tools--card-icon bc-tools--plan-icon"><Icon name="plan" /></span>
+          <span class="bc-tools--texts">
+            <span class="bc-tools--card-title">{t('tools.planner')}</span>
+            <span class="bc-tools--card-line">{plansText}</span>
           </span>
-          <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-tools--chevron"><Icon name="chevron" size={20} /></span>
         </span>
       </a>
 
-      <a class="od-tools--card" href="/tools/desaturation" aria-label={desatLabel}>
-        <span class="od-tools--card-row">
-          <span class="od-tools--card-icon od-tools--desat-icon" class:od-tools--idle={desat?.kind === 'rest' || desat?.kind === 'empty'}>
+      <a class="bc-tools--card" href="/tools/desaturation" aria-label={desatLabel}>
+        <span class="bc-tools--card-row">
+          <span class="bc-tools--card-icon bc-tools--desat-icon" class:bc-tools--idle={desat?.kind === 'rest' || desat?.kind === 'empty'}>
             <Icon name="desaturation" />
           </span>
-          <span class="od-tools--texts">
-            <span class="od-tools--card-title">{t('tools.desaturation')}</span>
-            <span class="od-tools--card-line">
+          <span class="bc-tools--texts">
+            <span class="bc-tools--card-title">{t('tools.desaturation')}</span>
+            <span class="bc-tools--card-line">
               {#if desat?.kind === 'waiting'}
-                <span class="od-tools--flight od-value">{t('tools.flightIn', { time: wait })}</span>
+                <span class="bc-tools--flight bc-value">{t('tools.flightIn', { time: wait })}</span>
                 · {t('tools.diveAgo', { time: ago })}
               {:else if desat?.kind === 'allowed'}
                 {t('tools.flightAllowed')} · {t('tools.diveAgo', { time: ago })}
@@ -126,42 +126,42 @@
               {/if}
             </span>
           </span>
-          <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-tools--chevron"><Icon name="chevron" size={20} /></span>
         </span>
         {#if desat?.kind === 'waiting'}
-          <span class="od-tools--track" aria-hidden="true"><span class="od-tools--fill" style="width: {(desat.share * 100).toFixed(1)}%"></span></span>
+          <span class="bc-tools--track" aria-hidden="true"><span class="bc-tools--fill" style="width: {(desat.share * 100).toFixed(1)}%"></span></span>
         {/if}
       </a>
     </div>
 
-    <h2 class="od-tools--title">{t('tools.groupGas')}</h2>
+    <h2 class="bc-tools--title">{t('tools.groupGas')}</h2>
     <!-- One card, a row per tool, laid out like the Planificateur card (task 2026-11-14-128). -->
-    <div class="od-tools--gases" role="list">
+    <div class="bc-tools--gases" role="list">
       {#each gases as tool (tool.href)}
         <div role="listitem">
-          <a class="od-tools--gas" href={tool.href}>
-            <span class="od-tools--gas-icon od-tools--{tool.shape}"><Icon name={tool.icon} /></span>
-            <span class="od-tools--texts">
-              <span class="od-tools--card-title">{tool.name}</span>
-              <span class="od-tools--card-line">{tool.text}</span>
+          <a class="bc-tools--gas" href={tool.href}>
+            <span class="bc-tools--gas-icon bc-tools--{tool.shape}"><Icon name={tool.icon} /></span>
+            <span class="bc-tools--texts">
+              <span class="bc-tools--card-title">{tool.name}</span>
+              <span class="bc-tools--card-line">{tool.text}</span>
             </span>
-            <span class="od-tools--chevron"><Icon name="chevron" size={20} /></span>
+            <span class="bc-tools--chevron"><Icon name="chevron" size={20} /></span>
           </a>
         </div>
       {/each}
     </div>
   </div>
-  <div class="od-tools--bottom"></div>
+  <div class="bc-tools--bottom"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .od-tools--content {
+    .bc-tools--content {
       container-type: inline-size;
     }
 
     /* The two dive tools: one under the other on a phone, side by side when there is room. */
-    .od-tools--dive {
+    .bc-tools--dive {
       margin: 12px 16px 0;
       display: grid;
       grid-template-columns: 1fr;
@@ -169,27 +169,27 @@
     }
 
     @container (min-width: 600px) {
-      .od-tools--dive {
+      .bc-tools--dive {
         grid-template-columns: 1fr 1fr;
       }
     }
 
-    .od-tools--card {
+    .bc-tools--card {
       display: block;
       padding: 16px;
       border-radius: 28px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-tools--card-row {
+    .bc-tools--card-row {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-tools--card-icon {
+    .bc-tools--card-icon {
       flex: none;
       width: 40px;
       height: 40px;
@@ -199,95 +199,95 @@
       justify-content: center;
     }
 
-    .od-tools--plan-icon {
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+    .bc-tools--plan-icon {
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
     }
 
-    .od-tools--desat-icon {
-      background: var(--od-tertiary-container);
-      color: var(--od-tertiary);
+    .bc-tools--desat-icon {
+      background: var(--bc-tertiary-container);
+      color: var(--bc-tertiary);
 
-      &.od-tools--idle {
-        background: var(--od-idle-container);
-        color: var(--od-text-2);
+      &.bc-tools--idle {
+        background: var(--bc-idle-container);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-tools--texts {
+    .bc-tools--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-tools--card-title {
+    .bc-tools--card-title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-tools--card-line {
+    .bc-tools--card-line {
       min-height: 20px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-tools--flight {
-      color: var(--od-tertiary);
+    .bc-tools--flight {
+      color: var(--bc-tertiary);
       font-weight: 600;
     }
 
-    .od-tools--chevron {
+    .bc-tools--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The wait before flying: the share of it already behind, under the text (52 dp in). */
-    .od-tools--track {
+    .bc-tools--track {
       display: block;
       margin: 12px 0 0 52px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-flight-track);
+      background: var(--bc-flight-track);
       overflow: hidden;
     }
 
-    .od-tools--fill {
+    .bc-tools--fill {
       display: block;
       height: 100%;
       border-radius: 2px;
-      background: var(--od-tertiary);
+      background: var(--bc-tertiary);
     }
 
-    .od-tools--title {
+    .bc-tools--title {
       margin: 20px 16px 8px 20px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-tools--gases {
+    .bc-tools--gases {
       margin: 0 16px;
       border-radius: 28px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
-      [role='listitem'] + [role='listitem'] .od-tools--gas::before {
+      [role='listitem'] + [role='listitem'] .bc-tools--gas::before {
         content: '';
         position: absolute;
         top: 0;
         left: 68px;
         right: 0;
         height: 1px;
-        background: var(--od-row-divider);
+        background: var(--bc-row-divider);
       }
     }
 
-    .od-tools--gas {
+    .bc-tools--gas {
       position: relative;
       box-sizing: border-box;
       min-height: 72px;
@@ -295,35 +295,35 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
     /* Each tool keeps its shape, in the Material 3 Expressive spirit: rounded square, circle, leaf. */
-    .od-tools--gas-icon {
+    .bc-tools--gas-icon {
       flex: none;
       width: 40px;
       height: 40px;
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
 
-      &.od-tools--square {
+      &.bc-tools--square {
         border-radius: 14px;
       }
 
-      &.od-tools--circle {
+      &.bc-tools--circle {
         border-radius: 20px;
       }
 
-      &.od-tools--leaf {
+      &.bc-tools--leaf {
         border-radius: 10px 20px 10px 20px;
       }
     }
 
-    .od-tools--bottom {
+    .bc-tools--bottom {
       height: 24px;
     }
   }

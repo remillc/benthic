@@ -131,11 +131,11 @@
     const preview = logbook.preview;
     if (!preview) return;
     const flat = preview.entries.flatMap((entry) => (entry.type === 'trip' ? entry.dives : [entry.dive]));
-    const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.od-trip-row'));
+    const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.bc-trip-row'));
     const diveLink = /** @type {HTMLElement|null} */ (target.closest('a[data-dive]'));
     const dive = tripRow ? flat.find((d) => d.trip?.id === Number(tripRow.dataset.trip)) : flat.find((d) => String(d.id) === diveLink?.dataset.dive);
     if (!dive) return;
-    heldTap = { date: dive.date, number: dive.number, expand: !!tripRow && !!target.closest('.od-trip-row--expand') };
+    heldTap = { date: dive.date, number: dive.number, expand: !!tripRow && !!target.closest('.bc-trip-row--expand') };
   }
 
   // The held tap is replayed on the real row once the dives are loaded.
@@ -149,7 +149,7 @@
       // At start, only the logbook holds links to dives and trips.
       const href = dive.trip ? `/trips/${dive.trip.id}` : `/dives/${dive.id}`;
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
-      /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.od-trip-row--expand') : link)?.click();
+      /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.bc-trip-row--expand') : link)?.click();
     });
   });
 
@@ -197,7 +197,7 @@
 
   /** The ⋮ menu is placed for its items when it opens: it closes when the selection starts or ends. */
   function closeMenu() {
-    f7.popover.close('.od-logbook-menu', false);
+    f7.popover.close('.bc-logbook-menu', false);
   }
 
   /** @param {number} id */
@@ -432,7 +432,7 @@
   $effect(() => {
     neighbourTrips;
     checkedInTrip.length;
-    tick().then(() => /** @type {any} */ (f7.popover.get('.od-logbook-menu'))?.resize());
+    tick().then(() => /** @type {any} */ (f7.popover.get('.bc-logbook-menu'))?.resize());
   });
 
   // A new load gives new identifiers: the selection is left.
@@ -460,7 +460,7 @@
     let dragRow = null;
 
     /** @param {Event} e */
-    const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.od-dive-row--link'));
+    const diveOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('a.bc-dive-row--link'));
 
     /** The trip a long press is on: let go, it is selected. */
     let pressedTrip = 0;
@@ -471,8 +471,8 @@
       dragIds = null;
       pressedTrip = 0;
       const target = /** @type {HTMLElement} */ (e.target);
-      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.od-trip-row'));
-      if (tripRow && !target.closest('.od-trip-row--expand')) {
+      const tripRow = /** @type {HTMLElement|null} */ (target.closest('li.bc-trip-row'));
+      if (tripRow && !target.closest('.bc-trip-row--expand')) {
         startX = e.clientX;
         startY = e.clientY;
         timer = setTimeout(() => {
@@ -495,7 +495,7 @@
         pressed = true;
         dragIds = checked[id] ? Object.keys(checked).filter((k) => checked[Number(k)]).map(Number) : [id];
         dragRow = row.closest('li');
-        dragRow?.classList.add('od-logbook--drag-lift');
+        dragRow?.classList.add('bc-logbook--drag-lift');
       }, LONG_PRESS_MS);
     }
     /** @param {PointerEvent} e */
@@ -527,7 +527,7 @@
       }
       // A trip's arrow expands it in place (accordion), without opening it:
       // its button sits in the row's link, which Framework7 would follow.
-      const arrow = /** @type {HTMLElement} */ (e.target).closest('.od-trip-row .od-trip-row--expand');
+      const arrow = /** @type {HTMLElement} */ (e.target).closest('.bc-trip-row .bc-trip-row--expand');
       if (arrow) {
         e.preventDefault();
         e.stopPropagation();
@@ -536,7 +536,7 @@
       }
       if (!selecting) return;
       // In selection mode a dive or a trip is checked, not opened.
-      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.od-trip-row'));
+      const trip = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('li.bc-trip-row'));
       if (trip) {
         toggleTripChecked(Number(trip.dataset.trip));
         e.preventDefault();
@@ -579,13 +579,13 @@
       if (!dragRow) return;
       dragging = true;
       ghost = document.createElement('div');
-      ghost.className = 'od-logbook--drag-chip';
+      ghost.className = 'bc-logbook--drag-chip';
       ghost.innerHTML =
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13.5"/></svg>';
       label = document.createElement('span');
       ghost.append(label);
       document.body.append(ghost);
-      dragRow.classList.add('od-logbook--drag-source');
+      dragRow.classList.add('bc-logbook--drag-source');
       updateTarget();
       placeGhost();
       autoScroll();
@@ -605,14 +605,14 @@
      * @param {HTMLElement|null} row
      */
     function placeDropLine(row) {
-      let line = /** @type {HTMLElement|null} */ (document.querySelector('.od-logbook--drop-line'));
+      let line = /** @type {HTMLElement|null} */ (document.querySelector('.bc-logbook--drop-line'));
       if (!row) {
         line?.remove();
         return;
       }
       if (!line) {
         line = document.createElement('div');
-        line.className = 'od-logbook--drop-line';
+        line.className = 'bc-logbook--drop-line';
         document.body.append(line);
       }
       const rect = (row.querySelector('.item-content') ?? row).getBoundingClientRect();
@@ -622,7 +622,7 @@
     }
 
     function updateTarget() {
-      el?.querySelectorAll('.od-logbook--drop-target').forEach((n) => n.classList.remove('od-logbook--drop-target'));
+      el?.querySelectorAll('.bc-logbook--drop-target').forEach((n) => n.classList.remove('bc-logbook--drop-target'));
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
       const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
@@ -631,7 +631,7 @@
         const tripId = Number(li.dataset.trip) || 0;
         if (tripId && dragged.some((d) => d.trip?.id !== tripId)) {
           target = { action: 'add', tripId };
-          el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('od-logbook--drop-target'));
+          el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('bc-logbook--drop-target'));
         } else if (!tripId && dragged.some((d) => d.trip)) {
           target = { action: 'remove' };
         }
@@ -648,7 +648,7 @@
       } else {
         label.textContent = t('logbook.dragRemove');
       }
-      ghost?.classList.toggle('od-logbook--drag-chip-target', !!target);
+      ghost?.classList.toggle('bc-logbook--drag-chip-target', !!target);
       placeGhost();
     }
 
@@ -675,11 +675,11 @@
       dragging = false;
       cancelAnimationFrame(scrolling);
       // Every chip, also one left by a drag the list reload cut short.
-      document.querySelectorAll('.od-logbook--drag-chip, .od-logbook--drop-line').forEach((n) => n.remove());
+      document.querySelectorAll('.bc-logbook--drag-chip, .bc-logbook--drop-line').forEach((n) => n.remove());
       ghost = null;
       label = null;
-      dragRow?.classList.remove('od-logbook--drag-source', 'od-logbook--drag-lift');
-      el?.querySelectorAll('.od-logbook--drop-target').forEach((n) => n.classList.remove('od-logbook--drop-target'));
+      dragRow?.classList.remove('bc-logbook--drag-source', 'bc-logbook--drag-lift');
+      el?.querySelectorAll('.bc-logbook--drop-target').forEach((n) => n.classList.remove('bc-logbook--drop-target'));
     }
 
     async function drop() {
@@ -725,10 +725,10 @@
         e.stopPropagation();
         drop();
       } else {
-        if (document.querySelector('.od-logbook--drag-chip')) endDrag();
+        if (document.querySelector('.bc-logbook--drag-chip')) endDrag();
         // A long press let go without moving: the selection.
         if (dragIds) {
-          dragRow?.classList.remove('od-logbook--drag-lift');
+          dragRow?.classList.remove('bc-logbook--drag-lift');
           const id = dragIds[0];
           if (!selecting) startSelection(id);
           else checked[id] = true;
@@ -741,7 +741,7 @@
 
     function touchCancel() {
       if (dragging) endDrag();
-      dragRow?.classList.remove('od-logbook--drag-lift');
+      dragRow?.classList.remove('bc-logbook--drag-lift');
       dragIds = null;
       pressedTrip = 0;
     }
@@ -822,7 +822,7 @@
     const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
     // The emptied pane (PaneEmpty) is not a screen to keep: the desktop layout leaves it when the window narrows.
     const pane = listEl.closest('.view')?.querySelector('.page-master-detail');
-    if (!dive || autoOpening || (pane && !pane.classList.contains('od-pane-empty'))) return;
+    if (!dive || autoOpening || (pane && !pane.classList.contains('bc-pane-empty'))) return;
     autoOpening = true;
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
@@ -1239,7 +1239,7 @@
   function openSearch(e) {
     const page = /** @type {HTMLElement} */ (e.currentTarget).closest('.page');
     const content = /** @type {HTMLElement|null} */ (page?.querySelector('.page-content') ?? null);
-    const field = /** @type {HTMLInputElement|null} */ (page?.querySelector('.od-band-search input') ?? null);
+    const field = /** @type {HTMLInputElement|null} */ (page?.querySelector('.bc-band-search input') ?? null);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     content?.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
     // The field is focused once it is back on screen (no scroll jump from focus()).
@@ -1263,35 +1263,35 @@
   }
 </script>
 
-<Page data-od-scroll class="od-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="{theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-tall od-band-titled'} {showPill && !theme.ios ? 'od-band-pill' : ''}" title={t('logbook.title')}>
+<Page data-od-scroll class="bc-logbook" onPageInit={keepInSvelteRange}>
+  <Navbar large={theme.ios} class="{theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-tall bc-band-titled'} {showPill && !theme.ios ? 'bc-band-pill' : ''}" title={t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <!-- Scrolled, with the month headers in the band (Android, task 2026-11-14-125): the search
            field has left the screen, a search button takes its place. Then the avatar, and the
            page ⋮ always last. -->
       {#if !theme.ios && stickyGroup}
-        <Link iconOnly class="od-logbook--search-button" onClick={openSearch}>
+        <Link iconOnly class="bc-logbook--search-button" onClick={openSearch}>
           <Icon name="search" />
-          <span class="od-sr-only">{t('logbook.search')}</span>
+          <span class="bc-sr-only">{t('logbook.search')}</span>
         </Link>
       {/if}
       <!-- Android phone: the account, sync, Réglages and À propos (task 2026-11-14-120); iPhone: last. -->
       {#if !theme.ios}<AccountAvatar />{/if}
       {#if releaseEmpty}
         <!-- The empty logbook of the release edition on a tablet: the logbook's own menu (task 224). -->
-        <Link iconOnly popoverOpen=".od-logbook-empty-menu">
+        <Link iconOnly popoverOpen=".bc-logbook-empty-menu">
           <Icon name="more" weight={4} />
-          <span class="od-sr-only">{t('detail.moreOptions')}</span>
+          <span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {:else if logbook.dives.length || logbook.preview}
-        <Link iconOnly popoverOpen=".od-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
+        <Link iconOnly popoverOpen=".bc-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
-          <span class="od-sr-only">{t('detail.moreOptions')}</span>
+          <span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {/if}
       {#if theme.ios}
-        <Link iconOnly onClick={add}><Icon name="plus" /><span class="od-sr-only">{t('logbook.add')}</span></Link>
+        <Link iconOnly onClick={add}><Icon name="plus" /><span class="bc-sr-only">{t('logbook.add')}</span></Link>
         <!-- iPhone: the account initial after the other buttons (task 2026-11-14-127). -->
         <AccountAvatar />
       {/if}
@@ -1316,7 +1316,7 @@
         inline
         customSearch
         backdrop={false}
-        class={theme.ios ? 'od-ios-search' : 'od-band-search'}
+        class={theme.ios ? 'bc-ios-search' : 'bc-band-search'}
         placeholder={t('logbook.search')}
         onSearchbarSearch={(/** @type {any} */ _sb, /** @type {string} */ q) => (query = q)}
         onSearchbarClear={() => (query = '')}
@@ -1335,9 +1335,9 @@
     {#if filtered}
       <ActiveFilter prefs={logbook.prefs} dives={logbook.dives} shown={results ? results.length : sorted.length} />
     {:else if sorted.length && (results || selecting)}
-      <p class="od-logbook--count od-value" role="status">{count}{#if selecting}<span class="od-logbook--separator" aria-hidden="true">·</span><span class="od-logbook--count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
+      <p class="bc-logbook--count bc-value" role="status">{count}{#if selecting}<span class="bc-logbook--separator" aria-hidden="true">·</span><span class="bc-logbook--count-selected">{t('logbook.selected', { n: checkedCount })}</span>{/if}</p>
     {/if}
-    {#if filter.failed}<p class="od-logbook--count od-logbook--failed" role="status">{t('logbook.filterFailed')}</p>{/if}
+    {#if filter.failed}<p class="bc-logbook--count bc-logbook--failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
       Only offline or in manual synchronisation, when the logbook may be out of
       date, and while a "Sync" runs: the line stays, only its text and
@@ -1355,15 +1355,15 @@
       the list replaces them (their identifiers are of the previous load).
     -->
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-    <div class="od-logbook--preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
+    <div class="bc-logbook--preview" aria-busy="true" aria-label={t('logbook.loading')} role="status" onclickcapture={holdTap}>
       <div aria-hidden="true">
-        <p class="od-logbook--count od-value">{t('logbook.count', { n: logbook.preview.total })}</p>
-        <div class="list media-list {theme.ios && !cards ? 'chevron-center od-logbook--dividers' : ''} od-dive-list" class:od-logbook--cards={cards}>
+        <p class="bc-logbook--count bc-value">{t('logbook.count', { n: logbook.preview.total })}</p>
+        <div class="list media-list {theme.ios && !cards ? 'chevron-center bc-logbook--dividers' : ''} bc-dive-list" class:bc-logbook--cards={cards}>
           <ul>
             {#if cards}
               {#each previewRows as row (row.key)}
                 {#if row.kind === 'year'}
-                  <li class="od-logbook--year"><h2 class="od-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2></li>
+                  <li class="bc-logbook--year"><h2 class="bc-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2></li>
                 {:else if row.kind === 'trip'}
                   <TripRow dives={row.dives} location={row.location} prefs={logbook.preview.prefs} expanded={false} ontoggle={() => {}} card cardFirst={row.cardFirst} cardLast={row.cardLast} gapBefore={row.gapBefore} />
                 {:else}
@@ -1390,23 +1390,23 @@
       the logbook". Each bar is one line of text high, so that the rows keep
       their height when the dives arrive.
     -->
-    <div class="od-logbook--loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
+    <div class="bc-logbook--loading skeleton-effect-wave" aria-busy="true" aria-label={t('logbook.loading')} role="status">
       <div aria-hidden="true">
-        <p class="od-logbook--count"><span class="skeleton-block od-logbook--bar" style:width="7.5em"></span></p>
-        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} od-dive-list">
+        <p class="bc-logbook--count"><span class="skeleton-block bc-logbook--bar" style:width="7.5em"></span></p>
+        <List mediaList dividers={theme.ios} class="{theme.ios ? 'chevron-center' : ''} bc-dive-list">
           {#each Array(14) as _, i (i)}
             <li>
               <!-- item-link: the same chevron space as the real rows. -->
               <div class="item-content item-link">
-                <div class="item-media"><div class="skeleton-block od-logbook--skeleton-thumbnail"></div></div>
-                <div class="item-inner od-row">
-                  <div class="od-row-text">
-                    <div class="item-title"><span class="skeleton-block od-logbook--bar" style:width="{40 + ((i * 17) % 35)}%"></span></div>
-                    <div class="item-text"><span class="skeleton-block od-logbook--bar" style:width="9em"></span></div>
+                <div class="item-media"><div class="skeleton-block bc-logbook--skeleton-thumbnail"></div></div>
+                <div class="item-inner bc-row">
+                  <div class="bc-row-text">
+                    <div class="item-title"><span class="skeleton-block bc-logbook--bar" style:width="{40 + ((i * 17) % 35)}%"></span></div>
+                    <div class="item-text"><span class="skeleton-block bc-logbook--bar" style:width="9em"></span></div>
                   </div>
-                  <div class="od-logbook--skeleton-values">
-                    <span class="od-logbook--value"><span class="skeleton-block od-logbook--bar" style:width="3em"></span></span>
-                    <span class="od-logbook--duration"><span class="skeleton-block od-logbook--bar" style:width="2.5em"></span></span>
+                  <div class="bc-logbook--skeleton-values">
+                    <span class="bc-logbook--value"><span class="skeleton-block bc-logbook--bar" style:width="3em"></span></span>
+                    <span class="bc-logbook--duration"><span class="skeleton-block bc-logbook--bar" style:width="2.5em"></span></span>
                   </div>
                 </div>
               </div>
@@ -1417,44 +1417,44 @@
     </div>
   {:else if logbook.error}
     <Block>
-      <h2 class="od-state-title">{t('logbook.errorTitle')}</h2>
+      <h2 class="bc-state-title">{t('logbook.errorTitle')}</h2>
       <p>{t('logbook.errorNothingChanged')}</p>
       <p>{t('logbook.errorCheck')}</p>
       <ol>
         <li>{t('logbook.errorInternet')}</li>
         <li>{t('logbook.errorStorage')}</li>
       </ol>
-      <Button fill class="od-primary-action" onClick={() => loadLogbook()}>{t('logbook.retry')}</Button>
+      <Button fill class="bc-primary-action" onClick={() => loadLogbook()}>{t('logbook.retry')}</Button>
     </Block>
   {:else if logbook.dives.length === 0}
     <!-- Empty logbook (docs/mockups/*-etat-vide): the choices of "+" directly. -->
     {#if releaseEmpty}
       <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
     {:else}
-    {#if logbook.email}<p class="od-logbook--count">{t(logbook.mode === 'git' ? (logbook.odplus ? 'logbook.emptyServer' : 'logbook.emptyGit') : 'logbook.emptyCloud')}</p>
+    {#if logbook.email}<p class="bc-logbook--count">{t(logbook.mode === 'git' ? (logbook.odplus ? 'logbook.emptyServer' : 'logbook.emptyGit') : 'logbook.emptyCloud')}</p>
     {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
-      <p class="od-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
-    <div class="od-logbook--empty">
-      <div class="od-logbook--empty-illustration" aria-hidden="true">
-        <DecorativeProfile trace class="od-logbook--empty-profile" />
-        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-1"></span>
-        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-2"></span>
-        <span class="od-logbook--empty-bubble od-logbook--empty-bubble-3"></span>
+      <p class="bc-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
+    <div class="bc-logbook--empty">
+      <div class="bc-logbook--empty-illustration" aria-hidden="true">
+        <DecorativeProfile trace class="bc-logbook--empty-profile" />
+        <span class="bc-logbook--empty-bubble bc-logbook--empty-bubble-1"></span>
+        <span class="bc-logbook--empty-bubble bc-logbook--empty-bubble-2"></span>
+        <span class="bc-logbook--empty-bubble bc-logbook--empty-bubble-3"></span>
       </div>
-      <h2 class="od-state-title od-logbook--empty-title">{t('logbook.emptyTitle')}</h2>
-      <p class="od-logbook--empty-text">{t(theme.ios ? 'logbook.emptyTextIos' : 'logbook.emptyText')}</p>
-      <a href={downloadRoute} class="od-logbook--empty-pair">
+      <h2 class="bc-state-title bc-logbook--empty-title">{t('logbook.emptyTitle')}</h2>
+      <p class="bc-logbook--empty-text">{t(theme.ios ? 'logbook.emptyTextIos' : 'logbook.emptyText')}</p>
+      <a href={downloadRoute} class="bc-logbook--empty-pair">
         <Icon name="diveComputer" size={20} weight={2} />{t('logbook.emptyDownload')}
       </a>
-      <nav class="od-logbook--empty-options" aria-label={t('logbook.emptyOthers')}>
+      <nav class="bc-logbook--empty-options" aria-label={t('logbook.emptyOthers')}>
         {#each emptyChoices as c (c.key)}
-          <a href={routes[c.key] ?? '#'} class="od-logbook--empty-option" onclick={(e) => { e.preventDefault(); choose(c.key); }}>
-            <span class="od-logbook--empty-option-icon"><Icon name={c.icon} size={22} weight={2} /></span>
-            <span class="od-logbook--empty-option-texts">
-              <span class="od-logbook--empty-option-title">{c.text}</span>
-              <span class="od-logbook--empty-option-note">{c.note}</span>
+          <a href={routes[c.key] ?? '#'} class="bc-logbook--empty-option" onclick={(e) => { e.preventDefault(); choose(c.key); }}>
+            <span class="bc-logbook--empty-option-icon"><Icon name={c.icon} size={22} weight={2} /></span>
+            <span class="bc-logbook--empty-option-texts">
+              <span class="bc-logbook--empty-option-title">{c.text}</span>
+              <span class="bc-logbook--empty-option-note">{c.note}</span>
             </span>
-            <span class="od-logbook--empty-option-chevron"><Icon name="chevron" size={20} weight={2} /></span>
+            <span class="bc-logbook--empty-option-chevron"><Icon name="chevron" size={20} weight={2} /></span>
           </a>
         {/each}
       </nav>
@@ -1471,14 +1471,14 @@
     logbook's name and where it is kept, then what can be done with the logbook itself. Rename has no flow yet (it says so); the two others open the first launch at its step.
   -->
   {#if releaseEmpty}
-    <Popover class="od-menu od-logbook-empty-menu" backdrop={false}>
+    <Popover class="bc-menu bc-logbook-empty-menu" backdrop={false}>
       <List noChevron mediaList>
-        <li class="od-menu-label">{emptyBand.split('\n')[0]}</li>
+        <li class="bc-menu-label">{emptyBand.split('\n')[0]}</li>
         <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={emptyMenuSoon} />
-        <li class="od-menu-divider" role="separator"></li>
+        <li class="bc-menu-divider" role="separator"></li>
         <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
         <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
-        <li class="od-menu-divider" role="separator"></li>
+        <li class="bc-menu-divider" role="separator"></li>
         <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={t('welcomeSteps.menuExportNone')} disabled />
       </List>
     </Popover>
@@ -1488,7 +1488,7 @@
     Overflow menu: Filter, and with a selection Delete, Create a trip, Add to
     the trip above / below.
   -->
-  <Popover class="od-menu od-logbook-menu" backdrop={false}>
+  <Popover class="bc-menu bc-logbook-menu" backdrop={false}>
     <List noChevron>
       <!-- Undo and Redo always come first. -->
       {#if logbook.undoText}
@@ -1540,11 +1540,11 @@
             icon="download"
             text={t('logbook.menuExport')}
             onclick={() => {
-              f7.popover.close('.od-logbook-menu');
+              f7.popover.close('.bc-logbook-menu');
               exporting = true;
             }}
           />
-          <li class="od-menu-divider" role="separator"></li>
+          <li class="bc-menu-divider" role="separator"></li>
           <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
         {/if}
       {/if}
@@ -1556,12 +1556,12 @@
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}
-    <div class="list media-list {theme.ios && !cards ? 'chevron-center od-logbook--dividers' : ''} od-logbook--virtual-list od-dive-list" class:od-logbook--cards={cards} bind:this={listEl}>
+    <div class="list media-list {theme.ios && !cards ? 'chevron-center bc-logbook--dividers' : ''} bc-logbook--virtual-list bc-dive-list" class:bc-logbook--cards={cards} bind:this={listEl}>
       <ul>
         {#each visible.items as row (row.key)}
           {#if row.kind === 'year'}
-            <li class="od-logbook--year" data-virtual-list-index={row.index} style:top="{visible.topPosition}px">
-              <h2 class="od-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2>
+            <li class="bc-logbook--year" data-virtual-list-index={row.index} style:top="{visible.topPosition}px">
+              <h2 class="bc-logbook--year-title">{theme.ios ? t('logbook.yearHeader', { year: row.year, n: row.count }) : row.year}</h2>
             </li>
           {:else if row.kind === 'trip'}
             <TripRow
@@ -1615,24 +1615,24 @@
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
-  <input type="file" multiple class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" multiple class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   {#if csv}
     <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={csvFailed} />
   {/if}
-  {#if importing}<p class="od-sr-only" role="status">{t('logbook.importing')}</p>{/if}
+  {#if importing}<p class="bc-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
-      <div class="od-logbook--selection-bar" bind:this={selectionBar}>
-        <button type="button" class="od-icon-button" onclick={endSelection}>
-          <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
+      <div class="bc-logbook--selection-bar" bind:this={selectionBar}>
+        <button type="button" class="bc-icon-button" onclick={endSelection}>
+          <Icon name="close" /><span class="bc-sr-only">{t('logbook.selectionClose')}</span>
         </button>
-        <span class="od-logbook--selection-count od-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
+        <span class="bc-logbook--selection-count bc-value" role="status">{t('logbook.selected', { n: checkedCount })}</span>
         {#if theme.ios}
-          <a href="#" class="link icon-only od-logbook--popover-open od-logbook--selection-more" data-popover=".od-logbook-menu" role="button">
+          <a href="#" class="link icon-only bc-logbook--popover-open bc-logbook--selection-more" data-popover=".bc-logbook-menu" role="button">
             <Icon name="moreCircle" />
-            <span class="od-sr-only">{t('detail.moreOptions')}</span>
+            <span class="bc-sr-only">{t('detail.moreOptions')}</span>
           </a>
         {/if}
       </div>
@@ -1644,7 +1644,7 @@
             { key: 'trip', icon: 'plus', label: t('logbook.menuCreateTrip'), text: t('logbook.menuCreateTrip'), onclick: createTrip },
             { key: 'export', icon: 'download', label: t('logbook.toolbarExport'), onclick: () => (exporting = true) },
             { key: 'delete', icon: 'delete', label: t('logbook.menuDelete'), onclick: deleteChecked },
-            { key: 'more', icon: 'more', label: t('logbook.selectionMore'), menu: '.od-logbook-menu' },
+            { key: 'more', icon: 'more', label: t('logbook.selectionMore'), menu: '.bc-logbook-menu' },
           ]}
         />
       {/if}
@@ -1664,56 +1664,56 @@
    * search band, for some air under the search box. Outside the layers:
    * Framework7's own variables are set without one.
    */
-  :global(.md .od-logbook) {
+  :global(.md .bc-logbook) {
     --f7-navbar-large-title-height: 64px;
     --f7-subnavbar-height: 76px;
   }
 
   /* The title and the search box at the top of their bands: the room is under the search box. */
-  :global(.md .od-logbook .title-large),
-  :global(.md .od-logbook .subnavbar) {
+  :global(.md .bc-logbook .title-large),
+  :global(.md .bc-logbook .subnavbar) {
     align-items: flex-start;
   }
 
   @layer od.components {
-    .od-logbook--count {
+    .bc-logbook--count {
       margin: 8px 16px 0;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-logbook--count .od-logbook--separator {
+    .bc-logbook--count .bc-logbook--separator {
       margin: 0 0.4em;
     }
 
     /* Selection mode: the number of dives checked, beside the total. */
-    .od-logbook--count-selected {
-      color: var(--od-text);
+    .bc-logbook--count-selected {
+      color: var(--bc-text);
       font-weight: 500;
     }
 
-    .od-logbook--failed {
-      color: var(--od-alarm);
+    .bc-logbook--failed {
+      color: var(--bc-alarm);
     }
 
     /* The snapshot of the start: a tap is held until the real list is there. */
-    .od-logbook--preview {
+    .bc-logbook--preview {
       user-select: none;
     }
 
     /* The menu of the empty logbook: 296 dp, each line on one line (mock-up …-carnet-vide-menu-paysage). */
-    :global(.od-logbook-empty-menu) {
+    :global(.bc-logbook-empty-menu) {
       width: 296px;
     }
 
-    :global(.od-logbook-empty-menu .item-title),
-    :global(.od-logbook-empty-menu .item-text) {
+    :global(.bc-logbook-empty-menu .item-title),
+    :global(.bc-logbook-empty-menu .item-text) {
       white-space: nowrap;
     }
 
     /* Selection mode: over the top bar, the same height. */
-    .od-logbook--selection-bar {
+    .bc-logbook--selection-bar {
       position: absolute;
       top: 0;
       left: 0;
@@ -1725,22 +1725,22 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-logbook--selection-count {
+    .bc-logbook--selection-count {
       font-size: 22px;
       line-height: 28px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-logbook--selection-more {
+    .bc-logbook--selection-more {
       margin-left: auto;
     }
 
     /* Dragging dives to a trip or out of it: the row lifted under the finger,
        its place faded, the trip it would join tinted. */
-    :global(.od-logbook--drag-chip) {
+    :global(.bc-logbook--drag-chip) {
       position: fixed;
       z-index: 9000;
       max-width: calc(100vw - 16px);
@@ -1751,8 +1751,8 @@
       align-items: center;
       gap: 8px;
       border-radius: 20px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font-size: 14px;
       font-weight: 600;
       white-space: nowrap;
@@ -1767,17 +1767,17 @@
 
     /* Over a place where the dives can go: the chip in ink. */
     /* Where the drop would go: a 3 dp bar with a dot at its start. */
-    :global(.od-logbook--drop-line) {
+    :global(.bc-logbook--drop-line) {
       position: fixed;
       z-index: 9999;
       height: 3px;
       margin-top: -1.5px;
       border-radius: 2px;
-      background: var(--od-text);
+      background: var(--bc-text);
       pointer-events: none;
     }
 
-    :global(.od-logbook--drop-line::before) {
+    :global(.bc-logbook--drop-line::before) {
       content: '';
       position: absolute;
       left: -5px;
@@ -1785,62 +1785,62 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--od-text);
+      background: var(--bc-text);
     }
 
-    :global(.od-logbook--drag-chip.od-logbook--drag-chip-target) {
-      background: var(--od-text);
-      color: var(--od-surface);
+    :global(.bc-logbook--drag-chip.bc-logbook--drag-chip-target) {
+      background: var(--bc-text);
+      color: var(--bc-surface);
     }
 
     /* Held by a long press: the row rises a little, ready to be dragged. */
-    :global(li.od-logbook--drag-lift) {
+    :global(li.bc-logbook--drag-lift) {
       position: relative;
       z-index: 2;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 2px 6px 2px rgb(0 0 0 / 0.15), 0 1px 2px rgb(0 0 0 / 0.3);
       transition: box-shadow 150ms;
     }
 
-    :global(.od-logbook--drag-source) {
+    :global(.bc-logbook--drag-source) {
       opacity: 0.35;
     }
 
-    :global(li.od-logbook--drop-target) {
-      background: var(--od-tint);
+    :global(li.bc-logbook--drop-target) {
+      background: var(--bc-tint);
     }
 
     /* The dives follow the count and the sync status closely. */
-    :global(.list.od-dive-list) {
+    :global(.list.bc-dive-list) {
       margin-top: 0;
     }
 
     /* Phone (task 2026-11-18-278): the dives by year in white cards on the screen's background. */
-    :global(.list.od-logbook--cards) {
+    :global(.list.bc-logbook--cards) {
       margin-bottom: 0;
     }
 
     /* Android: the last card scrolls clear of the + button. */
-    :global(.md .list.od-logbook--cards) {
+    :global(.md .list.bc-logbook--cards) {
       padding-bottom: 72px;
     }
 
-    :global(.list.od-logbook--cards ul) {
+    :global(.list.bc-logbook--cards ul) {
       background: none;
     }
 
     /* The title of a year: the row is measured by the virtual list, hence padding and no margin. */
-    :global(li.od-logbook--year) {
+    :global(li.bc-logbook--year) {
       list-style: none;
       padding: 16px 20px 8px;
     }
 
-    :global(.od-logbook--year-title) {
+    :global(.bc-logbook--year-title) {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       /* iPhone (docs/mockups/ios-carnet): « 2026 · 1 plongée » in small capitals. */
       :global(.ios) & {
@@ -1851,104 +1851,104 @@
       }
     }
 
-    :global(.ios li.od-logbook--year) {
+    :global(.ios li.bc-logbook--year) {
       padding: 10px 32px 6px;
     }
 
     /* A card row lifted by a long press or a drop target: the card's surface shows it, not the row's padding. */
-    :global(li.od-dive-row--card.od-logbook--drag-lift),
-    :global(li.od-trip-row--card.od-logbook--drag-lift) {
+    :global(li.bc-dive-row--card.bc-logbook--drag-lift),
+    :global(li.bc-trip-row--card.bc-logbook--drag-lift) {
       background: none;
       box-shadow: none;
     }
 
-    :global(li.od-dive-row--card.od-logbook--drag-lift > a),
-    :global(li.od-trip-row--card.od-logbook--drag-lift > a) {
+    :global(li.bc-dive-row--card.bc-logbook--drag-lift > a),
+    :global(li.bc-trip-row--card.bc-logbook--drag-lift > a) {
       box-shadow: 0 2px 6px 2px rgb(0 0 0 / 0.15), 0 1px 2px rgb(0 0 0 / 0.3);
     }
 
-    :global(li.od-dive-row--card.od-logbook--drop-target),
-    :global(li.od-trip-row--card.od-logbook--drop-target) {
+    :global(li.bc-dive-row--card.bc-logbook--drop-target),
+    :global(li.bc-trip-row--card.bc-logbook--drop-target) {
       background: none;
     }
 
-    :global(li.od-dive-row--card.od-logbook--drop-target > a),
-    :global(li.od-trip-row--card.od-logbook--drop-target > a) {
-      background: var(--od-tint);
+    :global(li.bc-dive-row--card.bc-logbook--drop-target > a),
+    :global(li.bc-trip-row--card.bc-logbook--drop-target > a) {
+      background: var(--bc-tint);
     }
 
     /* The filter button says when a filter is applied: a tinted circle. */
-    :global(.navbar .od-logbook--filter-on) {
-      background: var(--od-tint);
+    :global(.navbar .bc-logbook--filter-on) {
+      background: var(--bc-tint);
       border-radius: 50%;
     }
 
     /* Empty logbook (task 2026-11-15-204): a column of at most 440 dp, centred. */
-    .od-logbook--empty {
+    .bc-logbook--empty {
       max-width: 440px;
       margin: 16px auto 0;
       padding: 0 24px 24px;
       box-sizing: border-box;
     }
 
-    .od-logbook--empty-illustration {
+    .bc-logbook--empty-illustration {
       position: relative;
       height: 104px;
     }
 
-    :global(.od-logbook--empty-profile) {
+    :global(.bc-logbook--empty-profile) {
       height: 104px;
     }
 
     /* Three white outlines rising in the water of the descent, the smallest lowest. */
-    .od-logbook--empty-bubble {
+    .bc-logbook--empty-bubble {
       position: absolute;
       box-sizing: border-box;
-      border: 1.5px solid var(--od-bubble);
+      border: 1.5px solid var(--bc-bubble);
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
 
-    .od-logbook--empty-bubble-1 {
+    .bc-logbook--empty-bubble-1 {
       left: 18.1%;
       top: 67.3%;
       width: 5px;
       height: 5px;
     }
 
-    .od-logbook--empty-bubble-2 {
+    .bc-logbook--empty-bubble-2 {
       left: 19.9%;
       top: 53.8%;
       width: 7px;
       height: 7px;
     }
 
-    .od-logbook--empty-bubble-3 {
+    .bc-logbook--empty-bubble-3 {
       left: 18.4%;
       top: 38.5%;
       width: 9px;
       height: 9px;
     }
 
-    .od-logbook--empty-title {
+    .bc-logbook--empty-title {
       margin: 20px 0 0;
       font-size: 24px;
       line-height: 32px;
       font-weight: 500;
     }
 
-    .od-logbook--empty-text {
+    .bc-logbook--empty-text {
       margin: 4px 0 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 17px;
       }
     }
 
-    .od-logbook--empty-pair {
+    .bc-logbook--empty-pair {
       margin-top: 18px;
       min-height: 56px;
       padding: 8px 16px;
@@ -1959,8 +1959,8 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font-size: 16px;
       font-weight: 500;
       text-decoration: none;
@@ -1972,10 +1972,10 @@
       }
     }
 
-    .od-logbook--empty-options {
+    .bc-logbook--empty-options {
       margin: 16px -8px 0;
       border-radius: 24px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -1983,34 +1983,34 @@
       }
     }
 
-    .od-logbook--empty-option {
+    .bc-logbook--empty-option {
       display: flex;
       align-items: center;
       gap: 16px;
       padding: 10px 16px;
       min-height: 60px;
       box-sizing: border-box;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
 
       & + & {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
 
-    .od-logbook--empty-option-icon {
+    .bc-logbook--empty-option-icon {
       flex: none;
       width: 44px;
       height: 44px;
       border-radius: 14px;
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-logbook--empty-option-texts {
+    .bc-logbook--empty-option-texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -2018,48 +2018,48 @@
       gap: 2px;
     }
 
-    .od-logbook--empty-option-title {
+    .bc-logbook--empty-option-title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-logbook--empty-option-note {
+    .bc-logbook--empty-option-note {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-logbook--empty-option-chevron {
+    .bc-logbook--empty-option-chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-logbook--skeleton-thumbnail {
+    .bc-logbook--skeleton-thumbnail {
       width: 56px;
       height: 40px;
       border-radius: 8px;
     }
 
     /* Depth and duration on the right, as in <DiveRow>. */
-    .od-logbook--skeleton-values {
+    .bc-logbook--skeleton-values {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       flex: 0 0 auto;
 
-      .od-logbook--value {
+      .bc-logbook--value {
         line-height: 22px;
       }
 
-      .od-logbook--duration {
+      .bc-logbook--duration {
         line-height: 18px;
       }
     }
 
     /* A greyed bar one line of text high. */
-    .od-logbook--bar {
+    .bc-logbook--bar {
       display: inline-block;
       height: 0.8em;
       max-width: 100%;

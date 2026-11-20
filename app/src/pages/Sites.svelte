@@ -110,7 +110,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   );
   const listed = $derived(inArea ?? results);
 
-  // A pin tapped (od-map-site-card), or several pins under the finger (od-map-stack-sheet).
+  // A pin tapped (bc-map-site-card), or several pins under the finger (bc-map-stack-sheet).
   let selectedUuid = $state(/** @type {number|null} */ (null));
   const selectedSite = $derived(selectedUuid === null ? null : (located.find((s) => s.uuid === selectedUuid) ?? null));
   let stack = $state(/** @type {{ uuids: number[], at: { latUdeg: number, lonUdeg: number } }|null} */ (null));
@@ -179,7 +179,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     query = '';
     siteMap?.setView(viewBeforeSearch);
     viewBeforeSearch = null;
-    fadeIn([searchEl?.closest('.view')?.querySelector('.od-sites--bar .navbar-inner') ?? null, todoEl, fabEl]);
+    fadeIn([searchEl?.closest('.view')?.querySelector('.bc-sites--bar .navbar-inner') ?? null, todoEl, fabEl]);
   }
 
   function clearSearch() {
@@ -216,14 +216,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     let startY = 0;
     let pressed = false;
     /** @param {Event} e */
-    const rowOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('.od-sites--site-row'));
+    const rowOf = (e) => /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('.bc-sites--site-row'));
     const cancel = () => clearTimeout(timer);
 
     /** @param {PointerEvent} e */
     function down(e) {
       const row = rowOf(e);
       pressed = false;
-      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-sites--site-check')) return;
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.bc-sites--site-check')) return;
       startX = e.clientX;
       startY = e.clientY;
       timer = setTimeout(() => {
@@ -243,7 +243,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     function click(e) {
       if (!el.contains(/** @type {Node} */ (e.target))) return;
       const row = rowOf(e);
-      if (!row || /** @type {HTMLElement} */ (e.target).closest('.od-sites--site-check')) return;
+      if (!row || /** @type {HTMLElement} */ (e.target).closest('.bc-sites--site-check')) return;
       if (pressed) {
         pressed = false;
       } else if (selection.length) {
@@ -442,7 +442,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length || canCommon}
-    <div class="od-sites--map" class:od-sites--map-offline={!connection.online} class:od-sites--card-open={!!selectedSite || !!baseSelected}>
+    <div class="bc-sites--map" class:bc-sites--map-offline={!connection.online} class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
       <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
            and its own « Centrer sur ma position » (task 2026-11-14-147). No names on the
            map; a tapped pin shows its card, several under the finger a sheet (task 2026-11-14-150). -->
@@ -478,18 +478,18 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       </SiteMap>
       {#if canCommon}
         <!-- MD3 segmented button over the map (sites-commun-android.dc.html): the selected side has a check mark. -->
-        <div class="od-sites--mode" role="group" aria-label={t('sharedSites.show')}>
-          <button type="button" class="od-sites--mode-button" aria-pressed={!common} onclick={() => setSitesMode('mine')}>
+        <div class="bc-sites--mode" role="group" aria-label={t('sharedSites.show')}>
+          <button type="button" class="bc-sites--mode-button" aria-pressed={!common} onclick={() => setSitesMode('mine')}>
             {#if !common}<Icon name="check" size={18} weight={2} />{/if}{t('sharedSites.mine')}
           </button>
-          <button type="button" class="od-sites--mode-button od-sites--mode-common" aria-pressed={common} onclick={() => setSitesMode('common')}>
+          <button type="button" class="bc-sites--mode-button bc-sites--mode-common" aria-pressed={common} onclick={() => setSitesMode('common')}>
             {#if common}<Icon name="check" size={18} weight={2} />{/if}{t('sharedSites.commonMapButton')}
           </button>
         </div>
       {/if}
-      <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
+      <button type="button" class="bc-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
-        <span class="od-sr-only">{t('sites.centreOnMe')}</span>
+        <span class="bc-sr-only">{t('sites.centreOnMe')}</span>
       </button>
     </div>
   {/if}
@@ -503,35 +503,35 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
   >
     {#if !connection.online}
-      <p class="od-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
+      <p class="bc-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
     {/if}
   </SectionBand>
 {/snippet}
 
 {#snippet panel()}
   {#if common}
-  <section class="od-sites--panel" aria-label={t('sharedSites.listLabel')}>
+  <section class="bc-sites--panel" aria-label={t('sharedSites.listLabel')}>
     {#if !connection.online}
-      <p class="od-sites--area-count" role="status">{t('sharedSites.offline')}</p>
+      <p class="bc-sites--area-count" role="status">{t('sharedSites.offline')}</p>
     {:else if baseState === 'offer'}
-      <div class="od-sites--common-offer">
+      <div class="bc-sites--common-offer">
         <p>{t('sharedSites.offerText')}</p>
-        <button type="button" class="od-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
+        <button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
       </div>
     {:else if baseState === 'failed'}
-      <p class="od-sites--area-count" role="status">{t('sharedSites.failed')}</p>
+      <p class="bc-sites--area-count" role="status">{t('sharedSites.failed')}</p>
     {:else if baseState === 'ready' && baseBox}
-      <p class="od-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
+      <p class="bc-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
       {#if baseList.length}
-        <nav class="list no-chevron od-sites--surface od-sites--list od-sites--common-list" aria-label={t('sharedSites.listLabel')}>
+        <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')}>
           <ul>
             {#each baseList as b (b.id)}
               <li>
                 <a href="/sites/base/{encodeURIComponent(b.id)}" class="item-link item-content">
-                  <span class="od-sites--common-dot" class:od-sites--common-mine={inYourSites(b.id, sharedSites.links)} aria-hidden="true"></span>
+                  <span class="bc-sites--common-dot" class:bc-sites--common-mine={inYourSites(b.id, sharedSites.links)} aria-hidden="true"></span>
                   <div class="item-inner">
-                    <div class="od-sites--text">
-                      <div class="item-title od-site-name">{b.name}</div>
+                    <div class="bc-sites--text">
+                      <div class="item-title bc-site-name">{b.name}</div>
                       <div class="item-text">{baseRowText(b, sharedSites.links, logbook.prefs)}</div>
                     </div>
                   </div>
@@ -544,12 +544,12 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {/if}
   </section>
   {:else}
-  <section class="od-sites--panel" aria-label={t('sites.listLabel')}>
+  <section class="bc-sites--panel" aria-label={t('sites.listLabel')}>
     {#if withoutSite || unplaced || duplicates || unused}
-     <div class="od-sites--todo" class:od-sites--hidden={searching} bind:this={todoEl}>
-      <div class="od-sites--todo-inner">
-      <!-- « À faire » (od-sites-todo), on every device: iPhone and iPad too since task 2026-11-14-148. -->
-      <nav class="list od-sites--links od-sites--surface od-sites-todo" aria-label={t('sites.todoLabel')}>
+     <div class="bc-sites--todo" class:bc-sites--hidden={searching} bind:this={todoEl}>
+      <div class="bc-sites--todo-inner">
+      <!-- « À faire » (bc-sites-todo), on every device: iPhone and iPad too since task 2026-11-14-148. -->
+      <nav class="list bc-sites--links bc-sites--surface bc-sites-todo" aria-label={t('sites.todoLabel')}>
         <ul>
           {#if withoutSite}
             <li><a href="/sites/without/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.withoutLink', { n: withoutSite })}</div></div></a></li>
@@ -567,31 +567,31 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {/if}
 
     {#if inArea}
-      <p class="od-sites--area-count" role="status">{t('sites.areaCount', { n: inArea.length })}</p>
+      <p class="bc-sites--area-count" role="status">{t('sites.areaCount', { n: inArea.length })}</p>
     {/if}
     {#if listed.length}
       <!-- No chevron on the site rows (android-sites.dc.html). -->
-      <div class="list no-chevron od-sites--surface od-sites--list" use:selectable>
+      <div class="list no-chevron bc-sites--surface bc-sites--list" use:selectable>
         <ul>
           {#each listed as site (site.uuid)}
-            <li class="od-sites--site-row" data-uuid={site.uuid}>
+            <li class="bc-sites--site-row" data-uuid={site.uuid}>
               {#if selection.length}
-                <label class="checkbox od-sites--site-check">
+                <label class="checkbox bc-sites--site-check">
                   <input type="checkbox" bind:checked={checked[site.uuid]} aria-label={t('sites.selectSite', { name: site.name || t('sites.noName') })} />
                   <i class="icon-checkbox"></i>
                 </label>
               {/if}
               <a href="/sites/{site.uuid}" class="item-link item-content">
                 <div class="item-inner">
-                  <div class="od-sites--text">
-                    <div class="item-title od-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
+                  <div class="bc-sites--text">
+                    <div class="item-title bc-site-name">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="bc-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{t('sites.noName')}{/if}</div>
                     <div class="item-text">
                       {site.hasLocation
                         ? t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })
                         : t('sites.rowNoGps', { n: site.dives })}
                     </div>
                   </div>
-                  {#if site.maxDepthMm}<div class="od-sites--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
+                  {#if site.maxDepthMm}<div class="bc-sites--depth bc-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</div>{/if}
                 </div>
               </a>
             </li>
@@ -608,24 +608,24 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
 {#snippet fab()}
     <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
-    <div class="fab fab-right-bottom od-fab-add od-sites--fab" class:od-sites--hidden={searching} bind:this={fabEl}>
+    <div class="fab fab-right-bottom bc-fab-add bc-sites--fab" class:bc-sites--hidden={searching} bind:this={fabEl}>
       <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
 {/snippet}
 
-<Page class="od-sites{layout.phone ? '' : ' od-sites--tablet'}" style="--od-sites-pane: {listWidth + (ios ? 0 : 20)}px" onPageReinit={load}>
+<Page class="bc-sites{layout.phone ? '' : ' bc-sites--tablet'}" style="--bc-sites-pane: {listWidth + (ios ? 0 : 20)}px" onPageReinit={load}>
   {#snippet fixedContent()}
     <!-- The open search: ← and the field take the place of the top bar's items. -->
-    <div class="od-sites--search" class:od-sites--open={searching} inert={!searching} bind:this={searchEl} role="search">
-      <button type="button" class="od-icon-button od-sites--search-back" onclick={closeSearch}>
-        <Icon name="arrowBack" /><span class="od-sr-only">{t('sites.closeSearch')}</span>
+    <div class="bc-sites--search" class:bc-sites--open={searching} inert={!searching} bind:this={searchEl} role="search">
+      <button type="button" class="bc-icon-button bc-sites--search-back" onclick={closeSearch}>
+        <Icon name="arrowBack" /><span class="bc-sr-only">{t('sites.closeSearch')}</span>
       </button>
-      <div class="od-sites--search-field">
+      <div class="bc-sites--search-field">
         <input
           bind:this={searchInput}
           bind:value={query}
           type="search"
-          class="od-sites--search-input"
+          class="bc-sites--search-input"
           placeholder={t('sites.searchPlaceholder')}
           aria-label={t('sites.search')}
           enterkeyhint="search"
@@ -633,23 +633,23 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
           onkeydown={(e) => e.key === 'Enter' && searchInput?.blur()}
         />
         {#if query}
-          <button type="button" class="od-sites--search-clear" onclick={clearSearch}>
-            <Icon name="close" /><span class="od-sr-only">{t('sites.clearSearch')}</span>
+          <button type="button" class="bc-sites--search-clear" onclick={clearSearch}>
+            <Icon name="close" /><span class="bc-sr-only">{t('sites.clearSearch')}</span>
           </button>
         {/if}
       </div>
     </div>
     {#if selection.length}
       <!-- While sites are checked, the top bar gives way to their number. -->
-      <div class="od-sites--selection">
-        <button type="button" class="od-icon-button" onclick={() => (checked = {})}>
-          <Icon name="close" /><span class="od-sr-only">{t('logbook.selectionClose')}</span>
+      <div class="bc-sites--selection">
+        <button type="button" class="bc-icon-button" onclick={() => (checked = {})}>
+          <Icon name="close" /><span class="bc-sr-only">{t('logbook.selectionClose')}</span>
         </button>
-        <span class="od-sites--selection-count od-value" role="status">{t('sites.selected', { n: selection.length })}</span>
+        <span class="bc-sites--selection-count bc-value" role="status">{t('sites.selected', { n: selection.length })}</span>
         {#if selection.length >= 2}
-          <a href="#menu" class="link icon-only od-sites--popover-open od-sites--selection-more" data-popover=".od-sites-menu" role="button">
+          <a href="#menu" class="link icon-only bc-sites--popover-open bc-sites--selection-more" data-popover=".bc-sites-menu" role="button">
             {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
-            <span class="od-sr-only">{t('detail.moreOptions')}</span>
+            <span class="bc-sr-only">{t('detail.moreOptions')}</span>
           </a>
         {/if}
       </div>
@@ -660,24 +660,24 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       <!-- Selecting: no FAB. -->
     {:else}
       <!-- Tablet (spec, section 3): the list on the left, the map on the right. -->
-      <div class="od-sites--split" class:ios>
-        <div class="od-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
+      <div class="bc-sites--split" class:ios>
+        <div class="bc-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
-          <div class="od-sites--scroll" data-od-scroll>{@render band(false)}{@render panel()}</div>
+          <div class="bc-sites--scroll" data-od-scroll>{@render band(false)}{@render panel()}</div>
           {@render fab()}
         </div>
-        <div class="od-sites--map-pane">{@render mapBlock('100%')}</div>
+        <div class="bc-sites--map-pane">{@render mapBlock('100%')}</div>
       </div>
     {/if}
   {/snippet}
-  <Popover class="od-menu od-sites-sort-menu" backdrop={false}>
+  <Popover class="bc-menu bc-sites-sort-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon={sortBy === 'name' ? 'check' : 'blank'} text={t('sites.sortName')} onclick={() => setSort('name')} />
       <MenuItem icon={sortBy === 'recent' ? 'check' : 'blank'} text={t('sites.sortRecent')} onclick={() => setSort('recent')} />
     </List>
   </Popover>
 
-  <Popover class="od-menu od-sites-menu" backdrop={false}>
+  <Popover class="bc-menu bc-sites-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="merge" text={t('sites.mergeSites')} onclick={() => (choosingKeeper = true)} />
     </List>
@@ -701,14 +701,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     />
   {/if}
 
-  <Navbar class="od-band-bar od-sites--bar{searching ? ' od-sites--searching' : ''}" title={t('sites.title')}>
+  <Navbar class="bc-band-bar bc-sites--bar{searching ? ' bc-sites--searching' : ''}" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
-      <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="od-sr-only">{t('sites.search')}</span></Link>
+      <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="bc-sr-only">{t('sites.search')}</span></Link>
       {#if !theme.ios}<AccountAvatar />{/if}
-      <Link iconOnly popoverOpen=".od-sites-sort-menu">
+      <Link iconOnly popoverOpen=".bc-sites-sort-menu">
         {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
-        <span class="od-sr-only">{t('detail.moreOptions')}</span>
+        <span class="bc-sr-only">{t('detail.moreOptions')}</span>
       </Link>
       <!-- iPhone: the account initial after the other buttons (task 2026-11-14-127). -->
       {#if theme.ios}<AccountAvatar />{/if}
@@ -725,7 +725,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 <style>
   @layer od.components {
     /* Tablet: below the navigation bar, two panes side by side. */
-    .od-sites--split {
+    .bc-sites--split {
       position: absolute;
       inset: 0;
       display: flex;
@@ -733,54 +733,54 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
     /* The top bar and the open search or selection belong to the list pane only:
        the map runs up to the top, beside them. */
-    :global(.od-sites--tablet .navbar.od-sites--bar),
-    :global(.od-sites--tablet .od-sites--search),
-    :global(.od-sites--tablet .od-sites--selection) {
+    :global(.bc-sites--tablet .navbar.bc-sites--bar),
+    :global(.bc-sites--tablet .bc-sites--search),
+    :global(.bc-sites--tablet .bc-sites--selection) {
       right: auto;
-      width: var(--od-sites-pane);
+      width: var(--bc-sites-pane);
     }
 
-    .od-sites--list-pane {
+    .bc-sites--list-pane {
       position: relative;
       flex: none;
       display: flex;
       flex-direction: column;
-      border-right: 0.5px solid var(--od-separator);
+      border-right: 0.5px solid var(--bc-separator);
     }
 
-    .od-sites--scroll {
+    .bc-sites--scroll {
       flex: 1;
       padding-top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));
       overflow-y: auto;
     }
 
-    .od-sites--map-pane {
+    .bc-sites--map-pane {
       position: relative;
       flex: 1;
       min-width: 0;
     }
 
     /* Android: the map is a rounded pane, 16 px from the edges. */
-    .od-sites--split:not(.ios) .od-sites--map-pane {
+    .bc-sites--split:not(.ios) .bc-sites--map-pane {
       margin: 16px 16px 16px 0;
       border-radius: 28px;
       overflow: hidden;
     }
 
     /* iPad: 44 pt button at the top right of the map. */
-    .od-sites--split.ios .od-sites--locate {
+    .bc-sites--split.ios .bc-sites--locate {
       top: 76px;
       bottom: auto;
       width: 44px;
       height: 44px;
     }
 
-    .od-sites--split :global(.od-fab-add) {
+    .bc-sites--split :global(.bc-fab-add) {
       position: absolute;
     }
 
     /* "Offline" (android-sites-hors-ligne.dc.html): 28 dp, translucent white, under the summary. */
-    .od-sites--offline-chip {
+    .bc-sites--offline-chip {
       position: relative;
       display: inline-flex;
       align-items: center;
@@ -789,8 +789,8 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       margin: 6px 0 0 12px;
       padding: 0 12px 0 8px;
       border-radius: 14px;
-      background: var(--od-band-control);
-      color: var(--od-on-band-control);
+      background: var(--bc-band-control);
+      color: var(--bc-on-band-control);
       font-size: 13px;
       font-weight: 600;
     }
@@ -799,10 +799,10 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
        animation"). Closed, the field is clipped to the size of the magnifier
        button, at its place on the right: opening grows it to full width from
        there, closing shrinks it back. Closing is quicker and accelerates. */
-    .od-sites--search {
-      --od-search-from-right: 44px;
-      --od-search-open-ease: cubic-bezier(0.05, 0.7, 0.1, 1);
-      --od-search-close-ease: cubic-bezier(0.3, 0, 0.8, 0.15);
+    .bc-sites--search {
+      --bc-search-from-right: 44px;
+      --bc-search-open-ease: cubic-bezier(0.05, 0.7, 0.1, 1);
+      --bc-search-close-ease: cubic-bezier(0.3, 0, 0.8, 0.15);
       position: absolute;
       top: 0;
       left: 0;
@@ -815,26 +815,26 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       align-items: center;
       gap: 4px;
       pointer-events: none;
-      color: var(--od-on-band);
+      color: var(--bc-on-band);
 
-      &.od-sites--open > * {
+      &.bc-sites--open > * {
         pointer-events: auto;
       }
     }
 
-    .od-sites--search-back {
+    .bc-sites--search-back {
       flex: none;
       color: inherit;
       opacity: 0;
       transition: opacity 100ms linear 100ms;
 
-      .od-sites--open & {
+      .bc-sites--open & {
         opacity: 1;
         transition-delay: 0s;
       }
     }
 
-    .od-sites--search-field {
+    .bc-sites--search-field {
       flex: 1;
       min-width: 0;
       height: 48px;
@@ -845,21 +845,21 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       padding: 0 4px 0 16px;
       border-radius: 24px;
       background: transparent;
-      clip-path: inset(0 var(--od-search-from-right) 0 calc(100% - var(--od-search-from-right) - 48px) round 24px);
+      clip-path: inset(0 var(--bc-search-from-right) 0 calc(100% - var(--bc-search-from-right) - 48px) round 24px);
       transition:
-        clip-path 200ms var(--od-search-close-ease),
-        background-color 200ms var(--od-search-close-ease);
+        clip-path 200ms var(--bc-search-close-ease),
+        background-color 200ms var(--bc-search-close-ease);
 
-      .od-sites--open & {
-        background: var(--od-band-control);
-        color: var(--od-on-band-control);
+      .bc-sites--open & {
+        background: var(--bc-band-control);
+        color: var(--bc-on-band-control);
         clip-path: inset(0 0 0 0 round 24px);
         transition-duration: 300ms;
-        transition-timing-function: var(--od-search-open-ease);
+        transition-timing-function: var(--bc-search-open-ease);
       }
     }
 
-    .od-sites--search-input {
+    .bc-sites--search-input {
       flex: 1;
       min-width: 0;
       height: 100%;
@@ -874,7 +874,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       opacity: 0;
       transition: opacity 100ms linear;
 
-      .od-sites--open & {
+      .bc-sites--open & {
         opacity: 1;
         transition-delay: 100ms;
       }
@@ -884,11 +884,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       }
 
       &::placeholder {
-        color: var(--od-on-band-control-2);
+        color: var(--bc-on-band-control-2);
       }
     }
 
-    .od-sites--search-clear {
+    .bc-sites--search-clear {
       flex: none;
       width: 40px;
       height: 40px;
@@ -896,7 +896,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       border: none;
       border-radius: 50%;
       background: none;
-      color: var(--od-on-band-control-2);
+      color: var(--bc-on-band-control-2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -904,11 +904,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
     /* The top bar's own items give way: out in the first 100 ms of opening,
        back in the last 100 ms of closing. */
-    :global(.navbar.od-sites--bar .navbar-inner > *) {
+    :global(.navbar.bc-sites--bar .navbar-inner > *) {
       transition: opacity 100ms linear 100ms;
     }
 
-    :global(.navbar.od-sites--searching .navbar-inner > *) {
+    :global(.navbar.bc-sites--searching .navbar-inner > *) {
       opacity: 0;
       visibility: hidden;
       transition:
@@ -918,7 +918,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
     /* The "à faire" card and the + button: fade and slide, 150 ms, and the
        card's room closes so the results rise under the map. */
-    .od-sites--todo {
+    .bc-sites--todo {
       display: grid;
       grid-template-rows: 1fr;
       transition:
@@ -927,7 +927,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
         transform 150ms linear,
         visibility 0s;
 
-      &.od-sites--hidden {
+      &.bc-sites--hidden {
         grid-template-rows: 0fr;
         opacity: 0;
         transform: translateY(8px);
@@ -940,18 +940,18 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       }
     }
 
-    .od-sites--todo-inner {
+    .bc-sites--todo-inner {
       min-height: 0;
       overflow: hidden;
     }
 
-    .od-sites--fab {
+    .bc-sites--fab {
       transition:
         opacity 150ms linear,
         transform 150ms linear,
         visibility 0s;
 
-      &.od-sites--hidden {
+      &.bc-sites--hidden {
         opacity: 0;
         transform: translateY(8px);
         visibility: hidden;
@@ -963,24 +963,24 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     }
 
     /* The matched part of a name. */
-    .od-sites--match {
-      background: var(--od-secondary-container);
+    .bc-sites--match {
+      background: var(--bc-secondary-container);
       color: inherit;
       border-radius: 2px;
     }
 
-    .od-sites--map-pane .od-sites--map {
+    .bc-sites--map-pane .bc-sites--map {
       height: 100%;
     }
 
 
     /* « Centrer sur ma position » moves up above the card while it is open. */
-    .od-sites--card-open .od-sites--locate {
+    .bc-sites--card-open .bc-sites--locate {
       bottom: 116px;
     }
 
     /* « Mes sites | Carte commune »: MD3 segmented button, 40 dp, over the bottom left of the map. */
-    .od-sites--mode {
+    .bc-sites--mode {
       position: absolute;
       z-index: 3;
       left: 16px;
@@ -988,11 +988,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       display: flex;
       height: 40px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
       overflow: hidden;
     }
-    .od-sites--mode-button {
+    .bc-sites--mode-button {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1003,83 +1003,83 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
       &[aria-pressed='true'] {
         padding-left: 12px;
         font-weight: 600;
-        background: var(--od-secondary-container);
-        color: var(--od-on-secondary-container);
+        background: var(--bc-secondary-container);
+        color: var(--bc-on-secondary-container);
       }
     }
-    .od-sites--mode-common[aria-pressed='true'] {
-      background: var(--od-shared-site-container);
-      color: var(--od-on-shared-site-container);
+    .bc-sites--mode-common[aria-pressed='true'] {
+      background: var(--bc-shared-site-container);
+      color: var(--bc-on-shared-site-container);
     }
-    .od-sites--card-open .od-sites--mode {
+    .bc-sites--card-open .bc-sites--mode {
       bottom: 116px;
     }
-    .od-sites--common-dot {
+    .bc-sites--common-dot {
       flex: none;
       width: 12px;
       height: 12px;
       margin-right: 16px;
       border-radius: 6px;
-      background: var(--od-shared-site);
+      background: var(--bc-shared-site);
     }
-    .od-sites--common-mine {
-      background: var(--od-text);
+    .bc-sites--common-mine {
+      background: var(--bc-text);
     }
-    .od-sites--common-offer {
+    .bc-sites--common-offer {
       margin: 16px 24px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       & p {
         margin: 0;
       }
     }
 
-    .od-sites--area-count {
+    .bc-sites--area-count {
       margin: 8px 24px 4px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The full-screen button (task 2026-11-14-147): phone, top right of the visible
        map, 16 dp from the edge, under the band (whose wave runs 18 px over the map). */
-    .od-sites--map {
+    .bc-sites--map {
       position: relative;
-      --od-map-button-top: 34px;
-      --od-map-button-right: 16px;
+      --bc-map-button-top: 34px;
+      --bc-map-button-right: 16px;
 
       /* Offline (android-sites-hors-ligne): the credits at the top, the button under them. */
-      &.od-sites--map-offline {
-        --od-map-credits-top: 34px;
-        --od-map-credits-bottom: auto;
-        --od-map-button-top: 62px;
+      &.bc-sites--map-offline {
+        --bc-map-credits-top: 34px;
+        --bc-map-credits-bottom: auto;
+        --bc-map-button-top: 62px;
       }
     }
 
     /* Tablets: the map is its own pane, the button 16 dp from its top right; the
        credits stay at the bottom. */
-    .od-sites--map-pane .od-sites--map {
-      --od-map-button-top: 16px;
-      --od-map-credits-top: auto;
-      --od-map-credits-bottom: 4px;
+    .bc-sites--map-pane .bc-sites--map {
+      --bc-map-button-top: 16px;
+      --bc-map-credits-top: auto;
+      --bc-map-credits-bottom: 4px;
     }
 
     /* iPad: 24 pt from the top, « Centrer sur ma position » right under it. */
-    .od-sites--split.ios .od-sites--map {
-      --od-map-button-top: 24px;
+    .bc-sites--split.ios .bc-sites--map {
+      --bc-map-button-top: 24px;
     }
 
     /* 40 dp, white surface, 12 dp corners, elevation 1, 16 dp from the right
        of the map, above its credits. */
-    .od-sites--locate {
+    .bc-sites--locate {
       position: absolute;
       right: 16px;
       bottom: 32px;
@@ -1087,15 +1087,15 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       height: 40px;
       border: none;
       border-radius: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
     }
 
-    .od-sites--selection {
+    .bc-sites--selection {
       position: absolute;
       top: 0;
       left: 0;
@@ -1107,21 +1107,21 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-sites--selection-count {
+    .bc-sites--selection-count {
       font-size: 22px;
       line-height: 28px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-sites--selection-more {
+    .bc-sites--selection-more {
       margin-left: auto;
     }
 
     /* The box sits beside the row's link: touching it never opens the site. */
-    .od-sites--site-row {
+    .bc-sites--site-row {
       display: flex;
       align-items: center;
       user-select: none;
@@ -1133,7 +1133,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       }
     }
 
-    .od-sites--site-check {
+    .bc-sites--site-check {
       flex: none;
       display: flex;
       align-items: center;
@@ -1143,8 +1143,8 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       margin-left: 4px;
     }
 
-    .od-sites--panel {
-      border-top: 1px solid var(--od-separator);
+    .bc-sites--panel {
+      border-top: 1px solid var(--bc-separator);
       /* On a phone, the first group sits under the map without the count line. */
       padding-top: 12px;
       /* Room for the FAB under the last site. */
@@ -1152,29 +1152,29 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     }
 
     /* Tablet: the band's wave already ends the header, no line under it. */
-    .od-sites--list-pane .od-sites--panel {
+    .bc-sites--list-pane .bc-sites--panel {
       border-top: 0;
     }
 
     /* White surfaces, 20 dp corners, 16 dp side margins, 12 dp apart, light
        dividers between the rows (task 2026-11-07-24). */
-    .od-sites--surface {
+    .bc-sites--surface {
       margin: 0 16px 12px;
       border-radius: 20px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       ul {
         background: none;
       }
 
       li + li {
-        border-top: 1px solid var(--od-row-divider);
+        border-top: 1px solid var(--bc-row-divider);
       }
     }
 
     /* Maintenance rows: 48 dp, 14/20 ink, 24 dp chevron. */
-    .od-sites--links {
+    .bc-sites--links {
       .item-content,
       .item-inner {
         min-height: 48px;
@@ -1190,7 +1190,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        color: var(--od-text);
+        color: var(--bc-text);
         white-space: normal;
       }
 
@@ -1216,14 +1216,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
     /* Site rows: 72 dp, name 16/24, supporting 14/20, trailing depth 16/24
        medium ink, no chevron. */
-    .od-sites--list {
+    .bc-sites--list {
       .item-inner {
         min-height: 72px;
         padding: 8px 20px 8px 0;
         gap: 16px;
       }
 
-      .od-sites--text {
+      .bc-sites--text {
         flex: 1;
         min-width: 0;
         display: flex;
@@ -1235,22 +1235,22 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
         line-height: 24px;
         font-weight: 400;
         letter-spacing: 0.15px;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
       .item-text {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-sites--depth {
+      .bc-sites--depth {
         flex: none;
         font-size: 16px;
         line-height: 24px;
         font-weight: 500;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
   }

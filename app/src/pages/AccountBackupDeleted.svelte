@@ -7,7 +7,7 @@
   import { t } from '../lib/i18n.js';
 </script>
 
-<Page class="od-account-backup-page">
+<Page class="bc-account-backup-page">
   <Navbar title={t('backup.deleted.title')}>
     {#snippet left()}
       <BackLink label={t('backup.title')} name={t('detail.back')} />

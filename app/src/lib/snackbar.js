@@ -1,6 +1,6 @@
 // @ts-check
 // The one snackbar of the app (docs/ui-foundations.md, section 8). It is
-// Framework7's toast, styled by `.toast.od-snackbar` in theme.css: every
+// Framework7's toast, styled by `.toast.bc-snackbar` in theme.css: every
 // message of the app goes through `showSnackbar`, nothing else calls
 // `f7.toast`. Framework7 already closes the open toast when another opens, so
 // there is one snackbar at a time; the closing callback of the old one runs then.

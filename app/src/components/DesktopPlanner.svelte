@@ -325,7 +325,7 @@
   const stopsTotal = $derived((result?.stops ?? []).reduce((sum, s) => sum + s.durationSeconds, 0));
 
   /** @param {number} i the plan's gas */
-  const gasClass = (i) => `od-desktop-planner--gas-${Math.max(0, i) % 4}`;
+  const gasClass = (i) => `bc-desktop-planner--gas-${Math.max(0, i) % 4}`;
 
   // The profile, in its own units: x in minutes, y in depth.
   const W = 560;
@@ -492,40 +492,40 @@
   }
 </script>
 
-<div class="od-desktop-planner">
-  <header class="od-desktop-planner--head">
-    <h2 class="od-desktop-planner--title">{title}</h2>
-    <div class="od-desktop-planner--actions">
-      <button type="button" class="od-desktop-planner--button" onclick={openSaved}>
+<div class="bc-desktop-planner">
+  <header class="bc-desktop-planner--head">
+    <h2 class="bc-desktop-planner--title">{title}</h2>
+    <div class="bc-desktop-planner--actions">
+      <button type="button" class="bc-desktop-planner--button" onclick={openSaved}>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>{t('desktopTools.savedPlans')}
       </button>
-      <button type="button" class="od-desktop-planner--button" disabled={!result || !!result.error} onclick={printSlate}>
+      <button type="button" class="bc-desktop-planner--button" disabled={!result || !!result.error} onclick={printSlate}>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 9V4h10v5M7 17H4v-7h16v7h-3M7 14h10v6H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>{t('desktopTools.printSlate')}
       </button>
-      <button type="button" class="od-desktop-planner--button od-desktop-planner--filled" disabled={!canSave} onclick={save}>{t('desktopTools.savePlan')}</button>
-      <button type="button" class="od-desktop-planner--more" aria-label={t('desktopTools.moreOptions')} title={t('desktopTools.moreOptions')} aria-haspopup="menu" onclick={openMore}>
+      <button type="button" class="bc-desktop-planner--button bc-desktop-planner--filled" disabled={!canSave} onclick={save}>{t('desktopTools.savePlan')}</button>
+      <button type="button" class="bc-desktop-planner--more" aria-label={t('desktopTools.moreOptions')} title={t('desktopTools.moreOptions')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
     </div>
   </header>
 
-  <div class="od-desktop-planner--body">
-    <section class="od-desktop-planner--params" aria-label={t('plan.title')}>
-      <div class="od-desktop-planner--pair">
-        <div class="od-desktop-planner--wide"><DesktopField label={t('desktopTools.startFrom')} bind:value={startChoice} options={startOptions} onchange={startChanged} /></div>
+  <div class="bc-desktop-planner--body">
+    <section class="bc-desktop-planner--params" aria-label={t('plan.title')}>
+      <div class="bc-desktop-planner--pair">
+        <div class="bc-desktop-planner--wide"><DesktopField label={t('desktopTools.startFrom')} bind:value={startChoice} options={startOptions} onchange={startChanged} /></div>
         {#each levelFields as level, i (level.key)}
           <DesktopField label={t('plan.depth')} bind:value={level.depth} unit={depthUnit(prefs)} invalid={invalid[`depth-${level.key}`]} oninput={() => levelDepth(i)} />
-          <div class="od-desktop-planner--with-remove">
+          <div class="bc-desktop-planner--with-remove">
             <DesktopField label={t(i === 0 ? 'desktopTools.bottomTime' : 'plan.duration')} bind:value={level.time} unit={t('units.minutes')} invalid={invalid[`time-${level.key}`]} oninput={() => levelTime(i)} />
-            {#if i > 0}<button type="button" class="od-desktop-planner--remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" size={18} /></button>{/if}
+            {#if i > 0}<button type="button" class="bc-desktop-planner--remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" size={18} /></button>{/if}
           </div>
         {/each}
         {#if levelFields.length < 20}
-          <button type="button" class="od-desktop-planner--add od-desktop-planner--wide" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
+          <button type="button" class="bc-desktop-planner--add bc-desktop-planner--wide" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
         {/if}
 
         {#each gasFields as gas, i (gas.key)}
-          <div class="od-desktop-planner--wide od-desktop-planner--gas-field">
+          <div class="bc-desktop-planner--wide bc-desktop-planner--gas-field">
             <DesktopField
               label={t(i === 0 ? 'desktopTools.bottomGas' : 'desktopTools.decoGas')}
               bind:value={gas.choice}
@@ -534,14 +534,14 @@
               invalid={invalid[`gas-${gas.key}`]}
               helper={invalid[`gas-${gas.key}`] ? t('tools.gasInvalid') : ''}
             />
-            {#if i > 0}<button type="button" class="od-desktop-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" size={18} /></button>{/if}
+            {#if i > 0}<button type="button" class="bc-desktop-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" size={18} /></button>{/if}
           </div>
           {#if gas.choice === 'custom'}
             <DesktopField label={t('plan.oxygenPercent')} bind:value={gas.o2} unit={t('units.percent')} invalid={invalid[`gas-${gas.key}`]} oninput={() => gasTyped(i)} />
             <DesktopField label={t('plan.heliumPercent')} bind:value={gas.he} unit={t('units.percent')} invalid={invalid[`gas-${gas.key}`]} oninput={() => gasTyped(i)} />
           {/if}
         {/each}
-        <button type="button" class="od-desktop-planner--add od-desktop-planner--wide" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
+        <button type="button" class="bc-desktop-planner--add bc-desktop-planner--wide" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
 
         <DesktopField label={t('desktopTools.gradientFactors')} bind:value={gfField} invalid={gfInvalid} inputmode="text" oninput={gfTyped} helper={gfInvalid ? t('desktopTools.gradientInvalid') : ''} />
         <DesktopField
@@ -559,93 +559,93 @@
           oninput={() => sacTyped(decoSacField, (ml) => (planner.decoSacMlMin = ml), 'decoSac')}
         />
       </div>
-      <p class="od-desktop-planner--conditions">{conditions}</p>
+      <p class="bc-desktop-planner--conditions">{conditions}</p>
     </section>
 
-    <section class="od-desktop-planner--outcome" aria-live="polite">
+    <section class="bc-desktop-planner--outcome" aria-live="polite">
       {#if failed}
-        <p class="od-desktop-planner--note">{t('plan.failed')}</p>
+        <p class="bc-desktop-planner--note">{t('plan.failed')}</p>
       {:else if result}
-        {#if errorText}<p class="od-desktop-planner--error" role="alert">{errorText}</p>{/if}
-        <div class="od-desktop-planner--totals">
-          <div class="od-desktop-planner--total">
-            <span class="od-desktop-planner--total-label">{t('plan.totalTime')}</span>
-            <span class="od-desktop-planner--total-value od-value">{minutes(result.runtimeSeconds)}</span>
+        {#if errorText}<p class="bc-desktop-planner--error" role="alert">{errorText}</p>{/if}
+        <div class="bc-desktop-planner--totals">
+          <div class="bc-desktop-planner--total">
+            <span class="bc-desktop-planner--total-label">{t('plan.totalTime')}</span>
+            <span class="bc-desktop-planner--total-value bc-value">{minutes(result.runtimeSeconds)}</span>
           </div>
-          <div class="od-desktop-planner--total">
-            <span class="od-desktop-planner--total-label">{t('desktopTools.stops')}</span>
-            <span class="od-desktop-planner--total-value od-value">{minutes(stopsTotal)}</span>
+          <div class="bc-desktop-planner--total">
+            <span class="bc-desktop-planner--total-label">{t('desktopTools.stops')}</span>
+            <span class="bc-desktop-planner--total-value bc-value">{minutes(stopsTotal)}</span>
           </div>
           {#each volumeTiles as tile (tile.key)}
-            <div class="od-desktop-planner--total">
-              <span class="od-desktop-planner--total-label">{tile.label}</span>
-              <span class="od-desktop-planner--total-value od-value">{tile.value}</span>
+            <div class="bc-desktop-planner--total">
+              <span class="bc-desktop-planner--total-label">{tile.label}</span>
+              <span class="bc-desktop-planner--total-value bc-value">{tile.value}</span>
             </div>
           {/each}
-          <div class="od-desktop-planner--total">
-            <span class="od-desktop-planner--total-label">{t('tools.oxygen')}</span>
-            <span class="od-desktop-planner--total-value od-value">{t('plan.cnsValue', { cns: result.cns })}</span>
+          <div class="bc-desktop-planner--total">
+            <span class="bc-desktop-planner--total-label">{t('tools.oxygen')}</span>
+            <span class="bc-desktop-planner--total-value bc-value">{t('plan.cnsValue', { cns: result.cns })}</span>
           </div>
         </div>
-        {#if modRow}<p class="od-desktop-planner--error" role="alert">{modRow}</p>{/if}
+        {#if modRow}<p class="bc-desktop-planner--error" role="alert">{modRow}</p>{/if}
 
         {#if shape}
-          <div class="od-desktop-planner--card">
-            <svg class="od-desktop-planner--profile" viewBox="0 0 {W} {H}" role="img" aria-label={profileLabel}>
+          <div class="bc-desktop-planner--card">
+            <svg class="bc-desktop-planner--profile" viewBox="0 0 {W} {H}" role="img" aria-label={profileLabel}>
               <defs>
                 <linearGradient id="od-desktop-plan-water" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" style="stop-color: var(--od-water-top)" />
+                  <stop offset="0" style="stop-color: var(--bc-water-top)" />
                   <stop offset="1" style="stop-color: {shape.bottom}" />
                 </linearGradient>
               </defs>
               {#each shape.yTicks as tick (tick.text)}
-                <path class="od-desktop-planner--grid" d="M{LEFT} {tick.y} H{W - RIGHT}" />
-                <text class="od-desktop-planner--axis" x={LEFT - 6} y={tick.y + 4} text-anchor="end">{tick.text}</text>
+                <path class="bc-desktop-planner--grid" d="M{LEFT} {tick.y} H{W - RIGHT}" />
+                <text class="bc-desktop-planner--axis" x={LEFT - 6} y={tick.y + 4} text-anchor="end">{tick.text}</text>
               {/each}
               <path d={shape.area} fill="url(#od-desktop-plan-water)" opacity="0.9" />
-              <path d={shape.line} class="od-desktop-planner--line" />
+              <path d={shape.line} class="bc-desktop-planner--line" />
               {#each shape.xTicks as tick (tick.text)}
-                <text class="od-desktop-planner--axis" x={tick.x} y={H - 8} text-anchor="middle">{tick.text}</text>
+                <text class="bc-desktop-planner--axis" x={tick.x} y={H - 8} text-anchor="middle">{tick.text}</text>
               {/each}
               {#each shape.runs as run, i (i)}
                 <rect class={gasClass(run.gas)} x={run.x} y={H - BOTTOM - 4} width={run.w} height="6" rx="3" />
               {/each}
             </svg>
-            <ul class="od-desktop-planner--legend">
+            <ul class="bc-desktop-planner--legend">
               {#each planner.gases as gas, i (i)}
-                <li><i class="od-desktop-planner--swatch {gasClass(i)}"></i>{gasName(gas.o2Permille, gas.hePermille)}</li>
+                <li><i class="bc-desktop-planner--swatch {gasClass(i)}"></i>{gasName(gas.o2Permille, gas.hePermille)}</li>
               {/each}
             </ul>
           </div>
         {/if}
 
-        <div class="od-desktop-planner--card">
+        <div class="bc-desktop-planner--card">
           {#if tableRows.length}
-            <table class="od-desktop-planner--table od-value">
+            <table class="bc-desktop-planner--table bc-value">
               <thead>
                 <tr>
-                  <th scope="col" class="od-desktop-planner--num">{t('plan.depth')}</th>
-                  <th scope="col" class="od-desktop-planner--num">{t('plan.duration')}</th>
+                  <th scope="col" class="bc-desktop-planner--num">{t('plan.depth')}</th>
+                  <th scope="col" class="bc-desktop-planner--num">{t('plan.duration')}</th>
                   <th scope="col">{t('plan.gasColumn')}</th>
                 </tr>
               </thead>
               <tbody>
                 {#each tableRows as row, i (i)}
                   <tr>
-                    <td class="od-desktop-planner--num">{row.depth}</td>
-                    <td class="od-desktop-planner--num">{row.duration}</td>
+                    <td class="bc-desktop-planner--num">{row.depth}</td>
+                    <td class="bc-desktop-planner--num">{row.duration}</td>
                     <td>{row.gas}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
           {:else}
-            <p class="od-desktop-planner--no-stop"><Icon name="check" size={20} />{t('plan.noStopShort')}</p>
+            <p class="bc-desktop-planner--no-stop"><Icon name="check" size={20} />{t('plan.noStopShort')}</p>
           {/if}
         </div>
-        <p class="od-desktop-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
+        <p class="bc-desktop-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
       {:else}
-        <p class="od-desktop-planner--note" aria-busy="true">{t('plan.computing')}</p>
+        <p class="bc-desktop-planner--note" aria-busy="true">{t('plan.computing')}</p>
       {/if}
     </section>
   </div>
@@ -677,12 +677,12 @@
 
 <style>
   @layer od.components {
-    .od-desktop-planner {
+    .bc-desktop-planner {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-    .od-desktop-planner--head {
+    .bc-desktop-planner--head {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -690,52 +690,52 @@
       gap: 8px 16px;
       min-height: 48px;
     }
-    .od-desktop-planner--title {
+    .bc-desktop-planner--title {
       margin: 0;
       min-width: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-desktop-planner--actions {
+    .bc-desktop-planner--actions {
       display: flex;
       align-items: center;
       gap: 8px;
       flex: none;
     }
-    .od-desktop-planner--button {
+    .bc-desktop-planner--button {
       display: flex;
       align-items: center;
       gap: 8px;
       height: 42px;
       padding: 0 20px;
-      border: 1px solid var(--od-text-2);
+      border: 1px solid var(--bc-text-2);
       border-radius: 21px;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
       white-space: nowrap;
     }
-    .od-desktop-planner--button:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-planner--button:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-planner--button:disabled {
+    .bc-desktop-planner--button:disabled {
       opacity: 0.4;
       cursor: default;
     }
-    .od-desktop-planner--filled,
-    .od-desktop-planner--filled:hover:not(:disabled) {
+    .bc-desktop-planner--filled,
+    .bc-desktop-planner--filled:hover:not(:disabled) {
       border-color: transparent;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
     }
-    .od-desktop-planner--more {
+    .bc-desktop-planner--more {
       display: grid;
       place-items: center;
       width: 44px;
@@ -743,13 +743,13 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-planner--more:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-planner--more:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-planner--body {
+    .bc-desktop-planner--body {
       display: grid;
       grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
       gap: 32px;
@@ -757,25 +757,25 @@
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
     @container od-tool (max-width: 659px) {
-      .od-desktop-planner--body {
+      .bc-desktop-planner--body {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;
       }
     }
-    .od-desktop-planner--pair {
+    .bc-desktop-planner--pair {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px 16px;
       align-items: start;
     }
-    .od-desktop-planner--wide {
+    .bc-desktop-planner--wide {
       grid-column: 1 / -1;
     }
-    .od-desktop-planner--with-remove,
-    .od-desktop-planner--gas-field {
+    .bc-desktop-planner--with-remove,
+    .bc-desktop-planner--gas-field {
       position: relative;
     }
-    .od-desktop-planner--remove {
+    .bc-desktop-planner--remove {
       position: absolute;
       top: 0;
       right: 0;
@@ -786,10 +786,10 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       cursor: pointer;
     }
-    .od-desktop-planner--add {
+    .bc-desktop-planner--add {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -799,79 +799,79 @@
       background: none;
       font: inherit;
       font-size: 14px;
-      color: var(--od-desktop-selected-ink);
+      color: var(--bc-desktop-selected-ink);
       cursor: pointer;
     }
-    .od-desktop-planner--conditions {
+    .bc-desktop-planner--conditions {
       margin: 14px 0 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-planner--outcome {
+    .bc-desktop-planner--outcome {
       display: flex;
       flex-direction: column;
       gap: 12px;
       min-width: 0;
     }
-    .od-desktop-planner--totals {
+    .bc-desktop-planner--totals {
       display: flex;
       flex-wrap: wrap;
       gap: 12px 32px;
     }
-    .od-desktop-planner--total {
+    .bc-desktop-planner--total {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
-    .od-desktop-planner--total-label {
+    .bc-desktop-planner--total-label {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-planner--total-value {
-      font-family: var(--od-title-font);
+    .bc-desktop-planner--total-value {
+      font-family: var(--bc-title-font);
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-planner--card {
+    .bc-desktop-planner--card {
       padding: 16px 20px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-desktop-planner--profile {
+    .bc-desktop-planner--profile {
       display: block;
       width: 100%;
     }
-    .od-desktop-planner--grid {
-      stroke: var(--od-separator);
+    .bc-desktop-planner--grid {
+      stroke: var(--bc-separator);
       stroke-width: 1;
     }
-    .od-desktop-planner--axis {
+    .bc-desktop-planner--axis {
       font-size: 11px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
     }
-    .od-desktop-planner--line {
+    .bc-desktop-planner--line {
       fill: none;
-      stroke: var(--od-desktop-selected-ink);
+      stroke: var(--bc-desktop-selected-ink);
       stroke-width: 1.5;
     }
-    .od-desktop-planner--gas-0 {
-      fill: var(--od-gas-helium);
-      background: var(--od-gas-helium);
+    .bc-desktop-planner--gas-0 {
+      fill: var(--bc-gas-helium);
+      background: var(--bc-gas-helium);
     }
-    .od-desktop-planner--gas-1 {
-      fill: var(--od-gas-topup);
-      background: var(--od-gas-topup);
+    .bc-desktop-planner--gas-1 {
+      fill: var(--bc-gas-topup);
+      background: var(--bc-gas-topup);
     }
-    .od-desktop-planner--gas-2 {
-      fill: var(--od-gas-oxygen);
-      background: var(--od-gas-oxygen);
+    .bc-desktop-planner--gas-2 {
+      fill: var(--bc-gas-oxygen);
+      background: var(--bc-gas-oxygen);
     }
-    .od-desktop-planner--gas-3 {
-      fill: var(--od-text-2);
-      background: var(--od-text-2);
+    .bc-desktop-planner--gas-3 {
+      fill: var(--bc-text-2);
+      background: var(--bc-text-2);
     }
-    .od-desktop-planner--legend {
+    .bc-desktop-planner--legend {
       display: flex;
       flex-wrap: wrap;
       gap: 4px 16px;
@@ -879,69 +879,69 @@
       padding: 0;
       list-style: none;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-planner--legend li {
+    .bc-desktop-planner--legend li {
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .od-desktop-planner--swatch {
+    .bc-desktop-planner--swatch {
       width: 10px;
       height: 10px;
       border-radius: 5px;
     }
-    .od-desktop-planner--table {
+    .bc-desktop-planner--table {
       width: 100%;
       border-collapse: collapse;
       font-size: 15px;
     }
-    .od-desktop-planner--table th {
+    .bc-desktop-planner--table th {
       padding: 6px 12px 8px;
-      border-bottom: 1px solid var(--od-separator);
+      border-bottom: 1px solid var(--bc-separator);
       font-size: 13px;
       font-weight: 500;
       text-align: left;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-planner--table td {
+    .bc-desktop-planner--table td {
       padding: 9px 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-planner--num {
+    .bc-desktop-planner--num {
       text-align: right !important;
     }
-    .od-desktop-planner--no-stop {
+    .bc-desktop-planner--no-stop {
       display: flex;
       align-items: center;
       gap: 8px;
       margin: 0;
-      color: var(--od-status-ok);
+      color: var(--bc-status-ok);
     }
-    .od-desktop-planner--note {
+    .bc-desktop-planner--note {
       margin: 0;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-planner--error {
+    .bc-desktop-planner--error {
       margin: 0;
       padding: 10px 14px;
       border-radius: 12px;
-      background: var(--od-alarm-tint);
+      background: var(--bc-alarm-tint);
       font-size: 14px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-planner--filled {
+      .bc-desktop-planner--filled {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-planner--filled:hover:not(:disabled) {
+      .bc-desktop-planner--filled:hover:not(:disabled) {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
-      .od-desktop-planner--add:hover {
+      .bc-desktop-planner--add:hover {
         text-decoration: underline;
       }
     }
@@ -949,15 +949,15 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-planner--remove {
+      .bc-desktop-planner--remove {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-planner--remove:not(:disabled):hover {
+      .bc-desktop-planner--remove:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-desktop-planner--remove {
+      .bc-desktop-planner--remove {
         transition: none;
       }
     }

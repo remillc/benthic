@@ -14,7 +14,7 @@
   <!-- Written by hand, like the "+" button: a real button name and state for screen readers. -->
   <a
     href="#menu"
-    class="link icon-only external od-menu-button"
+    class="link icon-only external bc-menu-button"
     role="button"
     aria-controls="od-menu"
     aria-expanded={navigation.menuOpen}
@@ -24,6 +24,6 @@
     }}
   >
     <Icon name="menu" />
-    <span class="od-sr-only">{t('menu.open')}</span>
+    <span class="bc-sr-only">{t('menu.open')}</span>
   </a>
 {/if}

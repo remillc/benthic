@@ -91,7 +91,7 @@
     focused = next;
     view = { year: next.year, month: next.month };
     await tick();
-    /** @type {HTMLElement|null} */ (document.querySelector(`.od-date-picker--day[data-day="${next.day}"]`))?.focus();
+    /** @type {HTMLElement|null} */ (document.querySelector(`.bc-date-picker--day[data-day="${next.day}"]`))?.focus();
   }
 
   // Swipe left or right on the grid changes the month.
@@ -113,7 +113,7 @@
     yearGrid = !yearGrid;
     if (yearGrid) {
       await tick();
-      /** @type {HTMLElement|null} */ (document.querySelector('.od-date-picker--year[aria-pressed="true"]'))?.scrollIntoView({ block: 'center' });
+      /** @type {HTMLElement|null} */ (document.querySelector('.bc-date-picker--year[aria-pressed="true"]'))?.scrollIntoView({ block: 'center' });
     }
   }
 
@@ -164,21 +164,21 @@
   );
 </script>
 
-<Md3Dialog class="od-date-picker" title={mode === 'input' ? t('datePicker.titleInput') : t('datePicker.title')} {oncancel}>
-  <div class="od-date-picker--header">
-    <span class="od-date-picker--headline">{headline}</span>
-    <button type="button" class="od-date-picker--mode" onclick={toggleMode} aria-label={mode === 'input' ? t('datePicker.toCalendar') : t('datePicker.toInput')}>
+<Md3Dialog class="bc-date-picker" title={mode === 'input' ? t('datePicker.titleInput') : t('datePicker.title')} {oncancel}>
+  <div class="bc-date-picker--header">
+    <span class="bc-date-picker--headline">{headline}</span>
+    <button type="button" class="bc-date-picker--mode" onclick={toggleMode} aria-label={mode === 'input' ? t('datePicker.toCalendar') : t('datePicker.toInput')}>
       <Icon name={mode === 'input' ? 'calendar' : 'edit'} />
     </button>
   </div>
-  <div class="od-date-picker--divider"></div>
+  <div class="bc-date-picker--divider"></div>
   {#if mode === 'input'}
-    <div class="od-date-picker--input-area">
-      <label class="od-date-picker--input-box" class:od-date-picker--invalid={invalid && touched}>
-        <span class="od-date-picker--input-label">{t('datePicker.field')}</span>
+    <div class="bc-date-picker--input-area">
+      <label class="bc-date-picker--input-box" class:bc-date-picker--invalid={invalid && touched}>
+        <span class="bc-date-picker--input-label">{t('datePicker.field')}</span>
         <!-- svelte-ignore a11y_autofocus -->
         <input
-          class="od-date-picker--input"
+          class="bc-date-picker--input"
           type="text"
           inputmode="numeric"
           autocomplete="off"
@@ -191,47 +191,47 @@
           autofocus
         />
       </label>
-      <p id="od-date-picker-help" class="od-date-picker--help" class:od-date-picker--invalid={invalid && touched}>
+      <p id="od-date-picker-help" class="bc-date-picker--help" class:bc-date-picker--invalid={invalid && touched}>
         {invalid && touched ? t('datePicker.invalid') : pattern}
       </p>
     </div>
   {:else}
-    <div class="od-date-picker--month-row">
-      <button type="button" class="od-date-picker--month-button" aria-expanded={yearGrid} aria-label={`${monthLabel}, ${t('datePicker.chooseYear')}`} onclick={openYears}>
+    <div class="bc-date-picker--month-row">
+      <button type="button" class="bc-date-picker--month-button" aria-expanded={yearGrid} aria-label={`${monthLabel}, ${t('datePicker.chooseYear')}`} onclick={openYears}>
         <span>{monthLabel}</span>
-        <span class="od-date-picker--drop" class:od-date-picker--open={yearGrid}><Icon name="chevron" size={18} /></span>
+        <span class="bc-date-picker--drop" class:bc-date-picker--open={yearGrid}><Icon name="chevron" size={18} /></span>
       </button>
       {#if !yearGrid}
-        <span class="od-date-picker--arrows">
-          <button type="button" class="od-date-picker--arrow od-date-picker--prev" aria-label={t('datePicker.previousMonth')} disabled={!canPrev} onclick={() => shift(-1)}><Icon name="chevron" /></button>
-          <button type="button" class="od-date-picker--arrow" aria-label={t('datePicker.nextMonth')} disabled={!canNext} onclick={() => shift(1)}><Icon name="chevron" /></button>
+        <span class="bc-date-picker--arrows">
+          <button type="button" class="bc-date-picker--arrow bc-date-picker--prev" aria-label={t('datePicker.previousMonth')} disabled={!canPrev} onclick={() => shift(-1)}><Icon name="chevron" /></button>
+          <button type="button" class="bc-date-picker--arrow" aria-label={t('datePicker.nextMonth')} disabled={!canNext} onclick={() => shift(1)}><Icon name="chevron" /></button>
         </span>
       {/if}
     </div>
     {#if yearGrid}
-      <div class="od-date-picker--years" role="group" aria-label={t('datePicker.chooseYear')}>
+      <div class="bc-date-picker--years" role="group" aria-label={t('datePicker.chooseYear')}>
         {#each years as y (y)}
-          <button type="button" class="od-date-picker--year" aria-pressed={y === view.year} onclick={() => chooseYear(y)}>{y}</button>
+          <button type="button" class="bc-date-picker--year" aria-pressed={y === view.year} onclick={() => chooseYear(y)}>{y}</button>
         {/each}
       </div>
     {:else}
-      <div class="od-date-picker--grid" role="grid" aria-label={monthLabel} onpointerdown={swipeStart} onpointerup={swipeEnd} onpointercancel={() => (swipe = null)} onkeydown={keydown} tabindex="-1">
-        <div class="od-date-picker--row" role="row">
+      <div class="bc-date-picker--grid" role="grid" aria-label={monthLabel} onpointerdown={swipeStart} onpointerup={swipeEnd} onpointercancel={() => (swipe = null)} onkeydown={keydown} tabindex="-1">
+        <div class="bc-date-picker--row" role="row">
           {#each weekdays as w (w.name)}
-            <span class="od-date-picker--weekday" role="columnheader" aria-label={w.name}>{w.initial}</span>
+            <span class="bc-date-picker--weekday" role="columnheader" aria-label={w.name}>{w.initial}</span>
           {/each}
         </div>
         {#each rows as row, r (r)}
-          <div class="od-date-picker--row" role="row">
+          <div class="bc-date-picker--row" role="row">
             {#each row as d, c (c)}
-              <span class="od-date-picker--cell" role="gridcell" aria-selected={d !== null && selected.year === view.year && selected.month === view.month && selected.day === d}>
+              <span class="bc-date-picker--cell" role="gridcell" aria-selected={d !== null && selected.year === view.year && selected.month === view.month && selected.day === d}>
                 {#if d !== null}
                   {@const isSelected = selected.year === view.year && selected.month === view.month && selected.day === d}
                   <button
                     type="button"
-                    class="od-date-picker--day"
-                    class:od-date-picker--selected={isSelected}
-                    class:od-date-picker--today={`${view.year}-${view.month}-${d}` === todayKey}
+                    class="bc-date-picker--day"
+                    class:bc-date-picker--selected={isSelected}
+                    class:bc-date-picker--today={`${view.year}-${view.month}-${d}` === todayKey}
                     data-day={d}
                     tabindex={focused.year === view.year && focused.month === view.month && focused.day === d ? 0 : -1}
                     aria-label={fullFormat.format(utc(view.year, view.month, d))}
@@ -245,7 +245,7 @@
           </div>
         {/each}
       </div>
-      <span class="od-date-picker--sr" aria-live="polite">{monthName} {view.year}</span>
+      <span class="bc-date-picker--sr" aria-live="polite">{monthName} {view.year}</span>
     {/if}
   {/if}
   {#snippet actions()}
@@ -256,22 +256,22 @@
 
 <style>
   @layer od.components {
-    :global(.od-date-picker .od-md3-dialog--surface) {
+    :global(.bc-date-picker .bc-md3-dialog--surface) {
       width: min(360px, calc(100% - 48px));
       padding-top: 16px;
     }
 
     /* The dialog title is the small "Select date" label of the header. */
-    :global(.od-date-picker .od-md3-dialog--surface h2) {
+    :global(.bc-date-picker .bc-md3-dialog--surface h2) {
       margin: 0 24px 16px 24px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
       letter-spacing: 0.1px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-date-picker--header {
+    .bc-date-picker--header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -279,45 +279,45 @@
       min-height: 48px;
     }
 
-    .od-date-picker--headline {
-      font-family: var(--od-title-font);
+    .bc-date-picker--headline {
+      font-family: var(--bc-title-font);
       font-size: 32px;
       line-height: 40px;
       font-weight: 400;
       overflow: visible;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-date-picker--mode,
-    .od-date-picker--arrow {
+    .bc-date-picker--mode,
+    .bc-date-picker--arrow {
       width: 48px;
       height: 48px;
       padding: 0;
       border: none;
       border-radius: 50%;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-date-picker--arrow:disabled {
+    .bc-date-picker--arrow:disabled {
       opacity: 0.38;
     }
 
-    .od-date-picker--prev :global(svg) {
+    .bc-date-picker--prev :global(svg) {
       transform: scaleX(-1);
     }
 
-    .od-date-picker--divider {
+    .bc-date-picker--divider {
       height: 1px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
       margin-bottom: 4px;
     }
 
-    .od-date-picker--month-row {
+    .bc-date-picker--month-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -325,7 +325,7 @@
       min-height: 48px;
     }
 
-    .od-date-picker--month-button {
+    .bc-date-picker--month-button {
       display: flex;
       align-items: center;
       gap: 4px;
@@ -333,7 +333,7 @@
       padding: 0 8px 0 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -341,48 +341,48 @@
       cursor: pointer;
     }
 
-    .od-date-picker--drop {
+    .bc-date-picker--drop {
       display: flex;
       transform: rotate(90deg);
     }
 
-    .od-date-picker--open {
+    .bc-date-picker--open {
       transform: rotate(-90deg);
     }
 
-    .od-date-picker--arrows {
+    .bc-date-picker--arrows {
       display: flex;
     }
 
-    .od-date-picker--grid {
+    .bc-date-picker--grid {
       padding: 0 12px;
       touch-action: pan-y;
       outline: none;
     }
 
-    .od-date-picker--row {
+    .bc-date-picker--row {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
     }
 
-    .od-date-picker--weekday {
+    .bc-date-picker--weekday {
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-transform: uppercase;
     }
 
-    .od-date-picker--cell {
+    .bc-date-picker--cell {
       height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-date-picker--day {
+    .bc-date-picker--day {
       box-sizing: border-box;
       width: 40px;
       height: 40px;
@@ -390,32 +390,32 @@
       border: 1px solid transparent;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       cursor: pointer;
     }
 
-    .od-date-picker--today {
-      border-color: var(--od-outline);
+    .bc-date-picker--today {
+      border-color: var(--bc-outline);
     }
 
-    .od-date-picker--day.od-date-picker--selected {
-      background: var(--od-primary);
-      border-color: var(--od-primary);
-      color: var(--od-on-primary);
+    .bc-date-picker--day.bc-date-picker--selected {
+      background: var(--bc-primary);
+      border-color: var(--bc-primary);
+      color: var(--bc-on-primary);
     }
 
-    .od-date-picker--day:focus-visible,
-    .od-date-picker--year:focus-visible,
-    .od-date-picker--mode:focus-visible,
-    .od-date-picker--arrow:focus-visible,
-    .od-date-picker--month-button:focus-visible {
-      outline: 2px solid var(--od-primary);
+    .bc-date-picker--day:focus-visible,
+    .bc-date-picker--year:focus-visible,
+    .bc-date-picker--mode:focus-visible,
+    .bc-date-picker--arrow:focus-visible,
+    .bc-date-picker--month-button:focus-visible {
+      outline: 2px solid var(--bc-primary);
       outline-offset: 2px;
     }
 
-    .od-date-picker--years {
+    .bc-date-picker--years {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px 0;
@@ -425,49 +425,49 @@
       justify-items: center;
     }
 
-    .od-date-picker--year {
+    .bc-date-picker--year {
       box-sizing: border-box;
       width: 72px;
       height: 36px;
       border: none;
       border-radius: 18px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       cursor: pointer;
     }
 
-    .od-date-picker--year[aria-pressed='true'] {
-      background: var(--od-primary);
-      color: var(--od-on-primary);
+    .bc-date-picker--year[aria-pressed='true'] {
+      background: var(--bc-primary);
+      color: var(--bc-on-primary);
     }
 
-    .od-date-picker--input-area {
+    .bc-date-picker--input-area {
       padding: 24px 24px 8px;
     }
 
-    .od-date-picker--input-box {
+    .bc-date-picker--input-box {
       position: relative;
       display: block;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 4px;
       padding: 8px 16px 6px;
     }
 
-    .od-date-picker--input-box:focus-within {
-      border: 2px solid var(--od-primary);
+    .bc-date-picker--input-box:focus-within {
+      border: 2px solid var(--bc-primary);
       padding: 7px 15px 5px;
     }
 
-    .od-date-picker--input-label {
+    .bc-date-picker--input-label {
       display: block;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-date-picker--input {
+    .bc-date-picker--input {
       width: 100%;
       box-sizing: border-box;
       border: none;
@@ -477,25 +477,25 @@
       height: 28px;
       font: inherit;
       font-size: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-date-picker--help {
+    .bc-date-picker--help {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-date-picker--input-box.od-date-picker--invalid {
-      border-color: var(--od-error);
+    .bc-date-picker--input-box.bc-date-picker--invalid {
+      border-color: var(--bc-error);
     }
 
-    p.od-date-picker--invalid {
-      color: var(--od-error);
+    p.bc-date-picker--invalid {
+      color: var(--bc-error);
     }
 
-    .od-date-picker--sr {
+    .bc-date-picker--sr {
       position: absolute;
       width: 1px;
       height: 1px;

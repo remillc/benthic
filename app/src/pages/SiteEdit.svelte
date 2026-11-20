@@ -272,13 +272,13 @@
   }
 </script>
 
-<Page class="od-site-edit">
+<Page class="bc-site-edit">
   <Navbar title={editing ? t('sites.editTitle') : t('sites.newSite')}>
     {#snippet left()}
       {#if ios}
         <Link onClick={() => guard?.attempt()}>{t('dialog.cancel')}</Link>
       {:else}
-        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('sites.close')}</span></Link>
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="bc-sr-only">{t('sites.close')}</span></Link>
       {/if}
     {/snippet}
     {#snippet right()}
@@ -290,30 +290,30 @@
   <TextField label={t('sites.name')} bind:value={name} />
 
   <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
-  <div class="od-site-edit--map-card">
+  <div class="bc-site-edit--map-card">
     <SiteMap pin={position} editable onmove={setPosition} ratio={2.1}>
       {#snippet overlay(/** @type {boolean} */ full)}
-        <span class="chip od-site-edit--chip" class:od-site-edit--full={full}>{t('sites.movePin')}</span>
-        {#if full && coordsText}<span class="od-site-edit--coords od-value">{coordsText}</span>{/if}
+        <span class="chip bc-site-edit--chip" class:bc-site-edit--full={full}>{t('sites.movePin')}</span>
+        {#if full && coordsText}<span class="bc-site-edit--coords bc-value">{coordsText}</span>{/if}
       {/snippet}
     </SiteMap>
   </div>
 
   {#if !editing && nearby}
-    <div class="od-site-edit--nearby" role="note">
+    <div class="bc-site-edit--nearby" role="note">
       <span>{t('sites.nearbyShort', { site: nearby.name || t('sites.noName') })}</span>
-      <button type="button" class="od-text-button od-site-edit--use" onclick={useNearby}>{t('sites.useNearby')}</button>
+      <button type="button" class="bc-text-button bc-site-edit--use" onclick={useNearby}>{t('sites.useNearby')}</button>
     </div>
   {/if}
 
   {#if !editing && !nearby && commonNear && useBase !== commonNear.id}
-    <div class="od-site-edit--common" role="note">
+    <div class="bc-site-edit--common" role="note">
       <span>{t('sharedSites.suggest', { distance: distanceValue(commonNear.distanceM ?? 0, logbook.prefs), name: commonNear.name, dives: baseDivesText(commonNear) })}</span>
-      <button type="button" class="od-text-button od-site-edit--use" onclick={useCommon}>{t('sites.useNearby')}</button>
+      <button type="button" class="bc-text-button bc-site-edit--use" onclick={useCommon}>{t('sites.useNearby')}</button>
     </div>
   {/if}
   <!-- Position: coordinates, then country and region found from them. -->
-  <div class="od-form-surface">
+  <div class="bc-form-surface">
     <TextField
       label={t('sites.coordinates')}
       bind:value={coordsText}
@@ -322,105 +322,105 @@
       supporting={coordsBad ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
     >
       {#snippet trailing()}
-        <button type="button" class="od-icon-button" onclick={useDevicePosition}>
+        <button type="button" class="bc-icon-button" onclick={useDevicePosition}>
           <Icon name="locate" />
-          <span class="od-sr-only">{t('sites.useDevicePosition')}</span>
+          <span class="bc-sr-only">{t('sites.useDevicePosition')}</span>
         </button>
       {/snippet}
     </TextField>
     <TextField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
     <TextField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
-    <p class="od-site-edit--explain">{t('sites.placeExplain')}</p>
+    <p class="bc-site-edit--explain">{t('sites.placeExplain')}</p>
   </div>
 
-  <div class="od-form-surface">
+  <div class="bc-form-surface">
     <TextField label={t('sites.description')} bind:value={description} multiline />
     <TextField label={t('sites.notes')} bind:value={notes} multiline />
   </div>
 
   {#if editing}
-    <div class="od-form-surface od-site-edit--delete">
-      <button type="button" class={ios ? 'od-site-edit--delete-ios' : 'od-outlined-button od-danger'} onclick={deleteSite}>{t('sites.deleteSite')}</button>
-      <p class="od-site-edit--explain">{t('sites.deleteSiteHint')}</p>
+    <div class="bc-form-surface bc-site-edit--delete">
+      <button type="button" class={ios ? 'bc-site-edit--delete-ios' : 'bc-outlined-button bc-danger'} onclick={deleteSite}>{t('sites.deleteSite')}</button>
+      <p class="bc-site-edit--explain">{t('sites.deleteSiteHint')}</p>
     </div>
   {/if}
-  <div class="od-site-edit--end"></div>
+  <div class="bc-site-edit--end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .od-site-edit--map-card {
+    .bc-site-edit--map-card {
       position: relative;
       margin: 8px 16px 0;
       border-radius: 16px;
       overflow: hidden;
 
       /* The credits stay inside the rounded corners. */
-      --od-map-credits-right: 12px;
-      --od-map-credits-bottom: 8px;
+      --bc-map-credits-right: 12px;
+      --bc-map-credits-bottom: 8px;
     }
 
-    .od-site-edit--chip {
+    .bc-site-edit--chip {
       position: absolute;
       left: 12px;
       top: 12px;
       padding: 6px 10px;
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
 
-      &.od-site-edit--full {
-        top: calc(12px + var(--od-safe-top));
+      &.bc-site-edit--full {
+        top: calc(12px + var(--bc-safe-top));
       }
     }
 
-    .od-site-edit--coords {
+    .bc-site-edit--coords {
       position: absolute;
       left: 50%;
-      bottom: calc(40px + var(--od-safe-bottom));
+      bottom: calc(40px + var(--bc-safe-bottom));
       transform: translateX(-50%);
       padding: 8px 14px;
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 15px;
       white-space: nowrap;
     }
 
-    .od-site-edit--explain {
+    .bc-site-edit--explain {
       margin: 12px 16px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* iPhone: a red row at the bottom of the form (ios-sites-modifier.dc.html). */
-    .od-site-edit--delete-ios {
+    .bc-site-edit--delete-ios {
       box-sizing: border-box;
       width: 100%;
       min-height: 44px;
       border: none;
       border-radius: 10px;
-      background: var(--od-surface);
-      color: var(--od-alarm);
+      background: var(--bc-surface);
+      color: var(--bc-alarm);
       font: inherit;
       font-size: 17px;
     }
 
-    .od-site-edit--delete {
+    .bc-site-edit--delete {
       padding: 16px 12px;
 
-      .od-site-edit--explain {
+      .bc-site-edit--explain {
         margin: 8px 4px 0;
       }
     }
 
-    .od-site-edit--nearby {
+    .bc-site-edit--nearby {
       margin: 18px 16px 0;
       padding: 12px 16px 4px;
       border-radius: 12px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       font-size: 14px;
       line-height: 20px;
       display: flex;
@@ -428,27 +428,27 @@
       gap: 4px;
     }
 
-    .od-site-edit--common {
+    .bc-site-edit--common {
       margin: 18px 16px 0;
       padding: 12px 16px 4px;
       border-radius: 12px;
-      background: var(--od-shared-site-container);
-      color: var(--od-on-shared-site-container);
+      background: var(--bc-shared-site-container);
+      color: var(--bc-on-shared-site-container);
       font-size: 14px;
       line-height: 20px;
       display: flex;
       flex-direction: column;
       gap: 4px;
-      & .od-text-button {
-        color: var(--od-on-shared-site-container);
+      & .bc-text-button {
+        color: var(--bc-on-shared-site-container);
       }
     }
 
-    .od-site-edit--use {
+    .bc-site-edit--use {
       align-self: flex-end;
     }
 
-    .od-site-edit--end {
+    .bc-site-edit--end {
       height: 32px;
     }
   }

@@ -62,7 +62,7 @@ test('the logo and the bubbles: the timings of the brief, on transform and opaci
     assert.doesNotMatch(source.replace(/\/\*[\s\S]*?\*\//g, ''), /#[0-9A-Fa-f]{3,8}\b|rgba?\(/, `${name}: no hard-coded colour`);
   }
   const theme = read('theme.css');
-  for (const token of ['--od-plus-ring', '--od-plus-bubble', '--od-plus-logo-shadow', '--od-release-row-main: #1F5C99', '--od-release-on-panel: #FFFFFF']) assert.ok(theme.includes(token), token);
+  for (const token of ['--bc-plus-ring', '--bc-plus-bubble', '--bc-plus-logo-shadow', '--bc-release-row-main: #1F5C99', '--bc-release-on-panel: #FFFFFF']) assert.ok(theme.includes(token), token);
 });
 
 test('the screen claims the motion when the step appears and draws the profile band above the wave', () => {
@@ -71,8 +71,8 @@ test('the screen claims the motion when the step appears and draws the profile b
   assert.match(screen, /claimReady\(\)/);
   assert.match(read('lib/ready-motion.svelte.js'), /claimReadyMotion\(\)/);
   assert.match(screen, /<BenthicPlusReadyLogo play=\{motion\.play\} \/>/);
-  assert.match(screen, /od-plus-hero--profile/);
-  assert.match(screen, /od-plus-hero--wave/);
+  assert.match(screen, /bc-plus-hero--profile/);
+  assert.match(screen, /bc-plus-hero--wave/);
 });
 
 test('the release notes mention it in both languages', () => {

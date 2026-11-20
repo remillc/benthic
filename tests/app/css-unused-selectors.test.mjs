@@ -46,6 +46,24 @@ test('no component has a scoped CSS rule that Svelte drops as unused', () => {
   assert.deepEqual(problems, [], `unused CSS selectors (dropped from the build):\n${problems.join('\n')}`);
 });
 
+test('app styles, markup and e2e selectors use the bc prefix', () => {
+  const problems = [];
+  function check(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) check(file);
+      else if (/\.(svelte|css|js|mjs|html)$/.test(entry.name)) {
+        const text = readFileSync(file, 'utf8');
+        if (/--od-|\.od-[\w-]+|\bclass:od-|\bclass=(["'])[^"']*\bod-|\[class[^\]]*["']od-/.test(text)) problems.push(path.relative(appDir, file));
+      }
+    }
+  }
+  check(path.join(appDir, 'src'));
+  check(path.join(appDir, 'public'));
+  check(path.resolve(here, '..', 'e2e'));
+  assert.deepEqual(problems, []);
+});
+
 /** The CSS Svelte generates for one component. @param {string} rel path under app/src */
 function builtCss(rel) {
   const file = path.join(appDir, 'src', rel);
@@ -55,10 +73,10 @@ function builtCss(rel) {
 test('the first launch step transitions are in the built CSS, with keyframes the custom property can name', () => {
   const css = builtCss('components/FirstLaunchSteps.svelte');
   for (const kind of ['in-forward', 'in-back', 'out-forward', 'out-back']) {
-    assert.ok(css.includes(`.od-first-launch--${kind}`), `rule for ${kind}`);
-    // The slide name sits in a custom property (--od-first-launch-slide): Svelte does not rename it, so the keyframes must be global.
+    assert.ok(css.includes(`.bc-first-launch--${kind}`), `rule for ${kind}`);
+    // The slide name sits in a custom property (--bc-first-launch-slide): Svelte does not rename it, so the keyframes must be global.
     assert.ok(css.includes(`@keyframes od-first-launch-${kind} {`), `unscoped keyframes ${kind}`);
-    assert.ok(css.includes(`--od-first-launch-slide: od-first-launch-${kind}`), `slide variable for ${kind}`);
+    assert.ok(css.includes(`--bc-first-launch-slide: od-first-launch-${kind}`), `slide variable for ${kind}`);
   }
   assert.ok(css.includes('@keyframes od-first-launch-fade-in {'));
   assert.ok(css.includes('@keyframes od-first-launch-fade-out {'));
@@ -67,7 +85,7 @@ test('the first launch step transitions are in the built CSS, with keyframes the
 test('the bold of the sign-out box and the iPhone error field reach the built CSS', () => {
   // The nested rule is emitted as is: the pending box is global, so is the strong inside it.
   const account = builtCss('pages/Account.svelte');
-  const at = account.indexOf('.od-sign-out-dialog .od-sign-out-dialog--pending {');
+  const at = account.indexOf('.bc-sign-out-dialog .bc-sign-out-dialog--pending {');
   assert.ok(at >= 0 && account.slice(at, account.indexOf('\n    }', at)).includes('strong {'), 'strong inside the pending box');
-  assert.ok(builtCss('components/ReleaseField.svelte').includes('&.od-release-field--error .od-release-field--input:where('));
+  assert.ok(builtCss('components/ReleaseField.svelte').includes('&.bc-release-field--error .bc-release-field--input:where('));
 });

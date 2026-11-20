@@ -130,7 +130,7 @@
   });
 </script>
 
-<Page class="od-site-choose">
+<Page class="bc-site-choose">
   {#if ios}
     <Navbar title={t('sites.chooseSite')}>
       {#snippet left()}
@@ -138,9 +138,9 @@
       {/snippet}
     </Navbar>
   {/if}
-  <div class="od-site-choose--search" class:od-site-choose--search-ios={ios}>
+  <div class="bc-site-choose--search" class:bc-site-choose--search-ios={ios}>
     {#if !ios}
-      <button type="button" class="od-site-choose--back" aria-label={t('common.back')} onclick={() => f7router.back()}><Icon name="arrowBack" /></button>
+      <button type="button" class="bc-site-choose--back" aria-label={t('common.back')} onclick={() => f7router.back()}><Icon name="arrowBack" /></button>
     {:else}
       <Icon name="search" size={18} />
     {/if}
@@ -148,59 +148,59 @@
     {#if query}<SearchClear onclear={() => (query = '')} />{/if}
   </div>
 
-  <div class="od-site-choose--surface">
-    <button type="button" class="od-site-choose--create" disabled={creating} onclick={createHere}>
+  <div class="bc-site-choose--surface">
+    <button type="button" class="bc-site-choose--create" disabled={creating} onclick={createHere}>
       <Icon name="locate" size={22} />
       <span>{t('sites.createHere')}</span>
     </button>
   </div>
 
-  <p class="od-site-choose--count" role="status">
+  <p class="bc-site-choose--count" role="status">
     {position ? t('sites.chooseCountNear', { n: rows.length }) : t('sites.chooseCountRecent', { n: rows.length })}
   </p>
 
-  <ul class="od-site-choose--surface od-site-choose--list" role="list">
+  <ul class="bc-site-choose--surface bc-site-choose--list" role="list">
     {#each rows as row (row.site.uuid)}
       <li>
-        <button type="button" class="od-site-choose--row" onclick={() => choose(row.site)}>
+        <button type="button" class="bc-site-choose--row" onclick={() => choose(row.site)}>
           <Icon name="place" size={22} />
-          <span class="od-site-choose--texts">
-            <span class="od-site-choose--name">{row.site.name || t('sites.noName')}</span>
-            <span class="od-site-choose--line od-value">{line(row)}</span>
+          <span class="bc-site-choose--texts">
+            <span class="bc-site-choose--name">{row.site.name || t('sites.noName')}</span>
+            <span class="bc-site-choose--line bc-value">{line(row)}</span>
           </span>
         </button>
       </li>
     {/each}
   </ul>
   {#if commonRows.length}
-    <p class="od-site-choose--count od-site-choose--common-title"><Icon name="globe" size={18} />{t('sharedSites.chooseSection')}</p>
-    <ul class="od-site-choose--surface od-site-choose--list" role="list" aria-label={t('sharedSites.listLabel')}>
+    <p class="bc-site-choose--count bc-site-choose--common-title"><Icon name="globe" size={18} />{t('sharedSites.chooseSection')}</p>
+    <ul class="bc-site-choose--surface bc-site-choose--list" role="list" aria-label={t('sharedSites.listLabel')}>
       {#each commonRows as b (b.id)}
         <li>
-          <button type="button" class="od-site-choose--row" disabled={creating} onclick={() => chooseBase(b)}>
-            <span class="od-site-choose--common-dot" aria-hidden="true"></span>
-            <span class="od-site-choose--texts">
-              <span class="od-site-choose--name">{b.name}</span>
-              <span class="od-site-choose--line od-value">{commonLine(b)}</span>
+          <button type="button" class="bc-site-choose--row" disabled={creating} onclick={() => chooseBase(b)}>
+            <span class="bc-site-choose--common-dot" aria-hidden="true"></span>
+            <span class="bc-site-choose--texts">
+              <span class="bc-site-choose--name">{b.name}</span>
+              <span class="bc-site-choose--line bc-value">{commonLine(b)}</span>
             </span>
           </button>
         </li>
       {/each}
     </ul>
-    <p class="od-site-choose--note">{t('sharedSites.chooseNote')}</p>
+    <p class="bc-site-choose--note">{t('sharedSites.chooseNote')}</p>
   {/if}
-  <p class="od-site-choose--note">{t('sites.chooseNote')}</p>
+  <p class="bc-site-choose--note">{t('sites.chooseNote')}</p>
 </Page>
 
 <style>
   @layer od.components {
     /* Material 3 search bar: 56 dp pill, ← and the field (choisir-site-android). */
-    .od-site-choose--search {
+    .bc-site-choose--search {
       margin: calc(12px + var(--f7-safe-area-top)) 16px 8px;
       height: 56px;
       padding: 0 4px;
       border-radius: 28px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -211,42 +211,42 @@
         height: 100%;
         border: none;
         background: transparent;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
         outline: none;
       }
 
       /* iPhone: the search field under the navigation bar. */
-      &.od-site-choose--search-ios {
+      &.bc-site-choose--search-ios {
         margin: 8px 16px;
         height: 36px;
         padding: 0 8px;
         border-radius: 10px;
         gap: 6px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-site-choose--back {
+    .bc-site-choose--back {
       flex: none;
       width: 48px;
       height: 48px;
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-site-choose--surface {
+    .bc-site-choose--surface {
       margin: 8px 16px 0;
       padding: 0;
       list-style: none;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -254,15 +254,15 @@
       }
     }
 
-    .od-site-choose--create,
-    .od-site-choose--row {
+    .bc-site-choose--create,
+    .bc-site-choose--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
       padding: 8px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       text-align: start;
@@ -270,71 +270,71 @@
       align-items: center;
       gap: 16px;
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-site-choose--create {
+    .bc-site-choose--create {
       font-weight: 500;
 
-      :global(.od-icon) {
-        color: var(--od-secondary);
+      :global(.bc-icon) {
+        color: var(--bc-secondary);
       }
     }
 
-    .od-site-choose--list li + li {
-      border-top: 1px solid var(--od-row-divider);
+    .bc-site-choose--list li + li {
+      border-top: 1px solid var(--bc-row-divider);
     }
 
-    .od-site-choose--texts {
+    .bc-site-choose--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-site-choose--name {
+    .bc-site-choose--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-site-choose--line {
+    .bc-site-choose--line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-choose--count {
+    .bc-site-choose--count {
       margin: 16px 24px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-choose--common-title {
+    .bc-site-choose--common-title {
       margin-top: 24px;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--od-shared-site);
+      color: var(--bc-shared-site);
       font-weight: 600;
     }
-    .od-site-choose--common-dot {
+    .bc-site-choose--common-dot {
       flex: none;
       width: 12px;
       height: 12px;
       margin: 0 5px;
       border-radius: 6px;
-      background: var(--od-shared-site);
+      background: var(--bc-shared-site);
     }
 
-    .od-site-choose--note {
+    .bc-site-choose--note {
       margin: 12px 24px 32px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

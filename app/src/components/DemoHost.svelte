@@ -22,9 +22,9 @@
 
   // The app's content makes room for the banner (theme rules below, on the root element).
   $effect(() => {
-    document.documentElement.classList.toggle('od-demo-on', bannerShown && !bottom);
-    document.documentElement.classList.toggle('od-demo-bottom-on', bannerShown && bottom);
-    return () => document.documentElement.classList.remove('od-demo-on', 'od-demo-bottom-on');
+    document.documentElement.classList.toggle('bc-demo-on', bannerShown && !bottom);
+    document.documentElement.classList.toggle('bc-demo-bottom-on', bannerShown && bottom);
+    return () => document.documentElement.classList.remove('bc-demo-on', 'bc-demo-bottom-on');
   });
 
   // The first launch's link could not open the demo.
@@ -41,33 +41,33 @@
 </script>
 
 {#if bannerShown}
-  <div class="od-demo-banner" class:od-demo-banner--bottom={bottom} role="status" aria-label={t('demoLogbook.banner.lead')}>
-    <svg class="od-demo-banner--icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <div class="bc-demo-banner" class:bc-demo-banner--bottom={bottom} role="status" aria-label={t('demoLogbook.banner.lead')}>
+    <svg class="bc-demo-banner--icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3M7.5 15h9" />
     </svg>
-    <p class="od-demo-banner--text"><strong>{t('demoLogbook.banner.lead')}</strong> {t('demoLogbook.banner.text')}</p>
-    <button type="button" class="od-demo-banner--start" onclick={requestExit}>{bottom ? t('demoLogbook.banner.startShort') : t('demoLogbook.banner.start')}</button>
+    <p class="bc-demo-banner--text"><strong>{t('demoLogbook.banner.lead')}</strong> {t('demoLogbook.banner.text')}</p>
+    <button type="button" class="bc-demo-banner--start" onclick={requestExit}>{bottom ? t('demoLogbook.banner.startShort') : t('demoLogbook.banner.start')}</button>
   </div>
 {/if}
 
 {#if shown && demo.dialog}
   <Md3Dialog
-    class="od-demo-dialog"
+    class="bc-demo-dialog"
     title={demo.dialog === 'exit' ? t('demoLogbook.exit.title') : t('demoLogbook.add.title')}
     text=""
     oncancel={closeDialog}
   >
-    <p class="od-demo-dialog--text">{demo.dialog === 'exit' ? t(deviceKey('demoLogbook.exit.text', kind)) : t('demoLogbook.add.text')}</p>
+    <p class="bc-demo-dialog--text">{demo.dialog === 'exit' ? t(deviceKey('demoLogbook.exit.text', kind)) : t('demoLogbook.add.text')}</p>
     {#snippet actions()}
-      <button type="button" class="od-demo-dialog--cancel" onclick={closeDialog}>{t('demoLogbook.exit.cancel')}</button>
-      <button type="button" class="od-demo-dialog--confirm" disabled={demo.busy} onclick={confirm}>{t('demoLogbook.exit.confirm')}</button>
+      <button type="button" class="bc-demo-dialog--cancel" onclick={closeDialog}>{t('demoLogbook.exit.cancel')}</button>
+      <button type="button" class="bc-demo-dialog--confirm" disabled={demo.busy} onclick={confirm}>{t('demoLogbook.exit.confirm')}</button>
     {/snippet}
   </Md3Dialog>
 {/if}
 
 <style>
   @layer od.components {
-    .od-demo-banner {
+    .bc-demo-banner {
       position: fixed;
       top: calc(var(--f7-safe-area-top, 0px) + 4px);
       left: 12px;
@@ -80,36 +80,36 @@
       gap: 12px;
       padding: 0 8px 0 16px;
       border-radius: 16px;
-      background: var(--od-release-row-main);
-      color: var(--od-release-on-panel);
+      background: var(--bc-release-row-main);
+      color: var(--bc-release-on-panel);
     }
 
     /* Phone: above the bottom navigation bar, 8 dp from it, over the list's last row's room (theme rules below). */
-    .od-demo-banner--bottom {
+    .bc-demo-banner--bottom {
       top: auto;
-      bottom: calc(var(--od-bottom-nav-height, 64px) + var(--f7-safe-area-bottom, 0px) + 8px);
+      bottom: calc(var(--bc-bottom-nav-height, 64px) + var(--f7-safe-area-bottom, 0px) + 8px);
       height: auto;
       padding: 12px 12px 12px 16px;
-      box-shadow: 0 4px 12px color-mix(in srgb, var(--od-release-row-main) 25%, transparent);
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--bc-release-row-main) 25%, transparent);
     }
 
-    .od-demo-banner--bottom .od-demo-banner--text {
+    .bc-demo-banner--bottom .bc-demo-banner--text {
       font-size: 15px;
       line-height: 20px;
     }
 
-    .od-demo-banner--bottom .od-demo-banner--start {
+    .bc-demo-banner--bottom .bc-demo-banner--start {
       height: 40px;
       padding: 0 16px;
       border-radius: 20px;
       font-size: 14px;
     }
 
-    .od-demo-banner--icon {
+    .bc-demo-banner--icon {
       flex: none;
     }
 
-    .od-demo-banner--text {
+    .bc-demo-banner--text {
       flex: 1;
       min-width: 0;
       margin: 0;
@@ -117,19 +117,19 @@
       line-height: 22px;
     }
 
-    .od-demo-banner--text strong {
+    .bc-demo-banner--text strong {
       font-weight: 600;
     }
 
-    .od-demo-banner--start {
+    .bc-demo-banner--start {
       flex: none;
       width: auto;
       height: 38px;
       padding: 0 20px;
       border: none;
       border-radius: 19px;
-      background: var(--od-release-on-panel);
-      color: var(--od-release-row-main);
+      background: var(--bc-release-on-panel);
+      color: var(--bc-release-row-main);
       font: inherit;
       font-size: 15px;
       font-weight: 600;
@@ -143,54 +143,54 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-on-panel);
+        outline: 2px solid var(--bc-release-on-panel);
         outline-offset: 2px;
       }
     }
 
     /* The content leaves room for the banner: the views, the rail and the sidebar start under it. */
-    :global(html.od-demo-on) {
-      --od-demo-height: calc(var(--f7-safe-area-top, 0px) + 60px);
+    :global(html.bc-demo-on) {
+      --bc-demo-height: calc(var(--f7-safe-area-top, 0px) + 60px);
     }
 
-    :global(html.od-demo-on .views) {
+    :global(html.bc-demo-on .views) {
       --f7-safe-area-top: 0px;
-      margin-top: var(--od-demo-height);
-      height: calc(100% - var(--od-demo-height));
+      margin-top: var(--bc-demo-height);
+      height: calc(100% - var(--bc-demo-height));
     }
 
-    :global(html.od-demo-on .od-nav-rail--rail) {
-      top: var(--od-demo-height);
+    :global(html.bc-demo-on .bc-nav-rail--rail) {
+      top: var(--bc-demo-height);
       padding-top: 24px;
     }
 
-    .od-demo-dialog--text {
+    .bc-demo-dialog--text {
       margin: 0 24px;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.od-demo-dialog) :global(.od-md3-dialog--surface) {
+    :global(.bc-demo-dialog) :global(.bc-md3-dialog--surface) {
       width: min(420px, calc(100% - 48px));
     }
 
-    :global(.od-demo-dialog) :global(.od-md3-dialog--actions) {
+    :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) {
       margin: 20px 24px 0;
       gap: 12px;
     }
 
-    :global(.od-demo-dialog) :global(.od-md3-dialog--actions) .od-demo-dialog--cancel {
-      color: var(--od-release-link);
+    :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) .bc-demo-dialog--cancel {
+      color: var(--bc-release-link);
       font-size: 15px;
     }
 
-    :global(.od-demo-dialog) :global(.od-md3-dialog--actions) .od-demo-dialog--confirm {
+    :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) .bc-demo-dialog--confirm {
       height: 44px;
       padding: 0 24px;
       border-radius: 22px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font-size: 15px;
 
       &:disabled {

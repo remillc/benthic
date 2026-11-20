@@ -110,8 +110,8 @@ test('task 239: the tablet logbook opens with the snackbar at the bottom left an
   for (const key of Object.values(FIRST_LAUNCH_SNACKBARS_TABLET)) assert.ok(get(langs.en, key), key);
   assert.match(read('lib/account.js'), /desktopApp \? FIRST_LAUNCH_SNACKBARS_DESKTOP : layout\.phone \? FIRST_LAUNCH_SNACKBARS : FIRST_LAUNCH_SNACKBARS_TABLET/);
   assert.match(read('lib/account.js'), /\{ placement: 'start' \}/);
-  assert.match(read('lib/snackbar-logic.js'), /placement === 'start' \? 'od-snackbar-start'/);
-  assert.match(read('theme.css'), /&\.od-snackbar-start \{\s*left: calc\(var\(--od-nav-width, 96px\) \+ 24px\);\s*right: auto;\s*bottom: calc\(24px \+ var\(--f7-safe-area-bottom\)\);/);
+  assert.match(read('lib/snackbar-logic.js'), /placement === 'start' \? 'bc-snackbar-start'/);
+  assert.match(read('theme.css'), /&\.bc-snackbar-start \{\s*left: calc\(var\(--bc-nav-width, 96px\) \+ 24px\);\s*right: auto;\s*bottom: calc\(24px \+ var\(--f7-safe-area-bottom\)\);/);
   assert.equal(langs.fr.logbook.emptyLocalTablet, 'Sur cette tablette · aucune plongée');
   assert.ok(langs.en.logbook.emptyLocalTablet);
   assert.equal(langs.fr.logbook.emptyLocalDesktop, 'Sur cet ordinateur · aucune plongée');
@@ -157,31 +157,31 @@ test('the download: three steps from the sync progress, the count of what the co
 });
 
 test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a step, the section-band wave, the badge 16 dp tall', () => {
-  assert.match(band, /height: calc\(var\(--od-first-band-top\) \+ 140px\);/);
-  assert.match(band, /\.od-first-launch-band--welcome \{\s*height: calc\(var\(--od-first-band-top\) \+ 306px\);/);
+  assert.match(band, /height: calc\(var\(--bc-first-band-top\) \+ 140px\);/);
+  assert.match(band, /\.bc-first-launch-band--welcome \{\s*height: calc\(var\(--bc-first-band-top\) \+ 306px\);/);
   // The step band is 140 dp under the status bar (task 236); the welcome band is 330 dp with it (24 + 306).
-  assert.match(band, /--od-first-band-top: max\(var\(--f7-safe-area-top\), 24px\)/);
+  assert.match(band, /--bc-first-band-top: max\(var\(--f7-safe-area-top\), 24px\)/);
   // The welcome band draws the headline and the animated profile; a step has the section band's look
   // (task 250): its radial gradient, the rays, the faint profile and the 18 dp wave, no sheen, no straight edge.
-  assert.match(band, /\{#if welcome\}\s*<h1[\s\S]*<svg class="od-first-launch-band--profile"/);
-  assert.match(band, /\{#if welcome\}<div class="od-first-launch-band--sheen"/);
+  assert.match(band, /\{#if welcome\}\s*<h1[\s\S]*<svg class="bc-first-launch-band--profile"/);
+  assert.match(band, /\{#if welcome\}<div class="bc-first-launch-band--sheen"/);
   assert.match(band, /d="M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z"/);
-  assert.match(band, /od-first-launch-band--step-area[\s\S]*var\(--od-band-profile-area\)/);
-  assert.match(band, /background: var\(--od-first-band-step\)/);
-  assert.match(theme, /--od-first-band-step: radial-gradient\(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%\)/);
-  assert.match(band, /\.od-first-launch-band--alpha \{[^}]*height: 16px;[^}]*padding: 1px 5px;[^}]*font-size: 9px;[^}]*line-height: 12px;[^}]*letter-spacing: 0\.5px;/);
-  assert.match(band, /border: 1px solid var\(--od-first-band-badge-line\)/);
-  assert.match(theme, /--od-first-band-badge: rgb\(255 255 255 \/ 0\.18\)/);
-  assert.match(theme, /--od-first-band-badge-line: rgb\(255 255 255 \/ 0\.55\)/);
+  assert.match(band, /bc-first-launch-band--step-area[\s\S]*var\(--bc-band-profile-area\)/);
+  assert.match(band, /background: var\(--bc-first-band-step\)/);
+  assert.match(theme, /--bc-first-band-step: radial-gradient\(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%\)/);
+  assert.match(band, /\.bc-first-launch-band--alpha \{[^}]*height: 16px;[^}]*padding: 1px 5px;[^}]*font-size: 9px;[^}]*line-height: 12px;[^}]*letter-spacing: 0\.5px;/);
+  assert.match(band, /border: 1px solid var\(--bc-first-band-badge-line\)/);
+  assert.match(theme, /--bc-first-band-badge: rgb\(255 255 255 \/ 0\.18\)/);
+  assert.match(theme, /--bc-first-band-badge-line: rgb\(255 255 255 \/ 0\.55\)/);
   // The welcome band's name keeps the 24 sp size, a step's the 20 sp one.
-  assert.match(band, /\.od-first-launch-band--name \{\s*font-size: 20px;/);
-  assert.match(band, /--welcome \.od-first-launch-band--name \{\s*font-size: 24px;/);
+  assert.match(band, /\.bc-first-launch-band--name \{\s*font-size: 20px;/);
+  assert.match(band, /--welcome \.bc-first-launch-band--name \{\s*font-size: 24px;/);
 });
 
 test('the band is the blue panel of the tablet: gradient, sheen and hatching of task 234', () => {
-  assert.match(theme, /--od-first-band: linear-gradient\(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%\)/);
-  assert.match(theme, /--od-first-band-sheen: radial-gradient\(ellipse 70% 45% at 22% 0%, rgb\(255 255 255 \/ 0\.22\), rgb\(255 255 255 \/ 0\) 70%\)/);
-  assert.match(theme, /--od-first-band-hatch: repeating-linear-gradient\(105deg, rgb\(255 255 255 \/ 0\.035\) 0 60px, rgb\(255 255 255 \/ 0\) 60px 150px\)/);
+  assert.match(theme, /--bc-first-band: linear-gradient\(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%\)/);
+  assert.match(theme, /--bc-first-band-sheen: radial-gradient\(ellipse 70% 45% at 22% 0%, rgb\(255 255 255 \/ 0\.22\), rgb\(255 255 255 \/ 0\) 70%\)/);
+  assert.match(theme, /--bc-first-band-hatch: repeating-linear-gradient\(105deg, rgb\(255 255 255 \/ 0\.035\) 0 60px, rgb\(255 255 255 \/ 0\) 60px 150px\)/);
   assert.match(band, /mask-image: linear-gradient\(180deg, #000 0%, transparent 55%\)/);
 });
 
@@ -200,28 +200,28 @@ test('white text on the band: at least 4.5:1 on every colour of the gradient, an
   // Measured in headless Edge on the rendered band (lightest pixel under each text, text hidden): the name 4.76,
   // the welcome badge 4.57 (fill 12 %: at 18 % it was 4.04), the step badge 5.06 (fill 18 %), the headline 7.55,
   // the line under it 6.72.
-  assert.match(band, /welcome \.od-first-launch-band--alpha \{\s*background: var\(--od-first-band-badge-welcome\)/);
-  assert.match(theme, /--od-first-band-badge-welcome: rgb\(255 255 255 \/ 0\.12\)/);
+  assert.match(band, /welcome \.bc-first-launch-band--alpha \{\s*background: var\(--bc-first-band-badge-welcome\)/);
+  assert.match(theme, /--bc-first-band-badge-welcome: rgb\(255 255 255 \/ 0\.12\)/);
 });
 
 test('« Retour » goes back one step, and the steps are laid out as the mock-ups say', () => {
-  assert.match(editorial, /<Link back class="od-editorial-page--retour">[\s\S]*t\('accountStep\.back'\)/);
+  assert.match(editorial, /<Link back class="bc-editorial-page--retour">[\s\S]*t\('accountStep\.back'\)/);
   assert.match(editorial, /\{#if !noRetour && onback\}[\s\S]*\{:else if !noRetour\}/);
   // The download is a step you leave with « Annuler », not « Retour ».
   assert.match(download, /\bnoRetour\b/);
-  assert.match(editorial, /\.od-editorial-page--retour\) \{[^}]*min-height: 48px;/);
-  assert.match(editorial, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
+  assert.match(editorial, /\.bc-editorial-page--retour\) \{[^}]*min-height: 48px;/);
+  assert.match(editorial, /\.bc-editorial-page--band-body,\s*\.bc-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
   // Pointer and hover on the link.
   assert.match(editorial, /cursor: pointer;[\s\S]*@media \(hover: hover\)/);
 });
 
 test('the outlined field of the steps: 52 dp, 12 dp corners, the label on the border, colours from tokens', () => {
   const field = read('components/AccountField.svelte');
-  assert.match(field, /\.od-account-field--outlined \{[\s\S]*height: 52px;[\s\S]*border-radius: 12px;/);
+  assert.match(field, /\.bc-account-field--outlined \{[\s\S]*height: 52px;[\s\S]*border-radius: 12px;/);
   assert.match(field, /top: -9px;/);
-  assert.match(field, /var\(--od-outlined-field-error\)/);
-  assert.match(theme, /--od-outlined-field-active: var\(--od-code-active\)/);
-  assert.doesNotMatch(field.slice(field.indexOf('.od-account-field--outlined')), /#[0-9a-f]{3,6}\b/i);
+  assert.match(field, /var\(--bc-outlined-field-error\)/);
+  assert.match(theme, /--bc-outlined-field-active: var\(--bc-code-active\)/);
+  assert.doesNotMatch(field.slice(field.indexOf('.bc-account-field--outlined')), /#[0-9a-f]{3,6}\b/i);
   // The mask's #000 is an alpha mask, not a colour.
   assert.doesNotMatch(band.slice(band.indexOf('<style>')).replace('#000', ''), /#[0-9a-f]{3,6}/i);
 });

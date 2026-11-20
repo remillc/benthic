@@ -68,10 +68,10 @@
   }
 </script>
 
-<div class="od-wheel-picker od-wheel-picker--wheel no-swipeback" class:od-wheel-picker--inline={inline}>
-  <span class="od-wheel-picker--label" class:od-sr-only={inline} id={id}>{label}</span>
+<div class="bc-wheel-picker bc-wheel-picker--wheel no-swipeback" class:bc-wheel-picker--inline={inline}>
+  <span class="bc-wheel-picker--label" class:bc-sr-only={inline} id={id}>{label}</span>
   <div
-    class="od-wheel-picker--window"
+    class="bc-wheel-picker--window"
     role="spinbutton"
     tabindex="0"
     aria-labelledby={id}
@@ -81,13 +81,13 @@
     aria-valuetext={values[index]}
     onkeydown={keydown}
   >
-    <div class="od-wheel-picker--lines" aria-hidden="true"></div>
-    <div class="od-wheel-picker--scroller" bind:this={scroller} {onscroll} aria-hidden="true">
+    <div class="bc-wheel-picker--lines" aria-hidden="true"></div>
+    <div class="bc-wheel-picker--scroller" bind:this={scroller} {onscroll} aria-hidden="true">
       {#each values as text, i (i)}
         {@const distance = Math.abs(i - position)}
         <div
-          class="od-wheel-picker--item"
-          class:od-wheel-picker--current={distance < 0.5}
+          class="bc-wheel-picker--item"
+          class:bc-wheel-picker--current={distance < 0.5}
           style:opacity={distance < 0.5 ? 1 : distance < 1.5 ? 0.6 : distance < 2.5 ? 0.3 : 0.15}
         >
           {text}
@@ -95,12 +95,12 @@
       {/each}
     </div>
   </div>
-  {#if defaultText}<span class="od-wheel-picker--default">{defaultText}</span>{/if}
+  {#if defaultText}<span class="bc-wheel-picker--default">{defaultText}</span>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-wheel-picker--wheel {
+    .bc-wheel-picker--wheel {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -109,36 +109,36 @@
       gap: 6px;
     }
 
-    .od-wheel-picker--label {
+    .bc-wheel-picker--label {
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-wheel-picker--window {
+    .bc-wheel-picker--window {
       position: relative;
       width: 100%;
       height: 200px;
       border-radius: 8px;
 
       &:focus-visible {
-        outline: 2px solid var(--od-action);
+        outline: 2px solid var(--bc-action);
       }
     }
 
-    .od-wheel-picker--lines {
+    .bc-wheel-picker--lines {
       position: absolute;
       left: 8px;
       right: 8px;
       top: 80px;
       height: 40px;
       box-sizing: border-box;
-      border-top: 2px solid var(--od-text);
-      border-bottom: 2px solid var(--od-text);
+      border-top: 2px solid var(--bc-text);
+      border-bottom: 2px solid var(--bc-text);
       pointer-events: none;
     }
 
-    .od-wheel-picker--scroller {
+    .bc-wheel-picker--scroller {
       height: 100%;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
@@ -157,7 +157,7 @@
       }
     }
 
-    .od-wheel-picker--item {
+    .bc-wheel-picker--item {
       height: 40px;
       display: flex;
       align-items: center;
@@ -165,9 +165,9 @@
       scroll-snap-align: center;
       font-size: 18px;
       font-variant-numeric: tabular-nums;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      &.od-wheel-picker--current {
+      &.bc-wheel-picker--current {
         font-size: 22px;
         font-weight: 600;
       }
@@ -175,38 +175,38 @@
 
     /* Inline (the gas tools' pO2 wheel): three values visible, the current one
        framed, on a white surface; docs/mockups/outils-ead-mod-android.dc.html. */
-    .od-wheel-picker--inline {
+    .bc-wheel-picker--inline {
       flex: none;
       width: 96px;
 
-      .od-wheel-picker--window {
+      .bc-wheel-picker--window {
         height: 120px;
         overflow: hidden;
       }
 
-      .od-wheel-picker--lines {
+      .bc-wheel-picker--lines {
         left: 4px;
         right: 4px;
         top: 40px;
       }
 
-      .od-wheel-picker--scroller::before,
-      .od-wheel-picker--scroller::after {
+      .bc-wheel-picker--scroller::before,
+      .bc-wheel-picker--scroller::after {
         height: 40px;
       }
 
-      .od-wheel-picker--item {
+      .bc-wheel-picker--item {
         font-size: 17px;
 
-        &.od-wheel-picker--current {
+        &.bc-wheel-picker--current {
           font-size: 22px;
         }
       }
     }
 
-    .od-wheel-picker--default {
+    .bc-wheel-picker--default {
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

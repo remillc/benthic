@@ -83,17 +83,17 @@
   }
 </script>
 
-<div class="od-chips-field od-chips-field--field" class:od-chips-field--focused={focused} class:od-chips-field--floated={floated} class:od-chips-field--menu-open={proposals.length || isNew}>
+<div class="bc-chips-field bc-chips-field--field" class:bc-chips-field--focused={focused} class:bc-chips-field--floated={floated} class:bc-chips-field--menu-open={proposals.length || isNew}>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="od-chips-field--box" onclick={() => input?.focus()}>
-    <label class="od-chips-field--label" for={id}>{label}</label>
-    <div class="od-chips-field--chips">
+  <div class="bc-chips-field--box" onclick={() => input?.focus()}>
+    <label class="bc-chips-field--label" for={id}>{label}</label>
+    <div class="bc-chips-field--chips">
       {#each values as value, i (value)}
-        <span class="chip od-chips-field--chip">
-          {value}{#if notes[value]}<span class="od-chips-field--note">{notes[value]}</span>{/if}
-          <button type="button" class="od-chips-field--remove" onclick={(e) => { e.stopPropagation(); remove(i); }}>
+        <span class="chip bc-chips-field--chip">
+          {value}{#if notes[value]}<span class="bc-chips-field--note">{notes[value]}</span>{/if}
+          <button type="button" class="bc-chips-field--remove" onclick={(e) => { e.stopPropagation(); remove(i); }}>
             <Icon name="close" size={18} weight={2} />
-            <span class="od-sr-only">{t('chips.remove', { value })}</span>
+            <span class="bc-sr-only">{t('chips.remove', { value })}</span>
           </button>
         </span>
       {/each}
@@ -112,44 +112,44 @@
     </div>
   </div>
   {#if proposals.length || isNew}
-    <ul class="od-chips-field--proposals" role="listbox" aria-label={label} use:floatMenu={'.od-chips-field--box'}>
+    <ul class="bc-chips-field--proposals" role="listbox" aria-label={label} use:floatMenu={'.bc-chips-field--box'}>
       {#each proposals as p (p)}
         <li><button type="button" onmousedown={(e) => e.preventDefault()} onclick={() => add(p)}>{p}</button></li>
       {/each}
       {#if isNew}
-        <li><button type="button" class="od-chips-field--new" onmousedown={(e) => e.preventDefault()} onclick={() => add(typed)}>{t('chips.add', { value: typed.trim() })}</button></li>
+        <li><button type="button" class="bc-chips-field--new" onmousedown={(e) => e.preventDefault()} onclick={() => add(typed)}>{t('chips.add', { value: typed.trim() })}</button></li>
       {/if}
     </ul>
   {/if}
-  {#if supporting}<p class="od-chips-field--supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="bc-chips-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-chips-field--field {
+    .bc-chips-field--field {
       position: relative;
-      margin: 18px var(--od-field-margin, 16px) 0;
+      margin: 18px var(--bc-field-margin, 16px) 0;
 
       /* The open menu passes over what follows. */
-      &.od-chips-field--menu-open {
+      &.bc-chips-field--menu-open {
         z-index: 30;
       }
     }
 
     /* Framework7 gives each list its own stacking level: the list holding an
        open menu comes to the front, above the next cards. */
-    :global(:is(.list, .od-form-surface):has(.od-chips-field--menu-open)) {
+    :global(:is(.list, .bc-form-surface):has(.bc-chips-field--menu-open)) {
       position: relative;
       z-index: 30;
     }
 
-    .od-chips-field--box {
+    .bc-chips-field--box {
       position: relative;
       min-height: 56px;
       padding: 8px 12px 8px 16px;
       box-sizing: border-box;
       border-radius: 4px 4px 0 0;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       cursor: text;
 
       &::after {
@@ -159,27 +159,27 @@
         right: 0;
         bottom: 0;
         height: 1px;
-        background: var(--od-text-2);
+        background: var(--bc-text-2);
       }
 
-      .od-chips-field--focused &::after {
+      .bc-chips-field--focused &::after {
         height: 2px;
-        background: var(--od-primary-action);
+        background: var(--bc-primary-action);
       }
     }
 
     /* « sur 2 plongées » after the name of a chip of only some of the dives. */
-    .od-chips-field--note {
+    .bc-chips-field--note {
       margin-left: 6px;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-chips-field--label {
+    .bc-chips-field--label {
       display: block;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       transform: translateY(8px);
       transition:
         transform 150ms,
@@ -187,18 +187,18 @@
         line-height 150ms;
       pointer-events: none;
 
-      .od-chips-field--floated & {
+      .bc-chips-field--floated & {
         transform: none;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .od-chips-field--focused & {
-        color: var(--od-primary-action);
+      .bc-chips-field--focused & {
+        color: var(--bc-primary-action);
       }
     }
 
-    .od-chips-field--chips {
+    .bc-chips-field--chips {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -206,35 +206,35 @@
       padding: 4px 0 0;
 
       /* At rest and empty, the label sits on the input line. */
-      .od-chips-field--field:not(.od-chips-field--floated) & {
+      .bc-chips-field--field:not(.bc-chips-field--floated) & {
         margin-top: -24px;
       }
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners, outlined, with a remove ×. */
-    .od-chips-field--chip {
+    .bc-chips-field--chip {
       height: 32px;
       padding: 0 4px 0 12px;
       box-sizing: border-box;
-      border: var(--od-outline-width) solid var(--od-text-2);
+      border: var(--bc-outline-width) solid var(--bc-text-2);
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: inline-flex;
       align-items: center;
       gap: 4px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-chips-field--remove {
+    .bc-chips-field--remove {
       position: relative;
       width: 24px;
       height: 24px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -255,24 +255,24 @@
       border: none;
       outline: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
     }
 
     /* In the top layer, placed by floatMenu (lib/float-menu.js). */
-    .od-chips-field--proposals {
+    .bc-chips-field--proposals {
       position: fixed;
       inset: auto;
       box-sizing: border-box;
       overflow-y: auto;
       border: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       margin: 0;
       padding: 8px 0;
       list-style: none;
       border-radius: 4px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
 
       button {
@@ -281,23 +281,23 @@
         padding: 0 16px;
         border: none;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
         text-align: start;
       }
 
-      .od-chips-field--new {
-        color: var(--od-text-2);
+      .bc-chips-field--new {
+        color: var(--bc-text-2);
       }
     }
 
-    .od-chips-field--supporting {
+    .bc-chips-field--supporting {
       margin: 4px 0 0;
       padding-left: 16px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

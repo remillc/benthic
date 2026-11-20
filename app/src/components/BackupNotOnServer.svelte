@@ -15,22 +15,22 @@
   }
 </script>
 
-<div class="od-backup od-backup-not-on-server">
-  <div class="od-backup--card">
-    <span class="od-backup--status-tile od-backup--pending" aria-hidden="true"><Icon name="cloud" size={26} weight={1.8} /></span>
-    <span class="od-backup--texts">
-      <span class="od-backup--title">{t('backup.notOnServer.title')}</span>
-      <span class="od-backup--line">{t('backup.notOnServer.line')}</span>
+<div class="bc-backup bc-backup-not-on-server">
+  <div class="bc-backup--card">
+    <span class="bc-backup--status-tile bc-backup--pending" aria-hidden="true"><Icon name="cloud" size={26} weight={1.8} /></span>
+    <span class="bc-backup--texts">
+      <span class="bc-backup--title">{t('backup.notOnServer.title')}</span>
+      <span class="bc-backup--line">{t('backup.notOnServer.line')}</span>
     </span>
   </div>
-  <div class="od-backup-not-on-server--action">
-    <button type="button" class="od-outlined-button od-backup-not-on-server--send" onclick={send}>{t('backup.notOnServer.send')}</button>
+  <div class="bc-backup-not-on-server--action">
+    <button type="button" class="bc-outlined-button bc-backup-not-on-server--send" onclick={send}>{t('backup.notOnServer.send')}</button>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-backup-not-on-server--action {
+    .bc-backup-not-on-server--action {
       margin: 16px 16px 0;
       display: flex;
     }

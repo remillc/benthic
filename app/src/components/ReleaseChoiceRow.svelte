@@ -24,30 +24,30 @@
   let { icon, title, help = '', main = false, compact = false, prominent = false, dense = false, plus = false, disabled = false, class: extra = '', onclick } = $props();
 </script>
 
-<button type="button" class="od-release-row {extra}" class:od-release-row--main={main} class:od-release-row--compact={compact} class:od-release-row--prominent={prominent} class:od-release-row--dense={dense} {disabled} {onclick}>
-  <span class="od-release-row--tile"><Icon name={/** @type {any} */ (icon)} size={24} /></span>
-  <span class="od-release-row--text">
-    {#if plus}<span class="od-release-row--plus"><BenthicPlusChip /></span>{/if}
-    <span class="od-release-row--title">{title}</span>
-    {#if help}<span class="od-release-row--help">{help}</span>{/if}
+<button type="button" class="bc-release-row {extra}" class:bc-release-row--main={main} class:bc-release-row--compact={compact} class:bc-release-row--prominent={prominent} class:bc-release-row--dense={dense} {disabled} {onclick}>
+  <span class="bc-release-row--tile"><Icon name={/** @type {any} */ (icon)} size={24} /></span>
+  <span class="bc-release-row--text">
+    {#if plus}<span class="bc-release-row--plus"><BenthicPlusChip /></span>{/if}
+    <span class="bc-release-row--title">{title}</span>
+    {#if help}<span class="bc-release-row--help">{help}</span>{/if}
   </span>
-  <span class="od-release-row--chevron"><Icon name="chevron" size={20} weight={2} /></span>
+  <span class="bc-release-row--chevron"><Icon name="chevron" size={20} weight={2} /></span>
 </button>
 
 <style>
   @layer od.components {
-    .od-release-row {
+    .bc-release-row {
       box-sizing: border-box;
       width: 100%;
       display: flex;
       align-items: center;
       gap: 16px;
       padding: 16px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 24px;
-      background: var(--od-surface);
-      box-shadow: 0 1px 2px var(--od-release-row-shadow);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      box-shadow: 0 1px 2px var(--bc-release-row-shadow);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
@@ -58,7 +58,7 @@
         background-color 0.15s;
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
 
@@ -70,41 +70,41 @@
       @media (hover: hover) {
         &:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px var(--od-release-row-shadow-hover);
-          background: var(--od-surface-2);
+          box-shadow: 0 4px 12px var(--bc-release-row-shadow-hover);
+          background: var(--bc-surface-2);
         }
       }
     }
 
-    .od-release-row--main {
+    .bc-release-row--main {
       border: none;
-      background: var(--od-release-row-main);
-      box-shadow: 0 6px 18px var(--od-release-row-main-shadow);
-      color: var(--od-release-on-panel);
+      background: var(--bc-release-row-main);
+      box-shadow: 0 6px 18px var(--bc-release-row-main-shadow);
+      color: var(--bc-release-on-panel);
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          background: var(--od-release-row-main-hover);
-          box-shadow: 0 8px 22px var(--od-release-row-main-shadow);
+          background: var(--bc-release-row-main-hover);
+          box-shadow: 0 8px 22px var(--bc-release-row-main-shadow);
         }
       }
 
-      .od-release-row--tile {
-        background: var(--od-release-main-tile);
-        color: var(--od-release-on-panel);
+      .bc-release-row--tile {
+        background: var(--bc-release-main-tile);
+        color: var(--bc-release-on-panel);
       }
 
-      .od-release-row--help,
-      .od-release-row--chevron {
-        color: var(--od-release-on-main-soft);
+      .bc-release-row--help,
+      .bc-release-row--chevron {
+        color: var(--bc-release-on-main-soft);
       }
     }
 
     /* Compact (the recent logbooks screen, task 2026-11-16-241): a 40 dp tile and 10 dp above and below. */
-    .od-release-row--compact {
+    .bc-release-row--compact {
       padding-block: 10px;
 
-      .od-release-row--tile {
+      .bc-release-row--tile {
         width: 40px;
         height: 40px;
         border-radius: 12px;
@@ -113,16 +113,16 @@
 
     /* Android phone, first step (mock-up android-premier-lancement-production): 12 dp above and below, so that the
        three choices, the chip and the text buttons fit. */
-    .od-release-row--dense {
+    .bc-release-row--dense {
       padding-block: 12px;
     }
 
-    .od-release-row--plus {
+    .bc-release-row--plus {
       display: flex;
       margin-bottom: 4px;
     }
 
-    .od-release-row--tile {
+    .bc-release-row--tile {
       flex: none;
       width: 48px;
       height: 48px;
@@ -130,11 +130,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-release-tile-icon);
+      background: var(--bc-release-tile);
+      color: var(--bc-release-tile-icon);
     }
 
-    .od-release-row--text {
+    .bc-release-row--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -142,44 +142,44 @@
       gap: 2px;
     }
 
-    .od-release-row--title {
+    .bc-release-row--title {
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-release-row--help {
+    .bc-release-row--help {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-release-row--chevron {
+    .bc-release-row--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Tablet and desktop (task 2026-11-17-264): bigger choices on every step, 24 sp titles on two lines when they are
        long. « Se connecter » stands out on the first step: 20 dp padding, 28 dp corners, a 56 dp tile with 18 dp
        corners and a 16 sp sub-line. */
     @media (min-width: 768px) {
-      .od-release-row--title {
+      .bc-release-row--title {
         font-size: 24px;
         line-height: 30px;
       }
 
-      .od-release-row--prominent {
+      .bc-release-row--prominent {
         padding: 20px;
         border-radius: 28px;
 
-        .od-release-row--tile {
+        .bc-release-row--tile {
           width: 56px;
           height: 56px;
           border-radius: 18px;
         }
 
-        .od-release-row--help {
+        .bc-release-row--help {
           font-size: 16px;
           line-height: 22px;
         }
@@ -187,7 +187,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-release-row {
+      .bc-release-row {
         transition: none;
       }
     }

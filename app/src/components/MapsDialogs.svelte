@@ -20,7 +20,7 @@
 {#if dialog?.kind === 'cellular'}
   {@const r = regionOf(dialog.id)}
   {@const id = dialog.id}
-  <Md3Dialog class="od-maps-dialogs" title={t('maps.dialogs.cellular.title')} text={t('maps.dialogs.cellular.text', { name: r ? regionName(r) : '', size: formatMapSize(MAX_REGION_BYTES) })} oncancel={close}>
+  <Md3Dialog class="bc-maps-dialogs" title={t('maps.dialogs.cellular.title')} text={t('maps.dialogs.cellular.text', { name: r ? regionName(r) : '', size: formatMapSize(MAX_REGION_BYTES) })} oncancel={close}>
     {#snippet children()}{/snippet}
     {#snippet actions()}
       <button type="button" onclick={close}>{t('maps.dialogs.cellular.wait')}</button>
@@ -28,7 +28,7 @@
     {/snippet}
   </Md3Dialog>
 {:else if dialog?.kind === 'space'}
-  <Md3Dialog class="od-maps-dialogs"
+  <Md3Dialog class="bc-maps-dialogs"
     title={t('maps.dialogs.space.title')}
     text={t('maps.dialogs.space.text', { name: dialog.name, size: formatMapSize(dialog.sizeBytes), remaining: formatMapSize(dialog.remainingBytes), floor: formatMapSize(floor()) })}
     oncancel={close}
@@ -39,7 +39,7 @@
     {/snippet}
   </Md3Dialog>
 {:else if dialog?.kind === 'manage'}
-  <Md3Dialog class="od-maps-dialogs"
+  <Md3Dialog class="bc-maps-dialogs"
     title={t('maps.dialogs.manage.title')}
     text={t('maps.dialogs.manage.text', { free: formatMapSize(offlineMaps.freeBytes), floor: formatMapSize(floor()) })}
     oncancel={close}
@@ -52,7 +52,7 @@
 {:else if dialog?.kind === 'replace'}
   {@const r = regionOf(dialog.id)}
   {@const id = dialog.id}
-  <Md3Dialog class="od-maps-dialogs"
+  <Md3Dialog class="bc-maps-dialogs"
     title={t('maps.dialogs.replace.title')}
     text={t('maps.dialogs.replace.text', { name: r ? regionName(r) : '', size: formatMapSize(MAX_REGION_BYTES) })}
     oncancel={close}
@@ -72,7 +72,7 @@
 {:else if dialog?.kind === 'delete'}
   {@const r = regionOf(dialog.id)}
   {@const id = dialog.id}
-  <Md3Dialog class="od-maps-dialogs"
+  <Md3Dialog class="bc-maps-dialogs"
     title={t('maps.dialogs.delete.title', { name: r ? regionName(r) : '' })}
     text={t('maps.dialogs.delete.text', { size: formatMapSize(r?.sizeBytes ?? 0) })}
     oncancel={close}

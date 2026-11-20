@@ -167,7 +167,7 @@ test('adding an overdue piece to a dive: it stays selectable and says what is la
   assert.match(source, /e\.status !== 'overdue' \|\| !e\.item\.warnInDive\) continue/);
   assert.match(source, /warning=\{\(g\) => lateOf\.get\(g\.id\) \?\? ''\}/);
   const picker = readFileSync(new URL('../../app/src/components/GearPicker.svelte', import.meta.url), 'utf8');
-  assert.match(picker, /\{#if warning\(g\)\}<span class="od-gear-picker--warning"><Icon name="warning"/);
+  assert.match(picker, /\{#if warning\(g\)\}<span class="bc-gear-picker--warning"><Icon name="warning"/);
   // The row is a checkbox button like any other: the warning does not disable it.
   assert.match(picker, /role="checkbox" aria-checked=\{on\} \{disabled\}/);
 });

@@ -96,42 +96,42 @@
   }
 </script>
 
-<div class="od-desktop-weights" role="group" aria-label={label}>
+<div class="bc-desktop-weights" role="group" aria-label={label}>
   {#if editing}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="od-desktop-weights--editing" bind:this={box} onfocusout={focusout} onkeydown={keydown}>
-      <select class="od-desktop-weights--place" aria-label={t('desktopDetail.weightPlace')} bind:value={editing.description}>
+    <div class="bc-desktop-weights--editing" bind:this={box} onfocusout={focusout} onkeydown={keydown}>
+      <select class="bc-desktop-weights--place" aria-label={t('desktopDetail.weightPlace')} bind:value={editing.description}>
         {#each placeOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
       </select>
-      <input class="od-desktop-weights--input" type="text" inputmode="decimal" aria-label={label} aria-invalid={!valid} bind:value={editing.text} />
-      <span class="od-desktop-weights--unit">{unit}</span>
+      <input class="bc-desktop-weights--input" type="text" inputmode="decimal" aria-label={label} aria-invalid={!valid} bind:value={editing.text} />
+      <span class="bc-desktop-weights--unit">{unit}</span>
       {#if editing.index >= 0}
-        <button type="button" class="od-desktop-weights--remove" aria-label={t('desktopDetail.removeWeight')} title={t('desktopDetail.removeWeight')} onmousedown={(e) => e.preventDefault()} onclick={() => keep(true)}><Icon name="delete" size={18} /></button>
+        <button type="button" class="bc-desktop-weights--remove" aria-label={t('desktopDetail.removeWeight')} title={t('desktopDetail.removeWeight')} onmousedown={(e) => e.preventDefault()} onclick={() => keep(true)}><Icon name="delete" size={18} /></button>
       {/if}
-      <span class="od-desktop-weights--hint">{valid ? t('desktopDetail.hint') : t('desktopDetail.invalid')}</span>
+      <span class="bc-desktop-weights--hint">{valid ? t('desktopDetail.hint') : t('desktopDetail.invalid')}</span>
     </div>
   {:else}
-    <div class="od-desktop-weights--rest">
+    <div class="bc-desktop-weights--rest">
       {#each shown.chips as chip (chip.index)}
-        <button type="button" class="od-desktop-weights--chip" aria-label="{chip.place} {chip.weight}" onclick={() => edit(chip.index)}>
-          {chip.place}<span class="od-desktop-weights--amount">{chip.weight}</span>
+        <button type="button" class="bc-desktop-weights--chip" aria-label="{chip.place} {chip.weight}" onclick={() => edit(chip.index)}>
+          {chip.place}<span class="bc-desktop-weights--amount">{chip.weight}</span>
         </button>
       {/each}
-      <button type="button" class="od-desktop-weights--add" onclick={add}>{t('desktopDetail.add')}</button>
-      <span class="od-desktop-weights--spacer"></span>
-      {#if shown.total}<span class="od-desktop-weights--total">{t('desktopDetail.weightTotal')} <strong>{shown.total}</strong></span>{/if}
+      <button type="button" class="bc-desktop-weights--add" onclick={add}>{t('desktopDetail.add')}</button>
+      <span class="bc-desktop-weights--spacer"></span>
+      {#if shown.total}<span class="bc-desktop-weights--total">{t('desktopDetail.weightTotal')} <strong>{shown.total}</strong></span>{/if}
     </div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-weights {
+    .bc-desktop-weights {
       min-width: 0;
     }
 
-    .od-desktop-weights--rest,
-    .od-desktop-weights--editing {
+    .bc-desktop-weights--rest,
+    .bc-desktop-weights--editing {
       box-sizing: border-box;
       min-height: 40px;
       display: flex;
@@ -141,75 +141,75 @@
       padding: 4px 10px;
       border-radius: 8px;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-desktop-weights--rest {
-      background: var(--od-field-rest);
+    .bc-desktop-weights--rest {
+      background: var(--bc-field-rest);
     }
 
-    .od-desktop-weights--editing {
-      background: var(--od-surface);
-      box-shadow: inset 0 0 0 2px var(--od-secondary);
+    .bc-desktop-weights--editing {
+      background: var(--bc-surface);
+      box-shadow: inset 0 0 0 2px var(--bc-secondary);
     }
 
-    .od-desktop-weights--chip {
+    .bc-desktop-weights--chip {
       width: auto;
       height: 32px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 0 12px;
-      border: 1px solid var(--od-field-hover);
+      border: 1px solid var(--bc-field-hover);
       border-radius: 8px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       cursor: pointer;
     }
 
-    .od-desktop-weights--chip:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-desktop-weights--chip:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
 
-    .od-desktop-weights--amount {
+    .bc-desktop-weights--amount {
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-desktop-weights--add {
+    .bc-desktop-weights--add {
       width: auto;
       height: 32px;
       padding: 0 4px;
       border: 0;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font: inherit;
       cursor: pointer;
     }
 
-    .od-desktop-weights--add:hover {
-      color: var(--od-text);
+    .bc-desktop-weights--add:hover {
+      color: var(--bc-text);
     }
 
-    .od-desktop-weights--spacer {
+    .bc-desktop-weights--spacer {
       flex: 1;
     }
 
-    .od-desktop-weights--total {
+    .bc-desktop-weights--total {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-desktop-weights--total strong {
+    .bc-desktop-weights--total strong {
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-desktop-weights--place,
-    .od-desktop-weights--input {
+    .bc-desktop-weights--place,
+    .bc-desktop-weights--input {
       height: 32px;
       border: 0;
       outline: 0;
@@ -218,17 +218,17 @@
       font: inherit;
     }
 
-    .od-desktop-weights--input {
+    .bc-desktop-weights--input {
       width: 80px;
-      border-bottom: 1px solid var(--od-field-hover);
+      border-bottom: 1px solid var(--bc-field-hover);
     }
 
-    .od-desktop-weights--unit {
+    .bc-desktop-weights--unit {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-weights--remove {
+    .bc-desktop-weights--remove {
       display: grid;
       place-items: center;
       width: 32px;
@@ -237,14 +237,14 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       cursor: pointer;
     }
 
-    .od-desktop-weights--hint {
+    .bc-desktop-weights--hint {
       flex-basis: 100%;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

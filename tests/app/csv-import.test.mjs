@@ -361,8 +361,8 @@ test('the dialog texts exist in French and English, and the CSS follows the rule
   for (const kind of Object.values(FIELDS)) for (const f of kind) assert.ok(fr.csvImport.field[f.key], f.key);
   const dialog = src('components/CsvImportDialog.svelte');
   assert.doesNotMatch(dialog, /n: formatNumber/, 'a plural takes the number, not its text');
-  assert.match(dialog, /\.od-csv-import--kind \{[^}]*cursor: pointer/s, 'the type cards have the hand pointer');
-  assert.match(dialog, /\.od-csv-import--select select \{[^}]*cursor: pointer/s);
-  assert.match(dialog, /\.od-csv-import--filled \{[\s\S]*?:hover:not\(:disabled\)/, 'a hover state on the main button');
+  assert.match(dialog, /\.bc-csv-import--kind \{[^}]*cursor: pointer/s, 'the type cards have the hand pointer');
+  assert.match(dialog, /\.bc-csv-import--select select \{[^}]*cursor: pointer/s);
+  assert.match(dialog, /\.bc-csv-import--filled \{[\s\S]*?:hover:not\(:disabled\)/, 'a hover state on the main button');
   assert.doesNotMatch(dialog.slice(dialog.indexOf('<style>')), /#[0-9a-fA-F]{3,8}\b/, 'colours are variables, not values');
 });

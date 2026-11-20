@@ -130,74 +130,74 @@
   <ReadOnlyNotice />
 
   {#if piece}
-    <div class="od-piece-maintenance--head">
-      <span class="od-piece-maintenance--tile"><GearIcon type={piece.type} name={piece.name} size={26} {piece} tile={48} radius={14} /></span>
-      <span class="od-piece-maintenance--who">
-        <span class="od-piece-maintenance--type">{t(`gear.inventory.type.${piece.type}`)}</span>
-        <span class="od-piece-maintenance--name">{piece.name}</span>
-        <span class="od-piece-maintenance--line">{[piece.note, figures.dives ? t('gear.inventory.dives', { n: figures.dives }) : ''].filter(Boolean).join(' · ')}</span>
+    <div class="bc-piece-maintenance--head">
+      <span class="bc-piece-maintenance--tile"><GearIcon type={piece.type} name={piece.name} size={26} {piece} tile={48} radius={14} /></span>
+      <span class="bc-piece-maintenance--who">
+        <span class="bc-piece-maintenance--type">{t(`gear.inventory.type.${piece.type}`)}</span>
+        <span class="bc-piece-maintenance--name">{piece.name}</span>
+        <span class="bc-piece-maintenance--line">{[piece.note, figures.dives ? t('gear.inventory.dives', { n: figures.dives }) : ''].filter(Boolean).join(' · ')}</span>
       </span>
     </div>
 
-    <h2 class="od-piece-maintenance--title">{t('maintenance.piece.cardTitle')}</h2>
+    <h2 class="bc-piece-maintenance--title">{t('maintenance.piece.cardTitle')}</h2>
 
     {#each withRule as e (e.item.id)}
-      <section class="od-piece-maintenance--card" aria-label={taskLabel(e.item)}>
-        <div class="od-piece-maintenance--card-head">
-          <span class="od-piece-maintenance--task">{taskLabel(e.item)}</span>
-          <span class="od-piece-maintenance--tag od-piece-maintenance--tag-{e.status}">{tagText(e)}</span>
+      <section class="bc-piece-maintenance--card" aria-label={taskLabel(e.item)}>
+        <div class="bc-piece-maintenance--card-head">
+          <span class="bc-piece-maintenance--task">{taskLabel(e.item)}</span>
+          <span class="bc-piece-maintenance--tag bc-piece-maintenance--tag-{e.status}">{tagText(e)}</span>
         </div>
-        <p class="od-piece-maintenance--rule">{ruleLine(e)}</p>
-        <div class="od-piece-maintenance--bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress(e) * 100)} aria-label={taskLabel(e.item)}>
-          <span class="od-piece-maintenance--bar-fill od-piece-maintenance--bar-{e.status}" style:width={`${Math.round(progress(e) * 100)}%`}></span>
+        <p class="bc-piece-maintenance--rule">{ruleLine(e)}</p>
+        <div class="bc-piece-maintenance--bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress(e) * 100)} aria-label={taskLabel(e.item)}>
+          <span class="bc-piece-maintenance--bar-fill bc-piece-maintenance--bar-{e.status}" style:width={`${Math.round(progress(e) * 100)}%`}></span>
         </div>
         {#if e.item.intervalDives != null}
-          <p class="od-piece-maintenance--progress">{t('maintenance.piece.dives', { n: e.divesSince, done: e.divesSince, total: e.item.intervalDives })}{#if hoursSince(e)} · {formatHours(hoursSince(e))}{/if}</p>
+          <p class="bc-piece-maintenance--progress">{t('maintenance.piece.dives', { n: e.divesSince, done: e.divesSince, total: e.item.intervalDives })}{#if hoursSince(e)} · {formatHours(hoursSince(e))}{/if}</p>
         {/if}
         {#if e.item.lastDoneOn}
-          <p class="od-piece-maintenance--progress">{t('maintenance.piece.last', { date: dateText(e, e.item.lastDoneOn) })}</p>
+          <p class="bc-piece-maintenance--progress">{t('maintenance.piece.last', { date: dateText(e, e.item.lastDoneOn) })}</p>
         {/if}
         {#if e.dueDate}
-          <p class="od-piece-maintenance--progress">{t('maintenance.piece.due', { date: dateText(e, e.dueDate) })}</p>
+          <p class="bc-piece-maintenance--progress">{t('maintenance.piece.due', { date: dateText(e, e.dueDate) })}</p>
         {/if}
-        <div class="od-piece-maintenance--buttons">
-          <button type="button" class="od-piece-maintenance--filled" disabled={gear.readOnly} onclick={() => go(`/profile/gear/${id}/maintenance/note?item=${e.item.id}`)}>
+        <div class="bc-piece-maintenance--buttons">
+          <button type="button" class="bc-piece-maintenance--filled" disabled={gear.readOnly} onclick={() => go(`/profile/gear/${id}/maintenance/note?item=${e.item.id}`)}>
             <Icon name="check" size={20} />{noteLabel(e)}
           </button>
-          <button type="button" class="od-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => editRule(e)}>{t('maintenance.piece.editRule')}</button>
+          <button type="button" class="bc-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => editRule(e)}>{t('maintenance.piece.editRule')}</button>
         </div>
       </section>
     {/each}
 
     {#if next}
-      <div class="od-piece-maintenance--second">
+      <div class="bc-piece-maintenance--second">
         <Icon name="clock" size={22} />
-        <span class="od-piece-maintenance--second-texts">
-          <span class="od-piece-maintenance--second-title">{taskLabel({ task: next.task })}</span>
-          <span class="od-piece-maintenance--second-line">{t('maintenance.piece.none')}</span>
+        <span class="bc-piece-maintenance--second-texts">
+          <span class="bc-piece-maintenance--second-title">{taskLabel({ task: next.task })}</span>
+          <span class="bc-piece-maintenance--second-line">{t('maintenance.piece.none')}</span>
         </span>
-        <button type="button" class="od-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => addRule(next)}>{t('maintenance.piece.add')}</button>
+        <button type="button" class="bc-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => addRule(next)}>{t('maintenance.piece.add')}</button>
       </div>
     {:else if !withRule.length}
-      <div class="od-piece-maintenance--second">
+      <div class="bc-piece-maintenance--second">
         <Icon name="clock" size={22} />
-        <span class="od-piece-maintenance--second-texts">
-          <span class="od-piece-maintenance--second-title">{t('maintenance.piece.title')}</span>
-          <span class="od-piece-maintenance--second-line">{t('maintenance.piece.none')}</span>
+        <span class="bc-piece-maintenance--second-texts">
+          <span class="bc-piece-maintenance--second-title">{t('maintenance.piece.title')}</span>
+          <span class="bc-piece-maintenance--second-line">{t('maintenance.piece.none')}</span>
         </span>
-        <button type="button" class="od-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => addRule({ task: 'service', months: 24 })}>{t('maintenance.piece.add')}</button>
+        <button type="button" class="bc-piece-maintenance--outlined" disabled={gear.readOnly} onclick={() => addRule({ task: 'service', months: 24 })}>{t('maintenance.piece.add')}</button>
       </div>
     {/if}
 
-    <h2 class="od-piece-maintenance--title">{t('maintenance.piece.history')}</h2>
+    <h2 class="bc-piece-maintenance--title">{t('maintenance.piece.history')}</h2>
     {#if history.length}
-      <ul class="od-piece-maintenance--history">
+      <ul class="bc-piece-maintenance--history">
         {#each history as h (h.id)}
           <li>
-            <span class="od-piece-maintenance--history-icon"><Icon name="check" size={18} /></span>
-            <span class="od-piece-maintenance--history-texts">
-              <span class="od-piece-maintenance--history-title">{h.kind === 'service' ? taskLabel(h.item) : t(`maintenance.kind.${h.kind}`)}</span>
-              <span class="od-piece-maintenance--history-line">
+            <span class="bc-piece-maintenance--history-icon"><Icon name="check" size={18} /></span>
+            <span class="bc-piece-maintenance--history-texts">
+              <span class="bc-piece-maintenance--history-title">{h.kind === 'service' ? taskLabel(h.item) : t(`maintenance.kind.${h.kind}`)}</span>
+              <span class="bc-piece-maintenance--history-line">
                 {[h.item.task === 'hydrostatic' ? formatMonthYear(h.doneOn) : formatDate(h.doneOn), h.item.task === 'hydrostatic' ? t('maintenance.piece.stampedEntry') : '', h.doneBy ? t('maintenance.piece.by', { who: h.doneBy }) : t('maintenance.piece.byYou'), h.cost != null ? money(h.cost) : ''].filter(Boolean).join(' · ')}
               </span>
             </span>
@@ -205,20 +205,20 @@
         {/each}
       </ul>
     {:else}
-      <p class="od-piece-maintenance--none">{t('maintenance.piece.historyEmpty')}</p>
+      <p class="bc-piece-maintenance--none">{t('maintenance.piece.historyEmpty')}</p>
     {/if}
 
-    <p class="od-piece-maintenance--note"><Icon name="info" size={18} /><span>{t('maintenance.piece.countNote')}</span></p>
+    <p class="bc-piece-maintenance--note"><Icon name="info" size={18} /><span>{t('maintenance.piece.countNote')}</span></p>
   {/if}
-  <div class="od-piece-maintenance--bottom"></div>
+  <div class="bc-piece-maintenance--bottom"></div>
 {/snippet}
 
-<Page class="od-piece-maintenance" onPageBeforeIn={loadInventory}>
+<Page class="bc-piece-maintenance" onPageBeforeIn={loadInventory}>
   <Navbar title={t('maintenance.piece.title')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('maintenance.back')}</span>
+        <span class="bc-sr-only">{t('maintenance.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
@@ -242,21 +242,21 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-piece-maintenance .page-content) {
+    :global(.bc-piece-maintenance .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-piece-maintenance--head {
+    .bc-piece-maintenance--head {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-piece-maintenance--tile {
+    .bc-piece-maintenance--tile {
       flex: none;
       width: 48px;
       height: 48px;
@@ -264,115 +264,115 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
+      background: var(--bc-release-tile);
     }
 
-    .od-piece-maintenance--who {
+    .bc-piece-maintenance--who {
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-piece-maintenance--type,
-    .od-piece-maintenance--line {
+    .bc-piece-maintenance--type,
+    .bc-piece-maintenance--line {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--name {
+    .bc-piece-maintenance--name {
       font-size: 20px;
       line-height: 26px;
       font-weight: 500;
     }
 
-    .od-piece-maintenance--title {
+    .bc-piece-maintenance--title {
       margin: 20px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
     }
 
-    .od-piece-maintenance--card,
-    .od-piece-maintenance--second {
+    .bc-piece-maintenance--card,
+    .bc-piece-maintenance--second {
       margin: 0 16px 8px;
       padding: 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-piece-maintenance--card-head {
+    .bc-piece-maintenance--card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
     }
 
-    .od-piece-maintenance--task {
+    .bc-piece-maintenance--task {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-piece-maintenance--tag {
+    .bc-piece-maintenance--tag {
       flex: none;
       padding: 2px 10px;
       border-radius: 12px;
       font-size: 13px;
       line-height: 20px;
       font-weight: 500;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-piece-maintenance--tag-overdue {
-      background: var(--od-alarm-tint);
-      color: var(--od-alarm);
+    .bc-piece-maintenance--tag-overdue {
+      background: var(--bc-alarm-tint);
+      color: var(--bc-alarm);
     }
 
-    .od-piece-maintenance--tag-soon {
-      background: var(--od-pending-container, var(--od-surface-2));
+    .bc-piece-maintenance--tag-soon {
+      background: var(--bc-pending-container, var(--bc-surface-2));
     }
 
-    .od-piece-maintenance--rule {
+    .bc-piece-maintenance--rule {
       margin: 4px 0 12px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--bar {
+    .bc-piece-maintenance--bar {
       height: 8px;
       border-radius: 4px;
       overflow: hidden;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-piece-maintenance--bar-fill {
+    .bc-piece-maintenance--bar-fill {
       display: block;
       height: 100%;
       border-radius: 4px;
-      background: var(--od-secondary);
+      background: var(--bc-secondary);
     }
 
-    .od-piece-maintenance--bar-overdue {
-      background: var(--od-alarm);
+    .bc-piece-maintenance--bar-overdue {
+      background: var(--bc-alarm);
     }
 
-    .od-piece-maintenance--progress {
+    .bc-piece-maintenance--progress {
       margin: 8px 0 0;
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-piece-maintenance--buttons {
+    .bc-piece-maintenance--buttons {
       margin-top: 16px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .od-piece-maintenance--filled,
-    .od-piece-maintenance--outlined {
+    .bc-piece-maintenance--filled,
+    .bc-piece-maintenance--outlined {
       width: auto;
       height: 40px;
       padding: 0 20px;
@@ -385,50 +385,50 @@
       font-weight: 500;
     }
 
-    .od-piece-maintenance--filled {
+    .bc-piece-maintenance--filled {
       padding: 0 20px 0 14px;
       border: none;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-piece-maintenance--outlined {
-      border: var(--od-outline-width) solid var(--od-outline);
+    .bc-piece-maintenance--outlined {
+      border: var(--bc-outline-width) solid var(--bc-outline);
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-piece-maintenance--filled:disabled,
-    .od-piece-maintenance--outlined:disabled {
+    .bc-piece-maintenance--filled:disabled,
+    .bc-piece-maintenance--outlined:disabled {
       opacity: 0.38;
     }
 
-    .od-piece-maintenance--second {
+    .bc-piece-maintenance--second {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-piece-maintenance--second-texts {
+    .bc-piece-maintenance--second-texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-piece-maintenance--second-title {
+    .bc-piece-maintenance--second-title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-piece-maintenance--second-line {
+    .bc-piece-maintenance--second-line {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--history {
+    .bc-piece-maintenance--history {
       margin: 0 16px;
       padding: 0;
       list-style: none;
@@ -441,44 +441,44 @@
       }
     }
 
-    .od-piece-maintenance--history-icon {
+    .bc-piece-maintenance--history-icon {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--history-texts {
+    .bc-piece-maintenance--history-texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-piece-maintenance--history-title {
+    .bc-piece-maintenance--history-title {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-piece-maintenance--history-line,
-    .od-piece-maintenance--none {
+    .bc-piece-maintenance--history-line,
+    .bc-piece-maintenance--none {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--none {
+    .bc-piece-maintenance--none {
       margin: 0 20px;
     }
 
-    .od-piece-maintenance--note {
+    .bc-piece-maintenance--note {
       margin: 16px 20px 0;
       display: flex;
       gap: 8px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-maintenance--bottom {
+    .bc-piece-maintenance--bottom {
       height: 48px;
     }
   }

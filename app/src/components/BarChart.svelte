@@ -2,7 +2,7 @@
   // @ts-check
   // Bar chart of the Statistics section (spec, section 1, "Statistics"),
   // drawn in SVG: one bar per dive or per year, from the bottom. Colours come
-  // from the --od-* tokens only: a depth bar takes the water colour of its
+  // from the --bc-* tokens only: a depth bar takes the water colour of its
   // depth (same scale as the dive profile), a count or a time is blue. Labels
   // under the bars only when there are few of them.
   import { waterBottomColor } from '../lib/water-column.js';
@@ -20,8 +20,8 @@
    *   tinted?: boolean,
    * }}
    * `tinted`: the bars of a chart that is not about depth (ready-made charts
-   * of the Statistics screen) go from --od-chart-low for the smallest value
-   * to --od-chart-high for the largest (spec, "Statistics charts in blue").
+   * of the Statistics screen) go from --bc-chart-low for the smallest value
+   * to --bc-chart-high for the largest (spec, "Statistics charts in blue").
    * `value`: millimetres for a depth chart (`depth`), else any positive number.
    * `scale`: values per unit of the y axis (60 for seconds shown in minutes,
    * 1000 or 304.8 for millimetres in metres or feet); `unit` is written after
@@ -33,7 +33,7 @@
   /** @param {number} value @param {number} min @param {number} max */
   const tint = (value, min, max) => {
     const percent = max > min ? Math.round(((value - min) / (max - min)) * 1000) / 10 : 100;
-    return `color-mix(in srgb, var(--od-chart-high) ${percent}%, var(--od-chart-low))`;
+    return `color-mix(in srgb, var(--bc-chart-high) ${percent}%, var(--bc-chart-low))`;
   };
 
   let width = $state(0);
@@ -86,7 +86,7 @@
         y: plot - h,
         w: barWidth,
         h,
-        fill: depth ? waterBottomColor(b.value) : tinted ? tint(b.value, lowest, highest) : 'var(--od-text)',
+        fill: depth ? waterBottomColor(b.value) : tinted ? tint(b.value, lowest, highest) : 'var(--bc-text)',
         label: b.label ?? '',
       };
     });
@@ -94,21 +94,21 @@
   const rx = $derived(rects.length && rects[0].w >= 8 ? 3 : 0);
 </script>
 
-<div class="od-bar-chart od-bar-chart--chart" style:height="{height}px" bind:clientWidth={width}>
+<div class="bc-bar-chart bc-bar-chart--chart" style:height="{height}px" bind:clientWidth={width}>
   {#if width}
     <svg {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={label}>
       <!-- The y axis: a thin line and the value at each round step. -->
       {#if withAxis}
         {#each axis.ticks as tick (tick)}
           {@const y = plot - (tick * scale / axis.max) * (plot - 6)}
-          <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="od-bar-chart--grid" />
-          <text x={AXIS_WIDTH - 4} {y} class="od-bar-chart--tick">{tickText(tick)}</text>
+          <line x1={AXIS_WIDTH} x2={width} y1={y} y2={y} class="bc-bar-chart--grid" />
+          <text x={AXIS_WIDTH - 4} {y} class="bc-bar-chart--tick">{tickText(tick)}</text>
         {/each}
       {/if}
       {#each rects as r, i (i)}
         <rect x={r.x} y={r.y} width={r.w} height={r.h} {rx} style:fill={r.fill} />
         {#if showLabels}
-          <text x={r.x + r.w / 2} y={height - 3} class="od-bar-chart--label" style:font-size="{labelSize}px">{r.label}</text>
+          <text x={r.x + r.w / 2} y={height - 3} class="bc-bar-chart--label" style:font-size="{labelSize}px">{r.label}</text>
         {/if}
       {/each}
     </svg>
@@ -117,7 +117,7 @@
 
 <style>
   @layer od.components {
-    .od-bar-chart--chart {
+    .bc-bar-chart--chart {
       width: 100%;
     }
 
@@ -125,22 +125,22 @@
       display: block;
     }
 
-    .od-bar-chart--grid {
-      stroke: var(--od-separator);
+    .bc-bar-chart--grid {
+      stroke: var(--bc-separator);
       stroke-width: 1;
     }
 
-    .od-bar-chart--tick {
+    .bc-bar-chart--tick {
       font-size: 10px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
       text-anchor: end;
       dominant-baseline: middle;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-bar-chart--label {
+    .bc-bar-chart--label {
       font-size: 10px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
       text-anchor: middle;
       font-variant-numeric: tabular-nums;
     }

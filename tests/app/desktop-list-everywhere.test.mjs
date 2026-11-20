@@ -14,7 +14,7 @@ const walk = (/** @type {string} */ dir) =>
 
 test('the desktop logbook list is one component: the only table of dives, used by the one wide route', () => {
   const sources = walk('app/src').filter((f) => f.endsWith('.svelte'));
-  const tables = sources.filter((f) => /od-desktop-logbook--table/.test(read(f)) && /<table/.test(read(f)));
+  const tables = sources.filter((f) => /bc-desktop-logbook--table/.test(read(f)) && /<table/.test(read(f)));
   assert.deepEqual(tables, ['app/src/pages/DesktopLogbook.svelte']);
   // Every other desktop screen that opens over the logbook (selector, export, columns, menus, editing in place,
   // account, server) is a component of that page, not a page with its own list of dives.
@@ -27,8 +27,8 @@ test('the desktop logbook list is one component: the only table of dives, used b
 
 test('the list: weekday in the date, one sticky year line, no Profile column by default', () => {
   const page = read('app/src/pages/DesktopLogbook.svelte');
-  assert.match(page, /od-desktop-logbook--year-row/);
-  assert.equal((page.match(/od-desktop-logbook--year-row"/g) ?? []).length, 1);
+  assert.match(page, /bc-desktop-logbook--year-row/);
+  assert.equal((page.match(/bc-desktop-logbook--year-row"/g) ?? []).length, 1);
   assert.match(read('app/src/lib/desktop-table.js'), /key: 'profile'[^}]*defaultShown: false/);
 });
 
@@ -44,7 +44,7 @@ test('« Saucisse » gets the buoy icon wherever the app shows a piece, desktop 
 test('« Nouvelle pièce » has the model picture on every layout: one form, no layout of its own', () => {
   const form = read('app/src/pages/ProfilePieceEdit.svelte');
   assert.match(form, /data-testid="piece-picture"/);
-  assert.match(form, /od-piece-edit--picture/);
+  assert.match(form, /bc-piece-edit--picture/);
   assert.doesNotMatch(form, /isTablet|isDesktop|desk\b/);
   const routes = read('app/src/App.svelte').match(/ProfilePieceEdit\.svelte/g) ?? [];
   assert.equal(routes.length, 2); // new and edit: the same page on the phone, the tablet and the desktop

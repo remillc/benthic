@@ -94,7 +94,7 @@
 
   onMount(() => {
     const target = anchor;
-    target.classList.add('od-row-menu--anchored');
+    target.classList.add('bc-row-menu--anchored');
     target.setAttribute('aria-expanded', 'true');
     tick().then(() => {
       position();
@@ -106,7 +106,7 @@
     const moved = () => position();
     window.addEventListener('resize', moved);
     return () => {
-      target.classList.remove('od-row-menu--anchored');
+      target.classList.remove('bc-row-menu--anchored');
       target.removeAttribute('aria-expanded');
       el?.removeEventListener('od-cancel', cancel);
       window.removeEventListener('resize', moved);
@@ -115,12 +115,12 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-row-menu--scrim" use:portal onpointerdown={() => close()}></div>
+<div class="bc-row-menu--scrim" use:portal onpointerdown={() => close()}></div>
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="od-row-menu"
-  class:od-row-menu--ios={ios}
-  class:od-row-menu--up={place.up}
+  class="bc-row-menu"
+  class:bc-row-menu--ios={ios}
+  class:bc-row-menu--up={place.up}
   use:portal
   bind:this={menu}
   onkeydown={keydown}
@@ -130,7 +130,7 @@
   style:bottom={place.bottom === undefined ? 'auto' : place.bottom + 'px'}
   style:max-height="{place.maxHeight}px"
 >
-  <ul class="od-row-menu--options" role="listbox" aria-label={label}>
+  <ul class="bc-row-menu--options" role="listbox" aria-label={label}>
     {#each options as option, i (option.value)}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <li
@@ -138,17 +138,17 @@
         role="option"
         tabindex={i === active ? 0 : -1}
         aria-selected={option.value === value}
-        class="od-row-menu--option"
-        class:od-row-menu--help={!!option.example}
-        class:od-row-menu--selected={option.value === value}
+        class="bc-row-menu--option"
+        class:bc-row-menu--help={!!option.example}
+        class:bc-row-menu--selected={option.value === value}
         onclick={() => pick(option.value)}
       >
-        {#if ios}<span class="od-row-menu--check">{#if option.value === value}<Icon name="check" size={18} />{/if}</span>{/if}
-        <span class="od-row-menu--texts">
-          <span class="od-row-menu--label">{option.label}</span>
-          {#if option.example}<span class="od-row-menu--example">{option.example}</span>{/if}
+        {#if ios}<span class="bc-row-menu--check">{#if option.value === value}<Icon name="check" size={18} />{/if}</span>{/if}
+        <span class="bc-row-menu--texts">
+          <span class="bc-row-menu--label">{option.label}</span>
+          {#if option.example}<span class="bc-row-menu--example">{option.example}</span>{/if}
         </span>
-        {#if !ios && option.value === value}<span class="od-row-menu--check"><Icon name="check" size={24} /></span>{/if}
+        {#if !ios && option.value === value}<span class="bc-row-menu--check"><Icon name="check" size={24} /></span>{/if}
       </li>
     {/each}
   </ul>
@@ -157,12 +157,12 @@
 <style>
   @layer od.components {
     /* The touched row while its menu is open: selected tint, 12 dp corners. */
-    :global(.od-row-menu--anchored) {
-      background: var(--od-surface-container-highest) !important;
+    :global(.bc-row-menu--anchored) {
+      background: var(--bc-surface-container-highest) !important;
       border-radius: 12px !important;
     }
 
-    .od-row-menu--scrim {
+    .bc-row-menu--scrim {
       position: fixed;
       inset: 0;
       /* Under the menu, above the dialogs (13500). */
@@ -171,23 +171,23 @@
     }
 
     /* 16 dp corners, surface #F5F4F0 (the page background), elevation level 2. */
-    .od-row-menu {
+    .bc-row-menu {
       position: fixed;
       z-index: 14000;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       border-radius: 16px;
-      background: var(--od-background);
+      background: var(--bc-background);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
       overflow: hidden;
 
       :global(html.dark) & {
-        background: var(--od-surface-container-highest);
+        background: var(--bc-surface-container-highest);
       }
     }
 
-    .od-row-menu--options {
+    .bc-row-menu--options {
       margin: 0;
       padding: 8px 0;
       list-style: none;
@@ -195,61 +195,61 @@
       overscroll-behavior: contain;
     }
 
-    .od-row-menu--option {
+    .bc-row-menu--option {
       min-height: 48px;
       padding: 0 16px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
       outline: none;
 
-      &.od-row-menu--help {
+      &.bc-row-menu--help {
         min-height: 56px;
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: -2px;
         border-radius: 8px;
       }
 
-      &.od-row-menu--selected {
-        background: var(--od-surface-container-highest);
+      &.bc-row-menu--selected {
+        background: var(--bc-surface-container-highest);
 
         :global(html.dark) & {
-          background: var(--od-surface-2);
+          background: var(--bc-surface-2);
         }
       }
     }
 
-    .od-row-menu--texts {
+    .bc-row-menu--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-row-menu--label {
+    .bc-row-menu--label {
       font-size: 16px;
       line-height: 24px;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-row-menu--selected .od-row-menu--label {
+    .bc-row-menu--selected .bc-row-menu--label {
       font-weight: 600;
     }
 
-    .od-row-menu--example {
+    .bc-row-menu--example {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-row-menu--check {
+    .bc-row-menu--check {
       flex: none;
       display: flex;
       justify-content: center;
@@ -257,38 +257,38 @@
     }
 
     /* iOS: the look of a UIMenu, check at the start, no tint on the current value. */
-    .od-row-menu--ios {
+    .bc-row-menu--ios {
       border-radius: 13px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
-      .od-row-menu--options {
+      .bc-row-menu--options {
         padding: 0;
       }
 
-      .od-row-menu--option {
+      .bc-row-menu--option {
         min-height: 44px;
         gap: 8px;
         padding: 0 14px 0 10px;
-        border-bottom: 0.5px solid var(--od-separator);
+        border-bottom: 0.5px solid var(--bc-separator);
 
         &:last-child {
           border-bottom: none;
         }
 
-        &.od-row-menu--help {
+        &.bc-row-menu--help {
           min-height: 52px;
         }
 
-        &.od-row-menu--selected {
+        &.bc-row-menu--selected {
           background: none;
         }
       }
 
-      .od-row-menu--check {
+      .bc-row-menu--check {
         width: 20px;
       }
 
-      .od-row-menu--selected .od-row-menu--label {
+      .bc-row-menu--selected .bc-row-menu--label {
         font-weight: 400;
       }
     }
@@ -296,15 +296,15 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-row-menu--option {
+      .bc-row-menu--option {
         transition: box-shadow 120ms linear;
       }
-      .od-row-menu--option:hover {
+      .bc-row-menu--option:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-row-menu--option {
+      .bc-row-menu--option {
         transition: none;
       }
     }

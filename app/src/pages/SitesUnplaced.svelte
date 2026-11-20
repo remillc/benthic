@@ -18,14 +18,14 @@
   });
 </script>
 
-<Page class="od-sites-unplaced">
+<Page class="bc-sites-unplaced">
   <Navbar title={t('sites.unplacedTitle')}>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
+      <Link back iconOnly><i class="icon icon-back"></i><span class="bc-sr-only">{t('common.back')}</span></Link>
     {/snippet}
   </Navbar>
 
-  <p class="od-sites-unplaced--intro">{t('sites.unplacedIntro')}</p>
+  <p class="bc-sites-unplaced--intro">{t('sites.unplacedIntro')}</p>
 
   <div class="list media-list">
     <ul>
@@ -45,11 +45,11 @@
 
 <style>
   @layer od.components {
-    .od-sites-unplaced--intro {
+    .bc-sites-unplaced--intro {
       margin: 12px 16px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

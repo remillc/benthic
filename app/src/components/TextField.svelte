@@ -2,16 +2,16 @@
   // @ts-check
   import Icon from './Icon.svelte';
   // Text field (spec, section 4, "Text fields"): the MD3 filled variant.
-  // Surface-container-highest background (--od-surface-2), 4 dp top corners,
+  // Surface-container-highest background (--bc-surface-2), 4 dp top corners,
   // a 1 dp bottom indicator, 2 dp in the primary colour on focus. The label is
   // inside the field: full size when the field is empty and not focused (no
   // placeholder), small above the value on focus or once there is a value.
   // Helper text under the field; an optional plain icon button at the end.
-  // In error (invalid): the label and a 2 dp indicator in --od-alarm, an error
-  // icon at the end instead of the button, the helper text in --od-alarm.
+  // In error (invalid): the label and a 2 dp indicator in --bc-alarm, an error
+  // icon at the end instead of the button, the helper text in --bc-alarm.
   // Disabled: the whole field at 38 % (MD3).
   // Side margins: 16 dp on the page, 12 dp inside a white surface (set
-  // --od-field-margin on the surface).
+  // --bc-field-margin on the surface).
 
   /**
    * @type {{
@@ -57,12 +57,12 @@
   const floated = $derived(focused || !!value);
 </script>
 
-<div class="od-text-field od-text-field--field" class:od-text-field--focused={focused} class:od-text-field--invalid={invalid} class:od-text-field--floated={floated} class:od-text-field--multiline={multiline} class:disabled>
+<div class="bc-text-field bc-text-field--field" class:bc-text-field--focused={focused} class:bc-text-field--invalid={invalid} class:bc-text-field--floated={floated} class:bc-text-field--multiline={multiline} class:disabled>
   <!-- A tap anywhere in the field focuses the input. -->
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="od-text-field--box" onclick={() => input?.focus()}>
-    <div class="od-text-field--text">
-      <label class="od-text-field--label" for={id}>{label}</label>
+  <div class="bc-text-field--box" onclick={() => input?.focus()}>
+    <div class="bc-text-field--text">
+      <label class="bc-text-field--label" for={id}>{label}</label>
       {#if multiline}
         <textarea {id} bind:this={input} bind:value {onchange} {oninput} onfocus={() => (focused = true)} onblur={() => (focused = false)} aria-invalid={invalid}></textarea>
       {:else}
@@ -83,14 +83,14 @@
       {/if}
     </div>
     {#if invalid && !multiline}
-      <div class="od-text-field--error-icon"><Icon name="error" /></div>
+      <div class="bc-text-field--error-icon"><Icon name="error" /></div>
     {/if}
     {#if trailing && (keepTrailing || !(invalid && !multiline))}
-      <div class="od-text-field--trailing">{@render trailing()}</div>
+      <div class="bc-text-field--trailing">{@render trailing()}</div>
     {/if}
   </div>
   {#if supporting}
-    <p class="od-text-field--supporting" class:od-text-field--warning={warning}>
+    <p class="bc-text-field--supporting" class:bc-text-field--warning={warning}>
       {#if warning}<Icon name="warning" size={16} />{/if}
       <span>{supporting}</span>
     </p>
@@ -99,17 +99,17 @@
 
 <style>
   @layer od.components {
-    .od-text-field--field {
-      margin: 18px var(--od-field-margin, 16px) 0;
+    .bc-text-field--field {
+      margin: 18px var(--bc-field-margin, 16px) 0;
     }
 
-    .od-text-field--box {
+    .bc-text-field--box {
       position: relative;
       min-height: 56px;
       padding: 8px 12px 8px 16px;
       box-sizing: border-box;
       border-radius: 4px 4px 0 0;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -122,35 +122,35 @@
         left: 0;
         right: 0;
         bottom: 0;
-        height: var(--od-outline-width);
-        background: var(--od-text-2);
+        height: var(--bc-outline-width);
+        background: var(--bc-text-2);
       }
 
-      .od-text-field--focused &::after {
+      .bc-text-field--focused &::after {
         height: 2px;
-        background: var(--od-primary-action);
+        background: var(--bc-primary-action);
       }
 
-      .od-text-field--invalid &::after {
+      .bc-text-field--invalid &::after {
         height: 2px;
-        background: var(--od-alarm);
+        background: var(--bc-alarm);
       }
 
-      .od-text-field--multiline & {
+      .bc-text-field--multiline & {
         min-height: 104px;
         align-items: flex-start;
       }
     }
 
     /* Room for the small label above the value: 16 + 24 = 40, in 56. */
-    .od-text-field--text {
+    .bc-text-field--text {
       position: relative;
       flex: 1;
       min-width: 0;
       padding-top: 16px;
     }
 
-    .od-text-field--label {
+    .bc-text-field--label {
       position: absolute;
       left: 0;
       top: 8px; /* at rest: centred in the 56 dp field */
@@ -160,26 +160,26 @@
       white-space: nowrap;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
       transition:
         top 150ms,
         font-size 150ms,
         line-height 150ms;
 
-      .od-text-field--floated & {
+      .bc-text-field--floated & {
         top: 0;
         font-size: 12px;
         line-height: 16px;
       }
 
-      .od-text-field--focused & {
-        color: var(--od-primary-action);
+      .bc-text-field--focused & {
+        color: var(--bc-primary-action);
       }
 
       /* Inside the grey field: the darker red, 5.0:1 (task 2026-11-14-153). */
-      .od-text-field--invalid & {
-        color: var(--od-alarm-on-field);
+      .bc-text-field--invalid & {
+        color: var(--bc-alarm-on-field);
       }
     }
 
@@ -192,7 +192,7 @@
       border: none;
       outline: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       line-height: 24px;
@@ -211,31 +211,31 @@
       pointer-events: none;
     }
 
-    .od-text-field--error-icon {
+    .bc-text-field--error-icon {
       flex: none;
       display: flex;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
     /* Plain icon button at the end (spec: no filled background). */
-    .od-text-field--trailing {
+    .bc-text-field--trailing {
       flex: none;
       margin: -8px -8px -8px 0;
     }
 
-    .od-text-field--supporting {
+    .bc-text-field--supporting {
       margin: 4px 0 0;
       padding-left: 16px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      .od-text-field--invalid &,
-      &.od-text-field--warning {
-        color: var(--od-alarm);
+      .bc-text-field--invalid &,
+      &.bc-text-field--warning {
+        color: var(--bc-alarm);
       }
 
-      &.od-text-field--warning {
+      &.bc-text-field--warning {
         display: flex;
         gap: 4px;
         align-items: flex-start;

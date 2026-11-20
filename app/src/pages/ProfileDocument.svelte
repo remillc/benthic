@@ -140,79 +140,79 @@
   <ReadOnlyNotice />
 
   {#if missing}
-    <p class="od-doc--missing">{t('docs.notFound')}</p>
+    <p class="bc-doc--missing">{t('docs.notFound')}</p>
   {:else if doc}
-    <div class="od-doc--head">
+    <div class="bc-doc--head">
       {#if doc.kind === 'insurance'}
         <DocumentThumb {doc} urls={images.map((f) => f.url)} width={168} />
       {/if}
-      <span class="od-doc--head-texts">
-        <span class="od-doc--kind od-doc--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
-        <span class="od-doc--title">{documentTitle(doc)}</span>
-        {#if subtitle}<span class="od-doc--subtitle">{subtitle}</span>{/if}
+      <span class="bc-doc--head-texts">
+        <span class="bc-doc--kind bc-doc--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
+        <span class="bc-doc--title">{documentTitle(doc)}</span>
+        {#if subtitle}<span class="bc-doc--subtitle">{subtitle}</span>{/if}
       </span>
     </div>
 
     {#if status.state !== 'none'}
-      <div class="od-doc--banner od-doc--banner-{status.state}" role="status">
+      <div class="bc-doc--banner bc-doc--banner-{status.state}" role="status">
         <Icon name={status.state === 'expired' ? 'warning' : 'clock'} size={22} />
-        <span class="od-doc--banner-texts">
-          <span class="od-doc--banner-title">{badgeText(status)}</span>
-          <span class="od-doc--banner-line">{bannerLine(doc, formatDate, today)}</span>
+        <span class="bc-doc--banner-texts">
+          <span class="bc-doc--banner-title">{badgeText(status)}</span>
+          <span class="bc-doc--banner-line">{bannerLine(doc, formatDate, today)}</span>
         </span>
       </div>
     {/if}
 
     {#if images.length && doc.kind !== 'insurance'}
-      <div class="od-doc--pages">
+      <div class="bc-doc--pages">
         {#each images as f, i (f.file.hash)}
-          <figure class="od-doc--page">
+          <figure class="bc-doc--page">
             <figcaption>{pageLabel(f, i)}</figcaption>
             <img src={f.url} alt={pageLabel(f, i)} />
-            <button type="button" class="od-doc--full" onclick={() => (full = i)} aria-label={t('docs.sheet.pageFull', { n: f.file.page ?? i + 1 })}><Icon name="fullscreen" size={20} />{t('docs.sheet.fullscreen')}</button>
+            <button type="button" class="bc-doc--full" onclick={() => (full = i)} aria-label={t('docs.sheet.pageFull', { n: f.file.page ?? i + 1 })}><Icon name="fullscreen" size={20} />{t('docs.sheet.fullscreen')}</button>
           </figure>
         {/each}
       </div>
     {:else if images.length}
-      <div class="od-doc--pages">
-        <figure class="od-doc--page">
+      <div class="bc-doc--pages">
+        <figure class="bc-doc--page">
           <img src={images[0].url} alt={pageLabel(images[0], 0)} />
-          <button type="button" class="od-doc--full" onclick={() => (full = 0)}><Icon name="fullscreen" size={20} />{t('docs.sheet.fullscreen')}</button>
+          <button type="button" class="bc-doc--full" onclick={() => (full = 0)}><Icon name="fullscreen" size={20} />{t('docs.sheet.fullscreen')}</button>
         </figure>
       </div>
     {/if}
     {#each pdfs as f (f.file.hash)}
-      <div class="od-doc--pdf"><Icon name="document" size={22} /><span>{t('docs.sheet.pdfFile')}</span><button type="button" onclick={() => shareDocument({ title: documentTitle(/** @type {any} */ (doc)), images: [], pdfs: [f] }, 'pdf').catch(() => showSnackbar(t('docs.share.failed')))}>{t('docs.sheet.openPdf')}</button></div>
+      <div class="bc-doc--pdf"><Icon name="document" size={22} /><span>{t('docs.sheet.pdfFile')}</span><button type="button" onclick={() => shareDocument({ title: documentTitle(/** @type {any} */ (doc)), images: [], pdfs: [f] }, 'pdf').catch(() => showSnackbar(t('docs.share.failed')))}>{t('docs.sheet.openPdf')}</button></div>
     {/each}
 
     {#if rows.length}
-      <h2 class="od-doc--section">{t('docs.sheet.details')}</h2>
-      <div class="od-doc--card">
+      <h2 class="bc-doc--section">{t('docs.sheet.details')}</h2>
+      <div class="bc-doc--card">
         {#each rows as row (row.label)}
-          <div class="od-doc--row">
-            <span class="od-doc--label">{row.label}</span>
-            {#if row.tel}<a class="od-doc--value external" href={`tel:${row.value.replace(/[^+\d]/g, '')}`}>{row.value}</a>{:else}<span class="od-doc--value">{row.value}</span>{/if}
+          <div class="bc-doc--row">
+            <span class="bc-doc--label">{row.label}</span>
+            {#if row.tel}<a class="bc-doc--value external" href={`tel:${row.value.replace(/[^+\d]/g, '')}`}>{row.value}</a>{:else}<span class="bc-doc--value">{row.value}</span>{/if}
           </div>
         {/each}
       </div>
     {/if}
   {/if}
-  <div class="od-doc--bottom"></div>
+  <div class="bc-doc--bottom"></div>
 {/snippet}
 
-<Page class="od-doc">
+<Page class="bc-doc">
   <Navbar>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('docs.back')}</span>
+        <span class="bc-sr-only">{t('docs.back')}</span>
       </Link>
     {/snippet}
     {#snippet title()}{doc ? kindLabel(doc) : ''}{/snippet}
     {#snippet right()}
-      <button type="button" class="link icon-only od-doc--bar" disabled={!files.length} onclick={() => (sharing = true)} aria-label={t('docs.share.menu')}><Icon name="share" /></button>
+      <button type="button" class="link icon-only bc-doc--bar" disabled={!files.length} onclick={() => (sharing = true)} aria-label={t('docs.share.menu')}><Icon name="share" /></button>
       <a href={`/profile/documents/${id}/edit`} class="link icon-only" aria-label={t('diverProfile.cert.edit')}><Icon name="edit" /></a>
-      <button type="button" class="link icon-only od-doc--bar" onclick={more} aria-label={t('diverProfile.cert.menu')}><Icon name="more" /></button>
+      <button type="button" class="link icon-only bc-doc--bar" onclick={more} aria-label={t('diverProfile.cert.menu')}><Icon name="more" /></button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -236,62 +236,62 @@
 
 <style>
   @layer od.components {
-    :global(.od-doc .page-content) {
+    :global(.bc-doc .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-doc--bar {
+    .bc-doc--bar {
       border: none;
       background: none;
       color: inherit;
     }
 
-    .od-doc--bar:disabled {
+    .bc-doc--bar:disabled {
       opacity: 0.38;
     }
 
-    .od-doc--head {
+    .bc-doc--head {
       margin: 8px 20px 0;
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-doc--head-texts {
+    .bc-doc--head-texts {
       min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-doc--kind {
+    .bc-doc--kind {
       font-size: 12px;
       line-height: 16px;
       font-weight: 700;
       letter-spacing: 0.6px;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--tone-blue { color: var(--od-plus-blue-icon); }
-    .od-doc--tone-green { color: var(--od-plus-green-icon); }
-    .od-doc--tone-amber { color: var(--od-plus-amber-icon); }
-    .od-doc--tone-violet { color: var(--od-plus-violet-icon); }
-    .od-doc--tone-red { color: var(--od-maintenance-icon); }
+    .bc-doc--tone-blue { color: var(--bc-plus-blue-icon); }
+    .bc-doc--tone-green { color: var(--bc-plus-green-icon); }
+    .bc-doc--tone-amber { color: var(--bc-plus-amber-icon); }
+    .bc-doc--tone-violet { color: var(--bc-plus-violet-icon); }
+    .bc-doc--tone-red { color: var(--bc-maintenance-icon); }
 
-    .od-doc--title {
+    .bc-doc--title {
       font-size: 22px;
       line-height: 28px;
       font-weight: 500;
     }
 
-    .od-doc--subtitle {
+    .bc-doc--subtitle {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--banner {
+    .bc-doc--banner {
       margin: 16px 16px 0;
       padding: 12px 16px;
       border-radius: 16px;
@@ -300,34 +300,34 @@
       gap: 12px;
     }
 
-    .od-doc--banner-valid { background: var(--od-plus-green); color: var(--od-plus-green-icon); }
-    .od-doc--banner-soon { background: var(--od-plus-amber); color: var(--od-plus-amber-icon); }
-    .od-doc--banner-expired { background: var(--od-alarm-tint); color: var(--od-alarm); }
+    .bc-doc--banner-valid { background: var(--bc-plus-green); color: var(--bc-plus-green-icon); }
+    .bc-doc--banner-soon { background: var(--bc-plus-amber); color: var(--bc-plus-amber-icon); }
+    .bc-doc--banner-expired { background: var(--bc-alarm-tint); color: var(--bc-alarm); }
 
-    .od-doc--banner-texts {
+    .bc-doc--banner-texts {
       display: flex;
       flex-direction: column;
     }
 
-    .od-doc--banner-title {
+    .bc-doc--banner-title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-doc--banner-line {
+    .bc-doc--banner-line {
       font-size: 13px;
       line-height: 18px;
     }
 
-    .od-doc--pages {
+    .bc-doc--pages {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .od-doc--page {
+    .bc-doc--page {
       margin: 0;
       display: flex;
       flex-direction: column;
@@ -335,24 +335,24 @@
       gap: 8px;
     }
 
-    .od-doc--page figcaption {
+    .bc-doc--page figcaption {
       align-self: flex-start;
       padding: 0 4px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--page img {
+    .bc-doc--page img {
       width: 100%;
       max-height: 420px;
       border-radius: 16px;
       object-fit: contain;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-doc--full {
+    .bc-doc--full {
       height: 40px;
       padding: 0 20px 0 14px;
       border: none;
@@ -360,85 +360,85 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-doc--pdf {
+    .bc-doc--pdf {
       margin: 12px 16px 0;
       padding: 8px 8px 8px 16px;
       border-radius: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 16px;
     }
 
-    .od-doc--pdf span {
+    .bc-doc--pdf span {
       flex: 1;
     }
 
-    .od-doc--pdf button {
+    .bc-doc--pdf button {
       height: 40px;
       padding: 0 16px;
       border: none;
       border-radius: 20px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-doc--section {
+    .bc-doc--section {
       margin: 20px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--card {
+    .bc-doc--card {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-doc--row {
+    .bc-doc--row {
       padding: 10px 16px;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-doc--row + .od-doc--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-doc--row + .bc-doc--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-doc--label {
+    .bc-doc--label {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--value {
+    .bc-doc--value {
       font-size: 17px;
       line-height: 24px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-doc--missing {
+    .bc-doc--missing {
       margin: 32px;
       text-align: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc--bottom {
+    .bc-doc--bottom {
       height: 48px;
     }
   }

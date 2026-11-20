@@ -26,16 +26,16 @@
   const name = `od-choice-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<Md3Dialog class="od-choice-dialog" {title} {oncancel}>
-  <div class="od-choice-dialog--choices" role="radiogroup" aria-label={title}>
+<Md3Dialog class="bc-choice-dialog" {title} {oncancel}>
+  <div class="bc-choice-dialog--choices" role="radiogroup" aria-label={title}>
     {#each options as option (option.value)}
-      <ChoiceRow class="od-choice-dialog--choice" {name} selected={selected === option.value} onselect={() => (selected = option.value)}>
-        <span class="od-choice-dialog--label">{option.label}</span>
-        {#if option.example}<span class="od-choice-dialog--example">{option.example}</span>{/if}
+      <ChoiceRow class="bc-choice-dialog--choice" {name} selected={selected === option.value} onselect={() => (selected = option.value)}>
+        <span class="bc-choice-dialog--label">{option.label}</span>
+        {#if option.example}<span class="bc-choice-dialog--example">{option.example}</span>{/if}
       </ChoiceRow>
     {/each}
   </div>
-  {#if note}<p class="od-choice-dialog--note">{note}</p>{/if}
+  {#if note}<p class="bc-choice-dialog--note">{note}</p>{/if}
   {#snippet actions()}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" onclick={() => onselect(selected)}>{t('dialog.ok')}</button>
@@ -44,35 +44,35 @@
 
 <style>
   @layer od.components {
-    .od-choice-dialog--choices {
+    .bc-choice-dialog--choices {
       display: flex;
       flex-direction: column;
       padding: 0 12px;
     }
 
-    .od-choice-dialog--note {
+    .bc-choice-dialog--note {
       margin: 8px 24px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.od-choice-dialog--choice) {
+    :global(.bc-choice-dialog--choice) {
       min-height: 56px;
       padding: 0 12px;
     }
 
-    .od-choice-dialog--label {
+    .bc-choice-dialog--label {
       flex: 1;
       min-width: 0;
       font-size: 16px;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-choice-dialog--example {
+    .bc-choice-dialog--example {
       flex: none;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
   }

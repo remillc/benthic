@@ -43,9 +43,9 @@
 </script>
 
 <svg
-  class="od-profile-thumbnail od-profile-thumbnail--thumbnail"
-  class:od-profile-thumbnail--small={small}
-  class:od-profile-thumbnail--wide={wide}
+  class="bc-profile-thumbnail bc-profile-thumbnail--thumbnail"
+  class:bc-profile-thumbnail--small={small}
+  class:bc-profile-thumbnail--wide={wide}
   viewBox="0 0 {W} {H}"
   preserveAspectRatio="none"
   role={small || wide ? undefined : 'img'}
@@ -54,24 +54,24 @@
 >
   <defs>
     <linearGradient id="water-{uid}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" style="stop-color: var(--od-water-top)" />
+      <stop offset="0" style="stop-color: var(--bc-water-top)" />
       <stop offset="1" style="stop-color: {waterBottomColor(maxDepthMm)}" />
     </linearGradient>
   </defs>
   {#if shape}
     <path d={shape.water} fill="url(#water-{uid})" />
-    <path d={shape.line} class="od-profile-thumbnail--line" vector-effect="non-scaling-stroke" />
+    <path d={shape.line} class="bc-profile-thumbnail--line" vector-effect="non-scaling-stroke" />
   {/if}
 </svg>
 
 <style>
   @layer od.components {
-    .od-profile-thumbnail--thumbnail {
+    .bc-profile-thumbnail--thumbnail {
       display: block;
       width: 56px;
       height: 40px;
       border-radius: 8px;
-      background: var(--od-thumbnail-background);
+      background: var(--bc-thumbnail-background);
       overflow: hidden;
       flex-shrink: 0;
 
@@ -81,27 +81,27 @@
       }
 
       /* Phone rows (task 2026-11-18-278): 64 × 28, on a light grey chip. */
-      &.od-profile-thumbnail--wide {
+      &.bc-profile-thumbnail--wide {
         width: 64px;
         height: 28px;
         border-radius: 6px;
-        background: var(--od-profile-chip);
+        background: var(--bc-profile-chip);
       }
 
-      &.od-profile-thumbnail--small {
+      &.bc-profile-thumbnail--small {
         width: 100%;
         height: 100%;
         border-radius: 4px;
       }
     }
 
-    .od-profile-thumbnail--line {
+    .bc-profile-thumbnail--line {
       fill: none;
-      stroke: var(--od-trace);
+      stroke: var(--bc-trace);
       stroke-width: 1.25;
       stroke-linejoin: round;
 
-      .od-profile-thumbnail--small & {
+      .bc-profile-thumbnail--small & {
         stroke-width: 1;
       }
     }

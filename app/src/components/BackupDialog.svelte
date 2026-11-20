@@ -27,31 +27,31 @@
   }
 </script>
 
-<Popup class="od-backup-dialog" opened={navigation.backupOpen} onPopupClosed={() => ((shown = false), close(), (backup.choice = null))} closeByBackdropClick aria-label={t('backup.title')}>
-  <div class="od-backup-dialog--head">
-    <h2 class="od-backup-dialog--title">{t('backup.title')}</h2>
-    <button type="button" class="od-backup-dialog--close" onclick={close}>
-      <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
+<Popup class="bc-backup-dialog" opened={navigation.backupOpen} onPopupClosed={() => ((shown = false), close(), (backup.choice = null))} closeByBackdropClick aria-label={t('backup.title')}>
+  <div class="bc-backup-dialog--head">
+    <h2 class="bc-backup-dialog--title">{t('backup.title')}</h2>
+    <button type="button" class="bc-backup-dialog--close" onclick={close}>
+      <Icon name="close" /><span class="bc-sr-only">{t('nav.close')}</span>
     </button>
   </div>
-  <div class="od-backup-dialog--body">
+  <div class="bc-backup-dialog--body">
     {#if shown}{#if logbook.odplus}<BackupPanes onbrowse={browse} />{:else}<BackupNotOnServer />{/if}{/if}
   </div>
 </Popup>
 
 <style>
   @layer od.components {
-    :global(.popup.od-backup-dialog) {
+    :global(.popup.bc-backup-dialog) {
       --f7-popup-tablet-width: min(1000px, calc(100vw - 48px));
       --f7-popup-tablet-height: min(720px, calc(100vh - 48px));
-      background: var(--od-background);
+      background: var(--bc-background);
       max-height: calc(100vh - 32px);
       overflow: hidden;
       border-radius: 28px;
       box-shadow: 0 8px 28px rgb(0 0 0 / 0.25);
     }
 
-    .od-backup-dialog--head {
+    .bc-backup-dialog--head {
       height: 64px;
       padding: 8px 8px 0 24px;
       box-sizing: border-box;
@@ -59,28 +59,28 @@
       align-items: center;
     }
 
-    .od-backup-dialog--title {
+    .bc-backup-dialog--title {
       flex: 1;
       margin: 0;
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-backup-dialog--close {
+    .bc-backup-dialog--close {
       width: 48px;
       height: 48px;
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-backup-dialog--body {
+    .bc-backup-dialog--body {
       height: calc(100% - 64px);
       overflow: hidden;
     }

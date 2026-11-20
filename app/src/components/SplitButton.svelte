@@ -32,7 +32,7 @@
    */
   function place(popover) {
     const el = popover?.el;
-    const anchor = trigger?.closest('.od-split-button')?.getBoundingClientRect();
+    const anchor = trigger?.closest('.bc-split-button')?.getBoundingClientRect();
     if (!el || !anchor) return;
     // Inside the side menu (or the screen), 8 dp from its edges.
     const box = trigger?.closest('.panel')?.getBoundingClientRect() ?? { left: 0, right: window.innerWidth };
@@ -45,13 +45,13 @@
 {#if theme.ios}
   {@render lead()}
 {:else}
-  <div class="od-split-button" role="group">
-    <div class="od-split-button--lead">{@render lead()}</div>
+  <div class="bc-split-button" role="group">
+    <div class="bc-split-button--lead">{@render lead()}</div>
     <button
       type="button"
       bind:this={trigger}
-      class="od-split-button--trailing"
-      class:od-split-button--open={open}
+      class="bc-split-button--trailing"
+      class:bc-split-button--open={open}
       aria-label={label}
       aria-haspopup="menu"
       aria-expanded={open}
@@ -62,7 +62,7 @@
   </div>
   <Popover
     {id}
-    class="od-menu od-split-button--menu"
+    class="bc-menu bc-split-button--menu"
     backdrop={false}
     onPopoverOpen={(/** @type {any} */ popover) => {
       open = true;
@@ -77,19 +77,19 @@
 
 <style>
   @layer od.components {
-    .od-split-button {
+    .bc-split-button {
       display: inline-flex;
       gap: 2px;
     }
 
     /* The leading button: fully rounded outside, 4 dp inside. */
-    .od-split-button--lead > :global(.od-tonal-button) {
+    .bc-split-button--lead > :global(.bc-tonal-button) {
       height: 40px;
       padding: 0 12px 0 16px;
       border-radius: 20px 4px 4px 20px;
     }
 
-    .od-split-button--trailing {
+    .bc-split-button--trailing {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -98,8 +98,8 @@
       padding: 0;
       border: none;
       border-radius: 4px 20px 20px 4px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
       cursor: pointer;
 
       svg {
@@ -112,7 +112,7 @@
       }
 
       /* Open: the chevron points up and the button is fully rounded, as the Expressive spec draws it. */
-      &.od-split-button--open {
+      &.bc-split-button--open {
         border-radius: 20px;
 
         svg {
@@ -122,20 +122,20 @@
     }
 
     /* 280 dp wide, on the surface colour (the mock-up of task 2026-11-13-101). */
-    :global(.popover.od-menu.od-split-button--menu) {
+    :global(.popover.bc-menu.bc-split-button--menu) {
       --f7-popover-width: 280px;
       width: 280px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
     /* Labels as long as "Switch to automatic sync" wrap inside the 280 dp of the menu instead of being cut. */
-    :global(.od-split-button--menu .item-title) {
+    :global(.bc-split-button--menu .item-title) {
       white-space: normal;
       padding: 8px 0;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-split-button--trailing svg {
+      .bc-split-button--trailing svg {
         transition: none;
       }
     }
@@ -143,7 +143,7 @@
 
   /* Menu items: 48 dp (the mock-up), not the list's 53. Outside the layers: Framework7's
      list padding is not in a layer and would win over a layered rule. */
-  :global(.md .od-split-button--menu .item-title) {
+  :global(.md .bc-split-button--menu .item-title) {
     padding-top: 0;
     padding-bottom: 0;
   }

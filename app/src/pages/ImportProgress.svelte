@@ -149,7 +149,7 @@
   run();
 </script>
 
-<EditorialPage class="od-import-progress"
+<EditorialPage class="bc-import-progress"
   title={t('createAccount.title')}
   step={t('createAccount.step2')}
   heading={phase === 'failed' ? t('importProgress.failedTitle') : t('importProgress.title')}
@@ -169,24 +169,24 @@
   secondaryEnd
   closable={false}
 >
-  <ol class="od-import-progress--steps" aria-label={t('importProgress.stepsLabel')}>
+  <ol class="bc-import-progress--steps" aria-label={t('importProgress.stepsLabel')}>
     {#each steps as step (step.key)}
-      <li class="od-import-progress--state-{step.state}">
-        <span class="od-import-progress--mark" aria-hidden="true">
+      <li class="bc-import-progress--state-{step.state}">
+        <span class="bc-import-progress--mark" aria-hidden="true">
           {#if step.state === 'done'}
-            <span class="od-import-progress--done"><Icon name="check" size={18} weight={2.2} /></span>
+            <span class="bc-import-progress--done"><Icon name="check" size={18} weight={2.2} /></span>
           {:else if step.state === 'running'}
-            {#if ios}<span class="od-import-progress--spinner"></span>{:else}<LoadingIndicator size={24} label={t('importProgress.running')} />{/if}
+            {#if ios}<span class="bc-import-progress--spinner"></span>{:else}<LoadingIndicator size={24} label={t('importProgress.running')} />{/if}
           {:else if step.state === 'failed'}
-            <span class="od-import-progress--failed"><Icon name="error" /></span>
+            <span class="bc-import-progress--failed"><Icon name="error" /></span>
           {:else}
             <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" /></svg>
           {/if}
         </span>
-        <span class="od-import-progress--text">
-          <span class="od-import-progress--label">{t(`importProgress.steps.${step.key}`)}</span>
+        <span class="bc-import-progress--text">
+          <span class="bc-import-progress--label">{t(`importProgress.steps.${step.key}`)}</span>
           {#if step.text || step.state === 'running'}
-            <span class="od-import-progress--detail">{step.text || t('importProgress.running')}</span>
+            <span class="bc-import-progress--detail">{step.text || t('importProgress.running')}</span>
           {/if}
         </span>
       </li>
@@ -196,7 +196,7 @@
 
 <style>
   @layer od.components {
-    .od-import-progress--steps {
+    .bc-import-progress--steps {
       list-style: none;
       margin: 16px 0 0;
       padding: 0;
@@ -205,7 +205,7 @@
         margin: 20px 16px 0;
         border-radius: 20px;
         overflow: hidden;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
     }
 
@@ -219,12 +219,12 @@
         padding: 12px 16px;
 
         & + li {
-          box-shadow: inset 0 0.5px 0 var(--od-separator);
+          box-shadow: inset 0 0.5px 0 var(--bc-separator);
         }
       }
     }
 
-    .od-import-progress--mark {
+    .bc-import-progress--mark {
       flex: none;
       width: 24px;
       height: 24px;
@@ -234,32 +234,32 @@
 
       svg circle {
         fill: none;
-        stroke: var(--od-text-2);
+        stroke: var(--bc-text-2);
         stroke-width: 1.6;
         stroke-dasharray: 2.5 2.5;
       }
     }
 
-    .od-import-progress--done {
+    .bc-import-progress--done {
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: var(--od-surface-2);
-      color: var(--od-text);
+      background: var(--bc-surface-2);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-import-progress--failed {
+    .bc-import-progress--failed {
       display: flex;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-import-progress--spinner {
+    .bc-import-progress--spinner {
       width: 20px;
       height: 20px;
-      border: 2.5px solid var(--od-text);
+      border: 2.5px solid var(--bc-text);
       border-right-color: transparent;
       border-radius: 50%;
       box-sizing: border-box;
@@ -272,14 +272,14 @@
       }
     }
 
-    .od-import-progress--text {
+    .bc-import-progress--text {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-import-progress--label {
+    .bc-import-progress--label {
       font-size: 16px;
       line-height: 24px;
 
@@ -288,13 +288,13 @@
       }
     }
 
-    .od-import-progress--detail {
+    .bc-import-progress--detail {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      .od-import-progress--state-failed & {
-        color: var(--od-alarm);
+      .bc-import-progress--state-failed & {
+        color: var(--bc-alarm);
       }
 
       :global(.ios) & {

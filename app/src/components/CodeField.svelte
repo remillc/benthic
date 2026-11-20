@@ -72,21 +72,21 @@
   }
 </script>
 
-<div class="od-code-field" class:od-code-field--error={!!error} class:od-code-field--disabled={disabled}>
-  <label class="od-code-field--label" for={id}>{label}</label>
-  <div class="od-code-field--boxes" class:od-code-field--spread={spread} style:gap="{gap}px">
+<div class="bc-code-field" class:bc-code-field--error={!!error} class:bc-code-field--disabled={disabled}>
+  <label class="bc-code-field--label" for={id}>{label}</label>
+  <div class="bc-code-field--boxes" class:bc-code-field--spread={spread} style:gap="{gap}px">
     {#each digits as digit, i (i)}
       <span
-        class="od-code-field--box"
-        class:od-code-field--active={focused && !disabled && i === active}
-        class:od-code-field--filled={!!digit}
+        class="bc-code-field--box"
+        class:bc-code-field--active={focused && !disabled && i === active}
+        class:bc-code-field--filled={!!digit}
         aria-hidden="true"
-      >{digit}{#if focused && !disabled && i === active && !digit}<i class="od-code-field--caret"></i>{/if}</span>
+      >{digit}{#if focused && !disabled && i === active && !digit}<i class="bc-code-field--caret"></i>{/if}</span>
     {/each}
     <input
       bind:this={input}
       {id}
-      class="od-code-field--input"
+      class="bc-code-field--input"
       type="text"
       inputmode="numeric"
       autocomplete="one-time-code"
@@ -111,56 +111,56 @@
       onclick={toEnd}
     />
   </div>
-  {#if error}<p class="od-code-field--error-text" id={errorId} role="alert">{error}</p>{/if}
+  {#if error}<p class="bc-code-field--error-text" id={errorId} role="alert">{error}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-code-field {
-      /* In the editorial card (margin 0) or, on iOS, on the page (--od-field-margin 16). */
-      margin: 8px var(--od-field-margin, 0) 0;
+    .bc-code-field {
+      /* In the editorial card (margin 0) or, on iOS, on the page (--bc-field-margin 16). */
+      margin: 8px var(--bc-field-margin, 0) 0;
     }
 
-    .od-code-field--label {
+    .bc-code-field--label {
       display: block;
       margin: 0 0 8px;
       font-size: 13px;
       line-height: 18px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-code-field--boxes {
+    .bc-code-field--boxes {
       position: relative;
       display: flex;
       gap: 8px;
       justify-content: flex-start;
 
-      &.od-code-field--spread {
+      &.bc-code-field--spread {
         justify-content: space-between;
       }
     }
 
     /* 48 x 56 dp; under 328 dp of room the boxes shrink in proportion (the gap stays 8 dp). */
-    .od-code-field--box {
+    .bc-code-field--box {
       flex: 0 1 48px;
       min-width: 0;
       height: 56px;
       box-sizing: border-box;
-      border: 1px solid var(--od-code-border);
+      border: 1px solid var(--bc-code-border);
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Roboto Mono', ui-monospace, monospace;
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      &.od-code-field--active {
+      &.bc-code-field--active {
         border-width: 2px;
-        border-color: var(--od-code-active);
+        border-color: var(--bc-code-active);
       }
 
       :global(.ios) & {
@@ -168,10 +168,10 @@
       }
     }
 
-    .od-code-field--caret {
+    .bc-code-field--caret {
       width: 2px;
       height: 28px;
-      background: var(--od-code-active);
+      background: var(--bc-code-active);
       animation: od-code-caret 1s steps(1) infinite;
     }
 
@@ -182,13 +182,13 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-code-field--caret {
+      .bc-code-field--caret {
         animation: none;
       }
     }
 
     /* The one real field lies over the boxes: transparent, it takes the taps and the paste. */
-    .od-code-field--input {
+    .bc-code-field--input {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -209,23 +209,23 @@
       }
     }
 
-    .od-code-field--error .od-code-field--box {
+    .bc-code-field--error .bc-code-field--box {
       border-width: 2px;
-      border-color: var(--od-code-error);
+      border-color: var(--bc-code-error);
     }
 
-    .od-code-field--error .od-code-field--label {
-      color: var(--od-code-error);
+    .bc-code-field--error .bc-code-field--label {
+      color: var(--bc-code-error);
     }
 
-    .od-code-field--error-text {
+    .bc-code-field--error-text {
       margin: 6px 0 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-code-error);
+      color: var(--bc-code-error);
     }
 
-    .od-code-field--disabled {
+    .bc-code-field--disabled {
       opacity: 0.6;
     }
   }

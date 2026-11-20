@@ -94,10 +94,10 @@ test('the texts of the screen and of the dialog, in French and English', () => {
 test('the window without a logbook: the blue panel with a still profile, the recent logbooks, « Ou bien », two rows, the drop hint, the help link', () => {
   const start = read('components/DesktopLogbookStart.svelte');
   assert.match(start, /<FirstLaunchPanel still \/>/);
-  assert.match(start, /\{#if logbooks\.recent\.length\}\s*<RecentLogbooks \/>\s*<h2 class="od-logbook-start--or">\{t\('desktopLogbooks\.recents\.orElse'\)\}<\/h2>/);
+  assert.match(start, /\{#if logbooks\.recent\.length\}\s*<RecentLogbooks \/>\s*<h2 class="bc-logbook-start--or">\{t\('desktopLogbooks\.recents\.orElse'\)\}<\/h2>/);
   assert.match(start, /onclick=\{openLogbookDialog\}/, '« Ouvrir un carnet… » opens the system picker');
   assert.match(start, /onclick=\{\(\) => \(logbooks\.dialog = true\)\}/, '« Nouveau carnet… » opens the new-logbook flow');
-  assert.equal((start.match(/class="od-logbook-start--choice"/g) ?? []).length, 2, 'two neutral rows, no filled one');
+  assert.equal((start.match(/class="bc-logbook-start--choice"/g) ?? []).length, 2, 'two neutral rows, no filled one');
   assert.match(start, /<WelcomeHelpLink onopen=\{openAbout\} \/>/);
   assert.match(start, /desktopLogbooks\.start\.drop/);
   assert.match(start, /refreshRecent\(\)\.then\(checkRecent\)/);
@@ -107,11 +107,11 @@ test('the window without a logbook: the blue panel with a still profile, the rec
 
 test('the rail is out of sight on that window, back (dimmed) when Réglages steps in front of it', () => {
   const start = read('components/DesktopLogbookStart.svelte');
-  assert.match(start, /classList\.toggle\('od-start-screen', visible\)/);
+  assert.match(start, /classList\.toggle\('bc-start-screen', visible\)/);
   assert.match(start, /const visible = \$derived\(navigation\.section !== 'account'\)/);
-  assert.match(start, /html\.od-start-screen \.od-nav-rail--rail\) \{\s*visibility: hidden;/);
+  assert.match(start, /html\.bc-start-screen \.bc-nav-rail--rail\) \{\s*visibility: hidden;/);
   // Task 240 still applies where the rail shows: the sections dimmed, Réglages and the account active.
-  assert.match(start, /html\.od-no-logbook \.od-nav-rail--item:not\(\.od-nav-rail--settings\)\) \{\s*opacity: 0\.38;\s*pointer-events: none;/);
+  assert.match(start, /html\.bc-no-logbook \.bc-nav-rail--item:not\(\.bc-nav-rail--settings\)\) \{\s*opacity: 0\.38;\s*pointer-events: none;/);
   assert.match(start, /z-index: 6100;/, 'above the rail (6000)');
 });
 
@@ -134,7 +134,7 @@ test('a row opens its logbook; a missing one opens the dialog with « Retirer de
 
 test('the colours of the new screens are tokens, in light and dark', () => {
   const theme = read('theme.css');
-  for (const name of ['--od-start-fill', '--od-on-start-fill', '--od-start-hover']) assert.equal((theme.match(new RegExp(`${name}:`, 'g')) ?? []).length, 2, name);
+  for (const name of ['--bc-start-fill', '--bc-on-start-fill', '--bc-start-hover']) assert.equal((theme.match(new RegExp(`${name}:`, 'g')) ?? []).length, 2, name);
   for (const file of ['components/DesktopLogbookStart.svelte', 'components/RecentLogbooks.svelte']) assert.doesNotMatch(read(file), /#[0-9a-fA-F]{3,8}\b/, `${file} hard-codes a colour`);
 });
 
@@ -185,12 +185,12 @@ test('the desktop says « cet ordinateur »: a Desktop twin of every Tablet text
 
 test('the first launch in the desktop app: the tablet screen, a row in any window shape, the drop hint', () => {
   const welcome = read('pages/WelcomeStart.svelte');
-  assert.match(welcome, /<p class="od-welcome-start--drop"[^>]*>\{dragging \? t\('desktopLogbooks\.start\.dropHere'\) : t\('desktopLogbooks\.start\.drop'\)\}<\/p>/);
-  assert.match(welcome, /\{#if desktopApp\}\s*<p class="od-welcome-start--drop"/);
-  assert.match(welcome, /html\.od-desktop-app\) \.od-welcome-start--with-panel \{\s*flex-direction: row;/);
-  assert.match(read('components/FirstLaunchPanel.svelte'), /html\.od-desktop-app\) \.od-first-launch-panel \{\s*width: min\(700px, 48\.6%\);/);
-  assert.match(read('components/EditorialPage.svelte'), /html\.od-desktop-app \.od-editorial-page--panelled \.page-content\) \{\s*flex-direction: row;/);
-  assert.match(read('lib/layout.svelte.js'), /if \(desktopApp\) document\.documentElement\.classList\.add\('od-desktop-app'\)/);
+  assert.match(welcome, /<p class="bc-welcome-start--drop"[^>]*>\{dragging \? t\('desktopLogbooks\.start\.dropHere'\) : t\('desktopLogbooks\.start\.drop'\)\}<\/p>/);
+  assert.match(welcome, /\{#if desktopApp\}\s*<p class="bc-welcome-start--drop"/);
+  assert.match(welcome, /html\.bc-desktop-app\) \.bc-welcome-start--with-panel \{\s*flex-direction: row;/);
+  assert.match(read('components/FirstLaunchPanel.svelte'), /html\.bc-desktop-app\) \.bc-first-launch-panel \{\s*width: min\(700px, 48\.6%\);/);
+  assert.match(read('components/EditorialPage.svelte'), /html\.bc-desktop-app \.bc-editorial-page--panelled \.page-content\) \{\s*flex-direction: row;/);
+  assert.match(read('lib/layout.svelte.js'), /if \(desktopApp\) document\.documentElement\.classList\.add\('bc-desktop-app'\)/);
 });
 
 test('a drop on the first launch takes files only, starts the logbook of this computer and imports them', async () => {

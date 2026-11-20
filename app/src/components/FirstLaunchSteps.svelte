@@ -104,9 +104,9 @@
    * @param {{ kind: 'in'|'out' }} options
    */
   function move(node, { kind }) {
-    const cls = `od-first-launch--${kind}-${flow.direction}`;
+    const cls = `bc-first-launch--${kind}-${flow.direction}`;
     node.classList.add(cls);
-    const ms = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--od-motion-spatial-default-ms')) || 350;
+    const ms = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bc-motion-spatial-default-ms')) || 350;
     // The arriving step drops its animation class when the move is done, so that a later move starts clean.
     if (kind === 'in') setTimeout(() => node.classList.remove(cls), ms + 50);
     return { duration: reducedMotion() ? 0 : ms, css: () => '' };
@@ -737,7 +737,7 @@
       const begun = from;
       from = null;
       if (!begun || !touch) return;
-      if (document.querySelector('.od-welcome.modal-in') && touch.clientX - begun.x > 60 && Math.abs(touch.clientY - begun.y) < 60) welcomeBack();
+      if (document.querySelector('.bc-welcome.modal-in') && touch.clientX - begun.x > 60 && Math.abs(touch.clientY - begun.y) < 60) welcomeBack();
     };
     window.addEventListener('touchstart', start, { passive: true });
     window.addEventListener('touchend', end, { passive: true });
@@ -751,8 +751,8 @@
 
 {#snippet backButton()}
   {#if (hasBack(step, flow.origin === 'menu') && step !== 'odplusAll') || tabletOfferBack}
-    <button type="button" class="od-first-launch--back" onclick={step === 'start' ? leave : back}>
-      <span class="od-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
+    <button type="button" class="bc-first-launch--back" onclick={step === 'start' ? leave : back}>
+      <span class="bc-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
   {/if}
 {/snippet}
@@ -760,31 +760,31 @@
 <!-- Desktop app, task 2026-11-16-228: a logbook file dropped on the window starts the import with that file. -->
 {#snippet dropLine()}
   {#if desktopApp}
-    <p class="od-first-launch--drop">{t('welcomeSteps.dropLine')}</p>
+    <p class="bc-first-launch--drop">{t('welcomeSteps.dropLine')}</p>
   {/if}
 {/snippet}
 
 {#snippet logbookTitle()}
-  <button type="button" class="od-first-launch--name" aria-label={t('welcomeSteps.renameLabel')} onclick={editName}>
-    <span class="od-first-launch--title">{flow.name.trim() || t('welcomeSteps.defaultName')}</span>
+  <button type="button" class="bc-first-launch--name" aria-label={t('welcomeSteps.renameLabel')} onclick={editName}>
+    <span class="bc-first-launch--title">{flow.name.trim() || t('welcomeSteps.defaultName')}</span>
     <Icon name="edit" size={22} weight={2} />
   </button>
 {/snippet}
 
 {#snippet serviceList()}
-  <div class="od-first-launch--list">
+  <div class="bc-first-launch--list">
     {#each services as s (s.key)}
-      <button type="button" class="od-first-launch--list-row" onclick={() => pickService(s.key)}>
-        <span class="od-first-launch--list-tile"><Icon name={s.icon === 'server' ? 'server' : 'cloudUpload'} size={22} /></span>
+      <button type="button" class="bc-first-launch--list-row" onclick={() => pickService(s.key)}>
+        <span class="bc-first-launch--list-tile"><Icon name={s.icon === 'server' ? 'server' : 'cloudUpload'} size={22} /></span>
         {#if s.help}
-          <span class="od-first-launch--list-text">
-            <span class="od-first-launch--list-title">{t(s.text)}</span>
-            <span class="od-first-launch--list-detail">{t(s.help)}</span>
+          <span class="bc-first-launch--list-text">
+            <span class="bc-first-launch--list-title">{t(s.text)}</span>
+            <span class="bc-first-launch--list-detail">{t(s.help)}</span>
           </span>
         {:else}
-          <span class="od-first-launch--list-title">{t(s.text)}</span>
+          <span class="bc-first-launch--list-title">{t(s.text)}</span>
         {/if}
-        <span class="od-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
+        <span class="bc-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
       </button>
     {/each}
   </div>
@@ -792,27 +792,27 @@
 
 {#snippet hero(/** @type {'idle'|'waiting'|'refused'|'connected'} */ state)}
   {@const connected = state === 'connected'}
-  <div class="od-first-launch--hero">
-    <div class="od-first-launch--hero-end">
-      <span class="od-first-launch--hero-tile"><img src="logo-light.svg" alt="" width="48" height="48" /></span>
-      <span class="od-first-launch--hero-name">{t('welcomeSteps.appName')}</span>
+  <div class="bc-first-launch--hero">
+    <div class="bc-first-launch--hero-end">
+      <span class="bc-first-launch--hero-tile"><img src="logo-light.svg" alt="" width="48" height="48" /></span>
+      <span class="bc-first-launch--hero-name">{t('welcomeSteps.appName')}</span>
     </div>
-    <div class="od-first-launch--hero-link" class:od-first-launch--hero-linked={connected} class:od-first-launch--hero-waiting={state === 'waiting'} class:od-first-launch--hero-refused={state === 'refused'}>
-      <span class="od-first-launch--hero-line"></span>
-      <span class="od-first-launch--hero-badge">
+    <div class="bc-first-launch--hero-link" class:bc-first-launch--hero-linked={connected} class:bc-first-launch--hero-waiting={state === 'waiting'} class:bc-first-launch--hero-refused={state === 'refused'}>
+      <span class="bc-first-launch--hero-line"></span>
+      <span class="bc-first-launch--hero-badge">
         {#if state === 'waiting'}
-          <span class="od-first-launch--spinner" aria-hidden="true"></span>
+          <span class="bc-first-launch--spinner" aria-hidden="true"></span>
         {:else if state === 'refused'}
-          <span class="od-first-launch--hero-question" aria-hidden="true">?</span>
+          <span class="bc-first-launch--hero-question" aria-hidden="true">?</span>
         {:else}
           <Icon name={connected ? 'check' : 'link'} size={connected ? 16 : 14} weight={connected ? 2.6 : 1.8} />
         {/if}
       </span>
-      <span class="od-first-launch--hero-line"></span>
+      <span class="bc-first-launch--hero-line"></span>
     </div>
-    <div class="od-first-launch--hero-end">
-      <span class="od-first-launch--hero-tile"><Icon name={service.icon === 'server' ? 'server' : 'cloudUpload'} size={34} /></span>
-      <span class="od-first-launch--hero-name">{serviceName}</span>
+    <div class="bc-first-launch--hero-end">
+      <span class="bc-first-launch--hero-tile"><Icon name={service.icon === 'server' ? 'server' : 'cloudUpload'} size={34} /></span>
+      <span class="bc-first-launch--hero-name">{serviceName}</span>
     </div>
   </div>
 {/snippet}
@@ -820,51 +820,51 @@
 {#snippet connecting()}
   {@render hero(flow.connection)}
   {#if flow.connection === 'waiting'}
-    <p class="od-first-launch--status" role="status">{t('welcomeSteps.connecting')}</p>
-    <p class="od-first-launch--status-help">{t('welcomeSteps.connectingHelp')}</p>
-    <div class="od-first-launch--buttons">
-      <button type="button" class="od-first-launch--outlined" onclick={cancelConnection}>{t('welcomeSteps.cancel')}</button>
-      <button type="button" class="od-first-launch--quiet" onclick={reopenPage}>
+    <p class="bc-first-launch--status" role="status">{t('welcomeSteps.connecting')}</p>
+    <p class="bc-first-launch--status-help">{t('welcomeSteps.connectingHelp')}</p>
+    <div class="bc-first-launch--buttons">
+      <button type="button" class="bc-first-launch--outlined" onclick={cancelConnection}>{t('welcomeSteps.cancel')}</button>
+      <button type="button" class="bc-first-launch--quiet" onclick={reopenPage}>
         <Icon name="openInNew" size={18} />{t('welcomeSteps.reopenPage')}
       </button>
     </div>
   {:else if flow.connection === 'refused'}
-    <p class="od-first-launch--status od-first-launch--status-error" role="alert">{t('welcomeSteps.refusedTitle')}</p>
-    <p class="od-first-launch--status-help">{t('welcomeSteps.refusedHelp')}</p>
-    <button type="button" class="od-first-launch--action" onclick={signIn}>
+    <p class="bc-first-launch--status bc-first-launch--status-error" role="alert">{t('welcomeSteps.refusedTitle')}</p>
+    <p class="bc-first-launch--status-help">{t('welcomeSteps.refusedHelp')}</p>
+    <button type="button" class="bc-first-launch--action" onclick={signIn}>
       <Icon name="openInNew" size={18} />{t('welcomeSteps.retry')}
     </button>
   {:else}
-    <p class="od-first-launch--status">{t('welcomeSteps.notConnected')}</p>
-    <button type="button" class="od-first-launch--action od-first-launch--action-centre" onclick={signIn}>
+    <p class="bc-first-launch--status">{t('welcomeSteps.notConnected')}</p>
+    <button type="button" class="bc-first-launch--action bc-first-launch--action-centre" onclick={signIn}>
       <Icon name="openInNew" size={18} />{t('welcomeSteps.connect', { service: serviceName })}
     </button>
-    <p class="od-first-launch--hint">{t('welcomeSteps.connectHint')}</p>
+    <p class="bc-first-launch--hint">{t('welcomeSteps.connectHint')}</p>
   {/if}
 {/snippet}
 
 {#snippet nameStep()}
   {#if flow.source}
-    <div class="od-first-launch--summary">
-      <span class="od-first-launch--summary-icon"><Icon name="file" size={20} /></span>
-      <span class="od-first-launch--summary-text">
-        <span class="od-first-launch--summary-name">{flow.source.kind === 'file' ? flow.source.file.name : flow.source.kind === 'staged' ? flow.source.fileName : t('welcomeSteps.divelogsTitle')}</span>
-        <span class="od-first-launch--summary-detail">{summaryText(flow.source.summary, t)}</span>
+    <div class="bc-first-launch--summary">
+      <span class="bc-first-launch--summary-icon"><Icon name="file" size={20} /></span>
+      <span class="bc-first-launch--summary-text">
+        <span class="bc-first-launch--summary-name">{flow.source.kind === 'file' ? flow.source.file.name : flow.source.kind === 'staged' ? flow.source.fileName : t('welcomeSteps.divelogsTitle')}</span>
+        <span class="bc-first-launch--summary-detail">{summaryText(flow.source.summary, t)}</span>
       </span>
     </div>
   {/if}
-  <ReleaseField class="od-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} />
+  <ReleaseField class="bc-first-launch--name-field" label={t('welcomeSteps.nameLabel')} bind:value={flow.name} tall error={nameError} help={t('welcomeSteps.nameHelp')} />
   {#if step === 'importNew'}
-    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.importLogbook')}</button>
+    <button type="button" class="bc-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.importLogbook')}</button>
   {:else}
-    <button type="button" class="od-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.createLogbook')}</button>
+    <button type="button" class="bc-first-launch--action" disabled={busy || nameInvalid} onclick={createOnDevice}>{t('welcomeSteps.createLogbook')}</button>
   {/if}
 {/snippet}
 
-<div class="od-first-launch" class:od-first-launch--first={step === 'start'} class:od-first-launch--dragging={dragging} class:od-first-launch--desktop={desktopApp}>
-  <div class="od-first-launch--stage">
+<div class="bc-first-launch" class:bc-first-launch--first={step === 'start'} class:bc-first-launch--dragging={dragging} class:bc-first-launch--desktop={desktopApp}>
+  <div class="bc-first-launch--stage">
     {#key step}
-      <section class="od-first-launch--step" data-step={step} in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
+      <section class="bc-first-launch--step" data-step={step} in:move={{ kind: 'in' }} out:move={{ kind: 'out' }}>
         {@render backButton()}
 
         {#if hasLogbookTitle(step)}
@@ -872,68 +872,68 @@
         {:else if step === 'start' && recents}
           <RecentLogbooks />
         {:else if !OWN_HEADING.includes(step)}
-          <h2 class="od-first-launch--title">{t(titles[step])}</h2>
+          <h2 class="bc-first-launch--title">{t(titles[step])}</h2>
         {/if}
 
         {#if step === 'start' && recents}
-          <h3 class="od-first-launch--or">{t('desktopLogbooks.recents.orElse')}</h3>
-          <nav class="od-first-launch--rows od-first-launch--rows-compact" aria-label={t('desktopLogbooks.recents.otherChoices')}>
+          <h3 class="bc-first-launch--or">{t('desktopLogbooks.recents.orElse')}</h3>
+          <nav class="bc-first-launch--rows bc-first-launch--rows-compact" aria-label={t('desktopLogbooks.recents.otherChoices')}>
             <ReleaseChoiceRow compact icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
             <ReleaseChoiceRow compact icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
             <ReleaseChoiceRow compact icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
           </nav>
           {@render dropLine()}
         {:else if step === 'start'}
-          <nav class="od-first-launch--rows od-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
+          <nav class="bc-first-launch--rows bc-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
             <!-- Task 2026-11-17-263: sign in (the OpenDives+ chip above its title), then a logbook on the device, then the import. -->
             <ReleaseChoiceRow main prominent plus dense={denseRows} icon="login" title={t('welcomeSteps.signInTitle')} help={t('welcomeSteps.signInHelp')} onclick={() => go('signIn')} />
             <ReleaseChoiceRow dense={denseRows} icon={deviceIcon} title={t(deviceKey('welcomeSteps.localTitle', kind))} help={t('welcomeSteps.localHelp')} onclick={() => go('create')} />
             <ReleaseChoiceRow dense={denseRows} icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importStartHelp')} onclick={() => go('import')} />
           </nav>
-          <div class="od-first-launch--text-buttons">
+          <div class="bc-first-launch--text-buttons">
             {#if demoOffered}
-              <button type="button" class="od-first-launch--text-button" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
+              <button type="button" class="bc-first-launch--text-button" disabled={busy} onclick={() => void tryDemo()}>{t('demoLogbook.link')}</button>
             {/if}
-            <button type="button" class="od-first-launch--text-button od-first-launch--text-button-quiet" onclick={() => go('discover')}>{t('welcomeSteps.discoverPlus')}</button>
+            <button type="button" class="bc-first-launch--text-button bc-first-launch--text-button-quiet" onclick={() => go('discover')}>{t('welcomeSteps.discoverPlus')}</button>
           </div>
           {@render dropLine()}
         {:else if step === 'new' || step === 'importNew'}
           {@render nameStep()}
         {:else if step === 'cloudService'}
-          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.serviceTitle')}</h3>
-          <p class="od-first-launch--lead">{t('welcomeSteps.serviceHelp')}</p>
+          <h3 class="bc-first-launch--subtitle">{t('welcomeSteps.serviceTitle')}</h3>
+          <p class="bc-first-launch--lead">{t('welcomeSteps.serviceHelp')}</p>
           {@render serviceList()}
         {:else if step === 'cloudConnect' || step === 'cloudConnected'}
-          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.connectTitle', { service: serviceName })}</h3>
+          <h3 class="bc-first-launch--subtitle">{t('welcomeSteps.connectTitle', { service: serviceName })}</h3>
           {#if step === 'cloudConnect'}
             {@render connecting()}
           {:else}
             {@render hero('connected')}
-            <p class="od-first-launch--status">{flow.account}</p>
-            <p class="od-first-launch--status-help">{t('welcomeSteps.connectedCreate', { file: fileName })}</p>
+            <p class="bc-first-launch--status">{flow.account}</p>
+            <p class="bc-first-launch--status-help">{t('welcomeSteps.connectedCreate', { file: fileName })}</p>
             {#if service.key !== 'icloud'}
-              <button type="button" class="od-first-launch--text-link" disabled={switching} onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+              <button type="button" class="bc-first-launch--text-link" disabled={switching} onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
             {/if}
-            <button type="button" class="od-first-launch--action" disabled={busy} onclick={iphone && service.key === 'icloud' ? createInIcloud : createCloud}>{t('welcomeSteps.createLogbook')}</button>
+            <button type="button" class="bc-first-launch--action" disabled={busy} onclick={iphone && service.key === 'icloud' ? createInIcloud : createCloud}>{t('welcomeSteps.createLogbook')}</button>
           {/if}
         {:else if step === 'webdav'}
-          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
+          <h3 class="bc-first-launch--subtitle">{t('welcomeSteps.webdavTitle')}</h3>
           <FirstLaunchWebdav create oncoming={cloud} onsubmit={windowTakes ? createWebdav : undefined} onfail={windowTakes ? (e) => creationFailed(e, 'webdav') : undefined} />
         {:else if step === 'git'}
-          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
+          <h3 class="bc-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
           <FirstLaunchGit create router={f7router} afterConnect={afterGit} onswitch={() => go('openLink')} onconnect={windowTakes ? createGit : undefined} />
         {:else if step === 'import'}
-          <p class="od-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
+          <p class="bc-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
           {#if unreadable}
-            <div class="od-first-launch--error" role="alert">
-              <span class="od-first-launch--error-icon"><Icon name="error" size={22} /></span>
-              <span class="od-first-launch--error-text">
-                <span class="od-first-launch--error-title">{t('welcomeSteps.fileUnreadable')}</span>
-                <span class="od-first-launch--error-detail">{t('welcomeSteps.fileUnreadableHelp', { name: unreadable })}</span>
+            <div class="bc-first-launch--error" role="alert">
+              <span class="bc-first-launch--error-icon"><Icon name="error" size={22} /></span>
+              <span class="bc-first-launch--error-text">
+                <span class="bc-first-launch--error-title">{t('welcomeSteps.fileUnreadable')}</span>
+                <span class="bc-first-launch--error-detail">{t('welcomeSteps.fileUnreadableHelp', { name: unreadable })}</span>
               </span>
             </div>
           {/if}
-          <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
+          <nav class="bc-first-launch--rows" aria-label={t('welcomeSteps.importQuestion')}>
             {#each alphaFound as found (found.id)}
               <ReleaseChoiceRow icon="logbook" title={t('welcomeSteps.alphaTitle')} help={alphaFound.length > 1 ? t('welcomeSteps.alphaHelpDated', { n: found.dives, date: formatInstantDate(found.modified * 1000) }) : t('welcomeSteps.alphaHelp', { n: found.dives })} disabled={busy} onclick={() => useAlphaLogbook(found)} />
             {/each}
@@ -943,67 +943,67 @@
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
           {@render dropLine()}
-          <input type="file" multiple class="od-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+          <input type="file" multiple class="bc-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
           {#if csv}
             <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
           {/if}
         {:else if step === 'importDivelogs' || step === 'importProgress'}
           <FirstLaunchDivelogs {step} onread={divelogsRead} />
         {:else if step === 'open'}
-          <p class="od-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
-          <nav class="od-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
+          <p class="bc-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
+          <nav class="bc-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
             <!-- The OpenDives server only: the beta never opens a logbook in a cloud drive or a personal git repository. -->
             {#each entryRows('open') as row (row.key)}
               <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.openHelp')} onclick={() => go('server')} />
             {/each}
           </nav>
         {:else if step === 'openCloudService'}
-          <p class="od-first-launch--lead">{t('welcomeSteps.openService')}</p>
+          <p class="bc-first-launch--lead">{t('welcomeSteps.openService')}</p>
           {@render serviceList()}
         {:else if step === 'openCloudConnect' || step === 'openCloudConnected'}
-          <p class="od-first-launch--lead od-first-launch--lead-tight">{t('welcomeSteps.connectTitle', { service: serviceName })}</p>
+          <p class="bc-first-launch--lead bc-first-launch--lead-tight">{t('welcomeSteps.connectTitle', { service: serviceName })}</p>
           {#if step === 'openCloudConnect'}
             {@render connecting()}
           {:else}
             {@render hero('connected')}
-            <p class="od-first-launch--status">{flow.account}</p>
-            <p class="od-first-launch--status-help">{t('welcomeSteps.openConnectedHelp')}</p>
+            <p class="bc-first-launch--status">{flow.account}</p>
+            <p class="bc-first-launch--status-help">{t('welcomeSteps.openConnectedHelp')}</p>
             {#if service.key !== 'icloud'}
-              <button type="button" class="od-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
+              <button type="button" class="bc-first-launch--text-link" onclick={signIn}>{t('welcomeSteps.changeAccount')}</button>
             {/if}
-            <button type="button" class="od-first-launch--action" onclick={seeLogbooks}>{t('welcomeSteps.seeLogbooks')}</button>
+            <button type="button" class="bc-first-launch--action" onclick={seeLogbooks}>{t('welcomeSteps.seeLogbooks')}</button>
           {/if}
         {:else if step === 'openChoose'}
-          <p class="od-first-launch--lead">{t('welcomeSteps.chooseHelp', { account: flow.account, service: serviceName })}</p>
+          <p class="bc-first-launch--lead">{t('welcomeSteps.chooseHelp', { account: flow.account, service: serviceName })}</p>
           {#if chooseOutcome(flow.found) === 'none'}
             <!-- Nothing in the OpenDives folder (mock-up …-ouvrir-aucun-carnet-paysage). -->
-            <div class="od-first-launch--empty">
-              <span class="od-first-launch--empty-tile"><Icon name="logbook" size={24} /></span>
-              <p class="od-first-launch--empty-title">{t('welcomeSteps.noLogbookTitle')}</p>
-              <p class="od-first-launch--empty-text">{t('welcomeSteps.noLogbookText')}</p>
+            <div class="bc-first-launch--empty">
+              <span class="bc-first-launch--empty-tile"><Icon name="logbook" size={24} /></span>
+              <p class="bc-first-launch--empty-title">{t('welcomeSteps.noLogbookTitle')}</p>
+              <p class="bc-first-launch--empty-text">{t('welcomeSteps.noLogbookText')}</p>
             </div>
-            <div class="od-first-launch--buttons od-first-launch--buttons-even">
-              <button type="button" class="od-first-launch--outlined" onclick={otherAccount}>{t('welcomeSteps.changeAccount')}</button>
-              <button type="button" class="od-first-launch--action od-first-launch--action-inline" onclick={() => go('createHere')}>{t('welcomeSteps.createHere')}</button>
+            <div class="bc-first-launch--buttons bc-first-launch--buttons-even">
+              <button type="button" class="bc-first-launch--outlined" onclick={otherAccount}>{t('welcomeSteps.changeAccount')}</button>
+              <button type="button" class="bc-first-launch--action bc-first-launch--action-inline" onclick={() => go('createHere')}>{t('welcomeSteps.createHere')}</button>
             </div>
           {/if}
-          <div class="od-first-launch--list" hidden={chooseOutcome(flow.found) === 'none'}>
+          <div class="bc-first-launch--list" hidden={chooseOutcome(flow.found) === 'none'}>
             {#each flow.found as found (found.id)}
-              <button type="button" class="od-first-launch--list-row" onclick={cloud}>
-                <span class="od-first-launch--list-tile"><Icon name="logbook" size={22} /></span>
-                <span class="od-first-launch--list-text">
-                  <span class="od-first-launch--list-title">{found.name}</span>
-                  <span class="od-first-launch--list-detail">{t('welcomeSteps.foundLogbook', { n: found.dives, date: changed(Date.parse(found.changed)) })}</span>
+              <button type="button" class="bc-first-launch--list-row" onclick={cloud}>
+                <span class="bc-first-launch--list-tile"><Icon name="logbook" size={22} /></span>
+                <span class="bc-first-launch--list-text">
+                  <span class="bc-first-launch--list-title">{found.name}</span>
+                  <span class="bc-first-launch--list-detail">{t('welcomeSteps.foundLogbook', { n: found.dives, date: changed(Date.parse(found.changed)) })}</span>
                 </span>
-                <span class="od-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
+                <span class="bc-first-launch--list-chevron"><Icon name="chevron" size={20} weight={2} /></span>
               </button>
             {/each}
           </div>
         {:else if step === 'openWebdav'}
-          <p class="od-first-launch--lead od-first-launch--lead-tight">{t('welcomeSteps.webdavTitle')}</p>
+          <p class="bc-first-launch--lead bc-first-launch--lead-tight">{t('welcomeSteps.webdavTitle')}</p>
           <FirstLaunchWebdav create={false} oncoming={cloud} />
         {:else if step === 'openGit'}
-          <h3 class="od-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
+          <h3 class="bc-first-launch--subtitle">{t('welcomeSteps.gitStepTitle')}</h3>
           <FirstLaunchGit create={false} router={f7router} afterConnect={async () => resetFlow()} onswitch={() => go('createLink')} onconnect={windowTakes ? createGit : undefined} />
         {:else if step === 'server' || step === 'serverCode' || step === 'serverOffline' || step === 'serverDownload'}
           <FirstLaunchServer {step} />
@@ -1022,7 +1022,7 @@
 
 <style>
   @layer od.components {
-    .od-first-launch {
+    .bc-first-launch {
       position: relative;
       box-sizing: border-box;
       flex: 1;
@@ -1035,7 +1035,7 @@
       overflow: hidden;
     }
 
-    .od-first-launch--stage {
+    .bc-first-launch--stage {
       flex: 1;
       min-height: 0;
       display: grid;
@@ -1044,7 +1044,7 @@
     }
 
     /* The leaving and the arriving step lie on the same cell, centred. */
-    .od-first-launch--step {
+    .bc-first-launch--step {
       grid-area: 1 / 1;
       align-self: center;
       min-width: 0;
@@ -1075,38 +1075,38 @@
       to { opacity: 0; }
     }
 
-    .od-first-launch--stage :global(.od-first-launch--in-forward),
-    .od-first-launch--stage :global(.od-first-launch--in-back) {
+    .bc-first-launch--stage :global(.bc-first-launch--in-forward),
+    .bc-first-launch--stage :global(.bc-first-launch--in-back) {
       animation:
-        var(--od-first-launch-slide) var(--od-motion-spatial-default-ms, 350ms) var(--od-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-first-launch-fade-in calc(var(--od-motion-effects-default-ms, 200ms) * 1) var(--od-motion-effects-default, ease-out)
-          calc(var(--od-motion-spatial-default-ms, 350ms) * 0.3) both;
+        var(--bc-first-launch-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
+        od-first-launch-fade-in calc(var(--bc-motion-effects-default-ms, 200ms) * 1) var(--bc-motion-effects-default, ease-out)
+          calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) both;
     }
 
-    .od-first-launch--stage :global(.od-first-launch--in-forward) { --od-first-launch-slide: od-first-launch-in-forward; }
-    .od-first-launch--stage :global(.od-first-launch--in-back) { --od-first-launch-slide: od-first-launch-in-back; }
+    .bc-first-launch--stage :global(.bc-first-launch--in-forward) { --bc-first-launch-slide: od-first-launch-in-forward; }
+    .bc-first-launch--stage :global(.bc-first-launch--in-back) { --bc-first-launch-slide: od-first-launch-in-back; }
 
-    .od-first-launch--stage :global(.od-first-launch--out-forward),
-    .od-first-launch--stage :global(.od-first-launch--out-back) {
+    .bc-first-launch--stage :global(.bc-first-launch--out-forward),
+    .bc-first-launch--stage :global(.bc-first-launch--out-back) {
       pointer-events: none;
       animation:
-        var(--od-first-launch-slide) var(--od-motion-spatial-default-ms, 350ms) var(--od-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-first-launch-fade-out calc(var(--od-motion-spatial-default-ms, 350ms) * 0.3) var(--od-motion-effects-default, ease-out) both;
+        var(--bc-first-launch-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
+        od-first-launch-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
     }
 
-    .od-first-launch--stage :global(.od-first-launch--out-forward) { --od-first-launch-slide: od-first-launch-out-forward; }
-    .od-first-launch--stage :global(.od-first-launch--out-back) { --od-first-launch-slide: od-first-launch-out-back; }
+    .bc-first-launch--stage :global(.bc-first-launch--out-forward) { --bc-first-launch-slide: od-first-launch-out-forward; }
+    .bc-first-launch--stage :global(.bc-first-launch--out-back) { --bc-first-launch-slide: od-first-launch-out-back; }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch--stage :global(.od-first-launch--in-forward),
-      .od-first-launch--stage :global(.od-first-launch--in-back),
-      .od-first-launch--stage :global(.od-first-launch--out-forward),
-      .od-first-launch--stage :global(.od-first-launch--out-back) {
+      .bc-first-launch--stage :global(.bc-first-launch--in-forward),
+      .bc-first-launch--stage :global(.bc-first-launch--in-back),
+      .bc-first-launch--stage :global(.bc-first-launch--out-forward),
+      .bc-first-launch--stage :global(.bc-first-launch--out-back) {
         animation: none;
       }
     }
 
-    .od-first-launch--back {
+    .bc-first-launch--back {
       width: auto;
       align-self: flex-start;
       display: flex;
@@ -1117,7 +1117,7 @@
       border: none;
       border-radius: 18px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       line-height: 20px;
@@ -1127,21 +1127,21 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
       }
     }
 
-    .od-first-launch--back-icon {
+    .bc-first-launch--back-icon {
       display: flex;
       transform: rotate(180deg);
     }
 
-    .od-first-launch--title {
+    .bc-first-launch--title {
       margin: 0 0 6px;
       font-size: 28px;
       line-height: 36px;
@@ -1149,7 +1149,7 @@
       letter-spacing: -0.2px;
     }
 
-    .od-first-launch--name {
+    .bc-first-launch--name {
       width: auto;
       align-self: flex-start;
       display: flex;
@@ -1159,20 +1159,20 @@
       padding: 0;
       border: none;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       cursor: pointer;
 
       :global(svg) {
-        color: var(--od-release-row-main);
+        color: var(--bc-release-row-main);
       }
 
       @media (hover: hover) {
         &:hover :global(svg) {
-          color: var(--od-release-row-main-hover);
+          color: var(--bc-release-row-main-hover);
         }
 
-        &:hover .od-first-launch--title {
+        &:hover .bc-first-launch--title {
           text-decoration: underline;
           text-decoration-thickness: 1px;
           text-underline-offset: 4px;
@@ -1180,94 +1180,94 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 4px;
       }
     }
 
-    .od-first-launch--subtitle {
+    .bc-first-launch--subtitle {
       margin: 2px 0 6px;
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--lead {
+    .bc-first-launch--lead {
       margin: 0 0 20px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--lead-tight {
+    .bc-first-launch--lead-tight {
       margin-bottom: 14px;
     }
 
-    .od-first-launch--rows {
+    .bc-first-launch--rows {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-first-launch--rows-start {
+    .bc-first-launch--rows-start {
       margin-top: 14px;
     }
 
     /* The recent logbooks screen (task 2026-11-16-241): « Ou bien » and the three compact choices under the list. */
-    .od-first-launch--or {
+    .bc-first-launch--or {
       margin: 28px 0 10px;
       font-size: 15px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--rows-compact {
+    .bc-first-launch--rows-compact {
       gap: 8px;
     }
 
-    :global(.od-first-launch--name-field) {
+    :global(.bc-first-launch--name-field) {
       margin: 8px 0 4px;
     }
 
     /* The file that could not be read (mock-up …-importer-fichier-erreur-paysage). */
-    .od-first-launch--error {
+    .bc-first-launch--error {
       display: flex;
       gap: 12px;
       align-items: flex-start;
       margin: 0 0 22px;
       padding: 14px 16px;
       border-radius: 16px;
-      background: var(--od-error-container);
-      color: var(--od-on-error-container);
+      background: var(--bc-error-container);
+      color: var(--bc-on-error-container);
     }
 
-    .od-first-launch--error-icon {
+    .bc-first-launch--error-icon {
       flex: none;
-      color: var(--od-error);
+      color: var(--bc-error);
       display: flex;
     }
 
-    .od-first-launch--error-text {
+    .bc-first-launch--error-text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .od-first-launch--error-title {
+    .bc-first-launch--error-title {
       font-size: 16px;
       line-height: 21px;
       font-weight: 600;
     }
 
-    .od-first-launch--error-detail {
+    .bc-first-launch--error-detail {
       font-size: 14px;
       line-height: 19px;
     }
 
-    .od-first-launch--file {
+    .bc-first-launch--file {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -1276,14 +1276,14 @@
     }
 
     /* A grouped list: the services, the logbooks found. */
-    .od-first-launch--list {
-      border: 1px solid var(--od-surface-container-highest);
+    .bc-first-launch--list {
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-first-launch--list-row {
+    .bc-first-launch--list-row {
       box-sizing: border-box;
       width: 100%;
       display: flex;
@@ -1291,9 +1291,9 @@
       gap: 14px;
       padding: 14px 16px;
       border: none;
-      border-bottom: 1px solid var(--od-release-divider);
+      border-bottom: 1px solid var(--bc-release-divider);
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
@@ -1306,17 +1306,17 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-surface-2);
+          background: var(--bc-surface-2);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: -2px;
       }
     }
 
-    .od-first-launch--list-tile {
+    .bc-first-launch--list-tile {
       flex: none;
       width: 44px;
       height: 44px;
@@ -1324,11 +1324,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-release-tile-icon);
+      background: var(--bc-release-tile);
+      color: var(--bc-release-tile-icon);
     }
 
-    .od-first-launch--list-text {
+    .bc-first-launch--list-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -1336,41 +1336,41 @@
       gap: 1px;
     }
 
-    .od-first-launch--list-title {
+    .bc-first-launch--list-title {
       flex: 1;
       font-size: 16px;
       line-height: 21px;
       font-weight: 600;
     }
 
-    .od-first-launch--list-text .od-first-launch--list-title {
+    .bc-first-launch--list-text .bc-first-launch--list-title {
       flex: none;
     }
 
-    .od-first-launch--list-detail {
+    .bc-first-launch--list-detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--list-chevron {
+    .bc-first-launch--list-chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The link between OpenDives and the service. */
-    .od-first-launch--hero {
+    .bc-first-launch--hero {
       margin-top: 14px;
       padding: 22px 64px 18px;
       border-radius: 24px;
-      background: linear-gradient(180deg, var(--od-release-hero) 0%, var(--od-background) 100%);
+      background: linear-gradient(180deg, var(--bc-release-hero) 0%, var(--bc-background) 100%);
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
     }
 
-    .od-first-launch--hero-end {
+    .bc-first-launch--hero-end {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1378,26 +1378,26 @@
       width: 96px;
     }
 
-    .od-first-launch--hero-tile {
+    .bc-first-launch--hero-tile {
       width: 80px;
       height: 80px;
       border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      box-shadow: 0 2px 8px var(--od-release-row-shadow-hover);
-      color: var(--od-release-tile-icon);
+      background: var(--bc-surface);
+      box-shadow: 0 2px 8px var(--bc-release-row-shadow-hover);
+      color: var(--bc-release-tile-icon);
     }
 
-    .od-first-launch--hero-name {
+    .bc-first-launch--hero-name {
       font-size: 13px;
       line-height: 18px;
       font-weight: 600;
       text-align: center;
     }
 
-    .od-first-launch--hero-link {
+    .bc-first-launch--hero-link {
       flex: 1;
       height: 80px;
       display: flex;
@@ -1406,12 +1406,12 @@
       padding: 0 8px;
     }
 
-    .od-first-launch--hero-line {
+    .bc-first-launch--hero-line {
       flex: 1;
-      border-top: 2px dashed var(--od-release-line);
+      border-top: 2px dashed var(--bc-release-line);
     }
 
-    .od-first-launch--hero-badge {
+    .bc-first-launch--hero-badge {
       flex: none;
       width: 28px;
       height: 28px;
@@ -1420,44 +1420,44 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-line-soft);
-      color: var(--od-text-2);
+      background: var(--bc-release-line-soft);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--hero-linked {
-      .od-first-launch--hero-line {
-        border-top: 3px solid var(--od-release-ok);
+    .bc-first-launch--hero-linked {
+      .bc-first-launch--hero-line {
+        border-top: 3px solid var(--bc-release-ok);
       }
 
-      .od-first-launch--hero-badge {
-        background: var(--od-release-ok);
-        color: var(--od-release-on-panel);
-      }
-    }
-
-    .od-first-launch--hero-waiting {
-      .od-first-launch--hero-line {
-        border-top-color: var(--od-release-row-main);
-      }
-
-      .od-first-launch--hero-badge {
-        background: var(--od-surface);
-        box-shadow: 0 1px 4px var(--od-release-row-shadow-hover);
+      .bc-first-launch--hero-badge {
+        background: var(--bc-release-ok);
+        color: var(--bc-release-on-panel);
       }
     }
 
-    .od-first-launch--hero-refused {
-      .od-first-launch--hero-line {
-        border-top-color: var(--od-alarm);
+    .bc-first-launch--hero-waiting {
+      .bc-first-launch--hero-line {
+        border-top-color: var(--bc-release-row-main);
       }
 
-      .od-first-launch--hero-badge {
-        background: var(--od-error-container);
-        color: var(--od-alarm);
+      .bc-first-launch--hero-badge {
+        background: var(--bc-surface);
+        box-shadow: 0 1px 4px var(--bc-release-row-shadow-hover);
       }
     }
 
-    .od-first-launch--hero-question {
+    .bc-first-launch--hero-refused {
+      .bc-first-launch--hero-line {
+        border-top-color: var(--bc-alarm);
+      }
+
+      .bc-first-launch--hero-badge {
+        background: var(--bc-error-container);
+        color: var(--bc-alarm);
+      }
+    }
+
+    .bc-first-launch--hero-question {
       font-size: 14px;
       line-height: 14px;
       font-weight: 700;
@@ -1468,27 +1468,27 @@
       to { rotate: 360deg; }
     }
 
-    .od-first-launch--spinner {
+    .bc-first-launch--spinner {
       box-sizing: border-box;
       width: 18px;
       height: 18px;
-      border: 2px solid var(--od-release-track);
-      border-top-color: var(--od-release-row-main);
+      border: 2px solid var(--bc-release-track);
+      border-top-color: var(--bc-release-row-main);
       border-radius: 50%;
       animation: od-first-launch-spin 0.9s linear infinite;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch--spinner {
+      .bc-first-launch--spinner {
         animation: none;
       }
     }
 
-    .od-first-launch--status-error {
-      color: var(--od-alarm);
+    .bc-first-launch--status-error {
+      color: var(--bc-alarm);
     }
 
-    .od-first-launch--status {
+    .bc-first-launch--status {
       margin: 28px 0 0;
       text-align: center;
       font-size: 16px;
@@ -1496,30 +1496,30 @@
       font-weight: 600;
     }
 
-    .od-first-launch--status-help {
+    .bc-first-launch--status-help {
       margin: 2px 0 0;
       text-align: center;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* « Se connecter à… » is centred, and so is the two-line hint under it (task 2026-11-16-230). */
-    .od-first-launch--action.od-first-launch--action-centre {
+    .bc-first-launch--action.bc-first-launch--action-centre {
       align-self: center;
     }
 
-    .od-first-launch--hint {
+    .bc-first-launch--hint {
       align-self: center;
       margin: 8px 0 0;
       text-align: center;
       white-space: pre-line;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--buttons {
+    .bc-first-launch--buttons {
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -1527,14 +1527,14 @@
       margin-top: 22px;
     }
 
-    .od-first-launch--outlined {
+    .bc-first-launch--outlined {
       width: auto;
       height: 48px;
       padding: 0 22px;
-      border: 1px solid var(--od-release-field-border);
+      border: 1px solid var(--bc-release-field-border);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -1543,18 +1543,18 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
     /* A text button: « Rouvrir la page ». */
-    .od-first-launch--quiet {
+    .bc-first-launch--quiet {
       width: auto;
       display: flex;
       align-items: center;
@@ -1564,7 +1564,7 @@
       border: none;
       border-radius: 20px;
       background: transparent;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -1573,64 +1573,64 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
       }
     }
 
-    .od-first-launch--action.od-first-launch--action-inline {
+    .bc-first-launch--action.bc-first-launch--action-inline {
       margin-top: 0;
     }
 
     /* « Aucun carnet dans ce compte ». */
-    .od-first-launch--empty {
+    .bc-first-launch--empty {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 28px 32px 30px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 24px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       text-align: center;
     }
 
-    .od-first-launch--empty-tile {
+    .bc-first-launch--empty-tile {
       width: 56px;
       height: 56px;
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-release-tile-icon);
+      background: var(--bc-release-tile);
+      color: var(--bc-release-tile-icon);
     }
 
-    .od-first-launch--empty-title {
+    .bc-first-launch--empty-title {
       margin: 14px 0 0;
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-first-launch--empty-text {
+    .bc-first-launch--empty-text {
       margin: 4px 0 0;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--text-link {
+    .bc-first-launch--text-link {
       width: auto;
       align-self: center;
       margin: 6px 0 0;
       padding: 2px 4px;
       border: none;
       background: transparent;
-      color: var(--od-release-row-main);
+      color: var(--bc-release-row-main);
       font: inherit;
       font-size: 13px;
       line-height: 18px;
@@ -1644,7 +1644,7 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          color: var(--od-release-row-main-hover);
+          color: var(--bc-release-row-main-hover);
         }
       }
     }
@@ -1652,7 +1652,7 @@
     /* The two text buttons under the three choices of the first step (task 2026-11-17-263): « Essayer avec un carnet
        d’exemple » and « Découvrir OpenDives+ », centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp
        apart, 16 dp above and below the group. */
-    .od-first-launch--text-buttons {
+    .bc-first-launch--text-buttons {
       align-self: center;
       display: flex;
       flex-direction: column;
@@ -1661,7 +1661,7 @@
       margin: 16px 0;
     }
 
-    .od-first-launch--text-button {
+    .bc-first-launch--text-button {
       width: auto;
       box-sizing: border-box;
       display: flex;
@@ -1672,7 +1672,7 @@
       border: none;
       border-radius: 20px;
       background: transparent;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-size: 15px;
       line-height: 20px;
@@ -1681,8 +1681,8 @@
       transition: background-color 0.15s;
       -webkit-tap-highlight-color: transparent;
 
-      &.od-first-launch--text-button-quiet {
-        color: var(--od-text-2);
+      &.bc-first-launch--text-button-quiet {
+        color: var(--bc-text-2);
       }
 
       &:disabled {
@@ -1692,34 +1692,34 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-link);
+        outline: 2px solid var(--bc-release-link);
         outline-offset: 2px;
       }
     }
 
     /* Desktop app (task 2026-11-16-228): the line under the choices of « Pour commencer » and « Importer un carnet »;
        it lights up while a file is dragged over the window. */
-    .od-first-launch--drop {
+    .bc-first-launch--drop {
       margin: 12px 0 0;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch--dragging .od-first-launch--drop {
-      color: var(--od-release-link);
+    .bc-first-launch--dragging .bc-first-launch--drop {
+      color: var(--bc-release-link);
       font-weight: 600;
-      outline: 2px dashed var(--od-release-link);
+      outline: 2px dashed var(--bc-release-link);
       outline-offset: 8px;
       border-radius: 4px;
     }
 
-    .od-first-launch--action {
+    .bc-first-launch--action {
       width: auto;
       align-self: flex-end;
       display: flex;
@@ -1730,8 +1730,8 @@
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -1745,23 +1745,23 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
     /* The summary of an imported file. */
-    .od-first-launch--summary {
+    .bc-first-launch--summary {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-top: 4px;
       padding: 12px 14px;
       border-radius: 16px;
-      background: var(--od-release-note);
+      background: var(--bc-release-note);
     }
 
-    .od-first-launch--summary-icon {
+    .bc-first-launch--summary-icon {
       flex: none;
       width: 36px;
       height: 36px;
@@ -1769,30 +1769,30 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      color: var(--od-release-row-main);
+      background: var(--bc-surface);
+      color: var(--bc-release-row-main);
     }
 
-    .od-first-launch--summary-text {
+    .bc-first-launch--summary-text {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-first-launch--summary-name {
+    .bc-first-launch--summary-name {
       font-size: 15px;
       line-height: 20px;
       font-weight: 600;
     }
 
-    .od-first-launch--summary-detail {
+    .bc-first-launch--summary-detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     @media (orientation: portrait) {
-      .od-first-launch {
+      .bc-first-launch {
         padding: 0 120px 76px;
       }
 
@@ -1803,74 +1803,74 @@
        330 dp one); the page scrolls when a step is taller than the screen, and the help link follows the
        content, at the bottom of the screen when there is room. */
     @media (max-width: 767.98px) {
-      .od-first-launch {
+      .bc-first-launch {
         padding: 16px 16px 0;
         overflow: visible;
       }
 
-      .od-first-launch--first {
+      .bc-first-launch--first {
         padding-top: 20px;
       }
 
-      .od-first-launch--stage {
+      .bc-first-launch--stage {
         overflow: visible;
       }
 
-      .od-first-launch--step {
+      .bc-first-launch--step {
         align-self: start;
       }
 
-      .od-first-launch :global(.od-welcome-help-link) {
+      .bc-first-launch :global(.bc-welcome-help-link) {
         margin: auto auto calc(var(--f7-safe-area-bottom) + 28px);
         padding-top: 24px;
       }
 
       /* Android: the extra height of a tall screen goes above the link (auto margin), as in the mock-up, and the link
          ends 20 dp above the system bar (--f7-safe-area-bottom is the native navigation bar inset, lib/safe-area.js). */
-      :global(.md) .od-first-launch :global(.od-welcome-help-link) {
+      :global(.md) .bc-first-launch :global(.bc-welcome-help-link) {
         margin-bottom: calc(var(--f7-safe-area-bottom) + 20px);
       }
 
-      .od-first-launch--title {
+      .bc-first-launch--title {
         font-size: 24px;
         line-height: 30px;
       }
 
-      .od-first-launch--hero {
+      .bc-first-launch--hero {
         padding: 22px 0 18px;
         justify-content: center;
       }
 
-      .od-first-launch--hero-end {
+      .bc-first-launch--hero-end {
         width: 84px;
       }
 
-      .od-first-launch--hero-tile {
+      .bc-first-launch--hero-tile {
         width: 64px;
         height: 64px;
         border-radius: 20px;
       }
 
-      .od-first-launch--hero-link {
+      .bc-first-launch--hero-link {
         flex: none;
         width: 56px;
         height: 64px;
         padding: 0;
       }
 
-      .od-first-launch--action,
-      .od-first-launch--action.od-first-launch--action-centre {
+      .bc-first-launch--action,
+      .bc-first-launch--action.bc-first-launch--action-centre {
         align-self: stretch;
         justify-content: center;
       }
 
-      .od-first-launch--hint {
+      .bc-first-launch--hint {
         align-self: center;
         text-align: center;
       }
 
       /* « Changer de compte » and « Créer un carnet ici »: two buttons of the same width, their text on two lines. */
-      .od-first-launch--buttons-even {
+      .bc-first-launch--buttons-even {
         gap: 12px;
 
         > button {
@@ -1888,55 +1888,55 @@
     /* Desktop app (task 2026-11-16-228; mock-ups docs/mockups/bureau-premier-lancement-production-*.dc.html): the
        link between OpenDives and the service is compact and centred (80 dp tiles under 104 dp names, a 120 dp
        line), and the words under it are a little larger. */
-    .od-first-launch--desktop {
+    .bc-first-launch--desktop {
       /* A step taller than the window scrolls from its top: auto margins centre it only when there is room. */
-      .od-first-launch--step {
+      .bc-first-launch--step {
         align-self: start;
         margin-block: auto;
       }
 
-      .od-first-launch--hero {
+      .bc-first-launch--hero {
         padding: 24px 16px 18px;
         justify-content: center;
       }
 
-      .od-first-launch--hero-end {
+      .bc-first-launch--hero-end {
         width: 104px;
         gap: 8px;
       }
 
-      .od-first-launch--hero-tile {
+      .bc-first-launch--hero-tile {
         width: 80px;
         height: 80px;
         border-radius: 24px;
       }
 
-      .od-first-launch--hero-name {
+      .bc-first-launch--hero-name {
         font-size: 14px;
         line-height: 19px;
       }
 
-      .od-first-launch--hero-link {
+      .bc-first-launch--hero-link {
         flex: none;
         width: 120px;
         height: 80px;
         padding: 0;
       }
 
-      .od-first-launch--action {
+      .bc-first-launch--action {
         align-self: flex-end;
       }
 
-      .od-first-launch--action.od-first-launch--action-centre {
+      .bc-first-launch--action.bc-first-launch--action-centre {
         align-self: center;
       }
 
-      .od-first-launch--status {
+      .bc-first-launch--status {
         font-size: 17px;
         line-height: 22px;
       }
 
-      .od-first-launch--status-help {
+      .bc-first-launch--status-help {
         font-size: 15px;
         line-height: 21px;
       }

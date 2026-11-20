@@ -248,7 +248,7 @@ export function cardHtml(card, layout) {
         `<tr><td style="${cell}">${esc(r.symbol)}</td><td style="${cell}font-weight:700">${esc(r.depth)}</td><td style="${cell}${r.gasChange ? 'font-weight:700;text-decoration:underline' : ''}">${esc(r.gas)}</td><td style="${cell}text-align:right">${esc(r.duration)}</td><td style="${cell}text-align:right;font-weight:700">${esc(r.end)}</td>${r.extra.map((e) => `<td style="${cell}text-align:right">${esc(e)}</td>`).join('')}</tr>`,
     )
     .join('');
-  return `<div class="od-slate-card" style="box-sizing:border-box;width:${layout.widthMm}mm;height:${layout.heightMm}mm;overflow:hidden;padding:${layout.paddingMm}mm;background:#FFFFFF;color:#000000;font-family:Roboto,'Source Sans 3',Arial,sans-serif;font-size:${layout.fontPt}pt;line-height:1.25;font-variant-numeric:tabular-nums">`
+  return `<div class="bc-slate-card" style="box-sizing:border-box;width:${layout.widthMm}mm;height:${layout.heightMm}mm;overflow:hidden;padding:${layout.paddingMm}mm;background:#FFFFFF;color:#000000;font-family:Roboto,'Source Sans 3',Arial,sans-serif;font-size:${layout.fontPt}pt;line-height:1.25;font-variant-numeric:tabular-nums">`
     + `<div style="font-size:${layout.titlePt}pt;font-weight:700;line-height:1.2">${esc(card.title)}</div>`
     + `<div style="margin-top:0.15em">${esc(card.subtitle)}</div>`
     + `<div style="margin-top:0.3em">${esc(card.gasLine)}</div>`

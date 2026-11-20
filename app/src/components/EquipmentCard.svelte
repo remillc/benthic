@@ -57,69 +57,69 @@
 <!-- The main computer: its photo at 32 dp before its name (task 2026-11-19-306); a model without a photo shows the name alone. -->
 {#snippet computerValue()}
   {@const main = computers[0]}
-  <span class="od-equipment-card--value od-equipment-card--computer-value">
+  <span class="bc-equipment-card--value bc-equipment-card--computer-value">
     {#if main?.model}<DcTile model={main.model} size={32} radius={8} photo={ownComputerPhoto(main.model, main.serial)} fallback={noPhoto} />{/if}
     <span>{computer}</span>
   </span>
 {/snippet}
 
-<div class="od-equipment-card">
+<div class="bc-equipment-card">
   <svelte:element
     this={opens ? 'button' : 'div'}
     type={opens ? 'button' : undefined}
-    class="od-equipment-card--summary"
-    class:od-equipment-card--static={!opens}
+    class="bc-equipment-card--summary"
+    class:bc-equipment-card--static={!opens}
     role={opens ? undefined : 'group'}
     aria-expanded={opens ? open : undefined}
     aria-label={label}
     onclick={opens ? ontoggle : undefined}
   >
-    <span class="od-equipment-card--rows">
+    <span class="bc-equipment-card--rows">
       {#if suit}
-        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.suitRow')}</span><span class="od-equipment-card--value">{suit}</span></span>
+        <span class="bc-equipment-card--row"><span class="bc-equipment-card--name">{t('detail.suitRow')}</span><span class="bc-equipment-card--value">{suit}</span></span>
       {/if}
       {#if undersuit}
-        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('gear.diveGear.undersuit')}</span><span class="od-equipment-card--value">{undersuit}</span></span>
+        <span class="bc-equipment-card--row"><span class="bc-equipment-card--name">{t('gear.diveGear.undersuit')}</span><span class="bc-equipment-card--value">{undersuit}</span></span>
       {/if}
       {#if weightTotal}
-        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.weights')}</span><span class="od-equipment-card--value od-equipment-card--strong od-value">{weightTotal}</span></span>
+        <span class="bc-equipment-card--row"><span class="bc-equipment-card--name">{t('detail.weights')}</span><span class="bc-equipment-card--value bc-equipment-card--strong bc-value">{weightTotal}</span></span>
       {/if}
       {#if computer && computerInSummary && !several}
-        <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
+        <span class="bc-equipment-card--row"><span class="bc-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
       {/if}
     </span>
-    {#if opens}<span class="od-equipment-card--chevron" class:od-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
+    {#if opens}<span class="bc-equipment-card--chevron" class:bc-equipment-card--open={open}><Icon name="expand" size={24} weight={2} /></span>{/if}
   </svelte:element>
   {#if spread && weights.length}
-    <ul class="od-equipment-card--weights" aria-label={t('detail.weightsByPlace')}>
+    <ul class="bc-equipment-card--weights" aria-label={t('detail.weightsByPlace')}>
       {#each weights as weight, i (i)}
-        <li class="od-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
+        <li class="bc-value"><span>{weight.place || t('detail.weights')}</span><span>{weight.weight}</span></li>
       {/each}
     </ul>
   {/if}
   {#if spread && weightTotal && onfeedback}
-    <div class="od-equipment-card--feedback">
-      <p class="od-equipment-card--feedback-title" id="od-weight-feedback-title">{t('weightFeedback.title')}</p>
+    <div class="bc-equipment-card--feedback">
+      <p class="bc-equipment-card--feedback-title" id="od-weight-feedback-title">{t('weightFeedback.title')}</p>
       <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable rail />
     </div>
   {/if}
   {#if spread && computer && !computerInSummary && !several}
-    <div class="od-equipment-card--computer">
-      <span class="od-equipment-card--row"><span class="od-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
+    <div class="bc-equipment-card--computer">
+      <span class="bc-equipment-card--row"><span class="bc-equipment-card--name">{t('detail.computerRow')}</span>{@render computerValue()}</span>
     </div>
   {/if}
   {#if several}
     <!-- One touch target: it opens « Ordinateurs de cette plongée » (detail-ordinateurs-android.dc.html). -->
-    <button type="button" class="od-equipment-card--computers" aria-label={computersLabel} aria-haspopup="dialog" onclick={oncomputers}>
-      <span class="od-equipment-card--computers-head">
+    <button type="button" class="bc-equipment-card--computers" aria-label={computersLabel} aria-haspopup="dialog" onclick={oncomputers}>
+      <span class="bc-equipment-card--computers-head">
         <span>{t('detail.computersRow')}</span>
         <Icon name="chevron" size={24} weight={2} />
       </span>
       {#each computers as c, i (i)}
-        <span class="od-equipment-card--computer-row">
+        <span class="bc-equipment-card--computer-row">
           <DcTile model={c.model ?? c.name} photo={ownComputerPhoto(c.model ?? c.name, c.serial)} />
-          <span class="od-equipment-card--computer-name">{c.name}</span>
-          {#if c.main}<span class="od-equipment-card--main">{t('detail.mainBadge')}</span>{/if}
+          <span class="bc-equipment-card--computer-name">{c.name}</span>
+          {#if c.main}<span class="bc-equipment-card--main">{t('detail.mainBadge')}</span>{/if}
         </span>
       {/each}
     </button>
@@ -128,42 +128,42 @@
 
 <style>
   @layer od.components {
-    .od-equipment-card--computers {
+    .bc-equipment-card--computers {
       display: block;
       width: 100%;
       box-sizing: border-box;
       padding: 0 8px 4px 16px;
       border: none;
-      border-top: 1px solid var(--od-row-divider);
+      border-top: 1px solid var(--bc-row-divider);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
     }
 
-    .od-equipment-card--computers-head {
+    .bc-equipment-card--computers-head {
       min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 16px;
 
-      :global(.od-icon) {
-        color: var(--od-text-2);
+      :global(.bc-icon) {
+        color: var(--bc-text-2);
       }
     }
 
-    .od-equipment-card--computer-row {
+    .bc-equipment-card--computer-row {
       min-height: 64px;
       display: flex;
       align-items: center;
       gap: 12px;
       padding-right: 8px;
-      border-top: 1px solid var(--od-row-divider);
+      border-top: 1px solid var(--bc-row-divider);
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       /* iPhone: 68 pt rows (detail-ordinateurs-feuille-ios). */
@@ -172,35 +172,35 @@
       }
     }
 
-    .od-equipment-card--computer-name {
+    .bc-equipment-card--computer-name {
       flex: 1;
       min-width: 0;
       font-size: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* « Principal »: #114477 on #D4E2F2, as the blue theme's selection. */
-    .od-equipment-card--main {
+    .bc-equipment-card--main {
       flex: none;
       height: 24px;
       padding: 0 10px;
       border-radius: 12px;
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       font-size: 12px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
     }
 
-    .od-equipment-card {
+    .bc-equipment-card {
       border-radius: 16px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       overflow: hidden;
     }
 
-    .od-equipment-card--summary {
+    .bc-equipment-card--summary {
       width: 100%;
       box-sizing: border-box;
       padding: 4px 8px 4px 16px;
@@ -214,20 +214,20 @@
       gap: 8px;
       cursor: pointer;
 
-      &.od-equipment-card--static {
+      &.bc-equipment-card--static {
         padding-inline-end: 16px;
         cursor: default;
       }
     }
 
-    .od-equipment-card--rows {
+    .bc-equipment-card--rows {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-equipment-card--row {
+    .bc-equipment-card--row {
       min-height: 48px;
       display: flex;
       align-items: center;
@@ -235,63 +235,63 @@
       font-size: 16px;
 
       & + & {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
 
-    .od-equipment-card--name {
+    .bc-equipment-card--name {
       flex: 1;
     }
 
-    .od-equipment-card--value {
-      color: var(--od-text-2);
+    .bc-equipment-card--value {
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
       text-align: end;
 
-      &.od-equipment-card--strong {
+      &.bc-equipment-card--strong {
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
 
-    .od-equipment-card--computer-value {
+    .bc-equipment-card--computer-value {
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    .od-equipment-card--chevron {
+    .bc-equipment-card--chevron {
       flex: none;
       display: flex;
 
-      &.od-equipment-card--open {
+      &.bc-equipment-card--open {
         transform: rotate(180deg);
       }
     }
 
     /* "Ce lest était": its title, then the three buttons. */
-    .od-equipment-card--feedback {
+    .bc-equipment-card--feedback {
       padding: 12px 16px 16px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-equipment-card--feedback-title {
+    .bc-equipment-card--feedback-title {
       margin: 0 0 8px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-equipment-card--computer {
+    .bc-equipment-card--computer {
       padding: 0 16px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
     }
 
     /* The weights by location: one line each, as the section showed them. */
-    .od-equipment-card--weights {
+    .bc-equipment-card--weights {
       margin: 0;
       padding: 12px 16px 14px;
       list-style: none;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -302,22 +302,22 @@
         gap: 12px;
         font-size: 14px;
         line-height: 20px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-equipment-card--summary {
+      .bc-equipment-card--summary {
         transition: box-shadow 120ms linear;
       }
-      .od-equipment-card--summary:not(.od-equipment-card--static):hover {
+      .bc-equipment-card--summary:not(.bc-equipment-card--static):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-equipment-card--summary {
+      .bc-equipment-card--summary {
         transition: none;
       }
     }

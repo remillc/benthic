@@ -78,19 +78,19 @@ try {
   ws = await connect();
   listen();
   await desktopSize();
-  for (let i = 0; i < 30 && !(await run(`document.querySelectorAll('.od-desktop-logbook--row').length`)); i++) await wait(1000);
+  for (let i = 0; i < 30 && !(await run(`document.querySelectorAll('.bc-desktop-logbook--row').length`)); i++) await wait(1000);
   await wait(2000);
   await shot('02-logbook');
 
-  const svg = await centre('.od-dive-profile--frame svg');
+  const svg = await centre('.bc-dive-profile--frame svg');
   if (svg) {
     await mouse('mouseMoved', svg.x, svg.y);
     await wait(500);
     await shot('03-profile-hover');
   }
 
-  const first = await centre('.od-desktop-logbook--row', 3);
-  const second = await centre('.od-desktop-logbook--row', 4);
+  const first = await centre('.bc-desktop-logbook--row', 3);
+  const second = await centre('.bc-desktop-logbook--row', 4);
   if (first && second) {
     await mouse('mousePressed', first.x, first.y);
     await mouse('mouseReleased', first.x, first.y);

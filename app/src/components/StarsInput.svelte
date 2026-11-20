@@ -7,7 +7,7 @@
   const STAR = 'M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.8 19.5l1-5.8-4.2-4.1 5.8-.8z';
 </script>
 
-<span class="od-stars-input" role="radiogroup" aria-label={label}>
+<span class="bc-stars-input" role="radiogroup" aria-label={label}>
   {#each [1, 2, 3, 4, 5] as i (i)}
     <button
       type="button"
@@ -17,7 +17,7 @@
       onclick={() => onchange(value === i ? 0 : i)}
     >
       <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d={STAR} class:od-stars-input--filled={i <= value} />
+        <path d={STAR} class:bc-stars-input--filled={i <= value} />
       </svg>
     </button>
   {/each}
@@ -25,7 +25,7 @@
 
 <style>
   @layer od.components {
-    .od-stars-input {
+    .bc-stars-input {
       display: inline-flex;
       gap: 0;
     }
@@ -50,12 +50,12 @@
 
     path {
       fill: none;
-      stroke: var(--od-text);
+      stroke: var(--bc-text);
       stroke-width: 1.6;
       stroke-linejoin: round;
 
-      &.od-stars-input--filled {
-        fill: var(--od-text);
+      &.bc-stars-input--filled {
+        fill: var(--bc-text);
       }
     }
   }

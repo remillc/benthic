@@ -95,7 +95,7 @@
 </script>
 
 <Page
-  class="od-welcome-start{panel ? ' od-first-panelled' : ''}{!theme.ios && band ? ' od-welcome-start--phone' : ''}"
+  class="bc-welcome-start{panel ? ' bc-first-panelled' : ''}{!theme.ios && band ? ' bc-welcome-start--phone' : ''}"
   onPageBeforeIn={() => {
     playKey++;
     shown = true;
@@ -103,7 +103,7 @@
   onPageBeforeOut={() => (shown = false)}
 >
   {#if !theme.ios}
-    <div class="od-welcome-start--page" class:od-welcome-start--with-band={band} class:od-welcome-start--with-panel={panel}>
+    <div class="bc-welcome-start--page" class:bc-welcome-start--with-band={band} class:bc-welcome-start--with-panel={panel}>
       {#if band}
         <!-- Android phone (tasks 2026-11-16-233 to 236): the blue band replaces the brand row, the headline and the profile. -->
         <FirstLaunchBand variant="welcome" />
@@ -111,80 +111,80 @@
         <!-- Android tablet (task 2026-11-16-237): a blue panel with the profile animation, the choices beside it or below. -->
         <FirstLaunchPanel {playKey} />
       {/if}
-      <div class="od-welcome-start--space"></div>
-      <div class="od-welcome-start--actions">
-      {#if panel}<h2 class="od-welcome-start--start">{t('firstLaunch.tabletStart')}</h2>{/if}
-      <nav class="od-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
-        <div class="od-welcome-start--option">
-          <a href="/welcome/sign-in" class="od-welcome-start--pill od-welcome-start--pill-filled" onclick={(e) => go(e, '/welcome/sign-in')}>{t('welcome.existingShort')}</a>
-          <p class="od-welcome-start--note">{t('welcome.existingNote')}</p>
+      <div class="bc-welcome-start--space"></div>
+      <div class="bc-welcome-start--actions">
+      {#if panel}<h2 class="bc-welcome-start--start">{t('firstLaunch.tabletStart')}</h2>{/if}
+      <nav class="bc-welcome-start--buttons" aria-label={t('welcome.choicesLabel')}>
+        <div class="bc-welcome-start--option">
+          <a href="/welcome/sign-in" class="bc-welcome-start--pill bc-welcome-start--pill-filled" onclick={(e) => go(e, '/welcome/sign-in')}>{t('welcome.existingShort')}</a>
+          <p class="bc-welcome-start--note">{t('welcome.existingNote')}</p>
         </div>
-        <div class="od-welcome-start--option">
-          <a href="/welcome/create" class="od-welcome-start--pill od-welcome-start--pill-outlined" onclick={(e) => go(e, '/welcome/create')}>{t('welcome.createShort')}</a>
-          <p class="od-welcome-start--note">{t('welcome.createNote')}</p>
+        <div class="bc-welcome-start--option">
+          <a href="/welcome/create" class="bc-welcome-start--pill bc-welcome-start--pill-outlined" onclick={(e) => go(e, '/welcome/create')}>{t('welcome.createShort')}</a>
+          <p class="bc-welcome-start--note">{t('welcome.createNote')}</p>
         </div>
-        <div class="od-welcome-start--option">
-          <a href="#no-account" class="od-welcome-start--pill od-welcome-start--pill-tonal external" onclick={withoutAccount}>{t('welcome.noAccount')}</a>
-          <p class="od-welcome-start--note">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</p>
+        <div class="bc-welcome-start--option">
+          <a href="#no-account" class="bc-welcome-start--pill bc-welcome-start--pill-tonal external" onclick={withoutAccount}>{t('welcome.noAccount')}</a>
+          <p class="bc-welcome-start--note">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</p>
         </div>
       </nav>
-      <div class="od-welcome-start--divider" role="presentation"></div>
-      <a href="/welcome/git" class="od-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
+      <div class="bc-welcome-start--divider" role="presentation"></div>
+      <a href="/welcome/git" class="bc-welcome-start--git-link" onclick={(e) => go(e, '/welcome/git')}>{t('welcome.ownGit')}</a>
       {#if desktopApp}
-        <p class="od-welcome-start--drop" class:od-welcome-start--dragging={dragging}>{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
+        <p class="bc-welcome-start--drop" class:bc-welcome-start--dragging={dragging}>{dragging ? t('desktopLogbooks.start.dropHere') : t('desktopLogbooks.start.drop')}</p>
       {/if}
       </div>
       <!-- Phone (android-accueil-c.dc.html): 12 dp under the git link, 20 dp above the bottom edge. Tablet: pinned 28 dp from the edge. -->
       {#if desktopApp}
         <!-- Desktop (task 2026-11-16-246): the help link, a divider and the language menu on one centred line. -->
-        <div class="od-welcome-start--footer"><WelcomeHelpLink inline /><DesktopLanguageMenu /></div>
+        <div class="bc-welcome-start--footer"><WelcomeHelpLink inline /><DesktopLanguageMenu /></div>
       {:else}
         <WelcomeHelpLink />
       {/if}
     </div>
   {:else}
-  <svg class="od-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
+  <svg class="bc-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
     <defs>
       <linearGradient id="od-welcome-water" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" class="od-welcome-start--water-top"></stop>
-        <stop offset="1" class="od-welcome-start--water-bottom"></stop>
+        <stop offset="0" class="bc-welcome-start--water-top"></stop>
+        <stop offset="1" class="bc-welcome-start--water-bottom"></stop>
       </linearGradient>
     </defs>
-    <rect class="od-welcome-start--ground" x="0" y="0" width={WIDTH} height={HEIGHT}></rect>
-    <path class="od-welcome-start--water" d={area}></path>
-    <path class="od-welcome-start--trace" d={line}></path>
+    <rect class="bc-welcome-start--ground" x="0" y="0" width={WIDTH} height={HEIGHT}></rect>
+    <path class="bc-welcome-start--water" d={area}></path>
+    <path class="bc-welcome-start--trace" d={line}></path>
   </svg>
 
-  <div class="od-welcome-start--heading">
-    <h1 aria-label={t('welcome.brandAlpha')}><span aria-hidden="true">{t('welcome.title')}</span><span class="od-welcome-start--alpha" aria-hidden="true">{t('welcome.alpha')}</span></h1>
+  <div class="bc-welcome-start--heading">
+    <h1 aria-label={t('welcome.brandAlpha')}><span aria-hidden="true">{t('welcome.title')}</span><span class="bc-welcome-start--alpha" aria-hidden="true">{t('welcome.alpha')}</span></h1>
     <p>{t('welcome.headline')}</p>
   </div>
 
-  <nav class="od-welcome-start--choices" aria-label={t('welcome.choicesLabel')}>
-    <a href="/welcome/sign-in" class="od-welcome-start--choice od-welcome-start--filled" onclick={(e) => go(e, '/welcome/sign-in')}>
-      <span class="od-welcome-start--text">
-        <span class="od-welcome-start--label">{t('welcome.existingShort')}</span>
-        <span class="od-welcome-start--consequence">{t('welcome.existingNote')}</span>
+  <nav class="bc-welcome-start--choices" aria-label={t('welcome.choicesLabel')}>
+    <a href="/welcome/sign-in" class="bc-welcome-start--choice bc-welcome-start--filled" onclick={(e) => go(e, '/welcome/sign-in')}>
+      <span class="bc-welcome-start--text">
+        <span class="bc-welcome-start--label">{t('welcome.existingShort')}</span>
+        <span class="bc-welcome-start--consequence">{t('welcome.existingNote')}</span>
       </span>
-      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
+      <span class="bc-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
-    <a href="/welcome/create" class="od-welcome-start--choice" onclick={(e) => go(e, '/welcome/create')}>
-      <span class="od-welcome-start--text">
-        <span class="od-welcome-start--label">{t('welcome.createShort')}</span>
-        <span class="od-welcome-start--consequence">{t('welcome.createNote')}</span>
+    <a href="/welcome/create" class="bc-welcome-start--choice" onclick={(e) => go(e, '/welcome/create')}>
+      <span class="bc-welcome-start--text">
+        <span class="bc-welcome-start--label">{t('welcome.createShort')}</span>
+        <span class="bc-welcome-start--consequence">{t('welcome.createNote')}</span>
       </span>
-      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
+      <span class="bc-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
-    <a href="#no-account" class="od-welcome-start--choice external" onclick={withoutAccount}>
-      <span class="od-welcome-start--text">
-        <span class="od-welcome-start--label">{t('welcome.noAccount')}</span>
-        <span class="od-welcome-start--consequence">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</span>
+    <a href="#no-account" class="bc-welcome-start--choice external" onclick={withoutAccount}>
+      <span class="bc-welcome-start--text">
+        <span class="bc-welcome-start--label">{t('welcome.noAccount')}</span>
+        <span class="bc-welcome-start--consequence">{t(`welcome.noAccountNote${deviceSuffix(deviceKind())}`)}</span>
       </span>
-      <span class="od-welcome-start--chevron"><Icon name="expand" size={16} /></span>
+      <span class="bc-welcome-start--chevron"><Icon name="expand" size={16} /></span>
     </a>
   </nav>
 
-  <a href="/welcome/git" class="od-welcome-start--own-git" onclick={(e) => go(e, '/welcome/git')}>
+  <a href="/welcome/git" class="bc-welcome-start--own-git" onclick={(e) => go(e, '/welcome/git')}>
     <Icon name="git" size={20} />
     <span>{t('welcome.ownGit')}</span>
   </a>
@@ -194,12 +194,12 @@
 
 <style>
   @layer od.components {
-    :global(.od-welcome-start) {
-      --od-welcome-ground: var(--od-surface-2);
+    :global(.bc-welcome-start) {
+      --bc-welcome-ground: var(--bc-surface-2);
 
       :global(.ios) & {
-        --f7-page-bg-color: var(--od-surface);
-        --od-welcome-ground: var(--od-background);
+        --f7-page-bg-color: var(--bc-surface);
+        --bc-welcome-ground: var(--bc-background);
       }
 
       :global(.page-content) {
@@ -208,7 +208,7 @@
     }
 
     /* Android (android-accueil-c.dc.html): the page fills the screen, the choices at the bottom. */
-    .od-welcome-start--page {
+    .bc-welcome-start--page {
       box-sizing: border-box;
       min-height: calc(100% - var(--f7-safe-area-bottom) - 24px);
       padding-top: calc(var(--f7-safe-area-top) + 24px);
@@ -216,35 +216,35 @@
       flex-direction: column;
 
       /* Phone: the band starts at the top edge, under the status bar. */
-      &.od-welcome-start--with-band {
+      &.bc-welcome-start--with-band {
         padding-top: 0;
       }
     }
 
     /* Android phone: the help link ends the page, 20 dp above the bottom edge (set by the link), so the page takes
        the whole height and the content has no bottom padding of its own. */
-    :global(.od-welcome-start--phone) {
-      --od-help-link-bottom: 20px;
+    :global(.bc-welcome-start--phone) {
+      --bc-help-link-bottom: 20px;
 
       :global(.page-content) {
         padding-bottom: 0;
       }
 
-      .od-welcome-start--page {
+      .bc-welcome-start--page {
         min-height: 100%;
       }
     }
 
     /* The wrapper only matters on tablets. */
-    .od-welcome-start--actions {
+    .bc-welcome-start--actions {
       display: contents;
     }
 
     /* The desktop app: the help link and the language menu share one line, 24 dp from the bottom, centred under the
        choices (the same centre as the help link alone had). */
-    :global(html.od-desktop-app) .od-welcome-start--footer {
+    :global(html.bc-desktop-app) .bc-welcome-start--footer {
       position: absolute;
-      left: var(--od-help-link-left, 50%);
+      left: var(--bc-help-link-left, 50%);
       bottom: 24px;
       z-index: 2;
       transform: translateX(-50%);
@@ -262,26 +262,26 @@
       @media (max-width: 900px) {
         gap: 0 2px;
 
-        :global(.od-welcome-help-link),
-        :global(.od-desktop-language) {
+        :global(.bc-welcome-help-link),
+        :global(.bc-desktop-language) {
           padding-inline: 8px;
         }
       }
 
       /* A low window: a step may scroll under the line, which then keeps its own ground. */
       @media (max-height: 700px) {
-        background: var(--od-background);
+        background: var(--bc-background);
       }
     }
 
     /* « Alpha » after the name (tasks 2026-11-16-225 and 229): capitals, 14 sp, bold, a full pill 8 dp after the name. */
-    .od-welcome-start--alpha {
+    .bc-welcome-start--alpha {
       display: inline-block;
       margin-left: 8px;
       padding: 3px 10px;
       border-radius: 999px;
-      background: var(--od-alpha-badge);
-      color: var(--od-on-alpha-badge);
+      background: var(--bc-alpha-badge);
+      color: var(--bc-on-alpha-badge);
       font-size: 14px;
       line-height: 18px;
       font-weight: 700;
@@ -291,12 +291,12 @@
       vertical-align: middle;
     }
 
-    .od-welcome-start--space {
+    .bc-welcome-start--space {
       flex: 1;
       min-height: 24px;
     }
 
-    .od-welcome-start--buttons {
+    .bc-welcome-start--buttons {
       box-sizing: border-box;
       width: 100%;
       max-width: 560px;
@@ -307,13 +307,13 @@
       gap: 14px;
     }
 
-    .od-welcome-start--option {
+    .bc-welcome-start--option {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .od-welcome-start--pill {
+    .bc-welcome-start--pill {
       box-sizing: border-box;
       height: 56px;
       border-radius: 28px;
@@ -324,57 +324,57 @@
       font-weight: 500;
       letter-spacing: 0.1px;
       text-decoration: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-welcome-start--pill-filled {
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+    .bc-welcome-start--pill-filled {
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
     }
 
-    .od-welcome-start--pill-outlined {
-      border: var(--od-outline-width) solid var(--od-chip-outline);
+    .bc-welcome-start--pill-outlined {
+      border: var(--bc-outline-width) solid var(--bc-chip-outline);
     }
 
-    .od-welcome-start--pill-tonal {
-      background: var(--od-idle-container);
+    .bc-welcome-start--pill-tonal {
+      background: var(--bc-idle-container);
     }
 
     /* Between the three choices and the git link: 260 dp on phones, 200 dp on tablets. */
-    .od-welcome-start--divider {
+    .bc-welcome-start--divider {
       flex: none;
       width: 260px;
       max-width: calc(100% - 48px);
       height: 1px;
       margin: 0 auto 4px;
-      background: var(--od-surface-container-highest);
+      background: var(--bc-surface-container-highest);
 
       @media (min-width: 768px) {
         width: 200px;
       }
     }
 
-    .od-welcome-start--note {
+    .bc-welcome-start--note {
       margin: 0 8px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
 
-    .od-welcome-start--git-link {
+    .bc-welcome-start--git-link {
       margin: 0 auto;
       min-height: 48px;
       display: flex;
       align-items: center;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-decoration: underline;
     }
 
     /* Phone: the link is 18 dp of text with 6 dp of touch padding, 12 dp (6 + 6) above the help link. */
-    :global(.od-welcome-start--phone) .od-welcome-start--git-link {
+    :global(.bc-welcome-start--phone) .bc-welcome-start--git-link {
       min-height: 0;
       padding: 6px 12px;
       margin-bottom: 6px;
@@ -382,7 +382,7 @@
 
     /* A low phone window: every choice stays in view (to-do #31). */
     @media (max-width: 767.98px) and (max-height: 820px) {
-      .od-welcome-start--buttons {
+      .bc-welcome-start--buttons {
         gap: 8px;
       }
     }
@@ -390,23 +390,23 @@
     /* Tablet (width from 768 px; task 2026-11-16-237, mock-ups android-tablette-premier-lancement-*.dc.html):
        the blue panel (components/FirstLaunchPanel.svelte) and the choices, no scrolling. The panel reaches
        the screen edges: the page's bottom padding is taken back. */
-    .od-welcome-start--with-panel {
-      --od-first-panel-bottom: calc(var(--f7-safe-area-bottom) + 24px);
-      height: calc(100% + var(--od-first-panel-bottom));
+    .bc-welcome-start--with-panel {
+      --bc-first-panel-bottom: calc(var(--f7-safe-area-bottom) + 24px);
+      height: calc(100% + var(--bc-first-panel-bottom));
       min-height: 0;
       padding-top: 0;
-      margin-bottom: calc(-1 * var(--od-first-panel-bottom));
+      margin-bottom: calc(-1 * var(--bc-first-panel-bottom));
       flex-direction: row;
 
       @media (orientation: portrait) {
         flex-direction: column;
       }
 
-      .od-welcome-start--space {
+      .bc-welcome-start--space {
         display: none;
       }
 
-      .od-welcome-start--actions {
+      .bc-welcome-start--actions {
         box-sizing: border-box;
         flex: 1;
         min-width: 0;
@@ -418,12 +418,12 @@
       }
 
       @media (orientation: portrait) {
-        .od-welcome-start--actions {
+        .bc-welcome-start--actions {
           padding: 0 120px 64px;
         }
       }
 
-      .od-welcome-start--start {
+      .bc-welcome-start--start {
         margin: 0 0 20px;
         font-size: 28px;
         line-height: 36px;
@@ -431,40 +431,40 @@
         letter-spacing: -0.2px;
       }
 
-      .od-welcome-start--buttons {
+      .bc-welcome-start--buttons {
         max-width: none;
         padding: 0;
       }
 
-      .od-welcome-start--divider {
+      .bc-welcome-start--divider {
         width: auto;
         max-width: none;
         margin: 20px 48px 16px;
       }
 
-      .od-welcome-start--git-link {
+      .bc-welcome-start--git-link {
         cursor: pointer;
 
         @media (hover: hover) {
           &:hover {
-            color: var(--od-text);
+            color: var(--bc-text);
           }
         }
       }
 
-      .od-welcome-start--pill {
+      .bc-welcome-start--pill {
         cursor: pointer;
       }
 
       /* « Vous pouvez aussi déposer un fichier carnet sur cette fenêtre. » (desktop). */
-      .od-welcome-start--drop {
+      .bc-welcome-start--drop {
         margin: 12px 0 0;
         font-size: 14px;
         line-height: 20px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
 
-        &.od-welcome-start--dragging {
-          color: var(--od-action);
+        &.bc-welcome-start--dragging {
+          color: var(--bc-action);
           font-weight: 600;
         }
       }
@@ -472,15 +472,15 @@
 
     /* The desktop app (task 2026-11-16-242): always the panel on the left and the choices beside it, in a window of
        any shape; the column keeps its room in a narrow window. */
-    :global(html.od-desktop-app) .od-welcome-start--with-panel {
+    :global(html.bc-desktop-app) .bc-welcome-start--with-panel {
       flex-direction: row;
 
-      .od-welcome-start--actions {
+      .bc-welcome-start--actions {
         padding: 24px clamp(24px, 4.4vw, 64px) 56px;
       }
     }
 
-    .od-welcome-start--profile {
+    .bc-welcome-start--profile {
       display: block;
       width: 100%;
       height: calc(var(--f7-safe-area-top) + 196px);
@@ -491,30 +491,30 @@
       }
     }
 
-    .od-welcome-start--ground {
-      fill: var(--od-welcome-ground);
+    .bc-welcome-start--ground {
+      fill: var(--bc-welcome-ground);
     }
 
-    .od-welcome-start--water-top {
-      stop-color: var(--od-water-top);
+    .bc-welcome-start--water-top {
+      stop-color: var(--bc-water-top);
     }
 
-    .od-welcome-start--water-bottom {
-      stop-color: var(--od-water-bottom);
+    .bc-welcome-start--water-bottom {
+      stop-color: var(--bc-water-bottom);
     }
 
-    .od-welcome-start--water {
+    .bc-welcome-start--water {
       fill: url(#od-welcome-water);
     }
 
-    .od-welcome-start--trace {
+    .bc-welcome-start--trace {
       fill: none;
-      stroke: var(--od-trace);
+      stroke: var(--bc-trace);
       stroke-width: 2;
       vector-effect: non-scaling-stroke;
     }
 
-    .od-welcome-start--heading {
+    .bc-welcome-start--heading {
       padding: 20px 24px 0;
       display: flex;
       flex-direction: column;
@@ -532,7 +532,7 @@
         font-size: 16px;
         line-height: 24px;
         letter-spacing: 0.5px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       :global(.ios) & {
@@ -552,34 +552,34 @@
     }
 
     /* Android: three cards, the first filled, the others outlined. */
-    .od-welcome-start--choices {
+    .bc-welcome-start--choices {
       margin: 16px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .od-welcome-start--choice {
+    .bc-welcome-start--choice {
       padding: 16px;
       border-radius: 12px;
-      border: 1px solid var(--od-separator);
-      color: var(--od-text);
+      border: 1px solid var(--bc-separator);
+      color: var(--bc-text);
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      &.od-welcome-start--filled {
+      &.bc-welcome-start--filled {
         border-color: transparent;
-        background: var(--od-surface-2);
+        background: var(--bc-surface-2);
 
-        .od-welcome-start--consequence {
-          color: var(--od-text);
+        .bc-welcome-start--consequence {
+          color: var(--bc-text);
         }
       }
     }
 
-    .od-welcome-start--text {
+    .bc-welcome-start--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -587,26 +587,26 @@
       gap: 4px;
     }
 
-    .od-welcome-start--label {
+    .bc-welcome-start--label {
       font-size: 16px;
       line-height: 24px;
       font-weight: 500;
       letter-spacing: 0.15px;
     }
 
-    .od-welcome-start--consequence {
+    .bc-welcome-start--consequence {
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-welcome-start--chevron {
+    .bc-welcome-start--chevron {
       display: none;
     }
 
     /* Under the three cards: a text link with the git icon. */
-    .od-welcome-start--own-git {
+    .bc-welcome-start--own-git {
       margin: 8px 16px 0;
       min-height: 48px;
       padding: 0 8px;
@@ -617,7 +617,7 @@
       font-size: 14px;
       font-weight: 500;
       letter-spacing: 0.1px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
 
       :global(.ios) & {
@@ -627,45 +627,45 @@
     }
 
     /* iOS: an inset grouped list, a chevron on each row. */
-    :global(.ios) .od-welcome-start--choices {
+    :global(.ios) .bc-welcome-start--choices {
       margin-top: 20px;
       gap: 0;
       border-radius: 12px;
       overflow: hidden;
-      background: var(--od-background);
+      background: var(--bc-background);
 
-      .od-welcome-start--choice {
+      .bc-welcome-start--choice {
         padding: 12px 16px;
         border: none;
         border-radius: 0;
         background: none;
 
-        & + .od-welcome-start--choice {
-          box-shadow: inset 0 0.5px 0 var(--od-separator);
+        & + .bc-welcome-start--choice {
+          box-shadow: inset 0 0.5px 0 var(--bc-separator);
         }
       }
 
-      .od-welcome-start--text {
+      .bc-welcome-start--text {
         gap: 3px;
       }
 
-      .od-welcome-start--label {
+      .bc-welcome-start--label {
         font-size: 17px;
         font-weight: 600;
         letter-spacing: 0;
       }
 
-      .od-welcome-start--consequence {
+      .bc-welcome-start--consequence {
         font-size: 13px;
         line-height: 18px;
         letter-spacing: 0;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-welcome-start--chevron {
+      .bc-welcome-start--chevron {
         display: flex;
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
         /* "expand" points down: a quarter turn makes the iOS chevron. */
         transform: rotate(-90deg);
       }

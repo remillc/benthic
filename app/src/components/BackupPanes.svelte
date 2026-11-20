@@ -17,8 +17,8 @@
   const choice = $derived(backup.choice);
 </script>
 
-<div class="od-backup-panes">
-  <div class="od-backup-panes--list">
+<div class="bc-backup-panes">
+  <div class="bc-backup-panes--list">
     <BackupMain
       selected={choice}
       onversion={(id) => (backup.choice = { kind: 'version', id })}
@@ -26,7 +26,7 @@
       ondeleted={() => (backup.choice = { kind: 'deleted' })}
     />
   </div>
-  <div class="od-backup-panes--detail">
+  <div class="bc-backup-panes--detail">
     {#if choice?.kind === 'version'}
       {#key choice.id}<BackupVersion id={choice.id} {onbrowse} />{/key}
     {:else if choice?.kind === 'dive'}
@@ -34,7 +34,7 @@
     {:else if choice?.kind === 'deleted'}
       <BackupDeleted />
     {:else}
-      <div class="od-backup-panes--empty">{t('backup.pane.empty')}</div>
+      <div class="bc-backup-panes--empty">{t('backup.pane.empty')}</div>
     {/if}
   </div>
 </div>

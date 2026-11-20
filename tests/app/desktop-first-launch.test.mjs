@@ -56,7 +56,7 @@ test('« Pour commencer »: the 700 dp blue panel on the left over the window’
   assert.ok(Number(screen.match(/z-index: (\d+)/)[1]) > rail);
   // Its colours are the tablet’s tokens.
   assert.doesNotMatch(screen, /#[0-9A-Fa-f]{3,8}\b/);
-  assert.match(screen, /var\(--od-release-panel-1\)/);
+  assert.match(screen, /var\(--bc-release-panel-1\)/);
   // The smallest window (760 x 560): a narrower panel, and a column that scrolls with the help link after it.
   assert.match(screen, /@media \(max-width: 1100px\)/);
   assert.match(screen, /@media \(max-height: 700px\)/);
@@ -110,17 +110,17 @@ test('« cet ordinateur »: the texts that name the device have a desktop varian
 test('the sign-in hint reads on two lines, centred, on the desktop too (task 230)', () => {
   assert.equal(langs.fr.welcomeSteps.connectHint, 'La page de connexion du service s’ouvre.\nVous revenez ici ensuite.');
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /\.od-first-launch--hint \{\s+align-self: center;[\s\S]*?white-space: pre-line;/);
-  assert.match(steps, /\.od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: center;/);
+  assert.match(steps, /\.bc-first-launch--hint \{\s+align-self: center;[\s\S]*?white-space: pre-line;/);
+  assert.match(steps, /\.bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: center;/);
   // The desktop keeps the button centred where a narrow window would match the phone rules.
-  assert.match(steps, /\.od-first-launch--desktop \{[\s\S]*?\.od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: center;/);
+  assert.match(steps, /\.bc-first-launch--desktop \{[\s\S]*?\.bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: center;/);
 });
 
 // --- The drop --------------------------------------------------------------------------------------------
 
 test('the drop line sits under the choices of « Pour commencer » and « Importer un carnet », in the desktop app only', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /\{#snippet dropLine\(\)\}\s*\{#if desktopApp\}\s*<p class="od-first-launch--drop">\{t\('welcomeSteps\.dropLine'\)\}<\/p>/);
+  assert.match(steps, /\{#snippet dropLine\(\)\}\s*\{#if desktopApp\}\s*<p class="bc-first-launch--drop">\{t\('welcomeSteps\.dropLine'\)\}<\/p>/);
   // Right after the text buttons of the first step, after the compact choices of the recents screen (task 241) and after
   // the rows of the import step, and nowhere else.
   assert.equal((steps.match(/\{@render dropLine\(\)\}/g) ?? []).length, 3);
@@ -138,7 +138,7 @@ test('dropping a file starts the import with it, as « Un fichier » does; from 
   // Only on the steps that take it; a drop anywhere is kept from opening the file in the window.
   assert.match(steps, /const takes = \(\) => DROP_STEPS\.includes\(currentStep\(\)\) && !busy;/);
   assert.match(steps, /const drop = \(e\) => \{[\s\S]*?e\.preventDefault\(\);[\s\S]*?if \(!files\.length \|\| !takes\(\)\) return;/);
-  assert.match(steps, /\.od-first-launch--dragging \.od-first-launch--drop/);
+  assert.match(steps, /\.bc-first-launch--dragging \.bc-first-launch--drop/);
 });
 
 test('a drop carries files or it is not ours: text and links are left alone', () => {

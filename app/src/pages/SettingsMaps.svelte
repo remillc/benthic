@@ -58,7 +58,7 @@
     const target = /** @type {HTMLElement} */ (e.currentTarget);
     menuId = id;
     await tick();
-    f7.popover.open('.od-maps-menu', target);
+    f7.popover.open('.bc-maps-menu', target);
   }
 
   /** @param {import('../lib/offline-maps.svelte.js').Region} r */
@@ -78,21 +78,21 @@
 {/snippet}
 
 {#snippet summary()}
-  <div class="od-settings-maps--summary">
+  <div class="bc-settings-maps--summary">
     <!-- No limit of their own (task 2026-11-14-137): the regions, their space, and the device's. -->
-    <span class="od-settings-maps--line">
-      <span class="od-settings-maps--count">{t('maps.summary.regions', { n: ready.length })} · {formatMapSize(readyBytes)}</span>
+    <span class="bc-settings-maps--line">
+      <span class="bc-settings-maps--count">{t('maps.summary.regions', { n: ready.length })} · {formatMapSize(readyBytes)}</span>
     </span>
     {#if offlineMaps.totalBytes}
-      <span class="od-settings-maps--bar" role="img" aria-label={t('maps.summary.storageLabel', { maps: formatMapSize(readyBytes), free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}>
-        <span class="od-settings-maps--maps" style:width="{mapsPercent}%"></span>
-        <span class="od-settings-maps--other" style:width="{otherPercent}%"></span>
+      <span class="bc-settings-maps--bar" role="img" aria-label={t('maps.summary.storageLabel', { maps: formatMapSize(readyBytes), free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}>
+        <span class="bc-settings-maps--maps" style:width="{mapsPercent}%"></span>
+        <span class="bc-settings-maps--other" style:width="{otherPercent}%"></span>
       </span>
-      <span class="od-settings-maps--legend" aria-hidden="true">
-        <span class="od-settings-maps--key od-settings-maps--key-maps"></span>{t('maps.summary.maps')}
-        <span class="od-settings-maps--key od-settings-maps--key-other"></span>{t('maps.summary.other')}
+      <span class="bc-settings-maps--legend" aria-hidden="true">
+        <span class="bc-settings-maps--key bc-settings-maps--key-maps"></span>{t('maps.summary.maps')}
+        <span class="bc-settings-maps--key bc-settings-maps--key-other"></span>{t('maps.summary.other')}
       </span>
-      <span class="od-settings-maps--free">{t('maps.summary.freeOf', { free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}</span>
+      <span class="bc-settings-maps--free">{t('maps.summary.freeOf', { free: formatMapSize(offlineMaps.freeBytes), total: formatMapSize(offlineMaps.totalBytes) })}</span>
     {/if}
   </div>
 {/snippet}
@@ -103,37 +103,37 @@
     {#snippet body()}
       <span>{name}</span>
       {#if r.status === 'failed'}
-        <span class="od-maps-row--status od-maps-row--error">
+        <span class="bc-maps-row--status bc-maps-row--error">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7.5v5.5M12 16.5h.01" /></svg>{t('maps.failure.title')}
         </span>
-        <span class="od-maps-row--supporting">{failureReason(r)}</span>
-        <span class="od-maps-row--actions">
+        <span class="bc-maps-row--supporting">{failureReason(r)}</span>
+        <span class="bc-maps-row--actions">
           {#if r.error !== 'limit'}<button type="button" onclick={() => retryRegion(r.id)}>{t('maps.failure.retry')}</button>{/if}
           <button type="button" onclick={() => removeDownload(r.id)}>{t('maps.failure.remove')}</button>
         </span>
       {:else if interrupted(r)}
-        <span class="od-maps-row--supporting">{t('maps.download.interrupted', { done: r.tilesDone, total: r.tilesTotal })}</span>
-        <span class="od-maps-row--note">{t('maps.download.resumesOnline')}</span>
+        <span class="bc-maps-row--supporting">{t('maps.download.interrupted', { done: r.tilesDone, total: r.tilesTotal })}</span>
+        <span class="bc-maps-row--note">{t('maps.download.resumesOnline')}</span>
       {:else if r.pausedReason === 'space'}
-        <span class="od-maps-row--supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
-        <span class="od-maps-row--status od-maps-row--muted">
+        <span class="bc-maps-row--supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
+        <span class="bc-maps-row--status bc-maps-row--muted">
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 15h18 M7 18h.01" /></svg>{t('maps.download.noSpace')}
         </span>
-        <span class="od-maps-row--note">{t('maps.download.resumesWhen', { floor: formatMapSize(floor()) })}</span>
-        <span class="od-maps-row--actions"><button type="button" onclick={() => (offlineMaps.dialog = { kind: 'manage' })}>{t('maps.download.manage')}</button></span>
+        <span class="bc-maps-row--note">{t('maps.download.resumesWhen', { floor: formatMapSize(floor()) })}</span>
+        <span class="bc-maps-row--actions"><button type="button" onclick={() => (offlineMaps.dialog = { kind: 'manage' })}>{t('maps.download.manage')}</button></span>
       {:else if r.status === 'waiting-wifi'}
-        <span class="od-maps-row--supporting">{t('maps.download.waitingWifi', { total: r.tilesTotal })}</span>
-        <span class="od-maps-row--actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
+        <span class="bc-maps-row--supporting">{t('maps.download.waitingWifi', { total: r.tilesTotal })}</span>
+        <span class="bc-maps-row--actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
       {:else if r.status === 'paused'}
-        <span class="od-maps-row--supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
+        <span class="bc-maps-row--supporting">{t('maps.download.pausedAt', { done: r.tilesDone, total: r.tilesTotal })}</span>
       {:else if r.status === 'queued'}
-        <span class="od-maps-row--supporting">{t('maps.download.queued', { total: r.tilesTotal })}</span>
+        <span class="bc-maps-row--supporting">{t('maps.download.queued', { total: r.tilesTotal })}</span>
       {:else}
-        <span class="od-maps-row--supporting">{t('maps.download.progress', { done: r.tilesDone, total: r.tilesTotal, percent: tilesPercent(r) })}</span>
+        <span class="bc-maps-row--supporting">{t('maps.download.progress', { done: r.tilesDone, total: r.tilesTotal, percent: tilesPercent(r) })}</span>
         {#if ios}
           {#if ios}
             <span
-              class="od-maps-row--progress"
+              class="bc-maps-row--progress"
               role="progressbar"
               aria-label={t('maps.download.progressLabel', { name })}
               aria-valuenow={tilesPercent(r)}
@@ -141,16 +141,16 @@
               aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
             >
           {:else}
-            <LinearWavyProgress class="od-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
+            <LinearWavyProgress class="bc-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
           {/if}
         {:else}
-          <LinearWavyProgress class="od-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
+          <LinearWavyProgress class="bc-maps-row--wavy" value={tilesPercent(r) / 100} label={t('maps.download.progressLabel', { name })} />
         {/if}
       {/if}
     {/snippet}
     {#snippet trailing()}
       {#if r.status !== 'failed'}
-        <button type="button" class="od-maps-row--icon-button" aria-label={t('maps.download.stop')} onclick={() => removeDownload(r.id)}><Icon name="close" /></button>
+        <button type="button" class="bc-maps-row--icon-button" aria-label={t('maps.download.stop')} onclick={() => removeDownload(r.id)}><Icon name="close" /></button>
       {/if}
     {/snippet}
   </MapsRow>
@@ -164,12 +164,12 @@
       <span>{name}</span>
       {#if r.status === 'updating'}
         {#if act === 'waiting-wifi'}
-          <span class="od-maps-row--supporting">{t('maps.download.updatingWifi')}</span>
-          <span class="od-maps-row--actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
+          <span class="bc-maps-row--supporting">{t('maps.download.updatingWifi')}</span>
+          <span class="bc-maps-row--actions"><button type="button" onclick={() => askCellular(r.id)}>{t('maps.download.now')}</button></span>
         {:else}
-          <span class="od-maps-row--supporting">{t('maps.download.updating', { done: r.tilesDone, total: r.tilesTotal })}</span>
+          <span class="bc-maps-row--supporting">{t('maps.download.updating', { done: r.tilesDone, total: r.tilesTotal })}</span>
           <span
-            class="od-maps-row--progress"
+            class="bc-maps-row--progress"
             role="progressbar"
             aria-label={t('maps.download.progressLabel', { name })}
             aria-valuenow={tilesPercent(r)}
@@ -177,22 +177,22 @@
             aria-valuemax="100"><span style:width="{tilesPercent(r)}%"></span></span
           >
         {/if}
-        <span class="od-maps-row--note">{t('maps.download.oldStays')}</span>
+        <span class="bc-maps-row--note">{t('maps.download.oldStays')}</span>
       {:else}
-        <span class="od-maps-row--supporting">
+        <span class="bc-maps-row--supporting">
           {t('maps.region.sizeDate', { size: formatMapSize(r.sizeBytes), date: formatMapDate(r.downloadedAt) })}
         </span>
         {#if r.update}
-          <span class="od-maps-row--status">{@render refreshIcon()}{t('maps.region.updateAvailable')}</span>
+          <span class="bc-maps-row--status">{@render refreshIcon()}{t('maps.region.updateAvailable')}</span>
           {#if ios}
-            <span class="od-maps-row--actions"><button type="button" onclick={() => updateRegion(r.id)}>{t('maps.region.update')}</button></span>
+            <span class="bc-maps-row--actions"><button type="button" onclick={() => updateRegion(r.id)}>{t('maps.region.update')}</button></span>
           {/if}
         {/if}
       {/if}
     {/snippet}
     {#snippet trailing()}
       {#if !ios}
-        <button type="button" class="od-maps-row--icon-button" aria-haspopup="menu" aria-label={t('maps.region.options', { name })} onclick={(e) => openMenu(e, r.id)}>
+        <button type="button" class="bc-maps-row--icon-button" aria-haspopup="menu" aria-label={t('maps.region.options', { name })} onclick={(e) => openMenu(e, r.id)}>
           <Icon name="more" />
         </button>
       {/if}
@@ -201,13 +201,13 @@
 {/snippet}
 
 {#snippet settingsGroup()}
-  <h2 class="od-maps-row--maps-title">{t('maps.sections.settings')}</h2>
-  <div class="od-maps-row--surface" role="list">
+  <h2 class="bc-maps-row--maps-title">{t('maps.sections.settings')}</h2>
+  <div class="bc-maps-row--surface" role="list">
     <div role="listitem">
-      <label class="od-settings-maps--set-row">
-        <span class="od-settings-maps--texts">
-          <span class="od-settings-maps--label">{t(ios ? 'maps.cellular.labelShort' : 'maps.cellular.label')}</span>
-          <span class="od-maps-row--supporting">{t('maps.cellular.text')}</span>
+      <label class="bc-settings-maps--set-row">
+        <span class="bc-settings-maps--texts">
+          <span class="bc-settings-maps--label">{t(ios ? 'maps.cellular.labelShort' : 'maps.cellular.label')}</span>
+          <span class="bc-maps-row--supporting">{t('maps.cellular.text')}</span>
         </span>
         <span class="toggle">
           <input type="checkbox" checked={offlineMaps.cellular} onchange={(e) => setCellular(e.currentTarget.checked)} />
@@ -220,43 +220,43 @@
 
 {#snippet listPane()}
   {#if !offlineMaps.online}
-    <p class="od-settings-maps--no-network" role="status"><Icon name="offline" size={20} /><span>{t('maps.noNetwork')}</span></p>
+    <p class="bc-settings-maps--no-network" role="status"><Icon name="offline" size={20} /><span>{t('maps.noNetwork')}</span></p>
   {/if}
 
   {#if empty}
-    <div class="od-settings-maps--empty">
-      <span class="od-settings-maps--illustration" aria-hidden="true">
+    <div class="bc-settings-maps--empty">
+      <span class="bc-settings-maps--illustration" aria-hidden="true">
         <svg width="56" height="56" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z M9 4v14 M15 6v14" /></svg>
       </span>
       <h2>{t('maps.empty.title')}</h2>
       <p>{t('maps.empty.text')}</p>
-      {#if !split}<button type="button" class="od-settings-maps--filled" onclick={() => go('/settings/maps/area')}>{t('maps.add')}</button>{/if}
+      {#if !split}<button type="button" class="bc-settings-maps--filled" onclick={() => go('/settings/maps/area')}>{t('maps.add')}</button>{/if}
     </div>
   {:else}
     {@render summary()}
   {/if}
 
   {#if downloads.length}
-    <h2 class="od-maps-row--maps-title">{t('maps.sections.downloads')}</h2>
-    <div class="od-maps-row--surface" role="list">
+    <h2 class="bc-maps-row--maps-title">{t('maps.sections.downloads')}</h2>
+    <div class="bc-maps-row--surface" role="list">
       {#each downloads as r (r.id)}<div role="listitem">{@render downloadRow(r)}</div>{/each}
     </div>
-    {#if downloads.some((r) => r.status === 'downloading' || r.status === 'queued')}<p class="od-maps-row--maps-note">{t('maps.download.background')}</p>{/if}
+    {#if downloads.some((r) => r.status === 'downloading' || r.status === 'queued')}<p class="bc-maps-row--maps-note">{t('maps.download.background')}</p>{/if}
   {/if}
 
   {#if ready.length}
-    <div class="od-settings-maps--section-head">
-      <h2 class="od-maps-row--maps-title">{t('maps.sections.regions')}</h2>
-      {#if updates > 0}<button type="button" class="od-settings-maps--text-action" onclick={updateAll}>{t('maps.updateAll')}</button>{/if}
+    <div class="bc-settings-maps--section-head">
+      <h2 class="bc-maps-row--maps-title">{t('maps.sections.regions')}</h2>
+      {#if updates > 0}<button type="button" class="bc-settings-maps--text-action" onclick={updateAll}>{t('maps.updateAll')}</button>{/if}
     </div>
-    <div class="od-maps-row--surface" role="list">
+    <div class="bc-maps-row--surface" role="list">
       {#each ready as r (r.id)}
         {#if ios}
           <!-- iPhone: a swipe to the left deletes (Framework7 swipeout). -->
           <div role="listitem" class="swipeout no-swipeback">
             <div class="swipeout-content">{@render regionRow(r)}</div>
             <div class="swipeout-actions-right">
-              <a href="#delete" class="od-settings-maps--swipeout-close od-settings-maps--delete" onclick={(e) => { e.preventDefault(); askDelete(r.id); }}>{t('maps.menu.delete')}</a>
+              <a href="#delete" class="bc-settings-maps--swipeout-close bc-settings-maps--delete" onclick={(e) => { e.preventDefault(); askDelete(r.id); }}>{t('maps.menu.delete')}</a>
             </div>
           </div>
         {:else}
@@ -265,45 +265,45 @@
       {/each}
       {#if ios}
         <div role="listitem">
-          <button type="button" class="od-settings-maps--set-row od-settings-maps--add-row" onclick={() => go('/settings/maps/area')}>
-            <span class="od-settings-maps--texts"><span class="od-settings-maps--label">{t('maps.add')}</span></span>
+          <button type="button" class="bc-settings-maps--set-row bc-settings-maps--add-row" onclick={() => go('/settings/maps/area')}>
+            <span class="bc-settings-maps--texts"><span class="bc-settings-maps--label">{t('maps.add')}</span></span>
             <Icon name="chevron" size={20} />
           </button>
         </div>
       {/if}
     </div>
-    {#if ios}<p class="od-maps-row--maps-note">{t('maps.region.swipeHint')}</p>{/if}
+    {#if ios}<p class="bc-maps-row--maps-note">{t('maps.region.swipeHint')}</p>{/if}
   {/if}
 
   {@render settingsGroup()}
-  <div class="od-settings-maps--bottom"></div>
+  <div class="bc-settings-maps--bottom"></div>
 {/snippet}
 
-<Page class="od-settings-maps" onPageBeforeIn={refreshSpace}>
+<Page class="bc-settings-maps" onPageBeforeIn={refreshSpace}>
   <Navbar title={t('maps.title')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
     {#snippet right()}
       {#if ios && !split}
         <Link iconOnly onClick={() => go('/settings/maps/area')}>
           <Icon name="plus" />
-          <span class="od-sr-only">{t('maps.add')}</span>
+          <span class="bc-sr-only">{t('maps.add')}</span>
         </Link>
       {/if}
     {/snippet}
   </Navbar>
 
   {#if split}
-    <div class="od-settings-maps--panes">
-      <div class="od-settings-maps--pane od-settings-maps--list-pane">{@render listPane()}</div>
-      <div class="od-settings-maps--pane od-settings-maps--add-pane">
-        <h2 class="od-settings-maps--add-title">{t('maps.add')}</h2>
-        <p class="od-maps-row--maps-note od-settings-maps--add-text">{t('maps.empty.text')}</p>
-        <button type="button" class="od-settings-maps--filled" onclick={() => go('/settings/maps/area')}>{t('maps.area.choose')}</button>
+    <div class="bc-settings-maps--panes">
+      <div class="bc-settings-maps--pane bc-settings-maps--list-pane">{@render listPane()}</div>
+      <div class="bc-settings-maps--pane bc-settings-maps--add-pane">
+        <h2 class="bc-settings-maps--add-title">{t('maps.add')}</h2>
+        <p class="bc-maps-row--maps-note bc-settings-maps--add-text">{t('maps.empty.text')}</p>
+        <button type="button" class="bc-settings-maps--filled" onclick={() => go('/settings/maps/area')}>{t('maps.area.choose')}</button>
       </div>
     </div>
   {:else}
@@ -311,7 +311,7 @@
   {/if}
 
   <!-- The ⋮ menu of a region (android-cartes-menu.dc.html). -->
-  <Popover class="od-menu od-maps-menu" backdrop={false}>
+  <Popover class="bc-menu bc-maps-menu" backdrop={false}>
     <List noChevron>
       {#if menuRegion?.update && menuRegion.status === 'ready'}
         <MenuItem icon="refresh" text={t('maps.menu.update')} onclick={() => updateRegion(menuRegion.id)} />
@@ -324,7 +324,7 @@
   {#snippet fixedContent()}
     {#if !ios && !split && !empty}
       <!-- Extended floating button, written by hand as in the Logbook. -->
-      <div class="fab fab-right-bottom fab-extended od-fab-add">
+      <div class="fab fab-right-bottom fab-extended bc-fab-add">
         <a href="/settings/maps/area">
           <i class="icon"><Icon name="plus" /></i>
           <div class="fab-text">{t('maps.add')}</div>
@@ -336,17 +336,17 @@
 
 <style>
   @layer od.components {
-    .od-settings-maps--no-network {
+    .bc-settings-maps--no-network {
       margin: 8px 16px 0;
       padding: 14px 16px;
       border-radius: 16px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       display: flex;
       align-items: flex-start;
       gap: 12px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(svg) {
         flex: none;
@@ -354,33 +354,33 @@
       }
     }
 
-    .od-settings-maps--summary {
+    .bc-settings-maps--summary {
       margin: 8px 16px 0;
       padding: 14px 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 8px;
       font-variant-numeric: tabular-nums;
 
-      .od-settings-maps--line {
+      .bc-settings-maps--line {
         display: flex;
         align-items: baseline;
         gap: 8px;
       }
 
-      .od-settings-maps--count {
+      .bc-settings-maps--count {
         flex: 1;
         font-size: 16px;
         line-height: 24px;
       }
 
       /* The device's storage: the maps in ink, the other data in the outline tone, the rest free. */
-      .od-settings-maps--bar {
+      .bc-settings-maps--bar {
         height: 8px;
         border-radius: 4px;
-        background: var(--od-surface-container);
+        background: var(--bc-surface-container);
         overflow: hidden;
         display: flex;
         gap: 2px;
@@ -392,54 +392,54 @@
         }
       }
 
-      .od-settings-maps--maps,
-      .od-settings-maps--key-maps {
-        background: var(--od-text);
+      .bc-settings-maps--maps,
+      .bc-settings-maps--key-maps {
+        background: var(--bc-text);
       }
 
-      .od-settings-maps--other,
-      .od-settings-maps--key-other {
-        background: var(--od-separator);
+      .bc-settings-maps--other,
+      .bc-settings-maps--key-other {
+        background: var(--bc-separator);
       }
 
-      .od-settings-maps--legend {
+      .bc-settings-maps--legend {
         display: flex;
         align-items: center;
         gap: 6px;
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-settings-maps--key {
+      .bc-settings-maps--key {
         flex: none;
         width: 8px;
         height: 8px;
         border-radius: 4px;
 
-        &.od-settings-maps--key-other {
+        &.bc-settings-maps--key-other {
           margin-left: 6px;
         }
       }
 
-      .od-settings-maps--free {
+      .bc-settings-maps--free {
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-settings-maps--section-head {
+    .bc-settings-maps--section-head {
       display: flex;
       align-items: center;
       padding-right: 8px;
 
-      .od-maps-row--maps-title {
+      .bc-maps-row--maps-title {
         flex: 1;
       }
     }
 
-    .od-settings-maps--text-action {
+    .bc-settings-maps--text-action {
       flex: none;
       width: auto;
       height: 40px;
@@ -448,7 +448,7 @@
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -456,25 +456,25 @@
       cursor: pointer;
     }
 
-    .od-settings-maps--empty {
+    .bc-settings-maps--empty {
       margin: 24px 24px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
 
-      .od-settings-maps--illustration {
+      .bc-settings-maps--illustration {
         width: 96px;
         height: 96px;
         border-radius: 48px;
-        background: var(--od-primary-container);
+        background: var(--bc-primary-container);
         display: flex;
         align-items: center;
         justify-content: center;
 
         svg {
           fill: none;
-          stroke: var(--od-text);
+          stroke: var(--bc-text);
           stroke-width: 1.6;
           stroke-linecap: round;
           stroke-linejoin: round;
@@ -492,25 +492,25 @@
         margin: 0 0 20px;
         font-size: 15px;
         line-height: 22px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-settings-maps--filled {
+    .bc-settings-maps--filled {
       width: auto;
       height: 48px;
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
     }
 
-    .od-settings-maps--set-row {
+    .bc-settings-maps--set-row {
       box-sizing: border-box;
       width: 100%;
       min-height: 64px;
@@ -520,12 +520,12 @@
       gap: 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
 
-      .od-settings-maps--texts {
+      .bc-settings-maps--texts {
         flex: 1;
         min-width: 0;
         display: flex;
@@ -533,20 +533,20 @@
         gap: 2px;
       }
 
-      .od-settings-maps--label {
+      .bc-settings-maps--label {
         font-size: 16px;
         line-height: 24px;
       }
 
-      .od-maps-row--supporting {
+      .bc-maps-row--supporting {
         font-size: 14px;
         line-height: 20px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       :global(svg) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       .toggle {
@@ -560,35 +560,35 @@
       overflow: hidden;
     }
 
-    .od-settings-maps--delete {
-      background: var(--od-error);
-      color: var(--od-on-error);
+    .bc-settings-maps--delete {
+      background: var(--bc-error);
+      color: var(--bc-on-error);
       font-weight: 600;
     }
 
     /* Tablet: the list and the add pane side by side (the add pane on a surface container on Android). */
-    .od-settings-maps--panes {
+    .bc-settings-maps--panes {
       display: flex;
       align-items: flex-start;
       min-height: 100%;
     }
 
-    .od-settings-maps--pane {
+    .bc-settings-maps--pane {
       min-width: 0;
     }
 
     /* Tablet in portrait (task 2026-11-19-300): the detail pane is too narrow for two columns, the add pane goes under the list. */
     @media (orientation: portrait) {
-      .od-settings-maps--panes {
+      .bc-settings-maps--panes {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .od-settings-maps--list-pane {
+      .bc-settings-maps--list-pane {
         flex: none;
       }
 
-      .od-settings-maps--add-pane {
+      .bc-settings-maps--add-pane {
         flex: none;
         align-self: auto;
         margin: 16px 12px 24px;
@@ -596,36 +596,36 @@
         border-radius: 28px;
       }
 
-      :global(.ios) .od-settings-maps--add-pane {
+      :global(.ios) .bc-settings-maps--add-pane {
         border-radius: 10px;
         border-left: none;
       }
     }
 
-    .od-settings-maps--list-pane {
+    .bc-settings-maps--list-pane {
       flex: 1 1 0;
     }
 
-    .od-settings-maps--add-pane {
+    .bc-settings-maps--add-pane {
       flex: 1 1 0;
       align-self: stretch;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       border-radius: 28px 0 0 28px;
       padding-top: 8px;
-      --od-field-margin: 12px;
+      --bc-field-margin: 12px;
     }
 
-    :global(.ios) .od-settings-maps--add-pane {
-      background: var(--od-background);
+    :global(.ios) .bc-settings-maps--add-pane {
+      background: var(--bc-background);
       border-radius: 0;
-      border-left: 1px solid var(--od-separator);
+      border-left: 1px solid var(--bc-separator);
     }
 
-    .od-settings-maps--add-pane .od-settings-maps--filled {
+    .bc-settings-maps--add-pane .bc-settings-maps--filled {
       margin: 16px 20px 0;
     }
 
-    .od-settings-maps--add-title {
+    .bc-settings-maps--add-title {
       margin: 0;
       padding: 16px 20px 4px;
       font-size: 22px;
@@ -633,7 +633,7 @@
       font-weight: 500;
     }
 
-    .od-settings-maps--bottom {
+    .bc-settings-maps--bottom {
       height: 96px;
     }
   }

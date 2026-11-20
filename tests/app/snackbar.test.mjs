@@ -20,11 +20,11 @@ test('longer durations are kept: 6 s message, 8 s conflict, 10 s dive deletion',
   assert.equal(snackbarTimeout(10000, true), 10000);
 });
 
-test('classes: always od-snackbar, above the FAB and undoable on request', () => {
-  assert.equal(snackbarClasses(), 'od-snackbar');
-  assert.equal(snackbarClasses({ hasFab: true }), 'od-snackbar od-snackbar-above-fab');
-  assert.equal(snackbarClasses({ undoable: true }), 'od-snackbar od-undo-toast');
-  assert.equal(snackbarClasses({ hasFab: true, undoable: true }), 'od-snackbar od-snackbar-above-fab od-undo-toast');
+test('classes: always bc-snackbar, above the FAB and undoable on request', () => {
+  assert.equal(snackbarClasses(), 'bc-snackbar');
+  assert.equal(snackbarClasses({ hasFab: true }), 'bc-snackbar bc-snackbar-above-fab');
+  assert.equal(snackbarClasses({ undoable: true }), 'bc-snackbar bc-undo-toast');
+  assert.equal(snackbarClasses({ hasFab: true, undoable: true }), 'bc-snackbar bc-snackbar-above-fab bc-undo-toast');
 });
 
 /** @param {string} hex */
@@ -47,10 +47,10 @@ const dark = css.slice(darkAt);
 
 test('the snackbar tokens meet WCAG AA (4.5:1) for the text and the action, light and dark', () => {
   for (const [mode, block] of [['light', light], ['dark', dark]]) {
-    const surface = token(block, '--od-inverse-surface');
-    assert.ok(surface, `${mode}: --od-inverse-surface is declared`);
-    assert.ok(contrast(token(block, '--od-inverse-on-surface'), surface) >= 4.5, `${mode}: text`);
-    assert.ok(contrast(token(block, '--od-inverse-primary'), surface) >= 4.5, `${mode}: action`);
+    const surface = token(block, '--bc-inverse-surface');
+    assert.ok(surface, `${mode}: --bc-inverse-surface is declared`);
+    assert.ok(contrast(token(block, '--bc-inverse-on-surface'), surface) >= 4.5, `${mode}: text`);
+    assert.ok(contrast(token(block, '--bc-inverse-primary'), surface) >= 4.5, `${mode}: action`);
   }
 });
 

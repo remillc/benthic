@@ -7,7 +7,7 @@
   import { decorativeProfilePath } from '../lib/smooth-path.js';
 
   /**
-   * `trace`: the line in the profile ink (`--od-trace`, 1.25 dp) instead of the text colour (1.5 dp).
+   * `trace`: the line in the profile ink (`--bc-trace`, 1.25 dp) instead of the text colour (1.5 dp).
    * @type {{ class?: string, trace?: boolean }}
    */
   let { class: extraClass = '', trace = false } = $props();
@@ -20,46 +20,46 @@
   const gradient = `od-decorative-profile-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
-<svg class="od-decorative-profile {extraClass}" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
+<svg class="bc-decorative-profile {extraClass}" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
   <defs>
     <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" class="od-decorative-profile--water-top"></stop>
-      <stop offset="1" class="od-decorative-profile--water-bottom"></stop>
+      <stop offset="0" class="bc-decorative-profile--water-top"></stop>
+      <stop offset="1" class="bc-decorative-profile--water-bottom"></stop>
     </linearGradient>
   </defs>
-  <path class="od-decorative-profile--water" d="{line} Z" fill="url(#{gradient})"></path>
-  <path class="od-decorative-profile--line" class:od-decorative-profile--trace={trace} d={line}></path>
+  <path class="bc-decorative-profile--water" d="{line} Z" fill="url(#{gradient})"></path>
+  <path class="bc-decorative-profile--line" class:bc-decorative-profile--trace={trace} d={line}></path>
 </svg>
 
 <style>
   @layer od.components {
-    .od-decorative-profile {
+    .bc-decorative-profile {
       display: block;
       width: 100%;
     }
 
-    .od-decorative-profile--water-top {
-      stop-color: var(--od-water-top);
+    .bc-decorative-profile--water-top {
+      stop-color: var(--bc-water-top);
     }
 
-    .od-decorative-profile--water-bottom {
-      stop-color: var(--od-water-bottom);
+    .bc-decorative-profile--water-bottom {
+      stop-color: var(--bc-water-bottom);
     }
 
-    .od-decorative-profile--water {
+    .bc-decorative-profile--water {
       opacity: 0.9;
     }
 
-    .od-decorative-profile--line {
+    .bc-decorative-profile--line {
       fill: none;
-      stroke: var(--od-text);
+      stroke: var(--bc-text);
       stroke-width: 1.5;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
 
-    .od-decorative-profile--trace {
-      stroke: var(--od-trace);
+    .bc-decorative-profile--trace {
+      stroke: var(--bc-trace);
       stroke-width: 1.25;
     }
   }

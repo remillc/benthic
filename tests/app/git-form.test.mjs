@@ -60,7 +60,7 @@ test('the help page: the three hosts, their links, the steps of task 252', () =>
   assert.equal(stripMarked(fr.repoHelp.codeberg.s6), 'Choisissez HTTPS au-dessus de l’adresse du dépôt, puis copiez-la, par exemple https://codeberg.org/vous/carnet-plongee.git.');
   assert.equal(fr.repoHelp.open.replace('{page}', fr.repoHelp.gitlab.page).replace('{name}', 'GitLab'), 'Ouvrir la page « Nouveau projet » de GitLab');
   // The active tab: semi-bold, text colour, a 3 dp underline.
-  assert.match(help, /aria-selected='true'\] \{\s*color: var\(--od-text\);\s*font-weight: 600;[\s\S]*border-bottom: 3px solid var\(--od-text\)/);
+  assert.match(help, /aria-selected='true'\] \{\s*color: var\(--bc-text\);\s*font-weight: 600;[\s\S]*border-bottom: 3px solid var\(--bc-text\)/);
 });
 
 test('the routes: the help pages and the download of the repository', () => {
@@ -83,35 +83,35 @@ test('one form for the first launch and Compte', () => {
   // The fields are outlined, the address in a monospace face.
   assert.ok((form.match(/\boutlined\b/g) ?? []).length >= 4);
   assert.match(form, /mono\b/);
-  assert.match(form, /type="submit" class="od-git-form--connect"/);
+  assert.match(form, /type="submit" class="bc-git-form--connect"/);
 });
 
 test('MD3 spacing of the form (4 dp grid)', () => {
-  assert.match(form, /--od-outlined-gap: 16px;/);
+  assert.match(form, /--bc-outlined-gap: 16px;/);
   // 8 dp title to sentence; 16 dp sentence to link to first field (a 48 dp link with negative margins).
-  assert.match(form, /\.od-git-form--intro \{\s*margin: 8px 0 0;/);
+  assert.match(form, /\.bc-git-form--intro \{\s*margin: 8px 0 0;/);
   assert.match(form, /min-height: 48px;/);
-  assert.match(form, /od-git-form--link-repository \{\s*margin: 2px 0 -14px;/);
+  assert.match(form, /bc-git-form--link-repository \{\s*margin: 2px 0 -14px;/);
   // 4 dp field to help line; the token link 4 dp under the token help line.
-  assert.match(form, /\.od-git-form--status \{\s*margin: 4px 0 0 16px;/);
-  assert.match(form, /od-git-form--link-token \{\s*margin: -10px 0 -14px;/);
+  assert.match(form, /\.bc-git-form--status \{\s*margin: 4px 0 0 16px;/);
+  assert.match(form, /bc-git-form--link-token \{\s*margin: -10px 0 -14px;/);
   // 24 dp before « Connecter », full width.
-  assert.match(form, /\.od-git-form--connect \{\s*margin-top: 24px;\s*width: 100%;/);
+  assert.match(form, /\.bc-git-form--connect \{\s*margin-top: 24px;\s*width: 100%;/);
   // The page: no gap under the title (the sentence carries its 8 dp), 16 dp sides under Compte's app bar.
-  assert.match(page, /\.od-editorial-page--title\) \{\s*margin-bottom: 0;/);
+  assert.match(page, /\.bc-editorial-page--title\) \{\s*margin-bottom: 0;/);
   assert.match(page, /compte-body \{\s*padding: 8px 16px/);
   // The outlined fields read the shared gap.
-  assert.match(src('components/AccountField.svelte'), /margin-top: var\(--od-outlined-gap, 14px\)/);
-  assert.match(src('components/SelectField.svelte'), /od-select-field--outlined \{\s*margin: var\(--od-outlined-gap, 14px\) 0 0;/);
+  assert.match(src('components/AccountField.svelte'), /margin-top: var\(--bc-outlined-gap, 14px\)/);
+  assert.match(src('components/SelectField.svelte'), /bc-select-field--outlined \{\s*margin: var\(--bc-outlined-gap, 14px\) 0 0;/);
 });
 
 test('every link has a hand pointer and a hover', () => {
-  assert.match(form, /od-git-form--link \{[\s\S]*cursor: pointer;[\s\S]*@media \(hover: hover\) \{\s*&:hover/);
-  assert.match(form, /od-git-form--connect \{[\s\S]*cursor: pointer;[\s\S]*&:hover:not\(:disabled\)/);
+  assert.match(form, /bc-git-form--link \{[\s\S]*cursor: pointer;[\s\S]*@media \(hover: hover\) \{\s*&:hover/);
+  assert.match(form, /bc-git-form--connect \{[\s\S]*cursor: pointer;[\s\S]*&:hover:not\(:disabled\)/);
 });
 
 test('side margins of 16 dp on the phone step pages', () => {
-  assert.match(src('components/EditorialPage.svelte'), /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
+  assert.match(src('components/EditorialPage.svelte'), /\.bc-editorial-page--band-body,\s*\.bc-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
 });
 
 test('the branch list waits for the repository, then for the access', async () => {

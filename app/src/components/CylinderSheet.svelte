@@ -134,13 +134,13 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-cylinder-sheet modal-in" use:portal onkeydown={keydown}>
+<div class="bc-cylinder-sheet modal-in" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="od-cylinder-sheet--scrim" onclick={dismiss} style:opacity={dragging ? 1 - Math.min(1, Math.max(0, offset) / (surfaceHeight || 1)) : undefined}></div>
+  <div class="bc-cylinder-sheet--scrim" onclick={dismiss} style:opacity={dragging ? 1 - Math.min(1, Math.max(0, offset) / (surfaceHeight || 1)) : undefined}></div>
   <div
-    class="od-cylinder-sheet--surface"
-    class:od-cylinder-sheet--dragging={dragging}
-    class:od-cylinder-sheet--leaving={leaving}
+    class="bc-cylinder-sheet--surface"
+    class:bc-cylinder-sheet--dragging={dragging}
+    class:bc-cylinder-sheet--leaving={leaving}
     role="dialog"
     aria-modal="true"
     aria-labelledby={id}
@@ -151,7 +151,7 @@
     <!-- The M3 drag handle: a tap closes the sheet, a drag down closes it too. -->
     <button
       type="button"
-      class="od-cylinder-sheet--grab"
+      class="bc-cylinder-sheet--grab"
       aria-label={t('dialog.close')}
       onclick={() => {
         if (!moved) dismiss();
@@ -162,27 +162,27 @@
       onpointercancel={dragEnd}
       use:ownTouches
     >
-      <span class="od-cylinder-sheet--handle" aria-hidden="true"></span>
+      <span class="bc-cylinder-sheet--handle" aria-hidden="true"></span>
     </button>
-    <div class="od-cylinder-sheet--body">
-      <div class="od-cylinder-sheet--head">
+    <div class="bc-cylinder-sheet--body">
+      <div class="bc-cylinder-sheet--head">
         <CylinderIcon />
-        <h2 {id} class="od-cylinder-sheet--title">{t('edit.cylinderTitle', { n })}</h2>
-        <span class="od-cylinder-sheet--gas od-value">{gas}</span>
+        <h2 {id} class="bc-cylinder-sheet--title">{t('edit.cylinderTitle', { n })}</h2>
+        <span class="bc-cylinder-sheet--gas bc-value">{gas}</span>
       </div>
-      <div class="od-cylinder-sheet--fields">{@render children()}</div>
+      <div class="bc-cylinder-sheet--fields">{@render children()}</div>
     </div>
-    <div class="od-cylinder-sheet--actions">
-      <button type="button" class="od-cylinder-sheet--delete" onclick={ondelete}>{t('edit.deleteCylinder')}</button>
-      <span class="od-cylinder-sheet--spacer"></span>
-      <button type="button" class="od-cylinder-sheet--ok" onclick={dismiss}>{t('dialog.ok')}</button>
+    <div class="bc-cylinder-sheet--actions">
+      <button type="button" class="bc-cylinder-sheet--delete" onclick={ondelete}>{t('edit.deleteCylinder')}</button>
+      <span class="bc-cylinder-sheet--spacer"></span>
+      <button type="button" class="bc-cylinder-sheet--ok" onclick={dismiss}>{t('dialog.ok')}</button>
     </div>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-cylinder-sheet {
+    .bc-cylinder-sheet {
       position: fixed;
       inset: 0;
       z-index: 13400;
@@ -192,13 +192,13 @@
       font-family: inherit;
     }
 
-    .od-cylinder-sheet--scrim {
+    .bc-cylinder-sheet--scrim {
       position: absolute;
       inset: 0;
-      background: var(--od-scrim);
+      background: var(--bc-scrim);
     }
 
-    .od-cylinder-sheet--surface {
+    .bc-cylinder-sheet--surface {
       position: relative;
       box-sizing: border-box;
       width: min(640px, 100%);
@@ -207,18 +207,18 @@
       flex-direction: column;
       padding: 8px 0 calc(24px + var(--f7-safe-area-bottom, 0px));
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
-      color: var(--od-text);
+      background: var(--bc-dialog);
+      color: var(--bc-text);
       outline: none;
-      --od-field-margin: 0;
+      --bc-field-margin: 0;
     }
 
-    :global(.md) .od-cylinder-sheet--surface {
-      animation: od-cylinder-sheet-rise var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default) backwards;
+    :global(.md) .bc-cylinder-sheet--surface {
+      animation: od-cylinder-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
     }
 
-    :global(.md) .od-cylinder-sheet--scrim {
-      animation: od-cylinder-sheet-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+    :global(.md) .bc-cylinder-sheet--scrim {
+      animation: od-cylinder-sheet-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
     @keyframes od-cylinder-sheet-rise {
@@ -234,29 +234,29 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      :global(.md) .od-cylinder-sheet--surface,
-      :global(.md) .od-cylinder-sheet--scrim {
+      :global(.md) .bc-cylinder-sheet--surface,
+      :global(.md) .bc-cylinder-sheet--scrim {
         animation: none;
       }
     }
 
     /* Back to its place, or down off screen when closing. */
-    .od-cylinder-sheet--surface {
-      transition: transform 0.2s var(--od-motion-spatial-fast, ease-out);
+    .bc-cylinder-sheet--surface {
+      transition: transform 0.2s var(--bc-motion-spatial-fast, ease-out);
 
-      &.od-cylinder-sheet--dragging {
+      &.bc-cylinder-sheet--dragging {
         transition: none;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-cylinder-sheet--surface {
+      .bc-cylinder-sheet--surface {
         transition: none;
       }
     }
 
     /* The handle's touch target: 48 dp high across the top of the sheet. */
-    .od-cylinder-sheet--grab {
+    .bc-cylinder-sheet--grab {
       flex: none;
       align-self: center;
       width: 96px;
@@ -272,34 +272,34 @@
       cursor: grab;
 
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: -2px;
         border-radius: 8px;
       }
     }
 
-    .od-cylinder-sheet--handle {
+    .bc-cylinder-sheet--handle {
       width: 32px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
       opacity: 0.4;
     }
 
-    .od-cylinder-sheet--body {
+    .bc-cylinder-sheet--body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       padding: 0 24px;
     }
 
-    .od-cylinder-sheet--head {
+    .bc-cylinder-sheet--head {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-cylinder-sheet--title {
+    .bc-cylinder-sheet--title {
       flex: 1;
       min-width: 0;
       margin: 0;
@@ -308,24 +308,24 @@
       font-weight: 500;
     }
 
-    .od-cylinder-sheet--gas {
+    .bc-cylinder-sheet--gas {
       padding: 4px 12px;
       border-radius: 8px;
-      background: var(--od-surface-container-highest);
+      background: var(--bc-surface-container-highest);
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
       white-space: nowrap;
     }
 
-    .od-cylinder-sheet--fields {
+    .bc-cylinder-sheet--fields {
       margin-top: 12px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-cylinder-sheet--actions {
+    .bc-cylinder-sheet--actions {
       flex: none;
       margin: 20px 24px 0;
       display: flex;
@@ -333,11 +333,11 @@
       gap: 8px;
     }
 
-    .od-cylinder-sheet--spacer {
+    .bc-cylinder-sheet--spacer {
       flex: 1;
     }
 
-    .od-cylinder-sheet--actions button {
+    .bc-cylinder-sheet--actions button {
       width: auto;
       flex: none;
       height: 40px;
@@ -353,17 +353,17 @@
       cursor: pointer;
     }
 
-    .od-cylinder-sheet--delete {
-      color: var(--od-alarm);
+    .bc-cylinder-sheet--delete {
+      color: var(--bc-alarm);
     }
 
-    .od-cylinder-sheet--actions .od-cylinder-sheet--ok {
+    .bc-cylinder-sheet--actions .bc-cylinder-sheet--ok {
       padding: 0 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
     }
 
-    :global(.ios) .od-cylinder-sheet--surface {
+    :global(.ios) .bc-cylinder-sheet--surface {
       border-radius: 14px 14px 0 0;
     }
   }

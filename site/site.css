@@ -16,18 +16,18 @@
 }
 
 :root {
-  --od-background: #F4F4F2;
-  --od-surface: #FFFFFF;
-  --od-text: #1F2124;
-  --od-text-2: #4A4D52;
-  --od-separator: #DADAD6;
+  --bc-background: #F4F4F2;
+  --bc-surface: #FFFFFF;
+  --bc-text: #1F2124;
+  --bc-text-2: #4A4D52;
+  --bc-separator: #DADAD6;
   color-scheme: light;
 }
 
 body {
   margin: 0;
-  background: var(--od-background);
-  color: var(--od-text);
+  background: var(--bc-background);
+  color: var(--bc-text);
   font-family: 'Source Sans 3', system-ui, sans-serif;
   font-size: 16px;
   line-height: 24px;
@@ -56,7 +56,7 @@ header {
 }
 
 .other {
-  color: var(--od-text);
+  color: var(--bc-text);
   font-size: 14px;
 }
 
@@ -65,7 +65,7 @@ main {
   margin-bottom: 48px;
   padding: 8px 24px 24px;
   border-radius: 20px;
-  background: var(--od-surface);
+  background: var(--bc-surface);
 }
 
 h1,
@@ -99,17 +99,17 @@ li {
   margin-bottom: 6px;
 }
 
-.od-about-text--updated {
+.bc-about-text--updated {
   font-size: 14px;
-  color: var(--od-text-2);
+  color: var(--bc-text-2);
 }
 
 .button {
   display: inline-block;
   padding: 10px 20px;
   border-radius: 20px;
-  background: var(--od-text);
-  color: var(--od-surface);
+  background: var(--bc-text);
+  color: var(--bc-surface);
   font-family: system-ui, sans-serif;
   font-weight: 700;
   text-decoration: none;
@@ -118,5 +118,5 @@ li {
 section + section {
   margin-top: 32px;
   padding-top: 8px;
-  border-top: 1px solid var(--od-separator);
+  border-top: 1px solid var(--bc-separator);
 }

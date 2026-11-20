@@ -67,21 +67,21 @@
   }
 </script>
 
-<Sheet class="od-add-equipment" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.addSheet.title')}>
-  <div class="od-add-equipment--content">
-    <h2 class="od-add-equipment--title">{t('gear.addSheet.title')}</h2>
-    <div class="od-add-equipment--search">
+<Sheet class="bc-add-equipment" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.addSheet.title')}>
+  <div class="bc-add-equipment--content">
+    <h2 class="bc-add-equipment--title">{t('gear.addSheet.title')}</h2>
+    <div class="bc-add-equipment--search">
       <Icon name="search" size={20} />
       <input type="search" bind:value={query} placeholder={t('gear.addSheet.search')} aria-label={t('gear.addSheet.search')} />
     </div>
 
-    <div class="od-add-equipment--scroll">
+    <div class="bc-add-equipment--scroll">
       {#if kits.length}
-        <h3 class="od-add-equipment--group">{t('gear.addSheet.kits')}</h3>
-        <div class="od-add-equipment--chips">
+        <h3 class="bc-add-equipment--group">{t('gear.addSheet.kits')}</h3>
+        <div class="bc-add-equipment--chips">
           {#each kits as kit (kit.id)}
             {@const all = kit.ours.every((id) => selected.includes(id))}
-            <button type="button" class="od-add-equipment--chip" class:od-add-equipment--chip-on={all} aria-pressed={all} onclick={() => toggleKit(kit.ours)}>
+            <button type="button" class="bc-add-equipment--chip" class:bc-add-equipment--chip-on={all} aria-pressed={all} onclick={() => toggleKit(kit.ours)}>
               <Icon name={all ? 'check' : 'briefcase'} size={18} />{t('gear.addSheet.kitChip', { name: kit.name, n: kit.ours.length })}
             </button>
           {/each}
@@ -91,47 +91,47 @@
       {#if groups.length}
         <GearPicker {groups} bind:selected picker warning={(g) => lateOf.get(g.id) ?? ''} />
       {:else}
-        <p class="od-add-equipment--none">{t(query.trim() ? 'gear.addSheet.noResults' : 'gear.addSheet.empty')}</p>
+        <p class="bc-add-equipment--none">{t(query.trim() ? 'gear.addSheet.noResults' : 'gear.addSheet.empty')}</p>
       {/if}
 
-      <div class="od-add-equipment--adhoc">
+      <div class="bc-add-equipment--adhoc">
         <h3>{t('gear.addSheet.adhocTitle')}</h3>
         <p>{t('gear.addSheet.adhocText')}</p>
         <TextField label={t('gear.addSheet.adhocName')} bind:value={adhocName} />
       </div>
     </div>
 
-    <div class="od-add-equipment--actions">
-      <button type="button" class="od-add-equipment--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
-      <button type="button" class="od-add-equipment--main" disabled={!canAdd} onclick={add}>{t('gear.addSheet.confirm')}</button>
+    <div class="bc-add-equipment--actions">
+      <button type="button" class="bc-add-equipment--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
+      <button type="button" class="bc-add-equipment--main" disabled={!canAdd} onclick={add}>{t('gear.addSheet.confirm')}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-add-equipment) {
-      --f7-sheet-bg-color: var(--od-drawer);
+    :global(.sheet-modal.bc-add-equipment) {
+      --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
       max-height: 90%;
       border-radius: 28px 28px 0 0;
     }
 
-    .od-add-equipment--content {
+    .bc-add-equipment--content {
       display: flex;
       flex-direction: column;
       max-height: 90vh;
-      padding: 20px 0 calc(12px + var(--od-safe-bottom));
+      padding: 20px 0 calc(12px + var(--bc-safe-bottom));
     }
 
-    .od-add-equipment--title {
+    .bc-add-equipment--title {
       margin: 0 24px 12px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
     }
 
-    .od-add-equipment--search {
+    .bc-add-equipment--search {
       margin: 0 16px;
       height: 48px;
       padding: 0 16px;
@@ -139,74 +139,74 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface-2);
-      color: var(--od-text-2);
+      background: var(--bc-surface-2);
+      color: var(--bc-text-2);
 
       input {
         flex: 1;
         min-width: 0;
         border: none;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
         outline: none;
       }
     }
 
-    .od-add-equipment--scroll {
+    .bc-add-equipment--scroll {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
     }
 
-    .od-add-equipment--group {
+    .bc-add-equipment--group {
       margin: 16px 16px 4px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-add-equipment--chips {
+    .bc-add-equipment--chips {
       padding: 0 16px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .od-add-equipment--chip {
+    .bc-add-equipment--chip {
       width: auto;
       height: 40px;
       padding: 0 14px 0 10px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-add-equipment--chip-on {
+    .bc-add-equipment--chip-on {
       border-color: transparent;
-      background: var(--od-selected-container);
+      background: var(--bc-selected-container);
     }
 
-    .od-add-equipment--none {
+    .bc-add-equipment--none {
       margin: 24px 24px 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-add-equipment--adhoc {
+    .bc-add-equipment--adhoc {
       margin: 20px 16px 8px;
       padding: 16px 0 8px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       h3 {
         margin: 0 16px;
@@ -219,36 +219,36 @@
         margin: 2px 16px 8px;
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-add-equipment--actions {
+    .bc-add-equipment--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
       padding: 8px 16px 0;
     }
 
-    .od-add-equipment--text,
-    .od-add-equipment--main {
+    .bc-add-equipment--text,
+    .bc-add-equipment--main {
       height: 40px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-add-equipment--main {
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+    .bc-add-equipment--main {
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-add-equipment--main:disabled {
+    .bc-add-equipment--main:disabled {
       opacity: 0.38;
     }
   }

@@ -170,18 +170,18 @@
 </script>
 
 {#snippet slot(/** @type {'front'|'back'} */ side)}
-  <div class="od-cert-edit--slot">
+  <div class="bc-cert-edit--slot">
     {#if photos[side].url}
-      <div class="od-cert-edit--slot-thumb"><img src={photos[side].url} alt="" />{#if busy[side]}<PhotoBusy />{/if}</div>
-      <button type="button" class="od-cert-edit--slot-remove" onclick={() => remove(side)} aria-label={t('diverProfile.cert.photoRemove')}><Icon name="close" size={18} /></button>
-      <span class="od-cert-edit--slot-caption">
+      <div class="bc-cert-edit--slot-thumb"><img src={photos[side].url} alt="" />{#if busy[side]}<PhotoBusy />{/if}</div>
+      <button type="button" class="bc-cert-edit--slot-remove" onclick={() => remove(side)} aria-label={t('diverProfile.cert.photoRemove')}><Icon name="close" size={18} /></button>
+      <span class="bc-cert-edit--slot-caption">
         <span>{side === 'front' ? t('diverProfile.cert.sideFront') : t('diverProfile.cert.sideBack')}</span>
-        <button type="button" class="od-cert-edit--slot-replace" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>{t('diverProfile.cert.photoReplace')}</button>
+        <button type="button" class="bc-cert-edit--slot-replace" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>{t('diverProfile.cert.photoReplace')}</button>
       </span>
     {:else}
-      <button type="button" class="od-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>
+      <button type="button" class="bc-cert-edit--slot-button" onclick={() => pick(side)} disabled={gear.readOnly || busy[side]}>
         <Icon name="camera" size={28} weight={1.6} />
-        <span class="od-cert-edit--slot-label">{side === 'front' ? t('diverProfile.cert.photoFront') : t('diverProfile.cert.photoBack')}</span>
+        <span class="bc-cert-edit--slot-label">{side === 'front' ? t('diverProfile.cert.photoFront') : t('diverProfile.cert.photoBack')}</span>
         {#if busy[side]}<PhotoBusy />{/if}
       </button>
     {/if}
@@ -192,13 +192,13 @@
 
   <ReadOnlyNotice />
 
-  <div class="od-cert-edit--slots">
+  <div class="bc-cert-edit--slots">
     {@render slot('front')}
     {@render slot('back')}
   </div>
-  <p class="od-cert-edit--hint">{t('diverProfile.cert.photoHint')}</p>
+  <p class="bc-cert-edit--hint">{t('diverProfile.cert.photoHint')}</p>
 
-  <div class="od-cert-edit--fields">
+  <div class="bc-cert-edit--fields">
     <ComboField label={t('diverProfile.cert.agency')} bind:value={agencyText} options={agencyOptions.map((o) => o.label)} supporting={mark('agency', agencyText)} />
     <ComboField label={t('diverProfile.cert.level')} bind:value={level} options={suggestions} supporting={mark('level', level)} />
     <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
@@ -206,19 +206,19 @@
     <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={mark('instructor', instructor) || t('diverProfile.cert.instructorHint')} />
     <SwitchField label={t('diverProfile.cert.instructorCert')} bind:checked={instructorCert} supporting={t('diverProfile.cert.instructorCertText')} />
   </div>
-  <div class="od-cert-edit--bottom"></div>
+  <div class="bc-cert-edit--bottom"></div>
 {/snippet}
 
-<Page class="od-cert-edit">
+<Page class="bc-cert-edit">
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.cert.close')}</span>
+        <Icon name="close" /><span class="bc-sr-only">{t('diverProfile.cert.close')}</span>
       </a>
     {/snippet}
     {#snippet title()}{id ? t('diverProfile.cert.edit') : t('diverProfile.cert.new')}{/snippet}
     {#snippet right()}
-      <button type="button" class="od-cert-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.cert.save')}</button>
+      <button type="button" class="bc-cert-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.cert.save')}</button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -235,46 +235,46 @@
 
 <style>
   @layer od.components {
-    :global(.od-cert-edit .page-content) {
+    :global(.bc-cert-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-cert-edit--save {
+    .bc-cert-edit--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-cert-edit--save:disabled {
+    .bc-cert-edit--save:disabled {
       opacity: 0.38;
     }
 
-    .od-cert-edit--slots {
+    .bc-cert-edit--slots {
       margin: 8px 16px 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    .od-cert-edit--slot {
+    .bc-cert-edit--slot {
       position: relative;
     }
 
-    .od-cert-edit--slot-button {
+    .bc-cert-edit--slot-button {
       position: relative;
       width: 100%;
       aspect-ratio: 85.6 / 54;
-      border: 1.5px dashed var(--od-release-field-border);
+      border: 1.5px dashed var(--bc-release-field-border);
       border-radius: 16px;
-      background: var(--od-surface);
-      color: var(--od-text-2);
+      background: var(--bc-surface);
+      color: var(--bc-text-2);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -284,7 +284,7 @@
       font: inherit;
     }
 
-    .od-cert-edit--slot-thumb {
+    .bc-cert-edit--slot-thumb {
       position: relative;
       aspect-ratio: 85.6 / 54;
       border-radius: 12px;
@@ -292,38 +292,38 @@
       box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
     }
 
-    .od-cert-edit--slot-thumb img {
+    .bc-cert-edit--slot-thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .od-cert-edit--slot-caption {
+    .bc-cert-edit--slot-caption {
       margin-top: 6px;
       display: flex;
       justify-content: space-between;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-cert-edit--slot-replace {
+    .bc-cert-edit--slot-replace {
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-primary);
+      color: var(--bc-primary);
       font: inherit;
       font-weight: 600;
     }
 
-    .od-cert-edit--slot-label {
+    .bc-cert-edit--slot-label {
       position: relative;
       font-size: 13px;
       line-height: 18px;
       font-weight: 500;
     }
 
-    .od-cert-edit--slot-remove {
+    .bc-cert-edit--slot-remove {
       position: absolute;
       top: 6px;
       inset-inline-end: 6px;
@@ -331,26 +331,26 @@
       height: 32px;
       border: none;
       border-radius: 16px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-cert-edit--hint {
+    .bc-cert-edit--hint {
       margin: 8px 32px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The switch sits on the margin of the text fields (16 dp page + 16 dp field). */
-    .od-cert-edit--fields > :global(.od-switch-field) {
+    .bc-cert-edit--fields > :global(.bc-switch-field) {
       margin-inline: 16px;
     }
 
-    .od-cert-edit--fields {
+    .bc-cert-edit--fields {
       margin-top: 16px;
       padding: 0 16px;
       display: flex;
@@ -358,7 +358,7 @@
       gap: 12px;
     }
 
-    .od-cert-edit--bottom {
+    .bc-cert-edit--bottom {
       height: 48px;
     }
   }

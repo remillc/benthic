@@ -241,7 +241,7 @@
       layout.desktop &&
       navigation.section === 'sites' &&
       !moreAt &&
-      !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in, .od-site-chooser') &&
+      !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in, .bc-site-chooser') &&
       !!pageEl?.closest('.page-current')
     );
   }
@@ -351,63 +351,63 @@
   }
 </script>
 
-<Page class="od-desktop-sites" pageContent={false}>
-  <div class="od-desktop-sites--frame" bind:this={pageEl}>
-    <header class="od-desktop-sites--bar">
-      <div class="od-desktop-sites--titles">
-        <h1 class="od-desktop-sites--title">{t('sites.title')}</h1>
-        {#if summary}<p class="od-desktop-sites--summary od-value" title={summary} role="status">{summary}</p>{/if}
+<Page class="bc-desktop-sites" pageContent={false}>
+  <div class="bc-desktop-sites--frame" bind:this={pageEl}>
+    <header class="bc-desktop-sites--bar">
+      <div class="bc-desktop-sites--titles">
+        <h1 class="bc-desktop-sites--title">{t('sites.title')}</h1>
+        {#if summary}<p class="bc-desktop-sites--summary bc-value" title={summary} role="status">{summary}</p>{/if}
       </div>
-      <label class="od-desktop-sites--search">
+      <label class="bc-desktop-sites--search">
         <Icon name="search" size={20} />
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('sites.search')} spellcheck="false" aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} autocomplete="off" />
-        {#if !query}<kbd class="od-desktop-sites--hint">{mod}F</kbd>{/if}
+        {#if !query}<kbd class="bc-desktop-sites--hint">{mod}F</kbd>{/if}
       </label>
-      <button type="button" class="od-desktop-sites--outlined" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
+      <button type="button" class="bc-desktop-sites--outlined" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
         <Icon name="plus" size={20} />{t('sites.newSite')}
       </button>
-      <button type="button" class="od-desktop-sites--icon-button" aria-label={t('desktopSites.moreSites')} title={t('desktopSites.moreSites')} aria-haspopup="menu" onclick={openMore}>
+      <button type="button" class="bc-desktop-sites--icon-button" aria-label={t('desktopSites.moreSites')} title={t('desktopSites.moreSites')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
     </header>
 
-    <div class="od-desktop-sites--body" bind:this={bodyEl}>
-      <div class="od-desktop-sites--list" style:width="{deskSites.width}px">
+    <div class="bc-desktop-sites--body" bind:this={bodyEl}>
+      <div class="bc-desktop-sites--list" style:width="{deskSites.width}px">
         <!-- The bars never scroll: the list below is the only part that does (task 175). -->
         {#if bars.without}
-          <div class="od-desktop-sites--todo" class:od-desktop-sites--active={pane === 'without'} role="status">
-            <svg class="od-desktop-sites--todo-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM10 9l4 4M14 9l-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            <span class="od-desktop-sites--todo-text">{t('desktopSites.withoutBar', { n: bars.without.count })}</span>
-            <button type="button" class="od-desktop-sites--link" aria-pressed={pane === 'without'} onclick={showWithout}>{t('desktopSites.findThem')}</button>
+          <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'without'} role="status">
+            <svg class="bc-desktop-sites--todo-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM10 9l4 4M14 9l-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="bc-desktop-sites--todo-text">{t('desktopSites.withoutBar', { n: bars.without.count })}</span>
+            <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'without'} onclick={showWithout}>{t('desktopSites.findThem')}</button>
           </div>
         {/if}
         {#if bars.cleanup}
-          <div class="od-desktop-sites--todo" class:od-desktop-sites--active={pane === 'cleanup'} role="status">
+          <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'cleanup'} role="status">
             <Icon name="delete" size={18} />
-            <span class="od-desktop-sites--todo-text">{[bars.cleanup.duplicates ? t('sites.duplicatesCount', { n: bars.cleanup.duplicates }) : '', bars.cleanup.unused ? t('sites.unusedCount', { n: bars.cleanup.unused }) : ''].filter(Boolean).join(' · ')}</span>
-            <button type="button" class="od-desktop-sites--link" aria-pressed={pane === 'cleanup'} onclick={showCleanup}>{t('desktopSites.cleanUp')}</button>
+            <span class="bc-desktop-sites--todo-text">{[bars.cleanup.duplicates ? t('sites.duplicatesCount', { n: bars.cleanup.duplicates }) : '', bars.cleanup.unused ? t('sites.unusedCount', { n: bars.cleanup.unused }) : ''].filter(Boolean).join(' · ')}</span>
+            <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'cleanup'} onclick={showCleanup}>{t('desktopSites.cleanUp')}</button>
           </div>
         {/if}
-        {#if typed}<p class="od-desktop-sites--search-note">{t('desktopSites.searchNote')}</p>{/if}
+        {#if typed}<p class="bc-desktop-sites--search-note">{t('desktopSites.searchNote')}</p>{/if}
 
         {#if !loaded}
-          <p class="od-desktop-sites--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
+          <p class="bc-desktop-sites--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
         {:else if !sites.length}
-          <div class="od-desktop-sites--state">
-            <h2 class="od-state-title">{t('desktopSites.emptyTitle')}</h2>
+          <div class="bc-desktop-sites--state">
+            <h2 class="bc-state-title">{t('desktopSites.emptyTitle')}</h2>
             <p>{t('desktopSites.emptyText')}</p>
           </div>
         {:else}
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-          <div class="od-desktop-sites--scroll" data-od-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
-            <table class="od-desktop-sites--table" aria-rowcount={rows.length} aria-label={t('sites.listLabel')}>
+          <div class="bc-desktop-sites--scroll" data-od-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
+            <table class="bc-desktop-sites--table" aria-rowcount={rows.length} aria-label={t('sites.listLabel')}>
               <thead>
                 <tr>
                   {#each SITE_COLUMNS as column (column.key)}
                     {@const sortedHere = deskSites.sort.key === column.key}
-                    <th scope="col" class="od-desktop-sites--head" class:od-desktop-sites--numeric={column.numeric} aria-sort={sortedHere ? (deskSites.sort.descending ? 'descending' : 'ascending') : 'none'}>
+                    <th scope="col" class="bc-desktop-sites--head" class:bc-desktop-sites--numeric={column.numeric} aria-sort={sortedHere ? (deskSites.sort.descending ? 'descending' : 'ascending') : 'none'}>
                       <button type="button" onclick={() => setSitesSort(nextSort(deskSites.sort, column.key))}>
-                        {t(column.label)}{#if sortedHere}<span class="od-desktop-sites--arrow" aria-hidden="true">{deskSites.sort.descending ? '▴' : '▾'}</span>{/if}
+                        {t(column.label)}{#if sortedHere}<span class="bc-desktop-sites--arrow" aria-hidden="true">{deskSites.sort.descending ? '▴' : '▾'}</span>{/if}
                       </button>
                     </th>
                   {/each}
@@ -416,63 +416,63 @@
               <tbody>
                 {#each rows as site (site.uuid)}
                   <tr
-                    class="od-desktop-sites--row"
-                    class:od-desktop-sites--selected={sel.selected === site.uuid}
+                    class="bc-desktop-sites--row"
+                    class:bc-desktop-sites--selected={sel.selected === site.uuid}
                     aria-selected={sel.selected === site.uuid}
                     data-site={site.uuid}
                     onclick={() => select({ type: 'row' }, site.uuid)}
                   >
-                    <td class="od-desktop-sites--site">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="od-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}<span class="od-desktop-sites--muted">{t('sites.noName')}</span>{/if}</td>
-                    <td class="od-desktop-sites--country">{#each highlightParts(site.country, typed ? query : '') as part}{#if part.match}<mark class="od-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</td>
-                    <td class="od-desktop-sites--numeric od-value">{site.dives}</td>
-                    <td class="od-desktop-sites--last od-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</td>
+                    <td class="bc-desktop-sites--site">{#if site.name}{#each highlightParts(site.name, typed ? query : '') as part}{#if part.match}<mark class="bc-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}<span class="bc-desktop-sites--muted">{t('sites.noName')}</span>{/if}</td>
+                    <td class="bc-desktop-sites--country">{#each highlightParts(site.country, typed ? query : '') as part}{#if part.match}<mark class="bc-desktop-sites--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</td>
+                    <td class="bc-desktop-sites--numeric bc-value">{site.dives}</td>
+                    <td class="bc-desktop-sites--last bc-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
-            {#if !rows.length}<p class="od-desktop-sites--state" role="status">{t('sites.noMatch')}</p>{/if}
+            {#if !rows.length}<p class="bc-desktop-sites--state" role="status">{t('sites.noMatch')}</p>{/if}
           </div>
         {/if}
       </div>
 
-      <div class="od-desktop-sites--handle" role="separator" aria-orientation="vertical" aria-label={t('desktopSites.resize')} aria-valuenow={deskSites.width} tabindex="0" onpointerdown={startResize} onkeydown={resizeKey}>
-        <span class="od-desktop-sites--grip"></span>
+      <div class="bc-desktop-sites--handle" role="separator" aria-orientation="vertical" aria-label={t('desktopSites.resize')} aria-valuenow={deskSites.width} tabindex="0" onpointerdown={startResize} onkeydown={resizeKey}>
+        <span class="bc-desktop-sites--grip"></span>
       </div>
 
-      <div class="od-desktop-sites--right">
+      <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
-        <div class="od-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
+        <div class="bc-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
           <DesktopSiteMap sites={sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} onselect={(uuid) => select({ type: 'pin' }, uuid)} onclear={() => select({ type: 'clear' })}>
             {#snippet overlay()}
               {#if selectedSite}
-                <div class="od-desktop-sites--card">
-                  <div class="od-desktop-sites--card-text">
-                    <h2 class="od-desktop-sites--card-title">{selectedSite.name || t('sites.noName')}</h2>
-                    <p class="od-desktop-sites--card-line od-value">{cardLine(selectedSite)}</p>
+                <div class="bc-desktop-sites--card">
+                  <div class="bc-desktop-sites--card-text">
+                    <h2 class="bc-desktop-sites--card-title">{selectedSite.name || t('sites.noName')}</h2>
+                    <p class="bc-desktop-sites--card-line bc-value">{cardLine(selectedSite)}</p>
                   </div>
-                  <button type="button" class="od-desktop-sites--outlined" onclick={() => select({ type: 'edit' })}>{t('desktopSites.modify')}</button>
-                  <button type="button" class="od-desktop-sites--filled" onclick={() => showSiteDives(selectedSite?.name ?? '')}>{t('desktopSites.seeDives')}</button>
+                  <button type="button" class="bc-desktop-sites--outlined" onclick={() => select({ type: 'edit' })}>{t('desktopSites.modify')}</button>
+                  <button type="button" class="bc-desktop-sites--filled" onclick={() => showSiteDives(selectedSite?.name ?? '')}>{t('desktopSites.seeDives')}</button>
                 </div>
               {/if}
             {/snippet}
           </DesktopSiteMap>
         </div>
         {#if pane === 'sites' && sel.mode === 'sheet' && sel.selected !== null}
-          <div class="od-desktop-sites--pane">
+          <div class="bc-desktop-sites--pane">
             {#key sel.selected}
               <DesktopSiteSheet bind:this={sheet} uuid={sel.selected} {sites} ondeleted={() => select({ type: 'clear' })} />
             {/key}
           </div>
         {:else if pane === 'new'}
-          <div class="od-desktop-sites--pane">
+          <div class="bc-desktop-sites--pane">
             <DesktopSiteNew {sites} at={newFor?.at ?? null} oncreated={created} onuse={useExisting} oncancel={cancelNew} />
           </div>
         {:else if pane === 'without'}
-          <div class="od-desktop-sites--pane">
+          <div class="bc-desktop-sites--pane">
             <DesktopSitesWithout dives={without} {sites} onnew={(d) => newSite({ id: d.id, at: d.latUdeg !== undefined && d.lonUdeg !== undefined ? { latUdeg: d.latUdeg, lonUdeg: d.lonUdeg } : null })} />
           </div>
         {:else if pane === 'cleanup'}
-          <div class="od-desktop-sites--pane">
+          <div class="bc-desktop-sites--pane">
             <DesktopSitesCleanup {pairs} {unused} />
           </div>
         {/if}
@@ -487,45 +487,45 @@
 
 <style>
   @layer od.components {
-    .od-desktop-sites--frame {
+    .bc-desktop-sites--frame {
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
-    .od-desktop-sites--bar {
+    .bc-desktop-sites--bar {
       display: flex;
       align-items: center;
       gap: 12px;
       min-height: 64px;
       padding: 8px 8px 8px 12px;
     }
-    .od-desktop-sites--titles {
+    .bc-desktop-sites--titles {
       flex: 1 1 auto;
       min-width: 140px;
       display: flex;
       align-items: baseline;
       gap: 16px;
     }
-    .od-desktop-sites--title {
+    .bc-desktop-sites--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-sites--summary {
+    .bc-desktop-sites--summary {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-desktop-sites--title {
+    .bc-desktop-sites--title {
       flex: none;
     }
-    .od-desktop-sites--search {
+    .bc-desktop-sites--search {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -535,32 +535,32 @@
       padding: 0 12px 0 16px;
       border: 2px solid transparent;
       border-radius: 22px;
-      background: var(--od-surface-container);
-      color: var(--od-text-2);
+      background: var(--bc-surface-container);
+      color: var(--bc-text-2);
     }
-    .od-desktop-sites--search:focus-within {
-      border-color: var(--od-secondary);
-      background: var(--od-surface);
+    .bc-desktop-sites--search:focus-within {
+      border-color: var(--bc-secondary);
+      background: var(--bc-surface);
     }
-    .od-desktop-sites--search input {
+    .bc-desktop-sites--search input {
       flex: 1;
       min-width: 0;
       border: 0;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       outline: none;
     }
-    .od-desktop-sites--hint {
+    .bc-desktop-sites--hint {
       padding: 1px 6px;
-      border: 1px solid var(--od-separator);
+      border: 1px solid var(--bc-separator);
       border-radius: 4px;
       font: inherit;
       font-size: 11px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-sites--icon-button {
+    .bc-desktop-sites--icon-button {
       display: grid;
       place-items: center;
       width: 44px;
@@ -568,14 +568,14 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-sites--icon-button:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-sites--icon-button:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-sites--outlined,
-    .od-desktop-sites--filled {
+    .bc-desktop-sites--outlined,
+    .bc-desktop-sites--filled {
       flex: none;
       width: auto;
       display: inline-flex;
@@ -588,27 +588,27 @@
       font-size: 15px;
       cursor: pointer;
     }
-    .od-desktop-sites--outlined {
-      border: 1px solid var(--od-outline);
+    .bc-desktop-sites--outlined {
+      border: 1px solid var(--bc-outline);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-sites--outlined:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-desktop-sites--outlined:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-desktop-sites--filled {
+    .bc-desktop-sites--filled {
       border: 0;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
     }
-    .od-desktop-sites--body {
+    .bc-desktop-sites--body {
       position: relative;
       display: flex;
       flex: 1;
       min-height: 0;
     }
     /* The list pane is a column: the bars on top never scroll, the table area alone does. */
-    .od-desktop-sites--list {
+    .bc-desktop-sites--list {
       flex: none;
       display: flex;
       flex-direction: column;
@@ -617,7 +617,7 @@
       max-width: calc(100% - 469px);
       padding: 0 8px 0 12px;
     }
-    .od-desktop-sites--todo {
+    .bc-desktop-sites--todo {
       flex: none;
       display: flex;
       align-items: center;
@@ -626,25 +626,25 @@
       margin-bottom: 8px;
       padding: 0 8px 0 12px;
       border-radius: 12px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-sites--active {
-      background: var(--od-table-selected);
-      color: var(--od-on-table-selected);
+    .bc-desktop-sites--active {
+      background: var(--bc-table-selected);
+      color: var(--bc-on-table-selected);
     }
-    .od-desktop-sites--todo-icon {
+    .bc-desktop-sites--todo-icon {
       flex: none;
     }
-    .od-desktop-sites--todo-text {
+    .bc-desktop-sites--todo-text {
       flex: 1;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-desktop-sites--link {
+    .bc-desktop-sites--link {
       flex: none;
       width: auto;
       height: 32px;
@@ -655,45 +655,45 @@
       font: inherit;
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       cursor: pointer;
     }
-    .od-desktop-sites--link:hover {
-      background: color-mix(in srgb, var(--od-secondary) 10%, transparent);
+    .bc-desktop-sites--link:hover {
+      background: color-mix(in srgb, var(--bc-secondary) 10%, transparent);
     }
-    .od-desktop-sites--search-note {
+    .bc-desktop-sites--search-note {
       flex: none;
       margin: 0 0 4px;
       padding: 0 4px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-sites--scroll {
+    .bc-desktop-sites--scroll {
       flex: 1;
       min-height: 0;
       overflow: auto;
     }
-    .od-desktop-sites--table {
+    .bc-desktop-sites--table {
       width: 100%;
       table-layout: fixed;
       border-collapse: collapse;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-sites--head {
+    .bc-desktop-sites--head {
       position: sticky;
       top: 0;
       z-index: 1;
       height: 40px;
       padding: 0;
-      background: var(--od-background);
-      border-bottom: 1px solid var(--od-separator);
+      background: var(--bc-background);
+      border-bottom: 1px solid var(--bc-separator);
       font-size: 13px;
       font-weight: 500;
       text-align: start;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-sites--head button {
+    .bc-desktop-sites--head button {
       width: 100%;
       height: 100%;
       padding: 0 12px;
@@ -705,77 +705,77 @@
       white-space: nowrap;
       cursor: pointer;
     }
-    .od-desktop-sites--head button:hover {
-      color: var(--od-text);
+    .bc-desktop-sites--head button:hover {
+      color: var(--bc-text);
     }
-    .od-desktop-sites--head:nth-child(2) {
+    .bc-desktop-sites--head:nth-child(2) {
       width: 27%;
     }
-    .od-desktop-sites--head:nth-child(3) {
+    .bc-desktop-sites--head:nth-child(3) {
       width: 96px;
     }
-    .od-desktop-sites--head:nth-child(4) {
+    .bc-desktop-sites--head:nth-child(4) {
       width: 124px;
     }
-    .od-desktop-sites--arrow {
+    .bc-desktop-sites--arrow {
       margin-inline-start: 4px;
     }
-    .od-desktop-sites--numeric {
+    .bc-desktop-sites--numeric {
       text-align: end;
       font-variant-numeric: tabular-nums;
     }
-    .od-desktop-sites--row {
+    .bc-desktop-sites--row {
       height: 44px;
-      border-bottom: 1px solid var(--od-row-divider);
+      border-bottom: 1px solid var(--bc-row-divider);
       cursor: pointer;
     }
-    .od-desktop-sites--row td {
+    .bc-desktop-sites--row td {
       padding: 0 12px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 240px;
     }
-    .od-desktop-sites--row:hover {
-      background: color-mix(in srgb, var(--od-text) 4%, transparent);
+    .bc-desktop-sites--row:hover {
+      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
     }
-    .od-desktop-sites--selected,
-    .od-desktop-sites--selected:hover {
-      background: var(--od-table-selected);
-      color: var(--od-on-table-selected);
+    .bc-desktop-sites--selected,
+    .bc-desktop-sites--selected:hover {
+      background: var(--bc-table-selected);
+      color: var(--bc-on-table-selected);
     }
-    .od-desktop-sites--selected .od-desktop-sites--site {
+    .bc-desktop-sites--selected .bc-desktop-sites--site {
       font-weight: 500;
     }
-    .od-desktop-sites--muted {
-      color: var(--od-text-2);
+    .bc-desktop-sites--muted {
+      color: var(--bc-text-2);
     }
     /* The matching text: #FBE3B2 behind it. */
-    .od-desktop-sites--match {
+    .bc-desktop-sites--match {
       border-radius: 2px;
-      background: var(--od-tertiary-container);
+      background: var(--bc-tertiary-container);
       color: inherit;
     }
-    .od-desktop-sites--state {
+    .bc-desktop-sites--state {
       padding: 32px 16px;
       text-align: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
     /* 9 dp handle, a 1 dp line, a 4 × 32 dp grip, as the Carnet's. */
-    .od-desktop-sites--handle {
+    .bc-desktop-sites--handle {
       position: relative;
       flex: none;
       width: 9px;
       cursor: col-resize;
       outline: none;
     }
-    .od-desktop-sites--handle::before {
+    .bc-desktop-sites--handle::before {
       content: '';
       position: absolute;
       inset: 0 4px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
-    .od-desktop-sites--grip {
+    .bc-desktop-sites--grip {
       position: absolute;
       top: 50%;
       left: 2.5px;
@@ -783,27 +783,27 @@
       height: 32px;
       margin-top: -16px;
       border-radius: 2px;
-      background: var(--od-outline);
+      background: var(--bc-outline);
     }
-    .od-desktop-sites--handle:focus-visible .od-desktop-sites--grip,
-    .od-desktop-sites--handle:hover .od-desktop-sites--grip {
-      background: var(--od-text);
+    .bc-desktop-sites--handle:focus-visible .bc-desktop-sites--grip,
+    .bc-desktop-sites--handle:hover .bc-desktop-sites--grip {
+      background: var(--bc-text);
     }
-    .od-desktop-sites--right {
+    .bc-desktop-sites--right {
       position: relative;
       flex: 1;
       min-width: 0;
       padding: 0 16px 16px 8px;
     }
-    .od-desktop-sites--pane {
+    .bc-desktop-sites--pane {
       position: absolute;
       inset: 0 16px 16px 8px;
     }
-    .od-desktop-sites--pane[hidden] {
+    .bc-desktop-sites--pane[hidden] {
       display: none;
     }
     /* The selected site's card at the bottom of the map: white, 16 dp corners. */
-    .od-desktop-sites--card {
+    .bc-desktop-sites--card {
       position: absolute;
       z-index: 4;
       left: 12px;
@@ -814,36 +814,36 @@
       gap: 12px;
       padding: 12px 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
     }
-    .od-desktop-sites--card-text {
+    .bc-desktop-sites--card-text {
       flex: 1;
       min-width: 0;
     }
-    .od-desktop-sites--card-title {
+    .bc-desktop-sites--card-title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 20px;
       line-height: 26px;
       font-weight: 500;
     }
-    .od-desktop-sites--card-line {
+    .bc-desktop-sites--card-line {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-sites--filled {
+      .bc-desktop-sites--filled {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-sites--filled:not(:disabled):hover {
+      .bc-desktop-sites--filled:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
-      .od-desktop-sites--selected:hover td {
+      .bc-desktop-sites--selected:hover td {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }

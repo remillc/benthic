@@ -24,7 +24,7 @@ test('the Carnet shows the bar only while pulling, with the list on screen', () 
 test('Android: the wavy indicator; iPhone: the 8 pt bar; no height taken; the stages feed it', () => {
   assert.match(bar, /<LinearWavyProgress value=\{fraction\} indeterminate=\{fraction <= 0\} \{label\} \/>/);
   assert.match(bar, /:global\(\.ios\) & \{\s*height: 8px;/);
-  assert.match(bar, /\.od-pull-progress \{[^}]*height: 0;/);
+  assert.match(bar, /\.bc-pull-progress \{[^}]*height: 0;/);
   assert.match(bar, /logbook\.syncProgress\?\.fraction/);
-  assert.doesNotMatch(bar, /#[0-9a-fA-F]{3,6}\b/, 'colours are --od-* variables');
+  assert.doesNotMatch(bar, /#[0-9a-fA-F]{3,6}\b/, 'colours are --bc-* variables');
 });

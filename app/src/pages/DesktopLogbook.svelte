@@ -306,7 +306,7 @@
   /** @param {MouseEvent} e */
   async function areaMenu(e) {
     // A row, a header or a control has its own menu or none.
-    if (e.defaultPrevented || /** @type {HTMLElement} */ (e.target).closest('tr, thead, button, input, a, header, .od-desktop-logbook--handle')) return;
+    if (e.defaultPrevented || /** @type {HTMLElement} */ (e.target).closest('tr, thead, button, input, a, header, .bc-desktop-logbook--handle')) return;
     e.preventDefault();
     const { clientX: x, clientY: y } = e;
     emptyMenuAt = { x, y, canPaste: !!(await clipboardDives()) };
@@ -541,7 +541,7 @@
     const startX = e.clientX;
     const rect = th.getBoundingClientRect();
     const table = /** @type {HTMLElement} */ (th.closest('table'));
-    const scroller = /** @type {HTMLElement} */ (th.closest('.od-desktop-logbook--scroll'));
+    const scroller = /** @type {HTMLElement} */ (th.closest('.bc-desktop-logbook--scroll'));
     /** @param {PointerEvent} m */
     const move = (m) => {
       if (!dragging && Math.abs(m.clientX - startX) < 5) return;
@@ -933,85 +933,85 @@
   });
 </script>
 
-<Page class="od-desktop-logbook" pageContent={false}>
+<Page class="bc-desktop-logbook" pageContent={false}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="od-desktop-logbook--frame" bind:this={pageEl} oncontextmenu={areaMenu}>
-    <header class="od-desktop-logbook--bar">
+  <div class="bc-desktop-logbook--frame" bind:this={pageEl} oncontextmenu={areaMenu}>
+    <header class="bc-desktop-logbook--bar">
       <!-- The list column's own header (task 2026-11-15-192): the title, the count on one line under it. -->
-      <div class="od-desktop-logbook--titles">
-        {#if desktopMac}<h1 class="od-desktop-logbook--title">{t('logbook.title')}</h1>{:else}<DesktopLogbookSelector onexport={() => ((exportWhole = true), (exporting = true))} />{/if}
-        {#if summary}<p class="od-desktop-logbook--summary od-value" title={summary}>{summary}</p>{/if}
+      <div class="bc-desktop-logbook--titles">
+        {#if desktopMac}<h1 class="bc-desktop-logbook--title">{t('logbook.title')}</h1>{:else}<DesktopLogbookSelector onexport={() => ((exportWhole = true), (exporting = true))} />{/if}
+        {#if summary}<p class="bc-desktop-logbook--summary bc-value" title={summary}>{summary}</p>{/if}
       </div>
-      <label class="od-desktop-logbook--search">
+      <label class="bc-desktop-logbook--search">
         <Icon name="search" size={20} />
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('logbook.search')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} />
-        {#if !query}<kbd class="od-desktop-logbook--hint">{mod}F</kbd>{/if}
+        {#if !query}<kbd class="bc-desktop-logbook--hint">{mod}F</kbd>{/if}
       </label>
-      <div class="od-desktop-logbook--columns-anchor">
-        <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('desktop.columnsShown')} title={t('desktop.columnsShown')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>
+      <div class="bc-desktop-logbook--columns-anchor">
+        <button type="button" class="bc-desktop-logbook--icon-button" aria-label={t('desktop.columnsShown')} title={t('desktop.columnsShown')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>
           <Icon name="columns" size={22} />
         </button>
         {#if columnsOpen}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div class="od-desktop-logbook--columns-scrim" onpointerdown={() => (columnsOpen = false)}></div>
-          <div class="od-desktop-logbook--columns" role="menu" aria-label={t('desktop.columns')}>
+          <div class="bc-desktop-logbook--columns-scrim" onpointerdown={() => (columnsOpen = false)}></div>
+          <div class="bc-desktop-logbook--columns" role="menu" aria-label={t('desktop.columns')}>
             {#each COLUMNS as column (column.key)}
               {@const fixed = column.key === 'number' || column.key === 'date'}
-              <label class="od-desktop-logbook--column-choice" class:od-desktop-logbook--fixed={fixed}>
+              <label class="bc-desktop-logbook--column-choice" class:bc-desktop-logbook--fixed={fixed}>
                 <input type="checkbox" role="menuitemcheckbox" checked={columns.some((c) => c.key === column.key)} disabled={fixed} onchange={() => setColumns(toggleColumn(columns.map((c) => c.key), column.key))} />
                 {t(column.label)}
               </label>
             {/each}
-            <div class="od-desktop-logbook--columns-divider" role="separator"></div>
-            <button type="button" role="menuitem" class="od-desktop-logbook--column-choice od-desktop-logbook--columns-reset" onclick={resetColumnOrder}>{t('desktop.resetColumns')}</button>
+            <div class="bc-desktop-logbook--columns-divider" role="separator"></div>
+            <button type="button" role="menuitem" class="bc-desktop-logbook--column-choice bc-desktop-logbook--columns-reset" onclick={resetColumnOrder}>{t('desktop.resetColumns')}</button>
           </div>
         {/if}
       </div>
-      <button type="button" class="od-desktop-logbook--icon-button" aria-label={t('desktop.moreLogbook')} title={t('desktop.moreLogbook')} aria-haspopup="menu" onclick={openMore}>
+      <button type="button" class="bc-desktop-logbook--icon-button" aria-label={t('desktop.moreLogbook')} title={t('desktop.moreLogbook')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
     </header>
 
     {#if logbook.loading}
-      <p class="od-desktop-logbook--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
+      <p class="bc-desktop-logbook--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
     {:else if logbook.error}
-      <div class="od-desktop-logbook--state" role="alert">
-        <h2 class="od-state-title">{t('logbook.errorTitle')}</h2>
+      <div class="bc-desktop-logbook--state" role="alert">
+        <h2 class="bc-state-title">{t('logbook.errorTitle')}</h2>
         <p>{t('logbook.errorNothingChanged')}</p>
-        <button type="button" class="od-desktop-logbook--filled" onclick={() => loadLogbook({ force: true })}>{t('logbook.retry')}</button>
+        <button type="button" class="bc-desktop-logbook--filled" onclick={() => loadLogbook({ force: true })}>{t('logbook.retry')}</button>
       </div>
     {:else if !logbook.dives.length && ownLogbookWindow()}
       <DesktopLogbookReady ondownload={() => choose('download')} onimport={() => choose('import')} onmanual={() => choose('manual')} />
     {:else if !logbook.dives.length}
-      <div class="od-desktop-logbook--state">
-        <h2 class="od-state-title">{t('logbook.emptyTitle')}</h2>
+      <div class="bc-desktop-logbook--state">
+        <h2 class="bc-state-title">{t('logbook.emptyTitle')}</h2>
         <p>{t('logbook.emptyText')}</p>
-        <p class="od-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
+        <p class="bc-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="od-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
-        <table class="od-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
+      <div class="bc-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+        <table class="bc-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
             <tr aria-rowindex="1">
               {#each columnsNow as column (column.key)}
                 {@const sortedHere = desk.sort.key === column.key}
                 <th
                   scope="col"
-                  class="od-desktop-logbook--head"
-                  class:od-desktop-logbook--numeric={column.numeric}
+                  class="bc-desktop-logbook--head"
+                  class:bc-desktop-logbook--numeric={column.numeric}
                   data-col={column.key}
-                  class:od-desktop-logbook--slot={dragging?.key === column.key}
+                  class:bc-desktop-logbook--slot={dragging?.key === column.key}
                   aria-sort={sortedHere ? (desk.sort.descending ? 'descending' : 'ascending') : 'none'}
-                  class:od-desktop-logbook--plain={column.sortable === false}
+                  class:bc-desktop-logbook--plain={column.sortable === false}
                   style:width={desk.columnWidths[column.key] || exactWidths ? `${columnWidth(column.key, desk.columnWidths)}px` : undefined}
                   onpointerdown={(e) => headDown(e, column.key)}
                 >
                   <button type="button" onclick={() => headClick(column.key)} onkeydown={(e) => headKey(e, column.key)}>
-                    {t(column.label)}{#if sortedHere}<span class="od-desktop-logbook--arrow" aria-hidden="true">{desk.sort.descending ? '▾' : '▴'}</span>{/if}
+                    {t(column.label)}{#if sortedHere}<span class="bc-desktop-logbook--arrow" aria-hidden="true">{desk.sort.descending ? '▾' : '▴'}</span>{/if}
                   </button>
                   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                   <span
-                    class="od-desktop-logbook--edge"
+                    class="bc-desktop-logbook--edge"
                     role="separator"
                     tabindex="0"
                     aria-orientation="vertical"
@@ -1029,26 +1029,26 @@
             </tr>
             {#if yearLineShown}
               <!-- The year and dive count of the first visible dive; sticky under the header. Decorative: the rows say the rest. -->
-              <tr class="od-desktop-logbook--year-row" aria-hidden="true">
-                <th class="od-desktop-logbook--year" colspan={columnsNow.length}>
-                  {#if yearLine}<span class="od-desktop-logbook--year-title">{t('desktop.yearLine', { year: yearLine.year, dives: t('trip.dives', { n: yearLine.count }) })}</span>{/if}
+              <tr class="bc-desktop-logbook--year-row" aria-hidden="true">
+                <th class="bc-desktop-logbook--year" colspan={columnsNow.length}>
+                  {#if yearLine}<span class="bc-desktop-logbook--year-title">{t('desktop.yearLine', { year: yearLine.year, dives: t('trip.dives', { n: yearLine.count }) })}</span>{/if}
                 </th>
               </tr>
             {/if}
           </thead>
           <tbody>
-            {#if padTop}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padTop}px"></td></tr>{/if}
+            {#if padTop}<tr class="bc-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padTop}px"></td></tr>{/if}
             {#each visibleRows as row, at (row.type === 'trip' ? `t${row.id}` : `d${row.dive.id}`)}
               {#if row.type === 'trip'}
                 {@const text = tripText(row)}
-                <tr class="od-desktop-logbook--trip" class:od-desktop-logbook--folded={!row.expanded} class:od-desktop-logbook--trip-selected={desk.trip === row.id} aria-rowindex={windowStart + at + 2}>
+                <tr class="bc-desktop-logbook--trip" class:bc-desktop-logbook--folded={!row.expanded} class:bc-desktop-logbook--trip-selected={desk.trip === row.id} aria-rowindex={windowStart + at + 2}>
                   <td colspan={columnsNow.length}>
                     <button
                       type="button"
                       aria-expanded={row.expanded}
                       onclick={(e) => {
                         // The chevron folds the trip; the rest of the row opens its page beside the table (task 2026-11-19-297).
-                        if (/** @type {HTMLElement} */ (e.target).closest('.od-desktop-logbook--chevron')) desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded };
+                        if (/** @type {HTMLElement} */ (e.target).closest('.bc-desktop-logbook--chevron')) desk.collapsed = { ...desk.collapsed, [row.id]: row.expanded };
                         else desk.trip = row.id;
                       }}
                       onkeydown={(e) => {
@@ -1058,21 +1058,21 @@
                         }
                       }}
                     >
-                      <span class="od-desktop-logbook--chevron" class:od-desktop-logbook--open={row.expanded} aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-                      <span class="od-desktop-logbook--trip-icon" aria-hidden="true"><Icon name="trip" size={16} /></span>
-                      <span class="od-desktop-logbook--trip-title">{text.title}</span>
-                      <span class="od-desktop-logbook--trip-range"> · {text.range}</span>
+                      <span class="bc-desktop-logbook--chevron" class:bc-desktop-logbook--open={row.expanded} aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+                      <span class="bc-desktop-logbook--trip-icon" aria-hidden="true"><Icon name="trip" size={16} /></span>
+                      <span class="bc-desktop-logbook--trip-title">{text.title}</span>
+                      <span class="bc-desktop-logbook--trip-range"> · {text.range}</span>
                     </button>
                   </td>
                 </tr>
               {:else}
                 {@const dive = row.dive}
                 <tr
-                  class="od-desktop-logbook--row"
-                  class:od-desktop-logbook--in-trip={row.inTrip}
-                  class:od-desktop-logbook--trip-end={row.inTrip && row.last}
-                  class:od-desktop-logbook--selected={selected.has(dive.id)}
-                  class:od-desktop-logbook--focus={desk.selection.focus === dive.id}
+                  class="bc-desktop-logbook--row"
+                  class:bc-desktop-logbook--in-trip={row.inTrip}
+                  class:bc-desktop-logbook--trip-end={row.inTrip && row.last}
+                  class:bc-desktop-logbook--selected={selected.has(dive.id)}
+                  class:bc-desktop-logbook--focus={desk.selection.focus === dive.id}
                   aria-selected={selected.has(dive.id)}
                   aria-rowindex={windowStart + at + 2}
                   data-dive={dive.id}
@@ -1083,32 +1083,32 @@
                   {#each columnsNow as column (column.key)}
                     <td
                       data-col={column.key}
-                      class:od-desktop-logbook--numeric={column.numeric}
-                      class:od-desktop-logbook--strong={column.key === 'maxDepth' || column.key === 'number'}
+                      class:bc-desktop-logbook--numeric={column.numeric}
+                      class:bc-desktop-logbook--strong={column.key === 'maxDepth' || column.key === 'number'}
                     >
                       {#if column.key === 'site'}
-                        {#if dive.site}<span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="place" size={14} /></span>{dive.site}{:else}<span class="od-desktop-logbook--no-site"><span class="od-desktop-logbook--pin" aria-hidden="true"><Icon name="pinOff" size={14} /></span>{t('desktop.noSite')}</span>{/if}
+                        {#if dive.site}<span class="bc-desktop-logbook--pin" aria-hidden="true"><Icon name="place" size={14} /></span>{dive.site}{:else}<span class="bc-desktop-logbook--no-site"><span class="bc-desktop-logbook--pin" aria-hidden="true"><Icon name="pinOff" size={14} /></span>{t('desktop.noSite')}</span>{/if}
                       {:else if column.key === 'date'}
-                        {formatWeekdayDate(dive.date)}<span class="od-desktop-logbook--time">{' · ' + formatTimeOfDay(dive.date)}</span>
+                        {formatWeekdayDate(dive.date)}<span class="bc-desktop-logbook--time">{' · ' + formatTimeOfDay(dive.date)}</span>
                       {:else if column.key === 'profile'}
-                        <span class="od-desktop-logbook--profile"><ProfileThumbnail profile={dive.profile ?? []} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} wide /></span>
+                        <span class="bc-desktop-logbook--profile"><ProfileThumbnail profile={dive.profile ?? []} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} wide /></span>
                       {:else if column.key === 'buddies'}
-                        {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="od-desktop-logbook--buddy"><span class="od-desktop-logbook--initial" aria-hidden="true">{name.charAt(0).toLocaleUpperCase()}</span>{name}</span>{/each}
+                        {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="bc-desktop-logbook--buddy"><span class="bc-desktop-logbook--initial" aria-hidden="true">{name.charAt(0).toLocaleUpperCase()}</span>{name}</span>{/each}
                       {:else}{cell(column.key, dive)}{/if}
                     </td>
                   {/each}
                 </tr>
               {/if}
             {/each}
-            {#if padBottom}<tr class="od-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padBottom}px"></td></tr>{/if}
+            {#if padBottom}<tr class="bc-desktop-logbook--pad" aria-hidden="true"><td colspan={columnsNow.length} style:height="{padBottom}px"></td></tr>{/if}
           </tbody>
         </table>
-        {#if !rows.length}<p class="od-desktop-logbook--state" role="status">{t('desktop.noMatch')}</p>{/if}
+        {#if !rows.length}<p class="bc-desktop-logbook--state" role="status">{t('desktop.noMatch')}</p>{/if}
       </div>
     {/if}
 
     <div
-      class="od-desktop-logbook--handle"
+      class="bc-desktop-logbook--handle"
       role="separator"
       aria-orientation="vertical"
       aria-label={t('desktop.resize')}
@@ -1117,20 +1117,20 @@
       onpointerdown={startResize}
       onkeydown={resizeKey}
     >
-      <span class="od-desktop-logbook--grip"></span>
+      <span class="bc-desktop-logbook--grip"></span>
     </div>
 
-    {#if dropping}<div class="od-desktop-logbook--drop" aria-hidden="true"><p>{t('desktop.dropHere')}</p></div>{/if}
+    {#if dropping}<div class="bc-desktop-logbook--drop" aria-hidden="true"><p>{t('desktop.dropHere')}</p></div>{/if}
     {#if dragging}
-      <div class="od-desktop-logbook--ghost" aria-hidden="true" style:left="{dragging.x - dragging.dx}px" style:top="{dragging.y - 18}px" style:width="{dragging.width}px">
-        <span class="od-desktop-logbook--grip-dots">⠿</span>{dragging.label}
+      <div class="bc-desktop-logbook--ghost" aria-hidden="true" style:left="{dragging.x - dragging.dx}px" style:top="{dragging.y - 18}px" style:width="{dragging.width}px">
+        <span class="bc-desktop-logbook--grip-dots">⠿</span>{dragging.label}
       </div>
-      <div class="od-desktop-logbook--insert" aria-hidden="true" style:left="{dragging.barX - 1.5}px" style:top="{dragging.top}px" style:height="{dragging.height}px"></div>
+      <div class="bc-desktop-logbook--insert" aria-hidden="true" style:left="{dragging.barX - 1.5}px" style:top="{dragging.top}px" style:height="{dragging.height}px"></div>
     {/if}
-    <p class="od-sr-only" aria-live="polite">{announce}</p>
+    <p class="bc-sr-only" aria-live="polite">{announce}</p>
   </div>
 
-  <input type="file" class="od-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   {#if logbook.dives.length && !navigation.over}<FabMenu choices={addChoices} onchoose={choose} />{/if}
   {#if moreAt}
     <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
@@ -1164,41 +1164,41 @@
 
 <style>
   @layer od.components {
-    .od-desktop-logbook--frame {
+    .bc-desktop-logbook--frame {
       position: relative;
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
-    .od-desktop-logbook--bar {
+    .bc-desktop-logbook--bar {
       display: flex;
       align-items: center;
       gap: 12px;
       min-height: 64px;
       padding: 8px 8px 8px 12px;
     }
-    .od-desktop-logbook--titles {
+    .bc-desktop-logbook--titles {
       /* Fluid layout: in a narrow pane the search field gives way first, then the title. */
       flex: 1 0.2 auto;
       min-width: 0;
     }
-    .od-desktop-logbook--title {
+    .bc-desktop-logbook--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-logbook--summary {
+    .bc-desktop-logbook--summary {
       margin: 2px 0 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-desktop-logbook--search {
+    .bc-desktop-logbook--search {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -1207,28 +1207,28 @@
       height: 44px;
       padding: 0 12px 0 16px;
       border-radius: 22px;
-      background: var(--od-surface-container);
-      color: var(--od-text-2);
+      background: var(--bc-surface-container);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--search input {
+    .bc-desktop-logbook--search input {
       flex: 1;
       min-width: 0;
       border: 0;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       outline: none;
     }
-    .od-desktop-logbook--hint {
+    .bc-desktop-logbook--hint {
       padding: 1px 6px;
-      border: 1px solid var(--od-separator);
+      border: 1px solid var(--bc-separator);
       border-radius: 4px;
       font: inherit;
       font-size: 11px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--icon-button {
+    .bc-desktop-logbook--icon-button {
       display: grid;
       place-items: center;
       width: 44px;
@@ -1236,21 +1236,21 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-logbook--icon-button:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-logbook--icon-button:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-logbook--columns-anchor {
+    .bc-desktop-logbook--columns-anchor {
       position: relative;
     }
-    .od-desktop-logbook--columns-scrim {
+    .bc-desktop-logbook--columns-scrim {
       position: fixed;
       inset: 0;
       z-index: 12999;
     }
-    .od-desktop-logbook--columns {
+    .bc-desktop-logbook--columns {
       position: absolute;
       top: 48px;
       right: 0;
@@ -1258,29 +1258,29 @@
       min-width: 240px;
       padding: 8px 0;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow:
         0 2px 6px 2px rgb(0 0 0 / 0.15),
         0 1px 2px rgb(0 0 0 / 0.3);
     }
-    .od-desktop-logbook--column-choice {
+    .bc-desktop-logbook--column-choice {
       display: flex;
       align-items: center;
       gap: 12px;
       height: 40px;
       padding: 0 16px;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-logbook--column-choice:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-logbook--column-choice:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-logbook--fixed {
-      color: var(--od-text-2);
+    .bc-desktop-logbook--fixed {
+      color: var(--bc-text-2);
       cursor: default;
     }
-    .od-desktop-logbook--scroll {
+    .bc-desktop-logbook--scroll {
       flex: 1;
       overflow: auto;
       /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
@@ -1288,46 +1288,46 @@
       padding-right: 9px;
     }
     /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
-    .od-desktop-logbook--table {
+    .bc-desktop-logbook--table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0 2px;
       table-layout: fixed;
       font-size: 14px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-logbook--head {
+    .bc-desktop-logbook--head {
       position: sticky;
       top: 0;
       z-index: 1;
       height: 36px;
       padding: 0;
-      background: var(--od-background);
+      background: var(--bc-background);
       /* The 2 px between the header and the year line (or the first row) hides the rows passing under. */
-      box-shadow: 0 2px 0 var(--od-background);
+      box-shadow: 0 2px 0 var(--bc-background);
       font-size: 13px;
       font-weight: 500;
       text-align: start;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
     /* The sticky year line (task 2026-11-18-279): under the header, on the list's background; the rows pass under both. */
-    .od-desktop-logbook--year {
+    .bc-desktop-logbook--year {
       position: sticky;
       top: 38px;
       z-index: 1;
       height: 30px;
       padding: 0 10px;
-      background: var(--od-background);
-      box-shadow: 0 2px 0 var(--od-background);
+      background: var(--bc-background);
+      box-shadow: 0 2px 0 var(--bc-background);
       font-size: 13px;
       font-weight: 600;
       text-align: start;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--plain button {
+    .bc-desktop-logbook--plain button {
       cursor: default;
     }
-    .od-desktop-logbook--head button {
+    .bc-desktop-logbook--head button {
       width: 100%;
       height: 100%;
       padding: 0 10px;
@@ -1339,11 +1339,11 @@
       white-space: nowrap;
       cursor: pointer;
     }
-    .od-desktop-logbook--head button:hover {
-      color: var(--od-text);
+    .bc-desktop-logbook--head button:hover {
+      color: var(--bc-text);
     }
     /* The edge to drag (task 181): 8 px wide on the header's right side, a thin line on hover and focus. */
-    .od-desktop-logbook--edge {
+    .bc-desktop-logbook--edge {
       position: absolute;
       top: 0;
       right: 0;
@@ -1352,7 +1352,7 @@
       cursor: col-resize;
       outline: none;
     }
-    .od-desktop-logbook--edge::after {
+    .bc-desktop-logbook--edge::after {
       content: '';
       position: absolute;
       top: 8px;
@@ -1362,11 +1362,11 @@
       border-radius: 1px;
       background: transparent;
     }
-    .od-desktop-logbook--edge:hover::after,
-    .od-desktop-logbook--edge:focus-visible::after {
-      background: var(--od-outline);
+    .bc-desktop-logbook--edge:hover::after,
+    .bc-desktop-logbook--edge:focus-visible::after {
+      background: var(--bc-outline);
     }
-    .od-desktop-logbook--arrow {
+    .bc-desktop-logbook--arrow {
       margin-inline-start: 4px;
     }
     [data-col='number'] {
@@ -1393,138 +1393,138 @@
     [data-col='rating'] {
       width: 84px;
     }
-    .od-desktop-logbook--numeric {
+    .bc-desktop-logbook--numeric {
       text-align: end;
       font-variant-numeric: tabular-nums;
     }
-    .od-desktop-logbook--row {
+    .bc-desktop-logbook--row {
       height: 48px;
       cursor: pointer;
     }
-    .od-desktop-logbook--row td {
+    .bc-desktop-logbook--row td {
       padding: 0 10px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-desktop-logbook--row td:first-child {
+    .bc-desktop-logbook--row td:first-child {
       border-radius: 12px 0 0 12px;
     }
-    .od-desktop-logbook--row td:last-child {
+    .bc-desktop-logbook--row td:last-child {
       border-radius: 0 12px 12px 0;
     }
-    .od-desktop-logbook--row td[data-col='number'] {
+    .bc-desktop-logbook--row td[data-col='number'] {
       font-weight: 600;
     }
-    .od-desktop-logbook--row td[data-col='site'] {
+    .bc-desktop-logbook--row td[data-col='site'] {
       font-weight: 500;
     }
-    .od-desktop-logbook--time {
+    .bc-desktop-logbook--time {
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--profile {
+    .bc-desktop-logbook--profile {
       display: inline-flex;
       vertical-align: middle;
     }
-    .od-desktop-logbook--row:hover td {
-      background: color-mix(in srgb, var(--od-text) 4%, transparent);
+    .bc-desktop-logbook--row:hover td {
+      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
     }
     /* Selection (task 2026-11-18-279): pale blue, with the number and the site in blue. */
-    .od-desktop-logbook--selected td,
-    .od-desktop-logbook--selected:hover td {
-      background: var(--od-table-selected);
+    .bc-desktop-logbook--selected td,
+    .bc-desktop-logbook--selected:hover td {
+      background: var(--bc-table-selected);
     }
-    .od-desktop-logbook--selected td[data-col='number'],
-    .od-desktop-logbook--selected td[data-col='site'] {
-      color: var(--od-on-table-selected);
+    .bc-desktop-logbook--selected td[data-col='number'],
+    .bc-desktop-logbook--selected td[data-col='site'] {
+      color: var(--bc-on-table-selected);
     }
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-logbook--selected:hover td {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--od-on-table-selected) 8%, transparent);
+      .bc-desktop-logbook--selected:hover td {
+        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--bc-on-table-selected) 8%, transparent);
       }
-      .od-desktop-logbook--in-trip.od-desktop-logbook--selected:hover td {
+      .bc-desktop-logbook--in-trip.bc-desktop-logbook--selected:hover td {
         box-shadow:
-          inset 0 0 0 100vmax color-mix(in srgb, var(--od-on-table-selected) 8%, transparent),
-          0 2px 0 var(--od-surface);
+          inset 0 0 0 100vmax color-mix(in srgb, var(--bc-on-table-selected) 8%, transparent),
+          0 2px 0 var(--bc-surface);
       }
     }
-    .od-desktop-logbook--pin {
+    .bc-desktop-logbook--pin {
       display: inline-flex;
       vertical-align: -2px;
       margin-inline-end: 6px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--no-site {
+    .bc-desktop-logbook--no-site {
       font-style: italic;
       font-weight: 400;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--strong {
+    .bc-desktop-logbook--strong {
       font-weight: 700;
     }
     /* A trip is a white card of 20 px corners: its header, then its dives (their gaps filled in white). */
-    .od-desktop-logbook--in-trip:not(.od-desktop-logbook--selected) td {
-      background: var(--od-surface);
+    .bc-desktop-logbook--in-trip:not(.bc-desktop-logbook--selected) td {
+      background: var(--bc-surface);
     }
-    .od-desktop-logbook--in-trip td {
-      box-shadow: 0 2px 0 var(--od-surface);
+    .bc-desktop-logbook--in-trip td {
+      box-shadow: 0 2px 0 var(--bc-surface);
     }
-    .od-desktop-logbook--in-trip td:first-child,
-    .od-desktop-logbook--in-trip td:last-child {
+    .bc-desktop-logbook--in-trip td:first-child,
+    .bc-desktop-logbook--in-trip td:last-child {
       border-radius: 0;
     }
-    .od-desktop-logbook--trip-end td {
+    .bc-desktop-logbook--trip-end td {
       box-shadow: none;
     }
-    .od-desktop-logbook--trip-end td:first-child {
+    .bc-desktop-logbook--trip-end td:first-child {
       border-radius: 0 0 0 20px;
     }
-    .od-desktop-logbook--trip-end td:last-child {
+    .bc-desktop-logbook--trip-end td:last-child {
       border-radius: 0 0 20px 0;
     }
-    .od-desktop-logbook--in-trip:not(.od-desktop-logbook--selected):hover td {
-      background: color-mix(in srgb, var(--od-text) 4%, var(--od-surface));
+    .bc-desktop-logbook--in-trip:not(.bc-desktop-logbook--selected):hover td {
+      background: color-mix(in srgb, var(--bc-text) 4%, var(--bc-surface));
     }
-    .od-desktop-logbook--buddy {
+    .bc-desktop-logbook--buddy {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       margin-inline-end: 8px;
     }
-    .od-desktop-logbook--initial {
+    .bc-desktop-logbook--initial {
       display: inline-grid;
       place-items: center;
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: var(--od-buddy-badge);
-      color: var(--od-text);
+      background: var(--bc-buddy-badge);
+      color: var(--bc-text);
       font-size: 11px;
       font-weight: 600;
     }
     /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
-    .od-desktop-logbook--trip {
+    .bc-desktop-logbook--trip {
       height: 44px;
     }
-    .od-desktop-logbook--trip td {
+    .bc-desktop-logbook--trip td {
       padding: 0;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       border-radius: 20px 20px 0 0;
-      box-shadow: 0 2px 0 var(--od-surface);
+      box-shadow: 0 2px 0 var(--bc-surface);
     }
-    .od-desktop-logbook--trip-selected td {
-      background: var(--od-selected-container);
-      box-shadow: 0 2px 0 var(--od-selected-container);
+    .bc-desktop-logbook--trip-selected td {
+      background: var(--bc-selected-container);
+      box-shadow: 0 2px 0 var(--bc-selected-container);
     }
-    .od-desktop-logbook--folded td {
+    .bc-desktop-logbook--folded td {
       border-radius: 20px;
       box-shadow: none;
     }
-    .od-desktop-logbook--pad td {
+    .bc-desktop-logbook--pad td {
       padding: 0;
     }
-    .od-desktop-logbook--trip button {
+    .bc-desktop-logbook--trip button {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1535,46 +1535,46 @@
       border-radius: inherit;
       background: none;
       font: inherit;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-align: start;
       cursor: pointer;
     }
-    .od-desktop-logbook--trip-icon {
+    .bc-desktop-logbook--trip-icon {
       display: inline-flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--chevron {
+    .bc-desktop-logbook--chevron {
       display: inline-flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       transform: rotate(-90deg);
       transition: transform 150ms;
     }
-    .od-desktop-logbook--open {
+    .bc-desktop-logbook--open {
       transform: none;
     }
-    .od-desktop-logbook--trip-title {
+    .bc-desktop-logbook--trip-title {
       font-weight: 500;
     }
-    .od-desktop-logbook--trip-range {
-      color: var(--od-text-2);
+    .bc-desktop-logbook--trip-range {
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--state {
+    .bc-desktop-logbook--state {
       padding: 48px 24px;
       text-align: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--filled {
+    .bc-desktop-logbook--filled {
       height: 40px;
       padding: 0 24px;
       border: 0;
       border-radius: 20px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       cursor: pointer;
     }
     /* 9 dp handle, a 1 dp line, a 4 × 32 dp grip (task 2026-11-15-169). */
-    .od-desktop-logbook--handle {
+    .bc-desktop-logbook--handle {
       position: absolute;
       top: 64px;
       right: 0;
@@ -1583,13 +1583,13 @@
       cursor: col-resize;
       outline: none;
     }
-    .od-desktop-logbook--handle::before {
+    .bc-desktop-logbook--handle::before {
       content: '';
       position: absolute;
       inset: 0 4px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
-    .od-desktop-logbook--grip {
+    .bc-desktop-logbook--grip {
       position: absolute;
       top: 50%;
       left: 2.5px;
@@ -1597,21 +1597,21 @@
       height: 32px;
       margin-top: -16px;
       border-radius: 2px;
-      background: var(--od-outline);
+      background: var(--bc-outline);
     }
-    .od-desktop-logbook--handle:focus-visible .od-desktop-logbook--grip,
-    .od-desktop-logbook--handle:hover .od-desktop-logbook--grip {
-      background: var(--od-text);
+    .bc-desktop-logbook--handle:focus-visible .bc-desktop-logbook--grip,
+    .bc-desktop-logbook--handle:hover .bc-desktop-logbook--grip {
+      background: var(--bc-text);
     }
     /* Moving a column (task 181): the slot it leaves, the floating header, the insertion bar. */
-    .od-desktop-logbook--head {
+    .bc-desktop-logbook--head {
       user-select: none;
     }
-    .od-desktop-logbook--slot {
-      background: var(--od-trip-band);
+    .bc-desktop-logbook--slot {
+      background: var(--bc-trip-band);
       color: transparent;
     }
-    .od-desktop-logbook--ghost {
+    .bc-desktop-logbook--ghost {
       position: fixed;
       z-index: 14000;
       display: flex;
@@ -1620,25 +1620,25 @@
       height: 36px;
       padding: 0 10px;
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
       transform: rotate(-2deg);
       font-size: 13px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       pointer-events: none;
     }
-    .od-desktop-logbook--grip-dots {
-      color: var(--od-text-2);
+    .bc-desktop-logbook--grip-dots {
+      color: var(--bc-text-2);
     }
-    .od-desktop-logbook--insert {
+    .bc-desktop-logbook--insert {
       position: fixed;
       z-index: 13999;
       width: 3px;
-      background: var(--od-on-table-selected);
+      background: var(--bc-on-table-selected);
       pointer-events: none;
     }
-    .od-desktop-logbook--insert::before {
+    .bc-desktop-logbook--insert::before {
       content: '';
       position: absolute;
       top: 0;
@@ -1646,47 +1646,47 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: var(--od-on-table-selected);
+      background: var(--bc-on-table-selected);
     }
-    .od-desktop-logbook--columns-divider {
+    .bc-desktop-logbook--columns-divider {
       height: 1px;
       margin: 8px 0;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
-    .od-desktop-logbook--columns-reset {
+    .bc-desktop-logbook--columns-reset {
       width: 100%;
       border: 0;
       background: none;
       font: inherit;
       text-align: start;
     }
-    .od-desktop-logbook--drop {
+    .bc-desktop-logbook--drop {
       position: fixed;
       inset: 0;
       z-index: 12000;
       display: grid;
       place-items: center;
-      background: color-mix(in srgb, var(--od-background) 85%, transparent);
-      border: 3px dashed var(--od-selected);
+      background: color-mix(in srgb, var(--bc-background) 85%, transparent);
+      border: 3px dashed var(--bc-selected);
       font-size: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
       pointer-events: none;
     }
-    .od-desktop-logbook--drop-note {
+    .bc-desktop-logbook--drop-note {
       font-size: 14px;
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-logbook--trip button {
+      .bc-desktop-logbook--trip button {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-logbook--trip button:not(:disabled):hover {
+      .bc-desktop-logbook--trip button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-desktop-logbook--trip button {
+      .bc-desktop-logbook--trip button {
         transition: none;
       }
     }

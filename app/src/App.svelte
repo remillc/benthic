@@ -350,9 +350,9 @@
     theme: ios ? 'ios' : 'md',
     // Settings, Display, Theme: the device's, or light or dark.
     darkMode: settings.theme === 'system' ? 'auto' : settings.theme === 'dark',
-    // Framework7 derives its palette from --od-action (theme.css); the mapped
+    // Framework7 derives its palette from --bc-action (theme.css); the mapped
     // variables in theme.css then take precedence.
-    colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim() },
+    colors: { primary: getComputedStyle(document.documentElement).getPropertyValue('--bc-action').trim() },
     // A fingertip tap moves a little: past 5 px (Framework7's default) the tap
     // was dropped, so a button or a menu entry did nothing now and then.
     touch: { touchClicksDistanceThreshold: TAP_SLOP },
@@ -395,8 +395,8 @@
 
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
-    document.documentElement.classList.toggle('od-bottom-nav-on', bottomNav() && navigation.atRoot);
-    document.documentElement.classList.toggle('od-bottom-nav', bottomNav());
+    document.documentElement.classList.toggle('bc-bottom-nav-on', bottomNav() && navigation.atRoot);
+    document.documentElement.classList.toggle('bc-bottom-nav', bottomNav());
   });
 
   // The Mac's menu item « Mon profil de plongeur… » is on while the diver has OpenDives+; the separate profile window
@@ -500,7 +500,7 @@
   <!-- Desktop: a window with no logbook shows its start screen. The release edition shows « Pour commencer » (task 2026-11-16-228); the new-logbook dialog opens from the selector and the menu bar (task 2026-11-15-173). -->
   {#if desktopApp && noLogbook}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
   {#if desktopApp && logbooks.dialog}{#await import('./components/DesktopNewLogbook.svelte') then { default: DesktopNewLogbook }}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/await}{/if}
-  <Views tabs class="safe-areas {layout.rail ? 'od-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --od-no-dive: '{t('tablet.noDive')}'">
+  <Views tabs class="safe-areas {layout.rail ? 'bc-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --bc-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
     <View
@@ -509,7 +509,7 @@
       url="/statistics/"
       routes={statisticsRoutes}
       masterDetailBreakpoint={splitBreakpoint}
-      style="--f7-page-master-width: {statisticsListWidth}px; --od-no-dive: '{t('tablet.noStatistic')}'"
+      style="--f7-page-master-width: {statisticsListWidth}px; --bc-no-dive: '{t('tablet.noStatistic')}'"
     />
     <View id="view-tools" tab url="/tools/" />
     <View id="view-account" tab url="/account" routes={accountRoutes} masterDetailBreakpoint={splitBreakpoint} />
@@ -520,87 +520,87 @@
 <style>
   @layer od.components {
     /* Tablet: the views leave room for the sidebar or the rail (NavRail.svelte). */
-    :global(.views.od-tablet) {
+    :global(.views.bc-tablet) {
       /* The rail or sidebar takes the left safe area (camera cut-out in
          landscape): the pages beside it must not add it again. */
       --f7-safe-area-left: 0px;
-      margin-left: calc(var(--od-nav-width) + var(--od-safe-left));
-      width: calc(100% - var(--od-nav-width) - var(--od-safe-left));
+      margin-left: calc(var(--bc-nav-width) + var(--bc-safe-left));
+      width: calc(100% - var(--bc-nav-width) - var(--bc-safe-left));
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */
     /* Adaptive pages: the desktop layout of a master route fills the view, with no list column's width or border. */
-    :global(.view-master-detail .page-master:is(.od-desktop-statistics, .od-desktop-settings)) {
+    :global(.view-master-detail .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) {
       width: 100%;
       border-right: 0;
     }
     /* ... and no detail pane or empty-pane notice beside it (a detail opened in the tablet layout comes back when the window narrows). */
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail:is(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection)),
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings))::after) {
+    :global(.view-master-detail:has(> .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) > .page-master-detail:is(.bc-settings, .bc-statistics-result, .bc-statistics-dives, .bc-pane-empty, .bc-dive-detail, .bc-desktop-selection)),
+    :global(.view-master-detail:has(> .page-master:is(.bc-desktop-statistics, .bc-desktop-settings))::after) {
       display: none;
     }
     /* A screen opened over the section (the profile, an equipment piece, About's pages) is a detail page to Framework7 too:
        over the full-width desktop page it takes the whole view. Hidden, it measured 0 wide (bug of 19 November 2026). */
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection)) {
+    :global(.view-master-detail:has(> .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) > .page-master-detail:not(.bc-settings, .bc-statistics-result, .bc-statistics-dives, .bc-pane-empty, .bc-dive-detail, .bc-desktop-selection)) {
       inset: 0;
       width: 100%;
       z-index: 1000;
     }
     /* ... and it is not a pane's first screen: its Back button stays (nothing else leads back to the page under it). */
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail-root:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection) .navbar .left),
-    :global(.view-master-detail:has(> .page-master:is(.od-desktop-statistics, .od-desktop-settings)) > .page-master-detail-root:not(.od-settings, .od-statistics-result, .od-statistics-dives, .od-pane-empty, .od-dive-detail, .od-desktop-selection) .navbar .left .back) {
+    :global(.view-master-detail:has(> .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) > .page-master-detail-root:not(.bc-settings, .bc-statistics-result, .bc-statistics-dives, .bc-pane-empty, .bc-dive-detail, .bc-desktop-selection) .navbar .left),
+    :global(.view-master-detail:has(> .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) > .page-master-detail-root:not(.bc-settings, .bc-statistics-result, .bc-statistics-dives, .bc-pane-empty, .bc-dive-detail, .bc-desktop-selection) .navbar .left .back) {
       display: flex;
     }
     :global(.view-master-detail .page-master-detail) {
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
     /* Android download panes: the computers are white cards on the page background. */
-    :global(.md .view-master-detail .page-master-detail:is(.od-download, .od-download-failed)) {
-      background: var(--od-background);
+    :global(.md .view-master-detail .page-master-detail:is(.bc-download, .bc-download-failed)) {
+      background: var(--bc-background);
 
       :global(.navbar-bg) {
-        background: var(--od-background);
+        background: var(--bc-background);
       }
     }
 
     /* First screen of the detail pane (what a row of the list opened): no Back button, the list stays on screen.
        The download pages keep their ✕: it closes the task (back to the previous pane).
        A screen opened from inside the pane keeps its ← (lib/pane-history.js). */
-    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left .back) {
+    :global(.view-master-detail .page-master-detail-root:not(.bc-download, .bc-download-failed) .navbar .left .back) {
       display: none;
     }
 
     /* No ☰ button on a tablet and no Back button beside the list: no empty button bubble (iOS). */
-    :global(.views.od-tablet .navbar .left:not(:has(a, button))),
-    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left) {
+    :global(.views.bc-tablet .navbar .left:not(:has(a, button))),
+    :global(.view-master-detail .page-master-detail-root:not(.bc-download, .bc-download-failed) .navbar .left) {
       display: none;
     }
 
     /* Without a button before it, the title keeps the side margin of the pane. */
-    :global(.views.od-tablet .navbar .left:not(:has(a, button)) + .title),
-    :global(.view-master-detail .page-master-detail-root:not(.od-download, .od-download-failed) .navbar .left + .title) {
+    :global(.views.bc-tablet .navbar .left:not(:has(a, button)) + .title),
+    :global(.view-master-detail .page-master-detail-root:not(.bc-download, .bc-download-failed) .navbar .left + .title) {
       margin-left: 16px;
     }
 
     /* The release edition's empty logbook in portrait: the list pane is the whole width, under the band (task 224). */
     @media (orientation: portrait) {
-      :global(.view-master-detail:not(:has(.page-master-detail)):has(.od-release-empty)) {
+      :global(.view-master-detail:not(:has(.page-master-detail)):has(.bc-release-empty)) {
         --f7-page-master-width: 100%;
       }
     }
 
     /* Nothing chosen yet. */
     :global(.view-master-detail:not(:has(.page-master-detail))::after) {
-      content: var(--od-no-dive);
+      content: var(--bc-no-dive);
       position: absolute;
       inset: 0 0 0 var(--f7-page-master-width);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: var(--od-surface);
-      color: var(--od-text-2);
+      background: var(--bc-surface);
+      color: var(--bc-text-2);
       font-size: 16px;
       text-align: center;
     }

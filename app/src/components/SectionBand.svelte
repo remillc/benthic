@@ -17,26 +17,26 @@
 {#if ios && !overMap}
   <!-- iPhone (task 289, ios-carnet.dc.html): no band; the summary under the large title, then what the page puts there
        (the search field). -->
-  <div class="od-section-band od-section-band--ios">
+  <div class="bc-section-band bc-section-band--ios">
     {#key summaryKey}
-      {#if summary}<p class="od-section-band--summary od-value">{summary}</p>{/if}
+      {#if summary}<p class="bc-section-band--summary bc-value">{summary}</p>{/if}
     {/key}
     {@render children?.()}
   </div>
 {:else}
-<div class="od-section-band od-section-band--band" class:od-section-band--tall={tall} class:od-section-band--over-map={overMap} class:od-section-band--pill={pill} class:od-section-band--with-chip={chip} class:od-section-band--bare={bare}>
+<div class="bc-section-band bc-section-band--band" class:bc-section-band--tall={tall} class:bc-section-band--over-map={overMap} class:bc-section-band--pill={pill} class:bc-section-band--with-chip={chip} class:bc-section-band--bare={bare}>
   {#if !bare}
-    <svg class="od-section-band--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-      <path d="{PROFILE} V140 H0 Z" class="od-section-band--area" />
-      <path d={PROFILE} class="od-section-band--line" vector-effect="non-scaling-stroke" />
+    <svg class="bc-section-band--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <path d="{PROFILE} V140 H0 Z" class="bc-section-band--area" />
+      <path d={PROFILE} class="bc-section-band--line" vector-effect="non-scaling-stroke" />
     </svg>
   {/if}
   {#if !overMap && !bare}
-    <svg class="od-section-band--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    <svg class="bc-section-band--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
   {/if}
   <!-- A new summaryKey cross-fades to the new summary (Sites: the search count). -->
   {#key summaryKey}
-    {#if summary}<p class="od-section-band--summary od-value">{summary}</p>{/if}
+    {#if summary}<p class="bc-section-band--summary bc-value">{summary}</p>{/if}
   {/key}
   {@render children?.()}
 </div>
@@ -44,46 +44,46 @@
 
 <style>
   @layer od.components {
-    .od-section-band--band {
-      --od-band-h: calc(var(--f7-safe-area-top) + 120px);
+    .bc-section-band--band {
+      --bc-band-h: calc(var(--f7-safe-area-top) + 120px);
       position: relative;
       overflow: hidden;
       padding: 0 16px 32px;
-      background-image: var(--od-band-grain), var(--od-band-gradient);
+      background-image: var(--bc-band-grain), var(--bc-band-gradient);
       /* At least down to the band's bottom: on a tablet the status bar is outside the app. */
-      background-size: 256px 256px, 100% max(var(--od-band-h), calc(100% + var(--f7-navbar-height) + var(--f7-safe-area-top)));
+      background-size: 256px 256px, 100% max(var(--bc-band-h), calc(100% + var(--f7-navbar-height) + var(--f7-safe-area-top)));
       background-position: 0 0, 0 calc(-1 * (var(--f7-navbar-height) + var(--f7-safe-area-top)));
       background-repeat: repeat, no-repeat;
-      color: var(--od-on-band);
+      color: var(--bc-on-band);
 
-      &.od-section-band--tall {
-        --od-band-h: calc(var(--f7-safe-area-top) + 190px);
+      &.bc-section-band--tall {
+        --bc-band-h: calc(var(--f7-safe-area-top) + 190px);
       }
 
       /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
       /* :global: the search field comes from the page (a slot); Svelte would drop the rule otherwise. */
-      &.od-section-band--tall:has(:global(.od-band-search)) {
+      &.bc-section-band--tall:has(:global(.bc-band-search)) {
         padding-bottom: 40px;
       }
 
-      &.od-section-band--pill {
-        --od-band-h: calc(var(--f7-safe-area-top) + 242px);
+      &.bc-section-band--pill {
+        --bc-band-h: calc(var(--f7-safe-area-top) + 242px);
       }
 
       /* A small status chip under the summary (Sites, offline). */
-      &.od-section-band--with-chip {
-        --od-band-h: calc(var(--f7-safe-area-top) + 154px);
+      &.bc-section-band--with-chip {
+        --bc-band-h: calc(var(--f7-safe-area-top) + 154px);
       }
 
       /* Only the texts: <BandBackdrop> draws the band under them. */
-      &.od-section-band--bare {
+      &.bc-section-band--bare {
         z-index: 11;
         overflow: visible;
         background: none;
       }
 
       /* Only the wave's height runs over the map: its pins stay in view. */
-      &.od-section-band--over-map {
+      &.bc-section-band--over-map {
         z-index: 3;
         margin-bottom: -18px;
         mask:
@@ -92,26 +92,26 @@
       }
     }
 
-    .od-section-band--profile {
+    .bc-section-band--profile {
       position: absolute;
       left: 0;
       bottom: 2px;
       width: 100%;
       height: 34px;
 
-      .od-section-band--area {
-        fill: var(--od-band-profile-area);
+      .bc-section-band--area {
+        fill: var(--bc-band-profile-area);
       }
 
-      .od-section-band--line {
+      .bc-section-band--line {
         fill: none;
-        stroke: var(--od-band-profile-line);
+        stroke: var(--bc-band-profile-line);
         stroke-width: 1.5;
         stroke-linejoin: round;
       }
     }
 
-    .od-section-band--wave {
+    .bc-section-band--wave {
       position: absolute;
       left: 0;
       bottom: -1px;
@@ -131,18 +131,18 @@
     }
 
     /* iPhone: the summary and the search field under the large title, no band. */
-    .od-section-band--ios {
+    .bc-section-band--ios {
       padding: 0 16px 8px;
 
-      .od-section-band--summary {
-        color: var(--od-text-2);
+      .bc-section-band--summary {
+        color: var(--bc-text-2);
         font-size: 13px;
         line-height: 18px;
         margin-bottom: 10px;
       }
     }
 
-    .od-section-band--summary {
+    .bc-section-band--summary {
       position: relative;
       animation: od-summary-in 150ms linear;
       margin: 0;
@@ -150,7 +150,7 @@
       line-height: 20px;
       letter-spacing: 0.25px;
       white-space: pre-line;
-      color: var(--od-on-band-2);
+      color: var(--bc-on-band-2);
     }
   }
 </style>

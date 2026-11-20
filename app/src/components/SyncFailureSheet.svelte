@@ -44,41 +44,41 @@
   }
 </script>
 
-<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="od-sync-failure-sheet od-sync-failure-sheet--failure-sheet od-sheet-dialog" style="height: auto" onSheetClosed={close}>
-  <div class="od-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
-    <div class="od-sync-failure-sheet--handle" aria-hidden="true"></div>
+<Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="bc-sync-failure-sheet bc-sync-failure-sheet--failure-sheet bc-sheet-dialog" style="height: auto" onSheetClosed={close}>
+  <div class="bc-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
+    <div class="bc-sync-failure-sheet--handle" aria-hidden="true"></div>
     <span class="badge" aria-hidden="true"><Icon name={gitServer && !logbook.odplus ? 'git' : ICONS[cause]} weight={2} /></span>
-    <h2 id="od-failure-title" class="od-sync-failure-sheet--title">{t(`sync.failure.${cause}.title${flavour}`)}</h2>
-    <p class="od-sync-failure-sheet--text">
+    <h2 id="od-failure-title" class="bc-sync-failure-sheet--title">{t(`sync.failure.${cause}.title${flavour}`)}</h2>
+    <p class="bc-sync-failure-sheet--text">
       {t(`sync.failure.${cause}.intro${flavour}`)}
       {#if cause === 'server' && logbook.retryMinutes}{t('sync.failure.server.retry', { n: logbook.retryMinutes })}{/if}
       {stays}
     </p>
-    <div class="od-sync-failure-sheet--actions">
-      <button type="button" class="od-sync-failure-sheet--text-button" onclick={close}>{t(cause === 'server' ? 'sync.failure.close' : 'sync.failure.later')}</button>
-      <button type="button" class="od-sync-failure-sheet--tonal" onclick={act}>{cause !== 'server' && isRelease ? t('sync.failure.accountAction') : t(`sync.failure.${cause}.action`)}</button>
+    <div class="bc-sync-failure-sheet--actions">
+      <button type="button" class="bc-sync-failure-sheet--text-button" onclick={close}>{t(cause === 'server' ? 'sync.failure.close' : 'sync.failure.later')}</button>
+      <button type="button" class="bc-sync-failure-sheet--tonal" onclick={act}>{cause !== 'server' && isRelease ? t('sync.failure.accountAction') : t(`sync.failure.${cause}.action`)}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.od-sync-failure-sheet--failure-sheet) {
+    :global(.bc-sync-failure-sheet--failure-sheet) {
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
+      background: var(--bc-dialog);
       overflow: hidden;
     }
 
-    .od-sync-failure-sheet--sheet {
+    .bc-sync-failure-sheet--sheet {
       padding: 0 24px calc(32px + var(--f7-safe-area-bottom, 0px));
     }
 
-    .od-sync-failure-sheet--handle {
+    .bc-sync-failure-sheet--handle {
       width: 32px;
       height: 4px;
       margin: 22px auto 20px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
     }
 
     .badge {
@@ -88,27 +88,27 @@
       width: 48px;
       height: 48px;
       border-radius: 24px;
-      background: var(--od-secondary-container);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-secondary-container);
+      color: var(--bc-on-secondary-container);
     }
 
-    .od-sync-failure-sheet--title {
+    .bc-sync-failure-sheet--title {
       margin: 16px 0 8px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-sync-failure-sheet--text {
+    .bc-sync-failure-sheet--text {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-sync-failure-sheet--actions {
+    .bc-sync-failure-sheet--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
@@ -126,17 +126,17 @@
       }
     }
 
-    .od-sync-failure-sheet--text-button {
+    .bc-sync-failure-sheet--text-button {
       padding: 0 12px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-weight: 500;
     }
 
-    .od-sync-failure-sheet--tonal {
+    .bc-sync-failure-sheet--tonal {
       padding: 0 24px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font-weight: 600;
     }
   }

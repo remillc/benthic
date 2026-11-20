@@ -98,122 +98,122 @@
 </script>
 
 <div
-  class="od-fab-menu"
-  class:od-fab-menu--open={open}
+  class="bc-fab-menu"
+  class:bc-fab-menu--open={open}
   bind:this={root}
   onkeydown={key}
   role="presentation"
-  style:--od-fab-spatial={spatial.css}
-  style:--od-fab-spatial-ms="{spatial.ms}ms"
-  style:--od-fab-effects={effects.css}
-  style:--od-fab-effects-ms="{effects.ms}ms"
+  style:--bc-fab-spatial={spatial.css}
+  style:--bc-fab-spatial-ms="{spatial.ms}ms"
+  style:--bc-fab-effects={effects.css}
+  style:--bc-fab-effects-ms="{effects.ms}ms"
 >
   <!-- A tap outside closes the menu; the keyboard has the close button and Escape. -->
-  <div class="od-fab-menu--scrim" onclick={() => setOpen(false)} role="presentation"></div>
-  <div class="od-fab-menu--items" id="od-fab-menu-items" role="menu" aria-label={t('logbook.add')}>
+  <div class="bc-fab-menu--scrim" onclick={() => setOpen(false)} role="presentation"></div>
+  <div class="bc-fab-menu--items" id="od-fab-menu-items" role="menu" aria-label={t('logbook.add')}>
     {#each choices as choice, i (choice.key)}
       <button
         type="button"
         role="menuitem"
-        class="od-fab-menu--item"
-        class:od-fab-menu--primary={i === 0}
-        style:--od-fab-open-delay="{i * STAGGER}ms"
-        style:--od-fab-close-delay="{(choices.length - 1 - i) * CLOSE_STAGGER}ms"
+        class="bc-fab-menu--item"
+        class:bc-fab-menu--primary={i === 0}
+        style:--bc-fab-open-delay="{i * STAGGER}ms"
+        style:--bc-fab-close-delay="{(choices.length - 1 - i) * CLOSE_STAGGER}ms"
         tabindex={open ? 0 : -1}
         onclick={() => pick(choice.key)}
       >
         <Icon name={choice.icon} size={24} />
         {#if choice.sub}
           <!-- A second line (task 2026-11-14-126): the formats « Importer un fichier » reads. -->
-          <span class="od-fab-menu--texts">
-            <span class="od-fab-menu--label">{choice.text}</span>
-            <span class="od-fab-menu--sub">{choice.sub}</span>
+          <span class="bc-fab-menu--texts">
+            <span class="bc-fab-menu--label">{choice.text}</span>
+            <span class="bc-fab-menu--sub">{choice.sub}</span>
           </span>
         {:else}
-          <span class="od-fab-menu--label">{choice.text}</span>
+          <span class="bc-fab-menu--label">{choice.text}</span>
         {/if}
       </button>
     {/each}
   </div>
   <button
     type="button"
-    class="od-fab-menu--button"
+    class="bc-fab-menu--button"
     aria-haspopup="menu"
     aria-expanded={open}
     aria-controls="od-fab-menu-items"
     bind:this={button}
     onclick={() => setOpen(!open)}
   >
-    <span class="od-fab-menu--icon"><Icon name="plus" size={24} /></span>
-    <span class="od-sr-only">{t('logbook.add')}</span>
+    <span class="bc-fab-menu--icon"><Icon name="plus" size={24} /></span>
+    <span class="bc-sr-only">{t('logbook.add')}</span>
   </button>
 </div>
 
 <style>
   @layer od.components {
-    .od-fab-menu {
+    .bc-fab-menu {
       /* 24 dp from the screen's edges; from the bottom, 16 dp above the bottom navigation bar when
          it shows (task 2026-11-14-120). The bar only moves it up, never away from the right edge. */
-      --od-fab-edge: 24px;
-      --od-fab-bottom: calc(24px + var(--od-bottom-nav-room, 0px));
-      --od-fab-size: 56px;
+      --bc-fab-edge: 24px;
+      --bc-fab-bottom: calc(24px + var(--bc-bottom-nav-room, 0px));
+      --bc-fab-size: 56px;
     }
 
     /* Over the whole screen, under the button and the choices. */
-    .od-fab-menu--scrim {
+    .bc-fab-menu--scrim {
       position: fixed;
       inset: 0;
       z-index: 6500;
-      background: var(--od-fab-scrim);
+      background: var(--bc-fab-scrim);
       opacity: 0;
       visibility: hidden;
       transition:
-        opacity var(--od-fab-effects-ms) var(--od-fab-effects),
-        visibility 0s linear var(--od-fab-effects-ms);
+        opacity var(--bc-fab-effects-ms) var(--bc-fab-effects),
+        visibility 0s linear var(--bc-fab-effects-ms);
     }
 
-    .od-fab-menu--open .od-fab-menu--scrim {
+    .bc-fab-menu--open .bc-fab-menu--scrim {
       opacity: 1;
       visibility: visible;
       transition-delay: 0s;
     }
 
     /* Right edge of the button; the choices rise from it, from the bottom up. */
-    .od-fab-menu--items {
+    .bc-fab-menu--items {
       position: fixed;
       z-index: 6501;
-      right: calc(var(--od-fab-edge) + var(--f7-safe-area-right, 0px));
+      right: calc(var(--bc-fab-edge) + var(--f7-safe-area-right, 0px));
       /* 24 dp above the button, itself 24 dp above the bottom edge. */
-      bottom: calc(var(--od-fab-bottom) + var(--od-fab-size) + 24px + var(--f7-safe-area-bottom, 0px));
+      bottom: calc(var(--bc-fab-bottom) + var(--bc-fab-size) + 24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       flex-direction: column-reverse;
       align-items: flex-end;
       gap: 16px;
       visibility: hidden;
-      transition: visibility 0s linear calc(var(--od-fab-spatial-ms) + 100ms);
+      transition: visibility 0s linear calc(var(--bc-fab-spatial-ms) + 100ms);
     }
 
-    .od-fab-menu--open .od-fab-menu--items {
+    .bc-fab-menu--open .bc-fab-menu--items {
       visibility: visible;
       transition-delay: 0s;
     }
 
     /* The navigation rail is outside the page: it gets its own veil. */
-    :global(.od-nav-rail--rail)::after {
+    :global(.bc-nav-rail--rail)::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: var(--od-fab-scrim);
+      background: var(--bc-fab-scrim);
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--od-fab-effects-ms, 150ms) ease-out;
+      transition: opacity var(--bc-fab-effects-ms, 150ms) ease-out;
     }
 
-    :global(html:has(.od-fab-menu--open) .od-nav-rail--rail)::after {
+    :global(html:has(.bc-fab-menu--open) .bc-nav-rail--rail)::after {
       opacity: 1;
     }
 
-    .od-fab-menu--item {
+    .bc-fab-menu--item {
       width: max-content;
       min-height: 56px;
       padding: 0 24px;
@@ -223,8 +223,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-fab-tonal);
-      color: var(--od-text);
+      background: var(--bc-fab-tonal);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       font-weight: 500;
@@ -236,80 +236,80 @@
       transform: translateY(24px) scale(0.5);
       transform-origin: right bottom;
       transition:
-        transform var(--od-fab-spatial-ms) var(--od-fab-spatial) var(--od-fab-close-delay),
-        opacity var(--od-fab-effects-ms) var(--od-fab-effects) var(--od-fab-close-delay);
+        transform var(--bc-fab-spatial-ms) var(--bc-fab-spatial) var(--bc-fab-close-delay),
+        opacity var(--bc-fab-effects-ms) var(--bc-fab-effects) var(--bc-fab-close-delay);
     }
 
-    .od-fab-menu--texts {
+    .bc-fab-menu--texts {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       padding: 6px 0;
     }
 
-    .od-fab-menu--sub {
+    .bc-fab-menu--sub {
       font-size: 12px;
       line-height: 16px;
       font-weight: 400;
       letter-spacing: 0.2px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-fab-menu--primary {
-      background: var(--od-text);
-      color: var(--od-background);
+    .bc-fab-menu--primary {
+      background: var(--bc-text);
+      color: var(--bc-background);
     }
 
-    .od-fab-menu--open .od-fab-menu--item {
+    .bc-fab-menu--open .bc-fab-menu--item {
       opacity: 1;
       transform: none;
-      transition-delay: var(--od-fab-open-delay);
+      transition-delay: var(--bc-fab-open-delay);
     }
 
-    .od-fab-menu--item:focus-visible,
-    .od-fab-menu--button:focus-visible {
-      outline: 2px solid var(--od-text);
+    .bc-fab-menu--item:focus-visible,
+    .bc-fab-menu--button:focus-visible {
+      outline: 2px solid var(--bc-text);
       outline-offset: 3px;
     }
 
-    .od-fab-menu--primary:focus-visible {
-      outline-color: var(--od-text);
+    .bc-fab-menu--primary:focus-visible {
+      outline-color: var(--bc-text);
       outline-offset: 3px;
     }
 
     /* The "+" button: a rounded square, a circle in ink once open. */
-    .od-fab-menu--button {
+    .bc-fab-menu--button {
       position: fixed;
       z-index: 6502;
-      right: calc(var(--od-fab-edge) + var(--f7-safe-area-right, 0px));
-      bottom: calc(var(--od-fab-bottom) + var(--f7-safe-area-bottom, 0px));
-      width: var(--od-fab-size);
-      height: var(--od-fab-size);
+      right: calc(var(--bc-fab-edge) + var(--f7-safe-area-right, 0px));
+      bottom: calc(var(--bc-fab-bottom) + var(--f7-safe-area-bottom, 0px));
+      width: var(--bc-fab-size);
+      height: var(--bc-fab-size);
       padding: 0;
       border: 0;
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-primary-container);
-      color: var(--od-on-primary-container);
+      background: var(--bc-primary-container);
+      color: var(--bc-on-primary-container);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
       transition:
-        border-radius var(--od-fab-spatial-ms) var(--od-fab-spatial),
-        background-color var(--od-fab-effects-ms) var(--od-fab-effects),
-        color var(--od-fab-effects-ms) var(--od-fab-effects),
+        border-radius var(--bc-fab-spatial-ms) var(--bc-fab-spatial),
+        background-color var(--bc-fab-effects-ms) var(--bc-fab-effects),
+        color var(--bc-fab-effects-ms) var(--bc-fab-effects),
         box-shadow 120ms linear;
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour, over the elevation shadow. */
     @media (hover: hover) and (pointer: fine) {
-      .od-fab-menu--item:hover {
+      .bc-fab-menu--item:hover {
         box-shadow:
           inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
           0 1px 3px rgb(0 0 0 / 0.3),
           0 4px 8px 3px rgb(0 0 0 / 0.15);
       }
-      .od-fab-menu--button:hover {
+      .bc-fab-menu--button:hover {
         box-shadow:
           inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
           0 1px 3px rgb(0 0 0 / 0.3),
@@ -317,30 +317,30 @@
       }
     }
 
-    .od-fab-menu--open .od-fab-menu--button {
+    .bc-fab-menu--open .bc-fab-menu--button {
       border-radius: 28px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
     }
 
-    .od-fab-menu--icon {
+    .bc-fab-menu--icon {
       display: flex;
-      transition: transform var(--od-fab-spatial-ms) var(--od-fab-spatial);
+      transition: transform var(--bc-fab-spatial-ms) var(--bc-fab-spatial);
     }
 
     /* The + turned 45 degrees is a ✕. */
-    .od-fab-menu--open .od-fab-menu--icon {
+    .bc-fab-menu--open .bc-fab-menu--icon {
       transform: rotate(45deg);
     }
 
     /* "Remove animations": it appears and disappears at once. */
     @media (prefers-reduced-motion: reduce) {
-      :global(.od-nav-rail--rail)::after,
-      .od-fab-menu--scrim,
-      .od-fab-menu--items,
-      .od-fab-menu--item,
-      .od-fab-menu--button,
-      .od-fab-menu--icon {
+      :global(.bc-nav-rail--rail)::after,
+      .bc-fab-menu--scrim,
+      .bc-fab-menu--items,
+      .bc-fab-menu--item,
+      .bc-fab-menu--button,
+      .bc-fab-menu--icon {
         transition: none;
       }
     }

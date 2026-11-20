@@ -28,14 +28,14 @@
   onDestroy(() => clearInterval(timer));
 </script>
 
-{#if url}<div class="od-route-badge od-route-badge--route" aria-hidden="true">{url}</div>{/if}
+{#if url}<div class="bc-route-badge bc-route-badge--route" aria-hidden="true">{url}</div>{/if}
 
 <style>
   @layer od.components {
-    .od-route-badge--route {
+    .bc-route-badge--route {
       position: fixed;
       left: 8px;
-      bottom: calc(4px + var(--od-safe-bottom) + var(--od-bottom-nav-height, 0px));
+      bottom: calc(4px + var(--bc-safe-bottom) + var(--bc-bottom-nav-height, 0px));
       z-index: 20000;
       max-width: calc(100% - 16px);
       padding: 2px 8px;

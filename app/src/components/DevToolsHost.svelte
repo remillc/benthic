@@ -11,7 +11,7 @@
     let timer;
     /** @param {PointerEvent} e */
     const down = (e) => {
-      const badge = document.querySelector('.od-route-badge');
+      const badge = document.querySelector('.bc-route-badge');
       if (!badge) return;
       const r = badge.getBoundingClientRect();
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top - 8 || e.clientY > r.bottom + 8) return;

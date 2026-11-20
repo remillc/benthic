@@ -20,72 +20,72 @@
   const glow = `${gradient}-glow`;
 </script>
 
-<div class="od-release-profile" class:od-release-profile--still={still} bind:clientWidth={width} bind:clientHeight={height}>
-  <svg class="od-release-profile--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('welcomeRelease.profileLabel')}>
+<div class="bc-release-profile" class:bc-release-profile--still={still} bind:clientWidth={width} bind:clientHeight={height}>
+  <svg class="bc-release-profile--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('welcomeRelease.profileLabel')}>
     <defs>
       <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" class="od-release-profile--water-top"></stop>
-        <stop offset="1" class="od-release-profile--water-bottom"></stop>
+        <stop offset="0" class="bc-release-profile--water-top"></stop>
+        <stop offset="1" class="bc-release-profile--water-bottom"></stop>
       </linearGradient>
       <filter id={glow} x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
     </defs>
-    <line class="od-release-profile--surface" x1="0" y1={shape.surfaceY} x2={width} y2={shape.surfaceY}></line>
-    <path class="od-release-profile--water" d={shape.area} fill="url(#{gradient})"></path>
-    <path class="od-release-profile--glow" d={shape.line} filter="url(#{glow})"></path>
-    <path class="od-release-profile--line" d={shape.line} pathLength="1"></path>
+    <line class="bc-release-profile--surface" x1="0" y1={shape.surfaceY} x2={width} y2={shape.surfaceY}></line>
+    <path class="bc-release-profile--water" d={shape.area} fill="url(#{gradient})"></path>
+    <path class="bc-release-profile--glow" d={shape.line} filter="url(#{glow})"></path>
+    <path class="bc-release-profile--line" d={shape.line} pathLength="1"></path>
   </svg>
-  <span class="od-release-profile--dot" aria-hidden="true"></span>
-  <div class="od-release-profile--chip od-release-profile--chip-depth">
-    <span class="od-release-profile--value">{t('welcomeRelease.maxDepthValue')}</span>
-    <span class="od-release-profile--caption">{t('welcomeRelease.maxDepthLabel')}</span>
+  <span class="bc-release-profile--dot" aria-hidden="true"></span>
+  <div class="bc-release-profile--chip bc-release-profile--chip-depth">
+    <span class="bc-release-profile--value">{t('welcomeRelease.maxDepthValue')}</span>
+    <span class="bc-release-profile--caption">{t('welcomeRelease.maxDepthLabel')}</span>
   </div>
-  <div class="od-release-profile--chip od-release-profile--chip-duration">
-    <span class="od-release-profile--value">{t('welcomeRelease.durationValue')}</span>
-    <span class="od-release-profile--caption">{t('welcomeRelease.durationLabel')}</span>
+  <div class="bc-release-profile--chip bc-release-profile--chip-duration">
+    <span class="bc-release-profile--value">{t('welcomeRelease.durationValue')}</span>
+    <span class="bc-release-profile--caption">{t('welcomeRelease.durationLabel')}</span>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-release-profile {
+    .bc-release-profile {
       position: relative;
       /* Fills the box its page gives it; the curve is scaled to it. */
       width: 100%;
       height: 100%;
     }
 
-    .od-release-profile--svg {
+    .bc-release-profile--svg {
       position: absolute;
       inset: 0;
       overflow: visible;
     }
 
-    .od-release-profile--water-top {
-      stop-color: var(--od-release-on-panel);
+    .bc-release-profile--water-top {
+      stop-color: var(--bc-release-on-panel);
       stop-opacity: 0.2;
     }
 
-    .od-release-profile--water-bottom {
-      stop-color: var(--od-release-on-panel);
+    .bc-release-profile--water-bottom {
+      stop-color: var(--bc-release-on-panel);
       stop-opacity: 0.04;
     }
 
-    .od-release-profile--surface {
-      stroke: var(--od-release-surface-line);
+    .bc-release-profile--surface {
+      stroke: var(--bc-release-surface-line);
       stroke-width: 1;
       stroke-dasharray: 3 4;
     }
 
-    .od-release-profile--glow {
+    .bc-release-profile--glow {
       fill: none;
-      stroke: var(--od-release-glow);
+      stroke: var(--bc-release-glow);
       stroke-width: 6;
       stroke-opacity: 0.55;
     }
 
-    .od-release-profile--line {
+    .bc-release-profile--line {
       fill: none;
-      stroke: var(--od-release-on-panel);
+      stroke: var(--bc-release-on-panel);
       stroke-width: 2.5;
       stroke-linejoin: round;
       stroke-linecap: round;
@@ -94,7 +94,7 @@
     }
 
     /* The deepest point of the curve: 78.2 / 588 across and 284.7 / 300 down in the mock-up. */
-    .od-release-profile--dot {
+    .bc-release-profile--dot {
       position: absolute;
       left: 13.3%;
       top: 94.9%;
@@ -102,57 +102,57 @@
       height: 12px;
       margin: -6px 0 0 -6px;
       border-radius: 6px;
-      background: var(--od-release-on-panel);
-      box-shadow: 0 0 0 5px var(--od-release-dot-ring);
+      background: var(--bc-release-on-panel);
+      box-shadow: 0 0 0 5px var(--bc-release-dot-ring);
       animation: od-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
-    .od-release-profile--chip {
+    .bc-release-profile--chip {
       position: absolute;
       padding: 8px 14px;
       border-radius: 14px;
-      background: var(--od-release-chip);
-      border: 1px solid var(--od-release-chip-border);
+      background: var(--bc-release-chip);
+      border: 1px solid var(--bc-release-chip-border);
       backdrop-filter: blur(6px);
-      color: var(--od-release-on-panel);
+      color: var(--bc-release-on-panel);
       display: flex;
       flex-direction: column;
       white-space: nowrap;
       animation: od-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
-    .od-release-profile--value {
+    .bc-release-profile--value {
       font-size: 20px;
       line-height: 24px;
       font-weight: 600;
       letter-spacing: -0.2px;
     }
 
-    .od-release-profile--caption {
+    .bc-release-profile--caption {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-release-chip-caption);
+      color: var(--bc-release-chip-caption);
     }
 
     /* Landscape: the depth chip sits under the dot, the duration chip near the end of the line. */
-    .od-release-profile--chip-depth {
+    .bc-release-profile--chip-depth {
       left: calc(13.3% - 50px);
       top: calc(94.9% + 20px);
     }
 
-    .od-release-profile--chip-duration {
+    .bc-release-profile--chip-duration {
       left: 70%;
       top: 29%;
     }
 
     /* Portrait: the depth chip to the right of the dot, the duration chip a little lower. */
     @media (orientation: portrait) {
-      .od-release-profile--chip-depth {
+      .bc-release-profile--chip-depth {
         left: calc(13.4% + 72px);
         top: calc(95% - 22px);
       }
 
-      .od-release-profile--chip-duration {
+      .bc-release-profile--chip-duration {
         left: 74%;
         top: 34.5%;
       }
@@ -160,8 +160,8 @@
 
     /* Phone (task 2026-11-16-227): the band's profile is the line alone, without the dot and the chips. */
     @media (max-width: 767.98px) {
-      .od-release-profile--dot,
-      .od-release-profile--chip {
+      .bc-release-profile--dot,
+      .bc-release-profile--chip {
         display: none;
       }
     }
@@ -186,18 +186,18 @@
       }
     }
 
-    .od-release-profile--still {
-      .od-release-profile--line,
-      .od-release-profile--dot,
-      .od-release-profile--chip {
+    .bc-release-profile--still {
+      .bc-release-profile--line,
+      .bc-release-profile--dot,
+      .bc-release-profile--chip {
         animation: none;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-release-profile--line,
-      .od-release-profile--dot,
-      .od-release-profile--chip {
+      .bc-release-profile--line,
+      .bc-release-profile--dot,
+      .bc-release-profile--chip {
         animation: none;
       }
     }

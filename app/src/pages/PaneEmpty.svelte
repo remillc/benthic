@@ -8,26 +8,26 @@
   import { t } from '../lib/i18n.js';
 </script>
 
-<Page class="od-pane-empty">
-  <p class="od-pane-empty--text">{t('tablet.noDive')}</p>
+<Page class="bc-pane-empty">
+  <p class="bc-pane-empty--text">{t('tablet.noDive')}</p>
 </Page>
 
 <style>
   @layer od.components {
-    :global(.page.od-pane-empty) {
-      --f7-page-bg-color: var(--od-surface);
+    :global(.page.bc-pane-empty) {
+      --f7-page-bg-color: var(--bc-surface);
     }
 
-    :global(.od-pane-empty .page-content) {
+    :global(.bc-pane-empty .page-content) {
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-pane-empty--text {
+    .bc-pane-empty--text {
       margin: 0;
       padding: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 16px;
       text-align: center;
     }

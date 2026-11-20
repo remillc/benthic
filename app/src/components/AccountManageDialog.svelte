@@ -18,31 +18,31 @@
   });
 </script>
 
-<Popup class="od-account-manage-dialog" opened={navigation.manageOpen} onPopupClosed={() => ((shown = false), close())} closeByBackdropClick aria-label={t('account.manage.title')}>
-  <div class="od-account-manage-dialog--head">
-    <h2 class="od-account-manage-dialog--title">{t('account.manage.title')}</h2>
-    <button type="button" class="od-account-manage-dialog--close" onclick={close}>
-      <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
+<Popup class="bc-account-manage-dialog" opened={navigation.manageOpen} onPopupClosed={() => ((shown = false), close())} closeByBackdropClick aria-label={t('account.manage.title')}>
+  <div class="bc-account-manage-dialog--head">
+    <h2 class="bc-account-manage-dialog--title">{t('account.manage.title')}</h2>
+    <button type="button" class="bc-account-manage-dialog--close" onclick={close}>
+      <Icon name="close" /><span class="bc-sr-only">{t('nav.close')}</span>
     </button>
   </div>
-  <div class="od-account-manage-dialog--body">
+  <div class="bc-account-manage-dialog--body">
     {#if shown}<AccountManage columns onclose={close} />{/if}
   </div>
 </Popup>
 
 <style>
   @layer od.components {
-    :global(.popup.od-account-manage-dialog) {
+    :global(.popup.bc-account-manage-dialog) {
       --f7-popup-tablet-width: min(800px, calc(100vw - 48px));
       --f7-popup-tablet-height: 640px;
-      background: var(--od-background);
+      background: var(--bc-background);
       max-height: calc(100vh - 32px);
       overflow: hidden;
       border-radius: 28px;
       box-shadow: 0 8px 28px rgb(0 0 0 / 0.25);
     }
 
-    .od-account-manage-dialog--head {
+    .bc-account-manage-dialog--head {
       height: 64px;
       padding: 8px 8px 0 24px;
       box-sizing: border-box;
@@ -50,28 +50,28 @@
       align-items: center;
     }
 
-    .od-account-manage-dialog--title {
+    .bc-account-manage-dialog--title {
       flex: 1;
       margin: 0;
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-account-manage-dialog--close {
+    .bc-account-manage-dialog--close {
       width: 48px;
       height: 48px;
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-account-manage-dialog--body {
+    .bc-account-manage-dialog--body {
       height: calc(100% - 64px);
       overflow: auto;
     }

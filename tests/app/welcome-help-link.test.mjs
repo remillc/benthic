@@ -21,9 +21,9 @@ test('the component links to /about and only the link text is underlined', () =>
   const c = src('components/WelcomeHelpLink.svelte');
   assert.match(c, /href="\/about"/);
   assert.match(c, /navigate\('\/about'\)/);
-  assert.match(c, /class="od-welcome-help-link"/);
+  assert.match(c, /class="bc-welcome-help-link"/);
   assert.match(c, /welcomeHelp\.label/);
-  assert.match(c, /od-welcome-help-link--link\s*\{\s*text-decoration: underline/);
+  assert.match(c, /bc-welcome-help-link--link\s*\{\s*text-decoration: underline/);
   assert.match(c, /cursor: pointer/);
   assert.match(c, /:hover/);
 });
@@ -40,8 +40,8 @@ test('every first-launch screen includes it', () => {
 });
 
 test('its colour is the secondary text colour, #4B4A47 in light', () => {
-  assert.match(src('theme.css'), /--od-text-2: #4B4A47;/);
-  assert.match(src('components/WelcomeHelpLink.svelte'), /color: var\(--od-text-2\)/);
+  assert.match(src('theme.css'), /--bc-text-2: #4B4A47;/);
+  assert.match(src('components/WelcomeHelpLink.svelte'), /color: var\(--bc-text-2\)/);
 });
 
 test('Android phone: the link ends the page, 12 dp under the git link and 20 dp above the bottom edge (task 2026-11-16-243)', () => {
@@ -50,10 +50,10 @@ test('Android phone: the link ends the page, 12 dp under the git link and 20 dp 
   // The link is inside the Android page, after the actions (the git link), so it follows it.
   assert.match(welcome, /<\/div>\s*<!--[^>]*-->\s*\{#if desktopApp\}[\s\S]*?\{:else\}\s*<WelcomeHelpLink \/>\s*\{\/if\}\s*<\/div>\s*\{:else\}/);
   // 20 dp above the edge on the phone; the page content has no bottom padding of its own there.
-  assert.match(welcome, /:global\(\.od-welcome-start--phone\) \{\s*--od-help-link-bottom: 20px;[\s\S]*?padding-bottom: 0;/);
-  assert.match(link, /margin: 0 auto calc\(var\(--f7-safe-area-bottom\) \+ var\(--od-help-link-bottom, 28px\)\)/);
+  assert.match(welcome, /:global\(\.bc-welcome-start--phone\) \{\s*--bc-help-link-bottom: 20px;[\s\S]*?padding-bottom: 0;/);
+  assert.match(link, /margin: 0 auto calc\(var\(--f7-safe-area-bottom\) \+ var\(--bc-help-link-bottom, 28px\)\)/);
   // 12 dp between the git link's text and the help link: 6 dp of padding + 6 dp of margin under an 18 dp line.
-  assert.match(welcome, /:global\(\.od-welcome-start--phone\) \.od-welcome-start--git-link \{\s*min-height: 0;\s*padding: 6px 12px;\s*margin-bottom: 6px;/);
+  assert.match(welcome, /:global\(\.bc-welcome-start--phone\) \.bc-welcome-start--git-link \{\s*min-height: 0;\s*padding: 6px 12px;\s*margin-bottom: 6px;/);
 });
 
 test('tablet: the link stays pinned 28 dp above the bottom edge, iOS keeps its placement', () => {

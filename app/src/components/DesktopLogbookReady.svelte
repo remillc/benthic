@@ -24,54 +24,54 @@
   ];
 </script>
 
-<section class="od-logbook-ready" aria-labelledby="od-logbook-ready-title">
-  <h2 id="od-logbook-ready-title" class="od-logbook-ready--title">{t('desktopLogbooks.ready.title')}</h2>
+<section class="bc-logbook-ready" aria-labelledby="od-logbook-ready-title">
+  <h2 id="od-logbook-ready-title" class="bc-logbook-ready--title">{t('desktopLogbooks.ready.title')}</h2>
   {#if entry && kept}
-    <p class="od-logbook-ready--where">{t(`desktopLogbooks.ready.${kept.key}`, { name: displayName(entry, t), where: kept.where })}</p>
+    <p class="bc-logbook-ready--where">{t(`desktopLogbooks.ready.${kept.key}`, { name: displayName(entry, t), where: kept.where })}</p>
   {/if}
-  <ul class="od-logbook-ready--list">
+  <ul class="bc-logbook-ready--list">
     {#each ways as way (way.key)}
       <li>
-        <button type="button" class="od-logbook-ready--way" onclick={way.run}>
-          <span class="od-logbook-ready--icon"><Icon name={/** @type {any} */ (way.icon)} size={22} /></span>
-          <span class="od-logbook-ready--text">
-            <span class="od-logbook-ready--name">{t(`desktopLogbooks.ready.${way.key}`)}</span>
-            <span class="od-logbook-ready--help">{t(`desktopLogbooks.ready.${way.key}Help`)}</span>
+        <button type="button" class="bc-logbook-ready--way" onclick={way.run}>
+          <span class="bc-logbook-ready--icon"><Icon name={/** @type {any} */ (way.icon)} size={22} /></span>
+          <span class="bc-logbook-ready--text">
+            <span class="bc-logbook-ready--name">{t(`desktopLogbooks.ready.${way.key}`)}</span>
+            <span class="bc-logbook-ready--help">{t(`desktopLogbooks.ready.${way.key}Help`)}</span>
           </span>
-          <kbd class="od-logbook-ready--shortcut">{way.shortcut}</kbd>
+          <kbd class="bc-logbook-ready--shortcut">{way.shortcut}</kbd>
         </button>
       </li>
     {/each}
   </ul>
-  <p class="od-logbook-ready--drop">{t('desktopLogbooks.ready.drop')}</p>
+  <p class="bc-logbook-ready--drop">{t('desktopLogbooks.ready.drop')}</p>
 </section>
 
 <style>
   @layer od.components {
-    .od-logbook-ready {
+    .bc-logbook-ready {
       width: 560px;
       max-width: calc(100% - 48px);
       margin: auto;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-logbook-ready--title {
+    .bc-logbook-ready--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       line-height: 32px;
       font-weight: 500;
     }
-    .od-logbook-ready--where,
-    .od-logbook-ready--drop {
+    .bc-logbook-ready--where,
+    .bc-logbook-ready--drop {
       margin: 0;
       font-size: 15px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-logbook-ready--list {
+    .bc-logbook-ready--list {
       margin: 4px 0 0;
       padding: 0;
       list-style: none;
@@ -79,7 +79,7 @@
       flex-direction: column;
       gap: 12px;
     }
-    .od-logbook-ready--way {
+    .bc-logbook-ready--way {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -89,20 +89,20 @@
       padding: 16px 20px;
       border: none;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       color: inherit;
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
-    .od-logbook-ready--way:hover {
-      background: var(--od-surface-2);
+    .bc-logbook-ready--way:hover {
+      background: var(--bc-surface-2);
     }
-    .od-logbook-ready--way:focus-visible {
-      outline: 2px solid var(--od-action);
+    .bc-logbook-ready--way:focus-visible {
+      outline: 2px solid var(--bc-action);
       outline-offset: 2px;
     }
-    .od-logbook-ready--icon {
+    .bc-logbook-ready--icon {
       flex: none;
       width: 48px;
       height: 48px;
@@ -110,28 +110,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-selected-container);
-      color: var(--od-selected);
+      background: var(--bc-selected-container);
+      color: var(--bc-selected);
     }
-    .od-logbook-ready--text {
+    .bc-logbook-ready--text {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
-    .od-logbook-ready--name {
+    .bc-logbook-ready--name {
       font-size: 17px;
       line-height: 24px;
     }
-    .od-logbook-ready--help {
+    .bc-logbook-ready--help {
       font-size: 14px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-logbook-ready--shortcut {
+    .bc-logbook-ready--shortcut {
       font: inherit;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

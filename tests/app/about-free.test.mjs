@@ -28,10 +28,10 @@ test('the About texts are the ones of the task, and no text names the logbook fi
 test('the two buttons carry a 20 dp icon 8 dp from the text; the GitHub mark is the supplied file, in the ink colour', () => {
   assert.match(about, /import githubMark from '\.\.\/assets\/brands\/github-invertocat\.svg\?raw'/);
   assert.match(about, /<Icon name="download" size=\{20\}/);
-  assert.match(about, /\.od-about--free-actions \{[^}]*flex-direction: column;[^}]*gap: 12px;/s);
+  assert.match(about, /\.bc-about--free-actions \{[^}]*flex-direction: column;[^}]*gap: 12px;/s);
   assert.match(about, /height: 48px;[^}]*gap: 8px;/s);
-  assert.match(about, /\.od-about--free-desktop \.od-about--free-actions \{[^}]*a,\s*button \{\s*height: 40px;/s);
-  assert.match(about, /\.od-about--free-github :global\(path\) \{\s*fill: currentColor;/);
+  assert.match(about, /\.bc-about--free-desktop \.bc-about--free-actions \{[^}]*a,\s*button \{\s*height: 40px;/s);
+  assert.match(about, /\.bc-about--free-github :global\(path\) \{\s*fill: currentColor;/);
   const svg = read('assets/brands/github-invertocat.svg');
   assert.match(svg, /viewBox="0 0 98 96"/);
   assert.match(svg, /fill="#1F2124"/);
@@ -42,6 +42,6 @@ test('the two buttons carry a 20 dp icon 8 dp from the text; the GitHub mark is 
 test('« Tout ce qui est inclus » has its subtitle, 16/24 grey', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(plus, /odplus\.all\.subtitle/);
-  assert.match(plus, /\.od-plus-all--subtitle \{[^}]*font-size: 16px;\s*line-height: 24px;\s*color: var\(--od-text-2\);/s);
+  assert.match(plus, /\.bc-plus-all--subtitle \{[^}]*font-size: 16px;\s*line-height: 24px;\s*color: var\(--bc-text-2\);/s);
   assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
 });

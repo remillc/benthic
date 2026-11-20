@@ -91,31 +91,31 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-site-chooser--scrim" onpointerdown={(e) => e.target === e.currentTarget && onclose()}>
+<div class="bc-site-chooser--scrim" onpointerdown={(e) => e.target === e.currentTarget && onclose()}>
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-  <div class="od-site-chooser" role="dialog" aria-label={t('sites.chooseSite')} bind:this={box} style:left="{left}px" style:top="{top}px" onkeydown={keydown}>
-    <label class="od-site-chooser--search">
+  <div class="bc-site-chooser" role="dialog" aria-label={t('sites.chooseSite')} bind:this={box} style:left="{left}px" style:top="{top}px" onkeydown={keydown}>
+    <label class="bc-site-chooser--search">
       <Icon name="search" size={20} />
       <input type="search" bind:this={input} bind:value={query} placeholder={t('sites.searchSitePlaceholder')} aria-label={t('sites.searchSitePlaceholder')} autocomplete="off" />
     </label>
-    <p class="od-site-chooser--heading">{position ? t('desktopSites.nearestToDive') : t('desktopSites.mostRecent')}</p>
-    <ul class="od-site-chooser--list" role="listbox">
+    <p class="bc-site-chooser--heading">{position ? t('desktopSites.nearestToDive') : t('desktopSites.mostRecent')}</p>
+    <ul class="bc-site-chooser--list" role="listbox">
       {#each rows as row, i (row.site.uuid)}
-        <li role="option" aria-selected={i === active} class:od-site-chooser--active={i === active}>
+        <li role="option" aria-selected={i === active} class:bc-site-chooser--active={i === active}>
           <button type="button" tabindex="-1" onclick={() => pick(i)}>
             <Icon name="sites" size={18} />
-            <span class="od-site-chooser--text">
-              <span class="od-site-chooser--name">{row.site.name || t('sites.noName')}</span>
-              <span class="od-site-chooser--sub">{[row.site.country || t('sites.noCountry'), t('sites.diveCount', { n: row.site.dives })].join(' · ')}</span>
+            <span class="bc-site-chooser--text">
+              <span class="bc-site-chooser--name">{row.site.name || t('sites.noName')}</span>
+              <span class="bc-site-chooser--sub">{[row.site.country || t('sites.noCountry'), t('sites.diveCount', { n: row.site.dives })].join(' · ')}</span>
             </span>
-            {#if row.metres !== null}<span class="od-site-chooser--distance od-value">{away(row.metres)}</span>{/if}
+            {#if row.metres !== null}<span class="bc-site-chooser--distance bc-value">{away(row.metres)}</span>{/if}
           </button>
         </li>
       {/each}
-      {#if !rows.length}<li class="od-site-chooser--none">{t('sites.noMatch')}</li>{/if}
+      {#if !rows.length}<li class="bc-site-chooser--none">{t('sites.noMatch')}</li>{/if}
     </ul>
     {#if typed}
-      <button type="button" tabindex="-1" role="option" aria-selected={active === rows.length} class="od-site-chooser--new" class:od-site-chooser--active={active === rows.length} onclick={() => pick(rows.length)}>
+      <button type="button" tabindex="-1" role="option" aria-selected={active === rows.length} class="bc-site-chooser--new" class:bc-site-chooser--active={active === rows.length} onclick={() => pick(rows.length)}>
         <Icon name="plus" size={18} />
         <span>{t(position ? 'desktopSites.newSiteNamedHere' : 'desktopSites.newSiteNamed', { text: typed })}</span>
       </button>
@@ -125,12 +125,12 @@
 
 <style>
   @layer od.components {
-    .od-site-chooser--scrim {
+    .bc-site-chooser--scrim {
       position: fixed;
       inset: 0;
       z-index: 13000;
     }
-    .od-site-chooser {
+    .bc-site-chooser {
       position: fixed;
       width: 380px;
       max-height: min(480px, calc(100vh - 16px));
@@ -138,40 +138,40 @@
       flex-direction: column;
       padding: 12px 0 4px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow:
         0 2px 6px 2px rgb(0 0 0 / 0.15),
         0 1px 2px rgb(0 0 0 / 0.3);
     }
-    .od-site-chooser--search {
+    .bc-site-chooser--search {
       display: flex;
       align-items: center;
       gap: 8px;
       height: 44px;
       margin: 0 12px;
       padding: 0 12px;
-      border: 2px solid var(--od-secondary);
+      border: 2px solid var(--bc-secondary);
       border-radius: 22px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-chooser--search input {
+    .bc-site-chooser--search input {
       flex: 1;
       min-width: 0;
       border: 0;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       outline: none;
     }
-    .od-site-chooser--heading {
+    .bc-site-chooser--heading {
       margin: 8px 0 2px;
       padding: 0 16px;
       font-size: 12px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-chooser--list {
+    .bc-site-chooser--list {
       flex: 1;
       min-height: 0;
       margin: 0;
@@ -179,8 +179,8 @@
       list-style: none;
       overflow: auto;
     }
-    .od-site-chooser--list button,
-    .od-site-chooser--new {
+    .bc-site-chooser--list button,
+    .bc-site-chooser--new {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -191,45 +191,45 @@
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-align: start;
       cursor: pointer;
     }
-    .od-site-chooser--new {
-      border-top: 1px solid var(--od-separator);
+    .bc-site-chooser--new {
+      border-top: 1px solid var(--bc-separator);
       font-weight: 500;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
     }
-    .od-site-chooser--active > button,
-    .od-site-chooser--new.od-site-chooser--active,
-    .od-site-chooser--list li:hover > button,
-    .od-site-chooser--new:hover {
-      background: var(--od-surface-container-high);
+    .bc-site-chooser--active > button,
+    .bc-site-chooser--new.bc-site-chooser--active,
+    .bc-site-chooser--list li:hover > button,
+    .bc-site-chooser--new:hover {
+      background: var(--bc-surface-container-high);
     }
-    .od-site-chooser--text {
+    .bc-site-chooser--text {
       display: flex;
       flex: 1;
       flex-direction: column;
       min-width: 0;
     }
-    .od-site-chooser--name {
+    .bc-site-chooser--name {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-site-chooser--sub {
+    .bc-site-chooser--sub {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-chooser--distance {
+    .bc-site-chooser--distance {
       flex: none;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-chooser--none {
+    .bc-site-chooser--none {
       padding: 12px 16px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

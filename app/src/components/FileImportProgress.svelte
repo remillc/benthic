@@ -33,35 +33,35 @@
 </script>
 
 {#if importState.active && importState.visible}
-  <div class="od-import-progress" role="group" aria-label={t('importFlow.group')}>
+  <div class="bc-import-progress" role="group" aria-label={t('importFlow.group')}>
     <!-- Announced once per phase, not at each count (the line itself is read on demand). -->
-    <span class="od-sr-only" role="status">{phaseLabel}</span>
-    <div class="od-import-progress--head">
-      <span class="od-import-progress--phase">{phaseLabel}</span>
+    <span class="bc-sr-only" role="status">{phaseLabel}</span>
+    <div class="bc-import-progress--head">
+      <span class="bc-import-progress--phase">{phaseLabel}</span>
       {#if importState.cancellable}
-        <button type="button" class="od-text-button od-import-progress--cancel" disabled={importState.cancelling} onclick={() => importProgress.cancel()}>{t('importFlow.cancel')}</button>
+        <button type="button" class="bc-text-button bc-import-progress--cancel" disabled={importState.cancelling} onclick={() => importProgress.cancel()}>{t('importFlow.cancel')}</button>
       {/if}
     </div>
-    <div class="od-import-progress--bar">
+    <div class="bc-import-progress--bar">
       {#if theme.ios}
         <div
-          class="od-import-progress--ios"
-          class:od-import-progress--indeterminate={importState.indeterminate}
+          class="bc-import-progress--ios"
+          class:bc-import-progress--indeterminate={importState.indeterminate}
           role="progressbar"
           aria-label={phaseLabel}
           aria-valuemin="0"
           aria-valuemax="100"
           aria-valuenow={importState.indeterminate ? undefined : percent}
         >
-          <div class="od-import-progress--fill" style:width={importState.indeterminate ? undefined : `${percent}%`}></div>
+          <div class="bc-import-progress--fill" style:width={importState.indeterminate ? undefined : `${percent}%`}></div>
         </div>
       {:else}
         <LinearWavyProgress value={importState.fraction} indeterminate={importState.indeterminate} label={phaseLabel} />
       {/if}
     </div>
-    <div class="od-import-progress--line">
+    <div class="bc-import-progress--line">
       {#if importState.indeterminate}
-        <span class="od-import-progress--count">{count}</span>
+        <span class="bc-import-progress--count">{count}</span>
       {:else}
         {#key importState.segment}
           <ProgressLine done={Math.round(importState.fraction * 1000)} total={1000} {count} label={spoken} />
@@ -74,7 +74,7 @@
 <style>
   @layer od.components {
     /* A card over every screen, above the bottom bar and clear of the gesture bar; fixed, so nothing moves under it. */
-    .od-import-progress {
+    .bc-import-progress {
       position: fixed;
       z-index: 13000;
       left: 12px;
@@ -84,14 +84,14 @@
       margin-inline: auto;
       padding: 12px 16px 14px;
       border-radius: 16px;
-      background: var(--od-surface-container-highest, var(--od-surface));
-      color: var(--od-text);
+      background: var(--bc-surface-container-highest, var(--bc-surface));
+      color: var(--bc-text);
       box-shadow: 0 2px 12px rgb(0 0 0 / 0.22);
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-import-progress--head {
+    .bc-import-progress--head {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -99,36 +99,36 @@
       height: 36px;
     }
 
-    .od-import-progress--phase {
+    .bc-import-progress--phase {
       font-weight: 600;
     }
 
-    .od-import-progress--bar {
+    .bc-import-progress--bar {
       margin-top: 4px;
     }
 
-    .od-import-progress--line {
+    .bc-import-progress--line {
       margin-top: 6px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       height: 20px;
     }
 
-    .od-import-progress--ios {
+    .bc-import-progress--ios {
       position: relative;
       height: 8px;
       border-radius: 4px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       overflow: hidden;
     }
 
-    .od-import-progress--fill {
+    .bc-import-progress--fill {
       height: 100%;
       border-radius: inherit;
-      background: var(--od-action);
+      background: var(--bc-action);
       transition: width 0.3s;
     }
 
-    .od-import-progress--indeterminate .od-import-progress--fill {
+    .bc-import-progress--indeterminate .bc-import-progress--fill {
       position: absolute;
       width: 40%;
       animation: od-import-progress-slide 1.4s ease-in-out infinite;
@@ -144,7 +144,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-import-progress--fill {
+      .bc-import-progress--fill {
         transition: none;
       }
     }

@@ -150,10 +150,10 @@ test('the logbook\'s « + » goes through the demo guard, and the first step has
   const steps = src('components/FirstLaunchSteps.svelte');
   assert.match(steps, /\{#if demoOffered\}/);
   assert.match(steps, /t\('demoLogbook\.link'\)/);
-  const css = steps.slice(steps.indexOf('.od-first-launch--text-button {'));
+  const css = steps.slice(steps.indexOf('.bc-first-launch--text-button {'));
   assert.match(css, /cursor: pointer/);
   assert.match(css, /&:hover:not\(:disabled\)/);
-  assert.match(css, /var\(--od-release-link\)/);
+  assert.match(css, /var\(--bc-release-link\)/);
 });
 
 test('the banner and its dialogs read the texts of the mock-ups, with hand pointers and variables', () => {
@@ -169,9 +169,9 @@ test('the banner and its dialogs read the texts of the mock-ups, with hand point
   assert.equal(fr.add.text, 'Pour ajouter vos plongées, commencez votre carnet. Le carnet d’exemple sera effacé.');
   const host = src('components/DemoHost.svelte');
   const css = host.slice(host.indexOf('<style>'));
-  assert.match(css, /\.od-demo-banner--start \{[^]*?cursor: pointer/);
+  assert.match(css, /\.bc-demo-banner--start \{[^]*?cursor: pointer/);
   assert.match(css, /&:hover \{/);
   assert.doesNotMatch(css, /#[0-9a-fA-F]{3,8}\b/, 'colours are variables');
-  assert.match(host, /<DemoHost|class="od-demo-banner"/);
+  assert.match(host, /<DemoHost|class="bc-demo-banner"/);
   assert.match(src('App.svelte'), /<DemoHost \/>/);
 });

@@ -13,22 +13,22 @@
   let { title, rows } = $props();
 </script>
 
-<h2 class="od-gas-results od-gas-results--title">{title}</h2>
-<div class="od-gas-results od-gas-results--results" role="list" aria-live="polite">
+<h2 class="bc-gas-results bc-gas-results--title">{title}</h2>
+<div class="bc-gas-results bc-gas-results--results" role="list" aria-live="polite">
   {#each rows as row, i (i)}
-    <div class="od-gas-results--result" role="listitem">
-      <span class="od-gas-results--texts">
-        <span class="od-gas-results--name">{row.title}</span>
-        <span class="od-gas-results--sub" class:od-gas-results--alarm={row.alarm}>{row.sub}</span>
+    <div class="bc-gas-results--result" role="listitem">
+      <span class="bc-gas-results--texts">
+        <span class="bc-gas-results--name">{row.title}</span>
+        <span class="bc-gas-results--sub" class:bc-gas-results--alarm={row.alarm}>{row.sub}</span>
       </span>
-      <span class="od-gas-results--value od-value">{row.value}</span>
+      <span class="bc-gas-results--value bc-value">{row.value}</span>
     </div>
   {/each}
 </div>
 
 <style>
   @layer od.components {
-    .od-gas-results--title {
+    .bc-gas-results--title {
       margin: 0;
       padding: 20px 20px 8px;
       font-size: 18px;
@@ -36,14 +36,14 @@
       font-weight: 700;
     }
 
-    .od-gas-results--results {
+    .bc-gas-results--results {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-gas-results--result {
+    .bc-gas-results--result {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -52,29 +52,29 @@
       box-sizing: border-box;
     }
 
-    .od-gas-results--texts {
+    .bc-gas-results--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-gas-results--name {
+    .bc-gas-results--name {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-gas-results--sub {
+    .bc-gas-results--sub {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-gas-results--alarm {
-        color: var(--od-alarm);
+      &.bc-gas-results--alarm {
+        color: var(--bc-alarm);
       }
     }
 
-    .od-gas-results--value {
+    .bc-gas-results--value {
       flex: none;
       font-size: 24px;
       line-height: 32px;

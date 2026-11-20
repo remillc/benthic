@@ -60,23 +60,23 @@ export function rgb(hex) {
 /** The three gradients of the mock-up (#od-heat-1, 2 and 3 in android-stats.dc.html). */
 export const SPOT_GRADIENTS = /** @type {const} */ ({
   one: [
-    { offset: 0, colour: '--od-heat-1', alpha: 0.8 },
-    { offset: 0.5, colour: '--od-heat-spot-mid', alpha: 0.5 },
-    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+    { offset: 0, colour: '--bc-heat-1', alpha: 0.8 },
+    { offset: 0.5, colour: '--bc-heat-spot-mid', alpha: 0.5 },
+    { offset: 1, colour: '--bc-heat-fade', alpha: 0 },
   ],
   few: [
-    { offset: 0, colour: '--od-heat-4', alpha: 0.85 },
-    { offset: 0.35, colour: '--od-heat-3', alpha: 0.75 },
-    { offset: 0.7, colour: '--od-heat-spot-edge', alpha: 0.5 },
-    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+    { offset: 0, colour: '--bc-heat-4', alpha: 0.85 },
+    { offset: 0.35, colour: '--bc-heat-3', alpha: 0.75 },
+    { offset: 0.7, colour: '--bc-heat-spot-edge', alpha: 0.5 },
+    { offset: 1, colour: '--bc-heat-fade', alpha: 0 },
   ],
   many: [
-    { offset: 0, colour: '--od-heat-6', alpha: 0.9 },
-    { offset: 0.25, colour: '--od-heat-5', alpha: 0.85 },
-    { offset: 0.5, colour: '--od-heat-4', alpha: 0.75 },
-    { offset: 0.72, colour: '--od-heat-3', alpha: 0.55 },
-    { offset: 0.88, colour: '--od-heat-spot-edge', alpha: 0.35 },
-    { offset: 1, colour: '--od-heat-fade', alpha: 0 },
+    { offset: 0, colour: '--bc-heat-6', alpha: 0.9 },
+    { offset: 0.25, colour: '--bc-heat-5', alpha: 0.85 },
+    { offset: 0.5, colour: '--bc-heat-4', alpha: 0.75 },
+    { offset: 0.72, colour: '--bc-heat-3', alpha: 0.55 },
+    { offset: 0.88, colour: '--bc-heat-spot-edge', alpha: 0.35 },
+    { offset: 1, colour: '--bc-heat-fade', alpha: 0 },
   ],
 });
 /** Every spot is drawn at this opacity over its own gradient, as the mock-up does. */

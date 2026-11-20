@@ -110,21 +110,21 @@ test('Gaz: the card colours are the mobile ones, declared as tokens in light and
   const light = css.slice(0, css.indexOf('html.dark {'));
   const dark = css.slice(css.indexOf('html.dark {'));
   for (const [token, hex] of [
-    ['--od-cylinder-breathed', '#CFDEF0'],
-    ['--od-cylinder-water-top', '#A9C4E2'],
-    ['--od-cylinder-water-bottom', '#5584B5'],
-    ['--od-cylinder-level', '#C62828'],
-    ['--od-gas-card-selected', '#F5F4F0'],
-    ['--od-gas-card-selected-outline', '#1F2124'],
+    ['--bc-cylinder-breathed', '#CFDEF0'],
+    ['--bc-cylinder-water-top', '#A9C4E2'],
+    ['--bc-cylinder-water-bottom', '#5584B5'],
+    ['--bc-cylinder-level', '#C62828'],
+    ['--bc-gas-card-selected', '#F5F4F0'],
+    ['--bc-gas-card-selected-outline', '#1F2124'],
   ]) {
     assert.ok(light.includes(`${token}: ${hex};`), `${token} ${hex} in light`);
   }
-  for (const token of ['--od-gas-card-selected', '--od-gas-card-selected-outline', '--od-gas-card-add-outline', '--od-gas-reserve', '--od-gas-track', '--od-cylinder-breathed', '--od-cylinder-level']) {
+  for (const token of ['--bc-gas-card-selected', '--bc-gas-card-selected-outline', '--bc-gas-card-add-outline', '--bc-gas-reserve', '--bc-gas-track', '--bc-cylinder-breathed', '--bc-cylinder-level']) {
     assert.ok(dark.includes(`${token}:`), `${token} in dark`);
   }
   // The selected card: neutral background and a dark 2 dp outline, not blue; no hard-coded colour in the components.
   const cards = read('app/src/components/DesktopGasCards.svelte');
-  assert.match(cards, /\.od-desktop-gas-cards--card\.od-desktop-gas-cards--selected \{\s*border-color: var\(--od-gas-card-selected-outline\);\s*background: var\(--od-gas-card-selected\);/);
+  assert.match(cards, /\.bc-desktop-gas-cards--card\.bc-desktop-gas-cards--selected \{\s*border-color: var\(--bc-gas-card-selected-outline\);\s*background: var\(--bc-gas-card-selected\);/);
   assert.match(cards, /border: 2px solid transparent/);
   for (const file of ['DesktopGasCards', 'DesktopConsumption', 'DesktopWeights', 'DesktopOtherGear']) {
     assert.doesNotMatch(read(`app/src/components/${file}.svelte`), /#[0-9A-Fa-f]{3,8}\b(?!;?\s*\/\/)/, `${file} has no hard-coded colour`);
@@ -182,7 +182,7 @@ test('Autre équipement: a seam of three props, no storage of its own, inert in 
 
 test('the Carte tab keeps its height and the tab content replaces the old map block', () => {
   const fields = read('app/src/components/DesktopDiveFields.svelte');
-  assert.match(fields, /\.od-desktop-dive-fields--map \{\s*flex: none;\s*height: 300px;/);
+  assert.match(fields, /\.bc-desktop-dive-fields--map \{\s*flex: none;\s*height: 300px;/);
   assert.doesNotMatch(read('app/src/pages/DiveDetail.svelte'), /desk-map/);
 });
 

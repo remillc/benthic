@@ -198,48 +198,48 @@
   <ReadOnlyNotice />
 
   {#if piece}
-    <div class="od-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
-      {#if piece.type === 'computer'}<DcTile model={piece.computerModel || piece.name} size={150} radius={16} photo={photoUrl} fallback={genericIcon} />{:else if photoUrl}<img class="od-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
+    <div class="bc-piece-page--image" role="img" aria-label={t('gear.piece.image')}>
+      {#if piece.type === 'computer'}<DcTile model={piece.computerModel || piece.name} size={150} radius={16} photo={photoUrl} fallback={genericIcon} />{:else if photoUrl}<img class="bc-piece-page--photo" src={photoUrl} alt="" />{:else}<GearIcon type={piece.type} name={piece.name} size={72} />{/if}
     </div>
-    <p class="od-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}</p>
-    <h2 class="od-piece-page--name">{piece.name}</h2>
+    <p class="bc-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}</p>
+    <h2 class="bc-piece-page--name">{piece.name}</h2>
     {#if piece.retired}
       <!-- A retired piece (profil-piece-retiree-android): when and why, put back in service, export, no pencil. -->
-      <p class="od-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
-      <p class="od-piece-page--retired-line">{[piece.retiredReason ? t(`gear.retire.reason.${piece.retiredReason}`) : '', t('gear.retire.noReminders')].filter(Boolean).join('. ')}</p>
-      <div class="od-piece-page--retired-buttons">
-        <button type="button" class="od-piece-page--filled" disabled={gear.readOnly} onclick={restore}><Icon name="undo" size={20} />{t('gear.retire.restore')}</button>
-        <button type="button" class="od-piece-page--outlined" disabled={exportingHistory} onclick={exportPieceHistory}><Icon name="export" size={20} />{t('maintenance.export.button')}</button>
+      <p class="bc-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
+      <p class="bc-piece-page--retired-line">{[piece.retiredReason ? t(`gear.retire.reason.${piece.retiredReason}`) : '', t('gear.retire.noReminders')].filter(Boolean).join('. ')}</p>
+      <div class="bc-piece-page--retired-buttons">
+        <button type="button" class="bc-piece-page--filled" disabled={gear.readOnly} onclick={restore}><Icon name="undo" size={20} />{t('gear.retire.restore')}</button>
+        <button type="button" class="bc-piece-page--outlined" disabled={exportingHistory} onclick={exportPieceHistory}><Icon name="export" size={20} />{t('maintenance.export.button')}</button>
       </div>
     {/if}
 
-    <div class="od-piece-page--figures">
-      <span class="od-piece-page--figure"><span class="od-piece-page--value">{formatNumber(figures.dives, 0)}</span><span class="od-piece-page--legend">{t('gear.piece.dives')}</span></span>
-      <span class="od-piece-page--figure"><span class="od-piece-page--value">{figures.seconds ? formatHours(figures.seconds) : '–'}</span><span class="od-piece-page--legend">{t('gear.piece.hours')}</span></span>
-      <span class="od-piece-page--figure"><span class="od-piece-page--value">{figures.deepestMm ? formatDepth(figures.deepestMm, logbook.prefs) : '–'}</span><span class="od-piece-page--legend">{t('gear.piece.deepest')}</span></span>
+    <div class="bc-piece-page--figures">
+      <span class="bc-piece-page--figure"><span class="bc-piece-page--value">{formatNumber(figures.dives, 0)}</span><span class="bc-piece-page--legend">{t('gear.piece.dives')}</span></span>
+      <span class="bc-piece-page--figure"><span class="bc-piece-page--value">{figures.seconds ? formatHours(figures.seconds) : '–'}</span><span class="bc-piece-page--legend">{t('gear.piece.hours')}</span></span>
+      <span class="bc-piece-page--figure"><span class="bc-piece-page--value">{figures.deepestMm ? formatDepth(figures.deepestMm, logbook.prefs) : '–'}</span><span class="bc-piece-page--legend">{t('gear.piece.deepest')}</span></span>
     </div>
 
     {#if !piece.retired}
-    <a href={`/profile/gear/${id}/maintenance`} class="od-piece-page--maintenance" aria-label={t('maintenance.piece.openAria', { name: piece.name })}>
+    <a href={`/profile/gear/${id}/maintenance`} class="bc-piece-page--maintenance" aria-label={t('maintenance.piece.openAria', { name: piece.name })}>
       <Icon name="clock" size={22} />
-      <span class="od-piece-page--maintenance-texts">
-        <span class="od-piece-page--maintenance-title">{t('maintenance.piece.title')}</span>
-        <span class="od-piece-page--maintenance-line" class:od-piece-page--late={worst?.status === 'overdue'}>{worst ? tagText(worst) : t('maintenance.piece.noRuleLine')}</span>
+      <span class="bc-piece-page--maintenance-texts">
+        <span class="bc-piece-page--maintenance-title">{t('maintenance.piece.title')}</span>
+        <span class="bc-piece-page--maintenance-line" class:bc-piece-page--late={worst?.status === 'overdue'}>{worst ? tagText(worst) : t('maintenance.piece.noRuleLine')}</span>
       </span>
       <Icon name="chevron" size={20} />
     </a>
     {/if}
 
     {#if details.length}
-      <h3 class="od-piece-page--title">{t('gear.piece.details')}</h3>
-      <dl class="od-piece-page--details">
+      <h3 class="bc-piece-page--title">{t('gear.piece.details')}</h3>
+      <dl class="bc-piece-page--details">
         {#each details as row (row.label)}
-          <div class="od-piece-page--detail"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+          <div class="bc-piece-page--detail"><dt>{row.label}</dt><dd>{row.value}</dd></div>
         {/each}
       </dl>
     {/if}
 
-    <p class="od-piece-page--last">
+    <p class="bc-piece-page--last">
       {#if lastDive}
         {lastDive.site ? t('gear.piece.lastDive', { date: formatDate(lastDive.date), site: lastDive.site }) : t('gear.piece.lastDiveNoSite', { date: formatDate(lastDive.date) })}
       {:else if figures.last}
@@ -250,14 +250,14 @@
     </p>
 
     {#if piece.retired}
-      <button type="button" class="od-piece-page--forever" disabled={gear.readOnly} onclick={() => (confirmForever = true)}>{t('gear.forever.button')}</button>
+      <button type="button" class="bc-piece-page--forever" disabled={gear.readOnly} onclick={() => (confirmForever = true)}>{t('gear.forever.button')}</button>
     {/if}
   {:else if loaded}
-    <p class="od-piece-page--last">{t('gear.inventory.noResults')}</p>
+    <p class="bc-piece-page--last">{t('gear.inventory.noResults')}</p>
   {/if}
 {/snippet}
 
-<Page class="od-piece-page">
+<Page class="bc-piece-page">
   <Navbar>
     {#snippet left()}
       <BackLink label={t('gear.profile.equipment')} name={t('gear.piece.back')} />
@@ -278,10 +278,10 @@
             }
           }}
         >
-          <Icon name="edit" /><span class="od-sr-only">{t('gear.piece.edit')}</span>
+          <Icon name="edit" /><span class="bc-sr-only">{t('gear.piece.edit')}</span>
         </a>
         <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.piece.more')}</span>
+          <Icon name="more" weight={4} /><span class="bc-sr-only">{t('gear.piece.more')}</span>
         </a>
       {/if}
     {/snippet}
@@ -298,11 +298,11 @@
 {/if}
 {#if confirmForever && piece}
   <!-- « Supprimer pour de bon ? » (profil-piece-supprimer-definitif-android): only from a retired piece. -->
-  <Md3Dialog class="od-piece-forever" title={t('gear.forever.title')} text={t('gear.forever.text', { name: piece.name })} role="alertdialog" oncancel={() => (confirmForever = false)}>
+  <Md3Dialog class="bc-piece-forever" title={t('gear.forever.title')} text={t('gear.forever.text', { name: piece.name })} role="alertdialog" oncancel={() => (confirmForever = false)}>
     <span></span>
     {#snippet actions()}
       <button type="button" onclick={() => (confirmForever = false)}>{t('gear.retire.cancel')}</button>
-      <button type="button" class="od-piece-page--forever-confirm" onclick={removeForGood}>{t('gear.forever.confirm')}</button>
+      <button type="button" class="bc-piece-page--forever-confirm" onclick={removeForGood}>{t('gear.forever.confirm')}</button>
     {/snippet}
   </Md3Dialog>
 {/if}
@@ -310,18 +310,18 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-piece-page .page-content) {
+    :global(.bc-piece-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-piece-page--photo {
+    .bc-piece-page--photo {
       width: 100%;
       height: 100%;
       border-radius: 20px;
       object-fit: cover;
     }
 
-    .od-piece-page--maintenance {
+    .bc-piece-page--maintenance {
       margin: 12px 16px 0;
       min-height: 56px;
       padding: 8px 16px;
@@ -329,35 +329,35 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-piece-page--maintenance-texts {
+    .bc-piece-page--maintenance-texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-piece-page--maintenance-title {
+    .bc-piece-page--maintenance-title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-piece-page--maintenance-line {
+    .bc-piece-page--maintenance-line {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-page--late {
-      color: var(--od-alarm);
+    .bc-piece-page--late {
+      color: var(--bc-alarm);
     }
 
-    .od-piece-page--image {
+    .bc-piece-page--image {
       overflow: hidden;
       margin: 8px 16px 0;
       height: 160px;
@@ -365,40 +365,40 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-text);
+      background: var(--bc-release-tile);
+      color: var(--bc-text);
     }
 
-    .od-piece-page--type {
+    .bc-piece-page--type {
       margin: 16px 20px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-page--retired {
+    .bc-piece-page--retired {
       margin: 4px 20px 0;
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-piece-page--retired-line {
+    .bc-piece-page--retired-line {
       margin: 2px 20px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-page--retired-buttons {
+    .bc-piece-page--retired-buttons {
       margin: 16px 16px 0;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .od-piece-page--filled,
-    .od-piece-page--outlined {
+    .bc-piece-page--filled,
+    .bc-piece-page--outlined {
       width: auto;
       height: 40px;
       padding: 0 20px 0 16px;
@@ -411,25 +411,25 @@
       font-weight: 500;
     }
 
-    .od-piece-page--filled {
+    .bc-piece-page--filled {
       border: none;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-piece-page--outlined {
-      border: var(--od-outline-width) solid var(--od-outline);
+    .bc-piece-page--outlined {
+      border: var(--bc-outline-width) solid var(--bc-outline);
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-piece-page--filled:disabled,
-    .od-piece-page--outlined:disabled {
+    .bc-piece-page--filled:disabled,
+    .bc-piece-page--outlined:disabled {
       opacity: 0.38;
     }
 
     /* Only from a retired piece, at the bottom: red text, no fill. */
-    .od-piece-page--forever {
+    .bc-piece-page--forever {
       width: auto;
       margin: 0 12px 32px;
       height: 48px;
@@ -437,17 +437,17 @@
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    :global(.od-md3-dialog--actions button.od-piece-page--forever-confirm) {
-      color: var(--od-alarm);
+    :global(.bc-md3-dialog--actions button.bc-piece-page--forever-confirm) {
+      color: var(--bc-alarm);
     }
 
-    .od-piece-page--name {
+    .bc-piece-page--name {
       margin: 0 20px;
       font-size: 24px;
       line-height: 30px;
@@ -455,65 +455,65 @@
       overflow-wrap: anywhere;
     }
 
-    .od-piece-page--figures {
+    .bc-piece-page--figures {
       margin: 16px 16px 0;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    .od-piece-page--figure {
+    .bc-piece-page--figure {
       padding: 12px 8px;
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       text-align: center;
     }
 
-    .od-piece-page--value {
+    .bc-piece-page--value {
       font-size: 20px;
       line-height: 26px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-piece-page--legend {
+    .bc-piece-page--legend {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-piece-page--title {
+    .bc-piece-page--title {
       margin: 24px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
     }
 
-    .od-piece-page--details {
+    .bc-piece-page--details {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-piece-page--detail {
+    .bc-piece-page--detail {
       padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       gap: 16px;
 
       & + & {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
 
       dt {
         flex: none;
         font-size: 14px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       dd {
@@ -525,11 +525,11 @@
       }
     }
 
-    .od-piece-page--last {
+    .bc-piece-page--last {
       margin: 16px 20px 32px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

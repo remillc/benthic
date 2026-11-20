@@ -54,24 +54,24 @@
   const state = $derived(states[sync]);
 </script>
 
-<div class="od-sync-status" class:od-sync-status--pending={state.pending} class:od-sync-status--steady={steady} role={live ? 'status' : undefined}>
-  <div class="od-sync-status--line">
+<div class="bc-sync-status" class:bc-sync-status--pending={state.pending} class:bc-sync-status--steady={steady} role={live ? 'status' : undefined}>
+  <div class="bc-sync-status--line">
     <Icon name={state.icon} size={18} />
     <!-- The stage is announced, not each percent: the bar carries the value. -->
     <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' ? syncFlavour() : ''}`) : state.text}</span>
-    {#if showProgress}<span class="od-sync-status--percent od-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
+    {#if showProgress}<span class="bc-sync-status--percent bc-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
   </div>
   {#if showProgress}
     <!-- MD3 linear progress indicator, determinate: 4 dp, rounded. -->
-    <div class="od-sync-status--bar" role="progressbar" aria-label={t('sync.syncing')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
-      <div class="od-sync-status--fill" style:width="{percent}%"></div>
+    <div class="bc-sync-status--bar" role="progressbar" aria-label={t('sync.syncing')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
+      <div class="bc-sync-status--fill" style:width="{percent}%"></div>
     </div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-sync-status {
+    .bc-sync-status {
       position: relative;
       padding: 8px 16px;
       font-size: 14px;
@@ -83,28 +83,28 @@
         color: var(--f7-list-item-text-text-color);
       }
 
-      &.od-sync-status--pending {
-        color: var(--od-tertiary);
+      &.bc-sync-status--pending {
+        color: var(--bc-tertiary);
       }
     }
 
-    .od-sync-status--line {
+    .bc-sync-status--line {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     /* Two lines of text in any state: nothing under it moves. */
-    .od-sync-status--steady .od-sync-status--line {
+    .bc-sync-status--steady .bc-sync-status--line {
       min-height: 40px;
     }
 
-    .od-sync-status--percent {
+    .bc-sync-status--percent {
       margin-left: auto;
     }
 
     /* In the bottom padding, under the text: the line keeps its height. */
-    .od-sync-status--bar {
+    .bc-sync-status--bar {
       position: absolute;
       left: 16px;
       right: 16px;
@@ -112,14 +112,14 @@
       height: 4px;
       border-radius: 2px;
       /* The progress colours of every linear indicator, never black (task 2026-11-14-130). */
-      background: var(--od-progress-track);
+      background: var(--bc-progress-track);
       overflow: hidden;
     }
 
-    .od-sync-status--fill {
+    .bc-sync-status--fill {
       height: 100%;
       border-radius: 2px;
-      background: var(--od-progress-active);
+      background: var(--bc-progress-active);
       transition: width 200ms linear;
     }
   }

@@ -54,7 +54,7 @@ test('the menu is the Settings one and sets the same setting', () => {
 
 test('the menu shows only on the desktop first launch', () => {
   const start = src('pages/WelcomeStart.svelte');
-  assert.match(start, /\{#if desktopApp\}\s*<!--[^>]*-->\s*<div class="od-welcome-start--footer"><WelcomeHelpLink inline \/><DesktopLanguageMenu \/>/);
+  assert.match(start, /\{#if desktopApp\}\s*<!--[^>]*-->\s*<div class="bc-welcome-start--footer"><WelcomeHelpLink inline \/><DesktopLanguageMenu \/>/);
   for (const other of ['pages/WelcomeStep.svelte', 'components/DesktopLogbookStart.svelte']) {
     try {
       assert.doesNotMatch(src(other), /DesktopLanguageMenu/);
@@ -66,7 +66,7 @@ test('the menu shows only on the desktop first launch', () => {
 
 test('colour token with a dark value, and the keys in both languages', () => {
   const theme = src('theme.css');
-  assert.equal(theme.match(/--od-language-divider:/g).length, 2);
+  assert.equal(theme.match(/--bc-language-divider:/g).length, 2);
   for (const lang of ['fr', 'en']) {
     const json = JSON.parse(src(`i18n/${lang}.json`));
     for (const key of ['system', 'button']) assert.ok(lookup(json, `desktopLanguage.${key}`), `${lang}: ${key}`);

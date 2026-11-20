@@ -28,45 +28,45 @@
   let { onpdf, onsummary, onclose, pdfText = t('share.pdfText'), summaryLabel = t('share.summary'), summaryText = t('share.summaryText'), heading = t('share.title'), rows = undefined, onlink = undefined, linkText = t('share.linkText'), onqr = undefined } = $props();
 </script>
 
-<Sheet opened swipeToClose backdrop class="od-share-sheet{layout.split ? ' od-share-sheet--dialog' : ''}" style="height: auto" onSheetClosed={onclose}>
-  <div class="od-share-sheet--sheet" role="dialog" aria-labelledby="od-share-title">
-    <div class="od-share-sheet--handle" aria-hidden="true"></div>
-    <h2 id="od-share-title" class="od-share-sheet--title">{heading}</h2>
+<Sheet opened swipeToClose backdrop class="bc-share-sheet{layout.split ? ' bc-share-sheet--dialog' : ''}" style="height: auto" onSheetClosed={onclose}>
+  <div class="bc-share-sheet--sheet" role="dialog" aria-labelledby="od-share-title">
+    <div class="bc-share-sheet--handle" aria-hidden="true"></div>
+    <h2 id="od-share-title" class="bc-share-sheet--title">{heading}</h2>
     {#if rows}
       {#each rows as row (row.id)}
-        <button type="button" class="od-share-sheet--row" class:od-share-sheet--disabled={row.disabled} disabled={row.disabled} onclick={row.onclick}>
-          <span class="od-share-sheet--circle" aria-hidden="true">
+        <button type="button" class="bc-share-sheet--row" class:bc-share-sheet--disabled={row.disabled} disabled={row.disabled} onclick={row.onclick}>
+          <span class="bc-share-sheet--circle" aria-hidden="true">
             {#if row.icon === 'pdf'}
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg>
             {:else}
               <Icon name={iconName(row.icon)} size={22} weight={2} />
             {/if}
           </span>
-          <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{row.title}</span><span class="od-share-sheet--supporting">{row.text}</span></span>
+          <span class="bc-share-sheet--texts"><span class="bc-share-sheet--headline">{row.title}</span><span class="bc-share-sheet--supporting">{row.text}</span></span>
         </button>
       {/each}
     {:else}
-    <button type="button" class="od-share-sheet--row" onclick={onpdf}>
-      <span class="od-share-sheet--circle" aria-hidden="true">
+    <button type="button" class="bc-share-sheet--row" onclick={onpdf}>
+      <span class="bc-share-sheet--circle" aria-hidden="true">
         <!-- Material Symbols "picture_as_pdf": a filled glyph, unlike the line icons of Icon.svelte. -->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg>
       </span>
-      <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.pdf')}</span><span class="od-share-sheet--supporting">{pdfText}</span></span>
+      <span class="bc-share-sheet--texts"><span class="bc-share-sheet--headline">{t('share.pdf')}</span><span class="bc-share-sheet--supporting">{pdfText}</span></span>
     </button>
-    <button type="button" class="od-share-sheet--row" onclick={onsummary}>
-      <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
-      <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{summaryLabel}</span><span class="od-share-sheet--supporting">{summaryText}</span></span>
+    <button type="button" class="bc-share-sheet--row" onclick={onsummary}>
+      <span class="bc-share-sheet--circle" aria-hidden="true"><Icon name="image" size={22} weight={2} /></span>
+      <span class="bc-share-sheet--texts"><span class="bc-share-sheet--headline">{summaryLabel}</span><span class="bc-share-sheet--supporting">{summaryText}</span></span>
     </button>
     {#if onlink}
-      <button type="button" class="od-share-sheet--row" onclick={onlink}>
-        <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="link" size={22} weight={2} /></span>
-        <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.link')}</span><span class="od-share-sheet--supporting">{linkText}</span></span>
+      <button type="button" class="bc-share-sheet--row" onclick={onlink}>
+        <span class="bc-share-sheet--circle" aria-hidden="true"><Icon name="link" size={22} weight={2} /></span>
+        <span class="bc-share-sheet--texts"><span class="bc-share-sheet--headline">{t('share.link')}</span><span class="bc-share-sheet--supporting">{linkText}</span></span>
       </button>
     {/if}
     {#if onqr}
-      <button type="button" class="od-share-sheet--row" onclick={onqr}>
-        <span class="od-share-sheet--circle" aria-hidden="true"><Icon name="qr" size={22} weight={2} /></span>
-        <span class="od-share-sheet--texts"><span class="od-share-sheet--headline">{t('share.qr')}</span><span class="od-share-sheet--supporting">{t('share.qrText')}</span></span>
+      <button type="button" class="bc-share-sheet--row" onclick={onqr}>
+        <span class="bc-share-sheet--circle" aria-hidden="true"><Icon name="qr" size={22} weight={2} /></span>
+        <span class="bc-share-sheet--texts"><span class="bc-share-sheet--headline">{t('share.qr')}</span><span class="bc-share-sheet--supporting">{t('share.qrText')}</span></span>
       </button>
     {/if}
     {/if}
@@ -75,18 +75,18 @@
 
 <style>
   @layer od.components {
-    :global(.od-share-sheet) {
+    :global(.bc-share-sheet) {
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
+      background: var(--bc-dialog);
       overflow: hidden;
     }
 
-    .od-share-sheet--sheet {
+    .bc-share-sheet--sheet {
       padding: 8px 0 calc(16px + var(--f7-safe-area-bottom, 0px));
     }
 
     /* Tablet and desktop (tasks 2026-11-19-293 and 297, bureau-partage): a dialog in the middle of the window, no handle. */
-    :global(.sheet-modal.od-share-sheet.od-share-sheet--dialog) {
+    :global(.sheet-modal.bc-share-sheet.bc-share-sheet--dialog) {
       left: 50%;
       bottom: 50%;
       width: 480px;
@@ -94,37 +94,37 @@
       border-radius: 28px;
       translate: -50% 50%;
     }
-    :global(.od-share-sheet--dialog) .od-share-sheet--handle {
+    :global(.bc-share-sheet--dialog) .bc-share-sheet--handle {
       display: none;
     }
-    :global(.od-share-sheet--dialog) .od-share-sheet--title {
+    :global(.bc-share-sheet--dialog) .bc-share-sheet--title {
       margin-top: 24px;
     }
 
-    .od-share-sheet--handle {
+    .bc-share-sheet--handle {
       width: 32px;
       height: 4px;
       margin: 8px auto 12px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
       opacity: 0.4;
     }
 
-    .od-share-sheet--title {
+    .bc-share-sheet--title {
       margin: 0 24px 8px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-share-sheet--row {
+    .bc-share-sheet--row {
       width: 100%;
       min-height: 72px;
       padding: 8px 24px 8px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -133,7 +133,7 @@
     }
 
     /* The icon in a 40 dp circle of the water's top colour. */
-    .od-share-sheet--circle {
+    .bc-share-sheet--circle {
       flex: none;
       width: 40px;
       height: 40px;
@@ -141,29 +141,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-share-circle);
-      color: var(--od-share-icon);
+      background: var(--bc-share-circle);
+      color: var(--bc-share-icon);
     }
 
-    .od-share-sheet--disabled {
+    .bc-share-sheet--disabled {
       opacity: 0.5;
     }
 
-    .od-share-sheet--texts {
+    .bc-share-sheet--texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-share-sheet--headline {
+    .bc-share-sheet--headline {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-share-sheet--supporting {
+    .bc-share-sheet--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

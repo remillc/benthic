@@ -163,7 +163,7 @@
   });
 </script>
 
-<Page class="od-quick-entry">
+<Page class="bc-quick-entry">
   {#if ios}
     <Navbar title={t('quickEntry.titleShort')}>
       {#snippet left()}
@@ -174,55 +174,55 @@
       {/snippet}
     </Navbar>
   {:else}
-    <div class="od-quick-entry--bar">
-      <button type="button" class="od-quick-entry--close" aria-label={t('quickEntry.later')} onclick={later}><Icon name="close" /></button>
+    <div class="bc-quick-entry--bar">
+      <button type="button" class="bc-quick-entry--close" aria-label={t('quickEntry.later')} onclick={later}><Icon name="close" /></button>
       <h1>{t('quickEntry.title')}</h1>
-      <button type="button" class="od-quick-entry--save" disabled={saving} onclick={save}>{t('edit.save')}</button>
+      <button type="button" class="bc-quick-entry--save" disabled={saving} onclick={save}>{t('edit.save')}</button>
     </div>
   {/if}
 
-<div class="od-quick-entry--content" class:od-quick-entry--ios={ios}>
+<div class="bc-quick-entry--content" class:bc-quick-entry--ios={ios}>
   {#if dive}
-    <div class="od-quick-entry--dive">
+    <div class="bc-quick-entry--dive">
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} />
-      <span class="od-quick-entry--dive-texts">
-        <span class="od-quick-entry--dive-title">{t('quickEntry.diveOf', { date: formatDateTime(dive.date) })}</span>
-        <span class="od-quick-entry--dive-line od-value">{t('quickEntry.diveLine', { depth: formatDepth(dive.maxDepthMm, logbook.prefs), duration: formatMinutes(dive.durationSeconds) })}</span>
+      <span class="bc-quick-entry--dive-texts">
+        <span class="bc-quick-entry--dive-title">{t('quickEntry.diveOf', { date: formatDateTime(dive.date) })}</span>
+        <span class="bc-quick-entry--dive-line bc-value">{t('quickEntry.diveLine', { depth: formatDepth(dive.maxDepthMm, logbook.prefs), duration: formatMinutes(dive.durationSeconds) })}</span>
       </span>
     </div>
   {/if}
 
-  <h2 class="od-quick-entry--title">{t('quickEntry.site')}</h2>
-  <div class="od-quick-entry--block" role="group" aria-label={t('quickEntry.chooseSite')}>
-    <button type="button" class="od-quick-entry--action" disabled={creating} onclick={createHere}>
+  <h2 class="bc-quick-entry--title">{t('quickEntry.site')}</h2>
+  <div class="bc-quick-entry--block" role="group" aria-label={t('quickEntry.chooseSite')}>
+    <button type="button" class="bc-quick-entry--action" disabled={creating} onclick={createHere}>
       <Icon name="locate" size={22} />
       <span>{t('sites.createHere')}</span>
     </button>
-    <ul class="od-quick-entry--list" role="listbox" aria-label={t('quickEntry.chooseSite')}>
+    <ul class="bc-quick-entry--list" role="listbox" aria-label={t('quickEntry.chooseSite')}>
       {#each rows as row (row.site.uuid)}
         <li role="presentation">
-          <button type="button" role="option" aria-selected={chosen === row.site.uuid} class="od-quick-entry--row" class:od-quick-entry--selected={chosen === row.site.uuid} onclick={() => choose(row.site.uuid)}>
-            <span class="od-quick-entry--texts">
-              <span class="od-quick-entry--name">{row.site.name}{#if row.site.uuid === nearestId}<span class="od-quick-entry--nearest">&nbsp;· {t('quickEntry.nearest')}</span>{/if}</span>
-              <span class="od-quick-entry--line od-value">{line(row)}</span>
+          <button type="button" role="option" aria-selected={chosen === row.site.uuid} class="bc-quick-entry--row" class:bc-quick-entry--selected={chosen === row.site.uuid} onclick={() => choose(row.site.uuid)}>
+            <span class="bc-quick-entry--texts">
+              <span class="bc-quick-entry--name">{row.site.name}{#if row.site.uuid === nearestId}<span class="bc-quick-entry--nearest">&nbsp;· {t('quickEntry.nearest')}</span>{/if}</span>
+              <span class="bc-quick-entry--line bc-value">{line(row)}</span>
             </span>
             {#if chosen === row.site.uuid}<Icon name="check" size={22} />{/if}
           </button>
         </li>
       {/each}
     </ul>
-    <button type="button" class="od-quick-entry--action od-quick-entry--search" onclick={() => chooseSite(f7router, picks)}>{t('quickEntry.searchOther')}</button>
+    <button type="button" class="bc-quick-entry--action bc-quick-entry--search" onclick={() => chooseSite(f7router, picks)}>{t('quickEntry.searchOther')}</button>
   </div>
-  <p class="od-quick-entry--note">{t('quickEntry.siteNote')}</p>
+  <p class="bc-quick-entry--note">{t('quickEntry.siteNote')}</p>
 
-  <h2 class="od-quick-entry--title">{t('edit.buddies')}</h2>
-  <div class="od-quick-entry--block od-quick-entry--field">
+  <h2 class="bc-quick-entry--title">{t('edit.buddies')}</h2>
+  <div class="bc-quick-entry--block bc-quick-entry--field">
     <ChipsField label={t('quickEntry.addBuddy')} bind:values={buddies} suggestions={known} />
   </div>
-  <p class="od-quick-entry--note">{t('quickEntry.buddiesNote')}</p>
+  <p class="bc-quick-entry--note">{t('quickEntry.buddiesNote')}</p>
 
-  <h2 class="od-quick-entry--title">{t('edit.rating')}</h2>
-  <div class="od-quick-entry--block od-quick-entry--rating">
+  <h2 class="bc-quick-entry--title">{t('edit.rating')}</h2>
+  <div class="bc-quick-entry--block bc-quick-entry--rating">
     <StarsInput value={rating} label={t('quickEntry.ratingLabel')} onchange={(v) => (rating = v)} />
   </div>
 </div>
@@ -230,7 +230,7 @@
 
 <style>
   @layer od.components {
-    .od-quick-entry--bar {
+    .bc-quick-entry--bar {
       height: 64px;
       padding: calc(var(--f7-safe-area-top) + 0px) 4px 0 4px;
       box-sizing: content-box;
@@ -249,19 +249,19 @@
       }
     }
 
-    .od-quick-entry--close {
+    .bc-quick-entry--close {
       width: 48px;
       height: 48px;
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-quick-entry--save {
+    .bc-quick-entry--save {
       flex: none;
       width: auto;
       height: 40px;
@@ -269,68 +269,68 @@
       padding: 0 16px;
       border: none;
       border-radius: 20px;
-      background: var(--od-primary);
-      color: var(--od-on-primary);
+      background: var(--bc-primary);
+      color: var(--bc-on-primary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-quick-entry--dive {
+    .bc-quick-entry--dive {
       margin: 4px 16px 0;
       padding: 12px 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-quick-entry--dive-texts {
+    .bc-quick-entry--dive-texts {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-quick-entry--dive-title {
+    .bc-quick-entry--dive-title {
       font-size: 16px;
       font-weight: 600;
     }
 
-    .od-quick-entry--dive-line {
+    .bc-quick-entry--dive-line {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-quick-entry--title {
+    .bc-quick-entry--title {
       margin: 20px 16px 6px 24px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-quick-entry--block {
+    .bc-quick-entry--block {
       margin: 0 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-quick-entry--list {
+    .bc-quick-entry--list {
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
-    .od-quick-entry--action,
-    .od-quick-entry--row {
+    .bc-quick-entry--action,
+    .bc-quick-entry--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
       padding: 8px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       text-align: start;
@@ -339,101 +339,101 @@
       gap: 16px;
     }
 
-    .od-quick-entry--action {
+    .bc-quick-entry--action {
       font-weight: 500;
 
-      :global(.od-icon) {
-        color: var(--od-secondary);
+      :global(.bc-icon) {
+        color: var(--bc-secondary);
       }
     }
 
-    .od-quick-entry--search {
-      border-top: 1px solid var(--od-row-divider);
+    .bc-quick-entry--search {
+      border-top: 1px solid var(--bc-row-divider);
     }
 
-    .od-quick-entry--texts {
+    .bc-quick-entry--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-quick-entry--name {
+    .bc-quick-entry--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-quick-entry--nearest {
+    .bc-quick-entry--nearest {
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-quick-entry--line {
+    .bc-quick-entry--line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Android: the chosen row is filled with the secondary container, its name in 600, a check on the right. */
-    .od-quick-entry--selected {
-      background: var(--od-secondary-container);
-      color: var(--od-on-secondary-container);
+    .bc-quick-entry--selected {
+      background: var(--bc-secondary-container);
+      color: var(--bc-on-secondary-container);
 
-      .od-quick-entry--name {
+      .bc-quick-entry--name {
         font-weight: 600;
       }
 
-      :global(.od-icon) {
-        color: var(--od-secondary);
+      :global(.bc-icon) {
+        color: var(--bc-secondary);
       }
     }
 
-    .od-quick-entry--note {
+    .bc-quick-entry--note {
       margin: 6px 24px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-quick-entry--field {
+    .bc-quick-entry--field {
       padding: 4px 16px 8px;
     }
 
-    .od-quick-entry--rating {
+    .bc-quick-entry--rating {
       padding: 4px 8px;
       display: flex;
       justify-content: center;
     }
 
     /* iPhone: grouped lists, 10 pt corners, small grey titles, a check and no fill on the chosen row. */
-    .od-quick-entry--ios {
-      .od-quick-entry--block,
-      .od-quick-entry--dive {
+    .bc-quick-entry--ios {
+      .bc-quick-entry--block,
+      .bc-quick-entry--dive {
         border-radius: 10px;
       }
 
-      .od-quick-entry--title {
+      .bc-quick-entry--title {
         margin-inline-start: 32px;
         font-weight: 400;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-quick-entry--note {
+      .bc-quick-entry--note {
         margin-inline: 32px;
       }
 
-      .od-quick-entry--selected {
+      .bc-quick-entry--selected {
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
 
-        :global(.od-icon) {
-          color: var(--od-secondary);
+        :global(.bc-icon) {
+          color: var(--bc-secondary);
         }
       }
 
-      .od-quick-entry--list li + li {
-        border-top: 0.5px solid var(--od-row-divider);
+      .bc-quick-entry--list li + li {
+        border-top: 0.5px solid var(--bc-row-divider);
       }
     }
 

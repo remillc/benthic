@@ -1,7 +1,7 @@
 // @ts-check
 // Material 3 Expressive motion scheme for Android: the spring tokens of the
 // Material library, sampled into CSS `linear()` easings (see spring.js) and
-// exposed as --od-motion-* custom properties on <html> (docs/system-design.md,
+// exposed as --bc-motion-* custom properties on <html> (docs/system-design.md,
 // section 8, "Motion").
 //
 // Spatial springs (position, size, scale) may overshoot; effects springs
@@ -41,7 +41,7 @@ export function motionSpring(name) {
 }
 
 /**
- * The custom properties: --od-motion-<name> (easing) and --od-motion-<name>-ms
+ * The custom properties: --bc-motion-<name> (easing) and --bc-motion-<name>-ms
  * (duration).
  * @returns {Record<string, string>}
  */
@@ -50,8 +50,8 @@ export function motionVariables() {
   const vars = {};
   for (const name of Object.keys(SPRINGS)) {
     const { css, ms } = motionSpring(name);
-    vars[`--od-motion-${name}`] = css;
-    vars[`--od-motion-${name}-ms`] = `${ms}ms`;
+    vars[`--bc-motion-${name}`] = css;
+    vars[`--bc-motion-${name}-ms`] = `${ms}ms`;
   }
   return vars;
 }

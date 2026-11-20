@@ -50,24 +50,24 @@
   const title = (d) => [d.number ? t('backup.version.number', { n: d.number }) : '', d.site].filter(Boolean).join(' · ') || formatDate(d.date);
 </script>
 
-<div class="od-backup od-backup-browse">
-  <p class="od-backup--banner" role="status">
+<div class="bc-backup bc-backup-browse">
+  <p class="bc-backup--banner" role="status">
     <span>{t('backup.browse.banner', { date: version ? versionWhen(version.time) : '' })}</span>
-    <button type="button" class="od-outlined-button" onclick={leave}>{t('backup.browse.back')}</button>
+    <button type="button" class="bc-outlined-button" onclick={leave}>{t('backup.browse.back')}</button>
   </p>
   {#if failed}
-    <p class="od-backup--error">{t('backup.browse.failed')}</p>
+    <p class="bc-backup--error">{t('backup.browse.failed')}</p>
   {:else if dives === null}
-    <p class="od-backup--empty" role="status">{t('backup.versions.loading')}</p>
+    <p class="bc-backup--empty" role="status">{t('backup.versions.loading')}</p>
   {:else if !dives.length}
-    <p class="od-backup--empty">{t('backup.browse.empty')}</p>
+    <p class="bc-backup--empty">{t('backup.browse.empty')}</p>
   {:else}
-    <div class="od-backup--list" role="list" style="margin-top: 12px">
+    <div class="bc-backup--list" role="list" style="margin-top: 12px">
       {#each dives as d (d.id)}
-        <div class="od-backup--row" role="listitem">
-          <span class="od-backup--texts">
-            <span class="od-backup--row-title">{title(d)}</span>
-            <span class="od-backup--row-line">{formatDate(d.date)} · {formatDepth(d.maxDepthMm, logbook.prefs)} · {formatDuration(d.durationSeconds)}</span>
+        <div class="bc-backup--row" role="listitem">
+          <span class="bc-backup--texts">
+            <span class="bc-backup--row-title">{title(d)}</span>
+            <span class="bc-backup--row-line">{formatDate(d.date)} · {formatDepth(d.maxDepthMm, logbook.prefs)} · {formatDuration(d.durationSeconds)}</span>
           </span>
         </div>
       {/each}

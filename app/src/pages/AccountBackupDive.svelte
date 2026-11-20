@@ -13,7 +13,7 @@
   const startKey = (f7route.params.key ?? '').replace('T', ' ');
 </script>
 
-<Page class="od-account-backup-page">
+<Page class="bc-account-backup-page">
   <Navbar title={t('backup.dive.title')}>
     {#snippet left()}
       <BackLink label={t('backup.title')} name={t('detail.back')} />

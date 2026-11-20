@@ -60,23 +60,23 @@
   }
 </script>
 
-<div class="od-first-launch-webdav">
+<div class="bc-first-launch-webdav">
   <ReleaseField label={t('welcomeSteps.webdavAddress')} bind:value={w.url} mono error={addressError} disabled={busy} autocomplete="url" oninput={edited} />
   <ReleaseField label={t('welcomeSteps.webdavUser')} bind:value={w.user} disabled={busy} autocomplete="username" oninput={edited} />
   <ReleaseField label={t('welcomeSteps.webdavPassword')} bind:value={w.password} type="password" disabled={busy} autocomplete="current-password" error={passwordError} help={t(deviceKey('welcomeSteps.webdavHelp', kind))} oninput={edited} />
-  <button type="button" class="od-first-launch-webdav--action" disabled={!ready} aria-busy={busy} onclick={run}>
+  <button type="button" class="bc-first-launch-webdav--action" disabled={!ready} aria-busy={busy} onclick={run}>
     {t(create ? 'welcomeSteps.createLogbook' : 'welcomeSteps.seeLogbooks')}
   </button>
 </div>
 
 <style>
   @layer od.components {
-    .od-first-launch-webdav {
+    .bc-first-launch-webdav {
       display: flex;
       flex-direction: column;
     }
 
-    .od-first-launch-webdav--action {
+    .bc-first-launch-webdav--action {
       width: auto;
       align-self: flex-end;
       margin-top: 22px;
@@ -84,8 +84,8 @@
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -104,20 +104,20 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
 /* Phone (task 2026-11-16-227): the button takes the width of the column. */
     @media (max-width: 767.98px) {
-      .od-first-launch-webdav--action {
+      .bc-first-launch-webdav--action {
         align-self: stretch;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch-webdav--action {
+      .bc-first-launch-webdav--action {
         transition: none;
       }
     }

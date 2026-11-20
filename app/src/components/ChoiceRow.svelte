@@ -46,7 +46,7 @@
 </script>
 
 {#if theme.ios}
-  <label class="od-choice-row od-choice-row--ios {extra}">
+  <label class="bc-choice-row bc-choice-row--ios {extra}">
     <span class="radio"><input type="radio" {name} checked={selected} {disabled} onchange={onselect} /><i class="icon-radio"></i></span>
     {@render children()}
   </label>
@@ -57,19 +57,19 @@
     aria-checked={selected}
     {disabled}
     tabindex={selected ? 0 : -1}
-    class="od-choice-row {extra}"
-    class:od-choice-row--selected={selected && tinted}
+    class="bc-choice-row {extra}"
+    class:bc-choice-row--selected={selected && tinted}
     onclick={onselect}
     onkeydown={keydown}
   >
-    <span class="od-choice-row--check" aria-hidden="true">{#if selected}<Icon name="check" size={24} weight={2} />{/if}</span>
+    <span class="bc-choice-row--check" aria-hidden="true">{#if selected}<Icon name="check" size={24} weight={2} />{/if}</span>
     {@render children()}
   </button>
 {/if}
 
 <style>
   @layer od.components {
-    .od-choice-row {
+    .bc-choice-row {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -80,7 +80,7 @@
       border: none;
       border-radius: 12px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
@@ -91,41 +91,41 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: 2px;
       }
 
-      &.od-choice-row--ios {
+      &.bc-choice-row--ios {
         gap: 12px;
         border-radius: 0;
       }
     }
 
-    .od-choice-row--selected {
-      background: var(--od-surface-container-highest);
+    .bc-choice-row--selected {
+      background: var(--bc-surface-container-highest);
     }
 
-    .od-choice-row--check {
+    .bc-choice-row--check {
       flex: none;
       width: 24px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-choice-row {
+      .bc-choice-row {
         transition: box-shadow 120ms linear;
       }
-      .od-choice-row:not(:disabled):hover {
+      .bc-choice-row:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-choice-row {
+      .bc-choice-row {
         transition: none;
       }
     }

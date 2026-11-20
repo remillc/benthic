@@ -8,7 +8,7 @@
   let { name, size = 22 } = $props();
 </script>
 
-<svg class="od-desktop-stat-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+<svg class="bc-desktop-stat-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
   {#if name === 'bars'}
     <path d="M4 20h16 M7 16v-5 M12 16V7 M17 16v-8" />
   {:else if name === 'depth'}
@@ -27,7 +27,7 @@
 
 <style>
   @layer od.components {
-    .od-desktop-stat-icon {
+    .bc-desktop-stat-icon {
       display: block;
       fill: none;
       stroke: currentColor;

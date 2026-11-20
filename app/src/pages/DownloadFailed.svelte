@@ -52,31 +52,31 @@
   }
 </script>
 
-<Page class="od-download-failed">
+<Page class="bc-download-failed">
   <Navbar title={t('downloadFailed.title')}>
     {#snippet left()}
       {#if theme.ios}
         <Link back>{t('downloadFailed.close')}</Link>
       {:else}
-        <Link back iconOnly><Icon name="close" /><span class="od-sr-only">{t('downloadFailed.close')}</span></Link>
+        <Link back iconOnly><Icon name="close" /><span class="bc-sr-only">{t('downloadFailed.close')}</span></Link>
       {/if}
     {/snippet}
   </Navbar>
 
-  <div class="od-download-failed--content">
-    <div class="od-download-failed--header" class:od-download-failed--header-md={!theme.ios}>
+  <div class="bc-download-failed--content">
+    <div class="bc-download-failed--header" class:bc-download-failed--header-md={!theme.ios}>
       {#if !theme.ios}
-        <span class="od-download-failed--badge" aria-hidden="true"><Icon name="bluetoothOff" size={30} /></span>
+        <span class="bc-download-failed--badge" aria-hidden="true"><Icon name="bluetoothOff" size={30} /></span>
       {/if}
-      <div class="od-download-failed--header-texts">
+      <div class="bc-download-failed--header-texts">
         <h1>{computer ? t(`downloadFailed.${reason}.title`, { computer }) : t(`downloadFailed.${reason}.titleNoName`)}</h1>
-        <p class="od-download-failed--text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
+        <p class="bc-download-failed--text">{t(`downloadFailed.${reason}.text`)} {t('downloadFailed.nothingChanged')}</p>
       </div>
     </div>
     {#if received}
-      <div class="od-download-failed--received">
-        <p class="od-download-failed--text">{t('downloadFailed.received', { n: received })}</p>
-        <button type="button" class="od-outlined-button" disabled={keeping} onclick={keep}>
+      <div class="bc-download-failed--received">
+        <p class="bc-download-failed--text">{t('downloadFailed.received', { n: received })}</p>
+        <button type="button" class="bc-outlined-button" disabled={keeping} onclick={keep}>
           {t('download.keepReceived', { n: received })}
         </button>
       </div>
@@ -84,28 +84,28 @@
     <h2>{t('downloadFailed.check')}</h2>
     <ol>
       {#each checks as c, i (c)}
-        <li><span class="od-download-failed--number" aria-hidden="true">{i + 1}</span><span>{t(`downloadFailed.checks.${c}`)}</span></li>
+        <li><span class="bc-download-failed--number" aria-hidden="true">{i + 1}</span><span>{t(`downloadFailed.checks.${c}`)}</span></li>
       {/each}
     </ol>
   </div>
 
   {#snippet fixedContent()}
-    <div class="od-download-failed--actions">
-      <button type="button" class="od-text-button" onclick={() => again(false)}>{t('downloadFailed.otherComputer')}</button>
-      <button type="button" class="od-download-failed--retry" onclick={() => again(true)}>{t('downloadFailed.retry')}</button>
+    <div class="bc-download-failed--actions">
+      <button type="button" class="bc-text-button" onclick={() => again(false)}>{t('downloadFailed.otherComputer')}</button>
+      <button type="button" class="bc-download-failed--retry" onclick={() => again(true)}>{t('downloadFailed.retry')}</button>
     </div>
   {/snippet}
 </Page>
 
 <style>
   @layer od.components {
-    .od-download-failed--content {
+    .bc-download-failed--content {
       margin: 16px 24px 0;
     }
 
     /* Android: a 56 dp pale alarm circle with the crossed-out Bluetooth icon, then
        the title and the sentence 4 dp apart, the icon centred on that group. */
-    .od-download-failed--header-md {
+    .bc-download-failed--header-md {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -114,25 +114,25 @@
         margin: 0 0 4px;
       }
 
-      .od-download-failed--text {
+      .bc-download-failed--text {
         font-size: 18px;
         line-height: 26px;
       }
     }
 
-    .od-download-failed--badge {
+    .bc-download-failed--badge {
       flex: none;
       width: 56px;
       height: 56px;
       border-radius: 28px;
-      background: var(--od-alarm-tint);
-      color: var(--od-alarm);
+      background: var(--bc-alarm-tint);
+      color: var(--bc-alarm);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-download-failed--header-texts {
+    .bc-download-failed--header-texts {
       min-width: 0;
     }
 
@@ -149,11 +149,11 @@
       }
     }
 
-    .od-download-failed--text {
+    .bc-download-failed--text {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 17px;
@@ -172,7 +172,7 @@
       :global(.ios) & {
         font-size: 13px;
         font-weight: 400;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
@@ -194,13 +194,13 @@
       }
     }
 
-    .od-download-failed--number {
+    .bc-download-failed--number {
       flex: none;
       width: 24px;
       height: 24px;
       border-radius: 12px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
       font-size: 12px;
       font-weight: 500;
       display: flex;
@@ -208,7 +208,7 @@
       justify-content: center;
     }
 
-    .od-download-failed--received {
+    .bc-download-failed--received {
       margin-top: 16px;
       display: flex;
       flex-direction: column;
@@ -216,7 +216,7 @@
       gap: 12px;
     }
 
-    .od-download-failed--actions {
+    .bc-download-failed--actions {
       position: absolute;
       inset-inline: 24px;
       bottom: calc(32px + var(--f7-safe-area-bottom, 0px));
@@ -228,13 +228,13 @@
     }
 
     /* MD3 filled button; iOS large filled button. */
-    .od-download-failed--retry {
+    .bc-download-failed--retry {
       height: 40px;
       padding: 0 24px;
       border: none;
       border-radius: 20px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;

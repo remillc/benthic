@@ -47,12 +47,12 @@
 </script>
 
 {#if !ios}
-  <Md3Dialog class="od-retire-dialog" {title} text={t(`gear.retire.text${suffix}`)} role="alertdialog" {oncancel}>
-    <div class="od-retire-dialog--reason">
-      <p id="od-retire-reason" class="od-retire-dialog--label">{t('gear.retire.reasonLabel')}</p>
-      <div class="od-retire-dialog--chips" role="group" aria-labelledby="od-retire-reason">
+  <Md3Dialog class="bc-retire-dialog" {title} text={t(`gear.retire.text${suffix}`)} role="alertdialog" {oncancel}>
+    <div class="bc-retire-dialog--reason">
+      <p id="od-retire-reason" class="bc-retire-dialog--label">{t('gear.retire.reasonLabel')}</p>
+      <div class="bc-retire-dialog--chips" role="group" aria-labelledby="od-retire-reason">
         {#each RETIRE_REASONS as r (r)}
-          <button type="button" class="od-retire-dialog--chip" class:od-retire-dialog--chip-on={reason === r} aria-pressed={reason === r} onclick={() => (reason = reason === r ? undefined : r)}>
+          <button type="button" class="bc-retire-dialog--chip" class:bc-retire-dialog--chip-on={reason === r} aria-pressed={reason === r} onclick={() => (reason = reason === r ? undefined : r)}>
             {#if reason === r}<Icon name="check" size={18} />{/if}{t(`gear.retire.reason.${r}`)}
           </button>
         {/each}
@@ -67,45 +67,45 @@
 
 <style>
   @layer od.components {
-    :global(.od-retire-dialog .od-retire-dialog--reason) {
+    :global(.bc-retire-dialog .bc-retire-dialog--reason) {
       margin: 16px 24px 0;
     }
 
-    :global(.od-retire-dialog .od-retire-dialog--label) {
+    :global(.bc-retire-dialog .bc-retire-dialog--label) {
       margin: 0 0 8px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.od-retire-dialog .od-retire-dialog--chips) {
+    :global(.bc-retire-dialog .bc-retire-dialog--chips) {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    :global(.od-retire-dialog .od-retire-dialog--chip) {
+    :global(.bc-retire-dialog .bc-retire-dialog--chip) {
       width: auto;
       height: 32px;
       padding: 0 12px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 8px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    :global(.od-retire-dialog .od-retire-dialog--chip-on) {
+    :global(.bc-retire-dialog .bc-retire-dialog--chip-on) {
       border-color: transparent;
-      background: var(--od-selected-container);
+      background: var(--bc-selected-container);
     }
 
-    :global(.od-retire-sheet--title) {
+    :global(.bc-retire-sheet--title) {
       font-weight: 600;
     }
   }

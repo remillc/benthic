@@ -70,15 +70,15 @@ function topModal() {
 function dispatch(layersOnly) {
   // 0. The card of a selected pin on the Sites map closes (pages/Sites.svelte), then
   // a map shown full screen (components/SiteMap.svelte) goes back to its place.
-  const siteCard = document.querySelector('.od-map-site-card');
+  const siteCard = document.querySelector('.bc-map-site-card');
   if (siteCard && siteCard.getClientRects().length && !document.querySelector('.modal-in:not(.toast)')) return cancel(siteCard, 'map-card');
-  const fullMap = document.querySelector('.od-map-fullscreen');
+  const fullMap = document.querySelector('.bc-map-fullscreen');
   if (fullMap) return cancel(fullMap, 'map-fullscreen');
   // 0a. An open Settings row menu (components/RowMenu.svelte) closes first.
-  const rowMenu = document.querySelector('.od-row-menu');
+  const rowMenu = document.querySelector('.bc-row-menu');
   if (rowMenu) return cancel(rowMenu, 'row-menu');
   // 0b. An open dropdown menu (components/SelectField.svelte) closes first.
-  const dropdown = document.querySelector('.od-select-field--open');
+  const dropdown = document.querySelector('.bc-select-field--open');
   if (dropdown) return cancel(dropdown, 'dropdown');
   // 0c. An open suggestion list (lib/float-menu.js, in the browser's top layer) closes: its field loses the focus.
   const suggestions = document.querySelector('[data-od-float-menu]');
@@ -95,7 +95,7 @@ function dispatch(layersOnly) {
     return 'panel';
   }
   // 2. The choices of the "+" button close.
-  const fabMenu = document.querySelector('.od-fab-menu--open');
+  const fabMenu = document.querySelector('.bc-fab-menu--open');
   if (fabMenu) return cancel(fabMenu, 'fab-menu');
   if (document.querySelector('.fab-opened')) {
     f7.fab.close();
@@ -106,15 +106,15 @@ function dispatch(layersOnly) {
   // First launch waits for a choice: its steps are not router pages but a stack (lib/first-launch.svelte.js), so
   // Back goes to the previous step like « Retour » (lib/first-launch-steps.js, systemBack); from the first step
   // it sends the app to the background. Escape leaves it alone.
-  if (modal?.classList.contains('od-welcome')) {
+  if (modal?.classList.contains('bc-welcome')) {
     if (layersOnly) return 'nothing';
     return welcomeBack() ? 'welcome-step' : minimize();
   }
   // 3b. The Gas page of Edit dive (in the page, or in the tablet's popup) returns to the form.
-  const gasPage = document.querySelector('.od-edit-gas--open');
+  const gasPage = document.querySelector('.bc-edit-gas--open');
   if (gasPage && (!modal || modal.classList.contains('popup'))) return cancel(gasPage, 'gas-page');
   // 3b'. The account deletion wizard goes back one step (pages/DeleteAccount.svelte).
-  const wizardStep = document.querySelector('.page-current .od-delete-wizard--body:not([data-step="1"])');
+  const wizardStep = document.querySelector('.page-current .bc-delete-wizard--body:not([data-step="1"])');
   if (wizardStep && !modal && !layersOnly) return cancel(wizardStep, 'wizard-step');
   // 3c. A form with unsaved changes (the full screen, or its popup on a tablet) asks
   // before it is left (lib/leave-guard.js); a sheet or dialog above it closed first.
@@ -122,7 +122,7 @@ function dispatch(layersOnly) {
   if (modal) {
     const el = /** @type {HTMLElement} */ (modal);
     // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
-    if (modal.classList.contains('od-md3-dialog') || modal.classList.contains('od-cylinder-sheet') || modal.classList.contains('od-gauge-sheet')) return cancel(modal, 'od-dialog');
+    if (modal.classList.contains('bc-md3-dialog') || modal.classList.contains('bc-cylinder-sheet') || modal.classList.contains('bc-gauge-sheet')) return cancel(modal, 'od-dialog');
     if (modal.classList.contains('actions-modal')) f7.actions.close(el);
     else if (modal.classList.contains('dialog')) f7.dialog.close(el);
     else if (modal.classList.contains('sheet-modal')) f7.sheet.close(el);
@@ -133,10 +133,10 @@ function dispatch(layersOnly) {
   }
   if (layersOnly) return 'nothing';
   // 4. The logbook's selection mode is left.
-  const selection = document.querySelector('.od-logbook--selection-bar');
+  const selection = document.querySelector('.bc-logbook--selection-bar');
   if (selection) return cancel(selection, 'selection');
   // 4b. The Sites search closes (pages/Sites.svelte).
-  const sitesSearch = document.querySelector('.od-sites--search.od-sites--open');
+  const sitesSearch = document.querySelector('.bc-sites--search.bc-sites--open');
   if (sitesSearch) return cancel(sitesSearch, 'sites-search');
   // 5. An active search of the screen shown closes. Only that screen's: the
   // Logbook's search stays active under an opened dive, and Back then
@@ -174,7 +174,7 @@ function dispatch(layersOnly) {
  */
 function enableEscape() {
   /** What is on top when the key goes down, before anyone answers it. */
-  const top = () => document.querySelector('.od-row-menu, .od-select-field--open, [data-od-float-menu], .panel.panel-in, .od-fab-menu--open, .fab-opened') ?? topModal();
+  const top = () => document.querySelector('.bc-row-menu, .bc-select-field--open, [data-od-float-menu], .panel.panel-in, .bc-fab-menu--open, .fab-opened') ?? topModal();
   window.addEventListener(
     'keydown',
     (e) => {

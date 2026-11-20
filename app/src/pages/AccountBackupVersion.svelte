@@ -19,7 +19,7 @@
   });
 </script>
 
-<Page class="od-account-backup-page">
+<Page class="bc-account-backup-page">
   <Navbar title={ios || !version ? t('backup.version.title') : versionWhen(version.time)}>
     {#snippet left()}
       <BackLink label={t('backup.title')} name={t('detail.back')} />

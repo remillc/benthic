@@ -17,11 +17,11 @@
   });
 </script>
 
-<span class="od-ready-logo" class:od-ready-logo--play={play} style="--od-ready-size: {size}px; --od-ready-ring: {1 + (size === 72 ? 36 : 56) / (size / 2)}">
-  <span class="od-ready-logo--ring" aria-hidden="true"></span>
-  <span class="od-ready-logo--disc">
-    <span class="od-ready-logo--white"></span>
-    <svg class="od-ready-logo--mark" width={Math.round((size * 38) / 72)} height={Math.round((size * 38) / 72)} viewBox="0 0 24 24" aria-hidden="true">
+<span class="bc-ready-logo" class:bc-ready-logo--play={play} style="--bc-ready-size: {size}px; --bc-ready-ring: {1 + (size === 72 ? 36 : 56) / (size / 2)}">
+  <span class="bc-ready-logo--ring" aria-hidden="true"></span>
+  <span class="bc-ready-logo--disc">
+    <span class="bc-ready-logo--white"></span>
+    <svg class="bc-ready-logo--mark" width={Math.round((size * 38) / 72)} height={Math.round((size * 38) / 72)} viewBox="0 0 24 24" aria-hidden="true">
       <path d={play ? WAVE_PATH : CHECK_PATH}>
         {#if play}
           <animate bind:this={morph} attributeName="d" begin="indefinite" values={MORPH.values} keyTimes={MORPH.keyTimes} dur={MORPH.dur} calcMode="spline" keySplines={MORPH.keySplines} fill="freeze" />
@@ -33,66 +33,66 @@
 
 <style>
   @layer od.components {
-    .od-ready-logo {
+    .bc-ready-logo {
       position: relative;
-      width: var(--od-ready-size, 72px);
-      height: var(--od-ready-size, 72px);
+      width: var(--bc-ready-size, 72px);
+      height: var(--bc-ready-size, 72px);
       flex: none;
       display: block;
     }
 
     /* The ring of the end: a disc behind the logo that grows to twice its size while it fades (36 px of spread). */
-    .od-ready-logo--ring {
+    .bc-ready-logo--ring {
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: var(--od-plus-ring);
+      background: var(--bc-plus-ring);
       opacity: 0;
     }
 
-    .od-ready-logo--disc {
+    .bc-ready-logo--disc {
       position: absolute;
       inset: 0;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-row-main);
-      box-shadow: 0 6px 18px var(--od-plus-logo-shadow);
+      background: var(--bc-release-row-main);
+      box-shadow: 0 6px 18px var(--bc-plus-logo-shadow);
     }
 
     /* The white disc is a layer over the blue one, so the change of colour is an opacity change. */
-    .od-ready-logo--white {
+    .bc-ready-logo--white {
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: var(--od-release-on-panel);
+      background: var(--bc-release-on-panel);
     }
 
-    .od-ready-logo--mark {
+    .bc-ready-logo--mark {
       position: relative;
       flex: none;
       fill: none;
-      stroke: var(--od-release-row-main);
+      stroke: var(--bc-release-row-main);
       stroke-width: 2.6;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    .od-ready-logo--play {
-      .od-ready-logo--disc {
+    .bc-ready-logo--play {
+      .bc-ready-logo--disc {
         animation: od-ready-pop 2000ms linear 1 both;
       }
 
-      .od-ready-logo--white {
+      .bc-ready-logo--white {
         animation: od-ready-white 2000ms ease-out 1 both;
       }
 
-      .od-ready-logo--mark {
+      .bc-ready-logo--mark {
         animation: od-ready-line 2000ms ease-out 1 both;
       }
 
-      .od-ready-logo--ring {
+      .bc-ready-logo--ring {
         animation: od-ready-ring 2000ms ease-out 1 both;
       }
     }
@@ -136,11 +136,11 @@
     @keyframes od-ready-line {
       0%,
       65% {
-        stroke: var(--od-release-on-panel);
+        stroke: var(--bc-release-on-panel);
       }
       85%,
       100% {
-        stroke: var(--od-release-row-main);
+        stroke: var(--bc-release-row-main);
       }
     }
 
@@ -156,16 +156,16 @@
       }
       100% {
         opacity: 0;
-        transform: scale(var(--od-ready-ring, 2));
+        transform: scale(var(--bc-ready-ring, 2));
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-ready-logo--play {
-        .od-ready-logo--disc,
-        .od-ready-logo--white,
-        .od-ready-logo--mark,
-        .od-ready-logo--ring {
+      .bc-ready-logo--play {
+        .bc-ready-logo--disc,
+        .bc-ready-logo--white,
+        .bc-ready-logo--mark,
+        .bc-ready-logo--ring {
           animation: none;
         }
       }

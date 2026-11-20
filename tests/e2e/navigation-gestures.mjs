@@ -161,13 +161,13 @@ export async function gestureFlows(h) {
   console.log(' the system takes the touch while the account sheet is dragged down');
   // A real tap: after a drag, Framework7 swallows a click that no touch announced.
   const avatar = await tab.run(() => {
-    const r = document.querySelector('.view.tab-active .page-current .od-account-avatar')?.getBoundingClientRect();
+    const r = document.querySelector('.view.tab-active .page-current .bc-account-avatar')?.getBoundingClientRect();
     return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
   });
   if (avatar) await tab.tapAt(avatar.x, avatar.y);
   await sleep(800);
   const top = await tab.run(() => {
-    const r = document.querySelector('.od-account-sheet.modal-in')?.getBoundingClientRect();
+    const r = document.querySelector('.bc-account-sheet.modal-in')?.getBoundingClientRect();
     return r ? { x: r.x + r.width / 2, y: r.y + 14 } : null;
   });
   expect('the account sheet is open', { open: true }, { open: !!top });
@@ -182,13 +182,13 @@ export async function gestureFlows(h) {
     await sleep(700);
     // The sheet is at rest, open or closed: never left where the finger was.
     const rest = await tab.run(() => {
-      const el = document.querySelector('.od-account-sheet');
-      return { dragged: !!el && el.style.transform !== '', closing: !!document.querySelector('.od-account-sheet.modal-out') };
+      const el = document.querySelector('.bc-account-sheet');
+      return { dragged: !!el && el.style.transform !== '', closing: !!document.querySelector('.bc-account-sheet.modal-out') };
     });
     expect('the sheet taken by the system is at rest', { dragged: false, closing: false }, rest);
-    if (await tab.run(() => !!document.querySelector('.od-account-sheet.modal-in'))) await hardwareBack(tab);
+    if (await tab.run(() => !!document.querySelector('.bc-account-sheet.modal-in'))) await hardwareBack(tab);
     await sleep(700);
-    expect('the sheet is closed after Back', { open: false, scrim: false }, await tab.run(() => ({ open: !!document.querySelector('.od-account-sheet.modal-in'), scrim: !!document.querySelector('.sheet-backdrop.backdrop-in') })));
+    expect('the sheet is closed after Back', { open: false, scrim: false }, await tab.run(() => ({ open: !!document.querySelector('.bc-account-sheet.modal-in'), scrim: !!document.querySelector('.sheet-backdrop.backdrop-in') })));
     await sound('after the sheet: sound');
   }
   // The app's own check ran after each of these navigations (lib/nav-health.js): it found nothing to repair.

@@ -82,7 +82,7 @@
       `<li><a href="#" class="item-link item-content popover-close" data-action="${action}"><div class="item-inner"><div class="item-title">${label}</div></div></a></li>`;
     const popover = f7.popover.create({
       targetEl: /** @type {HTMLElement} */ (e.currentTarget),
-      content: `<div class="popover od-menu od-account-sheet--menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('auto', t('account.syncGoAuto'))}${item('unsent', t('account.syncShowPending'))}</ul></div></div></div>`,
+      content: `<div class="popover bc-menu bc-account-sheet--menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('auto', t('account.syncGoAuto'))}${item('unsent', t('account.syncShowPending'))}</ul></div></div></div>`,
       on: {
         opened(/** @type {any} */ p) {
           p.$el.find('[data-action]').on('click', (/** @type {Event} */ ev) => {
@@ -137,7 +137,7 @@
 
 <!-- Tablet (task 2026-11-14-126): a 360 dp panel next to the rail, over the scrim. -->
 <Sheet
-  class="od-account-sheet{layout.rail ? ' od-account-sheet--floating' : ''}"
+  class="bc-account-sheet{layout.rail ? ' bc-account-sheet--floating' : ''}"
   opened={navigation.accountOpen}
   onSheetClosed={() => (navigation.accountOpen = false)}
   backdrop
@@ -149,44 +149,44 @@
   <!-- iPhone (task 2026-11-14-127, appbar-tiroir-ios-ouvert.dc.html): a page sheet « Compte » with
        OK, in grouped lists: the account, the sync, then Réglages and À propos. Its rows are buttons: `data-row` names
        them as the Android rows' addresses do (« #profile » there, data-row="profile" here), for the navigation tests. -->
-  <div class="od-account-sheet--ios">
-    <div class="od-account-sheet--ios-bar">
-      <span class="od-account-sheet--ios-title">{t('account.title')}</span>
-      <button type="button" class="od-account-sheet--ios-ok" onclick={() => (navigation.accountOpen = false)}>{t('dialog.ok')}</button>
+  <div class="bc-account-sheet--ios">
+    <div class="bc-account-sheet--ios-bar">
+      <span class="bc-account-sheet--ios-title">{t('account.title')}</span>
+      <button type="button" class="bc-account-sheet--ios-ok" onclick={() => (navigation.accountOpen = false)}>{t('dialog.ok')}</button>
     </div>
     {#if free}
       <!-- Free version (ios-compte-gratuit.dc.html, task 289): the logbook on this iPhone, « S'abonner », « Déjà abonné ? »,
            then the two OpenDives+ rows that open the offer. -->
-      <div class="od-account-sheet--ios-group od-account-sheet--ios-free">
-        <div class="od-account-sheet--ios-row od-account-sheet--ios-identity">
-          <span class="od-account-sheet--initial od-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
-          <span class="od-account-sheet--texts">
-            <span class="od-account-sheet--name">{t('account.free.deviceIos')}</span>
-            <span class="od-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
+      <div class="bc-account-sheet--ios-group bc-account-sheet--ios-free">
+        <div class="bc-account-sheet--ios-row bc-account-sheet--ios-identity">
+          <span class="bc-account-sheet--initial bc-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
+          <span class="bc-account-sheet--texts">
+            <span class="bc-account-sheet--name">{t('account.free.deviceIos')}</span>
+            <span class="bc-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
           </span>
         </div>
-        <div class="od-account-sheet--ios-offer">
-          <button type="button" class="od-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
-          <span class="od-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+        <div class="bc-account-sheet--ios-offer">
+          <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
+          <span class="bc-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
         </div>
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
-      <div class="od-account-sheet--ios-group">
-        <button type="button" class="od-account-sheet--ios-row" data-row="offer-sync" onclick={() => plus('offer')}>
+      <div class="bc-account-sheet--ios-group">
+        <button type="button" class="bc-account-sheet--ios-row" data-row="offer-sync" onclick={() => plus('offer')}>
           <Icon name="cloudDownload" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             <BenthicPlusChip onSheet />
             {t('account.free.sync')}
-            <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+            <span class="bc-account-sheet--row-line">{t('account.free.syncText')}</span>
           </span>
           <Icon name="chevron" size={20} />
         </button>
-        <button type="button" class="od-account-sheet--ios-row" data-row="offer-profile" onclick={() => plus('offer')}>
+        <button type="button" class="bc-account-sheet--ios-row" data-row="offer-profile" onclick={() => plus('offer')}>
           <Icon name="briefcase" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             <BenthicPlusChip onSheet />
             {t('gear.profile.title')}
-            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+            <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
           </span>
           <Icon name="chevron" size={20} />
         </button>
@@ -194,34 +194,34 @@
     {:else}
       <!-- An account (ios-compte-abonne.dc.html): the e-mail, with the « + » chip for OpenDives+, « Gérer le compte »,
            the sync line with « Synchroniser ». -->
-      <div class="od-account-sheet--ios-group">
-        <div class="od-account-sheet--ios-row od-account-sheet--ios-identity">
-          <span class="od-account-sheet--initial" aria-hidden="true">
+      <div class="bc-account-sheet--ios-group">
+        <div class="bc-account-sheet--ios-row bc-account-sheet--ios-identity">
+          <span class="bc-account-sheet--initial" aria-hidden="true">
             {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
           </span>
-          <span class="od-account-sheet--texts">
-            <span class="od-account-sheet--name">
+          <span class="bc-account-sheet--texts">
+            <span class="bc-account-sheet--name">
               {accountName}
-              {#if subscriber}<span class="od-account-sheet--plus-dot" aria-hidden="true">+</span><span class="od-sr-only">{t('odplus.chipName')}</span>{/if}
+              {#if subscriber}<span class="bc-account-sheet--plus-dot" aria-hidden="true">+</span><span class="bc-sr-only">{t('odplus.chipName')}</span>{/if}
             </span>
-            {#if accountEmail}<span class="od-account-sheet--email">{accountEmail}</span>{/if}
-            <span class="od-account-sheet--line">{accountLine}</span>
+            {#if accountEmail}<span class="bc-account-sheet--email">{accountEmail}</span>{/if}
+            <span class="bc-account-sheet--line">{accountLine}</span>
           </span>
         </div>
-        <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={manage}>
+        <button type="button" class="bc-account-sheet--ios-row bc-account-sheet--ios-link" onclick={manage}>
           <Icon name="account" />
-          <span class="od-account-sheet--row-label">{t('nav.manageAccount')}</span>
+          <span class="bc-account-sheet--row-label">{t('nav.manageAccount')}</span>
           <Icon name="chevron" size={20} />
         </button>
         {#if !logbook.loading && !logbook.error}
           {#if logbook.syncFailure}
-            <div class="od-account-sheet--ios-row"><SyncFailureRow /></div>
+            <div class="bc-account-sheet--ios-row"><SyncFailureRow /></div>
           {:else if logbook.conflict && logbook.conflictLater}
-            <div class="od-account-sheet--ios-row"><SyncFailureRow conflict /></div>
+            <div class="bc-account-sheet--ios-row"><SyncFailureRow conflict /></div>
           {:else}
-            <div class="od-account-sheet--ios-row od-account-sheet--ios-sync">
+            <div class="bc-account-sheet--ios-row bc-account-sheet--ios-sync">
               {#if manual && logbook.pending > 0}
-                <span class="od-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
+                <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
               {:else}
                 <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} steady />
               {/if}
@@ -229,34 +229,34 @@
             </div>
           {/if}
           {#if manual}
-            <button type="button" class="od-account-sheet--ios-row od-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
+            <button type="button" class="bc-account-sheet--ios-row bc-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
           {/if}
         {/if}
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       {#if isRelease && !desktopApp}
         <!-- « Mon profil de plongeur », then « Sauvegarde et restauration » (tasks 267, 281, 290, 291): the red line and the badge when a piece is overdue. -->
-        <div class="od-account-sheet--ios-group">
-          <button type="button" class="od-account-sheet--ios-row" data-row="profile" onclick={() => go(() => openOver('/profile'))}>
+        <div class="bc-account-sheet--ios-group">
+          <button type="button" class="bc-account-sheet--ios-row" data-row="profile" onclick={() => go(() => openOver('/profile'))}>
             <Icon name="briefcase" />
-            <span class="od-account-sheet--row-label">
+            <span class="bc-account-sheet--row-label">
               {t('gear.profile.title')}
               {#if late.late}
-                <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
+                <span class="bc-account-sheet--row-line bc-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
               {:else}
-                <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+                <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
               {/if}
             </span>
-            {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
+            {#if late.late}<span class="bc-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
             <Icon name="chevron" size={20} />
           </button>
           {#if subscriber}
             <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
-            <button type="button" class="od-account-sheet--ios-row" data-row="backup" onclick={() => go(openBackup)}>
+            <button type="button" class="bc-account-sheet--ios-row" data-row="backup" onclick={() => go(openBackup)}>
               <Icon name="history" />
-              <span class="od-account-sheet--row-label">
+              <span class="bc-account-sheet--row-label">
                 {t('account.sheet.backup')}
-                <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
+                <span class="bc-account-sheet--row-line">{t('account.sheet.backupText')}</span>
               </span>
               <Icon name="chevron" size={20} />
             </button>
@@ -264,131 +264,131 @@
         </div>
       {/if}
     {/if}
-    <div class="od-account-sheet--ios-group">
-      <button type="button" class="od-account-sheet--ios-row" data-row="settings" onclick={() => go(openSettings)}>
+    <div class="bc-account-sheet--ios-group">
+      <button type="button" class="bc-account-sheet--ios-row" data-row="settings" onclick={() => go(openSettings)}>
         <Icon name="settings" />
-        <span class="od-account-sheet--row-label">{t('settings.title')}</span>
+        <span class="bc-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />
       </button>
       {#if mapUpdates > 0}
         <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
-        <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openMapSettings)}>
+        <button type="button" class="bc-account-sheet--ios-row" onclick={() => go(openMapSettings)}>
           <Icon name="map" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             {t('settings.groups.maps')}
-            <span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
+            <span class="bc-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
           </span>
-          <span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
+          <span class="bc-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
           <Icon name="chevron" size={20} />
         </button>
       {/if}
-      <button type="button" class="od-account-sheet--ios-row" onclick={() => go(openAbout)}>
+      <button type="button" class="bc-account-sheet--ios-row" onclick={() => go(openAbout)}>
         <Icon name="info" />
-        <span class="od-account-sheet--row-label">{t('about.title')}</span>
+        <span class="bc-account-sheet--row-label">{t('about.title')}</span>
         <Icon name="chevron" size={20} />
       </button>
     </div>
   </div>
   {:else}
-  <div class="od-account-sheet--content">
-    <div class="od-account-sheet--head">
+  <div class="bc-account-sheet--content">
+    <div class="bc-account-sheet--head">
       <span aria-hidden="true"></span>
       <!-- Centred on the sheet's width: an empty 48 dp slot on the left balances the ✕ on the right (task 2026-11-18-281).
            The simple logo with relief (the same drawing in both files, no inline gradient to share) (task 2026-11-14-123). -->
-      <span class="od-account-sheet--brand">
-        <img class="od-account-sheet--logo od-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
-        <img class="od-account-sheet--logo od-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
+      <span class="bc-account-sheet--brand">
+        <img class="bc-account-sheet--logo bc-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
+        <img class="bc-account-sheet--logo bc-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
         <!-- A subscriber's sheet: a small round « + » after the name, read « OpenDives Plus » (task 2026-11-18-282). -->
         {#if subscriber}
-          <span class="od-account-sheet--title"><span aria-hidden="true">{t('menu.title')}<span class="od-account-sheet--plus-dot">+</span></span><span class="od-sr-only">{t('odplus.chipName')}</span></span>
+          <span class="bc-account-sheet--title"><span aria-hidden="true">{t('menu.title')}<span class="bc-account-sheet--plus-dot">+</span></span><span class="bc-sr-only">{t('odplus.chipName')}</span></span>
         {:else}
-          <span class="od-account-sheet--title">{t('menu.title')}</span>
+          <span class="bc-account-sheet--title">{t('menu.title')}</span>
         {/if}
       </span>
-      <button type="button" class="od-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
-        <Icon name="close" /><span class="od-sr-only">{t('nav.close')}</span>
+      <button type="button" class="bc-account-sheet--close" onclick={() => (navigation.accountOpen = false)}>
+        <Icon name="close" /><span class="bc-sr-only">{t('nav.close')}</span>
       </button>
     </div>
 
     {#if free}
     <!-- Free version (docs/mockups-release/nav-compte-gratuit-android.dc.html): the logbook on this device, the offer, and
          the two OpenDives+ rows that open it. No e-mail, no sync line. -->
-    <div class="od-account-sheet--card od-account-sheet--identity od-account-sheet--free">
-      <div class="od-account-sheet--account">
-        <span class="od-account-sheet--initial od-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
-        <span class="od-account-sheet--texts">
-          <span class="od-account-sheet--name">{t('account.free.device')}</span>
-          <span class="od-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
+    <div class="bc-account-sheet--card bc-account-sheet--identity bc-account-sheet--free">
+      <div class="bc-account-sheet--account">
+        <span class="bc-account-sheet--initial bc-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
+        <span class="bc-account-sheet--texts">
+          <span class="bc-account-sheet--name">{t('account.free.device')}</span>
+          <span class="bc-account-sheet--line">{t('logbook.count', { n: logbook.dives.length })}</span>
         </span>
       </div>
-      <div class="od-account-sheet--offer">
-        <button type="button" class="od-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
-        <span class="od-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="od-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+      <div class="bc-account-sheet--offer">
+        <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
+        <span class="bc-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
       </div>
     </div>
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if isRelease && !desktopApp}
-      <div class="od-account-sheet--card">
-        <a href="#offer-sync" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
+      <div class="bc-account-sheet--card">
+        <a href="#offer-sync" class="bc-account-sheet--row bc-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
           <Icon name="cloudDownload" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             <BenthicPlusChip onSheet />
             {t('account.free.sync')}
-            <span class="od-account-sheet--row-line">{t('account.free.syncText')}</span>
+            <span class="bc-account-sheet--row-line">{t('account.free.syncText')}</span>
           </span>
           <Icon name="chevron" size={20} />
         </a>
-        <div class="od-account-sheet--divider od-account-sheet--margin"></div>
-        <a href="#offer-profile" class="od-account-sheet--row od-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
+        <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
+        <a href="#offer-profile" class="bc-account-sheet--row bc-account-sheet--plus-row" onclick={(e) => (e.preventDefault(), plus('offer'))}>
           <Icon name="briefcase" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             <BenthicPlusChip onSheet />
             {t('gear.profile.title')}
-            <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+            <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
           </span>
           <Icon name="chevron" size={20} />
         </a>
       </div>
     {/if}
     {:else}
-    <div class="od-account-sheet--card od-account-sheet--identity">
-      <div class="od-account-sheet--account">
-        <span class="od-account-sheet--initial" aria-hidden="true">
+    <div class="bc-account-sheet--card bc-account-sheet--identity">
+      <div class="bc-account-sheet--account">
+        <span class="bc-account-sheet--initial" aria-hidden="true">
           {#if initial}{initial}{:else}<Icon name="account" size={22} weight={2} />{/if}
         </span>
-        <span class="od-account-sheet--texts">
-          <span class="od-account-sheet--name">{accountName}</span>
-          {#if accountEmail}<span class="od-account-sheet--email">{accountEmail}</span>{/if}
-          <span class="od-account-sheet--line">{accountLine}</span>
+        <span class="bc-account-sheet--texts">
+          <span class="bc-account-sheet--name">{accountName}</span>
+          {#if accountEmail}<span class="bc-account-sheet--email">{accountEmail}</span>{/if}
+          <span class="bc-account-sheet--line">{accountLine}</span>
         </span>
       </div>
-      <div class="od-account-sheet--manage">
-        <button type="button" class="od-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>
+      <div class="bc-account-sheet--manage">
+        <button type="button" class="bc-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>
       </div>
       {#if !logbook.loading && !logbook.error}
-        <div class="od-account-sheet--divider"></div>
-        <div class="od-account-sheet--sync">
+        <div class="bc-account-sheet--divider"></div>
+        <div class="bc-account-sheet--sync">
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else if logbook.conflict && logbook.conflictLater}
             <SyncFailureRow conflict />
           {:else if manual}
-            <div class="od-account-sheet--manual">
+            <div class="bc-account-sheet--manual">
               {#if logbook.pending > 0}
-                <span class="od-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
+                <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
               {:else}
                 <!-- Nothing waiting: the last sync, as in automatic sync, not « 0 modification ». -->
                 <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
               {/if}
               <SyncButton filled={logbook.pending > 0} />
-              <button type="button" class="od-account-sheet--more" aria-label={t('account.syncOptions')} aria-haspopup="menu" onclick={syncOptions}>
+              <button type="button" class="bc-account-sheet--more" aria-label={t('account.syncOptions')} aria-haspopup="menu" onclick={syncOptions}>
                 <Icon name="more" weight={4} />
               </button>
             </div>
           {:else}
             <!-- One row: the cloud and the status take the width, « Synchroniser » on the right; a long
                  status wraps beside the button, never above it (task 2026-11-14-156). -->
-            <div class="od-account-sheet--auto">
+            <div class="bc-account-sheet--auto">
               <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
               {#if logbook.email}<SyncControl />{/if}
             </div>
@@ -403,27 +403,27 @@
          account « Sauvegarde et restauration » below it (tasks 290 and 291); no chip next to a subscriber's entries. When a piece
          is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
-      <div class="od-account-sheet--card">
-        <a href="#profile" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
+      <div class="bc-account-sheet--card">
+        <a href="#profile" class="bc-account-sheet--row bc-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
           <Icon name="briefcase" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             {t('gear.profile.title')}
             {#if late.late}
-              <span class="od-account-sheet--row-line od-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
+              <span class="bc-account-sheet--row-line bc-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
             {:else}
-              <span class="od-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
+              <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
             {/if}
           </span>
-          {#if late.late}<span class="od-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
+          {#if late.late}<span class="bc-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
           <Icon name="chevron" size={20} />
         </a>
         {#if subscriber}
-          <div class="od-account-sheet--divider od-account-sheet--margin"></div>
-          <a href="#backup" class="od-account-sheet--row od-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
+          <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
+          <a href="#backup" class="bc-account-sheet--row bc-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
             <Icon name="history" />
-            <span class="od-account-sheet--row-label">
+            <span class="bc-account-sheet--row-label">
               {t('account.sheet.backup')}
-              <span class="od-account-sheet--row-line">{t('account.sheet.backupText')}</span>
+              <span class="bc-account-sheet--row-line">{t('account.sheet.backupText')}</span>
             </span>
             <Icon name="chevron" size={20} />
           </a>
@@ -434,29 +434,29 @@
 
     <!-- Desktop: Réglages and À propos leave the sheet (rail, or the Mac's menu bar; task 2026-11-15-169). -->
     {#if !desktopApp}
-    <div class="od-account-sheet--card">
-      <a href="#settings" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openSettings))}>
+    <div class="bc-account-sheet--card">
+      <a href="#settings" class="bc-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openSettings))}>
         <Icon name="settings" />
-        <span class="od-account-sheet--row-label">{t('settings.title')}</span>
+        <span class="bc-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />
       </a>
-      <div class="od-account-sheet--divider od-account-sheet--inset"></div>
+      <div class="bc-account-sheet--divider bc-account-sheet--inset"></div>
       {#if mapUpdates > 0}
         <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
-        <a href="#settings-maps" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openMapSettings))}>
+        <a href="#settings-maps" class="bc-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openMapSettings))}>
           <Icon name="map" />
-          <span class="od-account-sheet--row-label">
+          <span class="bc-account-sheet--row-label">
             {t('settings.groups.maps')}
-            <span class="od-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
+            <span class="bc-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
           </span>
-          <span class="od-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
+          <span class="bc-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
           <Icon name="chevron" size={20} />
         </a>
-        <div class="od-account-sheet--divider od-account-sheet--inset"></div>
+        <div class="bc-account-sheet--divider bc-account-sheet--inset"></div>
       {/if}
-      <a href="#about" class="od-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openAbout))}>
+      <a href="#about" class="bc-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openAbout))}>
         <Icon name="info" />
-        <span class="od-account-sheet--row-label">{t('about.title')}</span>
+        <span class="bc-account-sheet--row-label">{t('about.title')}</span>
         <Icon name="chevron" size={20} />
       </a>
     </div>
@@ -467,78 +467,78 @@
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-account-sheet) {
-      --f7-sheet-bg-color: var(--od-drawer);
+    :global(.sheet-modal.bc-account-sheet) {
+      --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
       /* 36 dp corners (task 2026-11-14-158). */
       border-radius: 36px 36px 0 0;
     }
 
-    :global(.sheet-modal.od-account-sheet.od-account-sheet--floating) {
-      left: calc(var(--od-nav-width) + var(--od-safe-left) + 8px);
-      bottom: calc(16px + var(--od-safe-bottom));
+    :global(.sheet-modal.bc-account-sheet.bc-account-sheet--floating) {
+      left: calc(var(--bc-nav-width) + var(--bc-safe-left) + 8px);
+      bottom: calc(16px + var(--bc-safe-bottom));
       width: 360px;
       border-radius: 36px;
       box-shadow: 0 2px 6px rgb(0 0 0 / 0.15), 0 8px 24px rgb(0 0 0 / 0.12);
 
-      .od-account-sheet--content {
+      .bc-account-sheet--content {
         padding-bottom: 12px;
       }
     }
 
     /* iPhone: grouped lists on the grouped background, 10 pt corners at the top. */
-    :global(.ios .sheet-modal.od-account-sheet) {
-      --f7-sheet-bg-color: var(--od-background);
+    :global(.ios .sheet-modal.bc-account-sheet) {
+      --f7-sheet-bg-color: var(--bc-background);
       border-radius: 10px 10px 0 0;
     }
 
-    .od-account-sheet--ios {
-      padding: 0 16px calc(16px + var(--od-safe-bottom));
+    .bc-account-sheet--ios {
+      padding: 0 16px calc(16px + var(--bc-safe-bottom));
     }
 
     /* Title centred, « OK » at the end: three columns. */
-    .od-account-sheet--ios-bar {
+    .bc-account-sheet--ios-bar {
       height: 56px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
     }
 
-    .od-account-sheet--ios-title {
+    .bc-account-sheet--ios-title {
       grid-column: 2;
       font-size: 17px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-account-sheet--ios-ok {
+    .bc-account-sheet--ios-ok {
       grid-column: 3;
       justify-self: end;
       min-width: 44px;
       height: 44px;
       border: none;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 17px;
       font-weight: 600;
     }
 
-    .od-account-sheet--ios-group {
+    .bc-account-sheet--ios-group {
       margin-top: 16px;
       border-radius: 10px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-account-sheet--ios-row {
+    .bc-account-sheet--ios-row {
       box-sizing: border-box;
       width: 100%;
       min-height: 44px;
       padding: 10px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 17px;
       text-align: start;
@@ -546,49 +546,49 @@
       align-items: center;
       gap: 12px;
 
-      & + .od-account-sheet--ios-row {
-        box-shadow: inset 0 0.5px 0 var(--od-separator);
+      & + .bc-account-sheet--ios-row {
+        box-shadow: inset 0 0.5px 0 var(--bc-separator);
       }
 
-      :global(.od-sync-status) {
+      :global(.bc-sync-status) {
         padding: 0;
         font-size: 15px;
       }
     }
 
-    .od-account-sheet--ios-sync {
+    .bc-account-sheet--ios-sync {
       justify-content: space-between;
     }
 
-    .od-account-sheet--ios-identity {
+    .bc-account-sheet--ios-identity {
       min-height: 64px;
     }
 
     /* The chip keeps its own width above the title; the row's icons are the accent colour (the mock-ups' blue). */
-    .od-account-sheet--ios-row :global(.od-plus-chip) {
+    .bc-account-sheet--ios-row :global(.bc-plus-chip) {
       align-self: flex-start;
     }
 
-    .od-account-sheet--ios-row > :global(.od-icon) {
-      color: var(--od-secondary);
+    .bc-account-sheet--ios-row > :global(.bc-icon) {
+      color: var(--bc-secondary);
       flex: none;
     }
 
-    .od-account-sheet--ios-sync :global(.od-sync-status) {
+    .bc-account-sheet--ios-sync :global(.bc-sync-status) {
       flex: 1;
       min-width: 0;
     }
 
-    .od-account-sheet--ios-sync > :global(:last-child:not(.od-sync-status)) {
+    .bc-account-sheet--ios-sync > :global(:last-child:not(.bc-sync-status)) {
       flex: none;
     }
 
-    .od-account-sheet--ios-offer .od-account-sheet--already {
+    .bc-account-sheet--ios-offer .bc-account-sheet--already {
       justify-content: center;
     }
 
     /* The free card: the row, then the offer button and « Déjà abonné ? » under it. */
-    .od-account-sheet--ios-offer {
+    .bc-account-sheet--ios-offer {
       padding: 0 16px 14px;
       display: flex;
       flex-direction: column;
@@ -597,22 +597,22 @@
       text-align: center;
     }
 
-    .od-account-sheet--ios-link {
-      color: var(--od-secondary);
+    .bc-account-sheet--ios-link {
+      color: var(--bc-secondary);
     }
 
-    .od-account-sheet--content {
-      padding: 8px 8px calc(16px + var(--od-safe-bottom));
+    .bc-account-sheet--content {
+      padding: 8px 8px calc(16px + var(--bc-safe-bottom));
     }
 
-    .od-account-sheet--head {
+    .bc-account-sheet--head {
       height: 48px;
       display: grid;
       grid-template-columns: 48px minmax(0, 1fr) 48px;
       align-items: center;
     }
 
-    .od-account-sheet--brand {
+    .bc-account-sheet--brand {
       min-width: 0;
       display: flex;
       align-items: center;
@@ -620,7 +620,7 @@
       gap: 8px;
     }
 
-    .od-account-sheet--plus-dot {
+    .bc-account-sheet--plus-dot {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -628,57 +628,57 @@
       height: 18px;
       margin-left: 3px;
       border-radius: 9px;
-      background: var(--od-account-chip);
-      color: var(--od-account-chip-ink);
+      background: var(--bc-account-chip);
+      color: var(--bc-account-chip-ink);
       font-size: 14px;
       line-height: 1;
       font-weight: 700;
       vertical-align: 1px;
     }
 
-    .od-account-sheet--close {
+    .bc-account-sheet--close {
       width: 48px;
       height: 48px;
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-account-sheet--dark,
-    :global(html.dark) .od-account-sheet--light {
+    .bc-account-sheet--dark,
+    :global(html.dark) .bc-account-sheet--light {
       display: none;
     }
 
-    :global(html.dark) .od-account-sheet--dark {
+    :global(html.dark) .bc-account-sheet--dark {
       display: block;
     }
 
-    .od-account-sheet--title {
+    .bc-account-sheet--title {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 16px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-account-sheet--auto {
+    .bc-account-sheet--auto {
       align-self: stretch;
       display: flex;
       align-items: center;
       gap: 16px;
 
-      :global(.od-sync-status) {
+      :global(.bc-sync-status) {
         flex: 1;
         min-width: 0;
         justify-content: flex-start;
         text-align: start;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       > :global(*:last-child) {
@@ -687,31 +687,31 @@
     }
 
     /* The white cards: 28 dp corners; the identity card (the first) 12 dp narrower on each side (task 2026-11-14-158). */
-    .od-account-sheet--card {
+    .bc-account-sheet--card {
       margin-top: 8px;
       border-radius: 28px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-account-sheet--identity {
+    .bc-account-sheet--identity {
       margin-left: 12px;
       margin-right: 12px;
     }
 
-    .od-account-sheet--account {
+    .bc-account-sheet--account {
       padding: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-account-sheet--initial {
+    .bc-account-sheet--initial {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 20px;
-      background: var(--od-nav-avatar-ink);
+      background: var(--bc-nav-avatar-ink);
       color: #FFFFFF;
       display: flex;
       align-items: center;
@@ -720,126 +720,126 @@
       font-weight: 600;
     }
 
-    .od-account-sheet--texts {
+    .bc-account-sheet--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-account-sheet--name {
+    .bc-account-sheet--name {
       font-size: 16px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-account-sheet--email {
+    .bc-account-sheet--email {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .od-account-sheet--line {
+    .bc-account-sheet--line {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-account-sheet--manage {
+    .bc-account-sheet--manage {
       padding: 0 16px 16px 68px;
     }
 
-    .od-account-sheet--divider {
+    .bc-account-sheet--divider {
       height: 1px;
-      background: var(--od-row-divider);
+      background: var(--bc-row-divider);
 
-      &.od-account-sheet--inset {
+      &.bc-account-sheet--inset {
         margin-left: 56px;
       }
     }
 
-    .od-account-sheet--sync {
+    .bc-account-sheet--sync {
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
 
-      :global(.od-sync-status) {
+      :global(.bc-sync-status) {
         padding: 0;
         font-size: 14px;
       }
     }
 
-    .od-account-sheet--row {
+    .bc-account-sheet--row {
       min-height: 56px;
       padding: 0 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
       font-size: 16px;
     }
 
-    .od-account-sheet--row-label {
+    .bc-account-sheet--row-label {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
 
-    .od-account-sheet--row-line {
+    .bc-account-sheet--row-line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Manual sync: the changes waiting, « Synchroniser » and ⋮ on one row. */
-    .od-account-sheet--manual {
+    .bc-account-sheet--manual {
       align-self: stretch;
       display: flex;
       align-items: center;
       gap: 8px;
 
-      :global(.od-sync-status) {
+      :global(.bc-sync-status) {
         flex: 1;
         justify-content: flex-start;
       }
     }
 
-    .od-account-sheet--pending {
+    .bc-account-sheet--pending {
       flex: 1;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-pending);
+      color: var(--bc-pending);
     }
 
-    .od-account-sheet--more {
+    .bc-account-sheet--more {
       flex: none;
       width: 40px;
       height: 40px;
       border: none;
       border-radius: 20px;
-      background: var(--od-surface-container-high);
-      color: var(--od-text);
+      background: var(--bc-surface-container-high);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the OpenDives+ rows. */
-    .od-account-sheet--silhouette {
-      background: var(--od-surface-container-high);
-      color: var(--od-text-2);
+    .bc-account-sheet--silhouette {
+      background: var(--bc-surface-container-high);
+      color: var(--bc-text-2);
     }
 
-    .od-account-sheet--offer {
+    .bc-account-sheet--offer {
       padding: 0 16px 12px 68px;
       display: flex;
       flex-direction: column;
@@ -847,35 +847,35 @@
       gap: 4px;
     }
 
-    .od-account-sheet--subscribe {
+    .bc-account-sheet--subscribe {
       width: auto;
       height: 40px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-release-row-main);
-      color: var(--od-release-on-panel);
+      background: var(--bc-release-row-main);
+      color: var(--bc-release-on-panel);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
     }
 
-    .od-account-sheet--already {
+    .bc-account-sheet--already {
       min-height: 40px;
       display: inline-flex;
       align-items: center;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-account-sheet--sign-in {
+    .bc-account-sheet--sign-in {
       width: auto;
       padding: 10px 4px;
       margin: 0 -4px;
       border: none;
       background: none;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-weight: 500;
       text-decoration: underline;
@@ -883,17 +883,17 @@
       cursor: pointer;
     }
 
-    .od-account-sheet--plus-row {
+    .bc-account-sheet--plus-row {
       min-height: 64px;
       padding-top: 8px;
       padding-bottom: 8px;
     }
 
-    .od-account-sheet--plus-row .od-account-sheet--row-label {
+    .bc-account-sheet--plus-row .bc-account-sheet--row-label {
       gap: 2px;
       font-size: 16px;
 
-      :global(.od-plus-chip) {
+      :global(.bc-plus-chip) {
         align-self: flex-start;
         height: 22px;
         margin-bottom: 2px;
@@ -902,16 +902,16 @@
       }
     }
 
-    .od-account-sheet--divider.od-account-sheet--margin {
+    .bc-account-sheet--divider.bc-account-sheet--margin {
       margin: 0 16px;
     }
 
     /* « Mon profil de plongeur » of an OpenDives+ account: the chip above the title, the overdue pieces in red. */
-    .od-account-sheet--profile .od-account-sheet--row-label {
+    .bc-account-sheet--profile .bc-account-sheet--row-label {
       font-size: 16px;
       gap: 2px;
 
-      :global(.od-plus-chip) {
+      :global(.bc-plus-chip) {
         align-self: flex-start;
         height: 22px;
         margin-bottom: 2px;
@@ -920,18 +920,18 @@
       }
     }
 
-    .od-account-sheet--row-line.od-account-sheet--late-line {
-      color: var(--od-late-text);
+    .bc-account-sheet--row-line.bc-account-sheet--late-line {
+      color: var(--bc-late-text);
     }
 
-    .od-account-sheet--late-badge {
+    .bc-account-sheet--late-badge {
       flex: none;
       min-width: 24px;
       height: 24px;
       padding: 0 6px;
       box-sizing: border-box;
       border-radius: 12px;
-      background: var(--od-late);
+      background: var(--bc-late);
       color: #FFFFFF;
       display: flex;
       align-items: center;
@@ -940,11 +940,11 @@
       font-weight: 700;
     }
 
-    .od-account-sheet--badge {
+    .bc-account-sheet--badge {
       padding: 2px 10px;
       border-radius: 12px;
-      background: var(--od-tertiary);
-      color: var(--od-on-tertiary);
+      background: var(--bc-tertiary);
+      color: var(--bc-on-tertiary);
       font-size: 12px;
       line-height: 18px;
       font-weight: 600;

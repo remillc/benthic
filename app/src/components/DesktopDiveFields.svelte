@@ -346,24 +346,24 @@
   /** Ctrl/⌘+E: the first editable field of the tab takes the focus (and starts its edit). */
   let root = $state(/** @type {HTMLElement|undefined} */ (undefined));
   $effect(() => {
-    const focusFirst = () => /** @type {HTMLElement|null|undefined} */ (root?.querySelector('.od-desktop-edit-field--rest'))?.focus();
+    const focusFirst = () => /** @type {HTMLElement|null|undefined} */ (root?.querySelector('.bc-desktop-edit-field--rest'))?.focus();
     window.addEventListener('od-detail-focus-first', focusFirst);
     return () => window.removeEventListener('od-detail-focus-first', focusFirst);
   });
 </script>
 
-<div class="od-desktop-dive-fields" bind:this={root}>
-  <p class="od-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>
+<div class="bc-desktop-dive-fields" bind:this={root}>
+  <p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>
 
   {#if tab === 'info'}
     <!-- Informations (mock-up bureau-carnet-colonnes): the site card, then two columns with the label above. -->
-    <div class="od-desktop-dive-fields--stack">
+    <div class="bc-desktop-dive-fields--stack">
       <DesktopEditField card name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
-      <div class="od-desktop-dive-fields--columns">
+      <div class="bc-desktop-dive-fields--columns">
         <DesktopEditField stacked name="buddies" kind="list" label={t('desktopDetail.label.buddies')} value={dive.buddies} invitation={t('desktopDetail.invitation.buddies')} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
         <DesktopEditField stacked name="guides" kind="list" label={t('desktopDetail.label.guides')} value={dive.guides} invitation={t('desktopDetail.invitation.guides')} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
-        <div class="od-desktop-dive-fields--cell" data-field="waterType">
-          <span class="od-desktop-dive-fields--cell-label" id="od-df-water">{t('desktopDetail.label.waterType')}</span>
+        <div class="bc-desktop-dive-fields--cell" data-field="waterType">
+          <span class="bc-desktop-dive-fields--cell-label" id="od-df-water">{t('desktopDetail.label.waterType')}</span>
           <DesktopSegments block options={waterOptions} value={waterValue} ariaLabel={t('desktopDetail.label.waterType')} onchange={(v) => save('waterType', v)} />
         </div>
         <DesktopEditField stacked name="visibility" kind="stars" label={t('desktopDetail.label.visibility')} value={dive.visibility} emptyText={t('desktopDetail.notRated')} invitation={t('desktopDetail.invitation.visibility')} onsave={(v) => save('visibility', v)} />
@@ -387,7 +387,7 @@
     </div>
   {:else if tab === 'equipment'}
     <!-- Équipement (mock-up bureau-carnet-onglet-equipement). -->
-    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.computers')}</h3>
+    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.computers')}</h3>
     {#snippet noComputerPhoto()}{/snippet}
     {#each dive.diveComputers ?? [] as dc, i (i)}
       <DesktopEditField name="computer" kind="text" readonly label={computerRole(i)} value={dc.nickname || dc.model} display={[dc.nickname || dc.model, dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}>
@@ -399,20 +399,20 @@
     <!-- Computers join a dive when it is downloaded: nothing to type here. -->
     <DesktopEditField name="computer-add" kind="text" disabled label={computerRole(computers.length)} value="" invitation={t('desktopDetail.addComputer')} />
 
-    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.protection')}</h3>
+    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.protection')}</h3>
     <DesktopEditField name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
-    <div class="od-desktop-dive-fields--row" data-field="weights">
-      <span class="od-desktop-dive-fields--row-label">{t('desktopDetail.label.weights')}</span>
+    <div class="bc-desktop-dive-fields--row" data-field="weights">
+      <span class="bc-desktop-dive-fields--row-label">{t('desktopDetail.label.weights')}</span>
       <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
     </div>
     {#if dive.weights?.some((w) => w.grams > 0)}
-      <div class="od-desktop-dive-fields--row">
-        <span class="od-desktop-dive-fields--row-label" id="od-df-feedback">{t('weightFeedback.title')}</span>
+      <div class="bc-desktop-dive-fields--row">
+        <span class="bc-desktop-dive-fields--row-label" id="od-df-feedback">{t('weightFeedback.title')}</span>
         <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="od-df-feedback" clearable rail />
       </div>
     {/if}
 
-    <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<BenthicPlusChip onLight />{/if}</h3>
+    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<BenthicPlusChip onLight />{/if}</h3>
     {#if equipment && plus}
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
@@ -425,14 +425,14 @@
     {/if}
   {:else if tab === 'gas'}
     <!-- Gaz (mock-up bureau-carnet-onglet-gaz): one card per cylinder, the selected one's fields, Consommation. -->
-    <div class="od-desktop-dive-fields--card">
+    <div class="bc-desktop-dive-fields--card">
       <DesktopGasCards {cards} selected={cylinderIndex} onselect={(i) => (selectedCylinder = i)} onadd={addCylinderAndSelect} />
       {#if chosen}
-        <header class="od-desktop-dive-fields--cylinder-head">
-          <p class="od-desktop-dive-fields--cylinder-title">{t('desktopDetail.cylinder', { n: cylinderIndex + 1 })}<span class="od-desktop-dive-fields--cylinder-sub">{cylinderSub}</span></p>
-          <button type="button" class="od-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveUp')} title={t('desktopDetail.moveUp')} disabled={cylinderIndex === 0} onclick={async () => { if (await moveCylinder(cylinderIndex, -1)) selectedCylinder = cylinderIndex - 1; }}><Icon name="arrowUp" size={20} /></button>
-          <button type="button" class="od-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveDown')} title={t('desktopDetail.moveDown')} disabled={cylinderIndex === dive.cylinders.length - 1} onclick={async () => { if (await moveCylinder(cylinderIndex, 1)) selectedCylinder = cylinderIndex + 1; }}><Icon name="arrowDown" size={20} /></button>
-          <button type="button" class="od-desktop-dive-fields--icon" aria-label={t('desktopDetail.removeCylinder')} title={chosen.protected ? t('edit.cylinderInUse') : t('desktopDetail.removeCylinder')} disabled={chosen.protected} onclick={() => removeCylinder(cylinderIndex)}><Icon name="delete" size={20} /></button>
+        <header class="bc-desktop-dive-fields--cylinder-head">
+          <p class="bc-desktop-dive-fields--cylinder-title">{t('desktopDetail.cylinder', { n: cylinderIndex + 1 })}<span class="bc-desktop-dive-fields--cylinder-sub">{cylinderSub}</span></p>
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveUp')} title={t('desktopDetail.moveUp')} disabled={cylinderIndex === 0} onclick={async () => { if (await moveCylinder(cylinderIndex, -1)) selectedCylinder = cylinderIndex - 1; }}><Icon name="arrowUp" size={20} /></button>
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveDown')} title={t('desktopDetail.moveDown')} disabled={cylinderIndex === dive.cylinders.length - 1} onclick={async () => { if (await moveCylinder(cylinderIndex, 1)) selectedCylinder = cylinderIndex + 1; }}><Icon name="arrowDown" size={20} /></button>
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.removeCylinder')} title={chosen.protected ? t('edit.cylinderInUse') : t('desktopDetail.removeCylinder')} disabled={chosen.protected} onclick={() => removeCylinder(cylinderIndex)}><Icon name="delete" size={20} /></button>
         </header>
         {#key cylinderIndex}
           <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={chosen.description} options={typeOptions(chosen)} note={[chosen.sizeMl ? formatCylinderSize(chosen.sizeMl, chosen.workingPressureMbar, prefs) : '', chosen.workingPressureMbar ? formatPressure(chosen.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(cylinderIndex, /** @type {string} */ (v))} />
@@ -456,42 +456,42 @@
   {:else if tab === 'map'}
     <!-- Carte (mock-up bureau-carnet-onglet-carte): the map keeps its height, then the site and its position. -->
     {#if dive.siteCoordinates}
-      <div class="od-desktop-dive-fields--map"><SiteMap pin={dive.siteCoordinates} height="300px" /></div>
+      <div class="bc-desktop-dive-fields--map"><SiteMap pin={dive.siteCoordinates} height="300px" /></div>
     {:else}
-      <p class="od-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+      <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
     {/if}
     <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
     {#if dive.siteCoordinates}
       <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
     {/if}
-    {#if siteRow}<button type="button" class="od-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
+    {#if siteRow}<button type="button" class="bc-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-dive-fields {
+    .bc-desktop-dive-fields {
       display: flex;
       flex-direction: column;
       margin: 0 24px 24px;
     }
 
     /* One line above the fields: the grey ones can be edited with a click. */
-    .od-desktop-dive-fields--hint {
+    .bc-desktop-dive-fields--hint {
       margin: 16px 0 12px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-dive-fields--heading :global(.od-plus-chip) {
+    .bc-desktop-dive-fields--heading :global(.bc-plus-chip) {
       margin-inline-start: 10px;
       vertical-align: middle;
       letter-spacing: 0;
       text-transform: none;
     }
 
-    .od-desktop-dive-fields--stack {
+    .bc-desktop-dive-fields--stack {
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -499,35 +499,35 @@
     }
 
     /* Two columns that follow the pane's width: one column when it is narrow. */
-    .od-desktop-dive-fields--columns {
+    .bc-desktop-dive-fields--columns {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
       gap: 12px 16px;
       min-width: 0;
     }
 
-    .od-desktop-dive-fields--cell {
+    .bc-desktop-dive-fields--cell {
       display: grid;
       row-gap: 4px;
       align-content: start;
       min-width: 0;
     }
 
-    .od-desktop-dive-fields--cell-label {
+    .bc-desktop-dive-fields--cell-label {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-dive-fields--heading {
+    .bc-desktop-dive-fields--heading {
       margin: 18px 0 8px;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.4px;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-dive-fields--row {
+    .bc-desktop-dive-fields--row {
       display: grid;
       grid-template-columns: 140px minmax(0, 1fr);
       align-items: start;
@@ -535,30 +535,30 @@
       margin-bottom: 8px;
     }
 
-    .od-desktop-dive-fields--row-label {
+    .bc-desktop-dive-fields--row-label {
       min-height: 40px;
       display: flex;
       align-items: center;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-dive-fields--card {
+    .bc-desktop-dive-fields--card {
       margin-top: 12px;
       padding: 16px;
       border-radius: 16px;
-      background: var(--od-surface);
-      border: 1px solid var(--od-surface-container-highest);
+      background: var(--bc-surface);
+      border: 1px solid var(--bc-surface-container-highest);
     }
 
-    .od-desktop-dive-fields--cylinder-head {
+    .bc-desktop-dive-fields--cylinder-head {
       display: flex;
       align-items: center;
       gap: 2px;
       margin: 12px 0 8px;
     }
 
-    .od-desktop-dive-fields--cylinder-title {
+    .bc-desktop-dive-fields--cylinder-title {
       flex: 1;
       min-width: 0;
       margin: 0;
@@ -566,34 +566,34 @@
       font-weight: 600;
     }
 
-    .od-desktop-dive-fields--cylinder-sub {
+    .bc-desktop-dive-fields--cylinder-sub {
       font-weight: 400;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The map keeps its height: it never shrinks in the pane. */
-    .od-desktop-dive-fields--map {
+    .bc-desktop-dive-fields--map {
       flex: none;
       height: 300px;
       margin-bottom: 8px;
       border-radius: 12px;
       overflow: hidden;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
     }
 
-    .od-desktop-dive-fields--no-map {
+    .bc-desktop-dive-fields--no-map {
       margin: 8px 0 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-dive-fields--link {
+    .bc-desktop-dive-fields--link {
       align-self: flex-start;
       width: auto;
       min-height: 40px;
       padding: 0;
       border: 0;
       background: none;
-      color: var(--od-code-active);
+      color: var(--bc-code-active);
       font: inherit;
       font-size: 14px;
       text-decoration: underline;
@@ -601,7 +601,7 @@
       cursor: pointer;
     }
 
-    .od-desktop-dive-fields--icon {
+    .bc-desktop-dive-fields--icon {
       display: grid;
       place-items: center;
       width: 36px;
@@ -610,16 +610,16 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       cursor: pointer;
     }
 
-    .od-desktop-dive-fields--icon:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
-      color: var(--od-text);
+    .bc-desktop-dive-fields--icon:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      color: var(--bc-text);
     }
 
-    .od-desktop-dive-fields--icon:disabled {
+    .bc-desktop-dive-fields--icon:disabled {
       opacity: 0.38;
       cursor: default;
     }

@@ -40,33 +40,33 @@
   }
 </script>
 
-<Page class="od-settings-bailout">
+<Page class="bc-settings-bailout">
   <Navbar title={t('settings.defaultCylinder.bailout')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <p class="od-settings-bailout--intro">{t('settings.bailout.intro')}</p>
+  <p class="bc-settings-bailout--intro">{t('settings.bailout.intro')}</p>
   {#if settings.defaultBailout.length}
-    <div class="od-settings-bailout--surface" role="list">
+    <div class="bc-settings-bailout--surface" role="list">
       {#each settings.defaultBailout as name, i (i)}
-        <div class="od-settings-bailout--row" role="listitem">
-          <span class="od-settings-bailout--texts">
-            <span class="od-settings-bailout--label">{name}</span>
-            {#if example(name)}<span class="od-settings-bailout--supporting">{example(name)}</span>{/if}
+        <div class="bc-settings-bailout--row" role="listitem">
+          <span class="bc-settings-bailout--texts">
+            <span class="bc-settings-bailout--label">{name}</span>
+            {#if example(name)}<span class="bc-settings-bailout--supporting">{example(name)}</span>{/if}
           </span>
-          <button type="button" class="od-settings-bailout--change" onclick={() => choose(i)}>{t('settings.bailout.change')}</button>
-          <button type="button" class="od-settings-bailout--remove" aria-label={t('settings.bailout.remove', { name })} onclick={() => save(settings.defaultBailout.filter((_, k) => k !== i))}><Icon name="close" /></button>
+          <button type="button" class="bc-settings-bailout--change" onclick={() => choose(i)}>{t('settings.bailout.change')}</button>
+          <button type="button" class="bc-settings-bailout--remove" aria-label={t('settings.bailout.remove', { name })} onclick={() => save(settings.defaultBailout.filter((_, k) => k !== i))}><Icon name="close" /></button>
         </div>
       {/each}
     </div>
   {/if}
-  <button type="button" class="od-settings-bailout--add" onclick={() => choose(-1)}><Icon name="plus" />{t('settings.bailout.add')}</button>
-  <p class="od-settings-bailout--note">{t('settings.bailout.note')}</p>
+  <button type="button" class="bc-settings-bailout--add" onclick={() => choose(-1)}><Icon name="plus" />{t('settings.bailout.add')}</button>
+  <p class="bc-settings-bailout--note">{t('settings.bailout.note')}</p>
 </Page>
 
 {#if editing !== null}
@@ -85,22 +85,22 @@
 
 <style>
   @layer od.components {
-    .od-settings-bailout--intro,
-    .od-settings-bailout--note {
+    .bc-settings-bailout--intro,
+    .bc-settings-bailout--note {
       margin: 8px 20px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-settings-bailout--surface {
+    .bc-settings-bailout--surface {
       margin: 8px 16px 0;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-settings-bailout--row {
+    .bc-settings-bailout--row {
       min-height: 64px;
       padding: 6px 4px 6px 16px;
       display: flex;
@@ -108,59 +108,59 @@
       gap: 4px;
     }
 
-    .od-settings-bailout--texts {
+    .bc-settings-bailout--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-settings-bailout--label {
+    .bc-settings-bailout--label {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-settings-bailout--supporting {
+    .bc-settings-bailout--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-settings-bailout--change {
+    .bc-settings-bailout--change {
       width: auto;
       padding: 0 8px;
       height: 40px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
     }
 
-    .od-settings-bailout--remove {
+    .bc-settings-bailout--remove {
       flex: none;
       width: 44px;
       height: 44px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-settings-bailout--add {
+    .bc-settings-bailout--add {
       width: auto;
       margin: 12px 16px 0;
       height: 40px;
       padding: 0 12px 0 8px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;

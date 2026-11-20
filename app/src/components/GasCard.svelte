@@ -29,72 +29,72 @@
   const cells = $derived(rebreather ? rebreatherCells(rebreather) : []);
 </script>
 
-<div class="od-gas-card" role="group" aria-label={label}>
+<div class="bc-gas-card" role="group" aria-label={label}>
   {#if rebreather}
     <!-- At most the drawing's own width, the text columns on the same grid as the drawing. -->
-    <div class="od-gas-card--rebreather" style:max-width="{rebreatherWidth(rebreather.others.length)}px">
+    <div class="bc-gas-card--rebreather" style:max-width="{rebreatherWidth(rebreather.others.length)}px">
       <RebreatherDrawing
         diluent={rebreather.diluent >= 0 ? items[rebreather.diluent] : null}
         oxygen={rebreather.oxygen >= 0 ? items[rebreather.oxygen] : null}
         others={rebreather.others.map((i) => items[i])}
         marks={rebreather.marks}
       />
-      <div class="od-gas-card--columns" style:grid-template-columns={rebreatherTracks(rebreather.others.length)}>
+      <div class="bc-gas-card--columns" style:grid-template-columns={rebreatherTracks(rebreather.others.length)}>
         {#each cells as i, n (n)}
-          <div class="od-gas-card--cylinder">
+          <div class="bc-gas-card--cylinder">
             {#if i >= 0}
-              <span class="od-gas-card--gas">{items[i].gas}</span>
-              {#if items[i].line}<span class="od-gas-card--line">{items[i].line}</span>{/if}
-              {#if items[i].range}<span class="od-gas-card--line od-value">{items[i].range}</span>{/if}
+              <span class="bc-gas-card--gas">{items[i].gas}</span>
+              {#if items[i].line}<span class="bc-gas-card--line">{items[i].line}</span>{/if}
+              {#if items[i].range}<span class="bc-gas-card--line bc-value">{items[i].range}</span>{/if}
             {/if}
           </div>
         {/each}
       </div>
     </div>
   {:else}
-    <div class="od-gas-card--cylinders">
+    <div class="bc-gas-card--cylinders">
       {#each items as item, i (i)}
-        <div class="od-gas-card--cylinder">
+        <div class="bc-gas-card--cylinder">
           <CylinderDrawing ratio={item.ratio} startRatio={item.startRatio} hatched={item.hatched} />
-          <span class="od-gas-card--gas">{item.gas}</span>
-          {#if item.line}<span class="od-gas-card--line">{item.line}</span>{/if}
-          {#if item.range}<span class="od-gas-card--line od-value">{item.range}</span>{/if}
+          <span class="bc-gas-card--gas">{item.gas}</span>
+          {#if item.line}<span class="bc-gas-card--line">{item.line}</span>{/if}
+          {#if item.range}<span class="bc-gas-card--line bc-value">{item.range}</span>{/if}
         </div>
       {/each}
     </div>
   {/if}
-  {#if changes}<p class="od-gas-card--changes">{changes}</p>{/if}
+  {#if changes}<p class="bc-gas-card--changes">{changes}</p>{/if}
   {#if sac}
-    <div class="od-gas-card--sac"><span>{sac.label}</span><span class="od-value">{sac.value}</span></div>
+    <div class="bc-gas-card--sac"><span>{sac.label}</span><span class="bc-value">{sac.value}</span></div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-gas-card {
+    .bc-gas-card {
       padding: 16px 8px 12px;
       border-radius: 16px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
     }
 
-    .od-gas-card--cylinders {
+    .bc-gas-card--cylinders {
       display: flex;
       align-items: flex-start;
       gap: 4px;
     }
 
-    .od-gas-card--rebreather {
+    .bc-gas-card--rebreather {
       margin: 0 auto;
     }
 
-    .od-gas-card--columns {
+    .bc-gas-card--columns {
       display: grid;
       column-gap: 4px;
       margin-top: 8px;
     }
 
-    .od-gas-card--cylinder {
+    .bc-gas-card--cylinder {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -104,32 +104,32 @@
       text-align: center;
     }
 
-    .od-gas-card--gas {
+    .bc-gas-card--gas {
       margin-top: 2px;
       font-size: 14px;
       font-weight: 600;
     }
 
-    .od-gas-card--line {
+    .bc-gas-card--line {
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gas-card--changes {
+    .bc-gas-card--changes {
       margin: 12px 8px 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gas-card--sac {
+    .bc-gas-card--sac {
       margin: 12px 8px 0;
       padding-top: 10px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       display: flex;
       justify-content: space-between;
       gap: 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

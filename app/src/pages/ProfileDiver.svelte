@@ -29,64 +29,64 @@
 
 {#snippet body()}
 
-  <div class="od-profile--hero">
-    <span class="od-profile--initial" aria-hidden="true">{initial}</span>
-    <span class="od-profile--who">
-      <span class="od-profile--name">{name}</span>
-      <span class="od-profile--line">{divesLine}</span>
+  <div class="bc-profile--hero">
+    <span class="bc-profile--initial" aria-hidden="true">{initial}</span>
+    <span class="bc-profile--who">
+      <span class="bc-profile--name">{name}</span>
+      <span class="bc-profile--line">{divesLine}</span>
       <BenthicPlusChip onLight />
     </span>
   </div>
 
-  <a href="/profile/emergency" class="od-profile--emergency">
-    <span class="od-profile--emergency-icon"><Icon name="warning" size={22} weight={1.8} /></span>
-    <span class="od-profile--texts">
-      <span class="od-profile--emergency-label">{t('emergency.entry')}</span>
-      <span class="od-profile--emergency-text">{t('emergency.entryText')}</span>
+  <a href="/profile/emergency" class="bc-profile--emergency">
+    <span class="bc-profile--emergency-icon"><Icon name="warning" size={22} weight={1.8} /></span>
+    <span class="bc-profile--texts">
+      <span class="bc-profile--emergency-label">{t('emergency.entry')}</span>
+      <span class="bc-profile--emergency-text">{t('emergency.entryText')}</span>
     </span>
-    <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+    <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
   </a>
 
-  <h2 class="od-profile--section">{t('gear.profile.keep')}</h2>
-  <div class="od-profile--list">
-    <a href="/profile/gear/" class="od-profile--row">
-      <span class="od-profile--tile od-profile--tile-blue"><Icon name="briefcase" size={22} weight={1.8} /></span>
-      <span class="od-profile--texts">
-        <span class="od-profile--label">{t('gear.profile.equipment')}</span>
-        <span class="od-profile--supporting">{equipmentLine}</span>
+  <h2 class="bc-profile--section">{t('gear.profile.keep')}</h2>
+  <div class="bc-profile--list">
+    <a href="/profile/gear/" class="bc-profile--row">
+      <span class="bc-profile--tile bc-profile--tile-blue"><Icon name="briefcase" size={22} weight={1.8} /></span>
+      <span class="bc-profile--texts">
+        <span class="bc-profile--label">{t('gear.profile.equipment')}</span>
+        <span class="bc-profile--supporting">{equipmentLine}</span>
       </span>
-      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+      <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <a href="/profile/maintenance/" class="od-profile--row">
-      <span class="od-profile--tile od-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
-      <span class="od-profile--texts">
-        <span class="od-profile--label">{t('maintenance.entry')}</span>
+    <a href="/profile/maintenance/" class="bc-profile--row">
+      <span class="bc-profile--tile bc-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
+      <span class="bc-profile--texts">
+        <span class="bc-profile--label">{t('maintenance.entry')}</span>
       </span>
-      {#if overdue > 0}<span class="od-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
-      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+      {#if overdue > 0}<span class="bc-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
+      <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <a href="/profile/certs/" class="od-profile--row">
-      <span class="od-profile--tile od-profile--tile-violet"><Icon name="idCard" size={22} weight={1.8} /></span>
-      <span class="od-profile--texts">
-        <span class="od-profile--label">{t('gear.profile.certifications')}</span>
-        <span class="od-profile--supporting">{certsLine}</span>
+    <a href="/profile/certs/" class="bc-profile--row">
+      <span class="bc-profile--tile bc-profile--tile-violet"><Icon name="idCard" size={22} weight={1.8} /></span>
+      <span class="bc-profile--texts">
+        <span class="bc-profile--label">{t('gear.profile.certifications')}</span>
+        <span class="bc-profile--supporting">{certsLine}</span>
       </span>
-      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+      <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <a href="/profile/info" class="od-profile--row">
-      <span class="od-profile--tile od-profile--tile-red"><Icon name="account" size={22} weight={1.8} /></span>
-      <span class="od-profile--texts">
-        <span class="od-profile--label">{t('gear.profile.information')}</span>
-        <span class="od-profile--supporting">{t('gear.profile.informationLine')}</span>
+    <a href="/profile/info" class="bc-profile--row">
+      <span class="bc-profile--tile bc-profile--tile-red"><Icon name="account" size={22} weight={1.8} /></span>
+      <span class="bc-profile--texts">
+        <span class="bc-profile--label">{t('gear.profile.information')}</span>
+        <span class="bc-profile--supporting">{t('gear.profile.informationLine')}</span>
       </span>
-      <span class="od-profile--chevron"><Icon name="chevron" size={20} /></span>
+      <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
   </div>
 
-  <p class="od-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
+  <p class="bc-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
 {/snippet}
 
-<Page class="od-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
+<Page class="bc-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
   <Navbar title={t('gear.profile.title')}>
     {#snippet left()}
       <BackLink label={t('account.title')} name={t('gear.piece.back')} />
@@ -101,43 +101,43 @@
 
 <style>
   @layer od.components {
-    .od-profile--emergency {
+    .bc-profile--emergency {
       margin: 12px 16px 0;
       min-height: 72px;
       padding: 12px 16px;
       border-radius: 24px;
-      background: var(--od-emergency);
-      color: var(--od-on-emergency);
+      background: var(--bc-emergency);
+      color: var(--bc-on-emergency);
       display: flex;
       align-items: center;
       gap: 16px;
       text-decoration: none;
     }
 
-    .od-profile--emergency .od-profile--chevron {
+    .bc-profile--emergency .bc-profile--chevron {
       color: inherit;
     }
 
-    .od-profile--emergency-icon {
+    .bc-profile--emergency-icon {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 14px;
-      background: var(--od-surface);
-      color: var(--od-emergency);
+      background: var(--bc-surface);
+      color: var(--bc-emergency);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-profile--emergency-label {
+    .bc-profile--emergency-label {
       display: block;
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-profile--emergency-text {
+    .bc-profile--emergency-text {
       display: block;
       font-size: 14px;
       line-height: 20px;
@@ -145,21 +145,21 @@
     }
 
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-profile .page-content) {
+    :global(.bc-profile .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-profile--hero {
+    .bc-profile--hero {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-profile--initial {
+    .bc-profile--initial {
       flex: none;
       width: 56px;
       height: 56px;
@@ -167,13 +167,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-nav-avatar-ink);
+      background: var(--bc-nav-avatar-ink);
       color: #FFFFFF;
       font-size: 24px;
       font-weight: 600;
     }
 
-    .od-profile--who {
+    .bc-profile--who {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -182,7 +182,7 @@
       gap: 4px;
     }
 
-    .od-profile--name {
+    .bc-profile--name {
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -192,42 +192,42 @@
       font-weight: 500;
     }
 
-    .od-profile--line {
+    .bc-profile--line {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-profile--section {
+    .bc-profile--section {
       margin: 20px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-profile--list {
+    .bc-profile--list {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-profile--row {
+    .bc-profile--row {
       box-sizing: border-box;
       min-height: 72px;
       padding: 10px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-profile--row + .od-profile--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-profile--row + .bc-profile--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-profile--tile {
+    .bc-profile--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -235,19 +235,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-profile--tile-blue {
-      background: var(--od-release-tile);
+    .bc-profile--tile-blue {
+      background: var(--bc-release-tile);
     }
 
-    .od-profile--tile-amber {
-      background: var(--od-maintenance);
-      color: var(--od-maintenance-icon);
+    .bc-profile--tile-amber {
+      background: var(--bc-maintenance);
+      color: var(--bc-maintenance-icon);
     }
 
-    .od-profile--badge {
+    .bc-profile--badge {
       flex: none;
       min-width: 22px;
       height: 22px;
@@ -257,22 +257,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
       color: #FFFFFF;
       font-size: 13px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-profile--tile-violet {
-      background: var(--od-tile-violet);
+    .bc-profile--tile-violet {
+      background: var(--bc-tile-violet);
     }
 
-    .od-profile--tile-red {
-      background: var(--od-error-container);
+    .bc-profile--tile-red {
+      background: var(--bc-error-container);
     }
 
-    .od-profile--texts {
+    .bc-profile--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -280,31 +280,31 @@
       gap: 2px;
     }
 
-    .od-profile--label {
+    .bc-profile--label {
       font-size: 16px;
       line-height: 21px;
     }
 
-    .od-profile--supporting {
+    .bc-profile--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-profile--chevron {
+    .bc-profile--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-profile--note {
+    .bc-profile--note {
       margin: 16px 32px 24px;
       display: flex;
       gap: 10px;
       align-items: flex-start;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

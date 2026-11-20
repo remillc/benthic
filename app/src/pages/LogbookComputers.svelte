@@ -7,10 +7,10 @@
   import { t } from '../lib/i18n.js';
 </script>
 
-<Page class="od-logbook-computers">
+<Page class="bc-logbook-computers">
   <Navbar title={t('settings.logbookComputers.title')}>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('detail.back')}</span></Link>
+      <Link back iconOnly><i class="icon icon-back"></i><span class="bc-sr-only">{t('detail.back')}</span></Link>
     {/snippet}
   </Navbar>
   <LogbookComputersList />

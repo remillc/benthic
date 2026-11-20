@@ -28,11 +28,11 @@ const colour = (name) => getComputedStyle(document.documentElement).getPropertyV
 async function offlineStyle(channel) {
   const world = (await import('../assets/world-land.json')).default;
   const regions = offlineMaps.regions.filter((r) => r.status === 'ready' || r.status === 'updating');
-  const sea = colour('--od-map-sea') || '#D3E0EC';
-  const land = colour('--od-map-land') || '#F7F6F2';
-  const landLow = colour('--od-map-land-low') || '#EDECE7';
-  const road = colour('--od-map-road') || '#D9D3C4';
-  const outline = colour('--od-text-2') || '#4B4A47';
+  const sea = colour('--bc-map-sea') || '#D3E0EC';
+  const land = colour('--bc-map-land') || '#F7F6F2';
+  const landLow = colour('--bc-map-land-low') || '#EDECE7';
+  const road = colour('--bc-map-road') || '#D9D3C4';
+  const outline = colour('--bc-text-2') || '#4B4A47';
   const areas = {
     type: 'FeatureCollection',
     features: regions.map((r) => {

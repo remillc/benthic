@@ -45,11 +45,11 @@ test('the settle time matches the spring equation', () => {
   assert.ok(ms > 900 && ms < 950, String(ms));
 });
 
-test('variables are --od-motion-<name> and -ms, for every token', () => {
+test('variables are --bc-motion-<name> and -ms, for every token', () => {
   const vars = motionVariables();
   assert.equal(Object.keys(vars).length, Object.keys(SPRINGS).length * 2);
-  assert.match(vars['--od-motion-spatial-default'], /^linear\(/);
-  assert.match(vars['--od-motion-spatial-default-ms'], /^\d+ms$/);
+  assert.match(vars['--bc-motion-spatial-default'], /^linear\(/);
+  assert.match(vars['--bc-motion-spatial-default-ms'], /^\d+ms$/);
 });
 
 test('an unknown token is an error', () => {
@@ -68,7 +68,7 @@ test('tokens are declared on Android only', () => {
   assert.equal(Object.keys(ios.set).length, 0);
   const md = root(['md']);
   applyMotionTokens(/** @type {any} */ (md));
-  assert.ok(md.set['--od-motion-spatial-fast']);
+  assert.ok(md.set['--bc-motion-spatial-fast']);
 });
 
 // A screen released by the finger (lib/swipe.js): the spring starts at the finger's speed.

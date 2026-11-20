@@ -114,7 +114,7 @@ test('the pill of the account selector slides, stays still on the first render a
   const menu = read('components/DevToolsMenu.svelte');
   assert.match(menu, /segments-pill/);
   assert.match(menu, /transition: transform 0\.3s cubic-bezier\(0\.2, 0\.9, 0\.3, 1\.2\)/);
-  assert.match(menu, /prefers-reduced-motion: reduce\) \{\s+\.od-dev-tools-menu--segments-pill-slide/);
+  assert.match(menu, /prefers-reduced-motion: reduce\) \{\s+\.bc-dev-tools-menu--segments-pill-slide/);
   assert.match(menu, /target = -1/);
 });
 

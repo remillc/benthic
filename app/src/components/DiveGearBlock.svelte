@@ -18,48 +18,48 @@
 </script>
 
 {#if pieces.length || equipment.adhoc.length || kit}
-  <div class="od-dive-gear-block">
+  <div class="bc-dive-gear-block">
     {#if pieces.length || equipment.adhoc.length}
-      <div class="od-dive-gear-block--head"><h3>{t('gear.diveGear.other')}</h3><BenthicPlusChip onLight /></div>
-      <ul class="od-dive-gear-block--list">
+      <div class="bc-dive-gear-block--head"><h3>{t('gear.diveGear.other')}</h3><BenthicPlusChip onLight /></div>
+      <ul class="bc-dive-gear-block--list">
         {#each pieces as g (g?.id)}
           {#if g}
-            <li class="od-dive-gear-block--row">
-              <span class="od-dive-gear-block--icon"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
-              <span class="od-dive-gear-block--texts">
-                <span class="od-dive-gear-block--name">{g.name}</span>
-                <span class="od-dive-gear-block--line">{g.note || t(`gear.inventory.type.${g.type}`)}</span>
+            <li class="bc-dive-gear-block--row">
+              <span class="bc-dive-gear-block--icon"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
+              <span class="bc-dive-gear-block--texts">
+                <span class="bc-dive-gear-block--name">{g.name}</span>
+                <span class="bc-dive-gear-block--line">{g.note || t(`gear.inventory.type.${g.type}`)}</span>
               </span>
             </li>
           {/if}
         {/each}
         {#each equipment.adhoc as p (p.id)}
-          <li class="od-dive-gear-block--row">
-            <span class="od-dive-gear-block--icon"><GearIcon type="other" name={p.name} size={22} /></span>
-            <span class="od-dive-gear-block--texts">
-              <span class="od-dive-gear-block--name">{p.name}</span>
-              <span class="od-dive-gear-block--line">{t('gear.diveGear.outside')}</span>
+          <li class="bc-dive-gear-block--row">
+            <span class="bc-dive-gear-block--icon"><GearIcon type="other" name={p.name} size={22} /></span>
+            <span class="bc-dive-gear-block--texts">
+              <span class="bc-dive-gear-block--name">{p.name}</span>
+              <span class="bc-dive-gear-block--line">{t('gear.diveGear.outside')}</span>
             </span>
           </li>
         {/each}
       </ul>
     {/if}
     {#if kit}
-      <p class="od-dive-gear-block--kit"><Icon name="briefcase" size={20} />{t('gear.diveGear.kitDetail', { name: kit.name })}</p>
+      <p class="bc-dive-gear-block--kit"><Icon name="briefcase" size={20} />{t('gear.diveGear.kitDetail', { name: kit.name })}</p>
     {/if}
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-dive-gear-block {
+    .bc-dive-gear-block {
       margin-top: 8px;
       padding: 12px 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-dive-gear-block--head {
+    .bc-dive-gear-block--head {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -69,53 +69,53 @@
         font-size: 14px;
         line-height: 20px;
         font-weight: 600;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-dive-gear-block--list {
+    .bc-dive-gear-block--list {
       margin: 4px 0 0;
       padding: 0;
       list-style: none;
     }
 
-    .od-dive-gear-block--row {
+    .bc-dive-gear-block--row {
       min-height: 52px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-dive-gear-block--icon {
+    .bc-dive-gear-block--icon {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-gear-block--texts {
+    .bc-dive-gear-block--texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-dive-gear-block--name {
+    .bc-dive-gear-block--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-dive-gear-block--line {
+    .bc-dive-gear-block--line {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-gear-block--kit {
+    .bc-dive-gear-block--kit {
       margin: 8px 0 0;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

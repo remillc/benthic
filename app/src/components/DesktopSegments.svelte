@@ -19,13 +19,13 @@
   }
 </script>
 
-<div bind:this={group} class="od-desktop-segments" class:od-desktop-segments--block={block} role="radiogroup" aria-label={ariaLabel}>
+<div bind:this={group} class="bc-desktop-segments" class:bc-desktop-segments--block={block} role="radiogroup" aria-label={ariaLabel}>
   {#each options as option, i (option.value)}
     <button
       type="button"
       role="radio"
-      class="od-desktop-segments--segment"
-      class:od-desktop-segments--selected={value === option.value}
+      class="bc-desktop-segments--segment"
+      class:bc-desktop-segments--selected={value === option.value}
       aria-checked={value === option.value}
       tabindex={value === option.value ? 0 : -1}
       onclick={() => value !== option.value && onchange(option.value)}
@@ -39,24 +39,24 @@
 
 <style>
   @layer od.components {
-    .od-desktop-segments {
+    .bc-desktop-segments {
       display: inline-flex;
       height: 42px;
-      border: 1px solid var(--od-text-2);
+      border: 1px solid var(--bc-text-2);
       border-radius: 21px;
       overflow: hidden;
     }
-    .od-desktop-segments--block {
+    .bc-desktop-segments--block {
       display: flex;
       height: 40px;
       border-radius: 20px;
     }
-    .od-desktop-segments--block .od-desktop-segments--segment {
+    .bc-desktop-segments--block .bc-desktop-segments--segment {
       flex: 1;
       justify-content: center;
       padding: 0 12px;
     }
-    .od-desktop-segments--segment {
+    .bc-desktop-segments--segment {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -66,29 +66,29 @@
       font: inherit;
       font-size: 15px;
       white-space: nowrap;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-segments--segment + .od-desktop-segments--segment {
-      border-left: 1px solid var(--od-text-2);
+    .bc-desktop-segments--segment + .bc-desktop-segments--segment {
+      border-left: 1px solid var(--bc-text-2);
     }
-    .od-desktop-segments--segment:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-segments--segment:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-segments--selected,
-    .od-desktop-segments--selected:hover {
-      background: var(--od-desktop-selected);
-      color: var(--od-desktop-selected-ink);
+    .bc-desktop-segments--selected,
+    .bc-desktop-segments--selected:hover {
+      background: var(--bc-desktop-selected);
+      color: var(--bc-desktop-selected-ink);
     }
-    .od-desktop-segments--segment:focus-visible {
-      outline: 2px solid var(--od-text);
+    .bc-desktop-segments--segment:focus-visible {
+      outline: 2px solid var(--bc-text);
       outline-offset: -3px;
     }
 
 
     /* Mouse: the selected segment takes the 8 % layer of its text colour too. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-segments--selected:hover {
+      .bc-desktop-segments--selected:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }

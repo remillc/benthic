@@ -117,7 +117,7 @@
   }
 </script>
 
-<Popup class="od-statistic-new" push={theme.ios} swipeToClose={theme.ios}>
+<Popup class="bc-statistic-new" push={theme.ios} swipeToClose={theme.ios}>
   <View>
     <Page>
       <Navbar title={t(theme.ios ? 'stats.newTitleShort' : 'stats.newTitle')}>
@@ -125,18 +125,18 @@
           {#if theme.ios}
             <Link onClick={cancel}>{t('dialog.cancel')}</Link>
           {:else}
-            <Link iconOnly onClick={cancel}><Icon name="close" /><span class="od-sr-only">{t('stats.close')}</span></Link>
+            <Link iconOnly onClick={cancel}><Icon name="close" /><span class="bc-sr-only">{t('stats.close')}</span></Link>
           {/if}
         {/snippet}
         {#snippet right()}
-          <Link class={`od-statistic-new--save${canSave ? '' : ' disabled'}`} onClick={save}>{t('edit.save')}</Link>
+          <Link class={`bc-statistic-new--save${canSave ? '' : ' disabled'}`} onClick={save}>{t('edit.save')}</Link>
         {/snippet}
       </Navbar>
       <LeaveGuard bind:this={guard} noun="statistic" {dirty} {save} leave={close} canSave={() => canSave} />
 
       {#if theme.ios}
         <div class="block-title">{t('stats.name')}</div>
-        <div class="list list-strong inset list-dividers od-statistic-new--inline-labels">
+        <div class="list list-strong inset list-dividers bc-statistic-new--inline-labels">
           <ul>
             <li class="item-content item-input">
               <div class="item-inner">
@@ -146,7 +146,7 @@
             </li>
           </ul>
         </div>
-        <p class="od-statistic-new--note">{t('stats.nameHint')}</p>
+        <p class="bc-statistic-new--note">{t('stats.nameHint')}</p>
       {:else}
         <TextField label={t('stats.name')} bind:value={name} oninput={() => (nameTyped = true)} supporting={t('stats.nameHintShort')} />
       {/if}
@@ -158,7 +158,7 @@
           <div class="list list-strong inset list-dividers">
             <ul>
               <li>
-                <label class="item-content item-link od-statistic-new--select-row">
+                <label class="item-content item-link bc-statistic-new--select-row">
                   <div class="item-inner">
                     <div class="item-title">{t('stats.criterion')}</div>
                     <div class="item-after">{t(`stats.criteria.${c.field}`)}</div>
@@ -169,14 +169,14 @@
                 </label>
               </li>
               {#if index > 0}
-                <li><button type="button" class="item-content od-statistic-new--action-row od-statistic-new--remove-row" onclick={() => removeCriterion(index)}><div class="item-inner"><div class="item-title">{t('stats.removeCriterion')}</div></div></button></li>
+                <li><button type="button" class="item-content bc-statistic-new--action-row bc-statistic-new--remove-row" onclick={() => removeCriterion(index)}><div class="item-inner"><div class="item-title">{t('stats.removeCriterion')}</div></div></button></li>
               {/if}
             </ul>
           </div>
-          {#if index === 0}<p class="od-statistic-new--note">{t('stats.criteriaHint')}</p>{/if}
+          {#if index === 0}<p class="bc-statistic-new--note">{t('stats.criteriaHint')}</p>{/if}
         {:else}
           <!-- MD3 exposed dropdown menu (spec, section 8). -->
-          <div class="od-statistic-new--filled-field">
+          <div class="bc-statistic-new--filled-field">
             <SelectField
               label={t('stats.criterion')}
               value={c.field}
@@ -185,7 +185,7 @@
               supporting={index === 0 ? t('stats.criteriaHint') : ''}
             />
             {#if index > 0}
-              <button type="button" class="od-statistic-new--text-button" onclick={() => removeCriterion(index)}>
+              <button type="button" class="bc-statistic-new--text-button" onclick={() => removeCriterion(index)}>
                 <Icon name="close" size={18} weight={2} />{t('stats.removeCriterion')}
               </button>
             {/if}
@@ -194,18 +194,18 @@
 
         <div class="block-title">{t('stats.values')}</div>
         {#if values?.length}
-          <div class="list list-strong inset list-dividers od-statistic-new--values">
+          <div class="list list-strong inset list-dividers bc-statistic-new--values">
             <ul>
               {#each values as v (v.key)}
                 {@const on = c.values.includes(v.key)}
                 <li>
                   {#if theme.ios}
                     <!-- iOS: a check mark at the end of the selected rows (HIG). -->
-                    <button type="button" class="item-content od-statistic-new--check-row" role="checkbox" aria-checked={on} onclick={() => toggle(index, v.key, !on)}>
+                    <button type="button" class="item-content bc-statistic-new--check-row" role="checkbox" aria-checked={on} onclick={() => toggle(index, v.key, !on)}>
                       <div class="item-inner">
                         <div class="item-title">{v.label}</div>
-                        <div class="item-after od-value">{t('trip.dives', { n: v.dives })}</div>
-                        <span class="od-statistic-new--check" class:od-statistic-new--on={on}><Icon name="check" size={20} weight={2.6} /></span>
+                        <div class="item-after bc-value">{t('trip.dives', { n: v.dives })}</div>
+                        <span class="bc-statistic-new--check" class:bc-statistic-new--on={on}><Icon name="check" size={20} weight={2.6} /></span>
                       </div>
                     </button>
                   {:else}
@@ -214,7 +214,7 @@
                       <i class="icon icon-checkbox"></i>
                       <div class="item-inner">
                         <div class="item-title">{v.label}</div>
-                        <div class="item-after od-value">{t('trip.dives', { n: v.dives })}</div>
+                        <div class="item-after bc-value">{t('trip.dives', { n: v.dives })}</div>
                       </div>
                     </label>
                   {/if}
@@ -223,18 +223,18 @@
             </ul>
           </div>
         {:else if values}
-          <p class="od-statistic-new--note">{t('stats.noValues')}</p>
+          <p class="bc-statistic-new--note">{t('stats.noValues')}</p>
         {/if}
       {/each}
 
       {#if criteria.length < CRITERIA.length}
         {#if theme.ios}
-          <div class="list list-strong inset list-dividers od-statistic-new--add">
-            <ul><li><button type="button" class="item-content od-statistic-new--action-row" onclick={addCriterion}><div class="item-inner"><div class="item-title">{t('stats.addCriterionEllipsis')}</div></div></button></li></ul>
+          <div class="list list-strong inset list-dividers bc-statistic-new--add">
+            <ul><li><button type="button" class="item-content bc-statistic-new--action-row" onclick={addCriterion}><div class="item-inner"><div class="item-title">{t('stats.addCriterionEllipsis')}</div></div></button></li></ul>
           </div>
         {:else}
-          <div class="od-statistic-new--add">
-            <button type="button" class="od-statistic-new--text-button" onclick={addCriterion}><Icon name="plus" size={18} weight={2} />{t('stats.addCriterion')}</button>
+          <div class="bc-statistic-new--add">
+            <button type="button" class="bc-statistic-new--text-button" onclick={addCriterion}><Icon name="plus" size={18} weight={2} />{t('stats.addCriterion')}</button>
           </div>
         {/if}
       {/if}
@@ -243,46 +243,46 @@
       <!-- The result card opens the filtered result (in the Statistics section, behind this dialog). -->
       <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} href={canSave ? resultHref : undefined} onclick={openResult} />
 
-      <p class="od-statistic-new--note od-statistic-new--rules">{t('stats.rules')}</p>
-      <div class="od-statistic-new--end"></div>
+      <p class="bc-statistic-new--note bc-statistic-new--rules">{t('stats.rules')}</p>
+      <div class="bc-statistic-new--end"></div>
     </Page>
   </View>
 </Popup>
 
 <style>
   @layer od.components {
-    .od-statistic-new--note {
+    .bc-statistic-new--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-statistic-new--rules {
+      &.bc-statistic-new--rules {
         margin-top: 12px;
       }
     }
 
     /* "Enregistrer" in the top bar: a text button (spec, "Text fields"). */
-    :global(.navbar .od-statistic-new--save) {
+    :global(.navbar .bc-statistic-new--save) {
       font-weight: 500;
     }
 
-    .od-statistic-new--filled-field {
+    .bc-statistic-new--filled-field {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
 
-      :global(.od-select-field) {
+      :global(.bc-select-field) {
         align-self: stretch;
       }
 
-      .od-statistic-new--text-button {
+      .bc-statistic-new--text-button {
         margin-inline-start: 16px;
       }
     }
 
     /* iOS: the criterion row opens the system's picker. */
-    .od-statistic-new--select-row {
+    .bc-statistic-new--select-row {
       position: relative;
 
       select {
@@ -294,7 +294,7 @@
     }
 
     /* iOS action rows: bold, in the action colour. */
-    .od-statistic-new--action-row {
+    .bc-statistic-new--action-row {
       width: 100%;
       border: none;
       background: none;
@@ -304,15 +304,15 @@
 
       .item-title {
         font-weight: 600;
-        color: var(--od-action);
+        color: var(--bc-action);
       }
 
-      &.od-statistic-new--remove-row .item-title {
+      &.bc-statistic-new--remove-row .item-title {
         font-weight: 400;
       }
     }
 
-    .od-statistic-new--check-row {
+    .bc-statistic-new--check-row {
       width: 100%;
       border: none;
       background: none;
@@ -322,18 +322,18 @@
       cursor: pointer;
     }
 
-    .od-statistic-new--check {
+    .bc-statistic-new--check {
       width: 20px;
       margin-left: 10px;
-      color: var(--od-action);
+      color: var(--bc-action);
       visibility: hidden;
 
-      &.od-statistic-new--on {
+      &.bc-statistic-new--on {
         visibility: visible;
       }
     }
 
-    .od-statistic-new--add {
+    .bc-statistic-new--add {
       margin: 8px 8px 0;
 
       &.list {
@@ -342,13 +342,13 @@
     }
 
     /* MD3 text button (40 dp, 12 dp side padding); iOS, a 44 pt text button. */
-    .od-statistic-new--text-button {
+    .bc-statistic-new--text-button {
       height: 40px;
       padding: 0 12px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-action);
+      color: var(--bc-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -367,22 +367,22 @@
       }
     }
 
-    .od-statistic-new--end {
+    .bc-statistic-new--end {
       height: 32px;
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-statistic-new--text-button {
+      .bc-statistic-new--text-button {
         transition: box-shadow 120ms linear;
       }
-      .od-statistic-new--text-button:not(:disabled):hover {
+      .bc-statistic-new--text-button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-statistic-new--text-button {
+      .bc-statistic-new--text-button {
         transition: none;
       }
     }

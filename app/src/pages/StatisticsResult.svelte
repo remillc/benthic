@@ -65,29 +65,29 @@
   }
 </script>
 
-<Page class="od-statistics-result">
+<Page class="bc-statistics-result">
   <Navbar large={theme.ios} {title}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
         <i class="icon icon-back"></i>
-        {#if theme.ios}<span>{t('stats.title')}</span>{:else}<span class="od-sr-only">{t('common.back')}</span>{/if}
+        {#if theme.ios}<span>{t('stats.title')}</span>{:else}<span class="bc-sr-only">{t('common.back')}</span>{/if}
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="od-statistics-result--chips">
+  <div class="bc-statistics-result--chips">
     {#each criteria as c, i (c.field)}
-      <span class="od-statistics-result--chip-input">
+      <span class="bc-statistics-result--chip-input">
         {t('stats.criterionValue', {
           criterion: t(`stats.criteria.${c.field}`),
           value: c.values.map((v) => valueLabel(c.field, v, logbook.dives)).join(', '),
         })}
-        <button type="button" class="od-statistics-result--remove" onclick={() => removeCriterion(i)}>
-          <Icon name="close" size={18} weight={2} /><span class="od-sr-only">{t('stats.removeCriterion')}</span>
+        <button type="button" class="bc-statistics-result--remove" onclick={() => removeCriterion(i)}>
+          <Icon name="close" size={18} weight={2} /><span class="bc-sr-only">{t('stats.removeCriterion')}</span>
         </button>
       </span>
     {/each}
-    <span class="od-statistics-result--count od-value" role="status">
+    <span class="bc-statistics-result--count bc-value" role="status">
       {result ? t('stats.outOf', { n: result.total.dives, total: result.logDives }) : ''}
     </span>
   </div>
@@ -96,8 +96,8 @@
 
   <!-- As stats-filtre-android.dc.html: one bar per dive in the water colour
        of its depth, the year under each, no axis (task 2026-11-07-24). -->
-  <h2 class="od-statistics-result--chart-title">{t('stats.depthPerDive')}</h2>
-  <div class="od-statistics-result--chart-block">
+  <h2 class="bc-statistics-result--chart-title">{t('stats.depthPerDive')}</h2>
+  <div class="bc-statistics-result--chart-block">
     <BarChart {bars} depth axis={false} labelSize={12} height={120} label={`${t('stats.chartDepthLabel', { n: dives.length })}, ${title}`} />
   </div>
 
@@ -108,8 +108,8 @@
   />
 
   {#if !compare}
-    <div class="od-statistics-result--compare">
-      <button type="button" class="od-statistics-result--text-button" onclick={() => (compare = true)}>
+    <div class="bc-statistics-result--compare">
+      <button type="button" class="bc-statistics-result--text-button" onclick={() => (compare = true)}>
         {t('stats.compareBySuit')}<Icon name="expand" size={18} weight={2} />
       </button>
     </div>
@@ -123,9 +123,9 @@
               <div class="item-inner">
                 <div class="item-title-row">
                   <div class="item-title">{s.value || notSetLabel('suit')}</div>
-                  <div class="item-after od-value">{formatTotalTime(s.totalSeconds)}</div>
+                  <div class="item-after bc-value">{formatTotalTime(s.totalSeconds)}</div>
                 </div>
-                <div class="item-text od-value">{t('trip.dives', { n: s.dives })}</div>
+                <div class="item-text bc-value">{t('trip.dives', { n: s.dives })}</div>
               </div>
             </li>
           {/each}
@@ -133,12 +133,12 @@
       </div>
     {/if}
   {/if}
-  <div class="od-statistics-result--end"></div>
+  <div class="bc-statistics-result--end"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .od-statistics-result--chips {
+    .bc-statistics-result--chips {
       margin: 4px 16px 0;
       display: flex;
       align-items: center;
@@ -152,12 +152,12 @@
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners; iOS: a pill. */
-    .od-statistics-result--chip-input {
+    .bc-statistics-result--chip-input {
       height: 32px;
       padding: 0 4px 0 12px;
       border-radius: 8px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -172,7 +172,7 @@
     }
 
     /* 48 dp touch target around the 18 dp icon, without growing the chip. */
-    .od-statistics-result--remove {
+    .bc-statistics-result--remove {
       width: 32px;
       height: 32px;
       margin: -8px 0;
@@ -192,28 +192,28 @@
       }
     }
 
-    .od-statistics-result--count {
+    .bc-statistics-result--count {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 15px;
       }
     }
 
-    .od-statistics-result--chart-title {
+    .bc-statistics-result--chart-title {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-statistics-result--chart-block {
+    .bc-statistics-result--chart-block {
       margin: 0 16px;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       :global(.ios) & {
         padding: 14px 16px;
@@ -223,17 +223,17 @@
 
 
     /* MD3 text button (40 dp, 12 dp side padding); a plain text button on iOS. */
-    .od-statistics-result--compare {
+    .bc-statistics-result--compare {
       margin: 12px 8px 0;
     }
 
-    .od-statistics-result--text-button {
+    .bc-statistics-result--text-button {
       height: 40px;
       padding: 0 12px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-action);
+      color: var(--bc-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -250,7 +250,7 @@
       }
     }
 
-    .od-statistics-result--end {
+    .bc-statistics-result--end {
       height: 32px;
     }
   }

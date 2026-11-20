@@ -166,43 +166,43 @@
 </script>
 
 {#snippet hero(/** @type {'offer'|'ready'|'welcome'|'health'} */ which)}
-  <header class="od-plus-hero od-plus-hero--{which}">
-    <div class="od-plus-hero--bands" aria-hidden="true"></div>
+  <header class="bc-plus-hero bc-plus-hero--{which}">
+    <div class="bc-plus-hero--bands" aria-hidden="true"></div>
     {#if which === 'ready' && motion.bubbles}<BenthicPlusReadyBubbles still={motion.still} />{/if}
     {#if which === 'offer'}
       <!-- The offer's own bubbles: still, at the places of the mock-up (task 2026-11-19-304). -->
-      <svg class="od-plus-hero--bubbles" viewBox="0 0 390 300" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+      <svg class="bc-plus-hero--bubbles" viewBox="0 0 390 300" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
         {#each OFFER_BUBBLES as [cx, cy, r]}<circle {cx} {cy} {r} />{/each}
       </svg>
     {/if}
     <!-- Every OpenDives+ header: the band of the dive profile above the bottom wave, as on « Se connecter ». -->
-    <svg class="od-plus-hero--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-      <path d="{BAND_PROFILE} V140 H0 Z" class="od-plus-hero--profile-area" />
-      <path d={BAND_PROFILE} class="od-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
+    <svg class="bc-plus-hero--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+      <path d="{BAND_PROFILE} V140 H0 Z" class="bc-plus-hero--profile-area" />
+      <path d={BAND_PROFILE} class="bc-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
     </svg>
-    <svg class="od-plus-hero--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
-    <div class="od-plus-hero--brand">
+    <svg class="bc-plus-hero--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+    <div class="bc-plus-hero--brand">
       <img src="logo-light.svg" alt="" width="32" height="32" />
       <span>{t('welcomeSteps.appName')}</span>
     </div>
     {#if which === 'offer'}
-      <div class="od-plus-hero--text">
+      <div class="bc-plus-hero--text">
         <BenthicPlusChip label={t('odplus.offer.pill')} large />
-        <h2 class="od-plus-hero--title">{t('odplus.offer.title')}</h2>
-        <p class="od-plus-hero--lead">{t('odplus.offer.lead')}</p>
+        <h2 class="bc-plus-hero--title">{t('odplus.offer.title')}</h2>
+        <p class="bc-plus-hero--lead">{t('odplus.offer.lead')}</p>
       </div>
     {:else}
-      <div class="od-plus-hero--centre">
+      <div class="bc-plus-hero--centre">
         {#if which === 'ready'}
           <BenthicPlusReadyLogo play={motion.play} />
         {:else if which === 'health'}
-          <span class="od-plus-hero--check"><Icon name="lock" size={36} weight={2} /></span>
+          <span class="bc-plus-hero--check"><Icon name="lock" size={36} weight={2} /></span>
         {:else}
-          <span class="od-plus-hero--check od-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
+          <span class="bc-plus-hero--check bc-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
         {/if}
         <BenthicPlusChip />
-        <h2 class="od-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : which === 'health' ? 'odplus.health.title' : 'odplus.welcome.title')}</h2>
-        <p class="od-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : which === 'health' ? t('odplus.health.lead') : t('odplus.welcome.lead')}</p>
+        <h2 class="bc-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : which === 'health' ? 'odplus.health.title' : 'odplus.welcome.title')}</h2>
+        <p class="bc-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : which === 'health' ? t('odplus.health.lead') : t('odplus.welcome.lead')}</p>
       </div>
     {/if}
   </header>
@@ -210,11 +210,11 @@
 
 {#snippet priceBlock()}
   <!-- Plain centred text, not a card (task 2026-11-19-295): the grey label is not tappable. -->
-  <div class="od-plus--price">
-    <span class="od-plus--price-label">{t('odplus.offer.priceLabel')}</span>
-    <span class="od-plus--price-amount">{t('odplus.offer.price')} <span class="od-plus--price-per">{t('odplus.offer.per')}</span></span>
-    <span class="od-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
-    <span class="od-plus--price-cancel"><Icon name="check" size={20} weight={2.4} />{t('odplus.offer.cancelAnytime')}</span>
+  <div class="bc-plus--price">
+    <span class="bc-plus--price-label">{t('odplus.offer.priceLabel')}</span>
+    <span class="bc-plus--price-amount">{t('odplus.offer.price')} <span class="bc-plus--price-per">{t('odplus.offer.per')}</span></span>
+    <span class="bc-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
+    <span class="bc-plus--price-cancel"><Icon name="check" size={20} weight={2.4} />{t('odplus.offer.cancelAnytime')}</span>
   </div>
 {/snippet}
 
@@ -226,160 +226,160 @@
 {/if}
 
 {#if step === 'odplusConnect'}
-  <h2 class="od-plus--title">{t('odplus.connect.title')}</h2>
-  <p class="od-plus--lead">{t('odplus.connect.lead')}</p>
-  <div class="od-plus--buttons">
+  <h2 class="bc-plus--title">{t('odplus.connect.title')}</h2>
+  <p class="bc-plus--lead">{t('odplus.connect.lead')}</p>
+  <div class="bc-plus--buttons">
     <!-- The official logos and rules of each provider (assets/brands/README.md): the logos are never altered. -->
     <!-- « Continuer avec Apple » first on iOS (task 2026-11-19-289, ios-odplus-connexion.dc.html). -->
     {#each providerOrder(ios) as which (which)}
       {#if which === 'google'}
-        <button type="button" class="od-plus--provider od-plus--provider-google" onclick={() => provider('google')}>
-          <span class="od-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
+        <button type="button" class="bc-plus--provider bc-plus--provider-google" onclick={() => provider('google')}>
+          <span class="bc-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
         </button>
       {:else if which === 'apple'}
-        <button type="button" class="od-plus--provider od-plus--provider-apple" onclick={() => provider('apple')}>
-          <img class="od-plus--apple-logo od-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="od-plus--apple-logo od-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
+        <button type="button" class="bc-plus--provider bc-plus--provider-apple" onclick={() => provider('apple')}>
+          <img class="bc-plus--apple-logo bc-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="bc-plus--apple-logo bc-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
         </button>
       {:else}
-        <button type="button" class="od-plus--provider od-plus--provider-main" onclick={() => go('email')}>
+        <button type="button" class="bc-plus--provider bc-plus--provider-main" onclick={() => go('email')}>
           <Icon name="mail" size={22} />{t('odplus.connect.email')}
         </button>
       {/if}
     {/each}
   </div>
-  <p class="od-plus--note">{t('odplus.connect.note')}</p>
-  <button type="button" class="od-plus--text od-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
+  <p class="bc-plus--note">{t('odplus.connect.note')}</p>
+  <button type="button" class="bc-plus--text bc-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
 {:else if step === 'odplusOffer'}
-  <div class="od-plus--screen od-plus--screen-offer" class:od-plus--screen-ios={ios}>
+  <div class="bc-plus--screen bc-plus--screen-offer" class:bc-plus--screen-ios={ios}>
     <!-- A tablet's blue panel (pages/WelcomeStartRelease.svelte) carries the chip, the title and the lead: the hero is the phone's. -->
     {#if layout.phone || desktopApp}{@render hero('offer')}{/if}
-    <div class="od-plus--cards">
+    <div class="bc-plus--cards">
       {#each BENEFITS as b (b.key)}
-        <div class="od-plus--card od-plus--card-{b.tone}">
-          <span class="od-plus--card-icon"><Icon name={b.icon} size={24} weight={1.9} /></span>
-          <span class="od-plus--card-copy">
-            <span class="od-plus--card-title">{t(`odplus.offer.${b.key}`)}</span>
-            <span class="od-plus--card-text">{t(`odplus.offer.${b.key}Text`)}</span>
+        <div class="bc-plus--card bc-plus--card-{b.tone}">
+          <span class="bc-plus--card-icon"><Icon name={b.icon} size={24} weight={1.9} /></span>
+          <span class="bc-plus--card-copy">
+            <span class="bc-plus--card-title">{t(`odplus.offer.${b.key}`)}</span>
+            <span class="bc-plus--card-text">{t(`odplus.offer.${b.key}Text`)}</span>
           </span>
         </div>
       {/each}
     </div>
-    <div class="od-plus--card od-plus--card-maintenance od-plus--card-wide">
-      <span class="od-plus--card-icon"><Icon name="bell" size={24} weight={1.9} /></span>
-      <span class="od-plus--card-body">
-        <span class="od-plus--card-title">{t('odplus.offer.maintenance')}</span>
-        <span class="od-plus--card-text">{t('odplus.offer.maintenanceText')}</span>
+    <div class="bc-plus--card bc-plus--card-maintenance bc-plus--card-wide">
+      <span class="bc-plus--card-icon"><Icon name="bell" size={24} weight={1.9} /></span>
+      <span class="bc-plus--card-body">
+        <span class="bc-plus--card-title">{t('odplus.offer.maintenance')}</span>
+        <span class="bc-plus--card-text">{t('odplus.offer.maintenanceText')}</span>
       </span>
     </div>
     <!-- « Voir tout ce qui est inclus » (task 2026-11-19-295): opens the list of everything the subscription includes. -->
-    <button type="button" class="od-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
+    <button type="button" class="bc-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
     {@render priceBlock()}
-    <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+    <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     {#if ios}
       <!-- App Store requirements (task 289): restoring purchases, and the terms of the automatic renewal. -->
-      <button type="button" class="od-plus--text od-plus--text-centre" onclick={restore}>{t('odplus.offer.restore')}</button>
-      <p class="od-plus--terms">{t('odplus.offer.terms', { price: t('odplus.offer.price') })}</p>
+      <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={restore}>{t('odplus.offer.restore')}</button>
+      <p class="bc-plus--terms">{t('odplus.offer.terms', { price: t('odplus.offer.price') })}</p>
     {/if}
-    <button type="button" class="od-plus--text od-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
-    <p class="od-plus--no-account">{t('odplus.offer.noAccount')}</p>
+    <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
+    <p class="bc-plus--no-account">{t('odplus.offer.noAccount')}</p>
     {#if offerShowsSignIn(flow.stack)}
       <!-- « Déjà abonné ? Se connecter » (task 2026-11-18-281): hidden right after a sign-in, where the diver is already in.
            On a tablet it sits at the top right, on the row of « Retour » (task 2026-11-19-295). -->
-      <p class="od-plus--already" class:od-plus--already-top={!layout.phone && !desktopApp}>{t('odplus.offer.already')} <button type="button" class="od-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
+      <p class="bc-plus--already" class:bc-plus--already-top={!layout.phone && !desktopApp}>{t('odplus.offer.already')} <button type="button" class="bc-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
     {/if}
   </div>
 {:else if step === 'odplusAll'}
   <!-- « Tout ce qui est inclus » (task 2026-11-19-295; mock-ups android-odplus-complet, ios-odplus-complet and
        android-tablette-odplus-complet-paysage): the rows of each group, then the price footer that stays at the bottom. -->
-  <div class="od-plus-all" class:od-plus-all--ios={kind === 'iphone'}>
-    <div class="od-plus-all--bar">
-      <button type="button" class="od-plus-all--back" aria-label={t('welcomeSteps.back')} onclick={goBack}>
+  <div class="bc-plus-all" class:bc-plus-all--ios={kind === 'iphone'}>
+    <div class="bc-plus-all--bar">
+      <button type="button" class="bc-plus-all--back" aria-label={t('welcomeSteps.back')} onclick={goBack}>
         {#if kind === 'iphone'}
-          <span class="od-plus-all--back-chevron"><Icon name="chevron" size={22} weight={2.4} /></span>{t('odplus.chip')}
+          <span class="bc-plus-all--back-chevron"><Icon name="chevron" size={22} weight={2.4} /></span>{t('odplus.chip')}
         {:else}
           <Icon name="arrowBack" size={24} weight={2} />
         {/if}
       </button>
-      {#if kind !== 'iphone'}<h1 class="od-plus-all--title">{t('odplus.all.title')}</h1>{/if}
+      {#if kind !== 'iphone'}<h1 class="bc-plus-all--title">{t('odplus.all.title')}</h1>{/if}
     </div>
-    {#if kind === 'iphone'}<h1 class="od-plus-all--title od-plus-all--title-large">{t('odplus.all.title')}</h1>{/if}
-    <div class="od-plus-all--body">
+    {#if kind === 'iphone'}<h1 class="bc-plus-all--title bc-plus-all--title-large">{t('odplus.all.title')}</h1>{/if}
+    <div class="bc-plus-all--body">
       <BenthicPlusChip onSheet />
-      <p class="od-plus-all--subtitle">{t('odplus.all.subtitle')}</p>
+      <p class="bc-plus-all--subtitle">{t('odplus.all.subtitle')}</p>
       {#each includedGroups() as group (group.key)}
-        <h2 class="od-plus-all--group">{t(`odplus.all.${group.key}`)}</h2>
-        <ul class="od-plus-all--rows">
+        <h2 class="bc-plus-all--group">{t(`odplus.all.${group.key}`)}</h2>
+        <ul class="bc-plus-all--rows">
           {#each group.rows as row (row.key)}
-            <li class="od-plus-all--row">
-              <span class="od-plus-all--tile od-plus-all--tile-{row.tone}"><Icon name={row.icon} size={22} weight={2} /></span>
-              <span class="od-plus-all--texts">
-                <span class="od-plus-all--row-title">{t(`odplus.all.${row.key}`)}</span>
-                <span class="od-plus-all--row-text">{t(row.key === 'sync' ? deviceKey('odplus.all.syncText', kind) : `odplus.all.${row.key}Text`)}</span>
+            <li class="bc-plus-all--row">
+              <span class="bc-plus-all--tile bc-plus-all--tile-{row.tone}"><Icon name={row.icon} size={22} weight={2} /></span>
+              <span class="bc-plus-all--texts">
+                <span class="bc-plus-all--row-title">{t(`odplus.all.${row.key}`)}</span>
+                <span class="bc-plus-all--row-text">{t(row.key === 'sync' ? deviceKey('odplus.all.syncText', kind) : `odplus.all.${row.key}Text`)}</span>
               </span>
             </li>
           {/each}
         </ul>
       {/each}
-      <p class="od-plus-all--free">{t('odplus.all.free')}</p>
+      <p class="bc-plus-all--free">{t('odplus.all.free')}</p>
     </div>
-    <div class="od-plus-all--footer">
+    <div class="bc-plus-all--footer">
       {@render priceBlock()}
-      <button type="button" class="od-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+      <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
     </div>
   </div>
 {:else if step === 'odplusReady'}
-  <div class="od-plus--screen">
+  <div class="bc-plus--screen">
     {#if panelless}{@render hero('ready')}{/if}
     {#if summaryRows(flow.plus.counts).length}
-    <dl class="od-plus--summary">
+    <dl class="bc-plus--summary">
       {#each summaryRows(flow.plus.counts) as row (row.key)}
-        <div class="od-plus--summary-row">
+        <div class="bc-plus--summary-row">
           <dt>{t(`odplus.ready.${row.key}`)}</dt>
           <dd>{row.key === 'gear' ? t('odplus.ready.articles', { n: row.n }) : row.n}</dd>
         </div>
       {/each}
     </dl>
     {/if}
-    <p class="od-plus--account"><Icon name="check" size={16} weight={2.4} />{t('odplus.ready.account', { email: flow.plus.email })}</p>
-    <button type="button" class="od-plus--primary" onclick={onopen}>{t('odplus.ready.open')}</button>
+    <p class="bc-plus--account"><Icon name="check" size={16} weight={2.4} />{t('odplus.ready.account', { email: flow.plus.email })}</p>
+    <button type="button" class="bc-plus--primary" onclick={onopen}>{t('odplus.ready.open')}</button>
   </div>
 {:else if step === 'odplusWelcome'}
-  <div class="od-plus--screen">
+  <div class="bc-plus--screen">
     {@render hero('welcome')}
-    <h3 class="od-plus--label">{t('odplus.welcome.activated')}</h3>
-    <ul class="od-plus--activated">
+    <h3 class="bc-plus--label">{t('odplus.welcome.activated')}</h3>
+    <ul class="bc-plus--activated">
       {#each ACTIVATED as key, i (key)}
-        <li class="od-plus--activated-row od-plus--card-{['blue', 'green', 'amber'][i]}">
-          <span class="od-plus--activated-icon"><Icon name={['sync', 'cloudDownload', 'briefcase'][i]} size={22} weight={1.9} /></span>
-          <span class="od-plus--activated-text">{t(`odplus.welcome.${key}`)}</span>
+        <li class="bc-plus--activated-row bc-plus--card-{['blue', 'green', 'amber'][i]}">
+          <span class="bc-plus--activated-icon"><Icon name={['sync', 'cloudDownload', 'briefcase'][i]} size={22} weight={1.9} /></span>
+          <span class="bc-plus--activated-text">{t(`odplus.welcome.${key}`)}</span>
           <Icon name="check" size={20} weight={2.4} />
         </li>
       {/each}
     </ul>
-    <p class="od-plus--account od-plus--account-plain">{t('odplus.welcome.account', { email: flow.plus.email })}</p>
-    <button type="button" class="od-plus--primary" onclick={() => go('next')}>{t('odplus.welcome.next')}</button>
+    <p class="bc-plus--account bc-plus--account-plain">{t('odplus.welcome.account', { email: flow.plus.email })}</p>
+    <button type="button" class="bc-plus--primary" onclick={() => go('next')}>{t('odplus.welcome.next')}</button>
   </div>
 {:else if step === 'odplusHealth'}
-  <div class="od-plus--screen">
+  <div class="bc-plus--screen">
     {#if panelless}{@render hero('health')}{/if}
-    <div class="od-plus--health">
-      <label class="od-plus--health-row">
-        <span class="od-plus--health-texts">
-          <span class="od-plus--health-label">{t('odplus.health.switch')}</span>
-          <span class="od-plus--health-help">{t('odplus.health.switchHelp')}</span>
+    <div class="bc-plus--health">
+      <label class="bc-plus--health-row">
+        <span class="bc-plus--health-texts">
+          <span class="bc-plus--health-label">{t('odplus.health.switch')}</span>
+          <span class="bc-plus--health-help">{t('odplus.health.switchHelp')}</span>
         </span>
         <span class="toggle"><input type="checkbox" role="switch" bind:checked={keepHealth} /><span class="toggle-icon"></span></span>
       </label>
-      <p class="od-plus--health-note">{t('odplus.health.note')}</p>
+      <p class="bc-plus--health-note">{t('odplus.health.note')}</p>
     </div>
-    <p class="od-plus--lock"><Icon name="lock" size={18} /><span>{t('odplus.health.lock')}</span></p>
-    <button type="button" class="od-plus--primary" disabled={continuing} onclick={continueHealth}>{t('odplus.health.continue')}</button>
+    <p class="bc-plus--lock"><Icon name="lock" size={18} /><span>{t('odplus.health.lock')}</span></p>
+    <button type="button" class="bc-plus--primary" disabled={continuing} onclick={continueHealth}>{t('odplus.health.continue')}</button>
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-plus--title {
+    .bc-plus--title {
       margin: 0 0 8px;
       font-size: 28px;
       line-height: 36px;
@@ -387,30 +387,30 @@
       letter-spacing: -0.2px;
     }
 
-    .od-plus--lead {
+    .bc-plus--lead {
       margin: 0 0 20px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--buttons {
+    .bc-plus--buttons {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    .od-plus--provider {
+    .bc-plus--provider {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       height: 56px;
       padding: 0 20px;
-      border: 1px solid var(--od-release-field-border);
+      border: 1px solid var(--bc-release-field-border);
       border-radius: 28px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       font-weight: 500;
@@ -418,46 +418,46 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
-    .od-plus--provider-main {
+    .bc-plus--provider-main {
       border: none;
-      background: var(--od-release-row-main);
-      color: var(--od-release-on-panel);
+      background: var(--bc-release-row-main);
+      color: var(--bc-release-on-panel);
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-row-main-hover);
+          background: var(--bc-release-row-main-hover);
         }
       }
     }
 
     /* Google: white (light) or #131314 (dark) with a thin stroke. The supplied "G" is a 24 x 24 picture with a 1 px margin,
        shown at 22 x 22: the letter itself is about 20 px, the size the guidelines fix (custom button). */
-    .od-plus--provider-google {
+    .bc-plus--provider-google {
       gap: 10px;
       padding: 0 16px 0 12px;
-      border-color: var(--od-brand-google-border);
-      background: var(--od-brand-google-bg);
-      color: var(--od-brand-google-ink);
+      border-color: var(--bc-brand-google-border);
+      background: var(--bc-brand-google-bg);
+      color: var(--bc-brand-google-ink);
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-brand-google-bg);
+          background: var(--bc-brand-google-bg);
           filter: brightness(0.96);
         }
       }
     }
 
-    .od-plus--google-logo {
+    .bc-plus--google-logo {
       flex: none;
       display: flex;
       width: 22px;
@@ -471,49 +471,49 @@
 
     /* Apple: a white or black button, the logo 22 px high (width follows), the title in the logo's colour
        (Sign in with Apple guidelines, custom button). */
-    .od-plus--provider-apple {
+    .bc-plus--provider-apple {
       gap: 12px;
       padding: 0 20px;
-      border-color: var(--od-brand-apple-border);
-      background: var(--od-brand-apple-bg);
-      color: var(--od-brand-apple-ink);
+      border-color: var(--bc-brand-apple-border);
+      background: var(--bc-brand-apple-bg);
+      color: var(--bc-brand-apple-ink);
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-brand-apple-bg);
+          background: var(--bc-brand-apple-bg);
           filter: brightness(0.96);
         }
       }
     }
 
-    .od-plus--apple-logo {
+    .bc-plus--apple-logo {
       flex: none;
       height: 22px;
       width: auto;
     }
 
-    .od-plus--apple-logo-dark {
+    .bc-plus--apple-logo-dark {
       display: none;
     }
 
     :global(html.dark) {
-      .od-plus--apple-logo-light {
+      .bc-plus--apple-logo-light {
         display: none;
       }
 
-      .od-plus--apple-logo-dark {
+      .bc-plus--apple-logo-dark {
         display: block;
       }
     }
 
-    .od-plus--note {
+    .bc-plus--note {
       margin: 18px 0 6px;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--text {
+    .bc-plus--text {
       align-self: flex-start;
       height: 48px;
       margin-left: -12px;
@@ -521,7 +521,7 @@
       border: none;
       border-radius: 24px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -529,32 +529,32 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
       }
     }
 
     /* « Continuer sans compte » on the connection screen: centred, in the main blue (android-odplus-connexion). */
-    .od-plus--text-link {
+    .bc-plus--text-link {
       align-self: center;
       margin-left: 0;
       margin-top: 8px;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
     }
 
     /* Tablet and desktop (task 2026-11-18-281): the three buttons and their note are 440 px wide, and « Continuer sans compte » is centred across that width. */
     @media (min-width: 768px) {
-      .od-plus--buttons,
-      .od-plus--note {
+      .bc-plus--buttons,
+      .bc-plus--note {
         width: 100%;
         max-width: 440px;
       }
 
-      .od-plus--text-link {
+      .bc-plus--text-link {
         align-self: flex-start;
         width: 100%;
         max-width: 440px;
@@ -565,21 +565,21 @@
       }
     }
 
-    .od-plus--text-centre {
+    .bc-plus--text-centre {
       align-self: center;
       margin-left: 0;
       margin-top: 0;
       height: 48px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--primary {
+    .bc-plus--primary {
       height: 56px;
       border: none;
       border-radius: 28px;
-      background: var(--od-release-row-main);
-      box-shadow: 0 2px 6px var(--od-release-row-main-shadow);
-      color: var(--od-release-on-panel);
+      background: var(--bc-release-row-main);
+      box-shadow: 0 2px 6px var(--bc-release-row-main-shadow);
+      color: var(--bc-release-on-panel);
       font: inherit;
       font-size: 17px;
       font-weight: 600;
@@ -587,78 +587,78 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-row-main-hover);
+          background: var(--bc-release-row-main-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
-    .od-plus--health {
+    .bc-plus--health {
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding: 16px 20px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-plus--health-row {
+    .bc-plus--health-row {
       display: flex;
       align-items: center;
       gap: 16px;
       cursor: pointer;
     }
 
-    .od-plus--health-texts {
+    .bc-plus--health-texts {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-plus--health-label {
+    .bc-plus--health-label {
       font-size: 17px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-plus--health-help,
-    .od-plus--health-note,
-    .od-plus--lock {
+    .bc-plus--health-help,
+    .bc-plus--health-note,
+    .bc-plus--lock {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--health-note {
+    .bc-plus--health-note {
       margin: 0;
     }
 
-    .od-plus--lock {
+    .bc-plus--lock {
       margin: 0;
       display: flex;
       gap: 10px;
       align-items: flex-start;
     }
 
-    .od-plus--primary:disabled {
+    .bc-plus--primary:disabled {
       opacity: 0.6;
     }
 
-    .od-plus--no-account {
+    .bc-plus--no-account {
       margin: 0;
       text-align: center;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* « Déjà abonné ? Se connecter »: grey text, the link underlined in the main blue (task 2026-11-18-281). */
-    .od-plus--already {
+    .bc-plus--already {
       margin: 0;
       display: flex;
       align-items: center;
@@ -668,24 +668,24 @@
       min-height: 48px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* A tablet: « Déjà abonné ? Se connecter » sits at the top right, on the row of « Retour » (task 2026-11-19-295). */
-    .od-plus--already-top {
+    .bc-plus--already-top {
       position: absolute;
       top: -52px;
       right: 0;
       min-height: 40px;
     }
 
-    .od-plus--link {
+    .bc-plus--link {
       width: auto;
       min-height: 48px;
       padding: 0 4px;
       border: none;
       background: none;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-weight: 500;
       text-decoration: underline;
@@ -693,13 +693,13 @@
       cursor: pointer;
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         border-radius: 8px;
       }
     }
 
     /* The three screens with the blue hero. On a phone they use the whole width, the first launch's own band is hidden. */
-    .od-plus--screen {
+    .bc-plus--screen {
       position: relative;
       display: flex;
       flex-direction: column;
@@ -712,23 +712,23 @@
       }
     }
 
-    .od-plus-hero {
+    .bc-plus-hero {
       position: relative;
       overflow: hidden;
       border-radius: 28px;
       padding: 28px 24px 32px;
-      background: var(--od-plus-hero);
-      color: var(--od-release-on-panel);
+      background: var(--bc-plus-hero);
+      color: var(--bc-release-on-panel);
     }
 
-    .od-plus-hero--bands {
+    .bc-plus-hero--bands {
       position: absolute;
       inset: 0;
       background: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
       mask-image: linear-gradient(180deg, #000 0%, transparent 60%);
     }
 
-    .od-plus-hero--brand {
+    .bc-plus-hero--brand {
       position: relative;
       display: none;
       align-items: center;
@@ -738,7 +738,7 @@
       font-weight: 500;
     }
 
-    .od-plus-hero--bubbles {
+    .bc-plus-hero--bubbles {
       position: absolute;
       left: 0;
       top: 0;
@@ -748,13 +748,13 @@
 
       circle {
         fill: none;
-        stroke: var(--od-plus-bubble);
+        stroke: var(--bc-plus-bubble);
         stroke-width: 1.2;
       }
     }
 
-    .od-plus-hero--profile,
-    .od-plus-hero--wave {
+    .bc-plus-hero--profile,
+    .bc-plus-hero--wave {
       display: none;
       position: absolute;
       left: 0;
@@ -762,60 +762,60 @@
       pointer-events: none;
     }
 
-    .od-plus-hero--profile {
+    .bc-plus-hero--profile {
       bottom: 2px;
       height: 34px;
     }
 
-    .od-plus-hero--profile-area {
-      fill: var(--od-band-profile-area);
+    .bc-plus-hero--profile-area {
+      fill: var(--bc-band-profile-area);
     }
 
-    .od-plus-hero--profile-line {
+    .bc-plus-hero--profile-line {
       fill: none;
-      stroke: var(--od-band-profile-line);
+      stroke: var(--bc-band-profile-line);
       stroke-width: 1.5;
       stroke-linejoin: round;
     }
 
-    .od-plus-hero--wave {
+    .bc-plus-hero--wave {
       bottom: -1px;
       height: 18px;
 
       path {
-        fill: var(--od-background);
+        fill: var(--bc-background);
       }
     }
 
-    .od-plus-hero--text,
-    .od-plus-hero--centre {
+    .bc-plus-hero--text,
+    .bc-plus-hero--centre {
       position: relative;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-plus-hero--text {
+    .bc-plus-hero--text {
       align-items: flex-start;
     }
 
-    .od-plus-hero--centre {
+    .bc-plus-hero--centre {
       align-items: center;
       text-align: center;
     }
 
-    .od-plus-hero--check {
+    .bc-plus-hero--check {
       width: 72px;
       height: 72px;
       border-radius: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-on-panel);
-      color: var(--od-release-row-main);
+      background: var(--bc-release-on-panel);
+      color: var(--bc-release-row-main);
     }
 
-    .od-plus-hero--check-big {
+    .bc-plus-hero--check-big {
       width: 84px;
       height: 84px;
       border-radius: 42px;
@@ -823,7 +823,7 @@
       margin: 6px 0 8px;
     }
 
-    .od-plus-hero--title {
+    .bc-plus-hero--title {
       margin: 0;
       font-size: 28px;
       line-height: 34px;
@@ -831,72 +831,72 @@
       letter-spacing: -0.2px;
     }
 
-    .od-plus-hero--lead {
+    .bc-plus-hero--lead {
       margin: 0;
       font-size: 16px;
       line-height: 22px;
-      color: var(--od-release-on-panel-soft);
+      color: var(--bc-release-on-panel-soft);
     }
 
-    .od-plus--cards {
+    .bc-plus--cards {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
-    .od-plus--card {
+    .bc-plus--card {
       display: flex;
       flex-direction: column;
       gap: 8px;
       padding: 16px;
       border-radius: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-plus--card-blue {
-      background: var(--od-plus-blue);
-      --od-plus-tone: var(--od-plus-blue-icon);
+    .bc-plus--card-blue {
+      background: var(--bc-plus-blue);
+      --bc-plus-tone: var(--bc-plus-blue-icon);
     }
 
-    .od-plus--card-green {
-      background: var(--od-plus-green);
-      --od-plus-tone: var(--od-plus-green-icon);
+    .bc-plus--card-green {
+      background: var(--bc-plus-green);
+      --bc-plus-tone: var(--bc-plus-green-icon);
     }
 
-    .od-plus--card-amber {
-      background: var(--od-plus-amber);
-      --od-plus-tone: var(--od-plus-amber-icon);
+    .bc-plus--card-amber {
+      background: var(--bc-plus-amber);
+      --bc-plus-tone: var(--bc-plus-amber-icon);
     }
 
-    .od-plus--card-violet {
-      background: var(--od-plus-violet);
-      --od-plus-tone: var(--od-plus-violet-icon);
+    .bc-plus--card-violet {
+      background: var(--bc-plus-violet);
+      --bc-plus-tone: var(--bc-plus-violet-icon);
     }
 
-    .od-plus--card-maintenance {
-      background: var(--od-maintenance);
-      --od-plus-tone: var(--od-maintenance-icon);
+    .bc-plus--card-maintenance {
+      background: var(--bc-maintenance);
+      --bc-plus-tone: var(--bc-maintenance-icon);
     }
 
     /* Full width under the four tiles: the icon beside the two lines. */
-    .od-plus--card-wide {
+    .bc-plus--card-wide {
       flex-direction: row;
       align-items: center;
       gap: 16px;
       padding: 16px;
 
-      .od-plus--card-icon {
+      .bc-plus--card-icon {
         flex: none;
       }
     }
 
-    .od-plus--card-body {
+    .bc-plus--card-body {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .od-plus--card-icon {
+    .bc-plus--card-icon {
       flex: none;
       width: 40px;
       height: 40px;
@@ -904,47 +904,47 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      color: var(--od-plus-tone);
+      background: var(--bc-surface);
+      color: var(--bc-plus-tone);
     }
 
     /* The title and the line of a small card: on a phone they are two rows of the card's column (8 dp apart); on a tablet the
        icon sits to their left to save height. */
-    .od-plus--card-copy {
+    .bc-plus--card-copy {
       display: contents;
     }
 
-    .od-plus--activated-icon {
+    .bc-plus--activated-icon {
       width: 44px;
       height: 44px;
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      color: var(--od-plus-tone);
+      background: var(--bc-surface);
+      color: var(--bc-plus-tone);
     }
 
-    .od-plus--card-title {
+    .bc-plus--card-title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-plus--card-text {
+    .bc-plus--card-text {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     @media (min-width: 768px) {
-      .od-plus--cards .od-plus--card {
+      .bc-plus--cards .bc-plus--card {
         flex-direction: row;
         align-items: flex-start;
         gap: 12px;
       }
 
-      .od-plus--card-copy {
+      .bc-plus--card-copy {
         display: flex;
         flex-direction: column;
         gap: 2px;
@@ -952,66 +952,66 @@
       }
     }
 
-    .od-plus--terms {
+    .bc-plus--terms {
       margin: 4px 0 0;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
 
     /* The price: plain centred text, not a card (task 2026-11-19-295): the grey label is not tappable. */
-    .od-plus--price {
+    .bc-plus--price {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin: 8px 0 12px;
       text-align: center;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-plus--price-label {
+    .bc-plus--price-label {
       margin-bottom: 4px;
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--price-amount {
+    .bc-plus--price-amount {
       font-size: 32px;
       line-height: 40px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-plus--price-per {
+    .bc-plus--price-per {
       margin-left: 2px;
       font-size: 20px;
       line-height: 28px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--price-detail {
+    .bc-plus--price-detail {
       margin-top: 4px;
       font-size: 17px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--price-cancel {
+    .bc-plus--price-cancel {
       margin-top: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-release-ok);
+      color: var(--bc-release-ok);
     }
 
     /* « Voir tout ce qui est inclus ›»: a text link, 48 dp high. */
-    .od-plus--see-all {
+    .bc-plus--see-all {
       align-self: center;
       width: auto;
       height: 48px;
@@ -1022,7 +1022,7 @@
       border: none;
       border-radius: 24px;
       background: transparent;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-size: 17px;
       line-height: 24px;
@@ -1031,26 +1031,26 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
       }
     }
 
-    .od-plus--summary {
+    .bc-plus--summary {
       margin: 0 auto;
       width: 280px;
       max-width: 100%;
       padding: 4px 16px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 24px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-plus--summary-row {
+    .bc-plus--summary-row {
       display: flex;
       justify-content: space-between;
       padding: 12px 0;
@@ -1058,12 +1058,12 @@
       line-height: 22px;
 
       &:not(:last-child) {
-        border-bottom: 1px solid var(--od-release-divider);
+        border-bottom: 1px solid var(--bc-release-divider);
       }
 
       dt {
         margin: 0;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       dd {
@@ -1072,7 +1072,7 @@
       }
     }
 
-    .od-plus--account {
+    .bc-plus--account {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1080,24 +1080,24 @@
       margin: 0;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(svg) {
-        color: var(--od-release-ok);
+        color: var(--bc-release-ok);
       }
     }
 
-    .od-plus--label {
+    .bc-plus--label {
       margin: 8px 0 0;
       font-size: 13px;
       line-height: 18px;
       font-weight: 600;
       letter-spacing: 0.6px;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus--activated {
+    .bc-plus--activated {
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -1106,40 +1106,40 @@
       list-style: none;
     }
 
-    .od-plus--activated-row {
+    .bc-plus--activated-row {
       display: flex;
       align-items: center;
       gap: 14px;
       min-height: 64px;
       padding: 10px 16px;
       border-radius: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(svg:last-child) {
-        color: var(--od-plus-tone);
+        color: var(--bc-plus-tone);
       }
     }
 
-    .od-plus--activated-text {
+    .bc-plus--activated-text {
       flex: 1;
       font-size: 16px;
       line-height: 21px;
       font-weight: 600;
     }
 
-    .od-plus--screen-offer {
+    .bc-plus--screen-offer {
       gap: 8px;
     }
 
     /* « Tout ce qui est inclus » (task 2026-11-19-295). */
-    .od-plus-all {
+    .bc-plus-all {
       display: flex;
       flex-direction: column;
       max-width: 640px;
       min-height: 100%;
     }
 
-    .od-plus-all--bar {
+    .bc-plus-all--bar {
       display: flex;
       align-items: center;
       gap: 4px;
@@ -1147,7 +1147,7 @@
       margin-left: -12px;
     }
 
-    .od-plus-all--back {
+    .bc-plus-all--back {
       width: auto;
       min-width: 48px;
       height: 48px;
@@ -1158,82 +1158,82 @@
       border: none;
       border-radius: 24px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       cursor: pointer;
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
       }
     }
 
     /* The iPhone's navigation bar: « ‹ OpenDives+ » in the link colour, the large title under it. */
-    .od-plus-all--ios .od-plus-all--back {
+    .bc-plus-all--ios .bc-plus-all--back {
       padding: 0 8px 0 0;
       gap: 0;
       font-size: 17px;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
     }
 
-    .od-plus-all--back-chevron {
+    .bc-plus-all--back-chevron {
       display: flex;
       transform: rotate(180deg);
     }
 
-    .od-plus-all--title {
+    .bc-plus-all--title {
       margin: 0;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-plus-all--title-large {
+    .bc-plus-all--title-large {
       margin: 0 0 8px;
       font-size: 34px;
       line-height: 41px;
       font-weight: 700;
     }
 
-    .od-plus-all--body {
+    .bc-plus-all--body {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       padding-bottom: 24px;
     }
 
-    .od-plus-all--subtitle {
+    .bc-plus-all--subtitle {
       margin: 8px 4px 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus-all--group {
+    .bc-plus-all--group {
       margin: 20px 4px 8px;
       font-size: 15px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus-all--rows {
+    .bc-plus-all--rows {
       align-self: stretch;
       margin: 0;
       padding: 0;
       list-style: none;
       overflow: hidden;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-plus-all--row {
+    .bc-plus-all--row {
       position: relative;
       min-height: 72px;
       padding: 12px 16px;
@@ -1241,7 +1241,7 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       & + & {
         &::before {
@@ -1251,12 +1251,12 @@
           left: 72px;
           right: 0;
           height: 1px;
-          background: var(--od-release-divider);
+          background: var(--bc-release-divider);
         }
       }
     }
 
-    .od-plus-all--tile {
+    .bc-plus-all--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -1266,58 +1266,58 @@
       justify-content: center;
     }
 
-    .od-plus-all--tile-blue {
-      background: var(--od-plus-blue);
-      color: var(--od-plus-blue-icon);
+    .bc-plus-all--tile-blue {
+      background: var(--bc-plus-blue);
+      color: var(--bc-plus-blue-icon);
     }
 
-    .od-plus-all--tile-green {
-      background: var(--od-plus-green);
-      color: var(--od-plus-green-icon);
+    .bc-plus-all--tile-green {
+      background: var(--bc-plus-green);
+      color: var(--bc-plus-green-icon);
     }
 
-    .od-plus-all--tile-amber {
-      background: var(--od-plus-amber);
-      color: var(--od-plus-amber-icon);
+    .bc-plus-all--tile-amber {
+      background: var(--bc-plus-amber);
+      color: var(--bc-plus-amber-icon);
     }
 
-    .od-plus-all--tile-violet {
-      background: var(--od-plus-violet);
-      color: var(--od-plus-violet-icon);
+    .bc-plus-all--tile-violet {
+      background: var(--bc-plus-violet);
+      color: var(--bc-plus-violet-icon);
     }
 
-    .od-plus-all--tile-red {
-      background: var(--od-maintenance);
-      color: var(--od-maintenance-icon);
+    .bc-plus-all--tile-red {
+      background: var(--bc-maintenance);
+      color: var(--bc-maintenance-icon);
     }
 
-    .od-plus-all--texts {
+    .bc-plus-all--texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-plus-all--row-title {
+    .bc-plus-all--row-title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-plus-all--row-text {
+    .bc-plus-all--row-text {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plus-all--free {
+    .bc-plus-all--free {
       margin: 20px 4px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The price footer stays at the bottom while the list scrolls. */
-    .od-plus-all--footer {
+    .bc-plus-all--footer {
       position: sticky;
       bottom: 0;
       margin-top: auto;
@@ -1325,17 +1325,17 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      background: var(--od-background);
-      border-top: 1px solid var(--od-release-divider);
+      background: var(--bc-background);
+      border-top: 1px solid var(--bc-release-divider);
 
-      .od-plus--price {
+      .bc-plus--price {
         margin: 0 0 24px;
       }
     }
 
     /* A tablet: the footer is horizontal, the price on the left and the button on the right. */
     @media (min-width: 768px) {
-      .od-plus-all--footer {
+      .bc-plus-all--footer {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
@@ -1343,15 +1343,15 @@
         gap: 16px;
         padding: 16px 0 24px;
 
-        .od-plus--price {
+        .bc-plus--price {
           margin: 0;
         }
 
-        .od-plus--price-amount {
+        .bc-plus--price-amount {
           white-space: nowrap;
         }
 
-        .od-plus--primary {
+        .bc-plus--primary {
           flex: none;
           width: 160px;
         }
@@ -1360,89 +1360,89 @@
 
     /* Phone: the hero is edge to edge from the top of the page (the first launch's band is hidden for these steps). */
     @media (max-width: 767.98px) {
-      .od-plus--title {
+      .bc-plus--title {
         font-size: 24px;
         line-height: 30px;
       }
 
-      .od-plus--screen {
+      .bc-plus--screen {
         max-width: none;
         gap: 12px;
       }
 
-      .od-plus-hero {
+      .bc-plus-hero {
         margin: -16px -16px 4px;
         border-radius: 0 0 40px 40px;
         padding: 40px 20px 36px;
       }
 
-      .od-plus-hero--brand {
+      .bc-plus-hero--brand {
         display: flex;
         margin-bottom: 24px;
       }
 
       /* The OpenDives+ headers: the section band's dive profile above a wave in the page colour, as on the other setup screens. */
-      .od-plus-hero--offer,
-      .od-plus-hero--welcome,
-      .od-plus-hero--health,
-      .od-plus-hero--ready {
+      .bc-plus-hero--offer,
+      .bc-plus-hero--welcome,
+      .bc-plus-hero--health,
+      .bc-plus-hero--ready {
         border-radius: 0;
         padding-bottom: 52px;
         margin-bottom: 0;
       }
 
       /* The offer's header: 264 dp high (292 on an iPhone), 24 dp between the lead and the wave's top (task 2026-11-19-295). */
-      .od-plus-hero--offer {
+      .bc-plus-hero--offer {
         box-sizing: border-box;
         min-height: 264px;
         padding: 36px 16px 40px;
 
-        .od-plus-hero--brand {
+        .bc-plus-hero--brand {
           gap: 8px;
           line-height: 28px;
           margin-bottom: 20px;
         }
 
-        .od-plus-hero--lead {
+        .bc-plus-hero--lead {
           line-height: 24px;
           color: rgb(255 255 255 / 0.88);
         }
 
-        .od-plus-hero--title {
+        .bc-plus-hero--title {
           font-size: 24px;
           line-height: 32px;
         }
 
-        .od-plus-hero--text {
+        .bc-plus-hero--text {
           gap: 0;
 
-          .od-plus-hero--title {
+          .bc-plus-hero--title {
             margin: 12px 0 8px;
           }
         }
       }
 
-      .od-plus--screen-ios .od-plus-hero--offer {
+      .bc-plus--screen-ios .bc-plus-hero--offer {
         min-height: 292px;
       }
 
-      .od-plus-all--footer {
+      .bc-plus-all--footer {
         margin-left: -16px;
         margin-right: -16px;
         margin-bottom: -16px;
         padding-bottom: max(24px, var(--f7-safe-area-bottom, 0px));
       }
 
-      .od-plus-hero--profile {
+      .bc-plus-hero--profile {
         display: block;
       }
 
-      .od-plus-hero--wave {
+      .bc-plus-hero--wave {
         display: block;
       }
 
-      .od-plus--provider,
-      .od-plus--primary {
+      .bc-plus--provider,
+      .bc-plus--primary {
         width: 100%;
       }
     }

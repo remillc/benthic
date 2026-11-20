@@ -38,14 +38,14 @@
   ];
 </script>
 
-<Page data-od-scroll class="od-about-libraries">
+<Page data-od-scroll class="bc-about-libraries">
   <Navbar title={t('about.libraries')}>
     {#snippet left()}
       <BackLink label={t('about.title')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
 
-  <p class="od-about-libraries--intro">{t('about.librariesIntro')}</p>
+  <p class="bc-about-libraries--intro">{t('about.librariesIntro')}</p>
 
   {#each groups as group (group.title)}
     <h2 class="block-title">{t(`about.librariesGroups.${group.title}`)}</h2>
@@ -71,41 +71,41 @@
 
 <style>
   @layer od.components {
-    .od-about-libraries--intro {
+    .bc-about-libraries--intro {
       margin: 8px 16px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* iPhone (docs/mockups/ios-apropos): inset groups with 10 px corners, titles in small capitals. */
-    :global(.ios) .od-about-libraries--intro {
+    :global(.ios) .bc-about-libraries--intro {
       margin: 8px 32px 0;
       font-size: 13px;
       line-height: 18px;
     }
 
-    :global(.ios .od-about-libraries .block-title) {
+    :global(.ios .bc-about-libraries .block-title) {
       margin: 22px 32px 6px;
       font-size: 13px;
       line-height: 18px;
       font-weight: 400;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.ios .od-about-libraries .list.inset) {
+    :global(.ios .bc-about-libraries .list.inset) {
       margin-left: 16px;
       margin-right: 16px;
       border-radius: 10px;
     }
 
-    :global(.ios .od-about-libraries .list.inset ul) {
+    :global(.ios .bc-about-libraries .list.inset ul) {
       border-radius: 10px;
     }
 
-    :global(.ios .od-about-libraries .item-after) {
-      color: var(--od-text-2);
+    :global(.ios .bc-about-libraries .item-after) {
+      color: var(--bc-text-2);
     }
   }
 </style>

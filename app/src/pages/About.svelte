@@ -152,13 +152,13 @@
 </script>
 
 {#snippet aboutPage()}
-<Page data-od-scroll class="od-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-od-scroll class="bc-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
       {#if dialog}
         <Link popupClose iconOnly>
           <Icon name="close" />
-          <span class="od-sr-only">{t('nav.close')}</span>
+          <span class="bc-sr-only">{t('nav.close')}</span>
         </Link>
       {:else if !layout.rail && !bottomNav()}
         <MenuButton />
@@ -168,36 +168,36 @@
     {/snippet}
   </Navbar>
 
-  <header class="od-about--head">
+  <header class="bc-about--head">
     <!-- The simple logo with relief, the same drawing in light and dark mode. -->
-    <img class="od-about--logo od-about--light" src="logo-light.svg" alt="" width="112" height="112" />
-    <img class="od-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
+    <img class="bc-about--logo bc-about--light" src="logo-light.svg" alt="" width="112" height="112" />
+    <img class="bc-about--logo dark" src="logo-dark.svg" alt="" width="112" height="112" />
     <h1>Benthic</h1>
-    {#if version}<p class="od-about--version od-value">{version}</p>{/if}
-    {#if !dialog}<p class="od-about--tagline">{t('about.tagline')}</p>{/if}
-    <p class="od-about--author">{t('about.author', { name: AUTHOR })}</p>
+    {#if version}<p class="bc-about--version bc-value">{version}</p>{/if}
+    {#if !dialog}<p class="bc-about--tagline">{t('about.tagline')}</p>{/if}
+    <p class="bc-about--author">{t('about.author', { name: AUTHOR })}</p>
   </header>
 
   <!-- « Libre, et votre carnet aussi » (task 2026-11-14-142, to-do #57): the app's code is open and
        the logbook stays the diver's. The licence itself is named below, in « Licences ». -->
   <!-- Task 2026-11-19-296: the desktop dialog has one paragraph and no title (the app is paid there, so it never says « gratuit »);
        the phone and the tablet have the block « Libre, et votre carnet aussi ». -->
-  <section class="od-about--free" class:od-about--free-desktop={dialog} aria-labelledby={dialog ? undefined : 'od-about-free-title'} aria-label={dialog ? t('about.free.title') : undefined}>
+  <section class="bc-about--free" class:bc-about--free-desktop={dialog} aria-labelledby={dialog ? undefined : 'od-about-free-title'} aria-label={dialog ? t('about.free.title') : undefined}>
     {#if dialog}
       <p>{t('about.desktopText')}</p>
     {:else}
-      <h2 id="od-about-free-title" class="od-about--free-title">{t('about.free.title')}</h2>
+      <h2 id="od-about-free-title" class="bc-about--free-title">{t('about.free.title')}</h2>
       <p>{t('about.free.code')}</p>
       <p>{t('about.free.logbook')}</p>
     {/if}
-    <div class="od-about--free-actions">
-      <a href={LINKS.source} class="external od-tonal-button" target="_blank" rel="noopener"><span class="od-about--free-icon od-about--free-github" aria-hidden="true">{@html githubMark}</span>{t('about.free.github')}</a>
-      <button type="button" class="od-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}><span class="od-about--free-icon" aria-hidden="true"><Icon name="download" size={20} weight={2} /></span>{t('about.free.export')}</button>
+    <div class="bc-about--free-actions">
+      <a href={LINKS.source} class="external bc-tonal-button" target="_blank" rel="noopener"><span class="bc-about--free-icon bc-about--free-github" aria-hidden="true">{@html githubMark}</span>{t('about.free.github')}</a>
+      <button type="button" class="bc-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}><span class="bc-about--free-icon" aria-hidden="true"><Icon name="download" size={20} weight={2} /></span>{t('about.free.export')}</button>
     </div>
   </section>
 
   {#each groups as group (group.title)}
-    <h2 class="block-title od-section-title">{group.title}</h2>
+    <h2 class="block-title bc-section-title">{group.title}</h2>
     <nav class="list list-strong inset list-dividers" aria-label={group.title}>
       <ul>
         {#each group.rows as row (row.key)}
@@ -220,9 +220,9 @@
                   {#if row.sub}<div class="item-footer">{row.sub}</div>{/if}
                 </div>
                 {#if row.external}
-                  <div class="item-after"><Icon name="openInNew" size={24} /><span class="od-sr-only">{row.opens ?? t('about.opensElsewhere')}</span></div>
+                  <div class="item-after"><Icon name="openInNew" size={24} /><span class="bc-sr-only">{row.opens ?? t('about.opensElsewhere')}</span></div>
                 {:else if row.mail}
-                  <div class="item-after"><Icon name="mail" size={24} /><span class="od-sr-only">{t('about.opensMail')}</span></div>
+                  <div class="item-after"><Icon name="mail" size={24} /><span class="bc-sr-only">{t('about.opensMail')}</span></div>
                 {/if}
               </div>
             </a>
@@ -232,12 +232,12 @@
     </nav>
   {/each}
 
-  <p class="od-about--credit">{t('about.copyright', { year: '2026', name: AUTHOR })} {t('about.credit')}</p>
+  <p class="bc-about--credit">{t('about.copyright', { year: '2026', name: AUTHOR })} {t('about.credit')}</p>
 </Page>
 {/snippet}
 
 {#if dialog}
-  <Popup class="od-about-dialog" push={false}>
+  <Popup class="bc-about-dialog" push={false}>
     <View>{@render aboutPage()}</View>
   </Popup>
 {:else}
@@ -246,7 +246,7 @@
 
 <style>
   @layer od.components {
-    .od-about--head {
+    .bc-about--head {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -261,21 +261,21 @@
       }
     }
 
-    .od-about--logo.dark,
-    :global(html.dark) .od-about--logo.od-about--light {
+    .bc-about--logo.dark,
+    :global(html.dark) .bc-about--logo.bc-about--light {
       display: none;
     }
 
-    :global(html.dark) .od-about--logo.dark {
+    :global(html.dark) .bc-about--logo.dark {
       display: block;
     }
 
-    .od-about--free {
+    .bc-about--free {
       margin: 16px 16px 0;
       padding: 16px;
       border-radius: 20px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
 
       :global(.ios) & {
         border-radius: 10px;
@@ -285,11 +285,11 @@
         margin: 8px 0 0;
         font-size: 15px;
         line-height: 21px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-about--free-title {
+    .bc-about--free-title {
       margin: 0;
       font-size: 18px;
       line-height: 24px;
@@ -298,7 +298,7 @@
 
     /* The two buttons (task 2026-11-19-296): 48 dp high, a 20 dp icon 8 dp from the text. Phone: full width, one per line,
        12 dp apart, 16 dp under the text; tablet: side by side, 12 dp apart; desktop: 40 dp high. */
-    .od-about--free-actions {
+    .bc-about--free-actions {
       margin-top: 16px;
       display: flex;
       flex-direction: column;
@@ -326,13 +326,13 @@
     }
 
     @media (min-width: 768px) {
-      .od-about--free-actions {
+      .bc-about--free-actions {
         flex-direction: row;
         flex-wrap: wrap;
       }
     }
 
-    .od-about--free-desktop .od-about--free-actions {
+    .bc-about--free-desktop .bc-about--free-actions {
       flex-direction: row;
       flex-wrap: wrap;
 
@@ -342,7 +342,7 @@
       }
     }
 
-    .od-about--free-icon {
+    .bc-about--free-icon {
       flex: none;
       width: 20px;
       height: 20px;
@@ -355,28 +355,28 @@
     }
 
     /* The GitHub mark in the page's ink (#1F2124 in light mode). */
-    .od-about--free-github :global(path) {
+    .bc-about--free-github :global(path) {
       fill: currentColor;
     }
 
-    .od-about--author {
+    .bc-about--author {
       margin: 4px 0 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-about--version {
+    .bc-about--version {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-about--tagline {
+    .bc-about--tagline {
       margin: 8px 0 0;
       max-width: 320px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The section titles hold the space between the groups. */
@@ -394,19 +394,19 @@
     .item-footer {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: normal;
     }
 
     .item-after {
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-about--credit {
+    .bc-about--credit {
       margin: 24px 24px 40px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
   }

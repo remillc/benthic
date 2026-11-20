@@ -66,8 +66,8 @@
 </script>
 
 <span
-  class="od-linear-wavy-progress {extraClass}"
-  class:od-linear-wavy-progress--reduced={reduced}
+  class="bc-linear-wavy-progress {extraClass}"
+  class:bc-linear-wavy-progress--reduced={reduced}
   role="progressbar"
   aria-label={label}
   aria-valuemin="0"
@@ -78,9 +78,9 @@
   <svg width={width} height={WAVY.height} viewBox="0 0 {width || 1} {WAVY.height}" aria-hidden="true">
     {#each pieces as piece, i (i)}
       {#if piece.kind === 'dot'}
-        <circle class="od-linear-wavy-progress--dot" cx={piece.from + WAVY.dot / 2} cy={centerY} r={WAVY.dot / 2} />
+        <circle class="bc-linear-wavy-progress--dot" cx={piece.from + WAVY.dot / 2} cy={centerY} r={WAVY.dot / 2} />
       {:else}
-        <path class="od-linear-wavy-progress--{piece.kind}" d={piecePath(piece, { centerY, phase, wavelength })} />
+        <path class="bc-linear-wavy-progress--{piece.kind}" d={piecePath(piece, { centerY, phase, wavelength })} />
       {/if}
     {/each}
   </svg>
@@ -88,7 +88,7 @@
 
 <style>
   @layer od.components {
-    .od-linear-wavy-progress {
+    .bc-linear-wavy-progress {
       display: block;
       width: 100%;
       height: 10px;
@@ -103,16 +103,16 @@
         stroke-linejoin: round;
       }
 
-      .od-linear-wavy-progress--wave {
-        stroke: var(--od-linear-wavy-progress-active, var(--od-progress-active));
+      .bc-linear-wavy-progress--wave {
+        stroke: var(--bc-linear-wavy-progress-active, var(--bc-progress-active));
       }
 
-      .od-linear-wavy-progress--track {
-        stroke: var(--od-linear-wavy-progress-track, var(--od-progress-track));
+      .bc-linear-wavy-progress--track {
+        stroke: var(--bc-linear-wavy-progress-track, var(--bc-progress-track));
       }
 
-      .od-linear-wavy-progress--dot {
-        fill: var(--od-linear-wavy-progress-active, var(--od-progress-active));
+      .bc-linear-wavy-progress--dot {
+        fill: var(--bc-linear-wavy-progress-active, var(--bc-progress-active));
         stroke: none;
       }
     }

@@ -129,7 +129,7 @@
   /**
    * Phone (Christian's request of 14 November 2026): the two dives side by side. As soon as the
    * finger moves, the neighbour dive's page opens without animation beside this one (its detail is
-   * preloaded), and both follow the finger (the --od-push-dx of theme.css, as Réglages → À propos).
+   * preloaded), and both follow the finger (the --bc-push-dx of theme.css, as Réglages → À propos).
    * Through: this page leaves the history, so that back still goes to the list. Not through: back
    * to this one, without animation. The router is held from the first move to the end (lib/router-guard.js); when the
    * system takes the touch (its own Back gesture from the edge), everything is put back at once (`cancel`), so that
@@ -155,14 +155,14 @@
           // Until this swipe has settled, a Back or a link waits (or is ignored): the history is rewritten at the end.
           unlock = lockRouter(f7router, 'dive-swipe');
           trace('swipe', 'dive');
-          pageEl.classList.add('od-push-from');
-          view.style.setProperty('--od-push-dx', '0px');
-          view.classList.add('od-pushing');
-          if (push.dir > 0) view.classList.add('od-pushing-back');
+          pageEl.classList.add('bc-push-from');
+          view.style.setProperty('--bc-push-dx', '0px');
+          view.classList.add('bc-pushing');
+          if (push.dir > 0) view.classList.add('bc-pushing-back');
           const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
           heldNavigate(f7router, `${base}${id}`, { animate: false });
         }
-        push.view.style.setProperty('--od-push-dx', `${clamp(dx)}px`);
+        push.view.style.setProperty('--bc-push-dx', `${clamp(dx)}px`);
         return true;
       },
       /** The system took the touch: back to this dive at once, no animation. */
@@ -180,10 +180,10 @@
         const target = through ? dir * width : 0;
         const { easing, ms } = settle(x, target, x !== 0 ? velocity : 0);
         busy = true;
-        view.style.setProperty('--od-push-ease', easing);
-        view.style.setProperty('--od-push-ms', `${ms}ms`);
-        view.classList.add('od-push-settle');
-        view.style.setProperty('--od-push-dx', `${target}px`);
+        view.style.setProperty('--bc-push-ease', easing);
+        view.style.setProperty('--bc-push-ms', `${ms}ms`);
+        view.classList.add('bc-push-settle');
+        view.style.setProperty('--bc-push-dx', `${target}px`);
         setTimeout(() => settled(view, through), ms);
         return true;
       },
@@ -204,9 +204,9 @@
         else if (!through && intact) heldBack(f7router, { animate: false });
       } finally {
         unstackMaster(view);
-        view.classList.remove('od-pushing', 'od-pushing-back', 'od-push-settle');
-        for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) view.style.removeProperty(p);
-        pageEl.classList.remove('od-push-from');
+        view.classList.remove('bc-pushing', 'bc-pushing-back', 'bc-push-settle');
+        for (const p of ['--bc-push-dx', '--bc-push-ease', '--bc-push-ms']) view.style.removeProperty(p);
+        pageEl.classList.remove('bc-push-from');
         unlock();
         trace('swipe-end', through ? 'dive through' : 'dive reset');
       }
@@ -233,7 +233,7 @@
       return at >= 0 && ids[at + (dx < 0 ? 1 : -1)] !== undefined;
     };
     horizontalSwipe(content, {
-      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.od-dive-profile--profile')) && !document.querySelector('.modal-in:not(.toast)'),
+      accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.bc-dive-profile--profile')) && !document.querySelector('.modal-in:not(.toast)'),
       move(dx) {
         if (!layout.split && pair.move(dx)) return;
         const shown = hasNeighbour(dx) ? dx : dx / 3;
@@ -434,7 +434,7 @@
     if (!scroller) return;
     const update = () => {
       scrolled = scroller.scrollTop > 12;
-      const title = node.querySelector('.od-dive-detail--site');
+      const title = node.querySelector('.bc-dive-detail--site');
       const bar = scroller.closest('.page')?.querySelector('.navbar');
       titleInBar = !!title && !!bar && title.getBoundingClientRect().bottom <= bar.getBoundingClientRect().bottom;
     };
@@ -449,7 +449,7 @@
     sharing = false;
     if (!dive) return;
     // The profile chart of this page (the current one in its view).
-    const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .od-dive-profile--profile .od-dive-profile--frame svg'));
+    const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .bc-dive-profile--profile .bc-dive-profile--frame svg'));
     try {
       if (kind === 'link') await shareLink(diveLink(dive.date) ?? '', shareTitle(dive));
       else if (kind === 'pdf') await sharePdf(dive, prefs, svg);
@@ -777,26 +777,26 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page data-od-scroll onPageInit={watchSwipes} class="od-dive-detail no-swipeback {desk ? 'od-dive-detail--desk' : ''} {imageShown && !scrolled ? 'od-dive-detail--on-image' : ''} {slide ? `od-slide-${slide}` : ''}">
+<Page data-od-scroll onPageInit={watchSwipes} class="bc-dive-detail no-swipeback {desk ? 'bc-dive-detail--desk' : ''} {imageShown && !scrolled ? 'bc-dive-detail--on-image' : ''} {slide ? `bc-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}
       {#if dive}
-        <span class="od-dive-detail--bar-title" class:od-dive-detail--bar-title-shown={titleInBar} aria-hidden={!titleInBar}>{dive.site || t('dive.siteNotSet')}</span>
+        <span class="bc-dive-detail--bar-title" class:bc-dive-detail--bar-title-shown={titleInBar} aria-hidden={!titleInBar}>{dive.site || t('dive.siteNotSet')}</span>
       {/if}
     {/snippet}
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
     {#snippet right()}
       {#if theme.ios}
         <Link href="/dives/{diveId}/edit">{t('detail.edit')}</Link>
         <Link iconOnly popoverOpen="#{menuId}">
-          <Icon name="moreCircle" /><span class="od-sr-only">{t('detail.moreOptions')}</span>
+          <Icon name="moreCircle" /><span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {/if}
     {/snippet}
@@ -804,7 +804,7 @@
 
   <!-- Overflow menu (detail2 mock-ups): an MD3 menu on Android, icon before the
        label; an iOS pull-down menu, label then icon at the end, no arrow. -->
-  <Popover id={menuId} class="od-menu" backdrop={false}>
+  <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
       <!-- This page's router, not a link: the menu opens at the app's root, where a
            link would use the Carnet's view even when the dive is shown in another section. -->
@@ -853,7 +853,7 @@
           }}
         />
       {/if}
-      <li class="od-menu-divider" role="separator"></li>
+      <li class="bc-menu-divider" role="separator"></li>
       <!-- Alarm colour on Android (floating toolbar menu); iOS keeps ink. -->
       <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={confirmDelete} />
     </List>
@@ -861,54 +861,54 @@
 
   {#if failed}
     <!-- Error state (docs/system-design.md, section 9): what happened, what did not change, then a way on. -->
-    <div class="od-dive-detail--error" role="alert">
-      <h2 class="od-state-title od-dive-detail--error-title">{t('detail.errorTitle')}</h2>
-      <p class="od-dive-detail--error-text">{t('detail.errorText')}</p>
-      <Button fill class="od-primary-action od-dive-detail--error-retry" onClick={retry}>{t('detail.retry')}</Button>
+    <div class="bc-dive-detail--error" role="alert">
+      <h2 class="bc-state-title bc-dive-detail--error-title">{t('detail.errorTitle')}</h2>
+      <p class="bc-dive-detail--error-text">{t('detail.errorText')}</p>
+      <Button fill class="bc-primary-action bc-dive-detail--error-retry" onClick={retry}>{t('detail.retry')}</Button>
     </div>
   {:else if !dive}
     <div class="skeleton-text" aria-busy="true" aria-label={t('detail.loading')}>
-      <div class="od-dive-detail--head" aria-hidden="true">
-        <p class="od-dive-detail--day">––––––––––––––</p>
-        <h1 class="od-dive-detail--site">––––––––</h1>
+      <div class="bc-dive-detail--head" aria-hidden="true">
+        <p class="bc-dive-detail--day">––––––––––––––</p>
+        <h1 class="bc-dive-detail--site">––––––––</h1>
       </div>
-      <div class="skeleton-block od-dive-detail--skeleton-profile"></div>
+      <div class="skeleton-block bc-dive-detail--skeleton-profile"></div>
     </div>
   {:else}
     {#if desk}
     <!-- The site's map behind the header, 170 dp from the top of the pane (task 2026-11-15-193). -->
-    <div class="od-dive-detail--desk-hero">
+    <div class="bc-dive-detail--desk-hero">
       {#if dive.siteCoordinates}
         <SiteHeaderImage desk latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={() => {}} />
       {/if}
-      <header class="od-dive-detail--desk-head">
-        <div class="od-dive-detail--desk-titles">
-          <h1 class="od-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
-          <p class="od-dive-detail--desk-sub od-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
+      <header class="bc-dive-detail--desk-head">
+        <div class="bc-dive-detail--desk-titles">
+          <h1 class="bc-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
+          <p class="bc-dive-detail--desk-sub bc-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
         </div>
-        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
-        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
-        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.export')} title="{t('desktopDetail.export')} ({desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E'})" onclick={() => deskCommand('export')}><Icon name="export" size={22} /></button>
-        <button type="button" class="od-dive-detail--desk-action" aria-label={t('desktopDetail.delete')} title="{t('desktopDetail.delete')} ({desktopMac ? '⌫' : 'Suppr'})" onclick={() => deskCommand('delete')}><Icon name="delete" size={22} /></button>
+        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
+        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
+        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.export')} title="{t('desktopDetail.export')} ({desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E'})" onclick={() => deskCommand('export')}><Icon name="export" size={22} /></button>
+        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.delete')} title="{t('desktopDetail.delete')} ({desktopMac ? '⌫' : 'Suppr'})" onclick={() => deskCommand('delete')}><Icon name="delete" size={22} /></button>
       </header>
     </div>
     {:else}
-    <div class="od-dive-detail--hero" use:watchScroll>
+    <div class="bc-dive-detail--hero" use:watchScroll>
       {#if dive.siteCoordinates}
         <SiteHeaderImage latUdeg={dive.siteCoordinates.latUdeg} lonUdeg={dive.siteCoordinates.lonUdeg} onshown={(shown) => (imageShown = shown)} />
       {/if}
-    <header class="od-dive-detail--head">
-      <p class="od-dive-detail--day od-value">
+    <header class="bc-dive-detail--head">
+      <p class="bc-dive-detail--day bc-value">
         {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
       </p>
-      <h1 class="od-dive-detail--site" class:od-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
+      <h1 class="bc-dive-detail--site" class:bc-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location || trip}
-        <p class="od-dive-detail--location">
+        <p class="bc-dive-detail--location">
           {location}{#if location && trip}{' · '}{/if}{#if trip}<a href="/trips/{trip.id}">{t('detail.tripLine', { name: trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) })}</a>{/if}
         </p>
       {/if}
       {#if dive.rating > 0}
-        <p class="od-dive-detail--rating">
+        <p class="bc-dive-detail--rating">
           <Stars value={dive.rating} size={18} label={t('detail.ratingLabel', { n: dive.rating })} />
         </p>
       {/if}
@@ -918,7 +918,7 @@
 
     {#if !desk}<DiveFigures {dive} {prefs} />{/if}
 
-    <div class:od-dive-detail--desk-card={desk} class:od-dive-detail--desk-big={desk && profileBig}>
+    <div class:bc-dive-detail--desk-card={desk} class:bc-dive-detail--desk-big={desk && profileBig}>
     <DiveProfile
       hover={desk}
       onenlarge={desk ? () => (profileBig = !profileBig) : undefined}
@@ -935,17 +935,17 @@
 
     {#if desk}
       {#if deskFigures.length}
-        <dl class="od-dive-detail--desk-figures">
+        <dl class="bc-dive-detail--desk-figures">
           {#each deskFigures as figure (figure.label)}
-            <div><dt>{figure.label}</dt><dd class="od-value">{figure.value}</dd></div>
+            <div><dt>{figure.label}</dt><dd class="bc-value">{figure.value}</dd></div>
           {/each}
         </dl>
       {/if}
       {#if hasRecordedValues(dive)}
-        <p class="od-dive-detail--desk-recorded"><Icon name="computer" size={16} />{t('desktopDetail.recorded')}</p>
+        <p class="bc-dive-detail--desk-recorded"><Icon name="computer" size={16} />{t('desktopDetail.recorded')}</p>
       {/if}
       <!-- svelte-ignore a11y_interactive_supports_focus -->
-      <div class="od-dive-detail--desk-tabs" role="tablist" tabindex="-1" onkeydown={tabKey}>
+      <div class="bc-dive-detail--desk-tabs" role="tablist" tabindex="-1" onkeydown={tabKey}>
         {#each deskTabs as key (key)}
           <button type="button" role="tab" data-tab={key} aria-selected={tab === key} tabindex={tab === key ? 0 : -1} onclick={() => chooseTab(key)}>{t(`desktop.tab.${key}`)}</button>
         {/each}
@@ -953,37 +953,37 @@
     {/if}
 
     {#if !desk && facts.length}
-      <dl class="od-dive-detail--facts">
+      <dl class="bc-dive-detail--facts">
         {#each facts as fact (fact.label)}
-          <div class="od-dive-detail--fact"><dt>{fact.label}</dt><dd class="od-value">{fact.value}</dd></div>
+          <div class="bc-dive-detail--fact"><dt>{fact.label}</dt><dd class="bc-value">{fact.value}</dd></div>
         {/each}
       </dl>
     {/if}
 
     <!-- Validations by a buddy or an instructor (task 2026-11-19-309): OpenDives+ only. -->
     {#if odplusSubscriber()}
-      <section class="od-dive-detail--section od-dive-validations">
-        <h2 class="od-dive-detail--section-title">{t('validation.section')}</h2>
-        <div class="od-dive-detail--group">
+      <section class="bc-dive-detail--section bc-dive-validations">
+        <h2 class="bc-dive-detail--section-title">{t('validation.section')}</h2>
+        <div class="bc-dive-detail--group">
           {#each validationItems as v (v.id)}
-            <div class="od-dive-validations--item" class:od-dive-validations--pending={v.pending}>
-              <div class="od-dive-validations--text">
+            <div class="bc-dive-validations--item" class:bc-dive-validations--pending={v.pending}>
+              <div class="bc-dive-validations--text">
                 {#if v.pending}
-                  <span class="od-dive-validations--name">{t('validation.pending')}</span>
-                  <span class="od-dive-validations--detail">{t('validation.pendingText')}</span>
+                  <span class="bc-dive-validations--name">{t('validation.pending')}</span>
+                  <span class="bc-dive-validations--detail">{t('validation.pendingText')}</span>
                 {:else}
-                  <span class="od-dive-validations--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
-                  <span class="od-dive-validations--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
-                  {#if v.modified}<span class="od-dive-validations--modified">{t('validation.modified')}</span>{/if}
+                  <span class="bc-dive-validations--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
+                  <span class="bc-dive-validations--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
+                  {#if v.modified}<span class="bc-dive-validations--modified">{t('validation.modified')}</span>{/if}
                 {/if}
               </div>
-              {#if v.signature}<img class="od-dive-validations--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
-              <button type="button" class="od-dive-validations--remove" onclick={() => confirmRemoveValidation(v)}>
-                <Icon name="close" /><span class="od-sr-only">{t('validation.remove')}</span>
+              {#if v.signature}<img class="bc-dive-validations--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
+              <button type="button" class="bc-dive-validations--remove" onclick={() => confirmRemoveValidation(v)}>
+                <Icon name="close" /><span class="bc-sr-only">{t('validation.remove')}</span>
               </button>
             </div>
           {/each}
-          <button type="button" class="od-dive-validations--add" onclick={() => f7router.navigate(`/validate?ids=${diveId}`)}>
+          <button type="button" class="bc-dive-validations--add" onclick={() => f7router.navigate(`/validate?ids=${diveId}`)}>
             <Icon name="plus" /><span>{t('validation.add')}</span>
           </button>
         </div>
@@ -991,14 +991,14 @@
     {/if}
 
     {#if !desk && (dive.guides.length || dive.buddies.length)}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.people')}</h2>
-        <div class="od-dive-detail--group">
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.people')}</h2>
+        <div class="bc-dive-detail--group">
           {#if dive.guides.length}
-            <div class="od-dive-detail--row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="od-dive-detail--tags od-dive-detail--end">{#each dive.guides as name, i (i)}<span class="od-dive-detail--tag">{name}</span>{/each}</span></div>
+            <div class="bc-dive-detail--row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="bc-dive-detail--tags bc-dive-detail--end">{#each dive.guides as name, i (i)}<span class="bc-dive-detail--tag">{name}</span>{/each}</span></div>
           {/if}
           {#if dive.buddies.length}
-            <div class="od-dive-detail--row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="od-dive-detail--tags od-dive-detail--end">{#each dive.buddies as name, i (i)}<span class="od-dive-detail--tag">{name}</span>{/each}</span></div>
+            <div class="bc-dive-detail--row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="bc-dive-detail--tags bc-dive-detail--end">{#each dive.buddies as name, i (i)}<span class="bc-dive-detail--tag">{name}</span>{/each}</span></div>
           {/if}
         </div>
       </section>
@@ -1006,26 +1006,26 @@
 
     <!-- Notes right under Personnes (task 2026-11-12-64). -->
     {#if !desk && dive.notes.trim()}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.notes')}</h2>
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.notes')}</h2>
         <!-- Shown in full, line breaks kept: no "Read more". -->
-        <p class="od-dive-detail--group od-dive-detail--notes">{dive.notes}</p>
+        <p class="bc-dive-detail--group bc-dive-detail--notes">{dive.notes}</p>
       </section>
     {/if}
 
     <!-- Tags right under Notes (task 2026-11-12-66). -->
     {#if !desk && visibleTags(dive.tags).length}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
-        <ul class="od-dive-detail--tags">
-          {#each visibleTags(dive.tags) as tag (tag)}<li class="od-dive-detail--tag">{tag}</li>{/each}
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
+        <ul class="bc-dive-detail--tags">
+          {#each visibleTags(dive.tags) as tag (tag)}<li class="bc-dive-detail--tag">{tag}</li>{/each}
         </ul>
       </section>
     {/if}
 
     {#if !desk && hasGas}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.gasSection')}</h2>
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.gasSection')}</h2>
         <GasCard
           label={ccrView ? ccrView.label : gasLabel}
           items={gasCylinders}
@@ -1037,8 +1037,8 @@
     {/if}
 
     {#if !desk && hasEquipment}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
         <EquipmentCard
           label={equipmentName}
           suit={dive.suit ?? ''}
@@ -1073,25 +1073,25 @@
 
     {#if !desk && conditions.length}
       <!-- Collapsed by default, with a summary of the filled-in conditions. -->
-      <section class="od-dive-detail--section">
-        <div class="od-dive-detail--group">
+      <section class="bc-dive-detail--section">
+        <div class="bc-dive-detail--group">
           <button
             type="button"
-            class="od-dive-detail--disclosure"
+            class="bc-dive-detail--disclosure"
             aria-expanded={conditionsOpen}
             aria-label={conditionsOpen ? undefined : t('detail.conditionsClosed', { n: conditionsAverageText })}
             onclick={() => (conditionsOpen = !conditionsOpen)}
           >
-            <span class="od-dive-detail--text">
-              <span class="od-dive-detail--title">{t('detail.conditions')}</span>
+            <span class="bc-dive-detail--text">
+              <span class="bc-dive-detail--title">{t('detail.conditions')}</span>
             </span>
             <!-- The open card does not repeat the average: each row has its own stars. -->
             {#if !conditionsOpen}<Stars value={conditionsAverage} size={16} summary label={t('detail.conditionsAverage', { n: conditionsAverageText })} />{/if}
-            <span class="od-dive-detail--arrow" class:od-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
+            <span class="bc-dive-detail--arrow" class:bc-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
           </button>
           {#if conditionsOpen}
             {#each conditions as condition (condition.key)}
-              <div class="od-dive-detail--row">
+              <div class="bc-dive-detail--row">
                 <span>{condition.name}</span>
                 <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
               </div>
@@ -1107,17 +1107,17 @@
     {/if}
 
     {#if !desk && dive.pictures > 0 && settings.showPhotos}
-      <section class="od-dive-detail--section">
-        <h2 class="od-dive-detail--section-title">{t('detail.photos')}</h2>
-        <div class="od-dive-detail--group">
-          <div class="od-dive-detail--row">
-            <span class="od-dive-detail--stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="od-dive-detail--sub">{t('detail.photoNote')}</span></span>
+      <section class="bc-dive-detail--section">
+        <h2 class="bc-dive-detail--section-title">{t('detail.photos')}</h2>
+        <div class="bc-dive-detail--group">
+          <div class="bc-dive-detail--row">
+            <span class="bc-dive-detail--stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="bc-dive-detail--sub">{t('detail.photoNote')}</span></span>
           </div>
         </div>
       </section>
     {/if}
 
-    <div class="od-dive-detail--end" aria-hidden="true"></div>
+    <div class="bc-dive-detail--end" aria-hidden="true"></div>
   {/if}
 
   {#snippet fixedContent()}
@@ -1161,70 +1161,70 @@
 <style>
   @layer od.components {
     /* Error state: a centred column under the bar, the title in the title font. */
-    .od-dive-detail--error {
+    .bc-dive-detail--error {
       max-width: 440px;
       margin: 32px auto 0;
       padding: 0 24px 24px;
       box-sizing: border-box;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dive-detail--error-title {
-      color: var(--od-text);
+    .bc-dive-detail--error-title {
+      color: var(--bc-text);
     }
 
-    .od-dive-detail--error-text {
+    .bc-dive-detail--error-text {
       margin: 0 0 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 16px;
       line-height: 24px;
     }
 
     /* Desktop detail pane (task 2026-11-15-169). */
     /* No top bar on desktop: the pane's own header carries the actions. */
-    :global(.od-dive-detail--desk.page) {
-      --f7-page-bg-color: var(--od-background);
-      background: var(--od-background);
+    :global(.bc-dive-detail--desk.page) {
+      --f7-page-bg-color: var(--bc-background);
+      background: var(--bc-background);
     }
-    :global(.od-dive-detail--desk > .navbar) {
+    :global(.bc-dive-detail--desk > .navbar) {
       display: none;
     }
-    :global(.od-dive-detail--desk > .page-content) {
+    :global(.bc-dive-detail--desk > .page-content) {
       padding-top: 0;
     }
     /* 36 dp above the title, room for the site map behind the header (task 2026-11-15-193). */
-    .od-dive-detail--desk-hero {
+    .bc-dive-detail--desk-hero {
       position: relative;
     }
-    .od-dive-detail--desk-head {
+    .bc-dive-detail--desk-head {
       position: relative;
       display: flex;
       align-items: flex-start;
       gap: 4px;
       padding: 36px 16px 8px 24px;
     }
-    .od-dive-detail--desk-titles {
+    .bc-dive-detail--desk-titles {
       flex: 1;
       min-width: 0;
     }
-    .od-dive-detail--desk-title {
+    .bc-dive-detail--desk-title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
       line-height: 28px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
     /* The date line stays on one line, cut with an ellipsis (task 2026-11-15-194). */
-    .od-dive-detail--desk-sub {
+    .bc-dive-detail--desk-sub {
       margin: 2px 0 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-dive-detail--desk-action {
+    .bc-dive-detail--desk-action {
       display: grid;
       place-items: center;
       width: 44px;
@@ -1232,22 +1232,22 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-dive-detail--desk-action:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-dive-detail--desk-action:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-dive-detail--desk-card {
+    .bc-dive-detail--desk-card {
       margin: 8px 24px 0;
       padding: 8px 0 12px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
     /* « Agrandir le profil »: the card covers the pane. */
-    .od-dive-detail--desk-big {
+    .bc-dive-detail--desk-big {
       position: fixed;
-      inset: 16px 16px 16px calc(var(--f7-page-master-width, 50%) + var(--od-nav-width) + 16px);
+      inset: 16px 16px 16px calc(var(--f7-page-master-width, 50%) + var(--bc-nav-width) + 16px);
       z-index: 50;
       margin: 0;
       display: flex;
@@ -1255,38 +1255,38 @@
       justify-content: center;
       box-shadow: 0 2px 12px rgb(0 0 0 / 0.2);
     }
-    .od-dive-detail--desk-figures {
+    .bc-dive-detail--desk-figures {
       display: flex;
       flex-wrap: wrap;
       gap: 12px 28px;
       margin: 16px 24px 0;
     }
-    .od-dive-detail--desk-figures dt {
+    .bc-dive-detail--desk-figures dt {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-dive-detail--desk-figures dd {
+    .bc-dive-detail--desk-figures dd {
       margin: 2px 0 0;
       font-size: 18px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-dive-detail--desk-tabs {
+    .bc-dive-detail--desk-tabs {
       display: flex;
       gap: 4px;
       margin: 20px 24px 8px;
-      border-bottom: 1px solid var(--od-separator);
+      border-bottom: 1px solid var(--bc-separator);
     }
     /* Under the key figures: the dive computer's values cannot be edited (task 2026-11-15-172). */
-    .od-dive-detail--desk-recorded {
+    .bc-dive-detail--desk-recorded {
       display: flex;
       align-items: center;
       gap: 6px;
       margin: 12px 24px 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-dive-detail--desk-tabs button {
+    .bc-dive-detail--desk-tabs button {
       position: relative;
       height: 48px;
       padding: 0 16px;
@@ -1295,18 +1295,18 @@
       font: inherit;
       font-size: 14px;
       font-weight: 400;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       cursor: pointer;
     }
-    .od-dive-detail--desk-tabs button:hover {
-      color: var(--od-text);
-      background: color-mix(in srgb, var(--od-text) 4%, transparent);
+    .bc-dive-detail--desk-tabs button:hover {
+      color: var(--bc-text);
+      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
     }
-    .od-dive-detail--desk-tabs button[aria-selected='true'] {
+    .bc-dive-detail--desk-tabs button[aria-selected='true'] {
       font-weight: 600;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
     }
-    .od-dive-detail--desk-tabs button[aria-selected='true']::after {
+    .bc-dive-detail--desk-tabs button[aria-selected='true']::after {
       content: '';
       position: absolute;
       left: 8px;
@@ -1314,58 +1314,58 @@
       bottom: -1px;
       height: 3px;
       border-radius: 3px 3px 0 0;
-      background: var(--od-on-table-selected);
+      background: var(--bc-on-table-selected);
     }
-    .od-dive-detail--hero {
+    .bc-dive-detail--hero {
       position: relative;
     }
 
     /* 16 px under the top bar, as in the detail3 mock-ups. */
-    .od-dive-detail--head {
+    .bc-dive-detail--head {
       position: relative;
       padding: 16px 20px 0;
     }
 
-    .od-dive-detail--day {
+    .bc-dive-detail--day {
       margin: 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       strong {
         font-weight: 800;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
 
-    .od-dive-detail--site {
+    .bc-dive-detail--site {
       margin: 2px 0 0;
       font-size: 34px;
       line-height: 40px;
       font-weight: 800;
       letter-spacing: -0.4px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      &.od-dive-detail--not-set {
-        color: var(--od-text-2);
+      &.bc-dive-detail--not-set {
+        color: var(--bc-text-2);
       }
     }
 
-    .od-dive-detail--skeleton-profile {
+    .bc-dive-detail--skeleton-profile {
       height: 180px;
       margin: 14px 16px 0;
       border-radius: 16px;
     }
 
-    .od-dive-detail--facts {
+    .bc-dive-detail--facts {
       margin: 8px 20px 0;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       column-gap: 12px;
     }
 
-    .od-dive-detail--fact {
+    .bc-dive-detail--fact {
       padding: 9px 0;
-      border-bottom: 1px solid var(--od-separator);
+      border-bottom: 1px solid var(--bc-separator);
       display: flex;
       flex-direction: column;
       gap: 2px;
@@ -1373,65 +1373,65 @@
 
       dt {
         font-size: 13px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       dd {
         margin: 0;
         font-size: 16px;
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
         /* Between words only; a word longer than the column still breaks. */
         overflow-wrap: break-word;
       }
     }
 
-    .od-dive-detail--location {
-      --f7-theme-color: var(--od-text);
+    .bc-dive-detail--location {
+      --f7-theme-color: var(--bc-text);
       margin: 2px 0 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       a {
         font-weight: 600;
       }
     }
 
-    .od-dive-detail--section {
+    .bc-dive-detail--section {
       margin: 22px 16px 0;
     }
 
-    .od-dive-detail--section-title {
+    .bc-dive-detail--section-title {
       margin: 0 0 8px;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Grouped list in a rounded block, as in the mock-ups (iOS grouped list, MD3 list). */
-    .od-dive-detail--group {
+    .bc-dive-detail--group {
       border-radius: 16px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       overflow: hidden;
     }
 
-    .od-dive-validations--item {
+    .bc-dive-validations--item {
       box-sizing: border-box;
       min-height: 56px;
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-dive-validations--item:first-child {
+    .bc-dive-validations--item:first-child {
       border-top: none;
     }
 
-    .od-dive-validations--text {
+    .bc-dive-validations--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -1439,33 +1439,33 @@
       gap: 2px;
     }
 
-    .od-dive-validations--name {
+    .bc-dive-validations--name {
       font-size: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dive-validations--detail {
+    .bc-dive-validations--detail {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-validations--modified {
+    .bc-dive-validations--modified {
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
     /* The signature is drawn black on white, in every mode: it keeps its paper. */
-    .od-dive-validations--signature {
+    .bc-dive-validations--signature {
       width: 72px;
       height: 29px;
       border-radius: 6px;
       object-fit: contain;
-      background: var(--od-qr-paper);
-      border: 1px solid var(--od-separator);
+      background: var(--bc-qr-paper);
+      border: 1px solid var(--bc-separator);
     }
 
-    .od-dive-validations--remove {
+    .bc-dive-validations--remove {
       width: 40px;
       height: 40px;
       padding: 0;
@@ -1475,16 +1475,16 @@
       align-items: center;
       justify-content: center;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dive-validations--add {
+    .bc-dive-validations--add {
       box-sizing: border-box;
       width: 100%;
       min-height: 48px;
       padding: 0 16px;
       border: none;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1492,15 +1492,15 @@
       font-size: 16px;
       font-weight: 500;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dive-validations--item:first-child + .od-dive-validations--add,
-    .od-dive-validations--add:first-child {
+    .bc-dive-validations--item:first-child + .bc-dive-validations--add,
+    .bc-dive-validations--add:first-child {
       border-top: none;
     }
 
-    .od-dive-detail--row {
+    .bc-dive-detail--row {
       box-sizing: border-box;
       min-height: 44px;
       padding: 0 16px;
@@ -1509,7 +1509,7 @@
       align-items: center;
       gap: 12px;
       font-size: 16px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
 
       /* MD3: one-line list item, 56 dp. */
       :global(.md) & {
@@ -1523,7 +1523,7 @@
     }
 
     /* A label with a second line under it (computer role, photos). */
-    .od-dive-detail--stacked {
+    .bc-dive-detail--stacked {
       padding: 10px 0;
       display: flex;
       flex-direction: column;
@@ -1533,10 +1533,10 @@
         padding: 0;
       }
 
-      .od-dive-detail--sub {
+      .bc-dive-detail--sub {
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
 
         :global(.md) & {
           font-size: 14px;
@@ -1546,58 +1546,58 @@
     }
 
     /* Overall rating under the title. */
-    .od-dive-detail--rating {
+    .bc-dive-detail--rating {
       margin: 8px 0 0;
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Header of the collapsible Conditions block. */
-    .od-dive-detail--disclosure {
+    .bc-dive-detail--disclosure {
       width: 100%;
       min-height: 56px;
       padding: 8px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      .od-dive-detail--text {
+      .bc-dive-detail--text {
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 2px;
       }
 
-      .od-dive-detail--title {
+      .bc-dive-detail--title {
         font-size: 16px;
         font-weight: 600;
       }
 
 
-      .od-dive-detail--arrow {
+      .bc-dive-detail--arrow {
         display: block;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
 
-        &.od-dive-detail--open {
+        &.bc-dive-detail--open {
           transform: rotate(180deg);
         }
       }
     }
 
-    .od-dive-detail--disclosure + .od-dive-detail--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-dive-detail--disclosure + .bc-dive-detail--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
     /* Tags and people: 32 px chips on the tint. */
-    .od-dive-detail--tags {
+    .bc-dive-detail--tags {
       list-style: none;
       margin: 0;
       padding: 0;
@@ -1605,28 +1605,28 @@
       flex-wrap: wrap;
       gap: 6px;
 
-      &.od-dive-detail--end {
+      &.bc-dive-detail--end {
         justify-content: flex-end;
       }
     }
 
-    .od-dive-detail--tag {
+    .bc-dive-detail--tag {
       height: 32px;
       padding: 0 12px;
       border-radius: 8px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
       font-size: 14px;
       display: inline-flex;
       align-items: center;
     }
 
     /* Space after the last block, so that it never touches the bottom bar. */
-    .od-dive-detail--end {
+    .bc-dive-detail--end {
       height: 32px;
     }
 
-    .od-dive-detail--notes {
+    .bc-dive-detail--notes {
       margin: 0;
       padding: 12px 16px;
       font-size: 16px;
@@ -1635,12 +1635,12 @@
     }
   }
 
-  :global(.od-dive-detail.od-dive-detail--on-image > .navbar) {
+  :global(.bc-dive-detail.bc-dive-detail--on-image > .navbar) {
     --f7-navbar-bg-color: transparent;
   }
 
   @layer od.components {
-    .od-dive-detail--bar-title {
+    .bc-dive-detail--bar-title {
       display: block;
       overflow: hidden;
       white-space: nowrap;
@@ -1648,7 +1648,7 @@
       opacity: 0;
       transition: opacity 150ms ease-out;
 
-      &.od-dive-detail--bar-title-shown {
+      &.bc-dive-detail--bar-title-shown {
         opacity: 1;
       }
 
@@ -1660,15 +1660,15 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-dive-detail--disclosure {
+      .bc-dive-detail--disclosure {
         transition: box-shadow 120ms linear;
       }
-      .od-dive-detail--disclosure:not(:disabled):hover {
+      .bc-dive-detail--disclosure:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-dive-detail--disclosure {
+      .bc-dive-detail--disclosure {
         transition: none;
       }
     }

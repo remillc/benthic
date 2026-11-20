@@ -43,10 +43,10 @@
   });
 </script>
 
-<Page class="od-dive-no-site-profile">
+<Page class="bc-dive-no-site-profile">
   <Navbar title={dive ? formatDateTime(dive.date) : ''} {subtitle}>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
+      <Link back iconOnly><i class="icon icon-back"></i><span class="bc-sr-only">{t('common.back')}</span></Link>
     {/snippet}
   </Navbar>
 
@@ -62,19 +62,19 @@
       meanDepthMm={dive.meanDepthMm}
       prefs={logbook.prefs}
     />
-    {#if facts}<p class="od-dive-no-site-profile--facts">{facts}</p>{/if}
-    <div class="od-dive-no-site-profile--end"></div>
+    {#if facts}<p class="bc-dive-no-site-profile--facts">{facts}</p>{/if}
+    <div class="bc-dive-no-site-profile--end"></div>
   {/if}
 
   {#snippet fixedContent()}
     {#if dive}
-      <div class="od-dive-no-site-profile--bar">
-        <button type="button" class="od-dive-no-site-profile--action od-dive-no-site-profile--filled" onclick={() => chooseSite(f7router, async (site) => {
+      <div class="bc-dive-no-site-profile--bar">
+        <button type="button" class="bc-dive-no-site-profile--action bc-dive-no-site-profile--filled" onclick={() => chooseSite(f7router, async (site) => {
           // Back to the list once the dive has its site (« Choisir un site » has gone back first).
           if (await setDiveSite(diveId, site.uuid)) setTimeout(() => f7router.back(), 400);
         })}>{t('sites.chooseSite')}</button>
         <!-- Replaces this screen, so that saving the new site ends on the list. -->
-        <button type="button" class="od-dive-no-site-profile--action" onclick={() => f7router.navigate(`/sites/new?dive=${diveId}`, { reloadCurrent: true })}>{t('sites.newSite')}</button>
+        <button type="button" class="bc-dive-no-site-profile--action" onclick={() => f7router.navigate(`/sites/new?dive=${diveId}`, { reloadCurrent: true })}>{t('sites.newSite')}</button>
       </div>
     {/if}
   {/snippet}
@@ -82,19 +82,19 @@
 
 <style>
   @layer od.components {
-    .od-dive-no-site-profile--facts {
+    .bc-dive-no-site-profile--facts {
       margin: 14px 20px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Room for the fixed bar. */
-    .od-dive-no-site-profile--end {
+    .bc-dive-no-site-profile--end {
       height: 104px;
     }
 
-    .od-dive-no-site-profile--bar {
+    .bc-dive-no-site-profile--bar {
       position: absolute;
       inset-inline: 0;
       bottom: 0;
@@ -102,27 +102,27 @@
       padding: 12px 16px calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       gap: 8px;
-      border-top: 1px solid var(--od-separator);
-      background: var(--od-background);
+      border-top: 1px solid var(--bc-separator);
+      background: var(--bc-background);
     }
 
-    .od-dive-no-site-profile--action {
+    .bc-dive-no-site-profile--action {
       flex: 1;
       width: auto;
       height: 48px;
-      border: var(--od-outline-width) solid var(--od-text-2);
+      border: var(--bc-outline-width) solid var(--bc-text-2);
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
 
-      &.od-dive-no-site-profile--filled {
+      &.bc-dive-no-site-profile--filled {
         border: none;
-        background: var(--od-primary-action);
-        color: var(--od-on-primary-action);
+        background: var(--bc-primary-action);
+        color: var(--bc-on-primary-action);
       }
 
       :global(.ios) & {

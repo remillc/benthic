@@ -29,11 +29,11 @@ const OWN = new Set(['broken', 'repair']);
 export function tidyView(router) {
   const el = /** @type {HTMLElement|undefined} */ (router?.el);
   if (!el) return;
-  el.classList.remove(...[...el.classList].filter((c) => c.startsWith('router-transition')), 'od-pushing', 'od-pushing-back', 'od-push-settle');
-  for (const p of ['--od-push-dx', '--od-push-ease', '--od-push-ms']) el.style.removeProperty(p);
+  el.classList.remove(...[...el.classList].filter((c) => c.startsWith('router-transition')), 'bc-pushing', 'bc-pushing-back', 'bc-push-settle');
+  for (const p of ['--bc-push-dx', '--bc-push-ease', '--bc-push-ms']) el.style.removeProperty(p);
   for (const page of /** @type {HTMLElement[]} */ ([...el.children])) {
     if (!page.classList.contains('page')) continue;
-    page.classList.remove('page-transitioning', 'page-transitioning-swipeback', 'page-swipeback-active', 'od-push-from');
+    page.classList.remove('page-transitioning', 'page-transitioning-swipeback', 'page-swipeback-active', 'bc-push-from');
     page.style.transform = '';
     page.style.transition = '';
     for (const effect of page.querySelectorAll(':scope > .page-shadow-effect, :scope > .page-opacity-effect')) effect.remove();
@@ -179,7 +179,7 @@ const MODAL_CLOSE_MS = 2000;
 /** A sheet, popup or dialog in a few words, for the trace. @param {any} modal */
 function modalName(modal) {
   const classes = String(modal?.el?.className ?? '').split(/\s+/);
-  return classes.find((c) => c.startsWith('od-')) ?? classes.find((c) => /^(sheet-modal|popup|dialog|popover|actions-modal|toast|login-screen)$/.test(c)) ?? 'modal';
+  return classes.find((c) => c.startsWith('bc-')) ?? classes.find((c) => /^(sheet-modal|popup|dialog|popover|actions-modal|toast|login-screen)$/.test(c)) ?? 'modal';
 }
 
 /**

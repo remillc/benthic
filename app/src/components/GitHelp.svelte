@@ -58,29 +58,29 @@
   }
 </script>
 
-<div class="od-git-help" class:od-git-help--embedded={embedded}>
-  <div class="od-git-help--tabs" role="tablist" aria-label={t(help.tabs)}>
+<div class="bc-git-help" class:bc-git-help--embedded={embedded}>
+  <div class="bc-git-help--tabs" role="tablist" aria-label={t(help.tabs)}>
     {#each providers as p, i (p.id)}
       <button
         type="button"
         role="tab"
         id="od-git-help-tab-{kind}-{p.id}"
-        class="od-git-help--tab"
+        class="bc-git-help--tab"
         aria-selected={i === selected}
         aria-controls="od-git-help-panel-{kind}"
         tabindex={i === selected ? 0 : -1}
         onclick={() => choose(i)}
         onkeydown={keydown}
       >
-        <span class="od-git-help--tab-label">{t(`${prefix}.${p.id}.name`)}</span>
+        <span class="bc-git-help--tab-label">{t(`${prefix}.${p.id}.name`)}</span>
       </button>
     {/each}
   </div>
 
-  <p class="od-git-help--intro">{t(`${prefix}.${provider.id}.intro`)}</p>
+  <p class="bc-git-help--intro">{t(`${prefix}.${provider.id}.intro`)}</p>
 
   <div
-    class="od-git-help--surface"
+    class="bc-git-help--surface"
     id="od-git-help-panel-{kind}"
     role="tabpanel"
     tabindex="0"
@@ -88,51 +88,51 @@
     ontouchstart={touchstart}
     ontouchend={touchend}
   >
-    <p class="od-git-help--note">{t(`${prefix}.${provider.id}.note`)}</p>
+    <p class="bc-git-help--note">{t(`${prefix}.${provider.id}.note`)}</p>
     <ol>
       {#each helpStepKeys(kind, provider, desktopApp ? (k) => tIfExists(k) !== undefined : undefined) as key (key)}<li><MarkedText text={t(key)} /></li>{/each}
     </ol>
-    <a href={provider.page} class="od-git-help--open external" target="_blank" rel="noopener">
+    <a href={provider.page} class="bc-git-help--open external" target="_blank" rel="noopener">
       <span>{kind === 'repository' ? t('repoHelp.open', { name, page: t(`repoHelp.${provider.id}.page`) }) : t(`tokenHelp.${provider.id}.open`)}</span>
       <Icon name="openInNew" size={20} />
     </a>
   </div>
 
-  <p class="od-git-help--intro od-git-help--afterwards">{t(`${prefix}.afterwards`)}</p>
+  <p class="bc-git-help--intro bc-git-help--afterwards">{t(`${prefix}.afterwards`)}</p>
 </div>
 
 <style>
   @layer od.components {
-    .od-git-help--intro {
+    .bc-git-help--intro {
       margin: 16px 24px 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-git-help--afterwards {
+      &.bc-git-help--afterwards {
         margin-bottom: calc(var(--f7-safe-area-bottom) + 24px);
       }
     }
 
     /* MD3 primary tabs, fixed under the top bar: equal widths, 48 dp, an indicator under the active label. */
-    .od-git-help--tabs {
+    .bc-git-help--tabs {
       position: sticky;
       top: 0;
       z-index: 2;
       display: flex;
-      background: var(--od-background);
-      border-bottom: 1px solid var(--od-separator);
+      background: var(--bc-background);
+      border-bottom: 1px solid var(--bc-separator);
     }
 
-    .od-git-help--tab {
+    .bc-git-help--tab {
       flex: 1 1 0;
       min-width: 0;
       height: 48px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -144,44 +144,44 @@
 
       @media (hover: hover) {
         &:hover:not([aria-selected='true']) {
-          color: var(--od-text);
+          color: var(--bc-text);
         }
       }
 
       &[aria-selected='true'] {
-        color: var(--od-text);
+        color: var(--bc-text);
         font-weight: 600;
 
-        .od-git-help--tab-label {
-          border-bottom: 3px solid var(--od-text);
+        .bc-git-help--tab-label {
+          border-bottom: 3px solid var(--bc-text);
           border-radius: 3px 3px 0 0;
         }
       }
     }
 
-    .od-git-help--tab-label {
+    .bc-git-help--tab-label {
       box-sizing: border-box;
       padding: 0 4px;
       display: flex;
       align-items: center;
     }
 
-    .od-git-help--surface {
+    .bc-git-help--surface {
       margin: 16px 16px 0;
       padding: 16px 16px 8px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       :global(.ios) & {
         border-radius: 10px;
       }
     }
 
-    .od-git-help--note {
+    .bc-git-help--note {
       margin: 0 0 8px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     ol {
@@ -192,16 +192,16 @@
       gap: 8px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-git-help--open {
+    .bc-git-help--open {
       min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-weight: 500;
       text-decoration: none;
 
@@ -213,22 +213,22 @@
     }
 
     /* In the step column of the first launch: the column's own width, the tabs scroll with it. */
-    .od-git-help--embedded {
-      .od-git-help--tabs {
+    .bc-git-help--embedded {
+      .bc-git-help--tabs {
         position: static;
         background: none;
       }
 
-      .od-git-help--intro {
+      .bc-git-help--intro {
         margin-left: 0;
         margin-right: 0;
       }
 
-      .od-git-help--intro.od-git-help--afterwards {
+      .bc-git-help--intro.bc-git-help--afterwards {
         margin-bottom: 0;
       }
 
-      .od-git-help--surface {
+      .bc-git-help--surface {
         margin-left: 0;
         margin-right: 0;
       }

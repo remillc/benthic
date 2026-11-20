@@ -124,15 +124,15 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<section class="od-site-form" data-od-scroll aria-label={t('sites.newSite')} onkeydown={keydown}>
-  <h2 class="od-site-form--title">{t('sites.newSite')}</h2>
-  <div class="od-site-form--body">
-    <div class="od-site-form--left">
+<section class="bc-site-form" data-od-scroll aria-label={t('sites.newSite')} onkeydown={keydown}>
+  <h2 class="bc-site-form--title">{t('sites.newSite')}</h2>
+  <div class="bc-site-form--body">
+    <div class="bc-site-form--left">
       <DesktopSitePosMap {position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick onmove={setPosition} />
-      <p class="od-site-form--explain">{t('desktopSites.placeExplain')}</p>
+      <p class="bc-site-form--explain">{t('desktopSites.placeExplain')}</p>
     </div>
-    <div class="od-site-form--right">
-      <div class="od-site-form--fields">
+    <div class="bc-site-form--right">
+      <div class="bc-site-form--fields">
         <label for="od-new-name">{t('sites.name')}</label>
         <DesktopSiteField id="od-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
 
@@ -153,16 +153,16 @@
       </div>
 
       {#if nearby}
-        <div class="od-site-form--notice" role="status">
+        <div class="bc-site-form--notice" role="status">
           <Icon name="warning" size={22} />
           <p>{t('sites.nearbyShort', { site: nearby.name || t('sites.noName') })}</p>
-          <button type="button" class="od-site-form--text" onclick={() => nearby && onuse(nearby)}>{t('sites.useNearby')}</button>
+          <button type="button" class="bc-site-form--text" onclick={() => nearby && onuse(nearby)}>{t('sites.useNearby')}</button>
         </div>
       {/if}
 
-      <div class="od-site-form--actions">
-        <button type="button" class="od-site-form--text" onclick={oncancel}>{t('desktopSites.cancel')}</button>
-        <button type="button" class="od-site-form--filled" disabled={!valid || saving} onclick={add}>{t('desktopSites.addSite')}</button>
+      <div class="bc-site-form--actions">
+        <button type="button" class="bc-site-form--text" onclick={oncancel}>{t('desktopSites.cancel')}</button>
+        <button type="button" class="bc-site-form--filled" disabled={!valid || saving} onclick={add}>{t('desktopSites.addSite')}</button>
       </div>
     </div>
   </div>
@@ -170,70 +170,70 @@
 
 <style>
   @layer od.components {
-    .od-site-form {
+    .bc-site-form {
       box-sizing: border-box;
       height: 100%;
       overflow: auto;
       container-type: inline-size;
       padding: 4px 12px 24px 4px;
     }
-    .od-site-form--title {
+    .bc-site-form--title {
       margin: 0 0 12px;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       line-height: 30px;
       font-weight: 500;
     }
-    .od-site-form--body {
+    .bc-site-form--body {
       display: grid;
       grid-template-columns: minmax(280px, 330px) minmax(300px, 1fr);
       gap: 20px;
       align-items: start;
     }
     @container (max-width: 639px) {
-      .od-site-form--body {
+      .bc-site-form--body {
         grid-template-columns: minmax(0, 1fr);
       }
     }
-    .od-site-form--explain {
+    .bc-site-form--explain {
       margin: 8px 0 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-form--fields {
+    .bc-site-form--fields {
       display: grid;
       grid-template-columns: 110px minmax(0, 1fr);
       gap: 8px 12px;
       align-items: start;
     }
-    .od-site-form--fields > label {
+    .bc-site-form--fields > label {
       padding-top: 10px;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-form--notice {
+    .bc-site-form--notice {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-top: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      background: var(--od-tertiary-container);
-      color: var(--od-on-tertiary-container);
+      background: var(--bc-tertiary-container);
+      color: var(--bc-on-tertiary-container);
     }
-    .od-site-form--notice p {
+    .bc-site-form--notice p {
       flex: 1;
       margin: 0;
       font-size: 14px;
     }
-    .od-site-form--actions {
+    .bc-site-form--actions {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: 8px;
       margin-top: 16px;
     }
-    .od-site-form--text {
+    .bc-site-form--text {
       width: auto;
       height: 40px;
       padding: 0 12px;
@@ -243,28 +243,28 @@
       font: inherit;
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       cursor: pointer;
     }
-    .od-site-form--notice .od-site-form--text {
-      color: var(--od-on-tertiary-container);
+    .bc-site-form--notice .bc-site-form--text {
+      color: var(--bc-on-tertiary-container);
     }
-    .od-site-form--text:hover {
+    .bc-site-form--text:hover {
       background: color-mix(in srgb, currentColor 8%, transparent);
     }
-    .od-site-form--filled {
+    .bc-site-form--filled {
       width: auto;
       height: 40px;
       padding: 0 24px;
       border: 0;
       border-radius: 20px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 15px;
       cursor: pointer;
     }
-    .od-site-form--filled:disabled {
+    .bc-site-form--filled:disabled {
       opacity: 0.38;
       cursor: default;
     }

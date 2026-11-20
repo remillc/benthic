@@ -57,67 +57,67 @@
 </script>
 
 {#snippet body()}
-  <div class="od-emergency">
-    <div class="od-emergency--hero">
-      <div class="od-emergency--who">
-        <span class="od-emergency--kicker">{t('emergency.diver')}</span>
+  <div class="bc-emergency">
+    <div class="bc-emergency--hero">
+      <div class="bc-emergency--who">
+        <span class="bc-emergency--kicker">{t('emergency.diver')}</span>
         {#if text.name}
-          <span class="od-emergency--name">{text.name}</span>
+          <span class="bc-emergency--name">{text.name}</span>
         {:else}
-          <span class="od-emergency--name od-emergency--name-empty">{t('emergency.noName')}</span>
+          <span class="bc-emergency--name bc-emergency--name-empty">{t('emergency.noName')}</span>
         {/if}
-        {#if text.birthLine}<span class="od-emergency--birth">{text.birthLine}</span>{/if}
-        {#if !text.name}<a href="/profile/info/edit" class="od-emergency--fill">{t('emergency.noNameLink')}</a>{/if}
+        {#if text.birthLine}<span class="bc-emergency--birth">{text.birthLine}</span>{/if}
+        {#if !text.name}<a href="/profile/info/edit" class="bc-emergency--fill">{t('emergency.noNameLink')}</a>{/if}
       </div>
       {#if hasBlood}
-        <div class="od-emergency--blood">
-          <span class="od-emergency--blood-label">{t('emergency.blood')}</span>
-          <span class="od-emergency--blood-value">{text.blood}</span>
+        <div class="bc-emergency--blood">
+          <span class="bc-emergency--blood-label">{t('emergency.blood')}</span>
+          <span class="bc-emergency--blood-value">{text.blood}</span>
         </div>
       {/if}
     </div>
 
     {#each text.blocks as b (b.kind)}
-      <section class="od-emergency--card od-emergency--card-{b.kind}" aria-label={b.title}>
-        <h2 class="od-emergency--title">{b.title}</h2>
+      <section class="bc-emergency--card bc-emergency--card-{b.kind}" aria-label={b.title}>
+        <h2 class="bc-emergency--title">{b.title}</h2>
         {#if b.docId}
-          <a href={documentHref(b.kind, b.docId)} class="od-emergency--link">
-            <span class="od-emergency--texts">
-              {#if b.name}<span class="od-emergency--card-name">{b.name}</span>{:else}<span class="od-emergency--card-name">{b.title}</span>{/if}
-              {#if b.line}<span class="od-emergency--line">{b.line}</span>{/if}
+          <a href={documentHref(b.kind, b.docId)} class="bc-emergency--link">
+            <span class="bc-emergency--texts">
+              {#if b.name}<span class="bc-emergency--card-name">{b.name}</span>{:else}<span class="bc-emergency--card-name">{b.title}</span>{/if}
+              {#if b.line}<span class="bc-emergency--line">{b.line}</span>{/if}
             </span>
-            <span class="od-emergency--chevron"><Icon name="chevron" size={20} /></span>
+            <span class="bc-emergency--chevron"><Icon name="chevron" size={20} /></span>
           </a>
         {:else}
-          <span class="od-emergency--texts">
-            <span class="od-emergency--card-name">{b.name}</span>
-            {#if b.line}<span class="od-emergency--line">{b.line}</span>{/if}
+          <span class="bc-emergency--texts">
+            <span class="bc-emergency--card-name">{b.name}</span>
+            {#if b.line}<span class="bc-emergency--line">{b.line}</span>{/if}
           </span>
         {/if}
         {#if b.call}
-          <a href={b.call.tel} class="od-emergency--call external"><Icon name="phone" size={20} weight={1.8} />{b.call.label}</a>
+          <a href={b.call.tel} class="bc-emergency--call external"><Icon name="phone" size={20} weight={1.8} />{b.call.label}</a>
         {/if}
         {#if b.hotline}
-          <div class="od-emergency--hotline">
-            <span class="od-emergency--hotline-label">{b.hotline.label}</span>
-            <a href={b.hotline.tel} class="od-emergency--hotline-number external">{b.hotline.number}</a>
+          <div class="bc-emergency--hotline">
+            <span class="bc-emergency--hotline-label">{b.hotline.label}</span>
+            <a href={b.hotline.tel} class="bc-emergency--hotline-number external">{b.hotline.number}</a>
           </div>
         {/if}
       </section>
     {/each}
-    {#if !text.blocks.length && !text.birthLine && !hasBlood}<p class="od-emergency--none">{t('emergency.nothingYet')}</p>{/if}
+    {#if !text.blocks.length && !text.birthLine && !hasBlood}<p class="bc-emergency--none">{t('emergency.nothingYet')}</p>{/if}
 
-    <p class="od-emergency--offline">{t('emergency.offline')}</p>
+    <p class="bc-emergency--offline">{t('emergency.offline')}</p>
   </div>
 {/snippet}
 
-<Page class="od-emergency-page">
+<Page class="bc-emergency-page">
   <Navbar title={t('emergency.title')}>
     {#snippet left()}
       <BackLink label={t('gear.profile.title')} name={t('emergency.back')} />
     {/snippet}
     {#snippet right()}
-      <button type="button" class="link icon-only od-emergency--bar" aria-label={t('emergency.share.title')} onclick={() => (sharing = true)}><Icon name="share" /></button>
+      <button type="button" class="link icon-only bc-emergency--bar" aria-label={t('emergency.share.title')} onclick={() => (sharing = true)}><Icon name="share" /></button>
       <a href="/profile/emergency/content" class="link icon-only" aria-label={t('emergency.edit')}><Icon name="edit" /></a>
     {/snippet}
   </Navbar>
@@ -140,23 +140,23 @@
 
 <style>
   @layer od.components {
-    .od-emergency {
+    .bc-emergency {
       max-width: 720px;
       margin-inline: auto;
-      padding: 8px 16px calc(24px + var(--od-safe-bottom));
+      padding: 8px 16px calc(24px + var(--bc-safe-bottom));
     }
 
-    .od-emergency--hero {
+    .bc-emergency--hero {
       border-radius: 28px;
-      background: var(--od-emergency);
-      color: var(--od-on-emergency);
+      background: var(--bc-emergency);
+      color: var(--bc-on-emergency);
       padding: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-emergency--who {
+    .bc-emergency--who {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -164,31 +164,31 @@
       gap: 2px;
     }
 
-    .od-emergency--kicker {
+    .bc-emergency--kicker {
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.8px;
       opacity: 0.9;
     }
 
-    .od-emergency--name {
+    .bc-emergency--name {
       font-size: 26px;
       line-height: 32px;
       font-weight: 600;
       overflow-wrap: anywhere;
     }
 
-    .od-emergency--name-empty {
+    .bc-emergency--name-empty {
       font-size: 16px;
       line-height: 22px;
       font-weight: 500;
     }
 
-    .od-emergency--birth {
+    .bc-emergency--birth {
       font-size: 15px;
     }
 
-    .od-emergency--fill {
+    .bc-emergency--fill {
       margin-top: 8px;
       align-self: flex-start;
       color: inherit;
@@ -196,49 +196,49 @@
       text-decoration: underline;
     }
 
-    .od-emergency--blood {
+    .bc-emergency--blood {
       flex: none;
       width: 88px;
       height: 88px;
       border-radius: 24px;
-      background: var(--od-surface);
-      color: var(--od-emergency);
+      background: var(--bc-surface);
+      color: var(--bc-emergency);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
 
-    .od-emergency--blood-label {
+    .bc-emergency--blood-label {
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.4px;
     }
 
-    .od-emergency--blood-value {
+    .bc-emergency--blood-value {
       font-size: 34px;
       line-height: 40px;
       font-weight: 700;
     }
 
-    .od-emergency--card {
+    .bc-emergency--card {
       margin-top: 12px;
       border-radius: 24px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       padding: 16px;
     }
 
-    .od-emergency--title {
+    .bc-emergency--title {
       margin: 0 0 4px;
       font-size: 12px;
       line-height: 16px;
       font-weight: 700;
       letter-spacing: 0.6px;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-emergency--link {
+    .bc-emergency--link {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -247,35 +247,35 @@
       min-height: 48px;
     }
 
-    .od-emergency--texts {
+    .bc-emergency--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-emergency--card-name {
+    .bc-emergency--card-name {
       font-size: 20px;
       line-height: 26px;
       font-weight: 600;
     }
 
-    .od-emergency--line {
+    .bc-emergency--line {
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-emergency--chevron {
-      color: var(--od-text-2);
+    .bc-emergency--chevron {
+      color: var(--bc-text-2);
     }
 
-    .od-emergency--call {
+    .bc-emergency--call {
       margin-top: 12px;
       height: 48px;
       padding: 0 20px;
       border-radius: 24px;
-      background: var(--od-emergency);
-      color: var(--od-on-emergency);
+      background: var(--bc-emergency);
+      color: var(--bc-on-emergency);
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -284,32 +284,32 @@
       text-decoration: none;
     }
 
-    .od-emergency--hotline {
+    .bc-emergency--hotline {
       margin-top: 12px;
       padding-top: 12px;
-      border-top: 1px solid var(--od-outline-variant, var(--od-surface-container-high));
+      border-top: 1px solid var(--bc-outline-variant, var(--bc-surface-container-high));
       display: flex;
       flex-direction: column;
     }
 
-    .od-emergency--hotline-label {
+    .bc-emergency--hotline-label {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-emergency--hotline-number {
+    .bc-emergency--hotline-number {
       font-size: 17px;
       font-weight: 600;
-      color: var(--od-emergency);
+      color: var(--bc-emergency);
       text-decoration: none;
     }
 
-    .od-emergency--none,
-    .od-emergency--offline {
+    .bc-emergency--none,
+    .bc-emergency--offline {
       margin: 16px 8px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
   }

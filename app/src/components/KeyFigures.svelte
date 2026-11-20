@@ -26,31 +26,31 @@
 
 {#snippet content()}
   {#each items as item (item.label)}
-    <span class="od-key-figures--figure">
-      <span class="od-key-figures--label">{item.label}</span>
+    <span class="bc-key-figures--figure">
+      <span class="bc-key-figures--label">{item.label}</span>
       {#if item.value}
-        <span class="od-key-figures--value od-value">{item.value}</span>
+        <span class="bc-key-figures--value bc-value">{item.value}</span>
       {:else}
-        <span class="od-key-figures--value" aria-hidden="true">—</span><span class="od-sr-only">{t('stats.pendingValue')}</span>
+        <span class="bc-key-figures--value" aria-hidden="true">—</span><span class="bc-sr-only">{t('stats.pendingValue')}</span>
       {/if}
     </span>
   {/each}
 {/snippet}
 
 {#if href}
-  <a {href} class={['od-key-figures', 'od-key-figures--figures', onclick && 'external']} {onclick}>{@render content()}</a>
+  <a {href} class={['bc-key-figures', 'bc-key-figures--figures', onclick && 'external']} {onclick}>{@render content()}</a>
 {:else}
-  <div class="od-key-figures od-key-figures--figures">{@render content()}</div>
+  <div class="bc-key-figures bc-key-figures--figures">{@render content()}</div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-key-figures--figures {
+    .bc-key-figures--figures {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
       /* A value is never cut: when the three do not fit side by side (a
          narrow list column), the last one goes to the next line, whole. */
@@ -66,7 +66,7 @@
       }
     }
 
-    .od-key-figures--figure {
+    .bc-key-figures--figure {
       flex: 1 0 0;
       min-width: max-content;
       display: flex;
@@ -74,10 +74,10 @@
       gap: 2px;
     }
 
-    .od-key-figures--label {
+    .bc-key-figures--label {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 13px;
@@ -86,7 +86,7 @@
     }
 
     /* Highlighted value (spec, section 2): 24 px on Android, 22 px semibold on iOS. */
-    .od-key-figures--value {
+    .bc-key-figures--value {
       font-size: 24px;
       line-height: 32px;
       white-space: nowrap;

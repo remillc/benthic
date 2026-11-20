@@ -131,12 +131,12 @@
   }
 </script>
 
-<Popup opened onPopupClosed={onclose} class="od-plan-slate">
+<Popup opened onPopupClosed={onclose} class="bc-plan-slate">
   <Page>
     <Navbar title={t('slate.title')}>
       {#snippet left()}
         <Link popupClose iconOnly>
-          <Icon name="close" /><span class="od-sr-only">{t('slate.close')}</span>
+          <Icon name="close" /><span class="bc-sr-only">{t('slate.close')}</span>
         </Link>
       {/snippet}
       {#snippet right()}
@@ -144,79 +144,79 @@
       {/snippet}
     </Navbar>
 
-    <h2 class="od-plan-slate--title">{t('slate.plans')}</h2>
-    <div class="od-plan-slate--surface">
-      <div class="od-plan-slate--row" role="checkbox" aria-checked="true" aria-disabled="true">
-        <span class="od-plan-slate--check od-plan-slate--check-on od-plan-slate--check-locked" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>
-        <span class="od-plan-slate--texts"><span class="od-plan-slate--label">{t('slate.planned')}</span><span class="od-plan-slate--supporting">{t('slate.always')}</span></span>
+    <h2 class="bc-plan-slate--title">{t('slate.plans')}</h2>
+    <div class="bc-plan-slate--surface">
+      <div class="bc-plan-slate--row" role="checkbox" aria-checked="true" aria-disabled="true">
+        <span class="bc-plan-slate--check bc-plan-slate--check-on bc-plan-slate--check-locked" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>
+        <span class="bc-plan-slate--texts"><span class="bc-plan-slate--label">{t('slate.planned')}</span><span class="bc-plan-slate--supporting">{t('slate.always')}</span></span>
       </div>
       {#if deepest}
-        <button type="button" class="od-plan-slate--row" role="checkbox" aria-checked={settings.slatePlus5} onclick={() => setAppSetting('slatePlus5', !settings.slatePlus5)}>
-          <span class="od-plan-slate--check" class:od-plan-slate--check-on={settings.slatePlus5} aria-hidden="true">{#if settings.slatePlus5}<Icon name="check" size={14} weight={3} />{/if}</span>
-          <span class="od-plan-slate--texts">
-            <span class="od-plan-slate--label">{t('slate.plus5Row')}</span>
-            <span class="od-plan-slate--supporting">{t('slate.levelText', { depth: formatDepth(deepest.depthMm, prefs), time: minutesText(deepest.durationSeconds + EXTRA_BOTTOM_SECONDS) })}</span>
+        <button type="button" class="bc-plan-slate--row" role="checkbox" aria-checked={settings.slatePlus5} onclick={() => setAppSetting('slatePlus5', !settings.slatePlus5)}>
+          <span class="bc-plan-slate--check" class:bc-plan-slate--check-on={settings.slatePlus5} aria-hidden="true">{#if settings.slatePlus5}<Icon name="check" size={14} weight={3} />{/if}</span>
+          <span class="bc-plan-slate--texts">
+            <span class="bc-plan-slate--label">{t('slate.plus5Row')}</span>
+            <span class="bc-plan-slate--supporting">{t('slate.levelText', { depth: formatDepth(deepest.depthMm, prefs), time: minutesText(deepest.durationSeconds + EXTRA_BOTTOM_SECONDS) })}</span>
           </span>
         </button>
-        <button type="button" class="od-plan-slate--row" role="checkbox" aria-checked={settings.slatePlusDepth} onclick={() => setAppSetting('slatePlusDepth', !settings.slatePlusDepth)}>
-          <span class="od-plan-slate--check" class:od-plan-slate--check-on={settings.slatePlusDepth} aria-hidden="true">{#if settings.slatePlusDepth}<Icon name="check" size={14} weight={3} />{/if}</span>
-          <span class="od-plan-slate--texts">
-            <span class="od-plan-slate--label">{t('slate.plusDepthRow', { depth: formatDepth(stepMm, prefs) })}</span>
-            <span class="od-plan-slate--supporting">{t('slate.levelText', { depth: formatDepth(deepest.depthMm + stepMm, prefs), time: minutesText(deepest.durationSeconds) })}</span>
+        <button type="button" class="bc-plan-slate--row" role="checkbox" aria-checked={settings.slatePlusDepth} onclick={() => setAppSetting('slatePlusDepth', !settings.slatePlusDepth)}>
+          <span class="bc-plan-slate--check" class:bc-plan-slate--check-on={settings.slatePlusDepth} aria-hidden="true">{#if settings.slatePlusDepth}<Icon name="check" size={14} weight={3} />{/if}</span>
+          <span class="bc-plan-slate--texts">
+            <span class="bc-plan-slate--label">{t('slate.plusDepthRow', { depth: formatDepth(stepMm, prefs) })}</span>
+            <span class="bc-plan-slate--supporting">{t('slate.levelText', { depth: formatDepth(deepest.depthMm + stepMm, prefs), time: minutesText(deepest.durationSeconds) })}</span>
           </span>
         </button>
       {/if}
       {#each decoGases as cylinder (cylinder)}
         {@const on = without.includes(cylinder)}
-        <button type="button" class="od-plan-slate--row" role="checkbox" aria-checked={on} onclick={() => toggleWithout(cylinder)}>
-          <span class="od-plan-slate--check" class:od-plan-slate--check-on={on} aria-hidden="true">{#if on}<Icon name="check" size={14} weight={3} />{/if}</span>
-          <span class="od-plan-slate--texts">
-            <span class="od-plan-slate--label">{t('slate.withoutRow', { gas: gasOf(cylinder) })}</span>
-            <span class="od-plan-slate--supporting">{t('slate.withoutText')}</span>
+        <button type="button" class="bc-plan-slate--row" role="checkbox" aria-checked={on} onclick={() => toggleWithout(cylinder)}>
+          <span class="bc-plan-slate--check" class:bc-plan-slate--check-on={on} aria-hidden="true">{#if on}<Icon name="check" size={14} weight={3} />{/if}</span>
+          <span class="bc-plan-slate--texts">
+            <span class="bc-plan-slate--label">{t('slate.withoutRow', { gas: gasOf(cylinder) })}</span>
+            <span class="bc-plan-slate--supporting">{t('slate.withoutText')}</span>
           </span>
         </button>
       {/each}
     </div>
-    <p class="od-plan-slate--note">{t('slate.plansNote')}</p>
-    {#if failed}<p class="od-plan-slate--note od-plan-slate--alarm" role="status">{t('slate.unplannable')}</p>{/if}
+    <p class="bc-plan-slate--note">{t('slate.plansNote')}</p>
+    {#if failed}<p class="bc-plan-slate--note bc-plan-slate--alarm" role="status">{t('slate.unplannable')}</p>{/if}
 
-    <h2 class="od-plan-slate--title">{t('slate.print')}</h2>
-    <div class="od-plan-slate--surface">
-      <button type="button" class="od-plan-slate--row od-plan-slate--menu-row" onclick={(e) => openMenu('size', e)} aria-haspopup="listbox">
-        <span class="od-plan-slate--label od-plan-slate--grow">{t('slate.sizeLabel')}</span>
-        <span class="od-plan-slate--value">{sizeValue(size)}</span>
+    <h2 class="bc-plan-slate--title">{t('slate.print')}</h2>
+    <div class="bc-plan-slate--surface">
+      <button type="button" class="bc-plan-slate--row bc-plan-slate--menu-row" onclick={(e) => openMenu('size', e)} aria-haspopup="listbox">
+        <span class="bc-plan-slate--label bc-plan-slate--grow">{t('slate.sizeLabel')}</span>
+        <span class="bc-plan-slate--value">{sizeValue(size)}</span>
         <Icon name="expand" size={18} weight={2} />
       </button>
-      <button type="button" class="od-plan-slate--row od-plan-slate--menu-row" onclick={(e) => openMenu('file', e)} aria-haspopup="listbox">
-        <span class="od-plan-slate--label od-plan-slate--grow">{t('slate.fileLabel')}</span>
-        <span class="od-plan-slate--value">{t(`slate.files.${settings.slateFile}`)}</span>
+      <button type="button" class="bc-plan-slate--row bc-plan-slate--menu-row" onclick={(e) => openMenu('file', e)} aria-haspopup="listbox">
+        <span class="bc-plan-slate--label bc-plan-slate--grow">{t('slate.fileLabel')}</span>
+        <span class="bc-plan-slate--value">{t(`slate.files.${settings.slateFile}`)}</span>
         <Icon name="expand" size={18} weight={2} />
       </button>
     </div>
-    <p class="od-plan-slate--note">
+    <p class="bc-plan-slate--note">
       {settings.slateFile === 'pdf' ? t('slate.noteSheet', { paper: paperName }) : settings.slateFile === 'png' ? t('slate.noteImage') : t('slate.noteText')}
     </p>
 
-    <h2 class="od-plan-slate--title">{t('slate.preview')}</h2>
-    <div class="od-plan-slate--preview" aria-busy={pending}>
+    <h2 class="bc-plan-slate--title">{t('slate.preview')}</h2>
+    <div class="bc-plan-slate--preview" aria-busy={pending}>
       {#if settings.slateFile === 'text'}
-        <pre class="od-plan-slate--text" aria-label={t('slate.previewLabel')}>{slateText(card)}</pre>
+        <pre class="bc-plan-slate--text" aria-label={t('slate.previewLabel')}>{slateText(card)}</pre>
       {:else}
         <div
-          class="od-plan-slate--paper"
+          class="bc-plan-slate--paper"
           role="img"
           aria-label={t('slate.previewLabel')}
           style:width="{layout.widthMm * PX_PER_MM * scale}px"
           style:height="{layout.heightMm * PX_PER_MM * scale}px"
         >
-          <div class="od-plan-slate--card" style:transform="scale({scale})">
+          <div class="bc-plan-slate--card" style:transform="scale({scale})">
             <!-- eslint-disable-next-line svelte/no-at-html-tags -- the card's own markup, its texts escaped (slate.js) -->
             {@html cardHtml(card, layout)}
           </div>
         </div>
       {/if}
     </div>
-    <div class="od-plan-slate--bottom"></div>
+    <div class="bc-plan-slate--bottom"></div>
   </Page>
 </Popup>
 
@@ -233,23 +233,23 @@
 
 <style>
   @layer od.components {
-    .od-plan-slate--title {
+    .bc-plan-slate--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-plan-slate--surface {
+    .bc-plan-slate--surface {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-plan-slate--row {
+    .bc-plan-slate--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 72px;
@@ -258,9 +258,9 @@
       align-items: center;
       gap: 16px;
       border: none;
-      border-top: 1px solid var(--od-row-divider);
+      border-top: 1px solid var(--bc-row-divider);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
@@ -270,109 +270,109 @@
       }
     }
 
-    .od-plan-slate--menu-row {
+    .bc-plan-slate--menu-row {
       min-height: 56px;
       gap: 12px;
     }
 
-    .od-plan-slate--grow {
+    .bc-plan-slate--grow {
       flex: 1;
     }
 
-    .od-plan-slate--check {
+    .bc-plan-slate--check {
       flex: none;
       width: 18px;
       height: 18px;
       margin: 0 11px;
       box-sizing: border-box;
       border-radius: 2px;
-      border: 2px solid var(--od-text-2);
+      border: 2px solid var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-on-primary);
+      color: var(--bc-on-primary);
     }
 
-    .od-plan-slate--check-on {
+    .bc-plan-slate--check-on {
       border: none;
-      background: var(--od-primary);
+      background: var(--bc-primary);
     }
 
-    .od-plan-slate--check-locked {
-      background: var(--od-star-summary);
+    .bc-plan-slate--check-locked {
+      background: var(--bc-star-summary);
     }
 
-    .od-plan-slate--texts {
+    .bc-plan-slate--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-plan-slate--label {
+    .bc-plan-slate--label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-plan-slate--supporting {
+    .bc-plan-slate--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plan-slate--value {
+    .bc-plan-slate--value {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plan-slate--note {
+    .bc-plan-slate--note {
       margin: 8px 32px 0;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plan-slate--alarm {
-      color: var(--od-alarm);
+    .bc-plan-slate--alarm {
+      color: var(--bc-alarm);
     }
 
-    .od-plan-slate--preview {
+    .bc-plan-slate--preview {
       padding: 8px 0 24px;
       display: flex;
       justify-content: center;
     }
 
     /* The card is white on any theme, as it prints. */
-    .od-plan-slate--paper {
+    .bc-plan-slate--paper {
       overflow: hidden;
       background: #ffffff;
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
     }
 
-    .od-plan-slate--card {
+    .bc-plan-slate--card {
       transform-origin: top left;
       width: max-content;
     }
 
-    .od-plan-slate--text {
+    .bc-plan-slate--text {
       box-sizing: border-box;
       max-width: calc(100% - 32px);
       margin: 0;
       padding: 12px;
       overflow-x: auto;
       border-radius: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font: 12px/16px monospace;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-plan-slate--bottom {
+    .bc-plan-slate--bottom {
       height: calc(24px + var(--f7-safe-area-bottom, 0px));
     }
 
-    :global(.ios) .od-plan-slate--row {
+    :global(.ios) .bc-plan-slate--row {
       min-height: 56px;
     }
   }

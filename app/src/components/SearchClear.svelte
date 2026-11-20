@@ -20,13 +20,13 @@
 </script>
 
 <!-- pointerdown kept from the field: the keyboard stays open while the button is tapped. -->
-<button type="button" class="od-search-clear" onpointerdown={(e) => e.preventDefault()} onclick={clear}>
-  <Icon name="close" /><span class="od-sr-only">{t('searchField.clear')}</span>
+<button type="button" class="bc-search-clear" onpointerdown={(e) => e.preventDefault()} onclick={clear}>
+  <Icon name="close" /><span class="bc-sr-only">{t('searchField.clear')}</span>
 </button>
 
 <style>
   @layer od.components {
-    .od-search-clear {
+    .bc-search-clear {
       flex: none;
       width: 48px;
       height: 48px;
@@ -36,7 +36,7 @@
       border: none;
       border-radius: 50%;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;

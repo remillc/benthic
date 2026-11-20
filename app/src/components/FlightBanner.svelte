@@ -25,19 +25,19 @@
 </script>
 
 {#if running}
-  <button type="button" class="od-flight-banner ripple" onclick={() => handleLink(FLIGHT_LINK)}>
-    <span class="od-flight-banner--icon"><Icon name="plane" size={24} /></span>
-    <span class="od-flight-banner--text">
-      <span class="od-flight-banner--title od-value">{t('flight.banner.title', { time: formatHoursMinutes(running.remainingSeconds) })}</span>
-      <span class="od-flight-banner--when">{t('flight.banner.allowed', { when: formatDayAt(running.endsAt, now) })}</span>
+  <button type="button" class="bc-flight-banner ripple" onclick={() => handleLink(FLIGHT_LINK)}>
+    <span class="bc-flight-banner--icon"><Icon name="plane" size={24} /></span>
+    <span class="bc-flight-banner--text">
+      <span class="bc-flight-banner--title bc-value">{t('flight.banner.title', { time: formatHoursMinutes(running.remainingSeconds) })}</span>
+      <span class="bc-flight-banner--when">{t('flight.banner.allowed', { when: formatDayAt(running.endsAt, now) })}</span>
     </span>
-    <span class="od-flight-banner--chevron"><Icon name="chevron" size={20} /></span>
+    <span class="bc-flight-banner--chevron"><Icon name="chevron" size={20} /></span>
   </button>
 {/if}
 
 <style>
   @layer od.components {
-    .od-flight-banner {
+    .bc-flight-banner {
       position: relative;
       overflow: hidden;
       width: calc(100% - 32px);
@@ -47,8 +47,8 @@
       box-sizing: border-box;
       border: none;
       border-radius: 16px;
-      background: var(--od-tertiary-container);
-      color: var(--od-on-tertiary-container);
+      background: var(--bc-tertiary-container);
+      color: var(--bc-on-tertiary-container);
       font: inherit;
       text-align: start;
       display: flex;
@@ -56,31 +56,31 @@
       gap: 12px;
     }
 
-    .od-flight-banner--icon {
+    .bc-flight-banner--icon {
       flex: none;
       display: flex;
-      color: var(--od-tertiary);
+      color: var(--bc-tertiary);
     }
 
-    .od-flight-banner--text {
+    .bc-flight-banner--text {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-flight-banner--title {
+    .bc-flight-banner--title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-flight-banner--when {
+    .bc-flight-banner--when {
       font-size: 13px;
       line-height: 18px;
     }
 
-    .od-flight-banner--chevron {
+    .bc-flight-banner--chevron {
       flex: none;
       display: flex;
     }

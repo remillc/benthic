@@ -20,19 +20,19 @@
   });
 </script>
 
-<span class="od-desktop-stat-preview" aria-hidden="true">
+<span class="bc-desktop-stat-preview" aria-hidden="true">
   {#if preview}
     <svg width="56" height="24" viewBox="0 0 56 24">
       {#if preview.type === 'bars'}
         {#each bars as b, i (i)}
-          <rect class="od-desktop-stat-preview--bar" x={b.x} y={b.y} width={b.width} height={b.height} rx="1.5" />
+          <rect class="bc-desktop-stat-preview--bar" x={b.x} y={b.y} width={b.width} height={b.height} rx="1.5" />
         {/each}
       {:else if preview.type === 'line'}
-        <polyline class="od-desktop-stat-preview--line" points={linePoints(preview.values, downward)} />
+        <polyline class="bc-desktop-stat-preview--line" points={linePoints(preview.values, downward)} />
       {:else}
         {#each preview.levels as level, i (i)}
           <rect
-            class="od-desktop-stat-preview--cell od-desktop-stat-preview--level-{level}"
+            class="bc-desktop-stat-preview--cell bc-desktop-stat-preview--level-{level}"
             x={(i % 4) * 14}
             y={i < 4 ? 0 : 13}
             width="12"
@@ -48,51 +48,51 @@
 <style>
   @layer od.components {
     /* The slot keeps its size when there is no preview, so the titles do not move. */
-    .od-desktop-stat-preview {
+    .bc-desktop-stat-preview {
       flex: none;
       width: 56px;
       height: 24px;
       display: block;
     }
 
-    .od-desktop-stat-preview svg {
+    .bc-desktop-stat-preview svg {
       display: block;
     }
 
-    .od-desktop-stat-preview--bar {
-      fill: var(--od-desk-stats-preview);
+    .bc-desktop-stat-preview--bar {
+      fill: var(--bc-desk-stats-preview);
     }
 
-    .od-desktop-stat-preview--line {
+    .bc-desktop-stat-preview--line {
       fill: none;
-      stroke: var(--od-desk-stats-preview);
+      stroke: var(--bc-desk-stats-preview);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    .od-desktop-stat-preview--level-0 {
-      fill: var(--od-desk-stats-heat-0);
+    .bc-desktop-stat-preview--level-0 {
+      fill: var(--bc-desk-stats-heat-0);
     }
-    .od-desktop-stat-preview--level-1 {
-      fill: var(--od-desk-stats-heat-1);
+    .bc-desktop-stat-preview--level-1 {
+      fill: var(--bc-desk-stats-heat-1);
     }
-    .od-desktop-stat-preview--level-2 {
-      fill: var(--od-desk-stats-heat-2);
+    .bc-desktop-stat-preview--level-2 {
+      fill: var(--bc-desk-stats-heat-2);
     }
-    .od-desktop-stat-preview--level-3 {
-      fill: var(--od-desk-stats-heat-3);
+    .bc-desktop-stat-preview--level-3 {
+      fill: var(--bc-desk-stats-heat-3);
     }
-    .od-desktop-stat-preview--level-4 {
-      fill: var(--od-desk-stats-heat-4);
+    .bc-desktop-stat-preview--level-4 {
+      fill: var(--bc-desk-stats-heat-4);
     }
 
     /* On the chosen row: the ink of the selection. */
-    :global(.od-desktop-statistics--item-selected) .od-desktop-stat-preview--bar {
-      fill: var(--od-on-table-selected);
+    :global(.bc-desktop-statistics--item-selected) .bc-desktop-stat-preview--bar {
+      fill: var(--bc-on-table-selected);
     }
-    :global(.od-desktop-statistics--item-selected) .od-desktop-stat-preview--line {
-      stroke: var(--od-on-table-selected);
+    :global(.bc-desktop-statistics--item-selected) .bc-desktop-stat-preview--line {
+      stroke: var(--bc-on-table-selected);
     }
   }
 </style>

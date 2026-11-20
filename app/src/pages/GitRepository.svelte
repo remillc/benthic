@@ -81,7 +81,7 @@
     if (panelled) {
       help = which;
       // The keyboard goes with the diver to « Retour ».
-      tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector('.od-git-repository .od-editorial-page--retour'))?.focus());
+      tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector('.bc-git-repository .bc-editorial-page--retour'))?.focus());
       return;
     }
     f7router.navigate(`${welcome ? '/welcome' : '/account'}/git/${which === 'token' ? 'token' : 'repository'}`);
@@ -91,7 +91,7 @@
   function closeHelp() {
     const which = help;
     help = null;
-    tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-git-repository .od-git-form--link-${which}`))?.focus());
+    tick().then(() => /** @type {HTMLElement|null} */ (document.querySelector(`.bc-git-repository .bc-git-form--link-${which}`))?.focus());
   }
 
   onMount(form.load);
@@ -100,7 +100,7 @@
 </script>
 
 {#if phone && welcome}
-  <EditorialPage class="od-git-repository"
+  <EditorialPage class="bc-git-repository"
     firstLaunch
     helpLink
     title={heading}
@@ -113,7 +113,7 @@
     <GitForm {form} onhelp={openHelp} />
   </EditorialPage>
 {:else if panelled}
-  <EditorialPage class="od-git-repository"
+  <EditorialPage class="bc-git-repository"
     firstLaunch
     helpLink={!help}
     title={heading}
@@ -133,17 +133,17 @@
     {/if}
   </EditorialPage>
 {:else if phone}
-  <Page class="od-git-repository od-git-repository--compte">
+  <Page class="bc-git-repository bc-git-repository--compte">
     <Navbar title={heading}>
       {#snippet left()}
         <Link back iconOnly>
           <i class="icon icon-back"></i>
-          <span class="od-sr-only">{t('detail.back')}</span>
+          <span class="bc-sr-only">{t('detail.back')}</span>
         </Link>
       {/snippet}
     </Navbar>
     <form
-      class="od-git-repository--compte-body"
+      class="bc-git-repository--compte-body"
       novalidate
       onsubmit={(e) => {
         e.preventDefault();
@@ -154,7 +154,7 @@
     </form>
   </Page>
 {:else}
-<EditorialPage class="od-git-repository"
+<EditorialPage class="bc-git-repository"
   helpLink={welcome}
   title={t('gitRepo.title')}
   heading={t('gitRepo.heading')}
@@ -175,11 +175,11 @@
     onchange={form.checkAddress}
   />
   {#if form.addressState === 'checking'}
-    <p class="od-git-repository--status">{t('gitRepo.addressChecking')}</p>
+    <p class="bc-git-repository--status">{t('gitRepo.addressChecking')}</p>
   {:else if form.addressState === 'public' || form.addressState === 'publicEmpty'}
-    <p class="od-git-repository--status od-git-repository--ok"><Icon name="check" size={16} />{t(form.addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
+    <p class="bc-git-repository--status bc-git-repository--ok"><Icon name="check" size={16} />{t(form.addressState === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
   {:else if form.addressState === 'private'}
-    <p class="od-git-repository--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
+    <p class="bc-git-repository--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
   {/if}
 
   <AccountField
@@ -204,7 +204,7 @@
     position="last"
     onchange={form.checkAccess}
   />
-  <a href="/git/token" class="od-git-repository--help" onclick={(e) => openHelp('token', e)}>{t('gitRepo.tokenHow')}</a>
+  <a href="/git/token" class="bc-git-repository--help" onclick={(e) => openHelp('token', e)}>{t('gitRepo.tokenHow')}</a>
 
   <SelectField
     label={t('gitRepo.branch')}
@@ -214,37 +214,37 @@
     disabled={form.accessState !== 'ok' || form.busy}
   />
 
-  {#if form.formError}<p class="od-git-repository--form-error" role="alert"><Icon name="error" size={18} />{form.formError}</p>{/if}
+  {#if form.formError}<p class="bc-git-repository--form-error" role="alert"><Icon name="error" size={18} />{form.formError}</p>{/if}
 
-  <p class="od-git-repository--note">{t('gitRepo.note')}</p>
+  <p class="bc-git-repository--note">{t('gitRepo.note')}</p>
 </EditorialPage>
 {/if}
 
 <style>
   @layer od.components {
     /* Android phone, first launch: the sentence under the title is the form's (8 dp under it). */
-    :global(.od-git-repository .od-editorial-page--band-body .od-editorial-page--title) {
+    :global(.bc-git-repository .bc-editorial-page--band-body .bc-editorial-page--title) {
       margin-bottom: 0;
     }
 
     /* Android phone, Compte: under the app bar, the same 16 dp sides as the first launch. */
-    .od-git-repository--compte-body {
+    .bc-git-repository--compte-body {
       padding: 8px 16px calc(var(--f7-safe-area-bottom) + 24px);
     }
 
-    .od-git-repository--status {
+    .bc-git-repository--status {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       gap: 6px;
 
       /* The one green of the theme (the check mark of a found repository). */
-      &.od-git-repository--ok :global(svg) {
-        color: var(--od-oxygen);
+      &.bc-git-repository--ok :global(svg) {
+        color: var(--bc-oxygen);
       }
 
       :global(.ios) & {
@@ -252,13 +252,13 @@
       }
     }
 
-    .od-git-repository--help {
+    .bc-git-repository--help {
       margin: 8px 0 0;
       padding: 8px 16px;
       display: inline-block;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: underline;
 
       :global(.ios) & {
@@ -267,11 +267,11 @@
       }
     }
 
-    .od-git-repository--form-error {
+    .bc-git-repository--form-error {
       margin: 16px 16px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       display: flex;
       align-items: flex-start;
       gap: 8px;
@@ -282,11 +282,11 @@
     }
 
     /* The note: plain text, no background. */
-    .od-git-repository--note {
+    .bc-git-repository--note {
       margin: 16px 16px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         margin: 24px 24px 0;

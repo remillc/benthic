@@ -30,17 +30,17 @@
 
 {#snippet body()}
 
-  <div class="od-maintenance-page--figures">
+  <div class="bc-maintenance-page--figures">
     {#each figures as key (key)}
-      <span class="od-maintenance-page--figure od-maintenance-page--figure-{key}">
-        <span class="od-maintenance-page--value">{sections.counts[key]}</span>
-        <span class="od-maintenance-page--legend">{t(`maintenance.figures.${key}`)}</span>
+      <span class="bc-maintenance-page--figure bc-maintenance-page--figure-{key}">
+        <span class="bc-maintenance-page--value">{sections.counts[key]}</span>
+        <span class="bc-maintenance-page--legend">{t(`maintenance.figures.${key}`)}</span>
       </span>
     {/each}
   </div>
 
   {#if empty}
-    <div class="od-maintenance-page--empty">
+    <div class="bc-maintenance-page--empty">
       <h2>{t('maintenance.emptyTitle')}</h2>
       <p>{t('maintenance.emptyText')}</p>
     </div>
@@ -48,18 +48,18 @@
 
   {#each figures as key (key)}
     {#if sections[key].length}
-      <h2 class="od-maintenance-page--title">{t(`maintenance.sections.${key}`)}</h2>
-      <div class="od-maintenance-page--list">
+      <h2 class="bc-maintenance-page--title">{t(`maintenance.sections.${key}`)}</h2>
+      <div class="bc-maintenance-page--list">
         {#each sections[key] as e (e.item.id)}
           {@const p = piece(e)}
           {#if p}
-            <a href={open(p.id)} class="od-maintenance-page--row">
-              <span class="od-maintenance-page--tile"><GearIcon type={p.type} name={p.name} size={22} piece={p} tile={40} /></span>
-              <span class="od-maintenance-page--texts">
-                <span class="od-maintenance-page--name">{p.name} · {taskInline(e.item)}</span>
-                <span class="od-maintenance-page--line">{lineText(e, formatDate)}</span>
+            <a href={open(p.id)} class="bc-maintenance-page--row">
+              <span class="bc-maintenance-page--tile"><GearIcon type={p.type} name={p.name} size={22} piece={p} tile={40} /></span>
+              <span class="bc-maintenance-page--texts">
+                <span class="bc-maintenance-page--name">{p.name} · {taskInline(e.item)}</span>
+                <span class="bc-maintenance-page--line">{lineText(e, formatDate)}</span>
               </span>
-              <span class="od-maintenance-page--tag od-maintenance-page--tag-{key}">{tagText(e)}</span>
+              <span class="bc-maintenance-page--tag bc-maintenance-page--tag-{key}">{tagText(e)}</span>
             </a>
           {/if}
         {/each}
@@ -67,11 +67,11 @@
     {/if}
   {/each}
 
-  <p class="od-maintenance-page--note"><Icon name="info" size={18} /><span>{t('maintenance.listNote')}</span></p>
-  <div class="od-maintenance-page--bottom"></div>
+  <p class="bc-maintenance-page--note"><Icon name="info" size={18} /><span>{t('maintenance.listNote')}</span></p>
+  <div class="bc-maintenance-page--bottom"></div>
 {/snippet}
 
-<Page class="od-maintenance-page" onPageBeforeIn={loadInventory}>
+<Page class="bc-maintenance-page" onPageBeforeIn={loadInventory}>
   <Navbar title={t('maintenance.title')}>
     {#snippet left()}
       <BackLink label={t('gear.profile.equipment')} name={t('maintenance.back')} />
@@ -87,68 +87,68 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-maintenance-page .page-content) {
+    :global(.bc-maintenance-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-maintenance-page--figures {
+    .bc-maintenance-page--figures {
       margin: 8px 16px 0;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    .od-maintenance-page--figure {
+    .bc-maintenance-page--figure {
       padding: 12px 8px;
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-maintenance-page--value {
+    .bc-maintenance-page--value {
       font-size: 28px;
       line-height: 32px;
       font-weight: 600;
     }
 
-    .od-maintenance-page--figure-overdue .od-maintenance-page--value {
-      color: var(--od-alarm);
+    .bc-maintenance-page--figure-overdue .bc-maintenance-page--value {
+      color: var(--bc-alarm);
     }
 
-    .od-maintenance-page--legend {
+    .bc-maintenance-page--legend {
       font-size: 13px;
       line-height: 18px;
       text-align: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-page--title {
+    .bc-maintenance-page--title {
       margin: 20px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
     }
 
-    .od-maintenance-page--list {
+    .bc-maintenance-page--list {
       margin: 0 16px;
       border-radius: 20px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-maintenance-page--row {
+    .bc-maintenance-page--row {
       min-height: 64px;
       padding: 8px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-maintenance-page--tile {
+    .bc-maintenance-page--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -156,28 +156,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
+      background: var(--bc-release-tile);
     }
 
-    .od-maintenance-page--texts {
+    .bc-maintenance-page--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-maintenance-page--name {
+    .bc-maintenance-page--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-maintenance-page--line {
+    .bc-maintenance-page--line {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-page--tag {
+    .bc-maintenance-page--tag {
       flex: none;
       max-width: 40%;
       padding: 2px 10px;
@@ -186,15 +186,15 @@
       line-height: 20px;
       font-weight: 500;
       text-align: center;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-maintenance-page--tag-overdue {
-      background: var(--od-alarm-tint);
-      color: var(--od-alarm);
+    .bc-maintenance-page--tag-overdue {
+      background: var(--bc-alarm-tint);
+      color: var(--bc-alarm);
     }
 
-    .od-maintenance-page--empty {
+    .bc-maintenance-page--empty {
       margin: 32px 24px 0;
 
       h2 {
@@ -207,20 +207,20 @@
       p {
         margin: 4px 0 0;
         font-size: 14px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-maintenance-page--note {
+    .bc-maintenance-page--note {
       margin: 16px 20px 0;
       display: flex;
       gap: 8px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-page--bottom {
+    .bc-maintenance-page--bottom {
       height: 48px;
     }
   }

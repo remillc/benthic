@@ -16,23 +16,23 @@
   const options = $derived(languageOptions(settings.language, deviceLanguage, t('desktopLanguage.system')));
 </script>
 
-<span class="od-desktop-language--divider" aria-hidden="true"></span>
+<span class="bc-desktop-language--divider" aria-hidden="true"></span>
 <button
   type="button"
-  class="od-desktop-language"
-  class:od-desktop-language--open={open}
+  class="bc-desktop-language"
+  class:bc-desktop-language--open={open}
   aria-haspopup="listbox"
   aria-expanded={open}
   aria-label={t('desktopLanguage.button', { language: name })}
   bind:this={button}
   onclick={() => (open = true)}
 >
-  <svg class="od-desktop-language--globe" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+  <svg class="bc-desktop-language--globe" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
     <circle cx="12" cy="12" r="9"></circle>
     <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"></path>
   </svg>
   {name}
-  <svg class="od-desktop-language--chevron" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
+  <svg class="bc-desktop-language--chevron" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"></path></svg>
 </button>
 
 {#if open && button}
@@ -50,14 +50,14 @@
 
 <style>
   @layer od.components {
-    .od-desktop-language--divider {
+    .bc-desktop-language--divider {
       flex: none;
       width: 1px;
       height: 20px;
-      background: var(--od-language-divider);
+      background: var(--bc-language-divider);
     }
 
-    .od-desktop-language {
+    .bc-desktop-language {
       flex: none;
       width: auto; /* a global rule gives every button 100 % */
       height: 32px;
@@ -71,7 +71,7 @@
       font: inherit;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       cursor: pointer;
 
@@ -81,12 +81,12 @@
         max-width: none;
       }
 
-      .od-desktop-language--globe {
+      .bc-desktop-language--globe {
         width: 18px;
         height: 18px;
       }
 
-      .od-desktop-language--chevron {
+      .bc-desktop-language--chevron {
         width: 16px;
         height: 16px;
       }
@@ -100,20 +100,20 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-text-2);
+        outline: 2px solid var(--bc-text-2);
         outline-offset: 2px;
       }
 
       @media (hover: hover) {
         &:hover {
-          background: color-mix(in srgb, var(--od-text-2) 10%, transparent);
+          background: color-mix(in srgb, var(--bc-text-2) 10%, transparent);
         }
       }
 
       /* While the menu is open: the selected tint. */
-      &.od-desktop-language--open,
-      &:global(.od-row-menu--anchored) {
-        background: var(--od-surface-container-highest) !important;
+      &.bc-desktop-language--open,
+      &:global(.bc-row-menu--anchored) {
+        background: var(--bc-surface-container-highest) !important;
         border-radius: 16px !important;
       }
     }
