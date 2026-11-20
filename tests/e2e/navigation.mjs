@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -970,6 +970,102 @@ async function tabletFlows() {
   tab.ws.close();
 }
 
+async function settingsComputersFlows(expect) {
+  for (const [label, width, height, mobile, desktop, theme] of [
+    ['Android phone', 390, 844, true, false, 'md'],
+    ['Android tablet', 1280, 800, false, false, 'md'],
+    ['iPad', 1280, 800, false, false, 'ios'],
+    ['desktop', 1400, 900, false, true, 'md'],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/settings/'));
+    await sleep(1200);
+    if (!desktop) {
+      await tab.run(() => {
+        const row = document.querySelector('.bc-settings--overview-row[href="/settings/download"]');
+        if (!row) throw new Error('download settings row missing');
+        row.click();
+      });
+      await sleep(1000);
+      await tab.run(async () => {
+        const { t } = await import('/src/lib/i18n.js');
+        const row = [...document.querySelectorAll('.bc-settings--row')].find((el) => el.querySelector('.bc-settings--label')?.textContent === t('settings.logbookComputers.title'));
+        if (!row) throw new Error('logbook computers row missing');
+        row.click();
+      });
+    } else {
+      await tab.run(() => { document.querySelector('.view.tab-active').f7View.router.navigate('/settings/computers/'); });
+    }
+    await sleep(1200);
+    const state = await tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const view = document.querySelector('.view.tab-active');
+      const page = view.querySelector('.page-current.bc-logbook-computers');
+      return {
+        route: view.f7View.router.currentRoute.url,
+        page: !!page,
+        title: !!page && page.textContent.includes(t('settings.logbookComputers.title')),
+        content: !!page?.querySelector('.bc-logbook-computers--intro'),
+        matched: view.f7View.router.currentRoute.route.path,
+        visibleText: view.querySelector('.page-current')?.textContent?.trim().slice(0, 100),
+      };
+    });
+    expect(`${label}: logbook computers opens its page`, { route: '/settings/computers/', page: true, title: true, content: true }, state);
+    await tab.run(() => {
+      const row = document.querySelector('.page-current.bc-logbook-computers .bc-logbook-computers--row');
+      if (!row) throw new Error('sample computer missing');
+      row.click();
+    });
+    await sleep(900);
+    const edit = await tab.run(() => {
+      const view = document.querySelector('.view.tab-active');
+      return { path: view.f7View.router.currentRoute.path, page: !!view.querySelector('.page-current.bc-logbook-computer') };
+    });
+    expect(`${label}: a computer opens its edit page`, { path: '/settings/computers/edit', page: true }, edit);
+    await tab.run(() => { document.querySelector('.view.tab-active').f7View.router.back(); });
+    await sleep(900);
+    expect(`${label}: Back returns to the computers list`, { page: true }, { page: await tab.run(() => !!document.querySelector('.view.tab-active .page-current.bc-logbook-computers')) });
+    await tab.run(() => { document.querySelector('.view.tab-active').f7View.router.back(); });
+    await sleep(900);
+    const back = await tab.run(() => {
+      const view = document.querySelector('.view.tab-active');
+      return { route: view.f7View.router.currentRoute.url, computers: !!view.querySelector('.page-current.bc-logbook-computers') };
+    });
+    expect(`${label}: Back leaves logbook computers`, desktop ? { computers: false } : { route: '/settings/download', computers: false }, back);
+
+    if (!mobile && !desktop) {
+      for (const section of ['display', 'language', 'units', 'notifications', 'logbook', 'equipment', 'decompression', 'gases', 'tools', 'download', 'privacy', 'advanced']) {
+        await tab.run((section) => { document.querySelector('#view-account').f7View.router.navigate(`/settings/${section}`, { reloadDetail: true }); }, section);
+        await sleep(500);
+        const detail = await tab.run(() => {
+          const view = document.querySelector('#view-account');
+          const route = view.f7View.router.currentRoute;
+          const page = view.querySelector('.page-current.bc-settings');
+          return { section: route.params.section, detail: !!route.route.masterRoute, content: !!page?.querySelector('.bc-settings--surface, .bc-settings--segmented, .bc-settings--warning') };
+        });
+        expect(`${label}: ${section} remains a settings detail`, { section, detail: true, content: true }, detail);
+      }
+      for (const [path, selector] of [
+        ['/settings/maps/', '.bc-settings-maps'],
+        ['/settings/cylinders/', '.bc-cylinder-types'],
+        ['/settings/bailout', '.bc-settings-bailout'],
+        ['/settings/planner', '.bc-planner-settings'],
+      ]) {
+        await tab.run((path) => { document.querySelector('#view-account').f7View.router.navigate(path); }, path);
+        await sleep(900);
+        const page = await tab.run((selector) => {
+          const view = document.querySelector('#view-account');
+          return { route: view.f7View.router.currentRoute.url, shown: !!view.querySelector(`.page-current${selector}`) };
+        }, selector);
+        expect(`${label}: ${path} opens its own page`, { route: path, shown: true }, page);
+        await tab.run(() => { document.querySelector('#view-account').f7View.router.back(); });
+        await sleep(700);
+      }
+    }
+    tab.ws.close();
+  }
+}
+
 /** Pages opened over a section (the profile, an equipment piece) must have room in the desktop layout, with Settings opened before. */
 async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
@@ -1577,7 +1673,7 @@ async function gearTypeDialogFlows(expect) {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1595,6 +1691,7 @@ try {
   if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
+  if (args.has('--settings-computers-only') || fixed) await settingsComputersFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();
