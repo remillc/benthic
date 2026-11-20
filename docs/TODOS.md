@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 119
+Next number: 121
 
 ## List
 
@@ -50,3 +50,5 @@ Next number: 119
 - #115 [code] sur tablette et desktop, sur /profile, réduire la largeur du bouton "+ Ajouter une pièce" à son contenu et aligner à droite.
 - #117 [code] renommer les variables css "--od-..." par "--btc-...": On remplace le préfix "od" pour OpenDives pour "btc" pour Benthic ainsi que les classes css.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
+- #119 [code] /profile/info/, rendre editable in place, retirer la route /edit.
+- #120 [code] /profile/info, retirer le bouton Autoriser.
