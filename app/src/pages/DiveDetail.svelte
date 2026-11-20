@@ -393,7 +393,6 @@
   // svelte-ignore state_referenced_locally
   let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (readyDive(Number(f7route.params.id))));
   let failed = $state(false);
-  let awaitingLogbook = $state(false);
   const prefs = $derived(logbook.prefs);
 
   // After an edit or an undo of this dive, show the result at once.
@@ -411,20 +410,6 @@
       dive = await readDive(id);
     } catch (e) {
       console.error('Dive detail', e);
-      const code = String(/** @type {any} */ (e)?.message ?? e);
-      if (code.includes('Dive not found') && logbook.loading) {
-        awaitingLogbook = true;
-        return;
-      }
-      if (code.includes('Dive not found')) {
-        forgetDive(id);
-        if (layout.split && !f7route.params.trip) {
-          f7router.navigate('/pane/empty', { reloadDetail: true, animate: false });
-        } else {
-          f7router.navigate('/', { animate: false });
-        }
-        return;
-      }
       failed = true;
       return;
     }
@@ -435,11 +420,6 @@
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
 
-  $effect(() => {
-    if (!awaitingLogbook || logbook.loading) return;
-    awaitingLogbook = false;
-    void loadDive();
-  });
   /** « Réessayer » on the error state: reads the dive again. */
   function retry() {
     failed = false;

@@ -709,6 +709,7 @@ export class OpenDivesCoreDesktop extends WebPlugin {
    */
   async deviceLog(options) {
     const exists = await this.core('logExists', { repo: this.repo });
+    if (options?.action === 'exists') return { exists };
     if (options?.action === 'count') return { count: exists ? await this.core('countDives', { log: this.repo }) : 0 };
     if (options?.action === 'import') {
       if (!exists) throw reject('NO_DIVES');

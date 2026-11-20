@@ -57,6 +57,12 @@ test('the demo is never opened on top of a logbook of the diver\'s own', async (
   assert.equal(await demoAvailable({ deviceLogExists: async () => { throw new Error('x'); } }), false);
 });
 
+test('checking for a demo does not load a different logbook into the core', () => {
+  const demo = src('lib/demo.svelte.js');
+  assert.match(demo, /OpenDivesCore\.deviceLog\(\{ action: 'exists' \}\)/);
+  assert.doesNotMatch(demo, /OpenDivesCore\.listDives\(/);
+});
+
 test('a start that fails leaves nothing: the flag goes, the sample is erased, the first step is back', async () => {
   const state = createDemoState();
   const d = deps({ start: async () => { throw new Error('LOAD'); } });

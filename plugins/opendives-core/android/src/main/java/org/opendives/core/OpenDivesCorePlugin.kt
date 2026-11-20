@@ -1566,6 +1566,7 @@ class OpenDivesCorePlugin : Plugin() {
     fun deviceLog(call: PluginCall) = onCoreThread(call) {
         val exists = NativeCore.logExists(repo)
         when (call.getString("action")) {
+            "exists" -> call.resolve(JSObject().put("exists", exists))
             "count" -> call.resolve(JSObject().put("count", if (exists) NativeCore.countDives(repo) else 0))
             "import" -> {
                 if (!exists) {

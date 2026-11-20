@@ -327,10 +327,13 @@ test('divelogsDownload: the file is kept only when dives came, and deleted on fa
 
 test('deviceLog counts or imports the log of this device', async () => {
   install({ logExists: true, countDives: 7, importDives: '{}' });
+  assert.deepEqual(await plugin.deviceLog({ action: 'exists' }), { exists: true });
+  assert.equal(lastCall().method, 'logExists');
   assert.deepEqual(await plugin.deviceLog({ action: 'count' }), { count: 7 });
   await plugin.deviceLog({ action: 'import' });
   assert.deepEqual(lastCall().args, { file: '/data/OpenDives/carnet[main]', source: 'this device' });
   install({ logExists: false });
+  assert.deepEqual(await plugin.deviceLog({ action: 'exists' }), { exists: false });
   assert.deepEqual(await plugin.deviceLog({ action: 'count' }), { count: 0 });
   assert.equal((await rejection(plugin.deviceLog({ action: 'import' }))).code, 'NO_DIVES');
   assert.equal((await rejection(plugin.deviceLog({ action: 'x' }))).code, 'BAD_REQUEST');

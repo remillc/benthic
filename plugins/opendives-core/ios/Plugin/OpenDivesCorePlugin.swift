@@ -675,6 +675,8 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         onCoreThread(call) { [self] in
             let exists = OpenDivesNative.logExists(repo)
             switch action {
+            case "exists":
+                call.resolve(["exists": exists])
             case "count":
                 let count = exists ? try OpenDivesNative.countDives(repo).intValue : 0
                 call.resolve(["count": count])

@@ -23,7 +23,7 @@ function remember(on) {
   }
 }
 
-const deviceLogExists = async () => (await OpenDivesCore.listDives()).exists;
+const deviceLogExists = async () => (await OpenDivesCore.deviceLog({ action: 'exists' })).exists;
 
 /** The first launch's link is shown only on a device without a logbook. @returns {Promise<boolean>} */
 export function canTryDemo() {

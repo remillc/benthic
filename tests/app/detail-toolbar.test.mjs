@@ -34,12 +34,3 @@ test('checked dives on a tablet move detail actions to the top menu and add bulk
   assert.match(logbook, /logbook\.checkedDiveIds = checkedIds/);
   for (const l of ['fr', 'en']) assert.ok(lang(l).detail.deleteSelected);
 });
-
-test('a stale dive route recovers to the empty pane or the Logbook', () => {
-  assert.match(src, /if \(code\.includes\('Dive not found'\) && logbook\.loading\)/);
-  assert.match(src, /awaitingLogbook = true/);
-  assert.match(src, /if \(!awaitingLogbook \|\| logbook\.loading\) return/);
-  assert.match(src, /code\.includes\('Dive not found'\)/);
-  assert.match(src, /f7router\.navigate\('\/pane\/empty', \{ reloadDetail: true, animate: false \}\)/);
-  assert.match(src, /f7router\.navigate\('\/', \{ animate: false \}\)/);
-});

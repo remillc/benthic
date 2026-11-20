@@ -704,8 +704,9 @@ export { waterTypeOf };
  *   turned off or signed out on the iPhone) or BAD_REQUEST (empty name). Only the iOS side has an implementation;
  *   the JavaScript calls it on an iPhone only.
  * @property {(options: {source: 'empty'|'import'|'device', path?: string}) => Promise<CloudDives & {imported: number}>} createLog
- * @property {(options: {action: 'count'|'import'}) => Promise<any>} deviceLog
- *   The dives logged on this device without an account: "count" ({count}),
+ * @property {(options: {action: 'exists'|'count'|'import'}) => Promise<any>} deviceLog
+ *   The dives logged on this device without an account: "exists" ({exists}) checks for a logbook without loading it,
+ *   "count" ({count}),
  *   read apart; "import" adds them to the account's log, one undoable step (EditResult).
  *   First logbook of the new account (the only step that writes to it), then its
  *   credentials are stored. "import": the downloaded file, deleted afterwards.
@@ -1065,6 +1066,7 @@ export const OpenDivesCore = {
   },
   async deviceLog(options) {
     const result = await native.deviceLog(options);
+    if (options.action === 'exists') return { exists: result.exists };
     return options.action === 'count' ? { count: result.count } : JSON.parse(result.json);
   },
   async deleteAccount(options) {
