@@ -2721,7 +2721,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Backup and restore: the dives deleted before the account was created, and the earlier versions of the logbook, are listed and can be restored. A failed search for deleted dives now says so, with a Try again button. Each deleted dive shows its date and time, depth, duration, mode, computer and site.",
+      "Backup and restore: the dives deleted before the account was created, and the earlier versions of the logbook, are listed and can be restored. A failed search for deleted dives now says so, with a Try again button. Each deleted dive shows its date and time, depth, duration, mode, computer and site. Scrollable lists show their scrollbars.",
       "Information: the date of birth, relationship and phone fields are narrower.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",

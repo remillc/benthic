@@ -337,6 +337,29 @@
     overflow-y: auto;
   }
 
+  .bc-backup-panes--list .bc-backup-main--versions,
+  .bc-backup-panes--list .bc-backup-main--only,
+  .bc-backup-panes--detail {
+    scrollbar-color: color-mix(in srgb, var(--bc-text) 45%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar,
+  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar,
+  .bc-backup-panes--detail::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar-thumb,
+  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar-thumb,
+  .bc-backup-panes--detail::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bc-text) 45%, transparent);
+    background-clip: padding-box;
+  }
+
   .bc-backup-panes--empty {
     height: 100%;
     display: flex;

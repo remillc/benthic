@@ -24,6 +24,18 @@ test('scrollbars: thin in the desktop app, never on the page itself', () => {
   assert.match(css, /html\.bc-desktop-app body \{\s*scrollbar-width: none;/);
 });
 
+test('backup panes show a scrollbar in each scrollable section', () => {
+  const css = read('app/src/components/backup.css');
+  for (const selector of [
+    '.bc-backup-main--versions',
+    '.bc-backup-main--only',
+    '.bc-backup-panes--detail',
+  ]) {
+    assert.ok(css.includes(`${selector}::-webkit-scrollbar`), selector);
+  }
+  assert.match(css, /scrollbar-color: color-mix/);
+});
+
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {
   assert.match(read('app/src/pages/DesktopTools.svelte'), /container: od-tool \/ inline-size/);
   for (const file of ['DesktopBestMix', 'DesktopBlender', 'DesktopEadMod', 'DesktopPlanner']) {
