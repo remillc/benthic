@@ -1365,7 +1365,7 @@ async function gearAddFlows(expect) {
       const rect = circle?.getBoundingClientRect();
       return { circle: rect ? Math.round(rect.width) : 0, target: target ? Math.round(target.width) : 0, inRail: !!rect && !!rail && rect.left >= rail.left && rect.right <= rail.right };
     });
-    expect(`${label}: the account button of the rail is 48 dp in a 64 dp target`, { circle: 48, target: 64, inRail: true }, avatar);
+    expect(`${label}: the account button of the rail is 56 dp in a 72 dp target`, { circle: 56, target: 72, inRail: true }, avatar);
     await tab.run(() => document.querySelector('.page-current .bc-gear-list--add').click());
     await sleep(1000);
     expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.bc-piece-edit')) });

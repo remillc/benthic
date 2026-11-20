@@ -10,7 +10,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { bottomNav, layout, ios } from '../lib/layout.svelte.js';
 
-  /** rail: at the bottom of the Android tablet rail (task 2026-11-14-126), a 48 dp circle. */
+  /** rail: at the bottom of the Android tablet rail (task 2026-11-14-126), a 56 dp circle. */
   let { rail = false } = $props();
   const shown = $derived(rail ? layout.rail && !ios : bottomNav());
   import { updatesCount } from '../lib/offline-maps.svelte.js';
@@ -39,7 +39,7 @@
 {#if shown}
   <button type="button" class="bc-account-avatar" class:bc-account-avatar--rail={rail} class:bc-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
     <span class="bc-account-avatar--circle">
-      {#if initial}{initial}{:else}<Icon name="account" size={rail ? 26 : 20} weight={2} />{/if}
+      {#if initial}{initial}{:else}<Icon name="account" size={rail ? 32 : 20} weight={2} />{/if}
     </span>
     {#if badge}<span class="bc-account-avatar--badge bc-account-avatar--{badge}" aria-hidden="true"></span>{/if}
   </button>
@@ -76,24 +76,24 @@
       font-weight: 600;
     }
 
-    /* The rail (Android tablet and desktop): a 48 dp circle in the secondary colour, in a 64 dp target, on the rail's light surface. */
+    /* The rail (Android tablet and desktop): a 56 dp circle in the secondary colour, in a 72 dp target, on the rail's light surface. */
     .bc-account-avatar--rail {
-      width: 64px;
-      height: 64px;
-      border-radius: 32px;
+      width: 72px;
+      height: 72px;
+      border-radius: 36px;
 
       .bc-account-avatar--circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
         background: var(--bc-nav-avatar-ink);
         color: #FFFFFF;
-        font-size: 20px;
+        font-size: 24px;
       }
 
       .bc-account-avatar--badge {
-        top: 8px;
-        right: 8px;
+        top: 10px;
+        right: 10px;
         box-shadow: 0 0 0 2px var(--bc-background);
       }
     }
