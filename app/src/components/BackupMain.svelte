@@ -66,7 +66,17 @@
       <button type="button" class="bc-outlined-button" onclick={loadVersions}>{t('backup.versions.retry')}</button>
     </div>
   {:else if !backup.loaded}
-    <p class="bc-backup--empty" role="status">{t('backup.versions.loading')}</p>
+    <div class="bc-backup--list bc-backup-main--skeleton-list skeleton-effect-wave" role="status" aria-busy="true" aria-label={t('backup.versions.loading')}>
+      {#each Array(3) as _, i (i)}
+        <div class="bc-backup-main--skeleton-row" aria-hidden="true">
+          <span class="bc-backup--texts">
+            <span class="skeleton-block bc-backup-main--skeleton-title"></span>
+            <span class="skeleton-block bc-backup-main--skeleton-line"></span>
+          </span>
+          <span class="skeleton-block bc-backup-main--skeleton-chip"></span>
+        </div>
+      {/each}
+    </div>
   {:else if !backup.versions.length}
     <p class="bc-backup--empty">{t('backup.versions.empty')}</p>
   {:else}
@@ -93,6 +103,18 @@
       {#if backup.more}
         <button type="button" class="bc-backup--more" disabled={backup.loading} onclick={moreVersions}>{t('backup.versions.older')}</button>
       {/if}
+      {#if backup.loading}
+        <div class="bc-backup-main--skeleton-list skeleton-effect-wave" aria-hidden="true">
+          {#each Array(2) as _, i (i)}
+            <div class="bc-backup-main--skeleton-row">
+              <span class="bc-backup--texts">
+                <span class="skeleton-block bc-backup-main--skeleton-title"></span>
+                <span class="skeleton-block bc-backup-main--skeleton-line"></span>
+              </span>
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
     <p class="bc-backup--note">{t('backup.versions.note')} {t('backup.media')}</p>
   {/if}
@@ -109,11 +131,16 @@
       </span>
       <span class="bc-backup--chevron"><Icon name="chevron" size={20} /></span>
     </button>
-    <button type="button" class="bc-backup--row" class:bc-backup--row-selected={selected?.kind === 'deleted'} onclick={ondeleted}>
+    <button type="button" class="bc-backup--row" class:bc-backup--row-selected={selected?.kind === 'deleted'} aria-busy={backup.deletedLoading || backup.deleted === null} onclick={ondeleted}>
       <span class="bc-backup--tile"><Icon name="trash" size={22} weight={1.8} /></span>
       <span class="bc-backup--texts">
         <span class="bc-backup--row-title">{t('backup.only.deleted')}</span>
-        <span class="bc-backup--row-line">{deletedLine}</span>
+        {#if backup.deletedLoading || backup.deleted === null}
+          <span class="bc-sr-only">{deletedLine}</span>
+          <span class="skeleton-block bc-backup-main--deleted-skeleton" aria-hidden="true"></span>
+        {:else}
+          <span class="bc-backup--row-line">{deletedLine}</span>
+        {/if}
       </span>
       <span class="bc-backup--chevron"><Icon name="chevron" size={20} /></span>
     </button>

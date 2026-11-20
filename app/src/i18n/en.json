@@ -1417,6 +1417,12 @@
       "empty": "No deleted dive",
       "failed": "The history could not be read, so the deleted dives cannot be listed.",
       "row": "Deleted {when}",
+      "fields": {
+        "depth": "Max depth",
+        "duration": "Duration",
+        "mode": "Mode",
+        "computer": "Dive computer"
+      },
       "restore": "Restore",
       "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
       "restored": "Dive brought back",
@@ -2721,6 +2727,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Backup and restore: deleted dives are shown in readable cards. Lists show placeholders while they load.",
       "Backup and restore: the dives deleted before the account was created, and the earlier versions of the logbook, are listed and can be restored. A failed search for deleted dives now says so, with a Try again button. Each deleted dive shows its date and time, depth, duration, mode, computer and site. Scrollable lists show their scrollbars.",
       "Information: the date of birth, relationship and phone fields are narrower.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
