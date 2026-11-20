@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 121
+Next number: 122
 
 ## List
 
@@ -52,3 +52,4 @@ Next number: 121
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #119 [code] /profile/info/, rendre editable in place, retirer la route /edit.
 - #120 [code] /profile/info, retirer le bouton Autoriser.
+- #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
