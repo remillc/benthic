@@ -11,10 +11,10 @@
 </script>
 
 {#if ios && label}
-  <Link back class="od-back-link"><i class="icon icon-back"></i><span>{label}</span></Link>
+  <Link back class="bc-back-link"><i class="icon icon-back"></i><span>{label}</span></Link>
 {:else}
   <Link back iconOnly>
     <i class="icon icon-back"></i>
-    <span class="od-sr-only">{name || label || t('detail.back')}</span>
+    <span class="bc-sr-only">{name || label || t('detail.back')}</span>
   </Link>
 {/if}

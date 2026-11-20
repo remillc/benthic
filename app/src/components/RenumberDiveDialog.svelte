@@ -52,8 +52,8 @@
   }
 </script>
 
-<Md3Dialog class="od-renumber-dive-dialog" title={t('renumberDive.title')} {oncancel}>
-  <div class="od-renumber-dive-dialog--field">
+<Md3Dialog class="bc-renumber-dive-dialog" title={t('renumberDive.title')} {oncancel}>
+  <div class="bc-renumber-dive-dialog--field">
     <TextField label={t('renumberDive.number')} bind:value={text} inputmode="numeric" invalid={!!text.trim() && !plan} {supporting} />
   </div>
   {#snippet actions()}
@@ -64,8 +64,8 @@
 
 <style>
   @layer od.components {
-    .od-renumber-dive-dialog--field {
-      --od-field-margin: 24px;
+    .bc-renumber-dive-dialog--field {
+      --bc-field-margin: 24px;
     }
   }
 </style>

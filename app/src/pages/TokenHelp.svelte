@@ -8,12 +8,12 @@
   import { t } from '../lib/i18n.js';
 </script>
 
-<Page class="od-token-help">
+<Page class="bc-token-help">
   <Navbar title={t('tokenHelp.title')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>

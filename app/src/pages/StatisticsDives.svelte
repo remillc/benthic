@@ -101,17 +101,17 @@
   });
 </script>
 
-<Page class="od-statistics-dives">
+<Page class="bc-statistics-dives">
   <Navbar {title} subtitle={support}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
         <i class="icon icon-back"></i>
-        {#if theme.ios}<span>{t('common.back')}</span>{:else}<span class="od-sr-only">{t('common.back')}</span>{/if}
+        {#if theme.ios}<span>{t('common.back')}</span>{:else}<span class="bc-sr-only">{t('common.back')}</span>{/if}
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="list media-list {theme.ios ? 'chevron-center od-statistics-dives--dividers' : ''} od-dive-list od-statistics-dives--list" bind:this={listEl}>
+  <div class="list media-list {theme.ios ? 'chevron-center bc-statistics-dives--dividers' : ''} bc-dive-list bc-statistics-dives--list" bind:this={listEl}>
     <ul>
       {#each visible.items as dive, i (dive.id)}
         <DiveRow {dive} prefs={logbook.prefs} index={visible.from + i} top={visible.topPosition} />
@@ -122,7 +122,7 @@
 
 <style>
   @layer od.components {
-    .od-statistics-dives--list {
+    .bc-statistics-dives--list {
       margin-top: 12px;
     }
   }

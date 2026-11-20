@@ -42,14 +42,14 @@ test('parseInsets falls back: missing, negative or non-numeric sides are 0, junk
   assert.equal(parseInsets(42), null);
 });
 
-test('applyInsets sets the four --od-safe-* variables', () => {
+test('applyInsets sets the four --bc-safe-* variables', () => {
   const root = fakeRoot();
   const applied = applyInsets({ top: 52, right: 0, bottom: 24, left: 8 }, root);
   assert.deepEqual(applied, { top: 52, right: 0, bottom: 24, left: 8 });
-  assert.equal(root.props.get('--od-safe-top'), '52px');
-  assert.equal(root.props.get('--od-safe-right'), '0px');
-  assert.equal(root.props.get('--od-safe-bottom'), '24px');
-  assert.equal(root.props.get('--od-safe-left'), '8px');
+  assert.equal(root.props.get('--bc-safe-top'), '52px');
+  assert.equal(root.props.get('--bc-safe-right'), '0px');
+  assert.equal(root.props.get('--bc-safe-bottom'), '24px');
+  assert.equal(root.props.get('--bc-safe-left'), '8px');
 });
 
 test('applyInsets leaves the defaults alone when the value is unusable', () => {
@@ -68,22 +68,22 @@ test('installSafeArea does nothing without the native interface (iOS, desktop, b
 test('installSafeArea reads the boot value, then follows the pushes', () => {
   const win = fakeWindow({ get: () => '{"top":52,"right":0,"bottom":24,"left":0}' });
   assert.equal(installSafeArea(win), true);
-  assert.equal(win.root.props.get('--od-safe-bottom'), '24px');
+  assert.equal(win.root.props.get('--bc-safe-bottom'), '24px');
   assert.equal(win.events.length, 1);
   win.__odSetInsets({ top: 24, right: 0, bottom: 48, left: 0 });
-  assert.equal(win.root.props.get('--od-safe-top'), '24px');
-  assert.equal(win.root.props.get('--od-safe-bottom'), '48px');
+  assert.equal(win.root.props.get('--bc-safe-top'), '24px');
+  assert.equal(win.root.props.get('--bc-safe-bottom'), '48px');
   assert.equal(win.events.length, 2);
   assert.deepEqual(win.events[1].detail, { top: 24, right: 0, bottom: 48, left: 0 });
 });
 
-test('the app reads --od-safe-*, never env() directly, and Framework7 points at them', () => {
+test('the app reads --bc-safe-*, never env() directly, and Framework7 points at them', () => {
   const files = ['App.svelte', 'components/NavigationBar.svelte', 'components/AccountSheet.svelte', 'components/SiteMap.svelte', 'pages/SiteEdit.svelte'];
   for (const f of files) assert.doesNotMatch(read(f), /env\(safe-area-inset/, f);
   const theme = read('theme.css');
-  assert.match(theme, /--od-safe-bottom: env\(safe-area-inset-bottom, 0px\);/);
-  assert.match(theme, /--f7-safe-area-bottom: var\(--od-safe-bottom\);/);
-  assert.match(theme, /--f7-safe-area-top: var\(--od-safe-top\);/);
-  assert.match(theme, /--f7-safe-area-left: var\(--od-safe-left\);/);
+  assert.match(theme, /--bc-safe-bottom: env\(safe-area-inset-bottom, 0px\);/);
+  assert.match(theme, /--f7-safe-area-bottom: var\(--bc-safe-bottom\);/);
+  assert.match(theme, /--f7-safe-area-top: var\(--bc-safe-top\);/);
+  assert.match(theme, /--f7-safe-area-left: var\(--bc-safe-left\);/);
   assert.match(read('main.js'), /installSafeArea\(\);/);
 });

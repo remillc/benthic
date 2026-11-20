@@ -42,14 +42,14 @@
 </script>
 
 {#if shown.length}
-  <div class="od-stats-details block-title">{t('stats.details')}</div>
-  <div class="od-stats-details list list-strong inset list-dividers">
+  <div class="bc-stats-details block-title">{t('stats.details')}</div>
+  <div class="bc-stats-details list list-strong inset list-dividers">
     <ul>
       {#each shown as r (r.row)}
         <li class="item-content">
           <div class="item-inner">
             <div class="item-title">{t(`stats.detail.${r.row}`)}</div>
-            <div class="item-after od-value">{r.text}</div>
+            <div class="item-after bc-value">{r.text}</div>
           </div>
         </li>
       {/each}

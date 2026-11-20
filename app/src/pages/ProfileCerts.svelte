@@ -77,61 +77,61 @@
 
 {#snippet row(/** @type {import('../lib/profile.js').Certification} */ doc)}
   {@const status = expiryState(doc.expiresOn, today)}
-  <button type="button" class="od-docs--row" onclick={() => open(doc)}>
+  <button type="button" class="bc-docs--row" onclick={() => open(doc)}>
     <DocumentThumb {doc} urls={thumbs[doc.id] ?? []} />
-    <span class="od-docs--texts">
-      <span class="od-docs--kind od-docs--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
-      <span class="od-docs--title">{documentTitle(doc)}</span>
-      <span class="od-docs--line">{documentLine(doc, formatDate, today)}</span>
+    <span class="bc-docs--texts">
+      <span class="bc-docs--kind bc-docs--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
+      <span class="bc-docs--title">{documentTitle(doc)}</span>
+      <span class="bc-docs--line">{documentLine(doc, formatDate, today)}</span>
       {#if doc.kind !== 'certification' && status.state !== 'none'}
-        <span class="od-docs--badge od-docs--badge-{status.state}">{badgeText(status)}</span>
+        <span class="bc-docs--badge bc-docs--badge-{status.state}">{badgeText(status)}</span>
       {/if}
     </span>
-    <span class="od-docs--chevron"><Icon name="chevron" size={20} /></span>
+    <span class="bc-docs--chevron"><Icon name="chevron" size={20} /></span>
   </button>
 {/snippet}
 
 {#snippet section(/** @type {string} */ key, /** @type {import('../lib/profile.js').Certification[]} */ docs)}
   {#if docs.length}
-    <h2 class="od-docs--heading">{t(`docs.sections.${key}`)}</h2>
-    <div class="od-docs--list">
+    <h2 class="bc-docs--heading">{t(`docs.sections.${key}`)}</h2>
+    <div class="bc-docs--list">
       {#each docs as doc (doc.id)}{@render row(doc)}{/each}
     </div>
   {/if}
 {/snippet}
 
 {#snippet body()}
-  <div class="od-docs--content">
+  <div class="bc-docs--content">
   <ReadOnlyNotice />
 
   {#if diver.ready && !diver.certs.length}
-    <div class="od-docs--empty">
-      <span class="od-docs--empty-icon"><Icon name="idCard" size={32} weight={1.6} /></span>
-      <p class="od-docs--empty-title">{t('docs.empty')}</p>
-      <p class="od-docs--empty-text">{t('docs.emptyText')}</p>
+    <div class="bc-docs--empty">
+      <span class="bc-docs--empty-icon"><Icon name="idCard" size={32} weight={1.6} /></span>
+      <p class="bc-docs--empty-title">{t('docs.empty')}</p>
+      <p class="bc-docs--empty-text">{t('docs.emptyText')}</p>
     </div>
   {:else}
     {@render section('certs', groups.certs)}
     {@render section('health', groups.health)}
     {@render section('others', groups.others)}
     {#if groups.expired.length}
-      <button type="button" class="od-docs--expired" aria-expanded={expiredOpen} onclick={() => (expiredOpen = !expiredOpen)}>
-        <span class="od-docs--expired-label">{t('docs.sections.expired')}</span>
-        <span class="od-docs--expired-count">{groups.expired.length}</span>
-        <span class="od-docs--expired-chevron" class:od-docs--expired-open={expiredOpen}><Icon name="chevron" size={20} /></span>
+      <button type="button" class="bc-docs--expired" aria-expanded={expiredOpen} onclick={() => (expiredOpen = !expiredOpen)}>
+        <span class="bc-docs--expired-label">{t('docs.sections.expired')}</span>
+        <span class="bc-docs--expired-count">{groups.expired.length}</span>
+        <span class="bc-docs--expired-chevron" class:bc-docs--expired-open={expiredOpen}><Icon name="chevron" size={20} /></span>
       </button>
       {#if expiredOpen}
-        <div class="od-docs--list od-docs--list-expired">
+        <div class="bc-docs--list bc-docs--list-expired">
           {#each groups.expired as doc (doc.id)}{@render row(doc)}{/each}
         </div>
       {/if}
     {/if}
-    <div class="od-docs--bottom"></div>
+    <div class="bc-docs--bottom"></div>
   {/if}
   </div>
 {/snippet}
 
-<Page class="od-docs">
+<Page class="bc-docs">
   <Navbar title={t('docs.title')}>
     {#snippet left()}
       <BackLink label={t('gear.profile.title')} name={t('docs.back')} />
@@ -143,7 +143,7 @@
     {@render body()}
   {/if}
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended od-fab-add od-docs--fab" style:display={gear.readOnly ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended bc-fab-add bc-docs--fab" style:display={gear.readOnly ? 'none' : null}>
       <a href="#add" class="external" role="button" onclick={(e) => (e.preventDefault(), (choosing = true))}>
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('docs.add')}</div>
@@ -156,32 +156,32 @@
 
 <style>
   @layer od.components {
-    :global(.od-docs .page-content) {
+    :global(.bc-docs .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-docs--content {
+    .bc-docs--content {
       min-height: 100%;
       display: flex;
       flex-direction: column;
     }
 
-    .od-docs--heading {
+    .bc-docs--heading {
       margin: 16px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-docs--list {
+    .bc-docs--list {
       margin: 0 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .od-docs--row {
+    .bc-docs--row {
       position: relative;
       width: 100%;
       padding: 12px 40px 12px 14px;
@@ -190,13 +190,13 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
     }
 
-    .od-docs--texts {
+    .bc-docs--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -204,34 +204,34 @@
       gap: 2px;
     }
 
-    .od-docs--kind {
+    .bc-docs--kind {
       font-size: 11px;
       line-height: 14px;
       font-weight: 700;
       letter-spacing: 0.6px;
       text-transform: uppercase;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-docs--tone-blue { color: var(--od-plus-blue-icon); }
-    .od-docs--tone-green { color: var(--od-plus-green-icon); }
-    .od-docs--tone-amber { color: var(--od-plus-amber-icon); }
-    .od-docs--tone-violet { color: var(--od-plus-violet-icon); }
-    .od-docs--tone-red { color: var(--od-maintenance-icon); }
+    .bc-docs--tone-blue { color: var(--bc-plus-blue-icon); }
+    .bc-docs--tone-green { color: var(--bc-plus-green-icon); }
+    .bc-docs--tone-amber { color: var(--bc-plus-amber-icon); }
+    .bc-docs--tone-violet { color: var(--bc-plus-violet-icon); }
+    .bc-docs--tone-red { color: var(--bc-maintenance-icon); }
 
-    .od-docs--title {
+    .bc-docs--title {
       font-size: 16px;
       line-height: 21px;
       font-weight: 600;
     }
 
-    .od-docs--line {
+    .bc-docs--line {
       font-size: 12.5px;
       line-height: 17px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-docs--badge {
+    .bc-docs--badge {
       align-self: flex-start;
       margin-top: 4px;
       height: 24px;
@@ -244,20 +244,20 @@
       white-space: nowrap;
     }
 
-    .od-docs--badge-valid { background: var(--od-plus-green); color: var(--od-plus-green-icon); }
-    .od-docs--badge-soon { background: var(--od-plus-amber); color: var(--od-plus-amber-icon); }
-    .od-docs--badge-expired { background: var(--od-alarm-tint); color: var(--od-alarm); }
+    .bc-docs--badge-valid { background: var(--bc-plus-green); color: var(--bc-plus-green-icon); }
+    .bc-docs--badge-soon { background: var(--bc-plus-amber); color: var(--bc-plus-amber-icon); }
+    .bc-docs--badge-expired { background: var(--bc-alarm-tint); color: var(--bc-alarm); }
 
-    .od-docs--chevron {
+    .bc-docs--chevron {
       position: absolute;
       inset-inline-end: 14px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-docs--expired {
+    .bc-docs--expired {
       width: calc(100% - 32px);
       margin: 16px 16px 0;
       min-height: 48px;
@@ -267,32 +267,32 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface-2);
-      color: var(--od-text-2);
+      background: var(--bc-surface-2);
+      color: var(--bc-text-2);
       font: inherit;
       font-size: 15px;
       font-weight: 600;
     }
 
-    .od-docs--expired-label {
+    .bc-docs--expired-label {
       flex: 1;
       text-align: start;
     }
 
-    .od-docs--expired-chevron {
+    .bc-docs--expired-chevron {
       display: flex;
       transform: rotate(90deg);
     }
 
-    .od-docs--expired-open {
+    .bc-docs--expired-open {
       transform: rotate(-90deg);
     }
 
-    .od-docs--list-expired {
+    .bc-docs--list-expired {
       margin-top: 8px;
     }
 
-    .od-docs--empty {
+    .bc-docs--empty {
       flex: 1;
       min-height: 200px;
       box-sizing: border-box;
@@ -305,52 +305,52 @@
       gap: 8px;
     }
 
-    .od-docs--empty-icon {
+    .bc-docs--empty-icon {
       width: 64px;
       height: 64px;
       border-radius: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-tile-violet);
+      background: var(--bc-tile-violet);
     }
 
-    .od-docs--empty-title {
+    .bc-docs--empty-title {
       margin: 8px 0 0;
       font-size: 20px;
       line-height: 26px;
       font-weight: 500;
     }
 
-    .od-docs--empty-text {
+    .bc-docs--empty-text {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-docs--fab {
-      --f7-fab-bg-color: var(--od-secondary-container);
-      --f7-fab-text-color: var(--od-on-secondary-container);
+    .bc-docs--fab {
+      --f7-fab-bg-color: var(--bc-secondary-container);
+      --f7-fab-text-color: var(--bc-on-secondary-container);
     }
 
-    :global(.md) .od-docs--fab > a {
+    :global(.md) .bc-docs--fab > a {
       box-sizing: border-box;
       gap: 8px;
       padding-inline: 16px;
     }
 
-    :global(.md) .od-docs--fab > a i {
+    :global(.md) .bc-docs--fab > a i {
       position: static;
       transform: none;
       display: flex;
     }
 
-    :global(.md) .od-docs--fab .fab-text {
+    :global(.md) .bc-docs--fab .fab-text {
       padding: 0;
     }
 
-    .od-docs--bottom {
+    .bc-docs--bottom {
       height: 96px;
     }
   }

@@ -74,7 +74,7 @@
   }
 </script>
 
-<EditorialPage class="od-confirm-code"
+<EditorialPage class="bc-confirm-code"
   helpLink={welcome}
   firstLaunch={welcome}
   title={t('createAccount.title')}
@@ -87,7 +87,7 @@
   actionDisabled={!codeComplete(code)}
   onaction={confirm}
 >
-  <div class="od-confirm-code--fields">
+  <div class="bc-confirm-code--fields">
     <CodeField
       label={t('confirmCode.code')}
       accessibleLabel={t('confirmCode.codeLabel')}
@@ -97,7 +97,7 @@
       oninput={() => (codeError = '')}
       onsubmit={confirm}
     />
-    <div class="od-confirm-code--resend">
+    <div class="bc-confirm-code--resend">
       <button type="button" disabled={busy} onclick={resend}><Icon name="refresh" size={18} weight={2} />{t('confirmCode.resend')}</button>
     </div>
   </div>
@@ -105,16 +105,16 @@
 
 <style>
   @layer od.components {
-    .od-confirm-code--fields {
+    .bc-confirm-code--fields {
       margin: 6px 0 0;
 
-      :global(.od-editorial-page--first-launch) & {
+      :global(.bc-editorial-page--first-launch) & {
         margin: 8px 0 0;
       }
 
       /* Beside the tablet's panel (task 2026-11-16-239): the group of boxes is centred in the column, and the
          label, the error and « Renvoyer le code » start at the left edge of the first box. */
-      :global(.od-editorial-page--panelled) & {
+      :global(.bc-editorial-page--panelled) & {
         /* Six boxes of 48 dp and five gaps of 8 dp. */
         width: 328px;
         max-width: 100%;
@@ -127,17 +127,17 @@
     }
 
     /* MD3 outlined button with a leading icon (18 dp); iOS: a grey tinted button. */
-    .od-confirm-code--resend {
-      margin: 8px var(--od-field-margin, 0) 0;
+    .bc-confirm-code--resend {
+      margin: 8px var(--bc-field-margin, 0) 0;
 
       button {
         width: auto;
         height: 40px;
         padding: 0 24px 0 16px;
-        border: var(--od-outline-width) solid var(--od-text-2);
+        border: var(--bc-outline-width) solid var(--bc-text-2);
         border-radius: 20px;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 14px;
         font-weight: 500;
@@ -153,7 +153,7 @@
       }
 
       /* Alpha first launch on a phone (the mock-ups): a link under the boxes, a 48 dp target. */
-      :global(.od-editorial-page--first-launch) & {
+      :global(.bc-editorial-page--first-launch) & {
         margin: 4px 0 -12px;
 
         button {
@@ -162,7 +162,7 @@
           padding: 0 4px;
           border: none;
           border-radius: 8px;
-          color: var(--od-code-active);
+          color: var(--bc-code-active);
           text-decoration: underline;
           text-underline-offset: 2px;
           font-weight: 400;
@@ -183,8 +183,8 @@
           padding: 0 16px;
           border: none;
           border-radius: 12px;
-          background: var(--od-tint);
-          color: var(--od-on-tint);
+          background: var(--bc-tint);
+          color: var(--bc-on-tint);
           font-size: 17px;
           font-weight: 400;
           letter-spacing: 0;

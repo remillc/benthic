@@ -111,7 +111,7 @@
   }
 </script>
 
-<Page class="od-shared-site">
+<Page class="bc-shared-site">
   <Navbar>
     {#snippet left()}
       <BackLink label={t('sites.title')} name={t('common.back')} />
@@ -119,17 +119,17 @@
   </Navbar>
 
   {#if status === 'ready' && site}
-    <header class="od-shared-site--head">
+    <header class="bc-shared-site--head">
       <h1>{site.name}</h1>
-      {#if site.country || site.region}<p class="od-shared-site--sub">{[site.country, site.region].filter(Boolean).join(' · ')}</p>{/if}
-      <p class="od-shared-site--chips">
-        <span class="od-shared-site--chip"><Icon name="globe" size={16} weight={2} />{t('sharedSites.card.chip', { dives: baseDivesText(site) })}</span>
-        {#if site.closed}<span class="od-shared-site--chip od-shared-site--closed"><Icon name="warning" size={16} weight={2} />{t('sharedSites.card.closed')}</span>{/if}
+      {#if site.country || site.region}<p class="bc-shared-site--sub">{[site.country, site.region].filter(Boolean).join(' · ')}</p>{/if}
+      <p class="bc-shared-site--chips">
+        <span class="bc-shared-site--chip"><Icon name="globe" size={16} weight={2} />{t('sharedSites.card.chip', { dives: baseDivesText(site) })}</span>
+        {#if site.closed}<span class="bc-shared-site--chip bc-shared-site--closed"><Icon name="warning" size={16} weight={2} />{t('sharedSites.card.closed')}</span>{/if}
       </p>
     </header>
 
     <!-- Inside the margins, 16 dp corners, aspect ratio 2.1 : 1 (task 2026-11-19-314); the site as a teal dot. -->
-    <div class="od-shared-site--map">
+    <div class="bc-shared-site--map">
       <SiteMap
         ratio={2.1}
         frame={[[site.lon, site.lat]]}
@@ -137,41 +137,41 @@
         label={t('sharedSites.card.mapLabel', { name: site.name })}
       />
     </div>
-    <p class="od-shared-site--coords od-value">{formatCoordinates(Math.round(site.lat * 1e6), Math.round(site.lon * 1e6))}</p>
+    <p class="bc-shared-site--coords bc-value">{formatCoordinates(Math.round(site.lat * 1e6), Math.round(site.lon * 1e6))}</p>
 
     {#if site.carnets}
-      <h2 class="od-shared-site--title">{t('sharedSites.card.logbooksSay')}</h2>
-      <ul class="od-shared-site--surface">
+      <h2 class="bc-shared-site--title">{t('sharedSites.card.logbooksSay')}</h2>
+      <ul class="bc-shared-site--surface">
         {#if site.carnets.waterType}
-          <li class="od-shared-site--row"><span class="od-shared-site--label">{t('tools.waterType')}</span><span>{t(`tools.waterTypes.${site.carnets.waterType}`)}</span></li>
+          <li class="bc-shared-site--row"><span class="bc-shared-site--label">{t('tools.waterType')}</span><span>{t(`tools.waterTypes.${site.carnets.waterType}`)}</span></li>
         {/if}
         {#if depthText}
-          <li class="od-shared-site--row"><span class="od-shared-site--label">{t('sharedSites.card.usualDepth')}</span><span class="od-value">{depthText}</span></li>
+          <li class="bc-shared-site--row"><span class="bc-shared-site--label">{t('sharedSites.card.usualDepth')}</span><span class="bc-value">{depthText}</span></li>
         {/if}
-        <li class="od-shared-site--row"><span class="od-shared-site--label">{t('sharedSites.card.recentDives')}</span><span class="od-value">{recentText}</span></li>
+        <li class="bc-shared-site--row"><span class="bc-shared-site--label">{t('sharedSites.card.recentDives')}</span><span class="bc-value">{recentText}</span></li>
       </ul>
     {/if}
-    <p class="od-shared-site--note">{t('sharedSites.card.note')}</p>
+    <p class="bc-shared-site--note">{t('sharedSites.card.note')}</p>
 
-    <div class="od-shared-site--actions">
+    <div class="bc-shared-site--actions">
       {#if mine !== null}
-        <a class="od-shared-site--add" href="/sites/{mine}"><Icon name="check" size={20} weight={2} />{t('sharedSites.card.inYourSites')}</a>
+        <a class="bc-shared-site--add" href="/sites/{mine}"><Icon name="check" size={20} weight={2} />{t('sharedSites.card.inYourSites')}</a>
       {:else}
-        <button type="button" class="od-shared-site--add" disabled={adding || !connection.online} onclick={add}><Icon name="plus" size={20} weight={2} />{t('sharedSites.card.add')}</button>
+        <button type="button" class="bc-shared-site--add" disabled={adding || !connection.online} onclick={add}><Icon name="plus" size={20} weight={2} />{t('sharedSites.card.add')}</button>
       {/if}
-      <button type="button" class="od-shared-site--report" disabled={!connection.online} onclick={() => (reporting = true)}><Icon name="warning" size={20} />{t('sharedSites.card.report')}</button>
+      <button type="button" class="bc-shared-site--report" disabled={!connection.online} onclick={() => (reporting = true)}><Icon name="warning" size={20} />{t('sharedSites.card.report')}</button>
     </div>
   {:else if status === 'gone'}
-    <p class="od-shared-site--message">{t('sharedSites.card.gone')}</p>
+    <p class="bc-shared-site--message">{t('sharedSites.card.gone')}</p>
   {:else if status === 'offer'}
-    <div class="od-shared-site--message">
+    <div class="bc-shared-site--message">
       <p>{t('sharedSites.offerText')}</p>
-      <button type="button" class="od-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
+      <button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
     </div>
   {:else if status === 'failed'}
-    <div class="od-shared-site--message">
+    <div class="bc-shared-site--message">
       <p>{t(connection.online ? 'sharedSites.failed' : 'sharedSites.offline')}</p>
-      <button type="button" class="od-tonal-button" onclick={load}>{t('sharedSites.retry')}</button>
+      <button type="button" class="bc-tonal-button" onclick={load}>{t('sharedSites.retry')}</button>
     </div>
   {/if}
 </Page>
@@ -182,7 +182,7 @@
 
 <style>
   @layer od.components {
-    .od-shared-site--head {
+    .bc-shared-site--head {
       padding: 0 24px;
       & h1 {
         margin: 0;
@@ -191,64 +191,64 @@
         font-weight: 600;
       }
     }
-    .od-shared-site--sub {
+    .bc-shared-site--sub {
       margin: 2px 0 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-site--chips {
+    .bc-shared-site--chips {
       margin: 10px 0 0;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    .od-shared-site--chip {
+    .bc-shared-site--chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       height: 28px;
       padding: 0 12px;
       border-radius: 14px;
-      background: var(--od-shared-site-container);
-      color: var(--od-on-shared-site-container);
+      background: var(--bc-shared-site-container);
+      color: var(--bc-on-shared-site-container);
       font-size: 13px;
       font-weight: 600;
     }
-    .od-shared-site--closed {
-      background: var(--od-tint);
-      color: var(--od-text);
+    .bc-shared-site--closed {
+      background: var(--bc-tint);
+      color: var(--bc-text);
     }
-    .od-shared-site--map {
+    .bc-shared-site--map {
       margin: 16px 16px 0;
       border-radius: 20px;
       overflow: hidden;
-      --od-map-credits-right: 12px;
-      --od-map-credits-bottom: 8px;
+      --bc-map-credits-right: 12px;
+      --bc-map-credits-bottom: 8px;
     }
-    .od-shared-site--coords {
+    .bc-shared-site--coords {
       margin: 8px 24px 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-site--title {
+    .bc-shared-site--title {
       margin: 20px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-site--surface {
+    .bc-shared-site--surface {
       margin: 0 16px;
       padding: 0;
       list-style: none;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
       & li + li {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
-    .od-shared-site--row {
+    .bc-shared-site--row {
       min-height: 56px;
       padding: 8px 16px;
       box-sizing: border-box;
@@ -258,24 +258,24 @@
       gap: 2px;
       font-size: 16px;
     }
-    .od-shared-site--label {
+    .bc-shared-site--label {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-site--note {
+    .bc-shared-site--note {
       margin: 12px 24px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-site--actions {
+    .bc-shared-site--actions {
       margin: 20px 16px 24px;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
     }
-    .od-shared-site--add,
-    .od-shared-site--report {
+    .bc-shared-site--add,
+    .bc-shared-site--report {
       height: 48px;
       padding: 0 20px;
       box-sizing: border-box;
@@ -291,33 +291,33 @@
         opacity: 0.5;
       }
     }
-    .od-shared-site--add {
+    .bc-shared-site--add {
       border: none;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font-weight: 600;
     }
-    .od-shared-site--report {
-      border: 1px solid var(--od-outline);
+    .bc-shared-site--report {
+      border: 1px solid var(--bc-outline);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-weight: 500;
     }
-    .od-shared-site--message {
+    .bc-shared-site--message {
       margin: 24px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       & p {
         margin: 0;
       }
     }
-    :global(.ios) .od-shared-site--surface {
+    :global(.ios) .bc-shared-site--surface {
       border-radius: 10px;
     }
-    :global(.ios) .od-shared-site--title {
+    :global(.ios) .bc-shared-site--title {
       font-weight: 400;
       font-size: 13px;
       text-transform: uppercase;

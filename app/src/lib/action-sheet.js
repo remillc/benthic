@@ -30,7 +30,7 @@ const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt
 export function retireSheetButtons({ title, text, reasons, none, onPick, cancel }) {
   return [
     [
-      { text: `<span class="od-retire-sheet--title">${escapeHtml(title)}</span><br>${escapeHtml(text)}`, label: true },
+      { text: `<span class="bc-retire-sheet--title">${escapeHtml(title)}</span><br>${escapeHtml(text)}`, label: true },
       ...reasons.map((r) => ({ text: r.label, onClick: () => onPick(r.reason) })),
       { text: none, onClick: () => onPick(undefined) },
     ],

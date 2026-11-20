@@ -33,9 +33,9 @@ test('the phone layout is chosen by the width, the same one as layout.phone', ()
 test('the blue band is 330 dp on the first step and 140 dp on the others, the status bar included (task 244: 108 before)', () => {
   assert.deepEqual({ ...BAND_HEIGHT }, { start: 330, compact: 140 });
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
-  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--od-welcome-band-top\)\)/);
-  assert.match(page, /--od-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--bc-welcome-band-top\)\)/);
+  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--bc-welcome-band-top\)\)/);
+  assert.match(page, /--bc-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
   // First step: logo 40 dp, name 24 sp, headline 26 sp, line 14 sp; other steps: logo 32 dp, name 20 sp.
   for (const piece of [/width: 40px;\s+height: 40px/, /width: 32px;\s+height: 32px/, /font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
     assert.match(page, piece);
@@ -46,15 +46,15 @@ test('the column has 20 dp of padding, starts at the top, has 24 sp titles and f
   const steps = read('components/FirstLaunchSteps.svelte');
   const phone = steps.slice(steps.lastIndexOf('@media (max-width: 767.98px)'));
   assert.match(phone, /padding: 16px 16px 0/);
-  assert.match(phone, /od-first-launch--first \{\s+padding-top: 20px/);
-  assert.match(phone, /od-first-launch--step \{\s+align-self: start/);
-  assert.match(phone, /od-first-launch--title \{\s+font-size: 24px/);
-  assert.match(phone, /od-first-launch--action,\s+\.od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: stretch/);
+  assert.match(phone, /bc-first-launch--first \{\s+padding-top: 20px/);
+  assert.match(phone, /bc-first-launch--step \{\s+align-self: start/);
+  assert.match(phone, /bc-first-launch--title \{\s+font-size: 24px/);
+  assert.match(phone, /bc-first-launch--action,\s+\.bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: stretch/);
   // The link band: 64 dp tiles, a 56 dp line.
-  assert.match(phone, /od-first-launch--hero-tile \{\s+width: 64px;\s+height: 64px/);
-  assert.match(phone, /od-first-launch--hero-link \{\s+flex: none;\s+width: 56px/);
+  assert.match(phone, /bc-first-launch--hero-tile \{\s+width: 64px;\s+height: 64px/);
+  assert.match(phone, /bc-first-launch--hero-link \{\s+flex: none;\s+width: 56px/);
   // The help link follows the content (and sits at the bottom of the screen when there is room).
-  assert.match(phone, /od-welcome-help-link\) \{\s+margin: auto auto/);
+  assert.match(phone, /bc-welcome-help-link\) \{\s+margin: auto auto/);
   for (const file of ['components/FirstLaunchGit.svelte', 'components/FirstLaunchWebdav.svelte', 'components/FirstLaunchDivelogs.svelte']) {
     assert.match(read(file), /@media \(max-width: 767\.98px\)[^]*align-self: stretch/, file);
   }
@@ -63,7 +63,7 @@ test('the column has 20 dp of padding, starts at the top, has 24 sp titles and f
 test('the profile of the band has no dot and no chips on a phone', () => {
   assert.match(
     read('components/ReleaseProfile.svelte'),
-    /@media \(max-width: 767\.98px\) \{\s+\.od-release-profile--dot,\s+\.od-release-profile--chip \{\s+display: none/,
+    /@media \(max-width: 767\.98px\) \{\s+\.bc-release-profile--dot,\s+\.bc-release-profile--chip \{\s+display: none/,
   );
 });
 
@@ -71,30 +71,30 @@ test("the welcome hero is the alpha's hatched dark blue; the steps band takes th
   const page = read('pages/WelcomeStartRelease.svelte');
   assert.doesNotMatch(page, /SectionBand|layout\.phone|release-band-gradient/);
   const theme = read('theme.css');
-  assert.doesNotMatch(theme, /--od-release-band-gradient/);
+  assert.doesNotMatch(theme, /--bc-release-band-gradient/);
   const token = (name) => theme.match(new RegExp(`${name}: ([^;]*);`))[1];
-  assert.equal(token('--od-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
-  assert.equal(token('--od-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
-  assert.equal(token('--od-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
+  assert.equal(token('--bc-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
+  assert.equal(token('--bc-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
+  assert.equal(token('--bc-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
   // Task 251: the section band's radial gradient, its light centre at -40 %.
-  assert.equal(token('--od-first-step-band'), 'radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)');
+  assert.equal(token('--bc-first-step-band'), 'radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)');
   const phone = page.slice(page.lastIndexOf('@media (max-width: 767.98px)'));
   // The hero (330 dp) keeps the hatched blue, its sheen and its hatching.
-  assert.match(phone, /background: var\(--od-first-band\);/);
-  assert.match(phone, /od-welcome-release--panel-light \{\s+background: var\(--od-first-band-sheen\)/);
-  assert.match(phone, /od-welcome-release--panel-bands \{\s+background: var\(--od-first-band-hatch\)/);
+  assert.match(phone, /background: var\(--bc-first-band\);/);
+  assert.match(phone, /bc-welcome-release--panel-light \{\s+background: var\(--bc-first-band-sheen\)/);
+  assert.match(phone, /bc-welcome-release--panel-bands \{\s+background: var\(--bc-first-band-hatch\)/);
   // The steps band: gradient, no sheen, the faint profile (10 % area, 30 % line, 1.5 dp) and the 18 dp wave in the page colour.
-  assert.match(phone, /od-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--od-first-step-band\)/);
-  assert.match(phone, /od-welcome-release--compact \.od-welcome-release--panel-light \{\s+display: none/);
-  assert.match(phone, /fill: var\(--od-band-profile-area\)/);
-  assert.match(phone, /stroke: var\(--od-band-profile-line\);\s+stroke-width: 1\.5/);
-  assert.match(phone, /od-welcome-release--panel-wave \{\s+display: block;[^}]*height: 18px/);
-  assert.match(phone, /od-welcome-release--panel-wave path \{\s+fill: var\(--od-background\)/);
+  assert.match(phone, /bc-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--bc-first-step-band\)/);
+  assert.match(phone, /bc-welcome-release--compact \.bc-welcome-release--panel-light \{\s+display: none/);
+  assert.match(phone, /fill: var\(--bc-band-profile-area\)/);
+  assert.match(phone, /stroke: var\(--bc-band-profile-line\);\s+stroke-width: 1\.5/);
+  assert.match(phone, /bc-welcome-release--panel-wave \{\s+display: block;[^}]*height: 18px/);
+  assert.match(phone, /bc-welcome-release--panel-wave path \{\s+fill: var\(--bc-background\)/);
   assert.match(page, /M0 11 Q37\.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z/);
-  assert.equal(token('--od-band-profile-area'), 'rgb(255 255 255 / 0.1)');
-  assert.equal(token('--od-band-profile-line'), 'rgb(255 255 255 / 0.3)');
+  assert.equal(token('--bc-band-profile-area'), 'rgb(255 255 255 / 0.1)');
+  assert.equal(token('--bc-band-profile-line'), 'rgb(255 255 255 / 0.3)');
   // Neither the profile nor the wave shows outside a phone step band.
-  assert.match(page, /\.od-welcome-release--panel-profile,\s+\.od-welcome-release--panel-wave \{\s+display: none/);
+  assert.match(page, /\.bc-welcome-release--panel-profile,\s+\.bc-welcome-release--panel-wave \{\s+display: none/);
   // The rays fade out at 55 % of the height (the tablet panel's rule, shared).
   assert.match(page, /mask-image: linear-gradient\(180deg, black 0%, transparent 55%\)/);
 });
@@ -107,16 +107,16 @@ test('the sign-in hint reads on two lines, centred; the sign-in button is centre
   }
   assert.equal(langs.fr.welcomeSteps.connectHint, 'La page de connexion du service s’ouvre.\nVous revenez ici ensuite.');
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /od-first-launch--hint \{\s+align-self: center;[^}]*text-align: center;\s+white-space: pre-line/);
-  assert.match(steps, /od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: center/);
+  assert.match(steps, /bc-first-launch--hint \{\s+align-self: center;[^}]*text-align: center;\s+white-space: pre-line/);
+  assert.match(steps, /bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: center/);
   // On a phone the button takes the column's width again.
   const phone = steps.slice(steps.lastIndexOf('@media (max-width: 767.98px)'));
-  assert.match(phone, /od-first-launch--action\.od-first-launch--action-centre \{\s+align-self: stretch/);
+  assert.match(phone, /bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: stretch/);
 });
 
 test('the progress bar stays inside its card', () => {
   const divelogs = read('components/FirstLaunchDivelogs.svelte');
-  assert.match(divelogs, /od-first-launch-divelogs--bar \{\s+min-width: 0;\s+max-width: calc\(100% - 42px\);\s+overflow: hidden/);
+  assert.match(divelogs, /bc-first-launch-divelogs--bar \{\s+min-width: 0;\s+max-width: calc\(100% - 42px\);\s+overflow: hidden/);
 });
 
 test('texts that name the device: « ce téléphone » on a phone, « cette tablette » on a tablet', () => {
@@ -164,12 +164,12 @@ test('the formats dialog is 358 dp wide on a phone, the cards stacked and scroll
   assert.match(formats, /@media \(max-width: 767px\) \{[^]*width: min\(358px, calc\(100% - 32px\)\)[^]*max-height: min\(780px, calc\(100% - 64px\)\)/);
   assert.match(formats, /flex-direction: column;\s+align-items: stretch/);
   // The content scrolls, the actions row does not: « Fermer » stays visible.
-  assert.match(read('components/Md3Dialog.svelte'), /od-md3-dialog--content \{\s+flex: 1;\s+min-height: 0;\s+overflow-y: auto/);
+  assert.match(read('components/Md3Dialog.svelte'), /bc-md3-dialog--content \{\s+flex: 1;\s+min-height: 0;\s+overflow-y: auto/);
   assert.match(formats, /dialog\.close/);
 });
 
 test('the formats link is a 48 dp target under « Un fichier »', () => {
-  assert.match(read('components/ImportFormats.svelte'), /od-import-formats--link \{[^}]*min-height: 48px/);
+  assert.match(read('components/ImportFormats.svelte'), /bc-import-formats--link \{[^}]*min-height: 48px/);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.ok(steps.indexOf('welcomeSteps.fileTitle') < steps.indexOf('<ImportFormats />'));
   assert.ok(steps.indexOf('welcomeSteps.divelogsTitle', steps.indexOf('<ImportFormats />')) > 0);
@@ -198,18 +198,18 @@ test('the cascade layer order is declared first in the document, before any buil
 test('first step spacing: the mock-up vertical distances (title, choices, text buttons, help link)', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   // 20 dp under the band, the title 6 + the choices 14 = 20 dp apart, the choices 12 dp apart.
-  assert.match(steps, /\.od-first-launch--first \{\s*padding-top: 20px;/);
-  assert.match(steps, /\.od-first-launch--rows \{\s*display: flex;\s*flex-direction: column;\s*gap: 12px;/);
-  assert.match(steps, /\.od-first-launch--title \{\s*margin: 0 0 6px;/);
-  assert.match(steps, /\.od-first-launch--rows-start \{\s*margin-top: 14px;/);
+  assert.match(steps, /\.bc-first-launch--first \{\s*padding-top: 20px;/);
+  assert.match(steps, /\.bc-first-launch--rows \{\s*display: flex;\s*flex-direction: column;\s*gap: 12px;/);
+  assert.match(steps, /\.bc-first-launch--title \{\s*margin: 0 0 6px;/);
+  assert.match(steps, /\.bc-first-launch--rows-start \{\s*margin-top: 14px;/);
   // Text buttons: 40 dp high, 12 dp side padding, 8 dp apart, 16 dp above and below the group.
-  assert.match(steps, /\.od-first-launch--text-buttons \{[^}]*gap: 8px;\s*margin: 16px 0;/);
-  assert.match(steps, /\.od-first-launch--text-button \{[^}]*height: 40px;\s*padding: 0 12px;/);
+  assert.match(steps, /\.bc-first-launch--text-buttons \{[^}]*gap: 8px;\s*margin: 16px 0;/);
+  assert.match(steps, /\.bc-first-launch--text-button \{[^}]*height: 40px;\s*padding: 0 12px;/);
   // The help link takes the spare height above it (auto margin) and ends 20 dp above the system bar on Android.
   assert.match(steps, /margin: auto auto calc\(var\(--f7-safe-area-bottom\) \+ 28px\);\s*padding-top: 24px;/);
-  assert.match(steps, /:global\(\.md\) \.od-first-launch :global\(\.od-welcome-help-link\) \{\s*margin-bottom: calc\(var\(--f7-safe-area-bottom\) \+ 20px\);/);
+  assert.match(steps, /:global\(\.md\) \.bc-first-launch :global\(\.bc-welcome-help-link\) \{\s*margin-bottom: calc\(var\(--f7-safe-area-bottom\) \+ 20px\);/);
   // The band: 330 dp including the status bar, the intro 8 dp under the headline.
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
-  assert.match(page, /\.od-welcome-release--intro \{[^}]*margin: 8px 0 0;/);
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--bc-welcome-band-top\)\)/);
+  assert.match(page, /\.bc-welcome-release--intro \{[^}]*margin: 8px 0 0;/);
 });

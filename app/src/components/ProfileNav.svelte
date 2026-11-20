@@ -53,50 +53,50 @@
   }
 </script>
 
-<nav class="od-profile-nav" aria-label={t('gear.profile.title')}>
-  <div class="od-profile-nav--head">
-    {#if !profileWindow}<button type="button" class="od-profile-nav--back" aria-label={t('gear.piece.back')} onclick={leave}><i class="icon icon-back"></i></button>{/if}
-    <h1 class="od-profile-nav--title">{t('gear.profile.title')}</h1>
+<nav class="bc-profile-nav" aria-label={t('gear.profile.title')}>
+  <div class="bc-profile-nav--head">
+    {#if !profileWindow}<button type="button" class="bc-profile-nav--back" aria-label={t('gear.piece.back')} onclick={leave}><i class="icon icon-back"></i></button>{/if}
+    <h1 class="bc-profile-nav--title">{t('gear.profile.title')}</h1>
   </div>
-  <div class="od-profile-nav--hero">
-    <span class="od-profile-nav--initial" aria-hidden="true">{initial}</span>
-    <span class="od-profile-nav--who">
-      <span class="od-profile-nav--name">{name}</span>
-      <span class="od-profile-nav--line">{divesLine}</span>
+  <div class="bc-profile-nav--hero">
+    <span class="bc-profile-nav--initial" aria-hidden="true">{initial}</span>
+    <span class="bc-profile-nav--who">
+      <span class="bc-profile-nav--name">{name}</span>
+      <span class="bc-profile-nav--line">{divesLine}</span>
       <BenthicPlusChip onLight />
     </span>
   </div>
-  <h2 class="od-profile-nav--section">{t('gear.profile.keep')}</h2>
-  <div class="od-profile-nav--list">
+  <h2 class="bc-profile-nav--section">{t('gear.profile.keep')}</h2>
+  <div class="bc-profile-nav--list">
     {#each entries as e (e.id)}
-      <button type="button" class="od-profile-nav--row" class:od-profile-nav--on={section === e.id} aria-current={section === e.id ? 'page' : undefined} onclick={() => showProfilePath(PROFILE_SECTIONS[e.id])}>
-        <span class="od-profile-nav--tile od-profile-nav--tile-{e.tone}"><Icon name={e.icon} size={22} weight={1.8} /></span>
-        <span class="od-profile-nav--texts">
-          <span class="od-profile-nav--label">{t(e.label)}</span>
-          {#if lines[e.id]}<span class="od-profile-nav--supporting">{lines[e.id]}</span>{/if}
+      <button type="button" class="bc-profile-nav--row" class:bc-profile-nav--on={section === e.id} aria-current={section === e.id ? 'page' : undefined} onclick={() => showProfilePath(PROFILE_SECTIONS[e.id])}>
+        <span class="bc-profile-nav--tile bc-profile-nav--tile-{e.tone}"><Icon name={e.icon} size={22} weight={1.8} /></span>
+        <span class="bc-profile-nav--texts">
+          <span class="bc-profile-nav--label">{t(e.label)}</span>
+          {#if lines[e.id]}<span class="bc-profile-nav--supporting">{lines[e.id]}</span>{/if}
         </span>
-        {#if e.id === 'maintenance' && overdue > 0}<span class="od-profile-nav--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
+        {#if e.id === 'maintenance' && overdue > 0}<span class="bc-profile-nav--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
       </button>
     {/each}
   </div>
-  <p class="od-profile-nav--note"><Icon name="lock" size={16} /><span>{t('gear.profile.keptWide')}</span></p>
+  <p class="bc-profile-nav--note"><Icon name="lock" size={16} /><span>{t('gear.profile.keptWide')}</span></p>
 </nav>
 
 <style>
   @layer od.components {
-    .od-profile-nav {
+    .bc-profile-nav {
       flex: none;
-      width: var(--od-pf-nav);
+      width: var(--bc-pf-nav);
       box-sizing: border-box;
       height: 100%;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       padding: 0 8px 16px;
-      background: var(--od-background);
-      border-right: 1px solid var(--od-separator);
+      background: var(--bc-background);
+      border-right: 1px solid var(--bc-separator);
     }
-    .od-profile-nav--head {
+    .bc-profile-nav--head {
       flex: none;
       display: flex;
       align-items: center;
@@ -104,24 +104,24 @@
       height: 64px;
       padding: 0 12px;
     }
-    .od-profile-nav--back {
+    .bc-profile-nav--back {
       width: 40px;
       height: 40px;
       border: 0;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: grid;
       place-items: center;
       cursor: pointer;
     }
-    .od-profile-nav--title {
+    .bc-profile-nav--title {
       margin: 0;
       font-size: 22px;
       font-weight: 500;
       line-height: 28px;
     }
-    .od-profile-nav--hero {
+    .bc-profile-nav--hero {
       flex: none;
       margin: 0 0 8px;
       padding: 16px;
@@ -129,28 +129,28 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-profile-nav--initial {
+    .bc-profile-nav--initial {
       flex: none;
       width: 52px;
       height: 52px;
       border-radius: 26px;
       display: grid;
       place-items: center;
-      background: var(--od-nav-avatar-ink);
+      background: var(--bc-nav-avatar-ink);
       color: #FFFFFF;
       font-size: 22px;
       font-weight: 600;
     }
-    .od-profile-nav--who {
+    .bc-profile-nav--who {
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 2px;
     }
-    .od-profile-nav--name {
+    .bc-profile-nav--name {
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -158,22 +158,22 @@
       font-size: 18px;
       font-weight: 600;
     }
-    .od-profile-nav--line {
-      color: var(--od-text-2);
+    .bc-profile-nav--line {
+      color: var(--bc-text-2);
       font-size: 14px;
     }
-    .od-profile-nav--section {
+    .bc-profile-nav--section {
       margin: 8px 12px 4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 14px;
       font-weight: 600;
     }
-    .od-profile-nav--list {
+    .bc-profile-nav--list {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
-    .od-profile-nav--row {
+    .bc-profile-nav--row {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -182,55 +182,55 @@
       border: 0;
       border-radius: 16px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-align: start;
       font: inherit;
       cursor: pointer;
     }
-    .od-profile-nav--row:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-profile-nav--row:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-profile-nav--on,
-    .od-profile-nav--on:hover {
-      background: var(--od-selected-container);
+    .bc-profile-nav--on,
+    .bc-profile-nav--on:hover {
+      background: var(--bc-selected-container);
     }
-    .od-profile-nav--tile {
+    .bc-profile-nav--tile {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 12px;
       display: grid;
       place-items: center;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-profile-nav--tile-blue {
-      background: var(--od-release-tile);
+    .bc-profile-nav--tile-blue {
+      background: var(--bc-release-tile);
     }
-    .od-profile-nav--tile-amber {
-      background: var(--od-maintenance);
-      color: var(--od-maintenance-icon);
+    .bc-profile-nav--tile-amber {
+      background: var(--bc-maintenance);
+      color: var(--bc-maintenance-icon);
     }
-    .od-profile-nav--tile-violet {
-      background: var(--od-tile-violet);
+    .bc-profile-nav--tile-violet {
+      background: var(--bc-tile-violet);
     }
-    .od-profile-nav--tile-red {
-      background: var(--od-error-container);
+    .bc-profile-nav--tile-red {
+      background: var(--bc-error-container);
     }
-    .od-profile-nav--texts {
+    .bc-profile-nav--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
-    .od-profile-nav--label {
+    .bc-profile-nav--label {
       font-size: 16px;
       font-weight: 500;
     }
-    .od-profile-nav--supporting {
-      color: var(--od-text-2);
+    .bc-profile-nav--supporting {
+      color: var(--bc-text-2);
       font-size: 14px;
     }
-    .od-profile-nav--badge {
+    .bc-profile-nav--badge {
       min-width: 22px;
       height: 22px;
       padding: 0 6px;
@@ -238,18 +238,18 @@
       border-radius: 11px;
       display: grid;
       place-items: center;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
       color: #FFFFFF;
       font-size: 13px;
       font-weight: 600;
     }
-    .od-profile-nav--note {
+    .bc-profile-nav--note {
       margin: auto 8px 0;
       padding-top: 16px;
       display: flex;
       gap: 8px;
       align-items: flex-start;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 13px;
     }
   }

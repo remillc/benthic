@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The card of a selected pin (od-map-site-card, task 2026-11-14-150): over the bottom of
+  // The card of a selected pin (bc-map-site-card, task 2026-11-14-150): over the bottom of
   // a map, the site's name, « {pays} · {n} plongées, la dernière le {date} », its maximum
   // depth and a chevron; it opens the site's sheet. Back closes it (lib/back-button.js
   // sends od-cancel to it). On the Sites map and, up close, on the heat map (task 155). A site of the shared map
@@ -33,20 +33,20 @@
   }
 </script>
 
-<button type="button" class="od-map-site-card" aria-label={label} onclick={onopen} use:cancelable>
-  <span class="od-map-site-card--texts">
-    <span class="od-map-site-card--name">{site.name || t('sites.noName')}</span>
-    <span class="od-map-site-card--line">{line || [site.country, t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
+<button type="button" class="bc-map-site-card" aria-label={label} onclick={onopen} use:cancelable>
+  <span class="bc-map-site-card--texts">
+    <span class="bc-map-site-card--name">{site.name || t('sites.noName')}</span>
+    <span class="bc-map-site-card--line">{line || [site.country, t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
   </span>
-  {#if site.maxDepthMm && !line}<span class="od-map-site-card--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
+  {#if site.maxDepthMm && !line}<span class="bc-map-site-card--depth bc-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
   <Icon name="chevron" size={20} />
 </button>
 
 <style>
   @layer od.components {
-    /* The card of the selected pin (od-map-site-card): over the bottom of the map, 16 dp
+    /* The card of the selected pin (bc-map-site-card): over the bottom of the map, 16 dp
        from the edges, white, 16 dp corners, a light shadow. */
-    .od-map-site-card {
+    .bc-map-site-card {
       position: absolute;
       z-index: 3;
       left: 16px;
@@ -59,26 +59,26 @@
       padding: 10px 12px 10px 16px;
       border: none;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      :global(.od-map-fullscreen) & {
-        bottom: calc(var(--od-safe-bottom) + 112px);
+      :global(.bc-map-fullscreen) & {
+        bottom: calc(var(--bc-safe-bottom) + 112px);
       }
     }
 
-    .od-map-site-card--texts {
+    .bc-map-site-card--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -86,19 +86,19 @@
       gap: 2px;
     }
 
-    .od-map-site-card--name {
+    .bc-map-site-card--name {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
     }
 
-    .od-map-site-card--line {
+    .bc-map-site-card--line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-map-site-card--depth {
+    .bc-map-site-card--depth {
       flex: none;
       font-size: 16px;
       font-weight: 500;

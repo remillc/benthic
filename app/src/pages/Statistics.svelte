@@ -146,14 +146,14 @@
   });
 </script>
 
-<Page data-od-scroll class="od-statistics" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class={theme.ios ? 'od-ios-bar' : 'od-band-bar od-band-titled'} title={t('stats.title')}>
+<Page data-od-scroll class="bc-statistics" onPageInit={keepInSvelteRange}>
+  <Navbar large={theme.ios} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-titled'} title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       {#if theme.ios}
         <Link href="/filter">{t('stats.filterShort')}</Link>
       {:else}
-        <Link class="od-statistics--filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
+        <Link class="bc-statistics--filter-button" href="/filter"><Icon name="filter" size={18} weight={2} />{t('stats.freeFilter')}</Link>
       {/if}
       <AccountAvatar />
     </NavRight>
@@ -163,8 +163,8 @@
   <SectionBand bare={!theme.ios} summary={bandSummary} />
 
   {#if !logbook.loading && !logbook.dives.length}
-    <div class="od-statistics--empty">
-      <p class="od-state-title">{t('stats.emptyTitle')}</p>
+    <div class="bc-statistics--empty">
+      <p class="bc-state-title">{t('stats.emptyTitle')}</p>
       <p>{t('stats.emptyText')}</p>
     </div>
   {:else if !logbook.loading}
@@ -174,13 +174,13 @@
     <KeyFigures figures={result?.total ?? null} prefs={logbook.prefs} />
 
     <div class="block-title">{t('stats.charts')}</div>
-    <div class="od-statistics--charts">
-      <section class="od-statistics--chart-card">
+    <div class="bc-statistics--charts">
+      <section class="bc-statistics--chart-card">
         <h3>{t('stats.chartYears')}</h3>
         <p>{result ? t('stats.chartYearsText', { dives: t('trip.dives', { n: result.total.dives }), n: yearBars.length }) : ''}</p>
         <BarChart bars={yearBars} tinted label={t('stats.chartYears')} />
       </section>
-      <section class="od-statistics--chart-card">
+      <section class="bc-statistics--chart-card">
         <h3>{t('stats.chartDurations')}</h3>
         <p>{durationRange}</p>
         <BarChart bars={durationBars} tinted scale={60} unit={t('units.minutes')} label={t('stats.chartDurationsLabel', { n: dives.length })} />
@@ -188,7 +188,7 @@
     </div>
 
     <!-- « Où je plonge le plus » (task 2026-11-14-152): after the charts, on the same filter. -->
-    <div class="od-statistics--heatmap"><HeatMapCard {dives} {sites} /></div>
+    <div class="bc-statistics--heatmap"><HeatMapCard {dives} {sites} /></div>
 
     <div class="block-title">{t('stats.mine')}</div>
     {#if myStatistics.list.length || theme.ios}
@@ -196,26 +196,26 @@
         <ul>
           {#each myStatistics.list as s (s.id)}
             {@const href = rowHref('mine', s.name, s.criteria)}
-            <li class:od-statistics--selected={layout.split && selected === href}>
+            <li class:bc-statistics--selected={layout.split && selected === href}>
               <a {href} data-reload-detail="true" class="item-link item-content" onclick={(e) => { chooseStatistic(`saved:${s.id}`); select(e); }}>
                 <div class="item-inner">
                   <div class="item-title-row"><div class="item-title">{s.name}</div></div>
-                  <div class="item-text od-value">{summaryLine(saved[s.id])}</div>
+                  <div class="item-text bc-value">{summaryLine(saved[s.id])}</div>
                 </div>
               </a>
             </li>
           {/each}
           {#if theme.ios}
             <!-- iOS: the action is a row of the group (HIG), not a button. -->
-            <li><a href="/statistics/new" class="item-content od-statistics--action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
+            <li><a href="/statistics/new" class="item-content bc-statistics--action-row"><div class="item-inner"><div class="item-title">{t('stats.newEllipsis')}</div></div></a></li>
           {/if}
         </ul>
       </div>
     {/if}
-    {#if !myStatistics.list.length}<p class="od-statistics--note">{t('stats.mineEmpty')}</p>{/if}
+    {#if !myStatistics.list.length}<p class="bc-statistics--note">{t('stats.mineEmpty')}</p>{/if}
     {#if !theme.ios}
-      <div class="od-statistics--new">
-        <a href="/statistics/new" class="od-tonal-button od-statistics--new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
+      <div class="bc-statistics--new">
+        <a href="/statistics/new" class="bc-tonal-button bc-statistics--new-button"><Icon name="plus" size={18} weight={2} />{t('stats.new')}</a>
       </div>
     {/if}
 
@@ -224,24 +224,24 @@
       {#if rows?.length}
         {@const title = t(`stats.${key}`)}
         {@const open = !!openSections[key]}
-        <h2 class="od-statistics--heading">
-          <button type="button" class="od-statistics--toggle" aria-expanded={open} onclick={() => toggleSection(key, open)}>
-            <span class="od-statistics--toggle-text">{title}</span>
-            <span class="od-statistics--chevron" class:od-statistics--chevron-up={open}><Icon name="expand" size={24} /></span>
+        <h2 class="bc-statistics--heading">
+          <button type="button" class="bc-statistics--toggle" aria-expanded={open} onclick={() => toggleSection(key, open)}>
+            <span class="bc-statistics--toggle-text">{title}</span>
+            <span class="bc-statistics--chevron" class:bc-statistics--chevron-up={open}><Icon name="expand" size={24} /></span>
           </button>
         </h2>
         {#if open}
-          <ul class="od-statistics--rows">
+          <ul class="bc-statistics--rows">
             {#each rows as row (row.key)}
               {@const href = rowHref(key, row.title, row.criteria)}
-              <li class:od-statistics--selected={layout.split && selected === href}>
-                <a {href} data-reload-detail="true" class="od-statistics--row ripple" onclick={select}>
-                  <div class="od-statistics--text">
-                    <span class="od-statistics--title" class:od-value={row.numeric}>{row.title}</span>
-                    <span class="od-statistics--support od-value">{row.support}</span>
+              <li class:bc-statistics--selected={layout.split && selected === href}>
+                <a {href} data-reload-detail="true" class="bc-statistics--row ripple" onclick={select}>
+                  <div class="bc-statistics--text">
+                    <span class="bc-statistics--title" class:bc-value={row.numeric}>{row.title}</span>
+                    <span class="bc-statistics--support bc-value">{row.support}</span>
                   </div>
-                  {#if row.after}<span class="od-statistics--after od-value">{row.after}</span>{/if}
-                  <span class="od-statistics--row-chevron"><Icon name="chevron" size={20} /></span>
+                  {#if row.after}<span class="bc-statistics--after bc-value">{row.after}</span>{/if}
+                  <span class="bc-statistics--row-chevron"><Icon name="chevron" size={20} /></span>
                 </a>
               </li>
             {/each}
@@ -263,7 +263,7 @@
     {@render section('byMode', result ? result.byMode.filter((m) => m.dives).map((m) => totalRow('mode', m.mode, t(`detail.modes.${m.mode}`), m)) : null)}
     {@render section('bySuit', result ? result.bySuit.map((v) => totalRow('suit', v.value, v.value || notSetLabel('suit'), v)) : null)}
     {@render section('byBuddy', result ? result.byBuddy.map((v) => totalRow('buddy', v.value, v.value || notSetLabel('buddy'), v)) : null)}
-    <div class="od-statistics--end"></div>
+    <div class="bc-statistics--end"></div>
   {/if}
 </Page>
 
@@ -272,7 +272,7 @@
     /* The section titles (mock-up android-stats). */
     .block-title {
       margin: 22px 16px 8px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* iPhone (docs/mockups/ios-stats-tableau): small-capitals titles. */
@@ -284,25 +284,25 @@
       text-transform: uppercase;
     }
 
-    :global(.ios) .od-statistics--toggle-text {
+    :global(.ios) .bc-statistics--toggle-text {
       font-size: 13px;
       font-weight: 400;
       text-transform: uppercase;
     }
 
     /* The title of a "By …" section: a 48 dp button (mock-up android-stats). */
-    .od-statistics--heading {
+    .bc-statistics--heading {
       margin: 14px 8px 0;
       font: inherit;
     }
 
-    .od-statistics--toggle {
+    .bc-statistics--toggle {
       width: 100%;
       min-height: 48px;
       padding: 0 12px 0 8px;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -313,26 +313,26 @@
       cursor: pointer;
     }
 
-    .od-statistics--toggle-text {
+    .bc-statistics--toggle-text {
       flex: 1;
     }
 
-    .od-statistics--chevron {
+    .bc-statistics--chevron {
       display: flex;
       transition: transform 0.2s;
     }
 
-    .od-statistics--chevron-up {
+    .bc-statistics--chevron-up {
       transform: rotate(180deg);
     }
 
     /* The "By …" sections: a rounded card of plain rows (mock-up android-stats). */
-    .od-statistics--rows {
+    .bc-statistics--rows {
       margin: 0 16px;
       padding: 0;
       list-style: none;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -340,11 +340,11 @@
       }
     }
 
-    .od-statistics--rows li + li {
-      border-top: 1px solid var(--od-separator);
+    .bc-statistics--rows li + li {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-statistics--row {
+    .bc-statistics--row {
       position: relative;
       overflow: hidden;
       display: flex;
@@ -353,17 +353,17 @@
       box-sizing: border-box;
       min-height: 72px;
       padding: 8px 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-statistics--row-chevron {
+    .bc-statistics--row-chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-statistics--text {
+    .bc-statistics--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -371,41 +371,41 @@
       gap: 2px;
     }
 
-    .od-statistics--title {
+    .bc-statistics--title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-statistics--support,
-    .od-statistics--after {
+    .bc-statistics--support,
+    .bc-statistics--after {
       font-size: 14px;
       line-height: 20px;
     }
 
-    .od-statistics--support {
-      color: var(--od-text-2);
+    .bc-statistics--support {
+      color: var(--bc-text-2);
     }
 
     /* Tablet: the row whose result is shown beside the list. */
-    li.od-statistics--selected {
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+    li.bc-statistics--selected {
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
     }
 
-    .od-statistics--empty {
+    .bc-statistics--empty {
       margin: 32px 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-statistics--note {
+    .bc-statistics--note {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Top bar text button with its icon (MD3 text button, 12 dp side padding). */
-    :global(.md .od-statistics--filter-button) {
+    :global(.md .bc-statistics--filter-button) {
       width: auto;
       white-space: nowrap;
       gap: 8px;
@@ -415,12 +415,12 @@
       letter-spacing: 0.1px;
     }
 
-    .od-statistics--heatmap {
+    .bc-statistics--heatmap {
       margin-top: 16px;
     }
 
     /* Ready-made charts: cards scrolled sideways, snapping to each card. */
-    .od-statistics--charts {
+    .bc-statistics--charts {
       padding: 0 16px;
       display: flex;
       gap: 12px;
@@ -431,12 +431,12 @@
     }
 
     /* The desktop app (a mouse has no swipe, fluid layout): the cards wrap in the pane's width instead of scrolling sideways. */
-    :global(html.od-desktop-app) .od-statistics--charts {
+    :global(html.bc-desktop-app) .bc-statistics--charts {
       flex-wrap: wrap;
       overflow-x: visible;
       scroll-snap-type: none;
 
-      .od-statistics--chart-card {
+      .bc-statistics--chart-card {
         flex: 1 1 272px;
         width: auto;
         min-width: 0;
@@ -444,13 +444,13 @@
       }
     }
 
-    .od-statistics--chart-card {
+    .bc-statistics--chart-card {
       flex: none;
       width: 272px;
       padding: 16px;
       box-sizing: border-box;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -479,7 +479,7 @@
         margin: 0 0 10px;
         font-size: 12px;
         line-height: 16px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
         font-variant-numeric: tabular-nums;
 
         :global(.ios) & {
@@ -490,12 +490,12 @@
     }
 
     /* Android: "New statistic" is a tonal button under the list (MD3). */
-    .od-statistics--new {
+    .bc-statistics--new {
       margin: 12px 16px 0;
       display: flex;
     }
 
-    .od-statistics--new-button {
+    .bc-statistics--new-button {
       padding: 0 24px 0 16px;
       display: inline-flex;
       align-items: center;
@@ -505,12 +505,12 @@
     }
 
     /* iOS: the action row of the My statistics group, in bold. */
-    .od-statistics--action-row .item-title {
+    .bc-statistics--action-row .item-title {
       font-weight: 600;
-      color: var(--od-action);
+      color: var(--bc-action);
     }
 
-    .od-statistics--end {
+    .bc-statistics--end {
       height: 32px;
     }
   }

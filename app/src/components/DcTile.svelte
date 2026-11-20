@@ -84,10 +84,10 @@
 </script>
 
 {#if hasPhoto}
-  <span class="od-dc-tile {extra}" style:width="{size}px" style:height="{size}px" style:border-radius="{corner}px" class:od-dc-tile--shown={shown || !fade}>
-    <span class="od-dc-tile--placeholder" aria-hidden="true"><Icon name="wristComputer" size={size >= 96 ? 72 : 24} weight={1.8} /></span>
+  <span class="bc-dc-tile {extra}" style:width="{size}px" style:height="{size}px" style:border-radius="{corner}px" class:bc-dc-tile--shown={shown || !fade}>
+    <span class="bc-dc-tile--placeholder" aria-hidden="true"><Icon name="wristComputer" size={size >= 96 ? 72 : 24} weight={1.8} /></span>
     {#if src}
-      <img class="od-dc-tile--image" {src} alt="" width={size} height={size} onload={() => (shown = true)} onerror={() => (state = { ...state, phase: 'failed', src: null, failedAt: Date.now() })} />
+      <img class="bc-dc-tile--image" {src} alt="" width={size} height={size} onload={() => (shown = true)} onerror={() => (state = { ...state, phase: 'failed', src: null, failedAt: Date.now() })} />
     {/if}
   </span>
 {:else if fallback}
@@ -98,27 +98,27 @@
 
 <style>
   @layer od.components {
-    .od-dc-tile {
+    .bc-dc-tile {
       flex: none;
       position: relative;
       display: block;
       overflow: hidden;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
     }
 
-    .od-dc-tile--placeholder {
+    .bc-dc-tile--placeholder {
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-dc-tile--image {
+    .bc-dc-tile--image {
       position: absolute;
       inset: 0;
-      background: var(--od-photo-ground);
+      background: var(--bc-photo-ground);
       display: block;
       width: 100%;
       height: 100%;
@@ -127,12 +127,12 @@
       transition: opacity 150ms linear;
     }
 
-    .od-dc-tile--shown .od-dc-tile--image {
+    .bc-dc-tile--shown .bc-dc-tile--image {
       opacity: 1;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-dc-tile--image {
+      .bc-dc-tile--image {
         transition: none;
       }
     }

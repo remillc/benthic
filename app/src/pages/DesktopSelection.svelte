@@ -23,10 +23,10 @@
   });
 </script>
 
-<Page class="od-desktop-selection">
-  <div class="od-desktop-selection--body" role="status">
-    <h2 class="od-desktop-selection--title">{t('desktop.selected', { n: summary.count })}</h2>
-    <p class="od-desktop-selection--figures od-value">
+<Page class="bc-desktop-selection">
+  <div class="bc-desktop-selection--body" role="status">
+    <h2 class="bc-desktop-selection--title">{t('desktop.selected', { n: summary.count })}</h2>
+    <p class="bc-desktop-selection--figures bc-value">
       {[
         numbers ? t('desktop.numbers', { numbers }) : '',
         t('desktop.underWater', { n: Math.round(summary.seconds / 60) }),
@@ -35,13 +35,13 @@
         .filter(Boolean)
         .join(' · ')}
     </p>
-    <p class="od-desktop-selection--hint">{t('desktop.selectionHint')}</p>
+    <p class="bc-desktop-selection--hint">{t('desktop.selectionHint')}</p>
   </div>
 </Page>
 
 <style>
   @layer od.components {
-    .od-desktop-selection--body {
+    .bc-desktop-selection--body {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -51,22 +51,22 @@
       padding: 24px;
       text-align: center;
     }
-    .od-desktop-selection--title {
+    .bc-desktop-selection--title {
       margin: 0 0 8px;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-selection--figures {
+    .bc-desktop-selection--figures {
       margin: 0 0 6px;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-selection--hint {
+    .bc-desktop-selection--hint {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

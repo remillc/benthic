@@ -15,16 +15,16 @@
   }
 </script>
 
-<button type="button" class="od-dev-tools-row" onclick={open}>
-  <span class="od-dev-tools-row--icon"><Icon name="tune" size={20} /></span>
-  <span class="od-dev-tools-row--label">{label}</span>
-  <span class="od-dev-tools-row--tag">DEV</span>
-  <span class="od-dev-tools-row--chevron"><Icon name="chevron" size={18} /></span>
+<button type="button" class="bc-dev-tools-row" onclick={open}>
+  <span class="bc-dev-tools-row--icon"><Icon name="tune" size={20} /></span>
+  <span class="bc-dev-tools-row--label">{label}</span>
+  <span class="bc-dev-tools-row--tag">DEV</span>
+  <span class="bc-dev-tools-row--chevron"><Icon name="chevron" size={18} /></span>
 </button>
 
 <style>
   @layer od.components {
-    .od-dev-tools-row {
+    .bc-dev-tools-row {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -33,38 +33,38 @@
       min-height: 48px;
       margin: 8px 0;
       padding: 0 14px 0 12px;
-      border: 1.5px dashed var(--od-dev);
+      border: 1.5px dashed var(--bc-dev);
       border-radius: 16px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: left;
       cursor: pointer;
     }
-    .od-dev-tools-row:active {
-      background: var(--od-dev-tint);
+    .bc-dev-tools-row:active {
+      background: var(--bc-dev-tint);
     }
-    .od-dev-tools-row--icon {
+    .bc-dev-tools-row--icon {
       display: inline-flex;
-      color: var(--od-dev);
+      color: var(--bc-dev);
     }
-    .od-dev-tools-row--label {
+    .bc-dev-tools-row--label {
       flex: 1;
       min-width: 0;
       font-weight: 500;
     }
-    .od-dev-tools-row--tag {
+    .bc-dev-tools-row--tag {
       padding: 1px 7px;
       border-radius: 6px;
-      background: var(--od-dev);
-      color: var(--od-on-dev);
+      background: var(--bc-dev);
+      color: var(--bc-on-dev);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.6px;
     }
-    .od-dev-tools-row--chevron {
+    .bc-dev-tools-row--chevron {
       display: inline-flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

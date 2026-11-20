@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « {n} sites à cet endroit » (od-map-stack-sheet, task 2026-11-14-150;
+  // « {n} sites à cet endroit » (bc-map-stack-sheet, task 2026-11-14-150;
   // sites-superposes-android.dc.html): the pins one tap touched on the Sites map, when
   // they overlap at that scale. The place under the title, then one 56 dp row per site,
   // the most dived first: its dive count in an ink badge, its name, « {n} plongées »,
@@ -42,23 +42,23 @@
   const title = $derived(t('sites.stackTitle', { n: sites.length }));
 </script>
 
-<Sheet class="od-map-stack-sheet od-sheet-dialog" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
-  <div class="od-map-stack-sheet--content" bind:this={content}>
-    <div class="od-map-stack-sheet--handle" aria-hidden="true"></div>
-    <div class="od-map-stack-sheet--head">
-      <h2 class="od-map-stack-sheet--title">{title}</h2>
-      <button type="button" class="od-map-stack-sheet--close" aria-label={t('sites.close')} onclick={close}><Icon name="close" size={20} /></button>
+<Sheet class="bc-map-stack-sheet bc-sheet-dialog" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
+  <div class="bc-map-stack-sheet--content" bind:this={content}>
+    <div class="bc-map-stack-sheet--handle" aria-hidden="true"></div>
+    <div class="bc-map-stack-sheet--head">
+      <h2 class="bc-map-stack-sheet--title">{title}</h2>
+      <button type="button" class="bc-map-stack-sheet--close" aria-label={t('sites.close')} onclick={close}><Icon name="close" size={20} /></button>
     </div>
-    <p class="od-map-stack-sheet--note">{place ? `${place}. ` : ''}{t('sites.stackNote')}</p>
-    <nav class="od-map-stack-sheet--list">
+    <p class="bc-map-stack-sheet--note">{place ? `${place}. ` : ''}{t('sites.stackNote')}</p>
+    <nav class="bc-map-stack-sheet--list">
       {#each rows as site (site.uuid)}
-        <button type="button" class="od-map-stack-sheet--row" onclick={() => ((chosen = site.uuid), close())}>
-          <span class="od-map-stack-sheet--badge" aria-hidden="true">{formatNumber(site.dives)}</span>
-          <span class="od-map-stack-sheet--texts">
-            <span class="od-map-stack-sheet--name">{site.name || t('sites.noName')}</span>
-            <span class="od-map-stack-sheet--dives">{t('sites.diveCount', { n: site.dives })}</span>
+        <button type="button" class="bc-map-stack-sheet--row" onclick={() => ((chosen = site.uuid), close())}>
+          <span class="bc-map-stack-sheet--badge" aria-hidden="true">{formatNumber(site.dives)}</span>
+          <span class="bc-map-stack-sheet--texts">
+            <span class="bc-map-stack-sheet--name">{site.name || t('sites.noName')}</span>
+            <span class="bc-map-stack-sheet--dives">{t('sites.diveCount', { n: site.dives })}</span>
           </span>
-          {#if site.maxDepthMm}<span class="od-map-stack-sheet--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
+          {#if site.maxDepthMm}<span class="bc-map-stack-sheet--depth bc-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
           <Icon name="chevron" size={20} />
         </button>
       {/each}
@@ -68,8 +68,8 @@
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-map-stack-sheet) {
-      --f7-sheet-bg-color: var(--od-background);
+    :global(.sheet-modal.bc-map-stack-sheet) {
+      --f7-sheet-bg-color: var(--bc-background);
       height: auto;
       max-height: 85%;
       border-radius: 28px 28px 0 0;
@@ -79,33 +79,33 @@
       }
     }
 
-    .od-map-stack-sheet--content {
-      padding: 8px 0 calc(24px + var(--od-safe-bottom));
+    .bc-map-stack-sheet--content {
+      padding: 8px 0 calc(24px + var(--bc-safe-bottom));
       overflow-y: auto;
       max-height: 85vh;
     }
 
-    .od-map-stack-sheet--handle {
+    .bc-map-stack-sheet--handle {
       width: 32px;
       height: 4px;
       margin: 6px auto 12px;
       border-radius: 2px;
-      background: var(--od-outline);
+      background: var(--bc-outline);
     }
 
-    .od-map-stack-sheet--head {
+    .bc-map-stack-sheet--head {
       display: flex;
       align-items: center;
       padding: 0 24px 8px;
     }
 
-    .od-map-stack-sheet--title {
+    .bc-map-stack-sheet--title {
       flex: 1;
       margin: 0;
       font-size: 22px;
       line-height: 28px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(.ios) & {
         font-size: 17px;
@@ -113,30 +113,30 @@
       }
     }
 
-    .od-map-stack-sheet--close {
+    .bc-map-stack-sheet--close {
       flex: none;
       width: 48px;
       height: 48px;
       margin: -12px -12px -12px 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-map-stack-sheet--note {
+    .bc-map-stack-sheet--note {
       margin: 0 24px 10px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-map-stack-sheet--list {
+    .bc-map-stack-sheet--list {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -144,39 +144,39 @@
       }
     }
 
-    .od-map-stack-sheet--row {
+    .bc-map-stack-sheet--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
       padding: 6px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      & + .od-map-stack-sheet--row {
-        border-top: 1px solid var(--od-row-divider);
+      & + .bc-map-stack-sheet--row {
+        border-top: 1px solid var(--bc-row-divider);
       }
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-map-stack-sheet--badge {
+    .bc-map-stack-sheet--badge {
       flex: none;
       box-sizing: border-box;
       min-width: 36px;
       height: 22px;
       padding: 0 6px;
       border-radius: 11px;
-      background: var(--od-text);
-      color: var(--od-surface);
+      background: var(--bc-text);
+      color: var(--bc-surface);
       font-size: 13px;
       font-weight: 700;
       display: inline-flex;
@@ -185,25 +185,25 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .od-map-stack-sheet--texts {
+    .bc-map-stack-sheet--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-map-stack-sheet--name {
+    .bc-map-stack-sheet--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-map-stack-sheet--dives {
+    .bc-map-stack-sheet--dives {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-map-stack-sheet--depth {
+    .bc-map-stack-sheet--depth {
       flex: none;
       font-size: 16px;
       font-weight: 500;

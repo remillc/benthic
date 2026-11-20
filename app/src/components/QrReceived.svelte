@@ -42,58 +42,58 @@
 </script>
 
 {#if received.open && preview}
-  <Popup opened onPopupClosed={dismissReceived} class="od-qr-received">
+  <Popup opened onPopupClosed={dismissReceived} class="bc-qr-received">
     <Page>
       <Navbar title={t(isPlan ? 'qr.receivedPlan' : 'qr.receivedDive')}>
         {#snippet left()}
           <Link popupClose iconOnly>
-            <Icon name="close" /><span class="od-sr-only">{t('qr.close')}</span>
+            <Icon name="close" /><span class="bc-sr-only">{t('qr.close')}</span>
           </Link>
         {/snippet}
       </Navbar>
 
       {#if received.duplicate}
-        <p class="od-qr-received--duplicate" role="status">
+        <p class="bc-qr-received--duplicate" role="status">
           <strong>{t('qr.duplicateTitle')}</strong>
           <span>{t('qr.duplicateText')}</span>
         </p>
       {/if}
 
-      <div class="od-qr-received--card">
-        <p class="od-qr-received--date">{formatDateTime(preview.date)}</p>
-        <p class="od-qr-received--site">{preview.site || t('qr.noSite')}</p>
-        {#if preview.country}<p class="od-qr-received--country">{preview.country}</p>{/if}
-        <div class="od-qr-received--figures">
+      <div class="bc-qr-received--card">
+        <p class="bc-qr-received--date">{formatDateTime(preview.date)}</p>
+        <p class="bc-qr-received--site">{preview.site || t('qr.noSite')}</p>
+        {#if preview.country}<p class="bc-qr-received--country">{preview.country}</p>{/if}
+        <div class="bc-qr-received--figures">
           {#if preview.maxDepthMm}
-            <span><span class="od-qr-received--value">{formatDepth(preview.maxDepthMm, prefs)}</span><span class="od-qr-received--caption">{t('qr.deepest')}</span></span>
+            <span><span class="bc-qr-received--value">{formatDepth(preview.maxDepthMm, prefs)}</span><span class="bc-qr-received--caption">{t('qr.deepest')}</span></span>
           {/if}
           {#if preview.durationSeconds}
-            <span><span class="od-qr-received--value">{formatMinutes(preview.durationSeconds)}</span><span class="od-qr-received--caption">{t('qr.underwater')}</span></span>
+            <span><span class="bc-qr-received--value">{formatMinutes(preview.durationSeconds)}</span><span class="bc-qr-received--caption">{t('qr.underwater')}</span></span>
           {/if}
           {#if preview.minTempMk !== null}
-            <span><span class="od-qr-received--value">{formatTemperature(preview.minTempMk, prefs)}</span><span class="od-qr-received--caption">{t('qr.waterMin')}</span></span>
+            <span><span class="bc-qr-received--value">{formatTemperature(preview.minTempMk, prefs)}</span><span class="bc-qr-received--caption">{t('qr.waterMin')}</span></span>
           {/if}
         </div>
         {#if shape}
-          <svg class="od-qr-received--profile" viewBox="0 0 326 90" preserveAspectRatio="none" aria-hidden="true">
-            <path class="od-qr-received--area" d={shape.area}></path>
-            <path class="od-qr-received--line" d={shape.line}></path>
+          <svg class="bc-qr-received--profile" viewBox="0 0 326 90" preserveAspectRatio="none" aria-hidden="true">
+            <path class="bc-qr-received--area" d={shape.area}></path>
+            <path class="bc-qr-received--line" d={shape.line}></path>
           </svg>
         {/if}
         {#if rows.length}
-          <div class="od-qr-received--rows">
+          <div class="bc-qr-received--rows">
             {#each rows as [label, value]}
-              <div class="od-qr-received--row"><span class="od-qr-received--label">{label}</span><span class="od-qr-received--text">{value}</span></div>
+              <div class="bc-qr-received--row"><span class="bc-qr-received--label">{label}</span><span class="bc-qr-received--text">{value}</span></div>
             {/each}
           </div>
         {/if}
       </div>
 
-      <p class="od-qr-received--note">{t(isPlan ? 'qr.notePlan' : 'qr.noteDive')}</p>
+      <p class="bc-qr-received--note">{t(isPlan ? 'qr.notePlan' : 'qr.noteDive')}</p>
 
-      <div class="od-qr-received--actions">
-        <Link popupClose class="od-qr-received--cancel">{t('qr.cancel')}</Link>
-        <button type="button" class="od-qr-received--add" disabled={received.adding} onclick={addReceived}>
+      <div class="bc-qr-received--actions">
+        <Link popupClose class="bc-qr-received--cancel">{t('qr.cancel')}</Link>
+        <button type="button" class="bc-qr-received--add" disabled={received.adding} onclick={addReceived}>
           {received.duplicate ? t('qr.addAnyway') : t(isPlan ? 'qr.addPlan' : 'qr.addDive')}
         </button>
       </div>
@@ -103,89 +103,89 @@
 
 <style>
   @layer od.components {
-    :global(.od-qr-received .page) {
-      background: var(--od-background);
+    :global(.bc-qr-received .page) {
+      background: var(--bc-background);
     }
 
-    .od-qr-received--duplicate {
+    .bc-qr-received--duplicate {
       margin: 8px 16px 0;
       padding: 12px 16px;
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      background: var(--od-surface-container-highest);
-      color: var(--od-text);
+      background: var(--bc-surface-container-highest);
+      color: var(--bc-text);
       font-size: 15px;
     }
 
-    .od-qr-received--card {
+    .bc-qr-received--card {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-qr-received--card p {
+    .bc-qr-received--card p {
       margin: 0;
     }
 
-    .od-qr-received--date,
-    .od-qr-received--country {
+    .bc-qr-received--date,
+    .bc-qr-received--country {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-qr-received--site {
+    .bc-qr-received--site {
       margin-top: 2px;
       font-size: 24px;
       line-height: 30px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-qr-received--figures {
+    .bc-qr-received--figures {
       margin-top: 14px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
-    .od-qr-received--value {
+    .bc-qr-received--value {
       display: block;
       font-size: 22px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-qr-received--caption {
+    .bc-qr-received--caption {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-qr-received--profile {
+    .bc-qr-received--profile {
       display: block;
       width: 100%;
       height: 90px;
       margin-top: 14px;
     }
 
-    .od-qr-received--area {
-      fill: var(--od-water-top);
+    .bc-qr-received--area {
+      fill: var(--bc-water-top);
     }
 
-    .od-qr-received--line {
+    .bc-qr-received--line {
       fill: none;
-      stroke: var(--od-action);
+      stroke: var(--bc-action);
       stroke-width: 2;
       vector-effect: non-scaling-stroke;
     }
 
-    .od-qr-received--rows {
+    .bc-qr-received--rows {
       margin-top: 10px;
     }
 
-    .od-qr-received--row {
+    .bc-qr-received--row {
       min-height: 44px;
       display: flex;
       align-items: center;
@@ -193,37 +193,37 @@
       font-size: 15px;
     }
 
-    .od-qr-received--row + .od-qr-received--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-qr-received--row + .bc-qr-received--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-qr-received--label {
+    .bc-qr-received--label {
       flex: 1;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-qr-received--text {
-      color: var(--od-text);
+    .bc-qr-received--text {
+      color: var(--bc-text);
       text-align: end;
       font-variant-numeric: tabular-nums;
     }
 
-    .od-qr-received--note {
+    .bc-qr-received--note {
       margin: 16px 24px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-qr-received--actions {
+    .bc-qr-received--actions {
       margin: 24px 16px calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       justify-content: flex-end;
       gap: 12px;
     }
 
-    :global(.od-qr-received--cancel),
-    .od-qr-received--add {
+    :global(.bc-qr-received--cancel),
+    .bc-qr-received--add {
       height: 48px;
       padding: 0 24px;
       border-radius: 24px;
@@ -236,25 +236,25 @@
       text-align: center;
     }
 
-    :global(.od-qr-received--cancel) {
-      border: var(--od-outline-width) solid var(--od-outline);
-      color: var(--od-text);
+    :global(.bc-qr-received--cancel) {
+      border: var(--bc-outline-width) solid var(--bc-outline);
+      color: var(--bc-text);
     }
 
-    .od-qr-received--add {
+    .bc-qr-received--add {
       border: none;
-      background: var(--od-action);
-      color: var(--od-on-action);
+      background: var(--bc-action);
+      color: var(--bc-on-action);
     }
 
-    .od-qr-received--add:disabled {
+    .bc-qr-received--add:disabled {
       opacity: 0.5;
     }
   }
 
   /* « Ajouter au carnet » / « Ajouter quand même » keeps its own width: Framework7's unlayered
      `button { width: 100% }` would win over the layered rule (13 November 2026). */
-  .od-qr-received--add {
+  .bc-qr-received--add {
     width: auto;
   }
 </style>

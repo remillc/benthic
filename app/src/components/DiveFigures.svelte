@@ -19,37 +19,37 @@
   });
 </script>
 
-<div class="od-dive-figures od-value">
+<div class="bc-dive-figures bc-value">
   {#each figures as figure (figure.label)}
-    <span class="od-dive-figures--figure"><span class="od-dive-figures--value">{figure.value}</span><span class="od-dive-figures--label">{figure.label}</span></span>
+    <span class="bc-dive-figures--figure"><span class="bc-dive-figures--value">{figure.value}</span><span class="bc-dive-figures--label">{figure.label}</span></span>
   {/each}
 </div>
 
 <style>
   @layer od.components {
-    .od-dive-figures {
+    .bc-dive-figures {
       padding: 14px 20px 0;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .od-dive-figures--figure {
+    .bc-dive-figures--figure {
       display: flex;
       flex-direction: column;
     }
 
     /* Large key figures: the system font, as the titles (spec, "Fonts"). */
-    .od-dive-figures--value {
-      font-family: var(--od-title-font);
+    .bc-dive-figures--value {
+      font-family: var(--bc-title-font);
       font-size: 28px;
       line-height: normal;
       font-weight: 800;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-dive-figures--label {
+    .bc-dive-figures--label {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

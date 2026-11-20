@@ -138,14 +138,14 @@ function inspect(allow, rootSel) {
   // The window's foot: what is fixed to the window (the rail with the account button, a bar) must lie inside it
   // entirely; a window moved or sized so that its bottom is cut, or a rail taller than the window, shows here.
   // The whole page is looked at, whichever layer is on top, as the rail sits under every layer.
-  for (const el of document.querySelectorAll('.od-nav-rail--rail, .od-nav-rail--rail *, [class*="od-"][style*="fixed"]')) {
-    if (!shown(el) || el.closest('svg, .od-sr-only')) continue;
+  for (const el of document.querySelectorAll('.bc-nav-rail--rail, .bc-nav-rail--rail *, [class*="bc-"][style*="fixed"]')) {
+    if (!shown(el) || el.closest('svg, .bc-sr-only')) continue;
     const r = el.getBoundingClientRect();
     if (r.bottom > vh + 1 && r.top < vh) out.bottomCut.push({ el: label(el), bottom: Math.round(r.bottom), height: vh });
   }
   for (const el of root.querySelectorAll('*')) {
     // Covered pages (the previous page of a stack) and text for screen readers only are not on screen.
-    if (!shown(el) || el.closest('svg, .page-previous, .od-sr-only, .sr-only, .maplibregl-marker, .maplibregl-popup, .maplibregl-ctrl') || ['IMG', 'VIDEO', 'CANVAS'].includes(el.tagName)) continue;
+    if (!shown(el) || el.closest('svg, .page-previous, .bc-sr-only, .sr-only, .maplibregl-marker, .maplibregl-popup, .maplibregl-ctrl') || ['IMG', 'VIDEO', 'CANVAS'].includes(el.tagName)) continue;
     const cs = getComputedStyle(el);
     const ox = cs.overflowX;
     const oy = cs.overflowY;

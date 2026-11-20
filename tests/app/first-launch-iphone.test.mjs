@@ -109,26 +109,26 @@ test('the plugin: createIcloudLogbook in the contract, in Swift, and a stub on A
 test('every first-launch form is a grouped inset list on an iPhone: rows, 12 pt corners, help in #6C6C70', () => {
   const field = src('components/ReleaseField.svelte');
   assert.match(field, /const iphone = \$derived\(iosPhone\(ios, layout\.phone\)\)/);
-  assert.match(field, /class:od-release-field--ios=\{iphone\}/);
-  const rows = field.slice(field.indexOf('.od-release-field--ios {'));
+  assert.match(field, /class:bc-release-field--ios=\{iphone\}/);
+  const rows = field.slice(field.indexOf('.bc-release-field--ios {'));
   assert.match(rows, /border-radius: 12px/);
   assert.match(rows, /min-height: 48px/);
-  assert.match(rows, /color: var\(--od-release-ios-help\)/);
+  assert.match(rows, /color: var\(--bc-release-ios-help\)/);
   assert.match(rows, /width: 148px/);
   const theme = src('theme.css');
-  assert.match(theme, /--od-release-ios-help: #6C6C70;/);
-  assert.match(theme, /--od-release-ios-help: #98989D;/, 'dark value');
+  assert.match(theme, /--bc-release-ios-help: #6C6C70;/);
+  assert.match(theme, /--bc-release-ios-help: #98989D;/, 'dark value');
   // Every form uses the field: WebDAV, git, divelogs.de, the logbook name.
   for (const f of ['components/FirstLaunchWebdav.svelte', 'components/FirstLaunchGit.svelte', 'components/FirstLaunchDivelogs.svelte', 'components/FirstLaunchSteps.svelte']) {
     assert.match(src(f), /<ReleaseField/, f);
   }
   // Git: the three fields are rows of one list on an iPhone, not a pair side by side.
-  assert.match(src('components/FirstLaunchGit.svelte'), /\{#if iosPhone\(ios, layout\.phone\)\}[\s\S]+\{@render branchAndToken\(\)\}[\s\S]+\{:else\}[\s\S]+od-first-launch-git--pair/);
+  assert.match(src('components/FirstLaunchGit.svelte'), /\{#if iosPhone\(ios, layout\.phone\)\}[\s\S]+\{@render branchAndToken\(\)\}[\s\S]+\{:else\}[\s\S]+bc-first-launch-git--pair/);
 });
 
 test('« Un fichier » opens the system picker: a plain file input, several files, no custom screen', () => {
   const steps = src('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /<input type="file" multiple class="od-first-launch--file"/);
+  assert.match(steps, /<input type="file" multiple class="bc-first-launch--file"/);
   assert.doesNotMatch(steps.match(/<input type="file"[^>]*>/)[0], /accept=/, 'no accept list: every file shows in Files, an unreadable one gets the alert');
   assert.match(steps, /onclick=\{\(\) => fileInput\?\.click\(\)\}/);
 });
@@ -143,7 +143,7 @@ test('an unreadable file is a native alert on an iPhone, the inline card elsewhe
   assert.match(alert, /\{ text: t\('welcomeSteps\.otherFile'\), bold: true, onClick: \(\) => fileInput\?\.click\(\) \}/);
   // Only the unreadable file takes the alert: the other errors keep their dialog, and the inline card stays for the others.
   assert.match(steps, /if \(step === 'import' && file && \(key === 'logbook\.importFailed' \|\| key === 'logbook\.importNoDives'\)\)/);
-  assert.match(steps, /\{#if unreadable\}\s+<div class="od-first-launch--error" role="alert">/);
+  assert.match(steps, /\{#if unreadable\}\s+<div class="bc-first-launch--error" role="alert">/);
   assert.equal(langs.fr.welcomeSteps.otherFile, 'Autre fichier');
   assert.equal(langs.fr.welcomeSteps.cancel, 'Annuler');
   assert.equal(langs.fr.welcomeSteps.fileUnreadable, 'Ce fichier n’a pas pu être lu');
@@ -151,9 +151,9 @@ test('an unreadable file is a native alert on an iPhone, the inline card elsewhe
 
 test('safe area: the bands grow by the top inset, the last link clears the home indicator', () => {
   const page = src('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /--od-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
-  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--od-welcome-band-top\)\)/);
-  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--od-welcome-band-top\)\)/);
-  assert.match(page, /padding: calc\(var\(--od-welcome-band-top\) \+ 16px\) 20px 0/);
+  assert.match(page, /--bc-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
+  assert.match(page, /min-height: calc\(330px - 24px \+ var\(--bc-welcome-band-top\)\)/);
+  assert.match(page, /min-height: calc\(140px - 24px \+ var\(--bc-welcome-band-top\)\)/);
+  assert.match(page, /padding: calc\(var\(--bc-welcome-band-top\) \+ 16px\) 20px 0/);
   assert.match(src('components/FirstLaunchSteps.svelte'), /margin: auto auto calc\(var\(--f7-safe-area-bottom\) \+ 28px\)/);
 });

@@ -29,72 +29,72 @@
   const lineY = (y) => Math.min(BODY_TOP + BODY_HEIGHT - 0.75, Math.max(BODY_TOP + 0.75, y));
 </script>
 
-<svg class="od-cylinder-drawing" {width} height={(width * 76) / 44} viewBox="0 0 44 76" aria-hidden="true">
+<svg class="bc-cylinder-drawing" {width} height={(width * 76) / 44} viewBox="0 0 44 76" aria-hidden="true">
   <defs>
     <linearGradient id="{id}-water" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" class="od-cylinder-drawing--water-top" />
-      <stop offset="1" class="od-cylinder-drawing--water-bottom" />
+      <stop offset="0" class="bc-cylinder-drawing--water-top" />
+      <stop offset="1" class="bc-cylinder-drawing--water-bottom" />
     </linearGradient>
     <clipPath id="{id}-clip"><path d={SHAPE} /></clipPath>
     <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="8" height="8" class="od-cylinder-drawing--hatch-ground" />
-      <rect width="4" height="8" class="od-cylinder-drawing--hatch-stripe" />
+      <rect width="8" height="8" class="bc-cylinder-drawing--hatch-ground" />
+      <rect width="4" height="8" class="bc-cylinder-drawing--hatch-stripe" />
     </pattern>
   </defs>
-  <path d={SHAPE} class="od-cylinder-drawing--body" style:fill={hatched ? `url(#${id}-hatch)` : null} />
+  <path d={SHAPE} class="bc-cylinder-drawing--body" style:fill={hatched ? `url(#${id}-hatch)` : null} />
   {#if startLevel !== null && startLevel > 0}
-    <rect x="6" y={startTop} width="32" height={BODY_TOP + BODY_HEIGHT - startTop} class="od-cylinder-drawing--start-fill" clip-path="url(#{id}-clip)" />
-    <line x1="7" y1={lineY(startTop)} x2="37" y2={lineY(startTop)} class="od-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
+    <rect x="6" y={startTop} width="32" height={BODY_TOP + BODY_HEIGHT - startTop} class="bc-cylinder-drawing--start-fill" clip-path="url(#{id}-clip)" />
+    <line x1="7" y1={lineY(startTop)} x2="37" y2={lineY(startTop)} class="bc-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
   {/if}
   {#if level > 0}
     <rect x="6" y={fillTop} width="32" height={BODY_TOP + BODY_HEIGHT - fillTop} fill="url(#{id}-water)" clip-path="url(#{id}-clip)" />
     {#if startLevel !== null}
-      <line x1="7" y1={lineY(fillTop)} x2="37" y2={lineY(fillTop)} class="od-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
+      <line x1="7" y1={lineY(fillTop)} x2="37" y2={lineY(fillTop)} class="bc-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
     {/if}
   {/if}
-  <path d={SHAPE} class="od-cylinder-drawing--outline" stroke-width={stroke} vector-effect="non-scaling-stroke" />
+  <path d={SHAPE} class="bc-cylinder-drawing--outline" stroke-width={stroke} vector-effect="non-scaling-stroke" />
 </svg>
 
 <style>
   @layer od.components {
-    .od-cylinder-drawing {
+    .bc-cylinder-drawing {
       flex: none;
     }
 
-    .od-cylinder-drawing--body {
-      fill: var(--od-surface);
+    .bc-cylinder-drawing--body {
+      fill: var(--bc-surface);
     }
 
-    .od-cylinder-drawing--outline {
+    .bc-cylinder-drawing--outline {
       fill: none;
-      stroke: var(--od-text);
+      stroke: var(--bc-text);
       stroke-linejoin: round;
     }
 
-    .od-cylinder-drawing--hatch-ground {
-      fill: var(--od-cylinder-no-pressure);
+    .bc-cylinder-drawing--hatch-ground {
+      fill: var(--bc-cylinder-no-pressure);
     }
 
-    .od-cylinder-drawing--hatch-stripe {
-      fill: var(--od-cylinder-no-pressure-stripe);
+    .bc-cylinder-drawing--hatch-stripe {
+      fill: var(--bc-cylinder-no-pressure-stripe);
     }
 
     /* The water gradient. */
-    .od-cylinder-drawing--water-top {
-      stop-color: var(--od-cylinder-water-top);
+    .bc-cylinder-drawing--water-top {
+      stop-color: var(--bc-cylinder-water-top);
     }
 
-    .od-cylinder-drawing--water-bottom {
-      stop-color: var(--od-cylinder-water-bottom);
+    .bc-cylinder-drawing--water-bottom {
+      stop-color: var(--bc-cylinder-water-bottom);
     }
 
     /* Between the end and the start pressure: what was breathed. */
-    .od-cylinder-drawing--start-fill {
-      fill: var(--od-cylinder-breathed);
+    .bc-cylinder-drawing--start-fill {
+      fill: var(--bc-cylinder-breathed);
     }
 
-    .od-cylinder-drawing--level {
-      stroke: var(--od-cylinder-level);
+    .bc-cylinder-drawing--level {
+      stroke: var(--bc-cylinder-level);
       stroke-width: 1.5;
       stroke-dasharray: 3 2;
     }

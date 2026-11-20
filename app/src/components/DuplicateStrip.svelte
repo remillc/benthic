@@ -87,87 +87,87 @@
   );
 </script>
 
-<div class="od-duplicate-strip" bind:this={box} role="img" aria-label={label}>
+<div class="bc-duplicate-strip" bind:this={box} role="img" aria-label={label}>
   {#if url}
-    <img class="od-duplicate-strip--map" src={url} alt="" />
-    <svg class="od-duplicate-strip--marks" width={width} height={HEIGHT} viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
+    <img class="bc-duplicate-strip--map" src={url} alt="" />
+    <svg class="bc-duplicate-strip--marks" width={width} height={HEIGHT} viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
       {#if same}
         <g transform="translate({xy[0][0]} {xy[0][1]})">
-          <path d={PIN} class="od-duplicate-strip--kept" />
-          <text y="-19.5" class="od-duplicate-strip--count">{formatNumber(2)}</text>
+          <path d={PIN} class="bc-duplicate-strip--kept" />
+          <text y="-19.5" class="bc-duplicate-strip--count">{formatNumber(2)}</text>
         </g>
-        <text x={xy[0][0]} y={xy[0][1] + 16} text-anchor="middle" class="od-duplicate-strip--name">{nameOf(a)}, {nameOf(b)}</text>
+        <text x={xy[0][0]} y={xy[0][1] + 16} text-anchor="middle" class="bc-duplicate-strip--name">{nameOf(a)}, {nameOf(b)}</text>
       {:else if order.length}
-        <line x1={xy[0][0]} y1={xy[0][1] - 4} x2={xy[1][0]} y2={xy[1][1] - 4} class="od-duplicate-strip--line" />
+        <line x1={xy[0][0]} y1={xy[0][1] - 4} x2={xy[1][0]} y2={xy[1][1] - 4} class="bc-duplicate-strip--line" />
         {#each order as p (p.site.uuid)}
           {@const left = p.at[0] < (p === order[0] ? order[1].at[0] : order[0].at[0])}
           <g transform="translate({p.at[0]} {p.at[1]})">
-            <path d={PIN} class={p.kept ? 'od-duplicate-strip--kept' : 'od-duplicate-strip--other'} />
+            <path d={PIN} class={p.kept ? 'bc-duplicate-strip--kept' : 'bc-duplicate-strip--other'} />
           </g>
           <!-- The name away from the other pin. -->
-          <text x={p.at[0] + (left ? -18 : 18)} y={p.at[1] - 20} text-anchor={left ? 'end' : 'start'} class="od-duplicate-strip--name">{nameOf(p.site)}</text>
+          <text x={p.at[0] + (left ? -18 : 18)} y={p.at[1] - 20} text-anchor={left ? 'end' : 'start'} class="bc-duplicate-strip--name">{nameOf(p.site)}</text>
         {/each}
       {/if}
     </svg>
   {:else if !failed}
-    <div class="od-duplicate-strip--loading skeleton-block" aria-hidden="true"></div>
+    <div class="bc-duplicate-strip--loading skeleton-block" aria-hidden="true"></div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-duplicate-strip {
+    .bc-duplicate-strip {
       position: relative;
       height: 110px;
       overflow: hidden;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-duplicate-strip--map,
-    .od-duplicate-strip--marks,
-    .od-duplicate-strip--loading {
+    .bc-duplicate-strip--map,
+    .bc-duplicate-strip--marks,
+    .bc-duplicate-strip--loading {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
     }
 
-    .od-duplicate-strip--map {
+    .bc-duplicate-strip--map {
       object-fit: cover;
     }
 
-    .od-duplicate-strip--line {
-      stroke: var(--od-text);
+    .bc-duplicate-strip--line {
+      stroke: var(--bc-text);
       stroke-width: 1.5;
       stroke-dasharray: 4 3;
     }
 
-    .od-duplicate-strip--kept {
-      fill: var(--od-text);
-      stroke: var(--od-surface);
+    .bc-duplicate-strip--kept {
+      fill: var(--bc-text);
+      stroke: var(--bc-surface);
       stroke-width: 2;
     }
 
-    .od-duplicate-strip--other {
-      fill: var(--od-surface);
-      stroke: var(--od-text);
+    .bc-duplicate-strip--other {
+      fill: var(--bc-surface);
+      stroke: var(--bc-text);
       stroke-width: 2;
     }
 
 
-    .od-duplicate-strip--count {
-      fill: var(--od-surface);
+    .bc-duplicate-strip--count {
+      fill: var(--bc-surface);
       font-size: 13px;
       font-weight: 700;
       text-anchor: middle;
     }
 
-    .od-duplicate-strip--name {
-      fill: var(--od-text);
+    .bc-duplicate-strip--name {
+      fill: var(--bc-text);
       font-size: 13px;
       font-weight: 500;
       paint-order: stroke;
-      stroke: var(--od-surface);
+      stroke: var(--bc-surface);
       stroke-width: 4px;
       stroke-linejoin: round;
     }

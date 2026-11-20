@@ -201,9 +201,9 @@ export function systemBack(stack, fromMenu) {
 
 /** The « Annuler » button of the steps that have no « Retour » (it stops what is running). */
 const CANCEL_BUTTON = /** @type {Record<string, string>} */ ({
-  importProgress: '.od-first-launch-divelogs--cancel',
-  serverDownload: '.od-first-launch-server--cancel',
-  createSend: '.od-server-create--text',
+  importProgress: '.bc-first-launch-divelogs--cancel',
+  serverDownload: '.bc-first-launch-server--cancel',
+  createSend: '.bc-server-create--text',
 });
 
 /**

@@ -411,141 +411,141 @@
 
 {#snippet avatar(/** @type {string} */ vendor, /** @type {string} */ product)}
   {#snippet bluetoothAvatar()}
-    <span class="od-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
+    <span class="bc-download--avatar" aria-hidden="true"><Icon name="bluetooth" size={22} /></span>
   {/snippet}
   <!-- A model with a photo shows it (40 dp tile, 48 pt on iPhone); the others keep the Bluetooth circle (tasks 2026-11-19-303). -->
   {#if product}
-    <span class="od-download--photo" aria-hidden="true"><DcTile model={product} {vendor} size={theme.ios ? 48 : 40} fallback={bluetoothAvatar} /></span>
+    <span class="bc-download--photo" aria-hidden="true"><DcTile model={product} {vendor} size={theme.ios ? 48 : 40} fallback={bluetoothAvatar} /></span>
   {:else}
     {@render bluetoothAvatar()}
   {/if}
 {/snippet}
 
-<Page class="od-download">
+<Page class="bc-download">
   <Navbar title={t('download.title')}>
     {#snippet left()}
       {#if theme.ios}
         <Link onClick={close}>{phase === 'downloading' ? t('download.cancel') : t('download.close')}</Link>
       {:else}
         <Link iconOnly onClick={close}>
-          <Icon name="close" /><span class="od-sr-only">{phase === 'downloading' ? t('download.cancel') : t('download.close')}</span>
+          <Icon name="close" /><span class="bc-sr-only">{phase === 'downloading' ? t('download.cancel') : t('download.close')}</span>
         </Link>
       {/if}
     {/snippet}
   </Navbar>
 
   {#snippet offerIcon()}
-    <span class="od-download--offer-icon" aria-hidden="true"><Icon name="wristComputer" size={28} weight={1.8} /></span>
+    <span class="bc-download--offer-icon" aria-hidden="true"><Icon name="wristComputer" size={28} weight={1.8} /></span>
   {/snippet}
 
   {#snippet bluetoothState()}
-    <div class="od-download--state">
-      <div class="od-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
+    <div class="bc-download--state">
+      <div class="bc-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
       <h1>{t(`download.${phase}.title`)}</h1>
       <p>{t(`download.${phase}.text`)}</p>
-      <div class="od-download--state-actions">
+      <div class="bc-download--state-actions">
         {#if phase === 'permission'}
-          <button type="button" class="od-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
+          <button type="button" class="bc-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
         {:else if phase === 'denied'}
-          <button type="button" class="od-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
-          <button type="button" class="od-download--filled" onclick={() => OpenDivesCore.openAppSettings()}>{t('download.denied.button')}</button>
+          <button type="button" class="bc-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
+          <button type="button" class="bc-download--filled" onclick={() => OpenDivesCore.openAppSettings()}>{t('download.denied.button')}</button>
         {:else if phase === 'off'}
-          <button type="button" class="od-download--filled" onclick={turnOn}>{t('download.off.button')}</button>
+          <button type="button" class="bc-download--filled" onclick={turnOn}>{t('download.off.button')}</button>
         {/if}
       </div>
     </div>
   {/snippet}
 
   {#if phase === 'checking'}
-    <div class="od-download--state" aria-busy="true"></div>
+    <div class="bc-download--state" aria-busy="true"></div>
   {:else if stateBelow}
-    <p class="od-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
+    <p class="bc-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
     {#if remembered.length}
-      <h2 class="od-download--subheader">{t('download.remembered')}</h2>
-      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
+      <h2 class="bc-download--subheader">{t('download.remembered')}</h2>
+      <ul class="bc-download--rows bc-download--cards" class:bc-download--card-list={card}>
         {#each remembered as c (c.address)}
           <li>
-            <div class="od-download--row" class:od-download--card={card}>
+            <div class="bc-download--row" class:bc-download--card={card}>
               {@render avatar(c.vendor, c.product)}
-              <span class="od-download--texts">
-                <span class="od-download--headline">{c.product}</span>
-                <span class="od-download--supporting">{subtitle(c)}</span>
+              <span class="bc-download--texts">
+                <span class="bc-download--headline">{c.product}</span>
+                <span class="bc-download--supporting">{subtitle(c)}</span>
               </span>
             </div>
           </li>
         {/each}
       </ul>
     {/if}
-    <label class="od-download--switch-row">
-      <span class="od-download--texts">
-        <span class="od-download--headline">{t('download.forceAll')}</span>
-        <span class="od-download--supporting">{t('download.forceAllText')}</span>
+    <label class="bc-download--switch-row">
+      <span class="bc-download--texts">
+        <span class="bc-download--headline">{t('download.forceAll')}</span>
+        <span class="bc-download--supporting">{t('download.forceAllText')}</span>
       </span>
       <span class="toggle"><input type="checkbox" bind:checked={forceDownload} /><span class="toggle-icon"></span></span>
     </label>
-    <div class="od-download--state-card">
+    <div class="bc-download--state-card">
       {@render bluetoothState()}
     </div>
   {:else if phase === 'none' || phase === 'permission' || phase === 'denied' || phase === 'off'}
     {@render bluetoothState()}
   {:else if phase === 'choose'}
-    <p class="od-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
+    <p class="bc-download--intro">{t('download.intro')} {t('download.pairingNote')}</p>
 
     {#if remembered.length}
-      <h2 class="od-download--subheader">{t('download.remembered')}</h2>
-      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
+      <h2 class="bc-download--subheader">{t('download.remembered')}</h2>
+      <ul class="bc-download--rows bc-download--cards" class:bc-download--card-list={card}>
         {#each remembered as c (c.address)}
           <li>
-            <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => download(c)}>
+            <button type="button" class="bc-download--row" class:bc-download--card={card} onclick={() => download(c)}>
               {@render avatar(c.vendor, c.product)}
-              <span class="od-download--texts">
-                <span class="od-download--headline">{c.product}</span>
-                <span class="od-download--supporting">{subtitle(c)}</span>
+              <span class="bc-download--texts">
+                <span class="bc-download--headline">{c.product}</span>
+                <span class="bc-download--supporting">{subtitle(c)}</span>
               </span>
-              {#if found[macOf(c.address)]}<span class="od-download--trailing">{t('download.seen')}</span>{/if}
+              {#if found[macOf(c.address)]}<span class="bc-download--trailing">{t('download.seen')}</span>{/if}
             </button>
           </li>
         {/each}
       </ul>
     {/if}
 
-    <h2 class="od-download--subheader">
+    <h2 class="bc-download--subheader">
       {t('download.nearby')}
-      {#if scanning}{#if theme.ios}<span class="od-download--spinner" role="status" aria-label={t('download.searching')}></span>{:else}<LoadingIndicator size={20} label={t('download.searching')} />{/if}{/if}
+      {#if scanning}{#if theme.ios}<span class="bc-download--spinner" role="status" aria-label={t('download.searching')}></span>{:else}<LoadingIndicator size={20} label={t('download.searching')} />{/if}{/if}
     </h2>
     {#if nearby.length}
-      <ul class="od-download--rows od-download--cards" class:od-download--card-list={card}>
+      <ul class="bc-download--rows bc-download--cards" class:bc-download--card-list={card}>
         {#each nearby as d (d.mac)}
-          <li class="od-download--nearby">
-            <button type="button" class="od-download--row" class:od-download--card={card} onclick={() => pick(d)}>
+          <li class="bc-download--nearby">
+            <button type="button" class="bc-download--row" class:bc-download--card={card} onclick={() => pick(d)}>
               {@render avatar(d.computer?.vendor ?? "", d.computer?.product ?? "")}
-              <span class="od-download--texts">
-                <span class="od-download--headline">{d.computer ? d.computer.product : d.name}</span>
-                <span class="od-download--supporting">
+              <span class="bc-download--texts">
+                <span class="bc-download--headline">{d.computer ? d.computer.product : d.name}</span>
+                <span class="bc-download--supporting">
                   {d.computer ? t('download.vendorBluetooth', { vendor: d.computer.vendor }) : t('download.unknownModel')}
                 </span>
               </span>
             </button>
-            <button type="button" class="od-download--more" aria-label={t('download.moreFor', { name: d.computer ? d.computer.product : d.name })} onclick={(e) => openDeviceMenu(e, d)}><Icon name="more" weight={4} /></button>
+            <button type="button" class="bc-download--more" aria-label={t('download.moreFor', { name: d.computer ? d.computer.product : d.name })} onclick={(e) => openDeviceMenu(e, d)}><Icon name="more" weight={4} /></button>
           </li>
         {/each}
       </ul>
-      <Popover id={deviceMenuId} class="od-menu" backdrop={false}>
+      <Popover id={deviceMenuId} class="bc-menu" backdrop={false}>
         <List noChevron>
           <MenuItem icon="visibilityOff" text={t('download.notAComputer')} onclick={hideDevice} />
         </List>
       </Popover>
     {:else}
-      <p class="od-download--empty">{scanning ? t('download.searching') : t('download.noneFound')}</p>
+      <p class="bc-download--empty">{scanning ? t('download.searching') : t('download.noneFound')}</p>
     {/if}
     {#if !scanning}
-      <div class="od-download--again"><button type="button" class="od-outlined-button" onclick={scan}>{t('download.searchAgain')}</button></div>
+      <div class="bc-download--again"><button type="button" class="bc-outlined-button" onclick={scan}>{t('download.searchAgain')}</button></div>
     {/if}
 
-    <label class="od-download--switch-row">
-      <span class="od-download--texts">
-        <span class="od-download--headline">{t('download.forceAll')}</span>
-        <span class="od-download--supporting">{t('download.forceAllText')}</span>
+    <label class="bc-download--switch-row">
+      <span class="bc-download--texts">
+        <span class="bc-download--headline">{t('download.forceAll')}</span>
+        <span class="bc-download--supporting">{t('download.forceAllText')}</span>
       </span>
       <span class="toggle">
         <input type="checkbox" bind:checked={forceDownload} />
@@ -553,126 +553,126 @@
       </span>
     </label>
   {:else if phase === 'finished' && computer && finished}
-    <h2 class="od-download--subheader">{t('download.computer')}</h2>
-    <div class="od-download--computer" class:od-download--card={card}>
+    <h2 class="bc-download--subheader">{t('download.computer')}</h2>
+    <div class="bc-download--computer" class:bc-download--card={card}>
       {@render avatar(computer.vendor, computer.product)}
-      <span class="od-download--texts">
-        <span class="od-download--headline">{computer.product}</span>
-        <span class="od-download--supporting">{subtitle(computer)}</span>
+      <span class="bc-download--texts">
+        <span class="bc-download--headline">{computer.product}</span>
+        <span class="bc-download--supporting">{subtitle(computer)}</span>
       </span>
-      <span class="od-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
+      <span class="bc-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
     </div>
 
-    <div class="od-download--progress">
-      <div class="od-download--progress-head">
-        <span class="od-download--headline">{t('download.finished')}</span>
-        <span class="od-download--percent">{t('download.finishedCount', { n: finished.downloaded })}</span>
+    <div class="bc-download--progress">
+      <div class="bc-download--progress-head">
+        <span class="bc-download--headline">{t('download.finished')}</span>
+        <span class="bc-download--percent">{t('download.finishedCount', { n: finished.downloaded })}</span>
       </div>
       {#if theme.ios}
-        <div class="od-download--bar" role="progressbar" aria-label={t('download.progressLabel')} aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
-          <div class="od-download--fill" style:width="100%"></div>
+        <div class="bc-download--bar" role="progressbar" aria-label={t('download.progressLabel')} aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <div class="bc-download--fill" style:width="100%"></div>
         </div>
       {:else}
         <LinearWavyProgress value={1} label={t('download.progressLabel')} />
       {/if}
-      {#if computerOffer.computer}<p class="od-download--hint">{t('download.firstTime', { name: computer.product })}</p>{/if}
+      {#if computerOffer.computer}<p class="bc-download--hint">{t('download.firstTime', { name: computer.product })}</p>{/if}
     </div>
 
     {#if computerOffer.computer}
-      <div class="od-download--offer" role="group" aria-label={t('gear.computerOffer.title', { name: computer.product })}>
-        <div class="od-download--offer-head">
+      <div class="bc-download--offer" role="group" aria-label={t('gear.computerOffer.title', { name: computer.product })}>
+        <div class="bc-download--offer-head">
           <DcTile model={computerOffer.computer.model} size={56} radius={12} fallback={offerIcon} />
-          <span class="od-download--texts">
-            <span class="od-download--offer-title">{t('gear.computerOffer.title', { name: computer.product })}</span>
-            <span class="od-download--supporting">{t('gear.computerOffer.text')}</span>
+          <span class="bc-download--texts">
+            <span class="bc-download--offer-title">{t('gear.computerOffer.title', { name: computer.product })}</span>
+            <span class="bc-download--supporting">{t('gear.computerOffer.text')}</span>
           </span>
         </div>
-        <div class="od-download--offer-actions">
-          <button type="button" class="od-download--offer-later" onclick={putOffComputer}>{t('gear.computerOffer.later')}</button>
-          <button type="button" class="od-download--offer-add" onclick={addComputer}>{t('gear.computerOffer.add')}</button>
+        <div class="bc-download--offer-actions">
+          <button type="button" class="bc-download--offer-later" onclick={putOffComputer}>{t('gear.computerOffer.later')}</button>
+          <button type="button" class="bc-download--offer-add" onclick={addComputer}>{t('gear.computerOffer.add')}</button>
         </div>
       </div>
     {/if}
 
     {#if received.length}
-      <h2 class="od-download--subheader">{t('download.receivedAll')}</h2>
-      <ul class="od-download--rows od-dive-list">
+      <h2 class="bc-download--subheader">{t('download.receivedAll')}</h2>
+      <ul class="bc-download--rows bc-dive-list">
         {#each received as d, i (`${d.date}-${i}`)}
-          <li class="od-download--dive">
+          <li class="bc-download--dive">
             <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} prefs={logbook.prefs} />
-            <span class="od-download--texts">
-              <span class="od-download--headline">{t('download.newDive')}</span>
-              <span class="od-download--supporting">{formatDateTime(d.date)}</span>
+            <span class="bc-download--texts">
+              <span class="bc-download--headline">{t('download.newDive')}</span>
+              <span class="bc-download--supporting">{formatDateTime(d.date)}</span>
             </span>
-            <span class="od-download--values">
-              <span class="od-download--depth">{formatDuration(d.durationSeconds)}</span>
-              {#if d.maxDepthMm}<span class="od-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
+            <span class="bc-download--values">
+              <span class="bc-download--depth">{formatDuration(d.durationSeconds)}</span>
+              {#if d.maxDepthMm}<span class="bc-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
             </span>
           </li>
         {/each}
       </ul>
     {/if}
   {:else if phase === 'downloading' && computer}
-    <h2 class="od-download--subheader">{t('download.computer')}</h2>
-    <div class="od-download--computer" class:od-download--card={card}>
+    <h2 class="bc-download--subheader">{t('download.computer')}</h2>
+    <div class="bc-download--computer" class:bc-download--card={card}>
       {@render avatar(computer.vendor, computer.product)}
-      <span class="od-download--texts">
-        <span class="od-download--headline">{computer.product}</span>
-        <span class="od-download--supporting">{subtitle(computer)}</span>
+      <span class="bc-download--texts">
+        <span class="bc-download--headline">{computer.product}</span>
+        <span class="bc-download--supporting">{subtitle(computer)}</span>
       </span>
       {#if connected}
-        <span class="od-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
+        <span class="bc-download--connected"><Icon name="check" size={16} weight={2.4} />{t('download.connected')}</span>
       {:else}
-        <span class="od-download--trailing">{t('download.connecting')}</span>
+        <span class="bc-download--trailing">{t('download.connecting')}</span>
       {/if}
     </div>
-    {#if retrying}<p class="od-download--retrying" role="status">{t('download.retryingClassic')}</p>{/if}
+    {#if retrying}<p class="bc-download--retrying" role="status">{t('download.retryingClassic')}</p>{/if}
 
-    <div class="od-download--progress">
-      <div class="od-download--progress-head">
-        <span class="od-download--headline">{forceDownload ? t('download.readingAll') : t('download.reading')}</span>
-        {#if fraction > 0}<span class="od-download--percent">{t('download.percent', { n: percent })}</span>{/if}
+    <div class="bc-download--progress">
+      <div class="bc-download--progress-head">
+        <span class="bc-download--headline">{forceDownload ? t('download.readingAll') : t('download.reading')}</span>
+        {#if fraction > 0}<span class="bc-download--percent">{t('download.percent', { n: percent })}</span>{/if}
       </div>
       {#if theme.ios}
       <div
-        class="od-download--bar"
-        class:od-download--indeterminate={fraction <= 0}
+        class="bc-download--bar"
+        class:bc-download--indeterminate={fraction <= 0}
         role="progressbar"
         aria-label={t('download.progressLabel')}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow={fraction > 0 ? percent : undefined}
       >
-        <div class="od-download--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
+        <div class="bc-download--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
       </div>
       {:else}
         <LinearWavyProgress value={fraction} indeterminate={fraction <= 0} label={t('download.progressLabel')} />
       {/if}
-      <p class="od-download--hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
+      <p class="bc-download--hint">{t('download.keepNear')}{forceDownload ? '' : ` ${t('download.notAgain')}`}</p>
     </div>
 
-    <div class="od-download--stop">
+    <div class="bc-download--stop">
       <Button outline disabled={stopping} onClick={close}>{stopping ? t('download.stopping') : t('download.stop')}</Button>
     </div>
 
     {#if received.length}
-      <h2 class="od-download--subheader">{t('download.received')}</h2>
-      <ul class="od-download--rows od-dive-list">
+      <h2 class="bc-download--subheader">{t('download.received')}</h2>
+      <ul class="bc-download--rows bc-dive-list">
         {#each received as d, i (`${d.date}-${i}`)}
-          <li class="od-download--dive">
+          <li class="bc-download--dive">
             <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} prefs={logbook.prefs} />
-            <span class="od-download--texts">
-              <span class="od-download--headline">{t('download.newDive')}</span>
-              <span class="od-download--supporting">{formatDateTime(d.date)}</span>
+            <span class="bc-download--texts">
+              <span class="bc-download--headline">{t('download.newDive')}</span>
+              <span class="bc-download--supporting">{formatDateTime(d.date)}</span>
             </span>
-            <span class="od-download--values">
+            <span class="bc-download--values">
               {#if theme.ios}
-                <span class="od-download--depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
-                <span class="od-download--supporting">{formatDuration(d.durationSeconds)}</span>
+                <span class="bc-download--depth">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>
+                <span class="bc-download--supporting">{formatDuration(d.durationSeconds)}</span>
               {:else}
                 <!-- Android: the duration above the depth, as in the dive rows. -->
-                <span class="od-download--depth">{formatDuration(d.durationSeconds)}</span>
-                {#if d.maxDepthMm}<span class="od-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
+                <span class="bc-download--depth">{formatDuration(d.durationSeconds)}</span>
+                {#if d.maxDepthMm}<span class="bc-download--supporting">{formatDepth(d.maxDepthMm, logbook.prefs)}</span>{/if}
               {/if}
             </span>
           </li>
@@ -711,11 +711,11 @@
   @layer od.components {
     /* MD3 lists (Android): 14 sp subheaders, two-line 72 dp items with a
        40 dp leading avatar; iOS keeps the same order with its sizes. */
-    .od-download--intro {
+    .bc-download--intro {
       margin: 16px 16px 8px;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 15px;
@@ -723,7 +723,7 @@
       }
     }
 
-    .od-download--subheader {
+    .bc-download--subheader {
       margin: 16px 0 0;
       padding: 0 16px;
       min-height: 48px;
@@ -733,7 +733,7 @@
       font-size: 14px;
       font-weight: 500;
       letter-spacing: 0.1px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         min-height: 0;
@@ -743,7 +743,7 @@
       }
     }
 
-    .od-download--rows {
+    .bc-download--rows {
       margin: 0;
       padding: 0;
       list-style: none;
@@ -751,15 +751,15 @@
       :global(.ios) & {
         margin: 0 16px;
         border-radius: 10px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
         overflow: hidden;
       }
     }
 
-    .od-download--row,
-    .od-download--computer,
-    .od-download--dive,
-    .od-download--switch-row {
+    .bc-download--row,
+    .bc-download--computer,
+    .bc-download--dive,
+    .bc-download--switch-row {
       box-sizing: border-box;
       width: 100%;
       min-height: 72px;
@@ -769,27 +769,27 @@
       gap: 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
     }
 
-    .od-download--row {
+    .bc-download--row {
       cursor: pointer;
     }
 
-    .od-download--nearby {
+    .bc-download--nearby {
       display: flex;
       align-items: center;
 
-      .od-download--row {
+      .bc-download--row {
         flex: 1;
         min-width: 0;
         padding-inline-end: 0;
       }
     }
 
-    .od-download--more {
+    .bc-download--more {
       flex: none;
       width: 48px;
       height: 48px;
@@ -797,36 +797,36 @@
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-download--photo {
+    .bc-download--photo {
       display: contents;
     }
 
-    .od-download--avatar {
+    .bc-download--avatar {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 20px;
-      background: var(--od-surface-2);
-      color: var(--od-text);
+      background: var(--bc-surface-2);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
 
       /* Android: the computer icon in tertiary. */
       :global(.md) & {
-        background: var(--od-tertiary-container);
-        color: var(--od-tertiary);
+        background: var(--bc-tertiary-container);
+        color: var(--bc-tertiary);
       }
     }
 
-    .od-download--texts {
+    .bc-download--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -834,7 +834,7 @@
       gap: 2px;
     }
 
-    .od-download--headline {
+    .bc-download--headline {
       font-size: 16px;
       line-height: 24px;
 
@@ -843,14 +843,14 @@
       }
     }
 
-    .od-download--computer .od-download--headline {
+    .bc-download--computer .bc-download--headline {
       font-weight: 600;
     }
 
-    .od-download--supporting {
+    .bc-download--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 13px;
@@ -858,35 +858,35 @@
       }
     }
 
-    .od-download--trailing {
+    .bc-download--trailing {
       flex: none;
       font-size: 12px;
       line-height: 16px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-download--connected {
+    .bc-download--connected {
       flex: none;
       display: flex;
       align-items: center;
       gap: 4px;
       font-size: 14px;
-      color: var(--od-oxygen);
+      color: var(--bc-oxygen);
     }
 
     /* Android: a computer is a card, remembered, nearby or connected. */
-    .od-download--card {
+    .bc-download--card {
       width: auto;
       margin: 0 16px;
       padding: 12px 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
     /* 8 dp between cards. Two columns when the pane itself is wide (container
        query below), one column on a phone and in portrait. */
-    .od-download--card-list {
+    .bc-download--card-list {
       margin: 0 16px;
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -896,7 +896,7 @@
         display: flex;
       }
 
-      .od-download--card {
+      .bc-download--card {
         width: auto;
         flex: 1;
         margin: 0;
@@ -904,48 +904,48 @@
     }
 
     /* The page is the container: the width left beside the list decides, not the orientation. */
-    :global(.od-download .page-content) {
+    :global(.bc-download .page-content) {
       container-type: inline-size;
     }
 
     @container (min-width: 720px) {
-      .od-download--card-list {
+      .bc-download--card-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       /* The connected computer is one column wide, like the cards of the choice. */
-      .od-download--computer.od-download--card {
+      .bc-download--computer.bc-download--card {
         width: calc((100cqw - 40px) / 2);
       }
     }
 
-    .od-download--computer {
+    .bc-download--computer {
       :global(.ios) & {
         margin: 0 16px;
         width: auto;
         border-radius: 10px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
     }
 
-    .od-download--retrying {
+    .bc-download--retrying {
       margin: 8px 16px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-download--empty {
+    .bc-download--empty {
       margin: 0 16px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-download--again {
+    .bc-download--again {
       margin: 12px 16px 0;
     }
 
-    .od-download--switch-row {
+    .bc-download--switch-row {
       margin-top: 16px;
       cursor: pointer;
 
@@ -954,7 +954,7 @@
         width: auto;
         min-height: 44px;
         border-radius: 10px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
     }
 
@@ -962,58 +962,58 @@
       flex: none;
     }
 
-    .od-download--spinner {
+    .bc-download--spinner {
       width: 16px;
       height: 16px;
-      border: 2px solid var(--od-separator);
-      border-top-color: var(--od-text);
+      border: 2px solid var(--bc-separator);
+      border-top-color: var(--bc-text);
       border-radius: 50%;
       animation: od-download-spin 0.9s linear infinite;
     }
 
     /* « Ajouter le … à votre équipement ? »: a pale blue card, the photo, two lines, « Plus tard » and « Ajouter ». */
-    .od-download--offer {
+    .bc-download--offer {
       margin: 16px 16px 0;
       padding: 16px;
       border-radius: 20px;
-      background: var(--od-release-note);
+      background: var(--bc-release-note);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-download--offer-head {
+    .bc-download--offer-head {
       display: flex;
       gap: 12px;
       align-items: flex-start;
     }
 
-    .od-download--offer-title {
+    .bc-download--offer-title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-download--offer-icon {
+    .bc-download--offer-icon {
       width: 56px;
       height: 56px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      color: var(--od-text-2);
+      background: var(--bc-surface);
+      color: var(--bc-text-2);
     }
 
-    .od-download--offer-actions {
+    .bc-download--offer-actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
     }
 
-    .od-download--offer-later,
-    .od-download--offer-add {
+    .bc-download--offer-later,
+    .bc-download--offer-add {
       width: auto;
       height: 40px;
       border: none;
@@ -1023,47 +1023,47 @@
       font-weight: 500;
     }
 
-    .od-download--offer-later {
+    .bc-download--offer-later {
       padding: 0 16px;
       background: transparent;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-download--offer-add {
+    .bc-download--offer-add {
       padding: 0 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-download--progress {
+    .bc-download--progress {
       margin: 24px 16px 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .od-download--progress-head {
+    .bc-download--progress-head {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
 
-      .od-download--headline {
+      .bc-download--headline {
         font-weight: 500;
       }
     }
 
-    .od-download--percent {
+    .bc-download--percent {
       font-size: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
     /* MD3 linear progress indicator: 4 dp track; 8 pt on iOS (mock-up). */
-    .od-download--bar {
+    .bc-download--bar {
       position: relative;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       overflow: hidden;
 
       :global(.ios) & {
@@ -1072,35 +1072,35 @@
       }
     }
 
-    .od-download--fill {
+    .bc-download--fill {
       height: 100%;
       border-radius: inherit;
-      background: var(--od-action);
+      background: var(--bc-action);
       transition: width 0.3s;
     }
 
-    .od-download--indeterminate .od-download--fill {
+    .bc-download--indeterminate .bc-download--fill {
       position: absolute;
       width: 40%;
       animation: od-download-slide 1.4s ease-in-out infinite;
     }
 
-    .od-download--stop {
+    .bc-download--stop {
       margin: 16px 16px 8px;
     }
 
-    .od-download--hint {
+    .bc-download--hint {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 15px;
       }
     }
 
-    .od-download--values {
+    .bc-download--values {
       flex: none;
       display: flex;
       flex-direction: column;
@@ -1109,13 +1109,13 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .od-download--depth {
+    .bc-download--depth {
       font-size: 16px;
       font-weight: 600;
     }
 
     /* Empty and error states (spec, section 6). */
-    .od-download--state {
+    .bc-download--state {
       margin: 24px 24px 0;
 
       h1 {
@@ -1135,26 +1135,26 @@
         margin: 0;
         font-size: 16px;
         line-height: 24px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-download--state-card {
+    .bc-download--state-card {
       margin: 16px 16px 0;
       padding: 8px 0 24px;
       border-radius: 16px;
-      background: var(--od-surface-container);
+      background: var(--bc-surface-container);
 
-      .od-download--state {
+      .bc-download--state {
         margin: 16px 16px 0;
       }
     }
 
-    .od-download--state-icon {
-      color: var(--od-text-2);
+    .bc-download--state-icon {
+      color: var(--bc-text-2);
     }
 
-    .od-download--state-actions {
+    .bc-download--state-actions {
       margin-top: 24px;
       display: flex;
       justify-content: flex-end;
@@ -1162,15 +1162,15 @@
     }
 
     /* MD3 filled button; iOS large filled button. */
-    .od-download--filled {
+    .bc-download--filled {
       flex: none;
       width: auto;
       height: 40px;
       padding: 0 24px;
       border: none;
       border-radius: 20px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;

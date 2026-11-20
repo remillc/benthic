@@ -61,7 +61,7 @@ await run(`(() => {
     path(el) {
       const parts = [];
       for (let n = el; n && n.nodeType === 1 && parts.length < 4; n = n.parentElement) {
-        const cls = [...n.classList].filter((c) => c.startsWith('od-')).slice(0, 2).join('.');
+        const cls = [...n.classList].filter((c) => c.startsWith('bc-')).slice(0, 2).join('.');
         parts.unshift(n.tagName.toLowerCase() + (cls ? '.' + cls : n.getAttribute('role') ? '[role=' + n.getAttribute('role') + ']' : ''));
       }
       return parts.join(' > ');

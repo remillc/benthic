@@ -18,35 +18,35 @@
   const icon = $derived(ICONS[section]);
 </script>
 
-<svg class="od-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-  {#if active && icon.fill}<path d={icon.fill} class="od-nav-icon--filled" />{/if}
+<svg class="bc-nav-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+  {#if active && icon.fill}<path d={icon.fill} class="bc-nav-icon--filled" />{/if}
   <path d={icon.line} />
-  {#if icon.cut}<path d={icon.cut} class:od-nav-icon--cut={active} />{/if}
+  {#if icon.cut}<path d={icon.cut} class:bc-nav-icon--cut={active} />{/if}
   {#each icon.dots ?? [] as [cx, cy] (`${cx},${cy}`)}
-    <circle {cx} {cy} r="2" class:od-nav-icon--filled={active && section === 'tools'} class:od-nav-icon--cut-fill={active && section === 'sites'} />
+    <circle {cx} {cy} r="2" class:bc-nav-icon--filled={active && section === 'tools'} class:bc-nav-icon--cut-fill={active && section === 'sites'} />
   {/each}
 </svg>
 
 <style>
   @layer od.components {
-    .od-nav-icon {
+    .bc-nav-icon {
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
 
-      .od-nav-icon--filled {
+      .bc-nav-icon--filled {
         fill: currentColor;
       }
 
-      .od-nav-icon--cut {
-        stroke: var(--od-nav-active-container);
+      .bc-nav-icon--cut {
+        stroke: var(--bc-nav-active-container);
       }
 
-      .od-nav-icon--cut-fill {
-        fill: var(--od-nav-active-container);
-        stroke: var(--od-nav-active-container);
+      .bc-nav-icon--cut-fill {
+        fill: var(--bc-nav-active-container);
+        stroke: var(--bc-nav-active-container);
       }
     }
   }

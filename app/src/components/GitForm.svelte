@@ -31,9 +31,9 @@
   const state = $derived(form.addressState);
 </script>
 
-<div class="od-git-form">
-  <p class="od-git-form--intro">{t(deviceKey('gitRepo.introPhone', deviceKind()))}</p>
-  <a href="/git/repository" class="od-git-form--link od-git-form--link-repository" onclick={(e) => onhelp('repository', e)}>{t('gitRepo.repositoryHow')}</a>
+<div class="bc-git-form">
+  <p class="bc-git-form--intro">{t(deviceKey('gitRepo.introPhone', deviceKind()))}</p>
+  <a href="/git/repository" class="bc-git-form--link bc-git-form--link-repository" onclick={(e) => onhelp('repository', e)}>{t('gitRepo.repositoryHow')}</a>
 
   <AccountField
     label={t('gitRepo.address')}
@@ -46,11 +46,11 @@
     onchange={form.checkAddress}
   />
   {#if state === 'checking'}
-    <p class="od-git-form--status">{t('gitRepo.addressChecking')}</p>
+    <p class="bc-git-form--status">{t('gitRepo.addressChecking')}</p>
   {:else if state === 'public' || state === 'publicEmpty'}
-    <p class="od-git-form--status od-git-form--ok"><Icon name="check" size={16} />{t(state === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
+    <p class="bc-git-form--status bc-git-form--ok"><Icon name="check" size={16} />{t(state === 'public' ? 'gitRepo.addressPublic' : 'gitRepo.addressPublicEmpty')}</p>
   {:else if state === 'private'}
-    <p class="od-git-form--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
+    <p class="bc-git-form--status"><Icon name="info" size={16} />{t('gitRepo.addressPrivate')}</p>
   {/if}
 
   <AccountField
@@ -75,7 +75,7 @@
     disabled={form.busy}
     onchange={form.checkAccess}
   />
-  <a href="/git/token" class="od-git-form--link od-git-form--link-token" onclick={(e) => onhelp('token', e)}>{t('gitRepo.tokenHow')}</a>
+  <a href="/git/token" class="bc-git-form--link bc-git-form--link-token" onclick={(e) => onhelp('token', e)}>{t('gitRepo.tokenHow')}</a>
 
   <SelectField
     outlined
@@ -86,10 +86,10 @@
     disabled={form.accessState !== 'ok' || form.busy}
   />
 
-  {#if form.formError}<p class="od-git-form--error" role="alert"><Icon name="error" size={18} />{form.formError}</p>{/if}
+  {#if form.formError}<p class="bc-git-form--error" role="alert"><Icon name="error" size={18} />{form.formError}</p>{/if}
 
   {#if action}
-    <button type="submit" class="od-git-form--connect" disabled={!form.canConnect} aria-busy={form.busy}>
+    <button type="submit" class="bc-git-form--connect" disabled={!form.canConnect} aria-busy={form.busy}>
       {#if form.busy}<LoadingIndicator size={18} label="" />{t('gitRepo.connecting')}{:else}{t('gitRepo.connect')}{/if}
     </button>
   {/if}
@@ -97,21 +97,21 @@
 
 <style>
   @layer od.components {
-    .od-git-form {
-      --od-outlined-gap: 16px;
+    .bc-git-form {
+      --bc-outlined-gap: 16px;
       display: flex;
       flex-direction: column;
     }
 
-    .od-git-form--intro {
+    .bc-git-form--intro {
       margin: 8px 0 0;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* A link: 48 dp target, the visible gaps drawn with negative margins (the text is 19 dp tall). */
-    .od-git-form--link {
+    .bc-git-form--link {
       align-self: flex-start;
       box-sizing: border-box;
       min-height: 48px;
@@ -119,7 +119,7 @@
       align-items: center;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-code-active);
+      color: var(--bc-code-active);
       text-decoration: underline;
       text-underline-offset: 2px;
       cursor: pointer;
@@ -130,50 +130,50 @@
         }
       }
 
-      &.od-git-form--link-repository {
+      &.bc-git-form--link-repository {
         margin: 2px 0 -14px;
       }
 
-      &.od-git-form--link-token {
+      &.bc-git-form--link-token {
         margin: -10px 0 -14px;
         padding: 0 4px 0 16px;
       }
     }
 
-    .od-git-form--status {
+    .bc-git-form--status {
       margin: 4px 0 0 16px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       gap: 4px;
 
       /* The one green of the theme (the check mark of a found repository). */
-      &.od-git-form--ok {
-        color: var(--od-oxygen);
+      &.bc-git-form--ok {
+        color: var(--bc-oxygen);
       }
     }
 
-    .od-git-form--error {
+    .bc-git-form--error {
       margin: 16px 0 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       display: flex;
       align-items: flex-start;
       gap: 8px;
     }
 
-    .od-git-form--connect {
+    .bc-git-form--connect {
       margin-top: 24px;
       width: 100%;
       height: 48px;
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -186,14 +186,14 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          background: color-mix(in srgb, var(--od-primary-action) 88%, var(--od-on-primary-action));
+          background: color-mix(in srgb, var(--bc-primary-action) 88%, var(--bc-on-primary-action));
         }
       }
 
       /* MD3 disabled: on-surface at 12 % behind, 38 % in front. */
       &:disabled {
-        background: color-mix(in srgb, var(--od-text) 12%, transparent);
-        color: color-mix(in srgb, var(--od-text) 38%, transparent);
+        background: color-mix(in srgb, var(--bc-text) 12%, transparent);
+        color: color-mix(in srgb, var(--bc-text) 38%, transparent);
         cursor: default;
       }
     }

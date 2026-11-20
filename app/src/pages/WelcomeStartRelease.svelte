@@ -30,33 +30,33 @@
 </script>
 
 {#snippet panelContent()}
-  <div class="od-welcome-release--brand">
-    <span class="od-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
+  <div class="bc-welcome-release--brand">
+    <span class="bc-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
     <span>Benthic</span>
   </div>
   {#if plusPanel}
     <BenthicPlusPanel step={plusPanel} />
   {:else if offerPanel}
-    <div class="od-welcome-release--chip"><BenthicPlusChip label={t('odplus.offer.pill')} /></div>
-    <h1 class="od-welcome-release--headline od-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
-    <p class="od-welcome-release--intro">{t('odplus.offer.lead')}</p>
+    <div class="bc-welcome-release--chip"><BenthicPlusChip label={t('odplus.offer.pill')} /></div>
+    <h1 class="bc-welcome-release--headline bc-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
+    <p class="bc-welcome-release--intro">{t('odplus.offer.lead')}</p>
   {:else}
-    <h1 class="od-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
-    <p class="od-welcome-release--intro">{t('welcomeRelease.intro')}</p>
+    <h1 class="bc-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
+    <p class="bc-welcome-release--intro">{t('welcomeRelease.intro')}</p>
   {/if}
-  {#if !plusPanel}<div class="od-welcome-release--profile"><ReleaseProfile /></div>{/if}
+  {#if !plusPanel}<div class="bc-welcome-release--profile"><ReleaseProfile /></div>{/if}
 {/snippet}
 
-<Page class="od-welcome-release" noToolbar>
-  <div class="od-welcome-release--page" class:od-welcome-release--plus={plusHero}>
-    <section class="od-welcome-release--panel" class:od-welcome-release--compact={flow.stack.length > 1}>
-      <div class="od-welcome-release--panel-light" aria-hidden="true"></div>
-      <div class="od-welcome-release--panel-bands" aria-hidden="true"></div>
-      <svg class="od-welcome-release--panel-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
-        <path d="{BAND_PROFILE} V140 H0 Z" class="od-welcome-release--panel-profile-area" />
-        <path d={BAND_PROFILE} class="od-welcome-release--panel-profile-line" vector-effect="non-scaling-stroke" />
+<Page class="bc-welcome-release" noToolbar>
+  <div class="bc-welcome-release--page" class:bc-welcome-release--plus={plusHero}>
+    <section class="bc-welcome-release--panel" class:bc-welcome-release--compact={flow.stack.length > 1}>
+      <div class="bc-welcome-release--panel-light" aria-hidden="true"></div>
+      <div class="bc-welcome-release--panel-bands" aria-hidden="true"></div>
+      <svg class="bc-welcome-release--panel-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+        <path d="{BAND_PROFILE} V140 H0 Z" class="bc-welcome-release--panel-profile-area" />
+        <path d={BAND_PROFILE} class="bc-welcome-release--panel-profile-line" vector-effect="non-scaling-stroke" />
       </svg>
-      <svg class="od-welcome-release--panel-wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
+      <svg class="bc-welcome-release--panel-wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
       {@render panelContent()}
     </section>
 
@@ -66,8 +66,8 @@
 
 <style>
   @layer od.components {
-    :global(.od-welcome-release) {
-      --f7-page-bg-color: var(--od-background);
+    :global(.bc-welcome-release) {
+      --f7-page-bg-color: var(--bc-background);
 
       :global(.page-content) {
         padding: 0;
@@ -75,16 +75,16 @@
     }
 
     /* Landscape: panel and steps side by side. */
-    .od-welcome-release--page {
+    .bc-welcome-release--page {
       box-sizing: border-box;
       height: 100%;
       min-height: 100%;
       display: flex;
-      background: var(--od-background);
-      color: var(--od-text);
+      background: var(--bc-background);
+      color: var(--bc-text);
     }
 
-    .od-welcome-release--panel {
+    .bc-welcome-release--panel {
       position: relative;
       box-sizing: border-box;
       flex: none;
@@ -95,34 +95,34 @@
       flex-direction: column;
       background: linear-gradient(
         180deg,
-        var(--od-release-panel-1) 0%,
-        var(--od-release-panel-2) 22%,
-        var(--od-release-panel-3) 70%,
-        var(--od-release-panel-4) 100%
+        var(--bc-release-panel-1) 0%,
+        var(--bc-release-panel-2) 22%,
+        var(--bc-release-panel-3) 70%,
+        var(--bc-release-panel-4) 100%
       );
-      color: var(--od-release-on-panel);
+      color: var(--bc-release-on-panel);
     }
 
-    .od-welcome-release--panel-light {
+    .bc-welcome-release--panel-light {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 70% 45% at 22% 0%, var(--od-release-panel-light), transparent 70%);
+      background: radial-gradient(ellipse 70% 45% at 22% 0%, var(--bc-release-panel-light), transparent 70%);
     }
 
-    .od-welcome-release--panel-bands {
+    .bc-welcome-release--panel-bands {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(105deg, var(--od-release-panel-band) 0 60px, transparent 60px 150px);
+      background: repeating-linear-gradient(105deg, var(--bc-release-panel-band) 0 60px, transparent 60px 150px);
       mask-image: linear-gradient(180deg, black 0%, transparent 55%);
     }
 
     /* The phone steps band's faint profile and wave: only on a phone, only on the steps. */
-    .od-welcome-release--panel-profile,
-    .od-welcome-release--panel-wave {
+    .bc-welcome-release--panel-profile,
+    .bc-welcome-release--panel-wave {
       display: none;
     }
 
-    .od-welcome-release--brand {
+    .bc-welcome-release--brand {
       position: relative;
       display: flex;
       align-items: center;
@@ -135,7 +135,7 @@
 
     /* The logo on the blue band (task 2026-11-17-263): no drop shadow; its disc has a thin light ring instead, 1 dp,
        white at 30 %. The disc is 60/66 of the image, so the ring sits 4.5 % inside its edges. */
-    .od-welcome-release--logo {
+    .bc-welcome-release--logo {
       position: relative;
       display: block;
       width: 96px;
@@ -153,13 +153,13 @@
         position: absolute;
         inset: 4.545%;
         box-sizing: border-box;
-        border: 1px solid var(--od-release-logo-ring);
+        border: 1px solid var(--bc-release-logo-ring);
         border-radius: 50%;
         pointer-events: none;
       }
     }
 
-    .od-welcome-release--headline {
+    .bc-welcome-release--headline {
       position: relative;
       max-width: 540px;
       margin: 36px 0 0;
@@ -171,26 +171,26 @@
     }
 
     /* The offer's panel (task 2026-11-18-282): the chip sits where the headline would, the title 16 dp under it. */
-    .od-welcome-release--chip {
+    .bc-welcome-release--chip {
       position: relative;
       margin-top: 36px;
     }
 
-    .od-welcome-release--headline-offer {
+    .bc-welcome-release--headline-offer {
       margin-top: 16px;
     }
 
-    .od-welcome-release--intro {
+    .bc-welcome-release--intro {
       position: relative;
       max-width: 520px;
       margin: 10px 0 0;
       font-size: 16px;
       line-height: 22px;
-      color: var(--od-release-on-panel-soft);
+      color: var(--bc-release-on-panel-soft);
     }
 
     /* The profile keeps 56 dp from the panel's sides (the padding) and 96 dp above its bottom edge. */
-    .od-welcome-release--profile {
+    .bc-welcome-release--profile {
       position: relative;
       flex: 1;
       min-height: 120px;
@@ -200,86 +200,86 @@
     /* Portrait: the panel across the top (640 dp, 540 dp from the second step on: a compact hero), the steps
        centred below it with 120 dp side margins. */
     @media (orientation: portrait) {
-      .od-welcome-release--page {
+      .bc-welcome-release--page {
         flex-direction: column;
       }
 
-      .od-welcome-release--panel {
+      .bc-welcome-release--panel {
         width: auto;
         height: 640px;
         padding-top: calc(max(var(--f7-safe-area-top, 0px), 24px) + 40px);
       }
 
-      .od-welcome-release--compact {
+      .bc-welcome-release--compact {
         height: 540px;
       }
 
-      .od-welcome-release--headline {
+      .bc-welcome-release--headline {
         margin-top: 28px;
         max-width: 680px;
       }
 
-      .od-welcome-release--intro {
+      .bc-welcome-release--intro {
         margin-top: 8px;
         max-width: 600px;
       }
 
-      .od-welcome-release--profile {
+      .bc-welcome-release--profile {
         margin: 36px 0 48px;
       }
 
     }
 
     /* Phone (tasks 2026-11-16-227, 230 and 244; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):
-       the hatched dark blue of the alpha across the top (--od-first-band, its sheen and its hatching; no wave, no faint
+       the hatched dark blue of the alpha across the top (--bc-first-band, its sheen and its hatching; no wave, no faint
        profile, a straight bottom edge) on the first step; the steps take the section band's look (task 251, below), 330 dp on the first step (the status bar's 24 dp included) and 140 dp on the
        others, and the page scrolls as one when a step is taller than the screen. The first-step band grows when its
        texts need more room, so that nothing is cut off. */
     @media (max-width: 767.98px) {
-      .od-welcome-release--plus .od-welcome-release--panel {
+      .bc-welcome-release--plus .bc-welcome-release--panel {
         display: none;
       }
 
-      .od-welcome-release--page {
+      .bc-welcome-release--page {
         height: auto;
         flex-direction: column;
       }
 
-      .od-welcome-release--panel {
-        --od-welcome-band-top: max(var(--f7-safe-area-top, 0px), 24px);
+      .bc-welcome-release--panel {
+        --bc-welcome-band-top: max(var(--f7-safe-area-top, 0px), 24px);
         display: flex;
         flex-direction: column;
         flex: none;
         width: auto;
         height: auto;
-        min-height: calc(330px - 24px + var(--od-welcome-band-top));
-        padding: calc(var(--od-welcome-band-top) + 16px) 20px 0;
+        min-height: calc(330px - 24px + var(--bc-welcome-band-top));
+        padding: calc(var(--bc-welcome-band-top) + 16px) 20px 0;
         overflow: hidden;
-        background: var(--od-first-band);
-        color: var(--od-on-first-band);
+        background: var(--bc-first-band);
+        color: var(--bc-on-first-band);
       }
 
-      .od-welcome-release--panel-light {
-        background: var(--od-first-band-sheen);
+      .bc-welcome-release--panel-light {
+        background: var(--bc-first-band-sheen);
       }
 
-      .od-welcome-release--panel-bands {
-        background: var(--od-first-band-hatch);
+      .bc-welcome-release--panel-bands {
+        background: var(--bc-first-band-hatch);
       }
 
       /* Steps band (task 2026-11-16-251): the section band's radial gradient and rays, its faint profile and its 18 dp wave
          in the page colour; no sheen. */
-      .od-welcome-release--compact {
+      .bc-welcome-release--compact {
         height: auto;
-        min-height: calc(140px - 24px + var(--od-welcome-band-top));
-        background: var(--od-first-step-band);
+        min-height: calc(140px - 24px + var(--bc-welcome-band-top));
+        background: var(--bc-first-step-band);
       }
 
-      .od-welcome-release--compact .od-welcome-release--panel-light {
+      .bc-welcome-release--compact .bc-welcome-release--panel-light {
         display: none;
       }
 
-      .od-welcome-release--compact .od-welcome-release--panel-profile {
+      .bc-welcome-release--compact .bc-welcome-release--panel-profile {
         display: block;
         position: absolute;
         left: 0;
@@ -288,18 +288,18 @@
         height: 34px;
       }
 
-      .od-welcome-release--panel-profile-area {
-        fill: var(--od-band-profile-area);
+      .bc-welcome-release--panel-profile-area {
+        fill: var(--bc-band-profile-area);
       }
 
-      .od-welcome-release--panel-profile-line {
+      .bc-welcome-release--panel-profile-line {
         fill: none;
-        stroke: var(--od-band-profile-line);
+        stroke: var(--bc-band-profile-line);
         stroke-width: 1.5;
         stroke-linejoin: round;
       }
 
-      .od-welcome-release--compact .od-welcome-release--panel-wave {
+      .bc-welcome-release--compact .bc-welcome-release--panel-wave {
         display: block;
         position: absolute;
         left: 0;
@@ -308,39 +308,39 @@
         height: 18px;
       }
 
-      .od-welcome-release--panel-wave path {
-        fill: var(--od-background);
+      .bc-welcome-release--panel-wave path {
+        fill: var(--bc-background);
       }
 
-      .od-welcome-release--brand {
+      .bc-welcome-release--brand {
         gap: 10px;
         font-size: 24px;
         line-height: 30px;
         letter-spacing: 0;
       }
 
-      .od-welcome-release--logo {
+      .bc-welcome-release--logo {
         width: 40px;
         height: 40px;
       }
 
-      .od-welcome-release--compact .od-welcome-release--brand {
+      .bc-welcome-release--compact .bc-welcome-release--brand {
         font-size: 20px;
         line-height: 26px;
       }
 
-      .od-welcome-release--compact .od-welcome-release--logo {
+      .bc-welcome-release--compact .bc-welcome-release--logo {
         width: 32px;
         height: 32px;
       }
 
-      .od-welcome-release--compact .od-welcome-release--headline,
-      .od-welcome-release--compact .od-welcome-release--intro,
-      .od-welcome-release--compact .od-welcome-release--profile {
+      .bc-welcome-release--compact .bc-welcome-release--headline,
+      .bc-welcome-release--compact .bc-welcome-release--intro,
+      .bc-welcome-release--compact .bc-welcome-release--profile {
         display: none;
       }
 
-      .od-welcome-release--headline {
+      .bc-welcome-release--headline {
         max-width: none;
         margin: 18px 0 0;
         font-size: 26px;
@@ -348,23 +348,23 @@
         letter-spacing: -0.3px;
       }
 
-      .od-welcome-release--intro {
+      .bc-welcome-release--intro {
         max-width: none;
         margin: 8px 0 0;
-        color: var(--od-on-first-band-2);
+        color: var(--bc-on-first-band-2);
         font-size: 14px;
         line-height: 20px;
       }
 
       /* 24 dp from both edges (the band's 20 dp padding and 4 dp). */
-      .od-welcome-release--profile {
+      .bc-welcome-release--profile {
         flex: 1;
         min-height: 56px;
         margin: 16px 4px 24px;
       }
 
       /* Its height is the flex item's, which a percentage cannot reach: the profile fills it by position. */
-      .od-welcome-release--profile :global(.od-release-profile) {
+      .bc-welcome-release--profile :global(.bc-release-profile) {
         position: absolute;
         inset: 0;
         width: auto;

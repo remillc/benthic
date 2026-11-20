@@ -50,15 +50,15 @@ test('CodeField: one numeric one-time-code input of six characters, one accessib
   assert.equal((src.match(/^\s*<input$/gm) ?? []).length, 1, 'a single input');
   assert.match(src, /aria-label=\{accessibleLabel\}/);
   assert.match(src, /aria-hidden="true"/, 'the boxes are only a picture');
-  assert.match(src, /class="od-code-field/);
+  assert.match(src, /class="bc-code-field/);
   assert.match(src, /width: 48px|flex: 0 1 48px/);
   assert.match(src, /height: 56px/);
 });
 
 test('CodeField: the error turns all six boxes red and shows the message under them', () => {
   const src = read('app/src/components/CodeField.svelte');
-  assert.match(src, /class:od-code-field--error=\{!!error\}/);
-  assert.match(src, /\.od-code-field--error \.od-code-field--box \{[^}]*border-width: 2px;[^}]*var\(--od-code-error\)/);
+  assert.match(src, /class:bc-code-field--error=\{!!error\}/);
+  assert.match(src, /\.bc-code-field--error \.bc-code-field--box \{[^}]*border-width: 2px;[^}]*var\(--bc-code-error\)/);
   assert.match(src, /aria-invalid=\{!!error\}/);
 });
 
@@ -72,7 +72,7 @@ test('the texts and the colours exist, in French and English', () => {
   assert.equal(fr.confirmCode.codeLabel, 'Code de confirmation, 6 chiffres');
   assert.equal(fr.confirmCode.wrong, 'Code incorrect. Vérifiez le dernier courriel reçu.');
   const css = read('app/src/theme.css');
-  for (const [name, light] of [['--od-code-active', '#1F5C99'], ['--od-code-border', '#75787C'], ['--od-code-error', '#B3261E']]) {
+  for (const [name, light] of [['--bc-code-active', '#1F5C99'], ['--bc-code-border', '#75787C'], ['--bc-code-error', '#B3261E']]) {
     assert.ok(css.includes(`${name}: ${light};`), name);
     assert.equal((css.match(new RegExp(`${name}:`, 'g')) ?? []).length, 2, `${name}: light and dark`);
   }

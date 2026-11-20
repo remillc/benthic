@@ -8,7 +8,7 @@
   let { title, text } = $props();
 </script>
 
-<Page class="od-placeholder">
+<Page class="bc-placeholder">
   <Navbar large {title}>
     {#snippet left()}<MenuButton />{/snippet}
   </Navbar>

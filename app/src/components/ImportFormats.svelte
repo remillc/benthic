@@ -14,23 +14,23 @@
   const state = $state({ formatsOpen: false });
 </script>
 
-<button type="button" role="link" class="od-import-formats--link" onclick={() => openFormats(state)}>{t('importFormats.link')}</button>
+<button type="button" role="link" class="bc-import-formats--link" onclick={() => openFormats(state)}>{t('importFormats.link')}</button>
 
 {#if state.formatsOpen}
-  <Md3Dialog class="od-import-formats" title={t('importFormats.title')} text={t('importFormats.text')} oncancel={() => closeFormats(state)}>
-    <div class="od-import-formats--columns">
+  <Md3Dialog class="bc-import-formats" title={t('importFormats.title')} text={t('importFormats.text')} oncancel={() => closeFormats(state)}>
+    <div class="bc-import-formats--columns">
       {#each FORMAT_COLUMNS as column (column)}
-        <section class="od-import-formats--column" aria-labelledby="od-import-formats-{column}">
-          <header class="od-import-formats--head">
-            <span class="od-import-formats--tile"><Icon name={icons[column]} size={20} /></span>
-            <h3 id="od-import-formats-{column}" class="od-import-formats--title">{t(`importFormats.column.${column}`)}</h3>
+        <section class="bc-import-formats--column" aria-labelledby="od-import-formats-{column}">
+          <header class="bc-import-formats--head">
+            <span class="bc-import-formats--tile"><Icon name={icons[column]} size={20} /></span>
+            <h3 id="od-import-formats-{column}" class="bc-import-formats--title">{t(`importFormats.column.${column}`)}</h3>
           </header>
-          <ul class="od-import-formats--list">
+          <ul class="bc-import-formats--list">
             {#each formatsOf(column) as format (format.report)}
-              <li class="od-import-formats--line">
-                <span class="od-import-formats--name">{format.name}</span>
-                <span class="od-import-formats--extensions">
-                  {#each format.extensions as extension (extension)}<span class="od-import-formats--extension">{extension}</span>{/each}
+              <li class="bc-import-formats--line">
+                <span class="bc-import-formats--name">{format.name}</span>
+                <span class="bc-import-formats--extensions">
+                  {#each format.extensions as extension (extension)}<span class="bc-import-formats--extension">{extension}</span>{/each}
                 </span>
               </li>
             {/each}
@@ -48,7 +48,7 @@
   @layer od.components {
     /* Under « Un fichier » (task 2026-11-16-226): a 48 dp touch target, 4 dp of padding on each side,
        4 dp from each row (the rows' 12 px gap less 8). */
-    .od-import-formats--link {
+    .bc-import-formats--link {
       align-self: flex-start;
       width: auto;
       min-height: 48px;
@@ -57,7 +57,7 @@
       padding: 0 4px;
       border: none;
       background: transparent;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font: inherit;
       font-size: 14px;
       line-height: 19px;
@@ -66,65 +66,65 @@
       cursor: pointer;
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-link);
+        outline: 2px solid var(--bc-release-link);
         outline-offset: 3px;
         border-radius: 4px;
       }
 
       @media (hover: hover) {
         &:hover {
-          color: var(--od-release-row-main-hover);
+          color: var(--bc-release-row-main-hover);
           text-decoration-thickness: 2px;
         }
       }
     }
 
-    :global(.od-import-formats) :global(.od-md3-dialog--surface) {
+    :global(.bc-import-formats) :global(.bc-md3-dialog--surface) {
       width: min(1040px, calc(100% - 48px));
     }
 
     /* The mock-up's « Fermer » is the release blue. */
-    :global(.od-import-formats) :global(.od-md3-dialog--actions button) {
-      color: var(--od-release-link);
+    :global(.bc-import-formats) :global(.bc-md3-dialog--actions button) {
+      color: var(--bc-release-link);
     }
 
-    .od-import-formats--columns {
+    .bc-import-formats--columns {
       display: flex;
       gap: 12px;
       padding: 0 24px;
       align-items: flex-start;
     }
 
-    .od-import-formats--column {
+    .bc-import-formats--column {
       flex: 1;
       min-width: 0;
       box-sizing: border-box;
       padding: 14px 16px 8px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-import-formats--head {
+    .bc-import-formats--head {
       display: flex;
       align-items: center;
       gap: 10px;
       margin: 0 0 8px;
     }
 
-    .od-import-formats--tile {
+    .bc-import-formats--tile {
       width: 36px;
       height: 36px;
       flex: none;
       border-radius: 10px;
-      background: var(--od-release-tile);
-      color: var(--od-release-tile-icon);
+      background: var(--bc-release-tile);
+      color: var(--bc-release-tile-icon);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-import-formats--title {
+    .bc-import-formats--title {
       flex: 1;
       margin: 0;
       font-size: 16px;
@@ -132,38 +132,38 @@
       font-weight: 600;
     }
 
-    .od-import-formats--list {
+    .bc-import-formats--list {
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
-    .od-import-formats--line {
+    .bc-import-formats--line {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 7px 0;
-      border-top: 1px solid var(--od-release-divider);
+      border-top: 1px solid var(--bc-release-divider);
       font-size: 14px;
       line-height: 19px;
     }
 
-    .od-import-formats--name {
+    .bc-import-formats--name {
       flex: 1;
       min-width: 0;
     }
 
-    .od-import-formats--extensions {
+    .bc-import-formats--extensions {
       display: flex;
       gap: 4px;
     }
 
-    .od-import-formats--extension {
+    .bc-import-formats--extension {
       flex: none;
       padding: 1px 7px;
       border-radius: 6px;
-      background: var(--od-release-hero);
-      color: var(--od-release-chip-text);
+      background: var(--bc-release-hero);
+      color: var(--bc-release-chip-text);
       font-family: 'Roboto Mono', ui-monospace, monospace;
       font-size: 12px;
       line-height: 18px;
@@ -172,12 +172,12 @@
     /* Narrow screens: the columns stack. Phone (task 2026-11-16-227): a 358 dp dialog, at most 780 dp tall; the cards
        scroll inside it (the content area of Md3Dialog) and « Fermer » stays at the bottom. */
     @media (max-width: 767px) {
-      :global(.od-import-formats) :global(.od-md3-dialog--surface) {
+      :global(.bc-import-formats) :global(.bc-md3-dialog--surface) {
         width: min(358px, calc(100% - 32px));
         max-height: min(780px, calc(100% - 64px));
       }
 
-      .od-import-formats--columns {
+      .bc-import-formats--columns {
         flex-direction: column;
         align-items: stretch;
         padding: 0 16px;

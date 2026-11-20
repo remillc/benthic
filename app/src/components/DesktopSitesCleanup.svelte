@@ -113,67 +113,67 @@
   }
 </script>
 
-<section class="od-cleanup" data-od-scroll aria-label={t('sites.cleanupTitle')}>
-  <h2 class="od-cleanup--title">{t('sites.cleanupTitle')}</h2>
-  <p class="od-cleanup--intro">{t('desktopSites.cleanupIntro', { shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z' })}</p>
+<section class="bc-cleanup" data-od-scroll aria-label={t('sites.cleanupTitle')}>
+  <h2 class="bc-cleanup--title">{t('sites.cleanupTitle')}</h2>
+  <p class="bc-cleanup--intro">{t('desktopSites.cleanupIntro', { shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z' })}</p>
 
-  <div class="od-cleanup--columns">
-    <div class="od-cleanup--left">
-      <h3 class="od-cleanup--heading">{t('desktopSites.possibleDuplicates')}</h3>
+  <div class="bc-cleanup--columns">
+    <div class="bc-cleanup--left">
+      <h3 class="bc-cleanup--heading">{t('desktopSites.possibleDuplicates')}</h3>
       {#each merged as m (m.key)}
-        <div class="od-cleanup--card od-cleanup--merged" role="status">
+        <div class="bc-cleanup--card bc-cleanup--merged" role="status">
           <Icon name="check" size={22} />
           <div>
-            <p class="od-cleanup--name">{m.name}</p>
-            <p class="od-cleanup--sub">{m.text}</p>
+            <p class="bc-cleanup--name">{m.name}</p>
+            <p class="bc-cleanup--sub">{m.text}</p>
           </div>
         </div>
       {/each}
       {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
         {@const both = ordered(pair)}
-        <div class="od-cleanup--card">
-          <p class="od-cleanup--name">{both[0].name || t('sites.noName')}</p>
-          <p class="od-cleanup--sub">{reason(pair)}</p>
+        <div class="bc-cleanup--card">
+          <p class="bc-cleanup--name">{both[0].name || t('sites.noName')}</p>
+          <p class="bc-cleanup--sub">{reason(pair)}</p>
           {#each both as s (s.uuid)}
-            <div class="od-cleanup--site">
+            <div class="bc-cleanup--site">
               <Icon name="sites" size={18} />
               <div>
-                <p class="od-cleanup--site-name">{s.name || t('sites.noName')}</p>
-                <p class="od-cleanup--sub">{describe(s)}</p>
+                <p class="bc-cleanup--site-name">{s.name || t('sites.noName')}</p>
+                <p class="bc-cleanup--sub">{describe(s)}</p>
               </div>
             </div>
           {/each}
-          <div class="od-cleanup--actions">
-            <button type="button" class="od-cleanup--text" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
-            <button type="button" class="od-cleanup--tonal" onclick={() => (merging = pair)}>{t('sites.merge')}</button>
+          <div class="bc-cleanup--actions">
+            <button type="button" class="bc-cleanup--text" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
+            <button type="button" class="bc-cleanup--tonal" onclick={() => (merging = pair)}>{t('sites.merge')}</button>
           </div>
         </div>
       {/each}
-      {#if !pairs.length && !merged.length}<p class="od-cleanup--none">{t('desktopSites.noDuplicates')}</p>{/if}
+      {#if !pairs.length && !merged.length}<p class="bc-cleanup--none">{t('desktopSites.noDuplicates')}</p>{/if}
     </div>
 
-    <div class="od-cleanup--right">
-      <h3 class="od-cleanup--heading">{t('sites.unusedTitle')}</h3>
+    <div class="bc-cleanup--right">
+      <h3 class="bc-cleanup--heading">{t('sites.unusedTitle')}</h3>
       {#if unused.length}
-        <p class="od-cleanup--sub od-cleanup--lead">{t('sites.unusedIntro', { n: unused.length })}</p>
-        <div class="od-cleanup--card">
+        <p class="bc-cleanup--sub bc-cleanup--lead">{t('sites.unusedIntro', { n: unused.length })}</p>
+        <div class="bc-cleanup--card">
           {#each unused as s (s.uuid)}
-            <label class="od-cleanup--check">
+            <label class="bc-cleanup--check">
               <input type="checkbox" bind:checked={checked[s.uuid]} />
-              <span class="od-cleanup--box" aria-hidden="true"><Icon name="check" size={16} weight={2.6} /></span>
+              <span class="bc-cleanup--box" aria-hidden="true"><Icon name="check" size={16} weight={2.6} /></span>
               <span>
-                <span class="od-cleanup--site-name">{s.name || t('sites.noName')}</span>
-                <span class="od-cleanup--sub">{[t('sites.noDive'), s.country || t('sites.noCountry')].join(', ')}</span>
+                <span class="bc-cleanup--site-name">{s.name || t('sites.noName')}</span>
+                <span class="bc-cleanup--sub">{[t('sites.noDive'), s.country || t('sites.noCountry')].join(', ')}</span>
               </span>
             </label>
           {/each}
-          <div class="od-cleanup--actions od-cleanup--spread">
-            <button type="button" class="od-cleanup--text" onclick={() => (checked = toggleAllUnused(unused, checked))}>{t('sites.selectAll')}</button>
-            <button type="button" class="od-cleanup--danger" disabled={!selection.length} onclick={deleteSelection}>{t('sites.deleteSelection', { n: selection.length })}</button>
+          <div class="bc-cleanup--actions bc-cleanup--spread">
+            <button type="button" class="bc-cleanup--text" onclick={() => (checked = toggleAllUnused(unused, checked))}>{t('sites.selectAll')}</button>
+            <button type="button" class="bc-cleanup--danger" disabled={!selection.length} onclick={deleteSelection}>{t('sites.deleteSelection', { n: selection.length })}</button>
           </div>
         </div>
       {:else}
-        <p class="od-cleanup--none">{t('desktopSites.noUnused')}</p>
+        <p class="bc-cleanup--none">{t('desktopSites.noUnused')}</p>
       {/if}
     </div>
   </div>
@@ -185,7 +185,7 @@
 
 <style>
   @layer od.components {
-    .od-cleanup {
+    .bc-cleanup {
       box-sizing: border-box;
       height: 100%;
       overflow: auto;
@@ -193,94 +193,94 @@
       container-type: inline-size;
       padding: 4px 12px 24px 4px;
     }
-    .od-cleanup--title {
+    .bc-cleanup--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       line-height: 30px;
       font-weight: 500;
     }
-    .od-cleanup--intro {
+    .bc-cleanup--intro {
       margin: 2px 0 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-cleanup--columns {
+    .bc-cleanup--columns {
       display: grid;
       grid-template-columns: minmax(280px, 342px) minmax(260px, 1fr);
       gap: 16px;
       align-items: start;
     }
     @container (max-width: 599px) {
-      .od-cleanup--columns {
+      .bc-cleanup--columns {
         grid-template-columns: minmax(0, 1fr);
       }
     }
-    .od-cleanup--heading {
+    .bc-cleanup--heading {
       margin: 0 0 8px;
       font-size: 14px;
       font-weight: 600;
     }
-    .od-cleanup--lead {
+    .bc-cleanup--lead {
       margin: -4px 0 8px;
     }
-    .od-cleanup--card {
+    .bc-cleanup--card {
       margin-bottom: 8px;
       padding: 12px 14px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-cleanup--merged {
+    .bc-cleanup--merged {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
     }
-    .od-cleanup--merged > div > p {
+    .bc-cleanup--merged > div > p {
       margin: 0;
     }
-    .od-cleanup--name {
+    .bc-cleanup--name {
       margin: 0;
       font-size: 16px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-cleanup--sub {
+    .bc-cleanup--sub {
       display: block;
       margin: 0;
       font-size: 13px;
       line-height: 17px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-cleanup--site {
+    .bc-cleanup--site {
       display: flex;
       align-items: flex-start;
       gap: 12px;
       margin-top: 10px;
       padding-left: 2px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-cleanup--site-name {
+    .bc-cleanup--site-name {
       display: block;
       margin: 0;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-cleanup--site p {
+    .bc-cleanup--site p {
       margin: 0;
     }
-    .od-cleanup--actions {
+    .bc-cleanup--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
       margin-top: 8px;
     }
-    .od-cleanup--spread {
+    .bc-cleanup--spread {
       justify-content: space-between;
     }
-    .od-cleanup--text,
-    .od-cleanup--tonal,
-    .od-cleanup--danger {
+    .bc-cleanup--text,
+    .bc-cleanup--tonal,
+    .bc-cleanup--danger {
       width: auto;
       height: 36px;
       padding: 0 14px;
@@ -291,70 +291,70 @@
       font: inherit;
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       cursor: pointer;
     }
-    .od-cleanup--tonal {
-      background: var(--od-table-selected);
+    .bc-cleanup--tonal {
+      background: var(--bc-table-selected);
     }
-    .od-cleanup--danger {
-      color: var(--od-menu-danger);
+    .bc-cleanup--danger {
+      color: var(--bc-menu-danger);
     }
-    .od-cleanup--danger:disabled {
+    .bc-cleanup--danger:disabled {
       opacity: 0.38;
       cursor: default;
     }
-    .od-cleanup--text:hover,
-    .od-cleanup--danger:not(:disabled):hover {
+    .bc-cleanup--text:hover,
+    .bc-cleanup--danger:not(:disabled):hover {
       background: color-mix(in srgb, currentColor 8%, transparent);
     }
     /* Mouse: the tonal button takes the 8 % layer of its text colour; a checkbox row gets a halo round its box. */
     @media (hover: hover) and (pointer: fine) {
-      .od-cleanup--tonal {
+      .bc-cleanup--tonal {
         transition: box-shadow 120ms linear;
       }
-      .od-cleanup--tonal:hover {
+      .bc-cleanup--tonal:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
-      .od-cleanup--check:hover .od-cleanup--box {
-        box-shadow: 0 0 0 8px color-mix(in srgb, var(--od-text) 8%, transparent);
+      .bc-cleanup--check:hover .bc-cleanup--box {
+        box-shadow: 0 0 0 8px color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
     }
-    .od-cleanup--check {
+    .bc-cleanup--check {
       display: flex;
       align-items: flex-start;
       gap: 12px;
       padding: 6px 0;
       cursor: pointer;
     }
-    .od-cleanup--check input {
+    .bc-cleanup--check input {
       position: absolute;
       opacity: 0;
     }
-    .od-cleanup--box {
+    .bc-cleanup--box {
       display: grid;
       place-items: center;
       flex: none;
       width: 20px;
       height: 20px;
       margin: 2px 4px 0 0;
-      border: 2px solid var(--od-outline);
+      border: 2px solid var(--bc-outline);
       border-radius: 3px;
       color: transparent;
     }
-    .od-cleanup--check input:checked + .od-cleanup--box {
-      border-color: var(--od-secondary);
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+    .bc-cleanup--check input:checked + .bc-cleanup--box {
+      border-color: var(--bc-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
-    .od-cleanup--check input:focus-visible + .od-cleanup--box {
-      outline: 2px solid var(--od-secondary);
+    .bc-cleanup--check input:focus-visible + .bc-cleanup--box {
+      outline: 2px solid var(--bc-secondary);
       outline-offset: 2px;
     }
-    .od-cleanup--none {
+    .bc-cleanup--none {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

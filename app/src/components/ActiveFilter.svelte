@@ -38,13 +38,13 @@
 </script>
 
 {#if keys.length}
-  <div class="od-active-filter" role="group" aria-label={t('filter.activeLabel')}>
+  <div class="bc-active-filter" role="group" aria-label={t('filter.activeLabel')}>
     {#each keys as key (key)}
-      <span class="chip od-active-filter--chip">
+      <span class="chip bc-active-filter--chip">
         <span>{chipText(key)}</span>
         <button
           type="button"
-          class="od-active-filter--remove"
+          class="bc-active-filter--remove"
           aria-label={t('filter.removeCriterion', { name: chipText(key) })}
           onclick={() => removeCriterion(key === 'mode' ? 'mode' : key, prefs)}
         >
@@ -52,16 +52,16 @@
         </button>
       </span>
     {/each}
-    <span class="od-active-filter--count od-value" role="status">{t('filter.matching', { n: shown, total: dives.length })}</span>
+    <span class="bc-active-filter--count bc-value" role="status">{t('filter.matching', { n: shown, total: dives.length })}</span>
     {#if keys.length > 1}
-      <button type="button" class="od-text-button od-active-filter--clear" onclick={() => clearFilter(prefs)}>{t('filter.clear')}</button>
+      <button type="button" class="bc-text-button bc-active-filter--clear" onclick={() => clearFilter(prefs)}>{t('filter.clear')}</button>
     {/if}
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-active-filter {
+    .bc-active-filter {
       margin: 8px 16px 0;
       display: flex;
       align-items: center;
@@ -70,13 +70,13 @@
     }
 
     /* MD3 input chip: 32 dp, 8 dp corners, a trailing remove button. */
-    .od-active-filter--chip {
+    .bc-active-filter--chip {
       min-height: 32px;
       box-sizing: border-box;
       padding: 0 4px 0 12px;
       border-radius: 8px;
-      background: var(--od-tint);
-      color: var(--od-on-tint);
+      background: var(--bc-tint);
+      color: var(--bc-on-tint);
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -92,7 +92,7 @@
     }
 
     /* 24 dp button in the chip; its touch area is widened by padding. */
-    .od-active-filter--remove {
+    .bc-active-filter--remove {
       width: 32px;
       height: 32px;
       margin: -4px 0;
@@ -106,16 +106,16 @@
       cursor: pointer;
     }
 
-    .od-active-filter--count {
+    .bc-active-filter--count {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 15px;
       }
     }
 
-    .od-active-filter--clear {
+    .bc-active-filter--clear {
       margin-inline-start: auto;
     }
   }

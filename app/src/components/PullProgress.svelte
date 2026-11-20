@@ -15,18 +15,18 @@
   const label = $derived(t(`sync.syncing${syncFlavour()}`));
 </script>
 
-<div class="od-pull-progress" role="status">
+<div class="bc-pull-progress" role="status">
   {#if theme.ios}
     <div
-      class="od-pull-progress--bar"
-      class:od-pull-progress--indeterminate={fraction <= 0}
+      class="bc-pull-progress--bar"
+      class:bc-pull-progress--indeterminate={fraction <= 0}
       role="progressbar"
       aria-label={label}
       aria-valuemin="0"
       aria-valuemax="100"
       aria-valuenow={fraction > 0 ? percent : undefined}
     >
-      <div class="od-pull-progress--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
+      <div class="bc-pull-progress--fill" style:width={fraction > 0 ? `${percent}%` : undefined}></div>
     </div>
   {:else}
     <LinearWavyProgress value={fraction} indeterminate={fraction <= 0} {label} />
@@ -36,7 +36,7 @@
 <style>
   @layer od.components {
     /* No height: the bar lies over the first pixels of the list. */
-    .od-pull-progress {
+    .bc-pull-progress {
       position: relative;
       height: 0;
       z-index: 2;
@@ -44,14 +44,14 @@
       pointer-events: none;
     }
 
-    .od-pull-progress--bar {
+    .bc-pull-progress--bar {
       position: absolute;
       top: 4px;
       left: 16px;
       right: 16px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       overflow: hidden;
 
       :global(.ios) & {
@@ -60,14 +60,14 @@
       }
     }
 
-    .od-pull-progress--fill {
+    .bc-pull-progress--fill {
       height: 100%;
       border-radius: inherit;
-      background: var(--od-action);
+      background: var(--bc-action);
       transition: width 0.3s;
     }
 
-    .od-pull-progress--indeterminate .od-pull-progress--fill {
+    .bc-pull-progress--indeterminate .bc-pull-progress--fill {
       position: absolute;
       width: 40%;
       animation: od-pull-progress-slide 1.4s ease-in-out infinite;

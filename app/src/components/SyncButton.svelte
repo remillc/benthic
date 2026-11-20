@@ -45,33 +45,33 @@
 
 <button
   type="button"
-  class="od-tonal-button od-sync-button"
-  class:od-sync-button--filled={filled}
+  class="bc-tonal-button bc-sync-button"
+  class:bc-sync-button--filled={filled}
   disabled={logbook.loading || running}
   aria-busy={running}
   onclick={sync}
 >
   {#if running}
     {#if known}
-      <span class="od-sync-button--fill" style:width="{percent}%" aria-hidden="true"></span>
+      <span class="bc-sync-button--fill" style:width="{percent}%" aria-hidden="true"></span>
     {:else}
-      <span class="od-sync-button--sweep" aria-hidden="true"></span>
+      <span class="bc-sync-button--sweep" aria-hidden="true"></span>
     {/if}
   {/if}
-  <span class="od-sync-button--label">{label || t('account.syncNow')}</span>
-  {#if running}<span class="od-sr-only">, {known ? `${percent}\u00A0%` : t('sync.syncing')}</span>{/if}
+  <span class="bc-sync-button--label">{label || t('account.syncNow')}</span>
+  {#if running}<span class="bc-sr-only">, {known ? `${percent}\u00A0%` : t('sync.syncing')}</span>{/if}
 </button>
 
 <style>
   @layer od.components {
-    .od-sync-button {
+    .bc-sync-button {
       position: relative;
       overflow: hidden;
 
       /* Changes wait to be sent: filled in the tertiary colour (what waits for the diver). */
-      &.od-sync-button--filled {
-        background: var(--od-tertiary);
-        color: var(--od-on-tertiary);
+      &.bc-sync-button--filled {
+        background: var(--bc-tertiary);
+        color: var(--bc-on-tertiary);
         font-weight: 600;
       }
 
@@ -81,27 +81,27 @@
       }
     }
 
-    .od-sync-button--fill,
-    .od-sync-button--sweep {
+    .bc-sync-button--fill,
+    .bc-sync-button--sweep {
       position: absolute;
       top: 0;
       bottom: 0;
       left: 0;
-      background: color-mix(in srgb, var(--od-on-tint) 24%, transparent);
+      background: color-mix(in srgb, var(--bc-on-tint) 24%, transparent);
     }
 
-    .od-sync-button--fill {
+    .bc-sync-button--fill {
       transition: width 200ms linear;
     }
 
     /* Before the first stage: a bar a third as wide sweeps across. */
-    .od-sync-button--sweep {
+    .bc-sync-button--sweep {
       width: 35%;
       background: linear-gradient(
         90deg,
         transparent,
-        color-mix(in srgb, var(--od-on-tint) 24%, transparent) 30%,
-        color-mix(in srgb, var(--od-on-tint) 24%, transparent) 70%,
+        color-mix(in srgb, var(--bc-on-tint) 24%, transparent) 30%,
+        color-mix(in srgb, var(--bc-on-tint) 24%, transparent) 70%,
         transparent
       );
       animation: od-sync-sweep 1100ms ease-in-out infinite;
@@ -117,14 +117,14 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-sync-button--sweep {
+      .bc-sync-button--sweep {
         animation: none;
         width: 100%;
         opacity: 0.5;
       }
     }
 
-    .od-sync-button--label {
+    .bc-sync-button--label {
       position: relative;
     }
   }

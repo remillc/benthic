@@ -44,18 +44,18 @@
   }
 </script>
 
-<Page data-od-scroll class="od-about-text">
+<Page data-od-scroll class="bc-about-text">
   <Navbar title={which === 'notes' ? t('about.notes') : which === 'privacy' ? t('about.privacyPolicy') : t('about.licence')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
   {#if which === 'notes'}
-    <div class="od-about-text--text">
+    <div class="bc-about-text--text">
       <!-- The version of app/package.json, the one source of the version; its date from CHANGELOG.md. -->
       <h2>
         {__APP_RELEASE_DATE__
@@ -68,15 +68,15 @@
     </div>
   {:else if which === 'privacy'}
     <!-- The app's own file (public/privacy), not text from elsewhere. -->
-    <div class="od-about-text--text od-about-text--policy">{@html policy}</div>
+    <div class="bc-about-text--text bc-about-text--policy">{@html policy}</div>
   {:else}
-    <pre class="od-about-text--licence">{licence}</pre>
+    <pre class="bc-about-text--licence">{licence}</pre>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .od-about-text--text {
+    .bc-about-text--text {
       padding: 8px 24px 32px;
       font-size: 16px;
       line-height: 24px;
@@ -91,7 +91,7 @@
       }
     }
 
-    .od-about-text--policy {
+    .bc-about-text--policy {
       :global(a[href]) {
         text-decoration: underline;
       }
@@ -116,20 +116,20 @@
         padding-left: 20px;
       }
 
-      :global(.od-about-text--updated) {
+      :global(.bc-about-text--updated) {
         font-size: 14px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-about-text--licence {
+    .bc-about-text--licence {
       margin: 0;
       padding: 16px 16px 40px;
       font-family: ui-monospace, monospace;
       font-size: 12px;
       line-height: 17px;
       white-space: pre-wrap;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
   }
 </style>

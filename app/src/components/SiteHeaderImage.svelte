@@ -40,22 +40,22 @@
   });
 </script>
 
-<div class="od-site-header-image od-site-header-image--image" class:od-site-header-image--desk={desk} aria-hidden="true">
+<div class="bc-site-header-image bc-site-header-image--image" class:bc-site-header-image--desk={desk} aria-hidden="true">
   {#if src}
     <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
-    <svg class="od-site-header-image--pin" width="40" height="40" viewBox="-20 -20 40 40">
-      <circle class="od-site-header-image--halo" r="14" />
-      <path class="od-site-header-image--body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
-      <circle class="od-site-header-image--eye" cy="-11" r="3" />
+    <svg class="bc-site-header-image--pin" width="40" height="40" viewBox="-20 -20 40 40">
+      <circle class="bc-site-header-image--halo" r="14" />
+      <path class="bc-site-header-image--body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
+      <circle class="bc-site-header-image--eye" cy="-11" r="3" />
     </svg>
-    <div class="od-site-header-image--fade"></div>
+    <div class="bc-site-header-image--fade"></div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
     /* From the top of the screen to just under the header. */
-    .od-site-header-image--image {
+    .bc-site-header-image--image {
       position: absolute;
       left: 0;
       right: 0;
@@ -67,7 +67,7 @@
 
     /* The site is under the pin, in the middle of the top bar. */
     img,
-    .od-site-header-image--pin {
+    .bc-site-header-image--pin {
       position: absolute;
       left: 50%;
       top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height) / 2);
@@ -81,55 +81,55 @@
       }
     }
 
-    .od-site-header-image--pin {
+    .bc-site-header-image--pin {
       transform: translate(-50%, -50%);
     }
 
     /* Desktop pane: from the top of the pane, 170 dp; the pin in the header's right half. */
-    .od-site-header-image--image.od-site-header-image--desk {
+    .bc-site-header-image--image.bc-site-header-image--desk {
       top: 0;
       bottom: auto;
       height: 170px;
     }
 
-    .od-site-header-image--desk img,
-    .od-site-header-image--desk .od-site-header-image--pin {
+    .bc-site-header-image--desk img,
+    .bc-site-header-image--desk .bc-site-header-image--pin {
       top: 62px;
     }
 
-    .od-site-header-image--desk img,
-    .od-site-header-image--desk .od-site-header-image--pin {
+    .bc-site-header-image--desk img,
+    .bc-site-header-image--desk .bc-site-header-image--pin {
       left: 75%;
     }
 
-    .od-site-header-image--halo {
-      fill: var(--od-pin);
+    .bc-site-header-image--halo {
+      fill: var(--bc-pin);
       fill-opacity: 0.14;
     }
 
-    .od-site-header-image--body {
-      fill: var(--od-pin);
-      stroke: var(--od-on-pin);
+    .bc-site-header-image--body {
+      fill: var(--bc-pin);
+      stroke: var(--bc-on-pin);
       stroke-width: 1.5;
     }
 
-    .od-site-header-image--eye {
-      fill: var(--od-on-pin);
+    .bc-site-header-image--eye {
+      fill: var(--bc-on-pin);
     }
 
-    .od-site-header-image--fade {
+    .bc-site-header-image--fade {
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--od-background) 45%, transparent) 0%,
-        color-mix(in srgb, var(--od-background) 70%, transparent) 60%,
-        var(--od-background) 100%
+        color-mix(in srgb, var(--bc-background) 45%, transparent) 0%,
+        color-mix(in srgb, var(--bc-background) 70%, transparent) 60%,
+        var(--bc-background) 100%
       );
 
       /* High contrast: an opaque veil; the header reads on the plain background. */
-      :global(html.od-high-contrast) & {
-        background: var(--od-background);
+      :global(html.bc-high-contrast) & {
+        background: var(--bc-background);
       }
     }
   }

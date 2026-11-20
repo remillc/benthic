@@ -264,8 +264,8 @@
 </script>
 
 {#if step === 'createChoice'}
-  <p class="od-server-create--lead">{t('serverCreate.lead')}</p>
-  <nav class="od-server-create--rows" aria-label={t('serverCreate.title')}>
+  <p class="bc-server-create--lead">{t('serverCreate.lead')}</p>
+  <nav class="bc-server-create--rows" aria-label={t('serverCreate.title')}>
     {#each choices as choice (choice)}
       {#if choice === 'blank'}
         <ReleaseChoiceRow icon="plus" title={t('serverCreate.blankTitle')} help={t('serverCreate.blankHelp')} onclick={blank} />
@@ -281,66 +281,66 @@
       {/if}
     {/each}
   </nav>
-  <input type="file" accept=".ssrf,.xml,text/xml,application/xml" class="od-server-create--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" accept=".ssrf,.xml,text/xml,application/xml" class="bc-server-create--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
 {:else if step === 'createName'}
   <ReleaseField label={t('welcomeSteps.nameLabel')} bind:value={c.name} tall error={nameError} help={t(deviceKey('serverCreate.nameHelp', kind))} onenter={createBlank} />
-  <button type="button" class="od-server-create--action" disabled={busy || !fileName} aria-busy={busy} onclick={createBlank}>{t('serverCreate.create')}</button>
+  <button type="button" class="bc-server-create--action" disabled={busy || !fileName} aria-busy={busy} onclick={createBlank}>{t('serverCreate.create')}</button>
 {:else if step === 'createSend'}
-  <p class="od-server-create--name">{c.total ? t('serverCreate.sendingName', { name: sanitiseLogbookName(c.name), n: c.total }) : sanitiseLogbookName(c.name)}</p>
-  <div class="od-server-create--bar" role="progressbar" aria-label={t('serverCreate.sendingTitle')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(ratio * 100)}>
-    <span class="od-server-create--bar-fill" style:width="{ratio * 100}%"></span>
+  <p class="bc-server-create--name">{c.total ? t('serverCreate.sendingName', { name: sanitiseLogbookName(c.name), n: c.total }) : sanitiseLogbookName(c.name)}</p>
+  <div class="bc-server-create--bar" role="progressbar" aria-label={t('serverCreate.sendingTitle')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(ratio * 100)}>
+    <span class="bc-server-create--bar-fill" style:width="{ratio * 100}%"></span>
   </div>
-  <div class="od-server-create--counts">
+  <div class="bc-server-create--counts">
     {#if stage === 'importing'}
-      <span class="od-server-create--count">{t(c.source === 'file' ? 'serverCreate.reading' : 'serverCreate.importing')}</span>
+      <span class="bc-server-create--count">{t(c.source === 'file' ? 'serverCreate.reading' : 'serverCreate.importing')}</span>
     {:else if objects.total}
       <ProgressLine done={objects.n} total={objects.total} count={t('serverCreate.objects', { n: objects.n, total: objects.total })} />
     {:else}
-      <span class="od-server-create--count">{t('serverCreate.sending')}</span>
+      <span class="bc-server-create--count">{t('serverCreate.sending')}</span>
     {/if}
   </div>
-  <p class="od-server-create--note">
+  <p class="bc-server-create--note">
     <Icon name={desktopApp ? 'desktop' : layout.phone ? 'phone' : 'tablet'} size={20} />
     <span>{t(deviceKey('serverCreate.safe', kind))}</span>
   </p>
-  <button type="button" class="od-server-create--text" onclick={cancelSend}>{t('serverCreate.cancel')}</button>
+  <button type="button" class="bc-server-create--text" onclick={cancelSend}>{t('serverCreate.cancel')}</button>
 {:else if step === 'createInterrupted'}
-  <span class="od-server-create--tile od-server-create--tile-pending" aria-hidden="true"><Icon name="cloudUpload" size={28} weight={1.8} /></span>
-  <h2 class="od-server-create--heading">{t('serverCreate.interruptedTitle')}</h2>
-  <p class="od-server-create--lead">{t(deviceKey('serverCreate.interruptedHelp', kind))}</p>
-  <div class="od-server-create--bar od-server-create--bar-stopped" role="progressbar" aria-label={t('serverCreate.interruptedTitle')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(ratio * 100)}>
-    <span class="od-server-create--bar-fill" style:width="{ratio * 100}%"></span>
+  <span class="bc-server-create--tile bc-server-create--tile-pending" aria-hidden="true"><Icon name="cloudUpload" size={28} weight={1.8} /></span>
+  <h2 class="bc-server-create--heading">{t('serverCreate.interruptedTitle')}</h2>
+  <p class="bc-server-create--lead">{t(deviceKey('serverCreate.interruptedHelp', kind))}</p>
+  <div class="bc-server-create--bar bc-server-create--bar-stopped" role="progressbar" aria-label={t('serverCreate.interruptedTitle')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(ratio * 100)}>
+    <span class="bc-server-create--bar-fill" style:width="{ratio * 100}%"></span>
   </div>
-  <div class="od-server-create--buttons">
-    <button type="button" class="od-server-create--text" onclick={onlater}>{t('serverCreate.later')}</button>
-    <button type="button" class="od-server-create--action od-server-create--action-inline" onclick={() => goReplace('createSend')}>{t('serverCreate.resume')}</button>
+  <div class="bc-server-create--buttons">
+    <button type="button" class="bc-server-create--text" onclick={onlater}>{t('serverCreate.later')}</button>
+    <button type="button" class="bc-server-create--action bc-server-create--action-inline" onclick={() => goReplace('createSend')}>{t('serverCreate.resume')}</button>
   </div>
 {:else if step === 'createOffline'}
-  <span class="od-server-create--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
-  <h2 class="od-server-create--heading">{t('serverCreate.offlineTitle')}</h2>
-  <p class="od-server-create--lead">{t(deviceKey('serverCreate.offlineHelp', kind))} {t('serverCreate.offlineNote')}</p>
-  <div class="od-server-create--buttons">
-    <button type="button" class="od-server-create--text" onclick={home}>{t('serverSteps.backHome')}</button>
-    <button type="button" class="od-server-create--action od-server-create--action-inline" onclick={again}>{t('serverSteps.retry')}</button>
+  <span class="bc-server-create--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
+  <h2 class="bc-server-create--heading">{t('serverCreate.offlineTitle')}</h2>
+  <p class="bc-server-create--lead">{t(deviceKey('serverCreate.offlineHelp', kind))} {t('serverCreate.offlineNote')}</p>
+  <div class="bc-server-create--buttons">
+    <button type="button" class="bc-server-create--text" onclick={home}>{t('serverSteps.backHome')}</button>
+    <button type="button" class="bc-server-create--action bc-server-create--action-inline" onclick={again}>{t('serverSteps.retry')}</button>
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-server-create--lead {
+    .bc-server-create--lead {
       margin: 0 0 20px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-server-create--rows {
+    .bc-server-create--rows {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .od-server-create--file {
+    .bc-server-create--file {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -348,7 +348,7 @@
       pointer-events: none;
     }
 
-    .od-server-create--heading {
+    .bc-server-create--heading {
       margin: 0 0 8px;
       font-size: 28px;
       line-height: 36px;
@@ -356,7 +356,7 @@
       letter-spacing: -0.2px;
     }
 
-    .od-server-create--tile {
+    .bc-server-create--tile {
       width: 56px;
       height: 56px;
       margin: 4px 0 16px;
@@ -364,43 +364,43 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-error-container);
-      color: var(--od-error);
+      background: var(--bc-error-container);
+      color: var(--bc-error);
     }
 
-    .od-server-create--tile-pending {
-      background: var(--od-plus-amber);
-      color: var(--od-plus-amber-icon);
+    .bc-server-create--tile-pending {
+      background: var(--bc-plus-amber);
+      color: var(--bc-plus-amber-icon);
     }
 
-    .od-server-create--name {
+    .bc-server-create--name {
       margin: 0 0 14px;
       font-size: 16px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The bar of the mock-up: flat, determinate, the width says how many dives are on the server. */
-    .od-server-create--bar {
+    .bc-server-create--bar {
       height: 8px;
       border-radius: 4px;
       overflow: hidden;
-      background: var(--od-release-track);
+      background: var(--bc-release-track);
     }
 
-    .od-server-create--bar-fill {
+    .bc-server-create--bar-fill {
       display: block;
       height: 100%;
       border-radius: 4px;
-      background: var(--od-release-row-main);
+      background: var(--bc-release-row-main);
       transition: width 0.3s;
     }
 
-    .od-server-create--bar-stopped .od-server-create--bar-fill {
-      background: var(--od-plus-amber-icon);
+    .bc-server-create--bar-stopped .bc-server-create--bar-fill {
+      background: var(--bc-plus-amber-icon);
     }
 
-    .od-server-create--counts {
+    .bc-server-create--counts {
       display: flex;
       justify-content: space-between;
       gap: 12px;
@@ -409,30 +409,30 @@
       line-height: 20px;
     }
 
-    .od-server-create--count {
-      color: var(--od-text);
+    .bc-server-create--count {
+      color: var(--bc-text);
     }
 
-    .od-server-create--note {
+    .bc-server-create--note {
       display: flex;
       gap: 14px;
       align-items: flex-start;
       margin: 0 0 20px;
       padding: 14px 16px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-server-create--note :global(svg) {
+    .bc-server-create--note :global(svg) {
       flex: none;
       margin-top: 1px;
     }
 
-    .od-server-create--buttons {
+    .bc-server-create--buttons {
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -440,15 +440,15 @@
       margin-top: 22px;
     }
 
-    .od-server-create--action {
+    .bc-server-create--action {
       align-self: flex-end;
       height: 48px;
       margin-top: 22px;
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -457,8 +457,8 @@
 
       &:disabled {
         cursor: default;
-        background: var(--od-release-disabled-bg);
-        color: var(--od-release-disabled-text);
+        background: var(--bc-release-disabled-bg);
+        color: var(--bc-release-disabled-text);
       }
 
       @media (hover: hover) {
@@ -468,23 +468,23 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
-    .od-server-create--action-inline {
+    .bc-server-create--action-inline {
       margin-top: 0;
     }
 
-    .od-server-create--text {
+    .bc-server-create--text {
       align-self: flex-end;
       height: 48px;
       padding: 0 16px;
       border: none;
       border-radius: 24px;
       background: transparent;
-      color: var(--od-release-row-main);
+      color: var(--bc-release-row-main);
       font: inherit;
       font-size: 15px;
       font-weight: 600;
@@ -492,29 +492,29 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
-    .od-server-create--buttons .od-server-create--text {
-      color: var(--od-text);
+    .bc-server-create--buttons .bc-server-create--text {
+      color: var(--bc-text);
     }
 
     @media (max-width: 767.98px) {
-      .od-server-create--action:not(.od-server-create--action-inline) {
+      .bc-server-create--action:not(.bc-server-create--action-inline) {
         align-self: stretch;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-server-create--action,
-      .od-server-create--bar-fill {
+      .bc-server-create--action,
+      .bc-server-create--bar-fill {
         transition: none;
       }
     }

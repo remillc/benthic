@@ -23,73 +23,73 @@
   opened={errorReport.open}
   backdrop
   closeByBackdropClick={false}
-  class="od-error-report od-error-report--sheet"
+  class="bc-error-report bc-error-report--sheet"
   style="height: auto"
   onSheetClosed={() => errorReport.open && declineCurrent()}>
-  <div class="od-error-report--panel {ios ? 'od-error-report--ios' : 'od-error-report--material'}" role="alertdialog" aria-labelledby="od-error-report-title" aria-describedby="od-error-report-text">
-    <div class="od-error-report--handle" aria-hidden="true"></div>
-    <h2 id="od-error-report-title" class="od-error-report--title">{t(shown?.kind === 'native' ? 'errorReport.titleCrash' : 'errorReport.title')}</h2>
-    <p id="od-error-report-text" class="od-error-report--text">{t('errorReport.text')}</p>
-    <pre class="od-error-report--contents" tabindex="0" aria-label={t('errorReport.contents')}>{body}</pre>
-    {#if offline}<p class="od-error-report--offline" role="status">{t('errorReport.offline')}</p>{/if}
-    <div class="od-error-report--actions">
-      <button type="button" class="od-error-report--secondary" onclick={declineCurrent}>{t(offline ? 'errorReport.later' : 'errorReport.decline')}</button>
-      <button type="button" class="od-error-report--primary" disabled={sending} onclick={sendCurrent}>{t(sending ? 'errorReport.sending' : 'errorReport.send')}</button>
+  <div class="bc-error-report--panel {ios ? 'bc-error-report--ios' : 'bc-error-report--material'}" role="alertdialog" aria-labelledby="od-error-report-title" aria-describedby="od-error-report-text">
+    <div class="bc-error-report--handle" aria-hidden="true"></div>
+    <h2 id="od-error-report-title" class="bc-error-report--title">{t(shown?.kind === 'native' ? 'errorReport.titleCrash' : 'errorReport.title')}</h2>
+    <p id="od-error-report-text" class="bc-error-report--text">{t('errorReport.text')}</p>
+    <pre class="bc-error-report--contents" tabindex="0" aria-label={t('errorReport.contents')}>{body}</pre>
+    {#if offline}<p class="bc-error-report--offline" role="status">{t('errorReport.offline')}</p>{/if}
+    <div class="bc-error-report--actions">
+      <button type="button" class="bc-error-report--secondary" onclick={declineCurrent}>{t(offline ? 'errorReport.later' : 'errorReport.decline')}</button>
+      <button type="button" class="bc-error-report--primary" disabled={sending} onclick={sendCurrent}>{t(sending ? 'errorReport.sending' : 'errorReport.send')}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.od-error-report--sheet) {
+    :global(.bc-error-report--sheet) {
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
+      background: var(--bc-dialog);
       overflow: hidden;
     }
 
     @media (min-width: 768px) {
-      :global(.od-error-report--sheet) {
+      :global(.bc-error-report--sheet) {
         left: calc(50% - 280px);
         width: 560px;
       }
     }
 
-    .od-error-report--panel {
+    .bc-error-report--panel {
       padding: 0 24px calc(24px + var(--f7-safe-area-bottom, 0px));
     }
 
-    .od-error-report--handle {
+    .bc-error-report--handle {
       width: 32px;
       height: 4px;
       margin: 22px auto 20px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
     }
 
-    .od-error-report--title {
+    .bc-error-report--title {
       margin: 0 0 8px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-error-report--text {
+    .bc-error-report--text {
       margin: 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-error-report--contents {
+    .bc-error-report--contents {
       max-height: 32vh;
       margin: 16px 0 0;
       padding: 12px;
       overflow: auto;
       border-radius: 12px;
-      background: var(--od-field-rest);
-      color: var(--od-text);
+      background: var(--bc-field-rest);
+      color: var(--bc-text);
       font-family: 'Roboto Mono', ui-monospace, monospace;
       font-size: 12px;
       line-height: 16px;
@@ -98,14 +98,14 @@
       user-select: text;
     }
 
-    .od-error-report--offline {
+    .bc-error-report--offline {
       margin: 12px 0 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-error-report--actions {
+    .bc-error-report--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
@@ -128,22 +128,22 @@
       }
     }
 
-    .od-error-report--secondary {
+    .bc-error-report--secondary {
       padding: 0 12px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font-weight: 500;
     }
 
-    .od-error-report--primary {
+    .bc-error-report--primary {
       padding: 0 24px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font-weight: 600;
     }
 
     /* iPhone and iPad: the two choices stacked, full width, send first. */
-    .od-error-report--ios .od-error-report--actions {
+    .bc-error-report--ios .bc-error-report--actions {
       flex-direction: column-reverse;
       gap: 4px;
 
@@ -155,13 +155,13 @@
       }
     }
 
-    .od-error-report--ios .od-error-report--title {
+    .bc-error-report--ios .bc-error-report--title {
       font-size: 20px;
       font-weight: 600;
       text-align: center;
     }
 
-    .od-error-report--ios .od-error-report--text {
+    .bc-error-report--ios .bc-error-report--text {
       text-align: center;
     }
   }

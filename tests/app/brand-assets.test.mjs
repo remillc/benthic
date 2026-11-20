@@ -25,21 +25,21 @@ test('the brand assets are the providers\' files and the README names their sour
 
 test('the sign-in buttons use the logos, not letter discs, and the provider colours come from tokens', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.ok(!plus.includes('od-plus--disc'));
+  assert.ok(!plus.includes('bc-plus--disc'));
   assert.match(plus, /google-g\.svg\?raw/);
   assert.match(plus, /apple-logo-black\.svg/);
   assert.match(plus, /apple-logo-white\.svg/);
   const theme = read('theme.css');
-  for (const token of ['--od-brand-google-bg: #FFFFFF', '--od-brand-google-border: #747775', '--od-brand-google-ink: #1F1F1F', '--od-brand-google-bg: #131314', '--od-brand-google-border: #8E918F', '--od-brand-google-ink: #E3E3E3']) {
+  for (const token of ['--bc-brand-google-bg: #FFFFFF', '--bc-brand-google-border: #747775', '--bc-brand-google-ink: #1F1F1F', '--bc-brand-google-bg: #131314', '--bc-brand-google-border: #8E918F', '--bc-brand-google-ink: #E3E3E3']) {
     assert.ok(theme.includes(token), token);
   }
 });
 
 test('both logos are shown at 22 px high on the one connection screen used by phone, tablet and desktop', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(plus, /od-plus--google-logo {[^}]*width: 22px;\s*height: 22px;/);
-  assert.match(plus, /od-plus--apple-logo {[^}]*height: 22px;[^}]*width: auto;/);
-  assert.match(read('theme.css'), /--od-brand-apple-bg: #000000;/);
+  assert.match(plus, /bc-plus--google-logo {[^}]*width: 22px;\s*height: 22px;/);
+  assert.match(plus, /bc-plus--apple-logo {[^}]*height: 22px;[^}]*width: auto;/);
+  assert.match(read('theme.css'), /--bc-brand-apple-bg: #000000;/);
 });
 
 test('the first step opens the connection screen on every device, and « Continuer sans compte » goes back', () => {

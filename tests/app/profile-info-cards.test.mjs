@@ -340,7 +340,8 @@ test('scanCard: the native scanner answers, a cancel changes nothing, no scanner
 
 test('« Nouveau brevet »: the scan fills agency, level, number and date with the mark; nothing found stays silent', () => {
   const page = read('pages/ProfileCertEdit.svelte');
-  assert.ok(page.includes('readFrom.agency = agency = found.agency'));
+  assert.ok(page.includes('agencyText = certAgencyText(found.agency, found.agencyName, agencyOptions)'));
+  assert.ok(page.includes('readFrom.agency = agencyText'));
   assert.ok(page.includes('readFrom.issuedOn = issuedOn = found.issuedOn'));
   assert.ok(page.includes("readFrom[field] === value ? t('diverProfile.cert.readMark')"), 'the mark shows only while the field still holds the scanned value');
   assert.ok(page.includes('if (!scanned) return;'), 'a cancel changes nothing');

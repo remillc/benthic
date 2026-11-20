@@ -116,7 +116,7 @@ The screenshots come from the Subsurface sample log, never from a personal log.
   - `get_dive` returns the facts, the cylinders and gases, the gas changes, the buddies, the suit, the tags, the notes and the dive computer. The profile is computed by the core (`create_plot_info_new`), with the cylinder breathed, the ppO2 and the ceiling if there is one.
   - `get_prefs` gives the units (the log's, when it has a "units" line) and every core preference shown in Settings, with Subsurface's defaults; `set_prefs` changes them (settings.cpp). The app keeps the values changed on the device (`localStorage`, `lib/settings.svelte.js`) and sets them again in the core at each start, before the logbook is read. Trip grouping is the log's `autogroup` (`trips_autogroup`, an undoable step); cylinder types follow Subsurface's cylinder-type manager (`cylinder_types`, `cylinder_type_action`, `cylinder_type_rename`), the device's library kept by the app.
 - **Theme:**
-  - The `--od-*` color tokens are declared, in light and dark.
+  - The `--bc-*` color tokens are declared, in light and dark.
   - `colors.primary` is `#1E4D3A`, with cream backgrounds in light mode.
   - The CSS is organised in layers: `framework7`, `od.tokens`, `od.base`, `od.components`.
   - The `--f7-*` overrides stay outside any layer, otherwise the colors Framework7 injects at startup would override them. They were checked in the WebView: primary is #1e4d3a in light and #8fcfae in dark.
@@ -190,14 +190,14 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 
 A debug-only picker compared four palettes on the Pixel with the real cloud log: "Pine and tangerine", "Black and white", "Black blocks" and "Color in the data". **"Color in the data" (finalist 3) was chosen, and the picker has since been removed:** `theme.css` now declares a single palette in `:root`, with its dark values under `html.dark`; `src/lib/theme.js`, the "Development" section of Settings and the plugin's `getAppInfo` are gone.
 
-- **Tokens:** `--od-background`, `--od-surface`, `--od-surface-2`, `--od-text`, `--od-text-2`, `--od-separator`, `--od-action`, `--od-on-action`, `--od-water-top`, `--od-water-bottom`, `--od-trace`, `--od-block`, `--od-on-block`, `--od-trace-block`, plus `--od-primary-action`, `--od-cursor`, `--od-tint` and `--od-thumbnail-background`. Alarm, oxygen and pending stay common. Dark mode uses the same values for every theme.
+- **Tokens:** `--bc-background`, `--bc-surface`, `--bc-surface-2`, `--bc-text`, `--bc-text-2`, `--bc-separator`, `--bc-action`, `--bc-on-action`, `--bc-water-top`, `--bc-water-bottom`, `--bc-trace`, `--bc-block`, `--bc-on-block`, `--bc-trace-block`, plus `--bc-primary-action`, `--bc-cursor`, `--bc-tint` and `--bc-thumbnail-background`. Alarm, oxygen and pending stay common. Dark mode uses the same values for every theme.
 - **Bottom bar labels:** 12 px, and the WebView scales them with the system text size.
 
 **Contrast, measured in the WebView** (each text against its actual opaque background; 4.5:1 for text, 3:1 for graphics). Every text passed in "Black and white" and "Color in the data". Below the threshold:
 
 | Theme | Element | Ratio |
 | --- | --- | --- |
-| Black blocks | Latest dive row: site, date and depth (black on the black block) | 1.0 to 1.9. **Fixed** (Framework7 computes the list text colours on the whole list; they are now set again inside `.od-block`), not re-measured since |
+| Black blocks | Latest dive row: site, date and depth (black on the black block) | 1.0 to 1.9. **Fixed** (Framework7 computes the list text colours on the whole list; they are now set again inside `.bc-block`), not re-measured since |
 | Black blocks | Water top (#5A5E63) on the black block | 2.5 |
 | Black blocks | White trace on the deepest water (#F4F4F2) | 1.1 |
 | Black and white | Trace (#1F2124) on the deepest water (#1F2124) | 1.0 |

@@ -61,8 +61,8 @@
   const gasName = $derived(result ? formatMixName(result.o2, result.he) : '');
 </script>
 
-<div class="od-desktop-ead-mod">
-  <div class="od-desktop-ead-mod--fields">
+<div class="bc-desktop-ead-mod">
+  <div class="bc-desktop-ead-mod--fields">
     <DesktopField label={t('tools.oxygen')} bind:value={o2} unit={t('units.percent')} invalid={gasInvalid} helper={gasInvalid ? t('tools.gasInvalid') : ''} />
     <DesktopField label={t('tools.helium')} bind:value={he} unit={t('units.percent')} invalid={gasInvalid} />
     <DesktopField label={t('tools.maxPo2')} bind:value={po2} options={po2Options} />
@@ -76,9 +76,9 @@
     <DesktopField label={t('tools.waterType')} bind:value={water} options={waterOptions} />
   </div>
 
-  <div class="od-desktop-ead-mod--results">
-    <h3 class="od-desktop-ead-mod--heading">{result ? t('desktopTools.resultsFor', { gas: gasName }) : t('tools.results')}</h3>
-    <div class="od-desktop-ead-mod--cards" aria-live="polite">
+  <div class="bc-desktop-ead-mod--results">
+    <h3 class="bc-desktop-ead-mod--heading">{result ? t('desktopTools.resultsFor', { gas: gasName }) : t('tools.results')}</h3>
+    <div class="bc-desktop-ead-mod--cards" aria-live="polite">
       {#if result}
         <DesktopResultCard label={t('tools.mod')} value={wholeDepth(result.modMm)} text={t('desktopTools.modSub', { po2: formatPartialPressure(result.po2Mbar / 1000, 1) })} />
         <DesktopResultCard label={t('tools.ead')} value={wholeDepth(result.eadPlannedMm)} text={t('tools.eadSub', { depth: wholeDepth(depthMm) })} />
@@ -89,13 +89,13 @@
         <DesktopResultCard label={t('tools.end')} value="—" />
       {/if}
     </div>
-    <p class="od-desktop-ead-mod--note">{t('tools.eadNote')}</p>
+    <p class="bc-desktop-ead-mod--note">{t('tools.eadNote')}</p>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-ead-mod {
+    .bc-desktop-ead-mod {
       display: grid;
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
       gap: 32px;
@@ -103,32 +103,32 @@
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
     @container od-tool (max-width: 799px) {
-      .od-desktop-ead-mod {
+      .bc-desktop-ead-mod {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;
       }
     }
-    .od-desktop-ead-mod--fields {
+    .bc-desktop-ead-mod--fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px 16px;
       align-items: start;
     }
-    .od-desktop-ead-mod--heading {
+    .bc-desktop-ead-mod--heading {
       margin: 0 0 12px;
       font-size: 15px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-ead-mod--cards {
+    .bc-desktop-ead-mod--cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
     }
-    .od-desktop-ead-mod--note {
+    .bc-desktop-ead-mod--note {
       margin: 12px 0 0;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

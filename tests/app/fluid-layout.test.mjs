@@ -20,8 +20,8 @@ test('the overflow audit exists, refuses the developer window and documents its 
 
 test('scrollbars: thin in the desktop app, never on the page itself', () => {
   const css = read('app/src/theme.css');
-  assert.match(css, /html\.od-desktop-app \* \{\s*scrollbar-width: thin;/);
-  assert.match(css, /html\.od-desktop-app body \{\s*scrollbar-width: none;/);
+  assert.match(css, /html\.bc-desktop-app \* \{\s*scrollbar-width: thin;/);
+  assert.match(css, /html\.bc-desktop-app body \{\s*scrollbar-width: none;/);
 });
 
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {
@@ -40,7 +40,7 @@ test('the logbook follows the window: its table pane, its columns, its header', 
   const page = read('app/src/pages/DesktopLogbook.svelte');
   assert.match(page, /new ResizeObserver\(place\)/);
   assert.match(page, /fittingColumns\(columns, tableRoom, desk\.columnWidths\)/);
-  assert.match(page, /\.od-desktop-logbook--titles \{[^}]*flex: 1 0\.2 auto/);
+  assert.match(page, /\.bc-desktop-logbook--titles \{[^}]*flex: 1 0\.2 auto/);
   assert.match(read('app/src/components/DiveProfile.svelte'), /flex-wrap: wrap;\s*overflow-x: visible;/);
 });
 
@@ -54,12 +54,12 @@ test('short windows: the first launch, the tools and the new-logbook dialog give
 
 test('panes that scroll as lists are marked for the audit', () => {
   for (const [file, mark] of [
-    ['app/src/pages/DesktopLogbook.svelte', 'od-desktop-logbook--scroll" data-od-scroll'],
-    ['app/src/pages/DesktopSites.svelte', 'od-desktop-sites--scroll" data-od-scroll'],
-    ['app/src/pages/DesktopStatistics.svelte', 'od-desktop-statistics--list" data-od-scroll'],
-    ['app/src/pages/DesktopTools.svelte', 'od-desktop-tools--pane" data-od-scroll'],
-    ['app/src/pages/Settings.svelte', 'od-desktop-settings--pane" data-od-scroll'],
-    ['app/src/components/Md3Dialog.svelte', 'od-md3-dialog--content" data-od-scroll'],
+    ['app/src/pages/DesktopLogbook.svelte', 'bc-desktop-logbook--scroll" data-od-scroll'],
+    ['app/src/pages/DesktopSites.svelte', 'bc-desktop-sites--scroll" data-od-scroll'],
+    ['app/src/pages/DesktopStatistics.svelte', 'bc-desktop-statistics--list" data-od-scroll'],
+    ['app/src/pages/DesktopTools.svelte', 'bc-desktop-tools--pane" data-od-scroll'],
+    ['app/src/pages/Settings.svelte', 'bc-desktop-settings--pane" data-od-scroll'],
+    ['app/src/components/Md3Dialog.svelte', 'bc-md3-dialog--content" data-od-scroll'],
   ]) {
     assert.ok(read(file).includes(mark), `${file}: ${mark}`);
   }

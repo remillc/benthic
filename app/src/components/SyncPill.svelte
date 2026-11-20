@@ -17,21 +17,21 @@
 
 {#snippet content()}
   <Icon name={icon} size={18} weight={2} />
-  <span class="od-sync-pill--text">{text}</span>
+  <span class="bc-sync-pill--text">{text}</span>
 {/snippet}
 
 {#if onclick}
-  <button type="button" class="od-sync-pill od-sync-pill--pill" aria-haspopup="dialog" {onclick}>
+  <button type="button" class="bc-sync-pill bc-sync-pill--pill" aria-haspopup="dialog" {onclick}>
     {@render content()}
     <Icon name="chevron" size={18} weight={2} />
   </button>
 {:else}
-  <p class="od-sync-pill od-sync-pill--pill" role="status">{@render content()}</p>
+  <p class="bc-sync-pill bc-sync-pill--pill" role="status">{@render content()}</p>
 {/if}
 
 <style>
   @layer od.components {
-    .od-sync-pill--pill {
+    .bc-sync-pill--pill {
       position: relative;
       box-sizing: border-box;
       display: flex;
@@ -43,8 +43,8 @@
       padding: 8px 12px;
       border: none;
       border-radius: 20px;
-      background: var(--od-band-control);
-      color: var(--od-band-pending);
+      background: var(--bc-band-control);
+      color: var(--bc-band-pending);
       font: inherit;
       font-size: 14px;
       line-height: 20px;
@@ -52,11 +52,11 @@
       text-align: left;
     }
 
-    button.od-sync-pill--pill {
+    button.bc-sync-pill--pill {
       cursor: pointer;
     }
 
-    .od-sync-pill--text {
+    .bc-sync-pill--text {
       flex: 1;
       min-width: 0;
     }

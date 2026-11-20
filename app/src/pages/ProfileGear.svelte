@@ -103,93 +103,93 @@
   <ReadOnlyNotice onexport={() => (exporting = true)} />
 
   {#if gear.pending > 0}
-    <p class="od-gear-page--pending" role="status">
+    <p class="bc-gear-page--pending" role="status">
       <Icon name={connection.online ? 'sync' : 'offline'} size={18} />
       <span>{t(connection.online ? 'gear.inventory.pending' : 'gear.inventory.pendingOffline', { n: gear.pending })}</span>
     </p>
   {/if}
 
   {#if !searching}
-    <a href="/profile/maintenance/" class="od-gear-page--upkeep">
-      <span class="od-gear-page--tile"><Icon name="clock" size={22} /></span>
-      <span class="od-gear-page--texts">
-        <span class="od-gear-page--name">{t('maintenance.entry')}</span>
-        <span class="od-gear-page--supporting" class:od-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
+    <a href="/profile/maintenance/" class="bc-gear-page--upkeep">
+      <span class="bc-gear-page--tile"><Icon name="clock" size={22} /></span>
+      <span class="bc-gear-page--texts">
+        <span class="bc-gear-page--name">{t('maintenance.entry')}</span>
+        <span class="bc-gear-page--supporting" class:bc-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
       </span>
-      {#if upkeep.overdue > 0}<span class="od-gear-page--badge-red" role="status" aria-label={t('maintenance.badge', { n: upkeep.overdue })}>{upkeep.overdue}</span>{/if}
-      <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+      {#if upkeep.overdue > 0}<span class="bc-gear-page--badge-red" role="status" aria-label={t('maintenance.badge', { n: upkeep.overdue })}>{upkeep.overdue}</span>{/if}
+      <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <h2 class="od-gear-page--title">{t('gear.inventory.kits')}</h2>
-    <div class="od-gear-page--chips">
+    <h2 class="bc-gear-page--title">{t('gear.inventory.kits')}</h2>
+    <div class="bc-gear-page--chips">
       {#each gear.kits as kit (kit.id)}
-        <a href={`/profile/kits/${kit.id}`} class="od-gear-page--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })}>
-          <Icon name="briefcase" size={18} />{kit.name}<span class="od-gear-page--chip-count">{kit.gearIds.length}</span>
+        <a href={`/profile/kits/${kit.id}`} class="bc-gear-page--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })}>
+          <Icon name="briefcase" size={18} />{kit.name}<span class="bc-gear-page--chip-count">{kit.gearIds.length}</span>
         </a>
       {/each}
-      <button type="button" class="od-gear-page--chip od-gear-page--chip-new" onclick={newKit}>
+      <button type="button" class="bc-gear-page--chip bc-gear-page--chip-new" onclick={newKit}>
         <Icon name="plus" size={18} />{t('gear.inventory.newKit')}
       </button>
     </div>
   {/if}
 
   {#if empty}
-    <div class="od-gear-page--empty">
+    <div class="bc-gear-page--empty">
       <h2>{t('gear.inventory.emptyTitle')}</h2>
       <p>{t('gear.inventory.emptyText')}</p>
     </div>
   {:else if !groups.length}
-    <p class="od-gear-page--none">{t('gear.inventory.noResults')}</p>
+    <p class="bc-gear-page--none">{t('gear.inventory.noResults')}</p>
   {/if}
 
   {#each groups as { group, items } (group)}
-    <h2 class="od-gear-page--title">{t(`gear.inventory.group.${group}`)}</h2>
-    <div class="od-gear-page--list">
+    <h2 class="bc-gear-page--title">{t(`gear.inventory.group.${group}`)}</h2>
+    <div class="bc-gear-page--list">
       {#each items as g (g.id)}
-        <button type="button" class="od-gear-page--row" onclick={() => open(g.id)}>
-          <span class="od-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={ios ? 36 : 40} radius={ios ? 8 : 10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
-          <span class="od-gear-page--texts">
-            <span class="od-gear-page--name">{g.name}</span>
-            {#if subLine(g)}<span class="od-gear-page--supporting">{subLine(g)}</span>{/if}
+        <button type="button" class="bc-gear-page--row" onclick={() => open(g.id)}>
+          <span class="bc-gear-page--tile">{#if g.type === 'computer'}<DcTile model={g.computerModel || g.name} size={ios ? 36 : 40} radius={ios ? 8 : 10} photo={photos[g.id] ?? ''} fallback={computerIcon} />{:else}<GearIcon type={g.type} name={g.name} size={22} />{/if}</span>
+          <span class="bc-gear-page--texts">
+            <span class="bc-gear-page--name">{g.name}</span>
+            {#if subLine(g)}<span class="bc-gear-page--supporting">{subLine(g)}</span>{/if}
           </span>
-          <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       {/each}
     </div>
   {/each}
   {#if retired.length && !searching}
-    <div class="od-gear-page--list od-gear-page--retired">
-      <a href="/profile/gear/retired/" class="od-gear-page--row">
-        <span class="od-gear-page--tile"><Icon name="archive" size={22} /></span>
-        <span class="od-gear-page--texts">
-          <span class="od-gear-page--name">{t('gear.inventory.retiredRow')}</span>
-          <span class="od-gear-page--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
+    <div class="bc-gear-page--list bc-gear-page--retired">
+      <a href="/profile/gear/retired/" class="bc-gear-page--row">
+        <span class="bc-gear-page--tile"><Icon name="archive" size={22} /></span>
+        <span class="bc-gear-page--texts">
+          <span class="bc-gear-page--name">{t('gear.inventory.retiredRow')}</span>
+          <span class="bc-gear-page--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
         </span>
-        <span class="od-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+        <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
       </a>
     </div>
   {/if}
-  <div class="od-gear-page--bottom"></div>
+  <div class="bc-gear-page--bottom"></div>
 {/snippet}
 
-<Page class="od-gear-page">
+<Page class="bc-gear-page">
   <Navbar>
     {#snippet left()}
       <BackLink label={t('gear.profile.title')} name={t('gear.piece.back')} />
     {/snippet}
     {#snippet right()}
       {#if !searching}
-        {#if ios && !gear.readOnly}<Link href="/profile/gear/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('gear.inventory.add')}</span></Link>{/if}
+        {#if ios && !gear.readOnly}<Link href="/profile/gear/new" iconOnly><Icon name="plus" /><span class="bc-sr-only">{t('gear.inventory.add')}</span></Link>{/if}
         <a href="#search" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), openSearch())}>
-          <Icon name="search" /><span class="od-sr-only">{t('gear.inventory.search')}</span>
+          <Icon name="search" /><span class="bc-sr-only">{t('gear.inventory.search')}</span>
         </a>
         <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.inventory.more')}</span>
+          <Icon name="more" weight={4} /><span class="bc-sr-only">{t('gear.inventory.more')}</span>
         </a>
       {/if}
     {/snippet}
     {#snippet title()}
       {#if searching}
-        <div class="od-gear-page--search">
+        <div class="bc-gear-page--search">
           <input bind:this={field} type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
           <button type="button" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
         </div>
@@ -205,7 +205,7 @@
   {/if}
   {#snippet fixedContent()}
     <!-- Read only: the button goes away (hidden, not removed: the slot is drawn once). -->
-    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || ios || profileWide() ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended bc-fab-add" style:display={gear.readOnly || ios || profileWide() ? 'none' : null}>
       <a href="/profile/gear/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('gear.inventory.add')}</div>
@@ -218,7 +218,7 @@
 
 <style>
   @layer od.components {
-    .od-gear-page--upkeep {
+    .bc-gear-page--upkeep {
       margin: 8px 16px 0;
       min-height: 64px;
       padding: 8px 16px;
@@ -226,16 +226,16 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-gear-page--late {
-      color: var(--od-alarm);
+    .bc-gear-page--late {
+      color: var(--bc-alarm);
     }
 
-    .od-gear-page--badge-red {
+    .bc-gear-page--badge-red {
       flex: none;
       min-width: 22px;
       height: 22px;
@@ -245,7 +245,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
       color: #FFFFFF;
       font-size: 13px;
       line-height: 22px;
@@ -253,11 +253,11 @@
     }
 
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-gear-page .page-content) {
+    :global(.bc-gear-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-gear-page--search {
+    .bc-gear-page--search {
       width: 100%;
       display: flex;
       align-items: center;
@@ -269,7 +269,7 @@
         height: 40px;
         border: none;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
         outline: none;
@@ -280,33 +280,33 @@
         height: 40px;
         border: none;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         display: flex;
         align-items: center;
         justify-content: center;
       }
     }
 
-    .od-gear-page--pending {
+    .bc-gear-page--pending {
       margin: 8px 20px 0;
       display: flex;
       gap: 8px;
       align-items: center;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-page--title {
+    .bc-gear-page--title {
       margin: 0;
       padding: 20px 20px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-page--chips {
+    .bc-gear-page--chips {
       display: flex;
       gap: 8px;
       padding: 0 16px;
@@ -314,18 +314,18 @@
       scrollbar-width: none;
     }
 
-    .od-gear-page--chip {
+    .bc-gear-page--chip {
       flex: none;
       width: auto;
       height: 40px;
       padding: 0 14px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -333,7 +333,7 @@
       white-space: nowrap;
     }
 
-    .od-gear-page--chip-count {
+    .bc-gear-page--chip-count {
       min-width: 20px;
       height: 20px;
       padding: 0 6px;
@@ -342,23 +342,23 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-tonal);
+      background: var(--bc-tonal);
       font-size: 12px;
     }
 
-    .od-gear-page--chip-new {
+    .bc-gear-page--chip-new {
       border-style: dashed;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-gear-page--list {
+    .bc-gear-page--list {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-gear-page--row {
+    .bc-gear-page--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 64px;
@@ -368,17 +368,17 @@
       gap: 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
 
-    .od-gear-page--row + .od-gear-page--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-gear-page--row + .bc-gear-page--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-gear-page--tile {
+    .bc-gear-page--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -387,55 +387,55 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
-      color: var(--od-text);
+      background: var(--bc-release-tile);
+      color: var(--bc-text);
     }
 
     /* iPhone: 36 pt tiles with 8 pt corners (task 2026-11-19-306). */
-    :global(.ios) .od-gear-page--tile {
+    :global(.ios) .bc-gear-page--tile {
       width: 36px;
       height: 36px;
       border-radius: 8px;
     }
 
-    .od-gear-page--texts {
+    .bc-gear-page--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-gear-page--name {
+    .bc-gear-page--name {
       font-size: 16px;
       line-height: 22px;
     }
 
-    .od-gear-page--retired {
+    .bc-gear-page--retired {
       margin-top: 16px;
     }
 
-    .od-gear-page--supporting {
+    .bc-gear-page--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-page--chevron {
+    .bc-gear-page--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-page--empty {
+    .bc-gear-page--empty {
       margin: 32px 32px 0;
       text-align: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       h2 {
         margin: 0 0 8px;
         font-size: 20px;
         font-weight: 500;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
       p {
@@ -445,14 +445,14 @@
       }
     }
 
-    .od-gear-page--none {
+    .bc-gear-page--none {
       margin: 24px 32px;
       text-align: center;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-page--bottom {
+    .bc-gear-page--bottom {
       height: 96px;
     }
   }

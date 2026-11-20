@@ -667,24 +667,24 @@
   }
 </script>
 
-<Page data-od-scroll class="od-planner" onPageReinit={refresh}>
+<Page data-od-scroll class="bc-planner" onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
       <Link iconOnly={!theme.ios} onClick={() => guard?.attempt()}>
         <i class="icon icon-back"></i>
-        {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="od-sr-only">{t('plan.back')}</span>{/if}
+        {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="bc-sr-only">{t('plan.back')}</span>{/if}
       </Link>
     {/snippet}
     {#snippet right()}
       <Link class={canSave ? '' : 'disabled'} onClick={save}>{t('plan.save')}</Link>
       <Link iconOnly popoverOpen="#{menuId}">
-        <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
+        <Icon name="more" weight={4} /><span class="bc-sr-only">{t('detail.moreOptions')}</span>
       </Link>
     {/snippet}
   </Navbar>
   <LeaveGuard bind:this={guard} noun="plan" {dirty} {save} leave={toList} canSave={() => canSave} />
 
-  <Popover id={menuId} class="od-menu" backdrop={false}>
+  <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
       <MenuItem
         icon="share"
@@ -702,14 +702,14 @@
   </Popover>
 
   <!-- Tablet (wide pane): the data on the left, the profile and the result on the right. -->
-  <div class="od-planner">
-    <div class="od-planner--start">
-      <button type="button" class="od-planner--source" onclick={() => (choosing = true)}>
+  <div class="bc-planner">
+    <div class="bc-planner--start">
+      <button type="button" class="bc-planner--source" onclick={() => (choosing = true)}>
         {#if planner.source}
           <ProfileThumbnail profile={planner.source.profile} maxDepthMm={planner.source.maxDepthMm} {prefs} />
-          <span class="od-planner--text">
-            <span class="od-planner--title">{planner.source.site || t('dive.siteNotSet')}</span>
-            <span class="od-planner--sub"
+          <span class="bc-planner--text">
+            <span class="bc-planner--title">{planner.source.site || t('dive.siteNotSet')}</span>
+            <span class="bc-planner--sub"
               >{[
                 planner.source.number ? t('detail.number', { number: String(planner.source.number) }) : '',
                 formatDateTime(planner.source.date),
@@ -720,101 +720,101 @@
             >
           </span>
         {:else}
-          <span class="od-planner--empty-thumbnail" aria-hidden="true"
+          <span class="bc-planner--empty-thumbnail" aria-hidden="true"
             ><svg width="44" height="24" viewBox="0 0 44 24"><path d="M2 3 L8 18 L30 18 L36 9 L42 3" /></svg></span
           >
-          <span class="od-planner--text">
-            <span class="od-planner--title">{t('plan.newDive')}</span>
+          <span class="bc-planner--text">
+            <span class="bc-planner--title">{t('plan.newDive')}</span>
           </span>
         {/if}
-        <span class="od-planner--change">{t('plan.change')}</span>
+        <span class="bc-planner--change">{t('plan.change')}</span>
       </button>
     </div>
 
-    <div class="od-planner--chart">
-      <h2 class="od-planner--section-title">{t(planner.source && !planner.simplified ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
+    <div class="bc-planner--chart">
+      <h2 class="bc-planner--section-title">{t(planner.source && !planner.simplified ? 'plan.profileOfDive' : 'plan.profilePlanned')}</h2>
       {#if shape}
-        <div class="od-planner--profile-box">
-          <svg class="od-planner--profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
+        <div class="bc-planner--profile-box">
+          <svg class="bc-planner--profile" viewBox="0 0 {W} {H}" preserveAspectRatio="none" role="img" aria-label={profileLabel}>
             <defs>
               <linearGradient id="plan-water-{uid}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" style="stop-color: var(--od-water-top)" />
+                <stop offset="0" style="stop-color: var(--bc-water-top)" />
                 <stop offset="1" style="stop-color: {shape.bottom}" />
               </linearGradient>
             </defs>
             <path d={shape.water} fill="url(#plan-water-{uid})" />
-            <path d={shape.line} class="od-planner--line" vector-effect="non-scaling-stroke" />
+            <path d={shape.line} class="bc-planner--line" vector-effect="non-scaling-stroke" />
             {#if shape.ceilingArea}
-              <path d={shape.ceilingArea} class="od-planner--ceiling-area" />
-              <path d={shape.ceilingLine} class="od-planner--ceiling-line" vector-effect="non-scaling-stroke" />
+              <path d={shape.ceilingArea} class="bc-planner--ceiling-area" />
+              <path d={shape.ceilingLine} class="bc-planner--ceiling-line" vector-effect="non-scaling-stroke" />
             {/if}
           </svg>
           {#each shape.labels as label, i (i)}
-            <span class="od-planner--level-label" class:od-planner--above={label.top > 70} style="left: {label.left}%; top: {label.top}%" aria-hidden="true">{label.text}</span>
+            <span class="bc-planner--level-label" class:bc-planner--above={label.top > 70} style="left: {label.left}%; top: {label.top}%" aria-hidden="true">{label.text}</span>
           {/each}
         </div>
         {#if shape.ceilingArea}
-          <p class="od-planner--legend"><span class="od-planner--swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
+          <p class="bc-planner--legend"><span class="bc-planner--swatch" aria-hidden="true"></span>{t('plan.ceilingLegend')}</p>
         {/if}
       {:else if !failed}
-        <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
+        <div class="skeleton-block bc-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
       {#if planner.source && !planner.simplified}
         <!-- Task 2026-11-14-146: the profile is changed from here; « Modifier le profil » turns it
              into a few levels (what « Simplifier le profil » in the ⋮ menu did). -->
-        <div class="od-planner--edit-row">
-          <p class="od-planner--helper">{t('plan.fromDiveHelper')}</p>
+        <div class="bc-planner--edit-row">
+          <p class="bc-planner--helper">{t('plan.fromDiveHelper')}</p>
           {#if canSimplify()}
-            <button type="button" class="od-planner--edit-profile" onclick={simplify}><Icon name="edit" size={18} />{t('plan.editProfile')}</button>
+            <button type="button" class="bc-planner--edit-profile" onclick={simplify}><Icon name="edit" size={18} />{t('plan.editProfile')}</button>
           {/if}
         </div>
       {:else if planner.simplified}
-        <p class="od-planner--helper">{t('plan.simplifiedHelper')}</p>
+        <p class="bc-planner--helper">{t('plan.simplifiedHelper')}</p>
       {/if}
     </div>
 
-    <div class="od-planner--data">
+    <div class="bc-planner--data">
       {#if !planner.source}
-        <h2 class="od-planner--section-title">{t('plan.date')}</h2>
-        <div class="od-planner--fields">
-          <div class="od-planner--pair">
-            <div class="od-planner--grow"><ButtonField label={t('edit.date')} value={dateText} icon="calendar" onclick={() => (dialog = 'date')} /></div>
-            <div class="od-planner--grow"><ButtonField label={t('edit.time')} value={timeText} icon="clock" onclick={() => (dialog = 'time')} /></div>
+        <h2 class="bc-planner--section-title">{t('plan.date')}</h2>
+        <div class="bc-planner--fields">
+          <div class="bc-planner--pair">
+            <div class="bc-planner--grow"><ButtonField label={t('edit.date')} value={dateText} icon="calendar" onclick={() => (dialog = 'date')} /></div>
+            <div class="bc-planner--grow"><ButtonField label={t('edit.time')} value={timeText} icon="clock" onclick={() => (dialog = 'time')} /></div>
           </div>
-          {#if intervalHelper}<p class="od-planner--helper od-planner--inner">{intervalHelper}</p>{/if}
+          {#if intervalHelper}<p class="bc-planner--helper bc-planner--inner">{intervalHelper}</p>{/if}
         </div>
       {/if}
 
       {#if !planner.source || planner.simplified}
-        <h2 class="od-planner--section-title">{t('plan.levels')}</h2>
-        <div class="od-planner--fields">
+        <h2 class="bc-planner--section-title">{t('plan.levels')}</h2>
+        <div class="bc-planner--fields">
           {#each levelFields as level, i (level.key)}
-            <div class="od-planner--pair od-planner--with-remove">
+            <div class="bc-planner--pair bc-planner--with-remove">
               <TextField label={t('plan.depth')} bind:value={level.depth} inputmode="decimal" invalid={invalid[`depth-${level.key}`]} oninput={() => levelDepth(i)}>
-                {#snippet trailing()}<span class="od-planner--unit">{depthUnit(prefs)}</span>{/snippet}
+                {#snippet trailing()}<span class="bc-planner--unit">{depthUnit(prefs)}</span>{/snippet}
               </TextField>
               <TextField label={t('plan.duration')} bind:value={level.time} inputmode="numeric" invalid={invalid[`time-${level.key}`]} oninput={() => levelTime(i)}>
-                {#snippet trailing()}<span class="od-planner--unit">{t('units.minutes')}</span>{/snippet}
+                {#snippet trailing()}<span class="bc-planner--unit">{t('units.minutes')}</span>{/snippet}
               </TextField>
               {#if i > 0}
-                <button type="button" class="od-planner--remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" /></button>
+                <button type="button" class="bc-planner--remove" aria-label={t('plan.removeLevel')} onclick={() => removeLevel(i)}><Icon name="close" /></button>
               {:else}
-                <span class="od-planner--remove" aria-hidden="true"></span>
+                <span class="bc-planner--remove" aria-hidden="true"></span>
               {/if}
             </div>
           {/each}
           {#if levelFields.length < 20}
-            <button type="button" class="od-planner--add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
+            <button type="button" class="bc-planner--add" onclick={addLevel}><Icon name="plus" size={18} />{t('plan.addLevel')}</button>
           {/if}
-          <p class="od-planner--helper od-planner--inner">{t('plan.levelsHelper')}</p>
+          <p class="bc-planner--helper bc-planner--inner">{t('plan.levelsHelper')}</p>
         </div>
       {/if}
 
-      <h2 class="od-planner--section-title">{t('plan.gas')}</h2>
-      <div class="od-planner--fields">
+      <h2 class="bc-planner--section-title">{t('plan.gas')}</h2>
+      <div class="bc-planner--fields">
         {#each gasFields as gas, i (gas.key)}
-          <div class="od-planner--gas">
-            <div class="od-planner--pair od-planner--with-remove">
+          <div class="bc-planner--gas">
+            <div class="bc-planner--pair bc-planner--with-remove">
               <ChoiceField
                 label={t('plan.oxygenPercent')}
                 bind:value={gas.o2}
@@ -838,46 +838,46 @@
                 onrevert={() => gasReverted(i)}
               />
               {#if i > 0}
-                <button type="button" class="od-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
+                <button type="button" class="bc-planner--remove" aria-label={t('plan.removeGas')} onclick={() => removeGas(i)}><Icon name="close" /></button>
               {:else}
-                <span class="od-planner--remove" aria-hidden="true"></span>
+                <span class="bc-planner--remove" aria-hidden="true"></span>
               {/if}
             </div>
-            <p class="od-planner--helper od-planner--inner">{gasHelper(i)}</p>
+            <p class="bc-planner--helper bc-planner--inner">{gasHelper(i)}</p>
           </div>
         {/each}
-        <button type="button" class="od-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
-        <p class="od-planner--subhead">{t('plan.sac')}</p>
-        <div class="od-planner--pair">
+        <button type="button" class="bc-planner--add" onclick={addGas}><Icon name="plus" size={18} />{t('plan.addGas')}</button>
+        <p class="bc-planner--subhead">{t('plan.sac')}</p>
+        <div class="bc-planner--pair">
           <SacField label={t('plan.sacBottom')} value={planner.bottomSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacBottomLong', { value: sacSpoken(planner.bottomSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setBottomSac} />
           <SacField label={t('plan.sacDeco')} value={planner.decoSacMlMin} {cuft} unit={sacUnit} ariaLabel={t('plan.sacDecoLong', { value: sacSpoken(planner.decoSacMlMin) })} helper={t('plan.sacHelper')} openLabel={t('plan.sacOpen')} onchange={setDecoSac} />
         </div>
-        <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
+        <p class="bc-planner--helper bc-planner--inner">{t(planner.source ? 'plan.sacFromDive' : 'plan.sacFromSettings')}</p>
       </div>
 
-      <h2 class="od-planner--section-title">{t('plan.conditions')}</h2>
-      <div class="od-planner--fields">
-        <div class="od-planner--pair">
+      <h2 class="bc-planner--section-title">{t('plan.conditions')}</h2>
+      <div class="bc-planner--fields">
+        <div class="bc-planner--pair">
           <SelectField label={t('plan.waterType')} bind:value={water} options={waterOptions} />
           <AltitudeField label={t('plan.altitude')} value={altitude} {feet} unit={depthUnit(prefs)} ariaLabel={t('plan.altitudeLong', { value: `${formatNumber(altitude)}\u00A0${depthUnit(prefs)}` })} openLabel={t('plan.sacOpen')} onchange={setAltitude} />
         </div>
-        <p class="od-planner--helper od-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
+        <p class="bc-planner--helper bc-planner--inner">{t(planner.source ? 'plan.conditionsFromDive' : 'plan.conditionsDefault')}</p>
       </div>
 
-      <button type="button" class="od-planner--accordion" aria-expanded={decoOpen} onclick={() => (decoOpen = !decoOpen)}>
-        <span class="od-planner--text">
-          <span class="od-planner--title">{t('plan.deco')}</span>
-          <span class="od-planner--sub">{decoSummary(planner.deco)}</span>
+      <button type="button" class="bc-planner--accordion" aria-expanded={decoOpen} onclick={() => (decoOpen = !decoOpen)}>
+        <span class="bc-planner--text">
+          <span class="bc-planner--title">{t('plan.deco')}</span>
+          <span class="bc-planner--sub">{decoSummary(planner.deco)}</span>
         </span>
-        <span class="od-planner--arrow" class:od-planner--open={decoOpen}><Icon name="expand" /></span>
+        <span class="bc-planner--arrow" class:bc-planner--open={decoOpen}><Icon name="expand" /></span>
       </button>
       {#if decoOpen}
-        <div class="od-planner--fields">
+        <div class="bc-planner--fields">
           <SelectField label={t('plan.decoModel')} bind:value={modelChoice} options={modelOptions} />
           {#if planner.deco.decoModel === 'vpmb'}
             <SelectField label={t('settings.deco.vpmbConservatism')} bind:value={conservatismChoice} options={conservatismOptions} />
           {:else}
-            <div class="od-planner--pair">
+            <div class="bc-planner--pair">
               <TextField label={t('settings.deco.gfLow')} bind:value={gfLowField} inputmode="numeric" invalid={invalid.gfLow}
                 oninput={() => typed('gfLow', gfLowField, 10, 150, (v) => (planner.deco.gfLow = Math.round(v)))} />
               <TextField label={t('settings.deco.gfHigh')} bind:value={gfHighField} inputmode="numeric" invalid={invalid.gfHigh}
@@ -888,115 +888,115 @@
       {/if}
     </div>
 
-    <div class="od-planner--outcome">
+    <div class="bc-planner--outcome">
       {#if failed}
-        <p class="od-planner--note">{t('plan.failed')}</p>
+        <p class="bc-planner--note">{t('plan.failed')}</p>
       {:else if result}
         <!-- The result in one card (task 2026-11-13-95): key figures, stops or status, volumes, oxygen. -->
-        <h2 class="od-planner--result-title">{t('plan.resultTitle')}</h2>
-        <section class="od-planner--card" aria-label={t('plan.resultName', { time: minutes(result.runtimeSeconds) })}>
-          {#if errorText}<p class="od-planner--error" role="alert">{errorText}</p>{/if}
-          <div class="od-planner--tiles">
-            <div class="od-planner--tile">
-              <span class="od-planner--tile-label">{t('plan.totalTime')}</span>
-              <span class="od-planner--tile-value od-value">{formatNumber(Math.round(result.runtimeSeconds / 60), 0)}<small>{t('units.minutes')}</small></span>
+        <h2 class="bc-planner--result-title">{t('plan.resultTitle')}</h2>
+        <section class="bc-planner--card" aria-label={t('plan.resultName', { time: minutes(result.runtimeSeconds) })}>
+          {#if errorText}<p class="bc-planner--error" role="alert">{errorText}</p>{/if}
+          <div class="bc-planner--tiles">
+            <div class="bc-planner--tile">
+              <span class="bc-planner--tile-label">{t('plan.totalTime')}</span>
+              <span class="bc-planner--tile-value bc-value">{formatNumber(Math.round(result.runtimeSeconds / 60), 0)}<small>{t('units.minutes')}</small></span>
             </div>
-            <div class="od-planner--tile">
-              <span class="od-planner--tile-label">{t('plan.decoStops')}</span>
-              <span class="od-planner--tile-value od-value">{decoFigure}</span>
+            <div class="bc-planner--tile">
+              <span class="bc-planner--tile-label">{t('plan.decoStops')}</span>
+              <span class="bc-planner--tile-value bc-value">{decoFigure}</span>
             </div>
           </div>
           {#if rows.length}
-            <table class="od-planner--rows od-value">
+            <table class="bc-planner--rows bc-value">
               <thead>
                 <tr>
-                  <th scope="col"><span class="od-planner--visually-hidden">{t('plan.rowType')}</span></th>
+                  <th scope="col"><span class="bc-planner--visually-hidden">{t('plan.rowType')}</span></th>
                   <th scope="col">{t('plan.stop')}</th>
-                  <th scope="col" class="od-planner--num">{t('plan.start')}</th>
-                  <th scope="col" class="od-planner--num">{t('plan.duration')}</th>
-                  <th scope="col" class="od-planner--num">{t('plan.end')}</th>
+                  <th scope="col" class="bc-planner--num">{t('plan.start')}</th>
+                  <th scope="col" class="bc-planner--num">{t('plan.duration')}</th>
+                  <th scope="col" class="bc-planner--num">{t('plan.end')}</th>
                   <th scope="col">{t('plan.gasColumn')}</th>
                 </tr>
               </thead>
               <tbody>
                 {#each rows as row, i (i)}
-                  <tr class="od-planner--row" class:od-planner--row-transit={row.kind === 'descent' || row.kind === 'ascent'} class:od-planner--row-surface={row.surface}>
-                    <td class="od-planner--row-icon"><span role="img" aria-label={row.kindLabel}>{row.glyph}</span></td>
-                    <td class="od-planner--depth">
+                  <tr class="bc-planner--row" class:bc-planner--row-transit={row.kind === 'descent' || row.kind === 'ascent'} class:bc-planner--row-surface={row.surface}>
+                    <td class="bc-planner--row-icon"><span role="img" aria-label={row.kindLabel}>{row.glyph}</span></td>
+                    <td class="bc-planner--depth">
                       {row.depth}
-                      {#if row.speed}<span class="od-planner--row-speed">{row.speed}</span>{/if}
+                      {#if row.speed}<span class="bc-planner--row-speed">{row.speed}</span>{/if}
                     </td>
-                    <td class="od-planner--num">{row.start}</td>
-                    <td class="od-planner--num">{row.duration}</td>
-                    <td class="od-planner--num od-planner--row-end">{row.end}</td>
+                    <td class="bc-planner--num">{row.start}</td>
+                    <td class="bc-planner--num">{row.duration}</td>
+                    <td class="bc-planner--num bc-planner--row-end">{row.end}</td>
                     <!-- The starting gas is highlighted like a gas change (task 2026-11-13-96). -->
-                    <td>{#if row.gasChange || i === 0}<span class="od-planner--gas-chip">{row.gas}</span>{:else}{row.gas}{/if}</td>
+                    <td>{#if row.gasChange || i === 0}<span class="bc-planner--gas-chip">{row.gas}</span>{:else}{row.gas}{/if}</td>
                   </tr>
                 {/each}
               </tbody>
             </table>
-            <p class="od-planner--rows-note">{t('plan.rowsNote')}</p>
+            <p class="bc-planner--rows-note">{t('plan.rowsNote')}</p>
           {:else}
-            <p class="od-planner--no-stop"><Icon name="check" size={20} />{t('plan.noStopShort')}</p>
+            <p class="bc-planner--no-stop"><Icon name="check" size={20} />{t('plan.noStopShort')}</p>
           {/if}
 
-          <h3 class="od-planner--card-heading">{t('plan.volumes')}</h3>
+          <h3 class="bc-planner--card-heading">{t('plan.volumes')}</h3>
           {#each volumeRows as row (row.key)}
             <!-- Gas and total, the bar, then the legend of its two parts (task 2026-11-13-93). -->
-            <div class="od-planner--volume" role="group" aria-label={row.name}>
-              <div class="od-planner--volume-head" aria-hidden="true">
-                <span class="od-planner--label">{row.label}</span>
-                <span class="od-planner--volume-total od-value">{row.value}</span>
+            <div class="bc-planner--volume" role="group" aria-label={row.name}>
+              <div class="bc-planner--volume-head" aria-hidden="true">
+                <span class="bc-planner--label">{row.label}</span>
+                <span class="bc-planner--volume-total bc-value">{row.value}</span>
               </div>
               {#if row.usedPercent !== null}
-                <span class="od-planner--bar od-planner--volume-bar" aria-hidden="true">
-                  <span class="od-planner--fill" style:width="{row.usedPercent}%"></span>
-                  {#if row.hasReserve}<span class="od-planner--gap"></span><span class="od-planner--reserve"></span>{/if}
+                <span class="bc-planner--bar bc-planner--volume-bar" aria-hidden="true">
+                  <span class="bc-planner--fill" style:width="{row.usedPercent}%"></span>
+                  {#if row.hasReserve}<span class="bc-planner--gap"></span><span class="bc-planner--reserve"></span>{/if}
                 </span>
               {/if}
-              <div class="od-planner--volume-legend" aria-hidden="true">
-                <span class="od-planner--legend-item"><span class="od-planner--legend-swatch od-planner--legend-used"></span>{t('plan.legendUsed')} <b class="od-value">{row.used}</b></span>
+              <div class="bc-planner--volume-legend" aria-hidden="true">
+                <span class="bc-planner--legend-item"><span class="bc-planner--legend-swatch bc-planner--legend-used"></span>{t('plan.legendUsed')} <b class="bc-value">{row.used}</b></span>
                 {#if row.hasReserve}
-                  <span class="od-planner--legend-item"><span class="od-planner--legend-swatch od-planner--legend-reserve"></span>{row.reserveLegend} <b class="od-value">{row.reserve}</b></span>
+                  <span class="bc-planner--legend-item"><span class="bc-planner--legend-swatch bc-planner--legend-reserve"></span>{row.reserveLegend} <b class="bc-value">{row.reserve}</b></span>
                 {/if}
               </div>
             </div>
           {/each}
           {#if modRow}
-            <div class="od-planner--result">
-              <span class="od-planner--text"><span class="od-planner--label">{modRow.label}</span><span class="od-planner--hint">{modRow.hint}</span></span>
-              <span class="od-planner--value od-value od-planner--alarm">{modRow.value}</span>
+            <div class="bc-planner--result">
+              <span class="bc-planner--text"><span class="bc-planner--label">{modRow.label}</span><span class="bc-planner--hint">{modRow.hint}</span></span>
+              <span class="bc-planner--value bc-value bc-planner--alarm">{modRow.value}</span>
             </div>
           {/if}
           <!-- Laid out like the gas rows (task 2026-11-13-94). -->
-          <div class="od-planner--volume od-planner--oxygen" role="group" aria-label={t('plan.oxygenName', { cns: result.cns, otu: result.otu })}>
-            <div class="od-planner--volume-head" aria-hidden="true">
-              <span class="od-planner--label">{t('plan.oxygen')}</span>
-              <span class="od-planner--volume-total od-value">{t('plan.cnsValue', { cns: result.cns })}</span>
+          <div class="bc-planner--volume bc-planner--oxygen" role="group" aria-label={t('plan.oxygenName', { cns: result.cns, otu: result.otu })}>
+            <div class="bc-planner--volume-head" aria-hidden="true">
+              <span class="bc-planner--label">{t('plan.oxygen')}</span>
+              <span class="bc-planner--volume-total bc-value">{t('plan.cnsValue', { cns: result.cns })}</span>
             </div>
-            <span class="od-planner--bar od-planner--volume-bar" aria-hidden="true">
-              <span class="od-planner--fill" style:width="{Math.min(result.cns, 100)}%"></span>
+            <span class="bc-planner--bar bc-planner--volume-bar" aria-hidden="true">
+              <span class="bc-planner--fill" style:width="{Math.min(result.cns, 100)}%"></span>
             </span>
-            <div class="od-planner--volume-legend od-planner--legend-split" aria-hidden="true">
+            <div class="bc-planner--volume-legend bc-planner--legend-split" aria-hidden="true">
               <span>{t('plan.cnsLimit')}</span>
-              <span>{t('plan.otuLabel')} <b class="od-value">{result.otu}</b></span>
+              <span>{t('plan.otuLabel')} <b class="bc-value">{result.otu}</b></span>
             </div>
           </div>
         </section>
-        <p class="od-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
+        <p class="bc-planner--note">{t(planner.source ? 'plan.noteFromDive' : 'plan.note')}</p>
       {:else}
-        <div class="skeleton-block od-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
+        <div class="skeleton-block bc-planner--loading" aria-busy="true" aria-label={t('plan.computing')}></div>
       {/if}
     </div>
   </div>
-  <div class="od-planner--end" aria-hidden="true"></div>
+  <div class="bc-planner--end" aria-hidden="true"></div>
 
   <Popup opened={choosing} onPopupClosed={() => (choosing = false)}>
     <Page>
       <Navbar title={t('plan.chooseTitle')}>
         {#snippet left()}
           <Link popupClose iconOnly>
-            <Icon name="close" /><span class="od-sr-only">{t('plan.chooseClose')}</span>
+            <Icon name="close" /><span class="bc-sr-only">{t('plan.chooseClose')}</span>
           </Link>
         {/snippet}
       </Navbar>
@@ -1090,40 +1090,40 @@
   @layer od.components {
     /* One column in the order of the spec; a wide pane puts the data on the
        left, the profile and the result on the right. */
-    .od-planner,
-    :global(.page.od-planner > .page-content) {
+    .bc-planner,
+    :global(.page.bc-planner > .page-content) {
       container-type: inline-size;
     }
 
     @container (min-width: 680px) {
-      .od-planner--start,
-      .od-planner--data {
+      .bc-planner--start,
+      .bc-planner--data {
         grid-column: 1;
       }
 
-      .od-planner--chart,
-      .od-planner--outcome {
+      .bc-planner--chart,
+      .bc-planner--outcome {
         grid-column: 2;
       }
 
-      .od-planner > .od-planner--start {
+      .bc-planner > .bc-planner--start {
         grid-row: 1;
       }
 
-      .od-planner > .od-planner--chart {
+      .bc-planner > .bc-planner--chart {
         grid-row: 1 / span 2;
       }
 
-      .od-planner > .od-planner--data {
+      .bc-planner > .bc-planner--data {
         grid-row: 2 / span 2;
       }
 
-      .od-planner > .od-planner--outcome {
+      .bc-planner > .bc-planner--outcome {
         grid-row: 3;
       }
     }
 
-    .od-planner:has(> .od-planner--start) {
+    .bc-planner:has(> .bc-planner--start) {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       align-items: start;
@@ -1133,13 +1133,13 @@
        tablet the planner has only the pane beside the tools list. The page's
        content is the container this asks about. */
     @container (min-width: 680px) {
-      .od-planner:has(> .od-planner--start) {
+      .bc-planner:has(> .bc-planner--start) {
         grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
         column-gap: 8px;
       }
     }
 
-    .od-planner--source {
+    .bc-planner--source {
       width: calc(100% - 32px);
       margin: 0 16px;
       min-height: 72px;
@@ -1147,8 +1147,8 @@
       box-sizing: border-box;
       border: none;
       border-radius: 12px;
-      background: var(--od-surface-2);
-      color: var(--od-text);
+      background: var(--bc-surface-2);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -1156,19 +1156,19 @@
       gap: 16px;
 
       /* The empty thumbnail: the 56 x 36 slot of a starting dive's profile, with the dashed outline of a profile. */
-      .od-planner--empty-thumbnail {
+      .bc-planner--empty-thumbnail {
         flex: none;
         width: 56px;
         height: 36px;
         border-radius: 8px;
-        background: var(--od-background);
+        background: var(--bc-background);
         display: flex;
         align-items: center;
         justify-content: center;
 
         svg {
           fill: none;
-          stroke: var(--od-outline);
+          stroke: var(--bc-outline);
           stroke-width: 1.5;
           stroke-linecap: round;
           stroke-linejoin: round;
@@ -1176,26 +1176,26 @@
         }
       }
 
-      .od-planner--text {
+      .bc-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .od-planner--title {
+      .bc-planner--title {
         font-size: 16px;
         line-height: 24px;
       }
 
-      .od-planner--sub {
+      .bc-planner--sub {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-planner--change {
+      .bc-planner--change {
         font-size: 14px;
         font-weight: 500;
       }
@@ -1204,7 +1204,7 @@
     /* Vertical rhythm of the mock-up (android-planificateur-roulettes): a title is
        32 dp high, 24 dp under the block before it and 8 dp over its fields; the
        blocks of a section are 16 dp apart. */
-    .od-planner--section-title {
+    .bc-planner--section-title {
       margin: 24px 16px 8px;
       height: 32px;
       display: flex;
@@ -1212,7 +1212,7 @@
       font-size: 14px;
       font-weight: 500;
       letter-spacing: 0.1px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       &:first-child {
         margin-top: 16px;
@@ -1223,104 +1223,104 @@
         height: auto;
         font-size: 13px;
         font-weight: 400;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-planner--profile-box {
+    .bc-planner--profile-box {
       position: relative;
       margin: 0 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-planner--profile {
+    .bc-planner--profile {
       display: block;
       width: 100%;
       height: 120px;
 
-      .od-planner--line {
+      .bc-planner--line {
         fill: none;
-        stroke: var(--od-trace);
-        stroke-width: var(--od-profile-line-width);
+        stroke: var(--bc-trace);
+        stroke-width: var(--bc-profile-line-width);
         stroke-linejoin: round;
       }
 
-      .od-planner--ceiling-area {
-        fill: var(--od-alarm);
+      .bc-planner--ceiling-area {
+        fill: var(--bc-alarm);
         opacity: 0.25;
       }
 
-      .od-planner--ceiling-line {
+      .bc-planner--ceiling-line {
         fill: none;
-        stroke: var(--od-alarm);
+        stroke: var(--bc-alarm);
         stroke-width: 1;
       }
     }
 
-    .od-planner--level-label {
+    .bc-planner--level-label {
       position: absolute;
       transform: translate(-50%, 4px);
       font-size: 11px;
       line-height: 14px;
       white-space: nowrap;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       /* Near the bottom of the chart: over the line, in the water. */
-      &.od-planner--above {
+      &.bc-planner--above {
         transform: translate(-50%, calc(-100% - 4px));
       }
     }
 
-    .od-planner--legend {
+    .bc-planner--legend {
       margin: 8px 16px 0;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      .od-planner--swatch {
+      .bc-planner--swatch {
         width: 16px;
         height: 10px;
-        background: color-mix(in srgb, var(--od-alarm) 35%, transparent);
-        border: 1.5px solid var(--od-alarm);
+        background: color-mix(in srgb, var(--bc-alarm) 35%, transparent);
+        border: 1.5px solid var(--bc-alarm);
         box-sizing: border-box;
       }
     }
 
     /* "Consommation (SAC)", over its two fields. */
-    .od-planner--subhead {
+    .bc-planner--subhead {
       margin: 0 16px -8px;
       font-size: 12px;
       line-height: 16px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-planner--edit-row {
+    .bc-planner--edit-row {
       margin: 8px 16px 0;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      .od-planner--helper {
+      .bc-planner--helper {
         flex: 1;
         margin: 0;
       }
     }
 
     /* Tonal button (secondary container), as drawn in android-planificateur. */
-    .od-planner--edit-profile {
+    .bc-planner--edit-profile {
       flex: none;
       width: auto;
       height: 40px;
       padding: 0 16px 0 12px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -1335,36 +1335,36 @@
       }
     }
 
-    .od-planner--helper {
+    .bc-planner--helper {
       margin: 8px 16px 0;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       /* Under a field row: 4 dp below it (the blocks are 16 dp apart), text inset by 16 dp. */
-      &.od-planner--inner {
+      &.bc-planner--inner {
         margin: -12px 32px 0;
       }
 
-      .od-planner--add + &.od-planner--inner {
+      .bc-planner--add + &.bc-planner--inner {
         margin-top: -16px;
       }
     }
 
-    .od-planner--fields {
+    .bc-planner--fields {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .od-planner--gas {
+    .bc-planner--gas {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
     /* Two fields side by side, 12 dp apart; the fields carry no margin of their own here. */
-    .od-planner--pair {
+    .bc-planner--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
@@ -1375,20 +1375,20 @@
         min-width: 0;
       }
 
-      &.od-planner--pair > :global(*),
-      & .od-planner--grow > :global(*) {
+      &.bc-planner--pair > :global(*),
+      & .bc-planner--grow > :global(*) {
         margin: 0;
       }
 
-      &.od-planner--with-remove {
-        & > .od-planner--remove {
+      &.bc-planner--with-remove {
+        & > .bc-planner--remove {
           flex: none;
           width: 48px;
           height: 56px;
           padding: 0;
           border: none;
           background: none;
-          color: var(--od-text-2);
+          color: var(--bc-text-2);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1397,18 +1397,18 @@
       }
     }
 
-    .od-planner--grow {
+    .bc-planner--grow {
       flex: 1;
       min-width: 0;
     }
 
-    .od-planner--unit {
+    .bc-planner--unit {
       padding-inline-end: 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-planner--add {
+    .bc-planner--add {
       align-self: flex-start;
       width: auto;
       margin: -4px 0 0 12px;
@@ -1416,7 +1416,7 @@
       padding: 0 16px 0 12px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -1426,7 +1426,7 @@
       cursor: pointer;
     }
 
-    .od-planner--accordion {
+    .bc-planner--accordion {
       width: 100%;
       margin-top: 16px;
       min-height: 72px;
@@ -1434,7 +1434,7 @@
       box-sizing: border-box;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -1442,29 +1442,29 @@
       gap: 16px;
       cursor: pointer;
 
-      .od-planner--text {
+      .bc-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .od-planner--title {
+      .bc-planner--title {
         font-size: 16px;
         line-height: 24px;
       }
 
-      .od-planner--sub {
+      .bc-planner--sub {
         font-size: 14px;
         line-height: 20px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-planner--arrow {
+      .bc-planner--arrow {
         display: flex;
         transition: transform 0.2s;
 
-        &.od-planner--open {
+        &.bc-planner--open {
           transform: rotate(180deg);
         }
       }
@@ -1481,7 +1481,7 @@
         font-size: 12px;
         font-weight: 500;
         text-align: left;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
 
         &:first-child {
           padding-left: 16px;
@@ -1490,7 +1490,7 @@
 
       td {
         padding: 10px 8px;
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
 
         &:first-child {
           padding-left: 16px;
@@ -1501,68 +1501,68 @@
         }
       }
 
-      .od-planner--num {
+      .bc-planner--num {
         text-align: right;
       }
 
-      .od-planner--depth {
+      .bc-planner--depth {
         font-weight: 500;
       }
     }
 
     /* The plan table (task 73): a transit row is in the variant colour with its
        speed under the depth; the gas is a sand chip where it starts. */
-    .od-planner--rows {
-      .od-planner--row-icon {
+    .bc-planner--rows {
+      .bc-planner--row-icon {
         width: 18px;
         padding-right: 0;
         font-size: 18px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
         text-align: center;
       }
 
-      .od-planner--row-transit {
-        color: var(--od-text-2);
+      .bc-planner--row-transit {
+        color: var(--bc-text-2);
 
-        .od-planner--depth {
+        .bc-planner--depth {
           font-weight: 400;
         }
       }
 
-      .od-planner--row-speed {
+      .bc-planner--row-speed {
         display: block;
         font-size: 12px;
         font-weight: 400;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-planner--row-surface .od-planner--depth,
-      .od-planner--row-surface .od-planner--row-end {
+      .bc-planner--row-surface .bc-planner--depth,
+      .bc-planner--row-surface .bc-planner--row-end {
         font-weight: 600;
       }
 
-      .od-planner--gas-chip {
+      .bc-planner--gas-chip {
         display: inline-block;
         padding: 2px 8px;
         border-radius: 8px;
-        background: var(--od-cylinder-breathed);
-        color: var(--od-text);
+        background: var(--bc-cylinder-breathed);
+        color: var(--bc-text);
         font-size: 13px;
         font-weight: 600;
         white-space: nowrap;
       }
     }
 
-    .od-planner--rows-note {
+    .bc-planner--rows-note {
       margin: 0;
       padding: 8px 16px 12px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-planner--visually-hidden {
+    .bc-planner--visually-hidden {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -1572,104 +1572,104 @@
     }
 
     /* The result card (task 2026-11-13-95). */
-    .od-planner--result-title {
+    .bc-planner--result-title {
       margin: 24px 16px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-planner--card {
+    .bc-planner--card {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
-      > .od-planner--volume,
-      > .od-planner--result {
-        border-top: 1px solid var(--od-separator);
+      > .bc-planner--volume,
+      > .bc-planner--result {
+        border-top: 1px solid var(--bc-separator);
       }
 
       /* The first gas sits right under its heading, which carries the divider. */
-      > .od-planner--card-heading + .od-planner--volume {
+      > .bc-planner--card-heading + .bc-planner--volume {
         border-top: none;
       }
     }
 
-    .od-planner--tiles {
+    .bc-planner--tiles {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       padding: 12px 12px 4px;
     }
 
-    .od-planner--tile {
+    .bc-planner--tile {
       display: flex;
       flex-direction: column;
       gap: 2px;
       padding: 12px 16px;
       border-radius: 12px;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
 
-    .od-planner--tile-label {
+    .bc-planner--tile-label {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-planner--tile-value {
+    .bc-planner--tile-value {
       font-size: 24px;
       line-height: 32px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       small {
         margin-left: 4px;
         font-size: 14px;
         font-weight: 500;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-planner--card-heading {
+    .bc-planner--card-heading {
       margin: 0;
       padding: 16px 16px 4px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-planner--no-stop,
-    .od-planner--error {
+    .bc-planner--no-stop,
+    .bc-planner--error {
       margin: 0;
       padding: 12px 16px;
       font-size: 14px;
     }
 
-    .od-planner--error {
-      color: var(--od-alarm);
+    .bc-planner--error {
+      color: var(--bc-alarm);
       font-weight: 500;
     }
 
     /* No deco: one status line with a check (task 2026-11-13-95). */
-    .od-planner--no-stop {
+    .bc-planner--no-stop {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(svg) {
         flex: none;
-        color: var(--od-status-ok);
+        color: var(--bc-status-ok);
       }
     }
 
 
-    .od-planner--result {
+    .bc-planner--result {
       min-height: 72px;
       padding: 8px 24px 8px 16px;
       box-sizing: border-box;
@@ -1677,141 +1677,141 @@
       align-items: center;
       gap: 16px;
 
-      .od-planner--text {
+      .bc-planner--text {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
 
-      .od-planner--label {
+      .bc-planner--label {
         font-size: 16px;
         line-height: 24px;
         letter-spacing: 0.15px;
       }
 
-      .od-planner--hint {
+      .bc-planner--hint {
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      .od-planner--value {
+      .bc-planner--value {
         font-size: 16px;
         font-weight: 600;
         text-align: right;
-        color: var(--od-text);
+        color: var(--bc-text);
 
-        &.od-planner--alarm {
-          color: var(--od-alarm);
+        &.bc-planner--alarm {
+          color: var(--bc-alarm);
         }
       }
     }
 
     /* One gas of "Volume nécessaire par gaz" (task 2026-11-13-93). */
-    .od-planner--volume {
+    .bc-planner--volume {
       padding: 12px 24px 12px 16px;
 
-      .od-planner--label {
+      .bc-planner--label {
         font-size: 16px;
         line-height: 24px;
         letter-spacing: 0.15px;
       }
     }
 
-    .od-planner--volume-head {
+    .bc-planner--volume-head {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 16px;
     }
 
-    .od-planner--volume-total {
+    .bc-planner--volume-total {
       font-size: 22px;
       line-height: 28px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-planner--bar.od-planner--volume-bar {
+    .bc-planner--bar.bc-planner--volume-bar {
       height: 10px;
       border-radius: 5px;
     }
 
-    .od-planner--volume-legend {
+    .bc-planner--volume-legend {
       display: flex;
       flex-wrap: wrap;
       gap: 4px 16px;
       margin-top: 8px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       b {
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
 
     /* The oxygen row: the limit on the left, the OTU on the right. */
-    .od-planner--legend-split {
+    .bc-planner--legend-split {
       justify-content: space-between;
     }
 
-    .od-planner--volume.od-planner--oxygen {
-      border-top: 1px solid var(--od-separator);
+    .bc-planner--volume.bc-planner--oxygen {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-planner--legend-item {
+    .bc-planner--legend-item {
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
-    .od-planner--legend-swatch {
+    .bc-planner--legend-swatch {
       width: 10px;
       height: 10px;
       border-radius: 2px;
       flex: none;
     }
 
-    .od-planner--legend-used {
-      background: var(--od-tertiary);
+    .bc-planner--legend-used {
+      background: var(--bc-tertiary);
     }
 
-    .od-planner--legend-reserve {
-      background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 2px, var(--od-tertiary-hatch) 2px 4px);
+    .bc-planner--legend-reserve {
+      background: repeating-linear-gradient(135deg, var(--bc-tertiary-container) 0 2px, var(--bc-tertiary-hatch) 2px 4px);
     }
 
-    .od-planner--bar {
+    .bc-planner--bar {
       display: flex;
       height: 8px;
       margin-top: 8px;
       border-radius: 4px;
       overflow: hidden;
-      background: var(--od-tertiary-container);
+      background: var(--bc-tertiary-container);
 
-      .od-planner--fill {
-        background: var(--od-tertiary);
+      .bc-planner--fill {
+        background: var(--bc-tertiary);
       }
 
-      .od-planner--gap {
+      .bc-planner--gap {
         width: 2px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
 
-      .od-planner--reserve {
+      .bc-planner--reserve {
         flex: 1;
-        background: repeating-linear-gradient(135deg, var(--od-tertiary-container) 0 4px, var(--od-tertiary-hatch) 4px 8px);
+        background: repeating-linear-gradient(135deg, var(--bc-tertiary-container) 0 4px, var(--bc-tertiary-hatch) 4px 8px);
       }
     }
 
-    .od-planner--note {
+    .bc-planner--note {
       margin: 8px 16px 0;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     .skeleton-block {
@@ -1820,7 +1820,7 @@
       border-radius: 12px;
     }
 
-    .od-planner--end {
+    .bc-planner--end {
       height: 32px;
     }
   }

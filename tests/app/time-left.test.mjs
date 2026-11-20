@@ -124,8 +124,8 @@ test('the texts, short and spoken, in French and English', () => {
 
 test('the three progress screens use the one line, with the count on the left', () => {
   const line = read('components/ProgressLine.svelte');
-  assert.match(line, /od-progress-line--count/);
-  assert.match(line, /od-progress-line--left/);
-  assert.match(line, /od-sr-only/);
+  assert.match(line, /bc-progress-line--count/);
+  assert.match(line, /bc-progress-line--left/);
+  assert.match(line, /bc-sr-only/);
   for (const f of ['FirstLaunchServer', 'FirstLaunchDivelogs', 'FirstLaunchServerCreate']) assert.match(read(`components/${f}.svelte`), /<ProgressLine /, f);
 });

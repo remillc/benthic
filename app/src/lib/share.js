@@ -56,10 +56,10 @@ export function standaloneSvg(svg) {
     }
   });
   // The chart only: its height without the gas band below it.
-  const band = copy.querySelector('.od-dive-profile--gas rect');
+  const band = copy.querySelector('.bc-dive-profile--gas rect');
   const w = svg.getAttribute('width') ?? String(svg.clientWidth);
   const h = band ? String(Number(band.getAttribute('y')) - 2) : (svg.getAttribute('height') ?? String(svg.clientHeight));
-  for (const el of copy.querySelectorAll('.od-dive-profile--gas, .od-dive-profile--cursor, .od-dive-profile--cursor-halo')) el.remove();
+  for (const el of copy.querySelectorAll('.bc-dive-profile--gas, .bc-dive-profile--cursor, .bc-dive-profile--cursor-halo')) el.remove();
   for (const el of [copy, ...copy.querySelectorAll('*')]) el.removeAttribute('class');
   copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   copy.setAttribute('height', h);
@@ -89,7 +89,7 @@ export async function profilePng(svg, scale = 3) {
     canvas.width = (w + pad * 2) * scale;
     canvas.height = (h + pad * 2) * scale;
     const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
-    ctx.fillStyle = getComputedStyle(svg).getPropertyValue('--od-block').trim() || '#FFFFFF';
+    ctx.fillStyle = getComputedStyle(svg).getPropertyValue('--bc-block').trim() || '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, pad * scale, pad * scale, w * scale, h * scale);
     return canvas.toDataURL('image/png').split(',')[1];

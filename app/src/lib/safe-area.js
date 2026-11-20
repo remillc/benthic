@@ -3,7 +3,7 @@
 // navigation bar is never reported, the top is 52 px or 0 from one launch to the next), so the
 // native side (MainActivity, SafeAreaInsets.java) reads the window insets and hands them over:
 // once at boot through the OpenDivesInsets interface, then on every change through
-// window.__odSetInsets. They become --od-safe-top/right/bottom/left on <html>, and theme.css
+// window.__odSetInsets. They become --bc-safe-top/right/bottom/left on <html>, and theme.css
 // points Framework7's --f7-safe-area-* at them. Elsewhere (iOS, desktop, browser) nothing is
 // set and env() keeps working.
 //
@@ -77,8 +77,8 @@ export function parseGestureZone(raw) {
 export function applyInsets(raw, root = document.documentElement) {
   const insets = parseInsets(raw);
   if (!insets) return null;
-  for (const side of SIDES) root.style.setProperty(`--od-safe-${side}`, `${insets[side]}px`);
-  root.classList.add('od-native-insets');
+  for (const side of SIDES) root.style.setProperty(`--bc-safe-${side}`, `${insets[side]}px`);
+  root.classList.add('bc-native-insets');
   return insets;
 }
 

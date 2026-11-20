@@ -118,7 +118,7 @@ const read = (p) => readFileSync(new URL(p, root), 'utf8');
 test('the screens: retire everywhere, delete for good only on a retired piece, no pencil on it', () => {
   const piece = read('pages/ProfilePiece.svelte');
   assert.match(piece, /\{#if piece && !piece\.retired\}\s*<a\s+href=\{editPath\}/, 'no pencil on a retired piece');
-  assert.match(piece, /\{#if piece\.retired\}\s*<button type="button" class="od-piece-page--forever"/, '« Supprimer pour de bon » only when retired');
+  assert.match(piece, /\{#if piece\.retired\}\s*<button type="button" class="bc-piece-page--forever"/, '« Supprimer pour de bon » only when retired');
   assert.ok(!piece.includes("t('gear.piece.delete')"), 'the active menu has no Supprimer');
   assert.match(piece, /removeForGood[\s\S]*?if \(!piece\?\.retired\) return/, 'the deletion refuses a piece that is not retired');
   assert.match(read('pages/ProfileComputerEdit.svelte'), /RetirePieceDialog/);

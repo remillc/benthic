@@ -17,7 +17,7 @@
   let { f7router } = $props();
 </script>
 
-<Page class="od-account-backup-page">
+<Page class="bc-account-backup-page">
   <Navbar title={t('backup.title')}>
     {#snippet left()}
       <BackLink label={t('account.title')} name={t('detail.back')} />
@@ -26,7 +26,7 @@
   {#if !logbook.odplus}
     <BackupNotOnServer />
   {:else if layout.split}
-    <div class="od-account-backup-page--panes">
+    <div class="bc-account-backup-page--panes">
       <BackupPanes onbrowse={(id) => f7router.navigate(`/account/backup/browse/${id}`)} />
     </div>
   {:else}
@@ -40,7 +40,7 @@
 
 <style>
   @layer od.components {
-    .od-account-backup-page--panes {
+    .bc-account-backup-page--panes {
       height: 100%;
     }
   }

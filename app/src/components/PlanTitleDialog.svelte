@@ -34,9 +34,9 @@
   }
 </script>
 
-<Md3Dialog class="od-plan-title-dialog" title={t('plan.titleDialog')} {oncancel}>
+<Md3Dialog class="bc-plan-title-dialog" title={t('plan.titleDialog')} {oncancel}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="od-plan-title-dialog--field" bind:this={field} onkeydown={keydown}>
+  <div class="bc-plan-title-dialog--field" bind:this={field} onkeydown={keydown}>
     <TextField label={t('plan.titleLabel')} bind:value={text} />
   </div>
   {#snippet actions()}
@@ -47,8 +47,8 @@
 
 <style>
   @layer od.components {
-    .od-plan-title-dialog--field {
-      --od-field-margin: 24px;
+    .bc-plan-title-dialog--field {
+      --bc-field-margin: 24px;
     }
   }
 </style>

@@ -95,25 +95,25 @@
 {/snippet}
 
 {#snippet cylinder(/** @type {ReturnType<typeof shape>} */ s)}
-  {@render outline(s, 'od-rebreather-drawing--body', s.hatched ? `url(#${id}-hatch)` : null)}
+  {@render outline(s, 'bc-rebreather-drawing--body', s.hatched ? `url(#${id}-hatch)` : null)}
   {#if s.startY !== null}
-    <rect x={s.x} y={s.startY} width={s.width} height={s.bottom - s.startY} class="od-rebreather-drawing--start-fill" clip-path="url(#{id}-{s.key})" />
-    <line x1={s.x + 1} y1={s.lineStartY} x2={s.x + s.width - 1} y2={s.lineStartY} class="od-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
+    <rect x={s.x} y={s.startY} width={s.width} height={s.bottom - s.startY} class="bc-rebreather-drawing--start-fill" clip-path="url(#{id}-{s.key})" />
+    <line x1={s.x + 1} y1={s.lineStartY} x2={s.x + s.width - 1} y2={s.lineStartY} class="bc-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
   {/if}
   {#if s.endY !== null}
     <rect x={s.x} y={s.endY} width={s.width} height={s.bottom - s.endY} fill="url(#{id}-water)" clip-path="url(#{id}-{s.key})" />
     {#if s.lineEndY !== null}
-      <line x1={s.x + 1} y1={s.lineEndY} x2={s.x + s.width - 1} y2={s.lineEndY} class="od-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
+      <line x1={s.x + 1} y1={s.lineEndY} x2={s.x + s.width - 1} y2={s.lineEndY} class="bc-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
     {/if}
   {/if}
-  {@render outline(s, 'od-rebreather-drawing--outline', null)}
+  {@render outline(s, 'bc-rebreather-drawing--outline', null)}
 {/snippet}
 
-<svg class="od-rebreather-drawing" viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
+<svg class="bc-rebreather-drawing" viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
   <defs>
     <linearGradient id="{id}-water" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" class="od-rebreather-drawing--water-top" />
-      <stop offset="1" class="od-rebreather-drawing--water-bottom" />
+      <stop offset="0" class="bc-rebreather-drawing--water-top" />
+      <stop offset="1" class="bc-rebreather-drawing--water-bottom" />
     </linearGradient>
     {#each shapes as s (s.key)}
       <clipPath id="{id}-{s.key}">
@@ -126,31 +126,31 @@
     {/each}
     <!-- No pressure data: grey diagonal stripes, 8 wide, at 45°. -->
     <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="8" height="8" class="od-rebreather-drawing--hatch-ground" />
-      <rect width="4" height="8" class="od-rebreather-drawing--hatch-stripe" />
+      <rect width="8" height="8" class="bc-rebreather-drawing--hatch-ground" />
+      <rect width="4" height="8" class="bc-rebreather-drawing--hatch-stripe" />
     </pattern>
   </defs>
 
   <g transform="translate({UNIT_SCALE.x} {UNIT_SCALE.y}) scale({UNIT_SCALE.k})">
     <!-- Breathing hoses to the shoulders, and the stand. -->
-    <path d="M98 30 C 94 16, 80 10, 58 8" class="od-rebreather-drawing--hose" />
-    <path d="M120 30 C 124 16, 138 10, 160 8" class="od-rebreather-drawing--hose" />
-    <path d="M100 174 L 92 196 L 126 196 L 118 174" class="od-rebreather-drawing--stand" />
+    <path d="M98 30 C 94 16, 80 10, 58 8" class="bc-rebreather-drawing--hose" />
+    <path d="M120 30 C 124 16, 138 10, 160 8" class="bc-rebreather-drawing--hose" />
+    <path d="M100 174 L 92 196 L 126 196 L 118 174" class="bc-rebreather-drawing--stand" />
 
     <!-- Diluent (left) and oxygen (right), valve and first stage at the bottom. -->
     {#each unitShapes as s (s.key)}
       {@render cylinder(s)}
-      <rect x={s.x + 13} y="168" width="10" height="10" rx="2" class="od-rebreather-drawing--valve" />
-      <rect x={s.x + 7} y="175" width="22" height="7" rx="3" class="od-rebreather-drawing--first-stage" />
+      <rect x={s.x + 13} y="168" width="10" height="10" rx="2" class="bc-rebreather-drawing--valve" />
+      <rect x={s.x + 7} y="175" width="22" height="7" rx="3" class="bc-rebreather-drawing--first-stage" />
     {/each}
 
     <!-- The scrubber canister, between the two cylinders, with its head. -->
-    <rect x="86" y="24" width="46" height="152" rx="7" class="od-rebreather-drawing--canister" />
-    <rect x="86" y="24" width="46" height="18" rx="6" class="od-rebreather-drawing--head" />
-    <rect x="103" y="66" width="12" height="20" rx="2" class="od-rebreather-drawing--display" />
+    <rect x="86" y="24" width="46" height="152" rx="7" class="bc-rebreather-drawing--canister" />
+    <rect x="86" y="24" width="46" height="18" rx="6" class="bc-rebreather-drawing--head" />
+    <rect x="103" y="66" width="12" height="20" rx="2" class="bc-rebreather-drawing--display" />
   </g>
-  <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.diluent}</text>
-  <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="od-rebreather-drawing--mark">{marks.oxygen}</text>
+  <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.diluent}</text>
+  <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.oxygen}</text>
 
   <!-- The others beside the unit: the open-circuit cylinder shape, no valve (task 2026-11-13-89). -->
   {#if sideShapes.length}
@@ -162,7 +162,7 @@
           y={SIDE_MIDDLE}
           text-anchor="middle"
           dominant-baseline="central"
-          class="od-rebreather-drawing--mark od-rebreather-drawing--mark-side"
+          class="bc-rebreather-drawing--mark bc-rebreather-drawing--mark-side"
           transform="rotate(-90 {s.x + s.width / 2} {SIDE_MIDDLE})">{marks.bailout}</text>
       {/each}
     </g>
@@ -173,97 +173,97 @@
   @layer od.components {
     /* As wide as its box, which the card keeps at most the drawing's own width
        (140 tall, task 2026-11-13-84), so that the text columns line up with it. */
-    .od-rebreather-drawing {
+    .bc-rebreather-drawing {
       display: block;
       width: 100%;
       height: auto;
     }
 
-    .od-rebreather-drawing--hose {
+    .bc-rebreather-drawing--hose {
       fill: none;
-      stroke: var(--od-rebreather-hose);
+      stroke: var(--bc-rebreather-hose);
       stroke-width: 8;
       stroke-linecap: round;
       stroke-dasharray: 2.5 1.2;
     }
 
-    .od-rebreather-drawing--stand {
+    .bc-rebreather-drawing--stand {
       fill: none;
-      stroke: var(--od-rebreather-hardware);
+      stroke: var(--bc-rebreather-hardware);
       stroke-width: 4;
       stroke-linejoin: round;
     }
 
-    .od-rebreather-drawing--body {
-      fill: var(--od-surface);
+    .bc-rebreather-drawing--body {
+      fill: var(--bc-surface);
     }
 
-    .od-rebreather-drawing--outline {
+    .bc-rebreather-drawing--outline {
       fill: none;
-      stroke: var(--od-text);
+      stroke: var(--bc-text);
       stroke-width: 2;
       stroke-linejoin: round;
     }
 
-    .od-rebreather-drawing--valve {
-      fill: var(--od-rebreather-valve);
-      stroke: var(--od-text);
+    .bc-rebreather-drawing--valve {
+      fill: var(--bc-rebreather-valve);
+      stroke: var(--bc-text);
       stroke-width: 1.5;
     }
 
-    .od-rebreather-drawing--first-stage {
-      fill: var(--od-rebreather-hardware);
-      stroke: var(--od-text);
+    .bc-rebreather-drawing--first-stage {
+      fill: var(--bc-rebreather-hardware);
+      stroke: var(--bc-text);
       stroke-width: 1.5;
     }
 
-    .od-rebreather-drawing--canister {
-      fill: var(--od-rebreather-canister);
-      stroke: var(--od-text);
+    .bc-rebreather-drawing--canister {
+      fill: var(--bc-rebreather-canister);
+      stroke: var(--bc-text);
       stroke-width: 2;
     }
 
-    .od-rebreather-drawing--head {
-      fill: var(--od-rebreather-head);
+    .bc-rebreather-drawing--head {
+      fill: var(--bc-rebreather-head);
     }
 
-    .od-rebreather-drawing--display {
-      fill: var(--od-text-2);
+    .bc-rebreather-drawing--display {
+      fill: var(--bc-text-2);
     }
 
-    .od-rebreather-drawing--mark {
-      fill: var(--od-text);
+    .bc-rebreather-drawing--mark {
+      fill: var(--bc-text);
       font-size: 11px;
       font-weight: 700;
     }
 
-    .od-rebreather-drawing--mark-side {
+    .bc-rebreather-drawing--mark-side {
       font-weight: 600;
       letter-spacing: 1px;
     }
 
-    .od-rebreather-drawing--water-top {
-      stop-color: var(--od-cylinder-water-top);
+    .bc-rebreather-drawing--water-top {
+      stop-color: var(--bc-cylinder-water-top);
     }
 
-    .od-rebreather-drawing--water-bottom {
-      stop-color: var(--od-cylinder-water-bottom);
+    .bc-rebreather-drawing--water-bottom {
+      stop-color: var(--bc-cylinder-water-bottom);
     }
 
-    .od-rebreather-drawing--hatch-ground {
-      fill: var(--od-cylinder-no-pressure);
+    .bc-rebreather-drawing--hatch-ground {
+      fill: var(--bc-cylinder-no-pressure);
     }
 
-    .od-rebreather-drawing--hatch-stripe {
-      fill: var(--od-cylinder-no-pressure-stripe);
+    .bc-rebreather-drawing--hatch-stripe {
+      fill: var(--bc-cylinder-no-pressure-stripe);
     }
 
-    .od-rebreather-drawing--start-fill {
-      fill: var(--od-cylinder-breathed);
+    .bc-rebreather-drawing--start-fill {
+      fill: var(--bc-cylinder-breathed);
     }
 
-    .od-rebreather-drawing--level {
-      stroke: var(--od-cylinder-level);
+    .bc-rebreather-drawing--level {
+      stroke: var(--bc-cylinder-level);
       stroke-width: 1.5;
       stroke-dasharray: 3 2;
     }

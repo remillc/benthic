@@ -156,69 +156,69 @@
   }
 </script>
 
-<Page class="od-sites-cleanup">
+<Page class="bc-sites-cleanup">
   <Navbar title={t('sites.cleanupTitle')}>
     {#snippet left()}
-      <Link back iconOnly><i class="icon icon-back"></i><span class="od-sr-only">{t('common.back')}</span></Link>
+      <Link back iconOnly><i class="icon icon-back"></i><span class="bc-sr-only">{t('common.back')}</span></Link>
     {/snippet}
   </Navbar>
 
-  <p class="od-intro">{t('sites.cleanupIntro')}</p>
+  <p class="bc-intro">{t('sites.cleanupIntro')}</p>
 
   <!-- One surface per possible duplicate: the site kept is chosen with a tinted, checked row (radio buttons on iOS). -->
   {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
     {@const key = pairKey(pair.a.uuid, pair.b.uuid)}
     {@const both = ordered(pair)}
-    <fieldset class="od-sites-cleanup--surface">
-      <legend class="od-sites-cleanup--head">
-        <span class="od-sites-cleanup--name">{both[0].name || t('sites.noName')}</span>
-        <span class="od-sites-cleanup--sub">{reason(pair)}</span>
+    <fieldset class="bc-sites-cleanup--surface">
+      <legend class="bc-sites-cleanup--head">
+        <span class="bc-sites-cleanup--name">{both[0].name || t('sites.noName')}</span>
+        <span class="bc-sites-cleanup--sub">{reason(pair)}</span>
       </legend>
       <!-- Both sites on a map strip, when both have a position (task 2026-11-14-148). -->
       {#if both[0].hasLocation && both[1].hasLocation}
-        <div class="od-sites-cleanup--strip">
+        <div class="bc-sites-cleanup--strip">
           <DuplicateStrip a={both[0]} b={both[1]} kept={kept[key] ?? both[0].uuid} distanceM={pair.distanceM} />
         </div>
       {/if}
       {#each both as s (s.uuid)}
-        <div class="od-sites-cleanup--keep-row">
-          <ChoiceRow class="od-sites-cleanup--keep-pick" name="keep-{key}" selected={(kept[key] ?? both[0].uuid) === s.uuid} onselect={() => (kept[key] = s.uuid)}>
-            <span class="od-sites-cleanup--text"><span class="od-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="od-sites-cleanup--sub">{describe(s)}</span></span>
+        <div class="bc-sites-cleanup--keep-row">
+          <ChoiceRow class="bc-sites-cleanup--keep-pick" name="keep-{key}" selected={(kept[key] ?? both[0].uuid) === s.uuid} onselect={() => (kept[key] = s.uuid)}>
+            <span class="bc-sites-cleanup--text"><span class="bc-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="bc-sites-cleanup--sub">{describe(s)}</span></span>
           </ChoiceRow>
-          <button type="button" class="od-icon-button od-sites-cleanup--keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
+          <button type="button" class="bc-icon-button bc-sites-cleanup--keep-edit" aria-label={t('sites.editSite', { name: s.name || t('sites.noName') })} onclick={() => edit(s)}>
             <Icon name="edit" />
           </button>
         </div>
       {/each}
-      <div class="od-sites-cleanup--actions">
-        <button type="button" class="od-text-button" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
-        <button type="button" class="od-sites-cleanup--filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
+      <div class="bc-sites-cleanup--actions">
+        <button type="button" class="bc-text-button" onclick={() => notDuplicates(pair)}>{t('sites.notDuplicates')}</button>
+        <button type="button" class="bc-sites-cleanup--filled" onclick={() => merge(pair)}>{t('sites.merge')}</button>
       </div>
     </fieldset>
   {/each}
 
   {#if unused.length}
-    <h2 class="od-sites-cleanup--section">{t('sites.unusedTitle')}</h2>
-    <div class="od-sites-cleanup--surface">
-      <p class="od-sites-cleanup--explain">{t('sites.unusedIntro', { n: unused.length })}</p>
-      <label class="od-sites-cleanup--row od-sites-cleanup--check-row">
+    <h2 class="bc-sites-cleanup--section">{t('sites.unusedTitle')}</h2>
+    <div class="bc-sites-cleanup--surface">
+      <p class="bc-sites-cleanup--explain">{t('sites.unusedIntro', { n: unused.length })}</p>
+      <label class="bc-sites-cleanup--row bc-sites-cleanup--check-row">
         <span class="checkbox">
           <input type="checkbox" checked={selection.length === unused.length} indeterminate={selection.length > 0 && selection.length < unused.length} onchange={selectAll} />
           <i class="icon-checkbox"></i>
         </span>
-        <span class="od-sites-cleanup--label od-sites-cleanup--strong">{t('sites.selectAll')}</span>
+        <span class="bc-sites-cleanup--label bc-sites-cleanup--strong">{t('sites.selectAll')}</span>
       </label>
       {#each unused as s (s.uuid)}
-        <label class="od-sites-cleanup--row od-sites-cleanup--check-row">
+        <label class="bc-sites-cleanup--row bc-sites-cleanup--check-row">
           <span class="checkbox">
             <input type="checkbox" bind:checked={selected[s.uuid]} />
             <i class="icon-checkbox"></i>
           </span>
-          <span class="od-sites-cleanup--text"><span class="od-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="od-sites-cleanup--sub">{t('sites.noDive')}</span></span>
+          <span class="bc-sites-cleanup--text"><span class="bc-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="bc-sites-cleanup--sub">{t('sites.noDive')}</span></span>
         </label>
       {/each}
-      <div class="od-sites-cleanup--actions">
-        <button type="button" class="od-sites-cleanup--filled" disabled={!selection.length} onclick={deleteSelection}>
+      <div class="bc-sites-cleanup--actions">
+        <button type="button" class="bc-sites-cleanup--filled" disabled={!selection.length} onclick={deleteSelection}>
           {t('sites.deleteSelection', { n: selection.length })}
         </button>
       </div>
@@ -228,23 +228,23 @@
 
 <style>
   @layer od.components {
-    .od-sites-cleanup--surface {
+    .bc-sites-cleanup--surface {
       margin: 0 16px 12px;
       padding: 0;
       border: none;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
       min-width: 0;
     }
 
     /* The map strip spans the card, under the floating header. */
-    .od-sites-cleanup--strip {
+    .bc-sites-cleanup--strip {
       clear: both;
     }
 
     /* Header of a duplicate group: the site's name, then the reason. */
-    .od-sites-cleanup--head {
+    .bc-sites-cleanup--head {
       float: left;
       width: 100%;
       box-sizing: border-box;
@@ -252,7 +252,7 @@
       display: flex;
       flex-direction: column;
 
-      .od-sites-cleanup--name {
+      .bc-sites-cleanup--name {
         font-size: 16px;
         line-height: 24px;
         font-weight: 600;
@@ -263,34 +263,34 @@
       }
     }
 
-    .od-sites-cleanup--sub {
+    .bc-sites-cleanup--sub {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-sites-cleanup--row {
+    .bc-sites-cleanup--row {
       min-height: 48px;
       padding: 8px 16px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 16px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       cursor: pointer;
     }
 
     /* A choice and, apart from it, the button that edits the site. */
-    .od-sites-cleanup--keep-row {
+    .bc-sites-cleanup--keep-row {
       min-height: 56px;
       box-sizing: border-box;
       padding-right: 4px;
       display: flex;
       align-items: center;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
     }
 
-    :global(.od-sites-cleanup--keep-pick) {
+    :global(.bc-sites-cleanup--keep-pick) {
       flex: 1;
       width: auto;
       min-width: 0;
@@ -298,44 +298,44 @@
       padding: 8px 16px;
     }
 
-    .od-sites-cleanup--keep-edit {
+    .bc-sites-cleanup--keep-edit {
       flex: none;
       width: 48px;
     }
 
-    .od-sites-cleanup--text {
+    .bc-sites-cleanup--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .od-sites-cleanup--label {
+    .bc-sites-cleanup--label {
       font-size: 16px;
       line-height: 24px;
 
-      &.od-sites-cleanup--strong {
+      &.bc-sites-cleanup--strong {
         font-weight: 600;
       }
     }
 
-    .od-sites-cleanup--actions {
+    .bc-sites-cleanup--actions {
       padding: 10px 16px 12px;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
       display: flex;
       justify-content: flex-end;
       gap: 8px;
     }
 
     /* Filled button in ink: "Fusionner", "Supprimer la sélection". */
-    .od-sites-cleanup--filled {
+    .bc-sites-cleanup--filled {
       width: auto;
       height: 40px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -348,20 +348,20 @@
     }
 
     /* Title on the page background, as on the site sheet. */
-    .od-sites-cleanup--section {
+    .bc-sites-cleanup--section {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-sites-cleanup--explain {
+    .bc-sites-cleanup--explain {
       margin: 0;
       padding: 12px 16px 10px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

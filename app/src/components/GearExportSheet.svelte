@@ -36,79 +36,79 @@
   }
 </script>
 
-<Sheet class="od-gear-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.inventory.exportTitle')}>
-  <div class="od-gear-sheet--content">
-    <h2 class="od-gear-sheet--title">{t('gear.inventory.exportTitle')}</h2>
-    <p class="od-gear-sheet--count">{t('gear.inventory.exportChosen', { n: selected.length })}</p>
-    <div class="od-gear-sheet--scroll"><GearPicker {groups} bind:selected /></div>
-    <div class="od-gear-sheet--actions">
-      <button type="button" class="od-gear-sheet--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
-      <button type="button" class="od-gear-sheet--main" disabled={!selected.length} onclick={send}>{t('gear.inventory.exportAction')}</button>
+<Sheet class="bc-gear-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.inventory.exportTitle')}>
+  <div class="bc-gear-sheet--content">
+    <h2 class="bc-gear-sheet--title">{t('gear.inventory.exportTitle')}</h2>
+    <p class="bc-gear-sheet--count">{t('gear.inventory.exportChosen', { n: selected.length })}</p>
+    <div class="bc-gear-sheet--scroll"><GearPicker {groups} bind:selected /></div>
+    <div class="bc-gear-sheet--actions">
+      <button type="button" class="bc-gear-sheet--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
+      <button type="button" class="bc-gear-sheet--main" disabled={!selected.length} onclick={send}>{t('gear.inventory.exportAction')}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-gear-sheet) {
-      --f7-sheet-bg-color: var(--od-drawer);
+    :global(.sheet-modal.bc-gear-sheet) {
+      --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
       max-height: 85%;
       border-radius: 28px 28px 0 0;
     }
 
-    .od-gear-sheet--content {
+    .bc-gear-sheet--content {
       display: flex;
       flex-direction: column;
       max-height: 85vh;
-      padding: 20px 0 calc(12px + var(--od-safe-bottom));
+      padding: 20px 0 calc(12px + var(--bc-safe-bottom));
     }
 
-    .od-gear-sheet--title {
+    .bc-gear-sheet--title {
       margin: 0 24px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
     }
 
-    .od-gear-sheet--count {
+    .bc-gear-sheet--count {
       margin: 4px 24px 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gear-sheet--scroll {
+    .bc-gear-sheet--scroll {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
     }
 
-    .od-gear-sheet--actions {
+    .bc-gear-sheet--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
       padding: 8px 16px 0;
     }
 
-    .od-gear-sheet--text,
-    .od-gear-sheet--main {
+    .bc-gear-sheet--text,
+    .bc-gear-sheet--main {
       height: 40px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-gear-sheet--main {
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+    .bc-gear-sheet--main {
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
     }
 
-    .od-gear-sheet--main:disabled {
+    .bc-gear-sheet--main:disabled {
       opacity: 0.38;
     }
   }

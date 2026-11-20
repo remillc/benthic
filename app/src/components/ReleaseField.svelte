@@ -48,12 +48,12 @@
   const id = `od-release-field-${Math.random().toString(36).slice(2, 8)}-${uid++}`;
 </script>
 
-<div class="od-release-field {extra}" class:od-release-field--error={!!error} class:od-release-field--tall={tall} class:od-release-field--ios={iphone} class:od-release-field--noted={!!error || !!help}>
-  <div class="od-release-field--box">
+<div class="bc-release-field {extra}" class:bc-release-field--error={!!error} class:bc-release-field--tall={tall} class:bc-release-field--ios={iphone} class:bc-release-field--noted={!!error || !!help}>
+  <div class="bc-release-field--box">
     <input
       {id}
-      class="od-release-field--input"
-      class:od-release-field--mono={mono}
+      class="bc-release-field--input"
+      class:bc-release-field--mono={mono}
       {type}
       {disabled}
       {autocomplete}
@@ -69,38 +69,38 @@
         if (e.key === 'Enter' && onenter) onenter();
       }}
     />
-    <label class="od-release-field--label" for={id}>{label}</label>
-    {#if error}<span class="od-release-field--error-icon" aria-hidden="true"><Icon name="error" size={20} /></span>{/if}
+    <label class="bc-release-field--label" for={id}>{label}</label>
+    {#if error}<span class="bc-release-field--error-icon" aria-hidden="true"><Icon name="error" size={20} /></span>{/if}
   </div>
   {#if error}
-    <p class="od-release-field--note od-release-field--note-error" id="{id}-help" role="alert">{error}</p>
+    <p class="bc-release-field--note bc-release-field--note-error" id="{id}-help" role="alert">{error}</p>
   {/if}
   {#if help}
-    <p class="od-release-field--note" id={error ? undefined : `${id}-help`}>{help}</p>
+    <p class="bc-release-field--note" id={error ? undefined : `${id}-help`}>{help}</p>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-release-field {
+    .bc-release-field {
       margin-top: 14px;
       min-width: 0;
     }
 
-    .od-release-field--box {
+    .bc-release-field--box {
       position: relative;
     }
 
-    .od-release-field--input {
+    .bc-release-field--input {
       box-sizing: border-box;
       width: 100%;
       height: 52px;
       margin: 0;
       padding: 0 16px;
-      border: 1px solid var(--od-release-field-border);
+      border: 1px solid var(--bc-release-field-border);
       border-radius: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       outline: none;
@@ -108,12 +108,12 @@
 
       @media (hover: hover) {
         &:hover:not(:disabled):not(:focus) {
-          border-color: var(--od-text);
+          border-color: var(--bc-text);
         }
       }
 
       &:focus {
-        border: 2px solid var(--od-release-row-main);
+        border: 2px solid var(--bc-release-row-main);
         padding: 0 15px;
       }
 
@@ -122,85 +122,85 @@
       }
     }
 
-    .od-release-field--mono {
+    .bc-release-field--mono {
       font-family: 'Roboto Mono', ui-monospace, monospace;
       font-size: 15px;
     }
 
-    .od-release-field--tall .od-release-field--input {
+    .bc-release-field--tall .bc-release-field--input {
       height: 56px;
       font-size: 17px;
     }
 
-    .od-release-field--label {
+    .bc-release-field--label {
       position: absolute;
       left: 12px;
       top: -9px;
       padding: 0 4px;
-      background: var(--od-background);
+      background: var(--bc-background);
       font-size: 12px;
       line-height: 16px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
-    .od-release-field--input:focus + .od-release-field--label {
-      color: var(--od-release-row-main);
+    .bc-release-field--input:focus + .bc-release-field--label {
+      color: var(--bc-release-row-main);
     }
 
     /* The error mark at the end of the field (mock-up …-webdav-erreur-paysage). */
-    .od-release-field--error-icon {
+    .bc-release-field--error-icon {
       position: absolute;
       top: 0;
       right: 14px;
       bottom: 0;
       display: flex;
       align-items: center;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       pointer-events: none;
     }
 
-    .od-release-field--error {
-      .od-release-field--input,
-      .od-release-field--input:focus {
-        border: 2px solid var(--od-alarm);
+    .bc-release-field--error {
+      .bc-release-field--input,
+      .bc-release-field--input:focus {
+        border: 2px solid var(--bc-alarm);
         padding: 0 15px;
       }
 
-      .od-release-field--label {
-        color: var(--od-alarm);
+      .bc-release-field--label {
+        color: var(--bc-alarm);
       }
     }
 
-    .od-release-field--note {
+    .bc-release-field--note {
       margin: 4px 0 0 16px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-release-field--note-error {
-      color: var(--od-alarm);
+    .bc-release-field--note-error {
+      color: var(--bc-alarm);
     }
 
     /* iPhone (task 2026-11-16-261): a row of a grouped inset list. White card, 12 pt corners, the label at the left
        (148 pt: the longest label on one line) and the value at the right, a hairline between rows, the help line under the card. Rows without a
        note under them join into one card; a field with a note ends its card. */
-    .od-release-field--ios {
+    .bc-release-field--ios {
       margin-top: 16px;
 
-      .od-release-field--box {
+      .bc-release-field--box {
         min-height: 48px;
         display: flex;
         align-items: center;
         gap: 12px;
         padding: 0 16px;
         border-radius: 12px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
 
-      .od-release-field--label {
+      .bc-release-field--label {
         position: static;
         order: -1;
         width: 148px;
@@ -210,12 +210,12 @@
         font-size: 17px;
         line-height: 22px;
         font-weight: 400;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
-      .od-release-field--input,
-      .od-release-field--input:focus,
-      &.od-release-field--error .od-release-field--input {
+      .bc-release-field--input,
+      .bc-release-field--input:focus,
+      &.bc-release-field--error .bc-release-field--input {
         flex: 1;
         width: auto;
         min-width: 0;
@@ -225,65 +225,65 @@
         border-radius: 0;
         background: none;
         font-size: 17px;
-        caret-color: var(--od-release-row-main);
+        caret-color: var(--bc-release-row-main);
       }
 
-      .od-release-field--mono {
+      .bc-release-field--mono {
         font-size: 15px;
       }
 
-      &.od-release-field--tall .od-release-field--input {
+      &.bc-release-field--tall .bc-release-field--input {
         height: 48px;
         font-size: 17px;
       }
 
-      .od-release-field--input:focus + .od-release-field--label {
-        color: var(--od-text);
+      .bc-release-field--input:focus + .bc-release-field--label {
+        color: var(--bc-text);
       }
 
-      &.od-release-field--error .od-release-field--label {
-        color: var(--od-alarm);
+      &.bc-release-field--error .bc-release-field--label {
+        color: var(--bc-alarm);
       }
 
-      .od-release-field--error-icon {
+      .bc-release-field--error-icon {
         position: static;
         flex: none;
       }
 
-      .od-release-field--note {
+      .bc-release-field--note {
         margin: 6px 16px 0;
-        color: var(--od-release-ios-help);
+        color: var(--bc-release-ios-help);
       }
 
-      .od-release-field--note-error {
-        color: var(--od-alarm);
+      .bc-release-field--note-error {
+        color: var(--bc-alarm);
       }
 
     }
 
     /* Joined rows: no gap, square inner corners and a hairline inset 16 pt from the left. The neighbours are other
        instances of this component, which Svelte cannot see: the sibling selectors are global. */
-    :global(.od-release-field--ios:not(.od-release-field--noted):has(+ .od-release-field--ios) .od-release-field--box) {
+    :global(.bc-release-field--ios:not(.bc-release-field--noted):has(+ .bc-release-field--ios) .bc-release-field--box) {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
 
-    :global(.od-release-field--ios:not(.od-release-field--noted) + .od-release-field--ios) {
+    :global(.bc-release-field--ios:not(.bc-release-field--noted) + .bc-release-field--ios) {
       margin-top: 0;
 
-      :global(.od-release-field--box) {
+      :global(.bc-release-field--box) {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
-        background-image: linear-gradient(var(--od-release-line-soft), var(--od-release-line-soft));
+        background-image: linear-gradient(var(--bc-release-line-soft), var(--bc-release-line-soft));
         background-size: calc(100% - 16px) 1px;
         background-position: 16px 0;
         background-repeat: no-repeat;
-        background-color: var(--od-surface);
+        background-color: var(--bc-surface);
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-release-field--input {
+      .bc-release-field--input {
         transition: none;
       }
     }

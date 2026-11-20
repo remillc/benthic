@@ -44,11 +44,11 @@ test('the Compte button stays for a free diver: named « Compte, réglages et à
 // --- The free sheet's routes ---
 
 test('free sheet: « S’abonner » opens the offer, « Se connecter » opens the sign-in screen, both Benthic+ rows open the offer', () => {
-  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
-  const free = android.slice(android.indexOf('{#if free}'), android.indexOf('{:else}\n    <div class="od-account-sheet--card od-account-sheet--identity">'));
-  assert.match(free, /od-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
-  assert.match(free, /od-account-sheet--sign-in" onclick=\{\(\) => plus\('signIn'\)\}/);
-  assert.equal([...free.matchAll(/od-account-sheet--plus-row" onclick=\{\(e\) => \(e\.preventDefault\(\), plus\('offer'\)\)\}/g)].length, 2);
+  const android = sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'));
+  const free = android.slice(android.indexOf('{#if free}'), android.indexOf('{:else}\n    <div class="bc-account-sheet--card bc-account-sheet--identity">'));
+  assert.match(free, /bc-account-sheet--subscribe" onclick=\{\(\) => plus\('offer'\)\}/);
+  assert.match(free, /bc-account-sheet--sign-in" onclick=\{\(\) => plus\('signIn'\)\}/);
+  assert.equal([...free.matchAll(/bc-account-sheet--plus-row" onclick=\{\(e\) => \(e\.preventDefault\(\), plus\('offer'\)\)\}/g)].length, 2);
   assert.equal([...free.matchAll(/<BenthicPlusChip onSheet \/>/g)].length, 2, 'the chip is above each title');
   assert.ok(!/@/.test(free.replace(/<!--[\s\S]*?-->/g, '').replace(/\{[^}]*\}/g, '')), 'no e-mail, no sync line');
   assert.ok(!free.includes('SyncStatus') && !free.includes('SyncButton'));
@@ -77,7 +77,7 @@ test('the offer’s « Déjà abonné ? Se connecter » opens « Se connecter ou
   assert.equal(offerShowsSignIn(['start', 'odplusConnect', 'server', 'serverCode', 'odplusOffer']), false);
   assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'server', 'serverCode'])), false, 'after the sign-in of an account that has not subscribed');
   assert.match(offer, /\{#if offerShowsSignIn\(flow\.stack\)\}/);
-  assert.match(offer, /od-plus--link" onclick=\{\(\) => go\('signIn'\)\}/);
+  assert.match(offer, /bc-plus--link" onclick=\{\(\) => go\('signIn'\)\}/);
   assert.equal(langs.fr.odplus.offer.already, 'Déjà abonné ?');
   assert.equal(langs.fr.odplus.offer.signIn, 'Se connecter');
   // The offer's order: « Aucun compte n’est créé. » then the line.
@@ -86,8 +86,8 @@ test('the offer’s « Déjà abonné ? Se connecter » opens « Se connecter ou
 
 test('tablet and desktop: « Continuer sans compte » is centred across the 440 px of the three buttons', () => {
   const css = offer.slice(offer.indexOf('@media (min-width: 768px)'));
-  assert.match(css, /\.od-plus--buttons,\s*\.od-plus--note \{\s*width: 100%;\s*max-width: 440px;/);
-  assert.match(css, /\.od-plus--text-link \{[^}]*width: 100%;[^}]*max-width: 440px;[^}]*text-align: center;/);
+  assert.match(css, /\.bc-plus--buttons,\s*\.bc-plus--note \{\s*width: 100%;\s*max-width: 440px;/);
+  assert.match(css, /\.bc-plus--text-link \{[^}]*width: 100%;[^}]*max-width: 440px;[^}]*text-align: center;/);
 });
 
 // --- The subscriber's sheet: chip, overdue badge, red line, cross on the right ---
@@ -116,26 +116,26 @@ test('« Mon profil de plongeur »: the badge and the red line only for overdue 
 });
 
 test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
-  const row = sheet.slice(sheet.indexOf('od-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
+  const row = sheet.slice(sheet.indexOf('bc-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
   // A subscriber sees no Benthic+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
   assert.doesNotMatch(row, /BenthicPlusChip/);
-  assert.match(row, /\{#if late\.late\}\s*<span class="od-account-sheet--row-line od-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
-  assert.match(row, /\{:else\}\s*<span class="od-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
-  assert.match(row, /\{#if late\.late\}<span class="od-account-sheet--late-badge"/);
+  assert.match(row, /\{#if late\.late\}\s*<span class="bc-account-sheet--row-line bc-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
+  assert.match(row, /\{:else\}\s*<span class="bc-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
+  assert.match(row, /\{#if late\.late\}<span class="bc-account-sheet--late-badge"/);
   assert.equal(langs.fr.gear.profile.cardLine, 'Équipement, brevets, informations');
   assert.equal(langs.fr.account.sheet.maintenanceLate.one, 'Entretien : {n} pièce en retard');
   assert.equal(langs.fr.account.sheet.maintenanceLate.other, 'Entretien : {n} pièces en retard');
   // The red of the mock-up, white text on the badge.
   const theme = read('theme.css');
-  assert.match(theme, /--od-late: #A1372B;/);
-  assert.match(sheet, /\.od-account-sheet--late-badge \{[^}]*background: var\(--od-late\);[^}]*color: #FFFFFF;/);
+  assert.match(theme, /--bc-late: #A1372B;/);
+  assert.match(sheet, /\.bc-account-sheet--late-badge \{[^}]*background: var\(--bc-late\);[^}]*color: #FFFFFF;/);
 });
 
 test('Android phone: the ✕ of the sheet is on the right at the logo’s height, none on the left', () => {
-  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
-  const head = android.slice(android.indexOf('<div class="od-account-sheet--head">'), android.indexOf('{#if free}'));
-  assert.ok(head.indexOf('od-account-sheet--brand') < head.indexOf('od-account-sheet--close'), 'the cross comes after the logo');
-  assert.equal([...head.matchAll(/od-account-sheet--close/g)].length, 1);
+  const android = sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'));
+  const head = android.slice(android.indexOf('<div class="bc-account-sheet--head">'), android.indexOf('{#if free}'));
+  assert.ok(head.indexOf('bc-account-sheet--brand') < head.indexOf('bc-account-sheet--close'), 'the cross comes after the logo');
+  assert.equal([...head.matchAll(/bc-account-sheet--close/g)].length, 1);
   assert.match(head, /<span aria-hidden="true"><\/span>\s*<!--/);
 });
 
@@ -159,7 +159,7 @@ test('the store link: Google Play’s subscription page for this app, the App St
   assert.equal(subscriptionStore(undefined, false), 'google');
   const appId = JSON.parse(readFileSync(new URL('../../app/capacitor.config.json', import.meta.url), 'utf8')).appId;
   assert.match(manage, new RegExp(`const APP_ID = '${appId.replace(/\./g, '\\.')}'`), 'the package is the app’s id');
-  assert.match(manage, /<a class="od-account-manage--store" href=\{storeSubscriptionsUrl\(store, APP_ID\)\} target="_blank" rel="noopener noreferrer">/);
+  assert.match(manage, /<a class="bc-account-manage--store" href=\{storeSubscriptionsUrl\(store, APP_ID\)\} target="_blank" rel="noopener noreferrer">/);
   assert.match(manage, /<Icon name="openInNew"/, 'the outlined button carries the external-link icon');
   // No billing tool of our own: nothing here changes a payment method or cancels.
   assert.ok(!/cancelSubscription|updatePayment|purchaseSubscription/i.test(manage));
@@ -196,7 +196,7 @@ test('deleting the account asks first; the server is called only after the confi
   assert.match(body, /onConfirm: async \(\) => \{\s*try \{\s*await deleteServerAccount\(\);/);
   assert.equal([...manage.matchAll(/deleteServerAccount\(\)/g)].length, 1, 'one call, inside onConfirm');
   // The button itself only opens the dialog.
-  assert.match(manage, /od-account-manage--delete" onclick=\{askDelete\}/);
+  assert.match(manage, /bc-account-manage--delete" onclick=\{askDelete\}/);
   // The dialog tells what is deleted and that the subscription stays until it is cancelled in the store.
   assert.match(langs.fr.account.manage.deleteText, /résiliez-le dans \{store\}/);
   assert.match(langs.en.account.manage.deleteText, /cancel it in \{store\}/);
@@ -270,8 +270,8 @@ test('every new text exists in French and in English, and the release notes name
 // --- Task 2026-11-18-282: the « + » chip after the name, and the tablet's offer ---
 
 test('the subscriber sheet shows the round « + » chip after the name, read « Benthic Plus »; the free sheet does not', () => {
-  assert.match(sheet, /\{#if subscriber\}\s*<span class="od-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="od-account-sheet--plus-dot">\+<\/span><\/span><span class="od-sr-only">\{t\('odplus\.chipName'\)\}<\/span>/);
-  assert.match(sheet, /\.od-account-sheet--plus-dot \{[^}]*width: 18px;[^}]*height: 18px;[^}]*margin-left: 3px;[^}]*var\(--od-account-chip\)[^}]*var\(--od-account-chip-ink\)[^}]*font-weight: 700/);
+  assert.match(sheet, /\{#if subscriber\}\s*<span class="bc-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="bc-account-sheet--plus-dot">\+<\/span><\/span><span class="bc-sr-only">\{t\('odplus\.chipName'\)\}<\/span>/);
+  assert.match(sheet, /\.bc-account-sheet--plus-dot \{[^}]*width: 18px;[^}]*height: 18px;[^}]*margin-left: 3px;[^}]*var\(--bc-account-chip\)[^}]*var\(--bc-account-chip-ink\)[^}]*font-weight: 700/);
   assert.equal(langs.fr.odplus.chipName, 'Benthic Plus');
   assert.equal(langs.en.odplus.chipName, 'Benthic Plus');
 });
@@ -299,13 +299,13 @@ test('the free sheet opens the offer for both Benthic+ rows; the subscriber shee
   assert.match(desktopSheet, /plus-row" onclick=\{\(\) => plus\('offer'\)\}[\s\S]*plus-row" onclick=\{\(\) => plus\('offer'\)\}/);
   // Subscriber: the backup row opens the backup page (the three sheets), the profile row the profile.
   assert.equal((sheet.match(/go\(openBackup\)/g) ?? []).length, 2, 'Android and iPhone');
-  assert.match(sheet, /\{#if subscriber\}\s*<div class="od-account-sheet--divider od-account-sheet--margin"><\/div>\s*<a href="#backup"/);
+  assert.match(sheet, /\{#if subscriber\}\s*<div class="bc-account-sheet--divider bc-account-sheet--margin"><\/div>\s*<a href="#backup"/);
   assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
   assert.match(desktopSheet, /leaveTo\(openBackup\)/);
   assert.match(desktopSheet, /leaveTo\(openProfile\)/);
   assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*if \(layout\.desktop\) navigation\.backupOpen = true;\s*else openOver\('\/account\/backup'\);/);
   // The subscriber's entries carry no chip, whatever the platform; the history icon and the new texts are on all three sheets.
-  for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'))], ['desktop', desktopSheet]]) {
+  for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="bc-account-sheet--content">'))], ['desktop', desktopSheet]]) {
     const at = source.indexOf("t('account.sheet.backup')");
     const profileAt = source.lastIndexOf("t('gear.profile.title')", at + 2000) >= 0 && source.indexOf("t('gear.profile.title')", at - 1500) >= 0 ? source.indexOf("t('gear.profile.title')", at - 1500) : at;
     const rows = source.slice(Math.min(at, profileAt) - 400, Math.max(at, profileAt) + 400);
@@ -334,8 +334,8 @@ test('the backup and restore screens are routes of the account: the list, a vers
 
 
 test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sauvegarde et restauration », on every platform (task 291)', () => {
-  const android = sheet.slice(sheet.indexOf('<div class="od-account-sheet--content">'));
-  const iphone = sheet.slice(0, sheet.indexOf('<div class="od-account-sheet--content">'));
+  const android = sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'));
+  const iphone = sheet.slice(0, sheet.indexOf('<div class="bc-account-sheet--content">'));
   for (const [name, source, profile, backup] of [
     ['Android phone and tablet', android, 'href="#profile"', 'href="#backup"'],
     ['iPhone', iphone, "openOver('/profile')", 'go(openBackup)'],

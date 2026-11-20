@@ -90,41 +90,41 @@
 
   <ReadOnlyNotice />
 
-  <h2 class="od-profile-edit--section">{t('diverProfile.info.you')}</h2>
-  <div class="od-profile-edit--fields">
+  <h2 class="bc-profile-edit--section">{t('diverProfile.info.you')}</h2>
+  <div class="bc-profile-edit--fields">
     <TextField label={t('diverProfile.info.fullNameLabel')} bind:value={fullName} supporting={t('diverProfile.info.fullNameHint')} autocomplete="name" />
     <DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} supporting={dobLive.error} />
   </div>
 
-  <h2 class="od-profile-edit--section">{t('diverProfile.info.emergency')}</h2>
-  <div class="od-profile-edit--fields">
+  <h2 class="bc-profile-edit--section">{t('diverProfile.info.emergency')}</h2>
+  <div class="bc-profile-edit--fields">
     <TextField label={t('diverProfile.info.contactNameLabel')} bind:value={contactName} supporting={t('diverProfile.info.contactNameHint')} autocomplete="off" />
     <ComboField label={t('diverProfile.info.relationLabel')} bind:value={relation} options={relationOptions} supporting={t('diverProfile.info.relationHint')} />
-    <div class="od-profile-edit--phone">
-      <div class="od-profile-edit--country"><SelectField label={t('diverProfile.info.countryCode')} bind:value={country} options={countryOptions} /></div>
-      <div class="od-profile-edit--number">
+    <div class="bc-profile-edit--phone">
+      <div class="bc-profile-edit--country"><SelectField label={t('diverProfile.info.countryCode')} bind:value={country} options={countryOptions} /></div>
+      <div class="bc-profile-edit--number">
         <TextField label={t('diverProfile.info.phone')} bind:value={number} inputmode="numeric" autocomplete="tel-national" invalid={!!phoneLive.error} supporting={phoneLive.error || t('diverProfile.info.phoneHint')} />
       </div>
     </div>
   </div>
 
-  <h2 class="od-profile-edit--section">{t('diverProfile.info.health')}</h2>
-  <div class="od-profile-edit--fields">
+  <h2 class="bc-profile-edit--section">{t('diverProfile.info.health')}</h2>
+  <div class="bc-profile-edit--fields">
     <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} disabled={!consent} supporting={consent ? t('diverProfile.info.bloodHint') : t('diverProfile.info.bloodDenied')} />
   </div>
-  <div class="od-profile-edit--bottom"></div>
+  <div class="bc-profile-edit--bottom"></div>
 {/snippet}
 
-<Page class="od-profile-edit">
+<Page class="bc-profile-edit">
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('diverProfile.info.close')}</span>
+        <Icon name="close" /><span class="bc-sr-only">{t('diverProfile.info.close')}</span>
       </a>
     {/snippet}
     {#snippet title()}{t('diverProfile.info.title')}{/snippet}
     {#snippet right()}
-      <button type="button" class="od-profile-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.info.save')}</button>
+      <button type="button" class="bc-profile-edit--save" disabled={!canSave} onclick={save}>{t('diverProfile.info.save')}</button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -136,58 +136,58 @@
 
 <style>
   @layer od.components {
-    :global(.od-profile-edit .page-content) {
+    :global(.bc-profile-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-profile-edit--save {
+    .bc-profile-edit--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-profile-edit--save:disabled {
+    .bc-profile-edit--save:disabled {
       opacity: 0.38;
     }
 
-    .od-profile-edit--section {
+    .bc-profile-edit--section {
       margin: 20px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-profile-edit--fields {
+    .bc-profile-edit--fields {
       padding: 0 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-profile-edit--phone {
+    .bc-profile-edit--phone {
       display: flex;
       gap: 12px;
       align-items: flex-start;
     }
 
-    .od-profile-edit--country {
+    .bc-profile-edit--country {
       flex: 0 0 132px;
     }
 
-    .od-profile-edit--number {
+    .bc-profile-edit--number {
       flex: 1;
       min-width: 0;
     }
 
-    .od-profile-edit--bottom {
+    .bc-profile-edit--bottom {
       height: 48px;
     }
   }

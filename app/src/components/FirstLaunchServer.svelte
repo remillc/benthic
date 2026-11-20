@@ -258,15 +258,15 @@
 </script>
 
 {#if step === 'server'}
-  <h2 class="od-first-launch-server--heading">{t('serverSteps.accountTitle')}</h2>
-  <p class="od-first-launch-server--lead">{t('serverSteps.accountHelp')}</p>
-  <div class="od-first-launch-server--field">
+  <h2 class="bc-first-launch-server--heading">{t('serverSteps.accountTitle')}</h2>
+  <p class="bc-first-launch-server--lead">{t('serverSteps.accountHelp')}</p>
+  <div class="bc-first-launch-server--field">
     <ReleaseField label={t('serverSteps.emailLabel')} type="email" autocomplete="email" bind:value={s.email} error={emailError} help={t('serverSteps.emailHelp')} oninput={() => (s.emailError = false)} onenter={requestCode} />
   </div>
-  <button type="button" class="od-first-launch-server--action" disabled={busy || !s.email.trim()} aria-busy={busy} onclick={requestCode}>{t('serverSteps.getCode')}</button>
+  <button type="button" class="bc-first-launch-server--action" disabled={busy || !s.email.trim()} aria-busy={busy} onclick={requestCode}>{t('serverSteps.getCode')}</button>
 {:else if step === 'serverCode'}
-  <h2 class="od-first-launch-server--heading">{t('serverSteps.codeTitle')}</h2>
-  <p class="od-first-launch-server--lead">{t('serverSteps.codeHelp', { email: s.email })}</p>
+  <h2 class="bc-first-launch-server--heading">{t('serverSteps.codeTitle')}</h2>
+  <p class="bc-first-launch-server--lead">{t('serverSteps.codeHelp', { email: s.email })}</p>
   <CodeField
     label={t('serverSteps.codeLabel')}
     accessibleLabel={t('serverSteps.codeAccessible')}
@@ -279,75 +279,75 @@
     onsubmit={signIn}
   />
   {#if view.resend === 'countdown'}
-    <p class="od-first-launch-server--countdown" aria-live="off">{t('serverSteps.resendIn', { time: formatCountdown(secondsLeft) })}</p>
+    <p class="bc-first-launch-server--countdown" aria-live="off">{t('serverSteps.resendIn', { time: formatCountdown(secondsLeft) })}</p>
   {:else if view.resend === 'link'}
-    <button type="button" class="od-first-launch-server--link" disabled={view.resendDisabled} onclick={sendAgain}>{t('serverSteps.resend')}</button>
+    <button type="button" class="bc-first-launch-server--link" disabled={view.resendDisabled} onclick={sendAgain}>{t('serverSteps.resend')}</button>
   {/if}
-  <div class="od-first-launch-server--space"></div>
+  <div class="bc-first-launch-server--space"></div>
   {#if view.primary === 'signIn'}
-    <button type="button" class="od-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={signIn}>{t('serverSteps.signIn')}</button>
+    <button type="button" class="bc-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={signIn}>{t('serverSteps.signIn')}</button>
   {:else}
-    <button type="button" class="od-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={sendAgain}>{t('serverSteps.newCode')}</button>
+    <button type="button" class="bc-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={sendAgain}>{t('serverSteps.newCode')}</button>
   {/if}
 {:else if step === 'serverOffline'}
-  <span class="od-first-launch-server--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
-  <h2 class="od-first-launch-server--heading">{t('serverSteps.offlineTitle')}</h2>
-  <p class="od-first-launch-server--lead">{t(deviceKey('serverSteps.offlineHelp', kind))}</p>
-  <div class="od-first-launch-server--space"></div>
-  <button type="button" class="od-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
-  <button type="button" class="od-first-launch-server--quiet od-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
+  <span class="bc-first-launch-server--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
+  <h2 class="bc-first-launch-server--heading">{t('serverSteps.offlineTitle')}</h2>
+  <p class="bc-first-launch-server--lead">{t(deviceKey('serverSteps.offlineHelp', kind))}</p>
+  <div class="bc-first-launch-server--space"></div>
+  <button type="button" class="bc-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
+  <button type="button" class="bc-first-launch-server--quiet bc-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
 {:else if step === 'serverDownload'}
-  <div class="od-first-launch-server--chip"><BenthicPlusChip onLight /></div>
-  <h2 class="od-first-launch-server--heading">{t('serverSteps.progressDownload')}</h2>
-  <div class="od-first-launch-server--paper">
-    <div class="od-first-launch-server--step">
-      <span class="od-first-launch-server--mark od-first-launch-server--done"><Icon name="check" size={16} weight={2.6} /></span>
-      <span class="od-first-launch-server--text">
-        <span class="od-first-launch-server--name">{t('serverSteps.progressConnect')}</span>
-        <span class="od-first-launch-server--detail">{s.email}</span>
+  <div class="bc-first-launch-server--chip"><BenthicPlusChip onLight /></div>
+  <h2 class="bc-first-launch-server--heading">{t('serverSteps.progressDownload')}</h2>
+  <div class="bc-first-launch-server--paper">
+    <div class="bc-first-launch-server--step">
+      <span class="bc-first-launch-server--mark bc-first-launch-server--done"><Icon name="check" size={16} weight={2.6} /></span>
+      <span class="bc-first-launch-server--text">
+        <span class="bc-first-launch-server--name">{t('serverSteps.progressConnect')}</span>
+        <span class="bc-first-launch-server--detail">{s.email}</span>
       </span>
     </div>
     {#if d.phase === 'refused'}
-      <div class="od-first-launch-server--step" role="alert">
-        <span class="od-first-launch-server--mark od-first-launch-server--failed"><span class="od-first-launch-server--bang" aria-hidden="true">!</span></span>
-        <span class="od-first-launch-server--text">
-          <span class="od-first-launch-server--name od-first-launch-server--name-failed">{t('serverSteps.refusedTitle')}</span>
-          <span class="od-first-launch-server--detail">{t('serverSteps.refusedDetail')}</span>
+      <div class="bc-first-launch-server--step" role="alert">
+        <span class="bc-first-launch-server--mark bc-first-launch-server--failed"><span class="bc-first-launch-server--bang" aria-hidden="true">!</span></span>
+        <span class="bc-first-launch-server--text">
+          <span class="bc-first-launch-server--name bc-first-launch-server--name-failed">{t('serverSteps.refusedTitle')}</span>
+          <span class="bc-first-launch-server--detail">{t('serverSteps.refusedDetail')}</span>
         </span>
       </div>
     {:else}
-      <div class="od-first-launch-server--step">
-        <span class="od-first-launch-server--mark od-first-launch-server--current"><span class="od-first-launch-server--dot"></span></span>
-        <span class="od-first-launch-server--text">
-          <span class="od-first-launch-server--name od-first-launch-server--name-current">{t('serverSteps.progressDownload')}</span>
-          <span class="od-first-launch-server--detail">
+      <div class="bc-first-launch-server--step">
+        <span class="bc-first-launch-server--mark bc-first-launch-server--current"><span class="bc-first-launch-server--dot"></span></span>
+        <span class="bc-first-launch-server--text">
+          <span class="bc-first-launch-server--name bc-first-launch-server--name-current">{t('serverSteps.progressDownload')}</span>
+          <span class="bc-first-launch-server--detail">
             {#if d.total}<ProgressLine done={d.done} total={d.total} count={t('serverSteps.progressCount', { done: d.done, total: d.total })} />{:else}{t('serverSteps.progressListing')}{/if}
           </span>
         </span>
       </div>
-      <div class="od-first-launch-server--bar">
+      <div class="bc-first-launch-server--bar">
         <LinearWavyProgress value={d.fraction} label={t('serverSteps.progressDownload')} />
       </div>
     {/if}
-    <div class="od-first-launch-server--step">
-      <span class="od-first-launch-server--mark"></span>
-      <span class="od-first-launch-server--text">
-        <span class="od-first-launch-server--name od-first-launch-server--waiting">{t(deviceKey('serverSteps.progressCopy', kind))}</span>
+    <div class="bc-first-launch-server--step">
+      <span class="bc-first-launch-server--mark"></span>
+      <span class="bc-first-launch-server--text">
+        <span class="bc-first-launch-server--name bc-first-launch-server--waiting">{t(deviceKey('serverSteps.progressCopy', kind))}</span>
       </span>
     </div>
   </div>
   {#if d.phase === 'refused'}
-    <div class="od-first-launch-server--space"></div>
-    <button type="button" class="od-first-launch-server--action" onclick={otherPlace}>{t('serverSteps.otherPlace')}</button>
+    <div class="bc-first-launch-server--space"></div>
+    <button type="button" class="bc-first-launch-server--action" onclick={otherPlace}>{t('serverSteps.otherPlace')}</button>
   {:else}
-    <p class="od-first-launch-server--help">{t('serverSteps.progressHelp')}</p>
-    <button type="button" class="od-first-launch-server--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+    <p class="bc-first-launch-server--help">{t('serverSteps.progressHelp')}</p>
+    <button type="button" class="bc-first-launch-server--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
   {/if}
 {/if}
 
 <style>
   @layer od.components {
-    .od-first-launch-server--heading {
+    .bc-first-launch-server--heading {
       margin: 0 0 6px;
       font-size: 28px;
       line-height: 36px;
@@ -355,27 +355,27 @@
       letter-spacing: -0.2px;
     }
 
-    .od-first-launch-server--lead {
+    .bc-first-launch-server--lead {
       margin: 0 0 20px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-server--chip {
+    .bc-first-launch-server--chip {
       margin: 2px 0 10px;
     }
 
-    .od-first-launch-server--field {
+    .bc-first-launch-server--field {
       margin-top: 14px;
     }
 
-    .od-first-launch-server--space {
+    .bc-first-launch-server--space {
       flex: none;
       height: 24px;
     }
 
-    .od-first-launch-server--tile {
+    .bc-first-launch-server--tile {
       width: 56px;
       height: 56px;
       align-self: center;
@@ -384,12 +384,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-error-container);
-      color: var(--od-error);
+      background: var(--bc-error-container);
+      color: var(--bc-error);
     }
 
     /* « Renvoyer le code dans 0:42 »: not a button, the link comes back when the countdown ends. */
-    .od-first-launch-server--countdown {
+    .bc-first-launch-server--countdown {
       align-self: flex-start;
       display: flex;
       align-items: center;
@@ -398,10 +398,10 @@
       padding: 0 4px;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-server--link {
+    .bc-first-launch-server--link {
       align-self: flex-start;
       display: flex;
       align-items: center;
@@ -410,7 +410,7 @@
       padding: 0 4px;
       border: none;
       background: transparent;
-      color: var(--od-release-row-main);
+      color: var(--bc-release-row-main);
       font: inherit;
       font-size: 14px;
       line-height: 19px;
@@ -424,7 +424,7 @@
       }
     }
 
-    .od-first-launch-server--action {
+    .bc-first-launch-server--action {
       width: auto;
       align-self: flex-end;
       display: flex;
@@ -435,8 +435,8 @@
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -445,8 +445,8 @@
 
       &:disabled {
         cursor: default;
-        background: var(--od-release-disabled-bg);
-        color: var(--od-release-disabled-text);
+        background: var(--bc-release-disabled-bg);
+        color: var(--bc-release-disabled-text);
       }
 
       @media (hover: hover) {
@@ -456,12 +456,12 @@
       }
 
       &:focus-visible {
-        outline: 2px solid var(--od-release-row-main);
+        outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
     }
 
-    .od-first-launch-server--quiet {
+    .bc-first-launch-server--quiet {
       width: auto;
       align-self: flex-end;
       height: 48px;
@@ -470,7 +470,7 @@
       border: none;
       border-radius: 24px;
       background: transparent;
-      color: var(--od-release-row-main);
+      color: var(--bc-release-row-main);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -478,70 +478,70 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
     }
 
     /* The download card, as the divelogs.de one (task 2026-11-16-230): three steps, the bar as wide as the text. */
-    .od-first-launch-server--paper {
+    .bc-first-launch-server--paper {
       margin-top: 12px;
       padding: 20px 20px 22px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .od-first-launch-server--step {
+    .bc-first-launch-server--step {
       display: flex;
       gap: 14px;
       align-items: flex-start;
     }
 
-    .od-first-launch-server--mark {
+    .bc-first-launch-server--mark {
       flex: none;
       box-sizing: border-box;
       width: 28px;
       height: 28px;
-      border: 2px solid var(--od-release-pending);
+      border: 2px solid var(--bc-release-pending);
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-release-on-panel);
+      color: var(--bc-release-on-panel);
     }
 
-    .od-first-launch-server--failed {
+    .bc-first-launch-server--failed {
       border: none;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
     }
 
-    .od-first-launch-server--bang {
+    .bc-first-launch-server--bang {
       font-size: 15px;
       line-height: 16px;
       font-weight: 700;
     }
 
-    .od-first-launch-server--done {
+    .bc-first-launch-server--done {
       border: none;
-      background: var(--od-release-ok);
+      background: var(--bc-release-ok);
     }
 
-    .od-first-launch-server--current {
-      border: 3px solid var(--od-release-row-main);
+    .bc-first-launch-server--current {
+      border: 3px solid var(--bc-release-row-main);
     }
 
-    .od-first-launch-server--dot {
+    .bc-first-launch-server--dot {
       width: 10px;
       height: 10px;
       border-radius: 5px;
-      background: var(--od-release-row-main);
+      background: var(--bc-release-row-main);
     }
 
-    .od-first-launch-server--text {
+    .bc-first-launch-server--text {
       display: flex;
       flex: 1;
       flex-direction: column;
@@ -550,57 +550,57 @@
       min-width: 0;
     }
 
-    .od-first-launch-server--name {
+    .bc-first-launch-server--name {
       font-size: 16px;
       line-height: 21px;
       font-weight: 500;
     }
 
-    .od-first-launch-server--name-current {
+    .bc-first-launch-server--name-current {
       font-weight: 600;
     }
 
-    .od-first-launch-server--name-failed {
+    .bc-first-launch-server--name-failed {
       font-weight: 600;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-first-launch-server--waiting {
-      color: var(--od-text-2);
+    .bc-first-launch-server--waiting {
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-server--detail {
+    .bc-first-launch-server--detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       overflow-wrap: anywhere;
     }
 
-    .od-first-launch-server--bar {
+    .bc-first-launch-server--bar {
       min-width: 0;
       max-width: calc(100% - 42px);
       overflow: hidden;
       margin: -4px 0 2px 42px;
-      --od-linear-wavy-progress-active: var(--od-release-row-main);
-      --od-linear-wavy-progress-track: var(--od-release-track);
+      --bc-linear-wavy-progress-active: var(--bc-release-row-main);
+      --bc-linear-wavy-progress-track: var(--bc-release-track);
     }
 
-    .od-first-launch-server--help {
+    .bc-first-launch-server--help {
       margin: 14px 0 22px;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-server--cancel {
+    .bc-first-launch-server--cancel {
       width: auto;
       align-self: flex-end;
       height: 48px;
       padding: 0 22px;
-      border: 1px solid var(--od-release-field-border);
+      border: 1px solid var(--bc-release-field-border);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -608,32 +608,32 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
     }
 
     /* Phone: a button alone takes the width of the column (task 2026-11-16-227). */
     @media (max-width: 767.98px) {
-      .od-first-launch-server--action,
-      .od-first-launch-server--cancel,
-      .od-first-launch-server--quiet {
+      .bc-first-launch-server--action,
+      .bc-first-launch-server--cancel,
+      .bc-first-launch-server--quiet {
         align-self: stretch;
         justify-content: center;
       }
 
-      .od-first-launch-server--quiet {
+      .bc-first-launch-server--quiet {
         align-self: flex-end;
       }
 
       /* « Revenir à l'accueil » is centred under the two buttons on a phone. */
-      .od-first-launch-server--home {
+      .bc-first-launch-server--home {
         align-self: center;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch-server--action {
+      .bc-first-launch-server--action {
         transition: none;
       }
     }

@@ -184,37 +184,37 @@
 </script>
 
 {#if site}
-  <section class="od-site-sheet-desk" data-od-scroll aria-label={site.name || t('sites.noName')}>
-    <header class="od-site-sheet-desk--head">
-      <div class="od-site-sheet-desk--titles">
-        <h2 class="od-site-sheet-desk--title">{site.name || t('sites.noName')}</h2>
-        {#if place}<p class="od-site-sheet-desk--place">{place}</p>{/if}
+  <section class="bc-site-sheet-desk" data-od-scroll aria-label={site.name || t('sites.noName')}>
+    <header class="bc-site-sheet-desk--head">
+      <div class="bc-site-sheet-desk--titles">
+        <h2 class="bc-site-sheet-desk--title">{site.name || t('sites.noName')}</h2>
+        {#if place}<p class="bc-site-sheet-desk--place">{place}</p>{/if}
       </div>
-      <button type="button" class="od-site-sheet-desk--outlined" onclick={() => showSiteDives(site?.name ?? '')}>{t('desktopSites.seeDives')}</button>
-      <button type="button" class="od-site-sheet-desk--icon" aria-label={t('sites.actions')} title={t('sites.actions')} aria-haspopup="menu" onclick={openMenu}><Icon name="more" size={22} /></button>
+      <button type="button" class="bc-site-sheet-desk--outlined" onclick={() => showSiteDives(site?.name ?? '')}>{t('desktopSites.seeDives')}</button>
+      <button type="button" class="bc-site-sheet-desk--icon" aria-label={t('sites.actions')} title={t('sites.actions')} aria-haspopup="menu" onclick={openMenu}><Icon name="more" size={22} /></button>
     </header>
 
-    <div class="od-site-sheet-desk--body">
-      <div class="od-site-sheet-desk--left">
+    <div class="bc-site-sheet-desk--body">
+      <div class="bc-site-sheet-desk--left">
         <DesktopSitePosMap {position} previous={pending ? saved : null} others={nearby} hint={pending ? t('desktopSites.moveHint') : ''} onmove={moved} />
 
-        <dl class="od-site-sheet-desk--figures">
-          <div><dt>{t('desktopSites.column.dives')}</dt><dd class="od-value">{site.dives}</dd></div>
-          <div><dt>{t('desktopSites.deepest')}</dt><dd class="od-value">{site.maxDepthMm ? formatDepth(site.maxDepthMm, logbook.prefs) : '—'}</dd></div>
-          <div><dt>{t('desktopSites.column.last')}</dt><dd class="od-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</dd></div>
+        <dl class="bc-site-sheet-desk--figures">
+          <div><dt>{t('desktopSites.column.dives')}</dt><dd class="bc-value">{site.dives}</dd></div>
+          <div><dt>{t('desktopSites.deepest')}</dt><dd class="bc-value">{site.maxDepthMm ? formatDepth(site.maxDepthMm, logbook.prefs) : '—'}</dd></div>
+          <div><dt>{t('desktopSites.column.last')}</dt><dd class="bc-value">{site.lastDate ? formatDate(site.lastDate) : '—'}</dd></div>
         </dl>
 
         {#if latestFirst.length}
-          <h3 class="od-site-sheet-desk--subtitle">{t('sites.divesHere')}</h3>
-          <ul class="od-site-sheet-desk--dives">
+          <h3 class="bc-site-sheet-desk--subtitle">{t('sites.divesHere')}</h3>
+          <ul class="bc-site-sheet-desk--dives">
             {#each latestFirst as dive (dive.id)}
               {@const listed = byId.get(dive.id)}
               <li>
-                <button type="button" class="od-site-sheet-desk--dive" onclick={() => openDiveInCarnet(dive.id)}>
-                  <span class="od-site-sheet-desk--number od-value">{dive.number || ''}</span>
-                  <span class="od-site-sheet-desk--dive-text">
-                    <span class="od-value">{formatDateTime(dive.date)}</span>
-                    <span class="od-site-sheet-desk--dive-sub od-value">{[lines[dive.id] ?? formatMinutes(dive.durationSeconds), listed?.maxDepthMm ? formatDepth(listed.maxDepthMm, logbook.prefs) : ''].filter(Boolean).join(' · ')}</span>
+                <button type="button" class="bc-site-sheet-desk--dive" onclick={() => openDiveInCarnet(dive.id)}>
+                  <span class="bc-site-sheet-desk--number bc-value">{dive.number || ''}</span>
+                  <span class="bc-site-sheet-desk--dive-text">
+                    <span class="bc-value">{formatDateTime(dive.date)}</span>
+                    <span class="bc-site-sheet-desk--dive-sub bc-value">{[lines[dive.id] ?? formatMinutes(dive.durationSeconds), listed?.maxDepthMm ? formatDepth(listed.maxDepthMm, logbook.prefs) : ''].filter(Boolean).join(' · ')}</span>
                   </span>
                   <Icon name="chevron" size={18} />
                 </button>
@@ -224,8 +224,8 @@
         {/if}
       </div>
 
-      <div class="od-site-sheet-desk--right">
-        <div class="od-site-sheet-desk--fields">
+      <div class="bc-site-sheet-desk--right">
+        <div class="bc-site-sheet-desk--fields">
           <label for="od-site-name">{t('sites.name')}</label>
           <DesktopSiteField id="od-site-name" bind:this={nameField} value={site.name} placeholder={t('desktopSites.addName')} onkeep={(v) => edit('name', v.trim())} />
 
@@ -272,7 +272,7 @@
           <label for="od-site-notes">{t('sites.notes')}</label>
           <DesktopSiteField id="od-site-notes" multiline value={site.notes} placeholder={t('desktopSites.addNotes')} onkeep={(v) => edit('notes', v)} />
         </div>
-        <p class="od-site-sheet-desk--saved"><Icon name="info" size={16} />{t('desktopSites.savedAtOnce')}</p>
+        <p class="bc-site-sheet-desk--saved"><Icon name="info" size={16} />{t('desktopSites.savedAtOnce')}</p>
       </div>
     </div>
   </section>
@@ -283,7 +283,7 @@
 
 <style>
   @layer od.components {
-    .od-site-sheet-desk {
+    .bc-site-sheet-desk {
       box-sizing: border-box;
       height: 100%;
       overflow: auto;
@@ -291,46 +291,46 @@
       container-type: inline-size;
       padding: 0 12px 24px 4px;
     }
-    .od-site-sheet-desk--head {
+    .bc-site-sheet-desk--head {
       display: flex;
       align-items: flex-start;
       gap: 8px;
       padding: 4px 0 12px;
     }
-    .od-site-sheet-desk--titles {
+    .bc-site-sheet-desk--titles {
       flex: 1;
       min-width: 0;
     }
-    .od-site-sheet-desk--title {
+    .bc-site-sheet-desk--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       line-height: 30px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-site-sheet-desk--place {
+    .bc-site-sheet-desk--place {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-sheet-desk--outlined {
+    .bc-site-sheet-desk--outlined {
       flex: none;
       width: auto;
       height: 40px;
       padding: 0 20px;
-      border: 1px solid var(--od-outline);
+      border: 1px solid var(--bc-outline);
       border-radius: 20px;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-site-sheet-desk--outlined:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-site-sheet-desk--outlined:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-site-sheet-desk--icon {
+    .bc-site-sheet-desk--icon {
       display: grid;
       place-items: center;
       width: 40px;
@@ -338,51 +338,51 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-site-sheet-desk--icon:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-site-sheet-desk--icon:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-site-sheet-desk--body {
+    .bc-site-sheet-desk--body {
       display: grid;
       grid-template-columns: minmax(280px, 330px) minmax(300px, 1fr);
       gap: 20px;
       align-items: start;
     }
     @container (max-width: 639px) {
-      .od-site-sheet-desk--body {
+      .bc-site-sheet-desk--body {
         grid-template-columns: minmax(0, 1fr);
       }
     }
-    .od-site-sheet-desk--figures {
+    .bc-site-sheet-desk--figures {
       display: flex;
       gap: 28px;
       margin: 12px 0 0;
     }
-    .od-site-sheet-desk--figures dt {
+    .bc-site-sheet-desk--figures dt {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-sheet-desk--figures dd {
+    .bc-site-sheet-desk--figures dd {
       margin: 0;
       font-size: 20px;
       font-weight: 500;
     }
-    .od-site-sheet-desk--subtitle {
+    .bc-site-sheet-desk--subtitle {
       margin: 16px 0 8px;
       font-size: 14px;
       font-weight: 600;
     }
-    .od-site-sheet-desk--dives {
+    .bc-site-sheet-desk--dives {
       margin: 0;
       padding: 0;
       list-style: none;
       border-radius: 16px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-site-sheet-desk--dive {
+    .bc-site-sheet-desk--dive {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -391,49 +391,49 @@
       border: 0;
       background: none;
       font: inherit;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-align: start;
       cursor: pointer;
     }
-    .od-site-sheet-desk--dive:hover {
-      background: color-mix(in srgb, var(--od-text) 5%, transparent);
+    .bc-site-sheet-desk--dive:hover {
+      background: color-mix(in srgb, var(--bc-text) 5%, transparent);
     }
-    .od-site-sheet-desk--number {
+    .bc-site-sheet-desk--number {
       flex: none;
       min-width: 24px;
       text-align: end;
       font-size: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-sheet-desk--dive-text {
+    .bc-site-sheet-desk--dive-text {
       display: flex;
       flex: 1;
       flex-direction: column;
       min-width: 0;
       font-size: 15px;
     }
-    .od-site-sheet-desk--dive-sub {
+    .bc-site-sheet-desk--dive-sub {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-sheet-desk--fields {
+    .bc-site-sheet-desk--fields {
       display: grid;
       grid-template-columns: 110px minmax(0, 1fr);
       gap: 8px 12px;
       align-items: start;
     }
-    .od-site-sheet-desk--fields > label {
+    .bc-site-sheet-desk--fields > label {
       padding-top: 10px;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-site-sheet-desk--saved {
+    .bc-site-sheet-desk--saved {
       display: flex;
       align-items: center;
       gap: 8px;
       margin: 16px 0 0;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

@@ -412,71 +412,71 @@
 
 <svelte:window bind:innerHeight={windowHeight} />
 
-<Page class="od-desktop-statistics" pageContent={false}>
-  <div class="od-desktop-statistics--frame">
-    <header class="od-desktop-statistics--bar">
-      <h1 class="od-desktop-statistics--title">{t('stats.title')}</h1>
-      {#if summary}<p class="od-desktop-statistics--summary od-value" title={summary}>{summary}</p>{/if}
-      <span class="od-desktop-statistics--spacer"></span>
-      <button type="button" class="od-desktop-statistics--icon-button" aria-label={t('desktopStats.undo')} title="{t('desktopStats.undo')} ({mod}Z)" disabled={!logbook.undoText} onclick={() => step('undo')}>
+<Page class="bc-desktop-statistics" pageContent={false}>
+  <div class="bc-desktop-statistics--frame">
+    <header class="bc-desktop-statistics--bar">
+      <h1 class="bc-desktop-statistics--title">{t('stats.title')}</h1>
+      {#if summary}<p class="bc-desktop-statistics--summary bc-value" title={summary}>{summary}</p>{/if}
+      <span class="bc-desktop-statistics--spacer"></span>
+      <button type="button" class="bc-desktop-statistics--icon-button" aria-label={t('desktopStats.undo')} title="{t('desktopStats.undo')} ({mod}Z)" disabled={!logbook.undoText} onclick={() => step('undo')}>
         <Icon name="undo" size={22} />
       </button>
-      <button type="button" class="od-desktop-statistics--icon-button" aria-label={t('desktopStats.redo')} title="{t('desktopStats.redo')} ({desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z'})" disabled={!logbook.redoText} onclick={() => step('redo')}>
+      <button type="button" class="bc-desktop-statistics--icon-button" aria-label={t('desktopStats.redo')} title="{t('desktopStats.redo')} ({desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z'})" disabled={!logbook.redoText} onclick={() => step('redo')}>
         <Icon name="redo" size={22} />
       </button>
-      <button type="button" class="od-desktop-statistics--icon-button" aria-label={t('desktopStats.more')} title={t('desktopStats.more')} aria-haspopup="menu" onclick={openMore}>
+      <button type="button" class="bc-desktop-statistics--icon-button" aria-label={t('desktopStats.more')} title={t('desktopStats.more')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
     </header>
 
     {#if logbook.loading}
-      <p class="od-desktop-statistics--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
+      <p class="bc-desktop-statistics--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
     {:else if !logbook.dives.length}
-      <div class="od-desktop-statistics--state">
-        <h2 class="od-state-title">{t('stats.emptyTitle')}</h2>
+      <div class="bc-desktop-statistics--state">
+        <h2 class="bc-state-title">{t('stats.emptyTitle')}</h2>
         <p>{t('stats.emptyText')}</p>
       </div>
     {:else}
-      <div class="od-desktop-statistics--body">
+      <div class="bc-desktop-statistics--body">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <section class="od-desktop-statistics--list" data-od-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
+        <section class="bc-desktop-statistics--list" data-od-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
           <ul role="list">
             {#each rows as row (row.key)}
               <li>
                 <button
                   type="button"
-                  class="od-desktop-statistics--item"
-                  class:od-desktop-statistics--item-selected={row.key === selected}
+                  class="bc-desktop-statistics--item"
+                  class:bc-desktop-statistics--item-selected={row.key === selected}
                   aria-current={row.key === selected ? 'true' : undefined}
                   data-stat={row.key}
                   onclick={() => choose(row.key)}
                 >
-                  <span class="od-desktop-statistics--tile"><DesktopStatIcon name={row.icon} /></span>
-                  <span class="od-desktop-statistics--text">
-                    <span class="od-desktop-statistics--item-title">{row.title}</span>
-                    <span class="od-desktop-statistics--item-subtitle od-value">{row.subtitle}</span>
+                  <span class="bc-desktop-statistics--tile"><DesktopStatIcon name={row.icon} /></span>
+                  <span class="bc-desktop-statistics--text">
+                    <span class="bc-desktop-statistics--item-title">{row.title}</span>
+                    <span class="bc-desktop-statistics--item-subtitle bc-value">{row.subtitle}</span>
                   </span>
                   <DesktopStatPreview preview={row.preview} downward={row.downward} />
                 </button>
               </li>
             {/each}
           </ul>
-          <button type="button" class="od-desktop-statistics--outlined od-desktop-statistics--new" onclick={() => f7router?.navigate('/statistics/new')}>{t('desktopStats.newStatistic')}</button>
+          <button type="button" class="bc-desktop-statistics--outlined bc-desktop-statistics--new" onclick={() => f7router?.navigate('/statistics/new')}>{t('desktopStats.newStatistic')}</button>
         </section>
 
-        <div class="od-desktop-statistics--divider" role="separator" aria-orientation="vertical"></div>
+        <div class="bc-desktop-statistics--divider" role="separator" aria-orientation="vertical"></div>
 
-        <section class="od-desktop-statistics--detail" aria-label={current.title}>
-          <div class="od-desktop-statistics--detail-head">
-            <h2 class="od-desktop-statistics--detail-title">{current.title}</h2>
+        <section class="bc-desktop-statistics--detail" aria-label={current.title}>
+          <div class="bc-desktop-statistics--detail-head">
+            <h2 class="bc-desktop-statistics--detail-title">{current.title}</h2>
             {#if !isHeat}
-              <button type="button" class="od-desktop-statistics--outlined" disabled={!bars.length} onclick={exportChart}>{t('desktopStats.exportChart')}</button>
+              <button type="button" class="bc-desktop-statistics--outlined" disabled={!bars.length} onclick={exportChart}>{t('desktopStats.exportChart')}</button>
             {/if}
           </div>
           {#if isHeat}
             <HeatMapCard dives={chartDives} {sites} height="clamp(200px, calc(100vh - 330px), 420px)" />
           {:else}
-            <div class="od-desktop-statistics--card">
+            <div class="bc-desktop-statistics--card">
               {#if bars.length}
                 <DesktopStatChart
                   bind:svg={chartSvg}
@@ -490,15 +490,15 @@
                   unit={axis.unit}
                 />
               {:else}
-                <p class="od-desktop-statistics--none">{kind === 'sac' ? t('desktopStats.noSac') : t('desktopStats.noData')}</p>
+                <p class="bc-desktop-statistics--none">{kind === 'sac' ? t('desktopStats.noSac') : t('desktopStats.noData')}</p>
               {/if}
             </div>
             {#if figures.length}
-              <dl class="od-desktop-statistics--figures">
+              <dl class="bc-desktop-statistics--figures">
                 {#each figures as f (f.label)}
-                  <div class="od-desktop-statistics--figure">
+                  <div class="bc-desktop-statistics--figure">
                     <dt>{f.label}</dt>
-                    <dd class="od-value">{f.value}</dd>
+                    <dd class="bc-value">{f.value}</dd>
                   </div>
                 {/each}
               </dl>
@@ -516,21 +516,21 @@
 
 <style>
   @layer od.components {
-    .od-desktop-statistics--frame {
+    .bc-desktop-statistics--frame {
       position: relative;
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
 
     /* A page that is not the master of a master-detail pair: no « nothing chosen » cover over it. */
-    :global(.views .view-master-detail:has(.od-desktop-statistics)::after) {
+    :global(.views .view-master-detail:has(.bc-desktop-statistics)::after) {
       content: none;
       display: none;
     }
 
-    .od-desktop-statistics--bar {
+    .bc-desktop-statistics--bar {
       flex: none;
       display: flex;
       align-items: center;
@@ -539,38 +539,38 @@
       padding: 0 16px 0 24px;
     }
 
-    .od-desktop-statistics--title {
+    .bc-desktop-statistics--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-desktop-statistics--summary {
+    .bc-desktop-statistics--summary {
       margin: 0 0 0 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-desktop-statistics--spacer {
+    .bc-desktop-statistics--spacer {
       flex: 1;
     }
 
     /* The outlined button: 40 dp, a pill. */
-    .od-desktop-statistics--outlined {
+    .bc-desktop-statistics--outlined {
       flex: none;
       width: auto;
       height: 40px;
       padding: 0 16px;
       box-sizing: border-box;
-      border: 1px solid var(--od-separator);
+      border: 1px solid var(--bc-separator);
       border-radius: 20px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       display: inline-flex;
@@ -581,16 +581,16 @@
       cursor: pointer;
     }
 
-    .od-desktop-statistics--outlined:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-statistics--outlined:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
 
-    .od-desktop-statistics--outlined:disabled {
+    .bc-desktop-statistics--outlined:disabled {
       opacity: 0.38;
       cursor: default;
     }
 
-    .od-desktop-statistics--icon-button {
+    .bc-desktop-statistics--icon-button {
       display: grid;
       place-items: center;
       width: 44px;
@@ -598,32 +598,32 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
 
-    .od-desktop-statistics--icon-button:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-statistics--icon-button:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
 
-    .od-desktop-statistics--icon-button:disabled {
+    .bc-desktop-statistics--icon-button:disabled {
       opacity: 0.38;
       cursor: default;
     }
 
-    .od-desktop-statistics--state {
+    .bc-desktop-statistics--state {
       margin: 32px 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-statistics--body {
+    .bc-desktop-statistics--body {
       flex: 1;
       min-height: 0;
       display: flex;
     }
 
     /* The list of statistics: 340 dp. */
-    .od-desktop-statistics--list {
+    .bc-desktop-statistics--list {
       flex: none;
       width: 340px;
       padding-top: 8px;
@@ -632,14 +632,14 @@
       box-sizing: border-box;
     }
 
-    .od-desktop-statistics--list ul {
+    .bc-desktop-statistics--list ul {
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
     /* A row: 72 dp, 12 dp corners, 8 dp side margins, 4 dp between rows. */
-    .od-desktop-statistics--item {
+    .bc-desktop-statistics--item {
       width: calc(100% - 16px);
       height: 72px;
       margin: 0 8px 4px;
@@ -648,7 +648,7 @@
       border: 0;
       border-radius: 12px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -657,73 +657,73 @@
       cursor: pointer;
     }
 
-    .od-desktop-statistics--item:hover:not(.od-desktop-statistics--item-selected) {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-desktop-statistics--item:hover:not(.bc-desktop-statistics--item-selected) {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
 
-    .od-desktop-statistics--item-selected {
-      background: var(--od-table-selected);
-      color: var(--od-on-table-selected);
+    .bc-desktop-statistics--item-selected {
+      background: var(--bc-table-selected);
+      color: var(--bc-on-table-selected);
     }
 
-    .od-desktop-statistics--tile {
+    .bc-desktop-statistics--tile {
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-desktop-statistics--item-selected .od-desktop-statistics--tile {
-      background: var(--od-surface);
+    .bc-desktop-statistics--item-selected .bc-desktop-statistics--tile {
+      background: var(--bc-surface);
     }
 
-    .od-desktop-statistics--text {
+    .bc-desktop-statistics--text {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-desktop-statistics--item-title {
+    .bc-desktop-statistics--item-title {
       font-size: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-desktop-statistics--item-selected .od-desktop-statistics--item-title {
+    .bc-desktop-statistics--item-selected .bc-desktop-statistics--item-title {
       font-weight: 600;
     }
 
-    .od-desktop-statistics--item-subtitle {
+    .bc-desktop-statistics--item-subtitle {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-desktop-statistics--item-selected .od-desktop-statistics--item-subtitle {
-      color: var(--od-on-table-selected);
+    .bc-desktop-statistics--item-selected .bc-desktop-statistics--item-subtitle {
+      color: var(--bc-on-table-selected);
     }
 
-    .od-desktop-statistics--new {
+    .bc-desktop-statistics--new {
       margin: 12px 8px;
       width: auto;
     }
 
-    .od-desktop-statistics--divider {
+    .bc-desktop-statistics--divider {
       flex: none;
       width: 1px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
 
     /* The chosen statistic. */
-    .od-desktop-statistics--detail {
+    .bc-desktop-statistics--detail {
       flex: 1;
       min-width: 0;
       padding: 8px 24px 24px;
@@ -733,55 +733,55 @@
       overflow-y: auto;
     }
 
-    .od-desktop-statistics--detail-head {
+    .bc-desktop-statistics--detail-head {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-desktop-statistics--detail-title {
+    .bc-desktop-statistics--detail-title {
       flex: 1;
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-desktop-statistics--card {
+    .bc-desktop-statistics--card {
       padding: 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-desktop-statistics--none {
+    .bc-desktop-statistics--none {
       margin: 24px 8px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-statistics--figures {
+    .bc-desktop-statistics--figures {
       margin: 0;
       display: flex;
       flex-wrap: wrap;
       gap: 16px 32px;
     }
 
-    .od-desktop-statistics--figure dt {
+    .bc-desktop-statistics--figure dt {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desktop-statistics--figure dd {
+    .bc-desktop-statistics--figure dd {
       margin: 0;
       font-size: 20px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-statistics--item-selected:hover {
+      .bc-desktop-statistics--item-selected:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }

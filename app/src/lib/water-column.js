@@ -1,6 +1,6 @@
 // @ts-check
 // Water column (docs/ui-specification.md, section 4): vertical gradient
-// from --od-water-top to a mix of --od-water-top and --od-water-bottom, in the
+// from --bc-water-top to a mix of --bc-water-top and --bc-water-bottom, in the
 // ratio max depth / 60 m, capped at 1. The same scale applies to every dive.
 
 const DARKEST_DEPTH_MM = 60000;
@@ -12,5 +12,5 @@ const DARKEST_DEPTH_MM = 60000;
 export function waterBottomColor(maxDepthMm) {
   const ratio = Math.min(1, Math.max(0, maxDepthMm / DARKEST_DEPTH_MM));
   const percent = Math.round(ratio * 1000) / 10;
-  return `color-mix(in srgb, var(--od-water-bottom) ${percent}%, var(--od-water-top))`;
+  return `color-mix(in srgb, var(--bc-water-bottom) ${percent}%, var(--bc-water-top))`;
 }

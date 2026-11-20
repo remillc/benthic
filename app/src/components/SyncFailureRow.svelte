@@ -37,16 +37,16 @@
 {#if pill}
   <SyncPill icon={conflict ? 'sync' : 'warning'} {text} onclick={open} />
 {:else}
-  <button type="button" class="od-sync-failure-row od-sync-failure-row--failure" aria-haspopup="dialog" onclick={open}>
+  <button type="button" class="bc-sync-failure-row bc-sync-failure-row--failure" aria-haspopup="dialog" onclick={open}>
     <Icon name={conflict ? 'sync' : 'warning'} size={18} weight={2} />
-    <span class="od-sync-failure-row--text">{text}</span>
+    <span class="bc-sync-failure-row--text">{text}</span>
     <Icon name="chevron" size={18} weight={2} />
   </button>
 {/if}
 
 <style>
   @layer od.components {
-    .od-sync-failure-row--failure {
+    .bc-sync-failure-row--failure {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -55,7 +55,7 @@
       padding: 8px 16px;
       border: none;
       background: transparent;
-      color: var(--od-pending);
+      color: var(--bc-pending);
       font: inherit;
       font-size: 14px;
       line-height: 20px;
@@ -67,7 +67,7 @@
       }
     }
 
-    .od-sync-failure-row--text {
+    .bc-sync-failure-row--text {
       flex: 1;
       min-width: 0;
     }

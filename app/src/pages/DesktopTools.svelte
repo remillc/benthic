@@ -98,38 +98,38 @@
     const next = DESKTOP_TOOLS[(at + (e.key === 'ArrowDown' ? 1 : -1) + DESKTOP_TOOLS.length) % DESKTOP_TOOLS.length];
     e.preventDefault();
     openTool(next.id);
-    queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.od-desktop-tools--row[data-tool="${next.id}"]`))?.focus());
+    queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.bc-desktop-tools--row[data-tool="${next.id}"]`))?.focus());
   }
   const current = $derived(DESKTOP_TOOLS.find((tool) => tool.id === desktopTools.tool) ?? DESKTOP_TOOLS[0]);
   $effect(() => load(current.id));
 </script>
 
-<Page class="od-desktop-tools" pageContent={false}>
-  <div class="od-desktop-tools--frame">
-    <header class="od-desktop-tools--bar">
-      <h1 class="od-desktop-tools--title">{t('tools.title')}</h1>
-      <p class="od-desktop-tools--summary">{t('band.tools')}</p>
+<Page class="bc-desktop-tools" pageContent={false}>
+  <div class="bc-desktop-tools--frame">
+    <header class="bc-desktop-tools--bar">
+      <h1 class="bc-desktop-tools--title">{t('tools.title')}</h1>
+      <p class="bc-desktop-tools--summary">{t('band.tools')}</p>
     </header>
 
-    <div class="od-desktop-tools--columns">
-      <nav class="od-desktop-tools--list" data-od-scroll aria-label={t('tools.title')}>
+    <div class="bc-desktop-tools--columns">
+      <nav class="bc-desktop-tools--list" data-od-scroll aria-label={t('tools.title')}>
         {#each groups as group (group.id)}
-          <h2 class="od-desktop-tools--heading">{t(group.heading)}</h2>
+          <h2 class="bc-desktop-tools--heading">{t(group.heading)}</h2>
           <ul role="list" onkeydown={listKey}>
             {#each DESKTOP_TOOLS.filter((tool) => tool.group === group.id) as tool (tool.id)}
               <li>
                 <button
                   type="button"
-                  class="od-desktop-tools--row"
-                  class:od-desktop-tools--selected={desktopTools.tool === tool.id}
+                  class="bc-desktop-tools--row"
+                  class:bc-desktop-tools--selected={desktopTools.tool === tool.id}
                   data-tool={tool.id}
                   aria-current={desktopTools.tool === tool.id ? 'page' : undefined}
                   onclick={() => openTool(tool.id)}
                 >
-                  <span class="od-desktop-tools--tile"><Icon name={tool.icon} size={22} /></span>
-                  <span class="od-desktop-tools--texts">
-                    <span class="od-desktop-tools--name">{t(tool.name)}</span>
-                    <span class="od-desktop-tools--line od-value">{lineOf(tool.id, tool.text)}</span>
+                  <span class="bc-desktop-tools--tile"><Icon name={tool.icon} size={22} /></span>
+                  <span class="bc-desktop-tools--texts">
+                    <span class="bc-desktop-tools--name">{t(tool.name)}</span>
+                    <span class="bc-desktop-tools--line bc-value">{lineOf(tool.id, tool.text)}</span>
                   </span>
                 </button>
               </li>
@@ -138,12 +138,12 @@
         {/each}
       </nav>
 
-      <main class="od-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
+      <main class="bc-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
           <!-- The tools are their own chunks, read when first shown. -->
           {#if loaded.planner}{@const Planner = loaded.planner}<Planner />{/if}
         {:else}
-          <h2 class="od-desktop-tools--pane-title">{t(current.name)}</h2>
+          <h2 class="bc-desktop-tools--pane-title">{t(current.name)}</h2>
           {#if current.id === 'desaturation'}
             {#if loaded.desaturation}{@const Desaturation = loaded.desaturation}<Desaturation />{/if}
           {:else if current.id === 'eadMod'}
@@ -161,56 +161,56 @@
 
 <style>
   @layer od.components {
-    .od-desktop-tools--frame {
+    .bc-desktop-tools--frame {
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--od-background);
+      background: var(--bc-background);
     }
-    .od-desktop-tools--bar {
+    .bc-desktop-tools--bar {
       display: flex;
       align-items: baseline;
       gap: 16px;
       padding: 16px 24px 12px;
     }
-    .od-desktop-tools--title {
+    .bc-desktop-tools--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 22px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-tools--summary {
+    .bc-desktop-tools--summary {
       margin: 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-tools--columns {
+    .bc-desktop-tools--columns {
       display: flex;
       flex: 1;
       min-height: 0;
     }
-    .od-desktop-tools--list {
+    .bc-desktop-tools--list {
       flex: none;
       /* Fluid layout: 320 dp from 1280 dp of window, narrower below. */
       width: clamp(260px, 25vw, 320px);
       padding: 8px 8px 24px 12px;
-      border-right: 1px solid var(--od-separator);
+      border-right: 1px solid var(--bc-separator);
       overflow-y: auto;
     }
-    .od-desktop-tools--list ul {
+    .bc-desktop-tools--list ul {
       margin: 0;
       padding: 0;
       list-style: none;
     }
-    .od-desktop-tools--heading {
+    .bc-desktop-tools--heading {
       margin: 12px 0 4px;
       padding: 0 12px;
       font-size: 13px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-tools--row {
+    .bc-desktop-tools--row {
       display: flex;
       align-items: center;
       gap: 14px;
@@ -222,59 +222,59 @@
       background: none;
       font: inherit;
       text-align: left;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-desktop-tools--row:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-desktop-tools--row:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-desktop-tools--row:focus-visible {
-      outline: 2px solid var(--od-text);
+    .bc-desktop-tools--row:focus-visible {
+      outline: 2px solid var(--bc-text);
       outline-offset: -2px;
     }
-    .od-desktop-tools--selected,
-    .od-desktop-tools--selected:hover {
-      background: var(--od-desktop-selected);
-      color: var(--od-desktop-selected-ink);
+    .bc-desktop-tools--selected,
+    .bc-desktop-tools--selected:hover {
+      background: var(--bc-desktop-selected);
+      color: var(--bc-desktop-selected-ink);
     }
-    .od-desktop-tools--tile {
+    .bc-desktop-tools--tile {
       display: grid;
       place-items: center;
       flex: none;
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      background: var(--od-desktop-field);
-      color: var(--od-text);
+      background: var(--bc-desktop-field);
+      color: var(--bc-text);
     }
-    .od-desktop-tools--selected .od-desktop-tools--tile {
-      background: var(--od-surface);
-      color: var(--od-desktop-selected-ink);
+    .bc-desktop-tools--selected .bc-desktop-tools--tile {
+      background: var(--bc-surface);
+      color: var(--bc-desktop-selected-ink);
     }
-    .od-desktop-tools--texts {
+    .bc-desktop-tools--texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
-    .od-desktop-tools--name {
+    .bc-desktop-tools--name {
       font-size: 16px;
       line-height: 1.25;
     }
-    .od-desktop-tools--selected .od-desktop-tools--name {
+    .bc-desktop-tools--selected .bc-desktop-tools--name {
       font-weight: 500;
     }
-    .od-desktop-tools--line {
+    .bc-desktop-tools--line {
       font-size: 14px;
       line-height: 1.25;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .od-desktop-tools--selected .od-desktop-tools--line {
-      color: var(--od-desktop-selected-ink);
+    .bc-desktop-tools--selected .bc-desktop-tools--line {
+      color: var(--bc-desktop-selected-ink);
     }
-    .od-desktop-tools--pane {
+    .bc-desktop-tools--pane {
       flex: 1;
       min-width: 0;
       padding: 8px 32px 32px;
@@ -282,32 +282,32 @@
       /* The tools lay out by the pane's width, not the window's (@container od-tool). */
       container: od-tool / inline-size;
     }
-    .od-desktop-tools--pane-title {
+    .bc-desktop-tools--pane-title {
       margin: 0 0 20px;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
 
     /* A short window: the bar, the rows and the pane's margins take less room, so that more of the tool shows. */
     @media (max-height: 700px) {
-      .od-desktop-tools--bar {
+      .bc-desktop-tools--bar {
         padding-top: 8px;
         padding-bottom: 4px;
       }
-      .od-desktop-tools--row {
+      .bc-desktop-tools--row {
         height: 56px;
       }
-      .od-desktop-tools--heading {
+      .bc-desktop-tools--heading {
         margin-top: 8px;
       }
-      .od-desktop-tools--pane {
+      .bc-desktop-tools--pane {
         padding-top: 4px;
         padding-bottom: 16px;
       }
-      .od-desktop-tools--pane-title {
+      .bc-desktop-tools--pane-title {
         margin-bottom: 12px;
         font-size: 20px;
       }
@@ -315,10 +315,10 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-tools--row {
+      .bc-desktop-tools--row {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-tools--row:hover {
+      .bc-desktop-tools--row:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }

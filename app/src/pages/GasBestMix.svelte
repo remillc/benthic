@@ -89,50 +89,50 @@
   });
 </script>
 
-<Page class="od-gas-best-mix">
+<Page class="bc-gas-best-mix">
   <Navbar title={t('tools.bestMixTool')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('common.back')}</span>
+        <span class="bc-sr-only">{t('common.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="od-gas-best-mix--modes">
+  <div class="bc-gas-best-mix--modes">
     <ButtonGroup ariaLabel={t('tools.blendMode')} value={mode} options={MODES.map((choice) => ({ value: choice, label: t(`tools.${choice}`) }))} onchange={(choice) => (mode = /** @type {any} */ (choice))} />
   </div>
 
-  <div class="od-gas-best-mix--pair">
-    <div class="od-gas-best-mix--cell">
+  <div class="bc-gas-best-mix--pair">
+    <div class="bc-gas-best-mix--cell">
       <TextField label={t('tools.depth')} bind:value={depth} inputmode="decimal" invalid={depthInvalid} supporting={depthInvalid ? t('tools.depthInvalid') : ''}>
-        {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
       </TextField>
     </div>
-    <div class="od-gas-best-mix--cell">
+    <div class="bc-gas-best-mix--cell">
       <SelectField label={t('tools.waterType')} bind:value={water} options={WATER_TYPES.map((w) => ({ value: w.id, label: waterTypeName(w.id) }))} />
     </div>
   </div>
 
-  <div class="od-gas-best-mix--gap"></div>
+  <div class="bc-gas-best-mix--gap"></div>
   <!-- The pO2 takes one column; the trimix adds the maximum END in the other. -->
-  <div class="od-gas-best-mix--pair">
-    <div class="od-gas-best-mix--cell"><Po2Field bind:value={po2} /></div>
-    <div class="od-gas-best-mix--cell">
+  <div class="bc-gas-best-mix--pair">
+    <div class="bc-gas-best-mix--cell"><Po2Field bind:value={po2} /></div>
+    <div class="bc-gas-best-mix--cell">
       {#if trimix}
         <TextField label={t('tools.maxEnd')} bind:value={maxEnd} inputmode="decimal" invalid={endInvalid} supporting={endInvalid ? t('tools.depthInvalid') : t('tools.maxEndHelp')}>
-          {#snippet trailing()}<span class="od-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
+          {#snippet trailing()}<span class="bc-gas-best-mix--unit">{depthUnit(logbook.prefs)}</span>{/snippet}
         </TextField>
       {/if}
     </div>
   </div>
 
   <GasResults title={t('tools.bestMixResults')} {rows} />
-  <p class="od-gas-best-mix--caption">
+  <p class="bc-gas-best-mix--caption">
     {t(trimix ? (logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic') : 'tools.bestMixNoteNitrox')}
   </p>
   {#if result}
-    <a class="od-outlined-button od-gas-best-mix--prepare" href="/tools/blender" onclick={prepare}>
+    <a class="bc-outlined-button bc-gas-best-mix--prepare" href="/tools/blender" onclick={prepare}>
       <Icon name="blender" size={18} />
       <span>{prepareLabel}</span>
     </a>
@@ -141,13 +141,13 @@
 
 <style>
   @layer od.components {
-    .od-gas-best-mix--pair {
+    .bc-gas-best-mix--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
       align-items: flex-start;
 
-      :global(.od-text-field--field) {
+      :global(.bc-text-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -155,34 +155,34 @@
       }
     }
 
-    .od-gas-best-mix--modes {
+    .bc-gas-best-mix--modes {
       margin: 8px 16px 0;
     }
 
     /* Each half of a row; the fields inside take its whole width. */
-    .od-gas-best-mix--cell {
+    .bc-gas-best-mix--cell {
       flex: 1;
       min-width: 0;
-      --od-field-margin: 0;
+      --bc-field-margin: 0;
     }
 
-    .od-gas-best-mix--gap {
+    .bc-gas-best-mix--gap {
       height: 16px;
     }
 
-    .od-gas-best-mix--unit {
+    .bc-gas-best-mix--unit {
       display: block;
       padding: 24px 8px 0 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      :global(.od-text-field--field:not(.od-text-field--floated)) & {
+      :global(.bc-text-field--field:not(.bc-text-field--floated)) & {
         visibility: hidden;
       }
     }
 
-    .od-gas-best-mix--prepare {
+    .bc-gas-best-mix--prepare {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -192,12 +192,12 @@
       text-decoration: none;
     }
 
-    .od-gas-best-mix--caption {
+    .bc-gas-best-mix--caption {
       margin: 8px 20px 16px;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

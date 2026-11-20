@@ -55,7 +55,7 @@ test('the beta path is unchanged: WelcomeStart knows nothing of the edition, the
   const beta = read('pages/WelcomeStart.svelte');
   // The alpha's own phone band and tablet panel (FirstLaunchBand, FirstLaunchPanel, tasks 233 and 237, on main) is not the release edition.
   assert.doesNotMatch(beta, /edition|release|FirstLaunch(?!Band|Panel|.tabletStart)/i);
-  assert.match(beta, /od-first-panelled/);
+  assert.match(beta, /bc-first-panelled/);
   assert.match(beta, /welcome\.noAccountNote\$\{deviceSuffix\(deviceKind\(\)\)\}/);
   assert.match(read('App.svelte'), /component: isRelease \? WelcomeEntry : WelcomeStart/);
   // The release edition shows its own screen on phones too (task 2026-11-16-227): never the beta one.
@@ -406,11 +406,11 @@ test('shared-axis X: 30 dp, the leaving step fades in the first 30 %, « Retour 
   const s = sources.steps;
   assert.match(s, /translate: 30px 0/);
   assert.match(s, /translate: -30px 0/);
-  assert.match(s, /od-first-launch--in-forward/);
-  assert.match(s, /od-first-launch--out-back/);
+  assert.match(s, /bc-first-launch--in-forward/);
+  assert.match(s, /bc-first-launch--out-back/);
   assert.match(s, /\* 0\.3/);
-  assert.match(s, /--od-motion-spatial-default/);
-  assert.match(s, /--od-motion-effects-default/);
+  assert.match(s, /--bc-motion-spatial-default/);
+  assert.match(s, /--bc-motion-effects-default/);
   assert.match(s, /prefers-reduced-motion: reduce/);
   assert.match(s, /reducedMotion\(\) \? 0/);
   assert.match(sources.state, /flow\.direction = 'back'/);
@@ -425,12 +425,12 @@ test('every action has the hand pointer and a hover state; no colour is written 
   assert.match(sources.field, /@media \(hover: hover\)/);
   assert.doesNotMatch(sources.field, /#[0-9A-Fa-f]{3,8}\b|rgb\(/);
   const theme = read('theme.css');
-  for (const name of ['--od-release-panel-1', '--od-release-glow', '--od-release-tile', '--od-release-note', '--od-release-ok', '--od-release-field-border']) {
+  for (const name of ['--bc-release-panel-1', '--bc-release-glow', '--bc-release-tile', '--bc-release-note', '--bc-release-ok', '--bc-release-field-border']) {
     assert.ok(theme.includes(`${name}:`), name);
   }
-  assert.ok(theme.slice(theme.indexOf('html.dark {')).includes('--od-release-ok:'));
-  for (const gone of ['--od-release-scrim', '--od-release-dialog-shadow', '--od-release-label']) assert.ok(!theme.includes(gone), gone);
-  assert.match(sources.steps, /class="od-first-launch"/);
+  assert.ok(theme.slice(theme.indexOf('html.dark {')).includes('--bc-release-ok:'));
+  for (const gone of ['--bc-release-scrim', '--bc-release-dialog-shadow', '--bc-release-label']) assert.ok(!theme.includes(gone), gone);
+  assert.match(sources.steps, /class="bc-first-launch"/);
 });
 
 test('every step shows the help link « Une question ? À propos et contact » (task 219)', () => {

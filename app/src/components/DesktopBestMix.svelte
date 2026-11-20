@@ -77,10 +77,10 @@
   const note = $derived(t(trimix ? (logbook.prefs.o2narcotic ? 'tools.bestMixNoteNarcotic' : 'tools.bestMixNoteNotNarcotic') : 'tools.bestMixNoteNitrox'));
 </script>
 
-<div class="od-desktop-best-mix">
-  <div class="od-desktop-best-mix--inputs">
+<div class="bc-desktop-best-mix">
+  <div class="bc-desktop-best-mix--inputs">
     <DesktopSegments ariaLabel={t('tools.blendMode')} value={mode} options={[{ value: 'nitrox', label: t('tools.nitrox') }, { value: 'trimix', label: t('tools.trimix') }]} onchange={(v) => (mode = /** @type {any} */ (v))} />
-    <div class="od-desktop-best-mix--fields">
+    <div class="bc-desktop-best-mix--fields">
       <DesktopField label={t('tools.depth')} bind:value={depth} unit={depthUnit(logbook.prefs)} invalid={depthInvalid} helper={depthInvalid ? t('tools.depthInvalid') : ''} />
       <DesktopField label={t('tools.waterType')} bind:value={water} options={waterOptions} />
       <DesktopField label={t('tools.maxPo2')} bind:value={po2} options={po2Options} />
@@ -90,30 +90,30 @@
     </div>
   </div>
 
-  <div class="od-desktop-best-mix--results">
-    <h3 class="od-desktop-best-mix--heading">{t('tools.bestMixResults')}</h3>
-    <div class="od-desktop-best-mix--advised" aria-live="polite">
-      <span class="od-desktop-best-mix--name od-value">{bigName}</span>
-      <span class="od-desktop-best-mix--kind">
-        <span class="od-desktop-best-mix--title">{t(trimix ? 'tools.trimix' : 'tools.nitrox')}</span>
-        {#if result}<span class="od-desktop-best-mix--sub">{t(trimix ? 'tools.trimixSub' : 'tools.nitroxSub', { o2: o2Text, he: heText })}</span>{/if}
+  <div class="bc-desktop-best-mix--results">
+    <h3 class="bc-desktop-best-mix--heading">{t('tools.bestMixResults')}</h3>
+    <div class="bc-desktop-best-mix--advised" aria-live="polite">
+      <span class="bc-desktop-best-mix--name bc-value">{bigName}</span>
+      <span class="bc-desktop-best-mix--kind">
+        <span class="bc-desktop-best-mix--title">{t(trimix ? 'tools.trimix' : 'tools.nitrox')}</span>
+        {#if result}<span class="bc-desktop-best-mix--sub">{t(trimix ? 'tools.trimixSub' : 'tools.nitroxSub', { o2: o2Text, he: heText })}</span>{/if}
       </span>
-      <button type="button" class="od-desktop-best-mix--prepare" disabled={!result} onclick={() => result && prepareBlend(result.bestO2, trimix ? result.bestHe : 0)}>
+      <button type="button" class="bc-desktop-best-mix--prepare" disabled={!result} onclick={() => result && prepareBlend(result.bestO2, trimix ? result.bestHe : 0)}>
         <Icon name="blender" size={20} />{t('desktopTools.prepareMix')}
       </button>
     </div>
-    <div class="od-desktop-best-mix--cards">
+    <div class="bc-desktop-best-mix--cards">
       <DesktopResultCard label={t('tools.mod')} value={mix ? wholeDepth(mix.modMm) : '—'} text={mix ? t('desktopTools.atPo2', { po2: formatPartialPressure(Number(po2) / 1000, 1) }) : ''} />
       <DesktopResultCard label={t('desktopTools.endAt', { depth: depthText })} value={mix ? wholeDepth(mix.endPlannedMm) : '—'} text={mix ? t(mix.o2Narcotic ? 'desktopTools.o2Narcotic' : 'desktopTools.o2NotNarcotic') : ''} />
       <DesktopResultCard label={t('desktopTools.po2At', { depth: depthText })} value={mix ? formatPartialPressure(po2Here / 1000, 2) : '—'} text={mix ? t(over ? 'desktopTools.overLimit' : 'desktopTools.underLimit') : ''} alarm={over} />
     </div>
-    <p class="od-desktop-best-mix--note">{note}</p>
+    <p class="bc-desktop-best-mix--note">{note}</p>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-best-mix {
+    .bc-desktop-best-mix {
       display: grid;
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
       gap: 32px;
@@ -121,95 +121,95 @@
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
     @container od-tool (max-width: 799px) {
-      .od-desktop-best-mix {
+      .bc-desktop-best-mix {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;
       }
     }
-    .od-desktop-best-mix--inputs {
+    .bc-desktop-best-mix--inputs {
       display: flex;
       flex-direction: column;
       gap: 20px;
       align-items: flex-start;
     }
-    .od-desktop-best-mix--fields {
+    .bc-desktop-best-mix--fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       align-items: start;
       align-self: stretch;
     }
-    .od-desktop-best-mix--heading {
+    .bc-desktop-best-mix--heading {
       margin: 0 0 12px;
       font-size: 15px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-best-mix--advised {
+    .bc-desktop-best-mix--advised {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 12px 20px;
       padding: 20px 24px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-desktop-best-mix--name {
-      font-family: var(--od-title-font);
+    .bc-desktop-best-mix--name {
+      font-family: var(--bc-title-font);
       font-size: 44px;
       font-weight: 500;
       line-height: 1;
-      color: var(--od-desktop-selected-ink);
+      color: var(--bc-desktop-selected-ink);
       white-space: nowrap;
     }
-    .od-desktop-best-mix--kind {
+    .bc-desktop-best-mix--kind {
       flex: 1 1 140px;
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
-    .od-desktop-best-mix--title {
+    .bc-desktop-best-mix--title {
       font-size: 17px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-best-mix--sub {
+    .bc-desktop-best-mix--sub {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-best-mix--prepare {
+    .bc-desktop-best-mix--prepare {
       display: flex;
       align-items: center;
       gap: 8px;
       height: 40px;
       padding: 0 20px;
-      border: 1px solid var(--od-text-2);
+      border: 1px solid var(--bc-text-2);
       border-radius: 20px;
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
       white-space: nowrap;
     }
-    .od-desktop-best-mix--prepare:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-desktop-best-mix--prepare:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
-    .od-desktop-best-mix--prepare:disabled {
+    .bc-desktop-best-mix--prepare:disabled {
       opacity: 0.4;
       cursor: default;
     }
-    .od-desktop-best-mix--cards {
+    .bc-desktop-best-mix--cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-top: 12px;
     }
-    .od-desktop-best-mix--note {
+    .bc-desktop-best-mix--note {
       margin: 12px 0 0;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

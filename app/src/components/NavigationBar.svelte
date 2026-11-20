@@ -27,21 +27,21 @@
 </script>
 
 <!-- iPhone (task 2026-11-14-127): the same four destinations as a tab bar, in iOS form. -->
-<nav class="od-navigation-bar" class:ios aria-label={t('menu.sections')}>
+<nav class="bc-navigation-bar" class:ios aria-label={t('menu.sections')}>
   {#each sections as section (section)}
     {@const active = navigation.section === section}
-    <a href="#{section}" class="od-navigation-bar--item" class:od-navigation-bar--active={active} aria-current={active ? 'page' : undefined} onclick={(e) => choose(e, section)}>
-      <span class="od-navigation-bar--pill">
+    <a href="#{section}" class="bc-navigation-bar--item" class:bc-navigation-bar--active={active} aria-current={active ? 'page' : undefined} onclick={(e) => choose(e, section)}>
+      <span class="bc-navigation-bar--pill">
         <NavIcon {section} {active} />
       </span>
-      <span class="od-navigation-bar--label">{t(`tabs.${section}`)}</span>
+      <span class="bc-navigation-bar--label">{t(`tabs.${section}`)}</span>
     </a>
   {/each}
 </nav>
 
 <style>
   @layer od.components {
-    .od-navigation-bar {
+    .bc-navigation-bar {
       position: fixed;
       left: 0;
       right: 0;
@@ -50,25 +50,25 @@
       z-index: 5100;
       box-sizing: content-box;
       height: 64px;
-      padding: 0 8px var(--od-safe-bottom);
-      background: var(--od-surface-container-high);
-      box-shadow: 0 -1px 0 color-mix(in srgb, var(--od-text) 6%, transparent);
+      padding: 0 8px var(--bc-safe-bottom);
+      background: var(--bc-surface-container-high);
+      box-shadow: 0 -1px 0 color-mix(in srgb, var(--bc-text) 6%, transparent);
       display: flex;
     }
 
-    .od-navigation-bar--item {
+    .bc-navigation-bar--item {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-decoration: none;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .od-navigation-bar--pill {
+    .bc-navigation-bar--pill {
       width: 56px;
       height: 32px;
       border-radius: 16px;
@@ -78,67 +78,67 @@
       transition: background-color 150ms linear;
     }
 
-    .od-navigation-bar--label {
+    .bc-navigation-bar--label {
       font-size: 13px;
       line-height: 16px;
       font-weight: 400;
     }
 
-    .od-navigation-bar--active {
-      color: var(--od-nav-active);
+    .bc-navigation-bar--active {
+      color: var(--bc-nav-active);
 
-      .od-navigation-bar--pill {
-        background: var(--od-nav-active-container);
+      .bc-navigation-bar--pill {
+        background: var(--bc-nav-active-container);
       }
 
-      .od-navigation-bar--label {
+      .bc-navigation-bar--label {
         font-weight: 600;
       }
     }
 
     /* iPhone: a translucent 49 pt tab bar, no pill; the active tab in the secondary colour. */
-    .od-navigation-bar.ios {
+    .bc-navigation-bar.ios {
       height: 49px;
-      background: color-mix(in srgb, var(--od-background) 94%, transparent);
+      background: color-mix(in srgb, var(--bc-background) 94%, transparent);
       -webkit-backdrop-filter: blur(20px);
       backdrop-filter: blur(20px);
       box-shadow: 0 -0.5px 0 rgb(0 0 0 / 0.2);
 
       /* High contrast (task 2026-11-14-149): nothing translucent. */
-      :global(html.od-high-contrast) & {
-        background: var(--od-background);
+      :global(html.bc-high-contrast) & {
+        background: var(--bc-background);
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
-        box-shadow: 0 -1.5px 0 var(--od-text);
+        box-shadow: 0 -1.5px 0 var(--bc-text);
       }
       /* The inner lines of a filled icon take the bar's colour. */
-      --od-nav-active-container: var(--od-background);
+      --bc-nav-active-container: var(--bc-background);
 
-      .od-navigation-bar--item {
+      .bc-navigation-bar--item {
         justify-content: flex-start;
         padding-top: 7px;
         gap: 2px;
       }
 
-      .od-navigation-bar--pill {
+      .bc-navigation-bar--pill {
         width: auto;
         height: auto;
         background: none;
       }
 
-      .od-navigation-bar--label {
+      .bc-navigation-bar--label {
         font-size: 11px;
         line-height: 13px;
         font-weight: 500;
       }
 
-      .od-navigation-bar--active {
-        color: var(--od-secondary);
+      .bc-navigation-bar--active {
+        color: var(--bc-secondary);
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-navigation-bar--pill {
+      .bc-navigation-bar--pill {
         transition: none;
       }
     }

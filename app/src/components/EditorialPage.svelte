@@ -113,30 +113,30 @@
 </script>
 
 {#snippet actions()}
-  <div class="od-editorial-page--actions" class:od-editorial-page--end={secondaryEnd} class:od-editorial-page--previous={previous}>
+  <div class="bc-editorial-page--actions" class:bc-editorial-page--end={secondaryEnd} class:bc-editorial-page--previous={previous}>
     {#if secondary}
       <button
         type="button"
-        class="od-text-button od-editorial-page--secondary"
+        class="bc-text-button bc-editorial-page--secondary"
         disabled={secondary.disabled ?? busy}
         onclick={secondary.onclick}>{secondary.label}</button
       >
     {/if}
     {#if action}
-      <button type="submit" class="od-editorial-page--filled" disabled={actionDisabled || busy} aria-busy={busy}>
-        {#if busy}{#if ios}<span class="od-editorial-page--spinner" aria-hidden="true"></span>{:else}<LoadingIndicator size={18} label="" />{/if}{busyLabel || action}{:else}{action}{/if}
+      <button type="submit" class="bc-editorial-page--filled" disabled={actionDisabled || busy} aria-busy={busy}>
+        {#if busy}{#if ios}<span class="bc-editorial-page--spinner" aria-hidden="true"></span>{:else}<LoadingIndicator size={18} label="" />{/if}{busyLabel || action}{:else}{action}{/if}
       </button>
     {/if}
   </div>
 {/snippet}
 
-<Page class="od-editorial-page {extraClass} {compact ? 'od-editorial-page--first-launch' : ''} {panel ? 'od-editorial-page--panelled od-first-panelled' : ''}">
+<Page class="bc-editorial-page {extraClass} {compact ? 'bc-editorial-page--first-launch' : ''} {panel ? 'bc-editorial-page--panelled bc-first-panelled' : ''}">
   {#if band}
     <FirstLaunchBand />
   {:else if panel}
     <FirstLaunchPanel still />
   {:else}
-  <Navbar class="od-editorial-page--bar">
+  <Navbar class="bc-editorial-page--bar">
     {#snippet left()}
       {#if !closable}
         <span></span>
@@ -150,7 +150,7 @@
       {:else}
         <Link back iconOnly>
           <Icon name={back ? 'arrowBack' : 'close'} />
-          <span class="od-sr-only">{back ? t('accountStep.back') : t('accountStep.close')}</span>
+          <span class="bc-sr-only">{back ? t('accountStep.back') : t('accountStep.close')}</span>
         </Link>
       {/if}
     {/snippet}
@@ -158,13 +158,13 @@
   {/if}
 
   {#if busy && !ios}
-    <div class="od-editorial-page--linear" class:od-editorial-page--linear-band={band} class:od-editorial-page--linear-panel={panel}><LinearWavyProgress indeterminate label={busyLabel || action} /></div>
+    <div class="bc-editorial-page--linear" class:bc-editorial-page--linear-band={band} class:bc-editorial-page--linear-panel={panel}><LinearWavyProgress indeterminate label={busyLabel || action} /></div>
   {/if}
 
   <form
-    class="od-editorial-page--body"
-    class:od-editorial-page--band-body={band}
-    class:od-editorial-page--panel-body={panel}
+    class="bc-editorial-page--body"
+    class:bc-editorial-page--band-body={band}
+    class:bc-editorial-page--panel-body={panel}
     bind:this={panelBody}
     novalidate
     onsubmit={(e) => {
@@ -175,41 +175,41 @@
     {#if compact}
       <!-- Alpha first launch on a phone (task 2026-11-16-233; on a tablet, task 2026-11-16-239, beside the panel): « Retour », the title, the content on the page, full-width buttons. -->
       {#if !noRetour && onback}
-        <button type="button" class="od-editorial-page--retour" onclick={onback}>
+        <button type="button" class="bc-editorial-page--retour" onclick={onback}>
           <Icon name="arrowBack" size={20} weight={2} />
           <span>{t('accountStep.back')}</span>
         </button>
       {:else if !noRetour}
-        <Link back class="od-editorial-page--retour">
+        <Link back class="bc-editorial-page--retour">
           <Icon name="arrowBack" size={20} weight={2} />
           <span>{t('accountStep.back')}</span>
         </Link>
       {/if}
-      <div class="od-editorial-page--heading">
-        {#if step}<p class="od-editorial-page--eyebrow">{eyebrow}</p>{/if}
-        <h1 class="od-editorial-page--title">{heading}</h1>
-        {#if intro}<p class="od-editorial-page--intro">{intro}</p>{/if}
+      <div class="bc-editorial-page--heading">
+        {#if step}<p class="bc-editorial-page--eyebrow">{eyebrow}</p>{/if}
+        <h1 class="bc-editorial-page--title">{heading}</h1>
+        {#if intro}<p class="bc-editorial-page--intro">{intro}</p>{/if}
       </div>
-      <div class="od-editorial-page--card">{@render children()}</div>
+      <div class="bc-editorial-page--card">{@render children()}</div>
       {#if action || secondary}{@render actions()}{/if}
       {#if panel}
         <!-- The About link ends the column: at its foot when the step is short, after the content when it scrolls (task 2026-11-16-257). -->
-        <div class="od-editorial-page--spacer"></div>
+        <div class="bc-editorial-page--spacer"></div>
         {#if helpLink}<WelcomeHelpLink inColumn />{/if}
       {/if}
     {:else}
-    <div class="od-editorial-page--heading">
-      <p class="od-editorial-page--eyebrow">{eyebrow}</p>
-      <h1 class="od-editorial-page--title">{shownHeading}</h1>
-      <p class="od-editorial-page--intro">{intro}</p>
+    <div class="bc-editorial-page--heading">
+      <p class="bc-editorial-page--eyebrow">{eyebrow}</p>
+      <h1 class="bc-editorial-page--title">{shownHeading}</h1>
+      <p class="bc-editorial-page--intro">{intro}</p>
     </div>
 
-    <div class="od-editorial-page--card">
+    <div class="bc-editorial-page--card">
       {@render children()}
       {#if actionsInCard && (action || secondary)}{@render actions()}{/if}
     </div>
 
-    <DecorativeProfile class="od-editorial-page--profile" />
+    <DecorativeProfile class="bc-editorial-page--profile" />
 
     {#if !actionsInCard && (action || secondary)}{@render actions()}{/if}
     {/if}
@@ -219,43 +219,43 @@
 
 <style>
   /* Framework7 variables, outside the layers so that they win over Framework7's own. */
-  :global(.od-editorial-page) {
-    --f7-page-bg-color: var(--od-background);
+  :global(.bc-editorial-page) {
+    --f7-page-bg-color: var(--bc-background);
   }
 
   /* The bar carries only ✕ or ← (iOS: "Annuler" or "‹ Retour"), on the page's own background. */
-  :global(.od-editorial-page--bar) {
+  :global(.bc-editorial-page--bar) {
     --f7-navbar-bg-color: transparent;
   }
 
   /* Tablet: ✕ lines up with the heading (its 48 dp target 12 dp before it). */
   @media (min-width: 768px) {
-    :global(.md .od-editorial-page--bar) {
+    :global(.md .bc-editorial-page--bar) {
       --f7-navbar-inner-padding-left: max(0px, calc((100% - 520px) / 2 - 12px));
     }
   }
 
   @media (min-width: 768px) and (orientation: landscape) {
-    :global(.md .od-editorial-page--bar) {
+    :global(.md .bc-editorial-page--bar) {
       --f7-navbar-inner-padding-left: 36px;
     }
   }
 
   @layer od.components {
     /* No close button (an import that runs): no empty bar button either. */
-    :global(.od-editorial-page--bar .left:not(:has(a))) {
+    :global(.bc-editorial-page--bar .left:not(:has(a))) {
       display: none;
     }
 
-    :global(.od-editorial-page--bar .navbar-bg) {
+    :global(.bc-editorial-page--bar .navbar-bg) {
       background: transparent;
     }
 
-    :global(.od-editorial-page--bar .navbar-bg::after) {
+    :global(.bc-editorial-page--bar .navbar-bg::after) {
       display: none;
     }
 
-    .od-editorial-page--body {
+    .bc-editorial-page--body {
       box-sizing: border-box;
       min-height: 100%;
       display: flex;
@@ -263,7 +263,7 @@
     }
 
     /* 16 dp at the top: the 10 dp band of the busy indicator stays clear of the overline. */
-    .od-editorial-page--heading {
+    .bc-editorial-page--heading {
       padding: 16px 24px 0;
       display: flex;
       flex-direction: column;
@@ -271,17 +271,17 @@
 
       p {
         margin: 0;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-editorial-page--eyebrow {
+    .bc-editorial-page--eyebrow {
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
     }
 
-    .od-editorial-page--title {
+    .bc-editorial-page--title {
       margin: 0;
       font-size: 34px;
       line-height: 40px;
@@ -289,29 +289,29 @@
       letter-spacing: -0.4px;
     }
 
-    .od-editorial-page--intro {
+    .bc-editorial-page--intro {
       font-size: 16px;
       line-height: 24px;
     }
 
     /* The content in one white card. */
-    .od-editorial-page--card {
-      --od-field-margin: 0;
+    .bc-editorial-page--card {
+      --bc-field-margin: 0;
       margin: 24px 16px 0;
       padding: 20px 16px;
       border-radius: 28px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       /* Android: the first field starts at the top of the card. */
       :global(.md) & > :global(:first-child),
-      :global(.md) & > :global(:first-child > .od-text-field--field:first-child),
-      :global(.md) & > :global(:first-child > .od-select-field--field:first-child) {
+      :global(.md) & > :global(:first-child > .bc-text-field--field:first-child),
+      :global(.md) & > :global(:first-child > .bc-select-field--field:first-child) {
         margin-top: 0;
       }
     }
 
     /* Phone: the profile and the actions at the bottom of the screen. */
-    :global(.od-editorial-page--profile) {
+    :global(.bc-editorial-page--profile) {
       flex: none;
       height: 130px;
       margin-top: auto;
@@ -319,26 +319,26 @@
       box-sizing: content-box;
     }
 
-    .od-editorial-page--actions {
+    .bc-editorial-page--actions {
       padding: 16px 24px calc(var(--f7-safe-area-bottom) + 28px);
       display: flex;
       align-items: center;
       gap: 8px;
 
-      &.od-editorial-page--end {
+      &.bc-editorial-page--end {
         justify-content: flex-end;
       }
     }
 
-    .od-editorial-page--filled {
+    .bc-editorial-page--filled {
       flex: 1;
       min-width: 0;
       height: 56px;
       padding: 0 24px;
       border: none;
       border-radius: 28px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 16px;
       font-weight: 500;
@@ -352,24 +352,24 @@
 
       /* MD3 disabled: on-surface at 12 % behind, 38 % (here 60 % with the spinner) in front. */
       &:disabled {
-        background: color-mix(in srgb, var(--od-text) 12%, transparent);
-        color: color-mix(in srgb, var(--od-text) 60%, transparent);
+        background: color-mix(in srgb, var(--bc-text) 12%, transparent);
+        color: color-mix(in srgb, var(--bc-text) 60%, transparent);
 
-        /* Busy (« Connexion… ») is not disabled: its label in --od-text-2, 6.4:1 (task 2026-11-14-153). */
+        /* Busy (« Connexion… ») is not disabled: its label in --bc-text-2, 6.4:1 (task 2026-11-14-153). */
         &[aria-busy='true'] {
-          color: var(--od-text-2);
+          color: var(--bc-text-2);
         }
         cursor: default;
       }
     }
 
-    .od-editorial-page--secondary {
+    .bc-editorial-page--secondary {
       flex: none;
     }
 
     /* MD3 Expressive wavy linear progress indicator, indeterminate, under the top bar, 16 dp
        from each side (compte-connexion-encours-android.dc.html, task 2026-11-14-130). */
-    .od-editorial-page--linear {
+    .bc-editorial-page--linear {
       position: absolute;
       z-index: 600;
       left: 16px;
@@ -378,7 +378,7 @@
       height: 10px;
     }
 
-    .od-editorial-page--spinner {
+    .bc-editorial-page--spinner {
       width: 16px;
       height: 16px;
       border: 2px solid currentColor;
@@ -400,12 +400,12 @@
      * 520 dp, the card under the heading.
      */
     @media (min-width: 768px) {
-      :global(.md) .od-editorial-page--body {
+      :global(.md) .bc-editorial-page--body {
         position: relative;
         padding-bottom: 48px;
       }
 
-      :global(.md .od-editorial-page--profile) {
+      :global(.md .bc-editorial-page--profile) {
         position: absolute;
         z-index: 0;
         left: 0;
@@ -414,8 +414,8 @@
         padding: 0;
       }
 
-      :global(.md) .od-editorial-page--heading,
-      :global(.md) .od-editorial-page--card {
+      :global(.md) .bc-editorial-page--heading,
+      :global(.md) .bc-editorial-page--card {
         position: relative;
         z-index: 1;
         box-sizing: border-box;
@@ -425,21 +425,21 @@
         margin-right: auto;
       }
 
-      :global(.md) .od-editorial-page--heading {
+      :global(.md) .bc-editorial-page--heading {
         padding: 24px 0 0;
       }
 
-      :global(.md) .od-editorial-page--title {
+      :global(.md) .bc-editorial-page--title {
         font-size: 40px;
         line-height: 48px;
         letter-spacing: -0.5px;
       }
 
-      :global(.md) .od-editorial-page--card {
+      :global(.md) .bc-editorial-page--card {
         padding: 28px 24px 24px;
       }
 
-      :global(.md) .od-editorial-page--actions {
+      :global(.md) .bc-editorial-page--actions {
         margin-top: 24px;
         padding: 0;
       }
@@ -447,7 +447,7 @@
 
     /* Landscape: the heading on the left, the card in a 480 dp column on the right, centred vertically. */
     @media (min-width: 768px) and (orientation: landscape) {
-      :global(.md) .od-editorial-page--body {
+      :global(.md) .bc-editorial-page--body {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 480px;
         grid-template-rows: auto 1fr;
@@ -455,14 +455,14 @@
         padding: 0 48px 48px;
       }
 
-      :global(.md) .od-editorial-page--heading {
+      :global(.md) .bc-editorial-page--heading {
         grid-column: 1;
         grid-row: 1;
         max-width: 560px;
         margin: 0;
       }
 
-      :global(.md) .od-editorial-page--card {
+      :global(.md) .bc-editorial-page--card {
         grid-column: 2;
         grid-row: 1 / span 2;
         align-self: center;
@@ -477,33 +477,33 @@
      * the content on the page (no card), the buttons across the width.
      */
     /* The page is a column: band, content, then the About link at the bottom of the screen. */
-    :global(.od-editorial-page--first-launch .page-content) {
+    :global(.bc-editorial-page--first-launch .page-content) {
       display: flex;
       flex-direction: column;
     }
 
-    .od-editorial-page--band-body,
-    .od-editorial-page--panel-body {
+    .bc-editorial-page--band-body,
+    .bc-editorial-page--panel-body {
       padding: 16px 16px 0;
       min-height: 0;
       flex: 1 0 auto;
 
-      .od-editorial-page--heading {
+      .bc-editorial-page--heading {
         padding: 0;
         gap: 0;
       }
 
-      .od-editorial-page--eyebrow {
+      .bc-editorial-page--eyebrow {
         margin-bottom: 4px;
         font-size: 13px;
         line-height: 18px;
         font-weight: 600;
         letter-spacing: 0.6px;
         text-transform: uppercase;
-        color: var(--od-code-active);
+        color: var(--bc-code-active);
       }
 
-      .od-editorial-page--title {
+      .bc-editorial-page--title {
         margin-bottom: 6px;
         /* 28 sp in the mock-ups, drawn at 24 sp on a 390 dp screen: two lines of title must fit. */
         font-size: 24px;
@@ -512,40 +512,40 @@
         letter-spacing: -0.2px;
       }
 
-      .od-editorial-page--intro {
+      .bc-editorial-page--intro {
         margin-bottom: 20px;
         font-size: 15px;
         line-height: 21px;
       }
 
-      .od-editorial-page--card {
-        --od-field-margin: 0;
+      .bc-editorial-page--card {
+        --bc-field-margin: 0;
         margin: 0;
         padding: 0;
         border-radius: 0;
         background: none;
       }
 
-      .od-editorial-page--actions {
+      .bc-editorial-page--actions {
         padding: 22px 0 0;
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
 
-        .od-editorial-page--secondary {
+        .bc-editorial-page--secondary {
           margin: 0;
           flex: none;
           height: 48px;
           padding: 0 22px;
-          border: var(--od-outline-width) solid var(--od-chip-outline);
+          border: var(--bc-outline-width) solid var(--bc-chip-outline);
           border-radius: 24px;
           justify-content: center;
           font-size: 15px;
           font-weight: 500;
-          color: var(--od-text);
+          color: var(--bc-text);
         }
 
-        .od-editorial-page--filled {
+        .bc-editorial-page--filled {
           flex: none;
           height: 48px;
           border-radius: 24px;
@@ -559,7 +559,7 @@
      * android-tablette-premier-lancement-alpha-*.dc.html): the blue panel of task 237 (still) and the step in a
      * 452 dp column beside it (landscape) or under it (portrait), vertically centred, the buttons on the right.
      */
-    :global(.od-editorial-page--panelled .page-content) {
+    :global(.bc-editorial-page--panelled .page-content) {
       display: flex;
       flex-direction: row;
       padding: 0;
@@ -570,7 +570,7 @@
       }
     }
 
-    :global(.md) .od-editorial-page--panel-body {
+    :global(.md) .bc-editorial-page--panel-body {
       /* Against the tablet rules above (a grid of heading and card): a plain centred column. */
       display: flex;
       flex-direction: column;
@@ -587,7 +587,7 @@
       overflow-y: auto;
 
       &::before,
-      .od-editorial-page--spacer {
+      .bc-editorial-page--spacer {
         content: '';
         flex: 1 1 0;
       }
@@ -598,8 +598,8 @@
         padding-right: 32px;
       }
 
-      .od-editorial-page--heading,
-      .od-editorial-page--card {
+      .bc-editorial-page--heading,
+      .bc-editorial-page--card {
         grid-column: auto;
         grid-row: auto;
         width: auto;
@@ -613,27 +613,27 @@
         padding: 0 120px 64px;
       }
 
-      .od-editorial-page--title {
+      .bc-editorial-page--title {
         margin-bottom: 8px;
         font-size: 28px;
         line-height: 36px;
         letter-spacing: -0.2px;
       }
 
-      .od-editorial-page--intro {
+      .bc-editorial-page--intro {
         margin-bottom: 24px;
         font-size: 16px;
         line-height: 22px;
       }
 
-      .od-editorial-page--actions {
+      .bc-editorial-page--actions {
         padding: 24px 0 0;
         flex-direction: row;
         justify-content: flex-end;
         align-items: center;
 
-        .od-editorial-page--secondary,
-        .od-editorial-page--filled {
+        .bc-editorial-page--secondary,
+        .bc-editorial-page--filled {
           flex: none;
           width: auto;
           height: 48px;
@@ -645,10 +645,10 @@
 
     /* The desktop app (task 2026-11-16-242): the step is always beside the panel (48.6 % of the window, 700 dp at
        most), its column keeps its room in a narrow window. */
-    :global(html.od-desktop-app .od-editorial-page--panelled .page-content) {
+    :global(html.bc-desktop-app .bc-editorial-page--panelled .page-content) {
       flex-direction: row;
     }
-    :global(html.od-desktop-app.md) .od-editorial-page--panel-body {
+    :global(html.bc-desktop-app.md) .bc-editorial-page--panel-body {
       padding: 24px clamp(24px, 4.4vw, 64px) 56px;
       overflow-y: auto;
       justify-content: safe center;
@@ -664,39 +664,39 @@
       @media (max-height: 640px) {
         padding-top: 8px;
 
-        .od-editorial-page--retour {
+        .bc-editorial-page--retour {
           min-height: 36px;
         }
 
-        .od-editorial-page--eyebrow {
+        .bc-editorial-page--eyebrow {
           margin-bottom: 2px;
         }
 
-        .od-editorial-page--title {
+        .bc-editorial-page--title {
           margin-bottom: 4px;
           font-size: 24px;
           line-height: 30px;
         }
 
-        .od-editorial-page--intro {
+        .bc-editorial-page--intro {
           margin-bottom: 12px;
           font-size: 15px;
           line-height: 20px;
         }
 
-        .od-editorial-page--actions {
+        .bc-editorial-page--actions {
           padding-top: 12px;
         }
       }
     }
-    :global(html.od-desktop-app) .od-editorial-page--linear.od-editorial-page--linear-panel {
+    :global(html.bc-desktop-app) .bc-editorial-page--linear.bc-editorial-page--linear-panel {
       left: calc(min(700px, 48.6%) + clamp(24px, 4.4vw, 64px));
       right: clamp(24px, 4.4vw, 64px);
       top: 24px;
     }
 
     /* The busy indicator runs at the top of the step's column. */
-    .od-editorial-page--linear.od-editorial-page--linear-panel {
+    .bc-editorial-page--linear.bc-editorial-page--linear-panel {
       left: calc(min(700px, 55%) + 64px);
       right: 64px;
       top: 24px;
@@ -709,7 +709,7 @@
     }
 
     /* The « Retour » link: 20 dp chevron and 15 sp text, a 48 dp tall target, 8 dp out to the left. */
-    :global(.od-editorial-page--retour) {
+    :global(.bc-editorial-page--retour) {
       border: none;
       background: none;
       font-family: inherit;
@@ -725,61 +725,61 @@
       font-size: 15px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
       @media (hover: hover) {
         &:hover {
-          background: color-mix(in srgb, var(--od-text) 8%, transparent);
+          background: color-mix(in srgb, var(--bc-text) 8%, transparent);
         }
       }
     }
 
     /* The busy indicator runs under the band. */
-    .od-editorial-page--linear.od-editorial-page--linear-band {
+    .bc-editorial-page--linear.bc-editorial-page--linear-band {
       top: calc(max(var(--f7-safe-area-top), 24px) + 140px);
     }
 
     /* iPhone: the same layout with iOS sizes (compte-*-ios.dc.html). */
-    :global(.ios) .od-editorial-page--heading {
+    :global(.ios) .bc-editorial-page--heading {
       padding: 4px 24px 0;
       gap: 10px;
     }
 
-    :global(.ios) .od-editorial-page--eyebrow {
+    :global(.ios) .bc-editorial-page--eyebrow {
       font-size: 15px;
       line-height: 20px;
       font-weight: 600;
     }
 
-    :global(.ios) .od-editorial-page--title {
+    :global(.ios) .bc-editorial-page--title {
       font-size: 34px;
       line-height: 41px;
       font-weight: 400;
       letter-spacing: 0.4px;
     }
 
-    :global(.ios) .od-editorial-page--intro {
+    :global(.ios) .bc-editorial-page--intro {
       font-size: 17px;
       line-height: 24px;
     }
 
     /* The pages draw their own inset grouped sections. */
-    :global(.ios) .od-editorial-page--card {
-      --od-field-margin: 16px;
+    :global(.ios) .bc-editorial-page--card {
+      --bc-field-margin: 16px;
       margin: 4px 0 0;
       padding: 0;
       border-radius: 0;
       background: none;
     }
 
-    :global(.ios) .od-editorial-page--actions {
+    :global(.ios) .bc-editorial-page--actions {
       padding: 16px 24px calc(var(--f7-safe-area-bottom) + 24px);
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
 
-      .od-editorial-page--secondary {
+      .bc-editorial-page--secondary {
         margin: 0;
         min-height: 44px;
         justify-content: center;
@@ -787,31 +787,31 @@
       }
 
       /* The main button first, the plain text button under it. */
-      &.od-editorial-page--end .od-editorial-page--secondary {
+      &.bc-editorial-page--end .bc-editorial-page--secondary {
         order: 1;
       }
 
       /* "Précédent", a grey capsule beside the main one. */
-      &.od-editorial-page--previous {
+      &.bc-editorial-page--previous {
         flex-direction: row;
 
-        .od-editorial-page--secondary {
+        .bc-editorial-page--secondary {
           width: 128px;
           height: 56px;
           border-radius: 28px;
-          background: var(--od-tint);
-          color: var(--od-on-tint);
+          background: var(--bc-tint);
+          color: var(--bc-on-tint);
           font-weight: 600;
         }
 
-        .od-editorial-page--filled {
+        .bc-editorial-page--filled {
           flex: 1;
           width: auto;
         }
       }
     }
 
-    :global(.ios) .od-editorial-page--filled {
+    :global(.ios) .bc-editorial-page--filled {
       flex: none;
       width: 100%;
       height: 56px;
@@ -822,13 +822,13 @@
       gap: 10px;
 
       &:disabled {
-        background: var(--od-primary-action);
-        color: var(--od-on-primary-action);
+        background: var(--bc-primary-action);
+        color: var(--bc-on-primary-action);
         opacity: 0.5;
       }
     }
 
-    :global(.ios) .od-editorial-page--spinner {
+    :global(.ios) .bc-editorial-page--spinner {
       width: 18px;
       height: 18px;
     }

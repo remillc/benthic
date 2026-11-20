@@ -7,11 +7,11 @@ const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 
 const band = readFileSync(new URL('../../app/src/components/SectionBand.svelte', import.meta.url), 'utf8');
 
 test('the search box is 8 px under the summary', () => {
-  const rule = theme.match(/\.searchbar\.od-band-search \{([^}]*)\}/)?.[1] ?? '';
+  const rule = theme.match(/\.searchbar\.bc-band-search \{([^}]*)\}/)?.[1] ?? '';
   assert.match(rule, /margin: 8px 0 0;/);
 });
 
 test('the band gives the 8 px back under the search box: 40 px of blue before the wave', () => {
-  assert.match(band, /&\.od-section-band--tall:has\(:global\(\.od-band-search\)\) \{\s*padding-bottom: 40px;/);
+  assert.match(band, /&\.bc-section-band--tall:has\(:global\(\.bc-band-search\)\) \{\s*padding-bottom: 40px;/);
   assert.match(band, /padding: 0 16px 32px;/, 'other bands keep 32 px');
 });

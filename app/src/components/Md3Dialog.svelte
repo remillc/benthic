@@ -33,7 +33,7 @@
    * @param {HTMLElement} surface
    */
   function fit(surface) {
-    const row = /** @type {HTMLElement|null} */ (surface.querySelector('.od-md3-dialog--actions'));
+    const row = /** @type {HTMLElement|null} */ (surface.querySelector('.bc-md3-dialog--actions'));
     const measure = () => fitButtons(surface, row);
     requestAnimationFrame(measure);
     const observer = new ResizeObserver(measure);
@@ -73,25 +73,25 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-md3-dialog modal-in {extraClass}" use:portal onkeydown={keydown}>
+<div class="bc-md3-dialog modal-in {extraClass}" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="od-md3-dialog--scrim" onclick={oncancel}></div>
-  <div class="od-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1" use:fit>
+  <div class="bc-md3-dialog--scrim" onclick={oncancel}></div>
+  <div class="bc-md3-dialog--surface" {role} aria-modal="true" aria-labelledby={id} tabindex="-1" use:fit>
     <!-- The wizard dialogs (the CSV import): a small line above the title and a close button at the top right. -->
-    {#if eyebrow}<p class="od-md3-dialog--eyebrow">{eyebrow}</p>{/if}
+    {#if eyebrow}<p class="bc-md3-dialog--eyebrow">{eyebrow}</p>{/if}
     {#if onclose}
-      <button type="button" class="od-md3-dialog--close" aria-label={closeLabel} onclick={onclose}><Icon name="close" size={22} /></button>
+      <button type="button" class="bc-md3-dialog--close" aria-label={closeLabel} onclick={onclose}><Icon name="close" size={22} /></button>
     {/if}
     <h2 {id}>{title}</h2>
-    {#if text}<p class="od-md3-dialog--text">{text}</p>{/if}
-    <div class="od-md3-dialog--content" data-od-scroll>{@render children()}</div>
-    <div class="od-md3-dialog--actions">{@render actions()}</div>
+    {#if text}<p class="bc-md3-dialog--text">{text}</p>{/if}
+    <div class="bc-md3-dialog--content" data-od-scroll>{@render children()}</div>
+    <div class="bc-md3-dialog--actions">{@render actions()}</div>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-md3-dialog {
+    .bc-md3-dialog {
       position: fixed;
       inset: 0;
       z-index: 13500;
@@ -101,13 +101,13 @@
       font-family: inherit;
     }
 
-    .od-md3-dialog--scrim {
+    .bc-md3-dialog--scrim {
       position: absolute;
       inset: 0;
-      background: var(--od-scrim);
+      background: var(--bc-scrim);
     }
 
-    .od-md3-dialog--surface {
+    .bc-md3-dialog--surface {
       position: relative;
       box-sizing: border-box;
       width: min(560px, calc(100% - 48px));
@@ -116,21 +116,21 @@
       flex-direction: column;
       padding: 24px 0 24px;
       border-radius: 28px;
-      background: var(--od-dialog);
-      color: var(--od-text);
+      background: var(--bc-dialog);
+      color: var(--bc-text);
       outline: none;
     }
 
     /* Android: the dialog grows in from 90 % (spatial spring) while it fades in
        (effects spring); the scrim fades in. It is removed at once on closing. */
-    :global(.md) .od-md3-dialog--surface {
+    :global(.md) .bc-md3-dialog--surface {
       animation:
-        od-dialog-grow var(--od-motion-spatial-fast-ms) var(--od-motion-spatial-fast) backwards,
-        od-dialog-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+        od-dialog-grow var(--bc-motion-spatial-fast-ms) var(--bc-motion-spatial-fast) backwards,
+        od-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
-    :global(.md) .od-md3-dialog--scrim {
-      animation: od-dialog-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default) backwards;
+    :global(.md) .bc-md3-dialog--scrim {
+      animation: od-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
     @keyframes od-dialog-grow {
@@ -145,9 +145,9 @@
       }
     }
 
-    .od-md3-dialog--eyebrow {
+    .bc-md3-dialog--eyebrow {
       margin: -4px 64px 2px 24px;
-      color: var(--od-release-link);
+      color: var(--bc-release-link);
       font-size: 12px;
       line-height: 16px;
       font-weight: 500;
@@ -155,7 +155,7 @@
       text-transform: uppercase;
     }
 
-    .od-md3-dialog--close {
+    .bc-md3-dialog--close {
       position: absolute;
       top: 16px;
       right: 16px;
@@ -168,12 +168,12 @@
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
     }
@@ -185,20 +185,20 @@
       font-weight: 400;
     }
 
-    .od-md3-dialog--text {
+    .bc-md3-dialog--text {
       margin: -8px 24px 16px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-md3-dialog--content {
+    .bc-md3-dialog--content {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
     }
 
-    .od-md3-dialog--actions {
+    .bc-md3-dialog--actions {
       margin: 10px 12px 0 24px;
       display: flex;
       align-items: center;
@@ -206,7 +206,7 @@
       gap: 8px;
     }
 
-    .od-md3-dialog--actions :global(button) {
+    .bc-md3-dialog--actions :global(button) {
       /* Framework7 stretches buttons: text buttons keep their own width. */
       width: auto;
       flex: none;
@@ -215,7 +215,7 @@
       border: none;
       border-radius: 20px;
       background: none;
-      color: var(--od-action);
+      color: var(--bc-action);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
@@ -224,12 +224,12 @@
       cursor: pointer;
     }
 
-    .od-md3-dialog--actions :global(.od-md3-dialog--start) {
+    .bc-md3-dialog--actions :global(.bc-md3-dialog--start) {
       margin-right: auto;
     }
 
     /* Not on one line: one per line, aligned to the end, the main action (the last) on top. */
-    :global(.od-dialog-stacked) .od-md3-dialog--actions {
+    :global(.bc-dialog-stacked) .bc-md3-dialog--actions {
       flex-direction: column-reverse;
       align-items: flex-end;
 
@@ -243,12 +243,12 @@
         text-align: end;
       }
 
-      :global(.od-md3-dialog--start) {
+      :global(.bc-md3-dialog--start) {
         margin-right: 0;
       }
     }
 
-    :global(.ios) .od-md3-dialog--surface {
+    :global(.ios) .bc-md3-dialog--surface {
       width: min(400px, calc(100% - 48px));
       border-radius: 14px;
     }
@@ -260,22 +260,22 @@
       text-align: center;
     }
 
-    :global(.ios) .od-md3-dialog--actions :global(button) {
+    :global(.ios) .bc-md3-dialog--actions :global(button) {
       font-size: 17px;
       letter-spacing: 0;
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-md3-dialog--actions :global(button) {
+      .bc-md3-dialog--actions :global(button) {
         transition: box-shadow 120ms linear;
       }
-      .od-md3-dialog--actions :global(button:not(:disabled):hover) {
+      .bc-md3-dialog--actions :global(button:not(:disabled):hover) {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-md3-dialog--actions :global(button) {
+      .bc-md3-dialog--actions :global(button) {
         transition: none;
       }
     }

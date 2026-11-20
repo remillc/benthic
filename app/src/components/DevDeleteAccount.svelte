@@ -34,26 +34,26 @@
 </script>
 
 {#if isTempEmail(email)}
-  <div class="od-dev-delete-account">
-    <button type="button" class="od-outlined-button" onclick={ask}>{text.button}</button>
-    <span class="od-dev-delete-account--help">{text.help}</span>
+  <div class="bc-dev-delete-account">
+    <button type="button" class="bc-outlined-button" onclick={ask}>{text.button}</button>
+    <span class="bc-dev-delete-account--help">{text.help}</span>
   </div>
 {/if}
 
 <style>
   @layer od.components {
-    .od-dev-delete-account {
+    .bc-dev-delete-account {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin: 16px 16px 0;
       padding-top: 16px;
-      border-top: 2px dashed var(--od-alarm);
+      border-top: 2px dashed var(--bc-alarm);
     }
 
-    .od-dev-delete-account--help {
+    .bc-dev-delete-account--help {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

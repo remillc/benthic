@@ -29,28 +29,28 @@
 </script>
 
 {#snippet body()}
-  {#if profileWide()}<h1 class="od-retired-page--title">{t('gear.inventory.retiredRow')}</h1>{/if}
+  {#if profileWide()}<h1 class="bc-retired-page--title">{t('gear.inventory.retiredRow')}</h1>{/if}
   {#if !pieces.length && gear.ready}
-    <p class="od-retired-page--empty">{t('gear.retire.empty')}</p>
+    <p class="bc-retired-page--empty">{t('gear.retire.empty')}</p>
   {:else}
-    <p class="od-retired-page--note">{t('gear.retire.listNote')}</p>
-    <div class="od-retired-page--list">
+    <p class="bc-retired-page--note">{t('gear.retire.listNote')}</p>
+    <div class="bc-retired-page--list">
       {#each pieces as g (g.id)}
-        <button type="button" class="od-retired-page--row" onclick={() => open(g.id)}>
-          <span class="od-retired-page--tile"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
-          <span class="od-retired-page--texts">
-            <span class="od-retired-page--name">{g.name}</span>
-            <span class="od-retired-page--supporting">{line(g)}</span>
+        <button type="button" class="bc-retired-page--row" onclick={() => open(g.id)}>
+          <span class="bc-retired-page--tile"><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
+          <span class="bc-retired-page--texts">
+            <span class="bc-retired-page--name">{g.name}</span>
+            <span class="bc-retired-page--supporting">{line(g)}</span>
           </span>
-          <span class="od-retired-page--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-retired-page--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       {/each}
     </div>
   {/if}
-  <div class="od-retired-page--bottom"></div>
+  <div class="bc-retired-page--bottom"></div>
 {/snippet}
 
-<Page class="od-retired-page">
+<Page class="bc-retired-page">
   <Navbar title={t('gear.inventory.retiredRow')}>
     {#snippet left()}
       <BackLink label={t('gear.inventory.title')} name={t('gear.piece.back')} />
@@ -66,33 +66,33 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-retired-page .page-content) {
+    :global(.bc-retired-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-retired-page--title {
+    .bc-retired-page--title {
       margin: 24px 20px 4px;
       font-size: 24px;
       line-height: 30px;
       font-weight: 500;
     }
 
-    .od-retired-page--note,
-    .od-retired-page--empty {
+    .bc-retired-page--note,
+    .bc-retired-page--empty {
       margin: 8px 20px 16px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-retired-page--list {
+    .bc-retired-page--list {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-retired-page--row {
+    .bc-retired-page--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 64px;
@@ -102,17 +102,17 @@
       gap: 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
 
-    .od-retired-page--row + .od-retired-page--row {
-      border-top: 1px solid var(--od-separator);
+    .bc-retired-page--row + .bc-retired-page--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-retired-page--tile {
+    .bc-retired-page--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -121,41 +121,41 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-release-tile);
+      background: var(--bc-release-tile);
     }
 
-    :global(.ios) .od-retired-page--tile {
+    :global(.ios) .bc-retired-page--tile {
       width: 36px;
       height: 36px;
       border-radius: 8px;
     }
 
-    .od-retired-page--texts {
+    .bc-retired-page--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-retired-page--name {
+    .bc-retired-page--name {
       font-size: 16px;
       line-height: 22px;
       overflow-wrap: anywhere;
     }
 
-    .od-retired-page--supporting {
+    .bc-retired-page--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-retired-page--chevron {
+    .bc-retired-page--chevron {
       flex: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-retired-page--bottom {
-      height: calc(32px + var(--od-safe-bottom));
+    .bc-retired-page--bottom {
+      height: calc(32px + var(--bc-safe-bottom));
     }
   }
 </style>

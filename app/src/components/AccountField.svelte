@@ -4,8 +4,8 @@
   // in and new account"). Android: the MD3 filled TextField, with a show/hide
   // button for a password. iOS: a row of an inset group, label on the left,
   // value on the right; the group's footer (helper text, or the error in
-  // --od-alarm) under its last row. Errors: the value and an icon in
-  // --od-alarm on iOS.
+  // --bc-alarm) under its last row. Errors: the value and an icon in
+  // --bc-alarm on iOS.
   import { f7 } from 'framework7-svelte';
   import TextField from './TextField.svelte';
   import Icon from './Icon.svelte';
@@ -59,7 +59,7 @@
 </script>
 
 {#if ios}
-  <div class="od-account-field od-account-field--ios-row od-account-field--{position}" class:od-account-field--invalid={!!error} class:disabled>
+  <div class="bc-account-field bc-account-field--ios-row bc-account-field--{position}" class:bc-account-field--invalid={!!error} class:disabled>
     <label for={id}>{rowLabel}</label>
     <input
       {id}
@@ -73,14 +73,14 @@
       autocapitalize="off"
       spellcheck="false"
     />
-    {#if error}<span class="od-account-field--icon"><Icon name="error" size={20} /></span>{/if}
+    {#if error}<span class="bc-account-field--icon"><Icon name="error" size={20} /></span>{/if}
   </div>
   {#if position !== 'first' && footerText}
-    <p class="od-account-field od-account-field--ios-footer" class:od-account-field--error={footerIsError}>{footerText}</p>
+    <p class="bc-account-field bc-account-field--ios-footer" class:bc-account-field--error={footerIsError}>{footerText}</p>
   {/if}
 {:else if outlined}
-  <div class="od-account-field od-account-field--outlined" class:od-account-field--mono={mono} class:od-account-field--invalid={!!error} class:disabled>
-    <div class="od-account-field--box">
+  <div class="bc-account-field bc-account-field--outlined" class:bc-account-field--mono={mono} class:bc-account-field--invalid={!!error} class:disabled>
+    <div class="bc-account-field--box">
       <input
         {id}
         type={type === 'password' && shown ? 'text' : type}
@@ -96,7 +96,7 @@
       {#if type === 'password'}
         <button
           type="button"
-          class="od-icon-button od-account-field--toggle"
+          class="bc-icon-button bc-account-field--toggle"
           aria-label={shown ? t('accountStep.hidePassword') : t('accountStep.showPassword')}
           {disabled}
           onclick={() => (shown = !shown)}
@@ -105,9 +105,9 @@
         </button>
       {/if}
     </div>
-    <label class="od-account-field--label" for={id}>{label}</label>
+    <label class="bc-account-field--label" for={id}>{label}</label>
     {#if error || supporting}
-      <p class="od-account-field--supporting" id="{id}-supporting">{error || supporting}</p>
+      <p class="bc-account-field--supporting" id="{id}-supporting">{error || supporting}</p>
     {/if}
   </div>
 {:else}
@@ -125,7 +125,7 @@
       {#if type === 'password'}
         <button
           type="button"
-          class="od-icon-button"
+          class="bc-icon-button"
           aria-label={shown ? t('accountStep.hidePassword') : t('accountStep.showPassword')}
           {disabled}
           onclick={(e) => {
@@ -143,23 +143,23 @@
 <style>
   @layer od.components {
     /* Outlined field (docs/mockups/android-premier-lancement-*.dc.html): 52 dp, 12 dp corners, the label on the border. */
-    .od-account-field--outlined {
+    .bc-account-field--outlined {
       position: relative;
-      margin-top: var(--od-outlined-gap, 14px);
+      margin-top: var(--bc-outlined-gap, 14px);
 
-      .od-account-field--box {
+      .bc-account-field--box {
         box-sizing: border-box;
         height: 52px;
         padding: 0 16px;
-        border: var(--od-outline-width) solid var(--od-outlined-field-border);
+        border: var(--bc-outline-width) solid var(--bc-outlined-field-border);
         border-radius: 12px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
         display: flex;
         align-items: center;
         gap: 8px;
 
         &:focus-within {
-          border: 2px solid var(--od-outlined-field-active);
+          border: 2px solid var(--bc-outlined-field-active);
           padding: 0 15px;
         }
       }
@@ -174,54 +174,54 @@
         background: none;
         font: inherit;
         font-size: 16px;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
-      &.od-account-field--mono input {
+      &.bc-account-field--mono input {
         font-family: 'Roboto Mono', ui-monospace, monospace;
         font-size: 15px;
       }
 
-      .od-account-field--toggle {
+      .bc-account-field--toggle {
         flex: none;
         margin-right: -12px;
       }
 
-      .od-account-field--label {
+      .bc-account-field--label {
         position: absolute;
         left: 12px;
         top: -9px;
         padding: 0 4px;
-        background: var(--od-background);
+        background: var(--bc-background);
         font-size: 12px;
         line-height: 16px;
         font-weight: 600;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
         pointer-events: none;
       }
 
-      &:focus-within .od-account-field--label {
-        color: var(--od-outlined-field-active);
+      &:focus-within .bc-account-field--label {
+        color: var(--bc-outlined-field-active);
       }
 
-      .od-account-field--supporting {
+      .bc-account-field--supporting {
         margin: 4px 0 0 16px;
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
-      &.od-account-field--invalid {
-        .od-account-field--box,
-        .od-account-field--box:focus-within {
-          border: 2px solid var(--od-outlined-field-error);
+      &.bc-account-field--invalid {
+        .bc-account-field--box,
+        .bc-account-field--box:focus-within {
+          border: 2px solid var(--bc-outlined-field-error);
           padding: 0 15px;
         }
 
-        .od-account-field--label,
-        &:focus-within .od-account-field--label,
-        .od-account-field--supporting {
-          color: var(--od-outlined-field-error);
+        .bc-account-field--label,
+        &:focus-within .bc-account-field--label,
+        .bc-account-field--supporting {
+          color: var(--bc-outlined-field-error);
         }
       }
 
@@ -231,28 +231,28 @@
     }
 
     /* iOS: a row of an inset group (44 pt, label column of 112 pt). */
-    .od-account-field--ios-row {
+    .bc-account-field--ios-row {
       margin: 0 16px;
       min-height: 44px;
       padding: 0 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
-      &.od-account-field--single {
+      &.bc-account-field--single {
         margin-top: 20px;
         border-radius: 20px;
       }
 
-      &.od-account-field--first {
+      &.bc-account-field--first {
         margin-top: 20px;
         border-radius: 20px 20px 0 0;
       }
 
-      &.od-account-field--last {
+      &.bc-account-field--last {
         border-radius: 0 0 20px 20px;
-        box-shadow: inset 0 0.5px 0 var(--od-separator);
+        box-shadow: inset 0 0.5px 0 var(--bc-separator);
       }
 
       &.disabled {
@@ -263,7 +263,7 @@
         width: 112px;
         flex: none;
         font-size: 17px;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
       input {
@@ -276,29 +276,29 @@
         background: none;
         font: inherit;
         font-size: 17px;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
 
-      &.od-account-field--invalid input {
-        color: var(--od-alarm);
-        -webkit-text-fill-color: var(--od-alarm);
+      &.bc-account-field--invalid input {
+        color: var(--bc-alarm);
+        -webkit-text-fill-color: var(--bc-alarm);
       }
 
-      .od-account-field--icon {
+      .bc-account-field--icon {
         flex: none;
         display: flex;
-        color: var(--od-alarm);
+        color: var(--bc-alarm);
       }
     }
 
-    .od-account-field--ios-footer {
+    .bc-account-field--ios-footer {
       margin: 6px 32px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-account-field--error {
-        color: var(--od-alarm);
+      &.bc-account-field--error {
+        color: var(--bc-alarm);
       }
     }
   }

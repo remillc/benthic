@@ -149,7 +149,7 @@
   const BODY_TOP = 30;
   const BODY_BOTTOM = 262;
   /** @type {Record<string, string>} */
-  const LAYER_FILL = { he: 'var(--od-gas-helium)', o2: 'var(--od-gas-oxygen)', topup: 'var(--od-gas-topup)' };
+  const LAYER_FILL = { he: 'var(--bc-gas-helium)', o2: 'var(--bc-gas-oxygen)', topup: 'var(--bc-gas-topup)' };
   const drawn = $derived.by(() => {
     const total = layers.reduce((s, l) => s + l.mbar, 0) || 1;
     let y = BODY_BOTTOM;
@@ -175,8 +175,8 @@
   const workingText = $derived(working ? `${formatNumber(Number(working), 0)} ${pressureUnit}` : '');
 </script>
 
-<div class="od-desktop-blender">
-  <div class="od-desktop-blender--inputs">
+<div class="bc-desktop-blender">
+  <div class="bc-desktop-blender--inputs">
     <DesktopSegments
       ariaLabel={t('tools.blendMode')}
       value={b.mode}
@@ -184,12 +184,12 @@
       onchange={(v) => setBlenderMode(/** @type {any} */ (v))}
     />
 
-    <h3 class="od-desktop-blender--label">{t('tools.blendWanted')}</h3>
-    <div class="od-desktop-blender--pair">
+    <h3 class="bc-desktop-blender--label">{t('tools.blendWanted')}</h3>
+    <div class="bc-desktop-blender--pair">
       <DesktopField label={t('tools.oxygen')} bind:value={b.o2} unit={t('units.percent')} invalid={wantedInvalid} helper={wantedInvalid ? t('tools.gasInvalid') : ''} />
       {#if trimix}<DesktopField label={t('tools.helium')} bind:value={b.he} unit={t('units.percent')} invalid={wantedInvalid} />{/if}
     </div>
-    <div class="od-desktop-blender--pair">
+    <div class="bc-desktop-blender--pair">
       <DesktopField label={t('tools.blendCylinder')} bind:value={b.cylinder} options={cylinderOptions} />
       <DesktopField
         label={t('desktopTools.finalPressure')}
@@ -201,8 +201,8 @@
       />
     </div>
 
-    <h3 class="od-desktop-blender--label">{t('tools.blendInside')}</h3>
-    <div class="od-desktop-blender--pair">
+    <h3 class="bc-desktop-blender--label">{t('tools.blendInside')}</h3>
+    <div class="bc-desktop-blender--pair">
       <DesktopField
         label={t('tools.blendInsidePressure')}
         bind:value={b.insidePressure}
@@ -211,19 +211,19 @@
         helper={insideInvalid ? t('tools.blendInvalid') : t('tools.blendInsideHelp')}
       />
     </div>
-    <div class="od-desktop-blender--pair">
+    <div class="bc-desktop-blender--pair">
       <DesktopField label={t('tools.oxygen')} bind:value={b.insideO2} unit={t('units.percent')} invalid={insideMixInvalid} />
       {#if trimix}<DesktopField label={t('tools.helium')} bind:value={b.insideHe} unit={t('units.percent')} invalid={insideMixInvalid} />{/if}
     </div>
-    <div class="od-desktop-blender--pair">
+    <div class="bc-desktop-blender--pair">
       <DesktopField label={t('tools.blendTopUp')} bind:value={b.topUp} options={topUpOptions} />
       {#if b.topUp === 'nitrox'}<DesktopField label={t('tools.blendTopUpOxygen')} bind:value={b.topUpO2} unit={t('units.percent')} invalid={topUpInvalid} />{/if}
     </div>
   </div>
 
-  <div class="od-desktop-blender--fill">
-    <div class="od-desktop-blender--fill-head">
-      <h3 class="od-desktop-blender--title">{t('tools.blendFill')}</h3>
+  <div class="bc-desktop-blender--fill">
+    <div class="bc-desktop-blender--fill-head">
+      <h3 class="bc-desktop-blender--title">{t('tools.blendFill')}</h3>
       {#if trimix}
         <DesktopSegments
           ariaLabel={t('tools.blendOrder')}
@@ -235,54 +235,54 @@
     </div>
 
     {#if result && result.error === 'TOPUP_TOO_RICH'}
-      <p class="od-desktop-blender--notice" role="alert">{t('tools.blendTooRich')}</p>
+      <p class="bc-desktop-blender--notice" role="alert">{t('tools.blendTooRich')}</p>
     {:else if result}
       {#if result.error === 'RESIDUAL_TOO_HIGH'}
-        <div class="od-desktop-blender--notice" role="alert">
+        <div class="bc-desktop-blender--notice" role="alert">
           <strong>{t('tools.blendBleedTitle')}</strong>
           <span>{bleedText && result.bleedToMbar ? t('tools.blendBleedText', { pressure: bleedText }) : t('tools.blendBleedEmpty')}</span>
         </div>
       {/if}
-      <div class="od-desktop-blender--card">
-        <svg class="od-desktop-blender--cylinder" viewBox="0 0 120 270" width="110" role="img" aria-label={drawingLabel}>
+      <div class="bc-desktop-blender--card">
+        <svg class="bc-desktop-blender--cylinder" viewBox="0 0 120 270" width="110" role="img" aria-label={drawingLabel}>
           <defs>
             <clipPath id="od-desktop-blender-clip"><path d="M60 26 C 98 26 104 44 104 66 L 104 236 C 104 252 98 262 84 262 L 36 262 C 22 262 16 252 16 236 L 16 66 C 16 44 22 26 60 26 Z" /></clipPath>
           </defs>
-          <rect x="46" y="8" width="28" height="20" rx="4" class="od-desktop-blender--valve" />
+          <rect x="46" y="8" width="28" height="20" rx="4" class="bc-desktop-blender--valve" />
           <g clip-path="url(#od-desktop-blender-clip)">
-            <rect x="0" y="0" width="120" height="270" class="od-desktop-blender--empty" />
+            <rect x="0" y="0" width="120" height="270" class="bc-desktop-blender--empty" />
             {#each drawn as layer (layer.gas)}
               <rect x="0" y={layer.y} width="120" height={layer.h} style:fill={LAYER_FILL[layer.gas]} />
             {/each}
           </g>
-          <path class="od-desktop-blender--outline" d="M60 26 C 98 26 104 44 104 66 L 104 236 C 104 252 98 262 84 262 L 36 262 C 22 262 16 252 16 236 L 16 66 C 16 44 22 26 60 26 Z" />
+          <path class="bc-desktop-blender--outline" d="M60 26 C 98 26 104 44 104 66 L 104 236 C 104 252 98 262 84 262 L 36 262 C 22 262 16 252 16 236 L 16 66 C 16 44 22 26 60 26 Z" />
         </svg>
-        {#if workingText}<span class="od-desktop-blender--working od-value">{workingText}</span>{/if}
-        <ol class="od-desktop-blender--steps" aria-live="polite">
+        {#if workingText}<span class="bc-desktop-blender--working bc-value">{workingText}</span>{/if}
+        <ol class="bc-desktop-blender--steps" aria-live="polite">
           {#each steps as step, i (i)}
             <li>
-              <span class="od-desktop-blender--number od-desktop-blender--number-{step.gas}" aria-hidden="true">{i + 1}</span>
-              <span class="od-desktop-blender--texts">
-                <span class="od-desktop-blender--name">{step.name}</span>
-                <span class="od-desktop-blender--added od-value">{step.added}</span>
+              <span class="bc-desktop-blender--number bc-desktop-blender--number-{step.gas}" aria-hidden="true">{i + 1}</span>
+              <span class="bc-desktop-blender--texts">
+                <span class="bc-desktop-blender--name">{step.name}</span>
+                <span class="bc-desktop-blender--added bc-value">{step.added}</span>
               </span>
-              <span class="od-desktop-blender--upto od-value">{step.upTo}</span>
+              <span class="bc-desktop-blender--upto bc-value">{step.upTo}</span>
             </li>
           {/each}
         </ol>
       </div>
     {:else if invalid}
-      <p class="od-desktop-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
+      <p class="bc-desktop-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
     {/if}
 
-    <p class="od-desktop-blender--caption">{t('tools.blendCooled')} {t('tools.blendOxygenClean')}</p>
-    <div class="od-desktop-blender--banner" role="note"><Icon name="warning" size={20} />{t('tools.blendAnalyse')}</div>
+    <p class="bc-desktop-blender--caption">{t('tools.blendCooled')} {t('tools.blendOxygenClean')}</p>
+    <div class="bc-desktop-blender--banner" role="note"><Icon name="warning" size={20} />{t('tools.blendAnalyse')}</div>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-blender {
+    .bc-desktop-blender {
       display: grid;
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
       gap: 32px;
@@ -290,100 +290,100 @@
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
     @container od-tool (max-width: 799px) {
-      .od-desktop-blender {
+      .bc-desktop-blender {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;
       }
     }
-    .od-desktop-blender--inputs {
+    .bc-desktop-blender--inputs {
       display: flex;
       flex-direction: column;
       gap: 14px;
       align-items: stretch;
     }
-    .od-desktop-blender--inputs > :global(.od-desktop-segments) {
+    .bc-desktop-blender--inputs > :global(.bc-desktop-segments) {
       align-self: flex-start;
     }
-    .od-desktop-blender--label {
+    .bc-desktop-blender--label {
       margin: 6px 0 0;
       font-size: 15px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-blender--pair {
+    .bc-desktop-blender--pair {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       align-items: start;
     }
-    .od-desktop-blender--fill {
+    .bc-desktop-blender--fill {
       display: flex;
       flex-direction: column;
       gap: 12px;
       min-width: 0;
     }
-    .od-desktop-blender--fill-head {
+    .bc-desktop-blender--fill-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       min-height: 42px;
     }
-    .od-desktop-blender--title {
+    .bc-desktop-blender--title {
       margin: 0;
       font-size: 15px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-blender--card {
+    .bc-desktop-blender--card {
       position: relative;
       display: flex;
       align-items: center;
       gap: 32px;
       padding: 20px 24px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-desktop-blender--cylinder {
+    .bc-desktop-blender--cylinder {
       flex: none;
     }
-    .od-desktop-blender--valve {
-      fill: var(--od-text-2);
+    .bc-desktop-blender--valve {
+      fill: var(--bc-text-2);
     }
-    .od-desktop-blender--empty {
-      fill: var(--od-desktop-field);
+    .bc-desktop-blender--empty {
+      fill: var(--bc-desktop-field);
     }
-    .od-desktop-blender--outline {
+    .bc-desktop-blender--outline {
       fill: none;
-      stroke: var(--od-text-2);
+      stroke: var(--bc-text-2);
       stroke-width: 2;
     }
-    .od-desktop-blender--working {
+    .bc-desktop-blender--working {
       position: absolute;
       top: 28px;
       left: 140px;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-blender--steps {
+    .bc-desktop-blender--steps {
       flex: 1;
       min-width: 0;
       margin: 0;
       padding: 0;
       list-style: none;
     }
-    .od-desktop-blender--steps li {
+    .bc-desktop-blender--steps li {
       display: grid;
       grid-template-columns: 36px minmax(0, 1fr) auto;
       align-items: center;
       gap: 12px;
       padding: 12px 0;
-      border-top: 1px solid var(--od-separator);
+      border-top: 1px solid var(--bc-separator);
     }
-    .od-desktop-blender--steps li:first-child {
+    .bc-desktop-blender--steps li:first-child {
       border-top: 0;
     }
-    .od-desktop-blender--number {
+    .bc-desktop-blender--number {
       display: grid;
       place-items: center;
       width: 32px;
@@ -393,60 +393,60 @@
       font-weight: 600;
       color: #fff;
     }
-    .od-desktop-blender--number-he {
-      background: var(--od-gas-helium);
+    .bc-desktop-blender--number-he {
+      background: var(--bc-gas-helium);
     }
-    .od-desktop-blender--number-o2 {
-      background: var(--od-gas-oxygen);
+    .bc-desktop-blender--number-o2 {
+      background: var(--bc-gas-oxygen);
     }
-    .od-desktop-blender--number-topup {
-      background: var(--od-gas-topup-badge);
+    .bc-desktop-blender--number-topup {
+      background: var(--bc-gas-topup-badge);
     }
-    .od-desktop-blender--texts {
+    .bc-desktop-blender--texts {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
-    .od-desktop-blender--name {
+    .bc-desktop-blender--name {
       font-size: 17px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-blender--added {
+    .bc-desktop-blender--added {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-blender--upto {
+    .bc-desktop-blender--upto {
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: right;
       min-width: 110px;
     }
-    .od-desktop-blender--notice {
+    .bc-desktop-blender--notice {
       display: flex;
       flex-direction: column;
       gap: 2px;
       margin: 0;
       padding: 12px 16px;
       border-radius: 12px;
-      background: var(--od-alarm-tint);
+      background: var(--bc-alarm-tint);
       font-size: 14px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-desktop-blender--caption {
+    .bc-desktop-blender--caption {
       margin: 0;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-desktop-blender--banner {
+    .bc-desktop-blender--banner {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 14px 16px;
       border-radius: 12px;
-      background: var(--od-desktop-banner);
+      background: var(--bc-desktop-banner);
       font-size: 15px;
-      color: var(--od-desktop-banner-ink);
+      color: var(--bc-desktop-banner-ink);
     }
   }
 </style>

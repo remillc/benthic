@@ -230,10 +230,10 @@
 
 {#snippet rowView(/** @type {Row} */ row)}
   {#if row.kind === 'switch'}
-    <label class="od-planner-settings--row">
-      <span class="od-planner-settings--texts">
-        <span class="od-planner-settings--label">{row.label}</span>
-        {#if row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
+    <label class="bc-planner-settings--row">
+      <span class="bc-planner-settings--texts">
+        <span class="bc-planner-settings--label">{row.label}</span>
+        {#if row.text}<span class="bc-planner-settings--supporting">{row.text}</span>{/if}
       </span>
       <span class="toggle">
         <input type="checkbox" checked={row.checked} onchange={(e) => Promise.resolve(row.set(e.currentTarget.checked)).catch(failed)} />
@@ -241,7 +241,7 @@
       </span>
     </label>
   {:else if row.kind === 'sac'}
-    <div class="od-planner-settings--sac">
+    <div class="bc-planner-settings--sac">
       <SacField
         label={row.label}
         value={row.stored}
@@ -252,38 +252,38 @@
         openLabel={t('plan.sacOpen')}
         onchange={(ml) => Promise.resolve(setSetting(row.id, ml)).catch(failed)}
       />
-      {#if row.text}<p class="od-planner-settings--supporting od-planner-settings--sac-text">{row.text}</p>{/if}
+      {#if row.text}<p class="bc-planner-settings--supporting bc-planner-settings--sac-text">{row.text}</p>{/if}
     </div>
   {:else}
-    <button type="button" class="od-planner-settings--row" aria-haspopup={row.kind === 'number' ? 'dialog' : 'listbox'} onclick={(e) => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row, anchor: e.currentTarget })}>
-      <span class="od-planner-settings--texts">
-        <span class="od-planner-settings--label">{row.label}</span>
-        {#if row.kind === 'number' && row.text}<span class="od-planner-settings--supporting">{row.text}</span>{/if}
+    <button type="button" class="bc-planner-settings--row" aria-haspopup={row.kind === 'number' ? 'dialog' : 'listbox'} onclick={(e) => (dialog = row.kind === 'number' ? { kind: 'number', row } : { kind: 'choice', row, anchor: e.currentTarget })}>
+      <span class="bc-planner-settings--texts">
+        <span class="bc-planner-settings--label">{row.label}</span>
+        {#if row.kind === 'number' && row.text}<span class="bc-planner-settings--supporting">{row.text}</span>{/if}
       </span>
-      <span class="od-planner-settings--value od-value">{row.kind === 'number' ? shown(row) : row.value}</span>
+      <span class="bc-planner-settings--value bc-value">{row.kind === 'number' ? shown(row) : row.value}</span>
     </button>
   {/if}
 {/snippet}
 
-<Page class="od-planner-settings {theme.ios ? 'od-planner-settings--ios-list' : ''}">
+<Page class="bc-planner-settings {theme.ios ? 'bc-planner-settings--ios-list' : ''}">
   <Navbar title={t('plannerSettings.title')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
   {#if planner.setup}
     {#each groups as g (g.id)}
-      <h2 class="od-planner-settings--title">{g.title}</h2>
-      <div class="od-planner-settings--surface" role="list">
+      <h2 class="bc-planner-settings--title">{g.title}</h2>
+      <div class="bc-planner-settings--surface" role="list">
         {#each g.rows as row (row.id)}<div role="listitem">{@render rowView(row)}</div>{/each}
       </div>
     {/each}
   {/if}
-  <div class="od-planner-settings--end" aria-hidden="true"></div>
+  <div class="bc-planner-settings--end" aria-hidden="true"></div>
 </Page>
 
 {#if dialog?.kind === 'choice'}
@@ -322,44 +322,44 @@
     /* As Settings (spec, section 4, layout): titles on the page background,
        groups as rounded white surfaces, no dividers, 48 dp rows. The first
        group title follows the top bar directly. */
-    .od-planner-settings--title {
+    .bc-planner-settings--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
       line-height: 24px;
       font-weight: 700;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-planner-settings--surface {
+    .bc-planner-settings--surface {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
-      :global(.od-planner-settings--ios-list) & {
+      :global(.bc-planner-settings--ios-list) & {
         border-radius: 10px;
       }
     }
 
     /* A SAC field in its group: 12 dp from the edges, as every field in a white surface. */
-    .od-planner-settings--sac {
-      --od-field-margin: 12px;
+    .bc-planner-settings--sac {
+      --bc-field-margin: 12px;
       padding-bottom: 8px;
     }
 
-    .od-planner-settings--sac-text {
+    .bc-planner-settings--sac-text {
       margin: 4px 16px 0;
     }
 
-    .od-planner-settings--row {
+    .bc-planner-settings--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 48px;
       padding: 10px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -368,7 +368,7 @@
       cursor: pointer;
     }
 
-    .od-planner-settings--texts {
+    .bc-planner-settings--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -376,21 +376,21 @@
       gap: 2px;
     }
 
-    .od-planner-settings--label {
+    .bc-planner-settings--label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-planner-settings--supporting {
+    .bc-planner-settings--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-planner-settings--value {
+    .bc-planner-settings--value {
       flex: none;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: end;
     }
 
@@ -399,7 +399,7 @@
       flex: none;
     }
 
-    .od-planner-settings--end {
+    .bc-planner-settings--end {
       height: 32px;
     }
   }

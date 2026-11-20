@@ -55,8 +55,8 @@
 </script>
 
 {#snippet body()}
-  <p class="od-emergency-content--lead">{t('emergency.content.lead')}</p>
-  <div class="od-emergency-content--card">
+  <p class="bc-emergency-content--lead">{t('emergency.content.lead')}</p>
+  <div class="bc-emergency-content--card">
     {#each ITEMS as key (key)}
       <SwitchField
         label={t(`emergency.content.${key}`)}
@@ -69,7 +69,7 @@
   </div>
 {/snippet}
 
-<Page class="od-emergency-content-page">
+<Page class="bc-emergency-content-page">
   <Navbar title={t('emergency.content.title')}>
     {#snippet left()}
       <BackLink label={t('emergency.title')} name={t('emergency.content.back')} />
@@ -84,22 +84,22 @@
 
 <style>
   @layer od.components {
-    :global(.od-emergency-content-page .page-content) {
+    :global(.bc-emergency-content-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-emergency-content--lead {
+    .bc-emergency-content--lead {
       margin: 12px 32px 8px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-emergency-content--card {
+    .bc-emergency-content--card {
       margin: 0 16px;
       padding: 4px 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
   }
 </style>

@@ -32,72 +32,72 @@
   const glow = `od-profile-hero-glow-${id}`;
 </script>
 
-<div class="od-profile-hero" class:od-profile-hero--portrait={portrait} class:od-profile-hero--still={still} bind:clientWidth={width} bind:clientHeight={height}>
-  <svg class="od-profile-hero--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('firstLaunch.profileLabel')}>
+<div class="bc-profile-hero" class:bc-profile-hero--portrait={portrait} class:bc-profile-hero--still={still} bind:clientWidth={width} bind:clientHeight={height}>
+  <svg class="bc-profile-hero--svg" {width} {height} viewBox="0 0 {width} {height}" role="img" aria-label={t('firstLaunch.profileLabel')}>
     <defs>
       <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" class="od-profile-hero--water-top"></stop>
-        <stop offset="1" class="od-profile-hero--water-bottom"></stop>
+        <stop offset="0" class="bc-profile-hero--water-top"></stop>
+        <stop offset="1" class="bc-profile-hero--water-bottom"></stop>
       </linearGradient>
       <filter id={glow} x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
     </defs>
-    <line class="od-profile-hero--surface" x1="0" y1={shape.surfaceY} x2={width} y2={shape.surfaceY}></line>
-    <path class="od-profile-hero--water" d={shape.area} fill="url(#{gradient})"></path>
-    <path class="od-profile-hero--glow" d={shape.line} filter="url(#{glow})" pathLength="1"></path>
-    <path class="od-profile-hero--line" d={shape.line} pathLength="1"></path>
+    <line class="bc-profile-hero--surface" x1="0" y1={shape.surfaceY} x2={width} y2={shape.surfaceY}></line>
+    <path class="bc-profile-hero--water" d={shape.area} fill="url(#{gradient})"></path>
+    <path class="bc-profile-hero--glow" d={shape.line} filter="url(#{glow})" pathLength="1"></path>
+    <path class="bc-profile-hero--line" d={shape.line} pathLength="1"></path>
   </svg>
-  <span class="od-profile-hero--dot" style="left: {shape.deepest.x}px; top: {shape.deepest.y}px" aria-hidden="true"></span>
-  <div class="od-profile-hero--label od-profile-hero--label-depth" aria-hidden="true">
-    <span class="od-profile-hero--value">{t('firstLaunch.profileDepthValue')}</span>
-    <span class="od-profile-hero--caption">{t('firstLaunch.profileDepthCaption')}</span>
+  <span class="bc-profile-hero--dot" style="left: {shape.deepest.x}px; top: {shape.deepest.y}px" aria-hidden="true"></span>
+  <div class="bc-profile-hero--label bc-profile-hero--label-depth" aria-hidden="true">
+    <span class="bc-profile-hero--value">{t('firstLaunch.profileDepthValue')}</span>
+    <span class="bc-profile-hero--caption">{t('firstLaunch.profileDepthCaption')}</span>
   </div>
-  <div class="od-profile-hero--label od-profile-hero--label-duration" aria-hidden="true">
-    <span class="od-profile-hero--value">{t('firstLaunch.profileDurationValue')}</span>
-    <span class="od-profile-hero--caption">{t('firstLaunch.profileDurationCaption')}</span>
+  <div class="bc-profile-hero--label bc-profile-hero--label-duration" aria-hidden="true">
+    <span class="bc-profile-hero--value">{t('firstLaunch.profileDurationValue')}</span>
+    <span class="bc-profile-hero--caption">{t('firstLaunch.profileDurationCaption')}</span>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-profile-hero {
+    .bc-profile-hero {
       position: relative;
       /* Fills the box its page gives it; the curve is scaled to it. */
       width: 100%;
       height: 100%;
     }
 
-    .od-profile-hero--svg {
+    .bc-profile-hero--svg {
       position: absolute;
       inset: 0;
       overflow: visible;
     }
 
-    .od-profile-hero--water-top {
-      stop-color: var(--od-first-band-water-top);
+    .bc-profile-hero--water-top {
+      stop-color: var(--bc-first-band-water-top);
     }
 
-    .od-profile-hero--water-bottom {
-      stop-color: var(--od-first-band-water-bottom);
+    .bc-profile-hero--water-bottom {
+      stop-color: var(--bc-first-band-water-bottom);
     }
 
-    .od-profile-hero--surface {
-      stroke: var(--od-first-band-surface);
+    .bc-profile-hero--surface {
+      stroke: var(--bc-first-band-surface);
       stroke-width: 1;
       stroke-dasharray: 3 4;
     }
 
-    .od-profile-hero--glow {
+    .bc-profile-hero--glow {
       fill: none;
-      stroke: var(--od-first-band-glow);
+      stroke: var(--bc-first-band-glow);
       stroke-width: 6;
       stroke-opacity: 0.55;
       stroke-dasharray: 1;
       animation: od-profile-hero-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
 
-    .od-profile-hero--line {
+    .bc-profile-hero--line {
       fill: none;
-      stroke: var(--od-first-band-trace);
+      stroke: var(--bc-first-band-trace);
       stroke-width: 2.5;
       stroke-linejoin: round;
       stroke-linecap: round;
@@ -106,69 +106,69 @@
     }
 
     /* The deepest point of the curve (its centre is where the page puts left and top). */
-    .od-profile-hero--dot {
+    .bc-profile-hero--dot {
       position: absolute;
       width: 12px;
       height: 12px;
       margin: -6px 0 0 -6px;
       border-radius: 6px;
-      background: var(--od-first-band-trace);
-      box-shadow: 0 0 0 5px var(--od-first-band-dot-ring);
+      background: var(--bc-first-band-trace);
+      box-shadow: 0 0 0 5px var(--bc-first-band-dot-ring);
       animation: od-profile-hero-pop 0.3s 0.7s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
-    .od-profile-hero--label {
+    .bc-profile-hero--label {
       position: absolute;
       padding: 8px 14px;
       border-radius: 14px;
-      background: var(--od-first-band-label);
-      border: 1px solid var(--od-first-band-label-line);
+      background: var(--bc-first-band-label);
+      border: 1px solid var(--bc-first-band-label-line);
       backdrop-filter: blur(6px);
-      color: var(--od-on-first-band);
+      color: var(--bc-on-first-band);
       display: flex;
       flex-direction: column;
       white-space: nowrap;
       animation: od-profile-hero-in 0.5s 2.1s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
-    .od-profile-hero--value {
+    .bc-profile-hero--value {
       font-size: 20px;
       line-height: 24px;
       font-weight: 600;
       letter-spacing: -0.2px;
     }
 
-    .od-profile-hero--caption {
+    .bc-profile-hero--caption {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-first-band-label-caption);
+      color: var(--bc-first-band-label-caption);
     }
 
     /* Landscape: the depth label under the dot, the duration label near the end of the line. */
-    .od-profile-hero--label-depth {
+    .bc-profile-hero--label-depth {
       left: calc(13.3% - 50px);
       top: calc(94.9% + 20px);
     }
 
-    .od-profile-hero--label-duration {
+    .bc-profile-hero--label-duration {
       left: 70.1%;
       top: 29%;
     }
 
     /* Portrait: the depth label to the right of the dot, the duration label a little lower. */
-    .od-profile-hero--portrait .od-profile-hero--label-depth {
+    .bc-profile-hero--portrait .bc-profile-hero--label-depth {
       left: 23.8%;
       top: 85%;
     }
 
-    .od-profile-hero--portrait .od-profile-hero--label-duration {
+    .bc-profile-hero--portrait .bc-profile-hero--label-duration {
       left: 74%;
       top: 34.5%;
     }
 
     /* The desktop app in a narrow window (task 2026-11-16-242): the duration label stays inside the panel. */
     @media (max-width: 1100px) {
-      :global(html.od-desktop-app) .od-profile-hero--label-duration {
+      :global(html.bc-desktop-app) .bc-profile-hero--label-duration {
         left: auto;
         right: 0;
       }
@@ -206,19 +206,19 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-profile-hero--glow,
-      .od-profile-hero--line,
-      .od-profile-hero--dot,
-      .od-profile-hero--label {
+      .bc-profile-hero--glow,
+      .bc-profile-hero--line,
+      .bc-profile-hero--dot,
+      .bc-profile-hero--label {
         animation: none;
       }
     }
 
-    .od-profile-hero--still {
-      .od-profile-hero--glow,
-      .od-profile-hero--line,
-      .od-profile-hero--dot,
-      .od-profile-hero--label {
+    .bc-profile-hero--still {
+      .bc-profile-hero--glow,
+      .bc-profile-hero--line,
+      .bc-profile-hero--dot,
+      .bc-profile-hero--label {
         animation: none;
       }
     }

@@ -43,59 +43,59 @@
 
 <svelte:window onkeydown={key} />
 
-<div class="od-doc-full" role="dialog" aria-modal="true" aria-label={title}>
-  <div class="od-doc-full--top">
-    <span class="od-doc-full--texts">
-      <span class="od-doc-full--title">{title}</span>
-      {#if line}<span class="od-doc-full--line">{line}</span>{/if}
+<div class="bc-doc-full" role="dialog" aria-modal="true" aria-label={title}>
+  <div class="bc-doc-full--top">
+    <span class="bc-doc-full--texts">
+      <span class="bc-doc-full--title">{title}</span>
+      {#if line}<span class="bc-doc-full--line">{line}</span>{/if}
     </span>
-    <button type="button" class="od-doc-full--close" onclick={onclose} aria-label={t('docs.full.close')}><Icon name="close" /></button>
+    <button type="button" class="bc-doc-full--close" onclick={onclose} aria-label={t('docs.full.close')}><Icon name="close" /></button>
   </div>
-  <button type="button" class="od-doc-full--image" onclick={next} aria-label={current?.label}>
+  <button type="button" class="bc-doc-full--image" onclick={next} aria-label={current?.label}>
     {#if current}<img src={current.url} alt={current.label} />{/if}
   </button>
-  <p class="od-doc-full--hint">{images.length > 1 ? t('docs.full.hint') : t('docs.full.hintOne')}</p>
+  <p class="bc-doc-full--hint">{images.length > 1 ? t('docs.full.hint') : t('docs.full.hintOne')}</p>
 </div>
 
 <style>
   @layer od.components {
-    .od-doc-full {
+    .bc-doc-full {
       position: fixed;
       inset: 0;
       z-index: 20000;
       display: flex;
       flex-direction: column;
-      background: var(--od-viewer);
-      color: var(--od-viewer-on);
+      background: var(--bc-viewer);
+      color: var(--bc-viewer-on);
     }
 
-    .od-doc-full--top {
-      padding: calc(12px + var(--od-safe-top, 0px)) 8px 8px 20px;
+    .bc-doc-full--top {
+      padding: calc(12px + var(--bc-safe-top, 0px)) 8px 8px 20px;
       display: flex;
       align-items: flex-start;
       gap: 12px;
     }
 
-    .od-doc-full--texts {
+    .bc-doc-full--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-doc-full--title {
+    .bc-doc-full--title {
       font-size: 18px;
       line-height: 24px;
       font-weight: 600;
     }
 
-    .od-doc-full--line {
+    .bc-doc-full--line {
       font-size: 14px;
       line-height: 20px;
       opacity: 0.8;
     }
 
-    .od-doc-full--close {
+    .bc-doc-full--close {
       flex: none;
       width: 48px;
       height: 48px;
@@ -104,11 +104,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-viewer-control);
-      color: var(--od-viewer-on);
+      background: var(--bc-viewer-control);
+      color: var(--bc-viewer-on);
     }
 
-    .od-doc-full--image {
+    .bc-doc-full--image {
       flex: 1;
       min-height: 0;
       padding: 8px 16px;
@@ -119,16 +119,16 @@
       background: none;
     }
 
-    .od-doc-full--image img {
+    .bc-doc-full--image img {
       max-width: 100%;
       max-height: 100%;
       border-radius: 12px;
       object-fit: contain;
     }
 
-    .od-doc-full--hint {
+    .bc-doc-full--hint {
       margin: 0;
-      padding: 8px 24px calc(16px + var(--od-safe-bottom, 0px));
+      padding: 8px 24px calc(16px + var(--bc-safe-bottom, 0px));
       text-align: center;
       font-size: 13px;
       line-height: 18px;

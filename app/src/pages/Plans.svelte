@@ -60,7 +60,7 @@
       if (highlighted === id) highlighted = 0;
     }, 2000);
     await tick();
-    listEl?.querySelector('.od-plans--row-highlighted')?.scrollIntoView({ block: 'nearest' });
+    listEl?.querySelector('.bc-plans--row-highlighted')?.scrollIntoView({ block: 'nearest' });
   }
   loadSetup().catch((e) => console.error('Planner setup', e));
 
@@ -146,47 +146,47 @@
   }
 </script>
 
-<Page class="od-plans" onPageBeforeIn={load}>
+<Page class="bc-plans" onPageBeforeIn={load}>
   <Navbar title={t('plans.title')}>
     {#snippet left()}
       <Link back iconOnly={!theme.ios}>
         <i class="icon icon-back"></i>
-        {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="od-sr-only">{t('plan.back')}</span>{/if}
+        {#if theme.ios}<span>{t('plan.back')}</span>{:else}<span class="bc-sr-only">{t('plan.back')}</span>{/if}
       </Link>
     {/snippet}
   </Navbar>
 
   {#if failed}
-    <p class="od-plans--intro">{t('plans.failed')}</p>
+    <p class="bc-plans--intro">{t('plans.failed')}</p>
   {:else if plans && plans.length === 0}
-    <div class="od-plans--empty">
+    <div class="bc-plans--empty">
       <Icon name="plan" size={48} />
-      <p class="od-plans--headline">{t('plans.empty')}</p>
-      <p class="od-plans--text">{t('plans.emptyText')}</p>
+      <p class="bc-plans--headline">{t('plans.empty')}</p>
+      <p class="bc-plans--text">{t('plans.emptyText')}</p>
     </div>
   {:else if plans}
-    <p class="od-plans--intro">{t('plans.intro')}</p>
+    <p class="bc-plans--intro">{t('plans.intro')}</p>
     <div class="list" bind:this={listEl}>
       {#each plans as plan (plan.id)}
-        <div class="od-plans--row" class:od-plans--row-highlighted={plan.id === highlighted}>
-          <a class="od-plans--open" href="/plans/{plan.id}">
+        <div class="bc-plans--row" class:bc-plans--row-highlighted={plan.id === highlighted}>
+          <a class="bc-plans--open" href="/plans/{plan.id}">
             <ProfileThumbnail profile={plan.profile} maxDepthMm={plan.maxDepthMm} {prefs} />
-            <span class="od-plans--texts">
-              <span class="od-plans--name" class:od-plans--name-fallback={untitled(plan)}>{title(plan)}</span>
-              <span class="od-plans--sub">{detail(plan)}</span>
+            <span class="bc-plans--texts">
+              <span class="bc-plans--name" class:bc-plans--name-fallback={untitled(plan)}>{title(plan)}</span>
+              <span class="bc-plans--sub">{detail(plan)}</span>
             </span>
-            <span class="od-plans--figures od-value">
-              <span class="od-plans--depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
-              <span class="od-plans--time">{formatDuration(plan.durationSeconds)}</span>
+            <span class="bc-plans--figures bc-value">
+              <span class="bc-plans--depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
+              <span class="bc-plans--time">{formatDuration(plan.durationSeconds)}</span>
             </span>
           </a>
-          <button type="button" class="od-plans--more" aria-label={t('plans.more')} onclick={(e) => openMenu(e, plan)}><Icon name="more" weight={4} /></button>
+          <button type="button" class="bc-plans--more" aria-label={t('plans.more')} onclick={(e) => openMenu(e, plan)}><Icon name="more" weight={4} /></button>
         </div>
       {/each}
     </div>
   {/if}
 
-  <Popover id={menuId} class="od-menu" backdrop={false}>
+  <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="copy" text={t('plans.duplicate')} onclick={duplicate} />
       <MenuItem
@@ -202,7 +202,7 @@
   </Popover>
 
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended od-fab-add od-plans--fab" class:od-plans--fab-raised={snackbarUp}>
+    <div class="fab fab-right-bottom fab-extended bc-fab-add bc-plans--fab" class:bc-plans--fab-raised={snackbarUp}>
       <a href="/plan/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('plans.new')}</div>
@@ -217,73 +217,73 @@
 
 <style>
   @layer od.components {
-    .od-plans--intro {
+    .bc-plans--intro {
       margin: 8px 16px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-plans--row {
+    .bc-plans--row {
       display: flex;
       align-items: center;
       min-height: 72px;
     }
 
     /* The saved plan, then back to normal: the highlight fades over 400 ms after its 2 s. */
-    .od-plans--row {
+    .bc-plans--row {
       background: transparent;
       transition: background-color 400ms ease-out;
     }
 
-    .od-plans--row-highlighted {
-      background: var(--od-surface-container-high);
+    .bc-plans--row-highlighted {
+      background: var(--bc-surface-container-high);
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-plans--row {
+      .bc-plans--row {
         transition: none;
       }
     }
 
-    .od-plans--name-fallback {
-      color: var(--od-text-2);
+    .bc-plans--name-fallback {
+      color: var(--bc-text-2);
     }
 
-    .od-plans--fab {
+    .bc-plans--fab {
       transition: transform 250ms ease-out;
     }
 
-    .od-plans--fab-raised {
+    .bc-plans--fab-raised {
       /* The snackbar (48 dp at 24 dp) takes the bottom: the FAB goes above it. */
       transform: translateY(-80px);
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-plans--fab {
+      .bc-plans--fab {
         transition: none;
       }
     }
 
-    .od-plans--open {
+    .bc-plans--open {
       flex: 1;
       min-width: 0;
       padding: 8px 0 8px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-plans--texts {
+    .bc-plans--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-plans--name {
+    .bc-plans--name {
       font-size: 16px;
       line-height: 24px;
       white-space: nowrap;
@@ -291,66 +291,66 @@
       text-overflow: ellipsis;
     }
 
-    .od-plans--sub {
+    .bc-plans--sub {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-plans--figures {
+    .bc-plans--figures {
       flex: none;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
 
-      .od-plans--depth {
+      .bc-plans--depth {
         font-size: 16px;
         font-weight: 600;
       }
 
-      .od-plans--time {
+      .bc-plans--time {
         font-size: 14px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-plans--more {
+    .bc-plans--more {
       flex: none;
       width: 48px;
       height: 48px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-plans--empty {
+    .bc-plans--empty {
       margin-top: 96px;
       padding: 0 32px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      .od-plans--headline {
+      .bc-plans--headline {
         margin: 16px 0 4px;
         font-size: 16px;
         font-weight: 600;
       }
 
-      .od-plans--text {
+      .bc-plans--text {
         margin: 0;
         font-size: 14px;
         line-height: 20px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
   }

@@ -107,39 +107,39 @@
   }
 </script>
 
-<section class="od-without" aria-label={t('sites.withoutTitle')}>
-  <h2 class="od-without--title">{t('sites.withoutTitle')}</h2>
-  <p class="od-without--intro">{t('sites.withoutIntro', { n: dives.length })}</p>
+<section class="bc-without" aria-label={t('sites.withoutTitle')}>
+  <h2 class="bc-without--title">{t('sites.withoutTitle')}</h2>
+  <p class="bc-without--intro">{t('sites.withoutIntro', { n: dives.length })}</p>
 
   {#each groups as group (group.first.id)}
-    {#if group.trip}<h3 class="od-without--trip">{tripTitle(group.trip, logbook.dives)}</h3>{/if}
+    {#if group.trip}<h3 class="bc-without--trip">{tripTitle(group.trip, logbook.dives)}</h3>{/if}
     {@const d = group.first}
     {@const s = suggestion(d)}
-    <article class="od-without--card">
-      <div class="od-without--line">
-        <span class="od-without--number od-value">{d.number || ''}</span>
-        <span class="od-without--text">
-          <span class="od-without--date od-value">{formatDateTime(d.date)}</span>
-          <span class="od-without--sub od-value">{sub(d)}</span>
+    <article class="bc-without--card">
+      <div class="bc-without--line">
+        <span class="bc-without--number bc-value">{d.number || ''}</span>
+        <span class="bc-without--text">
+          <span class="bc-without--date bc-value">{formatDateTime(d.date)}</span>
+          <span class="bc-without--sub bc-value">{sub(d)}</span>
         </span>
-        <span class="od-without--actions">
+        <span class="bc-without--actions">
           {#if s.uuid}
-            <button type="button" class="od-without--tonal" onclick={() => assign([d.id], s.uuid)}>{siteName(s.uuid)}</button>
+            <button type="button" class="bc-without--tonal" onclick={() => assign([d.id], s.uuid)}>{siteName(s.uuid)}</button>
           {/if}
-          <button type="button" class="od-without--outlined" onclick={(e) => openChooser(e, [d.id], d)}>{t('desktopSites.chooseSite')}</button>
-          <button type="button" class="od-without--plain" onclick={() => onnew(d)}>{t('sites.newSite')}</button>
+          <button type="button" class="bc-without--outlined" onclick={(e) => openChooser(e, [d.id], d)}>{t('desktopSites.chooseSite')}</button>
+          <button type="button" class="bc-without--plain" onclick={() => onnew(d)}>{t('sites.newSite')}</button>
         </span>
       </div>
-      <p class="od-without--why">{s.why}</p>
+      <p class="bc-without--why">{s.why}</p>
     </article>
     {#if group.others.length}
-      <p class="od-without--more">
+      <p class="bc-without--more">
         {t('desktopSites.otherTripDives', { n: group.others.length })} ·
-        <button type="button" class="od-without--link" onclick={(e) => openChooser(e, [d.id, ...group.others.map((o) => o.id)], d)}>{t('desktopSites.assignAll')}</button>
+        <button type="button" class="bc-without--link" onclick={(e) => openChooser(e, [d.id, ...group.others.map((o) => o.id)], d)}>{t('desktopSites.assignAll')}</button>
       </p>
     {/if}
   {/each}
-  {#if !dives.length}<p class="od-without--empty" role="status">{t('desktopSites.noneWithout')}</p>{/if}
+  {#if !dives.length}<p class="bc-without--empty" role="status">{t('desktopSites.noneWithout')}</p>{/if}
 </section>
 
 {#if choosing}
@@ -160,70 +160,70 @@
 
 <style>
   @layer od.components {
-    .od-without {
+    .bc-without {
       box-sizing: border-box;
       height: 100%;
       overflow: auto;
       padding: 4px 12px 24px 4px;
     }
-    .od-without--title {
+    .bc-without--title {
       margin: 0;
-      font-family: var(--od-title-font);
+      font-family: var(--bc-title-font);
       font-size: 24px;
       line-height: 30px;
       font-weight: 500;
     }
-    .od-without--intro {
+    .bc-without--intro {
       margin: 2px 0 12px;
       max-width: 640px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-without--trip {
+    .bc-without--trip {
       margin: 16px 4px 6px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-without--card {
+    .bc-without--card {
       margin-bottom: 8px;
       padding: 10px 16px 10px 12px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-without--line {
+    .bc-without--line {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    .od-without--number {
+    .bc-without--number {
       flex: none;
       min-width: 24px;
       text-align: center;
       font-size: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-without--text {
+    .bc-without--text {
       display: flex;
       flex: 1;
       flex-direction: column;
       min-width: 0;
     }
-    .od-without--date {
+    .bc-without--date {
       font-size: 15px;
     }
-    .od-without--sub {
+    .bc-without--sub {
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-without--actions {
+    .bc-without--actions {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .od-without--tonal,
-    .od-without--outlined,
-    .od-without--plain {
+    .bc-without--tonal,
+    .bc-without--outlined,
+    .bc-without--plain {
       flex: none;
       width: auto;
       height: 40px;
@@ -233,50 +233,50 @@
       font-size: 14px;
       cursor: pointer;
     }
-    .od-without--tonal {
+    .bc-without--tonal {
       border: 0;
-      background: var(--od-table-selected);
-      color: var(--od-on-table-selected);
+      background: var(--bc-table-selected);
+      color: var(--bc-on-table-selected);
       font-weight: 600;
     }
-    .od-without--outlined {
-      border: 1px solid var(--od-outline);
+    .bc-without--outlined {
+      border: 1px solid var(--bc-outline);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-without--plain {
+    .bc-without--plain {
       border: 0;
       background: none;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       font-weight: 600;
     }
-    .od-without--tonal:hover,
-    .od-without--outlined:hover,
-    .od-without--plain:hover {
+    .bc-without--tonal:hover,
+    .bc-without--outlined:hover,
+    .bc-without--plain:hover {
       filter: brightness(0.96);
     }
-    .od-without--why {
+    .bc-without--why {
       margin: 2px 0 0 48px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-without--more {
+    .bc-without--more {
       margin: 0 0 8px 48px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-without--link {
+    .bc-without--link {
       padding: 0;
       border: 0;
       background: none;
       font: inherit;
       font-weight: 600;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       cursor: pointer;
     }
-    .od-without--empty {
+    .bc-without--empty {
       padding: 32px 0;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

@@ -134,19 +134,19 @@ test('the phone and the tablet logbook draw the cards, the desktop keeps its tab
   assert.match(src('lib/layout.svelte.js'), /\(orientation: portrait\)/);
   // The selected dive keeps the pale blue token on the card's surface.
   const row = src('components/DiveRow.svelte');
-  assert.match(row, /od-dive-row--card-selected \.od-dive-row--surface \{\s*background: var\(--od-table-selected\)/);
+  assert.match(row, /bc-dive-row--card-selected \.bc-dive-row--surface \{\s*background: var\(--bc-table-selected\)/);
   assert.match(logbook, /card=\{cards\}/);
   // The list stays virtual and its dives stay a raw array.
   assert.match(logbook, /f7\.virtualList\.create/);
   assert.match(logbook, /vl\.replaceAllItems\(items\)/);
   assert.match(src('lib/logbook.svelte.js'), /\$state\.raw/);
-  assert.ok(!src('pages/DesktopLogbook.svelte').includes('od-dive-row--card'));
+  assert.ok(!src('pages/DesktopLogbook.svelte').includes('bc-dive-row--card'));
 });
 
 test('a card row has one accessible name; its parts are hidden from the screen reader', () => {
   const row = src('components/DiveRow.svelte');
   assert.match(row, /diveRowLabel\(dive, prefs\)/);
-  for (const part of ['od-dive-row--date', 'od-dive-row--text', 'od-dive-row--right']) assert.match(row, new RegExp(`class="${part}[^"]*" aria-hidden="true"`));
+  for (const part of ['bc-dive-row--date', 'bc-dive-row--text', 'bc-dive-row--right']) assert.match(row, new RegExp(`class="${part}[^"]*" aria-hidden="true"`));
   assert.match(row, /name="pinOff"/, 'the crossed-out pin on a dive with no site');
   assert.match(row, /<ProfileThumbnail[^>]* wide \/>/);
 });
@@ -161,8 +161,8 @@ test('the trip header folds with its chevron, as before, and says whether it is 
 
 test('the colours are tokens in light and in dark, none hard-coded in the rows', () => {
   const theme = src('theme.css');
-  for (const token of ['--od-date-block', '--od-on-date-block', '--od-trip-header', '--od-profile-chip']) assert.equal(theme.split(`${token}:`).length - 1, 2, `${token} in light and dark`);
-  assert.match(theme, /--od-date-block: #E6EEF7/);
+  for (const token of ['--bc-date-block', '--bc-on-date-block', '--bc-trip-header', '--bc-profile-chip']) assert.equal(theme.split(`${token}:`).length - 1, 2, `${token} in light and dark`);
+  assert.match(theme, /--bc-date-block: #E6EEF7/);
   for (const file of ['components/DiveRow.svelte', 'components/TripRow.svelte']) {
     const css = src(file).slice(src(file).indexOf('<style>'));
     assert.ok(!/#[0-9a-fA-F]{3,8}\b/.test(css), `${file} has no colour value`);
@@ -171,10 +171,10 @@ test('the colours are tokens in light and in dark, none hard-coded in the rows',
 
 test('the right column gives way before the site: the site ellipsizes and the column is capped', () => {
   const row = src('components/DiveRow.svelte');
-  assert.match(row, /\.od-dive-row--text \{[^}]*min-width: 0/);
-  assert.match(row, /\.od-dive-row--site \{[^}]*text-overflow: ellipsis/);
-  assert.match(row, /\.od-dive-row--right \{[^}]*max-width: 40%/);
-  assert.match(row, /\.od-dive-row--date \{[^}]*min-width: 48px;[^}]*min-height: 48px/, 'the date block grows with a large text');
+  assert.match(row, /\.bc-dive-row--text \{[^}]*min-width: 0/);
+  assert.match(row, /\.bc-dive-row--site \{[^}]*text-overflow: ellipsis/);
+  assert.match(row, /\.bc-dive-row--right \{[^}]*max-width: 40%/);
+  assert.match(row, /\.bc-dive-row--date \{[^}]*min-width: 48px;[^}]*min-height: 48px/, 'the date block grows with a large text');
 });
 
 test('buildRows takes a function that says which trips are open (the tablet opens them by orientation)', () => {

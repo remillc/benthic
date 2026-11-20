@@ -156,7 +156,7 @@
 <!-- The dots of ⋮ are drawn by round caps: below a 4 px stroke they shrink to faint specks, so a
      component's own stroke width never applies to them (task 2026-11-14-136). -->
 <svg
-  class="od-icon"
+  class="bc-icon"
   width={size}
   height={size}
   viewBox="0 0 24 24"
@@ -170,12 +170,12 @@
   focusable="false"
 >
   <path d={paths[name]} />
-  {#if accents[name]}<path class="od-icon--accent" d={accents[name]} />{/if}
+  {#if accents[name]}<path class="bc-icon--accent" d={accents[name]} />{/if}
 </svg>
 
 <style>
   @layer od.components {
-    .od-icon {
+    .bc-icon {
       display: block;
       flex-shrink: 0;
     }

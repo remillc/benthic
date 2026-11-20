@@ -99,20 +99,20 @@ test('the window picks its screen from the list, and the profile is still on the
   assert.match(window, /refreshRecent\(\)\.then\(checkRecent\)/);
   assert.match(window, /<ReleaseProfile still=\{mode === 'recents'\} \/>/);
   assert.match(window, /\{#if mode\}<FirstLaunchSteps f7router=\{router\} recents=\{mode === 'recents'\} \/>\{\/if\}/);
-  assert.match(read('components/ReleaseProfile.svelte'), /od-release-profile--still/);
+  assert.match(read('components/ReleaseProfile.svelte'), /bc-release-profile--still/);
 });
 
 test('the recents screen: the list, « Ou bien », three compact neutral choices, the drop line, no demo link', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
   const block = steps.slice(steps.indexOf("{#if step === 'start' && recents}"), steps.indexOf("{:else if step === 'start'}"));
-  assert.match(block, /od-first-launch--or/);
+  assert.match(block, /bc-first-launch--or/);
   assert.equal((block.match(/<ReleaseChoiceRow compact /g) ?? []).length, 3);
   assert.ok(!/<ReleaseChoiceRow[^>]*\bmain\b/.test(block), 'no filled primary choice');
   assert.match(block, /dropLine/);
   assert.ok(!/demo/i.test(block), 'no demo link');
   assert.match(steps, /\{:else if step === 'start' && recents\}\s*<RecentLogbooks \/>/);
   const row = read('components/ReleaseChoiceRow.svelte');
-  assert.match(row, /od-release-row--compact[\s\S]*padding-block: 10px[\s\S]*width: 40px/);
+  assert.match(row, /bc-release-row--compact[\s\S]*padding-block: 10px[\s\S]*width: 40px/);
 });
 
 test('a row opens its logbook; a missing one opens the dialog with « Retirer de la liste » and « Chercher le fichier… »', () => {

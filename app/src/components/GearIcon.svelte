@@ -50,14 +50,14 @@
 {:else if type === 'computer'}
   <Icon name="wristComputer" {size} weight={1.8} />
 {:else if path}
-  <svg class="od-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path} /></svg>
+  <svg class="bc-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path} /></svg>
 {:else}
   <Icon name="briefcase" {size} weight={1.8} />
 {/if}
 
 <style>
   @layer od.components {
-    .od-gear-icon {
+    .bc-gear-icon {
       flex: none;
       fill: none;
       stroke: currentColor;

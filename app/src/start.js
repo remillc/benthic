@@ -41,13 +41,13 @@ Framework7.use(Framework7Svelte);
 /**
  * Resolves once the page's stylesheet applies. This module can run before it
  * has loaded (seen on iOS, about one start in three after an install), and the
- * app reads --od-action from it for Framework7, which then fails and leaves the
+ * app reads --bc-action from it for Framework7, which then fails and leaves the
  * screen white. At most 3 seconds, so that a stylesheet that never loads does
  * not stop the app.
  * @returns {Promise<unknown>}
  */
 function stylesApplied() {
-  if (getComputedStyle(document.documentElement).getPropertyValue('--od-action').trim()) return Promise.resolve();
+  if (getComputedStyle(document.documentElement).getPropertyValue('--bc-action').trim()) return Promise.resolve();
   const pending = [...document.querySelectorAll('link[rel="stylesheet"]')]
     .filter((link) => !(/** @type {HTMLLinkElement} */ (link).sheet))
     .map((link) => new Promise((done) => {

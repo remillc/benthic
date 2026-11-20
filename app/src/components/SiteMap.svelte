@@ -267,10 +267,10 @@
         /** @type {HTMLButtonElement} */ (el).type = 'button';
         el.setAttribute('aria-label', site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
       }
-      el.className = muted ? 'od-site-map--site-marker od-site-map--muted' : 'od-site-map--site-marker';
+      el.className = muted ? 'bc-site-map--site-marker bc-site-map--muted' : 'bc-site-map--site-marker';
       const svg = 'http://www.w3.org/2000/svg';
       const drawing = document.createElementNS(svg, 'svg');
-      drawing.setAttribute('class', 'od-site-map--pin');
+      drawing.setAttribute('class', 'bc-site-map--pin');
       drawing.setAttribute('width', '32');
       drawing.setAttribute('height', '42');
       drawing.setAttribute('viewBox', '-16 -40 32 42');
@@ -291,7 +291,7 @@
         drawing.append(count);
       }
       const text = document.createElement('span');
-      text.className = 'od-site-map--pin-name';
+      text.className = 'bc-site-map--pin-name';
       text.setAttribute('aria-hidden', 'true');
       text.textContent = name;
       el.append(drawing, text);
@@ -310,7 +310,7 @@
 
   /**
    * A tap on a pin: the pins whose head is within the 48 dp target around the tap.
-   * One: it is selected; several: they are given together (od-map-stack-sheet).
+   * One: it is selected; several: they are given together (bc-map-stack-sheet).
    * @param {number} uuid the pin that took the tap
    * @param {MouseEvent} e
    */
@@ -336,7 +336,7 @@
     for (const { uuid, marker } of markers) {
       const on = uuid === selected;
       const el = marker.getElement();
-      el.classList.toggle('od-site-map--selected', on);
+      el.classList.toggle('bc-site-map--selected', on);
       el.style.zIndex = on ? '2' : '';
     }
   }
@@ -356,7 +356,7 @@
     }
     if (!stackMarker) {
       const el = document.createElement('div');
-      el.className = 'od-site-map--stack-disc';
+      el.className = 'bc-site-map--stack-disc';
       el.setAttribute('aria-hidden', 'true');
       stackMarker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(stackAt)).addTo(map);
     } else stackMarker.setLngLat(lngLat(stackAt));
@@ -374,13 +374,13 @@
       const inView = markers.filter((m) => b.contains(m.marker.getLngLat()));
       if (inView.length <= 8) {
         // Measured with the names shown.
-        root?.classList.add('od-site-map--names-on');
-        const boxes = inView.map((m) => /** @type {HTMLElement} */ (m.marker.getElement().querySelector('.od-site-map--pin-name')).getBoundingClientRect());
+        root?.classList.add('bc-site-map--names-on');
+        const boxes = inView.map((m) => /** @type {HTMLElement} */ (m.marker.getElement().querySelector('.bc-site-map--pin-name')).getBoundingClientRect());
         on = !boxes.some((a, i) => boxes.some((c, j) => j > i && a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom));
       }
     }
     // The state draws the class (Svelte rewrites the class attribute); the class set by hand above was for the measure.
-    root?.classList.toggle('od-site-map--names-on', on);
+    root?.classList.toggle('bc-site-map--names-on', on);
     namesOn = on;
   }
 
@@ -395,7 +395,7 @@
     for (const m of pointMarkers) m.remove();
     pointMarkers = points.map((p) => {
       const el = document.createElement('div');
-      el.className = 'od-site-map--point';
+      el.className = 'bc-site-map--point';
       el.setAttribute('aria-hidden', 'true');
       el.textContent = numbers.format(p.n);
       return new maplibregl.Marker({ element: el }).setLngLat(lngLat(p)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
@@ -415,7 +415,7 @@
     for (const c of base.clusters) {
       const el = document.createElement('button');
       el.type = 'button';
-      el.className = 'od-site-map--base od-site-map--base-cluster';
+      el.className = 'bc-site-map--base bc-site-map--base-cluster';
       el.textContent = numbers.format(c.count);
       el.setAttribute('aria-label', t('sharedSites.clusterLabel', { n: c.count }));
       el.addEventListener('click', (e) => {
@@ -428,8 +428,8 @@
       if (s.mine) continue;
       const el = document.createElement('button');
       el.type = 'button';
-      el.className = 'od-site-map--base od-site-map--base-site';
-      el.classList.toggle('od-site-map--base-selected', s.id === baseSelected);
+      el.className = 'bc-site-map--base bc-site-map--base-site';
+      el.classList.toggle('bc-site-map--base-selected', s.id === baseSelected);
       el.dataset.baseId = s.id;
       el.setAttribute('aria-label', s.label);
       el.addEventListener('click', (e) => {
@@ -449,13 +449,13 @@
     const id = baseSelected;
     for (const m of baseMarkers) {
       const el = m.getElement();
-      el.classList.toggle('od-site-map--base-selected', !!id && el.dataset.baseId === id);
+      el.classList.toggle('bc-site-map--base-selected', !!id && el.dataset.baseId === id);
     }
   });
 
   /** During a search, the markers that do not match fade to 30 %. */
   function dim() {
-    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('od-site-map--dim', !!matching && !matching.has(uuid));
+    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('bc-site-map--dim', !!matching && !matching.has(uuid));
   }
 
   $effect(() => {
@@ -545,7 +545,7 @@
     });
     // A tap on the map, not on a pin (a pin's tap stops at the pin).
     m.on('click', (e) => {
-      if (/** @type {HTMLElement|null} */ (e.originalEvent?.target)?.closest?.('.od-site-map--site-marker, .od-site-map--base')) return;
+      if (/** @type {HTMLElement|null} */ (e.originalEvent?.target)?.closest?.('.bc-site-map--site-marker, .bc-site-map--base')) return;
       onmapclick?.();
     });
     if (editable) {
@@ -608,7 +608,7 @@
     // A marker needs its position before it is added to the map.
     if (pinMarker) pinMarker.setLngLat(lngLat(pin));
     else
-      pinMarker = new maplibregl.Marker({ color: getComputedStyle(container).getPropertyValue('--od-text').trim() || '#1F2124' })
+      pinMarker = new maplibregl.Marker({ color: getComputedStyle(container).getPropertyValue('--bc-text').trim() || '#1F2124' })
         .setLngLat(lngLat(pin))
         .addTo(map);
     // It shows a position and does nothing: the arrow, not the hand that maplibre's button role gives it.
@@ -649,12 +649,12 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-  class="od-site-map no-swipeback"
-  class:od-map-fullscreen={full}
-  class:od-site-map--quiet={names !== 'always'}
-  class:od-site-map--desaturated={desaturated}
-  class:od-site-map--pins-hidden={pinsHidden}
-  class:od-site-map--names-on={namesOn}
+  class="bc-site-map no-swipeback"
+  class:bc-map-fullscreen={full}
+  class:bc-site-map--quiet={names !== 'always'}
+  class:bc-site-map--desaturated={desaturated}
+  class:bc-site-map--pins-hidden={pinsHidden}
+  class:bc-site-map--names-on={namesOn}
   style:height={full ? '100%' : ratio ? 'auto' : height}
   style:aspect-ratio={!full && ratio ? `${ratio} / 1` : null}
   role="region"
@@ -666,67 +666,67 @@
     if (full && e.key === 'Escape') setFull(false);
   }}
 >
-  <div class="od-site-map--canvas" bind:this={container}></div>
-  {#if heat?.length}<canvas class="od-site-map--heat" bind:this={heatCanvas} aria-hidden="true"></canvas>{/if}
+  <div class="bc-site-map--canvas" bind:this={container}></div>
+  {#if heat?.length}<canvas class="bc-site-map--heat" bind:this={heatCanvas} aria-hidden="true"></canvas>{/if}
   {#if editable}
     <!-- The tip of the pin is the centre of the map. -->
-    <svg class="od-site-map--center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
+    <svg class="bc-site-map--center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
       <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" />
       <circle cx="0" cy="-24" r="5" />
     </svg>
   {/if}
   {@render overlay?.(full)}
   <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
-  {#if credits}<p class="od-site-map--credits">{t('sites.mapCredits')}</p>{/if}
-  <button type="button" class="od-map-fullscreen-button" bind:this={fullButton} onclick={() => setFull(!full)}>
+  {#if credits}<p class="bc-site-map--credits">{t('sites.mapCredits')}</p>{/if}
+  <button type="button" class="bc-map-fullscreen-button" bind:this={fullButton} onclick={() => setFull(!full)}>
     <Icon name={full ? 'exitFullscreen' : 'fullscreen'} size={22} weight={2} />
-    <span class="od-sr-only">{full ? t('sites.exitFullscreen') : fullscreenLabel || t('sites.fullscreen')}</span>
+    <span class="bc-sr-only">{full ? t('sites.exitFullscreen') : fullscreenLabel || t('sites.fullscreen')}</span>
   </button>
   {#if full && onlocate}
-    <button type="button" class="od-map-fullscreen-button od-map-fullscreen--locate" onclick={onlocate}>
+    <button type="button" class="bc-map-fullscreen-button bc-map-fullscreen--locate" onclick={onlocate}>
       <Icon name="locate" size={22} />
-      <span class="od-sr-only">{t('sites.centreOnMe')}</span>
+      <span class="bc-sr-only">{t('sites.centreOnMe')}</span>
     </button>
   {/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-site-map {
+    .bc-site-map {
       position: relative;
       width: 100%;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
 
-    .od-site-map--canvas {
+    .bc-site-map--canvas {
       position: absolute;
       inset: 0;
     }
 
-    /* Full screen (od-map-fullscreen, sites-carte-plein-ecran-android): edge to edge,
+    /* Full screen (bc-map-fullscreen, sites-carte-plein-ecran-android): edge to edge,
        under the status bar, over every bar of the app. */
-    .od-site-map.od-map-fullscreen {
+    .bc-site-map.bc-map-fullscreen {
       position: fixed;
       inset: 0;
       z-index: 12000;
     }
 
-    /* The full-screen button (od-map-fullscreen-button): a white square, 40 dp (44 pt on
+    /* The full-screen button (bc-map-fullscreen-button): a white square, 40 dp (44 pt on
        iOS), 12 dp corners, light shadow, 22 dp icon in ink. Where it sits is the
-       screen's choice (--od-map-button-top, --od-map-button-right): by default 8 dp
+       screen's choice (--bc-map-button-top, --bc-map-button-right): by default 8 dp
        from the top right of the map. */
-    .od-map-fullscreen-button {
+    .bc-map-fullscreen-button {
       position: absolute;
       z-index: 2;
-      top: var(--od-map-button-top, 8px);
-      right: var(--od-map-button-right, 8px);
+      top: var(--bc-map-button-top, 8px);
+      right: var(--bc-map-button-right, 8px);
       width: 40px;
       height: 40px;
       padding: 0;
       border: none;
       border-radius: 12px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -744,36 +744,36 @@
         inset: -4px;
       }
 
-      .od-map-fullscreen & {
-        top: calc(var(--f7-safe-area-top, var(--od-safe-top)) + 8px);
+      .bc-map-fullscreen & {
+        top: calc(var(--f7-safe-area-top, var(--bc-safe-top)) + 8px);
         right: 16px;
       }
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-map-fullscreen-button {
+      .bc-map-fullscreen-button {
         transition: box-shadow 120ms linear;
       }
-      .od-map-fullscreen-button:not(:disabled):hover {
+      .bc-map-fullscreen-button:not(:disabled):hover {
         box-shadow:
           inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
           0 1px 3px rgb(0 0 0 / 0.2);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-map-fullscreen-button {
+      .bc-map-fullscreen-button {
         transition: none;
       }
     }
     /* Full screen: « Centrer sur ma position » at the bottom right, above the credits. */
-    .od-map-fullscreen .od-map-fullscreen-button.od-map-fullscreen--locate {
+    .bc-map-fullscreen .bc-map-fullscreen-button.bc-map-fullscreen--locate {
       top: auto;
-      bottom: calc(var(--od-safe-bottom) + 56px);
+      bottom: calc(var(--bc-safe-bottom) + 56px);
     }
 
     /* The heat: its own layer over the map, taps go through to the map. */
-    .od-site-map--heat {
+    .bc-site-map--heat {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -782,85 +782,85 @@
     }
 
     /* The base map at about 25 % saturation, so the heat stands out (the heat is not affected). */
-    .od-site-map--desaturated .od-site-map--canvas :global(canvas) {
+    .bc-site-map--desaturated .bc-site-map--canvas :global(canvas) {
       filter: saturate(0.25);
     }
 
-    .od-site-map--credits {
+    .bc-site-map--credits {
       position: absolute;
       z-index: 1;
-      top: var(--od-map-credits-top, auto);
-      right: var(--od-map-credits-right, 8px);
-      bottom: var(--od-map-credits-bottom, 4px);
+      top: var(--bc-map-credits-top, auto);
+      right: var(--bc-map-credits-right, 8px);
+      bottom: var(--bc-map-credits-bottom, 4px);
       max-width: calc(100% - 16px);
       margin: 0;
       padding: 2px 6px;
       border-radius: 4px;
-      background: color-mix(in srgb, var(--od-surface) 85%, transparent);
+      background: color-mix(in srgb, var(--bc-surface) 85%, transparent);
 
-      :global(html.od-high-contrast) & {
-        background: var(--od-surface);
+      :global(html.bc-high-contrast) & {
+        background: var(--bc-surface);
       }
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 11px;
       line-height: 14px;
       pointer-events: none;
 
-      .od-map-fullscreen & {
+      .bc-map-fullscreen & {
         top: auto;
         right: 8px;
-        bottom: calc(var(--od-safe-bottom) + 24px);
+        bottom: calc(var(--bc-safe-bottom) + 24px);
       }
     }
 
     /* Sites: no names on the map, but in full screen with few pins (updateNames). */
-    .od-site-map--quiet:not(:global(.od-site-map--names-on)) :global(.od-site-map--pin-name) {
+    .bc-site-map--quiet:not(:global(.bc-site-map--names-on)) :global(.bc-site-map--pin-name) {
       display: none;
     }
 
     /* The heat map from afar: no pins (pinsFromZoom). */
-    .od-site-map--pins-hidden :global(.od-site-map--site-marker) {
+    .bc-site-map--pins-hidden :global(.bc-site-map--site-marker) {
       display: none;
     }
 
-    /* Where several pins were touched: a blue disc, 2 dp outline (od-map-stack-sheet). */
-    :global(.od-site-map--stack-disc) {
+    /* Where several pins were touched: a blue disc, 2 dp outline (bc-map-stack-sheet). */
+    :global(.bc-site-map--stack-disc) {
       width: 48px;
       height: 48px;
       box-sizing: border-box;
-      border: 2px solid var(--od-secondary);
+      border: 2px solid var(--bc-secondary);
       border-radius: 50%;
-      background: color-mix(in srgb, var(--od-secondary) 16%, transparent);
+      background: color-mix(in srgb, var(--bc-secondary) 16%, transparent);
       pointer-events: none;
     }
 
     /* The shared map (task 2026-11-19-315): a dot per base site, a numbered disc per crowded cell. */
-    :global(.od-site-map--base) {
+    :global(.bc-site-map--base) {
       box-sizing: border-box;
       padding: 0;
-      border: 2px solid var(--od-on-shared-site);
+      border: 2px solid var(--bc-on-shared-site);
       border-radius: 50%;
-      background: var(--od-shared-site);
-      color: var(--od-on-shared-site);
+      background: var(--bc-shared-site);
+      color: var(--bc-on-shared-site);
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
       cursor: pointer;
     }
-    :global(.od-site-map--base-site) {
+    :global(.bc-site-map--base-site) {
       width: 16px;
       height: 16px;
     }
     /* A 48 dp target around the 16 dp dot (the marker is positioned by MapLibre). */
-    :global(.od-site-map--base-site)::before {
+    :global(.bc-site-map--base-site)::before {
       content: '';
       position: absolute;
       inset: -16px;
       border-radius: 50%;
     }
-    :global(.od-site-map--base-selected) {
+    :global(.bc-site-map--base-selected) {
       transform: scale(1.4);
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--od-shared-site) 35%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--bc-shared-site) 35%, transparent);
     }
-    :global(.od-site-map--base-cluster) {
+    :global(.bc-site-map--base-cluster) {
       min-width: 32px;
       height: 32px;
       font: inherit;
@@ -868,14 +868,14 @@
       font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
-    :global(.od-site-map--point) {
+    :global(.bc-site-map--point) {
       box-sizing: border-box;
       width: 22px;
       height: 22px;
-      border: 2px solid var(--od-surface);
+      border: 2px solid var(--bc-surface);
       border-radius: 50%;
-      background: var(--od-text);
-      color: var(--od-surface);
+      background: var(--bc-text);
+      color: var(--bc-surface);
       font-size: 13px;
       font-weight: 700;
       line-height: 18px;
@@ -884,7 +884,7 @@
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
     }
 
-    .od-site-map--center-pin {
+    .bc-site-map--center-pin {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -894,20 +894,20 @@
       filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.35));
 
       path {
-        fill: var(--od-text);
-        stroke: var(--od-surface);
+        fill: var(--bc-text);
+        stroke: var(--bc-surface);
         stroke-width: 2;
       }
 
       circle {
-        fill: var(--od-surface);
+        fill: var(--bc-surface);
       }
     }
 
     /* A pin per site (no grouping, even when pins overlap): ink, with the number of
        dives, white, 13 sp, bold, in its head; the name beside it, ink with a 4 dp
        white halo. */
-    :global(.od-site-map--site-marker) {
+    :global(.bc-site-map--site-marker) {
       width: 32px;
       height: 42px;
       padding: 0;
@@ -916,20 +916,20 @@
       cursor: pointer;
       transition: opacity 150ms linear;
 
-      :global(.od-site-map--pin) {
+      :global(.bc-site-map--pin) {
         display: block;
         overflow: visible;
         filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
       }
 
-      :global(.od-site-map--pin path) {
-        fill: var(--od-text);
-        stroke: var(--od-surface);
+      :global(.bc-site-map--pin path) {
+        fill: var(--bc-text);
+        stroke: var(--bc-surface);
         stroke-width: 2;
       }
 
-      :global(.od-site-map--pin text) {
-        fill: var(--od-surface);
+      :global(.bc-site-map--pin text) {
+        fill: var(--bc-surface);
         font-size: 13px;
         font-weight: 700;
         text-anchor: middle;
@@ -937,13 +937,13 @@
       }
 
       /* Selected (task 2026-11-14-150): 1.3×, a halo in the secondary colour at 18 %. */
-      &:global(.od-site-map--selected) :global(.od-site-map--pin) {
+      &:global(.bc-site-map--selected) :global(.bc-site-map--pin) {
         transform: scale(1.3);
         transform-origin: 50% 95%;
         filter: drop-shadow(0 0 0 transparent) drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
       }
 
-      &:global(.od-site-map--selected)::before {
+      &:global(.bc-site-map--selected)::before {
         content: '';
         position: absolute;
         left: 50%;
@@ -951,13 +951,13 @@
         width: 52px;
         height: 52px;
         border-radius: 50%;
-        background: color-mix(in srgb, var(--od-secondary) 18%, transparent);
+        background: color-mix(in srgb, var(--bc-secondary) 18%, transparent);
         transform: translate(-50%, -50%) translateY(-6px);
         pointer-events: none;
       }
 
       /* Baseline 20 px above the tip, 18 px right of it, as drawn. */
-      :global(.od-site-map--pin-name) {
+      :global(.bc-site-map--pin-name) {
         position: absolute;
         left: 34px;
         top: 6px;
@@ -965,43 +965,43 @@
         font-size: 14px;
         line-height: 18px;
         font-weight: 500;
-        color: var(--od-text);
-        -webkit-text-stroke: 4px var(--od-surface);
+        color: var(--bc-text);
+        -webkit-text-stroke: 4px var(--bc-surface);
         paint-order: stroke fill;
         pointer-events: none;
       }
 
       /* !important: MapLibre sets an inline opacity on every marker. */
-      &.od-site-map--dim {
+      &.bc-site-map--dim {
         opacity: 0.3 !important;
       }
 
       /* The places around: a smaller grey pin, white dot, name on its left in
          the secondary text colour, 13 sp. */
-      &:global(.od-site-map--muted) {
+      &:global(.bc-site-map--muted) {
         width: 28px;
         height: 36px;
         cursor: default;
 
-        :global(.od-site-map--pin) {
+        :global(.bc-site-map--pin) {
           width: 28px;
           height: 36px;
         }
 
-        :global(.od-site-map--pin path) {
-          fill: var(--od-map-pin-muted);
+        :global(.bc-site-map--pin path) {
+          fill: var(--bc-map-pin-muted);
         }
 
-        :global(.od-site-map--pin circle) {
-          fill: var(--od-surface);
+        :global(.bc-site-map--pin circle) {
+          fill: var(--bc-surface);
         }
 
-        :global(.od-site-map--pin-name) {
+        :global(.bc-site-map--pin-name) {
           left: auto;
           right: 32px;
           top: 2px;
           font-size: 13px;
-          color: var(--od-text-2);
+          color: var(--bc-text-2);
         }
 
         &::after {

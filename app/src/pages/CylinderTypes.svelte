@@ -48,52 +48,52 @@
 </script>
 
 {#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
-  <div class="od-cylinder-types--surface" role="list">
+  <div class="bc-cylinder-types--surface" role="list">
     {#each items as type (type.name)}
       <div role="listitem">
-        <button type="button" class="od-cylinder-types--row" onclick={() => open(type.name)}>
-          <span class="od-cylinder-types--texts">
-            <span class="od-cylinder-types--label">{cylinderTypeLabel(type.name)}{#if usage && !type.dives}<span class="od-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
-            {#if usage}<span class="od-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
+        <button type="button" class="bc-cylinder-types--row" onclick={() => open(type.name)}>
+          <span class="bc-cylinder-types--texts">
+            <span class="bc-cylinder-types--label">{cylinderTypeLabel(type.name)}{#if usage && !type.dives}<span class="bc-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
+            {#if usage}<span class="bc-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
           </span>
-          <span class="od-cylinder-types--value">{size(type)}</span>
-          <span class="od-cylinder-types--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-cylinder-types--value">{size(type)}</span>
+          <span class="bc-cylinder-types--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       </div>
     {/each}
   </div>
 {/snippet}
 
-<Page class="od-cylinder-types" onPageBeforeIn={refresh}>
+<Page class="bc-cylinder-types" onPageBeforeIn={refresh}>
   <Navbar title={t('settings.cylinders.title')}>
     {#snippet left()}
       <BackLink label={t('common.back')} name={t('common.back')} />
     {/snippet}
     {#snippet right()}
-      {#if ios}<Link href="/settings/cylinders/new" iconOnly><Icon name="plus" /><span class="od-sr-only">{t('settings.cylinders.add')}</span></Link>{/if}
+      {#if ios}<Link href="/settings/cylinders/new" iconOnly><Icon name="plus" /><span class="bc-sr-only">{t('settings.cylinders.add')}</span></Link>{/if}
     {/snippet}
   </Navbar>
 
-  <p class="od-cylinder-types--intro">{t('settings.cylinders.intro')}</p>
+  <p class="bc-cylinder-types--intro">{t('settings.cylinders.intro')}</p>
 
   {#if yours.length}
-    <h2 class="od-cylinder-types--title">{t('settings.cylinders.yours')}</h2>
+    <h2 class="bc-cylinder-types--title">{t('settings.cylinders.yours')}</h2>
     {@render list(yours, true)}
   {/if}
 
-  <h2 class="od-cylinder-types--title">{t('settings.cylinders.standard')}</h2>
+  <h2 class="bc-cylinder-types--title">{t('settings.cylinders.standard')}</h2>
   {#if standard.length}
     {@render list(standard, false)}
-    <p class="od-cylinder-types--note">{t('settings.cylinders.standardNote')}</p>
+    <p class="bc-cylinder-types--note">{t('settings.cylinders.standardNote')}</p>
   {:else}
-    <p class="od-cylinder-types--note">{t('settings.cylinders.hidden')}</p>
+    <p class="bc-cylinder-types--note">{t('settings.cylinders.hidden')}</p>
   {/if}
-  <div class="od-cylinder-types--bottom"></div>
+  <div class="bc-cylinder-types--bottom"></div>
 
   {#snippet fixedContent()}
     {#if !ios}
     <!-- Extended floating button, written by hand as in the Logbook. -->
-    <div class="fab fab-right-bottom fab-extended od-fab-add">
+    <div class="fab fab-right-bottom fab-extended bc-fab-add">
       <a href="/settings/cylinders/new">
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('settings.cylinders.add')}</div>
@@ -105,14 +105,14 @@
 
 <style>
   @layer od.components {
-    .od-cylinder-types--intro {
+    .bc-cylinder-types--intro {
       margin: 8px 20px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-cylinder-types--title {
+    .bc-cylinder-types--title {
       margin: 0;
       padding: 22px 20px 8px;
       font-size: 18px;
@@ -120,14 +120,14 @@
       font-weight: 700;
     }
 
-    .od-cylinder-types--surface {
+    .bc-cylinder-types--surface {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-cylinder-types--row {
+    .bc-cylinder-types--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 56px;
@@ -137,63 +137,63 @@
       gap: 12px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
 
-    .od-cylinder-types--texts {
+    .bc-cylinder-types--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-cylinder-types--label {
+    .bc-cylinder-types--label {
       font-size: 16px;
     }
 
-    .od-cylinder-types--supporting {
+    .bc-cylinder-types--supporting {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* An outlined label after the name of a type no dive uses. */
-    .od-cylinder-types--unused {
+    .bc-cylinder-types--unused {
       margin-inline-start: 8px;
       padding: 0 6px;
-      border: var(--od-outline-width) solid var(--od-text-2);
+      border: var(--bc-outline-width) solid var(--bc-text-2);
       border-radius: 8px;
       font-size: 11px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-cylinder-types--value {
+    .bc-cylinder-types--value {
       flex: none;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
     /* The row opens the type's page (system-design, « Trailing chevron »). */
-    .od-cylinder-types--chevron {
+    .bc-cylinder-types--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-cylinder-types--note {
+    .bc-cylinder-types--note {
       margin: 10px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The floating button must not hide the last row. */
-    .od-cylinder-types--bottom {
+    .bc-cylinder-types--bottom {
       height: 96px;
     }
   }

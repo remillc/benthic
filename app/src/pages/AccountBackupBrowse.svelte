@@ -17,11 +17,11 @@
   }
 </script>
 
-<Page class="od-account-backup-page">
+<Page class="bc-account-backup-page">
   <Navbar title={t('backup.version.title')}>
     {#snippet left()}
       {#if layout.desktop}
-        <Link iconOnly onclick={leave}><i class="icon icon-back"></i><span class="od-sr-only">{t('detail.back')}</span></Link>
+        <Link iconOnly onclick={leave}><i class="icon icon-back"></i><span class="bc-sr-only">{t('detail.back')}</span></Link>
       {:else}
         <BackLink label={t('backup.title')} name={t('detail.back')} />
       {/if}

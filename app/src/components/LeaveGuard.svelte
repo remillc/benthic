@@ -115,23 +115,23 @@
   });
 </script>
 
-<span class="od-leave-guard" bind:this={marker} hidden></span>
+<span class="bc-leave-guard" bind:this={marker} hidden></span>
 
 {#if asking}
-  <Md3Dialog class="od-leave-guard--dialog" title={t('leave.title')} text={t(`leave.text.${noun}`)} role="alertdialog" oncancel={stay}>
+  <Md3Dialog class="bc-leave-guard--dialog" title={t('leave.title')} text={t(`leave.text.${noun}`)} role="alertdialog" oncancel={stay}>
     {#snippet children()}{/snippet}
     {#snippet actions()}
       <button type="button" onclick={stay}>{t('leave.stay')}</button>
       {#if canSave()}<button type="button" onclick={saveAndLeave}>{t('leave.save')}</button>{/if}
-      <button type="button" class="od-leave-guard--discard" onclick={discard}>{t('leave.discard')}</button>
+      <button type="button" class="bc-leave-guard--discard" onclick={discard}>{t('leave.discard')}</button>
     {/snippet}
   </Md3Dialog>
 {/if}
 
 <style>
   @layer od.components {
-    :global(.od-md3-dialog--actions) .od-leave-guard--discard {
-      color: var(--od-alarm);
+    :global(.bc-md3-dialog--actions) .bc-leave-guard--discard {
+      color: var(--bc-alarm);
     }
   }
 </style>

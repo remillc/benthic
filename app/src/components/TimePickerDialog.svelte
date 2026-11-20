@@ -174,14 +174,14 @@
   }
 </script>
 
-<Md3Dialog class="od-time-picker" title={mode === 'input' ? t('timePicker.titleInput') : t('timePicker.title')} {oncancel}>
-  <div class="od-time-picker--boxes">
-    <div class="od-time-picker--box-wrap">
+<Md3Dialog class="bc-time-picker" title={mode === 'input' ? t('timePicker.titleInput') : t('timePicker.title')} {oncancel}>
+  <div class="bc-time-picker--boxes">
+    <div class="bc-time-picker--box-wrap">
       {#if mode === 'input'}
         <input
-          class="od-time-picker--box od-time-picker--box-input"
-          class:od-time-picker--selected={unit === 'hour'}
-          class:od-time-picker--invalid={hourInvalid && touched}
+          class="bc-time-picker--box bc-time-picker--box-input"
+          class:bc-time-picker--selected={unit === 'hour'}
+          class:bc-time-picker--invalid={hourInvalid && touched}
           type="text"
           inputmode="numeric"
           maxlength="2"
@@ -193,11 +193,11 @@
           oninput={typedHour}
           onkeydown={(e) => e.key === 'Enter' && confirm()}
         />
-        <span class="od-time-picker--box-label">{t('timePicker.hour')}</span>
+        <span class="bc-time-picker--box-label">{t('timePicker.hour')}</span>
       {:else}
         <div
-          class="od-time-picker--box"
-          class:od-time-picker--selected={unit === 'hour'}
+          class="bc-time-picker--box"
+          class:bc-time-picker--selected={unit === 'hour'}
           role="spinbutton"
           tabindex="0"
           aria-label={t('timePicker.hour')}
@@ -212,13 +212,13 @@
         </div>
       {/if}
     </div>
-    <span class="od-time-picker--colon" aria-hidden="true">:</span>
-    <div class="od-time-picker--box-wrap">
+    <span class="bc-time-picker--colon" aria-hidden="true">:</span>
+    <div class="bc-time-picker--box-wrap">
       {#if mode === 'input'}
         <input
-          class="od-time-picker--box od-time-picker--box-input"
-          class:od-time-picker--selected={unit === 'minute'}
-          class:od-time-picker--invalid={minuteInvalid && touched}
+          class="bc-time-picker--box bc-time-picker--box-input"
+          class:bc-time-picker--selected={unit === 'minute'}
+          class:bc-time-picker--invalid={minuteInvalid && touched}
           type="text"
           inputmode="numeric"
           maxlength="2"
@@ -230,11 +230,11 @@
           oninput={typedMinute}
           onkeydown={(e) => e.key === 'Enter' && confirm()}
         />
-        <span class="od-time-picker--box-label">{t('timePicker.minute')}</span>
+        <span class="bc-time-picker--box-label">{t('timePicker.minute')}</span>
       {:else}
         <div
-          class="od-time-picker--box"
-          class:od-time-picker--selected={unit === 'minute'}
+          class="bc-time-picker--box"
+          class:bc-time-picker--selected={unit === 'minute'}
           role="spinbutton"
           tabindex="0"
           aria-label={t('timePicker.minute')}
@@ -250,20 +250,20 @@
       {/if}
     </div>
     {#if twelve}
-      <div class="od-time-picker--period" role="radiogroup" aria-label={t('timePicker.period')}>
-        <button type="button" role="radio" aria-checked={!pm} class="od-time-picker--period-button" class:od-time-picker--on={!pm} onclick={() => setPm(false)}>{t('timePicker.am')}</button>
-        <button type="button" role="radio" aria-checked={pm} class="od-time-picker--period-button" class:od-time-picker--on={pm} onclick={() => setPm(true)}>{t('timePicker.pm')}</button>
+      <div class="bc-time-picker--period" role="radiogroup" aria-label={t('timePicker.period')}>
+        <button type="button" role="radio" aria-checked={!pm} class="bc-time-picker--period-button" class:bc-time-picker--on={!pm} onclick={() => setPm(false)}>{t('timePicker.am')}</button>
+        <button type="button" role="radio" aria-checked={pm} class="bc-time-picker--period-button" class:bc-time-picker--on={pm} onclick={() => setPm(true)}>{t('timePicker.pm')}</button>
       </div>
     {/if}
   </div>
   {#if hourInvalid || minuteInvalid}
-    {#if touched}<p class="od-time-picker--error" role="alert">{t('timePicker.invalid')}</p>{/if}
+    {#if touched}<p class="bc-time-picker--error" role="alert">{t('timePicker.invalid')}</p>{/if}
   {/if}
   {#if mode === 'dial'}
-    <div class="od-time-picker--dial-area">
+    <div class="bc-time-picker--dial-area">
       <!-- The dial is a pointer shortcut: the boxes above are the accessible way to set the time. -->
       <svg
-        class="od-time-picker--dial"
+        class="bc-time-picker--dial"
         viewBox="0 0 256 256"
         width="256"
         height="256"
@@ -273,16 +273,16 @@
         onpointerup={up}
         onpointercancel={() => (dragging = false)}
       >
-        <circle class="od-time-picker--face" cx={C} cy={C} r="128" />
-        <line class="od-time-picker--hand" x1={C} y1={C} x2={handle.x} y2={handle.y} />
-        <circle class="od-time-picker--hub" cx={C} cy={C} r="4" />
-        <circle class="od-time-picker--handle" cx={handle.x} cy={handle.y} r="24" />
-        {#if offFive}<circle class="od-time-picker--dot" cx={handle.x} cy={handle.y} r="4" />{/if}
+        <circle class="bc-time-picker--face" cx={C} cy={C} r="128" />
+        <line class="bc-time-picker--hand" x1={C} y1={C} x2={handle.x} y2={handle.y} />
+        <circle class="bc-time-picker--hub" cx={C} cy={C} r="4" />
+        <circle class="bc-time-picker--handle" cx={handle.x} cy={handle.y} r="24" />
+        {#if offFive}<circle class="bc-time-picker--dot" cx={handle.x} cy={handle.y} r="4" />{/if}
         {#each labels as label (label.text + label.x)}
           <text
-            class="od-time-picker--number"
-            class:od-time-picker--number-selected={isLabelSelected(label)}
-            class:od-time-picker--number-small={unit === 'hour' && !twelve && label.x !== undefined && Math.hypot(label.x - C, label.y - C) < 80}
+            class="bc-time-picker--number"
+            class:bc-time-picker--number-selected={isLabelSelected(label)}
+            class:bc-time-picker--number-small={unit === 'hour' && !twelve && label.x !== undefined && Math.hypot(label.x - C, label.y - C) < 80}
             x={label.x}
             y={label.y}
             text-anchor="middle"
@@ -293,7 +293,7 @@
     </div>
   {/if}
   {#snippet actions()}
-    <button type="button" class="od-md3-dialog--start od-time-picker--mode" onclick={toggleMode} aria-label={mode === 'input' ? t('timePicker.toDial') : t('timePicker.toInput')}>
+    <button type="button" class="bc-md3-dialog--start bc-time-picker--mode" onclick={toggleMode} aria-label={mode === 'input' ? t('timePicker.toDial') : t('timePicker.toInput')}>
       <Icon name={mode === 'input' ? 'clock' : 'keyboard'} />
     </button>
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
@@ -303,21 +303,21 @@
 
 <style>
   @layer od.components {
-    :global(.od-time-picker .od-md3-dialog--surface) {
+    :global(.bc-time-picker .bc-md3-dialog--surface) {
       width: min(328px, calc(100% - 32px));
       padding-top: 16px;
     }
 
-    :global(.od-time-picker .od-md3-dialog--surface h2) {
+    :global(.bc-time-picker .bc-md3-dialog--surface h2) {
       margin: 0 24px 20px 24px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
       letter-spacing: 0.1px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-time-picker--boxes {
+    .bc-time-picker--boxes {
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -325,20 +325,20 @@
       padding: 0 24px;
     }
 
-    .od-time-picker--box-wrap {
+    .bc-time-picker--box-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .od-time-picker--box {
+    .bc-time-picker--box {
       box-sizing: border-box;
       width: 96px;
       height: 80px;
       border: 2px solid transparent;
       border-radius: 8px;
-      background: var(--od-surface-container-highest);
-      color: var(--od-text);
+      background: var(--bc-surface-container-highest);
+      color: var(--bc-text);
       font: inherit;
       font-size: 56px;
       line-height: 76px;
@@ -348,140 +348,140 @@
       padding: 0;
     }
 
-    .od-time-picker--box.od-time-picker--selected {
-      background: var(--od-primary-container);
-      border-color: var(--od-primary);
+    .bc-time-picker--box.bc-time-picker--selected {
+      background: var(--bc-primary-container);
+      border-color: var(--bc-primary);
     }
 
-    .od-time-picker--box:focus-visible {
-      outline: 2px solid var(--od-primary);
+    .bc-time-picker--box:focus-visible {
+      outline: 2px solid var(--bc-primary);
       outline-offset: 2px;
     }
 
-    .od-time-picker--box-input {
+    .bc-time-picker--box-input {
       height: 72px;
       font-size: 48px;
       line-height: 68px;
     }
 
-    .od-time-picker--box-input.od-time-picker--invalid {
-      border-color: var(--od-error);
+    .bc-time-picker--box-input.bc-time-picker--invalid {
+      border-color: var(--bc-error);
     }
 
-    .od-time-picker--box-label {
+    .bc-time-picker--box-label {
       margin-top: 4px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-time-picker--colon {
+    .bc-time-picker--colon {
       width: 24px;
       height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 56px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-time-picker--period {
+    .bc-time-picker--period {
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
       width: 52px;
       height: 80px;
       margin-left: 12px;
-      border: var(--od-outline-width) solid var(--od-outline);
+      border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 8px;
       overflow: hidden;
     }
 
-    .od-time-picker--period-button {
+    .bc-time-picker--period-button {
       flex: 1;
       border: none;
       padding: 0;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font: inherit;
       font-size: 16px;
       cursor: pointer;
     }
 
-    .od-time-picker--period-button + .od-time-picker--period-button {
-      border-top: 1px solid var(--od-outline);
+    .bc-time-picker--period-button + .bc-time-picker--period-button {
+      border-top: 1px solid var(--bc-outline);
     }
 
-    .od-time-picker--period-button.od-time-picker--on {
-      background: var(--od-primary-container);
-      box-shadow: inset 0 0 0 2px var(--od-primary);
-      color: var(--od-text);
+    .bc-time-picker--period-button.bc-time-picker--on {
+      background: var(--bc-primary-container);
+      box-shadow: inset 0 0 0 2px var(--bc-primary);
+      color: var(--bc-text);
       font-weight: 600;
     }
 
-    .od-time-picker--period-button:focus-visible {
-      outline: 2px solid var(--od-primary);
+    .bc-time-picker--period-button:focus-visible {
+      outline: 2px solid var(--bc-primary);
       outline-offset: -2px;
     }
 
-    .od-time-picker--error {
+    .bc-time-picker--error {
       margin: 8px 24px 0;
       font-size: 12px;
-      color: var(--od-error);
+      color: var(--bc-error);
       text-align: center;
     }
 
-    .od-time-picker--dial-area {
+    .bc-time-picker--dial-area {
       display: flex;
       justify-content: center;
       padding: 36px 0 8px;
     }
 
-    .od-time-picker--dial {
+    .bc-time-picker--dial {
       touch-action: none;
       user-select: none;
       cursor: pointer;
     }
 
-    .od-time-picker--face {
-      fill: var(--od-surface-container-highest);
+    .bc-time-picker--face {
+      fill: var(--bc-surface-container-highest);
     }
 
-    .od-time-picker--hand {
-      stroke: var(--od-primary);
+    .bc-time-picker--hand {
+      stroke: var(--bc-primary);
       stroke-width: 2;
     }
 
-    .od-time-picker--hub,
-    .od-time-picker--handle {
-      fill: var(--od-primary);
+    .bc-time-picker--hub,
+    .bc-time-picker--handle {
+      fill: var(--bc-primary);
     }
 
-    .od-time-picker--dot {
-      fill: var(--od-on-primary);
+    .bc-time-picker--dot {
+      fill: var(--bc-on-primary);
     }
 
-    .od-time-picker--number {
-      fill: var(--od-text);
+    .bc-time-picker--number {
+      fill: var(--bc-text);
       font-size: 16px;
       pointer-events: none;
     }
 
-    .od-time-picker--number-small {
+    .bc-time-picker--number-small {
       font-size: 14px;
     }
 
-    .od-time-picker--number-selected {
-      fill: var(--od-on-primary);
+    .bc-time-picker--number-selected {
+      fill: var(--bc-on-primary);
     }
 
-    :global(.od-time-picker .od-md3-dialog--actions .od-time-picker--mode) {
+    :global(.bc-time-picker .bc-md3-dialog--actions .bc-time-picker--mode) {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 48px;
       padding: 0;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

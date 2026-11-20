@@ -71,7 +71,7 @@ test('the hand-over functions move the open item and leave no hidden page', () =
   // Wide to narrow: the chosen item opens, the first-dive start-up is not blocked by the emptied pane.
   assert.match(handoff, /export function toolsToNarrow[\s\S]*desktopTools\.chosen/);
   assert.match(handoff, /export function logbookToNarrow[\s\S]*\/pane\/selection/);
-  assert.match(read('app/src/pages/Logbook.svelte'), /od-pane-empty/);
+  assert.match(read('app/src/pages/Logbook.svelte'), /bc-pane-empty/);
 });
 
 test('each tool has a page in the narrow layout, and back', async () => {

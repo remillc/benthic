@@ -19,30 +19,30 @@
 </script>
 
 {#if pages}
-  <span class="od-doc-thumb od-doc-thumb--pages" style:width="{width}px" style:height="{height}px" aria-hidden="true">
+  <span class="bc-doc-thumb bc-doc-thumb--pages" style:width="{width}px" style:height="{height}px" aria-hidden="true">
     {#each [0, 1] as i (i)}
-      <span class="od-doc-thumb--page">
+      <span class="bc-doc-thumb--page">
         {#if urls[i]}
           <img src={urls[i]} alt="" />
         {:else}
-          <span class="od-doc-thumb--line" style:width="60%"></span><span class="od-doc-thumb--line" style:width="90%"></span><span class="od-doc-thumb--line" style:width="80%"></span><span class="od-doc-thumb--line" style:width="95%"></span><span class="od-doc-thumb--line" style:width="70%"></span>
+          <span class="bc-doc-thumb--line" style:width="60%"></span><span class="bc-doc-thumb--line" style:width="90%"></span><span class="bc-doc-thumb--line" style:width="80%"></span><span class="bc-doc-thumb--line" style:width="95%"></span><span class="bc-doc-thumb--line" style:width="70%"></span>
         {/if}
       </span>
     {/each}
   </span>
 {:else if urls[0]}
-  <span class="od-doc-thumb od-doc-thumb--photo" style:width="{width}px" style:height="{height}px" aria-hidden="true"><img src={urls[0]} alt="" /></span>
+  <span class="bc-doc-thumb bc-doc-thumb--photo" style:width="{width}px" style:height="{height}px" aria-hidden="true"><img src={urls[0]} alt="" /></span>
 {:else}
-  <span class="od-doc-thumb od-doc-thumb--drawn od-doc-thumb--tone-{cardTone(doc)}" style:width="{width}px" style:height="{height}px" aria-hidden="true">
-    <span class="od-doc-thumb--heading">{drawn.heading}</span>
-    <span class="od-doc-thumb--lines">{#each drawn.lines as line (line)}<span>{line}</span>{/each}</span>
+  <span class="bc-doc-thumb bc-doc-thumb--drawn bc-doc-thumb--tone-{cardTone(doc)}" style:width="{width}px" style:height="{height}px" aria-hidden="true">
+    <span class="bc-doc-thumb--heading">{drawn.heading}</span>
+    <span class="bc-doc-thumb--lines">{#each drawn.lines as line (line)}<span>{line}</span>{/each}</span>
     {#if doc.kind === 'other' && !drawn.lines.length}<Icon name="idCard" size={14} weight={1.6} />{/if}
   </span>
 {/if}
 
 <style>
   @layer od.components {
-    .od-doc-thumb {
+    .bc-doc-thumb {
       flex: none;
       display: flex;
       border-radius: 7px;
@@ -50,33 +50,33 @@
       box-sizing: border-box;
     }
 
-    .od-doc-thumb--photo {
-      background: var(--od-surface-2);
+    .bc-doc-thumb--photo {
+      background: var(--bc-surface-2);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
     }
 
-    .od-doc-thumb--photo img {
+    .bc-doc-thumb--photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .od-doc-thumb--drawn {
+    .bc-doc-thumb--drawn {
       padding: 5px 6px;
       flex-direction: column;
       justify-content: space-between;
-      color: var(--od-card-on);
+      color: var(--bc-card-on);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
     }
 
-    .od-doc-thumb--heading {
+    .bc-doc-thumb--heading {
       font-size: 7px;
       line-height: 8px;
       font-weight: 800;
       letter-spacing: 0.5px;
     }
 
-    .od-doc-thumb--lines {
+    .bc-doc-thumb--lines {
       display: flex;
       flex-direction: column;
       font-size: 6.5px;
@@ -85,45 +85,45 @@
       overflow: hidden;
     }
 
-    .od-doc-thumb--tone-blue { background: var(--od-card-blue); }
-    .od-doc-thumb--tone-green { background: var(--od-card-green); }
-    .od-doc-thumb--tone-amber { background: var(--od-card-amber); }
-    .od-doc-thumb--tone-violet { background: var(--od-card-violet); }
-    .od-doc-thumb--tone-red { background: var(--od-card-red); }
-    .od-doc-thumb--tone-neutral { background: var(--od-card-neutral); }
+    .bc-doc-thumb--tone-blue { background: var(--bc-card-blue); }
+    .bc-doc-thumb--tone-green { background: var(--bc-card-green); }
+    .bc-doc-thumb--tone-amber { background: var(--bc-card-amber); }
+    .bc-doc-thumb--tone-violet { background: var(--bc-card-violet); }
+    .bc-doc-thumb--tone-red { background: var(--bc-card-red); }
+    .bc-doc-thumb--tone-neutral { background: var(--bc-card-neutral); }
 
     /* Two pages side by side, as the medical certificate's mock-up draws them. */
-    .od-doc-thumb--pages {
+    .bc-doc-thumb--pages {
       justify-content: center;
       gap: 4px;
       border-radius: 0;
       overflow: visible;
     }
 
-    .od-doc-thumb--page {
+    .bc-doc-thumb--page {
       width: 40px;
       height: 100%;
       padding: 4px;
-      border: 1px solid var(--od-outline);
+      border: 1px solid var(--bc-outline);
       border-radius: 4px;
       box-sizing: border-box;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
     }
 
-    .od-doc-thumb--page img {
+    .bc-doc-thumb--page img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .od-doc-thumb--line {
+    .bc-doc-thumb--line {
       display: block;
       height: 3px;
       margin-top: 3px;
       border-radius: 2px;
-      background: var(--od-outline);
+      background: var(--bc-outline);
     }
   }
 </style>

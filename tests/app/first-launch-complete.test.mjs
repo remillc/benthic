@@ -97,7 +97,7 @@ test('the connect screens: the hint under the button, in progress with « Annule
 
 test('the spinner stops under reduced motion', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /@media \(prefers-reduced-motion: reduce\) \{\s*\.od-first-launch--spinner \{\s*animation: none;/);
+  assert.match(steps, /@media \(prefers-reduced-motion: reduce\) \{\s*\.bc-first-launch--spinner \{\s*animation: none;/);
 });
 
 test('WebDAV: the codes tell the address or the password; the texts are the mock-ups’', () => {
@@ -260,9 +260,9 @@ test('the interrupted screen: the mock-up’s texts, « Annuler » and « Repren
 
 test('portrait: from the second step the blue panel is a 540 dp hero, the first step keeps 640 dp', () => {
   const page = read('pages/WelcomeStartRelease.svelte');
-  assert.match(page, /class:od-welcome-release--compact=\{flow\.stack\.length > 1\}/);
+  assert.match(page, /class:bc-welcome-release--compact=\{flow\.stack\.length > 1\}/);
   assert.match(page, /height: 640px/);
-  assert.match(page, /\.od-welcome-release--compact \{\s*height: 540px;/);
+  assert.match(page, /\.bc-welcome-release--compact \{\s*height: 540px;/);
 });
 
 test('every new action has the hand pointer and a hover state; no colour is written in the components', () => {
@@ -300,7 +300,7 @@ test('the logbook menu opens the first launch at its step, and its first screen 
 
 test('the empty logbook menu: rename says « coming », open and new enter the first launch, export is off', () => {
   const page = read('pages/Logbook.svelte');
-  const menu = page.slice(page.indexOf('od-logbook-empty-menu" backdrop'), page.indexOf('Overflow menu: Filter'));
+  const menu = page.slice(page.indexOf('bc-logbook-empty-menu" backdrop'), page.indexOf('Overflow menu: Filter'));
   const order = ['menuRename', 'menuOpenOther', 'menuNew', 'menuExport'];
   const at = order.map((k) => menu.indexOf(`welcomeSteps.${k}'`));
   assert.ok(at.every((i) => i > 0) && [...at].sort((a, b) => a - b).join() === at.join(), 'the four items, in the mock-up’s order');
@@ -323,11 +323,11 @@ test('the empty logbook menu: rename says « coming », open and new enter the f
 
 test('the empty logbook profile is 724 dp wide in landscape and 624 dp in portrait, inside the pane', () => {
   const empty = read('components/ReleaseEmptyLogbook.svelte');
-  assert.match(empty, /width: min\(724px, calc\(100vw - var\(--od-nav-width, 96px\) - var\(--f7-page-master-width, 340px\) - 96px\)\)/);
-  assert.match(empty, /width: min\(624px, calc\(100vw - var\(--od-nav-width, 96px\) - 80px\)\)/);
+  assert.match(empty, /width: min\(724px, calc\(100vw - var\(--bc-nav-width, 96px\) - var\(--f7-page-master-width, 340px\) - 96px\)\)/);
+  assert.match(empty, /width: min\(624px, calc\(100vw - var\(--bc-nav-width, 96px\) - 80px\)\)/);
   assert.match(empty, /@media \(orientation: portrait\)/);
   // Landscape on 1 280 dp: 1 280 - 96 - 340 = 844 dp of pane, 60 dp on each side of 724. Portrait on 800 dp: 704, 40 each side.
   assert.ok((1280 - 96 - 340 - 724) / 2 >= 48 && (800 - 96 - 624) / 2 >= 40);
   // The list pane takes the whole width in portrait while the column is alone.
-  assert.match(read('App.svelte'), /:has\(\.od-release-empty\)\) \{\s*--f7-page-master-width: 100%;/);
+  assert.match(read('App.svelte'), /:has\(\.bc-release-empty\)\) \{\s*--f7-page-master-width: 100%;/);
 });

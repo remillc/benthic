@@ -109,10 +109,10 @@
 
   <ReadOnlyNotice />
 
-  <p class="od-maintenance-note--what">{[piece?.name ?? '', item ? taskLabel(item).toLocaleLowerCase() : ''].filter(Boolean).join(' · ')}</p>
+  <p class="bc-maintenance-note--what">{[piece?.name ?? '', item ? taskLabel(item).toLocaleLowerCase() : ''].filter(Boolean).join(' · ')}</p>
 
-  <div class="od-maintenance-note--fields">
-    <h2 class="od-maintenance-note--group" id="od-note-kind">{t('maintenance.note.type')}</h2>
+  <div class="bc-maintenance-note--fields">
+    <h2 class="bc-maintenance-note--group" id="od-note-kind">{t('maintenance.note.type')}</h2>
     <ButtonGroup
       ariaLabelledby="od-note-kind"
       marked
@@ -124,41 +124,41 @@
         { value: 'other', label: t('maintenance.kind.other') },
       ]}
     />
-    <p class="od-maintenance-note--help">{t(`maintenance.kindHelp.${kind}`)}</p>
+    <p class="bc-maintenance-note--help">{t(`maintenance.kindHelp.${kind}`)}</p>
 
     <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || hydro ? t('maintenance.note.stampHint', { format: dateHint() }) : dateHint()} />
     <ComboField label={t('maintenance.note.doneBy')} bind:value={doneBy} options={shops} supporting={t('maintenance.note.doneByHint')} />
     <TextField label={t('maintenance.note.cost')} bind:value={cost} inputmode="decimal" invalid={!!costLive.error} supporting={costLive.error} />
     <TextField label={t('maintenance.note.notes')} bind:value={notes} multiline />
 
-    <div class="od-maintenance-note--invoice">
+    <div class="bc-maintenance-note--invoice">
       {#if invoiceUrl}
-        <img src={invoiceUrl} alt={t('maintenance.note.invoiceAlt')} class="od-maintenance-note--invoice-image" />
+        <img src={invoiceUrl} alt={t('maintenance.note.invoiceAlt')} class="bc-maintenance-note--invoice-image" />
       {/if}
-      <button type="button" class="od-maintenance-note--tonal" onclick={() => fileInput?.click()}>
+      <button type="button" class="bc-maintenance-note--tonal" onclick={() => fileInput?.click()}>
         <Icon name="camera" size={20} />{invoiceUrl ? t('maintenance.note.invoiceChange') : t('maintenance.note.invoiceAdd')}
       </button>
       {#if invoiceUrl}
-        <button type="button" class="od-maintenance-note--text" onclick={() => (invoiceUrl = '')}>{t('maintenance.note.invoiceRemove')}</button>
+        <button type="button" class="bc-maintenance-note--text" onclick={() => (invoiceUrl = '')}>{t('maintenance.note.invoiceRemove')}</button>
       {/if}
-      <input bind:this={fileInput} class="od-maintenance-note--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickInvoice} />
+      <input bind:this={fileInput} class="bc-maintenance-note--file" type="file" accept="image/*" tabindex="-1" aria-hidden="true" onchange={pickInvoice} />
     </div>
 
-    <p class="od-maintenance-note--next"><Icon name="info" size={18} /><span>{nextLine}</span></p>
+    <p class="bc-maintenance-note--next"><Icon name="info" size={18} /><span>{nextLine}</span></p>
   </div>
-  <div class="od-maintenance-note--bottom"></div>
+  <div class="bc-maintenance-note--bottom"></div>
 {/snippet}
 
-<Page class="od-maintenance-note">
+<Page class="bc-maintenance-note">
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('maintenance.note.close')}</span>
+        <Icon name="close" /><span class="bc-sr-only">{t('maintenance.note.close')}</span>
       </a>
     {/snippet}
     {#snippet title()}{t('maintenance.note.title')}{/snippet}
     {#snippet right()}
-      <button type="button" class="od-maintenance-note--save" disabled={!canSave} onclick={save}>{t('maintenance.note.save')}</button>
+      <button type="button" class="bc-maintenance-note--save" disabled={!canSave} onclick={save}>{t('maintenance.note.save')}</button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -171,72 +171,72 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-maintenance-note .page-content) {
+    :global(.bc-maintenance-note .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-maintenance-note--save {
+    .bc-maintenance-note--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-maintenance-note--save:disabled {
+    .bc-maintenance-note--save:disabled {
       opacity: 0.38;
     }
 
-    .od-maintenance-note--what {
+    .bc-maintenance-note--what {
       margin: 12px 20px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-note--fields {
+    .bc-maintenance-note--fields {
       padding: 0 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .od-maintenance-note--group {
+    .bc-maintenance-note--group {
       margin: 8px 4px 0;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-note--help {
+    .bc-maintenance-note--help {
       margin: -4px 4px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-maintenance-note--invoice {
+    .bc-maintenance-note--invoice {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
 
-    .od-maintenance-note--invoice-image {
+    .bc-maintenance-note--invoice-image {
       width: 72px;
       height: 72px;
       border-radius: 16px;
       object-fit: cover;
     }
 
-    .od-maintenance-note--tonal,
-    .od-maintenance-note--text {
+    .bc-maintenance-note--tonal,
+    .bc-maintenance-note--text {
       width: auto;
       height: 40px;
       padding: 0 16px 0 12px;
@@ -245,24 +245,24 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-maintenance-note--text {
+    .bc-maintenance-note--text {
       padding: 0 12px;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
     }
 
-    .od-maintenance-note--file {
+    .bc-maintenance-note--file {
       display: none;
     }
 
-    .od-maintenance-note--next {
+    .bc-maintenance-note--next {
       margin: 4px 4px 0;
       display: flex;
       gap: 8px;
@@ -270,7 +270,7 @@
       line-height: 20px;
     }
 
-    .od-maintenance-note--bottom {
+    .bc-maintenance-note--bottom {
       height: 48px;
     }
   }

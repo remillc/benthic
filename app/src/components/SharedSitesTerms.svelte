@@ -41,38 +41,38 @@
   const POINTS = /** @type {const} */ (['yours', 'encrypted', 'shared']);
 </script>
 
-<Popup class="od-shared-terms" opened={sharedSites.termsOpen} onPopupClosed={() => ((sharedSites.termsOpen = false), (full = false))} aria-label={t('sharedSites.terms.title')}>
+<Popup class="bc-shared-terms" opened={sharedSites.termsOpen} onPopupClosed={() => ((sharedSites.termsOpen = false), (full = false))} aria-label={t('sharedSites.terms.title')}>
   <Page data-od-scroll>
     {#if full}
       <Navbar title={t('sharedSites.terms.fullTitle')}>
         {#snippet left()}
           <Link iconOnly onClick={() => (full = false)}>
             <i class="icon icon-back"></i>
-            <span class="od-sr-only">{t('detail.back')}</span>
+            <span class="bc-sr-only">{t('detail.back')}</span>
           </Link>
         {/snippet}
       </Navbar>
       <!-- The app's own file (public/terms), not text from elsewhere. -->
-      <div class="od-shared-terms--full">{@html text}</div>
+      <div class="bc-shared-terms--full">{@html text}</div>
     {:else}
-      <div class="od-shared-terms--body">
-        <h1 class="od-shared-terms--title">{t('sharedSites.terms.title')}</h1>
-        <p class="od-shared-terms--lead">{t('sharedSites.terms.lead')}</p>
-        <ul class="od-shared-terms--points">
+      <div class="bc-shared-terms--body">
+        <h1 class="bc-shared-terms--title">{t('sharedSites.terms.title')}</h1>
+        <p class="bc-shared-terms--lead">{t('sharedSites.terms.lead')}</p>
+        <ul class="bc-shared-terms--points">
           {#each POINTS as point (point)}
-            <li class="od-shared-terms--point">
-              <span class="od-shared-terms--dot" aria-hidden="true"></span>
-              <span class="od-shared-terms--point-text">
+            <li class="bc-shared-terms--point">
+              <span class="bc-shared-terms--dot" aria-hidden="true"></span>
+              <span class="bc-shared-terms--point-text">
                 <strong>{t(`sharedSites.terms.${point}Title`)}</strong>
                 <span>{t(`sharedSites.terms.${point}Text`)}</span>
               </span>
             </li>
           {/each}
         </ul>
-        <button type="button" class="od-shared-terms--read" onclick={() => (full = true)}>{t('sharedSites.terms.readAll')}</button>
+        <button type="button" class="bc-shared-terms--read" onclick={() => (full = true)}>{t('sharedSites.terms.readAll')}</button>
       </div>
-      <div class="od-shared-terms--actions">
-        <button type="button" class="button button-fill button-large od-shared-terms--accept" disabled={busy} onclick={accept}>
+      <div class="bc-shared-terms--actions">
+        <button type="button" class="button button-fill button-large bc-shared-terms--accept" disabled={busy} onclick={accept}>
           {#if busy}<Icon name="sync" size={20} />{/if}{t('sharedSites.terms.accept')}
         </button>
       </div>
@@ -82,62 +82,62 @@
 
 <style>
   @layer od.components {
-    :global(.od-shared-terms) {
-      --f7-page-bg-color: var(--od-background);
+    :global(.bc-shared-terms) {
+      --f7-page-bg-color: var(--bc-background);
     }
-    .od-shared-terms--body {
+    .bc-shared-terms--body {
       padding: calc(48px + var(--f7-safe-area-top, 0px)) 0 120px;
     }
-    .od-shared-terms--title {
+    .bc-shared-terms--title {
       margin: 0 24px;
       font-size: 28px;
       line-height: 36px;
       font-weight: 500;
     }
-    .od-shared-terms--lead {
+    .bc-shared-terms--lead {
       margin: 8px 24px 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-shared-terms--points {
+    .bc-shared-terms--points {
       margin: 20px 16px 0;
       padding: 4px 16px;
       list-style: none;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-shared-terms--point {
+    .bc-shared-terms--point {
       display: flex;
       gap: 12px;
       padding: 12px 0;
       & + & {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
-    .od-shared-terms--dot {
+    .bc-shared-terms--dot {
       flex: none;
       width: 8px;
       height: 8px;
       margin-top: 8px;
       border-radius: 4px;
-      background: var(--od-secondary);
+      background: var(--bc-secondary);
     }
-    .od-shared-terms--point-text {
+    .bc-shared-terms--point-text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       & strong {
         font-size: 16px;
         line-height: 24px;
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
-    .od-shared-terms--read {
+    .bc-shared-terms--read {
       margin: 16px 24px 0;
       padding: 12px 0;
       border: none;
@@ -145,24 +145,24 @@
       font: inherit;
       font-size: 14px;
       font-weight: 600;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       text-decoration: underline;
       cursor: pointer;
     }
-    .od-shared-terms--actions {
+    .bc-shared-terms--actions {
       position: absolute;
       left: 16px;
       right: 16px;
       bottom: calc(32px + var(--f7-safe-area-bottom, 0px));
       z-index: 1;
     }
-    .od-shared-terms--accept {
+    .bc-shared-terms--accept {
       width: 100%;
       gap: 8px;
-      --f7-button-fill-bg-color: var(--od-secondary);
-      --f7-button-fill-text-color: var(--od-on-secondary);
+      --f7-button-fill-bg-color: var(--bc-secondary);
+      --f7-button-fill-text-color: var(--bc-on-secondary);
     }
-    .od-shared-terms--full {
+    .bc-shared-terms--full {
       padding: 8px 24px 32px;
       line-height: 1.5;
     }

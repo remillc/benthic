@@ -18,7 +18,7 @@
   import { t } from '../lib/i18n.js';
 
   /** The tint of a type's tile, the same as the new piece dialog's. @type {Record<string, string>} */
-  const TONES = { computer: 'var(--od-release-tile)', bcd: 'var(--od-release-tile)', regulator: 'var(--od-tile-green)', suit: 'var(--od-tile-beige)', undersuit: 'var(--od-tile-beige)', cylinder: 'var(--od-tile-violet)' };
+  const TONES = { computer: 'var(--bc-release-tile)', bcd: 'var(--bc-release-tile)', regulator: 'var(--bc-tile-green)', suit: 'var(--bc-tile-beige)', undersuit: 'var(--bc-tile-beige)', cylinder: 'var(--bc-tile-violet)' };
 
   /** `selected`: the piece open in the right pane. @type {{ selected?: string|null }} */
   let { selected = null } = $props();
@@ -83,71 +83,71 @@
   }
 </script>
 
-<section class="od-gear-list" aria-label={t('gear.inventory.title')}>
-  <header class="od-gear-list--head">
+<section class="bc-gear-list" aria-label={t('gear.inventory.title')}>
+  <header class="bc-gear-list--head">
     {#if searching}
-      <input bind:this={field} class="od-gear-list--search" type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
-      <button type="button" class="od-gear-list--icon" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
+      <input bind:this={field} class="bc-gear-list--search" type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
+      <button type="button" class="bc-gear-list--icon" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
     {:else}
-      <h1 class="od-gear-list--title">{t('gear.inventory.title')}</h1>
-      <button type="button" class="od-gear-list--icon" aria-label={t('gear.inventory.search')} onclick={openSearch}><Icon name="search" size={22} /></button>
-      <button type="button" class="od-gear-list--icon" aria-label={t('gear.inventory.more')} aria-haspopup="menu" onclick={more}><Icon name="more" size={22} weight={4} /></button>
+      <h1 class="bc-gear-list--title">{t('gear.inventory.title')}</h1>
+      <button type="button" class="bc-gear-list--icon" aria-label={t('gear.inventory.search')} onclick={openSearch}><Icon name="search" size={22} /></button>
+      <button type="button" class="bc-gear-list--icon" aria-label={t('gear.inventory.more')} aria-haspopup="menu" onclick={more}><Icon name="more" size={22} weight={4} /></button>
     {/if}
   </header>
-  <div class="od-gear-list--scroll">
+  <div class="bc-gear-list--scroll">
     <ReadOnlyNotice onexport={() => (exporting = true)} />
     {#if !searching}
-      <button type="button" class="od-gear-list--upkeep" onclick={() => showProfilePath('/profile/maintenance/')}>
-        <span class="od-gear-list--tile od-gear-list--tile-late"><Icon name="clock" size={22} /></span>
-        <span class="od-gear-list--texts">
-          <span class="od-gear-list--name">{t('maintenance.entry')}</span>
-          <span class="od-gear-list--supporting">{upkeepLine}</span>
+      <button type="button" class="bc-gear-list--upkeep" onclick={() => showProfilePath('/profile/maintenance/')}>
+        <span class="bc-gear-list--tile bc-gear-list--tile-late"><Icon name="clock" size={22} /></span>
+        <span class="bc-gear-list--texts">
+          <span class="bc-gear-list--name">{t('maintenance.entry')}</span>
+          <span class="bc-gear-list--supporting">{upkeepLine}</span>
         </span>
         <Icon name="chevron" size={20} />
       </button>
-      <h2 class="od-gear-list--group">{t('gear.inventory.kits')}</h2>
-      <div class="od-gear-list--chips">
+      <h2 class="bc-gear-list--group">{t('gear.inventory.kits')}</h2>
+      <div class="bc-gear-list--chips">
         {#each gear.kits as kit (kit.id)}
-          <button type="button" class="od-gear-list--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })} onclick={() => showProfilePath(`/profile/kits/${kit.id}`)}>
+          <button type="button" class="bc-gear-list--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })} onclick={() => showProfilePath(`/profile/kits/${kit.id}`)}>
             <Icon name="briefcase" size={18} />{kit.name}<span>{kit.gearIds.length}</span>
           </button>
         {/each}
-        <button type="button" class="od-gear-list--chip" onclick={newKit}><Icon name="plus" size={18} />{t('gear.inventory.newKit')}</button>
+        <button type="button" class="bc-gear-list--chip" onclick={newKit}><Icon name="plus" size={18} />{t('gear.inventory.newKit')}</button>
       </div>
     {/if}
     {#if empty}
-      <div class="od-gear-list--empty">
+      <div class="bc-gear-list--empty">
         <h2>{t('gear.inventory.emptyTitle')}</h2>
         <p>{t('gear.inventory.emptyText')}</p>
       </div>
     {:else if !groups.length}
-      <p class="od-gear-list--empty">{t('gear.inventory.noResults')}</p>
+      <p class="bc-gear-list--empty">{t('gear.inventory.noResults')}</p>
     {/if}
     {#each groups as { group, items } (group)}
-      <h2 class="od-gear-list--group">{t(`gear.inventory.group.${group}`)}</h2>
+      <h2 class="bc-gear-list--group">{t(`gear.inventory.group.${group}`)}</h2>
       {#each items as g (g.id)}
-        <button type="button" class="od-gear-list--row" class:od-gear-list--on={selected === g.id} aria-current={selected === g.id ? 'true' : undefined} onclick={() => showProfilePath(`/profile/gear/${g.id}`)}>
-          <span class="od-gear-list--tile" style:background={TONES[g.type] ?? 'var(--od-background)'}><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
-          <span class="od-gear-list--texts">
-            <span class="od-gear-list--name">{g.name}</span>
-            {#if subLine(g)}<span class="od-gear-list--supporting">{subLine(g)}</span>{/if}
+        <button type="button" class="bc-gear-list--row" class:bc-gear-list--on={selected === g.id} aria-current={selected === g.id ? 'true' : undefined} onclick={() => showProfilePath(`/profile/gear/${g.id}`)}>
+          <span class="bc-gear-list--tile" style:background={TONES[g.type] ?? 'var(--bc-background)'}><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
+          <span class="bc-gear-list--texts">
+            <span class="bc-gear-list--name">{g.name}</span>
+            {#if subLine(g)}<span class="bc-gear-list--supporting">{subLine(g)}</span>{/if}
           </span>
         </button>
       {/each}
     {/each}
     {#if retired.length && !searching}
-      <button type="button" class="od-gear-list--row od-gear-list--retired" class:od-gear-list--on={selected === 'retired'} onclick={() => showProfilePath('/profile/gear/retired/')}>
-        <span class="od-gear-list--tile"><Icon name="archive" size={22} /></span>
-        <span class="od-gear-list--texts">
-          <span class="od-gear-list--name">{t('gear.inventory.retiredRow')}</span>
-          <span class="od-gear-list--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
+      <button type="button" class="bc-gear-list--row bc-gear-list--retired" class:bc-gear-list--on={selected === 'retired'} onclick={() => showProfilePath('/profile/gear/retired/')}>
+        <span class="bc-gear-list--tile"><Icon name="archive" size={22} /></span>
+        <span class="bc-gear-list--texts">
+          <span class="bc-gear-list--name">{t('gear.inventory.retiredRow')}</span>
+          <span class="bc-gear-list--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
         </span>
       </button>
     {/if}
-    <div class="od-gear-list--bottom"></div>
+    <div class="bc-gear-list--bottom"></div>
   </div>
   {#if !gear.readOnly}
-    <button type="button" class="od-gear-list--add" onclick={() => push('/profile/gear/new')}><Icon name="plus" size={22} />{t('gear.inventory.add')}</button>
+    <button type="button" class="bc-gear-list--add" onclick={() => push('/profile/gear/new')}><Icon name="plus" size={22} />{t('gear.inventory.add')}</button>
   {/if}
 </section>
 
@@ -155,18 +155,18 @@
 
 <style>
   @layer od.components {
-    .od-gear-list {
+    .bc-gear-list {
       position: relative;
       flex: none;
-      width: var(--od-pf-list);
+      width: var(--bc-pf-list);
       height: 100%;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      background: var(--od-surface);
-      border-right: 1px solid var(--od-separator);
+      background: var(--bc-surface);
+      border-right: 1px solid var(--bc-separator);
     }
-    .od-gear-list--head {
+    .bc-gear-list--head {
       flex: none;
       height: 64px;
       padding: 0 12px 0 20px;
@@ -174,41 +174,41 @@
       align-items: center;
       gap: 4px;
     }
-    .od-gear-list--title {
+    .bc-gear-list--title {
       flex: 1;
       margin: 0;
       font-size: 22px;
       font-weight: 500;
     }
-    .od-gear-list--search {
+    .bc-gear-list--search {
       flex: 1;
       min-width: 0;
       height: 40px;
       padding: 0 12px;
       border: 0;
       border-radius: 20px;
-      background: var(--od-background);
-      color: var(--od-text);
+      background: var(--bc-background);
+      color: var(--bc-text);
       font: inherit;
     }
-    .od-gear-list--icon {
+    .bc-gear-list--icon {
       flex: none;
       width: 40px;
       height: 40px;
       border: 0;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: grid;
       place-items: center;
       cursor: pointer;
     }
-    .od-gear-list--scroll {
+    .bc-gear-list--scroll {
       flex: 1;
       overflow-y: auto;
       padding: 0 8px;
     }
-    .od-gear-list--upkeep {
+    .bc-gear-list--upkeep {
       width: 100%;
       min-height: 64px;
       padding: 8px 16px;
@@ -217,42 +217,42 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-maintenance);
-      color: var(--od-text);
+      background: var(--bc-maintenance);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
-    .od-gear-list--group {
+    .bc-gear-list--group {
       margin: 16px 12px 4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 14px;
       font-weight: 600;
     }
-    .od-gear-list--chips {
+    .bc-gear-list--chips {
       padding: 0 8px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    .od-gear-list--chip {
+    .bc-gear-list--chip {
       min-height: 36px;
       padding: 0 12px;
-      border: 1px solid var(--od-separator);
+      border: 1px solid var(--bc-separator);
       border-radius: 8px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       cursor: pointer;
     }
-    .od-gear-list--chip span {
-      color: var(--od-text-2);
+    .bc-gear-list--chip span {
+      color: var(--bc-text-2);
     }
-    .od-gear-list--row {
+    .bc-gear-list--row {
       width: 100%;
       min-height: 64px;
       padding: 8px 12px;
@@ -262,19 +262,19 @@
       align-items: center;
       gap: 12px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
-    .od-gear-list--row:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-gear-list--row:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-gear-list--on,
-    .od-gear-list--on:hover {
-      background: var(--od-selected-container);
+    .bc-gear-list--on,
+    .bc-gear-list--on:hover {
+      background: var(--bc-selected-container);
     }
-    .od-gear-list--tile {
+    .bc-gear-list--tile {
       flex: none;
       width: 40px;
       height: 40px;
@@ -282,42 +282,42 @@
       display: grid;
       place-items: center;
     }
-    .od-gear-list--tile-late {
-      background: var(--od-surface);
-      color: var(--od-maintenance-icon);
+    .bc-gear-list--tile-late {
+      background: var(--bc-surface);
+      color: var(--bc-maintenance-icon);
     }
-    .od-gear-list--texts {
+    .bc-gear-list--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
-    .od-gear-list--name {
+    .bc-gear-list--name {
       font-size: 16px;
       font-weight: 500;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-gear-list--supporting {
-      color: var(--od-text-2);
+    .bc-gear-list--supporting {
+      color: var(--bc-text-2);
       font-size: 14px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-gear-list--retired {
+    .bc-gear-list--retired {
       margin-top: 16px;
     }
-    .od-gear-list--empty {
+    .bc-gear-list--empty {
       margin: 24px 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       text-align: center;
     }
-    .od-gear-list--bottom {
+    .bc-gear-list--bottom {
       height: 88px;
     }
-    .od-gear-list--add {
+    .bc-gear-list--add {
       position: absolute;
       inset-inline-end: 16px;
       bottom: 16px;
@@ -328,12 +328,17 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-selected-container);
-      color: var(--od-text);
+      background: var(--bc-selected-container);
+      color: var(--bc-text);
       font: inherit;
       font-weight: 500;
-      box-shadow: var(--od-tile-shadow);
+      box-shadow: var(--bc-tile-shadow);
       cursor: pointer;
     }
+  }
+
+  /* Framework7's unlayered button rule otherwise stretches it across the list. */
+  .bc-gear-list--add {
+    width: auto;
   }
 </style>

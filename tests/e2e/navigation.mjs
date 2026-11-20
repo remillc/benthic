@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--certs-fab-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -9,7 +9,7 @@
 //   - exactly one page is current (the tablet's list and detail: the list plus the detail);
 //   - the current page's own route is the router's current route and the last entry of its history;
 //   - no page waits as page-next, no page keeps a transform, the view keeps no router-transition class and none of
-//     the dive page's swipe classes (od-pushing).
+//     the dive page's swipe classes (bc-pushing).
 // The flows try to break the stack: Back tapped twice, Back during the opening animation, Back in the middle of the
 // dive page's side-by-side swipe, Back after the account sheet, the Android Back key, Back right after a save.
 //
@@ -300,7 +300,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
   await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.OD_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
-    if (await tab.run((w) => !!document.querySelector(w ? '.od-welcome.modal-in .od-first-launch, .od-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
+    if (await tab.run((w) => !!document.querySelector(w ? '.bc-welcome.modal-in .bc-first-launch, .bc-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
   }
   await sleep(500);
   return tab;
@@ -337,12 +337,12 @@ async function settled(tab, label, o = {}) {
     await sleep(100);
     stack = await tab.run(readStack);
     // A swipe that follows the finger holds the router until its release animation has ended (lib/router-guard.js).
-    if (!/router-transition|od-pushing|od-push-settle/.test(stack.view) && stack.allow !== false && !stack.locks) break;
+    if (!/router-transition|bc-pushing|bc-push-settle/.test(stack.view) && stack.allow !== false && !stack.locks) break;
   }
   const problems = [];
   if (stack.locks) problems.push(`the router is still held (${stack.locks})`);
   const cur = stack.pages.filter((p) => /\bpage-current\b/.test(p.cls));
-  if (/router-transition|od-pushing|od-push-settle/.test(stack.view)) problems.push(`the view keeps ${stack.view.replace(/view\s+|tab\S*\s*/g, '').trim()}`);
+  if (/router-transition|bc-pushing|bc-push-settle/.test(stack.view)) problems.push(`the view keeps ${stack.view.replace(/view\s+|tab\S*\s*/g, '').trim()}`);
   if (!o.split && cur.length !== 1) problems.push(`${cur.length} current pages`);
   if (o.split && (cur.length < 1 || cur.length > 2)) problems.push(`${cur.length} current pages (list and detail)`);
   const top = cur[cur.length - 1];
@@ -353,7 +353,7 @@ async function settled(tab, label, o = {}) {
   for (const p of stack.pages) {
     if (/\bpage-next\b/.test(p.cls)) problems.push(`${p.route} waits as page-next`);
     if (/\bpage-current\b/.test(p.cls) && p.transform !== 'none') problems.push(`the current page ${p.route} keeps a transform`);
-    if (/od-push-from/.test(p.cls)) problems.push(`${p.route} keeps od-push-from`);
+    if (/bc-push-from/.test(p.cls)) problems.push(`${p.route} keeps bc-push-from`);
   }
   if (o.route && !(o.route instanceof RegExp ? o.route.test(stack.current) : route(stack.current) === o.route)) problems.push(`expected ${o.route}, on ${stack.current}`);
   checks++;
@@ -430,9 +430,9 @@ async function phoneFlows() {
 
   console.log(' selection toolbar above the bottom bar');
   for (const demo of [false, true]) {
-    await tab.run((on) => document.documentElement.classList.toggle('od-demo-bottom-on', on), demo);
+    await tab.run((on) => document.documentElement.classList.toggle('bc-demo-bottom-on', on), demo);
     const row = await tab.run(() => {
-      const r = document.querySelector('.page-current a.od-dive-row--link')?.getBoundingClientRect();
+      const r = document.querySelector('.page-current a.bc-dive-row--link')?.getBoundingClientRect();
       return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
     });
     if (!row) throw new Error('no dive row');
@@ -442,8 +442,8 @@ async function phoneFlows() {
     await sleep(900);
     if (process.env.OD_SHOTS) await shot(tab, `selection-toolbar${demo ? '-demo' : ''}`);
     const g = await tab.run(() => {
-      const t = document.querySelector('.od-floating-toolbar')?.getBoundingClientRect();
-      const b = document.querySelector('.od-navigation-bar')?.getBoundingClientRect();
+      const t = document.querySelector('.bc-floating-toolbar')?.getBoundingClientRect();
+      const b = document.querySelector('.bc-navigation-bar')?.getBoundingClientRect();
       return { toolbar: t ? t.bottom : null, bar: b ? b.top : null };
     });
     checks++;
@@ -452,7 +452,7 @@ async function phoneFlows() {
     await hardwareBack(tab);
     await sleep(500);
   }
-  await tab.run(() => document.documentElement.classList.remove('od-demo-bottom-on'));
+  await tab.run(() => document.documentElement.classList.remove('bc-demo-bottom-on'));
   await settled(tab, 'after the selection', { route: '/' });
 
   console.log(' logbook > dive > back');
@@ -501,12 +501,12 @@ async function phoneFlows() {
   await tapText(tab, 'Signature sur cet écran|Signature on this screen');
   await sleep(300);
   await tab.run(() => {
-    const field = document.querySelector('.page-current .od-validate--fields input');
+    const field = document.querySelector('.page-current .bc-validate--fields input');
     field.value = 'Marc Gagnon';
     field.dispatchEvent(new Event('input', { bubbles: true }));
   });
   const pad = await tab.run(() => {
-    const r = document.querySelector('.page-current canvas.od-signature-pad').getBoundingClientRect();
+    const r = document.querySelector('.page-current canvas.bc-signature-pad').getBoundingClientRect();
     return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
   await tab.touch('touchStart', pad.x + pad.w * 0.2, pad.y + pad.h * 0.6);
@@ -528,15 +528,15 @@ async function phoneFlows() {
   for (let i = 0; i < 60 && (await tab.run(readStack)).current !== validated; i++) await sleep(100);
   await settled(tab, 'validation: back on the dive', { route: validated });
   const shown = await tab.run(() => ({
-    text: document.querySelector('.page-current .od-dive-validations')?.textContent ?? '',
-    signature: !!document.querySelector('.page-current .od-dive-validations--signature'),
+    text: document.querySelector('.page-current .bc-dive-validations')?.textContent ?? '',
+    signature: !!document.querySelector('.page-current .bc-dive-validations--signature'),
   }));
   checks++;
   if (!/Marc Gagnon/.test(shown.text) || !shown.signature) failures.push({ label: 'validation: section', problems: ['the Validations section shows "' + shown.text.slice(0, 80) + '", signature ' + shown.signature] });
   if (process.env.OD_SHOTS) await shot(tab, 'validation-detail');
   await tapBack(tab);
   await settled(tab, 'validation: back to the logbook', { route: '/' });
-  const marked = await tab.run(() => !!document.querySelector('.page-current .od-dive-row--validated'));
+  const marked = await tab.run(() => !!document.querySelector('.page-current .bc-dive-row--validated'));
   checks++;
   if (!marked) failures.push({ label: 'validation: mark', problems: ['no mark on the validated dive in the logbook list'] });
   await tapDive(tab);
@@ -545,7 +545,7 @@ async function phoneFlows() {
   await sleep(500);
   await tapText(tab, '^\\s*(Retirer|Remove)\\s*$', '.dialog');
   await sleep(500);
-  const gone = await tab.run(() => !document.querySelector('.page-current .od-dive-validations--item'));
+  const gone = await tab.run(() => !document.querySelector('.page-current .bc-dive-validations--item'));
   checks++;
   if (!gone) failures.push({ label: 'validation: removed', problems: ['the validation is still listed after « Retirer »'] });
   await tapBack(tab);
@@ -575,7 +575,7 @@ async function phoneFlows() {
     await tapText(tab, '^\s*(Enregistrer|Save)\s*$');
     for (let i = 0; i < 100 && (await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
     await settled(tab, `${how}: after Save`, { route });
-    const toast = await tab.run(() => !!document.querySelector('.toast.od-undo-toast'));
+    const toast = await tab.run(() => !!document.querySelector('.toast.bc-undo-toast'));
     checks++;
     if (!toast) failures.push({ label: `${how}: Undo message`, problems: ['no Undo message after the save'] });
     if (how === 'arrow') await tapBack(tab);
@@ -593,9 +593,9 @@ async function phoneFlows() {
   for (const how of ['arrow', 'hardware', 'edge swipe']) {
     console.log(` avatar sheet > Settings > Back (${how})`);
     await settled(tab, `${how}: logbook before the sheet`, { route: '/' });
-    await tab.run(() => document.querySelector('.page-current .od-account-avatar, .od-account-avatar')?.click());
+    await tab.run(() => document.querySelector('.page-current .bc-account-avatar, .bc-account-avatar')?.click());
     await sleep(700);
-    await tab.run(() => [...document.querySelectorAll('.od-account-sheet a, .od-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || el.getAttribute('data-row') === 'settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
+    await tab.run(() => [...document.querySelectorAll('.bc-account-sheet a, .bc-account-sheet button')].find((el) => el.getAttribute('href') === '#settings' || el.getAttribute('data-row') === 'settings' || /^\s*(Réglages|Settings)\s*$/.test(el.textContent))?.click());
     await settled(tab, `${how}: Settings opened`, { route: '/settings/' });
     if (how === 'arrow') await tapBack(tab);
     else if (how === 'hardware') await hardwareBack(tab);
@@ -625,7 +625,7 @@ async function phoneFlows() {
   for (const [label, block] of [['^(Guide|Dive guide|Guides)', 'end'], ['^(Compagnons|Buddies|Buddy)', 'end'], ['^(Guide|Dive guide|Guides)', 'center'], ['^(Compagnons|Buddies|Buddy)', 'center']]) {
     const placed = await tab.run((label, block) => {
       const re = new RegExp(label, 'i');
-      const l = [...document.querySelectorAll('.page-current .od-chips-field--label')].find((x) => re.test(x.textContent.trim()));
+      const l = [...document.querySelectorAll('.page-current .bc-chips-field--label')].find((x) => re.test(x.textContent.trim()));
       const input = l && document.getElementById(l.getAttribute('for'));
       if (!input) return false;
       input.scrollIntoView({ block });
@@ -640,11 +640,11 @@ async function phoneFlows() {
     }
     // Focused and empty, the field lists the logbook's values (up to six): the tallest list it can show.
     await sleep(300);
-    if (!(await tab.run(() => document.querySelectorAll('.page-current .od-chips-field--proposals button').length > 1))) await tab.send('Input.insertText', { text: 'a' });
+    if (!(await tab.run(() => document.querySelectorAll('.page-current .bc-chips-field--proposals button').length > 1))) await tab.send('Input.insertText', { text: 'a' });
     await sleep(300);
     if (process.env.OD_SHOTS) await shot(tab, `suggestions-${label.replace(/\W/g, '')}-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
     const res = await tab.run(() => {
-      const ul = [...document.querySelectorAll('.page-current .od-chips-field--proposals')].find((u) => u.getClientRects().length);
+      const ul = [...document.querySelectorAll('.page-current .bc-chips-field--proposals')].find((u) => u.getClientRects().length);
       if (!ul) return { problem: 'no open list' };
       const items = [...ul.querySelectorAll('button')];
       const bad = [];
@@ -671,7 +671,7 @@ async function phoneFlows() {
   await tapBack(tab);
   await sleep(500);
   // Typed text asks first; a field only focused does not.
-  await tapText(tab, '^(Quitter|Leave)$', '.od-leave-guard--dialog').catch(() => {});
+  await tapText(tab, '^(Quitter|Leave)$', '.bc-leave-guard--dialog').catch(() => {});
   await settled(tab, 'after leaving the edit page', { route: /^\/dives\/\d+$/ });
   await toLogbook(tab, 'after the suggestions check');
 
@@ -689,27 +689,27 @@ async function phoneFlows() {
     return `/dives/${id}/complete`;
   });
   await settled(tab, 'quick entry opened', { route: quickRoute });
-  for (let i = 0; i < 40 && here && !(await tab.run(() => !!document.querySelector('.od-quick-entry [role=option][aria-selected=true]'))); i++) await sleep(200);
+  for (let i = 0; i < 40 && here && !(await tab.run(() => !!document.querySelector('.bc-quick-entry [role=option][aria-selected=true]'))); i++) await sleep(200);
   if (process.env.OD_SHOTS) await shot(tab, `quick-entry-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
   if (here) {
-    const preselected = await tab.run(() => document.querySelector('.od-quick-entry [role=option][aria-selected=true] .od-quick-entry--nearest')?.textContent ?? '');
+    const preselected = await tab.run(() => document.querySelector('.bc-quick-entry [role=option][aria-selected=true] .bc-quick-entry--nearest')?.textContent ?? '');
     checks++;
     if (!/\S/.test(preselected)) {
       failures.push({ label: 'quick entry: nearest site', problems: [`no preselected nearest site for ${here.name}`] });
       console.log('  FAIL quick entry: the nearest site is not preselected');
     } else console.log('  ok   quick entry: the nearest site is preselected');
   }
-  const sawSite = await tab.run(() => !!document.querySelector('.od-quick-entry [role=listbox]') && document.querySelectorAll('.od-quick-entry [role=option]').length > 0);
+  const sawSite = await tab.run(() => !!document.querySelector('.bc-quick-entry [role=listbox]') && document.querySelectorAll('.bc-quick-entry [role=option]').length > 0);
   checks++;
   if (!sawSite) {
     failures.push({ label: 'quick entry: site list', problems: ['no site rows'] });
     console.log('  FAIL quick entry: the site list is empty');
   } else console.log('  ok   quick entry: the site list shows');
-  await tapText(tab, '^\s*(Chercher un autre site|Search for another site)\s*$', '.od-quick-entry');
+  await tapText(tab, '^\s*(Chercher un autre site|Search for another site)\s*$', '.bc-quick-entry');
   await settled(tab, 'quick entry > Choose a site', { route: '/sites/choose' });
   await tapBack(tab);
   await settled(tab, 'back to the quick entry', { route: quickRoute });
-  await tapText(tab, '^\s*(Enregistrer|Save)\s*$', '.od-quick-entry');
+  await tapText(tab, '^\s*(Enregistrer|Save)\s*$', '.bc-quick-entry');
   // Saving a site writes the log: the screen is left when the write is done.
   for (let i = 0; i < 50 && (await tab.run(() => /\/complete$/.test(document.querySelector('.view-main')?.f7View?.router?.currentRoute?.url ?? ''))); i++) await sleep(200);
   await settled(tab, 'quick entry saved', { route: '/' });
@@ -724,7 +724,7 @@ async function phoneFlows() {
   }
   await toLogbook(tab, 'after the quick entry');
   // The Undo message of the save stays 6 s over the screen: wait for it to go before the next flow.
-  for (let i = 0; i < 60 && (await tab.run(() => !!document.querySelector('.toast.od-undo-toast'))); i++) await sleep(200);
+  for (let i = 0; i < 60 && (await tab.run(() => !!document.querySelector('.toast.bc-undo-toast'))); i++) await sleep(200);
 
   console.log(' error report sheet over the Download page and over the logbook');
   for (const where of ['/download', '/']) {
@@ -735,12 +735,12 @@ async function phoneFlows() {
     // A forced error: the report sheet opens, both buttons answer, and the page is usable afterwards.
     // At most three offers per session: decline over both pages, and « Envoyer » once over the Download page (no server
     // answers in this test: the sheet then shows « Plus tard », which closes it).
-    for (const [button, label] of where === '/' ? [['.od-error-report--secondary', 'decline']] : [['.od-error-report--secondary', 'decline'], ['.od-error-report--primary', 'send']]) {
+    for (const [button, label] of where === '/' ? [['.bc-error-report--secondary', 'decline']] : [['.bc-error-report--secondary', 'decline'], ['.bc-error-report--primary', 'send']]) {
       await tab.run((n) => window.dispatchEvent(new ErrorEvent('error', { error: new Error(`forced report ${n}`), message: `forced report ${n}` })), `${where}-${label}-${Date.now()}`);
       let up = false;
       for (let i = 0; i < 25 && !up; i++) {
         await sleep(200);
-        up = await tab.run(() => !!document.querySelector('.od-error-report.modal-in'));
+        up = await tab.run(() => !!document.querySelector('.bc-error-report.modal-in'));
       }
       checks++;
       if (!up) {
@@ -756,9 +756,9 @@ async function phoneFlows() {
       if (box) await tab.tapAt(box.x, box.y);
       if (label === 'send') {
         await sleep(1500);
-        if (await tab.run(() => !!document.querySelector('.od-error-report.modal-in'))) {
+        if (await tab.run(() => !!document.querySelector('.bc-error-report.modal-in'))) {
           const later = await boxOf(tab, () => {
-            const r = document.querySelector('.od-error-report--secondary')?.getBoundingClientRect();
+            const r = document.querySelector('.bc-error-report--secondary')?.getBoundingClientRect();
             return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
           });
           if (later) await tab.tapAt(later.x, later.y);
@@ -767,7 +767,7 @@ async function phoneFlows() {
       let closed = false;
       for (let i = 0; i < 25 && !closed; i++) {
         await sleep(200);
-        closed = await tab.run(() => !document.querySelector('.od-error-report.modal-in') && !document.querySelector('.sheet-backdrop-in'));
+        closed = await tab.run(() => !document.querySelector('.bc-error-report.modal-in') && !document.querySelector('.sheet-backdrop-in'));
       }
       checks++;
       if (!closed) {
@@ -842,7 +842,7 @@ async function phoneFlows() {
   await settled(tab, 'back after the sheet', { route: '/' });
 
   console.log(' free account sheet > OpenDives+ offer > Back reopens the sheet');
-  const sheetState = () => tab.run(() => ({ hash: location.hash, sheet: !!document.querySelector('.od-account-sheet.modal-in, .sheet-modal.modal-in .od-account-sheet--row, .modal-in .od-account-sheet--row'), welcome: !!document.querySelector('.od-welcome.modal-in'), len: history.length }));
+  const sheetState = () => tab.run(() => ({ hash: location.hash, sheet: !!document.querySelector('.bc-account-sheet.modal-in, .sheet-modal.modal-in .bc-account-sheet--row, .modal-in .bc-account-sheet--row'), welcome: !!document.querySelector('.bc-welcome.modal-in'), len: history.length }));
   const expectState = (label, want, got) => {
     checks++;
     const bad = Object.entries(want).filter(([k, v]) => got[k] !== v).map(([k, v]) => `${k} is ${got[k]}, expected ${v}`);
@@ -871,7 +871,7 @@ async function phoneFlows() {
   console.log(' subscriber with the logbook still on the device: the profile and the backup page open, never the offer');
   // What the development menu's « Abonné » does (lib/dev-tools.js): the account state, with no restart and the logbook untouched.
   await tab.run(() => window.__odplusAccount({ signedIn: true, email: 'essai@opendives.test', subscribed: true }));
-  for (const [row, route, page] of [['#profile', '/profile', '.od-profile, .od-profile-page, .page-current'], ['#backup', '/account/backup', '.od-backup-not-on-server']]) {
+  for (const [row, route, page] of [['#profile', '/profile', '.bc-profile, .bc-profile-page, .page-current'], ['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
     expectState(`subscriber ${row}: the sheet is open`, { hash: '', sheet: true }, await sheetState());
@@ -893,7 +893,7 @@ async function phoneFlows() {
 
   console.log(' sections: sites, statistics, tools, settings');
   for (const [label, pattern] of [['Sites', '^\\s*Sites\\s*$'], ['Statistiques', '^\\s*Statistiques\\s*$'], ['Outils', '^\\s*Outils\\s*$']]) {
-    await tapText(tab, pattern, '.toolbar, .od-bottom-nav, .tabbar').catch(() => tab.run((l) => [...document.querySelectorAll('.toolbar a, .tabbar a')].find((a) => a.textContent.trim() === l)?.click(), label));
+    await tapText(tab, pattern, '.toolbar, .bc-bottom-nav, .tabbar').catch(() => tab.run((l) => [...document.querySelectorAll('.toolbar a, .tabbar a')].find((a) => a.textContent.trim() === l)?.click(), label));
     await settled(tab, `${label} shown`);
   }
   tab.ws.close();
@@ -919,7 +919,7 @@ async function phoneFlows() {
 /** The step of the first launch on screen (data-step of lib/first-launch-steps.js), once its transition is over. */
 async function welcomeStep(tab) {
   await sleep(700);
-  return tab.run(() => document.querySelector('.od-welcome.modal-in .od-first-launch--step:last-of-type')?.getAttribute('data-step') ?? null);
+  return tab.run(() => document.querySelector('.bc-welcome.modal-in .bc-first-launch--step:last-of-type')?.getAttribute('data-step') ?? null);
 }
 /** Checks the step reached; counts as one check. */
 async function expectStep(tab, label, expected) {
@@ -935,16 +935,16 @@ async function expectStep(tab, label, expected) {
 async function welcomeFlows() {
   console.log('First launch, 390x844: the system Back goes to the previous step');
   const tab = await openTab(390, 844, true, true);
-  console.log(await tab.run(() => document.querySelector('.od-welcome')?.outerHTML.slice(0, 1500)));
+  console.log(await tab.run(() => document.querySelector('.bc-welcome')?.outerHTML.slice(0, 1500)));
   await expectStep(tab, 'first launch opens on the first step', 'start');
-  const welcomeTap = (pattern) => tapText(tab, pattern, '.od-welcome.modal-in');
+  const welcomeTap = (pattern) => tapText(tab, pattern, '.bc-welcome.modal-in');
   const cases = [
     ['Import a logbook / Importer un carnet', '^\s*(Import a logbook|Importer un carnet)', 'import'],
     ['New logbook / Commencer un carnet', '^\s*(Start a logbook|Commencer un carnet)', 'new'],
     ['Sign in or create an account', '(Sign in|Se connecter)', 'odplusConnect'],
   ];
   for (const [name, pattern, step] of cases) {
-    await welcomeTap(pattern).catch(async (e) => { console.log(await tab.run(() => [...document.querySelectorAll('.od-welcome.modal-in button, .od-welcome.modal-in a')].map((b) => b.textContent.trim().slice(0, 30) + '@' + Math.round(b.getBoundingClientRect().y)).join(' | '))); throw e; });
+    await welcomeTap(pattern).catch(async (e) => { console.log(await tab.run(() => [...document.querySelectorAll('.bc-welcome.modal-in button, .bc-welcome.modal-in a')].map((b) => b.textContent.trim().slice(0, 30) + '@' + Math.round(b.getBoundingClientRect().y)).join(' | '))); throw e; });
     await expectStep(tab, `${name}: opens`, step);
     await hardwareBack(tab);
     await expectStep(tab, `${name}: Back returns to the first step`, 'start');
@@ -952,7 +952,7 @@ async function welcomeFlows() {
   await hardwareBack(tab);
   await sleep(300);
   checks++;
-  if (!(await tab.run(() => !!document.querySelector('.od-welcome.modal-in')))) failures.push({ label: 'first step', problems: ['Back on the first step closed the first launch'] });
+  if (!(await tab.run(() => !!document.querySelector('.bc-welcome.modal-in')))) failures.push({ label: 'first step', problems: ['Back on the first step closed the first launch'] });
   await expectStep(tab, 'Back on the first step keeps the first launch', 'start');
   tab.ws.close();
 }
@@ -974,7 +974,7 @@ async function tabletFlows() {
 async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
-  await tab.run(() => !!document.querySelector('.od-desktop-logbook--table'));
+  await tab.run(() => !!document.querySelector('.bc-desktop-logbook--table'));
   const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
   await open('/settings/');
   await sleep(1200);
@@ -1025,19 +1025,19 @@ async function exportFlows(expect) {
     });
     await sleep(500);
     await tab.run((desktop) => {
-      const button = document.querySelector(desktop ? '.od-desktop-logbook--bar .od-desktop-logbook--icon-button[aria-haspopup="menu"]' : '.page-current [data-popover=".od-logbook-menu"], .page-master [data-popover=".od-logbook-menu"]');
+      const button = document.querySelector(desktop ? '.bc-desktop-logbook--bar .bc-desktop-logbook--icon-button[aria-haspopup="menu"]' : '.page-current [data-popover=".bc-logbook-menu"], .page-master [data-popover=".bc-logbook-menu"]');
       if (!button) throw new Error('logbook menu button missing');
       button.click();
     }, desktop);
     await sleep(500);
     await tab.run((desktop) => {
-      const menu = document.querySelector(desktop ? '.od-context-menu' : '.od-logbook-menu');
+      const menu = document.querySelector(desktop ? '.bc-context-menu' : '.bc-logbook-menu');
       const item = [...menu.querySelectorAll('a, button')].find((el) => /Exporter le carnet|Export the logbook/.test(el.textContent));
       if (!item) throw new Error('whole logbook export missing');
       item.click();
     }, desktop);
     await sleep(600);
-    const dialog = desktop ? '.od-desktop-export' : '.od-export-sheet';
+    const dialog = desktop ? '.bc-desktop-export' : '.bc-export-sheet';
     const state = await tab.run((dialog, count) => {
       const el = document.querySelector(dialog);
       if (!el) return { shown: false, formatCount: 0, title: false, allSelected: false };
@@ -1091,26 +1091,26 @@ async function unitsMenuFlows(expect) {
       await sleep(900);
     }
     await tab.run(() => {
-      const imperial = [...document.querySelectorAll('.od-settings--segmented [role="radio"]')].find((el) => /impérial|imperial/i.test(el.textContent));
+      const imperial = [...document.querySelectorAll('.bc-settings--segmented [role="radio"]')].find((el) => /impérial|imperial/i.test(el.textContent));
       if (!imperial) throw new Error('imperial unit system missing');
       imperial.click();
     });
     await sleep(700);
     await tab.run(() => {
-      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      const row = [...document.querySelectorAll('.bc-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
       if (!row) throw new Error('temperature row missing');
       row.click();
     });
     await sleep(300);
     await tab.run(() => {
-      const option = [...document.querySelectorAll('.od-row-menu [role="option"]')].find((el) => /°C/.test(el.textContent));
+      const option = [...document.querySelectorAll('.bc-row-menu [role="option"]')].find((el) => /°C/.test(el.textContent));
       if (!option) throw new Error('Celsius option missing');
       option.click();
     });
     await sleep(700);
     const result = await tab.run(async () => {
       const { logbook } = await import('/src/lib/logbook.svelte.js');
-      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      const row = [...document.querySelectorAll('.bc-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
       return {
         system: logbook.prefs.unitSystem,
         temperature: logbook.prefs.temperature,
@@ -1121,14 +1121,14 @@ async function unitsMenuFlows(expect) {
     });
     expect(`${width}px: Celsius with imperial units closes cleanly`, { system: 'personalize', temperature: 'C', length: 'ft', focused: true, errors: '' }, result);
     await tab.run(() => {
-      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      const row = [...document.querySelectorAll('.bc-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
       row.click();
     });
     await sleep(300);
-    await tab.run(() => document.querySelector('.od-row-menu').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    await tab.run(() => document.querySelector('.bc-row-menu').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await sleep(300);
     const cancelled = await tab.run(() => ({
-      closed: !document.querySelector('.od-row-menu'),
+      closed: !document.querySelector('.bc-row-menu'),
       errors: window.__unitsErrors.join(' | '),
     }));
     expect(`${width}px: Escape closes a choice menu cleanly`, { closed: true, errors: '' }, cancelled);
@@ -1178,18 +1178,95 @@ async function computerPhotoFlows(expect) {
   });
   await sleep(1200);
   await tab.run(() => {
-    const button = document.querySelector('.od-dive-detail--desk-tabs [data-tab="equipment"]');
+    const button = document.querySelector('.bc-dive-detail--desk-tabs [data-tab="equipment"]');
     if (!button) throw new Error('desktop equipment tab missing');
     button.click();
   });
   await sleep(800);
   const state = await tab.run(() => {
-    const row = document.querySelector('.od-desktop-edit-field[data-field="computer"] .od-desktop-edit-field--value');
-    const image = row?.querySelector('.od-dc-tile img');
+    const row = document.querySelector('.bc-desktop-edit-field[data-field="computer"] .bc-desktop-edit-field--value');
+    const image = row?.querySelector('.bc-dc-tile img');
     return { named: !!row?.textContent.includes('Sample'), photo: !!image && image.getAttribute('src')?.startsWith('data:image/svg+xml') };
   });
   expect('desktop equipment shows the computer photo beside its name', { named: true, photo: true }, state);
   tab.ws.close();
+}
+
+async function profileInsetsFlows(expect) {
+  for (const [label, width, height] of [['landscape', 1280, 800], ['portrait', 800, 1280]]) {
+    for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'dialog']]) {
+      const tab = await openTab(width, height, false, false, false, { theme: 'md' });
+      await tab.run(async (path) => {
+        window.__odSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
+        (await import('/src/lib/navigation.svelte.js')).openOver(path);
+      }, route);
+      await sleep(1600);
+      const state = await tab.run(({ kind, portrait }) => {
+        const page = [...document.querySelectorAll('.view.tab-active > .page-current')].find((item) => item.getBoundingClientRect().width > 0);
+        const frame = page?.querySelector('.bc-pf')?.getBoundingClientRect();
+        const back = page?.querySelector('.bc-profile-nav--back')?.getBoundingClientRect();
+        const add = page?.querySelector('.bc-gear-list--add, .fab:not([style*="display: none"])')?.getBoundingClientRect();
+        const navbar = page?.querySelector(':scope > .navbar')?.getBoundingClientRect();
+        const inner = page?.querySelector(':scope > .navbar .navbar-inner')?.getBoundingClientRect();
+        const box = page?.querySelector('.bc-pf--box')?.getBoundingClientRect();
+        const bottom = innerHeight - 48;
+        const near = (a, b) => Math.abs(a - b) < 2;
+        return {
+          frame: portrait ? !frame : !!frame && near(frame.top, 24) && near(frame.bottom, bottom),
+          back: portrait || (!!back && back.top >= 24),
+          add: !add || add.bottom <= bottom,
+          main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
+          dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
+        };
+      }, { kind: bar, portrait: label === 'portrait' });
+      expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true }, state);
+      if (label === 'landscape' && bar === 'dialog') {
+        const changed = await tab.run(() => {
+          window.__odSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
+          const page = document.querySelector('.view.tab-active > .page-current:has(.bc-pf)');
+          const frame = page.querySelector('.bc-pf').getBoundingClientRect();
+          const box = page.querySelector('.bc-pf--box').getBoundingClientRect();
+          const navbar = page.querySelector(':scope > .navbar').getBoundingClientRect();
+          return {
+            frame: Math.abs(frame.top - 40) < 2 && Math.abs(frame.bottom - (innerHeight - 20)) < 2,
+            dialog: Math.abs(navbar.top - box.top) < 2 && box.top >= 40 && box.bottom <= innerHeight - 20,
+          };
+        });
+        expect('landscape: profile dialog follows changed system insets', { frame: true, dialog: true }, changed);
+      }
+      tab.ws.close();
+    }
+  }
+}
+
+async function gearAddFlows(expect) {
+  for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['iPad', 1280, 800, false, 'ios'], ['desktop', 1400, 900, true, 'md']]) {
+    const tab = await openTab(width, height, false, false, desktop, { theme });
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
+    await sleep(1600);
+    const geometry = await tab.run(() => {
+      const button = document.querySelector('.page-current .bc-gear-list--add');
+      if (!button) return { visible: false, contentWidth: false, right: false };
+      const rect = button.getBoundingClientRect();
+      const panel = button.closest('.bc-gear-list').getBoundingClientRect();
+      const icon = button.querySelector('svg').getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(button.lastChild);
+      const text = range.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      const expectedWidth = icon.width + text.width + parseFloat(style.columnGap) + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      return {
+        visible: rect.width > 0 && rect.height > 0,
+        contentWidth: Math.abs(rect.width - expectedWidth) < 2,
+        right: Math.abs(panel.right - rect.right - 17) < 2,
+      };
+    });
+    expect(`${label}: gear Add fits its content at the right of the list`, { visible: true, contentWidth: true, right: true }, geometry);
+    await tab.run(() => document.querySelector('.page-current .bc-gear-list--add').click());
+    await sleep(1000);
+    expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.bc-piece-edit')) });
+    tab.ws.close();
+  }
 }
 
 async function certsFabFlows(expect) {
@@ -1199,37 +1276,37 @@ async function certsFabFlows(expect) {
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
     await sleep(1600);
     const position = await tab.run(() => {
-      const page = document.querySelector('.page-current.od-docs');
-      const fab = page?.querySelector('.od-fab-add');
+      const page = document.querySelector('.page-current.bc-docs');
+      const fab = page?.querySelector('.bc-fab-add');
       const rect = fab?.getBoundingClientRect();
       const bounds = page?.getBoundingClientRect();
       return {
         visible: !!rect && rect.width > 0 && rect.height > 0,
         bottomRight: !!rect && !!bounds && bounds.right - rect.right >= 0 && bounds.right - rect.right <= 64 && bounds.bottom - rect.bottom >= 0 && bounds.bottom - rect.bottom <= 64,
-        oldButton: !!page?.querySelector('.od-docs--wide-bar'),
+        oldButton: !!page?.querySelector('.bc-docs--wide-bar'),
       };
     });
     expect(`${label}: the Add FAB is at the bottom right`, { visible: true, bottomRight: true, oldButton: false }, position);
     const empty = await tab.run(() => {
-      const page = document.querySelector('.page-current.od-docs');
-      const content = page.querySelector('.od-docs--content').getBoundingClientRect();
-      const panel = page.querySelector('.od-pf--main') || page.querySelector('.page-content');
+      const page = document.querySelector('.page-current.bc-docs');
+      const content = page.querySelector('.bc-docs--content').getBoundingClientRect();
+      const panel = page.querySelector('.bc-pf--main') || page.querySelector('.page-content');
       const bounds = panel.getBoundingClientRect();
       const style = getComputedStyle(panel);
       const top = bounds.top + parseFloat(style.paddingTop);
       const bottom = bounds.bottom - parseFloat(style.paddingBottom);
-      const state = page.querySelector('.od-docs--empty');
+      const state = page.querySelector('.bc-docs--empty');
       const first = state?.firstElementChild?.getBoundingClientRect();
       const last = state?.lastElementChild?.getBoundingClientRect();
       return { shown: !!state, fits: Math.abs(content.top - top) < 2 && Math.abs(content.bottom - bottom) < 2, centred: !!first && !!last && Math.abs((first.top + last.bottom) / 2 - (top + bottom) / 2) < 2 };
     });
     expect(`${label}: empty state is centred in its panel`, { shown: true, fits: true, centred: true }, empty);
     const appearance = await tab.run(async () => {
-      const page = document.querySelector('.page-current.od-docs');
-      const button = page.querySelector('.od-fab-add a');
+      const page = document.querySelector('.page-current.bc-docs');
+      const button = page.querySelector('.bc-fab-add a');
       const sample = document.createElement('span');
-      sample.style.backgroundColor = 'var(--od-secondary-container)';
-      sample.style.color = 'var(--od-on-secondary-container)';
+      sample.style.backgroundColor = 'var(--bc-secondary-container)';
+      sample.style.color = 'var(--bc-on-secondary-container)';
       page.append(sample);
       const root = document.documentElement;
       const wasDark = root.classList.contains('dark');
@@ -1243,7 +1320,7 @@ async function certsFabFlows(expect) {
       };
       const light = await colours(false);
       const dark = await colours(true);
-      const result = { light: light.matches, dark: dark.matches, note: !!page.querySelector('.od-docs--note'), darkValues: dark.values };
+      const result = { light: light.matches, dark: dark.matches, note: !!page.querySelector('.bc-docs--note'), darkValues: dark.values };
       root.classList.toggle('dark', wasDark);
       sample.remove();
       return result;
@@ -1251,7 +1328,7 @@ async function certsFabFlows(expect) {
     expect(`${label}: Add uses the blue container in both themes and the note is absent`, { light: true, dark: true, note: false }, appearance);
     if (theme === 'md') {
       const spacing = await tab.run(() => {
-        const button = document.querySelector('.page-current.od-docs .od-fab-add a');
+        const button = document.querySelector('.page-current.bc-docs .bc-fab-add a');
         const rect = button.getBoundingClientRect();
         const icon = button.querySelector('i').getBoundingClientRect();
         const text = button.querySelector('.fab-text').getBoundingClientRect();
@@ -1260,16 +1337,16 @@ async function certsFabFlows(expect) {
       });
       expect(`${label}: Add has Expressive small extended FAB spacing`, { height: true, icon: true, start: true, gap: true, end: true }, spacing);
     }
-    await tab.run(() => document.querySelector('.page-current.od-docs .od-fab-add a').click());
+    await tab.run(() => document.querySelector('.page-current.bc-docs .bc-fab-add a').click());
     await sleep(500);
-    const sheet = await tab.run(() => document.querySelectorAll('.od-doc-choice.modal-in .od-doc-choice--option').length);
+    const sheet = await tab.run(() => document.querySelectorAll('.bc-doc-choice.modal-in .bc-doc-choice--option').length);
     expect(`${label}: Add opens the document choices`, { count: 4 }, { count: sheet });
     await tab.run(async () => {
       const { gear } = await import('/src/lib/inventory.svelte.js');
       gear.readOnly = true;
     });
     await sleep(100);
-    const hidden = await tab.run(() => getComputedStyle(document.querySelector('.page-current.od-docs .od-fab-add')).display === 'none');
+    const hidden = await tab.run(() => getComputedStyle(document.querySelector('.page-current.bc-docs .bc-fab-add')).display === 'none');
     expect(`${label}: read-only hides Add`, { hidden: true }, { hidden });
     await tab.run(async () => {
       const { gear } = await import('/src/lib/inventory.svelte.js');
@@ -1279,16 +1356,101 @@ async function certsFabFlows(expect) {
     });
     await sleep(300);
     const populated = await tab.run(() => {
-      const page = document.querySelector('.page-current.od-docs');
-      return { empty: !!page.querySelector('.od-docs--empty'), card: !!page.querySelector('.od-docs--row') };
+      const page = document.querySelector('.page-current.bc-docs');
+      return { empty: !!page.querySelector('.bc-docs--empty'), card: !!page.querySelector('.bc-docs--row') };
     });
     expect(`${label}: a saved document replaces the empty state`, { empty: false, card: true }, populated);
     tab.ws.close();
   }
 }
 
+async function certificationAgencyFlows(expect) {
+  for (const [label, width, height, mobile, desktop] of [['phone', 390, 844, true, false], ['tablet', 1280, 800, false, false], ['desktop', 1400, 900, false, true]]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
+    await tab.send('Page.bringToFront');
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/new'); });
+    await sleep(1600);
+    await tab.run(() => {
+      const input = document.querySelector('.bc-cert-edit .bc-combo-field input');
+      if (!input) throw new Error('agency field missing');
+      input.focus();
+    });
+    await sleep(300);
+    const menu = await tab.run(() => {
+      const options = [...document.querySelectorAll('.bc-combo-field--menu [role="option"]')];
+      const { lang } = document.documentElement;
+      return {
+        sorted: options.every((o, i) => i === 0 || options[i - 1].textContent.trim().localeCompare(o.textContent.trim(), lang, { sensitivity: 'base' }) <= 0),
+        fqas: options.some((o) => o.textContent.trim().startsWith('FQAS ·')),
+        other: options.some((o) => /^(Other agency|Autre agence)$/.test(o.textContent.trim())),
+      };
+    });
+    expect(`${label}: certification agencies`, { sorted: true, fqas: true, other: false }, menu);
+    await tab.run(() => [...document.querySelectorAll('.bc-combo-field--menu [role="option"]')].find((o) => o.textContent.trim().startsWith('FQAS ·')).click());
+    await sleep(200);
+    await tab.run(() => document.querySelectorAll('.bc-cert-edit .bc-combo-field input')[1].focus());
+    await sleep(200);
+    const levels = await tab.run(() => [...document.querySelectorAll('.bc-combo-field--menu [role="option"]')].map((o) => o.textContent.trim()));
+    expect(`${label}: levels match the agency`, { fqas: true, cdaa: false }, { fqas: levels.includes('Plongeur classe A'), cdaa: levels.includes('Advanced Cave Diver') });
+    await tab.run(() => {
+      const input = document.querySelectorAll('.bc-cert-edit .bc-combo-field input')[1];
+      input.value = 'Custom level';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.blur();
+    });
+    await sleep(250);
+    expect(`${label}: an unlisted level can be entered`, { value: 'Custom level' }, { value: await tab.run(() => document.querySelectorAll('.bc-cert-edit .bc-combo-field input')[1].value) });
+    await tab.run((number) => {
+      const [agency] = document.querySelectorAll('.bc-cert-edit .bc-combo-field input');
+      agency.focus();
+      agency.value = 'Custom agency';
+      agency.dispatchEvent(new Event('input', { bubbles: true }));
+      agency.blur();
+      const field = document.querySelector('.bc-cert-edit .bc-text-field input');
+      field.value = number;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }, `test-${label}`);
+    await sleep(250);
+    await tab.run(() => {
+      const save = document.querySelector('.bc-cert-edit--save');
+      if (!save || save.disabled) throw new Error('certificate cannot be saved');
+      save.click();
+    });
+    await sleep(1000);
+    const saved = await tab.run(async (number) => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const card = (await services().profile.listCertifications()).find((c) => c.number === number);
+      return card && { id: card.id, agency: card.agency, agencyName: card.agencyName, level: card.level };
+    }, `test-${label}`);
+    expect(`${label}: custom agency and level are saved`, { agency: 'other', agencyName: 'Custom agency', level: 'Custom level' }, saved || {});
+    if (!saved) throw new Error('saved certificate missing');
+    await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/certs/${id}/edit`); }, saved.id);
+    await sleep(1200);
+    const reopened = await tab.run(() => [...document.querySelectorAll('.bc-cert-edit .bc-combo-field input')].map((input) => input.value));
+    expect(`${label}: custom values reopen`, { agency: 'Custom agency', level: 'Custom level' }, { agency: reopened[0], level: reopened[1] });
+    await tab.run(() => {
+      const input = document.querySelector('.bc-cert-edit .bc-combo-field input');
+      input.focus();
+      input.value = 'FQAS';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await sleep(200);
+    await tab.run(() => [...document.querySelectorAll('.bc-combo-field--menu [role="option"]')].find((o) => o.textContent.trim().startsWith('FQAS ·')).click());
+    await sleep(200);
+    await tab.run(() => document.querySelector('.bc-cert-edit--save').click());
+    await sleep(1000);
+    const updated = await tab.run(async (id) => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const card = await services().profile.getCertification(id);
+      return card && { agency: card.agency, agencyName: card.agencyName, level: card.level };
+    }, saved.id);
+    expect(`${label}: a selected agency keeps its identifier`, { agency: 'FQAS', agencyName: '', level: 'Custom level' }, updated || {});
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--certs-fab-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1301,7 +1463,10 @@ try {
   if (args.has('--export-only') || fixed) await exportFlows(expect);
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
+  if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
+  if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
+  if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

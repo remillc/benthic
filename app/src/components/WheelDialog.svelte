@@ -28,11 +28,11 @@
   let indexes = $state(wheels.map((w) => w.index));
 </script>
 
-<Md3Dialog class="od-wheel-dialog{dropdowns ? ' od-wheel-dialog--dropdowns' : ''}" {title} {text} {oncancel}>
-  <div class="od-wheel-dialog--wheels">
+<Md3Dialog class="bc-wheel-dialog{dropdowns ? ' bc-wheel-dialog--dropdowns' : ''}" {title} {text} {oncancel}>
+  <div class="bc-wheel-dialog--wheels">
     {#each wheels as wheel, i (i)}
       {#if dropdowns}
-        <div class="od-wheel-dialog--dropdown">
+        <div class="bc-wheel-dialog--dropdown">
           <SelectField
             label={wheel.label}
             value={String(indexes[i])}
@@ -52,7 +52,7 @@
     {/each}
   </div>
   {#snippet actions()}
-    <button type="button" class="od-md3-dialog--start" onclick={() => (indexes = wheels.map((w) => w.defaultIndex))}>
+    <button type="button" class="bc-md3-dialog--start" onclick={() => (indexes = wheels.map((w) => w.defaultIndex))}>
       {t('settings.defaults')}
     </button>
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
@@ -62,16 +62,16 @@
 
 <style>
   @layer od.components {
-    .od-wheel-dialog--wheels {
+    .bc-wheel-dialog--wheels {
       padding: 0 24px;
       display: flex;
       gap: 16px;
     }
 
-    .od-wheel-dialog--dropdown {
+    .bc-wheel-dialog--dropdown {
       flex: 1;
       min-width: 0;
-      --od-field-margin: 0px;
+      --bc-field-margin: 0px;
     }
 
   }

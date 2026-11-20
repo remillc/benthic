@@ -72,7 +72,7 @@
 
 {#if kind === 'list' || kind === 'choice'}
   {#if values.length}
-    <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter-criterion-body--values">
+    <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="bc-filter-criterion-body--values">
       {#each [{ value: '', text: t('filter.any') }, ...values] as v (v.value)}
         {@const checked = v.value ? selected.includes(v.value) : selected.length === 0}
         {#if theme.ios}
@@ -80,14 +80,14 @@
           <li>
             <button
               type="button"
-              class="item-content od-filter-criterion-body--value"
+              class="item-content bc-filter-criterion-body--value"
               role="checkbox"
               aria-checked={checked}
               onclick={() => (v.value ? toggle(v.value) : clear())}
             >
               <span class="item-inner">
                 <span class="item-title">{v.text}</span>
-                {#if checked}<span class="od-filter-criterion-body--check"><Icon name="check" size={20} weight={2.2} /></span>{/if}
+                {#if checked}<span class="bc-filter-criterion-body--check"><Icon name="check" size={20} weight={2.2} /></span>{/if}
               </span>
             </button>
           </li>
@@ -97,10 +97,10 @@
       {/each}
     </List>
   {:else}
-    <p class="od-filter-criterion-body od-filter-criterion-body--hint">{t('filter.noValues')}</p>
+    <p class="bc-filter-criterion-body bc-filter-criterion-body--hint">{t('filter.noValues')}</p>
   {/if}
 {:else if kind === 'range' && range}
-  <div class="od-filter-criterion-body od-form-surface">
+  <div class="bc-filter-criterion-body bc-form-surface">
     <TextField
       label={fieldLabel('from')}
       bind:value={range.min}
@@ -117,8 +117,8 @@
     />
   </div>
 {:else if kind === 'stars'}
-  <div class="od-filter-criterion-body od-form-surface od-filter-criterion-body--stars">
-    <p class="od-filter-criterion-body--stars-label">{t('filter.atLeast')}</p>
+  <div class="bc-filter-criterion-body bc-form-surface bc-filter-criterion-body--stars">
+    <p class="bc-filter-criterion-body--stars-label">{t('filter.atLeast')}</p>
     <StarsInput
       value={Number(filter.draft[key])}
       label={t(`filter.criteria.${key}`)}
@@ -126,7 +126,7 @@
     />
   </div>
 {:else}
-  <div class="od-filter-criterion-body od-form-surface">
+  <div class="bc-filter-criterion-body bc-form-surface">
     <TextField
       label={t(`filter.criteria.${key}`)}
       bind:value={text}
@@ -136,18 +136,18 @@
 
 <style>
   @layer od.components {
-    .od-filter-criterion-body--hint {
+    .bc-filter-criterion-body--hint {
       margin: 8px 16px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         margin-inline: 32px;
       }
     }
 
-    .od-filter-criterion-body--value {
+    .bc-filter-criterion-body--value {
       width: 100%;
       border: none;
       background: none;
@@ -157,18 +157,18 @@
       cursor: pointer;
     }
 
-    .od-filter-criterion-body--check {
-      color: var(--od-action);
+    .bc-filter-criterion-body--check {
+      color: var(--bc-action);
     }
 
-    .od-filter-criterion-body--stars {
+    .bc-filter-criterion-body--stars {
       padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-filter-criterion-body--stars-label {
+    .bc-filter-criterion-body--stars-label {
       margin: 0;
       flex: 1;
     }

@@ -70,14 +70,14 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="od-gauge-sheet modal-in" use:portal onkeydown={keydown}>
+<div class="bc-gauge-sheet modal-in" use:portal onkeydown={keydown}>
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="od-gauge-sheet--scrim" onclick={oncancel}></div>
-  <div class="od-gauge-sheet--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
-    <span class="od-gauge-sheet--handle" aria-hidden="true"></span>
-    <div class="od-gauge-sheet--body">
-      <h2 {id} class="od-gauge-sheet--title">{t(two ? 'gauge.readTwo' : 'gauge.readOne')}</h2>
-      <p class="od-gauge-sheet--note">
+  <div class="bc-gauge-sheet--scrim" onclick={oncancel}></div>
+  <div class="bc-gauge-sheet--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
+    <span class="bc-gauge-sheet--handle" aria-hidden="true"></span>
+    <div class="bc-gauge-sheet--body">
+      <h2 {id} class="bc-gauge-sheet--title">{t(two ? 'gauge.readTwo' : 'gauge.readOne')}</h2>
+      <p class="bc-gauge-sheet--note">
         {#if two}
           {t(field === 'start' ? 'gauge.noteTwoStart' : 'gauge.noteTwoEnd')}
         {:else}
@@ -85,18 +85,18 @@
         {/if}
       </p>
       {#each rows as row, i (i)}
-        <div class="od-gauge-sheet--row">
-          <span class="od-gauge-sheet--thumb">
+        <div class="bc-gauge-sheet--row">
+          <span class="bc-gauge-sheet--thumb">
             <img src={`data:image/jpeg;base64,${thumbnail}`} alt={t('gauge.thumbnail')} style:object-position={`${Math.round(row.x * 100)}% 50%`} />
           </span>
-          <div class="od-gauge-sheet--fields">
-            <div class="od-gauge-sheet--field">
+          <div class="bc-gauge-sheet--fields">
+            <div class="bc-gauge-sheet--field">
               <TextField label={label} bind:value={row.text} inputmode="decimal" supporting={two ? '' : t('gauge.correct')}>
-                {#snippet trailing()}<span class="od-gauge-sheet--unit">{unit}</span>{/snippet}
+                {#snippet trailing()}<span class="bc-gauge-sheet--unit">{unit}</span>{/snippet}
               </TextField>
             </div>
             {#if two}
-              <div class="od-gauge-sheet--field od-gauge-sheet--for">
+              <div class="bc-gauge-sheet--field bc-gauge-sheet--for">
                 <SelectField label={t('gauge.for')} bind:value={row.target} options={cylinders} />
               </div>
             {/if}
@@ -104,16 +104,16 @@
         </div>
       {/each}
     </div>
-    <div class="od-gauge-sheet--actions">
-      <button type="button" class="od-gauge-sheet--again" onclick={onretry}>{t('gauge.again')}</button>
-      <button type="button" class="od-gauge-sheet--use" onclick={() => onuse(rows.map((r) => ({ target: r.target, text: r.text })))}>{t('gauge.use')}</button>
+    <div class="bc-gauge-sheet--actions">
+      <button type="button" class="bc-gauge-sheet--again" onclick={onretry}>{t('gauge.again')}</button>
+      <button type="button" class="bc-gauge-sheet--use" onclick={() => onuse(rows.map((r) => ({ target: r.target, text: r.text })))}>{t('gauge.use')}</button>
     </div>
   </div>
 </div>
 
 <style>
   @layer od.components {
-    .od-gauge-sheet {
+    .bc-gauge-sheet {
       position: fixed;
       inset: 0;
       z-index: 13500;
@@ -123,13 +123,13 @@
       font-family: inherit;
     }
 
-    .od-gauge-sheet--scrim {
+    .bc-gauge-sheet--scrim {
       position: absolute;
       inset: 0;
-      background: var(--od-scrim);
+      background: var(--bc-scrim);
     }
 
-    .od-gauge-sheet--surface {
+    .bc-gauge-sheet--surface {
       position: relative;
       box-sizing: border-box;
       width: min(640px, 100%);
@@ -138,14 +138,14 @@
       flex-direction: column;
       padding: 8px 0 calc(24px + var(--f7-safe-area-bottom, 0px));
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
-      color: var(--od-text);
+      background: var(--bc-dialog);
+      color: var(--bc-text);
       outline: none;
-      --od-field-margin: 0;
+      --bc-field-margin: 0;
     }
 
-    :global(.md) .od-gauge-sheet--surface {
-      animation: od-gauge-sheet-rise var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default) backwards;
+    :global(.md) .bc-gauge-sheet--surface {
+      animation: od-gauge-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
     }
 
     @keyframes od-gauge-sheet-rise {
@@ -155,51 +155,51 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      :global(.md) .od-gauge-sheet--surface {
+      :global(.md) .bc-gauge-sheet--surface {
         animation: none;
       }
     }
 
-    .od-gauge-sheet--handle {
+    .bc-gauge-sheet--handle {
       flex: none;
       align-self: center;
       width: 32px;
       height: 4px;
       margin: 6px 0 14px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
       opacity: 0.4;
     }
 
-    .od-gauge-sheet--body {
+    .bc-gauge-sheet--body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       padding: 0 24px;
     }
 
-    .od-gauge-sheet--title {
+    .bc-gauge-sheet--title {
       margin: 0 0 4px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
     }
 
-    .od-gauge-sheet--note {
+    .bc-gauge-sheet--note {
       margin: 0 0 4px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gauge-sheet--row {
+    .bc-gauge-sheet--row {
       display: flex;
       gap: 16px;
       align-items: flex-start;
       margin-top: 12px;
     }
 
-    .od-gauge-sheet--thumb {
+    .bc-gauge-sheet--thumb {
       flex: none;
       width: 56px;
       height: 56px;
@@ -209,33 +209,33 @@
       display: flex;
     }
 
-    .od-gauge-sheet--thumb img {
+    .bc-gauge-sheet--thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .od-gauge-sheet--fields {
+    .bc-gauge-sheet--fields {
       flex: 1;
       min-width: 0;
       display: flex;
       gap: 8px;
     }
 
-    .od-gauge-sheet--field {
+    .bc-gauge-sheet--field {
       flex: 1;
       min-width: 0;
     }
 
-    .od-gauge-sheet--for {
+    .bc-gauge-sheet--for {
       flex: 1.15;
     }
 
-    .od-gauge-sheet--unit {
-      color: var(--od-text-2);
+    .bc-gauge-sheet--unit {
+      color: var(--bc-text-2);
     }
 
-    .od-gauge-sheet--actions {
+    .bc-gauge-sheet--actions {
       flex: none;
       margin: 24px 24px 0;
       display: flex;
@@ -243,7 +243,7 @@
       gap: 8px;
     }
 
-    .od-gauge-sheet--actions button {
+    .bc-gauge-sheet--actions button {
       height: 40px;
       padding: 0 24px;
       border-radius: 20px;
@@ -254,19 +254,19 @@
       cursor: pointer;
     }
 
-    .od-gauge-sheet--again {
-      border: var(--od-outline-width) solid var(--od-text-2);
+    .bc-gauge-sheet--again {
+      border: var(--bc-outline-width) solid var(--bc-text-2);
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-gauge-sheet--use {
+    .bc-gauge-sheet--use {
       border: none;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
     }
 
-    :global(.ios) .od-gauge-sheet--surface {
+    :global(.ios) .bc-gauge-sheet--surface {
       border-radius: 14px 14px 0 0;
     }
   }

@@ -32,9 +32,9 @@
   function paper() {
     if (!ctx || !canvas) return;
     const style = getComputedStyle(canvas);
-    ctx.fillStyle = style.getPropertyValue('--od-qr-paper').trim() || '#fff';
+    ctx.fillStyle = style.getPropertyValue('--bc-qr-paper').trim() || '#fff';
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.strokeStyle = style.getPropertyValue('--od-qr-ink').trim() || '#000';
+    ctx.strokeStyle = style.getPropertyValue('--bc-qr-ink').trim() || '#000';
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -107,7 +107,7 @@
 
 <canvas
   bind:this={canvas}
-  class="od-signature-pad no-swipeback"
+  class="bc-signature-pad no-swipeback"
   width={WIDTH}
   height={HEIGHT}
   role="img"
@@ -120,13 +120,13 @@
 
 <style>
   @layer od.components {
-    .od-signature-pad {
+    .bc-signature-pad {
       display: block;
       width: 100%;
       aspect-ratio: 5 / 2;
       border-radius: 16px;
-      border: 1px solid var(--od-separator);
-      background: var(--od-qr-paper);
+      border: 1px solid var(--bc-separator);
+      background: var(--bc-qr-paper);
       /* The finger draws; the page does not scroll under it. */
       touch-action: none;
       cursor: crosshair;

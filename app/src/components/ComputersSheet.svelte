@@ -40,7 +40,7 @@
 </script>
 
 <Sheet
-  class="od-computers-sheet{layout.split ? ' od-computers-sheet--dialog' : ''}"
+  class="bc-computers-sheet{layout.split ? ' bc-computers-sheet--dialog' : ''}"
   {opened}
   onSheetClosed={onclose}
   backdrop
@@ -48,62 +48,62 @@
   push={false}
   aria-label={t('detail.computersTitle')}
 >
-  <div class="od-computers-sheet--content">
+  <div class="bc-computers-sheet--content">
     {#if ios}
-      <div class="od-computers-sheet--ios-bar">
-        <span class="od-computers-sheet--ios-title">{t('detail.computersRow')}</span>
-        <button type="button" class="od-computers-sheet--ok" onclick={onclose}>{t('dialog.ok')}</button>
+      <div class="bc-computers-sheet--ios-bar">
+        <span class="bc-computers-sheet--ios-title">{t('detail.computersRow')}</span>
+        <button type="button" class="bc-computers-sheet--ok" onclick={onclose}>{t('dialog.ok')}</button>
       </div>
     {:else}
-      <h2 class="od-computers-sheet--title">{t('detail.computersTitle')}</h2>
+      <h2 class="bc-computers-sheet--title">{t('detail.computersTitle')}</h2>
     {/if}
-    <p class="od-computers-sheet--subtitle">{[title, date ? formatDate(date) : ''].filter(Boolean).join(' · ')}</p>
+    <p class="bc-computers-sheet--subtitle">{[title, date ? formatDate(date) : ''].filter(Boolean).join(' · ')}</p>
 
-    <ul class="od-computers-sheet--list" role="list">
+    <ul class="bc-computers-sheet--list" role="list">
       {#each rows as c (c.index)}
         {@const main = c.index === mainIndex}
-        <li class="od-computers-sheet--item">
+        <li class="bc-computers-sheet--item">
           <svelte:element
             this={ios && !main ? 'button' : 'div'}
             type={ios && !main ? 'button' : undefined}
-            class="od-computers-sheet--row"
+            class="bc-computers-sheet--row"
             aria-label={ios && !main ? t('detail.makeMainLabel', { name: c.name }) : undefined}
             disabled={ios && !main ? busy : undefined}
             onclick={ios && !main ? () => onmain(c.index) : undefined}
           >
             <DcTile model={c.model} photo={ownComputerPhoto(c.model, c.serial)} />
-            <span class="od-computers-sheet--texts">
-              <span class="od-computers-sheet--name">{c.name}</span>
-              {#if detail(c)}<span class="od-computers-sheet--line">{detail(c)}</span>{/if}
+            <span class="bc-computers-sheet--texts">
+              <span class="bc-computers-sheet--name">{c.name}</span>
+              {#if detail(c)}<span class="bc-computers-sheet--line">{detail(c)}</span>{/if}
             </span>
             {#if main}
-              {#if ios}<Icon name="check" size={22} />{:else}<span class="od-computers-sheet--main">{t('detail.mainBadge')}</span>{/if}
+              {#if ios}<Icon name="check" size={22} />{:else}<span class="bc-computers-sheet--main">{t('detail.mainBadge')}</span>{/if}
             {/if}
           </svelte:element>
-          <button type="button" class="od-computers-sheet--rename" aria-label={t('detail.renameComputer', { name: c.name })} onclick={() => onrename(c)}>
+          <button type="button" class="bc-computers-sheet--rename" aria-label={t('detail.renameComputer', { name: c.name })} onclick={() => onrename(c)}>
             <Icon name="edit" size={20} />
           </button>
           {#if !ios && !main}
-            <button type="button" class="od-outlined-button od-computers-sheet--make-main" disabled={busy} onclick={() => onmain(c.index)}>{t('detail.makeMain')}</button>
+            <button type="button" class="bc-outlined-button bc-computers-sheet--make-main" disabled={busy} onclick={() => onmain(c.index)}>{t('detail.makeMain')}</button>
           {/if}
         </li>
       {/each}
     </ul>
-    <p class="od-computers-sheet--note">{t(ios ? 'detail.computersNoteIos' : 'detail.computersNote')}</p>
+    <p class="bc-computers-sheet--note">{t(ios ? 'detail.computersNoteIos' : 'detail.computersNote')}</p>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.sheet-modal.od-computers-sheet) {
-      --f7-sheet-bg-color: var(--od-drawer);
+    :global(.sheet-modal.bc-computers-sheet) {
+      --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
       max-height: 85%;
       border-radius: 28px 28px 0 0;
     }
 
     /* Tablet: a dialog in the middle of the screen. */
-    :global(.sheet-modal.od-computers-sheet.od-computers-sheet--dialog) {
+    :global(.sheet-modal.bc-computers-sheet.bc-computers-sheet--dialog) {
       left: 50%;
       bottom: 50%;
       width: 480px;
@@ -112,64 +112,64 @@
       translate: -50% 50%;
     }
 
-    :global(.ios .sheet-modal.od-computers-sheet) {
-      --f7-sheet-bg-color: var(--od-background);
+    :global(.ios .sheet-modal.bc-computers-sheet) {
+      --f7-sheet-bg-color: var(--bc-background);
       border-radius: 10px 10px 0 0;
     }
 
-    .od-computers-sheet--content {
-      padding: 20px 16px calc(16px + var(--od-safe-bottom));
+    .bc-computers-sheet--content {
+      padding: 20px 16px calc(16px + var(--bc-safe-bottom));
       overflow-y: auto;
     }
 
-    .od-computers-sheet--title {
+    .bc-computers-sheet--title {
       margin: 0 8px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-computers-sheet--ios-bar {
+    .bc-computers-sheet--ios-bar {
       height: 44px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
     }
 
-    .od-computers-sheet--ios-title {
+    .bc-computers-sheet--ios-title {
       grid-column: 2;
       font-size: 17px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-computers-sheet--ok {
+    .bc-computers-sheet--ok {
       grid-column: 3;
       justify-self: end;
       min-width: 44px;
       height: 44px;
       border: none;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-size: 17px;
       font-weight: 600;
     }
 
-    .od-computers-sheet--subtitle {
+    .bc-computers-sheet--subtitle {
       margin: 4px 8px 16px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-computers-sheet--list {
+    .bc-computers-sheet--list {
       margin: 0;
       padding: 0;
       list-style: none;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -177,32 +177,32 @@
       }
     }
 
-    .od-computers-sheet--item {
+    .bc-computers-sheet--item {
       position: relative;
       padding: 0 8px 0 16px;
 
-      & + .od-computers-sheet--item {
-        border-top: 1px solid var(--od-row-divider);
+      & + .bc-computers-sheet--item {
+        border-top: 1px solid var(--bc-row-divider);
       }
     }
 
-    .od-computers-sheet--row {
+    .bc-computers-sheet--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 64px;
       padding: 8px 48px 8px 0;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
       align-items: center;
       gap: 12px;
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
 
       /* iPhone: 68 pt rows, so the 48 pt photo has room (detail-ordinateurs-feuille-ios). */
@@ -211,38 +211,38 @@
       }
     }
 
-    .od-computers-sheet--texts {
+    .bc-computers-sheet--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-computers-sheet--name {
+    .bc-computers-sheet--name {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-computers-sheet--line {
+    .bc-computers-sheet--line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-computers-sheet--main {
+    .bc-computers-sheet--main {
       flex: none;
       height: 24px;
       padding: 0 10px;
       border-radius: 12px;
-      background: var(--od-secondary-container);
-      color: var(--od-secondary);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       font-size: 12px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
     }
 
-    .od-computers-sheet--rename {
+    .bc-computers-sheet--rename {
       position: absolute;
       top: 8px;
       right: 4px;
@@ -251,21 +251,21 @@
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-computers-sheet--make-main {
+    .bc-computers-sheet--make-main {
       margin: 0 0 12px 36px;
     }
 
-    .od-computers-sheet--note {
+    .bc-computers-sheet--note {
       margin: 12px 8px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

@@ -126,7 +126,7 @@
   const byId = $derived(new Map(logbook.dives.map((d) => [d.id, d])));
 </script>
 
-<Page class="od-site-sheet">
+<Page class="bc-site-sheet">
   <Navbar>
     {#snippet left()}
       <BackLink label={t('sites.title')} name={t('common.back')} />
@@ -134,17 +134,17 @@
     <!-- Android: the actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}
       {#if theme.ios}
-        <Link iconOnly onClick={() => (sharing = true)}><Icon name="share" weight={2.2} /><span class="od-sr-only">{t('share.title')}</span></Link>
-        <Link iconOnly href="/sites/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('sites.edit')}</span></Link>
+        <Link iconOnly onClick={() => (sharing = true)}><Icon name="share" weight={2.2} /><span class="bc-sr-only">{t('share.title')}</span></Link>
+        <Link iconOnly href="/sites/{uuid}/edit"><Icon name="edit" weight={2.2} /><span class="bc-sr-only">{t('sites.edit')}</span></Link>
       {/if}
     {/snippet}
   </Navbar>
 
   {#if !theme.ios}
-    <Popover id={menuId} class="od-menu" backdrop={false}>
+    <Popover id={menuId} class="bc-menu" backdrop={false}>
       <List noChevron>
         <MenuItem icon="merge" text={t('sites.mergeWithOther')} onclick={chooseOtherSite} />
-        <li class="od-menu-divider" role="separator"></li>
+        <li class="bc-menu-divider" role="separator"></li>
         <MenuItem icon="delete" text={t('sites.deleteSite')} destructive onclick={deleteSite} />
       </List>
     </Popover>
@@ -162,76 +162,76 @@
   {/if}
 
   {#if site && site.uuid}
-    <header class="od-site-sheet--head">
+    <header class="bc-site-sheet--head">
       <h1>{site.name || t('sites.noName')}</h1>
-      {#if site.country}<p class="od-site-sheet--sub">{site.country}</p>{/if}
+      {#if site.country}<p class="bc-site-sheet--sub">{site.country}</p>{/if}
     </header>
 
     {#if site.hasLocation}
       <!-- Inside the margins, 16 dp corners, aspect ratio 2.1 : 1 (tasks 2026-11-07-24, 2026-11-19-314). -->
-      <div class="od-site-sheet--map">
+      <div class="bc-site-sheet--map">
         <SiteMap pin={{ latUdeg: site.latUdeg, lonUdeg: site.lonUdeg }} ratio={2.1} />
       </div>
       {#if ios}
         <!-- iPhone (docs/mockups/ios-sites-fiche): the coordinates and « Ouvrir dans Plans » in one grouped card. -->
-        <ul class="od-site-sheet--surface od-site-sheet--ios-coords">
-          <li class="od-site-sheet--row">
-            <span class="od-site-sheet--headline od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
-            <span class="od-site-sheet--supporting">{t('sites.coordinates')}</span>
+        <ul class="bc-site-sheet--surface bc-site-sheet--ios-coords">
+          <li class="bc-site-sheet--row">
+            <span class="bc-site-sheet--headline bc-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
+            <span class="bc-site-sheet--supporting">{t('sites.coordinates')}</span>
           </li>
           <li>
-            <a class="od-site-sheet--row od-site-sheet--ios-open external" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={(e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name))}>
-              <span class="od-site-sheet--text-column">
-                <span class="od-site-sheet--headline">{t('sites.openInPlans')}</span>
-                <span class="od-site-sheet--supporting">{t('sites.opensInPlans')}</span>
+            <a class="bc-site-sheet--row bc-site-sheet--ios-open external" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={(e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name))}>
+              <span class="bc-site-sheet--text-column">
+                <span class="bc-site-sheet--headline">{t('sites.openInPlans')}</span>
+                <span class="bc-site-sheet--supporting">{t('sites.opensInPlans')}</span>
               </span>
-              <span class="od-site-sheet--chevron"><Icon name="openInNew" size={18} /></span>
+              <span class="bc-site-sheet--chevron"><Icon name="openInNew" size={18} /></span>
             </a>
           </li>
         </ul>
       {:else}
-        <div class="od-site-sheet--coords">
-          <span class="od-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
-          <a class="external od-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={ios ? (e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name)) : undefined}>
-            {t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="od-sr-only">, {t('sites.opensElsewhere')}</span>
+        <div class="bc-site-sheet--coords">
+          <span class="bc-value">{formatCoordinates(site.latUdeg, site.lonUdeg)}</span>
+          <a class="external bc-text-button" href={mapsLink(site.latUdeg, site.lonUdeg, site.name)} onclick={ios ? (e) => (e.preventDefault(), openInMapsApp(site.latUdeg, site.lonUdeg, site.name)) : undefined}>
+            {t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<Icon name="openInNew" size={18} /><span class="bc-sr-only">, {t('sites.opensElsewhere')}</span>
           </a>
         </div>
       {/if}
     {/if}
 
-    <h2 class="od-site-sheet--title">{t('sites.about')}</h2>
-    <ul class="od-site-sheet--surface">
-      <li class="od-site-sheet--row">
-        <span class="od-site-sheet--headline">{t('sites.description')}</span>
-        <span class="od-site-sheet--supporting od-site-sheet--text">{site.description || t('sites.noDescription')}</span>
+    <h2 class="bc-site-sheet--title">{t('sites.about')}</h2>
+    <ul class="bc-site-sheet--surface">
+      <li class="bc-site-sheet--row">
+        <span class="bc-site-sheet--headline">{t('sites.description')}</span>
+        <span class="bc-site-sheet--supporting bc-site-sheet--text">{site.description || t('sites.noDescription')}</span>
       </li>
-      <li class="od-site-sheet--row">
-        <span class="od-site-sheet--headline">{t('sites.notes')}</span>
-        <span class="od-site-sheet--supporting od-site-sheet--text">{site.notes || t('sites.noNotes')}</span>
+      <li class="bc-site-sheet--row">
+        <span class="bc-site-sheet--headline">{t('sites.notes')}</span>
+        <span class="bc-site-sheet--supporting bc-site-sheet--text">{site.notes || t('sites.noNotes')}</span>
       </li>
       {#if place}
-        <li class="od-site-sheet--row">
-          <span class="od-site-sheet--headline">{t('sites.regionCity')}</span>
-          <span class="od-site-sheet--supporting">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</span>
+        <li class="bc-site-sheet--row">
+          <span class="bc-site-sheet--headline">{t('sites.regionCity')}</span>
+          <span class="bc-site-sheet--supporting">{place}<br />{anyManual ? t('sites.corrected') : t('sites.foundAutomatically')}</span>
         </li>
       {/if}
     </ul>
 
     {#if site.diveList.length}
-      <h2 class="od-site-sheet--title">{t('sites.divesHere')}</h2>
-      <ul class="od-site-sheet--surface">
+      <h2 class="bc-site-sheet--title">{t('sites.divesHere')}</h2>
+      <ul class="bc-site-sheet--surface">
         {#each latestFirst as dive (dive.id)}
           {@const listed = byId.get(dive.id)}
           <li>
-            <a href="/dives/{dive.id}" class="od-site-sheet--row od-site-sheet--dive">
+            <a href="/dives/{dive.id}" class="bc-site-sheet--row bc-site-sheet--dive">
               {#if listed && !ios}
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}
-              <span class="od-site-sheet--text-column">
-                <span class="od-site-sheet--date od-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatDateTime(dive.date) }) : formatDateTime(dive.date)}</span>
-                <span class="od-site-sheet--supporting od-value">{lines[dive.id] ?? ''}</span>
+              <span class="bc-site-sheet--text-column">
+                <span class="bc-site-sheet--date bc-value">{dive.number ? t('sites.diveNumberDate', { number: dive.number, date: formatDateTime(dive.date) }) : formatDateTime(dive.date)}</span>
+                <span class="bc-site-sheet--supporting bc-value">{lines[dive.id] ?? ''}</span>
               </span>
-              <span class="od-site-sheet--chevron"><Icon name="chevron" size={20} /></span>
+              <span class="bc-site-sheet--chevron"><Icon name="chevron" size={20} /></span>
             </a>
           </li>
         {/each}
@@ -264,7 +264,7 @@
 
 <style>
   @layer od.components {
-    .od-site-sheet--head {
+    .bc-site-sheet--head {
       padding: 0 20px;
 
       h1 {
@@ -276,22 +276,22 @@
       }
     }
 
-    .od-site-sheet--sub {
+    .bc-site-sheet--sub {
       margin: 2px 0 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-sheet--map {
+    .bc-site-sheet--map {
       margin: 14px 16px 0;
       border-radius: 16px;
       overflow: hidden;
       /* The credits stay inside the rounded corners (task 2026-11-14-147). */
-      --od-map-credits-right: 12px;
-      --od-map-credits-bottom: 8px;
+      --bc-map-credits-right: 12px;
+      --bc-map-credits-bottom: 8px;
     }
 
-    .od-site-sheet--coords {
+    .bc-site-sheet--coords {
       margin: 4px 8px 0 20px;
       min-height: 48px;
       display: flex;
@@ -299,34 +299,34 @@
       align-items: center;
       gap: 8px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Section titles of the sheet: 14 medium, as in the mock-up. */
-    .od-site-sheet--title {
+    .bc-site-sheet--title {
       margin: 22px 16px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-sheet--surface {
+    .bc-site-sheet--surface {
       margin: 0 16px;
       padding: 0;
       list-style: none;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       li + li,
       > li + li {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
 
     /* iPhone (docs/mockups/ios-sites-fiche): grouped cards with 10 px corners, small capitals titles. */
-    :global(.ios) .od-site-sheet--title {
+    :global(.ios) .bc-site-sheet--title {
       margin: 22px 32px 6px;
       font-size: 13px;
       line-height: 18px;
@@ -334,22 +334,22 @@
       text-transform: uppercase;
     }
 
-    :global(.ios) .od-site-sheet--surface {
+    :global(.ios) .bc-site-sheet--surface {
       border-radius: 10px;
     }
 
-    .od-site-sheet--ios-coords {
+    .bc-site-sheet--ios-coords {
       margin-top: 12px;
     }
 
-    .od-site-sheet--row.od-site-sheet--ios-open {
+    .bc-site-sheet--row.bc-site-sheet--ios-open {
       flex-direction: row;
       align-items: center;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-site-sheet--row {
+    .bc-site-sheet--row {
       min-height: 56px;
       padding: 10px 16px;
       box-sizing: border-box;
@@ -359,41 +359,41 @@
       gap: 2px;
     }
 
-    .od-site-sheet--headline {
+    .bc-site-sheet--headline {
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-site-sheet--supporting {
+    .bc-site-sheet--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-sheet--text {
+    .bc-site-sheet--text {
       white-space: pre-line;
     }
 
     /* A dive: the profile thumbnail, the long date, then minutes, buddies, mode. */
-    .od-site-sheet--chevron {
+    .bc-site-sheet--chevron {
       flex: none;
       margin-left: auto;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-site-sheet--dive {
+    .bc-site-sheet--dive {
       min-height: 64px;
       flex-direction: row;
       align-items: center;
       justify-content: flex-start;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-site-sheet--text-column {
+    .bc-site-sheet--text-column {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -401,7 +401,7 @@
       gap: 2px;
     }
 
-    .od-site-sheet--date {
+    .bc-site-sheet--date {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;

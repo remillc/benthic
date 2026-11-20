@@ -130,5 +130,5 @@ test('every text of the new screens is in fr and en, and the price is the one of
 test('the server screens no longer draw the « Serveur OpenDives » overline, and the offline icon is centred', () => {
   const source = read('components/FirstLaunchServer.svelte');
   assert.doesNotMatch(source, /overline/);
-  assert.match(source, /od-first-launch-server--tile \{[^}]*align-self: center/s);
+  assert.match(source, /bc-first-launch-server--tile \{[^}]*align-self: center/s);
 });

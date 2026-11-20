@@ -80,8 +80,8 @@ test('the two pages render the steps through MarkedText, and the component sets 
   const component = read('src/components/MarkedText.svelte');
   assert.doesNotMatch(component, /\{@html/);
   assert.equal((component.match(/font-weight: 400/g) ?? []).length, 2);
-  assert.match(component, /var\(--od-kbd-background\)/);
-  assert.match(component, /var\(--od-code-background\)/);
+  assert.match(component, /var\(--bc-kbd-background\)/);
+  assert.match(component, /var\(--bc-code-background\)/);
 });
 
 // Colours: WCAG relative luminance of the tokens of theme.css, light and dark.
@@ -104,18 +104,18 @@ function ratio(a, b) {
 
 for (const dark of [false, true]) {
   test(`kbd and code tokens keep 4.5:1 (${dark ? 'dark' : 'light'})`, () => {
-    assert.ok(ratio(token('--od-kbd-text', dark), token('--od-kbd-background', dark)) >= 4.5);
-    assert.ok(ratio(token('--od-code-text', dark), token('--od-code-background', dark)) >= 4.5);
-    // The chip sits on the card (--od-surface): its text stays readable there too.
-    assert.ok(ratio(token('--od-kbd-text', dark), token('--od-surface', dark)) >= 4.5);
+    assert.ok(ratio(token('--bc-kbd-text', dark), token('--bc-kbd-background', dark)) >= 4.5);
+    assert.ok(ratio(token('--bc-code-text', dark), token('--bc-code-background', dark)) >= 4.5);
+    // The chip sits on the card (--bc-surface): its text stays readable there too.
+    assert.ok(ratio(token('--bc-kbd-text', dark), token('--bc-surface', dark)) >= 4.5);
   });
 }
 
 test('light values are those of the mock-ups', () => {
-  assert.equal(token('--od-kbd-background', false), '#F1EFEA');
-  assert.equal(token('--od-kbd-outline', false), '#D3D0C8');
-  assert.equal(token('--od-code-background', false), '#EAF0F7');
-  assert.equal(token('--od-code-text', false), '#1F3F66');
+  assert.equal(token('--bc-kbd-background', false), '#F1EFEA');
+  assert.equal(token('--bc-kbd-outline', false), '#D3D0C8');
+  assert.equal(token('--bc-code-background', false), '#EAF0F7');
+  assert.equal(token('--bc-code-text', false), '#1F3F66');
 });
 
 test('token help (tasks 254, 255): each host has its own intro, note, link text and steps, in both languages', () => {

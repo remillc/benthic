@@ -98,7 +98,7 @@
     const target = /** @type {HTMLElement} */ (e.currentTarget);
     menuDive = { id: dive.id, index };
     await tick();
-    f7.popover.open('.od-trip-dive-menu', target);
+    f7.popover.open('.bc-trip-dive-menu', target);
   }
 
   /** Trips of the logbook other than this one, the closest in time first. */
@@ -177,32 +177,32 @@
   }
 </script>
 
-<Page class="od-trip">
+<Page class="bc-trip">
   <Navbar>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('detail.back')}</span>
+        <span class="bc-sr-only">{t('detail.back')}</span>
       </Link>
     {/snippet}
     <!-- Android: the trip's actions are in the floating toolbar; the top bar keeps only ←. -->
     {#snippet right()}
       {#if theme.ios}
         <Link iconOnly onClick={() => editField('location')}>
-          <Icon name="edit" weight={2.2} /><span class="od-sr-only">{t('tripScreen.edit')}</span>
+          <Icon name="edit" weight={2.2} /><span class="bc-sr-only">{t('tripScreen.edit')}</span>
         </Link>
-        <Link iconOnly popoverOpen=".od-trip-menu">
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
+        <Link iconOnly popoverOpen=".bc-trip-menu">
+          <Icon name="more" weight={4} /><span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
       {/if}
     {/snippet}
   </Navbar>
 
   {#if trip && trip.tripId}
-    <header class="od-trip--head">
-      <p class="od-trip--kicker od-value">{t('tripScreen.kicker', { range })}</p>
-      <h1 class:od-trip--not-set={!trip.location}>{trip.location || t('tripScreen.placeToSpecify')}</h1>
-      <p class="od-trip--sub">{t(trip.autogen ? 'tripScreen.divesAuto' : 'tripScreen.dives', { n: trip.dives.length })}</p>
+    <header class="bc-trip--head">
+      <p class="bc-trip--kicker bc-value">{t('tripScreen.kicker', { range })}</p>
+      <h1 class:bc-trip--not-set={!trip.location}>{trip.location || t('tripScreen.placeToSpecify')}</h1>
+      <p class="bc-trip--sub">{t(trip.autogen ? 'tripScreen.divesAuto' : 'tripScreen.dives', { n: trip.dives.length })}</p>
     </header>
 
     <div class="block-title">{t('tripScreen.trip')}</div>
@@ -223,7 +223,7 @@
             <div class="item-inner">
               <div class="item-title">
                 {t('tripScreen.notes')}
-                <div class="item-footer od-trip--notes">{trip.notes || t('tripScreen.addNotes')}</div>
+                <div class="item-footer bc-trip--notes">{trip.notes || t('tripScreen.addNotes')}</div>
               </div>
             </div>
           </a>
@@ -238,12 +238,12 @@
           <li class="item-content">
             <div class="item-inner">
               <div class="item-title">
-                <span class="od-value">{formatDateTime(dive.date)}</span>
+                <span class="bc-value">{formatDateTime(dive.date)}</span>
                 <div class="item-footer">{formatDuration(dive.durationSeconds)} · {dive.site || t('dive.siteNotSet')}</div>
               </div>
               <div class="item-after">
-                <button type="button" class="od-trip--more" onclick={(e) => diveMenu(e, dive, i)}>
-                  <Icon name="more" weight={4} /><span class="od-sr-only">{t('detail.moreOptions')}</span>
+                <button type="button" class="bc-trip--more" onclick={(e) => diveMenu(e, dive, i)}>
+                  <Icon name="more" weight={4} /><span class="bc-sr-only">{t('detail.moreOptions')}</span>
                 </button>
               </div>
             </div>
@@ -252,23 +252,23 @@
       </ul>
     </div>
     {#if !theme.ios}
-      <p class="od-trip--note">{t('tripScreen.actionsNote')}</p>
+      <p class="bc-trip--note">{t('tripScreen.actionsNote')}</p>
     {/if}
   {/if}
 
   <!-- The ⋮ menus (components/MenuItem.svelte): the trip's, and a dive's. -->
-  <Popover class="od-menu od-trip-menu" backdrop={false}>
+  <Popover class="bc-menu bc-trip-menu" backdrop={false}>
     <List noChevron>
       <MenuItem icon="merge" text={t('tripScreen.merge')} onclick={chooseTripToMerge} />
       {#if theme.ios}
         <MenuItem icon="plus" text={t('tripScreen.addDives')} onclick={chooseDiveToAdd} />
       {:else}
-        <li class="od-menu-divider" role="separator"></li>
+        <li class="bc-menu-divider" role="separator"></li>
       {/if}
       <MenuItem icon="ungroup" text={t('tripScreen.ungroup')} destructive onclick={confirmUngroup} />
     </List>
   </Popover>
-  <Popover class="od-menu od-trip-dive-menu" backdrop={false}>
+  <Popover class="bc-menu bc-trip-dive-menu" backdrop={false}>
     <List noChevron>
       {#if menuDive}
         {@const d = menuDive}
@@ -289,7 +289,7 @@
         actions={[
           { key: 'edit', icon: 'edit', label: t('tripScreen.edit'), text: t('detail.edit'), onclick: () => editField('location') },
           { key: 'add', icon: 'plus', label: t('tripScreen.addDives'), onclick: chooseDiveToAdd },
-          { key: 'more', icon: 'more', label: t('tripScreen.moreOptionsList'), menu: '.od-trip-menu' },
+          { key: 'more', icon: 'more', label: t('tripScreen.moreOptionsList'), menu: '.bc-trip-menu' },
         ]}
       />
     {/if}
@@ -298,7 +298,7 @@
 
 <style>
   @layer od.components {
-    .od-trip--head {
+    .bc-trip--head {
       padding: 16px 20px 0;
 
       h1 {
@@ -307,45 +307,45 @@
         line-height: 34px;
         font-weight: 800;
 
-        &.od-trip--not-set {
-          color: var(--od-text-2);
+        &.bc-trip--not-set {
+          color: var(--bc-text-2);
         }
       }
     }
 
-    .od-trip--kicker,
-    .od-trip--sub {
+    .bc-trip--kicker,
+    .bc-trip--sub {
       margin: 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-trip--sub {
+    .bc-trip--sub {
       margin-top: 4px;
     }
 
     .item-footer {
       white-space: normal;
 
-      &.od-trip--notes {
+      &.bc-trip--notes {
         white-space: pre-line;
       }
     }
 
-    .od-trip--note {
+    .bc-trip--note {
       margin: 10px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-trip--more {
+    .bc-trip--more {
       width: 48px;
       height: 48px;
       margin-right: -12px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;

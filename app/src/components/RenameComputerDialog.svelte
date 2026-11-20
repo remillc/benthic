@@ -41,7 +41,7 @@
 </script>
 
 <Md3Dialog title={t('gear.diveGear.renameTitle')} text={t('gear.diveGear.renameText')} {oncancel}>
-  <div class="od-rename-computer--field">
+  <div class="bc-rename-computer--field">
     <TextField label={t('gear.diveGear.renameField')} bind:value={name} invalid={!typed && name !== ''} supporting={!typed ? t('gear.diveGear.renameEmpty') : ''} />
   </div>
   {#snippet actions()}
@@ -52,7 +52,7 @@
 
 <style>
   @layer od.components {
-    .od-rename-computer--field {
+    .bc-rename-computer--field {
       padding: 0 24px;
     }
   }

@@ -4,7 +4,7 @@
  * Layers, from weakest to strongest:
  *   framework7     Framework7's CSS, imported here and not in main.js;
  *   maplibre       MapLibre's CSS (the Sites maps);
- *   od.tokens     OpenDives colors (--od-*), each declared once;
+ *   od.tokens     OpenDives colors (--bc-*), each declared once;
  *   od.base        rules shared by the screens;
  *   od.components  styles of the Svelte components (each in this layer).
  * A stronger layer wins whatever the specificity of the selectors.
@@ -12,7 +12,7 @@
  * Palette: black and white with ink actions. Colour is allowed sparingly, within
  * WCAG 2.2 AA contrast (4.5:1 text, 3:1 large text and meaningful graphics), and
  * never as the only carrier of meaning. The water column of the dive data goes
- * from --od-water-top to --od-water-bottom with depth.
+ * from --bc-water-top to --bc-water-bottom with depth.
  */
 @layer framework7, maplibre, od.tokens, od.base, od.components;
 
@@ -44,17 +44,17 @@
 
 /* The safe area: env() on iOS, desktop and in a browser. On Android the WebView's env() is unreliable
    (no navigation bar, a top that varies from one launch to the next), so the native side reports the
-   window insets and lib/safe-area.js sets --od-safe-* inline on <html>, which wins over these defaults.
-   Every safe-area use in the app reads --od-safe-*, never env() directly. Framework7's safe areas read
+   window insets and lib/safe-area.js sets --bc-safe-* inline on <html>, which wins over these defaults.
+   Every safe-area use in the app reads --bc-safe-*, never env() directly. Framework7's safe areas read
    them too, in the same places where it reads env(). */
 @layer od.base {
   :root {
-    --od-safe-top: env(safe-area-inset-top, 0px);
-    --od-safe-right: env(safe-area-inset-right, 0px);
-    --od-safe-bottom: env(safe-area-inset-bottom, 0px);
-    --od-safe-left: env(safe-area-inset-left, 0px);
-    --f7-safe-area-top: var(--od-safe-top);
-    --f7-safe-area-bottom: var(--od-safe-bottom);
+    --bc-safe-top: env(safe-area-inset-top, 0px);
+    --bc-safe-right: env(safe-area-inset-right, 0px);
+    --bc-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bc-safe-left: env(safe-area-inset-left, 0px);
+    --f7-safe-area-top: var(--bc-safe-top);
+    --f7-safe-area-bottom: var(--bc-safe-bottom);
   }
 
   .ios-left-edge,
@@ -64,8 +64,8 @@
   .popup,
   .sheet-modal,
   .panel-left {
-    --f7-safe-area-left: var(--od-safe-left);
-    --f7-safe-area-outer-left: var(--od-safe-left);
+    --f7-safe-area-left: var(--bc-safe-left);
+    --f7-safe-area-outer-left: var(--bc-safe-left);
   }
 
   .ios-right-edge,
@@ -75,8 +75,8 @@
   .popup,
   .sheet-modal,
   .panel-right {
-    --f7-safe-area-right: var(--od-safe-right);
-    --f7-safe-area-outer-right: var(--od-safe-right);
+    --f7-safe-area-right: var(--bc-safe-right);
+    --f7-safe-area-outer-right: var(--bc-safe-right);
   }
 
   .no-safe-areas,
@@ -98,768 +98,768 @@
 
 @layer od.tokens {
   /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
-     the other curves keep --od-profile-line-width, and high contrast keeps its 2 dp. */
+     the other curves keep --bc-profile-line-width, and high contrast keeps its 2 dp. */
   @media (min-width: 768px) {
-    :root:not(.od-high-contrast) {
-      --od-profile-main-width: 1;
+    :root:not(.bc-high-contrast) {
+      --bc-profile-main-width: 1;
     }
   }
   :root {
     /* Meaning colors. */
-    --od-alarm: #C62828;
+    --bc-alarm: #C62828;
     /* The emergency sheet (OpenDives+): a deep red band with white text, 7.2:1; white tiles with the red on them. */
-    --od-emergency: #A1372B;
-    --od-on-emergency: #FFFFFF;
+    --bc-emergency: #A1372B;
+    --bc-on-emergency: #FFFFFF;
     /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a crimson red on white, close to but apart from the alarm red; 6.0:1 on white. */
-    --od-dev: #C4143C;
-    --od-dev-tint: #FDEDF0;
-    --od-on-dev: #FFFFFF;
-    /* Pale tint behind an alarm icon; the icon in --od-alarm on it: 4.8:1 (AA non-text 3:1). */
-    --od-alarm-tint: #FBE9E7;
+    --bc-dev: #C4143C;
+    --bc-dev-tint: #FDEDF0;
+    --bc-on-dev: #FFFFFF;
+    /* Pale tint behind an alarm icon; the icon in --bc-alarm on it: 4.8:1 (AA non-text 3:1). */
+    --bc-alarm-tint: #FBE9E7;
     /* MD3 colour roles (spec, section 1, "Colour roles"), light. */
     /* Pickers: the ink fills the selected day, the dial handle and the selected box's outline. */
-    --od-primary: #1F2124;
-    --od-on-primary: #FFFFFF;
-    --od-primary-container: #EBEAE5;
-    --od-on-primary-container: #1F2124;
+    --bc-primary: #1F2124;
+    --bc-on-primary: #FFFFFF;
+    --bc-primary-container: #EBEAE5;
+    --bc-on-primary-container: #1F2124;
     /* Secondary: the ocean-night blue (selection, active state, tonal buttons). */
-    --od-secondary: #114477;
-    --od-on-secondary: #FFFFFF;
-    --od-secondary-container: #D4E2F2;
-    --od-on-secondary-container: #0B2440;
+    --bc-secondary: #114477;
+    --bc-on-secondary: #FFFFFF;
+    --bc-secondary-container: #D4E2F2;
+    --bc-on-secondary-container: #0B2440;
     /* The « Alpha » badge of the first launch (tasks 2026-11-16-225 and 229). */
-    --od-alpha-badge: #DCE7F3;
-    --od-on-alpha-badge: #114477;
+    --bc-alpha-badge: #DCE7F3;
+    --bc-on-alpha-badge: #114477;
     /* The blue panel of the first launch (tasks 2026-11-16-233, 234 and 236; the same as the tablet's):
        the welcome band of the phone and the header of its steps. Fixed blue, light and dark. */
-    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
-    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
-    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
-    --od-on-first-band: #FFFFFF;
-    --od-on-first-band-2: rgb(255 255 255 / 0.78);
-    --od-first-band-step: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
-    --od-first-band-badge: rgb(255 255 255 / 0.18);
-    --od-first-band-badge-line: rgb(255 255 255 / 0.55);
-    --od-first-band-badge-welcome: rgb(255 255 255 / 0.12);
-    --od-first-band-water-top: rgb(255 255 255 / 0.2);
-    --od-first-band-water-bottom: rgb(255 255 255 / 0.04);
-    --od-first-band-trace: #FFFFFF;
-    --od-first-band-glow: #8CC4FF;
-    --od-first-band-surface: rgb(255 255 255 / 0.35);
+    --bc-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --bc-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --bc-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --bc-on-first-band: #FFFFFF;
+    --bc-on-first-band-2: rgb(255 255 255 / 0.78);
+    --bc-first-band-step: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    --bc-first-band-badge: rgb(255 255 255 / 0.18);
+    --bc-first-band-badge-line: rgb(255 255 255 / 0.55);
+    --bc-first-band-badge-welcome: rgb(255 255 255 / 0.12);
+    --bc-first-band-water-top: rgb(255 255 255 / 0.2);
+    --bc-first-band-water-bottom: rgb(255 255 255 / 0.04);
+    --bc-first-band-trace: #FFFFFF;
+    --bc-first-band-glow: #8CC4FF;
+    --bc-first-band-surface: rgb(255 255 255 / 0.35);
     /* The labels and the dot of the profile on the tablet's panel (task 2026-11-16-237). */
-    --od-first-band-label: rgb(255 255 255 / 0.12);
-    --od-first-band-label-line: rgb(255 255 255 / 0.22);
-    --od-first-band-label-caption: rgb(255 255 255 / 0.75);
-    --od-first-band-dot-ring: rgb(255 255 255 / 0.22);
+    --bc-first-band-label: rgb(255 255 255 / 0.12);
+    --bc-first-band-label-line: rgb(255 255 255 / 0.22);
+    --bc-first-band-label-caption: rgb(255 255 255 / 0.75);
+    --bc-first-band-dot-ring: rgb(255 255 255 / 0.22);
     /* Outlined text field of the first-launch steps. */
-    --od-outlined-field-border: var(--od-code-border);
-    --od-outlined-field-active: var(--od-code-active);
-    --od-outlined-field-error: var(--od-code-error);
+    --bc-outlined-field-border: var(--bc-code-border);
+    --bc-outlined-field-active: var(--bc-code-active);
+    --bc-outlined-field-error: var(--bc-code-error);
     /* Cards and steps of the first-launch screens (tasks 2026-11-16-233 and 236). */
-    --od-first-row-line: #F0EEE9;
-    --od-first-tile: #E6EEF7;
-    --od-first-tile-warn: #FBEFD9;
-    --od-first-done: #1E6B3A;
-    --od-on-first-done: #FFFFFF;
-    --od-first-pending-ring: #C9CCD0;
+    --bc-first-row-line: #F0EEE9;
+    --bc-first-tile: #E6EEF7;
+    --bc-first-tile-warn: #FBEFD9;
+    --bc-first-done: #1E6B3A;
+    --bc-on-first-done: #FFFFFF;
+    --bc-first-pending-ring: #C9CCD0;
     /* Tertiary: rust and sand, for data series other than the water (temperature, statistics charts). */
-    --od-tertiary: #B4530F;
-    --od-on-tertiary: #FFFFFF;
-    --od-tertiary-container: #FBE3B2;
+    --bc-tertiary: #B4530F;
+    --bc-on-tertiary: #FFFFFF;
+    --bc-tertiary-container: #FBE3B2;
     /* The Tools page (task 2026-11-14-122): the wait before flying's track; a tool with nothing to report. */
-    --od-flight-track: #F3E3C8;
-    --od-idle-container: #E8E8E5;
+    --bc-flight-track: #F3E3C8;
+    --bc-idle-container: #E8E8E5;
     /* Charts that do not measure depth: smallest value, largest value. */
     /* The stripes of a reserve, on the tertiary container. */
-    --od-tertiary-hatch: #EDC691;
+    --bc-tertiary-hatch: #EDC691;
     /* The cylinder bars of the dive detail: pressure used, empty track (water colours). */
-    --od-gauge-used: #A9C4E2;
-    --od-gauge-track: #CFDEF0;
-    --od-chart-low: #C45911;
-    --od-chart-high: #AF4F0F;
-    --od-on-tertiary-container: #3D2200;
-    --od-error: var(--od-alarm);
-    --od-on-error: #FFFFFF;
-    --od-error-container: #FDE2E0;
-    --od-on-error-container: #5F1010;
+    --bc-gauge-used: #A9C4E2;
+    --bc-gauge-track: #CFDEF0;
+    --bc-chart-low: #C45911;
+    --bc-chart-high: #AF4F0F;
+    --bc-on-tertiary-container: #3D2200;
+    --bc-error: var(--bc-alarm);
+    --bc-on-error: #FFFFFF;
+    --bc-error-container: #FDE2E0;
+    --bc-on-error-container: #5F1010;
     /* Selection and tonal buttons: the secondary role. */
-    --od-selected: var(--od-secondary);
+    --bc-selected: var(--bc-secondary);
     /* The selected fill (a selected card or row): lighter than the container. */
-    --od-selected-container: #E6EEF8;
+    --bc-selected-container: #E6EEF8;
     /* Desktop (task 2026-11-15-169): the selected row of a table, and a destructive menu item. */
-    --od-table-selected: #D4E2F2;
-    --od-on-table-selected: #114477;
+    --bc-table-selected: #D4E2F2;
+    --bc-on-table-selected: #114477;
     /* « Continue with Google » and « Continue with Apple » (Google's Sign in with Google branding guidelines: light theme
        white, #747775 stroke, #1F1F1F text; dark theme #131314, #8E918F, #E3E3E3. Apple: white or black button, logo and title
        the same colour). Fixed by the providers, not by the OpenDives theme. */
-    --od-brand-google-bg: #FFFFFF;
-    --od-brand-google-border: #747775;
-    --od-brand-google-ink: #1F1F1F;
-    --od-brand-apple-bg: #FFFFFF;
-    --od-brand-apple-border: #1F1F1F;
-    --od-brand-apple-ink: #000000;
+    --bc-brand-google-bg: #FFFFFF;
+    --bc-brand-google-border: #747775;
+    --bc-brand-google-ink: #1F1F1F;
+    --bc-brand-apple-bg: #FFFFFF;
+    --bc-brand-apple-border: #1F1F1F;
+    --bc-brand-apple-ink: #000000;
     /* Desktop Statistiques (tasks 2026-11-15-171 and 176): the chart bars, the previews of the list, the heat map's grid, the tooltip's second line. */
-    --od-desk-stats-bar: #7FA3C8;
-    --od-desk-stats-bar-strong: #114477;
-    --od-desk-stats-preview: #8FB0D6;
-    --od-desk-stats-heat-0: #ECEAE4;
-    --od-desk-stats-heat-1: #D4E2F2;
-    --od-desk-stats-heat-2: #8FB0D6;
-    --od-desk-stats-heat-3: #3F6F9F;
-    --od-desk-stats-heat-4: #114477;
-    --od-desk-stats-tip-hint: #D4E2F2;
-    --od-menu-danger: #B71C1C;
+    --bc-desk-stats-bar: #7FA3C8;
+    --bc-desk-stats-bar-strong: #114477;
+    --bc-desk-stats-preview: #8FB0D6;
+    --bc-desk-stats-heat-0: #ECEAE4;
+    --bc-desk-stats-heat-1: #D4E2F2;
+    --bc-desk-stats-heat-2: #8FB0D6;
+    --bc-desk-stats-heat-3: #3F6F9F;
+    --bc-desk-stats-heat-4: #114477;
+    --bc-desk-stats-tip-hint: #D4E2F2;
+    --bc-menu-danger: #B71C1C;
     /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
-    --od-buddy-badge: #E3E1DC;
+    --bc-buddy-badge: #E3E1DC;
     /* Desktop first launch (task 2026-11-16-246): the thin divider between the help link and the language button. */
-    --od-language-divider: #C8C6BF;
-    --od-trip-band: #ECEAE4;
+    --bc-language-divider: #C8C6BF;
+    --bc-trip-band: #ECEAE4;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185): an editable field at rest, its hover outline,
        the average-depth line of the profile, a chip of a person in a field. */
-    --od-field-rest: #ECEAE4;
-    --od-field-hover: #8F8D86;
+    --bc-field-rest: #ECEAE4;
+    --bc-field-hover: #8F8D86;
     /* Gaz tab of the desktop detail (task 2026-11-16-262): the selected cylinder card, the dashed add card, the reserve mark and the empty consumption bar. */
-    --od-gas-card-selected: #F5F4F0;
-    --od-gas-card-selected-outline: #1F2124;
-    --od-gas-card-add-outline: #B9B6AE;
-    --od-gas-reserve: #B3261E;
-    --od-gas-track: #F1EFEA;
-    --od-profile-mean: #114477;
-    --od-tonal: var(--od-secondary-container);
-    --od-oxygen: #2E7D32;
+    --bc-gas-card-selected: #F5F4F0;
+    --bc-gas-card-selected-outline: #1F2124;
+    --bc-gas-card-add-outline: #B9B6AE;
+    --bc-gas-reserve: #B3261E;
+    --bc-gas-track: #F1EFEA;
+    --bc-profile-mean: #114477;
+    --bc-tonal: var(--bc-secondary-container);
+    --bc-oxygen: #2E7D32;
     /* A safe outcome (the planner: no deco stop), in the oxygen green. */
-    --od-status-ok: var(--od-oxygen);
-    --od-pending: #8A4B00;
+    --bc-status-ok: var(--bc-oxygen);
+    --bc-pending: #8A4B00;
     /* The shared map of dive sites (task 2026-11-19-315): its dots, clusters, chip and banner (teal of the mock-ups). */
-    --od-shared-site: #0E6E6B;
-    --od-on-shared-site: #FFFFFF;
-    --od-shared-site-container: #D3ECEA;
-    --od-on-shared-site-container: #0B3B39;
+    --bc-shared-site: #0E6E6B;
+    --bc-on-shared-site: #FFFFFF;
+    --bc-shared-site-container: #D3ECEA;
+    --bc-on-shared-site-container: #0B3B39;
     /* On the header band, whose colours stay light in dark mode too. */
-    --od-band-pending: #8A4B00;
-    --od-band-control: rgb(255 255 255 / 0.9);
+    --bc-band-pending: #8A4B00;
+    --bc-band-control: rgb(255 255 255 / 0.9);
     /* Text and icons on a control placed on the band (white at 90 %): they stay dark. */
-    --od-on-band-control: #1F2124;
-    --od-on-band-control-2: #4B4A47;
+    --bc-on-band-control: #1F2124;
+    --bc-on-band-control-2: #4B4A47;
     /* The simplified offline map (sea, land, land inside a downloaded region, roads). */
-    --od-map-sea: #D3E0EC;
-    --od-map-land-low: #EDECE7;
-    --od-map-land: #F7F6F2;
-    --od-map-road: #D9D3C4;
+    --bc-map-sea: #D3E0EC;
+    --bc-map-land-low: #EDECE7;
+    --bc-map-land: #F7F6F2;
+    --bc-map-road: #D9D3C4;
 
     /* QR codes (sharing by QR code): always black on white, whatever the mode, so that a camera reads them. */
-    --od-qr-paper: #FFFFFF;
-    --od-qr-ink: #000000;
-    --od-background: #F5F4F0;
-    --od-surface: #FFFFFF;
+    --bc-qr-paper: #FFFFFF;
+    --bc-qr-ink: #000000;
+    --bc-background: #F5F4F0;
+    --bc-surface: #FFFFFF;
     /* Product photos (dive computers) are shot on white: the tile stays white in dark mode too. */
-    --od-photo-ground: #FFFFFF;
-    --od-surface-2: #EBEAE5;
+    --bc-photo-ground: #FFFFFF;
+    --bc-surface-2: #EBEAE5;
     /* MD3 surface-container-high: the tonal buttons of a connected button group. */
-    --od-surface-container: #EEEEEC;
-    --od-surface-container-high: #EBEAE5;
+    --bc-surface-container: #EEEEEC;
+    --bc-surface-container-high: #EBEAE5;
     /* MD3 surface-container-highest: the current value of an exposed dropdown menu. */
-    --od-surface-container-highest: #E3E1DC;
-    --od-text: #1F2124;
-    --od-text-2: #4B4A47;
+    --bc-surface-container-highest: #E3E1DC;
+    --bc-text: #1F2124;
+    --bc-text-2: #4B4A47;
     /* Steps of the git help pages (task 2026-11-16-253): an interface label (kbd) and a value to type (code). */
-    --od-kbd-text: #1F2124;
-    --od-kbd-background: #F1EFEA;
-    --od-kbd-outline: #D3D0C8;
-    --od-code-text: #1F3F66;
-    --od-code-background: #EAF0F7;
-    --od-separator: #DADAD6;
-    --od-outline: #74777C;
+    --bc-kbd-text: #1F2124;
+    --bc-kbd-background: #F1EFEA;
+    --bc-kbd-outline: #D3D0C8;
+    --bc-code-text: #1F3F66;
+    --bc-code-background: #EAF0F7;
+    --bc-separator: #DADAD6;
+    --bc-outline: #74777C;
     /* Outlines of fields, chips and outlined buttons, and the planned profile's line: thicker in high contrast. */
-    --od-outline-width: 1px;
+    --bc-outline-width: 1px;
     /* The profile curves (depth, temperature, ppO₂, ceiling) and the dark halo under the depth
        curve: thin lines, thicker in high contrast (task 2026-11-15-190). */
-    --od-profile-line-width: 1.25;
-    --od-profile-halo-width: 2.5;
+    --bc-profile-line-width: 1.25;
+    --bc-profile-halo-width: 2.5;
     /* Pins of the sites around, on the map of the dives without a site (task 2026-11-14-148). */
-    --od-map-pin-muted: #75787C;
+    --bc-map-pin-muted: #75787C;
     /* Rust as text on the tertiary container (#FBE3B2): 5.2:1; #B4530F stays for graphics,
        icons and large text (task 2026-11-14-153). */
-    --od-tertiary-text: #9A4400;
-    /* Error text on a grey field surface (#E3E1DC): 5.0:1; on white, --od-alarm. */
-    --od-alarm-on-field: #B71C1C;
+    --bc-tertiary-text: #9A4400;
+    /* Error text on a grey field surface (#E3E1DC): 5.0:1; on white, --bc-alarm. */
+    --bc-alarm-on-field: #B71C1C;
     /* The account initial's pill on the band: opaque, the initial 9.9:1 on any band. */
-    --od-band-avatar: #FFFFFF;
+    --bc-band-avatar: #FFFFFF;
     /* Confirmation code boxes (task 2026-11-16-232): the active box, the others, the error. */
-    --od-code-active: #1F5C99;
-    --od-code-border: #75787C;
-    --od-code-error: #B3261E;
+    --bc-code-active: #1F5C99;
+    --bc-code-border: #75787C;
+    --bc-code-error: #B3261E;
     /* The window without a logbook (task 2026-11-16-242): the filled action of its dialog, the blue of the panel. */
-    --od-start-fill: #1F5C99;
-    --od-on-start-fill: #FFFFFF;
-    --od-start-hover: rgb(31 33 36 / 0.06);
+    --bc-start-fill: #1F5C99;
+    --bc-on-start-fill: #FFFFFF;
+    --bc-start-hover: rgb(31 33 36 / 0.06);
     /* The heat of « Où je plonge le plus »: blue (least) to red (most), 1 to 6, the lowest density
        fading out through light blue (task 2026-11-14-161). Same in dark mode for now. */
-    --od-heat-fade: #6FC3F0;
-    --od-heat-1: #1E5BD8;
-    --od-heat-2: #3FB5D9;
-    --od-heat-3: #5CC06A;
-    --od-heat-4: #F2D43A;
-    --od-heat-5: #F07C1E;
-    --od-heat-6: #D7191C;
+    --bc-heat-fade: #6FC3F0;
+    --bc-heat-1: #1E5BD8;
+    --bc-heat-2: #3FB5D9;
+    --bc-heat-3: #5CC06A;
+    --bc-heat-4: #F2D43A;
+    --bc-heat-5: #F07C1E;
+    --bc-heat-6: #D7191C;
     /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
-    --od-heat-spot-mid: #3FA0E0;
-    --od-heat-spot-edge: #2F86DE;
+    --bc-heat-spot-mid: #3FA0E0;
+    --bc-heat-spot-edge: #2F86DE;
     /* The hatched dark blue of the first launch's phone bands (tasks 2026-11-16-233, 234, 236 and 244; the same names
        and values as the alpha): the welcome hero and the header of the steps. Fixed blue, light and dark. */
-    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
-    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
-    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --bc-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --bc-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --bc-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
     /* Task 2026-11-16-251: the steps band of the release phone first launch takes the section band's gradient (its light centre higher, -40 %). */
-    --od-first-step-band: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
-    --od-on-first-band: #FFFFFF;
-    --od-on-first-band-2: rgb(255 255 255 / 0.78);
+    --bc-first-step-band: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    --bc-on-first-band: #FFFFFF;
+    --bc-on-first-band-2: rgb(255 255 255 / 0.78);
     /* First launch of the release edition (task 2026-11-15-213): the blue panel's vertical gradient, the soft
        light at its top left, its faint bands, the glow under the profile and the frosted chips. The panel is
        the same blue in dark mode (white text on it: 7.7:1 at the lightest stop). */
-    --od-release-panel-1: #2A6FB0;
-    --od-release-panel-2: #1F5C99;
-    --od-release-panel-3: #0C3866;
-    --od-release-panel-4: #072A4D;
-    --od-release-panel-light: rgb(255 255 255 / 0.22);
-    --od-release-panel-band: rgb(255 255 255 / 0.035);
-    --od-release-glow: #8CC4FF;
-    --od-release-chip: rgb(255 255 255 / 0.12);
-    --od-release-chip-border: rgb(255 255 255 / 0.22);
+    --bc-release-panel-1: #2A6FB0;
+    --bc-release-panel-2: #1F5C99;
+    --bc-release-panel-3: #0C3866;
+    --bc-release-panel-4: #072A4D;
+    --bc-release-panel-light: rgb(255 255 255 / 0.22);
+    --bc-release-panel-band: rgb(255 255 255 / 0.035);
+    --bc-release-glow: #8CC4FF;
+    --bc-release-chip: rgb(255 255 255 / 0.12);
+    --bc-release-chip-border: rgb(255 255 255 / 0.22);
     /* The main choice's fill and shadow, the icon tiles, the section label, the dialog's row dividers and scrim. */
-    --od-release-row-main: #1F5C99;
-    --od-release-row-main-shadow: rgb(12 56 102 / 0.28);
-    --od-release-row-main-hover: #246AAE;
-    --od-release-tile: #E6EEF7;
-    --od-tile-violet: #EBE3F3;
+    --bc-release-row-main: #1F5C99;
+    --bc-release-row-main-shadow: rgb(12 56 102 / 0.28);
+    --bc-release-row-main-hover: #246AAE;
+    --bc-release-tile: #E6EEF7;
+    --bc-tile-violet: #EBE3F3;
     /* Gear type tiles (inventory, new piece): green for regulators, beige for suits; blue, purple and grey use the tiles above. */
-    --od-tile-green: #E1F0E4;
-    --od-tile-beige: #F5E8D3;
-    --od-release-tile-icon: #1F5C99;
+    --bc-tile-green: #E1F0E4;
+    --bc-tile-beige: #F5E8D3;
+    --bc-release-tile-icon: #1F5C99;
     /* The link « Voir les formats acceptés » (task 223) and the extension chips of its dialog. */
-    --od-release-link: #1F5C99;
-    --od-release-chip-text: #114477;
-    --od-release-divider: #ECEAE5;
-    --od-release-note: #E6EEF7;
-    --od-release-hero: #EEF3F9;
-    --od-release-field-border: #75787C;
-    --od-release-ok: #1E6B3A;
-    --od-release-pending: #C9CCD0;
-    --od-release-track: #D5DEE8;
-    --od-release-line: #A5A8AC;
-    --od-release-line-soft: #E3E1DC;
+    --bc-release-link: #1F5C99;
+    --bc-release-chip-text: #114477;
+    --bc-release-divider: #ECEAE5;
+    --bc-release-note: #E6EEF7;
+    --bc-release-hero: #EEF3F9;
+    --bc-release-field-border: #75787C;
+    --bc-release-ok: #1E6B3A;
+    --bc-release-pending: #C9CCD0;
+    --bc-release-track: #D5DEE8;
+    --bc-release-line: #A5A8AC;
+    --bc-release-line-soft: #E3E1DC;
     /* iPhone grouped rows (task 2026-11-16-261): the help line under a card, iOS's secondary label colour (4.9:1 on the page). */
-    --od-release-ios-help: #6C6C70;
-    --od-release-hover: rgb(31 33 36 / 0.06);
-    --od-release-on-panel: #FFFFFF;
-    --od-release-on-panel-soft: rgb(255 255 255 / 0.78);
-    --od-release-on-main-soft: rgb(255 255 255 / 0.82);
-    --od-release-main-tile: rgb(255 255 255 / 0.16);
+    --bc-release-ios-help: #6C6C70;
+    --bc-release-hover: rgb(31 33 36 / 0.06);
+    --bc-release-on-panel: #FFFFFF;
+    --bc-release-on-panel-soft: rgb(255 255 255 / 0.78);
+    --bc-release-on-main-soft: rgb(255 255 255 / 0.82);
+    --bc-release-main-tile: rgb(255 255 255 / 0.16);
     /* The thin ring of the logo's disc on the blue band. */
-    --od-release-logo-ring: rgb(255 255 255 / 0.3);
-    --od-release-chip-caption: rgb(255 255 255 / 0.75);
+    --bc-release-logo-ring: rgb(255 255 255 / 0.3);
+    --bc-release-chip-caption: rgb(255 255 255 / 0.75);
     /* OpenDives+ (task 2026-11-17-265): the hero's gradient, the soft colour of each benefit card with its icon, the price card. */
-    --od-plus-hero: radial-gradient(140% 100% at 38% -20%, #A9C4E2 0%, #7199C2 22%, #3F70A3 42%, #1F5C99 62%, #0C3866 100%);
-    --od-plus-blue: #DCE8F5;
-    --od-plus-blue-icon: #1F5C99;
-    --od-plus-green: #DDEFE4;
-    --od-plus-green-icon: #1E6B3A;
-    --od-plus-amber: #F4E6D2;
-    --od-plus-amber-icon: #8A4B0F;
-    --od-plus-violet: #EBE3F3;
-    --od-plus-violet-icon: #5B3A8A;
-    --od-maintenance: #F6E3E0;
-    --od-maintenance-icon: #8A2A1F;
+    --bc-plus-hero: radial-gradient(140% 100% at 38% -20%, #A9C4E2 0%, #7199C2 22%, #3F70A3 42%, #1F5C99 62%, #0C3866 100%);
+    --bc-plus-blue: #DCE8F5;
+    --bc-plus-blue-icon: #1F5C99;
+    --bc-plus-green: #DDEFE4;
+    --bc-plus-green-icon: #1E6B3A;
+    --bc-plus-amber: #F4E6D2;
+    --bc-plus-amber-icon: #8A4B0F;
+    --bc-plus-violet: #EBE3F3;
+    --bc-plus-violet-icon: #5B3A8A;
+    --bc-maintenance: #F6E3E0;
+    --bc-maintenance-icon: #8A2A1F;
     /* The card reproductions of « Brevets et documents » (task 2026-11-19-309): a card is a dark gradient with white text in both themes. */
-    --od-card-blue: linear-gradient(135deg, #1F5C99, #0C3866);
-    --od-card-green: linear-gradient(135deg, #2E7D4F, #15502F);
-    --od-card-amber: linear-gradient(135deg, #A66A0A, #6B4306);
-    --od-card-violet: linear-gradient(135deg, #6A4C93, #3D2A5C);
-    --od-card-red: linear-gradient(135deg, #C62828, #7F1414);
-    --od-card-neutral: linear-gradient(135deg, #5B6168, #33383D);
-    --od-card-on: #FFFFFF;
-    --od-plus-price: #114477;
-    --od-plus-on-price-soft: rgb(255 255 255 / 0.85);
-    --od-plus-chip: rgb(255 255 255 / 0.22);
+    --bc-card-blue: linear-gradient(135deg, #1F5C99, #0C3866);
+    --bc-card-green: linear-gradient(135deg, #2E7D4F, #15502F);
+    --bc-card-amber: linear-gradient(135deg, #A66A0A, #6B4306);
+    --bc-card-violet: linear-gradient(135deg, #6A4C93, #3D2A5C);
+    --bc-card-red: linear-gradient(135deg, #C62828, #7F1414);
+    --bc-card-neutral: linear-gradient(135deg, #5B6168, #33383D);
+    --bc-card-on: #FFFFFF;
+    --bc-plus-price: #114477;
+    --bc-plus-on-price-soft: rgb(255 255 255 / 0.85);
+    --bc-plus-chip: rgb(255 255 255 / 0.22);
     /* The account sheet (task 2026-11-18-281): the OpenDives+ chip on a white card, the overdue maintenance (badge with white text, red line), the red tile of « Supprimer le compte ». */
-    --od-account-chip: #D4E2F2;
-    --od-account-chip-ink: #114477;
-    --od-late: #A1372B;
-    --od-late-text: #A1372B;
-    --od-late-tint: #F6E2DF;
+    --bc-account-chip: #D4E2F2;
+    --bc-account-chip-ink: #114477;
+    --bc-late: #A1372B;
+    --bc-late-text: #A1372B;
+    --bc-late-tint: #F6E2DF;
     /* « Votre carnet est prêt » (task 2026-11-18-270): the logo's drop shadow, the ring that spreads at the end, the header's bubbles. */
-    --od-plus-logo-shadow: rgb(3 18 36 / 0.3);
-    --od-plus-ring: rgb(255 255 255 / 0.6);
-    --od-plus-bubble: rgb(255 255 255 / 0.35);
-    --od-release-surface-line: rgb(255 255 255 / 0.35);
-    --od-release-dot-ring: rgb(255 255 255 / 0.22);
-    --od-release-row-shadow: rgb(31 33 36 / 0.06);
-    --od-release-row-shadow-hover: rgb(31 33 36 / 0.12);
-    --od-release-disabled-bg: rgb(31 33 36 / 0.12);
-    --od-release-disabled-text: rgb(31 33 36 / 0.38);
+    --bc-plus-logo-shadow: rgb(3 18 36 / 0.3);
+    --bc-plus-ring: rgb(255 255 255 / 0.6);
+    --bc-plus-bubble: rgb(255 255 255 / 0.35);
+    --bc-release-surface-line: rgb(255 255 255 / 0.35);
+    --bc-release-dot-ring: rgb(255 255 255 / 0.22);
+    --bc-release-row-shadow: rgb(31 33 36 / 0.06);
+    --bc-release-row-shadow-hover: rgb(31 33 36 / 0.12);
+    --bc-release-disabled-bg: rgb(31 33 36 / 0.12);
+    --bc-release-disabled-text: rgb(31 33 36 / 0.38);
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
-    --od-star-summary: #8A8D91;
+    --bc-star-summary: #8A8D91;
     /* Dividers between the rows of a white surface (Sites). */
-    --od-row-divider: #ECECEA;
-    --od-action: #1F2124;
-    --od-on-action: #FFFFFF;
-    --od-primary-action: var(--od-action);
-    --od-on-primary-action: var(--od-on-action);
-    --od-cursor: var(--od-action);
-    --od-water-top: #D4E2F2;
+    --bc-row-divider: #ECECEA;
+    --bc-action: #1F2124;
+    --bc-on-action: #FFFFFF;
+    --bc-primary-action: var(--bc-action);
+    --bc-on-primary-action: var(--bc-on-action);
+    --bc-cursor: var(--bc-action);
+    --bc-water-top: #D4E2F2;
     /* The bubble outlines of the empty logbook illustration, white on the water in both modes. */
-    --od-bubble: #FFFFFF;
+    --bc-bubble: #FFFFFF;
     /* The active item of the bottom navigation bar (task 2026-11-14-120): primary container and primary. */
-    --od-nav-active-container: #D4E2F2;
-    --od-nav-active: #114477;
+    --bc-nav-active-container: #D4E2F2;
+    --bc-nav-active: #114477;
     /* The account avatar's initial, on the white 90 % circle of the band (the band stays blue in dark mode). */
-    --od-nav-avatar-ink: #114477;
+    --bc-nav-avatar-ink: #114477;
     /* Desktop Outils (task 2026-11-15-196): grey filled fields, the selected row and segment, the amber banner, the cylinder's gas layers. */
-    --od-desktop-field: #ECEAE4;
-    --od-desktop-selected: #D4E2F2;
-    --od-desktop-selected-ink: #114477;
-    --od-desktop-banner: #FBE3B2;
-    --od-desktop-banner-ink: #3D3A33;
-    --od-gas-helium: #7FA3C8;
-    --od-gas-oxygen: #4E9A6A;
-    --od-gas-topup: #C9B98F;
-    --od-gas-topup-badge: #9A8657;
-    --od-desktop-bar-mid: #114477;
-    --od-desktop-bar-low: #7FA3C8;
+    --bc-desktop-field: #ECEAE4;
+    --bc-desktop-selected: #D4E2F2;
+    --bc-desktop-selected-ink: #114477;
+    --bc-desktop-banner: #FBE3B2;
+    --bc-desktop-banner-ink: #3D3A33;
+    --bc-gas-helium: #7FA3C8;
+    --bc-gas-oxygen: #4E9A6A;
+    --bc-gas-topup: #C9B98F;
+    --bc-gas-topup-badge: #9A8657;
+    --bc-desktop-bar-mid: #114477;
+    --bc-desktop-bar-low: #7FA3C8;
     /* Header band of the sections and of the side menu, the same in dark mode: the « grand bleu »
        of task 2026-11-13-97, colours only (the band's drawing does not change). */
     /* The light centre above the top edge (contrast audit, task 2026-11-14-153): -20 % on phones,
        -30 % from 600 dp (below). White text on the band 5.3:1 and more. */
-    --od-band-gradient: radial-gradient(140% 115% at 38% -20%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    --bc-band-gradient: radial-gradient(140% 115% at 38% -20%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
     /* Paper grain over the band (tasks 2026-11-13-108 and 109, system design « Paper grain on the header
        band »): a 256 px tile drawn once by the browser and repeated, no live filter while scrolling. */
-    --od-band-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='7' stitchTiles='stitch' result='n'/><feDiffuseLighting in='n' lighting-color='%23FFFFFF' surfaceScale='1'><feDistantLight azimuth='45' elevation='55'/></feDiffuseLighting><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.18 0 0 0 0.155'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
+    --bc-band-grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='p' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='7' stitchTiles='stitch' result='n'/><feDiffuseLighting in='n' lighting-color='%23FFFFFF' surfaceScale='1'><feDistantLight azimuth='45' elevation='55'/></feDiffuseLighting><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.18 0 0 0 0.155'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
     /* The faint dive profile drawn at the bottom of a band: its area and its line. */
-    --od-band-profile-area: rgb(255 255 255 / 0.1);
-    --od-band-profile-line: rgb(255 255 255 / 0.3);
-    --od-on-band: #FFFFFF;
-    --od-on-band-2: #D4E2F2;
-    --od-water-bottom: #5584B5;
+    --bc-band-profile-area: rgb(255 255 255 / 0.1);
+    --bc-band-profile-line: rgb(255 255 255 / 0.3);
+    --bc-on-band: #FFFFFF;
+    --bc-on-band-2: #D4E2F2;
+    --bc-water-bottom: #5584B5;
     /* Loading indicator (Android): a blue gradient. */
-    --od-loading-indicator-top: #7199C2;
-    --od-loading-indicator-bottom: #2D5E90;
+    --bc-loading-indicator-top: #7199C2;
+    --bc-loading-indicator-bottom: #2D5E90;
     /* Drawn cylinders: water gradient, pale band between the end and the start pressure, and the red dashed start and end marks. */
-    --od-cylinder-water-top: #A9C4E2;
-    --od-cylinder-water-bottom: #5584B5;
-    --od-cylinder-breathed: #CFDEF0;
-    --od-cylinder-level: #C62828;
+    --bc-cylinder-water-top: #A9C4E2;
+    --bc-cylinder-water-bottom: #5584B5;
+    --bc-cylinder-breathed: #CFDEF0;
+    --bc-cylinder-level: #C62828;
     /* A cylinder with no pressure data: grey diagonal hatching (task 2026-11-13-84). */
-    --od-cylinder-no-pressure: #F1F1EF;
-    --od-cylinder-no-pressure-stripe: #D9D9D5;
+    --bc-cylinder-no-pressure: #F1F1EF;
+    --bc-cylinder-no-pressure-stripe: #D9D9D5;
     /* The small cylinder icon of the gas rows (task 2026-11-13-87). */
-    --od-cylinder-icon: #D4E2F2;
+    --bc-cylinder-icon: #D4E2F2;
     /* Progress bars: the wavy indicator and its end dot, on the track. */
-    --od-progress-active: #114477;
-    --od-progress-track: #D4E2F2;
+    --bc-progress-active: #114477;
+    --bc-progress-track: #D4E2F2;
     /* Rebreather drawing (dive detail, CCR): canister, head, hoses, stand, valves. */
-    --od-rebreather-canister: #2B2F33;
-    --od-rebreather-head: #1F2124;
-    --od-rebreather-hose: #1F2124;
-    --od-rebreather-hardware: #9A9DA1;
-    --od-rebreather-valve: #75787C;
-    --od-trace: #1F2124;
+    --bc-rebreather-canister: #2B2F33;
+    --bc-rebreather-head: #1F2124;
+    --bc-rebreather-hose: #1F2124;
+    --bc-rebreather-hardware: #9A9DA1;
+    --bc-rebreather-valve: #75787C;
+    --bc-trace: #1F2124;
     /* Outline drawn under the profile line; only used in dark mode. */
-    --od-trace-outline: transparent;
+    --bc-trace-outline: transparent;
     /* Profile chart: grid lines of the depth axis, water temperature curve and its scale. */
-    --od-chart-grid: #EBEAE5;
-    --od-chip-outline: #75787C;
+    --bc-chart-grid: #EBEAE5;
+    --bc-chip-outline: #75787C;
     /* Selected curve button of the profile: white with a 1 px border in the curve colour. */
-    --od-curve-chip-bg: #FFFFFF;
-    --od-curve-chip-border-width: 1px;
+    --bc-curve-chip-bg: #FFFFFF;
+    --bc-curve-chip-border-width: 1px;
     /* Pin on the aerial view of a site. */
-    --od-pin: #1F2124;
-    --od-on-pin: #FFFFFF;
-    --od-temperature: var(--od-tertiary);
+    --bc-pin: #1F2124;
+    --bc-on-pin: #FFFFFF;
+    --bc-temperature: var(--bc-tertiary);
     /* Share sheet and sync error screens: decorative icon circle, sand with an ink icon. */
-    --od-share-circle: #FBE3B2;
-    --od-share-icon: #1F2124;
-    --od-block: var(--od-surface);
-    --od-on-block: var(--od-text);
-    --od-trace-block: var(--od-trace);
-    --od-tint: var(--od-surface-2);
-    --od-on-tint: var(--od-text);
+    --bc-share-circle: #FBE3B2;
+    --bc-share-icon: #1F2124;
+    --bc-block: var(--bc-surface);
+    --bc-on-block: var(--bc-text);
+    --bc-trace-block: var(--bc-trace);
+    --bc-tint: var(--bc-surface-2);
+    --bc-on-tint: var(--bc-text);
     /* Model thumbnail in « Nouvelle pièce » (task 2026-11-18-283). */
-    --od-piece-thumb-background: #FFFFFF;
-    --od-piece-thumb-border: #DCDAD3;
-    --od-thumbnail-background: var(--od-surface-2);
+    --bc-piece-thumb-background: #FFFFFF;
+    --bc-piece-thumb-border: #DCDAD3;
+    --bc-thumbnail-background: var(--bc-surface-2);
     /* Phone logbook (task 2026-11-18-278): date block and trip header, the profile chip on the right of a row. */
-    --od-date-block: #E6EEF7;
-    --od-on-date-block: var(--od-secondary);
-    --od-trip-header: #E6EEF7;
-    --od-profile-chip: #F0EFEA;
-    /* Android side menu (MD3 surface-container-low); iOS uses --od-surface. */
-    --od-drawer: #F0F0EE;
+    --bc-date-block: #E6EEF7;
+    --bc-on-date-block: var(--bc-secondary);
+    --bc-trip-header: #E6EEF7;
+    --bc-profile-chip: #F0EFEA;
+    /* Android side menu (MD3 surface-container-low); iOS uses --bc-surface. */
+    --bc-drawer: #F0F0EE;
     /* Dialogs (MD3 surface-container-high) and the scrim under them. */
-    --od-dialog: #F0F0EE;
+    --bc-dialog: #F0F0EE;
     /* Android ⋮ menus (MD3 surface-container). */
-    --od-menu: #EEEEEC;
+    --bc-menu: #EEEEEC;
     /* Divider between groups of a ⋮ menu. */
-    --od-menu-divider: #C9C9C5;
-    --od-scrim: rgb(0 0 0 / 0.32);
+    --bc-menu-divider: #C9C9C5;
+    --bc-scrim: rgb(0 0 0 / 0.32);
     /* Full-screen viewer of a certification card photo: black, with white controls (the same in both themes). */
-    --od-viewer: #000000;
-    --od-viewer-on: #FFFFFF;
-    --od-viewer-control: rgb(255 255 255 / 0.2);
+    --bc-viewer: #000000;
+    --bc-viewer-on: #FFFFFF;
+    --bc-viewer-control: rgb(255 255 255 / 0.2);
     /* Android tablet FAB menu (spec, section 8): its light scrim and its tonal choices. */
-    --od-fab-scrim: rgb(0 0 0 / 0.16);
-    --od-fab-tonal: #E3E1DC;
+    --bc-fab-scrim: rgb(0 0 0 / 0.16);
+    --bc-fab-tonal: #E3E1DC;
     /* The square that holds a cloud service's own logo (task 2026-11-15-173): white in both themes, as the brand rules ask. */
-    --od-logo-square: #FFFFFF;
-    --od-logo-square-ink: #1F2124;
+    --bc-logo-square: #FFFFFF;
+    --bc-logo-square-ink: #1F2124;
     /* New logbook, step 3 (task 2026-11-15-208): the band with the two tiles, the link between them (dashed grey, solid green when signed in) and the brand tile. */
-    --od-link-band: #EEF3F9;
-    --od-link-off: #8F8D86;
-    --od-link-off-badge: #E3E1DC;
-    --od-link-ok: #1E6B3A;
-    --od-link-ok-badge: #DCEFE2;
-    --od-tile-shadow: 0 1px 3px rgb(17 68 119 / 0.12), 0 4px 12px rgb(17 68 119 / 0.08);
+    --bc-link-band: #EEF3F9;
+    --bc-link-off: #8F8D86;
+    --bc-link-off-badge: #E3E1DC;
+    --bc-link-ok: #1E6B3A;
+    --bc-link-ok-badge: #DCEFE2;
+    --bc-tile-shadow: 0 1px 3px rgb(17 68 119 / 0.12), 0 4px 12px rgb(17 68 119 / 0.08);
     /* Vibrant floating toolbar (spec, section 8): ink container, light icons. */
-    --od-toolbar-container: #1F2124;
-    --od-toolbar-on-container: #F5F4F0;
-    --od-toolbar-primary: #F5F4F0;
-    --od-toolbar-on-primary: #1F2124;
+    --bc-toolbar-container: #1F2124;
+    --bc-toolbar-on-container: #F5F4F0;
+    --bc-toolbar-primary: #F5F4F0;
+    --bc-toolbar-on-primary: #1F2124;
     /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
-    --od-area-frame: #1F2124;
-    --od-area-veil: rgb(31 33 36 / 0.4);
+    --bc-area-frame: #1F2124;
+    --bc-area-veil: rgb(31 33 36 / 0.4);
     /* Snackbar (ui-foundations, section 8): surface, text 12.0:1, action 6.3:1. */
-    --od-inverse-surface: #2E3033;
-    --od-inverse-on-surface: #F5F4F0;
-    --od-inverse-primary: #8AB4F8;
+    --bc-inverse-surface: #2E3033;
+    --bc-inverse-on-surface: #F5F4F0;
+    --bc-inverse-primary: #8AB4F8;
   }
 
   /* Dark mode: system surfaces from Framework7, bright water with an outlined line. */
   html.dark {
     /* First launch of the release edition: the panel keeps its blues; tiles, label, dividers and scrim follow dark mode. */
-    --od-release-tile: #1E3552;
-    --od-tile-violet: #35294A;
-    --od-tile-green: #21382A;
-    --od-tile-beige: #43361F;
-    --od-release-tile-icon: #8FB6E6;
-    --od-release-link: #8FB6E6;
-    --od-release-chip-text: #BFD6F0;
-    --od-release-divider: #2E3033;
-    --od-release-note: #1E3552;
-    --od-account-chip: #1E3552;
-    --od-account-chip-ink: #BFD6F0;
-    --od-late: #C0453A;
-    --od-late-text: #FF8A80;
-    --od-late-tint: #3F2423;
-    --od-release-hero: #1A2A3F;
-    --od-release-field-border: #8F9296;
-    --od-release-ok: #4C9F70;
-    --od-release-pending: #5A5D61;
-    --od-release-track: #1E3552;
-    --od-release-line: #6B6E72;
-    --od-release-line-soft: #3A3C40;
-    --od-release-ios-help: #98989D;
+    --bc-release-tile: #1E3552;
+    --bc-tile-violet: #35294A;
+    --bc-tile-green: #21382A;
+    --bc-tile-beige: #43361F;
+    --bc-release-tile-icon: #8FB6E6;
+    --bc-release-link: #8FB6E6;
+    --bc-release-chip-text: #BFD6F0;
+    --bc-release-divider: #2E3033;
+    --bc-release-note: #1E3552;
+    --bc-account-chip: #1E3552;
+    --bc-account-chip-ink: #BFD6F0;
+    --bc-late: #C0453A;
+    --bc-late-text: #FF8A80;
+    --bc-late-tint: #3F2423;
+    --bc-release-hero: #1A2A3F;
+    --bc-release-field-border: #8F9296;
+    --bc-release-ok: #4C9F70;
+    --bc-release-pending: #5A5D61;
+    --bc-release-track: #1E3552;
+    --bc-release-line: #6B6E72;
+    --bc-release-line-soft: #3A3C40;
+    --bc-release-ios-help: #98989D;
     /* OpenDives+: the soft cards go deep, their icons light (each pair 4.5:1 or more). */
-    --od-plus-blue: #1E3552;
-    --od-plus-blue-icon: #8FB6E6;
-    --od-plus-green: #1D3A2A;
-    --od-plus-green-icon: #7FCB9C;
-    --od-plus-amber: #43301B;
-    --od-plus-amber-icon: #E8B46E;
-    --od-plus-violet: #33284A;
-    --od-plus-violet-icon: #C2A8EA;
-    --od-maintenance: #4A2723;
-    --od-maintenance-icon: #F0A59B;
-    --od-release-hover: rgb(255 255 255 / 0.08);
-    --od-release-row-shadow: rgb(0 0 0 / 0.3);
-    --od-release-row-shadow-hover: rgb(0 0 0 / 0.5);
-    --od-release-disabled-bg: rgb(255 255 255 / 0.12);
-    --od-release-disabled-text: rgb(255 255 255 / 0.38);
+    --bc-plus-blue: #1E3552;
+    --bc-plus-blue-icon: #8FB6E6;
+    --bc-plus-green: #1D3A2A;
+    --bc-plus-green-icon: #7FCB9C;
+    --bc-plus-amber: #43301B;
+    --bc-plus-amber-icon: #E8B46E;
+    --bc-plus-violet: #33284A;
+    --bc-plus-violet-icon: #C2A8EA;
+    --bc-maintenance: #4A2723;
+    --bc-maintenance-icon: #F0A59B;
+    --bc-release-hover: rgb(255 255 255 / 0.08);
+    --bc-release-row-shadow: rgb(0 0 0 / 0.3);
+    --bc-release-row-shadow-hover: rgb(0 0 0 / 0.5);
+    --bc-release-disabled-bg: rgb(255 255 255 / 0.12);
+    --bc-release-disabled-text: rgb(255 255 255 / 0.38);
     /* Meaning colours, lighter to keep their contrast on the dark background (spec, section 1). */
-    --od-alarm: #FF8A80;
-    --od-emergency: #8E2C21;
-    --od-on-emergency: #FFFFFF;
+    --bc-alarm: #FF8A80;
+    --bc-emergency: #8E2C21;
+    --bc-on-emergency: #FFFFFF;
     /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a light crimson (pinker than the alarm). */
-    --od-dev: #FF93A8;
-    --od-dev-tint: #3A1C24;
-    --od-on-dev: #3A0A14;
+    --bc-dev: #FF93A8;
+    --bc-dev-tint: #3A1C24;
+    --bc-on-dev: #3A0A14;
     /* Dark counterpart: alarm colour at about 18 % over the dark surface; the icon on it: 6.2:1. */
-    --od-alarm-tint: #3F2423;
-    --od-language-divider: #4A4C50;
-    --od-code-active: #7FB0E6;
-    --od-code-border: #8E9196;
-    --od-code-error: #FF8A80;
+    --bc-alarm-tint: #3F2423;
+    --bc-language-divider: #4A4C50;
+    --bc-code-active: #7FB0E6;
+    --bc-code-border: #8E9196;
+    --bc-code-error: #FF8A80;
     /* The window without a logbook (task 2026-11-16-242). */
-    --od-start-fill: #7FB0E6;
-    --od-on-start-fill: #0C2A4A;
-    --od-start-hover: rgb(255 255 255 / 0.08);
-    --od-primary: #F4F4F2;
-    --od-on-primary: #1F2124;
-    --od-primary-container: #2E3033;
-    --od-on-primary-container: #F4F4F2;
-    --od-secondary: #8FB6E6;
-    --od-on-secondary: #0B2440;
-    --od-secondary-container: #1E3552;
-    --od-on-secondary-container: #D4E2F2;
-    --od-alpha-badge: #1E3552;
-    --od-on-alpha-badge: #D4E2F2;
+    --bc-start-fill: #7FB0E6;
+    --bc-on-start-fill: #0C2A4A;
+    --bc-start-hover: rgb(255 255 255 / 0.08);
+    --bc-primary: #F4F4F2;
+    --bc-on-primary: #1F2124;
+    --bc-primary-container: #2E3033;
+    --bc-on-primary-container: #F4F4F2;
+    --bc-secondary: #8FB6E6;
+    --bc-on-secondary: #0B2440;
+    --bc-secondary-container: #1E3552;
+    --bc-on-secondary-container: #D4E2F2;
+    --bc-alpha-badge: #1E3552;
+    --bc-on-alpha-badge: #D4E2F2;
     /* The blue panel of the first launch (tasks 2026-11-16-233, 234 and 236; the same as the tablet's):
        the welcome band of the phone and the header of its steps. The same blue in dark mode. */
-    --od-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
-    --od-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
-    --od-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
-    --od-on-first-band: #FFFFFF;
-    --od-on-first-band-2: rgb(255 255 255 / 0.78);
-    --od-first-band-step: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
-    --od-first-band-badge: rgb(255 255 255 / 0.18);
-    --od-first-band-badge-line: rgb(255 255 255 / 0.55);
-    --od-first-band-badge-welcome: rgb(255 255 255 / 0.12);
-    --od-first-band-water-top: rgb(255 255 255 / 0.2);
-    --od-first-band-water-bottom: rgb(255 255 255 / 0.04);
-    --od-first-band-trace: #FFFFFF;
-    --od-first-band-glow: #8CC4FF;
-    --od-first-band-surface: rgb(255 255 255 / 0.35);
+    --bc-first-band: linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%);
+    --bc-first-band-sheen: radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%);
+    --bc-first-band-hatch: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
+    --bc-on-first-band: #FFFFFF;
+    --bc-on-first-band-2: rgb(255 255 255 / 0.78);
+    --bc-first-band-step: radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+    --bc-first-band-badge: rgb(255 255 255 / 0.18);
+    --bc-first-band-badge-line: rgb(255 255 255 / 0.55);
+    --bc-first-band-badge-welcome: rgb(255 255 255 / 0.12);
+    --bc-first-band-water-top: rgb(255 255 255 / 0.2);
+    --bc-first-band-water-bottom: rgb(255 255 255 / 0.04);
+    --bc-first-band-trace: #FFFFFF;
+    --bc-first-band-glow: #8CC4FF;
+    --bc-first-band-surface: rgb(255 255 255 / 0.35);
     /* The labels and the dot of the profile on the tablet's panel (task 2026-11-16-237). */
-    --od-first-band-label: rgb(255 255 255 / 0.12);
-    --od-first-band-label-line: rgb(255 255 255 / 0.22);
-    --od-first-band-label-caption: rgb(255 255 255 / 0.75);
-    --od-first-band-dot-ring: rgb(255 255 255 / 0.22);
-    --od-outlined-field-border: var(--od-code-border);
-    --od-outlined-field-active: var(--od-code-active);
-    --od-outlined-field-error: var(--od-code-error);
+    --bc-first-band-label: rgb(255 255 255 / 0.12);
+    --bc-first-band-label-line: rgb(255 255 255 / 0.22);
+    --bc-first-band-label-caption: rgb(255 255 255 / 0.75);
+    --bc-first-band-dot-ring: rgb(255 255 255 / 0.22);
+    --bc-outlined-field-border: var(--bc-code-border);
+    --bc-outlined-field-active: var(--bc-code-active);
+    --bc-outlined-field-error: var(--bc-code-error);
     /* Cards and steps of the first-launch screens (tasks 2026-11-16-233 and 236). */
-    --od-first-row-line: #2A2C2F;
-    --od-first-tile: #1E3552;
-    --od-first-tile-warn: #4A3216;
-    --od-first-done: #4FA874;
-    --od-on-first-done: #0B2418;
-    --od-first-pending-ring: #4A4D52;
-    --od-tertiary: #F0A66B;
-    --od-on-tertiary: #3D2200;
-    --od-tertiary-container: #4A3216;
-    --od-flight-track: #5C4124;
-    --od-idle-container: #2E3033;
-    --od-tertiary-hatch: #6A4A22;
-    --od-gauge-used: #4C8BD4;
-    --od-gauge-track: #2A4466;
-    --od-chart-low: #F0A66B;
-    --od-chart-high: #C97A35;
-    --od-on-tertiary-container: #FBE3B2;
-    --od-selected-container: #1A2D47;
-    --od-table-selected: #1A2D47;
-    --od-on-table-selected: #BFD6F0;
-    --od-brand-google-bg: #131314;
-    --od-brand-google-border: #8E918F;
-    --od-brand-google-ink: #E3E3E3;
-    --od-brand-apple-bg: #000000;
-    --od-brand-apple-border: #8E918F;
-    --od-brand-apple-ink: #FFFFFF;
-    --od-desk-stats-bar: #4C7FB8;
-    --od-desk-stats-bar-strong: #BFD6F0;
-    --od-desk-stats-preview: #4C7FB8;
-    --od-desk-stats-heat-0: #2E3033;
-    --od-desk-stats-heat-1: #1E3552;
-    --od-desk-stats-heat-2: #2D5E90;
-    --od-desk-stats-heat-3: #4C8BD4;
-    --od-desk-stats-heat-4: #BFD6F0;
-    --od-desk-stats-tip-hint: #2B66AD;
-    --od-menu-danger: #FF8A80;
-    --od-buddy-badge: #3A3C40;
-    --od-trip-band: #26282B;
+    --bc-first-row-line: #2A2C2F;
+    --bc-first-tile: #1E3552;
+    --bc-first-tile-warn: #4A3216;
+    --bc-first-done: #4FA874;
+    --bc-on-first-done: #0B2418;
+    --bc-first-pending-ring: #4A4D52;
+    --bc-tertiary: #F0A66B;
+    --bc-on-tertiary: #3D2200;
+    --bc-tertiary-container: #4A3216;
+    --bc-flight-track: #5C4124;
+    --bc-idle-container: #2E3033;
+    --bc-tertiary-hatch: #6A4A22;
+    --bc-gauge-used: #4C8BD4;
+    --bc-gauge-track: #2A4466;
+    --bc-chart-low: #F0A66B;
+    --bc-chart-high: #C97A35;
+    --bc-on-tertiary-container: #FBE3B2;
+    --bc-selected-container: #1A2D47;
+    --bc-table-selected: #1A2D47;
+    --bc-on-table-selected: #BFD6F0;
+    --bc-brand-google-bg: #131314;
+    --bc-brand-google-border: #8E918F;
+    --bc-brand-google-ink: #E3E3E3;
+    --bc-brand-apple-bg: #000000;
+    --bc-brand-apple-border: #8E918F;
+    --bc-brand-apple-ink: #FFFFFF;
+    --bc-desk-stats-bar: #4C7FB8;
+    --bc-desk-stats-bar-strong: #BFD6F0;
+    --bc-desk-stats-preview: #4C7FB8;
+    --bc-desk-stats-heat-0: #2E3033;
+    --bc-desk-stats-heat-1: #1E3552;
+    --bc-desk-stats-heat-2: #2D5E90;
+    --bc-desk-stats-heat-3: #4C8BD4;
+    --bc-desk-stats-heat-4: #BFD6F0;
+    --bc-desk-stats-tip-hint: #2B66AD;
+    --bc-menu-danger: #FF8A80;
+    --bc-buddy-badge: #3A3C40;
+    --bc-trip-band: #26282B;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
-    --od-field-rest: #2A2D31;
-    --od-field-hover: #8A8D91;
-    --od-gas-card-selected: #26282B;
-    --od-gas-card-selected-outline: #F4F4F2;
-    --od-gas-card-add-outline: #5A5D62;
-    --od-gas-reserve: #FF8A80;
-    --od-gas-track: #2A2D31;
-    --od-profile-mean: #9DC1EA;
-    --od-on-error: #3A0A08;
-    --od-error-container: #5C1A16;
-    --od-on-error-container: #FDE2E0;
-    --od-pending: #F2B84B;
-    --od-shared-site: #5DC9C3;
-    --od-on-shared-site: #0B2B2A;
-    --od-shared-site-container: #123F3D;
-    --od-on-shared-site-container: #CDEFEC;
-    --od-background: #121314;
-    --od-surface: #1C1D1F;
-    --od-surface-2: #2E3033;
-    --od-surface-container: #1C1D1F;
-    --od-surface-container-high: #2E3033;
-    --od-surface-container-highest: #3A3C40;
-    --od-fab-tonal: #3A3C40;
-    --od-logo-square: #FFFFFF;
-    --od-logo-square-ink: #1F2124;
-    --od-link-band: #1D2A3A;
-    --od-link-off: #7A7D82;
-    --od-link-off-badge: #3A3C40;
-    --od-link-ok: #7FD39B;
-    --od-link-ok-badge: #1F3A2B;
-    --od-tile-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
-    --od-toolbar-container: #E3E1DC;
-    --od-toolbar-on-container: #1F2124;
-    --od-toolbar-primary: #1F2124;
-    --od-toolbar-on-primary: #F4F4F2;
-    --od-text: #F4F4F2;
-    --od-text-2: #B5B8BC;
-    --od-kbd-text: #F4F4F2;
-    --od-kbd-background: #2A2C30;
-    --od-kbd-outline: #4A4D52;
-    --od-code-text: #BFD6F0;
-    --od-code-background: #1F2B3B;
-    --od-separator: #3A3C40;
-    --od-outline: #8E9196;
-    --od-map-pin-muted: #8E9196;
-    --od-tertiary-text: #F0A66B;
-    --od-alarm-on-field: #FF8A80;
-    --od-band-avatar: #FFFFFF;
-    --od-heat-fade: #6FC3F0;
-    --od-heat-1: #1E5BD8;
-    --od-heat-2: #3FB5D9;
-    --od-heat-3: #5CC06A;
-    --od-heat-4: #F2D43A;
-    --od-heat-5: #F07C1E;
-    --od-heat-6: #D7191C;
+    --bc-field-rest: #2A2D31;
+    --bc-field-hover: #8A8D91;
+    --bc-gas-card-selected: #26282B;
+    --bc-gas-card-selected-outline: #F4F4F2;
+    --bc-gas-card-add-outline: #5A5D62;
+    --bc-gas-reserve: #FF8A80;
+    --bc-gas-track: #2A2D31;
+    --bc-profile-mean: #9DC1EA;
+    --bc-on-error: #3A0A08;
+    --bc-error-container: #5C1A16;
+    --bc-on-error-container: #FDE2E0;
+    --bc-pending: #F2B84B;
+    --bc-shared-site: #5DC9C3;
+    --bc-on-shared-site: #0B2B2A;
+    --bc-shared-site-container: #123F3D;
+    --bc-on-shared-site-container: #CDEFEC;
+    --bc-background: #121314;
+    --bc-surface: #1C1D1F;
+    --bc-surface-2: #2E3033;
+    --bc-surface-container: #1C1D1F;
+    --bc-surface-container-high: #2E3033;
+    --bc-surface-container-highest: #3A3C40;
+    --bc-fab-tonal: #3A3C40;
+    --bc-logo-square: #FFFFFF;
+    --bc-logo-square-ink: #1F2124;
+    --bc-link-band: #1D2A3A;
+    --bc-link-off: #7A7D82;
+    --bc-link-off-badge: #3A3C40;
+    --bc-link-ok: #7FD39B;
+    --bc-link-ok-badge: #1F3A2B;
+    --bc-tile-shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.3);
+    --bc-toolbar-container: #E3E1DC;
+    --bc-toolbar-on-container: #1F2124;
+    --bc-toolbar-primary: #1F2124;
+    --bc-toolbar-on-primary: #F4F4F2;
+    --bc-text: #F4F4F2;
+    --bc-text-2: #B5B8BC;
+    --bc-kbd-text: #F4F4F2;
+    --bc-kbd-background: #2A2C30;
+    --bc-kbd-outline: #4A4D52;
+    --bc-code-text: #BFD6F0;
+    --bc-code-background: #1F2B3B;
+    --bc-separator: #3A3C40;
+    --bc-outline: #8E9196;
+    --bc-map-pin-muted: #8E9196;
+    --bc-tertiary-text: #F0A66B;
+    --bc-alarm-on-field: #FF8A80;
+    --bc-band-avatar: #FFFFFF;
+    --bc-heat-fade: #6FC3F0;
+    --bc-heat-1: #1E5BD8;
+    --bc-heat-2: #3FB5D9;
+    --bc-heat-3: #5CC06A;
+    --bc-heat-4: #F2D43A;
+    --bc-heat-5: #F07C1E;
+    --bc-heat-6: #D7191C;
     /* The two blues inside the spots of the mock-up's gradients (heat-density.js, SPOT_GRADIENTS). */
-    --od-heat-spot-mid: #3FA0E0;
-    --od-heat-spot-edge: #2F86DE;
-    --od-star-summary: #75787C;
-    --od-row-divider: #3A3C40;
-    --od-map-sea: #1E2A36;
-    --od-map-land-low: #232426;
-    --od-map-land: #2A2C2F;
-    --od-map-road: #4A4D52;
-    --od-action: #F4F4F2;
-    --od-on-action: #1F2124;
-    --od-cursor: #F4F4F2;
-    --od-bubble: #FFFFFF;
-    --od-water-top: #BFD6F0;
-    --od-nav-active-container: #1E3552;
-    --od-nav-active: #8FB6E6;
-    --od-water-bottom: #4C8BD4;
-    --od-loading-indicator-top: #BFD6F0;
-    --od-loading-indicator-bottom: #4C8BD4;
-    --od-cylinder-water-top: #BFD6F0;
-    --od-cylinder-water-bottom: #4C8BD4;
+    --bc-heat-spot-mid: #3FA0E0;
+    --bc-heat-spot-edge: #2F86DE;
+    --bc-star-summary: #75787C;
+    --bc-row-divider: #3A3C40;
+    --bc-map-sea: #1E2A36;
+    --bc-map-land-low: #232426;
+    --bc-map-land: #2A2C2F;
+    --bc-map-road: #4A4D52;
+    --bc-action: #F4F4F2;
+    --bc-on-action: #1F2124;
+    --bc-cursor: #F4F4F2;
+    --bc-bubble: #FFFFFF;
+    --bc-water-top: #BFD6F0;
+    --bc-nav-active-container: #1E3552;
+    --bc-nav-active: #8FB6E6;
+    --bc-water-bottom: #4C8BD4;
+    --bc-loading-indicator-top: #BFD6F0;
+    --bc-loading-indicator-bottom: #4C8BD4;
+    --bc-cylinder-water-top: #BFD6F0;
+    --bc-cylinder-water-bottom: #4C8BD4;
     /* Desktop Outils (task 2026-11-15-196), dark. */
-    --od-desktop-field: #2E3033;
-    --od-desktop-selected: #1E3552;
-    --od-desktop-selected-ink: #8FB6E6;
-    --od-desktop-banner: #4A3A1A;
-    --od-desktop-banner-ink: #F4E4C0;
-    --od-gas-helium: #6E93BC;
-    --od-gas-oxygen: #5FB07F;
-    --od-gas-topup: #A8996F;
-    --od-gas-topup-badge: #7C6D45;
-    --od-desktop-bar-mid: #4C8BD4;
-    --od-desktop-bar-low: #3A6FAE;
-    --od-cylinder-breathed: #2A4466;
-    --od-cylinder-level: #FF8A80;
-    --od-cylinder-no-pressure: #1C1D1F;
-    --od-cylinder-no-pressure-stripe: #3A3C40;
-    --od-cylinder-icon: #1E3552;
-    --od-progress-active: #8FB6E6;
-    --od-progress-track: #1E3552;
-    --od-rebreather-canister: #3A3E43;
-    --od-rebreather-head: #4A4D52;
+    --bc-desktop-field: #2E3033;
+    --bc-desktop-selected: #1E3552;
+    --bc-desktop-selected-ink: #8FB6E6;
+    --bc-desktop-banner: #4A3A1A;
+    --bc-desktop-banner-ink: #F4E4C0;
+    --bc-gas-helium: #6E93BC;
+    --bc-gas-oxygen: #5FB07F;
+    --bc-gas-topup: #A8996F;
+    --bc-gas-topup-badge: #7C6D45;
+    --bc-desktop-bar-mid: #4C8BD4;
+    --bc-desktop-bar-low: #3A6FAE;
+    --bc-cylinder-breathed: #2A4466;
+    --bc-cylinder-level: #FF8A80;
+    --bc-cylinder-no-pressure: #1C1D1F;
+    --bc-cylinder-no-pressure-stripe: #3A3C40;
+    --bc-cylinder-icon: #1E3552;
+    --bc-progress-active: #8FB6E6;
+    --bc-progress-track: #1E3552;
+    --bc-rebreather-canister: #3A3E43;
+    --bc-rebreather-head: #4A4D52;
     /* Lighter than the head: the hoses cross the dark card, not the canister. */
-    --od-rebreather-hose: #75787C;
-    --od-rebreather-hardware: #8E9196;
-    --od-rebreather-valve: #6B6E73;
-    --od-trace: #F4F4F2;
-    --od-trace-outline: #121314;
-    --od-chart-grid: #3A3C40;
-    --od-chip-outline: #8E9196;
+    --bc-rebreather-hose: #75787C;
+    --bc-rebreather-hardware: #8E9196;
+    --bc-rebreather-valve: #6B6E73;
+    --bc-trace: #F4F4F2;
+    --bc-trace-outline: #121314;
+    --bc-chart-grid: #3A3C40;
+    --bc-chip-outline: #8E9196;
     /* Dark: the usual selected background, no border. */
-    --od-curve-chip-bg: var(--od-primary-container);
-    --od-curve-chip-border-width: 0px;
-    --od-pin: #BFD6F0;
-    --od-on-pin: #121314;
-    --od-temperature: var(--od-tertiary);
-    --od-share-circle: #4A3216;
-    --od-share-icon: #F4F4F2;
-    --od-block: var(--od-surface);
-    --od-tint: var(--od-surface-2);
-    --od-on-tint: var(--od-text);
-    --od-oxygen: #7FD283;
-    --od-status-ok: var(--od-oxygen);
-    --od-piece-thumb-background: var(--od-surface);
-    --od-piece-thumb-border: #4B4D52;
-    --od-thumbnail-background: var(--od-surface-2);
-    --od-date-block: #1B2E45;
-    --od-on-date-block: var(--od-secondary);
-    --od-trip-header: #1B2E45;
-    --od-profile-chip: #2E3033;
-    --od-drawer: var(--f7-md-surface-1);
-    --od-dialog: var(--f7-md-surface-3);
-    --od-menu: var(--f7-md-surface-2);
-    --od-menu-divider: var(--f7-md-outline-variant);
-    --od-area-frame: #F4F4F2;
-    --od-area-veil: rgb(0 0 0 / 0.4);
+    --bc-curve-chip-bg: var(--bc-primary-container);
+    --bc-curve-chip-border-width: 0px;
+    --bc-pin: #BFD6F0;
+    --bc-on-pin: #121314;
+    --bc-temperature: var(--bc-tertiary);
+    --bc-share-circle: #4A3216;
+    --bc-share-icon: #F4F4F2;
+    --bc-block: var(--bc-surface);
+    --bc-tint: var(--bc-surface-2);
+    --bc-on-tint: var(--bc-text);
+    --bc-oxygen: #7FD283;
+    --bc-status-ok: var(--bc-oxygen);
+    --bc-piece-thumb-background: var(--bc-surface);
+    --bc-piece-thumb-border: #4B4D52;
+    --bc-thumbnail-background: var(--bc-surface-2);
+    --bc-date-block: #1B2E45;
+    --bc-on-date-block: var(--bc-secondary);
+    --bc-trip-header: #1B2E45;
+    --bc-profile-chip: #2E3033;
+    --bc-drawer: var(--f7-md-surface-1);
+    --bc-dialog: var(--f7-md-surface-3);
+    --bc-menu: var(--f7-md-surface-2);
+    --bc-menu-divider: var(--f7-md-outline-variant);
+    --bc-area-frame: #F4F4F2;
+    --bc-area-veil: rgb(0 0 0 / 0.4);
     /* Snackbar, dark: text 13.1:1; action 4.7:1 (#2F6DB5 of the spec gives 4.3:1, under AA). */
-    --od-inverse-surface: #E8E8E5;
-    --od-inverse-on-surface: #1F2124;
-    --od-inverse-primary: #2B66AD;
+    --bc-inverse-surface: #E8E8E5;
+    --bc-inverse-on-surface: #1F2124;
+    --bc-inverse-primary: #2B66AD;
   }
 
   /* Tablet width: the band is wider, its light centre higher still. */
   @media (min-width: 600px) {
     :root {
-      --od-band-gradient: radial-gradient(140% 115% at 38% -30%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
+      --bc-band-gradient: radial-gradient(140% 115% at 38% -30%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%);
     }
   }
 
   /*
    * High contrast (task 2026-11-14-149; contraste-eleve-echantillons.dc.html): the class
-   * od-high-contrast, set by lib/contrast.js when the system asks for more contrast.
+   * bc-high-contrast, set by lib/contrast.js when the system asks for more contrast.
    * Text 7:1 at least, strokes 3:1 at least; meaning colours keep their families,
    * darker in light, lighter in dark. Containers are unchanged.
    */
-  html.od-high-contrast:not(.dark) {
-    --od-text: #000000;
-    --od-text-2: #26282B;
-    --od-separator: #74777C;
-    --od-row-divider: #74777C;
-    --od-outline: #3E4145;
-    --od-chip-outline: #3E4145;
-    --od-secondary: #0A2D52;
-    --od-tertiary: #7A3200;
-    --od-on-tertiary-container: #2E1900;
-    --od-alarm: #8E1010;
-    --od-oxygen: #1B5E20;
-    --od-pending: #5C3100;
-    --od-shared-site: #08504E;
-    --od-band-pending: #5C3100;
-    --od-background: #FFFFFF;
-    --od-surface: #FFFFFF;
-    --od-nav-active: #0A2D52;
-    --od-band-control: #FFFFFF;
-    --od-outline-width: 1.5px;
-    --od-profile-line-width: 2;
-    --od-profile-halo-width: 4.5;
+  html.bc-high-contrast:not(.dark) {
+    --bc-text: #000000;
+    --bc-text-2: #26282B;
+    --bc-separator: #74777C;
+    --bc-row-divider: #74777C;
+    --bc-outline: #3E4145;
+    --bc-chip-outline: #3E4145;
+    --bc-secondary: #0A2D52;
+    --bc-tertiary: #7A3200;
+    --bc-on-tertiary-container: #2E1900;
+    --bc-alarm: #8E1010;
+    --bc-oxygen: #1B5E20;
+    --bc-pending: #5C3100;
+    --bc-shared-site: #08504E;
+    --bc-band-pending: #5C3100;
+    --bc-background: #FFFFFF;
+    --bc-surface: #FFFFFF;
+    --bc-nav-active: #0A2D52;
+    --bc-band-control: #FFFFFF;
+    --bc-outline-width: 1.5px;
+    --bc-profile-line-width: 2;
+    --bc-profile-halo-width: 4.5;
   }
 
-  html.dark.od-high-contrast {
-    --od-text: #FFFFFF;
-    --od-text-2: #E2E4E7;
-    --od-separator: #8E9196;
-    --od-row-divider: #8E9196;
-    --od-outline: #C2C5C9;
-    --od-chip-outline: #C2C5C9;
-    --od-secondary: #C2DAF7;
-    --od-tertiary: #FFC79A;
-    --od-on-tertiary-container: #FFFFFF;
-    --od-alarm: #FFC0B8;
-    --od-oxygen: #B2EBB4;
-    --od-pending: #FFD98A;
-    --od-shared-site: #8FE3DD;
-    --od-background: #000000;
-    --od-surface: #121314;
-    --od-nav-active: #FFFFFF;
-    --od-band-control: #FFFFFF;
-    --od-outline-width: 1.5px;
-    --od-profile-line-width: 2;
-    --od-profile-halo-width: 4.5;
+  html.dark.bc-high-contrast {
+    --bc-text: #FFFFFF;
+    --bc-text-2: #E2E4E7;
+    --bc-separator: #8E9196;
+    --bc-row-divider: #8E9196;
+    --bc-outline: #C2C5C9;
+    --bc-chip-outline: #C2C5C9;
+    --bc-secondary: #C2DAF7;
+    --bc-tertiary: #FFC79A;
+    --bc-on-tertiary-container: #FFFFFF;
+    --bc-alarm: #FFC0B8;
+    --bc-oxygen: #B2EBB4;
+    --bc-pending: #FFD98A;
+    --bc-shared-site: #8FE3DD;
+    --bc-background: #000000;
+    --bc-surface: #121314;
+    --bc-nav-active: #FFFFFF;
+    --bc-band-control: #FFFFFF;
+    --bc-outline-width: 1.5px;
+    --bc-profile-line-width: 2;
+    --bc-profile-halo-width: 4.5;
   }
 }
 
@@ -868,69 +868,69 @@
  * style sheet (":root", ".dark", ".md", ".ios") computed from colors.primary.
  * A rule inside a layer would always lose against it; unlayered, these more
  * specific selectors win. They only map Framework7's variables onto the
- * --od-* tokens.
+ * --bc-* tokens.
  */
 html.md {
   /* The colour roles, for what uses them; other screens are not recoloured
      yet: the components Framework7 fills with the secondary container stay on
      the neutral primary container. */
-  --f7-md-secondary: var(--od-secondary);
-  --f7-md-on-secondary: var(--od-on-secondary);
-  --f7-md-tertiary: var(--od-tertiary);
-  --f7-md-on-tertiary: var(--od-on-tertiary);
-  --f7-md-tertiary-container: var(--od-tertiary-container);
-  --f7-md-on-tertiary-container: var(--od-on-tertiary-container);
-  --f7-md-error: var(--od-error);
-  --f7-md-on-error: var(--od-on-error);
-  --f7-md-error-container: var(--od-error-container);
-  --f7-md-on-error-container: var(--od-on-error-container);
-  --f7-button-tonal-bg-color: var(--od-primary-container);
-  --f7-chip-bg-color: var(--od-primary-container);
-  --f7-searchbar-input-bg-color: var(--od-primary-container);
-  --f7-progressbar-bg-color: var(--od-primary-container);
-  --f7-range-bar-bg-color: var(--od-primary-container);
-  --f7-menu-list-item-selected-bg-color: var(--od-primary-container);
-  --f7-tabbar-link-active-icon-bg-color: var(--od-primary-container);
+  --f7-md-secondary: var(--bc-secondary);
+  --f7-md-on-secondary: var(--bc-on-secondary);
+  --f7-md-tertiary: var(--bc-tertiary);
+  --f7-md-on-tertiary: var(--bc-on-tertiary);
+  --f7-md-tertiary-container: var(--bc-tertiary-container);
+  --f7-md-on-tertiary-container: var(--bc-on-tertiary-container);
+  --f7-md-error: var(--bc-error);
+  --f7-md-on-error: var(--bc-on-error);
+  --f7-md-error-container: var(--bc-error-container);
+  --f7-md-on-error-container: var(--bc-on-error-container);
+  --f7-button-tonal-bg-color: var(--bc-primary-container);
+  --f7-chip-bg-color: var(--bc-primary-container);
+  --f7-searchbar-input-bg-color: var(--bc-primary-container);
+  --f7-progressbar-bg-color: var(--bc-primary-container);
+  --f7-range-bar-bg-color: var(--bc-primary-container);
+  --f7-menu-list-item-selected-bg-color: var(--bc-primary-container);
+  --f7-tabbar-link-active-icon-bg-color: var(--bc-primary-container);
 
   /* Dark mode: the screen follows the spec's values. */
   &.dark {
-    --f7-page-bg-color: var(--od-background);
-    --f7-md-surface: var(--od-background);
-    --f7-md-secondary-container: var(--od-secondary-container);
-    --f7-md-on-secondary-container: var(--od-on-secondary-container);
+    --f7-page-bg-color: var(--bc-background);
+    --f7-md-surface: var(--bc-background);
+    --f7-md-secondary-container: var(--bc-secondary-container);
+    --f7-md-on-secondary-container: var(--bc-on-secondary-container);
   }
 
   &:not(.dark) {
-    --f7-md-primary: var(--od-action);
-    --f7-md-on-primary: var(--od-on-action);
-    --f7-md-surface: var(--od-background);
-    --f7-md-surface-1: var(--od-surface);
-    --f7-md-surface-2: var(--od-surface);
-    --f7-md-surface-3: var(--od-surface);
-    --f7-md-surface-variant: var(--od-surface-2);
-    --f7-md-outline-variant: var(--od-separator);
-    --f7-md-on-surface: var(--od-text);
-    --f7-md-on-surface-variant: var(--od-text-2);
-    --f7-md-outline: var(--od-text-2);
-    --f7-md-secondary-container: var(--od-secondary-container);
-    --f7-md-on-secondary-container: var(--od-on-secondary-container);
-    --f7-list-item-border-color: var(--od-separator);
+    --f7-md-primary: var(--bc-action);
+    --f7-md-on-primary: var(--bc-on-action);
+    --f7-md-surface: var(--bc-background);
+    --f7-md-surface-1: var(--bc-surface);
+    --f7-md-surface-2: var(--bc-surface);
+    --f7-md-surface-3: var(--bc-surface);
+    --f7-md-surface-variant: var(--bc-surface-2);
+    --f7-md-outline-variant: var(--bc-separator);
+    --f7-md-on-surface: var(--bc-text);
+    --f7-md-on-surface-variant: var(--bc-text-2);
+    --f7-md-outline: var(--bc-text-2);
+    --f7-md-secondary-container: var(--bc-secondary-container);
+    --f7-md-on-secondary-container: var(--bc-on-secondary-container);
+    --f7-list-item-border-color: var(--bc-separator);
   }
 
   &.dark {
-    --f7-md-primary: var(--od-action);
+    --f7-md-primary: var(--bc-action);
   }
 }
 
 html.ios {
   &:not(.dark) {
-    --f7-ios-primary: var(--od-action);
-    --f7-page-bg-color: var(--od-background);
-    --f7-list-strong-bg-color: var(--od-surface);
-    --f7-block-strong-bg-color: var(--od-surface);
-    --f7-bars-bg-color: var(--od-surface);
-    --f7-list-item-border-color: var(--od-separator);
-    --f7-list-outline-border-color: var(--od-separator);
+    --f7-ios-primary: var(--bc-action);
+    --f7-page-bg-color: var(--bc-background);
+    --f7-list-strong-bg-color: var(--bc-surface);
+    --f7-block-strong-bg-color: var(--bc-surface);
+    --f7-bars-bg-color: var(--bc-surface);
+    --f7-list-item-border-color: var(--bc-separator);
+    --f7-list-outline-border-color: var(--bc-separator);
     /* Secondary text and field labels: #6C6C70 (5.2:1 on white), iOS's secondary label
        colour, instead of 45 % black (about 3.5:1); task 2026-11-14-153. */
     --f7-block-header-text-color: #6C6C70;
@@ -942,7 +942,7 @@ html.ios {
   }
 
   &.dark {
-    --f7-ios-primary: var(--od-action);
+    --f7-ios-primary: var(--bc-action);
   }
 }
 
@@ -970,12 +970,12 @@ html.ios {
 
 /* Framework7 sets its font per platform, outside our layers: overridden here too. */
 .md {
-  --od-title-font: Roboto, system-ui, sans-serif;
+  --bc-title-font: Roboto, system-ui, sans-serif;
   --f7-font-family: 'Source Sans 3', Roboto, system-ui, sans-serif;
 }
 
 .ios {
-  --od-title-font: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  --bc-title-font: -apple-system, 'SF Pro Display', system-ui, sans-serif;
   --f7-font-family: 'Source Sans 3', -apple-system, system-ui, sans-serif;
 }
 
@@ -996,17 +996,17 @@ html.ios {
    (a list, a long detail) shows a thin bar whose thumb is faint and whose track is transparent. A bar that takes
    15 dp from a pane is never left to the system. */
 @layer od.base {
-  html.od-desktop-app {
-    scrollbar-color: color-mix(in srgb, var(--od-text) 30%, transparent) transparent;
+  html.bc-desktop-app {
+    scrollbar-color: color-mix(in srgb, var(--bc-text) 30%, transparent) transparent;
   }
 
-  html.od-desktop-app * {
+  html.bc-desktop-app * {
     scrollbar-width: thin;
   }
 
   /* The page itself never shows a bar (Framework7 hides the body's). */
-  html.od-desktop-app,
-  html.od-desktop-app body {
+  html.bc-desktop-app,
+  html.bc-desktop-app body {
     scrollbar-width: none;
   }
 }
@@ -1032,24 +1032,24 @@ html.ios {
   .title-large-text,
   .block-title,
   .dialog-title,
-  .od-state-title,
-  .od-title-font {
-    font-family: var(--od-title-font);
+  .bc-state-title,
+  .bc-title-font {
+    font-family: var(--bc-title-font);
   }
 
   /* Spec, section 2: tabular figures for every dive value. */
-  .od-value {
+  .bc-value {
     font-variant-numeric: tabular-nums;
   }
 
   /* A white surface holding text fields (site forms, dive editing): 20 px
      corners, 16 px side margins; the fields inside sit 12 px from its edges. */
-  .od-form-surface {
+  .bc-form-surface {
     margin: 18px 16px 0;
     padding: 2px 0 16px;
     border-radius: 20px;
-    background: var(--od-surface);
-    --od-field-margin: 12px;
+    background: var(--bc-surface);
+    --bc-field-margin: 12px;
   }
 
   /* MD3: check boxes (18 dp) and radio buttons (20 dp) keep their size in
@@ -1102,7 +1102,7 @@ html.ios {
     --f7-list-item-min-height: 56px;
 
     /* Two-line rows of the logbook: 72 dp. */
-    .media-list .item-inner.od-row {
+    .media-list .item-inner.bc-row {
       min-height: 72px;
     }
 
@@ -1112,16 +1112,16 @@ html.ios {
   }
 
   /* Title of an empty or error state. */
-  .od-state-title {
+  .bc-state-title {
     font-size: 22px;
     font-weight: 400;
     margin: 16px 0 8px;
   }
 
   /* A highlighted block (the latest dive, the profile). */
-  .od-block {
-    background: var(--od-block);
-    color: var(--od-on-block);
+  .bc-block {
+    background: var(--bc-block);
+    color: var(--bc-on-block);
   }
 
   /* Scrim under the side menu. */
@@ -1139,18 +1139,18 @@ html.ios {
   }
 
   /* Main action of a screen, at most once per screen. */
-  .button.od-primary-action {
-    --f7-button-fill-bg-color: var(--od-primary-action);
-    --f7-button-fill-text-color: var(--od-on-primary-action);
-    --f7-button-fill-pressed-bg-color: var(--od-primary-action);
+  .button.bc-primary-action {
+    --f7-button-fill-bg-color: var(--bc-primary-action);
+    --f7-button-fill-text-color: var(--bc-on-primary-action);
+    --f7-button-fill-pressed-bg-color: var(--bc-primary-action);
   }
 
   /* "+" button on Android: floating action button in secondary-container. */
-  .md .od-fab-add {
-    --f7-fab-bg-color: var(--od-primary-container);
+  .md .bc-fab-add {
+    --f7-fab-bg-color: var(--bc-primary-container);
     --f7-fab-text-color: var(--f7-md-on-secondary-container);
-    --f7-fab-label-bg-color: var(--od-surface);
-    --f7-fab-label-text-color: var(--od-text);
+    --f7-fab-label-bg-color: var(--bc-surface);
+    --f7-fab-label-text-color: var(--bc-text);
     --f7-fab-label-padding: 8px 14px;
 
     /* The label is part of the choice: a tap on it counts. */
@@ -1175,7 +1175,7 @@ html.ios {
   }
 
   /*
-   * Android: the chevron of Settings everywhere (24 dp, --od-text-2), not
+   * Android: the chevron of Settings everywhere (24 dp, --bc-text-2), not
    * Framework7's small light one.
    */
   .md {
@@ -1188,7 +1188,7 @@ html.ios {
       width: 24px;
       height: 24px;
       margin-top: -12px;
-      background: var(--od-chevron-color, var(--od-text-2));
+      background: var(--bc-chevron-color, var(--bc-text-2));
       mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / 24px no-repeat;
     }
 
@@ -1210,21 +1210,21 @@ html.ios {
    * Android section titles on the page background, as in Settings, Tools and
    * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
    */
-  .md .od-section-title {
+  .md .bc-section-title {
     margin: 0;
     padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
     font-size: 18px;
     line-height: 24px;
     font-weight: 700;
-    color: var(--od-text);
+    color: var(--bc-text);
   }
 
   /* Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites). */
-  .od-intro {
+  .bc-intro {
     margin: 16px 20px 8px;
     font-size: 16px;
     line-height: 24px;
-    color: var(--od-text-2);
+    color: var(--bc-text-2);
   }
 
   .md {
@@ -1280,7 +1280,7 @@ html.ios {
    * under a two-line value column. The list has Framework7's "chevron-center"
    * class: the chevron is centred on the row too.
    */
-  .media-list .item-content:has(> .od-row) {
+  .media-list .item-content:has(> .bc-row) {
     align-items: center;
 
     > .item-media {
@@ -1290,7 +1290,7 @@ html.ios {
     }
   }
 
-  .media-list .item-inner.od-row {
+  .media-list .item-inner.bc-row {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1299,7 +1299,7 @@ html.ios {
     padding-top: 10px;
     padding-bottom: 10px;
 
-    .od-row-text {
+    .bc-row-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -1317,7 +1317,7 @@ html.ios {
     .item-text {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       max-height: none;
     }
   }
@@ -1327,7 +1327,7 @@ html.ios {
    * 72 dp rows without dividers or chevron; the dives of an expanded trip in
    * a white surface, 64 dp each.
    */
-  .md .list.od-dive-list {
+  .md .list.bc-dive-list {
     /* A dive has no chevron; only a trip has its arrow. */
     .item-link .item-inner::before,
     .item-link .item-title-row::before {
@@ -1340,12 +1340,12 @@ html.ios {
      * row is the link and the content at once, so that margin came on top of
      * the 16 / 24 dp padding (about 25 / 33 dp on screen). No margin: 16 / 24.
      */
-    li > .item-link.item-content:has(> .od-row) {
+    li > .item-link.item-content:has(> .bc-row) {
       margin-left: 0;
       margin-right: 0;
     }
 
-    .item-content:has(> .od-row) {
+    .item-content:has(> .bc-row) {
       box-sizing: border-box;
       min-height: 72px;
       padding: 8px calc(24px + var(--f7-safe-area-right)) 8px calc(16px + var(--f7-safe-area-left));
@@ -1357,7 +1357,7 @@ html.ios {
       }
     }
 
-    .item-inner.od-row {
+    .item-inner.bc-row {
       min-height: 0;
       margin: 0;
       padding: 0;
@@ -1384,22 +1384,22 @@ html.ios {
       }
     }
 
-    li.od-dive-row--in-trip {
+    li.bc-dive-row--in-trip {
       padding: 0 12px 0 32px;
 
       > .item-content {
         min-height: 64px;
         padding: 8px 12px;
         border-radius: 0;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
 
-      &.od-dive-row--trip-first > .item-content {
+      &.bc-dive-row--trip-first > .item-content {
         padding-top: 12px;
         border-radius: 16px 16px 0 0;
       }
 
-      &.od-dive-row--trip-last {
+      &.bc-dive-row--trip-last {
         padding-bottom: 8px;
 
         > .item-content {
@@ -1408,7 +1408,7 @@ html.ios {
         }
       }
 
-      &.od-dive-row--trip-first.od-dive-row--trip-last > .item-content {
+      &.bc-dive-row--trip-first.bc-dive-row--trip-last > .item-content {
         border-radius: 16px;
       }
     }
@@ -1419,14 +1419,14 @@ html.ios {
    * padding, fully rounded); iOS, 44 pt bordered button with 12 pt corners.
    * Framework7 stretches buttons in lists: this one keeps its own width.
    */
-  .od-tonal-button {
+  .bc-tonal-button {
     width: auto;
     height: 40px;
     padding: 0 24px;
     border: none;
     border-radius: 20px;
-    background: var(--od-tint);
-    color: var(--od-on-tint);
+    background: var(--bc-tint);
+    color: var(--bc-on-tint);
     font: inherit;
     font-size: 14px;
     font-weight: 500;
@@ -1452,14 +1452,14 @@ html.ios {
    * medium label; "Utiliser ce site", "Ouvrir dans Cartes". A link that
    * leaves the app ends with the "open in new" icon (18 dp, 8 dp gap).
    */
-  .od-text-button {
+  .bc-text-button {
     width: auto;
     height: 40px;
     padding: 0 12px;
     border: none;
     border-radius: 20px;
     background: none;
-    color: var(--od-text);
+    color: var(--bc-text);
     font: inherit;
     font-size: 14px;
     font-weight: 500;
@@ -1476,19 +1476,19 @@ html.ios {
       font-size: 17px;
       font-weight: 400;
       letter-spacing: 0;
-      color: var(--od-action);
+      color: var(--bc-action);
     }
   }
 
   /* Plain icon button: a 24 dp icon in a 48 dp target, no background. */
-  .od-icon-button {
+  .bc-icon-button {
     width: 48px;
     height: 48px;
     padding: 0;
     border: none;
     border-radius: 50%;
     background: none;
-    color: var(--od-text);
+    color: var(--bc-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1497,16 +1497,16 @@ html.ios {
 
   /*
    * Outlined button ("Sign out", "Delete the account"): same sizes as the
-   * tonal button; ink, or --od-alarm with .od-danger (text and border).
+   * tonal button; ink, or --bc-alarm with .bc-danger (text and border).
    */
-  .od-outlined-button {
+  .bc-outlined-button {
     width: auto;
     height: 40px;
     padding: 0 24px;
-    border: var(--od-outline-width) solid var(--od-text-2);
+    border: var(--bc-outline-width) solid var(--bc-text-2);
     border-radius: 20px;
     background: none;
-    color: var(--od-text);
+    color: var(--bc-text);
     font: inherit;
     font-size: 14px;
     font-weight: 500;
@@ -1515,9 +1515,9 @@ html.ios {
     white-space: nowrap;
     cursor: pointer;
 
-    &.od-danger {
-      border-color: var(--od-alarm);
-      color: var(--od-alarm);
+    &.bc-danger {
+      border-color: var(--bc-alarm);
+      color: var(--bc-alarm);
     }
 
     .ios & {
@@ -1531,10 +1531,10 @@ html.ios {
   /* Mouse: the Material 3 hover layer, 8 % of the button's content colour over its background
      (docs/system-design.md, « Pointer »). */
   @media (hover: hover) and (pointer: fine) {
-    .od-tonal-button,
-    .od-text-button,
-    .od-icon-button,
-    .od-outlined-button {
+    .bc-tonal-button,
+    .bc-text-button,
+    .bc-icon-button,
+    .bc-outlined-button {
       transition: box-shadow 120ms linear;
 
       &:not(:disabled):hover {
@@ -1543,10 +1543,10 @@ html.ios {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .od-tonal-button,
-    .od-text-button,
-    .od-icon-button,
-    .od-outlined-button {
+    .bc-tonal-button,
+    .bc-text-button,
+    .bc-icon-button,
+    .bc-outlined-button {
       transition: none;
     }
   }
@@ -1564,7 +1564,7 @@ html.ios {
   }
 
   /* Text for screen readers only. */
-  .od-sr-only {
+  .bc-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -1574,7 +1574,7 @@ html.ios {
   }
 
   /* The floating button must not hide the last row of the logbook. */
-  .md .page:has(.od-fab-add, .od-fab-menu) .list:last-of-type {
+  .md .page:has(.bc-fab-add, .bc-fab-menu) .list:last-of-type {
     margin-bottom: 96px;
   }
 
@@ -1593,7 +1593,7 @@ html.ios {
    * the tablet width (Material 3 large-screen guidance). The sheet keeps its content; the grab handle goes.
    */
   @media (min-width: 768px) {
-    .sheet-modal.od-sheet-dialog {
+    .sheet-modal.bc-sheet-dialog {
       left: 50%;
       bottom: 50%;
       width: 480px;
@@ -1603,10 +1603,10 @@ html.ios {
       translate: -50% 50%;
     }
     /* iPad: the system's form sheet corners. */
-    .ios .sheet-modal.od-sheet-dialog {
+    .ios .sheet-modal.bc-sheet-dialog {
       border-radius: 14px;
     }
-    .sheet-modal.od-sheet-dialog [class*='--handle'] {
+    .sheet-modal.bc-sheet-dialog [class*='--handle'] {
       display: none;
     }
   }
@@ -1619,16 +1619,16 @@ html.ios {
      * below the items, no backdrop, as wide as its longest label from 112 to
      * 280 dp.
      */
-    .popover.od-menu {
+    .popover.bc-menu {
       --f7-popover-width: max-content;
       --f7-popover-border-radius: 16px;
       min-width: 112px;
       max-width: 280px;
-      background: var(--od-menu);
+      background: var(--bc-menu);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
     }
 
-    .od-menu .list {
+    .bc-menu .list {
       margin: 8px 0;
 
       ul {
@@ -1637,105 +1637,105 @@ html.ios {
     }
 
     /* The line above the items of a menu that names what it acts on (the logbook's name and where it is kept). */
-    .od-menu .od-menu-label {
+    .bc-menu .bc-menu-label {
       list-style: none;
       padding: 12px 16px 4px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* A 1 dp divider between groups of items, 8 dp above and below. */
-    .od-menu .od-menu-divider {
+    .bc-menu .bc-menu-divider {
       height: 1px;
       margin: 8px 0;
-      background: var(--od-menu-divider);
+      background: var(--bc-menu-divider);
     }
 
     /* Items 48 dp high, 12 dp at both ends, a 24 dp icon then 12 dp before the label. */
-    .od-menu .item-content {
+    .bc-menu .item-content {
       min-height: 48px;
       padding-left: 12px;
     }
 
-    .od-menu .item-inner {
+    .bc-menu .item-inner {
       min-height: 48px;
       padding-right: 12px;
     }
 
-    .od-menu .item-media {
+    .bc-menu .item-media {
       min-width: 24px;
       padding: 0;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       & + .item-inner {
         margin-left: 12px;
       }
     }
 
-    .od-menu .item-title {
+    .bc-menu .item-title {
       font-size: 14px;
       font-weight: 500;
       white-space: nowrap;
       overflow: visible;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
     /* iOS pull-down menu: 260 pt wide, 13 pt corners, 17 pt label, icon at the end. */
-    .ios .popover.od-menu {
+    .ios .popover.bc-menu {
       --f7-popover-width: 260px;
       --f7-popover-border-radius: 13px;
       min-width: 0;
       max-width: none;
-      background: color-mix(in srgb, var(--od-surface) 94%, transparent);
+      background: color-mix(in srgb, var(--bc-surface) 94%, transparent);
       backdrop-filter: blur(20px);
     }
 
-    .ios .od-menu .popover-arrow {
+    .ios .bc-menu .popover-arrow {
       display: none;
     }
 
-    .ios .od-menu .list {
+    .ios .bc-menu .list {
       margin: 0;
     }
 
-    .ios .od-menu .item-content {
+    .ios .bc-menu .item-content {
       min-height: 44px;
       padding-left: 16px;
     }
 
-    .ios .od-menu .item-title {
+    .ios .bc-menu .item-title {
       font-size: 17px;
       font-weight: 400;
     }
 
     /* Android: a destructive item (delete) in the alarm colour, icon and label. */
-    .md .od-menu .od-menu-item--destructive .item-title,
-    .md .od-menu .od-menu-item--destructive .item-media {
-      color: var(--od-alarm);
+    .md .bc-menu .bc-menu-item--destructive .item-title,
+    .md .bc-menu .bc-menu-item--destructive .item-media {
+      color: var(--bc-alarm);
     }
 
-    .ios .od-menu .od-menu-item--destructive .item-title,
-    .ios .od-menu .od-menu-item--destructive .item-after {
-      color: var(--od-alarm);
+    .ios .bc-menu .bc-menu-item--destructive .item-title,
+    .ios .bc-menu .bc-menu-item--destructive .item-after {
+      color: var(--bc-alarm);
     }
 
-    .ios .od-menu .item-after {
-      color: var(--od-text);
+    .ios .bc-menu .item-after {
+      color: var(--bc-text);
     }
 
     /* A menu item that cannot be used now (« Fusionner en une plongée »): 38 %, with the
        reason on a second line; it takes no touch. */
-    .od-menu .od-menu-item--disabled {
+    .bc-menu .bc-menu-item--disabled {
       pointer-events: none;
       opacity: 0.38;
     }
 
-    .od-menu .od-menu-item--disabled .item-text {
+    .bc-menu .bc-menu-item--disabled .item-text {
       white-space: normal;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 }
 
@@ -1744,32 +1744,32 @@ html.ios {
  * the next or previous one): the screen slides in from the side it came from.
  */
 @layer od.components {
-  .od-slide-next .page-content {
-    animation: od-slide-next 220ms ease-out;
+  .bc-slide-next .page-content {
+    animation: bc-slide-next 220ms ease-out;
   }
 
-  .od-slide-previous .page-content {
-    animation: od-slide-previous 220ms ease-out;
+  .bc-slide-previous .page-content {
+    animation: bc-slide-previous 220ms ease-out;
   }
 
   /* Android: the slide is spatial, the fade is effects. */
-  .md .od-slide-next .page-content {
+  .md .bc-slide-next .page-content {
     animation:
-      od-slide-next-move var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default),
-      od-slide-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default);
+      od-slide-next-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
+      od-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
   }
 
-  .md .od-slide-previous .page-content {
+  .md .bc-slide-previous .page-content {
     animation:
-      od-slide-previous-move var(--od-motion-spatial-default-ms) var(--od-motion-spatial-default),
-      od-slide-fade var(--od-motion-effects-default-ms) var(--od-motion-effects-default);
+      od-slide-previous-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
+      od-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .od-slide-next .page-content,
-    .od-slide-previous .page-content,
-    .md .od-slide-next .page-content,
-    .md .od-slide-previous .page-content {
+    .bc-slide-next .page-content,
+    .bc-slide-previous .page-content,
+    .md .bc-slide-next .page-content,
+    .md .bc-slide-previous .page-content {
       animation: none;
     }
   }
@@ -1793,14 +1793,14 @@ html.ios {
   }
 }
 
-@keyframes od-slide-next {
+@keyframes bc-slide-next {
   from {
     opacity: 0;
     transform: translateX(40%);
   }
 }
 
-@keyframes od-slide-previous {
+@keyframes bc-slide-previous {
   from {
     opacity: 0;
     transform: translateX(-40%);
@@ -1809,7 +1809,7 @@ html.ios {
 
 /*
  * Android: Material 3 Expressive motion (lib/motion.js declares the
- * --od-motion-* tokens on <html>; docs/system-design.md, section 8, "Motion").
+ * --bc-motion-* tokens on <html>; docs/system-design.md, section 8, "Motion").
  * Outside the framework7 layer's reach: od.base wins over Framework7's own
  * durations and curves. "Remove animations" is handled by the
  * prefers-reduced-motion rule at the end of od.base (all durations ~0).
@@ -1818,42 +1818,42 @@ html.ios {
   /* Pages: the new page comes in with the default spatial spring; going back is
      faster (fast spatial), and the fade follows the effects spring. */
   .md .router-transition-forward .page-next {
-    animation-duration: var(--od-motion-spatial-default-ms);
-    animation-timing-function: var(--od-motion-spatial-default);
+    animation-duration: var(--bc-motion-spatial-default-ms);
+    animation-timing-function: var(--bc-motion-spatial-default);
   }
 
   .md .router-transition-forward .page-current {
-    animation-duration: var(--od-motion-spatial-default-ms);
-    animation-timing-function: var(--od-motion-spatial-default);
+    animation-duration: var(--bc-motion-spatial-default-ms);
+    animation-timing-function: var(--bc-motion-spatial-default);
   }
 
   .md .router-transition-backward .page-current {
-    animation-duration: var(--od-motion-spatial-fast-ms), var(--od-motion-effects-fast-ms);
-    animation-timing-function: var(--od-motion-spatial-fast), var(--od-motion-effects-fast);
+    animation-duration: var(--bc-motion-spatial-fast-ms), var(--bc-motion-effects-fast-ms);
+    animation-timing-function: var(--bc-motion-spatial-fast), var(--bc-motion-effects-fast);
   }
 
   .md .router-transition-backward .page-previous {
-    animation-duration: var(--od-motion-spatial-fast-ms);
-    animation-timing-function: var(--od-motion-spatial-fast);
+    animation-duration: var(--bc-motion-spatial-fast-ms);
+    animation-timing-function: var(--bc-motion-spatial-fast);
   }
 }
 
 /* Panels, sheets and popups are anchored to an edge: the same springs without overshoot. */
 html.md {
-  --f7-panel-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
-  --f7-panel-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
-  --f7-sheet-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
-  --f7-sheet-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
-  --f7-popup-transition-duration: var(--od-motion-anchored-default-ms, 400ms);
-  --f7-popup-transition-timing-function: var(--od-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+  --f7-panel-transition-duration: var(--bc-motion-anchored-default-ms, 400ms);
+  --f7-panel-transition-timing-function: var(--bc-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+  --f7-sheet-transition-duration: var(--bc-motion-anchored-default-ms, 400ms);
+  --f7-sheet-transition-timing-function: var(--bc-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
+  --f7-popup-transition-duration: var(--bc-motion-anchored-default-ms, 400ms);
+  --f7-popup-transition-timing-function: var(--bc-motion-anchored-default, cubic-bezier(0, 0.8, 0.34, 1));
 }
 
 /* Framework7's dialogs (alerts, confirmations): grow (spatial) and fade (effects). */
 @layer od.base {
   .md .dialog {
     transition-property: transform, opacity;
-    transition-duration: var(--od-motion-spatial-fast-ms, 200ms), var(--od-motion-effects-default-ms, 200ms);
-    transition-timing-function: var(--od-motion-spatial-fast, ease), var(--od-motion-effects-default, ease);
+    transition-duration: var(--bc-motion-spatial-fast-ms, 200ms), var(--bc-motion-effects-default-ms, 200ms);
+    transition-timing-function: var(--bc-motion-spatial-fast, ease), var(--bc-motion-effects-default, ease);
   }
 }
 
@@ -1862,7 +1862,7 @@ html.md {
  * moves, the next section is shown beside the current one.
  */
 @layer od.components {
-  .views.od-tab-sliding {
+  .views.bc-tab-sliding {
     overflow: hidden;
 
     > .view {
@@ -1878,7 +1878,7 @@ html.md {
    * recalculations: without it, the ripple of each touch restyled the whole
    * document, about 200 ms before the button reacted.
    */
-  .views:not(.od-tablet) > .view.tab:not(.tab-active, .od-tab-peek) {
+  .views:not(.bc-tablet) > .view.tab:not(.tab-active, .bc-tab-peek) {
     display: block;
     position: absolute;
     inset: 0;
@@ -1886,7 +1886,7 @@ html.md {
     content-visibility: hidden;
   }
 
-  .views > .view.od-tab-peek {
+  .views > .view.bc-tab-peek {
     display: block;
     position: absolute;
     inset: 0;
@@ -1895,79 +1895,79 @@ html.md {
 
   /*
    * A swipe that opens a page (Settings, About): the page is already open,
-   * beside the screen, and both follow --od-push-dx, set on the view.
+   * beside the screen, and both follow --bc-push-dx, set on the view.
    */
-  .view.od-pushing > .page {
-    transform: translate3d(calc(100% + var(--od-push-dx)), 0, 0);
+  .view.bc-pushing > .page {
+    transform: translate3d(calc(100% + var(--bc-push-dx)), 0, 0);
     transition: none;
     animation: none;
   }
 
   /* A swipe to the previous dive: the new page comes from the left (DiveDetail.svelte). */
-  .view.od-pushing.od-pushing-back > .page:not(.od-push-from) {
-    transform: translate3d(calc(-100% + var(--od-push-dx)), 0, 0);
+  .view.bc-pushing.bc-pushing-back > .page:not(.bc-push-from) {
+    transform: translate3d(calc(-100% + var(--bc-push-dx)), 0, 0);
   }
 
-  .view.od-pushing > .page.od-push-from {
-    transform: translate3d(var(--od-push-dx), 0, 0);
+  .view.bc-pushing > .page.bc-push-from {
+    transform: translate3d(var(--bc-push-dx), 0, 0);
   }
 
-  .view.od-push-settle > .page {
+  .view.bc-push-settle > .page {
     /* The spring set by the swipe (lib/swipe.js, settle). */
-    transition: transform var(--od-push-ms, 180ms) var(--od-push-ease, ease-out);
+    transition: transform var(--bc-push-ms, 180ms) var(--bc-push-ease, ease-out);
   }
 }
 
 /* The top bar of a section continues into its band (SectionBand.svelte). Out of
    the layers: these override Framework7's variables and its navbar. */
-.navbar.od-band-bar {
-  --f7-navbar-text-color: var(--od-on-band);
-  --f7-navbar-link-color: var(--od-on-band);
+.navbar.bc-band-bar {
+  --f7-navbar-text-color: var(--bc-on-band);
+  --f7-navbar-link-color: var(--bc-on-band);
   --f7-navbar-title-font-size: 22px;
   --f7-navbar-title-font-weight: 500;
-  --od-band-h: calc(var(--f7-safe-area-top) + 120px);
+  --bc-band-h: calc(var(--f7-safe-area-top) + 120px);
 }
 
-.navbar.od-band-bar.od-band-tall {
-  --od-band-h: calc(var(--f7-safe-area-top) + 190px);
+.navbar.bc-band-bar.bc-band-tall {
+  --bc-band-h: calc(var(--f7-safe-area-top) + 190px);
 }
 
 /* A sync pill (40 dp and its margin) between the summary and the search bar. */
-.navbar.od-band-bar.od-band-pill {
-  --od-band-h: calc(var(--f7-safe-area-top) + 242px);
+.navbar.bc-band-bar.bc-band-pill {
+  --bc-band-h: calc(var(--f7-safe-area-top) + 242px);
 }
 
-.navbar.od-band-bar .navbar-bg {
-  background-image: var(--od-band-grain), var(--od-band-gradient);
-  background-size: 256px 256px, 100% var(--od-band-h);
+.navbar.bc-band-bar .navbar-bg {
+  background-image: var(--bc-band-grain), var(--bc-band-gradient);
+  background-size: 256px 256px, 100% var(--bc-band-h);
   background-repeat: repeat, no-repeat;
   background-color: transparent;
 }
 
-.navbar.od-band-bar .navbar-bg::after {
+.navbar.bc-band-bar .navbar-bg::after {
   display: none;
 }
 
 /* The Logbook's search bar in its band: MD3, 56 dp, translucent white. */
 /* The page title sits on the ☰ row (task 2026-11-14-117): MD3 top app bar title, 22/28,
    weight 500, white, one line with an ellipsis; the band under it holds the summary. */
-.navbar.od-band-bar .title {
+.navbar.bc-band-bar .title {
   line-height: 28px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.searchbar.od-band-search {
+.searchbar.bc-band-search {
   --f7-searchbar-height: 56px;
   --f7-searchbar-input-height: 56px;
   --f7-searchbar-input-border-radius: 28px;
-  --f7-searchbar-input-bg-color: var(--od-band-control);
+  --f7-searchbar-input-bg-color: var(--bc-band-control);
   /* The band stays light in dark mode, so its field keeps the band's ink, not the page's. */
-  --f7-searchbar-input-text-color: var(--od-on-band-control);
-  --f7-searchbar-placeholder-color: var(--od-on-band-control-2);
-  --f7-searchbar-search-icon-color: var(--od-on-band-control);
-  --f7-searchbar-clear-button-color: var(--od-on-band-control-2);
+  --f7-searchbar-input-text-color: var(--bc-on-band-control);
+  --f7-searchbar-placeholder-color: var(--bc-on-band-control-2);
+  --f7-searchbar-search-icon-color: var(--bc-on-band-control);
+  --f7-searchbar-clear-button-color: var(--bc-on-band-control-2);
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   position: relative;
@@ -1977,16 +1977,16 @@ html.md {
   box-shadow: none;
 }
 
-.searchbar.od-band-search .searchbar-inner {
+.searchbar.bc-band-search .searchbar-inner {
   padding: 0;
 }
 
 /* iPhone (task 289, ios-carnet.dc.html): the large title without a band; the search field is the system's grey one. */
-.ios .searchbar.od-ios-search {
+.ios .searchbar.bc-ios-search {
   --f7-searchbar-height: 40px;
   --f7-searchbar-input-height: 36px;
   --f7-searchbar-input-border-radius: 10px;
-  --f7-searchbar-input-bg-color: var(--od-surface-container-highest);
+  --f7-searchbar-input-bg-color: var(--bc-surface-container-highest);
   --f7-searchbar-inner-padding-left: 0px;
   --f7-searchbar-inner-padding-right: 0px;
   margin: 0;
@@ -1994,7 +1994,7 @@ html.md {
   box-shadow: none;
 }
 
-.ios .searchbar.od-ios-search .searchbar-inner {
+.ios .searchbar.bc-ios-search .searchbar-inner {
   padding: 0;
 }
 
@@ -2003,15 +2003,15 @@ html.md {
  * every message of the app (lib/snackbar.js). The same on iOS and Android.
  */
 @layer od.components {
-  .toast.od-snackbar {
-    --od-snackbar-bottom: calc(24px + var(--od-bottom-nav-room, 0px));
-    inset: auto 16px calc(var(--od-snackbar-bottom) + var(--f7-safe-area-bottom)) 16px;
+  .toast.bc-snackbar {
+    --bc-snackbar-bottom: calc(24px + var(--bc-bottom-nav-room, 0px));
+    inset: auto 16px calc(var(--bc-snackbar-bottom) + var(--f7-safe-area-bottom)) 16px;
     width: auto;
     max-width: 568px;
     margin: 0;
     border-radius: 4px;
-    background: var(--od-inverse-surface);
-    color: var(--od-inverse-on-surface);
+    background: var(--bc-inverse-surface);
+    color: var(--bc-inverse-on-surface);
     box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
     transform: scale(0.9);
     transition-duration: 200ms;
@@ -2023,8 +2023,8 @@ html.md {
 
     /* The first launch's snackbar on a tablet (task 2026-11-16-239): bottom left, 24 dp from the rail's edge. */
     @media (min-width: 768px) {
-      &.od-snackbar-start {
-        left: calc(var(--od-nav-width, 96px) + 24px);
+      &.bc-snackbar-start {
+        left: calc(var(--bc-nav-width, 96px) + 24px);
         right: auto;
         bottom: calc(24px + var(--f7-safe-area-bottom));
         width: max-content;
@@ -2032,8 +2032,8 @@ html.md {
     }
 
     /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */
-    &.od-snackbar-above-fab {
-      --od-snackbar-bottom: calc(88px + var(--od-bottom-nav-room, 0px));
+    &.bc-snackbar-above-fab {
+      --bc-snackbar-bottom: calc(88px + var(--bc-bottom-nav-room, 0px));
     }
 
     .toast-content {
@@ -2062,7 +2062,7 @@ html.md {
       padding: 0 12px;
       border-radius: 4px;
       background: none;
-      color: var(--od-inverse-primary);
+      color: var(--bc-inverse-primary);
       font-size: 14px;
       font-weight: 600;
       text-transform: none;
@@ -2075,27 +2075,27 @@ html.md {
 /*
  * Top app bar of pages without a band (system design, « Top app bar of pages without a band »,
  * task 2026-11-13-114). Android: the page colour, no hairline, no shadow; once the content
- * is scrolled (lib/top-bar.js), --od-surface-container, MD3's « on scroll » state. :where()
+ * is scrolled (lib/top-bar.js), --bc-surface-container, MD3's « on scroll » state. :where()
  * keeps the rule weak, so a page that sets its own bar (a picture under it, an editorial
  * page) still wins. iOS keeps its own bar.
  */
-.md :where(.navbar:not(.od-band-bar)) {
-  --f7-navbar-bg-color: var(--od-background);
+.md :where(.navbar:not(.bc-band-bar)) {
+  --f7-navbar-bg-color: var(--bc-background);
   --f7-navbar-hairline-color: transparent;
   --f7-navbar-shadow-image: none;
 }
 
-.md :where(.navbar:not(.od-band-bar)) .navbar-bg {
+.md :where(.navbar:not(.bc-band-bar)) .navbar-bg {
   box-shadow: none;
   transition: background-color 150ms linear;
 }
 
-.md :where(.navbar.od-navbar-scrolled:not(.od-band-bar)) {
-  --f7-navbar-bg-color: var(--od-surface-container);
+.md :where(.navbar.bc-navbar-scrolled:not(.bc-band-bar)) {
+  --f7-navbar-bg-color: var(--bc-surface-container);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .md :where(.navbar:not(.od-band-bar)) .navbar-bg {
+  .md :where(.navbar:not(.bc-band-bar)) .navbar-bg {
     transition: none;
   }
 }
@@ -2105,56 +2105,56 @@ html.md {
  * sections end above it; their « + » and the snackbar move up by the bar's room (64 dp of bar, they
  * sat 24 dp from the screen's edge: 56 dp more keeps them 16 dp above it).
  */
-html.od-bottom-nav-on {
-  --od-bottom-nav-room: 56px;
-  --od-bottom-nav-height: 64px;
+html.bc-bottom-nav-on {
+  --bc-bottom-nav-room: 56px;
+  --bc-bottom-nav-height: 64px;
 }
 
-html.od-bottom-nav-on .view.tab-active > .page-current > .page-content,
-html.od-bottom-nav-on .view.tab-active > .page-master > .page-content {
-  padding-bottom: calc(var(--od-bottom-nav-height) + var(--f7-safe-area-bottom, 0px));
+html.bc-bottom-nav-on .view.tab-active > .page-current > .page-content,
+html.bc-bottom-nav-on .view.tab-active > .page-master > .page-content {
+  padding-bottom: calc(var(--bc-bottom-nav-height) + var(--f7-safe-area-bottom, 0px));
 }
 
-html.od-bottom-nav-on .view.tab-active > .page-current .fab-right-bottom {
-  bottom: calc(var(--od-bottom-nav-room) + 24px + var(--f7-safe-area-bottom, 0px));
+html.bc-bottom-nav-on .view.tab-active > .page-current .fab-right-bottom {
+  bottom: calc(var(--bc-bottom-nav-room) + 24px + var(--f7-safe-area-bottom, 0px));
 }
 
 /*
  * The sample logbook's banner on a phone (components/DemoHost.svelte, mock-up android-demo) sits above the bar:
  * 64 dp of card and 8 dp of gap more under the lists, over the « + » and the snackbar.
  */
-html.od-bottom-nav-on.od-demo-bottom-on {
-  --od-demo-bottom-room: 72px;
-  --od-bottom-nav-room: calc(56px + var(--od-demo-bottom-room));
+html.bc-bottom-nav-on.bc-demo-bottom-on {
+  --bc-demo-bottom-room: 72px;
+  --bc-bottom-nav-room: calc(56px + var(--bc-demo-bottom-room));
 }
 
-html.od-bottom-nav-on.od-demo-bottom-on .view.tab-active > .page-current > .page-content,
-html.od-bottom-nav-on.od-demo-bottom-on .view.tab-active > .page-master > .page-content {
-  padding-bottom: calc(var(--od-bottom-nav-height) + var(--od-demo-bottom-room) + var(--f7-safe-area-bottom, 0px));
+html.bc-bottom-nav-on.bc-demo-bottom-on .view.tab-active > .page-current > .page-content,
+html.bc-bottom-nav-on.bc-demo-bottom-on .view.tab-active > .page-master > .page-content {
+  padding-bottom: calc(var(--bc-bottom-nav-height) + var(--bc-demo-bottom-room) + var(--f7-safe-area-bottom, 0px));
 }
 
 /* iPhone: the tab bar is 49 pt high, and there is no floating « + » to lift. */
-html.ios.od-bottom-nav-on {
-  --od-bottom-nav-height: 49px;
+html.ios.bc-bottom-nav-on {
+  --bc-bottom-nav-height: 49px;
 }
 
 /* iPhone (tab bar): no ☰, and no empty glass button where it was. */
-html.ios.od-bottom-nav .navbar .left:not(:has(a, button)) {
+html.ios.bc-bottom-nav .navbar .left:not(:has(a, button)) {
   display: none;
 }
 
 /* Android phone (bottom bar): a section's top bar has no ☰; its title starts 16 dp from the edge. */
-html.md.od-bottom-nav .navbar .left:not(:has(a, button)) {
+html.md.bc-bottom-nav .navbar .left:not(:has(a, button)) {
   display: none;
 }
 
-html.md.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
+html.md.bc-bottom-nav .navbar .left:not(:has(a, button)) + .title {
   margin-left: 16px;
 }
 
 /* The confirm button of a deletion that cannot be undone (confirmAction with danger): the red of the delete tiles. */
-.dialog .dialog-button.od-dialog-danger {
-  color: var(--od-late-text);
+.dialog .dialog-button.bc-dialog-danger {
+  color: var(--bc-late-text);
 }
 
 /*
@@ -2162,14 +2162,14 @@ html.md.od-bottom-nav .navbar .left:not(:has(a, button)) + .title {
  * one per line, aligned to the end, the main action (the last one) on top, 8 dp apart, labels that
  * wrap instead of being cut.
  */
-.dialog.od-dialog-stacked .dialog-buttons {
+.dialog.bc-dialog-stacked .dialog-buttons {
   flex-direction: column-reverse;
   align-items: flex-end;
   height: auto !important;
   gap: 8px;
 }
 
-.dialog.od-dialog-stacked .dialog-button {
+.dialog.bc-dialog-stacked .dialog-button {
   max-width: 100%;
   height: auto;
   min-height: 40px;

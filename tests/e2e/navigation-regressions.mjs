@@ -103,7 +103,7 @@ export async function regressionFlows(h) {
   tab = await h.openTab(390, 844, true);
   const section = async (name) => {
     const at = await tab.run((n) => {
-      const link = [...document.querySelectorAll('.od-navigation-bar a, .od-navigation-bar button, .toolbar a, .tabbar a')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
+      const link = [...document.querySelectorAll('.bc-navigation-bar a, .bc-navigation-bar button, .toolbar a, .tabbar a')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
       const r = link?.getBoundingClientRect();
       return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
     }, name);
@@ -161,7 +161,7 @@ export async function regressionFlows(h) {
   console.log(' tablet: Statistiques, back to the Carnet, then a dive tapped in the list');
   const rail = async (name) => {
     const at = await wide.run((n) => {
-      const link = [...document.querySelectorAll('.od-nav-rail a, .od-nav-rail button')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
+      const link = [...document.querySelectorAll('.bc-nav-rail a, .bc-nav-rail button')].find((a) => new RegExp(`^\\s*${n}\\s*$`).test(a.textContent));
       const r = link?.getBoundingClientRect();
       return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
     }, name);

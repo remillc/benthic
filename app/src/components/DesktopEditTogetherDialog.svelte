@@ -180,20 +180,20 @@
 
 {#snippet chips(/** @type {'guides'|'buddies'|'tags'} */ key, /** @type {string} */ label)}
   {@const proposed = proposals(key)}
-  <div class="od-edit-together--field">
-    <label class="od-edit-together--label" for="od-et-{uid}-{key}">{label}</label>
-    <div class="od-edit-together--chips">
+  <div class="bc-edit-together--field">
+    <label class="bc-edit-together--label" for="od-et-{uid}-{key}">{label}</label>
+    <div class="bc-edit-together--chips">
       {#each listOf(key) as name (name)}
         {@const note = noteOf(key, name)}
-        <span class="od-edit-together--chip" class:od-edit-together--chip-some={!!note}>
-          {name}{#if note}<span class="od-edit-together--chip-note">{note}</span>{/if}
-          <button type="button" class="od-edit-together--chip-x" aria-label={t('desktopDetail.removeItem', { name })} onclick={() => removeChip(key, name)}><Icon name="close" size={14} /></button>
+        <span class="bc-edit-together--chip" class:bc-edit-together--chip-some={!!note}>
+          {name}{#if note}<span class="bc-edit-together--chip-note">{note}</span>{/if}
+          <button type="button" class="bc-edit-together--chip-x" aria-label={t('desktopDetail.removeItem', { name })} onclick={() => removeChip(key, name)}><Icon name="close" size={14} /></button>
         </span>
       {/each}
-      <input id="od-et-{uid}-{key}" class="od-edit-together--chip-input" type="text" autocomplete="off" bind:value={typed[key]} onkeydown={(e) => chipKey(e, key)} />
+      <input id="od-et-{uid}-{key}" class="bc-edit-together--chip-input" type="text" autocomplete="off" bind:value={typed[key]} onkeydown={(e) => chipKey(e, key)} />
     </div>
     {#if proposed.length && typed[key].trim()}
-      <ul class="od-edit-together--suggestions">
+      <ul class="bc-edit-together--suggestions">
         {#each proposed as name (name)}
           <li><button type="button" onmousedown={(e) => e.preventDefault()} onclick={() => addChip(key, name)}>{name}</button></li>
         {/each}
@@ -202,17 +202,17 @@
   </div>
 {/snippet}
 
-<Md3Dialog class="od-edit-together" title={t('multiDive.editTitle', { n })} oncancel={onclose}>
+<Md3Dialog class="bc-edit-together" title={t('multiDive.editTitle', { n })} oncancel={onclose}>
   {#if failed}
-    <p class="od-edit-together--message">{t('multiDive.loadFailed')}</p>
+    <p class="bc-edit-together--message">{t('multiDive.loadFailed')}</p>
   {:else if state}
-    <div class="od-edit-together--form">
-      <div class="od-edit-together--field">
-        <label class="od-edit-together--label" for="od-et-{uid}-site">{t('edit.site')}</label>
+    <div class="bc-edit-together--form">
+      <div class="bc-edit-together--field">
+        <label class="bc-edit-together--label" for="od-et-{uid}-site">{t('edit.site')}</label>
         <input
           id="od-et-{uid}-site"
-          class="od-edit-together--input"
-          class:od-edit-together--many={state.site.mixed && !siteTouched}
+          class="bc-edit-together--input"
+          class:bc-edit-together--many={state.site.mixed && !siteTouched}
           type="text"
           autocomplete="off"
           list="od-et-{uid}-sites"
@@ -227,11 +227,11 @@
       {@render chips('buddies', t('edit.buddies'))}
       {@render chips('tags', t('edit.tags'))}
 
-      <div class="od-edit-together--field">
-        <label class="od-edit-together--label" for="od-et-{uid}-suit">{t('edit.suit')}</label>
+      <div class="bc-edit-together--field">
+        <label class="bc-edit-together--label" for="od-et-{uid}-suit">{t('edit.suit')}</label>
         <input
           id="od-et-{uid}-suit"
-          class="od-edit-together--input"
+          class="bc-edit-together--input"
           type="text"
           autocomplete="off"
           list="od-et-{uid}-suits"
@@ -242,12 +242,12 @@
         <datalist id="od-et-{uid}-suits">{#each known.suit as name (name)}<option value={name}></option>{/each}</datalist>
       </div>
 
-      <div class="od-edit-together--field">
-        <label class="od-edit-together--label" for="od-et-{uid}-water">{t('edit.waterType')}</label>
+      <div class="bc-edit-together--field">
+        <label class="bc-edit-together--label" for="od-et-{uid}-water">{t('edit.waterType')}</label>
         <select
           id="od-et-{uid}-water"
-          class="od-edit-together--input"
-          class:od-edit-together--many={state.salinity.mixed && !waterTouched}
+          class="bc-edit-together--input"
+          class:bc-edit-together--many={state.salinity.mixed && !waterTouched}
           value={state.salinity.mixed && !waterTouched ? '__many' : waterType}
           onchange={waterChosen}
         >
@@ -255,12 +255,12 @@
         </select>
       </div>
 
-      <div class="od-edit-together--field">
-        <label class="od-edit-together--label" for="od-et-{uid}-notes">{t('edit.notes')}</label>
+      <div class="bc-edit-together--field">
+        <label class="bc-edit-together--label" for="od-et-{uid}-notes">{t('edit.notes')}</label>
         <textarea
           id="od-et-{uid}-notes"
-          class="od-edit-together--input od-edit-together--textarea"
-          class:od-edit-together--many={state.notes.mixed && !notesTouched}
+          class="bc-edit-together--input bc-edit-together--textarea"
+          class:bc-edit-together--many={state.notes.mixed && !notesTouched}
           rows="4"
           placeholder={state.notes.mixed && !notesTouched ? many : ''}
           bind:value={notes}
@@ -278,81 +278,81 @@
 
 <style>
   @layer od.components {
-    .od-edit-together--form {
+    .bc-edit-together--form {
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding: 4px 24px 8px;
     }
-    .od-edit-together--message {
+    .bc-edit-together--message {
       margin: 0;
       padding: 0 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-edit-together--label {
+    .bc-edit-together--label {
       display: block;
       margin-bottom: 4px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-edit-together--input,
-    .od-edit-together--chips {
+    .bc-edit-together--input,
+    .bc-edit-together--chips {
       box-sizing: border-box;
       width: 100%;
       min-height: 40px;
       padding: 0 12px;
       border: 1px solid transparent;
       border-radius: 8px;
-      background: var(--od-surface-container);
-      color: var(--od-text);
+      background: var(--bc-surface-container);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
     }
-    .od-edit-together--input:focus,
-    .od-edit-together--chips:focus-within {
+    .bc-edit-together--input:focus,
+    .bc-edit-together--chips:focus-within {
       outline: none;
-      border: 2px solid var(--od-action);
+      border: 2px solid var(--bc-action);
       padding: 0 11px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-edit-together--textarea {
+    .bc-edit-together--textarea {
       padding-block: 8px;
       resize: vertical;
     }
-    /* « Plusieurs valeurs » in #4B4A47 (--od-text-2): not one of the dives' values. */
-    .od-edit-together--many::placeholder {
-      color: var(--od-text-2);
+    /* « Plusieurs valeurs » in #4B4A47 (--bc-text-2): not one of the dives' values. */
+    .bc-edit-together--many::placeholder {
+      color: var(--bc-text-2);
       opacity: 1;
     }
-    select.od-edit-together--many {
-      color: var(--od-text-2);
+    select.bc-edit-together--many {
+      color: var(--bc-text-2);
     }
-    .od-edit-together--chips {
+    .bc-edit-together--chips {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 6px;
       padding-block: 4px;
     }
-    .od-edit-together--chip {
+    .bc-edit-together--chip {
       display: inline-flex;
       align-items: center;
       gap: 4px;
       height: 28px;
       padding: 0 4px 0 10px;
       border-radius: 14px;
-      background: var(--od-surface);
-      border: 1px solid var(--od-separator);
+      background: var(--bc-surface);
+      border: 1px solid var(--bc-separator);
       font-size: 14px;
     }
-    .od-edit-together--chip-some {
+    .bc-edit-together--chip-some {
       border-style: dashed;
     }
-    .od-edit-together--chip-note {
+    .bc-edit-together--chip-note {
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-edit-together--chip-x {
+    .bc-edit-together--chip-x {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -365,7 +365,7 @@
       color: inherit;
       cursor: pointer;
     }
-    .od-edit-together--chip-input {
+    .bc-edit-together--chip-input {
       flex: 1;
       min-width: 80px;
       height: 28px;
@@ -376,28 +376,28 @@
       font-size: 15px;
       outline: none;
     }
-    .od-edit-together--suggestions {
+    .bc-edit-together--suggestions {
       margin: 4px 0 0;
       padding: 4px 0;
       list-style: none;
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
     }
-    .od-edit-together--suggestions button {
+    .bc-edit-together--suggestions button {
       display: block;
       width: 100%;
       padding: 8px 12px;
       border: 0;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 14px;
       text-align: start;
       cursor: pointer;
     }
-    .od-edit-together--suggestions button:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-edit-together--suggestions button:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
   }
 </style>

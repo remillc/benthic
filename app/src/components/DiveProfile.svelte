@@ -362,15 +362,15 @@
   );
 </script>
 
-<div class="od-dive-profile od-dive-profile--profile od-block no-swipeback">
+<div class="bc-dive-profile bc-dive-profile--profile bc-block no-swipeback">
   <!-- Desktop: the tooltip under the mouse carries the values. -->
   {#if !hover}
-  <div class="od-dive-profile--readout od-value" aria-hidden="true">
+  <div class="bc-dive-profile--readout bc-value" aria-hidden="true">
     {#if cursor !== null}
       <span>{t('profile.time')} <strong>{formatMinSec(times[cursor])}</strong></span>
       <span>{t('profile.depth')} <strong>{formatDepth(depths[cursor], prefs)}</strong></span>
       {#if showTemperature && temperature && temperature.mk[cursor] > 0}
-        <span>{t('profile.water')} <strong class="od-dive-profile--water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
+        <span>{t('profile.water')} <strong class="bc-dive-profile--water">{formatTemperature(temperature.mk[cursor], prefs)}</strong></span>
       {/if}
       {#if showPpo2}
         <span>{t('profile.ppo2')} <strong>{formatPartialPressure(samples.ppo2Mbar[cursor] / 1000, 2)}</strong></span>
@@ -382,12 +382,12 @@
         <span>{t('profile.ceilingCalc')} <strong>{formatDepth(calcCeilingMm[cursor], prefs)}</strong></span>
       {/if}
     {:else}
-      <span class="od-dive-profile--hint">{t('profile.hint')}</span>
+      <span class="bc-dive-profile--hint">{t('profile.hint')}</span>
     {/if}
   </div>
   {/if}
 
-  <div class="od-dive-profile--frame" use:widthOf>
+  <div class="bc-dive-profile--frame" use:widthOf>
     <svg
       {width}
       height={HEIGHT + (gasLayer ? BAND + 4 : 0)}
@@ -400,54 +400,54 @@
     >
       <defs>
         <linearGradient id="water-{uid}" x1="0" y1={y(0)} x2="0" y2={y(dMax)} gradientUnits="userSpaceOnUse">
-          <stop offset="0" style="stop-color: var(--od-water-top)" />
+          <stop offset="0" style="stop-color: var(--bc-water-top)" />
           <stop offset="1" style="stop-color: {waterBottomColor(maxDepthMm)}" />
         </linearGradient>
       </defs>
 
       {#each ticks.list as tick (tick.value)}
         {#if tick.major}
-          <line class="od-dive-profile--grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
-          <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
+          <line class="bc-dive-profile--grid" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={y(tick.mm)} y2={y(tick.mm)} />
+          <text class="bc-dive-profile--tick bc-value" x={MARGIN_LEFT - 4} y={y(tick.mm) + 4} text-anchor="end"
             >{tick.value === 0 ? `0\u00A0${depthUnit(prefs)}` : tick.value}</text
           >
         {:else}
-          <line class="od-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
+          <line class="bc-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + 5} y1={y(tick.mm)} y2={y(tick.mm)} />
         {/if}
       {/each}
 
       {#if paths}
         <path d={paths.water} fill="url(#water-{uid})" />
         {#if ceilingLayer && ceilingShape}
-          <path d={ceilingShape.area} class="od-dive-profile--ceiling-area" />
-          <path d={ceilingShape.edge} class="od-dive-profile--ceiling-line" />
+          <path d={ceilingShape.area} class="bc-dive-profile--ceiling-area" />
+          <path d={ceilingShape.edge} class="bc-dive-profile--ceiling-line" />
         {/if}
         {#if ceilingLayer && calcCeilingEdge}
-          <path d={calcCeilingEdge} class="od-dive-profile--ceiling-line od-dive-profile--ceiling-calc" />
+          <path d={calcCeilingEdge} class="bc-dive-profile--ceiling-line bc-dive-profile--ceiling-calc" />
         {/if}
         {#if showMean && hover}
           <!-- Desktop (task 2026-11-15-185): above the water, under the curves and the cursor; the label just above its left end. -->
-          <line class="od-dive-profile--mean-desk" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
-          <text class="od-dive-profile--mean-desk-label od-value" x={MARGIN_LEFT + 4} y={meanY - 4}>{t('desktopDetail.mean', { depth: formatDepth(meanDepthMm, prefs) })}</text>
+          <line class="bc-dive-profile--mean-desk" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
+          <text class="bc-dive-profile--mean-desk-label bc-value" x={MARGIN_LEFT + 4} y={meanY - 4}>{t('desktopDetail.mean', { depth: formatDepth(meanDepthMm, prefs) })}</text>
         {/if}
-        <path d={paths.line} class="od-dive-profile--trace-outline" />
-        <path d={paths.line} class="od-dive-profile--trace" />
+        <path d={paths.line} class="bc-dive-profile--trace-outline" />
+        <path d={paths.line} class="bc-dive-profile--trace" />
       {/if}
 
-      <line class="od-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight} />
+      <line class="bc-dive-profile--axis" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight} />
       {#each timeTicks.list as tick (tick.m)}
         {@const tx = x(tick.m * 60)}
-        <line class="od-dive-profile--axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
+        <line class="bc-dive-profile--axis" x1={tx} x2={tx} y1={MARGIN_TOP + plotHeight} y2={MARGIN_TOP + plotHeight + (tick.major ? 6 : 4)} />
         {#if tick.major}
-          <text class="od-dive-profile--tick od-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
+          <text class="bc-dive-profile--tick bc-value" x={tx} y={MARGIN_TOP + plotHeight + 17} text-anchor="middle"
             >{tick.m === timeTicks.lastMajor && tick.m > 0 ? `${tick.m}\u00A0${t('units.minutes')}` : tick.m}</text
           >
         {/if}
       {/each}
 
       {#if showMean && !hover}
-        <line class="od-dive-profile--mean" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
-        <text class="od-dive-profile--mean-label od-value" x={MARGIN_LEFT - 4} y={meanLabel + 3} text-anchor="end"
+        <line class="bc-dive-profile--mean" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={meanY} y2={meanY} />
+        <text class="bc-dive-profile--mean-label bc-value" x={MARGIN_LEFT - 4} y={meanLabel + 3} text-anchor="end"
           >{t('profile.mean', { depth: depthValue(meanDepthMm, prefs) })}</text
         >
       {/if}
@@ -455,28 +455,28 @@
       {#if ends}
         <!-- Second label row: the first digit of each time on its tick, the word to its left. -->
         {@const rowY = MARGIN_TOP + plotHeight + 32}
-        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 7} y={rowY} text-anchor="end">{t('profile.entry')}</text>
-        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT - 3} y={rowY}>{ends.entry}</text>
-        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT + plotWidth - 7} y={rowY} text-anchor="end">{t('profile.exit')}</text>
-        <text class="od-dive-profile--tick od-value" x={MARGIN_LEFT + plotWidth - 3} y={rowY}>{ends.exit}</text>
+        <text class="bc-dive-profile--tick bc-value" x={MARGIN_LEFT - 7} y={rowY} text-anchor="end">{t('profile.entry')}</text>
+        <text class="bc-dive-profile--tick bc-value" x={MARGIN_LEFT - 3} y={rowY}>{ends.entry}</text>
+        <text class="bc-dive-profile--tick bc-value" x={MARGIN_LEFT + plotWidth - 7} y={rowY} text-anchor="end">{t('profile.exit')}</text>
+        <text class="bc-dive-profile--tick bc-value" x={MARGIN_LEFT + plotWidth - 3} y={rowY}>{ends.exit}</text>
       {/if}
 
       {#if showPpo2}
         {#each [1.4, 1.6] as limit (limit)}
-          <line class="od-dive-profile--ppo2-limit" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={yPpo2(limit)} y2={yPpo2(limit)} />
+          <line class="bc-dive-profile--ppo2-limit" x1={MARGIN_LEFT} x2={MARGIN_LEFT + plotWidth} y1={yPpo2(limit)} y2={yPpo2(limit)} />
         {/each}
-        <path d={ppo2Path} class="od-dive-profile--ppo2" />
+        <path d={ppo2Path} class="bc-dive-profile--ppo2" />
       {/if}
       {#if showTemperature}
-        <path d={temperaturePath} class="od-dive-profile--temperature" />
+        <path d={temperaturePath} class="bc-dive-profile--temperature" />
       {/if}
       {#if rightScale === 'temperature'}
         {#each temperatureLabels as label (label.y)}
-          <text class="od-dive-profile--temperature-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
+          <text class="bc-dive-profile--temperature-label bc-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {:else if rightScale === 'ppo2'}
         {#each ppo2Labels as label (label.y)}
-          <text class="od-dive-profile--ppo2-label od-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
+          <text class="bc-dive-profile--ppo2-label bc-value" x={MARGIN_LEFT + plotWidth + 2} y={label.y}>{label.text}</text>
         {/each}
       {/if}
 
@@ -484,7 +484,7 @@
         {#each gasSegments as s, i (i)}
           {@const x1 = x(s.start)}
           {@const x2 = Math.max(x(s.end), x1 + 1)}
-          <g class="od-dive-profile--gas" class:od-dive-profile--oxygen={s.oxygen}>
+          <g class="bc-dive-profile--gas" class:bc-dive-profile--oxygen={s.oxygen}>
             <rect x={x1} y={HEIGHT + 2} width={x2 - x1} height={BAND} rx="3" />
             {#if x2 - x1 > 44}
               <text x={x1 + 6} y={HEIGHT + 2 + BAND / 2 + 4}>{s.name}</text>
@@ -494,15 +494,15 @@
       {/if}
 
       {#if cursor !== null}
-        <line class="od-dive-profile--cursor" class:od-dive-profile--cursor-hover={hover} x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
-        {#if hover}<circle class="od-dive-profile--depth-dot" cx={x(times[cursor])} cy={y(depths[cursor])} r="4" />{/if}
+        <line class="bc-dive-profile--cursor" class:bc-dive-profile--cursor-hover={hover} x1={x(times[cursor])} x2={x(times[cursor])} y1={MARGIN_TOP} y2={MARGIN_TOP + scaleHeight} />
+        {#if hover}<circle class="bc-dive-profile--depth-dot" cx={x(times[cursor])} cy={y(depths[cursor])} r="4" />{/if}
         {#if showTemperature && temperature && temperature.mk[cursor] > 0}
-          <circle class="od-dive-profile--temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
+          <circle class="bc-dive-profile--temperature-dot" cx={x(times[cursor])} cy={yTemperature(temperature.mk[cursor])} r="4" />
         {/if}
       {/if}
     </svg>
     {#if tip}
-      <div class="od-dive-profile--tip od-value" class:od-dive-profile--tip-left={tip.flip} style:left="{tip.left}px" style:top="{tip.top}px" aria-hidden="true">
+      <div class="bc-dive-profile--tip bc-value" class:bc-dive-profile--tip-left={tip.flip} style:left="{tip.left}px" style:top="{tip.top}px" aria-hidden="true">
         <span>{tip.first}</span>
         {#if tip.second}<span>{tip.second}</span>{/if}
       </div>
@@ -512,29 +512,29 @@
   {#if tissuesLayer && tissuesAvailable}
     <!-- Tissues: a separate drawing under the chart, so that the PDF sheet keeps the chart alone. -->
     <svg
-      class="od-dive-profile--tissues"
+      class="bc-dive-profile--tissues"
       width={tissuesWidth}
       height={T_HEIGHT}
       role="img"
       aria-label={t('profile.tissuesLabel')}
     >
-      <path class="od-dive-profile--tissue-limit" d="M0 {T_TOP} H{tissuesWidth}" />
+      <path class="bc-dive-profile--tissue-limit" d="M0 {T_TOP} H{tissuesWidth}" />
       {#each tissueValues as percent, c (c)}
         {@const h = tissueHeight(percent)}
         <rect x={c * (tissueBar + T_GAP)} y={T_BOTTOM - h} width={tissueBar} height={h} rx="2" style:fill={tissueColor(percent)} />
       {/each}
-      <text class="od-dive-profile--tick od-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
-      <text class="od-dive-profile--tick od-value" x={tissuesWidth} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
+      <text class="bc-dive-profile--tick bc-value" x="0" y={T_HEIGHT - 4}>{t('desaturation.fast')}</text>
+      <text class="bc-dive-profile--tick bc-value" x={tissuesWidth} y={T_HEIGHT - 4} text-anchor="end">{t('desaturation.slow')}</text>
     </svg>
   {/if}
 
   {#if temperatureAvailable || gasAvailable || ppo2Available || ceilingAvailable || tissuesAvailable || onenlarge}
-    <div class="od-dive-profile--layers" class:od-dive-profile--layers-desk={hover} role="group" aria-label={t('profile.layers')}>
+    <div class="bc-dive-profile--layers" class:bc-dive-profile--layers-desk={hover} role="group" aria-label={t('profile.layers')}>
       <!-- MD3 filter chips, 48 px targets around 32 px chips (spec, section 3); the row scrolls sideways. -->
       {#if temperatureAvailable}
         <button
           type="button"
-          class="od-dive-profile--filter"
+          class="bc-dive-profile--filter"
           aria-pressed={temperatureLayer}
           onclick={() => {
             temperatureLayer = !temperatureLayer;
@@ -542,14 +542,14 @@
             remember('temperature', temperatureLayer);
           }}
         >
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!temperatureLayer} class:od-dive-profile--chip-temperature={temperatureLayer}>
+          <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!temperatureLayer} class:bc-dive-profile--chip-temperature={temperatureLayer}>
             {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t(layout.phone ? 'profile.temperatureShort' : 'profile.temperature')}</span>
           </span>
         </button>
       {/if}
       {#if gasAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={gasLayer} onclick={() => ((gasLayer = !gasLayer), remember('gas', gasLayer))}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!gasLayer} class:od-dive-profile--chip-ink={gasLayer}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={gasLayer} onclick={() => ((gasLayer = !gasLayer), remember('gas', gasLayer))}>
+          <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!gasLayer} class:bc-dive-profile--chip-ink={gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
           </span>
         </button>
@@ -557,7 +557,7 @@
       {#if ppo2Available}
         <button
           type="button"
-          class="od-dive-profile--filter"
+          class="bc-dive-profile--filter"
           aria-pressed={ppo2Layer}
           onclick={() => {
             ppo2Layer = !ppo2Layer;
@@ -565,28 +565,28 @@
             remember('ppo2', ppo2Layer);
           }}
         >
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ppo2Layer} class:od-dive-profile--chip-ppo2={ppo2Layer}>
+          <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!ppo2Layer} class:bc-dive-profile--chip-ppo2={ppo2Layer}>
             {#if ppo2Layer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ppo2')}</span>
           </span>
         </button>
       {/if}
       {#if ceilingAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => ((ceilingLayer = !ceilingLayer), remember('ceiling', ceilingLayer))}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!ceilingLayer} class:od-dive-profile--chip-ceiling={ceilingLayer}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => ((ceilingLayer = !ceilingLayer), remember('ceiling', ceilingLayer))}>
+          <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!ceilingLayer} class:bc-dive-profile--chip-ceiling={ceilingLayer}>
             {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
           </span>
         </button>
       {/if}
       {#if tissuesAvailable}
-        <button type="button" class="od-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => ((tissuesLayer = !tissuesLayer), remember('tissues', tissuesLayer))}>
-          <span class="chip od-dive-profile--chip" class:od-dive-profile--chip-outline={!tissuesLayer} class:od-dive-profile--chip-ink={tissuesLayer}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => ((tissuesLayer = !tissuesLayer), remember('tissues', tissuesLayer))}>
+          <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!tissuesLayer} class:bc-dive-profile--chip-ink={tissuesLayer}>
             {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
         </button>
       {/if}
       {#if onenlarge}
         <!-- « Agrandir le profil » (Ctrl+P): at the end of the row. -->
-        <button type="button" class="od-dive-profile--enlarge" aria-label={t('desktopDetail.enlarge')} title={t('desktopDetail.enlargeTip', { shortcut: desktopMac ? '⌘P' : 'Ctrl+P' })} onclick={onenlarge}><Icon name="fullscreen" size={20} /></button>
+        <button type="button" class="bc-dive-profile--enlarge" aria-label={t('desktopDetail.enlarge')} title={t('desktopDetail.enlargeTip', { shortcut: desktopMac ? '⌘P' : 'Ctrl+P' })} onclick={onenlarge}><Icon name="fullscreen" size={20} /></button>
       {/if}
     </div>
   {/if}
@@ -597,12 +597,12 @@
     /* On the phone the profile is a band from edge to edge (white in the light
        themes); a tablet pane keeps the rounded card (spec, "Profile chart full
        width on the phone"). */
-    .od-dive-profile--profile {
+    .bc-dive-profile--profile {
       margin: 14px 0 0;
       overflow: hidden;
     }
 
-    :global(.views.od-tablet) .od-dive-profile--profile {
+    :global(.views.bc-tablet) .bc-dive-profile--profile {
       margin: 14px 16px 0;
       border-radius: 16px;
     }
@@ -612,7 +612,7 @@
       overflow: visible;
     }
 
-    .od-dive-profile--readout {
+    .bc-dive-profile--readout {
       display: flex;
       flex-wrap: wrap;
       gap: 0 16px;
@@ -620,23 +620,23 @@
       padding: 8px 20px 0;
       align-items: baseline;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       strong {
-        color: var(--od-text);
+        color: var(--bc-text);
 
-        &.od-dive-profile--water {
-          color: var(--od-temperature);
+        &.bc-dive-profile--water {
+          color: var(--bc-temperature);
         }
       }
     }
 
-    :global(.views.od-tablet) .od-dive-profile--readout {
+    :global(.views.bc-tablet) .bc-dive-profile--readout {
       padding: 8px 12px 0;
     }
 
     /* The hint line is centred; the cursor readout stays at the start. */
-    .od-dive-profile--hint {
+    .bc-dive-profile--hint {
       flex: 1;
       text-align: center;
       font-size: 12px;
@@ -644,118 +644,118 @@
 
     /* The chart is as wide as the screen minus the room its axis labels need:
        about 14 dp for the depths on the left, 26 dp for the temperatures on the right. */
-    .od-dive-profile--frame {
+    .bc-dive-profile--frame {
       position: relative;
       margin: 0 26px 0 14px;
       touch-action: pan-y;
       user-select: none;
     }
 
-    :global(.views.od-tablet) .od-dive-profile--frame {
+    :global(.views.bc-tablet) .bc-dive-profile--frame {
       margin: 0 12px;
     }
 
-    .od-dive-profile--grid {
-      stroke: var(--od-chart-grid);
+    .bc-dive-profile--grid {
+      stroke: var(--bc-chart-grid);
       stroke-width: 1;
     }
 
-    .od-dive-profile--axis {
-      stroke: var(--od-text-2);
+    .bc-dive-profile--axis {
+      stroke: var(--bc-text-2);
       stroke-width: 1;
     }
 
-    .od-dive-profile--temperature {
+    .bc-dive-profile--temperature {
       fill: none;
-      stroke: var(--od-temperature);
-      stroke-width: var(--od-profile-main-width, var(--od-profile-line-width));
+      stroke: var(--bc-temperature);
+      stroke-width: var(--bc-profile-main-width, var(--bc-profile-line-width));
       stroke-linejoin: round;
     }
 
-    .od-dive-profile--ppo2 {
+    .bc-dive-profile--ppo2 {
       fill: none;
-      stroke: var(--od-oxygen);
-      stroke-width: var(--od-profile-line-width);
+      stroke: var(--bc-oxygen);
+      stroke-width: var(--bc-profile-line-width);
       stroke-linejoin: round;
     }
 
-    .od-dive-profile--ppo2-limit {
-      stroke: var(--od-oxygen);
+    .bc-dive-profile--ppo2-limit {
+      stroke: var(--bc-oxygen);
       stroke-opacity: 0.4;
       stroke-width: 1;
       stroke-dasharray: 4 4;
     }
 
-    .od-dive-profile--ppo2-label {
+    .bc-dive-profile--ppo2-label {
       font-size: 10px;
-      fill: var(--od-oxygen);
+      fill: var(--bc-oxygen);
     }
 
     /* The ceiling (as on the planner): an exception to the rule that keeps
-       --od-alarm for violations (spec, section 4). */
-    .od-dive-profile--ceiling-calc {
+       --bc-alarm for violations (spec, section 4). */
+    .bc-dive-profile--ceiling-calc {
       stroke-dasharray: 4 3;
     }
 
-    .od-dive-profile--ceiling-area {
-      fill: var(--od-alarm);
+    .bc-dive-profile--ceiling-area {
+      fill: var(--bc-alarm);
       fill-opacity: 0.35;
     }
 
-    .od-dive-profile--ceiling-line {
+    .bc-dive-profile--ceiling-line {
       fill: none;
-      stroke: var(--od-alarm);
-      stroke-width: var(--od-profile-line-width);
+      stroke: var(--bc-alarm);
+      stroke-width: var(--bc-profile-line-width);
     }
 
-    .od-dive-profile--tissue-limit {
-      stroke: var(--od-text-2);
+    .bc-dive-profile--tissue-limit {
+      stroke: var(--bc-text-2);
       stroke-width: 1;
       stroke-dasharray: 3 3;
     }
 
-    .od-dive-profile--tissues {
+    .bc-dive-profile--tissues {
       display: block;
       margin: 6px 12px 0;
       touch-action: pan-y;
     }
 
-    .od-dive-profile--temperature-label {
+    .bc-dive-profile--temperature-label {
       font-size: 10px;
-      fill: var(--od-temperature);
+      fill: var(--bc-temperature);
     }
 
     /* Average depth: a thin dashed line across the whole profile, in the axis grey; 1 dp (task 2026-11-15-190). */
-    .od-dive-profile--mean {
-      stroke: var(--od-text-2);
+    .bc-dive-profile--mean {
+      stroke: var(--bc-text-2);
       stroke-width: 1;
       stroke-dasharray: 4 3;
     }
 
-    .od-dive-profile--mean-label {
+    .bc-dive-profile--mean-label {
       font-size: 9px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
     }
 
     /* Desktop (task 2026-11-15-185): the average depth, 1.2 dp dashes of 5 and gaps of 4 in blue. */
-    .od-dive-profile--mean-desk {
-      stroke: var(--od-profile-mean);
+    .bc-dive-profile--mean-desk {
+      stroke: var(--bc-profile-mean);
       stroke-width: 1.2;
       stroke-dasharray: 5 4;
     }
 
-    .od-dive-profile--mean-desk-label {
+    .bc-dive-profile--mean-desk-label {
       font-size: 11px;
-      fill: var(--od-profile-mean);
+      fill: var(--bc-profile-mean);
     }
 
     /* The desktop app, in the tablet layout too: no sideways scrolling a mouse cannot do. */
-    :global(html.od-desktop-app) .od-dive-profile--layers {
+    :global(html.bc-desktop-app) .bc-dive-profile--layers {
       flex-wrap: wrap;
       overflow-x: visible;
     }
 
-    .od-dive-profile--layers.od-dive-profile--layers-desk {
+    .bc-dive-profile--layers.bc-dive-profile--layers-desk {
       align-items: center;
       padding: 4px 12px 0;
       /* Fluid layout: in a narrow detail pane the curve buttons wrap on a second line instead of scrolling sideways. */
@@ -764,11 +764,11 @@
       row-gap: 0;
     }
 
-    .od-dive-profile--layers-desk .od-dive-profile--filter {
+    .bc-dive-profile--layers-desk .bc-dive-profile--filter {
       min-height: 40px;
     }
 
-    .od-dive-profile--enlarge {
+    .bc-dive-profile--enlarge {
       flex: none;
       margin-inline-start: auto;
       display: grid;
@@ -778,51 +778,51 @@
       border: 0;
       border-radius: 50%;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
 
-    .od-dive-profile--enlarge:hover {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-dive-profile--enlarge:hover {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
     }
 
-    .od-dive-profile--tick {
+    .bc-dive-profile--tick {
       font-size: 11px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
     }
 
     /* Dark mode: an outline twice the line's width under it keeps it readable on the bright water. */
-    .od-dive-profile--trace-outline {
+    .bc-dive-profile--trace-outline {
       fill: none;
-      stroke: var(--od-trace-outline);
-      stroke-width: var(--od-profile-halo-width);
+      stroke: var(--bc-trace-outline);
+      stroke-width: var(--bc-profile-halo-width);
       stroke-linejoin: round;
     }
 
-    .od-dive-profile--trace {
+    .bc-dive-profile--trace {
       fill: none;
-      stroke: var(--od-trace);
-      stroke-width: var(--od-profile-main-width, var(--od-profile-line-width));
+      stroke: var(--bc-trace);
+      stroke-width: var(--bc-profile-main-width, var(--bc-profile-line-width));
       stroke-linejoin: round;
     }
 
-    .od-dive-profile--cursor {
-      stroke: var(--od-cursor);
+    .bc-dive-profile--cursor {
+      stroke: var(--bc-cursor);
       stroke-width: 2;
       stroke-linecap: round;
     }
 
     /* Desktop hover (task 2026-11-15-169): a thin dashed line, a dot on the curve, a dark tooltip. */
-    .od-dive-profile--cursor-hover {
+    .bc-dive-profile--cursor-hover {
       stroke-width: 1;
       stroke-dasharray: 3 3;
     }
-    .od-dive-profile--depth-dot {
-      fill: var(--od-cursor);
-      stroke: var(--od-surface);
+    .bc-dive-profile--depth-dot {
+      fill: var(--bc-cursor);
+      stroke: var(--bc-surface);
       stroke-width: 2;
     }
-    .od-dive-profile--tip {
+    .bc-dive-profile--tip {
       position: absolute;
       transform: translate(12px, -50%);
       display: flex;
@@ -830,40 +830,40 @@
       gap: 2px;
       padding: 6px 10px;
       border-radius: 8px;
-      background: var(--od-inverse-surface);
-      color: var(--od-inverse-on-surface);
+      background: var(--bc-inverse-surface);
+      color: var(--bc-inverse-on-surface);
       font-size: 12px;
       line-height: 1.3;
       white-space: nowrap;
       pointer-events: none;
     }
-    .od-dive-profile--tip-left {
+    .bc-dive-profile--tip-left {
       transform: translate(calc(-100% - 12px), -50%);
     }
 
-    .od-dive-profile--temperature-dot {
-      fill: var(--od-temperature);
-      stroke: var(--od-block);
+    .bc-dive-profile--temperature-dot {
+      fill: var(--bc-temperature);
+      stroke: var(--bc-block);
       stroke-width: 2;
     }
 
-    .od-dive-profile--gas {
+    .bc-dive-profile--gas {
       rect {
-        fill: var(--od-tint);
+        fill: var(--bc-tint);
       }
 
-      &.od-dive-profile--oxygen rect {
-        stroke: var(--od-oxygen);
+      &.bc-dive-profile--oxygen rect {
+        stroke: var(--bc-oxygen);
         stroke-width: 2;
       }
 
       text {
         font-size: 12px;
-        fill: var(--od-on-tint);
+        fill: var(--bc-on-tint);
       }
     }
 
-    .od-dive-profile--layers {
+    .bc-dive-profile--layers {
       display: flex;
       flex-wrap: nowrap;
       gap: 8px;
@@ -871,39 +871,39 @@
       overflow-x: auto;
     }
 
-    .od-dive-profile--chip {
-      --od-curve: var(--od-trace);
+    .bc-dive-profile--chip {
+      --bc-curve: var(--bc-trace);
       gap: 8px;
 
-      &:not(.od-dive-profile--chip-outline) {
+      &:not(.bc-dive-profile--chip-outline) {
         padding-left: 8px;
       }
     }
 
     /* Selected curve button: text, check and border in the colour of its curve. */
-    .od-dive-profile--chip:not(.od-dive-profile--chip-outline) {
-      background: var(--od-curve-chip-bg);
-      color: var(--od-curve);
-      box-shadow: inset 0 0 0 var(--od-curve-chip-border-width) var(--od-curve);
+    .bc-dive-profile--chip:not(.bc-dive-profile--chip-outline) {
+      background: var(--bc-curve-chip-bg);
+      color: var(--bc-curve);
+      box-shadow: inset 0 0 0 var(--bc-curve-chip-border-width) var(--bc-curve);
 
       .chip-label {
-        color: var(--od-curve);
+        color: var(--bc-curve);
       }
     }
 
-    .od-dive-profile--chip-temperature {
-      --od-curve: var(--od-temperature);
+    .bc-dive-profile--chip-temperature {
+      --bc-curve: var(--bc-temperature);
     }
 
-    .od-dive-profile--chip-ppo2 {
-      --od-curve: var(--od-oxygen);
+    .bc-dive-profile--chip-ppo2 {
+      --bc-curve: var(--bc-oxygen);
     }
 
-    .od-dive-profile--chip-ceiling {
-      --od-curve: var(--od-alarm);
+    .bc-dive-profile--chip-ceiling {
+      --bc-curve: var(--bc-alarm);
     }
 
-    .od-dive-profile--filter {
+    .bc-dive-profile--filter {
       flex: none;
       width: auto;
       min-height: 48px;
@@ -919,20 +919,20 @@
   }
 
   /* Framework7's variable, outside the layers. */
-  .od-dive-profile--layers {
-    --f7-chip-outline-border-color: var(--od-chip-outline);
+  .bc-dive-profile--layers {
+    --f7-chip-outline-border-color: var(--bc-chip-outline);
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-dive-profile--chip {
+      .bc-dive-profile--chip {
         transition: box-shadow 120ms linear;
       }
-      .od-dive-profile--filter:hover .od-dive-profile--chip {
+      .bc-dive-profile--filter:hover .bc-dive-profile--chip {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-dive-profile--chip {
+      .bc-dive-profile--chip {
         transition: none;
       }
     }

@@ -123,63 +123,63 @@
 {#if step === 'importDivelogs'}
   <ReleaseField label={t('welcomeSteps.divelogsUser')} bind:value={d.user} disabled={busy} autocomplete="username" />
   <ReleaseField label={t('welcomeSteps.divelogsPassword')} bind:value={d.password} type="password" disabled={busy} autocomplete="current-password" error={d.error} help={t('welcomeSteps.credentialsNote')} />
-  <button type="button" class="od-first-launch-divelogs--action" disabled={!ready} aria-busy={busy} onclick={submit}>{t('welcomeSteps.importAction')}</button>
+  <button type="button" class="bc-first-launch-divelogs--action" disabled={!ready} aria-busy={busy} onclick={submit}>{t('welcomeSteps.importAction')}</button>
 {:else}
-  <div class="od-first-launch-divelogs--paper">
-    <div class="od-first-launch-divelogs--step">
-      <span class="od-first-launch-divelogs--mark od-first-launch-divelogs--done"><Icon name="check" size={16} weight={2.6} /></span>
-      <span class="od-first-launch-divelogs--text">
-        <span class="od-first-launch-divelogs--name">{t('welcomeSteps.progressConnect')}</span>
-        <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.progressAccount', { user: account })}</span>
+  <div class="bc-first-launch-divelogs--paper">
+    <div class="bc-first-launch-divelogs--step">
+      <span class="bc-first-launch-divelogs--mark bc-first-launch-divelogs--done"><Icon name="check" size={16} weight={2.6} /></span>
+      <span class="bc-first-launch-divelogs--text">
+        <span class="bc-first-launch-divelogs--name">{t('welcomeSteps.progressConnect')}</span>
+        <span class="bc-first-launch-divelogs--detail">{t('welcomeSteps.progressAccount', { user: account })}</span>
       </span>
     </div>
     {#if d.interrupted}
       <!-- A lost connection with part of the dives kept (mock-up …-importer-divelogs-interrompu-paysage). -->
-      <div class="od-first-launch-divelogs--step" role="alert">
-        <span class="od-first-launch-divelogs--mark od-first-launch-divelogs--failed"><span class="od-first-launch-divelogs--bang" aria-hidden="true">!</span></span>
-        <span class="od-first-launch-divelogs--text">
-          <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-failed">{t('welcomeSteps.interrupted')}</span>
-          <span class="od-first-launch-divelogs--detail">{t('welcomeSteps.interruptedDetail', { done: d.done, total: d.total })}</span>
+      <div class="bc-first-launch-divelogs--step" role="alert">
+        <span class="bc-first-launch-divelogs--mark bc-first-launch-divelogs--failed"><span class="bc-first-launch-divelogs--bang" aria-hidden="true">!</span></span>
+        <span class="bc-first-launch-divelogs--text">
+          <span class="bc-first-launch-divelogs--name bc-first-launch-divelogs--name-failed">{t('welcomeSteps.interrupted')}</span>
+          <span class="bc-first-launch-divelogs--detail">{t('welcomeSteps.interruptedDetail', { done: d.done, total: d.total })}</span>
         </span>
       </div>
     {:else}
-      <div class="od-first-launch-divelogs--step">
-        <span class="od-first-launch-divelogs--mark" class:od-first-launch-divelogs--done={d.phase === 'read'} class:od-first-launch-divelogs--current={d.phase === 'download'}>
-          {#if d.phase === 'read'}<Icon name="check" size={16} weight={2.6} />{:else}<span class="od-first-launch-divelogs--dot"></span>{/if}
+      <div class="bc-first-launch-divelogs--step">
+        <span class="bc-first-launch-divelogs--mark" class:bc-first-launch-divelogs--done={d.phase === 'read'} class:bc-first-launch-divelogs--current={d.phase === 'download'}>
+          {#if d.phase === 'read'}<Icon name="check" size={16} weight={2.6} />{:else}<span class="bc-first-launch-divelogs--dot"></span>{/if}
         </span>
-        <span class="od-first-launch-divelogs--text">
-          <span class="od-first-launch-divelogs--name od-first-launch-divelogs--name-current">{t('welcomeSteps.progressDownload')}</span>
-          <span class="od-first-launch-divelogs--detail"><ProgressLine done={d.done} total={d.total} count={t('welcomeSteps.progressCount', { done: d.done, total: d.total })} /></span>
+        <span class="bc-first-launch-divelogs--text">
+          <span class="bc-first-launch-divelogs--name bc-first-launch-divelogs--name-current">{t('welcomeSteps.progressDownload')}</span>
+          <span class="bc-first-launch-divelogs--detail"><ProgressLine done={d.done} total={d.total} count={t('welcomeSteps.progressCount', { done: d.done, total: d.total })} /></span>
         </span>
       </div>
-      <div class="od-first-launch-divelogs--bar">
+      <div class="bc-first-launch-divelogs--bar">
         <LinearWavyProgress value={d.total ? d.done / d.total : 0} label={t('welcomeSteps.progressDownload')} />
       </div>
     {/if}
-    <div class="od-first-launch-divelogs--step">
-      <span class="od-first-launch-divelogs--mark" class:od-first-launch-divelogs--current={d.phase === 'read'}>
-        {#if d.phase === 'read'}<span class="od-first-launch-divelogs--dot"></span>{/if}
+    <div class="bc-first-launch-divelogs--step">
+      <span class="bc-first-launch-divelogs--mark" class:bc-first-launch-divelogs--current={d.phase === 'read'}>
+        {#if d.phase === 'read'}<span class="bc-first-launch-divelogs--dot"></span>{/if}
       </span>
-      <span class="od-first-launch-divelogs--text">
-        <span class="od-first-launch-divelogs--name" class:od-first-launch-divelogs--waiting={d.phase !== 'read'}>{t('welcomeSteps.progressRead')}</span>
+      <span class="bc-first-launch-divelogs--text">
+        <span class="bc-first-launch-divelogs--name" class:bc-first-launch-divelogs--waiting={d.phase !== 'read'}>{t('welcomeSteps.progressRead')}</span>
       </span>
     </div>
   </div>
   {#if d.interrupted}
-    <p class="od-first-launch-divelogs--help">{t('welcomeSteps.interruptedHelp', { n: d.done })}</p>
-    <div class="od-first-launch-divelogs--buttons">
-      <button type="button" class="od-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
-      <button type="button" class="od-first-launch-divelogs--action od-first-launch-divelogs--resume" onclick={resume}>{t('welcomeSteps.resume')}</button>
+    <p class="bc-first-launch-divelogs--help">{t('welcomeSteps.interruptedHelp', { n: d.done })}</p>
+    <div class="bc-first-launch-divelogs--buttons">
+      <button type="button" class="bc-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+      <button type="button" class="bc-first-launch-divelogs--action bc-first-launch-divelogs--resume" onclick={resume}>{t('welcomeSteps.resume')}</button>
     </div>
   {:else}
-    <p class="od-first-launch-divelogs--help">{t('welcomeSteps.progressHelp')}</p>
-    <button type="button" class="od-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
+    <p class="bc-first-launch-divelogs--help">{t('welcomeSteps.progressHelp')}</p>
+    <button type="button" class="bc-first-launch-divelogs--cancel" onclick={cancel}>{t('welcomeSteps.cancel')}</button>
   {/if}
 {/if}
 
 <style>
   @layer od.components {
-    .od-first-launch-divelogs--action {
+    .bc-first-launch-divelogs--action {
       width: auto;
       align-self: flex-end;
       margin-top: 22px;
@@ -187,8 +187,8 @@
       padding: 0 24px;
       border: none;
       border-radius: 24px;
-      background: var(--od-text);
-      color: var(--od-background);
+      background: var(--bc-text);
+      color: var(--bc-background);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -207,64 +207,64 @@
       }
     }
 
-    .od-first-launch-divelogs--paper {
+    .bc-first-launch-divelogs--paper {
       margin-top: 12px;
       padding: 20px 20px 22px;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    .od-first-launch-divelogs--step {
+    .bc-first-launch-divelogs--step {
       display: flex;
       gap: 14px;
       align-items: flex-start;
     }
 
-    .od-first-launch-divelogs--mark {
+    .bc-first-launch-divelogs--mark {
       flex: none;
       box-sizing: border-box;
       width: 28px;
       height: 28px;
-      border: 2px solid var(--od-release-pending);
+      border: 2px solid var(--bc-release-pending);
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--od-release-on-panel);
+      color: var(--bc-release-on-panel);
     }
 
-    .od-first-launch-divelogs--failed {
+    .bc-first-launch-divelogs--failed {
       border: none;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
     }
 
-    .od-first-launch-divelogs--bang {
+    .bc-first-launch-divelogs--bang {
       font-size: 15px;
       line-height: 16px;
       font-weight: 700;
     }
 
-    .od-first-launch-divelogs--done {
+    .bc-first-launch-divelogs--done {
       border: none;
-      background: var(--od-release-ok);
+      background: var(--bc-release-ok);
     }
 
-    .od-first-launch-divelogs--current {
-      border: 3px solid var(--od-release-row-main);
+    .bc-first-launch-divelogs--current {
+      border: 3px solid var(--bc-release-row-main);
     }
 
-    .od-first-launch-divelogs--dot {
+    .bc-first-launch-divelogs--dot {
       width: 10px;
       height: 10px;
       border-radius: 5px;
-      background: var(--od-release-row-main);
+      background: var(--bc-release-row-main);
     }
 
-    .od-first-launch-divelogs--text {
+    .bc-first-launch-divelogs--text {
       display: flex;
       flex: 1;
       min-width: 0;
@@ -273,67 +273,67 @@
       padding-top: 4px;
     }
 
-    .od-first-launch-divelogs--name {
+    .bc-first-launch-divelogs--name {
       font-size: 16px;
       line-height: 21px;
       font-weight: 500;
     }
 
-    .od-first-launch-divelogs--name-current {
+    .bc-first-launch-divelogs--name-current {
       font-weight: 600;
     }
 
-    .od-first-launch-divelogs--name-failed {
+    .bc-first-launch-divelogs--name-failed {
       font-weight: 600;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
-    .od-first-launch-divelogs--waiting {
-      color: var(--od-text-2);
+    .bc-first-launch-divelogs--waiting {
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-divelogs--detail {
+    .bc-first-launch-divelogs--detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Inside the card at any width (task 2026-11-16-230): the bar is as wide as the text beside it, never wider. */
-    .od-first-launch-divelogs--bar {
+    .bc-first-launch-divelogs--bar {
       min-width: 0;
       max-width: calc(100% - 42px);
       overflow: hidden;
       margin: -4px 0 2px 42px;
-      --od-linear-wavy-progress-active: var(--od-release-row-main);
-      --od-linear-wavy-progress-track: var(--od-release-track);
+      --bc-linear-wavy-progress-active: var(--bc-release-row-main);
+      --bc-linear-wavy-progress-track: var(--bc-release-track);
     }
 
-    .od-first-launch-divelogs--help {
+    .bc-first-launch-divelogs--help {
       margin: 14px 0 22px;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-first-launch-divelogs--buttons {
+    .bc-first-launch-divelogs--buttons {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
     }
 
-    .od-first-launch-divelogs--resume {
+    .bc-first-launch-divelogs--resume {
       margin-top: 0;
     }
 
-    .od-first-launch-divelogs--cancel {
+    .bc-first-launch-divelogs--cancel {
       width: auto;
       align-self: flex-end;
       height: 48px;
       padding: 0 22px;
-      border: 1px solid var(--od-release-field-border);
+      border: 1px solid var(--bc-release-field-border);
       border-radius: 24px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 15px;
       font-weight: 500;
@@ -342,29 +342,29 @@
 
       @media (hover: hover) {
         &:hover {
-          background: var(--od-release-hover);
+          background: var(--bc-release-hover);
         }
       }
     }
 
     /* Phone (task 2026-11-16-227): the buttons alone take the width of the column; side by side they keep their size. */
     @media (max-width: 767.98px) {
-      .od-first-launch-divelogs--action,
-      .od-first-launch-divelogs--cancel {
+      .bc-first-launch-divelogs--action,
+      .bc-first-launch-divelogs--cancel {
         align-self: stretch;
       }
 
-      .od-first-launch-divelogs--buttons {
-        .od-first-launch-divelogs--action,
-        .od-first-launch-divelogs--cancel {
+      .bc-first-launch-divelogs--buttons {
+        .bc-first-launch-divelogs--action,
+        .bc-first-launch-divelogs--cancel {
           align-self: auto;
         }
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .od-first-launch-divelogs--action,
-      .od-first-launch-divelogs--cancel {
+      .bc-first-launch-divelogs--action,
+      .bc-first-launch-divelogs--cancel {
         transition: none;
       }
     }

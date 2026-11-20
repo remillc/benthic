@@ -216,19 +216,19 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="od-select-field od-select-field--field"
+  class="bc-select-field bc-select-field--field"
   class:disabled
-  class:od-select-field--invalid={invalid}
-  class:od-select-field--open={open}
-  class:od-select-field--outlined={outlined}
+  class:bc-select-field--invalid={invalid}
+  class:bc-select-field--open={open}
+  class:bc-select-field--outlined={outlined}
   bind:this={root}
   onkeydown={keydown}
 >
-  <div class="od-select-field--box" bind:this={box}>
+  <div class="bc-select-field--box" bind:this={box}>
     {#if ios}
-      <label class="od-select-field--label" for={id}>{label}</label>
-      {#if icon}<span class="od-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
-      <select {id} {disabled} class:od-select-field--with-icon={!!icon} aria-label={ariaLabel} aria-invalid={invalid} class:od-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
+      <label class="bc-select-field--label" for={id}>{label}</label>
+      {#if icon}<span class="bc-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
+      <select {id} {disabled} class:bc-select-field--with-icon={!!icon} aria-label={ariaLabel} aria-invalid={invalid} class:bc-select-field--clearable={clearLabel && value} bind:value onchange={() => onchange?.(value)}>
         {#each all as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
       </select>
     {:else}
@@ -236,9 +236,9 @@
         type="button"
         {id}
         bind:this={trigger}
-        class="od-select-field--trigger"
-        class:od-select-field--clearable={clearLabel && value}
-        class:od-select-field--with-icon={!!icon}
+        class="bc-select-field--trigger"
+        class:bc-select-field--clearable={clearLabel && value}
+        class:bc-select-field--with-icon={!!icon}
         {disabled}
         role="combobox"
         aria-haspopup="listbox"
@@ -248,19 +248,19 @@
         aria-invalid={invalid}
         onclick={() => (open ? close(false) : show())}
       >
-        <span class="od-select-field--label">{label}</span>
-        <span class="od-select-field--value">{shownLabel}</span>
+        <span class="bc-select-field--label">{label}</span>
+        <span class="bc-select-field--value">{shownLabel}</span>
       </button>
-      {#if icon}<span class="od-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
+      {#if icon}<span class="bc-select-field--lead" aria-hidden="true">{@render icon(value)}</span>{/if}
     {/if}
     {#if clearLabel && value}
-      <button type="button" class="od-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
+      <button type="button" class="bc-select-field--clear" aria-label={clearLabel} onclick={clear}><Icon name="close" size={20} /></button>
     {/if}
-    <span class="od-select-field--arrow"><DropdownArrow /></span>
+    <span class="bc-select-field--arrow"><DropdownArrow /></span>
     {#if open}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
-        class="od-select-field--menu"
+        class="bc-select-field--menu"
         use:portal
         bind:this={menu}
         onkeydown={keydown}
@@ -271,7 +271,7 @@
         style:max-height="{place.maxHeight}px"
       >
         {#if searchLabel}
-          <div class="od-select-field--search">
+          <div class="bc-select-field--search">
             <Icon name="search" size={20} />
             <input
               type="text"
@@ -287,7 +287,7 @@
             />
           </div>
         {/if}
-        <ul class="od-select-field--options" id="{id}-list" role="listbox" aria-label={ariaLabel ?? label}>
+        <ul class="bc-select-field--options" id="{id}-list" role="listbox" aria-label={ariaLabel ?? label}>
           {#each shown as option, i (option.value)}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <li
@@ -295,21 +295,21 @@
               role="option"
               data-value={option.value}
               aria-selected={option.value === value}
-              class="od-select-field--option"
-              class:od-select-field--active={i === active}
+              class="bc-select-field--option"
+              class:bc-select-field--active={i === active}
               onmousedown={(e) => e.preventDefault()}
               onclick={() => pick(option.value)}
-            >{#if icon}<span class="od-select-field--option-icon" aria-hidden="true">{@render icon(option.value)}</span><span class="od-select-field--option-text">{option.label}</span>{#if option.value === value}<span class="od-select-field--check" aria-hidden="true"><Icon name="check" size={20} /></span>{/if}{:else}{option.label}{/if}</li>
+            >{#if icon}<span class="bc-select-field--option-icon" aria-hidden="true">{@render icon(option.value)}</span><span class="bc-select-field--option-text">{option.label}</span>{#if option.value === value}<span class="bc-select-field--check" aria-hidden="true"><Icon name="check" size={20} /></span>{/if}{:else}{option.label}{/if}</li>
           {/each}
-          {#if searchLabel && shown.length === 0 && noResultsLabel}<li class="od-select-field--none" role="presentation">{noResultsLabel}</li>{/if}
+          {#if searchLabel && shown.length === 0 && noResultsLabel}<li class="bc-select-field--none" role="presentation">{noResultsLabel}</li>{/if}
           {#if newLabel}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <li
               id="{id}-o{shown.length}"
               role="option"
               aria-selected="false"
-              class="od-select-field--option od-select-field--new"
-              class:od-select-field--active={active === shown.length}
+              class="bc-select-field--option bc-select-field--new"
+              class:bc-select-field--active={active === shown.length}
               onmousedown={(e) => e.preventDefault()}
               onclick={() => activate(shown.length)}
             >{newLabel}</li>
@@ -318,25 +318,25 @@
       </div>
     {/if}
   </div>
-  {#if supporting}<p class="od-select-field--supporting">{supporting}</p>{/if}
+  {#if supporting}<p class="bc-select-field--supporting">{supporting}</p>{/if}
 </div>
 
 <style>
   @layer od.components {
-    .od-select-field--field {
-      margin: 18px var(--od-field-margin, 16px) 0;
+    .bc-select-field--field {
+      margin: 18px var(--bc-field-margin, 16px) 0;
     }
 
-    .od-select-field--field.disabled {
+    .bc-select-field--field.disabled {
       opacity: 0.38;
     }
 
-    .od-select-field--box {
+    .bc-select-field--box {
       position: relative;
       height: 56px;
       box-sizing: border-box;
       border-radius: 4px 4px 0 0;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
 
       &::after {
         content: '';
@@ -345,23 +345,23 @@
         right: 0;
         bottom: 0;
         height: 1px;
-        background: var(--od-text-2);
+        background: var(--bc-text-2);
       }
 
       &:focus-within::after,
-      .od-select-field--open &::after {
+      .bc-select-field--open &::after {
         height: 2px;
-        background: var(--od-primary-action);
+        background: var(--bc-primary-action);
       }
 
-      .od-select-field--invalid &::after {
+      .bc-select-field--invalid &::after {
         height: 2px;
-        background: var(--od-alarm);
+        background: var(--bc-alarm);
       }
 
       :global(.ios) & {
         border-radius: 10px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
 
         &::after {
           display: none;
@@ -369,25 +369,25 @@
       }
     }
 
-    .od-select-field--label {
+    .bc-select-field--label {
       position: absolute;
       left: 16px;
       top: 8px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
-    .od-select-field--open .od-select-field--label {
-      color: var(--od-primary-action);
+    .bc-select-field--open .bc-select-field--label {
+      color: var(--bc-primary-action);
     }
 
-    .od-select-field--invalid .od-select-field--label {
-      color: var(--od-alarm);
+    .bc-select-field--invalid .bc-select-field--label {
+      color: var(--bc-alarm);
     }
 
-    .od-select-field--trigger {
+    .bc-select-field--trigger {
       display: block;
       width: 100%;
       height: 100%;
@@ -397,18 +397,18 @@
       border-radius: inherit;
       outline: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       line-height: 24px;
       text-align: start;
 
-      &.od-select-field--clearable {
+      &.bc-select-field--clearable {
         padding-right: 92px;
       }
     }
 
-    .od-select-field--value {
+    .bc-select-field--value {
       display: block;
       white-space: nowrap;
       overflow: hidden;
@@ -416,38 +416,38 @@
     }
 
     /* The drawing of the chosen option, before its name (task 2026-11-19-310). */
-    .od-select-field--lead {
+    .bc-select-field--lead {
       position: absolute;
       left: 16px;
       bottom: 6px;
       height: 24px;
       display: flex;
       align-items: center;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
-    .od-select-field--trigger.od-select-field--with-icon,
-    select.od-select-field--with-icon {
+    .bc-select-field--trigger.bc-select-field--with-icon,
+    select.bc-select-field--with-icon {
       padding-left: 52px;
     }
 
-    .od-select-field--option-icon {
+    .bc-select-field--option-icon {
       flex: none;
       margin-right: 16px;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-select-field--option-text {
+    .bc-select-field--option-text {
       flex: 1;
       min-width: 0;
     }
 
-    .od-select-field--check {
+    .bc-select-field--check {
       flex: none;
       display: flex;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
     select {
@@ -459,18 +459,18 @@
       outline: none;
       background: none;
       appearance: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       line-height: 24px;
 
-      &.od-select-field--clearable {
+      &.bc-select-field--clearable {
         padding-right: 92px;
       }
     }
 
     /* 48 dp target, 20 dp icon, before the arrow. */
-    .od-select-field--clear {
+    .bc-select-field--clear {
       position: absolute;
       right: 40px;
       top: 4px;
@@ -480,72 +480,72 @@
       border: none;
       border-radius: 24px;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-select-field--arrow {
+    .bc-select-field--arrow {
       position: absolute;
       right: 12px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       pointer-events: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       transition: transform 150ms;
 
-      .od-select-field--open & {
+      .bc-select-field--open & {
         transform: translateY(-50%) rotate(180deg);
       }
     }
 
     /* Outlined (docs/mockups/android-premier-lancement-alpha-git.dc.html): the box is 52 dp with a border, no
        underline; the label sits on the border over the page colour. */
-    .od-select-field--outlined {
-      margin: var(--od-outlined-gap, 14px) 0 0;
+    .bc-select-field--outlined {
+      margin: var(--bc-outlined-gap, 14px) 0 0;
 
-      .od-select-field--box {
+      .bc-select-field--box {
         height: 52px;
-        border: var(--od-outline-width) solid var(--od-outlined-field-border);
+        border: var(--bc-outline-width) solid var(--bc-outlined-field-border);
         border-radius: 12px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
 
         &::after {
           display: none;
         }
       }
 
-      &.od-select-field--open .od-select-field--box {
-        border: 2px solid var(--od-outlined-field-active);
+      &.bc-select-field--open .bc-select-field--box {
+        border: 2px solid var(--bc-outlined-field-active);
       }
 
-      .od-select-field--label {
+      .bc-select-field--label {
         left: 12px;
         top: -9px;
         padding: 0 4px;
-        background: var(--od-background);
+        background: var(--bc-background);
         font-weight: 600;
       }
 
-      &.od-select-field--open .od-select-field--label {
-        color: var(--od-outlined-field-active);
+      &.bc-select-field--open .bc-select-field--label {
+        color: var(--bc-outlined-field-active);
       }
 
-      .od-select-field--trigger {
+      .bc-select-field--trigger {
         padding: 0 48px 0 16px;
         line-height: 50px;
       }
 
-      .od-select-field--supporting {
+      .bc-select-field--supporting {
         margin: 4px 0 0 16px;
       }
     }
 
     /* Exposed dropdown menu (spec, section 8): the field's width, 4 dp corners, 8 dp
        above and below, 48 dp items at 16 sp, the current value on surface-container-highest. */
-    .od-select-field--menu {
+    .bc-select-field--menu {
       position: fixed;
       /* Above the dialogs (13500). */
       z-index: 14000;
@@ -553,11 +553,11 @@
       display: flex;
       flex-direction: column;
       border-radius: 4px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
     }
 
-    .od-select-field--options {
+    .bc-select-field--options {
       margin: 0;
       padding: 8px 0;
       list-style: none;
@@ -565,7 +565,7 @@
       overscroll-behavior: contain;
     }
 
-    .od-select-field--option {
+    .bc-select-field--option {
       min-height: 48px;
       padding: 0 16px;
       box-sizing: border-box;
@@ -573,37 +573,37 @@
       align-items: center;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
 
-      &.od-select-field--active {
-        background: var(--od-surface-2);
+      &.bc-select-field--active {
+        background: var(--bc-surface-2);
       }
 
       &[aria-selected='true'] {
-        background: var(--od-surface-container-highest);
+        background: var(--bc-surface-container-highest);
       }
 
-      &.od-select-field--new {
-        color: var(--od-text-2);
+      &.bc-select-field--new {
+        color: var(--bc-text-2);
       }
     }
 
-    .od-select-field--none {
+    .bc-select-field--none {
       padding: 12px 16px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-select-field--search {
+    .bc-select-field--search {
       flex: none;
       height: 56px;
       padding: 0 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid var(--od-separator);
-      color: var(--od-text-2);
+      border-bottom: 1px solid var(--bc-separator);
+      color: var(--bc-text-2);
 
       input {
         flex: 1;
@@ -611,25 +611,25 @@
         border: none;
         outline: none;
         background: none;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
       }
     }
 
-    .od-select-field--supporting {
+    .bc-select-field--supporting {
       margin: 4px 16px 0;
       font-size: 12px;
       line-height: 16px;
       letter-spacing: 0.4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
 
     /* Mouse: the 8 % layer of the text colour over the field. */
     @media (hover: hover) and (pointer: fine) {
-      .od-select-field--trigger:hover {
-        background: color-mix(in srgb, var(--od-text) 8%, transparent);
+      .bc-select-field--trigger:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
     }
   }

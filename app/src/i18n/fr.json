@@ -2729,8 +2729,13 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil sur tablette et ordinateur : le bouton « Ajouter une pièce » est ajusté à son contenu et aligné à droite.",
+      "Profil sur tablette : les commandes restent visibles au-dessus des barres système.",
       "Brevets et documents : Ajouter est bleu pâle et flotte en bas à droite sur tablette et ordinateur ; la note sur la reproduction des cartes est retirée.",
       "Brevets et documents : l’état vide est centré dans le panneau.",
+      "Brevets : le menu des agences comprend davantage d’organismes de plongée, en ordre alphabétique.",
+      "Brevets : davantage d’agences proposent des niveaux ; les autres qualifications restent libres.",
+      "Brevets : saisissez une agence ou un niveau directement, sans choisir Autre.",
       "Carnet : le menu permet d’exporter tout le carnet dans le format choisi.",
       "Plongée sur ordinateur : la section Équipement affiche la photo de chaque ordinateur de plongée lorsqu’elle est disponible.",
       "Réglages : la fermeture des menus de choix ne provoque plus d’erreur.",

@@ -195,7 +195,7 @@
   }
 </script>
 
-<Page class="od-cylinder-type">
+<Page class="bc-cylinder-type">
   <Navbar title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')}>
     {#snippet left()}
       {#if ios}
@@ -203,7 +203,7 @@
       {:else}
         <Link iconOnly onClick={() => guard?.attempt()}>
           <Icon name="close" />
-          <span class="od-sr-only">{t('plan.chooseClose')}</span>
+          <span class="bc-sr-only">{t('plan.chooseClose')}</span>
         </Link>
       {/if}
     {/snippet}
@@ -213,42 +213,42 @@
   </Navbar>
   <LeaveGuard bind:this={guard} noun="cylinderType" {dirty} {save} leave={() => f7router.back()} />
 
-  <div class="od-form-surface">
+  <div class="bc-form-surface">
     <TextField label={t('settings.cylinders.name')} bind:value={name} supporting={error || t('settings.cylinders.nameHelp')} invalid={!!error} />
-    <div class="od-cylinder-type--pair">
+    <div class="bc-cylinder-type--pair">
       <TextField label={t('settings.cylinders.volume')} bind:value={volume} inputmode="decimal" invalid={!!volumeLive.error} supporting={volumeLive.error}>
-        {#snippet trailing()}<span class="od-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-cylinder-type--unit">{t(cuft ? 'units.cubicFeet' : 'units.liters')}</span>{/snippet}
       </TextField>
       <TextField label={t('settings.cylinders.pressure')} bind:value={pressure} inputmode="decimal" invalid={!!pressureLive.error} supporting={pressureLive.error}>
-        {#snippet trailing()}<span class="od-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-cylinder-type--unit">{t(psi ? 'units.psi' : 'units.bar')}</span>{/snippet}
       </TextField>
     </div>
   </div>
-  <p class="od-cylinder-type--note od-cylinder-type--first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
-  {#if usageNote}<p class="od-cylinder-type--note">{usageNote}</p>{/if}
+  <p class="bc-cylinder-type--note bc-cylinder-type--first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
+  {#if usageNote}<p class="bc-cylinder-type--note">{usageNote}</p>{/if}
 
   {#if editing && type}
     {#if deletable(type)}
-      <div class="od-cylinder-type--action">
-        <button type="button" class={ios ? 'od-cylinder-type--delete-ios' : 'od-outlined-button od-danger od-cylinder-type--delete'} onclick={deleteTheType}>
+      <div class="bc-cylinder-type--action">
+        <button type="button" class={ios ? 'bc-cylinder-type--delete-ios' : 'bc-outlined-button bc-danger bc-cylinder-type--delete'} onclick={deleteTheType}>
           {#if !ios}<Icon name="delete" size={18} />{/if}
           {t('settings.cylinders.deleteType')}
         </button>
-        {#if deleteNote}<p class="od-cylinder-type--delete-note">{deleteNote}</p>{/if}
+        {#if deleteNote}<p class="bc-cylinder-type--delete-note">{deleteNote}</p>{/if}
       </div>
     {:else if type.library}
-      <div class="od-cylinder-type--action">
-        <button type="button" class="od-outlined-button" onclick={remove}>{t('settings.cylinders.delete')}</button>
+      <div class="bc-cylinder-type--action">
+        <button type="button" class="bc-outlined-button" onclick={remove}>{t('settings.cylinders.delete')}</button>
       </div>
     {:else}
-      <p class="od-cylinder-type--note">{t('settings.cylinders.fromLogbook')}</p>
+      <p class="bc-cylinder-type--note">{t('settings.cylinders.fromLogbook')}</p>
     {/if}
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .od-cylinder-type--pair {
+    .bc-cylinder-type--pair {
       display: flex;
       gap: 16px;
 
@@ -258,57 +258,57 @@
       }
     }
 
-    .od-cylinder-type--unit {
+    .bc-cylinder-type--unit {
       padding-inline-end: 12px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The button and the line under it start on the page margin, 16 dp, like the fields (Material 3). */
-    .od-cylinder-type--action {
+    .bc-cylinder-type--action {
       margin: 16px 16px 0;
     }
 
-    /* The red of « Supprimer le compte » (--od-late), not the alarm red. */
+    /* The red of « Supprimer le compte » (--bc-late), not the alarm red. */
     /* iPhone: a red row of a grouped list (ios-reglages2-bouteille-vos-modifier.dc.html). */
-    .od-cylinder-type--delete-ios {
+    .bc-cylinder-type--delete-ios {
       box-sizing: border-box;
       width: 100%;
       min-height: 44px;
       border: none;
       border-radius: 10px;
-      background: var(--od-surface);
-      color: var(--od-alarm);
+      background: var(--bc-surface);
+      color: var(--bc-alarm);
       font: inherit;
       font-size: 17px;
     }
 
-    .od-cylinder-type--delete {
+    .bc-cylinder-type--delete {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border-color: var(--od-late);
-      color: var(--od-late-text);
+      border-color: var(--bc-late);
+      color: var(--bc-late-text);
     }
 
-    .od-cylinder-type--delete-note {
+    .bc-cylinder-type--delete-note {
       margin: 6px 0 0;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-cylinder-type--note.od-cylinder-type--first {
+    .bc-cylinder-type--note.bc-cylinder-type--first {
       margin-top: 4px;
       font-size: 12px;
       line-height: 16px;
     }
 
-    .od-cylinder-type--note {
+    .bc-cylinder-type--note {
       margin: 20px 16px 0;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

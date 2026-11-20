@@ -14,7 +14,7 @@
   }
 </script>
 
-<Page class="od-account-manage-page">
+<Page class="bc-account-manage-page">
   <Navbar title={t('account.manage.title')}>
     {#snippet left()}
       <BackLink label={t('account.title')} name={t('detail.back')} />

@@ -45,25 +45,25 @@
   }
 </script>
 
-<Sheet {opened} swipeToClose backdrop class="od-export-sheet od-sheet-dialog" style="height: auto" onSheetClosed={onclose}>
-  <div class="od-export-sheet--sheet" role="dialog" aria-labelledby="od-export-title">
-    <div class="od-export-sheet--handle" aria-hidden="true"></div>
-    <h2 id="od-export-title" class="od-export-sheet--title">{t('export.title', { n: count })}</h2>
-    <p class="od-export-sheet--text">{t('export.text')}</p>
-    <div class="od-export-sheet--formats" role="radiogroup" aria-labelledby="od-export-title">
+<Sheet {opened} swipeToClose backdrop class="bc-export-sheet bc-sheet-dialog" style="height: auto" onSheetClosed={onclose}>
+  <div class="bc-export-sheet--sheet" role="dialog" aria-labelledby="od-export-title">
+    <div class="bc-export-sheet--handle" aria-hidden="true"></div>
+    <h2 id="od-export-title" class="bc-export-sheet--title">{t('export.title', { n: count })}</h2>
+    <p class="bc-export-sheet--text">{t('export.text')}</p>
+    <div class="bc-export-sheet--formats" role="radiogroup" aria-labelledby="od-export-title">
       {#each FORMATS as f (f)}
-        <ChoiceRow class="od-export-sheet--format" name="od-export-format" selected={format === f} onselect={() => (format = f)}>
-          <span class="od-export-sheet--texts">
-            <span class="od-export-sheet--headline">{t(`export.formats.${f}`)}</span>
-            <span class="od-export-sheet--supporting">{t(`export.formatTexts.${f}`)}</span>
+        <ChoiceRow class="bc-export-sheet--format" name="od-export-format" selected={format === f} onselect={() => (format = f)}>
+          <span class="bc-export-sheet--texts">
+            <span class="bc-export-sheet--headline">{t(`export.formats.${f}`)}</span>
+            <span class="bc-export-sheet--supporting">{t(`export.formatTexts.${f}`)}</span>
           </span>
         </ChoiceRow>
       {/each}
     </div>
-    <label class="od-export-sheet--switch-row">
-      <span class="od-export-sheet--texts">
-        <span class="od-export-sheet--headline">{t('export.anonymize')}</span>
-        <span class="od-export-sheet--supporting">{t('export.anonymizeText')}</span>
+    <label class="bc-export-sheet--switch-row">
+      <span class="bc-export-sheet--texts">
+        <span class="bc-export-sheet--headline">{t('export.anonymize')}</span>
+        <span class="bc-export-sheet--supporting">{t('export.anonymizeText')}</span>
       </span>
       <span class="toggle">
         <input type="checkbox" bind:checked={anonymize} />
@@ -71,10 +71,10 @@
       </span>
     </label>
     {#if format === 'pdf' && fullName}
-      <label class="od-export-sheet--switch-row od-export-sheet--show-name">
-        <span class="od-export-sheet--texts">
-          <span class="od-export-sheet--headline">{t('export.showName')}</span>
-          <span class="od-export-sheet--supporting">{t('export.showNameText', { name: fullName })}</span>
+      <label class="bc-export-sheet--switch-row bc-export-sheet--show-name">
+        <span class="bc-export-sheet--texts">
+          <span class="bc-export-sheet--headline">{t('export.showName')}</span>
+          <span class="bc-export-sheet--supporting">{t('export.showNameText', { name: fullName })}</span>
         </span>
         <span class="toggle">
           <input type="checkbox" bind:checked={showName} disabled={anonymize} />
@@ -82,90 +82,90 @@
         </span>
       </label>
     {/if}
-    <div class="od-export-sheet--actions">
-      <button type="button" class="od-export-sheet--text-button" onclick={() => (opened = false)}>{t('dialog.cancel')}</button>
-      <button type="button" class="od-export-sheet--filled" onclick={submit}>{t('export.action')}</button>
+    <div class="bc-export-sheet--actions">
+      <button type="button" class="bc-export-sheet--text-button" onclick={() => (opened = false)}>{t('dialog.cancel')}</button>
+      <button type="button" class="bc-export-sheet--filled" onclick={submit}>{t('export.action')}</button>
     </div>
   </div>
 </Sheet>
 
 <style>
   @layer od.components {
-    :global(.od-export-sheet) {
+    :global(.bc-export-sheet) {
       border-radius: 28px 28px 0 0;
-      background: var(--od-dialog);
+      background: var(--bc-dialog);
       overflow: hidden;
     }
 
-    .od-export-sheet--sheet {
+    .bc-export-sheet--sheet {
       max-height: 85vh;
       overflow-y: auto;
       padding: 8px 0 calc(16px + var(--f7-safe-area-bottom, 0px));
     }
 
-    .od-export-sheet--handle {
+    .bc-export-sheet--handle {
       width: 32px;
       height: 4px;
       margin: 8px auto 12px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
       opacity: 0.4;
     }
 
-    .od-export-sheet--title {
+    .bc-export-sheet--title {
       margin: 0 24px 4px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-export-sheet--text {
+    .bc-export-sheet--text {
       margin: 0 24px 8px;
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    :global(.od-export-sheet--format) {
+    :global(.bc-export-sheet--format) {
       min-height: 64px;
       padding: 8px 12px;
     }
 
-    .od-export-sheet--formats {
+    .bc-export-sheet--formats {
       padding: 0 12px;
     }
 
-    .od-export-sheet--switch-row {
+    .bc-export-sheet--switch-row {
       min-height: 64px;
       padding: 8px 24px 8px 16px;
       display: flex;
       align-items: center;
       gap: 16px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-export-sheet--texts {
+    .bc-export-sheet--texts {
       flex: 1;
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
 
-    .od-export-sheet--headline {
+    .bc-export-sheet--headline {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-export-sheet--supporting {
+    .bc-export-sheet--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-export-sheet--switch-row {
+    .bc-export-sheet--switch-row {
       padding-left: 24px;
-      border-top: 1px solid var(--od-row-divider);
+      border-top: 1px solid var(--bc-row-divider);
       margin-top: 4px;
     }
 
@@ -173,14 +173,14 @@
       flex: none;
     }
 
-    .od-export-sheet--actions {
+    .bc-export-sheet--actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
       padding: 12px 24px 0;
     }
 
-    .od-export-sheet--actions button {
+    .bc-export-sheet--actions button {
       width: auto;
       min-height: 40px;
       padding: 0 20px;
@@ -191,14 +191,14 @@
       font-weight: 600;
     }
 
-    .od-export-sheet--text-button {
+    .bc-export-sheet--text-button {
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-export-sheet--filled {
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+    .bc-export-sheet--filled {
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
     }
   }
 </style>

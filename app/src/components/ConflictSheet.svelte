@@ -122,7 +122,7 @@
   /**
    * The full-screen dialog is moved under <body> (no page transform can clip
    * it); Back and Escape dismiss it (lib/back-button.js sends od-cancel to a
-   * .od-dialog).
+   * .bc-dialog).
    * @param {HTMLElement} node
    */
   function portal(node) {
@@ -166,23 +166,23 @@
 
 {#snippet identity(/** @type {Item} */ item)}
   {@const dive = diveOf(item)}
-  <div class="od-conflict-sheet--identity">
+  <div class="bc-conflict-sheet--identity">
     {#if item.date && dive}
       <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} />
     {:else}
-      <span class="od-conflict-sheet--identity-icon" aria-hidden="true"><Icon name={computersLine(item) ? 'computer' : 'file'} weight={2} /></span>
+      <span class="bc-conflict-sheet--identity-icon" aria-hidden="true"><Icon name={computersLine(item) ? 'computer' : 'file'} weight={2} /></span>
     {/if}
-    <span class="od-conflict-sheet--identity-text">
+    <span class="bc-conflict-sheet--identity-text">
       {#if item.date}
-        <span class="od-conflict-sheet--identity-title">{dive?.site || t('dive.siteNotSet')}</span>
-        <span class="od-conflict-sheet--identity-sub od-value">
+        <span class="bc-conflict-sheet--identity-title">{dive?.site || t('dive.siteNotSet')}</span>
+        <span class="bc-conflict-sheet--identity-sub bc-value">
           {[item.number ? t('detail.number', { number: String(item.number) }) : '', formatDateTime(item.date)].filter(Boolean).join(' · ')}
         </span>
       {:else if computersLine(item)}
-        <span class="od-conflict-sheet--identity-title">{t('conflict.computersCard')}</span>
-        <span class="od-conflict-sheet--identity-sub">{t('conflict.computersCardSub')}</span>
+        <span class="bc-conflict-sheet--identity-title">{t('conflict.computersCard')}</span>
+        <span class="bc-conflict-sheet--identity-sub">{t('conflict.computersCardSub')}</span>
       {:else}
-        <span class="od-conflict-sheet--identity-title">{t('conflict.otherCard')}</span>
+        <span class="bc-conflict-sheet--identity-title">{t('conflict.otherCard')}</span>
       {/if}
     </span>
   </div>
@@ -190,7 +190,7 @@
 
 {#snippet explanation(/** @type {Item} */ item)}
   {@const s = summary(item)}
-  <p class="od-conflict-sheet--text">
+  <p class="bc-conflict-sheet--text">
     {#if s}
       {t('conflict.introComputers')}
       {#if s.differing.length}<b>{differingText(s)}</b>{/if}
@@ -207,17 +207,17 @@
 
 {#snippet values(/** @type {Item} */ item, /** @type {'device'|'cloud'} */ side)}
   {@const s = summary(item)}
-  <span class="od-conflict-sheet--values">
+  <span class="bc-conflict-sheet--values">
     {#if s}
       {#each s.differing as d (`${d.model}\n${d.serial}`)}
         <span>{t('conflict.labelled', { label: d.model })} <b>{quoted(d[side])}</b></span>
       {/each}
       {#if side === 'device'}
         {#if s.onlyDevice.length}<span>{t('conflict.extra', { names: computerNames(s.onlyDevice) })}</span>{/if}
-        {#if s.onlyCloud.length}<span class="od-conflict-sheet--loss">{t('conflict.loseCloud', { n: s.onlyCloud.length })}</span>{/if}
+        {#if s.onlyCloud.length}<span class="bc-conflict-sheet--loss">{t('conflict.loseCloud', { n: s.onlyCloud.length })}</span>{/if}
       {:else}
         {#if s.onlyCloud.length}<span>{t('conflict.extra', { names: computerNames(s.onlyCloud) })}</span>{/if}
-        {#if s.onlyDevice.length}<span class="od-conflict-sheet--loss">{t('conflict.loseDevice', { n: s.onlyDevice.length })}</span>{/if}
+        {#if s.onlyDevice.length}<span class="bc-conflict-sheet--loss">{t('conflict.loseDevice', { n: s.onlyDevice.length })}</span>{/if}
       {/if}
     {/if}
     {#each item.lines.filter((l) => l.key !== 'divecomputerid' || !s) as line (line.key)}
@@ -229,18 +229,18 @@
 {#snippet body()}
   {#each asked as item (item.path)}
     {@const s = summary(item)}
-    <section class="od-conflict-sheet--item">
+    <section class="bc-conflict-sheet--item">
       {@render identity(item)}
       {@render explanation(item)}
-      <div class="od-conflict-sheet--cards" role="radiogroup" aria-label={t('conflict.choiceLabel')}>
+      <div class="bc-conflict-sheet--cards" role="radiogroup" aria-label={t('conflict.choiceLabel')}>
         {#each sides as side (side)}
           {@const selected = sideOf(item) === side}
-          <label class="od-conflict-sheet--choice" class:od-conflict-sheet--selected={selected}>
+          <label class="bc-conflict-sheet--choice" class:bc-conflict-sheet--selected={selected}>
             <input type="radio" name="od-conflict-{item.path}" value={side} checked={selected} disabled={forAll} onchange={() => (choices[item.path] = side)} />
-            {#if selected || theme.ios}<span class="od-conflict-sheet--mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>{/if}
-            <span class="od-conflict-sheet--card-text">
-              <span class="od-conflict-sheet--card-title">{t(side === 'device' ? 'conflict.deviceCard' : 'conflict.cloudCard')}</span>
-              <span class="od-conflict-sheet--card-when">
+            {#if selected || theme.ios}<span class="bc-conflict-sheet--mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>{/if}
+            <span class="bc-conflict-sheet--card-text">
+              <span class="bc-conflict-sheet--card-title">{t(side === 'device' ? 'conflict.deviceCard' : 'conflict.cloudCard')}</span>
+              <span class="bc-conflict-sheet--card-when">
                 {t(side === 'device' ? 'conflict.deviceWhen' : 'conflict.cloudWhen', { when: when(side === 'device' ? (conflict?.deviceTime ?? '') : (conflict?.cloudTime ?? '')) })}
               </span>
               {@render values(item, side)}
@@ -248,19 +248,19 @@
           </label>
         {/each}
       </div>
-      {#if s?.same.length}<p class="od-conflict-sheet--unchanged">{t('conflict.unchanged', { names: computerNames(s.same) })}</p>{/if}
+      {#if s?.same.length}<p class="bc-conflict-sheet--unchanged">{t('conflict.unchanged', { names: computerNames(s.same) })}</p>{/if}
     </section>
   {/each}
-  {#if failed}<p class="od-conflict-sheet--failed" role="alert">{t('conflict.failed')}</p>{/if}
+  {#if failed}<p class="bc-conflict-sheet--failed" role="alert">{t('conflict.failed')}</p>{/if}
 {/snippet}
 
 <!-- Two small selectable cards, side by side (several dives). -->
 {#snippet small(/** @type {Item|null} */ item, /** @type {string} */ name)}
-  <div class="od-conflict-sheet--smalls" role="radiogroup" aria-label={t('conflict.choiceFor', { name })}>
+  <div class="bc-conflict-sheet--smalls" role="radiogroup" aria-label={t('conflict.choiceFor', { name })}>
     {#each sides as side (side)}
       {@const selected = (item ? sideOf(item) : allSide) === side}
       {@const disabled = !!item && forAll}
-      <label class="od-conflict-sheet--small" class:od-conflict-sheet--selected={selected} class:disabled>
+      <label class="bc-conflict-sheet--small" class:bc-conflict-sheet--selected={selected} class:disabled>
         <input
           type="radio"
           name="od-conflict-{item ? item.path : 'all'}"
@@ -269,11 +269,11 @@
           {disabled}
           onchange={() => (item ? (choices[item.path] = side) : (allSide = side))}
         />
-        {#if selected || theme.ios}<span class="od-conflict-sheet--mark od-conflict-sheet--small-mark" aria-hidden="true">{#if selected}<Icon name="check" size={13} weight={3} />{/if}</span>{/if}
-        <span class="od-conflict-sheet--small-title">{t(side === 'device' ? 'conflict.phoneShort' : 'conflict.cloudShort')}</span>
+        {#if selected || theme.ios}<span class="bc-conflict-sheet--mark bc-conflict-sheet--small-mark" aria-hidden="true">{#if selected}<Icon name="check" size={13} weight={3} />{/if}</span>{/if}
+        <span class="bc-conflict-sheet--small-title">{t(side === 'device' ? 'conflict.phoneShort' : 'conflict.cloudShort')}</span>
         {#if item}
-          <span class="od-conflict-sheet--small-when">{when(side === 'device' ? (conflict?.deviceTime ?? '') : (conflict?.cloudTime ?? ''))}</span>
-          <span class="od-conflict-sheet--small-value">{shortValue(item, side)}</span>
+          <span class="bc-conflict-sheet--small-when">{when(side === 'device' ? (conflict?.deviceTime ?? '') : (conflict?.cloudTime ?? ''))}</span>
+          <span class="bc-conflict-sheet--small-value">{shortValue(item, side)}</span>
         {/if}
       </label>
     {/each}
@@ -281,12 +281,12 @@
 {/snippet}
 
 {#snippet many()}
-  <p class="od-conflict-sheet--text od-conflict-sheet--intro-many">{t('conflict.introMany')}</p>
-  <div class="od-conflict-sheet--all-card">
-    <label class="od-conflict-sheet--all-row">
-      <span class="od-conflict-sheet--all-texts">
-        <span class="od-conflict-sheet--all-title">{t('conflict.allSame')}</span>
-        <span class="od-conflict-sheet--all-sub">{t('conflict.allSameText')}</span>
+  <p class="bc-conflict-sheet--text bc-conflict-sheet--intro-many">{t('conflict.introMany')}</p>
+  <div class="bc-conflict-sheet--all-card">
+    <label class="bc-conflict-sheet--all-row">
+      <span class="bc-conflict-sheet--all-texts">
+        <span class="bc-conflict-sheet--all-title">{t('conflict.allSame')}</span>
+        <span class="bc-conflict-sheet--all-sub">{t('conflict.allSameText')}</span>
       </span>
       <span class="toggle">
         <input type="checkbox" role="switch" bind:checked={forAll} />
@@ -298,16 +298,16 @@
   {#each items as item (item.path)}
     {@const dive = diveOf(item)}
     {@const name = (item.date ? dive?.site : '') || (computersLine(item) ? t('conflict.computersCard') : item.date ? t('dive.siteNotSet') : t('conflict.otherCard'))}
-    <section class="od-conflict-sheet--dive-card">
-      <button type="button" class="od-conflict-sheet--dive-head" aria-label={t('conflict.details', { name })} onclick={() => (detail = item.path)}>
+    <section class="bc-conflict-sheet--dive-card">
+      <button type="button" class="bc-conflict-sheet--dive-head" aria-label={t('conflict.details', { name })} onclick={() => (detail = item.path)}>
         {#if item.date && dive}
           <ProfileThumbnail profile={dive.profile} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} />
         {:else}
-          <span class="od-conflict-sheet--identity-icon" aria-hidden="true"><Icon name={computersLine(item) ? 'computer' : 'file'} weight={2} /></span>
+          <span class="bc-conflict-sheet--identity-icon" aria-hidden="true"><Icon name={computersLine(item) ? 'computer' : 'file'} weight={2} /></span>
         {/if}
-        <span class="od-conflict-sheet--identity-text">
-          <span class="od-conflict-sheet--identity-title">{name}</span>
-          <span class="od-conflict-sheet--identity-sub od-value">
+        <span class="bc-conflict-sheet--identity-text">
+          <span class="bc-conflict-sheet--identity-title">{name}</span>
+          <span class="bc-conflict-sheet--identity-sub bc-value">
             {[item.number ? t('detail.number', { number: String(item.number) }) : '', item.date ? formatDateTime(item.date) : '', t('conflict.differs', { fields: differsText(item) })].filter(Boolean).join(' · ')}
           </span>
         </span>
@@ -315,50 +315,50 @@
       {@render small(item, name)}
     </section>
   {/each}
-  {#if failed}<p class="od-conflict-sheet--failed" role="alert">{t('conflict.failed')}</p>{/if}
+  {#if failed}<p class="bc-conflict-sheet--failed" role="alert">{t('conflict.failed')}</p>{/if}
 {/snippet}
 
 {#if conflict}
   {#if theme.ios}
-    <Sheet opened swipeToClose={false} backdrop class="od-conflict-sheet" style={list ? 'height: 92%' : 'height: auto'}>
-      <div class="od-conflict-sheet--sheet" class:od-conflict-sheet--large={list} role="dialog" aria-labelledby="od-conflict-title">
-        <h2 id="od-conflict-title" class="od-conflict-sheet--title">{title}</h2>
+    <Sheet opened swipeToClose={false} backdrop class="bc-conflict-sheet" style={list ? 'height: 92%' : 'height: auto'}>
+      <div class="bc-conflict-sheet--sheet" class:bc-conflict-sheet--large={list} role="dialog" aria-labelledby="od-conflict-title">
+        <h2 id="od-conflict-title" class="bc-conflict-sheet--title">{title}</h2>
         {#if list && !detailItem}{@render many()}{:else}{@render body()}{/if}
         {#if detailItem}
-          <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--wide" onclick={dismiss}>{t('conflict.back')}</button>
+          <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--wide" onclick={dismiss}>{t('conflict.back')}</button>
         {:else}
-          <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue od-conflict-sheet--wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
-          <button type="button" class="od-conflict-sheet--later" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
+          <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--continue bc-conflict-sheet--wide" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+          <button type="button" class="bc-conflict-sheet--later" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
         {/if}
       </div>
     </Sheet>
   {:else if list}
     <!-- Android, several dives: an MD3 full-screen dialog. ✕ is "Plus tard" (or back to the list from one dive). -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="od-conflict-sheet od-conflict-sheet--full od-md3-dialog modal-in" use:portal onkeydown={keydown}>
-      <div class="od-conflict-sheet--full-surface" role="dialog" aria-modal="true" aria-labelledby="od-conflict-title" tabindex="-1">
-        <div class="od-conflict-sheet--bar">
-          <button type="button" class="od-conflict-sheet--bar-close" aria-label={t(detailItem ? 'conflict.back' : 'conflict.later')} disabled={busy} onclick={dismiss}>
+    <div class="bc-conflict-sheet bc-conflict-sheet--full bc-md3-dialog modal-in" use:portal onkeydown={keydown}>
+      <div class="bc-conflict-sheet--full-surface" role="dialog" aria-modal="true" aria-labelledby="od-conflict-title" tabindex="-1">
+        <div class="bc-conflict-sheet--bar">
+          <button type="button" class="bc-conflict-sheet--bar-close" aria-label={t(detailItem ? 'conflict.back' : 'conflict.later')} disabled={busy} onclick={dismiss}>
             <Icon name="close" weight={2} />
           </button>
           <h1 id="od-conflict-title">{title}</h1>
           {#if detailItem}
-            <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--bar-action" onclick={dismiss}>{t('conflict.back')}</button>
+            <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--bar-action" onclick={dismiss}>{t('conflict.back')}</button>
           {:else}
-            <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue od-conflict-sheet--bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+            <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--continue bc-conflict-sheet--bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
           {/if}
         </div>
-        <div class="od-conflict-sheet--full-body">
+        <div class="bc-conflict-sheet--full-body">
           {#if detailItem}{@render body()}{:else}{@render many()}{/if}
         </div>
       </div>
     </div>
   {:else}
-    <Md3Dialog class="od-conflict-sheet" {title} oncancel={onlater}>
-      <div class="od-conflict-sheet--md-body">{@render body()}</div>
+    <Md3Dialog class="bc-conflict-sheet" {title} oncancel={onlater}>
+      <div class="bc-conflict-sheet--md-body">{@render body()}</div>
       {#snippet actions()}
         <button type="button" disabled={busy} onclick={onlater}>{t('conflict.later')}</button>
-        <button type="button" class="od-conflict-sheet--tonal od-conflict-sheet--continue" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
+        <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--continue" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
       {/snippet}
     </Md3Dialog>
   {/if}
@@ -366,25 +366,25 @@
 
 <style>
   @layer od.components {
-    .od-conflict-sheet--md-body {
+    .bc-conflict-sheet--md-body {
       padding: 0 24px;
     }
 
-    .od-conflict-sheet--title {
+    .bc-conflict-sheet--title {
       margin: 16px 4px 12px;
       font-size: 22px;
       line-height: 28px;
       font-weight: 700;
     }
 
-    .od-conflict-sheet--item + .od-conflict-sheet--item {
+    .bc-conflict-sheet--item + .bc-conflict-sheet--item {
       margin-top: 20px;
     }
 
-    .od-conflict-sheet--identity {
+    .bc-conflict-sheet--identity {
       padding: 12px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -394,30 +394,30 @@
       }
     }
 
-    .od-conflict-sheet--identity-icon {
+    .bc-conflict-sheet--identity-icon {
       flex: none;
       width: 56px;
       height: 40px;
       border-radius: 8px;
-      background: var(--od-background);
-      color: var(--od-text);
+      background: var(--bc-background);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-conflict-sheet--identity-text {
+    .bc-conflict-sheet--identity-text {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-conflict-sheet--identity-title {
+    .bc-conflict-sheet--identity-title {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(.ios) & {
         font-size: 17px;
@@ -425,22 +425,22 @@
       }
     }
 
-    .od-conflict-sheet--identity-sub {
+    .bc-conflict-sheet--identity-sub {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 15px;
       }
     }
 
-    .od-conflict-sheet--text {
+    .bc-conflict-sheet--text {
       margin: 16px 0 0;
       font-size: 14px;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         margin: 12px 4px 0;
@@ -451,11 +451,11 @@
 
       b {
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
 
-    .od-conflict-sheet--cards {
+    .bc-conflict-sheet--cards {
       margin-top: 12px;
       display: flex;
       flex-direction: column;
@@ -466,19 +466,19 @@
       }
     }
 
-    .od-conflict-sheet--choice {
+    .bc-conflict-sheet--choice {
       position: relative;
       display: flex;
       align-items: flex-start;
       padding: 13px 15px 15px;
-      border: 1px solid var(--od-menu-divider);
+      border: 1px solid var(--bc-menu-divider);
       border-radius: 16px;
       cursor: pointer;
 
       :global(.ios) & {
         border-radius: 14px;
         border-width: 0.5px;
-        background: var(--od-surface);
+        background: var(--bc-surface);
       }
 
       input {
@@ -489,59 +489,59 @@
         opacity: 0;
       }
 
-      &.od-conflict-sheet--selected {
+      &.bc-conflict-sheet--selected {
         padding: 14px 16px 16px;
         border: none;
         border-radius: 24px;
-        background: var(--od-selected-container);
+        background: var(--bc-selected-container);
 
         :global(.ios) & {
           border-radius: 14px;
-          background: var(--od-selected-container);
+          background: var(--bc-selected-container);
         }
 
-        .od-conflict-sheet--mark {
+        .bc-conflict-sheet--mark {
           border: none;
-          background: var(--od-selected);
-          color: var(--od-on-secondary);
+          background: var(--bc-selected);
+          color: var(--bc-on-secondary);
         }
 
-        .od-conflict-sheet--values {
-          background: var(--od-surface);
+        .bc-conflict-sheet--values {
+          background: var(--bc-surface);
         }
 
         /* On the tinted fill, the secondary text keeps its contrast in dark mode too. */
-        .od-conflict-sheet--card-title {
-          color: var(--od-on-secondary-container);
+        .bc-conflict-sheet--card-title {
+          color: var(--bc-on-secondary-container);
         }
 
-        .od-conflict-sheet--card-when {
-          color: var(--od-on-secondary-container);
+        .bc-conflict-sheet--card-when {
+          color: var(--bc-on-secondary-container);
         }
       }
 
       &:has(input:focus-visible) {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: 2px;
       }
     }
 
-    .od-conflict-sheet--mark {
+    .bc-conflict-sheet--mark {
       position: absolute;
       top: 12px;
       right: 12px;
       width: 24px;
       height: 24px;
       box-sizing: border-box;
-      border: 2px solid var(--od-chip-outline);
+      border: 2px solid var(--bc-chip-outline);
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-conflict-sheet--card-text {
+    .bc-conflict-sheet--card-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -549,11 +549,11 @@
       gap: 2px;
     }
 
-    .od-conflict-sheet--card-title {
+    .bc-conflict-sheet--card-title {
       padding-right: 32px;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text);
+      color: var(--bc-text);
 
       :global(.ios) & {
         font-size: 17px;
@@ -562,10 +562,10 @@
       }
     }
 
-    .od-conflict-sheet--card-when {
+    .bc-conflict-sheet--card-when {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 13px;
@@ -573,14 +573,14 @@
       }
     }
 
-    .od-conflict-sheet--values {
+    .bc-conflict-sheet--values {
       margin-top: 6px;
       padding: 8px 10px;
       border-radius: 8px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -588,7 +588,7 @@
       overflow-wrap: anywhere;
 
       :global(.ios) & {
-        background: var(--od-background);
+        background: var(--bc-background);
         font-size: 15px;
       }
 
@@ -596,45 +596,45 @@
         font-weight: 600;
       }
 
-      .od-conflict-sheet--loss {
+      .bc-conflict-sheet--loss {
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-conflict-sheet--unchanged {
+    .bc-conflict-sheet--unchanged {
       margin: 8px 0 0 4px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Several dives: the full-screen dialog (Android) and the same content in the large sheet (iOS). */
-    .od-conflict-sheet--full {
+    .bc-conflict-sheet--full {
       position: fixed;
       inset: 0;
       z-index: 13500;
       font-family: inherit;
     }
 
-    .od-conflict-sheet--full-surface {
+    .bc-conflict-sheet--full-surface {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
-      background: var(--od-background);
-      color: var(--od-text);
+      background: var(--bc-background);
+      color: var(--bc-text);
       outline: none;
     }
 
     /* Tablet (task 2026-11-19-293, android-tablette-etat-conflit-plusieurs): a large dialog over the screen, not a full page. */
     @media (min-width: 768px) {
-      .od-conflict-sheet--full {
+      .bc-conflict-sheet--full {
         background: rgba(0, 0, 0, 0.4);
       }
 
-      .od-conflict-sheet--full-surface {
+      .bc-conflict-sheet--full-surface {
         inset: 50% auto auto 50%;
         width: 720px;
         max-width: calc(100% - 48px);
@@ -645,7 +645,7 @@
       }
     }
 
-    .od-conflict-sheet--bar {
+    .bc-conflict-sheet--bar {
       flex: none;
       display: flex;
       align-items: center;
@@ -654,7 +654,7 @@
       padding: var(--f7-safe-area-top, 0px) 4px 0;
     }
 
-    .od-conflict-sheet--bar h1 {
+    .bc-conflict-sheet--bar h1 {
       flex: 1;
       min-width: 0;
       margin: 0 0 0 4px;
@@ -663,85 +663,85 @@
       font-weight: 500;
     }
 
-    .od-conflict-sheet--bar-close {
+    .bc-conflict-sheet--bar-close {
       flex: none;
       width: 48px;
       height: 48px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    button.od-conflict-sheet--tonal.od-conflict-sheet--bar-action {
+    button.bc-conflict-sheet--tonal.bc-conflict-sheet--bar-action {
       width: auto;
       flex: none;
       margin-right: 12px;
       padding: 0 16px;
     }
 
-    .od-conflict-sheet--full-body {
+    .bc-conflict-sheet--full-body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       padding: 0 16px calc(16px + var(--f7-safe-area-bottom, 0px));
     }
 
-    .od-conflict-sheet--intro-many {
+    .bc-conflict-sheet--intro-many {
       margin: 4px 4px 12px;
     }
 
-    .od-conflict-sheet--all-card,
-    .od-conflict-sheet--dive-card {
+    .bc-conflict-sheet--all-card,
+    .bc-conflict-sheet--dive-card {
       margin-bottom: 12px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
 
       :global(.ios) & {
         border-radius: 14px;
       }
     }
 
-    .od-conflict-sheet--all-card {
+    .bc-conflict-sheet--all-card {
       padding: 4px 16px;
     }
 
-    .od-conflict-sheet--dive-card {
+    .bc-conflict-sheet--dive-card {
       padding: 12px;
     }
 
-    .od-conflict-sheet--all-row {
+    .bc-conflict-sheet--all-row {
       min-height: 56px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-conflict-sheet--all-texts {
+    .bc-conflict-sheet--all-texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-conflict-sheet--all-title {
+    .bc-conflict-sheet--all-title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-conflict-sheet--all-sub {
+    .bc-conflict-sheet--all-sub {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-conflict-sheet--all-card .od-conflict-sheet--smalls {
+    .bc-conflict-sheet--all-card .bc-conflict-sheet--smalls {
       padding-bottom: 12px;
     }
 
-    button.od-conflict-sheet--dive-head {
+    button.bc-conflict-sheet--dive-head {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -755,13 +755,13 @@
       cursor: pointer;
     }
 
-    .od-conflict-sheet--smalls {
+    .bc-conflict-sheet--smalls {
       margin-top: 10px;
       display: flex;
       gap: 8px;
     }
 
-    .od-conflict-sheet--small {
+    .bc-conflict-sheet--small {
       position: relative;
       flex: 1;
       min-width: 0;
@@ -770,7 +770,7 @@
       gap: 2px;
       box-sizing: border-box;
       padding: 9px 9px 11px 11px;
-      border: 1px solid var(--od-menu-divider);
+      border: 1px solid var(--bc-menu-divider);
       border-radius: 14px;
       cursor: pointer;
 
@@ -782,21 +782,21 @@
         opacity: 0;
       }
 
-      &.od-conflict-sheet--selected {
+      &.bc-conflict-sheet--selected {
         padding: 10px 10px 12px 12px;
         border: none;
         border-radius: 20px;
-        background: var(--od-selected-container);
+        background: var(--bc-selected-container);
 
-        .od-conflict-sheet--small-mark {
+        .bc-conflict-sheet--small-mark {
           border: none;
-          background: var(--od-selected);
-          color: var(--od-on-secondary);
+          background: var(--bc-selected);
+          color: var(--bc-on-secondary);
         }
 
-        .od-conflict-sheet--small-title,
-        .od-conflict-sheet--small-when {
-          color: var(--od-on-secondary-container);
+        .bc-conflict-sheet--small-title,
+        .bc-conflict-sheet--small-when {
+          color: var(--bc-on-secondary-container);
         }
       }
 
@@ -807,12 +807,12 @@
       }
 
       &:has(input:focus-visible) {
-        outline: 2px solid var(--od-text);
+        outline: 2px solid var(--bc-text);
         outline-offset: 2px;
       }
     }
 
-    .od-conflict-sheet--small-mark {
+    .bc-conflict-sheet--small-mark {
       top: 8px;
       right: 8px;
       width: 20px;
@@ -820,24 +820,24 @@
       border-radius: 10px;
     }
 
-    .od-conflict-sheet--small-title {
+    .bc-conflict-sheet--small-title {
       padding-right: 24px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
     }
 
-    .od-conflict-sheet--small-when {
+    .bc-conflict-sheet--small-when {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-conflict-sheet--small-value {
+    .bc-conflict-sheet--small-value {
       margin-top: 4px;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       line-clamp: 2;
@@ -846,31 +846,31 @@
       overflow-wrap: anywhere;
     }
 
-    .od-conflict-sheet--failed {
+    .bc-conflict-sheet--failed {
       margin: 12px 0 0;
       font-size: 14px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
     }
 
     /* « Continuer »: on the tertiary container, what waits for the diver (task 2026-11-13-103). */
-    button.od-conflict-sheet--tonal.od-conflict-sheet--continue {
-      background: var(--od-tertiary-container);
-      color: var(--od-on-tertiary-container);
+    button.bc-conflict-sheet--tonal.bc-conflict-sheet--continue {
+      background: var(--bc-tertiary-container);
+      color: var(--bc-on-tertiary-container);
     }
 
-    button.od-conflict-sheet--tonal.od-conflict-sheet--tonal {
+    button.bc-conflict-sheet--tonal.bc-conflict-sheet--tonal {
       height: 40px;
       padding: 0 24px;
       border: none;
       border-radius: 20px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.1px;
 
-      &.od-conflict-sheet--wide {
+      &.bc-conflict-sheet--wide {
         width: 100%;
         height: 50px;
         margin-top: 16px;
@@ -879,28 +879,28 @@
       }
     }
 
-    .od-conflict-sheet--later {
+    .bc-conflict-sheet--later {
       width: 100%;
       height: 44px;
       margin-top: 4px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 17px;
     }
 
-    .od-conflict-sheet--sheet.od-conflict-sheet--large {
+    .bc-conflict-sheet--sheet.bc-conflict-sheet--large {
       max-height: none;
       height: 100%;
       box-sizing: border-box;
     }
 
-    .od-conflict-sheet--sheet {
+    .bc-conflict-sheet--sheet {
       max-height: 85vh;
       overflow-y: auto;
       padding: 8px 16px calc(16px + var(--f7-safe-area-bottom, 0px));
-      background: var(--od-background);
+      background: var(--bc-background);
       display: flex;
       flex-direction: column;
     }

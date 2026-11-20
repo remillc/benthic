@@ -40,7 +40,7 @@ test('the action sheet: the explanation, the action in red, « Annuler » apart'
   assert.equal(buttons[1][0].bold, true);
   const page = src('pages/CylinderType.svelte');
   assert.match(page, /if \(ios\) \{[^}]*confirmActionSheet/s);
-  assert.match(page, /od-cylinder-type--delete-ios/);
+  assert.match(page, /bc-cylinder-type--delete-ios/);
 });
 
 test('StoreKit and Sign in with Apple stay inert: the same « not available » answers', async () => {
@@ -64,5 +64,5 @@ test('the offer shows « Restaurer les achats » and the renewal terms on iOS; t
 test('the account sheet on iPhone: « Carnet sur cet iPhone » for the free version, the OpenDives+ chip for a subscriber', () => {
   const sheet = src('components/AccountSheet.svelte');
   assert.match(sheet, /account\.free\.deviceIos/);
-  assert.match(sheet, /od-account-sheet--ios-link/);
+  assert.match(sheet, /bc-account-sheet--ios-link/);
 });

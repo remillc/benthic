@@ -40,45 +40,45 @@
   });
 </script>
 
-<div class="od-plans-panel--scrim" role="presentation" onclick={onclose}></div>
-<aside class="od-plans-panel" role="dialog" aria-modal="true" aria-labelledby="od-plans-panel-title" bind:this={panel}>
-  <header class="od-plans-panel--head">
+<div class="bc-plans-panel--scrim" role="presentation" onclick={onclose}></div>
+<aside class="bc-plans-panel" role="dialog" aria-modal="true" aria-labelledby="od-plans-panel-title" bind:this={panel}>
+  <header class="bc-plans-panel--head">
     <h2 id="od-plans-panel-title">{t('plans.title')}</h2>
-    <button type="button" class="od-plans-panel--close" aria-label={t('nav.close')} onclick={onclose}><Icon name="close" size={24} /></button>
+    <button type="button" class="bc-plans-panel--close" aria-label={t('nav.close')} onclick={onclose}><Icon name="close" size={24} /></button>
   </header>
-  <p class="od-plans-panel--intro">{t('plans.intro')}</p>
+  <p class="bc-plans-panel--intro">{t('plans.intro')}</p>
   {#if plans.length}
-    <ul class="od-plans-panel--list">
+    <ul class="bc-plans-panel--list">
       {#each plans as plan (plan.id)}
         <li>
-          <button type="button" class="od-plans-panel--row" class:od-plans-panel--open={plan.id === openId} onclick={() => onchoose(plan.id)}>
-            <span class="od-plans-panel--texts">
-              <span class="od-plans-panel--name">{title(plan)}</span>
-              <span class="od-plans-panel--detail">{detail(plan)}</span>
+          <button type="button" class="bc-plans-panel--row" class:bc-plans-panel--open={plan.id === openId} onclick={() => onchoose(plan.id)}>
+            <span class="bc-plans-panel--texts">
+              <span class="bc-plans-panel--name">{title(plan)}</span>
+              <span class="bc-plans-panel--detail">{detail(plan)}</span>
             </span>
-            <span class="od-plans-panel--figures">
-              <span class="od-plans-panel--depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
-              <span class="od-plans-panel--time">{formatDuration(plan.durationSeconds)}</span>
+            <span class="bc-plans-panel--figures">
+              <span class="bc-plans-panel--depth">{formatDepth(plan.maxDepthMm, prefs)}</span>
+              <span class="bc-plans-panel--time">{formatDuration(plan.durationSeconds)}</span>
             </span>
           </button>
         </li>
       {/each}
     </ul>
   {:else}
-    <p class="od-plans-panel--empty">{t('plans.empty')}</p>
+    <p class="bc-plans-panel--empty">{t('plans.empty')}</p>
   {/if}
-  <button type="button" class="od-outlined-button od-plans-panel--new" onclick={onnew}>{t('plans.new')}</button>
+  <button type="button" class="bc-outlined-button bc-plans-panel--new" onclick={onnew}>{t('plans.new')}</button>
 </aside>
 
 <style>
   @layer od.components {
-    .od-plans-panel--scrim {
+    .bc-plans-panel--scrim {
       position: fixed;
       inset: 0;
       z-index: 13000;
       background: rgb(0 0 0 / 0.4);
     }
-    .od-plans-panel {
+    .bc-plans-panel {
       position: fixed;
       z-index: 13001;
       top: 0;
@@ -89,49 +89,49 @@
       padding: 16px;
       overflow-y: auto;
       border-radius: 28px 0 0 28px;
-      background: var(--od-background);
-      color: var(--od-text);
+      background: var(--bc-background);
+      color: var(--bc-text);
       box-shadow: -8px 0 32px rgb(0 0 0 / 0.25);
     }
-    .od-plans-panel--head {
+    .bc-plans-panel--head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 4px 4px 0 8px;
     }
-    .od-plans-panel--head h2 {
+    .bc-plans-panel--head h2 {
       margin: 0;
       font-size: 24px;
       font-weight: 500;
     }
-    .od-plans-panel--close {
+    .bc-plans-panel--close {
       width: 40px;
       height: 40px;
       border: 0;
       border-radius: 20px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       display: grid;
       place-items: center;
       cursor: pointer;
     }
-    .od-plans-panel--intro {
+    .bc-plans-panel--intro {
       margin: 4px 8px 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 14px;
     }
-    .od-plans-panel--list {
+    .bc-plans-panel--list {
       margin: 0 0 16px;
       padding: 0;
       list-style: none;
       border-radius: 20px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-plans-panel--list li + li {
-      border-top: 1px solid var(--od-separator);
+    .bc-plans-panel--list li + li {
+      border-top: 1px solid var(--bc-separator);
     }
-    .od-plans-panel--row {
+    .bc-plans-panel--row {
       width: 100%;
       min-height: 56px;
       padding: 8px 16px;
@@ -140,47 +140,47 @@
       align-items: center;
       gap: 12px;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
     }
-    .od-plans-panel--row:hover {
-      background: color-mix(in srgb, var(--od-text) 6%, transparent);
+    .bc-plans-panel--row:hover {
+      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
     }
-    .od-plans-panel--open,
-    .od-plans-panel--open:hover {
-      background: var(--od-selected-container);
+    .bc-plans-panel--open,
+    .bc-plans-panel--open:hover {
+      background: var(--bc-selected-container);
     }
-    .od-plans-panel--texts,
-    .od-plans-panel--figures {
+    .bc-plans-panel--texts,
+    .bc-plans-panel--figures {
       display: flex;
       flex-direction: column;
     }
-    .od-plans-panel--texts {
+    .bc-plans-panel--texts {
       flex: 1;
       min-width: 0;
     }
-    .od-plans-panel--figures {
+    .bc-plans-panel--figures {
       align-items: flex-end;
     }
-    .od-plans-panel--name,
-    .od-plans-panel--depth {
+    .bc-plans-panel--name,
+    .bc-plans-panel--depth {
       font-size: 16px;
     }
-    .od-plans-panel--depth {
+    .bc-plans-panel--depth {
       font-weight: 600;
     }
-    .od-plans-panel--detail,
-    .od-plans-panel--time {
-      color: var(--od-text-2);
+    .bc-plans-panel--detail,
+    .bc-plans-panel--time {
+      color: var(--bc-text-2);
       font-size: 13px;
     }
-    .od-plans-panel--empty {
+    .bc-plans-panel--empty {
       margin: 24px 8px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-plans-panel--new {
+    .bc-plans-panel--new {
       width: auto;
     }
   }

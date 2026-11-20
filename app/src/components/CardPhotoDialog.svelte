@@ -115,12 +115,12 @@
   }
 </script>
 
-<Md3Dialog title={photo ? t('diverProfile.cert.photoDialog.title') : t(side === 'front' ? 'diverProfile.cert.photoDialog.titleFront' : 'diverProfile.cert.photoDialog.titleBack')} {oncancel} class="od-card-photo">
-  <div class="od-card-photo--body">
+<Md3Dialog title={photo ? t('diverProfile.cert.photoDialog.title') : t(side === 'front' ? 'diverProfile.cert.photoDialog.titleFront' : 'diverProfile.cert.photoDialog.titleBack')} {oncancel} class="bc-card-photo">
+  <div class="bc-card-photo--body">
   {#if !photo}
     <div
-      class="od-card-photo--drop"
-      class:od-card-photo--over={over}
+      class="bc-card-photo--drop"
+      class:bc-card-photo--over={over}
       role="group"
       aria-label={t('diverProfile.cert.photoDialog.drop')}
       ondragover={(e) => (e.preventDefault(), (over = true))}
@@ -128,49 +128,49 @@
       ondrop={dropped}
     >
       <Icon name="image" size={32} />
-      <p class="od-card-photo--drop-title">{t('diverProfile.cert.photoDialog.drop')}</p>
-      <p class="od-card-photo--drop-hint">{t('diverProfile.cert.photoDialog.paste')}</p>
-      <button type="button" class="od-tonal-button" onclick={() => input?.click()}>{t('diverProfile.cert.photoDialog.choose')}</button>
+      <p class="bc-card-photo--drop-title">{t('diverProfile.cert.photoDialog.drop')}</p>
+      <p class="bc-card-photo--drop-hint">{t('diverProfile.cert.photoDialog.paste')}</p>
+      <button type="button" class="bc-tonal-button" onclick={() => input?.click()}>{t('diverProfile.cert.photoDialog.choose')}</button>
       <input bind:this={input} type="file" accept="image/*" hidden onchange={chosen} />
     </div>
   {:else}
-    <div class="od-card-photo--pair">
-      <figure class="od-card-photo--figure" bind:this={before}>
+    <div class="bc-card-photo--pair">
+      <figure class="bc-card-photo--figure" bind:this={before}>
         <figcaption>{t('diverProfile.cert.photoDialog.before')}</figcaption>
-        <div class="od-card-photo--frame">
+        <div class="bc-card-photo--frame">
           <img src={photoSrc} alt="" draggable="false" />
           {#if corners}
-            <svg class="od-card-photo--quad" viewBox="0 0 {photo.width} {photo.height}" onpointermove={drag} onpointerup={() => (dragging = -1)} role="presentation">
+            <svg class="bc-card-photo--quad" viewBox="0 0 {photo.width} {photo.height}" onpointermove={drag} onpointerup={() => (dragging = -1)} role="presentation">
               <polygon points={corners.map((c) => `${c.x},${c.y}`).join(' ')} />
               {#if adjusting}
                 {#each corners as c, i (i)}
-                  <circle class="od-card-photo--corner" cx={c.x} cy={c.y} r={Math.max(photo.width, photo.height) / 60} onpointerdown={(e) => grab(e, i)} role="presentation" />
+                  <circle class="bc-card-photo--corner" cx={c.x} cy={c.y} r={Math.max(photo.width, photo.height) / 60} onpointerdown={(e) => grab(e, i)} role="presentation" />
                 {/each}
               {/if}
             </svg>
           {/if}
         </div>
       </figure>
-      <figure class="od-card-photo--figure">
+      <figure class="bc-card-photo--figure">
         <figcaption>{t('diverProfile.cert.photoDialog.after')}</figcaption>
-        <div class="od-card-photo--frame od-card-photo--after"><canvas bind:this={after}></canvas></div>
+        <div class="bc-card-photo--frame bc-card-photo--after"><canvas bind:this={after}></canvas></div>
       </figure>
     </div>
-    <div class="od-card-photo--checks">
-      <span class="od-card-photo--check" class:od-card-photo--check-off={!found}><Icon name={found ? 'check' : 'close'} size={20} />{t(found ? 'diverProfile.cert.photoDialog.framed' : 'diverProfile.cert.photoDialog.notFramed')}</span>
-      <span class="od-card-photo--check"><Icon name="check" size={20} />{t('diverProfile.cert.photoDialog.straightened')}</span>
-      <label class="od-card-photo--glare">
+    <div class="bc-card-photo--checks">
+      <span class="bc-card-photo--check" class:bc-card-photo--check-off={!found}><Icon name={found ? 'check' : 'close'} size={20} />{t(found ? 'diverProfile.cert.photoDialog.framed' : 'diverProfile.cert.photoDialog.notFramed')}</span>
+      <span class="bc-card-photo--check"><Icon name="check" size={20} />{t('diverProfile.cert.photoDialog.straightened')}</span>
+      <label class="bc-card-photo--glare">
         <span>{t('diverProfile.cert.photoDialog.glare')}</span>
         <span class="toggle"><input type="checkbox" bind:checked={glare} /><span class="toggle-icon"></span></span>
       </label>
     </div>
-    <p class="od-card-photo--note">{t('diverProfile.cert.photoDialog.local')}</p>
-    {#if failed}<p class="od-card-photo--error" role="alert">{t('diverProfile.cert.photoFailed')}</p>{/if}
+    <p class="bc-card-photo--note">{t('diverProfile.cert.photoDialog.local')}</p>
+    {#if failed}<p class="bc-card-photo--error" role="alert">{t('diverProfile.cert.photoFailed')}</p>{/if}
   {/if}
   </div>
   {#snippet actions()}
     {#if photo}
-      <button type="button" class="od-card-photo--adjust" aria-pressed={adjusting} onclick={() => (adjusting = !adjusting)}><Icon name="fullscreen" size={20} />{t(adjusting ? 'diverProfile.cert.photoDialog.adjustDone' : 'diverProfile.cert.photoDialog.adjust')}</button>
+      <button type="button" class="bc-card-photo--adjust" aria-pressed={adjusting} onclick={() => (adjusting = !adjusting)}><Icon name="fullscreen" size={20} />{t(adjusting ? 'diverProfile.cert.photoDialog.adjustDone' : 'diverProfile.cert.photoDialog.adjust')}</button>
       <button type="button" onclick={() => { photoSrc && URL.revokeObjectURL(photoSrc); photo = null; photoSrc = ''; corners = null; source = null; }}>{t('diverProfile.cert.photoDialog.other')}</button>
       <button type="button" onclick={use} disabled={busy}>{t('diverProfile.cert.photoDialog.use')}</button>
     {:else}
@@ -181,13 +181,13 @@
 
 <style>
   @layer od.components {
-    .od-card-photo--body {
+    .bc-card-photo--body {
       padding: 0 24px;
     }
-    .od-card-photo--drop {
+    .bc-card-photo--drop {
       min-width: min(560px, 80vw);
       padding: 32px 16px;
-      border: 2px dashed var(--od-outline);
+      border: 2px dashed var(--bc-outline);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -195,103 +195,103 @@
       gap: 8px;
       text-align: center;
     }
-    .od-card-photo--over {
-      border-color: var(--od-secondary);
-      background: var(--od-selected-container);
+    .bc-card-photo--over {
+      border-color: var(--bc-secondary);
+      background: var(--bc-selected-container);
     }
-    .od-card-photo--drop-title {
+    .bc-card-photo--drop-title {
       margin: 0;
       font-size: 16px;
       font-weight: 500;
     }
-    .od-card-photo--drop-hint {
+    .bc-card-photo--drop-hint {
       margin: 0 0 8px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 14px;
     }
-    .od-card-photo--pair {
+    .bc-card-photo--pair {
       display: flex;
       gap: 24px;
       align-items: flex-start;
     }
-    .od-card-photo--figure {
+    .bc-card-photo--figure {
       margin: 0;
       flex: 1;
       min-width: 0;
     }
-    .od-card-photo--figure figcaption {
+    .bc-card-photo--figure figcaption {
       margin-bottom: 4px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 13px;
       font-weight: 600;
     }
-    .od-card-photo--frame {
+    .bc-card-photo--frame {
       position: relative;
       border-radius: 12px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       line-height: 0;
     }
-    .od-card-photo--frame img,
-    .od-card-photo--frame canvas {
+    .bc-card-photo--frame img,
+    .bc-card-photo--frame canvas {
       width: 100%;
       max-height: 280px;
       object-fit: contain;
       user-select: none;
     }
-    .od-card-photo--quad {
+    .bc-card-photo--quad {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       touch-action: none;
     }
-    .od-card-photo--quad polygon {
+    .bc-card-photo--quad polygon {
       fill: rgb(255 255 255 / 0.12);
-      stroke: var(--od-secondary);
+      stroke: var(--bc-secondary);
       stroke-width: 3;
       vector-effect: non-scaling-stroke;
     }
-    .od-card-photo--corner {
+    .bc-card-photo--corner {
       fill: #FFFFFF;
-      stroke: var(--od-secondary);
+      stroke: var(--bc-secondary);
       stroke-width: 3;
       vector-effect: non-scaling-stroke;
       cursor: grab;
     }
-    .od-card-photo--checks {
+    .bc-card-photo--checks {
       margin-top: 16px;
       padding: 12px 16px;
       border-radius: 16px;
       display: flex;
       align-items: center;
       gap: 24px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-card-photo--check {
+    .bc-card-photo--check {
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
-    .od-card-photo--check-off {
-      color: var(--od-text-2);
+    .bc-card-photo--check-off {
+      color: var(--bc-text-2);
     }
-    .od-card-photo--glare {
+    .bc-card-photo--glare {
       margin-inline-start: auto;
       display: inline-flex;
       align-items: center;
       gap: 12px;
     }
-    .od-card-photo--note,
-    .od-card-photo--error {
+    .bc-card-photo--note,
+    .bc-card-photo--error {
       margin: 8px 0 0;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 13px;
     }
-    .od-card-photo--error {
-      color: var(--od-alarm);
+    .bc-card-photo--error {
+      color: var(--bc-alarm);
     }
-    .od-card-photo--adjust {
+    .bc-card-photo--adjust {
       margin-inline-end: auto;
       display: inline-flex;
       align-items: center;

@@ -30,13 +30,13 @@
       const { width, height } = menu.getBoundingClientRect();
       left = Math.max(8, Math.min(x, innerWidth - width - 8));
       top = Math.max(8, Math.min(y, innerHeight - height - 8));
-      /** @type {HTMLElement|null} */ (menu.querySelector('.od-context-menu--item:not(:disabled)'))?.focus();
+      /** @type {HTMLElement|null} */ (menu.querySelector('.bc-context-menu--item:not(:disabled)'))?.focus();
     });
   });
 
   /** @param {KeyboardEvent} e */
   function keydown(e) {
-    const items = /** @type {HTMLElement[]} */ ([...(menu?.querySelectorAll('.od-context-menu--item:not(:disabled)') ?? [])]);
+    const items = /** @type {HTMLElement[]} */ ([...(menu?.querySelectorAll('.bc-context-menu--item:not(:disabled)') ?? [])]);
     const at = items.indexOf(/** @type {HTMLElement} */ (document.activeElement));
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -59,23 +59,23 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="od-context-menu--scrim"
+  class="bc-context-menu--scrim"
   onpointerdown={(e) => e.target === e.currentTarget && onclose()}
   oncontextmenu={(e) => {
     e.preventDefault();
     onclose();
   }}
 >
-  <div class="od-context-menu" role="menu" aria-label={heading} bind:this={menu} style:left="{left}px" style:top="{top}px" tabindex="-1" onkeydown={keydown}>
-    {#if heading}<p class="od-context-menu--heading">{heading}</p>{/if}
+  <div class="bc-context-menu" role="menu" aria-label={heading} bind:this={menu} style:left="{left}px" style:top="{top}px" tabindex="-1" onkeydown={keydown}>
+    {#if heading}<p class="bc-context-menu--heading">{heading}</p>{/if}
     {#each entries as entry, i (entry.key === 'separator' ? `separator${i}` : entry.key)}
       {#if entry.key === 'separator'}
-        <div class="od-context-menu--separator" role="separator"></div>
+        <div class="bc-context-menu--separator" role="separator"></div>
       {:else if 'label' in entry}
-        <button type="button" role="menuitem" class="od-context-menu--item" class:od-context-menu--danger={entry.danger} disabled={entry.disabled} aria-disabled={entry.disabled} title={entry.hint ? t(entry.hint) : undefined} onclick={() => choose(entry.key)}>
+        <button type="button" role="menuitem" class="bc-context-menu--item" class:bc-context-menu--danger={entry.danger} disabled={entry.disabled} aria-disabled={entry.disabled} title={entry.hint ? t(entry.hint) : undefined} onclick={() => choose(entry.key)}>
           <Icon name={/** @type {any} */ (entry.icon)} size={20} />
-          <span class="od-context-menu--label">{entry.text ?? t(entry.label)}{#if entry.hint}<span class="od-context-menu--hint">{t(entry.hint)}</span>{/if}</span>
-          {#if entry.shortcut}<kbd class="od-context-menu--shortcut">{entry.shortcut}</kbd>{/if}
+          <span class="bc-context-menu--label">{entry.text ?? t(entry.label)}{#if entry.hint}<span class="bc-context-menu--hint">{t(entry.hint)}</span>{/if}</span>
+          {#if entry.shortcut}<kbd class="bc-context-menu--shortcut">{entry.shortcut}</kbd>{/if}
         </button>
       {/if}
     {/each}
@@ -84,30 +84,30 @@
 
 <style>
   @layer od.components {
-    .od-context-menu--scrim {
+    .bc-context-menu--scrim {
       position: fixed;
       inset: 0;
       z-index: 13000;
     }
-    .od-context-menu {
+    .bc-context-menu {
       position: fixed;
       min-width: 280px;
       max-width: 360px;
       padding: 8px 0;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow:
         0 2px 6px 2px rgb(0 0 0 / 0.15),
         0 1px 2px rgb(0 0 0 / 0.3);
       outline: none;
     }
-    .od-context-menu--heading {
+    .bc-context-menu--heading {
       margin: 0;
       padding: 4px 16px 8px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-context-menu--item {
+    .bc-context-menu--item {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -118,43 +118,43 @@
       background: none;
       font: inherit;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-align: start;
       cursor: pointer;
     }
-    .od-context-menu--item:disabled {
+    .bc-context-menu--item:disabled {
       opacity: 0.38;
       cursor: default;
     }
-    .od-context-menu--item:not(:disabled):hover,
-    .od-context-menu--item:focus-visible {
-      background: color-mix(in srgb, var(--od-text) 8%, transparent);
+    .bc-context-menu--item:not(:disabled):hover,
+    .bc-context-menu--item:focus-visible {
+      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       outline: none;
     }
-    .od-context-menu--label {
+    .bc-context-menu--label {
       flex: 1;
     }
     /* The supporting line of a disabled item: why it cannot be chosen. */
-    .od-context-menu--hint {
+    .bc-context-menu--hint {
       display: block;
       padding-block: 2px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-context-menu--shortcut {
+    .bc-context-menu--shortcut {
       font: inherit;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-context-menu--danger,
-    .od-context-menu--danger .od-context-menu--shortcut {
-      color: var(--od-menu-danger);
+    .bc-context-menu--danger,
+    .bc-context-menu--danger .bc-context-menu--shortcut {
+      color: var(--bc-menu-danger);
     }
-    .od-context-menu--separator {
+    .bc-context-menu--separator {
       height: 1px;
       margin: 8px 0;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
   }
 </style>

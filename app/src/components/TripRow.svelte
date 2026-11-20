@@ -61,9 +61,9 @@
 
 {#if card}
   <li
-    class="od-trip-row od-trip-row--card"
-    class:od-trip-row--card-last={cardLast}
-    class:od-trip-row--gap-before={gapBefore}
+    class="bc-trip-row bc-trip-row--card"
+    class:bc-trip-row--card-last={cardLast}
+    class:bc-trip-row--gap-before={gapBefore}
     data-trip={dives[0].trip?.id}
     data-virtual-list-index={index}
     style:top={top === undefined ? undefined : `${top}px`}
@@ -73,31 +73,31 @@
       href="/trips/{dives[0].trip?.id}"
       data-reload-detail="true"
       draggable="false"
-      class="od-trip-row--surface"
+      class="bc-trip-row--surface"
       role={selecting ? 'checkbox' : undefined}
       aria-checked={selecting ? checked : undefined}
     >
       {#if selecting}
         <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
       {/if}
-      <span class="od-trip-row--badge" aria-hidden="true"><Icon name="trip" size={22} weight={2} /></span>
-      <span class="od-trip-row--text">
-        <span class="od-trip-row--title">{title}</span>
-        <span class="od-trip-row--summary">{summary}</span>
+      <span class="bc-trip-row--badge" aria-hidden="true"><Icon name="trip" size={22} weight={2} /></span>
+      <span class="bc-trip-row--text">
+        <span class="bc-trip-row--title">{title}</span>
+        <span class="bc-trip-row--summary">{summary}</span>
       </span>
       <button
         type="button"
-        class="od-trip-row--expand"
+        class="bc-trip-row--expand"
         aria-expanded={expanded}
         aria-label={t(expanded ? 'trip.collapse' : 'trip.expand')}
         onclick={toggle}
       >
-        <span class="od-trip-row--arrow" class:od-trip-row--expanded={expanded}><Icon name="expand" /></span>
+        <span class="bc-trip-row--arrow" class:bc-trip-row--expanded={expanded}><Icon name="expand" /></span>
       </button>
     </a>
   </li>
 {:else}
-<li class="od-trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
+<li class="bc-trip-row" data-trip={dives[0].trip?.id} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- The row opens the trip screen (spec, section 4, "Trip"); the arrow expands the trip in place. On a tablet the trip replaces what the pane shows (first screen of the pane). -->
   <a
     href="/trips/{dives[0].trip?.id}"
@@ -111,26 +111,26 @@
       <span class="checkbox" aria-hidden="true"><input type="checkbox" {checked} tabindex="-1" /><i class="icon-checkbox"></i></span>
     {/if}
     <div class="item-media">
-      <div class="od-trip-row--grid" aria-hidden="true">
+      <div class="bc-trip-row--grid" aria-hidden="true">
         {#each preview as d (d.id)}
           <ProfileThumbnail profile={d.profile} maxDepthMm={d.maxDepthMm} {prefs} small />
         {/each}
       </div>
     </div>
-    <div class="item-inner od-row">
-      <div class="od-row-text">
+    <div class="item-inner bc-row">
+      <div class="bc-row-text">
         <div class="item-title">{title}</div>
-        <div class="item-text od-value">{summary}</div>
+        <div class="item-text bc-value">{summary}</div>
         {#if location && theme.ios}<div class="item-text">{t('trip.startingOn', { date: formatDate(start) })}</div>{/if}
       </div>
       <button
         type="button"
-        class="od-trip-row--expand"
+        class="bc-trip-row--expand"
         aria-expanded={expanded}
         aria-label={t(expanded ? 'trip.collapse' : 'trip.expand')}
         onclick={toggle}
       >
-        <span class="od-trip-row--arrow" class:od-trip-row--expanded={expanded}><Icon name="expand" /></span>
+        <span class="bc-trip-row--arrow" class:bc-trip-row--expanded={expanded}><Icon name="expand" /></span>
       </button>
     </div>
   </a>
@@ -140,16 +140,16 @@
 <style>
   @layer od.components {
     /* Phone header (task 2026-11-18-278): the top of the trip's white card, pale blue. */
-    .od-trip-row--card {
+    .bc-trip-row--card {
       list-style: none;
       padding: 0 12px;
     }
 
-    .od-trip-row--gap-before {
+    .bc-trip-row--gap-before {
       padding-top: 12px;
     }
 
-    .od-trip-row--surface {
+    .bc-trip-row--surface {
       display: flex;
       align-items: center;
       gap: 14px;
@@ -157,16 +157,16 @@
       min-height: 72px;
       padding: 12px 6px 12px 12px;
       border-radius: 20px 20px 0 0;
-      background: var(--od-trip-header);
-      color: var(--od-text);
+      background: var(--bc-trip-header);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-trip-row--card-last .od-trip-row--surface {
+    .bc-trip-row--card-last .bc-trip-row--surface {
       border-radius: 20px;
     }
 
-    .od-trip-row--badge {
+    .bc-trip-row--badge {
       flex: none;
       display: flex;
       align-items: center;
@@ -175,11 +175,11 @@
       width: 48px;
       height: 48px;
       border-radius: 14px;
-      background: var(--od-surface);
-      color: var(--od-on-date-block);
+      background: var(--bc-surface);
+      color: var(--bc-on-date-block);
     }
 
-    .od-trip-row--text {
+    .bc-trip-row--text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -187,7 +187,7 @@
       gap: 2px;
     }
 
-    .od-trip-row--title {
+    .bc-trip-row--title {
       font-size: 16px;
       line-height: 22px;
       font-weight: 600;
@@ -196,18 +196,18 @@
       text-overflow: ellipsis;
     }
 
-    .od-trip-row--summary {
+    .bc-trip-row--summary {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
     }
 
-    .od-trip-row--card .od-trip-row--expand {
+    .bc-trip-row--card .bc-trip-row--expand {
       margin-right: 0;
     }
 
-    .od-trip-row--grid {
+    .bc-trip-row--grid {
       width: 56px;
       height: 40px;
       display: grid;
@@ -228,24 +228,24 @@
     }
 
     /* 48 px touch target for the arrow, separate from the row's link. */
-    .od-trip-row--expand {
+    .bc-trip-row--expand {
       width: 48px;
       height: 48px;
       margin-right: -12px;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
       flex: none;
     }
 
-    .od-trip-row--arrow {
+    .bc-trip-row--arrow {
       display: block;
       transition: transform 200ms;
 
-      &.od-trip-row--expanded {
+      &.bc-trip-row--expanded {
         transform: rotate(180deg);
       }
     }

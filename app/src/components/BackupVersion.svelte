@@ -61,50 +61,50 @@
 </script>
 
 {#if version}
-  <div class="od-backup od-backup-version">
-    {#if heading}<h2 class="od-backup--section od-backup-version--title">{versionWhen(version.time)}</h2>{/if}
-    <div class="od-backup--counts">
-      <span class="od-backup--count">
-        <span class="od-backup--count-n">{version.counts.dives}</span>
-        <span class="od-backup--count-label">{t('backup.version.dives', { n: version.counts.dives }).replace(/^[\d  ]+/, '')}</span>
+  <div class="bc-backup bc-backup-version">
+    {#if heading}<h2 class="bc-backup--section bc-backup-version--title">{versionWhen(version.time)}</h2>{/if}
+    <div class="bc-backup--counts">
+      <span class="bc-backup--count">
+        <span class="bc-backup--count-n">{version.counts.dives}</span>
+        <span class="bc-backup--count-label">{t('backup.version.dives', { n: version.counts.dives }).replace(/^[\d  ]+/, '')}</span>
       </span>
-      <span class="od-backup--count">
-        <span class="od-backup--count-n">{version.counts.sites}</span>
-        <span class="od-backup--count-label">{t('backup.version.sites', { n: version.counts.sites }).replace(/^[\d  ]+/, '')}</span>
+      <span class="bc-backup--count">
+        <span class="bc-backup--count-n">{version.counts.sites}</span>
+        <span class="bc-backup--count-label">{t('backup.version.sites', { n: version.counts.sites }).replace(/^[\d  ]+/, '')}</span>
       </span>
       {#if version.counts.pieces != null}
-        <span class="od-backup--count">
-          <span class="od-backup--count-n">{version.counts.pieces}</span>
-          <span class="od-backup--count-label">{t('backup.version.pieces', { n: version.counts.pieces }).replace(/^[\d  ]+/, '')}</span>
+        <span class="bc-backup--count">
+          <span class="bc-backup--count-n">{version.counts.pieces}</span>
+          <span class="bc-backup--count-label">{t('backup.version.pieces', { n: version.counts.pieces }).replace(/^[\d  ]+/, '')}</span>
         </span>
       {/if}
     </div>
 
-    <h3 class="od-backup--section">{t('backup.version.differences')}</h3>
+    <h3 class="bc-backup--section">{t('backup.version.differences')}</h3>
     {#if failed}
-      <p class="od-backup--error">{t('backup.versions.failed')}</p>
+      <p class="bc-backup--error">{t('backup.versions.failed')}</p>
     {:else if !detail}
-      <p class="od-backup--empty" role="status">{t('backup.versions.loading')}</p>
+      <p class="bc-backup--empty" role="status">{t('backup.versions.loading')}</p>
     {:else if !blocks.length}
-      <p class="od-backup--empty">{t('backup.version.none')}</p>
+      <p class="bc-backup--empty">{t('backup.version.none')}</p>
     {:else}
-      <div class="od-backup--list">
+      <div class="bc-backup--list">
         {#each blocks as b (b.kind)}
-          <div class="od-backup--diff">
-            <span class="od-backup--tile"><Icon name={ICONS[b.kind]} size={20} weight={1.8} /></span>
-            <span class="od-backup--texts">
-              <span class="od-backup--row-title">{b.title}</span>
-              <span class="od-backup--diff-detail">{b.detail}</span>
+          <div class="bc-backup--diff">
+            <span class="bc-backup--tile"><Icon name={ICONS[b.kind]} size={20} weight={1.8} /></span>
+            <span class="bc-backup--texts">
+              <span class="bc-backup--row-title">{b.title}</span>
+              <span class="bc-backup--diff-detail">{b.detail}</span>
             </span>
           </div>
         {/each}
       </div>
     {/if}
 
-    <div class="od-backup--actions">
-      <button type="button" class="od-tonal-button" disabled={!detail || backup.busy} onclick={askRestore}>{t('backup.version.restore')}</button>
-      <button type="button" class="od-outlined-button" disabled={backup.busy} onclick={() => onbrowse(version.id)}>{t('backup.version.browse')}</button>
+    <div class="bc-backup--actions">
+      <button type="button" class="bc-tonal-button" disabled={!detail || backup.busy} onclick={askRestore}>{t('backup.version.restore')}</button>
+      <button type="button" class="bc-outlined-button" disabled={backup.busy} onclick={() => onbrowse(version.id)}>{t('backup.version.browse')}</button>
     </div>
-    <p class="od-backup--note">{t('backup.version.browseNote')}</p>
+    <p class="bc-backup--note">{t('backup.version.browseNote')}</p>
   </div>
 {/if}

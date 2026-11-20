@@ -63,10 +63,10 @@ async function inject() {
       cap.__odHooked = true;
     }
     window.__od = {
-      root() { const all = [...document.querySelectorAll('.od-planner')].filter((e) => e.offsetParent !== null); return all[all.length - 1] || null; },
+      root() { const all = [...document.querySelectorAll('.bc-planner')].filter((e) => e.offsetParent !== null); return all[all.length - 1] || null; },
       field(text, n = 0) {
         const r = this.root();
-        const l = r && [...r.querySelectorAll('label.od-text-field--label, label.od-select-field--label, label.od-combo-field--label, label.od-number-combo--label, label.od-button-field--label')].filter((x) => x.textContent.trim() === text)[n];
+        const l = r && [...r.querySelectorAll('label.bc-text-field--label, label.bc-select-field--label, label.bc-combo-field--label, label.bc-number-combo--label, label.bc-button-field--label')].filter((x) => x.textContent.trim() === text)[n];
         return l ? document.getElementById(l.htmlFor) : null;
       },
       // The value a field shows: a text field's value, or the number of a dropdown (Android's
@@ -75,8 +75,8 @@ async function inject() {
         const e = this.field(text, n);
         if (e && 'value' in e && e.tagName !== 'BUTTON') return e.value;
         const r = this.root();
-        const f = r && [...r.querySelectorAll('.od-select-field')].filter((x) => x.querySelector('.od-select-field--label')?.textContent.trim() === text)[n];
-        const v = f?.querySelector('.od-select-field--value')?.textContent ?? '';
+        const f = r && [...r.querySelectorAll('.bc-select-field')].filter((x) => x.querySelector('.bc-select-field--label')?.textContent.trim() === text)[n];
+        const v = f?.querySelector('.bc-select-field--value')?.textContent ?? '';
         return (v.match(/-?\\d+([.,]\\d+)?/) ?? [''])[0];
       },
       visible(sel, text) {
@@ -138,10 +138,10 @@ async function choose(label, n, value) {
   const native = await p.eval(`(() => { const e = __od.field(${q(label)}, ${n}); if (!e || e.tagName !== 'SELECT') return null; e.value = ${q(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); return e.value === ${q(value)}; })()`);
   let ok = native;
   if (native === null) {
-    const opened = await p.eval(`(() => { const r = __od.root(); const f = r && [...r.querySelectorAll('.od-select-field')].filter((x) => x.querySelector('.od-select-field--label')?.textContent.trim() === ${q(label)})[${n}]; const b = f?.querySelector('.od-select-field--trigger'); if (!b) return false; b.scrollIntoView({ block: 'center' }); b.click(); return true; })()`);
+    const opened = await p.eval(`(() => { const r = __od.root(); const f = r && [...r.querySelectorAll('.bc-select-field')].filter((x) => x.querySelector('.bc-select-field--label')?.textContent.trim() === ${q(label)})[${n}]; const b = f?.querySelector('.bc-select-field--trigger'); if (!b) return false; b.scrollIntoView({ block: 'center' }); b.click(); return true; })()`);
     if (opened) {
       await sleep(250);
-      ok = await p.eval(`(() => { const o = [...document.querySelectorAll('.od-select-field--menu [data-value]')].find((x) => x.dataset.value === ${q(value)}); if (!o) return false; o.click(); return true; })()`);
+      ok = await p.eval(`(() => { const o = [...document.querySelectorAll('.bc-select-field--menu [data-value]')].find((x) => x.dataset.value === ${q(value)}); if (!o) return false; o.click(); return true; })()`);
     }
   }
   if (!ok) throw new Error(`cannot choose ${value} in ${label}`);
@@ -165,27 +165,27 @@ async function settle() {
 const read = () =>
   p.eval(`(() => {
     const r = __od.root();
-    const o = r.querySelector('.od-planner--outcome');
+    const o = r.querySelector('.bc-planner--outcome');
     const text = (e) => e.textContent.replace(/\\s+/g, ' ').trim();
     // The result card (tasks 93 to 95): one block per gas (total, then the used and
     // reserve volumes of its legend, a missing reserve read as 0), the MOD alarm row,
     // and the oxygen block (CNS, then OTU).
-    const gases = [...o.querySelectorAll('.od-planner--card .od-planner--volume:not(.od-planner--oxygen)')].map((e) => {
-      const parts = [...e.querySelectorAll('.od-planner--volume-legend b')].map(text);
-      return { label: text(e.querySelector('.od-planner--label')), hint: parts.length > 1 ? parts.join(' ') : parts.join(' ') + ' 0', value: text(e.querySelector('.od-planner--volume-total')), alarm: false };
+    const gases = [...o.querySelectorAll('.bc-planner--card .bc-planner--volume:not(.bc-planner--oxygen)')].map((e) => {
+      const parts = [...e.querySelectorAll('.bc-planner--volume-legend b')].map(text);
+      return { label: text(e.querySelector('.bc-planner--label')), hint: parts.length > 1 ? parts.join(' ') : parts.join(' ') + ' 0', value: text(e.querySelector('.bc-planner--volume-total')), alarm: false };
     });
-    const alarms = [...o.querySelectorAll('.od-planner--card .od-planner--result')].map((e) => ({
-      label: text(e.querySelector('.od-planner--label')), hint: text(e.querySelector('.od-planner--hint')), value: text(e.querySelector('.od-planner--value')), alarm: !!e.querySelector('.od-planner--value.od-planner--alarm'),
+    const alarms = [...o.querySelectorAll('.bc-planner--card .bc-planner--result')].map((e) => ({
+      label: text(e.querySelector('.bc-planner--label')), hint: text(e.querySelector('.bc-planner--hint')), value: text(e.querySelector('.bc-planner--value')), alarm: !!e.querySelector('.bc-planner--value.bc-planner--alarm'),
     }));
     const rows = [...gases, ...alarms];
-    const oxygenBlock = o.querySelector('.od-planner--volume.od-planner--oxygen');
-    const oxygen = oxygenBlock ? { textContent: text(oxygenBlock.querySelector('.od-planner--volume-total')) + ' ' + text(oxygenBlock.querySelector('.od-planner--volume-legend b')) } : null;
-    const tile = o.querySelector('.od-planner--tile-value');
+    const oxygenBlock = o.querySelector('.bc-planner--volume.bc-planner--oxygen');
+    const oxygen = oxygenBlock ? { textContent: text(oxygenBlock.querySelector('.bc-planner--volume-total')) + ' ' + text(oxygenBlock.querySelector('.bc-planner--volume-legend b')) } : null;
+    const tile = o.querySelector('.bc-planner--tile-value');
     return {
       title: tile ? text(tile) : '',
-      error: o.querySelector('p.od-planner--error') ? text(o.querySelector('p.od-planner--error')) : '',
-      failed: [...o.querySelectorAll('p.od-planner--note')].map(text).includes(${q(T('plan.failed'))}),
-      noStop: !!o.querySelector('.od-planner--no-stop'),
+      error: o.querySelector('p.bc-planner--error') ? text(o.querySelector('p.bc-planner--error')) : '',
+      failed: [...o.querySelectorAll('p.bc-planner--note')].map(text).includes(${q(T('plan.failed'))}),
+      noStop: !!o.querySelector('.bc-planner--no-stop'),
       // The table lists every row of the dive (task 2026-11-12-34): its deco stops are the
       // rows marked "–"; columns: kind, stop, start, duration, end, gas.
       stops: [...o.querySelectorAll('table tbody tr')]
@@ -194,10 +194,10 @@ const read = () =>
         .map((cells) => [cells[1], cells[3], cells[4], cells[5], cells[2]]),
       rows,
       oxygen: oxygen ? text(oxygen) : '',
-      helpers: [...r.querySelectorAll('.od-planner--gas .od-planner--helper')].map(text),
+      helpers: [...r.querySelectorAll('.bc-planner--gas .bc-planner--helper')].map(text),
       saveDisabled: !!r.closest('.page')?.querySelector('.navbar .right a.disabled'),
       // Oxygen and helium are dropdowns: their error shows on the select field.
-      invalid: [...r.querySelectorAll('.od-text-field--field.od-text-field--invalid label, .od-select-field--invalid .od-select-field--label')].map(text),
+      invalid: [...r.querySelectorAll('.bc-text-field--field.bc-text-field--invalid label, .bc-select-field--invalid .bc-select-field--label')].map(text),
     };
   })()`);
 
@@ -276,7 +276,7 @@ async function openNew() {
     await sleep(700);
     await go('/plan/new');
     try {
-      await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome')`, 'the planner', 8000);
+      await p.waitFor(`!!__od.root()?.querySelector('.bc-planner--outcome')`, 'the planner', 8000);
       break;
     } catch (e) {
       if (attempt >= 3) throw e;
@@ -307,10 +307,10 @@ async function run() {
   await check('1 one level, metric', 'metric', { ...base, levels: [{ depthMm: 30000, durationSeconds: 1200 }], cylinders: [air()] });
 
   // 2. Several levels -------------------------------------------------------------------
-  await click('button.od-planner--add', T('plan.addLevel'));
+  await click('button.bc-planner--add', T('plan.addLevel'));
   await type(T('plan.depth'), 1, '20');
   await type(T('plan.duration'), 1, '12');
-  await click('button.od-planner--add', T('plan.addLevel'));
+  await click('button.bc-planner--add', T('plan.addLevel'));
   await type(T('plan.depth'), 2, '10');
   await type(T('plan.duration'), 2, '8');
   await check('2 three levels', 'metric', {
@@ -325,8 +325,8 @@ async function run() {
   await type(T('plan.duration'), 0, '25');
   await choose(T('plan.oxygenPercent'), 0, '21');
   await choose(T('plan.heliumPercent'), 0, '35');
-  await click('button.od-planner--add', T('plan.addGas'));
-  await click('button.od-planner--add', T('plan.addGas'));
+  await click('button.bc-planner--add', T('plan.addGas'));
+  await click('button.bc-planner--add', T('plan.addGas'));
   const three = await check('3 three gases, 21/35 EAN50 O2', 'metric', {
     ...base,
     levels: [{ depthMm: 45000, durationSeconds: 1500 }],
@@ -339,7 +339,7 @@ async function run() {
   const dives = await core('listLoadedDives');
   const dive = dives.filter((d) => d.maxDepthMm > 12000 && d.durationSeconds > 1200).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
   await go(`/plan/${dive.id}`);
-  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--card')`, 'the plan from a dive');
+  await p.waitFor(`!!__od.root()?.querySelector('.bc-planner--outcome .bc-planner--card')`, 'the plan from a dive');
   await settle();
   const fromDive = await lastRequest();
   same('4 from a dive: the request names the dive', [fromDive.sourceDiveId, fromDive.levels], [dive.id, undefined]);
@@ -354,7 +354,7 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '40');
   await type(T('plan.duration'), 0, '30');
-  await click('button.od-planner--accordion');
+  await click('button.bc-planner--accordion');
   await sleep(300);
   const gfBefore = (await core('getPrefs')).gfHigh;
   await type(T('settings.deco.gfLow'), 0, '40');
@@ -384,7 +384,7 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '100');
   await type(T('plan.duration'), 0, '25');
-  await click('button.od-planner--add', T('plan.addGas'));
+  await click('button.bc-planner--add', T('plan.addGas'));
   const imp = await check('7 imperial: 100 ft, air + EAN50', 'imperial', {
     ...base,
     levels: [{ depthMm: 30480, durationSeconds: 1500 }],
@@ -429,7 +429,7 @@ async function run() {
     await openNew();
     await type(T('plan.depth'), 0, '40');
     await type(T('plan.duration'), 0, '30');
-    await click('button.od-planner--add', T('plan.addGas'));
+    await click('button.bc-planner--add', T('plan.addGas'));
     return check(label, 'metric', deco40);
   };
   const before = await show('10a default planner settings');
@@ -464,7 +464,7 @@ async function run() {
   await openNew();
   await type(T('plan.depth'), 0, '30');
   await type(T('plan.duration'), 0, '300');
-  await click('button.od-planner--add', T('plan.addLevel'));
+  await click('button.bc-planner--add', T('plan.addLevel'));
   await type(T('plan.duration'), 1, '120');
   await settle();
   r = await read();
@@ -481,8 +481,8 @@ async function run() {
   await type(T('plan.duration'), 0, '25');
   await choose(T('plan.oxygenPercent'), 0, '21');
   await choose(T('plan.heliumPercent'), 0, '35');
-  await click('button.od-planner--add', T('plan.addGas'));
-  await click('button.od-planner--add', T('plan.addGas'));
+  await click('button.bc-planner--add', T('plan.addGas'));
+  await click('button.bc-planner--add', T('plan.addGas'));
   const saved = await check('12 the plan to save', 'metric', {
     ...base,
     levels: [{ depthMm: 45000, durationSeconds: 1500 }],
@@ -493,15 +493,15 @@ async function run() {
   if (!account.includes('roger.bourdieu')) throw new Error('not the test account: no save');
   await click('.page-current .navbar .right a, .navbar .right a', T('plan.save'));
   // "Save" asks for a title first (task 2026-11-12-38): keep the proposed one.
-  await click('.od-plan-title-dialog button', T('plan.save'));
-  await p.waitFor(`document.querySelectorAll('.list .od-plans--row').length >= 1`, 'the list of plans');
+  await click('.bc-plan-title-dialog button', T('plan.save'));
+  await p.waitFor(`document.querySelectorAll('.list .bc-plans--row').length >= 1`, 'the list of plans');
   let plans = await core('listPlans');
   created = plans.map((x) => x.id).filter((id) => !startPlans.includes(id));
   same('12 saved: one new plan in the list', created.length, 1);
   const stored = plans.find((x) => x.id === created[0]);
   same('12 saved: depth and duration', [stored.maxDepthMm, minutes(stored.durationSeconds)], [saved.ref.maxDepthMm, minutes(saved.ref.runtimeSeconds)]);
   same('12 saved: the gases', stored.gases.map((g) => [g.o2Permille, g.hePermille]), [[210, 350], [500, 0], [1000, 0]]);
-  const rowText = await p.eval(`__od.visible('.list .od-plans--row')[0]?.textContent.replace(/\\s+/g, ' ')`);
+  const rowText = await p.eval(`__od.visible('.list .bc-plans--row')[0]?.textContent.replace(/\\s+/g, ' ')`);
   yes('12 the list shows the plan', /45/.test(rowText ?? '') , rowText);
 
   // reopen after an app reload
@@ -516,12 +516,12 @@ async function run() {
   if (afterReload.length !== 'm') console.log(`note: after the reload the units are ${afterReload.unitSystem} ${afterReload.length}/${afterReload.pressure}/${afterReload.volume}, not the metric chosen before`);
   await useUnits('metric');
   await go('/plans/');
-  await p.waitFor(`__od.visible('.list .od-plans--row').length >= 1`, 'the plans after the reload');
+  await p.waitFor(`__od.visible('.list .bc-plans--row').length >= 1`, 'the plans after the reload');
   // The settings of the moment do not change a saved plan.
   const setupBeforeReopen = await core('plannerSetup');
   await core('setPrefs', { changes: { descentMmMin: 3000, reserveMbar: 100000 } });
-  await click('.list .od-plans--row a.od-plans--open');
-  await p.waitFor(`!!__od.root()?.querySelector('.od-planner--outcome .od-planner--card')`, 'the reopened plan');
+  await click('.list .bc-plans--row a.bc-plans--open');
+  await p.waitFor(`!!__od.root()?.querySelector('.bc-planner--outcome .bc-planner--card')`, 'the reopened plan');
   await settle();
   const reopened = await read();
   same('12 reopened after a reload: fields', await p.eval(`[__od.shown(${q(T('plan.depth'))}, 0), __od.shown(${q(T('plan.duration'))}, 0), __od.shown(${q(T('plan.oxygenPercent'))}, 1)]`), ['45', '25', '50']);
@@ -531,18 +531,18 @@ async function run() {
 
   // duplicate, share, delete from the list
   await go('/plans/');
-  await p.waitFor(`__od.visible('.list .od-plans--row').length >= 1`, 'the plans');
-  await click('.list .od-plans--row .od-plans--more');
+  await p.waitFor(`__od.visible('.list .bc-plans--row').length >= 1`, 'the plans');
+  await click('.list .bc-plans--row .bc-plans--more');
   await click('.popover .item-link, .popover a, .popover button, .popover li', T('plans.duplicate'));
-  await p.waitFor(`__od.visible('.list .od-plans--row').length === 2`, 'the duplicate');
+  await p.waitFor(`__od.visible('.list .bc-plans--row').length === 2`, 'the duplicate');
   plans = await core('listPlans');
   created = plans.map((x) => x.id).filter((id) => !startPlans.includes(id));
   same('12 duplicated: two plans, same depth and gases', [created.length, plans.filter((x) => created.includes(x.id)).every((x) => x.maxDepthMm === stored.maxDepthMm)], [2, true]);
-  await click('.list .od-plans--row .od-plans--more');
+  await click('.list .bc-plans--row .bc-plans--more');
   await click('.popover .item-link, .popover a, .popover button, .popover li', T('plans.share'));
-  await p.waitFor(`__od.visible('.od-share-sheet').length > 0 || __od.visible('.sheet-modal').length > 0`, 'the share sheet');
-  yes('12 the share sheet opens with both choices', (await p.eval(`__od.visible('.od-share-sheet .od-share-sheet--row').length`)) === 2);
-  await click('.od-share-sheet .od-share-sheet--row .od-share-sheet--headline', T('plan.shareSummary'));
+  await p.waitFor(`__od.visible('.bc-share-sheet').length > 0 || __od.visible('.sheet-modal').length > 0`, 'the share sheet');
+  yes('12 the share sheet opens with both choices', (await p.eval(`__od.visible('.bc-share-sheet .bc-share-sheet--row').length`)) === 2);
+  await click('.bc-share-sheet .bc-share-sheet--row .bc-share-sheet--headline', T('plan.shareSummary'));
   await sleep(2500);
   const focus = adb(['shell', 'dumpsys window | grep -E "mCurrentFocus|mFocusedApp"']);
   yes('12 the system share sheet opens', /Chooser|Resolver|sharesheet|intentresolver/i.test(focus), focus.trim().slice(0, 200));
@@ -551,8 +551,8 @@ async function run() {
 
   for (let i = 0; i < 2; i++) {
     await go('/plans/');
-    await p.waitFor(`__od.visible('.list .od-plans--row').length >= 1`, 'the plans to delete');
-    await click('.list .od-plans--row .od-plans--more');
+    await p.waitFor(`__od.visible('.list .bc-plans--row').length >= 1`, 'the plans to delete');
+    await click('.list .bc-plans--row .bc-plans--more');
     await click('.popover .item-link, .popover a, .popover button, .popover li', T('plans.delete'));
     await click('.dialog-button', T('plans.delete'));
     await sleep(1500);
@@ -575,8 +575,8 @@ async function deleteLeftovers() {
     await go('/tools/');
     await sleep(600);
     await go('/plans/');
-    await p.waitFor(`__od.visible('.list .od-plans--row').length >= 1`, 'the plans to delete');
-    await click('.list .od-plans--row .od-plans--more');
+    await p.waitFor(`__od.visible('.list .bc-plans--row').length >= 1`, 'the plans to delete');
+    await click('.list .bc-plans--row .bc-plans--more');
     await click('.popover .item-link', T('plans.delete'));
     await click('.dialog-button', T('plans.delete'));
     await sleep(2500);

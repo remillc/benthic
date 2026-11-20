@@ -102,19 +102,19 @@
     const pending = logbook.pending;
     const text = pending ? t(server ? 'signOut.textPendingServer' : git ? 'signOut.textPendingGit' : 'signOut.textPending', { n: pending }) : t(server ? 'signOut.textNoneServer' : git ? 'signOut.textNoneGit' : 'signOut.textNone');
     // Android, cloud (task 2026-11-14-165; compte-android-deconnexion.dc.html): the waiting changes
-    // in a box of the pending family (od-sign-out-dialog--pending), in place of the sentence.
+    // in a box of the pending family (bc-sign-out-dialog--pending), in place of the sentence.
     const box = pending && !git && !ios;
     const lead = box
-      ? `<div class="od-sign-out-dialog--pending">
-          <svg class="od-sign-out-dialog--pending-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${CLOUD_UPLOAD}"/></svg>
+      ? `<div class="bc-sign-out-dialog--pending">
+          <svg class="bc-sign-out-dialog--pending-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${CLOUD_UPLOAD}"/></svg>
           <span><strong>${escape(t('signOut.pendingCount', { n: pending }))}</strong><br>${escape(t('signOut.pendingWhen', { n: pending }))}</span>
         </div>`
-      : `<p class="od-account--signout-text">${escape(text)}</p>`;
+      : `<p class="bc-account--signout-text">${escape(text)}</p>`;
     const content = `
       ${lead}
-      <label class="od-account--signout-copy${pending ? ' disabled' : ''}">
+      <label class="bc-account--signout-copy${pending ? ' disabled' : ''}">
         <span class="checkbox"><input type="checkbox"${pending ? ' disabled' : ''}><i class="icon-checkbox"></i></span>
-        <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="od-account--signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
+        <span>${escape(t('signOut.deleteCopy'))}${pending ? `<span class="bc-account--signout-hint">${escape(t('signOut.deleteCopyHint'))}</span>` : ''}</span>
       </label>`;
     /** @param {any} dialog */
     const deleteCopy = (dialog) => !pending && dialog.$el.find('input[type="checkbox"]')[0]?.checked === true;
@@ -130,8 +130,8 @@
         ];
     const title = escape(t(server ? 'signOut.titleServer' : git ? 'signOut.titleGit' : 'signOut.title'));
     // Android: the Material 3 dialog with icon, the sign-out icon centred over a centred title; iOS keeps its alert.
-    const heroTitle = ios ? title : `<svg class="od-sign-out-dialog--icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${LOGOUT}"/></svg><span>${title}</span>`;
-    f7.dialog.create({ title: heroTitle, content, buttons, verticalButtons: pending > 0, cssClass: `od-account--signout${ios ? '' : ' od-sign-out-dialog'}` }).open();
+    const heroTitle = ios ? title : `<svg class="bc-sign-out-dialog--icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="${LOGOUT}"/></svg><span>${title}</span>`;
+    f7.dialog.create({ title: heroTitle, content, buttons, verticalButtons: pending > 0, cssClass: `bc-account--signout${ios ? '' : ' bc-sign-out-dialog'}` }).open();
   }
 
   /** @param {boolean} deleteCopy */
@@ -161,14 +161,14 @@
   }
 </script>
 
-<Page class="od-account">
-  <Navbar large={theme.ios && !bottomNav()} class={theme.ios ? 'od-ios-bar' : 'od-band-bar'} title={t('account.title')}>
+<Page class="bc-account">
+  <Navbar large={theme.ios && !bottomNav()} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar'} title={t('account.title')}>
     {#snippet left()}
       {#if bottomNav()}
         <!-- Android phone: Compte opens from the account sheet, over a section (task 2026-11-14-120). -->
         <Link iconOnly onClick={leave}>
           <i class="icon icon-back"></i>
-          <span class="od-sr-only">{t('detail.back')}</span>
+          <span class="bc-sr-only">{t('detail.back')}</span>
         </Link>
       {:else}
         <MenuButton />
@@ -181,24 +181,24 @@
   <SectionBand bare={!theme.ios} summary={t(signedIn ? (server ? 'account.bandServer' : git ? 'account.bandGit' : 'account.bandSignedIn') : 'account.bandNone')} />
 
   {#if signedIn}
-    <div class="od-account--identity">
+    <div class="bc-account--identity">
       {#if server}
-        <span class="od-account--avatar"><Icon name="cloud" size={28} /></span>
-        <span class="od-account--text">
-          <span class="od-account--name">{t('account.serverName')}</span>
-          <span class="od-account--status">{serverEmail}</span>
+        <span class="bc-account--avatar"><Icon name="cloud" size={28} /></span>
+        <span class="bc-account--text">
+          <span class="bc-account--name">{t('account.serverName')}</span>
+          <span class="bc-account--status">{serverEmail}</span>
         </span>
       {:else if git}
-        <span class="od-account--avatar"><Icon name="git" size={28} /></span>
-        <span class="od-account--text">
-          <span class="od-account--name">{gitName}</span>
-          <span class="od-account--status">{t('account.gitCaption', { host: gitHost, branch: gitBranch })}</span>
+        <span class="bc-account--avatar"><Icon name="git" size={28} /></span>
+        <span class="bc-account--text">
+          <span class="bc-account--name">{gitName}</span>
+          <span class="bc-account--status">{t('account.gitCaption', { host: gitHost, branch: gitBranch })}</span>
         </span>
       {:else}
-        <span class="od-account--avatar"><Icon name="account" size={28} /></span>
-        <span class="od-account--text">
-          <span class="od-account--name">{logbook.email}</span>
-          <span class="od-account--status"><Icon name="cloud" size={16} />{t('account.cloudLine')}</span>
+        <span class="bc-account--avatar"><Icon name="account" size={28} /></span>
+        <span class="bc-account--text">
+          <span class="bc-account--name">{logbook.email}</span>
+          <span class="bc-account--status"><Icon name="cloud" size={16} />{t('account.cloudLine')}</span>
         </span>
       {/if}
     </div>
@@ -227,7 +227,7 @@
             <div class="item-content">
               <div class="item-inner">
                 <div class="item-title">{t('account.pending')}</div>
-                <div class="item-after od-value" class:od-account--pending={logbook.pending > 0}>{formatNumber(logbook.pending)}</div>
+                <div class="item-after bc-value" class:bc-account--pending={logbook.pending > 0}>{formatNumber(logbook.pending)}</div>
               </div>
             </div>
           </li>
@@ -236,7 +236,7 @@
           <div class="item-content">
             <div class="item-inner">
               <div class="item-title">{t('account.lastSync')}</div>
-              <div class="item-after od-value">{lastSync}</div>
+              <div class="item-after bc-value">{lastSync}</div>
             </div>
           </div>
         </li>
@@ -244,7 +244,7 @@
           <div class="item-content">
             <div class="item-inner">
               <div class="item-title">{t(server ? 'account.serverDives' : git ? 'account.gitDives' : 'account.cloudDives')}</div>
-              <div class="item-after od-value">{formatNumber(count)}</div>
+              <div class="item-after bc-value">{formatNumber(count)}</div>
             </div>
           </div>
         </li>
@@ -260,7 +260,7 @@
             </a>
           </li>
         {/if}
-        <li class="od-account--sync-now">
+        <li class="bc-account--sync-now">
           <SyncControl />
         </li>
       </ul>
@@ -306,9 +306,9 @@
     {#if git}
       <!-- The git repository: signing out only (there is no account to delete); under the group,
            apart from it (tasks 2026-11-14-132 and 133). -->
-      <div class="od-account--leave od-account--sign-out">
-        <button type="button" class="od-outlined-button" onclick={confirmSignOut}>{t(server ? 'account.serverSignOut' : 'account.gitSignOut')}</button>
-        <span class="od-account--consequence">{t(server ? 'account.serverSignOutText' : 'account.gitSignOutText')}</span>
+      <div class="bc-account--leave bc-account--sign-out">
+        <button type="button" class="bc-outlined-button" onclick={confirmSignOut}>{t(server ? 'account.serverSignOut' : 'account.gitSignOut')}</button>
+        <span class="bc-account--consequence">{t(server ? 'account.serverSignOutText' : 'account.gitSignOutText')}</span>
       </div>
       {#if devAccounts && server}
         {#await import('../components/DevDeleteAccount.svelte') then dev}
@@ -322,59 +322,59 @@
            « définitivement », not by a heading. Signing out opens a dialog (no chevron); deleting
            opens a page (a chevron). -->
       <h2 class="block-title">{t('account.leaveGroup')}</h2>
-      <div class="od-account-leave">
-        <button type="button" class="od-account-leave--row od-account-leave--sign-out" aria-haspopup="dialog" onclick={confirmSignOut}>
+      <div class="bc-account-leave">
+        <button type="button" class="bc-account-leave--row bc-account-leave--sign-out" aria-haspopup="dialog" onclick={confirmSignOut}>
           <Icon name="logout" size={24} />
-          <span class="od-account-leave--texts">
-            <span class="od-account-leave--label">{t('account.signOutDevice')}</span>
-            <span class="od-account-leave--supporting">{t(`account.signOutKeeps${deviceSuffix(deviceKind())}`)}</span>
+          <span class="bc-account-leave--texts">
+            <span class="bc-account-leave--label">{t('account.signOutDevice')}</span>
+            <span class="bc-account-leave--supporting">{t(`account.signOutKeeps${deviceSuffix(deviceKind())}`)}</span>
           </span>
         </button>
-        <button type="button" class="od-account-leave--row od-account-leave--delete" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
+        <button type="button" class="bc-account-leave--row bc-account-leave--delete" onclick={() => f7.views.current?.router.navigate('/account/delete')}>
           <Icon name="delete" size={24} />
-          <span class="od-account-leave--texts">
-            <span class="od-account-leave--label">{t('account.delete')}</span>
-            <span class="od-account-leave--supporting">{t(`account.deleteKeeps${deviceSuffix(deviceKind())}`)}</span>
+          <span class="bc-account-leave--texts">
+            <span class="bc-account-leave--label">{t('account.delete')}</span>
+            <span class="bc-account-leave--supporting">{t(`account.deleteKeeps${deviceSuffix(deviceKind())}`)}</span>
           </span>
-          <span class="od-account-leave--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-account-leave--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       </div>
     {/if}
 
-    {#if serverCaption && !git}<p class="od-account--caption">{serverCaption}</p>{/if}
+    {#if serverCaption && !git}<p class="bc-account--caption">{serverCaption}</p>{/if}
   {:else}
-    <div class="od-account--identity">
-      <span class="od-account--avatar"><Icon name="device" size={26} /></span>
-      <span class="od-account--text">
-        <span class="od-account--name">{t('account.noAccount')}</span>
-        <span class="od-account--status">{t('account.deviceDives', { n: count })}</span>
+    <div class="bc-account--identity">
+      <span class="bc-account--avatar"><Icon name="device" size={26} /></span>
+      <span class="bc-account--text">
+        <span class="bc-account--name">{t('account.noAccount')}</span>
+        <span class="bc-account--status">{t('account.deviceDives', { n: count })}</span>
       </span>
     </div>
     <!-- The beta has none of these: no Subsurface cloud, no personal git repository (the OpenDives+ server is signed in to from the first launch). -->
     {#if !isRelease}
-    <p class="od-account--pitch">{t('account.pitch')}</p>
+    <p class="bc-account--pitch">{t('account.pitch')}</p>
     <!-- Three choices, each with its consequence and a decorative icon (task 2026-11-14-135,
          compte-android-sans-compte.dc.html); the git repository is the third, on no background. -->
-    <div class="od-account--choices">
-      <a href="/account/create" class="od-account--choice od-account--primary">
+    <div class="bc-account--choices">
+      <a href="/account/create" class="bc-account--choice bc-account--primary">
         <Icon name="personAdd" />
-        <span class="od-account--choice-texts">
-          <span class="od-account--label">{t('account.create')}</span>
-          <span class="od-account--consequence">{t('account.createText', { n: count })}</span>
+        <span class="bc-account--choice-texts">
+          <span class="bc-account--label">{t('account.create')}</span>
+          <span class="bc-account--consequence">{t('account.createText', { n: count })}</span>
         </span>
       </a>
-      <a href="/account/sign-in" class="od-account--choice">
+      <a href="/account/sign-in" class="bc-account--choice">
         <Icon name="login" />
-        <span class="od-account--choice-texts">
-          <span class="od-account--label">{t('account.signIn')}</span>
-          <span class="od-account--consequence">{t('account.signInText', { n: count })}</span>
+        <span class="bc-account--choice-texts">
+          <span class="bc-account--label">{t('account.signIn')}</span>
+          <span class="bc-account--consequence">{t('account.signInText', { n: count })}</span>
         </span>
       </a>
-      <a href="/account/git/new" class="od-account--choice od-account--third">
+      <a href="/account/git/new" class="bc-account--choice bc-account--third">
         <Icon name="git" />
-        <span class="od-account--choice-texts">
-          <span class="od-account--label">{t('account.ownGit')}</span>
-          <span class="od-account--consequence">{t('account.ownGitText', { n: count })}</span>
+        <span class="bc-account--choice-texts">
+          <span class="bc-account--label">{t('account.ownGit')}</span>
+          <span class="bc-account--consequence">{t('account.ownGitText', { n: count })}</span>
         </span>
       </a>
     </div>
@@ -384,11 +384,11 @@
 
 <style>
   @layer od.components {
-    .od-account--identity {
+    .bc-account--identity {
       margin: 16px 16px 0;
       padding: 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       gap: 14px;
@@ -398,35 +398,35 @@
       }
     }
 
-    .od-account--avatar {
+    .bc-account--avatar {
       flex: none;
       width: 52px;
       height: 52px;
       border-radius: 26px;
-      background: var(--od-surface-2);
-      color: var(--od-text);
+      background: var(--bc-surface-2);
+      color: var(--bc-text);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .od-account--text {
+    .bc-account--text {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
 
-    .od-account--name {
+    .bc-account--name {
       font-size: 17px;
       font-weight: 700;
       overflow-wrap: anywhere;
     }
 
-    .od-account--status {
+    .bc-account--status {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -436,23 +436,23 @@
       white-space: normal;
     }
 
-    /* "Sync": a real button centred in its row (style: .od-tonal-button). */
-    .od-account--sync-now {
+    /* "Sync": a real button centred in its row (style: .bc-tonal-button). */
+    .bc-account--sync-now {
       padding: 12px 16px 14px;
       display: flex;
       justify-content: center;
     }
 
-    .od-account--pending {
-      color: var(--od-tertiary);
+    .bc-account--pending {
+      color: var(--bc-tertiary);
     }
 
     /* Sign-out dialog (outside this page in the document): fully global selectors. */
-    :global(.od-account--signout .od-account--signout-text) {
+    :global(.bc-account--signout .bc-account--signout-text) {
       margin: 0 0 12px;
     }
 
-    :global(.od-account--signout .od-account--signout-copy) {
+    :global(.bc-account--signout .bc-account--signout-copy) {
       display: flex;
       align-items: flex-start;
       gap: 12px;
@@ -460,17 +460,17 @@
     }
 
     /* The check box keeps its 18 dp: never shrunk by the text beside it. */
-    :global(.od-account--signout .od-account--signout-copy .checkbox) {
+    :global(.bc-account--signout .bc-account--signout-copy .checkbox) {
       flex: none;
       margin-top: 2px;
     }
 
-    :global(.od-account--signout .od-account--signout-copy.disabled) {
+    :global(.bc-account--signout .bc-account--signout-copy.disabled) {
       opacity: 0.55;
     }
 
     /* Android (task 2026-11-14-165): the icon and the title centred, Material 3 « dialog with icon ». */
-    :global(.od-sign-out-dialog .dialog-title) {
+    :global(.bc-sign-out-dialog .dialog-title) {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -478,21 +478,21 @@
       text-align: center;
     }
 
-    :global(.od-sign-out-dialog .od-sign-out-dialog--icon) {
+    :global(.bc-sign-out-dialog .bc-sign-out-dialog--icon) {
       fill: none;
-      stroke: var(--od-secondary);
+      stroke: var(--bc-secondary);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
     /* The waiting changes: a 16 dp box of the pending family (tertiary container, pending text). */
-    :global(.od-sign-out-dialog .od-sign-out-dialog--pending) {
+    :global(.bc-sign-out-dialog .bc-sign-out-dialog--pending) {
       margin: 0 0 12px;
       padding: 12px 16px;
       border-radius: 16px;
-      background: var(--od-tertiary-container);
-      color: var(--od-pending);
+      background: var(--bc-tertiary-container);
+      color: var(--bc-pending);
       display: flex;
       align-items: flex-start;
       gap: 12px;
@@ -505,7 +505,7 @@
       }
     }
 
-    :global(.od-sign-out-dialog .od-sign-out-dialog--pending-icon) {
+    :global(.bc-sign-out-dialog .bc-sign-out-dialog--pending-icon) {
       flex: none;
       margin-top: 1px;
       fill: none;
@@ -516,43 +516,43 @@
     }
 
     /* The checkbox: 18 dp in a 48 dp target (MD3). */
-    :global(.od-sign-out-dialog .od-account--signout-copy) {
+    :global(.bc-sign-out-dialog .bc-account--signout-copy) {
       align-items: center;
       min-height: 48px;
     }
 
-    :global(.od-account--signout .od-account--signout-hint) {
+    :global(.bc-account--signout .bc-account--signout-hint) {
       display: block;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-account--leave {
+    .bc-account--leave {
       margin: 0 16px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
 
-      .od-account--consequence {
+      .bc-account--consequence {
         max-width: 300px;
         font-size: 13px;
         line-height: 18px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
         text-align: center;
       }
     }
 
     /* 32 dp between the account group and « Se déconnecter » (task 2026-11-14-133). */
-    .od-account--sign-out {
+    .bc-account--sign-out {
       margin-top: 32px;
     }
 
     /* « Quitter le cloud »: one card of two list rows (task 2026-11-14-164). */
-    .od-account-leave {
+    .bc-account-leave {
       margin: 0 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       :global(.ios) & {
@@ -560,26 +560,26 @@
       }
     }
 
-    .od-account-leave--row {
+    .bc-account-leave--row {
       box-sizing: border-box;
       width: 100%;
       min-height: 72px;
       padding: 12px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
       align-items: center;
       gap: 16px;
 
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
       }
 
-      & + .od-account-leave--row {
-        border-top: 1px solid var(--od-row-divider);
+      & + .bc-account-leave--row {
+        border-top: 1px solid var(--bc-row-divider);
       }
 
       :global(.ios) & {
@@ -588,7 +588,7 @@
       }
     }
 
-    .od-account-leave--texts {
+    .bc-account-leave--texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -596,7 +596,7 @@
       gap: 2px;
     }
 
-    .od-account-leave--label {
+    .bc-account-leave--label {
       font-size: 16px;
       line-height: 24px;
 
@@ -606,46 +606,46 @@
       }
     }
 
-    .od-account-leave--supporting {
+    .bc-account-leave--supporting {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Deleting: the alarm colour on the icon and the label, medium weight. */
-    .od-account-leave--delete {
-      > :global(.od-icon),
-      .od-account-leave--label {
-        color: var(--od-alarm);
+    .bc-account-leave--delete {
+      > :global(.bc-icon),
+      .bc-account-leave--label {
+        color: var(--bc-alarm);
       }
 
-      .od-account-leave--label {
+      .bc-account-leave--label {
         font-weight: 500;
       }
     }
 
-    .od-account-leave--chevron {
+    .bc-account-leave--chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* The server in use, set apart in small type (task 2026-11-14-134). */
-    .od-account--caption {
+    .bc-account--caption {
       margin: 24px 20px;
       font-size: 11px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-account--pitch {
+    .bc-account--pitch {
       margin: 18px 20px 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-account--choice-texts {
+    .bc-account--choice-texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -653,32 +653,32 @@
       gap: 3px;
     }
 
-    .od-account--choices {
+    .bc-account--choices {
       margin: 16px 16px 24px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .od-account--choice {
+    .bc-account--choice {
       padding: 14px 16px;
       border-radius: 20px;
-      border: 1px solid var(--od-separator);
-      background: var(--od-surface);
-      color: var(--od-text);
+      border: 1px solid var(--bc-separator);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       text-decoration: none;
       display: flex;
       align-items: flex-start;
       gap: 14px;
 
       /* The 24 dp icon on the left, aligned with the title. */
-      :global(.od-icon) {
+      :global(.bc-icon) {
         flex: none;
         margin-top: 0;
       }
 
       /* The git repository: the third choice, on no background. */
-      &.od-account--third {
+      &.bc-account--third {
         background: transparent;
       }
 
@@ -686,41 +686,41 @@
         border-radius: 10px;
       }
 
-      &.od-account--primary {
-        border-color: var(--od-primary-action);
-        background: var(--od-primary-action);
-        color: var(--od-on-primary-action);
+      &.bc-account--primary {
+        border-color: var(--bc-primary-action);
+        background: var(--bc-primary-action);
+        color: var(--bc-on-primary-action);
 
-        .od-account--consequence {
+        .bc-account--consequence {
           color: inherit;
           opacity: 0.85;
         }
       }
     }
 
-    .od-account--label {
+    .bc-account--label {
       font-size: 17px;
       font-weight: 700;
     }
 
-    .od-account--consequence {
+    .bc-account--consequence {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-account--choice {
+      .bc-account--choice {
         transition: box-shadow 120ms linear;
       }
-      .od-account--choice:hover {
+      .bc-account--choice:hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-account--choice {
+      .bc-account--choice {
         transition: none;
       }
     }

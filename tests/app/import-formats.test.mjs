@@ -82,29 +82,29 @@ test('the link opens the dialog; « Fermer », the scrim and Back all end in the
   assert.equal(state.formatsOpen, false);
 
   const c = src('components/ImportFormats.svelte');
-  assert.match(c, /class="od-import-formats--link" onclick=\{\(\) => openFormats\(state\)\}/);
+  assert.match(c, /class="bc-import-formats--link" onclick=\{\(\) => openFormats\(state\)\}/);
   // A basic dialog: Md3Dialog (scrim tap, Escape, system Back through od-cancel) with oncancel, a « Fermer » text button, no ✕.
   assert.match(c, /<Md3Dialog[^>]*oncancel=\{\(\) => closeFormats\(state\)\}/);
   assert.match(c, /onclick=\{\(\) => closeFormats\(state\)\}>\{t\('dialog\.close'\)\}/);
   assert.doesNotMatch(c, /name="close"|✕/);
   const dialog = src('components/Md3Dialog.svelte');
-  assert.match(dialog, /od-md3-dialog--scrim" onclick=\{oncancel\}/);
+  assert.match(dialog, /bc-md3-dialog--scrim" onclick=\{oncancel\}/);
   assert.match(dialog, /addEventListener\('od-cancel'/);
   // The Back dispatcher sends « od-cancel » to the dialog through its `cancel` helper.
-  assert.match(src('lib/back-button.js'), /classList\.contains\('od-md3-dialog'\)[^\n]*return cancel\(modal, 'od-dialog'\)/);
+  assert.match(src('lib/back-button.js'), /classList\.contains\('bc-md3-dialog'\)[^\n]*return cancel\(modal, 'od-dialog'\)/);
   assert.match(src('lib/back-button.js'), /function cancel\(el, name\) \{\s*el\.dispatchEvent\(new CustomEvent\('od-cancel'\)\);/);
   assert.equal(json('fr').dialog.close, 'Fermer');
 });
 
-test('the link: 14 sp, --od-release-link (#1F5C99), underlined, hand pointer, hover', () => {
+test('the link: 14 sp, --bc-release-link (#1F5C99), underlined, hand pointer, hover', () => {
   const c = src('components/ImportFormats.svelte');
-  const rule = /\.od-import-formats--link \{([^]*?)\n    \}\n/.exec(c)[1];
+  const rule = /\.bc-import-formats--link \{([^]*?)\n    \}\n/.exec(c)[1];
   assert.match(rule, /font-size: 14px/);
-  assert.match(rule, /color: var\(--od-release-link\)/);
+  assert.match(rule, /color: var\(--bc-release-link\)/);
   assert.match(rule, /text-decoration: underline/);
   assert.match(rule, /cursor: pointer/);
   assert.match(rule, /:hover/);
-  assert.match(src('theme.css'), /--od-release-link: #1F5C99;/);
+  assert.match(src('theme.css'), /--bc-release-link: #1F5C99;/);
 });
 
 test('the link is on the source screen, which also shows the error; the beta does not use it', () => {
@@ -124,8 +124,8 @@ test('task 226: the link sits right under « Un fichier », before divelogs.de, 
   const divelogs = imp.indexOf("title={t('welcomeSteps.divelogsTitle')}");
   assert.ok(file > 0 && file < link && link < divelogs);
   const c = src('components/ImportFormats.svelte');
-  assert.match(c, /role="link" class="od-import-formats--link"/);
-  const rule = /\.od-import-formats--link \{([^]*?)\n    \}\n/.exec(c)[1];
+  assert.match(c, /role="link" class="bc-import-formats--link"/);
+  const rule = /\.bc-import-formats--link \{([^]*?)\n    \}\n/.exec(c)[1];
   assert.match(rule, /min-height: 48px;/);
   assert.match(rule, /padding: 0 4px;/);
 });

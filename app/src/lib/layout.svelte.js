@@ -43,10 +43,10 @@ export const desktopBreakpoint = 1200;
 export const navWidth = ios ? 220 : 96;
 
 // Read by the rail and by the views (App.svelte).
-if (typeof document !== 'undefined') document.documentElement.style.setProperty('--od-nav-width', `${navWidth}px`);
+if (typeof document !== 'undefined') document.documentElement.style.setProperty('--bc-nav-width', `${navWidth}px`);
 
 // The desktop app's own rules in CSS (the first-launch panel stays a row in any window shape, task 2026-11-16-242).
-if (desktopApp) document.documentElement.classList.add('od-desktop-app');
+if (desktopApp) document.documentElement.classList.add('bc-desktop-app');
 
 /** Width of the list pane of a list and detail pair (spec, section 3). */
 export const listWidth = 340;

@@ -84,7 +84,7 @@
   }
 </script>
 
-<Page class="od-health-import">
+<Page class="bc-health-import">
   <Navbar title={t('health.title')} backLink={t('detail.back')}>
     {#snippet right()}
       <Link onClick={importTicked} class={!ticked.size || importing ? 'disabled' : ''}>{t('health.import', { n: ticked.size })}</Link>
@@ -92,14 +92,14 @@
   </Navbar>
 
   {#if state === 'loading'}
-    <p class="od-health-import--note">{t('health.reading')}</p>
+    <p class="bc-health-import--note">{t('health.reading')}</p>
   {:else if state === 'unavailable'}
-    <p class="od-health-import--note">{t('health.unavailable')}</p>
+    <p class="bc-health-import--note">{t('health.unavailable')}</p>
   {:else if state === 'failed'}
-    <p class="od-health-import--note">{t('health.failed')}</p>
+    <p class="bc-health-import--note">{t('health.failed')}</p>
   {:else if !dives.length}
     <!-- HealthKit does not tell a refused reading from no data: both are said. -->
-    <p class="od-health-import--note">{t('health.none')}</p>
+    <p class="bc-health-import--note">{t('health.none')}</p>
   {:else}
     <div class="list list-strong inset list-dividers">
       <ul>
@@ -122,17 +122,17 @@
         {/each}
       </ul>
     </div>
-    <p class="od-health-import--note">{t('health.what')}</p>
+    <p class="bc-health-import--note">{t('health.what')}</p>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .od-health-import--note {
+    .bc-health-import--note {
       margin: 16px 20px;
       font-size: 15px;
       line-height: 21px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

@@ -230,7 +230,7 @@ export function restoreFocus() {
   const target =
     opener?.isConnected && opener.offsetParent
       ? opener
-      : /** @type {HTMLElement|null} */ (document.querySelector('.view.tab-active .page-current .od-menu-button'));
+      : /** @type {HTMLElement|null} */ (document.querySelector('.view.tab-active .page-current .bc-menu-button'));
   target?.focus();
   opener = null;
 }
@@ -270,7 +270,7 @@ export function enableSectionSwipes() {
 
   /** @param {HTMLElement} el */
   function hasOwnGesture(el) {
-    if (el.closest('.maplibregl-map, .od-dive-profile--profile, .od-planner--profile, canvas, input, textarea, select, .panel, .modal-in, .fab, .od-logbook--selection-bar')) return true;
+    if (el.closest('.maplibregl-map, .bc-dive-profile--profile, .bc-planner--profile, canvas, input, textarea, select, .panel, .modal-in, .fab, .bc-logbook--selection-bar')) return true;
     for (let n = /** @type {HTMLElement|null} */ (el); n && n !== document.body; n = n.parentElement) {
       const overflow = getComputedStyle(n).overflowX;
       if ((overflow === 'auto' || overflow === 'scroll') && n.scrollWidth > n.clientWidth) return true;
@@ -280,7 +280,7 @@ export function enableSectionSwipes() {
 
   /** @returns {typeof start} */
   function startingPoint() {
-    if (!layout.phone || document.querySelector('.panel-in, .modal-in:not(.toast), .searchbar-enabled, .od-sites--search.od-sites--open, .od-logbook--selection-bar')) return null;
+    if (!layout.phone || document.querySelector('.panel-in, .modal-in:not(.toast), .searchbar-enabled, .bc-sites--search.bc-sites--open, .bc-logbook--selection-bar')) return null;
     const view = f7.views.current;
     const section = view?.el?.id?.replace('view-', '');
     if (!swipeOrder().includes(section)) return null;
@@ -307,7 +307,7 @@ export function enableSectionSwipes() {
   /** @param {HTMLElement|null} el */
   function release(el) {
     if (!el) return;
-    el.classList.remove('od-tab-peek');
+    el.classList.remove('bc-tab-peek');
     el.style.transform = '';
     el.style.transition = '';
   }
@@ -316,13 +316,13 @@ export function enableSectionSwipes() {
   function dropSections() {
     if (from) from.style.transform = '';
     release(neighbour);
-    views?.classList.remove('od-tab-sliding');
+    views?.classList.remove('bc-tab-sliding');
     from = neighbour = views = null;
   }
 
   /**
    * Opens the page without animation, both pages then placed by the
-   * --od-push-dx offset of the view (theme.css, od-pushing): the new page is
+   * --bc-push-dx offset of the view (theme.css, bc-pushing): the new page is
    * already beside the screen when it appears.
    * @param {string} route
    */
@@ -332,20 +332,20 @@ export function enableSectionSwipes() {
     const page = /** @type {HTMLElement|null|undefined} */ (view?.querySelector(':scope > .page-current'));
     if (!router || !view || !page) return null;
     width = view.clientWidth;
-    page.classList.add('od-push-from');
-    view.style.setProperty('--od-push-dx', '0px');
-    view.classList.add('od-pushing');
+    page.classList.add('bc-push-from');
+    view.style.setProperty('--bc-push-dx', '0px');
+    view.classList.add('bc-pushing');
     router.navigate(route, { animate: false });
     return { router, view, page, route };
   }
 
   /** Gives the view of a push back to the router. @param {NonNullable<typeof push>} p */
   function clearPush({ view, page }) {
-    view.classList.remove('od-pushing', 'od-push-settle');
-    view.style.removeProperty('--od-push-dx');
-    view.style.removeProperty('--od-push-ease');
-    view.style.removeProperty('--od-push-ms');
-    page.classList.remove('od-push-from');
+    view.classList.remove('bc-pushing', 'bc-push-settle');
+    view.style.removeProperty('--bc-push-dx');
+    view.style.removeProperty('--bc-push-ease');
+    view.style.removeProperty('--bc-push-ms');
+    page.classList.remove('bc-push-from');
   }
 
   /** The system took the touch (its own gesture from the edge): everything back in place at once. */
@@ -363,7 +363,7 @@ export function enableSectionSwipes() {
 
   /** @param {number} dx */
   function placePush(dx) {
-    push?.view.style.setProperty('--od-push-dx', `${Math.min(dx, 0)}px`);
+    push?.view.style.setProperty('--bc-push-dx', `${Math.min(dx, 0)}px`);
   }
 
   /**
@@ -379,10 +379,10 @@ export function enableSectionSwipes() {
     const from = Math.min(dx, 0);
     const { easing, ms } = settle(from, through ? -width : 0, from < 0 ? velocity : 0);
     settling = true;
-    view.style.setProperty('--od-push-ease', easing);
-    view.style.setProperty('--od-push-ms', `${ms}ms`);
-    view.classList.add('od-push-settle');
-    view.style.setProperty('--od-push-dx', through ? `${-width}px` : '0px');
+    view.style.setProperty('--bc-push-ease', easing);
+    view.style.setProperty('--bc-push-ms', `${ms}ms`);
+    view.classList.add('bc-push-settle');
+    view.style.setProperty('--bc-push-dx', through ? `${-width}px` : '0px');
     setTimeout(() => {
       if (!through) backFromPush(router, pushed.route);
       clearPush(pushed);
@@ -409,19 +409,19 @@ export function enableSectionSwipes() {
       if (!views || !el) return;
       ids.splice(ids.indexOf(el.id), 1);
       // Not under a finger or a settling swipe: try again at the next idle moment.
-      if (start || settling || views.classList.contains('od-tab-sliding')) {
+      if (start || settling || views.classList.contains('bc-tab-sliding')) {
         ids.push(el.id);
         idle(next, { timeout: 2000 });
         return;
       }
-      views.classList.add('od-tab-sliding');
-      el.classList.add('od-tab-peek');
+      views.classList.add('bc-tab-sliding');
+      el.classList.add('bc-tab-peek');
       el.style.transform = `translateX(${views.clientWidth}px)`;
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           // A swipe may have taken this section meanwhile: it is then its own.
           if (neighbour !== el) release(el);
-          if (!from) views.classList.remove('od-tab-sliding');
+          if (!from) views.classList.remove('bc-tab-sliding');
           idle(next, { timeout: 2000 });
         }),
       );
@@ -456,7 +456,7 @@ export function enableSectionSwipes() {
         views = from?.parentElement ?? null;
         if (!from || !views) return;
         width = views.clientWidth;
-        views.classList.add('od-tab-sliding');
+        views.classList.add('bc-tab-sliding');
       }
       const el = next && 'tab' in next ? document.getElementById(`view-${next.tab}`) : null;
       if (neighbour !== el) {
@@ -467,7 +467,7 @@ export function enableSectionSwipes() {
       const shown = el ? dx : dx / 3;
       from.style.transform = `translateX(${shown}px)`;
       if (el) {
-        el.classList.add('od-tab-peek');
+        el.classList.add('bc-tab-peek');
         el.style.transform = `translateX(${shown + (dx < 0 ? width : -width)}px)`;
       }
     },
@@ -500,7 +500,7 @@ export function enableSectionSwipes() {
         left.style.transform = '';
         left.style.transition = '';
         release(coming);
-        container.classList.remove('od-tab-sliding');
+        container.classList.remove('bc-tab-sliding');
         settling = false;
       }, ms);
     },

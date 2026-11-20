@@ -44,6 +44,6 @@ export async function offerUndo(text, after, timeout = 6000, steps = 1) {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('od-undo-cleared', () => {
-    for (const el of document.querySelectorAll('.toast.od-undo-toast')) f7.toast.close(/** @type {HTMLElement} */ (el));
+    for (const el of document.querySelectorAll('.toast.bc-undo-toast')) f7.toast.close(/** @type {HTMLElement} */ (el));
   });
 }

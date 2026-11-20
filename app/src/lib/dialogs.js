@@ -20,7 +20,7 @@ export function confirmAction({ title, text, action, onConfirm, cancel, onCancel
     .create({
       title,
       text,
-      buttons: [{ text: cancel ?? t('dialog.cancel'), onClick: onCancel }, { text: action, onClick: onConfirm, cssClass: danger ? 'od-dialog-danger' : undefined }],
+      buttons: [{ text: cancel ?? t('dialog.cancel'), onClick: onCancel }, { text: action, onClick: onConfirm, cssClass: danger ? 'bc-dialog-danger' : undefined }],
     })
     .open();
 }

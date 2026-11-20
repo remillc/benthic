@@ -57,74 +57,74 @@
   });
 </script>
 
-<Popup opened onPopupClosed={onclose} class="od-qr-share">
+<Popup opened onPopupClosed={onclose} class="bc-qr-share">
   <Page>
     <Navbar title={t('qr.shareTitle')}>
       {#snippet left()}
         <Link popupClose iconOnly>
-          <Icon name="close" /><span class="od-sr-only">{t('qr.close')}</span>
+          <Icon name="close" /><span class="bc-sr-only">{t('qr.close')}</span>
         </Link>
       {/snippet}
     </Navbar>
 
-    <p class="od-qr-share--summary">{summary}</p>
+    <p class="bc-qr-share--summary">{summary}</p>
 
     {#if failed}
-      <p class="od-qr-share--failed" role="alert">{t('qr.failed')}</p>
+      <p class="bc-qr-share--failed" role="alert">{t('qr.failed')}</p>
     {:else if current}
-      <div class="od-qr-share--card" role="img" aria-label={t('qr.imageLabel', { n: String(shown + 1), total: String(codes.length) })}>
-        <svg class="od-qr-share--code" viewBox="-4 -4 {current.size + 8} {current.size + 8}" shape-rendering="crispEdges" aria-hidden="true"><path d={current.d}></path></svg>
+      <div class="bc-qr-share--card" role="img" aria-label={t('qr.imageLabel', { n: String(shown + 1), total: String(codes.length) })}>
+        <svg class="bc-qr-share--code" viewBox="-4 -4 {current.size + 8} {current.size + 8}" shape-rendering="crispEdges" aria-hidden="true"><path d={current.d}></path></svg>
       </div>
       {#if several}
         {#if codes.length <= MAX_DOTS}
-          <div class="od-qr-share--dots" aria-hidden="true">
-            {#each codes as _, i}<span class="od-qr-share--dot" class:od-qr-share--dot-on={i === shown}></span>{/each}
+          <div class="bc-qr-share--dots" aria-hidden="true">
+            {#each codes as _, i}<span class="bc-qr-share--dot" class:bc-qr-share--dot-on={i === shown}></span>{/each}
           </div>
         {/if}
-        <p class="od-qr-share--counter" aria-live="off">{t('qr.codeOf', { n: String(shown + 1), total: String(codes.length) })}</p>
+        <p class="bc-qr-share--counter" aria-live="off">{t('qr.codeOf', { n: String(shown + 1), total: String(codes.length) })}</p>
       {/if}
-      <p class="od-qr-share--help">{several ? t('qr.helpDive') : t('qr.helpPlan')}</p>
+      <p class="bc-qr-share--help">{several ? t('qr.helpDive') : t('qr.helpPlan')}</p>
     {:else}
-      <p class="od-qr-share--help">{t('qr.preparing')}</p>
+      <p class="bc-qr-share--help">{t('qr.preparing')}</p>
     {/if}
 
-    <div class="od-qr-share--actions">
-      <Link popupClose class="od-qr-share--done">{t('qr.done')}</Link>
+    <div class="bc-qr-share--actions">
+      <Link popupClose class="bc-qr-share--done">{t('qr.done')}</Link>
     </div>
   </Page>
 </Popup>
 
 <style>
   @layer od.components {
-    :global(.od-qr-share .page) {
-      background: var(--od-background);
+    :global(.bc-qr-share .page) {
+      background: var(--bc-background);
     }
 
-    .od-qr-share--summary {
+    .bc-qr-share--summary {
       margin: 4px 24px 0;
       font-size: 15px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* White 20 dp card: the code is always black on white, whatever the mode. */
-    .od-qr-share--card {
+    .bc-qr-share--card {
       box-sizing: border-box;
       width: min(310px, calc(100% - 48px));
       aspect-ratio: 1;
       margin: 24px auto 0;
       padding: 20px;
       border-radius: 24px;
-      background: var(--od-qr-paper);
+      background: var(--bc-qr-paper);
     }
 
-    .od-qr-share--code {
+    .bc-qr-share--code {
       display: block;
       width: 100%;
       height: 100%;
-      fill: var(--od-qr-ink);
+      fill: var(--bc-qr-ink);
     }
 
-    .od-qr-share--dots {
+    .bc-qr-share--dots {
       margin-top: 20px;
       display: flex;
       justify-content: center;
@@ -132,52 +132,52 @@
       gap: 6px;
     }
 
-    .od-qr-share--dot {
+    .bc-qr-share--dot {
       width: 8px;
       height: 8px;
       border-radius: 4px;
-      background: var(--od-separator);
+      background: var(--bc-separator);
     }
 
-    .od-qr-share--dot-on {
+    .bc-qr-share--dot-on {
       width: 20px;
-      background: var(--od-action);
+      background: var(--bc-action);
     }
 
-    .od-qr-share--counter {
+    .bc-qr-share--counter {
       margin: 10px 0 0;
       text-align: center;
       font-size: 16px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-qr-share--help,
-    .od-qr-share--failed {
+    .bc-qr-share--help,
+    .bc-qr-share--failed {
       margin: 20px 32px 0;
       text-align: center;
       font-size: 15px;
       line-height: 22px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-qr-share--failed {
-      color: var(--od-alarm);
+    .bc-qr-share--failed {
+      color: var(--bc-alarm);
     }
 
-    .od-qr-share--actions {
+    .bc-qr-share--actions {
       margin: 32px 0 calc(24px + var(--f7-safe-area-bottom, 0px));
       display: flex;
       justify-content: center;
     }
 
-    :global(.od-qr-share--done) {
+    :global(.bc-qr-share--done) {
       height: 48px;
       padding: 0 32px;
       border-radius: 24px;
-      background: var(--od-action);
-      color: var(--od-on-action);
+      background: var(--bc-action);
+      color: var(--bc-on-action);
       font-size: 16px;
       font-weight: 500;
       display: inline-flex;

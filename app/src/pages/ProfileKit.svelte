@@ -109,41 +109,41 @@
 
   <ReadOnlyNotice />
 
-  <div class="od-kit-page--field">
+  <div class="bc-kit-page--field">
     <TextField label={t('gear.kit.name')} bind:value={name} invalid={!!live.error} supporting={live.error || (kitId ? useLine : t('gear.kit.nameHint'))} disabled={gear.readOnly} />
   </div>
 
   {#if loaded}
-    <div class="od-kit-page--head">
+    <div class="bc-kit-page--head">
       <h2>{t('gear.kit.pieces')}</h2>
       <span aria-live="polite">{t('gear.kit.chosen', { n: selected.length })}</span>
     </div>
     {#if groups.length}
       <GearPicker {groups} bind:selected disabled={gear.readOnly} line={(g) => (g.type === 'computer' && g.serial ? t('gear.inventory.serialLine', { serial: g.serial }) : (g.note ?? ''))} />
     {:else}
-      <p class="od-kit-page--none">{t('gear.kit.noGear')}</p>
+      <p class="bc-kit-page--none">{t('gear.kit.noGear')}</p>
     {/if}
-    <p class="od-kit-page--hint">{t('gear.kit.hint')}</p>
-    {#if kitId}<p class="od-kit-page--hint">{t('gear.kit.deleteNote')}</p>{/if}
+    <p class="bc-kit-page--hint">{t('gear.kit.hint')}</p>
+    {#if kitId}<p class="bc-kit-page--hint">{t('gear.kit.deleteNote')}</p>{/if}
   {/if}
-  <div class="od-kit-page--bottom"></div>
+  <div class="bc-kit-page--bottom"></div>
 {/snippet}
 
-<Page class="od-kit-page">
+<Page class="bc-kit-page">
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('gear.kit.close')}</span>
+        <Icon name="close" /><span class="bc-sr-only">{t('gear.kit.close')}</span>
       </a>
     {/snippet}
     {#snippet title()}{kitId ? t('gear.kit.editTitle') : t('gear.kit.newTitle')}{/snippet}
     {#snippet right()}
       {#if kitId}
         <a href="#more" class="link icon-only external" role="button" aria-haspopup="menu" onclick={(e) => (e.preventDefault(), more(e))}>
-          <Icon name="more" weight={4} /><span class="od-sr-only">{t('gear.kit.more')}</span>
+          <Icon name="more" weight={4} /><span class="bc-sr-only">{t('gear.kit.more')}</span>
         </a>
       {/if}
-      <button type="button" class="od-kit-page--save" disabled={!canSave} onclick={save}>{t('gear.kit.save')}</button>
+      <button type="button" class="bc-kit-page--save" disabled={!canSave} onclick={save}>{t('gear.kit.save')}</button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -166,33 +166,33 @@
 <style>
   @layer od.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
-    :global(.od-kit-page .page-content) {
+    :global(.bc-kit-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-kit-page--save {
+    .bc-kit-page--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-kit-page--save:disabled {
+    .bc-kit-page--save:disabled {
       opacity: 0.38;
     }
 
-    .od-kit-page--field {
+    .bc-kit-page--field {
       margin: 8px 0 0;
       padding: 0 16px;
     }
 
-    .od-kit-page--head {
+    .bc-kit-page--head {
       margin: 16px 20px 0;
       display: flex;
       align-items: baseline;
@@ -207,19 +207,19 @@
 
       span {
         font-size: 14px;
-        color: var(--od-text-2);
+        color: var(--bc-text-2);
       }
     }
 
-    .od-kit-page--none,
-    .od-kit-page--hint {
+    .bc-kit-page--none,
+    .bc-kit-page--hint {
       margin: 16px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-kit-page--bottom {
+    .bc-kit-page--bottom {
       height: 48px;
     }
   }

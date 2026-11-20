@@ -37,17 +37,17 @@
 </script>
 
 {#if shown}
-  <button type="button" class="od-account-avatar" class:od-account-avatar--rail={rail} class:od-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
-    <span class="od-account-avatar--circle">
+  <button type="button" class="bc-account-avatar" class:bc-account-avatar--rail={rail} class:bc-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
+    <span class="bc-account-avatar--circle">
       {#if initial}{initial}{:else}<Icon name="account" size={20} weight={2} />{/if}
     </span>
-    {#if badge}<span class="od-account-avatar--badge od-account-avatar--{badge}" aria-hidden="true"></span>{/if}
+    {#if badge}<span class="bc-account-avatar--badge bc-account-avatar--{badge}" aria-hidden="true"></span>{/if}
   </button>
 {/if}
 
 <style>
   @layer od.components {
-    .od-account-avatar {
+    .bc-account-avatar {
       position: relative;
       flex: none;
       width: 48px;
@@ -62,12 +62,12 @@
       cursor: pointer;
     }
 
-    .od-account-avatar--circle {
+    .bc-account-avatar--circle {
       width: 32px;
       height: 32px;
       border-radius: 16px;
-      background: var(--od-band-avatar);
-      color: var(--od-nav-avatar-ink);
+      background: var(--bc-band-avatar);
+      color: var(--bc-nav-avatar-ink);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -77,50 +77,50 @@
     }
 
     /* The rail: a 40 dp circle in the secondary colour, on the rail's light surface. */
-    .od-account-avatar--rail {
+    .bc-account-avatar--rail {
       width: 56px;
       height: 56px;
 
-      .od-account-avatar--circle {
+      .bc-account-avatar--circle {
         width: 40px;
         height: 40px;
         border-radius: 20px;
-        background: var(--od-nav-avatar-ink);
+        background: var(--bc-nav-avatar-ink);
         color: #FFFFFF;
         font-size: 17px;
       }
 
-      .od-account-avatar--badge {
+      .bc-account-avatar--badge {
         top: 6px;
         right: 6px;
-        box-shadow: 0 0 0 2px var(--od-background);
+        box-shadow: 0 0 0 2px var(--bc-background);
       }
     }
 
     /* iPhone (task 2026-11-14-127): a 32 pt circle in the secondary colour, white initial. */
-    .od-account-avatar--ios {
+    .bc-account-avatar--ios {
       width: 44px;
       height: 44px;
 
-      .od-account-avatar--circle {
-        background: var(--od-secondary);
-        color: var(--od-on-secondary);
+      .bc-account-avatar--circle {
+        background: var(--bc-secondary);
+        color: var(--bc-on-secondary);
         font-size: 15px;
       }
 
-      .od-account-avatar--badge {
+      .bc-account-avatar--badge {
         top: 4px;
         right: 4px;
-        box-shadow: 0 0 0 2px var(--od-background);
+        box-shadow: 0 0 0 2px var(--bc-background);
       }
     }
 
     /* Mouse: the Material 3 hover layer, 8 % of the circle's content colour, over the circle. */
     @media (hover: hover) and (pointer: fine) {
-      .od-account-avatar--circle {
+      .bc-account-avatar--circle {
         position: relative;
       }
-      .od-account-avatar--circle::after {
+      .bc-account-avatar--circle::after {
         content: '';
         position: absolute;
         inset: 0;
@@ -129,32 +129,32 @@
         opacity: 0;
         transition: opacity 120ms linear;
       }
-      .od-account-avatar:hover .od-account-avatar--circle::after {
+      .bc-account-avatar:hover .bc-account-avatar--circle::after {
         opacity: 0.08;
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-account-avatar--circle::after {
+      .bc-account-avatar--circle::after {
         transition: none;
       }
     }
 
     /* A small dot at the top right of the circle; its meaning is also in the sheet, in words. */
-    .od-account-avatar--badge {
+    .bc-account-avatar--badge {
       position: absolute;
       top: 8px;
       right: 8px;
       width: 10px;
       height: 10px;
       border-radius: 5px;
-      box-shadow: 0 0 0 2px var(--od-band-control);
+      box-shadow: 0 0 0 2px var(--bc-band-control);
 
-      &.od-account-avatar--waiting {
-        background: var(--od-tertiary);
+      &.bc-account-avatar--waiting {
+        background: var(--bc-tertiary);
       }
 
-      &.od-account-avatar--alarm {
-        background: var(--od-alarm);
+      &.bc-account-avatar--alarm {
+        background: var(--bc-alarm);
       }
     }
   }

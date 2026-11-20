@@ -56,7 +56,7 @@ function readTappables(avoid) {
   const re = new RegExp(avoid, 'i');
   const out = [];
   for (const el of document.querySelectorAll('a, button, [role=button], [role=tab], [role=option], [role=menuitem], [role=radio], label.item-content')) {
-    if (el.closest('.od-dev-tools-menu, .od-dev-tools-host, .od-route-badge')) continue;
+    if (el.closest('.bc-dev-tools-menu, .bc-dev-tools-host, .bc-route-badge')) continue;
     if (el.disabled || el.getAttribute('aria-disabled') === 'true') continue;
     const href = el.getAttribute('href') || '';
     if (/^(https?:|mailto:|tel:)/.test(href) || el.classList.contains('external') || el.target === '_blank') continue;
@@ -69,7 +69,7 @@ function readTappables(avoid) {
     if (r.bottom < 0 || r.top > innerHeight) continue;
     const hit = document.elementFromPoint(x, y);
     if (!hit || !(el === hit || el.contains(hit))) continue;
-    out.push({ x, y, label: label || href || el.className.slice(0, 30), back: el.classList.contains('back') && !!el.closest('.navbar'), nav: !!el.closest('.od-navigation-bar, .od-nav-rail, .toolbar.tabbar'), avatar: !!el.closest('.od-account-avatar') || el.classList.contains('od-account-avatar') });
+    out.push({ x, y, label: label || href || el.className.slice(0, 30), back: el.classList.contains('back') && !!el.closest('.navbar'), nav: !!el.closest('.bc-navigation-bar, .bc-nav-rail, .toolbar.tabbar'), avatar: !!el.closest('.bc-account-avatar') || el.classList.contains('bc-account-avatar') });
   }
   return out;
 }
@@ -85,13 +85,13 @@ async function readHealth() {
   // The middle of the screen belongs to the top layer: an open modal or its scrim, else the active section's current page.
   const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
   const current = view ? [...view.querySelectorAll(':scope > .page-current')] : [];
-  const layerOk = !hit || !!hit.closest('.modal-in, .modal-out, .backdrop-in, .panel, .panel-backdrop, .od-fab-menu, [popover], .od-map-fullscreen, [class*="od-select-field--"], .od-row-menu') || current.some((p) => p.contains(hit)) || !!hit.closest('.od-navigation-bar, .od-nav-rail') || (!!view && view.classList.contains('view-master-detail') && view.contains(hit));
+  const layerOk = !hit || !!hit.closest('.modal-in, .modal-out, .backdrop-in, .panel, .panel-backdrop, .bc-fab-menu, [popover], .bc-map-fullscreen, [class*="bc-select-field--"], .bc-row-menu') || current.some((p) => p.contains(hit)) || !!hit.closest('.bc-navigation-bar, .bc-nav-rail') || (!!view && view.classList.contains('view-master-detail') && view.contains(hit));
   let trace = null;
   try {
     trace = await import('/src/lib/nav-trace.js');
   } catch {}
   return {
-    moving: inv.appIsMoving(app) || !!document.querySelector('.modal-out, .panel-in-swipe, .od-tab-sliding'),
+    moving: inv.appIsMoving(app) || !!document.querySelector('.modal-out, .panel-in-swipe, .bc-tab-sliding'),
     problems: inv.checkApp(app),
     layerOk,
     hit: hit ? `${hit.tagName.toLowerCase()}.${String(hit.className).slice(0, 60)}` : '',
@@ -103,16 +103,16 @@ async function readHealth() {
       depth: router?.history?.length ?? 0,
       modals: modals.map((m) => m.className.split(' ').slice(0, 3).join('.')),
       inner: top?.querySelector('.view')?.f7View?.router?.currentRoute?.url ?? '',
-      step: document.querySelector('.od-welcome.modal-in .od-first-launch--step:last-of-type')?.getAttribute('data-step') ?? '',
+      step: document.querySelector('.bc-welcome.modal-in .bc-first-launch--step:last-of-type')?.getAttribute('data-step') ?? '',
       panel: !!document.querySelector('.panel.panel-in'),
-      fab: !!document.querySelector('.od-fab-menu--open, .fab-opened'),
-      search: !!document.querySelector('.view.tab-active .searchbar-enabled, .od-sites--search.od-sites--open'),
-      menus: document.querySelectorAll('.od-row-menu, .od-select-field--open, .od-map-site-card, .od-map-fullscreen, .od-edit-gas--open, [popover]:popover-open').length,
-      selection: !!document.querySelector('.od-logbook--selection-bar'),
-      wizard: document.querySelector('.page-current .od-delete-wizard--body')?.getAttribute('data-step') ?? '',
+      fab: !!document.querySelector('.bc-fab-menu--open, .fab-opened'),
+      search: !!document.querySelector('.view.tab-active .searchbar-enabled, .bc-sites--search.bc-sites--open'),
+      menus: document.querySelectorAll('.bc-row-menu, .bc-select-field--open, .bc-map-site-card, .bc-map-fullscreen, .bc-edit-gas--open, [popover]:popover-open').length,
+      selection: !!document.querySelector('.bc-logbook--selection-bar'),
+      wizard: document.querySelector('.page-current .bc-delete-wizard--body')?.getAttribute('data-step') ?? '',
     }),
     // Back from here sends the app to the background: nothing changes on screen.
-    exit: !modals.length && view?.id === 'view-logbook' && (router?.history?.length ?? 1) <= 1 && !document.querySelector('.panel.panel-in, .od-fab-menu--open, .fab-opened, .searchbar-enabled, .od-logbook--selection-bar, .od-row-menu, .od-select-field--open, [popover]:popover-open'),
+    exit: !modals.length && view?.id === 'view-logbook' && (router?.history?.length ?? 1) <= 1 && !document.querySelector('.panel.panel-in, .bc-fab-menu--open, .fab-opened, .searchbar-enabled, .bc-logbook--selection-bar, .bc-row-menu, .bc-select-field--open, [popover]:popover-open'),
     exitSplit: !modals.length && view?.id === 'view-logbook' && !!view?.classList.contains('view-master-detail') && !!view.querySelector(':scope > .page-current.page-master-detail-root, :scope > .page-master:only-child'),
   };
 }

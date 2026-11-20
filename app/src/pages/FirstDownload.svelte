@@ -59,7 +59,7 @@
   }
 </script>
 
-<EditorialPage class="od-first-download"
+<EditorialPage class="bc-first-download"
   firstLaunch
   noRetour
   helpLink
@@ -69,24 +69,24 @@
   secondary={{ label: t('accountStep.cancel'), onclick: cancel, disabled: cancelling }}
   closable={false}
 >
-  <ol class="od-first-download--steps" aria-label={t('firstLaunch.download.stepsLabel')}>
+  <ol class="bc-first-download--steps" aria-label={t('firstLaunch.download.stepsLabel')}>
     {#each rows as row (row.key)}
       {@const state = steps[row.key]}
-      <li class="od-first-download--state-{state}" aria-current={state === 'running' ? 'step' : undefined}>
-        <span class="od-first-download--mark" aria-hidden="true">
+      <li class="bc-first-download--state-{state}" aria-current={state === 'running' ? 'step' : undefined}>
+        <span class="bc-first-download--mark" aria-hidden="true">
           {#if state === 'done'}
-            <span class="od-first-download--done"><Icon name="check" size={18} weight={2.4} /></span>
+            <span class="bc-first-download--done"><Icon name="check" size={18} weight={2.4} /></span>
           {:else if state === 'running'}
-            <span class="od-first-download--running"><span></span></span>
+            <span class="bc-first-download--running"><span></span></span>
           {:else}
-            <span class="od-first-download--waiting"></span>
+            <span class="bc-first-download--waiting"></span>
           {/if}
         </span>
-        <span class="od-first-download--text">
-          <span class="od-first-download--label">{t(row.key === 'copy' ? deviceKey('firstLaunch.download.copy', deviceKind()) : row.key === 'connect' && git ? 'firstLaunch.download.gitConnect' : `firstLaunch.download.${row.key}`)}</span>
-          {#if row.detail}<span class="od-first-download--detail">{row.detail}</span>{/if}
+        <span class="bc-first-download--text">
+          <span class="bc-first-download--label">{t(row.key === 'copy' ? deviceKey('firstLaunch.download.copy', deviceKind()) : row.key === 'connect' && git ? 'firstLaunch.download.gitConnect' : `firstLaunch.download.${row.key}`)}</span>
+          {#if row.detail}<span class="bc-first-download--detail">{row.detail}</span>{/if}
           {#if row.key === 'dives' && state === 'running'}
-            <span class="od-first-download--bar">
+            <span class="bc-first-download--bar">
               <LinearWavyProgress value={steps.value} indeterminate={steps.value <= 0} label={t('firstLaunch.download.progressLabel')} />
             </span>
           {/if}
@@ -94,18 +94,18 @@
       </li>
     {/each}
   </ol>
-  <p class="od-first-download--note">{t('firstLaunch.download.note')}</p>
+  <p class="bc-first-download--note">{t('firstLaunch.download.note')}</p>
 </EditorialPage>
 
 <style>
   @layer od.components {
-    .od-first-download--steps {
+    .bc-first-download--steps {
       margin: 12px 0 0;
       padding: 20px 20px 22px;
       list-style: none;
-      border: 1px solid var(--od-surface-container-highest);
+      border: 1px solid var(--bc-surface-container-highest);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -117,15 +117,15 @@
       }
     }
 
-    .od-first-download--mark {
+    .bc-first-download--mark {
       flex: none;
       padding-top: 1px;
       display: flex;
     }
 
-    .od-first-download--done,
-    .od-first-download--running,
-    .od-first-download--waiting {
+    .bc-first-download--done,
+    .bc-first-download--running,
+    .bc-first-download--waiting {
       box-sizing: border-box;
       width: 28px;
       height: 28px;
@@ -135,27 +135,27 @@
       justify-content: center;
     }
 
-    .od-first-download--done {
-      background: var(--od-first-done);
-      color: var(--od-on-first-done);
+    .bc-first-download--done {
+      background: var(--bc-first-done);
+      color: var(--bc-on-first-done);
     }
 
-    .od-first-download--running {
-      border: 3px solid var(--od-code-active);
+    .bc-first-download--running {
+      border: 3px solid var(--bc-code-active);
 
       span {
         width: 10px;
         height: 10px;
         border-radius: 5px;
-        background: var(--od-code-active);
+        background: var(--bc-code-active);
       }
     }
 
-    .od-first-download--waiting {
-      border: 2px solid var(--od-first-pending-ring);
+    .bc-first-download--waiting {
+      border: 2px solid var(--bc-first-pending-ring);
     }
 
-    .od-first-download--text {
+    .bc-first-download--text {
       flex: 1;
       min-width: 0;
       padding-top: 4px;
@@ -164,38 +164,38 @@
       gap: 2px;
     }
 
-    .od-first-download--label {
+    .bc-first-download--label {
       font-size: 16px;
       line-height: 21px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
 
-      .od-first-download--state-running & {
+      .bc-first-download--state-running & {
         font-weight: 600;
       }
 
-      .od-first-download--state-waiting & {
-        color: var(--od-text-2);
+      .bc-first-download--state-waiting & {
+        color: var(--bc-text-2);
       }
     }
 
-    .od-first-download--detail {
+    .bc-first-download--detail {
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       overflow-wrap: anywhere;
     }
 
-    .od-first-download--bar {
+    .bc-first-download--bar {
       margin-top: 8px;
       display: block;
     }
 
-    .od-first-download--note {
+    .bc-first-download--note {
       margin: 14px 0 0;
       font-size: 14px;
       line-height: 19px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

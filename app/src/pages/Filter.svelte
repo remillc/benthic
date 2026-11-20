@@ -217,26 +217,26 @@
 </script>
 
 {#snippet criterionRow(/** @type {string} */ row, /** @type {string} */ title, /** @type {string} */ value, /** @type {boolean} */ active, nested = false)}
-  <a href="/filter/{row}" class="od-filter--row" class:od-filter--row-set={active} class:od-filter--row-nested={nested}>
-    <span class="od-filter--row-text">
-      <span class="od-filter--row-title">{title}</span>
-      <span class="od-filter--row-value">{value}</span>
+  <a href="/filter/{row}" class="bc-filter--row" class:bc-filter--row-set={active} class:bc-filter--row-nested={nested}>
+    <span class="bc-filter--row-text">
+      <span class="bc-filter--row-title">{title}</span>
+      <span class="bc-filter--row-value">{value}</span>
     </span>
-    <span class="od-filter--row-icon"><Icon name="chevron" size={20} /></span>
+    <span class="bc-filter--row-icon"><Icon name="chevron" size={20} /></span>
   </a>
 {/snippet}
 
-<Page class="od-filter">
+<Page class="bc-filter">
   <Navbar title={t('filter.title')}>
     {#snippet left()}
       {#if theme.ios}
         <Link onClick={() => guard?.attempt()}>{t('filter.cancel')}</Link>
       {:else}
-        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="od-sr-only">{t('filter.cancel')}</span></Link>
+        <Link iconOnly onClick={() => guard?.attempt()}><Icon name="close" /><span class="bc-sr-only">{t('filter.cancel')}</span></Link>
       {/if}
     {/snippet}
     {#snippet right()}
-      <Link class="od-filter--clear" onClick={clearAll}>{t('filter.clearAll')}</Link>
+      <Link class="bc-filter--clear" onClick={clearAll}>{t('filter.clearAll')}</Link>
     {/snippet}
   </Navbar>
   <LeaveGuard
@@ -262,7 +262,7 @@
       onSearchbarClear={() => (search = '')}
     />
   {:else}
-    <label class="od-filter--search">
+    <label class="bc-filter--search">
       <Icon name="search" />
       <input type="search" aria-label={t('filter.searchCriterion')} placeholder={t('filter.searchCriterion')} bind:value={search} />
       {#if search}<SearchClear onclear={() => (search = '')} />{/if}
@@ -270,17 +270,17 @@
   {/if}
 
   {#if filter.presets.length && !search.trim()}
-    <h2 class="od-filter--group-title">{t('filter.savedFilters')}</h2>
+    <h2 class="bc-filter--group-title">{t('filter.savedFilters')}</h2>
     {#if theme.ios}
-      <List inset strong dividers class="od-filter--criteria">
+      <List inset strong dividers class="bc-filter--criteria">
         {#each filter.presets as p (p.name)}
-          <li class:od-filter--set={appliedPreset === p.name}>
-            <div class="item-content od-filter--preset-row">
-              <button type="button" class="od-filter--preset-ios" aria-pressed={appliedPreset === p.name} onclick={() => applyPreset(p)}>
-                <span class="od-filter--preset-name-ios">{p.name}</span>
+          <li class:bc-filter--set={appliedPreset === p.name}>
+            <div class="item-content bc-filter--preset-row">
+              <button type="button" class="bc-filter--preset-ios" aria-pressed={appliedPreset === p.name} onclick={() => applyPreset(p)}>
+                <span class="bc-filter--preset-name-ios">{p.name}</span>
                 {#if appliedPreset === p.name}<Icon name="check" size={20} weight={2} />{/if}
               </button>
-              <button type="button" class="od-icon-button" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
+              <button type="button" class="bc-icon-button" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
                 <Icon name="close" size={20} />
               </button>
             </div>
@@ -288,15 +288,15 @@
         {/each}
       </List>
     {:else}
-      <div class="od-filter--card">
+      <div class="bc-filter--card">
         {#each filter.presets as p (p.name)}
           {@const on = appliedPreset === p.name}
-          <div class="od-filter--preset" class:od-filter--preset-on={on}>
-            <button type="button" class="od-filter--preset-apply" aria-pressed={on} onclick={() => applyPreset(p)}>
+          <div class="bc-filter--preset" class:bc-filter--preset-on={on}>
+            <button type="button" class="bc-filter--preset-apply" aria-pressed={on} onclick={() => applyPreset(p)}>
               {#if on}<Icon name="check" size={20} weight={2.2} />{/if}
-              <span class="od-filter--preset-name">{p.name}</span>
+              <span class="bc-filter--preset-name">{p.name}</span>
             </button>
-            <button type="button" class="od-filter--preset-delete" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
+            <button type="button" class="bc-filter--preset-delete" aria-label={t('filter.deleteNamed', { name: p.name })} onclick={() => removePreset(p)}>
               <Icon name="close" size={20} />
             </button>
           </div>
@@ -306,8 +306,8 @@
   {/if}
 
   {#if showMode && !search.trim()}
-    <h2 class="od-filter--group-title" id="od-filter-mode">{t('filter.mode')}</h2>
-    <div class="od-filter--mode">
+    <h2 class="bc-filter--group-title" id="od-filter-mode">{t('filter.mode')}</h2>
+    <div class="bc-filter--mode">
       <ButtonGroup ariaLabelledby="od-filter-mode" value={filter.draft.mode} options={modes.map((mode) => ({ value: mode, label: t(`filter.modes.${mode}`) }))} onchange={(mode) => setMode(/** @type {any} */ (mode))} />
     </div>
   {/if}
@@ -316,8 +316,8 @@
     {@const gear = shown.find((g) => g.group === 'gear')}
     {@const others = shown.filter((g) => g.group !== 'gear' && g.keys.length)}
     {#if gear?.keys.length}
-      <h2 class="od-filter--group-title">{t('filter.groups.gear')}</h2>
-      <div class="od-filter--card">
+      <h2 class="bc-filter--group-title">{t('filter.groups.gear')}</h2>
+      <div class="bc-filter--card">
         {#each gearRows(gear.keys) as row (row)}
           {@render criterionRow(
             row,
@@ -329,20 +329,20 @@
       </div>
     {/if}
     {#if others.length}
-      <h2 class="od-filter--group-title">{t('filter.otherCriteria')}</h2>
-      <div class="od-filter--card">
+      <h2 class="bc-filter--group-title">{t('filter.otherCriteria')}</h2>
+      <div class="bc-filter--card">
         {#each others as g (g.group)}
           {@const open = opened[g.group] || !!search.trim()}
-          <div class="od-filter--group">
-            <button type="button" class="od-filter--row" aria-expanded={open} onclick={() => (opened[g.group] = !opened[g.group])}>
-              <span class="od-filter--row-text">
-                <span class="od-filter--row-title">
+          <div class="bc-filter--group">
+            <button type="button" class="bc-filter--row" aria-expanded={open} onclick={() => (opened[g.group] = !opened[g.group])}>
+              <span class="bc-filter--row-text">
+                <span class="bc-filter--row-title">
                   {t(`filter.groups.${g.group}`)}
-                  {#if setInGroup(g.group)}<span class="od-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
+                  {#if setInGroup(g.group)}<span class="bc-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
                 </span>
-                <span class="od-filter--row-value">{hint(g.group)}</span>
+                <span class="bc-filter--row-value">{hint(g.group)}</span>
               </span>
-              <span class="od-filter--row-icon" class:od-filter--row-icon-up={open}><Icon name="expand" size={20} /></span>
+              <span class="bc-filter--row-icon" class:bc-filter--row-icon-up={open}><Icon name="expand" size={20} /></span>
             </button>
             {#if open}
               {#each g.keys as k (k.key)}
@@ -358,35 +358,35 @@
   {#each theme.ios ? shown : [] as g (g.group)}
     {#if g.keys.length}
       {#if g.group === 'gear'}
-        <h2 class="od-filter--group-title">{t('filter.groups.gear')}</h2>
-        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter--criteria">
+        <h2 class="bc-filter--group-title">{t('filter.groups.gear')}</h2>
+        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="bc-filter--criteria">
           {#each g.keys as k (k.key)}
             <ListItem
               link="/filter/{k.key}"
               title={label(k.key)}
               after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
-              class={isSet(k.key, filter.draft) ? 'od-filter--set' : ''}
+              class={isSet(k.key, filter.draft) ? 'bc-filter--set' : ''}
             />
           {/each}
         </List>
       {:else}
-        {#if g.group === 'when'}<h2 class="od-filter--group-title">{t('filter.otherCriteria')}</h2>{/if}
-        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="od-filter--criteria od-filter--groups">
-          <li class="od-filter--group-ios" class:od-filter--open={opened[g.group] || !!search.trim()}>
+        {#if g.group === 'when'}<h2 class="bc-filter--group-title">{t('filter.otherCriteria')}</h2>{/if}
+        <List inset={theme.ios} strong={theme.ios} dividers={theme.ios} class="bc-filter--criteria bc-filter--groups">
+          <li class="bc-filter--group-ios" class:bc-filter--open={opened[g.group] || !!search.trim()}>
             <button
               type="button"
-              class="od-filter--group-button"
+              class="bc-filter--group-button"
               aria-expanded={opened[g.group] || !!search.trim()}
               onclick={() => (opened[g.group] = !opened[g.group])}
             >
-              <span class="od-filter--group-text">
-                <span class="od-filter--group-label">
+              <span class="bc-filter--group-text">
+                <span class="bc-filter--group-label">
                   {t(`filter.groups.${g.group}`)}
-                  {#if setInGroup(g.group)}<span class="od-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
+                  {#if setInGroup(g.group)}<span class="bc-filter--group-count">{t('filter.setCount', { n: setInGroup(g.group) })}</span>{/if}
                 </span>
-                <span class="od-filter--group-hint">{hint(g.group)}</span>
+                <span class="bc-filter--group-hint">{hint(g.group)}</span>
               </span>
-              <span class="od-filter--expand"><Icon name="expand" size={20} /></span>
+              <span class="bc-filter--expand"><Icon name="expand" size={20} /></span>
             </button>
           </li>
           {#if opened[g.group] || search.trim()}
@@ -395,7 +395,7 @@
                 link="/filter/{k.key}"
                 title={label(k.key)}
                 after={valueText(k.key, filter.draft, logbook.prefs, (id) => tripNames.get(id) ?? id)}
-                class={isSet(k.key, filter.draft) ? 'od-filter--set od-filter--in-group' : 'od-filter--in-group'}
+                class={isSet(k.key, filter.draft) ? 'bc-filter--set bc-filter--in-group' : 'bc-filter--in-group'}
               />
             {/each}
           {/if}
@@ -405,16 +405,16 @@
   {/each}
 
   {#snippet fixedContent()}
-    <div class="od-filter--bottom">
-      <button type="button" class="od-filter--show" onclick={show} disabled={filter.draftCount === 0}>{showText}</button>
-      <button type="button" class="od-text-button od-filter--save" onclick={startSaving} disabled={isEmpty(filter.draft)}>{t('filter.save')}</button>
+    <div class="bc-filter--bottom">
+      <button type="button" class="bc-filter--show" onclick={show} disabled={filter.draftCount === 0}>{showText}</button>
+      <button type="button" class="bc-text-button bc-filter--save" onclick={startSaving} disabled={isEmpty(filter.draft)}>{t('filter.save')}</button>
     </div>
   {/snippet}
 </Page>
 
 {#if naming}
-  <Md3Dialog class="od-filter" title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={cancelNaming}>
-    <div class="od-filter--name-field">
+  <Md3Dialog class="bc-filter" title={t('filter.saveTitle')} text={t('filter.saveText')} oncancel={cancelNaming}>
+    <div class="bc-filter--name-field">
       <TextField label={t('filter.name')} bind:value={presetName} invalid={!!saveError} supporting={saveError} />
     </div>
     {#snippet actions()}
@@ -426,15 +426,15 @@
 
 <style>
   @layer od.components {
-    :global(.od-filter .page-content) {
+    :global(.bc-filter .page-content) {
       padding-bottom: 160px;
     }
 
-    .od-filter--group-title {
+    .bc-filter--group-title {
       margin: 20px 16px 8px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         margin: 18px 16px 6px 32px;
@@ -443,13 +443,13 @@
       }
     }
 
-    .od-filter--search {
+    .bc-filter--search {
       margin: 8px 16px 0;
       height: 56px;
       padding: 0 16px;
       border-radius: 28px;
-      background: var(--od-surface-2);
-      color: var(--od-text-2);
+      background: var(--bc-surface-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       gap: 16px;
@@ -461,35 +461,35 @@
         padding: 0;
         border: none;
         background: transparent;
-        color: var(--od-text);
+        color: var(--bc-text);
         font: inherit;
         font-size: 16px;
         outline: none;
       }
     }
 
-    .od-filter--card {
+    .bc-filter--card {
       margin: 0 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       & > :global(* + *) {
-        border-top: 1px solid var(--od-separator);
+        border-top: 1px solid var(--bc-separator);
       }
     }
 
-    .od-filter--group > :global(* + *) {
-      border-top: 1px solid var(--od-separator);
+    .bc-filter--group > :global(* + *) {
+      border-top: 1px solid var(--bc-separator);
     }
 
-    .od-filter--row {
+    .bc-filter--row {
       width: 100%;
       min-height: 56px;
       padding: 8px 20px 8px 16px;
       box-sizing: border-box;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       text-decoration: none;
@@ -499,20 +499,20 @@
       cursor: pointer;
     }
 
-    button.od-filter--row {
+    button.bc-filter--row {
       border: none;
     }
 
-    :global(.md .od-filter--clear) {
+    :global(.md .bc-filter--clear) {
       font-size: 14px;
       font-weight: 600;
     }
 
-    .od-filter--row-nested {
+    .bc-filter--row-nested {
       padding-inline-start: 32px;
     }
 
-    .od-filter--row-text {
+    .bc-filter--row-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -520,38 +520,38 @@
       gap: 2px;
     }
 
-    .od-filter--row-title {
+    .bc-filter--row-title {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-filter--row-value {
+    .bc-filter--row-value {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-filter--row-set {
-      background: var(--od-surface-2);
+    .bc-filter--row-set {
+      background: var(--bc-surface-2);
 
-      .od-filter--row-value {
-        color: var(--od-text);
+      .bc-filter--row-value {
+        color: var(--bc-text);
         font-weight: 600;
       }
     }
 
-    .od-filter--row-icon {
+    .bc-filter--row-icon {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       transition: transform 0.2s;
     }
 
-    .od-filter--row-icon-up {
+    .bc-filter--row-icon-up {
       transform: rotate(180deg);
     }
 
-    .od-filter--preset {
+    .bc-filter--preset {
       min-height: 56px;
       padding: 4px 8px 4px 16px;
       box-sizing: border-box;
@@ -560,22 +560,22 @@
       gap: 8px;
     }
 
-    .od-filter--preset-on {
-      background: var(--od-surface-2);
+    .bc-filter--preset-on {
+      background: var(--bc-surface-2);
 
-      .od-filter--preset-name {
+      .bc-filter--preset-name {
         font-weight: 600;
       }
     }
 
-    .od-filter--preset-apply {
+    .bc-filter--preset-apply {
       flex: 1;
       min-width: 0;
       min-height: 48px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -584,53 +584,53 @@
       cursor: pointer;
     }
 
-    .od-filter--preset-name {
+    .bc-filter--preset-name {
       flex: 1;
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-filter--preset-delete {
+    .bc-filter--preset-delete {
       flex: none;
       width: 48px;
       height: 48px;
       padding: 0;
       border: none;
       background: none;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
 
-    .od-filter--mode {
+    .bc-filter--mode {
       margin: 0 16px;
     }
 
     /* A set criterion: its value in ink and bold (iOS board), on a tint. */
-    :global(.od-filter .od-filter--criteria .od-filter--set .item-after) {
-      color: var(--od-text);
+    :global(.bc-filter .bc-filter--criteria .bc-filter--set .item-after) {
+      color: var(--bc-text);
       font-weight: 600;
     }
 
-    :global(.od-filter .od-filter--criteria .item-after) {
+    :global(.bc-filter .bc-filter--criteria .item-after) {
       max-width: 55%;
       white-space: normal;
       text-align: end;
     }
 
-    :global(.od-filter .od-filter--criteria .od-filter--in-group .item-content) {
+    :global(.bc-filter .bc-filter--criteria .bc-filter--in-group .item-content) {
       padding-inline-start: 32px;
     }
 
-    .od-filter--group-button {
+    .bc-filter--group-button {
       width: 100%;
       min-height: 56px;
       padding: 6px 12px 6px 16px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       text-align: start;
       display: flex;
@@ -639,14 +639,14 @@
       cursor: pointer;
     }
 
-    .od-filter--group-text {
+    .bc-filter--group-text {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-filter--group-label {
+    .bc-filter--group-label {
       font-size: 16px;
       line-height: 24px;
 
@@ -655,42 +655,42 @@
       }
     }
 
-    .od-filter--group-count {
+    .bc-filter--group-count {
       margin-inline-start: 8px;
       font-size: 14px;
       font-weight: 600;
     }
 
-    .od-filter--group-hint {
+    .bc-filter--group-hint {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         font-size: 13px;
       }
     }
 
-    .od-filter--expand {
-      color: var(--od-text-2);
+    .bc-filter--expand {
+      color: var(--bc-text-2);
       transition: transform 0.2s;
     }
 
-    .od-filter--open .od-filter--expand {
+    .bc-filter--open .bc-filter--expand {
       transform: rotate(180deg);
     }
 
-    .od-filter--preset-row {
+    .bc-filter--preset-row {
       padding-inline-end: 4px;
       gap: 4px;
     }
 
-    .od-filter--preset-ios {
+    .bc-filter--preset-ios {
       flex: 1;
       min-height: 56px;
       border: none;
       background: none;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       font-size: 16px;
       text-align: start;
@@ -704,32 +704,32 @@
       }
     }
 
-    .od-filter--preset-name-ios {
+    .bc-filter--preset-name-ios {
       flex: 1;
     }
 
-    .od-filter--save {
+    .bc-filter--save {
       display: flex;
       margin: 4px auto 0;
 
       :global(.md) & {
         font-weight: 600;
-        color: var(--od-text);
+        color: var(--bc-text);
       }
     }
 
-    .od-filter--name-field {
-      --od-field-margin: 24px;
+    .bc-filter--name-field {
+      --bc-field-margin: 24px;
     }
 
-    .od-filter--bottom {
+    .bc-filter--bottom {
       position: absolute;
       inset-inline: 0;
       bottom: 0;
       z-index: 10;
       padding: 12px 16px calc(20px + var(--f7-safe-area-bottom, 0px));
-      background: var(--od-background);
-      border-top: 1px solid var(--od-separator);
+      background: var(--bc-background);
+      border-top: 1px solid var(--bc-separator);
 
       :global(.ios) & {
         padding-bottom: calc(16px + var(--f7-safe-area-bottom, 0px));
@@ -737,13 +737,13 @@
     }
 
     /* The screen's main action: MD3 filled button, iOS large filled button. */
-    .od-filter--show {
+    .bc-filter--show {
       width: 100%;
       height: 48px;
       border: none;
       border-radius: 24px;
-      background: var(--od-primary-action);
-      color: var(--od-on-primary-action);
+      background: var(--bc-primary-action);
+      color: var(--bc-on-primary-action);
       font: inherit;
       font-size: 16px;
       font-weight: 600;

@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // One item of an overflow menu (a Framework7 Popover with the "od-menu"
+  // One item of an overflow menu (a Framework7 Popover with the "bc-menu"
   // class, styled in theme.css): an MD3 menu item on Android, icon before the
   // label; an iOS pull-down menu item, label then icon at the end. Tapping it
   // closes the menu.
@@ -34,7 +34,7 @@
   popoverClose={!disabled}
   title={text}
   text={supporting || undefined}
-  class="od-menu-item {destructive ? 'od-menu-item--destructive' : ''} {disabled ? 'od-menu-item--disabled' : ''}"
+  class="bc-menu-item {destructive ? 'bc-menu-item--destructive' : ''} {disabled ? 'bc-menu-item--disabled' : ''}"
   onClick={disabled ? undefined : onclick}
   aria-disabled={disabled ? 'true' : undefined}
   {...theme.ios ? { after: trailing } : { media: leading }}

@@ -1,6 +1,6 @@
 // @ts-check
 // A small menu under a button (task 2026-11-17-267): the ⋮ of the equipment screens and the kit menu of the dive
-// editor. A Framework7 popover with the app's `od-menu` look (theme.css), as the account sheet's sync options.
+// editor. A Framework7 popover with the app's `bc-menu` look (theme.css), as the account sheet's sync options.
 import { f7 } from 'framework7-svelte';
 
 /** @param {string} s */
@@ -25,16 +25,16 @@ export const escapeHtml = (s) => s.replace(/[&<>"']/g, (c) => /** @type {Record<
 export function openPopupMenu(target, items, name = '') {
   const rows = items
     .map((item, i) => {
-      const divider = item.divider ? '<li class="od-menu-divider" role="separator"></li>' : '';
+      const divider = item.divider ? '<li class="bc-menu-divider" role="separator"></li>' : '';
       const sub = item.supporting ? `<div class="item-text">${escapeHtml(item.supporting)}</div>` : '';
-      const style = item.danger ? ' style="color:var(--od-menu-danger)"' : '';
+      const style = item.danger ? ' style="color:var(--bc-menu-danger)"' : '';
       const off = item.disabled ? ' disabled' : '';
       return `${divider}<li class="${item.disabled ? 'disabled' : ''}"><a href="#" class="item-link item-content popover-close" data-index="${i}"${off}><div class="item-inner"><div class="item-title"${style}>${escapeHtml(item.label)}${sub}</div></div></a></li>`;
     })
     .join('');
   const popover = f7.popover.create({
     targetEl: target,
-    content: `<div class="popover od-menu" role="menu" aria-label="${escapeHtml(name)}"><div class="popover-inner"><div class="list no-chevron"><ul>${rows}</ul></div></div></div>`,
+    content: `<div class="popover bc-menu" role="menu" aria-label="${escapeHtml(name)}"><div class="popover-inner"><div class="list no-chevron"><ul>${rows}</ul></div></div></div>`,
     on: {
       opened(/** @type {any} */ p) {
         p.$el.find('[data-index]').on('click', (/** @type {Event} */ ev) => {

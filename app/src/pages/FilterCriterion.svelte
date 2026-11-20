@@ -15,23 +15,23 @@
   const title = row in combinedRows ? t(`filter.combined.${row}`) : t(`filter.criteria.${row}`);
 </script>
 
-<Page class="od-filter-criterion">
+<Page class="bc-filter-criterion">
   <Navbar {title} backLink={t('filter.title')} backLinkShowText={theme.ios} />
 
   {#each keys as key (key)}
-    {#if keys.length > 1}<h2 class="od-filter-criterion--heading">{t(`filter.criteria.${key}`)}</h2>{/if}
+    {#if keys.length > 1}<h2 class="bc-filter-criterion--heading">{t(`filter.criteria.${key}`)}</h2>{/if}
     <FilterCriterionBody criterion={key} />
   {/each}
 </Page>
 
 <style>
   @layer od.components {
-    .od-filter-criterion--heading {
+    .bc-filter-criterion--heading {
       margin: 20px 16px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

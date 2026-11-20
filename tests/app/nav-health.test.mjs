@@ -177,7 +177,7 @@ test('tidying a view removes what a page change or a swipe left behind and reope
   const next = page(['page', 'page-next']);
   const props = [];
   const router = {
-    el: { classList: classes(['view', 'router-transition-backward', 'router-transition', 'od-pushing']), style: { removeProperty: (p) => props.push(p) }, children: [current, next, { classList: classes(['navbar']) }] },
+    el: { classList: classes(['view', 'router-transition-backward', 'router-transition', 'bc-pushing']), style: { removeProperty: (p) => props.push(p) }, children: [current, next, { classList: classes(['navbar']) }] },
     removePage: (el) => removed.push(el),
     odLocks: 2,
     swipeBackActive: true,

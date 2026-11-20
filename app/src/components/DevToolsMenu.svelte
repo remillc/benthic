@@ -167,7 +167,7 @@
    * @param {HTMLElement} grip
    */
   function dragToClose(grip) {
-    const panel = /** @type {HTMLElement} */ (grip.closest('.od-dev-tools-menu--panel'));
+    const panel = /** @type {HTMLElement} */ (grip.closest('.bc-dev-tools-menu--panel'));
     const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
     let startY = 0;
     let lastY = 0;
@@ -252,55 +252,55 @@
 <svelte:window onkeydown={onKey} />
 
 {#snippet row(id, icon, title, hint, click, off = false, danger = false)}
-  <button type="button" class="od-dev-tools-menu--action" class:od-dev-tools-menu--danger={danger} disabled={!!busy || !tools || off} aria-busy={busy === id} onclick={click}>
-    <span class="od-dev-tools-menu--action-icon"><Icon name={icon} size={22} /></span>
-    <span class="od-dev-tools-menu--action-text">
-      <span class="od-dev-tools-menu--action-title">{title}</span>
-      <span class="od-dev-tools-menu--action-hint">{hint}</span>
+  <button type="button" class="bc-dev-tools-menu--action" class:bc-dev-tools-menu--danger={danger} disabled={!!busy || !tools || off} aria-busy={busy === id} onclick={click}>
+    <span class="bc-dev-tools-menu--action-icon"><Icon name={icon} size={22} /></span>
+    <span class="bc-dev-tools-menu--action-text">
+      <span class="bc-dev-tools-menu--action-title">{title}</span>
+      <span class="bc-dev-tools-menu--action-hint">{hint}</span>
     </span>
-    {#if busy === id}<span class="od-dev-tools-menu--spinner" aria-hidden="true"></span>{/if}
+    {#if busy === id}<span class="bc-dev-tools-menu--spinner" aria-hidden="true"></span>{/if}
   </button>
 {/snippet}
 
 {#snippet segment(id, index, icon, title, tag)}
   {@const seg = segments[index]}
-  <button type="button" role="radio" class="od-dev-tools-menu--segment" class:od-dev-tools-menu--segment-on={pillIndex === index} aria-checked={seg.on} disabled={seg.disabled} aria-busy={busy === id} onclick={() => pick(id, index)}>
-    {#if busy === id}<span class="od-dev-tools-menu--spinner" aria-hidden="true"></span>{:else}<Icon name={icon} size={20} />{/if}
-    <span class="od-dev-tools-menu--segment-title">{title}</span>
-    {#if tag}<span class="od-dev-tools-menu--segment-tag">{tag}</span>{/if}
+  <button type="button" role="radio" class="bc-dev-tools-menu--segment" class:bc-dev-tools-menu--segment-on={pillIndex === index} aria-checked={seg.on} disabled={seg.disabled} aria-busy={busy === id} onclick={() => pick(id, index)}>
+    {#if busy === id}<span class="bc-dev-tools-menu--spinner" aria-hidden="true"></span>{:else}<Icon name={icon} size={20} />{/if}
+    <span class="bc-dev-tools-menu--segment-title">{title}</span>
+    {#if tag}<span class="bc-dev-tools-menu--segment-tag">{tag}</span>{/if}
   </button>
 {/snippet}
 
 {#if devUi.open}
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div class="od-dev-tools-menu" onclick={(e) => e.target === e.currentTarget && (devUi.open = false)}>
-    <div class="od-dev-tools-menu--panel" role="dialog" aria-modal="true" aria-label={text.title}>
-      <div class="od-dev-tools-menu--grip" use:dragToClose aria-hidden="true"><span class="od-dev-tools-menu--handle"></span></div>
-      <header class="od-dev-tools-menu--head">
-        <span class="od-dev-tools-menu--title">{text.title}</span>
-        <span class="od-dev-tools-menu--tag">DEV</span>
-        <button type="button" class="od-dev-tools-menu--close" aria-label={text.close} onclick={() => (devUi.open = false)}><Icon name="close" size={22} /></button>
+  <div class="bc-dev-tools-menu" onclick={(e) => e.target === e.currentTarget && (devUi.open = false)}>
+    <div class="bc-dev-tools-menu--panel" role="dialog" aria-modal="true" aria-label={text.title}>
+      <div class="bc-dev-tools-menu--grip" use:dragToClose aria-hidden="true"><span class="bc-dev-tools-menu--handle"></span></div>
+      <header class="bc-dev-tools-menu--head">
+        <span class="bc-dev-tools-menu--title">{text.title}</span>
+        <span class="bc-dev-tools-menu--tag">DEV</span>
+        <button type="button" class="bc-dev-tools-menu--close" aria-label={text.close} onclick={() => (devUi.open = false)}><Icon name="close" size={22} /></button>
       </header>
 
       {#if status.message}
-        <p class="od-dev-tools-menu--status od-dev-tools-menu--status-{status.kind}" role="status" aria-live="polite">{status.message}{#if status.detail}<span class="od-dev-tools-menu--status-detail">{text.failed} · {status.detail}</span>{/if}</p>
+        <p class="bc-dev-tools-menu--status bc-dev-tools-menu--status-{status.kind}" role="status" aria-live="polite">{status.message}{#if status.detail}<span class="bc-dev-tools-menu--status-detail">{text.failed} · {status.detail}</span>{/if}</p>
       {/if}
 
-      <div class="od-dev-tools-menu--body">
-        <section class="od-dev-tools-menu--state" aria-live="polite">
+      <div class="bc-dev-tools-menu--body">
+        <section class="bc-dev-tools-menu--state" aria-live="polite">
           {#if current}
-            <div class="od-dev-tools-menu--state-top">
-              <span class="od-dev-tools-menu--avatar" aria-hidden="true">{initial}</span>
-              <div class="od-dev-tools-menu--state-who">
+            <div class="bc-dev-tools-menu--state-top">
+              <span class="bc-dev-tools-menu--avatar" aria-hidden="true">{initial}</span>
+              <div class="bc-dev-tools-menu--state-who">
                 {#if current.kind === 'subscribed'}
-                  <span class="od-dev-tools-menu--badge od-dev-tools-menu--badge-plus"><BenthicPlusChip onLight />{text.subscribed}</span>
+                  <span class="bc-dev-tools-menu--badge bc-dev-tools-menu--badge-plus"><BenthicPlusChip onLight />{text.subscribed}</span>
                 {:else}
-                  <span class="od-dev-tools-menu--badge">{text.free}</span>
+                  <span class="bc-dev-tools-menu--badge">{text.free}</span>
                 {/if}
-                <span class="od-dev-tools-menu--state-mail">{current.email || text.none}</span>
+                <span class="bc-dev-tools-menu--state-mail">{current.email || text.none}</span>
               </div>
             </div>
-            <dl class="od-dev-tools-menu--facts">
+            <dl class="bc-dev-tools-menu--facts">
               <dt><Icon name="server" size={16} /></dt>
               <dd>{current.server || '-'}</dd>
               <dt><Icon name="logbook" size={16} /></dt>
@@ -309,28 +309,28 @@
           {/if}
         </section>
 
-        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-account">
-          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-account">{text.account}</h3>
-          <div class="od-dev-tools-menu--segments" role="radiogroup" aria-labelledby="od-dev-s-account" style:--od-dev-segment-index={Math.max(pillIndex, 0)}>
-            {#if pillIndex >= 0}<span class="od-dev-tools-menu--segments-pill" class:od-dev-tools-menu--segments-pill-slide={slide} aria-hidden="true"></span>{/if}
+        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-account">
+          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-account">{text.account}</h3>
+          <div class="bc-dev-tools-menu--segments" role="radiogroup" aria-labelledby="od-dev-s-account" style:--bc-dev-segment-index={Math.max(pillIndex, 0)}>
+            {#if pillIndex >= 0}<span class="bc-dev-tools-menu--segments-pill" class:bc-dev-tools-menu--segments-pill-slide={slide} aria-hidden="true"></span>{/if}
             {@render segment('out', 0, 'phone', text.toFreeOut, text.toFreeOutTag)}
             {@render segment('keep', 1, 'lock', text.toFreeKeep, text.toFreeKeepTag)}
             {@render segment('sub', 2, 'plusMark', text.toSub, text.toSubTag)}
           </div>
           {#if level >= 0}
-            <p class="od-dev-tools-menu--caption">{[text.toFreeOutHint, text.toFreeKeepHint, text.toSubHint][level]}</p>
+            <p class="bc-dev-tools-menu--caption">{[text.toFreeOutHint, text.toFreeKeepHint, text.toSubHint][level]}</p>
           {/if}
         </section>
 
-        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-trial">
-          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-trial">{text.trial}</h3>
-          <div class="od-dev-tools-menu--group">
+        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-trial">
+          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-trial">{text.trial}</h3>
+          <div class="bc-dev-tools-menu--group">
             {@render row('new', 'personAdd', text.fresh, text.freshHint, () => run('new', () => tools?.newAccount()))}
             {#if confirming}
-              <div class="od-dev-tools-menu--confirm" role="alertdialog" aria-label={text.delConfirm}>
-                <span class="od-dev-tools-menu--confirm-text"><Icon name="warning" size={20} />{text.delConfirm}</span>
-                <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!!busy} onclick={() => (confirming = false)}>{text.cancel}</button>
-                <button type="button" class="od-dev-tools-menu--confirm-yes" disabled={!!busy} aria-busy={busy === 'del'} onclick={() => run('del', () => tools?.deleteAccount())}>{text.delYes}</button>
+              <div class="bc-dev-tools-menu--confirm" role="alertdialog" aria-label={text.delConfirm}>
+                <span class="bc-dev-tools-menu--confirm-text"><Icon name="warning" size={20} />{text.delConfirm}</span>
+                <button type="button" class="bc-dev-tools-menu--confirm-cancel" disabled={!!busy} onclick={() => (confirming = false)}>{text.cancel}</button>
+                <button type="button" class="bc-dev-tools-menu--confirm-yes" disabled={!!busy} aria-busy={busy === 'del'} onclick={() => run('del', () => tools?.deleteAccount())}>{text.delYes}</button>
               </div>
             {:else}
               {@render row('del', 'delete', text.del, !current ? text.delHint : !current.signedIn ? text.noSession : !current.temporary ? text.delOnly : text.delHint, () => (confirming = true), !current?.temporary, true)}
@@ -338,26 +338,26 @@
           </div>
         </section>
 
-        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-first">
-          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-first">{text.first}</h3>
-          <div class="od-dev-tools-menu--group">
+        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-first">
+          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-first">{text.first}</h3>
+          <div class="bc-dev-tools-menu--group">
             {#if resetOpen}
-              <div class="od-dev-tools-menu--reset" role="alertdialog" aria-label={text.resetTitle}>
-                <span class="od-dev-tools-menu--confirm-text"><Icon name="warning" size={20} />{text.resetTitle}</span>
-                <ul class="od-dev-tools-menu--reset-list">
+              <div class="bc-dev-tools-menu--reset" role="alertdialog" aria-label={text.resetTitle}>
+                <span class="bc-dev-tools-menu--confirm-text"><Icon name="warning" size={20} />{text.resetTitle}</span>
+                <ul class="bc-dev-tools-menu--reset-list">
                   {#each lines as line}
                     <li>{line === 'logbook' ? text.resetLogbook(logbook.dives.length) : line === 'settings' ? text.resetSettings : line === 'session' ? text.resetSession : line === 'equipment' ? text.resetEquipment : line === 'files' ? text.resetFiles : line === 'notifications' ? text.resetNotifications : text.resetAlpha}</li>
                   {/each}
                   {#if !lines.includes('logbook')}<li>{text.resetNothing}</li>{/if}
                 </ul>
-                <label class="od-dev-tools-menu--reset-check"><input type="checkbox" bind:checked={keepAlpha} disabled={!!busy} />{text.resetKeepAlpha}</label>
-                <p class="od-dev-tools-menu--caption">{text.resetKept}</p>
+                <label class="bc-dev-tools-menu--reset-check"><input type="checkbox" bind:checked={keepAlpha} disabled={!!busy} />{text.resetKeepAlpha}</label>
+                <p class="bc-dev-tools-menu--caption">{text.resetKept}</p>
                 {#if logbook.dives.length}
-                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!!busy} aria-busy={busy === 'export'} onclick={exportFirst}>{text.resetExport}</button>
+                  <button type="button" class="bc-dev-tools-menu--confirm-cancel" disabled={!!busy} aria-busy={busy === 'export'} onclick={exportFirst}>{text.resetExport}</button>
                 {/if}
-                <div class="od-dev-tools-menu--reset-buttons">
-                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!!busy} onclick={() => ((resetOpen = false), (resetArmed = false))}>{text.cancel}</button>
-                  <button type="button" class="od-dev-tools-menu--confirm-yes" disabled={!!busy} aria-busy={busy === 'reset'} onclick={resetNow}>{resetArmed ? text.resetAgain : text.resetAll}</button>
+                <div class="bc-dev-tools-menu--reset-buttons">
+                  <button type="button" class="bc-dev-tools-menu--confirm-cancel" disabled={!!busy} onclick={() => ((resetOpen = false), (resetArmed = false))}>{text.cancel}</button>
+                  <button type="button" class="bc-dev-tools-menu--confirm-yes" disabled={!!busy} aria-busy={busy === 'reset'} onclick={resetNow}>{resetArmed ? text.resetAgain : text.resetAll}</button>
                 </div>
               </div>
             {:else}
@@ -366,38 +366,38 @@
           </div>
         </section>
 
-        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-nav">
-          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-nav">{text.nav}</h3>
-          <div class="od-dev-tools-menu--group">
+        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-nav">
+          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-nav">{text.nav}</h3>
+          <div class="bc-dev-tools-menu--group">
             {#if navOpen}
-              <div class="od-dev-tools-menu--reset" role="group" aria-label={text.navLog}>
+              <div class="bc-dev-tools-menu--reset" role="group" aria-label={text.navLog}>
                 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-                <pre class="od-dev-tools-menu--trace" tabindex="0">{navText || text.navEmpty}</pre>
-                <div class="od-dev-tools-menu--reset-buttons">
-                  <button type="button" class="od-dev-tools-menu--confirm-cancel" onclick={() => (navOpen = false)}>{text.close}</button>
-                  <button type="button" class="od-dev-tools-menu--confirm-cancel" disabled={!navText} onclick={shareNav}>{text.navShare}</button>
-                  <button type="button" class="od-dev-tools-menu--confirm-yes" disabled={!navText} onclick={copyNav}>{text.navCopy}</button>
+                <pre class="bc-dev-tools-menu--trace" tabindex="0">{navText || text.navEmpty}</pre>
+                <div class="bc-dev-tools-menu--reset-buttons">
+                  <button type="button" class="bc-dev-tools-menu--confirm-cancel" onclick={() => (navOpen = false)}>{text.close}</button>
+                  <button type="button" class="bc-dev-tools-menu--confirm-cancel" disabled={!navText} onclick={shareNav}>{text.navShare}</button>
+                  <button type="button" class="bc-dev-tools-menu--confirm-yes" disabled={!navText} onclick={copyNav}>{text.navCopy}</button>
                 </div>
               </div>
             {:else}
-              <button type="button" class="od-dev-tools-menu--action" onclick={openNav}>
-                <span class="od-dev-tools-menu--action-icon"><Icon name="history" size={22} /></span>
-                <span class="od-dev-tools-menu--action-text">
-                  <span class="od-dev-tools-menu--action-title">{text.navLog}</span>
-                  <span class="od-dev-tools-menu--action-hint">{text.navHint}</span>
+              <button type="button" class="bc-dev-tools-menu--action" onclick={openNav}>
+                <span class="bc-dev-tools-menu--action-icon"><Icon name="history" size={22} /></span>
+                <span class="bc-dev-tools-menu--action-text">
+                  <span class="bc-dev-tools-menu--action-title">{text.navLog}</span>
+                  <span class="bc-dev-tools-menu--action-hint">{text.navHint}</span>
                 </span>
               </button>
             {/if}
           </div>
         </section>
 
-        <section class="od-dev-tools-menu--section" aria-labelledby="od-dev-s-alpha">
-          <h3 class="od-dev-tools-menu--heading" id="od-dev-s-alpha">{text.alphaSection}</h3>
-          <div class="od-dev-tools-menu--group">
+        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-alpha">
+          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-alpha">{text.alphaSection}</h3>
+          <div class="bc-dev-tools-menu--group">
             {@render row('alpha', 'logbook', text.alpha, current?.alphaFolders === 0 ? text.noAlpha : text.alphaHint, () => run('alpha', () => tools?.importAlphaLogbook()), current?.alphaFolders === 0)}
           </div>
         </section>
-        <p class="od-dev-tools-menu--foot">{text.foot}</p>
+        <p class="bc-dev-tools-menu--foot">{text.foot}</p>
       </div>
     </div>
   </div>
@@ -405,7 +405,7 @@
 
 <style>
   @layer od.components {
-    .od-dev-tools-menu {
+    .bc-dev-tools-menu {
       position: fixed;
       inset: 0;
       /* Under the snackbar (Framework7's toast is at 20000): a message must never be hidden by this sheet. */
@@ -415,7 +415,7 @@
       justify-content: center;
       background: rgb(0 0 0 / 0.45);
     }
-    .od-dev-tools-menu--panel {
+    .bc-dev-tools-menu--panel {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -423,22 +423,22 @@
       max-width: 560px;
       max-height: min(100%, 90dvh);
       padding: 8px 16px calc(16px + env(safe-area-inset-bottom));
-      border-top: 4px solid var(--od-dev);
+      border-top: 4px solid var(--bc-dev);
       border-radius: 28px 28px 0 0;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       box-shadow: 0 -2px 24px rgb(0 0 0 / 0.25);
       animation: od-dev-tools-menu-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
     }
     @media (min-width: 768px) {
-      .od-dev-tools-menu {
+      .bc-dev-tools-menu {
         align-items: center;
       }
-      .od-dev-tools-menu--panel {
+      .bc-dev-tools-menu--panel {
         border-radius: 28px;
         padding-top: 16px;
       }
-      .od-dev-tools-menu--grip {
+      .bc-dev-tools-menu--grip {
         display: none;
       }
     }
@@ -449,11 +449,11 @@
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-dev-tools-menu--panel {
+      .bc-dev-tools-menu--panel {
         animation: none;
       }
     }
-    .od-dev-tools-menu--grip {
+    .bc-dev-tools-menu--grip {
       display: flex;
       flex: none;
       justify-content: center;
@@ -462,29 +462,29 @@
       cursor: grab;
       touch-action: none;
     }
-    .od-dev-tools-menu--handle {
+    .bc-dev-tools-menu--handle {
       align-self: center;
       flex: none;
       width: 32px;
       height: 4px;
       border-radius: 2px;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
       opacity: 0.5;
     }
-    .od-dev-tools-menu--head {
+    .bc-dev-tools-menu--head {
       display: flex;
       align-items: center;
       gap: 12px;
       flex: none;
       padding: 4px 0 12px;
     }
-    .od-dev-tools-menu--status-detail {
+    .bc-dev-tools-menu--status-detail {
       display: block;
       margin-top: 2px;
       font-size: 11px;
       opacity: 0.7;
     }
-    .od-dev-tools-menu--action-icon {
+    .bc-dev-tools-menu--action-icon {
       display: inline-flex;
       flex: none;
       align-items: center;
@@ -492,10 +492,10 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: var(--od-dev-tint);
-      color: var(--od-dev);
+      background: var(--bc-dev-tint);
+      color: var(--bc-dev);
     }
-    .od-dev-tools-menu--title {
+    .bc-dev-tools-menu--title {
       min-width: 0;
       overflow: hidden;
       font-size: 19px;
@@ -504,17 +504,17 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-dev-tools-menu--tag {
+    .bc-dev-tools-menu--tag {
       padding: 1px 7px;
-      border: 1.5px solid var(--od-dev);
+      border: 1.5px solid var(--bc-dev);
       border-radius: 6px;
-      background: var(--od-surface);
-      color: var(--od-dev);
+      background: var(--bc-surface);
+      color: var(--bc-dev);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.6px;
     }
-    .od-dev-tools-menu--close {
+    .bc-dev-tools-menu--close {
       display: inline-flex;
       flex: none;
       align-items: center;
@@ -525,10 +525,10 @@
       border: 0;
       border-radius: 50%;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       cursor: pointer;
     }
-    .od-dev-tools-menu--body {
+    .bc-dev-tools-menu--body {
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -536,21 +536,21 @@
       overflow-y: auto;
       overscroll-behavior: contain;
     }
-    .od-dev-tools-menu--state {
+    .bc-dev-tools-menu--state {
       box-sizing: border-box;
       flex: none;
       min-height: 72px;
       padding: 16px;
-      border: 1.5px dashed var(--od-dev);
+      border: 1.5px dashed var(--bc-dev);
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
-    .od-dev-tools-menu--state-top {
+    .bc-dev-tools-menu--state-top {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    .od-dev-tools-menu--avatar {
+    .bc-dev-tools-menu--avatar {
       display: inline-flex;
       flex: none;
       align-items: center;
@@ -558,90 +558,90 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: var(--od-dev-tint);
-      color: var(--od-dev);
+      background: var(--bc-dev-tint);
+      color: var(--bc-dev);
       font-size: 24px;
       font-weight: 600;
     }
-    .od-dev-tools-menu--state-who {
+    .bc-dev-tools-menu--state-who {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 4px;
       min-width: 0;
     }
-    .od-dev-tools-menu--state-mail {
+    .bc-dev-tools-menu--state-mail {
       max-width: 100%;
       overflow: hidden;
       font-size: 14px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-dev-tools-menu--badge {
+    .bc-dev-tools-menu--badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       height: 32px;
       padding: 0 14px;
       border-radius: 16px;
-      background: var(--od-dev);
-      color: var(--od-on-dev);
+      background: var(--bc-dev);
+      color: var(--bc-on-dev);
       font-size: 15px;
       font-weight: 600;
     }
-    .od-dev-tools-menu--badge-plus {
+    .bc-dev-tools-menu--badge-plus {
       padding-left: 4px;
-      background: var(--od-surface-container-high);
-      color: var(--od-text);
+      background: var(--bc-surface-container-high);
+      color: var(--bc-text);
     }
-    .od-dev-tools-menu--facts {
+    .bc-dev-tools-menu--facts {
       display: grid;
       grid-template-columns: auto 1fr;
       gap: 6px 10px;
       align-items: center;
       margin: 14px 0 0;
       padding-top: 12px;
-      border-top: 1px solid var(--od-dev-tint);
+      border-top: 1px solid var(--bc-dev-tint);
       font-size: 14px;
     }
-    .od-dev-tools-menu--facts dt {
+    .bc-dev-tools-menu--facts dt {
       display: inline-flex;
-      color: var(--od-dev);
+      color: var(--bc-dev);
     }
-    .od-dev-tools-menu--facts dd {
+    .bc-dev-tools-menu--facts dd {
       margin: 0;
       min-width: 0;
       overflow-wrap: anywhere;
     }
-    .od-dev-tools-menu--heading {
+    .bc-dev-tools-menu--heading {
       margin: 0 0 8px 8px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.6px;
       text-transform: uppercase;
     }
-    .od-dev-tools-menu--segments {
+    .bc-dev-tools-menu--segments {
       position: relative;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 4px;
       padding: 4px;
       border-radius: 24px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
     }
-    .od-dev-tools-menu--segments-pill {
+    .bc-dev-tools-menu--segments-pill {
       position: absolute;
       inset: 4px auto 4px 4px;
       width: calc((100% - 16px) / 3);
       border-radius: 20px;
-      background: var(--od-dev);
-      transform: translateX(calc(var(--od-dev-segment-index, 0) * (100% + 4px)));
+      background: var(--bc-dev);
+      transform: translateX(calc(var(--bc-dev-segment-index, 0) * (100% + 4px)));
     }
-    .od-dev-tools-menu--segments-pill-slide {
+    .bc-dev-tools-menu--segments-pill-slide {
       transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
     }
-    .od-dev-tools-menu--segment {
+    .bc-dev-tools-menu--segment {
       position: relative;
       transition: color 0.3s ease;
       display: flex;
@@ -655,22 +655,22 @@
       border: 0;
       border-radius: 20px;
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
       font: inherit;
       cursor: pointer;
     }
-    .od-dev-tools-menu--segment-on {
-      color: var(--od-on-dev);
+    .bc-dev-tools-menu--segment-on {
+      color: var(--bc-on-dev);
       cursor: default;
     }
-    .od-dev-tools-menu--segment:disabled:not(.od-dev-tools-menu--segment-on):not([aria-busy='true']) {
+    .bc-dev-tools-menu--segment:disabled:not(.bc-dev-tools-menu--segment-on):not([aria-busy='true']) {
       opacity: 0.5;
       cursor: default;
     }
-    .od-dev-tools-menu--segment:active:not(:disabled):not(.od-dev-tools-menu--segment-on) {
-      background: var(--od-surface-container-highest);
+    .bc-dev-tools-menu--segment:active:not(:disabled):not(.bc-dev-tools-menu--segment-on) {
+      background: var(--bc-surface-container-highest);
     }
-    .od-dev-tools-menu--segment-title {
+    .bc-dev-tools-menu--segment-title {
       max-width: 100%;
       overflow: hidden;
       font-size: 15px;
@@ -678,7 +678,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-dev-tools-menu--segment-tag {
+    .bc-dev-tools-menu--segment-tag {
       max-width: 100%;
       overflow: hidden;
       font-size: 12px;
@@ -686,18 +686,18 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-dev-tools-menu--caption {
+    .bc-dev-tools-menu--caption {
       margin: 8px 8px 0;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 13px;
       line-height: 18px;
     }
-    .od-dev-tools-menu--group {
+    .bc-dev-tools-menu--group {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-    .od-dev-tools-menu--action {
+    .bc-dev-tools-menu--action {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -705,109 +705,109 @@
       padding: 12px 16px 12px 12px;
       border: 0;
       border-radius: 16px;
-      background: var(--od-surface-container-high);
-      color: var(--od-text);
+      background: var(--bc-surface-container-high);
+      color: var(--bc-text);
       font: inherit;
       text-align: left;
       cursor: pointer;
     }
-    .od-dev-tools-menu--action:active:not(:disabled) {
-      background: var(--od-surface-container-highest);
+    .bc-dev-tools-menu--action:active:not(:disabled) {
+      background: var(--bc-surface-container-highest);
     }
-    .od-dev-tools-menu--action:disabled {
+    .bc-dev-tools-menu--action:disabled {
       opacity: 0.5;
       cursor: default;
     }
-    .od-dev-tools-menu--action[aria-busy='true'] {
+    .bc-dev-tools-menu--action[aria-busy='true'] {
       opacity: 1;
     }
-    .od-dev-tools-menu--action-text {
+    .bc-dev-tools-menu--action-text {
       display: flex;
       flex: 1;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
     }
-    .od-dev-tools-menu--action-title {
+    .bc-dev-tools-menu--action-title {
       overflow: hidden;
       font-size: 16px;
       font-weight: 500;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .od-dev-tools-menu--action-hint {
-      color: var(--od-text-2);
+    .bc-dev-tools-menu--action-hint {
+      color: var(--bc-text-2);
       font-size: 13px;
       line-height: 18px;
     }
-    .od-dev-tools-menu--danger .od-dev-tools-menu--action-icon {
-      background: var(--od-alarm-tint);
-      color: var(--od-alarm);
+    .bc-dev-tools-menu--danger .bc-dev-tools-menu--action-icon {
+      background: var(--bc-alarm-tint);
+      color: var(--bc-alarm);
     }
-    .od-dev-tools-menu--danger .od-dev-tools-menu--action-title {
-      color: var(--od-alarm);
+    .bc-dev-tools-menu--danger .bc-dev-tools-menu--action-title {
+      color: var(--bc-alarm);
     }
-    .od-dev-tools-menu--spinner {
+    .bc-dev-tools-menu--spinner {
       flex: none;
       width: 20px;
       height: 20px;
-      border: 2.5px solid var(--od-dev-tint);
-      border-top-color: var(--od-dev);
+      border: 2.5px solid var(--bc-dev-tint);
+      border-top-color: var(--bc-dev);
       border-radius: 50%;
       animation: od-dev-tools-menu-spin 0.8s linear infinite;
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-dev-tools-menu--segments-pill-slide,
-      .od-dev-tools-menu--segment {
+      .bc-dev-tools-menu--segments-pill-slide,
+      .bc-dev-tools-menu--segment {
         transition: none;
       }
     }
-    .od-dev-tools-menu--segment-on .od-dev-tools-menu--spinner {
+    .bc-dev-tools-menu--segment-on .bc-dev-tools-menu--spinner {
       border-color: rgb(255 255 255 / 0.35);
-      border-top-color: var(--od-on-dev);
+      border-top-color: var(--bc-on-dev);
     }
     @keyframes od-dev-tools-menu-spin {
       to {
         transform: rotate(360deg);
       }
     }
-    .od-dev-tools-menu--status {
+    .bc-dev-tools-menu--status {
       margin: 0 16px 8px;
       padding: 10px 14px;
       border-radius: 16px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
       font-size: 14px;
     }
-    .od-dev-tools-menu--status-error {
-      outline: 2px solid var(--od-dev);
+    .bc-dev-tools-menu--status-error {
+      outline: 2px solid var(--bc-dev);
     }
-    .od-dev-tools-menu--reset {
+    .bc-dev-tools-menu--reset {
       display: flex;
       flex-direction: column;
       gap: 10px;
       padding: 14px;
       border-radius: 20px;
-      background: var(--od-surface-container-high);
+      background: var(--bc-surface-container-high);
     }
-    .od-dev-tools-menu--reset-list {
+    .bc-dev-tools-menu--reset-list {
       margin: 0;
       padding-left: 20px;
       font-size: 14px;
     }
-    .od-dev-tools-menu--reset-check {
+    .bc-dev-tools-menu--reset-check {
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 14px;
     }
-    .od-dev-tools-menu--reset-buttons {
+    .bc-dev-tools-menu--reset-buttons {
       display: flex;
       gap: 8px;
     }
-    .od-dev-tools-menu--reset-buttons button {
+    .bc-dev-tools-menu--reset-buttons button {
       flex: 1;
     }
-    .od-dev-tools-menu--confirm {
+    .bc-dev-tools-menu--confirm {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -815,18 +815,18 @@
       gap: 8px;
       padding: 12px 16px;
       border-radius: 16px;
-      background: var(--od-alarm-tint);
+      background: var(--bc-alarm-tint);
     }
-    .od-dev-tools-menu--confirm-text {
+    .bc-dev-tools-menu--confirm-text {
       display: flex;
       flex: 1 1 100%;
       align-items: center;
       gap: 8px;
-      color: var(--od-alarm);
+      color: var(--bc-alarm);
       font-weight: 600;
     }
-    .od-dev-tools-menu--confirm-cancel,
-    .od-dev-tools-menu--confirm-yes {
+    .bc-dev-tools-menu--confirm-cancel,
+    .bc-dev-tools-menu--confirm-yes {
       flex: 0 0 auto;
       width: auto;
       min-height: 44px;
@@ -837,40 +837,40 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .od-dev-tools-menu--confirm-cancel {
+    .bc-dev-tools-menu--confirm-cancel {
       background: transparent;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-dev-tools-menu--confirm-yes {
-      background: var(--od-alarm);
-      color: var(--od-surface);
+    .bc-dev-tools-menu--confirm-yes {
+      background: var(--bc-alarm);
+      color: var(--bc-surface);
     }
-    .od-dev-tools-menu--confirm button:disabled {
+    .bc-dev-tools-menu--confirm button:disabled {
       opacity: 0.5;
     }
-    .od-dev-tools-menu--foot {
+    .bc-dev-tools-menu--foot {
       margin: 0;
       padding: 4px 8px 0;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       font-size: 12px;
       line-height: 16px;
       text-align: center;
     }
     /* « Journal de navigation »: the trace, one event a line, scrolled inside its box. */
-    .od-dev-tools-menu--trace {
+    .bc-dev-tools-menu--trace {
       max-height: 280px;
       margin: 0;
       padding: 8px;
       overflow: auto;
       border-radius: 8px;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
       font: 11px/15px ui-monospace, Menlo, Consolas, monospace;
       white-space: pre;
       user-select: text;
     }
-    .od-dev-tools-menu button:focus-visible {
-      outline: 2px solid var(--od-dev);
+    .bc-dev-tools-menu button:focus-visible {
+      outline: 2px solid var(--bc-dev);
       outline-offset: -2px;
     }
   }

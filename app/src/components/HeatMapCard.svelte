@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Où je plonge le plus » (od-stats-heatmap, tasks 2026-11-14-152 and 154; the card under
+  // « Où je plonge le plus » (bc-stats-heatmap, tasks 2026-11-14-152 and 154; the card under
   // « Graphiques » in android-stats.dc.html, full screen in
   // stats-carte-chaleur-plein-ecran-android.dc.html): the dives of the Statistics filter as
   // a density (lib/heat-density.js), on a live map (one finger pans, two fingers zoom),
@@ -54,16 +54,16 @@
 </script>
 
 {#snippet legend()}
-  <div class="od-stats-heatmap--legend" aria-hidden="true">
-    <span>{t('stats.heatLess')}</span><span class="od-stats-heatmap--ramp"></span><span>{t('stats.heatMore')}</span>
+  <div class="bc-stats-heatmap--legend" aria-hidden="true">
+    <span>{t('stats.heatLess')}</span><span class="bc-stats-heatmap--ramp"></span><span>{t('stats.heatMore')}</span>
   </div>
 {/snippet}
 
 {#if shown}
-  <section class="od-stats-heatmap" aria-label={t('stats.heatTitle')}>
-    <h3 class="od-stats-heatmap--title">{t('stats.heatTitle')}</h3>
-    <p class="od-stats-heatmap--lead">{t('stats.heatLead', { site: lead.name, dives: t('trip.dives', { n: lead.count }) })}</p>
-    <div class="od-stats-heatmap--map">
+  <section class="bc-stats-heatmap" aria-label={t('stats.heatTitle')}>
+    <h3 class="bc-stats-heatmap--title">{t('stats.heatTitle')}</h3>
+    <p class="bc-stats-heatmap--lead">{t('stats.heatLead', { site: lead.name, dives: t('trip.dives', { n: lead.count }) })}</p>
+    <div class="bc-stats-heatmap--map">
       <SiteMap
         bind:this={map}
         heat={spots}
@@ -83,7 +83,7 @@
         onlocate={centreOnMe}
       >
         {#snippet overlay(/** @type {boolean} */ full)}
-          {#if full}<div class="od-stats-heatmap--full-legend">{@render legend()}</div>{/if}
+          {#if full}<div class="bc-stats-heatmap--full-legend">{@render legend()}</div>{/if}
           {#if selectedSite}
             <MapSiteCard site={selectedSite} onopen={() => openSite(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
           {/if}
@@ -96,62 +96,62 @@
 
 <style>
   @layer od.components {
-    .od-stats-heatmap {
+    .bc-stats-heatmap {
       margin: 0 16px;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-stats-heatmap--title {
+    .bc-stats-heatmap--title {
       margin: 0;
       font-size: 16px;
       line-height: 24px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-stats-heatmap--lead {
+    .bc-stats-heatmap--lead {
       margin: 0 0 12px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* 170 dp, 8 dp corners; the full-screen button 8 dp from the edges (SiteMap's default). */
-    .od-stats-heatmap--map {
+    .bc-stats-heatmap--map {
       border-radius: 8px;
       overflow: hidden;
     }
 
-    .od-stats-heatmap--legend {
+    .bc-stats-heatmap--legend {
       margin-top: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-stats-heatmap--ramp {
+    .bc-stats-heatmap--ramp {
       width: 96px;
       height: 8px;
       border-radius: 4px;
       /* The six stops, least (blue) to most (red), as on the map (task 2026-11-14-161). */
       /* The six colours evenly, least to most, as the mock-up's legend. */
-      background: linear-gradient(to right, var(--od-heat-1), var(--od-heat-2), var(--od-heat-3), var(--od-heat-4), var(--od-heat-5), var(--od-heat-6));
+      background: linear-gradient(to right, var(--bc-heat-1), var(--bc-heat-2), var(--bc-heat-3), var(--bc-heat-4), var(--bc-heat-5), var(--bc-heat-6));
     }
 
     /* Full screen: the legend in a white card at the bottom left. */
-    .od-stats-heatmap--full-legend {
+    .bc-stats-heatmap--full-legend {
       position: absolute;
       z-index: 2;
       left: 16px;
-      bottom: calc(var(--od-safe-bottom) + 24px);
+      bottom: calc(var(--bc-safe-bottom) + 24px);
       padding: 4px 12px 10px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
     }
   }

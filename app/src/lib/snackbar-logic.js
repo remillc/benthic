@@ -30,5 +30,5 @@ export function snackbarTimeout(requested, hasAction) {
  * @returns {string}
  */
 export function snackbarClasses({ hasFab = false, undoable = false, placement } = {}) {
-  return ['od-snackbar', hasFab ? 'od-snackbar-above-fab' : '', undoable ? 'od-undo-toast' : '', placement === 'start' ? 'od-snackbar-start' : ''].filter(Boolean).join(' ');
+  return ['bc-snackbar', hasFab ? 'bc-snackbar-above-fab' : '', undoable ? 'bc-undo-toast' : '', placement === 'start' ? 'bc-snackbar-start' : ''].filter(Boolean).join(' ');
 }

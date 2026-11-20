@@ -223,34 +223,34 @@
   const nitroxOptions = Array.from({ length: 101 }, (_, i) => ({ value: String(i), label: i === 0 ? `0 ${t('units.percent')}` : `EAN${i}` }));
 </script>
 
-<Page class="od-gas-blender">
+<Page class="bc-gas-blender">
   <Navbar title={t('tools.blender')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('common.back')}</span>
+        <span class="bc-sr-only">{t('common.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
-  <div class="od-gas-blender--modes">
+  <div class="bc-gas-blender--modes">
     <ButtonGroup ariaLabel={t('tools.blendMode')} value={mode} options={MODES.map((choice) => ({ value: choice, label: t(`tools.${choice}`) }))} onchange={(choice) => setMode(/** @type {any} */ (choice))} />
   </div>
 
-  <h2 class="od-gas-blender--label">{t('tools.blendWanted')}</h2>
-  <div class="od-gas-blender--pair">
+  <h2 class="bc-gas-blender--label">{t('tools.blendWanted')}</h2>
+  <div class="bc-gas-blender--pair">
     <TextField label={t('tools.oxygen')} bind:value={o2} inputmode="decimal" invalid={wantedInvalid} supporting={wantedInvalid ? t('tools.gasInvalid') : ''}>
-      {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
+      {#snippet trailing()}<span class="bc-gas-blender--unit">{t('units.percent')}</span>{/snippet}
     </TextField>
     {#if trimix}
       <TextField label={t('tools.helium')} bind:value={he} inputmode="decimal" invalid={wantedInvalid}>
-        {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
+        {#snippet trailing()}<span class="bc-gas-blender--unit">{t('units.percent')}</span>{/snippet}
       </TextField>
     {:else}
       <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
     {/if}
   </div>
-  <div class="od-gas-blender--pair">
+  <div class="bc-gas-blender--pair">
     {#if trimix}
       <SelectField label={t('tools.blendCylinder')} bind:value={cylinder} options={cylinderOptions} />
     {/if}
@@ -262,12 +262,12 @@
       warning={aboveWorking}
       supporting={aboveWorking ? t('tools.blendAboveWorking', { pressure: workingText }) : workingText ? t('tools.blendWorking', { pressure: workingText }) : ''}
     >
-      {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
+      {#snippet trailing()}<span class="bc-gas-blender--unit">{pressureUnit}</span>{/snippet}
     </TextField>
   </div>
 
-  <h2 class="od-gas-blender--label">{t('tools.blendInside')}</h2>
-  <div class="od-gas-blender--pair">
+  <h2 class="bc-gas-blender--label">{t('tools.blendInside')}</h2>
+  <div class="bc-gas-blender--pair">
     <TextField
       label={t('tools.blendInsidePressure')}
       bind:value={insidePressure}
@@ -275,14 +275,14 @@
       invalid={insideInvalid}
       supporting={insideInvalid ? t('tools.blendInvalid') : t('tools.blendInsideHelp')}
     >
-      {#snippet trailing()}<span class="od-gas-blender--unit">{pressureUnit}</span>{/snippet}
+      {#snippet trailing()}<span class="bc-gas-blender--unit">{pressureUnit}</span>{/snippet}
     </TextField>
     {#if !trimix}
       <SelectField label={t('tools.blendInsideMix')} bind:value={insideO2} options={nitroxOptions} />
     {/if}
   </div>
   {#if trimix}
-    <div class="od-gas-blender--pair">
+    <div class="bc-gas-blender--pair">
       <SelectField label={t('tools.blendInsideOxygen')} bind:value={insideO2} options={percentOptions} />
       <SelectField label={t('tools.blendInsideHelium')} bind:value={insideHe} options={percentOptions} />
     </div>
@@ -290,62 +290,62 @@
   <SelectField label={t('tools.blendTopUp')} bind:value={topUp} options={topUpOptions} />
   {#if topUp === 'nitrox'}
     <TextField label={t('tools.blendTopUpOxygen')} bind:value={topUpO2} inputmode="decimal" invalid={topUpInvalid}>
-      {#snippet trailing()}<span class="od-gas-blender--unit">{t('units.percent')}</span>{/snippet}
+      {#snippet trailing()}<span class="bc-gas-blender--unit">{t('units.percent')}</span>{/snippet}
     </TextField>
   {/if}
 
   {#if result}
     {#if result.error === 'TOPUP_TOO_RICH'}
-      <p class="od-gas-blender--notice" role="alert">{t('tools.blendTooRich')}</p>
+      <p class="bc-gas-blender--notice" role="alert">{t('tools.blendTooRich')}</p>
     {:else}
       {#if result.error === 'RESIDUAL_TOO_HIGH'}
-        <div class="od-gas-blender--notice" role="alert">
+        <div class="bc-gas-blender--notice" role="alert">
           <strong>{t('tools.blendBleedTitle')}</strong>
           <span>{bleedText && result.bleedToMbar ? t('tools.blendBleedText', { pressure: bleedText }) : t('tools.blendBleedEmpty')}</span>
         </div>
       {/if}
-      <h2 class="od-gas-blender--title">{t('tools.blendFill')}</h2>
+      <h2 class="bc-gas-blender--title">{t('tools.blendFill')}</h2>
       {#if trimix}
-        <div class="od-gas-blender--modes od-gas-blender--order">
+        <div class="bc-gas-blender--modes bc-gas-blender--order">
           <ButtonGroup ariaLabel={t('tools.blendOrder')} value={order} options={ORDERS.map((choice) => ({ value: choice, label: t(choice === 'helium' ? 'tools.blendOrderHelium' : 'tools.blendOrderOxygen') }))} onchange={(choice) => setOrder(/** @type {any} */ (choice))} />
         </div>
       {/if}
-      <ol class="od-gas-blender--steps" aria-live="polite">
+      <ol class="bc-gas-blender--steps" aria-live="polite">
         {#each steps as step, i (i)}
           <li>
-            <span class="od-gas-blender--number" aria-hidden="true">{i + 1}</span>
-            <span class="od-gas-blender--texts">
-              <span class="od-gas-blender--name">{step.name}</span>
-              <span class="od-gas-blender--sub od-value">{step.added}</span>
+            <span class="bc-gas-blender--number" aria-hidden="true">{i + 1}</span>
+            <span class="bc-gas-blender--texts">
+              <span class="bc-gas-blender--name">{step.name}</span>
+              <span class="bc-gas-blender--sub bc-value">{step.added}</span>
             </span>
-            <span class="od-gas-blender--upto od-value">{step.upTo}</span>
+            <span class="bc-gas-blender--upto bc-value">{step.upTo}</span>
           </li>
         {/each}
       </ol>
     {/if}
   {:else if invalid}
-    <p class="od-gas-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
+    <p class="bc-gas-blender--notice" role="alert">{t('tools.blendInvalid')}</p>
   {/if}
 
-  <p class="od-gas-blender--caption">{t('tools.blendCooled')} {t('tools.blendOxygenClean')}</p>
-  <p class="od-gas-blender--analyse">
+  <p class="bc-gas-blender--caption">{t('tools.blendCooled')} {t('tools.blendOxygenClean')}</p>
+  <p class="bc-gas-blender--analyse">
     <Icon name="warning" size={20} />
     <span>{t('tools.blendAnalyse')}</span>
   </p>
-  <div class="od-gas-blender--bottom"></div>
+  <div class="bc-gas-blender--bottom"></div>
 </Page>
 
 <style>
   @layer od.components {
-    .od-gas-blender--modes {
+    .bc-gas-blender--modes {
       margin: 8px 16px 0;
     }
 
-    .od-gas-blender--order {
+    .bc-gas-blender--order {
       margin-top: 12px;
     }
 
-    .od-gas-blender--title {
+    .bc-gas-blender--title {
       margin: 0;
       padding: 20px 20px 0;
       font-size: 18px;
@@ -354,23 +354,23 @@
     }
 
     /* "Mélange voulu", "Dans la bouteille": small labels above the fields. */
-    .od-gas-blender--label {
+    .bc-gas-blender--label {
       margin: 0;
       padding: 16px 20px 0;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-gas-blender--pair {
+    .bc-gas-blender--pair {
       display: flex;
       gap: 12px;
       margin: 0 16px;
       align-items: flex-start;
 
-      :global(.od-text-field--field),
-      :global(.od-select-field--field) {
+      :global(.bc-text-field--field),
+      :global(.bc-select-field--field) {
         flex: 1;
         min-width: 0;
         margin-left: 0;
@@ -378,24 +378,24 @@
       }
     }
 
-    .od-gas-blender--unit {
+    .bc-gas-blender--unit {
       display: block;
       padding: 24px 8px 0 0;
       font-size: 16px;
       line-height: 24px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      :global(.od-text-field--field:not(.od-text-field--floated)) & {
+      :global(.bc-text-field--field:not(.bc-text-field--floated)) & {
         visibility: hidden;
       }
     }
 
-    .od-gas-blender--notice {
+    .bc-gas-blender--notice {
       margin: 20px 16px 0;
       padding: 12px 16px;
       border-radius: 12px;
-      border: 1px solid var(--od-alarm);
-      color: var(--od-alarm);
+      border: 1px solid var(--bc-alarm);
+      color: var(--bc-alarm);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -403,12 +403,12 @@
       line-height: 20px;
     }
 
-    .od-gas-blender--steps {
+    .bc-gas-blender--steps {
       list-style: none;
       margin: 8px 16px 0;
       padding: 0;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
 
       li {
@@ -421,12 +421,12 @@
       }
     }
 
-    .od-gas-blender--number {
+    .bc-gas-blender--number {
       flex: none;
       width: 28px;
       height: 28px;
       border-radius: 14px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -434,44 +434,44 @@
       font-weight: 600;
     }
 
-    .od-gas-blender--texts {
+    .bc-gas-blender--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
-    .od-gas-blender--name {
+    .bc-gas-blender--name {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-gas-blender--sub {
+    .bc-gas-blender--sub {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-gas-blender--upto {
+    .bc-gas-blender--upto {
       font-size: 20px;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .od-gas-blender--caption {
+    .bc-gas-blender--caption {
       margin: 12px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
     /* Amber banner: what waits for the diver (tertiary container, docs/system-design.md). */
-    .od-gas-blender--analyse {
+    .bc-gas-blender--analyse {
       margin: 16px 16px 0;
       padding: 14px 16px;
       border-radius: 12px;
-      background: var(--od-tertiary-container);
-      color: var(--od-on-tertiary-container);
+      background: var(--bc-tertiary-container);
+      color: var(--bc-on-tertiary-container);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -483,7 +483,7 @@
       }
     }
 
-    .od-gas-blender--bottom {
+    .bc-gas-blender--bottom {
       height: 32px;
     }
   }

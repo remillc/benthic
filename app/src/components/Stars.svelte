@@ -12,47 +12,47 @@
   const uid = $props.id();
 </script>
 
-<span class="od-stars" class:od-stars--summary={summary} role={decorative ? undefined : 'img'} aria-label={decorative ? undefined : label} aria-hidden={decorative ? 'true' : undefined}>
+<span class="bc-stars" class:bc-stars--summary={summary} role={decorative ? undefined : 'img'} aria-label={decorative ? undefined : label} aria-hidden={decorative ? 'true' : undefined}>
   {#each [1, 2, 3, 4, 5] as i (i)}
     {@const fill = starFill(value, i)}
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       {#if fill > 0 && fill < 1}
         <defs><clipPath id="od-stars-{uid}-{i}"><rect x="0" y="0" width={24 * fill} height="24" /></clipPath></defs>
-        <path d={STAR} class="od-stars--part" clip-path="url(#od-stars-{uid}-{i})" />
+        <path d={STAR} class="bc-stars--part" clip-path="url(#od-stars-{uid}-{i})" />
       {/if}
-      <path d={STAR} class:od-stars--filled={fill >= 1} />
+      <path d={STAR} class:bc-stars--filled={fill >= 1} />
     </svg>
   {/each}
 </span>
 
 <style>
   @layer od.components {
-    .od-stars {
+    .bc-stars {
       display: inline-flex;
       gap: 2px;
       flex: none;
     }
 
-    .od-stars {
-      --od-stars-ink: var(--od-text);
+    .bc-stars {
+      --bc-stars-ink: var(--bc-text);
 
-      &.od-stars--summary {
-        --od-stars-ink: var(--od-star-summary);
+      &.bc-stars--summary {
+        --bc-stars-ink: var(--bc-star-summary);
       }
     }
 
     path {
       fill: none;
-      stroke: var(--od-stars-ink);
+      stroke: var(--bc-stars-ink);
       stroke-width: 1.6;
       stroke-linejoin: round;
 
-      &.od-stars--filled,
-      &.od-stars--part {
-        fill: var(--od-stars-ink);
+      &.bc-stars--filled,
+      &.bc-stars--part {
+        fill: var(--bc-stars-ink);
       }
 
-      &.od-stars--part {
+      &.bc-stars--part {
         stroke: none;
       }
     }

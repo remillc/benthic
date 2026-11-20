@@ -56,20 +56,20 @@ test('on a tablet the form opens in the first-launch frame, and the help replace
 });
 
 test('« Retour » in the help is a button, the column scrolls and the panel does not move', () => {
-  assert.match(editorial, /\{#if !noRetour && onback\}\s*<button type="button" class="od-editorial-page--retour" onclick=\{onback\}>/);
-  assert.match(editorial, /\.od-editorial-page--panel-body \{[\s\S]*?overflow-y: auto;/);
+  assert.match(editorial, /\{#if !noRetour && onback\}\s*<button type="button" class="bc-editorial-page--retour" onclick=\{onback\}>/);
+  assert.match(editorial, /\.bc-editorial-page--panel-body \{[\s\S]*?overflow-y: auto;/);
   // The panel is not in the column: it is the page's other child, and the page itself does not scroll.
-  assert.match(editorial, /\.od-editorial-page--panelled \.page-content\) \{[\s\S]*?overflow: hidden;/);
+  assert.match(editorial, /\.bc-editorial-page--panelled \.page-content\) \{[\s\S]*?overflow: hidden;/);
   // The column starts at the top again when the heading changes.
   assert.match(editorial, /panelBody\.scrollTop = 0/);
   // Portrait: the panel of the steps is 540 dp tall, as the mock-ups of the steps draw it.
-  assert.match(src('components/FirstLaunchPanel.svelte'), /od-first-launch-panel--step \{\s*@media \(orientation: portrait\) \{\s*height: 540px;/);
+  assert.match(src('components/FirstLaunchPanel.svelte'), /bc-first-launch-panel--step \{\s*@media \(orientation: portrait\) \{\s*height: 540px;/);
 });
 
 test('the embedded help keeps the colours and the pointer of the phone\'s', () => {
   const help = src('components/GitHelp.svelte');
-  assert.match(help, /class:od-git-help--embedded=\{embedded\}/);
-  assert.match(help, /\.od-git-help--tab \{[\s\S]*?cursor: pointer;[\s\S]*?@media \(hover: hover\)/);
+  assert.match(help, /class:bc-git-help--embedded=\{embedded\}/);
+  assert.match(help, /\.bc-git-help--tab \{[\s\S]*?cursor: pointer;[\s\S]*?@media \(hover: hover\)/);
   assert.doesNotMatch(help.slice(help.indexOf('<style>')), /#[0-9a-f]{3,6}\b/i);
 });
 

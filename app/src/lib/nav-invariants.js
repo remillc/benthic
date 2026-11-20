@@ -41,7 +41,7 @@ const path = (url) => String(url ?? '').replace(/[?#].*$/, '');
 const has = (/** @type {string} */ classes, /** @type {string} */ name) => new RegExp(`(^|\\s)${name}(\\s|$)`).test(classes);
 
 /** The classes a view only carries while a page change or a swipe is running. */
-const MOVING = /router-transition|od-pushing|od-push-settle/;
+const MOVING = /router-transition|bc-pushing|bc-push-settle/;
 
 /**
  * @param {ViewSnapshot} view
@@ -77,7 +77,7 @@ export function checkView(view) {
     if (has(p.classes, 'page-next')) problems.push(`${name} waits as page-next`);
     if (has(p.classes, 'page-transitioning')) problems.push(`${name} keeps page-transitioning`);
     if (has(p.classes, 'page-swipeback-active')) problems.push(`${name} keeps page-swipeback-active`);
-    if (has(p.classes, 'od-push-from')) problems.push(`${name} keeps od-push-from`);
+    if (has(p.classes, 'bc-push-from')) problems.push(`${name} keeps bc-push-from`);
     if (has(p.classes, 'page-current') && view.visible) {
       if (p.transform !== 'none') problems.push(`the current page ${name} keeps a transform`);
       // A list beside its detail starts at the view's edge too; the detail starts after the list.

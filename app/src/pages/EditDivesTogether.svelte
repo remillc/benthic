@@ -142,7 +142,7 @@
       {#if ios}
         <Link onClick={leave}>{t('dialog.cancel')}</Link>
       {:else}
-        <Link iconOnly onClick={leave}><Icon name="close" /><span class="od-sr-only">{t('dialog.cancel')}</span></Link>
+        <Link iconOnly onClick={leave}><Icon name="close" /><span class="bc-sr-only">{t('dialog.cancel')}</span></Link>
       {/if}
     {/snippet}
     {#snippet right()}
@@ -155,16 +155,16 @@
   {#if failed}
     <div class="block"><p>{t('multiDive.loadFailed')}</p></div>
   {:else if state}
-    <div class="od-multi-edit--content">
+    <div class="bc-multi-edit--content">
       <!-- Site: chosen on « Choisir un site »; « Plusieurs valeurs » until the diver chooses. -->
-      <div class="od-multi-edit--field" class:od-multi-edit--many={state.site.mixed && !siteTouched}>
+      <div class="bc-multi-edit--field" class:bc-multi-edit--many={state.site.mixed && !siteTouched}>
         <ButtonField
           label={t('edit.site')}
           value={state.site.mixed && !siteTouched ? many : siteName || t('edit.noSite')}
           onclick={() => chooseSite(f7router, (site) => ((siteName = site.name), (siteUuid = site.uuid), (siteTouched = true)))}
         />
         {#if siteTouched ? !!siteName : !!state.site.value && !state.site.mixed}
-          <button type="button" class="od-text-button od-multi-edit--site-clear" onclick={() => ((siteName = ''), (siteUuid = 0), (siteTouched = true))}>{t('edit.siteClear')}</button>
+          <button type="button" class="bc-text-button bc-multi-edit--site-clear" onclick={() => ((siteName = ''), (siteUuid = 0), (siteTouched = true))}>{t('edit.siteClear')}</button>
         {/if}
       </div>
 
@@ -174,17 +174,17 @@
 
       <!-- Suit and notes: a mixed value is shown as « Plusieurs valeurs »; a tap makes the field editable, empty. -->
       {#if state.suit.mixed && !suitTouched}
-        <div class="od-multi-edit--field od-multi-edit--many">
+        <div class="bc-multi-edit--field bc-multi-edit--many">
           <ButtonField label={t('edit.suit')} value={many} onclick={() => (suitTouched = true)} />
         </div>
       {:else}
         <ComboField label={t('edit.suit')} bind:value={suit} options={known.suit} />
       {/if}
-      <div class="od-multi-edit--field">
+      <div class="bc-multi-edit--field">
         <SelectField label={t('edit.waterType')} value={state.salinity.mixed && !waterTouched ? '__many' : waterType} options={waterOptions} onchange={waterChosen} />
       </div>
       {#if state.notes.mixed && !notesTouched}
-        <div class="od-multi-edit--field od-multi-edit--many">
+        <div class="bc-multi-edit--field bc-multi-edit--many">
           <ButtonField label={t('edit.notes')} value={many} onclick={() => (notesTouched = true)} />
         </div>
       {:else}
@@ -195,16 +195,16 @@
 {/snippet}
 
 {#if sheet}
-  <Popup class="od-multi-edit od-edit-sheet" push={false} swipeToClose={ios} style={sheetStyle}>
+  <Popup class="bc-multi-edit bc-edit-sheet" push={false} swipeToClose={ios} style={sheetStyle}>
     <View>
-      <Page class="od-multi-edit">
+      <Page class="bc-multi-edit">
         {@render chrome()}
         {@render content()}
       </Page>
     </View>
   </Popup>
 {:else}
-  <Page class="od-multi-edit">
+  <Page class="bc-multi-edit">
     {@render chrome()}
     {@render content()}
   </Page>
@@ -212,20 +212,20 @@
 
 <style>
   @layer od.components {
-    .od-multi-edit--content {
+    .bc-multi-edit--content {
       padding: 8px 0 32px;
     }
 
-    .od-multi-edit--field {
+    .bc-multi-edit--field {
       margin-top: 0;
     }
 
-    /* « Plusieurs valeurs » in #4B4A47 (--od-text-2): the value is not one of the dives'. */
-    .od-multi-edit--many :global(.od-button-field--value) {
-      color: var(--od-text-2);
+    /* « Plusieurs valeurs » in #4B4A47 (--bc-text-2): the value is not one of the dives'. */
+    .bc-multi-edit--many :global(.bc-button-field--value) {
+      color: var(--bc-text-2);
     }
 
-    .od-multi-edit--site-clear {
+    .bc-multi-edit--site-clear {
       margin: 4px 16px 0;
     }
   }

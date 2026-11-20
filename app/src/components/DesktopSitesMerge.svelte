@@ -27,17 +27,17 @@
   const name = (/** @type {Site} */ s) => s.name || t('sites.noName');
 </script>
 
-<Md3Dialog class="od-sites-merge" title={t('desktopFollowups.siteMerge.title')} oncancel={onclose}>
-  <p class="od-sites-merge--lead">{t('desktopFollowups.siteMerge.which')}</p>
-  <div class="od-sites-merge--choices" role="radiogroup" aria-label={t('desktopFollowups.siteMerge.which')}>
+<Md3Dialog class="bc-sites-merge" title={t('desktopFollowups.siteMerge.title')} oncancel={onclose}>
+  <p class="bc-sites-merge--lead">{t('desktopFollowups.siteMerge.which')}</p>
+  <div class="bc-sites-merge--choices" role="radiogroup" aria-label={t('desktopFollowups.siteMerge.which')}>
     {#each [sides.first, sides.second] as s (s.uuid)}
       <ChoiceRow name="od-sites-merge-keep" selected={sides.keep === s} onselect={() => (kept = s.uuid)}>
-        <span class="od-sites-merge--label">{name(s)}</span>
-        <span class="od-sites-merge--line">{describe(s)}</span>
+        <span class="bc-sites-merge--label">{name(s)}</span>
+        <span class="bc-sites-merge--line">{describe(s)}</span>
       </ChoiceRow>
     {/each}
   </div>
-  <p class="od-sites-merge--effect">{t('sites.mergeText', { keep: name(sides.keep), other: name(sides.other) })}</p>
+  <p class="bc-sites-merge--effect">{t('sites.mergeText', { keep: name(sides.keep), other: name(sides.other) })}</p>
 
   {#snippet actions()}
     <button type="button" class="button" onclick={onclose}>{t('dialog.cancel')}</button>
@@ -47,33 +47,33 @@
 
 <style>
   @layer od.components {
-    .od-sites-merge--lead,
-    .od-sites-merge--effect {
+    .bc-sites-merge--lead,
+    .bc-sites-merge--effect {
       margin: 0;
       padding-inline: 24px;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
-    .od-sites-merge--lead {
+    .bc-sites-merge--lead {
       margin-bottom: 8px;
     }
-    .od-sites-merge--effect {
+    .bc-sites-merge--effect {
       margin-top: 12px;
     }
-    .od-sites-merge--choices {
+    .bc-sites-merge--choices {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
-    .od-sites-merge--label {
+    .bc-sites-merge--label {
       display: block;
       font-size: 15px;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
-    .od-sites-merge--line {
+    .bc-sites-merge--line {
       display: block;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
   }
 </style>

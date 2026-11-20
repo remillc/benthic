@@ -30,32 +30,32 @@ test('the animation timing is the one of the brief: 2.2 s line, dot at 0.7 s ove
   const style = css(hero);
   // The line and its glow: the stroke length is trimmed (pathLength 1, dash 1, offset 1 -> 0), left to right.
   for (const part of ['glow', 'line']) {
-    assert.match(style, new RegExp(`\\.od-profile-hero--${part} \\{[^}]*stroke-dasharray: 1;[^}]*animation: od-profile-hero-draw 2\\.2s cubic-bezier\\(0\\.4, 0, 0\\.2, 1\\) both;`));
+    assert.match(style, new RegExp(`\\.bc-profile-hero--${part} \\{[^}]*stroke-dasharray: 1;[^}]*animation: od-profile-hero-draw 2\\.2s cubic-bezier\\(0\\.4, 0, 0\\.2, 1\\) both;`));
   }
   assert.equal((hero.match(/pathLength="1"/g) ?? []).length, 2);
   assert.match(style, /@keyframes od-profile-hero-draw \{\s*from \{\s*stroke-dashoffset: 1;\s*\}\s*to \{\s*stroke-dashoffset: 0;/);
   // The dot: 0.3 s after 0.7 s, from 40 % to 100 % with a fade-in.
-  assert.match(style, /\.od-profile-hero--dot \{[^}]*animation: od-profile-hero-pop 0\.3s 0\.7s [^;]*both;/);
+  assert.match(style, /\.bc-profile-hero--dot \{[^}]*animation: od-profile-hero-pop 0\.3s 0\.7s [^;]*both;/);
   assert.match(style, /@keyframes od-profile-hero-pop \{\s*from \{\s*opacity: 0;\s*transform: scale\(0\.4\);\s*\}\s*to \{\s*opacity: 1;\s*transform: none;/);
   // The labels: 0.5 s after 2.1 s, fade in and rise 8 dp.
-  assert.match(style, /\.od-profile-hero--label \{[^}]*animation: od-profile-hero-in 0\.5s 2\.1s [^;]*both;/);
+  assert.match(style, /\.bc-profile-hero--label \{[^}]*animation: od-profile-hero-in 0\.5s 2\.1s [^;]*both;/);
   assert.match(style, /@keyframes od-profile-hero-in \{\s*from \{\s*opacity: 0;\s*transform: translateY\(8px\);/);
 });
 
 test('the water column is visible from the start: nothing animates it', () => {
   const style = css(hero);
-  assert.doesNotMatch(style, /\.od-profile-hero--water \{[^}]*animation/);
-  assert.doesNotMatch(style, /\.od-profile-hero--water-(top|bottom) \{[^}]*animation/);
-  assert.match(hero, /<path class="od-profile-hero--water" d=\{shape\.area\} fill="url\(#\{gradient\}\)">/);
-  assert.match(style, /\.od-profile-hero--surface \{[^}]*stroke-dasharray: 3 4;/);
-  assert.doesNotMatch(style, /\.od-profile-hero--surface \{[^}]*animation/);
+  assert.doesNotMatch(style, /\.bc-profile-hero--water \{[^}]*animation/);
+  assert.doesNotMatch(style, /\.bc-profile-hero--water-(top|bottom) \{[^}]*animation/);
+  assert.match(hero, /<path class="bc-profile-hero--water" d=\{shape\.area\} fill="url\(#\{gradient\}\)">/);
+  assert.match(style, /\.bc-profile-hero--surface \{[^}]*stroke-dasharray: 3 4;/);
+  assert.doesNotMatch(style, /\.bc-profile-hero--surface \{[^}]*animation/);
 });
 
 test('reduced motion shows the final state at once; the steps show it still', () => {
   const style = css(hero);
-  assert.match(style, /@media \(prefers-reduced-motion: reduce\) \{\s*\.od-profile-hero--glow,\s*\.od-profile-hero--line,\s*\.od-profile-hero--dot,\s*\.od-profile-hero--label \{\s*animation: none;/);
-  assert.match(style, /\.od-profile-hero--still \{\s*\.od-profile-hero--glow,\s*\.od-profile-hero--line,\s*\.od-profile-hero--dot,\s*\.od-profile-hero--label \{\s*animation: none;/);
-  assert.match(hero, /class:od-profile-hero--still=\{still\}/);
+  assert.match(style, /@media \(prefers-reduced-motion: reduce\) \{\s*\.bc-profile-hero--glow,\s*\.bc-profile-hero--line,\s*\.bc-profile-hero--dot,\s*\.bc-profile-hero--label \{\s*animation: none;/);
+  assert.match(style, /\.bc-profile-hero--still \{\s*\.bc-profile-hero--glow,\s*\.bc-profile-hero--line,\s*\.bc-profile-hero--dot,\s*\.bc-profile-hero--label \{\s*animation: none;/);
+  assert.match(hero, /class:bc-profile-hero--still=\{still\}/);
   assert.match(panel, /<ProfileHero \{still\} \/>/);
   assert.match(editorial, /<FirstLaunchPanel still \/>/);
 });
@@ -93,22 +93,22 @@ test('the panel: 700 dp on the left in landscape, 640 dp at the top in portrait,
   const style = css(panel);
   assert.match(style, /width: min\(700px, 55%\);\s*height: 100%;/);
   assert.match(style, /@media \(orientation: portrait\) \{\s*width: 100%;\s*height: 640px;/);
-  assert.match(style, /\.od-first-launch-panel--name \{\s*font-size: 48px;\s*line-height: 56px;/);
-  assert.match(style, /\.od-first-launch-panel--title \{[^}]*font-size: 40px;\s*line-height: 48px;/);
-  assert.match(style, /\.od-first-launch-panel--intro \{[^}]*font-size: 16px;[^}]*color: var\(--od-on-first-band-2\);/);
+  assert.match(style, /\.bc-first-launch-panel--name \{\s*font-size: 48px;\s*line-height: 56px;/);
+  assert.match(style, /\.bc-first-launch-panel--title \{[^}]*font-size: 40px;\s*line-height: 48px;/);
+  assert.match(style, /\.bc-first-launch-panel--intro \{[^}]*font-size: 16px;[^}]*color: var\(--bc-on-first-band-2\);/);
   assert.match(panel, /src="logo-light\.svg" alt="" width="96" height="96"/);
-  assert.match(style, /background: var\(--od-first-band\);/);
-  assert.match(style, /background: var\(--od-first-band-hatch\);/);
-  assert.match(theme, /--od-on-first-band-2: rgb\(255 255 255 \/ 0\.78\);/);
+  assert.match(style, /background: var\(--bc-first-band\);/);
+  assert.match(style, /background: var\(--bc-first-band-hatch\);/);
+  assert.match(theme, /--bc-on-first-band-2: rgb\(255 255 255 \/ 0\.78\);/);
 });
 
 test('the Alpha badge: 12 sp, line 16, letter spacing 0.6, padding 2 x 8 dp, outline at 55 %, 4.5:1 for the white text', () => {
   const style = css(panel);
-  assert.match(style, /\.od-first-launch-panel--alpha \{[^}]*padding: 2px 8px;[^}]*border: 1px solid var\(--od-first-band-badge-line\);[^}]*font-size: 12px;\s*line-height: 16px;\s*font-weight: 700;\s*letter-spacing: 0\.6px;\s*text-transform: uppercase;/);
-  assert.match(theme, /--od-first-band-badge-line: rgb\(255 255 255 \/ 0\.55\);/);
+  assert.match(style, /\.bc-first-launch-panel--alpha \{[^}]*padding: 2px 8px;[^}]*border: 1px solid var\(--bc-first-band-badge-line\);[^}]*font-size: 12px;\s*line-height: 16px;\s*font-weight: 700;\s*letter-spacing: 0\.6px;\s*text-transform: uppercase;/);
+  assert.match(theme, /--bc-first-band-badge-line: rgb\(255 255 255 \/ 0\.55\);/);
   // The fill is 12 %, not the 18 % of the brief: at 18 % the white text measured 4.2:1 on the panel.
-  assert.match(style, /background: var\(--od-first-band-badge-welcome\);/);
-  assert.match(theme, /--od-first-band-badge-welcome: rgb\(255 255 255 \/ 0\.12\);/);
+  assert.match(style, /background: var\(--bc-first-band-badge-welcome\);/);
+  assert.match(theme, /--bc-first-band-badge-welcome: rgb\(255 255 255 \/ 0\.12\);/);
   const lum = (rgb) => {
     const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
     return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
@@ -123,30 +123,30 @@ test('the Alpha badge: 12 sp, line 16, letter spacing 0.6, padding 2 x 8 dp, out
 test('the tablet / phone split: the panel on an Android tablet only, the band on a phone, iOS untouched', () => {
   assert.match(welcome, /const band = \$derived\(layout\.phone && !desktopApp\);\s*const panel = \$derived\(!theme\.ios && !band\);/);
   assert.match(welcome, /\{#if band\}\s*<!--[^>]*-->\s*<FirstLaunchBand variant="welcome" \/>\s*\{:else\}/);
-  assert.match(welcome, /\{#if panel\}<h2 class="od-welcome-start--start">\{t\('firstLaunch\.tabletStart'\)\}<\/h2>\{\/if\}/);
+  assert.match(welcome, /\{#if panel\}<h2 class="bc-welcome-start--start">\{t\('firstLaunch\.tabletStart'\)\}<\/h2>\{\/if\}/);
   // The three buttons, their hints, the divider and the git link are shared with the phone.
   for (const key of ['existingShort', 'existingNote', 'createShort', 'createNote', 'noAccount']) assert.ok(welcome.includes(`'welcome.${key}'`), key);
-  assert.match(welcome, /<div class="od-welcome-start--divider" role="presentation"><\/div>\s*<a href="\/welcome\/git"/);
+  assert.match(welcome, /<div class="bc-welcome-start--divider" role="presentation"><\/div>\s*<a href="\/welcome\/git"/);
   assert.match(welcome, /<WelcomeHelpLink \/>/);
   // The panel rules apply only with the panel class: the phone's rules are the ones of task 233 to 236.
-  assert.match(welcome, /\.od-welcome-start--with-panel \{/);
-  assert.doesNotMatch(welcome.slice(welcome.indexOf('.od-welcome-start--page {'), welcome.indexOf('.od-welcome-start--with-panel {')), /orientation/);
-  assert.match(welcome, /\.od-welcome-start--start \{\s*margin: 0 0 20px;\s*font-size: 28px;\s*line-height: 36px;/);
-  assert.match(welcome, /\.od-welcome-start--divider \{\s*width: auto;\s*max-width: none;\s*margin: 20px 48px 16px;/);
+  assert.match(welcome, /\.bc-welcome-start--with-panel \{/);
+  assert.doesNotMatch(welcome.slice(welcome.indexOf('.bc-welcome-start--page {'), welcome.indexOf('.bc-welcome-start--with-panel {')), /orientation/);
+  assert.match(welcome, /\.bc-welcome-start--start \{\s*margin: 0 0 20px;\s*font-size: 28px;\s*line-height: 36px;/);
+  assert.match(welcome, /\.bc-welcome-start--divider \{\s*width: auto;\s*max-width: none;\s*margin: 20px 48px 16px;/);
   assert.match(welcome, /padding: 24px 64px 56px;/);
   assert.match(welcome, /padding: 0 120px 64px;/);
   // Hand pointer and hover.
-  assert.match(welcome, /\.od-welcome-start--pill \{\s*cursor: pointer;/);
-  assert.match(welcome, /\.od-welcome-start--git-link \{\s*cursor: pointer;[\s\S]*@media \(hover: hover\)/);
+  assert.match(welcome, /\.bc-welcome-start--pill \{\s*cursor: pointer;/);
+  assert.match(welcome, /\.bc-welcome-start--git-link \{\s*cursor: pointer;[\s\S]*@media \(hover: hover\)/);
 });
 
 test('the « Une question ? » link sits in the middle of the content side beside the panel', () => {
   const link = read('components/WelcomeHelpLink.svelte');
-  assert.match(link, /left: var\(--od-help-link-left, 50%\);/);
-  assert.match(link, /:global\(\.od-first-panelled\) \{\s*--od-help-link-left: calc\(min\(700px, 55%\) \+ \(100% - min\(700px, 55%\)\) \/ 2\);/);
-  assert.match(link, /@media \(orientation: portrait\) \{\s*--od-help-link-left: 50%;/);
-  assert.match(welcome, /od-welcome-start\{panel \? ' od-first-panelled' : ''\}/);
-  assert.match(editorial, /panel \? 'od-editorial-page--panelled od-first-panelled' : ''/);
+  assert.match(link, /left: var\(--bc-help-link-left, 50%\);/);
+  assert.match(link, /:global\(\.bc-first-panelled\) \{\s*--bc-help-link-left: calc\(min\(700px, 55%\) \+ \(100% - min\(700px, 55%\)\) \/ 2\);/);
+  assert.match(link, /@media \(orientation: portrait\) \{\s*--bc-help-link-left: 50%;/);
+  assert.match(welcome, /bc-welcome-start\{panel \? ' bc-first-panelled' : ''\}/);
+  assert.match(editorial, /panel \? 'bc-editorial-page--panelled bc-first-panelled' : ''/);
 });
 
 test('task 239: the steps keep the panel, still, with the step in a 452 dp column and the buttons on the right', () => {
@@ -155,17 +155,17 @@ test('task 239: the steps keep the panel, still, with the step in a 452 dp colum
   assert.match(editorial, /\{:else if panel\}\s*<FirstLaunchPanel still \/>/);
   const style = css(editorial);
   // 580 dp of content side at 1280 dp, 64 dp on each side: 452 dp.
-  assert.match(style, /\.od-editorial-page--panel-body \{[\s\S]*?padding: 24px 64px 28px;\s*\/\* Centred while it fits[^*]*\*\/\s*overflow-y: auto;\s*&::before,\s*\.od-editorial-page--spacer \{\s*content: '';\s*flex: 1 1 0;/);
+  assert.match(style, /\.bc-editorial-page--panel-body \{[\s\S]*?padding: 24px 64px 28px;\s*\/\* Centred while it fits[^*]*\*\/\s*overflow-y: auto;\s*&::before,\s*\.bc-editorial-page--spacer \{\s*content: '';\s*flex: 1 1 0;/);
   assert.match(style, /@media \(orientation: portrait\) \{\s*padding: 0 120px 64px;/);
   assert.match(style, /flex-direction: row;\s*justify-content: flex-end;/);
-  assert.match(style, /\.od-editorial-page--title \{\s*margin-bottom: 8px;\s*font-size: 28px;\s*line-height: 36px;/);
+  assert.match(style, /\.bc-editorial-page--title \{\s*margin-bottom: 8px;\s*font-size: 28px;\s*line-height: 36px;/);
   // The phone's rule is the one of tasks 233 to 236, unchanged.
-  assert.match(style, /\.od-editorial-page--band-body,\s*\.od-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
+  assert.match(style, /\.bc-editorial-page--band-body,\s*\.bc-editorial-page--panel-body \{\s*padding: 16px 16px 0;/);
 });
 
 test('task 239: the six code boxes are one centred group of 328 dp, the label, error and resend at its left edge', () => {
   const confirm = read('pages/ConfirmCode.svelte');
-  assert.match(confirm, /:global\(\.od-editorial-page--panelled\) & \{\s*\/\*[^*]*\*\/\s*width: 328px;\s*max-width: 100%;\s*margin: 8px auto 0;/);
+  assert.match(confirm, /:global\(\.bc-editorial-page--panelled\) & \{\s*\/\*[^*]*\*\/\s*width: 328px;\s*max-width: 100%;\s*margin: 8px auto 0;/);
   const field = read('components/CodeField.svelte');
   assert.match(field, /flex: 0 1 48px;/);
   assert.match(field, /gap: 8px;/);

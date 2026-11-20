@@ -16,7 +16,7 @@ const sound = () => ({
   swiping: false,
   pages: [
     { classes: 'page page-master page-previous', route: '/', transform: 'matrix(1, 0, 0, 1, -24, 0)', dx: -24 },
-    { classes: 'page od-dive-detail page-current', route: '/dives/3', transform: 'none', dx: 0 },
+    { classes: 'page bc-dive-detail page-current', route: '/dives/3', transform: 'none', dx: 0 },
   ],
 });
 const app = (view, more = {}) => ({ hash: '', activeTabs: 1, orphanBackdrop: false, views: [view], ...more });

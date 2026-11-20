@@ -88,55 +88,55 @@
   }
 </script>
 
-<div class="od-backup od-backup-dive">
+<div class="bc-backup bc-backup-dive">
   {#if picking}
-    <input class="od-backup--search" type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
-    <div class="od-backup--list" style="margin-top: 12px">
+    <input class="bc-backup--search" type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
+    <div class="bc-backup--list" style="margin-top: 12px">
       {#each choices as d (d.id)}
-        <button type="button" class="od-backup--row" onclick={() => choose(d)}>
-          <span class="od-backup--texts">
-            <span class="od-backup--row-title">{rowText(d)}</span>
+        <button type="button" class="bc-backup--row" onclick={() => choose(d)}>
+          <span class="bc-backup--texts">
+            <span class="bc-backup--row-title">{rowText(d)}</span>
           </span>
-          <span class="od-backup--chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-backup--chevron"><Icon name="chevron" size={20} /></span>
         </button>
       {/each}
     </div>
     {#if key}
-      <p class="od-backup--note"><button type="button" class="od-text-button" onclick={() => (picking = false)}>{t('dialog.cancel')}</button></p>
+      <p class="bc-backup--note"><button type="button" class="bc-text-button" onclick={() => (picking = false)}>{t('dialog.cancel')}</button></p>
     {/if}
   {:else}
-    <h2 class="od-backup--section">{t('backup.dive.pick')}</h2>
-    <div class="od-backup--dive-card">
-      <span class="od-backup--texts">
-        <span class="od-backup--row-title">{dive ? rowText(dive) : key}</span>
+    <h2 class="bc-backup--section">{t('backup.dive.pick')}</h2>
+    <div class="bc-backup--dive-card">
+      <span class="bc-backup--texts">
+        <span class="bc-backup--row-title">{dive ? rowText(dive) : key}</span>
       </span>
-      <button type="button" class="od-text-button" onclick={() => (picking = true)}>{t('backup.dive.change')}</button>
+      <button type="button" class="bc-text-button" onclick={() => (picking = true)}>{t('backup.dive.change')}</button>
     </div>
 
-    <h2 class="od-backup--section">{t('backup.dive.versions')}</h2>
+    <h2 class="bc-backup--section">{t('backup.dive.versions')}</h2>
     {#if failed}
-      <p class="od-backup--error">{t('backup.versions.failed')}</p>
+      <p class="bc-backup--error">{t('backup.versions.failed')}</p>
     {:else if versions === null}
-      <p class="od-backup--empty" role="status">{t('backup.versions.loading')}</p>
+      <p class="bc-backup--empty" role="status">{t('backup.versions.loading')}</p>
     {:else if !versions.length}
-      <p class="od-backup--empty">{t('backup.dive.none')}</p>
+      <p class="bc-backup--empty">{t('backup.dive.none')}</p>
     {:else}
-      <div class="od-backup--list" role="list">
+      <div class="bc-backup--list" role="list">
         {#each versions as v (v.id)}
-          <div class="od-backup--row" role="listitem">
-            <span class="od-backup--texts">
-              <span class="od-backup--row-title">{versionWhen(v.time)}</span>
-              <span class="od-backup--row-line">{diveVersionLine(v)}</span>
+          <div class="bc-backup--row" role="listitem">
+            <span class="bc-backup--texts">
+              <span class="bc-backup--row-title">{versionWhen(v.time)}</span>
+              <span class="bc-backup--row-line">{diveVersionLine(v)}</span>
             </span>
             {#if v.current}
-              <span class="od-backup--chip">{t('backup.versions.current')}</span>
+              <span class="bc-backup--chip">{t('backup.versions.current')}</span>
             {:else if v.dir}
-              <button type="button" class="od-backup--restore" disabled={backup.busy} onclick={() => restore(v)}>{t('backup.dive.restore')}</button>
+              <button type="button" class="bc-backup--restore" disabled={backup.busy} onclick={() => restore(v)}>{t('backup.dive.restore')}</button>
             {/if}
           </div>
         {/each}
       </div>
     {/if}
-    <p class="od-backup--note">{t('backup.dive.note')} {t('backup.media')}</p>
+    <p class="bc-backup--note">{t('backup.dive.note')} {t('backup.media')}</p>
   {/if}
 </div>

@@ -115,52 +115,52 @@
   });
 </script>
 
-<Page class="od-desaturation">
+<Page class="bc-desaturation">
   <Navbar title={t('desaturation.title')}>
     {#snippet left()}
       <Link back iconOnly>
         <i class="icon icon-back"></i>
-        <span class="od-sr-only">{t('common.back')}</span>
+        <span class="bc-sr-only">{t('common.back')}</span>
       </Link>
     {/snippet}
   </Navbar>
 
   {#if failed}
-    <p class="od-desaturation--lead">{t('desaturation.failed')}</p>
+    <p class="bc-desaturation--lead">{t('desaturation.failed')}</p>
   {:else if desat}
-    <p class="od-desaturation--lead od-value">{t('desaturation.asOf', { date: formatFullDate(desat.now) })}</p>
+    <p class="bc-desaturation--lead bc-value">{t('desaturation.asOf', { date: formatFullDate(desat.now) })}</p>
 
     {#if wait && wait.remainingSeconds === 0}
       <!-- The wait is over (docs/mockups/outils-desaturation-terminee-android.dc.html). -->
-      <div class="od-desaturation--over">
-        <span class="od-desaturation--over-icon"><Icon name="checkCircle" size={24} weight={2.2} /></span>
-        <span class="od-desaturation--over-text">
-          <span class="od-desaturation--over-title">{t('desaturation.canFly')}</span>
-          <span class="od-desaturation--over-when od-value">{t('desaturation.waitOverAt', { when: formatRelativeDateTime(wait.endsAt, desat.now, false) })}</span>
+      <div class="bc-desaturation--over">
+        <span class="bc-desaturation--over-icon"><Icon name="checkCircle" size={24} weight={2.2} /></span>
+        <span class="bc-desaturation--over-text">
+          <span class="bc-desaturation--over-title">{t('desaturation.canFly')}</span>
+          <span class="bc-desaturation--over-when bc-value">{t('desaturation.waitOverAt', { when: formatRelativeDateTime(wait.endsAt, desat.now, false) })}</span>
         </span>
       </div>
     {:else}
-      <div class="od-desaturation--tiles">
-        <div class="od-desaturation--tile">
-          <span class="od-desaturation--tile-label">{t('desaturation.beforeFlying')}</span>
-          <span class="od-desaturation--tile-value od-value" class:od-desaturation--flight={!!wait}>
+      <div class="bc-desaturation--tiles">
+        <div class="bc-desaturation--tile">
+          <span class="bc-desaturation--tile-label">{t('desaturation.beforeFlying')}</span>
+          <span class="bc-desaturation--tile-value bc-value" class:bc-desaturation--flight={!!wait}>
             {#if !wait}{t('desaturation.noWait')}{:else}{formatHoursMinutes(wait.remainingSeconds)}{/if}
           </span>
         </div>
-        <div class="od-desaturation--tile">
-          <span class="od-desaturation--tile-label">{t('desaturation.lastDive')}</span>
-          <span class="od-desaturation--tile-value od-value">
+        <div class="bc-desaturation--tile">
+          <span class="bc-desaturation--tile-label">{t('desaturation.lastDive')}</span>
+          <span class="bc-desaturation--tile-value bc-value">
             {sinceLastDive < 0 ? t('desaturation.noRecentDive') : t('desaturation.ago', { time: formatHoursMinutes(sinceLastDive) })}
           </span>
         </div>
       </div>
       {#if wait}
         <!-- The reminder (task 2026-11-13-98): the same setting as in Settings. -->
-        <label class="od-desaturation--notify">
-          <span class="od-desaturation--notify-text">
-            <span class="od-desaturation--notify-label">{t('settings.flight.notify')}</span>
+        <label class="bc-desaturation--notify">
+          <span class="bc-desaturation--notify-text">
+            <span class="bc-desaturation--notify-label">{t('settings.flight.notify')}</span>
             {#if settings.flightNotify}
-              <span class="od-desaturation--notify-when">{t('desaturation.notifyAt', { when: formatDayAt(wait.endsAt, desat.now) })}</span>
+              <span class="bc-desaturation--notify-when">{t('desaturation.notifyAt', { when: formatDayAt(wait.endsAt, desat.now) })}</span>
             {/if}
           </span>
           <span class="toggle">
@@ -170,7 +170,7 @@
         </label>
       {/if}
     {/if}
-    <p class="od-desaturation--caption">
+    <p class="bc-desaturation--caption">
       {wait
         ? settings.flightWait !== 'auto'
           ? t('desaturation.ruleFixed', { hours: wait.hours })
@@ -179,56 +179,56 @@
     </p>
 
     {#if lastDive}
-      <h2 class="od-desaturation--section">{t('desaturation.lastDive')}</h2>
-      <div class="od-desaturation--last-card">
-        <a href="/dives/{lastDive.id}" class="od-desaturation--last-dive ripple">
-          <span class="od-desaturation--last-text">
-            <span class="od-desaturation--last-date od-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
-            <span class="od-desaturation--last-line">
+      <h2 class="bc-desaturation--section">{t('desaturation.lastDive')}</h2>
+      <div class="bc-desaturation--last-card">
+        <a href="/dives/{lastDive.id}" class="bc-desaturation--last-dive ripple">
+          <span class="bc-desaturation--last-text">
+            <span class="bc-desaturation--last-date bc-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
+            <span class="bc-desaturation--last-line">
               {lastDive.site || t('dive.siteNotSet')} · {formatDepth(lastDive.maxDepthMm, logbook.prefs)} · {formatDuration(lastDive.durationSeconds)}
             </span>
-            <span class="od-desaturation--last-line od-value">{surfaced}</span>
+            <span class="bc-desaturation--last-line bc-value">{surfaced}</span>
           </span>
-          <span class="od-desaturation--last-chevron"><Icon name="chevron" size={20} /></span>
+          <span class="bc-desaturation--last-chevron"><Icon name="chevron" size={20} /></span>
         </a>
       </div>
     {/if}
 
-    <h2 class="od-desaturation--section">{t('desaturation.tissues')}</h2>
-    <div class="card od-desaturation--card od-desaturation--chart">
+    <h2 class="bc-desaturation--section">{t('desaturation.tissues')}</h2>
+    <div class="card bc-desaturation--card bc-desaturation--chart">
       <svg width="100%" viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-label={chartLabel}>
-        <path class="od-desaturation--limit" d="M0 {TOP} H{WIDTH}" />
-        <text class="od-desaturation--axis" x={WIDTH} y="12" text-anchor="end">{t('desaturation.limit')}</text>
+        <path class="bc-desaturation--limit" d="M0 {TOP} H{WIDTH}" />
+        <text class="bc-desaturation--axis" x={WIDTH} y="12" text-anchor="end">{t('desaturation.limit')}</text>
         {#each desat.tissues as tissue, i (i)}
           {@const h = barHeight(restLoad(tissue))}
           <rect x={i * (BAR + GAP)} y={BOTTOM - h} width={BAR} height={h} rx="1" style:fill={barColor(restLoad(tissue))} />
         {/each}
-        <text class="od-desaturation--axis" x="0" y="134">{t('desaturation.fastToSlow')}</text>
-        <text class="od-desaturation--axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.restZero')}</text>
+        <text class="bc-desaturation--axis" x="0" y="134">{t('desaturation.fastToSlow')}</text>
+        <text class="bc-desaturation--axis" x={WIDTH} y="134" text-anchor="end">{t('desaturation.restZero')}</text>
       </svg>
     </div>
-    <div class="od-desaturation--legend od-value" aria-hidden="true">
-      <span class="od-desaturation--alarm-swatch"></span>
+    <div class="bc-desaturation--legend bc-value" aria-hidden="true">
+      <span class="bc-desaturation--alarm-swatch"></span>
       <span>{t('desaturation.legendAlarm')}</span>
     </div>
-    <p class="od-desaturation--caption">{t('desaturation.chartText')} {modelText}</p>
+    <p class="bc-desaturation--caption">{t('desaturation.chartText')} {modelText}</p>
     {#if overlapAt}
       <!-- Two dives overlap: the core stopped loading the tissues there (13 November 2026). -->
-      <div class="od-desaturation--note" role="note">
-        <span class="od-desaturation--note-icon"><Icon name="info" size={20} /></span>
+      <div class="bc-desaturation--note" role="note">
+        <span class="bc-desaturation--note-icon"><Icon name="info" size={20} /></span>
         <span>{t('desaturation.overlap', { date: formatDateTime(overlapAt) })}</span>
       </div>
     {/if}
 
     {#if desat.dives.length}
-      <h2 class="od-desaturation--section">{t('desaturation.usedDives')}</h2>
-      <div class="list list-strong inset list-dividers media-list od-dive-list">
+      <h2 class="bc-desaturation--section">{t('desaturation.usedDives')}</h2>
+      <div class="list list-strong inset list-dividers media-list bc-dive-list">
         <ul>
           {#each [...desat.dives].reverse() as dive (dive.id)}
             <li>
               <a href="/dives/{dive.id}" class="item-link item-content">
                 <div class="item-inner">
-                  <div class="item-title od-value">{formatDateTime(dive.date)}</div>
+                  <div class="item-title bc-value">{formatDateTime(dive.date)}</div>
                   <div class="item-text">
                     {dive.site || t('dive.siteNotSet')} · {formatDepth(dive.maxDepthMm, logbook.prefs)} · {formatDuration(dive.durationSeconds)}
                   </div>
@@ -239,76 +239,76 @@
         </ul>
       </div>
     {:else}
-      <p class="od-desaturation--caption">{t('desaturation.noDives')}</p>
+      <p class="bc-desaturation--caption">{t('desaturation.noDives')}</p>
     {/if}
 
-    <div class="od-desaturation--note" role="note">
-      <span class="od-desaturation--note-icon"><Icon name="info" size={20} /></span>
+    <div class="bc-desaturation--note" role="note">
+      <span class="bc-desaturation--note-icon"><Icon name="info" size={20} /></span>
       <span>{t('desaturation.note')}</span>
     </div>
-    <p class="od-desaturation--caption od-desaturation--last">{t('desaturation.recommendation')}</p>
+    <p class="bc-desaturation--caption bc-desaturation--last">{t('desaturation.recommendation')}</p>
   {/if}
 </Page>
 
 <style>
   @layer od.components {
-    .od-desaturation--lead {
+    .bc-desaturation--lead {
       margin: 8px 20px 0;
       font-size: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--tiles {
+    .bc-desaturation--tiles {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
-    .od-desaturation--over {
+    .bc-desaturation--over {
       margin: 8px 16px 0;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: flex-start;
       gap: 12px;
     }
 
-    .od-desaturation--over-icon {
+    .bc-desaturation--over-icon {
       flex: none;
       display: flex;
-      color: var(--od-text);
+      color: var(--bc-text);
     }
 
-    .od-desaturation--over-text {
+    .bc-desaturation--over-text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-desaturation--over-title {
+    .bc-desaturation--over-title {
       font-size: 22px;
       line-height: 28px;
     }
 
-    .od-desaturation--over-when {
+    .bc-desaturation--over-when {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--last-card {
+    .bc-desaturation--last-card {
       margin: 0 16px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       overflow: hidden;
     }
 
-    .od-desaturation--last-dive {
+    .bc-desaturation--last-dive {
       position: relative;
       overflow: hidden;
       min-height: 72px;
@@ -317,11 +317,11 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--od-text);
+      color: var(--bc-text);
       text-decoration: none;
     }
 
-    .od-desaturation--last-text {
+    .bc-desaturation--last-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -329,36 +329,36 @@
       gap: 2px;
     }
 
-    .od-desaturation--last-date {
+    .bc-desaturation--last-date {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-desaturation--last-line {
+    .bc-desaturation--last-line {
       font-size: 14px;
       line-height: 20px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--last-chevron {
+    .bc-desaturation--last-chevron {
       flex: none;
       display: flex;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--tile {
+    .bc-desaturation--tile {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    .od-desaturation--tile-label {
+    .bc-desaturation--tile-label {
       font-size: 12px;
       line-height: 16px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--tile-value {
+    .bc-desaturation--tile-value {
       font-size: 22px;
       line-height: 28px;
 
@@ -368,22 +368,22 @@
     }
 
     /* What waits for the diver: the tertiary role (docs/system-design.md). */
-    .od-desaturation--flight {
+    .bc-desaturation--flight {
       font-weight: 600;
-      color: var(--od-tertiary);
+      color: var(--bc-tertiary);
     }
 
-    .od-desaturation--notify {
+    .bc-desaturation--notify {
       margin: 12px 16px 0;
       padding: 12px 16px;
       border-radius: 20px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .od-desaturation--notify-text {
+    .bc-desaturation--notify-text {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -391,22 +391,22 @@
       gap: 2px;
     }
 
-    .od-desaturation--notify-label {
+    .bc-desaturation--notify-label {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .od-desaturation--notify-when {
+    .bc-desaturation--notify-when {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-desaturation--section {
+    .bc-desaturation--section {
       margin: 22px 16px 8px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
       :global(.ios) & {
         margin: 24px 20px 8px;
@@ -416,66 +416,66 @@
       }
     }
 
-    .od-desaturation--card {
+    .bc-desaturation--card {
       margin: 0 16px;
       padding: 16px;
       border-radius: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
     }
 
-    .od-desaturation--chart svg {
+    .bc-desaturation--chart svg {
       display: block;
     }
 
-    .od-desaturation--limit {
-      stroke: var(--od-text-2);
+    .bc-desaturation--limit {
+      stroke: var(--bc-text-2);
       stroke-width: 1;
       stroke-dasharray: 4 4;
     }
 
-    .od-desaturation--axis {
+    .bc-desaturation--axis {
       font-size: 10px;
-      fill: var(--od-text-2);
+      fill: var(--bc-text-2);
     }
 
-    .od-desaturation--legend {
+    .bc-desaturation--legend {
       margin: 8px 20px 0;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
 
-    .od-desaturation--alarm-swatch {
+    .bc-desaturation--alarm-swatch {
       flex: none;
       width: 12px;
       height: 8px;
       border-radius: 2px;
-      background: var(--od-alarm);
+      background: var(--bc-alarm);
     }
 
-    .od-desaturation--caption {
+    .bc-desaturation--caption {
       margin: 8px 20px 0;
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
 
-      &.od-desaturation--last {
+      &.bc-desaturation--last {
         margin-bottom: 32px;
       }
     }
 
-    .od-dive-list {
+    .bc-dive-list {
       margin-top: 0;
     }
 
-    .od-desaturation--note {
+    .bc-desaturation--note {
       margin: 18px 16px 0;
       padding: 12px 16px;
       border-radius: 12px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
       display: flex;
       gap: 12px;
       align-items: flex-start;
@@ -483,7 +483,7 @@
       line-height: 20px;
     }
 
-    .od-desaturation--note-icon {
+    .bc-desaturation--note-icon {
       flex: none;
       display: flex;
     }

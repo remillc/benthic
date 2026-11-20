@@ -237,42 +237,42 @@
 
 {#snippet filesBlock()}
   {#if kind === 'insurance'}
-    <div class="od-doc-edit--card">
-      <span class="od-doc-edit--thumb"><DocumentThumb doc={preview} urls={images[0] ? [images[0].url] : []} width={150} />{#if busy}<PhotoBusy />{/if}</span>
-      <span class="od-doc-edit--card-texts">
-        {#if images.length && scanned}<span class="od-doc-edit--scanned">{t('docs.insurance.scanned')}</span>{/if}
-        <span class="od-doc-edit--buttons">
-          <button type="button" class="od-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.insurance.scanAgain') : t('docs.insurance.scan')}</button>
-          <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
+    <div class="bc-doc-edit--card">
+      <span class="bc-doc-edit--thumb"><DocumentThumb doc={preview} urls={images[0] ? [images[0].url] : []} width={150} />{#if busy}<PhotoBusy />{/if}</span>
+      <span class="bc-doc-edit--card-texts">
+        {#if images.length && scanned}<span class="bc-doc-edit--scanned">{t('docs.insurance.scanned')}</span>{/if}
+        <span class="bc-doc-edit--buttons">
+          <button type="button" class="bc-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.insurance.scanAgain') : t('docs.insurance.scan')}</button>
+          <button type="button" class="bc-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
         </span>
       </span>
     </div>
     {#each pdfFiles as f (f.key)}
-      <div class="od-doc-edit--pdf"><Icon name="document" size={20} /><span>{t('docs.insurance.fileKept')}</span><button type="button" onclick={() => removeFile(f.key)}>{t('docs.insurance.removeFile')}</button></div>
+      <div class="bc-doc-edit--pdf"><Icon name="document" size={20} /><span>{t('docs.insurance.fileKept')}</span><button type="button" onclick={() => removeFile(f.key)}>{t('docs.insurance.removeFile')}</button></div>
     {/each}
   {:else}
-    <h2 class="od-doc-edit--section">{t('docs.medical.pages')}</h2>
-    <div class="od-doc-edit--pages">
+    <h2 class="bc-doc-edit--section">{t('docs.medical.pages')}</h2>
+    <div class="bc-doc-edit--pages">
       {#each files as f, i (f.key)}
-        <div class="od-doc-edit--page">
-          {#if f.pdf}<span class="od-doc-edit--page-pdf"><Icon name="document" size={28} /></span>{:else}<img src={f.url} alt="" />{/if}
-          <span class="od-doc-edit--page-label">{f.pdf ? t('docs.sheet.pdfFile') : t('docs.medical.page', { n: images.indexOf(f) + 1 })}</span>
-          <button type="button" class="od-doc-edit--page-remove" onclick={() => removeFile(f.key)} aria-label={t('docs.medical.removePage', { n: i + 1 })}><Icon name="close" size={18} /></button>
+        <div class="bc-doc-edit--page">
+          {#if f.pdf}<span class="bc-doc-edit--page-pdf"><Icon name="document" size={28} /></span>{:else}<img src={f.url} alt="" />{/if}
+          <span class="bc-doc-edit--page-label">{f.pdf ? t('docs.sheet.pdfFile') : t('docs.medical.page', { n: images.indexOf(f) + 1 })}</span>
+          <button type="button" class="bc-doc-edit--page-remove" onclick={() => removeFile(f.key)} aria-label={t('docs.medical.removePage', { n: i + 1 })}><Icon name="close" size={18} /></button>
         </div>
       {/each}
-      {#if busy}<div class="od-doc-edit--page od-doc-edit--page-busy"><span class="od-doc-edit--page-pdf"></span><PhotoBusy /></div>{/if}
+      {#if busy}<div class="bc-doc-edit--page bc-doc-edit--page-busy"><span class="bc-doc-edit--page-pdf"></span><PhotoBusy /></div>{/if}
     </div>
-    <span class="od-doc-edit--buttons">
-      <button type="button" class="od-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.medical.addPage') : t('docs.medical.scanPage')}</button>
-      <button type="button" class="od-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
+    <span class="bc-doc-edit--buttons">
+      <button type="button" class="bc-doc-edit--button" disabled={gear.readOnly || busy} onclick={scan}><Icon name="camera" size={20} />{images.length ? t('docs.medical.addPage') : t('docs.medical.scanPage')}</button>
+      <button type="button" class="bc-doc-edit--button" disabled={gear.readOnly} onclick={() => pdfInput?.click()}><Icon name="document" size={20} />{t('docs.insurance.pdf')}</button>
     </span>
   {/if}
-  <input bind:this={pdfInput} class="od-doc-edit--file" type="file" accept="application/pdf" tabindex="-1" aria-hidden="true" onchange={pickPdf} />
+  <input bind:this={pdfInput} class="bc-doc-edit--file" type="file" accept="application/pdf" tabindex="-1" aria-hidden="true" onchange={pickPdf} />
 {/snippet}
 
 {#snippet notify()}
-  <div class="od-doc-edit--notify">
-    <span class="od-doc-edit--notify-label" id="od-doc-notify">{t('docs.insurance.notify')}</span>
+  <div class="bc-doc-edit--notify">
+    <span class="bc-doc-edit--notify-label" id="od-doc-notify">{t('docs.insurance.notify')}</span>
     <ButtonGroup ariaLabelledby="od-doc-notify" value={String(notifyDays)} onchange={(v) => v && (notifyDays = /** @type {14|30|60} */ (Number(v)))} options={notifyOptions} />
   </div>
 {/snippet}
@@ -281,7 +281,7 @@
 
   <ReadOnlyNotice />
 
-  <div class="od-doc-edit--fields">
+  <div class="bc-doc-edit--fields">
     {@render filesBlock()}
 
     {#if kind === 'insurance'}
@@ -306,19 +306,19 @@
       <TextField label={t('docs.other.notes')} bind:value={notes} multiline supporting={t('docs.other.notesHint')} />
     {/if}
   </div>
-  <div class="od-doc-edit--bottom"></div>
+  <div class="bc-doc-edit--bottom"></div>
 {/snippet}
 
-<Page class="od-doc-edit">
+<Page class="bc-doc-edit">
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
-        <Icon name="close" /><span class="od-sr-only">{t('docs.close')}</span>
+        <Icon name="close" /><span class="bc-sr-only">{t('docs.close')}</span>
       </a>
     {/snippet}
     {#snippet title()}{heading}{/snippet}
     {#snippet right()}
-      <button type="button" class="od-doc-edit--save" disabled={!canSave} onclick={save}>{t('docs.save')}</button>
+      <button type="button" class="bc-doc-edit--save" disabled={!canSave} onclick={save}>{t('docs.save')}</button>
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -334,28 +334,28 @@
 
 <style>
   @layer od.components {
-    :global(.od-doc-edit .page-content) {
+    :global(.bc-doc-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .od-doc-edit--save {
+    .bc-doc-edit--save {
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
       border: none;
       border-radius: 20px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-doc-edit--save:disabled {
+    .bc-doc-edit--save:disabled {
       opacity: 0.38;
     }
 
-    .od-doc-edit--fields {
+    .bc-doc-edit--fields {
       margin-top: 8px;
       padding: 0 16px;
       display: flex;
@@ -363,7 +363,7 @@
       gap: 12px;
     }
 
-    .od-doc-edit--thumb {
+    .bc-doc-edit--thumb {
       position: relative;
       display: inline-flex;
       flex: none;
@@ -371,13 +371,13 @@
       overflow: hidden;
     }
 
-    .od-doc-edit--card {
+    .bc-doc-edit--card {
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .od-doc-edit--card-texts {
+    .bc-doc-edit--card-texts {
       flex: 1;
       min-width: 0;
       display: flex;
@@ -385,19 +385,19 @@
       gap: 8px;
     }
 
-    .od-doc-edit--scanned {
+    .bc-doc-edit--scanned {
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc-edit--buttons {
+    .bc-doc-edit--buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .od-doc-edit--button {
+    .bc-doc-edit--button {
       height: 40px;
       padding: 0 16px 0 12px;
       border: none;
@@ -405,81 +405,81 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--od-tonal);
-      color: var(--od-on-secondary-container);
+      background: var(--bc-tonal);
+      color: var(--bc-on-secondary-container);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
     }
 
-    .od-doc-edit--button:disabled {
+    .bc-doc-edit--button:disabled {
       opacity: 0.38;
     }
 
-    .od-doc-edit--file {
+    .bc-doc-edit--file {
       display: none;
     }
 
-    .od-doc-edit--pdf {
+    .bc-doc-edit--pdf {
       padding: 8px 8px 8px 16px;
       border-radius: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 15px;
     }
 
-    .od-doc-edit--pdf span {
+    .bc-doc-edit--pdf span {
       flex: 1;
     }
 
-    .od-doc-edit--pdf button {
+    .bc-doc-edit--pdf button {
       height: 40px;
       padding: 0 12px;
       border: none;
       background: none;
-      color: var(--od-secondary);
+      color: var(--bc-secondary);
       font: inherit;
       font-weight: 500;
     }
 
-    .od-doc-edit--section {
+    .bc-doc-edit--section {
       margin: 4px 4px 0;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc-edit--pages {
+    .bc-doc-edit--pages {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
       gap: 12px;
     }
 
-    .od-doc-edit--page {
+    .bc-doc-edit--page {
       position: relative;
       display: flex;
       flex-direction: column;
       gap: 4px;
       font-size: 13px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
     }
 
-    .od-doc-edit--page img,
-    .od-doc-edit--page-pdf {
+    .bc-doc-edit--page img,
+    .bc-doc-edit--page-pdf {
       width: 100%;
       aspect-ratio: 3 / 4;
       border-radius: 12px;
       object-fit: cover;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       display: grid;
       place-items: center;
       box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
     }
 
-    .od-doc-edit--page-remove {
+    .bc-doc-edit--page-remove {
       position: absolute;
       top: 6px;
       inset-inline-end: 6px;
@@ -490,25 +490,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--od-surface);
-      color: var(--od-text);
+      background: var(--bc-surface);
+      color: var(--bc-text);
     }
 
-    .od-doc-edit--notify {
+    .bc-doc-edit--notify {
       margin: 0 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .od-doc-edit--notify-label {
+    .bc-doc-edit--notify-label {
       padding: 0 4px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 500;
     }
 
-    .od-doc-edit--bottom {
+    .bc-doc-edit--bottom {
       height: 48px;
     }
   }

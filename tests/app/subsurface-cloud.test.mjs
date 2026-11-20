@@ -36,7 +36,7 @@ test('the Subsurface-cloud sign-in routes exist only in the alpha', () => {
     assert.match(app.slice(Math.max(0, at - 520), at), /isRelease\s*\?\s*\[\]/, `${route} sits in the alpha-only branch`);
   }
   // The pitch and the three choices of the Account page without an account (create, sign in, own git) are the alpha's.
-  assert.match(src('pages/Account.svelte'), /\{#if !isRelease\}\s*<p class="od-account--pitch">[\s\S]*<a href="\/account\/create"[\s\S]*<a href="\/account\/git\/new"/);
+  assert.match(src('pages/Account.svelte'), /\{#if !isRelease\}\s*<p class="bc-account--pitch">[\s\S]*<a href="\/account\/create"[\s\S]*<a href="\/account\/git\/new"/);
 });
 
 test('the beta never offers to open a logbook in a personal git repository: no route, no link (18 November 2026)', () => {
@@ -59,13 +59,13 @@ test('the beta never offers to open a logbook in a personal git repository: no r
 test('the error state of a dive has the app styling: own class, title font, tokens only, a way on', () => {
   const page = src('pages/DiveDetail.svelte');
   const block = page.slice(page.indexOf('{#if failed}'), page.indexOf('{:else if !dive}'));
-  assert.match(block, /class="od-dive-detail--error"/);
-  assert.match(block, /od-state-title/);
+  assert.match(block, /class="bc-dive-detail--error"/);
+  assert.match(block, /bc-state-title/);
   assert.match(block, /t\('detail\.errorTitle'\)/);
   assert.match(block, /t\('detail\.retry'\)/);
-  const css = page.slice(page.indexOf('.od-dive-detail--error {'), page.indexOf('.od-dive-detail--error-text {') + 200);
+  const css = page.slice(page.indexOf('.bc-dive-detail--error {'), page.indexOf('.bc-dive-detail--error-text {') + 200);
   assert.doesNotMatch(css, /#[0-9a-fA-F]{3,8}\b/, 'no hard-coded colour');
-  assert.match(css, /var\(--od-text\)/);
+  assert.match(css, /var\(--bc-text\)/);
   for (const lang of ['en', 'fr']) {
     const j = JSON.parse(src(`i18n/${lang}.json`));
     assert.ok(j.detail.retry && j.detail.errorTitle && j.detail.errorText);

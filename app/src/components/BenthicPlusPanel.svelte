@@ -21,20 +21,20 @@
 </script>
 
 {#if ready && readyMotion.bubbles}<BenthicPlusReadyBubbles panel still={readyMotion.still} />{/if}
-<div class="od-plus-panel">
+<div class="bc-plus-panel">
   {#if ready}
     <BenthicPlusReadyLogo play={readyMotion.play} size={120} />
   {:else}
-    <span class="od-plus-panel--lock"><Icon name="lock" size={44} weight={2} /></span>
+    <span class="bc-plus-panel--lock"><Icon name="lock" size={44} weight={2} /></span>
   {/if}
   <BenthicPlusChip />
-  <h1 class="od-plus-panel--title">{t(ready ? 'odplus.ready.title' : 'odplus.health.title')}</h1>
-  <p class="od-plus-panel--lead">{ready ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.health.lead')}</p>
+  <h1 class="bc-plus-panel--title">{t(ready ? 'odplus.ready.title' : 'odplus.health.title')}</h1>
+  <p class="bc-plus-panel--lead">{ready ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.health.lead')}</p>
 </div>
 
 <style>
   @layer od.components {
-    .od-plus-panel {
+    .bc-plus-panel {
       position: relative;
       flex: 1;
       display: flex;
@@ -44,16 +44,16 @@
       gap: 16px;
       padding-bottom: 96px;
     }
-    .od-plus-panel--lock {
+    .bc-plus-panel--lock {
       width: 88px;
       height: 88px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: color-mix(in srgb, var(--od-release-on-panel) 16%, transparent);
-      color: var(--od-release-on-panel);
+      background: color-mix(in srgb, var(--bc-release-on-panel) 16%, transparent);
+      color: var(--bc-release-on-panel);
     }
-    .od-plus-panel--title {
+    .bc-plus-panel--title {
       margin: 0;
       max-width: 540px;
       font-size: 40px;
@@ -61,12 +61,12 @@
       font-weight: 400;
       letter-spacing: -0.5px;
     }
-    .od-plus-panel--lead {
+    .bc-plus-panel--lead {
       margin: 0;
       max-width: 520px;
       font-size: 16px;
       line-height: 22px;
-      color: var(--od-release-on-panel-soft);
+      color: var(--bc-release-on-panel-soft);
     }
   }
 </style>

@@ -22,11 +22,11 @@ test('removed welcome keys are gone from every language file', () => {
   }
 });
 
-test('the water gradient ends in --od-water-bottom and the line is --od-trace', () => {
-  assert.match(source, /\.od-welcome-start--water-bottom \{\s*stop-color: var\(--od-water-bottom\);/);
-  assert.match(source, /\.od-welcome-start--water-top \{\s*stop-color: var\(--od-water-top\);/);
-  assert.match(source, /\.od-welcome-start--trace \{[^}]*stroke: var\(--od-trace\);/);
-  assert.doesNotMatch(source, /--od-water-bottom:|#1F2124/i);
+test('the water gradient ends in --bc-water-bottom and the line is --bc-trace', () => {
+  assert.match(source, /\.bc-welcome-start--water-bottom \{\s*stop-color: var\(--bc-water-bottom\);/);
+  assert.match(source, /\.bc-welcome-start--water-top \{\s*stop-color: var\(--bc-water-top\);/);
+  assert.match(source, /\.bc-welcome-start--trace \{[^}]*stroke: var\(--bc-trace\);/);
+  assert.doesNotMatch(source, /--bc-water-bottom:|#1F2124/i);
 });
 
 // Tasks 210 and 211 (the larger brand row and the profile off the screen edges) and the tablet half of tasks
@@ -38,7 +38,7 @@ test('the tablet head of tasks 210 and 211 is gone, the phone and iOS keep what 
   assert.doesNotMatch(source, /od-welcome-start--head["\s]|od-welcome-start--wide-profile|od-welcome-start--brand/);
   assert.doesNotMatch(source, /DecorativeProfile/);
   // The phone's low-window rule keeps its tighter gap.
-  assert.match(source, /@media \(max-width: 767\.98px\) and \(max-height: 820px\) \{\s*\.od-welcome-start--buttons \{\s*gap: 8px;/);
+  assert.match(source, /@media \(max-width: 767\.98px\) and \(max-height: 820px\) \{\s*\.bc-welcome-start--buttons \{\s*gap: 8px;/);
 });
 
 test('tasks 225 and 229: iOS keeps the pill badge after the name, read once as « Benthic, alpha »', () => {
@@ -47,8 +47,8 @@ test('tasks 225 and 229: iOS keeps the pill badge after the name, read once as �
   assert.equal(fr.welcome.alpha, 'Alpha');
   assert.equal(en.welcome.alpha, 'Alpha');
   assert.equal(fr.welcome.brandAlpha, 'Benthic, alpha');
-  assert.match(ios, /<h1 aria-label=\{t\('welcome\.brandAlpha'\)\}>[\s\S]*od-welcome-start--alpha/);
-  assert.match(source, /\.od-welcome-start--alpha \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
+  assert.match(ios, /<h1 aria-label=\{t\('welcome\.brandAlpha'\)\}>[\s\S]*bc-welcome-start--alpha/);
+  assert.match(source, /\.bc-welcome-start--alpha \{[^}]*margin-left: 8px;[^}]*padding: 3px 10px;[^}]*font-size: 14px;[^}]*font-weight: 700;[^}]*letter-spacing: 0\.8px;[^}]*text-transform: uppercase;/);
   const theme = readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8');
-  assert.match(theme, /--od-alpha-badge: #DCE7F3;\s*--od-on-alpha-badge: #114477;/);
+  assert.match(theme, /--bc-alpha-badge: #DCE7F3;\s*--bc-on-alpha-badge: #114477;/);
 });

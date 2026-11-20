@@ -43,7 +43,7 @@
     for (const m of dotMarkers) m.remove();
     dotMarkers = others.map((s) => {
       const node = document.createElement('div');
-      node.className = 'od-desktop-pos-map--other';
+      node.className = 'bc-desktop-pos-map--other';
       node.setAttribute('aria-hidden', 'true');
       const label = document.createElement('span');
       label.textContent = s.name || t('sites.noName');
@@ -62,7 +62,7 @@
     }
     if (!previousMarker) {
       const node = document.createElement('div');
-      node.className = 'od-desktop-pos-map--previous';
+      node.className = 'bc-desktop-pos-map--previous';
       node.setAttribute('aria-hidden', 'true');
       node.innerHTML = `<svg width="28" height="28" viewBox="0 0 28 28"><path d="${CROSS}" /></svg>`;
       previousMarker = new maplibregl.Marker({ element: node }).setLngLat(lngLatOf(shown)).addTo(map);
@@ -150,42 +150,42 @@
   });
 </script>
 
-<div class="od-desktop-pos-map">
-  <div class="od-desktop-pos-map--canvas" bind:this={container}></div>
-  {#if hint}<p class="od-desktop-pos-map--hint">{hint}</p>{/if}
+<div class="bc-desktop-pos-map">
+  <div class="bc-desktop-pos-map--canvas" bind:this={container}></div>
+  {#if hint}<p class="bc-desktop-pos-map--hint">{hint}</p>{/if}
   {#if position || placeOnClick}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="od-desktop-pos-map--cross" onpointerdown={dragCross}>
+    <div class="bc-desktop-pos-map--cross" onpointerdown={dragCross}>
       <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-        <path class="od-desktop-pos-map--halo" d={CROSS} />
-        <path class="od-desktop-pos-map--stroke" d={CROSS} />
+        <path class="bc-desktop-pos-map--halo" d={CROSS} />
+        <path class="bc-desktop-pos-map--stroke" d={CROSS} />
       </svg>
     </div>
   {/if}
-  <div class="od-desktop-pos-map--zoom">
+  <div class="bc-desktop-pos-map--zoom">
     <button type="button" aria-label={t('desktopSites.zoomIn')} onclick={() => map?.zoomIn({ duration: 150 }, { programmatic: true })}><Icon name="plus" size={18} weight={2} /></button>
     <button type="button" aria-label={t('desktopSites.zoomOut')} onclick={() => map?.zoomOut({ duration: 150 }, { programmatic: true })}>
       <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
     </button>
   </div>
-  <p class="od-desktop-pos-map--credits">{t('sites.mapCredits')}</p>
+  <p class="bc-desktop-pos-map--credits">{t('sites.mapCredits')}</p>
 </div>
 
 <style>
   @layer od.components {
-    .od-desktop-pos-map {
+    .bc-desktop-pos-map {
       position: relative;
       width: 100%;
       aspect-ratio: 2.1 / 1;
       overflow: hidden;
       border-radius: 16px;
-      background: var(--od-surface-2);
+      background: var(--bc-surface-2);
     }
-    .od-desktop-pos-map--canvas {
+    .bc-desktop-pos-map--canvas {
       position: absolute;
       inset: 0;
     }
-    .od-desktop-pos-map--hint {
+    .bc-desktop-pos-map--hint {
       position: absolute;
       z-index: 2;
       top: 10px;
@@ -194,15 +194,15 @@
       margin: 0;
       padding: 6px 12px;
       border-radius: 16px;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       font-size: 13px;
       line-height: 18px;
-      color: var(--od-text);
+      color: var(--bc-text);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
       pointer-events: none;
     }
     /* The crosshair on the middle of the map: 28 dp, 2.5 dp blue stroke, white halo. */
-    .od-desktop-pos-map--cross {
+    .bc-desktop-pos-map--cross {
       position: absolute;
       z-index: 1;
       left: 50%;
@@ -215,49 +215,49 @@
       cursor: grab;
       touch-action: none;
     }
-    .od-desktop-pos-map--halo,
-    .od-desktop-pos-map--stroke {
+    .bc-desktop-pos-map--halo,
+    .bc-desktop-pos-map--stroke {
       fill: none;
       stroke-linecap: round;
     }
-    .od-desktop-pos-map--halo {
-      stroke: var(--od-surface);
+    .bc-desktop-pos-map--halo {
+      stroke: var(--bc-surface);
       stroke-width: 5.5;
     }
-    .od-desktop-pos-map--stroke {
-      stroke: var(--od-secondary);
+    .bc-desktop-pos-map--stroke {
+      stroke: var(--bc-secondary);
       stroke-width: 2.5;
     }
-    :global(.od-desktop-pos-map--previous path) {
+    :global(.bc-desktop-pos-map--previous path) {
       fill: none;
-      stroke: var(--od-text-2);
+      stroke: var(--bc-text-2);
       stroke-width: 1.5;
       stroke-dasharray: 3 2.5;
       stroke-linecap: round;
     }
     /* Nearby sites: 6 dp dots with their names. */
-    :global(.od-desktop-pos-map--other) {
+    :global(.bc-desktop-pos-map--other) {
       display: flex;
       align-items: center;
       gap: 4px;
       pointer-events: none;
       white-space: nowrap;
     }
-    :global(.od-desktop-pos-map--other i) {
+    :global(.bc-desktop-pos-map--other i) {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--od-text-2);
+      background: var(--bc-text-2);
     }
-    :global(.od-desktop-pos-map--other span) {
+    :global(.bc-desktop-pos-map--other span) {
       font-size: 11px;
       line-height: 14px;
       font-weight: 500;
-      color: var(--od-text);
-      -webkit-text-stroke: 3px var(--od-surface-2);
+      color: var(--bc-text);
+      -webkit-text-stroke: 3px var(--bc-surface-2);
       paint-order: stroke fill;
     }
-    .od-desktop-pos-map--zoom {
+    .bc-desktop-pos-map--zoom {
       position: absolute;
       z-index: 2;
       right: 8px;
@@ -266,10 +266,10 @@
       flex-direction: column;
       border-radius: 8px;
       overflow: hidden;
-      background: var(--od-surface);
+      background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
     }
-    .od-desktop-pos-map--zoom button {
+    .bc-desktop-pos-map--zoom button {
       display: grid;
       place-items: center;
       width: 32px;
@@ -277,35 +277,35 @@
       padding: 0;
       border: 0;
       background: none;
-      color: var(--od-on-table-selected);
+      color: var(--bc-on-table-selected);
       cursor: pointer;
     }
-    .od-desktop-pos-map--zoom button + button {
-      border-top: 1px solid var(--od-separator);
+    .bc-desktop-pos-map--zoom button + button {
+      border-top: 1px solid var(--bc-separator);
     }
-    .od-desktop-pos-map--credits {
+    .bc-desktop-pos-map--credits {
       position: absolute;
       left: 8px;
       bottom: 4px;
       margin: 0;
       font-size: 10px;
       line-height: 14px;
-      color: var(--od-text-2);
+      color: var(--bc-text-2);
       pointer-events: none;
     }
 
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-desktop-pos-map--zoom button {
+      .bc-desktop-pos-map--zoom button {
         transition: box-shadow 120ms linear;
       }
-      .od-desktop-pos-map--zoom button:not(:disabled):hover {
+      .bc-desktop-pos-map--zoom button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-desktop-pos-map--zoom button {
+      .bc-desktop-pos-map--zoom button {
         transition: none;
       }
     }

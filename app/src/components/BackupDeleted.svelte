@@ -33,24 +33,24 @@
   }
 </script>
 
-<div class="od-backup od-backup-deleted">
-  <h2 class="od-backup--section">{t('backup.deleted.title')}</h2>
+<div class="bc-backup bc-backup-deleted">
+  <h2 class="bc-backup--section">{t('backup.deleted.title')}</h2>
   {#if backup.deleted === null || backup.deletedLoading}
-    <p class="od-backup--empty" role="status">{t('backup.only.deletedSearching')}</p>
+    <p class="bc-backup--empty" role="status">{t('backup.only.deletedSearching')}</p>
   {:else if !backup.deleted.length}
-    <p class="od-backup--empty">{t('backup.deleted.empty')}</p>
+    <p class="bc-backup--empty">{t('backup.deleted.empty')}</p>
   {:else}
-    <div class="od-backup--list" role="list">
+    <div class="bc-backup--list" role="list">
       {#each backup.deleted as d (d.key)}
-        <div class="od-backup--row" role="listitem">
-          <span class="od-backup--texts">
-            <span class="od-backup--row-title">{rowTitle(d)}</span>
-            <span class="od-backup--row-line">{t('backup.deleted.row', { when: formatTimeAgo(isoOfEpoch(d.deletedAt)) })}</span>
+        <div class="bc-backup--row" role="listitem">
+          <span class="bc-backup--texts">
+            <span class="bc-backup--row-title">{rowTitle(d)}</span>
+            <span class="bc-backup--row-line">{t('backup.deleted.row', { when: formatTimeAgo(isoOfEpoch(d.deletedAt)) })}</span>
           </span>
-          <button type="button" class="od-backup--restore" disabled={backup.busy} onclick={() => restore(d)}>{t('backup.deleted.restore')}</button>
+          <button type="button" class="bc-backup--restore" disabled={backup.busy} onclick={() => restore(d)}>{t('backup.deleted.restore')}</button>
         </div>
       {/each}
     </div>
   {/if}
-  <p class="od-backup--note">{t('backup.deleted.note')} {t('backup.media')}</p>
+  <p class="bc-backup--note">{t('backup.deleted.note')} {t('backup.media')}</p>
 </div>

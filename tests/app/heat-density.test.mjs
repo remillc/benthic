@@ -35,8 +35,8 @@ test('the gradient of a site: one dive blue, a few yellow, from about 5 % of the
   assert.equal(spotKind(7, 144), 'few');
   assert.equal(spotKind(8, 144), 'many');
   assert.equal(spotKind(144, 144), 'many');
-  assert.equal(SPOT_GRADIENTS.many[0].colour, '--od-heat-6', 'red at the centre');
-  assert.equal(SPOT_GRADIENTS.few[0].colour, '--od-heat-4', 'yellow at the centre');
-  assert.equal(SPOT_GRADIENTS.one[0].colour, '--od-heat-1', 'blue at the centre');
+  assert.equal(SPOT_GRADIENTS.many[0].colour, '--bc-heat-6', 'red at the centre');
+  assert.equal(SPOT_GRADIENTS.few[0].colour, '--bc-heat-4', 'yellow at the centre');
+  assert.equal(SPOT_GRADIENTS.one[0].colour, '--bc-heat-1', 'blue at the centre');
   for (const g of Object.values(SPOT_GRADIENTS)) assert.equal(g[g.length - 1].alpha, 0, 'transparent at the edge');
 });

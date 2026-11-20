@@ -81,7 +81,7 @@
   }
 </script>
 
-<EditorialPage class="od-create-account"
+<EditorialPage class="bc-create-account"
   helpLink={welcome}
   firstLaunch={welcome}
   title={t('createAccount.title')}
@@ -94,7 +94,7 @@
   actionDisabled={!confirmed && (!email.trim() || !password)}
   onaction={create}
 >
-  <div class="od-create-account--fields">
+  <div class="bc-create-account--fields">
     <AccountField
       label={t(look ? 'firstLaunch.signIn.email' : 'createAccount.email')}
       rowLabel={t('accountStep.emailRow')}
@@ -124,10 +124,10 @@
 
 <style>
   @layer od.components {
-    .od-create-account--fields {
+    .bc-create-account--fields {
       margin: 6px 0 0;
 
-      :global(.od-editorial-page--first-launch) & {
+      :global(.bc-editorial-page--first-launch) & {
         margin: 0;
       }
 

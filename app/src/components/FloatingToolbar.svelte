@@ -203,24 +203,24 @@
 </script>
 
 <div
-  class="od-floating-toolbar"
-  class:od-floating-toolbar--hidden={hidden}
-  class:od-floating-toolbar--clear-fab={clearFab}
+  class="bc-floating-toolbar"
+  class:bc-floating-toolbar--hidden={hidden}
+  class:bc-floating-toolbar--clear-fab={clearFab}
   role="toolbar"
   aria-label={label}
   aria-orientation="horizontal"
   bind:this={root}
   onkeydown={key}
   inert={hidden}
-  style:--od-toolbar-spatial={spatial.css}
-  style:--od-toolbar-spatial-ms="{spatial.ms}ms"
+  style:--bc-toolbar-spatial={spatial.css}
+  style:--bc-toolbar-spatial-ms="{spatial.ms}ms"
 >
   {#each actions as action, i (action.key)}
     <button
       type="button"
-      class="od-floating-toolbar--button"
-      class:od-floating-toolbar--primary={i === 0}
-      class:od-floating-toolbar--pressed={openKey === action.key}
+      class="bc-floating-toolbar--button"
+      class:bc-floating-toolbar--primary={i === 0}
+      class:bc-floating-toolbar--pressed={openKey === action.key}
       aria-label={action.label}
       aria-expanded={action.menu ? openKey === action.key : undefined}
       aria-haspopup={action.menu ? 'menu' : undefined}
@@ -238,24 +238,24 @@
       }}
     >
       <Icon name={action.icon} size={i === 0 ? 22 : 24} weight={action.icon === 'more' ? 4 : 2} />
-      {#if i === 0 && action.text}<span class="od-floating-toolbar--text">{action.text}</span>{/if}
+      {#if i === 0 && action.text}<span class="bc-floating-toolbar--text">{action.text}</span>{/if}
     </button>
   {/each}
   {#if tip}
     <!-- The buttons carry their own accessible names: hidden from screen readers. -->
-    <div class="od-floating-toolbar--tooltip" aria-hidden="true" style:left="{tip.x}px">{tip.text}</div>
+    <div class="bc-floating-toolbar--tooltip" aria-hidden="true" style:left="{tip.x}px">{tip.text}</div>
   {/if}
 </div>
 
 <style>
   @layer od.components {
     /* 64 dp high, 24 dp above the bottom edge; fixed to the page, centred. */
-    .od-floating-toolbar {
+    .bc-floating-toolbar {
       position: absolute;
       z-index: 50;
       left: 0;
       right: 0;
-      bottom: calc(24px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
+      bottom: calc(24px + var(--bc-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
       width: max-content;
       max-width: calc(100% - 16px);
       margin: 0 auto;
@@ -266,32 +266,32 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      background: var(--od-toolbar-container);
-      color: var(--od-toolbar-on-container);
+      background: var(--bc-toolbar-container);
+      color: var(--bc-toolbar-on-container);
       box-shadow: 0 3px 8px rgb(0 0 0 / 0.25);
       transition:
-        transform var(--od-toolbar-spatial-ms) var(--od-toolbar-spatial),
+        transform var(--bc-toolbar-spatial-ms) var(--bc-toolbar-spatial),
         opacity 150ms ease-out,
         visibility 0s;
     }
 
     /* The "+" is 56 dp wide, 24 dp from the edge: 8 dp between it and the toolbar. */
-    .od-floating-toolbar--clear-fab {
+    .bc-floating-toolbar--clear-fab {
       right: calc(88px + var(--f7-safe-area-right, 0px));
       max-width: calc(100% - 96px);
     }
 
-    .od-floating-toolbar--hidden {
-      transform: translateY(calc(100% + 24px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px)));
+    .bc-floating-toolbar--hidden {
+      transform: translateY(calc(100% + 24px + var(--bc-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px)));
       opacity: 0;
       visibility: hidden;
       transition:
-        transform var(--od-toolbar-spatial-ms) var(--od-toolbar-spatial),
+        transform var(--bc-toolbar-spatial-ms) var(--bc-toolbar-spatial),
         opacity 150ms ease-out,
-        visibility 0s linear var(--od-toolbar-spatial-ms);
+        visibility 0s linear var(--bc-toolbar-spatial-ms);
     }
 
-    .od-floating-toolbar--button {
+    .bc-floating-toolbar--button {
       flex: none;
       /* Framework7 gives every button a width of 100 %. */
       width: auto;
@@ -313,37 +313,37 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .od-floating-toolbar--primary {
+    .bc-floating-toolbar--primary {
       padding: 0 20px 0 16px;
-      background: var(--od-toolbar-primary);
-      color: var(--od-toolbar-on-primary);
+      background: var(--bc-toolbar-primary);
+      color: var(--bc-toolbar-on-primary);
     }
 
-    .od-floating-toolbar--text {
+    .bc-floating-toolbar--text {
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .od-floating-toolbar--button:focus-visible {
-      outline: 2px solid var(--od-toolbar-on-container);
+    .bc-floating-toolbar--button:focus-visible {
+      outline: 2px solid var(--bc-toolbar-on-container);
       outline-offset: 2px;
     }
 
     /* The ⋮ while its menu is open: a state layer. */
-    .od-floating-toolbar--button.od-floating-toolbar--pressed:not(.od-floating-toolbar--primary) {
-      background: color-mix(in srgb, var(--od-toolbar-on-container) 16%, transparent);
+    .bc-floating-toolbar--button.bc-floating-toolbar--pressed:not(.bc-floating-toolbar--primary) {
+      background: color-mix(in srgb, var(--bc-toolbar-on-container) 16%, transparent);
     }
 
     /* MD3 plain tooltip: inverse surface, 12 sp, 4 dp corners, 4 dp above the toolbar. */
-    .od-floating-toolbar--tooltip {
+    .bc-floating-toolbar--tooltip {
       position: absolute;
       bottom: calc(100% + 4px);
       transform: translateX(-50%);
       max-width: 200px;
       padding: 4px 8px;
       border-radius: 4px;
-      background: var(--od-inverse-surface);
-      color: var(--od-inverse-on-surface);
+      background: var(--bc-inverse-surface);
+      color: var(--bc-inverse-on-surface);
       font-size: 12px;
       line-height: 16px;
       text-align: center;
@@ -351,19 +351,19 @@
       pointer-events: none;
     }
 
-    .od-floating-toolbar--primary:focus-visible {
+    .bc-floating-toolbar--primary:focus-visible {
       outline-offset: 3px;
     }
 
     /* The content never ends under the toolbar. */
-    :global(.page:has(.od-floating-toolbar) .page-content) {
-      padding-bottom: calc(104px + var(--od-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
+    :global(.page:has(.bc-floating-toolbar) .page-content) {
+      padding-bottom: calc(104px + var(--bc-bottom-nav-room, 0px) + var(--f7-safe-area-bottom, 0px));
     }
 
     /* "Remove animations": it appears and disappears at once. */
     @media (prefers-reduced-motion: reduce) {
-      .od-floating-toolbar,
-      .od-floating-toolbar--hidden {
+      .bc-floating-toolbar,
+      .bc-floating-toolbar--hidden {
         transition: none;
       }
     }
@@ -371,15 +371,15 @@
 
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
-      .od-floating-toolbar--button {
+      .bc-floating-toolbar--button {
         transition: box-shadow 120ms linear;
       }
-      .od-floating-toolbar--button:not(:disabled):hover {
+      .bc-floating-toolbar--button:not(:disabled):hover {
         box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .od-floating-toolbar--button {
+      .bc-floating-toolbar--button {
         transition: none;
       }
     }
