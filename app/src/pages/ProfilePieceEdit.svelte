@@ -448,7 +448,7 @@
   {/if}
 
   <div class="bc-piece-edit--fields">
-    {#if type === 'other'}
+    {#if type === 'other' && id}
       {#each fields.before as f (f.key)}{@render detail(f)}{/each}
     {/if}
     {#if namedByHand}

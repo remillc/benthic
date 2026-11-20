@@ -26,7 +26,7 @@ Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur �
 | Coupe-ligne | Brand, model |
 | Couteau | Brand, model |
 | Boussole | Brand, model |
-| Autre | Type name (free text), piece name, photo |
+| Autre | Piece name, photo; type name (free text) on existing pieces only |
 
 Suggested maintenance reminders by type: Détendeur every 2 years or 100 dives; Bouteille visual inspection every year and hydrostatic test every 5 years; Veste every year; Combinaison (Étanche only) the seals every year; Ordinateur none (a battery reminder waits for after the launch, `docs/POST-LAUNCH.md` #104); the other types none.
 

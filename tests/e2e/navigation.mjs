@@ -1641,6 +1641,55 @@ async function gearTypeDialogFlows(expect) {
       return { found: !!piece, type: piece?.type, serial: piece?.serial, suitType: piece?.details?.suitType };
     }, `Dialog ${label}`);
     expect(`${label}: the piece saves its type details`, { found: true, type: 'suit', serial: 'S-123', suitType: 'dry' }, saved);
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+    await sleep(1000);
+    await selectType('other');
+    const otherFields = await tab.run(async (name) => {
+      const { t } = await import('/src/lib/i18n.js');
+      const page = document.querySelector('.page-current.bc-piece-edit');
+      const labels = [...page.querySelectorAll('label')];
+      const nameLabel = labels.find((element) => element.textContent.trim() === t('gear.pieceNew.otherName'));
+      if (!nameLabel) throw new Error('Missing other piece name');
+      const input = document.getElementById(nameLabel.htmlFor);
+      input.value = name;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return {
+        typeName: labels.some((element) => element.textContent.trim() === t('gear.field.typeName')),
+        photo: !!page.querySelector('[data-testid="piece-picture"]'),
+        name: !!input,
+      };
+    }, `Other ${label}`);
+    expect(`${label}: a new Other piece has a name and photo but no type name field`, { typeName: false, photo: true, name: true }, otherFields);
+    await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+    await sleep(900);
+    const other = await tab.run(async (name) => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const item = gear.pieces.find((piece) => piece.type === 'other' && piece.name === name);
+      return item && { id: item.id, name: item.name, typeName: item.details?.typeName ?? '' };
+    }, `Other ${label}`);
+    expect(`${label}: the Other piece saves its name without a type name`, { name: `Other ${label}`, typeName: '' }, other ? { name: other.name, typeName: other.typeName } : {});
+    if (label === 'Android tablet' && other) {
+      await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}/edit`); }, other.id);
+      await sleep(1000);
+      const editType = await tab.run(async () => {
+        const { t } = await import('/src/lib/i18n.js');
+        const page = document.querySelector('.page-current.bc-piece-edit');
+        const fieldLabel = [...page.querySelectorAll('label')].find((element) => element.textContent.trim() === t('gear.field.typeName'));
+        if (!fieldLabel) return false;
+        const input = document.getElementById(fieldLabel.htmlFor);
+        input.value = 'Repair kit';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+      });
+      expect('tablet: an existing Other piece keeps its type name field', { present: true }, { present: editType });
+      await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+      await sleep(900);
+      const savedType = await tab.run(async (id) => {
+        const { gear } = await import('/src/lib/inventory.svelte.js');
+        return gear.pieces.find((piece) => piece.id === id)?.details?.typeName;
+      }, other.id);
+      expect('tablet: an existing Other piece keeps its type name when saved', { typeName: 'Repair kit' }, { typeName: savedType });
+    }
     if (label === 'Android tablet') {
       for (const type of ['knife', 'diveKnife', 'compass']) {
         await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
