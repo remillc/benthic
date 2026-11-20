@@ -43,6 +43,8 @@ Moved to System design, section 7.
 
 ## 4. Account, dive detail, editing, settings, trip and sites
 
+- **Certificates and documents** (`/profile/certs/`): the extended Add button uses the primary action colour and floats at the bottom right; it is hidden when the inventory is read-only. On Android it uses the small Material 3 Expressive extended FAB: 56 dp high, 16 dp side padding, 24 dp icon and 8 dp between icon and label. The empty state is centred vertically in the available panel. The list has no explanatory note about reproducing cards.
+
 The shared components are in System design, section 8.
 
 **Manual synchronisation (decided on 6 November 2026).** When "Sync automatically" is turned off in Account, the app behaves like Subsurface-mobile: changes are saved in the local copy, nothing is sent or fetched, and the full exchange (fetch, merge, send) only happens on "Sync". The setting belongs to the device. In this mode, `<SyncStatus>` says so at all times, at the top of the Logbook and at the bottom of the side menu: "Manual sync: 3 changes not sent", in `--od-pending`; the side menu then offers the "Sync" button; the Account screen adds a "Changes not sent" row, and the explanation under the switch becomes "Off: changes stay on this device, and those from other devices do not arrive, until you sync".

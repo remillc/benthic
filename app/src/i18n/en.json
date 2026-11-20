@@ -8,7 +8,6 @@
       "expired": "Expired"
     },
     "add": "Add",
-    "note": "Cards are reproduced from your photos or scans. Without a photo, the app draws one with the details entered.",
     "empty": "No documents",
     "emptyText": "Add your certifications, your insurance and your medical certificate: they stay encrypted and available without a network.",
     "back": "Back",
@@ -2731,6 +2730,8 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Profile on tablets: controls stay clear of the system bars.",
+      "Certificates and documents: Add uses the main action colour and floats at the bottom right on tablets and desktop; the card reproduction note has been removed.",
+      "Certificates and documents: the empty state is centred in the panel.",
       "Logbook: the menu can export the whole logbook in the chosen format.",
       "Dive detail on desktop: Equipment shows each dive computer’s photo when available.",
       "Settings: closing choice menus no longer causes an error.",
