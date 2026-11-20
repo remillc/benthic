@@ -395,16 +395,17 @@
     return dives ? t('conflict.stoppedDives', { n: dives }) : t('conflict.stopped');
   });
 
-  /** "Exporter au format…" open (selection mode). */
   let exporting = $state(false);
+  let exportWhole = $state(false);
 
   /**
-   * The checked dives exported, then the system's share sheet; the selection is kept.
+   * Export the whole logbook or the checked dives, then open the system's share sheet.
    * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF)
    */
-  async function exportChecked(format, anonymize, showName = true) {
+  async function exportFromSheet(format, anonymize, showName = true) {
     try {
-      await exportDives(checkedIds, format, anonymize, logbook.prefs, checkedIds.length > 0 && checkedIds.length === logbook.dives.length, showName);
+      const ids = exportWhole ? logbook.dives.map((d) => d.id) : checkedIds;
+      await exportDives(ids, format, anonymize, logbook.prefs, ids.length > 0 && ids.length === logbook.dives.length, showName);
     } catch (e) {
       // Closing the system's share sheet without choosing is not an error.
       if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
@@ -1514,6 +1515,7 @@
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
         <MenuItem icon="computer" text={t('settings.logbookComputers.title')} link="/settings/computers/" />
+        <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={!logbook.dives.length ? t('welcomeSteps.menuExportNone') : ''} disabled={logbook.loading || !!logbook.error || !logbook.dives.length} onclick={() => ((exportWhole = true), (exporting = true))} />
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
       {/if}
@@ -1550,7 +1552,7 @@
   </Popover>
 
   {#if exporting}
-    <ExportSheet count={checkedCount} onexport={exportChecked} onclose={() => (exporting = false)} />
+    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}

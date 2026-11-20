@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1002,8 +1002,71 @@ async function desktopFlows() {
   tab.ws.close();
 }
 
+async function exportFlows(expect) {
+  for (const desktop of [false, true]) {
+    const tab = await openTab(desktop ? 1400 : 390, desktop ? 900 : 844, !desktop, false, desktop, { theme: 'md' });
+    const ids = await tab.run(async () => {
+      const { logbook } = await import('/src/lib/logbook.svelte.js');
+      const { filter } = await import('/src/lib/filter.svelte.js');
+      const ids = logbook.dives.map((d) => d.id);
+      filter.ids = new Set(ids.slice(0, 1));
+      window.__exportCalls = [];
+      const core = window.odDesktop.core;
+      window.odDesktop.core = (method, args) => {
+        if (method === 'exportDives') {
+          window.__exportCalls.push(args);
+          return Promise.resolve({});
+        }
+        return core(method, args);
+      };
+      window.odDesktop.saveAs = async () => ({ saved: false });
+      Object.defineProperty(navigator, 'share', { configurable: true, value: async () => {} });
+      return ids;
+    });
+    await sleep(500);
+    await tab.run((desktop) => {
+      const button = document.querySelector(desktop ? '.od-desktop-logbook--bar .od-desktop-logbook--icon-button[aria-haspopup="menu"]' : '.page-current [data-popover=".od-logbook-menu"], .page-master [data-popover=".od-logbook-menu"]');
+      if (!button) throw new Error('logbook menu button missing');
+      button.click();
+    }, desktop);
+    await sleep(500);
+    await tab.run((desktop) => {
+      const menu = document.querySelector(desktop ? '.od-context-menu' : '.od-logbook-menu');
+      const item = [...menu.querySelectorAll('a, button')].find((el) => /Exporter le carnet|Export the logbook/.test(el.textContent));
+      if (!item) throw new Error('whole logbook export missing');
+      item.click();
+    }, desktop);
+    await sleep(600);
+    const dialog = desktop ? '.od-desktop-export' : '.od-export-sheet';
+    const state = await tab.run((dialog, count) => {
+      const el = document.querySelector(dialog);
+      if (!el) return { shown: false, formatCount: 0, title: false, allSelected: false };
+      const groups = el.querySelectorAll('[role="radiogroup"]');
+      const scope = groups.length > 1 ? groups[0] : null;
+      return {
+        shown: true,
+        formatCount: groups[groups.length - 1].querySelectorAll('[role="radio"], input[type="radio"]').length,
+        title: el.textContent.includes(String(count)),
+        allSelected: !scope || scope.querySelector('[role="radio"]:last-child')?.getAttribute('aria-checked') === 'true',
+      };
+    }, dialog, ids.length);
+    expect(`${desktop ? 'desktop' : 'phone'} export choices`, { shown: true, formatCount: 5, title: true, allSelected: true }, state);
+    await tab.run((dialog) => {
+      const groups = document.querySelector(dialog).querySelectorAll('[role="radiogroup"]');
+      groups[groups.length - 1].querySelectorAll('[role="radio"]')[1].click();
+      const button = [...document.querySelector(dialog).querySelectorAll('button')].find((b) => /^Exporter|^Export/.test(b.textContent.trim()) && b.getAttribute('role') !== 'radio');
+      if (!button) throw new Error('export confirmation missing');
+      button.click();
+    }, dialog);
+    await sleep(800);
+    const call = await tab.run(() => window.__exportCalls[0] ?? null);
+    expect(`${desktop ? 'desktop' : 'phone'} exports every dive as UDDF`, { ids: JSON.stringify(ids), format: 'uddf' }, { ids: JSON.stringify(call?.ids), format: call?.format });
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1013,6 +1076,7 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
+  if (args.has('--export-only') || fixed) await exportFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

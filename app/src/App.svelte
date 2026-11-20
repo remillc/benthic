@@ -43,6 +43,8 @@
   import AccountManageDialog from './components/AccountManageDialog.svelte';
   import BackupDialog from './components/BackupDialog.svelte';
   import SyncFailureSheet from './components/SyncFailureSheet.svelte';
+  import SharedSitesTerms from './components/SharedSitesTerms.svelte';
+  import { startSharedSites } from './lib/shared-sites.svelte.js';
   import ConflictHost from './components/ConflictHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import ValidationConfirm from './components/ValidationConfirm.svelte';
@@ -259,6 +261,7 @@
     { path: '/sites/choose', ...lazy(() => import('./pages/SiteChoose.svelte')) },
     { path: '/sites/unplaced/', ...lazy(() => import('./pages/SitesUnplaced.svelte')) },
     { path: '/sites/new', ...lazy(() => import('./pages/SiteEdit.svelte')) },
+    { path: '/sites/base/:id', ...lazy(() => import('./pages/SharedSiteSheet.svelte')) },
     { path: '/sites/:uuid', ...lazy(() => import('./pages/SiteSheet.svelte')) },
     { path: '/sites/:uuid/edit', ...lazy(() => import('./pages/SiteEdit.svelte')) },
     { path: '/statistics/', component: Statistics },
@@ -444,6 +447,8 @@
         .then((m) => m.loadInventory())
         .catch((e) => console.error('Inventory', e));
       // The same for the documents that expire (task 2026-11-19-309).
+      // The shared map of dive sites (task 2026-11-19-315): the terms once per version, then the account's sites sent when they change.
+      startSharedSites();
       import('./lib/document-notify.js')
         .then((m) => m.startDocumentNotifications())
         .catch((e) => console.error('Documents', e));
@@ -481,6 +486,7 @@
   <AccountManageDialog />
   {#if layout.desktop}<BackupDialog />{/if}
   <SyncFailureSheet />
+  {#if isRelease}<SharedSitesTerms />{/if}
   <ErrorReportHost />
   <ConflictHost />
   <QrReceived />

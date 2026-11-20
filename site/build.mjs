@@ -4,7 +4,8 @@
 //   build/site/index.html          /           sends the visitor to their language
 //   build/site/en/index.html       /en/        home page
 //   build/site/en/privacy.html     /en/privacy privacy policy
-//   build/site/fr/...              /fr/, /fr/privacy
+//   build/site/en/terms.html       /en/terms   Benthic+ terms of use
+//   build/site/fr/...              /fr/, /fr/privacy, /fr/terms
 //   build/site/_redirects          the former addresses of the policy; the app's links to open.html
 //   build/site/_headers            application/json for the two .well-known files
 //   build/site/open.html           the page of an app link opened without the app (fr and en)
@@ -12,7 +13,7 @@
 //   build/site/assets/             the app's body font and logo
 // Cloudflare Pages serves page.html at /page and folder/index.html at
 // /folder/: a page (a resource) has no trailing slash, a collection has one.
-// The policy is app/public/privacy/<language>.html and the tagline comes from
+// The policy is app/public/privacy/<language>.html, the terms app/public/terms/<language>.html, and the tagline comes from
 // the app's translations: one source for the app and the site.
 // Run from anywhere: node site/build.mjs
 import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -54,7 +55,12 @@ const languages = {
       heading: 'Privacy policy',
       description: 'Which data the Benthic dive log uses, where it goes and how to erase it.',
     },
-    home: { title: 'Benthic, a free dive log', privacyLink: 'Privacy policy', sourceLink: 'Source code' },
+    terms: {
+      title: 'Benthic+ terms of use',
+      heading: 'Benthic+ terms of use',
+      description: 'The terms of the Benthic+ subscription: your logbook, your encrypted data and the shared map of dive sites.',
+    },
+    home: { title: 'Benthic, a free dive log', privacyLink: 'Privacy policy', termsLink: 'Benthic+ terms of use', sourceLink: 'Source code' },
     open: {
       title: 'Open in Benthic',
       heading: 'This link opens in the Benthic app',
@@ -70,7 +76,12 @@ const languages = {
       heading: 'Politique de confidentialité',
       description: 'Les données qu’utilise le carnet de plongée Benthic, où elles vont et comment les effacer.',
     },
-    home: { title: 'Benthic, un carnet de plongée libre', privacyLink: 'Politique de confidentialité', sourceLink: 'Code source' },
+    terms: {
+      title: 'Conditions d’utilisation de Benthic+',
+      heading: 'Conditions d’utilisation de Benthic+',
+      description: 'Les conditions de l’abonnement Benthic+ : votre carnet, vos données chiffrées et la carte commune des sites de plongée.',
+    },
+    home: { title: 'Benthic, un carnet de plongée libre', privacyLink: 'Politique de confidentialité', termsLink: 'Conditions d’utilisation de Benthic+', sourceLink: 'Code source' },
     open: {
       title: 'Ouvrir dans Benthic',
       heading: 'Ce lien s’ouvre dans l’application Benthic',
@@ -87,7 +98,7 @@ const content = (html) => html.replace(/^\s*<!--[\s\S]*?-->\s*/, '').trim();
 
 /**
  * @param {string} lang
- * @param {string} tail the page's address after the language: '' or 'privacy'
+ * @param {string} tail the page's address after the language: '', 'privacy' or 'terms'
  * @param {{ title: string, description: string, heading?: string }} p
  * @param {string} body
  */
@@ -153,12 +164,15 @@ await mkdir(join(out, 'assets'), { recursive: true });
 for (const [lang, l] of Object.entries(languages)) {
   const policy = await readFile(join(root, 'app', 'public', 'privacy', `${lang}.html`), 'utf8');
   await write(`${lang}/privacy.html`, page(lang, 'privacy', l.privacy, content(policy)));
+  const terms = await readFile(join(root, 'app', 'public', 'terms', `${lang}.html`), 'utf8');
+  await write(`${lang}/terms.html`, page(lang, 'terms', l.terms, content(terms)));
   const app = JSON.parse(await readFile(join(root, 'app', 'src', 'i18n', `${lang}.json`), 'utf8'));
   const tagline = app.about.tagline;
   const home = `<h1>Benthic</h1>
 <p>${tagline}</p>
 <ul>
   <li><a href="/${lang}/privacy">${l.home.privacyLink}</a></li>
+  <li><a href="/${lang}/terms">${l.home.termsLink}</a></li>
   <li><a href="${SOURCE}">${l.home.sourceLink}</a></li>
 </ul>`;
   await write(`${lang}/index.html`, page(lang, '', { title: l.home.title, description: tagline }, home));

@@ -7,6 +7,9 @@
   // (« {pays} · à {distance} · {n} plongées »), else the most recently dived first.
   // Typing filters on the name and the country. A site is chosen and the screen goes
   // back. On iPhone, a navigation bar with the title, and the search field under it.
+  // A signed-in Benthic+ account also sees « Dans la carte commune » (task 2026-11-19-315, point 5;
+  // choisir-site-commun-android.dc.html): base sites near the phone that the logbook does not have; choosing one adds
+  // it to the diver's sites (lib/shared-sites.svelte.js, addBaseSite) and gives it back like any site.
   import { onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { OpenDivesCore } from 'opendives-core';
@@ -20,6 +23,12 @@
   import { matchesSite } from '../lib/site-search.js';
   import { distanceParts, sitesInChoiceOrder } from '../lib/site-distance.js';
   import { currentPosition, deliverSite, forgetSiteChoice } from '../lib/site-choice.js';
+  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { addBaseSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+  import { CHOOSE_RADIUS_M, inYourSites } from '../lib/shared-sites.js';
+  import { baseDivesText, distanceText as awayText } from '../lib/shared-sites-format.js';
+  import { showSnackbar } from '../lib/snackbar.js';
+  import { connection } from '../lib/online.svelte.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -59,6 +68,51 @@
     handedOver = true;
     deliverSite({ uuid: site.uuid, name: site.name });
     f7router.back();
+  }
+
+  /** The base sites near the phone, without those the logbook has. */
+  let commonRows = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let commonTimer;
+  let commonAsk = 0;
+  $effect(() => {
+    const p = position;
+    const q = query;
+    clearTimeout(commonTimer);
+    if (!p || !odplusAccount.signedIn || !connection.online) {
+      commonRows = [];
+      return;
+    }
+    commonTimer = setTimeout(async () => {
+      const ask = ++commonAsk;
+      try {
+        if (!sharedSites.linksLoaded) await loadLinks();
+        const near = await withSession((api, token) => api.nearby(token, { lat: p.latUdeg / 1e6, lon: p.lonUdeg / 1e6, radiusM: CHOOSE_RADIUS_M, limit: 10, q }));
+        if (ask === commonAsk) commonRows = near.filter((b) => !inYourSites(b.id, sharedSites.links));
+      } catch {
+        // Not a subscriber, or the server does not answer: the section stays hidden.
+        if (ask === commonAsk) commonRows = [];
+      }
+    }, q ? 300 : 0);
+  });
+
+  /** « Carte commune · à 1,4 mi · 87 plongées ». @param {import('../lib/shared-sites.js').BaseSite} b */
+  const commonLine = (b) => [t('sharedSites.commonMapButton'), b.distanceM !== undefined ? awayText(b.distanceM, logbook.prefs) : '', baseDivesText(b)].filter(Boolean).join(' · ');
+
+  /** @param {import('../lib/shared-sites.js').BaseSite} b */
+  async function chooseBase(b) {
+    if (creating) return;
+    creating = true;
+    try {
+      const uuid = await addBaseSite(b.id);
+      handedOver = true;
+      deliverSite({ uuid, name: b.name });
+      f7router.back();
+    } catch {
+      showSnackbar(t('sharedSites.card.addFailed'));
+    } finally {
+      creating = false;
+    }
   }
 
   /** « Nouveau site » at the phone's position, in this screen's place: its site is given back. */
@@ -118,6 +172,23 @@
       </li>
     {/each}
   </ul>
+  {#if commonRows.length}
+    <p class="od-site-choose--count od-site-choose--common-title"><Icon name="globe" size={18} />{t('sharedSites.chooseSection')}</p>
+    <ul class="od-site-choose--surface od-site-choose--list" role="list" aria-label={t('sharedSites.listLabel')}>
+      {#each commonRows as b (b.id)}
+        <li>
+          <button type="button" class="od-site-choose--row" disabled={creating} onclick={() => chooseBase(b)}>
+            <span class="od-site-choose--common-dot" aria-hidden="true"></span>
+            <span class="od-site-choose--texts">
+              <span class="od-site-choose--name">{b.name}</span>
+              <span class="od-site-choose--line od-value">{commonLine(b)}</span>
+            </span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+    <p class="od-site-choose--note">{t('sharedSites.chooseNote')}</p>
+  {/if}
   <p class="od-site-choose--note">{t('sites.chooseNote')}</p>
 </Page>
 
@@ -240,6 +311,23 @@
       font-size: 14px;
       line-height: 20px;
       color: var(--od-text-2);
+    }
+
+    .od-site-choose--common-title {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--od-shared-site);
+      font-weight: 600;
+    }
+    .od-site-choose--common-dot {
+      flex: none;
+      width: 12px;
+      height: 12px;
+      margin: 0 5px;
+      border-radius: 6px;
+      background: var(--od-shared-site);
     }
 
     .od-site-choose--note {

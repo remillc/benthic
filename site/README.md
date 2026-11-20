@@ -1,8 +1,8 @@
 # Public web pages
 
-The pages of benthicdivelog.app, one folder per language: a home page and the privacy policy.
+The pages of benthicdivelog.app, one folder per language: a home page, the privacy policy and the Benthic+ terms of use.
 
-- **Source:** `app/public/privacy/en.html` and `fr.html`. The app shows the same files in About → Privacy policy, so the app and the web page never differ. Edit only these files.
+- **Sources:** `app/public/privacy/en.html` and `fr.html` (the privacy policy; the app shows them in About → Privacy policy), `app/public/terms/en.html` and `fr.html` (the Benthic+ terms of use; the app shows them from « Avant de commencer »). The app and the web pages never differ: edit only these files.
 - **Build:** `node site/build.mjs` writes `build/site/` (not in git): the pages, the app's body font and logo, `site.css`, and `_redirects`.
 - **Adding a language:** add it to `languages` in `site/build.mjs`; the app must have its policy and translation files.
 
@@ -11,6 +11,7 @@ The pages of benthicdivelog.app, one folder per language: a home page and the pr
 | `build/site/index.html` | `https://benthicdivelog.app/`, sends the visitor to their language |
 | `build/site/en/index.html`, `fr/index.html` | `https://benthicdivelog.app/en/`, `https://benthicdivelog.app/fr/` |
 | `build/site/en/privacy.html`, `fr/privacy.html` | `https://benthicdivelog.app/en/privacy`, `https://benthicdivelog.app/fr/privacy` |
+| `build/site/en/terms.html`, `fr/terms.html` | `https://benthicdivelog.app/en/terms`, `https://benthicdivelog.app/fr/terms` |
 
 The former addresses `/privacy` and `/privacy/fr` are redirected to these (`_redirects`, 301).
 

@@ -3,7 +3,8 @@
   // The card of a selected pin (od-map-site-card, task 2026-11-14-150): over the bottom of
   // a map, the site's name, « {pays} · {n} plongées, la dernière le {date} », its maximum
   // depth and a chevron; it opens the site's sheet. Back closes it (lib/back-button.js
-  // sends od-cancel to it). On the Sites map and, up close, on the heat map (task 155).
+  // sends od-cancel to it). On the Sites map and, up close, on the heat map (task 155). A site of the shared map
+  // (task 2026-11-19-315) gives its own line (« Nouvelle-Zélande · carte commune · 214 plongées ») and no depth.
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { formatDepth, formatDate } from '../lib/format.js';
@@ -12,15 +13,16 @@
   /**
    * @type {{
    *   site: { name: string, country: string, dives: number, lastDate: string, maxDepthMm: number },
+   *   line?: string,
    *   onopen: () => void,
    *   onclose: () => void,
    * }}
    */
-  let { site, onopen, onclose } = $props();
+  let { site, line = '', onopen, onclose } = $props();
 
   /** « Northern Arch, Nouvelle-Zélande, 1 plongée. Ouvrir la fiche du site ». */
   const label = $derived(
-    `${[site.name || t('sites.noName'), site.country, t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`,
+    `${line ? [site.name, line].join(', ') : [site.name || t('sites.noName'), site.country, t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`,
   );
 
   /** Back closes the card. @param {HTMLElement} node */
@@ -34,9 +36,9 @@
 <button type="button" class="od-map-site-card" aria-label={label} onclick={onopen} use:cancelable>
   <span class="od-map-site-card--texts">
     <span class="od-map-site-card--name">{site.name || t('sites.noName')}</span>
-    <span class="od-map-site-card--line">{[site.country, t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
+    <span class="od-map-site-card--line">{line || [site.country, t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
   </span>
-  {#if site.maxDepthMm}<span class="od-map-site-card--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
+  {#if site.maxDepthMm && !line}<span class="od-map-site-card--depth od-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
   <Icon name="chevron" size={20} />
 </button>
 

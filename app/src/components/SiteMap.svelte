@@ -50,7 +50,13 @@
    *   fullscreenLabel?: string,
    *   closerInFullScreen?: boolean,
    *   pinsFromZoom?: number,
+   *   base?: { sites: { id: string, name: string, lat: number, lon: number, mine: boolean, label: string }[], clusters: { lat: number, lon: number, count: number }[] }|null,
+   *   baseSelected?: string|null,
+   *   onbaseselect?: (id: string) => void,
    * }}
+   * base: the shared map of dive sites (task 2026-11-19-315): its sites as teal dots (a base site the diver already has is
+   *   not drawn: the diver's own pin is there) and its crowded cells as numbered teal clusters; a tap on a cluster zooms in.
+   * baseSelected: the base site whose dot is selected; onbaseselect: a tap on a dot.
    * pinsFromZoom: the pins show only from this zoom, and the heat fades out over the zoom
    *   level before it (the heat map up close, task 2026-11-14-155); 0: always.
    * heat: the dives per site drawn as a density over the map (« Où je plonge le plus »,
@@ -101,6 +107,9 @@
     fullscreenLabel = '',
     closerInFullScreen = false,
     pinsFromZoom = 0,
+    base = null,
+    baseSelected = null,
+    onbaseselect,
   } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
@@ -393,6 +402,57 @@
     });
   }
 
+  /** @type {import('maplibre-gl').Marker[]} */
+  let baseMarkers = [];
+
+  /** The shared map's dots (16 dp) and clusters (32 dp, the count inside), teal with a white ring. */
+  function drawBase() {
+    if (!map) return;
+    for (const m of baseMarkers) m.remove();
+    baseMarkers = [];
+    if (!base) return;
+    const m = map;
+    for (const c of base.clusters) {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'od-site-map--base od-site-map--base-cluster';
+      el.textContent = numbers.format(c.count);
+      el.setAttribute('aria-label', t('sharedSites.clusterLabel', { n: c.count }));
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        m.easeTo({ center: [c.lon, c.lat], zoom: Math.min(m.getZoom() + 2, 16) });
+      });
+      baseMarkers.push(new maplibregl.Marker({ element: el }).setLngLat([c.lon, c.lat]).addTo(m));
+    }
+    for (const s of base.sites) {
+      if (s.mine) continue;
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'od-site-map--base od-site-map--base-site';
+      el.classList.toggle('od-site-map--base-selected', s.id === baseSelected);
+      el.dataset.baseId = s.id;
+      el.setAttribute('aria-label', s.label);
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onbaseselect?.(s.id);
+      });
+      baseMarkers.push(new maplibregl.Marker({ element: el }).setLngLat([s.lon, s.lat]).addTo(m));
+    }
+  }
+
+  $effect(() => {
+    base;
+    if (map?.loaded()) drawBase();
+  });
+
+  $effect(() => {
+    const id = baseSelected;
+    for (const m of baseMarkers) {
+      const el = m.getElement();
+      el.classList.toggle('od-site-map--base-selected', !!id && el.dataset.baseId === id);
+    }
+  });
+
   /** During a search, the markers that do not match fade to 30 %. */
   function dim() {
     for (const { uuid, marker } of markers) marker.getElement().classList.toggle('od-site-map--dim', !!matching && !matching.has(uuid));
@@ -464,6 +524,7 @@
       showLabelsInLanguage(m);
       drawSites();
       drawPoints();
+      drawBase();
       fit();
       readBounds();
       drawHeat();
@@ -484,7 +545,7 @@
     });
     // A tap on the map, not on a pin (a pin's tap stops at the pin).
     m.on('click', (e) => {
-      if (/** @type {HTMLElement|null} */ (e.originalEvent?.target)?.closest?.('.od-site-map--site-marker')) return;
+      if (/** @type {HTMLElement|null} */ (e.originalEvent?.target)?.closest?.('.od-site-map--site-marker, .od-site-map--base')) return;
       onmapclick?.();
     });
     if (editable) {
@@ -773,6 +834,40 @@
       pointer-events: none;
     }
 
+    /* The shared map (task 2026-11-19-315): a dot per base site, a numbered disc per crowded cell. */
+    :global(.od-site-map--base) {
+      box-sizing: border-box;
+      padding: 0;
+      border: 2px solid var(--od-on-shared-site);
+      border-radius: 50%;
+      background: var(--od-shared-site);
+      color: var(--od-on-shared-site);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+      cursor: pointer;
+    }
+    :global(.od-site-map--base-site) {
+      width: 16px;
+      height: 16px;
+    }
+    /* A 48 dp target around the 16 dp dot (the marker is positioned by MapLibre). */
+    :global(.od-site-map--base-site)::before {
+      content: '';
+      position: absolute;
+      inset: -16px;
+      border-radius: 50%;
+    }
+    :global(.od-site-map--base-selected) {
+      transform: scale(1.4);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--od-shared-site) 35%, transparent);
+    }
+    :global(.od-site-map--base-cluster) {
+      min-width: 32px;
+      height: 32px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
     :global(.od-site-map--point) {
       box-sizing: border-box;
       width: 22px;

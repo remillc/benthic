@@ -2730,6 +2730,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: the menu can export the whole logbook in the chosen format.",
       "Account (free version): the Account button stays, with a silhouette. Its sheet shows the logbook on this device, “Subscribe”, “Already subscribed? Sign in” and the Benthic+ rows that open the offer. With an Benthic+ account, “My diver profile” carries the Benthic+ chip and, when a piece is overdue for maintenance, a red badge and the line “Maintenance: 1 piece overdue”; the sheet’s cross is on the right. “Manage the account” opens a screen (a two-column dialog on a tablet and on the desktop): e-mail and sign-in method, subscription with “Manage in Google Play” (or the App Store), a 10 GB photo and video space, “Download my data”, “Sign out” and “Delete the account” after a confirmation. On Android, Back closes the account sheet. The Benthic+ offer has “Already subscribed? Sign in” (except right after signing in), and “Continue without an account” is centred under the three buttons on a tablet and on the desktop. The “Benthic” name on an Benthic+ account’s sheet is followed by a small round “+” chip. On a tablet, “Subscribe” and the two rows with the chip open the Benthic+ offer in two panes: the blue panel on the left, the five tiles, the price and “Subscribe” on the right.",
       "Logbook: the search box moves up a little, further from the header wave.",
       "Start: the launch screen now stays until the first real screen is drawn (the first launch on a first start, the logbook otherwise), with a short fade, and the first launch no longer appears after an empty logbook. The first screen is laid out once, with the real height of the status bar, so nothing jumps.",
@@ -6617,6 +6618,82 @@
       "medicalText": "Valid until {date}",
       "certificate": "Most recent certificate",
       "back": "Back to the emergency sheet"
+    }
+  },
+  "sharedSites": {
+    "commonMap": "shared map",
+    "show": "Show",
+    "mine": "My sites",
+    "commonMapButton": "Shared map",
+    "listLabel": "Sites of the shared map",
+    "clusterLabel": {
+      "one": "{n} site of the shared map. Zoom in",
+      "other": "{n} sites of the shared map. Zoom in"
+    },
+    "areaCount": {
+      "one": "{n} site of the shared map in this area",
+      "other": "{n} sites of the shared map in this area"
+    },
+    "fewDives": "Fewer than 5 dives",
+    "inYourSites": "In your sites",
+    "offline": "Offline: the shared map comes back with the network.",
+    "failed": "The shared map does not answer. Try again later.",
+    "retry": "Try again",
+    "offerText": "The shared map of dive sites is part of Benthic+.",
+    "offerButton": "Discover Benthic+",
+    "chooseSection": "On the shared map",
+    "chooseNote": "Choosing a site of the shared map adds it to your sites.",
+    "suggest": "The shared map already has a site {distance} away: {name}, {dives}.",
+    "terms": {
+      "title": "Before you start",
+      "lead": "The Benthic+ terms of use, in short.",
+      "yoursTitle": "Your logbook is yours",
+      "yoursText": "Export it at any time. Cancel whenever you want.",
+      "encryptedTitle": "Your data is encrypted",
+      "encryptedText": "Profile, health and documents are kept encrypted on the Benthic server.",
+      "sharedTitle": "The shared map of sites",
+      "sharedText": "The sites in your logbook feed Benthic’s shared base of dive sites: name, position, country, water type and depth. Never your notes, never your name.",
+      "readAll": "Read the full terms",
+      "fullTitle": "Terms of use",
+      "accept": "I accept the terms",
+      "changed": "The terms just changed. Read them again, then accept them.",
+      "failed": "Acceptance not recorded. Check the connection, then try again."
+    },
+    "card": {
+      "chip": "Shared map · {dives}",
+      "closed": "Closed or forbidden",
+      "mapLabel": "Map of {name}",
+      "logbooksSay": "What the logbooks say",
+      "usualDepth": "Depth most often logged",
+      "depthRange": "{from} to {to}",
+      "recentDives": "Dives in the last 12 months",
+      "note": "Sites contributed by Benthic+ divers. No diver’s name is shown.",
+      "add": "Add to my sites",
+      "inYourSites": "In your sites",
+      "report": "Report",
+      "added": "Site added to your sites",
+      "open": "Open",
+      "addFailed": "Site not added. Check the connection, then try again.",
+      "gone": "This site is no longer on the shared map."
+    },
+    "report": {
+      "title": "Report a problem",
+      "text": "{name}. Your report goes to the moderators of the shared map.",
+      "reasons": {
+        "wrong_position": "Wrong position",
+        "duplicate": "Duplicate of another site",
+        "wrong_name_or_country": "Wrong name or country",
+        "closed_or_forbidden": "Site closed or forbidden",
+        "other": "Something else"
+      },
+      "wrongPositionHint": "The pin is not at the entry point",
+      "details": "Details (optional)",
+      "detailsExample": "For example, the entry point is 200 m further north",
+      "tooLong": "{n} characters at most",
+      "send": "Send",
+      "sent": "Report sent",
+      "tooMany": "Too many reports today. Try again tomorrow.",
+      "failed": "Report not sent. Check the connection, then try again."
     }
   }
 }

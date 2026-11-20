@@ -230,6 +230,11 @@
     /* A safe outcome (the planner: no deco stop), in the oxygen green. */
     --od-status-ok: var(--od-oxygen);
     --od-pending: #8A4B00;
+    /* The shared map of dive sites (task 2026-11-19-315): its dots, clusters, chip and banner (teal of the mock-ups). */
+    --od-shared-site: #0E6E6B;
+    --od-on-shared-site: #FFFFFF;
+    --od-shared-site-container: #D3ECEA;
+    --od-on-shared-site-container: #0B3B39;
     /* On the header band, whose colours stay light in dark mode too. */
     --od-band-pending: #8A4B00;
     --od-band-control: rgb(255 255 255 / 0.9);
@@ -672,6 +677,10 @@
     --od-error-container: #5C1A16;
     --od-on-error-container: #FDE2E0;
     --od-pending: #F2B84B;
+    --od-shared-site: #5DC9C3;
+    --od-on-shared-site: #0B2B2A;
+    --od-shared-site-container: #123F3D;
+    --od-on-shared-site-container: #CDEFEC;
     --od-background: #121314;
     --od-surface: #1C1D1F;
     --od-surface-2: #2E3033;
@@ -819,6 +828,7 @@
     --od-alarm: #8E1010;
     --od-oxygen: #1B5E20;
     --od-pending: #5C3100;
+    --od-shared-site: #08504E;
     --od-band-pending: #5C3100;
     --od-background: #FFFFFF;
     --od-surface: #FFFFFF;
@@ -842,6 +852,7 @@
     --od-alarm: #FFC0B8;
     --od-oxygen: #B2EBB4;
     --od-pending: #FFD98A;
+    --od-shared-site: #8FE3DD;
     --od-background: #000000;
     --od-surface: #121314;
     --od-nav-active: #FFFFFF;

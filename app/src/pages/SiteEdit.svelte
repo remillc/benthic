@@ -6,7 +6,9 @@
   // change of position (OpenStreetMap, else the offline Natural Earth file),
   // a corrected value is never replaced; description and notes. A site
   // within 100 m is offered instead of a duplicate. With ?dive=<id>, the new
-  // site is set on that dive (dives without a site).
+  // site is set on that dive (dives without a site). A new site next to a site of the shared map (Benthic+,
+  // task 2026-11-19-315, point 6; sites-edition-commun-android.dc.html) gets the teal banner « La carte commune a déjà
+  // un site à 160 pi » with « Utiliser ce site »: its name and position fill the form and the saved site is linked to it.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { ios } from '../lib/layout.svelte.js';
@@ -23,6 +25,11 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
+  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { linkSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+  import { SUGGEST_RADIUS_M, inYourSites } from '../lib/shared-sites.js';
+  import { baseDivesText, distanceValue } from '../lib/shared-sites-format.js';
+  import { connection } from '../lib/online.svelte.js';
   import { isDirty } from '../lib/leave-guard.js';
 
   /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, lat?: string, lon?: string, choose?: string } }, f7router: any }} */
@@ -48,6 +55,10 @@
   let coordsText = $state('');
   let coordsError = $state(false);
   let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
+  /** The closest site of the shared map, when the logbook has none close. */
+  let commonNear = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite|null} */ (null));
+  /** « Utiliser ce site »: the base site the new site is linked to when saved. */
+  let useBase = $state(/** @type {string|null} */ (null));
   let saving = $state(false);
   let lookups = 0;
 
@@ -116,12 +127,37 @@
     coordsError = false;
     const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
     nearby = near && near.uuid !== editing ? near : null;
+    if (!editing) suggestCommon(p, asked);
     // Country and region of the new position, unless the diver corrected them.
     const place = await placeAt(p.latUdeg, p.lonUdeg, language);
     // Only the answer for the latest position counts.
     if (asked !== lookups || !place) return;
     if (!country || country === autoCountry) country = autoCountry = place.country;
     if (!region || region === autoRegion) region = autoRegion = place.region;
+  }
+
+  /** A base site close to the new site's position (none when the logbook already has one close). @param {{latUdeg: number, lonUdeg: number}} p @param {number} asked */
+  async function suggestCommon(p, asked) {
+    if (nearby || !odplusAccount.signedIn || !connection.online) {
+      commonNear = null;
+      return;
+    }
+    try {
+      if (!sharedSites.linksLoaded) await loadLinks();
+      const near = await withSession((api, token) => api.nearby(token, { lat: p.latUdeg / 1e6, lon: p.lonUdeg / 1e6, radiusM: SUGGEST_RADIUS_M, limit: 3 }));
+      if (asked === lookups) commonNear = near.find((b) => !inYourSites(b.id, sharedSites.links)) ?? null;
+    } catch {
+      if (asked === lookups) commonNear = null;
+    }
+  }
+
+  /** « Utiliser ce site »: the base site's name and position; the saved site is linked to it. */
+  function useCommon() {
+    const b = commonNear;
+    if (!b) return;
+    name = b.name;
+    useBase = b.id;
+    setPosition({ latUdeg: Math.round(b.lat * 1e6), lonUdeg: Math.round(b.lon * 1e6) });
   }
 
   // Coordinates that cannot be read are told as the diver types, after a pause (forms are
@@ -162,6 +198,7 @@
         const created = await siteChange({ action: 'create', value: name.trim(), lat, lon });
         uuid = created.site?.uuid ?? 0;
         moved = !!position;
+        if (uuid && useBase) await linkSite(uuid, useBase);
       } else if (original) {
         if (name.trim() !== original.name) await siteChange({ action: 'edit', uuid, field: 'name', value: name.trim() });
         if (lat !== original.latUdeg || lon !== original.lonUdeg) {
@@ -269,6 +306,12 @@
     </div>
   {/if}
 
+  {#if !editing && !nearby && commonNear && useBase !== commonNear.id}
+    <div class="od-site-edit--common" role="note">
+      <span>{t('sharedSites.suggest', { distance: distanceValue(commonNear.distanceM ?? 0, logbook.prefs), name: commonNear.name, dives: baseDivesText(commonNear) })}</span>
+      <button type="button" class="od-text-button od-site-edit--use" onclick={useCommon}>{t('sites.useNearby')}</button>
+    </div>
+  {/if}
   <!-- Position: coordinates, then country and region found from them. -->
   <div class="od-form-surface">
     <TextField
@@ -383,6 +426,22 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+    }
+
+    .od-site-edit--common {
+      margin: 18px 16px 0;
+      padding: 12px 16px 4px;
+      border-radius: 12px;
+      background: var(--od-shared-site-container);
+      color: var(--od-on-shared-site-container);
+      font-size: 14px;
+      line-height: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      & .od-text-button {
+        color: var(--od-on-shared-site-container);
+      }
     }
 
     .od-site-edit--use {
