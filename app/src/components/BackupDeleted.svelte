@@ -4,7 +4,9 @@
   // « Restaurer » brings one back as a new commit; nothing else changes. Photos and videos are not in the history: they are
   // kept 90 days after a deletion, then erased (said under the list).
   import './backup.css';
-  import { backup, restoreOne, loadDeleted } from '../lib/backup.svelte.js';
+  import { backup, restoreOne, loadDeleted, loadVersions } from '../lib/backup.svelte.js';
+  import { restoredDiveNumberPlan } from '../lib/backup-history.js';
+  import { renumberDivesTo, logbook } from '../lib/logbook.svelte.js';
   import { versionDay, isoOfEpoch } from '../lib/backup-text.js';
   import { formatDate, formatTimeAgo } from '../lib/format.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -28,8 +30,36 @@
   async function restore(d) {
     if (backup.busy) return;
     const ok = await restoreOne({ commit: d.commit, dir: d.dir, key: d.key, date: versionDay(d.deletedAt) });
-    showSnackbar(t(ok ? 'backup.deleted.restored' : 'backup.deleted.restoreFailed'));
-    if (ok) onrestored?.();
+    if (!ok) {
+      showSnackbar(t('backup.deleted.restoreFailed'));
+      return;
+    }
+
+    let message = 'backup.deleted.restored';
+    /** @type {Record<string, string>} */
+    let values = {};
+    if (d.number == null) {
+      const plan = restoredDiveNumberPlan(d.key, logbook.dives);
+      if (!plan) {
+        console.error('The restored dive could not be found for numbering', d.key);
+        message = 'backup.deleted.numberFailed';
+      } else {
+        backup.busy = true;
+        try {
+          await renumberDivesTo(plan.ids, plan.numbers);
+          await loadVersions();
+          message = plan.shifted ? 'backup.deleted.restoredAndShifted' : 'backup.deleted.restoredWithNumber';
+          values = { number: String(plan.number) };
+        } catch (e) {
+          console.error('Numbering the restored dive', e);
+          message = 'backup.deleted.numberFailed';
+        } finally {
+          backup.busy = false;
+        }
+      }
+    }
+    showSnackbar(t(message, values));
+    onrestored?.();
   }
 </script>
 

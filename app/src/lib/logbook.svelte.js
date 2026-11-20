@@ -62,6 +62,8 @@ export const logbook = $state({
   set dives(value) {
     diveList = value;
   },
+  /** Checked dives in the Logbook list, shared with the tablet detail pane. */
+  checkedDiveIds: /** @type {number[]} */ ([]),
   /** The core's preferences (units, Settings); only the units until the first read. */
   prefs: /** @type {Prefs} */ ({ ...defaultPrefs }),
   /** @type {SyncState} */
@@ -346,6 +348,7 @@ export function renumberShiftPlan(id, target) {
   const last = numbered.reduce((max, d) => Math.max(max, d.number), 0);
   const n = dive?.number ?? 0;
   const m = Math.max(1, Math.min(Math.round(target), n > 0 ? last : last + 1));
+  const targetTaken = numbered.some((d) => d.id !== id && d.number === m);
   /** @type {number[]} */
   const ids = [id];
   /** @type {number[]} */
@@ -354,7 +357,7 @@ export function renumberShiftPlan(id, target) {
   let shifted = null;
   if (n > 0 && m < n) shifted = { from: m, to: n - 1, by: 1 };
   else if (n > 0 && m > n) shifted = { from: n + 1, to: m, by: -1 };
-  else if (n === 0 && m <= last) shifted = { from: m, to: last, by: 1 };
+  else if (n === 0 && m <= last && targetTaken) shifted = { from: m, to: last, by: 1 };
   if (shifted) {
     const { from, to, by } = shifted;
     for (const d of numbered)

@@ -43,7 +43,7 @@
   import { horizontalSwipe, swipeGoesThrough, settle } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
   import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
-  import { logbook, deleteDive, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, deleteDive, deleteDives, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
   import { openDiveVersions } from '../lib/backup-nav.js';
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -331,6 +331,52 @@
     }
   }
 
+  function confirmDeleteSelected() {
+    f7.popover.close(`#${menuId}`);
+    const ids = logbook.checkedDiveIds.filter((id) => logbook.dives.some((d) => d.id === id));
+    if (!ids.length) return;
+
+    const selected = new Set(ids);
+    const currentId = Number(diveId);
+    const order = listOrder();
+    const at = order.indexOf(currentId);
+    const nextId = selected.has(currentId) && at >= 0
+      ? order.slice(at + 1).find((id) => !selected.has(id)) ?? order.slice(0, at).reverse().find((id) => !selected.has(id))
+      : undefined;
+
+    confirmAction({
+      title: t('logbook.deleteTitle', { n: ids.length }),
+      text: t(logbook.mode === 'git' ? 'logbook.deleteTextGit' : 'logbook.deleteText', { n: ids.length }),
+      action: t('logbook.deleteAction'),
+      onConfirm: async () => {
+        try {
+          await deleteDives(ids);
+          for (const id of ids) forgetDive(id);
+          logbook.checkedDiveIds = [];
+          if (selected.has(currentId)) {
+            if (layout.split && nextId !== undefined) {
+              const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
+              f7router.navigate(`${base}${nextId}`, { reloadDetail: true });
+            } else {
+              f7router.back();
+            }
+          }
+          offerUndo(t('logbook.deleted', { n: ids.length }), undefined, 10000);
+        } catch (e) {
+          const code = String(/** @type {any} */ (e)?.message ?? '');
+          console.error('Delete selected dives', code);
+          f7.dialog
+            .create({
+              title: t('logbook.deleteTitle', { n: ids.length }),
+              text: code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('logbook.selectionFailed'),
+              buttons: [{ text: t('dialog.ok') }],
+            })
+            .open();
+        }
+      },
+    });
+  }
+
   // The list beside it highlights the dive shown, unless it was opened from inside the
   // detail pane (from a trip): the list and its selected row do not change then.
   $effect(() => {
@@ -347,6 +393,7 @@
   // svelte-ignore state_referenced_locally
   let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (readyDive(Number(f7route.params.id))));
   let failed = $state(false);
+  let awaitingLogbook = $state(false);
   const prefs = $derived(logbook.prefs);
 
   // After an edit or an undo of this dive, show the result at once.
@@ -364,6 +411,20 @@
       dive = await readDive(id);
     } catch (e) {
       console.error('Dive detail', e);
+      const code = String(/** @type {any} */ (e)?.message ?? e);
+      if (code.includes('Dive not found') && logbook.loading) {
+        awaitingLogbook = true;
+        return;
+      }
+      if (code.includes('Dive not found')) {
+        forgetDive(id);
+        if (layout.split && !f7route.params.trip) {
+          f7router.navigate('/pane/empty', { reloadDetail: true, animate: false });
+        } else {
+          f7router.navigate('/', { animate: false });
+        }
+        return;
+      }
       failed = true;
       return;
     }
@@ -373,6 +434,12 @@
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
   }
+
+  $effect(() => {
+    if (!awaitingLogbook || logbook.loading) return;
+    awaitingLogbook = false;
+    void loadDive();
+  });
   /** « Réessayer » on the error state: reads the dive again. */
   function retry() {
     failed = false;
@@ -686,6 +753,7 @@
   // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
   // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
   const desk = $derived(layout.desktop);
+  const selectionMenuActive = $derived(layout.split && !desk && !f7route.params.trip && logbook.checkedDiveIds.length > 0);
   /** The last tab chosen is kept for the next dive and the next session (task 2026-11-15-191). */
   let tab = $state(readTab(deviceStore));
   const deskTabs = DETAIL_TABS;
@@ -796,7 +864,11 @@
       {#if theme.ios}
         <Link href="/dives/{diveId}/edit">{t('detail.edit')}</Link>
         <Link iconOnly popoverOpen="#{menuId}">
-          <Icon name="moreCircle" /><span class="bc-sr-only">{t('detail.moreOptions')}</span>
+          <Icon name="moreCircle" /><span class="bc-sr-only">{selectionMenuActive ? t('logbook.selectionActions') : t('detail.moreOptions')}</span>
+        </Link>
+      {:else if selectionMenuActive}
+        <Link iconOnly popoverOpen="#{menuId}">
+          <Icon name="more" /><span class="bc-sr-only">{t('logbook.selectionActions')}</span>
         </Link>
       {/if}
     {/snippet}
@@ -806,9 +878,38 @@
        label; an iOS pull-down menu, label then icon at the end, no arrow. -->
   <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
+      {#if selectionMenuActive && dive && !failed}
+        {#if !theme.ios}
+          <MenuItem
+            icon="edit"
+            text={t('detail.edit')}
+            onclick={() => {
+              f7.popover.close(`#${menuId}`);
+              f7router.navigate(`/dives/${diveId}/edit`);
+            }}
+          />
+        {/if}
+        <MenuItem
+          icon="plan"
+          text={t('detail.plan')}
+          onclick={() => {
+            f7.popover.close(`#${menuId}`);
+            f7router.navigate(`/plan/${diveId}`);
+          }}
+        />
+        <MenuItem
+          icon="share"
+          text={t('share.title')}
+          onclick={() => {
+            f7.popover.close(`#${menuId}`);
+            sharing = true;
+          }}
+        />
+        <li class="bc-menu-divider" role="separator"></li>
+      {/if}
       <!-- This page's router, not a link: the menu opens at the app's root, where a
            link would use the Carnet's view even when the dive is shown in another section. -->
-      {#if theme.ios}
+      {#if theme.ios && !selectionMenuActive}
         <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
       {/if}
       {#if odplusSubscriber()}
@@ -843,7 +944,7 @@
           }}
         />
       {/if}
-      {#if theme.ios}
+      {#if theme.ios && !selectionMenuActive}
         <MenuItem
           icon="share"
           text={t('share.title')}
@@ -855,7 +956,11 @@
       {/if}
       <li class="bc-menu-divider" role="separator"></li>
       <!-- Alarm colour on Android (floating toolbar menu); iOS keeps ink. -->
-      <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={confirmDelete} />
+      {#if selectionMenuActive}
+        <MenuItem icon="delete" text={t('detail.deleteSelected')} destructive={!theme.ios} onclick={confirmDeleteSelected} />
+      {:else}
+        <MenuItem icon="delete" text={t('detail.delete')} destructive={!theme.ios} onclick={confirmDelete} />
+      {/if}
     </List>
   </Popover>
 
@@ -1121,8 +1226,8 @@
   {/if}
 
   {#snippet fixedContent()}
-    <!-- Android: the actions in a floating toolbar (Material 3 Expressive); iOS keeps the top bar. -->
-    {#if !theme.ios && dive && !failed && !desk}
+    <!-- Android: floating toolbar, except for a checked Logbook selection on a tablet, which uses the top-bar menu. -->
+    {#if !theme.ios && dive && !failed && !desk && !selectionMenuActive}
       <FloatingToolbar
         label={t('detail.actions')}
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}

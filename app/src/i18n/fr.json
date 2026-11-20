@@ -656,6 +656,7 @@
     },
     "photoNote": "Sur un autre appareil : seule leur référence est synchronisée",
     "delete": "Supprimer la plongée",
+    "deleteSelected": "Supprimer ces plongées",
     "deleteTitle": "Supprimer la plongée",
     "deleted": "Plongée supprimée",
     "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée.",
@@ -1418,7 +1419,10 @@
       "restore": "Restaurer",
       "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
       "restored": "Plongée rétablie",
-      "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé."
+      "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé.",
+      "restoredWithNumber": "Plongée rétablie sous le N° {number}",
+      "restoredAndShifted": "Plongée rétablie sous le N° {number}. Les plongées suivantes ont été décalées.",
+      "numberFailed": "Plongée rétablie, mais son numéro n’a pas pu être attribué."
     },
     "browse": {
       "banner": "Version en lecture seule : {date}",
@@ -2719,6 +2723,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Corrigé le démarrage sur tablette lorsque la dernière plongée ouverte n’existe plus.",
+      "Carnet sur tablette : quand des plongées sont cochées, les actions du détail passent dans le menu ⋮ en haut et permettent de supprimer la sélection.",
+      "Restauration : une plongée retrouve le numéro manquant à sa position ; si aucun numéro n’est disponible, les suivantes sont décalées.",
       "Informations : les champs de date de naissance, de lien et de téléphone sont moins larges.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
