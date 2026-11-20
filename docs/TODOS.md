@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 119
+Next number: 127
 
 ## List
 
@@ -47,3 +47,11 @@ Next number: 119
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
+- #119 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
+- #120 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
+- #121 [design] Sur /welcome, écran « Le serveur ne répond pas » : dessiner la maquette à partir de la vue de Claude VC.
+- #122 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
+- #123 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
+- #124 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
+- #125 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
+- #126 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
