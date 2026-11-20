@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1721,6 +1721,101 @@ async function gearTypeDialogFlows(expect) {
   }
 }
 
+async function gearDeleteFlows(expect) {
+  for (const [label, width, height, mobile, desktop, theme] of [
+    ['Android phone', 390, 844, true, false, 'md'],
+    ['iPhone', 390, 844, true, false, 'ios'],
+    ['Android tablet', 1280, 800, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    const fixture = await tab.run(async (name) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return change(async (inv) => {
+        const piece = await inv.saveGear({ type: 'regulator', name });
+        const reminder = await inv.saveMaintenance({ gearId: piece.id, task: 'service', intervalMonths: 12, intervalDives: null });
+        const kit = await inv.saveKit({ name: `Kit ${name}`, gearIds: [piece.id] });
+        await inv.saveDiveEquipment('2026-06-01T10:00:00', { suitGearId: '', undersuitGearId: '', gearIds: [piece.id], adhoc: [], kitId: '' });
+        return { id: piece.id, reminder: reminder.id, kit: kit.id };
+      });
+    }, `Delete ${label}`);
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'); });
+    await sleep(900);
+    await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}`); }, fixture.id);
+    await sleep(1000);
+    const chooseDelete = async () => {
+      await tab.run(() => document.querySelector('.page-current.bc-piece-page [aria-haspopup="menu"]').click());
+      await sleep(500);
+      return tab.run(async () => {
+        const { t } = await import('/src/lib/i18n.js');
+        const item = [...document.querySelectorAll('.bc-menu [data-index]')].find((element) => element.textContent.trim() === t('gear.piece.delete'));
+        if (!item) throw new Error('Missing Delete menu action');
+        item.click();
+        return true;
+      });
+    };
+    if (label === 'Android phone') {
+      await tab.run(async () => { (await import('/src/lib/inventory.svelte.js')).gear.readOnly = true; });
+      await chooseDelete();
+      await sleep(300);
+      expect(`${label}: read-only mode refuses deletion`, { dialog: false, exists: true }, await tab.run(async (id) => ({
+        dialog: !!document.querySelector('.bc-piece-forever'),
+        exists: (await import('/src/lib/inventory.svelte.js')).gear.pieces.some((piece) => piece.id === id),
+      }), fixture.id));
+      await tab.run(async () => { (await import('/src/lib/inventory.svelte.js')).gear.readOnly = false; });
+      await sleep(400);
+    }
+    await chooseDelete();
+    await sleep(300);
+    const warning = await tab.run(() => document.querySelector('.bc-piece-forever .bc-md3-dialog--text')?.textContent ?? '');
+    expect(`${label}: Delete opens the permanent deletion warning`, { present: true }, { present: warning.includes(`Delete ${label}`) && warning.length > 50 });
+    await tab.run(() => document.querySelector('.bc-piece-forever .bc-md3-dialog--actions button').click());
+    await sleep(300);
+    expect(`${label}: cancelling keeps the piece`, { exists: true }, await tab.run(async (id) => ({
+      exists: (await import('/src/lib/inventory.svelte.js')).gear.pieces.some((piece) => piece.id === id),
+    }), fixture.id));
+    await chooseDelete();
+    await sleep(300);
+    await tab.run(() => document.querySelector('.bc-piece-page--forever-confirm').click());
+    await sleep(1200);
+    const deleted = await tab.run(async (fixture) => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
+      return {
+        route: view?.f7View?.router?.currentRoute?.url,
+        piece: gear.pieces.some((p) => p.id === fixture.id),
+        reminder: gear.maintenance.some((m) => m.id === fixture.reminder),
+        kitLink: gear.kits.find((k) => k.id === fixture.kit)?.gearIds.includes(fixture.id),
+        diveLink: gear.records.some((r) => r.gearIds.includes(fixture.id)),
+      };
+    }, fixture);
+    expect(`${label}: confirmation deletes the piece and its associations`, { route: '/profile/gear/', piece: false, reminder: false, kitLink: false, diveLink: false }, deleted);
+    const retiredId = await tab.run(async (name) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return change(async (inv) => {
+        const piece = await inv.saveGear({ type: 'mask', name });
+        await inv.retireGear(piece.id);
+        return piece.id;
+      });
+    }, `Retired ${label}`);
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/retired/'); });
+    await sleep(900);
+    await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}`); }, retiredId);
+    await sleep(1000);
+    await tab.run(() => document.querySelector('.page-current .bc-piece-page--forever').click());
+    await sleep(300);
+    await tab.run(() => document.querySelector('.bc-piece-page--forever-confirm').click());
+    await sleep(1200);
+    const retiredResult = await tab.run(async (id) => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
+      return { route: view?.f7View?.router?.currentRoute?.url, exists: gear.pieces.some((p) => p.id === id) };
+    }, retiredId);
+    expect(`${label}: deleting a retired piece returns to equipment`, { route: '/profile/gear/', exists: false }, retiredResult);
+    tab.ws.close();
+  }
+}
+
 async function profileLayersFlows(expect) {
   for (const [label, width, height, mobile] of [['phone', 390, 844, true], ['tablet', 1280, 800, false]]) {
     const tab = await openTab(width, height, mobile);
@@ -1808,7 +1903,7 @@ async function profileLayersFlows(expect) {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1824,6 +1919,7 @@ try {
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
   if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
   if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);
+  if (args.has('--gear-delete-only') || fixed) await gearDeleteFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (args.has('--settings-computers-only') || fixed) await settingsComputersFlows(expect);

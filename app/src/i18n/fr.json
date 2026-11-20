@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
       "Profil de plongée : les courbes choisies restent affichées pendant la session.",
       "Plongées : « Faire signer » remplace « Faire valider ».",
@@ -3136,7 +3137,7 @@
       "Supprimer un ordinateur de plongée demande « Supprimer le … ? » ; « Nouvelle pièce » de type Ordinateur propose marques et modèles, la photo du modèle et aucun rappel d’entretien ; « Modifier l’ordinateur de plongée » suit chaque appareil ; Réglages › Modifier l’ordinateur est repensé (image, cartes doublon et retrait).",
       "Après un téléchargement depuis un ordinateur de plongée, « Compléter la plongée » s’ouvre pour chaque nouvelle plongée sans site (Android et iPhone) : les trois sites les plus proches de la position du téléphone, ou les trois plus récemment plongés sans position, le plus proche présélectionné à moins de 500 m, « Créer un site à ma position actuelle », « Chercher un autre site », les compagnons et la note. « Plus tard » laisse la plongée telle quelle.",
       "Réglages › Notifications (Benthic+) : rappels d’entretien, délai par défaut de 2 semaines, 30 ou 60 jours, « Rappeler si en retard » une fois par semaine jusqu’à ce que l’entretien soit noté, et « Avion permis ». Les notifications arrivent à 9 h (sauf celle de l’avion) avec les boutons « Voir », « Noter l’entretien » et « Me le rappeler dans 1 semaine ». Le délai d’un rappel passe à 14, 30 ou 60 jours ; « Contrôle avant voyage » disparaît, et un ordinateur de plongée n’a plus de rappel.",
-      "Équipement (Benthic+) : « Retirer de l’équipement » remplace la suppression, avec une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce.",
+      "Équipement (Benthic+) : « Retirer de l’équipement » permet de donner une raison facultative (vendue, perdue, hors d’usage). Une pièce retirée quitte les listes, les kits et les rappels, mais garde son historique de révision et ses plongées ; elle se retrouve dans « Pièces retirées », d’où on peut la remettre en service, exporter son historique en PDF ou la supprimer pour de bon. « Exporter l’historique » est aussi dans le menu de la fiche d’une pièce.",
       "Une bouteille a deux échéances, chacune avec sa carte, sa barre, son bouton « Noter … » et son rappel : l’inspection visuelle (chaque année) et la requalification (tous les 5 ans, avec la date frappée sur la bouteille, comme 03/22). La carte d’entretien montre aussi les heures sous l’eau à côté des plongées (« 82 plongées sur 100 · 61 h »). Dans « Ajouter de l’équipement », une pièce en retard reste choisissable mais indique en rouge ce qui est en retard, quand son rappel avertit dans une plongée.",
       "Le téléchargement depuis un ordinateur de plongée ne fige plus l'écran quand la fiche d'envoi d'un rapport d'erreur s'ouvre.",
       "Sur Windows, « Modifier la plongée » et la saisie rapide enregistrent maintenant tous les sites : certains sites (plus de la moitié) restaient introuvables à l’enregistrement.",
@@ -5771,7 +5772,7 @@
     "forever": {
       "button": "Supprimer pour de bon",
       "title": "Supprimer pour de bon ?",
-      "text": "{name} et tout son historique de révision seront effacés. Ce choix est définitif. Les plongées restent dans le carnet.",
+      "text": "{name}, sa photo et son historique de révision seront effacés. La pièce sera retirée des kits et des plongées, mais les plongées restent dans le carnet. Ce choix est définitif.",
       "confirm": "Supprimer"
     },
     "retire": {

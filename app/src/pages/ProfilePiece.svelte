@@ -124,16 +124,16 @@
     }
   }
 
-  /** « Supprimer pour de bon »: only from a retired piece; the dives stay in the logbook. */
+  /** Deletes the piece and its inventory associations; the dives stay in the logbook. */
   async function removeForGood() {
     confirmForever = false;
-    if (!piece?.retired) return;
+    if (!piece) return;
     try {
       await change((inv) => inv.deleteGear(id));
       showSnackbar(t('gear.piece.deleted'));
-      f7router.back();
-    } catch {
-      refused();
+      f7router.back('/profile/gear/', { force: true });
+    } catch (e) {
+      showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     }
   }
 
@@ -183,6 +183,7 @@
         { label: t('gear.piece.share'), onclick: share },
         { label: t('maintenance.export.menu'), onclick: exportPieceHistory },
         ...(retired ? [] : [{ label: t('gear.retire.button'), onclick: () => (gear.readOnly ? refused() : (confirmRetire = true)) }]),
+        { label: t('gear.piece.delete'), onclick: () => (gear.readOnly ? refused() : (confirmForever = true)), danger: true },
       ],
       t('gear.piece.more'),
     );
@@ -297,7 +298,6 @@
   <RetirePieceDialog name={piece.name} computer={piece.type === 'computer'} oncancel={() => (confirmRetire = false)} onconfirm={retire} />
 {/if}
 {#if confirmForever && piece}
-  <!-- « Supprimer pour de bon ? » (profil-piece-supprimer-definitif-android): only from a retired piece. -->
   <Md3Dialog class="bc-piece-forever" title={t('gear.forever.title')} text={t('gear.forever.text', { name: piece.name })} role="alertdialog" oncancel={() => (confirmForever = false)}>
     <span></span>
     {#snippet actions()}

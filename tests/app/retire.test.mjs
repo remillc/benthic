@@ -115,12 +115,11 @@ test('the history PDF: the piece, a table from the latest entry, the invoices af
 const root = new URL('../../app/src/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
-test('the screens: retire everywhere, delete for good only on a retired piece, no pencil on it', () => {
+test('the screens: retire everywhere, offer deletion and keep the retired piece without a pencil', () => {
   const piece = read('pages/ProfilePiece.svelte');
   assert.match(piece, /\{#if piece && !piece\.retired\}\s*<a\s+href=\{editPath\}/, 'no pencil on a retired piece');
   assert.match(piece, /\{#if piece\.retired\}\s*<button type="button" class="bc-piece-page--forever"/, '« Supprimer pour de bon » only when retired');
-  assert.ok(!piece.includes("t('gear.piece.delete')"), 'the active menu has no Supprimer');
-  assert.match(piece, /removeForGood[\s\S]*?if \(!piece\?\.retired\) return/, 'the deletion refuses a piece that is not retired');
+  assert.ok(piece.includes("t('gear.piece.delete')"), 'the active menu offers deletion');
   assert.match(read('pages/ProfileComputerEdit.svelte'), /RetirePieceDialog/);
   assert.match(read('pages/ProfilePieceEdit.svelte'), /RetirePieceDialog/);
   const app = read('App.svelte');

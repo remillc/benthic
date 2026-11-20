@@ -8,7 +8,7 @@
       "listNote": "Elles gardent leur historique d’entretien et leurs plongées."
     },
     "forever": {
-      "text": "{name} et tout son historique d’entretien seront effacés. Ce choix est définitif. Les plongées restent dans le carnet."
+      "text": "{name}, sa photo et son historique d’entretien seront effacés. La pièce sera retirée des kits et des plongées, mais les plongées restent dans le carnet. Ce choix est définitif."
     }
   },
   "logbook": {

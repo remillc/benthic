@@ -56,5 +56,3 @@ Next number: 133
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
-- #131 [code] On /profile/gear/:id, after permanently deleting a retired piece, remain on /profile/gear/.
-- #132 [code] On /profile/gear/:id, add a Delete action to the three-dot menu.
