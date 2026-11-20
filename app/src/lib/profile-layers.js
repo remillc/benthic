@@ -3,12 +3,16 @@
 // they were turned on (the last right-hand scale turned on is the one drawn). The choice is kept
 // between dives and sessions in the settings of this computer (device-store.js, key
 // `od.profileLayers`), never in the logbook. Without a choice yet, the water temperature is on.
+import { writable } from 'svelte/store';
 
 export const LAYER_KEY = 'od.profileLayers';
 /** The chips, in their order. */
 export const LAYERS = /** @type {const} */ (['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']);
 /** @typedef {typeof LAYERS[number]} Layer */
 export const DEFAULT_LAYERS = /** @type {Layer[]} */ (['temperature']);
+
+/** Phone and tablet selections live only for the lifetime of the app. */
+export const sessionLayers = writable([...DEFAULT_LAYERS]);
 
 /** @typedef {{ getItem: (key: string) => string|null, setItem: (key: string, value: string) => void }} Store */
 

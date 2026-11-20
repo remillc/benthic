@@ -51,7 +51,6 @@ Next number: 128
 - #120 [code] /profile/info, retirer le bouton Autoriser.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
-- #123 [code] sur /dives/:id, faire en sorte que la sélection des variables à afficher dans le profil de plongée (température, gas, ppo2 et tissus) soit préservée à travers la session.
 - #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.

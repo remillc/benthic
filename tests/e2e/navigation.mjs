@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1672,8 +1672,94 @@ async function gearTypeDialogFlows(expect) {
   }
 }
 
+async function profileLayersFlows(expect) {
+  for (const [label, width, height, mobile] of [['phone', 390, 844, true], ['tablet', 1280, 800, false]]) {
+    const tab = await openTab(width, height, mobile);
+    await tab.run(async () => {
+      const { mount, unmount, tick } = await import('/node_modules/.vite/deps/svelte.js');
+      const Component = (await import('/src/components/DiveProfile.svelte')).default;
+      const { t } = await import('/src/lib/i18n.js');
+      const full = {
+        timeSeconds: [0, 60], depthMm: [0, 10000], temperatureMk: [293150, 291150],
+        ppo2Mbar: [400, 800], cylinder: [0, 0], ceilingMm: [0, 1000], tissues: Array(32).fill(50),
+      };
+      const props = { samples: full, cylinders: [{ gas: 'Air', o2Permille: 210 }], divemode: 'OC', maxDepthMm: 10000, durationSeconds: 60, prefs: { length: 'm', temperature: 'C', pressure: 'bar' } };
+      const instances = [];
+      window.__layerTest = {
+        async add(samples = full) {
+          const target = document.createElement('div');
+          target.style.width = '320px';
+          document.body.append(target);
+          const component = mount(Component, { target, props: { ...props, samples } });
+          instances.push({ target, component });
+          await tick();
+          return instances.length - 1;
+        },
+        async remove(index) {
+          await unmount(instances[index].component);
+          instances[index].target.remove();
+        },
+        state(index) {
+          const target = instances[index].target;
+          const names = ['temperature', 'gas', 'ppo2', 'ceiling', 'tissues'];
+          return Object.fromEntries(names.map((name) => {
+            const labels = name === 'temperature' ? [t('profile.temperature'), t('profile.temperatureShort')] : [t(`profile.${name}`)];
+            const button = [...target.querySelectorAll('.bc-dive-profile--filter')].find((b) => labels.includes(b.querySelector('.chip-label')?.textContent));
+            return [name, button ? button.getAttribute('aria-pressed') === 'true' : null];
+          }));
+        },
+        async toggle(index, name) {
+          const labels = name === 'temperature' ? [t('profile.temperature'), t('profile.temperatureShort')] : [t(`profile.${name}`)];
+          const button = [...instances[index].target.querySelectorAll('.bc-dive-profile--filter')].find((b) => labels.includes(b.querySelector('.chip-label')?.textContent));
+          if (!button) throw new Error(`Missing ${name} chip`);
+          button.click();
+          await tick();
+        },
+        sparse: { ...full, temperatureMk: [], ppo2Mbar: [], tissues: [], cylinder: [-1, -1], ceilingMm: [] },
+        scale(index) {
+          const target = instances[index].target;
+          return target.querySelector('.bc-dive-profile--ppo2-label') ? 'ppo2' : target.querySelector('.bc-dive-profile--temperature-label') ? 'temperature' : 'none';
+        },
+      };
+      await window.__layerTest.add();
+      await window.__layerTest.add();
+    });
+    expect(`${label}: the second profile starts with the existing default`, { state: JSON.stringify({ temperature: true, gas: false, ppo2: false, ceiling: false, tissues: false }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(1))) });
+    await tab.run(async () => {
+      for (const name of ['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']) await window.__layerTest.toggle(0, name);
+    });
+    expect(`${label}: choices update another mounted profile`, { state: JSON.stringify({ temperature: false, gas: true, ppo2: true, ceiling: true, tissues: true }), scale: 'ppo2' }, await tab.run(() => ({ state: JSON.stringify(window.__layerTest.state(1)), scale: window.__layerTest.scale(1) })));
+    await tab.run(async () => {
+      await window.__layerTest.remove(0);
+      await window.__layerTest.remove(1);
+      await window.__layerTest.add(window.__layerTest.sparse);
+      await window.__layerTest.add();
+    });
+    expect(`${label}: unavailable curves return when the next dive has data`, { state: JSON.stringify({ temperature: false, gas: true, ppo2: true, ceiling: true, tissues: true }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(3))) });
+    await tab.run(async () => window.__layerTest.toggle(3, 'temperature'));
+    expect(`${label}: the last enabled right-hand scale wins`, { scale: 'temperature' }, await tab.run(() => ({ scale: window.__layerTest.scale(3) })));
+    await tab.run(async () => {
+      for (const name of ['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']) await window.__layerTest.toggle(3, name);
+      await window.__layerTest.remove(3);
+      await window.__layerTest.add();
+    });
+    expect(`${label}: turning every curve off is remembered`, { state: JSON.stringify({ temperature: false, gas: false, ppo2: false, ceiling: false, tissues: false }) }, { state: JSON.stringify(await tab.run(() => window.__layerTest.state(4))) });
+    await tab.send('Page.reload');
+    await sleep(1800);
+    const restarted = await tab.run(async () => {
+      const { sessionLayers } = await import('/src/lib/profile-layers.js');
+      let value;
+      const unsubscribe = sessionLayers.subscribe((layers) => (value = layers));
+      unsubscribe();
+      return JSON.stringify(value);
+    });
+    expect(`${label}: a new app session restores the default`, { state: '["temperature"]' }, { state: restarted });
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1692,6 +1778,7 @@ try {
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (args.has('--settings-computers-only') || fixed) await settingsComputersFlows(expect);
+  if (args.has('--profile-layers-only') || fixed) await profileLayersFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

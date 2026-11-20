@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil de plongée : les courbes choisies restent affichées pendant la session.",
       "Plongées : « Faire signer » remplace « Faire valider ».",
       "Équipement : l’icône du scooter a été redessinée.",
       "Équipement : choisissez le type de pièce avant de remplir son formulaire.",

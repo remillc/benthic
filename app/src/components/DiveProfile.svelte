@@ -14,7 +14,7 @@
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { decimate, changesAt } from '../lib/profile-decimate.js';
-  import { readLayers, saveLayers, setLayer } from '../lib/profile-layers.js';
+  import { readLayers, saveLayers, sessionLayers, setLayer } from '../lib/profile-layers.js';
 
   /**
    * @type {{
@@ -31,20 +31,20 @@
   // `hover` (desktop, task 2026-11-15-169): the mouse pointer reads the values without a press:
   // a dashed line, a dot on the curve and a dark tooltip next to it.
   // `onenlarge` (desktop, task 2026-11-15-194): « Agrandir le profil », a button at the end of the chips
-  // row and a double click on the profile. On desktop the curves that are on are kept between dives
-  // and sessions (task 2026-11-15-183, lib/profile-layers.js).
+  // row and a double click on the profile. Desktop choices are kept between sessions; phone and tablet
+  // choices are shared between profiles until the app closes.
   let { samples, cylinders, divemode, maxDepthMm, durationSeconds, startIso, meanDepthMm = 0, prefs, hover = false, onenlarge = undefined } = $props();
 
-  // svelte-ignore state_referenced_locally
-  const remembered = hover ? readLayers(deviceStore) : null;
-  /** The chips turned on, in the order they were turned on (desktop). @type {import('../lib/profile-layers.js').Layer[]} */
-  // svelte-ignore state_referenced_locally
-  let layersOn = remembered ?? [];
+  let desktopLayers = $state(readLayers(deviceStore));
+  const layersOn = $derived(hover ? desktopLayers : $sessionLayers);
   /** @param {import('../lib/profile-layers.js').Layer} layer @param {boolean} on */
   function remember(layer, on) {
-    if (!hover) return;
-    layersOn = setLayer(layersOn, layer, on);
-    saveLayers(deviceStore, layersOn);
+    if (hover) {
+      desktopLayers = setLayer(desktopLayers, layer, on);
+      saveLayers(deviceStore, desktopLayers);
+    } else {
+      sessionLayers.update((layers) => setLayer(layers, layer, on));
+    }
   }
 
   const uid = $props.id();
@@ -127,25 +127,19 @@
     return { mk, unit, lo, hi, symbol: fahrenheit ? '°F' : '°C' };
   });
   const temperatureAvailable = $derived(temperature !== null);
-  let temperatureLayer = $state(remembered ? remembered.includes('temperature') : true);
+  const temperatureLayer = $derived(layersOn.includes('temperature'));
   const showTemperature = $derived(temperatureAvailable && temperatureLayer);
 
   // ppO2: the samples in bar, on their own 0 to 1.6 bar scale on the right,
   // with the 1.4 and 1.6 bar limits as light dashed lines.
   const PPO2_MAX = 1.6;
   const ppo2Available = $derived(samples.ppo2Mbar.some((v) => v > 0));
-  let ppo2Layer = $state(!!remembered?.includes('ppo2'));
+  const ppo2Layer = $derived(layersOn.includes('ppo2'));
   const showPpo2 = $derived(ppo2Available && ppo2Layer);
 
   // Only one right-hand scale is drawn: the last one turned on.
-  /** @type {('temperature'|'ppo2')[]} */
-  let scaleOrder = $state(remembered ? remembered.filter((l) => l === 'temperature' || l === 'ppo2') : ['temperature']);
-  /** @param {'temperature'|'ppo2'} layer @param {boolean} on */
-  function trackScale(layer, on) {
-    scaleOrder = on ? [...scaleOrder.filter((l) => l !== layer), layer] : scaleOrder.filter((l) => l !== layer);
-  }
   const rightScale = $derived(
-    [...scaleOrder].reverse().find((l) => (l === 'temperature' ? showTemperature : showPpo2)) ?? null,
+    [...layersOn].reverse().find((l) => (l === 'temperature' && showTemperature) || (l === 'ppo2' && showPpo2)) ?? null,
   );
 
   const MARGIN_RIGHT = $derived(rightScale ? 28 : 18);
@@ -227,7 +221,7 @@
     return edge;
   });
   const ceilingAvailable = $derived((!!ceilingMm && ceilingMm.some((v) => v > 0)) || !!calcCeilingEdge);
-  let ceilingLayer = $state(!!remembered?.includes('ceiling'));
+  const ceilingLayer = $derived(layersOn.includes('ceiling'));
   const ceilingShape = $derived.by(() => {
     if (!ceilingAvailable || !ceilingMm || !times.length) return null;
     let edge = '';
@@ -240,7 +234,7 @@
   // the end of the dive.
   const tissueData = $derived(samples.tissues);
   const tissuesAvailable = $derived(!!tissueData && tissueData.length >= 16 && tissueData.length === times.length * 16);
-  let tissuesLayer = $state(!!remembered?.includes('tissues'));
+  const tissuesLayer = $derived(layersOn.includes('tissues'));
   const T_HEIGHT = 56;
   const T_TOP = 4;
   const T_BOTTOM = 40;
@@ -283,7 +277,7 @@
     return list.filter((s) => s.name);
   });
   const gasAvailable = $derived(gasSegments.length > 0);
-  let gasLayer = $state(!!remembered?.includes('gas'));
+  const gasLayer = $derived(layersOn.includes('gas'));
 
   // Cursor: a finger on the profile places a vertical line and shows time and depth.
   /** @type {number|null} */
@@ -536,11 +530,7 @@
           type="button"
           class="bc-dive-profile--filter"
           aria-pressed={temperatureLayer}
-          onclick={() => {
-            temperatureLayer = !temperatureLayer;
-            trackScale('temperature', temperatureLayer);
-            remember('temperature', temperatureLayer);
-          }}
+          onclick={() => remember('temperature', !temperatureLayer)}
         >
           <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!temperatureLayer} class:bc-dive-profile--chip-temperature={temperatureLayer}>
             {#if temperatureLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t(layout.phone ? 'profile.temperatureShort' : 'profile.temperature')}</span>
@@ -548,7 +538,7 @@
         </button>
       {/if}
       {#if gasAvailable}
-        <button type="button" class="bc-dive-profile--filter" aria-pressed={gasLayer} onclick={() => ((gasLayer = !gasLayer), remember('gas', gasLayer))}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={gasLayer} onclick={() => remember('gas', !gasLayer)}>
           <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!gasLayer} class:bc-dive-profile--chip-ink={gasLayer}>
             {#if gasLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.gas')}</span>
           </span>
@@ -559,11 +549,7 @@
           type="button"
           class="bc-dive-profile--filter"
           aria-pressed={ppo2Layer}
-          onclick={() => {
-            ppo2Layer = !ppo2Layer;
-            trackScale('ppo2', ppo2Layer);
-            remember('ppo2', ppo2Layer);
-          }}
+          onclick={() => remember('ppo2', !ppo2Layer)}
         >
           <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!ppo2Layer} class:bc-dive-profile--chip-ppo2={ppo2Layer}>
             {#if ppo2Layer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ppo2')}</span>
@@ -571,14 +557,14 @@
         </button>
       {/if}
       {#if ceilingAvailable}
-        <button type="button" class="bc-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => ((ceilingLayer = !ceilingLayer), remember('ceiling', ceilingLayer))}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={ceilingLayer} onclick={() => remember('ceiling', !ceilingLayer)}>
           <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!ceilingLayer} class:bc-dive-profile--chip-ceiling={ceilingLayer}>
             {#if ceilingLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.ceiling')}</span>
           </span>
         </button>
       {/if}
       {#if tissuesAvailable}
-        <button type="button" class="bc-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => ((tissuesLayer = !tissuesLayer), remember('tissues', tissuesLayer))}>
+        <button type="button" class="bc-dive-profile--filter" aria-pressed={tissuesLayer} onclick={() => remember('tissues', !tissuesLayer)}>
           <span class="chip bc-dive-profile--chip" class:bc-dive-profile--chip-outline={!tissuesLayer} class:bc-dive-profile--chip-ink={tissuesLayer}>
             {#if tissuesLayer}<Icon name="check" size={18} weight={2.4} />{/if}<span class="chip-label">{t('profile.tissues')}</span>
           </span>
