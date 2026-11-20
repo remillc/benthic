@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 122
+Next number: 123
 
 ## List
 
@@ -53,3 +53,4 @@ Next number: 122
 - #119 [code] /profile/info/, rendre editable in place, retirer la route /edit.
 - #120 [code] /profile/info, retirer le bouton Autoriser.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
+- #122 [code] Appliquer l'imbrication css dans les feuilles de style.
