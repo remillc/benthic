@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 125
+Next number: 126
 
 ## List
 
@@ -56,3 +56,4 @@ Next number: 125
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #123 [code] sur /dives/:id, faire en sorte que la sélection des variables à afficher dans le profil de plongée (température, gas, ppo2 et tissus) soit préservée à travers la session.
 - #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
+- #125 [code] changer l'expression valider par signer dans /dives/:id et aussi dans /validate?ids=<id>.
