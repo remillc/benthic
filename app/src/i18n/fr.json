@@ -2730,6 +2730,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Brevets : le menu des agences comprend davantage d’organismes de plongée, en ordre alphabétique.",
+      "Brevets : davantage d’agences proposent des niveaux ; les autres qualifications restent libres.",
+      "Brevets : saisissez une agence ou un niveau directement, sans choisir Autre.",
       "Carnet : le menu permet d’exporter tout le carnet dans le format choisi.",
       "Plongée sur ordinateur : la section Équipement affiche la photo de chaque ordinateur de plongée lorsqu’elle est disponible.",
       "Réglages : la fermeture des menus de choix ne provoque plus d’erreur.",
