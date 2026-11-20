@@ -2729,7 +2729,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Certificates and documents: Add uses the main action colour and floats at the bottom right on tablets and desktop; the card reproduction note has been removed.",
+      "Certificates and documents: Add is pale blue and floats at the bottom right on tablets and desktop; the card reproduction note has been removed.",
       "Certificates and documents: the empty state is centred in the panel.",
       "Logbook: the menu can export the whole logbook in the chosen format.",
       "Dive detail on desktop: Equipment shows each dive computer’s photo when available.",

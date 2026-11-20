@@ -43,7 +43,7 @@ Moved to System design, section 7.
 
 ## 4. Account, dive detail, editing, settings, trip and sites
 
-- **Certificates and documents** (`/profile/certs/`): the extended Add button uses the primary action colour and floats at the bottom right; it is hidden when the inventory is read-only. On Android it uses the small Material 3 Expressive extended FAB: 56 dp high, 16 dp side padding, 24 dp icon and 8 dp between icon and label. The empty state is centred vertically in the available panel. The list has no explanatory note about reproducing cards.
+- **Certificates and documents** (`/profile/certs/`): the extended Add button uses the pale blue secondary container and floats at the bottom right; it is hidden when the inventory is read-only. On Android it uses the small Material 3 Expressive extended FAB: 56 dp high, 16 dp side padding, 24 dp icon and 8 dp between icon and label. The empty state is centred vertically in the available panel. The list has no explanatory note about reproducing cards.
 
 The shared components are in System design, section 8.
 

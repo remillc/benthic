@@ -330,8 +330,8 @@
     }
 
     .od-docs--fab {
-      --f7-fab-bg-color: var(--od-primary-action);
-      --f7-fab-text-color: var(--od-on-primary-action);
+      --f7-fab-bg-color: var(--od-secondary-container);
+      --f7-fab-text-color: var(--od-on-secondary-container);
     }
 
     :global(.md) .od-docs--fab > a {

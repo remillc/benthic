@@ -1224,20 +1224,31 @@ async function certsFabFlows(expect) {
       return { shown: !!state, fits: Math.abs(content.top - top) < 2 && Math.abs(content.bottom - bottom) < 2, centred: !!first && !!last && Math.abs((first.top + last.bottom) / 2 - (top + bottom) / 2) < 2 };
     });
     expect(`${label}: empty state is centred in its panel`, { shown: true, fits: true, centred: true }, empty);
-    const appearance = await tab.run(() => {
+    const appearance = await tab.run(async () => {
       const page = document.querySelector('.page-current.od-docs');
       const button = page.querySelector('.od-fab-add a');
       const sample = document.createElement('span');
-      sample.style.backgroundColor = 'var(--od-primary-action)';
-      sample.style.color = 'var(--od-on-primary-action)';
+      sample.style.backgroundColor = 'var(--od-secondary-container)';
+      sample.style.color = 'var(--od-on-secondary-container)';
       page.append(sample);
-      const actual = getComputedStyle(button);
-      const expected = getComputedStyle(sample);
-      const result = { background: actual.backgroundColor === expected.backgroundColor, text: actual.color === expected.color, note: !!page.querySelector('.od-docs--note') };
+      const root = document.documentElement;
+      const wasDark = root.classList.contains('dark');
+      const colours = async (dark) => {
+        root.classList.toggle('dark', dark);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const actual = getComputedStyle(button);
+        const expected = getComputedStyle(sample);
+        const values = { background: actual.backgroundColor, expectedBackground: expected.backgroundColor, text: actual.color, expectedText: expected.color };
+        return { matches: values.background === values.expectedBackground && values.text === values.expectedText, values };
+      };
+      const light = await colours(false);
+      const dark = await colours(true);
+      const result = { light: light.matches, dark: dark.matches, note: !!page.querySelector('.od-docs--note'), darkValues: dark.values };
+      root.classList.toggle('dark', wasDark);
       sample.remove();
       return result;
     });
-    expect(`${label}: Add uses the primary action colours and the note is absent`, { background: true, text: true, note: false }, appearance);
+    expect(`${label}: Add uses the blue container in both themes and the note is absent`, { light: true, dark: true, note: false }, appearance);
     if (theme === 'md') {
       const spacing = await tab.run(() => {
         const button = document.querySelector('.page-current.od-docs .od-fab-add a');
