@@ -43,7 +43,7 @@
       --od-pf-list: 340px;
       --od-pf-dw: min(640px, 92%);
       position: absolute;
-      inset: 0;
+      inset: var(--od-safe-top) 0 var(--od-safe-bottom);
       display: flex;
       background: var(--od-surface);
     }
@@ -127,8 +127,9 @@
       margin-inline-start: 16px;
     }
     :global(.page:has(.od-pf--bar-dialog) > .navbar) {
+      --f7-safe-area-top: 0px;
       left: calc(50% - min(640px, 92%) / 2);
-      top: calc(50% - min(var(--od-pf-dh, 680px), 90%) / 2);
+      top: calc(50% + (var(--od-safe-top) - var(--od-safe-bottom)) / 2 - min(var(--od-pf-dh, 680px), calc((100% - var(--od-safe-top) - var(--od-safe-bottom)) * 0.9)) / 2);
       width: min(640px, 92%);
       border-radius: 28px 28px 0 0;
       overflow: hidden;

@@ -2730,6 +2730,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil sur tablette : les commandes restent visibles au-dessus des barres système.",
       "Carnet : le menu permet d’exporter tout le carnet dans le format choisi.",
       "Plongée sur ordinateur : la section Équipement affiche la photo de chaque ordinateur de plongée lorsqu’elle est disponible.",
       "Réglages : la fermeture des menus de choix ne provoque plus d’erreur.",
