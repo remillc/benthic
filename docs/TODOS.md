@@ -46,7 +46,5 @@ Next number: 119
 - #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
-- #114 [code] Après le lancement, prévoir une tâche récurrente pour mettre à jour les listes d'agences de certification et leurs certifications.
-- #115 [code] sur tablette et desktop, sur /profile, réduire la largeur du bouton "+ Ajouter une pièce" à son contenu et aligner à droite.
-- #117 [code] renommer les variables css "--od-..." par "--btc-...": On remplace le préfix "od" pour OpenDives pour "btc" pour Benthic ainsi que les classes css.
+- #117 [code] renommer les variables css "--od-..." par "--bc-...": On remplace le préfix "od" pour OpenDives par "bc" pour Benthic ainsi que les classes css.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.

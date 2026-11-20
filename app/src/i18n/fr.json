@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil sur tablette et ordinateur : le bouton « Ajouter une pièce » est ajusté à son contenu et aligné à droite.",
       "Profil sur tablette : les commandes restent visibles au-dessus des barres système.",
       "Brevets et documents : Ajouter prend la couleur principale et flotte en bas à droite sur tablette et ordinateur ; la note sur la reproduction des cartes est retirée.",
       "Brevets et documents : l’état vide est centré dans le panneau.",

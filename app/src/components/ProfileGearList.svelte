@@ -336,4 +336,9 @@
       cursor: pointer;
     }
   }
+
+  /* Framework7's unlayered button rule otherwise stretches it across the list. */
+  .od-gear-list--add {
+    width: auto;
+  }
 </style>

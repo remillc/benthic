@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1239,6 +1239,36 @@ async function profileInsetsFlows(expect) {
   }
 }
 
+async function gearAddFlows(expect) {
+  for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['iPad', 1280, 800, false, 'ios'], ['desktop', 1400, 900, true, 'md']]) {
+    const tab = await openTab(width, height, false, false, desktop, { theme });
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
+    await sleep(1600);
+    const geometry = await tab.run(() => {
+      const button = document.querySelector('.page-current .od-gear-list--add');
+      if (!button) return { visible: false, contentWidth: false, right: false };
+      const rect = button.getBoundingClientRect();
+      const panel = button.closest('.od-gear-list').getBoundingClientRect();
+      const icon = button.querySelector('svg').getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(button.lastChild);
+      const text = range.getBoundingClientRect();
+      const style = getComputedStyle(button);
+      const expectedWidth = icon.width + text.width + parseFloat(style.columnGap) + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      return {
+        visible: rect.width > 0 && rect.height > 0,
+        contentWidth: Math.abs(rect.width - expectedWidth) < 2,
+        right: Math.abs(panel.right - rect.right - 17) < 2,
+      };
+    });
+    expect(`${label}: gear Add fits its content at the right of the list`, { visible: true, contentWidth: true, right: true }, geometry);
+    await tab.run(() => document.querySelector('.page-current .od-gear-list--add').click());
+    await sleep(1000);
+    expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.od-piece-edit')) });
+    tab.ws.close();
+  }
+}
+
 async function certsFabFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['iPhone', 390, 844, true, false, 'ios'], ['tablet landscape', 1280, 800, false, false, 'md'], ['tablet portrait', 800, 1280, false, false, 'md'], ['desktop', 1400, 900, false, true, 'md']]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
@@ -1409,7 +1439,7 @@ async function certificationAgencyFlows(expect) {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1423,6 +1453,7 @@ try {
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
+  if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
