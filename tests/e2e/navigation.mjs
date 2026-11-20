@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--computer-photo-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1002,8 +1002,38 @@ async function desktopFlows() {
   tab.ws.close();
 }
 
+async function computerPhotoFlows(expect) {
+  const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
+  await tab.run(async () => {
+    const { useStorage, getCatalog } = await import('/src/lib/dc-images.js');
+    useStorage({
+      getText: async () => JSON.stringify([{ vendor: 'Test', product: 'Sample', slug: 'sample', hasImage: true }]),
+      putText: async () => {},
+      imageUrl: async () => 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/%3E',
+      putImage: async () => {},
+    });
+    await getCatalog();
+    const { logbook } = await import('/src/lib/logbook.svelte.js');
+    document.querySelector('#view-logbook').f7View.router.navigate(`/dives/${logbook.dives[0].id}`);
+  });
+  await sleep(1200);
+  await tab.run(() => {
+    const button = document.querySelector('.od-dive-detail--desk-tabs [data-tab="equipment"]');
+    if (!button) throw new Error('desktop equipment tab missing');
+    button.click();
+  });
+  await sleep(800);
+  const state = await tab.run(() => {
+    const row = document.querySelector('.od-desktop-edit-field[data-field="computer"] .od-desktop-edit-field--value');
+    const image = row?.querySelector('.od-dc-tile img');
+    return { named: !!row?.textContent.includes('Sample'), photo: !!image && image.getAttribute('src')?.startsWith('data:image/svg+xml') };
+  });
+  expect('desktop equipment shows the computer photo beside its name', { named: true, photo: true }, state);
+  tab.ws.close();
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--computer-photo-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1013,6 +1043,7 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
+  if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

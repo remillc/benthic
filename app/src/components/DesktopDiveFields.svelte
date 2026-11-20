@@ -9,6 +9,8 @@
   import { OpenDivesCore } from 'opendives-core';
   import { cachedCylinderTypes, cachedPlannerSetup, cachedSites, cachedValues } from '../lib/core-cache.js';
   import DesktopEditField from './DesktopEditField.svelte';
+  import DcTile from './DcTile.svelte';
+  import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopSegments from './DesktopSegments.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
@@ -386,8 +388,13 @@
   {:else if tab === 'equipment'}
     <!-- Équipement (mock-up bureau-carnet-onglet-equipement). -->
     <h3 class="od-desktop-dive-fields--heading">{t('desktopDetail.section.computers')}</h3>
+    {#snippet noComputerPhoto()}{/snippet}
     {#each dive.diveComputers ?? [] as dc, i (i)}
-      <DesktopEditField name="computer" kind="text" readonly label={computerRole(i)} value={dc.nickname || dc.model} display={[dc.nickname || dc.model, dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')} />
+      <DesktopEditField name="computer" kind="text" readonly label={computerRole(i)} value={dc.nickname || dc.model} display={[dc.nickname || dc.model, dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}>
+        {#snippet leading()}
+          {#if dc.model}<DcTile model={dc.model} size={32} radius={8} photo={ownComputerPhoto(dc.model, dc.serial)} fallback={dive.diveComputers?.length === 1 ? noComputerPhoto : undefined} />{/if}
+        {/snippet}
+      </DesktopEditField>
     {/each}
     <!-- Computers join a dive when it is downloaded: nothing to type here. -->
     <DesktopEditField name="computer-add" kind="text" disabled label={computerRole(computers.length)} value="" invitation={t('desktopDetail.addComputer')} />

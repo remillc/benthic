@@ -43,10 +43,11 @@
    *   emptyText?: string,
    *   onopen?: () => void,
    *   openLabel?: string,
+   *   leading?: import('svelte').Snippet,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -206,7 +207,7 @@
   <span class="od-desktop-edit-field--label" class:od-sr-only={card} id="od-df-{uid}">{label}</span>
 
   {#if readonly}
-    <span class="od-desktop-edit-field--value od-value" aria-labelledby="od-df-{uid}">{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
+    <span class="od-desktop-edit-field--value od-value" aria-labelledby="od-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="od-desktop-edit-field--rest od-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
@@ -429,6 +430,7 @@
       min-height: 40px;
       display: flex;
       align-items: center;
+      gap: 8px;
       padding: 0 10px;
       font-size: 15px;
       color: var(--od-text);
