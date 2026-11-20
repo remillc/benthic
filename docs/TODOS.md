@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 117
+Next number: 118
 
 ## List
 
@@ -49,3 +49,4 @@ Next number: 117
 - #114 [code] Après le lancement, prévoir une tâche récurrente pour mettre à jour les listes d'agences de certification et leurs certifications.
 - #115 [code] sur tablette et desktop, sur /profile, réduire la largeur du bouton "+ Ajouter une pièce" à son contenu et aligner à droite.
 - #116 [code] sur tablette, l'app est masquée en haut par la barre d'état d'Android, et en bas par la barre d'apps.
+- #117 [code] renommer les variables css "--od-..." par "--btc-...": On remplace le préfix "od" pour OpenDives pour "btc" pour Benthic ainsi que les classes css.
