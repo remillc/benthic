@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 138
+Next number: 139
 
 ## List
 
@@ -57,3 +57,4 @@ Next number: 138
 - #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
+- #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
