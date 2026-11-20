@@ -127,7 +127,7 @@ async function fixture({ media } = {}) {
   await profile.saveInfo({ dateOfBirth: '1980-05-17', emergency: { name: 'Alex Martin', relation: 'Sister', phone: { country: 'CA', number: '5145551234' } }, bloodGroup: 'O+' });
   const front = jpeg(2000, 3);
   const back = jpeg(1500, 9);
-  const cert = await profile.saveCertification({ agency: 'padi', level: 'Advanced', number: 'A123456', issuedOn: '2019-06-01', instructor: 'Sam', photos: { front, back } });
+  const cert = await profile.saveCertification({ agency: 'padi', level: 'Advanced', number: 'A123456', issuedOn: '2019-06-01', instructor: 'Sam', instructorNumber: 'I234', photos: { front, back } });
   const cert2 = await profile.saveCertification({ agency: 'ssi', level: 'Open Water', number: 'S987' });
   const ssrf = new TextEncoder().encode('<divelog program="subsurface"><dives><dive number="1"/></dives></divelog>');
   const deps = {
@@ -275,6 +275,7 @@ test('the sealed items come out decrypted, and read back the same as in the app'
     assert.equal(card.number, 'A123456');
     assert.equal(card.agency, 'padi');
     assert.equal(card.instructor, 'Sam');
+    assert.equal(card.instructorNumber, 'I234');
     assert.deepEqual(card.documents.map((d) => d.file).sort(), [`certifications/photos/${cert.id}-back.jpg`, `certifications/photos/${cert.id}-front.jpg`]);
     for (const [name, e] of zip) if (name.endsWith('.json')) assert.ok(!/"enc"/.test(e.data.toString()), `no sealed block left in ${name}`);
   } finally {

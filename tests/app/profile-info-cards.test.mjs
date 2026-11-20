@@ -279,10 +279,24 @@ test('a certification card: saved sealed with its photos, listed, changed, delet
   assert.equal((await backend.list('documents/')).length, 0);
 });
 
-test('a card needs an agency, a level and a number; the date is checked', () => {
-  assert.deepEqual(certificationProblems({ agency: '', level: '', number: '', issuedOn: '' }), { agency: 'empty', level: 'empty', number: 'empty' });
+test('a card needs an agency and a level; the number is optional and the date is checked', () => {
+  assert.deepEqual(certificationProblems({ agency: '', level: '', number: '', issuedOn: '' }), { agency: 'empty', level: 'empty' });
+  assert.deepEqual(certificationProblems({ agency: 'SSI', level: 'x', number: '', issuedOn: '' }), {});
   assert.deepEqual(certificationProblems({ agency: 'SSI', level: 'x', number: '1', issuedOn: '2999-01-01' }), { issuedOn: 'future' });
   assert.deepEqual(certificationProblems({ agency: 'SSI', level: 'x', number: '1', issuedOn: '2019-05-20' }), {});
+});
+
+test('a certificate can keep the issuing instructor number without a diver number', async () => {
+  const { profile } = setup();
+  const card = await profile.saveCertification({ agency: 'PADI', level: 'Open Water', instructor: 'Marie', instructorNumber: '  A123  ', instructorCert: true });
+  assert.equal(card.number, '');
+  assert.equal(card.instructorNumber, 'A123');
+  const reopened = await profile.getCertification(card.id);
+  assert.equal(reopened.number, '');
+  assert.equal(reopened.instructorNumber, 'A123');
+  const changed = await profile.saveCertification({ id: card.id, agency: 'PADI', level: 'Open Water', number: '42', instructor: 'Marie', instructorNumber: 'A123', instructorCert: true });
+  assert.equal(changed.number, '42');
+  assert.equal(changed.instructorNumber, 'A123');
 });
 
 test('the level suggestions follow the agency and what is typed', () => {

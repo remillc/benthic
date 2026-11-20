@@ -1406,16 +1406,16 @@ async function certificationAgencyFlows(expect) {
     });
     await sleep(250);
     expect(`${label}: an unlisted level can be entered`, { value: 'Custom level' }, { value: await tab.run(() => document.querySelectorAll('.bc-cert-edit .bc-combo-field input')[1].value) });
-    await tab.run((number) => {
+    await tab.run((agencyName) => {
       const [agency] = document.querySelectorAll('.bc-cert-edit .bc-combo-field input');
       agency.focus();
-      agency.value = 'Custom agency';
+      agency.value = agencyName;
       agency.dispatchEvent(new Event('input', { bubbles: true }));
       agency.blur();
-      const field = document.querySelector('.bc-cert-edit .bc-text-field input');
-      field.value = number;
-      field.dispatchEvent(new Event('input', { bubbles: true }));
-    }, `test-${label}`);
+      const instructorNumber = document.querySelectorAll('.bc-cert-edit .bc-text-field input')[2];
+      instructorNumber.value = 'instructor-42';
+      instructorNumber.dispatchEvent(new Event('input', { bubbles: true }));
+    }, `Custom agency ${label}`);
     await sleep(250);
     await tab.run(() => {
       const save = document.querySelector('.bc-cert-edit--save');
@@ -1423,23 +1423,27 @@ async function certificationAgencyFlows(expect) {
       save.click();
     });
     await sleep(1000);
-    const saved = await tab.run(async (number) => {
+    const saved = await tab.run(async (agencyName) => {
       const { services } = await import('/src/lib/profile.svelte.js');
-      const card = (await services().profile.listCertifications()).find((c) => c.number === number);
-      return card && { id: card.id, agency: card.agency, agencyName: card.agencyName, level: card.level };
-    }, `test-${label}`);
-    expect(`${label}: custom agency and level are saved`, { agency: 'other', agencyName: 'Custom agency', level: 'Custom level' }, saved || {});
+      const card = (await services().profile.listCertifications()).find((c) => c.agencyName === agencyName && c.level === 'Custom level');
+      return card && { id: card.id, agency: card.agency, agencyName: card.agencyName, level: card.level, number: card.number, instructorNumber: card.instructorNumber };
+    }, `Custom agency ${label}`);
+    expect(`${label}: the issuing instructor number is saved without a diver number`, { agency: 'other', agencyName: `Custom agency ${label}`, level: 'Custom level', number: '', instructorNumber: 'instructor-42' }, saved || {});
     if (!saved) throw new Error('saved certificate missing');
     await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/certs/${id}/edit`); }, saved.id);
     await sleep(1200);
     const reopened = await tab.run(() => [...document.querySelectorAll('.bc-cert-edit .bc-combo-field input')].map((input) => input.value));
-    expect(`${label}: custom values reopen`, { agency: 'Custom agency', level: 'Custom level' }, { agency: reopened[0], level: reopened[1] });
-    await tab.run(() => {
+    expect(`${label}: custom values reopen`, { agency: `Custom agency ${label}`, level: 'Custom level' }, { agency: reopened[0], level: reopened[1] });
+    expect(`${label}: the instructor number reopens`, { number: 'instructor-42' }, { number: await tab.run(() => document.querySelectorAll('.bc-cert-edit .bc-text-field input')[2].value) });
+    await tab.run((number) => {
       const input = document.querySelector('.bc-cert-edit .bc-combo-field input');
       input.focus();
       input.value = 'FQAS';
       input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
+      const field = document.querySelector('.bc-cert-edit .bc-text-field input');
+      field.value = number;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }, `test-${label}`);
     await sleep(200);
     await tab.run(() => [...document.querySelectorAll('.bc-combo-field--menu [role="option"]')].find((o) => o.textContent.trim().startsWith('FQAS ·')).click());
     await sleep(200);
@@ -1448,9 +1452,9 @@ async function certificationAgencyFlows(expect) {
     const updated = await tab.run(async (id) => {
       const { services } = await import('/src/lib/profile.svelte.js');
       const card = await services().profile.getCertification(id);
-      return card && { agency: card.agency, agencyName: card.agencyName, level: card.level };
+      return card && { agency: card.agency, agencyName: card.agencyName, level: card.level, number: card.number, instructorNumber: card.instructorNumber };
     }, saved.id);
-    expect(`${label}: a selected agency keeps its identifier`, { agency: 'FQAS', agencyName: '', level: 'Custom level' }, updated || {});
+    expect(`${label}: a selected agency keeps its identifier and a number can be added`, { agency: 'FQAS', agencyName: '', level: 'Custom level', number: `test-${label}`, instructorNumber: 'instructor-42' }, updated || {});
     tab.ws.close();
   }
 }

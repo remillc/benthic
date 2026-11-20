@@ -2,7 +2,7 @@
   // @ts-check
   // « Nouveau brevet » and « Modifier le brevet » (task 2026-11-18-272, docs/mockups-release/profil-brevet-nouveau-android.dc.html):
   // two photo slots (recto, verso), then Agence and Niveau (free text with suggestions),
-  // Numéro, Date and Moniteur (optional). The slots call `scanCard` (lib/card-scan.js): today the image picker, later the
+  // optional Numéro, Date and Moniteur. The slots call `scanCard` (lib/card-scan.js): today the image picker, later the
   // phone's document scanner with text recognition; the text it returns proposes the agency, level and number, which the
   // diver checks. The photos stay on the device (sealed); nothing is sent. The fields are checked as the diver types.
   import { onDestroy, onMount } from 'svelte';
@@ -38,11 +38,12 @@
   let number = $state('');
   let issuedOn = $state('');
   let instructor = $state('');
+  let instructorNumber = $state('');
   /** « Brevet de moniteur »: its number is used when the diver confirms another diver's dive (task 2026-11-19-309). */
   let instructorCert = $state(false);
   let saving = $state(false);
   /** What the scan filled in, to mark it « Lu sur la carte » while the field still holds it. */
-  let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '', instructor: '' });
+  let readFrom = $state({ agency: '', level: '', number: '', issuedOn: '', instructor: '', instructorNumber: '' });
   /** The text read on each side, to read both together. */
   const cardTexts = { front: '', back: '' };
   /** The photos: `bytes` is set when changed here (null: removed), `url` is what is shown. @type {Record<'front'|'back', { bytes?: Uint8Array|null, url: string }>} */
@@ -61,6 +62,7 @@
     number = c.number;
     issuedOn = c.issuedOn;
     instructor = c.instructor;
+    instructorNumber = c.instructorNumber;
     instructorCert = c.instructorCert;
     for (const d of c.documents) {
       const bytes = await services().profile.readPhoto(c.id, d.hash);
@@ -78,7 +80,7 @@
     () => issuedOn,
     () => (problems.issuedOn ? t('diverProfile.cert.dateFuture') : ''),
   );
-  const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'|'instructor'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
+  const mark = (/** @type {'agency'|'level'|'number'|'issuedOn'|'instructor'|'instructorNumber'} */ field, /** @type {string} */ value) => (readFrom[field] && readFrom[field] === value ? t('diverProfile.cert.readMark') : '');
   const canSave = $derived(!Object.keys(problems).length && !saving && !busy.front && !busy.back && !gear.readOnly);
 
   /** The side whose photo the desktop's dialog is asking for (a computer has no camera nor scanner). @type {'front'|'back'|null} */
@@ -119,7 +121,7 @@
       // The text of both sides proposes what the diver has not typed: a field that still holds an earlier proposal may be replaced by a better one.
       cardTexts[side] = scanned.text;
       const found = parseCardText(joinTexts(cardTexts.front, cardTexts.back));
-      /** @param {'agency'|'level'|'number'|'issuedOn'|'instructor'} field @param {string} current */
+      /** @param {'agency'|'level'|'number'|'issuedOn'|'instructor'|'instructorNumber'} field @param {string} current */
       const free = (field, current) => !current.trim() || (readFrom[field] !== '' && readFrom[field] === current);
       if (found.agency && free('agency', agencyText)) {
         agencyText = certAgencyText(found.agency, found.agencyName, agencyOptions);
@@ -129,6 +131,7 @@
       if (found.number && free('number', number)) readFrom.number = number = found.number;
       if (found.issuedOn && free('issuedOn', issuedOn)) readFrom.issuedOn = issuedOn = found.issuedOn;
       if (found.instructor && free('instructor', instructor)) readFrom.instructor = instructor = found.instructor;
+      if (found.instructorNumber && free('instructorNumber', instructorNumber)) readFrom.instructorNumber = instructorNumber = found.instructorNumber;
     } catch {
       showSnackbar(t('diverProfile.cert.photoFailed'));
     } finally {
@@ -155,6 +158,7 @@
           number,
           issuedOn,
           instructor,
+          instructorNumber,
           instructorCert,
           photos: { ...(photos.front.bytes !== undefined ? { front: photos.front.bytes } : {}), ...(photos.back.bytes !== undefined ? { back: photos.back.bytes } : {}) },
         }),
@@ -201,9 +205,10 @@
   <div class="bc-cert-edit--fields">
     <ComboField label={t('diverProfile.cert.agency')} bind:value={agencyText} options={agencyOptions.map((o) => o.label)} supporting={mark('agency', agencyText)} />
     <ComboField label={t('diverProfile.cert.level')} bind:value={level} options={suggestions} supporting={mark('level', level)} />
-    <TextField label={t('diverProfile.cert.number')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
+    <TextField label={t('diverProfile.cert.numberOptional')} bind:value={number} supporting={mark('number', number) || t('diverProfile.cert.numberHint')} />
     <DateField label={t('diverProfile.cert.date')} bind:value={issuedOn} maxYear={new Date().getFullYear()} supporting={dateLive.error || mark('issuedOn', issuedOn)} />
     <TextField label={t('diverProfile.cert.instructor')} bind:value={instructor} supporting={mark('instructor', instructor) || t('diverProfile.cert.instructorHint')} />
+    <TextField label={t('diverProfile.cert.instructorNumberOptional')} bind:value={instructorNumber} supporting={mark('instructorNumber', instructorNumber)} />
     <SwitchField label={t('diverProfile.cert.instructorCert')} bind:checked={instructorCert} supporting={t('diverProfile.cert.instructorCertText')} />
   </div>
   <div class="bc-cert-edit--bottom"></div>

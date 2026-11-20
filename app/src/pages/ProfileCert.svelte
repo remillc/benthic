@@ -106,9 +106,10 @@
     <div class="bc-cert--card">
       <div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.agency')}</span><span class="bc-cert--value">{agency}</span></div>
       <div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.level')}</span><span class="bc-cert--value">{card.level}</span></div>
-      <div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.number')}</span><span class="bc-cert--value">{card.number}</span></div>
+      {#if card.number.trim()}<div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.number')}</span><span class="bc-cert--value">{card.number}</span></div>{/if}
       {#if card.issuedOn}<div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.date')}</span><span class="bc-cert--value">{formatDate(card.issuedOn)}</span></div>{/if}
       {#if card.instructor}<div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.instructor')}</span><span class="bc-cert--value">{card.instructor}</span></div>{/if}
+      {#if card.instructorNumber}<div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.instructorNumber')}</span><span class="bc-cert--value">{card.instructorNumber}</span></div>{/if}
       {#if card.instructorCert}<div class="bc-cert--row"><span class="bc-cert--label">{t('diverProfile.cert.instructorCert')}</span><span class="bc-cert--value bc-cert--value-small">{t('diverProfile.cert.instructorCertText')}</span></div>{/if}
     </div>
   {/if}

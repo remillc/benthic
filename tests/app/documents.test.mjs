@@ -7,12 +7,13 @@ import { documentProblems, instructorNumber, createProfile } from '../../app/src
 import { parseInsuranceText, findDates } from '../../app/src/lib/card-scan.js';
 import { createFileStore, memoryBackend } from '../../app/src/lib/file-store.js';
 import { createSecretBox } from '../../app/src/lib/secret-box.js';
+import { documentLine } from '../../app/src/lib/documents-text.js';
 
 const TODAY = '2026-11-19';
 
 /** @param {Partial<import('../../app/src/lib/profile.js').Certification>} o */
 const doc = (o) => ({
-  id: 'd1', kind: 'other', agency: '', agencyName: '', level: '', number: '', issuedOn: '', instructor: '', instructorCert: false, title: '', expiresOn: '',
+  id: 'd1', kind: 'other', agency: '', agencyName: '', level: '', number: '', issuedOn: '', instructor: '', instructorNumber: '', instructorCert: false, title: '', expiresOn: '',
   notifyDays: 30, insurer: '', plan: '', policyNumber: '', emergencyPhone: '', startsOn: '', doctor: '', notes: '', documents: [], updatedAt: '', ...o,
 });
 
@@ -52,6 +53,12 @@ test('a card without a photo is drawn from the details entered', () => {
   assert.deepEqual(drawnCard(doc({ kind: 'insurance', insurer: 'DAN Canada', plan: 'Sport', policyNumber: '88 410 233' }), words), { heading: 'DAN CANADA', lines: ['Sport', '88 410 233'] });
   assert.equal(cardTone(doc({ kind: 'insurance' })), 'red');
   assert.equal(cardTone(doc({ kind: 'certification', agency: 'SSI' })), 'green');
+});
+
+test('a certification without a number shows its date alone or no line', () => {
+  const format = (date) => `formatted ${date}`;
+  assert.equal(documentLine(doc({ kind: 'certification', issuedOn: '2020-01-02' }), format, TODAY), 'formatted 2020-01-02');
+  assert.equal(documentLine(doc({ kind: 'certification' }), format, TODAY), '');
 });
 
 test('validation: an insurance needs its insurer and its expiry, a medical certificate its expiry, another document its title', () => {
@@ -111,6 +118,7 @@ test('the instructor\'s number: the first card marked « Brevet de moniteur »',
   ];
   assert.deepEqual(instructorNumber(certs), { number: '412 778', agency: 'PADI', level: 'Open Water Scuba Instructor' });
   assert.equal(instructorNumber([certs[0]]), null);
+  assert.equal(instructorNumber([doc({ kind: 'certification', instructorCert: true, instructorNumber: '123' })]), null);
 });
 
 test('documents in the sealed store: an insurance with a PDF, a medical certificate with pages, files kept or removed', async () => {

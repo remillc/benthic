@@ -77,12 +77,13 @@
 
 {#snippet row(/** @type {import('../lib/profile.js').Certification} */ doc)}
   {@const status = expiryState(doc.expiresOn, today)}
+  {@const line = documentLine(doc, formatDate, today)}
   <button type="button" class="bc-docs--row" onclick={() => open(doc)}>
     <DocumentThumb {doc} urls={thumbs[doc.id] ?? []} />
     <span class="bc-docs--texts">
       <span class="bc-docs--kind bc-docs--tone-{cardTone(doc)}">{kindLabel(doc)}</span>
       <span class="bc-docs--title">{documentTitle(doc)}</span>
-      <span class="bc-docs--line">{documentLine(doc, formatDate, today)}</span>
+      {#if line}<span class="bc-docs--line">{line}</span>{/if}
       {#if doc.kind !== 'certification' && status.state !== 'none'}
         <span class="bc-docs--badge bc-docs--badge-{status.state}">{badgeText(status)}</span>
       {/if}

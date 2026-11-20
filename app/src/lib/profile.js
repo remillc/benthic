@@ -109,6 +109,7 @@ export const EXPIRY_LEAD_CHOICES = [14, 30, 60];
  * @property {string} number the card's number; an instructor's number when `instructorCert`
  * @property {string} issuedOn YYYY-MM-DD: the card's date, the medical certificate's date
  * @property {string} instructor
+ * @property {string} instructorNumber the number of the instructor who issued the card
  * @property {boolean} instructorCert « Brevet de moniteur »: `number` is used when the diver confirms another diver's dive
  * @property {string} title the name of another document
  * @property {string} expiresOn YYYY-MM-DD, '' when the document does not expire
@@ -181,16 +182,15 @@ export const fileExtension = (mime) => (mime === 'application/pdf' ? 'pdf' : 'jp
 
 /**
  * What is wrong with a card, for live validation.
- * @param {{ agency: string, level: string, number: string, issuedOn: string }} f
+ * @param {{ agency: string, level: string, number?: string, issuedOn: string }} f
  * @param {string} [today]
- * @returns {{ agency?: 'empty', level?: 'empty', number?: 'empty', issuedOn?: 'date'|'future' }}
+ * @returns {{ agency?: 'empty', level?: 'empty', issuedOn?: 'date'|'future' }}
  */
 export function certificationProblems(f, today = new Date().toISOString().slice(0, 10)) {
-  /** @type {{ agency?: 'empty', level?: 'empty', number?: 'empty', issuedOn?: 'date'|'future' }} */
+  /** @type {{ agency?: 'empty', level?: 'empty', issuedOn?: 'date'|'future' }} */
   const out = {};
   if (!f.agency) out.agency = 'empty';
   if (!f.level.trim()) out.level = 'empty';
-  if (!f.number.trim()) out.number = 'empty';
   const d = f.issuedOn.trim();
   if (d && !realDate(d)) out.issuedOn = 'date';
   else if (d && d > today) out.issuedOn = 'future';
@@ -342,6 +342,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
           number: p.number ?? '',
           issuedOn: p.issuedOn ?? '',
           instructor: p.instructor ?? '',
+          instructorNumber: p.instructorNumber ?? '',
           instructorCert: p.instructorCert === true,
           title: p.title ?? '',
           expiresOn: p.expiresOn ?? '',
@@ -369,7 +370,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     /**
      * Creates a card (no `id`) or changes one. `photos`: new card photos (JPEG bytes) by side; a side given with
      * `null` removes the photo of that side. The other fields of a document are kept as they are.
-     * @param {{ id?: string, agency: string, agencyName?: string, level: string, number: string, issuedOn?: string, instructor?: string, instructorCert?: boolean, photos?: { front?: Uint8Array|null, back?: Uint8Array|null } }} f
+     * @param {{ id?: string, agency: string, agencyName?: string, level: string, number?: string, issuedOn?: string, instructor?: string, instructorNumber?: string, instructorCert?: boolean, photos?: { front?: Uint8Array|null, back?: Uint8Array|null } }} f
      * @returns {Promise<Certification>}
      */
     async saveCertification(f) {
@@ -381,7 +382,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
      * document. `files` is the final list of its files: an item with a `hash` is a file already kept, one with `bytes` is
      * new (a JPEG, or a PDF with `mime`); a kept file that is not in the list is removed. Without `files`, `photos` (by
      * side) works as in `saveCertification` and the other files stay.
-     * @param {{ id?: string, kind: DocumentKind, agency?: string, agencyName?: string, level?: string, number?: string, issuedOn?: string, instructor?: string, instructorCert?: boolean, title?: string, expiresOn?: string, notifyDays?: number, insurer?: string, plan?: string, policyNumber?: string, emergencyPhone?: string, startsOn?: string, doctor?: string, notes?: string, photos?: { front?: Uint8Array|null, back?: Uint8Array|null }, files?: { side: 'front'|'back'|'page', page?: number, hash?: string, bytes?: Uint8Array, mime?: string }[] }} f
+     * @param {{ id?: string, kind: DocumentKind, agency?: string, agencyName?: string, level?: string, number?: string, issuedOn?: string, instructor?: string, instructorNumber?: string, instructorCert?: boolean, title?: string, expiresOn?: string, notifyDays?: number, insurer?: string, plan?: string, policyNumber?: string, emergencyPhone?: string, startsOn?: string, doctor?: string, notes?: string, photos?: { front?: Uint8Array|null, back?: Uint8Array|null }, files?: { side: 'front'|'back'|'page', page?: number, hash?: string, bytes?: Uint8Array, mime?: string }[] }} f
      * @returns {Promise<Certification>}
      */
     async saveDocument(f) {
@@ -433,6 +434,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
               level: text(f.level),
               number: text(f.number),
               ...(text(f.instructor) ? { instructor: text(f.instructor) } : {}),
+              ...(text(f.instructorNumber) ? { instructorNumber: text(f.instructorNumber) } : {}),
               ...(f.instructorCert ? { instructorCert: true } : {}),
             }
           : {}),

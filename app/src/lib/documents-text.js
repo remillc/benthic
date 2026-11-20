@@ -34,7 +34,10 @@ export const kindLabel = (doc) => (doc.kind === 'certification' ? agencyLabel(do
  * @param {string} today
  */
 export function documentLine(doc, formatDate, today) {
-  if (doc.kind === 'certification') return doc.issuedOn ? t('diverProfile.certs.line', { number: doc.number, date: formatDate(doc.issuedOn) }) : t('diverProfile.certs.lineNoDate', { number: doc.number });
+  if (doc.kind === 'certification') {
+    if (!doc.number.trim()) return doc.issuedOn ? formatDate(doc.issuedOn) : '';
+    return doc.issuedOn ? t('diverProfile.certs.line', { number: doc.number, date: formatDate(doc.issuedOn) }) : t('diverProfile.certs.lineNoDate', { number: doc.number });
+  }
   if (doc.expiresOn) return t(expiryState(doc.expiresOn, today).state === 'expired' ? 'docs.expiredOn' : 'docs.expiresOn', { date: formatDate(doc.expiresOn) });
   return doc.notes;
 }

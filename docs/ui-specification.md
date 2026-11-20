@@ -45,6 +45,8 @@ Moved to System design, section 7.
 
 - **Certificates and documents** (`/profile/certs/`): the extended Add button uses the pale blue secondary container and floats at the bottom right; it is hidden when the inventory is read-only. On Android it uses the small Material 3 Expressive extended FAB: 56 dp high, 16 dp side padding, 24 dp icon and 8 dp between icon and label. The empty state is centred vertically in the available panel. The list has no explanatory note about reproducing cards.
 - **Certificate agency:** an editable menu lists agencies with at least one verified diver certification alphabetically by their displayed name. An unlisted agency can be typed directly, without choosing Other. Existing saved agency identifiers stay unchanged. The level field suggests known certifications for the selected agency and also accepts free text, including historical or unlisted levels.
+- **Certificate number:** optional on new and edited certificates. A missing number is omitted from the document list and details; an instructor certificate without one does not supply an instructor number for dive validation.
+- **Issuing instructor:** a certificate can also record the instructor's optional number separately from the diver's own certificate number.
 - **Profile equipment list:** on tablets and desktop, the Add equipment button fits its content and sits at the bottom right of the list pane.
 - **Profile navigation:** on landscape tablets, the profile column is 320 px wide, or 350 px from a viewport width of 1200 px; the page bar stays aligned with its content pane. Desktop widths are unchanged.
 
