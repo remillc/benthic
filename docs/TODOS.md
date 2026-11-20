@@ -47,7 +47,6 @@ Next number: 136
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
-- #119 [code] /profile/info/, rendre editable in place, retirer la route /edit.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
@@ -55,5 +54,5 @@ Next number: 136
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
-- #134 [code] On /profile/info/edit, place Save at the bottom right.
-- #135 [code] On /profile/info/edit, reduce the width of the Blood group field.
+- #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
+- #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.

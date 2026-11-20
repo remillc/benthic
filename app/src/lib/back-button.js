@@ -118,6 +118,9 @@ function dispatch(layersOnly) {
   if (wizardStep && !modal && !layersOnly) return cancel(wizardStep, 'wizard-step');
   const gearStep = document.querySelector('.page-current .bc-piece-edit--stage[data-step="form"]');
   if (gearStep && !modal && !layersOnly) return cancel(gearStep, 'gear-type-step');
+  // 3b''. The profile information edited in place stops editing, without saving (pages/ProfileInfo.svelte).
+  const infoEditing = document.querySelector('.page-current .bc-profile-info--editing');
+  if (infoEditing && !modal && !layersOnly) return cancel(infoEditing, 'profile-info-edit');
   // 3c. A form with unsaved changes (the full screen, or its popup on a tablet) asks
   // before it is left (lib/leave-guard.js); a sheet or dialog above it closed first.
   if ((modal ? modal.classList.contains('popup') : !layersOnly) && backThroughGuard(modal)) return 'leave-guard';

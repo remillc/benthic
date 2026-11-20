@@ -1720,21 +1720,34 @@ async function profileInfoWidthsFlows(expect) {
     ['tablet', 1280, 800, false, false, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
-    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info/edit'); });
-    await sleep(1200);
+    const state = () => tab.run(() => {
+      const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
+      return { route: view?.f7View?.router?.currentRoute?.url, editing: !!document.querySelector('.page-current .bc-profile-info--editing') };
+    });
+    /** The page opens in its read view; the pencil edits it in place. */
+    const edit = async () => {
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info'); });
+      await sleep(1200);
+      const found = await tab.run(() => !!document.querySelector('.page-current .bc-profile-info--edit-button'));
+      if (!found) throw new Error(`The pencil of the information page is missing: ${await tab.run(() => document.querySelector('.page-current')?.className)} ${JSON.stringify(tab.logs.slice(-3))}`);
+      await tab.run(() => document.querySelector('.page-current .bc-profile-info--edit-button').click());
+      await sleep(500);
+    };
+    await edit();
+    expect(`${label}: the pencil edits in place`, { route: '/profile/info', editing: true }, await state());
     const result = await tab.run(() => {
-      const page = document.querySelector('.page-current.bc-profile-edit');
-      if (!page) throw new Error('Information editor is missing');
+      const page = document.querySelector('.page-current.bc-profile-info');
+      if (!page) throw new Error('Information page is missing');
       const rect = (selector) => {
         const element = page.querySelector(selector);
         if (!element) throw new Error(`Missing ${selector}`);
         return element.getBoundingClientRect();
       };
-      const full = rect('.bc-profile-edit--fields .bc-text-field--box');
-      const birth = rect('.bc-profile-edit--birth .bc-button-field--box');
-      const relation = rect('.bc-profile-edit--relation .bc-combo-field--box');
-      const phone = rect('.bc-profile-edit--number .bc-text-field--box');
-      const country = rect('.bc-profile-edit--country .bc-select-field--box');
+      const full = rect('.bc-profile-info--fields .bc-text-field--box');
+      const birth = rect('.bc-profile-info--birth .bc-button-field--box');
+      const relation = rect('.bc-profile-info--relation .bc-combo-field--box');
+      const phone = rect('.bc-profile-info--number .bc-text-field--box');
+      const country = rect('.bc-profile-info--country .bc-select-field--box');
       return {
         birthNarrower: birth.width < full.width && birth.width <= 192.5,
         relationNarrower: relation.width < full.width && relation.width <= 240.5,
@@ -1745,7 +1758,7 @@ async function profileInfoWidthsFlows(expect) {
     expect(`${label}: the three fields are narrower and fit`, { birthNarrower: true, relationNarrower: true, phoneNarrower: true, withinViewport: true }, result);
     const bloodField = await tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
-      const page = document.querySelector('.page-current.bc-profile-edit');
+      const page = document.querySelector('.page-current.bc-profile-info');
       const field = [...page.querySelectorAll('.bc-select-field')].find((item) => item.textContent.includes(t('diverProfile.info.blood')));
       const control = field?.querySelector('select, .bc-select-field--trigger');
       if (!control) throw new Error('Blood group field is missing');
@@ -1767,18 +1780,17 @@ async function profileInfoWidthsFlows(expect) {
       });
     }
     await sleep(100);
-    await tab.run(() => document.querySelector('.page-current .bc-profile-edit--save').click());
+    await tab.run(() => document.querySelector('.page-current .bc-profile-info--save').click());
     await sleep(700);
     const saved = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
     expect(`${label}: blood group is saved`, { blood: 'O+' }, { blood: saved });
+    expect(`${label}: Save returns to the read view of the same page`, { route: '/profile/info', editing: false }, await state());
     if (label === 'narrow phone') {
-      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info'); });
-      await sleep(700);
       const profile = await tab.run(() => {
         const page = document.querySelector('.page-current.bc-profile-info');
-        return { blood: page?.textContent.includes('O+'), allow: !!page?.querySelector('.bc-profile-info--allow') };
+        return { blood: page?.querySelector('.bc-profile-info--tile-blood')?.textContent.trim() === 'O+', add: page?.querySelectorAll('.bc-profile-info--add').length };
       });
-      expect('profile shows the blood group without an allow button', { blood: true, allow: false }, profile);
+      expect('profile shows the blood group tile, and Add only where a value is missing', { blood: true, add: 2 }, profile);
       await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/emergency'); });
       await sleep(700);
       const shown = await tab.run(() => document.querySelector('.page-current .bc-emergency--blood-value')?.textContent);
@@ -1805,8 +1817,13 @@ async function profileInfoWidthsFlows(expect) {
         writeInclude(deviceStore, { ...readInclude(deviceStore), blood: true });
       });
     }
-    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info/edit'); });
-    await sleep(700);
+    await edit();
+    // The system Back leaves the editing without saving; the page stays.
+    await tab.run(() => window.dispatchEvent(new Event('od:back')));
+    await sleep(400);
+    expect(`${label}: Back stops editing and stays on the page`, { route: '/profile/info', editing: false }, await state());
+    await tab.run(() => document.querySelector('.page-current .bc-profile-info--edit-button').click());
+    await sleep(500);
     await tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
       const button = document.querySelector(`.page-current .bc-select-field--clear[aria-label="${t('diverProfile.info.clearBlood')}"]`);
@@ -1814,7 +1831,7 @@ async function profileInfoWidthsFlows(expect) {
       button.click();
     });
     await sleep(100);
-    await tab.run(() => document.querySelector('.page-current .bc-profile-edit--save').click());
+    await tab.run(() => document.querySelector('.page-current .bc-profile-info--save').click());
     await sleep(700);
     const cleared = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
     expect(`${label}: blood group can be cleared`, { blood: '' }, { blood: cleared });

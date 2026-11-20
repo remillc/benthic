@@ -64,7 +64,7 @@
           <span class="bc-emergency--name bc-emergency--name-empty">{t('emergency.noName')}</span>
         {/if}
         {#if text.birthLine}<span class="bc-emergency--birth">{text.birthLine}</span>{/if}
-        {#if !text.name}<a href="/profile/info/edit" class="bc-emergency--fill">{t('emergency.noNameLink')}</a>{/if}
+        {#if !text.name}<a href="/profile/info?edit=1" class="bc-emergency--fill">{t('emergency.noNameLink')}</a>{/if}
       </div>
       {#if hasBlood}
         <div class="bc-emergency--blood">

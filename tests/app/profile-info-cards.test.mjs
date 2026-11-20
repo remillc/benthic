@@ -425,10 +425,19 @@ test('the texts of the new screens exist in French and English', () => {
   const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
   const get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const l of ['fr', 'en']) {
-    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood']) {
+    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood', 'diverProfile.info.add', 'diverProfile.info.dobAge']) {
       assert.ok(get(langs[l], key), `${l}: ${key}`);
     }
   }
+});
+
+test('the information page is edited in place: no edit route, and Back stops the editing', () => {
+  assert.doesNotMatch(read('App.svelte'), /profile\/info\/edit|ProfileInfoEdit/);
+  const page = read('pages/ProfileInfo.svelte');
+  assert.match(page, /bc-profile-info--editing/);
+  assert.match(page, /od-cancel/);
+  assert.match(read('lib/back-button.js'), /\.page-current \.bc-profile-info--editing/);
+  assert.match(read('pages/EmergencySheet.svelte'), /href="\/profile\/info\?edit=1"/);
 });
 
 test('the subscription screens continue directly to the ready step', () => {
