@@ -18,6 +18,15 @@ import {
 const text = (url) => readFileSync(url, 'utf8').split(String.fromCharCode(13)).join('');
 const src = (path) => text(new URL(`../../app/src/${path}`, import.meta.url));
 
+test('the demo offer counts the device dives and never loads the device logbook into the core', () => {
+  // listDives replaces the log in memory: at start it made the dive ids on screen unknown to the core.
+  const source = src('lib/demo.svelte.js');
+  const offer = source.slice(source.indexOf('export function canTryDemo'), source.indexOf('export function tryDemo'));
+  assert.match(offer, /deviceLogHasDives/);
+  assert.doesNotMatch(offer, /listDives/);
+  assert.match(source, /deviceLog\(\{ action: 'count' \}\)/);
+});
+
 /** The calls of the app, recording what ran. */
 function deps(overrides = {}) {
   const log = [];

@@ -25,9 +25,13 @@ function remember(on) {
 
 const deviceLogExists = async () => (await OpenDivesCore.listDives()).exists;
 
+// listDives loads the device's logbook into the core, which would replace the account's log already open (the dive
+// ids of the list on screen are then unknown to the core): the offer only counts the dives, nothing is loaded.
+const deviceLogHasDives = async () => (await OpenDivesCore.deviceLog({ action: 'count' })).count > 0;
+
 /** The first launch's link is shown only on a device without a logbook. @returns {Promise<boolean>} */
 export function canTryDemo() {
-  return demoAvailable({ deviceLogExists });
+  return demoAvailable({ deviceLogExists: deviceLogHasDives });
 }
 
 /** « Essayer avec un carnet d’exemple ». @returns {Promise<boolean>} */
