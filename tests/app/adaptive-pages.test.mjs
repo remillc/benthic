@@ -45,7 +45,8 @@ test('the rule is written in the design system', () => {
 test('every adaptive route hands its selection over when the layout changes', () => {
   const page = read('app/src/components/AdaptivePage.svelte');
   assert.match(page, /handOver\?\.\(rest\.f7router\)/);
-  assert.match(app, /detailRoutes: \[\{ path: '\/settings\/:section', component: Settings \}, PANE_EMPTY\]/);
+  // Only Settings' own groups are details (the sections listed in the route), not the pages with a route of their own.
+  assert.match(app, /detailRoutes: \[\{ path: '\/settings\/:section\([a-z|]+\)', component: Settings \}, PANE_EMPTY\]/);
   for (const hook of ['logbookToNarrow', 'statisticsToWide', 'statisticsToNarrow', 'settingsToWide', 'settingsToNarrow', 'toolsToWide', 'toolsToNarrow']) {
     assert.ok(app.includes(hook), hook);
   }
