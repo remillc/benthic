@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1192,8 +1192,55 @@ async function computerPhotoFlows(expect) {
   tab.ws.close();
 }
 
+async function profileInsetsFlows(expect) {
+  for (const [label, width, height] of [['landscape', 1280, 800], ['portrait', 800, 1280]]) {
+    for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'dialog']]) {
+      const tab = await openTab(width, height, false, false, false, { theme: 'md' });
+      await tab.run(async (path) => {
+        window.__odSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
+        (await import('/src/lib/navigation.svelte.js')).openOver(path);
+      }, route);
+      await sleep(1600);
+      const state = await tab.run(({ kind, portrait }) => {
+        const page = [...document.querySelectorAll('.view.tab-active > .page-current')].find((item) => item.getBoundingClientRect().width > 0);
+        const frame = page?.querySelector('.od-pf')?.getBoundingClientRect();
+        const back = page?.querySelector('.od-profile-nav--back')?.getBoundingClientRect();
+        const add = page?.querySelector('.od-gear-list--add, .fab:not([style*="display: none"])')?.getBoundingClientRect();
+        const navbar = page?.querySelector(':scope > .navbar')?.getBoundingClientRect();
+        const inner = page?.querySelector(':scope > .navbar .navbar-inner')?.getBoundingClientRect();
+        const box = page?.querySelector('.od-pf--box')?.getBoundingClientRect();
+        const bottom = innerHeight - 48;
+        const near = (a, b) => Math.abs(a - b) < 2;
+        return {
+          frame: portrait ? !frame : !!frame && near(frame.top, 24) && near(frame.bottom, bottom),
+          back: portrait || (!!back && back.top >= 24),
+          add: !add || add.bottom <= bottom,
+          main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
+          dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
+        };
+      }, { kind: bar, portrait: label === 'portrait' });
+      expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true }, state);
+      if (label === 'landscape' && bar === 'dialog') {
+        const changed = await tab.run(() => {
+          window.__odSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
+          const page = document.querySelector('.view.tab-active > .page-current:has(.od-pf)');
+          const frame = page.querySelector('.od-pf').getBoundingClientRect();
+          const box = page.querySelector('.od-pf--box').getBoundingClientRect();
+          const navbar = page.querySelector(':scope > .navbar').getBoundingClientRect();
+          return {
+            frame: Math.abs(frame.top - 40) < 2 && Math.abs(frame.bottom - (innerHeight - 20)) < 2,
+            dialog: Math.abs(navbar.top - box.top) < 2 && box.top >= 40 && box.bottom <= innerHeight - 20,
+          };
+        });
+        expect('landscape: profile dialog follows changed system insets', { frame: true, dialog: true }, changed);
+      }
+      tab.ws.close();
+    }
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1206,6 +1253,7 @@ try {
   if (args.has('--export-only') || fixed) await exportFlows(expect);
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
+  if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

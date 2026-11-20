@@ -2730,6 +2730,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Profile on tablets: controls stay clear of the system bars.",
       "Logbook: the menu can export the whole logbook in the chosen format.",
       "Dive detail on desktop: Equipment shows each dive computer’s photo when available.",
       "Settings: closing choice menus no longer causes an error.",

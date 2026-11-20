@@ -48,4 +48,3 @@ Next number: 117
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #114 [code] Après le lancement, prévoir une tâche récurrente pour mettre à jour les listes d'agences de certification et leurs certifications.
 - #115 [code] sur tablette et desktop, sur /profile, réduire la largeur du bouton "+ Ajouter une pièce" à son contenu et aligner à droite.
-- #116 [code] sur tablette, l'app est masquée en haut par la barre d'état d'Android, et en bas par la barre d'apps.
