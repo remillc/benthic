@@ -93,13 +93,13 @@
   <h2 class="bc-profile-edit--section">{t('diverProfile.info.you')}</h2>
   <div class="bc-profile-edit--fields">
     <TextField label={t('diverProfile.info.fullNameLabel')} bind:value={fullName} supporting={t('diverProfile.info.fullNameHint')} autocomplete="name" />
-    <DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} supporting={dobLive.error} />
+    <div class="bc-profile-edit--birth"><DateField label={t('diverProfile.info.dob')} bind:value={dateOfBirth} supporting={dobLive.error} /></div>
   </div>
 
   <h2 class="bc-profile-edit--section">{t('diverProfile.info.emergency')}</h2>
   <div class="bc-profile-edit--fields">
     <TextField label={t('diverProfile.info.contactNameLabel')} bind:value={contactName} supporting={t('diverProfile.info.contactNameHint')} autocomplete="off" />
-    <ComboField label={t('diverProfile.info.relationLabel')} bind:value={relation} options={relationOptions} supporting={t('diverProfile.info.relationHint')} />
+    <div class="bc-profile-edit--relation"><ComboField label={t('diverProfile.info.relationLabel')} bind:value={relation} options={relationOptions} supporting={t('diverProfile.info.relationHint')} /></div>
     <div class="bc-profile-edit--phone">
       <div class="bc-profile-edit--country"><SelectField label={t('diverProfile.info.countryCode')} bind:value={country} options={countryOptions} /></div>
       <div class="bc-profile-edit--number">
@@ -172,6 +172,14 @@
       gap: 12px;
     }
 
+    .bc-profile-edit--birth {
+      width: min(100%, 224px);
+    }
+
+    .bc-profile-edit--relation {
+      width: min(100%, 272px);
+    }
+
     .bc-profile-edit--phone {
       display: flex;
       gap: 12px;
@@ -183,7 +191,7 @@
     }
 
     .bc-profile-edit--number {
-      flex: 1;
+      flex: 0 1 200px;
       min-width: 0;
     }
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1721,6 +1721,41 @@ async function gearTypeDialogFlows(expect) {
   }
 }
 
+async function profileInfoWidthsFlows(expect) {
+  for (const [label, width, height, mobile, desktop, theme] of [
+    ['narrow phone', 320, 740, true, false, 'md'],
+    ['iPhone', 390, 844, true, false, 'ios'],
+    ['tablet', 1280, 800, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info/edit'); });
+    await sleep(1200);
+    const result = await tab.run(() => {
+      const page = document.querySelector('.page-current.bc-profile-edit');
+      if (!page) throw new Error('Information editor is missing');
+      const rect = (selector) => {
+        const element = page.querySelector(selector);
+        if (!element) throw new Error(`Missing ${selector}`);
+        return element.getBoundingClientRect();
+      };
+      const full = rect('.bc-profile-edit--fields .bc-text-field--box');
+      const birth = rect('.bc-profile-edit--birth .bc-button-field--box');
+      const relation = rect('.bc-profile-edit--relation .bc-combo-field--box');
+      const phone = rect('.bc-profile-edit--number .bc-text-field--box');
+      const country = rect('.bc-profile-edit--country .bc-select-field--box');
+      return {
+        birthNarrower: birth.width < full.width && birth.width <= 192.5,
+        relationNarrower: relation.width < full.width && relation.width <= 240.5,
+        phoneNarrower: phone.width < full.width && phone.width <= 168.5,
+        withinViewport: [birth, relation, phone, country].every((r) => r.width > 0 && r.left >= 0 && r.right <= innerWidth),
+      };
+    });
+    expect(`${label}: the three fields are narrower and fit`, { birthNarrower: true, relationNarrower: true, phoneNarrower: true, withinViewport: true }, result);
+    tab.ws.close();
+  }
+}
+
 async function maintenanceEntryFlows(expect) {
   for (const [label, width, height, mobile, desktop] of [
     ['phone', 390, 844, true, false],
@@ -1979,7 +2014,7 @@ async function profileLayersFlows(expect) {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--maintenance-entry-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--maintenance-entry-only') && !args.has('--profile-info-widths-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1993,6 +2028,7 @@ try {
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
+  if (args.has('--profile-info-widths-only') || fixed) await profileInfoWidthsFlows(expect);
   if (args.has('--maintenance-entry-only') || fixed) await maintenanceEntryFlows(expect);
   if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
   if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);

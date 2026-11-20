@@ -2729,6 +2729,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Information: the date of birth, relationship and phone fields are narrower.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
