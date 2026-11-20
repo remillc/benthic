@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 130
+Next number: 131
 
 ## List
 
@@ -56,3 +56,4 @@ Next number: 130
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
+- #130 [code] On /profile/gear/new, do not show the piece type field when the selected type is Other.
