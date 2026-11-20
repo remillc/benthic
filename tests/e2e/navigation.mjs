@@ -1358,6 +1358,14 @@ async function gearAddFlows(expect) {
     });
     expect(`${label}: gear Add fits its content at the right of the list`, { visible: true, contentWidth: true, right: true }, geometry);
     expect(`${label}: profile navigation has the expected width`, { navWidth: desktop ? 330 : 350 }, geometry);
+    const avatar = await tab.run(() => {
+      const circle = document.querySelector('.bc-account-avatar--rail .bc-account-avatar--circle');
+      const target = document.querySelector('.bc-account-avatar--rail')?.getBoundingClientRect();
+      const rail = document.querySelector('.bc-nav-rail--rail')?.getBoundingClientRect();
+      const rect = circle?.getBoundingClientRect();
+      return { circle: rect ? Math.round(rect.width) : 0, target: target ? Math.round(target.width) : 0, inRail: !!rect && !!rail && rect.left >= rail.left && rect.right <= rail.right };
+    });
+    expect(`${label}: the account button of the rail is 48 dp in a 64 dp target`, { circle: 48, target: 64, inRail: true }, avatar);
     await tab.run(() => document.querySelector('.page-current .bc-gear-list--add').click());
     await sleep(1000);
     expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.bc-piece-edit')) });
