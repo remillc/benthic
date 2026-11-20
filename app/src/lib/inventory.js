@@ -53,13 +53,13 @@ import { rekey as rekeyValidations } from './validation.js';
 export const RETIRE_REASONS = ['sold', 'lost', 'worn'];
 
 /**
- * The 16 types of « Nouvelle pièce » (task 2026-11-19-309): `bcd` is « Veste », `dsmb` « Parachute de palier »,
+ * The types of « Nouvelle pièce »: `bcd` is « Veste », `dsmb` « Parachute de palier »,
  * `floatBuoy` « Bouée de surface ».
- * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'other'} GearType
+ * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'diveKnife'|'compass'|'other'} GearType
  */
 
 /** The types, in the order of the type grid. @type {GearType[]} */
-export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'other'];
+export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
 
 /** The groups of the inventory page and of the kit editor. @type {('computer'|'regulator'|'suit'|'cylinder'|'other')[]} */
 export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];

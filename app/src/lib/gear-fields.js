@@ -1,7 +1,7 @@
 // @ts-check
 // The form of a piece adapts to its type (task 2026-11-19-309, docs/equipment-fields.md): the type is the only required
 // field, « Date d'achat » and « Notes » are the only fields every type has. This file says which fields each of the
-// 16 types shows, in the order of the form; the screens draw them, the inventory keeps them as they are.
+// types shows, in the order of the form; the screens draw them, the inventory keeps them as they are.
 //
 // A piece keeps `brand`, `model`, `serial`, `purchasedOn` and `note` as keys of its file (older screens read them);
 // every other field of a type goes in `details`, an object of short values (text, a choice, 'yes' or 'no'). Unknown
@@ -105,6 +105,8 @@ export const SPECS = {
   dsmb: { brand: true, extras: [{ key: 'lift', kind: 'text', hint: true }] },
   floatBuoy: { brand: true, extras: [{ key: 'colour', kind: 'text' }] },
   knife: { brand: true },
+  diveKnife: { brand: true },
+  compass: { brand: true },
   other: { named: true, photo: true, before: [{ key: 'typeName', kind: 'text', hint: true }] },
 };
 

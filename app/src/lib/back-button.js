@@ -116,6 +116,8 @@ function dispatch(layersOnly) {
   // 3b'. The account deletion wizard goes back one step (pages/DeleteAccount.svelte).
   const wizardStep = document.querySelector('.page-current .bc-delete-wizard--body:not([data-step="1"])');
   if (wizardStep && !modal && !layersOnly) return cancel(wizardStep, 'wizard-step');
+  const gearStep = document.querySelector('.page-current .bc-piece-edit--stage[data-step="form"]');
+  if (gearStep && !modal && !layersOnly) return cancel(gearStep, 'gear-type-step');
   // 3c. A form with unsaved changes (the full screen, or its popup on a tablet) asks
   // before it is left (lib/leave-guard.js); a sheet or dialog above it closed first.
   if ((modal ? modal.classList.contains('popup') : !layersOnly) && backThroughGuard(modal)) return 'leave-guard';

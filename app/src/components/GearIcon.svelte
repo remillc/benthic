@@ -35,6 +35,8 @@
     camera: 'M4 8h3l1.5-2h7L17 8h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
     floatBuoy: 'M12 3.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 13.5V17M2.5 19c1.6 0 1.6-1.2 3.2-1.2s1.6 1.2 3.2 1.2 1.6-1.2 3.1-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2 1.6 1.2 3.1 1.2',
     knife: 'M9.5 3.5a7 7 0 0 0-4.5 6.5v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-4a7 7 0 0 0-4.5-6.5L12 9zM10.5 8.6l1.5 2.4 1.5-2.4M10.4 16a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z',
+    diveKnife: 'M5 19l5-5m-1-2 3 3m-1-2 5-7 4-2-2 4-6 6M4 20l2 2 4-4-2-2z',
+    compass: 'M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM15.5 8.5l-2 5-5 2 2-5zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2',
   };
   // An « Autre » piece named like a surface marker buoy shows the buoy.
   const shown = $derived(type === 'dsmb' || (type === 'other' && isBuoyName(name)) ? 'buoy' : type === 'undersuit' ? 'suit' : type);

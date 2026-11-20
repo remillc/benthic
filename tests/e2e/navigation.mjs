@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1459,8 +1459,125 @@ async function certificationAgencyFlows(expect) {
   }
 }
 
+async function gearTypeDialogFlows(expect) {
+  for (const [label, width, height, mobile, desktop, theme] of [
+    ['Android phone', 390, 844, true, false, 'md'],
+    ['iPhone', 390, 844, true, false, 'ios'],
+    ['Android tablet', 1280, 800, false, false, 'md'],
+    ['iPad', 1280, 800, false, false, 'ios'],
+    ['desktop', 1400, 900, false, true, 'md'],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+    await sleep(1400);
+    const initial = await tab.run(() => {
+      const page = document.querySelector('.page-current.bc-piece-edit');
+      window.__gearSurface = page.querySelector('.bc-piece-edit--stage');
+      return { save: !!page.querySelector('.bc-piece-edit--save'), selected: !!page.querySelector('.bc-piece-edit--tile[aria-checked="true"]') };
+    });
+    expect(`${label}: a type must be chosen first`, { save: false, selected: false }, initial);
+    const selectType = async (type) => {
+      const animation = await tab.run(async (type) => {
+        const page = document.querySelector('.page-current.bc-piece-edit');
+        const { t } = await import('/src/lib/i18n.js');
+        const label = t(`gear.pieceNew.tile.${type}`);
+        const tiles = [...page.querySelectorAll('.bc-piece-edit--tile')];
+        const tile = tiles.find((element) => element.textContent.trim() === label);
+        if (!tile) throw new Error(`Missing tile ${type}`);
+        tile.click();
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        const incoming = page.querySelector('.bc-piece-edit--in-forward');
+        return incoming ? getComputedStyle(incoming).animationName : '';
+      }, type);
+      await sleep(600);
+      return animation;
+    };
+    const animation = await selectType('suit');
+    if (theme === 'md') expect(`${label}: the form uses the Expressive shared-axis motion`, { animated: true }, { animated: animation.includes('od-piece-in-forward') && animation.includes('od-piece-fade-in') });
+    const fields = await tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const page = document.querySelector('.page-current.bc-piece-edit');
+      const stage = page.querySelector('.bc-piece-edit--stage');
+      const labels = [...stage.querySelectorAll('label')].map((element) => element.textContent.trim());
+      return {
+        sameSurface: stage === window.__gearSurface,
+        step: stage.dataset.step,
+        nestedDialog: !!document.querySelector('.bc-piece-type-dialog'),
+        brand: labels.includes(t('gear.pieceEdit.brand')),
+        serial: labels.includes(t('gear.pieceEdit.serialOptional')),
+        suit: !!stage.querySelector('.bc-piece-edit--segments'),
+        photo: !!stage.querySelector('[data-testid="piece-picture"]'),
+        common: labels.includes(t('gear.pieceEdit.purchasedOn')),
+      };
+    });
+    expect(`${label}: choosing a suit transitions to its form in the same surface`, { sameSurface: true, step: 'form', nestedDialog: false, brand: true, serial: true, suit: true, photo: false, common: true }, fields);
+    await tab.run(async (name) => {
+      const { t } = await import('/src/lib/i18n.js');
+      const dialog = document.querySelector('.page-current .bc-piece-edit--stage');
+      const input = (key) => {
+        const label = [...dialog.querySelectorAll('label')].find((element) => element.textContent.trim() === t(key));
+        if (!label) throw new Error(`Missing label ${key}`);
+        return document.getElementById(label.htmlFor);
+      };
+      for (const [key, value] of [['gear.pieceEdit.brand', name], ['gear.pieceEdit.model', 'Dialog model'], ['gear.pieceEdit.serialOptional', 'S-123']]) {
+        const field = input(key);
+        field.value = value;
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      [...dialog.querySelectorAll('button')].find((button) => button.textContent.trim() === t('gear.fieldOption.suitType.dry')).click();
+    }, `Dialog ${label}`);
+    await tab.run(() => window.dispatchEvent(new Event('od:back')));
+    await sleep(600);
+    expect(`${label}: Back returns to the type choices`, { step: 'choose' }, { step: await tab.run(() => document.querySelector('.page-current .bc-piece-edit--stage').dataset.step) });
+    await selectType('suit');
+    const reopened = await tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const dialog = document.querySelector('.page-current .bc-piece-edit--stage');
+      const label = [...dialog.querySelectorAll('label')].find((element) => element.textContent.trim() === t('gear.pieceEdit.brand'));
+      return { brand: document.getElementById(label.htmlFor).value };
+    });
+    expect(`${label}: returning to the same type keeps entered fields`, { brand: `Dialog ${label}` }, reopened);
+    await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+    await sleep(900);
+    const saved = await tab.run(async (name) => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const piece = gear.pieces.find((item) => item.brand === name && item.model === 'Dialog model');
+      return { found: !!piece, type: piece?.type, serial: piece?.serial, suitType: piece?.details?.suitType };
+    }, `Dialog ${label}`);
+    expect(`${label}: the piece saves its type details`, { found: true, type: 'suit', serial: 'S-123', suitType: 'dry' }, saved);
+    if (label === 'Android tablet') {
+      for (const type of ['knife', 'diveKnife', 'compass']) {
+        await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+        await sleep(1000);
+        await selectType(type);
+        const dialog = await tab.run(async (type) => {
+          const { t } = await import('/src/lib/i18n.js');
+          const dialog = document.querySelector('.page-current .bc-piece-edit--stage');
+          const labels = [...dialog.querySelectorAll('label')].map((element) => element.textContent.trim());
+          return {
+            title: dialog.querySelector('.bc-piece-edit--form-title').textContent.trim(),
+            expected: t(`gear.pieceNew.tile.${type}`),
+            brand: labels.includes(t('gear.pieceEdit.brand')),
+            model: labels.includes(t('gear.pieceEdit.model')),
+            photo: !!dialog.querySelector('[data-testid="piece-picture"]'),
+          };
+        }, type);
+        expect(`tablet: ${type} has its own title, brand and model`, { title: dialog.expected, brand: true, model: true, photo: false }, dialog);
+        await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+        await sleep(600);
+        const found = await tab.run(async (type) => {
+          const { gear } = await import('/src/lib/inventory.svelte.js');
+          return gear.pieces.some((piece) => piece.type === type);
+        }, type);
+        expect(`tablet: ${type} can be saved`, { found: true }, { found });
+      }
+    }
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1475,6 +1592,7 @@ try {
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
   if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
+  if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();

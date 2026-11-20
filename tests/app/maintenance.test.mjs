@@ -46,17 +46,16 @@ const rule = (extra = {}) => ({
   ...extra,
 });
 
-// Task 2026-11-19-309 (docs/equipment-fields.md): the grid has 16 types, the seven new ones after the weight belt.
-test('a new piece can be created for each of the sixteen types', async () => {
-  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'other']);
+test('a new piece can be created for each equipment type', async () => {
+  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other']);
   const { inventory } = setup();
   for (const type of GEAR_TYPES) await inventory.saveGear({ type, name: `piece ${type}`, brand: 'Apeks' });
   const all = await inventory.listGear();
-  assert.equal(all.length, 16);
+  assert.equal(all.length, GEAR_TYPES.length);
   assert.deepEqual(new Set(all.map((g) => g.type)), new Set(GEAR_TYPES));
-  // The vest, the weight belt and the seven new types go in « Autres », with the lamps.
+  // The vest, weight belt and accessories go in « Autres », with the lamps.
   const groups = groupGear(all);
-  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'camera', 'dsmb', 'fins', 'floatBuoy', 'knife', 'light', 'mask', 'other', 'scooter', 'weights']);
+  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'camera', 'compass', 'diveKnife', 'dsmb', 'fins', 'floatBuoy', 'knife', 'light', 'mask', 'other', 'scooter', 'weights']);
 });
 
 test('a kit can be duplicated under a name no other kit has, then deleted without touching the dives', async () => {

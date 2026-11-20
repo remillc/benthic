@@ -8,8 +8,7 @@ import { GEAR_TYPES } from '../../app/src/lib/inventory.js';
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(fs.readFileSync(new URL(`../../app/src/i18n/${l}.json`, import.meta.url), 'utf8'))]));
 const at = (/** @type {any} */ o, /** @type {string} */ path) => path.split('.').reduce((n, k) => n?.[k], o);
 
-test('every one of the 16 types has a form', () => {
-  assert.equal(GEAR_TYPES.length, 16);
+test('every equipment type has a form', () => {
   for (const type of GEAR_TYPES) assert.ok(SPECS[type], type);
 });
 
@@ -39,10 +38,12 @@ test('the fields of each type follow docs/equipment-fields.md', () => {
   assert.deepEqual(keys('dsmb'), ['lift']);
   assert.deepEqual(keys('floatBuoy'), ['colour']);
   assert.deepEqual(keys('knife'), []);
+  assert.deepEqual(SPECS.diveKnife, SPECS.knife, 'a knife has the same fields as a line cutter');
+  assert.deepEqual(SPECS.compass, { brand: true });
   assert.deepEqual(keys('other'), ['typeName']);
   // Photo: the types of the document that list one.
   for (const type of ['computer', 'regulator', 'bcd', 'light', 'scooter', 'camera', 'other']) assert.equal(SPECS[type].photo, true, type);
-  for (const type of ['suit', 'undersuit', 'cylinder', 'weights', 'mask', 'fins', 'dsmb', 'floatBuoy', 'knife']) assert.ok(!SPECS[type].photo, type);
+  for (const type of ['suit', 'undersuit', 'cylinder', 'weights', 'mask', 'fins', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass']) assert.ok(!SPECS[type].photo, type);
   // The types without a brand are named by hand.
   for (const type of ['cylinder', 'weights', 'other']) assert.equal(isNamedByHand(type), true, type);
   assert.equal(isNamedByHand('mask'), false);

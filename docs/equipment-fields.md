@@ -1,6 +1,6 @@
 # Equipment fields by piece type
 
-Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur › Équipement »). The form of « Nouvelle pièce » and « Modifier la pièce » shows only the fields of the chosen type.
+Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur › Équipement »). The form of « Nouvelle pièce » and « Modifier la pièce » shows only the fields of the chosen type. On a new piece, no type is selected initially; choosing one transitions to its form within the same dialog (full screen on phones). The diver can return to the type choices before saving.
 
 - **Required:** the piece type only. Every other field is optional.
 - **Common to every type:** « Date d’achat » and « Notes ». Nothing else is common.
@@ -23,7 +23,11 @@ Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur �
 | Caméra | Photo, brand, model, serial number, housing depth rating |
 | Parachute de palier | Brand, model, volume or lift |
 | Bouée de surface | Brand, model, colour |
+| Coupe-ligne | Brand, model |
 | Couteau | Brand, model |
+| Boussole | Brand, model |
 | Autre | Type name (free text), piece name, photo |
 
 Suggested maintenance reminders by type: Détendeur every 2 years or 100 dives; Bouteille visual inspection every year and hydrostatic test every 5 years; Veste every year; Combinaison (Étanche only) the seals every year; Ordinateur none (a battery reminder waits for after the launch, `docs/POST-LAUNCH.md` #104); the other types none.
+
+The original `knife` type is displayed as « Coupe-ligne »; `diveKnife` is the distinct « Couteau » type. Existing pieces retain their original type and are therefore displayed as line cutters.

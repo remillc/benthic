@@ -1,14 +1,11 @@
 <script>
   // @ts-check
-  // « Nouvelle pièce » and « Modifier la pièce » (tasks 2026-11-17-267, 2026-11-18-273 and 2026-11-19-309,
-  // docs/mockups/profil-piece-nouvelle-*-android.dc.html): « Type de pièce » as a grid of 16 tiles with the inventory's
-  // icons (the chosen one blue with a check), then only the fields of the chosen type (lib/gear-fields.js,
-  // docs/equipment-fields.md), « Date d'achat » and « Notes », and the card « Rappels d'entretien » with the reminders
-  // suggested for the type. The type is the only required field. The fields are checked as the diver types. A
+  // New and edited equipment (docs/equipment-fields.md): a new piece moves from the type choices to its form
+  // within the same surface. The type is the only required field. A
   // computer's serial number and firmware are read at each download, so they are not typed. The name of a piece is its
   // brand and model (else its type); a cylinder, a weight belt and « Autre » have a name of their own.
   import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import GearIcon from '../components/GearIcon.svelte';
@@ -41,15 +38,16 @@
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
   import { ios } from '../lib/layout.svelte.js';
+  import { reducedMotion } from '../lib/reduced-motion.js';
 
   /** The colour of a type's icon square on a wide screen, the inventory's: blue, green, beige, purple, else grey. @type {Record<string, string>} */
-  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet' };
+  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet', diveKnife: 'violet', compass: 'blue' };
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
 
   const id = f7route.params.id ?? '';
-  let type = $state('regulator');
+  let type = $state('');
   let name = $state('');
   let brand = $state('');
   let model = $state('');
@@ -75,6 +73,26 @@
   let ruleOpen = $state(false);
   /** The reminder set in the card (a new piece only), saved with the piece. @type {{ task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }|null} */
   let reminder = $state(null);
+  let choosingType = $state(!id);
+  let direction = 'forward';
+  /** @type {HTMLElement|undefined} */
+  let stage = $state();
+
+  $effect(() => {
+    const node = stage;
+    if (!node) return;
+    node.addEventListener('od-cancel', chooseAgain);
+    return () => node.removeEventListener('od-cancel', chooseAgain);
+  });
+
+  /** @param {HTMLElement} node @param {{ kind: 'in'|'out' }} options */
+  function moveStep(node, { kind }) {
+    const cls = `bc-piece-edit--${kind}-${direction}`;
+    node.classList.add(cls);
+    const ms = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bc-motion-spatial-default-ms')) || 350;
+    if (kind === 'in') setTimeout(() => node.classList.remove(cls), ms + 50);
+    return { duration: reducedMotion() ? 0 : ms, css: () => '' };
+  }
 
   /** Brands and models for a dive computer (libdivecomputer's names; any other text can be typed). */
   let lists = $state(brandModels([], []));
@@ -112,7 +130,7 @@
   const typeOptions = GEAR_TYPES.map((value) => ({ value, label: t(`gear.pieceNew.tile.${value}`) }));
   /** The computer's catalog name from what is typed, for its photo. */
   const catalogModel = $derived([brand, model].map((s) => s.trim()).filter(Boolean).join(' '));
-  const typeLabel = $derived(t(`gear.pieceNew.tile.${type}`));
+  const typeLabel = $derived(type ? t(`gear.pieceNew.tile.${type}`) : '');
   /** The type is the only required field: a piece with nothing typed is named by its type. */
   const effectiveName = $derived(
     namedByHand ? name.trim() || (type === 'other' ? (details.typeName ?? '').trim() : '') || typeLabel : derivedName({ brand, model }, (piece && piece.type === type && piece.name) || typeLabel),
@@ -130,19 +148,13 @@
     () => purchasedOn,
     () => (problems.purchasedOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : ''),
   );
-  const canSave = $derived(!problems.name && !problems.purchasedOn && !Object.keys(detailWrong).length && !saving && !gear.readOnly);
+  const canSave = $derived(!!type && !problems.name && !problems.purchasedOn && !Object.keys(detailWrong).length && !saving && !gear.readOnly);
   const suggestions = $derived(suggestionsFor(type, details));
   const suggestion = $derived(suggestions[0]);
   const suggestedRule = $derived(suggestion ? { intervalMonths: suggestion.months ?? null, intervalDives: suggestion.dives ?? null } : null);
   /** Every field of the type has a text to bind to. */
   $effect.pre(() => {
     for (const f of [...fields.before, ...fields.after]) if (details[f.key] === undefined) details[f.key] = '';
-  });
-  /** A reminder chosen for another type, or another kind of suit, does not carry over. */
-  $effect(() => {
-    void type;
-    void details.suitType;
-    reminder = null;
   });
   /** The line of the reminders card: the type's own wording for a cylinder and a drysuit, else the generic one with the rule. */
   const suggestionLine = $derived(
@@ -154,9 +166,37 @@
           ? t(`maintenance.reminderCard.suggest.${type}`, { rule: ruleText(suggestedRule).replace(/^./, (c) => c.toLocaleLowerCase()) })
           : t('maintenance.reminderCard.noSuggestion'),
   );
-  const showReminderCard = $derived(!id && !computer);
+  const showReminderCard = $derived(!id && !!type && !computer);
   /** @param {string} key @param {string} value */
-  const setDetail = (key, value) => (details = { ...details, [key]: value });
+  const setDetail = (key, value) => {
+    if (key === 'suitType' && details[key] !== value) reminder = null;
+    details = { ...details, [key]: value };
+  };
+
+  /** @param {string} next */
+  async function chooseType(next) {
+    if (id) {
+      type = next;
+      return;
+    }
+    if (type !== next) reminder = null;
+    type = next;
+    direction = 'forward';
+    choosingType = false;
+    await tick();
+    /** @type {HTMLElement|null|undefined} */ (stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
+    const scroller = stage?.closest('.bc-pf--box, .page-content');
+    if (scroller) scroller.scrollTop = 0;
+  }
+
+  async function chooseAgain() {
+    direction = 'back';
+    choosingType = true;
+    await tick();
+    /** @type {HTMLElement|null|undefined} */ (stage?.querySelector('.bc-piece-edit--type-heading'))?.focus({ preventScroll: true });
+    const scroller = stage?.closest('.bc-pf--box, .page-content');
+    if (scroller) scroller.scrollTop = 0;
+  }
 
   /** @param {Event} e */
   async function pickPhoto(e) {
@@ -311,12 +351,8 @@
   {/if}
 {/snippet}
 
-{#snippet body()}
-
-  <ReadOnlyNotice />
-
-  {#if profileWide()}
-  <h2 class="bc-piece-edit--title" id="od-piece-type">{t('gear.pieceNew.typeTitle')}</h2>
+{#snippet typeGrid()}
+  <h2 class="bc-piece-edit--title bc-piece-edit--type-heading" id="od-piece-type" tabindex="-1">{t('gear.pieceNew.typeTitle')}</h2>
     <div class="bc-piece-edit--tiles" class:bc-piece-edit--compact={profileWide()} role="radiogroup" aria-labelledby="od-piece-type">
       {#each GEAR_TYPES as value (value)}
         {@const on = type === value}
@@ -327,7 +363,7 @@
           class="bc-piece-edit--tile"
           class:bc-piece-edit--tile-on={on}
           disabled={!!piece?.computerModel && value !== type}
-          onclick={() => (type = value)}
+          onclick={() => chooseType(value)}
         >
           {#if on}<span class="bc-piece-edit--check" aria-hidden="true"><Icon name="check" size={14} weight={3} /></span>{/if}
           <span class="bc-piece-edit--tile-icon bc-piece-edit--tone-{TONES[value] ?? 'grey'}"><GearIcon type={value} size={profileWide() ? 22 : 26} /></span>
@@ -335,14 +371,66 @@
         </button>
       {/each}
     </div>
-  
-{:else}
-    <!-- Phone: one filled field that opens a menu with the 16 types (task 2026-11-19-310); the iPhone uses the system list. -->
-    <div class="bc-piece-edit--type-field">
-      <SelectField label={t('gear.pieceNew.typeTitle')} bind:value={type} options={typeOptions} disabled={!!piece?.computerModel} icon={typeIcon} />
+{/snippet}
+
+{#snippet form()}
+  {#if !id}
+    <button type="button" class="bc-piece-edit--change-type" onclick={chooseAgain}><Icon name="arrowBack" size={20} />{t('gear.pieceNew.changeType')}</button>
+    <h2 class="bc-piece-edit--title bc-piece-edit--form-title" tabindex="-1">{typeLabel}</h2>
+  {/if}
+  {#if type}{@render typeFields()}{/if}
+
+  <div class="bc-piece-edit--fields">
+    <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
+    <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
+    {#if showReminderCard}
+      <div class="bc-piece-edit--reminder">
+        <span class="bc-piece-edit--reminder-icon"><Icon name="clock" size={22} /></span>
+        <span class="bc-piece-edit--reminder-texts">
+          <span class="bc-piece-edit--reminder-title">{t('maintenance.reminderCard.title')}</span>
+          <span class="bc-piece-edit--reminder-line">
+            {#if reminder}
+              {taskLabel({ task: reminder.task })} · {ruleText({ intervalMonths: reminder.months, intervalDives: reminder.dives })}
+            {:else}
+              {suggestionLine}
+            {/if}
+          </span>
+        </span>
+        <button type="button" class="bc-piece-edit--reminder-button" disabled={gear.readOnly} onclick={() => (ruleOpen = true)}>
+          {reminder ? t('maintenance.reminderCard.edit') : t('maintenance.reminderCard.add')}
+        </button>
+      </div>
+    {/if}
+    {#if id}
+      <button type="button" class="bc-piece-edit--retire" disabled={gear.readOnly} onclick={() => (confirmRetire = true)}><Icon name="archive" size={20} />{t('gear.retire.button')}</button>
+    {/if}
+  </div>
+  <div class="bc-piece-edit--bottom"></div>
+{/snippet}
+
+{#snippet body()}
+  <ReadOnlyNotice />
+  {#if id}
+    {#if profileWide()}
+      {@render typeGrid()}
+    {:else}
+      <div class="bc-piece-edit--type-field">
+        <SelectField label={t('gear.pieceNew.typeTitle')} value={type} onchange={chooseType} options={typeOptions} disabled={!!piece?.computerModel} icon={typeIcon} />
+      </div>
+    {/if}
+    {@render form()}
+  {:else}
+    <div class="bc-piece-edit--stage" bind:this={stage} data-step={choosingType ? 'choose' : 'form'}>
+      {#key choosingType}
+        <section class="bc-piece-edit--step" in:moveStep={{ kind: 'in' }} out:moveStep={{ kind: 'out' }}>
+          {#if choosingType}{@render typeGrid()}{:else}{@render form()}{/if}
+        </section>
+      {/key}
     </div>
   {/if}
+{/snippet}
 
+{#snippet typeFields()}
   {#if spec.photo}
     <div class="bc-piece-edit--image">
       <div class="bc-piece-edit--picture" data-testid="piece-picture" class:bc-piece-edit--picture-box={!ios && !profileWide()} role="img" aria-label={t('gear.computerEdit.imageLabel')}>
@@ -401,32 +489,7 @@
 
     {#each fields.after as f (f.key)}{@render detail(f)}{/each}
 
-    <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
-    <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
-
-    {#if showReminderCard}
-      <div class="bc-piece-edit--reminder">
-        <span class="bc-piece-edit--reminder-icon"><Icon name="clock" size={22} /></span>
-        <span class="bc-piece-edit--reminder-texts">
-          <span class="bc-piece-edit--reminder-title">{t('maintenance.reminderCard.title')}</span>
-          <span class="bc-piece-edit--reminder-line">
-            {#if reminder}
-              {taskLabel({ task: reminder.task })} · {ruleText({ intervalMonths: reminder.months, intervalDives: reminder.dives })}
-            {:else}
-              {suggestionLine}
-            {/if}
-          </span>
-        </span>
-        <button type="button" class="bc-piece-edit--reminder-button" disabled={gear.readOnly} onclick={() => (ruleOpen = true)}>
-          {reminder ? t('maintenance.reminderCard.edit') : t('maintenance.reminderCard.add')}
-        </button>
-      </div>
-    {/if}
-    {#if id}
-      <button type="button" class="bc-piece-edit--retire" disabled={gear.readOnly} onclick={() => (confirmRetire = true)}><Icon name="archive" size={20} />{t('gear.retire.button')}</button>
-    {/if}
   </div>
-  <div class="bc-piece-edit--bottom"></div>
 {/snippet}
 
 <Page class="bc-piece-edit">
@@ -438,7 +501,7 @@
     {/snippet}
     {#snippet title()}{id ? t('gear.pieceEdit.editTitle') : t('gear.pieceEdit.addTitle')}{/snippet}
     {#snippet right()}
-      <button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
+      {#if id || !choosingType}<button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>{/if}
     {/snippet}
   </Navbar>
   {#if profileWide()}
@@ -472,6 +535,57 @@
 
 <style>
   @layer od.components {
+    .bc-piece-edit--change-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 12px 20px;
+      padding: 8px;
+      color: var(--bc-action);
+      background: none;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+    .bc-piece-edit--stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      overflow-x: clip;
+    }
+    .bc-piece-edit--step {
+      grid-area: 1 / 1;
+      min-width: 0;
+      align-self: start;
+    }
+    @keyframes -global-od-piece-in-forward { from { translate: 30px 0; } to { translate: 0 0; } }
+    @keyframes -global-od-piece-in-back { from { translate: -30px 0; } to { translate: 0 0; } }
+    @keyframes -global-od-piece-out-forward { to { translate: -30px 0; } }
+    @keyframes -global-od-piece-out-back { to { translate: 30px 0; } }
+    @keyframes -global-od-piece-fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes -global-od-piece-fade-out { to { opacity: 0; } }
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-forward),
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-back) {
+      animation:
+        var(--bc-piece-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
+        od-piece-fade-in var(--bc-motion-effects-default-ms, 200ms) var(--bc-motion-effects-default, ease-out) calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) both;
+    }
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-forward) { --bc-piece-slide: od-piece-in-forward; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-back) { --bc-piece-slide: od-piece-in-back; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-forward),
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-back) {
+      pointer-events: none;
+      animation:
+        var(--bc-piece-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
+        od-piece-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
+    }
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-forward) { --bc-piece-slide: od-piece-out-forward; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-back) { --bc-piece-slide: od-piece-out-back; }
+    @media (prefers-reduced-motion: reduce) {
+      .bc-piece-edit--stage :global(.bc-piece-edit--in-forward),
+      .bc-piece-edit--stage :global(.bc-piece-edit--in-back),
+      .bc-piece-edit--stage :global(.bc-piece-edit--out-forward),
+      .bc-piece-edit--stage :global(.bc-piece-edit--out-back) { animation: none; }
+    }
     /* Fluid layout: the content keeps a readable width on a tablet. */
     :global(.bc-piece-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
