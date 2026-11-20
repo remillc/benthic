@@ -77,6 +77,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
+const { StringDecoder } = require('node:string_decoder');
 const logbooks = require('./logbooks.cjs');
 
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
@@ -150,6 +151,35 @@ function safeName(name, fallback) {
   return base && base !== '.' && base !== '..' ? base : fallback;
 }
 
+function forwardCoreStderr(input, write) {
+  const decoder = new StringDecoder('utf8');
+  const prefix = 'ERROR: Dive: ';
+  const ignored = /^ERROR: Dive: \d+, dive computer: [^\r\n]*: CCR dive, but no diluent cylinder found\. Please add or select the correct cylinder use\.\r?$/;
+  let pending = '';
+  let passthrough = false;
+  const forward = (text) => { if (text) write(`[core] ${text}`); };
+  const consume = (text) => {
+    pending += text;
+    let newline;
+    while ((newline = pending.indexOf('\n')) !== -1) {
+      const line = pending.slice(0, newline);
+      if (passthrough || !ignored.test(line)) forward(`${line}\n`);
+      pending = pending.slice(newline + 1);
+      passthrough = false;
+    }
+    if (passthrough || (!prefix.startsWith(pending) && !pending.startsWith(prefix)) || pending.length > 65536) {
+      forward(pending);
+      pending = '';
+      passthrough = true;
+    }
+  };
+  input.on('data', (chunk) => consume(decoder.write(chunk)));
+  input.on('end', () => {
+    consume(decoder.end());
+    if (passthrough || !ignored.test(pending)) forward(pending);
+  });
+}
+
 /**
  * The helper process: started on demand, restarted after it dies, every call matched by id.
  * `onStart` runs first on every new process (the setup calls); calls wait for it.
@@ -196,7 +226,7 @@ class HostProcess {
     child.on('error', (e) => gone(`Cannot run the core: ${e.message}`));
     child.on('exit', (code, signal) => gone(`The core stopped (${signal || code})`));
     child.stdin.on('error', () => {}); // a closed pipe is reported by 'exit'
-    child.stderr.on('data', (chunk) => process.stderr.write(`[core] ${chunk}`));
+    forwardCoreStderr(child.stderr, (text) => process.stderr.write(text));
     readline.createInterface({ input: child.stdout, crlfDelay: Infinity }).on('line', (line) => this.line(line));
     this.ready = Promise.resolve()
       .then(() => this.onStart?.((method, args) => this.send(method, args)))
@@ -1100,4 +1130,4 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   };
 }
 
-module.exports = { setupBridge, HostProcess, CORE_METHODS, PATH_ARGS };
+module.exports = { setupBridge, HostProcess, forwardCoreStderr, CORE_METHODS, PATH_ARGS };

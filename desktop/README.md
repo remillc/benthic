@@ -38,6 +38,8 @@ packaged, else `desktop/resources`.
 ### Host protocol
 
 One JSON object per line over stdio, UTF-8, nothing else on stdout (logs go to stderr).
+The bridge omits only the core's missing CCR diluent-cylinder diagnostic from the desktop stderr
+log. Other diagnostics and the core's return values are unchanged.
 
 ```
 -> {"id":7,"method":"editDive","args":{"id":12,"changes":"{...}"}}
