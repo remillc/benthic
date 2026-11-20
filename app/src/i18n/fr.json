@@ -2721,7 +2721,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Sauvegarde et restauration : les plongées supprimées avant la création du compte et les versions antérieures du carnet sont listées et peuvent être restaurées. Une recherche des plongées supprimées qui échoue le dit maintenant, avec un bouton Réessayer.",
+      "Sauvegarde et restauration : les plongées supprimées avant la création du compte et les versions antérieures du carnet sont listées et peuvent être restaurées. Une recherche des plongées supprimées qui échoue le dit maintenant, avec un bouton Réessayer. Chaque plongée supprimée montre sa date et son heure, sa profondeur, sa durée, son mode, son ordinateur et son site.",
       "Informations : les champs de date de naissance, de lien et de téléphone sont moins larges.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",

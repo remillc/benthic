@@ -6,7 +6,8 @@
   import './backup.css';
   import { backup, restoreOne, loadDeleted } from '../lib/backup.svelte.js';
   import { versionDay, isoOfEpoch } from '../lib/backup-text.js';
-  import { formatDate, formatTimeAgo } from '../lib/format.js';
+  import { formatDateTime, formatDepth, formatDuration, formatTimeAgo } from '../lib/format.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
@@ -20,8 +21,23 @@
   /** @param {import('../lib/backup-history.js').DeletedDive} d */
   function rowTitle(d) {
     const number = d.number != null ? t('backup.version.number', { n: d.number }) : '';
-    const date = formatDate(d.key.replace(' ', 'T'));
-    return [number, d.site, date].filter(Boolean).join(' · ');
+    return [number, d.site].filter(Boolean).join(' · ') || formatDateTime(startIso(d));
+  }
+
+  /** @param {import('../lib/backup-history.js').DeletedDive} d */
+  const startIso = (d) => d.key.replace(' ', 'T');
+
+  /** What identifies the dive: when it started, how deep, how long, the mode and the computer. @param {import('../lib/backup-history.js').DeletedDive} d */
+  function identityLine(d) {
+    const title = rowTitle(d);
+    const when = formatDateTime(startIso(d));
+    return [
+      title === when ? '' : when,
+      d.maxDepthMm ? formatDepth(d.maxDepthMm, logbook.prefs) : '',
+      d.durationSeconds != null ? formatDuration(d.durationSeconds) : '',
+      d.mode && d.mode !== 'OC' ? t(`detail.modes.${d.mode}`) : '',
+      d.computer,
+    ].filter(Boolean).join(' · ');
   }
 
   /** @param {import('../lib/backup-history.js').DeletedDive} d */
@@ -50,6 +66,7 @@
         <div class="bc-backup--row" role="listitem">
           <span class="bc-backup--texts">
             <span class="bc-backup--row-title">{rowTitle(d)}</span>
+            {#if identityLine(d)}<span class="bc-backup--row-line">{identityLine(d)}</span>{/if}
             <span class="bc-backup--row-line">{t('backup.deleted.row', { when: formatTimeAgo(isoOfEpoch(d.deletedAt)) })}</span>
           </span>
           <button type="button" class="bc-backup--restore" disabled={backup.busy} onclick={() => restore(d)}>{t('backup.deleted.restore')}</button>

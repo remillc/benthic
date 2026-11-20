@@ -209,6 +209,23 @@ test('the versions of one dive say what each sync changed; restoring changes tha
   }
 });
 
+test('a deleted dive carries what identifies it: duration, depth, mode and computer', async () => {
+  const lb = new GitLogbook();
+  try {
+    const dir = '2026/09/13-Sun-09=15=48';
+    lb.commit({ [`${dir}/Dive`]: 'duration 1:45 min\nnotrip\n', [`${dir}/Divecomputer`]: 'model "Shearwater Petrel 3"\ndctype CCR\nmaxdepth 2.377m\n' });
+    lb.commit({ [dir]: null });
+    const [d] = await deletedDives(lb);
+    assert.equal(d.number, null);
+    assert.equal(d.durationSeconds, 105);
+    assert.equal(d.maxDepthMm, 2377);
+    assert.equal(d.mode, 'CCR');
+    assert.equal(d.computer, 'Shearwater Petrel 3');
+  } finally {
+    lb.dispose();
+  }
+});
+
 test('a deleted dive is listed from the history and restored alone', async () => {
   const { lb, v2, v3, v4 } = makeLogbook();
   try {
