@@ -1031,6 +1031,9 @@ int odgit_remove(const std::string &dir, std::string &error)
 
 namespace {
 
+// Where the commits of the device's own logbook are kept inside the account's repository: one reference per head.
+#define DEVICE_REFS "refs/opendives/device/"
+
 bool valid_utf8(const char *s, size_t n)
 {
 	size_t i = 0;
@@ -1214,6 +1217,8 @@ int odgit_history_log(const std::string &dir, const std::string &branch, int ski
 		return -1;
 	}
 	std::unique_ptr<git_revwalk, Free<git_revwalk, git_revwalk_free>> walk(rawwalk);
+	// The history the device's own logbook had before the account (odgit_history_adopt) follows the branch's.
+	git_revwalk_push_glob(walk.get(), DEVICE_REFS "*");
 	git_revwalk_sorting(walk.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 	json = "{\"commits\":[";
 	git_oid oid;
@@ -1285,6 +1290,57 @@ int odgit_history_log(const std::string &dir, const std::string &branch, int ski
 		json += '}';
 	}
 	json += std::string("],\"more\":") + (more ? "true" : "false") + "}";
+	return 0;
+}
+
+int odgit_history_adopt(const std::string &dir, const std::string &source, const std::string &source_branch,
+			std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	if (!valid_branch(source_branch) || source.empty()) {
+		error = "GIT_ERROR: bad arguments";
+		return -1;
+	}
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	git_repository *rawsource = nullptr;
+	if (git_repository_open_ext(&rawsource, source.c_str(), GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr)) {
+		json = "{\"result\":\"none\",\"head\":null}";
+		return 0;
+	}
+	Repo from(rawsource);
+	git_oid head;
+	if (!lookup_oid(from.get(), ref_of(source_branch), head)) {
+		json = "{\"result\":\"none\",\"head\":null}";
+		return 0;
+	}
+	const std::string name = DEVICE_REFS + oid_string(head);
+	git_oid known;
+	if (lookup_oid(repo.get(), name, known)) {
+		json = "{\"result\":\"unchanged\",\"head\":\"" + oid_string(head) + "\"}";
+		return 0;
+	}
+	git_remote *rawremote = nullptr;
+	int rc = git_remote_create_anonymous(&rawremote, repo.get(), source.c_str());
+	if (rc) {
+		error = local_error(rc);
+		return -1;
+	}
+	Remote remote(rawremote);
+	// Not forced and one reference per head: a head the logbook had earlier is never replaced by a later one.
+	std::string spec = ref_of(source_branch) + ":" + name;
+	const char *spec_ptr = spec.c_str();
+	git_strarray specs = { const_cast<char **>(&spec_ptr), 1 };
+	git_fetch_options fo = GIT_FETCH_OPTIONS_INIT;
+	fo.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_NONE;
+	rc = git_remote_fetch(remote.get(), &specs, &fo, "adopt the device's history");
+	if (rc) {
+		error = local_error(rc);
+		return -1;
+	}
+	json = "{\"result\":\"adopted\",\"head\":\"" + oid_string(head) + "\"}";
 	return 0;
 }
 

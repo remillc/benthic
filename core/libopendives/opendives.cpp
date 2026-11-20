@@ -1655,6 +1655,10 @@ int history_call(const std::string &action, const std::vector<std::string> &args
 	if (action == "log")
 		return odgit_history_log(dir, branch, atoi(arg(0).c_str()), atoi(arg(1).empty() ? "50" : arg(1).c_str()), arg(2) == "1",
 					 json, error);
+	if (action == "adopt") {
+		// The device's own logbook from before the account: its commits join the history (odgit_history_adopt).
+		return odgit_history_adopt(dir, arg(0), arg(1).empty() ? "main" : arg(1), json, error);
+	}
 	if (action == "stats")
 		return odgit_history_stats(dir, args, json, error);
 	if (action == "diff")

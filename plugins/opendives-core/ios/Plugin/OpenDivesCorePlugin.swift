@@ -855,10 +855,11 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// The versions of the configured logbook (opendives.h, history_call): `action` and `args` (strings).
+    /// The versions of the configured logbook (opendives.h, history_call): `action` and `args` (strings). "adopt" always
+    /// reads this device's own logbook folder, whatever the page passes.
     @objc func history(_ call: CAPPluginCall) {
         let action = call.getString("action", "")
-        let args = (call.getArray("args") ?? []).compactMap { $0 as? String }
+        let args = action == "adopt" ? [repoDir.path] : (call.getArray("args") ?? []).compactMap { $0 as? String }
         onCoreThread(call) {
             call.resolve(["json": try OpenDivesNative.history(action, args: args)])
         }

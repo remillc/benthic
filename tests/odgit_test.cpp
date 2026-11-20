@@ -12,6 +12,7 @@
 //        odgit-test hdiff <dir> <from|-> <to>   odgit-test hread <dir> <commit> <path>
 //        odgit-test hfiles <dir> <commit> [prefix]
 //        odgit-test hrestore <dir> <branch> <commit> <message> [path...]   odgit-test hborrow <dir> <commit> <into>
+//        odgit-test hadopt <dir> <source-dir> <source-branch>
 #include "core/libopendives/odgit.h"
 
 #include <cstdio>
@@ -80,6 +81,8 @@ int main(int argc, char **argv)
 		rc = odgit_history_restore(arg(0), arg(1), arg(2), paths, arg(3), OdgitAuthor(), json, error);
 	} else if (cmd == "hborrow")
 		rc = odgit_history_borrow(arg(0), arg(1), arg(2), json, error);
+	else if (cmd == "hadopt")
+		rc = odgit_history_adopt(arg(0), arg(1), arg(2), json, error);
 	if (rc) {
 		printf("ERROR %s\n", error.c_str());
 		return 1;

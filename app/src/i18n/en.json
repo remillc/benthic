@@ -1275,6 +1275,7 @@
         "other": "{n} dives, always recoverable"
       },
       "deletedNone": "No deleted dive",
+      "deletedFailed": "The history could not be read",
       "deletedSearching": "Searching the history"
     },
     "pane": {
@@ -1414,6 +1415,7 @@
     "deleted": {
       "title": "Deleted dives",
       "empty": "No deleted dive",
+      "failed": "The history could not be read, so the deleted dives cannot be listed.",
       "row": "Deleted {when}",
       "restore": "Restore",
       "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
@@ -2719,6 +2721,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Backup and restore: the dives deleted before the account was created, and the earlier versions of the logbook, are listed and can be restored. A failed search for deleted dives now says so, with a Try again button.",
       "Information: the date of birth, relationship and phone fields are narrower.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",

@@ -37,7 +37,13 @@
   const capital = (text) => text.charAt(0).toLocaleUpperCase() + text.slice(1);
 
   const deletedLine = $derived(
-    backup.deletedLoading || backup.deleted === null ? t('backup.only.deletedSearching') : backup.deleted.length ? t('backup.only.deletedLine', { n: backup.deleted.length }) : t('backup.only.deletedNone'),
+    backup.deletedLoading || backup.deleted === null
+      ? t('backup.only.deletedSearching')
+      : backup.deletedFailed
+        ? t('backup.only.deletedFailed')
+        : backup.deleted.length
+          ? t('backup.only.deletedLine', { n: backup.deleted.length })
+          : t('backup.only.deletedNone'),
   );
 </script>
 

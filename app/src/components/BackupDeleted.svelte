@@ -37,6 +37,11 @@
   <h2 class="bc-backup--section">{t('backup.deleted.title')}</h2>
   {#if backup.deleted === null || backup.deletedLoading}
     <p class="bc-backup--empty" role="status">{t('backup.only.deletedSearching')}</p>
+  {:else if backup.deletedFailed}
+    <div class="bc-backup--error">
+      {t('backup.deleted.failed')}
+      <button type="button" class="bc-outlined-button" onclick={loadDeleted}>{t('backup.versions.retry')}</button>
+    </div>
   {:else if !backup.deleted.length}
     <p class="bc-backup--empty">{t('backup.deleted.empty')}</p>
   {:else}

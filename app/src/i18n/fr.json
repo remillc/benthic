@@ -1275,6 +1275,7 @@
         "other": "{n} plongées, toujours récupérables"
       },
       "deletedNone": "Aucune plongée supprimée",
+      "deletedFailed": "L’historique n’a pas pu être lu",
       "deletedSearching": "Recherche dans l’historique"
     },
     "pane": {
@@ -1414,6 +1415,7 @@
     "deleted": {
       "title": "Plongées supprimées",
       "empty": "Aucune plongée supprimée",
+      "failed": "L’historique n’a pas pu être lu : les plongées supprimées ne peuvent pas être listées.",
       "row": "Supprimée {when}",
       "restore": "Restaurer",
       "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
@@ -2719,6 +2721,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Sauvegarde et restauration : les plongées supprimées avant la création du compte et les versions antérieures du carnet sont listées et peuvent être restaurées. Une recherche des plongées supprimées qui échoue le dit maintenant, avec un bouton Réessayer.",
       "Informations : les champs de date de naissance, de lien et de téléphone sont moins larges.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
