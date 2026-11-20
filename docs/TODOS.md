@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 115
+Next number: 116
 
 ## List
 
@@ -47,3 +47,4 @@ Next number: 115
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #114 [code] Après le lancement, prévoir une tâche récurrente pour mettre à jour les listes d'agences de certification et leurs certifications.
+- #115 [code] sur tablette et desktop, sur /profile, réduire la largeur du bouton "+ Ajouter une pièce" à son contenu et aligner à droite.
