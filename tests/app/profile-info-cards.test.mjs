@@ -425,7 +425,7 @@ test('the texts of the new screens exist in French and English', () => {
   const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
   const get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const l of ['fr', 'en']) {
-    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood', 'diverProfile.info.add', 'diverProfile.info.dobAge']) {
+    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood']) {
       assert.ok(get(langs[l], key), `${l}: ${key}`);
     }
   }

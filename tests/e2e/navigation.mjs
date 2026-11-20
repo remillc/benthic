@@ -1788,9 +1788,9 @@ async function profileInfoWidthsFlows(expect) {
     if (label === 'narrow phone') {
       const profile = await tab.run(() => {
         const page = document.querySelector('.page-current.bc-profile-info');
-        return { blood: page?.querySelector('.bc-profile-info--tile-blood')?.textContent.trim() === 'O+', add: page?.querySelectorAll('.bc-profile-info--add').length };
+        return { blood: !!page?.textContent.includes('O+') };
       });
-      expect('profile shows the blood group tile, and Add only where a value is missing', { blood: true, add: 2 }, profile);
+      expect('profile shows the blood group', { blood: true }, profile);
       await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/emergency'); });
       await sleep(700);
       const shown = await tab.run(() => document.querySelector('.page-current .bc-emergency--blood-value')?.textContent);

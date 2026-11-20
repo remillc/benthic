@@ -1,8 +1,8 @@
 <script>
   // @ts-check
-  // « Informations » of « Mon profil de plongeur » (task 2026-11-18-272, docs/mockups-release/profil-infos-android.dc.html):
-  // an identity header (initial, name, date of birth), « Contact d’urgence » (name and relationship, a phone number that
-  // calls) and « Santé » (blood group, « Vous seul »). The pencil edits in place (todo #119): the header stays, the
+  // « Informations » of « Mon profil de plongeur » (task 2026-11-18-272, docs/mockups-release/profil-infos-android.dc.html
+  // and profil-infos-sans-accord-android.dc.html): « Vous » (date of birth), « Contact d’urgence » (name and relationship,
+  // phone with its country code) and « Santé » (blood group, « Vous seul »). The pencil edits in place (todo #119): the
   // sections turn into fields and the bar offers « Enregistrer »; the system Back leaves the editing without saving
   // (lib/back-button.js sends od-cancel). `?edit=1` opens the page already editing (the emergency sheet uses it).
   import BackLink from '../components/BackLink.svelte';
@@ -19,9 +19,7 @@
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
   import { BLOOD_GROUPS, UNKNOWN_BLOOD, infoProblems } from '../lib/profile.js';
   import { COUNTRIES, countryLabel, formatNational, formatInternational } from '../lib/phone-format.js';
-  import { ageOn, telHref } from '../lib/emergency.js';
   import { formatDate } from '../lib/profile-format.js';
-  import { todayIso } from '../lib/maintenance.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { profileWide } from '../lib/profile-frame.js';
@@ -106,37 +104,15 @@
   }
 
   const info = $derived(diver.info);
-  // The header follows what is typed while editing.
-  const name = $derived((editing ? fullName : info.fullName).trim());
-  const birth = $derived(editing ? dateOfBirth : info.dateOfBirth);
-  const age = $derived(birth ? ageOn(birth, todayIso()) : null);
-  const birthLine = $derived(birth && formatDate(birth) ? (age == null ? formatDate(birth) : t('diverProfile.info.dobAge', { date: formatDate(birth), age })) : '');
-  const initial = $derived(name.charAt(0).toLocaleUpperCase());
+  const contact = $derived([info.emergency.name, info.emergency.relation].filter(Boolean).join(' · '));
   const phone = $derived(formatInternational(info.emergency.phone));
-  const relationLine = $derived(info.emergency.relation ? info.emergency.relation.charAt(0).toLocaleUpperCase() + info.emergency.relation.slice(1) : '');
   const bloodLabel = $derived(info.bloodGroup === UNKNOWN_BLOOD ? t('diverProfile.info.unknown') : info.bloodGroup);
-  const bloodKnown = $derived(!!info.bloodGroup && info.bloodGroup !== UNKNOWN_BLOOD);
 </script>
-
-{#snippet add()}
-  <button type="button" class="bc-profile-info--add" onclick={startEdit}>{t('diverProfile.info.add')}</button>
-{/snippet}
-
-{#snippet hero()}
-  <div class="bc-profile-info--hero">
-    <span class="bc-profile-info--initial" aria-hidden="true">{#if initial}{initial}{:else}<Icon name="account" size={28} weight={1.8} />{/if}</span>
-    <span class="bc-profile-info--who">
-      <span class="bc-profile-info--name" class:bc-profile-info--empty={!name}>{name || t('diverProfile.info.fullName')}</span>
-      {#if birthLine}<span class="bc-profile-info--line">{birthLine}</span>{/if}
-    </span>
-  </div>
-{/snippet}
 
 {#snippet body()}
   {#if editing}
     <div class="bc-profile-info--editing" use:cancelable>
       <ReadOnlyNotice />
-      {@render hero()}
 
       <h2 class="bc-profile-info--section">{t('diverProfile.info.you')}</h2>
       <div class="bc-profile-info--fields">
@@ -163,40 +139,41 @@
       <div class="bc-profile-info--bottom"></div>
     </div>
   {:else}
-    {@render hero()}
+    <h2 class="bc-profile-info--section">{t('diverProfile.info.you')}</h2>
+    <div class="bc-profile-info--card">
+      <div class="bc-profile-info--row bc-profile-info--row-icon">
+        <span class="bc-profile-info--tile" aria-hidden="true"><Icon name="account" size={22} weight={1.8} /></span>
+        <span class="bc-profile-info--texts">
+          <span class="bc-profile-info--label">{t('diverProfile.info.fullName')}</span>
+          <span class="bc-profile-info--value" class:bc-profile-info--empty={!info.fullName}>{info.fullName || t('diverProfile.info.empty')}</span>
+        </span>
+      </div>
+      <div class="bc-profile-info--row">
+        <span class="bc-profile-info--label">{t('diverProfile.info.dob')}</span>
+        <span class="bc-profile-info--value" class:bc-profile-info--empty={!info.dateOfBirth}>{formatDate(info.dateOfBirth) || t('diverProfile.info.empty')}</span>
+      </div>
+    </div>
 
     <h2 class="bc-profile-info--section">{t('diverProfile.info.emergency')}</h2>
     <div class="bc-profile-info--card">
       <div class="bc-profile-info--row">
-        <span class="bc-profile-info--tile" aria-hidden="true"><Icon name="account" size={22} weight={1.8} /></span>
-        <span class="bc-profile-info--texts">
-          <span class="bc-profile-info--label">{t('diverProfile.info.contactNameLabel')}</span>
-          {#if info.emergency.name}<span class="bc-profile-info--value">{info.emergency.name}</span>{/if}
-          {#if relationLine}<span class="bc-profile-info--supporting">{relationLine}</span>{/if}
-        </span>
-        {#if !info.emergency.name}{@render add()}{/if}
+        <span class="bc-profile-info--label">{t('diverProfile.info.nameRelation')}</span>
+        <span class="bc-profile-info--value" class:bc-profile-info--empty={!contact}>{contact || t('diverProfile.info.empty')}</span>
       </div>
       <div class="bc-profile-info--row">
-        <span class="bc-profile-info--tile" aria-hidden="true"><Icon name="phone" size={22} weight={1.8} /></span>
-        <span class="bc-profile-info--texts">
-          <span class="bc-profile-info--label">{t('diverProfile.info.phone')}</span>
-          {#if phone}<a href={telHref(phone)} class="bc-profile-info--value bc-profile-info--call external">{phone}</a>{/if}
-        </span>
-        {#if !phone}{@render add()}{/if}
+        <span class="bc-profile-info--label">{t('diverProfile.info.phone')}</span>
+        <span class="bc-profile-info--value" class:bc-profile-info--empty={!phone}>{phone || t('diverProfile.info.empty')}</span>
       </div>
     </div>
 
     <h2 class="bc-profile-info--section">{t('diverProfile.info.health')}</h2>
     <div class="bc-profile-info--card">
       <div class="bc-profile-info--row">
-        <span class="bc-profile-info--tile bc-profile-info--tile-blood" class:bc-profile-info--tile-text={bloodKnown} aria-hidden="true">
-          {#if bloodKnown}{bloodLabel}{:else}<Icon name="lock" size={22} weight={1.8} />{/if}
+        <span class="bc-profile-info--label">{t('diverProfile.info.blood')}</span>
+        <span class="bc-profile-info--line">
+          <span class="bc-profile-info--value" class:bc-profile-info--empty={!bloodLabel}>{bloodLabel || t('diverProfile.info.empty')}</span>
+          <span class="bc-profile-info--tag"><Icon name="lock" size={14} />{t('diverProfile.info.onlyYou')}</span>
         </span>
-        <span class="bc-profile-info--texts">
-          <span class="bc-profile-info--label">{t('diverProfile.info.blood')}</span>
-          {#if bloodLabel}<span class="bc-profile-info--value">{bloodLabel}</span>{/if}
-        </span>
-        {#if !info.bloodGroup}{@render add()}{:else}<span class="bc-profile-info--tag"><Icon name="lock" size={14} />{t('diverProfile.info.onlyYou')}</span>{/if}
       </div>
     </div>
 
@@ -239,57 +216,6 @@
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }
 
-    .bc-profile-info--hero {
-      margin: 8px 16px 0;
-      padding: 16px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--bc-surface);
-    }
-
-    .bc-profile-info--initial {
-      flex: none;
-      width: 56px;
-      height: 56px;
-      border-radius: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bc-nav-avatar-ink);
-      color: #FFFFFF;
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .bc-profile-info--who {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .bc-profile-info--name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 20px;
-      line-height: 26px;
-      font-weight: 500;
-    }
-
-    .bc-profile-info--line {
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--bc-text-2);
-    }
-
-    .bc-profile-info--empty {
-      color: var(--bc-text-2);
-    }
-
     .bc-profile-info--section {
       margin: 20px 32px 8px;
       font-size: 14px;
@@ -305,17 +231,11 @@
       overflow: hidden;
     }
 
-    .bc-profile-info--row {
-      box-sizing: border-box;
+    .bc-profile-info--row.bc-profile-info--row-icon {
       min-height: 72px;
-      padding: 10px 16px;
-      display: flex;
+      flex-direction: row;
       align-items: center;
       gap: 16px;
-    }
-
-    .bc-profile-info--row + .bc-profile-info--row {
-      border-top: 1px solid var(--bc-separator);
     }
 
     .bc-profile-info--tile {
@@ -330,22 +250,31 @@
       color: var(--bc-text);
     }
 
-    .bc-profile-info--tile-blood {
-      background: var(--bc-error-container);
-      color: var(--bc-on-error-container);
-    }
-
-    .bc-profile-info--tile-text {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
     .bc-profile-info--texts {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 2px;
+    }
+
+    .bc-profile-info--row {
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .bc-profile-info--line {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bc-profile-info--row + .bc-profile-info--row {
+      border-top: 1px solid var(--bc-separator);
     }
 
     .bc-profile-info--label {
@@ -355,38 +284,20 @@
     }
 
     .bc-profile-info--value {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 17px;
       line-height: 24px;
-      color: var(--bc-text);
     }
 
-    .bc-profile-info--call {
-      align-self: flex-start;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .bc-profile-info--supporting {
-      font-size: 14px;
-      line-height: 20px;
+    .bc-profile-info--empty {
       color: var(--bc-text-2);
     }
 
-    .bc-profile-info--add {
-      flex: none;
-      height: 36px;
-      padding: 0 16px;
-      border: none;
-      border-radius: 18px;
-      background: var(--bc-secondary-container);
-      color: var(--bc-on-secondary-container);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
     .bc-profile-info--tag {
-      flex: none;
       display: inline-flex;
       align-items: center;
       gap: 4px;
