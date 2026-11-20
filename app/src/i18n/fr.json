@@ -8,7 +8,6 @@
       "expired": "Expirés"
     },
     "add": "Ajouter",
-    "note": "Les cartes sont reproduites d’après vos photos ou vos scans. Sans photo, l’app en dessine une avec les détails saisis.",
     "empty": "Aucun document",
     "emptyText": "Ajoutez vos brevets, votre assurance et votre certificat médical : ils restent chiffrés et disponibles sans réseau.",
     "back": "Retour",
@@ -2730,6 +2729,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Brevets et documents : Ajouter prend la couleur principale et flotte en bas à droite sur tablette et ordinateur ; la note sur la reproduction des cartes est retirée.",
+      "Brevets et documents : l’état vide est centré dans le panneau.",
       "Carnet : le menu permet d’exporter tout le carnet dans le format choisi.",
       "Plongée sur ordinateur : la section Équipement affiche la photo de chaque ordinateur de plongée lorsqu’elle est disponible.",
       "Réglages : la fermeture des menus de choix ne provoque plus d’erreur.",

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--certs-fab-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1192,8 +1192,92 @@ async function computerPhotoFlows(expect) {
   tab.ws.close();
 }
 
+async function certsFabFlows(expect) {
+  for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['iPhone', 390, 844, true, false, 'ios'], ['tablet landscape', 1280, 800, false, false, 'md'], ['tablet portrait', 800, 1280, false, false, 'md'], ['desktop', 1400, 900, false, true, 'md']]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    await tab.send('Page.bringToFront');
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
+    await sleep(1600);
+    const position = await tab.run(() => {
+      const page = document.querySelector('.page-current.od-docs');
+      const fab = page?.querySelector('.od-fab-add');
+      const rect = fab?.getBoundingClientRect();
+      const bounds = page?.getBoundingClientRect();
+      return {
+        visible: !!rect && rect.width > 0 && rect.height > 0,
+        bottomRight: !!rect && !!bounds && bounds.right - rect.right >= 0 && bounds.right - rect.right <= 64 && bounds.bottom - rect.bottom >= 0 && bounds.bottom - rect.bottom <= 64,
+        oldButton: !!page?.querySelector('.od-docs--wide-bar'),
+      };
+    });
+    expect(`${label}: the Add FAB is at the bottom right`, { visible: true, bottomRight: true, oldButton: false }, position);
+    const empty = await tab.run(() => {
+      const page = document.querySelector('.page-current.od-docs');
+      const content = page.querySelector('.od-docs--content').getBoundingClientRect();
+      const panel = page.querySelector('.od-pf--main') || page.querySelector('.page-content');
+      const bounds = panel.getBoundingClientRect();
+      const style = getComputedStyle(panel);
+      const top = bounds.top + parseFloat(style.paddingTop);
+      const bottom = bounds.bottom - parseFloat(style.paddingBottom);
+      const state = page.querySelector('.od-docs--empty');
+      const first = state?.firstElementChild?.getBoundingClientRect();
+      const last = state?.lastElementChild?.getBoundingClientRect();
+      return { shown: !!state, fits: Math.abs(content.top - top) < 2 && Math.abs(content.bottom - bottom) < 2, centred: !!first && !!last && Math.abs((first.top + last.bottom) / 2 - (top + bottom) / 2) < 2 };
+    });
+    expect(`${label}: empty state is centred in its panel`, { shown: true, fits: true, centred: true }, empty);
+    const appearance = await tab.run(() => {
+      const page = document.querySelector('.page-current.od-docs');
+      const button = page.querySelector('.od-fab-add a');
+      const sample = document.createElement('span');
+      sample.style.backgroundColor = 'var(--od-primary-action)';
+      sample.style.color = 'var(--od-on-primary-action)';
+      page.append(sample);
+      const actual = getComputedStyle(button);
+      const expected = getComputedStyle(sample);
+      const result = { background: actual.backgroundColor === expected.backgroundColor, text: actual.color === expected.color, note: !!page.querySelector('.od-docs--note') };
+      sample.remove();
+      return result;
+    });
+    expect(`${label}: Add uses the primary action colours and the note is absent`, { background: true, text: true, note: false }, appearance);
+    if (theme === 'md') {
+      const spacing = await tab.run(() => {
+        const button = document.querySelector('.page-current.od-docs .od-fab-add a');
+        const rect = button.getBoundingClientRect();
+        const icon = button.querySelector('i').getBoundingClientRect();
+        const text = button.querySelector('.fab-text').getBoundingClientRect();
+        const near = (a, b) => Math.abs(a - b) < 1;
+        return { height: near(rect.height, 56), icon: near(icon.width, 24) && near(icon.height, 24), start: near(icon.left - rect.left, 16), gap: near(text.left - icon.right, 8), end: near(rect.right - text.right, 16) };
+      });
+      expect(`${label}: Add has Expressive small extended FAB spacing`, { height: true, icon: true, start: true, gap: true, end: true }, spacing);
+    }
+    await tab.run(() => document.querySelector('.page-current.od-docs .od-fab-add a').click());
+    await sleep(500);
+    const sheet = await tab.run(() => document.querySelectorAll('.od-doc-choice.modal-in .od-doc-choice--option').length);
+    expect(`${label}: Add opens the document choices`, { count: 4 }, { count: sheet });
+    await tab.run(async () => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      gear.readOnly = true;
+    });
+    await sleep(100);
+    const hidden = await tab.run(() => getComputedStyle(document.querySelector('.page-current.od-docs .od-fab-add')).display === 'none');
+    expect(`${label}: read-only hides Add`, { hidden: true }, { hidden });
+    await tab.run(async () => {
+      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const { changeProfile } = await import('/src/lib/profile.svelte.js');
+      gear.readOnly = false;
+      await changeProfile((profile) => profile.saveCertification({ agency: 'PADI', level: 'Open Water', number: 'test-1' }));
+    });
+    await sleep(300);
+    const populated = await tab.run(() => {
+      const page = document.querySelector('.page-current.od-docs');
+      return { empty: !!page.querySelector('.od-docs--empty'), card: !!page.querySelector('.od-docs--row') };
+    });
+    expect(`${label}: a saved document replaces the empty state`, { empty: false, card: true }, populated);
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--certs-fab-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1206,6 +1290,7 @@ try {
   if (args.has('--export-only') || fixed) await exportFlows(expect);
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
+  if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

@@ -101,12 +101,8 @@
 {/snippet}
 
 {#snippet body()}
-
+  <div class="od-docs--content">
   <ReadOnlyNotice />
-
-  {#if profileWide() && !gear.readOnly}
-    <div class="od-docs--wide-bar"><button type="button" class="od-docs--add" onclick={() => (choosing = true)}><Icon name="plus" size={20} />{t('docs.add')}</button></div>
-  {/if}
 
   {#if diver.ready && !diver.certs.length}
     <div class="od-docs--empty">
@@ -130,10 +126,9 @@
         </div>
       {/if}
     {/if}
+    <div class="od-docs--bottom"></div>
   {/if}
-
-  <p class="od-docs--note"><Icon name="info" size={18} /><span>{t('docs.note')}</span></p>
-  <div class="od-docs--bottom"></div>
+  </div>
 {/snippet}
 
 <Page class="od-docs">
@@ -148,7 +143,7 @@
     {@render body()}
   {/if}
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended od-fab-add" style:display={gear.readOnly || profileWide() ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended od-fab-add od-docs--fab" style:display={gear.readOnly ? 'none' : null}>
       <a href="#add" class="external" role="button" onclick={(e) => (e.preventDefault(), (choosing = true))}>
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('docs.add')}</div>
@@ -163,6 +158,12 @@
   @layer od.components {
     :global(.od-docs .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
+    }
+
+    .od-docs--content {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .od-docs--heading {
@@ -291,32 +292,15 @@
       margin-top: 8px;
     }
 
-    .od-docs--wide-bar {
-      margin: 16px 16px 0;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .od-docs--add {
-      height: 40px;
-      padding: 0 20px 0 14px;
-      border: none;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--od-secondary);
-      color: var(--od-on-secondary);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
     .od-docs--empty {
-      margin: 48px 32px 16px;
+      flex: 1;
+      min-height: 200px;
+      box-sizing: border-box;
+      padding: 24px 32px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       text-align: center;
       gap: 8px;
     }
@@ -345,14 +329,25 @@
       color: var(--od-text-2);
     }
 
-    .od-docs--note {
-      margin: 16px 32px 0;
+    .od-docs--fab {
+      --f7-fab-bg-color: var(--od-primary-action);
+      --f7-fab-text-color: var(--od-on-primary-action);
+    }
+
+    :global(.md) .od-docs--fab > a {
+      box-sizing: border-box;
+      gap: 8px;
+      padding-inline: 16px;
+    }
+
+    :global(.md) .od-docs--fab > a i {
+      position: static;
+      transform: none;
       display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--od-text-2);
+    }
+
+    :global(.md) .od-docs--fab .fab-text {
+      padding: 0;
     }
 
     .od-docs--bottom {
