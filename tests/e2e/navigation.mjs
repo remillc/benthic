@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--certs-fab-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--certs-fab-only|--cert-agencies-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1323,8 +1323,93 @@ async function certsFabFlows(expect) {
   }
 }
 
+async function certificationAgencyFlows(expect) {
+  for (const [label, width, height, mobile, desktop] of [['phone', 390, 844, true, false], ['tablet', 1280, 800, false, false], ['desktop', 1400, 900, false, true]]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
+    await tab.send('Page.bringToFront');
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/new'); });
+    await sleep(1600);
+    await tab.run(() => {
+      const input = document.querySelector('.od-cert-edit .od-combo-field input');
+      if (!input) throw new Error('agency field missing');
+      input.focus();
+    });
+    await sleep(300);
+    const menu = await tab.run(() => {
+      const options = [...document.querySelectorAll('.od-combo-field--menu [role="option"]')];
+      const { lang } = document.documentElement;
+      return {
+        sorted: options.every((o, i) => i === 0 || options[i - 1].textContent.trim().localeCompare(o.textContent.trim(), lang, { sensitivity: 'base' }) <= 0),
+        fqas: options.some((o) => o.textContent.trim().startsWith('FQAS ·')),
+        other: options.some((o) => /^(Other agency|Autre agence)$/.test(o.textContent.trim())),
+      };
+    });
+    expect(`${label}: certification agencies`, { sorted: true, fqas: true, other: false }, menu);
+    await tab.run(() => [...document.querySelectorAll('.od-combo-field--menu [role="option"]')].find((o) => o.textContent.trim().startsWith('FQAS ·')).click());
+    await sleep(200);
+    await tab.run(() => document.querySelectorAll('.od-cert-edit .od-combo-field input')[1].focus());
+    await sleep(200);
+    const levels = await tab.run(() => [...document.querySelectorAll('.od-combo-field--menu [role="option"]')].map((o) => o.textContent.trim()));
+    expect(`${label}: levels match the agency`, { fqas: true, cdaa: false }, { fqas: levels.includes('Plongeur classe A'), cdaa: levels.includes('Advanced Cave Diver') });
+    await tab.run(() => {
+      const input = document.querySelectorAll('.od-cert-edit .od-combo-field input')[1];
+      input.value = 'Custom level';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.blur();
+    });
+    await sleep(250);
+    expect(`${label}: an unlisted level can be entered`, { value: 'Custom level' }, { value: await tab.run(() => document.querySelectorAll('.od-cert-edit .od-combo-field input')[1].value) });
+    await tab.run((number) => {
+      const [agency] = document.querySelectorAll('.od-cert-edit .od-combo-field input');
+      agency.focus();
+      agency.value = 'Custom agency';
+      agency.dispatchEvent(new Event('input', { bubbles: true }));
+      agency.blur();
+      const field = document.querySelector('.od-cert-edit .od-text-field input');
+      field.value = number;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }, `test-${label}`);
+    await sleep(250);
+    await tab.run(() => {
+      const save = document.querySelector('.od-cert-edit--save');
+      if (!save || save.disabled) throw new Error('certificate cannot be saved');
+      save.click();
+    });
+    await sleep(1000);
+    const saved = await tab.run(async (number) => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const card = (await services().profile.listCertifications()).find((c) => c.number === number);
+      return card && { id: card.id, agency: card.agency, agencyName: card.agencyName, level: card.level };
+    }, `test-${label}`);
+    expect(`${label}: custom agency and level are saved`, { agency: 'other', agencyName: 'Custom agency', level: 'Custom level' }, saved || {});
+    if (!saved) throw new Error('saved certificate missing');
+    await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/certs/${id}/edit`); }, saved.id);
+    await sleep(1200);
+    const reopened = await tab.run(() => [...document.querySelectorAll('.od-cert-edit .od-combo-field input')].map((input) => input.value));
+    expect(`${label}: custom values reopen`, { agency: 'Custom agency', level: 'Custom level' }, { agency: reopened[0], level: reopened[1] });
+    await tab.run(() => {
+      const input = document.querySelector('.od-cert-edit .od-combo-field input');
+      input.focus();
+      input.value = 'FQAS';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await sleep(200);
+    await tab.run(() => [...document.querySelectorAll('.od-combo-field--menu [role="option"]')].find((o) => o.textContent.trim().startsWith('FQAS ·')).click());
+    await sleep(200);
+    await tab.run(() => document.querySelector('.od-cert-edit--save').click());
+    await sleep(1000);
+    const updated = await tab.run(async (id) => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const card = await services().profile.getCertification(id);
+      return card && { agency: card.agency, agencyName: card.agencyName, level: card.level };
+    }, saved.id);
+    expect(`${label}: a selected agency keeps its identifier`, { agency: 'FQAS', agencyName: '', level: 'Custom level' }, updated || {});
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--certs-fab-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1339,6 +1424,7 @@ try {
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
   if (args.has('--certs-fab-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await certsFabFlows(expect);
+  if (args.has('--cert-agencies-only') || fixed) await certificationAgencyFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

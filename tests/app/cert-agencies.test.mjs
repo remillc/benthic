@@ -2,7 +2,7 @@
 // one of the new agencies or levels is read into them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CERT_AGENCIES } from '../../app/src/lib/cert-agencies.js';
+import { CERT_AGENCIES, certAgencyOptions, certAgencySelection, certAgencyText } from '../../app/src/lib/cert-agencies.js';
 import { CERT_LEVELS } from '../../app/src/lib/cert-levels.js';
 import { AGENCIES, LEVEL_SUGGESTIONS, levelSuggestions } from '../../app/src/lib/profile.js';
 import { parseCardText } from '../../app/src/lib/card-parse.js';
@@ -57,6 +57,42 @@ test('levels: the main agencies have their whole ladder', () => {
   for (const l of ['4 star diver', 'Instructor 2 star', 'Instructor 3 star']) assert.ok(CERT_LEVELS.CMAS.includes(l), l);
   for (const l of ['PA20', 'PE40', 'E3', 'Guide de palanquée']) assert.ok(CERT_LEVELS.FFESSM.includes(l), l);
   assert.deepEqual(levelSuggestions('CMAS', 'instructor'), ['Instructor 1 star', 'Instructor 2 star', 'Instructor 3 star']);
+});
+
+test('agency options sort the displayed labels in both languages', () => {
+  for (const locale of ['fr', 'en']) {
+    const options = certAgencyOptions(locale);
+    assert.ok(!options.some((o) => o.value === 'other'));
+    assert.deepEqual(options.map((o) => o.value).sort(), CERT_AGENCIES.filter((a) => a.id !== 'other' && CERT_LEVELS[a.id]?.length).map((a) => a.id).sort());
+    for (let i = 1; i < options.length; i++) {
+      assert.ok(options[i - 1].label.localeCompare(options[i].label, locale, { sensitivity: 'base' }) <= 0);
+    }
+  }
+});
+
+test('levels: suggestions follow the selected agency and allow an unlisted level', () => {
+  assert.ok(levelSuggestions('FQAS', '').includes('Plongeur classe A'));
+  assert.ok(levelSuggestions('CDAA', '').includes('Advanced Cave Diver'));
+  assert.ok(!levelSuggestions('FQAS', '').includes('Advanced Cave Diver'));
+  assert.deepEqual(levelSuggestions('other', ''), []);
+  assert.ok(!certAgencyOptions('en').some((o) => o.value === 'SUSV'));
+  assert.ok(CERT_AGENCIES.some((a) => a.id === 'SUSV'));
+});
+
+test('agency text preserves saved identifiers and stores new names as other', () => {
+  const options = certAgencyOptions('en');
+  const empty = { agency: '', text: '' };
+  const padi = options.find((o) => o.value === 'PADI');
+  assert.ok(padi);
+  assert.deepEqual(certAgencySelection(padi.label, options, empty), { agency: 'PADI', agencyName: '' });
+  assert.deepEqual(certAgencySelection('padi', options, empty), { agency: 'PADI', agencyName: '' });
+  assert.deepEqual(certAgencySelection('  My agency  ', options, empty), { agency: 'other', agencyName: 'My agency' });
+  assert.deepEqual(certAgencySelection('   ', options, empty), { agency: '', agencyName: '' });
+  assert.equal(certAgencyText('other', 'My agency', options), 'My agency');
+  assert.deepEqual(certAgencySelection('My agency', options, { agency: 'other', text: 'My agency' }), { agency: 'other', agencyName: 'My agency' });
+  assert.deepEqual(certAgencySelection('PADI', options, { agency: 'other', text: 'PADI' }), { agency: 'other', agencyName: 'PADI' });
+  assert.deepEqual(certAgencySelection('Legacy ID', options, { agency: 'Legacy ID', text: 'Legacy ID' }), { agency: 'Legacy ID', agencyName: '' });
+  assert.deepEqual(certAgencySelection('SUSV', options, empty), { agency: 'SUSV', agencyName: '' });
 });
 
 test('cards: the new agencies and levels are read', () => {
