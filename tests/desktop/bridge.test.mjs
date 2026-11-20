@@ -8,10 +8,11 @@ import { createRequire } from 'node:module';
 import { mkdtempSync, rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { PassThrough } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const { setupBridge, HostProcess } = require('../../desktop/bridge.cjs');
+const { setupBridge, HostProcess, forwardCoreStderr } = require('../../desktop/bridge.cjs');
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fakeHost = path.join(here, 'fake-host.cjs');
 
@@ -158,6 +159,38 @@ test('host process: results, errors, events and exact text', async () => {
   } finally {
     await host.stop();
   }
+});
+
+test('host stderr: only the exact missing CCR diluent diagnostic is ignored, even across chunks', async () => {
+  const input = new PassThrough();
+  const output = [];
+  forwardCoreStderr(input, (text) => output.push(text.slice('[core] '.length)));
+  const ignored = 'ERROR: Dive: 42, dive computer: Ordinateur é: CCR dive, but no diluent cylinder found. Please add or select the correct cylinder use.';
+  const other = [
+    'ERROR: Dive: 42, dive computer: Model: PSCR dive, but no drive gas cylinder found. Please add or select the correct cylinder use.',
+    'ERROR: Dive: 42, dive computer: Model: CCR dive, but no diluent cylinder found. A different error.',
+    `Other: ${ignored}`,
+    'INFO: Create full text index',
+  ];
+  const bytes = Buffer.from(`${ignored}\r\n${other.join('\n')}\n${ignored}\n`);
+  for (const byte of bytes) input.write(Buffer.from([byte]));
+  input.end('ERROR: unfinished diagnostic');
+  await new Promise((resolve) => input.on('end', resolve));
+  assert.equal(output.join(''), `${other.join('\n')}\nERROR: unfinished diagnostic`);
+});
+
+test('host stderr: unrelated partial and long lines remain visible without waiting for a newline', async () => {
+  const input = new PassThrough();
+  const output = [];
+  forwardCoreStderr(input, (text) => output.push(text.slice('[core] '.length)));
+  input.write('INFO: progress');
+  assert.equal(output.join(''), 'INFO: progress');
+  const longLine = `ERROR: Dive: ${'x'.repeat(65537)}`;
+  input.write(`\n${longLine}`);
+  assert.equal(output.join(''), `INFO: progress\n${longLine}`);
+  input.end('\n');
+  await new Promise((resolve) => input.on('end', resolve));
+  assert.equal(output.join(''), `INFO: progress\n${longLine}\n`);
 });
 
 test('host process: a crash fails the pending calls, tells the windows, and the next call restarts it', async () => {
