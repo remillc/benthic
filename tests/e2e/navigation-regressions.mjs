@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e, the faults the random sequences found (run by tests/e2e/navigation.mjs). Each flow is the shortest
 // path to one of them, with the seed that found it (tests/e2e/navigation-monkey.mjs).
+import { readHealth, settleHealth } from './navigation-monkey.mjs';
 
 /**
  * @param {object} h the harness of navigation.mjs
@@ -31,6 +32,31 @@ export async function regressionFlows(h) {
   const reach = async (t, wanted) => {
     for (let i = 0; i < 50 && !(wanted instanceof RegExp ? wanted.test(await route(t)) : (await route(t)) === wanted); i++) await sleep(100);
   };
+
+  // Seed 101: the sheet can finish closing before its backdrop finishes fading.
+  console.log('Phone: account sheet closes before its backdrop');
+  const sheetTab = await h.openTab(390, 844, true, false, false, { theme: 'md' });
+  await sheetTab.run(() => document.querySelector('.bc-account-avatar').click());
+  await sleep(600);
+  await sheetTab.run(() => {
+    document.querySelector('.bc-account-sheet').style.setProperty('--f7-sheet-transition-duration', '50ms');
+    document.querySelector('.sheet-backdrop').style.transitionDuration = '1200ms';
+  });
+  await hardwareBack(sheetTab);
+  await sleep(200);
+  const fading = await sheetTab.run(readHealth);
+  expect('sheet backdrop: a fading scrim is still moving', { moving: true, layerOk: false }, fading);
+  const rested = await settleHealth(() => sheetTab.run(readHealth), sleep);
+  expect('sheet backdrop: settles without obstructing the page', { moving: false, layerOk: true }, rested || {});
+  await sheetTab.run(() => {
+    const b = document.querySelector('.sheet-backdrop');
+    b.style.transition = 'none';
+    b.style.visibility = 'visible';
+    b.style.opacity = '1';
+  });
+  const stuck = await settleHealth(() => sheetTab.run(readHealth), sleep);
+  expect('sheet backdrop: a stuck scrim is still reported', { moving: false, layerOk: false }, stuck || {});
+  sheetTab.ws.close();
 
   console.log('Phone, 390x844: faults found by the random sequences');
   let tab = await h.openTab(390, 844, true);

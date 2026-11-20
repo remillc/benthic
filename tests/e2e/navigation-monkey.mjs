@@ -75,7 +75,7 @@ function readTappables(avoid) {
 }
 
 /** The app's own invariants (app/src/lib/nav-invariants.js) and what only the test looks at. */
-async function readHealth() {
+export async function readHealth() {
   const inv = await import('/src/lib/nav-invariants.js');
   const app = inv.readApp();
   const view = document.querySelector('.views > .view.tab-active');
@@ -86,12 +86,18 @@ async function readHealth() {
   const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
   const current = view ? [...view.querySelectorAll(':scope > .page-current')] : [];
   const layerOk = !hit || !!hit.closest('.modal-in, .modal-out, .backdrop-in, .panel, .panel-backdrop, .bc-fab-menu, [popover], .bc-map-fullscreen, [class*="bc-select-field--"], .bc-row-menu') || current.some((p) => p.contains(hit)) || !!hit.closest('.bc-navigation-bar, .bc-nav-rail') || (!!view && view.classList.contains('view-master-detail') && view.contains(hit));
+  // Framework7 can finish the modal's transition before the independent backdrop fade. Only a running
+  // opacity/visibility transition delays the check: a scrim left visible without one is still a failure.
+  const fadingBackdrop = [...document.querySelectorAll('.sheet-backdrop, .popup-backdrop, .dialog-backdrop, .actions-backdrop, .popover-backdrop')].some((el) =>
+    !el.classList.contains('backdrop-in') && getComputedStyle(el).visibility === 'visible' &&
+    el.getAnimations().some((a) => a instanceof CSSTransition && ['opacity', 'visibility'].includes(a.transitionProperty) && (a.playState === 'running' || a.pending)),
+  );
   let trace = null;
   try {
     trace = await import('/src/lib/nav-trace.js');
   } catch {}
   return {
-    moving: inv.appIsMoving(app) || !!document.querySelector('.modal-out, .panel-in-swipe, .bc-tab-sliding'),
+    moving: inv.appIsMoving(app) || fadingBackdrop || !!document.querySelector('.modal-out, .panel-in-swipe, .bc-tab-sliding'),
     problems: inv.checkApp(app),
     layerOk,
     hit: hit ? `${hit.tagName.toLowerCase()}.${String(hit.className).slice(0, 60)}` : '',
@@ -115,6 +121,23 @@ async function readHealth() {
     exit: !modals.length && view?.id === 'view-logbook' && (router?.history?.length ?? 1) <= 1 && !document.querySelector('.panel.panel-in, .bc-fab-menu--open, .fab-opened, .searchbar-enabled, .bc-logbook--selection-bar, .bc-row-menu, .bc-select-field--open, [popover]:popover-open'),
     exitSplit: !modals.length && view?.id === 'view-logbook' && !!view?.classList.contains('view-master-detail') && !!view.querySelector(':scope > .page-current.page-master-detail-root, :scope > .page-master:only-child'),
   };
+}
+
+/** Waits for the page to be at rest, then reads it. */
+export async function settleHealth(read, sleep) {
+  let health = null;
+  let still = 0;
+  let silent = 0;
+  for (let i = 0; i < 45 && still < 2 && silent < 2; i++) {
+    await sleep(100);
+    const result = await read().catch(() => null);
+    silent = result ? 0 : silent + 1;
+    health = result ?? health;
+    still = result && !result.moving ? still + 1 : 0;
+  }
+  if (silent >= 2) return null;
+  await sleep(150);
+  return (await read().catch(() => null)) ?? health;
 }
 
 /** The pages of the section on screen, with their place and role, and the history of its router. */
@@ -300,22 +323,7 @@ export async function monkeyFlows(h) {
         return 'pause';
       };
 
-      /** Waits for the page to be at rest, then reads it. */
-      const settle = async () => {
-        let health = null;
-        let still = 0;
-        let silent = 0;
-        for (let i = 0; i < 45 && still < 2 && silent < 2; i++) {
-          await sleep(100);
-          const read = await run(readHealth).catch(() => null);
-          silent = read ? 0 : silent + 1;
-          health = read ?? health;
-          still = read && !read.moving ? still + 1 : 0;
-        }
-        if (silent >= 2) return null;
-        await sleep(150);
-        return (await run(readHealth).catch(() => null)) ?? health;
-      };
+      const settle = () => settleHealth(() => run(readHealth), sleep);
 
       const report = async (/** @type {number} */ step, /** @type {string[]} */ problems) => {
         failures++;
