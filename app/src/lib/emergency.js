@@ -88,16 +88,16 @@ export const telHref = (number) => `tel:${number.replace(/[^+\d]/g, '')}`;
 
 /**
  * What the sheet shows: the name, then each item that is on and has something to show.
- * @param {{ info: DiverInfo, docs: Doc[], include: Include, consent: boolean, today: string }} input
+ * @param {{ info: DiverInfo, docs: Doc[], include: Include, today: string }} input
  * @returns {Sheet}
  */
-export function buildSheet({ info, docs, include, consent, today }) {
+export function buildSheet({ info, docs, include, today }) {
   const phone = formatInternational(info.emergency.phone);
   const hasContact = !!(info.emergency.name || phone);
   return {
     name: info.fullName,
     birth: include.birth && info.dateOfBirth ? { date: info.dateOfBirth, age: ageOn(info.dateOfBirth, today) } : null,
-    blood: include.blood && consent && info.bloodGroup ? info.bloodGroup : null,
+    blood: include.blood && info.bloodGroup ? info.bloodGroup : null,
     contact: include.contact && hasContact ? { name: info.emergency.name, relation: info.emergency.relation, phone } : null,
     insurance: include.insurance ? (validOf(docs, 'insurance', today)[0] ?? null) : null,
     medical: include.medical ? (validOf(docs, 'medical', today)[0] ?? null) : null,

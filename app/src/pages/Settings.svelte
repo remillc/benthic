@@ -45,9 +45,6 @@
     TIME_PATTERNS,
   } from '../lib/settings.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
-  import { isRelease } from '../lib/edition.js';
-  import { diver, loadProfile, refreshConsent, changeProfile } from '../lib/profile.svelte.js';
-  import { formatStampDate } from '../lib/profile-format.js';
   import { formatNumber, formatDuration, formatDateChoice, formatTimeChoice, formatDepth, formatPartialPressure, ppUnitLabel, depthUnit } from '../lib/format.js';
   import { depthToMm, mmToDepth } from '../lib/planner-rules.js';
   import { o2RateValues, o2RateText } from '../lib/sac-field.js';
@@ -950,10 +947,6 @@
           summary: computers.length ? t('settings.overview.remembered', { name: computerName(computers[0]) }) : t('settings.overview.noComputer'),
         },
         { id: 'maps', icon: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z M9 4v14 M15 6v14', href: '/settings/maps/', summary: rowOf('regions')?.text ?? '' },
-        // Release edition, phone and tablet: the health-data consent (task 2026-11-18-271).
-        ...(isRelease && !desktopApp
-          ? [{ id: 'privacy', icon: 'M7 11V8a5 5 0 0 1 10 0v3 M5 11h14v10H5z M12 15v2', href: '/settings/privacy', summary: t('settings.overview.privacy', { state: t(diver.consent.consent ? 'settings.privacy.on' : 'settings.privacy.off') }) }]
-          : []),
         {
           id: 'advanced',
           icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19 12l2-1-1-3-2 .5-1.5-1.5.5-2-3-1-1 2h-2l-1-2-3 1 .5 2L6 7.5 4 7 3 10l2 1v2l-2 1 1 3 2-.5 1.5 1.5-.5 2 3 1 1-2h2l1 2 3-1-.5-2 1.5-1.5 2 .5 1-3-2-1z',
@@ -1069,30 +1062,6 @@
       text: t('settings.computers.forgetAllText', { n: computers.length }),
       action: t('settings.computers.forget'),
       onConfirm: () => forget(0),
-    });
-  }
-
-  // Réglages › Confidentialité: the consent to keep health data (the blood group), shown and withdrawn here too.
-  onMount(() => {
-    if (isRelease && !desktopApp) loadProfile().then(refreshConsent);
-  });
-
-  async function setHealthConsent(/** @type {boolean} */ on) {
-    try {
-      await changeProfile((_p, c) => (on ? c.give() : c.withdraw()));
-      showSnackbar(t(on ? 'diverProfile.info.allowed' : 'diverProfile.info.withdrawn'));
-    } catch {
-      showSnackbar(t('diverProfile.info.saveFailed'));
-    }
-  }
-
-  function confirmWithdrawConsent() {
-    confirmAction({
-      title: t('diverProfile.info.withdrawTitle'),
-      text: t('diverProfile.info.withdrawText'),
-      action: t('diverProfile.info.withdraw'),
-      cancel: t('diverProfile.info.cancel'),
-      onConfirm: () => setHealthConsent(false),
     });
   }
 
@@ -1694,22 +1663,6 @@
   <!-- Offline maps: the overview opens their own screen; the search still lists the row. -->
   {#if !section && query}{@render groupView('maps')}{/if}
 
-  {#if isRelease && !desktopApp && inPage('privacy')}
-    <div class="bc-settings--surface">
-      <div class="bc-settings--consent">
-        <span class="bc-settings--texts">
-          <span class="bc-settings--label">{t('settings.privacy.health')}</span>
-          <span class="bc-settings--overview-summary">{t('settings.privacy.healthHelp')}</span>
-        </span>
-        <span class="toggle"><input type="checkbox" role="switch" checked={diver.consent.consent} onchange={(e) => (e.currentTarget.checked ? setHealthConsent(true) : (e.currentTarget.checked = true, confirmWithdrawConsent()))} aria-label={t('settings.privacy.health')} /><span class="toggle-icon"></span></span>
-      </div>
-      {#if diver.consent.consent && diver.consent.at}
-        <p class="bc-settings--action-text">{t('settings.privacy.since', { date: formatStampDate(diver.consent.at) })}</p>
-      {/if}
-    </div>
-    <p class="bc-settings--note">{t('settings.privacy.note')}</p>
-  {/if}
-
   {#if inPage('advanced') && advancedShown}
     {#if !section}<h2 class="bc-settings--title">{t('settings.groups.advanced')}</h2>{/if}
     <div class="bc-settings--surface">
@@ -1858,18 +1811,6 @@
       line-height: 24px;
       font-weight: 700;
       color: var(--bc-text);
-    }
-
-    .bc-settings--consent .bc-settings--overview-summary {
-      white-space: normal;
-    }
-
-    .bc-settings--consent {
-      min-height: 72px;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
     }
 
     .bc-settings--surface {

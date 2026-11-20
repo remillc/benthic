@@ -18,12 +18,11 @@
   let { f7router } = $props();
 
   /** The OpenDives+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
-  const plusHero = $derived(['odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome', 'odplusHealth'].includes(currentStep()));
+  const plusHero = $derived(['odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome'].includes(currentStep()));
 
   /** « OpenDives+, l'offre » on a tablet (task 2026-11-18-282): the panel carries the offer's chip, title and lead. */
   const offerPanel = $derived(currentStep() === 'odplusOffer' || currentStep() === 'odplusAll');
-  /** « Vos données de santé » and « Votre carnet est prêt » (task 2026-11-18-275): the panel carries the header. @type {'odplusReady'|'odplusHealth'|''} */
-  const plusPanel = $derived(['odplusReady', 'odplusHealth'].includes(currentStep()) ? /** @type {'odplusReady'|'odplusHealth'} */ (currentStep()) : '');
+  const plusPanel = $derived(currentStep() === 'odplusReady');
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
@@ -35,7 +34,7 @@
     <span>Benthic</span>
   </div>
   {#if plusPanel}
-    <BenthicPlusPanel step={plusPanel} />
+    <BenthicPlusPanel />
   {:else if offerPanel}
     <div class="bc-welcome-release--chip"><BenthicPlusChip label={t('odplus.offer.pill')} /></div>
     <h1 class="bc-welcome-release--headline bc-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>

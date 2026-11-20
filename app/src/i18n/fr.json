@@ -1175,16 +1175,6 @@
     "showPhotos": {
       "label": "Afficher les champs photos et vidéos",
       "text": "Dans le détail et la modification d’une plongée"
-    },
-    "privacy": {
-      "on": "accordées",
-      "off": "non accordées",
-      "health": "Garder des données de santé",
-      "healthHelp": "Votre groupe sanguin, utile en cas d’urgence.",
-      "since": "Vous avez donné votre accord le {date}.",
-      "note": "Chiffré sur votre compte et visible par vous seul. Retirer l’accord supprime le groupe sanguin.",
-      "withdraw": "Retirer l’accord",
-      "allow": "Autoriser"
     }
   },
   "gas": {
@@ -3098,7 +3088,7 @@
       "Sur ordinateur, agrandir ou réduire la fenêtre au-delà de 1200 dp passe de la grande à la petite disposition sans quitter l’écran : la plongée sélectionnée dans le Carnet, la statistique enregistrée dans Statistiques, la catégorie dans Réglages et l’outil dans Outils restent en place.",
       "Sur ordinateur, la fenêtre ouverte pour un autre carnet reste dans l’écran : le bouton du compte, en bas de la barre de gauche, n’est plus coupé.",
       "Téléphone, « Votre carnet est prêt » (Benthic+) : le logo tourne deux fois et devient une coche, avec un anneau qui s’étend, pendant que les bulles de l’en-tête montent et sortent ; la séquence ne joue qu’une fois, à la première apparition de l’écran. Avec « Réduire les animations », la coche est affichée tout de suite et les bulles restent immobiles. L’en-tête a aussi le profil de plongée au-dessus de sa vague.",
-      "Mon profil de plongeur (Benthic+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin n’est gardé qu’avec votre accord, demandé une seule fois après l’abonnement (« Vos données de santé ») et retirable dans « Informations » ou dans Réglages › Confidentialité. « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
+      "Mon profil de plongeur (Benthic+) : « Informations » garde votre date de naissance, votre contact d’urgence (le numéro se met en forme selon le pays) et votre groupe sanguin, chiffrés sur ce téléphone. Le groupe sanguin peut être renseigné ou effacé dans « Modifier les informations ». « Brevets » garde vos cartes avec leurs photos recto et verso, sans réseau ; le scanner de documents du téléphone cadre et redresse chaque carte, puis l’app y lit l’agence, le niveau, le numéro et la date, à vérifier. Le rappel de révision proposé pour un détendeur est maintenant annuel.",
       "Équipement : la veste a sa propre icône (col, ouverture centrale, deux sangles) et la saucisse de signalisation (parachute de palier) la sienne, au haut plat. Dans « Nouvelle pièce » (et la modification), une miniature à gauche du champ « Modèle » montre votre photo de la pièce, sinon l’icône de son type en grand.",
       "Fichiers reçus d’une autre application : Benthic apparaît dans « Ouvrir avec » et « Partager vers » pour un carnet (.ssrf, .xml), un fichier UDDF, FIT, DLD et les autres formats importables. Le fichier est lu, puis un choix est demandé : « Ajouter à ce carnet » ajoute les plongées au carnet ouvert, avec Annuler (« Nouveau carnet », qui garde le carnet ouvert et en crée un autre, n’est pas proposé : cet appareil ne garde qu’un carnet à la fois) ; sans carnet, il ouvre « Importer un carnet ». Le fichier de sites d’un export à deux fichiers est accepté : les sites déjà présents ne sont pas dupliqués. Les sites sont ajoutés au carnet nommé dans la question, jamais à un autre.",
       "Premier lancement : le glissement entre les étapes joue maintenant (il était absent de la version compilée). La boîte des changements en attente de la déconnexion affiche le nombre en gras, et un champ iPhone en erreur ne garde plus de cadre rouge dans sa ligne.",
@@ -3119,7 +3109,7 @@
       "Export de tout le carnet : le fichier porte le nom du carnet et la date, par exemple « carnet-de-roger-2026-11-19.ssrf ».",
       "Offre Benthic+ : l’en-tête devient « L’offre Benthic+ » avec « Votre carnet à l’abri, sur tous vos appareils. », les cartes sont plus aérées (sur tablette, l’icône est à gauche du texte), et le prix s’affiche en texte simple, sans carte bleue, avec « Résiliable en tout temps ». Le nouveau lien « Voir tout ce qui est inclus » ouvre l’écran « Tout ce qui est inclus » : les fonctions de l’abonnement par groupe, ce qui reste gratuit, et le prix avec « S’abonner » qui reste en bas pendant le défilement. Sur tablette, « Déjà abonné ? Se connecter » passe en haut à droite, sur la ligne de « Retour ».",
       "À propos : « Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. », un bloc « Libre, et votre carnet aussi » (l’offre de base reste gratuite, le code est sur GitHub, le carnet est exportable en tout temps) avec « Voir sur GitHub » (logo de GitHub) et « Exporter mon carnet » (icône de téléchargement), l’un sous l’autre sur téléphone et côte à côte sur tablette ; sur ordinateur, un seul paragraphe et les deux boutons. « Tout ce qui est inclus » dit sous son titre ce qu’il liste.",
-      "Tablette en paysage et ordinateur : « Mon profil de plongeur » s’affiche en volets : le profil à gauche, la liste (équipement ou entretien) au milieu, la fiche à droite. Les formulaires (nouvelle pièce, nouveau kit, nouveau brevet, noter une révision) s’ouvrent dans une fenêtre centrée ; les types de pièce forment une grille de 3 × 3. Sur ordinateur, la photo d’un brevet se choisit, se dépose ou se colle (Ctrl+V) ; la carte est recadrée et redressée, avec « Retirer les reflets » et « Ajuster les coins ». Sur Mac, « Mon profil de plongeur… » (⇧⌘P) ouvre le profil dans sa propre fenêtre. « Vos données de santé » et « Votre carnet est prêt » se présentent dans le panneau bleu. Sur ordinateur, le + du carnet ne reste plus affiché au-dessus d’une page ouverte à droite.",
+      "Tablette en paysage et ordinateur : « Mon profil de plongeur » s’affiche en volets : le profil à gauche, la liste (équipement ou entretien) au milieu, la fiche à droite. Les formulaires (nouvelle pièce, nouveau kit, nouveau brevet, noter une révision) s’ouvrent dans une fenêtre centrée ; les types de pièce forment une grille de 3 × 3. Sur ordinateur, la photo d’un brevet se choisit, se dépose ou se colle (Ctrl+V) ; la carte est recadrée et redressée, avec « Retirer les reflets » et « Ajuster les coins ». Sur Mac, « Mon profil de plongeur… » (⇧⌘P) ouvre le profil dans sa propre fenêtre. « Votre carnet est prêt » se présente dans le panneau bleu. Sur ordinateur, le + du carnet ne reste plus affiché au-dessus d’une page ouverte à droite.",
       "Ordinateur : la feuille du compte d’un abonné Benthic+ est refaite : le logo en haut, le compte (avatar avec le +, « Gérer le compte » aligné sur le texte, la ligne de synchronisation avec « Synchroniser »), puis « Mon profil de plongeur » et « Sauvegarde et restauration », puis Réglages et À propos, chacun avec son icône dans une pastille bleue.",
       "Ordinateur : « Partager » s’ouvre en boîte de dialogue au milieu de la fenêtre ; un clic sur un voyage du carnet affiche la page du voyage à droite (le chevron le replie) ; l’import d’un fichier dit d’où viennent les plongées (« 1 plongée importée depuis « … » ») avec Annuler ; « Plans enregistrés » ouvre un volet « Plongées planifiées » avec « Nouveau plan » ; dans Réglages › Recycleur, la consommation d’O₂ dit qu’elle suit l’unité de Volume.",
       "Tablette : « Exporter » et la liste des plongées d’un point de la carte s’ouvrent en dialogue au milieu de l’écran ; les conflits sur plusieurs plongées aussi ; au téléchargement, un Bluetooth non autorisé ou éteint s’affiche en carte sous les ordinateurs mémorisés.",
@@ -3157,7 +3147,7 @@
       "Mon profil de plongeur : un champ « Nom complet » (facultatif), en premier dans « Vous » des Informations et de leur édition. Il s’affiche en haut de « Mon profil de plongeur » (sans lui, le courriel) et, avec un compte Benthic+, sur la première ligne de la feuille du compte, le courriel dessous en plus petit gris. Quand vous confirmez la plongée d’un autre plongeur, le champ « Votre nom » vient du profil (une correction vaut pour cette confirmation seulement), la phrase dessous donne votre rôle et le numéro de votre brevet de moniteur, et « Je confirme » reste grisé tant que le nom est vide ; si le profil n’a pas de nom, celui que vous tapez y est enregistré. Le nom s’ajoute en haut des fiches PDF d’une plongée et du carnet (interrupteur « Mon nom dans l’en-tête » à l’export en PDF ; « Anonymiser » le retire aussi).",
       "« Nouvelle pièce » : sur téléphone, « Type de pièce » est un champ qui ouvre un menu des 16 types (icône, nom, coche sur le type choisi ; liste du système sur iPhone) ; la grille de tuiles reste sur tablette et ordinateur. Sous le champ, la photo du modèle en grand avec « Changer d’image » (le dessin du type sans photo du modèle ; « Ajouter une photo » et la petite vignette à côté de « Modèle » disparaissent). Cinq icônes redessinées partout dans l’équipement : ceinture de lest, scooter, couteau, palmes et lampe.",
       "Dates : toutes les dates suivent le format choisi dans Réglages › Langue et date (2026-11-06 par défaut) : carnet, détail d’une plongée, équipement et entretien, brevets et documents, validation, compte, sauvegarde, cartes hors ligne, PDF. Les champs de date montrent ce format en indication (« aaaa-mm-jj »), la saisie au clavier du calendrier le suit, et une date connue au mois près (test hydrostatique) s’écrit dans le même ordre (2022-03).",
-      "Fiche d’urgence (Benthic+) : une entrée rouge « Fiche d’urgence » sous la carte d’identité de « Mon profil de plongeur » ouvre une fiche plein écran, disponible sans réseau : le nom complet du profil, la date de naissance et l’âge, le groupe sanguin dans une tuile (seulement avec l’accord pour les données de santé), le contact d’urgence avec « Appeler Marc » (ouvre le composeur du téléphone), l’assurance de plongée avec sa « Ligne d’urgence » et le certificat médical, qui ouvrent le document. Le crayon ouvre « Contenu de la fiche » : un interrupteur par élément (le brevet le plus élevé est désactivé au départ), le nom est toujours affiché. Le partage envoie la fiche en image ou en PDF, avec le rappel qu’elle contient le groupe sanguin. Dans « Modifier les informations », le contact d’urgence a deux champs, « Nom » et « Lien » (un menu qui accepte aussi un texte libre).",
+      "Fiche d’urgence (Benthic+) : une entrée rouge « Fiche d’urgence » sous la carte d’identité de « Mon profil de plongeur » ouvre une fiche plein écran, disponible sans réseau : le nom complet du profil, la date de naissance et l’âge, le groupe sanguin dans une tuile, le contact d’urgence avec « Appeler Marc » (ouvre le composeur du téléphone), l’assurance de plongée avec sa « Ligne d’urgence » et le certificat médical, qui ouvrent le document. Le crayon ouvre « Contenu de la fiche » : un interrupteur par élément (le brevet le plus élevé est désactivé au départ), le nom est toujours affiché. Le partage envoie la fiche en image ou en PDF, avec le rappel qu’elle contient le groupe sanguin. Dans « Modifier les informations », le contact d’urgence a deux champs, « Nom » et « Lien » (un menu qui accepte aussi un texte libre).",
       "Détail d’une plongée : sur Android, la barre flottante contient Modifier, « Planifier depuis cette plongée », Partager et un menu ⋮ (« Faire signer la plongée » avec Benthic+, « Renuméroter la plongée », « Retirer du voyage » dans un voyage, « Supprimer la plongée »). Le nom du bouton ⋮ énumère ce que contient son menu.",
       "Carte d’un site : dans la fiche, à la modification et sur le bureau, la carte garde un rapport largeur/hauteur de 2,1 à toutes les largeurs ; la hauteur suit la largeur.",
       "Fiche d’urgence : le brevet affiché est votre carte la plus récente (date d’obtention la plus récente), quel que soit son niveau ou son type ; à date égale, la dernière ajoutée. L’interrupteur de « Contenu de la fiche » s’appelle « Brevet le plus récent ».",
@@ -5583,15 +5573,6 @@
       "account": "Compte : {email}",
       "open": "Ouvrir mon carnet",
       "next": "Continuer"
-    },
-    "health": {
-      "title": "Vos données de santé",
-      "lead": "Facultatif. Vous pourrez changer d’avis en tout temps.",
-      "switch": "Garder des données de santé",
-      "switchHelp": "Votre groupe sanguin, utile en cas d’urgence",
-      "note": "C’est une donnée de santé. Benthic+ la garde seulement avec votre accord.",
-      "lock": "Chiffrées sur votre compte et visibles par vous seul. Vous pouvez retirer votre accord dans Mon profil ou dans les Réglages : les données sont alors supprimées.",
-      "continue": "Continuer"
     }
   },
   "importFlow": {
@@ -6386,18 +6367,10 @@
       "phone": "Téléphone",
       "health": "Santé",
       "blood": "Groupe sanguin",
+      "clearBlood": "Effacer le groupe sanguin",
       "onlyYou": "Vous seul",
-      "notKept": "Non gardé",
-      "allow": "Autoriser",
       "empty": "Non renseigné",
-      "lockNote": "Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous. Vous avez donné votre accord le {date}.",
       "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous.",
-      "withdraw": "Retirer l’accord",
-      "deniedNote": "Pour garder votre groupe sanguin, autorisez les données de santé. Elles sont chiffrées et visibles par vous seul.",
-      "withdrawTitle": "Retirer l’accord ?",
-      "withdrawText": "Le groupe sanguin est supprimé de cet appareil et de votre compte. Vous pourrez autoriser de nouveau en tout temps.",
-      "withdrawn": "Accord retiré, groupe sanguin supprimé",
-      "allowed": "Données de santé autorisées",
       "cancel": "Annuler",
       "saved": "Informations enregistrées",
       "saveFailed": "Les informations n’ont pas pu être enregistrées.",
@@ -6411,7 +6384,6 @@
       "relations": {"spouse": "conjoint", "parent": "parent", "child": "enfant", "friend": "ami", "sibling": "frère ou sœur"},
       "phoneHint": "Le numéro se met en forme tout seul selon le pays.",
       "bloodHint": "« Inconnu » si vous ne le connaissez pas. Chiffré et visible par vous seul.",
-      "bloodDenied": "Autorisez les données de santé pour garder le groupe sanguin.",
       "unknown": "Inconnu",
       "dobPick": "Choisir la date de naissance",
       "dobFuture": "La date est dans le futur.",
@@ -6644,7 +6616,6 @@
       "birthText": "Et l’âge",
       "blood": "Groupe sanguin",
       "bloodText": "Votre groupe sanguin",
-      "bloodDenied": "Autorisez les données de santé dans Informations pour l’afficher.",
       "contact": "Contact d’urgence",
       "insurance": "Assurance plongée",
       "insuranceText": "{name}, avec sa ligne d’urgence",

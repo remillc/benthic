@@ -48,7 +48,6 @@ Next number: 134
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #119 [code] /profile/info/, rendre editable in place, retirer la route /edit.
-- #120 [code] /profile/info, retirer le bouton Autoriser.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.

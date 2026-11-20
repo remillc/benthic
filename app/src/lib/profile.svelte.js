@@ -1,15 +1,11 @@
 // @ts-check
-// « Mon profil de plongeur » on screen (task 2026-11-18-272): the information, the consent and the cards read from the
+// « Mon profil de plongeur » on screen (task 2026-11-18-272): the information and the cards read from the
 // local store (lib/profile.js over lib/file-store.js, the same IndexedDB as the equipment) into one reactive object
 // that the screens share. The data key of the sensitive items is kept by the plugin's secure storage.
 import { OpenDivesCore } from 'opendives-core';
 import { createFileStore, indexedDbBackend, memoryBackend } from './file-store.js';
 import { createSecretBox } from './secret-box.js';
 import { createProfile, emptyInfo } from './profile.js';
-import { createHealthConsent } from './health-consent.js';
-import { createServerApi } from './server-api.js';
-import { serverTransport } from './server-transport.js';
-import { serverUrl } from './server-url.js';
 
 /** @typedef {import('./profile.js').DiverInfo} DiverInfo */
 /** @typedef {import('./profile.js').Certification} Certification */
@@ -18,12 +14,11 @@ import { serverUrl } from './server-url.js';
 export const diver = $state({
   ready: false,
   info: emptyInfo(),
-  consent: { consent: false, at: '', synced: true },
   /** @type {Certification[]} */
   certs: [],
 });
 
-/** @type {{ store: ReturnType<typeof createFileStore>, profile: ReturnType<typeof createProfile>, consent: ReturnType<typeof createHealthConsent> }|null} */
+/** @type {{ store: ReturnType<typeof createFileStore>, profile: ReturnType<typeof createProfile> }|null} */
 let opened = null;
 
 /**
@@ -59,52 +54,33 @@ function open() {
   if (!opened) {
     const store = createFileStore(typeof globalThis.indexedDB === 'undefined' ? memoryBackend() : indexedDbBackend());
     const profile = createProfile(store, createSecretBox(keeper(store)));
-    const api = createServerApi({ baseUrl: serverUrl(), transport: serverTransport });
-    const consent = createHealthConsent(profile, {
-      sessionToken: async () => {
-        try {
-          return (await OpenDivesCore.serverSessionAccess()).sessionToken || '';
-        } catch {
-          return '';
-        }
-      },
-      get: (token) => api.healthConsent(token),
-      set: (token, on) => api.setHealthConsent(token, on),
-    });
-    opened = { store, profile, consent };
+    opened = { store, profile };
   }
   return opened;
 }
 
-/** The profile and the consent service, for the screens that write. */
+/** The profile service, for the screens that write. */
 export const services = () => open();
 
 /** Reads everything again from the store. */
 export async function loadProfile() {
   const { profile } = open();
-  const [info, consent, certs] = await Promise.all([profile.readInfo(), profile.readConsent(), profile.listCertifications()]);
+  const [info, certs] = await Promise.all([profile.readInfo(), profile.listCertifications()]);
   diver.info = info;
-  diver.consent = consent;
   diver.certs = certs;
   diver.ready = true;
-}
-
-/** The account's answer about the consent, when reachable, then a new read. */
-export async function refreshConsent() {
-  await open().consent.refresh();
-  await loadProfile();
 }
 
 /**
  * A change, then the screens read again.
  * @template T
- * @param {(p: ReturnType<typeof createProfile>, c: ReturnType<typeof createHealthConsent>) => Promise<T>} work
+ * @param {(p: ReturnType<typeof createProfile>) => Promise<T>} work
  * @returns {Promise<T>}
  */
 export async function changeProfile(work) {
-  const { profile, consent } = open();
+  const { profile } = open();
   try {
-    return await work(profile, consent);
+    return await work(profile);
   } finally {
     await loadProfile();
   }

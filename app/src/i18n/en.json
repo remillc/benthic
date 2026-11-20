@@ -1175,16 +1175,6 @@
     "showPhotos": {
       "label": "Show photo and video fields",
       "text": "In the detail and the editing of a dive"
-    },
-    "privacy": {
-      "on": "allowed",
-      "off": "not allowed",
-      "health": "Keep health data",
-      "healthHelp": "Your blood group, useful in an emergency.",
-      "since": "You gave your consent on {date}.",
-      "note": "Encrypted on your account and visible only to you. Withdrawing consent deletes the blood group.",
-      "withdraw": "Withdraw consent",
-      "allow": "Allow"
     }
   },
   "gas": {
@@ -3098,7 +3088,7 @@
       "In the desktop app, resizing the window across 1200 dp switches between the wide and the narrow layout without leaving the screen: the dive selected in the Logbook, the saved statistic in Statistics, the category in Settings and the tool in Tools stay as they were.",
       "In the desktop app, a window opened for another logbook stays inside the screen, so the account button at the foot of the left bar is never cut off.",
       "Phone, « Your logbook is ready » (Benthic+): the logo turns twice and becomes a check mark, with a ring that spreads out, while the bubbles of the header rise and leave; it plays once, the first time the screen shows. With reduced motion, the check mark is shown at once and the bubbles stay still. The header also has the dive profile above its wave.",
-      "My diver profile (Benthic+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. The blood group is kept only with your consent, asked once after the subscription (“Your health data”) and withdrawable in “Information” or in Settings › Privacy. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
+      "My diver profile (Benthic+): “Information” keeps your date of birth, your emergency contact (the number formats itself for the country) and your blood group, encrypted on this phone. You can enter or clear your blood group in “Edit information”. “Certifications” keeps your cards with their front and back photos, without a network; the phone’s document scanner frames and straightens each card, then the app reads the agency, the level, the number and the date from it, for you to check. The service reminder suggested for a regulator is now yearly.",
       "Equipment: the BCD has its own icon (collar, centre opening, two straps) and the surface marker buoy its own, with a flat top. In « New piece » (and when editing), a thumbnail left of the « Model » field shows your photo of the piece, otherwise the icon of its type, large.",
       "Files from another app: Benthic is in “Open with” and “Share to” for a logbook (.ssrf, .xml), a UDDF, FIT or DLD file and the other formats it imports. The file is read, then a choice is asked: “Add to this logbook” adds the dives to the open logbook, with Undo (“New logbook”, which keeps the open logbook and creates another, is not offered: this device keeps one logbook at a time); with no logbook yet it opens “Import a logbook”. The sites file of a two-file export is accepted: sites already there are not duplicated. The sites go to the logbook named in the question, never to another one.",
       "First launch: the slide between steps now plays (it was dropped from the build). The waiting-changes box of the sign-out dialog shows its count in bold, and an iPhone field in error no longer keeps a red frame inside its row.",
@@ -3119,7 +3109,7 @@
       "Export of the whole logbook: the file is named after the logbook and the date, for example “carnet-de-roger-2026-11-19.ssrf”.",
       "Benthic+ offer: the header now reads “The Benthic+ plan” with “Your logbook, safe on all your devices.”, the cards have more room (on a tablet the icon sits to the left of the text), and the price is plain text, not a blue card, with “Cancel any time”. The new “See everything included” link opens the “Everything included” screen: the subscription’s features by group, what stays free, and the price with “Subscribe” that stays at the bottom while you scroll. On a tablet, “Already subscribed? Sign in” moves to the top right, on the row of “Back”.",
       "About: “Open-source dive logbook, built on the solid, proven foundations of Subsurface.”, a block “Free, and so is your logbook” (the base plan stays free, the code is on GitHub, the logbook can be exported at any time) with “See on GitHub” (the GitHub mark) and “Export my logbook” (a download icon), one under the other on a phone and side by side on a tablet; on the desktop, one paragraph and the two buttons. “Everything included” says under its title what it lists.",
-      "Tablet in landscape and desktop: “My diver profile” shows in panes: the profile on the left, the list (equipment or maintenance) in the middle, the sheet on the right. The forms (new piece, new kit, new certification, note a service) open in a centred dialog; the piece types form a 3 × 3 grid. On the desktop, the photo of a certification is chosen, dropped or pasted (Ctrl+V); the card is cropped and straightened, with “Remove glare” and “Adjust the corners”. On a Mac, “My diver profile…” (⇧⌘P) opens the profile in its own window. “Your health data” and “Your logbook is ready” appear in the blue panel. On the desktop, the logbook’s + no longer stays over a page opened on the right.",
+      "Tablet in landscape and desktop: “My diver profile” shows in panes: the profile on the left, the list (equipment or maintenance) in the middle, the sheet on the right. The forms (new piece, new kit, new certification, note a service) open in a centred dialog; the piece types form a 3 × 3 grid. On the desktop, the photo of a certification is chosen, dropped or pasted (Ctrl+V); the card is cropped and straightened, with “Remove glare” and “Adjust the corners”. On a Mac, “My diver profile…” (⇧⌘P) opens the profile in its own window. “Your logbook is ready” appears in the blue panel. On the desktop, the logbook’s + no longer stays over a page opened on the right.",
       "Desktop: the account sheet of an Benthic+ subscriber is redone: the logo at the top, the account (avatar with the +, “Manage the account” aligned with the text, the sync line with “Sync”), then “My diver profile” and “Backup and restore”, then Settings and About, each with its icon in a blue tile.",
       "Desktop: “Share” opens as a dialog in the middle of the window; a click on a trip in the logbook shows the trip page on the right (the chevron folds it); importing a file says where the dives come from (“1 dive imported from “…””) with Undo; “Saved plans” opens a “Planned dives” side panel with “New plan”; in Settings › Rebreather, the O₂ consumption says it follows the Volume unit.",
       "Tablet: “Export” and the list of dives at one map point open as a dialog in the middle of the screen, and so do conflicts on several dives; when downloading, a Bluetooth that is not allowed or is off shows as a card under the remembered computers.",
@@ -3157,7 +3147,7 @@
       "My diver profile: an optional “Full name” field, first in “You” of Information and its edit screen. It shows at the top of “My diver profile” (the e-mail without it) and, with an Benthic+ account, on the first line of the account sheet, with the e-mail under it in smaller grey text. When you confirm another diver’s dive, “Your name” comes from the profile (a correction applies to that confirmation only), the sentence under it gives your role and your instructor certification number, and “I confirm” stays off while the name is empty; if the profile has no name, the name you type is saved there. The name is added at the top of the PDF sheets of a dive and of the logbook (switch “My name in the header” when exporting a PDF; “Anonymize” removes it too).",
       "“New piece”: on a phone, “Piece type” is a field that opens a menu of the 16 types (icon, name, a check on the chosen type; the system list on iPhone); the grid of tiles stays on tablets and desktop. Under the field, the model’s photo, large, with “Change image” (the type’s drawing when the model has no photo; “Add a photo” and the small thumbnail beside “Model” are gone). Five icons redrawn everywhere in the equipment: weight belt, scooter, knife, fins and light.",
       "Dates: every date follows the format chosen in Settings › Language and date (2026-11-06 by default): logbook, dive detail, equipment and maintenance, certificates and documents, validation, account, backup, offline maps, PDF. Date fields show that format as their hint (“yyyy-mm-dd”), typing in the calendar follows it, and a date known to the month only (hydrostatic test) is written in the same order (2022-03).",
-      "Emergency sheet (Benthic+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile (only with the health-data consent), the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
+      "Emergency sheet (Benthic+): a red “Emergency sheet” entry under the identity card of “My diver profile” opens a full-screen sheet that works without a network: the profile’s full name, date of birth and age, the blood type in a tile, the emergency contact with “Call Marc” (opens the phone’s dialer), the diving insurance with its “Emergency line” and the medical certificate, which open the document. The pencil opens “Sheet content”: one switch for each item (the highest certificate starts off), the name is always shown. Sharing sends the sheet as an image or a PDF, with the reminder that it contains the blood type. In “Edit information”, the emergency contact has two fields, “Name” and “Relationship” (a menu that also takes free text).",
       "Dive detail: on Android the floating toolbar holds Edit, “Plan from this dive”, Share and a ⋮ menu (“Get the dive signed” with Benthic+, “Renumber the dive”, “Remove from trip” in a trip, “Delete the dive”). The ⋮ button’s name lists what its menu holds.",
       "Site map: in a site’s card, on the edit screen and on the desktop, the map keeps a 2.1 to 1 width to height ratio at every width; the height follows the width.",
       "Emergency sheet: the certificate shown is your most recent card (latest issue date), whatever its level or type; with the same date, the one added last. The switch in “Sheet content” is named “Most recent certificate”.",
@@ -5583,15 +5573,6 @@
       "account": "Account: {email}",
       "open": "Open my logbook",
       "next": "Continue"
-    },
-    "health": {
-      "title": "Your health data",
-      "lead": "Optional. You can change your mind at any time.",
-      "switch": "Keep health data",
-      "switchHelp": "Your blood group, useful in an emergency",
-      "note": "This is health data. Benthic+ keeps it only with your consent.",
-      "lock": "Encrypted on your account and visible only to you. You can withdraw your consent in My profile or in Settings: the data is then deleted.",
-      "continue": "Continue"
     }
   },
   "importFlow": {
@@ -6383,18 +6364,10 @@
       "phone": "Phone",
       "health": "Health",
       "blood": "Blood group",
+      "clearBlood": "Clear blood group",
       "onlyYou": "Only you",
-      "notKept": "Not kept",
-      "allow": "Allow",
       "empty": "Not set",
-      "lockNote": "The blood group is encrypted on your Benthic+ account and only you can see it. You gave your consent on {date}.",
       "lockNoteNoDate": "The blood group is encrypted on your Benthic+ account and only you can see it.",
-      "withdraw": "Withdraw consent",
-      "deniedNote": "To keep your blood group, allow health data. It is encrypted and only you can see it.",
-      "withdrawTitle": "Withdraw consent?",
-      "withdrawText": "The blood group is deleted from this device and from your account. You can allow it again at any time.",
-      "withdrawn": "Consent withdrawn, blood group deleted",
-      "allowed": "Health data allowed",
       "cancel": "Cancel",
       "saved": "Information saved",
       "saveFailed": "The information could not be saved.",
@@ -6408,7 +6381,6 @@
       "relations": {"spouse": "spouse", "parent": "parent", "child": "child", "friend": "friend", "sibling": "sibling"},
       "phoneHint": "The number formats itself for the country.",
       "bloodHint": "“Unknown” if you do not know it. Encrypted and only you can see it.",
-      "bloodDenied": "Allow health data to keep the blood group.",
       "unknown": "Unknown",
       "dobPick": "Choose the date of birth",
       "dobFuture": "The date is in the future.",
@@ -6641,7 +6613,6 @@
       "birthText": "And the age",
       "blood": "Blood type",
       "bloodText": "Your blood type",
-      "bloodDenied": "Allow health data in Information to show it.",
       "contact": "Emergency contact",
       "insurance": "Diving insurance",
       "insuranceText": "{name}, with its emergency line",

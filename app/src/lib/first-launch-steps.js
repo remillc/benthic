@@ -17,7 +17,7 @@
 //     account: serverDownload → odplusReady (« Votre carnet est prêt »), or createChoice when the account holds no
 //     logbook (task 2026-11-17-266: createChoice → createName | createSend → createInterrupted | createOffline);
 //     any other account: odplusOffer
-//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase) → odplusHealth (« Vos données de santé », the optional consent, task 2026-11-18-271) → odplusReady
+//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase) → odplusReady
 //   odplusOffer → odplusAll (« Tout ce qui est inclus », task 2026-11-19-295): « Retour » returns to the offer.
 //   Both entries (`signIn`, `discover`) are the choices of the first step; « Continuer sans compte » and
 //   « Continuer sans abonnement » go back to it and create nothing (task 2026-11-17-265).
@@ -30,7 +30,7 @@
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
- *   |'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'|'odplusHealth'
+ *   |'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'
  *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
@@ -70,8 +70,7 @@ const FORWARD = {
   'odplusOffer:welcome': 'odplusWelcome',
   'odplusOffer:all': 'odplusAll',
   'odplusOffer:signIn': 'odplusConnect',
-  'odplusWelcome:next': 'odplusHealth',
-  'odplusHealth:next': 'odplusReady',
+  'odplusWelcome:next': 'odplusReady',
   'serverDownload:ready': 'odplusReady',
   'createChoice:blank': 'createName',
   'createChoice:send': 'createSend',
@@ -172,7 +171,7 @@ export function hasBack(step, leavable = false) {
  * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the OpenDives+ screens, which
  * leave through their own buttons.
  */
-const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome', 'odplusHealth']);
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome']);
 
 /**
  * What the system Back (Android back key and gesture, predictive back; the iOS left-edge swipe) does on a step. It does

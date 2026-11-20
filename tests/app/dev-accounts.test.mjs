@@ -80,7 +80,7 @@ test('a local server: the sign-in, the simulated purchase and the deletion call 
 
 test('the download step of the simulated sign-in sits over the address step, so that Retour leaves for it', () => {
   assert.deepEqual(enterDownload(['start', 'odplusConnect']), ['start', 'odplusConnect', 'server', 'serverDownload']);
-  assert.deepEqual(enterDownload(['start', 'odplusConnect', 'odplusOffer', 'odplusWelcome', 'odplusHealth']), ['start', 'odplusConnect', 'server', 'serverDownload']);
+  assert.deepEqual(enterDownload(['start', 'odplusConnect', 'odplusOffer', 'odplusWelcome']), ['start', 'odplusConnect', 'server', 'serverDownload']);
   assert.deepEqual(forward(['start', 'odplusConnect'], 'email'), ['start', 'odplusConnect', 'server']);
 });
 

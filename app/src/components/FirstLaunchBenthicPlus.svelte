@@ -20,7 +20,6 @@
   import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/benthic-plus.js';
   import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/benthic-plus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { services } from '../lib/profile.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -28,7 +27,7 @@
   /**
    * `onwithout`: « Continuer sans compte » and « Continuer sans abonnement » (back to the first step, nothing created).
    * `onopen`: « Ouvrir mon carnet ».
-   * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'|'odplusHealth', onwithout: () => void, onopen: () => void }}
+   * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome', onwithout: () => void, onopen: () => void }}
    */
   let { step, onwithout, onopen } = $props();
 
@@ -46,15 +45,12 @@
     motionStep = step;
   });
 
-  /** Ready and health: a tablet's and the desktop's blue panel carries the header; only a phone draws it here. */
+  /** On a tablet and the desktop, the blue panel carries the ready header; only a phone draws it here. */
   const panelless = $derived(layout.phone && !desktopApp);
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 
-  // « Vos données de santé » (task 2026-11-18-271): the optional consent, off until the diver turns it on. « Continuer »
-  // works in both states; the choice is kept on the device and sent to the account when it can be.
-  let keepHealth = $state(false);
   let continuing = $state(false);
-  async function continueHealth() {
+  async function continueWelcome() {
     if (continuing) return;
     continuing = true;
     try {
@@ -62,26 +58,18 @@
       if (devAccounts) {
         const dev = await import('../lib/dev-accounts.js');
         if (dev.hasPending()) {
-          try {
-            flow.plus.email = await dev.savePending();
-          } catch (e) {
-            console.error('Keeping the simulated account on this device', e);
-            showSnackbar(t('odplus.purchaseUnavailable'));
-            continuing = false;
-            return;
-          }
-          if (keepHealth) await services().consent.give().catch((e) => console.error('Keeping the health-data consent', e));
-          continuing = false;
+          flow.plus.email = await dev.savePending();
           goDownload();
           return;
         }
       }
-      if (keepHealth) await services().consent.give();
+      go('next');
     } catch (e) {
-      console.error('Keeping the health-data consent', e);
+      console.error('Keeping the simulated account on this device', e);
+      showSnackbar(t('odplus.purchaseUnavailable'));
+    } finally {
+      continuing = false;
     }
-    continuing = false;
-    go('next');
   }
 
   /** @param {'google'|'apple'} provider */
@@ -165,7 +153,7 @@
   });
 </script>
 
-{#snippet hero(/** @type {'offer'|'ready'|'welcome'|'health'} */ which)}
+{#snippet hero(/** @type {'offer'|'ready'|'welcome'} */ which)}
   <header class="bc-plus-hero bc-plus-hero--{which}">
     <div class="bc-plus-hero--bands" aria-hidden="true"></div>
     {#if which === 'ready' && motion.bubbles}<BenthicPlusReadyBubbles still={motion.still} />{/if}
@@ -195,14 +183,12 @@
       <div class="bc-plus-hero--centre">
         {#if which === 'ready'}
           <BenthicPlusReadyLogo play={motion.play} />
-        {:else if which === 'health'}
-          <span class="bc-plus-hero--check"><Icon name="lock" size={36} weight={2} /></span>
         {:else}
           <span class="bc-plus-hero--check bc-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
         {/if}
         <BenthicPlusChip />
-        <h2 class="bc-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : which === 'health' ? 'odplus.health.title' : 'odplus.welcome.title')}</h2>
-        <p class="bc-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : which === 'health' ? t('odplus.health.lead') : t('odplus.welcome.lead')}</p>
+        <h2 class="bc-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : 'odplus.welcome.title')}</h2>
+        <p class="bc-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.welcome.lead')}</p>
       </div>
     {/if}
   </header>
@@ -357,23 +343,7 @@
       {/each}
     </ul>
     <p class="bc-plus--account bc-plus--account-plain">{t('odplus.welcome.account', { email: flow.plus.email })}</p>
-    <button type="button" class="bc-plus--primary" onclick={() => go('next')}>{t('odplus.welcome.next')}</button>
-  </div>
-{:else if step === 'odplusHealth'}
-  <div class="bc-plus--screen">
-    {#if panelless}{@render hero('health')}{/if}
-    <div class="bc-plus--health">
-      <label class="bc-plus--health-row">
-        <span class="bc-plus--health-texts">
-          <span class="bc-plus--health-label">{t('odplus.health.switch')}</span>
-          <span class="bc-plus--health-help">{t('odplus.health.switchHelp')}</span>
-        </span>
-        <span class="toggle"><input type="checkbox" role="switch" bind:checked={keepHealth} /><span class="toggle-icon"></span></span>
-      </label>
-      <p class="bc-plus--health-note">{t('odplus.health.note')}</p>
-    </div>
-    <p class="bc-plus--lock"><Icon name="lock" size={18} /><span>{t('odplus.health.lock')}</span></p>
-    <button type="button" class="bc-plus--primary" disabled={continuing} onclick={continueHealth}>{t('odplus.health.continue')}</button>
+    <button type="button" class="bc-plus--primary" disabled={continuing} onclick={continueWelcome}>{t('odplus.welcome.next')}</button>
   </div>
 {/if}
 
@@ -595,54 +565,6 @@
         outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
-    }
-
-    .bc-plus--health {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px 20px;
-      border-radius: 20px;
-      background: var(--bc-surface);
-    }
-
-    .bc-plus--health-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
-    }
-
-    .bc-plus--health-texts {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .bc-plus--health-label {
-      font-size: 17px;
-      line-height: 22px;
-      font-weight: 600;
-    }
-
-    .bc-plus--health-help,
-    .bc-plus--health-note,
-    .bc-plus--lock {
-      font-size: 14px;
-      line-height: 19px;
-      color: var(--bc-text-2);
-    }
-
-    .bc-plus--health-note {
-      margin: 0;
-    }
-
-    .bc-plus--lock {
-      margin: 0;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
     }
 
     .bc-plus--primary:disabled {
@@ -1384,7 +1306,6 @@
       /* The OpenDives+ headers: the section band's dive profile above a wave in the page colour, as on the other setup screens. */
       .bc-plus-hero--offer,
       .bc-plus-hero--welcome,
-      .bc-plus-hero--health,
       .bc-plus-hero--ready {
         border-radius: 0;
         padding-bottom: 52px;

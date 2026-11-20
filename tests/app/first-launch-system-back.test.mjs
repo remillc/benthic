@@ -30,7 +30,7 @@ test('the offer continues without a subscription', () => {
 });
 
 test('what was bought or created is not undone', () => {
-  for (const step of ['odplusWelcome', 'odplusHealth', 'odplusReady', 'createInterrupted', 'createOffline']) {
+  for (const step of ['odplusWelcome', 'odplusReady', 'createInterrupted', 'createOffline']) {
     assert.equal(systemBack(['start', 'odplusOffer', step], false).kind, 'ignore', step);
   }
 });

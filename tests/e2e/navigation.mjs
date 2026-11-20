@@ -1034,7 +1034,7 @@ async function settingsComputersFlows(expect) {
     expect(`${label}: Back leaves logbook computers`, desktop ? { computers: false } : { route: '/settings/download', computers: false }, back);
 
     if (!mobile && !desktop) {
-      for (const section of ['display', 'language', 'units', 'notifications', 'logbook', 'equipment', 'decompression', 'gases', 'tools', 'download', 'privacy', 'advanced']) {
+      for (const section of ['display', 'language', 'units', 'notifications', 'logbook', 'equipment', 'decompression', 'gases', 'tools', 'download', 'advanced']) {
         await tab.run((section) => { document.querySelector('#view-account').f7View.router.navigate(`/settings/${section}`, { reloadDetail: true }); }, section);
         await sleep(500);
         const detail = await tab.run(() => {
@@ -1752,6 +1752,81 @@ async function profileInfoWidthsFlows(expect) {
       };
     });
     expect(`${label}: the three fields are narrower and fit`, { birthNarrower: true, relationNarrower: true, phoneNarrower: true, withinViewport: true }, result);
+    const bloodField = await tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const page = document.querySelector('.page-current.bc-profile-edit');
+      const field = [...page.querySelectorAll('.bc-select-field')].find((item) => item.textContent.includes(t('diverProfile.info.blood')));
+      const control = field?.querySelector('select, .bc-select-field--trigger');
+      if (!control) throw new Error('Blood group field is missing');
+      if (control.tagName === 'SELECT') {
+        control.value = 'O+';
+        control.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        control.click();
+      }
+      return { enabled: !control.disabled, native: control.tagName === 'SELECT' };
+    });
+    expect(`${label}: blood group is editable`, { enabled: true }, bloodField);
+    if (!bloodField.native) {
+      await sleep(100);
+      await tab.run(() => {
+        const option = document.querySelector('.bc-select-field--menu [data-value="O+"]');
+        if (!option) throw new Error('Blood group option is missing');
+        option.click();
+      });
+    }
+    await sleep(100);
+    await tab.run(() => document.querySelector('.page-current .bc-profile-edit--save').click());
+    await sleep(700);
+    const saved = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
+    expect(`${label}: blood group is saved`, { blood: 'O+' }, { blood: saved });
+    if (label === 'narrow phone') {
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info'); });
+      await sleep(700);
+      const profile = await tab.run(() => {
+        const page = document.querySelector('.page-current.bc-profile-info');
+        return { blood: page?.textContent.includes('O+'), allow: !!page?.querySelector('.bc-profile-info--allow') };
+      });
+      expect('profile shows the blood group without an allow button', { blood: true, allow: false }, profile);
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/emergency'); });
+      await sleep(700);
+      const shown = await tab.run(() => document.querySelector('.page-current .bc-emergency--blood-value')?.textContent);
+      expect('emergency sheet shows the blood group', { blood: 'O+' }, { blood: shown });
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/emergency/content'); });
+      await sleep(700);
+      const enabled = await tab.run(async () => {
+        const { t } = await import('/src/lib/i18n.js');
+        const row = [...document.querySelectorAll('.page-current .bc-switch-field')].find((item) => item.querySelector('.bc-switch-field--label')?.textContent === t('emergency.content.blood'));
+        const input = row?.querySelector('input');
+        if (!input) throw new Error('Blood group switch is missing');
+        input.click();
+        return !input.disabled;
+      });
+      expect('emergency blood group switch is enabled', { enabled: true }, { enabled });
+      await sleep(100);
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/emergency'); });
+      await sleep(700);
+      const hidden = await tab.run(() => !document.querySelector('.page-current .bc-emergency--blood-value'));
+      expect('emergency sheet respects the blood group switch', { hidden: true }, { hidden });
+      await tab.run(async () => {
+        const { readInclude, writeInclude } = await import('/src/lib/emergency.js');
+        const { deviceStore } = await import('/src/lib/device-store.js');
+        writeInclude(deviceStore, { ...readInclude(deviceStore), blood: true });
+      });
+    }
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/info/edit'); });
+    await sleep(700);
+    await tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const button = document.querySelector(`.page-current .bc-select-field--clear[aria-label="${t('diverProfile.info.clearBlood')}"]`);
+      if (!button) throw new Error('Clear blood group button is missing');
+      button.click();
+    });
+    await sleep(100);
+    await tab.run(() => document.querySelector('.page-current .bc-profile-edit--save').click());
+    await sleep(700);
+    const cleared = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
+    expect(`${label}: blood group can be cleared`, { blood: '' }, { blood: cleared });
     tab.ws.close();
   }
 }

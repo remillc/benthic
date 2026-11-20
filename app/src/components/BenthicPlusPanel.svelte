@@ -1,10 +1,6 @@
 <script>
   // @ts-check
-  // The blue panel's content on the OpenDives+ « Vos données de santé » and « Votre carnet est prêt » steps, on a tablet
-  // and on the desktop (task 2026-11-18-275, bureau-odplus-sante and bureau-odplus-pret): the same header as the phone's
-  // (the lock or the logo that turns into the check mark, the chip, the title and the lead), in the panel; on « prêt » the
-  // disc is 120 px, the ring spreads 56 px and the bubbles rise across the whole panel.
-  import Icon from './Icon.svelte';
+  // The ready step's blue panel on a tablet and on the desktop.
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import BenthicPlusReadyLogo from './BenthicPlusReadyLogo.svelte';
   import BenthicPlusReadyBubbles from './BenthicPlusReadyBubbles.svelte';
@@ -13,23 +9,15 @@
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ step: 'odplusReady'|'odplusHealth' }} */
-  let { step } = $props();
-
-  const ready = $derived(step === 'odplusReady');
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 </script>
 
-{#if ready && readyMotion.bubbles}<BenthicPlusReadyBubbles panel still={readyMotion.still} />{/if}
+{#if readyMotion.bubbles}<BenthicPlusReadyBubbles panel still={readyMotion.still} />{/if}
 <div class="bc-plus-panel">
-  {#if ready}
-    <BenthicPlusReadyLogo play={readyMotion.play} size={120} />
-  {:else}
-    <span class="bc-plus-panel--lock"><Icon name="lock" size={44} weight={2} /></span>
-  {/if}
+  <BenthicPlusReadyLogo play={readyMotion.play} size={120} />
   <BenthicPlusChip />
-  <h1 class="bc-plus-panel--title">{t(ready ? 'odplus.ready.title' : 'odplus.health.title')}</h1>
-  <p class="bc-plus-panel--lead">{ready ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.health.lead')}</p>
+  <h1 class="bc-plus-panel--title">{t('odplus.ready.title')}</h1>
+  <p class="bc-plus-panel--lead">{t(deviceKey('odplus.ready.lead', kind))}</p>
 </div>
 
 <style>
@@ -43,15 +31,6 @@
       justify-content: center;
       gap: 16px;
       padding-bottom: 96px;
-    }
-    .bc-plus-panel--lock {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: color-mix(in srgb, var(--bc-release-on-panel) 16%, transparent);
-      color: var(--bc-release-on-panel);
     }
     .bc-plus-panel--title {
       margin: 0;

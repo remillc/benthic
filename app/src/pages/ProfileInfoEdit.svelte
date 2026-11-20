@@ -3,7 +3,7 @@
   // « Modifier les informations » (task 2026-11-18-272, docs/mockups-release/profil-infos-modifier-android.dc.html): the
   // date of birth, the emergency contact (name and relationship, « Indicatif » and « Téléphone » side by side, the number
   // formats itself for the country as it is typed) and the blood group (a menu: « Inconnu », O−, O+, A−, A+, B−, B+, AB−,
-  // AB+). The fields are checked as the diver types. Without the consent the blood group is not editable.
+  // AB+). The fields are checked as the diver types.
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -14,7 +14,7 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import { diver, loadProfile, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
-  import { BLOOD_GROUPS, UNKNOWN_BLOOD, infoProblems, ConsentRequiredError } from '../lib/profile.js';
+  import { BLOOD_GROUPS, UNKNOWN_BLOOD, infoProblems } from '../lib/profile.js';
   import { COUNTRIES, countryLabel, formatNational } from '../lib/phone-format.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -52,14 +52,13 @@
     if (formatted !== number) number = formatted;
   });
 
-  const consent = $derived(diver.consent.consent);
   const countryOptions = COUNTRIES.map((c) => ({ value: c.code, label: countryLabel(c.code) }));
-  const bloodOptions = $derived([{ value: UNKNOWN_BLOOD, label: t('diverProfile.info.unknown') }, ...BLOOD_GROUPS.map((g) => ({ value: g, label: g }))]);
+  const bloodOptions = $derived([{ value: '', label: t('diverProfile.info.empty') }, { value: UNKNOWN_BLOOD, label: t('diverProfile.info.unknown') }, ...BLOOD_GROUPS.map((g) => ({ value: g, label: g }))]);
 
   /** The usual relationships; « Lien » also takes any other text. */
   const relationOptions = $derived(['spouse', 'parent', 'child', 'friend', 'sibling'].map((k) => t(`diverProfile.info.relations.${k}`)));
 
-  const draft = $derived({ fullName, dateOfBirth, emergency: { name: contactName.trim(), relation: relation.trim(), phone: { country, number } }, bloodGroup: consent ? blood : '' });
+  const draft = $derived({ fullName, dateOfBirth, emergency: { name: contactName.trim(), relation: relation.trim(), phone: { country, number } }, bloodGroup: blood });
   const problems = $derived(infoProblems(draft));
   const dobLive = liveError(
     () => dateOfBirth,
@@ -78,8 +77,8 @@
       await changeProfile((p) => p.saveInfo(draft));
       showSnackbar(t('diverProfile.info.saved'));
       f7router.back();
-    } catch (e) {
-      showSnackbar(t(e instanceof ConsentRequiredError ? 'diverProfile.info.bloodDenied' : 'diverProfile.info.saveFailed'));
+    } catch {
+      showSnackbar(t('diverProfile.info.saveFailed'));
     } finally {
       saving = false;
     }
@@ -110,7 +109,7 @@
 
   <h2 class="bc-profile-edit--section">{t('diverProfile.info.health')}</h2>
   <div class="bc-profile-edit--fields">
-    <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} disabled={!consent} supporting={consent ? t('diverProfile.info.bloodHint') : t('diverProfile.info.bloodDenied')} />
+    <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} clearLabel={t('diverProfile.info.clearBlood')} supporting={t('diverProfile.info.bloodHint')} />
   </div>
   <div class="bc-profile-edit--bottom"></div>
 {/snippet}

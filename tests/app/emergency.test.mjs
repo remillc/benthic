@@ -1,4 +1,4 @@
-// The emergency sheet (task 2026-11-19-311): what it shows, what each switch removes, the call link, the blood type behind the consent.
+// The emergency sheet: what it shows, what each switch removes and the call link.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DEFAULT_INCLUDE, latestCertificate, INCLUDE_KEY, ageOn, buildSheet, readInclude, sheetText, telHref, writeInclude } from '../../app/src/lib/emergency.js';
@@ -29,7 +29,7 @@ test('the age counts whole years', () => {
 });
 
 test('the sheet shows what is on, the valid documents only', () => {
-  const s = buildSheet({ info, docs, include: all, consent: true, today });
+  const s = buildSheet({ info, docs, include: all, today });
   assert.equal(s.name, 'Valérie Tremblay');
   assert.equal(s.birth?.age, 47);
   assert.equal(s.blood, 'A+');
@@ -38,16 +38,16 @@ test('the sheet shows what is on, the valid documents only', () => {
   assert.equal(s.certificate?.id, 'c2');
 });
 
-test('the blood type needs the consent; each switch removes its item; the name stays', () => {
+test('each switch removes its item; the name stays', () => {
   const off = Object.fromEntries(Object.keys(all).map((k) => [k, false]));
-  const s = buildSheet({ info, docs, include: off, consent: true, today });
+  const s = buildSheet({ info, docs, include: off, today });
   assert.deepEqual([s.birth, s.blood, s.contact, s.insurance, s.medical, s.certificate], [null, null, null, null, null, null]);
   assert.equal(s.name, 'Valérie Tremblay');
-  assert.equal(buildSheet({ info, docs, include: all, consent: false, today }).blood, null);
+  assert.equal(buildSheet({ info, docs, include: all, today }).blood, info.bloodGroup);
 });
 
 test('the blocks: the call button, the emergency line, the documents they open', () => {
-  const text = sheetText(buildSheet({ info, docs, include: all, consent: true, today }), words);
+  const text = sheetText(buildSheet({ info, docs, include: all, today }), words);
   const [contact, insurance, medical, cert] = text.blocks;
   assert.equal(contact.call?.tel, 'tel:+15145550142');
   assert.match(contact.call?.label ?? '', /Marc/);

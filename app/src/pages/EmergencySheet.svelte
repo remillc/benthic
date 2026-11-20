@@ -11,7 +11,7 @@
   import DocumentChoiceSheet from '../components/DocumentChoiceSheet.svelte';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
-  import { diver, loadProfile, refreshConsent } from '../lib/profile.svelte.js';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { buildSheet, sheetText, readInclude } from '../lib/emergency.js';
   import { shareEmergency } from '../lib/emergency-share.js';
   import { deviceStore } from '../lib/device-store.js';
@@ -25,14 +25,11 @@
 
   let sharing = $state(false);
 
-  onMount(async () => {
-    await loadProfile();
-    refreshConsent();
-  });
+  onMount(loadProfile);
 
   const text = $derived(
     sheetText(
-      buildSheet({ info: diver.info, docs: diver.certs, include: readInclude(deviceStore), consent: diver.consent.consent, today: todayIso() }),
+      buildSheet({ info: diver.info, docs: diver.certs, include: readInclude(deviceStore), today: todayIso() }),
       { t, date: formatDate, otherAgency: t('diverProfile.cert.agencyOther'), unknownBlood: t('emergency.unknownBlood') },
     ),
   );

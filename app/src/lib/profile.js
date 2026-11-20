@@ -5,9 +5,8 @@
 //   profile/diver.json          plain: dateOfBirth; sealed block `enc`: emergencyContact, bloodGroup
 //   certifications/<uuid>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
 //   documents/<hash>.json       one sealed card photo, named by the hash of its ciphertext (section 11.6)
-//   meta/health-consent.json    this device's copy of the health-data consent (the account holds the original)
-// Sensitive data is sealed on the device (lib/secret-box.js, section 11.5). The blood group is a health datum: it is
-// kept only while the consent is given, and withdrawing the consent deletes it. Unknown fields of a file are kept.
+//   meta/health-consent.json    legacy health-data consent, retained for export
+// Sensitive data is sealed on the device (lib/secret-box.js, section 11.5). Unknown fields of a file are kept.
 
 import { newId, ReadOnlyError } from './inventory.js';
 import { CERT_AGENCIES } from './cert-agencies.js';
@@ -34,14 +33,6 @@ export const UNKNOWN_BLOOD = 'unknown';
 
 /** @returns {DiverInfo} */
 export const emptyInfo = () => ({ fullName: '', dateOfBirth: '', emergency: { name: '', relation: '', phone: { country: 'CA', number: '' } }, bloodGroup: '' });
-
-/** Thrown when the blood group is saved while the consent is off. */
-export class ConsentRequiredError extends Error {
-  constructor() {
-    super('HEALTH_CONSENT_REQUIRED');
-    this.name = 'ConsentRequiredError';
-  }
-}
 
 /** The full name as it is kept: one line, single spaces, at most 80 characters. @param {string} name */
 export const cleanFullName = (name) => name.trim().replace(/\s+/g, ' ').slice(0, 80);
@@ -243,26 +234,6 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
   const api = {
     readConsent,
 
-    /**
-     * Records the consent (or its withdrawal) on this device. Withdrawing deletes the blood group at once.
-     * @param {boolean} on
-     * @param {{ at?: string, synced?: boolean }} [options] `at`: the date the account gives; `synced`: false until the account has it
-     * @returns {Promise<{ consent: boolean, at: string, synced: boolean }>}
-     */
-    async setConsent(on, { at, synced = false } = {}) {
-      const prev = await readConsent();
-      const next = { consent: on, at: on ? (at ?? (prev.consent && prev.at ? prev.at : stamp())) : '', synced };
-      await store.write(CONSENT, { format: 1, ...next });
-      if (!on) await api.deleteBloodGroup();
-      return next;
-    },
-
-    /** The consent state came back from the account: keep it as the device's copy. @param {{ consent: boolean, at: string }} account */
-    async adoptConsent(account) {
-      await store.write(CONSENT, { format: 1, consent: account.consent, at: account.consent ? account.at : '', synced: true });
-      if (!account.consent) await api.deleteBloodGroup();
-    },
-
     /** Removes the blood group from the sealed block; the rest of the file stays. */
     async deleteBloodGroup() {
       const file = await store.read(DIVER);
@@ -279,25 +250,19 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     async readInfo() {
       const file = await store.read(DIVER);
       const sealed = await readSealed();
-      const consent = (await readConsent()).consent;
       const info = emptyInfo();
       info.dateOfBirth = typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
       info.fullName = typeof sealed.fullName === 'string' ? sealed.fullName : '';
       const e = sealed.emergencyContact;
       if (e) info.emergency = { name: e.name ?? '', relation: e.relation ?? '', phone: { country: e.phone?.country ?? 'CA', number: e.phone?.number ?? '' } };
-      info.bloodGroup = consent && typeof sealed.bloodGroup === 'string' ? sealed.bloodGroup : '';
+      info.bloodGroup = typeof sealed.bloodGroup === 'string' ? sealed.bloodGroup : '';
       return info;
     },
 
-    /**
-     * Saves the information. The blood group is refused (ConsentRequiredError) while the consent is off, unless it
-     * is empty.
-     * @param {DiverInfo} info
-     */
+    /** Saves the information. @param {DiverInfo} info */
     async saveInfo(info) {
       const problems = infoProblems(info, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_INFO:${Object.keys(problems).join(',')}`);
-      if (info.bloodGroup && !(await readConsent()).consent) throw new ConsentRequiredError();
       const file = (await store.read(DIVER)) ?? { format: 1 };
       const sealed = await readSealed();
       const phone = { country: info.emergency.phone.country, number: nationalDigits(info.emergency.phone.number, info.emergency.phone.country) };

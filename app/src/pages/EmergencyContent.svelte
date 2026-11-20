@@ -8,7 +8,7 @@
   import SwitchField from '../components/SwitchField.svelte';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
-  import { diver, loadProfile, refreshConsent } from '../lib/profile.svelte.js';
+  import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { ITEMS, buildSheet, readInclude, writeInclude, latestCertificate } from '../lib/emergency.js';
   import { agencyLabel } from '../lib/documents.js';
   import { deviceStore } from '../lib/device-store.js';
@@ -18,14 +18,10 @@
 
   let include = $state(readInclude(deviceStore));
 
-  onMount(async () => {
-    await loadProfile();
-    refreshConsent();
-  });
+  onMount(loadProfile);
 
-  const consent = $derived(diver.consent.consent);
   // What each switch would show now, from everything on: the line under its name.
-  const all = $derived(buildSheet({ info: diver.info, docs: diver.certs, include: Object.fromEntries(ITEMS.map((k) => [k, true])), consent: true, today: todayIso() }));
+  const all = $derived(buildSheet({ info: diver.info, docs: diver.certs, include: Object.fromEntries(ITEMS.map((k) => [k, true])), today: todayIso() }));
   const cert = $derived(latestCertificate(diver.certs));
 
   /** @param {(typeof ITEMS)[number]} key */
@@ -35,7 +31,7 @@
       case 'birth':
         return t('emergency.content.birthText');
       case 'blood':
-        return consent ? t('emergency.content.bloodText') : t('emergency.content.bloodDenied');
+        return t('emergency.content.bloodText');
       case 'contact':
         return c ? [c.name, c.relation].filter(Boolean).join(' · ') || c.phone : t('emergency.nothingYet');
       case 'insurance':
@@ -62,7 +58,6 @@
         label={t(`emergency.content.${key}`)}
         supporting={line(key)}
         bind:checked={include[key]}
-        disabled={key === 'blood' && !consent}
         onchange={save(key)}
       />
     {/each}

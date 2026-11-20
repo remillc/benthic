@@ -42,6 +42,7 @@ test('the two entries of the first step, and the way of the offer', () => {
   assert.deepEqual(forward(['start'], 'discover'), ['start', 'odplusOffer']);
   assert.deepEqual(forward(['start', 'odplusConnect'], 'email'), ['start', 'odplusConnect', 'server']);
   assert.deepEqual(forward(['start', 'odplusOffer'], 'welcome').at(-1), 'odplusWelcome');
+  assert.deepEqual(forward(['start', 'odplusOffer', 'odplusWelcome'], 'next').at(-1), 'odplusReady');
   assert.deepEqual(enterOffer(['start', 'odplusConnect', 'server', 'serverCode']), ['start', 'odplusConnect', 'server', 'odplusOffer']);
   assert.deepEqual(forward(['start', 'odplusConnect', 'server', 'serverCode', 'serverDownload'], 'ready').at(-1), 'odplusReady');
 });

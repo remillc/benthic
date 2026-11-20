@@ -26,8 +26,7 @@
   let pushed = $state(false);
   const visible = $derived(navigation.section !== 'account' && !pushed);
   /** The screen: the first launch, or the recent logbooks; null until the list is read. */
-  /** « Vos données de santé » and « Votre carnet est prêt »: the panel carries the header (task 2026-11-18-275). @type {'odplusReady'|'odplusHealth'|''} */
-  const plusPanel = $derived(['odplusReady', 'odplusHealth'].includes(currentStep()) ? /** @type {'odplusReady'|'odplusHealth'} */ (currentStep()) : '');
+  const plusPanel = $derived(currentStep() === 'odplusReady');
   const mode = $derived(startMode(logbooks.recentLoaded ? logbooks.recent : null));
 
   /** The same router the pages use, read when it is needed (the views are built after this component). */
@@ -70,7 +69,7 @@
       <span>Benthic</span>
     </div>
     {#if plusPanel}
-      <BenthicPlusPanel step={plusPanel} />
+      <BenthicPlusPanel />
     {:else}
       <h1 class="bc-desktop-first-launch--headline">{t('welcomeRelease.headline')}</h1>
       <p class="bc-desktop-first-launch--intro">{t('welcomeRelease.intro')}</p>

@@ -104,7 +104,7 @@ function folderSink(dir) {
 
 const tempDir = () => mkdtempSync(path.join(tmpdir(), 'od-export-'));
 
-/** A device with equipment, a profile with a consent, two certifications with photos. */
+/** A device with equipment, a profile with legacy consent, two certifications with photos. */
 async function fixture({ media } = {}) {
   const store = createFileStore(memoryBackend());
   let key = '';
@@ -123,7 +123,7 @@ async function fixture({ media } = {}) {
   await store.write('media/p1.json', { format: 1, id: 'p1', dataUrl: `data:image/jpeg;base64,${toBase64(jpeg(300, 1))}` });
   await store.write('meta/dev-data-key.json', { format: 1, key: 'SECRET-KEY' });
   await store.write('meta/pending.json', { format: 1, paths: [] });
-  await profile.setConsent(true, { at: '2026-11-01T00:00:00Z' });
+  await store.write('meta/health-consent.json', { format: 1, consent: true, at: '2026-11-01T00:00:00Z', synced: true });
   await profile.saveInfo({ dateOfBirth: '1980-05-17', emergency: { name: 'Alex Martin', relation: 'Sister', phone: { country: 'CA', number: '5145551234' } }, bloodGroup: 'O+' });
   const front = jpeg(2000, 3);
   const back = jpeg(1500, 9);
@@ -283,15 +283,15 @@ test('the sealed items come out decrypted, and read back the same as in the app'
   }
 });
 
-test('the blood group is not exported once the consent is withdrawn', async () => {
+test('the blood group is exported even when legacy consent is off', async () => {
   const dir = tempDir();
   try {
     const { deps } = await fixture();
-    await deps.profile.setConsent(false);
+    await deps.store.write('meta/health-consent.json', { format: 1, consent: false, at: '', synced: true });
     deps.openFile = folderSink(dir);
     const { file } = await buildExport({}, deps);
     const diver = JSON.parse(readZip(readFileSync(file.path)).get('opendives/profile/diver.json').data);
-    assert.ok(!('bloodGroup' in diver));
+    assert.equal(diver.bloodGroup, 'O+');
     assert.deepEqual(diver.healthConsent, { consent: false, at: '' });
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -313,7 +313,7 @@ test('containsSensitive names what is written in clear', async () => {
   assert.deepEqual(await containsSensitive({ profile: bare }), { any: false, kinds: [] });
   const { deps } = await fixture();
   assert.deepEqual((await containsSensitive(deps)).kinds, ['dateOfBirth', 'emergencyContact', 'bloodGroup', 'certifications', 'certificationPhotos']);
-  await deps.profile.setConsent(false);
+  await deps.profile.deleteBloodGroup();
   assert.ok(!(await containsSensitive(deps)).kinds.includes('bloodGroup'));
 });
 

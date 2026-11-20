@@ -1,5 +1,4 @@
-// « Mon profil de plongeur » (tasks 2026-11-18-271 and 272): the encryption round trip, the health-data consent (off by
-// default, the blood group refused without it, withdrawing deletes it), the information, the phone number formats,
+// « Mon profil de plongeur »: the encryption round trip, the information, the phone number formats,
 // the certification cards, the text parser of a scanned card, and the card-image module (perspective warp, corner
 // detection, glare) that the desktop uses.
 import test from 'node:test';
@@ -7,8 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createFileStore, memoryBackend } from '../../app/src/lib/file-store.js';
 import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
-import { createProfile, ConsentRequiredError, UNKNOWN_BLOOD, BLOOD_GROUPS, emptyInfo, levelSuggestions, infoProblems, certificationProblems } from '../../app/src/lib/profile.js';
-import { createHealthConsent } from '../../app/src/lib/health-consent.js';
+import { createProfile, UNKNOWN_BLOOD, BLOOD_GROUPS, emptyInfo, levelSuggestions, infoProblems, certificationProblems } from '../../app/src/lib/profile.js';
 import { createServerApi } from '../../app/src/lib/server-api.js';
 import { formatNational, formatInternational, nationalDigits, isCompletePhone } from '../../app/src/lib/phone-format.js';
 import { parseCardText, findDate, scanCard } from '../../app/src/lib/card-scan.js';
@@ -27,25 +25,6 @@ function setup() {
   let n = 0;
   const profile = createProfile(store, box, { id: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}` });
   return { backend, store, box, profile, keeper, key: () => key };
-}
-
-/** A fake account that records what it is told. */
-function fakeAccount({ token = 'tok', offline = false } = {}) {
-  const state = { consent: false, at: '' };
-  return {
-    state,
-    sessionToken: async () => token,
-    get: async () => {
-      if (offline) throw new Error('offline');
-      return { consent: state.consent, consentedAt: state.at };
-    },
-    set: async (_t, on) => {
-      if (offline) throw new Error('offline');
-      state.consent = on;
-      state.at = on ? '2026-11-02T10:00:00.000Z' : '';
-      return { consent: on, consentedAt: state.at };
-    },
-  };
 }
 
 // ---- Encryption ----
@@ -88,7 +67,6 @@ test('raw bytes (a card photo) round trip', async () => {
 
 test('the sensitive data is not readable in the files of the store', async () => {
   const { profile, backend } = setup();
-  await profile.setConsent(true);
   const info = emptyInfo();
   info.bloodGroup = 'AB+';
   info.emergency = { name: 'Marc Tremblay', relation: 'conjoint', phone: { country: 'CA', number: '5145550142' } };
@@ -114,38 +92,24 @@ test('the full name is kept sealed, cleaned, and emptying it removes it', async 
   assert.equal((await profile.readInfo()).fullName, '');
 });
 
-// ---- Consent ----
+// ---- Blood group ----
 
-test('the consent is off by default', async () => {
-  const { profile } = setup();
-  assert.deepEqual(await profile.readConsent(), { consent: false, at: '', synced: true });
-  const consent = createHealthConsent(profile, fakeAccount());
-  assert.equal((await consent.read()).consent, false);
-});
-
-test('the blood group cannot be saved without the consent, and « Autoriser » turns it on', async () => {
-  const { profile } = setup();
-  const account = fakeAccount();
-  const consent = createHealthConsent(profile, account);
+test('the blood group can be saved, read and cleared without consent', async () => {
+  const { profile, store } = setup();
   const info = emptyInfo();
   info.bloodGroup = 'O+';
-  await assert.rejects(profile.saveInfo(info), ConsentRequiredError);
-  info.bloodGroup = '';
   info.emergency.name = 'Marc';
-  await profile.saveInfo(info); // the rest is savable without the consent
-  const given = await consent.give();
-  assert.equal(given.consent, true);
-  assert.equal(given.synced, true);
-  assert.equal(given.at, '2026-11-02T10:00:00.000Z');
-  assert.equal(account.state.consent, true);
-  info.bloodGroup = 'O+';
   await profile.saveInfo(info);
   assert.equal((await profile.readInfo()).bloodGroup, 'O+');
+  info.bloodGroup = '';
+  await profile.saveInfo(info);
+  assert.equal((await profile.readInfo()).bloodGroup, '');
+  assert.equal((await profile.readInfo()).emergency.name, 'Marc');
+  assert.ok((await store.read('meta/pending.json')).paths.includes('profile/diver.json'));
 });
 
 test('« Inconnu » can be saved as the blood group', async () => {
   const { profile } = setup();
-  await profile.setConsent(true);
   const info = emptyInfo();
   info.bloodGroup = UNKNOWN_BLOOD;
   assert.deepEqual(infoProblems(info), {});
@@ -154,53 +118,35 @@ test('« Inconnu » can be saved as the blood group', async () => {
   assert.equal(BLOOD_GROUPS.length, 8);
 });
 
-test('withdrawing the consent deletes the blood group and keeps the rest', async () => {
-  const { profile, store } = setup();
-  const account = fakeAccount();
-  const consent = createHealthConsent(profile, account);
-  await consent.give();
+test('legacy consent states do not hide or delete an encrypted blood group', async () => {
+  const { profile, store, box } = setup();
+  await store.write('profile/diver.json', { format: 1, future: 'keep', enc: await box.seal({ bloodGroup: 'O+', future: 'keep' }, { id: 'profile', format: 1 }) });
+  for (const consent of [false, true]) {
+    await store.write('meta/health-consent.json', { format: 1, consent, at: '', synced: false });
+    const info = await profile.readInfo();
+    assert.equal(info.bloodGroup, 'O+');
+    info.emergency.name = 'Marc';
+    await profile.saveInfo(info);
+    assert.equal((await profile.readInfo()).bloodGroup, 'O+');
+    const file = await store.read('profile/diver.json');
+    assert.equal(file.future, 'keep');
+    assert.equal((await box.open(file.enc, { id: 'profile', format: 1 })).future, 'keep');
+  }
+});
+
+test('explicitly deleting the blood group keeps the rest', async () => {
+  const { profile } = setup();
   const info = emptyInfo();
   info.dateOfBirth = '1979-03-14';
   info.bloodGroup = 'O+';
   info.emergency = { name: 'Marc', relation: 'conjoint', phone: { country: 'CA', number: '514 555-0142' } };
   await profile.saveInfo(info);
-  const withdrawn = await consent.withdraw();
-  assert.equal(withdrawn.consent, false);
-  assert.equal(account.state.consent, false);
+  await profile.deleteBloodGroup();
   const after = await profile.readInfo();
   assert.equal(after.bloodGroup, '');
   assert.equal(after.dateOfBirth, '1979-03-14');
   assert.equal(after.emergency.name, 'Marc');
   assert.equal(after.emergency.phone.number, '5145550142');
-  // Even with the consent given again, the deleted value does not come back.
-  await consent.give();
-  assert.equal((await profile.readInfo()).bloodGroup, '');
-  assert.ok((await store.read('meta/pending.json')).paths.includes('profile/diver.json'));
-});
-
-test('the consent is kept on the device when the account cannot be reached, then sent', async () => {
-  const { profile } = setup();
-  const offline = fakeAccount({ offline: true });
-  const consent = createHealthConsent(profile, offline);
-  const given = await consent.give();
-  assert.equal(given.consent, true);
-  assert.equal(given.synced, false);
-  assert.ok(given.at);
-  // Back online: the refresh sends the local state.
-  const online = fakeAccount();
-  const later = createHealthConsent(profile, online);
-  const refreshed = await later.refresh();
-  assert.equal(online.state.consent, true);
-  assert.equal(refreshed.synced, true);
-  assert.equal(refreshed.consent, true);
-});
-
-test('the consent without a session stays on the device', async () => {
-  const { profile } = setup();
-  const consent = createHealthConsent(profile, fakeAccount({ token: '' }));
-  const given = await consent.give();
-  assert.equal(given.consent, true);
-  assert.equal(given.synced, false);
 });
 
 test('the account API: the calls carry the session and read the answer', async () => {
@@ -479,17 +425,16 @@ test('the texts of the new screens exist in French and English', () => {
   const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
   const get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const l of ['fr', 'en']) {
-    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'odplus.health.title', 'odplus.health.switch', 'odplus.health.continue', 'diverProfile.info.deniedNote', 'diverProfile.info.allow', 'settings.privacy.withdraw']) {
+    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood']) {
       assert.ok(get(langs[l], key), `${l}: ${key}`);
     }
   }
 });
 
-test('the subscription screens: « Continuer » then « Vos données de santé » then « Votre carnet est prêt »', () => {
+test('the subscription screens continue directly to the ready step', () => {
   const steps = read('lib/first-launch-steps.js');
-  assert.match(steps, /'odplusWelcome:next': 'odplusHealth'/);
-  assert.match(steps, /'odplusHealth:next': 'odplusReady'/);
+  assert.match(steps, /'odplusWelcome:next': 'odplusReady'/);
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /odplus\.welcome\.next/);
-  assert.match(screen, /odplus\.health\.continue/);
+  assert.doesNotMatch(screen, /odplusHealth/);
 });
