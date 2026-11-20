@@ -2729,6 +2729,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings on tablets and desktop: the logbook computers list opens correctly.",
       "Certifications: the number is optional and the instructor’s number can be added.",
       "Profile on a landscape tablet: the My diver profile column is a little wider.",
       "Profile on tablets and desktop: the Add equipment button fits its content and is aligned to the right.",

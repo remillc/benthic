@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages sur tablette et ordinateur : la liste des ordinateurs du carnet s’ouvre correctement.",
       "Brevets : le numéro est facultatif et le numéro de l’instructeur peut être ajouté.",
       "Profil sur tablette en paysage : la colonne « Mon profil de plongeur » est un peu plus large.",
       "Profil sur tablette et ordinateur : le bouton « Ajouter une pièce » est ajusté à son contenu et aligné à droite.",

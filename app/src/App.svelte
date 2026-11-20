@@ -336,7 +336,8 @@
       component: AdaptivePage,
       options: { props: { wide: Settings, narrow: Settings, wideProps: { desk: true }, narrowProps: { desk: false }, toWide: settingsToWide, toNarrow: settingsToNarrow } },
       master: true,
-      detailRoutes: [{ path: '/settings/:section', component: Settings }, PANE_EMPTY],
+      // Only Settings' own groups are details; standalone pages must reach their appRoutes entries.
+      detailRoutes: [{ path: '/settings/:section(display|language|units|notifications|logbook|equipment|decompression|gases|tools|download|privacy|advanced)', component: Settings }, PANE_EMPTY],
     },
     ...appRoutes,
   ];

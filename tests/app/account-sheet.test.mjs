@@ -260,8 +260,8 @@ test('every new text exists in French and in English, and the release notes name
       assert.ok(key.split('.').reduce((o, k) => o?.[k], langs[lang]), `${lang} ${key}`);
     }
   }
-  assert.match(langs.fr.about.releaseNotes[0], /Gérer le compte/);
-  assert.match(langs.en.about.releaseNotes[0], /Manage the account/);
+  assert.ok(langs.fr.about.releaseNotes.some((note) => /Gérer le compte/.test(note)));
+  assert.ok(langs.en.about.releaseNotes.some((note) => /Manage the account/.test(note)));
   assert.equal(langs.fr.account.manage.perYear, '{price} par an');
   assert.equal(langs.fr.account.manage.renews, 'Renouvelé le {date} · acheté sur {store}');
   assert.equal(langs.fr.account.free.device, 'Carnet sur cet appareil');
