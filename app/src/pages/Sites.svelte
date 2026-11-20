@@ -33,6 +33,12 @@ import MapStackSheet from '../components/MapStackSheet.svelte';
 import MapSiteCard from '../components/MapSiteCard.svelte';
 import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
+import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+import { inYourSites } from '../lib/shared-sites.js';
+import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
+import { distanceKm } from '../lib/maps-logic.js';
+import { openOdPlus } from '../lib/open-offer.svelte.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
   let sites = $state([]);
@@ -333,7 +339,70 @@ import { language } from '../lib/i18n.js';
   function onview(v) {
     view = v;
     hintIfNotDownloaded();
+    if (common) loadBase(v);
   }
+
+  // « Mes sites | Carte commune » (task 2026-11-19-315, docs/mockups/sites-commun-android.dc.html): a signed-in Benthic+
+  // account sees the shared map over its own sites. Who may read it is the server's switch: a refusal shows the offer.
+  const canCommon = $derived(odplusAccount.signedIn);
+  const common = $derived(canCommon && sharedSites.mode === 'common');
+  let baseBox = $state.raw(/** @type {{ mode: string, total: number, sites: import('../lib/shared-sites.js').BaseSite[], clusters: { lat: number, lon: number, count: number }[] }|null} */ (null));
+  /** The base sites around the centre of the map, nearest first. */
+  let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */
+  let baseState = $state('idle');
+  let baseSelectedId = $state(/** @type {string|null} */ (null));
+  const baseSelected = $derived(baseSelectedId === null ? null : (baseBox?.sites.find((x) => x.id === baseSelectedId) ?? baseList.find((x) => x.id === baseSelectedId) ?? null));
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let baseTimer;
+  let baseAsk = 0;
+
+  /** Reads the base in the view once the map has stopped. @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
+  function loadBase(v) {
+    clearTimeout(baseTimer);
+    baseTimer = setTimeout(async () => {
+      if (!connection.online) return;
+      const ask = ++baseAsk;
+      if (baseState !== 'ready') baseState = 'loading';
+      const [w, so, e, n] = v.bounds;
+      const radiusM = Math.min(50000, Math.max(1, Math.round(distanceKm(v.center[0], v.center[1], e, n) * 1000)));
+      try {
+        const [box, near] = await withSession((api, token) =>
+          Promise.all([api.inBox(token, { bbox: [w, so, e, n], zoom: v.zoom }), api.nearby(token, { lat: v.center[1], lon: v.center[0], radiusM, limit: 30 })]),
+        );
+        if (ask !== baseAsk) return;
+        baseBox = box;
+        baseList = near;
+        baseState = 'ready';
+      } catch (err) {
+        if (ask !== baseAsk) return;
+        const code = /** @type {any} */ (err)?.code;
+        baseState = code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
+      }
+    }, 350);
+  }
+
+  $effect(() => {
+    if (!common) {
+      baseSelectedId = null;
+      return;
+    }
+    if (!sharedSites.linksLoaded) loadLinks();
+    if (view) loadBase(view);
+  });
+
+  /** What the map draws of the base. */
+  const baseLayer = $derived(
+    common && baseBox
+      ? {
+          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x)}` })),
+          clusters: baseBox.clusters,
+        }
+      : null,
+  );
+
+  /** @param {string} id */
+  const openBase = (id) => f7.views.current?.router.navigate(`/sites/base/${encodeURIComponent(id)}`);
 
   // The device goes offline with the map already in view.
   $effect(() => {
@@ -372,8 +441,8 @@ import { language } from '../lib/i18n.js';
 </script>
 
 {#snippet mapBlock(/** @type {string} */ height)}
-  {#if located.length}
-    <div class="od-sites--map" class:od-sites--map-offline={!connection.online} class:od-sites--card-open={!!selectedSite}>
+  {#if located.length || canCommon}
+    <div class="od-sites--map" class:od-sites--map-offline={!connection.online} class:od-sites--card-open={!!selectedSite || !!baseSelected}>
       <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
            and its own « Centrer sur ma position » (task 2026-11-14-147). No names on the
            map; a tapped pin shows its card, several under the finger a sheet (task 2026-11-14-150). -->
@@ -382,9 +451,12 @@ import { language } from '../lib/i18n.js';
         sites={located}
         names="fewInFullScreen"
         selected={selectedUuid}
-        onselect={(uuid) => ((stack = null), (selectedUuid = uuid))}
+        onselect={(uuid) => ((stack = null), (baseSelectedId = null), (selectedUuid = uuid))}
         onstack={showStack}
-        onmapclick={() => (selectedUuid = null)}
+        onmapclick={() => ((selectedUuid = null), (baseSelectedId = null))}
+        base={baseLayer}
+        baseSelected={baseSelectedId}
+        onbaseselect={(id) => ((stack = null), (selectedUuid = null), (baseSelectedId = id))}
         stackAt={stack?.at ?? null}
         {onview}
         {height}
@@ -394,9 +466,27 @@ import { language } from '../lib/i18n.js';
         {#snippet overlay()}
           {#if selectedSite}
             <MapSiteCard site={selectedSite} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
+          {:else if baseSelected}
+            <MapSiteCard
+              site={{ name: baseSelected.name, country: baseSelected.country, dives: baseSelected.dives ?? 0, lastDate: '', maxDepthMm: 0 }}
+              line={baseCardLine(baseSelected)}
+              onopen={() => baseSelected && openBase(baseSelected.id)}
+              onclose={() => (baseSelectedId = null)}
+            />
           {/if}
         {/snippet}
       </SiteMap>
+      {#if canCommon}
+        <!-- MD3 segmented button over the map (sites-commun-android.dc.html): the selected side has a check mark. -->
+        <div class="od-sites--mode" role="group" aria-label={t('sharedSites.show')}>
+          <button type="button" class="od-sites--mode-button" aria-pressed={!common} onclick={() => setSitesMode('mine')}>
+            {#if !common}<Icon name="check" size={18} weight={2} />{/if}{t('sharedSites.mine')}
+          </button>
+          <button type="button" class="od-sites--mode-button od-sites--mode-common" aria-pressed={common} onclick={() => setSitesMode('common')}>
+            {#if common}<Icon name="check" size={18} weight={2} />{/if}{t('sharedSites.commonMapButton')}
+          </button>
+        </div>
+      {/if}
       <button type="button" class="od-sites--locate" onclick={centreOnDevice}>
         <Icon name="locate" size={20} />
         <span class="od-sr-only">{t('sites.centreOnMe')}</span>
@@ -419,6 +509,41 @@ import { language } from '../lib/i18n.js';
 {/snippet}
 
 {#snippet panel()}
+  {#if common}
+  <section class="od-sites--panel" aria-label={t('sharedSites.listLabel')}>
+    {#if !connection.online}
+      <p class="od-sites--area-count" role="status">{t('sharedSites.offline')}</p>
+    {:else if baseState === 'offer'}
+      <div class="od-sites--common-offer">
+        <p>{t('sharedSites.offerText')}</p>
+        <button type="button" class="od-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
+      </div>
+    {:else if baseState === 'failed'}
+      <p class="od-sites--area-count" role="status">{t('sharedSites.failed')}</p>
+    {:else if baseState === 'ready' && baseBox}
+      <p class="od-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
+      {#if baseList.length}
+        <nav class="list no-chevron od-sites--surface od-sites--list od-sites--common-list" aria-label={t('sharedSites.listLabel')}>
+          <ul>
+            {#each baseList as b (b.id)}
+              <li>
+                <a href="/sites/base/{encodeURIComponent(b.id)}" class="item-link item-content">
+                  <span class="od-sites--common-dot" class:od-sites--common-mine={inYourSites(b.id, sharedSites.links)} aria-hidden="true"></span>
+                  <div class="item-inner">
+                    <div class="od-sites--text">
+                      <div class="item-title od-site-name">{b.name}</div>
+                      <div class="item-text">{baseRowText(b, sharedSites.links, logbook.prefs)}</div>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </nav>
+      {/if}
+    {/if}
+  </section>
+  {:else}
   <section class="od-sites--panel" aria-label={t('sites.listLabel')}>
     {#if withoutSite || unplaced || duplicates || unused}
      <div class="od-sites--todo" class:od-sites--hidden={searching} bind:this={todoEl}>
@@ -478,6 +603,7 @@ import { language } from '../lib/i18n.js';
       <div class="list"><ul><li class="item-content"><div class="item-inner">{t('sites.noMatch')}</div></li></ul></div>
     {/if}
   </section>
+  {/if}
 {/snippet}
 
 {#snippet fab()}
@@ -851,6 +977,69 @@ import { language } from '../lib/i18n.js';
     /* « Centrer sur ma position » moves up above the card while it is open. */
     .od-sites--card-open .od-sites--locate {
       bottom: 116px;
+    }
+
+    /* « Mes sites | Carte commune »: MD3 segmented button, 40 dp, over the bottom left of the map. */
+    .od-sites--mode {
+      position: absolute;
+      z-index: 3;
+      left: 16px;
+      bottom: 32px;
+      display: flex;
+      height: 40px;
+      border-radius: 20px;
+      background: var(--od-surface);
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+      overflow: hidden;
+    }
+    .od-sites--mode-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--od-text);
+      cursor: pointer;
+      &[aria-pressed='true'] {
+        padding-left: 12px;
+        font-weight: 600;
+        background: var(--od-secondary-container);
+        color: var(--od-on-secondary-container);
+      }
+    }
+    .od-sites--mode-common[aria-pressed='true'] {
+      background: var(--od-shared-site-container);
+      color: var(--od-on-shared-site-container);
+    }
+    .od-sites--card-open .od-sites--mode {
+      bottom: 116px;
+    }
+    .od-sites--common-dot {
+      flex: none;
+      width: 12px;
+      height: 12px;
+      margin-right: 16px;
+      border-radius: 6px;
+      background: var(--od-shared-site);
+    }
+    .od-sites--common-mine {
+      background: var(--od-text);
+    }
+    .od-sites--common-offer {
+      margin: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--od-text-2);
+      & p {
+        margin: 0;
+      }
     }
 
     .od-sites--area-count {

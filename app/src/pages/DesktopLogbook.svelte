@@ -486,6 +486,7 @@
       { key: 'filter', label: '', text: t(filter.ids ? 'desktop.filterOn' : 'desktop.filter'), icon: 'filter', shortcut: desktopMac ? '⇧⌘F' : 'Ctrl+Maj+F' },
       { key: 'renumber', label: 'desktop.renumberDives', icon: 'renumber' },
       { key: 'computers', label: 'settings.logbookComputers.title', icon: 'computer' },
+      { key: 'exportWhole', label: '', text: t('welcomeSteps.menuExport'), icon: 'upload', disabled: logbook.loading || !!logbook.error || !logbook.dives.length },
       // Only when the selection touches a trip on that side (task 2026-11-15-194).
       ...(nearTrips.previous || nearTrips.next ? [{ key: 'separator' }] : []),
       ...(nearTrips.previous ? [{ key: 'mergePrevious', label: 'desktop.mergePreviousTrip', icon: 'merge' }] : []),
@@ -503,6 +504,10 @@
     else if (key === 'filter') command('filter');
     else if (key === 'renumber') renumbering = true;
     else if (key === 'computers') f7router.navigate('/settings/computers/');
+    else if (key === 'exportWhole') {
+      exportWhole = true;
+      exporting = true;
+    }
     else if (key === 'about') openAbout();
     else if (key === 'mergePrevious' || key === 'mergeNext') {
       const trip = key === 'mergePrevious' ? nearTrips.previous : nearTrips.next;
