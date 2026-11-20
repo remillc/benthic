@@ -1193,7 +1193,7 @@ async function computerPhotoFlows(expect) {
 }
 
 async function profileInsetsFlows(expect) {
-  for (const [label, width, height] of [['landscape', 1280, 800], ['portrait', 800, 1280]]) {
+  for (const [label, width, height] of [['landscape narrow', 1000, 700], ['landscape', 1280, 800], ['portrait', 800, 1280]]) {
     for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'dialog']]) {
       const tab = await openTab(width, height, false, false, false, { theme: 'md' });
       await tab.run(async (path) => {
@@ -1204,6 +1204,7 @@ async function profileInsetsFlows(expect) {
       const state = await tab.run(({ kind, portrait }) => {
         const page = [...document.querySelectorAll('.view.tab-active > .page-current')].find((item) => item.getBoundingClientRect().width > 0);
         const frame = page?.querySelector('.bc-pf')?.getBoundingClientRect();
+        const nav = page?.querySelector('.bc-profile-nav')?.getBoundingClientRect();
         const back = page?.querySelector('.bc-profile-nav--back')?.getBoundingClientRect();
         const add = page?.querySelector('.bc-gear-list--add, .fab:not([style*="display: none"])')?.getBoundingClientRect();
         const navbar = page?.querySelector(':scope > .navbar')?.getBoundingClientRect();
@@ -1217,9 +1218,11 @@ async function profileInsetsFlows(expect) {
           add: !add || add.bottom <= bottom,
           main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
           dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
+          navWidth: portrait || (!!nav && near(nav.width, innerWidth >= 1200 ? 350 : 320)),
+          barAligned: portrait || kind !== 'main' || (!!nav && !!navbar && near(nav.right, navbar.left)),
         };
       }, { kind: bar, portrait: label === 'portrait' });
-      expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true }, state);
+      expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true, navWidth: true, barAligned: true }, state);
       if (label === 'landscape' && bar === 'dialog') {
         const changed = await tab.run(() => {
           window.__odSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
@@ -1249,6 +1252,7 @@ async function gearAddFlows(expect) {
       if (!button) return { visible: false, contentWidth: false, right: false };
       const rect = button.getBoundingClientRect();
       const panel = button.closest('.bc-gear-list').getBoundingClientRect();
+      const nav = document.querySelector('.page-current .bc-profile-nav').getBoundingClientRect();
       const icon = button.querySelector('svg').getBoundingClientRect();
       const range = document.createRange();
       range.selectNodeContents(button.lastChild);
@@ -1259,9 +1263,11 @@ async function gearAddFlows(expect) {
         visible: rect.width > 0 && rect.height > 0,
         contentWidth: Math.abs(rect.width - expectedWidth) < 2,
         right: Math.abs(panel.right - rect.right - 17) < 2,
+        navWidth: nav.width,
       };
     });
     expect(`${label}: gear Add fits its content at the right of the list`, { visible: true, contentWidth: true, right: true }, geometry);
+    expect(`${label}: profile navigation has the expected width`, { navWidth: desktop ? 330 : 350 }, geometry);
     await tab.run(() => document.querySelector('.page-current .bc-gear-list--add').click());
     await sleep(1000);
     expect(`${label}: gear Add opens the new piece`, { opened: true }, { opened: await tab.run(() => !!document.querySelector('.page-current[data-name="profile-piece-edit"], .page-current.bc-piece-edit')) });

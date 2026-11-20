@@ -2729,6 +2729,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Profile on a landscape tablet: the My diver profile column is a little wider.",
       "Profile on tablets and desktop: the Add equipment button fits its content and is aligned to the right.",
       "Profile on tablets: controls stay clear of the system bars.",
       "Certificates and documents: Add is pale blue and floats at the bottom right on tablets and desktop; the card reproduction note has been removed.",

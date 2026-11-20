@@ -39,7 +39,7 @@
 <style>
   @layer od.components {
     .bc-pf {
-      --bc-pf-nav: 300px;
+      --bc-pf-nav: var(--bc-pf-nav-width, 300px);
       --bc-pf-list: 340px;
       --bc-pf-dw: min(640px, 92%);
       position: absolute;
@@ -49,7 +49,7 @@
     }
     @media (min-width: 1200px) {
       .bc-pf {
-        --bc-pf-nav: 330px;
+        --bc-pf-nav: var(--bc-pf-nav-width, 330px);
         --bc-pf-list: 440px;
       }
     }
@@ -118,6 +118,16 @@
       :global(.page:has(.bc-pf--bar-main, .bc-pf--bar-dialog)) {
         --bc-pf-nav-width: 330px;
         --bc-pf-list-width: 440px;
+      }
+    }
+    @media (orientation: landscape) {
+      :global(html:not(.bc-desktop-app) .page:has(.bc-pf)) {
+        --bc-pf-nav-width: 320px;
+      }
+    }
+    @media (orientation: landscape) and (min-width: 1200px) {
+      :global(html:not(.bc-desktop-app) .page:has(.bc-pf)) {
+        --bc-pf-nav-width: 350px;
       }
     }
     :global(.page:has(.bc-pf--bar-main) > .navbar .left) {

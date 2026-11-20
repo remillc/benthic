@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil sur tablette en paysage : la colonne « Mon profil de plongeur » est un peu plus large.",
       "Profil sur tablette et ordinateur : le bouton « Ajouter une pièce » est ajusté à son contenu et aligné à droite.",
       "Profil sur tablette : les commandes restent visibles au-dessus des barres système.",
       "Brevets et documents : Ajouter est bleu pâle et flotte en bas à droite sur tablette et ordinateur ; la note sur la reproduction des cartes est retirée.",
