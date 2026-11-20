@@ -555,8 +555,8 @@ int filter_dives(const std::string &fulltext, const std::string &fulltext_mode, 
 // "o2Permille", "hePermille".
 int create_dive(const std::string &fields_json, std::string &result_json, std::string &error);
 
-// Deletes a dive (DeleteDive, commands/command_divelist.cpp): its trip goes
-// too if it was the last one; undo puts both back.
+// Deletes a dive: its trip goes too if it was the last one. Later numbered
+// dives shift down; undo restores the dive, trip and original numbers together.
 int delete_dive(int id, std::string &result_json, std::string &error);
 // The same for several dives, one undoable step ("delete N dive(s) [...]").
 int delete_dives(const std::vector<int> &ids, std::string &result_json, std::string &error);

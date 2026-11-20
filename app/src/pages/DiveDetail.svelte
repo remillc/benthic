@@ -394,6 +394,7 @@
   let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (readyDive(Number(f7route.params.id))));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
+  const diveNumber = $derived(logbook.dives.find((d) => d.id === dive?.id)?.number ?? dive?.number ?? 0);
 
   // After an edit or an undo of this dive, show the result at once.
   $effect(() => {
@@ -968,7 +969,7 @@
       {/if}
       <header class="bc-dive-detail--desk-head">
         <div class="bc-dive-detail--desk-titles">
-          <h1 class="bc-dive-detail--desk-title">{dive.number ? t('desktop.diveTitle', { number: dive.number, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
+          <h1 class="bc-dive-detail--desk-title">{diveNumber ? t('desktop.diveTitle', { number: diveNumber, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
           <p class="bc-dive-detail--desk-sub bc-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
         </div>
         <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
@@ -984,7 +985,7 @@
       {/if}
     <header class="bc-dive-detail--head">
       <p class="bc-dive-detail--day bc-value">
-        {#if dive.number}<strong>{t('detail.number', { number: String(dive.number) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
+        {#if diveNumber}<strong>{t('detail.number', { number: String(diveNumber) })}</strong>&emsp;{/if}{formatDiveDay(dive.date)}
       </p>
       <h1 class="bc-dive-detail--site" class:bc-dive-detail--not-set={!dive.site}>{dive.site || t('dive.siteNotSet')}</h1>
       {#if location || trip}
@@ -1234,7 +1235,7 @@
 {#if renumbering && dive}
   <RenumberDiveDialog
     id={dive.id}
-    number={dive.number}
+    number={diveNumber}
     oncancel={() => (renumbering = false)}
     ondone={() => {
       renumbering = false;

@@ -732,8 +732,7 @@ export { waterTypeOf };
  * @property {(options: {fields: Record<string, string|number|string[]>}) => Promise<EditResult>} createDive
  *   Logs a dive by hand, one undoable step (create_dive in opendives.h).
  * @property {(options: {id?: number, ids?: number[]}) => Promise<EditResult>} deleteDive
- *   One dive (id) or several (ids), one undoable step.
- *   Deletes a dive, one undoable step (delete_dive).
+ *   Deletes one dive (id) or several (ids) and shifts later numbered dives, in one undoable step.
  * @property {(options: {ids: number[]}) => Promise<EditResult>} mergeDives
  *   Merges two or more dives into one, one undoable step (merge_dives in opendives.h): Subsurface's own merge;
  *   the merged dive keeps the first numbered dive's number. The result's `id` is the merged dive.

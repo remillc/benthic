@@ -11,6 +11,7 @@
 //        edit-roundtrip refuse <repo[branch]> <other[branch]>
 //                                                       edit, then save into an unrelated repo
 //        edit-roundtrip divelist <repo[branch]> <file>  log a dive by hand, import <file>; each undone
+//        edit-roundtrip delete-save <repo[branch]> -    delete, save and reopen the renumbered log
 //        edit-roundtrip presets  <repo[branch]> -       filter presets created, edited, deleted, undone
 //        edit-roundtrip syncundo <git://…[branch]> -    edit, save, sync, undo, save, sync
 //        edit-roundtrip conflict <repo[branch]> device|cloud
@@ -522,6 +523,34 @@ int main(int argc, char **argv)
 	if (int ret = open_log(repo))
 		return ret;
 
+	if (mode == "delete-save") {
+		std::vector<dive *> numbered;
+		for (const auto &d: divelog.dives)
+			if (d->number > 0 && (!d->is_planned() || d->is_logged()))
+				numbered.push_back(d.get());
+		if (numbered.size() < 2 || numbered.back()->number <= 1) {
+			printf("error=delete-save: not enough numbered dives\n");
+			return 1;
+		}
+		const int id = numbered.front()->id;
+		const timestamp_t last_when = numbered.back()->when;
+		const int expected = numbered.back()->number - 1;
+		const size_t count = divelog.dives.size();
+		std::string json, error;
+		if (delete_dive(id, json, error) || save_local(error) || open_log(repo)) {
+			printf("error=delete-save: %s\n", error.c_str());
+			return 1;
+		}
+		auto last = std::find_if(divelog.dives.begin(), divelog.dives.end(),
+					 [last_when](const auto &d) { return d->when == last_when; });
+		if (divelog.dives.size() != count - 1 || last == divelog.dives.end() || (*last)->number != expected) {
+			printf("error=delete-save: the renumbered log did not survive reload\n");
+			return 1;
+		}
+		printf("delete-save=ok\n");
+		return 0;
+	}
+
 	if (mode == "sites") {
 		// Each site change: applied, saved, undone, saved again; the script
 		// then checks that the tree is the original one.
@@ -737,6 +766,96 @@ int main(int argc, char **argv)
 			}
 			if (!undo_and_save("delete2") || divelog.trips.size() != trips0)
 				return 1;
+		}
+		// Deleting non-adjacent dives shifts only later numbered dives, keeping
+		// existing gaps and unnumbered dives. One undo and redo cover both changes.
+		if (divelog.dives.size() >= 6) {
+			std::vector<int> ids, original;
+			const std::vector<int> numbered = { 10, 11, 0, 14, 18, 21 };
+			for (size_t i = 0; i < numbered.size(); ++i) {
+				dive *d = divelog.dives[i].get();
+				ids.push_back(d->id);
+				original.push_back(d->number);
+				d->number = numbered[i];
+				d->invalidate_cache();
+			}
+			auto has_numbers = [&](const std::vector<int> &numbers) {
+				for (size_t i = 0; i < ids.size(); ++i) {
+					dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+					if (numbers[i] < 0 ? d != nullptr : !d || d->number != numbers[i])
+						return false;
+				}
+				return true;
+			};
+			const std::vector<int> after = { 10, -1, 0, -1, 16, 19 };
+			if (delete_dives({ ids[1], ids[3] }, json, error) || !has_numbers(after) ||
+			    undo(json, error) || !has_numbers(numbered) ||
+			    redo(json, error) || !has_numbers(after) ||
+			    undo(json, error) || !has_numbers(numbered)) {
+				printf("error=delete renumber undo or redo: %s\n", error.c_str());
+				return 1;
+			}
+			if (delete_dive(ids[2], json, error) || !has_numbers({ 10, 11, -1, 14, 18, 21 }) ||
+			    undo(json, error) || !has_numbers(numbered) ||
+			    delete_dive(ids[0], json, error) || !has_numbers({ -1, 10, 0, 13, 17, 20 }) ||
+			    undo(json, error) || !has_numbers(numbered)) {
+				printf("error=delete numbered or unnumbered dive: %s\n", error.c_str());
+				return 1;
+			}
+			for (size_t i = 0; i < ids.size(); ++i) {
+				dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+				d->number = original[i];
+				d->invalidate_cache();
+			}
+			divelog.dives.sort();
+		}
+		// Equal timestamps and duplicate numbers can change the table's sort order.
+		{
+			std::vector<dive *> same_trip;
+			for (const auto &candidate: divelog.dives) {
+				same_trip.clear();
+				for (const auto &d: divelog.dives)
+					if (d->divetrip == candidate->divetrip && (!d->is_planned() || d->is_logged()))
+						same_trip.push_back(d.get());
+				if (same_trip.size() >= 3)
+					break;
+			}
+			if (same_trip.size() >= 3) {
+				same_trip.resize(3);
+				struct OriginalDive {
+					dive *d;
+					timestamp_t when;
+					int number;
+				};
+				std::vector<OriginalDive> originals;
+				const timestamp_t when = same_trip.front()->when;
+				for (dive *d: same_trip) {
+					originals.push_back({ d, d->when, d->number });
+					d->when = when;
+					d->number = 10;
+					d->invalidate_cache();
+				}
+				divelog.dives.sort();
+				std::sort(same_trip.begin(), same_trip.end(),
+					  [](const dive *a, const dive *b) { return dive_less_than(*a, *b); });
+				auto sorted = []() {
+					return std::is_sorted(divelog.dives.begin(), divelog.dives.end(),
+						[](const auto &a, const auto &b) { return dive_less_than(*a, *b); });
+				};
+				if (delete_dive(same_trip[1]->id, json, error) || !sorted() ||
+				    undo(json, error) || !sorted() ||
+				    redo(json, error) || !sorted() ||
+				    undo(json, error) || !sorted()) {
+					printf("error=delete with equal timestamps: %s\n", error.c_str());
+					return 1;
+				}
+				for (const auto &original: originals) {
+					original.d->when = original.when;
+					original.d->number = original.number;
+					original.d->invalidate_cache();
+				}
+				divelog.dives.sort();
+			}
 		}
 		// Renumber: all the dives from 100, then the last half only from 7; the
 		// numbers are consecutive in date order, planned dives left out; each

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -17,7 +17,7 @@
 // desktop bridge (the browser has no plugin). Set OPENDIVES_HOST to the host binary, or build it for the desktop
 // (desktop/README.md); without it the suite stops with exit code 2 and says why. Chrome: set CHROME to its path
 // when it is not in a usual place. Never uses the ports 5180, 9333, 8080 and 3443.
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -118,7 +118,10 @@ await core('init', { home });
 if (stage) await core('setXsltDir', { dir: path.join(stage, 'xslt') }).catch(() => {});
 // A few dives with other buddies and guides: the people fields then list several values (the tallest suggestion list).
 const seeded = path.join(work, 'sample-people.ssrf');
-{
+if (args.has('--delete-only')) {
+  const generated = spawnSync(process.execPath, [path.join(root, 'tools/perf/gen-logbook.mjs'), '1200', seeded, '1', '60', '30'], { encoding: 'utf8' });
+  if (generated.status !== 0) throw new Error(`Generating the test logbook: ${generated.stderr}`);
+} else {
   let n = 0;
   const names = ['Bea', 'Cal', 'Dan', 'Eli', 'Fay', 'Gus'];
   writeFileSync(
@@ -960,6 +963,55 @@ async function tabletFlows() {
   await settled(tab, 'dive tapped again', { split: true });
   await hardwareBack(tab);
   await settled(tab, 'hardware Back', { split: true });
+  tab.ws.close();
+}
+
+async function deleteFlows(expect) {
+  const tab = await openTab(1280, 800, false);
+  await tab.send('Page.bringToFront');
+  await tab.run(async () => {
+    const { logbook } = await import('/src/lib/logbook.svelte.js');
+    const ordered = [...logbook.dives].filter((d) => d.number > 0).sort((a, b) => a.date.localeCompare(b.date));
+    const last = ordered[ordered.length - 1];
+    document.querySelector('#view-logbook').f7View.router.navigate(`/dives/${last.id}`);
+  });
+  await settled(tab, 'deletion: latest dive is open', { split: true, setup: true });
+  const result = await tab.run(async () => {
+    const { logbook, deleteDives, undoLastChange } = await import('/src/lib/logbook.svelte.js');
+    const ordered = [...logbook.dives].filter((d) => d.number > 0).sort((a, b) => a.date.localeCompare(b.date));
+    const first = ordered[0];
+    const last = ordered[ordered.length - 1];
+    if (ordered.length !== 1200) throw new Error(`Expected 1200 dives, got ${ordered.length}`);
+    let active = true;
+    let frames = 0;
+    let maxGap = 0;
+    let previous = performance.now();
+    const frame = (time) => {
+      maxGap = Math.max(maxGap, time - previous);
+      previous = time;
+      frames++;
+      if (active) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await deleteDives([first.id]);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    active = false;
+    const shifted = logbook.dives.find((d) => d.id === last.id)?.number;
+    const shownShifted = document.querySelector('.bc-dive-detail--day strong')?.textContent;
+    await undoLastChange();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const restored = logbook.dives.find((d) => d.id === last.id)?.number;
+    const shownRestored = document.querySelector('.bc-dive-detail--day strong')?.textContent;
+    return { frames, maxGap: Math.round(maxGap), shifted, original: last.number, restored, shownShifted, shownRestored };
+  });
+  console.log(`  deletion: ${result.frames} frames, longest gap ${result.maxGap} ms`);
+  expect('deletion keeps the interface responsive', { responsive: true }, { responsive: result.frames > 1 && result.maxGap < 250 });
+  expect('later dive number shifts and undo restores it', { shifted: result.original - 1, restored: result.original }, result);
+  expect('the open dive shows both changes', { shifted: true, restored: true }, {
+    shifted: result.shownShifted?.includes(String(result.shifted)) ?? false,
+    restored: result.shownRestored?.includes(String(result.restored)) ?? false,
+  });
   tab.ws.close();
 }
 
@@ -2091,7 +2143,7 @@ async function profileLayersFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2122,6 +2174,7 @@ try {
    * @type {[string, string, number, boolean, () => Promise<unknown>][]}
    */
   const all = [
+    ['delete responsiveness', '--delete-only', 60, false, () => deleteFlows(expect)],
     ['export', '--export-only', 17, true, () => exportFlows(expect)],
     ['computer photo', '--computer-photo-only', 10, !phoneOnly && !tabletOnly && !welcomeOnly, () => computerPhotoFlows(expect)],
     ['units', '--units-only', 2, true, () => unitsMenuFlows(expect)],

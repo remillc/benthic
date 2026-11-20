@@ -134,8 +134,7 @@ struct Step {
 	std::vector<std::pair<std::string, FilterData>> presets_to_add;
 	std::vector<int> presets_to_remove;
 	bool list_applied = false;
-	// RENUMBER: as Subsurface's RenumberDives, each dive with the number to
-	// swap in; after each undo or redo it holds the previous numbers.
+	// RENUMBER and deletion: each dive with the number to swap in on undo or redo.
 	std::vector<std::pair<dive *, int>> renumbered;
 	// A download from a dive computer (download.cpp): the core's fingerprint
 	// table to swap in on the next undo or redo, so that undoing the download
@@ -2122,6 +2121,26 @@ static void apply_dive_list(Step &step)
 	}
 }
 
+static void apply_delete(Step &step)
+{
+	const bool deleting = !step.list_applied;
+	if (deleting)
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	if (deleting && !step.renumbered.empty())
+		divelog.dives.sort();
+	apply_dive_list(step);
+	if (!deleting)
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	if (!deleting && !step.renumbered.empty())
+		divelog.dives.sort();
+}
+
 // MergeDives::redoit() and undoit() (commands/command_divelist.cpp): redo
 // renumbers the following dives, adds the merged dive, removes the originals
 // and sets the location of the merged dive's site; undo does it in reverse
@@ -2309,7 +2328,7 @@ static int swap_step(Step &step, std::string &result_json, std::string &error)
 		return 0;
 	}
 	if (step.kind == Step::DIVE_LIST) {
-		apply_dive_list(step);
+		apply_delete(step);
 		result_json = dive_list_json(step);
 		return 0;
 	}
@@ -3817,14 +3836,20 @@ int delete_dives(const std::vector<int> &ids, std::string &result_json, std::str
 	if (check_writable_log(error))
 		return -1;
 	std::vector<dive *> dives;
+	const std::set<int> wanted(ids.begin(), ids.end());
+	std::map<int, dive *> found;
+	for (const auto &d: divelog.dives)
+		if (wanted.count(d->id))
+			found.emplace(d->id, d.get());
+	std::set<int> added;
 	for (int id: ids) {
-		dive *d = divelog.dives.get_by_uniq_id(id);
-		if (!d) {
+		auto it = found.find(id);
+		if (it == found.end()) {
 			error = "NOT_FOUND";
 			return -1;
 		}
-		if (std::find(dives.begin(), dives.end(), d) == dives.end())
-			dives.push_back(d);
+		if (added.insert(id).second)
+			dives.push_back(it->second);
 	}
 	if (dives.empty()) {
 		error = "NOTHING_TO_DO";
@@ -3836,7 +3861,20 @@ int delete_dives(const std::vector<int> &ids, std::string &result_json, std::str
 	step.kind = Step::DIVE_LIST;
 	step.list.remove_dives = dives;
 	step.text = "delete " + std::to_string(dives.size()) + " dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
-	apply_dive_list(step);
+	int removed = 0;
+	for (const auto &entry: divelog.dives) {
+		dive *d = entry.get();
+		if (internal::is_plan_only(*d) || d->number <= 0)
+			continue;
+		if (wanted.count(d->id))
+			++removed;
+		else if (removed) {
+			int number = std::max(1, d->number - removed);
+			if (number != d->number)
+				step.renumbered.emplace_back(d, number);
+		}
+	}
+	apply_delete(step);
 	result_json = dive_list_json(step);
 	push_step(std::move(step));
 	return 0;

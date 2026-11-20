@@ -129,6 +129,11 @@ run_one() {
     fi
   fi
 
+  if [ -z "$why" ] && [ "$n" = SampleDivesV2.ssrf ]; then
+    E="$d/delete-save"; cp -r "$d/B" "$E"
+    "$ED" delete-save "$E[main]" - >"$E.out" 2>"$E.err" || why="delete-save: $(value error "$E.out")"
+  fi
+
   if [ -z "$why" ]; then
     # Filter presets created, edited, deleted, each undone, and read back
     # from git: the tree is the original one again.
