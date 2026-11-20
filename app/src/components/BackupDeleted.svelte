@@ -97,16 +97,16 @@
           </div>
           <dl class="bc-backup-deleted--facts">
             {#if d.maxDepthMm != null}
-              <div><dt>{t('backup.deleted.fields.depth')}</dt><dd>{formatDepth(d.maxDepthMm, logbook.prefs)}</dd></div>
+              <div class="bc-backup-deleted--fact-depth"><dt>{t('backup.deleted.fields.depth')}</dt><dd>{formatDepth(d.maxDepthMm, logbook.prefs)}</dd></div>
             {/if}
             {#if d.durationSeconds != null}
-              <div><dt>{t('backup.deleted.fields.duration')}</dt><dd>{formatDuration(d.durationSeconds)}</dd></div>
+              <div class="bc-backup-deleted--fact-duration"><dt>{t('backup.deleted.fields.duration')}</dt><dd>{formatDuration(d.durationSeconds)}</dd></div>
             {/if}
             {#if d.mode}
-              <div><dt>{t('backup.deleted.fields.mode')}</dt><dd>{t(`detail.modes.${d.mode}`)}</dd></div>
+              <div class="bc-backup-deleted--fact-mode"><dt>{t('backup.deleted.fields.mode')}</dt><dd>{t(`detail.modes.${d.mode}`)}</dd></div>
             {/if}
             {#if d.computer}
-              <div><dt>{t('backup.deleted.fields.computer')}</dt><dd>{d.computer}</dd></div>
+              <div class="bc-backup-deleted--fact-computer"><dt>{t('backup.deleted.fields.computer')}</dt><dd>{d.computer}</dd></div>
             {/if}
           </dl>
           <p class="bc-backup-deleted--removed">{t('backup.deleted.row', { when: formatTimeAgo(isoOfEpoch(d.deletedAt)) })}</p>

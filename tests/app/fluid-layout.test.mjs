@@ -45,6 +45,10 @@ test('backup history shows loading skeletons and keeps restore beside the dive d
   assert.match(deleted, /bc-backup-deleted--facts/);
   const css = read('app/src/components/backup.css');
   assert.match(css, /\.bc-backup-deleted--restore,\s*\.bc-backup-deleted--state button \{\s*width: auto;/);
+  assert.match(css, /\.bc-backup-deleted--facts \{\s*display: grid;\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
+  for (const field of ['depth', 'duration', 'mode', 'computer']) {
+    assert.ok(deleted.includes(`bc-backup-deleted--fact-${field}`), field);
+  }
 });
 
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {

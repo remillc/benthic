@@ -454,11 +454,27 @@
 
   .bc-backup-deleted--facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px 24px;
     margin: 18px 0 0;
     padding: 16px 0;
     border-block: 1px solid var(--bc-separator);
+  }
+
+  .bc-backup-deleted--fact-depth {
+    grid-column: 1;
+  }
+
+  .bc-backup-deleted--fact-duration {
+    grid-column: 2;
+  }
+
+  .bc-backup-deleted--fact-mode {
+    grid-column: 3;
+  }
+
+  .bc-backup-deleted--fact-computer {
+    grid-column: 4;
   }
 
   .bc-backup-deleted--facts dt {
@@ -622,6 +638,18 @@
     .bc-backup-deleted--restore {
       min-width: 0;
       padding-inline: 16px;
+    }
+
+    .bc-backup-deleted--facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bc-backup-deleted--fact-mode {
+      grid-column: 1;
+    }
+
+    .bc-backup-deleted--fact-computer {
+      grid-column: 2;
     }
   }
 }
