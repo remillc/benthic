@@ -166,10 +166,12 @@ const memory = () => {
   return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v), m };
 };
 
-test('the curve chips: temperature by default, the choice is kept in the device store', () => {
+test('the curve chips: none on by default (todo 124), the choice is kept in the device store', () => {
   const store = memory();
+  assert.deepEqual(DEFAULT_LAYERS, []);
   assert.deepEqual(readLayers(store), DEFAULT_LAYERS);
   let layers = readLayers(store);
+  layers = setLayer(layers, 'temperature', true);
   layers = setLayer(layers, 'ppo2', true);
   layers = setLayer(layers, 'ceiling', true);
   saveLayers(store, layers);

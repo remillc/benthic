@@ -3,7 +3,7 @@
   // <DiveProfile> (spec, section 4, "Profil", "Axes" and "Temperature curve"):
   // depth over time, surface at the top; water column; graduated depth and
   // time axes; finger cursor; filter chips for the layers: water temperature
-  // (on by default when the dive has temperature samples), gas, ppO2, ceiling
+  // (off by default like the others, todo 124), gas, ppO2, ceiling
   // and tissues, each offered only when the dive has the data.
   import Icon from './Icon.svelte';
   import { waterBottomColor } from '../lib/water-column.js';

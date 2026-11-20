@@ -49,7 +49,6 @@ Next number: 138
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
-- #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
