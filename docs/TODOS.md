@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 138
+Next number: 148
 
 ## List
 
@@ -57,3 +57,11 @@ Next number: 138
 - #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
+- #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
+- #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
+- #142 [design] Sur /welcome, écran « Le serveur ne répond pas » : dessiner la maquette à partir de la vue de Claude VC.
+- #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
+- #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
+- #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
+- #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
+- #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
