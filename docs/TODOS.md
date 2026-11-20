@@ -53,6 +53,5 @@ Next number: 128
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #123 [code] sur /dives/:id, faire en sorte que la sélection des variables à afficher dans le profil de plongée (température, gas, ppo2 et tissus) soit préservée à travers la session.
 - #124 [code] sur /dives/:id, faire en sorte que la température dans le profil de plongée (graphique) soit déselectionnée par défaut.
-- #125 [code] changer l'expression valider par signer dans /dives/:id et aussi dans /validate?ids=<id>.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.

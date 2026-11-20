@@ -3,7 +3,7 @@
   // « Faire valider la plongée » (inbox task 2026-11-19-309, point 2; OpenDives+; docs/mockups/validation-choix-android,
   // validation-signature-android and validation-qr-android): one screen for the dive (or the checked dives, `?ids=1,2,3`),
   // in three steps. The choice (« Signature sur cet écran » or « Code QR »); the signature (name, role, instructor number,
-  // the frame, « Effacer », « Valider »); the QR code made by the server, valid 10 minutes, whose answer arrives through
+  // the frame, « Effacer », « Signer »); the QR code made by the server, valid 10 minutes, whose answer arrives through
   // the server. A full screen on every layout. The records and the server are in lib/validation.svelte.js.
   import { onDestroy, onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';

@@ -487,8 +487,8 @@ async function phoneFlows() {
   await tapBack(tab);
   await settled(tab, 'back after Save', { route: '/' });
 
-  // Dive validation by signature (task 2026-11-19-309, point 2; OpenDives+): « Faire valider » of the dive's Validations
-  // section, the choice, the signature drawn with the finger, « Valider »; the dive shows the validation, the logbook marks
+  // Dive validation by signature (task 2026-11-19-309, point 2; OpenDives+): « Faire signer » of the dive's Validations
+  // section, the choice, the signature drawn with the finger, « Signer »; the dive shows the validation, the logbook marks
   // the dive, and the validation can be removed. The stack stays sound at every step.
   console.log(' dive > validate by signature > Back');
   await tapDive(tab);
@@ -496,7 +496,7 @@ async function phoneFlows() {
   const validated = (await tab.run(readStack)).current;
   await tab.run(() => window.__odplusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
   await sleep(800);
-  await tapText(tab, '^\\s*(Faire valider|Get it validated)\\s*$');
+  await tapText(tab, '^\\s*(Faire signer|Get it signed)\\s*$');
   await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/ });
   await tapText(tab, 'Signature sur cet écran|Signature on this screen');
   await sleep(300);
@@ -515,16 +515,16 @@ async function phoneFlows() {
     await sleep(16);
   }
   // The finger rests before it is lifted. Lifted while moving, the stroke ends as a fling, and the browser takes the tap
-  // that follows within a moment for « stop the fling »: it sends the touch to « Valider » but no click (seen on
+  // that follows within a moment for « stop the fling »: it sends the touch to « Signer » but no click (seen on
   // 19 November 2026: the page stayed on /validate because the button was never clicked, not because Back failed).
   await sleep(300);
   await tab.touch('touchEnd', pad.x + pad.w * 0.8, pad.y + pad.h * 0.5);
   await sleep(200);
-  const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Valider|Validate/.test(a.textContent) && a.classList.contains('disabled')));
+  const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Signer|Sign/.test(a.textContent) && a.classList.contains('disabled')));
   checks++;
-  if (!enabled) failures.push({ label: 'validation: Valider enabled', problems: ['« Valider » stays disabled after a name and a signature'] });
+  if (!enabled) failures.push({ label: 'validation: Signer enabled', problems: ['« Signer » stays disabled after a name and a signature'] });
   if (process.env.OD_SHOTS) await shot(tab, 'validation-signature');
-  await tapText(tab, '^\\s*(Valider|Validate)\\s*$', '.page-current .navbar');
+  await tapText(tab, '^\\s*(Signer|Sign)\\s*$', '.page-current .navbar');
   for (let i = 0; i < 60 && (await tab.run(readStack)).current !== validated; i++) await sleep(100);
   await settled(tab, 'validation: back on the dive', { route: validated });
   const shown = await tab.run(() => ({
