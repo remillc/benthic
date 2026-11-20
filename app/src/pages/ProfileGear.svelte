@@ -13,7 +13,7 @@
   import DcTile from '../components/DcTile.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import GearExportSheet from '../components/GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, readPhoto } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, readPhoto, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { connection } from '../lib/online.svelte.js';
@@ -110,15 +110,17 @@
   {/if}
 
   {#if !searching}
-    <a href="/profile/maintenance/" class="bc-gear-page--upkeep">
-      <span class="bc-gear-page--tile"><Icon name="clock" size={22} /></span>
-      <span class="bc-gear-page--texts">
-        <span class="bc-gear-page--name">{t('maintenance.entry')}</span>
-        <span class="bc-gear-page--supporting" class:bc-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
-      </span>
-      {#if upkeep.overdue > 0}<span class="bc-gear-page--badge-red" role="status" aria-label={t('maintenance.badge', { n: upkeep.overdue })}>{upkeep.overdue}</span>{/if}
-      <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
-    </a>
+    {#if hasActiveMaintenance()}
+      <a href="/profile/maintenance/" class="bc-gear-page--upkeep">
+        <span class="bc-gear-page--tile"><Icon name="clock" size={22} /></span>
+        <span class="bc-gear-page--texts">
+          <span class="bc-gear-page--name">{t('maintenance.entry')}</span>
+          <span class="bc-gear-page--supporting" class:bc-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
+        </span>
+        {#if upkeep.overdue > 0}<span class="bc-gear-page--badge-red" role="status" aria-label={t('maintenance.badge', { n: upkeep.overdue })}>{upkeep.overdue}</span>{/if}
+        <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+      </a>
+    {/if}
     <h2 class="bc-gear-page--title">{t('gear.inventory.kits')}</h2>
     <div class="bc-gear-page--chips">
       {#each gear.kits as kit (kit.id)}

@@ -33,3 +33,5 @@ Suggested maintenance reminders by type: Détendeur every 2 years or 100 dives; 
 The original `knife` type is displayed as « Coupe-ligne »; `diveKnife` is the distinct « Couteau » type. Existing pieces retain their original type and are therefore displayed as line cutters.
 
 An active piece's menu offers permanent deletion after confirmation. The piece, its photos and maintenance history are erased, and its links to kits and dives are removed; the dives stay in the logbook. A retired piece can still be deleted from its sheet.
+
+The general Maintenance entries in the profile and equipment views appear only while a non-retired piece has an active reminder. A piece's own maintenance link remains available to add a first reminder.

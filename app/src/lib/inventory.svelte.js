@@ -76,6 +76,9 @@ export function evaluations() {
   return evaluateAll({ items: gear.maintenance, pieces: gear.pieces, diveKeysOf, today: todayIso() });
 }
 
+/** Whether a non-retired piece has an active maintenance reminder. */
+export const hasActiveMaintenance = () => evaluations().some((e) => e.active);
+
 /** The number on the red badge: reminders overdue. */
 export const overdueBadge = () => overdueCount(evaluations());
 

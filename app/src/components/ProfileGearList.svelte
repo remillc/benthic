@@ -10,7 +10,7 @@
   import GearIcon from './GearIcon.svelte';
   import ReadOnlyNotice from './ReadOnlyNotice.svelte';
   import GearExportSheet from './GearExportSheet.svelte';
-  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, retiredGear, figuresOf, computerDiveCounts, setReadOnly, maintenanceSections, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { groupGear, searchGear } from '../lib/inventory.js';
   import { showProfilePath } from '../lib/profile-frame.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
@@ -97,14 +97,16 @@
   <div class="bc-gear-list--scroll">
     <ReadOnlyNotice onexport={() => (exporting = true)} />
     {#if !searching}
-      <button type="button" class="bc-gear-list--upkeep" onclick={() => showProfilePath('/profile/maintenance/')}>
-        <span class="bc-gear-list--tile bc-gear-list--tile-late"><Icon name="clock" size={22} /></span>
-        <span class="bc-gear-list--texts">
-          <span class="bc-gear-list--name">{t('maintenance.entry')}</span>
-          <span class="bc-gear-list--supporting">{upkeepLine}</span>
-        </span>
-        <Icon name="chevron" size={20} />
-      </button>
+      {#if hasActiveMaintenance()}
+        <button type="button" class="bc-gear-list--upkeep" onclick={() => showProfilePath('/profile/maintenance/')}>
+          <span class="bc-gear-list--tile bc-gear-list--tile-late"><Icon name="clock" size={22} /></span>
+          <span class="bc-gear-list--texts">
+            <span class="bc-gear-list--name">{t('maintenance.entry')}</span>
+            <span class="bc-gear-list--supporting">{upkeepLine}</span>
+          </span>
+          <Icon name="chevron" size={20} />
+        </button>
+      {/if}
       <h2 class="bc-gear-list--group">{t('gear.inventory.kits')}</h2>
       <div class="bc-gear-list--chips">
         {#each gear.kits as kit (kit.id)}

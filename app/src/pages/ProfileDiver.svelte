@@ -7,7 +7,7 @@
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
-  import { gear, loadInventory, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -57,14 +57,16 @@
       </span>
       <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
-    <a href="/profile/maintenance/" class="bc-profile--row">
-      <span class="bc-profile--tile bc-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
-      <span class="bc-profile--texts">
-        <span class="bc-profile--label">{t('maintenance.entry')}</span>
-      </span>
-      {#if overdue > 0}<span class="bc-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
-      <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
-    </a>
+    {#if hasActiveMaintenance()}
+      <a href="/profile/maintenance/" class="bc-profile--row">
+        <span class="bc-profile--tile bc-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
+        <span class="bc-profile--texts">
+          <span class="bc-profile--label">{t('maintenance.entry')}</span>
+        </span>
+        {#if overdue > 0}<span class="bc-profile--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
+        <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
+      </a>
+    {/if}
     <a href="/profile/certs/" class="bc-profile--row">
       <span class="bc-profile--tile bc-profile--tile-violet"><Icon name="idCard" size={22} weight={1.8} /></span>
       <span class="bc-profile--texts">

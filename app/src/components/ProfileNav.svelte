@@ -5,7 +5,7 @@
   import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
-  import { gear, visibleGear, overdueBadge } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { onMount } from 'svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
@@ -20,6 +20,7 @@
 
   onMount(() => {
     if (!diver.ready) loadProfile().catch((e) => console.error('Reading the profile', e));
+    if (!gear.ready) loadInventory().catch((e) => console.error('Reading the inventory', e));
   });
 
   // The Mac's profile window does not load the logbook: the main window left the diver's line.
@@ -69,14 +70,16 @@
   <h2 class="bc-profile-nav--section">{t('gear.profile.keep')}</h2>
   <div class="bc-profile-nav--list">
     {#each entries as e (e.id)}
-      <button type="button" class="bc-profile-nav--row" class:bc-profile-nav--on={section === e.id} aria-current={section === e.id ? 'page' : undefined} onclick={() => showProfilePath(PROFILE_SECTIONS[e.id])}>
-        <span class="bc-profile-nav--tile bc-profile-nav--tile-{e.tone}"><Icon name={e.icon} size={22} weight={1.8} /></span>
-        <span class="bc-profile-nav--texts">
-          <span class="bc-profile-nav--label">{t(e.label)}</span>
-          {#if lines[e.id]}<span class="bc-profile-nav--supporting">{lines[e.id]}</span>{/if}
-        </span>
-        {#if e.id === 'maintenance' && overdue > 0}<span class="bc-profile-nav--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
-      </button>
+      {#if e.id !== 'maintenance' || hasActiveMaintenance()}
+        <button type="button" class="bc-profile-nav--row" class:bc-profile-nav--on={section === e.id} aria-current={section === e.id ? 'page' : undefined} onclick={() => showProfilePath(PROFILE_SECTIONS[e.id])}>
+          <span class="bc-profile-nav--tile bc-profile-nav--tile-{e.tone}"><Icon name={e.icon} size={22} weight={1.8} /></span>
+          <span class="bc-profile-nav--texts">
+            <span class="bc-profile-nav--label">{t(e.label)}</span>
+            {#if lines[e.id]}<span class="bc-profile-nav--supporting">{lines[e.id]}</span>{/if}
+          </span>
+          {#if e.id === 'maintenance' && overdue > 0}<span class="bc-profile-nav--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
+        </button>
+      {/if}
     {/each}
   </div>
   <p class="bc-profile-nav--note"><Icon name="lock" size={16} /><span>{t('gear.profile.keptWide')}</span></p>

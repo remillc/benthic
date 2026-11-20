@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1721,6 +1721,82 @@ async function gearTypeDialogFlows(expect) {
   }
 }
 
+async function maintenanceEntryFlows(expect) {
+  for (const [label, width, height, mobile, desktop] of [
+    ['phone', 390, 844, true, false],
+    ['tablet', 1280, 800, false, false],
+    ['desktop', 1400, 900, false, true],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
+    const id = await tab.run(async (name) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return (await change((inv) => inv.saveGear({ type: 'regulator', name }))).id;
+    }, `Maintenance ${label}`);
+    const profileEntry = async () => tab.run(async () => {
+      const { t } = await import('/src/lib/i18n.js');
+      const page = document.querySelector('.page-current.bc-profile');
+      return { profile: !!page, visible: !!page && [...page.querySelectorAll('.bc-profile--row, .bc-profile-nav--row')].some((row) => row.textContent.includes(t('maintenance.entry'))) };
+    });
+    const gearEntry = async () => tab.run(() => !!document.querySelector('.page-current .bc-gear-page--upkeep, .page-current .bc-gear-list--upkeep'));
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile'); });
+    await sleep(900);
+    expect(`${label}: profile hides Maintenance without a reminder`, { profile: true, visible: false }, await profileEntry());
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'); });
+    await sleep(900);
+    expect(`${label}: equipment hides Maintenance without a reminder`, { visible: false }, { visible: await gearEntry() });
+    await tab.run(async (id) => { (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}`); }, id);
+    await sleep(900);
+    expect(`${label}: the piece still offers its maintenance page`, { visible: true }, { visible: await tab.run(() => !!document.querySelector('.page-current .bc-piece-page--maintenance')) });
+    await tab.run(() => {
+      const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
+      view.f7View.router.back();
+    });
+    await sleep(900);
+    const reminder = await tab.run(async (id) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return (await change((inv) => inv.saveMaintenance({ gearId: id, task: 'service', intervalMonths: 12, intervalDives: null }))).id;
+    }, id);
+    await sleep(300);
+    expect(`${label}: an active reminder shows the equipment entry`, { visible: true }, { visible: await gearEntry() });
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile'); });
+    await sleep(900);
+    expect(`${label}: an active reminder shows the profile entry`, { profile: true, visible: true }, await profileEntry());
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'); });
+    await sleep(900);
+    const secondId = await tab.run(async ({ id, reminder, name }) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return change(async (inv) => {
+        const second = await inv.saveGear({ type: 'cylinder', name });
+        await inv.saveMaintenance({ gearId: second.id, task: 'inspection', intervalMonths: 12, intervalDives: null });
+        await inv.noteMaintenance({ id: reminder, gearId: id, task: 'service' }, { kind: 'service', doneOn: '2026-01-01' });
+        await inv.removeRule(reminder);
+        return second.id;
+      });
+    }, { id, reminder, name: `Second ${label}` });
+    await sleep(300);
+    expect(`${label}: another active piece keeps the entry visible`, { visible: true }, { visible: await gearEntry() });
+    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.deleteGear(id)); }, secondId);
+    await sleep(300);
+    expect(`${label}: history without an active rule does not show the entry`, { visible: false }, { visible: await gearEntry() });
+    await tab.run(async ({ id, reminder }) => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      await change(async (inv) => {
+        await inv.saveMaintenance({ id: reminder, gearId: id, task: 'service', intervalMonths: 12, intervalDives: null });
+        await inv.retireGear(id);
+      });
+    }, { id, reminder });
+    await sleep(300);
+    expect(`${label}: a retired piece does not show the entry`, { visible: false }, { visible: await gearEntry() });
+    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.restoreGear(id)); }, id);
+    await sleep(300);
+    expect(`${label}: restoring the piece shows the entry again`, { visible: true }, { visible: await gearEntry() });
+    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.deleteGear(id)); }, id);
+    await sleep(300);
+    expect(`${label}: deleting the last reminder hides the entry`, { visible: false }, { visible: await gearEntry() });
+    tab.ws.close();
+  }
+}
+
 async function gearDeleteFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['Android phone', 390, 844, true, false, 'md'],
@@ -1903,7 +1979,7 @@ async function profileLayersFlows(expect) {
 }
 
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--export-only') && !args.has('--computer-photo-only') && !args.has('--units-only') && !args.has('--profile-insets-only') && !args.has('--gear-add-only') && !args.has('--gear-type-dialog-only') && !args.has('--gear-delete-only') && !args.has('--maintenance-entry-only') && !args.has('--profile-layers-only') && !args.has('--certs-fab-only') && !args.has('--cert-agencies-only') && !args.has('--settings-computers-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1917,6 +1993,7 @@ try {
   if (args.has('--computer-photo-only') || (fixed && !args.has('--phone-only') && !args.has('--tablet-only') && !args.has('--welcome-only'))) await computerPhotoFlows(expect);
   if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (args.has('--profile-insets-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await profileInsetsFlows(expect);
+  if (args.has('--maintenance-entry-only') || fixed) await maintenanceEntryFlows(expect);
   if (args.has('--gear-add-only') || (fixed && !args.has('--phone-only') && !args.has('--welcome-only'))) await gearAddFlows(expect);
   if (args.has('--gear-type-dialog-only') || fixed) await gearTypeDialogFlows(expect);
   if (args.has('--gear-delete-only') || fixed) await gearDeleteFlows(expect);

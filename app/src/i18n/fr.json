@@ -2729,6 +2729,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
       "Profil de plongée : les courbes choisies restent affichées pendant la session.",
