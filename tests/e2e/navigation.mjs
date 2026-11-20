@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--units-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1002,8 +1002,105 @@ async function desktopFlows() {
   tab.ws.close();
 }
 
+async function unitsMenuFlows(expect) {
+  for (const [width, height, mobile] of [[390, 844, true], [1280, 800, false]]) {
+    const tab = await openTab(width, height, mobile, false, false, { theme: 'md' });
+    const before = await tab.run(async () => {
+      const { logbook } = await import('/src/lib/logbook.svelte.js');
+      const { deviceStore } = await import('/src/lib/device-store.js');
+      const { unitSystem, length, temperature, pressure, volume, weight } = logbook.prefs;
+      return {
+        prefs: { unitSystem, length, temperature, pressure, volume, weight },
+        core: deviceStore.getItem('od.corePrefs'),
+        app: deviceStore.getItem('od.appSettings'),
+      };
+    });
+    await tab.run(async (mobile) => {
+      window.__unitsErrors = [];
+      window.addEventListener('error', (event) => window.__unitsErrors.push(event.message));
+      (await import('/src/lib/navigation.svelte.js')).openOver(mobile ? '/settings/units' : '/settings/');
+    }, mobile);
+    await sleep(1200);
+    if (!mobile) {
+      await tab.run(() => {
+        document.querySelector('#view-account').f7View.router.navigate('/settings/units');
+      });
+      await sleep(900);
+    }
+    await tab.run(() => {
+      const imperial = [...document.querySelectorAll('.od-settings--segmented [role="radio"]')].find((el) => /impérial|imperial/i.test(el.textContent));
+      if (!imperial) throw new Error('imperial unit system missing');
+      imperial.click();
+    });
+    await sleep(700);
+    await tab.run(() => {
+      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      if (!row) throw new Error('temperature row missing');
+      row.click();
+    });
+    await sleep(300);
+    await tab.run(() => {
+      const option = [...document.querySelectorAll('.od-row-menu [role="option"]')].find((el) => /°C/.test(el.textContent));
+      if (!option) throw new Error('Celsius option missing');
+      option.click();
+    });
+    await sleep(700);
+    const result = await tab.run(async () => {
+      const { logbook } = await import('/src/lib/logbook.svelte.js');
+      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      return {
+        system: logbook.prefs.unitSystem,
+        temperature: logbook.prefs.temperature,
+        length: logbook.prefs.length,
+        focused: document.activeElement === row,
+        errors: window.__unitsErrors.join(' | '),
+      };
+    });
+    expect(`${width}px: Celsius with imperial units closes cleanly`, { system: 'personalize', temperature: 'C', length: 'ft', focused: true, errors: '' }, result);
+    await tab.run(() => {
+      const row = [...document.querySelectorAll('.od-settings--row')].find((el) => /température|temperature/i.test(el.textContent));
+      row.click();
+    });
+    await sleep(300);
+    await tab.run(() => document.querySelector('.od-row-menu').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    await sleep(300);
+    const cancelled = await tab.run(() => ({
+      closed: !document.querySelector('.od-row-menu'),
+      errors: window.__unitsErrors.join(' | '),
+    }));
+    expect(`${width}px: Escape closes a choice menu cleanly`, { closed: true, errors: '' }, cancelled);
+    if (!mobile) {
+      await tab.run(() => {
+        const router = document.querySelector('#view-account').f7View.router;
+        router.back();
+        router.back();
+      });
+      await sleep(1800);
+      const state = await tab.run(async () => {
+        const { readApp, checkApp } = await import('/src/lib/nav-invariants.js');
+        const { traceEvents } = await import('/src/lib/nav-trace.js');
+        return {
+          problems: checkApp(readApp()).join(' | '),
+          broken: traceEvents().filter((event) => event.type === 'broken').map((event) => event.detail).join(' | '),
+        };
+      });
+      expect('tablet: two rapid Back calls from Settings leave navigation sound', { problems: '', broken: '' }, state);
+    }
+    await tab.run(async (before) => {
+      await window.odDesktop.core('setPrefs', { changes: JSON.stringify(before.prefs) });
+      const { deviceStore } = await import('/src/lib/device-store.js');
+      for (const [key, value] of [['od.corePrefs', before.core], ['od.appSettings', before.app]]) {
+        if (value === null) deviceStore.removeItem(key);
+        else deviceStore.setItem(key, value);
+      }
+    }, before);
+    await sleep(200);
+    tab.ws.close();
+  }
+}
+
 try {
-  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only');
+  const fixed = !args.has('--monkey-only') && !args.has('--gestures-only') && !args.has('--regressions-only') && !args.has('--units-only');
   /** One check: every key of `want` has that value in `got`. */
   const expect = (label, want, got) => {
     checks++;
@@ -1013,6 +1110,7 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
+  if (args.has('--units-only') || fixed) await unitsMenuFlows(expect);
   if (fixed && !args.has('--tablet-only') && !args.has('--welcome-only')) await phoneFlows();
   if (fixed && !args.has('--tablet-only')) await welcomeFlows();
   if (fixed && !args.has('--phone-only')) await tabletFlows();

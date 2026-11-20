@@ -39,6 +39,7 @@
   let closed = false;
 
   function position() {
+    if (closed) return;
     const height = menu?.scrollHeight ?? menuHeight(options);
     place = placeRowMenu(anchor.getBoundingClientRect(), { width: window.innerWidth, height: window.innerHeight }, height, { width, above });
   }
@@ -53,18 +54,20 @@
   function close(refocus = true) {
     if (closed) return;
     closed = true;
+    const target = anchor;
     onclose();
-    if (refocus) anchor.focus();
+    if (refocus) target.focus();
   }
 
   /** @param {string} chosen */
   function pick(chosen) {
     if (closed) return;
     closed = true;
+    const target = anchor;
     // The choice is applied first: the page forgets the row when the menu closes.
     if (chosen !== value) onselect(chosen);
     onclose();
-    anchor.focus();
+    target.focus();
   }
 
   function focusActive() {
@@ -90,8 +93,9 @@
   }
 
   onMount(() => {
-    anchor.classList.add('od-row-menu--anchored');
-    anchor.setAttribute('aria-expanded', 'true');
+    const target = anchor;
+    target.classList.add('od-row-menu--anchored');
+    target.setAttribute('aria-expanded', 'true');
     tick().then(() => {
       position();
       focusActive();
@@ -102,8 +106,8 @@
     const moved = () => position();
     window.addEventListener('resize', moved);
     return () => {
-      anchor.classList.remove('od-row-menu--anchored');
-      anchor.removeAttribute('aria-expanded');
+      target.classList.remove('od-row-menu--anchored');
+      target.removeAttribute('aria-expanded');
       el?.removeEventListener('od-cancel', cancel);
       window.removeEventListener('resize', moved);
     };
