@@ -135,7 +135,7 @@
 
     <div class="bc-desktop-account--group">
       <div class="bc-desktop-account--identity">
-        <span class="bc-desktop-account--avatar" aria-hidden="true">{initial}<span class="bc-desktop-account--avatar-plus">+</span></span>
+        <span class="bc-desktop-account--avatar" aria-hidden="true">{initial}</span>
         <span class="bc-desktop-account--texts">
           <span class="bc-desktop-account--name">{accountName}</span>
           {#if accountEmail}<span class="bc-desktop-account--email">{accountEmail}</span>{/if}
@@ -608,7 +608,6 @@
       padding: 16px 16px 12px;
     }
     .bc-desktop-account--avatar {
-      position: relative;
       flex: none;
       width: 48px;
       height: 48px;
@@ -619,23 +618,6 @@
       color: #FFFFFF;
       font-size: 20px;
       font-weight: 500;
-    }
-    .bc-desktop-account--avatar-plus {
-      position: absolute;
-      right: -2px;
-      bottom: -2px;
-      width: 18px;
-      height: 18px;
-      box-sizing: border-box;
-      border: 2px solid var(--bc-surface);
-      border-radius: 9px;
-      display: grid;
-      place-items: center;
-      background: var(--bc-account-chip);
-      color: var(--bc-account-chip-ink);
-      font-size: 13px;
-      line-height: 1;
-      font-weight: 700;
     }
     .bc-desktop-account--manage {
       align-self: flex-start;
