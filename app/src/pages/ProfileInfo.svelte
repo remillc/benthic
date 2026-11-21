@@ -133,7 +133,7 @@
       </div>
 
       <h2 class="bc-profile-info--section">{t('diverProfile.info.health')}</h2>
-      <div class="bc-profile-info--fields">
+      <div class="bc-profile-info--fields bc-profile-info--blood">
         <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} clearLabel={t('diverProfile.info.clearBlood')} supporting={t('diverProfile.info.bloodHint')} />
       </div>
       <div class="bc-profile-info--bottom"></div>
@@ -353,6 +353,10 @@
 
     .bc-profile-info--relation {
       width: min(100%, 272px);
+    }
+
+    .bc-profile-info--blood :global(.bc-select-field--box) {
+      width: min(100%, 192px);
     }
 
     .bc-profile-info--phone {

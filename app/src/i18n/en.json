@@ -2727,7 +2727,7 @@
       "Fixed a dive detail error at startup when a cloud logbook is open.",
       "Logbook on tablets: when dives are checked, detail actions move to the top ⋮ menu, which can delete the selection.",
       "Restore: a dive takes the missing number at its position; if none is available, later dives are shifted.",
-      "Information: the date of birth, relationship and phone fields are narrower.",
+      "Information: the date of birth, relationship, phone and blood group fields are narrower.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
