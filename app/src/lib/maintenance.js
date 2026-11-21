@@ -76,7 +76,7 @@ export const SOON_DIVES = 10;
 export const SUGGESTIONS = {
   // A dive computer has no reminder (task 2026-11-19-308).
   computer: [],
-  regulator: [{ task: 'service', months: 24, dives: 100 }],
+  regulator: [{ task: 'service', months: 12, dives: 100 }],
   suit: [{ task: 'seals', months: 12 }],
   cylinder: [
     { task: 'inspection', months: 12 },

@@ -98,9 +98,7 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 });
 
 test('suggestions per type, and the rule fields are validated', () => {
-  // Decided 19 November 2026 (task 309, docs/equipment-fields.md): the suggested service of a regulator is every 2
-  // years or 100 dives (18 November had said yearly); a vest every year (it was every 2 years).
-  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 24, dives: 100 });
+  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12, dives: 100 });
   assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
   // Only a drysuit has seals to change.
   assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }]);
