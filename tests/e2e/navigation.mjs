@@ -1117,6 +1117,29 @@ async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
   await tab.run(() => !!document.querySelector('.bc-desktop-logbook--table'));
+  const separator = await tab.run(() => {
+    const row = document.querySelector('.bc-desktop-logbook--row:has(+ .bc-desktop-logbook--row)');
+    const cells = [...(row?.querySelectorAll('td') ?? [])];
+    const color = getComputedStyle(document.documentElement).getPropertyValue('--bc-separator').trim();
+    const probe = document.createElement('span');
+    probe.style.color = color;
+    document.body.append(probe);
+    const expectedColor = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      visible: cells.length > 0 && cells.every((cell) => {
+        const style = getComputedStyle(cell);
+        const width = parseFloat(style.borderBottomWidth);
+        return width > 0 && width <= 1 && style.borderBottomColor === expectedColor;
+      }),
+      height: row?.getBoundingClientRect().height,
+    };
+  });
+  checks++;
+  if (!separator.visible || separator.height !== 48) {
+    failures.push({ label: 'desktop dive separators', problems: ['separator or row height is incorrect'], separator });
+    console.log('  FAIL desktop dive separators', separator);
+  } else console.log('  ok   desktop dive separators');
   const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
   await open('/settings/');
   await sleep(1200);

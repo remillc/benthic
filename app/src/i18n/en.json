@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop logbook: a grey line separates dives.",
       "Deleting dives automatically shifts the numbers of later dives.",
       "Fixed a dive detail error at startup when a cloud logbook is open.",
       "Logbook on tablets: when dives are checked, detail actions move to the top ⋮ menu, which can delete the selection.",
