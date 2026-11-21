@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Android tablets: the Account icon in the navigation rail is larger.",
       "Desktop logbook: rename the displayed logbook from the Logbook menu without changing its file.",
       "Tablet logbook: the dive list is slightly wider in landscape.",
       "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
